@@ -3822,4 +3822,121 @@ CREATE TABLE IF NOT EXISTS hstEXCEPTION (
   UNIQUE KEY (name(50), filename(255), line)
 ) TYPE=MyISAM;
 
+-- tables for BibAuthorID module:
+
+CREATE TABLE IF NOT EXISTS `aidPERSONID` (
+  `id` bigint(15) NOT NULL AUTO_INCREMENT,
+  `personid` bigint(15) NOT NULL,
+  `tag` varchar(50) NOT NULL,
+  `data` varchar(250) NOT NULL,
+  `flag` int NOT NULL DEFAULT '0',
+  `lcul` int NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  INDEX `personid-b` (`personid`),
+  INDEX `tag-b` (`tag`),
+  INDEX `data-b` (`data`),
+  INDEX `flag-b` (`flag`)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `aidUSERINPUTLOG` (
+  `id` bigint(15) NOT NULL AUTO_INCREMENT,
+  `transactionid` bigint(15) NOT NULL,
+  `timestamp` datetime NOT NULL,
+  `userinfo` varchar(255) NOT NULL,
+  `personid` bigint(15) NOT NULL,
+  `action` varchar(50) NOT NULL,
+  `tag` varchar(50) NOT NULL,
+  `value` varchar(200) NOT NULL,
+  `comment` text,
+  PRIMARY KEY (`id`),
+  INDEX `transactionid-b` (`transactionid`),
+  INDEX `timestamp-b` (`timestamp`),
+  INDEX `userinfo-b` (`userinfo`),
+  INDEX `personid-b` (`personid`),
+  INDEX `action-b` (`action`),
+  INDEX `tag-b` (`tag`),
+  INDEX `value-b` (`value`)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `aidAUTHORNAMES` (
+  `id` bigint(15) NOT NULL auto_increment,
+  `Name` varchar(255) NOT NULL,
+  `bibrefs` varchar(200) NOT NULL,
+  `db_name` varchar(255),
+  PRIMARY KEY  (`id`),
+  INDEX `Name-b` (`Name`),
+  INDEX `db_Name-b` (`db_name`),
+  INDEX `bibrefs-b` (`bibrefs`)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `aidAUTHORNAMESBIBREFS` (
+  `id` bigint(15) NOT NULL auto_increment,
+  `Name_id` bigint(15) NOT NULL,
+  `bibref` varchar(200) NOT NULL,
+  PRIMARY KEY  (`id`),
+  INDEX `Name_id-b` (`Name_id`),
+  INDEX `bibref-b` (`bibref`)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `aidDOCLIST` (
+  `id` bigint(15) NOT NULL auto_increment,
+  `bibrecID` bigint(15) NOT NULL,
+  `processed_author` bigint(15) default NULL,
+  PRIMARY KEY  (`id`),
+  INDEX `bibrecID-b` (`bibrecID`),
+  INDEX `processed_author-b` (`processed_author`)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `aidREALAUTHORS` (
+  `id` bigint(15) NOT NULL auto_increment,
+  `realauthorID` bigint(15) NOT NULL,
+  `virtualauthorID` bigint(15) NOT NULL,
+  `p` float NOT NULL,
+  PRIMARY KEY  (`id`),
+  INDEX `realauthorID-b` (`realauthorID`),
+  INDEX `virtualauthorID-b` (`virtualauthorID`)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `aidREALAUTHORDATA` (
+  `id` bigint(15) NOT NULL auto_increment,
+  `realauthorID` bigint(15) NOT NULL,
+  `tag` varchar(50) NOT NULL,
+  `value` varchar(255) NOT NULL,
+  `va_count` int(8) NOT NULL default '0',
+  `va_names_p` double NOT NULL default '0' COMMENT 'Summed VA-Names probability',
+  `va_p` double NOT NULL default '0' COMMENT 'Summed VA probabilities',
+  PRIMARY KEY  (`id`),
+  INDEX `realauthorID-b` (`realauthorID`,`tag`),
+  INDEX `value-b` (`value`),
+  INDEX `tag-b` (`tag`)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `aidVIRTUALAUTHORS` (
+  `id` bigint(15) NOT NULL auto_increment,
+  `virtualauthorID` bigint(15) NOT NULL,
+  `authornamesID` bigint(15) NOT NULL,
+  `p` float NOT NULL,
+  `clusterID` bigint(15) NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  INDEX `authornamesID-b` (`authornamesID`),
+  INDEX `clusterID-b` (`clusterID`),
+  INDEX `virtualauthorID-b` (`virtualauthorID`)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `aidVIRTUALAUTHORSDATA` (
+  `id` bigint(15) NOT NULL auto_increment,
+  `virtualauthorID` bigint(15) NOT NULL,
+  `tag` varchar(255) NOT NULL,
+  `value` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id`),
+  INDEX `tag-b` (`tag`),
+  INDEX `value-b` (`value`)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `aidVIRTUALAUTHORSCLUSTERS` (
+  `id` int(15) NOT NULL auto_increment,
+  `cluster_name` varchar(60) NOT NULL,
+  PRIMARY KEY  (`id`)
+) TYPE=MyISAM;
+
 -- end of file

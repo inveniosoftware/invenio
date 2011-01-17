@@ -26,6 +26,14 @@ img_DATA = add-small.png \
            arrow_up.gif \
            arrow_up2.png \
            at.gif \
+           aid_check_gray.png \
+           aid_check.png \
+           aid_reject_gray.png \
+           aid_reject.png \
+           aid_reset_gray.png \
+           aid_reset.png \
+           minus-9x9.png \
+           plus-9x9.png \
            balloon_arrow_left_shadow.png \
            balloon_bottom_left_shadow.png \
            balloon_bottom_shadow.png \

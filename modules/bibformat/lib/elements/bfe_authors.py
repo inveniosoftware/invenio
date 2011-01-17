@@ -24,8 +24,8 @@ def format_element(bfo, limit, separator=' ; ',
            extension='[...]',
            print_links="yes",
            print_affiliations='no',
-           affiliation_prefix = ' (',
-           affiliation_suffix = ')',
+           affiliation_prefix=' (',
+           affiliation_suffix=')',
            interactive="no",
            highlight="no"):
     """
@@ -57,6 +57,8 @@ def format_element(bfo, limit, separator=' ; ',
 
     nb_authors = len(authors)
 
+    bibrec_id = bfo.control_field("001")
+
     # Process authors to add link, highlight and format affiliation
     for author in authors:
 
@@ -67,10 +69,17 @@ def format_element(bfo, limit, separator=' ; ',
                                                         bfo.search_pattern)
 
             if print_links.lower() == "yes":
-                author['a'] = '<a href="' + CFG_SITE_URL + \
-                              '/search?f=author&amp;p='+ quote(author['a']) + \
-                              '&amp;ln='+ bfo.lang + \
-                              '">'+escape(author['a'])+'</a>'
+                if True: # FIXME: /author/123:Ellis is not a user-friendly default
+                    author['a'] = '<a href="' + CFG_SITE_URL + \
+                                  '/search?f=author&amp;p=' + quote(author['a']) + \
+                                  '&amp;ln=' + bfo.lang + \
+                                  '">' + escape(author['a']) + '</a>'
+                else:
+                    author['a'] = '<a href="' + CFG_SITE_URL + \
+                                  '/author/' + bibrec_id + ':' + \
+                                  quote(author['a']) + \
+                                  '&ln=' + bfo.lang + \
+                                  '">' + escape(author['a']) + '</a>'
 
         if author.has_key('u'):
             if print_affiliations == "yes":
@@ -114,7 +123,7 @@ def format_element(bfo, limit, separator=' ; ',
         }
 
         </script>
-        '''%{'show_less':_("Hide"),
+        ''' % {'show_less':_("Hide"),
              'show_more':_("Show all %i authors") % nb_authors,
              'extension':extension}
 

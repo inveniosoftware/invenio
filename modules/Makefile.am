@@ -15,6 +15,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = bibcatalog bibcheck bibcirculation bibclassify bibconvert bibedit bibexport bibharvest bibknowledge bibmatch bibmerge bibsched bibsword bibindex bibrank bibupload bibformat elmsubmit miscutil webstyle websession webhelp webbasket webalert websearch websubmit webaccess webmessage webstat webcomment webjournal
+SUBDIRS = bibauthorid bibcatalog bibcheck bibcirculation bibclassify bibconvert bibedit bibexport bibharvest bibknowledge bibmatch bibmerge bibsched bibsword bibindex bibrank bibupload bibformat elmsubmit miscutil webstyle websession webhelp webbasket webalert websearch websubmit webaccess webmessage webstat webcomment webjournal
 
 CLEANFILES = *~

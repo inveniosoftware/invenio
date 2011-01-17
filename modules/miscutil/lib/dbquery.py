@@ -144,7 +144,6 @@ def run_sql(sql, param=None, n=0, with_desc=0):
         the Python DB API 2.0.  The client code can import them from
         this file and catch them.
     """
-
     if CFG_ACCESS_CONTROL_LEVEL_SITE == 3:
         # do not connect to the database as the site is closed for maintenance:
         return []

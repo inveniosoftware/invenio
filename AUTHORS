@@ -71,9 +71,13 @@ The CERN development team currently consists of:
  - Roman Chyla <roman.chyla@cern.ch>
      WSGI handler accepts UTF-8 strings.
 
+ - Henning Weiler <henning.weiler@cern.ch>
+     Initial implementation of BibAuthorID module, with Samuele Carli.
+
  - Samuele Carli <samuele.carli@cern.ch>
-     Fixes for basket export facility and adding external items to
-     baskets.
+     Initial implementation of BibAuthorID module, with Henning
+     Weiler.  Fixes for basket export facility and adding external
+     items to baskets.
 
  - Tony Ohls <tony.ohls@cern.ch>
      Fixes for regexp treatment in BibConvert.

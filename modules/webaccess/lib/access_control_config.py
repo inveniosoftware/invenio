@@ -36,16 +36,16 @@ class InvenioWebAccessFireroleError(Exception):
 # CURRENTLY USED BY THE FILES access_control_engine.py access_control_admin.py webaccessadmin_lib.py
 
 # name of the role giving superadmin rights
-SUPERADMINROLE      = 'superadmin'
+SUPERADMINROLE = 'superadmin'
 
 # name of the webaccess webadmin role
-WEBACCESSADMINROLE  = 'webaccessadmin'
+WEBACCESSADMINROLE = 'webaccessadmin'
 
 # name of the action allowing roles to access the web administrator interface
-WEBACCESSACTION     = 'cfgwebaccess'
+WEBACCESSACTION = 'cfgwebaccess'
 
 # name of the action allowing roles to access the web administrator interface
-VIEWRESTRCOLL     = 'viewrestrcoll'
+VIEWRESTRCOLL = 'viewrestrcoll'
 
 
 # name of the action allowing roles to delegate the rights to other roles
@@ -130,7 +130,9 @@ DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights', 'deny any'),
              ('alertusers', 'Users who can use alerts', 'allow any'),
              ('messageusers', 'Users who can use messages', 'allow any'),
              ('holdingsusers', 'Users who can view holdings', 'allow any'),
-             ('statisticsusers', 'Users who can view statistics', 'allow any'))
+             ('statisticsusers', 'Users who can view statistics', 'allow any'),
+             ('claimpaperusers', 'Users who can use Claim This Paper', 'allow any'),
+             ('claimpaperoperators', 'Users (librarians) who can operate Claim This Paper facility and resolve conflicts', 'deny any'))
 
 # Demo site roles
 DEF_DEMO_ROLES = (('photocurator', 'Photo collection curator', 'deny any'),
@@ -195,12 +197,12 @@ DEF_ACTIONS = (
                ('runwebstatadmin', 'run WebStadAdmin', '', 'no'),
                ('runinveniogc', 'run InvenioGC', '', 'no'),
                ('runbibexport', 'run BibExport', '', 'no'),
-               ('referee', 'referee document type doctype/category categ', 'doctype,categ',    'yes'),
+               ('referee', 'referee document type doctype/category categ', 'doctype,categ', 'yes'),
                ('submit', 'use webSubmit', 'doctype,act,categ', 'yes'),
                ('viewrestrdoc', 'view restricted document', 'status', 'no'),
                ('viewrestrcomment', 'view restricted comment', 'status', 'no'),
                (WEBACCESSACTION, 'configure WebAccess', '', 'no'),
-               (DELEGATEADDUSERROLE, 'delegate subroles inside WebAccess', 'role',          'no'),
+               (DELEGATEADDUSERROLE, 'delegate subroles inside WebAccess', 'role', 'no'),
                (VIEWRESTRCOLL, 'view restricted collection', 'collection', 'no'),
                ('cfgwebjournal', 'configure WebJournal', 'name,with_editor_rights', 'no'),
                ('viewcomment', 'view comments', 'collection', 'no'),
@@ -218,7 +220,12 @@ DEF_ACTIONS = (
                ('viewstatistics', 'view statistics', 'collection', 'yes'),
                ('runbibcirculation', 'run BibCirculation', '', 'no'),
                ('moderatecomments', 'moderate comments', 'collection', 'no'),
-               ('runbatchuploader', 'run batchuploader', 'collection', 'yes')
+               ('runbatchuploader', 'run batchuploader', 'collection', 'yes'),
+               ('claimpaper_view_pid_universe', 'View the Claim Paper interface', '', 'no'),
+               ('claimpaper_claim_own_papers', 'Clam papers to his own personID', '', 'no'),
+               ('claimpaper_claim_others_papers', 'Claim papers for others', '', 'no'),
+               ('claimpaper_change_own_data', 'Change data associated to his own person ID', '', 'no'),
+               ('claimpaper_change_others_data', 'Change data of any person ID', '', 'no')
               )
 
 # Default authorizations
@@ -229,7 +236,16 @@ DEF_AUTHS = (('basketusers', 'usebaskets', {}),
              ('alertusers', 'usealerts', {}),
              ('messageusers', 'usemessages', {}),
              ('holdingsusers', 'viewholdings', {}),
-             ('statisticsusers', 'viewstatistics', {}))
+             ('statisticsusers', 'viewstatistics', {}),
+             ('claimpaperusers', 'claimpaper_view_pid_universe', {}),
+             ('claimpaperoperators', 'claimpaper_view_pid_universe', {}),
+             ('claimpaperusers', 'claimpaper_claim_own_papers', {}),
+             ('claimpaperoperators', 'claimpaper_claim_own_papers', {}),
+             ('claimpaperoperators', 'claimpaper_claim_others_papers', {}),
+             ('claimpaperusers', 'claimpaper_change_own_data', {}),
+             ('claimpaperoperators', 'claimpaper_change_own_data', {}),
+             ('claimpaperoperators', 'claimpaper_change_others_data', {})
+             )
 
 # Demo site authorizations
 #              role          action        arguments
@@ -276,7 +292,8 @@ CFG_ACC_ACTIVITIES_URLS = {
     'cfgwebsubmit' : (_("Configure WebSubmit"), "%s/admin/websubmit/websubmitadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgwebjournal' : (_("Configure WebJournal"), "%s/admin/webjournal/webjournaladmin.py?ln=%%s" % CFG_SITE_URL),
     'runbibcirculation' : (_("Run BibCirculation"), "%s/admin/bibcirculation/bibcirculationadmin.py?ln=%%s" % CFG_SITE_URL),
-    'runbatchuploader' : (_("Run Batch Uploader"), "%s/batchuploader/metadata?ln=%%s" % CFG_SITE_URL)
+    'runbatchuploader' : (_("Run Batch Uploader"), "%s/batchuploader/metadata?ln=%%s" % CFG_SITE_URL),
+    'claimpaper_claim_others_papers' : (_("Run Person/Author Manager"), "%s/person/search?ln=%%s" % CFG_SITE_URL)
 }
 
 CFG_WEBACCESS_MSGS = {

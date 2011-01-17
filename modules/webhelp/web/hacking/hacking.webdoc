@@ -60,6 +60,10 @@ wiki</a>.</p>
 <blockquote>
 <dl>
 
+<dt><a href="bibauthorid-internals">BibAuthorID Internals</a></dt>
+<dd>Describes information useful to understand how BibAuthorID works.
+</dd>
+
 <dt><a href="bibclassify-internals">BibClassify Internals</a></dt>
 <dd>Describes information useful to understand how BibClassify works,
 the taxonomy extensions we use, how the keyword extraction algorithm works.
