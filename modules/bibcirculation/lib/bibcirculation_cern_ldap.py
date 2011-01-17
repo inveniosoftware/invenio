@@ -20,7 +20,7 @@
 from invenio.config import CFG_CERN_SITE
 try:
     import ldap
-    from invenio.external_authentication_cern_wrapper import _cern_nice_soap_auth
+    #from invenio.external_authentication_cern_wrapper import _cern_nice_soap_auth
     CFG_BIBCIRCULATION_HAS_LDAP = CFG_CERN_SITE
 except (ImportError, IOError):
     CFG_BIBCIRCULATION_HAS_LDAP = False
@@ -28,25 +28,38 @@ except (ImportError, IOError):
 from thread import get_ident
 from base64 import decodestring
 
-CFG_CERN_LDAP_URI = "ldaps://ldap.cern.ch:636"
-CFG_CERN_LDAP_BIND = "n=%s,ou=users,o=cern,c=ch"
-CFG_CERN_LDAP_BASE = "O=CERN,C=CH"
+# This is the old configuration
+# CFG_CERN_LDAP_URI  = "ldaps://ldap.cern.ch:636"
+# CFG_CERN_LDAP_BIND = "n=%s,ou=users,o=cern,c=ch"
+# CFG_CERN_LDAP_BASE = "O=CERN,C=CH"
+
+
+CFG_CERN_LDAP_URI  = "ldap://xldap.cern.ch:389"
+# CFG_CERN_LDAP_BIND = "n=%s,ou=users,o=cern,c=ch"
+CFG_CERN_LDAP_BASE = "ou=users,ou=organic units,dc=cern,dc=ch"
+
+# This one also works but the previous one is recommended
+# CFG_CERN_LDAP_URI  = "ldap://ldap.cern.ch"
+# CFG_CERN_LDAP_BIND = "cn=%s,ou=users,ou=organic units,dc=cern,dc=ch"
+# CFG_CERN_LDAP_BASE = "O=CERN,C=CH"
 
 _ldap_connection_pool = {}
 
 def _cern_ldap_login():
-    user, password = decodestring(_cern_nice_soap_auth).split(':', 1)
+    #user, password = decodestring(_cern_nice_soap_auth).split(':', 1)
     connection = ldap.initialize(CFG_CERN_LDAP_URI)
-    connection.simple_bind(CFG_CERN_LDAP_BIND % user, password)
+    #connection.simple_bind(CFG_CERN_LDAP_BIND % user, password)
     return connection
 
 def get_user_info_from_ldap(nickname="", email="", ccid=""):
     """Query the CERN LDAP server for information about a user.
     Return a dictionary of information"""
+
     try:
         connection = _ldap_connection_pool[get_ident()]
     except KeyError:
         connection = _ldap_connection_pool[get_ident()] = _cern_ldap_login()
+
     if nickname:
         query = '(displayName=%s)' % nickname
     elif email:
@@ -55,6 +68,7 @@ def get_user_info_from_ldap(nickname="", email="", ccid=""):
         query = '(employeeID=%s)' % ccid
     else:
         return {}
+
     try:
         result = connection.search_st(CFG_CERN_LDAP_BASE, ldap.SCOPE_SUBTREE, query, timeout=5)
         if result and nickname:
@@ -66,4 +80,5 @@ def get_user_info_from_ldap(nickname="", email="", ccid=""):
                 return {}
     except:
         return 'busy'
+
     return {}

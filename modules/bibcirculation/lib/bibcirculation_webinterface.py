@@ -242,7 +242,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
 
         argd = wash_urlargd(form, {'title': (str, None), 'authors': (str, None),
             'place': (str, None), 'publisher': (str, None), 'year': (str, None),
-            'edition': (str, None), 'isbn': (str, None), 'budget_code': (str, None),
+            'edition': (str, None), 'isbn': (str, None), 'budget_code': (str, ''),
             'period_of_interest_from': (str, None), 'period_of_interest_to': (str, None),
             'additional_comments': (str, None), 'only_edition': (str, 'No'),'ln': (str, "en")})
 
@@ -268,16 +268,26 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         #else:
         #    borrower_id = borrower_id.strip()
 
-        title = title.strip()
-        authors = authors.strip()
-        place = place.strip()
-        publisher = publisher.strip()
-        year = year.strip()
-        edition =  edition.strip()
-        isbn = isbn.strip()
-        budget_code = budget_code.strip()
-        period_of_interest_from = period_of_interest_from.strip()
-        period_of_interest_to = period_of_interest_to.strip()
+        if title is not None:
+            title = title.strip()
+        if authors is not None:
+            authors = authors.strip()
+        if place is not None:
+            place = place.strip()
+        if publisher is not None:
+            publisher = publisher.strip()
+        if year is not None:
+            year = year.strip()
+        if edition is not None:
+            edition =  edition.strip()
+        if isbn is not None:
+            isbn = isbn.strip()
+        if budget_code is not None:
+            budget_code = budget_code.strip()
+        if period_of_interest_from is not None:
+            period_of_interest_from = period_of_interest_from.strip()
+        if period_of_interest_to is not None:
+            period_of_interest_to = period_of_interest_to.strip()
         #string = string.strip()
 
         # Check if user is logged
@@ -341,7 +351,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'title': (str, None), 'authors': (str, None),
             'place': (str, None), 'publisher': (str, None), 'year': (str, None),
             'edition': (str, None), 'isbn': (str, None), 'borrower_id': (str, None),
-            'budget_code': (str, None), 'period_of_interest_from': (str, None),
+            'budget_code': (str, ''), 'period_of_interest_from': (str, None),
             'period_of_interest_to': (str, None), 'additional_comments': (str, None),
             'only_edition': (str, None), 'ln': (str, "en")})
 
@@ -453,7 +463,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
             body = bibcirculation_templates.tmpl_register_ill_article_request_step1([], False, argd['ln'])
 
 
-        return page(title       = _("Interlibrary loan request for books"),
+        return page(title       = _("Interlibrary loan request for articles"),
                     body        = body,
                     uid         = uid,
                     lastupdated = __lastupdated__,
@@ -471,7 +481,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'periodical_title': (str, None), 'article_title': (str, None),
             'author': (str, None), 'report_number': (str, None), 'volume': (str, None),
             'issue': (str, None), 'page': (str, None), 'year': (str, None),
-            'budget_code': (str, None), 'issn': (str, None),
+            'budget_code': (str, ''), 'issn': (str, None),
             'period_of_interest_from': (str, None), 'period_of_interest_to': (str, None),
             'additional_comments': (str, None), 'key': (str, None), 'string': (str, None),
             'ln': (str, "en")})
@@ -627,7 +637,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'do': (str, "od"),
                                    'ds': (str, "all"),
                                    'nb': (int, 100),
-                                   'p': (int, 1),
+                                   'p' : (int, 1),
                                    'voted': (int, -1),
                                    'reported': (int, -1),
                                    })
@@ -671,9 +681,8 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                 text = auth_msg)
 
 
-        unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
-                                                    self.recid,
-                                                    ln=argd['ln'])
+        unordered_tabs = get_detailed_page_tabs(get_colID(\
+                    guess_primary_collection_of_a_record(self.recid)), self.recid, ln=argd['ln'])
         ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
         ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
         link_ln = ''
@@ -882,8 +891,6 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                               websearch_templates.tmpl_search_pageend(argd['ln']) + \
                               pagefooteronly(lastupdated=__lastupdated__,
                               language=argd['ln'], req=req)
-
-
 
 
     def ill_request_with_recid(self, req, form):

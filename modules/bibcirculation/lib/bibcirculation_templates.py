@@ -28,19 +28,24 @@ import cgi
 from invenio.urlutils import create_html_link
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, \
      CFG_CERN_SITE, CFG_SITE_SECURE_URL
+
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL, \
-                                          CFG_BIBCIRCULATION_ITEM_STATUS
+                                          CFG_BIBCIRCULATION_ITEM_STATUS, \
+                                          CFG_BIBCIRCULATION_ITEM_LOAN_PERIOD, \
+                                          CFG_BIBCIRCULATION_COLLECTION, \
+                                          CFG_BIBCIRCULATION_LIBRARY_TYPE
 from invenio.messages import gettext_set_language
 
 import invenio.bibcirculation_dblayer as db
+from invenio.search_engine import get_fieldvalues
 from invenio.bibcirculation_utils import get_book_cover, \
       book_information_from_MARC, \
       book_title_from_MARC, \
       renew_loan_for_X_days, \
       get_item_info_for_search_result, \
       all_copies_are_missing, \
-      has_copies
-
+      has_copies, \
+      is_periodical
 
 
 def load_menu(ln=CFG_SITE_LANG):
@@ -89,7 +94,9 @@ def load_menu(ln=CFG_SITE_LANG):
             <li><a href="%(url)s/admin2/bibcirculation/get_pending_requests">%(Items_on_shelf_with_holds)s</a></li>
             <li><a href="%(url)s/admin2/bibcirculation/get_waiting_requests">%(Items_on_loan_with_holds)s</a></li>
             <li><a href="%(url)s/admin2/bibcirculation/get_expired_loans_with_requests">%(Overdue_loans_with_holds)s</a></li>
+        <!--
             <li><a href="%(url)s/admin2/bibcirculation/ordered_books">%(Ordered_books)s</a></li>
+        -->
         </ul>
     </li>
 
@@ -238,7 +245,7 @@ class Template:
 
             out = """<div align="center"
                      <div class="bibcircinfoboxmsg">
-                    All the copies of <strong>%s</strong> are missing.You can request a copy using <strong>%s</strong>.
+                    All the copies of <strong>%s</strong> are missing. You can request a copy using <strong>%s</strong>.
                       </div>""" % (book_title_from_MARC(recid), ill_link)
 
             return out
@@ -252,18 +259,50 @@ class Template:
             return out
 
         out = """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <script src="/js/jquery.js" type="text/javascript"></script>
-            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+            <style type="text/css">
+                @import url("/js/tablesorter/themes/blue/style.css");
+            </style>
+            <style type="text/css">
+                @import url("/js/tablesorter/addons/pager/jquery.tablesorter.pager.css");
+            </style>
+
+            <script src="/js/jquery.min.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/addons/pager/jquery.tablesorter.pager.js"
+                    type="text/javascript"></script>
             <script type="text/javascript">
-            $(document).ready(function() {
-              $('#table_holdings').tablesorter({widthFixed: true, widgets: ['zebra']})
+            """
+
+        if is_periodical(recid):
+            out += """
+            $(document).ready(function(){
+                $("#table_holdings")
+                    .tablesorter({sortList: [[4,1]],
+                                widthFixed: true,
+                                   widgets: ['zebra']})
+                    .bind("sortStart",function(){$("#overlay").show();})
+                    .bind("sortEnd",function(){$("#overlay").hide()})
+                    .tablesorterPager({container: $("#pager"), positionFixed: false});
             });
             </script>
-        """
+            """
+        else:
+            out += """
+            $(document).ready(function(){
+                $("#table_holdings")
+                    .tablesorter({sortList: [[6,1],[1,0]],
+                                widthFixed: true,
+                                   widgets: ['zebra']})
+                    .bind("sortStart",function(){$("#overlay").show();})
+                    .bind("sortEnd",function(){$("#overlay").hide()})
+                    .tablesorterPager({container: $("#pager"), positionFixed: false});
+            });
+            </script>
+            """
 
         out += """
-                   <table id="table_holdings" class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                <table id="table_holdings" class="tablesorter" border="0"
+                                           cellpadding="0" cellspacing="1">
                    <thead>
                    <tr>
                    <th>%s</th>
@@ -278,14 +317,14 @@ class Template:
                    </tr>
                    </thead>
                    <tbody>
-                   """ % (_("Options"), _("Library"), _("Collection"),
-                          _("Location"), _("Description"), _("Loan period"),
-                          _("Status"), _("Due date"), _("Barcode"))
+                """ % (_("Options"),  _("Library"),     _("Collection"),
+                       _("Location"), _("Description"), _("Loan period"),
+                       _("Status"),   _("Due date"),    _("Barcode"))
 
         for (barcode, library, collection, location, description,
              loan_period, status, due_date) in holdings_info:
 
-            if loan_period in ('Not for loan', 'reference'):
+            if loan_period == 'Reference':
                 request_button = '-'
             else:
                 request_button = """
@@ -294,7 +333,7 @@ class Template:
                 onmouseout="this.className='bibcircbutton'">
                 """ % (CFG_SITE_URL, recid, barcode, _("Request"))
 
-            if status == 'on order':
+            if status in ('on order', 'claimed'):
                 expected_arrival_date = db.get_expected_arrival_date(barcode)
                 if expected_arrival_date != '':
                     status = status + ' - ' + expected_arrival_date
@@ -331,6 +370,22 @@ class Template:
         out += """
             </tbody>
            </table>
+           <div id="pager" class="pager">
+                        <form>
+                            <br />
+                            <img src="/img/sb.gif" class="first" />
+                            <img src="/img/sp.gif" class="prev" />
+                            <input type="text" class="pagedisplay" />
+                            <img src="/img/sn.gif" class="next" />
+                            <img src="/img/se.gif" class="last" />
+                            <select class="pagesize">
+                                <option value="10" selected="selected">10</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                                <option value="40">40</option>
+                            </select>
+                        </form>
+                    </div>
            <br />
            <br />
            <table class="bibcirctable">
@@ -384,6 +439,34 @@ class Template:
                               "Please contact " + CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
 
         return message
+
+    def tmpl_display_infos(self, infos, ln=CFG_SITE_LANG):
+        """
+        Returns a page where the only content are infoboxes.
+
+        @param infos: messages to be displayed
+        @type infos: list
+
+        @param ln: language
+        """
+
+        _ = gettext_set_language(ln)
+
+        out = load_menu(ln)
+        out += """ <br /> """
+
+        if type(infos) is not list or len(infos) == 0:
+            out += """<div class="infobox">"""
+            out += _("No messages to be displayed")
+            out += """</div> <br /> """
+        else:
+            for info in infos:
+                out += """<div class="infobox">"""
+                out += info
+                out += """</div> <br /> """
+
+        return out
+
 
     def tmpl_borrower_search_result(self, result, redirect='no', ln=CFG_SITE_LANG):
         """
@@ -958,11 +1041,16 @@ class Template:
         <td><input type=button onClick="location.href='%s'" value='%s' class='formbutton'></td>
         </table>
         <br /> <br />
+        #"" % (message,
+        #       _("You can see your loans "),
+        #       CFG_SITE_URL + '/yourloans/display',
+        #       _("here"),
+        #       _("."),
+        #       CFG_SITE_URL,
+        #       _("Back to home"))
+
         """ % (message,
-               _("You can see your loans "),
-               CFG_SITE_URL + '/yourloans/display',
-               _("here"),
-               _("."),
+               _("You can see your loans %(x_url_open)shere%(x_url_close)s." % {'x_url_open': '<a href="' + CFG_SITE_URL + '/yourloans/display' + '">','x_url_close': '</a>'}),
                CFG_SITE_URL,
                _("Back to home"))
 
@@ -1010,13 +1098,19 @@ class Template:
         out = load_menu(ln)
 
         out += """
-            <style type="text/css"> @import url("/js/tablesorter/themes/blue/style.css"); </style>
-            <style type="text/css"> @import url("/js/tablesorter/addons/pager/jquery.tablesorter.pager.css"); </style>
+            <style type="text/css">
+                @import url("/js/tablesorter/themes/blue/style.css");
+            </style>
+            <style type="text/css">
+                @import url("/js/tablesorter/addons/pager/jquery.tablesorter.pager.css");
+            </style>
 
             <script src="/js/jquery.min.js" type="text/javascript"></script>
             <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
-            <script src="/js/tablesorter/addons/pager/jquery.tablesorter.pager.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/addons/pager/jquery.tablesorter.pager.js"
+                    type="text/javascript"></script>
             <script type="text/javascript">
+
             $(document).ready(function(){
                 $("#table_all_loans")
                     .tablesorter({sortList: [[4,0], [0,0]],widthFixed: true, widgets: ['zebra']})
@@ -1025,11 +1119,12 @@ class Template:
                     .tablesorterPager({container: $("#pager"), positionFixed: false});
             });
             </script>
+
             <script type="text/javascript">
                 function confirmation(rqid) {
                   var answer = confirm("Delete this request?")
                   if (answer){
-                    window.location = "%s/admin2/bibcirculation/get_pending_requests?request_id="+rqid;
+            window.location = "%s/admin2/bibcirculation/get_pending_requests?request_id="+rqid;
                     }
                   else{
                     alert("Request not deleted.")
@@ -1079,18 +1174,22 @@ class Template:
                        <th>%s</th>
                        <th>%s</th>
                        <th>%s</th>
+                       <th>%s</th>
+                       <th>%s</th>
                     </tr>
               </thead>
               <tbody>
-                       """%  (CFG_SITE_URL,
-                              _("Name"),
-                              _("Item"),
-                              _('Library'),
-                              _("Location"),
-                              _("From"),
-                              _("To"),
-                              _("Request date"),
-                              _("Actions"))
+                    """ % ( CFG_SITE_URL,
+                            _("Name"),
+                            _("Item"),
+                            _('Library'),
+                            _("Location"),
+                            _("Vol."),
+                            _("Ed."),
+                            _("From"),
+                            _("To"),
+                            _("Request date"),
+                            _("Actions") )
 
             for (request_id, recid, name, borrower_id, library, location,
                  date_from, date_to, request_date) in result:
@@ -1105,10 +1204,26 @@ class Template:
                                              {'borrower_id': borrower_id, 'ln': ln},
                                              (name))
 
+                volume = get_fieldvalues(recid, "773__v")
+
+                if volume == []:
+                    volume = ''
+                else:
+                    volume = volume[0]
+
+                edition = get_fieldvalues(recid, "250__a")
+
+                if edition == []:
+                    edition = ''
+                else:
+                    edition = edition[0]
+
                 out += """
                 <tr>
                  <td width='150'>%s</td>
                  <td width='250'>%s</td>
+                 <td>%s</td>
+                 <td>%s</td>
                  <td>%s</td>
                  <td>%s</td>
                  <td>%s</td>
@@ -1132,6 +1247,8 @@ class Template:
                        title_link,
                        library,
                        location,
+                       volume,
+                       edition,
                        date_from,
                        date_to,
                        request_date,
@@ -1267,6 +1384,20 @@ class Template:
                _("Request date"),
                _("Options"))
 
+            out += """
+                <script type="text/javascript">
+                    function confirmation(rqid) {
+                        var answer = confirm("Delete this request?")
+                        if (answer){
+                window.location = "%s/admin2/bibcirculation/get_waiting_requests?request_id="+rqid;
+                        }
+                        else{
+                            alert("Request not deleted.")
+                        }
+                    }
+                </script>
+                """ % (CFG_SITE_URL)
+
             for (request_id, recid, name, borrower_id, library, location,
                  date_from, date_to, request_date) in result:
 
@@ -1281,17 +1412,6 @@ class Template:
                                              (name))
 
                 out += """
-                <script type="text/javascript">
-                function confirmation() {
-                  var answer = confirm("Delete this request?")
-                  if (answer){
-                    window.location = "%s/admin2/bibcirculation/get_pending_requests?request_id=%s";
-                    }
-                  else{
-                    alert("Request not deleted.")
-                    }
-                 }
-                </script>
                 <tr>
                  <td>%s</td>
                  <td>%s</td>
@@ -1303,16 +1423,14 @@ class Template:
                  <td align="center">
                  <input type="button" value='%s' style="background: url(/img/dialog-cancel.png)
                  no-repeat; width: 75px; text-align: right;"
-                 onClick="confirmation()"
+                 onClick="confirmation(%s)"
                  class="bibcircbutton">
 
                  <input type=button type=button style="background: url(/img/dialog-yes.png) no-repeat; width: 150px; text-align: right;" onClick="location.href='%s/admin2/bibcirculation/associate_barcode?request_id=%s&recid=%s&borrower_id=%s'"
                  value='%s' class="bibcircbutton">
                  </td>
                 </tr>
-                """ % (CFG_SITE_URL,
-                       request_id,
-                       borrower_link,
+                """ % (borrower_link,
                        title_link,
                        library,
                        location,
@@ -1320,6 +1438,7 @@ class Template:
                        date_to,
                        request_date,
                        _("Cancel"),
+                       request_id,
                        CFG_SITE_URL,
                        request_id,
                        recid,
@@ -1576,18 +1695,22 @@ class Template:
                  action="%s/admin2/bibcirculation/get_next_waiting_loan_request" method="get" >
              <div class="bibcircbottom">
              <br />
-             <div class="infoboxsuccess">%s</div>
-            """ % (CFG_SITE_URL, _("The item <strong>%s</strong>, with barcode\
-        <strong>%s</strong>, has been returned with success." % (book_title_from_MARC(recid),
-                                                                barcode)))
+             <div class="infoboxsuccess">""" % (CFG_SITE_URL)
+
+        out += _("The item %(x_strong_tag_open)s%(x_title)s%(x_strong_tag_close)s, with barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s, has been returned with success.") % {'x_title': book_title_from_MARC(recid), 'x_barcode': barcode, 'x_strong_tag_open': '<strong>', 'x_strong_tag_close': '</strong>'}
+
+        out += """</div> """
+
+            #""" % (CFG_SITE_URL, _("The item <strong>%s</strong>, with barcode <strong>%s</strong>, has been returned with success." % (book_title_from_MARC(recid), barcode)))
         if len(result) > 0:
             out+= """
              <br />
              <div class="infoboxmsg">%s</div>
              <br />
-        """ % (_("There are %s requests on the book that has been returned." % len(result)))
+            """ % (_("There are %(x_strong_tag_open)s%(x_number_of_requests)s requests%(x_strong_tag_close)s on the book that has been returned." % {'x_number_of_requests':len(result), 'x_strong_tag_open': '<strong>', 'x_strong_tag_close': '</strong>'}))
 
-        (_book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
+        (_book_title, book_year, book_author,
+                       book_isbn, book_editor) = book_information_from_MARC(recid)
 
         if book_isbn:
             book_cover = get_book_cover(book_isbn)
@@ -1735,12 +1858,12 @@ class Template:
             </table>
             """
 
-        else:
-            out += """
-              </table>
-              <div class="infoboxmsg">%s</div>""" % (_("There are no requests waiting on the item <strong>%s</strong>." % book_title_from_MARC(recid)))
+        #else:
+        #    out += """
+        #      <div class="infoboxmsg">%s</div>""" % (_("There are no requests waiting on the item <strong>%s</strong>." % book_title_from_MARC(recid)))
 
             out += """
+             </table>
             <br />
             <br />
             <br />
@@ -1874,17 +1997,27 @@ class Template:
         <br />
         <input type=hidden value="0">
         <input type=hidden value="10">
+        """ % (CFG_SITE_URL)
+
+        out += """
         <table class="bibcirctable">
           <tr align="center">
-            <td class="bibcirctableheader">Search item by
-              <input type="radio" name="f" value="" checked>any field
-              <input type="radio" name="f" value="barcode">barcode
-              <input type="radio" name="f" value="author">author
-              <input type="radio" name="f" value="title">title
+            <td class="bibcirctableheader">%s
+              <input type="radio" name="f" value="" checked>%s
+              <input type="radio" name="f" value="barcode">%s
+              <input type="radio" name="f" value="recid">%s
+        <!---
+              <input type="radio" name="f" value="author">%s
+              <input type="radio" name="f" value="title">%s
+        --->
               <br />
               <br />
             </td>
           </tr>
+          """ % (_("Search item by"), _("any field"), _("barcode"), _("recid"), _("author"),
+                 _("title"))
+
+        out += """
           <tr align="center">
             <td>
                 <input type="text" size="50" name="p" id="p" style='border: 1px solid #cfcfcf'>
@@ -1893,16 +2026,32 @@ class Template:
                 </script>
             </td>
           </tr>
+            """
+
+        #out += """
+        #  <tr align="center">
+        #    <td class="bibcirctableheader">
+        #        <br />
+        #        %s:  <select name="library_id"  style='border: 1px solid #cfcfcf'>
+        #    """ % (_("in library"))
+        #
+        #out += """    <option value="all" selected="selected">%s</option>""" % (_("all"))
+        #
+        #libraries = db.get_internal_libraries()
+        #
+        #for(lib_id, name) in libraries:
+        #    out += """    <option value="%s">%s</option>""" % (lib_id, name)
+
+        out += """
+            </td>
+          </tr>
         </table>
         <br />
         <table class="bibcirctable">
           <tr align="center">
             <td>
-
-              <input type=button value='%s'
-              onClick="history.go(-1)" class="formbutton">
+              <input type=button   value='%s' class="formbutton" onClick="history.go(-1)">
               <input type="submit" value='%s' class="formbutton">
-
             </td>
           </tr>
         </table>
@@ -1912,8 +2061,7 @@ class Template:
         <br />
         </div>
         <form>
-
-        """ % (CFG_SITE_URL, _("Back"), _("Search"))
+        """ % (_("Back"), _("Search"))
 
         return out
 
@@ -1967,7 +2115,7 @@ class Template:
           <tbody>
         """ % (str(number_of_results), _("Title"),
                _("Author"), _("Publisher"),
-               _("No. Copies"))
+               _("# copies"))
 
 ### FIXME: If one result -> go ahead ###
             for recid in result:
@@ -2250,10 +2398,10 @@ class Template:
                 <br />
                 </div>
                 """ %( _("Name"), name,
-                       _("Email"), email,
-                       _("Phone"), phone,
                        _("Address"), address,
                        _("Mailbox"), mailbox,
+                       _("Email"), email,
+                       _("Phone"), phone,
                        _("Barcode(s)"), _("Back"),
                        _("Continue"), user_id)
 
@@ -2368,10 +2516,10 @@ class Template:
                 """  % (CFG_SITE_URL, str(list_of_barcodes), _("User information"),
                          id_string, display_id,
                         _("Name"), name,
-                        _("Email"), email,
-                        _("Phone"), phone,
                         _("Address"), address,
                         _("Mailbox"), mailbox,
+                        _("Email"), email,
+                        _("Phone"), phone,
                         _("List of borrowed books"),
                         CFG_SITE_URL,CFG_SITE_URL,
                         _("Item"), _("Barcode"),
@@ -2583,13 +2731,14 @@ class Template:
         <br />
         </div>
         """ % (_("A new loan has been registered."),
-               _("Name"), name,
+
                id_string, display_id,
-               _("Email"), email,
-               _("Phone"), phone,
+               _("Name"), name,
                _("Address"), address,
                _("Mailbox"), mailbox,
-               _("Name"), book_title,
+               _("Email"), email,
+               _("Phone"), phone,
+               _("Title"), book_title,
                _("Author(s)"), book_author,
                _("Year"), book_year,
                _("Publisher"), book_editor,
@@ -2867,6 +3016,8 @@ class Template:
 
         _ = gettext_set_language(ln)
 
+        record_is_periodical = is_periodical(recid)
+
         out = self.tmpl_infobox(infos, ln)
 
         out += load_menu(ln)
@@ -2882,7 +3033,8 @@ class Template:
         else:
             book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
-        link_to_detailed_record = "<a href='%s/record/%s' target='_blank'>%s</a>" % (CFG_SITE_URL, recid, book_title)
+        link_to_detailed_record = "<a href='%s/record/%s' "\
+                                  "target='_blank'>%s</a>" % (CFG_SITE_URL, recid, book_title)
 
         out += """
            <div class="bibcircbottom">
@@ -2944,16 +3096,51 @@ class Template:
                    _("Additional details"))
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css">
+                @import url("/img/tablesorter.css");
+            </style>
             <script src="/js/jquery.js" type="text/javascript"></script>
             <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
-            <script type="text/javascript">
-            $(document).ready(function() {
-              $('#table_copies').tablesorter({widthFixed: true, widgets: ['zebra']})
-            });
-            </script>
 
-                  <table class="tablesorter" id="table_copies" border="0" cellpadding="0" cellspacing="1">
+            <style type="text/css">
+                @import url("/js/tablesorter/themes/blue/style.css");
+            </style>
+            <style type="text/css">
+                @import url("/js/tablesorter/addons/pager/jquery.tablesorter.pager.css");
+            </style>
+
+            <script src="/js/jquery.min.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/addons/pager/jquery.tablesorter.pager.js"
+                    type="text/javascript"></script>
+            """
+
+        if record_is_periodical:
+            out += """
+            <script type="text/javascript">
+                $(document).ready(function(){
+                    $("#table_copies")
+                      .tablesorter({sortList: [[7,1],[4,0]],widthFixed: true,widgets: ['zebra']})
+                      .bind("sortStart",function(){$("#overlay").show();})
+                      .bind("sortEnd",function(){$("#overlay").hide()})
+                      .tablesorterPager({container: $("#pager"), positionFixed: false});
+                });
+            </script>
+            """
+        else:
+            out += """
+            <script type="text/javascript">
+                $(document).ready(function(){
+                    $('#table_copies').tablesorter({sortList: [[1,1],[4,0]],
+                                                    widthFixed: true,
+                                                    widgets: ['zebra']})
+                });
+            </script>
+            """
+
+        out += """
+                  <table class="tablesorter" id="table_copies" border="0"
+                         cellpadding="0" cellspacing="1">
                   <thead>
                     <tr>
                       <th>%s</th>
@@ -2961,25 +3148,35 @@ class Template:
                       <th>%s</th>
                       <th>%s</th>
                       <th>%s</th>
+               """ % (_("Barcode"),
+                      _("Status"),
+                      _("Requested"),
+                      _("Due date"),
+                      _("Library"))
+
+        if not record_is_periodical:
+            out += """
+                      <th>%s</th>
+                   """ % (_("Location"))
+
+        out +=  """
                       <th>%s</th>
                       <th>%s</th>
+                """ % (_("Loan period"),
+                       _("No of loans"))
+
+        if not record_is_periodical:
+            out += """
                       <th>%s</th>
-                      <th>%s</th>
+                   """ % (_("Collection"))
+
+        out += """
                       <th>%s</th>
                       <th>%s</th>
                     </tr>
                   </thead>
                   <tboby>
-                    """ % (_("Barcode"),
-                           _("Status"),
-                           _("Requested"),
-                           _("Due date"),
-                           _("Library"),
-                           _("Location"),
-                           _("Loan period"),
-                           _("No of loans"),
-                           _("Collection"),
-                           _("Description"),
+                    """ % (_("Description"),
                            _("Actions"))
 
         for (barcode, loan_period, library_name, library_id,
@@ -2992,7 +3189,7 @@ class Template:
             else:
                 requested = 'No'
 
-            if status == 'on order':
+            if status in ('on order', 'claimed'):
                 expected_arrival_date = db.get_expected_arrival_date(barcode)
                 if expected_arrival_date != '':
                     status = status + ' - ' + expected_arrival_date
@@ -3009,14 +3206,26 @@ class Template:
                      <td>%s</td>
                      <td>%s</td>
                      <td>%s</td>
+                     """ % (barcode, status, requested, due_date or '-', library_link)
+
+            if not record_is_periodical:
+                out += """
+                     <td>%s</td>
+                     """ % (location)
+
+            out += """
                      <td>%s</td>
                      <td>%s</td>
+                     """ % (loan_period, nb_requests)
+
+            if not record_is_periodical:
+                out += """
                      <td>%s</td>
+                     """ % (collection or '-')
+
+            out += """
                      <td>%s</td>
-                     <td>%s</td>
-                     """% (barcode, status, requested, due_date or '-', library_link, location,
-                           loan_period, nb_requests, collection or '-',
-                           description or '-')
+                     """ % (description or '-')
 
             if status == 'on loan':
                 out += """
@@ -3024,13 +3233,14 @@ class Template:
                     <SELECT style='border: 1px solid #cfcfcf' ONCHANGE="location = this.options[this.selectedIndex].value;">
                       <OPTION VALUE="">Select an action
                       <OPTION VALUE="update_item_info_step4?barcode=%s">Update
+                      <OPTION VALUE="add_new_copy_step3?recid=%s&barcode=%s">Add similar copy
                       <OPTION VALUE="place_new_request_step1?barcode=%s">New request
                       <OPTION VALUE="" DISABLED>New loan
                       <OPTION VALUE="" DISABLED>Delete copy
                     </SELECT>
                   </td>
                  </tr>
-                 """ % (barcode, barcode)
+                 """ % (barcode, recid, barcode, barcode)
 
             elif status == 'missing':
                 out += """
@@ -3038,27 +3248,29 @@ class Template:
                        <SELECT style='border: 1px solid #cfcfcf' ONCHANGE="location = this.options[this.selectedIndex].value;">
                          <OPTION VALUE="">Select an action
                          <OPTION VALUE="update_item_info_step4?barcode=%s">Update
+                         <OPTION VALUE="add_new_copy_step3?recid=%s&barcode=%s">Add similar copy
                          <OPTION VALUE="" DISABLED>New request
                          <OPTION VALUE="" DISABLED>New loan
                          <OPTION VALUE="delete_copy_step1?barcode=%s">Delete copy
                        </SELECT>
                      </td>
                  </tr>
-                 """ % (barcode, barcode)
+                 """ % (barcode, recid, barcode, barcode)
 
-            elif status == 'Not for loan':
+            elif status == 'Reference':
                 out += """
                      <td align="center">
                        <SELECT style='border: 1px solid #cfcfcf' ONCHANGE="location = this.options[this.selectedIndex].value;">
                          <OPTION VALUE="">Select an action
                          <OPTION VALUE="update_item_info_step4?barcode=%s">Update
+                         <OPTION VALUE="add_new_copy_step3?recid=%s&barcode=%s">Add similar copy
                          <OPTION VALUE="place_new_request_step1?barcode=%s">New request
                          <OPTION VALUE="place_new_loan_step1?barcode=%s">New loan
                          <OPTION VALUE="delete_copy_step1?barcode=%s">Delete copy
                        </SELECT>
                      </td>
                  </tr>
-                 """ % (barcode, barcode, barcode, barcode)
+                 """ % (barcode, recid, barcode, barcode, barcode, barcode)
 
             else:
                 out += """
@@ -3066,18 +3278,41 @@ class Template:
                        <SELECT style='border: 1px solid #cfcfcf' ONCHANGE="location = this.options[this.selectedIndex].value;">
                          <OPTION VALUE="">Select an action
                          <OPTION VALUE="update_item_info_step4?barcode=%s">Update
+                         <OPTION VALUE="add_new_copy_step3?recid=%s&barcode=%s">Add similar copy
                          <OPTION VALUE="place_new_request_step1?barcode=%s">New request
                          <OPTION VALUE="place_new_loan_step1?barcode=%s">New loan
                          <OPTION VALUE="delete_copy_step1?barcode=%s">Delete copy
                        </SELECT>
                      </td>
                  </tr>
-                 """ % (barcode, barcode, barcode, barcode)
-
+                 """ % (barcode, recid, barcode, barcode, barcode, barcode)
 
         out += """
              </tbody>
             </table>
+            """
+
+        if record_is_periodical:
+            out += """
+            <div id="pager" class="pager">
+                        <form>
+                            <img src="/img/sb.gif" class="first" />
+                            <img src="/img/sp.gif" class="prev" />
+                            <input type="text" class="pagedisplay" />
+                            <img src="/img/sn.gif" class="next" />
+                            <img src="/img/se.gif" class="last" />
+                            <select class="pagesize">
+                                <option value="10" selected="selected">10</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                                <option value="40">40</option>
+                            </select>
+                        </form>
+            </div>
+            """
+
+        out += """
+            </br>
             <table class="bibcirctable">
                  <tr>
                      <td>
@@ -3095,7 +3330,7 @@ class Template:
             <br />
             <table class="bibcirctable">
                  <tr>
-                     <td class="bibcirctableheader">%s %s</td>
+                     <td class="bibcirctableheader">%s</td>
                 </tr>
             </table>
             <table class="tablesortersmall" border="0" cellpadding="0" cellspacing="1">
@@ -3155,14 +3390,14 @@ class Template:
             <br />
 
             """ % (CFG_SITE_URL, recid, _("Add new copy"),
-                   CFG_SITE_URL, recid, _("Order new copy"),
-                    CFG_SITE_URL, recid, _("ILL request"),
-                   _("Hold requests and loans overview on"), time.ctime(),
-                   _("Hold requests"), len(requests), _("More details"), CFG_SITE_URL, recid,
-                   _("Loans"), len(loans), _("More details"), CFG_SITE_URL, recid,
-                   _("Historical overview"),
-                   _("Hold requests"), len(req_hist_overview), _("More details"), CFG_SITE_URL, recid,
-                   _("Loans"), len(loans_hist_overview), _("More details"), CFG_SITE_URL, recid)
+            CFG_SITE_URL, recid, _("Order new copy"),
+            CFG_SITE_URL, recid, _("ILL request"),
+            _("Hold requests and loans overview on %(date)s") % {'date': time.ctime()},
+            _("Hold requests"), len(requests), _("More details"), CFG_SITE_URL, recid,
+            _("Loans"), len(loans), _("More details"), CFG_SITE_URL, recid,
+            _("Historical overview"),
+            _("Hold requests"), len(req_hist_overview), _("More details"), CFG_SITE_URL, recid,
+            _("Loans"), len(loans_hist_overview), _("More details"), CFG_SITE_URL, recid)
 
 
 
@@ -4201,10 +4436,10 @@ class Template:
                    _("Personal details"),
                    id_string, display_id,
                    _("Name"), name,
-                   _("Email"), email,
-                   _("Phone"), phone,
                    _("Address"), address,
                    _("Mailbox"), mailbox,
+                   _("Email"), email,
+                   _("Phone"), phone,
                    _("Notes"), check_notes)
 
         nb_requests = len(requests)
@@ -4216,12 +4451,13 @@ class Template:
 
         out += """
         </table>
-        <!-- <table class="bibcirctable">
+   <!---
+        <table class="bibcirctable">
              <tr>
-                  <td><input type=button onClick="location.href='%s/admin2/bibcirculation/update_borrower_info_step3?borrower_id=%s'"
-                       value=%s class='formbutton'></td>
+                  <td><input type=button onClick="location.href='%s/admin2/bibcirculation/get_borrower_details?borrower_id=%s&update=True'" value=%s class='formbutton'></td>
              </tr>
-        </table> -->
+        </table>
+    --->
         <br />
         <table class="bibcirctable">
           <tr>
@@ -4233,6 +4469,7 @@ class Template:
             <input type=button onClick="location.href='%s/admin2/bibcirculation/register_ill_book_request?borrower_id=%s'"
             value='%s' class='formbutton'>
             <input type='submit' name='notify_button' value='%s' class='formbutton'>
+            <input type=button onClick="location.href='%s/admin2/bibcirculation/get_borrower_details?borrower_id=%s&update=True'"  value=%s class='formbutton'>
             </td>
           </tr>
         </table>
@@ -4326,6 +4563,7 @@ class Template:
                CFG_SITE_URL, borrower_id, _("New request"),
                CFG_SITE_URL, borrower_id, _("New ILL request"),
                _("Notify this borrower"),
+               CFG_SITE_URL, borrower_id, _("Update"),
                _("Requests, Loans and ILL overview on"), time.ctime(),
                _("Requests"), nb_requests, CFG_SITE_URL, borrower_id, _("More details"),
                _("Loans"), nb_loans, CFG_SITE_URL, borrower_id, _("More details"),
@@ -4550,23 +4788,28 @@ class Template:
                   <OPTION VALUE="">Select an action
                   <OPTION VALUE="get_borrower_loans_details?borrower_id=%s&barcode=%s&loan_id=%s&recid=%s">Renew
                   <OPTION VALUE="loan_return_confirm?barcode=%s">Return
-                  <OPTION VALUE="change_due_date_step1?barcode=%s&borrower_id=%s">Change due date
-                  <OPTION VALUE="claim_book_return?borrower_id=%s&recid=%s&loan_id=%s&template=claim_return">Send recall
+
+                """ % (title_link, barcode, loaned_on, due_date, nb_renewall, nb_overdue,
+                       date_overdue, loan_type, check_notes, status, borrower_id, barcode,
+                       loan_id, recid, barcode)
+
+                if status == 'expired':
+                    out += """
+        <OPTION VALUE="change_due_date_step1?barcode=%s&borrower_id=%s" DISABLED>Change due date
+                  """ % (barcode, borrower_id)
+                else:
+                    out += """
+        <OPTION VALUE="change_due_date_step1?barcode=%s&borrower_id=%s">Change due date
+                  """ % (barcode, borrower_id)
+
+                out += """
+                <OPTION VALUE="claim_book_return?borrower_id=%s&recid=%s&loan_id=%s&template=claim_return">Send recall
                 </SELECT>
               </td>
                 <input type=hidden name=barcode value=%s>
                 <input type=hidden name=loan_id value=%s>
             </tr>
-
-            """ % (title_link, barcode, loaned_on,
-                   due_date, nb_renewall,
-                   nb_overdue, date_overdue, loan_type,
-                   check_notes, status,
-                   borrower_id, barcode,
-                   loan_id, recid,
-                   barcode, barcode, borrower_id,
-                   borrower_id, recid, loan_id,
-                   barcode, loan_id)
+            """  % (borrower_id, recid, loan_id, barcode, loan_id)
 
             out += """
         </tbody>
@@ -5285,20 +5528,25 @@ class Template:
                       <OPTION VALUE="">Select an action
                       <OPTION VALUE="get_item_loans_details?barcode=%s&loan_id=%s&recid=%s">Renew
                       <OPTION VALUE="loan_return_confirm?barcode=%s">Return
+                """ % (borrower_link, barcode, loaned_on, due_date, nb_renewall, nb_overdue,
+                       date_overdue, status, check_notes, barcode, loan_id, recid, barcode)
+
+                if status == 'expired':
+                    out += """
+                      <OPTION VALUE="change_due_date_step1?barcode=%s" DISABLED>Change due date
+                      """ % (barcode)
+                else:
+                    out += """
                       <OPTION VALUE="change_due_date_step1?barcode=%s">Change due date
-                      <OPTION VALUE="claim_book_return?recid=%s&loan_id=%s&template=claim_return">Send recall
+                      """ % (barcode)
+
+                out += """
+                      <OPTION VALUE="claim_book_return?borrower_id=%s&recid=%s&loan_id=%s&template=claim_return">Send recall
                     </SELECT>
                  </td>
              </tr>
              <input type=hidden name=loan_id value=%s>
-             """ % (borrower_link, barcode,
-                   loaned_on, due_date,
-                   nb_renewall, nb_overdue,
-                   date_overdue, status, check_notes,
-                   barcode, loan_id, recid,
-                   barcode, barcode,
-                   recid, loan_id,
-                   loan_id)
+             """ % (borrower_id, recid, loan_id, loan_id)
 
         out += """
         <tbody>
@@ -5398,11 +5646,10 @@ class Template:
                   _("Personal details"),
                   id_string, display_id,
                   _("Name"), name,
-                  _("Email"), email,
-                  _("Phone"), phone,
                   _("Address"), address,
-                  _("Mailbox"), mailbox)
-
+                  _("Mailbox"), mailbox,
+                  _("Email"), email,
+                  _("Phone"), phone)
 
         out +="""
         <br />
@@ -5414,7 +5661,9 @@ class Template:
             <td>%s</td>
           </tr>
           <tr algin='center'>
-            <td><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
+            <td>
+                <img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/>
+            </td>
           </tr>
           <tr>
             <th>%s</th>
@@ -5438,7 +5687,10 @@ class Template:
                   <th>%s</th>
                 </tr>
                 <tr>
-                  <td><textarea name='new_note' rows="4" cols="57" style='border: 1px solid #cfcfcf'></textarea></td>
+                  <td>
+                    <textarea name='new_note' rows="4" cols="57"
+                              style='border: 1px solid #cfcfcf'></textarea>
+                  </td>
                 </tr>
               </table>
               <br />
@@ -5484,7 +5736,7 @@ class Template:
 
         out +="""
             <div class="bibcircbottom">
-            <form name="borrower_notes" action="%s/admin2/bibcirculation/get_borrower_notes" method="get" >
+            <form name="borrower_notes" action="%s/admin2/bibcirculation/get_borrower_notes" method="post" >
             <input type=hidden name=borrower_id value='%s'>
             <br />
             <br />
@@ -5768,74 +6020,85 @@ class Template:
                               size=45 value="" name="location">
                      </td>
                      </tr>
-                     <tr>
-                     <td width="110">%s</td>
-                     <td class="bibcirccontent">
-                     <select name="loan_period" style='border: 1px solid #cfcfcf'>
-                             <option value ="Not for loan">Not for loan</option>
-                             <option value ="4 weeks loan">4 weeks loan</option>
-                     </select></td>
-                     </tr>
-                     <tr>
-                     <td width="110">%s</td>
-                     <td class="bibcirccontent">
-                       <input type="text" style='border: 1px solid #cfcfcf'
+                     """ % (_("Book Information"),
+                            _("Title"), book_info[6],
+                            book_info[8],
+                            _("Author"), book_info[0],
+                            _("EAN"), book_info[1],
+                            _("ISBN"), book_info[2],
+                            _("Publisher"), book_info[3],
+                            _("Publication date"), book_info[5],
+                            _("Publication place"),
+                            _("Edition"), book_info[7],
+                            _("Number of pages"), book_info[4],
+                            _("Sub-library"),
+                            _("CERN Central Library"),
+                            _("Location"))
+
+            out += """
+                    <tr>
+                        <td width="110">%s</td>
+                        <td class="bibcirccontent">
+                            <select name="loan_period"  style='border: 1px solid #cfcfcf'>
+                """ % (_("Loan period"))
+
+            for loan_period in CFG_BIBCIRCULATION_ITEM_LOAN_PERIOD:
+                out += """
+                                <option value="%s">%s</option>
+                           """ % (loan_period, loan_period)
+
+            out += """
+                            </select>
+                        </td>
+                    </tr>
+                """
+
+            out += """
+                    <tr>
+                        <td width="110">%s</td>
+                        <td class="bibcirccontent">
+                            <input type="text" style='border: 1px solid #cfcfcf'
                               size=45 value="" name="barcode">
-                     </td>
-                     </tr>
-                     <tr>
-                     <td width="110">%s</td>
-                     <td class="bibcirccontent">
-                       <input type="text" style='border: 1px solid #cfcfcf'
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="110">%s</td>
+                        <td class="bibcirccontent">
+                            <input type="text" style='border: 1px solid #cfcfcf'
                               size=45 value="" name="collection">
-                     </td>
-                     </tr>
-                     <tr>
-                     <td width="110">%s</td>
-                     <td class="bibcirccontent">
-                       <input type="text" style='border: 1px solid #cfcfcf'
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="110">%s</td>
+                        <td class="bibcirccontent">
+                            <input type="text" style='border: 1px solid #cfcfcf'
                               size=45 value="" name="description">
-                     </td>
-                     </tr>
-           </table>
+                        </td>
+                    </tr>
+                </table>
            <br />
            <br />
-           """ % (_("Book Information"),
-                  _("Title"), book_info[6],
-                  book_info[8],
-                  _("Author"), book_info[0],
-                  _("EAN"), book_info[1],
-                  _("ISBN"), book_info[2],
-                  _("Publisher"), book_info[3],
-                  _("Publication date"), book_info[5],
-                  _("Publication place"),
-                  _("Edition"), book_info[7],
-                  _("Number of pages"), book_info[4],
-                  _("Sub-library"),
-                  _("CERN Central Library"),
-                  _("Location"),
-                  _("Loan period"),
-                  _("Barcode"),
+           """ % (_("Barcode"),
                   _("Collection"),
                   _("Description"))
 
         elif errors:
             out += """
             <div class="bibcircbottom">
-            <form name="list_form" action="%s/admin2/bibcirculation/new_item" method="get" >
-            <br />
-            <br />
-            <br />
-            <table class="bibcirctable_contents">
-            <tr align="center">
-            <td>ERROR: %s. %s</td>
-            </tr>
-            </table>
-            <br />
-            <br />
-            <br />
-            <br />
-            </form>
+                <form name="list_form" action="%s/admin2/bibcirculation/new_item" method="get">
+                    <br />
+                    <br />
+                    <br />
+                    <table class="bibcirctable_contents">
+                        <tr align="center">
+                            <td>ERROR: %s. %s</td>
+                        </tr>
+                    </table>
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                </form>
             </div>
             """ % (CFG_SITE_URL, errors[0], errors[1])
 
@@ -6205,34 +6468,41 @@ class Template:
                 <tr>
                     <td width="70">%s</td>
                     <td class="bibcirccontent">
-                      <input type="text" style='border: 1px solid #cfcfcf' size=45 name="name" value="%s">
+                        <input type="text" style='border: 1px solid #cfcfcf' size=45
+                               name="name" value="%s">
                     </td>
                 </tr>
                 <tr>
                     <td width="70">%s</td>
                     <td class="bibcirccontent">
-                      <input type="text" style='border: 1px solid #cfcfcf' size=45 name="email" value="%s">
-                    </td>
-                </tr>
-                <tr>
-                    <td width="70">%s</td>
-                    <td class="bibcirccontent">
-                      <input type="text" style='border: 1px solid #cfcfcf' size=45 name="phone" value="%s">
-                    </td>
-                </tr>
-                <tr>
-                    <td width="70">%s</td>
-                    <td class="bibcirccontent">
-                      <input type="text" style='border: 1px solid #cfcfcf' size=45 name="address" value="%s">
+                        <input type="text" style='border: 1px solid #cfcfcf' size=45
+                               name="address" value="%s">
                     </td>
                  </tr>
                  <tr>
                     <td width="70">%s</td>
                     <td class="bibcirccontent">
-                      <input type="text" style='border: 1px solid #cfcfcf' size=45 name="mailbox" value="%s">
-                      <input type=hidden name=borrower_id    value="%s">
+                        <input type="text" style='border: 1px solid #cfcfcf' size=45
+                               name="mailbox" value="%s">
+
                     </td>
                  </tr>
+                <tr>
+                    <td width="70">%s</td>
+                    <td class="bibcirccontent">
+                        <input type="text" style='border: 1px solid #cfcfcf' size=45
+                               name="email" value="%s">
+                    </td>
+                </tr>
+                <tr>
+                    <td width="70">%s</td>
+                    <td class="bibcirccontent">
+                        <input type="text" style='border: 1px solid #cfcfcf' size=45
+                               name="phone" value="%s">
+                        <input type=hidden name=borrower_id    value="%s">
+                    </td>
+                </tr>
+
                 </table>
                 <br />
                 <table class="bibcirctable">
@@ -6250,10 +6520,11 @@ class Template:
                 """ % (CFG_SITE_URL, _("Borrower information"),
                        id_string, display_id,
                        _("Name"), name,
+                       _("Address"), address,
+                       _("Mailbox"), mailbox,
                        _("Email"), email,
                        _("Phone"), phone,
-                       _("Address"), address,
-                       _("Mailbox"), mailbox, borrower_id,
+                       borrower_id,
                        _("Back"), _("Continue"))
 
 
@@ -6317,10 +6588,10 @@ class Template:
                 </div>
                 """ % (CFG_SITE_URL, _("Borrower information"),
                        _("Name"), name,
-                       _("Email"), email,
-                       _("Phone"), phone,
                        _("Address"), address,
                        _("Mailbox"), mailbox,
+                       _("Email"), email,
+                       _("Phone"), phone,
                        _("Back"), _("Confirm"),
                        borrower_id, name, email, phone, address, mailbox)
                        #tup_infos)
@@ -6416,8 +6687,15 @@ class Template:
                     <th width="70">%s</th>
                     <td>
                     <select name="type"  style='border: 1px solid #cfcfcf'>
-                          <option value ="internal" selected>internal</option>
-                          <option value ="external">external</option>
+            """ % (CFG_SITE_URL, _("New library information"), _("Name"),
+                     _("Email"), _("Phone"), _("Address"), _("Type"))
+
+        for lib in CFG_BIBCIRCULATION_LIBRARY_TYPE:
+            out += """
+                        <option value="%s">%s</option>
+                   """ % (lib, lib)
+
+        out += """
                       </select>
                     </td>
                  </tr>
@@ -6442,9 +6720,7 @@ class Template:
                 <br />
                 </form>
                 </div>
-                """ % (CFG_SITE_URL, _("New library information"), _("Name"),
-                       _("Email"), _("Phone"), _("Address"), _("Type"), _("Notes"),
-                       _("Back"), _("Continue"))
+                """ % (_("Notes"), _("Back"), _("Continue"))
 
 
         return out
@@ -6744,16 +7020,15 @@ class Template:
                        _("Address"), address,
                        _("Type"))
 
-        if lib_type == 'internal':
-            out += """
-                                <option value ="internal" selected>internal</option>
-                                <option value ="external">external</option>
-                """
-        else:
-            out += """
-                                <option value ="internal">internal</option>
-                                <option value ="external" selected>external</option>
-                """
+        for lib in CFG_BIBCIRCULATION_LIBRARY_TYPE:
+            if lib == lib_type:
+                out += """
+                                <option value="%s" selected="selected">%s</option>
+                       """ % (lib, lib)
+            else:
+                out += """
+                                <option value="%s">%s</option>
+                       """ % (lib, lib)
 
         out += """
                             </select>
@@ -6764,14 +7039,10 @@ class Template:
                 <table class="bibcirctable">
                 <tr align="center">
                   <td>
-                       <input type=button value=%s
-                        onClick="history.go(-1)" class="formbutton">
-
-                       <input type="submit"
-                       value=%s class="formbutton">
-
+                       <input type=button value=%s onClick="history.go(-1)" class="formbutton">
+                       <input type="submit" value=%s class="formbutton">
                   </td>
-                 </tr>
+                </tr>
                 </table>
                 <br />
                 <br />
@@ -7119,13 +7390,15 @@ class Template:
         return out
 
 
-    def tmpl_add_new_copy_step3(self, recid, result, libraries,
+    def tmpl_add_new_copy_step3(self, recid, result, libraries, original_copy_barcode,
                                 infos, ln=CFG_SITE_LANG):
         """
         @param ln: language of the page
         """
 
         _ = gettext_set_language(ln)
+
+        record_is_periodical = is_periodical(recid)
 
         out = self.tmpl_infobox(infos, ln)
 
@@ -7139,23 +7412,56 @@ class Template:
         else:
             book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
+        out += """
+            <style type="text/css">
+                @import url("/img/tablesorter.css");
+            </style>
+            <script src="/js/jquery.js" type="text/javascript"></script>
+            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+
+            <style type="text/css">
+                @import url("/js/tablesorter/themes/blue/style.css");
+            </style>
+            <style type="text/css">
+                @import url("/js/tablesorter/addons/pager/jquery.tablesorter.pager.css");
+            </style>
+
+            <script src="/js/jquery.min.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/addons/pager/jquery.tablesorter.pager.js"
+                    type="text/javascript"></script>
+            """
+
+        if record_is_periodical:
+            out += """
+            <script type="text/javascript">
+                $(document).ready(function(){
+                    $("#table_copies")
+                      .tablesorter({sortList: [[6,1]],widthFixed: true, widgets: ['zebra']})
+                      .bind("sortStart",function(){$("#overlay").show();})
+                      .bind("sortEnd",function(){$("#overlay").hide()})
+                      .tablesorterPager({container: $("#pager"), positionFixed: false});
+                });
+            </script>
+            """
+        else:
+            out += """
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    $('#table_copies').tablesorter({widthFixed: true, widgets: ['zebra']})
+                });
+            </script>
+            """
 
         out += """
-           <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-           <script src="/js/jquery.js" type="text/javascript"></script>
-            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
-            <script type="text/javascript">
-            $(document).ready(function() {
-              $('#table_copies').tablesorter({widthFixed: true, widgets: ['zebra']})
-            });
-            </script>
-           <form name="add_new_copy_step3_form" action="%s/admin2/bibcirculation/add_new_copy_step4" method="get" >
+           <form name="add_new_copy_step3_form"
+                 action="%s/admin2/bibcirculation/add_new_copy_step4" method="get" >
            <div class="bibcircbottom">
                 <br />
-                     <table class="bibcirctable">
-                          <tr>
-                               <td class="bibcirctableheader" width="10">%s</td>
-                          </tr>
+                <table class="bibcirctable">
+                    <tr>
+                        <td class="bibcirctableheader" width="10">%s</td>
+                    </tr>
                 </table>
                 <table class="bibcirctable">
                  <tr valign='top'>
@@ -7183,7 +7489,9 @@ class Template:
                      </tr>
                      </table>
                      </td>
-                     <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
+                     <td class="bibcirccontent">
+                        <img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/>
+                     </td>
                      </tr>
               </table>
 
@@ -7210,29 +7518,42 @@ class Template:
                    _("Copies of %s" % book_title))
 
 
-        out += """<table id="table_copies" class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+        out += """
+                  <table class="tablesorter" id="table_copies" border="0"
+                         cellpadding="0" cellspacing="1">
                   <thead>
                     <tr>
                       <th>%s</th>
                       <th>%s</th>
                       <th>%s</th>
                       <th>%s</th>
+                """ % (_("Barcode"),
+                       _("Status"),
+                       _("Due date"),
+                       _("Library"))
+
+        if not record_is_periodical:
+            out += """
+                      <th>%s</th>
+                   """ % (_("Location"))
+
+        out += """
                       <th>%s</th>
                       <th>%s</th>
+                """ % (_("Loan period"),
+                       _("No of loans"))
+
+        if not record_is_periodical:
+            out += """
                       <th>%s</th>
-                      <th>%s</th>
+                   """ % (_("Collection"))
+
+        out += """
                       <th>%s</th>
                     </tr>
-                    </thead>
-                    <tbody>""" % (_("Barcode"),
-                                _("Status"),
-                                _("Due date"),
-                                _("Library"),
-                                _("Location"),
-                                _("Loan period"),
-                                _("No of loans"),
-                                _("Collection"),
-                                _("Description"))
+                  </thead>
+                  <tboby>
+                    """ % (_("Description"))
 
         for (barcode, loan_period, lib_name, libid, location, nb_requests,
              status, collection, description, due_date) in result:
@@ -7248,21 +7569,67 @@ class Template:
                      <td>%s</td>
                      <td>%s</td>
                      <td>%s</td>
-                     <td>%s</td>
-                     <td>%s</td>
-                     <td>%s</td>
-                     <td>%s</td>
-                     <td>%s</td>
-                 </tr>
-                 """ % (barcode, status, due_date, library_link, location,
-                        loan_period, nb_requests, collection or '-',
-                        description or '-')
+                     """ % (barcode, status, due_date or '-', library_link)
 
+            if not record_is_periodical:
+                out += """
+                     <td>%s</td>
+                     """ % (location)
+
+            out += """
+                     <td>%s</td>
+                     <td>%s</td>
+                     """ % (loan_period, nb_requests)
+
+            if not record_is_periodical:
+                out += """
+                     <td>%s</td>
+                     """ % (collection or '-')
+
+            out += """
+                     <td>%s</td>
+                     """ % (description or '-')
 
         out += """
            </tbody>
            </table>
-           <br />
+           """
+
+        if record_is_periodical:
+            out += """
+            <div id="pager" class="pager">
+                        <form>
+                            <img src="/img/sb.gif" class="first" />
+                            <img src="/img/sp.gif" class="prev" />
+                            <input type="text" class="pagedisplay" />
+                            <img src="/img/sn.gif" class="next" />
+                            <img src="/img/se.gif" class="last" />
+                            <select class="pagesize">
+                                <option value="10" selected="selected">10</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                                <option value="40">40</option>
+                            </select>
+                        </form>
+            </div>
+            </br>
+            """
+
+        if record_is_periodical:
+            colspan = 'colspan="5"'
+        else:
+            colspan = ''
+
+        if original_copy_barcode is not None:
+            default_details = db.get_item_info(original_copy_barcode)
+            if default_details is not None:
+                default_library_id  = default_details[1]
+                default_collection  = default_details[3]
+                default_location    = default_details[4]
+                default_description = default_details[5]
+                default_loan_period = default_details[6]
+
+        out += """
           <table class="bibcirctable">
                 <tr>
                      <td class="bibcirctableheader">%s</td>
@@ -7270,88 +7637,165 @@ class Template:
            </table>
            <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
                 <tr>
-                    <th width="100">%s</th>
-                    <td>
+                    <th>%s</th>
+                    <td %s>
                       <input type="text" style='border: 1px solid #cfcfcf' size=35
                              name="barcode">
                     </td>
                 </tr>
                 <tr>
-                    <th width="100">%s</th>
-                    <td>
+                    <th>%s</th>
+                    <td %s>
                       <select name="library"  style='border: 1px solid #cfcfcf'>
 
-                """ % (_("New copy details"), _("Barcode"), _("Library"))
+                """ % (_("New copy details"), _("Barcode"), colspan, _("Library"), colspan)
+
+        main_library = db.get_main_libraries()
+        if main_library is not None:
+            main_library = main_library[0][0] #id of the first main library
 
         for(library_id, name) in libraries:
-            out +="""<option value ="%s">%s</option>""" % (library_id, name)
+            if original_copy_barcode is not None and \
+               default_details is not None and \
+               library_id == default_library_id:
+                out +="""<option value="%s" selected="selected">%s</option>
+                      """ % (library_id, name)
+            elif library_id == main_library:
+                out +="""<option value="%s" selected="selected">%s</option>
+                      """ % (library_id, name)
+            else:
+                out +="""<option value="%s">%s</option>""" % (library_id, name)
+
+        if original_copy_barcode is not None \
+            and default_location is not None:
+            loc = default_location
+        else:
+            loc = ''
 
         out += """
                     </select>
                     </td>
                 </tr>
+            """
+
+        if record_is_periodical:
+            out += """ <input type=hidden name=collection value=%s> """ % ("Periodical")
+        else:
+            out += """
                 <tr>
                     <th width="100">%s</th>
                     <td>
                       <input type="text" style='border: 1px solid #cfcfcf' size=35
-                             name="location">
+                             name="location" value=%s>
                     </td>
                 </tr>
+                """ % (_("Location"), loc)
+
+            out += """
                 <tr>
                     <th width="100">%s</th>
                     <td>
                       <select name="collection" style='border: 1px solid #cfcfcf'>
-                        <option value = "Monography">Monography</option>
-                        <option value = "Reference">Reference</option>
-                        <option value = "Archives">Archives</option>
-                        <option value = "Library">Library</option>
-                        <option value = "Conference">Conference</option>
-                        <option value = "LSL Depot">LSL Depot</option>
-                        <option value = "Oversize">Oversize</option>
-                        <option value = "Official">Official</option>
-                        <option value = "Pamphlet">Pamphlet</option>
-                        <option value = "CDROM">CDROM</option>
-                        <option value = "Standards">Standards</option>
-                        <option value = "Video & Trainings">Video & Trainings</option>
+                   """ % (_("Collection"))
+
+            for collection in CFG_BIBCIRCULATION_COLLECTION:
+                if original_copy_barcode is not None and \
+                   default_collection is not None and \
+                   collection == default_collection:
+                    out += """
+                        <option value="%s" selected="selected">%s</option>
+                           """ % (collection, collection)
+                else:
+                    out += """
+                        <option value="%s">%s</option>
+                           """ % (collection, collection)
+
+            out += """
                       </select>
                     </td>
                 </tr>
+                """
+
+        #if record_is_periodical:
+        #    out += """
+        #        <tr>
+        #            <th>%s</th>
+        #            <td>
+        #              <input type="text" style='border: 1px solid #cfcfcf' size=2
+        #                     name="year">
+        #            </td>
+        #            <th>%s</th>
+        #            <td>
+        #              <input type="text" style='border: 1px solid #cfcfcf' size=2
+        #                     name="volume">
+        #            </td>
+        #
+        #            <th>%s</th>
+        #            <td>
+        #              <input type="text" style='border: 1px solid #cfcfcf' size=2
+        #                     name="number">
+        #            </td>
+        #        </tr>
+        #        """ % (_("Year"), _("Volume"), _("Number"))
+        #else:
+
+        if original_copy_barcode is not None \
+           and default_description is not None:
+            desc = default_description
+        else:
+            desc = ''
+
+        out += """
                 <tr>
                     <th width="100">%s</th>
                     <td>
                       <input type="text" style='border: 1px solid #cfcfcf' size=35
-                             name="description">
+                             name="description" value="%s">
                     </td>
                 </tr>
-                <tr>
-                    <th width="100">%s</th>
-                    <td>
-                      <select name="loan_period"  style='border: 1px solid #cfcfcf'>
-                          <option value ="4 weeks">4 weeks</option>
-                          <option value ="1 week">1 week</option>
-                          <option value ="reference">reference</option>
-                      </select>
-                    </td>
-                 </tr>
-            """ % (_("Location"), _("Collection"), _("Description"),
-                  _("Loan period"))
+                """ % (_("Description"), desc)
 
         out += """
-                 <tr>
+                <tr>
                     <th width="100">%s</th>
-                    <td>
+                    <td %s>
+                      <select name="loan_period"  style='border: 1px solid #cfcfcf'>
+                """ % (_("Loan period"), colspan)
+
+        for loan_period in CFG_BIBCIRCULATION_ITEM_LOAN_PERIOD:
+            if original_copy_barcode is not None and \
+                 default_loan_period is not None and \
+                 loan_period == default_loan_period:
+                out += """
+                          <option value="%s" selected="selected">%s</option>
+                       """ % (loan_period, loan_period)
+            else:
+                out += """
+                          <option value="%s">%s</option>
+                       """ % (loan_period, loan_period)
+
+        out += """
+                      </select>
+                    </td>
+                </tr>
+            """
+
+        out += """
+                <tr>
+                    <th width="100">%s</th>
+                    <td %s>
                     <select name="status"  style='border: 1px solid #cfcfcf'>
-                """ % ( _("Status"))
+                """ % (_("Status"), colspan)
 
         for st in CFG_BIBCIRCULATION_ITEM_STATUS:
-            if st == 'in process':
+            if st == 'on shelf':
                 out += """
-                          <option value ="%s" selected>%s</option>
-                    """ % (st,st)
+                          <option value ="%s" selected="selected">%s</option>
+                    """ % (st, st)
             else:
                 out += """
                           <option value ="%s">%s</option>
-                    """ % (st,st)
+                    """ % (st, st)
 
         out += """
                     </select>
@@ -7359,7 +7803,7 @@ class Template:
                  </tr>
                  <tr>
                   <th width="100">%s</th>
-                  <td>
+                  <td %s>
                     <input type="text" style='border: 1px solid #cfcfcf' size=35
                            name="expected_arrival_date" value="">
                   </td>
@@ -7380,7 +7824,7 @@ class Template:
            <br />
            </div>
            </form>
-           """ % (_("Expected arrival date"), recid)
+           """ % (_("Expected arrival date"), colspan, recid)
 
         return out
 
@@ -7675,7 +8119,8 @@ class Template:
         """
         out += load_menu(ln)
 
-        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
+        (book_title, book_year, book_author,
+                     book_isbn, book_editor) = book_information_from_MARC(recid)
 
         if book_isbn:
             book_cover = get_book_cover(book_isbn)
@@ -7843,10 +8288,10 @@ class Template:
                  action="%s/admin2/bibcirculation/update_item_info_step5" method="get" >
            <div class="bibcircbottom">
                 <br />
-                     <table class="bibcirctable">
-                          <tr>
-                               <td class="bibcirctableheader" width="10">%s</td>
-                          </tr>
+                <table class="bibcirctable">
+                    <tr>
+                        <td class="bibcirctableheader" width="10">%s</td>
+                    </tr>
                 </table>
                 <table class="bibcirctable">
                  <tr valign='top'>
@@ -7946,213 +8391,15 @@ class Template:
                     """ % (_("Location"), result[4],
                            _("Collection"))
 
-        if result[3] == 'Monography':
-            out += """
-                      <option value = "Monography" selected>Monography</option>
-                      <option value = "Reference">Reference</option>
-                      <option value = "Archives">Archives</option>
-                      <option value = "Library">Library</option>
-                      <option value = "Conference">Conference</option>
-                      <option value = "LSL Depot">LSL Depot</option>
-                      <option value = "Oversize">Oversize</option>
-                      <option value = "Official">Official</option>
-                      <option value = "Pamphlet">Pamphlet</option>
-                      <option value = "CDROM">CDROM</option>
-                      <option value = "Standards">Standards</option>
-                      <option value = "Video & Trainings">Video & Trainings</option>
-                   """
-        elif result[3] == 'Reference':
-            out += """
-                      <option value = "Monography">Monography</option>
-                      <option value = "Reference" selected>Reference</option>
-                      <option value = "Archives">Archives</option>
-                      <option value = "Library">Library</option>
-                      <option value = "Conference">Conference</option>
-                      <option value = "LSL Depot">LSL Depot</option>
-                      <option value = "Oversize">Oversize</option>
-                      <option value = "Official">Official</option>
-                      <option value = "Pamphlet">Pamphlet</option>
-                      <option value = "CDROM">CDROM</option>
-                      <option value = "Standards">Standards</option>
-                      <option value = "Video & Trainings">Video & Trainings</option>
-                   """
-
-        elif result[3] == 'Archives':
-            out += """
-                      <option value = "Monography">Monography</option>
-                      <option value = "Reference">Reference</option>
-                      <option value = "Archives" selected>Archives</option>
-                      <option value = "Library">Library</option>
-                      <option value = "Conference">Conference</option>
-                      <option value = "LSL Depot">LSL Depot</option>
-                      <option value = "Oversize">Oversize</option>
-                      <option value = "Official">Official</option>
-                      <option value = "Pamphlet">Pamphlet</option>
-                      <option value = "CDROM">CDROM</option>
-                      <option value = "Standards">Standards</option>
-                      <option value = "Video & Trainings">Video & Trainings</option>
-                   """
-
-        elif result[3] == 'Library':
-            out += """
-                      <option value = "Monography">Monography</option>
-                      <option value = "Reference">Reference</option>
-                      <option value = "Archives">Archives</option>
-                      <option value = "Library" selected>Library</option>
-                      <option value = "Conference">Conference</option>
-                      <option value = "LSL Depot">LSL Depot</option>
-                      <option value = "Oversize">Oversize</option>
-                      <option value = "Official">Official</option>
-                      <option value = "Pamphlet">Pamphlet</option>
-                      <option value = "CDROM">CDROM</option>
-                      <option value = "Standards">Standards</option>
-                      <option value = "Video & Trainings">Video & Trainings</option>
-                   """
-
-        elif result[3] == 'Conference':
-            out += """
-                      <option value = "Monography">Monography</option>
-                      <option value = "Reference">Reference</option>
-                      <option value = "Archives">Archives</option>
-                      <option value = "Library">Library</option>
-                      <option value = "Conference" selected>Conference</option>
-                      <option value = "LSL Depot">LSL Depot</option>
-                      <option value = "Oversize">Oversize</option>
-                      <option value = "Official">Official</option>
-                      <option value = "Pamphlet">Pamphlet</option>
-                      <option value = "CDROM">CDROM</option>
-                      <option value = "Standards">Standards</option>
-                      <option value = "Video & Trainings">Video & Trainings</option>
-                   """
-
-        elif result[3] == 'LSL Depot':
-            out += """
-                      <option value = "Monography">Monography</option>
-                      <option value = "Reference">Reference</option>
-                      <option value = "Archives">Archives</option>
-                      <option value = "Library">Library</option>
-                      <option value = "Conference">Conference</option>
-                      <option value = "LSL Depot" selected>LSL Depot</option>
-                      <option value = "Oversize">Oversize</option>
-                      <option value = "Official">Official</option>
-                      <option value = "Pamphlet">Pamphlet</option>
-                      <option value = "CDROM">CDROM</option>
-                      <option value = "Standards">Standards</option>
-                      <option value = "Video & Trainings">Video & Trainings</option>
-                   """
-
-        elif result[3] == 'Oversize':
-            out += """
-                      <option value = "Monography">Monography</option>
-                      <option value = "Reference">Reference</option>
-                      <option value = "Archives">Archives</option>
-                      <option value = "Library">Library</option>
-                      <option value = "Conference">Conference</option>
-                      <option value = "LSL Depot">LSL Depot</option>
-                      <option value = "Oversize" selected>Oversize</option>
-                      <option value = "Official">Official</option>
-                      <option value = "Pamphlet">Pamphlet</option>
-                      <option value = "CDROM">CDROM</option>
-                      <option value = "Standards">Standards</option>
-                      <option value = "Video & Trainings">Video & Trainings</option>
-                   """
-
-        elif result[3] == 'Official':
-            out += """
-                      <option value = "Monography">Monography</option>
-                      <option value = "Reference">Reference</option>
-                      <option value = "Archives">Archives</option>
-                      <option value = "Library">Library</option>
-                      <option value = "Conference">Conference</option>
-                      <option value = "LSL Depot">LSL Depot</option>
-                      <option value = "Oversize">Oversize</option>
-                      <option value = "Official" selected>Official</option>
-                      <option value = "Pamphlet">Pamphlet</option>
-                      <option value = "CDROM">CDROM</option>
-                      <option value = "Standards">Standards</option>
-                      <option value = "Video & Trainings">Video & Trainings</option>
-                   """
-
-        elif result[3] == 'Pamphlet':
-            out += """
-                      <option value = "Monography">Monography</option>
-                      <option value = "Reference">Reference</option>
-                      <option value = "Archives">Archives</option>
-                      <option value = "Library">Library</option>
-                      <option value = "Conference">Conference</option>
-                      <option value = "LSL Depot">LSL Depot</option>
-                      <option value = "Oversize">Oversize</option>
-                      <option value = "Official">Official</option>
-                      <option value = "Pamphlet" select>Pamphlet</option>
-                      <option value = "CDROM">CDROM</option>
-                      <option value = "Standards">Standards</option>
-                      <option value = "Video & Trainings">Video & Trainings</option>
-                   """
-
-        elif result[3] == 'CDROM':
-            out += """
-                      <option value = "Monography">Monography</option>
-                      <option value = "Reference">Reference</option>
-                      <option value = "Archives">Archives</option>
-                      <option value = "Library">Library</option>
-                      <option value = "Conference">Conference</option>
-                      <option value = "LSL Depot">LSL Depot</option>
-                      <option value = "Oversize">Oversize</option>
-                      <option value = "Official">Official</option>
-                      <option value = "Pamphlet">Pamphlet</option>
-                      <option value = "CDROM" selected>CDROM</option>
-                      <option value = "Standards">Standards</option>
-                      <option value = "Video & Trainings">Video & Trainings</option>
-                   """
-
-        elif result[3] == 'Standarts':
-            out += """
-                      <option value = "Monography">Monography</option>
-                      <option value = "Reference">Reference</option>
-                      <option value = "Archives">Archives</option>
-                      <option value = "Library">Library</option>
-                      <option value = "Conference">Conference</option>
-                      <option value = "LSL Depot">LSL Depot</option>
-                      <option value = "Oversize">Oversize</option>
-                      <option value = "Official">Official</option>
-                      <option value = "Pamphlet">Pamphlet</option>
-                      <option value = "CDROM">CDROM</option>
-                      <option value = "Standards" selected>Standards</option>
-                      <option value = "Video & Trainings">Video & Trainings</option>
-                   """
-
-        elif result[3] == 'Video & Trainings':
-            out += """
-                      <option value = "Monography">Monography</option>
-                      <option value = "Reference">Reference</option>
-                      <option value = "Archives">Archives</option>
-                      <option value = "Library">Library</option>
-                      <option value = "Conference">Conference</option>
-                      <option value = "LSL Depot">LSL Depot</option>
-                      <option value = "Oversize">Oversize</option>
-                      <option value = "Official">Official</option>
-                      <option value = "Pamphlet">Pamphlet</option>
-                      <option value = "CDROM">CDROM</option>
-                      <option value = "Standards">Standards</option>
-                      <option value = "Video & Trainings" selected>Video & Trainings</option>
-                   """
-
-        else:
-            out += """
-                      <option value = "">-</option>
-                      <option value = "Monography">Monography</option>
-                      <option value = "Reference">Reference</option>
-                      <option value = "Archives">Archives</option>
-                      <option value = "Library">Library</option>
-                      <option value = "Conference">Conference</option>
-                      <option value = "LSL Depot">LSL Depot</option>
-                      <option value = "Oversize">Oversize</option>
-                      <option value = "Official">Official</option>
-                      <option value = "Pamphlet">Pamphlet</option>
-                      <option value = "CDROM">CDROM</option>
-                      <option value = "Standards">Standards</option>
-                      <option value = "Video & Trainings">Video & Trainings</option>
-                   """
+        for collection in CFG_BIBCIRCULATION_COLLECTION:
+                if collection == result[3]:
+                    out += """
+                        <option value="%s" selected="selected">%s</option>
+                           """ % (collection, collection)
+                else:
+                    out += """
+                        <option value="%s">%s</option>
+                           """ % (collection, collection)
 
         out += """
                    </select>
@@ -8165,35 +8412,32 @@ class Template:
                            name="description" value="%s">
                   </td>
                 </tr>
+                    """ % (_("Description"), result[5] or '-')
+
+        out += """
                 <tr>
                     <th width="100">%s</th>
                     <td>
-                    <select name="loan_period" style='border: 1px solid #cfcfcf'>
-                    """ % (_("Description"), result[5] or '-',
-                           _("Loan period"))
+                      <select name="loan_period"  style='border: 1px solid #cfcfcf'>
+                """ % (_("Loan period"))
 
-        if result[6] == '4 weeks':
-            out += """
-                    <option value ="4 weeks" selected>4 weeks</option>
-                    <option value ="1 week">1 week</option>
-                    <option value ="reference">reference</option>
-                    """
-        elif result[6] == '1 week':
-            out += """
-                    <option value ="4 weeks">4 weeks</option>
-                    <option value ="1 week" selected>1 week</option>
-                    <option value ="reference">reference</option>
-                    """
-        else:
-            out += """
-                    <option value ="4 weeks">4 weeks</option>
-                    <option value ="1 week">1 week</option>
-                    <option value ="reference" selected>reference</option>
-                    """
+        for loan_period in CFG_BIBCIRCULATION_ITEM_LOAN_PERIOD:
+            if loan_period == result[6]:
+                out += """
+                          <option value="%s" selected="selected">%s</option>
+                       """ % (loan_period, loan_period)
+            else:
+                out += """
+                          <option value="%s">%s</option>
+                       """ % (loan_period, loan_period)
 
-        out += """</select>
+        out += """
+                      </select>
                     </td>
-                 </tr>
+                </tr>
+            """
+
+        out += """
                  <tr>
                     <th width="100">%s</th>
                     <td>
@@ -8860,10 +9104,10 @@ class Template:
                   _("Personal details"),
                   id_string, display_id,
                   _("Name"), name,
-                  _("Email"), email,
-                  _("Phone"), phone,
                   _("Address"), address,
-                  _("Mailbox"), mailbox)
+                  _("Mailbox"), mailbox,
+                  _("Email"), email,
+                  _("Phone"), phone)
 
 
         out +="""
@@ -9107,10 +9351,10 @@ class Template:
             """% (_("Borrower details"),
                   id_string, display_id,
                   _("Name"), name,
-                  _("Email"), email,
-                  _("Phone"), phone,
                   _("Address"), address,
-                  _("Mailbox"), mailbox)
+                  _("Mailbox"), mailbox,
+                  _("Email"), email,
+                  _("Phone"), phone)
 
 
         out += """
@@ -9707,10 +9951,10 @@ class Template:
                 """ % (_("Borrower details"),
                        _("ID"), ccid,
                        _("Name"), name,
-                       _("Email"), email,
-                       _("Phone"), phone,
                        _("Address"), address,
-                       _("Mailbox"), mailbox)
+                       _("Mailbox"), mailbox,
+                       _("Email"), email,
+                       _("Phone"), phone)
 
         out += """
 
@@ -9975,7 +10219,8 @@ class Template:
                     </tr>
                     <tr>
                     <td align="center">
-                    <input type="text" size="40" id="string" name="string"  value='%s' style='border: 1px solid #cfcfcf'>
+                    <input type="text" size="40" id="string" name="string"
+                           value='%s' style='border: 1px solid #cfcfcf'>
                     </td>
                     </tr>
                     <tr>
@@ -9992,24 +10237,37 @@ class Template:
 #<input type=hidden name=recid value='%s'>
         if result:
             out += """
+                <script type="text/javascript">
+                    function checkform(form){
+                      if (form.user_id.value == ""){
+                        alert("Please select one borrower to continue");
+                        return false;
+                      }
+                      else{
+                        return true;
+                      }
+                    }
+                </script>
+                """
+
+            out += """
             <br />
-            <form name="step1_form2" action="%s/admin2/bibcirculation/loan_on_desk_step3" method="get" >
+            <form name="step1_form2" action="%s/admin2/bibcirculation/loan_on_desk_step3"
+                  method="get" onsubmit="return checkform(this);">
             <input type=hidden name=barcode value='%s'>
 
             <table class="bibcirctable">
               <tr width="200">
                 <td align="center">
-                  <select name="user_id" size="8" style='border: 1px solid #cfcfcf; width:40%%'>
+                  <select name="user_id" size="8" style='border: 1px solid #cfcfcf;'>
 
             """ % (CFG_SITE_URL, barcode)
 
             for brw in result:
                 borrower_id = brw[0]
                 name = brw[2]
-                #(borrower_id, ccid, name, email, phone, address, mailbox)
                 out += """
                        <option value ="%s">%s
-
                        """ % (borrower_id, name)
 
             out += """
@@ -10169,10 +10427,10 @@ class Template:
                 """ % (_("Borrower details"),
                        _("ID"), ccid,
                        _("Name"), name,
-                       _("Email"), email,
-                       _("Phone"), phone,
                        _("Address"), address,
-                       _("Mailbox"), mailbox)
+                       _("Mailbox"), mailbox,
+                       _("Email"), email,
+                       _("Phone"), phone)
 
         out += """
 
@@ -11242,10 +11500,10 @@ class Template:
     #            """ % (_("Borrower details"),
     #                   id_string, display_id,
     #                   _("Name"), name,
-    #                   _("Email"), email,
-    #                   _("Phone"), phone,
     #                   _("Address"), address,
     #                   _("Mailbox"), mailbox,
+    #                   _("Email"), email,
+    #                   _("Phone"), phone,
     #                   _("ILL request details"),
     #                   _("Period of interest - From"), _("period_of_interest_from"),
     #                   _("jsCal3"), _("period_of_interest_from"), _("jsCal3"),
@@ -11415,10 +11673,10 @@ class Template:
                              _("Borrower details"),
                              id_string, display_id,
                              _("Name"), name,
-                             _("Email"), email,
-                             _("Phone"), phone,
                              _("Address"), address,
-                             _("Mailbox"), mailbox)
+                             _("Mailbox"), mailbox,
+                             _("Email"), email,
+                             _("Phone"), phone)
 
         out += """<br />
                   <table class="bibcirctable">
@@ -11859,11 +12117,13 @@ class Template:
         </script>
          <div class="bibcircbottom">
            <br />
-             <table id="table_ill" class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+             <table id="table_ill" class="tablesorter" border="0"
+                                   cellpadding="0" cellspacing="1">
              <thead>
                     <tr>
-                       <th width="200">%s</th>
-                       <th width="300">%s</th>
+                       <th>%s</th>
+                       <th>%s</th>
+                       <th>%s</th>
                        <th>%s</th>
                        <th>%s</th>
                        <th>%s</th>
@@ -11879,13 +12139,14 @@ class Template:
                   _("Status"),
                   _("ID"),
                   _("Interest from"),
+                  _("Due date"),
                   _("Type"),
                   _("Option(s)"))
 
 
 
         for (ill_request_id, borrower_id, borrower_name, library_id,
-             ill_status, period_from, _period_to, item_info, request_type) in ill_req:
+             ill_status, period_from, _period_to, due_date, item_info, request_type) in ill_req:
 
             borrower_link = create_html_link(CFG_SITE_URL +
                                              '/admin2/bibcirculation/get_borrower_details',
@@ -11920,6 +12181,7 @@ class Template:
                     <td class="bibcirccontent">%s</td>
                     <td class="bibcirccontent">%s</td>
                     <td class="bibcirccontent">%s</td>
+                    <td class="bibcirccontent">%s</td>
                     <td align="center">
                        <input type=button onClick="location.href='%s/admin2/bibcirculation/ill_request_details_step1?ill_request_id=%s'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                        value=%s class='bibcircbutton'>
@@ -11927,7 +12189,8 @@ class Template:
                    </tr>
 
                     """ % (borrower_link, title_link, library_name, ill_status,ill_request_id,
-                           period_from, request_type, CFG_SITE_URL, ill_request_id, _('select'))
+                           period_from, due_date or '-', request_type, CFG_SITE_URL,
+                           ill_request_id, _('select'))
 
         out += """
            </tbody>
@@ -11978,6 +12241,7 @@ class Template:
 
         (library_id, request_date, expected_date, arrival_date, due_date, return_date,
          cost, barcode, library_notes, ill_status) = ill_request_details
+        request_ok = True
 
         if cost:
             (value, currency) = cost.split()
@@ -12314,7 +12578,7 @@ class Template:
                          #--->
 
             else:
-                out += """aqui falta algo, no?"""
+                out += """something is missing, isn't it?"""
 
         out += """
         <table class="bibcirctable">
@@ -15186,12 +15450,14 @@ class Template:
                 </tr>
              </table>
              <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
+             <!--
                 <tr>
                     <th width="100">%s</th>
                     <td>
                         <input type="text" size="30" name="budget_code" style='border: 1px solid #cfcfcf'>
                     </td>
                 </tr>
+                -->
                 <tr>
                     <th valign="center" width="100">%s</th>
                     <td valign="center" width="250">
@@ -15357,10 +15623,12 @@ class Template:
                         </tr>
                        </table>
                        <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                       <!--
                         <tr>
                           <th width="100">%s</th>
                           <td>%s</td><input type=hidden name=budget_code value="%s">
                         </tr>
+                        -->
                         <tr>
                           <th width="100">%s</th>
                           <td>%s</td><input type=hidden name=period_of_interest_from value="%s">
@@ -15529,7 +15797,7 @@ class Template:
                         </td>
                     </tr>
                     </table>
-                    <input type=hidden name=budget_code value="%s">
+                    <!-- <input type=hidden name=budget_code value="%s"> -->
                     <input type=hidden name=period_of_interest_from value="%s">
                     <input type=hidden name=period_of_interest_to value="%s">
                     <input type=hidden name=additional_comments value="%s">
@@ -15615,7 +15883,7 @@ class Template:
                 """ % (title, authors, place, publisher, year, edition, isbn)
 
         out += """
-                    <input type=hidden name=budget_code value='%s'>
+                    <!-- <input type=hidden name=budget_code value='%s'> -->
                     <input type=hidden name=period_of_interest_from value='%s'>
                     <input type=hidden name=period_of_interest_to value='%s'>
                     <input type=hidden name=additional_comments value='%s'>
@@ -15755,10 +16023,10 @@ class Template:
                       """ % (_("Borrower details"), borrower_id,
                              id_string, display_id,
                              _("Name"), name,
-                             _("Email"), email,
-                             _("Phone"), phone,
                              _("Address"), address,
-                             _("Mailbox"), mailbox)
+                             _("Mailbox"), mailbox,
+                             _("Email"), email,
+                             _("Phone"), phone)
 
         out += """<br />
                   <table class="bibcirctable">
@@ -16332,7 +16600,7 @@ class Template:
           <tbody>
         """ % (len(result), _("Title"),
                _("Author"), _("Publisher"),
-               _("No. Copies"))
+               _("# copies"))
 
             for recid in result:
 
@@ -16494,7 +16762,7 @@ class Template:
           <tbody>
         """ % (len(result), _("Title"),
                _("Author"), _("Publisher"),
-               _("No. Copies"))
+               _("# copies"))
 
             for recid in result:
 
@@ -16867,10 +17135,10 @@ class Template:
                              _("Borrower details"), user_info,
                              id_string, display_id,
                              _("Name"), name,
-                             _("Email"), email,
-                             _("Phone"), phone,
                              _("Address"), address,
-                             _("Mailbox"), mailbox)
+                             _("Mailbox"), mailbox,
+                             _("Email"), email,
+                             _("Phone"), phone)
 
         out += """<br />
                   <table class="bibcirctable">
@@ -16978,12 +17246,12 @@ class Template:
                           <input type="text" size="30" name="year" style='border: 1px solid #cfcfcf'>
                         </td>
                      </tr>
-                     <tr>
+                     <!-- <tr>
                         <th width="100">%s</th>
                         <td>
                           <input type="text" size="30" name="budget_code" style='border: 1px solid #cfcfcf'>
                         </td>
-                     </tr>
+                     </tr> -->
                      <tr>
                         <th width="100">%s</th>
                         <td>
@@ -17168,10 +17436,10 @@ class Template:
                           <th width="100">%s</th>
                           <td>%s</td><input type=hidden name=year value="%s">
                         </tr>
-                        <tr>
+                        <!-- <tr>
                           <th width="100">%s</th>
                           <td>%s</td><input type=hidden name=budget_code value="%s">
-                        </tr>
+                        </tr> -->
                         <tr>
                           <th width="100">%s</th>
                           <td>%s</td><input type=hidden name=issn value="%s">
@@ -17476,6 +17744,8 @@ class Template:
 
         _ = gettext_set_language(ln)
 
+        record_is_periodical = is_periodical(recid)
+
         #out = self.tmpl_infobox(infos, ln)
 
         out = load_menu(ln)
@@ -17489,14 +17759,47 @@ class Template:
 
 
         out += """
-           <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-           <script src="/js/jquery.js" type="text/javascript"></script>
+            <style type="text/css">
+                @import url("/img/tablesorter.css");
+            </style>
+            <script src="/js/jquery.js" type="text/javascript"></script>
             <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+
+            <style type="text/css">
+                @import url("/js/tablesorter/themes/blue/style.css");
+            </style>
+            <style type="text/css">
+                @import url("/js/tablesorter/addons/pager/jquery.tablesorter.pager.css");
+            </style>
+
+            <script src="/js/jquery.min.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/addons/pager/jquery.tablesorter.pager.js"
+                    type="text/javascript"></script>
+            """
+
+        if record_is_periodical:
+            out += """
             <script type="text/javascript">
-            $(document).ready(function() {
-              $('#table_copies').tablesorter({widthFixed: true, widgets: ['zebra']})
-            });
+                $(document).ready(function(){
+                    $("#table_copies")
+                      .tablesorter({sortList: [[6,1]],widthFixed: true, widgets: ['zebra']})
+                      .bind("sortStart",function(){$("#overlay").show();})
+                      .bind("sortEnd",function(){$("#overlay").hide()})
+                      .tablesorterPager({container: $("#pager"), positionFixed: false});
+                });
             </script>
+            """
+        else:
+            out += """
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    $('#table_copies').tablesorter({widthFixed: true, widgets: ['zebra']})
+                });
+            </script>
+            """
+
+        out += """
            <form name="delete_copy_step2_form" action="%s/admin2/bibcirculation/delete_copy_step2" method="get">
            <div class="bibcircbottom">
                 <br />
@@ -17558,29 +17861,42 @@ class Template:
                    _("Copies of %s" % book_title))
 
 
-        out += """<table id="table_copies" class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+        out += """
+                  <table class="tablesorter" id="table_copies" border="0"
+                         cellpadding="0" cellspacing="1">
                   <thead>
                     <tr>
                       <th>%s</th>
                       <th>%s</th>
                       <th>%s</th>
                       <th>%s</th>
+                """ % (_("Barcode"),
+                       _("Status"),
+                       _("Due date"),
+                       _("Library"))
+
+        if not record_is_periodical:
+            out += """
+                      <th>%s</th>
+                   """ % (_("Location"))
+
+        out += """
                       <th>%s</th>
                       <th>%s</th>
+                """ % (_("Loan period"),
+                       _("No of loans"))
+
+        if not record_is_periodical:
+            out += """
                       <th>%s</th>
-                      <th>%s</th>
+                   """ % (_("Collection"))
+
+        out += """
                       <th>%s</th>
                     </tr>
-                    </thead>
-                    <tbody>""" % (_("Barcode"),
-                                _("Status"),
-                                _("Due date"),
-                                _("Library"),
-                                _("Location"),
-                                _("Loan period"),
-                                _("No of loans"),
-                                _("Collection"),
-                                _("Description"))
+                  </thead>
+                  <tboby>
+                    """ % (_("Description"))
 
         for (barcode, loan_period, lib_name, libid, location, nb_requests,
              status, collection, description, due_date) in result:
@@ -17596,19 +17912,52 @@ class Template:
                      <td>%s</td>
                      <td>%s</td>
                      <td>%s</td>
+                     """ % (barcode, status, due_date or '-', library_link)
+
+            if not record_is_periodical:
+                out += """
+                     <td>%s</td>
+                     """ % (location)
+
+            out += """
                      <td>%s</td>
                      <td>%s</td>
+                     """ % (loan_period, nb_requests)
+
+            if not record_is_periodical:
+                out += """
                      <td>%s</td>
+                     """ % (collection or '-')
+
+            out += """
                      <td>%s</td>
-                     <td>%s</td>
-                 </tr>
-                 """ % (barcode, status, due_date, library_link, location,
-                        loan_period, nb_requests, collection or '-',
-                        description or '-')
+                     """ % (description or '-')
+
 
         out += """ </tbody>
                   </table>
                 """
+
+        if record_is_periodical:
+            out += """
+            <div id="pager" class="pager">
+                        <form>
+                            <img src="/img/sb.gif" class="first" />
+                            <img src="/img/sp.gif" class="prev" />
+                            <input type="text" class="pagedisplay" />
+                            <img src="/img/sn.gif" class="next" />
+                            <img src="/img/se.gif" class="last" />
+                            <select class="pagesize">
+                                <option value="10" selected="selected">10</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                                <option value="40">40</option>
+                            </select>
+                        </form>
+            </div>
+            </br>
+            """
+
         out += self.tmpl_infobox(infos, ln)
 
         out += """<table id="table_copies" class="tablesorter" border="0" cellpadding="0" cellspacing="1">
@@ -17667,5 +18016,238 @@ class Template:
         out+= """<input type="submit" value='%s' class="formbutton">""" %(_("Delete"))
 
         out += """</div></form>"""
+
+        return out
+
+    def tmpl_all_library_items(self, library_id, library_name, copies, infos, ln=CFG_SITE_LANG):
+        """
+        @param ln: language of the page
+        """
+
+        _ = gettext_set_language(ln)
+
+        out = self.tmpl_infobox(infos, ln)
+
+        library_link = ''
+        if library_name is not None:
+            library_link = create_html_link(CFG_SITE_URL +
+                                        '/admin2/bibcirculation/get_library_details',
+                                        {'library_id': library_id, 'ln': ln}, (library_name))
+
+        out += load_menu(ln)
+
+        out += str(time.ctime())
+
+        out += """<br />"""
+
+        out += """
+            <style type="text/css">
+                @import url("/img/tablesorter.css");
+            </style>
+            <script src="/js/jquery.js" type="text/javascript"></script>
+            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+
+            <style type="text/css">
+                @import url("/js/tablesorter/themes/blue/style.css");
+            </style>
+            <style type="text/css">
+                @import url("/js/tablesorter/addons/pager/jquery.tablesorter.pager.css");
+            </style>
+
+            <script src="/js/jquery.min.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/addons/pager/jquery.tablesorter.pager.js"
+                    type="text/javascript"></script>
+            """
+
+
+        out += """
+            <script type="text/javascript">
+                $(document).ready(function(){
+                    $("#table_copies")
+                      .tablesorter({sortList: [[7,1],[4,0]],widthFixed: true,widgets: ['zebra']})
+                      .bind("sortStart",function(){$("#overlay").show();})
+                      .bind("sortEnd",function(){$("#overlay").hide()})
+                      .tablesorterPager({container: $("#pager"), positionFixed: false});
+                });
+            </script>
+            """
+
+        out += """
+                  <table class="tablesorter" id="table_copies" border="0"
+                         cellpadding="0" cellspacing="1">
+                  <thead>
+                    <tr>
+                      <th>%s</th>
+                      <th>%s</th>
+                      <th>%s</th>
+                      <th>%s</th>
+                      <th>%s</th>
+               """ % (_("Barcode"),
+                      _("Status"),
+                      _("Requested"),
+                      _("Due date"),
+                      _("Library"))
+
+        out += """
+                      <th>%s</th>
+                   """ % (_("Location"))
+
+        out +=  """
+                      <th>%s</th>
+
+                """ % (_("Loan period"))
+
+        out += """
+                      <th>%s</th>
+                   """ % (_("Collection"))
+
+        out += """
+                      <th>%s</th>
+                      <th>%s</th>
+                    </tr>
+                  </thead>
+                  <tboby>
+                    """ % (_("Description"),
+                           _("Actions"))
+
+        for (barcode, recid, loan_period, location,
+             status, collection, description, due_date) in copies:
+
+            number_of_requests = db.get_number_requests_per_copy(barcode)
+            if number_of_requests > 0:
+                requested = 'Yes'
+            else:
+                requested = 'No'
+
+            if status in ('on order', 'claimed'):
+                expected_arrival_date = db.get_expected_arrival_date(barcode)
+                if expected_arrival_date != '':
+                    status = status + ' - ' + expected_arrival_date
+
+            record_link = create_html_link(CFG_SITE_URL +
+                                           '/admin2/bibcirculation/get_item_details',
+                                           {'recid': recid, 'ln': ln}, (barcode))
+
+            out += """
+                 <tr>
+                     <td>%s</td>
+                     <td>%s</td>
+                     <td>%s</td>
+                     <td>%s</td>
+                     <td>%s</td>
+                     """ % (record_link, status, requested, due_date or '-', library_link)
+
+            out += """
+                     <td>%s</td>
+                     """ % (location)
+
+            out += """
+                     <td>%s</td>
+                     """ % (loan_period)
+
+            out += """
+                     <td>%s</td>
+                     """ % (collection or '-')
+
+            out += """
+                     <td>%s</td>
+                     """ % (description or '-')
+
+            if status == 'on loan':
+                out += """
+                  <td align="center">
+                    <SELECT style='border: 1px solid #cfcfcf' ONCHANGE="location = this.options[this.selectedIndex].value;">
+                      <OPTION VALUE="">Select an action
+                      <OPTION VALUE="update_item_info_step4?barcode=%s">Update
+                      <OPTION VALUE="place_new_request_step1?barcode=%s">New request
+                      <OPTION VALUE="" DISABLED>New loan
+                      <OPTION VALUE="" DISABLED>Delete copy
+                    </SELECT>
+                  </td>
+                 </tr>
+                 """ % (barcode, barcode, barcode)
+
+            elif status == 'missing':
+                out += """
+                     <td align="center">
+                       <SELECT style='border: 1px solid #cfcfcf' ONCHANGE="location = this.options[this.selectedIndex].value;">
+                         <OPTION VALUE="">Select an action
+                         <OPTION VALUE="update_item_info_step4?barcode=%s">Update
+                         <OPTION VALUE="" DISABLED>New request
+                         <OPTION VALUE="" DISABLED>New loan
+                         <OPTION VALUE="delete_copy_step1?barcode=%s">Delete copy
+                       </SELECT>
+                     </td>
+                 </tr>
+                 """ % (barcode, barcode)
+
+            elif status == 'Reference':
+                out += """
+                     <td align="center">
+                       <SELECT style='border: 1px solid #cfcfcf' ONCHANGE="location = this.options[this.selectedIndex].value;">
+                         <OPTION VALUE="">Select an action
+                         <OPTION VALUE="update_item_info_step4?barcode=%s">Update
+                         <OPTION VALUE="place_new_request_step1?barcode=%s">New request
+                         <OPTION VALUE="place_new_loan_step1?barcode=%s">New loan
+                         <OPTION VALUE="delete_copy_step1?barcode=%s">Delete copy
+                       </SELECT>
+                     </td>
+                 </tr>
+                 """ % (barcode, barcode, barcode, barcode)
+
+            else:
+                out += """
+                     <td align="center">
+                       <SELECT style='border: 1px solid #cfcfcf' ONCHANGE="location = this.options[this.selectedIndex].value;">
+                         <OPTION VALUE="">Select an action
+                         <OPTION VALUE="update_item_info_step4?barcode=%s">Update
+                         <OPTION VALUE="place_new_request_step1?barcode=%s">New request
+                         <OPTION VALUE="place_new_loan_step1?barcode=%s">New loan
+                         <OPTION VALUE="delete_copy_step1?barcode=%s">Delete copy
+                       </SELECT>
+                     </td>
+                 </tr>
+                 """ % (barcode, barcode, barcode, barcode)
+
+        out += """
+             </tbody>
+            </table>
+            """
+
+        out += """
+            <div id="pager" class="pager">
+                        <form>
+                            <img src="/img/sb.gif" class="first" />
+                            <img src="/img/sp.gif" class="prev" />
+                            <input type="text" class="pagedisplay" />
+                            <img src="/img/sn.gif" class="next" />
+                            <img src="/img/se.gif" class="last" />
+                            <select class="pagesize">
+                                <option value="10">10</option>
+                                <option value="20" selected="selected">20</option>
+                                <option value="30">30</option>
+                                <option value="40">40</option>
+                            </select>
+                        </form>
+            </div>
+            """
+        out += str(time.ctime())
+        out += """
+           <br />
+           <table class="bibcirctable">
+             <tr>
+               <td>
+                 <input type=button value='%s'
+                 onClick="history.go(-1)" class="formbutton">
+               </td>
+             </tr>
+           </table>
+           <br />
+           <br />
+           <br />
+           </div>
+
+           """ % (_("Back"))
 
         return out

@@ -25,7 +25,7 @@ import invenio.bibcirculation_dblayer as db
 from invenio.search_engine import get_fieldvalues, get_field_tags
 from invenio.bibtask import task_low_level_submission
 from invenio.textutils import encode_for_xml
-from invenio.config import CFG_SITE_URL, CFG_TMPDIR
+from invenio.config import CFG_SITE_URL, CFG_TMPDIR, CFG_SITE_LANG
 
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY, \
                                           CFG_BIBCIRCULATION_WORKING_DAYS, \
@@ -38,7 +38,10 @@ import datetime, time
 def search_user(column, string):
     if string is not None:
         string = string.strip()
+
+
     if CFG_CERN_SITE == 1:
+
         if column == 'name':
             result = db.search_borrower_by_name(string)
         else:
@@ -70,7 +73,7 @@ def search_user(column, string):
                     result = ()
                 else:
                     try:
-                        name = ldap_info['cn'][0]
+                        name = ldap_info['displayName'][0]
                     except KeyError:
                         name = ""
                     try:
@@ -105,6 +108,40 @@ def search_user(column, string):
         else:
             result = db.search_borrower_by_id(string)
 
+    return result
+
+def update_user_info_from_ldap(user_id):
+    from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
+    ccid = db.get_borrower_ccid(user_id)
+    ldap_info = 'busy'
+    while ldap_info == 'busy':
+        time.sleep(1)
+        ldap_info = get_user_info_from_ldap(ccid=ccid)
+    if len(ldap_info) == 0:
+        result = ()
+    else:
+        try:
+            name    = ldap_info['displayName'][0]
+        except KeyError:
+            name    = ""
+        try:
+            email   = ldap_info['mail'][0]
+        except KeyError:
+            email   = ""
+        try:
+            phone   = ldap_info['telephoneNumber'][0]
+        except KeyError:
+            phone   = ""
+        try:
+            address = ldap_info['physicalDeliveryOfficeName'][0]
+        except KeyError:
+            address = ""
+        try:
+            mailbox = ldap_info['postOfficeBox'][0]
+        except KeyError:
+            mailbox = ""
+        db.update_borrower(user_id, name, email, phone, address, mailbox)
+        result = db.search_borrower_by_ccid(int(ccid))
     return result
 
 #def hold_request_mail(recid, barcode, borrower_id):
@@ -269,15 +306,26 @@ def book_information_from_MARC(recid):
 
     book_title  = book_title_from_MARC(recid)
 
-    book_year   = ''.join(get_fieldvalues(recid, "260__c"))
+    book_year   =   ''.join(get_fieldvalues(recid, "260__c"))
 
-    book_author = ''.join(get_fieldvalues(recid, "100__a") + \
-                           get_fieldvalues(recid, "100__u"))
 
-    book_isbn   = ''.join(get_fieldvalues(recid, "020__a"))
+    author_tags = ['100__a', '700__a', '721__a']
+    book_author = ''
 
-    book_editor = ', '.join(get_fieldvalues(recid,"260__a") + \
-                           get_fieldvalues(recid, "260__b"))
+    for tag in author_tags:
+        l = get_fieldvalues(recid, tag)
+        for c in l:
+            book_author += c + '; '
+    book_author = book_author[:-2]
+
+    l = get_fieldvalues(recid, "020__a")
+    book_isbn = ''
+    for isbn in l:
+        book_isbn += isbn + ', '
+    book_isbn = book_isbn[:-2]
+
+    book_editor = ', '.join(get_fieldvalues(recid, "260__a") + \
+                            get_fieldvalues(recid, "260__b"))
 
     return (book_title, book_year, book_author, book_isbn, book_editor)
 
@@ -407,22 +455,24 @@ def make_copy_available(request_id):
 
     return
 
-def print_new_loan_information(req, ln):
+def print_new_loan_information(req):
     """
     Create a printable format with the information of the last
     loan who has been registered on the table crcLOAN.
     """
 
-    _ = gettext_set_language(ln)
+    _ = gettext_set_language(CFG_SITE_LANG)
 
     # get the last loan from crcLOAN
     (recid, borrower_id, due_date) = db.get_last_loan()
 
     # get book's information
-    (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
+    (book_title, book_year, book_author,
+                 book_isbn, book_editor) = book_information_from_MARC(recid)
 
     # get borrower's data/information (name, address, email)
-    (borrower_name, borrower_address, _borrower_mailbox, borrower_email) = db.get_borrower_data(borrower_id)
+    (borrower_name, borrower_address,
+     borrower_mailbox, borrower_email) = db.get_borrower_data(borrower_id)
 
     # Generate printable format
     req.content_type = "text/html"
@@ -435,14 +485,22 @@ def print_new_loan_information(req, ln):
                    </tr>
                   </table><br />""" % (CFG_SITE_URL)
 
-    out += """<table style='color: #79d; font-size: 82%; width:95%; margin:auto; max-width: 400px;'>"""
+    out += """<table style='color: #79d; font-size: 82%; width:95%;
+                            margin:auto; max-width: 400px;'>"""
 
-    out += """ <tr><td align="center"><h2><strong>%s</strong></h2></td></tr>""" % (_("Loan information"))
+    out += """  <tr>
+                    <td align="center">
+                        <h2><strong>%s</strong></h2>
+                    </td>
+                </tr>""" % (_("Loan information"))
 
-    out += """ <tr><td align="center"><strong>%s</strong></td></tr>""" % (_("This book is sent to you ..."))
+    out += """  <tr>
+                    <td align="center"><strong>%s</strong></td>
+                </tr>""" % (_("This book has been sent to you:"))
 
     out += """</table><br />"""
-    out += """<table style='color: #79d; font-size: 82%; width:95%; margin:auto; max-width: 400px;'>"""
+    out += """<table style='color: #79d; font-size: 82%; width:95%;
+                            margin:auto; max-width: 400px;'>"""
     out += """<tr>
                         <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
                   </tr>
@@ -458,42 +516,60 @@ def print_new_loan_information(req, ln):
                    <tr>
                         <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
                   </tr>
-                  """ % (_("Title"), book_title,
+                  """ % (_("Title"),  book_title,
                          _("Author"), book_author,
                          _("Editor"), book_editor,
-                         _("ISBN"), book_isbn,
-                         _("Year"), book_year)
+                         _("ISBN"),   book_isbn,
+                         _("Year"),   book_year)
 
     out += """</table><br />"""
 
-    out += """<table style='color: #79d; font-size: 82%; width:95%; margin:auto; max-width: 400px;'>"""
-    out += """<tr>
-                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
-                  </tr>
-                  <tr>
-                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
-                  </tr>
-                  <tr>
-                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
-                  </tr>
-                  <tr>
-                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
-                  </tr> """ % (_("Id"), borrower_id,
-                               _("Name"), borrower_name,
-                               _("Address"), borrower_address,
-                               _("Email"), borrower_email)
-    out += """</table> <br />"""
+    out += """<table style='color: #79d; font-size: 82%; width:95%;
+                            margin:auto; max-width: 400px;'>"""
+    out += """  <tr>
+                    <td width="70"><strong>%s</strong></td>
+                    <td style='color: black;'>%s</td>
+                </tr>
+                <tr>
+                    <td width="70"><strong>%s</strong></td>
+                    <td style='color: black;'>%s</td>
+                </tr>
+                <tr>
+                    <td width="70"><strong>%s</strong></td>
+                    <td style='color: black;'>%s</td>
+                </tr>
+                <tr>
+                    <td width="70"><strong>%s</strong></td>
+                    <td style='color: black;'>%s</td>
+                </tr>
+           """ % (_("Name"),    borrower_name,
+                  _("Mailbox"), borrower_mailbox,
+                  _("Address"), borrower_address,
+                  _("Email"),   borrower_email)
 
-    out += """<table style='color: #79d; font-size: 82%; width:95%; margin:auto; max-width: 400px;'>"""
+    out += """</table>
+              <br />"""
 
-    out += """ <tr><td align="center"><h2><strong>%s: %s</strong></h2></td></tr>""" % (_("Due date"), due_date)
+    out += """<table style='color: #79d; font-size: 82%; width:95%;
+                            margin:auto; max-width: 400px;'>"""
+
+    out += """  <tr>
+                    <td align="center"><h2><strong>%s: %s</strong></h2></td>
+                </tr>""" % (_("Due date"), due_date)
 
     out += """</table>"""
 
-    out += """<table style='color: #79d; font-size: 82%; width:95%; margin:auto; max-width: 800px;'>
-                  <tr><td><input type="button" onClick='window.print()'
-                  value='Print' style='color: #fff; background: #36c; font-weight: bold;'></td></tr>
-                  </table>"""
+    out += """<table style='color: #79d; font-size: 82%; width:95%;
+                            margin:auto; max-width: 800px;'>
+                <tr>
+                    <td>
+                        <input type="button" onClick='window.print()'
+                               value='Print' style='color: #fff;
+                               background: #36c; font-weight: bold;'>
+                    </td>
+                </tr>
+              </table>
+           """
 
     req.write("<html>")
     req.write(out)
@@ -828,3 +904,42 @@ def tag_all_requests_as_done(barcode, user_id):
     list_of_barcodes = db.get_barcodes(recid)
     for bc in list_of_barcodes:
         db.tag_requests_as_done(bc, user_id)
+
+def update_requests_statuses(barcode):
+    recid = db.get_recid(barcode)
+    list_of_pending_requests = db.get_requests(recid, 'pending')
+    some_copy_available = False
+    copies_status = db.get_copies_status(recid)
+    for status in copies_status:
+        if status == 'on shelf':
+            some_copy_available = True
+
+    if len(list_of_pending_requests) == 1:
+        if not some_copy_available:
+            db.update_loan_request_status(list_of_pending_requests[0][0], 'waiting')
+        else:
+            return list_of_pending_requests[0][0]
+
+    elif len(list_of_pending_requests) == 0:
+        if some_copy_available:
+            list_of_waiting_requests = db.get_requests(recid, 'waiting')
+            if len(list_of_waiting_requests) > 0:
+                db.update_loan_request_status(list_of_waiting_requests[0][0], 'pending')
+                return list_of_waiting_requests[0][0]
+
+    elif len(list_of_pending_requests) > 1:
+        for request in list_of_pending_requests:
+            db.update_loan_request_status(request[0], 'waiting')
+        list_of_waiting_requests = db.get_requests(recid, 'waiting')
+        if some_copy_available:
+            db.update_loan_request_status(list_of_waiting_requests[0][0], 'pending')
+            return list_of_waiting_requests[0][0]
+
+    return None
+
+def is_periodical(recid):
+    rec_type = get_fieldvalues(recid, "690C_a")
+    if len(rec_type) > 0:
+        return rec_type[0] == 'PERI'
+    else:
+        return False

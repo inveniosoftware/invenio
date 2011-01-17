@@ -26,7 +26,7 @@ import invenio.bibcirculation_dblayer as db
 import invenio.template
 bibcirculation_templates = invenio.template.load('bibcirculation')
 from invenio.bibcirculationadminlib import load_template
-# others invenio imports
+# other invenio imports
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_CERN_SITE, \
@@ -37,10 +37,12 @@ from invenio.urlutils import create_html_link
 from invenio.webuser import collect_user_info
 from invenio.mailutils import send_email
 from invenio.bibcirculation_utils import book_title_from_MARC, \
+     update_status_if_expired, \
      book_information_from_MARC, \
      make_copy_available, \
      create_ill_record, search_user, \
-     tag_all_requests_as_done
+     tag_all_requests_as_done, \
+     generate_new_due_date
      #book_information_from_MARC
 from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL, \
@@ -87,13 +89,13 @@ def perform_borrower_loans(uid, barcode, borrower_id,
 
     borrower_id = db.is_borrower(db.get_invenio_user_email(uid))
 
+    new_due_date = generate_new_due_date(30)
+    #tmp_date = datetime.date.today() + datetime.timedelta(days=30)
+    #new_due_date = get_datetext(tmp_date.year, tmp_date.month, tmp_date.day)
 
-    tmp_date = datetime.date.today() + datetime.timedelta(days=30)
-    new_due_date = get_datetext(tmp_date.year, tmp_date.month, tmp_date.day)
 
     #renew loan
     if action == 'renew':
-    #if barcode:
         recid = db.get_id_bibrec(barcode)
         queue = db.get_queue_request(recid)
 
@@ -104,20 +106,17 @@ def perform_borrower_loans(uid, barcode, borrower_id,
         else:
             loan_id = db.get_current_loan_id(barcode)
             db.renew_loan(loan_id, new_due_date)
+            update_status_if_expired(loan_id)
             tag_all_requests_as_done(barcode, borrower_id)
-            #db.update_due_date(loan_id, new_due_date)
             infos.append("Your loan has been renewed with sucess.")
 
     #cancel request
     elif action == 'cancel':
-    #elif request_id:
         db.cancel_request(request_id)
         make_copy_available(request_id)
 
     #renew all loans
     elif action == 'renew_all':
-    #elif borrower_id:
-        #list_of_recids = db.get_borrower_recids(borrower_id)
         list_of_barcodes = db.get_borrower_loans_barcodes(borrower_id)
         for bc in list_of_barcodes:
             bc_recid = db.get_recid(bc)
@@ -126,13 +125,13 @@ def perform_borrower_loans(uid, barcode, borrower_id,
             #check if there are requests
             if len(queue) != 0 and queue[0][0] != borrower_id:
                 infos.append("It is not possible to renew your loan for " \
-                        "<strong>" + book_title_from_MARC(bc_recid) + "</strong>. Another user" \
-                        " is waiting for this book.")
+                        "<strong>" + book_title_from_MARC(bc_recid) + "</strong>. Another user " \
+                        "is waiting for this book.")
             else:
                 loan_id = db.get_current_loan_id(bc)
                 db.renew_loan(loan_id, new_due_date)
+                update_status_if_expired(loan_id)
                 tag_all_requests_as_done(barcode, borrower_id)
-                #db.update_due_date_borrower(borrower_id, new_due_date)
 
         if infos == []:
             infos.append("All loans have been renewed with success.")
@@ -147,23 +146,6 @@ def perform_borrower_loans(uid, barcode, borrower_id,
                                                    ln=ln)
     return body
 
-#def perform_get_holdings_information(recid, req, ln=CFG_SITE_LANG):
-#    """
-#    Display all the copies of an item.
-#
-#    @param recid: identify the record. Primary key of bibrec.
-#    @type recid: int
-#
-#    @return body(html)
-#    """
-#
-#    holdings_information = db.get_holdings_information(recid)
-#
-#    body = bibcirculation_templates.tmpl_holdings_information2(recid=recid,
-#                                                               req=req,
-#                                                               holdings_info=holdings_information,
-#                                                               ln=ln)
-#    return body
 ### with message ###
 def perform_get_holdings_information(recid, req, ln=CFG_SITE_LANG):
     """
@@ -175,14 +157,14 @@ def perform_get_holdings_information(recid, req, ln=CFG_SITE_LANG):
     @return body(html)
     """
 
-    holdings_information = db.get_holdings_information(recid)
+    holdings_information = db.get_holdings_information(recid, False)
 
     body = bibcirculation_templates.tmpl_holdings_information2(recid=recid,
                                                                req=req,
                                                                holdings_info=holdings_information,
                                                                ln=ln)
-    body += '''<p style="color:#f00">The online loan request system is partially under maintenance.
-    You can contact the <a style="color:#f00" href="mailto:Library.Desk@cern.ch">CERN Library desk</a> for any question</p>'''
+    #body += '''<p style="color:#f00">The online loan request system is partially under maintenance.
+    #You can contact the <a style="color:#f00" href="mailto:Library.Desk@cern.ch">CERN Library desk</a> for any question</p>'''
     return body
 
 def perform_get_pending_request(ln=CFG_SITE_LANG):
@@ -192,8 +174,7 @@ def perform_get_pending_request(ln=CFG_SITE_LANG):
 
     status = db.get_loan_request_by_status("pending")
 
-    body = bibcirculation_templates.tmpl_get_pending_request(status=status,
-                                                                  ln=ln)
+    body = bibcirculation_templates.tmpl_get_pending_request(status=status, ln=ln)
 
     return body
 
@@ -214,9 +195,7 @@ def perform_new_request(recid, barcode, ln=CFG_SITE_LANG):
     @return request form
     """
 
-    body = bibcirculation_templates.tmpl_new_request2(recid=recid,
-                                                      barcode=barcode,
-                                                      ln=ln)
+    body = bibcirculation_templates.tmpl_new_request2(recid=recid, barcode=barcode, ln=ln)
 
     return body
 
@@ -228,19 +207,27 @@ def perform_new_request_send(uid, recid, period_from, period_to, barcode, ln=CFG
     @param ln: language of the page
     """
 
-    nb_requests = db.get_number_requests_per_copy(barcode)
-    is_on_loan = db.is_item_on_loan(barcode)
+    nb_requests = 0
+    all_copies_on_loan = True
+    copies = db.get_barcodes(recid)
+    for bc in copies:
+        nb_requests += db.get_number_requests_per_copy(bc)
+        if db.is_item_on_loan(bc) is None:
+            all_copies_on_loan = False
 
-    if nb_requests == 0 and is_on_loan is not None:
+    if nb_requests == 0 and all_copies_on_loan:
         status = 'waiting'
-    elif nb_requests == 0 and is_on_loan is None:
+    elif nb_requests == 0 and not all_copies_on_loan:
         status = 'pending'
     else:
         status = 'waiting'
 
     user = collect_user_info(uid)
     if CFG_CERN_SITE:
-        borrower = search_user('ccid',user['external_hidden_personid'])
+        try:
+            borrower = search_user('ccid',user['external_hidden_personid'])
+        except:
+            borrower = ()
     else:
         borrower = search_user('email',user['email'])
 
@@ -255,7 +242,7 @@ def perform_new_request_send(uid, recid, period_from, period_to, barcode, ln=CFG
         req_id = db.new_hold_request(borrower_id, recid, barcode,
                                 period_from, period_to, status)
 
-        is_on_loan=db.is_item_on_loan(barcode)
+        # is_on_loan=db.is_item_on_loan(barcode)
 
         details = db.get_loan_request_details(req_id)
         if details:
@@ -316,6 +303,7 @@ def perform_new_request_send(uid, recid, period_from, period_to, barcode, ln=CFG
     body = bibcirculation_templates.tmpl_new_request_send(message=message, ln=ln)
 
     return body
+
 #############################################################
 #
 #    if is_borrower != 0:
@@ -682,6 +670,7 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
 
             #If BibCirculation at CERN, use LDAP.
             if CFG_CERN_SITE == 1:
+
                 email=user['email']
                 result = get_user_info_from_ldap(email)
 
@@ -712,7 +701,7 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
                 else:
                     message = "It is not possible to validate your request. "\
                               "Your office address is not available. "\
-                              "Please contact ... "
+                              "Please contact Library.Desk@cern.ch"
 
     else:
 

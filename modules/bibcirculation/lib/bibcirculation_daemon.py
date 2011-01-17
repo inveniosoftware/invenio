@@ -35,7 +35,9 @@ import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
                                           CFG_BIBCIRCULATION_LOANS_EMAIL
 
-from invenio.bibcirculation_utils import generate_email_body, book_title_from_MARC
+from invenio.bibcirculation_utils import generate_email_body, \
+                                         book_title_from_MARC, \
+                                         update_user_info_from_ldap
 
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """ Given the string key, checks its meaning and returns True if
@@ -154,6 +156,13 @@ def must_send_third_recall(date_letters):
     else:
         return False
 
+def update_borrowers_information():
+    list_of_borrowers = db.get_all_borrowers()
+
+    for (user_id, ccid) in list_of_borrowers:
+        update_user_info_from_ldap(user_id)
+
+
 def task_run_core():
     """
     run daemon
@@ -164,7 +173,6 @@ def task_run_core():
 
         total = len(expired_loans)
         done  = 0
-
 
         for (borrower_id, _bor_name, recid, _barcode,
              _loaned_on, _due_date, _number_of_renewals, number_of_letters,
@@ -182,10 +190,6 @@ def task_run_core():
             elif number_of_letters >= 3 and must_send_third_recall(date_letters):
                 content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL3'], loan_id)
 
-#from invenio.search_engine import get_field_tags
-#get_field_tags('title')
-#Out: ['245__%', '246_%', '250__a', '711__a', '210__a', '222__a', '111__a']
-
             if content != '':
                 title = book_title_from_MARC(recid)
                 subject = "LOAN RECALL: " + title
@@ -200,6 +204,19 @@ def task_run_core():
             task_sleep_now_if_required(can_stop_too=True)
             time.sleep(1)
 
+    if task_get_option("update_borrowers"):
+        list_of_borrowers = db.get_all_borrowers()
+
+        total = len(list_of_borrowers)
+        done  = 0
+
+        for (user_id, ccid) in list_of_borrowers:
+            update_user_info_from_ldap(user_id)
+
+            done+=1
+            task_update_progress("Done %d out of %d." % (done, total))
+            task_sleep_now_if_required(can_stop_too=True)
+            time.sleep(1)
 
     return 1
 

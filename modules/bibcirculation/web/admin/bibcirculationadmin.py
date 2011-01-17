@@ -506,7 +506,7 @@ def search_library_step1(req, ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/search_library_step1
     """
-    return bal.search_library_step1(req, ln)
+    return bal.search_library_step1(req=req, ln=ln)
 
 def search_library_step2(req, column, string, ln=CFG_SITE_LANG):
     """
