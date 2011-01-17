@@ -902,8 +902,10 @@ def apply_stamp_to_file(path_workingdir,
     ## Try to determine the file type by examining its extension:
     if subject_filetype == "":
         ## split the name of the file to be stamped on "." and take the last
-        ## part of it.  This should be the "extension".
+        ## part of it.  This should be the "extension", once cleaned from
+        ## the possible "version" suffix (for eg. ';2' in "foo.pdf;2")
         tmp_file_extension = subject_file.split(".")[-1]
+        tmp_file_extension = tmp_file_extension.split(';')[0]
         if tmp_file_extension.lower() == "pdf":
             subject_filetype = "pdf"
         elif tmp_file_extension.lower() == "ps":
