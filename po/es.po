@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: Invenio 1.0.0-rc0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2010-12-21 09:26+0100\n"
-"PO-Revision-Date: 2011-01-09 23:11+0100\n"
+"PO-Revision-Date: 2011-01-16 18:14+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: ES <info@invenio-software.org>\n"
 "Language: \n"
@@ -10742,9 +10742,8 @@ msgstr "El nuevo proveedor ha sido dado de alta."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13689
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13997
-#, fuzzy
 msgid "Search vendor by"
-msgstr "Buscar en todas partes"
+msgstr "Buscar proveedor por"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13726
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14034
@@ -10753,9 +10752,8 @@ msgstr "Proveedor(es)"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13833
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13900
-#, fuzzy
 msgid "Vendor information"
-msgstr "Más información:"
+msgstr "Información del proveedor"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14099
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14189
@@ -10767,20 +10765,16 @@ msgid "Vendor details"
 msgstr "Detalles del proveedor"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14228
-#, fuzzy
 msgid "Add notes"
-msgstr "Añadir a los usuarios"
+msgstr "Añadir notas"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14326
-#, fuzzy
 msgid "Book does not exists on Invenio."
-msgstr ""
-"Este libro no existe en Invenio.  Rellene por favor el sigüente formulario."
+msgstr "Este libro no existe en Invenio."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14326
-#, fuzzy
 msgid "Please fill the following form."
-msgstr "Por favor contacte con %s indicando la siguiente información:"
+msgstr "Rellene por favor el sigüente formulario."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14422
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15903
@@ -10806,9 +10800,8 @@ msgid "Notes about this ILL"
 msgstr "Notas sobre este PI"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15259
-#, fuzzy
 msgid "No more requests are pending or waiting."
-msgstr "Algunos documentos están pendientes."
+msgstr "No existen más peticiones pendientes o esperando."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15410
 msgid "Printable format"
@@ -10820,14 +10813,12 @@ msgstr "Compruebe si el libro existe en Invenio,"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15494
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15657
-#, fuzzy
 msgid "0 items found."
-msgstr "No se han encontrado valores."
+msgstr "No se han encontrado items."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15562
-#, fuzzy
 msgid "Proceed anyway"
-msgstr "Continuar igualmente"
+msgstr "Continuar de todas maneras"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15628
 msgid ""
@@ -10842,9 +10833,8 @@ msgstr ""
 "Este libro no existe en Invenio.  Rellene por favor el sigüente formulario."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16160
-#, fuzzy
 msgid "Article details"
-msgstr "Artículo"
+msgstr "Detalles del artículo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16161
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16348
@@ -10853,33 +10843,28 @@ msgstr "Título de la revista"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16162
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16349
-#, fuzzy
 msgid "Article title"
-msgstr "Artículo"
+msgstr "Título del artículo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16164
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16351
-#, fuzzy
 msgid "Report number"
-msgstr "número de reporte"
+msgstr "Número de informe"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16165
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16352
-#, fuzzy
 msgid "Volume"
-msgstr "Página principal"
+msgstr "Volumen"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16166
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16353
-#, fuzzy
 msgid "Issue"
-msgstr "Sin mensajes"
+msgstr "Número"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16167
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16354
-#, fuzzy
 msgid "Page"
-msgstr "Página:"
+msgstr "Página"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16169
 msgid "Budget code"
@@ -10890,22 +10875,19 @@ msgid "the beginning"
 msgstr "el principio"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16570
-#, fuzzy
 msgid "now"
-msgstr "no"
+msgstr "ahora"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:60
-#, fuzzy
 msgid "BibCheck Admin"
-msgstr "Administración de BibFormat"
+msgstr "Administración de BibCheck"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:70
 #: modules/bibcheck/web/admin/bibcheckadmin.py:250
 #: modules/bibcheck/web/admin/bibcheckadmin.py:290
 #: modules/bibcheck/web/admin/bibcheckadmin.py:328
-#, fuzzy
 msgid "Not authorized"
-msgstr "autor"
+msgstr "No autorizado"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:80
 #: modules/bibcheck/web/admin/bibcheckadmin.py:82
@@ -10914,9 +10896,8 @@ msgid "ERROR"
 msgstr "ERROR"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:80
-#, fuzzy
 msgid "does not exist"
-msgstr "El usuario %s no existe"
+msgstr "no existe"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:82
 msgid "is not a directory"
@@ -10931,23 +10912,21 @@ msgid "Limit to knowledge bases containing string:"
 msgstr "Limitarlo a las bases de conocimiento con el texto:"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:135
-#, fuzzy
 msgid "Really delete"
-msgstr "suprimido correctamente"
+msgstr "Confirmación para eliminar"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:141
 msgid "Verify syntax"
 msgstr "Verifique la sintaxis"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:146
-#, fuzzy
 msgid "Create new"
-msgstr "Crear un nuevo tema"
+msgstr "Crear otro"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:166
-#, fuzzy, python-format
+#, python-format
 msgid "File %s does not exist."
-msgstr "El usuario %s no existe"
+msgstr "El fichero %s no existe"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:175
 msgid "Calling bibcheck -verify failed."
@@ -10958,16 +10937,14 @@ msgid "Verify BibCheck config file"
 msgstr "Verifique el archivo de configuración de BibCheck"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:183
-#, fuzzy
 msgid "Verify problem"
-msgstr "Problema en la base de datos"
+msgstr "Problema de verificación"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:205
 #: modules/bibcheck/web/admin/bibcheckadmin.py:265
 #: modules/bibcheck/web/admin/bibcheckadmin.py:305
-#, fuzzy
 msgid "File"
-msgstr "título"
+msgstr "Fichero"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:241
 msgid "Edit BibCheck config file"
@@ -10978,9 +10955,8 @@ msgid "already exists."
 msgstr "ya existe"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:273
-#, fuzzy
 msgid "written OK."
-msgstr "Escrita por"
+msgstr "escrito correctamente."
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:279
 msgid "write failed."
@@ -10991,14 +10967,12 @@ msgid "Save BibCheck config file"
 msgstr "Guardar el fichero de configuración de BibCheck"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:315
-#, fuzzy
 msgid "deleted"
-msgstr "Suprimir"
+msgstr "Eliminado"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:317
-#, fuzzy
 msgid "delete failed"
-msgstr "Suprimir la cesta"
+msgstr "No se ha podido eliminar"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:319
 msgid "Delete BibCheck config file"
@@ -11007,38 +10981,32 @@ msgstr "Eliminar el fichero de configuración de BibCheck"
 #: modules/bibharvest/lib/oai_repository_admin.py:153
 #: modules/bibharvest/lib/oai_repository_admin.py:258
 #: modules/bibharvest/lib/oai_repository_admin.py:337
-#, fuzzy
 msgid "Return to main selection"
-msgstr "Selección de revisor"
+msgstr "Volver a la selección principal"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:118
-#, fuzzy
 msgid "Overview of sources"
-msgstr "Puntuación mediana de las reseñas"
+msgstr "Resumen de los servidores OAI"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:119
-#, fuzzy
 msgid "Harvesting status"
-msgstr "estado actual:"
+msgstr "Estado de la recolección"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:137
-#, fuzzy
 msgid "Not Set"
-msgstr "Nota"
+msgstr "Sin definir"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:138
-#, fuzzy
 msgid "never"
-msgstr "Convertir"
+msgstr "nunca"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:149
 msgid "Never harvested"
 msgstr "Nunca recolectado"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:161
-#, fuzzy
 msgid "View Holding Pen"
-msgstr "Visualización"
+msgstr "Ver los registros en espera de revisión"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:186
 #: modules/bibharvest/lib/oai_harvest_admin.py:547
@@ -11055,9 +11023,8 @@ msgid "Go back to the OAI sources overview"
 msgstr "Volver a la lista dels servidores OAI"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:408
-#, fuzzy
 msgid "Try again with another url"
-msgstr "Escriba ortra vez la nueva contraseña"
+msgstr "Pruebe con otra URL"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:415
 msgid "Continue anyway"
@@ -11091,28 +11058,24 @@ msgstr ""
 "Error al formatear la entrada en espera.  Probablemente su contenido esté mal"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1137
-#, fuzzy
 msgid "Accept Holding Pen version"
-msgstr "versiones anteriores"
+msgstr "Aceptar la versión en espera de revisión"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:75
 msgid "Limit display to knowledge bases matching"
 msgstr "Limitar la visualización a las bases de conocimiento con el texto"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:76
-#, fuzzy
 msgid "in their rules and descriptions"
-msgstr "Mostrar el texto de las últimas entradas"
+msgstr "en sus reglas y descripciones"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:140
-#, fuzzy
 msgid "Add New Knowledge Base"
-msgstr "Suprimir la base de conocimiento"
+msgstr "Añadir otra base de conocimiento"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:141
-#, fuzzy
 msgid "Configure a dynamic KB"
-msgstr "Configurar BibRank"
+msgstr "Configurar una base de conocimiento dinámica"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:142
 msgid "Add New Taxonomy"
@@ -11135,9 +11098,8 @@ msgid "Please upload the RDF file for taxonomy"
 msgstr "Suba el fichero RDF de la taxonomía"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:224
-#, fuzzy
 msgid "Please configure"
-msgstr "Primero hace falta que se identifique."
+msgstr "Es necesario configurarla"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:225
 msgid ""
@@ -11187,9 +11149,8 @@ msgstr ""
 "colección específica."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:255
-#, fuzzy
 msgid "Exporting: "
-msgstr "Exportar como"
+msgstr "Exportando: "
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:296
 #: modules/bibknowledge/lib/bibknowledge_templates.py:557
@@ -11218,14 +11179,12 @@ msgstr ""
 "base."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:333
-#, fuzzy
 msgid "Map From"
-msgstr "De:"
+msgstr "Convertir de:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:396
-#, fuzzy
 msgid "Search for a mapping"
-msgstr "Opciones de búsqueda:"
+msgstr "Buscar una conversión"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:514
 msgid "You can get a these mappings in textual format by: "
@@ -11236,9 +11195,8 @@ msgid "And the KBA version by:"
 msgstr "Y la versión KBA haciendo:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:667
-#, fuzzy
 msgid "Your rule"
-msgstr "Sus alertas"
+msgstr "Su regla"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:669
 msgid "The left side of the rule "
@@ -11253,9 +11211,8 @@ msgid "already appears in these knowledge bases"
 msgstr "ya aparece en estas bases de conocimiento"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:685
-#, fuzzy
 msgid "Please select action"
-msgstr "Seleccione una categoría"
+msgstr "Seleccione una acción"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:686
 msgid "Replace the selected rules with this rule"
@@ -11278,23 +11235,20 @@ msgstr ""
 "de conocimento."
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:80
-#, fuzzy
 msgid "BibKnowledge Admin"
-msgstr "Administración de BibFormat"
+msgstr "Administración de BibKnowledge"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:100
-#, fuzzy
 msgid "Knowledge Bases"
-msgstr "Base de conocimiento %s"
+msgstr "Bases de conocimiento"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:118
 msgid "upload is a file"
 msgstr "subir este fichero"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:130
-#, fuzzy
 msgid "Cannot create upload"
-msgstr "No ha sido posible crear el formato de salida"
+msgstr "No ha sido posible subir el fichero"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:144
 msgid "File uploaded"
@@ -11349,12 +11303,10 @@ msgid "Right side exists"
 msgstr "Ya existe la parte derecha"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:589
-#, fuzzy
 msgid "Knowledge base name missing"
-msgstr "Mapeados de la base de conocimientos"
+msgstr "Falta el nombre de la base de conocimiento"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:609
-#, fuzzy
 msgid "Unknown knowledge base"
 msgstr "Base de conocimiento desconocida"
 
@@ -11363,49 +11315,42 @@ msgid "There is no knowledge base with that name."
 msgstr "No existe ninguna base de conocimiento con este nombre."
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:629
-#, fuzzy
 msgid "No such knowledge base"
-msgstr "Base de conocimiento desconocida"
+msgstr "No existe esta base de conocimiemento"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:711
 msgid "Delete Knowledge Base"
 msgstr "Suprimir la base de conocimiento"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:157
-#, fuzzy
 msgid "BibSword Admin Interface"
-msgstr "Interfaz de administración de BibEdit"
+msgstr "Administración de BibSword"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:171
 #: modules/bibsword/lib/bibsword_webinterface.py:277
 #: modules/bibsword/lib/bibsword_webinterface.py:301
 #: modules/bibsword/lib/bibsword_webinterface.py:330
-#, fuzzy
 msgid "Export with BibSword: Step 2/4"
 msgstr "Exportar con BibSword: paso 2/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:222
 #: modules/bibsword/lib/bibsword_webinterface.py:233
 #: modules/bibsword/lib/bibsword_webinterface.py:291
-#, fuzzy
 msgid "Export with BibSword: Step 1/4"
 msgstr "Exportar con BibSword: paso 1/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:315
 #: modules/bibsword/lib/bibsword_webinterface.py:343
 #: modules/bibsword/lib/bibsword_webinterface.py:374
-#, fuzzy
 msgid "Export with BibSword: Step 3/4"
 msgstr "Exportar con BibSword: paso 3/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:358
 #: modules/bibsword/lib/bibsword_webinterface.py:389
-#, fuzzy
 msgid "Export with BibSword: Step 4/4"
 msgstr "Exportar con BibSword: paso 4/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:434
-#, fuzzy
 msgid "Export with BibSword: Acknowledgement"
 msgstr "Exportar con BibSword: verificación"
 
@@ -11418,9 +11363,8 @@ msgid "No records match that file name"
 msgstr "Ningún registro tiene ficheros con este nombre"
 
 #: modules/bibupload/lib/batchuploader_engine.py:200
-#, fuzzy
 msgid "File already exists"
-msgstr "ya existe"
+msgstr "Este fichero ya existe"
 
 #: modules/bibupload/lib/batchuploader_engine.py:200
 msgid "A file with the same name and format already exists"
@@ -11439,852 +11383,3 @@ msgid ""
 msgstr ""
 "El usuario «%(x_user)s» no está autorizado a modificar la colección "
 "«%(x_coll)s»"
-
-#~ msgid ""
-#~ "Cannot download release notes from http://cdsware.cern.ch/, please check "
-#~ "your internet connection"
-#~ msgstr ""
-#~ "No es posible bajar las notas de la versión desde http://cdsware.cern."
-#~ "ch/.  Compruebe su conexión a Internet."
-
-#~ msgid "Date:"
-#~ msgstr "Fecha:"
-
-#~ msgid "Time:"
-#~ msgstr "Hora:"
-
-#~ msgid "Example:"
-#~ msgstr "Ejemplo:"
-
-#~ msgid "All fields with"
-#~ msgstr "Todos los campos con"
-
-#~ msgid "are mandatory"
-#~ msgstr "son obligatorios"
-
-#~ msgid "Input dir:"
-#~ msgstr "Directorio de entrada:"
-
-#~ msgid "are mandatory."
-#~ msgstr "son obligatorios."
-
-#~ msgid "Check the"
-#~ msgstr "Compruebe la"
-
-#~ msgid " Batch Uploader daemon help page"
-#~ msgstr " página de ayuda del proceso de subida masiva"
-
-#~ msgid " for executing these actions periodically."
-#~ msgstr " para ejecutar estas acciones periódicamente."
-
-#~ msgid "Configure Bibknowledge"
-#~ msgstr "Configurar Bibknowledge"
-
-#~ msgid "creating a new basket"
-#~ msgstr "crear una nueva cesta"
-
-#~ msgid "You may want to start by"
-#~ msgstr "Puede comenzar a"
-
-#~ msgid "In"
-#~ msgstr "En"
-
-#~ msgid "by"
-#~ msgstr "por"
-
-#~ msgid "on"
-#~ msgstr "el"
-
-#~ msgid "basket"
-#~ msgstr "cesta"
-
-#~ msgid "Proceed to the"
-#~ msgstr "Continue a"
-
-#~ msgid "previous basket"
-#~ msgstr "cesta anterior"
-
-#~ msgid "or return to your"
-#~ msgstr "o vuelva a su"
-
-#~ msgid "search"
-#~ msgstr "buscar"
-
-#~ msgid "create a new one"
-#~ msgstr "crear uno de nuevo"
-
-#~ msgid "Adding"
-#~ msgstr "Añadir"
-
-#~ msgid "Please choose a basket"
-#~ msgstr "Escoja una cesta"
-
-#~ msgid "first"
-#~ msgstr "primero"
-
-#~ msgid "Editing basket"
-#~ msgstr "Editar cesta"
-
-#~ msgid "Editing topic"
-#~ msgstr "Editar el tema"
-
-#~ msgid "Item "
-#~ msgstr "Ítem "
-
-#~ msgid " of "
-#~ msgstr "de"
-
-#~ msgid ""
-#~ "Nested or mismatched parentheses detected. Ignoring all parentheses in "
-#~ "the query..."
-#~ msgstr ""
-#~ "Existen paréntesis dentro de otros o no aparejados.  Se ignorarán todos "
-#~ "ellos en la búsqueda..."
-
-#, fuzzy
-#~ msgid "niceName"
-#~ msgstr "Nombre"
-
-#, fuzzy
-#~ msgid "Apply Changes"
-#~ msgstr "Guardar cambios"
-
-#~ msgid "Replace text"
-#~ msgstr "Reemplazar texto"
-
-#, fuzzy
-#~ msgid "Edit this item"
-#~ msgstr "Editar instituto"
-
-#~ msgid "order_date"
-#~ msgstr "fecha del pedido"
-
-#~ msgid "expected_date"
-#~ msgstr "fecha prevista"
-
-#~ msgid "arrival_date"
-#~ msgstr "fecha_de_llegada"
-
-#~ msgid "due_date"
-#~ msgstr "fecha de devolución"
-
-#, fuzzy
-#~ msgid "return_date"
-#~ msgstr "Fecha de creación"
-
-#~ msgid "Record %s - Add a field"
-#~ msgstr "Registro %s - Añadir un campo"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s"
-#~ msgstr "Edición del registro %(x_recid)s, campo %(x_field)s"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
-#~ msgstr ""
-#~ "Edición del registro %(x_recid)s, campo %(x_field)s - Añadir un subcampo"
-
-#~ msgid "Submit and save record %s"
-#~ msgstr "Enviar y guardar el registro %s"
-
-#~ msgid "Your comment has been successfully posted"
-#~ msgstr "Su comentario se ha publicado correctamente"
-
-#~ msgid "There are %i baskets"
-#~ msgstr "Hay %i cestas"
-
-#~ msgid "updated on"
-#~ msgstr "actualizado en"
-
-#~ msgid ""
-#~ "This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe"
-#~ "%(x_url_close)s to it"
-#~ msgstr ""
-#~ "Esta cesta pertenece a %(x_name)s. Puede %(x_url_open)ssubscribirse"
-#~ "%(x_url_close)s libremente."
-
-#~ msgid "records"
-#~ msgstr "registros"
-
-#~ msgid "Number of views"
-#~ msgstr "Número de visualizaciones"
-
-#~ msgid "Non-shared basket"
-#~ msgstr "Cestas no compartidas"
-
-#~ msgid "Group-shared basket"
-#~ msgstr "Cesta compartida en grupo"
-
-#~ msgid "comments"
-#~ msgstr "comentarios"
-
-#~ msgid "last"
-#~ msgstr "último"
-
-#~ msgid "View comments"
-#~ msgstr "Ver comentarios"
-
-#~ msgid "There is a total of %i comments"
-#~ msgstr "Hay un total de %i comentarios"
-
-#~ msgid "Select basket"
-#~ msgstr "Seleccione la cesta"
-
-#~ msgid "Add to a personal basket"
-#~ msgstr "Añadir a la cesta personal"
-
-#~ msgid "%i baskets"
-#~ msgstr "%i cestas"
-
-#~ msgid "Add to a group-shared basket"
-#~ msgstr "Añadir a una cesta de grupo"
-
-#~ msgid "Adding %i records to these baskets"
-#~ msgstr "Añadidos %i registros a estas cestas"
-
-#~ msgid "No records were added to the selected baskets."
-#~ msgstr "No se han añadido registros a las cestas seleccionadas."
-
-#~ msgid "Details and comments"
-#~ msgstr "Detalles y comentarios"
-
-#~ msgid "Add records to baskets"
-#~ msgstr "Añadir registros a las cestas"
-
-#, fuzzy
-#~ msgid "Subscribe to this discussion"
-#~ msgstr "Subscribirse a esta cesta"
-
-#, fuzzy
-#~ msgid "Unsubscribe from this discussion"
-#~ msgstr "Darse de baja de esta cesta"
-
-#~ msgid ""
-#~ "Would you like to receive email notifications when new comments are added "
-#~ "to this page?"
-#~ msgstr ""
-#~ "Quisiera recibir notificaciones por correo electrónico cuando se añadan "
-#~ "nuevos comentarios a esta página?"
-
-#, fuzzy
-#~ msgid "Delete comment(s) or supress abuse report(s)"
-#~ msgstr "Eliminar las denuncias de abuso"
-
-#, fuzzy
-#~ msgid "Delete Comments"
-#~ msgstr "Suprimir comentario"
-
-#~ msgid "ADD TO BASKET"
-#~ msgstr "AÑADIR A LA CESTA"
-
-#, fuzzy
-#~ msgid "Frequently publishes in:"
-#~ msgstr "Publica en"
-
-#~ msgid "The collection to which this file belong is restricted: "
-#~ msgstr ""
-#~ "La colección a la que pertenece este documento es de acceso restringido:"
-
-#~ msgid "An error has happened in trying to retrieve the corresponding icon."
-#~ msgstr ""
-#~ "Ha habido un error al intentar recuperar la miniatura correspondiente."
-
-#~ msgid "An error has happened in trying to stream the corresponding icon."
-#~ msgstr "Ha habido un error al intentar enviar la miniatura correspondiente."
-
-#~ msgid "Do you really want to delete this record?"
-#~ msgstr "¿Está seguro de que quiere suprimir este registro?"
-
-#~ msgid ""
-#~ "Do you really want to revert to revision %(revdate)s of record #%(recid)s?"
-#~ msgstr ""
-#~ "Está seguro que quiere retroceder a la revisión %(revdate)s del registro #"
-#~ "%(recid)s?"
-
-#~ msgid ""
-#~ "The current version will be replaced with a copy of revision %(revdate)s"
-#~ msgstr ""
-#~ "La versión actual será remplazada por una copia de revisión %(revdate)s"
-
-#~ msgid "You will also lose any unsubmitted changes for this record!"
-#~ msgstr "¡També perderá todos los cambios no enviados de este registro!"
-
-#, fuzzy
-#~ msgid "This record does not exist. Please try another record ID."
-#~ msgstr "Pruebe otro número de registro."
-
-#, fuzzy
-#~ msgid "Cannot edit deleted record.\""
-#~ msgstr "No se puede editar un registro suprimido."
-
-#, fuzzy
-#~ msgid ""
-#~ "This record is currently being edited by another user. Please try again "
-#~ "later."
-#~ msgstr "Este registro está siendo editado por otra persona."
-
-#~ msgid ""
-#~ "The record is locked because of unfinished upload tasks. Please try again "
-#~ "in a few minutes."
-#~ msgstr ""
-#~ "El registro está bloqueado por unas tareas de carga que no han acabado.  "
-#~ "Vuélvalo a intentar dentro de unos minutos."
-
-#~ msgid ""
-#~ "Your modifications have now been submitted. They will be processed as "
-#~ "soon as the task queue is empty."
-#~ msgstr ""
-#~ "Sus modificaciones han sido enviadas. Se procesarán tan pronto como la "
-#~ "cola de tareas esté vacía"
-
-#~ msgid "The record will be deleted as soon as the task queue is empty."
-#~ msgstr ""
-#~ "Este registro se suprimirá tan pronto como la cola de tareas esté vacía."
-
-#~ msgid "Please enter the ID of the record you want to edit"
-#~ msgstr "Introduzca el identificador del registro que desea editar"
-
-#~ msgid "Move up"
-#~ msgstr "Subir"
-
-#~ msgid "Move down"
-#~ msgstr "Bajar"
-
-#~ msgid "Add Subfield"
-#~ msgstr "Añadir subcampo"
-
-#~ msgid "Edit institute"
-#~ msgstr "Editar instituto"
-
-#~ msgid "Add Field"
-#~ msgstr "Añadir campo"
-
-#~ msgid "Verbose"
-#~ msgstr "Textual"
-
-#~ msgid "Display"
-#~ msgstr "Mostrar"
-
-#~ msgid "(%s previous revision)"
-#~ msgstr "(%s revisión anterior)"
-
-#~ msgid "(%s previous revisions)"
-#~ msgstr "(%s revisiones anteriores)"
-
-#~ msgid "Done"
-#~ msgstr "Listo"
-
-#~ msgid "Add another subfield"
-#~ msgstr "Añadir subcampo"
-
-#~ msgid ""
-#~ "Tags and values should be filled before pressing Done or Add another "
-#~ "subfield"
-#~ msgstr ""
-#~ "Añada las etiquetas y los valores antes de pulsar Listo o Añadir subcampo"
-
-#~ msgid "Your changes are TEMPORARY."
-#~ msgstr "Sus cambios son TEMPORALES."
-
-#~ msgid "To save this record, please click on submit."
-#~ msgstr "Para guardar este registro, haga clic en Enviar."
-
-#, fuzzy
-#~ msgid "Revision %(revdate)s"
-#~ msgstr "Registro #%(recid)s, revisión %(revdate)s"
-
-#, fuzzy
-#~ msgid "current version"
-#~ msgstr "Miembros actuales"
-
-#~ msgid "revert to this revision"
-#~ msgstr "recuperar esta revisión"
-
-#, fuzzy
-#~ msgid "Edit current version"
-#~ msgstr "Editar parámetros"
-
-#, fuzzy
-#~ msgid "View revision"
-#~ msgstr "división"
-
-#~ msgid "Revert to revision"
-#~ msgstr "Volver a la revisión"
-
-#, fuzzy
-#~ msgid "Back to BibEdit"
-#~ msgstr "Volver a las cestas"
-
-#~ msgid "period_from"
-#~ msgstr "desde"
-
-#, fuzzy
-#~ msgid "select_from1"
-#~ msgstr "seleccione el usuario"
-
-#~ msgid "period_to"
-#~ msgstr "hasta"
-
-#, fuzzy
-#~ msgid "select_to1"
-#~ msgstr "hasta"
-
-#, fuzzy
-#~ msgid "No more requests are waiting."
-#~ msgstr "Algunos documentos están pendientes."
-
-#~ msgid "due_date_"
-#~ msgstr "fecha_"
-
-#~ msgid "jsCal_"
-#~ msgstr "jsCal_"
-
-#~ msgid "next page >>>"
-#~ msgstr "página siguiente >>>"
-
-#~ msgid "<<< previous page"
-#~ msgstr "<<< página anterior"
-
-#~ msgid "|<< first page"
-#~ msgstr "|<< primera página"
-
-#~ msgid "last page >>|"
-#~ msgstr "última página >>|"
-
-#~ msgid "jsCal"
-#~ msgstr "jsCal"
-
-#~ msgid "from"
-#~ msgstr "de"
-
-#~ msgid "jsCal_from"
-#~ msgstr "jsCal_from"
-
-#~ msgid "to"
-#~ msgstr "a"
-
-#~ msgid "jsCal_to"
-#~ msgstr "jsCal_to"
-
-#~ msgid "request_date"
-#~ msgstr "fecha_de_petición"
-
-#~ msgid "Please try again later."
-#~ msgstr "Vuélvalo a intentar."
-
-#~ msgid "There are record revisions not yet synchronized with the database."
-#~ msgstr ""
-#~ "Hay registros que todavía no estan sincronizados con la base de datos."
-
-#~ msgid "Please try again in a few minutes."
-#~ msgstr "Vuélvalo a intentar."
-
-#~ msgid ""
-#~ "A new revision of this record is not yet synchronized with the database."
-#~ msgstr ""
-#~ "Una nueva revisión de este registro todavía no está sincronizada con la "
-#~ "base de datos"
-
-#~ msgid ""
-#~ "The new revision is being synchronized with the database and will be "
-#~ "ready shortly."
-#~ msgstr ""
-#~ "La nueva revisión se está sincronizando con la base de datos y pronto "
-#~ "estará disponible"
-
-#~ msgid "View all reported comments"
-#~ msgstr "Visualizar todos los comentarios denunciados"
-
-#~ msgid "View all reported reviews"
-#~ msgstr "Visualizar todas las reseñas denunciadas"
-
-#~ msgid "Delete a specific comment/review (by ID)"
-#~ msgstr "Suprimir un comentario/crítica (por número)"
-
-#~ msgid ""
-#~ "Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)"
-#~ "s first."
-#~ msgstr ""
-#~ "Antes de añadir su comentario, tiene que %(x_url_open)sidentificarse"
-#~ "%(x_url_close)s"
-
-#~ msgid "session"
-#~ msgstr "sesión"
-
-#~ msgid "alerts"
-#~ msgstr "alertas"
-
-#~ msgid "account"
-#~ msgstr "cuenta"
-
-#~ msgid "messages"
-#~ msgstr "mensajes"
-
-#~ msgid "groups"
-#~ msgstr "grupos"
-
-#~ msgid "submissions"
-#~ msgstr "envios"
-
-#~ msgid "approvals"
-#~ msgstr "aprobaciones"
-
-#~ msgid "Unknown form field found on one of the submission pages."
-#~ msgstr "Campo desconocido en una de las páginas del formulario de envíos."
-
-#~ msgid "List of specific approvals"
-#~ msgstr "Lista de aprovaciones específicas"
-
-#~ msgid "List of publication categories"
-#~ msgstr "Lista de las categorías de publicación"
-
-#~ msgid "List of direct approval categories"
-#~ msgstr "Lista de las categorías de aprobación directa"
-
-#~ msgid "Specific Approval and Refereeing Workflow"
-#~ msgstr "Procedimiento específico de aprovación y revisión"
-
-#~ msgid "Internal configuration error"
-#~ msgstr "Error interno de configuración"
-
-#~ msgid "There is no format configured for this journals index page"
-#~ msgstr ""
-#~ "No hay ningún formato configurado para la página de índice de estas "
-#~ "revistas"
-
-#~ msgid "There is no format configured for this journals search page"
-#~ msgstr ""
-#~ "No hay ningún formato configurado para la página de búsqueda de estas "
-#~ "revistas"
-
-#~ msgid "There is no format configured for this journals popup page"
-#~ msgstr ""
-#~ "No hay ningún formato configurado para la página de «popup» de estats "
-#~ "revistas"
-
-#, fuzzy
-#~ msgid "link"
-#~ msgstr "en"
-
-#~ msgid "The contents of this collection is restricted."
-#~ msgstr "El contenido de esta colección es reservado."
-
-#, fuzzy
-#~ msgid "Sort:"
-#~ msgstr "Ordenar por:"
-
-#, fuzzy
-#~ msgid "Please login to perform this action."
-#~ msgstr "Tiene que identificarse para ejecutar esta acción."
-
-#, fuzzy
-#~ msgid "Alert sent successfully!"
-#~ msgstr "Suprimido correctamente"
-
-#, fuzzy
-#~ msgid "Webjournal Administration Interface"
-#~ msgstr "Administración de WebSubmit"
-
-#, fuzzy
-#~ msgid "   Username/Email: %s\n"
-#~ msgstr "Nombre de usuario"
-
-#, fuzzy
-#~ msgid "   Password: %s\n"
-#~ msgstr "Contraseña"
-
-#~ msgid "Migrate BibFormat Settings"
-#~ msgstr "Migrar los parámetros de BibFormat"
-
-#~ msgid "Migrate Knowledge Bases"
-#~ msgstr "Migrar las bases de conocimiento"
-
-#~ msgid "Migrate Behaviours"
-#~ msgstr "Migrar los comportamientos"
-
-#~ msgid "Migrate Formats"
-#~ msgstr "Migrar los formatos"
-
-#, fuzzy
-#~ msgid "Your account created on"
-#~ msgstr "Cuenta creada"
-
-#, fuzzy
-#~ msgid "You have created a new account on"
-#~ msgstr "o cree uno de nuevo"
-
-#~ msgid ""
-#~ "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)"
-#~ "s."
-#~ msgstr ""
-#~ "Puede volver a %(x_url_open)sla interfaz de administración de BibEdit"
-#~ "%(x_url_close)s."
-
-#, fuzzy
-#~ msgid "Article Error"
-#~ msgstr "Artículo"
-
-#, fuzzy
-#~ msgid "%s Personalize, Main page"
-#~ msgstr "Personalizar"
-
-#, fuzzy
-#~ msgid "%s , personalize"
-#~ msgstr "Personalizar"
-
-#, fuzzy
-#~ msgid "Successfully featured record: %s"
-#~ msgstr "eliminada correctamente la denuncia de abuso"
-
-#~ msgid "Agenda"
-#~ msgstr "Agenda"
-
-#~ msgid "Webcast"
-#~ msgstr "Webcast"
-
-#~ msgid "Search Help"
-#~ msgstr "Ayuda a la Búsqueda"
-
-#~ msgid "Format:"
-#~ msgstr "Formato:"
-
-#~ msgid "Send lost password"
-#~ msgstr "Enviar contraseña perdida"
-
-#~ msgid "Here are your user credentials for"
-#~ msgstr "Aquí tiene sus credenciales para"
-
-#~ msgid "username"
-#~ msgstr "nombre de usuario"
-
-#~ msgid "password"
-#~ msgstr "contraseña"
-
-#~ msgid "You seem to be %(x_role)s."
-#~ msgstr "Usted parece ser %(x_role)s."
-
-#~ msgid "Credentials for"
-#~ msgstr "Credenciales para"
-
-#~ msgid ""
-#~ "An email has been sent to the given address with the account information."
-#~ msgstr ""
-#~ "Se ha enviado un correo electrónico a la dirección dada con la "
-#~ "información de la cuenta."
-
-#~ msgid "Unable to find file."
-#~ msgstr "No ha sido posible encontrar el archivo."
-
-#~ msgid "Cannot find submission directory."
-#~ msgstr "No ha sido posible encontrar el directorio de los envíos."
-
-#~ msgid "Unknown type of document"
-#~ msgstr "Tipo de documento desconocido"
-
-#~ msgid "Login via:"
-#~ msgstr "Identificación vía:"
-
-#~ msgid "Try your search on..."
-#~ msgstr "Intentar la búsqueda en..."
-
-#, fuzzy
-#~ msgid "Timeout"
-#~ msgstr "Hora"
-
-#~ msgid "Before you add your comment, you need to log in first"
-#~ msgstr "Antes de añadir su comentario, tiene que identificarse"
-
-#~ msgid "MARC"
-#~ msgstr "MARC"
-
-#~ msgid "Please try to come back later."
-#~ msgstr "Pruebe a intentarlo más tarde."
-
-#~ msgid "Please enter"
-#~ msgstr "Entre"
-
-#~ msgid "to edit"
-#~ msgstr "a editar"
-
-#~ msgid "You can now go back to"
-#~ msgstr "Ahora puede volver a"
-
-#~ msgid ""
-#~ "The record as soon deleted when the task queue is empty.You can now go "
-#~ "back to"
-#~ msgstr ""
-#~ "Este registro se borrará cuando la cola de tareas esté vacía.  Ahora "
-#~ "puede volver a"
-
-#~ msgid "detailed list"
-#~ msgstr "lista detallada"
-
-#~ msgid "your searches"
-#~ msgstr "sus búsquedas"
-
-#~ msgid "#"
-#~ msgstr "nº"
-
-# 'otros' por 'terceros'?
-#~ msgid "%i others' baskets"
-#~ msgstr "%i cestas de otros"
-
-# 'Tiene' o 'ha'?
-#~ msgid "You have %s and are subscribed to %s and %s."
-#~ msgstr "Tiene %s y está subscrito a %s y %s."
-
-#~ msgid "Bring item up"
-#~ msgstr "Subir el item"
-
-#~ msgid "Sort by"
-#~ msgstr "Ordenar por"
-
-#~ msgid "You're not member of a group"
-#~ msgstr "Usted no es miembro de un grupo"
-
-#~ msgid "Discuss this document:"
-#~ msgstr "Comente este documento:"
-
-#~ msgid "wrote on"
-#~ msgstr "escribió en"
-
-#~ msgid "(Report abuse)"
-#~ msgstr "(Avisar de un abuso)"
-
-#~ msgid "based on %(nb_comments_total)s reviews"
-#~ msgstr "basado en %(nb_comments_total)s reseñs"
-
-#~ msgid ""
-#~ "Note: you currently haven't %(link_open)sdefined a nickname%(link_close)s."
-#~ msgstr ""
-#~ "Atención: todavía no ha %(link_open)sdefinido un alias%(link_close)s."
-
-#~ msgid "%s will temporarly be displayed as author of this comment."
-#~ msgstr "%s se mostrará temporalmente como autor de este comentario"
-
-#~ msgid "Article:"
-#~ msgstr "Artículo:"
-
-#~ msgid "Comment:"
-#~ msgstr "Comentario:"
-
-#~ msgid "email"
-#~ msgstr "dirección electrónica"
-
-#~ msgid "Detailed record #%s"
-#~ msgstr "Registro completo #%s"
-
-#~ msgid "View all Reported %s"
-#~ msgstr "Ver todos los %s denunciados"
-
-#~ msgid "These users are overquota: "
-#~ msgstr "Estos usuarios han sobrepasado su cuota: "
-
-#~ msgid "Search term <em>%s</em>"
-#~ msgstr "Término de búsqueda <em>%s</em>"
-
-#~ msgid "inside <em>%s</em> index"
-#~ msgstr "en el índice <em>%s</em>"
-
-#~ msgid "Record #%d: %s"
-#~ msgstr "Registro #%d: %s"
-
-#~ msgid "Words nearest to"
-#~ msgstr "Las palabras más cercanas a"
-
-#~ msgid "inside"
-#~ msgstr "en"
-
-#~ msgid "in any collection are:"
-#~ msgstr "en cualquier colección son:"
-
-#~ msgid "<strong>%s</strong> records found"
-#~ msgstr "<strong>%s</strong> registros encontrados"
-
-#~ msgid ""
-#~ "<strong>Results overview:</strong> Found <strong>%s</strong> records in "
-#~ "%.2f seconds."
-#~ msgstr ""
-#~ "<strong>Todos los resultados:</strong> Encontrados <strong>%s</strong> "
-#~ "registros en %.2f segundos."
-
-#~ msgid ""
-#~ "<p>Sorry, collection <strong>%s</strong> does not seem to exist. <p>You "
-#~ "may want to start browsing from <a href=\"%s\">%s</a>."
-#~ msgstr ""
-#~ "<p>Lo sentimos, la colección <strong>%s</strong> no existe. <p>Inténtelo "
-#~ "empezando desde <a href=\"%s\">%s</a>."
-
-#~ msgid ""
-#~ "The <strong class=\"headline\">guest</strong> users need to <A href=\"%s"
-#~ "\">register</A> first"
-#~ msgstr ""
-#~ "Los usuarios <strong class=\"headline\">visitantes</strong> antes tienen "
-#~ "que <A href=\"%s\">identificarse</A>"
-
-#, fuzzy
-#~ msgid "your groups"
-#~ msgstr "approvals"
-
-#, fuzzy
-#~ msgid "your submissions"
-#~ msgstr "envios"
-
-#, fuzzy
-#~ msgid "your approvals"
-#~ msgstr "approvals"
-
-#~ msgid ""
-#~ "You are no longer recognized.  If you wish you can <A href=\"./login?ln=%s"
-#~ "\">login here</A>."
-#~ msgstr ""
-#~ "Ya no está identificado.  Si lo desea puede <A href=\"./login?ln=%s"
-#~ "\">identificarse aquí</A>."
-
-#~ msgid "Edit<br/>members"
-#~ msgstr "Editar<br/>miembros"
-
-#~ msgid "Create New Group"
-#~ msgstr "Crear un nuevo grupo"
-
-#~ msgid "Please Select:"
-#~ msgstr "Seleccione:"
-
-#~ msgid "Add member"
-#~ msgstr "Añadir miembro"
-
-#~ msgid "Group: <b>%s</b>"
-#~ msgstr "Grupo: <b>%s</b>"
-
-# Quizás cambiar el # per un nº?
-#~ msgid "user #%i"
-#~ msgstr "usuario #%i"
-
-#, fuzzy
-#~ msgid "this action does not apply on this type of document"
-#~ msgstr "Esta colección no contiene aún ningún documento."
-
-#, fuzzy
-#~ msgid "Submission no(1)"
-#~ msgstr "envios"
-
-#~ msgid "id"
-#~ msgstr "id"
-
-#, fuzzy
-#~ msgid "pending"
-#~ msgstr "Agenda"
-
-#, fuzzy
-#~ msgid "%(num)s results found"
-#~ msgstr "Buscar en %s registros por:"
-
-#, fuzzy
-#~ msgid "No result found"
-#~ msgstr "No se ha encontrado ninguna búsqueda"
-
-#, fuzzy
-#~ msgid "GROUP_DELETED"
-#~ msgstr "SUPRIMIR"
-
-#, fuzzy
-#~ msgid "MEMBER_DELETED"
-#~ msgstr "SUPRIMIR"

@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: Invenio 1.0.0-rc0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2010-12-21 09:26+0100\n"
-"PO-Revision-Date: 2011-01-09 23:11+0100\n"
+"PO-Revision-Date: 2011-01-16 18:15+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: CA <info@invenio-software.org>\n"
 "Language: \n"
@@ -10777,9 +10777,8 @@ msgstr "El nou proveïdor ha estat enregistrat."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13689
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13997
-#, fuzzy
 msgid "Search vendor by"
-msgstr "Cercar a tot arreu"
+msgstr "Cercar proveïdor per"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13726
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14034
@@ -10788,9 +10787,8 @@ msgstr "Proveïdor(s)"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13833
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13900
-#, fuzzy
 msgid "Vendor information"
-msgstr "Més informació:"
+msgstr "Informació del proveïdor"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14099
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14189
@@ -10802,20 +10800,16 @@ msgid "Vendor details"
 msgstr "Detalls del proveïdor"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14228
-#, fuzzy
 msgid "Add notes"
-msgstr "Afegir als usuaris"
+msgstr "Afegir notes"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14326
-#, fuzzy
 msgid "Book does not exists on Invenio."
-msgstr ""
-"Aquest llibre no existeix a Invenio.  Ompliu si us plau el següent formulari."
+msgstr "Aquest llibre no existeix a Invenio."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14326
-#, fuzzy
 msgid "Please fill the following form."
-msgstr "Si us plau contacteu amb %s indicant-li la següent informació:"
+msgstr "Si us plau ompliu aquest formulari."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14422
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15903
@@ -10841,9 +10835,8 @@ msgid "Notes about this ILL"
 msgstr "Notes sobre aquest PI"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15259
-#, fuzzy
 msgid "No more requests are pending or waiting."
-msgstr "Quedent alguns documents pendents"
+msgstr "No existeixen més peticions pendents o esperant."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15410
 msgid "Printable format"
@@ -10855,14 +10848,12 @@ msgstr "Comproveu si el llibre existeix en Invenio,"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15494
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15657
-#, fuzzy
 msgid "0 items found."
-msgstr "No s'han trobat valors."
+msgstr "No s'han trobat items."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15562
-#, fuzzy
 msgid "Proceed anyway"
-msgstr "Continuar igualment"
+msgstr "Continuar de tota manera"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15628
 msgid ""
@@ -10877,9 +10868,8 @@ msgstr ""
 "Aquest llibre no existeix a Invenio.  Ompliu si us plau el següent formulari."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16160
-#, fuzzy
 msgid "Article details"
-msgstr "Article"
+msgstr "Detalls de l'article"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16161
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16348
@@ -10888,33 +10878,28 @@ msgstr "Títol de la revista"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16162
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16349
-#, fuzzy
 msgid "Article title"
-msgstr "Article"
+msgstr "Títol de l'article"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16164
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16351
-#, fuzzy
 msgid "Report number"
-msgstr "número d'informe"
+msgstr "Número d'informe"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16165
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16352
-#, fuzzy
 msgid "Volume"
-msgstr "Pàgina inicial"
+msgstr "Volum"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16166
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16353
-#, fuzzy
 msgid "Issue"
-msgstr "Sense missatges"
+msgstr "Número"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16167
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16354
-#, fuzzy
 msgid "Page"
-msgstr "Pàgina:"
+msgstr "Pàgina"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16169
 msgid "Budget code"
@@ -10925,22 +10910,19 @@ msgid "the beginning"
 msgstr "el principi"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16570
-#, fuzzy
 msgid "now"
-msgstr "no"
+msgstr "ara"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:60
-#, fuzzy
 msgid "BibCheck Admin"
-msgstr "Administració de BibFormat"
+msgstr "Administració de BibCheck"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:70
 #: modules/bibcheck/web/admin/bibcheckadmin.py:250
 #: modules/bibcheck/web/admin/bibcheckadmin.py:290
 #: modules/bibcheck/web/admin/bibcheckadmin.py:328
-#, fuzzy
 msgid "Not authorized"
-msgstr "autor"
+msgstr "No autoritzat"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:80
 #: modules/bibcheck/web/admin/bibcheckadmin.py:82
@@ -10949,9 +10931,8 @@ msgid "ERROR"
 msgstr "ERROR"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:80
-#, fuzzy
 msgid "does not exist"
-msgstr "L'usuari %s no existeix"
+msgstr "no existeix"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:82
 msgid "is not a directory"
@@ -10966,23 +10947,21 @@ msgid "Limit to knowledge bases containing string:"
 msgstr "Limitar-ho a les bases de coneixement amb el text:"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:135
-#, fuzzy
 msgid "Really delete"
-msgstr "suprimit correctament"
+msgstr "Confirmació per a eliminar"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:141
 msgid "Verify syntax"
 msgstr "Verifiqueu la sintaxi"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:146
-#, fuzzy
 msgid "Create new"
-msgstr "Creeu un nou tema"
+msgstr "Crear-ne un altre"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:166
-#, fuzzy, python-format
+#, python-format
 msgid "File %s does not exist."
-msgstr "L'usuari %s no existeix"
+msgstr "El fitxer %s no existeix"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:175
 msgid "Calling bibcheck -verify failed."
@@ -10993,16 +10972,14 @@ msgid "Verify BibCheck config file"
 msgstr "Verifiqueu el fitxer de configuració de BibCheck"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:183
-#, fuzzy
 msgid "Verify problem"
-msgstr "Problema a la base de dades"
+msgstr "Problema de verificació"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:205
 #: modules/bibcheck/web/admin/bibcheckadmin.py:265
 #: modules/bibcheck/web/admin/bibcheckadmin.py:305
-#, fuzzy
 msgid "File"
-msgstr "títol"
+msgstr "Fitxer"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:241
 msgid "Edit BibCheck config file"
@@ -11013,29 +10990,24 @@ msgid "already exists."
 msgstr "ja existeix"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:273
-#, fuzzy
 msgid "written OK."
-msgstr "Escrit per"
+msgstr "escrito correctament."
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:279
-#, fuzzy
 msgid "write failed."
-msgstr "Escriviu una crítica"
+msgstr "no s'ha pogut escriur"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:281
 msgid "Save BibCheck config file"
 msgstr "Desar el fitxer de configuració de BibCheck"
 
-# Suprimir? Temps verbal?
 #: modules/bibcheck/web/admin/bibcheckadmin.py:315
-#, fuzzy
 msgid "deleted"
-msgstr "Suprimeix"
+msgstr "Suprimit"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:317
-#, fuzzy
 msgid "delete failed"
-msgstr "Suprimeix el cistell"
+msgstr "No s'ha pogut suprimir"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:319
 msgid "Delete BibCheck config file"
@@ -11044,39 +11016,32 @@ msgstr "Suprimir el fitxer de configuració de BibCheck"
 #: modules/bibharvest/lib/oai_repository_admin.py:153
 #: modules/bibharvest/lib/oai_repository_admin.py:258
 #: modules/bibharvest/lib/oai_repository_admin.py:337
-#, fuzzy
 msgid "Return to main selection"
-msgstr "Selecció de revisor"
+msgstr "Tornar a la selecció principal"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:118
-#, fuzzy
 msgid "Overview of sources"
-msgstr "Puntuació mitjana de les ressenyes"
+msgstr "Resum dels servidors OAI"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:119
-#, fuzzy
 msgid "Harvesting status"
-msgstr "estat actual:"
+msgstr "Estat de la recollida"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:137
-#, fuzzy
 msgid "Not Set"
-msgstr "Nota"
+msgstr "Sense definir"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:138
-#, fuzzy
 msgid "never"
-msgstr "Converteix"
+msgstr "mai"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:149
 msgid "Never harvested"
 msgstr "Mai recol·lectat"
 
-# Conjugació? Gerundi!?!?
 #: modules/bibharvest/lib/oai_harvest_admin.py:161
-#, fuzzy
 msgid "View Holding Pen"
-msgstr "Visualització"
+msgstr "Veure els registres en espera de revisió"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:186
 #: modules/bibharvest/lib/oai_harvest_admin.py:547
@@ -11093,9 +11058,8 @@ msgid "Go back to the OAI sources overview"
 msgstr "Tornar a la llista dels servidors OAI"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:408
-#, fuzzy
 msgid "Try again with another url"
-msgstr "Escriviu un altre cop la nova contrassenya"
+msgstr "Proveu amb una altra URL"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:415
 msgid "Continue anyway"
@@ -11130,28 +11094,24 @@ msgstr ""
 "estigui malament"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1137
-#, fuzzy
 msgid "Accept Holding Pen version"
-msgstr "versions anteriors"
+msgstr "Acceptar la versió en espera de revisió"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:75
 msgid "Limit display to knowledge bases matching"
 msgstr "Limitar la visualització a bases de coneixement amb el text"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:76
-#, fuzzy
 msgid "in their rules and descriptions"
-msgstr "Mostra el text de les darreres entrades"
+msgstr "en les seves regles i descripcions"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:140
-#, fuzzy
 msgid "Add New Knowledge Base"
-msgstr "Suprimeix la base de coneixement"
+msgstr "Afegir una altra base de coneixement"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:141
-#, fuzzy
 msgid "Configure a dynamic KB"
-msgstr "Configurar de BibRank"
+msgstr "Configurar una base de coneixement dinàmica"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:142
 msgid "Add New Taxonomy"
@@ -11174,9 +11134,8 @@ msgid "Please upload the RDF file for taxonomy"
 msgstr "Pengeu el fitxer RDF de la taxonomia"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:224
-#, fuzzy
 msgid "Please configure"
-msgstr "Primer cal que us identifiqueu."
+msgstr "Cal configurar-la"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:225
 msgid ""
@@ -11226,9 +11185,8 @@ msgstr ""
 "col·lecció específica."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:255
-#, fuzzy
 msgid "Exporting: "
-msgstr "Anomena i desa"
+msgstr "Exportant: "
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:296
 #: modules/bibknowledge/lib/bibknowledge_templates.py:557
@@ -11257,14 +11215,12 @@ msgstr ""
 "la base."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:333
-#, fuzzy
 msgid "Map From"
-msgstr "De:"
+msgstr "Convertir de:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:396
-#, fuzzy
 msgid "Search for a mapping"
-msgstr "Opcions de cerca:"
+msgstr "Cercar una conversió"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:514
 msgid "You can get a these mappings in textual format by: "
@@ -11275,9 +11231,8 @@ msgid "And the KBA version by:"
 msgstr "I la versió KBA fent:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:667
-#, fuzzy
 msgid "Your rule"
-msgstr "Les vostres alertes"
+msgstr "La vostra regla"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:669
 msgid "The left side of the rule "
@@ -11292,9 +11247,8 @@ msgid "already appears in these knowledge bases"
 msgstr "ja apareix en aquestes bases de coneixement"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:685
-#, fuzzy
 msgid "Please select action"
-msgstr "Seleccioneu una categoria"
+msgstr "Seleccioneu una acció"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:686
 msgid "Replace the selected rules with this rule"
@@ -11317,23 +11271,20 @@ msgstr ""
 "base de coneixement."
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:80
-#, fuzzy
 msgid "BibKnowledge Admin"
-msgstr "Administració de BibFormat"
+msgstr "Administració de BibKnowledge"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:100
-#, fuzzy
 msgid "Knowledge Bases"
-msgstr "Base de coneixement %s"
+msgstr "Bases de coneixement"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:118
 msgid "upload is a file"
 msgstr "penjar aquest fitxer"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:130
-#, fuzzy
 msgid "Cannot create upload"
-msgstr "No ha estat possible crear el format de sortida"
+msgstr "No ha estat possible pujar el fitxer"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:144
 msgid "File uploaded"
@@ -11388,12 +11339,10 @@ msgid "Right side exists"
 msgstr "Ja existeix la banda dreta"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:589
-#, fuzzy
 msgid "Knowledge base name missing"
-msgstr "Mapatge de la base de coneixement"
+msgstr "Falta el nom de la base de coneixement"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:609
-#, fuzzy
 msgid "Unknown knowledge base"
 msgstr "Base de coneixement desconeguda"
 
@@ -11402,49 +11351,42 @@ msgid "There is no knowledge base with that name."
 msgstr "No existeix cap base de coneixement amb aquest nom."
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:629
-#, fuzzy
 msgid "No such knowledge base"
-msgstr "Base de coneixement desconeguda"
+msgstr "No existeix aquesta base de coneixement"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:711
 msgid "Delete Knowledge Base"
 msgstr "Suprimeix la base de coneixement"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:157
-#, fuzzy
 msgid "BibSword Admin Interface"
-msgstr "Interfície d'aministració de BibEdit"
+msgstr "Administració de BibSword"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:171
 #: modules/bibsword/lib/bibsword_webinterface.py:277
 #: modules/bibsword/lib/bibsword_webinterface.py:301
 #: modules/bibsword/lib/bibsword_webinterface.py:330
-#, fuzzy
 msgid "Export with BibSword: Step 2/4"
 msgstr "Exportar amb BibSword: paso 2/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:222
 #: modules/bibsword/lib/bibsword_webinterface.py:233
 #: modules/bibsword/lib/bibsword_webinterface.py:291
-#, fuzzy
 msgid "Export with BibSword: Step 1/4"
 msgstr "Exportar amb BibSword: paso 1/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:315
 #: modules/bibsword/lib/bibsword_webinterface.py:343
 #: modules/bibsword/lib/bibsword_webinterface.py:374
-#, fuzzy
 msgid "Export with BibSword: Step 3/4"
 msgstr "Exportar amb BibSword: paso 3/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:358
 #: modules/bibsword/lib/bibsword_webinterface.py:389
-#, fuzzy
 msgid "Export with BibSword: Step 4/4"
 msgstr "Exportar amb BibSword: paso 4/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:434
-#, fuzzy
 msgid "Export with BibSword: Acknowledgement"
 msgstr "Exportar amb BibSword: verificació"
 
@@ -11457,9 +11399,8 @@ msgid "No records match that file name"
 msgstr "Cap registre no té fitxers amb aquest nom"
 
 #: modules/bibupload/lib/batchuploader_engine.py:200
-#, fuzzy
 msgid "File already exists"
-msgstr "ja existeix"
+msgstr "Aquest fitxer ja existeix"
 
 #: modules/bibupload/lib/batchuploader_engine.py:200
 msgid "A file with the same name and format already exists"
@@ -11478,968 +11419,3 @@ msgid ""
 msgstr ""
 "L'usuari «%(x_user)s» no està autoritzat a modificar la col·lecció "
 "«%(x_coll)s»"
-
-#~ msgid ""
-#~ "Cannot download release notes from http://cdsware.cern.ch/, please check "
-#~ "your internet connection"
-#~ msgstr ""
-#~ "No és possible baixar les notes de la versió des de http://cdsware.cern."
-#~ "ch/.  Comproveu la vostra connexió a Internet."
-
-#~ msgid "Date:"
-#~ msgstr "Data:"
-
-#~ msgid "Time:"
-#~ msgstr "Hora:"
-
-#~ msgid "Example:"
-#~ msgstr "Exemple:"
-
-#~ msgid "All fields with"
-#~ msgstr "Tots els camps amb"
-
-#~ msgid "are mandatory"
-#~ msgstr "són obligatoris"
-
-#~ msgid "Input dir:"
-#~ msgstr "Directori d'entrada:"
-
-#~ msgid "are mandatory."
-#~ msgstr "són obligatoris."
-
-#~ msgid "Check the"
-#~ msgstr "Comproveu la"
-
-#~ msgid " Batch Uploader daemon help page"
-#~ msgstr " pàgina d'ajuda del procés de pujada massiva"
-
-#~ msgid " for executing these actions periodically."
-#~ msgstr " per executar aquestes accions periòdicament."
-
-#~ msgid "Configure Bibknowledge"
-#~ msgstr "Configurar Bibknowledge"
-
-#~ msgid "creating a new basket"
-#~ msgstr "creeu un nou cistell"
-
-#~ msgid "You may want to start by"
-#~ msgstr "Podeu començar a"
-
-#~ msgid "In"
-#~ msgstr "A"
-
-#~ msgid "by"
-#~ msgstr "per"
-
-#~ msgid "on"
-#~ msgstr "el"
-
-#~ msgid "basket"
-#~ msgstr "cistell"
-
-#~ msgid "Proceed to the"
-#~ msgstr "Continueu a"
-
-#~ msgid "previous basket"
-#~ msgstr "cistell anterior"
-
-#~ msgid "or return to your"
-#~ msgstr "o torneu al vostre"
-
-#~ msgid "search"
-#~ msgstr "cerca"
-
-#~ msgid "create a new one"
-#~ msgstr "creeu-ne un de nou"
-
-#~ msgid "Adding"
-#~ msgstr "Afegeix"
-
-#~ msgid "Please choose a basket"
-#~ msgstr "Escolliu un cistell"
-
-#~ msgid "first"
-#~ msgstr "primer"
-
-#~ msgid "Editing basket"
-#~ msgstr "Edita el cistell"
-
-#~ msgid "Editing topic"
-#~ msgstr "Edita el tema"
-
-#~ msgid "Item "
-#~ msgstr "Ítem "
-
-#~ msgid " of "
-#~ msgstr "de"
-
-#~ msgid ""
-#~ "Nested or mismatched parentheses detected. Ignoring all parentheses in "
-#~ "the query..."
-#~ msgstr ""
-#~ "Hi ha parèntesis dins d'altres o desaparellats.  S'ignoren tots en la "
-#~ "cerca..."
-
-#, fuzzy
-#~ msgid "niceName"
-#~ msgstr "Nom"
-
-#, fuzzy
-#~ msgid "Apply Changes"
-#~ msgstr "Desa els canvis"
-
-#~ msgid "Replace text"
-#~ msgstr "Substitueix text"
-
-#, fuzzy
-#~ msgid "Edit this item"
-#~ msgstr "Editeu l'institut"
-
-#~ msgid "order_date"
-#~ msgstr "data de la comanda"
-
-#~ msgid "expected_date"
-#~ msgstr "data prevista"
-
-#~ msgid "arrival_date"
-#~ msgstr "data_d'arribada"
-
-#~ msgid "due_date"
-#~ msgstr "data de retorn"
-
-#, fuzzy
-#~ msgid "return_date"
-#~ msgstr "Data de creació"
-
-#~ msgid "Record %s - Add a field"
-#~ msgstr "Registre %s - Afegeix un camp"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s"
-#~ msgstr "Edició del registre %(x_recid)s, camp %(x_field)s"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
-#~ msgstr ""
-#~ "Edició del registre %(x_recid)s, camp %(x_field)s - Afegir un subcamp"
-
-#~ msgid "Submit and save record %s"
-#~ msgstr "Lliura i desa el registre %s"
-
-#~ msgid "Your comment has been successfully posted"
-#~ msgstr "El vostre comentari ha estat publicat"
-
-#~ msgid "There are %i baskets"
-#~ msgstr "Hi ha %i cistells"
-
-#~ msgid "updated on"
-#~ msgstr "actualitzat el"
-
-#~ msgid ""
-#~ "This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe"
-#~ "%(x_url_close)s to it"
-#~ msgstr ""
-#~ "Aquest cistell pertany a %(x_name)s. Us hi podeu %(x_url_open)ssubscriure"
-#~ "%(x_url_close)s lliurement"
-
-#~ msgid "records"
-#~ msgstr "registres"
-
-#~ msgid "Number of views"
-#~ msgstr "Nombre de visualitzacions"
-
-#~ msgid "Non-shared basket"
-#~ msgstr "Cistell no compartit"
-
-#~ msgid "Group-shared basket"
-#~ msgstr "Cistell compartit en grup"
-
-#~ msgid "comments"
-#~ msgstr "comentaris"
-
-#~ msgid "last"
-#~ msgstr "darrer"
-
-#~ msgid "View comments"
-#~ msgstr "Visualitza els comentaris"
-
-#~ msgid "There is a total of %i comments"
-#~ msgstr "Hi ha un total de %i comentaris"
-
-#~ msgid "Select basket"
-#~ msgstr "Seleccioneu el cistell"
-
-#~ msgid "Add to a personal basket"
-#~ msgstr "Afegeix-lo al cistell personal"
-
-#~ msgid "%i baskets"
-#~ msgstr "%i cistells"
-
-#~ msgid "Add to a group-shared basket"
-#~ msgstr "Afegeix-lo a un cistell de grup"
-
-#~ msgid "Adding %i records to these baskets"
-#~ msgstr "Afegits %i registres a aquests cistells"
-
-#~ msgid "No records were added to the selected baskets."
-#~ msgstr "No s'han afegit registres als cistells seleccionats."
-
-#~ msgid "Details and comments"
-#~ msgstr "Detalls i comentaris"
-
-#~ msgid "Add records to baskets"
-#~ msgstr "Afegir registres als cistells"
-
-#, fuzzy
-#~ msgid "Subscribe to this discussion"
-#~ msgstr "Subscriure's a aquest cistell"
-
-#, fuzzy
-#~ msgid "Unsubscribe from this discussion"
-#~ msgstr "Donar-se de baixa d'aquest cistell"
-
-#~ msgid ""
-#~ "Would you like to receive email notifications when new comments are added "
-#~ "to this page?"
-#~ msgstr ""
-#~ "Voldrieu rebre notificacions per correu electrònic quan s'afegeixin nous "
-#~ "comentaris a aquesta pàgina?"
-
-#, fuzzy
-#~ msgid "Delete comment(s) or supress abuse report(s)"
-#~ msgstr "Elimina les denúncies d'abús"
-
-#, fuzzy
-#~ msgid "Delete Comments"
-#~ msgstr "Suprimir comentari"
-
-#~ msgid "ADD TO BASKET"
-#~ msgstr "AFEGIR AL CISTELL"
-
-#, fuzzy
-#~ msgid "Frequently publishes in:"
-#~ msgstr "Publica a"
-
-#~ msgid "The collection to which this file belong is restricted: "
-#~ msgstr ""
-#~ "La col·lecció a la què pertany aquest document és d'accés restringit:"
-
-#~ msgid "An error has happened in trying to retrieve the corresponding icon."
-#~ msgstr "Hi ha hagut un error a l'intentar recuperar la icona corresponent."
-
-#~ msgid "An error has happened in trying to stream the corresponding icon."
-#~ msgstr "Hi ha hagut un error a l'intentar enviar la icona corresponent."
-
-#~ msgid "Do you really want to delete this record?"
-#~ msgstr "Esteu segur que voleu suprimir aquest cistell?"
-
-#~ msgid ""
-#~ "Do you really want to revert to revision %(revdate)s of record #%(recid)s?"
-#~ msgstr ""
-#~ "Esteu segurs que voleu retrocedir a la revisió %(revdate)s del registre #"
-#~ "%(recid)s?"
-
-#~ msgid ""
-#~ "The current version will be replaced with a copy of revision %(revdate)s"
-#~ msgstr ""
-#~ "La versió actual serà substituïda per una còpia de revisió %(revdate)s"
-
-#~ msgid "You will also lose any unsubmitted changes for this record!"
-#~ msgstr "També perdereu tots els canvis no lliurats per aquest registre!"
-
-#, fuzzy
-#~ msgid "This record does not exist. Please try another record ID."
-#~ msgstr "Proveu un altre número de registre."
-
-#, fuzzy
-#~ msgid "Cannot edit deleted record.\""
-#~ msgstr "No es pot editar un registre suprimit."
-
-#, fuzzy
-#~ msgid ""
-#~ "This record is currently being edited by another user. Please try again "
-#~ "later."
-#~ msgstr "Aquest registre ara mateix l'està editant algú altre."
-
-#~ msgid ""
-#~ "The record is locked because of unfinished upload tasks. Please try again "
-#~ "in a few minutes."
-#~ msgstr ""
-#~ "El registre està bloquejat per unes tasques de càrrega que encara no han "
-#~ "acabat.  Torneu-ho a provar en uns minuts."
-
-#~ msgid ""
-#~ "Your modifications have now been submitted. They will be processed as "
-#~ "soon as the task queue is empty."
-#~ msgstr ""
-#~ "Les vostres modificacions han estat lliurades. Es processaran tan aviat "
-#~ "com la cua de tasques estigui buida"
-
-#~ msgid "The record will be deleted as soon as the task queue is empty."
-#~ msgstr ""
-#~ "Aquest registre es suprimirà tan aviat com la cua de tasques estigui "
-#~ "buida."
-
-#~ msgid "Please enter the ID of the record you want to edit"
-#~ msgstr "Introduiu l'identificador del registre que voleu editar"
-
-#~ msgid "Move up"
-#~ msgstr "Puja'l"
-
-#~ msgid "Move down"
-#~ msgstr "Baixa'l"
-
-#~ msgid "Add Subfield"
-#~ msgstr "Afegeix subcamp"
-
-#~ msgid "Edit institute"
-#~ msgstr "Editeu l'institut"
-
-#~ msgid "Add Field"
-#~ msgstr "Afegeix camp"
-
-#~ msgid "Verbose"
-#~ msgstr "Textual"
-
-#~ msgid "Display"
-#~ msgstr "Mostra"
-
-#~ msgid "(%s previous revision)"
-#~ msgstr "(%s revisió anterior)"
-
-#~ msgid "(%s previous revisions)"
-#~ msgstr "(%s revisions anteriors)"
-
-#~ msgid "Done"
-#~ msgstr "Fet"
-
-#~ msgid "Add another subfield"
-#~ msgstr "Afegeix subcamp"
-
-#~ msgid ""
-#~ "Tags and values should be filled before pressing Done or Add another "
-#~ "subfield"
-#~ msgstr ""
-#~ "Cal omplir les etiquetes i els valors abans de prémer Fet o Afegeix un "
-#~ "altre subcamp"
-
-#~ msgid "Your changes are TEMPORARY."
-#~ msgstr "Els vostres canvis són TEMPORALS."
-
-#~ msgid "To save this record, please click on submit."
-#~ msgstr "Per a desar aquest registre, feu clic a Lliura."
-
-#, fuzzy
-#~ msgid "Revision %(revdate)s"
-#~ msgstr "Registre #%(recid)s, revisió %(revdate)s"
-
-#, fuzzy
-#~ msgid "current version"
-#~ msgstr "Membres actuals"
-
-#~ msgid "revert to this revision"
-#~ msgstr "recuperar aquesta revisió"
-
-#, fuzzy
-#~ msgid "Edit current version"
-#~ msgstr "Edita els paràmetres"
-
-#, fuzzy
-#~ msgid "View revision"
-#~ msgstr "divisió"
-
-#~ msgid "Revert to revision"
-#~ msgstr "Tornar a la revisió"
-
-#, fuzzy
-#~ msgid "Back to BibEdit"
-#~ msgstr "Torna als cistells"
-
-#~ msgid "period_from"
-#~ msgstr "des de"
-
-#, fuzzy
-#~ msgid "select_from1"
-#~ msgstr "seleccioneu l'ususari"
-
-#~ msgid "period_to"
-#~ msgstr "fins"
-
-#, fuzzy
-#~ msgid "select_to1"
-#~ msgstr "fins"
-
-#, fuzzy
-#~ msgid "No more requests are waiting."
-#~ msgstr "Quedent alguns documents pendents"
-
-#~ msgid "due_date_"
-#~ msgstr "data_"
-
-#~ msgid "jsCal_"
-#~ msgstr "jsCal_"
-
-#~ msgid "next page >>>"
-#~ msgstr "pàgina següent >>>"
-
-#~ msgid "<<< previous page"
-#~ msgstr "<<< pàgina anterior"
-
-#~ msgid "|<< first page"
-#~ msgstr "|<< primera pàgina"
-
-#~ msgid "last page >>|"
-#~ msgstr "darrera pàgina >>|"
-
-#~ msgid "jsCal"
-#~ msgstr "jsCal"
-
-#~ msgid "from"
-#~ msgstr "de"
-
-#~ msgid "jsCal_from"
-#~ msgstr "jsCal_from"
-
-#~ msgid "to"
-#~ msgstr "a"
-
-#~ msgid "jsCal_to"
-#~ msgstr "jsCal_to"
-
-#~ msgid "request_date"
-#~ msgstr "data_de_petició"
-
-#~ msgid "Please try again later."
-#~ msgstr "Torneu-ho a provar més tard."
-
-#~ msgid "There are record revisions not yet synchronized with the database."
-#~ msgstr ""
-#~ "Hi ha registres que encara no estan sincronitzats amb la base de dades."
-
-#~ msgid "Please try again in a few minutes."
-#~ msgstr "Torneu-ho a provar més tard."
-
-#~ msgid ""
-#~ "A new revision of this record is not yet synchronized with the database."
-#~ msgstr ""
-#~ "Una nova revisió d'aquest registre encara no està sincronitzada a la base "
-#~ "de dades"
-
-#~ msgid ""
-#~ "The new revision is being synchronized with the database and will be "
-#~ "ready shortly."
-#~ msgstr ""
-#~ "La nova revisió s'està sincronitzant amb la base de dades i aviat estarà "
-#~ "disponible"
-
-#~ msgid "View all reported comments"
-#~ msgstr "Visualitza tots els comentaris denunciats"
-
-#~ msgid "View all reported reviews"
-#~ msgstr "Visualitza totes les ressenyes denunciades"
-
-#~ msgid "Delete a specific comment/review (by ID)"
-#~ msgstr "Suprimir un comentari/ressenya específic (per número)"
-
-#~ msgid ""
-#~ "Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)"
-#~ "s first."
-#~ msgstr ""
-#~ "Abans d'afegir el vostre comentari, us heu d'%(x_url_open)sidentificar"
-#~ "%(x_url_close)s."
-
-#~ msgid "session"
-#~ msgstr "sessió"
-
-#~ msgid "alerts"
-#~ msgstr "alertes"
-
-#~ msgid "account"
-#~ msgstr "compte"
-
-#~ msgid "messages"
-#~ msgstr "missatges"
-
-#~ msgid "groups"
-#~ msgstr "grups"
-
-#~ msgid "submissions"
-#~ msgstr "lliuraments"
-
-#~ msgid "approvals"
-#~ msgstr "aprovacions"
-
-#~ msgid "Unknown form field found on one of the submission pages."
-#~ msgstr "Camp desconegut a una de les pàgines del formulari de lliuraments."
-
-#~ msgid "List of specific approvals"
-#~ msgstr "Llista d'aprovacions específiques"
-
-#~ msgid "List of publication categories"
-#~ msgstr "Llista de les categories de publicació"
-
-#~ msgid "List of direct approval categories"
-#~ msgstr "Llista de les categories d'aprovació directa"
-
-#~ msgid "Specific Approval and Refereeing Workflow"
-#~ msgstr "Procediment específic d'aprovació i revisió"
-
-#~ msgid "Internal configuration error"
-#~ msgstr "Error intern de configuració"
-
-#~ msgid "There is no format configured for this journals index page"
-#~ msgstr ""
-#~ "No hi ha cap format configurat per a la pàgina d'índex d'aquestes revistes"
-
-#~ msgid "There is no format configured for this journals search page"
-#~ msgstr ""
-#~ "No hi ha cap format configurat per a la pàgina de cerca d'aquestes "
-#~ "revistes"
-
-#~ msgid "There is no format configured for this journals popup page"
-#~ msgstr ""
-#~ "No hi ha cap format configurat per a la pàgina «popup» d'aquestes revistes"
-
-#~ msgid "We could not find a current issue in the Database"
-#~ msgstr "No s'ha pogut trobar el número actual a la base de dades"
-
-#, fuzzy
-#~ msgid "link"
-#~ msgstr "dins"
-
-#~ msgid "The contents of this collection is restricted."
-#~ msgstr "Els continguts d'aquesta col·lecció són restringits."
-
-#, fuzzy
-#~ msgid "Sort:"
-#~ msgstr "Ordena'ls per:"
-
-#, fuzzy
-#~ msgid "Please login to perform this action."
-#~ msgstr "Heu d'identificar-vos per a executar aquesta acció."
-
-#, fuzzy
-#~ msgid "Alert sent successfully!"
-#~ msgstr "Suprimit correctament"
-
-#, fuzzy
-#~ msgid "Webjournal Administration Interface"
-#~ msgstr "Administració de lliuraments"
-
-# Confirmar que no hagi de ser l'email!
-#, fuzzy
-#~ msgid "   Username/Email: %s\n"
-#~ msgstr "Nom d'usuari"
-
-#, fuzzy
-#~ msgid "   Password: %s\n"
-#~ msgstr "Contrasenya"
-
-#~ msgid "Migrate BibFormat Settings"
-#~ msgstr "Migra els paràmetres de BibFormat"
-
-#~ msgid "Migrate Knowledge Bases"
-#~ msgstr "Migra les bases de coneixement"
-
-#~ msgid "Migrate Behaviours"
-#~ msgstr "Migra els comportaments"
-
-#~ msgid "Migrate Formats"
-#~ msgstr "Migra els formats"
-
-#, fuzzy
-#~ msgid "Your account created on"
-#~ msgstr "Compte creat"
-
-#, fuzzy
-#~ msgid "You have created a new account on"
-#~ msgstr "o creeu-ne un de nou"
-
-#~ msgid ""
-#~ "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)"
-#~ "s."
-#~ msgstr ""
-#~ "Podeu tornar a %(x_url_open)sl'interfície d'administració de BibEdit"
-#~ "%(x_url_close)s."
-
-#, fuzzy
-#~ msgid "Article Error"
-#~ msgstr "Article"
-
-#, fuzzy
-#~ msgid "%s Personalize, Main page"
-#~ msgstr "Personalitza"
-
-#, fuzzy
-#~ msgid "%s , personalize"
-#~ msgstr "Personalitza"
-
-#, fuzzy
-#~ msgid "Successfully featured record: %s"
-#~ msgstr "eliminat correctament l'informa d'abús"
-
-#~ msgid "Agenda"
-#~ msgstr "Agenda"
-
-#~ msgid "Webcast"
-#~ msgstr "Webcast"
-
-#~ msgid "Search Help"
-#~ msgstr "Ajuda a la cerca"
-
-#~ msgid "Format:"
-#~ msgstr "Format:"
-
-#~ msgid "Send lost password"
-#~ msgstr "Enviar la contrasenya perduda"
-
-#~ msgid "Here are your user credentials for"
-#~ msgstr "Aquí teniu les vostres credencials per"
-
-#~ msgid "username"
-#~ msgstr "nom d'usuari"
-
-#~ msgid "password"
-#~ msgstr "contrasenya"
-
-#~ msgid "You seem to be %(x_role)s."
-#~ msgstr "Sembla que sou %(x_role)s."
-
-#~ msgid "Credentials for"
-#~ msgstr "Credencials per"
-
-#~ msgid ""
-#~ "An email has been sent to the given address with the account information."
-#~ msgstr ""
-#~ "S'ha enviat un correu electrònic a l'adreça indicada amb la informació "
-#~ "del compte."
-
-#~ msgid "Unable to find file."
-#~ msgstr "No s'ha pogut trobar el fitxer."
-
-#~ msgid "Cannot find submission directory."
-#~ msgstr "No es pot trobar el directori de lliuraments."
-
-#~ msgid "Unknown type of document"
-#~ msgstr "Tipus de document desconegut"
-
-#~ msgid "Login via:"
-#~ msgstr "Identificació via:"
-
-#~ msgid "Try your search on..."
-#~ msgstr "Proveu la vostra cerca a..."
-
-#, fuzzy
-#~ msgid "Timeout"
-#~ msgstr "Hora"
-
-#~ msgid "Before you add your comment, you need to log in first"
-#~ msgstr "Abans d'afegir el vostre comentari, us heu d'identificar"
-
-#~ msgid "MARC"
-#~ msgstr "MARC"
-
-#~ msgid "Please try to come back later."
-#~ msgstr "Proveu a intentar-ho més endavant."
-
-#~ msgid "Please enter"
-#~ msgstr "Entreu"
-
-#~ msgid "to edit"
-#~ msgstr "a editar"
-
-#~ msgid "You can now go back to"
-#~ msgstr "Ara podeu tornar a"
-
-#~ msgid ""
-#~ "The record as soon deleted when the task queue is empty.You can now go "
-#~ "back to"
-#~ msgstr ""
-#~ "Aquest registre s'esborrarà quan la cua de tasques estigui buida.  Ara "
-#~ "podeu tornar a"
-
-#~ msgid "detailed list"
-#~ msgstr "llista detallada"
-
-#~ msgid "your searches"
-#~ msgstr "les vostres cerques"
-
-#~ msgid "#"
-#~ msgstr "n."
-
-# 'altri' per 'tercers'?
-#~ msgid "%i others' baskets"
-#~ msgstr "%i cistells d'altri"
-
-# 'Teniu' o 'heu'?
-#~ msgid "You have %s and are subscribed to %s and %s."
-#~ msgstr "Teniu %s i esteu subscrits a %s i %s."
-
-#~ msgid "Bring item up"
-#~ msgstr "Puja l'item"
-
-#~ msgid "Sort by"
-#~ msgstr "Ordenar per:"
-
-#~ msgid "You're not member of a group"
-#~ msgstr "No sou membre d'un grup"
-
-# Discuss: discussió o comentari?
-#~ msgid "Discuss this document:"
-#~ msgstr "Comenteu aquest document:"
-
-#~ msgid "wrote on"
-#~ msgstr "va escriure el"
-
-#~ msgid "(Report abuse)"
-#~ msgstr "(Avisar d'un abús)"
-
-#~ msgid "based on %(nb_comments_total)s reviews"
-#~ msgstr "basat en %(nb_comments_total)s ressenyes"
-
-#~ msgid ""
-#~ "Note: you currently haven't %(link_open)sdefined a nickname%(link_close)s."
-#~ msgstr "Compte: encara no heu %(link_open)sdefinit un àlies%(link_close)s."
-
-#~ msgid "%s will temporarly be displayed as author of this comment."
-#~ msgstr "%s es mostrarà temporalment com autor d'aquest comentari"
-
-#~ msgid "Article:"
-#~ msgstr "Article:"
-
-#~ msgid "Comment:"
-#~ msgstr "Comentari:"
-
-#~ msgid "email"
-#~ msgstr "adreça electrònica"
-
-#~ msgid "Detailed record #%s"
-#~ msgstr "Registre complet #%s"
-
-# Reported? Informats?
-# Tant pot ser 'reviews' com 'comments'
-#~ msgid "View all Reported %s"
-#~ msgstr "Visualitzar tots els %s denunciats"
-
-#~ msgid "These users are overquota: "
-#~ msgstr "Aquests usuaris han sobrepassat la seva quota: "
-
-#~ msgid "Search term <em>%s</em>"
-#~ msgstr "El terme de cerca <em>%s</em>"
-
-#~ msgid "inside <em>%s</em> index"
-#~ msgstr "dins l'índex <em>%s</em>"
-
-#~ msgid "Record #%d: %s"
-#~ msgstr "Registre #%d: %s"
-
-#~ msgid "Record #%d"
-#~ msgstr "Registre #%d"
-
-#~ msgid "Words nearest to"
-#~ msgstr "Paraules més properes a"
-
-#~ msgid "inside"
-#~ msgstr "dins"
-
-#~ msgid "in any collection are:"
-#~ msgstr "en qualsevol col·lecció són:"
-
-#~ msgid "<strong>%s</strong> records found"
-#~ msgstr "<strong>%s</strong> registres trobats"
-
-#~ msgid ""
-#~ "<strong>Results overview:</strong> Found <strong>%s</strong> records in "
-#~ "%.2f seconds."
-#~ msgstr ""
-#~ "<strong>Resultats globals:</strong> Trobats <strong>%s</strong> registres "
-#~ "en %.2f segons."
-
-#~ msgid ""
-#~ "<p>Sorry, collection <strong>%s</strong> does not seem to exist. <p>You "
-#~ "may want to start browsing from <a href=\"%s\">%s</a>."
-#~ msgstr ""
-#~ "<p>Ho sentim, la col·lecció <strong>%s</strong> no existeix. <p>Proveu-ho "
-#~ "començant des de <a href=\"%s\">%s</a>."
-
-#~ msgid ""
-#~ "The <strong class=\"headline\">guest</strong> users need to <A href=\"%s"
-#~ "\">register</A> first"
-#~ msgstr ""
-#~ "Els usuaris <strong class=\"headline\">visitants</strong> abans han d'<A "
-#~ "href=\"%s\">identificar-se</A>"
-
-#, fuzzy
-#~ msgid ""
-#~ "You are logged in as a guest user, so your %s will disappear at the end "
-#~ "of the current session. If you wish you can\n"
-#~ "               <a href=\"%s/youraccount/login?ln=%s\">login or register "
-#~ "here</a>."
-#~ msgstr ""
-#~ "Com que esteu connectats com a usuari visitant, els vostres %s "
-#~ "desapareixeran al final d'aquesta sessió.  Si voleu, podeu <a href=\"../"
-#~ "youraccount.py/login?ln=%s\">identificar-vos o donar-vos d'alta</a>."
-
-#, fuzzy
-#~ msgid "your groups"
-#~ msgstr "Afegir als grups"
-
-#~ msgid "your submissions"
-#~ msgstr "els vostres lliuraments"
-
-#~ msgid "your approvals"
-#~ msgstr "les vostres aprovacions"
-
-#~ msgid ""
-#~ "You are no longer recognized.  If you wish you can <A href=\"./login?ln=%s"
-#~ "\">login here</A>."
-#~ msgstr ""
-#~ "Ja heu deixat d'estar identificat.  Si voleu podeu <A \n"
-#~ "href=\"./login?ln=%s\">identificar-vos aquí</A>."
-
-#~ msgid "Edit<br/>members"
-#~ msgstr "Editar<br/>membres"
-
-#~ msgid "Create New Group"
-#~ msgstr "Crear un nou grup"
-
-# Una?
-#, fuzzy
-#~ msgid "Please Select:"
-#~ msgstr "Si us plau seleccioneu-ne un o més:"
-
-#~ msgid "Add member"
-#~ msgstr "Afegir membre"
-
-#~ msgid "Group: <b>%s</b>"
-#~ msgstr "Grup: <b>%s</b>"
-
-# Potser canviar el # per un n. ?
-#, fuzzy
-#~ msgid "user #%i"
-#~ msgstr "usuari #%i"
-
-#~ msgid "Error: %s"
-#~ msgstr "Error: %s"
-
-#~ msgid "can't figure number of pages"
-#~ msgstr "no és possible calcular el número de pàgines"
-
-#~ msgid "this action does not apply on this type of document"
-#~ msgstr "aquesta acció no és aplicable a aquest tipus de document"
-
-#~ msgid "error"
-#~ msgstr "error"
-
-#~ msgid "warning"
-#~ msgstr "atenció"
-
-#~ msgid "go"
-#~ msgstr "endavant"
-
-#~ msgid "Submission no(1)"
-#~ msgstr "Lliurament núm(1)"
-
-#~ msgid ""
-#~ "(1) you should take note of this number at the beginning of the "
-#~ "submission, it will allow you to get your information back in case your "
-#~ "browser crashes before the end of the submission."
-#~ msgstr ""
-#~ "(1) haurieu de prendre nota d'aquest número al començament del vostre "
-#~ "lliurament, perquè us permeterà recuperar la vostra informació en cas que "
-#~ "el navegador fa fallida abans del final del lliurament."
-
-# O núm?
-#, fuzzy
-#~ msgid "record #%s"
-#~ msgstr "registre #%s"
-
-#~ msgid "id"
-#~ msgstr "id"
-
-#~ msgid "pending"
-#~ msgstr "pendent"
-
-#~ msgid "click here"
-#~ msgstr "Feu clic aquí"
-
-#~ msgid ""
-#~ "It has first been sent to approval on: <strong class=\"headline\">%(date)"
-#~ "s</strong>"
-#~ msgstr ""
-#~ "Ha estat enviar per aprovació el primer cop el: <strong class=\"headline"
-#~ "\">%(date)s</strong>"
-
-#~ msgid ""
-#~ "Last approval e-mail was sent on: <strong class=\"headline\">%(date)s</"
-#~ "strong>"
-#~ msgstr ""
-#~ "L'últim correu electrònic d'aprovació av ser enviat el <strong class="
-#~ "\"headline\">%(date)s</strong>"
-
-#~ msgid "This Document has been <strong class=\"headline\">approved</strong>."
-#~ msgstr ""
-#~ "Aquest document ha estat <strong class=\"headline\">approvat</strong>."
-
-#~ msgid ""
-#~ "Its approved reference is: <strong class=\"headline\">%(rn)s</strong>"
-#~ msgstr ""
-#~ "La referència de la seva aprovació és: <strong class=\"headline\">%(rn)s</"
-#~ "strong>."
-
-#~ msgid ""
-#~ "It has been approved on: <strong class=\"headline\">%(date)s</strong>"
-#~ msgstr "Ha estat aprovat el: <strong class=\"headline\">%(date)s</strong>."
-
-#~ msgid "This Document has been <strong class=\"headline\">rejected</strong>."
-#~ msgstr ""
-#~ "Aquest document ha estat <strong class=\"headline\">rebutjat</strong>."
-
-#~ msgid ""
-#~ "It has been rejected on: <strong class=\"headline\">%(date)s</strong>"
-#~ msgstr "Ha estat rebutjat el: <strong class=\"headline\">%(date)s</strong>."
-
-#~ msgid ""
-#~ "You first have to login before using this feature. Use the left menu to "
-#~ "log in."
-#~ msgstr ""
-#~ "Abans de fer aquesta acció us heu d'identificar.  Useu el menú de "
-#~ "l'esquerra per a fer-ho."
-
-#~ msgid "%s"
-#~ msgstr "%s"
-
-#~ msgid "Sorry, the record %s does not seem to be a number."
-#~ msgstr "El registre %s no sembla un número."
-
-# Temps verbal: visualita?  Visualitzeu?
-#~ msgid "view all %s reviews"
-#~ msgstr "visualitzar totes les %s crítiques"
-
-#~ msgid "Comment #%s"
-#~ msgstr "Comentari #%s"
-
-#~ msgid "The email address is already in use, please try again."
-#~ msgstr "Aquesta adreça de correu electrònic ja s'està usant, torneu-hi."
-
-#~ msgid "The passwords do not match, please try again."
-#~ msgstr "Les contrasenyes no coincideixen, torneu-ho a intentar."
-
-#~ msgid "The email address given is not valid, please try again."
-#~ msgstr ""
-#~ "L'adreça de correu electrònic que heu entrat és incorrecte, si us plau "
-#~ "torneu-ho a intentar."
-
-#, fuzzy
-#~ msgid "%(num)s results found"
-#~ msgstr "Cercar en %s registres per"
-
-#, fuzzy
-#~ msgid "No result found"
-#~ msgstr "No s'ha trobat cap cerca"
-
-#, fuzzy
-#~ msgid "GROUP_DELETED"
-#~ msgstr "SUPRIMIR"
-
-#, fuzzy
-#~ msgid "MEMBER_DELETED"
-#~ msgstr "SUPRIMIR"
