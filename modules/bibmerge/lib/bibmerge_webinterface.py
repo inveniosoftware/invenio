@@ -40,7 +40,7 @@ from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized, collect_user_info
 
 from invenio.urlutils import redirect_to_url
-from invenio.webinterface_handler import WebInterfaceDirectory
+from invenio.webinterface_handler import WebInterfaceDirectory, wash_urlargd
 from invenio.bibedit_utils import json_unicode_to_utf8
 from invenio.bibmerge_engine import perform_request_init, \
                                     perform_request_ajax
@@ -68,6 +68,7 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
         """
         # If it is an Ajax request, extract any JSON data.
         ajax_request, recid1, recid2 = False, None, None
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
         if form.has_key('jsondata'):
             json_data = json.loads(str(form['jsondata']))
             # Deunicode all strings (Invenio doesn't have unicode
@@ -126,14 +127,13 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
   <script type="text/javascript" src="%(site)s/js/json2.js"></script>
   <script type="text/javascript" src="%(site)s/js/bibmerge_engine.js"></script>""" % {'site': CFG_SITE_URL}
             title = 'Record Merger'
-            ln = CFG_SITE_LANG
             return page(title         = title,
                         metaheaderadd = metaheaderadd,
                         body          = body,
                         errors        = errors,
                         warnings      = warnings,
                         uid           = uid,
-                        language      = ln,
+                        language      = argd['ln'],
                         navtrail      = navtrail,
                         lastupdated   = __lastupdated__,
                         req           = req)

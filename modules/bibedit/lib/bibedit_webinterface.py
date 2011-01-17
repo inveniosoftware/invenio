@@ -70,7 +70,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
 
         """
         uid = getUid(req)
-        ln = CFG_SITE_LANG
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
         # Abort if the simplejson module isn't available
         if not simplejson_available:
             title = 'Record Editor'
@@ -82,7 +82,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
                         errors      = [],
                         warnings    = [],
                         uid         = uid,
-                        language    = ln,
+                        language    = argd['ln'],
                         navtrail    = navtrail,
                         lastupdated = __lastupdated__,
                         req         = req)
@@ -136,14 +136,14 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         # Handle request.
         if not ajax_request:
             # Show BibEdit start page.
-            body, errors, warnings = perform_request_init(uid, ln, req, __lastupdated__)
+            body, errors, warnings = perform_request_init(uid, argd['ln'], req, __lastupdated__)
             title = 'Record Editor'
             return page(title       = title,
                         body        = body,
                         errors      = errors,
                         warnings    = warnings,
                         uid         = uid,
-                        language    = ln,
+                        language    = argd['ln'],
                         navtrail    = navtrail,
                         lastupdated = __lastupdated__,
                         req         = req)
