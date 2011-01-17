@@ -181,8 +181,8 @@ class TestGetEmergencyRecipients(unittest.TestCase):
         now = datetime.datetime.today()
         tomorrow = now + datetime.timedelta(days=1)
         diff_day = now + datetime.timedelta(days=4)
-        later = now.replace(hour=now.hour + 1)
-        earlier = now.replace(hour=now.hour - 1)
+        later = now.replace(hour=(now.hour + 1) % 24)
+        earlier = now.replace(hour=(now.hour - 1) % 24)
         constraint_now = "%s %s-%s" % (
                                     now.strftime("%a"),
                                     earlier.strftime("%H:00"),
@@ -197,9 +197,16 @@ class TestGetEmergencyRecipients(unittest.TestCase):
                                     earlier.strftime("%H:00"),
                                     later.strftime("%H:00"),
                                     )
+        minute = (now.minute - 3) % 60
+        # hour and earlier can change when minute is modified
+        if minute > now.minute:
+             hour = (now.hour - 1) % 24
+             earlier = now.replace(hour=(now.hour - 2) % 24)
+        else:
+            hour = now.hour
         constraint_near_miss = "%s-%s" % (
                                     earlier.strftime("%H:00"),
-                                    now.replace(minute=now.minute - 3) \
+                                    now.replace(minute=minute, hour=hour) \
                                         .strftime("%H:%M")
                                     )
         constraint_day = "%s" % now.strftime("%A")
