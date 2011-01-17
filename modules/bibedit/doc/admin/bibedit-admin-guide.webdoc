@@ -25,10 +25,12 @@
 <strong>1. <a href="#1">Overview</a></strong><br />
 <strong>2. <a href="#2">Edit records via Web interface</a></strong><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.1. <a href="#2.1">Keyboard shortcuts</a><br />
-<strong>3. <a href="#3">Edit records via command line</a></strong><br />
-<strong>4. <a href="#4">Delete records via command line</a></strong><br />
-<strong>5. <a href="#5">Delete all records</a></strong><br />
-<strong>6. <a href="#6">Access record history</a></strong><br />
+<strong>3. <a href="#3">Edit multiple records via Web interface</a></strong><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1. <a href="#3.1">Multi-Record Editor user guide</a><br />
+<strong>4. <a href="#4">Edit records via command line</a></strong><br />
+<strong>5. <a href="#5">Delete records via command line</a></strong><br />
+<strong>6. <a href="#6">Delete all records</a></strong><br />
+<strong>7. <a href="#7">Access record history</a></strong><br />
 
 <a name="1"></a><h2>1. Overview</h2>
 
@@ -127,7 +129,99 @@ bibdocfile command line tool.</p>
   </tbody>
 </table>
 
-<a name="3"></a><h2>3. Edit records via command line</h2>
+<a name="3"></a><h2>3. Edit multiple records via web interface</h2>
+
+<p>The purpose of the <a href="<CFG_SITE_URL>/record/multiedit/">Multi-Record Editor Web interface</a> is to allow cataloguers to easily edit more than one record in one go.</p>
+
+<p>The Multi-Record Editor allows cataloguers to easily look up various records in
+the system in order to find record sets upon which to operate, and then to allow
+some easy replacement procedures on these records in one go, e.g. a substring
+substitution of some field value in some field tags.
+</p>
+
+<a name="3.1"></a><h3>3.1 Multi-Record Editor user guide</h3>
+
+<p>While working with the Multi-Record Editor, the first step is to filter the set
+of records that are going to be modified.<p>
+
+<p>In order to do that, three options are available in the interface:<p>
+
+<blockquote>
+<pre>
+        Search criteria:    [         ]
+        Filter collection:  [         ]
+        Output tags:        [         ]
+        [Search]
+</pre>
+</blockquote>
+
+<p>
+    <ul>
+
+    <li>Search criteria allows to search records using the
+    same syntax offered by Invenio's web search.
+
+    <li>These records can be filtered by the desired collection, thus narrowing the
+    search results.
+
+    <li>Finally, for convenience, the tags displayed for each record can be specified.
+    The tags have to be separated by commas.
+
+    </ul>
+</p>
+<p>After clicking the <code>Search</code> button, the set of records that will
+be affected by the changes will be visible at the bottom of the interface. It is
+possible to specify whether to visualize them in <code>MARC</code> format or in
+<code>HTML Brief</code> format.</p>
+
+<p>The next step is to specify the desired changes to be made on the records.
+When defining a new field action, the field tag and its indicators (if necessary)
+have to be specified and one of the three actions (Add field, Delete field,
+Update field) selected.</p>
+
+<blockquote>
+<pre>
+    Field
+    [ tag ][ind1][ind2]     [Select action[V]]
+</pre>
+</blockquote>
+
+<p>After that, as many actions on subfields as needed can be defined. The subfield
+tag has to be specified and one action (<code>Add subfield, Delete subfield, Replace
+full content, Replace substring</code>) selected. Depending on the field action
+selected some actions for subfields will not be available.</p>
+
+<p>The difference between <code>Replace full content</code> and <code>Replace
+substring</code> resides in that the former deletes all the content present in
+a subfield and writes the specified value on it whereas the latter looks for a string
+and substitutes it by a new string.</p>
+
+<p>All subfield actions have the <code>Apply only to specific field instances</code>
+option. This is useful, for example, in cases where there are multiple authors
+(<code>700__</code> tags) and we do not want to act in all of them.</p>
+
+<p>In that case one could add the condition that only fields where the tag
+<code>$a</code> is equal to <code>Ellis A.</code> should be modified.</p>
+
+<blockquote>
+<pre>
+    700__   Update Field
+            [u] [Replace full content]
+                [Ellis J.]
+            when other subfield [u] is equal to [Ellis A.]
+</pre>
+</blockquote>
+
+<p>Every subfield action defined has to be saved using the correspondent button
+before applying the changes.</p>
+
+<p>Once all the actions for fields and subfields have been specified the modifications
+can be previewed using the corresponding button.</p>
+
+<p>Finally, when clicking on the <code>Apply changes</code> button all modifications
+will be sent to the server and will be visible after some time.</p>
+
+<a name="4"></a><h2>4. Edit records via command line</h2>
 
 <p>The idea is to download record in XML MARC format, edit it by using
 any editor, and upload the changes back.  Note that you can edit any
@@ -188,7 +282,7 @@ proper form <code>Ellis, J</code>.</p>
 <p>After which the record(s) should be fully modified and formatted and
 all indexes and collections updated, as necessary.</p>
 
-<a name="4"></a><h2>4. Delete records via command line</h2>
+<a name="5"></a><h2>5. Delete records via command line</h2>
 
 <p>Once a record has been uploaded, we prefer not to *destroy* it fully
 anymore (i.e. to wipe it out and to reuse its record ID for another
@@ -268,7 +362,7 @@ be able to access it.
      bibXXx tables, so that this won't be necessary anymore.</p>
 
 
-<a name="5"></a><h2>5. Delete all records</h2>
+<a name="6"></a><h2>6. Delete all records</h2>
 
     <p>If you want to wipe out all the existing bibliographic content of
        your site, for example to start uploading the documents from
@@ -286,7 +380,7 @@ be able to access it.
      subdirectories, if you use WebSubmit.
     </p>
 
-<a name="6"></a><h2>6. Access record history</h2>
+<a name="7"></a><h2>7. Access record history</h2>
 
 <p>Every revision of the metadata of a record is stored in the
 "history" table containing all previous MARCXML master formats of the
