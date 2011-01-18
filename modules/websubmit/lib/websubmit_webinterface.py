@@ -525,6 +525,9 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                                                          "submit",
                                                          doctype=argd['doctype'],
                                                          act=action)
+            if not acc_is_role("submit", doctype=argd['doctype'], act=action):
+                # There is NO authorization plugged. User should have access
+                auth_code = 0
         else:
             # User must be allowed to attach files
             (auth_code, auth_msg) = acc_authorize_action(user_info,
