@@ -2286,6 +2286,127 @@ class BibUploadFFTModeTest(GenericBibUploadTest):
                                           testrec_expected_hm), '')
         self.failUnless(try_url_download(testrec_expected_url))
 
+    def test_fft_insert_with_valid_embargo(self):
+        """bibupload - FFT insert with valid embargo"""
+        # define the test case:
+        import time
+        future_date = time.strftime('%Y-%m-%d', time.gmtime(time.time() + 24 * 3600 * 2))
+        test_to_upload = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="r">firerole: deny until '%s'
+allow any</subfield>
+         </datafield>
+        </record>
+        """ % future_date
+        testrec_expected_xm = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
+         </datafield>
+        </record>
+        """ % {'siteurl': CFG_SITE_URL}
+        testrec_expected_hm = """
+        001__ 123456789
+        003__ SzGeCERN
+        100__ $$aTest, John$$uTest University
+        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
+        """ % {'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
+            % {'siteurl': CFG_SITE_URL}
+        # insert test record:
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
+        # replace test buffers with real recid of inserted test record:
+        testrec_expected_xm = testrec_expected_xm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_hm = testrec_expected_hm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_url = testrec_expected_url.replace('123456789',
+                                                          str(recid))
+        # compare expected results:
+        inserted_xm = print_record(recid, 'xm')
+        inserted_hm = print_record(recid, 'hm')
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
+        result = urlopen(testrec_expected_url).read()
+        self.failUnless("This file is restricted." in result, result)
+
+    def test_fft_insert_with_expired_embargo(self):
+        """bibupload - FFT insert with expired embargo"""
+        # define the test case:
+        import time
+        past_date = time.strftime('%Y-%m-%d', time.gmtime(time.time() - 24 * 3600 * 2))
+        test_to_upload = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="r">firerole: deny until '%s'
+allow any</subfield>
+         </datafield>
+        </record>
+        """ % past_date
+        testrec_expected_xm = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
+         </datafield>
+        </record>
+        """ % {'siteurl': CFG_SITE_URL}
+        testrec_expected_hm = """
+        001__ 123456789
+        003__ SzGeCERN
+        100__ $$aTest, John$$uTest University
+        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
+        """ % {'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
+            % {'siteurl': CFG_SITE_URL}
+        # insert test record:
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
+        # replace test buffers with real recid of inserted test record:
+        testrec_expected_xm = testrec_expected_xm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_hm = testrec_expected_hm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_url = testrec_expected_url.replace('123456789',
+                                                          str(recid))
+        # compare expected results:
+        inserted_xm = print_record(recid, 'xm')
+        inserted_hm = print_record(recid, 'hm')
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
+        result = urlopen(testrec_expected_url).read()
+        self.failIf("This file is restricted." in result, result)
+
+
     def test_exotic_format_fft_append(self):
         """bibupload - exotic format FFT append"""
         # define the test case:
