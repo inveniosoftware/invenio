@@ -2755,7 +2755,7 @@ class BibDocFile:
             req.status = apache.HTTP_NOT_FOUND
             raise InvenioWebSubmitFileError, "%s does not exists!" % self.fullpath
 
-_RE_STATUS_PARSER = re.compile(r'^(?P<type>email|group|egroup|role|firerole|status):\s*(?P<value>.*)$', re.M)
+_RE_STATUS_PARSER = re.compile(r'^(?P<type>email|group|egroup|role|firerole|status):\s*(?P<value>.*)$', re.S + re.I)
 def check_bibdoc_authorization(user_info, status):
     """
     Check if the user is authorized to access a document protected with the given status.

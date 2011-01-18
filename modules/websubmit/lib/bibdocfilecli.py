@@ -427,7 +427,12 @@ Examples:
                                                  # the collection
     $ bibdocfile --get-info --recids=1-4,6-8 # obtain informations
     $ bibdocfile -r 1 --with-docname=foo --set-docname=bar # Rename a document
-    """
+    $ bibdocfile -r 1 --set-restriction "firerole: deny until '2011-01-01'
+    allow any" # set an embargo to all the documents attached to record 1
+        # (note the ^M or \\n before 'allow any')
+        # See also $r subfield in <%(site)s/help/admin/bibupload-admin-guide#3.6>
+        # and Firerole in <%(site)s/help/admin/webaccess-admin-guide#6>
+    """ % {'site': CFG_SITE_URL}
     query_options = OptionGroup(parser, 'Query options')
 
     query_options.add_option('-r', '--recids', action="callback", callback=_ids_ranges_callback, type='string', dest='recids', help='matches records by recids, e.g.: --recids=1-3,5-7')
