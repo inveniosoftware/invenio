@@ -426,7 +426,7 @@ update-v0.99.1-tables:
 update-v0.99.2-tables:
 	@echo "Nothing to do; table structure did not change between v0.99.2 and v0.99.3."
 
-update-v0.99.3-tables:
+update-v0.99.3-tables: # from v0.99.3 to v1.0.0-rc0
 	echo "RENAME TABLE oaiARCHIVE TO oaiREPOSITORY;" | ${prefix}/bin/dbexec
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "INSERT INTO knwKB (id,name,description,kbtype) SELECT id,name,description,'' FROM fmtKNOWLEDGEBASES;" | ${prefix}/bin/dbexec
@@ -521,5 +521,11 @@ update-v0.99.3-tables:
 	migrate_comments_populate_threads_index()' | $(PYTHON)
 	echo -e 'from invenio.access_control_firerole import repair_role_definitions;\
 	repair_role_definitions()' | $(PYTHON)
+
+update-v1.0.0-rc0-tables: # from v1.0.0-rc0 to next release
+	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
+	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Set_Embargo','Set an embargo on all the documents of a given record.');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Set_Embargo','date_file');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Set_Embargo','date_format');" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~ *.pyc *.tmp

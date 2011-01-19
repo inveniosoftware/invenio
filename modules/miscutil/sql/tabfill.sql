@@ -434,6 +434,7 @@ INSERT INTO sbmALLFUNCDESCR VALUES ('Send_APP_Mail','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Send_Delete_Mail','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Send_Modify_Mail',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Send_SRV_Mail',NULL);
+INSERT INTO sbmALLFUNCDESCR VALUES ('Set_Embargo','Set an embargo on all the documents of a given record.');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Stamp_Replace_Single_File_Approval','Stamp a single file when a document is approved.');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Stamp_Uploaded_Files','Stamp some of the files that were uploaded during a submission.');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Test_Status','');
@@ -541,6 +542,8 @@ INSERT INTO sbmFUNDESC VALUES ('Move_Revised_Files_to_Storage','createIconDoctyp
 INSERT INTO sbmFUNDESC VALUES ('Move_Revised_Files_to_Storage','createRelatedFormats');
 INSERT INTO sbmFUNDESC VALUES ('Move_Revised_Files_to_Storage','iconsize');
 INSERT INTO sbmFUNDESC VALUES ('Move_Revised_Files_to_Storage','keepPreviousVersionDoctypes');
+INSERT INTO sbmFUNDESC VALUES ('Set_Embargo','date_file');
+INSERT INTO sbmFUNDESC VALUES ('Set_Embargo','date_format');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','files_to_be_stamped');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','latex_template');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','latex_template_vars');
