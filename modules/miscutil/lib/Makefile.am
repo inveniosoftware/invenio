@@ -101,7 +101,11 @@ pylib_DATA = __init__.py \
              hepdatadisplayutils.py \
              hepdatautils_unit_tests.py \
              filedownloadutils.py \
-             filedownloadutils_unit_tests.py
+             filedownloadutils_unit_tests.py \
+             CQLParser.py \
+             CQLUtils.py  \
+             invenio_sru.py \
+             SRWDiagnostics.py
 
 jsdir=$(localstatedir)/www/js
 

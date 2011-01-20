@@ -265,6 +265,25 @@ class Template:
     tmpl_opensearch_rss_url_syntax = "%(CFG_BASE_URL)s/rss?p={searchTerms}&amp;jrec={startIndex}&amp;rg={count}&amp;ln={language}" % {'CFG_BASE_URL': CFG_BASE_URL}
     tmpl_opensearch_html_url_syntax = "%(CFG_BASE_URL)s/search?p={searchTerms}&amp;jrec={startIndex}&amp;rg={count}&amp;ln={language}" % {'CFG_BASE_URL': CFG_BASE_URL}
 
+    tmpl_sru_accepted_args = {
+            'operation' : (str, 'explain'),
+            'version' : (str, '1.2'),
+            'query' : (str, ''),
+            'startRecord' : (int, 1),
+            'maximumRecords' : (int, 100),
+            'recordPacking' : (str, 'xml'),
+            'recordSchema' : (str, ''),
+            'recordXPath' : (str, ''),
+            'resultSetTTL' : (int, 0),
+            'sortKeys' : (str, ''),
+            'stylesheet' : (str, None),
+            'extraRequestData' : (str, ''),
+            # Scan Operation
+            'scanClause' : (str, ''),
+            'responsePosition' : (str, ''),
+            'maximumTerms' : (str, ''),
+    }
+
     def tmpl_openurl2invenio(self, openurl_data):
         """ Return an Invenio url corresponding to a search with the data
         included in the openurl form map.
@@ -5080,3 +5099,102 @@ class Template:
             if default_values:
                 default_args[item] = default_values[1]
         return default_args
+
+    sru_schemas = {"dc": "info:srw/schema/1/dc-v1.1",
+                   "diag": "info:srw/schema/1/diagnostic-v1.1",
+                   "zeerex": "http://explain.z3950.org/dtd/2.0/",
+                   "marcxml": "info:srw/schema/1/marcxml-v1.1",
+                   "unimarcxml": "info:srw/schema/8/unimarcxml-v0.1"}
+    sru_formats = {'marcxml': 'xm',
+                   'dc': 'xd'}
+
+    def tmpl_sru_searchrestrieve_response(self, records_xml, number_of_records, result_set_id, result_set_idle_time,
+                                          next_record_position, diagnostics_xml="",
+                                          schmema = "dc",
+                                          schema_url='info:srw/schema/1/dc-v1.1',
+                                          version="1.2", extra_response_data="",
+                                          echoed_cql_query="", echoed_xcql_query="",
+                                          stylesheet=None):
+        """
+        """
+
+        next_record_position_element = ""
+        if next_record_position:
+            next_record_position_element = "<nextRecordPosition>%s</nextRecordPosition>" % \
+                                            next_record_position
+
+        stylesheet_tag = ""
+        if stylesheet:
+            stylesheet_tag = '\n<?xml-stylesheet type="text/xsl" href="%s"?>' % cgi.escape(stylesheet)
+
+        echoed_search_element = ""
+        if echoed_cql_query and echoed_xcql_query:
+            echoed_search_element = """
+            <echoedSearchRetrieveRequest>
+                <version>%(version)s</version>
+                <query>%(echoed_cql_query)s</query>
+                <recordSchema>%(schmema)s</recordSchema>
+                <xQuery>%(echoed_xcql_query)s</xQuery>
+                <baseUrl>%(CFG_SITE_URL)s/sru</baseUrl>
+            </echoedSearchRetrieveRequest>""" % \
+                {"CFG_SITE_URL": CFG_SITE_URL,
+                 "schema": schema,
+                 "echoed_cql_query": echoed_cql_query,
+                 "echoed_xcql_query": echoed_xcql_query,
+                 "version": version
+               }
+
+        out = '''<?xml version="1.0"?>%(stylesheet)s
+<zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/">
+    <zs:version>%(version)s</zs:version>
+    <zs:numberOfRecords>%(number_of_records)s</zs:numberOfRecords>
+    <resultSetId>%(result_set_id)s</resultSetId>
+    <resultSetIdleTime>%(result_set_idle_time)s</resultSetIdleTime>
+    %(next_record_position_element)s
+    %(diagnostics_xml)s
+    %(extra_response_data)s
+    %(echoed_search_element)s
+    <zs:records>
+    %(records)s
+    </zs:records>
+</zs:searchRetrieveResponse>
+        ''' % {"number_of_records": number_of_records,
+               "version": version,
+               "result_set_id": result_set_id,
+               "result_set_idle_time": result_set_idle_time,
+               "next_record_position_element": next_record_position_element,
+               "diagnostics_xml": diagnostics_xml,
+               "extra_response_data": extra_response_data,
+               "echoed_search_element": echoed_search_element,
+               "records": '\n'.join(records_xml),
+               "stylesheet": stylesheet_tag
+               }
+        return out
+
+    def tmpl_sru_record(self, record_data, record_position, identifier, packing="xml",
+                        schema_url="info:srw/schema/1/dc-v1.1",
+                        extra_record_data="", version="1.2"):
+        """
+        """
+        record_identifier_element = ""
+        if version != "1.1":
+            record_identifier_element = "<recordIdentifier>%s</recordIdentifier>" % identifier
+
+        if packing == 'string':
+            record_data = cgi.escape(record_data)
+
+        out = """
+<record>
+  <recordSchema>%(schema_url)s</recordSchema>
+  <recordPacking>%(packing)s</recordPacking>
+  <recordData>%(record_data)s</recordData>
+  %(record_identifier_element)s
+  <recordPosition>%(record_position)s</recordPosition>
+  %(extra_record_data)s
+</record>""" % {"packing": packing,
+                "record_data": record_data,
+                "record_position": record_position,
+                "schema_url": schema_url,
+                "extra_record_data": extra_record_data and "<extraRecordData>%s</extraRecordData>" % extra_record_data or "",
+                "record_identifier_element": record_identifier_element}
+        return out

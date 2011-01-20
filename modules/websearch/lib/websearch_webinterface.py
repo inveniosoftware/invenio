@@ -27,6 +27,8 @@ import sys
 from urllib import quote
 from invenio import webinterface_handler_config as apache
 import threading
+from invenio import CQLParser
+from invenio import SRWDiagnostics
 
 #maximum number of collaborating authors etc shown in GUI
 MAX_COLLAB_LIST = 10
@@ -93,7 +95,7 @@ from invenio.search_engine_utils import get_fieldvalues, \
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
-from invenio.bibformat import format_records
+from invenio.bibformat import format_records, format_record
 from invenio.bibformat_engine import get_output_formats
 from invenio.websearch_webcoll import get_collection
 from invenio.intbitset import intbitset
@@ -611,7 +613,8 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 ('', 'legacy_collection'),
                 ('search.py', 'legacy_search'),
                 'search', 'openurl',
-                'opensearchdescription', 'logout_SSO_hook']
+                'opensearchdescription', 'logout_SSO_hook',
+                'sru']
 
     search = WebInterfaceSearchResultsPages()
     legacy_search = WebInterfaceLegacySearchPages()
@@ -769,6 +772,37 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
                                    'verbose': (int, 0) })
         return websearch_templates.tmpl_opensearch_description(ln=argd['ln'])
+
+    def sru(self, req, form):
+        """SRU protocol interface"""
+        argd = wash_urlargd(form, websearch_templates.tmpl_sru_accepted_args)
+        req.content_type = "application/xml"
+        req.send_http_header()
+        if argd["operation"] == "explain":
+            pass
+        elif argd['operation'] == "searchRetrieve":
+            invenio_search_query = ''
+            try:
+                parsed_cql_query = CQLParser.parse(argd['query'])
+                invenio_search_query = parsed_cql_query.toInvenio()
+            except SRWDiagnostics.SRWDiagnostic, val:
+                # Query syntax error
+                pass
+                raise
+            except:
+                # Parser error
+                pass
+                raise
+            recids = perform_request_search(p=invenio_search_query, jrec=argd['startRecord'] - 1,
+                                    rg=argd['maximumRecords'], of="id")
+            recids = recids[argd['startRecord'] - 1:argd['maximumRecords']]
+            record_schema = websearch_templates.sru_formats.get(argd['recordSchema'], 'xm')
+            records_xml = [websearch_templates.tmpl_sru_record(format_record(recid, of=record_schema), position, recid, argd['recordPacking'], version=argd['version']) \
+                           for position, recid in enumerate(recids)]
+
+            return websearch_templates.tmpl_sru_searchrestrieve_response(records_xml, len(recids),
+                                                                         0, 0, 0, version=argd['version'],
+                                                                         stylesheet=argd['stylesheet'])
 
     def legacy_collection(self, req, form):
         """Collection URL backward compatibility handling."""
