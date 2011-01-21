@@ -1,8 +1,5 @@
-
--- $Id$
-
 -- This file is part of Invenio.
--- Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+-- Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
 --
 -- Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -27,7 +24,7 @@ CREATE TABLE IF NOT EXISTS bibrec (
   PRIMARY KEY  (id),
   KEY creation_date (creation_date),
   KEY modification_date (modification_date)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib00x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -36,7 +33,7 @@ CREATE TABLE IF NOT EXISTS bib00x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib01x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -45,7 +42,7 @@ CREATE TABLE IF NOT EXISTS bib01x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib02x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -54,7 +51,7 @@ CREATE TABLE IF NOT EXISTS bib02x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib03x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -63,7 +60,7 @@ CREATE TABLE IF NOT EXISTS bib03x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib04x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -72,7 +69,7 @@ CREATE TABLE IF NOT EXISTS bib04x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib05x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -81,7 +78,7 @@ CREATE TABLE IF NOT EXISTS bib05x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib06x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -90,7 +87,7 @@ CREATE TABLE IF NOT EXISTS bib06x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib07x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -99,7 +96,7 @@ CREATE TABLE IF NOT EXISTS bib07x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib08x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -108,7 +105,7 @@ CREATE TABLE IF NOT EXISTS bib08x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib09x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -117,7 +114,7 @@ CREATE TABLE IF NOT EXISTS bib09x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib10x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -126,7 +123,7 @@ CREATE TABLE IF NOT EXISTS bib10x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib11x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -135,7 +132,7 @@ CREATE TABLE IF NOT EXISTS bib11x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib12x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -144,7 +141,7 @@ CREATE TABLE IF NOT EXISTS bib12x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib13x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -153,7 +150,7 @@ CREATE TABLE IF NOT EXISTS bib13x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib14x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -162,7 +159,7 @@ CREATE TABLE IF NOT EXISTS bib14x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib15x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -171,7 +168,7 @@ CREATE TABLE IF NOT EXISTS bib15x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib16x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -180,7 +177,7 @@ CREATE TABLE IF NOT EXISTS bib16x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib17x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -189,7 +186,7 @@ CREATE TABLE IF NOT EXISTS bib17x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib18x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -198,7 +195,7 @@ CREATE TABLE IF NOT EXISTS bib18x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib19x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -207,7 +204,7 @@ CREATE TABLE IF NOT EXISTS bib19x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib20x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -216,7 +213,7 @@ CREATE TABLE IF NOT EXISTS bib20x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib21x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -225,7 +222,7 @@ CREATE TABLE IF NOT EXISTS bib21x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib22x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -234,7 +231,7 @@ CREATE TABLE IF NOT EXISTS bib22x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib23x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -243,7 +240,7 @@ CREATE TABLE IF NOT EXISTS bib23x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib24x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -252,7 +249,7 @@ CREATE TABLE IF NOT EXISTS bib24x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib25x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -261,7 +258,7 @@ CREATE TABLE IF NOT EXISTS bib25x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib26x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -270,7 +267,7 @@ CREATE TABLE IF NOT EXISTS bib26x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib27x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -279,7 +276,7 @@ CREATE TABLE IF NOT EXISTS bib27x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib28x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -288,7 +285,7 @@ CREATE TABLE IF NOT EXISTS bib28x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib29x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -297,7 +294,7 @@ CREATE TABLE IF NOT EXISTS bib29x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib30x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -306,7 +303,7 @@ CREATE TABLE IF NOT EXISTS bib30x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib31x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -315,7 +312,7 @@ CREATE TABLE IF NOT EXISTS bib31x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib32x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -324,7 +321,7 @@ CREATE TABLE IF NOT EXISTS bib32x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib33x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -333,7 +330,7 @@ CREATE TABLE IF NOT EXISTS bib33x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib34x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -342,7 +339,7 @@ CREATE TABLE IF NOT EXISTS bib34x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib35x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -351,7 +348,7 @@ CREATE TABLE IF NOT EXISTS bib35x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib36x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -360,7 +357,7 @@ CREATE TABLE IF NOT EXISTS bib36x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib37x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -369,7 +366,7 @@ CREATE TABLE IF NOT EXISTS bib37x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib38x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -378,7 +375,7 @@ CREATE TABLE IF NOT EXISTS bib38x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib39x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -387,7 +384,7 @@ CREATE TABLE IF NOT EXISTS bib39x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib40x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -396,7 +393,7 @@ CREATE TABLE IF NOT EXISTS bib40x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib41x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -405,7 +402,7 @@ CREATE TABLE IF NOT EXISTS bib41x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib42x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -414,7 +411,7 @@ CREATE TABLE IF NOT EXISTS bib42x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib43x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -423,7 +420,7 @@ CREATE TABLE IF NOT EXISTS bib43x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib44x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -432,7 +429,7 @@ CREATE TABLE IF NOT EXISTS bib44x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib45x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -441,7 +438,7 @@ CREATE TABLE IF NOT EXISTS bib45x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib46x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -450,7 +447,7 @@ CREATE TABLE IF NOT EXISTS bib46x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib47x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -459,7 +456,7 @@ CREATE TABLE IF NOT EXISTS bib47x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib48x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -468,7 +465,7 @@ CREATE TABLE IF NOT EXISTS bib48x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib49x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -477,7 +474,7 @@ CREATE TABLE IF NOT EXISTS bib49x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib50x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -486,7 +483,7 @@ CREATE TABLE IF NOT EXISTS bib50x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib51x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -495,7 +492,7 @@ CREATE TABLE IF NOT EXISTS bib51x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib52x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -504,7 +501,7 @@ CREATE TABLE IF NOT EXISTS bib52x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib53x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -513,7 +510,7 @@ CREATE TABLE IF NOT EXISTS bib53x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib54x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -522,7 +519,7 @@ CREATE TABLE IF NOT EXISTS bib54x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib55x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -531,7 +528,7 @@ CREATE TABLE IF NOT EXISTS bib55x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib56x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -540,7 +537,7 @@ CREATE TABLE IF NOT EXISTS bib56x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib57x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -549,7 +546,7 @@ CREATE TABLE IF NOT EXISTS bib57x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib58x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -558,7 +555,7 @@ CREATE TABLE IF NOT EXISTS bib58x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib59x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -567,7 +564,7 @@ CREATE TABLE IF NOT EXISTS bib59x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib60x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -576,7 +573,7 @@ CREATE TABLE IF NOT EXISTS bib60x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib61x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -585,7 +582,7 @@ CREATE TABLE IF NOT EXISTS bib61x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib62x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -594,7 +591,7 @@ CREATE TABLE IF NOT EXISTS bib62x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib63x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -603,7 +600,7 @@ CREATE TABLE IF NOT EXISTS bib63x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib64x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -612,7 +609,7 @@ CREATE TABLE IF NOT EXISTS bib64x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib65x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -621,7 +618,7 @@ CREATE TABLE IF NOT EXISTS bib65x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib66x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -630,7 +627,7 @@ CREATE TABLE IF NOT EXISTS bib66x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib67x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -639,7 +636,7 @@ CREATE TABLE IF NOT EXISTS bib67x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib68x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -648,7 +645,7 @@ CREATE TABLE IF NOT EXISTS bib68x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib69x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -657,7 +654,7 @@ CREATE TABLE IF NOT EXISTS bib69x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib70x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -666,7 +663,7 @@ CREATE TABLE IF NOT EXISTS bib70x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib71x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -675,7 +672,7 @@ CREATE TABLE IF NOT EXISTS bib71x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib72x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -684,7 +681,7 @@ CREATE TABLE IF NOT EXISTS bib72x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib73x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -693,7 +690,7 @@ CREATE TABLE IF NOT EXISTS bib73x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib74x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -702,7 +699,7 @@ CREATE TABLE IF NOT EXISTS bib74x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib75x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -711,7 +708,7 @@ CREATE TABLE IF NOT EXISTS bib75x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib76x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -720,7 +717,7 @@ CREATE TABLE IF NOT EXISTS bib76x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib77x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -729,7 +726,7 @@ CREATE TABLE IF NOT EXISTS bib77x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib78x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -738,7 +735,7 @@ CREATE TABLE IF NOT EXISTS bib78x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib79x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -747,7 +744,7 @@ CREATE TABLE IF NOT EXISTS bib79x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib80x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -756,7 +753,7 @@ CREATE TABLE IF NOT EXISTS bib80x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib81x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -765,7 +762,7 @@ CREATE TABLE IF NOT EXISTS bib81x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib82x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -774,7 +771,7 @@ CREATE TABLE IF NOT EXISTS bib82x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib83x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -783,7 +780,7 @@ CREATE TABLE IF NOT EXISTS bib83x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib84x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -792,7 +789,7 @@ CREATE TABLE IF NOT EXISTS bib84x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib85x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -801,7 +798,7 @@ CREATE TABLE IF NOT EXISTS bib85x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(100)) -- URLs need usually a larger index for speedy lookups
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib86x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -810,7 +807,7 @@ CREATE TABLE IF NOT EXISTS bib86x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib87x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -819,7 +816,7 @@ CREATE TABLE IF NOT EXISTS bib87x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib88x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -828,7 +825,7 @@ CREATE TABLE IF NOT EXISTS bib88x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib89x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -837,7 +834,7 @@ CREATE TABLE IF NOT EXISTS bib89x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib90x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -846,7 +843,7 @@ CREATE TABLE IF NOT EXISTS bib90x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib91x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -855,7 +852,7 @@ CREATE TABLE IF NOT EXISTS bib91x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib92x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -864,7 +861,7 @@ CREATE TABLE IF NOT EXISTS bib92x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib93x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -873,7 +870,7 @@ CREATE TABLE IF NOT EXISTS bib93x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib94x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -882,7 +879,7 @@ CREATE TABLE IF NOT EXISTS bib94x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib95x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -891,7 +888,7 @@ CREATE TABLE IF NOT EXISTS bib95x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib96x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -900,7 +897,7 @@ CREATE TABLE IF NOT EXISTS bib96x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib97x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -909,7 +906,7 @@ CREATE TABLE IF NOT EXISTS bib97x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib98x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -918,7 +915,7 @@ CREATE TABLE IF NOT EXISTS bib98x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib99x (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -927,7 +924,7 @@ CREATE TABLE IF NOT EXISTS bib99x (
   PRIMARY KEY  (id),
   KEY kt (tag),
   KEY kv (value(35))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib00x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -935,7 +932,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib00x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib01x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -943,7 +940,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib01x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib02x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -951,7 +948,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib02x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib03x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -959,7 +956,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib03x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib04x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -967,7 +964,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib04x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib05x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -975,7 +972,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib05x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib06x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -983,7 +980,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib06x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib07x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -991,7 +988,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib07x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib08x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -999,7 +996,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib08x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib09x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1007,7 +1004,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib09x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib10x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1015,7 +1012,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib10x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib11x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1023,7 +1020,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib11x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib12x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1031,7 +1028,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib12x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib13x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1039,7 +1036,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib13x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib14x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1047,7 +1044,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib14x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib15x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1055,7 +1052,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib15x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib16x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1063,7 +1060,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib16x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib17x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1071,7 +1068,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib17x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib18x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1079,7 +1076,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib18x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib19x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1087,7 +1084,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib19x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib20x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1095,7 +1092,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib20x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib21x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1103,7 +1100,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib21x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib22x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1111,7 +1108,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib22x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib23x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1119,7 +1116,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib23x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib24x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1127,7 +1124,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib24x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib25x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1135,7 +1132,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib25x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib26x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1143,7 +1140,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib26x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib27x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1151,7 +1148,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib27x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib28x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1159,7 +1156,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib28x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib29x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1167,7 +1164,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib29x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib30x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1175,7 +1172,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib30x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib31x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1183,7 +1180,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib31x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib32x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1191,7 +1188,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib32x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib33x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1199,7 +1196,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib33x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib34x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1207,7 +1204,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib34x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib35x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1215,7 +1212,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib35x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib36x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1223,7 +1220,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib36x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib37x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1231,7 +1228,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib37x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib38x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1239,7 +1236,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib38x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib39x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1247,7 +1244,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib39x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib40x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1255,7 +1252,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib40x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib41x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1263,7 +1260,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib41x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib42x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1271,7 +1268,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib42x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib43x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1279,7 +1276,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib43x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib44x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1287,7 +1284,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib44x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib45x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1295,7 +1292,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib45x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib46x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1303,7 +1300,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib46x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib47x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1311,7 +1308,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib47x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib48x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1319,7 +1316,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib48x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib49x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1327,7 +1324,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib49x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib50x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1335,7 +1332,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib50x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib51x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1343,7 +1340,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib51x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib52x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1351,7 +1348,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib52x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib53x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1359,7 +1356,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib53x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib54x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1367,7 +1364,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib54x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib55x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1375,7 +1372,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib55x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib56x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1383,7 +1380,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib56x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib57x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1391,7 +1388,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib57x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib58x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1399,7 +1396,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib58x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib59x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1407,7 +1404,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib59x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib60x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1415,7 +1412,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib60x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib61x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1423,7 +1420,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib61x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib62x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1431,7 +1428,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib62x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib63x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1439,7 +1436,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib63x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib64x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1447,7 +1444,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib64x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib65x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1455,7 +1452,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib65x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib66x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1463,7 +1460,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib66x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib67x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1471,7 +1468,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib67x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib68x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1479,7 +1476,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib68x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib69x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1487,7 +1484,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib69x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib70x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1495,7 +1492,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib70x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib71x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1503,7 +1500,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib71x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib72x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1511,7 +1508,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib72x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib73x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1519,7 +1516,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib73x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib74x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1527,7 +1524,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib74x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib75x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1535,7 +1532,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib75x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib76x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1543,7 +1540,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib76x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib77x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1551,7 +1548,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib77x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib78x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1559,7 +1556,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib78x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib79x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1567,7 +1564,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib79x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib80x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1575,7 +1572,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib80x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib81x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1583,7 +1580,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib81x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib82x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1591,7 +1588,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib82x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib83x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1599,7 +1596,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib83x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib84x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1607,7 +1604,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib84x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib85x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1615,7 +1612,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib85x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib86x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1623,7 +1620,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib86x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib87x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1631,7 +1628,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib87x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib88x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1639,7 +1636,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib88x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib89x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1647,7 +1644,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib89x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib90x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1655,7 +1652,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib90x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib91x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1663,7 +1660,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib91x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib92x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1671,7 +1668,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib92x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib93x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1679,7 +1676,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib93x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib94x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1687,7 +1684,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib94x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib95x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1695,7 +1692,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib95x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib96x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1703,7 +1700,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib96x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib97x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1711,7 +1708,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib97x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib98x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1719,7 +1716,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib98x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib99x (
   id_bibrec mediumint(8) unsigned NOT NULL default '0',
@@ -1727,7 +1724,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib99x (
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for bibliographic records formatted:
 
@@ -1740,7 +1737,7 @@ CREATE TABLE IF NOT EXISTS bibfmt (
   PRIMARY KEY  (id),
   KEY id_bibrec (id_bibrec),
   KEY format (format)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for index files:
 
@@ -1752,7 +1749,7 @@ CREATE TABLE IF NOT EXISTS idxINDEX (
   stemming_language varchar(10) NOT NULL default '',
   PRIMARY KEY  (id),
   UNIQUE KEY name (name)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxINDEXNAME (
   id_idxINDEX mediumint(9) unsigned NOT NULL,
@@ -1760,7 +1757,7 @@ CREATE TABLE IF NOT EXISTS idxINDEXNAME (
   type char(3) NOT NULL default 'sn',
   value varchar(255) NOT NULL,
   PRIMARY KEY  (id_idxINDEX,ln,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxINDEX_field (
   id_idxINDEX mediumint(9) unsigned NOT NULL,
@@ -1768,7 +1765,7 @@ CREATE TABLE IF NOT EXISTS idxINDEX_field (
   regexp_punctuation varchar(255) NOT NULL default "[\.\,\:\;\?\!\"]",
   regexp_alphanumeric_separators varchar(255) NOT NULL default "[\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]",
   PRIMARY KEY  (id_idxINDEX,id_field)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- this comment line here is just to fix the SQL display mode in Emacs '
 
@@ -1778,14 +1775,14 @@ CREATE TABLE IF NOT EXISTS idxWORD01F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD01R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD02F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -1793,14 +1790,14 @@ CREATE TABLE IF NOT EXISTS idxWORD02F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD02R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD03F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -1808,14 +1805,14 @@ CREATE TABLE IF NOT EXISTS idxWORD03F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD03R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD04F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -1823,14 +1820,14 @@ CREATE TABLE IF NOT EXISTS idxWORD04F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD04R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD05F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -1838,14 +1835,14 @@ CREATE TABLE IF NOT EXISTS idxWORD05F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD05R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD06F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -1853,14 +1850,14 @@ CREATE TABLE IF NOT EXISTS idxWORD06F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD06R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD07F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -1868,14 +1865,14 @@ CREATE TABLE IF NOT EXISTS idxWORD07F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD07R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD08F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -1883,14 +1880,14 @@ CREATE TABLE IF NOT EXISTS idxWORD08F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD08R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD09F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -1898,14 +1895,14 @@ CREATE TABLE IF NOT EXISTS idxWORD09F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD09R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD10F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -1913,14 +1910,14 @@ CREATE TABLE IF NOT EXISTS idxWORD10F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD10R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD11F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -1928,14 +1925,14 @@ CREATE TABLE IF NOT EXISTS idxWORD11F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD11R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD12F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -1943,14 +1940,14 @@ CREATE TABLE IF NOT EXISTS idxWORD12F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD12R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD13F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -1958,14 +1955,14 @@ CREATE TABLE IF NOT EXISTS idxWORD13F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD13R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD14F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -1973,14 +1970,14 @@ CREATE TABLE IF NOT EXISTS idxWORD14F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD14R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD15F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -1988,14 +1985,14 @@ CREATE TABLE IF NOT EXISTS idxWORD15F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD15R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD16F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2003,14 +2000,14 @@ CREATE TABLE IF NOT EXISTS idxWORD16F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD16R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR01F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2018,14 +2015,14 @@ CREATE TABLE IF NOT EXISTS idxPAIR01F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR01R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR02F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2033,14 +2030,14 @@ CREATE TABLE IF NOT EXISTS idxPAIR02F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR02R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR03F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2048,14 +2045,14 @@ CREATE TABLE IF NOT EXISTS idxPAIR03F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR03R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR04F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2063,14 +2060,14 @@ CREATE TABLE IF NOT EXISTS idxPAIR04F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR04R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR05F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2078,14 +2075,14 @@ CREATE TABLE IF NOT EXISTS idxPAIR05F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR05R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR06F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2093,14 +2090,14 @@ CREATE TABLE IF NOT EXISTS idxPAIR06F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR06R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR07F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2108,14 +2105,14 @@ CREATE TABLE IF NOT EXISTS idxPAIR07F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR07R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR08F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2123,14 +2120,14 @@ CREATE TABLE IF NOT EXISTS idxPAIR08F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR08R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR09F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2138,14 +2135,14 @@ CREATE TABLE IF NOT EXISTS idxPAIR09F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR09R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR10F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2153,14 +2150,14 @@ CREATE TABLE IF NOT EXISTS idxPAIR10F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR10R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR11F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2168,14 +2165,14 @@ CREATE TABLE IF NOT EXISTS idxPAIR11F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR11R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR12F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2183,14 +2180,14 @@ CREATE TABLE IF NOT EXISTS idxPAIR12F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR12R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR13F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2198,14 +2195,14 @@ CREATE TABLE IF NOT EXISTS idxPAIR13F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR13R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR14F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2213,14 +2210,14 @@ CREATE TABLE IF NOT EXISTS idxPAIR14F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR14R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR15F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2228,14 +2225,14 @@ CREATE TABLE IF NOT EXISTS idxPAIR15F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR15R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR16F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2243,14 +2240,14 @@ CREATE TABLE IF NOT EXISTS idxPAIR16F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR16R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE01F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2258,14 +2255,14 @@ CREATE TABLE IF NOT EXISTS idxPHRASE01F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE01R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE02F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2273,14 +2270,14 @@ CREATE TABLE IF NOT EXISTS idxPHRASE02F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE02R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE03F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2288,14 +2285,14 @@ CREATE TABLE IF NOT EXISTS idxPHRASE03F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE03R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE04F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2303,14 +2300,14 @@ CREATE TABLE IF NOT EXISTS idxPHRASE04F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE04R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE05F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2318,14 +2315,14 @@ CREATE TABLE IF NOT EXISTS idxPHRASE05F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE05R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE06F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2333,14 +2330,14 @@ CREATE TABLE IF NOT EXISTS idxPHRASE06F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE06R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE07F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2348,14 +2345,14 @@ CREATE TABLE IF NOT EXISTS idxPHRASE07F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE07R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE08F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2363,14 +2360,14 @@ CREATE TABLE IF NOT EXISTS idxPHRASE08F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE08R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE09F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2378,14 +2375,14 @@ CREATE TABLE IF NOT EXISTS idxPHRASE09F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE09R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE10F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2393,14 +2390,14 @@ CREATE TABLE IF NOT EXISTS idxPHRASE10F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE10R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE11F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2408,14 +2405,14 @@ CREATE TABLE IF NOT EXISTS idxPHRASE11F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE11R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE12F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2423,14 +2420,14 @@ CREATE TABLE IF NOT EXISTS idxPHRASE12F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE12R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE13F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2438,14 +2435,14 @@ CREATE TABLE IF NOT EXISTS idxPHRASE13F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE13R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE14F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2453,14 +2450,14 @@ CREATE TABLE IF NOT EXISTS idxPHRASE14F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE14R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE15F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2468,14 +2465,14 @@ CREATE TABLE IF NOT EXISTS idxPHRASE15F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE15R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE16F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2483,14 +2480,14 @@ CREATE TABLE IF NOT EXISTS idxPHRASE16F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE16R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for ranking:
 
@@ -2500,7 +2497,7 @@ CREATE TABLE IF NOT EXISTS rnkMETHOD (
   last_updated datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY (id),
   UNIQUE KEY name (name)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS rnkMETHODNAME (
   id_rnkMETHOD mediumint(9) unsigned NOT NULL,
@@ -2508,13 +2505,13 @@ CREATE TABLE IF NOT EXISTS rnkMETHODNAME (
   type char(3) NOT NULL default 'sn',
   value varchar(255) NOT NULL,
   PRIMARY KEY  (id_rnkMETHOD,ln,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS rnkMETHODDATA (
   id_rnkMETHOD mediumint(9) unsigned NOT NULL,
   relevance_data longblob,
   PRIMARY KEY  (id_rnkMETHOD)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 
 CREATE TABLE IF NOT EXISTS collection_rnkMETHOD (
@@ -2522,7 +2519,7 @@ CREATE TABLE IF NOT EXISTS collection_rnkMETHOD (
   id_rnkMETHOD mediumint(9) unsigned NOT NULL,
   score tinyint(4) unsigned NOT NULL default '0',
   PRIMARY KEY  (id_collection,id_rnkMETHOD)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS rnkWORD01F (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2530,20 +2527,20 @@ CREATE TABLE IF NOT EXISTS rnkWORD01F (
   hitlist longblob,
   PRIMARY KEY  (id),
   UNIQUE KEY term (term)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS rnkWORD01R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY  (id_bibrec,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS rnkAUTHORDATA (
   aterm varchar(50) default NULL,
   hitlist longblob,
   UNIQUE KEY aterm (aterm)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS rnkPAGEVIEWS (
   id_bibrec mediumint(8) unsigned default NULL,
@@ -2552,7 +2549,7 @@ CREATE TABLE IF NOT EXISTS rnkPAGEVIEWS (
   view_time datetime default '0000-00-00 00:00:00',
   KEY view_time (view_time),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS rnkDOWNLOADS (
   id_bibrec mediumint(8) unsigned default NULL,
@@ -2564,7 +2561,7 @@ CREATE TABLE IF NOT EXISTS rnkDOWNLOADS (
   file_format varchar(10) NULL default NULL,
   KEY download_time (download_time),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- a table for citations. record-cites-record
 
@@ -2575,7 +2572,7 @@ CREATE TABLE IF NOT EXISTS rnkCITATIONDATA (
   last_updated datetime NOT NULL default '0000-00-00',
   PRIMARY KEY id (id),
   UNIQUE KEY object_name (object_name)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- a table for missing citations. This should be scanned by a program
 -- occasionally to check if some publication has been cited more than
@@ -2589,7 +2586,7 @@ CREATE TABLE IF NOT EXISTS rnkCITATIONDATAEXT (
   extcitepubinfo varchar(255) NOT NULL,
   PRIMARY KEY (id_bibrec, extcitepubinfo),
   KEY extcitepubinfo (extcitepubinfo)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for collections and collection tree:
 
@@ -2602,7 +2599,7 @@ CREATE TABLE IF NOT EXISTS collection (
   PRIMARY KEY  (id),
   UNIQUE KEY name (name),
   KEY dbquery (dbquery(50))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS collectionname (
   id_collection mediumint(9) unsigned NOT NULL,
@@ -2610,7 +2607,7 @@ CREATE TABLE IF NOT EXISTS collectionname (
   type char(3) NOT NULL default 'sn',
   value varchar(255) NOT NULL,
   PRIMARY KEY  (id_collection,ln,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS collection_collection (
   id_dad mediumint(9) unsigned NOT NULL,
@@ -2618,7 +2615,7 @@ CREATE TABLE IF NOT EXISTS collection_collection (
   type char(1) NOT NULL default 'r',
   score tinyint(4) unsigned NOT NULL default '0',
   PRIMARY KEY (id_dad,id_son)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for OAI sets:
 
@@ -2640,7 +2637,7 @@ CREATE TABLE IF NOT EXISTS oaiREPOSITORY (
   f3 text NOT NULL default '',
   m3 text NOT NULL default '',
   PRIMARY KEY (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS oaiHARVEST (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2656,7 +2653,7 @@ CREATE TABLE IF NOT EXISTS oaiHARVEST (
   bibfilterprogram varchar(255) NOT NULL default '',
   setspecs text NOT NULL default '',
   PRIMARY KEY  (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS oaiHARVESTLOG (
   id_oaiHARVEST mediumint(9) unsigned NOT NULL REFERENCES oaiHARVEST, -- source we harvest from
@@ -2667,7 +2664,7 @@ CREATE TABLE IF NOT EXISTS oaiHARVESTLOG (
   date_inserted datetime NOT NULL default '0000-00-00', -- when it was inserted
   inserted_to_db char(1) NOT NULL default 'P', -- where it was inserted (P=prod, H=holding-pen, etc)
   PRIMARY KEY (bibupload_task_id, oai_id, date_harvested)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibHOLDINGPEN (
   changeset_id INT NOT NULL AUTO_INCREMENT, -- the identifier of the changeset stored in the holding pen
@@ -2678,7 +2675,7 @@ CREATE TABLE IF NOT EXISTS bibHOLDINGPEN (
   PRIMARY KEY (changeset_id),
   KEY changeset_date (changeset_date),
   KEY id_bibrec (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for portal elements:
 
@@ -2689,14 +2686,14 @@ CREATE TABLE IF NOT EXISTS collection_portalbox (
   position char(3) NOT NULL default 'top',
   score tinyint(4) unsigned NOT NULL default '0',
   PRIMARY KEY  (id_collection,id_portalbox,ln)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS portalbox (
   id mediumint(9) unsigned NOT NULL auto_increment,
   title text NOT NULL,
   body text NOT NULL,
   UNIQUE KEY id (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for search examples:
 
@@ -2705,14 +2702,14 @@ CREATE TABLE IF NOT EXISTS collection_example (
   id_example mediumint(9) unsigned NOT NULL,
   score tinyint(4) unsigned NOT NULL default '0',
   PRIMARY KEY  (id_collection,id_example)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS example (
   id mediumint(9) unsigned NOT NULL auto_increment,
   type text NOT NULL default '',
   body text NOT NULL,
   PRIMARY KEY  (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for collection formats:
 
@@ -2721,7 +2718,7 @@ CREATE TABLE IF NOT EXISTS collection_format (
   id_format mediumint(9) unsigned NOT NULL,
   score tinyint(4) unsigned NOT NULL default '0',
   PRIMARY KEY  (id_collection,id_format)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS format (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2732,7 +2729,7 @@ CREATE TABLE IF NOT EXISTS format (
   visibility tinyint NOT NULL default '1',
   PRIMARY KEY  (id),
   UNIQUE KEY code (code)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS formatname (
   id_format mediumint(9) unsigned NOT NULL,
@@ -2740,7 +2737,7 @@ CREATE TABLE IF NOT EXISTS formatname (
   type char(3) NOT NULL default 'sn',
   value varchar(255) NOT NULL,
   PRIMARY KEY  (id_format,ln,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for collection detailed page options
 
@@ -2748,7 +2745,7 @@ CREATE TABLE IF NOT EXISTS collectiondetailedrecordpagetabs (
   id_collection mediumint(9) unsigned NOT NULL,
   tabs varchar(255) NOT NULL default '',
   PRIMARY KEY (id_collection)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for search options and MARC tags:
 
@@ -2762,7 +2759,7 @@ CREATE TABLE IF NOT EXISTS collection_field_fieldvalue (
   KEY id_collection (id_collection),
   KEY id_field (id_field),
   KEY id_fieldvalue (id_fieldvalue)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS field (
   id mediumint(9) unsigned NOT NULL auto_increment,
@@ -2770,7 +2767,7 @@ CREATE TABLE IF NOT EXISTS field (
   code varchar(255) NOT NULL,
   PRIMARY KEY  (id),
   UNIQUE KEY code (code)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS fieldname (
   id_field mediumint(9) unsigned NOT NULL,
@@ -2778,28 +2775,28 @@ CREATE TABLE IF NOT EXISTS fieldname (
   type char(3) NOT NULL default 'sn',
   value varchar(255) NOT NULL,
   PRIMARY KEY  (id_field,ln,type)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS fieldvalue (
   id mediumint(9) unsigned NOT NULL auto_increment,
   name varchar(255) NOT NULL,
   value text NOT NULL,
   PRIMARY KEY  (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS field_tag (
   id_field mediumint(9) unsigned NOT NULL,
   id_tag mediumint(9) unsigned NOT NULL,
   score tinyint(4) unsigned NOT NULL default '0',
   PRIMARY KEY  (id_field,id_tag)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS tag (
   id mediumint(9) unsigned NOT NULL auto_increment,
   name varchar(255) NOT NULL,
   value char(6) NOT NULL,
   PRIMARY KEY  (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for file management
 
@@ -2815,7 +2812,7 @@ CREATE TABLE IF NOT EXISTS bibdoc (
   KEY docname (docname),
   KEY creation_date (creation_date),
   KEY modification_date (modification_date)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bibdoc (
   id_bibrec mediumint(9) unsigned NOT NULL default '0',
@@ -2823,7 +2820,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bibdoc (
   type varchar(255),
   KEY  (id_bibrec),
   KEY  (id_bibdoc)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibdoc_bibdoc (
   id_bibdoc1 mediumint(9) unsigned NOT NULL,
@@ -2831,7 +2828,7 @@ CREATE TABLE IF NOT EXISTS bibdoc_bibdoc (
   type varchar(255),
   KEY  (id_bibdoc1),
   KEY  (id_bibdoc2)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for publication requests:
 
@@ -2844,7 +2841,7 @@ CREATE TABLE IF NOT EXISTS publreq (
   address text NOT NULL,
   publication text NOT NULL,
   PRIMARY KEY  (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- table for sessions and users:
 
@@ -2855,7 +2852,7 @@ CREATE TABLE IF NOT EXISTS session (
   uid int(15) unsigned NOT NULL,
   UNIQUE KEY session_key (session_key),
   KEY uid (uid)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS user (
   id int(15) unsigned NOT NULL auto_increment,
@@ -2868,7 +2865,7 @@ CREATE TABLE IF NOT EXISTS user (
   PRIMARY KEY id (id),
   KEY email (email),
   KEY nickname (nickname)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for usergroups
 
@@ -2881,7 +2878,7 @@ CREATE TABLE IF NOT EXISTS usergroup (
   PRIMARY KEY  (id),
   UNIQUE KEY login_method_name (login_method(70), name),
   KEY name (name)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 
 CREATE TABLE IF NOT EXISTS user_usergroup (
@@ -2891,7 +2888,7 @@ CREATE TABLE IF NOT EXISTS user_usergroup (
   user_status_date datetime NOT NULL default '0000-00-00 00:00:00',
   KEY id_user (id_user),
   KEY id_usergroup (id_usergroup)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for access control engine
 
@@ -2903,14 +2900,14 @@ CREATE TABLE IF NOT EXISTS accROLE (
   firerole_def_src text NULL,
   PRIMARY KEY (id),
   UNIQUE KEY name (name)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS user_accROLE (
   id_user int(15) unsigned NOT NULL,
   id_accROLE int(15) unsigned NOT NULL,
   expiration datetime NOT NULL default '9999-12-31 23:59:59',
   PRIMARY KEY (id_user, id_accROLE)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS accMAILCOOKIE (
   id int(15) unsigned NOT NULL auto_increment,
@@ -2920,7 +2917,7 @@ CREATE TABLE IF NOT EXISTS accMAILCOOKIE (
   onetime boolean NOT NULL default 0,
   status char(1) NOT NULL default 'W',
   PRIMARY KEY (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS accACTION (
   id int(15) unsigned NOT NULL auto_increment,
@@ -2930,7 +2927,7 @@ CREATE TABLE IF NOT EXISTS accACTION (
   optional ENUM ('yes', 'no') NOT NULL default 'no',
   PRIMARY KEY (id),
   UNIQUE KEY name (name)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS accARGUMENT (
   id int(15) unsigned NOT NULL auto_increment,
@@ -2938,7 +2935,7 @@ CREATE TABLE IF NOT EXISTS accARGUMENT (
   value varchar(255),
   PRIMARY KEY (id),
   KEY KEYVAL (keyword, value)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS accROLE_accACTION_accARGUMENT (
   id_accROLE int(15),
@@ -2948,7 +2945,7 @@ CREATE TABLE IF NOT EXISTS accROLE_accACTION_accARGUMENT (
   KEY id_accROLE     (id_accROLE),
   KEY id_accACTION   (id_accACTION),
   KEY id_accARGUMENT (id_accARGUMENT)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for personal/collaborative features (baskets, alerts, searches, messages, usergroups):
 
@@ -2958,7 +2955,7 @@ CREATE TABLE IF NOT EXISTS user_query (
   hostname varchar(50) default 'unknown host',
   date datetime default NULL,
   KEY id_user (id_user,id_query)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS query (
   id int(15) unsigned NOT NULL auto_increment,
@@ -2966,7 +2963,7 @@ CREATE TABLE IF NOT EXISTS query (
   urlargs text NOT NULL,
   PRIMARY KEY  (id),
   KEY urlargs (urlargs(100))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS user_query_basket (
   id_user int(15) unsigned NOT NULL default '0',
@@ -2979,7 +2976,7 @@ CREATE TABLE IF NOT EXISTS user_query_basket (
   notification char(1) NOT NULL default 'y',
   PRIMARY KEY  (id_user,id_query,frequency,id_basket),
   KEY alert_name (alert_name)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- baskets
 CREATE TABLE IF NOT EXISTS bskBASKET (
@@ -2991,7 +2988,7 @@ CREATE TABLE IF NOT EXISTS bskBASKET (
   PRIMARY KEY  (id),
   KEY id_owner (id_owner),
   KEY name (name)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bskREC (
   id_bibrec_or_bskEXTREC int(16) NOT NULL default '0',
@@ -3004,7 +3001,7 @@ CREATE TABLE IF NOT EXISTS bskREC (
   KEY id_bskBASKET (id_bskBASKET),
   KEY score (score),
   KEY date_added (date_added)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bskEXTREC (
   id int(15) unsigned NOT NULL auto_increment,
@@ -3014,7 +3011,7 @@ CREATE TABLE IF NOT EXISTS bskEXTREC (
   creation_date datetime NOT NULL default '0000-00-00 00:00:00',
   modification_date datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY  (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bskEXTFMT (
    id int(15) unsigned NOT NULL auto_increment,
@@ -3025,7 +3022,7 @@ CREATE TABLE IF NOT EXISTS bskEXTFMT (
    PRIMARY KEY (id),
    KEY id_bskEXTREC (id_bskEXTREC),
    KEY format (format)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS user_bskBASKET (
   id_user int(15) unsigned NOT NULL default '0',
@@ -3034,7 +3031,7 @@ CREATE TABLE IF NOT EXISTS user_bskBASKET (
   PRIMARY KEY  (id_user,id_bskBASKET),
   KEY id_user (id_user),
   KEY id_bskBASKET (id_bskBASKET)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS usergroup_bskBASKET (
   id_usergroup int(15) unsigned NOT NULL default '0',
@@ -3045,7 +3042,7 @@ CREATE TABLE IF NOT EXISTS usergroup_bskBASKET (
   PRIMARY KEY  (id_usergroup,id_bskBASKET),
   KEY id_usergroup (id_usergroup),
   KEY id_bskBASKET (id_bskBASKET)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bskRECORDCOMMENT (
   id int(15) unsigned NOT NULL auto_increment,
@@ -3064,7 +3061,7 @@ CREATE TABLE IF NOT EXISTS bskRECORDCOMMENT (
   KEY date_creation (date_creation),
   KEY in_reply_to_id_bskRECORDCOMMENT (in_reply_to_id_bskRECORDCOMMENT),
   INDEX (reply_order_cached_data(40))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for messaging system
 
@@ -3079,7 +3076,7 @@ CREATE TABLE IF NOT EXISTS msgMESSAGE (
   received_date datetime NULL default '0000-00-00 00:00:00',
   PRIMARY KEY id (id),
   KEY id_user_from (id_user_from)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS user_msgMESSAGE (
   id_user_to int(15) unsigned NOT NULL default '0',
@@ -3088,7 +3085,7 @@ CREATE TABLE IF NOT EXISTS user_msgMESSAGE (
   PRIMARY KEY id (id_user_to, id_msgMESSAGE),
   KEY id_user_to (id_user_to),
   KEY id_msgMESSAGE (id_msgMESSAGE)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for WebComment
 
@@ -3114,7 +3111,7 @@ CREATE TABLE IF NOT EXISTS cmtRECORDCOMMENT (
   KEY status (status),
   KEY in_reply_to_id_cmtRECORDCOMMENT (in_reply_to_id_cmtRECORDCOMMENT),
   INDEX (reply_order_cached_data(40))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS cmtACTIONHISTORY (
   id_cmtRECORDCOMMENT int(15) unsigned NULL,
@@ -3127,14 +3124,14 @@ CREATE TABLE IF NOT EXISTS cmtACTIONHISTORY (
   KEY client_host (client_host),
   KEY id_user (id_user),
   KEY action_code (action_code)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS cmtSUBSCRIPTION (
   id_bibrec mediumint(8) unsigned NOT NULL,
   id_user int(15) unsigned NOT NULL,
   creation_time datetime NOT NULL default '0000-00-00 00:00:00',
   KEY id_user (id_bibrec, id_user)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for BibKnowledge:
 
@@ -3145,7 +3142,7 @@ CREATE TABLE IF NOT EXISTS knwKB (
   kbtype char default NULL,
   PRIMARY KEY  (id),
   UNIQUE KEY name (name)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS knwKBRVAL (
   id mediumint(8) unsigned NOT NULL auto_increment,
@@ -3156,7 +3153,7 @@ CREATE TABLE IF NOT EXISTS knwKBRVAL (
   KEY id_knwKB (id_knwKB),
   KEY m_key (m_key(30)),
   KEY m_value (m_value(30))
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS knwKBDDEF (
   id_knwKB mediumint(8) unsigned NOT NULL,
@@ -3164,7 +3161,7 @@ CREATE TABLE IF NOT EXISTS knwKBDDEF (
   output_tag text default '',
   search_expression text default '',
   PRIMARY KEY  (id_knwKB)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for WebSubmit:
 
@@ -3177,13 +3174,13 @@ CREATE TABLE IF NOT EXISTS sbmACTION (
   actionbutton text,
   statustext text,
   PRIMARY KEY  (sactname)
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmALLFUNCDESCR (
   function varchar(40) NOT NULL default '',
   description tinytext,
   PRIMARY KEY  (function)
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmAPPROVAL (
   doctype varchar(10) NOT NULL default '',
@@ -3196,7 +3193,7 @@ CREATE TABLE IF NOT EXISTS sbmAPPROVAL (
   access varchar(20) NOT NULL default '0',
   note text NOT NULL default '',
   PRIMARY KEY  (rn)
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmCPLXAPPROVAL (
   doctype varchar(10) NOT NULL default '',
@@ -3216,25 +3213,25 @@ CREATE TABLE IF NOT EXISTS sbmCPLXAPPROVAL (
   dPubComRecom datetime NOT NULL default '0000-00-00 00:00:00',
   dProjectLeaderAction datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY  (rn, type)
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmCOLLECTION (
   id int(11) NOT NULL auto_increment,
   name varchar(100) NOT NULL default '',
   PRIMARY KEY  (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmCOLLECTION_sbmCOLLECTION (
   id_father int(11) NOT NULL default '0',
   id_son int(11) NOT NULL default '0',
   catalogue_order int(11) NOT NULL default '0'
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmCOLLECTION_sbmDOCTYPE (
   id_father int(11) NOT NULL default '0',
   id_son char(10) NOT NULL default '0',
   catalogue_order int(11) NOT NULL default '0'
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmCATEGORIES (
   doctype varchar(10) NOT NULL default '',
@@ -3244,7 +3241,7 @@ CREATE TABLE IF NOT EXISTS sbmCATEGORIES (
   PRIMARY KEY (doctype, sname),
   KEY doctype (doctype),
   KEY sname (sname)
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmCHECKS (
   chname varchar(15) NOT NULL default '',
@@ -3254,7 +3251,7 @@ CREATE TABLE IF NOT EXISTS sbmCHECKS (
   chefi1 text,
   chefi2 text,
   PRIMARY KEY  (chname)
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmDOCTYPE (
   ldocname text,
@@ -3262,7 +3259,7 @@ CREATE TABLE IF NOT EXISTS sbmDOCTYPE (
   cd date default NULL,
   md date default NULL,
   description text
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmFIELD (
   subname varchar(13) default NULL,
@@ -3277,7 +3274,7 @@ CREATE TABLE IF NOT EXISTS sbmFIELD (
   md date default NULL,
   fiefi1 text,
   fiefi2 text
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmFIELDDESC (
   name varchar(15) NOT NULL default '',
@@ -3296,12 +3293,12 @@ CREATE TABLE IF NOT EXISTS sbmFIELDDESC (
   fddfi2 text,
   cookie int(11) default '0',
   PRIMARY KEY  (name)
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmFORMATEXTENSION (
   FILE_FORMAT text NOT NULL,
   FILE_EXTENSION text NOT NULL
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmFUNCTIONS (
   action varchar(10) NOT NULL default '',
@@ -3309,17 +3306,17 @@ CREATE TABLE IF NOT EXISTS sbmFUNCTIONS (
   function varchar(40) NOT NULL default '',
   score int(11) NOT NULL default '0',
   step tinyint(4) NOT NULL default '1'
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmFUNDESC (
   function varchar(40) NOT NULL default '',
   param varchar(40) default NULL
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmGFILERESULT (
   FORMAT text NOT NULL,
   RESULT text NOT NULL
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmIMPLEMENT (
   docname varchar(10) default NULL,
@@ -3335,14 +3332,14 @@ CREATE TABLE IF NOT EXISTS sbmIMPLEMENT (
   score int(11) NOT NULL default '0',
   stpage int(11) NOT NULL default '0',
   endtxt varchar(100) NOT NULL default ''
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmPARAMETERS (
   doctype varchar(10) NOT NULL default '',
   name varchar(40) NOT NULL default '',
   value text NOT NULL default '',
   PRIMARY KEY  (doctype,name)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmPUBLICATION (
   doctype varchar(10) NOT NULL default '',
@@ -3363,7 +3360,7 @@ CREATE TABLE IF NOT EXISTS sbmPUBLICATION (
   accessspo varchar(20) NOT NULL default '',
   journal varchar(100) default NULL,
   PRIMARY KEY  (doctype,categ,rn)
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmPUBLICATIONCOMM (
   id int(11) NOT NULL auto_increment,
@@ -3376,7 +3373,7 @@ CREATE TABLE IF NOT EXISTS sbmPUBLICATIONCOMM (
   synopsis varchar(255) NOT NULL default '',
   commentfulltext text,
   PRIMARY KEY  (id)
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmPUBLICATIONDATA (
   doctype varchar(10) NOT NULL default '',
@@ -3385,7 +3382,7 @@ CREATE TABLE IF NOT EXISTS sbmPUBLICATIONDATA (
   logicalbase varchar(10) NOT NULL default '',
   spokesperson varchar(50) NOT NULL default '',
   PRIMARY KEY  (doctype)
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmREFEREES (
   doctype varchar(10) NOT NULL default '',
@@ -3394,7 +3391,7 @@ CREATE TABLE IF NOT EXISTS sbmREFEREES (
   address varchar(50) NOT NULL default '',
   rid int(11) NOT NULL auto_increment,
   PRIMARY KEY  (rid)
-) TYPE=MyISAM PACK_KEYS=1;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmSUBMISSIONS (
   email varchar(50) NOT NULL default '',
@@ -3405,7 +3402,7 @@ CREATE TABLE IF NOT EXISTS sbmSUBMISSIONS (
   reference varchar(40) NOT NULL default '',
   cd datetime NOT NULL default '0000-00-00 00:00:00',
   md datetime NOT NULL default '0000-00-00 00:00:00'
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS sbmCOOKIES (
   id int(15) unsigned NOT NULL auto_increment,
@@ -3413,7 +3410,7 @@ CREATE TABLE IF NOT EXISTS sbmCOOKIES (
   value text,
   uid int(15) NOT NULL,
   PRIMARY KEY  (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- Scheduler tables
 
@@ -3432,7 +3429,7 @@ CREATE TABLE IF NOT EXISTS schTASK (
   KEY status (status),
   KEY runtime (runtime),
   KEY priority (priority)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS hstTASK (
   id int(15) unsigned NOT NULL,
@@ -3449,7 +3446,7 @@ CREATE TABLE IF NOT EXISTS hstTASK (
   KEY status (status),
   KEY runtime (runtime),
   KEY priority (priority)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- Batch Upload History
 
@@ -3463,7 +3460,7 @@ CREATE TABLE IF NOT EXISTS hstBATCHUPLOAD (
   batch_mode varchar(15) NOT NULL,
   PRIMARY KEY (id),
   KEY user (user)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- External collections
 
@@ -3472,14 +3469,14 @@ CREATE TABLE IF NOT EXISTS collection_externalcollection (
   id_externalcollection mediumint(9) unsigned NOT NULL default '0',
   type tinyint(4) unsigned NOT NULL default '0',
   PRIMARY KEY (id_collection, id_externalcollection)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS externalcollection (
   id mediumint(9) unsigned NOT NULL auto_increment,
   name varchar(255) NOT NULL default '',
   PRIMARY KEY (id),
   UNIQUE KEY name (name)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- WebStat tables:
 
@@ -3491,7 +3488,7 @@ CREATE TABLE IF NOT EXISTS staEVENT (
   cols varchar(255),
   PRIMARY KEY  (id),
   UNIQUE KEY number (number)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- BibClassify tables:
 
@@ -3503,13 +3500,13 @@ CREATE TABLE IF NOT EXISTS clsMETHOD (
   last_updated datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY  (id),
   UNIQUE KEY name (name)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS collection_clsMETHOD (
   id_collection mediumint(9) unsigned NOT NULL,
   id_clsMETHOD mediumint(9) unsigned NOT NULL,
   PRIMARY KEY  (id_collection, id_clsMETHOD)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- WebJournal tables:
 
@@ -3518,7 +3515,7 @@ CREATE TABLE IF NOT EXISTS jrnJOURNAL (
   name varchar(50) NOT NULL default '',
   PRIMARY KEY (id),
   UNIQUE KEY name (name)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS jrnISSUE (
   id_jrnJOURNAL mediumint(9) unsigned NOT NULL,
@@ -3527,7 +3524,7 @@ CREATE TABLE IF NOT EXISTS jrnISSUE (
   date_released datetime NOT NULL default '0000-00-00 00:00:00',
   date_announced datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY (id_jrnJOURNAL,issue_number)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables recording history of record's metadata and fulltext documents:
 
@@ -3544,7 +3541,7 @@ CREATE TABLE IF NOT EXISTS hstRECORD (
   KEY (job_name),
   KEY (job_person),
   KEY (job_date)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS hstDOCUMENT (
   id_bibdoc mediumint(9) unsigned NOT NULL,
@@ -3569,7 +3566,7 @@ CREATE TABLE IF NOT EXISTS hstDOCUMENT (
   KEY (job_name),
   KEY (job_person),
   KEY (job_date)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- BibCirculation tables:
 
@@ -3584,7 +3581,7 @@ CREATE TABLE IF NOT EXISTS crcBORROWER (
   borrower_until datetime NOT NULL default '0000-00-00 00:00:00',
   notes text,
   PRIMARY KEY  (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS crcILLREQUEST (
   id int(15) unsigned NOT NULL auto_increment,
@@ -3608,7 +3605,7 @@ CREATE TABLE IF NOT EXISTS crcILLREQUEST (
   PRIMARY KEY  (id),
   KEY id_crcborrower (id_crcBORROWER),
   KEY id_crclibrary (id_crcLIBRARY)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS crcITEM (
   barcode varchar(30) NOT NULL default '',
@@ -3625,7 +3622,7 @@ CREATE TABLE IF NOT EXISTS crcITEM (
   PRIMARY KEY  (barcode),
   KEY id_bibrec (id_bibrec),
   KEY id_crclibrary (id_crcLIBRARY)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS crcLIBRARY (
   id int(15) unsigned NOT NULL auto_increment,
@@ -3636,7 +3633,7 @@ CREATE TABLE IF NOT EXISTS crcLIBRARY (
   type varchar(30) default NULL,
   notes text,
   PRIMARY KEY  (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS crcLOAN (
   id int(15) unsigned NOT NULL auto_increment,
@@ -3656,7 +3653,7 @@ CREATE TABLE IF NOT EXISTS crcLOAN (
   KEY id_crcborrower (id_crcBORROWER),
   KEY id_bibrec (id_bibrec),
   KEY barcode (barcode)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS crcLOANREQUEST (
   id int(15) unsigned NOT NULL auto_increment,
@@ -3672,7 +3669,7 @@ CREATE TABLE IF NOT EXISTS crcLOANREQUEST (
   KEY id_crcborrower (id_crcBORROWER),
   KEY id_bibrec (id_bibrec),
   KEY barcode (barcode)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS crcPURCHASE (
   id int(15) unsigned NOT NULL auto_increment,
@@ -3686,7 +3683,7 @@ CREATE TABLE IF NOT EXISTS crcPURCHASE (
   PRIMARY KEY  (id),
   KEY id_bibrec (id_bibrec),
   KEY id_crcVENDOR (id_crcVENDOR)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS crcVENDOR (
   id int(15) unsigned NOT NULL auto_increment,
@@ -3696,7 +3693,7 @@ CREATE TABLE IF NOT EXISTS crcVENDOR (
   phone varchar(30) NOT NULL default '',
   notes text,
   PRIMARY KEY  (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- BibExport tables:
 
@@ -3710,7 +3707,7 @@ CREATE TABLE IF NOT EXISTS expJOB (
   output_directory text,
   PRIMARY KEY  (id),
   UNIQUE KEY jobname (jobname)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS expQUERY (
   id int(15) unsigned NOT NULL auto_increment,
@@ -3720,7 +3717,7 @@ CREATE TABLE IF NOT EXISTS expQUERY (
   notes text,
   deleted mediumint(12) NOT NULL default '0',
   PRIMARY KEY  (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS expJOB_expQUERY (
   id_expJOB int(15) NOT NULL,
@@ -3728,7 +3725,7 @@ CREATE TABLE IF NOT EXISTS expJOB_expQUERY (
   PRIMARY KEY  (id_expJOB,id_expQUERY),
   KEY id_expJOB (id_expJOB),
   KEY id_expQUERY (id_expQUERY)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS expQUERYRESULT (
   id int(15) unsigned NOT NULL auto_increment,
@@ -3737,7 +3734,7 @@ CREATE TABLE IF NOT EXISTS expQUERYRESULT (
   status mediumint(12) NOT NULL default '0',
   status_message text NOT NULL,
   PRIMARY KEY  (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS expJOBRESULT (
   id int(15) unsigned NOT NULL auto_increment,
@@ -3746,7 +3743,7 @@ CREATE TABLE IF NOT EXISTS expJOBRESULT (
   status mediumint(12) NOT NULL default '0',
   status_message text NOT NULL,
   PRIMARY KEY  (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS expJOBRESULT_expQUERYRESULT (
   id_expJOBRESULT int(15) NOT NULL,
@@ -3754,7 +3751,7 @@ CREATE TABLE IF NOT EXISTS expJOBRESULT_expQUERYRESULT (
   PRIMARY KEY  (id_expJOBRESULT, id_expQUERYRESULT),
   KEY id_expJOBRESULT (id_expJOBRESULT),
   KEY id_expQUERYRESULT (id_expQUERYRESULT)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS user_expJOB (
   id_user int(15) NOT NULL,
@@ -3762,7 +3759,7 @@ CREATE TABLE IF NOT EXISTS user_expJOB (
   PRIMARY KEY  (id_user, id_expJOB),
   KEY id_user (id_user),
   KEY id_expJOB (id_expJOB)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS swrREMOTESERVER (
   id int(15) unsigned NOT NULL auto_increment,
@@ -3777,7 +3774,7 @@ CREATE TABLE IF NOT EXISTS swrREMOTESERVER (
   xml_servicedocument longblob,
   last_update int(15) unsigned NOT NULL,
   PRIMARY KEY (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS swrCLIENTDATA (
   id int(15) unsigned NOT NULL auto_increment,
@@ -3799,7 +3796,7 @@ CREATE TABLE IF NOT EXISTS swrCLIENTDATA (
   status varchar(150) NOT NULL default 'submitted',
   last_update datetime NOT NULL,
   PRIMARY KEY (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- tables for exception management
 
@@ -3820,6 +3817,6 @@ CREATE TABLE IF NOT EXISTS hstEXCEPTION (
   KEY (last_notified),
   KEY (total),
   UNIQUE KEY (name(50), filename(255), line)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- end of file
