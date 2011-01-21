@@ -146,46 +146,57 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
         output_format = json_data["outputFormat"]
         page_to_display = json_data["pageToDisplay"]
         collection = json_data["collection"]
+        compute_modifications = json_data["compute_modifications"]
 
+        json_response = {}
         if action_type == self._action_types.test_search:
-            return multi_edit_engine.perform_request_test_search(
+            json_response.update(multi_edit_engine.perform_request_test_search(
                                                     search_criteria,
                                                     [],
                                                     output_format,
                                                     page_to_display,
                                                     language,
                                                     output_tags,
-                                                    collection)
+                                                    collection))
+            json_response['display_info_box'] = 1
+            json_response['info_html'] = ""
+            return json.dumps(json_response)
 
         elif action_type == self._action_types.display_detailed_record:
-            return multi_edit_engine.perform_request_detailed_record(
+            json_response.update(multi_edit_engine.perform_request_detailed_record(
                                                     current_record_id,
                                                     [],
                                                     output_format,
-                                                    language)
+                                                    language))
+            return json.dumps(json_response)
 
         elif action_type == self._action_types.preview_results:
             commands_list, upload_mode, tag_list = self._create_commands_list(commands)
-            return multi_edit_engine.perform_request_test_search(
+            json_response = {}
+            json_response.update(multi_edit_engine.perform_request_test_search(
                                                     search_criteria,
                                                     commands_list,
                                                     output_format,
                                                     page_to_display,
                                                     language,
                                                     output_tags,
-                                                    collection)
+                                                    collection,
+                                                    compute_modifications))
+            return json.dumps(json_response)
 
         elif action_type == self._action_types.display_detailed_result:
             commands_list, upload_mode, tag_list = self._create_commands_list(commands)
-            return multi_edit_engine.perform_request_detailed_record(
+            json_response.update(multi_edit_engine.perform_request_detailed_record(
                                                     current_record_id,
                                                     commands_list,
                                                     output_format,
-                                                    language)
+                                                    language))
+            return json.dumps(json_response)
 
         elif action_type == self._action_types.submit_changes:
             commands_list, upload_mode, tag_list = self._create_commands_list(commands)
-            return multi_edit_engine.perform_request_submit_changes(search_criteria, commands_list, language, upload_mode, tag_list, collection, req)
+            json_response.update(multi_edit_engine.perform_request_submit_changes(search_criteria, commands_list, language, upload_mode, tag_list, collection, req))
+            return json.dumps(json_response)
 
         # In case we obtain wrong action type we return empty page.
         return " "

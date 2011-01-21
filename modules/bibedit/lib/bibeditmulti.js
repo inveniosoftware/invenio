@@ -63,6 +63,7 @@ var gCommandDisplayTemplateIDPrefix = "commandDisplayTemplateID_";
 var gOutputFormat = gOutputFormatTypes.marc;
 var gOutputFormatDetails = gOutputFormatTypes.htmlDetailed;
 var gOutputFormatPreview = gOutputFormatTypes.marc;
+var gComputeModifications = 0;
 
 /*
 * Global variables
@@ -168,6 +169,7 @@ function onButtonPreviewResultsClick() {
 	gActionToPerform = gActionTypes.previewResults;
 	gOutputFormat = gOutputFormatPreview;
 	gPageToDiplay = 1;
+        gComputeModifications = 1;
 	performAJAXRequest();
 }
 
@@ -221,9 +223,22 @@ function rebindControls() {
 	$(".buttonGoToNextPage").bind("click", onButtonGoToNextPageClick);
 }
 
-function displayResultsPreview(data) {
-	$("#preview_area").html(data);
+function onAjaxSuccess(json) {
+        var display_info_box = json['display_info_box'];
+        var info_html = json['info_html'];
+        var search_html = json['search_html'];
+        if (display_info_box === 1) {
+            $("#info_area").html(info_html);
+            gComputeModifications = 0;
+
+        }
+        $("#preview_area").html(search_html);
 	rebindControls();
+}
+
+function displayError(msg) {
+    $("#preview_area").html(msg);
+    rebindControls();
 }
 
 function createJSONData() {
@@ -239,8 +254,9 @@ function createJSONData() {
 	var currentRecordID = gCurrentRecordID;
 	var outputFormat = gOutputFormat;
 	var pageToDisplay = gPageToDiplay;
-  var collection = $("#collection").val();
+        var collection = $("#collection").val();
 	var commands = createCommandsList();
+        var compute_modifications = gComputeModifications;
 
 	var data = {
 		language : language,
@@ -251,7 +267,8 @@ function createJSONData() {
 		commands : commands,
 		outputFormat : outputFormat,
 		pageToDisplay : pageToDisplay,
-		collection: collection
+		collection : collection,
+                compute_modifications : compute_modifications
 	};
 
 	return JSON.stringify(data);
@@ -270,7 +287,7 @@ function onRequestError(XMLHttpRequest, textStatus, errorThrown) {
 	error_message = 'Request completed with status ' + textStatus +
 			'\nResult: ' + XMLHttpRequest.responseText + '\nError: ' + errorThrown;
 
-	displayResultsPreview(error_message);
+	displayError(error_message);
 }
 
 function performAJAXRequest() {
@@ -281,11 +298,13 @@ function performAJAXRequest() {
 	$.ajax( {
 		cache : false,
 		type : "POST",
-		dataType : "text",
+		dataType : "json",
 		data : {
 			jsondata : createJSONData()
 		},
-		success : displayResultsPreview,
+		success : function(json){
+                      onAjaxSuccess(json);
+                    },
 		error : onRequestError
 	});
 }
