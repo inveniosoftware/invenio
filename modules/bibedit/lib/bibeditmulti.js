@@ -485,6 +485,7 @@ function createSubfield(templateNewSubield){
     var newValue = templateNewSubield.find(".textBoxNewValue").eq(0).val();
     var action = templateNewSubield.find(".subfieldActionType").eq(0).val();
     var condition = templateNewSubield.find(".textBoxCondition").eq(0).val();
+    var conditionSubfieldExactMatch = templateNewSubield.find(".selectConditionExactMatch").eq(0).val();
     var conditionSubfield = templateNewSubield.find(".textBoxConditionSubfield").eq(0).val();
 
     var subfield = {
@@ -493,6 +494,7 @@ function createSubfield(templateNewSubield){
         newValue : newValue,
         action : action,
         condition : condition,
+        conditionSubfieldExactMatch: conditionSubfieldExactMatch,
         conditionSubfield : conditionSubfield
     };
 
@@ -609,12 +611,17 @@ function onButtonSaveNewSubfieldClick() {
 
     // update subfield appearence at the user interface
     var actionText = templateNewSubfield.find(".subfieldActionType").eq(0).find('option').filter(':selected').text();
+    var conditionExactText;
+    if (currentSubfield.conditionSubfieldExactMatch == 0) {
+        conditionExactText = "is equal to"
+    } else conditionExactText = "contains";
 
     templateDisplaySubfield.attr("id", subfieldDisplayID);
     templateDisplaySubfield.find(".action").eq(0).text(actionText);
     templateDisplaySubfield.find(".subfieldCode").eq(0).text(currentSubfield.subfieldCode);
     templateDisplaySubfield.find(".value").eq(0).text(currentSubfield.value);
     templateDisplaySubfield.find(".newValue").eq(0).text(currentSubfield.newValue);
+    templateDisplaySubfield.find(".conditionExact").eq(0).text(conditionExactText);
     templateDisplaySubfield.find(".condition").eq(0).text(currentSubfield.condition);
     templateDisplaySubfield.find(".conditionSubfield").eq(0).text(currentSubfield.conditionSubfield);
 

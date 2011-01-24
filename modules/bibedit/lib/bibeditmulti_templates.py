@@ -428,6 +428,7 @@ div .boxleft_2 {
         <span class="newValue newValueParameters">new value</span>
 
         <span class="conditionParameters"><strong> %(text_with_condition)s </strong></span>
+        <span class="conditionExact conditionParameters"></span>
         <span class="condition conditionParameters"></span>
 
         <span class="conditionSubfieldParameters"><strong> %(text_with_condition_subfield)s </strong></span>
@@ -457,7 +458,7 @@ div .boxleft_2 {
     <tr class="valueParameters">
         <td /><td /><td /><td />
         <td colspan="3">
-            <input id="textBoxValue" class="txtValue textBoxValue" type="text" value="%(text_value)s" maxlength="50"/>
+            <input id="textBoxValue" class="txtValue textBoxValue" type="text" value="%(text_value)s"/>
         </td>
     </tr>
     <tr class="newValueParameters">
@@ -469,7 +470,10 @@ div .boxleft_2 {
     <tr class="conditionParameters">
         <td /> <td /> <td /> <td /><td colspan="3">when other subfield
         <input class="txtValue textBoxConditionSubfield" type="text"/>
-        is equal to
+        <select class="selectConditionExactMatch">
+            <option value="0">%(text_equal_to)s</option>
+            <option value="1">%(text_contains)s</option>
+        </select>
         <input id="textBoxCondition" class="txtValue textBoxCondition" type="text" value="%(text_condition)s"/>
         </td>
     </tr>
@@ -518,9 +522,11 @@ div .boxleft_2 {
               "text_replace_text" : _("Replace substring"),
               "text_replace_content" : _("Replace full content"),
               "text_with" : _("with"),
-              "text_with_condition": _("when field equals"),
+              "text_with_condition": _("when field"),
               "text_with_condition_subfield" : _("on subfield"),
               "text_new_value" : _("new value"),
+              "text_equal_to" : _("is equal to"),
+              "text_contains" : _("contains"),
               "text_condition" : _("condition"),
               "text_filter_fields": _("Apply only to specific field instances"),
               "text_value" : _("value")
