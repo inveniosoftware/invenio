@@ -34,6 +34,7 @@ try:
                   CFG_REFEXTRACT_KB_JOURNAL_TITLES, \
                   CFG_REFEXTRACT_KB_REPORT_NUMBERS, \
                   CFG_REFEXTRACT_KB_AUTHORS, \
+                  CFG_INSTITUTIONS, \
                   CFG_REFEXTRACT_CTRL_FIELD_RECID, \
                   CFG_REFEXTRACT_TAG_ID_REFERENCE, \
                   CFG_REFEXTRACT_IND1_REFERENCE, \
@@ -368,7 +369,7 @@ def restrict_m_subfields(reference_lines):
     """Remove complete datafields which hold ONLY a single 'm' subfield,
        AND where the misc content is too short or too long to be of use.
        Min and max lengths derived by inspection of actual data. """
-    min_length = 12
+    min_length = 4
     max_length = 1024
     m_tag=re.compile('\<subfield code=\"m\"\>(.*?)\<\/subfield\>')
     filter_list = []
@@ -1233,6 +1234,81 @@ re_doi = (re.compile("""
     [\w\-_;\(\)\/])                         #any character excluding a full stop
     """, re.VERBOSE))
 
+def get_single_and_extra_author_pattern():
+    """Generates a simple, one-hit-only, author name pattern, matching just one author
+    name, but ALSO INCLUDING author names generated from the knowledge base. The author 
+    patterns are the same ones used inside the main 'author group' pattern generator.
+    This function is used not for reference extraction, but for author extraction."""
+    return get_single_author_pattern()+"|"+make_extra_author_regex_str()
+
+def get_single_author_pattern(incl_numeration=True):
+    """Generates a simple, one-hit-only, author name pattern, matching just one author
+    name in either of the 'S I' or 'I S' formats. The author patterns are the same
+    ones used inside the main 'author group' pattern generator. This function is used
+    not for reference extraction, but for author extraction. Numeration is appended
+    to author patterns by default.
+    @return (string): Just the author name pattern designed to identify single author names
+    in both SI and IS formats. (NO 'et al', editors, 'and'... matching)"""
+    return "(?:"+get_initial_surname_author_pattern(incl_numeration)+"|"+\
+            get_surname_initial_author_pattern(incl_numeration)+")"
+
+def get_initial_surname_author_pattern(incl_numeration=False):
+    """Return a standard author, with a maximum of 6 initials, and a surname.
+    The author pattern returned will match 'Initials Surname' formats only.
+    The Initials MUST be uppercase, and MUST have at least a dot, hypen or apostrophe between them.
+    @param incl_numeration: (boolean) Return an author pattern with optional numeration after authors.
+    @return (string): The 'Initials Surname' author pattern."""
+    append_num_re = ""
+    ## Possible inclusion of superscript numeration at the end of author names
+    if incl_numeration:
+        append_num_re = "(?:\d*)"
+    return u"""
+    (
+        (?<![Vv]olume\s)(?:[A-Z]((\.)|(\’)|(\-[A-Z]?[\s\.\,\’])) ## Initials (1-6) (EACH MUST PRECEED A DOT, APOS. or HYPHEN) (cannot follow 'Volume\s')
+        (?:(?:\-\s)|(?:\s\-)|(?:[\-\s]))?){1,5}
+
+        (?:[A-Za-z]\w{1,2}(?:(?:[\-’'`´]\s?)|(?:\s))){0,2}       ## The surname prefix: 1 or 2, 2-3 character prefixes before the surname (e.g. 'van','de')
+
+        [A-Z]\w+[\-’'`´]?\w*                                     ## The surname, which must start with an upper case character (single hyphen allowed)
+
+        %(numeration)s                                           ## A possible number to appear after an author name, used for author extraction
+
+       (?:(?:[,\.\;]\s*)|([,\.]?\s+)|($))                        ## A comma, dot or space between authors (or an end of line marker)
+    )""" % {'numeration' : append_num_re}
+
+def get_surname_initial_author_pattern(incl_numeration=False):
+    """The author name of the form: 'surname initial(s)'
+    This is sometimes the represention of the first author found inside an author group.
+    This author pattern is only used to find a maximum of ONE author inside an author group.
+    Authors of this form MUST have either a comma after the initials, or an 'and',
+    which denotes the presence of other authors in the author group.
+    @param incl_numeration: (boolean) Return an author pattern with optional numeration after authors.
+    @return (string): The 'Surname Initials' author pattern."""
+    append_num_re = ""
+    ## Possible inclusion of superscript numeration at the end of author names
+    if incl_numeration:
+        append_num_re = "(?:\d*)"
+    return u"""
+    (
+                                                                 ## The optional surname prefix:
+                                                                 ## 1 or 2, 2-3 character prefixes before the surname (e.g. 'van','de')
+        (?:[A-Z]\w{1,2}(?:(?:[\-’'`´]\s?)|(?:\s))){0,2}
+
+        [A-Z]\w+[\-’'`´]?\w*                                     ## The surname, which must start with an upper case character (single hyphen allowed)
+
+        (?:(?:\.?\s)|(?:\.\s?))                                  ## The space between the surname and its initials
+
+        (?<!Volume\s)(?:[A-Z](?:(\.)|(\’)|(\-[A-Z]?[\s\.\,\’]))  ## Initials (1-6) (EACH MUST PRECEED A DOT, APOS. or HYPHEN) (cannot follow 'Volume\s')
+        (?:(?:\-\s)|(?:\s\-)|(?:[\-\s]))?){1,5}
+
+        %(numeration)s                                           ## A possible number to appear after an author name, used for author extraction
+
+                                                                 ## Either a comma or an 'and' MUST be present ... OR an end of line marker
+                                                                 ## (maybe some space's between authors)
+                                                                 ## Uses positive lookahead assertion
+        (?:(?:[\.\;]?\s?(?:(\,\s*)|(?:\s*(?=[Aa][Nn][Dd]\s|\&\s))))|(?:$))
+    )""" % {'numeration' : append_num_re}
+
 
 def make_auth_regex_str(etal,initial_surname_author=None,surname_initial_author=None):
     """
@@ -1287,43 +1363,10 @@ def make_auth_regex_str(etal,initial_surname_author=None,surname_initial_author=
     """
 
     if not initial_surname_author:
-        ## Standard author, with a maximum of 6 initials, and a surname.
-        ## The Initials MUST be uppercase, and MUST have at least a dot, hypen or apostrophe between them.
-        initial_surname_author = u"""
-    (
-        (?<![Vv]olume\s)(?:[A-Z]((\.)|(\’)|(\-[A-Z]?[\s\.\,\’])) ## Initials (1-6) (EACH MUST PRECEED A DOT, APOS. or HYPHEN) (cannot follow 'Volume\s')
-        (?:(?:\-\s)|(?:\s\-)|(?:[\-\s]))?){1,5}
-
-        (?:[A-Za-z]\w{1,2}(?:(?:[\-’'`´]\s?)|(?:\s))){0,2}       ## The surname prefix: 1 or 2, 2-3 character prefixes before the surname (e.g. 'van','de')
-
-        [A-Z]\w+[\-’'`´]?\w*                                     ## The surname, which must start with an upper case character (single hyphen allowed)
-
-       (?:(?:[,\.\;]\s*)|([,\.]?\s+)|($))                        ## A comma, dot or space between authors (or an end of line marker)
-    )"""
+        initial_surname_author = get_initial_surname_author_pattern()
 
     if not surname_initial_author:
-        ## The author name of the form: 'surname initial(s)'
-        ## This is sometimes the represention of the first author found inside an author group.
-        ## This author pattern is only used to find a maximum of ONE author inside an author group.
-        ## Authors of this form MUST have either a comma after the initials, or an 'and',
-        ## which denotes the presence of other authors in the author group.
-        surname_initial_author = u"""
-    (
-                                                                 ## The optional surname prefix:
-                                                                 ## 1 or 2, 2-3 character prefixes before the surname (e.g. 'van','de')
-        (?:[A-Z]\w{1,2}(?:(?:[\-’'`´]\s?)|(?:\s))){0,2}
-
-        [A-Z]\w+[\-’'`´]?\w*                                     ## The surname, which must start with an upper case character (single hyphen allowed)
-
-        (?:(?:\.?\s)|(?:\.\s?))                                  ## The space between the surname and its initials
-
-        (?<!Volume\s)(?:[A-Z](?:(\.)|(\’)|(\-[A-Z]?[\s\.\,\’]))  ## Initials (1-6) (EACH MUST PRECEED A DOT, APOS. or HYPHEN) (cannot follow 'Volume\s')
-        (?:(?:\-\s)|(?:\s\-)|(?:[\-\s]))?){1,5}
-                                                                 ## Either a comma or an 'and' MUST be present ... OR an end of line marker
-                                                                 ## (maybe some space's between authors)
-                                                                 ## Uses positive lookahead assertion
-        (?:(?:[\.\;]?\s?(?:(\,\s*)|(?:\s*(?=[Aa][Nn][Dd]\s|\&\s))))|(?:$))
-    )"""
+        surname_initial_author = get_surname_initial_author_pattern()
 
     ## Pattern used to locate a GROUP of author names in a reference
     ## The format of an author can take many forms:
@@ -1395,9 +1438,13 @@ def make_auth_regex_str(etal,initial_surname_author=None,surname_initial_author=
 ## I.e. could be a title match... ignore it
 etal_matches = (' et al.,',' et. al.,',' et. al.',' et.al.,',' et al.',' et al')
 
+## Standard et al ('and others') pattern for author recognition
 re_etal = u"""[Ee][Tt](?:(?:(?:,|\.)\s*)|(?:(?:,|\.)?\s+))[Aa][Ll][,\.]?[,\.]?"""
 
+## The pattern used to identify authors inside references
 re_auth = (re.compile(make_auth_regex_str(re_etal),re.VERBOSE|re.UNICODE))
+
+
 
 ## Given an Auth hit, some misc text, and then another Auth hit straight after,
 ## (OR a bad_and was found)
@@ -1423,7 +1470,7 @@ def make_extra_author_regex_str():
     """
     def add_to_auth_list(s):
         """ Strip the line, replace spaces with '\s' and append 'the' to the start
-        and 's' to the end. Add the prepared line to the list of extra kb authors. """
+        and 's' to the end. Add the prepared line to the list of extra kb authors."""
         s = "(?:the\s)?" + s.strip().replace(' ','\s') + "s?"
         auths.append(s)
 
@@ -1450,7 +1497,7 @@ def make_extra_author_regex_str():
                              % (fpath, str(line_num)), sys.stderr, verbose=0)
             halt(err=UnicodeError, \
                  msg="Error: Unable to parse author kb (line: %s)" % str(line_num), exit_code=1)
-        if (len(rawline) > 0) and (rawline[0] != '#'):
+        if (len(rawline) > 0) and (rawline.strip()[0] != '#'):
             add_to_auth_list(rawline)
             ## Shorten collaboration to 'coll'
             if rawline.lower().endswith('collaboration\n'):
@@ -4494,7 +4541,7 @@ def _create_regex_pattern_add_optional_spaces_to_word_characters(word):
         if ch.isspace():
             new_word += ch
         else:
-            new_word += ch + unicode(r'\s*?')
+            new_word += ch + unicode(r'\s*')
     return new_word
 
 
@@ -4712,6 +4759,155 @@ def perform_regex_search_upon_line_with_pattern_list(line, patterns):
             break
     return m
 
+def standardise_line_affiliations(line):
+    ## Removes numeration, 'the'/'and', and replace titles
+    line = line.strip()
+    line = re.sub(r"^Livermore","LLNL, Livermore",line)
+    line = re.sub(r".*Stanford Linear Accelerator Center.*","SLAC",line)
+    line = re.sub(r"^Fermi National Accelerator Laboratory","Fermilab",line)
+    line = re.sub(r"[tT][hH][eE]"," ",line)
+    line = re.sub(r"[aA][nN][dD]"," ",line)
+    return line
+
+re_aff_num = re.compile(r"(^[\d]+[A-Z])")
+re_aff_inst = re.compile(r"(univ|institut|laborator)",re.I)
+re_aff_univ = re.compile(r"univ[a-z]+\s+(of)?\s+([a-z\s\-]+)|([a-z\s\-]+)\s+(?!univ[a-z]+\sof)univ[a-z]+",re.I)
+
+def find_author_affiliations(docbody,use_to_find_authors=False):
+    """ Given a possible author section, attempt to retrieve any affliations.
+        @param docbody: The document body as a list of lines.
+        @param use_to_find_authors: Boolean, whether or not the affiliations found 
+        within this function should be used to support the identification of authors.
+        (This will be True in the case when '--authors' is selected, and no authors
+        have been found using the specific author regular expression during the first 
+        method.)
+        @return (tuple): Affilations and the possibly improved author section.
+    """
+
+    ## Used to validate a set of words found above an affiliation
+    ## This is used when no authors have been found for a paper, but an affiliation has
+    ## Will try to match a single ambiguous author, such as "William J. Smith"
+    re_find_ambig_auth = re.compile(r"\s*[A-Z][^\s_<>0-9]+\s+([^\s_<>0-9]{1,3}\.?\s+)?[A-Z][^\s_<>0-9]+\s*(\d*)\s*$",re.UNICODE)
+
+    end_of_section_position = find_end_of_auth_aff_section(docbody)
+
+    start = 0
+    if end_of_section_position is not None:
+        end = end_of_section_position
+    else:
+        if cli_opts['verbosity'] > 2:
+            print "no ending keyword, stopping affiliation search"
+        return False
+
+    docbody = docbody[start:end]
+
+    affiliations = []
+    affiliation_positions = []
+
+    for position in range(len(docbody)):
+        second_try_authors = []
+        line = standardise_line_affiliations(docbody[position])
+        if cli_opts['verbosity'] > 2:
+            print "(find affiliations) examining " + line.encode("utf8")
+
+        if re_aff_num.search(line) or re_aff_inst.search(line):
+            line = re.sub(r"[0-9]","",line)
+            ## Format the found affiliation
+            univ_name = re_aff_univ.search(line)
+            if univ_name:
+                ## Get the University name
+                line = (univ_name.group(2) or univ_name.group(3)) + " U."
+            ## Check and set an institution
+            for inst in CFG_INSTITUTIONS:
+                if line.find(" "+inst) != -1:
+                    line = inst
+                    break
+
+            ## And save the position within this affiliation section
+            affiliation_positions.append(position)
+
+            if use_to_find_authors == True:
+                ## Use the found affiliation to try and help with author extraction
+                if ((position - 1) > 0) and not ((position - 1) in affiliation_positions):
+                    ## Replace 'and' or '&' with a comma
+                    tmp_line = re.sub(r"\s([Aa][Nn][Dd]|&)\s",", ",docbody[position-1])
+                    possible_authors = tmp_line.strip().split(",")
+                    print "checking these possible authors:"
+                    print possible_authors
+                    ## Return the list of ok authors found in the split line, above the affiliation
+                    second_try_authors = filter(lambda x: re_find_ambig_auth.match(x), possible_authors)
+
+            ## Add the institution to the list of institutions for this document
+            affiliations.append((line,second_try_authors))
+
+    print "identified affiliations:"
+    print affiliations
+    return affiliations
+
+def get_post_author_section_keyword_patterns():
+    """ Return a list of compiled regex's based on keywords used as an indication of the
+        end of a possible author section on the title page of a document.
+    """
+    ptns = []
+    ptns.append(_create_regex_pattern_add_optional_spaces_to_word_characters('abstract'))
+    ptns.append(_create_regex_pattern_add_optional_spaces_to_word_characters('introduction'))
+    ptns.append(_create_regex_pattern_add_optional_spaces_to_word_characters('intro'))
+    ptns.append(_create_regex_pattern_add_optional_spaces_to_word_characters('overview'))
+    ptns.append(_create_regex_pattern_add_optional_spaces_to_word_characters('contents'))
+    ptns.append(_create_regex_pattern_add_optional_spaces_to_word_characters('table of contents'))
+    ptns.append(_create_regex_pattern_add_optional_spaces_to_word_characters('content'))
+    ptns.append(_create_regex_pattern_add_optional_spaces_to_word_characters('overview'))
+    ptns.append(_create_regex_pattern_add_optional_spaces_to_word_characters('objectives'))
+    #ptns.append(_create_regex_pattern_add_optional_spaces_to_word_characters('copyright'))
+    ptns.append(_create_regex_pattern_add_optional_spaces_to_word_characters('page'))
+    ptns.append(_create_regex_pattern_add_optional_spaces_to_word_characters('preface'))
+    ptns.append(_create_regex_pattern_add_optional_spaces_to_word_characters('summary'))
+    ## Page number 1
+    ptns.append('\s*(page)?\s*(1|2|i)\s*\.?\s*$')
+
+    ## Add an optional chapter numeration (1., 2, 1.1...) to the start of each pattern
+    ptns = map(lambda x:'\s*(\d\s*\.?\s*1?\s*\.?\s*)?'+x,ptns)
+
+    compiled_patterns = []
+    for p in ptns:
+        compiled_patterns.append(re.compile(p, re.I|re.UNICODE))
+    return compiled_patterns
+
+
+def check_for_end_of_author_section_match_keywords(line):
+    """ Given a lowercase, stripped line from the start of a document, try to find a match the
+        line exactly for a keyword. A match should indicate the end of the author section.
+        @param line: The line to be checked for ending section keywords.
+        @return (match object): The match object returned when a keyword match is found.
+    """
+    found_keyword = perform_regex_match_upon_line_with_pattern_list(line, get_post_author_section_keyword_patterns())
+    if found_keyword:
+        return found_keyword
+
+def find_end_of_auth_aff_section(docbody):
+    """ Return the ending position of the author/affiliation section.
+        @param docbody: The full, line-by-line document
+        @return (int): The position of the found end-keyword
+    """
+
+    end_of_section_keyword_position = None
+
+    ## Obtain the line numbers of lines which hold authors
+    for position in range(len(docbody)):
+        ## Skip the first line        ##FIXME
+        if position == 0:
+            continue
+        line = docbody[position]
+        print '(find ending keyword) examining: %s' % line.strip()
+        ## Check for post-author keywords in the line which signifies the end of an author section
+        if check_for_end_of_author_section_match_keywords(line.strip().lower()):
+            end_of_section_keyword_position = position
+            print "ending keyword match, stopping auth/aff section search: %d" % position
+            print "on line: %s" % line.strip().lower()
+            break
+
+    return end_of_section_keyword_position
+
 
 def find_author_section(docbody, author_marker = None, first_author = None):
     """Search in document body for its author section.
@@ -4740,6 +4936,7 @@ def find_author_section(docbody, author_marker = None, first_author = None):
     """
     auth_start_line = None
     auth_end_line = None
+
     #A pattern to match author names
     # demands name has a comma
     # allows space or hyphen in family name
@@ -4747,11 +4944,30 @@ def find_author_section(docbody, author_marker = None, first_author = None):
     #        no . or spaces used...)
     # allows a trailing number
     # Aubert, F. I. 3
-    author_pattern = re.compile('([A-Z]\w+\s?\w+)\s?([A-Z\.\s]{1,9})\.?\s?(\d*)')
+    #author_pattern = re.compile('([A-Z]\w+\s?\w+)\s?([A-Z\.\s]{1,9})\.?\s?(\d*)')
     # F. I. Aubert, 3
-    author_pattern = re.compile('([A-Z])\.\s?([A-Z]?)\.?\s?([A-Z]\w+\s?\w*)\,?\s?(\d*)')
-    start_pattern = author_pattern
-    end_pattern = author_pattern
+    #author_pattern = re.compile('([A-Z])\.\s?([A-Z]?)\.?\s?([A-Z]\w+\s?\w*)\,?\s?(\d*)')
+
+    ## Obtain the compiled expression which includes the proper author numeration
+    ## (The pattern used to identify authors of papers)
+    total_author_pattern = (re.compile(make_auth_regex_str(re_etal,\
+                                       get_initial_surname_author_pattern(incl_numeration=True),\
+                                       get_surname_initial_author_pattern(incl_numeration=True)),re.VERBOSE|re.UNICODE))
+
+    ## Obtain the compiled expression which includes the user-specified 'extra' authors
+    extra_author_pattern = re_extra_auth
+
+    ## Obtain the compiled expression which matches single author names (Initials Surname, or Surname Initials)
+    ## Also caters for the possible inclusion of superscript numeration at the end of author names
+    ## (e.g. W.H.Smith2)
+    single_author_pattern = re.compile(get_single_and_extra_author_pattern(),re.VERBOSE)
+
+    ## 'initial surname', or 'surname initial'
+    #start_pattern = total_author_pattern
+    #end_pattern = total_author_pattern
+
+    ## 'initial surname' only
+    #end_pattern = re.compile(get_initial_surname_author_pattern(),re.VERBOSE)
 
 #    if author_marker is not None:
 #        start_pattern = re.compile(author_marker+'(.*)')
@@ -4759,40 +4975,79 @@ def find_author_section(docbody, author_marker = None, first_author = None):
 #    if first_author is not None:
 #        start_pattern = re.compile(first_author)
 #        end_pattern = None;
-        
 
+    ## Obtain the line numbers of lines which hold authors
     for position in range(len(docbody)):
+
+        ##FIXME
+        if position == 0:
+            continue
+
         line = docbody[position]
-        if auth_start_line is None:
-            if cli_opts['verbosity'] > 2:
-                print "examining " + line.encode("utf8")
-                print "re -> " + start_pattern.pattern
-            if start_pattern.search(line):
+        if cli_opts['verbosity'] > 2:
+            print "(find authors) examining " + line.encode("utf8")
+            #print "re -> " + start_pattern.pattern
+
+        ## Set the ending position to equal this line number
+        ## (This could be the last author or one of many)
+        if total_author_pattern.search(line) or extra_author_pattern.search(line):
+            print "author found -> " + line.encode("utf8")
+            ## Set the starting position, if it has not been set
+            if auth_start_line is None:
                 auth_start_line = position
-        elif auth_end_line is None and end_pattern.search(line):            
-            # this could be the last author or one of many
+            ## Always update the ending position
             auth_end_line = position
-        elif auth_end_line is not None and end_pattern.search(line):
-            break
+
+
+        #elif (auth_end_line is not None) and (not end_pattern.search(line))\
+        #and (not kb_author_pattern.search(line)):
             # leave when we have found a possible and, and the ending
             # pattern no longer matches this will fail if there are
             # affiliations interspersed, or othe corruptions of the list
+        #    if ((position+1) < len(docbody))\
+        #    and (not end_pattern.search(docbody[position+1]))\
+        #    and (not kb_author_pattern.search(docbody[position+1])):
+                ## Finish searching when a gap of two lines is found (between authors)
+        #        break
 
-                          
+        ## Check for post-author keywords in the line which signifies the end of an author section
+        elif check_for_end_of_author_section_match_keywords(line.strip().lower()):
+            print "ending keyword match, stopping author section search"
+            break
+
+        ## If moved 10 lines beyond the last found author line, stop the search.
+        #elif auth_end_line and (position == auth_end_line + 10):
+        #    print "maximum search line limit reached, stopping author section search"
+        #    break
+
+        #elif position > 0:
+            ## End the search when two adjacent lines, of the maximum page length are found
+            ## (High likelihood that these two lines indicate the start of a paragraph.)
+        #    if (len(line) == prev_line_length) and prev_line_ends_with_new_line and line.endswith('\n'):
+        #        break
+        #prev_line_length = len(line)
+        #prev_line_ends_with_new_line = line.endswith('\n')
+
     if auth_start_line is not None:
-        ## return dictionary containing details of author section:
-        auth_sect_details = {
-            'start_line' : auth_start_line,
-            'end_line'   : auth_end_line,
-            'marker_pattern' : author_pattern,
-            'title_string' : None,
-            'marker' : None,
-            'title_marker_same_line' : None,
+        ## Return dictionary containing details of author section:
+        ## (The pattern used is just a single name matching author pattern,
+        ## and not the full author pattern. This allows for each author group
+        ## to be split into separate author names, within the output xml.)
+        auth_sect_details = {'start_line'            : auth_start_line,
+                             'end_line'              : auth_end_line,
+                             'marker_pattern'        : single_author_pattern,#just the single author matches, as opposed to re_auth
+                             'title_string'          : None,
+                             'marker'                : None,
+                             'title_marker_same_line': None
                             }
     else:
         auth_sect_details = None
-    return auth_sect_details
 
+
+
+    ## Now attempt to get the affilations. This will also try to get authors once again,
+    ## if authors have not already been found...
+    return auth_sect_details
 
 
 def find_reference_section(docbody):
@@ -5680,7 +5935,7 @@ def get_lines(docbody,
                                   marker_ptn)
             #lines = docbody[start_idx:]
     return lines
-                        
+
 
 
 def get_reference_lines(docbody,
@@ -5770,14 +6025,18 @@ def extract_section_from_fulltext(fulltext, section):
     """
     ## Try to remove pagebreaks, headers, footers
     fulltext = remove_page_boundary_lines(fulltext)
+
+    #fulltext = ['Some title','Some date','Chris Hayward, Tim Smith, Joe Harris','University of Bath','','Abstract']
+
     status = 0
+    lines = []
     sect_start = {'start_line' : None,
                   'end_line'   : None,
                   'title_string': None,
                   'marker_pattern': None,
                   'marker' : None,
                   }
-                  
+
     sect_end = None
     #How ref section found flag
     how_found_start = 0
@@ -5798,22 +6057,52 @@ def extract_section_from_fulltext(fulltext, section):
                     ## No references found - try with no title option (with even weaker patterns..)
                     sect_start = find_reference_section_no_title_via_numbers(fulltext)
                     if sect_start is not None: how_found_start = 4
-    elif section == 'authors':            
 
+    elif section == 'authors':
         sect_start = find_author_section(fulltext, first_author = cli_opts['first_author'])
-  
+
+    elif section == 'affiliations':
+        sect_start = None
+        affiliations = find_author_affiliations(fulltext)
+        if affiliations:
+            return ([aff[0] for aff in affiliations], status, how_found_start)
+        else:
+            if cli_opts['verbosity'] >= 1:
+                sys.stdout.write("-----extract_section_from_fulltext: " \
+                                 "No ending keyword found for affilation extraction!\n")
 
     if sect_start is None:
-        ## No References
-        lines = []
-        status = 4
-        write_message("-----extract_section_from_fulltext: " \
-                         "No section found\n", verbose=2)
+        ## Only if an ending keyword was found, look for affilations
+        if section == 'authors':
+            affiliations = find_author_affiliations(fulltext,use_to_find_authors=True)
+
+            ## Found affiliations... there could be some new authors found too!
+            if affiliations:
+                ## Append the affiliation supported authors, since the first method failed
+                for aff_auth_pair in affiliations:
+                    lines.extend([auth for auth in aff_auth_pair[1]])#Authors
+                return (lines,status,how_found_start)
+                #lines.append(aff_auth_pair[0])#Affiliation
+        else:
+            ## No References
+            lines = []
+            status = 4
+            write_message("-----extract_section_from_fulltext: " \
+                             "No section found\n", verbose=2)
     else:
+        ## Only if an ending keyword was found, look for affilations
+        ## It's a bonus that authors were found
+        #if end_of_section_keyword:
+        #    affiliations = find_author_affiliations(fulltext)
+        #    lines.extend([i[0] for i in affiliations])
+
         sect_end = None
         if sect_start.has_key("end_line"):
             sect_end = sect_start["end_line"]
-        if sect_end is None:
+
+        ## Attempt to find the end of the section in the case where references are being
+        ## extracted, and a first pass failed at finding the end of the reference section
+        if (sect_end is None) and (section == 'references'):
             sect_end = \
                      find_end_of_reference_section(fulltext, \
                                                    sect_start["start_line"], \
@@ -5821,8 +6110,7 @@ def extract_section_from_fulltext(fulltext, section):
                                                    sect_start["marker_pattern"])
 
         if sect_end is None:
-            ## No End to refs? Not safe to extract
-            lines = []
+            ## No End to reference or author section? Not safe to extract...
             status = 5
             write_message("-----extract_section_from_fulltext: " \
                              "No end to section!\n", verbose=2)
@@ -5834,10 +6122,9 @@ def extract_section_from_fulltext(fulltext, section):
                               sect_start["title_string"], \
                               sect_start["marker_pattern"], \
                               sect_start["title_marker_same_line"],
-                              section,
-                              )
-    return (lines, status, how_found_start)
+                              section)
 
+    return (lines, status, how_found_start)
 
 ## Tasks related to conversion of full-text to plain-text:
 
@@ -6024,25 +6311,27 @@ def get_cli_options():
                  'kb-journal'                 : 0,
                  'kb-report-number'           : 0,
                  'authors'                    : 0,
+                 'affiliations'               : 0,
                  'first_author'               : 0,
                }
 
     try:
-        myoptions, myargs = getopt.getopt(sys.argv[1:], "hVv:f:zrx:d:pj:n:", \
+        myoptions, myargs = getopt.getopt(sys.argv[1:], "hVv:f:zalrx:d:pj:n:", \
                                           ["help",
                                            "version",
                                            "verbose=",
                                            "fulltext=",
                                            "raw-references",
-                                           "raw-authors",
                                            "authors",
+                                           "affiliations",
                                            "output-raw-refs",
                                            "xmlfile=",
                                            "dictfile=",
                                            "inspire",
                                            "kb-journal=",
                                            "kb-report-number=",
-                                           "first_author",])
+                                           "first_author",
+                                           "raw-authors",])
     except getopt.GetoptError, err:
         if err.opt in ("c", "collection", "i", "recid", "e", "extraction-job"):
             ## These are arguments designed to be used for the daemon mode only
@@ -6098,6 +6387,14 @@ def get_cli_options():
             cli_opts['kb-report-number'] = o[1]
         elif o[0] in ("-a", "--authors"):
             cli_opts['authors'] = 1;
+        elif o[0] in ("-f", "--affiliations"):
+            cli_opts['affiliations'] = 1;
+        elif o[0] in ("--first_author"):
+            cli_opts['first_author'] = 1;
+        if len(myargs) == 0:
+            ## no arguments: error message
+            usage(wmsg="Error: no full-text.")
+        
     # What journal title format are we using?
     if cli_opts['verbosity'] > 0 and cli_opts['inspire']:
         sys.stdout.write("--- Using inspire journal title form\n")
@@ -6363,6 +6660,8 @@ def begin_extraction(daemon_cli_options=None):
                 ## launch search for the relevant section in the document body:
                 if cli_opts['authors'] == 1:
                     section = 'authors'
+                elif cli_opts['affiliations'] == 1:
+                    section = 'affiliations'
                 else:
                     section = 'references'
 
