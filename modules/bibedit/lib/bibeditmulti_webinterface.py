@@ -207,7 +207,9 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
             value = current_subfield["value"]
             new_value = current_subfield["newValue"]
             condition = current_subfield["condition"]
-            condition_exact_match = True if int(current_subfield["conditionSubfieldExactMatch"]) == 0 else False
+            condition_exact_match = False
+            if int(current_subfield["conditionSubfieldExactMatch"]) == 0:
+                condition_exact_match = True
             condition_subfield = current_subfield["conditionSubfield"]
 
 
