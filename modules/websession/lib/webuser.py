@@ -1083,6 +1083,7 @@ def collect_user_info(req, login_time=False, refresh=False):
         'precached_useapprove' : False,
         'precached_useadmin' : False,
         'precached_usestats' : False,
+        'precached_useclaimpaper' : False,
     }
 
     try:
@@ -1182,6 +1183,13 @@ def collect_user_info(req, login_time=False, refresh=False):
                 user_info['precached_viewsubmissions'] = isUserSubmitter(user_info)
                 user_info['precached_useapprove'] = isUserReferee(user_info)
                 user_info['precached_useadmin'] = isUserAdmin(user_info)
+
+                auth_claim = False
+                if (acc_authorize_action(user_info, 'claimpaper_claim_own_papers')[0] == 0
+                    or acc_authorize_action(user_info, 'claimpaper_claim_others_papers')[0] == 0):
+                    auth_claim = True
+                user_info['precached_useclaimpaper'] = auth_claim
+
     except Exception, e:
         register_exception()
     return user_info

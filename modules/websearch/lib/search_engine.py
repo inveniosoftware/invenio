@@ -3744,6 +3744,11 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
 
     _ = gettext_set_language(ln)
 
+    display_claim_this_paper = False
+    try:
+         display_claim_this_paper = user_info["precached_useclaimpaper"]
+    except KeyError:
+         display_claim_this_paper = False
     #check from user information if the user has the right to see hidden fields/tags in the
     #records as well
     can_see_hidden = (acc_authorize_action(user_info, 'runbibedit')[0] == 0)
@@ -3785,7 +3790,8 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                                                                          sf=sf,
                                                                          so=so,
                                                                          sp=sp,
-                                                                         rm=rm)
+                                                                         rm=rm,
+                                                                         display_claim_link=display_claim_this_paper)
         return out
 
     # Old PHP BibFormat procedure for formatting
@@ -4069,7 +4075,8 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                                                                          sf=sf,
                                                                          so=so,
                                                                          sp=sp,
-                                                                         rm=rm)
+                                                                         rm=rm,
+                                                                         display_claim_link=display_claim_this_paper)
 
     # print record closing tags, if needed:
     if format == "marcxml" or format == "oai_dc":

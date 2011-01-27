@@ -3303,7 +3303,7 @@ class Template:
 
         return out
 
-    def tmpl_print_record_brief_links(self, ln, recID, sf='', so='d', sp='', rm=''):
+    def tmpl_print_record_brief_links(self, ln, recID, sf='', so='d', sp='', rm='', display_claim_link=False):
         """Displays links for brief record on-the-fly
 
         Parameters:
@@ -3362,7 +3362,7 @@ class Template:
             else:
                 out += "<!--not showing citations links-->"
 
-        if True: #Maybe we want not to show the link to who cannot use id?
+        if display_claim_link: #Maybe we want not to show the link to who cannot use id?
             out += '<span class="moreinfo"> - %s</span>' % \
                 create_html_link(CFG_SITE_URL + '/person/batchprocess', {'mfind_bibref':'claim',
                                                                          'selected_bibrecs':str(recID),

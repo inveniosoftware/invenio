@@ -38,7 +38,7 @@ from invenio.template import load
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.session import get_session
 from invenio.urlutils import redirect_to_url
-from invenio.webuser import getUid, page_not_authorized, collect_user_info
+from invenio.webuser import getUid, page_not_authorized, collect_user_info, isGuestUser
 from invenio.access_control_admin import acc_find_user_role_actions
 from invenio.search_engine import perform_request_search
 import invenio.bibauthorid_webapi as webapi
@@ -285,6 +285,10 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                              "failed for a currently unknown reason. The "
                              "administrators have been contacted.")
 
+        uid = getUid(req)
+        if uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login" % CFG_SITE_URL)
+
         if (not self.__user_is_authorized(req, CLAIMPAPER_CLAIM_OTHERS_PAPERS) and
             not self.__user_is_authorized(req, CLAIMPAPER_CLAIM_OWN_PAPERS)):
             return page_not_authorized(
@@ -311,7 +315,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                 session.save()
                 if self.__user_is_authorized(req, CLAIMPAPER_CLAIM_OTHERS_PAPERS):
                     return redirect_to_url(req, "%s/person/%s"
-                                       % (CFG_SITE_URL, pid))
+                                       % (CFG_SITE_URL, redir_pid))
                 else:
                     return redirect_to_url(req, "%s/person/claim" % CFG_SITE_URL)
 
@@ -1515,7 +1519,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                 return json.dumps({'editable': ["OK"]})
         else:
             return "You have to specify an action for this method."
-
 
     def __user_is_authorized(self, req, action):
         '''
