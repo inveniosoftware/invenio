@@ -492,20 +492,24 @@ function deleteMsg(fieldID) {
     $(msgID).remove();
 }
 
-function createSubfield(templateNewSubield){
+function createSubfield(templateNewSubfield){
     /*
     * Creates a subfield from the informaiton contained in
     * templateNewSubield. It is expected to contain specific
     * fields with all the necessary information
     */
 
-    var subfieldCode = templateNewSubield.find(".textBoxSubfieldCode").eq(0).val();
-    var value = templateNewSubield.find(".textBoxValue").eq(0).val();
-    var newValue = templateNewSubield.find(".textBoxNewValue").eq(0).val();
-    var action = templateNewSubield.find(".subfieldActionType").eq(0).val();
-    var condition = templateNewSubield.find(".textBoxCondition").eq(0).val();
-    var conditionSubfieldExactMatch = templateNewSubield.find(".selectConditionExactMatch").eq(0).val();
-    var conditionSubfield = templateNewSubield.find(".textBoxConditionSubfield").eq(0).val();
+    if (templateNewSubfield === "None"){
+        return "None"
+    }
+
+    var subfieldCode = templateNewSubfield.find(".textBoxSubfieldCode").eq(0).val();
+    var value = templateNewSubfield.find(".textBoxValue").eq(0).val();
+    var newValue = templateNewSubfield.find(".textBoxNewValue").eq(0).val();
+    var action = templateNewSubfield.find(".subfieldActionType").eq(0).val();
+    var condition = templateNewSubfield.find(".textBoxCondition").eq(0).val();
+    var conditionSubfieldExactMatch = templateNewSubfield.find(".selectConditionExactMatch").eq(0).val();
+    var conditionSubfield = templateNewSubfield.find(".textBoxConditionSubfield").eq(0).val();
 
     var subfield = {
         subfieldCode : subfieldCode,
@@ -568,6 +572,13 @@ function onButtonNewSubfieldClick(instance) {
 
     // generate ID for the the element of the new subfield
     var subfieldDisplayID = generateSubfieldDisplayID(fieldID);
+    var subfieldID = getSubfieldID(subfieldDisplayID);
+
+    // create empty subfield to be able to delete it in
+    // case the field is deleted
+    var emptySubfield = createSubfield("None");
+    var field = gFields[fieldID];
+    field.subfields[subfieldID] = emptySubfield;
 
     // add the new subfield to the UI
     var templateNewSubfield = $("#displayTemplates .templateNewSubfield").clone();
