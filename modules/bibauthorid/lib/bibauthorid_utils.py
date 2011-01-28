@@ -28,6 +28,16 @@ import bibauthorid_config as bconfig
 import bibauthorid_structs as dat
 
 
+def string_partition(s, sep, dir='l'):
+    if dir=='r':
+        i = s.rfind(sep)
+    else:
+        i = s.find(sep)
+    if i < 0:
+        return (s,'','')
+    else:
+        return (s[0:i],s[i:i+1],s[i+1:])
+
 def split_name_parts(name_string, delete_name_additions=True,
                      override_surname_sep=''):
     '''
@@ -67,13 +77,13 @@ def split_name_parts(name_string, delete_name_additions=True,
     for sep in surname_separators:
         if name_string.count(sep) >= 1:
             found_sep = sep
-            surname, rest_of_name = name_string.partition(sep)[0::2]
+            surname, rest_of_name = string_partition(name_string,sep)[0::2]
             break
     if not found_sep:
-        rest_of_name, surname = name_string.rpartition(' ')[0::2]
+        rest_of_name, surname = string_partition(name_string,' ',dir='r')[0::2]
 
     if rest_of_name.count(","):
-        rest_of_name = rest_of_name.partition(",")[0]
+        rest_of_name = string_partition(rest_of_name,",")[0]
 
     substitution_regexp = re.compile('[%s]' % (name_separators))
     initials_names_list = substitution_regexp.sub(' ', rest_of_name).split()
@@ -120,10 +130,10 @@ def split_name_parts_old(name_string, delete_name_additions=True):
         for name_addition in name_additions:
             name_string = name_string.replace(name_addition, '')
 
-    surname, rest_of_name = name_string.partition(',')[0::2]
+    surname, rest_of_name = string_partition(name_string,',')[0::2]
 
     if rest_of_name.count(","):
-        rest_of_name = rest_of_name.partition(",")[0]
+        rest_of_name = string_partition(rest_of_name,",")[0]
 
     substitution_regexp = re.compile('[%s]' % (name_separators))
     initials_names_list = substitution_regexp.sub(' ', rest_of_name).split()

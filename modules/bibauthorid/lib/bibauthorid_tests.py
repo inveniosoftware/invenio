@@ -44,9 +44,10 @@ class TestSplitNameParts(unittest.TestCase):
          baidu.split_name_parts('Strange+)*{ (=]&-$Char, Name'))
 
 class TestCreateUnifiedNames(unittest.TestCase):
+    """Test for the functionality of creation of unified names strings"""
 
     def test_create_unified_name(self):
-        """bibauthorid - test create unified name"""
+        """bibauthorid - test creation of unified name strings"""
 
         self.assertEqual('this, I. F. ',
             baidu.create_unified_name('this, isa fullname'))
@@ -62,9 +63,10 @@ class TestCreateUnifiedNames(unittest.TestCase):
 
 
 class TestCreateNormalizedName(unittest.TestCase):
+    """Test for the functionality of creation of normalized names strings"""
 
     def test_create_normalized_name(self):
-        """bibauthorid - test create normalized name"""
+        """bibauthorid - test creation of normalized name strings"""
 
         self.assertEqual('this, Isa Fullname',
             baidu.create_normalized_name(
@@ -83,9 +85,10 @@ class TestCreateNormalizedName(unittest.TestCase):
             baidu.split_name_parts('')))
 
 class TestCleanNameString(unittest.TestCase):
+    """Test for the functionality of creation of cleaned names strings"""
 
     def test_clean_name_string(self):
-        """bibauthorid - test crean name string"""
+        """bibauthorid - test cleaning of name strings"""
 
         self.assertEqual('this is a full name',
            baidu.clean_name_string('this is a full name'))
@@ -97,9 +100,10 @@ class TestCleanNameString(unittest.TestCase):
             baidu.clean_name_string(''))
 
 class TestCompareNames(unittest.TestCase):
+    """Test for the functionality of comparison of names strings"""
 
     def test_compare_names(self):
-        """bibauthorid - test compare names"""
+        """bibauthorid - test names comparison funcions"""
 
         self.assertEqual(0.94999999999999996,
             bau.compare_names('Ellis, j.', 'Ellis, j.'))
