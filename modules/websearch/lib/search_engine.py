@@ -3747,7 +3747,7 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
     display_claim_this_paper = False
     try:
          display_claim_this_paper = user_info["precached_useclaimpaper"]
-    except KeyError:
+    except (KeyError, TypeError):
          display_claim_this_paper = False
     #check from user information if the user has the right to see hidden fields/tags in the
     #records as well
