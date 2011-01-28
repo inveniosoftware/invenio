@@ -71,7 +71,8 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_BIBRANK_SHOW_CITATION_LINKS, \
      CFG_SOLR_URL, \
-     CFG_SITE_RECORD
+     CFG_SITE_RECORD, \
+     CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT
 
 from invenio.search_engine_config import InvenioWebSearchUnknownCollectionError, InvenioWebSearchWildcardLimitError
 from invenio.search_engine_utils import get_fieldvalues
@@ -107,9 +108,10 @@ from invenio.bibrank_citation_searcher import get_cited_by_count, calculate_cite
     get_refersto_hitset, get_citedby_hitset
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
+
 from invenio.dbquery import run_sql, run_sql_with_limit, \
                             get_table_update_time, Error
-from invenio.webuser import getUid, collect_user_info
+from invenio.webuser import getUid, collect_user_info, session_param_set
 from invenio.webpage import pageheaderonly, pagefooteronly, create_error_box
 from invenio.messages import gettext_set_language
 from invenio.search_engine_query_parser import SearchQueryParenthesisedParser, \
@@ -3845,8 +3847,12 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                             creationdate = creationdate,
                             modificationdate = modificationdate,
                             content = content)
+                        # display of the next-hit/previous-hit/back-to-search links
+                        # on the detailed record pages
+                        content += websearch_templates.tmpl_display_back_to_search(req,
+                                                                                   recIDs[irec],
+                                                                                   ln)
                         req.write(content)
-
                         req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
                                                                                       tabs,
                                                                                       ln,
@@ -5121,6 +5127,8 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                 if len(colls_to_search)>1:
                     cpu_time = -1 # we do not want to have search time printed on each collection
                 print_records_prologue(req, of, cc=cc)
+                results_final_colls = []
+                wlqh_results_overlimit = 0
                 for coll in colls_to_search:
                     if results_final.has_key(coll) and len(results_final[coll]):
                         if of.startswith("h"):
@@ -5147,6 +5155,12 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                                 # rank_records failed and returned some error message to display:
                                 print_warning(req, results_final_relevances_prologue)
                                 print_warning(req, results_final_relevances_epilogue)
+
+                        if len(results_final_recIDs) < CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT:
+                            results_final_colls.append(results_final_recIDs)
+                        else:
+                            wlqh_results_overlimit = 1
+
                         print_records(req, results_final_recIDs, jrec, rg, of, ot, ln,
                                       results_final_relevances,
                                       results_final_relevances_prologue,
@@ -5159,11 +5173,24 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                                       so=so,
                                       sp=sp,
                                       rm=rm)
+
                         if of.startswith("h"):
                             req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
                                                         jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                         sc, pl_in_url,
                                                         d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1))
+
+                # store the last search results page
+                session_param_set(req, 'websearch-last-query', req.unparsed_uri)
+
+                if not wlqh_results_overlimit:
+                    # store list of results if user wants to display hits
+                    # in a single list, or store list of collections of records
+                    # if user displays hits split by collections:
+                    session_param_set(req, 'websearch-last-query-hits', results_final_colls)
+                else:
+                    results_final_colls = []
+                    session_param_set(req, 'websearch-last-query-hits', results_final_colls)
 
                 #if hosted_colls and (of.startswith("h") or of.startswith("x")):
                 if hosted_colls_actual_or_potential_results_p:
