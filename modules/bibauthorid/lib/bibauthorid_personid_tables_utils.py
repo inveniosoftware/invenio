@@ -57,13 +57,15 @@ def update_personID_table_from_paper(papers_list=[]):
         for i in fullbibrefs700:
             fullbibrefs700str += " '" + str(i[0]) + "',"
         fullbibrefs700str = fullbibrefs700str[0:len(fullbibrefs700str) - 1] + ' )'
-
+        #NOTE: values are taken only from bibrec_bibXXX tables which are considered safe. 
         if len(fullbibrefs100) >= 1:
-            bibrefs100 = run_sql("select id from bib10x where tag='100__a' and id in %s" % fullbibrefs100str)
+            sqlquery = "select id from bib10x where tag='100__a' and id in %s" % fullbibrefs100str
+            bibrefs100 = run_sql(sqlquery)
         else:
             bibrefs100 = []
         if len(fullbibrefs700) >= 1:
-            bibrefs700 = run_sql("select id from bib70x where tag='700__a' and id in %s" % fullbibrefs700str)
+            sqlquery = "select id from bib70x where tag='700__a' and id in %s" % fullbibrefs700str
+            bibrefs700 = run_sql(sqlquery)
         else:
             bibrefs700 = []
 
@@ -75,7 +77,7 @@ def update_personID_table_from_paper(papers_list=[]):
 
         if bconfig.TABLES_UTILS_DEBUG:
             print "update_personID_table_from_paper: searching for pids owning " + str(paper[0])
-        pid_rows = run_sql("select * from aidPERSONID where tag='paper' and data like %s", ('%,' + str(paper[0]),))
+        pid_rows = run_sql("select id,personid,tag,data,flag,lcul from aidPERSONID where tag='paper' and data like %s", ('%,' + str(paper[0]),))
 
         #finally, if a bibrec/ref pair is in the authornames table but not in this list that name of that paper
         #is no longer existing and must be removed from the table. The new one will be addedd by the
@@ -1069,7 +1071,7 @@ def get_user_log(transactionid='', userinfo='', personID='', action='', tag='', 
     @param value: value
     @param comment: comment
     '''
-    sql_query = 'select * from aidUSERINPUTLOG where 1 '
+    sql_query = 'select id,transactionid,timestamp,userinfo,personid,action,tag,value,comment from aidUSERINPUTLOG where 1 '
     if transactionid:
         sql_query += ' and transactionid=\'' + str(transactionid) + '\''
     if userinfo:
@@ -1383,7 +1385,7 @@ def user_can_modify_paper(uid, paper):
     @param paper: the paper bibref,bibrec pair x00:1234,4321
     @type: str
     '''
-    prow = run_sql("select * from aidPERSONID where tag=%s and data =%s"
+    prow = run_sql("select id,personid,tag,data,flag,lcul from aidPERSONID where tag=%s and data =%s"
                    "order by lcul desc limit 0,1", ('paper', str(paper)))
 
     if len(prow) == 0:
@@ -1564,7 +1566,7 @@ def get_personid_from_uid(uid):
     @param uid: userID
     @type uid: ((int,),)
     '''
-    pid = run_sql("select * from aidPERSONID where tag=%s and data=%s", ('uid', str(uid[0][0])))
+    pid = run_sql("select id,personid,tag,data,flag,lcul from aidPERSONID where tag=%s and data=%s", ('uid', str(uid[0][0])))
     if len(pid) == 1:
         return ([pid[0][1]], True)
     else:
@@ -1583,7 +1585,7 @@ def get_personid_from_uid(uid):
             return ([-1], False)
         valid_pids = []
         for p in pid:
-            uid = run_sql("select * from aidPERSONID where tag=%s and personid=%s", ('uid', str(p[0])))
+            uid = run_sql("select id,personid,tag,data,flag,lcul from aidPERSONID where tag=%s and personid=%s", ('uid', str(p[0])))
             if len(uid) == 0:
                 if split_name_parts(surname + ', ' + name)[0].lower() == split_name_parts(p[1][0][0])[0].lower():
                     valid_pids.append(p[0])

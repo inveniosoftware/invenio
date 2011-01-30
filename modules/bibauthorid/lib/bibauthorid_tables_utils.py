@@ -232,7 +232,7 @@ def authornames_tables_gc(bunch_size=50):
     else:
         return
 
-    abfs_ids_bunch = run_sql("select * from aidAUTHORNAMESBIBREFS limit %s, %s"
+    abfs_ids_bunch = run_sql("select id,Name_id,bibref from aidAUTHORNAMESBIBREFS limit %s, %s"
                             , (str(bunch_start - 1), str(bunch_size)))
     bunch_start += bunch_size
 
@@ -296,7 +296,7 @@ def authornames_tables_gc(bunch_size=50):
                         (str(id_to_remove[0]),))
                 if bconfig.TABLES_UTILS_DEBUG:
                     print "authornames_tables_gc: idAUTHORNAMESBIBREFS deleting row " + str(id_to_remove)
-                authrow = run_sql("select * from aidAUTHORNAMES where id=%s", (str(id_to_remove[1]),))
+                authrow = run_sql("select id,Name,bibrefs,db_name from aidAUTHORNAMES where id=%s", (str(id_to_remove[1]),))
                 if len(authrow[0][2].split(',')) == 1:
                     run_sql("delete from aidAUTHORNAMES where id=%s", (str(id_to_remove[1]),))
                     if bconfig.TABLES_UTILS_DEBUG:
@@ -315,7 +315,7 @@ def authornames_tables_gc(bunch_size=50):
                 pass
 
 
-        abfs_ids_bunch = run_sql("select * from aidAUTHORNAMESBIBREFS limit %s,%s" %
+        abfs_ids_bunch = run_sql("select id,Name_id,bibref from aidAUTHORNAMESBIBREFS limit %s,%s" ,
                             (str(bunch_start - 1), str(bunch_size)))
         bunch_start += bunch_size
 
@@ -337,9 +337,9 @@ def update_authornames_tables_from_paper(papers_list=[]):
         '''
         Update the tables for one bibref,name touple
         '''
-        authornames_row = run_sql("select * from aidAUTHORNAMES where db_name like %s",
+        authornames_row = run_sql("select id,Name,bibrefs,db_name from aidAUTHORNAMES where db_name like %s",
                             (str(name),))
-        authornames_bibrefs_row = run_sql("select * from aidAUTHORNAMESBIBREFS "
+        authornames_bibrefs_row = run_sql("select id,Name_id,bibref from aidAUTHORNAMESBIBREFS "
                                         "where bibref like %s", (str(bibref),))
 
 #@XXX: update_authornames_tables: if i'm not wrong there should always be only one result; will be checked further on
@@ -396,11 +396,11 @@ def update_authornames_tables_from_paper(papers_list=[]):
     tables = [['bibrec_bib10x', 'bib10x', '100__a', '100'], ['bibrec_bib70x', 'bib70x', '700__a', '700']]
     for paper in papers_list:
         for table in tables:
-            bibrefs = run_sql(("select id_bibxxx from %s where id_bibrec='%s'")
-                        % (table[0], str(paper[0])))
+            sqlstr = "select id_bibxxx from %s where id_bibrec=" % table[0]
+            bibrefs = run_sql(sqlstr+"%s", (str(paper[0]),))
             for ref in bibrefs:
-                name = run_sql("select value from %s where tag='%s' and id='%s'" %
-                                (table[1], table[2], str(ref[0])))
+                sqlstr = "select value from %s where tag='%s' and id=" % (table[1], table[2])
+                name = run_sql(sqlstr+"%s", (str(ref[0]),))
                 if len(name) >= 1:
                     update_authornames_tables(name[0][0], table[3] + ':' + str(ref[0]))
 
@@ -490,7 +490,7 @@ def populate_authornames():
                 if not authornames_is_empty:
 #                    Find duplicates in the database and append id if
 #                    duplicate is found
-                    authorexists = run_sql("SELECT * FROM aidAUTHORNAMES "
+                    authorexists = run_sql("SELECT id,Name,bibrefs,db_name FROM aidAUTHORNAMES "
                                            "WHERE db_name = %s", (authorname,))
 
                 bibrefs = "%s:%s" % (table_number, i[0])
@@ -810,9 +810,9 @@ def write_mem_cache_to_tables(sanity_checks=False):
 
     if sanity_checks:
         if va_mem_data:
-            check_on_va = run_sql("SELECT * FROM aidVIRTUALAUTHORSDATA "
+            check_on_va = run_sql("SELECT id,virtualauthorID,tag,value FROM aidVIRTUALAUTHORSDATA "
                                   "WHERE tag='orig_authorname_id' AND "
-                                  "value=%s" % (va_mem_data))
+                                  "value=%s" , (va_mem_data,))
 
             if check_on_va:
                 bconfig.LOGGER.error("Sanity check reported that the data "
@@ -992,9 +992,9 @@ def write_mem_cache_to_tables(sanity_checks=False):
 
     if sanity_checks:
         if va_mem_data:
-            check_on_va = run_sql("SELECT * FROM aidVIRTUALAUTHORSDATA "
+            check_on_va = run_sql("SELECT id,virtualauthorID,tag,value FROM aidVIRTUALAUTHORSDATA "
                                   "WHERE tag='orig_authorname_id' AND "
-                                  "value=%s" % (va_mem_data,))
+                                  "value=%s" , (va_mem_data,))
 
             if not check_on_va:
                 bconfig.LOGGER.error("Sanity check reported that no data "
