@@ -234,6 +234,16 @@ class TestQueryParser(unittest.TestCase):
         self._check("title:/(one|two)/", '', None,
                     [['+', '(one|two)', 'title', 'r']])
 
+    def test_parsing_structured_regexp_marc_query(self):
+        "search engine - parsing structured regexp MARC query"
+        self._check("245__a:/(one|two)/", '', None,
+                    [['+', '(one|two)', '245__a', 'r']])
+
+    def test_parsing_structured_regexp_refersto_query(self):
+        "search engine - parsing structured regexp refersto query"
+        self._check("refersto:/(one|two)/", '', None,
+                    [['+', '(one|two)', 'refersto', 'r']])
+
     def test_parsing_combined_structured_query_in_a_field(self):
         "search engine - parsing structured query in a field"
         self._check("title:muon author:ellis", 'abstract', None,
