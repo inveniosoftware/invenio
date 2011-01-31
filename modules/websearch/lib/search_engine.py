@@ -691,15 +691,15 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                         opfts.append([oi, "%" + pi + "%", fi, 'a'])
                     else: # unbalanced quotes, so fall back to WRD query:
                         opfts.append([oi, pi, fi, 'w'])
+                elif pi.startswith('/') and pi.endswith('/'):
+                    # B3b - pi has slashes around => do regexp search
+                    opfts.append([oi, pi[1:-1], fi, 'r'])
                 elif fi and str(fi[0]).isdigit() and str(fi[0]).isdigit():
-                    # B3b - fi exists and starts by two digits => do ACC search
+                    # B3c - fi exists and starts by two digits => do ACC search
                     opfts.append([oi, pi, fi, 'a'])
                 elif fi and not get_index_id_from_field(fi) and get_field_name(fi):
-                    # B3c - logical field fi exists but there is no WRD index for fi => try ACC search
+                    # B3d - logical field fi exists but there is no WRD index for fi => try ACC search
                     opfts.append([oi, pi, fi, 'a'])
-                elif pi.startswith('/') and pi.endswith('/'):
-                    # B3d - pi has slashes around => do regexp search
-                    opfts.append([oi, pi[1:-1], fi, 'r'])
                 else:
                     # B3e - general case => do WRD search
                     pi = strip_accents(pi) # strip accents for 'w' mode, FIXME: delete when not needed

@@ -1295,12 +1295,9 @@ class WebSearchMARCQueryTest(unittest.TestCase):
 
     def test_single_marc_tag_regexp_query(self):
         """websearch - single MARC tag, regexp query"""
-        # NOTE: regexp queries for physical MARC tags (e.g. 245:/and/)
-        # are not treated by the search engine by purpose.  But maybe
-        # we should support them?!
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%2Fand%2F',
-                                               expected_text="[]"))
+                                               expected_text="[1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 91, 96]"))
 
 class WebSearchExtSysnoQueryTest(unittest.TestCase):
     """Test of queries using external system numbers."""
