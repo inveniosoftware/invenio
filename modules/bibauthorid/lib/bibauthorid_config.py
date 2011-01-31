@@ -73,7 +73,7 @@ PERSONID_UPFA_PPLMF = -1
 
 
 #Tables Utils debug output
-TABLES_UTILS_DEBUG = True
+TABLES_UTILS_DEBUG = False
 
 # Is the authorid algorithm allowed to attach a virtual author to multiple
 # real authors in the last run of the orphan processing?
@@ -81,7 +81,7 @@ ATTACH_VA_TO_MULTIPLE_RAS = False
 # Log Level for the message output.
 # Log Levels are defined in the Python logging system
 # 0 - 50 (log everything - log exceptions)
-LOG_LEVEL = 25
+LOG_LEVEL = 30
 
 # Default logging file name
 LOG_FILENAME = "job.log"
@@ -137,6 +137,8 @@ DEFAULT_HANDLER.setLevel(logging.CRITICAL)
 ## of type logging.
 LOGGER = logging.getLogger("Dummy")
 LOGGER.addHandler(DEFAULT_HANDLER)
+LOGGER.setLevel(LOG_LEVEL)
+
 
 if not LOGGERS:
     LOGGERS.append(logging.getLogger("Dummy"))

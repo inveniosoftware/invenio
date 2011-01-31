@@ -150,7 +150,7 @@ def _task_submit_elaborate_specific_parameter(key, value, opts, args):
     if key in ("-n", "--lastname"):
         if value == "None," or value == "None":
             bibtask.write_message("The value specified for --lastname must "
-                "be a valid name. Not '%s'." % value, stream=sys.stderr,
+                "be a valid name. Not '%s'." % value, stream=sys.stdout,
                 verbose=0)
             return False
 
@@ -209,27 +209,27 @@ def _task_run_core():
 
     if lastname:
         bibtask.write_message("Processing last name %s" % (lastname),
-                              stream=sys.stderr, verbose=0)
+                              stream=sys.stdout, verbose=0)
 
     if process_all:
         if bconfig.STANDALONE:
             bibtask.write_message("Processing not possible in standalone!",
-                                  stream=sys.stderr, verbose=0)
+                                  stream=sys.stdout, verbose=0)
             return 0
 
         bibtask.write_message("Processing all names...",
-                              stream=sys.stderr, verbose=0)
+                              stream=sys.stdout, verbose=0)
 
         lengths = get_len_authornames_bibrefs()
 
         if not check_and_create_aid_tables():
             bibtask.write_message("Failed to create database tables!",
-                                  stream=sys.stderr, verbose=0)
+                                  stream=sys.stdout, verbose=0)
             return 0
 
         if lengths['names'] < 1:
             bibtask.write_message("Populating Authornames table. It's Empty.",
-                                  stream=sys.stderr, verbose=0)
+                                  stream=sys.stdout, verbose=0)
             bibtask.task_update_progress('Populating Authornames table.')
             populate_authornames()
             insert_user_log('daemon', '-1', 'UATFP', 'bibsched', 'status',
@@ -239,7 +239,7 @@ def _task_run_core():
 
         if lengths['bibrefs'] < 1:
             bibtask.write_message("Populating Bibrefs lookup. It's Empty.",
-                                  stream=sys.stderr, verbose=0)
+                                  stream=sys.stdout, verbose=0)
             bibtask.task_update_progress('Populating Bibrefs lookup table.')
             populate_authornames_bibrefs_from_authornames()
 
@@ -255,7 +255,7 @@ def _task_run_core():
 
     if prepare_grid:
         bibtask.write_message("Preparing Grid Job",
-                              stream=sys.stderr, verbose=0)
+                              stream=sys.stdout, verbose=0)
         data_dir_name = "grid_data"
         workdir_prefix = "job"
         max_records = 4000
@@ -274,42 +274,42 @@ def _task_run_core():
     if load_grid:
         bibtask.write_message("Reading Grid Job results and will write"
                               " them to the database.",
-                              stream=sys.stderr, verbose=0)
+                              stream=sys.stdout, verbose=0)
 
         _write_data_files_to_db(data_dir)
 
     if update or update_cache:
         bibtask.write_message("update-cache: Processing recently updated"
-                              " papers", stream=sys.stderr, verbose=0)
+                              " papers", stream=sys.stdout, verbose=0)
         bibtask.task_update_progress('update-cache: Processing recently'
                                      ' updated papers')
         _run_update_authornames_tables_from_paper()
         bibtask.write_message("update-cache: Finished processing papers",
-                              stream=sys.stderr, verbose=0)
+                              stream=sys.stdout, verbose=0)
         bibtask.task_update_progress('update-cache: DONE')
 
     if update:
         bibtask.write_message("updating authorid universe",
-                              stream=sys.stderr, verbose=0)
+                              stream=sys.stdout, verbose=0)
         bibtask.task_update_progress('updating authorid universe')
         _update_authorid_universe()
         bibtask.write_message("done updating authorid universe",
-                              stream=sys.stderr, verbose=0)
+                              stream=sys.stdout, verbose=0)
         bibtask.task_update_progress('done updating authorid universe')
 
     if clean_cache:
         bibtask.write_message("clean-cache: Processing recently updated"
-                              " papers", stream=sys.stderr, verbose=0)
+                              " papers", stream=sys.stdout, verbose=0)
         bibtask.task_update_progress('clean-cache: Processing recently updated'
                                      ' papers for names')
         _run_authornames_tables_gc()
         bibtask.write_message("update-cache: Finished cleaning authornames "
-                              "tables", stream=sys.stderr, verbose=0)
+                              "tables", stream=sys.stdout, verbose=0)
         bibtask.task_update_progress('clean-cache: Processing recently updated'
                                      ' papers for persons')
         _run_update_personID_table_from_paper()
         bibtask.write_message("update-cache: Finished cleaning PersonID"
-                              " table", stream=sys.stderr, verbose=0)
+                              " table", stream=sys.stdout, verbose=0)
         bibtask.task_update_progress('clean-cache: DONE')
 
     return 1
@@ -338,23 +338,23 @@ def _task_submit_check_options():
         and not update_cache):
         bibtask.write_message("ERROR: One of the options -a, -n, -U, -G, -R, "
                               "--clean-cache, --update-cache is"
-                              " required!", stream=sys.stderr, verbose=0)
+                              " required!", stream=sys.stdout, verbose=0)
         return False
     elif not (bool(lastname) ^ bool(process_all) ^ bool(update)
               ^ bool(prepare_grid) ^ bool(load_grid) ^ bool(clean_cache)
               ^ bool(update_cache)):
         bibtask.write_message("ERROR: Options -a -n -U -R -G --clean-cache "
                               "--update-cache are mutually"
-                              " exclusive!", stream=sys.stderr, verbose=0)
+                              " exclusive!", stream=sys.stdout, verbose=0)
         return False
     elif ((not prepare_grid and (data_dir or prefix or max_records)) and
           (not load_grid and (data_dir))):
         bibtask.write_message("ERROR: The options -d, -m and -p require -G or "
-                              "-R to run!", stream=sys.stderr, verbose=0)
+                              "-R to run!", stream=sys.stdout, verbose=0)
         return False
     elif load_grid and not bool(data_dir):
         bibtask.write_message("ERROR: The option -R requires the option -d "
-                              "to run!", stream=sys.stderr, verbose=0)
+                              "to run!", stream=sys.stdout, verbose=0)
         return False
 
     return True
@@ -374,13 +374,13 @@ def _write_data_files_to_db(data_dir_name):
 
     if not data_dir_name:
         bibtask.write_message("Data directory not specified. Task failed.",
-                              stream=sys.stderr, verbose=0)
+                              stream=sys.stdout, verbose=0)
         return False
 
     if not osp.isdir(data_dir_name):
         bibtask.write_message("Specified Data directory is not a directory. "
                               "Task failed.",
-                              stream=sys.stderr, verbose=0)
+                              stream=sys.stdout, verbose=0)
         return False
 
     job_dirs = os.listdir(data_dir_name)
@@ -395,14 +395,14 @@ def _write_data_files_to_db(data_dir_name):
         if not osp.isdir(job_dir):
             bibtask.write_message("This is not a directory and therefore "
                                   "skipped: %s." % job_dir,
-                              stream=sys.stderr, verbose=0)
+                              stream=sys.stdout, verbose=0)
             continue
 
         results_dir = "%s/results/" % (job_dir,)
 
         if not osp.isdir(results_dir):
             bibtask.write_message("No result set found in %s"
-                                  % (results_dir,), stream=sys.stderr,
+                                  % (results_dir,), stream=sys.stdout,
                                   verbose=0)
             continue
 
@@ -412,7 +412,7 @@ def _write_data_files_to_db(data_dir_name):
 
         if not osp.isfile(logfile):
             bibtask.write_message("No log file found in %s" % (job_dir,),
-                                  stream=sys.stderr, verbose=0)
+                                  stream=sys.stdout, verbose=0)
             continue
 
         try:
@@ -422,7 +422,7 @@ def _write_data_files_to_db(data_dir_name):
 
         if logfile_lastline.count("Finish! The computation finished in") < 1:
             bibtask.write_message("Log file indicates broken results for %s"
-                                  % (job_dir,), stream=sys.stderr, verbose=0)
+                                  % (job_dir,), stream=sys.stdout, verbose=0)
             continue
 
         correct_files = set(['realauthors.dat',
@@ -441,7 +441,7 @@ def _write_data_files_to_db(data_dir_name):
         if not correct_files.issubset(set(result_files)):
             bibtask.write_message("Reults folder does not hold the "
                                   "correct files: %s" % (results_dir,),
-                                  stream=sys.stderr, verbose=0)
+                                  stream=sys.stdout, verbose=0)
             continue
 
         bibtask.task_update_progress('Loading job %s of %s: %s'
@@ -450,11 +450,11 @@ def _write_data_files_to_db(data_dir_name):
         if (populate_structs_from_files(results_dir, results=True) and
             write_mem_cache_to_tables(sanity_checks=True)):
             bibtask.write_message("All Done.",
-                                  stream=sys.stderr, verbose=0)
+                                  stream=sys.stdout, verbose=0)
         else:
             bibtask.write_message("Could not write data to the tables from %s"
                                   % (results_dir,),
-                                  stream=sys.stderr, verbose=0)
+                                  stream=sys.stdout, verbose=0)
 
 
 def _prepare_data_files_from_db(data_dir_name="grid_data",
@@ -499,9 +499,9 @@ def _prepare_data_files_from_db(data_dir_name="grid_data",
     except ValueError:
         max_records = 4000
 
-    bibtask.write_message("Loading last names", stream=sys.stderr, verbose=0)
+    bibtask.write_message("Loading last names", stream=sys.stdout, verbose=0)
     bibtask.write_message("Limiting files to %s records" % (max_records,),
-                          stream=sys.stderr, verbose=0)
+                          stream=sys.stdout, verbose=0)
     bibtask.task_update_progress('Loading last names...')
 
     last_names = find_all_last_names()
@@ -513,7 +513,7 @@ def _prepare_data_files_from_db(data_dir_name="grid_data",
     total = len(last_names)
     status = 1
     bibtask.write_message("Done. Loaded %s last names."
-                          % (total), stream=sys.stderr, verbose=0)
+                          % (total), stream=sys.stdout, verbose=0)
     job_id = 0
     data_dir = ""
 
@@ -530,7 +530,7 @@ def _prepare_data_files_from_db(data_dir_name="grid_data",
     while True:
         if last_name_queue.empty():
             bibtask.write_message("Done with all names.",
-                                    stream=sys.stderr, verbose=0)
+                                    stream=sys.stdout, verbose=0)
             break
 
         lname = last_name_queue.get()
@@ -540,7 +540,7 @@ def _prepare_data_files_from_db(data_dir_name="grid_data",
                                      % (status, total, lname))
         bibtask.write_message(("Processing: %s (%d/%d).")
                                     % (lname, status, total),
-                                    stream=sys.stderr, verbose=0)
+                                    stream=sys.stdout, verbose=0)
 
         populate_doclist_for_author_surname(lname)
 
@@ -566,7 +566,7 @@ def _prepare_data_files_from_db(data_dir_name="grid_data",
             bibtask.write_message(("-> Removed %s entries from the "
                                     + "computation list: %s")
                                     % (removed, removed_names),
-                                    stream=sys.stderr, verbose=0)
+                                    stream=sys.stdout, verbose=0)
             total -= removed
 
         if len(dat.RELEVANT_RECORDS) >= max_records:
@@ -647,12 +647,12 @@ def _update_authorid_universe():
                     comment='bibauthorid_daemon, update_authorid_universe',
                     timestamp=last_update_time[0][0])
         bibtask.write_message("Update authorid will operate on %s records."
-                              % (len(recently_modified)), stream=sys.stderr,
+                              % (len(recently_modified)), stream=sys.stdout,
                               verbose=0)
 
         if not recently_modified:
             bibtask.write_message("Update authorid: Nothing to do",
-                                  stream=sys.stderr, verbose=0)
+                                  stream=sys.stdout, verbose=0)
             return
 
         for rec in recently_modified:
@@ -661,7 +661,7 @@ def _update_authorid_universe():
 
     else:
         bibtask.write_message("Update authorid: Nothing to do",
-                              stream=sys.stderr, verbose=0)
+                              stream=sys.stdout, verbose=0)
         return
 
     authors = []
@@ -669,7 +669,7 @@ def _update_authorid_universe():
 
     bibtask.task_update_progress('Reading authors from updated records')
     bibtask.write_message("Reading authors from updated records",
-                                stream=sys.stderr, verbose=0)
+                                stream=sys.stdout, verbose=0)
     updated_ras = set()
 
     # get all authors from all updated records
@@ -710,7 +710,7 @@ def _update_authorid_universe():
         bibtask.write_message('Processing %s of %s cluster: "%s" '
                               '(%s authors)'
                               % (status + 1, total_lnames, author_last_name,
-                                 total_authors), stream=sys.stderr, verbose=0)
+                                 total_authors), stream=sys.stdout, verbose=0)
         dat.reset_mem_cache(True)
         init_authornames(author_last_name)
         load_mem_cache_from_tables()
@@ -820,7 +820,7 @@ def _write_to_files(work_dir, job_lnames):
     bibtask.write_message("Writing cluster with %s entries to "
                           "files in %s"
                           % (len(dat.RELEVANT_RECORDS), work_dir,),
-                            stream=sys.stderr, verbose=0)
+                            stream=sys.stdout, verbose=0)
 
     if not os.path.exists(work_dir):
         os.mkdir(work_dir)
@@ -840,7 +840,7 @@ def _run_update_authornames_tables_from_paper():
         #select only the most recent papers
         recently_modified, min_date = get_papers_recently_modified(date=last_log[0][2])
         insert_user_log('daemon', '-1', 'UATFP', 'bibsched', 'status', comment='bibauthorid_daemon, update_authornames_tables_from_paper', timestamp=min_date[0][0])
-        bibtask.write_message("update_authornames_tables_from_paper: Running on: " + str(recently_modified), stream=sys.stderr, verbose=0)
+        bibtask.write_message("update_authornames_tables_from_paper: Running on: " + str(recently_modified), stream=sys.stdout, verbose=0)
         update_authornames_tables_from_paper(recently_modified)
     else:
         #this is the first time the utility is run, run on all the papers?
@@ -848,7 +848,7 @@ def _run_update_authornames_tables_from_paper():
         #@todo: authornames population writes the log
         recently_modified, min_date = get_papers_recently_modified()
         insert_user_log('daemon', '-1', 'UATFP', 'bibsched', 'status', comment='bibauthorid_daemon, update_authornames_tables_from_paper', timestamp=min_date[0][0])
-        bibtask.write_message("update_authornames_tables_from_paper: Running on: " + str(recently_modified), stream=sys.stderr, verbose=0)
+        bibtask.write_message("update_authornames_tables_from_paper: Running on: " + str(recently_modified), stream=sys.stdout, verbose=0)
         update_authornames_tables_from_paper(recently_modified)
 
 
@@ -865,14 +865,14 @@ def _run_update_personID_table_from_paper():
         #select only the most recent papers
         recently_modified, min_date = get_papers_recently_modified(date=last_log[0][2])
         insert_user_log('daemon', '-1', 'UPITFP', 'bibsched', 'status', comment='bibauthorid_daemon, update_personID_table_from_paper', timestamp=min_date[0][0])
-        bibtask.write_message("update_personID_table_from_paper: Running on: " + str(recently_modified), stream=sys.stderr, verbose=0)
+        bibtask.write_message("update_personID_table_from_paper: Running on: " + str(recently_modified), stream=sys.stdout, verbose=0)
         update_personID_table_from_paper(recently_modified)
     else:
         # Should not process all papers, hence authornames population writes
         # the appropriate log. In case the log is missing, process everything.
         recently_modified, min_date = get_papers_recently_modified()
         insert_user_log('daemon', '-1', 'UPITFP', 'bibsched', 'status', comment='bibauthorid_daemon, update_personID_table_from_paper', timestamp=min_date[0][0])
-        bibtask.write_message("update_personID_table_from_paper: Running on: " + str(recently_modified), stream=sys.stderr, verbose=0)
+        bibtask.write_message("update_personID_table_from_paper: Running on: " + str(recently_modified), stream=sys.stdout, verbose=0)
         update_personID_table_from_paper(recently_modified)
     # @todo: develop a method that removes the respective VAs from the database
     # as well since no reference will be there for them any longer. VAs can be
