@@ -40,7 +40,7 @@ from invenio.config import \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE
 from invenio.messages import gettext_set_language, language_list_long
-from invenio.search_engine import HitSet, search_pattern, get_creation_date, get_field_i18nname, collection_restricted_p
+from invenio.search_engine import HitSet, search_pattern, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records
 from invenio.dbquery import run_sql, Error, get_table_update_time
 from invenio.bibrank_record_sorter import get_bibrank_methods
 from invenio.dateutils import convert_datestruct_to_dategui
@@ -420,20 +420,45 @@ class Collection:
             # firstly, get last 'rg' records:
             recIDs = list(self.reclist)
 
-            # FIXME: temporary hack in order to display tweaked latest
-            # additions box for some CERN collections:
+            # CERN hack begins: tweak latest additions for selected collections:
             if CFG_CERN_SITE:
+                # alter recIDs list for some CERN collections:
                 this_year = time.strftime("%Y", time.localtime())
-                if self.name in ['CERN Yellow Reports']:
+                if self.name in ['CERN Yellow Reports','Videos']:
                     last_year = str(int(this_year) - 1)
                     # detect recIDs only from this and past year:
                     recIDs = list(self.reclist & \
                                   search_pattern(p='year:%s or year:%s' % \
                                                  (this_year, last_year)))
-                elif self.name in ['Videos']:
+                elif self.name in ['VideosXXX']:
                     # detect recIDs only from this year:
                     recIDs = list(self.reclist & \
                                   search_pattern(p='year:%s' % this_year))
+                elif self.name == 'CMS Physics Analysis Summaries' and \
+                         1281585 in self.reclist:
+                    # REALLY, REALLY temporary hack
+                    recIDs = list(self.reclist)
+                    recIDs.remove(1281585)
+                # apply special filters:
+                if self.name in ['Videos']:
+                    # select only videos with movies:
+                    from invenio.intbitset import intbitset
+                    recIDs = list(intbitset(recIDs) & \
+                                  search_pattern(p='collection:"PUBLVIDEOMOVIE"'))
+                # sort some CERN collections specially:
+                if self.name in ['Videos',
+                                 'Video Clips',
+                                 'Video Movies',
+                                 'Video News',
+                                 'Video Rushes',
+                                 'Webcast',
+                                 'ATLAS Videos',
+                                 'Restricted Video Movies',
+                                 'Restricted Video Rushes',
+                                 'LHC First Beam Videos',
+                                 'CERN openlab Videos']:
+                    recIDs = sort_records(None, recIDs, '269__c')
+            # CERN hack ends.
 
             total = len(recIDs)
             to_display = min(rg, total)
@@ -458,9 +483,10 @@ class Collection:
             # do not show latest additions box
             return ""
 
-        # FIXME: temporary hack in order not to display latest
-        # additions box for some CERN collections:
-        if CFG_CERN_SITE and self.name in ['Periodicals', 'Electronic Journals']:
+        # CERN hack: do not display latest additions for some CERN collections:
+        if CFG_CERN_SITE and self.name in ['Periodicals', 'Electronic Journals',
+                                           'Press Office Photo Selection',
+                                           'Press Office Video Selection']:
             return ""
 
         try:
