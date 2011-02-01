@@ -161,7 +161,7 @@ def assemble_caption(begin_line, begin_index, end_line, end_index, lines):
     # clean out characters not allowed in MARCXML
     # not allowed: & < >
     try:
-        caption = encode_for_xml(caption.encode('utf-8', 'xmlcharrefreplace'), wash = True)
+        caption = encode_for_xml(caption.encode('utf-8', 'xmlcharrefreplace'), wash=True)
     except: # that damn encode thing threw an error on astro-ph/0601014
         sys.stderr.write(caption)
         sys.stderr.write(' cannot be processed\n')
@@ -332,7 +332,7 @@ def create_MARC(extracted_image_data, tarball, refno):
     marcxml.append('</record>')
     return '\n'.join(marcxml)
 
-def get_image_location(image, sdir, image_list, recurred = False):
+def get_image_location(image, sdir, image_list, recurred=False):
     """
     This function takes a raw image name and a directory and returns the location of the
     (possibly converted) image
@@ -446,17 +446,17 @@ def get_image_location(image, sdir, image_list, recurred = False):
 
     # agh, this calls for drastic measures
     for piece in image.split(' '):
-        res = get_image_location(piece, sdir, image_list, recurred = True)
+        res = get_image_location(piece, sdir, image_list, recurred=True)
         if res != None:
             return res
 
     for piece in image.split(','):
-        res = get_image_location(piece, sdir, image_list, recurred = True)
+        res = get_image_location(piece, sdir, image_list, recurred=True)
         if res != None:
             return res
 
     for piece in image.split('='):
-        res = get_image_location(piece, sdir, image_list, recurred = True)
+        res = get_image_location(piece, sdir, image_list, recurred=True)
         if res != None:
             return res
 
@@ -492,7 +492,7 @@ def get_converted_image_name(image):
 
     return os.path.join(img_dir, converted_image)
 
-def get_tex_location(new_tex_name, current_tex_name, recurred = False):
+def get_tex_location(new_tex_name, current_tex_name, recurred=False):
     """
     Takes the name of a TeX file and attempts to match it to an actual file
     in the tarball.
@@ -556,6 +556,6 @@ def get_tex_location(new_tex_name, current_tex_name, recurred = False):
 
     if tex_location == None and not recurred:
         return get_tex_location(new_tex_name + '.tex', current_tex_name, \
-                                recurred = True)
+                                recurred=True)
 
     return tex_location

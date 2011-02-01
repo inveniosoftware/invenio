@@ -227,28 +227,28 @@ class TestIntelligentlyFindFilenames(unittest.TestCase):
         """plotextractor - intelligently_find_filenames simple"""
         line = 'file.eps'
 
-        filenames = intelligently_find_filenames(line, ext = True)
+        filenames = intelligently_find_filenames(line, ext=True)
         self.assertTrue(filenames == ['file.eps'], 'didn\'t find correct filenames')
 
     def test_ext_test(self):
         """plotextractor - intelligently_find_filenames extension"""
         line = 'file.eps file2'
 
-        filenames = intelligently_find_filenames(line, ext = True)
+        filenames = intelligently_find_filenames(line, ext=True)
         self.assertTrue(filenames == ['file.eps'], 'didn\'t look for extension')
 
     def test_tex_test(self):
         """plotextractor - intelligently_find_filenames TeX extension"""
         line = 'file.eps file2.tex'
 
-        filenames = intelligently_find_filenames(line, TeX = True)
+        filenames = intelligently_find_filenames(line, TeX=True)
         self.assertTrue(filenames == ['file.eps', 'file2.tex'], 'not looking for TeX ext')
 
     def test_file_equals_test(self):
         """plotextractor - intelligently_find_filenames equals"""
         line = 'file=something.eps'
 
-        filenames = intelligently_find_filenames(line, ext = True)
+        filenames = intelligently_find_filenames(line, ext=True)
         self.assertTrue(filenames == ['something.eps', 'file=something.eps'], \
                         'didn\'t catch file=')
 
@@ -264,7 +264,7 @@ class TestIntelligentlyFindFilenames(unittest.TestCase):
         """plotextractor - intelligently_find_filenames lots of filenames"""
         line = '[file.pstex]figure=something.eps,haha,anotherthing.ps'
 
-        filenames = intelligently_find_filenames(line, ext = True)
+        filenames = intelligently_find_filenames(line, ext=True)
         self.assertTrue('file.pstex' in filenames, 'didn\'t look in brackets')
         self.assertTrue('something.eps' in filenames, 'didn\'t find figure=')
         self.assertTrue('anotherthing.ps' in filenames, 'didn\'t find filename')

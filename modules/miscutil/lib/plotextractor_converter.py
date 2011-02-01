@@ -47,7 +47,7 @@ def untar(original_tarball, sdir):
         run_shell_command('rm %s', (tarball,))
         return ([], [], None)
     dummy1, cmd_out, cmd_err = run_process_with_timeout('tar xvf %s -C %s' %
-                                                        (tarball, sdir), shell = True)
+                                                        (tarball, sdir), shell=True)
 
     if cmd_err != '':
         return ([], [], None)
@@ -184,7 +184,7 @@ def convert_images(image_list):
             try:
                 dummy1, cmd_out, cmd_err = run_process_with_timeout('convert %s %s'\
                                                    % (image_file, \
-                                                      converted_image_file), shell = True)
+                                                      converted_image_file), shell=True)
                 if cmd_err == '':
                     ret_list.append(converted_image_file)
                 else:
@@ -206,7 +206,7 @@ def extract_text(tarball):
     try:
         os.stat(tarball + '.pdf')
         dummy1, dummy2, cmd_err = run_process_with_timeout('pdftotext %s %s' % \
-                                     (tarball + '.pdf ', tarball + '.txt'), shell = True)
+                                     (tarball + '.pdf ', tarball + '.txt'), shell=True)
         if cmd_err != '':
             return - 1
         write_message('generated ' + tarball + '.txt from ' + tarball + '.pdf')

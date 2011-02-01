@@ -178,16 +178,16 @@ def main():
         sys.exit(1)
 
     if squash:
-        squash_fd, squash_path = mkstemp(suffix = "_" + time.strftime("%Y%m%d%H%M%S") + ".xml", \
-                                  prefix = "plotextractor_", dir = sdir)
+        squash_fd, squash_path = mkstemp(suffix="_" + time.strftime("%Y%m%d%H%M%S") + ".xml", \
+                                  prefix="plotextractor_", dir=sdir)
         os.write(squash_fd, '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n')
         os.close(squash_fd)
 
     for tarball in tars_and_gzips:
-        process_single(tarball, sdir = sdir, xtract_text = xtract_text, \
-                       upload_plots = upload_plots, force = force, squash = squash_path, \
-                       yes_i_know = yes_i_know, refno_url = refno_url, \
-                       clean = clean)
+        process_single(tarball, sdir=sdir, xtract_text=xtract_text, \
+                       upload_plots=upload_plots, force=force, squash=squash_path, \
+                       yes_i_know=yes_i_know, refno_url=refno_url, \
+                       clean=clean)
     if squash:
         squash_fd = open(squash_path, "a")
         squash_fd.write("</collection>\n")
@@ -196,10 +196,10 @@ def main():
         if upload_plots:
             upload_to_site(squash_path, yes_i_know)
 
-def process_single(tarball, sdir = CFG_TMPDIR, xtract_text = False, \
-                   upload_plots = False, force = False, squash = "", \
-                   yes_i_know = False, refno_url = "", \
-                   clean = False):
+def process_single(tarball, sdir=CFG_TMPDIR, xtract_text=False, \
+                   upload_plots=False, force=False, squash="", \
+                   yes_i_know=False, refno_url="", \
+                   clean=False):
     """
     Processes one tarball end-to-end.
 
@@ -354,7 +354,7 @@ def get_reference_number(tarball, refno_url):
             else:
                 arXiv_record = tarball
 
-            result = server.search(p = prefix + arXiv_record, of = 'id')
+            result = server.search(p=prefix + arXiv_record, of='id')
 
             if len(result) == 0:
                 return None
@@ -364,7 +364,7 @@ def get_reference_number(tarball, refno_url):
         arXiv_record = re.findall('(([a-zA-Z\\-]+/\\d+)|(\\d+\\.\\d+))', tarball)
         if len(arXiv_record) > 1:
             arXiv_record = arXiv_record[0]
-            result = server.search(p = prefix + arXiv_record, of = 'id')
+            result = server.search(p=prefix + arXiv_record, of='id')
 
             if len(result) > 0:
                 return str(result[0])
@@ -374,7 +374,7 @@ def get_reference_number(tarball, refno_url):
                                   tarball_mod)
         if len(arXiv_record) > 1:
             arXiv_record = arXiv_record[0]
-            result = server.search(p = prefix + arXiv_record, of = 'id')
+            result = server.search(p=prefix + arXiv_record, of='id')
 
             if len(result) > 0:
                 return str(result[0])
@@ -408,13 +408,13 @@ def rotate_image(filename, line, sdir, image_list):
     degrees = str(0 - int(degrees))
 
     dummy, dummy, cmd_err = run_process_with_timeout('mogrify -rotate %s %s' % \
-                                                     (degrees, file_loc), shell = True)
+                                                     (degrees, file_loc), shell=True)
     if cmd_err != '':
         return True
     else:
         return True
 
-def get_context(lines, backwards = False):
+def get_context(lines, backwards=False):
     """
     Given a relevant string from a TeX file, this function will extract text
     from it as far as it is deemed contextually relevant, either backwards or forwards
@@ -500,7 +500,7 @@ def extract_context(tex_file, extracted_image_data):
 
         # Generate a list of index tuples for all matches
         indicies = [match.span() \
-                    for match in re.finditer(r"(\\(?:fig|ref)\{" + label + "\})", \
+                    for match in re.finditer(r"(\\(?:fig|ref)\{%s\})" % (re.escape(label),), \
                                                           lines)]
         for startindex, endindex in indicies:
             # Retrive all lines before label until beginning of file
@@ -509,7 +509,7 @@ def extract_context(tex_file, extracted_image_data):
                 text_before = lines[:startindex]
             else:
                 text_before = lines[i:startindex]
-            context_before = get_context(text_before, backwards = True)
+            context_before = get_context(text_before, backwards=True)
 
             # Retrive all lines from label until end of file and get context
             i = endindex + CFG_PLOTEXTRACTOR_CONTEXT_EXTRACT_LIMIT
@@ -519,7 +519,7 @@ def extract_context(tex_file, extracted_image_data):
         new_image_data.append((image, caption, label, context_list))
     return new_image_data
 
-def extract_captions(tex_file, sdir, image_list, primary = True):
+def extract_captions(tex_file, sdir, image_list, primary=True):
     """
     Take the TeX file and the list of images in the tarball (which all,
     presumably, are used in the TeX file) and figure out which captions
@@ -642,18 +642,18 @@ def extract_captions(tex_file, sdir, image_list, primary = True):
                 ext = True
             else:
                 ext = False
-            filenames = intelligently_find_filenames(line, ext = ext,
-                                                     commas_okay = commas_okay)
+            filenames = intelligently_find_filenames(line, ext=ext,
+                                                     commas_okay=commas_okay)
 
             # try to look ahead!  sometimes there are better matches after
             if line_index < len(lines) - 1:
                 filenames.extend(\
                           intelligently_find_filenames(lines[line_index + 1],
-                                                      commas_okay = commas_okay))
+                                                      commas_okay=commas_okay))
             if line_index < len(lines) - 2:
                 filenames.extend(\
                           intelligently_find_filenames(lines[line_index + 2],
-                                                      commas_okay = commas_okay))
+                                                      commas_okay=commas_okay))
 
             for filename in filenames:
                 filename = str(filename)
@@ -674,14 +674,14 @@ def extract_captions(tex_file, sdir, image_list, primary = True):
         if index > -1:
             # which is the image associated to it?
             filenames = intelligently_find_filenames(line,
-                                                     commas_okay = commas_okay)
+                                                     commas_okay=commas_okay)
             # try the line after and the line before
             if line_index + 1 < len(lines):
                 filenames.extend(intelligently_find_filenames(lines[line_index + 1],
-                                                      commas_okay = commas_okay))
+                                                      commas_okay=commas_okay))
             if line_index > 1:
                 filenames.extend(intelligently_find_filenames(lines[line_index - 1],
-                                                      commas_okay = commas_okay))
+                                                      commas_okay=commas_okay))
 
             already_tried = []
             for filename in filenames:
@@ -721,8 +721,8 @@ def extract_captions(tex_file, sdir, image_list, primary = True):
         """
         index = line.find(input_head)
         if index > -1:
-            new_tex_names = intelligently_find_filenames(line, TeX = True, \
-                                                         commas_okay = commas_okay)
+            new_tex_names = intelligently_find_filenames(line, TeX=True, \
+                                                         commas_okay=commas_okay)
 
             for new_tex_name in new_tex_names:
                 if new_tex_name != 'ERROR':
@@ -731,7 +731,7 @@ def extract_captions(tex_file, sdir, image_list, primary = True):
                         extracted_image_data.extend(extract_captions(\
                                                       new_tex_file, sdir, \
                                                       image_list,
-                                                      primary = False))
+                                                      primary=False))
 
         """PICTURE"""
 
@@ -1112,7 +1112,7 @@ def put_it_together(cur_image, caption, context, extracted_image_data, line_inde
 
     return (cur_image, caption, extracted_image_data)
 
-def intelligently_find_filenames(line, TeX = False, ext = False, commas_okay = False):
+def intelligently_find_filenames(line, TeX=False, ext=False, commas_okay=False):
     """
     Find the filename in the line.  We don't support all filenames!  Just eps
     and ps for now.

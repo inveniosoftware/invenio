@@ -260,7 +260,7 @@ def tarballs_by_recids(recids, sdir):
 
     for recid in list_of_ids:
         rec = get_record(recid)
-        for afieldinstance in record_get_field_instances(rec, tag = '037'):
+        for afieldinstance in record_get_field_instances(rec, tag='037'):
             if 'arXiv' == field_get_subfield_values(afieldinstance, '9')[0]:
                 arXiv_id = field_get_subfield_values(afieldinstance, 'a')[0]
                 arXiv_ids.append(arXiv_id)

@@ -57,3 +57,4 @@ CFG_PLOTEXTRACTOR_CONTEXT_WORD_LIMIT = 75
 ## CFG_PLOTEXTRACTOR_CONTEXT_SENTENCE_LIMIT -- when extracting context of plots from
 ## TeX sources, this is the limitation of sentences in each direction. Default 2.
 CFG_PLOTEXTRACTOR_CONTEXT_SENTENCE_LIMIT = 2
+
