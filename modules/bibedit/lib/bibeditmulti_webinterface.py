@@ -211,6 +211,7 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
         """
         commands_list = []
 
+        upload_mode_replace = False
         for current_subfield in subfields:
 
             action = current_subfield["action"]
@@ -223,12 +224,11 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
                 condition_exact_match = True
             condition_subfield = current_subfield["conditionSubfield"]
 
-
-
             if action == self._subfield_action_types.add:
                 subfield_command = multi_edit_engine.AddSubfieldCommand(subfield_code, value, condition=condition, condition_exact_match=condition_exact_match, condition_subfield=condition_subfield)
             elif action == self._subfield_action_types.delete:
                 subfield_command = multi_edit_engine.DeleteSubfieldCommand(subfield_code, condition=condition, condition_exact_match=condition_exact_match, condition_subfield=condition_subfield)
+                upload_mode_replace = True
             elif action == self._subfield_action_types.replace_content:
                 subfield_command = multi_edit_engine.ReplaceSubfieldContentCommand(subfield_code, value, condition=condition, condition_exact_match=condition_exact_match, condition_subfield=condition_subfield)
             elif action == self._subfield_action_types.replace_text:
@@ -238,7 +238,7 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
 
             commands_list.append(subfield_command)
 
-        return commands_list
+        return commands_list, upload_mode_replace
 
 
     def _create_commands_list(self, commands_json_structure):
@@ -257,8 +257,9 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
             action = current_field["action"]
 
             subfields = current_field["subfields"]
-            subfield_commands = self._create_subfield_commands_list(subfields)
-
+            subfield_commands, upload_mode_replace = self._create_subfield_commands_list(subfields)
+            if upload_mode_replace:
+                upload_mode = '-r'
             # create appropriate command depending on the type
             if action == self._field_action_types.add:
                 command = multi_edit_engine.AddFieldCommand(tag, ind1, ind2, subfield_commands)
