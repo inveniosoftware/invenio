@@ -3269,7 +3269,12 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
             val = "" # will hold value for recID according to which sort
             vals = [] # will hold all values found in sorting tag for recID
             for tag in tags:
-                vals.extend(get_fieldvalues(recID, tag))
+                if CFG_CERN_SITE and tag == '773__c':
+                    # CERN hack: journal sorting
+                    # 773__c contains page numbers, e.g. 3-13, and we want to sort by 3, and numerically:
+                    vals.extend(["%050s" % x.split("-",1)[0] for x in get_fieldvalues(recID, tag)])
+                else:
+                    vals.extend(get_fieldvalues(recID, tag))
             if sort_pattern:
                 # try to pick that tag value that corresponds to sort pattern
                 bingo = 0
