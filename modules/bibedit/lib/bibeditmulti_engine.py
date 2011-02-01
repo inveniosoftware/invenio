@@ -432,7 +432,7 @@ def _get_record_diff(record_id, record, updated_record):
     updated_record_split = updated_record_marc.split('\n')[:-1]
     
     result = ''
-    if len(updated_record_split) == len(record_split):
+    if (len(updated_record_split) == len(record_split)) and (record.keys() == updated_record.keys()):
         for line_updated, line in itertools.izip(updated_record_split, record_split):
             line_updated_split = line_updated.split("$$")
             line_split = line.split("$$")
