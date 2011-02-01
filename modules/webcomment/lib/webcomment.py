@@ -123,6 +123,22 @@ def perform_request_display_comments_or_remarks(req, recID, display_order='od', 
     (valid, error_body) = check_recID_is_in_range(recID, warnings, ln)
     if not(valid):
         return (error_body, errors, warnings)
+
+    # CERN hack begins: filter out ATLAS comments
+    from invenio.config import CFG_CERN_SITE
+    if CFG_CERN_SITE:
+        restricted_comments_p = False
+        for report_number in  get_fieldvalues(recID, '088__a'):
+            if report_number.startswith("ATL-"):
+                restricted_comments_p = True
+                break
+        if restricted_comments_p:
+            err_code, err_msg = acc_authorize_action(uid, 'viewrestrcoll',
+                                                     collection='ATLAS Communications')
+            if err_code:
+                return (err_msg, errors, warnings)
+    # CERN hack ends
+
     # Query the database and filter results
     user_info = collect_user_info(uid)
     res = query_retrieve_comments_or_remarks(recID, display_order, display_since, reviews, user_info=user_info)
