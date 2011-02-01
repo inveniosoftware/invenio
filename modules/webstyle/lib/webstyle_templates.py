@@ -191,6 +191,7 @@ class Template:
                                    adminactivities_menu = adminactivities_menu,
                                    navtrailbox = navtrailbox,
                                    pageheaderadd = pageheaderadd,
+                                   uid=uid,
                                    secure_page_p = secure_page_p,
                                    navmenuid=navmenuid,
                                    rssurl=rssurl,
@@ -214,6 +215,7 @@ class Template:
     %(titleepilogue)s
     %(body)s
   </div>
+  <div class="clear"></div>
 </div>
 """ % {
   'boxlefttop' : boxlefttop,
