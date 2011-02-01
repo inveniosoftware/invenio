@@ -3665,7 +3665,7 @@ cal escriure:
    <p>Note also that these operators can be freely combined with
    regular metadata search.  For example, to find papers authored by
    Klebanov that are cited by Papadimitriou but that do not cite any
-   of Papadimitriou's papers themselves, type:</p>
+   of Papadimitriou's papers themselves, you can type:</p>
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -3678,6 +3678,22 @@ cal escriure:
       </blockquote>
       </form>
 
+   <p>Finally, you can make use of regexp-style quoting or
+   phrase-style quoting to combine search expressions in the same
+   refersto/citedby operand.  For example, to find papers that are
+   referring to only those I. Klebanov's papers that mention O(N) in
+   the title, you can type:</p>
+
+      <form action="<CFG_SITE_URL>/search" method="get">
+      <input type="hidden" name="ln" value="<lang:current />" />
+      <blockquote>
+      <input size="40" type="text" name="p" value="refersto:/author:&quot;Klebanov, I&quot; title:O(N)/" />
+      <select name="f"><option value="">_(any field)_</option>
+                       <option value="title">_(title)_</option>
+                       <option value="author">_(author)_</option></select>
+      <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+      </blockquote>
+      </form>
 </en>
 </lang>
 
