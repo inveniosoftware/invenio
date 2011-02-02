@@ -387,7 +387,6 @@ function displayProperSubfieldInformation(actionParentElement, actionType, displ
     actionParentElement.find(".valueParameters").hide();
     actionParentElement.find(".newValueParameters").hide();
     actionParentElement.find(".conditionParameters").hide();
-    actionParentElement.find(".conditionSubfieldParameters").hide();
 
     if (actionType == null){
         actionType = actionParentElement.find(".subfieldActionType").eq(0).val();
@@ -413,7 +412,6 @@ function displayProperSubfieldInformation(actionParentElement, actionType, displ
 
     if (displayCondition == 'true') {
         actionParentElement.find(".conditionParameters").show();
-        actionParentElement.find(".conditionSubfieldParameters").show();
     }
 
 }
@@ -435,7 +433,6 @@ function unbindControls(filter_field){
 function onActOnFieldsClick() {
     var parentElement = $(this).parents(".templateNewSubfield").eq(0);
     parentElement.find(".conditionParameters").show();
-    parentElement.find(".conditionSubfieldParameters").show();
     parentElement.find("#actOnFields").html('<u>Act on all fields</u>');
     parentElement.find("#actOnFields").attr('id', 'actOnFieldsRemove');
 
@@ -445,7 +442,6 @@ function onActOnFieldsClick() {
 function onActOnFieldsRemoveClick() {
     var parentElement = $(this).parents(".templateNewSubfield").eq(0);
     parentElement.find(".conditionParameters").hide();
-    parentElement.find(".conditionSubfieldParameters").hide();
     parentElement.find("#actOnFieldsRemove").html('<u>Apply only to specific field instances</u>');
     parentElement.find("#actOnFieldsRemove").attr('id', 'actOnFields');
 
@@ -657,7 +653,9 @@ function onButtonSaveNewSubfieldClick() {
     templateDisplaySubfield.find(".newValue").eq(0).text(currentSubfield.newValue);
     templateDisplaySubfield.find(".conditionExact").eq(0).text(conditionExactText);
     templateDisplaySubfield.find(".condition").eq(0).text(currentSubfield.condition);
-    templateDisplaySubfield.find(".conditionSubfield").eq(0).text(currentSubfield.conditionSubfield);
+    if (currentSubfield.conditionSubfield){
+        templateDisplaySubfield.find(".conditionSubfield").eq(0).text('$$' + currentSubfield.conditionSubfield);
+    }
 
     if (templateDisplaySubfield.find(".condition").eq(0).text() != 'condition') {
         displayProperSubfieldInformation(templateDisplaySubfield, currentSubfield.action, 'true');

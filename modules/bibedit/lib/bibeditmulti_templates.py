@@ -443,11 +443,10 @@ div .boxleft_2 {
         <span class="newValue newValueParameters">new value</span>
 
         <span class="conditionParameters"><strong> %(text_with_condition)s </strong></span>
+        <span class="conditionSubfield conditionSubfieldParameters"></span>
+
         <span class="conditionExact conditionParameters"></span>
         <span class="condition conditionParameters"></span>
-
-        <span class="conditionSubfieldParameters"><strong> %(text_with_condition_subfield)s </strong></span>
-        <span class="conditionSubfield conditionSubfieldParameters"></span>
 
     </td>
     <td/>
@@ -537,8 +536,7 @@ div .boxleft_2 {
               "text_replace_text" : _("Replace substring"),
               "text_replace_content" : _("Replace full content"),
               "text_with" : _("with"),
-              "text_with_condition": _("when field"),
-              "text_with_condition_subfield" : _("on subfield"),
+              "text_with_condition": _("when subfield"),
               "text_new_value" : _("new value"),
               "text_equal_to" : _("is equal to"),
               "text_contains" : _("contains"),
