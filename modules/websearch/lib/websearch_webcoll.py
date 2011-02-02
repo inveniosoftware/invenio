@@ -253,7 +253,7 @@ class Collection:
             col_desc = get_collection(row[1])
             # looking for loops
             if col_desc in descendants:
-                write_message("Loop found in collection %s" % self.namee, stream=sys.stderr)
+                write_message("Loop found in collection %s" % self.name, stream=sys.stderr)
                 raise OverflowError
             else:
                 descendants.append(col_desc)
