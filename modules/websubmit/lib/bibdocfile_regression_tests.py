@@ -245,7 +245,7 @@ class CheckBibDocAuthorization(unittest.TestCase):
         self.assertEqual(check_bibdoc_authorization(jekyll, 'role:thesesviewer'), (0, CFG_WEBACCESS_WARNING_MSGS[0]))
         self.assertEqual(check_bibdoc_authorization(jekyll, 'role: thesesviewer'), (0, CFG_WEBACCESS_WARNING_MSGS[0]))
         self.assertEqual(check_bibdoc_authorization(jekyll, 'role:  thesesviewer'), (0, CFG_WEBACCESS_WARNING_MSGS[0]))
-        self.assertNotEqual(check_bibdoc_authorization(jekyll, 'Role:  thesesviewer')[0], 0)
+        self.assertEqual(check_bibdoc_authorization(jekyll, 'Role:  thesesviewer'), (0, CFG_WEBACCESS_WARNING_MSGS[0]))
         self.assertEqual(check_bibdoc_authorization(jekyll, 'email: jekyll@cds.cern.ch'), (0, CFG_WEBACCESS_WARNING_MSGS[0]))
         self.assertEqual(check_bibdoc_authorization(jekyll, 'email: jekyll@cds.cern.ch'), (0, CFG_WEBACCESS_WARNING_MSGS[0]))
 

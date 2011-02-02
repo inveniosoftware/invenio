@@ -2797,7 +2797,7 @@ def check_bibdoc_authorization(user_info, status):
     def parse_status(status):
         g = _RE_STATUS_PARSER.match(status)
         if g:
-            return (g.group('type'), g.group('value'))
+            return (g.group('type').lower(), g.group('value'))
         else:
             return ('status', status)
     if acc_is_user_in_role(user_info, acc_get_role_id(SUPERADMINROLE)):
