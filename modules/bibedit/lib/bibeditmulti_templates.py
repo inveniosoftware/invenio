@@ -423,7 +423,23 @@ div .boxleft_2 {
         </td>
         <td />
     </tr>
-    </tbody>
+    <tr class="conditionParameters">
+        <td /> <td /> <td /> <td /><td colspan="3">%(text_condition_subfield)s
+        <input class="txtValue textBoxConditionSubfield" type="text" length="1"/>
+        <select class="selectConditionExactMatch">
+            <option value="0">%(text_equal_to)s</option>
+            <option value="1">%(text_contains)s</option>
+        </select>
+        <input id="textBoxCondition" class="txtValue textBoxCondition" type="text" value="%(text_condition)s"/>
+        </td>
+    </tr>
+    <tr class="conditionActOnFields">
+        <td /><td /><td /><td />
+        <td colspan="3">
+            <span class="actOnFieldLink" id="actOnFields2"><u>%(text_filter_fields)s</u></span>
+        </td>
+    </tr>
+</tbody>
 
     <!-- Templates for subfields -->
 
@@ -437,16 +453,16 @@ div .boxleft_2 {
         <span class="action colActionType">%(text_replace_text)s</span>&nbsp;
     </td>
     <td>
-        <span class="value valueParameters">value</span>&nbsp;
+        <input id="textBoxValueDisplay" class="txtValue textBoxValue valueParameters" type="text"/>&nbsp;
 
         <span class="newValueParameters"><strong> %(text_with)s </strong></span>
-        <span class="newValue newValueParameters">new value</span>
+        <input id="textBoxNewValueDisplay" class="txtValue textBoxNewValue newValueParameters" type="text" value="%(text_new_value)s"/>
 
-        <span class="conditionParameters"><strong> %(text_with_condition)s </strong></span>
-        <span class="conditionSubfield conditionSubfieldParameters"></span>
+        <span class="conditionParameters"><strong> %(text_with_condition)s</strong></span>
+        <input id="textBoxConditionSubfieldDisplay" class="txtValue textBoxConditionSubfield conditionSubfieldParameters" type="text" length="1"/>
 
         <span class="conditionExact conditionParameters"></span>
-        <span class="condition conditionParameters"></span>
+        <input id="textBoxConditionDisplay" class="txtValue textBoxCondition conditionParameters" type="text"/>
 
     </td>
     <td/>
@@ -482,8 +498,8 @@ div .boxleft_2 {
         </td>
     </tr>
     <tr class="conditionParameters">
-        <td /> <td /> <td /> <td /><td colspan="3">when other subfield
-        <input class="txtValue textBoxConditionSubfield" type="text"/>
+        <td /> <td /> <td /> <td /><td colspan="3">%(text_condition_subfield)s
+        <input class="txtValue textBoxConditionSubfield" type="text" length="1"/>
         <select class="selectConditionExactMatch">
             <option value="0">%(text_equal_to)s</option>
             <option value="1">%(text_contains)s</option>
@@ -536,11 +552,12 @@ div .boxleft_2 {
               "text_replace_text" : _("Replace substring"),
               "text_replace_content" : _("Replace full content"),
               "text_with" : _("with"),
-              "text_with_condition": _("when subfield"),
+              "text_with_condition": _("when subfield $$"),
               "text_new_value" : _("new value"),
               "text_equal_to" : _("is equal to"),
               "text_contains" : _("contains"),
               "text_condition" : _("condition"),
+              "text_condition_subfield" : _("when other subfield"),
               "text_filter_fields": _("Apply only to specific field instances"),
               "text_value" : _("value")
              }
