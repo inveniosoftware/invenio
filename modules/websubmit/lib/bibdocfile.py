@@ -3065,6 +3065,11 @@ def list_types_from_array(bibdocs):
     for bibdoc in bibdocs:
         if not bibdoc.get_type() in types:
             types.append(bibdoc.get_type())
+    types.sort()
+    if 'Main' in types:
+        ## Move 'Main' at the beginning
+        types.remove('Main')
+        types.insert(0, 'Main')
     return types
 
 def list_versions_from_array(docfiles):
