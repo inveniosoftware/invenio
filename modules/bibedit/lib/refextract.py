@@ -33,6 +33,7 @@ try:
            import CFG_REFEXTRACT_VERSION, \
                   CFG_REFEXTRACT_KB_JOURNAL_TITLES, \
                   CFG_REFEXTRACT_KB_REPORT_NUMBERS, \
+                  CFG_REFEXTRACT_KB_AUTHORS, \
                   CFG_REFEXTRACT_CTRL_FIELD_RECID, \
                   CFG_REFEXTRACT_TAG_ID_REFERENCE, \
                   CFG_REFEXTRACT_IND1_REFERENCE, \
@@ -43,6 +44,7 @@ try:
                   CFG_REFEXTRACT_SUBFIELD_TITLE, \
                   CFG_REFEXTRACT_SUBFIELD_URL, \
                   CFG_REFEXTRACT_SUBFIELD_DOI, \
+                  CFG_REFEXTRACT_SUBFIELD_AUTH, \
                   CFG_REFEXTRACT_SUBFIELD_URL_DESCR, \
                   CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS, \
                   CFG_REFEXTRACT_IND1_EXTRACTION_STATS, \
@@ -77,6 +79,8 @@ except ImportError:
     CFG_REFEXTRACT_IND1_EXTRACTION_STATS     = "C"   ## ref-stats ind1
     CFG_REFEXTRACT_IND2_EXTRACTION_STATS     = "6"   ## ref-stats ind2
     CFG_REFEXTRACT_SUBFIELD_EXTRACTION_STATS = "a"   ## ref-stats subfield
+    CFG_REFEXTRACT_SUBFIELD_AUTH             = "h"   ## ref author subfield
+    CFG_REFEXTRACT_SUBFIELD_DOI              = "a"   ## ref doi subfield
     CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM = r"</cds.REPORTNUMBER>"
     CFG_REFEXTRACT_MARKER_CLOSING_TITLE      = r"</cds.TITLE>"
     CFG_REFEXTRACT_MARKER_CLOSING_SERIES     = r"</cds.SER>"
@@ -125,22 +129,22 @@ def massage_arxiv_reportnumber(report_number):
         report_number = 'arXiv:' + words[0][5:] + '.' + words[1].lower()
     return report_number
 
-def get_subfield_content(line,code):
+def get_subfield_content(line,subfield_code):
     """ Given a line (subfield element) and a xml code attribute for a subfield element,
         return the contents of the subfield element.
     """
-    content = line.split('<subfield code="'+code+'">')[1]
+    content = line.split('<subfield code="'+subfield_code+'">')[1]
     content = content.split('</subfield>')[0]
     return content
 
-def compress_m_subfields(out):
+def compress_subfields(out,subfield_code):
     #
-    ## For each datafield, compress multiple 'm' subfields into a single one
+    ## For each datafield, compress multiple subfields of type 'subfield_code' into a single one
     #
-    """ change xml format from (e.g.):
+    """ e.g. for MISC text, change xml format from:
            <datafield tag="999" ind1="C" ind2="5">
               <subfield code="o">1.</subfield>
-              <subfield code="m">J. Dukelsky, S. Pittel and G. Sierra,</subfield>
+              <subfield code="m">J. Dukelsky, S. Pittel and G. Sierra</subfield>
               <subfield code="s">Rev. Mod. Phys. 76 (2004) 643</subfield>
               <subfield code="m">and this is some more misc text</subfield>
            </datafield>
@@ -152,7 +156,7 @@ def compress_m_subfields(out):
         to:
            <datafield tag="999" ind1="C" ind2="5">
               <subfield code="o">1.</subfield>
-              <subfield code="m">J. Dukelsky, S. Pittel and G. Sierra,and this is some more misc text</subfield>
+              <subfield code="m">J. Dukelsky, S. Pittel and G. Sierra and this is some more misc text</subfield>
               <subfield code="s">Rev. Mod. Phys. 76 (2004) 643</subfield>
            </datafield>
            <datafield tag="999" ind1="C" ind2="5">
@@ -162,37 +166,44 @@ def compress_m_subfields(out):
            </datafield>
            """
     in_lines = out.split('\n')
-    ## hold the 'm' compressed version of the xml, line by line
+    ## hold the subfield compressed version of the xml, line by line
     new_rec_lines=[]
-    ## Used to indicate when an m tag has already been reached inside a particular datafield
-    position_m = 0
+    ## Used to indicate when the selected subfield has already been reached inside a particular datafield
+    position = 0
     ## Where the concatenated misc text is held before appended at the end
-    misc_text = ""
+    content_text = ""
     ## Components of the misc subfield elements
-    misc_subfield_start = "      <subfield code=\"m\">"
-    subfield_end = "</subfield>"
+    subfield_start = "      <subfield code=\"%s\">" % subfield_code
+    subfield_end   = "</subfield>"
 
     for i, line in enumerate(in_lines):
+        print "%d %s" % (i,line)
+
+    for line in in_lines:
+        ## If reached the end of the datafield
         if line.find('</datafield>') != -1:
-            if misc_text != "":
+            if len(content_text) > 0:
+                #print "inserting: "+subfield_start+content_text.strip(" ,.").lstrip(";")+subfield_end
+                #print "at: %d" % position
                 ## Insert the concatenated misc contents back where it was first encountered
                 ## (dont RIGHTstrip semi-colons, as these may be needed for &amp; or &lt;)
-                new_rec_lines.insert(position_m, misc_subfield_start+misc_text.strip(" ,.").lstrip(" ,.;")+subfield_end)
-                misc_text = ""
-            position_m = 0
+                new_rec_lines[position] = new_rec_lines[position] + content_text.strip(" ,.").lstrip(" ;")+subfield_end
+                content_text = ""
+            position = 0
             new_rec_lines.append(line)
-        ## concatenate misc contents for this single datafield
-        elif line.find('<subfield code="m">') != -1:
-            if position_m == 0:
-                ## Save the position of this found 'm' subfield
+        ## Found subfield in question, concatenate subfield contents for this single datafield
+        elif line.find(subfield_start.strip()) != -1:
+            if position == 0:
+                ## Save the position of this found subfield 
                 ## for later insertion into the same place
-                position_m = i
-            new_m_text = get_subfield_content(line,'m')
-            if (len(misc_text) > 0) and (len(new_m_text)) > 0:
-                ## If there is no space between the m text.. make a space
-                if (misc_text[-1]+new_m_text[0]).find(" ") == -1:
-                    new_m_text = " "+new_m_text
-            misc_text += new_m_text
+                new_rec_lines.append(subfield_start)
+                position = len(new_rec_lines) - 1
+            new_text = get_subfield_content(line,subfield_code)
+            if (len(content_text) > 0) and (len(new_text)) > 0:
+                ## Append spaces between merged text, if needed
+                if (content_text[-1]+new_text[0]).find(" ") == -1:
+                    new_text = " "+new_text
+            content_text += new_text
         else:
             new_rec_lines.append(line)
 
@@ -615,6 +626,7 @@ def get_bad_char_replacements():
         u'\x13A' : u'\u00C1',
         u'\x13E' : u'\u00C9',
         u'\x13I' : u'\u00CD',
+        u'\x13ı' : u'\u00ED', ## Lower case turkish 'i' (dotless i)
         u'\x13O' : u'\u00D3',
         u'\x13U' : u'\u00DA',
         u'\x13Y' : u'\u00DD',
@@ -627,6 +639,7 @@ def get_bad_char_replacements():
         u'\x13 A' : u'\u00C1',
         u'\x13 E' : u'\u00C9',
         u'\x13 I' : u'\u00CD',
+        u'\x13 ı' : u'\u00ED',
         u'\x13 O' : u'\u00D3',
         u'\x13 U' : u'\u00DA',
         u'\x13 Y' : u'\u00DD',
@@ -639,6 +652,7 @@ def get_bad_char_replacements():
         u'\u00B4 A' : u'\u00C1',
         u'\u00B4 E' : u'\u00C9',
         u'\u00B4 I' : u'\u00CD',
+        u'\u00B4 ı' : u'\u00ED',
         u'\u00B4 O' : u'\u00D3',
         u'\u00B4 U' : u'\u00DA',
         u'\u00B4 Y' : u'\u00DD',
@@ -651,6 +665,7 @@ def get_bad_char_replacements():
         u'\u00B4A' : u'\u00C1',
         u'\u00B4E' : u'\u00C9',
         u'\u00B4I' : u'\u00CD',
+        u'\u00B4ı' : u'\u00ED',
         u'\u00B4O' : u'\u00D3',
         u'\u00B4U' : u'\u00DA',
         u'\u00B4Y' : u'\u00DD',
@@ -695,7 +710,7 @@ def get_bad_char_replacements():
         u'\u02DCO' : u'\u00D5',
         u'\u02DCa' : u'\u00E3',
         u'\u02DCA' : u'\u00C3',
-        u'\u02DCs' : u'\u0303s', ## Combining tilde with 's'
+        u'\u02DCs' : u'_', ## no valid 's with tilde' character
     }
     return replacements
 
@@ -747,12 +762,12 @@ re_extract_char_class = (re.compile(r' \[([^\]]+) \]', re.UNICODE), \
 ## URL recognition:
 ## Stand-alone URL (e.g. http://invenio-software.org/ )
 re_raw_url = \
- re.compile(r'((https?|s?ftp):\/\/([\w\d\_\.\-])+(:\d{1,5})?(\/\~([\w\d\_\.\-])+)?(\/([\w\d\_\.\-])+)*(\/([\w\d\_\-]+\.\w{1,6})?)?)', \
+ re.compile(r'((https?|s?ftp):\/\/([\w\d\_\.\-])+(:\d{1,5})?(\/\~([\w\d\_\.\-])+)?(\/([\w\d\_\.\-\?\=])+)*(\/([\w\d\_\-]+\.\w{1,6})?)?)', \
              re.UNICODE|re.I)
 ## HTML marked-up URL (e.g. <a href="http://invenio-software.org/">
 ## CERN Document Server Software Consortium</a> )
 re_html_tagged_url = \
- re.compile(r'(\<a\s+href\s*=\s*([\'"])?(((https?|s?ftp):\/\/)?([\w\d\_\.\-])+(:\d{1,5})?(\/\~([\w\d\_\.\-])+)?(\/([\w\d\_\.\-])+)*(\/([\w\d\_\-]+\.\w{1,6})?)?)([\'"])?\>([^\<]+)\<\/a\>)', \
+ re.compile(r'(\<a\s+href\s*=\s*([\'"])?(((https?|s?ftp):\/\/)?([\w\d\_\.\-])+(:\d{1,5})?(\/\~([\w\d\_\.\-])+)?(\/([\w\d\_\.\-\?\=])+)*(\/([\w\d\_\-]+\.\w{1,6})?)?)([\'"])?\>([^\<]+)\<\/a\>)', \
              re.UNICODE|re.I)
 
 
@@ -792,7 +807,7 @@ re_tagged_citation = re.compile(r"""
           |SER                   ## or a SER tag
           |URL                   ## or a URL tag
           |DOI                   ## or a DOI tag
-          |AUTH(stnd|etal))       ## or an AUTH tag
+          |AUTH(stnd|etal|incl)) ## or an AUTH tag
           (\s\/)?                ## optional /
           \>                     ## closing of tag (>)
           """, \
@@ -1055,23 +1070,19 @@ re_doi = (re.compile("""
     [\w\-_;\(\)\/])                         #any character excluding a full stop
     """, re.VERBOSE))
 
-
 ## SURNAME FIRST NAME, auth, massive problems with this
 ## ((([A-Z]\w\s)\w+[\-\’'\`]?\w*)|([A-Z]\w+[\-\’'\`]?\w*)(\s+))
 ##  ([A-Z])
 
-def make_auth_regex_str(first_author=None,author=None):
+def make_auth_regex_str(author=None):
     """
        Build a regular expression used to identify groups of author names in a citation. This method
        contains patterns for default authors, so no arguments are needed for the most reliable form
        of matching.
-       @param first_author: (string) the first author which must be matched at the start of 
-        an author group (Applies to looking for initials first, then a surname. Else, first author will
+       @param author: (string) the author patterns which could be matched after the first author.
+        (Applies to looking for initials first, then a surname. Else, first author will
         be ignored, and one or two surnames which MUST be followed by 'et al' could be
-        matched instead). If the first author matches an 'A' for an initial, this 'A' MUST be followed
-        by a full stop (This is the only reason for having first_author).
-       @param author: (string) the author patterns which could be matched after the first author. The
-        same mechanics apply as with the use of the first author.
+        matched instead).
        @return: (string) The regex which will:
         - detect groups of authors in a range of formats, e.g.:
             C. Hayward, V van Edwards, M. J. Woodbridge, and L. Kelloggs et al.,
@@ -1083,33 +1094,20 @@ def make_auth_regex_str(first_author=None,author=None):
          (must be separated by 'and' if there are two), e.g.:
             Amaldi et al., | Hayward and Yellow et al.,
     """
+
     if not author:
         ## Standard author, with a max of 9 initials, and a surname.
         ## The Initials MUST be uppercase, and have at least a dot or space between them.
         author = u"""
     (
-
-       ([A-Z]((\’\s?)|(\.\s?)|(\.?\s+)|(\.?\s?\-))){1,9}        ## The single initials (x1-9)(with a dot, space or hyphen separating them)
-       ([A-Z]\w{1,2}\s)?[A-Z]\w+[\-’'`´]?\w*                 ## The surname, which must start with an upper case lttr (single hyphen allowed)
-                                                                ## ...and possbily a separate prefix consisting on 2-3 characters
-       (([,\.]\s*)|([,\.]?\s+))                                 ## A comma, dot or space between authors
+        (?<![Vv]olume\s)([A-Z]((\.)|(\’)|(\-[A-Z]?[\s\.\,\’])) ## Initials (1-5) (EACH MUST PRECEED A DOT, APOS. or HYPHEN) (cannot follow 'Volume\s')
+        ((\-\s)|(\s\-)|([\-\s]))?){1,5}                      
+        ([A-Za-z]\w{1,2}\s){0,2}[A-Z]\w+[\-’'`´]?\w*           ## The surname, which must start with an upper case lttr (single hyphen allowed)
+                                                               ## The surname can also have 1 or 2, 2-3 letter length prefixes before it (e.g. 'van','de')
+       (([,\.\;]\s*)|([,\.]?\s+)|($))                            ## A comma, dot or space between authors (or an end of line marker)
     )
         """
 
-    if not first_author:
-        ## The starting author, found before a standard author, MUST NOT start with an 'A' without a fullstop,
-        ## since this could relate to a title. (e.g. 'A software method ...')
-        ## Subsequently found authors are fine to start with 'A ...'
-        first_author = u"""
-    (
-
-      (([B-Z]((\.\s?)|(\.?\s+)|(\.?\s?\-)))|(A\.\s?))           ## The first initial (with a dot, space or hyphen separating them) if A, must end with '.'
-       ([A-Z]((\’\s?)|(\.\s?)|(\.?\s+)|(\.?\s?\-))){0,8}        ## The single initials (x0-8) (with a dot, space or hyphen separating them)
-       ([A-Z]\w{1,2}\s)?[A-Z]\w+[\-’'`´]?\w*                 ## The surname, which must start with an upper case lttr (hyphen allowed)
-                                                                ## ...and possbily a separate prefix consisting on 2-3 characters
-       (([,\.]\s*)|([,\.]?\s+))                                 ## A comma, dot or space between authors
-    )
-        """
     ## Pattern used to locate a GROUP of author names in a reference
     ## The format of an author can take many forms:
     ## J. Bloggs, W.-H. Smith, D. De Samuel, G.L. Bayetian, C. Hayward et al.,
@@ -1117,6 +1115,8 @@ def make_auth_regex_str(first_author=None,author=None):
     ## text was indeed an author name)
     ## This will also match authors which seem to be labeled as editors (with the phrase 'ed.')
     ## In which case, the author will be thrown away later on.
+    ## The regex returned has around 100 named groups already (max), so any new groups must be 
+    ## started using '?:'
 
     return r"""
      (^|\s+|\()                                                     ## Must be the start of the line, or a space (or an opening bracket in very few cases)
@@ -1126,41 +1126,40 @@ def make_auth_regex_str(first_author=None,author=None):
       |((eds?|edited|editions?)((\.\s?)|(\.?\s))by(\s|([:,]\s)))    ## 'eds?. by, ' | 'ed. by: ' | 'ed by '  | 'ed. by '| 'ed by: '
       |(\(\s?(eds?|edited|editors?)((\.\s?)|(\.?\s))?\)))           ## '( eds?. )'  | '(ed.)'    | '(ed )'   | '( ed )' | '(ed)'
      )?
-                                                                    ## Standard author form.. (e.g. J. Bloggs)
-   (
-         %s
-         (%s)*
-         (
-          (([Aa][Nn]([Dd]|[Ss])|\&)\s+)                             ## Maybe 'and' or 'ans' (mistake) or '&' tied with another name
-          %s
-         )?
-
-        (?P<et> 
-            [Ee][Tt](((,|\.)\s*)|((,|\.)?\s+))[Aa][Ll][,\.]?[,\.]?\s*   ## Possibly: Et al., or Et al. or Et al, 
-        )?
-
-
-   )|(                                                              ## OR.. one or two surnames which MUST end with 'et al' (e.g. Amaldi et al.,)
+                                                                    ## one or two surnames which MUST end with 'et al' (e.g. Amaldi et al.,)
+   ((
          [A-Z][^0-9_\.\s]{3,20}(?:(?:[,\.]\s*)|(?:[,\.]?\s+))
-         (?:
+         (?P<multi_surs>
           (?:(?:[Aa][Nn](?:[Dd]|[Ss])|\&)\s+)                       ## Maybe 'and' or 'ans' (mistake) or '&' tied with another name
           [A-Z][^0-9_\.\s]{3,20}(?:(?:[,\.]\s*)|(?:[,\.]?\s+))
          )?
-         (?P<et2> 
+         (?P<et2>
             [Ee][Tt](?:(?:(?:,|\.)\s*)|(?:(?:,|\.)?\s+))
             [Aa][Ll][,\.]?[,\.]?\s*                                 ## et al, MUST BE PRESENT however, for this author form
          )
-   )
+   )|(                                                              ## OR, Standard author form.. (e.g. J. Bloggs)
+          %s
+         (?P<multi_stnd>
+          (?:%s)*
+          (?:
+           (([Aa][Nn]([Dd]|[Ss])|\&)\s+)                            ## Maybe 'and' or 'ans' (mistake) or '&' tied with another name
+           %s
+          )?
+         )
 
+        (?P<et>
+            [Ee][Tt](((,|\.)\s*)|((,|\.)?\s+))[Aa][Ll][,\.]?[,\.]?((\s*)|($))   ## Possibly: Et al., or Et al. or Et al, 
+        )?
+   ))
 
-    (?P<ee>                                                         ## Look for 'ed' after the author group...
-     (((eds?|edited|editors?)((\.?\s)|(\.\s?)))                     ## 'eds?.'   | 'ed. '   | 'ed '
-     |(\((eds?|edited|editors?)((\.\s)|(\.))?\)))                   ## '(eds?.)' | '(ed. )' | '(ed)'
+    (?P<ee>                                                                 ## Look for 'ed' after the author group...
+     (((eds?|edited|editors?)(([\.\,]{0,2}\s)|([\.\,]{1,2}((\s)|($))?)))    ## 'eds?.'   | 'ed. '   | 'ed '
+     |(\((eds?|edited|editors?)([\.\,]{1,2}((\s)|($))?)?\)))                ## '(eds?.)' | '(ed. )' | '(ed)'
     )?
 
-    \)?                                                             ## Possible closing bracket
-
-    """ % (first_author,author,author)
+    \)?                                                             ## A possible closing bracket
+    
+    """ % (author,author,author)
 
 
 re_auth = (re.compile(make_auth_regex_str(),re.VERBOSE|re.UNICODE))
@@ -1180,12 +1179,72 @@ weaker_author = """
     """
 
 ## End of line MUST match, since the next string is definitely a portion of an author group (append '$')
-## The second author pattern is not used, but still passed.
-re_auth_near_miss = (re.compile(make_auth_regex_str("("+weaker_author+")+$",weaker_author),re.VERBOSE|re.UNICODE))
+re_auth_near_miss = (re.compile(make_auth_regex_str("("+weaker_author+")+$"),re.VERBOSE|re.UNICODE))
 
 ## Finding an et. al, before author names indicates a bad match!!!
 ## I.e. could be a title match... ignore it
 bad_etal_before_auth_matches = (' et al.,',' et. al.,',' et. al.',' et.al.,',' et al.',' et al')
+
+
+def make_extra_author_regex_str():
+    """ From the authors knowledge-base, construct a single regex holding the or'd possibilities of patterns
+    which should be included in $h subfields. The word 'Collaboration' is also converted to 'Coll', and 
+    used in finding matches.
+    @return: (string) The single pattern built from each line in the author knowledge base.
+    """
+    def convert_to_upper_lower_choice(s):
+        tmp_list = []
+        ## Replace upper cased characters with choice brackets for the lowercase form
+        for i,char in enumerate(s):
+            if char.isupper():
+                tmp_list.append('['+char+char.lower()+']')
+            else:
+                tmp_list.append(char)
+        return ''.join(tmp_list).strip().replace(' ','\s')
+
+    def add_to_auth_list(s):
+        s = convert_to_upper_lower_choice(s)
+        s = "(?:[Tt]he\s)?" + s + "s?"
+        auths.append(s)
+
+    ## Build the 'or'd regular expression of the author lines in the author knowledge base
+    auths = []
+    fpath = CFG_REFEXTRACT_KB_AUTHORS
+    try:
+        fh = open(fpath, "r")
+        for rawline in fh:
+            try:
+                rawline = rawline.decode("utf-8")
+            except UnicodeError:
+                sys.stderr.write("*** Unicode problems in %s for line %s\n" \
+                                 % (fpath, str(kb_line_num)))
+                sys.exit(1)
+            if (len(rawline) > 0) and (rawline[0] != '#'):
+                add_to_auth_list(rawline)
+                ## Shorten collaboration to 'coll'
+                if rawline.lower().endswith('collaboration\n'):
+                    coll_version = rawline[:rawline.lower().find('collaboration\n')]+"Coll[\.\,]"
+                    add_to_auth_list(coll_version.strip().replace(' ','\s')+"s?")
+
+        author_match_re = ""
+        if len(auths) > 0:
+            for a in auths:
+                author_match_re = author_match_re + "(?:"+a+")|"
+            author_match_re = "(?:(?:[\(\"]?(?:"+author_match_re[:-1] + ")[\)\"]?[\,\.]?\s?(?:and\s)?)+)"
+
+    except IOError:
+        ## problem opening KB for reading, or problem while reading from it:
+        emsg = """Error: Could not build knowledge base containing """ \
+               """author patterns - failed """ \
+               """to read from KB %(kb)s.\n""" \
+               % { 'kb' : fpath }
+        sys.stderr.write(emsg)
+        sys.stderr.flush()
+        sys.exit(1)
+    print "returning: %s" % (author_match_re)
+    return author_match_re
+
+re_extra_auth = re.compile(make_extra_author_regex_str())
 
 ## The different forms of arXiv notation
 re_arxiv_notation = re.compile("""
@@ -2035,23 +2094,43 @@ def identify_and_tag_DOI(line):
         end = match.end()
         ## Get the actual DOI string (remove the url part of the doi string)
         doi_phrase = match.group(6)
+        
 
-        ## Either overwrite the doi phrase with a tag, or leave the phrase in
-        if match.group(1) and match.group(1).find("http") <> -1:
-            ## Leave the link in the citation so that the url method can find it
-            line = line[0:end]+"<cds.DOI />"+line[end:]
-        else:
-            ## Take out the entire matched doi
-            line = line[0:start]+"<cds.DOI />"+line[end:]
+        ## Replace the entire matched doi with a tag
+        line = line[0:start]+"<cds.DOI />"+line[end:]
         ## Add the single DOI string to the list of DOI strings
         doi_strings.append(doi_phrase)
 
     return (line, doi_strings)
 
+
 def identify_and_tag_authors(line):
     """Given a reference, look for a GROUP of author names,
        leave a tag in place, and return a list of authors GROUPS found in the line.
     """
+
+    def identify_and_tag_extra_authors(line):
+        """Given a line where Authors have been tagged, and all other tags and content has
+           been replaced with underscores, go through and try to identify extra items of data
+           which should be placed into 'h' subfields.
+           Later on, these tagged pieces of information will be merged into the content of the
+           most recently found author. This is separated from the author tagging procedure since
+           separate tags can be used, which won't influence the reference splitting heuristics
+           (used when looking at mulitple <AUTH> tags in a line).
+        """
+        if re_extra_auth:
+            extra_authors = re_extra_auth.finditer(line)
+            positions = []
+            for match in extra_authors:
+                positions.append({  'start'       : match.start(),
+                                    'end'         : match.end()})
+            positions.reverse()
+            for p in positions:
+                print 'found "include author": %s' % (line[p['start']:p['end']])
+                line = line[:p['start']] + "<cds.AUTHincl>" \
+                    + line[p['start']:p['end']].strip(".,:;- []") + "</cds.AUTHincl>" + line[p['end']:]
+        return line
+
 
     output_line = line
     tmp_line = line
@@ -2099,6 +2178,8 @@ def identify_and_tag_authors(line):
                                             'etal'        : match.group('et'),
                                             'ed_start'    : match.group('es'),
                                             'ed_end'      : match.group('ee'),
+                                            'multi_stnd'  : match.group('multi_stnd'),
+                                            'multi_surs'  : match.group('multi_surs'),
                                             'text_before' : preceeding_text_string[preceeding_text_start:match.start()],
                                             'auth_no'     : auth_no })
                 ## Save the end of the match, from where to snip the misc text found before an author match
@@ -2122,7 +2203,10 @@ def identify_and_tag_authors(line):
             ## An AND found here likely indicates a missed author before this text
             ## Thus, triggers weaker author searching, within the previous misc text
             ## (Check the text before the current match to see if it has a bad 'and')
-            if not dump_in_misc and (lower_text_before.endswith(' and') or lower_text_before.endswith(' ans')):
+            ## A bad 'and' will only be denoted as such if there exists only one author after it
+            ## and the author group is legit (not to be dumped in misc)
+            if not dump_in_misc and not (m['multi_stnd'] or m['multi_surs']) \
+                and (lower_text_before.endswith(' and') or lower_text_before.endswith(' ans')):
                 ## Search using a weaker author pattern to try and find the missed author(s) (cut away the end 'and')
                 weaker_match = re_auth_near_miss.match(m['text_before'])
                 if weaker_match and not (weaker_match.group('es') or weaker_match.group('ee')):
@@ -2132,8 +2216,11 @@ def identify_and_tag_authors(line):
                 else:
                     dump_in_misc = True
 
-            ## Ideally, id like to have it search the misc text when auth-misc-auth occurs
-            #elif m['
+            add_to_misc = ""
+            ## If a semi-colon was found at the end of this author group, keep it in misc
+            ## so that it can be looked at for splitting heurisitics
+            if output_line[m['end']].strip(" ,.") == ';':
+                add_to_misc = ';'
 
             ## ONLY wrap author data with tags IF there is no evidence that it is an
             ## ed. author. (i.e. The author is not referred to as an editor)
@@ -2142,13 +2229,17 @@ def identify_and_tag_authors(line):
                 ## Et al. is present! This is HIGHLY likely to be an author group
                 ## Insert the etal tag...
                 output_line = output_line[:start] + "<cds.AUTHetal>" \
-                    + re.sub('\sans\s',' and ',output_line[start:end].strip(".,:;- []"), re.IGNORECASE) \
-                    + "</cds.AUTHetal>" + output_line[end:]
-            elif not(m['ed_start'] or m['ed_end'] or dump_in_misc):
+                    + re.sub('\sans\s',' and ',output_line[start:end].strip(".,:;- []()"), re.IGNORECASE) \
+                    + "</cds.AUTHetal>" + add_to_misc + output_line[end:]
+            elif not(m['ed_start'] or m['ed_end'] or dump_in_misc):    
                 ## Insert the std (standard) tag
                 output_line = output_line[:start] + "<cds.AUTHstnd>" \
-                    + re.sub('\sans\s',' and ',output_line[start:end].strip(".,:;- []"), re.IGNORECASE) \
-                    + "</cds.AUTHstnd>" + output_line[end:]
+                    + re.sub('\sans\s',' and ',output_line[start:end].strip(".,:;- []()"), re.IGNORECASE) \
+                    + "</cds.AUTHstnd>" + add_to_misc + output_line[end:]
+
+    ## Now that authors have been tagged, search for the extra information which should be included in $h
+    ## Tag for this datafield, merge into one $h subfield later on
+    output_line = identify_and_tag_extra_authors(output_line)
 
     return output_line
 
@@ -2500,6 +2591,9 @@ def create_marc_xml_reference_line(line_marker,
     ## Found authors are immediately placed into tags (after Titles and Repnum's have been found)
     tagged_line = identify_and_tag_authors(tagged_line)
 
+    print '\n%s - to : convert_processed_reference_line_to_marc_xml' % line_marker
+    print 'tagged line %s' % tagged_line
+
     ## Now, from the tagged line, create a MARC XML string,
     ## marking up any recognised citations:
     (xml_line, \
@@ -2562,7 +2656,14 @@ def convert_unusable_tag_to_misc(line,
 
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def append_datafield_element(line_marker):
+def is_in_line_elements(element_type,line_elements):
+    for p in line_elements:
+        if p['type'] == element_type:
+            return True
+    return False
+
+
+def append_datafield_element(line_marker,citation_structure,line_elements):
     """ Finish the current datafield element and start a new one, with a new
         marker subfield.
         @param line_marker: (string) The line marker which will be the sole
@@ -2581,6 +2682,9 @@ def append_datafield_element(line_marker):
              'sf-code-ref-marker' : CFG_REFEXTRACT_SUBFIELD_MARKER,
              'marker-val'         : encode_for_xml(line_marker)
     }
+    ## add the past elements for end previous citation to the citation_structure list
+    ## (citation_structure is a reference to the initial citation_structure list found in the calling method)
+    citation_structure.append(line_elements)
 
     return new_datafield
 
@@ -2604,11 +2708,11 @@ def start_datafield_element(line_marker):
     return new_datafield
 
 
-def split_on_semi_colon(misc_txt,past_elements,elements_processed,total_elements):
+def split_on_semi_colon(misc_txt,line_elements,elements_processed,total_elements):
     """ Given some misc text, see if there are any semi-colons which may indiciate that
         a reference line is in fact two separate citations.
         @param misc_txt: (string) The misc_txt to look for semi-colons within.
-        @param past_elements: (list) The list of single upper-case chars which
+        @param line_elements: (list) The list of single upper-case chars which
             represent an element of a reference which has been processed.
         @param elements_processed: (integer) The number of elements which have been
             *looked at* for this entire reference line, regardless of splits
@@ -2621,7 +2725,7 @@ def split_on_semi_colon(misc_txt,past_elements,elements_processed,total_elements
     ## If there has already been meaningful information found in the reference
     ## and there are still elements to be processed beyond the element relating to
     ## this misc_txt
-    if (("T" in past_elements) or ("R" in past_elements)) and \
+    if ((is_in_line_elements("TITLE",line_elements)) or (is_in_line_elements("REPORTNUMBER",line_elements))) and \
         (elements_processed < (total_elements)):
 
         if ((len(misc_txt) > 4)) and \
@@ -2640,7 +2744,7 @@ def split_on_semi_colon(misc_txt,past_elements,elements_processed,total_elements
     return False
 
 
-def dump_or_split_author(misc_txt,past_elements):
+def dump_or_split_author(misc_txt,line_elements):
     """
         This method heavily assumes that the first author group found in a single citation is the
         most reliable (In accordance with the IEEE standard, which states that authors should
@@ -2649,10 +2753,14 @@ def dump_or_split_author(misc_txt,past_elements):
 
     ## If this author group is directly after another author group, with minimal misc text between, 
     ## then this author group is very likely to be wrong.
-    if "A" in past_elements:
+    if is_in_line_elements("AUTH",line_elements) or \
+        (is_in_line_elements("TITLE",line_elements) and (len(line_elements) == 1) and \
+        (len(misc_txt) == 0)):
         ## Minimal misc text after a previous author group. Not good.
-        if (past_elements[-1] == "A") and (len(misc_txt) < 6):
+        if (line_elements[-1]['type'] == "AUTH") and (len(misc_txt) < 10):
             return "dump"
+        ## In cases where an author is directly after (no misc) an alone title in a datafield,
+        ## Or where there is another author inside the same datafield
         else:
             ## Use this found author to create a new datafield
             return "split"
@@ -2674,7 +2782,12 @@ def build_formatted_xml_citation(citation_elements,line_marker):
     ## This will hold the ordering of tags which have been appended to the xml line
     ## This list will be used to control the desisions involving the creation of new citation lines
     ## (in the event of a new set of authors being recognised, or strange title ordering...)
-    past_elements = []
+    line_elements = []
+
+    ## This is a list which will hold the current 'over-view' of a single reference line,
+    ## as a list of lists, where each list corresponds to the contents of a datafield element
+    ## in the xml mark-up
+    citation_structure = []
     elements_processed = 0
     #print "Element type ordering: "
     for element in citation_elements:
@@ -2702,7 +2815,7 @@ def build_formatted_xml_citation(citation_elements,line_marker):
             ## It is important to note that Author tagging helps the accurate detection
             ## a dual citation when looking for semi-colons (by reducing the length of misc text)
             split_sc = split_on_semi_colon(element['misc_txt'],\
-                                           past_elements,\
+                                           line_elements,\
                                            elements_processed,\
                                            len(citation_elements))
 
@@ -2717,14 +2830,14 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                               }
                 ## THEN set as a new citation line
                 ## %%%%% Set as NEW citation line %%%%%
-                xml_line += append_datafield_element(line_marker)
-                past_elements = []
+                xml_line += append_datafield_element(line_marker,citation_structure,line_elements)
+                line_elements = []
 
             elif split_sc == "before":
                 ## FIRST
                 ## %%%%% Set as NEW citation line %%%%%
-                xml_line += append_datafield_element(line_marker)
-                past_elements = []
+                xml_line += append_datafield_element(line_marker,citation_structure,line_elements)
+                line_elements = []
                 if misc_txt:
                     ## THEN append the misc text found AFTER the semi-colon (if any)
                     ## Append the misc subfield, before any of semi-colons
@@ -2747,15 +2860,15 @@ def build_formatted_xml_citation(citation_elements,line_marker):
 ##TITLE
         if element['type'] == "TITLE":
             ## If a report number has been marked up, and there's misc text before this title and the last tag
-            if "R" in past_elements and \
+            if is_in_line_elements("REPORTNUMBER",line_elements) and \
                 (len(re.sub(re_arxiv_notation,"",(element['misc_txt'].lower().strip(".,:;- []")))) > 0):
                 ## %%%%% Set as NEW citation line %%%%%
-                xml_line += append_datafield_element(line_marker)
-                past_elements = []
-            elif "T" in past_elements:
+                xml_line += append_datafield_element(line_marker,citation_structure,line_elements)
+                line_elements = []
+            elif is_in_line_elements("TITLE",line_elements):
                 ## %%%%% Set as NEW citation line %%%%%
-                xml_line += append_datafield_element(line_marker)
-                past_elements = []
+                xml_line += append_datafield_element(line_marker,citation_structure,line_elements)
+                line_elements = []
             ## ADD to current datafield
             xml_line += """
       <subfield code="%(sf-code-ref-title)s">%(title)s %(volume)s (%(year)s) %(page)s</subfield>""" \
@@ -2771,7 +2884,7 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                 ## At least one IBID is present, these are to be outputted each into their own datafield
                 for IBID in element['IBIDs']:
                     ## %%%%% Set as NEW citation line %%%%%
-                    xml_line += append_datafield_element(line_marker)
+                    xml_line += append_datafield_element(line_marker,citation_structure,line_elements)
                     xml_line += """
       <subfield code="%(sf-code-ref-title)s">%(title)s %(volume)s (%(year)s) %(page)s</subfield>""" \
                           % { 'sf-code-ref-title'   : CFG_REFEXTRACT_SUBFIELD_TITLE,
@@ -2781,22 +2894,22 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                               'page'                : encode_for_xml(IBID['page']),
                             }
                 ## Add a Title element to the past elements list, since we last found an IBID
-                past_elements = []
+                line_elements = []
 
-            past_elements.append("T")
+            line_elements.append(element)
 ##REPORT NUMBER
         elif element['type'] == "REPORTNUMBER":
             report_number = element['report_num']
             ## If a report number has been marked up, and there's misc text before this title and the last tag
-            if "T" in past_elements and \
+            if is_in_line_elements("TITLE",line_elements) and \
                 (len(re.sub(re_arxiv_notation,"",(element['misc_txt'].lower().strip(".,:;- []")))) > 0):
                 ## %%%%% Set as NEW citation line %%%%%
-                xml_line += append_datafield_element(line_marker)
-                past_elements = []
-            elif "R" in past_elements:
+                xml_line += append_datafield_element(line_marker,citation_structure,line_elements)
+                line_elements = []
+            elif is_in_line_elements("REPORTNUMBER",line_elements):
                 ## %%%%% Set as NEW citation line %%%%%
-                xml_line += append_datafield_element(line_marker)
-                past_elements = []
+                xml_line += append_datafield_element(line_marker,citation_structure,line_elements)
+                line_elements = []
             if report_number.lower().find('arxiv') == 0:
                 report_number = massage_arxiv_reportnumber(report_number)
             ## ADD to current datafield
@@ -2805,7 +2918,7 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                 % {'sf-code-ref-report-num' : CFG_REFEXTRACT_SUBFIELD_REPORT_NUM,
                    'report-number'          : encode_for_xml(report_number)
                 }
-            past_elements.append("R")
+            line_elements.append(element)
 ##URL
         elif element['type'] == "URL":
             if element['url_string'] == element['url_desc']:
@@ -2826,7 +2939,7 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                             'url'                   : encode_for_xml(element['url_string']),
                             'url-desc'              : encode_for_xml(element['url_desc'])
                          }
-            past_elements.append("U")
+            line_elements.append(element)
 ##DOI
         elif element['type'] == "DOI":
             xml_line += """
@@ -2834,33 +2947,44 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                 % {     'sf-code-ref-doi'       : CFG_REFEXTRACT_SUBFIELD_DOI,
                         'doi-val'               : encode_for_xml(element['doi_string'])
                  }
-            past_elements.append("D")
+            line_elements.append(element)
 ##AUTHOR
         elif element['type'] == "AUTH":
 
-            auth_choice = dump_or_split_author(element['misc_txt'],past_elements)
-
-            if auth_choice == "dump":
-                ## Place author text into misc text
-                xml_line += """
+            if element['auth_type'] != 'incl':
+                auth_choice = dump_or_split_author(element['misc_txt'],line_elements)
+                if auth_choice == "dump":
+                    ## Place author text into misc text
+                    xml_line += """
       <subfield code="%(sf-code-ref-misc)s">%(auth-txt)s</subfield>""" \
-                     % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
-                         'auth-txt'               : encode_for_xml(element['auth_txt']),
-                      }
-            else:
-                if auth_choice == "split":
-                    ## This author triggered the creation of a new datafield
-                    if element['auth_type'] == 'etal' or element['auth_type'] == 'stnd':
-                        ## %%%%% Set as NEW citation line %%%%%
-                        xml_line += append_datafield_element(line_marker)
-                        past_elements = []
-                ## Add the author subfield with the author text
-                xml_line += """
-      <subfield code="h">%(authors)s</subfield>""" \
-                    % {     'authors'               : encode_for_xml(element['auth_txt'])
-                     }
+                         % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
+                             'auth-txt'               : encode_for_xml(element['auth_txt']),
+                          }
+                else:
+                    if auth_choice == "split":
+                        ## This author triggered the creation of a new datafield
+                        if element['auth_type'] == 'etal' or element['auth_type'] == 'stnd':
+                            ## %%%%% Set as NEW citation line %%%%%
+                            xml_line += append_datafield_element(line_marker,citation_structure,line_elements)
+                            line_elements = []
+                    ## Add the author subfield with the author text
+                    xml_line += """
+      <subfield code="%(sf-code-ref-auth)s">%(authors)s</subfield>""" \
+                        % {     'authors'               : encode_for_xml(element['auth_txt']),
+                                'sf-code-ref-auth'      : CFG_REFEXTRACT_SUBFIELD_AUTH,
+                         }
 
-                past_elements.append("A")
+                    line_elements.append(element)
+
+            elif element['auth_type'] == 'incl':
+                ## Always include the matched author from the knowledge base into the datafield, 
+                ## No splitting heuristics are used here. It is purely so that it can be included 
+                ## with any previously found authors for this datafield.
+                xml_line += """
+      <subfield code="%(sf-code-ref-auth)s">%(authors)s</subfield>""" \
+                        % {     'authors'               : encode_for_xml(element['auth_txt']),
+                                'sf-code-ref-auth'      : CFG_REFEXTRACT_SUBFIELD_AUTH,
+                         }
 
         ## The number of elements processed
         elements_processed+=1
@@ -3074,9 +3198,12 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
             if tag_type.find("stnd") <> -1:
                 auth_type = "stnd"
                 idx_closing_tag_nearest = processed_line.find("</cds.AUTHstnd>", tag_match_end)
-            else:
+            elif tag_type.find("etal") <> -1:
                 auth_type = "etal"
                 idx_closing_tag_nearest = processed_line.find("</cds.AUTHetal>", tag_match_end)
+            elif tag_type.find("incl") <> -1:
+                auth_type = "incl"
+                idx_closing_tag_nearest = processed_line.find("</cds.AUTHincl>", tag_match_end)
 
             if idx_closing_tag_nearest == -1:
                 ## no closing </cds.AUTH****> tag found - strip the opening tag
@@ -3552,6 +3679,8 @@ def create_marc_xml_reference_section(ref_sect,
         ## Now that numeration has been marked-up, check for and remove any
         ## ocurrences of " bf ":
         working_line1 = re_identify_bf_before_vol.sub(r" \1", working_line1)
+
+        print "Line given to before REP# and TITLE: %s" % working_line1
 
         ## Clean the line once more:
         working_line1 = wash_line(working_line1)
@@ -5566,11 +5695,14 @@ def main():
                                  processed_references)
 
         ## Filter the processed reference lines to remove junk
-        out = filter_processed_references(out)  ## Be sure to call this BEFORE compress_m_subfields
+        out = filter_processed_references(out)  ## Be sure to call this BEFORE compress_subfields
                                                 ## since filter_processed_references expects the
                                                 ## original xml format.
-        ## Change o_tag format
-        out = compress_m_subfields(out)
+        ## Compress mulitple 'm' subfields in a datafield
+        out = compress_subfields(out,CFG_REFEXTRACT_SUBFIELD_MISC)
+        ## Compress multiple 'h' subfields in a datafield
+        out = compress_subfields(out,CFG_REFEXTRACT_SUBFIELD_AUTH)
+
         if cli_opts['verbosity'] >= 1:
             lines = out.split('\n')
             sys.stdout.write("-----display_xml_record gave: %s significant " \
@@ -5677,9 +5809,11 @@ def test_get_reference_lines():
                 """[41] M. I. Trofimov, N. De Filippis and E. A. Smolenskii. Application of the electronegativity indices of organic molecules to tasks of chemical informatics. Russ. Chem. Bull., 54:2235-2246, 2005. http://dx.doi.org/10.1007/s11172-006-0105-6.""",
                 """[42] M. Gell-Mann, P. Ramon ans R. Slansky, in Supergravity, P. van Niewenhuizen and D. Freedman (North-Holland 1979); T. Yanagida, in Proceedings of the Workshop on the Unified Thoery and the Baryon Number in teh Universe, ed. O. Sawaga and A. Sugamoto (Tsukuba 1979); R.N. Mohapatra and G. Senjanovic, Phys. Rev. Lett. 44, 912, (1980).
                 """,
-                """[43] L.S. Durkin and P. Langacker, Phys. Lett B166, 436 (1986); Amaldi et al., Phys. Rev. D36, 1385 (1987); Hayward and Yellow et al., Phys. Lett B245, 669 (1990); Nucl. Phys. B342, 15 (1990);
+                """[43] L.S. Durkin and P. Langacker, Phys. Lett B166, 436 (1986); Amaldi et al., Phys. Rev. D36, 1385 (1987); Hayward and Yellow et al., eds. Phys. Lett B245, 669 (1990); Nucl. Phys. B342, 15 (1990);
                 """,
-                """[44] M. I. _________________________________________ Molinero, and J. C. Oller, Performance test of the CMS link alignment system
+                """[44] M. I. Moli_ero, and J. C. Oller, Performance test of the CMS link alignment system
+                """,
+                """[45] Hush, D.R., R.Leighton, and B.G. Horne, 1993. "Progress in supervised Neural Netw. What’s new since Lippmann?" IEEE Signal Process. Magazine 10, 8-39
                 """,
                ]
     return reflines

@@ -32,6 +32,8 @@ CFG_REFEXTRACT_VERSION = "Invenio/%s refextract/%s" % (CFG_VERSION, CFG_VERSION)
 CFG_REFEXTRACT_KB_JOURNAL_TITLES = "%s/bibedit/refextract-journal-titles.kb" % CFG_ETCDIR
 # report numbers knowledge base:
 CFG_REFEXTRACT_KB_REPORT_NUMBERS = "%s/bibedit/refextract-report-numbers.kb" % CFG_ETCDIR
+# authors which should be recognised as such
+CFG_REFEXTRACT_KB_AUTHORS = "%s/bibedit/refextract-authors.kb" % CFG_ETCDIR 
 
 
 ## MARC Fields and subfields used by refextract:
@@ -48,6 +50,7 @@ CFG_REFEXTRACT_SUBFIELD_REPORT_NUM       = "r"   ## ref reportnum subfield
 CFG_REFEXTRACT_SUBFIELD_TITLE            = "s"   ## ref title subfield
 CFG_REFEXTRACT_SUBFIELD_URL              = "u"   ## ref url subfield
 CFG_REFEXTRACT_SUBFIELD_URL_DESCR        = "z"   ## ref url-text subfield
+CFG_REFEXTRACT_SUBFIELD_AUTH             = "h"   ## ref author subfield
 
 ## refextract statisticts fields:
 CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS   = "999" ## ref-stats tag
