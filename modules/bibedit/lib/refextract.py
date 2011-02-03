@@ -1122,9 +1122,9 @@ def make_auth_regex_str(author=None):
      (^|\s+|\()                                                     ## Must be the start of the line, or a space (or an opening bracket in very few cases)
 
      (?P<es>                                                        ## Look for 'ed' before the author
-      (((eds?|edited|editors?)((\.\s?)|(\.?\s)))                    ## 'eds?. '     | 'ed '      | 'ed.'
-      |((eds?|edited|editions?)((\.\s?)|(\.?\s))by(\s|([:,]\s)))    ## 'eds?. by, ' | 'ed. by: ' | 'ed by '  | 'ed. by '| 'ed by: '
-      |(\(\s?(eds?|edited|editors?)((\.\s?)|(\.?\s))?\)))           ## '( eds?. )'  | '(ed.)'    | '(ed )'   | '( ed )' | '(ed)'
+      ((([Ee]ds?|[Ee]dited|[Ee]ditors?)((\.\s?)|(\.?\s)))                    ## 'eds?. '     | 'ed '      | 'ed.'
+      |(([Ee]ds?|[Ee]dited|[Ee]ditions?)((\.\s?)|(\.?\s))by(\s|([:,]\s)))    ## 'eds?. by, ' | 'ed. by: ' | 'ed by '  | 'ed. by '| 'ed by: '
+      |(\(\s?([Ee]ds?|[Ee]dited|[Ee]ditors?)((\.\s?)|(\.?\s))?\)))           ## '( eds?. )'  | '(ed.)'    | '(ed )'   | '( ed )' | '(ed)'
      )?
                                                                     ## one or two surnames which MUST end with 'et al' (e.g. Amaldi et al.,)
    ((
@@ -1153,8 +1153,8 @@ def make_auth_regex_str(author=None):
    ))
 
     (?P<ee>                                                                 ## Look for 'ed' after the author group...
-     (((eds?|edited|editors?)(([\.\,]{0,2}\s)|([\.\,]{1,2}((\s)|($))?)))    ## 'eds?.'   | 'ed. '   | 'ed '
-     |(\((eds?|edited|editors?)([\.\,]{1,2}((\s)|($))?)?\)))                ## '(eds?.)' | '(ed. )' | '(ed)'
+     ((([Ee]ds?|[Ee]dited|[Ee]ditors?)(([\.\,]{0,2}\s)|([\.\,]{1,2}((\s)|($))?)))    ## 'eds?.'   | 'ed. '   | 'ed '
+     |(\(([Ee]ds?|[Ee]dited|[Ee]ditors?)([\.\,]{1,2}((\s)|($))?)?\)))                ## '(eds?.)' | '(ed. )' | '(ed)'
     )?
 
     \)?                                                             ## A possible closing bracket
