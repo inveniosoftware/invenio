@@ -52,10 +52,14 @@ try:
                   CFG_REFEXTRACT_SUBFIELD_EXTRACTION_STATS, \
                   CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM, \
                   CFG_REFEXTRACT_MARKER_CLOSING_TITLE, \
+                  CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID, \
                   CFG_REFEXTRACT_MARKER_CLOSING_SERIES, \
                   CFG_REFEXTRACT_MARKER_CLOSING_VOLUME, \
                   CFG_REFEXTRACT_MARKER_CLOSING_YEAR, \
                   CFG_REFEXTRACT_MARKER_CLOSING_PAGE, \
+                  CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND, \
+                  CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL, \
+                  CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL, \
                   CFG_REFEXTRACT_XML_VERSION, \
                   CFG_REFEXTRACT_XML_COLLECTION_OPEN, \
                   CFG_REFEXTRACT_XML_COLLECTION_CLOSE, \
@@ -83,10 +87,14 @@ except ImportError:
     CFG_REFEXTRACT_SUBFIELD_DOI              = "a"   ## ref doi subfield
     CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM = r"</cds.REPORTNUMBER>"
     CFG_REFEXTRACT_MARKER_CLOSING_TITLE      = r"</cds.TITLE>"
+    CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID = r"</cds.TITLEibid>"
     CFG_REFEXTRACT_MARKER_CLOSING_SERIES     = r"</cds.SER>"
     CFG_REFEXTRACT_MARKER_CLOSING_VOLUME     = r"</cds.VOL>"
     CFG_REFEXTRACT_MARKER_CLOSING_YEAR       = r"</cds.YR>"
     CFG_REFEXTRACT_MARKER_CLOSING_PAGE       = r"</cds.PG>"
+    CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND= r"</cds.AUTHstnd>"
+    CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL= r"</cds.AUTHetal>"
+    CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL= r"</cds.AUTHincl>"
     CFG_REFEXTRACT_XML_VERSION          = u"""<?xml version="1.0" encoding="UTF-8"?>"""
     CFG_REFEXTRACT_XML_COLLECTION_OPEN  = u"""<collection xmlns="http://www.loc.gov/MARC21/slim">"""
     CFG_REFEXTRACT_XML_COLLECTION_CLOSE = u"""</collection>\n"""
@@ -113,6 +121,20 @@ except ImportError:
 
 cli_opts = {}
 
+## The minimum length of a reference's misc text to be deemed insignificant.
+## Values higher than this value reflect meaningful misc text.
+## Hence, upon finding a correct semi-colon, but having current misc text 
+## length less than this value (without other meaningful reference objects:
+## report numbers, titles...) then no split will occur.
+## (A higher value will increase splitting strictness. i.e. Fewer splits)
+semi_colon_misc_text_sensitivity = 60
+
+## The length of misc text between two adjacent authors which is 
+## deemed as insignificant. As such, when misc text of a length less
+## than this value is found, then the latter author group is dumped into misc.
+## (A higher value will increase splitting strictness. i.e. Fewer splits)
+adjacent_auth_misc_separation = 10
+
 def massage_arxiv_reportnumber(report_number):
     """arXiv report numbers need some massaging
         to change from arXiv-1234-2233(v8) to arXiv.1234.2233(v8)
@@ -138,10 +160,9 @@ def get_subfield_content(line,subfield_code):
     return content
 
 def compress_subfields(out,subfield_code):
-    #
-    ## For each datafield, compress multiple subfields of type 'subfield_code' into a single one
-    #
-    """ e.g. for MISC text, change xml format from:
+    """
+    For each datafield, compress multiple subfields of type 'subfield_code' into a single one
+    e.g. for MISC text, change xml format from:
            <datafield tag="999" ind1="C" ind2="5">
               <subfield code="o">1.</subfield>
               <subfield code="m">J. Dukelsky, S. Pittel and G. Sierra</subfield>
@@ -788,7 +809,7 @@ re_numeration_no_ibid_txt = \
           """, re.UNICODE|re.VERBOSE)
 
 re_title_followed_by_series_markup_tags = \
-     re.compile(r'(\<cds.TITLE\>([^\<]+)\<\/cds.TITLE\>\s*.?\s*\<cds\.SER\>([A-H]|(I{1,3}V?|VI{0,3}))\<\/cds\.SER\>)', re.UNICODE)
+     re.compile(r'(\<cds.TITLE(?P<ibid>ibid)?\>([^\<]+)\<\/cds.TITLE(?:ibid)?\>\s*.?\s*\<cds\.SER\>([A-H]|(I{1,3}V?|VI{0,3}))\<\/cds\.SER\>)', re.UNICODE)
 
 re_punctuation = re.compile(r'[\.\,\;\'\(\)\-]', re.UNICODE)
 
@@ -796,7 +817,7 @@ re_punctuation = re.compile(r'[\.\,\;\'\(\)\-]', re.UNICODE)
 ## identified in the line, when building a MARC XML representation of the line:
 re_tagged_citation = re.compile(r"""
           \<cds\.                ## open tag: <cds.
-          (TITLE                 ## a TITLE tag
+          ((?:TITLE(?P<ibid>ibid)?)  ## a TITLE tag
           |VOL                   ## or a VOL tag
           |YR                    ## or a YR tag
           |PG                    ## or a PG tag
@@ -816,12 +837,11 @@ re_tagged_citation = re.compile(r"""
 re_tagged_numeration_near_line_start = \
                          re.compile(r'^.{0,4}?<CDS (VOL|SER)>', re.UNICODE)
 
-## FIXME check against group(2), that needs to be present
 re_ibid = \
-   re.compile(r'(-|\b)((?:(?:IBID)|(?:IBI\-?DEM))\.?( ([A-H]|(I{1,3}V?|VI{0,3})|[1-3]))?)\s?:', \
+   re.compile(r'(-|\b)?((?:(?:IBID)|(?:IBIDEM))\.?( ([A-H]|(I{1,3}V?|VI{0,3})|[1-3]))?)\s?:', \
                re.UNICODE)
 
-re_matched_ibid = re.compile(r'(?:(?:IBID)|(?:IBI\-?DEM))\.?\s?([A-H]|(I{1,3}V?|VI{0,3})|[1-3])?', \
+re_matched_ibid = re.compile(r'(?:(?:IBID)|(?:IBIDEM))\.?\s?([A-H]|(I{1,3}V?|VI{0,3})|[1-3])?', \
                                re.UNICODE)
 
 re_title_series = re.compile(r'\.,? +([A-H]|(I{1,3}V?|VI{0,3}))$', \
@@ -1073,14 +1093,38 @@ re_doi = (re.compile("""
 
 def make_auth_regex_str(etal,author=None):
     """
-       Build a regular expression used to identify groups of author names in a citation. This method
-       contains patterns for default authors, so no arguments are needed for the most reliable form
-       of matching.
-       @param author: (string) the author patterns which could be matched after the first author.
-        (Applies to looking for initials first, then a surname. Else, first author will
-        be ignored, and one or two surnames which MUST be followed by 'et al' could be
-        matched instead).
-       @return: (string) The regex which will:
+        Returns a regular expression to be used to identify groups of author names in a citation. 
+        This method contains patterns for default authors, so no arguments are needed for the
+        most reliable form of matching.
+
+        The returned author pattern is capable of:
+        1. Identifying single authors, with at least one initial, of the form:
+        'Initial. [surname prefix...] Surname'
+
+        2. Identifying multiple authors, each with at least one initial, of the form:
+        'Initial. [surname prefix...] Surname, [and] [Initial. [surname prefix...] Surname ... ]'
+        ***(Note that a full stop, hyphen or apostrophe after each initial is 
+        absolutely vital in identifying authors for both of these above methods. 
+        Initials must also be uppercase.)***
+
+        3. Capture 'et al' statements at the end of author groups (allows for authors with et al
+        to be processed differently from 'standard' authors)
+
+        4. Identifying a single author surname name positioned before the phrase 'et al',
+        with no initials: 'Surname et al'
+
+        5. Identifying two author surname name positioned before the phrase 'et al',
+        with no initials, but separated by 'and' or '&': 'Surname [and|&] Surname et al'
+
+        6. Capture editor notation, of which can take many forms e.g. 
+        'eds. editors. edited by. etc.'. Authors captured in this way can be treated as
+        'editor groups', and hense processed differently if needed from standard authors
+
+        @param etal: (string) The regular expression used to identify 'etal' notation
+        @param author: (string) An optional argument, which replaces the default author
+        regex used to identify author groups (initials, surnames... etc)
+
+        @return: (string) The full author group identification regex, which will:
         - detect groups of authors in a range of formats, e.g.:
             C. Hayward, V van Edwards, M. J. Woodbridge, and L. Kelloggs et al.,
         - detect whether the author group has been marked up as editors of the doc.
@@ -1093,14 +1137,15 @@ def make_auth_regex_str(etal,author=None):
     """
 
     if not author:
-        ## Standard author, with a max of 9 initials, and a surname.
-        ## The Initials MUST be uppercase, and have at least a dot or space between them.
+        ## Standard author, with a maximum of 5 initials, and a surname.
+        ## The Initials MUST be uppercase, and MUST have at least a dot, hypen or apostrophe between them.
         author = u"""
     (
         (?<![Vv]olume\s)([A-Z]((\.)|(\’)|(\-[A-Z]?[\s\.\,\’])) ## Initials (1-5) (EACH MUST PRECEED A DOT, APOS. or HYPHEN) (cannot follow 'Volume\s')
-        ((\-\s)|(\s\-)|([\-\s]))?){1,5}                      
-        ([A-Za-z]\w{1,2}\s){0,2}[A-Z]\w+[\-’'`´]?\w*           ## The surname, which must start with an upper case lttr (single hyphen allowed)
+        ((\-\s)|(\s\-)|([\-\s]))?){1,5}
+                                                               ## The surname, which must start with an upper case lttr (single hyphen allowed)
                                                                ## The surname can also have 1 or 2, 2-3 letter length prefixes before it (e.g. 'van','de')
+        ([A-Za-z]\w{1,2}(?:(?:[\-’'`´]\s?)|(?:\s))){0,2}[A-Z]\w+[\-’'`´]?\w*
        (([,\.\;]\s*)|([,\.]?\s+)|($))                            ## A comma, dot or space between authors (or an end of line marker)
     )
         """
@@ -1112,18 +1157,18 @@ def make_auth_regex_str(etal,author=None):
     ## text was indeed an author name)
     ## This will also match authors which seem to be labeled as editors (with the phrase 'ed.')
     ## In which case, the author will be thrown away later on.
-    ## The regex returned has around 100 named groups already (max), so any new groups must be 
+    ## The regex returned has around 100 named groups already (max), so any new groups must be
     ## started using '?:'
 
     return r"""
      (^|\s+|\()                                                     ## Must be the start of the line, or a space (or an opening bracket in very few cases)
 
      (?P<es>                                                        ## Look for 'ed' before the author
-      ((([Ee]ds?|[Ee]dited|[Ee]ditors?)((\.\s?)|(\.?\s)))                    ## 'eds?. '     | 'ed '      | 'ed.'
-      |(([Ee]ds?|[Ee]dited|[Ee]ditions?)((\.\s?)|(\.?\s))by(\s|([:,]\s)))    ## 'eds?. by, ' | 'ed. by: ' | 'ed by '  | 'ed. by '| 'ed by: '
-      |(\(\s?([Ee]ds?|[Ee]dited|[Ee]ditors?)((\.\s?)|(\.?\s))?\)))           ## '( eds?. )'  | '(ed.)'    | '(ed )'   | '( ed )' | '(ed)'
+      ((([Ee][Dd]s?|[Ee]dited|[Ee]ditors?)((\.\s?)|(\.?\s)))                    ## 'eds?. '     | 'ed '      | 'ed.'
+      |(([Ee][Dd]s?|[Ee]dited|[Ee]ditions?)((\.\s?)|(\.?\s))by(\s|([:,]\s)))    ## 'eds?. by, ' | 'ed. by: ' | 'ed by '  | 'ed. by '| 'ed by: '
+      |(\(\s?([Ee][Dd]s?|[Ee]dited|[Ee]ditors?)((\.\s?)|(\.?\s))?\)))           ## '( eds?. )'  | '(ed.)'    | '(ed )'   | '( ed )' | '(ed)'
      )?
-                                                                    ## one or two surnames which MUST end with 'et al' (e.g. Amaldi et al.,)
+                                                                    ## *EITHER, one or two surnames which MUST end with 'et al' (e.g. Amaldi et al.,)
    (?P<author_names>(
          [A-Z][^0-9_\.\s]{3,20}(?:(?:[,\.]\s*)|(?:[,\.]?\s+))
          (?P<multi_surs>
@@ -1131,37 +1176,38 @@ def make_auth_regex_str(etal,author=None):
           [A-Z][^0-9_\.\s]{3,20}(?:(?:[,\.]\s*)|(?:[,\.]?\s+))
          )?
          (?P<et2>
-            %s\s*                                 ## et al, MUST BE PRESENT however, for this author form
+            %(etal)s\s*                                             ## et al, MUST BE PRESENT however, for this author form
          )
-   )|(                                                              ## OR, Standard author form.. (e.g. J. Bloggs)
-          %s
+   )|(                                                              ## *OR, The standard author form.. (e.g. J. Bloggs)
+          %(author)s
          (?P<multi_stnd>
-          (?:%s)*
+          (?:%(author)s)*
           (?:
            (([Aa][Nn]([Dd]|[Ss])|\&)\s+)                            ## Maybe 'and' or 'ans' (mistake) or '&' tied with another name
-           %s
+           %(author)s
           )?
          )
 
         (?P<et>
-            %s((\s*)|($))   ## Possibly: Et al., or Et al. or Et al, 
+            %(etal)s((\s*)|($))   ## Possibly: Et al., or Et al. or Et al, 
         )?
    ))
 
-    (?P<ee>                                                                 ## Look for 'ed' after the author group...
-     ((([Ee]ds?|[Ee]dited|[Ee]ditors?)(([\.\,]{0,2}\s)|([\.\,]{1,2}((\s)|($))?)))    ## 'eds?.'   | 'ed. '   | 'ed '
-     |(\(([Ee]ds?|[Ee]dited|[Ee]ditors?)([\.\,]{1,2}((\s)|($))?)?\)))                ## '(eds?.)' | '(ed. )' | '(ed)'
+    (?P<ee>                                                                             ## Look for 'ed' after the author group...
+     ((([Ee][Dd]s?|[Ee]dited|[Ee]ditors?)(([\.\,]{0,2}\s)|([\.\,]{1,2}((\s)|($))?)))    ## 'eds?.'   | 'ed. '   | 'ed '
+     |(\(([Ee][Dd]s?|[Ee]dited|[Ee]ditors?)([\.\,]{1,2}((\s)|($))?)?\)))                ## '(eds?.)' | '(ed. )' | '(ed)'
     )?
 
     \)?                                                             ## A possible closing bracket
     
-    """ % (etal,author,author,author,etal)
-
-re_etal = u"""[Ee][Tt](?:(?:(?:,|\.)\s*)|(?:(?:,|\.)?\s+))[Aa][Ll][,\.]?[,\.]?"""
+    """ % { 'etal'   : etal,
+            'author' : author}
 
 ## Finding an et. al, before author names indicates a bad match!!!
 ## I.e. could be a title match... ignore it
 etal_matches = (' et al.,',' et. al.,',' et. al.',' et.al.,',' et al.',' et al')
+
+re_etal = u"""[Ee][Tt](?:(?:(?:,|\.)\s*)|(?:(?:,|\.)?\s+))[Aa][Ll][,\.]?[,\.]?"""
 
 re_auth = (re.compile(make_auth_regex_str(re_etal),re.VERBOSE|re.UNICODE))
 
@@ -1174,8 +1220,8 @@ re_auth = (re.compile(make_auth_regex_str(re_etal),re.VERBOSE|re.UNICODE))
 ## ELIF an auth-misc-auth combo was hit, do re.match using this pattern
 
 re_weaker_author = """
-      ([A-Z]((\.\s?)|(\.?\s+)|(\-))){1,9}             ## look closely for initials, and less closely at the last name.
-      (?:[^\s_<>]+(?:(?:[,\.]\s*)|(?:[,\.]?\s+)))+
+      ([A-Z]((\.\s?)|(\.?\s+)|(\-))){1,5}             ## look closely for initials, and less closely at the last name.
+      (?:[^\s_<>0-9]+(?:(?:[,\.]\s*)|(?:[,\.]?\s+)))+
     """
 
 ## End of line MUST match, since the next string is definitely a portion of an author group (append '$')
@@ -1185,49 +1231,21 @@ re_auth_near_miss = (re.compile(make_auth_regex_str(re_etal,"("+re_weaker_author
 def make_extra_author_regex_str():
     """ From the authors knowledge-base, construct a single regex holding the or'd possibilities of patterns
     which should be included in $h subfields. The word 'Collaboration' is also converted to 'Coll', and 
-    used in finding matches.
+    used in finding matches. Letter case is not considered during the search.
     @return: (string) The single pattern built from each line in the author knowledge base.
     """
-    def convert_to_upper_lower_choice(s):
-        tmp_list = []
-        ## Replace upper cased characters with choice brackets for the lowercase form
-        for i,char in enumerate(s):
-            if char.isupper():
-                tmp_list.append('['+char+char.lower()+']')
-            else:
-                tmp_list.append(char)
-        return ''.join(tmp_list).strip().replace(' ','\s')
-
     def add_to_auth_list(s):
-        s = convert_to_upper_lower_choice(s)
-        s = "(?:[Tt]he\s)?" + s + "s?"
+        """ Strip the line, replace spaces with '\s' and append 'the' to the start 
+        and 's' to the end. Add the prepared line to the list of extra kb authors. """
+        s = "(?:the\s)?" + s.strip().replace(' ','\s') + "s?"
         auths.append(s)
 
     ## Build the 'or'd regular expression of the author lines in the author knowledge base
     auths = []
     fpath = CFG_REFEXTRACT_KB_AUTHORS
+
     try:
         fh = open(fpath, "r")
-        for rawline in fh:
-            try:
-                rawline = rawline.decode("utf-8")
-            except UnicodeError:
-                sys.stderr.write("*** Unicode problems in %s for line %s\n" \
-                                 % (fpath, str(kb_line_num)))
-                sys.exit(1)
-            if (len(rawline) > 0) and (rawline[0] != '#'):
-                add_to_auth_list(rawline)
-                ## Shorten collaboration to 'coll'
-                if rawline.lower().endswith('collaboration\n'):
-                    coll_version = rawline[:rawline.lower().find('collaboration\n')]+"Coll[\.\,]"
-                    add_to_auth_list(coll_version.strip().replace(' ','\s')+"s?")
-
-        author_match_re = ""
-        if len(auths) > 0:
-            for a in auths:
-                author_match_re = author_match_re + "(?:"+a+")|"
-            author_match_re = "(?:(?:[\(\"]?(?:"+author_match_re[:-1] + ")[\)\"]?[\,\.]?\s?(?:and\s)?)+)"
-
     except IOError:
         ## problem opening KB for reading, or problem while reading from it:
         emsg = """Error: Could not build knowledge base containing """ \
@@ -1237,19 +1255,39 @@ def make_extra_author_regex_str():
         sys.stderr.write(emsg)
         sys.stderr.flush()
         sys.exit(1)
+
+    for rawline in fh:
+        try:
+            rawline = rawline.decode("utf-8")
+        except UnicodeError:
+            sys.stderr.write("*** Unicode problems in %s for line %s\n" \
+                             % (fpath, str(kb_line_num)))
+            sys.exit(1)
+        if (len(rawline) > 0) and (rawline[0] != '#'):
+            add_to_auth_list(rawline)
+            ## Shorten collaboration to 'coll'
+            if rawline.lower().endswith('collaboration\n'):
+                coll_version = rawline[:rawline.lower().find('collaboration\n')]+"coll[\.\,]"
+                add_to_auth_list(coll_version.strip().replace(' ','\s')+"s?")
+
+    author_match_re = ""
+    if len(auths) > 0:
+        for a in auths:
+            author_match_re = author_match_re + "(?:"+a+")|"
+        author_match_re = "(?:(?:[\(\"]?(?:"+author_match_re[:-1] + ")[\)\"]?[\,\.]?\s?(?:and\s)?)+)"
+
     return author_match_re
 
-re_extra_auth = re.compile(make_extra_author_regex_str())
+## Create the regular expression used to find user-specified 'extra' authors
+## (letter case is not concidered when matching)
+re_extra_auth = re.compile(make_extra_author_regex_str(),re.IGNORECASE)
 
 ## The different forms of arXiv notation
 re_arxiv_notation = re.compile("""
     (arxiv)|(e[\-\s]?print:?\s*arxiv)
     """, re.VERBOSE)
 
-# AND is before last author
-# et. al. is at the end always
 # et. al. before J. /// means J is a journal
-
 
 ## a list of patterns used to try to repair broken URLs within reference lines:
 re_list_url_repair_patterns = get_url_repair_patterns()
@@ -2122,7 +2160,7 @@ def identify_and_tag_authors(line):
             positions.reverse()
             for p in positions:
                 line = line[:p['start']] + "<cds.AUTHincl>" \
-                    + line[p['start']:p['end']].strip(".,:;- []") + "</cds.AUTHincl>" + line[p['end']:]
+                    + line[p['start']:p['end']].strip(".,:;- []") + CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL + line[p['end']:]
         return line
 
 
@@ -2227,19 +2265,19 @@ def identify_and_tag_authors(line):
                 tmp_stnd_etal_line = re.sub(re_etal,'et al',output_line[start:end].strip(".,:;- []()"), re.IGNORECASE)
                 output_line = output_line[:start] + "<cds.AUTHetal>" \
                     + re.sub('\sans\s',' and ',tmp_stnd_etal_line, re.IGNORECASE) \
-                    + "</cds.AUTHetal>" + add_to_misc + output_line[end:]
+                    + CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL + add_to_misc + output_line[end:]
             elif not(m['ed_start'] or m['ed_end'] or dump_in_misc):    
                 ## Insert the std (standard) tag
                 output_line = output_line[:start] + "<cds.AUTHstnd>" \
                     + re.sub('\sans\s',' and ',output_line[start:end].strip(".,:;- []()"), re.IGNORECASE) \
-                    + "</cds.AUTHstnd>" + add_to_misc + output_line[end:]
+                    + CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND + add_to_misc + output_line[end:]
             ## Apply the 'include in $h' method to author groups marked as editors
             elif (m['ed_start'] or m['ed_end']):
                 ## remove any characters which denote this author group to be editors, just take the 
                 ## author names, and append '(ed.)'
                 output_line = output_line[:start] + "<cds.AUTHincl>" \
                     + re.sub('\sans\s',' and ',m['author_names'].strip(".,:;- []()"), re.IGNORECASE) \
-                    + " (ed.)</cds.AUTHincl>" + add_to_misc + output_line[end:]
+                    + " (ed.)" + CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL + add_to_misc + output_line[end:]
 
     ## Now that authors have been tagged, search for the extra information which should be included in $h
     ## Tag for this datafield, merge into one $h subfield later on
@@ -2306,7 +2344,7 @@ def identify_periodical_titles(line,
             ## record the matched non-standard version of the title:
             title_matches_matchtext[title_match.start()] = title
 
-            ## replace the matched title text in the line it n * '-',
+            ## replace the matched title text in the line it n * '_',
             ## where n is the length of the matched title:
             line = u"".join((line[0:title_match.start(1)],
                             u"_"*len(title_match.group(1)),
@@ -2653,18 +2691,61 @@ def convert_unusable_tag_to_misc(line,
         line = line[idx_closing_tag+len(closing_tag):]
     return (misc_text, line)
 
-
-
-## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 def is_in_line_elements(element_type,line_elements):
-    for p in line_elements:
-        if p['type'] == element_type:
-            return True
+    """ Checks the list of current elements in the line for the given element type """
+    for i, element in enumerate(line_elements):
+        if element['type'] == element_type:
+            return (True, line_elements[i])
     return False
 
+def check_author_for_ibid(line_elements,author):
+    """ Given a list of elements for an *entire* reference line, and the current
+        author element to be used for ibids, check to see if that author element needs
+        to be inserted into this line, depending on the presence of ibids and whether
+        or not there is already an author paired with an ibid.
+        Also, if no ibids are present in the line, see if the author element needs
+        to be updated, depending on the presence of a normal title and a corresponding
+        author group.
+        @param line_elements: List of line elements for the entire processed reference
+        line
+        @param author: The current parent author element to be used with an ibid
+        @return: (tuple) - containing a possible new author subfield, and the parent 
+        author element to be used for future ibids (if any) 
+    """
+    ## Upon splitting, check for ibids in the previous line, 
+    ## If an appropriate author was found, pair it with this ibid.
+    ## (i.e., an author has not been explicitly paired with this ibid already
+    ## and an author exists with the parent title to which this ibid refers)
+    if (is_in_line_elements("TITLE",line_elements)):
+        ## Get the title element for this line
+        title_element = is_in_line_elements("TITLE",line_elements)[1]
 
-def append_datafield_element(line_marker,citation_structure,line_elements):
+        if (author != None) and (not is_in_line_elements("AUTH",line_elements)) \
+        and (title_element['is_ibid']):
+            ## Return the author subfield which needs to be appended for an ibid in the line
+            ## No need to reset the author to be used for ibids, since this line holds an ibid
+            return """
+          <subfield code="%(sf-code-ref-auth)s">%(authors)s</subfield>""" \
+                % { 'authors'          : author['auth_txt'].strip('()'),
+                    'sf-code-ref-auth' : CFG_REFEXTRACT_SUBFIELD_AUTH,
+                  }, author
+
+        ## Set the author for to be used for ibids, when a standard title is present in this line,
+        ## as well as an author
+        if (not title_element['is_ibid']) and (is_in_line_elements("AUTH",line_elements)):
+            ## Set the author to be used for ibids, in the event that a subsequent ibid is found
+            ## this author element will be repeated. 
+            ## This author is only used when an ibid is in a line
+            ## and there is no other author found in the line.
+            author = is_in_line_elements("AUTH",line_elements)[1]
+        ## If there is no author associated with this head title, clear the author to be used for ibids
+        elif (not title_element['is_ibid']):
+            author = None
+
+    ## If an author does not need to be replicated for an ibid, append nothing to the xml line
+    return "", author
+
+def append_datafield_element(line_marker,citation_structure,line_elements,author,xml_line):
     """ Finish the current datafield element and start a new one, with a new
         marker subfield.
         @param line_marker: (string) The line marker which will be the sole
@@ -2673,7 +2754,12 @@ def append_datafield_element(line_marker,citation_structure,line_elements):
         @return new_datafield: (string) The string holding the relevant
         datafield and subfield tags.
     """
-    new_datafield = """
+    ## Add an author, if one must be added for ibid's, before splitting this line
+    ## Also, if a standard title and an author are both present, save the author for future use
+    new_datafield, author = check_author_for_ibid(line_elements,author)
+    xml_line += new_datafield
+    ## Start the new datafield
+    xml_line += """
    </datafield>
    <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">
       <subfield code="%(sf-code-ref-marker)s">%(marker-val)s</subfield>""" \
@@ -2687,7 +2773,10 @@ def append_datafield_element(line_marker,citation_structure,line_elements):
     ## (citation_structure is a reference to the initial citation_structure list found in the calling method)
     citation_structure.append(line_elements)
 
-    return new_datafield
+    ## Clear the elements in the referenced list of elements
+    del line_elements[0:len(line_elements)]
+
+    return xml_line, author
 
 def start_datafield_element(line_marker):
     """ Start a brand new datafield element with a marker subfield.
@@ -2705,9 +2794,7 @@ def start_datafield_element(line_marker):
              'sf-code-ref-marker' : CFG_REFEXTRACT_SUBFIELD_MARKER,
              'marker-val'         : encode_for_xml(line_marker)
     }
-
     return new_datafield
-
 
 def split_on_semi_colon(misc_txt,line_elements,elements_processed,total_elements):
     """ Given some misc text, see if there are any semi-colons which may indiciate that
@@ -2727,15 +2814,13 @@ def split_on_semi_colon(misc_txt,line_elements,elements_processed,total_elements
     ## and there are still elements to be processed beyond the element relating to
     ## this misc_txt
     if (((is_in_line_elements("TITLE",line_elements)) or (is_in_line_elements("REPORTNUMBER",line_elements))) or \
-        (len(misc_txt) > 60)) and \
+        (len(misc_txt) >= semi_colon_misc_text_sensitivity)) and \
         (elements_processed < (total_elements)):
 
-
-        #FIXME greater than 4, but checks for &lt;??? CHECK THIS
-        if ((len(misc_txt) > 4) and (misc_txt[-5:] == '&amp;')) \
-            or ((len(misc_txt) > 3) and (misc_txt[-4:] == '&lt;')):
+        if (len(misc_txt) >= 4) and \
+            ((misc_txt[-5:] == '&amp;') or (misc_txt[-4:] == '&lt;')):
             ## This is a semi-colon which does not indicate a new citation
-            return False
+            return ""
         else:
             ## If a semi-colon is at the end, make sure to append preceeding misc_txt to
             ## the current datafield element
@@ -2744,32 +2829,48 @@ def split_on_semi_colon(misc_txt,line_elements,elements_processed,total_elements
             ## Else, make sure to append the misc_txt to the *newly created datafield element*
             elif misc_txt.strip(" .,")[0] == ";":
                 return "before"
-
-    return False
+    return ""
 
 
 def dump_or_split_author(misc_txt,line_elements):
     """
+        Given the list of current elements, and misc text, try to decide how to use this
+        author for splitting heuristics, and see if it is useful. Returning 'dump' indicates
+        put this author into misc text, since it had been identified as bad. 'split' 
+        indicates split the line and place this author into the fresh datafield. The empty string
+        indicates add this author as normal to the current xml datafield.
+
+        A line will be split using author information in two situations:
+            1. When there already exists a previous author group in the same line
+            2. If the only item in the current line is a title, with no misc text
+        In both situations, the newly found author element is placed into the newly created 
+        datafield.
+
         This method heavily assumes that the first author group found in a single citation is the
         most reliable (In accordance with the IEEE standard, which states that authors should
         be written at the beginning of a citation, in the overwhelming majority of cases).
+        @param misc_txt: (string) The misc text for this reference line
+        @param line_elements: (list) The list of elements found for this current line
+        @return: (string) The action to take to deal with this author.
     """
+    ## If an author has already been found in this reference line
+    if is_in_line_elements("AUTH",line_elements):
 
-    ## If this author group is directly after another author group, with minimal misc text between, 
-    ## then this author group is very likely to be wrong.
-    if is_in_line_elements("AUTH",line_elements) or \
-        (is_in_line_elements("TITLE",line_elements) and (len(line_elements) == 1) and \
-        (len(misc_txt) == 0)):
-        ## Minimal misc text after a previous author group. Not good.
-        if (line_elements[-1]['type'] == "AUTH") and (len(misc_txt) < 10):
+        ## If this author group is directly after another author group, 
+        ## with minimal misc text between, then this author group is very likely to be wrong.
+        if (line_elements[-1]['type'] == "AUTH") \
+        and (len(misc_txt) < adjacent_auth_misc_separation):
             return "dump"
-        ## In cases where an author is directly after (no misc) an alone title in a datafield,
-        ## Or where there is another author inside the same datafield
-        else:
-            ## Use this found author to create a new datafield
-            return "split"
-    
-    return False
+        ## Else, trigger a new reference line
+        return "split"
+
+    ## In cases where an author is directly after an alone title (ibid or normal, with no misc),
+    ## Trigger a new reference line
+    if (is_in_line_elements("TITLE",line_elements)) and (len(line_elements) == 1) \
+     and (len(misc_txt) == 0):
+        return "split"
+
+    return ""
 
 
 def build_formatted_xml_citation(citation_elements,line_marker):
@@ -2792,8 +2893,9 @@ def build_formatted_xml_citation(citation_elements,line_marker):
     ## as a list of lists, where each list corresponds to the contents of a datafield element
     ## in the xml mark-up
     citation_structure = []
+    auth_for_ibid = None
     elements_processed = 0
-    #print "Element type ordering: "
+
     for element in citation_elements:
         #print "   "+element['type']
 
@@ -2823,6 +2925,10 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                                            elements_processed,\
                                            len(citation_elements))
 
+            ## Ignore semi-colon splitting heuristics, if the current item is a known ibid.
+            #if element['type'] == 'TITLE' and element['is_ibid']:
+            #    split_sc = ""
+
             if split_sc == "after":
                 if misc_txt:
                     ## Append the misc subfield, before any of semi-colons (if any),
@@ -2834,14 +2940,18 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                               }
                 ## THEN set as a new citation line
                 ## %%%%% Set as NEW citation line %%%%%
-                xml_line += append_datafield_element(line_marker,citation_structure,line_elements)
-                line_elements = []
-
+                (xml_line, auth_for_ibid) = append_datafield_element(line_marker,
+                                                                     citation_structure,
+                                                                     line_elements,
+                                                                     auth_for_ibid,
+                                                                     xml_line)
             elif split_sc == "before":
-                ## FIRST
                 ## %%%%% Set as NEW citation line %%%%%
-                xml_line += append_datafield_element(line_marker,citation_structure,line_elements)
-                line_elements = []
+                (xml_line, auth_for_ibid) = append_datafield_element(line_marker,
+                                                                     citation_structure,
+                                                                     line_elements,
+                                                                     auth_for_ibid,
+                                                                     xml_line)
                 if misc_txt:
                     ## THEN append the misc text found AFTER the semi-colon (if any)
                     ## Append the misc subfield, before any of semi-colons
@@ -2861,18 +2971,27 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                           }
 
         ## Now handle the type dependent actions
-##TITLE
+        ##TITLE
         if element['type'] == "TITLE":
+
+
             ## If a report number has been marked up, and there's misc text before this title and the last tag
             if is_in_line_elements("REPORTNUMBER",line_elements) and \
                 (len(re.sub(re_arxiv_notation,"",(element['misc_txt'].lower().strip(".,:;- []")))) > 0):
                 ## %%%%% Set as NEW citation line %%%%%
-                xml_line += append_datafield_element(line_marker,citation_structure,line_elements)
-                line_elements = []
+                (xml_line, auth_for_ibid) = append_datafield_element(line_marker,
+                                                                     citation_structure,
+                                                                     line_elements,
+                                                                     auth_for_ibid,
+                                                                     xml_line)
             elif is_in_line_elements("TITLE",line_elements):
                 ## %%%%% Set as NEW citation line %%%%%
-                xml_line += append_datafield_element(line_marker,citation_structure,line_elements)
-                line_elements = []
+                (xml_line, auth_for_ibid) = append_datafield_element(line_marker,
+                                                                     citation_structure,
+                                                                     line_elements,
+                                                                     auth_for_ibid,
+                                                                     xml_line)
+
             ## ADD to current datafield
             xml_line += """
       <subfield code="%(sf-code-ref-title)s">%(title)s, %(volume)s, %(page)s, %(year)s</subfield>""" \
@@ -2883,12 +3002,16 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                       'page'                : encode_for_xml(element['page']),
                     }
 
-            ## Now, see if there are any IBID's after this title:
-            if len(element['IBIDs']) > 0:
+            ## Now, if there are any extra (numeration based) IBID's after this title
+            if len(element['extra_ibids']) > 0:
                 ## At least one IBID is present, these are to be outputted each into their own datafield
-                for IBID in element['IBIDs']:
+                for IBID in element['extra_ibids']:
                     ## %%%%% Set as NEW citation line %%%%%
-                    xml_line += append_datafield_element(line_marker,citation_structure,line_elements)
+                    (xml_line, auth_for_ibid) = append_datafield_element(line_marker,
+                                                                         citation_structure,
+                                                                         line_elements,
+                                                                         auth_for_ibid,
+                                                                         xml_line)
                     xml_line += """
       <subfield code="%(sf-code-ref-title)s">%(title)s %(volume)s (%(year)s) %(page)s</subfield>""" \
                           % { 'sf-code-ref-title'   : CFG_REFEXTRACT_SUBFIELD_TITLE,
@@ -2897,23 +3020,28 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                               'year'                : encode_for_xml(IBID['year']),
                               'page'                : encode_for_xml(IBID['page']),
                             }
-                ## Add a Title element to the past elements list, since we last found an IBID
-                line_elements = []
-
+            ## Add a Title element to the past elements list, since we last found an IBID
             line_elements.append(element)
-##REPORT NUMBER
+
+        ##REPORT NUMBER
         elif element['type'] == "REPORTNUMBER":
             report_number = element['report_num']
             ## If a report number has been marked up, and there's misc text before this title and the last tag
             if is_in_line_elements("TITLE",line_elements) and \
                 (len(re.sub(re_arxiv_notation,"",(element['misc_txt'].lower().strip(".,:;- []")))) > 0):
                 ## %%%%% Set as NEW citation line %%%%%
-                xml_line += append_datafield_element(line_marker,citation_structure,line_elements)
-                line_elements = []
+                (xml_line, auth_for_ibid) = append_datafield_element(line_marker,
+                                                                     citation_structure,
+                                                                     line_elements,
+                                                                     auth_for_ibid,
+                                                                     xml_line)
             elif is_in_line_elements("REPORTNUMBER",line_elements):
                 ## %%%%% Set as NEW citation line %%%%%
-                xml_line += append_datafield_element(line_marker,citation_structure,line_elements)
-                line_elements = []
+                (xml_line, auth_for_ibid) = append_datafield_element(line_marker,
+                                                                     citation_structure,
+                                                                     line_elements,
+                                                                     auth_for_ibid,
+                                                                     xml_line)
             if report_number.lower().find('arxiv') == 0:
                 report_number = massage_arxiv_reportnumber(report_number)
             ## ADD to current datafield
@@ -2923,7 +3051,8 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                    'report-number'          : encode_for_xml(report_number)
                 }
             line_elements.append(element)
-##URL
+
+        ##URL
         elif element['type'] == "URL":
             if element['url_string'] == element['url_desc']:
                 ## Build the datafield for the URL segment of the reference line:
@@ -2944,33 +3073,47 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                             'url-desc'              : encode_for_xml(element['url_desc'])
                          }
             line_elements.append(element)
-##DOI
+
+        ##DOI
         elif element['type'] == "DOI":
+            ## Split on hitting another DOI in the same line
+            if is_in_line_elements("DOI",line_elements):
+                ## %%%%% Set as NEW citation line %%%%%
+                (xml_line, auth_for_ibid) = append_datafield_element(line_marker,
+                                                                     citation_structure,
+                                                                     line_elements,
+                                                                     auth_for_ibid,
+                                                                     xml_line)
             xml_line += """
       <subfield code="%(sf-code-ref-doi)s">%(doi-val)s</subfield>""" \
                 % {     'sf-code-ref-doi'       : CFG_REFEXTRACT_SUBFIELD_DOI,
                         'doi-val'               : encode_for_xml(element['doi_string'])
                  }
             line_elements.append(element)
-##AUTHOR
+
+        ##AUTHOR
         elif element['type'] == "AUTH":
 
             if element['auth_type'] != 'incl':
                 auth_choice = dump_or_split_author(element['misc_txt'],line_elements)
                 if auth_choice == "dump":
-                    ## Place author text into misc text
+                    ## This author is no good, place it into misc text
                     xml_line += """
       <subfield code="%(sf-code-ref-misc)s">%(auth-txt)s</subfield>""" \
                          % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
                              'auth-txt'               : encode_for_xml(element['auth_txt']).strip('()'),
                           }
                 else:
+                    ## Either the author denotes a new citation, or it is the first in this reference
                     if auth_choice == "split":
                         ## This author triggered the creation of a new datafield
                         if element['auth_type'] == 'etal' or element['auth_type'] == 'stnd':
                             ## %%%%% Set as NEW citation line %%%%%
-                            xml_line += append_datafield_element(line_marker,citation_structure,line_elements)
-                            line_elements = []
+                            (xml_line, auth_for_ibid) = append_datafield_element(line_marker,
+                                                                                 citation_structure,
+                                                                                 line_elements,
+                                                                                 auth_for_ibid,
+                                                                                 xml_line)
                     ## Add the author subfield with the author text
                     xml_line += """
       <subfield code="%(sf-code-ref-auth)s">%(authors)s</subfield>""" \
@@ -2992,6 +3135,10 @@ def build_formatted_xml_citation(citation_elements,line_marker):
 
         ## The number of elements processed
         elements_processed+=1
+
+    ## Append the author, if needed for an ibid, for the last element in the entire line
+    ## Don't bother setting the author to be used for ibids, since the line is finished
+    xml_line += check_author_for_ibid(line_elements,auth_for_ibid)[0]
 
     ## Close the ending datafield element
     xml_line += """
@@ -3037,8 +3184,6 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
     # the last tag element found when working from left-to-right across the line
     identified_citation_element = None
 
-    #print "tagged line from where information will be extracted \n %s" % processed_line
-
     while tag_match is not None:
         ## While there are tags inside this reference line...
         tag_match_start = tag_match.start()
@@ -3046,18 +3191,32 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
         tag_type        = tag_match.group(1)
         #print "adding to cur_misc_txt: %s" % processed_line[0:tag_match_start]
         cur_misc_txt += processed_line[0:tag_match_start]
-        if tag_type == "TITLE":
+
+        ## Catches both standard titles, and ibid's
+        if tag_type.find("TITLE") != -1:
             ## This tag is an identified journal TITLE. It should be followed
             ## by VOLUME, YEAR and PAGE tags.
 
-            ## extract the title from the line:
-            idx_closing_tag = processed_line.find(CFG_REFEXTRACT_MARKER_CLOSING_TITLE, tag_match_end)
+            ## See if the found title has been tagged as an ibid: <cds.TITLEibid>
+            if tag_match.group('ibid'):
+                is_ibid = True
+                closing_tag_length = len(CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID)
+                idx_closing_tag = processed_line.find(CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID, \
+                                                        tag_match_end)
+            else:
+                is_ibid = False
+                closing_tag_length = len(CFG_REFEXTRACT_MARKER_CLOSING_TITLE)
+                ## extract the title from the line:
+                idx_closing_tag = processed_line.find(CFG_REFEXTRACT_MARKER_CLOSING_TITLE, \
+                                                       tag_match_end)
+
 
             if idx_closing_tag == -1:
-                ## no closing </cds.TITLE> tag found - get rid of the solitary tag
+                ## no closing TITLE tag found - get rid of the solitary tag
                 processed_line = processed_line[tag_match_end:]
                 identified_citation_element = None
             else:
+
                 ## Closing tag was found:
                 ## The title text to be used in the marked-up citation:
                 title_text  = processed_line[tag_match_end:idx_closing_tag]
@@ -3065,7 +3224,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                 ## after this title citation:
                 title_text_for_ibid = title_text
                 ## Now trim this matched title and its tags from the start of the line:
-                processed_line = processed_line[idx_closing_tag+len(CFG_REFEXTRACT_MARKER_CLOSING_TITLE):]
+                processed_line = processed_line[idx_closing_tag+closing_tag_length:]
 
                 ## Was this title followed by the tags of recognised VOLUME, YEAR and PAGE objects?
                 numeration_match = re_recognised_numeration_for_title.match(processed_line)
@@ -3077,18 +3236,25 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                     ## Skip past the matched numeration in the working line:
                     processed_line = processed_line[numeration_match.end():]
 
+                    ## 'id_ibid' saves whether THIS TITLE is an ibid or not. (True or False)
+                    ## 'extra_ibids' are there to hold ibid's without the word 'ibid', which
+                    ## come directly after this title
+                    ## i.e., they are recognised using title numeration instead of ibid notation
                     identified_citation_element =   {   'type'       : "TITLE",
                                                         'misc_txt'   : cur_misc_txt,
                                                         'title'      : title_text,
                                                         'volume'     : reference_volume,
                                                         'year'       : reference_year,
                                                         'page'       : reference_page,
-                                                        'IBIDs'      : []
+                                                        'is_ibid'    : is_ibid,
+                                                        'extra_ibids': []
                                                     }
                     count_title += 1
                     cur_misc_txt = u""
-
-                    # Now try to find IBID's after this title
+            
+                    ## Try to find IBID's after this title, on top of previously found titles that were
+                    ## denoted with the word 'IBID'. (i.e. look for IBID's without the word 'IBID' by
+                    ## looking at extra numeration after this title)
                     numeration_match = re_numeration_no_ibid_txt.match(processed_line)
                     while numeration_match is not None:
 
@@ -3099,7 +3265,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                         processed_line = processed_line[numeration_match.end():]
 
                         ## Takes the just found title text
-                        identified_citation_element['IBIDs'].append(
+                        identified_citation_element['extra_ibids'].append(
                                                 { 'type'       : "TITLE",
                                                   'misc_txt'   : "",
                                                   'title'      : title_text_for_ibid,
@@ -3163,10 +3329,10 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
             identified_urls[0:1] = []
 
             ## Save the current misc text
-            identified_citation_element =   {   'type'      :     "URL",
+            identified_citation_element =   {   'type'       :     "URL",
                                                 'misc_txt'   :     "%s" % cur_misc_txt,
                                                 'url_string' :     "%s" % url_string,
-                                                'url_desc'  :     "%s" % url_desc
+                                                'url_desc'   :     "%s" % url_desc
                                             }
             count_url += 1
             cur_misc_txt = u""
@@ -3185,7 +3351,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
             identified_dois[0:1] = []
 
             #SAVE the current misc text
-            identified_citation_element =   {      'type'       : "DOI",
+            identified_citation_element =   {       'type'       : "DOI",
                                                     'misc_txt'   : "%s" % cur_misc_txt,
                                                     'doi_string' : "%s" % doi_string
                                             }
@@ -3201,13 +3367,16 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
             ## extract the title from the line:
             if tag_type.find("stnd") <> -1:
                 auth_type = "stnd"
-                idx_closing_tag_nearest = processed_line.find("</cds.AUTHstnd>", tag_match_end)
+                idx_closing_tag_nearest = processed_line.find(\
+                    CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND, tag_match_end)
             elif tag_type.find("etal") <> -1:
                 auth_type = "etal"
-                idx_closing_tag_nearest = processed_line.find("</cds.AUTHetal>", tag_match_end)
+                idx_closing_tag_nearest = processed_line.find(\
+                    CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL, tag_match_end)
             elif tag_type.find("incl") <> -1:
                 auth_type = "incl"
-                idx_closing_tag_nearest = processed_line.find("</cds.AUTHincl>", tag_match_end)
+                idx_closing_tag_nearest = processed_line.find(\
+                    CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL, tag_match_end)
 
             if idx_closing_tag_nearest == -1:
                 ## no closing </cds.AUTH****> tag found - strip the opening tag
@@ -3217,7 +3386,6 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
             else:
                 auth_txt = processed_line[tag_match_end:idx_closing_tag_nearest]
                 ## Now move past the ending tag in the line:
-                ## FIXME add the string to a CONF variable
                 processed_line = processed_line[idx_closing_tag_nearest+len("</cds.AUTHxxxx>"):]
                 #SAVE the current misc text
                 identified_citation_element =   {   'type'       : "AUTH",
@@ -3290,7 +3458,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
     if len(cur_misc_txt.strip(" .;,")) > 0:
         ## Increment the stats counters:
         count_misc += 1
-        identified_citation_element =   {   'type'  : "MISC",
+        identified_citation_element =   {   'type'       : "MISC",
                                             'misc_txt'   : "%s" % cur_misc_txt,
                                         }
         citation_elements.append(identified_citation_element)
@@ -3339,7 +3507,10 @@ def move_tagged_series_into_tagged_title(line):
             ## Add a full-stop followed by a space, then the series letter:
             corrected_title_text += ". %s" % series_match
 
-        line = re.sub("%s" % re.escape(entire_match), "<cds.TITLE>%s</cds.TITLE>" % corrected_title_text, line, 1)
+        if match.group('ibid'):
+            line = re.sub("%s" % re.escape(entire_match), "<cds.TITLEibid>%s</cds.TITLEibid>" % corrected_title_text, line, 1)
+        else:
+            line = re.sub("%s" % re.escape(entire_match), "<cds.TITLE>%s</cds.TITLE>" % corrected_title_text, line, 1)
         m_tagged_series = re_title_followed_by_series_markup_tags.search(line)
     return line
 
@@ -3424,6 +3595,9 @@ def add_tagged_title_in_place_of_IBID(previous_match,
        @return: (tuple) containing a string (the rebuilt line segment) and an
         other string (the newly updated previous-match).
     """
+
+    IBID_start_tag = " <cds.TITLEibid>"
+
     rebuilt_line = u""
     if ibid_series != "":
         ## This IBID has a series letter. If the previously matched TITLE also
@@ -3438,16 +3612,18 @@ def add_tagged_title_in_place_of_IBID(previous_match,
 
             if previous_series == ibid_series:
                 ## Both the previous match & this IBID have the same series
-                rebuilt_line += " <cds.TITLE>%(previous-match)s</cds.TITLE>" \
-                                % { 'previous-match' : previous_match }
+                rebuilt_line += IBID_start_tag + "%(previous-match)s" \
+                                % { 'previous-match' : previous_match } + \
+                                CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID
             else:
                 ## Previous match and this IBID do not have the same series
                 previous_match = \
                       re.sub("(\\.?)(,?) +%s$" % previous_series, \
                               "\\g<1>\\g<2> %s" % ibid_series, \
                               previous_match)
-                rebuilt_line += " <cds.TITLE>%(previous-match)s</cds.TITLE>" \
-                                % { 'previous-match' : previous_match }
+                rebuilt_line += IBID_start_tag + "%(previous-match)s" \
+                                % { 'previous-match' : previous_match } + \
+                                CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID
         else:
             ## Previous match had no recognised series but the IBID did. Add a
             ## the series letter to the end of the previous match.
@@ -3462,12 +3638,15 @@ def add_tagged_title_in_place_of_IBID(previous_match,
                 ## then a space, then the IBID series
                 previous_match += ". %(ibid-series)s" \
                                   % { 'ibid-series' : ibid_series }
-            rebuilt_line += " <cds.TITLE>%(previous-match)s</cds.TITLE>" \
-                           % { 'previous-match' : previous_match }
+            rebuilt_line += IBID_start_tag + "%(previous-match)s" \
+                           % { 'previous-match' : previous_match } + \
+                            CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID
     else:
         ## IBID's series letter is empty - Replace as-is:
-        rebuilt_line += " <cds.TITLE>%(previous-match)s</cds.TITLE>" \
-                       % { 'previous-match' : previous_match }
+        rebuilt_line += IBID_start_tag + "%(previous-match)s" \
+                       % { 'previous-match' : previous_match } + \
+                        CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID
+
     return (rebuilt_line, previous_match)
 
 def add_tagged_title(reading_line,
@@ -3481,7 +3660,7 @@ def add_tagged_title(reading_line,
     """In rebuilding the line, add an identified periodical TITLE (standardised
        and tagged) into the line.
        @param reading_line: (string) The reference line before capitalization
-        was performed, and before REPORT-NUMBERs and TITLEs were stipped out.
+        was performed, and before REPORT-NUMBERs and TITLEs were stripped out.
        @param len_title: (integer) the length of the matched TITLE.
        @param matched_title: (string) the matched TITLE text.
        @previous_match: (string) the previous periodical TITLE citation to
@@ -3504,7 +3683,8 @@ def add_tagged_title(reading_line,
     ## of the reading-line, up to the point of the matched TITLE:
     rebuilt_line = reading_line[startpos:true_replacement_index]
     ## Test to see whether a title or an "IBID" was matched:
-    if matched_title.upper().find("IBID") != -1:
+    if matched_title.upper().find("IBID") != -1 \
+        or matched_title.upper().find("IBIDEM") != -1:
         ## This is an IBID
         ## Try to replace the IBID with a title:
         if previous_match != "":
@@ -3564,6 +3744,7 @@ def add_tagged_title(reading_line,
     ## return the rebuilt line-segment, the position (of the reading line) from
     ## which the next part of the rebuilt line should be started, and the newly
     ## updated previous match.
+
     return (rebuilt_line, startpos, previous_match)
 
 
@@ -3722,8 +3903,7 @@ def create_marc_xml_reference_section(ref_sect,
 
         ## Attempt to identify, record and replace any IBIDs in the line:
         if (working_line2.upper().find(u"IBID") != -1) or \
-            (working_line2.upper().find(u"IBIDEM") != -1) or \
-            (working_line2.upper().find(u"IBI-DEM") != -1):
+            (working_line2.upper().find(u"IBIDEM") != -1):
             ## there is at least one IBID in the line - try to
             ## identify its meaning:
             (found_ibids_len, \

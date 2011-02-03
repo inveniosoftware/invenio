@@ -63,11 +63,16 @@ CFG_REFEXTRACT_SUBFIELD_EXTRACTION_STATS = "a"   ## ref-stats subfield
 ## information. These are the "closing tags:
 CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM = r"</cds.REPORTNUMBER>"
 CFG_REFEXTRACT_MARKER_CLOSING_TITLE      = r"</cds.TITLE>"
+CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID = r"</cds.TITLEibid>"
 CFG_REFEXTRACT_MARKER_CLOSING_SERIES     = r"</cds.SER>"
 CFG_REFEXTRACT_MARKER_CLOSING_VOLUME     = r"</cds.VOL>"
 CFG_REFEXTRACT_MARKER_CLOSING_YEAR       = r"</cds.YR>"
 CFG_REFEXTRACT_MARKER_CLOSING_PAGE       = r"</cds.PG>"
 
+## Of the form '</cds.AUTHxxxx>' only
+CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND= r"</cds.AUTHstnd>"
+CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL= r"</cds.AUTHetal>"
+CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL= r"</cds.AUTHincl>"
 
 ## XML Record and collection opening/closing tags:
 CFG_REFEXTRACT_XML_VERSION          = u"""<?xml version="1.0" encoding="UTF-8"?>"""
