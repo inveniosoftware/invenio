@@ -1237,7 +1237,6 @@ def make_extra_author_regex_str():
         sys.stderr.write(emsg)
         sys.stderr.flush()
         sys.exit(1)
-    print "returning: %s" % (author_match_re)
     return author_match_re
 
 re_extra_auth = re.compile(make_extra_author_regex_str())
@@ -2122,7 +2121,6 @@ def identify_and_tag_authors(line):
                                     'end'         : match.end()})
             positions.reverse()
             for p in positions:
-                print 'found "include author": %s' % (line[p['start']:p['end']])
                 line = line[:p['start']] + "<cds.AUTHincl>" \
                     + line[p['start']:p['end']].strip(".,:;- []") + "</cds.AUTHincl>" + line[p['end']:]
         return line
@@ -2216,8 +2214,9 @@ def identify_and_tag_authors(line):
             add_to_misc = ""
             ## If a semi-colon was found at the end of this author group, keep it in misc
             ## so that it can be looked at for splitting heurisitics
-            if output_line[m['end']].strip(" ,.") == ';':
-                add_to_misc = ';'
+            if (len(output_line) > m['end']):
+                if output_line[m['end']].strip(" ,.") == ';':
+                    add_to_misc = ';'
 
             ## ONLY wrap author data with tags IF there is no evidence that it is an
             ## ed. author. (i.e. The author is not referred to as an editor)
@@ -2595,9 +2594,6 @@ def create_marc_xml_reference_line(line_marker,
     ## Before moving onto creating the XML string... try to find any authors in the line
     ## Found authors are immediately placed into tags (after Titles and Repnum's have been found)
     tagged_line = identify_and_tag_authors(tagged_line)
-
-    print '\n%s - to : convert_processed_reference_line_to_marc_xml' % line_marker
-    print 'tagged line %s' % tagged_line
 
     ## Now, from the tagged line, create a MARC XML string,
     ## marking up any recognised citations:
@@ -3687,8 +3683,6 @@ def create_marc_xml_reference_section(ref_sect,
         ## Now that numeration has been marked-up, check for and remove any
         ## ocurrences of " bf ":
         working_line1 = re_identify_bf_before_vol.sub(r" \1", working_line1)
-
-        print "Line given to before REP# and TITLE: %s" % working_line1
 
         ## Clean the line once more:
         working_line1 = wash_line(working_line1)
@@ -5304,7 +5298,8 @@ def get_plaintext_document_body(fpath):
         res_gfile = pipe_gfile.readline()
         pipe_gfile.close()
 
-        if res_gfile.lower().find("text") != -1 and \
+        if (res_gfile.lower().find("text") != -1 or 
+           res_gfile.lower().find("txt") != -1) and \
            res_gfile.lower().find("pdf") == -1:
             ## plain-text file: don't convert - just read in:
             textbody = []
