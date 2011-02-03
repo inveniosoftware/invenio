@@ -688,14 +688,14 @@ def get_bad_char_replacements():
         ## \030 : cedilla
         u'\u0327c' : u'\u00E7',
         u'\u0327C' : u'\u00C7',
-        ## \02DC : tilde (s with a tilde turns to just 's')
+        ## \02DC : tilde
         u'\u02DCn' : u'\u00F1',
         u'\u02DCN' : u'\u00D1',
         u'\u02DCo' : u'\u00F5',
         u'\u02DCO' : u'\u00D5',
         u'\u02DCa' : u'\u00E3',
         u'\u02DCA' : u'\u00C3',
-        u'\u02DCs' : u'\u0073',
+        u'\u02DCs' : u'\u0303s', ## Combining tilde with 's'
     }
     return replacements
 
@@ -1060,8 +1060,29 @@ re_doi = (re.compile("""
 ## ((([A-Z]\w\s)\w+[\-\’'\`]?\w*)|([A-Z]\w+[\-\’'\`]?\w*)(\s+))
 ##  ([A-Z])
 
-def make_auth_regex_str(author=None,first_author=None):
-
+def make_auth_regex_str(first_author=None,author=None):
+    """
+       Build a regular expression used to identify groups of author names in a citation. This method
+       contains patterns for default authors, so no arguments are needed for the most reliable form
+       of matching.
+       @param first_author: (string) the first author which must be matched at the start of 
+        an author group (Applies to looking for initials first, then a surname. Else, first author will
+        be ignored, and one or two surnames which MUST be followed by 'et al' could be
+        matched instead). If the first author matches an 'A' for an initial, this 'A' MUST be followed
+        by a full stop (This is the only reason for having first_author).
+       @param author: (string) the author patterns which could be matched after the first author. The
+        same mechanics apply as with the use of the first author.
+       @return: (string) The regex which will:
+        - detect groups of authors in a range of formats, e.g.:
+            C. Hayward, V van Edwards, M. J. Woodbridge, and L. Kelloggs et al.,
+        - detect whether the author group has been marked up as editors of the doc.
+            (therefore they will NOT be marked up as authors) e.g.:
+            ed. C Hayward | (ed) V van Edwards  | ed by, M. J. Woodbridge and V van Edwards
+            | L. Kelloggs (editors) | M. Jackson (eds.) | ...
+        -detect a maximum of two surnames only if the surname(s) is followed by 'et al'
+         (must be separated by 'and' if there are two), e.g.:
+            Amaldi et al., | Hayward and Yellow et al.,
+    """
     if not author:
         ## Standard author, with a max of 9 initials, and a surname.
         ## The Initials MUST be uppercase, and have at least a dot or space between them.
@@ -1069,7 +1090,7 @@ def make_auth_regex_str(author=None,first_author=None):
     (
 
        ([A-Z]((\’\s?)|(\.\s?)|(\.?\s+)|(\.?\s?\-))){1,9}        ## The single initials (x1-9)(with a dot, space or hyphen separating them)
-       ([A-Za-z]\w{1,2}\s)?[A-Z]\w+[\-’'\`]?\w*                 ## The surname, which must start with an upper case lttr (single hyphen allowed)
+       ([A-Z]\w{1,2}\s)?[A-Z]\w+[\-’'`´]?\w*                 ## The surname, which must start with an upper case lttr (single hyphen allowed)
                                                                 ## ...and possbily a separate prefix consisting on 2-3 characters
        (([,\.]\s*)|([,\.]?\s+))                                 ## A comma, dot or space between authors
     )
@@ -1084,7 +1105,7 @@ def make_auth_regex_str(author=None,first_author=None):
 
       (([B-Z]((\.\s?)|(\.?\s+)|(\.?\s?\-)))|(A\.\s?))           ## The first initial (with a dot, space or hyphen separating them) if A, must end with '.'
        ([A-Z]((\’\s?)|(\.\s?)|(\.?\s+)|(\.?\s?\-))){0,8}        ## The single initials (x0-8) (with a dot, space or hyphen separating them)
-       ([A-Za-z]\w{1,2}\s)?[A-Z]\w+[\-’'\`]?\w*                 ## The surname, which must start with an upper case lttr (hyphen allowed)
+       ([A-Z]\w{1,2}\s)?[A-Z]\w+[\-’'`´]?\w*                 ## The surname, which must start with an upper case lttr (hyphen allowed)
                                                                 ## ...and possbily a separate prefix consisting on 2-3 characters
        (([,\.]\s*)|([,\.]?\s+))                                 ## A comma, dot or space between authors
     )
@@ -1105,17 +1126,31 @@ def make_auth_regex_str(author=None,first_author=None):
       |((eds?|edited|editions?)((\.\s?)|(\.?\s))by(\s|([:,]\s)))    ## 'eds?. by, ' | 'ed. by: ' | 'ed by '  | 'ed. by '| 'ed by: '
       |(\(\s?(eds?|edited|editors?)((\.\s?)|(\.?\s))?\)))           ## '( eds?. )'  | '(ed.)'    | '(ed )'   | '( ed )' | '(ed)'
      )?
-                                                                    ## Do not place comments to the side of 'format strings' !!!
-     %s
-     (%s)*
-     (
-      (([Aa][Nn]([Dd]|[Ss])|\&)\s+)                                 ## Maybe 'and' or 'ans' (mistake) or '&' tied with another name
-      %s
-     )?
+                                                                    ## Standard author form.. (e.g. J. Bloggs)
+   (
+         %s
+         (%s)*
+         (
+          (([Aa][Nn]([Dd]|[Ss])|\&)\s+)                             ## Maybe 'and' or 'ans' (mistake) or '&' tied with another name
+          %s
+         )?
 
-    (?P<et>
-        [Ee][Tt](((,|\.)\s*)|((,|\.)?\s+))[Aa][Ll][,\.]?[,\.]?\s*   ## Possibly: Et al., or Et al. or Et al,
-    )?
+        (?P<et> 
+            [Ee][Tt](((,|\.)\s*)|((,|\.)?\s+))[Aa][Ll][,\.]?[,\.]?\s*   ## Possibly: Et al., or Et al. or Et al, 
+        )?
+
+
+   )|(                                                              ## OR.. one or two surnames which MUST end with 'et al' (e.g. Amaldi et al.,)
+         [A-Z][^0-9_\.\s]{3,20}(?:(?:[,\.]\s*)|(?:[,\.]?\s+))
+         (?:
+          (?:(?:[Aa][Nn](?:[Dd]|[Ss])|\&)\s+)                       ## Maybe 'and' or 'ans' (mistake) or '&' tied with another name
+          [A-Z][^0-9_\.\s]{3,20}(?:(?:[,\.]\s*)|(?:[,\.]?\s+))
+         )?
+         (?P<et2> 
+            [Ee][Tt](?:(?:(?:,|\.)\s*)|(?:(?:,|\.)?\s+))
+            [Aa][Ll][,\.]?[,\.]?\s*                                 ## et al, MUST BE PRESENT however, for this author form
+         )
+   )
 
 
     (?P<ee>                                                         ## Look for 'ed' after the author group...
@@ -1140,12 +1175,13 @@ re_auth = (re.compile(make_auth_regex_str(),re.VERBOSE|re.UNICODE))
 
 
 weaker_author = """
-     (([A-Z]((\.\s?)|(\.?\s+)|(\-))){1,9}             ## look closely for initials, and less closely at the last name.
-     [^\s]*\s?[^\s]*?(\s|$))
+      ([A-Z]((\.\s?)|(\.?\s+)|(\-))){1,9}             ## look closely for initials, and less closely at the last name.
+      (?:[^\s_<>]+(?:(?:[,\.]\s*)|(?:[,\.]?\s+)))+
     """
 
 ## End of line MUST match, since the next string is definitely a portion of an author group (append '$')
-re_auth_near_miss = (re.compile(make_auth_regex_str(weaker_author,weaker_author),re.VERBOSE|re.UNICODE))
+## The second author pattern is not used, but still passed.
+re_auth_near_miss = (re.compile(make_auth_regex_str("("+weaker_author+")+$",weaker_author),re.VERBOSE|re.UNICODE))
 
 ## Finding an et. al, before author names indicates a bad match!!!
 ## I.e. could be a title match... ignore it
@@ -2019,16 +2055,29 @@ def identify_and_tag_authors(line):
 
     output_line = line
     tmp_line = line
-    ## Firstly, go through and change JUST THE TITLES to underscores
-    ## so that title tag content won't be tagged as authors
-    title_start = tmp_line.find("<cds.TITLE>")
-    while title_start != -1:
-        title_end = tmp_line.find("</cds.TITLE>") + len("</cds.TITLE>")
-        ## Replace title tags, and the title itself with underscores (this line is used to find authors)
-        line = line[:title_start]+"_"*(title_end - title_start)+line[title_end:]
-        ## Place underscores in the wake of the search
-        tmp_line = "_"*len(tmp_line[:title_end]) + tmp_line[title_end:]
-        title_start = tmp_line.find("<cds.TITLE>")
+    ## Firstly, go through and change ALL TAGS and their contents to underscores
+    ## author content can be checked for underscores later on
+    tag_start = tmp_line.find("<cds.")
+    url_start = tmp_line.find("<cds.URL />")
+    doi_start = tmp_line.find("<cds.DOI />")
+    while tag_start != -1:
+        if (tag_start == url_start) or (tag_start == doi_start):
+            tag_end = tag_start + len("<cds.XXX />")
+            line = line[:tag_start]+"_"*(tag_end - tag_start)+line[tag_end:]
+            tmp_line = "_"*len(tmp_line[:tag_end]) + tmp_line[tag_end:]
+
+            url_start = tmp_line.find("<cds.URL />")
+            doi_start = tmp_line.find("<cds.DOI />")
+            tag_start = tmp_line.find("<cds.",tag_end)
+        else:
+            tag_start_length = (tmp_line.find(">",tag_start) + 1) - tag_start
+            final_length = (tmp_line.find(">",tmp_line.find("</cds.",tag_start+tag_start_length)) + 1) - tag_start
+            tag_end = tag_start+final_length
+            ## Replace title tags, and the title itself with underscores (this line is used to find authors)
+            line = line[:tag_start]+("_"*final_length)+line[tag_end:]
+            ## Place underscores in the wake of the search
+            tmp_line = "_"*len(tmp_line[:tag_end]) + tmp_line[tag_end:]
+            tag_start = tmp_line.find("<cds.",tag_end)
 
     ## Find as many author groups (collections of author names) as possible from the 'title-hidden' line
     matched_authors = re_auth.finditer(line)
@@ -2038,18 +2087,22 @@ def identify_and_tag_authors(line):
         preceeding_text_string = line
         preceeding_text_start = 0
         for auth_no, match in enumerate(matched_authors):
-            ## Has the group with name 'et' (for 'et al') been found in the pattern?
-            ## Has the group with name 'es' (for ed. before the author) been found in the pattern?
-            ## Has the group with name 'ee' (for ed. after the author) been found in the pattern?
-            matched_positions.append({  'start'       : match.start(),
-                                        'end'         : match.end(),
-                                        'etal'        : match.group('et'),
-                                        'ed_start'    : match.group('es'),
-                                        'ed_end'      : match.group('ee'),
-                                        'text_before' : preceeding_text_string[preceeding_text_start:match.start()],
-                                        'auth_no'     : auth_no })
-            ## Save the end of the match, from where to snip the misc text found before an author match
-            preceeding_text_start = match.end()
+            ## Only if there are no underscores or closing arrows found in the matched author group
+            ## This must be checked for here, as it cannot be applied to the re without clashing with
+            ## other Unicode characters
+            if line[match.start():match.end()].find("_") == -1:
+                ## Has the group with name 'et' (for 'et al') been found in the pattern?
+                ## Has the group with name 'es' (for ed. before the author) been found in the pattern?
+                ## Has the group with name 'ee' (for ed. after the author) been found in the pattern?
+                matched_positions.append({  'start'       : match.start(),
+                                            'end'         : match.end(),
+                                            'etal'        : match.group('et'),
+                                            'ed_start'    : match.group('es'),
+                                            'ed_end'      : match.group('ee'),
+                                            'text_before' : preceeding_text_string[preceeding_text_start:match.start()],
+                                            'auth_no'     : auth_no })
+                ## Save the end of the match, from where to snip the misc text found before an author match
+                preceeding_text_start = match.end()
 
         ## Work backwards to avoid index problems when adding AUTH tags
         matched_positions.reverse()
@@ -2062,7 +2115,7 @@ def identify_and_tag_authors(line):
             lower_text_before = m['text_before'].strip().lower()
             for e in bad_etal_before_auth_matches:
                 if lower_text_before.endswith(e):
-                    ## If so, this author match is likely to be a bad match on a title
+                    ## If so, this author match is likely to be a bad match on a missed title
                     dump_in_misc = True
                     break
 
@@ -2070,8 +2123,8 @@ def identify_and_tag_authors(line):
             ## Thus, triggers weaker author searching, within the previous misc text
             ## (Check the text before the current match to see if it has a bad 'and')
             if not dump_in_misc and (lower_text_before.endswith(' and') or lower_text_before.endswith(' ans')):
-                ## Search using a weaker author pattern to try and find the missed author(s)
-                weaker_match = re_auth_near_miss.search(m['text_before'])
+                ## Search using a weaker author pattern to try and find the missed author(s) (cut away the end 'and')
+                weaker_match = re_auth_near_miss.match(m['text_before'])
                 if weaker_match and not (weaker_match.group('es') or weaker_match.group('ee')):
                     ## Change the start of the author group to include this new author group
                     start = start - (len(m['text_before']) - weaker_match.start())
@@ -2551,7 +2604,7 @@ def start_datafield_element(line_marker):
     return new_datafield
 
 
-def apply_semi_colon_heuristics(misc_txt,past_elements,elements_processed,total_elements):
+def split_on_semi_colon(misc_txt,past_elements,elements_processed,total_elements):
     """ Given some misc text, see if there are any semi-colons which may indiciate that
         a reference line is in fact two separate citations.
         @param misc_txt: (string) The misc_txt to look for semi-colons within.
@@ -2584,6 +2637,26 @@ def apply_semi_colon_heuristics(misc_txt,past_elements,elements_processed,total_
             elif misc_txt.strip(" .,")[0] == ";":
                 return "before"
 
+    return False
+
+
+def dump_or_split_author(misc_txt,past_elements):
+    """
+        This method heavily assumes that the first author group found in a single citation is the
+        most reliable (In accordance with the IEEE standard, which states that authors should
+        be written at the beginning of a citation, in the overwhelming majority of cases).
+    """
+
+    ## If this author group is directly after another author group, with minimal misc text between, 
+    ## then this author group is very likely to be wrong.
+    if "A" in past_elements:
+        ## Minimal misc text after a previous author group. Not good.
+        if (past_elements[-1] == "A") and (len(misc_txt) < 6):
+            return "dump"
+        else:
+            ## Use this found author to create a new datafield
+            return "split"
+    
     return False
 
 
@@ -2628,12 +2701,12 @@ def build_formatted_xml_citation(citation_elements,line_marker):
             ## (an author choice will not create a new citation if a correct semi-colon is found)
             ## It is important to note that Author tagging helps the accurate detection
             ## a dual citation when looking for semi-colons (by reducing the length of misc text)
-            split_on_semi_colon = apply_semi_colon_heuristics(element['misc_txt'],\
-                                                                past_elements,\
-                                                                elements_processed,\
-                                                                len(citation_elements))
+            split_sc = split_on_semi_colon(element['misc_txt'],\
+                                           past_elements,\
+                                           elements_processed,\
+                                           len(citation_elements))
 
-            if split_on_semi_colon == "after":
+            if split_sc == "after":
                 if misc_txt:
                     ## Append the misc subfield, before any of semi-colons (if any),
                     ## only if there is are other elements to be processed after this current element
@@ -2647,7 +2720,7 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                 xml_line += append_datafield_element(line_marker)
                 past_elements = []
 
-            elif split_on_semi_colon == "before":
+            elif split_sc == "before":
                 ## FIRST
                 ## %%%%% Set as NEW citation line %%%%%
                 xml_line += append_datafield_element(line_marker)
@@ -2671,7 +2744,7 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                           }
 
         ## Now handle the type dependent actions
-        ## If a TITLE was found...
+##TITLE
         if element['type'] == "TITLE":
             ## If a report number has been marked up, and there's misc text before this title and the last tag
             if "R" in past_elements and \
@@ -2711,7 +2784,7 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                 past_elements = []
 
             past_elements.append("T")
-
+##REPORT NUMBER
         elif element['type'] == "REPORTNUMBER":
             report_number = element['report_num']
             ## If a report number has been marked up, and there's misc text before this title and the last tag
@@ -2733,7 +2806,7 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                    'report-number'          : encode_for_xml(report_number)
                 }
             past_elements.append("R")
-
+##URL
         elif element['type'] == "URL":
             if element['url_string'] == element['url_desc']:
                 ## Build the datafield for the URL segment of the reference line:
@@ -2754,7 +2827,7 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                             'url-desc'              : encode_for_xml(element['url_desc'])
                          }
             past_elements.append("U")
-
+##DOI
         elif element['type'] == "DOI":
             xml_line += """
       <subfield code="%(sf-code-ref-doi)s">%(doi-val)s</subfield>""" \
@@ -2762,22 +2835,32 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                         'doi-val'               : encode_for_xml(element['doi_string'])
                  }
             past_elements.append("D")
-
+##AUTHOR
         elif element['type'] == "AUTH":
-            # This is where the magic happens
-            if "A" in past_elements:
-                ## Stronger confirmation that this is an author group
-                if element['auth_type'] == 'etal' or element['auth_type'] == 'stnd':
-                    ## %%%%% Set as NEW citation line %%%%%
-                    xml_line += append_datafield_element(line_marker)
-                    past_elements = []
-                ## Create a new subfield type to hold this author group
-            xml_line += """
+
+            auth_choice = dump_or_split_author(element['misc_txt'],past_elements)
+
+            if auth_choice == "dump":
+                ## Place author text into misc text
+                xml_line += """
+      <subfield code="%(sf-code-ref-misc)s">%(auth-txt)s</subfield>""" \
+                     % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
+                         'auth-txt'               : encode_for_xml(element['auth_txt']),
+                      }
+            else:
+                if auth_choice == "split":
+                    ## This author triggered the creation of a new datafield
+                    if element['auth_type'] == 'etal' or element['auth_type'] == 'stnd':
+                        ## %%%%% Set as NEW citation line %%%%%
+                        xml_line += append_datafield_element(line_marker)
+                        past_elements = []
+                ## Add the author subfield with the author text
+                xml_line += """
       <subfield code="h">%(authors)s</subfield>""" \
-                % {     'authors'               : encode_for_xml(element['auth_txt'])
-                 }
-            ## Append the "A" symbol only
-            past_elements.append("A")
+                    % {     'authors'               : encode_for_xml(element['auth_txt'])
+                     }
+
+                past_elements.append("A")
 
         ## The number of elements processed
         elements_processed+=1
@@ -2785,6 +2868,7 @@ def build_formatted_xml_citation(citation_elements,line_marker):
     ## Close the ending datafield element
     xml_line += """
    </datafield>\n"""
+
 
     return xml_line
 
@@ -2799,6 +2883,10 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
         Try to find all tags and extract their contents and their types into corresponding
         dictionary elements. Append each dictionary tag representation onto a list, which
         is given to 'build_formatted_xml_citation()' where the correct xml output will be generated.
+        
+        This method is dumb, with very few heuristics. It simply looks for tags, and makes dictionaries
+        from the data it finds in a tagged reference line.
+
         @param line_marker: (string) The line marker for this single reference line (e.g. [19])
         @param line: (string) The tagged reference line.
         @param identified_dois: (list) a list of dois which were found in this line. The ordering of
@@ -3010,10 +3098,9 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                 count_auth_group += 1
                 cur_misc_txt = u""
 
-## These following tags may be found separately;
-## They are usually found when a "TITLE" tag is hit (ONLY immediately afterwards, however)
-## Sitting by themselves means they do not have an associated TITLE tag, and should be MISC
-
+        ## These following tags may be found separately;
+        ## They are usually found when a "TITLE" tag is hit (ONLY immediately afterwards, however)
+        ## Sitting by themselves means they do not have an associated TITLE tag, and should be MISC
         elif tag_type == "SER":
             ## This tag is a SERIES tag; Since it was not preceeded by a TITLE
             ## tag, it is useless - strip the tag and put it into miscellaneous:
@@ -5588,7 +5675,11 @@ def test_get_reference_lines():
                 """[1] P. A. M. Dirac, Proc. R. Soc. London, Ser. A155, 447(1936); ibid, D24, 3333(1981).""",
                 """[40] O.O. Vaneeva, R.O. Popovych and C. Sophocleous, Enhanced Group Analysis and Exact Solutions of Vari-able Coefficient Semilinear Diffusion Equations with a Power Source, Acta Appl. Math., doi:10.1007/s10440-008-9280-9, 46 p., arXiv:0708.3457.""",
                 """[41] M. I. Trofimov, N. De Filippis and E. A. Smolenskii. Application of the electronegativity indices of organic molecules to tasks of chemical informatics. Russ. Chem. Bull., 54:2235-2246, 2005. http://dx.doi.org/10.1007/s11172-006-0105-6.""",
-                """[42] M. Gell-Mann, P. Ramon ans R. Slansky, in Supergravity, P. van Niewenhuizen and D. Freedman (North-Holland 1979); T. Yanagida, in Proceedings of the Workshop on the Unified Thoery and the Baryon Number in teh Universe, ed. O. Sawaga and A. Sugamoto (Tsukuba 1979); R.N. Mohapatra and G. Senjanovic’, Phys. Rev. Lett. 44, 912, (1980).
+                """[42] M. Gell-Mann, P. Ramon ans R. Slansky, in Supergravity, P. van Niewenhuizen and D. Freedman (North-Holland 1979); T. Yanagida, in Proceedings of the Workshop on the Unified Thoery and the Baryon Number in teh Universe, ed. O. Sawaga and A. Sugamoto (Tsukuba 1979); R.N. Mohapatra and G. Senjanovic, Phys. Rev. Lett. 44, 912, (1980).
+                """,
+                """[43] L.S. Durkin and P. Langacker, Phys. Lett B166, 436 (1986); Amaldi et al., Phys. Rev. D36, 1385 (1987); Hayward and Yellow et al., Phys. Lett B245, 669 (1990); Nucl. Phys. B342, 15 (1990);
+                """,
+                """[44] M. I. _________________________________________ Molinero, and J. C. Oller, Performance test of the CMS link alignment system
                 """,
                ]
     return reflines
