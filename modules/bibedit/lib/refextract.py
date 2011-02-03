@@ -123,13 +123,13 @@ cli_opts = {}
 
 ## The minimum length of a reference's misc text to be deemed insignificant.
 ## Values higher than this value reflect meaningful misc text.
-## Hence, upon finding a correct semi-colon, but having current misc text 
+## Hence, upon finding a correct semi-colon, but having current misc text
 ## length less than this value (without other meaningful reference objects:
 ## report numbers, titles...) then no split will occur.
 ## (A higher value will increase splitting strictness. i.e. Fewer splits)
 semi_colon_misc_text_sensitivity = 60
 
-## The length of misc text between two adjacent authors which is 
+## The length of misc text between two adjacent authors which is
 ## deemed as insignificant. As such, when misc text of a length less
 ## than this value is found, then the latter author group is dumped into misc.
 ## (A higher value will increase splitting strictness. i.e. Fewer splits)
@@ -212,7 +212,7 @@ def compress_subfields(out,subfield_code):
         ## Found subfield in question, concatenate subfield contents for this single datafield
         elif line.find(subfield_start.strip()) != -1:
             if position == 0:
-                ## Save the position of this found subfield 
+                ## Save the position of this found subfield
                 ## for later insertion into the same place
                 new_rec_lines.append(subfield_start)
                 position = len(new_rec_lines) - 1
@@ -802,7 +802,7 @@ re_recognised_numeration_for_title = \
 ## <cds.YR>(1999)</cds.YR> <cds.PG>6119</cds.PG>.
 re_numeration_no_ibid_txt = \
           re.compile(r"""
-          ^((\s*;\s*|\s+and\s+):?\s                                 ## Leading ; : or " and :"
+          ^((\s*;\s*|\s+and\s+)[A-H]?\s*:?\s                        ## Leading ; : or " and :", and a possible series letter
           \<cds\.VOL\>(\d+|(?:\d+\-\d+))\<\/cds\.VOL>\s             ## Volume
           \<cds\.YR\>\(([12]\d{3})\)\<\/cds\.YR\>\s                 ## year
           \<cds\.PG\>([RL]?\d+[c]?)\<\/cds\.PG\>)                   ## page
@@ -838,13 +838,13 @@ re_tagged_numeration_near_line_start = \
                          re.compile(r'^.{0,4}?<CDS (VOL|SER)>', re.UNICODE)
 
 re_ibid = \
-   re.compile(r'(-|\b)?((?:(?:IBID)|(?:IBIDEM))\.?( ([A-H]|(I{1,3}V?|VI{0,3})|[1-3]))?)\s?:', \
+   re.compile(r'(-|\b)?((?:(?:IBID(?!EM))|(?:IBIDEM))\.?(\s([A-H]|(I{1,3}V?|VI{0,3})|[1-3]))?)\s?:', \
                re.UNICODE)
 
-re_matched_ibid = re.compile(r'(?:(?:IBID)|(?:IBIDEM))\.?\s?([A-H]|(I{1,3}V?|VI{0,3})|[1-3])?', \
+re_matched_ibid = re.compile(r'(?:(?:IBID(?!EM))|(?:IBIDEM))\.?\s?([A-H]|(I{1,3}V?|VI{0,3})|[1-3])?', \
                                re.UNICODE)
 
-re_title_series = re.compile(r'\.,? +([A-H]|(I{1,3}V?|VI{0,3}))$', \
+re_title_series = re.compile(r'\.,?\s+([A-H]|(I{1,3}V?|VI{0,3}))$', \
                                re.UNICODE)
 
 ## After having processed a line for titles, it may be possible to find more
@@ -1090,7 +1090,7 @@ re_doi = (re.compile("""
 
 def make_auth_regex_str(etal,initial_surname_author=None,surname_initial_author=None):
     """
-        Returns a regular expression to be used to identify groups of author names in a citation. 
+        Returns a regular expression to be used to identify groups of author names in a citation.
         This method contains patterns for default authors, so no arguments are needed for the
         most reliable form of matching.
 
@@ -1100,8 +1100,8 @@ def make_auth_regex_str(etal,initial_surname_author=None,surname_initial_author=
 
         2. Identifying multiple authors, each with at least one initial, of the form:
         'Initial. [surname prefix...] Surname, [and] [Initial. [surname prefix...] Surname ... ]'
-        ***(Note that a full stop, hyphen or apostrophe after each initial is 
-        absolutely vital in identifying authors for both of these above methods. 
+        ***(Note that a full stop, hyphen or apostrophe after each initial is
+        absolutely vital in identifying authors for both of these above methods.
         Initials must also be uppercase.)***
 
         3. Capture 'et al' statements at the end of author groups (allows for authors with et al
@@ -1117,10 +1117,10 @@ def make_auth_regex_str(etal,initial_surname_author=None,surname_initial_author=
         'Surname Initials, Initials Surname [Initials Surname]...'. Some authors choose
         to represent the most important cited author (in a list of authors) by listing first
         their surname, and then their initials. Since this form has little distinguishing
-        characteristics which could be used to create a reliable a pattern, at least one 
+        characteristics which could be used to create a reliable a pattern, at least one
         standard author must be present after it in order to improve the accuracy.
 
-        7. Capture editor notation, of which can take many forms e.g. 
+        7. Capture editor notation, of which can take many forms e.g.
         'eds. editors. edited by. etc.'. Authors captured in this way can be treated as
         'editor groups', and hense processed differently if needed from standard authors
 
@@ -1163,9 +1163,9 @@ def make_auth_regex_str(etal,initial_surname_author=None,surname_initial_author=
         ## which denotes the presence of other authors in the author group.
         surname_initial_author = u"""
     (
-                                                                 ## The optional surname prefix: 
+                                                                 ## The optional surname prefix:
                                                                  ## 1 or 2, 2-3 character prefixes before the surname (e.g. 'van','de')
-        (?:[A-Z]\w{1,2}(?:(?:[\-’'`´]\s?)|(?:\s))){0,2}                  
+        (?:[A-Z]\w{1,2}(?:(?:[\-’'`´]\s?)|(?:\s))){0,2}
 
         [A-Z]\w+[\-’'`´]?\w*                                     ## The surname, which must start with an upper case character (single hyphen allowed)
 
@@ -1220,15 +1220,18 @@ def make_auth_regex_str(etal,initial_surname_author=None,surname_initial_author=
          %(i_s_author)s
         )
         (?:%(i_s_author)s)*                                         ## Then 0 or more standard author names
+
+        (?:
+         (?:(?:[Aa][Nn][Dd]|\&)\s+)                                 ## Maybe 'and' or '&' tied with another name
+         %(i_s_author)s
+        )?
+
        )
-       (?:
-        (?:(?:[Aa][Nn][Dd]|\&)\s+)                                  ## Maybe 'and' or '&' tied with another name
-        %(i_s_author)s
-       )?
+       
                                                                     ## 'et al' need not be present for either of 'initial surname' or 'surname initial'
                                                                     ## authors
        (?P<et>
-        %(etal)s(?:(?:\s*)|(?:$))                                   
+        %(etal)s(?:(?:\s*)|(?:$))
        )?
      )
    )# End of all author name patters
@@ -1238,7 +1241,7 @@ def make_auth_regex_str(etal,initial_surname_author=None,surname_initial_author=
      |(\(([Ee][Dd]s?|[Ee]dited|[Ee]ditors?)([\.\,]{1,2}((\s)|($))?)?\)))                ## '(eds?.)' | '(ed. )' | '(ed)'
     )?
     \)?                                                             ## A possible closing bracket to finish the author group
-    
+
     """ % { 'etal'       : etal,
             'i_s_author' : initial_surname_author,
             's_i_author' : surname_initial_author }
@@ -1251,8 +1254,8 @@ re_etal = u"""[Ee][Tt](?:(?:(?:,|\.)\s*)|(?:(?:,|\.)?\s+))[Aa][Ll][,\.]?[,\.]?""
 
 re_auth = (re.compile(make_auth_regex_str(re_etal),re.VERBOSE|re.UNICODE))
 
-## Given an Auth hit, some misc text, and then another Auth hit straight after, 
-## (OR a bad_and was found) 
+## Given an Auth hit, some misc text, and then another Auth hit straight after,
+## (OR a bad_and was found)
 ## check the entire misc text to see if is 'looks' like an author group, which didn't match
 ## as a normal author. In which case, append it to the single author group.
 ## PLEASE use this pattern only against space stripped text.
@@ -1269,12 +1272,12 @@ re_auth_near_miss = (re.compile(make_auth_regex_str(re_etal,"("+re_weaker_author
 
 def make_extra_author_regex_str():
     """ From the authors knowledge-base, construct a single regex holding the or'd possibilities of patterns
-    which should be included in $h subfields. The word 'Collaboration' is also converted to 'Coll', and 
+    which should be included in $h subfields. The word 'Collaboration' is also converted to 'Coll', and
     used in finding matches. Letter case is not considered during the search.
     @return: (string) The single pattern built from each line in the author knowledge base.
     """
     def add_to_auth_list(s):
-        """ Strip the line, replace spaces with '\s' and append 'the' to the start 
+        """ Strip the line, replace spaces with '\s' and append 'the' to the start
         and 's' to the end. Add the prepared line to the list of extra kb authors. """
         s = "(?:the\s)?" + s.strip().replace(' ','\s') + "s?"
         auths.append(s)
@@ -2166,7 +2169,7 @@ def identify_and_tag_DOI(line):
         end = match.end()
         ## Get the actual DOI string (remove the url part of the doi string)
         doi_phrase = match.group(6)
-        
+
 
         ## Replace the entire matched doi with a tag
         line = line[0:start]+"<cds.DOI />"+line[end:]
@@ -2177,7 +2180,7 @@ def identify_and_tag_DOI(line):
 
 
 def identify_and_tag_authors(line):
-    """Given a reference, look for a group of author names, 
+    """Given a reference, look for a group of author names,
        place tags around the author group, return the newly tagged line.
     """
 
@@ -2305,18 +2308,22 @@ def identify_and_tag_authors(line):
                 output_line = output_line[:start] + "<cds.AUTHetal>" \
                     + tmp_stnd_etal_line \
                     + CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL + add_to_misc + output_line[end:]
-            elif not(m['ed_start'] or m['ed_end'] or dump_in_misc):    
+            elif not(m['ed_start'] or m['ed_end'] or dump_in_misc):
                 ## Insert the std (standard) tag
                 output_line = output_line[:start] + "<cds.AUTHstnd>" \
                     + output_line[start:end].strip(".,:;- []()") \
                     + CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND + add_to_misc + output_line[end:]
             ## Apply the 'include in $h' method to author groups marked as editors
             elif (m['ed_start'] or m['ed_end']):
-                ## remove any characters which denote this author group to be editors, just take the 
+                if m['multi_auth']:
+                    ed_notation = " (eds.)"
+                else:
+                    ed_notation = " (ed.)"
+                ## remove any characters which denote this author group to be editors, just take the
                 ## author names, and append '(ed.)'
                 output_line = output_line[:start] + "<cds.AUTHincl>" \
                     + m['author_names'].strip(".,:;- []()") \
-                    + " (ed.)" + CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL + add_to_misc + output_line[end:]
+                    + ed_notation + CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL + add_to_misc + output_line[end:]
 
 
     ## Now that authors have been tagged, search for the extra information which should be included in $h
@@ -2749,10 +2756,10 @@ def check_author_for_ibid(line_elements,author):
         @param line_elements: List of line elements for the entire processed reference
         line
         @param author: The current parent author element to be used with an ibid
-        @return: (tuple) - containing a possible new author subfield, and the parent 
-        author element to be used for future ibids (if any) 
+        @return: (tuple) - containing a possible new author subfield, and the parent
+        author element to be used for future ibids (if any)
     """
-    ## Upon splitting, check for ibids in the previous line, 
+    ## Upon splitting, check for ibids in the previous line,
     ## If an appropriate author was found, pair it with this ibid.
     ## (i.e., an author has not been explicitly paired with this ibid already
     ## and an author exists with the parent title to which this ibid refers)
@@ -2774,7 +2781,7 @@ def check_author_for_ibid(line_elements,author):
         ## as well as an author
         if (not title_element['is_ibid']) and (is_in_line_elements("AUTH",line_elements)):
             ## Set the author to be used for ibids, in the event that a subsequent ibid is found
-            ## this author element will be repeated. 
+            ## this author element will be repeated.
             ## This author is only used when an ibid is in a line
             ## and there is no other author found in the line.
             author = is_in_line_elements("AUTH",line_elements)[1]
@@ -2876,14 +2883,14 @@ def dump_or_split_author(misc_txt,line_elements):
     """
         Given the list of current elements, and misc text, try to decide how to use this
         author for splitting heuristics, and see if it is useful. Returning 'dump' indicates
-        put this author into misc text, since it had been identified as bad. 'split' 
+        put this author into misc text, since it had been identified as bad. 'split'
         indicates split the line and place this author into the fresh datafield. The empty string
         indicates add this author as normal to the current xml datafield.
 
         A line will be split using author information in two situations:
             1. When there already exists a previous author group in the same line
             2. If the only item in the current line is a title, with no misc text
-        In both situations, the newly found author element is placed into the newly created 
+        In both situations, the newly found author element is placed into the newly created
         datafield.
 
         This method heavily assumes that the first author group found in a single citation is the
@@ -2896,7 +2903,7 @@ def dump_or_split_author(misc_txt,line_elements):
     ## If an author has already been found in this reference line
     if is_in_line_elements("AUTH",line_elements):
 
-        ## If this author group is directly after another author group, 
+        ## If this author group is directly after another author group,
         ## with minimal misc text between, then this author group is very likely to be wrong.
         if (line_elements[-1]['type'] == "AUTH") \
         and (len(misc_txt) < adjacent_auth_misc_separation):
@@ -3164,8 +3171,8 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                     line_elements.append(element)
 
             elif element['auth_type'] == 'incl':
-                ## Always include the matched author from the knowledge base into the datafield, 
-                ## No splitting heuristics are used here. It is purely so that it can be included 
+                ## Always include the matched author from the knowledge base into the datafield,
+                ## No splitting heuristics are used here. It is purely so that it can be included
                 ## with any previously found authors for this datafield.
                 xml_line += """
       <subfield code="%(sf-code-ref-auth)s">(%(authors)s)</subfield>""" \
@@ -3198,7 +3205,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
         Try to find all tags and extract their contents and their types into corresponding
         dictionary elements. Append each dictionary tag representation onto a list, which
         is given to 'build_formatted_xml_citation()' where the correct xml output will be generated.
-        
+
         This method is dumb, with very few heuristics. It simply looks for tags, and makes dictionaries
         from the data it finds in a tagged reference line.
 
@@ -3291,7 +3298,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                                                     }
                     count_title += 1
                     cur_misc_txt = u""
-            
+
                     ## Try to find IBID's after this title, on top of previously found titles that were
                     ## denoted with the word 'IBID'. (i.e. look for IBID's without the word 'IBID' by
                     ## looking at extra numeration after this title)
@@ -3643,13 +3650,13 @@ def add_tagged_title_in_place_of_IBID(previous_match,
         ## This IBID has a series letter. If the previously matched TITLE also
         ## had a series letter and that series letter differs to the one
         ## carried by this IBID, the series letter stored in the previous-match
-        ## must be updated to that of this IBID:
+        ## must be updated to that of this IBID
+        ## (i.e. Keep the series letter paired directly with the IBID):
         m_previous_series = re_title_series.search(previous_match)
 
         if m_previous_series is not None:
             ## Previous match had a series:
             previous_series = m_previous_series.group(1)
-
             if previous_series == ibid_series:
                 ## Both the previous match & this IBID have the same series
                 rebuilt_line += IBID_start_tag + "%(previous-match)s" \
@@ -3723,8 +3730,7 @@ def add_tagged_title(reading_line,
     ## of the reading-line, up to the point of the matched TITLE:
     rebuilt_line = reading_line[startpos:true_replacement_index]
     ## Test to see whether a title or an "IBID" was matched:
-    if matched_title.upper().find("IBID") != -1 \
-        or matched_title.upper().find("IBIDEM") != -1:
+    if matched_title.upper().find("IBID") != -1:
         ## This is an IBID
         ## Try to replace the IBID with a title:
         if previous_match != "":
@@ -3942,8 +3948,7 @@ def create_marc_xml_reference_section(ref_sect,
                                                  line_titles_count)
 
         ## Attempt to identify, record and replace any IBIDs in the line:
-        if (working_line2.upper().find(u"IBID") != -1) or \
-            (working_line2.upper().find(u"IBIDEM") != -1):
+        if (working_line2.upper().find(u"IBID") != -1):
             ## there is at least one IBID in the line - try to
             ## identify its meaning:
             (found_ibids_len, \
@@ -5518,7 +5523,7 @@ def get_plaintext_document_body(fpath):
         res_gfile = pipe_gfile.readline()
         pipe_gfile.close()
 
-        if (res_gfile.lower().find("text") != -1 or 
+        if (res_gfile.lower().find("text") != -1 or
            res_gfile.lower().find("txt") != -1) and \
            res_gfile.lower().find("pdf") == -1:
             ## plain-text file: don't convert - just read in:
@@ -6047,7 +6052,9 @@ def test_get_reference_lines():
                 """[235] Hawking S., D. Freeman, some title of some journal
                 """,
                 """[236] Hawking S. and D. Freeman, another random title of some random journal
-                """
+                """,
+                """[237] L.S. Durkin and P. Langacker, Phys. Lett B166, 436 (1986); Amaldi et al., Phys. Rev. D36, 1385 (1987); G. Altarelli et al., Phys. Lett B245, 669 (1990); Nucl. Phys. B342, 15 (1990); Phys. Lett. B261, 146 (1991); ibidem B263, 459 (1991);
+                """,
                ]
     return reflines
 
