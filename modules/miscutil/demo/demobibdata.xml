@@ -22155,6 +22155,10 @@
   <!--It's probably a good article, anyway-->
   <record>
     <controlfield tag="003">SzGeCERN</controlfield>
+    <datafield tag="024" ind1="7" ind2=" ">
+        <subfield code="a">10.1142/S0217732300001444</subfield>
+        <subfield code="2">DOI</subfield>
+    </datafield>
     <datafield tag="035" ind1=" " ind2=" ">
       <subfield code="a">2174811CERCER</subfield>
     </datafield>
