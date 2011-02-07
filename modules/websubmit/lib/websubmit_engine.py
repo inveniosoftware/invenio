@@ -338,6 +338,11 @@ def interface(req,
     fp.write(curdir)
     fp.close()
 
+    ## Let's write in ln file the current language
+    fp = open(os.path.join(curdir, "ln"), "w")
+    fp.write(ln)
+    fp.close()
+
     # Save the form fields entered in the previous submission page
     # If the form was sent with the GET method
     form = dict(req.form)
@@ -884,6 +889,11 @@ def endaction(req,
     ## in case e.g. it is needed in FFT.
     fp = open(os.path.join(curdir, "curdir"), "w")
     fp.write(curdir)
+    fp.close()
+
+    ## Let's write in ln file the current language
+    fp = open(os.path.join(curdir, "ln"), "w")
+    fp.write(ln)
     fp.close()
 
     # Save the form fields entered in the previous submission page

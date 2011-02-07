@@ -48,7 +48,8 @@ CFG_RESERVED_SUBMISSION_FILENAMES = ['SuE',
                                      'lastuploadedfile',
                                      'curdir',
                                      'function_log',
-                                     'SN']
+                                     'SN',
+                                     'ln']
 
 ## CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM -- a comma-separated
 ## list of document extensions in decrescent order of preference
