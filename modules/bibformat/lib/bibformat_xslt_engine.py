@@ -76,7 +76,7 @@ if processor_type == -1:
     # No XSLT processor found
     sys.stderr.write('No XSLT processor could be found.\n' \
                      'No output produced.\n')
-    sys.exit(1)
+    #sys.exit(1)
 
 ##################################################################
 # Support for 'creation_date' and 'modification_date' functions  #
@@ -318,7 +318,7 @@ def format(xmltext, template_filename=None, template_source=None):
     if processor_type == -1:
         # No XSLT processor found
         sys.stderr.write('No XSLT processor could be found.')
-        sys.exit(1)
+        #sys.exit(1)
 
     # Retrieve template and read it
     if template_source:
