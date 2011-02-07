@@ -58,12 +58,8 @@ from invenio.plotextractor_getter import harvest_single, make_single_directory
 from invenio.plotextractor import process_single
 
 ## precompile some often-used regexp for speed reasons:
-re_subfields = re.compile('\$\$\w')
-re_datetime_shift = re.compile("([-\+]{0, 1})([\d]+)([dhms])")
-re_record = re.compile('<record>(.*?<datafield tag="035" ind1=" " ind2=" ">' + \
-                           '<subfield code="9">arXiv<\/subfield>' + \
-                           '<subfield code="z">(.*?)<\/subfield>' + \
-                       '<\/datafield>.*?)<\/record>', re.DOTALL)
+re_oai_id = re.compile("<identifier.*?>(.*?)<\/identifier>", re.DOTALL)
+re_record = re.compile('<record.*?>(.*?)</record>', re.DOTALL)
 
 tmpHARVESTpath = CFG_TMPDIR + "/oaiharvest"
 
@@ -97,7 +93,7 @@ def task_run_core():
         for reposname in task_get_option("repository"):
             row = get_row_from_reposname(reposname)
             if row == []:
-                write_message("source name " + reposname + " is not valid")
+                write_message("source name %s is not valid" % (reposname,))
                 continue
             else:
                 reposlist.append(get_row_from_reposname(reposname))
@@ -134,42 +130,38 @@ def task_run_core():
                                       str(datelist[1]),
                                       j, \
                                       len(reposlist)))
-                exit_code, file_list = oai_harvest_get(prefix = repos[0][2],
-                                      baseurl = repos[0][1],
-                                      harvestpath = harvestpath,
-                                      fro = str(datelist[0]),
-                                      until = str(datelist[1]),
-                                      setspecs = setspecs)
+                exit_code, file_list = oai_harvest_get(prefix=repos[0][2],
+                                      baseurl=repos[0][1],
+                                      harvestpath=harvestpath,
+                                      fro=str(datelist[0]),
+                                      until=str(datelist[1]),
+                                      setspecs=setspecs)
                 if exit_code == 1 :
-                    write_message("source " + reponame + \
-                                  " was harvested from " + str(datelist[0]) \
-                                  + " to " + str(datelist[1]))
+                    write_message("source %s was harvested from %s to %s" % \
+                                  (reponame, str(datelist[0]), str(datelist[1])))
                     harvested_files_list = file_list
                 else:
-                    write_message("an error occurred while harvesting "
-                        "from source " +
-                        reponame + " for the dates chosen")
+                    write_message("an error occurred while harvesting from source %s for the dates chosen" % \
+                                  (reponame,))
                     error_happened_p = True
                     continue
 
             elif dateflag != 1 and repos[0][7] is None and repos[0][8] != 0:
-                write_message("source " + reponame + \
-                              " was never harvested before - harvesting whole "
-                              "repository")
+                write_message("source %s was never harvested before - harvesting whole repository" % \
+                              (reponame,))
                 task_update_progress("Harvesting %s (%i/%i)" % \
                                      (reponame,
                                       j, \
                                       len(reposlist)))
-                exit_code, file_list = oai_harvest_get(prefix = repos[0][2],
-                                      baseurl = repos[0][1],
-                                      harvestpath = harvestpath,
-                                      setspecs = setspecs)
+                exit_code, file_list = oai_harvest_get(prefix=repos[0][2],
+                                      baseurl=repos[0][1],
+                                      harvestpath=harvestpath,
+                                      setspecs=setspecs)
                 if exit_code == 1 :
                     update_lastrun(repos[0][0])
                     harvested_files_list = file_list
                 else :
-                    write_message("an error occurred while harvesting from "
-                        "source " + reponame)
+                    write_message("an error occurred while harvesting from source %s" % (reponame,))
                     error_happened_p = True
                     continue
 
@@ -183,8 +175,7 @@ def task_run_core():
                 updatedue = add_timestamp_and_timelag(lastrundate, timeinsec)
                 proceed = compare_timestamps_with_tolerance(updatedue, timenow)
                 if proceed == 0 or proceed == -1 : #update needed!
-                    write_message("source " + reponame +
-                        " is going to be updated")
+                    write_message("source %s is going to be updated" % (reponame,))
                     fromdate = str(repos[0][7])
                     fromdate = fromdate.split()[0] # get rid of time
                                                    # of the day for the moment
@@ -192,34 +183,39 @@ def task_run_core():
                                          (reponame,
                                          j, \
                                          len(reposlist)))
-                    exit_code, file_list = oai_harvest_get(prefix = repos[0][2],
-                                          baseurl = repos[0][1],
-                                          harvestpath = harvestpath,
-                                          fro = fromdate,
-                                          setspecs = setspecs)
+                    exit_code, file_list = oai_harvest_get(prefix=repos[0][2],
+                                          baseurl=repos[0][1],
+                                          harvestpath=harvestpath,
+                                          fro=fromdate,
+                                          setspecs=setspecs)
                     if exit_code == 1 :
                         update_lastrun(repos[0][0])
                         harvested_files_list = file_list
                     else :
-                        write_message("an error occurred while harvesting "
-                            "from source " + reponame)
+                        write_message("an error occurred while harvesting from source %s" % (reponame,))
                         error_happened_p = True
                         continue
                 else:
-                    write_message("source " + reponame +
-                        " does not need updating")
+                    write_message("source %s does not need updating" % (reponame,))
                     continue
 
             elif dateflag != 1 and repos[0][8] == 0:
-                write_message("source " + reponame + \
-                    " has frequency set to 'Never' so it will not be updated")
+                write_message("source %s has frequency set to 'Never' so it will not be updated" % (reponame,))
                 continue
 
             # Harvesting done, now convert/extract/filter/upload as requested
             if len(harvested_files_list) < 1:
                 write_message("No records harvested for %s" % (reponame,))
                 continue
+
+            # Retrieve all OAI IDs and set active list
+            harvested_identifier_list = collect_identifiers(harvested_files_list)
             active_files_list = harvested_files_list
+            if len(active_files_list) != len(harvested_identifier_list):
+                # Harvested files and its identifiers are 'out of sync', abort harvest
+                write_message("Harvested files miss identifiers for %s" % (reponame,))
+                continue
+
             # Convert phase
             if 'c' in postmode:
                 converted_files_list = []
@@ -234,15 +230,14 @@ def task_run_core():
                     converted_file = filepath_prefix + "_" + str(i) + "_" + \
                         time.strftime("%Y%m%d%H%M%S") + "_converted"
                     converted_files_list.append(converted_file)
-                    (exitcode, err_msg) = call_bibconvert(config = str(repos[0][5]),
-                                                          harvestpath = active_file,
-                                                          convertpath = converted_file)
+                    (exitcode, err_msg) = call_bibconvert(config=str(repos[0][5]),
+                                                          harvestpath=active_file,
+                                                          convertpath=converted_file)
                     if exitcode == 0:
-                        write_message("material harvested from source " +
-                            reponame + " was successfully converted")
+                        write_message("material harvested from source %s was successfully converted" % \
+                                      (reponame,))
                     else:
-                        write_message("an error occurred while converting from " +
-                            reponame + ': \n' + err_msg)
+                        write_message("an error occurred while converting from %s:\n%s" % (reponame, err_msg))
                         error_happened_p = True
                         continue
                 # print stats:
@@ -258,6 +253,7 @@ def task_run_core():
                 extracted_files_list = []
                 i = 0
                 for active_file in active_files_list:
+                    identifiers = harvested_identifier_list[i]
                     i += 1
                     task_sleep_now_if_required()
                     task_update_progress("Extracting material harvested from %s (%i/%i)" % \
@@ -266,13 +262,13 @@ def task_run_core():
                         time.strftime("%Y%m%d%H%M%S") + "_extracted"
                     extracted_files_list.append(extracted_file)
                     (exitcode, err_msg) = call_plotextractor(active_file,
-                                                             extracted_file)
+                                                             extracted_file,
+                                                             identifiers)
                     if exitcode == 0:
-                        write_message("material harvested from source " +
-                            reponame + " was successfully extracted")
+                        write_message("material harvested from source %s was successfully extracted" % \
+                                      (reponame,))
                     else:
-                        write_message("an error occurred while extracting from " +
-                            reponame + ': \n' + err_msg)
+                        write_message("an error occurred while extracting from %s:\n%s" % (reponame, err_msg))
                         error_happened_p = True
                         continue
                 # print stats:
@@ -298,11 +294,10 @@ def task_run_core():
                     res += call_bibfilter(str(repos[0][11]), active_file)
                 if len(active_files_list) > 0:
                     if res == 0:
-                        write_message("material harvested from source " +
-                                      reponame + " was successfully bibfiltered")
+                        write_message("material harvested from source %s was successfully bibfiltered" % \
+                                      (reponame,))
                     else:
-                        write_message("an error occurred while bibfiltering "
-                                      "harvest from " + reponame)
+                        write_message("an error occurred while bibfiltering harvest from " % (reponame,))
                         error_happened_p = True
                         continue
                 # print stats:
@@ -334,7 +329,7 @@ def task_run_core():
                                                   i, \
                                                   len(active_files_list)))
                             res += call_bibupload(active_file + ".insert.xml", \
-                                                  ["-i"], oai_src_id = repos[0][0])
+                                                  ["-i"], oai_src_id=repos[0][0])
                             uploaded = True
                         task_sleep_now_if_required()
                         if get_nb_records_in_file(active_file + ".correct.xml") > 0:
@@ -343,7 +338,7 @@ def task_run_core():
                                                   i, \
                                                   len(active_files_list)))
                             res += call_bibupload(active_file + ".correct.xml", \
-                                                  ["-c"], oai_src_id = repos[0][0])
+                                                  ["-c"], oai_src_id=repos[0][0])
                             uploaded = True
                         if get_nb_records_in_file(active_file + ".append.xml") > 0:
                             task_update_progress("Uploading additions for records harvested from %s (%i/%i)" % \
@@ -351,7 +346,7 @@ def task_run_core():
                                                   i, \
                                                   len(active_files_list)))
                             res += call_bibupload(active_file + ".append.xml", \
-                                                  ["-a"], oai_src_id = repos[0][0])
+                                                  ["-a"], oai_src_id=repos[0][0])
                             uploaded = True
                         if get_nb_records_in_file(active_file + ".holdingpen.xml") > 0:
                             task_update_progress("Uploading records harvested from %s to holding pen (%i/%i)" % \
@@ -359,18 +354,17 @@ def task_run_core():
                                                   i, \
                                                   len(active_files_list)))
                             res += call_bibupload(active_file + ".holdingpen.xml", \
-                                                  ["-o"], oai_src_id = repos[0][0])
+                                                  ["-o"], oai_src_id=repos[0][0])
                             uploaded = True
                     if len(active_files_list) > 0:
                         if res == 0:
                             if uploaded:
-                                write_message("material harvested from source " +
-                                              reponame + " was successfully uploaded")
+                                write_message("material harvested from source %s was successfully uploaded" % \
+                                              (reponame,))
                             else:
                                 write_message("nothing to upload")
                         else:
-                            write_message("an error occurred while uploading "
-                                          "harvest from " + reponame)
+                            write_message("an error occurred while uploading harvest from %s" % (reponame,))
                             error_happened_p = True
                             continue
                 else:
@@ -386,23 +380,21 @@ def task_run_core():
                                                  (reponame, \
                                                   i, \
                                                   len(active_files_list)))
-                            res += call_bibupload(active_file, oai_src_id = repos[0][0])
+                            res += call_bibupload(active_file, oai_src_id=repos[0][0])
                             uploaded = True
                         if res == 0:
                             if uploaded:
-                                write_message("material harvested from source " +
-                                              reponame + " was successfully uploaded")
+                                write_message("material harvested from source %s was successfully uploaded" % \
+                                              (reponame,))
                             else:
                                 write_message("nothing to upload")
                         else:
-                            write_message("an error occurred while uploading "
-                                          "harvest from " + reponame)
+                            write_message("an error occurred while uploading harvest from %s" % (reponame,))
                             error_happened_p = True
                             continue
 
         else: ### this should not happen
-            write_message("invalid postprocess mode: " + postmode +
-                " skipping repository")
+            write_message("invalid postprocess mode: %s skipping repository" % (postmode,))
             error_happened_p = True
             continue
 
@@ -411,6 +403,25 @@ def task_run_core():
     else:
         return True
 
+def collect_identifiers(harvested_file_list):
+    """Collects all OAI PMH identifiers from each file in the list
+    and adds them to a list of identifiers per file.
+
+    @param harvested_file_list: list of filepaths to harvested files
+
+    @return list of lists, containing each files' identifier list"""
+    result = []
+    for harvested_file in harvested_file_list:
+        try:
+            fd_active = open(harvested_file)
+        except IOError:
+            write_message("Error opening harvested file '%s'. Skipping.." % (harvested_file,))
+            error_happened_p = True
+            break
+        data = fd_active.read()
+        fd_active.close()
+        result.append(re_oai_id.findall(data))
+    return result
 
 def add_timestamp_and_timelag(timestamp,
                               timelag):
@@ -438,9 +449,9 @@ def update_lastrun(index):
         return (0, e)
 
 def oai_harvest_get(prefix, baseurl, harvestpath,
-                    fro = None, until = None, setspecs = None,
-                    user = None, password = None, cert_file = None,
-                    key_file = None, method = "POST"):
+                    fro=None, until=None, setspecs=None,
+                    user=None, password=None, cert_file=None,
+                    key_file=None, method="POST"):
     """
     Retrieve OAI records from given repository, with given arguments
     """
@@ -496,7 +507,7 @@ def call_bibconvert(config, harvestpath, convertpath):
     os.close(cmd_err_fd)
     return (exitcode, cmd_err)
 
-def call_plotextractor(active_file, extracted_file):
+def call_plotextractor(active_file, extracted_file, harvested_identifier_list):
     """
     Function that generates proper MARCXML containing harvested material
     such as plots and fulltext for each record.
@@ -504,6 +515,8 @@ def call_plotextractor(active_file, extracted_file):
     @param active_file: path to the currently processed file
     @param extracted_file: path to the file to be extracted in which the
                            final resulting MARCXML will be saved
+    @param harvested_identifier_list: list of OAI identifiers for this harvested file
+
     @return: exitcode and any error messages as: (exitcode, err_msg)
     """
     err_msg = ""
@@ -514,28 +527,27 @@ def call_plotextractor(active_file, extracted_file):
     records = recs_fd.read()
     recs_fd.close()
 
-    # Find all records mapped with identifier
+    # Find all record
     record_xmls = re_record.findall(records)
-    updated_xml = '<?xml version="1.0" encoding="UTF-8"?><collection>'
-    for record_xml, identifier in record_xmls:
-        updated_xml += "<record>%s" % (record_xml,)
+    updated_xml = ['<?xml version="1.0" encoding="UTF-8"?>']
+    updated_xml.append('<collection>')
+    i = 0
+    for record_xml in record_xmls:
+        identifier = harvested_identifier_list[i]
+        i += 1
+        updated_xml.append("<record>")
+        updated_xml.append(record_xml)
         exitcode, err_msg, extracted_fulltext_xml, plotextracted_xml = \
                     plotextractor_harvest(identifier, active_file)
         if plotextracted_xml != None:
-            # Strip tags. Expecting:
-            # <?xml version="1.0" encoding="UTF-8"?>
-            # <collection><record>
-            # ...
-            # </record></collection>
-            plotextracted_xml = plotextracted_xml[58:-22]
-            updated_xml += plotextracted_xml
+            updated_xml.append(plotextracted_xml)
         if extracted_fulltext_xml != None:
-            updated_xml += extracted_fulltext_xml
-        updated_xml += "</record>"
-
+            updated_xml.append(extracted_fulltext_xml)
+        updated_xml.append("</record>")
+    updated_xml.append('</collection>')
     # Write to file
     file_fd = open(extracted_file, 'w')
-    file_fd.write(updated_xml + '</collection>')
+    file_fd.write("\n".join(updated_xml))
     file_fd.close()
     return exitcode, err_msg
 
@@ -559,11 +571,16 @@ def plotextractor_harvest(identifier, active_file):
                                           "_plotextraction")
     tarball, pdf = harvest_single(identifier, extract_path)
     if tarball != None:
-        plotextracted_xml_path = process_single(tarball, clean = True)
+        plotextracted_xml_path = process_single(tarball, clean=True)
         if plotextracted_xml_path != None:
             plotsxml_fd = open(plotextracted_xml_path, 'r')
             plotextracted_xml = plotsxml_fd.read()
             plotsxml_fd.close()
+            re_list = re_record.findall(plotextracted_xml)
+            if re_list != []:
+                plotextracted_xml = re_list[0]
+            else:
+                plotextracted_xml = None
         else:
             err_msg += "Error extracting plots from id: %s %s\n" % \
                      (identifier, tarball)
@@ -608,7 +625,7 @@ def create_oaiharvest_log_str(task_id, oai_src_id, xml_content):
     except Exception, msg:
         print "Logging exception : %s   " % (str(msg),)
 
-def call_bibupload(marcxmlfile, mode = None, oai_src_id = -1):
+def call_bibupload(marcxmlfile, mode=None, oai_src_id= -1):
     """Call bibupload in insert mode on MARCXMLFILE."""
     if mode is None:
         mode = ["-r", "-i"]
@@ -623,7 +640,7 @@ def call_bibupload(marcxmlfile, mode = None, oai_src_id = -1):
             return 1
         return 0
     else:
-        write_message("marcxmlfile %s does not exist" % marcxmlfile)
+        write_message("marcxmlfile %s does not exist" % (marcxmlfile,))
         return 1
 
 def call_bibfilter(bibfilterprogram, marcxmlfile):
@@ -645,21 +662,21 @@ def call_bibfilter(bibfilterprogram, marcxmlfile):
     if bibfilterprogram:
         if not os.path.isfile(bibfilterprogram):
             write_message("bibfilterprogram %s is not a file" %
-                bibfilterprogram)
+                (bibfilterprogram,))
             return 1
         elif not os.path.isfile(marcxmlfile):
-            write_message("marcxmlfile %s is not a file" % marcxmlfile)
+            write_message("marcxmlfile %s is not a file" % (marcxmlfile,))
             return 1
         else:
             return os.system('%s %s' % (bibfilterprogram, marcxmlfile))
     else:
         try:
             write_message("no bibfilterprogram defined, copying %s only" %
-                marcxmlfile)
+                (marcxmlfile,))
             shutil.copy(marcxmlfile, marcxmlfile + ".insert.xml")
             return 0
         except:
-            write_message("cannot copy %s into %s.insert.xml" % marcxmlfile)
+            write_message("cannot copy %s into %s.insert.xml" % (marcxmlfile,))
             return 1
 
 def get_row_from_reposname(reposname):
@@ -708,7 +725,7 @@ def get_all_rows_from_db():
 
 def compare_timestamps_with_tolerance(timestamp1,
                                       timestamp2,
-                                      tolerance = 0):
+                                      tolerance=0):
     """Compare two timestamps TIMESTAMP1 and TIMESTAMP2, of the form
        '2005-03-31 17:37:26'. Optionally receives a TOLERANCE argument
        (in seconds).  Return -1 if TIMESTAMP1 is less than TIMESTAMP2
@@ -790,7 +807,7 @@ def get_repository_names(repositories):
         repository_names = None
     return repository_names
 
-def usage(exitcode = 0, msg = ""):
+def usage(exitcode=0, msg=""):
     "Print out info. Only used when run in 'manual' harvesting mode"
     sys.stderr.write("*Manual single-shot harvesting mode*\n")
     if msg:
@@ -923,9 +940,9 @@ def main():
     # mode.
     task_set_option("repository", None)
     task_set_option("dates", None)
-    task_init(authorization_action = 'runoaiharvest',
-              authorization_msg = "oaiharvest Task Submission",
-              description = """
+    task_init(authorization_action='runoaiharvest',
+              authorization_msg="oaiharvest Task Submission",
+              description="""
 Harvest records from OAI sources.
 Manual vs automatic harvesting:
    - Manual harvesting retrieves records from the specified URL,
@@ -954,7 +971,7 @@ Automatic (periodical) harvesting mode:
    between 2005-05-05 and 2005-05-10:
      $ oaiharvest -r pubmed -d 2005-05-05:2005-05-10 -t 10m
 """,
-            help_specific_usage = 'Manual single-shot harvesting mode:\n'
+            help_specific_usage='Manual single-shot harvesting mode:\n'
               '  -o, --output         specify output file\n'
               '  -v, --verb           OAI verb to be executed\n'
               '  -m, --method         http method (default POST)\n'
@@ -971,11 +988,11 @@ Automatic (periodical) harvesting mode:
               'Automatic periodical harvesting mode:\n'
               '  -r, --repository="repo A"[,"repo B"] \t which repositories to harvest (default=all)\n'
               '  -d, --dates=yyyy-mm-dd:yyyy-mm-dd \t reharvest given dates only\n',
-            version = __revision__,
-            specific_params = ("r:d:", ["repository=", "dates=", ]),
-            task_submit_elaborate_specific_parameter_fnc =
+            version=__revision__,
+            specific_params=("r:d:", ["repository=", "dates=", ]),
+            task_submit_elaborate_specific_parameter_fnc=
                 task_submit_elaborate_specific_parameter,
-            task_run_fnc = task_run_core)
+            task_run_fnc=task_run_core)
 
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """Elaborate specific cli parameters for oaiharvest."""
