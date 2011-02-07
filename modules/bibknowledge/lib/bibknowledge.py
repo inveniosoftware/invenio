@@ -26,8 +26,6 @@ from invenio.bibformat_config  import CFG_BIBFORMAT_ELEMENTS_PATH
 from invenio.config import CFG_WEBDIR
 import os
 import re
-import libxml2
-import libxslt
 
 def get_kb_mappings(kb_name="", key="", value="", match_type="s"):
     """Get mappings from kb kb_name. If key given, give only those with
@@ -361,6 +359,8 @@ def get_kbt_items(taxonomyfilename, templatefilename, searchwith=""):
     @param templatefile: full path+name of the XSLT file
     @param searchwith: a term to search with
     """
+    import libxml2
+    import libxslt
     styledoc = libxml2.parseFile(templatefilename)
     style = libxslt.parseStylesheetDoc(styledoc)
     doc = libxml2.parseFile(taxonomyfilename)
@@ -395,6 +395,8 @@ def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):
     @param tag: name of tag whose content
     @param searchwith: a term to search with
     """
+    import libxml2
+    import libxslt
     #get the actual file based on the kbt name
     kb_id = get_kb_id(kbtname)
     if not kb_id:
