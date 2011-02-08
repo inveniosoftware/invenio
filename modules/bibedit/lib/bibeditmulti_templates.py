@@ -416,7 +416,13 @@ div .boxleft_2 {
         <td />
         <td />
         <td><span class="action colActionType"></span></td>
+        <td class="conditionParametersDisplay">
+            <span class="conditionParametersDisplay"><strong> %(text_with_condition)s</strong></span>
+            <input id="textBoxConditionSubfieldDisplay" class="txtValue textBoxConditionSubfield conditionSubfieldParameters" type="text" maxlength="1"/>
 
+            <span class="conditionExact conditionParametersDisplay"></span>
+            <input id="textBoxConditionFieldDisplay" class="txtValue textBoxCondition conditionParametersDisplay" type="text"/>
+        </td>
         <td align="center">
             <img src="%(site_url)s/img/add.png" class="buttonNewSubfield" alt="Add new"/>
             <span class="buttonNewSubfield linkButton">%(text_define_subfield)s</span>
@@ -424,8 +430,8 @@ div .boxleft_2 {
         <td />
     </tr>
     <tr class="conditionParameters">
-        <td /> <td /> <td /> <td /><td colspan="3">%(text_condition_subfield)s
-        <input class="txtValue textBoxConditionSubfield" type="text" length="1"/>
+        <td /> <td /> <td /> <td /><td colspan="3">%(text_condition_subfield_delete)s
+        <input id="textBoxConditionSubfield" class="txtValue textBoxConditionSubfield" type="text" maxlength="1"/>
         <select class="selectConditionExactMatch">
             <option value="0">%(text_equal_to)s</option>
             <option value="1">%(text_contains)s</option>
@@ -436,7 +442,13 @@ div .boxleft_2 {
     <tr class="conditionActOnFields">
         <td /><td /><td /><td />
         <td colspan="3">
-            <span class="actOnFieldLink" id="actOnFields2"><u>%(text_filter_fields)s</u></span>
+            <span class="actOnFieldLink" id="actOnFieldsDelete"><u>%(text_filter_fields)s</u></span>
+        </td>
+    </tr>
+    <tr class="conditionActOnFieldsSave">
+        <td /><td /><td /><td /><td>
+            <input value="%(text_save)s" type="button" id="buttonSaveNewFieldCondition" class="formbutton"/>
+            <input value="%(text_cancel)s" type="button" id="buttonCancelFieldCondition" class="formbutton">
         </td>
     </tr>
 </tbody>
@@ -459,7 +471,7 @@ div .boxleft_2 {
         <input id="textBoxNewValueDisplay" class="txtValue textBoxNewValue newValueParameters" type="text" value="%(text_new_value)s"/>
 
         <span class="conditionParameters"><strong> %(text_with_condition)s</strong></span>
-        <input id="textBoxConditionSubfieldDisplay" class="txtValue textBoxConditionSubfield conditionSubfieldParameters" type="text" length="1"/>
+        <input id="textBoxConditionSubfieldDisplay" class="txtValue textBoxConditionSubfield conditionSubfieldParameters" type="text" maxlength="1"/>
 
         <span class="conditionExact conditionParameters"></span>
         <input id="textBoxConditionDisplay" class="txtValue textBoxCondition conditionParameters" type="text"/>
@@ -499,7 +511,7 @@ div .boxleft_2 {
     </tr>
     <tr class="conditionParameters">
         <td /> <td /> <td /> <td /><td colspan="3">%(text_condition_subfield)s
-        <input class="txtValue textBoxConditionSubfield" type="text" length="1"/>
+        <input class="txtValue textBoxConditionSubfield" type="text" maxlength="1"/>
         <select class="selectConditionExactMatch">
             <option value="0">%(text_equal_to)s</option>
             <option value="1">%(text_contains)s</option>
@@ -558,6 +570,7 @@ div .boxleft_2 {
               "text_contains" : _("contains"),
               "text_condition" : _("condition"),
               "text_condition_subfield" : _("when other subfield"),
+              "text_condition_subfield_delete" : _("when subfield"),
               "text_filter_fields": _("Apply only to specific field instances"),
               "text_value" : _("value")
              }

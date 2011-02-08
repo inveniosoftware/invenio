@@ -117,6 +117,9 @@ function createCommandsList(){
 	        ind1 : currentField.ind1,
 	        ind2 : currentField.ind2,
 	        action : currentField.action,
+                condition : currentField.condition,
+                conditionSubfield : currentField.conditionSubfield,
+                conditionSubfieldExactMatch: currentField.conditionSubfieldExactMatch,
 	        subfields : subfieldsList
 		};
 
@@ -213,18 +216,18 @@ function rebindControls() {
 	initTextBoxes();
 
 
-	$("#buttonTestSearch").bind("click", onButtonTestSearchClick);
-	$("#buttonPreviewResults").bind("click", onButtonPreviewResultsClick);
-	$("#buttonSubmitChanges").bind("click", onButtonSubmitChangesClick);
-	$(".buttonBackToResults").bind("click", onButtonBackToResultsClick);
-	$(".buttonOutputFormatMarcXML").bind("click", onButtonOutputFormatMarcXMLClick);
-	$(".buttonOutputFormatHTMLBrief").bind("click", onButtonOutputFormatHTMLBriefClick);
-	$(".buttonOutputFormatHTMLDetailed").bind("click", onButtonOutputFormatHTMLDetailedClick);
-	$(".buttonOutputFormatMARC").bind("click", onButtonOutputFormatMARCClick);
-	/*$(".resultItem").bind("click", onResultItemClick);*/
-	$(".buttonGoToFirstPage").bind("click", onButtonGoToFirstPageClick);
-	$(".buttonGoToPreviousPage").bind("click", onButtonGoToPreviousPageClick);
-	$(".buttonGoToNextPage").bind("click", onButtonGoToNextPageClick);
+	$("#buttonTestSearch").live("click", onButtonTestSearchClick);
+	$("#buttonPreviewResults").live("click", onButtonPreviewResultsClick);
+	$("#buttonSubmitChanges").live("click", onButtonSubmitChangesClick);
+	$(".buttonBackToResults").live("click", onButtonBackToResultsClick);
+	$(".buttonOutputFormatMarcXML").live("click", onButtonOutputFormatMarcXMLClick);
+	$(".buttonOutputFormatHTMLBrief").live("click", onButtonOutputFormatHTMLBriefClick);
+	$(".buttonOutputFormatHTMLDetailed").live("click", onButtonOutputFormatHTMLDetailedClick);
+	$(".buttonOutputFormatMARC").live("click", onButtonOutputFormatMARCClick);
+	/*$(".resultItem").live("click", onResultItemClick);*/
+	$(".buttonGoToFirstPage").live("click", onButtonGoToFirstPageClick);
+	$(".buttonGoToPreviousPage").live("click", onButtonGoToPreviousPageClick);
+	$(".buttonGoToNextPage").live("click", onButtonGoToNextPageClick);
 }
 
 function onAjaxSuccess(json) {
@@ -237,12 +240,10 @@ function onAjaxSuccess(json) {
 
         }
         $("#preview_area").html(search_html);
-	rebindControls();
 }
 
 function displayError(msg) {
     $("#preview_area").html(msg);
-    rebindControls();
 }
 
 function createJSONData() {
@@ -420,60 +421,57 @@ function displayProperSubfieldInformation(actionParentElement, actionType, displ
 
 function unbindControls(filter_field){
     if (filter_field == 'true'){
-        $("#actOnFields").unbind("click");
-        $("#actOnFieldsRemove").unbind("click");
-        $("#actOnFieldsRemove").bind("click", onActOnFieldsRemoveClick);
+        $("#actOnFields, #actOnFieldsDelete").unbind("click");
+        $("#actOnFieldsRemove, #actOnFieldsDeleteRemove").unbind("click");
+        $("#actOnFieldsRemove, #actOnFieldsDeleteRemove").bind("click", onActOnFieldsRemoveClick);
     }
     else{
-        $("#actOnFields").unbind("click");
-        $("#actOnFields").bind("click", onActOnFieldsClick);
-        $("#actOnFieldsRemove").unbind("click");
+        $("#actOnFields, #actOnFieldsDelete").unbind("click");
+        $("#actOnFields, #actOnFieldsDelete").bind("click", onActOnFieldsClick);
+        $("#actOnFieldsRemove, #actOnFieldsDeleteRemove").unbind("click");
     }
 
 }
 
 function onActOnFieldsClick() {
     var parentElement;
-    if ($(this).parents(".templateNewSubfield").eq(0)) {
+    if ($(this).attr("id") == "actOnFields"){
         parentElement = $(this).parents(".templateNewSubfield").eq(0);
+    
+        parentElement.find(".conditionParameters").show();
+        parentElement.find("#actOnFields").html('<u>Act on all fields</u>');
+        parentElement.find("#actOnFields").attr('id', 'actOnFieldsRemove');
     }
-    else{
+    else {
         parentElement = $(this).parents(".templateDisplayField").eq(0);
+
+        parentElement.find(".conditionParameters").show();
+        parentElement.find("#actOnFieldsDelete").html('<u>Act on all fields</u>');
+        parentElement.find("#actOnFieldsDelete").attr('id', 'actOnFieldsDeleteRemove');
+        parentElement.find(".conditionActOnFieldsSave").show();
     }
-    parentElement.find(".conditionParameters").show();
-    parentElement.find("#actOnFields").html('<u>Act on all fields</u>');
-    parentElement.find("#actOnFields").attr('id', 'actOnFieldsRemove');
-
-    unbindControls('true');
-}
-
-function onActOnFieldsClick2() {
-    //alert("Hey!");
-    var parentElement;
-    //if ($(this).parents(".templateNewSubfield").eq(0)) {
-     //   parentElement = $(this).parents(".templateNewSubfield").eq(0);
-    //}
-    //else{
-    parentElement = $(this).parents(".templateDisplayField").eq(0);
-   // }
-    parentElement.find(".conditionParameters").show();
-    parentElement.find("#actOnFields2").html('<u>Act on all fields</u>');
-    parentElement.find("#actOnFields2").attr('id', 'actOnFieldsRemove');
 
     unbindControls('true');
 }
 
 function onActOnFieldsRemoveClick() {
-    var parentElement;
-    if ($(this).parents(".templateNewSubfield").eq(0)) {
-        parentElement = $(this).parents(".templateNewSubfield").eq(0);
+
+    if ($(this).attr("id") == "actOnFieldsRemove"){
+        var parentElement = $(this).parents(".templateNewSubfield").eq(0);
+
+        parentElement.find(".conditionParameters").hide();
+        parentElement.find("#actOnFieldsRemove").html('<u>Apply only to specific field instances</u>');
+        parentElement.find("#actOnFieldsRemove").attr('id', 'actOnFields');
     }
-    else{
-        parentElement = $(this).parents(".templateDisplayField").eq(0);
+    else {
+        var parentElement = $(this).parents(".templateDisplayField").eq(0);
+
+        parentElement.find(".conditionParameters").hide();
+        parentElement.find("#actOnFieldsDeleteRemove").html('<u>Apply only to specific field instances</u>');
+        parentElement.find("#actOnFieldsDeleteRemove").attr('id', 'actOnFieldsDelete');
+        parentElement.find(".conditionActOnFieldsSave").hide();
     }
-    parentElement.find(".conditionParameters").hide();
-    parentElement.find("#actOnFieldsRemove").html('<u>Apply only to specific field instances</u>');
-    parentElement.find("#actOnFieldsRemove").attr('id', 'actOnFields');
+
 
     unbindControls('false');
 }
@@ -513,7 +511,7 @@ function addMessage(fieldID, actionText) {
 
         $("#actionsDisplayArea .lastRow").before(templateMsg);
 
-        rebindControls();
+        //rebindControls();
     }
 }
 
@@ -572,6 +570,7 @@ function createField(jqueryElement) {
     var subfields = {};
     var conditionSubfield = "";
     var condition = "";
+    var conditionSubfieldExactMatch = 0;
 
 
     var field = {
@@ -581,7 +580,8 @@ function createField(jqueryElement) {
         action : action,
         subfields : subfields,
         conditionSubfield : conditionSubfield,
-        condition: condition
+        condition: condition,
+        conditionSubfieldExactMatch: conditionSubfieldExactMatch
     };
 
     return field;
@@ -620,7 +620,7 @@ function onButtonNewSubfieldClick(instance) {
     displayProperSubfieldInformation(templateNewSubfield);
     templateField.after(templateNewSubfield);
 
-    rebindControls();
+    //rebindControls();
 }
 
 function onButtonCancelNewSubfieldClick() {
@@ -632,7 +632,7 @@ function onButtonNewFieldClick() {
     templateNewField.attr("id", generateFieldDisplayID());
     $("#actionsDisplayArea .lastRow").before(templateNewField);
 
-    rebindControls();
+    //rebindControls();
 }
 
 function onButtonCancelNewFieldClick(instance) {
@@ -700,7 +700,7 @@ function onButtonSaveNewSubfieldClick() {
     templateNewSubfield.replaceWith(templateDisplaySubfield );
 
     deleteMsg(fieldID);
-    rebindControls();
+    //rebindControls();
 }
 
 function onButtonDeleteSubfieldClick() {
@@ -723,6 +723,8 @@ function onButtonSaveNewFieldClick(instance) {
     // Possibility to add a condition is only valid when deleting a field
     templateDisplayField.find(".conditionParameters").hide();
     templateDisplayField.find(".conditionActOnFields").hide();
+    templateDisplayField.find(".conditionActOnFieldsSave").hide();
+    templateDisplayField.find(".conditionParametersDisplay").hide();
 
     // here is where the user entered the information
     var templateNewField = $(instance).parents(".templateNewField");
@@ -751,11 +753,45 @@ function onButtonSaveNewFieldClick(instance) {
 
     templateNewField.replaceWith(templateDisplayField);
 
-    rebindControls();
+    //rebindControls();
     addMessage(fieldID, actionText);
 }
 
+function onButtonSaveNewFieldConditionClick() {
+    /* Event handler to save the condition when a field is deleted */
+    var templateDisplayField = $(this).parents(".templateDisplayField");
+
+    var fieldDisplayID = templateDisplayField.attr("id");
+    var fieldID = getFieldID(fieldDisplayID);
+
+    var condition = templateDisplayField.find("#textBoxCondition").eq(0).val();
+    var conditionSubfieldExactMatch = templateDisplayField.find(".selectConditionExactMatch").eq(0).val();
+    var conditionSubfield = templateDisplayField.find("#textBoxConditionSubfield").eq(0).val();
+
+    gFields[fieldID].conditionSubfield = conditionSubfield;
+    gFields[fieldID].condition = condition;
+    gFields[fieldID].conditionSubfieldExactMatch = conditionSubfieldExactMatch;
+
+    if (conditionSubfieldExactMatch == 0) {
+        conditionExactText = "is equal to"
+    } else conditionExactText = "contains";
+
+    templateDisplayField.find(".conditionExact").eq(0).text(conditionExactText);
+    templateDisplayField.find("#textBoxConditionFieldDisplay").eq(0).attr("value", condition);
+    if (conditionSubfield){
+        templateDisplayField.find("#textBoxConditionSubfieldDisplay").eq(0).attr("value", conditionSubfield);
+    }
+
+    templateDisplayField.find(".conditionParameters").hide();
+    templateDisplayField.find(".conditionActOnFields").hide();
+    templateDisplayField.find(".conditionActOnFieldsSave").hide();
+
+    templateDisplayField.find(".conditionParametersDisplay").show();
+
+}
+
 function onTextBoxValueDisplayChange(){
+
     var subfieldElement = $(this).parents(".templateDisplaySubfield");
 
     var subfieldDisplayID = subfieldElement.attr("id");
@@ -803,28 +839,42 @@ function onTextBoxConditionSubfieldDisplayChange(){
     gFields[fieldID].subfields[subfieldID].conditionSubfield = conditionSubfield;
 }
 
+function onTextBoxConditionFieldDisplayChange() {
+    var templateDisplayField = $(this).parents(".templateDisplayField");
+
+    var fieldDisplayID = templateDisplayField.attr("id");
+
+    var fieldID = getFieldID(fieldDisplayID);
+
+    var condition = templateDisplayField.find("#textBoxConditionFieldDisplay").eq(0).val();
+    gFields[fieldID].condition = condition;
+}
+
 function rebindActionsRelatedControls() {
     /*
-    * Binds controls with the appropriate events
+    * lives controls with the appropriate events
     */
     // Field related
-    $(".buttonNewField").bind("click", onButtonNewFieldClick);
-    $("#buttonSaveNewField").bind("click", onButtonSaveNewFieldClick);
-    $("#buttonCancelNewField").bind("click", onButtonCancelNewFieldClick);
-    $(".buttonDeleteField").bind("click", onButtonDeleteFieldClick);
+    $(".buttonNewField").live("click", onButtonNewFieldClick);
+    $("#buttonSaveNewField").live("click", onButtonSaveNewFieldClick);
+    $("#buttonCancelNewField").live("click", onButtonCancelNewFieldClick);
+    $("#buttonSaveNewFieldCondition").live("click", onButtonSaveNewFieldConditionClick);
+    $("#buttonCancelFieldCondition").live("click", onActOnFieldsRemoveClick);
+    $(".buttonDeleteField").live("click", onButtonDeleteFieldClick);
     // Subfield related
-    $(".buttonNewSubfield").bind("click", onButtonNewSubfieldClick);
-    $("#buttonSaveNewSubfield").bind("click", onButtonSaveNewSubfieldClick);
-    $("#buttonCancelNewSubfield").bind("click", onButtonCancelNewSubfieldClick);
-    $(".buttonDeleteSubfield").bind("click", onButtonDeleteSubfieldClick);
-    $(".subfieldActionType").bind("change", onSubfieldActionTypeChange);
-    $("#actOnFields").bind("click", onActOnFieldsClick);
-    $("#actOnFields2").bind("click", onActOnFieldsClick2);
-    $("#actOnFieldsRemove").bind("click", onActOnFieldsRemoveClick);
-    $("#textBoxValueDisplay").bind("change", onTextBoxValueDisplayChange);
-    $("#textBoxNewValueDisplay").bind("change", onTextBoxNewValueDisplayChange);
-    $("#textBoxConditionDisplay").bind("change", onTextBoxConditionDisplayChange);
-    $("#textBoxConditionSubfieldDisplay").bind("change", onTextBoxConditionSubfieldDisplayChange);
+    $(".buttonNewSubfield").live("click", onButtonNewSubfieldClick);
+    $("#buttonSaveNewSubfield").live("click", onButtonSaveNewSubfieldClick);
+    $("#buttonCancelNewSubfield").live("click", onButtonCancelNewSubfieldClick);
+    $(".buttonDeleteSubfield").live("click", onButtonDeleteSubfieldClick);
+    $(".subfieldActionType").live("change", onSubfieldActionTypeChange);
+    $("#actOnFields, #actOnFieldsDelete").live("click", onActOnFieldsClick);
+    $("#actOnFieldsRemove, #actOnFieldsDeleteRemove").live("click", onActOnFieldsRemoveClick);
+    // Edit actions
+    $("#textBoxValueDisplay").live("change", onTextBoxValueDisplayChange);
+    $("#textBoxNewValueDisplay").live("change", onTextBoxNewValueDisplayChange);
+    $("#textBoxConditionDisplay").live("change", onTextBoxConditionDisplayChange);
+    $("#textBoxConditionFieldDisplay").live("change", onTextBoxConditionFieldDisplayChange);
+    $("#textBoxConditionSubfieldDisplay").live("change", onTextBoxConditionSubfieldDisplayChange);
 }
 
 function onSelectOutputFormatChange(value){

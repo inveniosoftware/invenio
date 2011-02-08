@@ -277,10 +277,40 @@ class AddFieldCommand(BaseFieldCommand):
 class DeleteFieldCommand(BaseFieldCommand):
     """Deletes given fields from a record"""
 
+    def __init__(self, tag, ind1, ind2, subfield_commands, conditionSubfield="", condition="", condition_exact_match=True):
+        BaseFieldCommand.__init__(self, tag, ind1, ind2, subfield_commands)
+        self._conditionSubfield = conditionSubfield
+        self._condition = condition
+        self._condition_exact_match = condition_exact_match
+
+    def _delete_field_condition(self, record):
+        """Checks if a subfield meets the condition for the
+        field to be deleted
+        """
+        try:
+            for field in record[self._tag]:
+                for subfield in field[0]:
+                    if subfield[0] == self._conditionSubfield:
+                        if self._condition_exact_match:
+                            if self._condition == subfield[1]:
+                                bibrecord.record_delete_field(record, self._tag, self._ind1, self._ind2, field_position_global=field[4])
+                                self._modifications += 1
+                                break
+                        else:
+                            if self._condition in subfield[1]:
+                                bibrecord.record_delete_field(record, self._tag, self._ind1, self._ind2, field_position_global=field[4])
+                                self._modifications += 1
+                                break
+        except KeyError:
+            pass
+
     def process_record(self, record):
         """@see: BaseFieldCommand.process_record"""
-        bibrecord.record_delete_field(record, self._tag, self._ind1, self._ind2)
-        self._modifications += 1
+        if self._condition:
+            self._delete_field_condition(record)
+        else:
+            bibrecord.record_delete_field(record, self._tag, self._ind1, self._ind2)
+            self._modifications += 1
 
 class UpdateFieldCommand(BaseFieldCommand):
     """Deletes given fields from a record"""
