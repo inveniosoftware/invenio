@@ -1394,7 +1394,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
                     else:
                         if not pretend:
                             bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
-                            for (url, format, description, comment) in urls:
+                            for (url, format, description, comment, flags) in urls:
                                 assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment, flags))
             elif mode == 'append':
                 try:
