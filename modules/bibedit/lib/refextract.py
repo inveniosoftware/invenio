@@ -201,8 +201,6 @@ def compress_subfields(out,subfield_code):
         ## If reached the end of the datafield
         if line.find('</datafield>') != -1:
             if len(content_text) > 0:
-                #print "inserting: "+subfield_start+content_text.strip(" ,.").lstrip(";")+subfield_end
-                #print "at: %d" % position
                 ## Insert the concatenated misc contents back where it was first encountered
                 ## (dont RIGHTstrip semi-colons, as these may be needed for &amp; or &lt;)
                 new_rec_lines[position] = new_rec_lines[position] + content_text.strip(" ,.").lstrip(" ;")+subfield_end
@@ -391,6 +389,7 @@ def get_bad_char_replacements():
         u'\uFFFB' : u"",
         u'\uFFFC' : u"",
         u'\uFEFF' : u"",
+        u'\uFFFF' : u"", #Unrecognised characters converted to this
         ## Language Tag Code Points:
         u"\U000E0000" : u"",
         u"\U000E0001" : u"",
@@ -792,8 +791,9 @@ re_html_tagged_url = \
 ## Numeration recognition pattern - used to identify numeration
 ## associated with a title when marking the title up into MARC XML:
 ## UPDATED: volume numbers can be two numbers with a hyphen in between!
-re_recognised_numeration_for_title = \
-     re.compile(r'^(\s*\.?,?\s*:?\s\<cds\.VOL\>(\d+|(?:\d+\-\d+))\<\/cds\.VOL> \<cds\.YR\>\(([1-2]\d\d\d)\)\<\/cds\.YR\> \<cds\.PG\>([RL]?\d+[c]?)\<\/cds\.PG\>)', re.UNICODE)
+re_recognised_numeration_for_title_plus_series = \
+    re.compile(r'^(\s*\.?,?\s*(?P<series>(?:[A-H]|I{1,3}V?|VI{0,3}))?\s*:?\s\<cds\.VOL\>(?P<vol>(?:\d+|(?:\d+\-\d+)))\<\/cds\.VOL> \<cds\.YR\>\((?P<yr>(?:[1-2]\d\d\d))\)\<\/cds\.YR\> \<cds\.PG\>(?P<pg>(?:[RL]?\d+[c]?))\<\/cds\.PG\>)', re.UNICODE)
+
 
 ## Another numeration pattern. This one is designed to match marked-up
 ## numeration that is essentially an IBID, but without the word "IBID". E.g.:
@@ -802,14 +802,18 @@ re_recognised_numeration_for_title = \
 ## <cds.YR>(1999)</cds.YR> <cds.PG>6119</cds.PG>.
 re_numeration_no_ibid_txt = \
           re.compile(r"""
-          ^((\s*;\s*|\s+and\s+)[A-H]?\s*:?\s                        ## Leading ; : or " and :", and a possible series letter
-          \<cds\.VOL\>(\d+|(?:\d+\-\d+))\<\/cds\.VOL>\s             ## Volume
-          \<cds\.YR\>\(([12]\d{3})\)\<\/cds\.YR\>\s                 ## year
-          \<cds\.PG\>([RL]?\d+[c]?)\<\/cds\.PG\>)                   ## page
+          ^((\s*;\s*|\s+and\s+)(?P<series>(?:[A-H]|I{1,3}V?|VI{0,3}))?\s*:?\s       ## Leading ; : or " and :", and a possible series letter
+          \<cds\.VOL\>(?P<vol>\d+|(?:\d+\-\d+))\<\/cds\.VOL>\s             ## Volume
+          \<cds\.YR\>\((?P<yr>[12]\d{3})\)\<\/cds\.YR\>\s                 ## year
+          \<cds\.PG\>(?P<pg>[RL]?\d+[c]?)\<\/cds\.PG\>)                   ## page
           """, re.UNICODE|re.VERBOSE)
 
 re_title_followed_by_series_markup_tags = \
      re.compile(r'(\<cds.TITLE(?P<ibid>ibid)?\>([^\<]+)\<\/cds.TITLE(?:ibid)?\>\s*.?\s*\<cds\.SER\>([A-H]|(I{1,3}V?|VI{0,3}))\<\/cds\.SER\>)', re.UNICODE)
+
+re_title_followed_by_implied_series = \
+     re.compile(r'(\<cds.TITLE(?P<ibid>ibid)?\>([^\<]+)\<\/cds.TITLE(?:ibid)?\>\s*.?\s*([A-H]|(I{1,3}V?|VI{0,3}))\s+:)', re.UNICODE)
+
 
 re_punctuation = re.compile(r'[\.\,\;\'\(\)\-]', re.UNICODE)
 
@@ -841,11 +845,21 @@ re_ibid = \
    re.compile(r'(-|\b)?((?:(?:IBID(?!EM))|(?:IBIDEM))\.?(\s([A-H]|(I{1,3}V?|VI{0,3})|[1-3]))?)\s?:', \
                re.UNICODE)
 
-re_matched_ibid = re.compile(r'(?:(?:IBID(?!EM))|(?:IBIDEM))\.?\s?([A-H]|(I{1,3}V?|VI{0,3})|[1-3])?', \
+re_matched_ibid = re.compile(r'(?:(?:IBID(?!EM))|(?:IBIDEM))(?:[\.,]{0,2}\s*|\s+)([A-H]|(I{1,3}V?|VI{0,3})|[1-3])?', \
                                re.UNICODE)
 
-re_title_series = re.compile(r'\.,?\s+([A-H]|(I{1,3}V?|VI{0,3}))$', \
+re_series_from_numeration = re.compile(r'^\.?,?\s+([A-H]|(I{1,3}V?|VI{0,3}))\s+:\s+', \
                                re.UNICODE)
+
+## Obtain the series character from the standardised title text
+## Only used when no series letter is obtained from numeration matching
+re_series_from_title = re.compile(r"""
+    ([^\s].*?)
+    (?:[\s\.]+(?:(?P<open_bracket>\()\s*[Ss][Ee][Rr]\.)?
+            ([A-H]|(I{1,3}V?|VI{0,3}))
+    )?
+    (?(open_bracket)\s*\))$   ## Only match the ending bracket if the opening bracket was found""", \
+                               re.UNICODE|re.VERBOSE)
 
 ## After having processed a line for titles, it may be possible to find more
 ## numeration with the aid of the recognised titles. The following 2 patterns
@@ -1227,7 +1241,6 @@ def make_auth_regex_str(etal,initial_surname_author=None,surname_initial_author=
         )?
 
        )
-       
                                                                     ## 'et al' need not be present for either of 'initial surname' or 'surname initial'
                                                                     ## authors
        (?P<et>
@@ -1298,12 +1311,12 @@ def make_extra_author_regex_str():
         sys.stderr.flush()
         sys.exit(1)
 
-    for rawline in fh:
+    for line_num, rawline in enumerate(fh):
         try:
             rawline = rawline.decode("utf-8")
         except UnicodeError:
             sys.stderr.write("*** Unicode problems in %s for line %s\n" \
-                             % (fpath, str(kb_line_num)))
+                             % (fpath, str(line_num)))
             sys.exit(1)
         if (len(rawline) > 0) and (rawline[0] != '#'):
             add_to_auth_list(rawline)
@@ -1796,13 +1809,16 @@ def build_titles_knowledge_base(fpath):
     repl_terms = {}
 
     ## Pattern to recognise a correct knowledge base line:
-    p_kb_line = re.compile('^\s*(?P<seek>\w.*?)\s*---\s*(?P<repl>\w.*?)\s*$', \
+    p_kb_line = re.compile('^\s*(?P<seek>[^\s].*?)\s*---\s*(?P<repl>[^\s].*?)\s*$', \
                             re.UNICODE)
 
     try:
         fh = open(fpath, "r")
         count = 0
         for rawline in fh:
+
+            if rawline.find('\\') != -1:
+                continue
             count += 1
             ## Test line to ensure that it is a correctly formatted
             ## knowledge base line:
@@ -1816,6 +1832,7 @@ def build_titles_knowledge_base(fpath):
             ## Extract the seek->replace terms from this KB line:
             m_kb_line = p_kb_line.search(rawline)
             if m_kb_line is not None:
+
                 ## good KB line
                 ## Add the 'replacement term' into the dictionary of
                 ## replacement terms:
@@ -1837,9 +1854,10 @@ def build_titles_knowledge_base(fpath):
                         seek_phrases.append(seek_phrase)
             else:
                 ## KB line was not correctly formatted - die with error
-                emsg = """Error: Could not build list of journal titles """ \
+                emsg = """Error: Could not build list of journal titles\n""" \
                        """- KB %(kb)s has errors.\n""" \
-                       % { 'kb' : fpath }
+                       """- Mapping: %(mapping)s\n""" \
+                       % { 'kb' : fpath , 'mapping' : rawline}
                 sys.stderr.write(emsg)
                 sys.exit(1)
         fh.close()
@@ -2591,6 +2609,8 @@ def create_marc_xml_reference_line(line_marker,
                     integer -> number of institutional report-number citations
                                marked-up for the line.
                     integer -> number of URL citations marked-up for the record.
+                    integer -> number of DOI's found for the record
+                    integer -> number of author groups found
                   )
 
     """
@@ -2604,7 +2624,7 @@ def create_marc_xml_reference_line(line_marker,
         ## build a new version of the working-line in which the standard
         ## versions of the REPORT-NUMBERs and TITLEs are tagged:
         startpos = 0          ## First cell of the reference line...
-        previous_match = u""  ## previously matched TITLE within line (used
+        previous_match = {}   ## previously matched TITLE within line (used
                               ## for replacement of IBIDs.
         replacement_types = {}
         title_keys = found_title_matchtext.keys()
@@ -2673,7 +2693,10 @@ def create_marc_xml_reference_line(line_marker,
         tagged_line = _re_identify_numeration(tagged_line)
         ## remove any series tags that are next to title tags, putting
         ## series information into the title tags:
-        tagged_line = move_tagged_series_into_tagged_title(tagged_line)
+        ## Only do this if the user doesn't want the Inspire journal title output format
+        ## otherwise, the series letters are handled elsewhere in the xml conversion process
+        #if not cli_opts['inspire']:
+        #    tagged_line = move_tagged_series_into_tagged_title(tagged_line)
         tagged_line = wash_line(tagged_line)
 
     ## Before moving onto creating the XML string... try to find any authors in the line
@@ -2687,18 +2710,19 @@ def create_marc_xml_reference_line(line_marker,
      count_title, \
      count_reportnum, \
      count_url, \
-     count_doi) = \
+     count_doi, \
+     count_auth_group) = \
          convert_processed_reference_line_to_marc_xml(line_marker, \
                                                       tagged_line.replace('\n',''), \
                                                       identified_dois, \
                                                       identified_urls)
-    return (xml_line, count_misc, count_title, count_reportnum, count_url, count_doi)
+    return (xml_line, count_misc, count_title, \
+               count_reportnum, count_url, count_doi, count_auth_group)
 
 
 
 def convert_unusable_tag_to_misc(line,
                                  misc_text,
-                                 tag_match_start,
                                  tag_match_end,
                                  closing_tag):
     """Function to remove an unwanted, tagged, citation item from a reference
@@ -2715,8 +2739,6 @@ def convert_unusable_tag_to_misc(line,
        @param line: (string) - the reference line.
        @param misc_text: (string) - the variable containing the miscellaneous
         text recorded so far.
-       @param tag_match_start: (integer) - the index of the start of the opening
-        tag in the line.
        @param tag_match_end: (integer) - the index of the end of the opening tag
         in the line.
        @param closing_tag: (string) - the closing tag to look for in the line
@@ -2944,8 +2966,6 @@ def build_formatted_xml_citation(citation_elements,line_marker):
     elements_processed = 0
 
     for element in citation_elements:
-        #print "   "+element['type']
-
         ## Before going onto checking 'what' the next element is, handle misc text and semi-colons
         ## Multiple misc text subfields will be compressed later
         ## This will also be the only part of the code that deals with MISC tag_typed elements
@@ -3039,15 +3059,28 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                                                                      auth_for_ibid,
                                                                      xml_line)
 
-            ## ADD to current datafield
-            xml_line += """
-      <subfield code="%(sf-code-ref-title)s">%(title)s, %(volume)s, %(page)s, %(year)s</subfield>""" \
-                  % { 'sf-code-ref-title'   : CFG_REFEXTRACT_SUBFIELD_TITLE,
-                      'title'               : encode_for_xml(element['title']),
-                      'volume'              : encode_for_xml(element['volume']),
-                      'year'                : encode_for_xml(element['year']),
-                      'page'                : encode_for_xml(element['page']),
-                    }
+            ## Select the journal title output format
+            if cli_opts['inspire']:
+                ## ADD to current datafield
+                xml_line += """
+      <subfield code="%(sf-code-ref-title)s">%(title)s,%(volume)s,%(page)s,%(year)s</subfield>""" \
+              % { 'sf-code-ref-title'   : CFG_REFEXTRACT_SUBFIELD_TITLE,
+                  'title'               : encode_for_xml(element['title']),
+                  'volume'              : encode_for_xml(element['volume']),
+                  'year'                : encode_for_xml(element['year']),
+                  'page'                : encode_for_xml(element['page']),
+                }
+            else:
+                ## ADD to current datafield
+                xml_line += """
+      <subfield code="%(sf-code-ref-title)s">%(title)s %(volume)s (%(year)s) %(page)s</subfield>""" \
+              % { 'sf-code-ref-title'   : CFG_REFEXTRACT_SUBFIELD_TITLE,
+                  'title'               : encode_for_xml(element['title']),
+                  'volume'              : encode_for_xml(element['volume']),
+                  'year'                : encode_for_xml(element['year']),
+                  'page'                : encode_for_xml(element['page']),
+                }
+
 
             ## Now, if there are any extra (numeration based) IBID's after this title
             if len(element['extra_ibids']) > 0:
@@ -3059,7 +3092,17 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                                                                          line_elements,
                                                                          auth_for_ibid,
                                                                          xml_line)
-                    xml_line += """
+                    if cli_opts['inspire']:
+                        xml_line += """
+      <subfield code="%(sf-code-ref-title)s">%(title)s,%(volume)s,%(page)s,%(year)s</subfield>""" \
+                          % { 'sf-code-ref-title'   : CFG_REFEXTRACT_SUBFIELD_TITLE,
+                              'title'               : encode_for_xml(IBID['title']),
+                              'volume'              : encode_for_xml(IBID['volume']),
+                              'year'                : encode_for_xml(IBID['year']),
+                              'page'                : encode_for_xml(IBID['page']),
+                            }
+                    else:
+                        xml_line += """
       <subfield code="%(sf-code-ref-title)s">%(title)s %(volume)s (%(year)s) %(page)s</subfield>""" \
                           % { 'sf-code-ref-title'   : CFG_REFEXTRACT_SUBFIELD_TITLE,
                               'title'               : encode_for_xml(IBID['title']),
@@ -3191,7 +3234,6 @@ def build_formatted_xml_citation(citation_elements,line_marker):
     xml_line += """
    </datafield>\n"""
 
-
     return xml_line
 
 
@@ -3236,7 +3278,6 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
         tag_match_start = tag_match.start()
         tag_match_end   = tag_match.end()
         tag_type        = tag_match.group(1)
-        #print "adding to cur_misc_txt: %s" % processed_line[0:tag_match_start]
         cur_misc_txt += processed_line[0:tag_match_start]
 
         ## Catches both standard titles, and ibid's
@@ -3267,19 +3308,36 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                 ## Closing tag was found:
                 ## The title text to be used in the marked-up citation:
                 title_text  = processed_line[tag_match_end:idx_closing_tag]
-                ## Title text to be referred to by IBID-numerations immediately
-                ## after this title citation:
-                title_text_for_ibid = title_text
+
                 ## Now trim this matched title and its tags from the start of the line:
                 processed_line = processed_line[idx_closing_tag+closing_tag_length:]
 
-                ## Was this title followed by the tags of recognised VOLUME, YEAR and PAGE objects?
-                numeration_match = re_recognised_numeration_for_title.match(processed_line)
+                numeration_match = re_recognised_numeration_for_title_plus_series.match(processed_line)
                 if numeration_match is not None:
                     ## recognised numeration immediately after the title - extract it:
-                    reference_volume = numeration_match.group(2)
-                    reference_year   = numeration_match.group(3)
-                    reference_page   = numeration_match.group(4)
+                    reference_volume = numeration_match.group('vol')
+                    reference_year   = numeration_match.group('yr')
+                    reference_page   = numeration_match.group('pg')
+
+                    ## This is used on two accounts:
+                    ## 1. To get the series char from the title, if no series was found with the numeration
+                    ## 2. To always remove any series character from the title match text
+                    series_from_title = re_series_from_title.search(title_text)
+
+                    if numeration_match.group('series'):
+                        if cli_opts['inspire']:
+                            reference_volume = numeration_match.group('series') + reference_volume
+                        else:
+                            reference_volume = numeration_match.group('series') + " " + reference_volume
+                    elif series_from_title and series_from_title.group(3):
+                        if cli_opts['inspire']:
+                            reference_volume = series_from_title.group(3) + reference_volume
+                        else:
+                            reference_volume = series_from_title.group(3) + " " + reference_volume
+
+                    if series_from_title.group(1):
+                        title_text = series_from_title.group(1)
+
                     ## Skip past the matched numeration in the working line:
                     processed_line = processed_line[numeration_match.end():]
 
@@ -3302,12 +3360,29 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                     ## Try to find IBID's after this title, on top of previously found titles that were
                     ## denoted with the word 'IBID'. (i.e. look for IBID's without the word 'IBID' by
                     ## looking at extra numeration after this title)
+
                     numeration_match = re_numeration_no_ibid_txt.match(processed_line)
                     while numeration_match is not None:
 
-                        reference_volume = numeration_match.group(3)
-                        reference_year   = numeration_match.group(4)
-                        reference_page   = numeration_match.group(5)
+                        reference_volume = numeration_match.group('vol')
+                        reference_year   = numeration_match.group('yr')
+                        reference_page   = numeration_match.group('pg')
+
+                        if numeration_match.group('series'):
+                            if cli_opts['inspire']:
+                                reference_volume = numeration_match.group('series') + reference_volume
+                            else:
+                                reference_volume = numeration_match.group('series') + " " + reference_volume
+                        elif series_from_title and series_from_title.group(3):
+                            if cli_opts['inspire']:
+                                reference_volume = series_from_title.group(3) + reference_volume
+                            else:
+                                reference_volume = series_from_title.group(3) + " " + reference_volume
+
+                        ## Also remove the series char from the ibid title
+                        if series_from_title.group(1):
+                            title_text_for_ibid = series_from_title.group(1)
+
                         ## Skip past the matched numeration in the working line:
                         processed_line = processed_line[numeration_match.end():]
 
@@ -3451,9 +3526,8 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
             ## This tag is a SERIES tag; Since it was not preceeded by a TITLE
             ## tag, it is useless - strip the tag and put it into miscellaneous:
             (cur_misc_txt, processed_line) = \
-              convert_unusable_tag_to_misc(processed_line, \
-                                           cur_misc_txt, \
-                                           tag_match_start,tag_match_end, \
+              convert_unusable_tag_to_misc(processed_line, cur_misc_txt, \
+                                           tag_match_end, \
                                            CFG_REFEXTRACT_MARKER_CLOSING_SERIES)
             identified_citation_element = None
 
@@ -3462,7 +3536,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
             ## tag, it is useless - strip the tag and put it into miscellaneous:
             (cur_misc_txt, processed_line) = \
               convert_unusable_tag_to_misc(processed_line, cur_misc_txt, \
-                                           tag_match_start,tag_match_end, \
+                                           tag_match_end, \
                                            CFG_REFEXTRACT_MARKER_CLOSING_VOLUME)
             identified_citation_element = None
 
@@ -3472,7 +3546,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
             ## into miscellaneous:
             (cur_misc_txt, processed_line) = \
               convert_unusable_tag_to_misc(processed_line, cur_misc_txt, \
-                                           tag_match_start,tag_match_end, \
+                                           tag_match_end, \
                                            CFG_REFEXTRACT_MARKER_CLOSING_YEAR)
             identified_citation_element = None
 
@@ -3482,7 +3556,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
             ## contents into miscellaneous:
             (cur_misc_txt, processed_line) = \
               convert_unusable_tag_to_misc(processed_line, cur_misc_txt, \
-                                           tag_match_start,tag_match_end, \
+                                           tag_match_end, \
                                            CFG_REFEXTRACT_MARKER_CLOSING_PAGE)
             identified_citation_element = None
 
@@ -3522,44 +3596,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
 
     ## return the reference-line as MARC XML:
 
-    return (xml_line, count_misc, count_title, count_reportnum, count_url, count_doi)
-
-
-def move_tagged_series_into_tagged_title(line):
-    """Moves a marked-up series item into a marked-up title.
-       E.g. should change <cds.TITLE>Phys. Rev.</cds.TITLE> <cds.SER>D</cds.SER>
-        into:
-       <cds.TITLE>Phys. Rev. D</cds.TITLE>
-       @param line: (string) - the line in which a series tagged item is to be
-        moved into title tags.
-       @return: (string) - the line after the series items have been moved
-        into the title tags.
-    """
-    ## Seek a marked-up series occurrence in line:
-    m_tagged_series = re_title_followed_by_series_markup_tags.search(line)
-    while m_tagged_series is not None:
-        ## tagged series found in line - try to remove it and put it into the title:
-        entire_match = m_tagged_series.group(0) ## the entire match (e.g.<cds.TITLE>xxxxx</cds.TITLE> <cds.SER>A</cds.SER>)
-        title_match = m_tagged_series.group(2)  ## the string matched between <cds.TITLE></cds.TITLE> tags
-        series_match = m_tagged_series.group(3) ## the series information matched between <cds.SER></cds.SER> tags.
-        corrected_title_text = title_match
-
-        ## Add the series letter into the title:
-        corrected_title_text = corrected_title_text.strip()
-        if corrected_title_text[-1] == ".":
-            ## The corrected title ends with a full-stop. Add a space, followed
-            ## by the series letter:
-            corrected_title_text += " %s" % series_match
-        else:
-            ## Add a full-stop followed by a space, then the series letter:
-            corrected_title_text += ". %s" % series_match
-
-        if match.group('ibid'):
-            line = re.sub("%s" % re.escape(entire_match), "<cds.TITLEibid>%s</cds.TITLEibid>" % corrected_title_text, line, 1)
-        else:
-            line = re.sub("%s" % re.escape(entire_match), "<cds.TITLE>%s</cds.TITLE>" % corrected_title_text, line, 1)
-        m_tagged_series = re_title_followed_by_series_markup_tags.search(line)
-    return line
+    return (xml_line, count_misc, count_title, count_reportnum, count_url, count_doi, count_auth_group)
 
 def _re_identify_numeration(line):
     """Look for other numeration in line.
@@ -3652,47 +3689,37 @@ def add_tagged_title_in_place_of_IBID(previous_match,
         ## carried by this IBID, the series letter stored in the previous-match
         ## must be updated to that of this IBID
         ## (i.e. Keep the series letter paired directly with the IBID):
-        m_previous_series = re_title_series.search(previous_match)
-
-        if m_previous_series is not None:
+        if previous_match['series'] is not None:
             ## Previous match had a series:
-            previous_series = m_previous_series.group(1)
-            if previous_series == ibid_series:
-                ## Both the previous match & this IBID have the same series
-                rebuilt_line += IBID_start_tag + "%(previous-match)s" \
-                                % { 'previous-match' : previous_match } + \
-                                CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID
-            else:
+            if previous_match['series'] != ibid_series:
                 ## Previous match and this IBID do not have the same series
-                previous_match = \
-                      re.sub("(\\.?)(,?) +%s$" % previous_series, \
-                              "\\g<1>\\g<2> %s" % ibid_series, \
-                              previous_match)
-                rebuilt_line += IBID_start_tag + "%(previous-match)s" \
-                                % { 'previous-match' : previous_match } + \
-                                CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID
+                previous_match['series'] = ibid_series
+
+            rebuilt_line += IBID_start_tag + "%(previous-match)s" \
+                            % { 'previous-match' : previous_match['title'] } + \
+                            CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID + \
+                            " : " + previous_match['series']
         else:
             ## Previous match had no recognised series but the IBID did. Add a
             ## the series letter to the end of the previous match.
-            previous_match = previous_match.rstrip()
-            if previous_match[-1] == ".":
-                ## Previous match ended with a full-stop. Add a space, then
-                ## the IBID series
-                previous_match += " %(ibid-series)s" \
-                                  % { 'ibid-series' : ibid_series }
-            else:
-                ## Previous match did not end with a full-stop. Add a full-stop
-                ## then a space, then the IBID series
-                previous_match += ". %(ibid-series)s" \
-                                  % { 'ibid-series' : ibid_series }
+            previous_match['series'] = ibid_series
             rebuilt_line += IBID_start_tag + "%(previous-match)s" \
-                           % { 'previous-match' : previous_match } + \
-                            CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID
+                           % { 'previous-match' : previous_match['title'] } + \
+                           CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID + \
+                           " : " + previous_match['series']
+
     else:
-        ## IBID's series letter is empty - Replace as-is:
-        rebuilt_line += IBID_start_tag + "%(previous-match)s" \
-                       % { 'previous-match' : previous_match } + \
-                        CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID
+        if previous_match['series'] is not None:
+            ## Both the previous match & this IBID have the same series
+            rebuilt_line += IBID_start_tag + "%(previous-match)s" \
+                            % { 'previous-match' : previous_match['title'] } + \
+                            CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID + \
+                            " : " + previous_match['series']
+        else:
+            ## This IBID has no series letter. If a previous series is present append it.
+            rebuilt_line += IBID_start_tag + "%(previous-match)s" \
+                           % { 'previous-match' : previous_match['title'] } + \
+                           CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID
 
     return (rebuilt_line, previous_match)
 
@@ -3733,7 +3760,7 @@ def add_tagged_title(reading_line,
     if matched_title.upper().find("IBID") != -1:
         ## This is an IBID
         ## Try to replace the IBID with a title:
-        if previous_match != "":
+        if len(previous_match) > 1:
             ## A title has already been replaced in this line - IBID can be
             ## replaced meaninfully First, try to get the series number/letter
             ## of this IBID:
@@ -3770,8 +3797,27 @@ def add_tagged_title(reading_line,
         ## This is a normal title, not an IBID
         rebuilt_line += "<cds.TITLE>%(title)s</cds.TITLE>" \
                         % { 'title' : standardised_titles[matched_title] }
-        previous_match = standardised_titles[matched_title]
+        previous_title = standardised_titles[matched_title]
         startpos = true_replacement_index + len_title + extras
+
+        ## Try to get the series of this just added title, by dynamically finding it
+        ## from the text after the title tag (rather than from the kb)
+        ## Ideally, the series will be found with the numeration after the title
+        ## but will also check the ending of the title text if this match fails.
+        previous_series_from_numeration = re_series_from_numeration.search(reading_line[startpos:])
+        previous_series_from_title = re_series_from_title.search(previous_title)
+        ## First, try to obtain the series from the identified numeration
+        if previous_series_from_numeration:
+            previous_match = {'title':previous_title,
+                   'series':previous_series_from_numeration.group(1)}
+        ## If it isn't found, try to get it from the standardised title
+        ## BUT ONLY if the numeration matched!
+        elif previous_series_from_title and previous_series_from_title.group(3):
+            previous_match = {'title':previous_series_from_title.group(1),
+                    'series':previous_series_from_title.group(3)}
+        else:
+            previous_match = {'title':previous_title,'series':None}
+
         ## Skip past any punctuation at the end of the replacement that was
         ## just made:
         try:
@@ -3854,6 +3900,8 @@ def create_marc_xml_reference_section(ref_sect,
            integer    -> number of institutional report-number citations found
                          for the record.
            integer    -> number of URL citations found for the record.
+           integer    -> number of DOI's found
+           integer    -> number of author groups found
            dictionary -> The totals for each 'bad title' found in the reference
                          section.
          )
@@ -3861,7 +3909,7 @@ def create_marc_xml_reference_section(ref_sect,
     ## a list to contain the processed reference lines:
     xml_ref_sectn = []
     ## counters for extraction stats:
-    count_misc = count_title = count_reportnum = count_url = count_doi = 0
+    count_misc = count_title = count_reportnum = count_url = count_doi = count_auth_group = 0
 
     ## A dictionary to contain the total count of each 'bad title' found
     ## in the entire reference section:
@@ -3963,8 +4011,8 @@ def create_marc_xml_reference_section(ref_sect,
         ## of the rebuilt line:
         ## At the same time, get stats of citations found in the reference line
         ## (titles, urls, etc):
-        (xml_line, this_count_misc, this_count_title, \
-         this_count_reportnum, this_count_url, this_count_doi) = \
+        (xml_line, this_count_misc, this_count_title, this_count_reportnum, \
+          this_count_url, this_count_doi, this_count_auth_group) = \
            create_marc_xml_reference_line(line_marker=line_marker,
                                           working_line=working_line1,
                                           found_title_len=found_title_len,
@@ -3979,19 +4027,20 @@ def create_marc_xml_reference_section(ref_sect,
                                           removed_spaces=removed_spaces,
                                           standardised_titles=\
                                             standardised_periodical_titles)
-        count_misc      += this_count_misc
-        count_title     += this_count_title
-        count_reportnum += this_count_reportnum
-        count_url       += this_count_url
-        count_doi       += this_count_doi
+        count_misc       += this_count_misc
+        count_title      += this_count_title
+        count_reportnum  += this_count_reportnum
+        count_url        += this_count_url
+        count_doi        += this_count_doi
+        count_auth_group += this_count_auth_group
 
         ## Append the rebuilt line details to the list of
         ## MARC XML reference lines:
         xml_ref_sectn.append(xml_line)
 
     ## Return the list of processed reference lines:
-    return (xml_ref_sectn, count_misc, count_title, \
-            count_reportnum, count_url, count_doi, record_titles_count)
+    return (xml_ref_sectn, count_misc, count_title, count_reportnum, \
+             count_url, count_doi, count_auth_group, record_titles_count)
 
 
 ## Tasks related to extraction of reference section from full-text:
@@ -5626,17 +5675,19 @@ def get_cli_options():
                  'verbosity'                  : 0,
                  'xmlfile'                    : 0,
                  'dictfile'                   : 0,
+                 'inspire'                    : 0,
                }
 
     try:
-        myoptions, myargs = getopt.getopt(sys.argv[1:], "hVv:zrx:d:", \
+        myoptions, myargs = getopt.getopt(sys.argv[1:], "hVv:zrx:d:s", \
                                           ["help",
                                            "version",
                                            "verbose=",
                                            "raw-references",
                                            "output-raw-refs",
                                            "xmlfile=",
-                                           "dictfile="])
+                                           "dictfile=",
+                                           "inspire"])
     except getopt.GetoptError, err:
         ## Invalid option provided - usage message
         usage(wmsg="Error: %(msg)s." % { 'msg' : str(err) })
@@ -5669,14 +5720,25 @@ def get_cli_options():
             ## Write out the statistics of all titles matched during the
             ## extraction job to the specified file
             cli_opts['dictfile'] = o[1]
+        elif o[0] in ("-s", "--inspire"):
+            ## Write out the statistics of all titles matched during the
+            ## extraction job to the specified file
+            cli_opts['inspire'] = 1
+
+    # What journal title format are we using?
+    if cli_opts['verbosity'] > 0 and cli_opts['inspire']:
+        print 'INSPIRE Journal title format set!'
+    elif cli_opts['verbosity'] > 0:
+        print 'INVENIO Journal title format set!'
+
     if len(myargs) == 0:
         ## no arguments: error message
         usage(wmsg="Error: no full-text.")
 
     return (cli_opts, myargs)
 
-def display_xml_record(status_code, count_reportnum,
-                       count_title, count_url, count_doi, count_misc, recid, xml_lines):
+def display_xml_record(status_code, count_reportnum, count_title, count_url,
+                       count_doi, count_misc, count_auth_group, recid, xml_lines):
     """Given a series of MARC XML-ized reference lines and a record-id, write a
        MARC XML record to the stdout stream. Include in the record some stats
        for the extraction job.
@@ -5707,12 +5769,14 @@ def display_xml_record(status_code, count_reportnum,
         document's reference lines.
        @param count_misc: (integer) - the number of sections of miscellaneous
         text (i.e. 999C5$m) from the document's reference lines.
+       @param count_auth_group: (integer) - the total number of author groups
+        identified ($h)
        @param recid: (string) - the record-id of the given document. (put into
         001 field.)
        @param xml_lines: (list) of strings. Each string in the list contains a
         group of MARC XML 999C5 datafields, making up a single reference line.
         These reference lines will make up the document body.
-       @return: None
+       @return: The entire MARC XML textual output, plus recognition statistics.
     """
     ## Start with the opening record tag:
     out = u"%(record-open)s\n" \
@@ -5731,7 +5795,7 @@ def display_xml_record(status_code, count_reportnum,
 
     ## add the 999C6 status subfields:
     out += u"""   <datafield tag="%(df-tag-ref-stats)s" ind1="%(df-ind1-ref-stats)s" ind2="%(df-ind2-ref-stats)s">
-      <subfield code="%(sf-code-ref-stats)s">%(version)s-%(timestamp)s-%(status)s-%(reportnum)s-%(title)s-%(url)s-%(doi)s-%(misc)s</subfield>
+      <subfield code="%(sf-code-ref-stats)s">%(version)s-%(timestamp)s-%(status)s-%(reportnum)s-%(title)s-%(author)s-%(url)s-%(doi)s-%(misc)s</subfield>
    </datafield>\n""" \
         % { 'df-tag-ref-stats'  : CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS,
             'df-ind1-ref-stats' : CFG_REFEXTRACT_IND1_EXTRACTION_STATS,
@@ -5742,6 +5806,7 @@ def display_xml_record(status_code, count_reportnum,
             'status'            : status_code,
             'reportnum'         : count_reportnum,
             'title'             : count_title,
+            'author'            : count_auth_group,
             'url'               : count_url,
             'doi'               : count_doi,
             'misc'              : count_misc,
@@ -5865,7 +5930,8 @@ def main():
             #reflines = test_get_reference_lines()
             (processed_references, count_misc, \
              count_title, count_reportnum, \
-             count_url, count_doi, record_titles_count) = \
+             count_url, count_doi, count_auth_group, \
+             record_titles_count) = \
               create_marc_xml_reference_section(reflines,
                                                 preprint_repnum_search_kb=\
                                                   preprint_reportnum_sre,
@@ -5921,6 +5987,7 @@ def main():
                                  count_url, \
                                  count_doi, \
                                  count_misc, \
+                                 count_auth_group, \
                                  recid, \
                                  processed_references)
 
