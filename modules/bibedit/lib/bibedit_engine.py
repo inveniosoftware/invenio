@@ -36,8 +36,7 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_KEYWORD_TAXONOMY, CFG_BIBEDIT_KEYWORD_TAG, \
     CFG_BIBEDIT_KEYWORD_RDFLABEL
 
-from invenio.config import CFG_SITE_LANG
-
+from invenio.config import CFG_SITE_LANG, CFG_DEVEL_SITE
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
     get_related_hp_changesets, get_hp_update_xml, delete_hp_change, \
     get_record_last_modification_date, get_record_revision_author, \
@@ -71,6 +70,7 @@ from invenio.bibknowledge import get_kbd_values_for_bibedit, get_kbr_values, \
 
 from invenio.bibcirculation_dblayer import get_number_copies, has_copies
 from invenio.bibcirculation_utils import create_item_details_url
+from datetime import datetime
 
 import re
 import difflib
@@ -540,6 +540,8 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                     # a normal cacheless retrieval of a record
                     record = get_bibrecord(recid)
                     record_revision = get_record_last_modification_date(recid)
+                    if record_revision == None:
+                        record_revision = datetime.now().timetuple()
                     pending_changes = []
                     disabled_hp_changes = {}
                 cache_dirty = False
@@ -585,8 +587,11 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             else:
                 response['resultCode'] = 3
             revision_author = get_record_revision_author(recid, record_revision)
-            last_revision_ts = revision_to_timestamp( \
-                get_record_last_modification_date(recid))
+            latest_revision = get_record_last_modification_date(recid)
+            if latest_revision == None:
+                latest_revision = datetime.now().timetuple()
+            last_revision_ts = revision_to_timestamp(latest_revision)
+
             revisions_history = get_record_revision_timestamps(recid)
             number_of_physical_copies = get_number_copies(recid)
             bibcirc_details_URL = create_item_details_url(recid, ln)
@@ -647,12 +652,18 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                 elif not data['force'] and \
                         not latest_record_revision(recid, record_revision):
                     response['cacheOutdated'] = True
+                    if CFG_DEVEL_SITE:
+                        response['record_revision'] = record_revision.__str__()
+                        response['newest_record_revision'] = \
+                            get_record_last_modification_date(recid).__str__()
                 else:
                     save_xml_record(recid, uid)
                     response['resultCode'] = 4
-            except:
+            except Exception, e:
                 response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV[ \
                     'error_wrong_cache_file_format']
+                if CFG_DEVEL_SITE: # return debug information in the request
+                    response['exception_message'] = e.__str__()
     elif request_type == 'revert':
         revId = data['revId']
         job_date = "%s-%s-%s %s:%s:%s" % re_revdate_split.search(revId).groups()

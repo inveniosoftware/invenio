@@ -58,6 +58,7 @@ from invenio.webuser import get_user_info
 from invenio.dbquery import run_sql
 from invenio.websearchadminlib import get_detailed_page_tabs
 
+
 # Precompile regexp:
 re_file_option = re.compile(r'^%s' % CFG_TMPSHAREDDIR)
 re_xmlfilename_suffix = re.compile('_(\d+)_\d+\.xml$')
@@ -113,6 +114,9 @@ datetime.
 
     file_path = '%s.tmp' % _get_file_path(recid, uid)
     record_revision = get_record_last_modification_date(recid)
+    if record_revision == None:
+        record_revision = datetime.now().timetuple()
+
     cache_file = open(file_path, 'w')
     assert_undo_redo_lists_correctness(undo_list, redo_list);
     cPickle.dump([cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list], cache_file)
@@ -212,7 +216,9 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
 # Security: Locking and integrity
 def latest_record_revision(recid, revision_time):
     """Check if timetuple REVISION_TIME matches latest modification date."""
-    return revision_time == get_record_last_modification_date(recid)
+    latest = get_record_last_modification_date(recid)
+    # this can be none if the record is new
+    return (latest == None) or (revision_time == latest)
 
 def record_locked_by_other_user(recid, uid):
     """Return true if any other user than UID has active caches for record

@@ -21,7 +21,6 @@
 __revision__ = "$Id$"
 
 from invenio.dbquery import run_sql
-from datetime import datetime
 
 def get_name_tags_all():
     """Return a dictionary of all MARC tag's textual names."""
@@ -64,9 +63,7 @@ def get_record_last_modification_date(recid):
     sql_res = run_sql('SELECT max(job_date) FROM  hstRECORD WHERE id_bibrec=%s',
                       (recid, ))
     if sql_res[0][0] == None:
-        return datetime.now().timetuple() # in the case of missing last
-                                          # modification datetime, use
-                                          # current
+        return None
     else:
         return sql_res[0][0].timetuple()
 
