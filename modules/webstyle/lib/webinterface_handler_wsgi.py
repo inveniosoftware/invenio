@@ -473,6 +473,11 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
             ## pain will go away anyway :-)
             if isinstance(value, str):
                 form[key] = str(value)
+            else:
+                ## NOTE: this is a workaround for e.g. legacy webupload
+                ## that is still using legacy publisher and expect to
+                ## have a file (Field) instance instead of a string.
+                form[key] = value
 
         try:
             return _check_result(req, module_globals[possible_handler](req, **form))
