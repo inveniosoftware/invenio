@@ -219,39 +219,22 @@ def perform_request_init(uid, ln, req, lastupdated):
             'gAUTOCOMPLETE_TAGS' : CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS.keys(),
             'gKEYWORD_TAG' : '"' + CFG_BIBEDIT_KEYWORD_TAG  + '"'
             }
-    body += '<script type="text/javascript">\n'
-    for key in data:
-        body += '    var %s = %s;\n' % (key, data[key])
-    body += '    </script>\n'
 
-    # Adding the information about field templates
     fieldTemplates = get_available_fields_templates()
-    body += "<script>\n" + \
-            "   var fieldTemplates = %s\n" % (json.dumps(fieldTemplates), ) + \
-            "</script>\n"
-    # Add scripts (the ordering is NOT irrelevant).
 
     jquery_scripts = ['jquery.min.js', 'jquery.effects.core.min.js',
-               'jquery.effects.highlight.min.js', 'jquery.autogrow.js',
-               'jquery.jeditable.mini.js', 'jquery.hotkeys.min.js', 'json2.js']
+                          'jquery.effects.highlight.min.js',
+                          'jquery.autogrow.js', 'jquery.jeditable.mini.js',
+                          'jquery.hotkeys.min.js', 'json2.js']
 
     scripts = ['bibedit_display.js', 'bibedit_engine.js', 'bibedit_keys.js',
                'bibedit_menu.js', 'bibedit_holdingpen.js', 'marcxml.js',
                'bibedit_clipboard.js']
 
-    for script in jquery_scripts:
-        body += '    <script type="text/javascript" src="%s/js/jquery/%s">' \
-            '</script>\n' % (CFG_SITE_URL, script)
+    stylesheets = ['bibedit.css']
 
-    for script in scripts:
-        body += '    <script type="text/javascript" src="%s/js/%s">' \
-            '</script>\n' % (CFG_SITE_URL, script)
-
-
-
-    # Build page structure and menu.
-    # rec = create_record(format_record(235, "xm"))[0]
-    #oaiId = record_extract_oai_id(rec)
+    body += bibedit_templates.page_headers(jquery_scripts, scripts,
+                                           stylesheets, data, fieldTemplates)
 
     body += bibedit_templates.menu()
     body += '    <div id="bibEditContent"></div>\n'

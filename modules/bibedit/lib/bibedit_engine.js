@@ -1197,7 +1197,6 @@ function onGetRecordSuccess(json){
   adjustGeneralHPControlsVisibility();
 
   createReq({recID: gRecID, requestType: 'getTickets'}, onGetTicketsSuccess);
-
   updateToolbar(true);
 }
 
@@ -2332,7 +2331,7 @@ function onContentClick(cell){
   }
 }
 
-function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex, 
+function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex,
         subfieldCode, value, changeNo, undoDescriptor, modifySubfieldCode){
   var requestType;
   if (modifySubfieldCode == true) {
@@ -2359,7 +2358,7 @@ function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex,
   return data;
 }
 
-function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, 
+function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode,
                             value, consumedChange, undoDescriptor,
                             modifySubfieldCode){
   updateStatus('updating');
@@ -2367,7 +2366,7 @@ function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode,
   if (consumedChange == undefined || consumedChange == null){
     consumedChange = -1;
   }
-  
+
   var data = getUpdateSubfieldValueRequestData(tag,
                                                fieldPosition,
                                                subfieldIndex,
@@ -3407,7 +3406,7 @@ function processURUntil(entry){
   }
 }
 
-function prepareUndoHandlerChangeSubfield(tag, fieldPos, subfieldPos, oldVal, 
+function prepareUndoHandlerChangeSubfield(tag, fieldPos, subfieldPos, oldVal,
          newVal, oldCode, newCode, operation_type){
   var result = {};
   result.operation_type = operation_type;
@@ -3432,7 +3431,7 @@ function prepareUndoHandlerChangeFieldCode(oldTag, oldInd1, oldInd2, newTag, new
   result.ind1 = newInd1;
   result.ind2 = newInd2;
   result.fieldPos = fieldPos;
-  
+
   if (gRecord[newTag] == undefined) {
       result.newFieldPos = 0;
   }

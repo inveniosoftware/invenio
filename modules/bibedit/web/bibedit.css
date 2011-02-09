@@ -1,0 +1,494 @@
+/*Styles used inside BibEdit*/
+
+/* BibEdit - old interface */
+
+.bibEditTable{
+    background: #ececec;
+    border: 0px;
+    padding: 0px;
+    border-collapse: collapse;
+}
+
+.bibEditTable th{
+    background: #ccc;
+    text-align: left;
+    padding: 5px;
+}
+
+.bibEditCellRight{
+    font-size: small;
+    text-align: right;
+    padding: 0px;
+}
+
+.bibEditCellTag{
+    font-size: small;
+    text-align: right;
+    vertical-align: top;
+    padding: 2px 5px 2px 5px;
+    font-weight: bold;
+}
+
+.bibEditHistView{
+    float: left;
+    margin: 0px 10px 5px 0px;
+    width: 70%;
+}
+
+.bibEditHistCompare{
+    float: left;
+    margin: 0px 10px 5px 0px;
+    font-size: small;
+    width: 70%;
+}
+
+.bibEditHistForms{
+    margin: 5px 0px 5px 10px;
+}
+
+/* BibEdit - new interface */
+.bibEditBtnBold {
+    font-weight: bold
+}
+
+#bibEditMenu {
+    width: 136px;
+    position: fixed;
+    top: 220px;
+    left: 20px;
+    margin-bottom: 20px;
+    font-size: 0.8em;
+}
+
+#bibEditMenu .bibEditMenuSection {
+    margin-bottom: 10px;
+}
+
+#bibEditMenu .bibEditMenuSectionHeader {
+    font-weight: bold;
+}
+
+#bibEditMenu .bibEditMenuSection table {
+    width: 100%;
+}
+
+#bibEditMenu form {
+    margin: 0px;
+}
+
+#bibEditMenu .bibEditImgExpandMenuSection,
+#bibEditMenu .bibEditImgCompressMenuSection {
+    margin: 0px;
+    text-align: left;
+    vertical-align: bottom;
+}
+
+#bibEditMenu a, #bibEditMenu button, #bibEditMenu input, #bibEditMenu select {
+    font-size: 0.8em;
+}
+
+#bibEditMenu a, #bibEditMenu button, #bibEditMenu img,
+#bibEditMenu input, #bibEditMenu select {
+    margin: 1px;
+}
+
+#bibEditMenu button, #bibEditMenu input, #bibEditMenu select  {
+    width: 100%;
+}
+
+#bibEditMenu .bibEditImgCtrlEnabled {
+    cursor: pointer;
+    opacity: 1.0;
+    vertical-align: bottom;
+}
+
+#bibEditMenu .bibEditImgCtrlDisabled {
+    cursor: default;
+    opacity: 0.4;
+    vertical-align: bottom;
+}
+
+#bibEditContent {
+    min-height: 300px;
+    margin-left: 150px;
+}
+
+#bibEditTable {
+    background-color: rgb(255, 255, 255);
+    border: 1px solid #A1A1A1;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.bibEditColFieldBox {
+    min-width: 14px;
+    max-width: 14px;
+    width: 14px;
+}
+
+#bibEditColFieldTag {
+    min-width: 48px;
+    max-width: 100px;
+    width: 48px;
+    border-right: 1px solid #A1A1A1;
+}
+
+#bibEditColSubfieldTag {
+    width: 28px;
+    min-width: 28px;
+    max-width: 80px;
+    border-right: 1px solid #A1A1A1;
+}
+
+#bibEditColSubfieldAdd {
+    width: 16px;
+    min-width: 16px;
+    max-width: 16px;
+}
+
+#bibEditTable .bibEditCellContent:hover,
+#bibEditTable .bibEditCellContentProtected:hover{
+    background: lightyellow;
+}
+
+#bibEditTable .bibEditFieldColored {
+    background-color: rgb(235, 235, 235);
+    border: 1px solid #A1A1A1;
+}
+
+#bibEditTable .bibEditSelected {
+    background: lightblue;
+}
+
+#bibEditTable .bibEditVolatileSubfield {
+    color: grey;
+}
+#bibEditTable td {
+    padding: 1px 1px;
+    font-size: 0.8em;
+}
+
+#bibEditTable .bibEditCellField,
+#bibEditTable .bibEditCellFieldTag,
+#bibEditTable .bibEditCellSubfield,
+#bibEditTable .bibEditCellSubfieldTag {
+    vertical-align: top;
+}
+
+#bibEditTable .bibEditCellFieldTag {
+    font-weight: bold;
+}
+
+#bibEditTable .bibEditCellContentProtected {
+  font-weight: bold;
+}
+
+#bibEditTable textarea {
+    min-height: 36px;
+}
+
+#bibEditTable .bibEditCellAddSubfields {
+    vertical-align: bottom;
+}
+
+#bibEditTable img {
+    cursor: pointer;
+}
+
+#bibEditTable .bibEditBtnMoveSubfieldUp {
+    float: left;
+}
+
+#bibEditTable .bibEditBtnMoveSubfieldDown {
+    float: right;
+}
+
+#bibEditTable input[type="text"]:not(.bibEditInputError){
+    border: 2px inset grey;
+}
+
+#bibEditTable input[type="checkbox"] {
+    margin: 1px 0px 0px;
+    padding: 0px;
+}
+
+#bibEditTable .bibEditBtnClear {
+    margin-left: 20px;
+}
+
+#bibEditTable .bibEditTxtTag {
+    width: 34px;
+}
+
+#bibEditTable .bibEditTxtInd {
+    width: 14px;
+}
+
+#bibEditTable .bibEditCellAddSubfieldCode {
+    text-align: right;
+}
+
+#bibEditTable .bibEditTxtSubfieldCode {
+    width: 14px;
+}
+
+#bibEditTable .bibEditTxtValue {
+    width: 100%;
+}
+
+#bibEditTable .bibEditInputError {
+    border: 2px solid red;
+}
+
+#bibEditMessage {
+    background: rgb(250, 209, 99);
+}
+
+.bibEditAddFieldManipulationsBar {
+    display: table;
+}
+
+.bibEditAddFieldFormSelectTemplate {
+    display: table-cell;
+    width: 400px;
+}
+
+.bibEditAddFieldFormCreateSimilar {
+    display: table-cell;
+}
+
+.bibeditscrollArea {
+    width: 200px;
+    height: 75px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-color: #6699CC;
+    border-width: 1px;
+    border-style: solid;
+    float: left;
+    overflow: auto;
+}
+
+.bibeditscrollArea ul {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.bibeditHPCorrection{
+    border-width: 1px;
+    background-color: #FAEBD7;
+    font-size: smaller;
+    border-style: groove;
+    display: inline-block;
+    border-color: RosyBrown;
+    margin:5px 3px 3px 5px;
+    padding: 2px;
+}
+
+#bibeditHPChanges{
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 150px;
+}
+
+.bibeditHPHiddenElement{
+    visibility: hidden;
+    display: none;
+}
+
+.bibeditHPPanelEntry{
+    border-width: 1px;
+    border-style: dotted;
+    display: table;
+    background-color: #feffff;
+    border-color: #cbcccc;
+    margin-bottom: 5px;
+}
+
+.bibeditHPContentPreviewBox {
+    position: absolute;
+    z-index:0;
+    border-style: dotted;
+    border-width: 1px;
+    background-color: #fefeff;
+    top: 0px;
+    height: 500px;
+    overflow: auto;
+    width: 500px;
+}
+
+.bibeditHPControl{
+    display:table-cell;
+    width:20%;
+    margin:0px;
+}
+
+.bibeditHPEntryNumber{
+    display: table-cell;
+    width: 80%;
+}
+
+.bibeditHPEntryDateSection{
+    font-size: smaller;
+    width: 60%;
+    margin: 0px;
+    display: table-cell;
+}
+
+.bibeditHPDetailsOpener{
+    display: table-cell;
+    width: 20%;
+}
+
+.bibeditHPInformationsSection{
+
+}
+
+.bibeditHPDetailsOpener{
+    display: table-cell;
+}
+
+.bibeditHPEntryControlsPanel{
+    display: table-row;
+}
+
+.bibeditHPEntryRow1{
+    display: table-row;
+}
+
+.bibeditHPEntryRow2{
+    display: table-row;
+}
+
+.bibeditHPEntryCol1{
+    display: table-cell;
+}
+
+.bibeditHPEntryCol2{
+    display: table-cell;
+    max-width: 28px;
+    min-width: 28px;
+    margin: 0px;
+}
+
+.bibeditHPPanelEntryDisabled {
+    background-color: #eeeeee;
+    color: #BBBBBB;
+}
+
+.bibEditRevHistorySelectedEntry{
+    background-color: #cccccc;
+    display: table-row;
+}
+
+.bibEditRevHistoryEntry{
+    background-color: #efefef;
+    display: table-row;
+}
+
+.bibEditRevHistoryEntryContent{
+    display: table-cell;
+    font-size: 80%;
+}
+
+.bibEditRevHistoryEntryControls{
+    display: table-cell;
+}
+
+.bibEditRevHistoryLink{
+    display: table-cell;
+    border-style: none;
+}
+
+.bibEditRevHistoryLinkImg{
+    border-width: 0px;
+    border-style: none;
+}
+.bibEditRevHistoryMenuSection{
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+/* end of invenio.css */
+
+.bibEditHiddenElement {
+    display: none;
+}
+
+.bibEditURPreviewBox {
+    border-color: #dddddd;
+    border-style: dotted;
+}
+.bibEditURPairRow {
+    background-color: white;
+}
+
+.bibEditUROddRow {
+    background-color: #eeeeee;
+}
+
+.bibEditURPreviewHeader{
+    font-weight: bolder;
+}
+
+.bibEditURDescHeader{
+    font-weight: bolder;
+}
+
+.bibEditURDescEmptyCell{
+    width:20px;
+}
+
+.bibEditURDescChar{
+    font-style: italic;
+}
+
+.bibEditURDescVal{
+}
+
+.bibEditURMenuSection{
+    display: table-row;
+    width: 138px;
+    max-width: 138px;
+    overflow: visible;
+}
+
+.bibEditURDetailsSection{
+    display: table-cell;
+    max-width: 64px;
+    width: 64px;
+}
+
+.bibEditURPreviewBox{
+    max-width: 138px;
+    width: 138px;
+}
+
+.bibEditURDescEntry {
+    max-width: 138px;
+    width: 138px;
+    max-height: 20px;
+    overflow: visible;
+}
+
+.bibEditURDescEntryDetails {
+    position: relative;
+    left: 138px;
+    top: -20px;
+    overflow: visible;
+    background-color: white;
+    border-style: dotted;
+    border-width: 1px;
+    width: 300px;
+}
+
+.bibEditURDescEntrySelected{
+    background-color: #aaaaaa;
+}
+
+.bibEditBibCircPanel{
+    font-weight: normal;
+}
