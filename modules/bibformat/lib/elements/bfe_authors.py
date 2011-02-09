@@ -27,7 +27,8 @@ def format_element(bfo, limit, separator=' ; ',
            affiliation_prefix=' (',
            affiliation_suffix=')',
            interactive="no",
-           highlight="no"):
+           highlight="no",
+           link_author_pages="no"):
     """
     Prints the list of authors of a record.
 
@@ -69,15 +70,15 @@ def format_element(bfo, limit, separator=' ; ',
                                                         bfo.search_pattern)
 
             if print_links.lower() == "yes":
-                if True: # FIXME: /author/123:Ellis is not a user-friendly default
+                if link_author_pages == "no":
                     author['a'] = '<a href="' + CFG_SITE_URL + \
                                   '/search?f=author&amp;p=' + quote(author['a']) + \
                                   '&amp;ln=' + bfo.lang + \
                                   '">' + escape(author['a']) + '</a>'
                 else:
                     author['a'] = '<a href="' + CFG_SITE_URL + \
-                                  '/author/' + bibrec_id + ':' + \
-                                  quote(author['a']) + \
+                                  '/author/' + quote(author['a']) + \
+                                  '?recid=' +  bibrec_id + \
                                   '&ln=' + bfo.lang + \
                                   '">' + escape(author['a']) + '</a>'
 

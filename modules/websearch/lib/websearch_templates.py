@@ -3889,7 +3889,7 @@ class Template:
         return out
 
     def tmpl_author_information(self, req, pubs, authorname, num_downloads, aff_pubdict,
-                                citedbylist, kwtuples, authors, vtuples, names_dict, admin_link, ln):
+                                citedbylist, kwtuples, authors, vtuples, names_dict, admin_link, is_bibauthorid, ln):
         """Prints stuff about the author given as authorname.
            1. Author name + his/her institutes. Each institute I has a link
               to papers where the auhtor has I as institute.
@@ -3911,6 +3911,7 @@ class Template:
         from invenio.search_engine import perform_request_search
         from operator import itemgetter
         _ = gettext_set_language(ln)
+        ib_pubs = intbitset(pubs)
 
         # Prepare data for display
         # construct names box
@@ -3927,19 +3928,41 @@ class Template:
             content.append("%s (%s)" % (name, name_lnk))
 
         if not content:
-            content = [_("No name variants found")]
+            content = [_("No Name Variants")]
 
         names_box = self.tmpl_print_searchresultbox(header, "<br />\n".join(content))
+        # construct an extended search as an interim solution for author id
+        # searches. Will build "(exactauthor:v1 OR exactauthor:v2)" strings
+        extended_author_search_str = ""
+
+        if is_bibauthorid:
+            if len(names_dict.keys()) > 1:
+                extended_author_search_str = '('
+
+            for name_index, name_query in enumerate(names_dict.keys()):
+                if name_index > 0:
+                    extended_author_search_str += " OR "
+
+                extended_author_search_str += 'exactauthor:"' + name_query + '"'
+
+            if len(names_dict.keys()) > 1:
+                extended_author_search_str += ')'
 
         # construct papers box
-        searchstr = create_html_link(self.build_search_url(p=authorname,
-                                     f='exactauthor'),
+        rec_query = 'exactauthor:"' + authorname + '"'
+
+        if is_bibauthorid and extended_author_search_str:
+            rec_query = extended_author_search_str
+
+        searchstr = create_html_link(self.build_search_url(p=rec_query),
                                      {}, "All papers (" + str(len(pubs)) + ")",)
-        line1 = "<strong>" + _("Records") + "</strong>"
+        line1 = "<strong>" + _("Papers") + "</strong>"
         line2 = searchstr
+
         if CFG_BIBRANK_SHOW_DOWNLOAD_STATS and num_downloads:
             line2 += " (" + _("downloaded") + " "
             line2 += str(num_downloads) + " " + _("times") + ")"
+
         if CFG_INSPIRE_SITE:
             CFG_COLLS = ['Book',
                          'Conference',
@@ -3956,15 +3979,22 @@ class Template:
                          'Preprint', ]
         collsd = {}
         for coll in CFG_COLLS:
-            coll_num_papers = len(intbitset(pubs) & intbitset(perform_request_search(p="collection:" + coll)))
-            if coll_num_papers:
-                collsd[coll] = coll_num_papers
+            coll_papers = list(ib_pubs & intbitset(perform_request_search(f="collection", p=coll)))
+            if coll_papers:
+                collsd[coll] = coll_papers
         colls = collsd.keys()
-        colls.sort(lambda x, y: cmp(collsd[y], collsd[x])) # sort by number of papers
+        colls.sort(lambda x, y: cmp(len(collsd[y]), len(collsd[x]))) # sort by number of papers
         for coll in colls:
-            line2 += "<br>" + create_html_link(self.build_search_url(p='exactauthor:"' + authorname + '" ' + \
-                                                                     'collection:' + coll),
-                                                   {}, coll + " (" + str(collsd[coll]) + ")",)
+            rec_query = 'exactauthor:"' + authorname + '" ' + 'collection:' + coll
+
+            if is_bibauthorid and extended_author_search_str:
+                rec_query = extended_author_search_str + ' collection:' + coll
+
+            line2 += "<br />" + create_html_link(self.build_search_url(p=rec_query),
+                                                                       {}, coll + " (" + str(len(collsd[coll])) + ")",)
+
+        if not pubs:
+            line2 = _("No Papers")
 
         papers_box = self.tmpl_print_searchresultbox(line1, line2)
 
@@ -3972,14 +4002,19 @@ class Template:
         authoraff = ""
         aff_pubdict_keys = aff_pubdict.keys()
         aff_pubdict_keys.sort(lambda x, y: cmp(len(aff_pubdict[y]), len(aff_pubdict[x])))
-        for a in aff_pubdict_keys:
-            recids = "+or+".join(map(str, aff_pubdict[a]))
-            print_a = a
-            if (print_a == ' '):
-                print_a = _("unknown")
-            if authoraff:
-                authoraff += '<br>'
-            authoraff += "<a href=\"../search?f=recid&p=" + recids + "\">" + print_a + ' (' + str(len(aff_pubdict[a])) + ")</a>"
+
+        if aff_pubdict_keys:
+            for a in aff_pubdict_keys:
+                print_a = a
+                if (print_a == ' '):
+                    print_a = _("unknown affiliation")
+                if authoraff:
+                    authoraff += '<br>'
+                authoraff += create_html_link(self.build_search_url(p=' or '.join(["%s" % x for x in aff_pubdict[a]]),
+                                                                       f='recid'),
+                                                                       {}, print_a + ' (' + str(len(aff_pubdict[a])) + ')',)
+        else:
+            authoraff = _("No Affiliations")
 
         line1 = "<strong>" + _("Affiliations") + "</strong>"
         line2 = authoraff
@@ -3991,15 +4026,17 @@ class Template:
             for (kw, freq) in kwtuples:
                 if keywstr:
                     keywstr += '<br>'
-                #create a link in author=x, keyword=y
-                searchstr = create_html_link(self.build_search_url(
-                                                p='exactauthor:"' + authorname + '" ' +
-                                                  'keyword:"' + kw + '"'),
-                                                {}, kw + " (" + str(freq) + ")",)
+                rec_query = 'exactauthor:"' + authorname + '" ' + 'keyword:"' + kw + '"'
+
+                if is_bibauthorid and extended_author_search_str:
+                    rec_query = extended_author_search_str + ' keyword:"' + kw + '"'
+
+                searchstr = create_html_link(self.build_search_url(p=rec_query),
+                                                                   {}, kw + " (" + str(freq) + ")",)
                 keywstr = keywstr + " " + searchstr
 
         else:
-            keywstr += 'No Keywords found'
+            keywstr += _('No Keywords')
 
 
         line1 = "<strong>" + _("Frequent keywords") + "</strong>"
@@ -4009,16 +4046,19 @@ class Template:
 
         header = "<strong>" + _("Frequent co-authors") + "</strong>"
         content = []
+        sorted_coauthors = sorted(sorted(authors.iteritems(), key=itemgetter(0)), key=itemgetter(1), reverse=True)
 
-        for name, frequency in sorted(authors.iteritems(),
-                                      key=itemgetter(1),
-                                      reverse=True):
-            lnk = create_html_link(self.build_search_url(p=name,
-                f='exactauthor'), {}, "%s (%s)" % (name, frequency),)
+        for name, frequency in sorted_coauthors:
+            rec_query = 'exactauthor:"' + authorname + '" ' + 'exactauthor:"' + name + '"'
+
+            if is_bibauthorid and extended_author_search_str:
+                rec_query = extended_author_search_str + ' exactauthor:"' + name + '"'
+
+            lnk = create_html_link(self.build_search_url(p=rec_query), {}, "%s (%s)" % (name, frequency),)
             content.append("%s" % lnk)
 
         if not content:
-            content = [_("No frequent co-authors")]
+            content = [_("No Frequent Co-authors")]
 
         coauthor_box = self.tmpl_print_searchresultbox(header, "<br />\n".join(content))
 
@@ -4044,9 +4084,18 @@ class Template:
         req.write("</td></tr></table>")
 
         # print citations:
+        rec_query = 'exactauthor:"' + authorname + '"'
+
+        if is_bibauthorid and extended_author_search_str:
+            rec_query = extended_author_search_str
+
         if len(citedbylist):
             line1 = "<strong>" + _("Citations:") + "</strong>"
             line2 = ""
+
+            if not pubs:
+                line2 = _("No Citation Information available")
+
             req.write(self.tmpl_print_searchresultbox(line1, line2))
 
         # print frequent co-authors:

@@ -478,7 +478,7 @@ def find_personIDs_by_name_string(namestring):
 #   matching_pids = sorted(matching_pids, key=lambda k: k[3], reverse=True)
     persons = {}
     for n in matching_pids:
-        if n[3] >= 0.0:
+        if n[3] >= 0.8:
             if n[0] not in persons:
                 persons[n[0]] = sorted([[p[1], p[2], p[3]] for p in  matching_pids if p[0] == n[0]],
                                 key=lambda k: k[2], reverse=True)

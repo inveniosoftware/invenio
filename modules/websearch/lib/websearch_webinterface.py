@@ -229,7 +229,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
     def __init__(self, pageparam=''):
         """Constructor."""
-        self.pageparam = pageparam.replace("+", " ")
+        self.pageparam = cgi.escape(pageparam.replace("+", " "))
         self.personid = -1
         self.authorname = " "
 
@@ -240,25 +240,32 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
     def __call__(self, req, form):
         """Serve the page in the given language."""
-        is_bibauthorid = True
+        is_bibauthorid = False
 
         try:
             from invenio.bibauthorid_webapi import search_person_ids_by_name
             from invenio.bibauthorid_webapi import get_papers_by_person_id
             from invenio.bibauthorid_webapi import get_person_names_from_id
+            from invenio.bibauthorid_webapi import get_person_db_names_from_id
             from invenio.bibauthorid_utils import create_normalized_name
             from invenio.bibauthorid_utils import split_name_parts
             from invenio.bibauthorid_config import CLAIMPAPER_CLAIM_OTHERS_PAPERS
             from invenio.access_control_admin import acc_find_user_role_actions
+            is_bibauthorid = True
         except (ImportError):
             is_bibauthorid = False
 
         from operator import itemgetter
 
-        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG), 'verbose': (int, 0) })
+        argd = wash_urlargd(form,
+                            {'ln': (str, CFG_SITE_LANG), 
+                             'verbose': (int, 0),
+                             'recid': (int, -1)
+                             })
         ln = argd['ln']
         verbose = argd['verbose']
         req.argd = argd #needed since perform_req_search
+        param_recid = argd['recid']
 
         # start page
         req.content_type = "text/html"
@@ -270,6 +277,8 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         recid = None
         nquery = ""
         names_dict = {}
+        db_names_dict = {}
+        _ = gettext_set_language(ln)
 
         #let's see what takes time..
         time1 = time.time()
@@ -282,9 +291,13 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         except (ValueError, TypeError):
             self.personid = -1
 
-        # Well, it's not a person id, maybe a bibrec:name or name:bibrec pair?
-        if self.personid < 1 and is_bibauthorid:
-            if self.pageparam.count(":"):
+        if self.personid < 0 and is_bibauthorid:
+            if param_recid > -1:
+                # Well, it's not a person id, did we get a record ID?
+                recid = param_recid
+                nquery = self.pageparam
+            elif self.pageparam.count(":"):
+                # No recid passed, maybe name is recid:name or name:recid pair?
                 left, right = self.pageparam.split(":")
 
                 try:
@@ -298,6 +311,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                         recid = None
                         nquery = self.pageparam
             else:
+                # No recid could be determined. Work with name only
                 nquery = self.pageparam
 
             sorted_results = search_person_ids_by_name(nquery)
@@ -317,25 +331,28 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
             search_results = authors
 
-            if search_results:
+            if len(search_results) == 1:
                 self.personid = search_results[0][0]
+            #@todo: Show selection of possible Person entities if len > 1
 
-        if self.personid < 1 or not is_bibauthorid:
+        if self.personid < 0 or not is_bibauthorid:
             # Well, no person. Fall back to the exact author name search then.
             self.authorname = self.pageparam
 
             if not self.authorname:
                 return websearch_templates.tmpl_author_information(req, {},
                                                             self.authorname,
-                                                            0, {}, {},
-                                                            {}, {}, {}, {}, ln)
+                                                            0, {}, {}, {},
+                                                            {}, {}, {}, {}, False, ln)
 
             #search the publications by this author
             pubs = perform_request_search(req=req, p=self.authorname, f="exactauthor")
             names_dict[self.authorname] = len(pubs)
+            db_names_dict[self.authorname] = len(pubs)
 
-        elif is_bibauthorid:
+        elif is_bibauthorid and self.personid > -1:
             #yay! Person found! find only papers not disapproved by humans
+            req.write("<!-- Authorpages are Bibauthorid-powered !-->")
             full_pubs = get_papers_by_person_id(self.personid, -1)
             pubs = [int(row[0]) for row in full_pubs]
             longest_name = ""
@@ -352,16 +369,34 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                 if len(norm_name) > len(longest_name):
                     longest_name = norm_name
 
+            for aname, acount in get_person_db_names_from_id(self.personid):
+                aname = aname.replace('"','').strip()
+                db_names_dict[aname] = acount
+
             self.authorname = longest_name
+
+        if not pubs and param_recid > -1:
+            req.write("<p>")
+            req.write(_("We're sorry. The requested author \"%s\" seems not to be listed on the specified paper."
+                        % (self.pageparam,)))
+            req.write("<br />")
+            req.write(_("Please try the following link to start a broader search on the author: "))
+            req.write('<a href="%s/author/%s">%s</a>'
+                      % (CFG_SITE_URL, self.pageparam, self.pageparam))
+            req.write("</p>")
+
+            return page_end(req, 'hb', ln)
 
         #get most frequent authors of these pubs
         popular_author_tuples = get_most_popular_field_values(pubs, (AUTHOR_TAG, COAUTHOR_TAG))
         coauthors = {}
 
         for (coauthor, frequency) in popular_author_tuples:
-            if len(authors) < MAX_COLLAB_LIST:
-                if coauthor not in names_dict:
-                    coauthors[coauthor] = frequency
+            if coauthor not in db_names_dict:
+                coauthors[coauthor] = frequency
+
+            if len(coauthors) > MAX_COLLAB_LIST:
+                break
 
         time1 = time.time()
         if verbose == 9:
@@ -408,7 +443,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             req.write("<br/>misc: " + str(time2 - time1) + "<br/>")
 
         #a dict. keys: affiliations, values: lists of publications
-        author_aff_pubs = self.get_institute_pub_dict(pubs, names_dict.keys())
+        author_aff_pubs = self.get_institute_pub_dict(pubs, db_names_dict.keys())
 
         time1 = time.time()
         if verbose == 9:
@@ -443,16 +478,37 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                                                     author_aff_pubs,
                                                     citedbylist, kwtuples,
                                                     coauthors, vtuples,
-                                                    names_dict, admin_link, ln)
+                                                    db_names_dict, admin_link,
+                                                    is_bibauthorid, ln)
         time1 = time.time()
         #cited-by summary
-        out = summarize_records(intbitset(pubs), 'hcs', ln, req=req)
+        rec_query = 'exactauthor:"' + self.authorname + '"'
+
+        extended_author_search_str = ""
+
+        if is_bibauthorid:
+            if len(db_names_dict.keys()) > 1:
+                extended_author_search_str = '('
+
+            for name_index, name_query in enumerate(db_names_dict.keys()):
+                if name_index > 0:
+                    extended_author_search_str += " OR "
+
+                extended_author_search_str += 'exactauthor:"' + name_query + '"'
+
+            if len(db_names_dict.keys()) > 1:
+                extended_author_search_str += ')'
+
+        if is_bibauthorid and extended_author_search_str:
+            rec_query = extended_author_search_str
+
+
+        if pubs:
+            req.write(summarize_records(intbitset(pubs), 'hcs', ln, rec_query, req=req))
 
         time2 = time.time()
         if verbose == 9:
             req.write("<br/>summarizer: " + str(time2 - time1) + "<br/>")
-
-        req.write(out)
 
 #        simauthbox = create_similarly_named_authors_link_box(self.authorname)
 #        req.write(simauthbox)

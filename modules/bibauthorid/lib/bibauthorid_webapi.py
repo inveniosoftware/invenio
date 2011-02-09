@@ -172,6 +172,25 @@ def get_person_names_from_id(person_id= -1):
     return tu.get_person_names_count((person_id,))
 
 
+def get_person_db_names_from_id(person_id= -1):
+    '''
+    Finds and returns the names associated with this person as stored in the 
+    meta data of the underlying data set along with the
+    frequency of occurrence (i.e. the number of papers)
+
+    @param person_id: an id to find the names for
+    @type person_id: int
+
+    @return: name and number of occurrences of the name
+    @rtype: tuple of tuple
+    '''
+#    #retrieve all rows for the person
+    if (not person_id > -1) or (not isinstance(person_id, int)):
+        return []
+
+    return tu.get_person_db_names_count((person_id,))
+
+
 def get_paper_status(person_id, bibref):
     '''
     Finds an returns the status of a bibrec to person assignment
