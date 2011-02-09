@@ -3926,6 +3926,7 @@ CREATE TABLE IF NOT EXISTS `aidVIRTUALAUTHORSDATA` (
   `tag` varchar(255) NOT NULL,
   `value` varchar(255) NOT NULL,
   PRIMARY KEY  (`id`),
+  INDEX `virtualauthorID-b` (`virtualauthorID`),
   INDEX `tag-b` (`tag`),
   INDEX `value-b` (`value`)
 ) ENGINE=MyISAM;
