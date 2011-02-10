@@ -71,6 +71,12 @@ try:
 except ImportError:
     CFG_HAS_MAGIC = False
 
+## The above flag controls whether HTTP range requests are supported or not
+## when serving static files via Python. This is disabled by default as
+## it currently breaks support for opening PDF files on Windows platforms
+## using Acrobat reader brower plugin.
+CFG_ENABLE_HTTP_RANGE_REQUESTS = False
+
 from datetime import datetime
 from mimetypes import MimeTypes
 from thread import get_ident
@@ -3014,7 +3020,10 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         req.encoding = encoding
         req.filename = fullname
         req.headers_out["Last-Modified"] = time.strftime('%a, %d %b %Y %X GMT', time.gmtime(mtime))
-        req.headers_out["Accept-Ranges"] = "bytes"
+        if CFG_ENABLE_HTTP_RANGE_REQUESTS:
+            req.headers_out["Accept-Ranges"] = "bytes"
+        else:
+            req.headers_out["Accept-Ranges"] = "none"
         req.headers_out["Content-Location"] = location
         if etag is not None:
             req.headers_out["ETag"] = etag
@@ -3035,7 +3044,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                 raise apache.SERVER_RETURN, apache.HTTP_NOT_MODIFIED
         if headers['unless-modified-since'] and headers['unless-modified-since'] < mtime:
             return normal_streaming(size)
-        if headers['range']:
+        if CFG_ENABLE_HTTP_RANGE_REQUESTS and headers['range']:
             try:
                 if headers['if-range']:
                     if etag is None or etag not in headers['if-range']:
