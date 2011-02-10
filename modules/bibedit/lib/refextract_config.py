@@ -32,6 +32,8 @@ CFG_REFEXTRACT_VERSION = "Invenio/%s refextract/%s" % (CFG_VERSION, CFG_VERSION)
 CFG_REFEXTRACT_KB_JOURNAL_TITLES = "%s/bibedit/refextract-journal-titles.kb" % CFG_ETCDIR
 # report numbers knowledge base:
 CFG_REFEXTRACT_KB_REPORT_NUMBERS = "%s/bibedit/refextract-report-numbers.kb" % CFG_ETCDIR
+# authors which should be recognised as such
+CFG_REFEXTRACT_KB_AUTHORS = "%s/bibedit/refextract-authors.kb" % CFG_ETCDIR 
 
 
 ## MARC Fields and subfields used by refextract:
@@ -48,6 +50,7 @@ CFG_REFEXTRACT_SUBFIELD_REPORT_NUM       = "r"   ## ref reportnum subfield
 CFG_REFEXTRACT_SUBFIELD_TITLE            = "s"   ## ref title subfield
 CFG_REFEXTRACT_SUBFIELD_URL              = "u"   ## ref url subfield
 CFG_REFEXTRACT_SUBFIELD_URL_DESCR        = "z"   ## ref url-text subfield
+CFG_REFEXTRACT_SUBFIELD_AUTH             = "h"   ## ref author subfield
 
 ## refextract statisticts fields:
 CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS   = "999" ## ref-stats tag
@@ -60,11 +63,16 @@ CFG_REFEXTRACT_SUBFIELD_EXTRACTION_STATS = "a"   ## ref-stats subfield
 ## information. These are the "closing tags:
 CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM = r"</cds.REPORTNUMBER>"
 CFG_REFEXTRACT_MARKER_CLOSING_TITLE      = r"</cds.TITLE>"
+CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID = r"</cds.TITLEibid>"
 CFG_REFEXTRACT_MARKER_CLOSING_SERIES     = r"</cds.SER>"
 CFG_REFEXTRACT_MARKER_CLOSING_VOLUME     = r"</cds.VOL>"
 CFG_REFEXTRACT_MARKER_CLOSING_YEAR       = r"</cds.YR>"
 CFG_REFEXTRACT_MARKER_CLOSING_PAGE       = r"</cds.PG>"
 
+## Of the form '</cds.AUTHxxxx>' only
+CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND= r"</cds.AUTHstnd>"
+CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL= r"</cds.AUTHetal>"
+CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL= r"</cds.AUTHincl>"
 
 ## XML Record and collection opening/closing tags:
 CFG_REFEXTRACT_XML_VERSION          = u"""<?xml version="1.0" encoding="UTF-8"?>"""
