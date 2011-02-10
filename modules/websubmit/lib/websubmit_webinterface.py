@@ -53,7 +53,8 @@ from invenio.urlutils import make_canonical_urlargd, redirect_to_url
 from invenio.messages import gettext_set_language
 from invenio.search_engine import \
      guess_primary_collection_of_a_record, get_colID, record_exists, \
-     create_navtrail_links, check_user_can_view_record, record_empty
+     create_navtrail_links, check_user_can_view_record, record_empty, \
+     is_user_owner_of_record
 from invenio.bibdocfile import BibRecDocs, normalize_format, file_strip_ext, \
     stream_restricted_icon, BibDoc, InvenioWebSubmitFileError, stream_file, \
     decompose_file, propose_next_docname, get_subformat_from_format
@@ -187,7 +188,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         try:
                             docfile = doc.get_file(format, version)
                             (auth_code, auth_message) = docfile.is_restricted(user_info)
-                            if auth_code != 0:
+                            if auth_code != 0 and not is_user_owner_of_record(user_info, self.recid):
                                 if CFG_WEBSUBMIT_ICON_SUBFORMAT_RE.match(get_subformat_from_format(format)):
                                     return stream_restricted_icon(req)
                                 if user_info['email'] == 'guest':

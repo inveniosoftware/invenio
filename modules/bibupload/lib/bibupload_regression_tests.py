@@ -41,11 +41,12 @@ from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, CFG_SITE_URL, CFG_TMPDI
      CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
      CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG, \
      CFG_WEBDIR
+from invenio.access_control_config import CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
 from invenio import bibupload
 from invenio.search_engine import print_record
 from invenio.dbquery import run_sql, get_table_status_info
 from invenio.dateutils import convert_datestruct_to_datetext
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, test_web_page_content
 from invenio.bibdocfile import BibRecDocs
 from invenio.bibtask import task_set_task_param, setup_loggers
 
@@ -155,6 +156,17 @@ def try_url_download(url):
         raise StandardError("Downloading %s is impossible because of %s"
             % (url, str(e)))
     return True
+
+def force_webcoll(recid):
+    from invenio import bibindex_engine
+    reload(bibindex_engine)
+    from invenio import websearch_webcoll
+    reload(websearch_webcoll)
+    index_id, index_name, index_tags = bibindex_engine.get_word_tables("collection")[0]
+    bibindex_engine.WordTable(index_id, index_tags, "idxWORD%02dF", default_get_words_fnc=bibindex_engine.get_words_from_phrase, tag_to_words_fnc_map={'8564_u': bibindex_engine.get_words_from_fulltext}).add_recIDs([[recid, recid]], 1)
+    c = websearch_webcoll.Collection()
+    c.calculate_reclist()
+    c.update_reclist()
 
 class GenericBibUploadTest(unittest.TestCase):
     """Generic BibUpload testing class with predefined
@@ -2358,6 +2370,9 @@ allow any</subfield>
           <subfield code="a">Test, John</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
+         <datafield tag="980" ind1=" " ind2=" ">
+          <subfield code="a">ARTICLE</subfield>
+         </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
           <subfield code="r">firerole: deny until '%s'
@@ -2376,6 +2391,9 @@ allow any</subfield>
          <datafield tag="856" ind1="4" ind2=" ">
           <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
          </datafield>
+         <datafield tag="980" ind1=" " ind2=" ">
+          <subfield code="a">ARTICLE</subfield>
+         </datafield>
         </record>
         """ % {'siteurl': CFG_SITE_URL}
         testrec_expected_hm = """
@@ -2383,6 +2401,7 @@ allow any</subfield>
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
         8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
+        980__ $$aARTICLE
         """ % {'siteurl': CFG_SITE_URL}
         testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
             % {'siteurl': CFG_SITE_URL}
@@ -2404,7 +2423,11 @@ allow any</subfield>
         self.assertEqual(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm), '')
         result = urlopen(testrec_expected_url).read()
-        self.failIf("This file is restricted." in result, result)
+        self.failIf("If you already have an account, please login using the form below." in result, result)
+        self.assertEqual(test_web_page_content(testrec_expected_url, 'hyde', 'h123yde', expected_text='Authorization failure'), [])
+        force_webcoll(recid)
+        self.assertEqual(test_web_page_content(testrec_expected_url, 'hyde', 'h123yde', expected_text=urlopen("http://cds.cern.ch/img/cds.gif").read()), [])
+
 
 
     def test_exotic_format_fft_append(self):
@@ -2412,6 +2435,10 @@ allow any</subfield>
         # define the test case:
         testfile = os.path.join(CFG_TMPDIR, 'test.ps.Z')
         open(testfile, 'w').write('TEST')
+        email_tag = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][0:3]
+        email_ind1 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][3]
+        email_ind2 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][4]
+        email_code = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][5]
         test_to_upload = """
         <record>
         <controlfield tag="003">SzGeCERN</controlfield>
@@ -2419,8 +2446,15 @@ allow any</subfield>
           <subfield code="a">Test, John</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
+         <datafield tag="%(email_tag)s" ind1="%(email_ind1)s" ind2="%(email_ind2)s">
+          <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
+         </datafield>
         </record>
-        """
+        """ % {
+            'email_tag': email_tag,
+            'email_ind1': email_ind1 == '_' and ' ' or email_ind1,
+            'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
+            'email_code': email_code}
         testrec_to_append = """
         <record>
         <controlfield tag="001">123456789</controlfield>
@@ -2438,17 +2472,30 @@ allow any</subfield>
           <subfield code="a">Test, John</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
+         <datafield tag="%(email_tag)s" ind1="%(email_ind1)s" ind2="%(email_ind2)s">
+          <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
+         </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
           <subfield code="u">%(siteurl)s/record/123456789/files/test.ps.Z</subfield>
          </datafield>
         </record>
-        """ % {'siteurl': CFG_SITE_URL}
+        """ % {'siteurl': CFG_SITE_URL,
+            'email_tag': email_tag,
+            'email_ind1': email_ind1 == '_' and ' ' or email_ind1,
+            'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
+            'email_code': email_code}
+
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
+        %(email_tag)s%(email_ind1)s%(email_ind2)s $$%(email_code)sjekyll@cds.cern.ch
         8564_ $$u%(siteurl)s/record/123456789/files/test.ps.Z
-        """ % {'siteurl': CFG_SITE_URL}
+        """ % {'siteurl': CFG_SITE_URL,
+            'email_tag': email_tag,
+            'email_ind1': email_ind1 == ' ' and '_' or email_ind1,
+            'email_ind2': email_ind2 == ' ' and '_' or email_ind2,
+            'email_code': email_code}
         testrec_expected_url = "%(siteurl)s/record/123456789/files/test.ps.Z" \
                % {'siteurl': CFG_SITE_URL}
         testrec_expected_url2 = "%(siteurl)s/record/123456789/files/test?format=ps.Z" \
@@ -2476,8 +2523,8 @@ allow any</subfield>
                                           testrec_expected_xm), '')
         self.assertEqual(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm), '')
-        self.assertEqual(urlopen(testrec_expected_url).read(), 'TEST')
-        self.assertEqual(urlopen(testrec_expected_url2).read(), 'TEST')
+        self.assertEqual(test_web_page_content(testrec_expected_url, 'jekyll', 'j123ekyll', expected_text='TEST'), [])
+        self.assertEqual(test_web_page_content(testrec_expected_url2, 'jekyll', 'j123ekyll', expected_text='TEST'), [])
 
 
     def test_fft_check_md5_through_bibrecdoc_str(self):
@@ -2594,6 +2641,10 @@ allow any</subfield>
     def test_simple_fft_insert_with_restriction(self):
         """bibupload - simple FFT insert with restriction"""
         # define the test case:
+        email_tag = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][0:3]
+        email_ind1 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][3]
+        email_ind2 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][4]
+        email_code = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][5]
         test_to_upload = """
         <record>
         <controlfield tag="003">SzGeCERN</controlfield>
@@ -2601,13 +2652,23 @@ allow any</subfield>
           <subfield code="a">Test, John</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
+         <datafield tag="%(email_tag)s" ind1="%(email_ind1)s" ind2="%(email_ind2)s">
+          <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
+         </datafield>
+         <datafield tag="980" ind1=" " ind2=" ">
+          <subfield code="a">ARTICLE</subfield>
+         </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
           <subfield code="r">thesis</subfield>
           <subfield code="x">http://cds.cern.ch/img/cds.gif</subfield>
          </datafield>
         </record>
-        """
+        """ % {'email_tag': email_tag,
+            'email_ind1': email_ind1 == '_' and ' ' or email_ind1,
+            'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
+            'email_code': email_code}
+
         testrec_expected_xm = """
         <record>
         <controlfield tag="001">123456789</controlfield>
@@ -2616,6 +2677,9 @@ allow any</subfield>
           <subfield code="a">Test, John</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
+         <datafield tag="%(email_tag)s" ind1="%(email_ind1)s" ind2="%(email_ind2)s">
+          <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
+         </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
           <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
          </datafield>
@@ -2623,15 +2687,29 @@ allow any</subfield>
           <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif?subformat=icon</subfield>
           <subfield code="x">icon</subfield>
          </datafield>
+         <datafield tag="980" ind1=" " ind2=" ">
+          <subfield code="a">ARTICLE</subfield>
+         </datafield>
         </record>
-        """ % {'siteurl': CFG_SITE_URL}
+        """ % {'siteurl': CFG_SITE_URL,
+            'email_tag': email_tag,
+            'email_ind1': email_ind1 == '_' and ' ' or email_ind1,
+            'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
+            'email_code': email_code}
+
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
+        %(email_tag)s%(email_ind1)s%(email_ind2)s $$%(email_code)sjekyll@cds.cern.ch
         8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
         8564_ $$u%(siteurl)s/record/123456789/files/cds.gif?subformat=icon$$xicon
-        """ % {'siteurl': CFG_SITE_URL}
+        980__ $$aARTICLE
+        """ % {'siteurl': CFG_SITE_URL,
+            'email_tag': email_tag,
+            'email_ind1': email_ind1 == ' ' and '_' or email_ind1,
+            'email_ind2': email_ind2 == ' ' and '_' or email_ind2,
+            'email_code': email_code}
         testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
             % {'siteurl': CFG_SITE_URL}
         testrec_expected_icon = "%(siteurl)s/record/123456789/files/cds.gif?subformat=icon" \
@@ -2656,7 +2734,12 @@ allow any</subfield>
         self.assertEqual(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm), '')
 
-        self.assertEqual(urlopen(testrec_expected_icon).read(), open('%s/img/restricted.gif' % CFG_WEBDIR).read())
+        self.assertEqual(test_web_page_content(testrec_expected_icon, 'jekyll', 'j123ekyll', expected_text=urlopen('http://cds.cern.ch/img/cds.gif').read()), [])
+        self.assertEqual(test_web_page_content(testrec_expected_icon, 'hyde', 'h123yde', expected_text='Authorization failure'), [])
+        force_webcoll(recid)
+        self.assertEqual(test_web_page_content(testrec_expected_icon, 'hyde', 'h123yde', expected_text=urlopen('%(siteurl)s/img/restricted.gif' % {'siteurl': CFG_SITE_URL}).read()), [])
+
+        self.failUnless("HTTP Error 401: Unauthorized" in test_web_page_content(testrec_expected_url, 'hyde', 'h123yde')[0])
         self.failUnless("This file is restricted." in urlopen(testrec_expected_url).read())
 
     def test_simple_fft_insert_with_icon(self):
@@ -3471,6 +3554,10 @@ allow any</subfield>
     def test_revert_fft_correct(self):
         """bibupload - revert FFT correct"""
         # define the test case:
+        email_tag = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][0:3]
+        email_ind1 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][3]
+        email_ind2 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][4]
+        email_code = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][5]
         test_to_upload = """
         <record>
         <controlfield tag="003">SzGeCERN</controlfield>
@@ -3478,12 +3565,20 @@ allow any</subfield>
           <subfield code="a">Test, John</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
+         <datafield tag="%(email_tag)s" ind1="%(email_ind1)s" ind2="%(email_ind2)s">
+          <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
+         </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">%s/img/iconpen.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/iconpen.gif</subfield>
           <subfield code="n">cds</subfield>
          </datafield>
         </record>
-        """ % CFG_SITE_URL
+        """ % {
+            'siteurl': CFG_SITE_URL,
+            'email_tag': email_tag,
+            'email_ind1': email_ind1 == '_' and ' ' or email_ind1,
+            'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
+            'email_code': email_code}
         test_to_correct = """
         <record>
         <controlfield tag="001">123456789</controlfield>
@@ -3512,17 +3607,29 @@ allow any</subfield>
           <subfield code="a">Test, John</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
+         <datafield tag="%(email_tag)s" ind1="%(email_ind1)s" ind2="%(email_ind2)s">
+          <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
+         </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
           <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
          </datafield>
         </record>
-        """ % { 'siteurl': CFG_SITE_URL}
+        """ % {'siteurl': CFG_SITE_URL,
+            'email_tag': email_tag,
+            'email_ind1': email_ind1 == '_' and ' ' or email_ind1,
+            'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
+            'email_code': email_code}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
+        %(email_tag)s%(email_ind1)s%(email_ind2)s $$%(email_code)sjekyll@cds.cern.ch
         8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
-        """ % { 'siteurl': CFG_SITE_URL}
+        """ % {'siteurl': CFG_SITE_URL,
+            'email_tag': email_tag,
+            'email_ind1': email_ind1 == ' ' and '_' or email_ind1,
+            'email_ind2': email_ind2 == ' ' and '_' or email_ind2,
+            'email_code': email_code}
         testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" % { 'siteurl': CFG_SITE_URL}
 
         # insert test record:
@@ -3563,17 +3670,18 @@ allow any</subfield>
         expected_content_version2 = urlopen('%s/img/head.gif' % CFG_SITE_URL).read()
         expected_content_version3 = expected_content_version1
 
-        content_version1 = urlopen('%s/record/%s/files/cds.gif?version=1' % (CFG_SITE_URL, recid)).read()
-        content_version2 = urlopen('%s/record/%s/files/cds.gif?version=2' % (CFG_SITE_URL, recid)).read()
-        content_version3 = urlopen('%s/record/%s/files/cds.gif?version=3' % (CFG_SITE_URL, recid)).read()
+        self.assertEqual(test_web_page_content('%s/record/%s/files/cds.gif?version=1' % (CFG_SITE_URL, recid), 'jekyll', 'j123ekyll', expected_content_version1), [])
+        self.assertEqual(test_web_page_content('%s/record/%s/files/cds.gif?version=2' % (CFG_SITE_URL, recid), 'jekyll', 'j123ekyll', expected_content_version2), [])
+        self.assertEqual(test_web_page_content('%s/record/%s/files/cds.gif?version=3' % (CFG_SITE_URL, recid), 'jekyll', 'j123ekyll', expected_content_version3), [])
 
-        self.assertEqual(expected_content_version1, content_version1)
-        self.assertEqual(expected_content_version2, content_version2)
-        self.assertEqual(expected_content_version3, content_version3)
 
     def test_simple_fft_replace(self):
         """bibupload - simple FFT replace"""
         # define the test case:
+        email_tag = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][0:3]
+        email_ind1 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][3]
+        email_ind2 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][4]
+        email_code = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][5]
         test_to_upload = """
         <record>
         <controlfield tag="003">SzGeCERN</controlfield>
@@ -3581,12 +3689,20 @@ allow any</subfield>
           <subfield code="a">Test, John</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
+         <datafield tag="%(email_tag)s" ind1="%(email_ind1)s" ind2="%(email_ind2)s">
+          <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
+         </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">%s/img/iconpen.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/iconpen.gif</subfield>
           <subfield code="n">cds</subfield>
          </datafield>
         </record>
-        """ % CFG_SITE_URL
+        """ % {'siteurl': CFG_SITE_URL,
+            'email_tag': email_tag,
+            'email_ind1': email_ind1 == '_' and ' ' or email_ind1,
+            'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
+            'email_code': email_code}
+
         test_to_replace = """
         <record>
         <controlfield tag="001">123456789</controlfield>
@@ -3595,11 +3711,18 @@ allow any</subfield>
           <subfield code="a">Test, John</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
+         <datafield tag="%(email_tag)s" ind1="%(email_ind1)s" ind2="%(email_ind2)s">
+          <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
+         </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">%s/img/head.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/head.gif</subfield>
          </datafield>
         </record>
-        """ % CFG_SITE_URL
+        """ % {'siteurl': CFG_SITE_URL,
+            'email_tag': email_tag,
+            'email_ind1': email_ind1 == '_' and ' ' or email_ind1,
+            'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
+            'email_code': email_code}
 
         testrec_expected_xm = """
         <record>
@@ -3609,17 +3732,32 @@ allow any</subfield>
           <subfield code="a">Test, John</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
+         <datafield tag="%(email_tag)s" ind1="%(email_ind1)s" ind2="%(email_ind2)s">
+          <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
+         </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
           <subfield code="u">%(siteurl)s/record/123456789/files/head.gif</subfield>
          </datafield>
         </record>
-        """ % { 'siteurl': CFG_SITE_URL}
+        """ % {
+             'siteurl': CFG_SITE_URL,
+            'email_tag': email_tag,
+            'email_ind1': email_ind1 == '_' and ' ' or email_ind1,
+            'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
+            'email_code': email_code}
+
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
+        %(email_tag)s%(email_ind1)s%(email_ind2)s $$%(email_code)sjekyll@cds.cern.ch
         8564_ $$u%(siteurl)s/record/123456789/files/head.gif
-        """ % { 'siteurl': CFG_SITE_URL}
+        """ % {
+            'siteurl': CFG_SITE_URL,
+            'email_tag': email_tag,
+            'email_ind1': email_ind1 == ' ' and '_' or email_ind1,
+            'email_ind2': email_ind2 == ' ' and '_' or email_ind2,
+            'email_code': email_code}
         testrec_expected_url = "%(siteurl)s/record/123456789/files/head.gif" % { 'siteurl': CFG_SITE_URL}
 
         # insert test record:
@@ -3649,9 +3787,8 @@ allow any</subfield>
 
         expected_content_version = urlopen('%s/img/head.gif' % CFG_SITE_URL).read()
 
-        content_version = urlopen('%s/record/%s/files/head.gif' % (CFG_SITE_URL, recid)).read()
-
-        self.assertEqual(expected_content_version, content_version)
+        self.assertEqual(test_web_page_content(testrec_expected_url, 'hyde', 'h123yde', expected_text='Authorization failure'), [])
+        self.assertEqual(test_web_page_content(testrec_expected_url, 'jekyll', 'j123ekyll', expected_text=expected_content_version), [])
 
 
 TEST_SUITE = make_test_suite(BibUploadHoldingPenTest,

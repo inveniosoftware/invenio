@@ -365,8 +365,9 @@ access right/restriction to desired user. e.g. if you set the keyword
 "thesis", you can the connect the "thesisviewer" to the action
 "viewrestrdoc" with parameter "status" set to "thesis". Then all the
 user which are linked with the "thesisviewer" role will be able to
-download the document. Instead any other user will not be
-allowed. Note, if you use the keyword "KEEP-OLD-VALUE" the previous
+download the document. Instead any other user <em>which are not considered
+as authors</em> for the given record will not be allowed.
+Note, if you use the keyword "KEEP-OLD-VALUE" the previous
 restrictions if applicable will be kept.
 </p>
 

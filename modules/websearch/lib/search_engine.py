@@ -199,8 +199,9 @@ class RestrictedCollectionDataCacher(DataCacher):
 
         DataCacher.__init__(self, cache_filler, timestamp_verifier)
 
-def collection_restricted_p(collection):
-    restricted_collection_cache.recreate_cache_if_needed()
+def collection_restricted_p(collection, recreate_cache_if_needed=True):
+    if recreate_cache_if_needed:
+        restricted_collection_cache.recreate_cache_if_needed()
     return collection in restricted_collection_cache.cache
 
 try:
@@ -226,23 +227,25 @@ def ziplist(*lists):
     return map(l, *lists)
 
 
-def get_permitted_restricted_collections(user_info):
+def get_permitted_restricted_collections(user_info, recreate_cache_if_needed=True):
     """Return a list of collection that are restricted but for which the user
     is authorized."""
-    restricted_collection_cache.recreate_cache_if_needed()
+    if recreate_cache_if_needed:
+        restricted_collection_cache.recreate_cache_if_needed()
     ret = []
     for collection in restricted_collection_cache.cache:
         if acc_authorize_action(user_info, 'viewrestrcoll', collection=collection)[0] == 0:
             ret.append(collection)
     return ret
 
-def get_restricted_collections_for_recid(recid):
+def get_restricted_collections_for_recid(recid, recreate_cache_if_needed=True):
     """
     Return the list of restricted collection names to which recid belongs.
     """
-    restricted_collections = run_sql("""SELECT c.name, c.reclist FROM accROLE_accACTION_accARGUMENT raa JOIN accARGUMENT ar ON raa.id_accARGUMENT = ar.id JOIN collection c ON ar.value=c.name WHERE ar.keyword = 'collection' AND raa.id_accACTION = %s""", (VIEWRESTRCOLL_ID,))
-    return [row[0] for row in restricted_collections if recid in HitSet(row[1])]
-
+    if recreate_cache_if_needed:
+        restricted_collection_cache.recreate_cache_if_needed()
+        collection_reclist_cache.recreate_cache_if_needed()
+    return [collection for collection in restricted_collection_cache.cache if recid in get_collection_reclist(collection, recreate_cache_if_needed=False)]
 
 def is_user_owner_of_record(user_info, recid):
     """
@@ -282,16 +285,44 @@ def check_user_can_view_record(user_info, recid):
     authorization is not granted
     @rtype: (int, string)
     """
-    restricted_collections = get_restricted_collections_for_recid(recid)
-    if not restricted_collections or is_user_owner_of_record(user_info, recid):
+    if record_public_p(recid):
+        ## The record is already known to be public.
         return (0, '')
-    for collection in restricted_collections:
-        (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=collection)
+    ## At this point, either webcoll has not yet run or there are some
+    ## restricted collections. Let's see first if the user own the record.
+    if is_user_owner_of_record(user_info, recid):
+        ## Perfect! It's authorized then!
+        return (0, '')
+    restricted_collections = get_restricted_collections_for_recid(recid, recreate_cache_if_needed=False)
+    if restricted_collections:
+        ## If there are restricted collections the user must be authorized to all of them
+        for collection in get_restricted_collections_for_recid(recid, recreate_cache_if_needed=False):
+            (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=collection)
+            if auth_code:
+                ## Ouch! the user is not authorized to this collection
+                return (auth_code, auth_msg)
+        ## OK! The user is authorized.
+        return (0, '')
+    if is_record_in_any_collection(recid, recreate_cache_if_needed=False):
+        ## the record is not in any restricted collection
+        return (0, '')
+    elif record_exists(recid) > 0:
+        ## We are in the case where webcoll has not run.
+        ## Let's authorize SUPERADMIN
+        (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=None)
         if auth_code == 0:
-            continue
+            return (0, '')
         else:
-            return (auth_code, auth_msg)
-    return (0, '')
+            ## Too bad. Let's print a nice message:
+            return (1, """The record you are trying to access has just been
+submitted to the system and needs to be assigned to the
+proper collections. It is currently restricted for security reasons
+until the assignment will be fully completed. Please come back later to
+properly access this record.""")
+    else:
+        ## The record either does not exists or has been deleted.
+        ## Let's handle these situations outside of this code.
+        return (0, '')
 
 class IndexStemmingDataCacher(DataCacher):
     """
@@ -318,9 +349,10 @@ try:
 except Exception:
     index_stemming_cache = IndexStemmingDataCacher()
 
-def get_index_stemming_language(index_id):
+def get_index_stemming_language(index_id, recreate_cache_if_needed=True):
     """Return stemming langugage for given index."""
-    index_stemming_cache.recreate_cache_if_needed()
+    if recreate_cache_if_needed:
+        index_stemming_cache.recreate_cache_if_needed()
     return index_stemming_cache.cache[index_id]
 
 class CollectionRecListDataCacher(DataCacher):
@@ -351,9 +383,10 @@ try:
 except Exception:
     collection_reclist_cache = CollectionRecListDataCacher()
 
-def get_collection_reclist(coll):
+def get_collection_reclist(coll, recreate_cache_if_needed=True):
     """Return hitset of recIDs that belong to the collection 'coll'."""
-    collection_reclist_cache.recreate_cache_if_needed()
+    if recreate_cache_if_needed:
+        collection_reclist_cache.recreate_cache_if_needed()
     if not collection_reclist_cache.cache[coll]:
         # not yet it the cache, so calculate it and fill the cache:
         set = HitSet()
@@ -2788,7 +2821,7 @@ def guess_primary_collection_of_a_record(recID):
     return out
 
 _re_collection_url = re.compile('/collection/(.+)')
-def guess_collection_of_a_record(recID, referer=None):
+def guess_collection_of_a_record(recID, referer=None, recreate_cache_if_needed=True):
     """Return collection name a record recid belongs to, by first testing
        the referer URL if provided and otherwise returning the
        primary collection."""
@@ -2800,18 +2833,34 @@ def guess_collection_of_a_record(recID, referer=None):
             if recID in get_collection_reclist(name):
                 return name
         elif path.startswith('/search'):
+            if recreate_cache_if_needed:
+                collection_reclist_cache.recreate_cache_if_needed()
             query = cgi.parse_qs(query)
             for name in query.get('cc', []) + query.get('c', []):
-                if recID in get_collection_reclist(name):
+                if recID in get_collection_reclist(name, recreate_cache_if_needed=False):
                     return name
     return guess_primary_collection_of_a_record(recID)
 
-def get_all_collections_of_a_record(recID):
+def is_record_in_any_collection(recID, recreate_cache_if_needed=True):
+    """Return True if the record belongs to at least one collection. This is a
+    good, although not perfect, indicator to guess if webcoll has already run
+    after this record has been entered into the system.
+    """
+    if recreate_cache_if_needed:
+        collection_reclist_cache.recreate_cache_if_needed()
+    for name in collection_reclist_cache.cache.keys():
+        if recID in get_collection_reclist(name, recreate_cache_if_needed=False):
+            return True
+    return False
+
+def get_all_collections_of_a_record(recID, recreate_cache_if_needed=True):
     """Return all the collection names a record belongs to.
     Note this function is O(n_collections)."""
     ret = []
+    if recreate_cache_if_needed:
+        collection_reclist_cache.recreate_cache_if_needed()
     for name in collection_reclist_cache.cache.keys():
-        if recID in get_collection_reclist(name):
+        if recID in get_collection_reclist(name, recreate_cache_if_needed=False):
             ret.append(name)
     return ret
 
@@ -3028,11 +3077,11 @@ def record_empty(recID):
     else:
         return 0
 
-def record_public_p(recID):
+def record_public_p(recID, recreate_cache_if_needed=True):
     """Return 1 if the record is public, i.e. if it can be found in the Home collection.
        Return 0 otherwise.
     """
-    return recID in get_collection_reclist(CFG_SITE_NAME)
+    return recID in get_collection_reclist(CFG_SITE_NAME, recreate_cache_if_needed=recreate_cache_if_needed)
 
 def get_creation_date(recID, fmt="%Y-%m-%d"):
     "Returns the creation date of the record 'recID'."
