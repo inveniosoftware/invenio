@@ -26,6 +26,7 @@ import time
 import math
 import os
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 # Invenio imports:
 
@@ -1230,16 +1231,10 @@ def calculate_start_date(display_since):
             yesterday = today.replace(year=final_nb_year)
     # month
     elif time_type == 'm':
-        # to convert nb of months in years
-        nb_year = nb / 12                        # nb_year = number of year to substract
-        nb = nb % 12
-        if nb > today.month-1:                    # ex: july(07)-9 months = -1year -3months
-            nb_year += 1
-            nb_month = 12 - (today.month % nb)
-        else:
-            nb_month = today.month - nb
-        final_nb_year = today.year - nb_year      # final_nb_year = number of year to print
-        yesterday = today.replace(year=final_nb_year, month=nb_month)
+        # obtain only the date: yyyy-mm-dd
+        date_today = datetime.now().date()
+        final_date = date_today - relativedelta(months=nb)
+        yesterday = today.replace(year=final_date.year, month=final_date.month, day=final_date.day)
     # week
     elif time_type == 'w':
         delta = timedelta(weeks=nb)
