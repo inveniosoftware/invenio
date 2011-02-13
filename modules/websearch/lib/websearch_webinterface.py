@@ -346,7 +346,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                                                             {}, {}, {}, {}, False, ln)
 
             #search the publications by this author
-            pubs = perform_request_search(req=req, p=self.authorname, f="exactauthor")
+            pubs = perform_request_search(req=None, p=self.authorname, f="exactauthor")
             names_dict[self.authorname] = len(pubs)
             db_names_dict[self.authorname] = len(pubs)
 
