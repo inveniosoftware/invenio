@@ -399,28 +399,12 @@ cdef class intbitset:
     def __repr__(self):
         cdef int last
         cdef int maxelem
+        cdef int next_last
+        finite_list = self.extract_finite_list()
         if self.bitset.trailing_bits:
-            maxelem = (intBitSetGetSize(self.bitset)) * wordbitsize
-            ret = "intbitset(["
-            last = -1
-            while last < maxelem:
-                last = intBitSetGetNext(self.bitset, last)
-                ret = ret + '%i, ' % last
-            if ret.endswith(", "):
-                ret = ret[:-2]
-            ret = ret + '], trailing_bits=True)'
-            return ret
+            return "intbitset(%s, trailing_bits=True)" % repr(finite_list)
         else:
-            ret = "intbitset(["
-            last = -1
-            while last >= -1:
-                last = intBitSetGetNext(self.bitset, last)
-                ret = ret + '%i, ' % last
-            ret = ret[:-4] # -len('-2, ')
-            if ret.endswith(', '):
-                ret = ret[:-2]
-            ret = ret + '])'
-            return ret
+            return "intbitset(%s)" % repr(finite_list)
 
     def __str__(self):
         cdef int tot

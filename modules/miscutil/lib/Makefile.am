@@ -62,6 +62,10 @@ noinst_DATA = testimport.py \
               kwalitee.py \
               pep8.py
 
+tmpdir = $(prefix)/var/tmp
+
+tmp_DATA = intbitset_example.int
+
 EXTRA_DIST = $(pylib_DATA) \
              testimport.py \
              kwalitee.py \
@@ -71,7 +75,9 @@ EXTRA_DIST = $(pylib_DATA) \
              intbitset.h \
              intbitset_impl.c \
              intbitset_setup.py \
-             intbitset.pyx
+             intbitset.pyx \
+             $(tmp_DATA)
+
 
 all:
 	$(PYTHON) $(srcdir)/intbitset_setup.py build_ext
