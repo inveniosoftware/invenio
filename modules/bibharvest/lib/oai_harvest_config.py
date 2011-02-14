@@ -22,10 +22,9 @@ __revision__ = "$Id$"
 ## CFG_OAI_POSSIBLE_POSTMODES -- list of possible modes available for
 ## OAI harvest post-processing
 CFG_OAI_POSSIBLE_POSTMODES = [\
-         ["h", "harvest only (h)"], \
-         ["h-c", "harvest and convert (h-c)"], \
-         ["h-u", "harvest and upload (h-u)"], \
-         ["h-c-u", "harvest, convert and upload (h-c-u)"], \
-         ["h-c-f-u", "harvest, convert, filter, upload (h-c-f-u)"], \
-         ["h-c-e-u", "harvest, convert, extract, upload (h-c-e-u)"], \
-         ["h-c-e-f-u", "harvest, convert, extract, filter, upload (h-c-e-f-u)"]]
+         ["c", "convert (c)"], \
+         ["r", "extract references (r)"], \
+         ["p", "extract plots (p)"], \
+         ["t", "attach full-text (t)"], \
+         ["f", "filter (f)"], \
+         ["u", "upload (u)"]]

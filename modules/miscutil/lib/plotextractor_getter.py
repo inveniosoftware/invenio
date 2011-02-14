@@ -330,7 +330,7 @@ def parse_and_download(infile, sdir):
 
     return tarfiles
 
-def harvest_single(single, to_dir):
+def harvest_single(single, to_dir, selection=("tarball", "pdf")):
     """
     if we only want to harvest one id (arXiv or DESY), we can use this.
 
@@ -345,7 +345,6 @@ def harvest_single(single, to_dir):
 
     if single.find('arXiv') > -1 and \
            CFG_PLOTEXTRACTOR_ARXIV_BASE == 'http://arxiv.org/':
-        # good!
         id_str = re.findall('[a-zA-Z\\-]+/\\d+|\\d+\\.\\d+', single)[0]
         idno = id_str.split('/')
         if len(idno) > 0:
@@ -362,11 +361,11 @@ def harvest_single(single, to_dir):
         tarball = abs_path
         pdf = abs_path + '.pdf'
         write_message('download ' + url_for_file + ' to ' + abs_path)
-        if not download(url_for_file, individual_file, individual_dir):
-            write_message('download of tarball failed')
+        if "tarball" in selection and not download(url_for_file, individual_file, individual_dir):
+            write_message('download of tarball failed/skipped')
             tarball = None
-        if not download(url_for_pdf, individual_file + '.pdf', individual_dir):
-            write_message('download of pdf failed')
+        if "pdf" in selection and not download(url_for_pdf, individual_file + '.pdf', individual_dir):
+            write_message('download of pdf failed/skipped')
             pdf = None
         return (tarball, pdf)
 
@@ -391,7 +390,7 @@ def harvest_single(single, to_dir):
             return (None, None)
 
         # okay... is it... a website?
-        elif CFG_PLOTEXTRACTOR_ARXIV_BASE.startswith('http'):
+        elif CFG_PLOTEXTRACTOR_ARXIV_BASE.startswith('http') and "tarball" in selection:
             url_for_file = CFG_PLOTEXTRACTOR_ARXIV_BASE + single
             individual_file = os.path.join(to_dir, single)
             download(url_for_file, individual_file, to_dir)
@@ -404,7 +403,7 @@ def harvest_single(single, to_dir):
                   'miscutil/lib/plotextractor_getter.py')
             return (None, None)
 
-    elif single.find('DESY') > -1:
+    elif single.find('DESY') > -1 and "pdf" in selection:
         # also okay!
         idno = re.findall('\\d{2,4}-\\d{3}', single)[0]
         year, number = idno.split('-')
@@ -615,7 +614,7 @@ def download(url, filename, to_dir):
     try:
         urllib.urlretrieve(url, new_file)
         write_message('Downloaded to ' + new_file)
-        time.sleep(7) # be nice to arXiv!
+        time.sleep(5) # be nice to remote server
         return True
     except IOError:
         # this could be a permissions error, but it probably means that

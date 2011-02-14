@@ -80,11 +80,11 @@ class Template:
         _ = gettext_set_language(ln)
         present = _("OAI sources currently present in the database")
         notpresent = _("No OAI sources currently present in the database")
-        if (numbersources>0):
-            output  = """&nbsp;&nbsp;&nbsp;&nbsp;<strong><span class="info">%s %s</span></strong><br /><br />""" % (numbersources, present)
+        if (numbersources > 0):
+            output = """&nbsp;&nbsp;&nbsp;&nbsp;<strong><span class="info">%s %s</span></strong><br /><br />""" % (numbersources, present)
             return output
         else:
-            output  = """&nbsp;&nbsp;&nbsp;&nbsp;<strong><span class="warning">%s</span></strong><br /><br />""" % notpresent
+            output = """&nbsp;&nbsp;&nbsp;&nbsp;<strong><span class="warning">%s</span></strong><br /><br />""" % notpresent
             return output
 
     def tmpl_output_schedule(self, ln, schtime, schstatus):
@@ -94,12 +94,12 @@ class Template:
         msg_cur = _("current status:")
         msg_notask = _("No oaiharvest task currently scheduled.")
         if schtime and schstatus:
-            output  = """&nbsp;&nbsp;&nbsp;&nbsp;<strong>%s<br />
+            output = """&nbsp;&nbsp;&nbsp;&nbsp;<strong>%s<br />
                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - %s %s <br />
                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - %s %s </strong><br /><br />""" % (msg_next, msg_sched, schtime, msg_cur, schstatus)
             return output
         else:
-            output  = """&nbsp;&nbsp;&nbsp;&nbsp;<strong><span class="warning">%s</span></strong><br /><br />""" % msg_notask
+            output = """&nbsp;&nbsp;&nbsp;&nbsp;<strong><span class="warning">%s</span></strong><br /><br />""" % msg_notask
             return output
 
     def tmpl_admin_w200_text(self, ln, title, name, value, suffix="<br/>"):
@@ -115,21 +115,22 @@ class Template:
         """ % (cgi.escape(name, 1), cgi.escape(value, 1), suffix)
         return text
 
-    def tmpl_admin_checkboxes(self, ln, title, name, values, labels, states):
+    def tmpl_admin_checkboxes(self, ln, title, name, values, labels, states, message=""):
         """Draws a list of HTML checkboxes
           - 'title' *string* - The name of the list of checkboxes
           - 'name' *string* - The name for this group of checkboxes
           - 'values' *list* - The values of the checkboxes
           - 'labels' *list* - The labels for the checkboxes
           - 'states' *list* - The previous state of each checkbox 1|0
+          - 'message' *string* - Put a message over the checkboxes. Optional.
 
           len(values) == len(labels) == len(states)
           """
         _ = gettext_set_language(ln)
         text = """<div><div style="float:left;"><span class="adminlabel">%s</span></div>""" % title
         text += """<table><tr><td>"""
-        text += '&nbsp;&nbsp; <small><i>(Leave all unchecked for non-selective' \
-                ' harvesting)</i></small><br/>'
+        if message:
+            text += '&nbsp;&nbsp; <small><i>(%s)</i></small><br/>' % (message,)
 
         for i in range(len(values)):
             value = values[i]
@@ -181,7 +182,7 @@ class Template:
     def tmpl_print_warning(self, ln, warntext):
         """Outputs some info"""
         _ = gettext_set_language(ln)
-        text = """<span class="warning">%s</span>""" % warntext
+        text = """<br /><span class="warning">%s</span>""" % warntext
         return text
 
     def tmpl_print_brs(self, ln, howmany):
@@ -230,7 +231,7 @@ class Template:
             data = []
         result = "<table><tr>"
         for header in title_row:
-            result += "<td><b>"+ header + "</b></td>"
+            result += "<td><b>" + header + "</b></td>"
         result += "</tr>"
         for row in data:
             result += "<tr>"
@@ -240,12 +241,12 @@ class Template:
         result += "</table>"
         return result
 
-    def tmpl_table_begin(self, title_row = None):
+    def tmpl_table_begin(self, title_row=None):
         result = "<table class=\"brtable\">"
         if title_row != None:
             result += "<tr>"
             for header in title_row:
-                result += "<td><b>"+ header + "</b></td>"
+                result += "<td><b>" + header + "</b></td>"
             result += "</tr>"
         return result
 
@@ -272,7 +273,7 @@ class Template:
     def tmpl_history_day_details_link(self, ln, date, oai_src_id):
         """Return link to detailed history for the day"""
         _ = gettext_set_language(ln)
-        return create_html_link(urlbase = oai_harvest_admin_url + \
+        return create_html_link(urlbase=oai_harvest_admin_url + \
                                 "/viewhistoryday",
                                 urlargd={'ln':ln,
                                          'oai_src_id': str(oai_src_id),
@@ -282,11 +283,11 @@ class Template:
                                          'start': str(10)},
                                  link_label=_("View next entries..."))
 
-    def tmpl_history_table_output_day_cell(self, date, number_of_records, oai_src_id, ln, show_details = False):
+    def tmpl_history_table_output_day_cell(self, date, number_of_records, oai_src_id, ln, show_details=False):
         inner_text = "<b>" + self.format_date(date)
-        inner_text += " ( "+ str(number_of_records) + " entries ) &nbsp;&nbsp;&nbsp;"
+        inner_text += " ( " + str(number_of_records) + " entries ) &nbsp;&nbsp;&nbsp;"
         if show_details:
-            inner_text +=  self.tmpl_history_day_details_link(ln, date, oai_src_id)
+            inner_text += self.tmpl_history_day_details_link(ln, date, oai_src_id)
         inner_text += "</b>"
         return self.tmpl_table_output_cell(inner_text, colspan=6)
 
@@ -312,7 +313,7 @@ class Template:
         output += "</div>"
         return output
 
-    def tmpl_output_month_selection_bar(self, oai_src_id, ln, current_year = None, current_month=None):
+    def tmpl_output_month_selection_bar(self, oai_src_id, ln, current_year=None, current_month=None):
         """constructs the month selection bar"""
         _ = gettext_set_language(ln)
         if current_month == None or current_year == None:
@@ -427,7 +428,7 @@ class Template:
         return result
 
     def tmpl_output_select_day_button(self, day):
-        result = """<button class="adminbutton" onClick="return selectDay(""" + str(day)+ """)">Select</button>"""
+        result = """<button class="adminbutton" onClick="return selectDay(""" + str(day) + """)">Select</button>"""
         return result
 
     def tmpl_output_menu(self, ln, oai_src_id, guideurl):
@@ -437,34 +438,34 @@ class Template:
         _ = gettext_set_language(ln)
         link_default_argd = {'ln': ln}
 
-        main_link = create_html_link(urlbase = oai_harvest_admin_url,
+        main_link = create_html_link(urlbase=oai_harvest_admin_url,
                                      urlargd=link_default_argd,
                                      link_label=_("main Page"))
 
         link_default_argd['oai_src_id'] = str(oai_src_id)
 
-        edit_link = create_html_link(urlbase = oai_harvest_admin_url + \
+        edit_link = create_html_link(urlbase=oai_harvest_admin_url + \
                                      "/editsource",
                                      urlargd=link_default_argd,
                                      link_label=_("edit"))
-        delete_link = create_html_link(urlbase = oai_harvest_admin_url + \
+        delete_link = create_html_link(urlbase=oai_harvest_admin_url + \
                                      "/delsource",
                                      urlargd=link_default_argd,
                                      link_label=_("delete"))
-        test_link = create_html_link(urlbase = oai_harvest_admin_url + \
+        test_link = create_html_link(urlbase=oai_harvest_admin_url + \
                                      "/testsource",
                                      urlargd=link_default_argd,
                                      link_label=_("test"))
-        hist_link = create_html_link(urlbase = oai_harvest_admin_url + \
+        hist_link = create_html_link(urlbase=oai_harvest_admin_url + \
                                      "/viewhistory",
                                      urlargd=link_default_argd,
                                      link_label=_("history"))
-        harvest_link = create_html_link(urlbase = oai_harvest_admin_url + \
+        harvest_link = create_html_link(urlbase=oai_harvest_admin_url + \
                                         "/harvest",
                                         urlargd=link_default_argd,
                                         link_label=_("harvest"))
         separator = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-        menu_header = self.tmpl_draw_titlebar(ln, title = "Menu" , guideurl = guideurl)
+        menu_header = self.tmpl_draw_titlebar(ln, title="Menu" , guideurl=guideurl)
         # Putting everything together
         result = menu_header + main_link
         if oai_src_id != None:
@@ -518,7 +519,7 @@ class Template:
         <input type="submit" value="Show"></input>
     </form>
     </div>
-    <ul id="holdingpencontainer"> %s </ul>""" %(filter, content, )
+    <ul id="holdingpencontainer"> %s </ul>""" % (filter, content,)
 
 
     def tmpl_view_holdingpen_headers(self):
