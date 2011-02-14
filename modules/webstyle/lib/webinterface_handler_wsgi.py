@@ -81,6 +81,7 @@ class SimulatedModPythonRequest(object):
         self.headers_out = self.__headers
         ## See: <http://www.python.org/dev/peps/pep-0333/#the-write-callable>
         self.__write = None
+        self.__write_error = False
         self.__errors = environ['wsgi.errors']
         self.__headers_in = table([])
         for key, value in environ.iteritems():
@@ -136,11 +137,14 @@ class SimulatedModPythonRequest(object):
         if self.__buffer:
             self.__bytes_sent += len(self.__buffer)
             try:
-                self.__write(self.__buffer)
+                if not self.__write_error:
+                    self.__write(self.__buffer)
             except IOError, err:
                 if "failed to write data" in str(err) or "client connection closed" in str(err):
                     ## Let's just log this exception without alerting the admin:
                     register_exception(req=self)
+                    self.__write_error = True ## This flag is there just
+                        ## to not report later other errors to the admin.
                 else:
                     raise
             self.__buffer = ''
