@@ -27,7 +27,7 @@ import re
 
 re_pattern_fuzzy_author_dots = re.compile(r'[\.\-]+')
 re_pattern_fuzzy_author_spaces = re.compile(r'\s+')
-re_pattern_fuzzy_author_trigger = re.compile(r'[\s\,\.\-]')
+re_pattern_fuzzy_author_trigger = re.compile(r'[\s\,\.]')
 
 def wash_author_name(p):
     """
