@@ -222,7 +222,7 @@ function initJeditable(){
         textarea.attr('rows', settings.rows);
       } else {
         textarea.height(settings.height);
-      } if (settings.cols) {
+      }if (settings.cols) {
         textarea.attr('cols', settings.cols);
       } else {
         textarea.width(settings.width);
@@ -321,7 +321,7 @@ function createBulkReq(reqsData, onSuccess, optArgs){
   */
     // creating a bulk request ... the cache timestamp is not saved
 
-    var data = { 'requestType' : 'applyBulkUpdates',
+    var data = {'requestType' : 'applyBulkUpdates',
                  'requestsData' : reqsData,
                  'recID' : gRecID};
     if (optArgs.undoRedo != undefined){
@@ -1010,7 +1010,7 @@ function getSubfieldTag(MARC){
       if (subfieldName != undefined)
   return subfieldName;
   }
-  return '$$' + MARC.charAt(5);
+  return MARC.charAt(5);
 }
 
 function validMARC(datatype, value){
@@ -2168,7 +2168,7 @@ function convertFieldIntoEditable(cell, shouldSelect){
         newVal = newVal.substring(9);
         $(cell).addClass("bibEditVolatileSubfield");
         if (!shouldSelect){
-          // the field should start selcting all the content upon the click
+          // the field should start selecting all the content upon the click
           convertFieldIntoEditable(cell, true);
         }
       }
@@ -2208,11 +2208,21 @@ function convertFieldIntoEditable(cell, shouldSelect){
         subfieldIndex = tmpArray[3];
         var field = gRecord[tag][fieldPosition];
         var tmpResult = "";
-        if (subfieldIndex == undefined)
+        if (tmpArray[0] == 'fieldTag'){
+            var ind1 = (field[1] == " ") ? "_" : field[1];
+            var ind2 = (field[2] == " ") ? "_" : field[2];
+            tmpResult = tag + ind1 + ind2;
+        }
+        else if (subfieldIndex == undefined){
           // Controlfield
           tmpResult = field[3];
-        else
-          tmpResult = field[0][subfieldIndex][1];
+        }
+        else if (tmpArray[0] == 'subfieldTag'){
+            tmpResult = field[0][subfieldIndex][0];
+        }
+        else {
+            tmpResult = field[0][subfieldIndex][1];
+        }
         if (tmpResult.substring(0,9) == "VOLATILE:"){
           tmpResult = tmpResult.substring(9);
         }
@@ -2245,10 +2255,18 @@ function onContentClick(cell){
   }
 }
 
-function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex, subfieldCode, value, changeNo, undoDescriptor, restoreChange){
+function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex, 
+        subfieldCode, value, changeNo, undoDescriptor, modifySubfieldCode){
+  var requestType;
+  if (modifySubfieldCode == true) {
+      requestType = 'modifySubfieldTag';
+  }
+  else {
+      requestType = 'modifyContent';
+  }
   var data = {
     recID: gRecID,
-    requestType: 'modifyContent',
+    requestType: requestType,
     tag: tag,
     fieldPosition: fieldPosition,
     subfieldIndex: subfieldIndex,
@@ -2264,24 +2282,95 @@ function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex, su
   return data;
 }
 
-function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, value, consumedChange, undoDescriptor){
+function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, 
+                            value, consumedChange, undoDescriptor,
+                            modifySubfieldCode){
   updateStatus('updating');
   // Create Ajax request for simple updating the subfield value
   if (consumedChange == undefined || consumedChange == null){
     consumedChange = -1;
   }
-
+  
   var data = getUpdateSubfieldValueRequestData(tag,
                                                fieldPosition,
                                                subfieldIndex,
                                                subfieldCode,
                                                value,
                                                consumedChange,
-                                               undoDescriptor);
+                                               undoDescriptor,
+                                               modifySubfieldCode);
 
   createReq(data, function(json){
     updateStatus('report', gRESULT_CODES[json['resultCode']]);
   });
+}
+
+function updateFieldTag(oldTag, newTag, oldInd1, oldInd2, ind1, ind2, fieldPosition,
+                        consumedChange, undoDescriptor){
+  updateStatus('updating');
+  // Create Ajax request for simple updating the subfield value
+  if (consumedChange == undefined || consumedChange == null){
+      consumedChange = -1;
+  }
+  var data = getUpdateFieldTagRequestData(oldTag,
+                                          oldInd1,
+                                          oldInd2,
+                                          newTag,
+                                          ind1,
+                                          ind2,
+                                          fieldPosition,
+                                          consumedChange,
+                                          undoDescriptor);
+
+  createReq(data, function(json){
+    updateStatus('report', gRESULT_CODES[json['resultCode']]);
+  });
+}
+
+function getUpdateFieldTagRequestData(oldTag, oldInd1, oldInd2, newTag, ind1, ind2,
+                                      fieldPosition, changeNo, undoDescriptor){
+  var data = {
+    recID: gRecID,
+    requestType: "modifyFieldTag",
+    fieldPosition: fieldPosition,
+    oldTag: oldTag,
+    newTag: newTag,
+    ind1: ind1,
+    ind2: ind2,
+    oldInd1: oldInd1,
+    oldInd2: oldInd2
+  };
+  if (changeNo != undefined && changeNo != -1){
+    data.hpChanges = {toDisable: [changeNo]};
+  }
+  if (undoDescriptor != undefined && undoDescriptor != null){
+    data.undoRedo = undoDescriptor;
+  }
+
+  // updating the local model
+  var currentField = gRecord[oldTag][fieldPosition];
+  currentField[1] = ind1;
+  currentField[2] = ind2;
+  gRecord[oldTag].splice(fieldPosition,1);
+  if (gRecord[oldTag].length == 0){
+      delete gRecord[oldTag];
+  }
+  var fieldNewPos;
+  if (gRecord[newTag] == undefined) {
+      fieldNewPos = 0;
+      gRecord[newTag] = [];
+      gRecord[newTag][fieldNewPos] = currentField;
+  }
+  else {
+      fieldNewPos = gRecord[newTag].length;
+      gRecord[newTag].splice(fieldNewPos, 0, currentField);
+  }
+  // changing the display .... what if being edited right now ?
+  redrawFields(oldTag);
+  redrawFields(newTag);
+  reColorFields();
+
+  return data;
 }
 
 /*call autosuggest, get the values, suggest them to the user*/
@@ -2296,7 +2385,6 @@ function onAutosuggest(event) {
   var mylen = value.length;
   var replacement = ""; //used by autocomplete
   var tmpArray = mygrandparent.id.split('_');
-  //alert("parentid "+ parentid +" grannyid "+ mygrandparent.id);
   /*ids for autosuggest/autocomplete html elements*/
   var content_id = 'content_'+tmpArray[1]+'_'+tmpArray[2]+'_'+tmpArray[3];
   var autosuggest_id = 'autosuggest_'+tmpArray[1]+'_'+tmpArray[2]+'_'+tmpArray[3];
@@ -2310,9 +2398,9 @@ function onAutosuggest(event) {
   //check if this an autosuggest or autocomplete field.
   var fullcode = getMARC(maintag, fieldPosition, subfieldIndex);
   var reqtype = ""; //autosuggest or autocomplete, according to tag..
-  for (var i=0;i<gAUTOSUGGEST_TAGS.length;i++) { if (fullcode == gAUTOSUGGEST_TAGS[i]) { reqtype = "autosuggest" }}
-  for (var i=0;i<gAUTOCOMPLETE_TAGS.length;i++) { if (fullcode == gAUTOCOMPLETE_TAGS[i]) { reqtype = "autocomplete" }}
-  if (fullcode == gKEYWORD_TAG) { reqtype = "autokeyword" }
+  for (var i=0;i<gAUTOSUGGEST_TAGS.length;i++) {if (fullcode == gAUTOSUGGEST_TAGS[i]) {reqtype = "autosuggest"}}
+  for (var i=0;i<gAUTOCOMPLETE_TAGS.length;i++) {if (fullcode == gAUTOCOMPLETE_TAGS[i]) {reqtype = "autocomplete"}}
+  if (fullcode == gKEYWORD_TAG) {reqtype = "autokeyword"}
   if (reqtype == "") {
     return;
   }
@@ -2367,7 +2455,7 @@ function onAutosuggest(event) {
             mysel = mysel+"</tr></table>";
             //for (var i=0;i<suggestions.length;i++) { mysel = mysel + +suggestions[i]+ " "; }
             autosugg_in = document.getElementById(autosuggest_id);
-            if (autosugg_in != null) { autosugg_in.innerHTML = mysel; }
+            if (autosugg_in != null) {autosugg_in.innerHTML = mysel;}
          } else { //there were no suggestions
              alert("No suggestions for your search term "+value);
          }
@@ -2399,7 +2487,7 @@ function onAutosuggestSelect(selectidandselval){
      if (content_f) {
          content_ta = content_f.firstChild; //textarea is the sub-elem of form
      }
-     if (!(content_ta)) { return; }
+     if (!(content_ta)) {return;}
      content = content_ta;
   } else {
      content = content_t;
@@ -2424,45 +2512,120 @@ function onContentChange(value, th){
   var tmpArray = th.id.split('_');
   var tag = tmpArray[1], fieldPosition = tmpArray[2], subfieldIndex = tmpArray[3];
   var field = gRecord[tag][fieldPosition];
+  var tag_ind = tag + field[1] + field[2];
   var oldValue = "";
   value = value.replace(/\n/g, ' '); // Replace newlines with spaces.
   if (subfieldIndex == undefined){
-    // Controlfield
-    if (field[3] == value)
+    // Controlfield or modifying a field tag
+    if (tmpArray[0] == 'fieldTag') {
+        if (tag_ind == value.replace(/_/g, " "))
+            return escapeHTML(value);
+        else {
+            oldValue = tag_ind;
+        }
+    }
+    else if (field[3] == value)
       return escapeHTML(value);
-    oldValue = field[3];
-    field[3] = value;
-    subfieldIndex = null;
-    var subfieldCode = null;
+    else{
+        oldValue = field[3];
+        field[3] = value;
+        subfieldIndex = null;
+        var subfieldCode = null;
+    }
   }
   else{
-    if (field[0][subfieldIndex][1] == value)
-      return escapeHTML(value);
-    // Regular field
-    oldValue = field[0][subfieldIndex][1];
-    field[0][subfieldIndex][1] = value;
+    if (tmpArray[0] == 'subfieldTag') {
+        if (field[0][subfieldIndex][0] == value)
+            return escapeHTML(value);
+        else {
+            // Regular subfield
+            oldValue = field[0][subfieldIndex][0];
+            field[0][subfieldIndex][0] = value;
+        }
+    }
+    else {
+        if (field[0][subfieldIndex][1] == value)
+            return escapeHTML(value);
+        // Regular field
+        else {
+            oldValue = field[0][subfieldIndex][1];
+            field[0][subfieldIndex][1] = value;
+        }
+    }
     var subfieldCode = field[0][subfieldIndex][0];
   }
 
-  // setting the undo/redo handler
+  // setting the undo/redo handlers
   var newValue = escapeHTML(value);
-  var code = gRecord[tag][fieldPosition][0][subfieldIndex][0];
-  urHandler = prepareUndoHandlerChangeSubfield(tag,
+  var code;
+
+  var urHandler;
+  var operation_type;
+  if (tmpArray[0] == 'subfieldTag') {
+      code = gRecord[tag][fieldPosition][0][subfieldIndex][0];
+      value = field[0][subfieldIndex][1];
+      operation_type = "change_subfield_code";
+      urHandler = prepareUndoHandlerChangeSubfield(tag,
+                                               fieldPosition,
+                                               subfieldIndex,
+                                               value,
+                                               value,
+                                               oldValue, code,
+                                               operation_type);
+  }
+  else if (tmpArray[0] == 'fieldTag') {
+      var oldTag = oldValue.substring(0,3);
+      var oldInd1 = oldValue.substring(3,4);
+      var oldInd2 = oldValue.substring(4,5);
+      var newTag = value.substring(0,3);
+      var newInd1 = value.substring(3,4);
+      var newInd2 = value.substring(4,5);
+      operation_type = "change_field_code";
+      urHandler = prepareUndoHandlerChangeFieldCode(oldTag,
+                                                    oldInd1,
+                                                    oldInd2,
+                                                    newTag,
+                                                    newInd1,
+                                                    newInd2,
+                                                    fieldPosition,
+                                                    operation_type);
+  }
+  else {
+      code = gRecord[tag][fieldPosition][0][subfieldIndex][0];
+      operation_type = "change_content";
+      urHandler = prepareUndoHandlerChangeSubfield(tag,
                                                fieldPosition,
                                                subfieldIndex,
                                                oldValue,
                                                newValue,
-                                               code, code);
+                                               code, code,
+                                               operation_type);
+  }
   addUndoOperation(urHandler);
 
   // generating the Ajax request
+  if (tmpArray[0] == 'subfieldTag') {
+      value = field[0][subfieldIndex][1];
+      updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, value,
+                          null, urHandler, modifySubfieldCode=true);
+  }
+  else if (tmpArray[0] == 'fieldTag'){
+      updateFieldTag(oldTag, newTag, oldInd1, oldInd2, newInd1, newInd2, fieldPosition, null, urHandler);
+  }
+  else{
+      updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, value, null, urHandler);
+  }
 
-  updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, value, null, urHandler);
-
-  setTimeout('$("#content_' + tag + '_' + fieldPosition + '_' + subfieldIndex +
+  var idPrefix;
+  if (tmpArray[0] == 'subfieldTag') {
+      idPrefix = '"#subfieldTag_';
+  }
+  else{
+      idPrefix = '"#content_';
+  }
+  setTimeout('$(' + idPrefix + tag + '_' + fieldPosition + '_' + subfieldIndex +
       '").effect("highlight", {color: gNEW_CONTENT_COLOR}, ' +
       'gNEW_CONTENT_COLOR_FADE_DURATION)', gNEW_CONTENT_HIGHLIGHT_DELAY);
-
   // Return escaped value to display.
   return newValue;
 }
@@ -3167,9 +3330,10 @@ function processURUntil(entry){
   }
 }
 
-function prepareUndoHandlerChangeSubfield(tag, fieldPos, subfieldPos, oldVal, newVal, oldCode, newCode){
+function prepareUndoHandlerChangeSubfield(tag, fieldPos, subfieldPos, oldVal, 
+         newVal, oldCode, newCode, operation_type){
   var result = {};
-  result.operation_type = "change_content";
+  result.operation_type = operation_type;
   result.tag = tag;
   result.oldVal = oldVal;
   result.newVal = newVal;
@@ -3177,6 +3341,28 @@ function prepareUndoHandlerChangeSubfield(tag, fieldPos, subfieldPos, oldVal, ne
   result.newCode = newCode;
   result.fieldPos = fieldPos;
   result.subfieldPos = subfieldPos;
+  return result;
+}
+
+function prepareUndoHandlerChangeFieldCode(oldTag, oldInd1, oldInd2, newTag, newInd1,
+                                           newInd2, fieldPos, operation_type){
+  var result = {};
+  result.operation_type = operation_type;
+  result.oldTag = oldTag;
+  result.oldInd1 = oldInd1;
+  result.oldInd2 = oldInd2;
+  result.newTag = newTag;
+  result.ind1 = newInd1;
+  result.ind2 = newInd2;
+  result.fieldPos = fieldPos;
+  
+  if (gRecord[newTag] == undefined) {
+      result.newFieldPos = 0;
+  }
+  else {
+      result.newFieldPos = gRecord[newTag].length - 1;
+  }
+
   return result;
 }
 
@@ -3308,6 +3494,24 @@ function preparePerformRedoOperations(operations){
                                      operation.newCode,
                                      operation.newVal,
                                      false);
+      break;
+    case "change_subfield_code":
+      ajaxData = urPerformChangeSubfieldCode(operation.tag,
+                                     operation.fieldPos,
+                                     operation.subfieldPos,
+                                     operation.newCode,
+                                     operation.newVal,
+                                     false);
+      break;
+    case "change_field_code":
+        ajaxData = urPerformChangeFieldCode(operation.newTag,
+                                            operation.ind1,
+                                            operation.ind2,
+                                            operation.oldTag,
+                                            operation.oldInd1,
+                                            operation.oldInd2,
+                                            operation.fieldPos,
+                                            false);
       break;
     case "add_field":
       ajaxData = urPerformAddField(operation.isControlField,
@@ -3607,6 +3811,12 @@ function getHumanReadableUREntry(handler){
     case "change_content":
       operationDescription = "edit subfield";
       break;
+    case "change_subfield_code":
+      operationDescription = "edit subfield code";
+      break;
+    case "change_field_code":
+      operationDescription = "edit field code";
+      break;
     case "add_field":
       operationDescription = "add field";
       break;
@@ -3637,13 +3847,15 @@ function getHumanReadableUREntry(handler){
   var readableDescriptors = {
     'tag' : 'tag',
     'operation_type' : false,
-    'field_position' : 'field position',
-    'subfield_position' : 'subfield position',
+    'field_position' : false,
+    'subfield_position' : false,
+    'subfieldPos' : false,
     'newVal' : 'new value',
     'oldVal' : 'old value',
-    'fieldPos' : 'field position',
+    'fieldPos' : false,
     'toDelete' : false,
-    'handlers' : false
+    'handlers' : false,
+    'newFieldPos' : false
   };
 
   var handlerDetails = '<table>';
@@ -3708,22 +3920,40 @@ function preparePerformUndoOperations(operations){
       break;
     case "change_content":
       ajaxData = urPerformChangeSubfieldContent(operation.tag,
-                                     operation.fieldPos,
-                                     operation.subfieldPos,
-                                     operation.oldCode,
-                                     operation.oldVal,
-                                     true);
+                                                operation.fieldPos,
+                                                operation.subfieldPos,
+                                                operation.oldCode,
+                                                operation.oldVal,
+                                                true);
+      break;
+    case "change_subfield_code":
+      ajaxData = urPerformChangeSubfieldCode(operation.tag,
+                                             operation.fieldPos,
+                                             operation.subfieldPos,
+                                             operation.oldCode,
+                                             operation.oldVal,
+                                             true);
+      break;
+    case "change_field_code":
+      ajaxData = urPerformChangeFieldCode(operation.oldTag,
+                                          operation.oldInd1,
+                                          operation.oldInd2,
+                                          operation.newTag,
+                                          operation.ind1,
+                                          operation.ind2,
+                                          operation.newFieldPos,
+                                          true);
       break;
     case "add_field":
       ajaxData = urPerformRemoveField(operation.tag,
-                            operation.fieldPosition,
-                                              true);
+                                      operation.fieldPosition,
+                                      true);
       break;
     case "add_subfields":
       ajaxData = urPerformRemoveSubfields(operation.tag,
-                               operation.fieldPosition,
-                               operation.newSubfields,
-                               true);
+                                          operation.fieldPosition,
+                                          operation.newSubfields,
+                                          true);
       break;
 
     case "delete_fields":
@@ -4022,9 +4252,6 @@ function urPerformChangeSubfieldContent(tag, fieldPos, subfieldPos, code, val, i
     value: val,
     undoRedo: (isUndo ? "undo": "redo")
   };
-//  createReq(data, function(json){
-//    updateStatus('report', gRESULT_CODES[json['resultCode']]);
-//  });
 
   // changing the model
   gRecord[tag][fieldPos][0][subfieldPos][0] = code;
@@ -4037,6 +4264,70 @@ function urPerformChangeSubfieldContent(tag, fieldPos, subfieldPos, code, val, i
   return ajaxData;
 }
 
+function urPerformChangeSubfieldCode(tag, fieldPos, subfieldPos, code, val, isUndo){
+  // changing the server side model
+  var ajaxData = {
+    recID: gRecID,
+    requestType: 'modifySubfieldTag',
+    tag: tag,
+    fieldPosition: fieldPos,
+    subfieldIndex: subfieldPos,
+    subfieldCode: code,
+    value: val,
+    undoRedo: (isUndo ? "undo": "redo")
+  };
+
+  gRecord[tag][fieldPos][0][subfieldPos][0] = code;
+  gRecord[tag][fieldPos][0][subfieldPos][1] = val;
+
+  // changing the display .... what if being edited right now ?
+  redrawFields(tag);
+  reColorFields();
+
+  return ajaxData;
+}
+
+function urPerformChangeFieldCode(oldTag, oldInd1, oldInd2, newTag, ind1, ind2,
+                                  fieldPos, isUndo){
+  // changing the server side model
+  var ajaxData = {
+    recID: gRecID,
+    requestType: 'modifyFieldTag',
+    oldTag: newTag,
+    oldInd1: ind1,
+    oldInd2: ind2,
+    newTag: oldTag,
+    fieldPosition: fieldPos,
+    ind1: oldInd1,
+    ind2: oldInd2,
+    undoRedo: (isUndo ? "undo": "redo")
+  };
+
+  // updating the local model
+  var currentField = gRecord[newTag][fieldPos];
+  currentField[1] = oldInd1;
+  currentField[2] = oldInd2;
+  gRecord[newTag].splice(fieldPos,1);
+  if (gRecord[newTag].length == 0){
+      delete gRecord[newTag];
+  }
+  var fieldNewPos;
+  if (gRecord[oldTag] == undefined) {
+      fieldNewPos = 0;
+      gRecord[oldTag] = [];
+      gRecord[oldTag][fieldNewPos] = currentField;
+  }
+  else {
+      fieldNewPos = gRecord[oldTag].length;
+      gRecord[oldTag].splice(fieldNewPos, 0, currentField);
+  }
+  // changing the display .... what if being edited right now ?
+  redrawFields(newTag);
+  redrawFields(oldTag);
+  reColorFields();
+
+  return ajaxData;
+}
 
 function performChangeField(tag, fieldPos, ind1, ind2, subFields, isControlfield,
   value, undoRedo){

@@ -58,7 +58,8 @@ from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_delete_subfield_from, \
     record_modify_subfield, record_move_subfield, \
     create_field, record_replace_field, record_move_fields, \
-    record_modify_controlfield, record_get_field_values
+    record_modify_controlfield, record_get_field_values, \
+    record_get_subfields
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL
 from invenio.search_engine import record_exists, search_pattern
@@ -329,6 +330,7 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False, \
                                                data))
     elif request_type in ('addField', 'addSubfields', \
                           'addFieldsSubfieldsOnPositions', 'modifyContent', \
+                          'modifySubfieldTag', 'modifyFieldTag', \
                           'moveSubfield', 'deleteFields', 'moveField', \
                           'modifyField', 'otherUpdateRequest', \
                           'disableHpChange', 'deactivateHoldingPenChangeset'):
@@ -946,6 +948,27 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
                   field_position_local=field_position_local)
             response['resultCode'] = 24
 
+        elif request_type == 'modifySubfieldTag':
+            record_add_subfield_into(record, data['tag'], data['subfieldCode'],
+            data["value"], subfield_position= int(data['subfieldIndex']),
+            field_position_local=field_position_local)
+
+            record_delete_subfield_from(record, data['tag'], int(data['subfieldIndex']) + 1,
+            field_position_local=field_position_local)
+
+            response['resultCode'] = 24
+        
+        elif request_type == 'modifyFieldTag':
+            subfields = record_get_subfields(record, data['oldTag'],
+            field_position_local=field_position_local)
+
+            record_add_field(record, data['newTag'], data['ind1'],
+                             data['ind2'] , subfields=subfields)
+
+            record_delete_field(record, data['oldTag'], ind1=data['oldInd1'], \
+                                ind2=data['oldInd2'], field_position_local=field_position_local)
+            response['resultCode'] = 32
+
         elif request_type == 'moveSubfield':
             record_move_subfield(record, data['tag'],
                 int(data['subfieldIndex']), int(data['newSubfieldIndex']),
@@ -994,6 +1017,7 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
                 response['resultCode'] = 29
             else:
                 response['resultCode'] = 30
+                
         response['cacheMTime'], response['cacheDirty'] = \
             update_cache_file_contents(recid, uid, record_revision,
                                        record, \
@@ -1128,4 +1152,3 @@ def perform_request_bibcatalog(request_type, recid, uid):
         response['resultCode'] = 31
 
     return response
-

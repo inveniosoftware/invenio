@@ -168,7 +168,8 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
     boxField = input('checkbox', 'boxField_' + fieldID, 'bibEditBoxField',
       {onclick: 'onFieldBoxClick(this)', tabindex: -1});
     cellFieldTagAttrs = 'id="fieldTag_' + fieldID +
-      '" class="bibEditCellFieldTag"';
+      '" class="bibEditCellFieldTag '  + cellContentClass + '" ' +
+  cellContentTitle + cellContentOnClick + 'tabindex="0" ';
     fieldTagToPrint = getFieldTag(MARC);
   }
   // If last subfield, remove down arrow, add 'Add subfield' button.
@@ -183,10 +184,10 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
       '<td ' + cellFieldTagAttrs  + '>' + fieldTagToPrint + '</td>' +
       '<td class="bibEditCellSubfield">' + boxSubfield + '</td>' +
       '<td id="subfieldTag_' + subfieldID +
-  '" class="bibEditCellSubfieldTag">' +
-  subfieldTagToPrint +
+  '" class="bibEditCellSubfieldTag ' + cellContentClass + '" ' +
+  cellContentTitle + cellContentOnClick + 'tabindex="0">' + subfieldTagToPrint +
       '</td>' +
-      '<td id="content_' + subfieldID + '" class="' + cellContentClass + cellContentAdditionalClass+  '" ' +
+      '<td id="content_' + subfieldID + '" class="' + cellContentClass + cellContentAdditionalClass +  '" ' +
 	cellContentTitle + autosuggestkeypress + cellContentOnClick + 'tabindex="0">' +
 	subfieldValue +
       '</td>' +
