@@ -462,6 +462,12 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         inv_search = "695__a:\"B --> pi pi\""
         self._compare_searches(inv_search, spi_search)
 
+    def test_journal_section_joining(self):
+        """SPIRES search syntax - journal Phys.Lett, 0903, 024 -> journal:Phys.Lett,0903,024"""
+        spi_search = "find j Phys.Lett, 0903, 024"
+        inv_search = "journal:Phys.Lett,0903,024"
+        self._compare_searches(inv_search, spi_search)
+
     def test_distribution_of_search_terms(self):
         """SPIRES search syntax - find t this and that ->title:this and title:that"""
         spi_search = "find t this and that"
@@ -599,6 +605,13 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         inv_search = converter.is_applicable("t:p a:c")
         self.assertEqual(inv_search, False)
 
+    def test_spires_keyword_distribution_before_conjunctions(self):
+        """SPIRES search syntax - test find journal phys.lett 0903 024 => journal:phys.lett and journal:0903 and journal:024"""
+        # trac 113
+        converter = search_engine_query_parser.SpiresToInvenioSyntaxConverter()
+        spi_search = 'find journal phys.lett 0903 024'
+        inv_search = '(journal:phys.lett and journal:0903 and journal:024)'
+        self._compare_searches(inv_search, spi_search)
 
 TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser,
                              TestSpiresToInvenioSyntaxConverter,

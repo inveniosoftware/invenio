@@ -570,7 +570,7 @@ class SpiresToInvenioSyntaxConverter:
         # taking in mind if they are escaped.
         self._re_quotes_match = re.compile('[^\\\\](".*?[^\\\\]")|[^\\\\](\'.*?[^\\\\]\')')
 
-        # for matching cases where kw needs distributing
+        # match cases where a keyword distributes across a conjunction
         self._re_distribute_keywords = re.compile(r'\b(?P<keyword>\S*:)(?P<content>.+?)\s*(?P<combination>and not | and | or | not )\s*(?P<last_content>[^:]*?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # regular expression that matches author patterns
@@ -582,11 +582,12 @@ class SpiresToInvenioSyntaxConverter:
         # in case of changes correct also the code in this method
         self._re_exact_author_match = re.compile(r'\bexactauthor:(?P<author_name>[^\'\"].*?[^\'\"]\b)(?= and not | and | or | not |$)', re.IGNORECASE)
 
-        # regular expression that matches search term, its content (words that
-        # are searched) and the operator preceding the term. In case that the
-        # names of the groups defined in the expression are changed, the
-        # chagned should be reflected in the code that use it.
-        self._re_search_term_pattern_match = re.compile(r'\b(?P<combine_operator>find|and|or|not)\s+(?P<search_term>title:|keyword:|fulltext:)(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+        # match search term, its content (words that are searched) and
+        # the operator preceding the term.
+        self._re_search_term_pattern_match = re.compile(r'\b(?P<combine_operator>find|and|or|not)\s+(?P<search_term>\S+:)(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+
+        # match journal searches with a comma at end and no keyword after
+        self._re_search_term_is_journal = re.compile(r'\b(?P<combine_operator>find|and|or|not)\s+(?P<search_term>journal|j):(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # regular expression matching date after pattern
         self._re_date_after_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(after|>)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
@@ -594,9 +595,7 @@ class SpiresToInvenioSyntaxConverter:
         # regular expression matching date after pattern
         self._re_date_before_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(before|<)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
-        # regular expression that matches date searches which have been
-        # keyword-substituted
-        #self._re_keysubbed_date_expr = re.compile(r'\b(?P<term>(' + self._DATE_ADDED_FIELD + ')|(' + self._DATE_UPDATED_FIELD + ')|(' + self._DATE_FIELD + '))\s*(?P<content>.+)(?= and not | and | or | not |$)', re.IGNORECASE)
+        # match date searches which have been keyword-substituted
         self._re_keysubbed_date_expr = re.compile(r'\b(?P<term>(' + self._DATE_ADDED_FIELD + ')|(' + self._DATE_UPDATED_FIELD + ')|(' + self._DATE_FIELD + '))(?P<content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # for finding (and changing) a variety of different SPIRES search keywords
@@ -631,7 +630,7 @@ class SpiresToInvenioSyntaxConverter:
             # starting with 'find' are SPIRES queries.  Turn fin into find.
             query = self._re_spires_find_keyword.sub(lambda m: 'find '+m.group('query'), query)
 
-            # these calls are before keywords replacement becuase when keywords
+            # these calls are before keywords replacement because when keywords
             # are replaced, date keyword is replaced by specific field search
             # and the DATE keyword is not match in DATE BEFORE or DATE AFTER
             query = self._convert_spires_date_before_to_invenio_span_query(query)
@@ -640,6 +639,7 @@ class SpiresToInvenioSyntaxConverter:
             # call to _replace_spires_keywords_with_invenio_keywords should be at the
             # beginning because the next methods use the result of the replacement
             query = self._replace_spires_keywords_with_invenio_keywords(query)
+            query = self._remove_spaces_in_comma_separated_journal(query)
             query = self._distribute_keywords_across_combinations(query)
 
             query = self._convert_dates(query)
@@ -772,11 +772,11 @@ class SpiresToInvenioSyntaxConverter:
         """Expands search queries.
 
         If a search term is followed by several words e.g.
-        author: ellis or title:THESE THREE WORDS it is expanded to
-        author:ellis or (title: THESE and title:THREE...)
+        author:ellis or title:THESE THREE WORDS it is expanded to
+        author:ellis or (title:THESE and title:THREE...)
 
-        Not all the search terms are expanded this way, but only title:,
-        keyword:, and fulltext: - see _re_search_term_pattern_match for details.
+        All keywords are thus expanded.  XXX: this may lead to surprising
+        results for any later parsing stages if we're not careful.
         """
 
         def create_replacements(term, content):
@@ -900,6 +900,17 @@ class SpiresToInvenioSyntaxConverter:
 
         return search_pattern
 
+    def _remove_spaces_in_comma_separated_journal(self, query):
+        """Phys.Lett, 0903, 024 -> Phys.Lett,0903,024"""
+        result = ""
+        current_position = 0
+        for match in self._re_search_term_is_journal.finditer(query):
+            result += query[current_position : match.start()]
+            result += match.group('combine_operator') + ' ' + match.group('search_term') + ':'
+            result += re.sub(',\s+', ',', match.group('search_content'))
+            current_position = match.end()
+        result += query[current_position : ]
+        return result
 
     def _replace_spires_keywords_with_invenio_keywords(self, query):
         """Replaces SPIRES keywords that have directly
@@ -958,6 +969,7 @@ class SpiresToInvenioSyntaxConverter:
         return result
 
     def _distribute_keywords_across_combinations(self, query):
+        """author:ellis and james -> author:ellis and author:james"""
         # method used for replacement with regular expression
 
         def create_replacement_pattern(match):
