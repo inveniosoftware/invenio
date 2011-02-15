@@ -1363,7 +1363,9 @@ def get_recids_and_filepaths(args):
 
     jobs = []
     for x in args:
-        items = x.split(":")
+        ## Split a maximum of once so as to cater for file names with colons
+        ## (e.g. arXiv names)
+        items = x.split(":", 1)
         if len(items) != 2:
             sys.stderr.write(u"W: Recid:filepath argument invalid. Skipping.\n")
             continue
@@ -5646,7 +5648,8 @@ def usage(wmsg="", err_code=0):
                   No MARC XML mark-up - just each extracted line, prefixed
                   by the recid of the document that it came from.
    -x, --xmlfile
-                  write xml output to a file rather than standard output.
+                  write the extracted references, in xml form, to a file rather
+                  than standard output.
    -d, --dictfile
                   write statistics about all matched title abbreviations
                   (i.e. LHS terms in the titles knowledge base) to a file.
@@ -5655,8 +5658,11 @@ def usage(wmsg="", err_code=0):
                   of trying to locate the reference section within a document
                   and instead move to the stage of recognition and
                   standardisation of citations within lines.
+    -s, --inspire
+                  output journal title numeration in the inspire recognised
+                  format: [series]volume,page,year
 
-  Example: refextract 499:thesis.pdf
+  Example: refextract -x /home/chayward/refs.xml 499:/home/chayward/thesis.pdf
 """
     sys.stderr.write(wmsg + msg)
     sys.exit(err_code)
@@ -5727,9 +5733,9 @@ def get_cli_options():
 
     # What journal title format are we using?
     if cli_opts['verbosity'] > 0 and cli_opts['inspire']:
-        print 'INSPIRE Journal title format set!'
+        sys.stdout.write("--- Using inspire journal title form\n")
     elif cli_opts['verbosity'] > 0:
-        print 'INVENIO Journal title format set!'
+        sys.stdout.write("--- Using invenio journal title form\n")
 
     if len(myargs) == 0:
         ## no arguments: error message
@@ -5870,11 +5876,25 @@ def main():
         how_found_start = -1  ## flag to indicate how the reference start section was found (or not)
         extract_error = 0  ## extraction was OK unless determined otherwise
         ## reset the stats counters:
-        count_misc = count_title = count_reportnum = count_url = count_doi = 0
+        count_misc = count_title = count_reportnum = count_url = count_doi = count_auth_group = 0
         recid = curitem[0]
         if cli_opts['verbosity'] >= 1:
             sys.stdout.write("--- processing RecID: %s pdffile: %s; %s\n" \
                              % (str(curitem[0]), curitem[1], ctime()))
+
+        ## 1. Get this document body as plaintext:
+        (docbody, extract_error) = get_plaintext_document_body(curitem[1])
+        if extract_error == 1:
+            ## Non-existent or unreadable pdf/text directory.
+            sys.stderr.write("Error: could not open %s for extraction.\n" \
+                             % curitem[1])
+            sys.exit(1)
+        if extract_error == 0 and len(docbody) == 0:
+            extract_error = 3
+        if cli_opts['verbosity'] >= 1:
+            sys.stdout.write("-----get_plaintext_document_body gave: " \
+                             "%s lines, overall error: %s\n" \
+                             % (str(len(docbody)), str(extract_error)))
 
         if not done_coltags:
             ## Output opening XML collection tags:
@@ -5899,14 +5919,6 @@ def main():
                           % CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8"))
             done_coltags = 1
 
-        ## 1. Get this document body as plaintext:
-        (docbody, extract_error) = get_plaintext_document_body(curitem[1])
-        if extract_error == 0 and len(docbody) == 0:
-            extract_error = 3
-        if cli_opts['verbosity'] >= 1:
-            sys.stdout.write("-----get_plaintext_document_body gave: " \
-                             "%s lines, overall error: %s\n" \
-                             % (str(len(docbody)), str(extract_error)))
         if len(docbody) > 0:
             ## the document body is not empty:
             ## 2. If necessary, locate the reference section:
@@ -5971,8 +5983,7 @@ def main():
         ## studies show that such cases are ~ 100% rubbish. Also allowing only
         ## urls found greatly increases the level of rubbish accepted..
         if count_reportnum + count_title == 0 and how_found_start > 2:
-            count_misc = 0
-            count_url = 0
+            count_misc = count_url = count_doi = count_auth_group = 0
             processed_references = []
             if cli_opts['verbosity'] >= 1:
                 sys.stdout.write("-----Found ONLY miscellaneous/Urls so removed it how_found_start=  %d\n" % (how_found_start))
