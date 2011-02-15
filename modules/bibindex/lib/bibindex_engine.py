@@ -533,9 +533,14 @@ def get_author_family_name_words_from_phrase(phrase, stemming_language=None):
     useful for CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES.
     """
     d_family_names = {}
+    # first, treat everything before first comma as surname:
+    if ',' in phrase:
+        d_family_names[phrase.split(',', 1)[0]] = 1
+    # second, try fuzzy author tokenizer to find surname variants:
     for name in get_fuzzy_authors_from_phrase(phrase, stemming_language):
         if ',' in name:
             d_family_names[name.split(',', 1)[0]] = 1
+    # now extract words from these surnames:
     d_family_names_words = {}
     for family_name in d_family_names.keys():
         for word in get_words_from_phrase(family_name, stemming_language):

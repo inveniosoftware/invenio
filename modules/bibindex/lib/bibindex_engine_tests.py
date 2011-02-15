@@ -134,6 +134,11 @@ class TestGetAuthorFamilyNameWords(unittest.TestCase):
         self.assertEqual(['doe',],
           bibindex_engine.get_author_family_name_words_from_phrase('Doe, John'))
 
+    def test_authornames_campbell_wilson(self):
+        """bibindex engine - get author family name words for Campbell-Wilson, D"""
+        self.assertEqual(['campbell', 'wilson', 'campbell-wilson'],
+          bibindex_engine.get_author_family_name_words_from_phrase('Campbell-Wilson, D'))
+
 
 TEST_SUITE = make_test_suite(TestListSetOperations,
                              TestWashIndexTerm,
