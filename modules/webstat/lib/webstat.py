@@ -171,8 +171,8 @@ def create_customevent(id=None, name=None, cols=[]):
     sql_query.append("creation_time TIMESTAMP DEFAULT NOW(),")
     for argument in cols:
         arg = wash_table_column_name(argument)
-        sql_query.append("%s MEDIUMTEXT NULL," % arg)
-        sql_query.append("INDEX %s (%s(50))," % (arg, arg))
+        sql_query.append("`%s` MEDIUMTEXT NULL," % arg)
+        sql_query.append("INDEX `%s` (`%s` (50))," % (arg, arg))
     sql_query.append("PRIMARY KEY (id))")
     sql_str = ' '.join(sql_query)
     run_sql(sql_str)
