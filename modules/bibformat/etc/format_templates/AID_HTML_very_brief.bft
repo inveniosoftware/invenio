@@ -14,7 +14,7 @@ separator="] [" link="no"/>
 
 <BFE_DATE /><BFE_PRIMARY_REPORT_NUMBER
 prefix = '<small class="quicknote"> ['
-suffix="]</small> " link="no"/>
+suffix="]</small> " />
 
 <BFE_ABSTRACT limit="1" prefix="<br /><small>" suffix="</small>"
 highlight="no" contextual="no"/>
