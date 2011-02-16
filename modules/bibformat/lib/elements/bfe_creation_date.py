@@ -20,11 +20,17 @@ __revision__ = "$Id$"
 
 from invenio.search_engine import get_creation_date
 
-def format_element(bfo, format='%Y-%m-%d'):
+def format_element(bfo, format='%Y-%m-%d', date_format='%Y-%m-%d'):
     '''
     Get the record creation date.
-    @param format: The date format in MySQL syntax
+    <b>Note:</b> parameter <code>format</code> is deprecated
+
+    @param date_format: The date format in MySQL syntax
     '''
     recID = bfo.recID
-    out = get_creation_date(recID, format)
+
+    # Let's be gentle and backward compatible while "format" is here:
+    if date_format == '%Y-%m-%d' and format != '%Y-%m-%d':
+        date_format = format
+    out = get_creation_date(recID, date_format)
     return out
