@@ -299,12 +299,13 @@ def get_kbd_values(kbname, searchwith=""):
         if (expression.count('%') > 0):
             expression = expression.replace("%", searchwith)
             #take the field, unnecessary except for debugging..
+            # XXX: Can this be done with a regular expression more efficiently?
             myval = ""
             found = expression.find(":")
             if (found > -1):
                 myefield = expression[:found]
                 myval = expression[found+1:]
-                #check if myval is quoted..
+                # check if myval is quoted..
                 if not (myval.startswith("'") or myval.startswith('"')):
                     myval = "'"+myval
                 if not (myval.endswith("'") or myval.endswith('"')):
@@ -347,7 +348,7 @@ def get_existing_kbd_values_for_bibedit(kb_name, searchwith=""):
     return get_kbd_values(kb_name, searchwith)
 
 
-def get_kbd_values_for_bibedit(tag, collection="", searchwith="", dkbname=""):
+def get_kbd_values_for_bibedit(tag, collection="", searchwith="", expression="", dkbname=None):
     """
     A specific convenience method: use or create a temporary dynamic knowledge base
     a return its values.
@@ -362,11 +363,13 @@ def get_kbd_values_for_bibedit(tag, collection="", searchwith="", dkbname=""):
     @param searchwith: the string to search. If empty, match all.
     @
     """
-    kb_id = add_kb(kb_name="tmp_dynamic", kb_type='dynamic')
+    if dkbname == None:
+        dkbname = "tmp_dynamic_"+tag+'_'+expression
+    kb_id = add_kb(kb_name=dkbname, kb_type='dynamic')
     #get the kb name since it may be catenated by a number
     #in case there are concurrent calls.
     kb_name = get_kb_name(kb_id)
-    bibknowledge_dblayer.save_kb_dyn_config(kb_id, tag, collection, searchwith)
+    bibknowledge_dblayer.save_kb_dyn_config(kb_id, tag, expression, collection)
     #now, get stuff
     myvalues = get_kbd_values(kb_name, searchwith)
     #the tmp dyn kb is now useless, delete it

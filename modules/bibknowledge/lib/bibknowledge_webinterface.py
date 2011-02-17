@@ -82,7 +82,6 @@ class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
         delete_mapping = argd['delete_mapping']
         kbname = argd['kbname']
         format = argd['format']
-        term = argd['term']
 
         req.argd = argd #needed by some lower level modules
 

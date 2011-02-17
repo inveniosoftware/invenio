@@ -83,7 +83,7 @@ class BibknowledgeTests(unittest.TestCase):
 
     def test_kb_for_bibedit(self):
         """bibknowledge - test a dynamic db"""
-        myvalues = get_kbd_values_for_bibedit("100__a", "", "Ellis")
+        myvalues = get_kbd_values_for_bibedit("100__a", "", "Ellis", "100__a:%")
         self.assertEqual(1, len(myvalues))
 
 
@@ -93,8 +93,8 @@ class BibknowledgeTests(unittest.TestCase):
         new_kb_id = add_dynamic_kb("test_dyn","100__a", "245__:%")
         kbname = get_kb_name(new_kb_id)
         vals = get_existing_kbd_values_for_bibedit(kbname,"Rio Macâe")
-        self.assertEqual(1, len(val))
-        self.assertEqual(val[0], 'Charles Darwin')
+        self.assertEqual(1, len(vals))
+        self.assertEqual(vals[0], 'Charles Darwin')
 
     def test_taxonomy(self):
         """bibknowledge - test a taxonomy"""
