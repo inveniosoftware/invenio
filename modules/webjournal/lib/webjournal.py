@@ -130,6 +130,7 @@ def perform_request_article(req, journal_name, issue_number, ln,
         register_exception(req=req)
         return e.user_box()
 
+    # if it is cached, return it
     cached_html = get_article_page_from_cache(journal_name, category,
                                               recid, issue_number, ln)
 
@@ -151,6 +152,7 @@ def perform_request_article(req, journal_name, issue_number, ln,
                          issue_number.split('/')[1],
                          issue_number.split('/')[0],
                          ln))
+
 
     # create a record and get HTML back from bibformat
     user_info = collect_user_info(req)

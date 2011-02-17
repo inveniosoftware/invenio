@@ -167,6 +167,11 @@ install-jquery-plugins: install-jquery-plugins
 	rm jquery.tablesorter.zip && \
 	unzip -u uploadify.zip && \
 	mv -T jquery.uploadify-v2.1.3 uploadify && \
+	wget http://flot.googlecode.com/files/flot-0.6.zip && \
+	wget http://trentrichardson.com/examples/timepicker/js/jquery-ui-timepicker-addon.js && \
+	unzip -u flot-0.6.zip && \
+	mv flot/jquery.flot.selection.min.js flot/jquery.flot.min.js flot/excanvas.min.js ./ && \
+	rm flot-0.6.zip && rm -r flot && \
 	mv uploadify/swfobject.js ./ && \
 	mv uploadify/cancel.png uploadify/uploadify.css uploadify/uploadify.allglyphs.swf uploadify/uploadify.fla uploadify/uploadify.swf ../img/ && \
 	mv uploadify/jquery.uploadify.v2.1.3.min.js ./jquery.uploadify.min.js && \
@@ -182,8 +187,9 @@ install-jquery-plugins: install-jquery-plugins
 	wget http://plugins.jquery.com/files/jquery.ajaxPager.js_5.txt && \
 	mv jquery.ajaxPager.js_5.txt jquery.ajaxPager.js && \
 	wget http://jqueryui.com/download/jquery-ui-1.7.3.custom.zip && \
-	unzip jquery-ui-1.7.3.custom.zip development-bundle/ui/ui.core.js && \
+	unzip jquery-ui-1.7.3.custom.zip development-bundle/ui/ui.core.js js/jquery-ui-1.7.3.custom.min.js && \
 	mv development-bundle/ui/ui.core.js ui.core.js && \
+	mv js/jquery-ui-1.7.3.custom.min.js jquery-ui-1.7.3.custom.min.js && \
 	rm -rf development-bundle && \
 	rm jquery-ui-1.7.3.custom.zip && \
 	mkdir -p ${prefix}/var/www/img && \
@@ -206,6 +212,10 @@ uninstall-jquery-plugins:
 	rm -f jquery.effects.highlight.min.js && \
 	rm -f jquery.MultiFile.pack.js && \
 	rm -f jquery.jeditable.mini.js && \
+	rm -f jquery.flot.selection.min.js && \
+	rm -f jquery.flot.min.js && \
+	rm -f excanvas.min.js && \
+	rm -f jquery-ui-timepicker-addon.min.js && \
 	rm -f jquery.tablesorter.js && \
 	rm -f jquery.tablesorter.pager.js && \
 	rm -f ui.datepicker.min.js && \

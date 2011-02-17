@@ -24,6 +24,7 @@ import re
 import datetime
 import cPickle
 import calendar
+from datetime import timedelta
 from urllib import quote
 
 from invenio import template
@@ -34,94 +35,388 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_LANG
 from invenio.webstat_config import CFG_WEBSTAT_CONFIG_PATH
-from invenio.search_engine import get_alphabetically_ordered_collection_list
+from invenio.search_engine import get_alphabetically_ordered_collection_list, \
+    is_hosted_collection
 from invenio.dbquery import run_sql, wash_table_column_name
-from invenio.bibsched import is_task_scheduled, get_task_ids_by_descending_date, get_task_options
+from invenio.bibsched import is_task_scheduled, \
+    get_task_ids_by_descending_date, \
+    get_task_options
+from invenio.bibcirculation_utils import book_title_from_MARC
 
-# Imports handling key events
-from invenio.webstat_engine import get_keyevent_trend_collection_population
-from invenio.webstat_engine import get_keyevent_trend_search_frequency
-from invenio.webstat_engine import get_keyevent_trend_search_type_distribution
-from invenio.webstat_engine import get_keyevent_trend_download_frequency
-from invenio.webstat_engine import get_keyevent_snapshot_apache_processes
-from invenio.webstat_engine import get_keyevent_snapshot_bibsched_status
-from invenio.webstat_engine import get_keyevent_snapshot_uptime_cmd
-from invenio.webstat_engine import get_keyevent_snapshot_sessions
+# Imports handling key events and error log
+from invenio.webstat_engine import get_keyevent_trend_collection_population, \
+    get_keyevent_trend_search_frequency, \
+    get_keyevent_trend_search_type_distribution, \
+    get_keyevent_trend_download_frequency, \
+    get_keyevent_trend_comments_frequency, \
+    get_keyevent_trend_number_of_loans, \
+    get_keyevent_trend_web_submissions, \
+    get_keyevent_snapshot_apache_processes, \
+    get_keyevent_snapshot_bibsched_status, \
+    get_keyevent_snapshot_uptime_cmd, \
+    get_keyevent_snapshot_sessions, \
+    get_keyevent_bibcirculation_report, \
+    get_keyevent_loan_statistics, \
+    get_keyevent_loan_lists, \
+    get_keyevent_renewals_lists, \
+    get_keyevent_returns_table, \
+    get_keyevent_trend_returns_percentage, \
+    get_keyevent_ill_requests_statistics, \
+    get_keyevent_ill_requests_lists, \
+    get_keyevent_trend_satisfied_ill_requests_percentage, \
+    get_keyevent_items_statistics, \
+    get_keyevent_items_lists, \
+    get_keyevent_loan_request_statistics, \
+    get_keyevent_loan_request_lists, \
+    get_keyevent_user_statistics, \
+    get_keyevent_user_lists, \
+    _get_doctypes, \
+    _get_item_statuses, \
+    _get_item_doctype, \
+    _get_request_statuses, \
+    _get_libraries, \
+    _get_loan_periods, \
+    get_invenio_error_log_ranking, \
+    get_invenio_last_n_errors, \
+    update_error_log_analyzer, \
+    get_apache_error_log_ranking
 
 # Imports handling custom events
-from invenio.webstat_engine import get_customevent_table
-from invenio.webstat_engine import get_customevent_trend
-from invenio.webstat_engine import get_customevent_dump
+from invenio.webstat_engine import get_customevent_table, \
+    get_customevent_trend, \
+    get_customevent_dump
+
+# Imports handling custom report
+from invenio.webstat_engine import get_custom_summary_data, \
+    _get_tag_name, \
+    create_custom_summary_graph
 
 # Imports for handling outputting
-from invenio.webstat_engine import create_graph_trend
-from invenio.webstat_engine import create_graph_dump
+from invenio.webstat_engine import create_graph_trend, \
+    create_graph_dump, \
+    create_graph_table
 
 # Imports for handling exports
-from invenio.webstat_engine import export_to_python
-from invenio.webstat_engine import export_to_csv
+from invenio.webstat_engine import export_to_python, \
+    export_to_csv, \
+    export_to_excel
 
 TEMPLATES = template.load('webstat')
 
 # Constants
 WEBSTAT_CACHE_INTERVAL = 600 # Seconds, cache_* functions not affected by this.
-                             # Also not taking into account if BibSched has webstatadmin process.
+                             # Also not taking into account if BibSched has
+                             # webstatadmin process.
 WEBSTAT_RAWDATA_DIRECTORY = CFG_TMPDIR + "/"
 WEBSTAT_GRAPH_DIRECTORY = CFG_WEBDIR + "/img/"
 
-TYPE_REPOSITORY = [ ('gnuplot', 'Image - Gnuplot'),
-                    ('asciiart', 'Image - ASCII art'),
-                    ('asciidump', 'Image - ASCII dump'),
-                    ('python', 'Data - Python code', export_to_python),
-                    ('csv', 'Data - CSV', export_to_csv) ]
+TYPE_REPOSITORY = [('gnuplot', 'Image - Gnuplot'),
+                   ('asciiart', 'Image - ASCII art'),
+                   ('flot', 'Image - Flot'),
+                   ('asciidump', 'Image - ASCII dump'),
+                   ('python', 'Data - Python code', export_to_python),
+                   ('csv', 'Data - CSV', export_to_csv)]
+
+
+def get_collection_list_plus_all():
+    """ Return all the collection names plus the name All"""
+    coll = get_alphabetically_ordered_collection_list()
+    hosted_colls = []
+    for collection in coll:
+        if is_hosted_collection(collection[0]):
+            hosted_colls.append(collection)
+    for hosted_coll in hosted_colls:
+        coll.remove(hosted_coll)
+    coll.append(['All', 'All'])
+    return coll
 
 # Key event repository, add an entry here to support new key measures.
-KEYEVENT_REPOSITORY = { 'collection population':
-                          { 'fullname': 'Collection population',
-                            'specificname': 'Population in collection "%(collection)s"',
-                            'gatherer': get_keyevent_trend_collection_population,
-                            'extraparams': {'collection': ('Collection', get_alphabetically_ordered_collection_list)},
-                            'cachefilename': 'webstat_%(id)s_%(collection)s_%(timespan)s',
+KEYEVENT_REPOSITORY = {'collection population':
+                          {'fullname': 'Collection population',
+                            'specificname':
+                                   'Population in collection "%(collection)s"',
+                            'gatherer':
+                                   get_keyevent_trend_collection_population,
+                            'extraparams': {'collection': ('combobox', 'Collection',
+                                   get_collection_list_plus_all)},
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(collection)s_%(timespan)s',
                             'ylabel': 'Number of records',
                             'multiple': None,
-                           },
+                            'output': 'Graph'},
                         'search frequency':
-                          { 'fullname': 'Search frequency',
+                          {'fullname': 'Search frequency',
                             'specificname': 'Search frequency',
                             'gatherer': get_keyevent_trend_search_frequency,
                             'extraparams': {},
-                            'cachefilename': 'webstat_%(id)s_%(timespan)s',
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(timespan)s',
                             'ylabel': 'Number of searches',
                             'multiple': None,
-                           },
+                            'output': 'Graph'},
                         'search type distribution':
-                          { 'fullname': 'Search type distribution',
+                          {'fullname': 'Search type distribution',
                             'specificname': 'Search type distribution',
-                            'gatherer': get_keyevent_trend_search_type_distribution,
+                            'gatherer':
+                                   get_keyevent_trend_search_type_distribution,
                             'extraparams': {},
-                            'cachefilename': 'webstat_%(id)s_%(timespan)s',
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(timespan)s',
                             'ylabel': 'Number of searches',
-                            'multiple': ['Simple searches', 'Advanced searches'],
-                           },
+                            'multiple': ['Simple searches',
+                                         'Advanced searches'],
+                            'output': 'Graph'},
                         'download frequency':
-                          { 'fullname': 'Download frequency',
-                            'specificname': 'Download frequency',
+                          {'fullname': 'Download frequency',
+                            'specificname': 'Download frequency in collection "%(collection)s"',
                             'gatherer': get_keyevent_trend_download_frequency,
-                            'extraparams': {},
-                            'cachefilename': 'webstat_%(id)s_%(timespan)s',
+                            'extraparams': {'collection': ('combobox', 'Collection',
+                                                    get_collection_list_plus_all)},
+                            'cachefilename': 'webstat_%(event_id)s_%(collection)s_%(timespan)s',
                             'ylabel': 'Number of downloads',
                             'multiple': None,
-                           }
+                            'output': 'Graph'},
+                         'comments frequency':
+                          {'fullname': 'Comments frequency',
+                            'specificname': 'Comments frequency in collection "%(collection)s"',
+                            'gatherer': get_keyevent_trend_comments_frequency,
+                            'extraparams': {'collection': ('combobox', 'Collection',
+                                                    get_collection_list_plus_all)},
+                            'cachefilename': 'webstat_%(event_id)s_%(collection)s_%(timespan)s',
+                            'ylabel': 'Number of comments',
+                            'multiple': None,
+                            'output': 'Graph'},
+                        'number of loans':
+                          {'fullname': 'Number of loans',
+                            'specificname': 'Number of loans',
+                            'gatherer': get_keyevent_trend_number_of_loans,
+                            'extraparams': {},
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(timespan)s',
+                            'ylabel': 'Number of loans',
+                            'multiple': None,
+                            'output': 'Graph'},
+                        'web submissions':
+                          {'fullname': 'Number of web submissions',
+                            'specificname':
+                                   'Number of web submissions of "%(doctype)s"',
+                            'gatherer': get_keyevent_trend_web_submissions,
+                            'extraparams': {
+                                'doctype': ('combobox', 'Type of document', _get_doctypes)},
+                            'cachefilename':
+                                'webstat_%(event_id)s_%(doctype)s_%(timespan)s',
+                            'ylabel': 'Web submissions',
+                            'multiple': None,
+                            'output': 'Graph'},
+                        'loans statistics':
+                          {'fullname': 'Loans statistics',
+                            'specificname': 'Loans statistics',
+                            'gatherer':
+                                   get_keyevent_loan_statistics,
+                            'extraparams': {
+                                'user_address': ('textbox', 'User address'),
+                                'udc': ('textbox', 'UDC'),
+                                'item_status': ('combobox', 'Item status', _get_item_statuses),
+                                'publication_date': ('textbox', 'Publication date'),
+                                'creation_date': ('textbox', 'Creation date')},
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(user_address)s_' + \
+                                '%(udc)s_%(item_status)s_%(publication_date)s' + \
+                                '_%(creation_date)s_%(timespan)s',
+                            'rows': ['Number of documents loaned',
+                                         'Number of items loaned on the total number of items',
+                                         'Number of items never loaned on the \
+                                         total number of items',
+                                         'Average time between the date of ' + \
+                                         'the record creation and the date of the first loan'],
+                            'output': 'Table'},
+                         'loans lists':
+                           {'fullname': 'Loans lists',
+                            'specificname': 'Loans lists',
+                            'gatherer':
+                                   get_keyevent_loan_lists,
+                            'extraparams': {
+                                'udc': ('textbox', 'UDC'),
+                                'loan_period': ('combobox', 'Loan period', _get_loan_periods),
+                                'max_loans': ('textbox', 'Maximum number of loans'),
+                                'min_loans': ('textbox', 'Minimum number of loans'),
+                                'publication_date': ('textbox', 'Publication date'),
+                                'creation_date': ('textbox', 'Creation date'),
+                                'user_address': ('textbox', 'User address')},
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(udc)s_%(loan_period)s' + \
+                                 '_%(min_loans)s_%(max_loans)s_%(publication_date)s_' + \
+                                 '%(creation_date)s_%(user_address)s_%(timespan)s',
+                            'rows': [],
+                            'output': 'List'},
+                          'renewals':
+                           {'fullname': 'Renewals',
+                            'specificname': 'Renewals',
+                            'gatherer':
+                                   get_keyevent_renewals_lists,
+                            'extraparams': {
+                                'udc': ('textbox', 'UDC'),
+                                'user_address': ('textbox', 'User address')},
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(udc)s_%(user_address)s_%(timespan)s',
+                            'rows': [],
+                            'output': 'List'},
+                          'number returns':
+                           {'fullname': 'Number of overdue returns',
+                            'specificname': 'Number of overdue returns',
+                            'gatherer':
+                                   get_keyevent_returns_table,
+                            'extraparams': {},
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(timespan)s',
+                            'rows': ['Number of overdue returns'],
+                            'output': 'Table'},
+                          'percentage returns':
+                           {'fullname': 'Percentage of overdue returns',
+                            'specificname': 'Percentage of overdue returns',
+                            'gatherer':
+                                   get_keyevent_trend_returns_percentage,
+                            'extraparams': {},
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(timespan)s',
+                            'ylabel': 'Percentage of overdue returns',
+                            'multiple': ['Overdue returns',
+                                         'Total returns'],
+                            'output': 'Graph'},
+                        'ill requests statistics':
+                          {'fullname': 'ILL Requests statistics',
+                            'specificname': 'ILL Requests statistics',
+                            'gatherer':
+                                   get_keyevent_ill_requests_statistics,
+                            'extraparams': {
+                                'user_address': ('textbox', 'User address'),
+                                'doctype': ('combobox', 'Type of document', _get_item_doctype),
+                                'status': ('combobox', 'Status of request', _get_request_statuses),
+                                'supplier': ('combobox', 'Supplier', _get_libraries)},
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(user_address)s_\
+                                   %(doctype)s_%(status)s_%(supplier)s_%(timespan)s',
+                            'rows': ['Number of ILL requests',
+                                     'Number of satisfied ILL requests 3 months \
+                                     after the date of request creation',
+                                     'Average time between the date and the hour \
+                                     of the ill request date and the date and the \
+                                     hour of the delivery item to the user',
+                                     'Average time between the date and the hour \
+                                     the ILL request was sent to the supplier and \
+                                     the date and hour of the delivery item'],
+                            'output': 'Table'},
+                          'ill requests list':
+                           {'fullname': 'ILL Requests list',
+                            'specificname': 'ILL Requests list',
+                            'gatherer':
+                                   get_keyevent_ill_requests_lists,
+                            'extraparams': {
+                                'doctype': ('combobox', 'Type of document', _get_item_doctype),
+                                'supplier': ('combobox', 'Supplier', _get_libraries)},
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(doctype)s_%(supplier)s_%(timespan)s',
+                            'rows': [],
+                            'output': 'List'},
+                          'percentage satisfied ill requests':
+                           {'fullname': 'Percentage of satisfied ILL requests',
+                            'specificname': 'Percentage of satisfied ILL requests',
+                            'gatherer':
+                                   get_keyevent_trend_satisfied_ill_requests_percentage,
+                            'extraparams': {
+                                'user_address': ('textbox', 'User address'),
+                                'doctype': ('combobox', 'Type of document', _get_item_doctype),
+                                'status': ('combobox', 'Status of request', _get_request_statuses),
+                                'supplier': ('combobox', 'Supplier', _get_libraries)},
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(user_address)s_\
+                                   %(doctype)s_%(status)s_%(supplier)s_%(timespan)s',
+                            'ylabel': 'Percentage of satisfied ILL requests',
+                            'multiple': ['Satisfied ILL requests',
+                                         'Total requests'],
+                            'output': 'Graph'},
+                          'items stats':
+                           {'fullname': 'Items statistics',
+                            'specificname': 'Items statistics',
+                            'gatherer':
+                                   get_keyevent_items_statistics,
+                            'extraparams': {
+                                'udc': ('textbox', 'UDC'),
+                                },
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(udc)s_%(timespan)s',
+                            'rows': ['The total number of items', 'Total number of new items'],
+                            'output': 'Table'},
+                          'items list':
+                           {'fullname': 'Items list',
+                            'specificname': 'Items list',
+                            'gatherer':
+                                   get_keyevent_items_lists,
+                            'extraparams': {
+                                'library': ('combobox', 'Library', _get_libraries),
+                                'status': ('combobox', 'Status', _get_item_statuses)},
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(library)s_%(status)s',
+                            'rows': [],
+                            'output': 'List'},
+                        'loan request statistics':
+                          {'fullname': 'Hold requests statistics',
+                            'specificname': 'Hold requests statistics',
+                            'gatherer':
+                                   get_keyevent_loan_request_statistics,
+                            'extraparams': {
+                                'item_status': ('combobox', 'Item status', _get_item_statuses)},
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(item_status)s_%(timespan)s',
+                            'rows': ['Number of hold requests, one week after the date of \
+                                        request creation',
+                                         'Number of successful hold requests transactions',
+                                         'Average time between the hold request date and \
+                                         the date of delivery document  in a year'],
+                            'output': 'Table'},
+                         'loans request lists':
+                           {'fullname': 'Hold requests lists',
+                            'specificname': 'Hold requests lists',
+                            'gatherer':
+                                   get_keyevent_loan_request_lists,
+                            'extraparams': {
+                                'udc': ('textbox', 'UDC'),
+                                'user_address': ('textbox', 'User address')},
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(udc)s_%(user_address)s_%(timespan)s',
+                            'rows': [],
+                            'output': 'List'},
+                         'user statistics':
+                           {'fullname': 'Users statistics',
+                            'specificname': 'Users statistics',
+                            'gatherer':
+                                   get_keyevent_user_statistics,
+                            'extraparams': {'user_address': ('textbox', 'User address')},
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(user_address)s_%(timespan)s',
+                            'rows': ['Number of active users'],
+                            'output': 'Table'},
+                         'user lists':
+                           {'fullname': 'Users lists',
+                            'specificname': 'Users lists',
+                            'gatherer':
+                                   get_keyevent_user_lists,
+                            'extraparams': {'user_address': ('textbox', 'User address')},
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(user_address)s_%(timespan)s',
+                            'rows': [],
+                            'output': 'List'}
+
                        }
 
 # CLI
 
-def create_customevent(id=None, name=None, cols=[]):
+def create_customevent(event_id=None, name=None, cols=[]):
     """
     Creates a new custom event by setting up the necessary MySQL tables.
 
-    @param id: Proposed human-readable id of the new event.
-    @type id: str
+    @param event_id: Proposed human-readable id of the new event.
+    @type event_id: str
 
     @param name: Optionally, a descriptive name.
     @type name: str
@@ -132,16 +427,18 @@ def create_customevent(id=None, name=None, cols=[]):
     @return: A status message
     @type: str
     """
-    if id is None:
+    if event_id is None:
         return "Please specify a human-readable ID for the event."
 
     # Only accept id and name with standard characters
-    if not re.search("[^\w]", str(id) + str(name)) is None:
-        return "Please note that both event id and event name needs to be written without any non-standard characters."
+    if not re.search("[^\w]", str(event_id) + str(name)) is None:
+        return "Please note that both event id and event name needs to be " + \
+                  "written without any non-standard characters."
 
     # Make sure the chosen id is not already taken
-    if len(run_sql("SELECT NULL FROM staEVENT WHERE id = %s", (id,))) != 0:
-        return "Event id [%s] already exists! Aborted." % id
+    if len(run_sql("SELECT NULL FROM staEVENT WHERE id = %s",
+                   (event_id, ))) != 0:
+        return "Event id [%s] already exists! Aborted." % event_id
 
     # Check if the cols are valid titles
     for argument in cols:
@@ -149,7 +446,7 @@ def create_customevent(id=None, name=None, cols=[]):
             return "Invalid column title: %s! Aborted." % argument
 
     # Insert a new row into the events table describing the new event
-    sql_param = [id]
+    sql_param = [event_id]
     if name is not None:
         sql_name = "%s"
         sql_param.append(name)
@@ -160,10 +457,10 @@ def create_customevent(id=None, name=None, cols=[]):
         sql_param.append(cPickle.dumps(cols))
     else:
         sql_cols = "NULL"
-    run_sql("INSERT INTO staEVENT (id, name, cols) VALUES (%s, " + sql_name + ", " + sql_cols + ")",
-            tuple(sql_param))
+    run_sql("INSERT INTO staEVENT (id, name, cols) VALUES (%s, " + \
+                sql_name + ", " + sql_cols + ")", tuple(sql_param))
 
-    tbl_name = get_customevent_table(id)
+    tbl_name = get_customevent_table(event_id)
 
     # Create a table for the new event
     sql_query = ["CREATE TABLE %s (" % tbl_name]
@@ -179,15 +476,17 @@ def create_customevent(id=None, name=None, cols=[]):
 
     # We're done! Print notice containing the name of the event.
     return ("Event table [%s] successfully created.\n" +
-            "Please use event id [%s] when registering an event.") % (tbl_name, id)
+            "Please use event id [%s] when registering an event.") \
+            % (tbl_name, event_id)
 
-def modify_customevent(id=None, name=None, cols=[]):
+
+def modify_customevent(event_id=None, name=None, cols=[]):
     """
     Modify a custom event. It can modify the columns definition
     or/and the descriptive name
 
-    @param id: Human-readable id of the event.
-    @type id: str
+    @param event_id: Human-readable id of the event.
+    @type event_id: str
 
     @param name: Optionally, a descriptive name.
     @type name: str
@@ -198,19 +497,21 @@ def modify_customevent(id=None, name=None, cols=[]):
     @return: A status message
     @type: str
     """
-    if id is None:
+    if event_id is None:
         return "Please specify a human-readable ID for the event."
 
     # Only accept name with standard characters
     if not re.search("[^\w]", str(name)) is None:
-        return "Please note that event name needs to be written without any non-standard characters."
+        return "Please note that event name needs to be written " + \
+            "without any non-standard characters."
 
     # Check if the cols are valid titles
     for argument in cols:
         if (argument == "creation_time") or (argument == "id"):
             return "Invalid column title: %s! Aborted." % argument
 
-    res = run_sql("SELECT CONCAT('staEVENT', number), cols FROM staEVENT WHERE id = %s", (id,))
+    res = run_sql("SELECT CONCAT('staEVENT', number), cols " + \
+                      "FROM staEVENT WHERE id = %s", (event_id, ))
     cols_orig = cPickle.loads(res[0][1])
 
     # add new cols
@@ -251,38 +552,42 @@ def modify_customevent(id=None, name=None, cols=[]):
         sql_param.append(name)
     if sql_param:
         sql_query[-1] = "WHERE id = %s"
-        sql_param.append(id)
+        sql_param.append(event_id)
         sql_str = ' '.join(sql_query)
         run_sql(sql_str, sql_param)
 
     # We're done! Print notice containing the name of the event.
-    return ("Event table [%s] successfully modified." % (id,))
+    return ("Event table [%s] successfully modified." % (event_id, ))
 
-def destroy_customevent(id=None):
+
+def destroy_customevent(event_id=None):
     """
     Removes an existing custom event by destroying the MySQL tables and
     the event data that might be around. Use with caution!
 
-    @param id: Human-readable id of the event to be removed.
-    @type id: str
+    @param event_id: Human-readable id of the event to be removed.
+    @type event_id: str
 
     @return: A status message
     @type: str
     """
-    if id is None:
+    if event_id is None:
         return "Please specify an existing event id."
 
     # Check if the specified id exists
-    if len(run_sql("SELECT NULL FROM staEVENT WHERE id = %s", (id,))) == 0:
-        return "Event id [%s] doesn't exist! Aborted." % id
+    if len(run_sql("SELECT NULL FROM staEVENT WHERE id = %s",
+                   (event_id, ))) == 0:
+        return "Event id [%s] doesn't exist! Aborted." % event_id
     else:
-        tbl_name = get_customevent_table(id)
-        run_sql("DROP TABLE %s" % tbl_name)
-        run_sql("DELETE FROM staEVENT WHERE id = %s", (id,))
+        tbl_name = get_customevent_table(event_id)
+        run_sql("DROP TABLE %s" % (tbl_name))
+        run_sql("DELETE FROM staEVENT WHERE id = %s", (event_id, ))
         return ("Event with id [%s] was successfully destroyed.\n" +
-                "Table [%s], with content, was destroyed.") % (id, tbl_name)
+                "Table [%s], with content, was destroyed.") \
+                % (event_id, tbl_name)
 
-def register_customevent(id, *arguments):
+
+def register_customevent(event_id, *arguments):
     """
     Registers a custom event. Will add to the database's event tables
     as created by create_customevent().
@@ -291,13 +596,14 @@ def register_customevent(id, *arguments):
     called throughout Invenio where one wants to register a
     custom event! Refer to the help section on the admin web page.
 
-    @param id: Human-readable id of the event to be registered
-    @type id: str
+    @param event_id: Human-readable id of the event to be registered
+    @type event_id: str
 
     @param *arguments: The rest of the parameters of the function call
     @type *arguments: [params]
     """
-    res = run_sql("SELECT CONCAT('staEVENT', number),cols FROM staEVENT WHERE id = %s",  (id,))
+    res = run_sql("SELECT CONCAT('staEVENT', number),cols " + \
+                      "FROM staEVENT WHERE id = %s", (event_id, ))
     if not res:
         return # the id does not exist
     tbl_name = res[0][0]
@@ -326,7 +632,8 @@ def register_customevent(id, *arguments):
         sql_str = ''.join(sql_query)
         run_sql(sql_str, tuple(sql_param))
     else:
-        run_sql("INSERT INTO %s () VALUES ()" % tbl_name)
+        run_sql("INSERT INTO %s () VALUES ()" % (tbl_name))
+
 
 def cache_keyevent_trend(ids=[]):
     """
@@ -341,38 +648,47 @@ def cache_keyevent_trend(ids=[]):
     args = {}
     timespans = _get_timespans()
 
-    for id in ids:
-        args['id'] = id
-        extraparams = KEYEVENT_REPOSITORY[id]['extraparams']
+    for event_id in ids:
+        args['event_id'] = event_id
+        extraparams = KEYEVENT_REPOSITORY[event_id]['extraparams']
 
-        # Construct all combinations of extraparams and store as [{param name: arg value}]
-        # so as we can loop over them and just pattern-replace the each dictionary against
-        # the KEYEVENT_REPOSITORY['id']['cachefilename'].
+        # Construct all combinations of extraparams and store as
+        # [{param name: arg value}] so as we can loop over them and just
+        # pattern-replace the each dictionary against
+        # the KEYEVENT_REPOSITORY['event_id']['cachefilename'].
         combos = [[]]
-        for x in [[(param, x[0]) for x in extraparams[param][1]()] for param in extraparams]:
-            combos = [i + [y] for y in x for i in combos]
-        combos = [dict(x) for x in combos]
+        for extra in [[(param, extra[0]) for extra in extraparams[param][1]()]
+                  for param in extraparams]:
+            combos = [i + [y] for y in extra for i in combos]
+        combos = [dict(extra) for extra in combos]
 
         for i in range(len(timespans)):
             # Get timespans parameters
             args['timespan'] = timespans[i][0]
-            args.update({ 't_start': timespans[i][2], 't_end': timespans[i][3], 'granularity': timespans[i][4],
-                          't_format': timespans[i][5], 'xtic_format': timespans[i][6] })
+
+            args.update({'t_start': timespans[i][2], 't_end': timespans[i][3],
+                          'granularity': timespans[i][4],
+                          't_format': timespans[i][5],
+                          'xtic_format': timespans[i][6]})
 
             for combo in combos:
                 args.update(combo)
 
                 # Create unique filename for this combination of parameters
-                filename = KEYEVENT_REPOSITORY[id]['cachefilename'] \
-                            % dict([(param, re.subn("[^\w]", "_", args[param])[0]) for param in args])
+                filename = KEYEVENT_REPOSITORY[event_id]['cachefilename'] \
+                            % dict([(param, re.subn("[^\w]", "_",
+                                           args[param])[0]) for param in args])
 
-                # Create closure of gatherer function in case cache needs to be refreshed
-                gatherer = lambda: KEYEVENT_REPOSITORY[id]['gatherer'](args)
+                # Create closure of gatherer function in case cache
+                # needs to be refreshed
+                gatherer = lambda: KEYEVENT_REPOSITORY[event_id] \
+                    ['gatherer'](args)
 
                 # Get data file from cache, ALWAYS REFRESH DATA!
                 _get_file_using_cache(filename, gatherer, True).read()
 
     return True
+
 
 def cache_customevent_trend(ids=[]):
     """
@@ -387,27 +703,32 @@ def cache_customevent_trend(ids=[]):
     args = {}
     timespans = _get_timespans()
 
-    for id in ids:
-        args['id'] = id
+    for event_id in ids:
+        args['event_id'] = event_id
         args['cols'] = []
 
         for i in range(len(timespans)):
             # Get timespans parameters
             args['timespan'] = timespans[i][0]
-            args.update({ 't_start': timespans[i][2], 't_end': timespans[i][3], 'granularity': timespans[i][4],
-                          't_format': timespans[i][5], 'xtic_format': timespans[i][6] })
+            args.update({'t_start': timespans[i][2], 't_end': timespans[i][3],
+                          'granularity': timespans[i][4],
+                          't_format': timespans[i][5],
+                          'xtic_format': timespans[i][6]})
 
             # Create unique filename for this combination of parameters
-            filename = "webstat_customevent_%(id)s_%(timespan)s" \
-                        % { 'id': re.subn("[^\w]", "_", id)[0], 'timespan': re.subn("[^\w]", "_", args['timespan'])[0] }
+            filename = "webstat_customevent_%(event_id)s_%(timespan)s" \
+                        % {'event_id': re.subn("[^\w]", "_", event_id)[0],
+                        'timespan': re.subn("[^\w]", "_", args['timespan'])[0]}
 
-            # Create closure of gatherer function in case cache needs to be refreshed
+            # Create closure of gatherer function in case cache
+            # needs to be refreshed
             gatherer = lambda: get_customevent_trend(args)
 
             # Get data file from cache, ALWAYS REFRESH DATA!
             _get_file_using_cache(filename, gatherer, True).read()
 
     return True
+
 
 def basket_display():
     """
@@ -418,12 +739,16 @@ def basket_display():
         # custom event baskets not defined, so return empty output:
         return []
     try:
-        res = run_sql("SELECT creation_time FROM %s ORDER BY creation_time" % tbl_name)
+        res = run_sql("SELECT creation_time FROM %s ORDER BY creation_time"
+                      % tbl_name)
         days = (res[-1][0] - res[0][0]).days + 1
-        public = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'display_public'" % tbl_name)[0][0]
+        public = run_sql("SELECT COUNT(*) FROM %s " % tbl_name + \
+                             "WHERE action = 'display_public'")[0][0]
         users = run_sql("SELECT COUNT(DISTINCT user) FROM %s" % tbl_name)[0][0]
-        adds = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'add'" % tbl_name)[0][0]
-        displays = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'display' OR action = 'display_public'" % tbl_name)[0][0]
+        adds = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'add'"
+                       % tbl_name)[0][0]
+        displays = run_sql("SELECT COUNT(*) FROM %s " % tbl_name + \
+                 "WHERE action = 'display' OR action = 'display_public'")[0][0]
         hits = adds + displays
         average = hits / days
 
@@ -437,6 +762,7 @@ def basket_display():
 
     return res
 
+
 def alert_display():
     """
     Display alert statistics.
@@ -446,13 +772,16 @@ def alert_display():
         # custom event alerts not defined, so return empty output:
         return []
     try:
-        res = run_sql("SELECT creation_time FROM %s ORDER BY creation_time" % tbl_name)
+        res = run_sql("SELECT creation_time FROM %s ORDER BY creation_time"
+                      % tbl_name)
         days = (res[-1][0] - res[0][0]).days + 1
-        res = run_sql("SELECT COUNT(DISTINCT user),COUNT(*) FROM %s" % tbl_name)
+        res = run_sql("SELECT COUNT(DISTINCT user),COUNT(*) FROM %s" % (tbl_name))
         users = res[0][0]
         hits = res[0][1]
-        displays = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'list'" % tbl_name)[0][0]
-        search = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'display'" % tbl_name)[0][0]
+        displays = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'list'"
+                           % tbl_name)[0][0]
+        search = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'display'"
+                         % tbl_name)[0][0]
         average = hits / days
 
         res = [("Alerts page hits", hits)]
@@ -465,27 +794,64 @@ def alert_display():
 
     return res
 
-def get_url_customevent(url_dest, id, *arguments):
+
+def loan_display():
+    """
+    Display loan statistics.
+    """
+    try:
+        total = run_sql("SELECT COUNT(*) FROM crcLOAN")[0][0]
+        toppop = run_sql("SELECT id_bibrec, COUNT(DISTINCT id_crcBORROWER) \
+                      FROM crcLOAN GROUP BY id_bibrec \
+                      HAVING COUNT(DISTINCT id_crcBORROWER) = (SELECT MAX(n) from (\
+                      SELECT COUNT(DISTINCT id_crcBORROWER) n \
+                      FROM crcLOAN GROUP BY id_bibrec) aux)")
+        topreq = run_sql("SELECT id_bibrec, COUNT(DISTINCT id_crcBORROWER) " +
+                         "FROM crcLOANREQUEST GROUP BY id_bibrec " +
+                         "HAVING COUNT(DISTINCT id_crcBORROWER) = (SELECT MAX(n) from (" +
+                         "SELECT COUNT(DISTINCT id_crcBORROWER) n " +
+                         "FROM crcLOANREQUEST GROUP BY id_bibrec) aux)")
+        res = [("Loans", total)]
+        for record in toppop:
+            res.append(("   Most popular records",
+                        book_title_from_MARC(record[0]) + '(%d)' % record[1]))
+        for record in topreq:
+            res.append(("   Most requested records",
+                        book_title_from_MARC(record[0]) + '(%d)' % record[1]))
+        loans, renewals, returns, illrequests, holdrequests = \
+                get_keyevent_bibcirculation_report()
+        res.append(("Yearly report", ''))
+        res.append(("   Loans", loans))
+        res.append(("   Renewals", renewals))
+        res.append(("   Returns", returns))
+        res.append(("   ILL requests", illrequests))
+        res.append(("   Hold requests", holdrequests))
+        return res
+    except IndexError:
+        return []
+
+
+def get_url_customevent(url_dest, event_id, *arguments):
     """
     Get an url for registers a custom event. Every time is load the
     url will register a customevent as register_customevent().
 
-    @param id: Human-readable id of the event to be registered
-    @type id: str
+    @param event_id: Human-readable id of the event to be registered
+    @type event_id: str
 
     @param *arguments: The rest of the parameters of the function call
                        the param "WEBSTAT_IP" will tell webstat that here
                        should be the IP who request the url
     @type *arguments: [params]
 
-    @param id: url to redirect after register the event
-    @type id: str
+    @param url_dest: url to redirect after register the event
+    @type url_dest: str
 
     @return: url for register event
     @type: str
     """
-    return "%s/stats/customevent_register?id=%s&arg=%s&url=%s" % \
-            (CFG_SITE_URL, id, ','.join(arguments[0]), quote(url_dest))
+    return "%s/stats/customevent_register?event_id=%s&arg=%s&url=%s" % \
+            (CFG_SITE_URL, event_id, ','.join(arguments[0]), quote(url_dest))
 
 # WEB
 
@@ -502,9 +868,9 @@ def perform_request_index(ln=CFG_SITE_LANG):
     # Prepare the health base data
     health_indicators = []
     now = datetime.datetime.now()
-    yesterday = (now-datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+    yesterday = (now - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
     today = now.strftime("%Y-%m-%d")
-    tomorrow = (now+datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+    tomorrow = (now + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
 
     # Append session information to the health box
     if conf.get("general", "visitors_box") == "True":
@@ -515,29 +881,41 @@ def perform_request_index(ln=CFG_SITE_LANG):
 
     # Append searches information to the health box
     if conf.get("general", "search_box") == "True":
-        args = { 't_start': today, 't_end': tomorrow, 'granularity': "day", 't_format': "%Y-%m-%d" }
+        args = {'t_start': today, 't_end': tomorrow,
+                 'granularity': "day", 't_format': "%Y-%m-%d"}
         searches = get_keyevent_trend_search_type_distribution(args)
-        health_indicators.append(("Searches since midnight", sum(searches[0][1])))
+        health_indicators.append(("Searches since midnight",
+                                  sum(searches[0][1])))
         health_indicators.append(("    Simple", searches[0][1][0]))
         health_indicators.append(("    Advanced", searches[0][1][1]))
         health_indicators.append(None)
 
     # Append new records information to the health box
     if conf.get("general", "record_box") == "True":
-        args = { 'collection': CFG_SITE_NAME, 't_start': today, 't_end': tomorrow, 'granularity': "day", 't_format': "%Y-%m-%d" }
-        try: tot_records = get_keyevent_trend_collection_population(args)[0][1]
-        except IndexError: tot_records = 0
-        args = { 'collection': CFG_SITE_NAME, 't_start': yesterday, 't_end': today, 'granularity': "day", 't_format': "%Y-%m-%d" }
-        try: new_records = tot_records - get_keyevent_trend_collection_population(args)[0][1]
-        except IndexError: new_records = 0
+        args = {'collection': CFG_SITE_NAME, 't_start': today,
+                 't_end': tomorrow, 'granularity': "day",
+                 't_format': "%Y-%m-%d"}
+        try:
+            tot_records = get_keyevent_trend_collection_population(args)[0][1]
+        except IndexError:
+            tot_records = 0
+        args = {'collection': CFG_SITE_NAME, 't_start': yesterday,
+                 't_end': today, 'granularity': "day", 't_format': "%Y-%m-%d"}
+        try:
+            new_records = tot_records - \
+                get_keyevent_trend_collection_population(args)[0][1]
+        except IndexError:
+            new_records = 0
         health_indicators.append(("Total records", tot_records))
-        health_indicators.append(("    New records since midnight", new_records))
+        health_indicators.append(("    New records since midnight",
+                                  new_records))
         health_indicators.append(None)
 
     # Append status of BibSched queue to the health box
     if conf.get("general", "bibsched_box") == "True":
         bibsched = get_keyevent_snapshot_bibsched_status()
-        health_indicators.append(("BibSched queue", sum([x[1] for x in bibsched])))
+        health_indicators.append(("BibSched queue",
+                                  sum([x[1] for x in bibsched])))
         for item in bibsched:
             health_indicators.append(("    " + item[0], str(item[1])))
         health_indicators.append(None)
@@ -552,13 +930,20 @@ def perform_request_index(ln=CFG_SITE_LANG):
         health_indicators += alert_display()
         health_indicators.append(None)
 
+    # Append loans stats to the health box
+    if conf.get("general", "loan_box") == "True":
+        health_indicators += loan_display()
+        health_indicators.append(None)
+
     # Append number of Apache processes to the health box
     if conf.get("general", "apache_box") == "True":
-        health_indicators.append(("Apache processes", get_keyevent_snapshot_apache_processes()))
+        health_indicators.append(("Apache processes",
+                                  get_keyevent_snapshot_apache_processes()))
 
     # Append uptime and load average to the health box
     if conf.get("general", "uptime_box") == "True":
-        health_indicators.append(("Uptime cmd", get_keyevent_snapshot_uptime_cmd()))
+        health_indicators.append(("Uptime cmd",
+                                  get_keyevent_snapshot_uptime_cmd()))
 
     # Display the health box
     out += TEMPLATES.tmpl_system_health(health_indicators, ln=ln)
@@ -569,9 +954,20 @@ def perform_request_index(ln=CFG_SITE_LANG):
     # Display the custom statistics
     out += TEMPLATES.tmpl_customevent_list(_get_customevents(), ln=ln)
 
+    # Display error log analyzer
+    out += TEMPLATES.tmpl_error_log_statistics_list(ln=ln)
+
+    # Display annual report
+    out += TEMPLATES.tmpl_custom_summary(ln=ln)
+
+    # Display test for collections
+    out += TEMPLATES.tmpl_collection_stats_list(get_collection_list_plus_all(), ln=ln)
+
     return out
 
-def perform_display_keyevent(id=None, args={}, req=None, ln=CFG_SITE_LANG):
+
+def perform_display_keyevent(event_id=None, args={},
+                             req=None, ln=CFG_SITE_LANG):
     """
     Display key events using a certain output type over the given time span.
 
@@ -584,19 +980,40 @@ def perform_display_keyevent(id=None, args={}, req=None, ln=CFG_SITE_LANG):
     @param req: The Apache request object, necessary for export redirect.
     @type req:
     """
-    # Get all the option lists: { parameter name: [(argument internal name, argument full name)]}
-    options = dict([(param,
-                     (KEYEVENT_REPOSITORY[id]['extraparams'][param][0],
-                      KEYEVENT_REPOSITORY[id]['extraparams'][param][1]())) for param in
-                    KEYEVENT_REPOSITORY[id]['extraparams']] +
-                   [('timespan', ('Time span', _get_timespans())), ('format', ('Output format', _get_formats()))])
-    # Order of options
-    order = [param for param in KEYEVENT_REPOSITORY[id]['extraparams']] + ['timespan', 'format']
-    # Build a dictionary for the selected parameters: { parameter name: argument internal name }
-    choosed = dict([(param, args[param]) for param in KEYEVENT_REPOSITORY[id]['extraparams']] +
-                   [('timespan', args['timespan']), ('format', args['format'])])
+    # Get all the option lists:
+    # { parameter name: [(argument internal name, argument full name)]}
+    options = dict()
+    order = []
+    for param in KEYEVENT_REPOSITORY[event_id]['extraparams']:
+        # Order of options
+        order.append(param)
+
+        if KEYEVENT_REPOSITORY[event_id]['extraparams'][param][0] == 'combobox':
+            options[param] = ('combobox',
+                     KEYEVENT_REPOSITORY[event_id]['extraparams'][param][1],
+                      KEYEVENT_REPOSITORY[event_id]['extraparams'][param][2]())
+        else:
+            options[param] = (KEYEVENT_REPOSITORY[event_id]['extraparams'][param][0],
+                     (KEYEVENT_REPOSITORY[event_id]['extraparams'][param][1]))
+
+    # Build a dictionary for the selected parameters:
+    # { parameter name: argument internal name }
+    choosed = dict([(param, args[param]) for param in KEYEVENT_REPOSITORY
+                    [event_id]['extraparams']])
+    if KEYEVENT_REPOSITORY[event_id]['output'] == 'Graph':
+        options['format'] = ('combobox', 'Output format', _get_formats())
+        choosed['format'] = args['format']
+        order += ['format']
+    if event_id != 'items list':
+        options['timespan'] = ('combobox', 'Time span', _get_timespans())
+        choosed['timespan'] = args['timespan']
+        order += ['timespan']
+        choosed['s_date'] = args['s_date']
+        choosed['f_date'] = args['f_date']
+
     # Send to template to prepare event customization FORM box
-    out = TEMPLATES.tmpl_keyevent_box(options, order, choosed, ln=ln)
+    excel = KEYEVENT_REPOSITORY[event_id]['output'] == 'List'
+    out = TEMPLATES.tmpl_keyevent_box(options, order, choosed, ln=ln, excel=excel)
 
     # Arguments OK?
 
@@ -605,51 +1022,71 @@ def perform_display_keyevent(id=None, args={}, req=None, ln=CFG_SITE_LANG):
         return out
 
     # Make sure extraparams are valid, if any
-    for param in choosed:
-        if not choosed[param] in [x[0] for x in options[param][1]]:
-            return out + TEMPLATES.tmpl_error('Please specify a valid value for parameter "%s".'
+    if KEYEVENT_REPOSITORY[event_id]['output'] == 'Graph' and \
+            event_id != 'percentage satisfied ill requests':
+        for param in choosed:
+            if param in options and options[param] == 'combobox' and \
+                    not choosed[param] in [x[0] for x in options[param][2]]:
+                return out + TEMPLATES.tmpl_error(
+                'Please specify a valid value for parameter "%s".'
                                                % options[param][0], ln=ln)
 
     # Arguments OK beyond this point!
 
-    # Get unique name for caching purposes (make sure that the params used in the filename are safe!)
-    filename = KEYEVENT_REPOSITORY[id]['cachefilename'] \
-               % dict([(param, re.subn("[^\w]", "_", choosed[param])[0]) for param in choosed] +
-                      [('id', re.subn("[^\w]", "_", id)[0])])
+    # Get unique name for caching purposes (make sure that the params used
+    # in the filename are safe!)
+    filename = KEYEVENT_REPOSITORY[event_id]['cachefilename'] \
+               % dict([(param, re.subn("[^\w]", "_", choosed[param])[0])
+                       for param in choosed] +
+                      [('event_id', re.subn("[^\w]", "_", event_id)[0])])
 
     # Get time parameters from repository
-    # TODO: This should quite possibly be lifted out (webstat_engine?), in any case a cleaner repository
-    _, t_fullname, t_start, t_end, granularity, t_format, xtic_format = \
-        options['timespan'][1][[x[0] for x in options['timespan'][1]].index(choosed['timespan'])]
-    args = { 't_start': t_start, 't_end': t_end, 'granularity': granularity,
-             't_format': t_format, 'xtic_format': xtic_format }
-    for param in KEYEVENT_REPOSITORY[id]['extraparams']:
-        args[param] = choosed[param]
+    if 'timespan' in choosed:
+        if choosed['timespan'] == "select date":
+            t_args = _get_time_parameters_select_date(args["s_date"], args["f_date"])
+        else:
+            t_args = _get_time_parameters(options, choosed['timespan'])
+    else:
+        t_args = args
+    for param in KEYEVENT_REPOSITORY[event_id]['extraparams']:
+        t_args[param] = choosed[param]
 
     # Create closure of frequency function in case cache needs to be refreshed
-    gatherer = lambda: KEYEVENT_REPOSITORY[id]['gatherer'](args)
+    gatherer = lambda: KEYEVENT_REPOSITORY[event_id]['gatherer'](t_args)
 
-    # Determine if this particular file is due for scheduling cacheing, in that case we must not
-    # allow refreshing of the rawdata.
-    allow_refresh = not _is_scheduled_for_cacheing(id)
+    # Determine if this particular file is due for scheduling cacheing,
+    # in that case we must not allow refreshing of the rawdata.
+    allow_refresh = not _is_scheduled_for_cacheing(event_id)
 
     # Get data file from cache (refresh if necessary)
-    data = eval(_get_file_using_cache(filename, gatherer, allow_refresh=allow_refresh).read())
+    force = 'timespan' in choosed and choosed['timespan'] == "select date"
+    data = eval(_get_file_using_cache(filename, gatherer, force,
+                                      allow_refresh=allow_refresh).read())
 
-    # If type indicates an export, run the export function and we're done
-    if _is_type_export(choosed['format']):
-        _get_export_closure(choosed['format'])(data, req)
-        return out
-
-    # Prepare the graph settings that are being passed on to grapher
-    settings = { "title": KEYEVENT_REPOSITORY[id]['specificname'] % choosed,
-                  "xlabel": t_fullname + ' (' + granularity + ')',
-                  "ylabel": KEYEVENT_REPOSITORY[id]['ylabel'],
-                  "xtic_format": xtic_format,
+    if KEYEVENT_REPOSITORY[event_id]['output'] == 'Graph':
+        # If type indicates an export, run the export function and we're done
+        if _is_type_export(choosed['format']):
+            _get_export_closure(choosed['format'])(data, req)
+            return out
+        # Prepare the graph settings that are being passed on to grapher
+        settings = {"title": KEYEVENT_REPOSITORY[event_id]['specificname']\
+                     % choosed,
+                  "xlabel": t_args['t_fullname'] + ' (' + \
+                     t_args['granularity'] + ')',
+                  "ylabel": KEYEVENT_REPOSITORY[event_id]['ylabel'],
+                  "xtic_format": t_args['xtic_format'],
                   "format": choosed['format'],
-                  "multiple": KEYEVENT_REPOSITORY[id]['multiple'] }
+                  "multiple": KEYEVENT_REPOSITORY[event_id]['multiple']}
+    else:
+        if 'format' in args and args['format'] == 'Excel':
+            export_to_excel(data, req)
+            return out
+        settings = {"title": KEYEVENT_REPOSITORY[event_id]['specificname']\
+                     % choosed, "format": 'Table',
+                     "rows": KEYEVENT_REPOSITORY[event_id]['rows']}
+    return out + _perform_display_event(data,
+                                 os.path.basename(filename), settings, ln=ln)
 
-    return out + _perform_display_event(data, os.path.basename(filename), settings, ln=ln)
 
 def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
     """
@@ -664,25 +1101,29 @@ def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
     @param req: The Apache request object, necessary for export redirect.
     @type req:
     """
-    # Get all the option lists: { parameter name: [(argument internal name, argument full name)]}
+    # Get all the option lists:
+    # { parameter name: [(argument internal name, argument full name)]}
     cols_dict = _get_customevent_cols()
     cols_dict['__header'] = 'Argument'
     cols_dict['__none'] = []
-    options = { 'ids': ('Custom event', _get_customevents()),
+    options = {'ids': ('Custom event', _get_customevents()),
                 'timespan': ('Time span', _get_timespans()),
                 'format': ('Output format', _get_formats(True)),
-                'cols': cols_dict }
+                'cols': cols_dict}
 
-    # Build a dictionary for the selected parameters: { parameter name: argument internal name }
-    choosed = { 'ids': args['ids'], 'timespan': args['timespan'], 'format': args['format']}
+    # Build a dictionary for the selected parameters:
+    # { parameter name: argument internal name }
+    choosed = {'ids': args['ids'], 'timespan': args['timespan'],
+                'format': args['format'], 's_date': args['s_date'],
+                'f_date': args['f_date']}
     # Calculate cols
     index = []
     for key in args.keys():
         if key[:4] == 'cols':
             index.append(key[4:])
     index.sort()
-    choosed['cols'] = [ zip([""]+args['bool'+i], args['cols'+i], args['col_value'+i])
-                        for i in index ]
+    choosed['cols'] = [zip([""] + args['bool' + i], args['cols' + i],
+                            args['col_value' + i]) for i in index]
     # Send to template to prepare event customization FORM box
     out = TEMPLATES.tmpl_customevent_box(options, choosed, ln=ln)
 
@@ -693,56 +1134,36 @@ def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
         legalvalues = [x[0] for x in options[param][1]]
 
         if type(args[param]) is list:
-            # If the argument is a list, like the content of 'ids' every value has to be checked
+            # If the argument is a list, like the content of 'ids'
+            # every value has to be checked
             if len(args[param]) == 0:
-                return out + TEMPLATES.tmpl_error('Please specify a valid value for parameter "%s".' % options[param][0], ln=ln)
+                return out + TEMPLATES.tmpl_error(
+                    'Please specify a valid value for parameter "%s".'
+                    % options[param][0], ln=ln)
             for arg in args[param]:
                 if not arg in legalvalues:
-                    return out + TEMPLATES.tmpl_error('Please specify a valid value for parameter "%s".' % options[param][0], ln=ln)
+                    return out + TEMPLATES.tmpl_error(
+                        'Please specify a valid value for parameter "%s".'
+                        % options[param][0], ln=ln)
         else:
             if not args[param] in legalvalues:
-                return out + TEMPLATES.tmpl_error('Please specify a valid value for parameter "%s".' % options[param][0], ln=ln)
+                return out + TEMPLATES.tmpl_error(
+                    'Please specify a valid value for parameter "%s".'
+                        % options[param][0], ln=ln)
 
     # Fetch time parameters from repository
-    _, t_fullname, t_start, t_end, granularity, t_format, xtic_format = \
-        options['timespan'][1][[x[0] for x in options['timespan'][1]].index(choosed['timespan'])]
-    args_req = { 't_start': t_start, 't_end': t_end, 'granularity': granularity,
-                't_format': t_format, 'xtic_format': xtic_format }
-
-    data_unmerged = []
+    if choosed['timespan'] == "select date":
+        args_req = _get_time_parameters_select_date(args["s_date"],
+                                                    args["f_date"])
+    else:
+        args_req = _get_time_parameters(options, choosed['timespan'])
 
     # ASCII dump data is different from the standard formats
     if choosed['format'] == 'asciidump':
-        for i in [ str(j) for j in range(len(ids))]:
-            args['bool'+i].insert(0, "")
-            args_req['cols'+i] = zip(args['bool'+i], args['cols'+i], args['col_value'+i])
-        filename = "webstat_customevent_" + re.subn("[^\w]", "", ''.join(ids) + "_" + choosed['timespan'] + "_" + '-'.join([ ':'.join(col) for col in [ args['cols'+str(i)] for i in range(len(ids))]]) + "_asciidump")[0]
-        args_req['ids'] = ids
-        gatherer = lambda: get_customevent_dump(args_req)
-        data = eval(_get_file_using_cache(filename, gatherer).read())
+        data = perform_display_customevent_data_ascii_dump(ids, args,
+                                                           args_req, choosed)
     else:
-        for id, i in [ (ids[i], str(i)) for i in range(len(ids))]:
-            # Calculate cols
-            args_req['cols'] = choosed['cols'][int(i)]
-
-            # Get unique name for the rawdata file (wash arguments!)
-            filename = "webstat_customevent_" + re.subn("[^\w]", "", id + "_" + choosed['timespan'] + "_" + '-'.join([ ':'.join(col) for col in args_req['cols']]))[0]
-
-            # Add the current id to the gatherer's arguments
-            args_req['id'] = id
-
-            # Prepare raw data gatherer, if cache needs refreshing.
-            gatherer = lambda: get_customevent_trend(args_req)
-
-            # Determine if this particular file is due for scheduling cacheing, in that case we must not
-            # allow refreshing of the rawdata.
-            allow_refresh = not _is_scheduled_for_cacheing(id)
-
-            # Get file from cache, and evaluate it to trend data
-            data_unmerged.append(eval(_get_file_using_cache(filename, gatherer, allow_refresh=allow_refresh).read()))
-
-        # Merge data from the unmerged trends into the final destination
-        data = [(x[0][0], tuple([y[1] for y in x])) for x in zip(*data_unmerged)]
+        data = perform_display_customevent_data(ids, args_req, choosed)
 
     # If type indicates an export, run the export function and we're done
     if _is_type_export(args['format']):
@@ -752,34 +1173,175 @@ def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
     # Get full names, for those that have them
     names = []
     events = _get_customevents()
-    for id in ids:
-        temp = events[[x[0] for x in events].index(id)]
+    for event_id in ids:
+        temp = events[[x[0] for x in events].index(event_id)]
         if temp[1] != None:
             names.append(temp[1])
         else:
             names.append(temp[0])
 
     # Generate a filename for the graph
-    filename = "tmp_webstat_customevent_" + ''.join([re.subn("[^\w]", "", id)[0] for id in ids]) + "_" + choosed['timespan']
-
-    settings = { "title": 'Custom event',
-                 "xlabel": t_fullname + ' (' + granularity + ')',
+    filename = "tmp_webstat_customevent_" + ''.join([re.subn("[^\w]", "",
+                                       event_id)[0] for event_id in ids]) + "_"
+    if choosed['timespan'] == "select date":
+        filename += args_req['t_start'] + "_" + args_req['t_end']
+    else:
+        filename += choosed['timespan']
+    settings = {"title": 'Custom event',
+                 "xlabel": args_req['t_fullname'] + ' (' + \
+                     args_req['granularity'] + ')',
                  "ylabel": "Action quantity",
-                 "xtic_format": xtic_format,
+                 "xtic_format": args_req['xtic_format'],
                  "format": choosed['format'],
-                 "multiple": (type(ids) is list) and names or [] }
+                 "multiple": (type(ids) is list) and names or []}
 
-    return out + _perform_display_event(data, os.path.basename(filename), settings, ln=ln)
+    return out + _perform_display_event(data, os.path.basename(filename),
+                                        settings, ln=ln)
+
+
+def perform_display_customevent_data(ids, args_req, choosed):
+    """Returns the trend data"""
+    data_unmerged = []
+    for event_id, i in [(ids[i], str(i)) for i in range(len(ids))]:
+        # Calculate cols
+        args_req['cols'] = choosed['cols'][int(i)]
+
+        # Get unique name for the rawdata file (wash arguments!)
+        filename = "webstat_customevent_" + re.subn("[^\w]", "", event_id + \
+                   "_" + choosed['timespan'] + "_" + '-'.join([':'.join(col)
+                                            for col in args_req['cols']]))[0]
+
+        # Add the current id to the gatherer's arguments
+        args_req['event_id'] = event_id
+
+        # Prepare raw data gatherer, if cache needs refreshing.
+        gatherer = lambda: get_customevent_trend(args_req)
+
+        # Determine if this particular file is due for scheduling cacheing,
+        # in that case we must not allow refreshing of the rawdata.
+        allow_refresh = not _is_scheduled_for_cacheing(event_id)
+
+        # Get file from cache, and evaluate it to trend data
+        force = choosed['timespan'] == "select date"
+        data_unmerged.append(eval(_get_file_using_cache(filename, gatherer,
+                             force, allow_refresh=allow_refresh).read()))
+
+    # Merge data from the unmerged trends into the final destination
+    return [(x[0][0], tuple([y[1] for y in x])) for x in zip(*data_unmerged)]
+
+
+def perform_display_customevent_data_ascii_dump(ids, args, args_req, choosed):
+    """Returns the trend data"""
+    for i in [str(j) for j in range(len(ids))]:
+        args['bool' + i].insert(0, "")
+        args_req['cols' + i] = zip(args['bool' + i], args['cols' + i],
+                                 args['col_value' + i])
+    filename = "webstat_customevent_" + re.subn("[^\w]", "", ''.join(ids) +
+                "_" + choosed['timespan'] + "_" + '-'.join([':'.join(col) for
+                col in [args['cols' + str(i)] for i in range(len(ids))]]) +
+                                                "_asciidump")[0]
+    args_req['ids'] = ids
+    gatherer = lambda: get_customevent_dump(args_req)
+    force = choosed['timespan'] == "select date"
+    return eval(_get_file_using_cache(filename, gatherer, force).read())
+
+
+def perform_display_stats_per_coll(collection='All', req=None, ln=CFG_SITE_LANG):
+    """
+    Display general statistics for a given collection
+
+    @param req: The Apache request object, necessary for export redirect.
+    @type req:
+    """
+    timespan = 'this month'
+    events_id = ('download frequency', 'collection population', 'comments frequency')
+    gformat = 'gnuplot'
+    # Make sure extraparams are valid, if any
+    if not collection in [x[0] for x in get_collection_list_plus_all()]:
+        return TEMPLATES.tmpl_error('Please specify a valid value for parameter "Collection".')
+
+    # Arguments OK beyond this point!
+
+    # Get unique name for caching purposes (make sure that the params
+    # used in the filename are safe!)
+    choosed = {'timespan': timespan, 'collection': collection}
+    out = "<table>"
+    pair = False
+    for event_id in events_id:
+        filename = KEYEVENT_REPOSITORY[event_id]['cachefilename'] \
+               % dict([(param, re.subn("[^\w]", "_", choosed[param])[0])
+                       for param in choosed] +
+                      [('event_id', re.subn("[^\w]", "_", event_id)[0])])
+
+        # Get time parameters from repository
+        _, t_fullname, t_start, t_end, granularity, t_format, xtic_format = \
+            _get_timespans()[3]
+        args = {'t_start': t_start, 't_end': t_end, 'granularity': granularity,
+                't_format': t_format, 'xtic_format': xtic_format, 'collection': collection}
+        # Create closure of frequency function in case cache needs to be refreshed
+        gatherer = lambda: KEYEVENT_REPOSITORY[event_id]['gatherer'](args)
+
+        # Determine if this particular file is due for scheduling cacheing,
+        # in that case we must not allow refreshing of the rawdata.
+        allow_refresh = not _is_scheduled_for_cacheing(event_id)
+
+        # Get data file from cache (refresh if necessary)
+        data = eval(_get_file_using_cache(filename, gatherer, allow_refresh=allow_refresh).read())
+
+        # Prepare the graph settings that are being passed on to grapher
+        settings = {"title": KEYEVENT_REPOSITORY[event_id]['specificname'] % args,
+                  "xlabel": t_fullname + ' (' + granularity + ')',
+                  "ylabel": KEYEVENT_REPOSITORY[event_id]['ylabel'],
+                  "xtic_format": xtic_format,
+                  "format": gformat,
+                  "multiple": KEYEVENT_REPOSITORY[event_id]['multiple'],
+                  "size": '360,270'}
+        if not pair:
+            out += '<tr>'
+        out += '<td>%s</td>' % _perform_display_event(data,
+                                    os.path.basename(filename), settings, ln=ln)
+        if pair:
+            out += '</tr>'
+        pair = not pair
+    return out + "</table>"
+
 
 def perform_display_customevent_help(ln=CFG_SITE_LANG):
     """Display the custom event help"""
     return TEMPLATES.tmpl_customevent_help(ln=ln)
 
+
+def perform_display_error_log_analyzer(ln=CFG_SITE_LANG):
+    """Display the error log analyzer"""
+    update_error_log_analyzer()
+    return TEMPLATES.tmpl_error_log_analyzer(get_invenio_error_log_ranking(),
+                                             get_invenio_last_n_errors(5),
+                                             get_apache_error_log_ranking())
+
+
+def perform_display_custom_summary(args, ln=CFG_SITE_LANG):
+    """Display the custom summary (annual report)
+
+    @param args: { param name: argument value } (chart title, search query and output tag)
+    @type args: { str: str }
+    """
+    if args['tag'] == '':
+        args['tag'] = "909C4p"
+    data = get_custom_summary_data(args['query'], args['tag'])
+    tag_name = _get_tag_name(args['tag'])
+    if tag_name == '':
+        tag_name = args['tag']
+    path = WEBSTAT_GRAPH_DIRECTORY + os.path.basename("tmp_webstat_custom_summary_"
+                                                + args['query'] + args['tag'])
+    create_custom_summary_graph(data[:-1], path, args['title'])
+    return TEMPLATES.tmpl_display_custom_summary(tag_name, data, args['title'],
+                                    args['query'], args['tag'], path, ln=ln)
+
 # INTERNALS
 
 def _perform_display_event(data, name, settings, ln=CFG_SITE_LANG):
     """
-    Retrieves a graph.
+    Retrieves a graph or a table.
 
     @param data: The trend/dump data
     @type data: [(str, str|int|(str|int,...))] | [(str|int,...)]
@@ -796,23 +1358,37 @@ def _perform_display_event(data, name, settings, ln=CFG_SITE_LANG):
     path = WEBSTAT_GRAPH_DIRECTORY + "tmp_" + name
 
     # Generate, and insert using the appropriate template
-    if settings["format"] != "asciidump":
-        create_graph_trend(data, path, settings)
-        if settings["format"] == "asciiart":
-            return TEMPLATES.tmpl_display_event_trend_ascii(settings["title"], path, ln=ln)
-        else:
-            if settings["format"] == "gnuplot":
-                try:
-                    import Gnuplot
-                except ImportError:
-                    return 'Gnuplot is not installed. Returning ASCII art.' +\
-                           TEMPLATES.tmpl_display_event_trend_ascii(settings["title"], path, ln=ln)
-
-            return TEMPLATES.tmpl_display_event_trend_image(settings["title"], path, ln=ln)
-    else:
+    if settings["format"] == "asciidump":
         path += "_asciidump"
-        create_graph_dump(data, path, settings)
-        return TEMPLATES.tmpl_display_event_trend_ascii(settings["title"], path, ln=ln)
+        create_graph_dump(data, path)
+        return TEMPLATES.tmpl_display_event_trend_ascii(settings["title"],
+                                                        path, ln=ln)
+
+    if settings["format"] == "Table":
+        create_graph_table(data, path, settings)
+        return TEMPLATES.tmpl_display_event_trend_text(settings["title"], path, ln=ln)
+
+    create_graph_trend(data, path, settings)
+    if settings["format"] == "asciiart":
+        return TEMPLATES.tmpl_display_event_trend_ascii(
+            settings["title"], path, ln=ln)
+    else:
+        if settings["format"] == "gnuplot":
+            try:
+                import Gnuplot
+            except ImportError:
+                return 'Gnuplot is not installed. Returning ASCII art.' + \
+                       TEMPLATES.tmpl_display_event_trend_ascii(
+                    settings["title"], path, ln=ln)
+
+            return TEMPLATES.tmpl_display_event_trend_image(
+                settings["title"], path, ln=ln)
+        elif settings["format"] == "flot":
+            return TEMPLATES.tmpl_display_event_trend_text(
+                settings["title"], path, ln=ln)
+        return TEMPLATES.tmpl_display_event_trend_ascii(
+            settings["title"], path, ln=ln)
+
 
 def _get_customevents():
     """
@@ -823,7 +1399,8 @@ def _get_customevents():
     """
     return [(x[0], x[1]) for x in run_sql("SELECT id, name FROM staEVENT")]
 
-def _get_timespans(dt=None):
+
+def _get_timespans(dttime=None):
     """
     Helper function that generates possible time spans to be put in the
     drop-down in the generation box. Computes possible years, and also some
@@ -831,80 +1408,155 @@ def _get_timespans(dt=None):
     output graph, if any, since such values are closely related to the nature
     of the time span.
 
-    @param dt: A datetime object indicating the current date and time
-    @type dt: datetime.datetime
+    @param dttime: A datetime object indicating the current date and time
+    @type dttime: datetime.datetime
 
     @return: [(Internal name, Readable name, t_start, t_end, granularity, format, xtic_format)]
     @type [(str, str, str, str, str, str, str)]
     """
-    if dt is None:
-        dt = datetime.datetime.now()
+    if dttime is None:
+        dttime = datetime.datetime.now()
 
-    format = "%Y-%m-%d"
+    dtformat = "%Y-%m-%d"
     # Helper function to return a timediff object reflecting a diff of x days
     d_diff = lambda x: datetime.timedelta(days=x)
     # Helper function to return the number of days in the month x months ago
-    d_in_m = lambda x: calendar.monthrange(((dt.month-x<1) and dt.year-1 or dt.year),
-                                           (((dt.month-1)-x)%12+1))[1]
-    to_str = lambda x: x.strftime(format)
-    dt_str = to_str(dt)
+    d_in_m = lambda x: calendar.monthrange(
+        ((dttime.month - x < 1) and dttime.year - 1 or dttime.year),
+                                           (((dttime.month - 1) - x) % 12 + 1))[1]
+    to_str = lambda x: x.strftime(dtformat)
+    dt_str = to_str(dttime)
 
     spans = [("today", "Today",
               dt_str,
-              to_str(dt+d_diff(1)),
-              "hour", format, "%H"),
+              to_str(dttime + d_diff(1)),
+              "hour", dtformat, "%H"),
              ("this week", "This week",
-              to_str(dt-d_diff(dt.weekday())),
-              to_str(dt+d_diff(1)),
-              "day", format, "%a"),
+              to_str(dttime - d_diff(dttime.weekday())),
+              to_str(dttime + d_diff(1)),
+              "day", dtformat, "%a"),
              ("last week", "Last week",
-              to_str(dt-d_diff(dt.weekday()+7)),
-              to_str(dt-d_diff(dt.weekday())),
-              "day", format, "%a"),
+              to_str(dttime - d_diff(dttime.weekday() + 7)),
+              to_str(dttime - d_diff(dttime.weekday())),
+              "day", dtformat, "%a"),
              ("this month", "This month",
-              to_str(dt-d_diff(dt.day)+d_diff(1)),
-              to_str(dt+d_diff(1)),
-              "day", format, "%d"),
+              to_str(dttime - d_diff(dttime.day) + d_diff(1)),
+              to_str(dttime + d_diff(1)),
+              "day", dtformat, "%d"),
              ("last month", "Last month",
-              to_str(dt-d_diff(d_in_m(1))-d_diff(dt.day)+d_diff(1)),
-              to_str(dt-d_diff(dt.day)+d_diff(1)),
-              "day", format, "%d"),
+              to_str(dttime - d_diff(d_in_m(1)) - d_diff(dttime.day) + d_diff(1)),
+              to_str(dttime - d_diff(dttime.day) + d_diff(1)),
+              "day", dtformat, "%d"),
              ("last three months", "Last three months",
-              to_str(dt-d_diff(d_in_m(1))-d_diff(d_in_m(2))-d_diff(dt.day)+d_diff(1)),
+              to_str(dttime - d_diff(d_in_m(1)) - d_diff(d_in_m(2)) -
+                     d_diff(dttime.day) + d_diff(1)),
               dt_str,
-              "month", format, "%b"),
+              "month", dtformat, "%b"),
              ("last year", "Last year",
-              to_str((dt - datetime.timedelta(days=365)).replace(day=1)),
-              to_str((dt + datetime.timedelta(days=31)).replace(day=1)),
-              "month", format, "%b")]
+              to_str((dttime - datetime.timedelta(days=365)).replace(day=1)),
+              to_str((dttime + datetime.timedelta(days=31)).replace(day=1)),
+              "month", dtformat, "%b")]
 
     # Get first year as indicated by the content's in bibrec
     try:
-        y1 = run_sql("SELECT creation_date FROM bibrec ORDER BY creation_date LIMIT 1")[0][0].year
+        year1 = run_sql("SELECT creation_date FROM bibrec ORDER BY \
+                creation_date LIMIT 1")[0][0].year
     except IndexError:
-        y1 = dt.year
+        year1 = dttime.year
 
-    y2 = time.localtime()[0]
-    diff_year = y2 - y1
+    year2 = time.localtime()[0]
+    diff_year = year2 - year1
     if diff_year >= 2:
         spans.append(("last 2 years", "Last 2 years",
-                      to_str((dt - datetime.timedelta(days=365*2)).replace(day=1)),
-                      to_str((dt + datetime.timedelta(days=31)).replace(day=1)),
-                      "month", format, "%b"))
+                      to_str((dttime - datetime.timedelta(days=365 * 2)).replace(day=1)),
+                      to_str((dttime + datetime.timedelta(days=31)).replace(day=1)),
+                      "month", dtformat, "%b"))
     if diff_year >= 5:
         spans.append(("last 5 years", "Last 5 years",
-                      to_str((dt - datetime.timedelta(days=365*5)).replace(day=1)),
-                      to_str((dt + datetime.timedelta(days=31)).replace(day=1)),
-                      "year", format, "%Y"))
+                      to_str((dttime - datetime.timedelta(days=365 * 5)).replace(day=1)),
+                      to_str((dttime + datetime.timedelta(days=31)).replace(day=1)),
+                      "year", dtformat, "%Y"))
     if diff_year >= 10:
         spans.append(("last 10 years", "Last 10 years",
-                      to_str((dt - datetime.timedelta(days=365*10)).replace(day=1)),
-                      to_str((dt + datetime.timedelta(days=31)).replace(day=1)),
-                      "year", format, "%Y"))
-    spans.append(("full history", "Full history", str(y1), str(y2+1), "year", "%Y", "%Y"))
-    spans.extend([(str(x), str(x), str(x), str(x+1), "month", "%Y", "%b") for x in range(y2, y1-1, -1)])
+                      to_str((dttime - datetime.timedelta(days=365 * 10)).replace(day=1)),
+                      to_str((dttime + datetime.timedelta(days=31)).replace(day=1)),
+                      "year", dtformat, "%Y"))
+    spans.append(("full history", "Full history", str(year1), str(year2 + 1),
+                  "year", "%Y", "%Y"))
+    spans.extend([(str(x), str(x), str(x), str(x + 1), "month", "%Y", "%b")
+                  for x in range(year2, year1 - 1, -1)])
+
+    spans.append(("select date", "Select date...", "", "",
+                  "hour", dtformat, "%H"))
 
     return spans
+
+
+def _get_time_parameters(options, timespan):
+    """
+    Returns the time parameters from the repository when it is a default timespan
+    @param options: A dictionary with the option lists
+    @type options: { parameter name: [(argument internal name, argument full name)]}
+
+    @param timespan: name of the chosen timespan
+    @type timespan: str
+
+    @return: [(Full name, t_start, t_end, granularity, format, xtic_format)]
+    @type [(str, str, str, str, str, str, str)]
+    """
+    if len(options['timespan']) == 2:
+        i = 1
+    else:
+        i = 2
+    _, t_fullname, t_start, t_end, granularity, t_format, xtic_format = \
+            options['timespan'][i][[x[0]
+                          for x in options['timespan'][i]].index(timespan)]
+    return {'t_fullname': t_fullname, 't_start': t_start, 't_end': t_end,
+            'granularity': granularity, 't_format': t_format,
+            'xtic_format': xtic_format}
+
+
+def _get_time_parameters_select_date(s_date, f_date):
+    """
+    Returns the time parameters from the repository when it is a custom timespan
+    @param s_date: start date for the graph
+    @type s_date: str %m/%d/%Y %H:%M
+
+    @param f_date: finish date for the graph
+    @type f_date: str %m/%d/%Y %H:%M
+
+    @return: [(Full name, t_start, t_end, granularity, format, xtic_format)]
+    @type [(str, str, str, str, str, str, str)]
+    """
+
+    t_fullname = "%s-%s" % (s_date, f_date)
+    dt_start = datetime.datetime.strptime(s_date, "%m/%d/%Y %H:%M")
+    dt_end = datetime.datetime.strptime(f_date, "%m/%d/%Y %H:%M")
+    if dt_end - dt_start <= timedelta(hours=1):
+        xtic_format = "%m:%s"
+        granularity = 'second'
+    elif dt_end - dt_start <= timedelta(days=3):
+        xtic_format = "%H:%m"
+        granularity = 'minute'
+    elif dt_end - dt_start <= timedelta(days=7):
+        xtic_format = "%H"
+        granularity = 'hour'
+    elif dt_end - dt_start <= timedelta(days=60):
+        xtic_format = "%a"
+        granularity = 'day'
+    elif dt_end - dt_start <= timedelta(days=730):
+        xtic_format = "%d"
+        granularity = 'month'
+    else:
+        xtic_format = "%H"
+        granularity = 'hour'
+    t_format = "%Y-%m-%d %H:%M:%S"
+    t_start = dt_start.strftime("%Y-%m-%d %H:%M:%S")
+    t_end = dt_end.strftime("%Y-%m-%d %H:%M:%S")
+    return {'t_fullname': t_fullname, 't_start': t_start, 't_end': t_end,
+            'granularity': granularity, 't_format': t_format,
+            'xtic_format': xtic_format}
+
 
 def _get_formats(with_dump=False):
     """
@@ -924,7 +1576,8 @@ def _get_formats(with_dump=False):
     else:
         return [(x[0], x[1]) for x in TYPE_REPOSITORY if x[0] != 'asciidump']
 
-def _get_customevent_cols(id=""):
+
+def _get_customevent_cols(event_id=""):
     """
     List of all the diferent name of columns in customevents.
 
@@ -933,17 +1586,19 @@ def _get_customevent_cols(id=""):
     """
     sql_str = "SELECT id,cols FROM staEVENT"
     sql_param = []
-    if id:
+    if event_id:
         sql_str += "WHERE id = %s"
-        sql_param.append(id)
+        sql_param.append(event_id)
     cols = {}
-    for x in run_sql(sql_str, sql_param):
-        if x[0]:
-            if x[1]:
-                cols[x[0]] = [ (name, name) for name in cPickle.loads(x[1]) ]
+    for event in run_sql(sql_str, sql_param):
+        if event[0]:
+            if event[1]:
+                cols[event[0]] = [(name, name) for name
+                                   in cPickle.loads(event[1])]
             else:
-                cols[x[0]] = []
+                cols[event[0]] = []
     return cols
+
 
 def _is_type_export(typename):
     """
@@ -956,7 +1611,9 @@ def _is_type_export(typename):
     @return: Information whether a certain type exports data
     @type: bool
     """
-    return len(TYPE_REPOSITORY[[x[0] for x in TYPE_REPOSITORY].index(typename)]) == 3
+    return len(TYPE_REPOSITORY[[x[0] for x in
+                                TYPE_REPOSITORY].index(typename)]) == 3
+
 
 def _get_export_closure(typename):
     """
@@ -970,6 +1627,7 @@ def _get_export_closure(typename):
     @type: function
     """
     return TYPE_REPOSITORY[[x[0] for x in TYPE_REPOSITORY].index(typename)][2]
+
 
 def _get_file_using_cache(filename, closure, force=False, allow_refresh=True):
     """
@@ -998,11 +1656,12 @@ def _get_file_using_cache(filename, closure, force=False, allow_refresh=True):
     try:
         mtime = os.path.getmtime(filename)
     except OSError:
-        # No cached version of this particular file exists, thus the modification
-        # time is set to 0 for easy logic below.
+        # No cached version of this particular file exists, thus the
+        # modification time is set to 0 for easy logic below.
         mtime = 0
 
-    # Consider refreshing cache if FORCE or NO CACHE AT ALL, or CACHE EXIST AND REFRESH IS ALLOWED.
+    # Consider refreshing cache if FORCE or NO CACHE AT ALL,
+    # or CACHE EXIST AND REFRESH IS ALLOWED.
     if force or mtime == 0 or (mtime > 0 and allow_refresh):
 
         # Is the file modification time recent enough?
@@ -1017,10 +1676,11 @@ def _get_file_using_cache(filename, closure, force=False, allow_refresh=True):
     # Return the (perhaps just) cached file
     return open(filename, 'r')
 
-def _is_scheduled_for_cacheing(id):
+
+def _is_scheduled_for_cacheing(event_id):
     """
-    @param id: The event id
-    @type id: str
+    @param event_id: The event id
+    @type event_id: str
 
     @return: Indication of if the event id is scheduling for BibSched execution.
     @type: bool
@@ -1030,9 +1690,10 @@ def _is_scheduled_for_cacheing(id):
 
     # Get the task id
     try:
-        task_id = get_task_ids_by_descending_date('webstatadmin', ['RUNNING', 'WAITING'])[0]
+        task_id = get_task_ids_by_descending_date('webstatadmin',
+                                                  ['RUNNING', 'WAITING'])[0]
     except IndexError:
         return False
     else:
         args = get_task_options(task_id)
-        return id in (args['keyevents'] + args['customevents'])
+        return event_id in (args['keyevents'] + args['customevents'])

@@ -24,7 +24,7 @@ import os
 import time
 import calendar
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION, CFG_WEBDIR
 from invenio.messages import gettext_set_language
 from invenio.intbitset import intbitset
 from invenio.dbquery import run_sql
@@ -69,9 +69,13 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
         else:
             history_analysis_results = draw_downloads_statistics(id_bibrec, [])
         if history_analysis_results and history_analysis_results[0]:
-            graph_file_history = CFG_SITE_URL + "/img/" + history_analysis_results[0]
+            if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS == 2:
+                graph_file_history = CFG_WEBDIR + "/img/" + history_analysis_results[0]
+                html_content += """<tr><td valign=center align=center>%s</td>""" % open(graph_file_history).read()
+            else:#gnuplot
+                graph_file_history = CFG_SITE_URL + "/img/" + history_analysis_results[0]
+                html_content += """<tr><td valign=center align=center><img src='%s'/></td>""" % graph_file_history
             file_to_close_history = history_analysis_results[1]
-            html_content += """<tr><td valign=center align=center><img src='%s'/></td>""" % graph_file_history
             if file_to_close_history :
                 if os.path.exists(file_to_close_history):
                     os.unlink(file_to_close_history)
@@ -79,8 +83,7 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
             out += """<br/><br/><table><tr><td class="blocknote">
                       %s</td></tr><tr><td>
                       <table border="0" cellspacing="1" cellpadding="1">""" % _("Download history:")
-            out += html_content
-            out += "</table></td></tr></table>"
+            out += html_content + "</table></td></tr></table>"
 
     if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION:
         # do we show also user IP repartition?
@@ -91,9 +94,10 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
         if ips:
             users_analysis_results = create_users_analysis_graph(id_bibrec, ips)
             if users_analysis_results[0]:
-                graph_file_users = CFG_SITE_URL + "/img/"  + users_analysis_results[0]
+                #graph_file_users = CFG_SITE_URL + "/img/"  + users_analysis_results[0]
+                graph_file_users = CFG_WEBDIR + "/img/"  + users_analysis_results[0]
                 file_to_close_users = users_analysis_results[1]
-                html_content += """<tr><td valign=center align=center><img src='%s'/></td>""" % graph_file_users
+                html_content += """<tr><td valign=center align=center>%s</td>""" % open(graph_file_users).read()
                 if file_to_close_users:
                     if os.path.exists(file_to_close_users):
                         os.unlink(file_to_close_users)
