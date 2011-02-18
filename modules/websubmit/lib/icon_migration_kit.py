@@ -33,6 +33,8 @@ from invenio.config import CFG_LOGDIR, CFG_SITE_SUPPORT_EMAIL
 from invenio.bibdocfilecli import cli_fix_marc
 from invenio.errorlib import register_exception
 from invenio.intbitset import intbitset
+from invenio.search_engine import record_exists
+
 
 def retrieve_bibdoc_bibdoc():
     return run_sql('SELECT id_bibdoc1, id_bibdoc2 from bibdoc_bibdoc')
@@ -128,10 +130,22 @@ In order for the script to go further they need to be removed.""", style='import
     try:
         try:
             for id_bibdoc1, id_bibdoc2 in bibdoc_bibdoc:
-                for recid in get_recid_from_docid(id_bibdoc1):
-                    to_fix_marc.add(recid[0])
-                if not fix_bibdoc_bibdoc(id_bibdoc1, id_bibdoc2, logfile):
-                    raise StandardError("Error when correcting document ID %s" % id_bibdoc1)
+                try:
+                    record_does_exist = True
+                    recids = get_recid_from_docid(id_bibdoc1)
+                    if not recids:
+                        print "Skipping %s" % id_bibdoc1
+                        continue
+                    for recid in recids:
+                        if record_exists(recid[0]) > 0:
+                            to_fix_marc.add(recid[0])
+                        else:
+                            record_does_exist = False
+                    if not fix_bibdoc_bibdoc(id_bibdoc1, id_bibdoc2, logfile):
+                        if record_does_exist:
+                            raise StandardError("Error when correcting document ID %s" % id_bibdoc1)
+                except Exception, err:
+                    print >> logfile, "ERROR: %s" % err
             print wrap_text_in_a_box("DONE", style='conclusion')
         except:
             logfile.close()
