@@ -135,7 +135,7 @@ class ExternalAuthSSO(ExternalAuth):
             return None
 
     def _fetch_egroups(self, req=None):
-        if self.egroup_cache is not None:
+        if False: #self.egroup_cache is not None:
             return self.egroup_cache
         elif req:
             req.add_common_vars()
