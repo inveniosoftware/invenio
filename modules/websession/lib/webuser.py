@@ -895,8 +895,8 @@ def create_adminactivities_menu(req, uid, navmenuid, ln="en"):
         else:
             if activities.has_key(_("Run Record Editor")):
                 activities[_("Run Record Editor")] = activities[_("Run Record Editor")] + '&amp;#state=edit&amp;recid=' + str(current_record_id)
-            if activities.has_key(_("Run File Manager")):
-                activities[_("Run File Manager")] = activities[_("Run File Manager")] + '&amp;recid=' + str(current_record_id)
+            if activities.has_key(_("Run Document File Manager")):
+                activities[_("Run Document File Manager")] = activities[_("Run Document File Manager")] + '&amp;recid=' + str(current_record_id)
 
     try:
         return tmpl.tmpl_create_adminactivities_menu(
