@@ -93,8 +93,11 @@ contributed to the project:
   - Nino Jejelava <nino.jejelava@gmail.com>
     Contributions to the Georgian translation.
 
- - Cristian Bacchi <cristian.bacchi@gmail.com>
-   Improvements to the browse interface.
+  - Cristian Bacchi <cristian.bacchi@gmail.com>
+    Improvements to the browse interface.
+
+  - Genis Musulmanbekov <genis@jinr.ru>
+    Contributions to the Russian translation.
 
 The URL handler was inspired by the Quixote Web Framework which is
 ``Copyright (c) 2004 Corporation for National Research Initiatives;
