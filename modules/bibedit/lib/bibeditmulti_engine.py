@@ -75,6 +75,21 @@ class BaseSubfieldCommand:
         Every specific command provides its own implementation"""
         pass
 
+    def _subfield_condition_match(self, subfield_value):
+        """Check if the condition is met for the given subfield value
+        in order to act only on certain subfields
+        @return True if condition match, False if condition does not match
+        """
+        if self._condition_exact_match:
+            # exact matching
+            if self._condition == subfield_value:
+                return True
+        else:
+            # partial matching
+            if self._condition in subfield_value:
+                return True
+        return False
+
     def _perform_on_all_matching_subfields(self, record, tag, field_number, callback):
         """Perform an action on all subfields of a given field matching
         the subfield represented by the current command.
@@ -101,17 +116,12 @@ class BaseSubfieldCommand:
                 for subfield in field[0]:
                     if self._condition != 'condition':
                         # only modify subfields that match the condition
-                        if self._condition_subfield == subfield[0]:
-                            if self._condition_exact_match:
-                                # exact matching
-                                if self._condition == subfield[1]:
-                                    self._add_subfield_modification()
-                                    callback(record, tag, field_number, subfield_index)
-                            else:
-                                # partial matching
-                                if self._condition in subfield[1]:
-                                    self._add_subfield_modification()
-                                    callback(record, tag, field_number, subfield_index)
+                        if subfield[0] == self._subfield:
+                            for subfield in field[0]:
+                                if self._condition_subfield == subfield[0]:
+                                    if self._subfield_condition_match(subfield[1]):
+                                        self._add_subfield_modification()
+                                        callback(record, tag, field_number, subfield_index)
                     elif subfield[0] == self._subfield:
                         self._add_subfield_modification()
                         callback(record, tag, field_number, subfield_index)
