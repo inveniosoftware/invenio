@@ -461,6 +461,14 @@ def wash_function_parameters(parameters, curdir, ln=CFG_SITE_LANG):
     startDoc = parameters['startDoc']
     endDoc = parameters['endDoc']
 
+    prefix = read_file(curdir, startDoc)
+    if prefix is None:
+        prefix = ""
+
+    suffix = read_file(curdir, endDoc)
+    if suffix is None:
+        suffix = ""
+
     return (minsize, maxsize, doctypes_and_desc, doctypes,
             can_delete_doctypes, can_revise_doctypes,
             can_describe_doctypes, can_comment_doctypes,
@@ -468,7 +476,7 @@ def wash_function_parameters(parameters, curdir, ln=CFG_SITE_LANG):
             can_add_format_to_doctypes, createRelatedFormats_p,
             can_name_new_files, keep_default, show_links, file_label,
             filename_label, description_label, comment_label,
-            startDoc, endDoc, access_restrictions_and_desc,
+            prefix, suffix, access_restrictions_and_desc,
             can_restrict_doctypes, restriction_label,
             doctypes_to_default_filename, max_files_for_doctype)
 
