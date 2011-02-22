@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 import os
 import time
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_WEBDIR, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_WEBDIR, CFG_BIBRANK_SHOW_CITATION_GRAPHS
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
 from invenio.bibrank_grapher import create_temporary_image, write_coordinates_in_tmp_file, remove_old_img
@@ -105,9 +105,9 @@ def get_initial_result(rec_years):
 
 def html_command(file):
     t = ''
-    if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS == 1:
+    if CFG_BIBRANK_SHOW_CITATION_GRAPHS == 1:
         t = """<img src='%s/img/%s' align="center" alt="">""" % (CFG_SITE_URL, file)
-    elif CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS == 2:
+    elif CFG_BIBRANK_SHOW_CITATION_GRAPHS == 2:
         t = open(CFG_WEBDIR + "/img/" + file).read()
     #t += "</table></td></tr></table>"
     return t
@@ -124,7 +124,7 @@ def create_citation_history_graph_and_box(recid, ln=CFG_SITE_LANG):
     if cfg_bibrank_print_citation_history:
         coordinates = calculate_citation_history_coordinates(recid)
         if coordinates:
-            html_head = """<br /><table><tr><td class="blocknote">%s</td></tr></table>"""% _("Citation history:")   
+            html_head = """<br /><table><tr><td class="blocknote">%s</td></tr></table>"""% _("Citation history:")
             graphe_file_name = 'citation_%s_stats.png' % str(recid)
             remove_old_img(graphe_file_name)
             years = calculate_citation_graphe_x_coordinates(recid)

@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 import os
 import tempfile
 
-from invenio.config import CFG_WEBDIR, CFG_SITE_URL, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS
+from invenio.config import CFG_WEBDIR, CFG_SITE_URL, CFG_BIBRANK_SHOW_CITATION_GRAPHS
 from invenio.websubmit_config import *
 
 ## test gnuplot presence:
@@ -85,7 +85,7 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
     docid_list     - In download_history case, docid_list is used to plot multiple curves.
     graphe_titles  - List of graph titles. It's used to name the curve in the legend.
     intervals      - x tics location and xrange specification"""
-    if gnuplot or CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS == 1:
+    if gnuplot or CFG_BIBRANK_SHOW_CITATION_GRAPHS == 1:
         if cfg_gnuplot_available == 0:
             return (None, None)
         #For different curves
@@ -171,7 +171,7 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
             plot_text = """plot "% s" index 0:0 using 1:2 title "" w steps lt %s lw 3"""  % (data_file, color_line_list[1])
 
         g('%s' % plot_text)
-    elif CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS == 2:
+    elif CFG_BIBRANK_SHOW_CITATION_GRAPHS == 2:
         graphe_name = "tmp_%s_%s_stats.html" % (kind_of_graphe, recid)
         out = """
               <!--[if IE]><script language="javascript" type="text/javascript" src="%(site)s/js/excanvas.min.js"></script><![endif]-->
@@ -199,7 +199,7 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
         tics = ""
         lines = 'lines'
         if kind_of_graphe == 'download_history':
-            if len(intervals) > 1 :     
+            if len(intervals) > 1 :
                 tics += 'xaxis: { mode:"time",min:parseDate("%s"),max:parseDate("%s")},'\
                 % (intervals[0],  intervals[len(intervals)-1])
             tics += """yaxis: {
@@ -245,7 +245,7 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
                      return [d1];
                       }
             """
-        
+
         elif kind_of_graphe == 'download_users':
             tics += """xaxis: { ticks: ['', "CERN\\n Users", '', "Other\\n Users", '']},
                              yaxis: { min: 0, max: 100},"""
@@ -293,7 +293,7 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
         # Write the plot method in javascript
         out += """%s
         var startData = getData();
-        var plot = $.plot($("#placeholder"), startData, options); 
+        var plot = $.plot($("#placeholder"), startData, options);
         var overview = $.plot($("#overview"), startData, {
                  legend: { show: true, container: $("#overviewLegend") },
                  series: {
@@ -326,16 +326,16 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
         if (item) {
             if (previousPoint != item.datapoint) {
                 previousPoint = item.datapoint;
-                    
+
                 $("#tooltip").remove();
                 var y = item.datapoint[1];
-                    
+
                 showTooltip(item.pageX, item.pageY, y);
             }
         }
         else {
             $("#tooltip").remove();
-            previousPoint = null;            
+            previousPoint = null;
         }
     });
 
@@ -351,14 +351,14 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
             ranges.xaxis.to = ranges.xaxis.from + 0.00001;}
         if (ranges.yaxis.to - ranges.yaxis.from < 0.00001){
             ranges.yaxis.to = ranges.yaxis.from + 0.00001;}
-        
+
         // do the zooming
         plot = $.plot($("#placeholder"), startData,
                       $.extend(true, {}, options, {
                           xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
                           yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
                       }));
-        
+
         // don't fire event on the overview to prevent eternal loop
         overview.setSelection(ranges, true);
     });
@@ -376,7 +376,7 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
     else:
         graphe_name = "tmp_error.html"
         open(CFG_WEBDIR + "/img/" + graphe_name, 'w').write("Error, select a correct format")
-    return (graphe_name, data_file, format) 
+    return (graphe_name, data_file)
 
 def remove_old_img(prefix_file_name):
     """Detele all the images older than 10 minutes to prevent to much storage
