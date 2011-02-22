@@ -24,6 +24,7 @@ import re
 from invenio.bibdocfile import BibRecDocs, file_strip_ext
 from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_CERN_SITE
+from invenio.websubmit_config import CFG_WEBSUBMIT_ICON_SUBFORMAT_RE
 from cgi import escape
 from urlparse import urlparse
 from os.path import basename
@@ -38,7 +39,7 @@ cern_arxiv_categories = ["astro-ph", "chao-dyn", "cond-mat", "gr-qc",
                          "atom-ph", "cmp-lg", "dg-ga", "funct-an", "mtrl-th",
                          "plasm-ph", "q-alg", "supr-con"]
 
-def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_file='no'):
+def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_file='no', show_subformat_icons='no'):
     """
     This is the default format for formatting fulltext links.
 
@@ -53,6 +54,7 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
     @param focus_on_main_file: if 'yes' and a doctype 'Main' is found,
     prominently display this doctype. In that case other doctypes are
     summarized with a link to the Files tab, named "Additional files"
+    @param show_subformat_icons: shall we display subformats considered as icons?
     """
     _ = gettext_set_language(bfo.lang)
 
@@ -60,7 +62,8 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
 
     # Retrieve files
     (parsed_urls, old_versions, additionals) = get_files(bfo, \
-                                                         distinguish_main_and_additional_files=focus_on_main_file.lower() == 'yes')
+                                                         distinguish_main_and_additional_files=focus_on_main_file.lower() == 'yes',
+                                                         include_subformat_icons=show_subformat_icons == 'yes')
 
     main_urls = parsed_urls['main_urls']
     others_urls = parsed_urls['others_urls']
@@ -103,18 +106,18 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
             url_list = []
             ## FIXME: This is so ugly!
             urls_dict = {}
-            for url, name, format in urls:
-                urls_dict[url] = (name, format)
+            for url, name, url_format in urls:
+                urls_dict[url] = (name, url_format)
             urls_dict_keys = sort_alphanumerically(urls_dict.keys())
             for url in urls_dict_keys:
-                name, format = urls_dict[url]
+                name, url_format = urls_dict[url]
                 if not name == last_name and len(main_urls) > 1:
                     print_name = "<em>%s</em> - " % name
                 else:
                     print_name = ""
                 last_name = name
                 url_list.append(print_name + '<a '+style+' href="'+escape(url)+'">'+ \
-                                file_icon + format.upper()+'</a>')
+                                file_icon + url_format.upper()+'</a>')
             out += separator.join(url_list) + additional_str + versions_str + '<br />'
 
     if CFG_CERN_SITE and cern_urls:
@@ -152,13 +155,16 @@ def escape_values(bfo):
     """
     return 0
 
-def get_files(bfo, distinguish_main_and_additional_files=True):
+def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat_icons=False):
     """
     Returns the files available for the given record.
     Returned structure is a tuple (parsed_urls, old_versions, additionals):
      - parsed_urls: contains categorized URLS (see details below)
      - old_versions: set to True if we can have access to old versions
      - additionals: set to True if we have other documents than the 'main' document
+
+     Parameter 'include_subformat_icons' decides if subformat
+     considered as icons should be returned
 
     'parsed_urls' is a dictionary in the form:
     {'main_urls' : {'Main'      : [('http://CFG_SITE_URL/record/1/files/aFile.pdf', 'aFile', 'PDF'),
@@ -212,11 +218,12 @@ def get_files(bfo, distinguish_main_and_additional_files=True):
         if complete_url.has_key('u'):
             url = complete_url['u']
             (dummy, host, path, dummy, params, dummy) = urlparse(url)
+            subformat = complete_url.get('x', '')
             filename = urllib.unquote(basename(path))
             name = file_strip_ext(filename)
-            format = filename[len(name):]
-            if format.startswith('.'):
-                format = format[1:]
+            url_format = filename[len(name):]
+            if url_format.startswith('.'):
+                url_format = url_format[1:]
 
             descr = ''
             if complete_url.has_key('y'):
@@ -231,8 +238,6 @@ def get_files(bfo, distinguish_main_and_additional_files=True):
                         'documents.cern.ch' in url or \
                         'doc.cern.ch' in url or \
                         'preprints.cern.ch' in url):
-                    url_params_dict = dict([part.split('=') for part in params.split('&') \
-                                            if len(part) == 2])
                     if url_params_dict.has_key('categ') and \
                            (url_params_dict['categ'].split('.', 1)[0] in cern_arxiv_categories) and \
                            url_params_dict.has_key('id'):
@@ -260,7 +265,10 @@ def get_files(bfo, distinguish_main_and_additional_files=True):
                     if True in [f.fullname.startswith(filename) \
                                 for f in doc.list_all_files()]:
                         assigned = True
-                        #doc.getIcon()
+                        if not include_subformat_icons and \
+                               CFG_WEBSUBMIT_ICON_SUBFORMAT_RE.match(subformat):
+                            # This is an icon and we want to skip it
+                            continue
                         if not doc.doctype == 'Main' and \
                                distinct_main_and_additional_files == True:
                             # In that case we record that there are
@@ -272,7 +280,7 @@ def get_files(bfo, distinguish_main_and_additional_files=True):
                                 descr = _('Fulltext')
                             if not parsed_urls['main_urls'].has_key(descr):
                                 parsed_urls['main_urls'][descr] = []
-                            parsed_urls['main_urls'][descr].append((url, name, format))
+                            parsed_urls['main_urls'][descr].append((url, name, url_format))
                 if not assigned: # Url is not a bibdoc :-S
                     if not descr:
                         descr = filename

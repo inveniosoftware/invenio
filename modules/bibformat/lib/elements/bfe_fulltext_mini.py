@@ -25,7 +25,7 @@ from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_CERN_SITE
 from cgi import escape
 
-def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_file='yes'):
+def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_file='yes', show_subformat_icons='no'):
     """
     This is the format for formatting fulltext links in the mini panel.
     @param separator: the separator between urls.
@@ -34,13 +34,15 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
     @param focus_on_main_file: if 'yes' and a doctype 'Main' is found,
     prominently display this doctype. In that case other doctypes are
     summarized with a link to the Files tab, named"Additional files".
+    @param show_subformat_icons: shall we display subformats considered as icons?
     """
     _ = gettext_set_language(bfo.lang)
     out = ''
 
     # Retrieve files
     (parsed_urls, old_versions, additionals) = \
-                  get_files(bfo, distinguish_main_and_additional_files=focus_on_main_file.lower() == 'yes')
+                  get_files(bfo, distinguish_main_and_additional_files=focus_on_main_file.lower() == 'yes',
+                            include_subformat_icons=show_subformat_icons == 'yes')
 
     main_urls = parsed_urls['main_urls']
     others_urls = parsed_urls['others_urls']
@@ -127,7 +129,7 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
         else:
             file_icon = ''
         external_link = len(others_urls) == 1 and _('external link') or _('external links')
-        out += '<small class="detailedRecordActions">%s:</small>%s' % (external_link, separator)
+        out += '<small class="detailedRecordActions">%s:</small>%s' % (external_link.capitalize(), separator)
         url_list = []
         for url, descr in others_urls:
             # we don't need to show the plot links here, and all are pngs.
