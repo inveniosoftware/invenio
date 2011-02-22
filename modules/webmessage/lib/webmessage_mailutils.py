@@ -21,7 +21,9 @@
 
 __revision__ = "$Id$"
 
+import cgi
 from invenio.htmlutils import HTMLWasher
+from HTMLParser import HTMLParseError
 
 def email_quoted_txt2html(text,
                           tabs_before=0,
@@ -87,7 +89,11 @@ def email_quoted_txt2html(text,
         else:
             final_body += (tabs_before)*"\t"
 
-        line = washer.wash(line)
+        try:
+            line = washer.wash(line)
+        except HTMLParseError:
+            # Line contained something like "foo<bar"
+            line = cgi.escape(line)
         final_body += tabs_before*"\t" + line
         final_body += linebreak_html + "\n"
         nb_indent = new_nb_indent
