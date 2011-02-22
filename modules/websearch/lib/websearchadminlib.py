@@ -38,7 +38,8 @@ from invenio.config import \
      CFG_SITE_URL,\
      CFG_WEBCOMMENT_ALLOW_COMMENTS,\
      CFG_WEBCOMMENT_ALLOW_REVIEWS,\
-     CFG_INSPIRE_SITE
+     CFG_INSPIRE_SITE, \
+     CFG_CERN_SITE
 from invenio.bibrankadminlib import \
      write_outcome, \
      modify_translations, \
@@ -3451,6 +3452,12 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
         brd =  BibRecDocs(recID)
         if len(brd.list_bibdocs('Plot')) == 0:
             tabs['plots']['enabled'] = False
+
+        if CFG_CERN_SITE:
+            from invenio.search_engine import get_collection_reclist
+            if recID in get_collection_reclist("Books & Proceedings"):
+                tabs['holdings']['visible'] = True
+                tabs['holdings']['enabled'] = True
 
     tabs[''] = tabs['metadata']
     del tabs['metadata']
