@@ -2254,10 +2254,12 @@ class BibUploadFFTModeTest(GenericBibUploadTest):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
          </datafield>
         </record>
-        """
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
         testrec_expected_xm = """
         <record>
         <controlfield tag="001">123456789</controlfield>
@@ -2267,7 +2269,7 @@ class BibUploadFFTModeTest(GenericBibUploadTest):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
         """ % {'siteurl': CFG_SITE_URL}
@@ -2275,9 +2277,9 @@ class BibUploadFFTModeTest(GenericBibUploadTest):
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
+        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
         """ % {'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -2311,12 +2313,15 @@ class BibUploadFFTModeTest(GenericBibUploadTest):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
-          <subfield code="r">firerole: deny until '%s'
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
+          <subfield code="r">firerole: deny until '%(future_date)s'
 allow any</subfield>
          </datafield>
         </record>
-        """ % future_date
+        """ % {
+            'future_date': future_date,
+            'siteurl': CFG_SITE_URL
+        }
         testrec_expected_xm = """
         <record>
         <controlfield tag="001">123456789</controlfield>
@@ -2326,7 +2331,7 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
         """ % {'siteurl': CFG_SITE_URL}
@@ -2334,9 +2339,9 @@ allow any</subfield>
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
+        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
         """ % {'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -2374,12 +2379,15 @@ allow any</subfield>
           <subfield code="a">ARTICLE</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
-          <subfield code="r">firerole: deny until '%s'
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
+          <subfield code="r">firerole: deny until '%(past_date)s'
 allow any</subfield>
          </datafield>
         </record>
-        """ % past_date
+        """ % {
+            'past_date': past_date,
+            'siteurl': CFG_SITE_URL
+        }
         testrec_expected_xm = """
         <record>
         <controlfield tag="001">123456789</controlfield>
@@ -2389,7 +2397,7 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
          </datafield>
          <datafield tag="980" ind1=" " ind2=" ">
           <subfield code="a">ARTICLE</subfield>
@@ -2400,10 +2408,10 @@ allow any</subfield>
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
+        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
         980__ $$aARTICLE
         """ % {'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -2426,7 +2434,9 @@ allow any</subfield>
         self.failIf("If you already have an account, please login using the form below." in result, result)
         self.assertEqual(test_web_page_content(testrec_expected_url, 'hyde', 'h123yde', expected_text='Authorization failure'), [])
         force_webcoll(recid)
-        self.assertEqual(test_web_page_content(testrec_expected_url, 'hyde', 'h123yde', expected_text=urlopen("http://cds.cern.ch/img/cds.gif").read()), [])
+        self.assertEqual(test_web_page_content(testrec_expected_url, 'hyde', 'h123yde', expected_text=urlopen("%(siteurl)s/img/site_logo.gif" % {
+            'siteurl': CFG_SITE_URL
+        }).read()), [])
 
 
 
@@ -2570,14 +2580,14 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
           <subfield code="t">SuperMain</subfield>
           <subfield code="d">This is a description</subfield>
           <subfield code="z">This is a comment</subfield>
           <subfield code="n">CIDIESSE</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
           <subfield code="t">SuperMain</subfield>
           <subfield code="f">.jpeg</subfield>
           <subfield code="d">This is a description</subfield>
@@ -2585,7 +2595,9 @@ allow any</subfield>
           <subfield code="n">CIDIESSE</subfield>
          </datafield>
         </record>
-        """
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
         testrec_expected_xm = """
         <record>
         <controlfield tag="001">123456789</controlfield>
@@ -2659,15 +2671,16 @@ allow any</subfield>
           <subfield code="a">ARTICLE</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
           <subfield code="r">thesis</subfield>
-          <subfield code="x">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="x">%(siteurl)s/img/site_logo.gif</subfield>
          </datafield>
         </record>
         """ % {'email_tag': email_tag,
             'email_ind1': email_ind1 == '_' and ' ' or email_ind1,
             'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
-            'email_code': email_code}
+            'email_code': email_code,
+            'siteurl': CFG_SITE_URL}
 
         testrec_expected_xm = """
         <record>
@@ -2681,10 +2694,10 @@ allow any</subfield>
           <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif?subformat=icon</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon</subfield>
           <subfield code="x">icon</subfield>
          </datafield>
          <datafield tag="980" ind1=" " ind2=" ">
@@ -2702,17 +2715,17 @@ allow any</subfield>
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
         %(email_tag)s%(email_ind1)s%(email_ind2)s $$%(email_code)sjekyll@cds.cern.ch
-        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
-        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif?subformat=icon$$xicon
+        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
+        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon$$xicon
         980__ $$aARTICLE
         """ % {'siteurl': CFG_SITE_URL,
             'email_tag': email_tag,
             'email_ind1': email_ind1 == ' ' and '_' or email_ind1,
             'email_ind2': email_ind2 == ' ' and '_' or email_ind2,
             'email_code': email_code}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL}
-        testrec_expected_icon = "%(siteurl)s/record/123456789/files/cds.gif?subformat=icon" \
+        testrec_expected_icon = "%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon" \
             % {'siteurl': CFG_SITE_URL}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -2734,7 +2747,9 @@ allow any</subfield>
         self.assertEqual(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm), '')
 
-        self.assertEqual(test_web_page_content(testrec_expected_icon, 'jekyll', 'j123ekyll', expected_text=urlopen('http://cds.cern.ch/img/cds.gif').read()), [])
+        self.assertEqual(test_web_page_content(testrec_expected_icon, 'jekyll', 'j123ekyll', expected_text=urlopen('%(siteurl)s/img/site_logo.gif' % {
+            'siteurl': CFG_SITE_URL
+        }).read()), [])
         self.assertEqual(test_web_page_content(testrec_expected_icon, 'hyde', 'h123yde', expected_text='Authorization failure'), [])
         force_webcoll(recid)
         self.assertEqual(test_web_page_content(testrec_expected_icon, 'hyde', 'h123yde', expected_text=urlopen('%(siteurl)s/img/restricted.gif' % {'siteurl': CFG_SITE_URL}).read()), [])
@@ -2753,11 +2768,13 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
-          <subfield code="x">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
+          <subfield code="x">%(siteurl)s/img/site_logo.gif</subfield>
          </datafield>
         </record>
-        """
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
         testrec_expected_xm = """
         <record>
         <controlfield tag="001">123456789</controlfield>
@@ -2767,10 +2784,10 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif?subformat=icon</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon</subfield>
           <subfield code="x">icon</subfield>
          </datafield>
         </record>
@@ -2779,12 +2796,12 @@ allow any</subfield>
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
-        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif?subformat=icon$$xicon
+        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
+        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon$$xicon
         """ % {'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL}
-        testrec_expected_icon = "%(siteurl)s/record/123456789/files/cds.gif?subformat=icon" \
+        testrec_expected_icon = "%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon" \
             % {'siteurl': CFG_SITE_URL}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -2821,19 +2838,22 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cdsweb.cern.ch/img/head.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/head.gif</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://doc.cern.ch/archive/electronic/hep-th/0101/0101001.pdf</subfield>
+          <subfield code="a">%(siteurl)s/record/95/files/9809057.pdf</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">%(prefix)s/var/tmp/demobibdata.xml</subfield>
          </datafield>
         </record>
-        """ % { 'prefix': CFG_PREFIX }
+        """ % {
+            'prefix': CFG_PREFIX,
+            'siteurl': CFG_SITE_URL
+        }
         testrec_expected_xm = """
         <record>
         <controlfield tag="001">123456789</controlfield>
@@ -2843,10 +2863,7 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/0101001.pdf</subfield>
-         </datafield>
-         <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/9809057.pdf</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
           <subfield code="u">%(siteurl)s/record/123456789/files/demobibdata.xml</subfield>
@@ -2854,20 +2871,23 @@ allow any</subfield>
          <datafield tag="856" ind1="4" ind2=" ">
           <subfield code="u">%(siteurl)s/record/123456789/files/head.gif</subfield>
          </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
+         </datafield>
         </record>
         """ % { 'siteurl': CFG_SITE_URL}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/0101001.pdf
-        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
+        8564_ $$u%(siteurl)s/record/123456789/files/9809057.pdf
         8564_ $$u%(siteurl)s/record/123456789/files/demobibdata.xml
         8564_ $$u%(siteurl)s/record/123456789/files/head.gif
+        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
         """ % { 'siteurl': CFG_SITE_URL}
         # insert test record:
         testrec_expected_urls = []
-        for files in ('cds.gif', 'head.gif', '0101001.pdf', 'demobibdata.xml'):
+        for files in ('site_logo.gif', 'head.gif', '9809057.pdf', 'demobibdata.xml'):
             testrec_expected_urls.append('%(siteurl)s/record/123456789/files/%(files)s' % {'siteurl' : CFG_SITE_URL, 'files' : files})
         recs = bibupload.xml_marc_to_records(test_to_upload)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
@@ -2877,7 +2897,7 @@ allow any</subfield>
         testrec_expected_hm = testrec_expected_hm.replace('123456789',
                                                           str(recid))
         testrec_expected_urls = []
-        for files in ('cds.gif', 'head.gif', '0101001.pdf', 'demobibdata.xml'):
+        for files in ('site_logo.gif', 'head.gif', '9809057.pdf', 'demobibdata.xml'):
             testrec_expected_urls.append('%(siteurl)s/record/%(recid)s/files/%(files)s' % {'siteurl' : CFG_SITE_URL, 'files' : files, 'recid' : recid})
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
@@ -2891,8 +2911,8 @@ allow any</subfield>
             self.failUnless(try_url_download(url))
 
         self._test_bibdoc_status(recid, 'head', '')
-        self._test_bibdoc_status(recid, '0101001', '')
-        self._test_bibdoc_status(recid, 'cds', '')
+        self._test_bibdoc_status(recid, '9809057', '')
+        self._test_bibdoc_status(recid, 'site_logo', '')
         self._test_bibdoc_status(recid, 'demobibdata', '')
 
     def test_simple_fft_correct(self):
@@ -2906,18 +2926,22 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
          </datafield>
         </record>
-        """
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
         test_to_correct = """
         <record>
         <controlfield tag="001">123456789</controlfield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
          </datafield>
         </record>
-        """
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
 
         testrec_expected_xm = """
         <record>
@@ -2928,7 +2952,7 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
         """ % { 'siteurl': CFG_SITE_URL}
@@ -2936,9 +2960,9 @@ allow any</subfield>
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
+        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
         """ % { 'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -2965,7 +2989,7 @@ allow any</subfield>
         self.assertEqual(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm), '')
 
-        self._test_bibdoc_status(recid, 'cds', '')
+        self._test_bibdoc_status(recid, 'site_logo', '')
 
     def test_fft_implicit_fix_marc(self):
         """bibupload - FFT implicit FIX-MARC"""
@@ -2980,10 +3004,12 @@ allow any</subfield>
           <subfield code="f">foo@bar.com</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="f">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="f">%(siteurl)s/img/site_logo.gif</subfield>
          </datafield>
         </record>
-        """
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
         test_to_correct = """
         <record>
         <controlfield tag="001">123456789</controlfield>
@@ -2991,10 +3017,10 @@ allow any</subfield>
           <subfield code="f">foo@bar.com</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/img/site_logo.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
         """ % { 'siteurl': CFG_SITE_URL}
@@ -3010,17 +3036,21 @@ allow any</subfield>
           <subfield code="f">foo@bar.com</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/img/site_logo.gif</subfield>
          </datafield>
         </record>
-        """
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
         8560_ $$ffoo@bar.com
-        8564_ $$uhttp://cds.cern.ch/img/cds.gif
-        """
+        8564_ $$u%(siteurl)s/img/site_logo.gif
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
         recs = bibupload.xml_marc_to_records(test_to_upload)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
         # replace test buffers with real recid of inserted test record:
@@ -3052,10 +3082,12 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
          </datafield>
         </record>
-        """
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
         test_to_replace = """
         <record>
         <controlfield tag="001">123456789</controlfield>
@@ -3069,7 +3101,7 @@ allow any</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
           <subfield code="z">BibEdit Comment</subfield>
-          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
           <subfield code="y">BibEdit Description</subfield>
           <subfield code="x">01</subfield>
          </datafield>
@@ -3085,10 +3117,10 @@ allow any</subfield>
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
         8564_ $$uhttp://www.google.com/
-        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif$$x01$$yBibEdit Description$$zBibEdit Comment
+        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif$$x01$$yBibEdit Description$$zBibEdit Comment
         8564_ $$uhttp://cern.ch/
         """ % { 'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -3115,10 +3147,10 @@ allow any</subfield>
         self.assertEqual(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm), '')
 
-        self._test_bibdoc_status(recid, 'cds', '')
+        self._test_bibdoc_status(recid, 'site_logo', '')
 
         bibrecdocs = BibRecDocs(recid)
-        bibdoc = bibrecdocs.get_bibdoc('cds')
+        bibdoc = bibrecdocs.get_bibdoc('site_logo')
         self.assertEqual(bibdoc.get_description('.gif'), 'BibEdit Description')
 
 
@@ -3133,24 +3165,28 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
           <subfield code="d">Try</subfield>
           <subfield code="z">Comment</subfield>
          </datafield>
         </record>
-        """
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
         test_to_correct = """
         <record>
         <controlfield tag="001">123456789</controlfield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cdsweb.cern.ch/img/head.gif</subfield>
-          <subfield code="n">cds</subfield>
+          <subfield code="a">%(siteurl)s/img/head.gif</subfield>
+          <subfield code="n">site_logo</subfield>
           <subfield code="m">patata</subfield>
           <subfield code="d">Next Try</subfield>
           <subfield code="z">KEEP-OLD-VALUE</subfield>
          </datafield>
         </record>
-        """
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
 
         testrec_expected_xm = """
         <record>
@@ -3217,17 +3253,19 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
           <subfield code="d">Try</subfield>
           <subfield code="z">Comment</subfield>
          </datafield>
         </record>
-        """
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
         test_to_correct = """
         <record>
         <controlfield tag="001">123456789</controlfield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="n">cds</subfield>
+          <subfield code="n">site_logo</subfield>
           <subfield code="m">patata</subfield>
           <subfield code="f">.gif</subfield>
           <subfield code="d">KEEP-OLD-VALUE</subfield>
@@ -3306,11 +3344,13 @@ allow any</subfield>
         <record>
         <controlfield tag="001">123456789</controlfield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="n">cds</subfield>
-          <subfield code="x">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="n">site_logo</subfield>
+          <subfield code="x">%(siteurl)s/img/site_logo.gif</subfield>
          </datafield>
         </record>
-        """
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
 
         testrec_expected_xm = """
         <record>
@@ -3321,7 +3361,7 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif?subformat=icon</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon</subfield>
           <subfield code="x">icon</subfield>
          </datafield>
         </record>
@@ -3330,9 +3370,9 @@ allow any</subfield>
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif?subformat=icon$$xicon
+        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon$$xicon
         """ % { 'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif?subformat=icon" \
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon" \
             % {'siteurl': CFG_SITE_URL}
 
         # insert test record:
@@ -3363,7 +3403,7 @@ allow any</subfield>
         self.assertEqual(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm), '')
 
-        self._test_bibdoc_status(recid, 'cds', '')
+        self._test_bibdoc_status(recid, 'site_logo', '')
 
 
     def test_multiple_fft_correct(self):
@@ -3377,31 +3417,35 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
           <subfield code="d">Try</subfield>
           <subfield code="z">Comment</subfield>
           <subfield code="r">Restricted</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
           <subfield code="f">.jpeg</subfield>
           <subfield code="d">Try jpeg</subfield>
           <subfield code="z">Comment jpeg</subfield>
           <subfield code="r">Restricted</subfield>
          </datafield>
         </record>
-        """
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
         test_to_correct = """
         <record>
         <controlfield tag="001">123456789</controlfield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
           <subfield code="m">patata</subfield>
           <subfield code="f">.gif</subfield>
           <subfield code="r">New restricted</subfield>
          </datafield>
         </record>
-        """
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
 
         testrec_expected_xm = """
         <record>
@@ -3466,30 +3510,36 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cdsweb.cern.ch/img/head.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/head.gif</subfield>
          </datafield>
         </record>
-        """
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
         test_to_correct = """
         <record>
         <controlfield tag="001">123456789</controlfield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
          </datafield>
         </record>
-        """
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
         test_to_purge = """
         <record>
         <controlfield tag="001">123456789</controlfield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
           <subfield code="t">PURGE</subfield>
          </datafield>
         </record>
-        """
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
 
         testrec_expected_xm = """
         <record>
@@ -3500,10 +3550,10 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/head.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/head.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
         """ % { 'siteurl': CFG_SITE_URL}
@@ -3511,10 +3561,10 @@ allow any</subfield>
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
         8564_ $$u%(siteurl)s/record/123456789/files/head.gif
+        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
         """ % { 'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" % { 'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" % { 'siteurl': CFG_SITE_URL}
 
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -3548,7 +3598,7 @@ allow any</subfield>
         self.assertEqual(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm), '')
 
-        self._test_bibdoc_status(recid, 'cds', '')
+        self._test_bibdoc_status(recid, 'site_logo', '')
         self._test_bibdoc_status(recid, 'head', '')
 
     def test_revert_fft_correct(self):
@@ -3570,7 +3620,7 @@ allow any</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">%(siteurl)s/img/iconpen.gif</subfield>
-          <subfield code="n">cds</subfield>
+          <subfield code="n">site_logo</subfield>
          </datafield>
         </record>
         """ % {
@@ -3584,7 +3634,7 @@ allow any</subfield>
         <controlfield tag="001">123456789</controlfield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">%s/img/head.gif</subfield>
-          <subfield code="n">cds</subfield>
+          <subfield code="n">site_logo</subfield>
          </datafield>
         </record>
         """ % CFG_SITE_URL
@@ -3592,7 +3642,7 @@ allow any</subfield>
         <record>
         <controlfield tag="001">123456789</controlfield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="n">cds</subfield>
+          <subfield code="n">site_logo</subfield>
           <subfield code="t">REVERT</subfield>
           <subfield code="v">1</subfield>
          </datafield>
@@ -3611,7 +3661,7 @@ allow any</subfield>
           <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
         """ % {'siteurl': CFG_SITE_URL,
@@ -3624,13 +3674,13 @@ allow any</subfield>
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
         %(email_tag)s%(email_ind1)s%(email_ind2)s $$%(email_code)sjekyll@cds.cern.ch
-        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
+        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
         """ % {'siteurl': CFG_SITE_URL,
             'email_tag': email_tag,
             'email_ind1': email_ind1 == ' ' and '_' or email_ind1,
             'email_ind2': email_ind2 == ' ' and '_' or email_ind2,
             'email_code': email_code}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" % { 'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" % { 'siteurl': CFG_SITE_URL}
 
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -3664,15 +3714,15 @@ allow any</subfield>
         self.assertEqual(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm), '')
 
-        self._test_bibdoc_status(recid, 'cds', '')
+        self._test_bibdoc_status(recid, 'site_logo', '')
 
         expected_content_version1 = urlopen('%s/img/iconpen.gif' % CFG_SITE_URL).read()
         expected_content_version2 = urlopen('%s/img/head.gif' % CFG_SITE_URL).read()
         expected_content_version3 = expected_content_version1
 
-        self.assertEqual(test_web_page_content('%s/record/%s/files/cds.gif?version=1' % (CFG_SITE_URL, recid), 'jekyll', 'j123ekyll', expected_content_version1), [])
-        self.assertEqual(test_web_page_content('%s/record/%s/files/cds.gif?version=2' % (CFG_SITE_URL, recid), 'jekyll', 'j123ekyll', expected_content_version2), [])
-        self.assertEqual(test_web_page_content('%s/record/%s/files/cds.gif?version=3' % (CFG_SITE_URL, recid), 'jekyll', 'j123ekyll', expected_content_version3), [])
+        self.assertEqual(test_web_page_content('%s/record/%s/files/site_logo.gif?version=1' % (CFG_SITE_URL, recid), 'jekyll', 'j123ekyll', expected_content_version1), [])
+        self.assertEqual(test_web_page_content('%s/record/%s/files/site_logo.gif?version=2' % (CFG_SITE_URL, recid), 'jekyll', 'j123ekyll', expected_content_version2), [])
+        self.assertEqual(test_web_page_content('%s/record/%s/files/site_logo.gif?version=3' % (CFG_SITE_URL, recid), 'jekyll', 'j123ekyll', expected_content_version3), [])
 
 
     def test_simple_fft_replace(self):
@@ -3694,7 +3744,7 @@ allow any</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">%(siteurl)s/img/iconpen.gif</subfield>
-          <subfield code="n">cds</subfield>
+          <subfield code="n">site_logo</subfield>
          </datafield>
         </record>
         """ % {'siteurl': CFG_SITE_URL,
