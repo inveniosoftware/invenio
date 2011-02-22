@@ -26,7 +26,7 @@ import cgi
 
 # Invenio imports
 from invenio.urlutils import create_html_link
-from invenio.webuser import get_user_info, collect_user_info, isGuestUser
+from invenio.webuser import get_user_info, collect_user_info, isGuestUser, get_email
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.webcomment_config import \
@@ -42,7 +42,8 @@ from invenio.config import CFG_SITE_URL, \
                            CFG_WEBCOMMENT_ALLOW_COMMENTS, \
                            CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR, \
                            CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN, \
-                           CFG_WEBCOMMENT_AUTHOR_DELETE_COMMENT_OPTION
+                           CFG_WEBCOMMENT_AUTHOR_DELETE_COMMENT_OPTION, \
+                           CFG_CERN_SITE
 from invenio.htmlutils import get_html_text_editor
 from invenio.messages import gettext_set_language
 from invenio.bibformat import format_record
@@ -572,6 +573,22 @@ class Template:
         """
         # load the right message language
         _ = gettext_set_language(ln)
+
+        # CERN hack begins: display full ATLAS user name. Check further below too.
+        current_user_fullname = ""
+        override_nickname_p = False
+        if CFG_CERN_SITE:
+            from invenio.search_engine import get_all_collections_of_a_record
+            user_info = collect_user_info(uid)
+            if 'atlas-readaccess-current-physicists [CERN]' in user_info['group']:
+                # An ATLAS member is never anonymous to its colleagues
+                # when commenting inside ATLAS collections
+                recid_collections = get_all_collections_of_a_record(recID)
+                if 'ATLAS' in str(recid_collections):
+                    override_nickname_p = True
+                    current_user_fullname = user_info.get('external_fullname', '')
+        # CERN hack ends
+
         # naming data fields of comments
         if reviews:
             c_nickname = 0
@@ -591,7 +608,7 @@ class Template:
             discussion = 'reviews'
             comments_link = '<a href="%s/record/%s/comments/">%s</a> (%i)' % (CFG_SITE_URL, recID, _('Comments'), total_nb_comments)
             reviews_link = '<b>%s (%i)</b>' % (_('Reviews'), total_nb_reviews)
-            add_comment_or_review = self.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, '', score, note, warnings, show_title_p=True, can_attach_files=can_attach_files)
+            add_comment_or_review = self.tmpl_add_comment_form_with_ranking(recID, uid, current_user_fullname or nickname, ln, '', score, note, warnings, show_title_p=True, can_attach_files=can_attach_files)
         else:
             c_nickname = 0
             c_user_id = 1
@@ -683,12 +700,20 @@ class Template:
                 else:
                     depth = thread_history.index(comment[reply_to])
                     thread_history = thread_history[:depth + 1]
+
+
+                # CERN hack begins: display full ATLAS user name.
+                comment_user_fullname = ""
+                if CFG_CERN_SITE and override_nickname_p:
+                    comment_user_fullname = get_email(comment[c_user_id])
+                # CERN hack ends
+
                 if comment[c_nickname]:
                     _nickname = comment[c_nickname]
                     display = _nickname
                 else:
                     (uid, _nickname, display) = get_user_info(comment[c_user_id])
-                messaging_link = self.create_messaging_link(_nickname, display, ln)
+                messaging_link = self.create_messaging_link(_nickname, comment_user_fullname or display, ln)
                 from invenio.webcomment import get_attached_files # FIXME
                 files = get_attached_files(recID, comment[c_id])
                 # do NOT delete the HTML comment below. It is used for parsing... (I plead unguilty!)
