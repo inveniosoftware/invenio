@@ -94,10 +94,11 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
         if ips:
             users_analysis_results = create_users_analysis_graph(id_bibrec, ips)
             if users_analysis_results[0]:
-                #graph_file_users = CFG_SITE_URL + "/img/"  + users_analysis_results[0]
-                graph_file_users = CFG_WEBDIR + "/img/"  + users_analysis_results[0]
                 file_to_close_users = users_analysis_results[1]
-                html_content += """<tr><td valign=center align=center>%s</td>""" % open(graph_file_users).read()
+                if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION == 1:
+                    html_content += """<tr><td valign=center align=center><img src='%s/img/%s' align="center" alt=""></td>""" % (CFG_SITE_URL, users_analysis_results[0])
+                elif CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION == 2:
+                    html_content += """<tr><td valign=center align=center>%s</td>""" % open(CFG_WEBDIR + "/img/"  + users_analysis_results[0]).read()
                 if file_to_close_users:
                     if os.path.exists(file_to_close_users):
                         os.unlink(file_to_close_users)
