@@ -361,12 +361,14 @@ class StringField(str):
     disposition = None
     disp_options = None
 
-    # I wanted __init__(name, value) but that does not work (apparently, you
-    # cannot subclass str with a constructor that takes >1 argument)
-    def __init__(self, value):
+    def __new__(cls, value):
         '''Create StringField instance. You'll have to set name yourself.'''
-        str.__init__(self, value)
-        self.value = value
+        obj = str.__new__(cls, value)
+        obj.value = value
+        return obj
+
+    def __str__(self):
+        return str.__str__(self)
 
     def __getattr__(self, name):
         if name != 'file':
