@@ -80,6 +80,10 @@ class IntBitSetTest(unittest.TestCase):
             "djflsdkfjsdljfsldkfjsldjlfk",
         ]
 
+    def tearDown(self):
+        del self.big_examples
+        del self.corrupted_strdumps
+
     def _helper_sanity_test(self, intbitset1, msg=''):
         wordbitsize = intbitset1.get_wordbitsize()
         size1 = intbitset1.get_size()
@@ -296,7 +300,7 @@ class IntBitSetTest(unittest.TestCase):
 
     def test_ascii_bit_dump(self):
         """intbitset - ascii bit dump"""
-        for set1 in self.sets[:-1] + [[]]: # We skip the big example... too slow!
+        for set1 in self.sets + [[]]:
             tot = 0
             count = 0
             for bit in intbitset(set1).strbits():
@@ -359,7 +363,6 @@ class IntBitSetTest(unittest.TestCase):
             for set2 in self.sets + [[]]:
                 for op in self.cmp_list:
                     self.assertEqual(op[0](intbitset(set1), intbitset(set2)), op[1](set(set1), set(set2)), "Error in comparing %s %s with comparing function %s" % (set1, set2, op[0].__name__))
-
 
     def test_set_update_with_signs(self):
         """intbitset - set update with signs"""

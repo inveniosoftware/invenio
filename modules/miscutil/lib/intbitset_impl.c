@@ -1,5 +1,3 @@
-// $Id$
-
 // This file is part of Invenio.
 // Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
 //
@@ -32,26 +30,31 @@ const int maxelem = INT_MAX;
 IntBitSet *intBitSetCreate(register const int size, const bool_t trailing_bits) {
     register word_t *base;
     register word_t *end;
-    IntBitSet *ret = malloc(sizeof(IntBitSet));
+    IntBitSet *ret = PyMem_Malloc(sizeof(IntBitSet));
+    // fprintf(stderr, "intBitSetCreate called\n");
     // At least one word -> the one who represent the trailing_bits
     ret->allocated = (size / wordbitsize + 1);
     ret->size = 0; // trailing_bits
     ret->trailing_bits = trailing_bits ? (word_t) ~0 : 0;
     if (trailing_bits) {
-        base = ret->bitset = malloc(ret->allocated * wordbytesize);
+        base = ret->bitset = PyMem_Malloc(ret->allocated * wordbytesize);
         end = base + ret->allocated;
         for (; base < end; ++base)
             *base = (word_t) ~0;
         ret->tot = -1;
     } else {
-        ret->bitset = calloc(ret->allocated, wordbytesize);
+        base = ret->bitset = PyMem_Malloc(ret->allocated * wordbytesize);
+        end = base + ret->allocated;
+        for (; base < end; ++base)
+            *base = (word_t) 0;
         ret->tot = 0;
     }
     return ret;
 }
 
 IntBitSet *intBitSetCreateNoAllocate() {
-    IntBitSet *ret = malloc(sizeof(IntBitSet));
+    // fprintf(stderr, "intBitSetCreateNoAllocate called\n");
+    IntBitSet *ret = PyMem_Malloc(sizeof(IntBitSet));
     ret->allocated = 0;
     ret->size = -1;
     ret->trailing_bits = 0;
@@ -60,9 +63,10 @@ IntBitSet *intBitSetCreateNoAllocate() {
 }
 
 IntBitSet *intBitSetResetFromBuffer(IntBitSet *const bitset, const void *const buf, const Py_ssize_t bufsize) {
+    // fprintf(stderr, "intBitSetResetFromBuffer called\n");
     bitset->allocated = bufsize/wordbytesize;
-    free(bitset->bitset);
-    bitset->bitset = malloc(bufsize);
+    PyMem_Free(bitset->bitset);
+    bitset->bitset = PyMem_Malloc(bufsize);
     bitset->tot = -1;
     bitset->size = bitset->allocated - 1;
     memcpy(bitset->bitset, buf, bufsize);
@@ -71,18 +75,21 @@ IntBitSet *intBitSetResetFromBuffer(IntBitSet *const bitset, const void *const b
 }
 
 IntBitSet *intBitSetReset(IntBitSet *const bitset) {
+    // fprintf(stderr, "intBitSetReset called\n");
     bitset->allocated = 1;
     bitset->size = 0;
     *bitset->bitset = 0;
     bitset->trailing_bits = 0;
+    bitset->tot = 0;
     return bitset;
 }
 
 
 IntBitSet *intBitSetCreateFromBuffer(const void *const buf, const Py_ssize_t bufsize) {
-    IntBitSet *ret = malloc(sizeof(IntBitSet));
+    // fprintf(stderr, "intBitSetCreateFromBuffer called\n");
+    IntBitSet *ret = PyMem_Malloc(sizeof(IntBitSet));
     ret->allocated = bufsize/wordbytesize;
-    ret->bitset = malloc(bufsize);
+    ret->bitset = PyMem_Malloc(bufsize);
     ret->size = ret->allocated - 1;;
     ret->tot = -1;
     memcpy(ret->bitset, buf, bufsize);
@@ -92,17 +99,22 @@ IntBitSet *intBitSetCreateFromBuffer(const void *const buf, const Py_ssize_t buf
 
 
 void intBitSetDestroy(IntBitSet *const bitset) {
-    free(bitset->bitset);
-    free(bitset);
+    // fprintf(stderr, "intBitSetDestroy called\n");
+    if (bitset) {
+        if (bitset->bitset)
+            PyMem_Free(bitset->bitset);
+        PyMem_Free(bitset);
+    }
 }
 
 IntBitSet *intBitSetClone(const IntBitSet * const bitset) {
-    IntBitSet *ret = malloc(sizeof(IntBitSet));
+    // fprintf(stderr, "intBitSetClone called\n");
+    IntBitSet *ret = PyMem_Malloc(sizeof(IntBitSet));
     ret->size = bitset->size;
     ret->tot = bitset->tot;
     ret->trailing_bits = bitset->trailing_bits;
     ret->allocated = bitset->allocated;
-    ret->bitset = malloc(bitset->allocated * wordbytesize);
+    ret->bitset = PyMem_Malloc(bitset->allocated * wordbytesize);
     memcpy(ret->bitset, bitset->bitset, bitset->allocated * wordbytesize);
     return ret;
 }
@@ -145,10 +157,11 @@ int intBitSetGetAllocated(const IntBitSet * const bitset) {
 }
 
 void intBitSetResize(IntBitSet *const bitset, register const int allocated) {
+    // fprintf(stderr, "intBitSetResize called\n");
     register word_t *base;
     register word_t *end;
     if (allocated > bitset->allocated) {
-        bitset->bitset = realloc(bitset->bitset, allocated * wordbytesize);
+        bitset->bitset = PyMem_Realloc(bitset->bitset, allocated * wordbytesize);
         base = bitset->bitset + bitset->allocated;
         end = bitset->bitset + allocated;
         for (; base<end; ++base)
@@ -230,12 +243,12 @@ IntBitSet *intBitSetUnion(IntBitSet *const x, IntBitSet *const y) {
     register word_t *xend;
     register word_t *ybase;
     register word_t *retbase;
-    register IntBitSet * ret = malloc(sizeof (IntBitSet));
+    register IntBitSet * ret = PyMem_Malloc(sizeof (IntBitSet));
     ret->allocated = intBitSetAdaptMax(x, y);
     xbase = x->bitset;
     xend = x->bitset+ret->allocated;
     ybase = y->bitset;
-    retbase = ret->bitset = malloc(wordbytesize * ret->allocated);
+    retbase = ret->bitset = PyMem_Malloc(wordbytesize * ret->allocated);
     ret->size = -1;
     ret->tot = -1;
     for (; xbase < xend; ++xbase, ++ybase, ++retbase)
@@ -249,12 +262,12 @@ IntBitSet *intBitSetXor(IntBitSet *const x, IntBitSet *const y) {
     register word_t *xend;
     register word_t *ybase;
     register word_t *retbase;
-    register IntBitSet * ret = malloc(sizeof (IntBitSet));
+    register IntBitSet * ret = PyMem_Malloc(sizeof (IntBitSet));
     ret->allocated = intBitSetAdaptMax(x, y);
     xbase = x->bitset;
     xend = x->bitset+ret->allocated;
     ybase = y->bitset;
-    retbase = ret->bitset = malloc(wordbytesize * ret->allocated);
+    retbase = ret->bitset = PyMem_Malloc(wordbytesize * ret->allocated);
     ret->size = -1;
     ret->tot = -1;
     for (; xbase < xend; ++xbase, ++ybase, ++retbase)
@@ -268,12 +281,12 @@ IntBitSet *intBitSetIntersection(IntBitSet *const x, IntBitSet *const y) {
     register word_t *xend;
     register word_t *ybase;
     register word_t *retbase;
-    register IntBitSet * ret = malloc(sizeof (IntBitSet));
+    register IntBitSet * ret = PyMem_Malloc(sizeof (IntBitSet));
     ret->allocated = intBitSetAdaptMin(x, y);
     xbase = x->bitset;
     xend = x->bitset+ret->allocated;
     ybase = y->bitset;
-    retbase = ret->bitset = malloc(wordbytesize * ret->allocated);
+    retbase = ret->bitset = PyMem_Malloc(wordbytesize * ret->allocated);
     ret->size = -1;
     ret->tot = -1;
     for (; xbase < xend; ++xbase, ++ybase, ++retbase)
@@ -287,12 +300,12 @@ IntBitSet *intBitSetSub(IntBitSet *const x, IntBitSet *const y) {
     register word_t *ybase;
     register word_t *retbase;
     register word_t *retend;
-    register IntBitSet * ret = malloc(sizeof (IntBitSet));
+    register IntBitSet * ret = PyMem_Malloc(sizeof (IntBitSet));
     register int tmpsize = intBitSetAdaptMin(x, y);
     ret->allocated = x->allocated > tmpsize ? x->allocated : tmpsize;
     xbase = x->bitset;
     ybase = y->bitset;
-    retbase = ret->bitset = malloc(wordbytesize * ret->allocated);
+    retbase = ret->bitset = PyMem_Malloc(wordbytesize * ret->allocated);
     retend = ret->bitset+tmpsize;
     ret->size = -1;
     ret->tot = -1;
