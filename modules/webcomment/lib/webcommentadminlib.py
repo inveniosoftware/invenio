@@ -44,27 +44,37 @@ def getnavtrail(previous = '', ln=CFG_SITE_LANG):
     navtrail = navtrail + previous
     return navtrail
 
-def get_nb_reviews(recID):
+def get_nb_reviews(recID, count_deleted=True):
     """
     Return number of reviews for the record recID
+
+    if count_deleted is True, deleted reviews are also counted
     """
     query = """SELECT count(*)
             FROM cmtRECORDCOMMENT c
             WHERE c.id_bibrec = %s and c.star_score > 0
             """
 
+    if not count_deleted:
+        query += "and c.status != 'dm' and c.status != 'da'"
+
     res = run_sql(query, (recID,))
 
     return res[0][0]
 
-def get_nb_comments(recID):
+def get_nb_comments(recID, count_deleted=True):
     """
     Return number of comments for the record recID
+
+    if count_deleted is True, deleted comments are also counted
     """
     query = """SELECT count(*)
             FROM cmtRECORDCOMMENT c
             WHERE c.id_bibrec = %s and c.star_score = 0
             """
+
+    if not count_deleted:
+        query += "and c.status != 'dm' and c.status != 'da'"
 
     res = run_sql(query, (recID,))
 

@@ -3370,7 +3370,7 @@ class Template:
                                                                         {'class': "moreinfo"})
 
         if CFG_WEBCOMMENT_ALLOW_COMMENTS and CFG_WEBSEARCH_SHOW_COMMENT_COUNT:
-            num_comments = get_nb_comments(recID)
+            num_comments = get_nb_comments(recID, count_deleted=False)
             if num_comments:
                 out += '<span class="moreinfo"> - %s</span>' % \
                         create_html_link(CFG_SITE_URL + '/record/' + str(recID)
@@ -3381,7 +3381,7 @@ class Template:
                 out += "<!--not showing reviews links-->"
 
         if CFG_WEBCOMMENT_ALLOW_REVIEWS and CFG_WEBSEARCH_SHOW_REVIEW_COUNT:
-            num_reviews = get_nb_reviews(recID)
+            num_reviews = get_nb_reviews(recID, count_deleted=False)
             if num_reviews:
                 out += '<span class="moreinfo"> - %s</span>' % \
                         create_html_link(CFG_SITE_URL + '/record/' + str(recID)
