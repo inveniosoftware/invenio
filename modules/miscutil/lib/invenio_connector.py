@@ -46,6 +46,7 @@ import re
 import tempfile
 import os
 import time
+import sys
 
 try:
     # if we are running locally, we can optimize :-)
@@ -150,13 +151,48 @@ class InvenioConnector:
             # pylint: enable=E1103
 
             if of == "id":
-                if type(res) is str:
-                    # Transform to list
-                    res = [int(recid.strip()) for recid in \
-                    res.strip("[]").split(",") if recid.strip() != ""]
-                res.reverse()
+                try:
+                    if type(res) is str:
+                        # Transform to list
+                        res = [int(recid.strip()) for recid in \
+                        res.strip("[]").split(",") if recid.strip() != ""]
+                    res.reverse()
+                except (ValueError, AttributeError):
+                    res = []
             self.cached_queries[params + str(parse_results)] = res
             return self.cached_queries[params + str(parse_results)]
+
+    def search_with_retry(self, sleeptime=3.0, retrycount=3, **params):
+        """
+        This function performs a search given a dictionary of search(..)
+        parameters. It accounts for server timeouts as necessary and
+        will retry some number of times.
+
+        @param sleeptime: number of seconds to sleep between queries
+        @type sleeptime: float
+
+        @param retrycount: number of times to retry given search
+        @type retrycount: int
+
+        @param params: search parameters
+        @type params: **kwds
+
+        @rtype: list
+        @return: returns records in given format
+        """
+        results = []
+        count = 0
+        while count < retrycount:
+            try:
+                results = self.search(**params)
+                break
+            except urllib2.URLError:
+                sys.stderr.write("Timeout while searching...Retrying\n")
+                time.sleep(sleeptime)
+                count += 1
+        else:
+            sys.stderr.write("Aborting search after %d attempts.\n" % (retrycount,))
+        return results
 
     def search_similar_records(self, recid):
         """
