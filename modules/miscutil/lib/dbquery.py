@@ -70,6 +70,14 @@ CFG_DATABASE_PASS = 'my123p$ss'
 
 _DB_CONN = {}
 
+
+class InvenioDbQueryWildcardLimitError(Exception):
+    """Exception raised when query limit reached."""
+    def __init__(self, res):
+        """Initialization."""
+        self.res = res
+
+
 def _db_login(relogin = 0):
     """Login to the database."""
 
@@ -216,6 +224,25 @@ def run_sql_many(query, params, limit=CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT):
             r += rc
         i += limit
     return r
+
+def run_sql_with_limit(query, param=None, n=0, with_desc=0, wildcard_limit=0):
+    """This function should be used in some cases, instead of run_sql function, in order
+        to protect the db from queries that might take a log time to respond
+        Ex: search queries like [a-z]+ ; cern*; a->z;
+        The parameters are exactly the ones for run_sql function.
+        In case the query limit is reached, an InvenioDbQueryWildcardLimitError will be raised.
+    """
+    try:
+        dummy = int(wildcard_limit)
+    except ValueError:
+        raise
+    if wildcard_limit < 1:#no limit on the wildcard queries
+        return run_sql(query, param, n, with_desc)
+    safe_query = query + " limit %s" %wildcard_limit
+    res = run_sql(safe_query, param, n, with_desc)
+    if len(res) == wildcard_limit:
+        raise InvenioDbQueryWildcardLimitError(res)
+    return res
 
 def blob_to_string(ablob):
     """Return string representation of ABLOB.  Useful to treat MySQL

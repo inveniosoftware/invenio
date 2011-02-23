@@ -61,6 +61,7 @@ from invenio.config import \
      CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE, \
      CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
+     CFG_WEBSEARCH_WILDCARD_LIMIT, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_LOGDIR, \
@@ -68,7 +69,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_BIBRANK_SHOW_CITATION_LINKS
-from invenio.search_engine_config import InvenioWebSearchUnknownCollectionError
+from invenio.search_engine_config import InvenioWebSearchUnknownCollectionError, InvenioWebSearchWildcardLimitError
 from invenio.bibrecord import create_record, record_get_field_instances
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records, is_method_valid
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
@@ -84,7 +85,7 @@ from invenio.access_control_config import VIEWRESTRCOLL, \
     CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
 from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.intbitset import intbitset as HitSet
-from invenio.dbquery import DatabaseError, deserialize_via_marshal
+from invenio.dbquery import DatabaseError, deserialize_via_marshal, InvenioDbQueryWildcardLimitError
 from invenio.access_control_engine import acc_authorize_action
 from invenio.errorlib import register_exception
 from invenio.textutils import encode_for_xml, wash_for_utf8
@@ -98,7 +99,8 @@ from invenio.bibrank_citation_searcher import get_cited_by_count, calculate_cite
     get_refersto_hitset, get_citedby_hitset
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
-from invenio.dbquery import run_sql, get_table_update_time
+from invenio.dbquery import run_sql, run_sql_with_limit, \
+                            get_table_update_time, Error
 from invenio.webuser import getUid, collect_user_info
 from invenio.webpage import pageheaderonly, pagefooteronly, create_error_box
 from invenio.messages import gettext_set_language
@@ -738,7 +740,6 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                     pi = strip_accents(pi) # strip accents for 'w' mode, FIXME: delete when not needed
                     for pii in get_words_from_pattern(pi):
                         opfts.append([oi, pii, fi, 'w'])
-
     ## sanity check:
     for i in range(0, len(opfts)):
         try:
@@ -1505,7 +1506,7 @@ def wash_pattern(p):
     # get rid of unquoted wildcards after spaces:
     p = re_pattern_wildcards_after_spaces.sub("\\1", p)
     # get rid of extremely short words (1-3 letters with wildcards):
-    p = re_pattern_short_words.sub("\\1", p)
+    #p = re_pattern_short_words.sub("\\1", p)
     # replace back __SPACE__ by spaces:
     p = re_pattern_space.sub(" ", p)
     # replace special terms:
@@ -1759,7 +1760,7 @@ def browse_in_bibwords(req, p, f, ln=CFG_SITE_LANG):
     ))
     return
 
-def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=CFG_SITE_LANG, display_nearest_terms_box=True):
+def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=CFG_SITE_LANG, display_nearest_terms_box=True, wl=0):
     """Search for complex pattern 'p' within field 'f' according to
        matching type 'm'.  Return hitset of recIDs.
 
@@ -1827,7 +1828,12 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
 
     for idx_unit in xrange(len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
-        basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m)
+        try:
+            basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m, wl)
+        except InvenioWebSearchWildcardLimitError, excp:
+            basic_search_unit_hitset = excp.res
+            if of.startswith("h"):
+                print_warning(req, "Search term too generic, displaying only partial results...")
         # FIXME: workaround for not having phrase index yet
         if bsu_f == 'fulltext' and bsu_m != 'w' and of.startswith('h'):
             print_warning(req, _("No phrase index available for fulltext yet, looking for word combination..."))
@@ -1845,7 +1851,6 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                                             it queries in a hidden tag %s" %
                                       (repr(bsu_p), repr(myhiddens)))
                     display_nearest_terms_box=False #..and stop spying, too.
-
         if verbose >= 9 and of.startswith("h"):
             print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (cgi.escape(bsu_p), basic_search_unit_hitset))
         if len(basic_search_unit_hitset) > 0 or \
@@ -1867,7 +1872,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                     bsu_pn = re.sub(r'[^a-zA-Z0-9\s\:]+', " ", bsu_p)
                 if verbose and of.startswith('h') and req:
                     print_warning(req, "Trying (%s,%s,%s)" % (cgi.escape(bsu_pn), cgi.escape(bsu_f), cgi.escape(bsu_m)))
-                basic_search_unit_hitset = search_pattern(req=None, p=bsu_pn, f=bsu_f, m=bsu_m, of="id", ln=ln)
+                basic_search_unit_hitset = search_pattern(req=None, p=bsu_pn, f=bsu_f, m=bsu_m, of="id", ln=ln, wl=wl)
                 if len(basic_search_unit_hitset) > 0:
                     # we retain the new unit instead
                     if of.startswith('h'):
@@ -1946,7 +1951,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         print_warning(req, "Search stage 3: execution took %.2f seconds." % (t2 - t1))
     return hitset_in_any_collection
 
-def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=CFG_SITE_LANG, display_nearest_terms_box=True):
+def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=CFG_SITE_LANG, display_nearest_terms_box=True, wl=0):
     """Search for complex pattern 'p' containing parenthesis within field 'f' according to
        matching type 'm'.  Return hitset of recIDs.
 
@@ -1964,7 +1969,7 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
     # sanity check: do not call parenthesised parser for search terms
     # like U(1):
     if not re_pattern_parens.search(p):
-        return search_pattern(req, p, f, m, ap, of, verbose, ln, display_nearest_terms_box=display_nearest_terms_box)
+        return search_pattern(req, p, f, m, ap, of, verbose, ln, display_nearest_terms_box=display_nearest_terms_box, wl=wl)
 
     # Try searching with parentheses
     try:
@@ -1995,7 +2000,7 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
                 display_nearest_terms_box=False
 
             # obtain a hitset for the current pattern
-            current_hitset = search_pattern(req, current_pattern, f, m, ap, of, verbose, ln, display_nearest_terms_box=display_nearest_terms_box)
+            current_hitset = search_pattern(req, current_pattern, f, m, ap, of, verbose, ln, display_nearest_terms_box=display_nearest_terms_box, wl=wl)
 
             # combine the current hitset with resulting hitset using the current operator
             if current_operator == '+':
@@ -2019,9 +2024,9 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
         p = p.replace('(', ' ')
         p = p.replace(')', ' ')
 
-        return search_pattern(req, p, f, m, ap, of, verbose, ln, display_nearest_terms_box=display_nearest_terms_box)
+        return search_pattern(req, p, f, m, ap, of, verbose, ln, display_nearest_terms_box=display_nearest_terms_box, wl=wl)
 
-def search_unit(p, f=None, m=None):
+def search_unit(p, f=None, m=None, wl=0):
     """Search for basic search unit defined by pattern 'p' and field
        'f' and matching type 'm'.  Return hitset of recIDs.
 
@@ -2029,6 +2034,11 @@ def search_unit(p, f=None, m=None):
        'p' is assumed to be already a ``basic search unit'' so that it
        is searched as such and is not broken up in any way.  Only
        wildcard and span queries are being detected inside 'p'.
+
+       In case the wildcard limit (wl) is greater than 0 and this limit
+       is reached an InvenioWebSearchWildcardLimitError will be raised.
+       In case you want to call this function with no limit for the
+       wildcard queries, wl should be 0.
 
        This function is suitable as a low-level API.
     """
@@ -2054,21 +2064,22 @@ def search_unit(p, f=None, m=None):
             return search_pattern(None, p, f, 'w')
         index_id = get_index_id_from_field(f)
         if index_id != 0:
-            set = search_unit_in_idxphrases(p, f, m)
+            set = search_unit_in_idxphrases(p, f, m, wl)
         else:
-            set = search_unit_in_bibxxx(p, f, m)
+            set = search_unit_in_bibxxx(p, f, m, wl)
     elif p.startswith("cited:"):
         # we are doing search by the citation count
         set = search_unit_by_times_cited(p[6:])
     else:
         # we are doing bibwords search by default
-        set = search_unit_in_bibwords(p, f)
+        set = search_unit_in_bibwords(p, f, m, wl=wl)
     return set
 
-def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
+def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
     """Searches for 'word' inside bibwordsX table for field 'f' and returns hitset of recIDs."""
     set = HitSet() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
+    limit_reached = 0 # flag for knowing if the query limit has been reached
     # deduce into which bibwordsX table we will search:
     stemming_language = get_index_stemming_language(get_index_id_from_field("anyfield"))
     bibwordsX = "idxWORD%02dF" % get_index_id_from_field("anyfield")
@@ -2091,8 +2102,12 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
             word1 = lower_index_term(word1)
             word0 = stem(word0, stemming_language)
             word1 = stem(word1, stemming_language)
-        res = run_sql("SELECT term,hitlist FROM %s WHERE term BETWEEN %%s AND %%s" % bibwordsX,
-                      (wash_index_term(word0), wash_index_term(word1)))
+        try:
+            res = run_sql_with_limit("SELECT term,hitlist FROM %s WHERE term BETWEEN %%s AND %%s" % bibwordsX,
+                          (wash_index_term(word0), wash_index_term(word1)), wildcard_limit = wl)
+        except InvenioDbQueryWildcardLimitError, excp:
+            res = excp.res
+            limit_reached = 1 # set the limit reached flag to true
     else:
         if f == 'journal':
             pass # FIXME: quick hack for the journal index
@@ -2107,8 +2122,12 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
                 # FIXME: we can run a sanity check here for all indexes
                 res = ()
             else:
-                res = run_sql("SELECT term,hitlist FROM %s WHERE term LIKE %%s" % bibwordsX,
-                              (wash_index_term(word),))
+                try:
+                    res = run_sql_with_limit("SELECT term,hitlist FROM %s WHERE term LIKE %%s" % bibwordsX,
+                                  (wash_index_term(word),), wildcard_limit = wl)
+                except InvenioDbQueryWildcardLimitError, excp:
+                    res = excp.res
+                    limit_reached = 1 # set the limit reached flag to true
         else:
             res = run_sql("SELECT term,hitlist FROM %s WHERE term=%%s" % bibwordsX,
                           (wash_index_term(word),))
@@ -2121,14 +2140,19 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
         else:
             set = hitset_bibwrd
             set_used = 1
+    #check to see if the query limit was reached
+    if limit_reached:
+        #raise an exception, so we can print a nice message to the user
+        raise InvenioWebSearchWildcardLimitError(set)
     # okay, return result set:
     return set
 
-def search_unit_in_idxphrases(p, f, type):
+def search_unit_in_idxphrases(p, f, type, wl=0):
     """Searches for phrase 'p' inside idxPHRASE*F table for field 'f' and returns hitset of recIDs found.
     The search type is defined by 'type' (e.g. equals to 'r' for a regexp search)."""
     set = HitSet() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
+    limit_reached = 0 # flag for knowing if the query limit has been reached
     # deduce in which idxPHRASE table we will search:
     idxphraseX = "idxPHRASE%02dF" % get_index_id_from_field("anyfield")
     if f:
@@ -2137,7 +2161,6 @@ def search_unit_in_idxphrases(p, f, type):
             idxphraseX = "idxPHRASE%02dF" % index_id
         else:
             return HitSet() # phrase index f does not exist
-
     # detect query type (exact phrase, partial phrase, regexp):
     if type == 'r':
         query_addons = "REGEXP %s"
@@ -2163,8 +2186,12 @@ def search_unit_in_idxphrases(p, f, type):
             query_params_washed += (wash_author_name(query_param),)
         query_params = query_params_washed
     # perform search:
-    res = run_sql("SELECT term,hitlist FROM %s WHERE term %s" % (idxphraseX, query_addons),
-                  query_params)
+    try:
+        res = run_sql_with_limit("SELECT term,hitlist FROM %s WHERE term %s" % (idxphraseX, query_addons),
+                      query_params, wildcard_limit=wl)
+    except InvenioDbQueryWildcardLimitError, excp:
+        res = excp.res
+        limit_reached = 1 # set the limit reached flag to true
     # fill the result set:
     for word, hitlist in res:
         hitset_bibphrase = HitSet(hitlist)
@@ -2174,18 +2201,22 @@ def search_unit_in_idxphrases(p, f, type):
         else:
             set = hitset_bibphrase
             set_used = 1
+    #check to see if the query limit was reached
+    if limit_reached:
+        #raise an exception, so we can print a nice message to the user
+        raise InvenioWebSearchWildcardLimitError(set)
     # okay, return result set:
     return set
 
-def search_unit_in_bibxxx(p, f, type):
+def search_unit_in_bibxxx(p, f, type, wl=0):
     """Searches for pattern 'p' inside bibxxx tables for field 'f' and returns hitset of recIDs found.
     The search type is defined by 'type' (e.g. equals to 'r' for a regexp search)."""
 
     # FIXME: quick hack for the journal index
     if f == 'journal':
-        return search_unit_in_bibwords(p, f)
-
+        return search_unit_in_bibwords(p, f, wl=wl)
     p_orig = p # saving for eventual future 'no match' reporting
+    limit_reached = 0 # flag for knowing if the query limit has been reached
     query_addons = "" # will hold additional SQL code for the query
     query_params = () # will hold parameters for the query (their number may vary depending on TYPE argument)
     # wash arguments:
@@ -2225,8 +2256,12 @@ def search_unit_in_bibxxx(p, f, type):
         bibx = "bibrec_bib%d%dx" % (digit1, digit2)
         # construct and run query:
         if t == "001":
-            res = run_sql("SELECT id FROM bibrec WHERE id %s" % query_addons,
-                          query_params)
+            try:
+                res = run_sql_with_limit("SELECT id FROM bibrec WHERE id %s" % query_addons,
+                              query_params, wildcard_limit=wl)
+            except InvenioDbQueryWildcardLimitError, excp:
+                res = excp.res
+                limit_reached = 1 # set the limit reached flag to true
         else:
             query = "SELECT bibx.id_bibrec FROM %s AS bx LEFT JOIN %s AS bibx ON bx.id=bibx.id_bibxxx WHERE bx.value %s" % \
                     (bx, bibx, query_addons)
@@ -2234,11 +2269,19 @@ def search_unit_in_bibxxx(p, f, type):
                 # wildcard query, or only the beginning of field 't'
                 # is defined, so add wildcard character:
                 query += " AND bx.tag LIKE %s"
-                res = run_sql(query, query_params + (t + '%',))
+                try:
+                    res = run_sql_with_limit(query, query_params + (t + '%',), wildcard_limit=wl)
+                except InvenioDbQueryWildcardLimitError, excp:
+                    res = excp.res
+                    limit_reached = 1 # set the limit reached flag to true
             else:
                 # exact query for 't':
                 query += " AND bx.tag=%s"
-                res = run_sql(query, query_params + (t,))
+                try:
+                    res = run_sql_with_limit(query, query_params + (t,), wildcard_limit=wl)
+                except InvenioDbQueryWildcardLimitError, excp:
+                    res = excp.res
+                    limit_reached = 1 # set the limit reached flag to true
         # fill the result set:
         for id_bibrec in res:
             if id_bibrec[0]:
@@ -2247,6 +2290,10 @@ def search_unit_in_bibxxx(p, f, type):
     nb_hits = len(l)
     # okay, return result set:
     set = HitSet(l)
+    #check to see if the query limit was reached
+    if limit_reached:
+        #raise an exception, so we can print a nice message to the user
+        raise InvenioWebSearchWildcardLimitError(set)
     return set
 
 def search_unit_in_bibrec(datetext1, datetext2, type='c'):
@@ -4213,7 +4260,7 @@ def log_query_info(action, p, f, colls, nb_records_found_total=-1):
 def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, sf="", so="d", sp="", rm="", of="id", ot="", aas=0,
                            p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc=0, jrec=0,
                            recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="", d1="",
-                           d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=CFG_SITE_LANG, ec=None, tab=""):
+                           d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=CFG_SITE_LANG, ec=None, tab="", wl=CFG_WEBSEARCH_WILDCARD_LIMIT):
     """Perform search or browse request, without checking for
        authentication.  Return list of recIDs found, if of=id.
        Otherwise create web page.
@@ -4382,6 +4429,9 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
 
           ec - list of external search engines to search as well
                (e.g. "SPIRES HEP").
+
+          wl - wildcard limit (ex: 100) the wildcard queries will be
+               limited at 100 results
     """
 
     selected_external_collections_infos = None
@@ -4629,7 +4679,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
     else:
         ## 3 - common search needed
         query_in_cache = False
-        query_representation_in_cache = repr((p,f,colls_to_search))
+        query_representation_in_cache = repr((p,f,colls_to_search, wl))
         page_start(req, of, cc, aas, ln, uid, p=create_page_title_search_pattern_info(p, p1, p2, p3))
 
         if of.startswith("h") and verbose and wash_colls_debug:
@@ -4689,7 +4739,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
         if aas == 1 or (p1 or p2 or p3):
             ## 3A - advanced search
             try:
-                results_in_any_collection = search_pattern_parenthesised(req, p1, f1, m1, ap=ap, of=of, verbose=verbose, ln=ln)
+                results_in_any_collection = search_pattern_parenthesised(req, p1, f1, m1, ap=ap, of=of, verbose=verbose, ln=ln, wl=wl)
                 if len(results_in_any_collection) == 0:
                     if of.startswith("h"):
                         perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
@@ -4699,7 +4749,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                         print_records_epilogue(req, of)
                     return page_end(req, of, ln)
                 if p2:
-                    results_tmp = search_pattern_parenthesised(req, p2, f2, m2, ap=ap, of=of, verbose=verbose, ln=ln)
+                    results_tmp = search_pattern_parenthesised(req, p2, f2, m2, ap=ap, of=of, verbose=verbose, ln=ln, wl=wl)
                     if op1 == "a": # add
                         results_in_any_collection.intersection_update(results_tmp)
                     elif op1 == "o": # or
@@ -4718,7 +4768,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                             print_records_epilogue(req, of)
                         return page_end(req, of, ln)
                 if p3:
-                    results_tmp = search_pattern_parenthesised(req, p3, f3, m3, ap=ap, of=of, verbose=verbose, ln=ln)
+                    results_tmp = search_pattern_parenthesised(req, p3, f3, m3, ap=ap, of=of, verbose=verbose, ln=ln, wl=wl)
                     if op2 == "a": # add
                         results_in_any_collection.intersection_update(results_tmp)
                     elif op2 == "o": # or
@@ -4753,7 +4803,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                     # recommendations when there are results only in the hosted collections. Also added the if clause to avoid
                     # searching in case we know we only have actual or potential hosted collections results
                     if not only_hosted_colls_actual_or_potential_results_p:
-                        results_in_any_collection = search_pattern_parenthesised(req, p, f, ap=ap, of=of, verbose=verbose, ln=ln, display_nearest_terms_box=not hosted_colls_actual_or_potential_results_p)
+                        results_in_any_collection = search_pattern_parenthesised(req, p, f, ap=ap, of=of, verbose=verbose, ln=ln, display_nearest_terms_box=not hosted_colls_actual_or_potential_results_p, wl=wl)
                 except:
                     register_exception(req=req, alert_admin=True)
                     if of.startswith("h"):
@@ -4837,7 +4887,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
             try:
                 results_final = intersect_results_with_hitset(req,
                                                               results_final,
-                                                              search_pattern_parenthesised(req, pl, ap=0, ln=ln),
+                                                              search_pattern_parenthesised(req, pl, ap=0, ln=ln, wl=wl),
                                                               ap,
                                                               aptext=_("No match within your search limits, "
                                                                        "discarding this condition..."),

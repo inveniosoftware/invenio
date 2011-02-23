@@ -39,7 +39,7 @@ from mechanize import Browser, LinkNotFoundError
 from invenio.config import CFG_SITE_URL, CFG_SITE_NAME, CFG_SITE_LANG
 from invenio.testutils import make_test_suite, \
                               run_test_suite, \
-                              make_url, test_web_page_content, \
+                              make_url, make_surl, test_web_page_content, \
                               merge_error_messages
 from invenio.urlutils import same_urls_p
 from invenio.search_engine import perform_request_search, \
@@ -640,6 +640,62 @@ class WebSearchTestSearch(unittest.TestCase):
                                                     p="Ellis, R S",
                                                     f='author',
                                                     ln='en')))
+
+class WebSearchTestWildcardLimit(unittest.TestCase):
+    """Checks if the wildcard limit is correctly passed and that
+    users without autorization can not exploit it"""
+
+    def test_wildcard_limit_correctly_passed_when_default(self):
+        """websearch - wildcard limit is correctly passed when default"""
+        self.assertEqual(perform_request_search(p="e*", f='author'),
+                            perform_request_search(p="e*", f='author', wl=1000))
+
+    def test_wildcard_limit_correctly_passed_when_set(self):
+        """websearch - wildcard limit is correctly passed when set"""
+        self.assertEqual([],
+            test_web_page_content(CFG_SITE_URL + '/search?p=e*&f=author&of=id&wl=5',
+                                  expected_text="[9, 10, 11, 17, 46, 48, 50, 51, 52, 53, 54, 67, 72, 74, 81, 88, 92, 96]"))
+
+    def test_wildcard_limit_increased_by_authorized_users(self):
+        """websearch - wildcard limit increased by authorized user"""
+
+        browser = Browser()
+
+        #try a search query, with no wildcard limit set by the user
+        browser.open(make_url('/search?p=a*&of=id'))
+        recid_list_guest_no_limit = browser.response().read() # so the limit is CGF_WEBSEARCH_WILDCARD_LIMIT
+
+        #try a search query, with a wildcard limit imposed by the user
+        #wl=1000000 - a very high limit,higher then what the CFG_WEBSEARCH_WILDCARD_LIMIT might be
+        browser.open(make_url('/search?p=a*&of=id&wl=1000000'))
+        recid_list_guest_with_limit = browser.response().read()
+
+        #same results should be returned for a search without the wildcard limit set by the user
+        #and for a search with a large limit set by the user
+        #in this way we know that nomatter how large the limit is, the wildcard query will be
+        #limitted by CFG_WEBSEARCH_WILDCARD_LIMIT (for a guest user)
+        self.failIf(len(recid_list_guest_no_limit.split(',')) != len(recid_list_guest_with_limit.split(',')))
+
+        ##login as admin
+        browser.open(make_surl('/youraccount/login'))
+        browser.select_form(nr=0)
+        browser['p_un'] = 'admin'
+        browser['p_pw'] = ''
+        browser.submit()
+
+        #try a search query, with a wildcard limit imposed by an authorized user
+        #wl = 10000 a very high limit, higher then what the CFG_WEBSEARCH_WILDCARD_LIMIT might be
+        browser.open(make_surl('/search?p=a*&of=id&wl=10000'))
+        recid_list_authuser_with_limit = browser.response().read()
+
+        #the authorized user can set whatever limit he might wish
+        #so, the results returned for the auth. users should exceed the results returned for unauth. users
+        self.failUnless(len(recid_list_guest_no_limit.split(',')) <= len(recid_list_authuser_with_limit.split(',')))
+
+        #logout
+        browser.open(make_surl('/youraccount/logout'))
+        browser.response().read()
+        browser.close()
 
 class WebSearchNearestTermsTest(unittest.TestCase):
     """Check various alternatives of searches leading to the nearest
@@ -1727,7 +1783,9 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchAlertTeaserTest,
                              WebSearchSpanQueryTest,
                              WebSearchReferstoCitedbyTest,
-                             WebSearchSPIRESSyntaxTest)
+                             WebSearchSPIRESSyntaxTest,
+                             WebSearchTestWildcardLimit)
+
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

@@ -81,7 +81,8 @@ from invenio.config import \
      CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL, \
      CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
      CFG_WEBSEARCH_RSS_I18N_COLLECTIONS, \
-     CFG_INSPIRE_SITE
+     CFG_INSPIRE_SITE, \
+     CFG_WEBSEARCH_WILDCARD_LIMIT
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
@@ -258,7 +259,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         from operator import itemgetter
 
         argd = wash_urlargd(form,
-                            {'ln': (str, CFG_SITE_LANG), 
+                            {'ln': (str, CFG_SITE_LANG),
                              'verbose': (int, 0),
                              'recid': (int, -1)
                              })
@@ -823,6 +824,13 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                         text=auth_msg, \
                         navmenuid='search')
 
+        #check if the user has rights to set a high wildcard limit
+        #if not, reduce the limit set by user, with the default one
+        if CFG_WEBSEARCH_WILDCARD_LIMIT > 0 and (argd['wl'] > CFG_WEBSEARCH_WILDCARD_LIMIT or argd['wl'] == 0):
+            auth_code, auth_message = acc_authorize_action(req,'runbibedit')
+            if auth_code != 0:
+                argd['wl'] = CFG_WEBSEARCH_WILDCARD_LIMIT
+
         # Keep all the arguments, they might be reused in the
         # search_engine itself to derivate other queries
         req.argd = argd
@@ -862,6 +870,13 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                     return page_not_authorized(req, "../", \
                         text=auth_msg, \
                         navmenuid='search')
+
+        #check if the user has rights to set a high wildcard limit
+        #if not, reduce the limit set by user, with the default one
+        if CFG_WEBSEARCH_WILDCARD_LIMIT > 0 and (argd['wl'] > CFG_WEBSEARCH_WILDCARD_LIMIT or argd['wl'] == 0):
+            auth_code, auth_message = acc_authorize_action(req,'runbibedit')
+            if auth_code != 0:
+                argd['wl'] = CFG_WEBSEARCH_WILDCARD_LIMIT
 
         # Keep all the arguments, they might be reused in the
         # search_engine itself to derivate other queries

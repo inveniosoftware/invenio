@@ -58,6 +58,7 @@ from invenio.config import \
      CFG_BIBINDEX_CHARS_PUNCTUATION, \
      CFG_WEBCOMMENT_ALLOW_COMMENTS, \
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
+     CFG_WEBSEARCH_WILDCARD_LIMIT,\
      CFG_WEBSEARCH_SHOW_COMMENT_COUNT, \
      CFG_WEBSEARCH_SHOW_REVIEW_COUNT
 
@@ -162,6 +163,7 @@ class Template:
         'ap': (int, 1),
         'verbose': (int, 0),
         'ec': (list, []),
+        'wl': (int, CFG_WEBSEARCH_WILDCARD_LIMIT),
         }
 
     # ...and for search interfaces
