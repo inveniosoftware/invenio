@@ -5658,9 +5658,15 @@ def usage(wmsg="", err_code=0):
                   of trying to locate the reference section within a document
                   and instead move to the stage of recognition and
                   standardisation of citations within lines.
-    -s, --inspire
+   -s, --inspire
                   output journal title numeration in the inspire recognised
-                  format: [series]volume,page,year
+                  format: [series]volume,page,year.
+   -j, --kb-journal
+                  manually specify the location of a journal title knowledge-
+                  base file.
+   -n, --kb-report-number
+                  manually specify the location of a report number knowledge-
+                  base file.
 
   Example: refextract -x /home/chayward/refs.xml 499:/home/chayward/thesis.pdf
 """
@@ -5682,10 +5688,12 @@ def get_cli_options():
                  'xmlfile'                    : 0,
                  'dictfile'                   : 0,
                  'inspire'                    : 0,
+                 'kb-journal'                 : 0,
+                 'kb-report-number'           : 0,
                }
 
     try:
-        myoptions, myargs = getopt.getopt(sys.argv[1:], "hVv:zrx:d:s", \
+        myoptions, myargs = getopt.getopt(sys.argv[1:], "hVv:zrx:d:sj:n:", \
                                           ["help",
                                            "version",
                                            "verbose=",
@@ -5693,7 +5701,9 @@ def get_cli_options():
                                            "output-raw-refs",
                                            "xmlfile=",
                                            "dictfile=",
-                                           "inspire"])
+                                           "inspire",
+                                           "kb-journal=",
+                                           "kb-report-number="])
     except getopt.GetoptError, err:
         ## Invalid option provided - usage message
         usage(wmsg="Error: %(msg)s." % { 'msg' : str(err) })
@@ -5727,9 +5737,18 @@ def get_cli_options():
             ## extraction job to the specified file
             cli_opts['dictfile'] = o[1]
         elif o[0] in ("-s", "--inspire"):
-            ## Write out the statistics of all titles matched during the
-            ## extraction job to the specified file
+            ## Output recognised journal titles in the Inspire compatible
+            ## format
             cli_opts['inspire'] = 1
+        elif o[0] in ("-j","--kb-journal"):
+            ## The location of the journal title kb requested to override
+            ## a 'configuration file'-specified kb, holding
+            ## 'seek---replace' terms, used when matching titles in references
+            cli_opts['kb-journal'] = o[1]
+        elif o[0] in ("-n","--kb-report-number"):
+            ## The location of the report number kb requested to override
+            ## a 'configuration file'-specified kb
+            cli_opts['kb-report-number'] = o[1]
 
     # What journal title format are we using?
     if cli_opts['verbosity'] > 0 and cli_opts['inspire']:
@@ -5860,14 +5879,28 @@ def main():
         usage()
 
     ## Read the journal titles knowledge base, creating the search
-    ## patterns and replace terms:
-    (title_search_kb, \
-     title_search_standardised_titles, \
-     title_search_keys) = \
-               build_titles_knowledge_base(CFG_REFEXTRACT_KB_JOURNAL_TITLES)
-    (preprint_reportnum_sre, \
-     standardised_preprint_reportnum_categs) = \
-               build_reportnum_knowledge_base(CFG_REFEXTRACT_KB_REPORT_NUMBERS)
+    ## patterns and replace terms. Check for user-specified journal kb.
+    if cli_opts['kb-journal'] != 0:
+        (title_search_kb, \
+         title_search_standardised_titles, \
+         title_search_keys) = \
+                   build_titles_knowledge_base(cli_opts['kb-journal'])
+    else:
+        (title_search_kb, \
+         title_search_standardised_titles, \
+         title_search_keys) = \
+                   build_titles_knowledge_base(CFG_REFEXTRACT_KB_JOURNAL_TITLES)
+
+    ## Read the report numbers knowledge base, creating the search
+    ## patterns and replace terms. Check for user-specified rep-no kb.
+    if cli_opts['kb-report-number'] != 0:
+        (preprint_reportnum_sre, \
+         standardised_preprint_reportnum_categs) = \
+                   build_reportnum_knowledge_base(cli_opts['kb-report-number'])
+    else:
+        (preprint_reportnum_sre, \
+         standardised_preprint_reportnum_categs) = \
+                   build_reportnum_knowledge_base(CFG_REFEXTRACT_KB_REPORT_NUMBERS)
 
     done_coltags = 0 ## flag to signal that the starting XML collection
                      ## tags have been output to either an xml file or stdout
