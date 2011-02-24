@@ -303,9 +303,9 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
         if file_upload_url is not None:
             file_upload_script = '''
             oFCKeditor.Config["LinkUploadURL"] = '%(file_upload_url)s';
-            oFCKeditor.Config["ImageUploadURL"] = '%(file_upload_url)s%%3Ftype%%3DImage';
-            oFCKeditor.Config["FlashUploadURL"] = '%(file_upload_url)s%%3Ftype%%3DFlash';
-            oFCKeditor.Config["MediaUploadURL"] = '%(file_upload_url)s%%3Ftype%%3DMedia';
+            oFCKeditor.Config["ImageUploadURL"] = '%(file_upload_url)s?type=Image';
+            oFCKeditor.Config["FlashUploadURL"] = '%(file_upload_url)s?type=Flash';
+            oFCKeditor.Config["MediaUploadURL"] = '%(file_upload_url)s?type=Media';
             oFCKeditor.Config["LinkUpload"] = true;
             oFCKeditor.Config["ImageUpload"] = true;
             oFCKeditor.Config["FlashUpload"] = true;
