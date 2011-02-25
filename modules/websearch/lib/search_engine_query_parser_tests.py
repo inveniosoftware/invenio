@@ -408,6 +408,12 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = 'find a j ellis and (t report or k "cross section")'
         self._compare_searches(inv_search, spi_search)
 
+    def test_find_first_author(self):
+        """SPIRES search syntax - find fa ellis"""
+        inv_search = 'firstauthor:ellis'
+        spi_search = 'find fa ellis'
+        self._compare_searches(inv_search, spi_search)
+
     def test_irn_processing(self):
         """SPIRES search syntax - find irn 1360337 == find irn SPIRES-1360337"""
         # Added for trac-130

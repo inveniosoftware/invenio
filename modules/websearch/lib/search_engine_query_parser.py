@@ -424,8 +424,8 @@ class SpiresToInvenioSyntaxConverter:
         'dupd': _DATE_UPDATED_FIELD,
         'du': _DATE_UPDATED_FIELD,
         # first author
-        'fa' : '100__a:',
-        'first-author' : '100__a:',
+        'fa' : 'firstauthor:',
+        'first-author' : 'firstauthor:',
         # author
         'a' : 'author:',
         'au' : 'author:',
