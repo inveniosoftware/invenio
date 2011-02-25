@@ -826,6 +826,8 @@ translated_welcome =  &#95;("Welcome")
               <li>4 - remove all HTML/XML tags </li>
               <li>5 - same as 2, but allows more tags, like &lt;img></li>
               <li>6 - same as 3, but allows more tags, like &lt;img></li>
+              <li>7 - mix of mode 0 and mode 1. If field_value starts with &lt;!--HTML--&gt;,
+		then use mode mode 0. Else use mode 1.
            </ul>
      These modes are the same for <code>escape_values(bfo)</code> function.
      <p>
