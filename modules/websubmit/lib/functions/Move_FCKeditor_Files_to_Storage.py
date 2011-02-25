@@ -92,8 +92,8 @@ def Move_FCKeditor_Files_to_Storage(parameters, curdir, form, user_info=None):
                 if os.path.exists(possible_original_path):
                     icon_location = original_location
                     original_location = possible_original_path
-                    new_url = build_url(sysno, "icon-" + name,
-                                        file_type, extension)
+                    new_url = build_url(sysno, name,
+                                        file_type, extension, is_icon=True)
 
             docname = build_docname(name, file_type, extension)
             if original_location not in processed_paths:
@@ -113,7 +113,7 @@ def Move_FCKeditor_Files_to_Storage(parameters, curdir, form, user_info=None):
         output_file.write(output_string)
         output_file.close()
 
-def build_url(sysno, name, file_type, extension):
+def build_url(sysno, name, file_type, extension, is_icon=False):
     """
     Build the local URL to the file with given parameters
 
@@ -123,7 +123,8 @@ def build_url(sysno, name, file_type, extension):
     @param extension: file extension, including '.'
     """
     return CFG_SITE_URL + '/record/' + str(sysno) + \
-           '/files/' + build_docname(name, file_type, extension)
+           '/files/' + build_docname(name, file_type, extension) + \
+           (is_icon and '?subformat=icon' or '')
 
 def build_docname(name, file_type, extension):
     """
