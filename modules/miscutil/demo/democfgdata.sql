@@ -51,6 +51,7 @@ INSERT INTO collection VALUES (21,'Atlantis Times Science','collection:ATLANTIST
 INSERT INTO collection VALUES (22,'Atlantis Times',NULL,NULL,NULL);
 INSERT INTO collection VALUES (23,'Atlantis Institute Books','hostedcollection:',NULL,NULL);
 INSERT INTO collection VALUES (24,'Atlantis Institute Articles','hostedcollection:',NULL,NULL);
+INSERT INTO collection VALUES (25,'Atlantis Times Drafts','collection:ATLANTISTIMESSCIENCEDRAFT or collection:ATLANTISTIMESARTSDRAFT or collection:ATLANTISTIMESNEWSDRAFT',NULL,NULL);
 
 INSERT INTO clsMETHOD VALUES (1,'HEP','http://invenio-software.org/download/invenio-demo-site-files/HEP.rdf','High Energy Physics Taxonomy','0000-00-00 00:00:00');
 INSERT INTO clsMETHOD VALUES (2,'NASA-subjects','http://invenio-software.org/download/invenio-demo-site-files/NASA-subjects.rdf','NASA Subjects','0000-00-00 00:00:00');
@@ -507,6 +508,9 @@ INSERT INTO collectionname VALUES (23,'fr','ln','Atlantis Institute Books');
 
 INSERT INTO collectionname VALUES (24,'en','ln','Atlantis Institute Articles');
 INSERT INTO collectionname VALUES (24,'fr','ln','Atlantis Institute Articles');
+
+INSERT INTO collectionname VALUES (25,'en','ln','Atlantis Times Drafts');
+INSERT INTO collectionname VALUES (25,'fr','ln','Atlantis Times Ébauches');
 
 INSERT INTO collection_collection VALUES (1,15,'r',60);
 INSERT INTO collection_collection VALUES (1,16,'r',40);
