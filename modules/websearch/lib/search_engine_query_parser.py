@@ -408,7 +408,7 @@ class SpiresToInvenioSyntaxConverter:
         'cn' : 'collaboration:',
         # conference number
         'conf-number' : '111__g:',
-        'cnum' : '111__g:',
+        'cnum' : '773__w:',
         # country
         'cc' : '044__a:',
         'country' : '044__a:',
@@ -498,6 +498,9 @@ class SpiresToInvenioSyntaxConverter:
         'desy-keyword' : '695__a:',
         'dk' : '695__a:',
 
+        # topcite
+        'topcite' : 'cited:',
+
         # second-order operators
         'refersto' : 'refersto:',
         'refs': 'refersto:',
@@ -573,6 +576,10 @@ class SpiresToInvenioSyntaxConverter:
         # match cases where a keyword distributes across a conjunction
         self._re_distribute_keywords = re.compile(r'\b(?P<keyword>\S*:)(?P<content>.+?)\s*(?P<combination>and not | and | or | not )\s*(?P<last_content>[^:]*?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
+        # massaging SPIRES quirks
+        self._re_pattern_IRN_search = re.compile(r'970__a:(?P<irn>\d+)')
+        self._re_topcite_match = re.compile(r'(?P<x>cited:\d+)\+')
+
         # regular expression that matches author patterns
         self._re_author_match = re.compile(r'\bauthor:\s*(?P<name>.+?)\s*(?= and not | and | or | not |$)', re.IGNORECASE)
 
@@ -606,7 +613,6 @@ class SpiresToInvenioSyntaxConverter:
         self._re_pattern_double_quotes = re.compile("\"(.*?)\"")
         self._re_pattern_regexp_quotes = re.compile("\/(.*?)\/")
         self._re_pattern_space = re.compile("__SPACE__")
-        self._re_pattern_IRN_search = re.compile(r'970__a:(?P<irn>\d+)')
 
     def is_applicable(self, query):
         """Is this converter applicable to this query?
@@ -644,6 +650,7 @@ class SpiresToInvenioSyntaxConverter:
 
             query = self._convert_dates(query)
             query = self._convert_irns_to_spires_irns(query)
+            query = self._convert_topcite_to_cited(query)
             query = self._convert_spires_author_search_to_invenio_author_search(query)
             query = self._convert_spires_exact_author_search_to_invenio_author_search(query)
             query = self._convert_spires_truncation_to_invenio_truncation(query)
@@ -744,6 +751,14 @@ class SpiresToInvenioSyntaxConverter:
             """method used for replacement with regular expression"""
             return '970__a:SPIRES-' + match.group('irn')
         query = self._re_pattern_IRN_search.sub(create_replacement_pattern, query)
+        return query
+
+    def _convert_topcite_to_cited(self, query):
+        """Replace SPIRES topcite x+ with cited:x->999999999"""
+        def create_replacement_pattern(match):
+            """method used for replacement with regular expression"""
+            return match.group('x') + '->999999999'
+        query = self._re_topcite_match.sub(create_replacement_pattern, query)
         return query
 
     def _convert_spires_date_after_to_invenio_span_query(self, query):

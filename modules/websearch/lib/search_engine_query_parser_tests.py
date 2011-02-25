@@ -426,6 +426,12 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         # return [] twice.  Unlikely though.
         self.assertEqual(with_result, without_result)
 
+    def test_topcite(self):
+        """SPIRES search syntax - find topcite 50+"""
+        inv_search = "cited:50->999999999"
+        spi_search = "find topcite 50+"
+        self._compare_searches(inv_search, spi_search)
+
     def test_quotes(self):
         """SPIRES search syntax - find t 'compton scattering' and a mele"""
         inv_search = "title:'compton scattering' and author:mele"
