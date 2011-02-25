@@ -168,7 +168,7 @@ class InvenioConnector:
         parameters. It accounts for server timeouts as necessary and
         will retry some number of times.
 
-        @param sleeptime: number of seconds to sleep between queries
+        @param sleeptime: number of seconds to sleep between retries
         @type sleeptime: float
 
         @param retrycount: number of times to retry given search

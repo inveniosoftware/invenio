@@ -123,7 +123,9 @@ def convert_conf_option(option_name, option_value):
     ## 3c) special cases: dicts
     if option_name in ['CFG_WEBSEARCH_FIELDS_CONVERT',
                        'CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS',
-                       'CFG_SITE_EMERGENCY_EMAIL_ADDRESSES']:
+                       'CFG_SITE_EMERGENCY_EMAIL_ADDRESSES',
+                       'CFG_BIBMATCH_FUZZY_WORDLIMITS',
+                       'CFG_BIBMATCH_QUERY_TEMPLATES']:
         option_value = option_value[1:-1]
 
     ## 3d) special cases: comma-separated lists
@@ -164,7 +166,9 @@ def convert_conf_option(option_name, option_value):
         return
 
     ## 3g) special cases: float
-    if option_name == 'CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY':
+    if option_name in ['CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY',
+                       'CFG_BIBMATCH_LOCAL_SLEEPTIME',
+                       'CFG_BIBMATCH_REMOTE_SLEEPTIME']:
         option_value = float(option_value[1:-1])
 
     ## 4) finally, return output line:

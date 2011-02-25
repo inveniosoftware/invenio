@@ -35,33 +35,98 @@ home collection.</p>
 <blockquote>
 <pre>
 
+ QUERYSTRINGS
+     Querystrings determine which type of query/strategy to use when searching for the
+     matching records in the database.
+
+   Predefined querystrings:
+
+     There are some predefined querystrings available:
+
+     title             - standard title search. (i.e. "this is a title") (default)
+     title-author      - title and author search (i.e. "this is a title AND Lastname, F")
+     reportnumber      - reportnumber search (i.e. reportnumber:REP-NO-123).
+
+     You can also add your own predefined querystrings inside invenio.conf file.
+
+     You can structure your query in different ways:
+
+     * Old-style: fieldnames separated by '||' (conforms with earlier BibMatch versions):
+       -q "773__p||100__a"
+
+     * New-style: Invenio query syntax with "bracket syntax":
+       -q "773__p:\"[773__p]\" 100__a:[100__a]"
+
+     Depending on the structure of the query, it will fetch associated values from each record and put it into
+     the final search query. i.e in the above example it will put journal-title from 773__p.
+
+     When more then one value/datafield is found, i.e. when looking for 700__a (additional authors),
+     several queries will be put together to make sure all combinations of values are accounted for.
+     The queries are separated with given operator (-o, --operator) value.
+
+     Note: You can add more then one query to a search, just give more (-q, --query-string) arguments.
+     The results of all queries will be combined when matching.
+
+   BibConvert formats:
+
+     Another option to further improve your matching strategy is to use BibConvert formats. By using the formats
+     available by BibConvert you can change the values from the retrieved record-fields.
+
+     i.e. using WORDS(1,R) will only return the first (1) word from the right (R). This can be very useful when
+     adjusting your matching parameters to better match the content. For example only getting authors last-name
+     instead of full-name.
+
+     You can use these formats directly in the querystrings (indicated by '::'):
+
+     * Old-style: -q "100__a::WORDS(1,R)::DOWN()"
+       This query will take first word from the right from 100__a and also convert it to lower-case.
+
+     * New-style: -q "100__a:[100__a::WORDS(1,R)::DOWN()]"
+
+     See BibConvert documentation for a more detailed explanation of formats.
+
+   Predefined fields:
+
+     In addition to specifying distinct MARC fields in the querystrings you can use predefined
+     fields as configured in the LOCAL(!) Invenio system. These fields will then be mapped to one
+     or more fieldtags to be retrieved from input records.
+
+     Common predefined fields used in querystrings: (for Invenio demo site, your fields may vary!)
+
+     'abstract', 'affiliation', 'anyfield', 'author', 'coden', 'collaboration',
+     'collection', 'datecreated', 'datemodified', 'division', 'exactauthor',
+     'experiment', 'fulltext', 'isbn', 'issn', 'journal', 'keyword', 'recid',
+     'reference', 'reportnumber', 'subject', 'title', 'year'
 
 </pre>
 </blockquote>
 
 <h4>Examples</h4>
 
-To match records on title and print out only new (unmatched) ones:
+To match records on title in the title index, also print out only new (unmatched) ones:
 
 <blockquote>
 <pre>
- $ bibmatch [--print-new] --field=\"title\" < input.xml > output.xml
+ $ bibmatch [--print-new] -q "[title]" --field=\"title\" < input.xml > output.xml
 </pre>
 </blockquote>
 
-To print potential duplicate entries before manual upload, run:
+To print potential duplicate entries before manual upload using predefined queries, use:
 
 <blockquote>
 <pre>
- $ bibmatch --print-match --field=\"245__a\" --mode=\"a\" < input.xml > output.xml
+ $ bibmatch --print-match -q title-author < input.xml > output.xml
 </pre>
 </blockquote>
 
-To print undecided result from a match on multiple fields, including predefined fields (title, author etc.):
+Two options for matching on multiple fields, including predefined fields (title, author etc.):
 
 <blockquote>
 <pre>
- $ bibmatch --print-ambiguous --query-string=\"245__a||author\" < input.xml > output.xml
+ #1:
+   $ bibmatch --query-string=\"[245__a] [author]" < input.xml > output.xml
+ #2:
+   $ bibmatch --query-string=\"245__a||author\" < input.xml > output.xml
 </pre>
 </blockquote>
 
@@ -99,60 +164,63 @@ used with BibUpload to update record:
 </pre>
 </blockquote>
 
+To match using BibConvert formats to manipulate fieldvalues. See <a href="<CFG_SITE_URL>/help/admin/bibconvert-admin-guide<lang:link/>">BibConvert Admin Guide</a> for more details on formats:
+
+<blockquote>
+<pre>
+ $ bibmatch --query-string=\"[245__a] [100__a::WORDS(1,R)::DOWN()]" < input.xml > output.xml
+</pre>
+</blockquote>
+
 Command line options:
 
 <blockquote>
 <pre>
+ Output:
+
  -0 --print-new (default) print unmatched in stdout
  -1 --print-match print matched records in stdout
  -2 --print-ambiguous print records that match more than 1 existing records
  -3 --print-fuzzy print records that match the longest words in existing records
 
- -b --batch-output=(filename). filename.0 will be new records, filename.1 will be matched,
-      filename.2 will be ambiguous, filename.3 will be fuzzy match
+ -b --batch-output=(filename). filename.new will be new records, filename.matched will be matched,
+      filename.ambiguous will be ambiguous, filename.fuzzy will be fuzzy match
  -t --text-marc-output transform the output to text-marc format instead of the default MARCXML
 
  Simple query:
 
+ -q --query-string=(search-query/predefined-query) See "Querystring"-section below.
  -f --field=(field)
-
- Advanced query:
-
- -c --config=(config-filename)
- -q --query-string=(uploader_querystring)
- -m --mode=(a|e|o|p|r)
- -o --operator=(a|o)
-
- Where mode is:
-  "a" all of the words,
-  "o" any of the words,
-  "e" exact phrase,
-  "p" partial phrase,
-  "r" regular expression.
-
- Operator is:
-  "a" and,
-  "o" or.
 
  General options:
 
  -n   --noprocess          Do not print records in stdout.
  -i,  --input              use a named file instead of stdin for input
- -h,  --help               print this help and exit
- -V,  --version            print version information and exit
  -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
- -r,  --remote=URL         match against a remote invenio installation (URL, no trailing '/')
+ -r,  --remote=URL         match against a remote Invenio installation (Full URL, no trailing '/')
                            Beware: Only searches public records attached to home collection
  -a,  --alter-recid        The recid (controlfield 001) of matched or fuzzy matched records in
                            output will be replaced by the 001 value of the matched record.
-                           Useful to prepare files to then be used with BibUpload.
+                           Note: Useful if you want to replace matched records using BibUpload.
+ -c,  --clean              clean queries before searching
+ -h,  --help               print this help and exit
+ -V,  --version            print version information and exit
 
- Common predefined fields used in querystrings: (for Invenio demo site, your fields may vary!)
+ Advanced options:
 
- 'abstract', 'affiliation', 'anyfield', 'author', 'coden', 'collaboration',
- 'collection', 'datecreated', 'datemodified', 'division', 'exactauthor',
- 'experiment', 'fulltext', 'isbn', 'issn', 'journal', 'keyword', 'recid',
- 'reference', 'reportnumber', 'subject', 'title', 'year'
+ -c --config=(config-filename)
+ -m --mode=(a|e|o|p|r) perform an advanced search using special search mode.
+    Where mode is:
+      "a" all of the words,
+      "o" any of the words,
+      "e" exact phrase,
+      "p" partial phrase,
+      "r" regular expression.
+
+ -o --operator(a|o) used to concatenate identical fields in search query (i.e. several report-numbers)
+    Where operator is:
+      "a" boolean AND (default)
+      "o" boolean OR
 
 </pre>
 </blockquote>

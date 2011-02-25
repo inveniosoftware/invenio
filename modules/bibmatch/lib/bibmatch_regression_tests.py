@@ -25,7 +25,8 @@ __revision__ = "$Id$"
 
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibrecord import create_records, record_has_field
-from invenio.bibmatch_engine import match_records, transform_input_to_marcxml
+from invenio.bibmatch_engine import match_records, transform_input_to_marcxml, \
+                                    Querystring
 import unittest
 
 class BibMatchTest(unittest.TestCase):
@@ -66,115 +67,57 @@ class BibMatchTest(unittest.TestCase):
 000000019 909CS $$sn$$w198238n
 000000019 980__ $$aREPORT
         """
-
-        #this exists in the DB, just some bibliography removed.
+        #ambig match:  Changed Atlantis (Timaeus) ->Atlantis
         self.recxml1 = """
-  <record>
-    <controlfield tag="003">SzGeCERN</controlfield>
-    <datafield tag="035" ind1=" " ind2=" ">
-      <subfield code="a">2341644CERCER</subfield>
-    </datafield>
-    <datafield tag="035" ind1=" " ind2=" ">
-      <subfield code="9">SLAC</subfield>
-      <subfield code="a">5208424</subfield>
-    </datafield>
-    <datafield tag="037" ind1=" " ind2=" ">
-      <subfield code="a">hep-th/0209226</subfield>
-    </datafield>
-    <datafield tag="041" ind1=" " ind2=" ">
-      <subfield code="a">eng</subfield>
-    </datafield>
-    <datafield tag="088" ind1=" " ind2=" ">
-      <subfield code="a">PUTP-2002-48</subfield>
-    </datafield>
-    <datafield tag="088" ind1=" " ind2=" ">
-      <subfield code="a">SLAC-PUB-9504</subfield>
-    </datafield>
-    <datafield tag="088" ind1=" " ind2=" ">
-      <subfield code="a">SU-ITP-2002-36</subfield>
-    </datafield>
-    <datafield tag="100" ind1=" " ind2=" ">
-      <subfield code="a">Adams, A</subfield>
-      <subfield code="u">Stanford University</subfield>
-    </datafield>
-    <datafield tag="245" ind1=" " ind2=" ">
-      <subfield code="a">Decapitating Tadpoles</subfield>
-    </datafield>
-    <datafield tag="260" ind1=" " ind2=" ">
-      <subfield code="c">2002</subfield>
-    </datafield>
-    <datafield tag="269" ind1=" " ind2=" ">
-      <subfield code="a">Beijing</subfield>
-      <subfield code="b">Beijing Univ. Dept. Phys.</subfield>
-      <subfield code="c">26 Sep 2002</subfield>
-    </datafield>
-    <datafield tag="300" ind1=" " ind2=" ">
-      <subfield code="a">31 p</subfield>
-    </datafield>
-    <datafield tag="520" ind1=" " ind2=" ">
-      <subfield code="a">We argue that perturbative quantum field theory and string theory can be consistently modified in the infrared to eliminate, in a radiatively stable manner, tadpole instabilities that arise after supersymmetry breaking. This is achieved by deforming the propagators of classically massless scalar fields and the graviton so as to cancel the contribution of their zero modes. In string theory, this modification of propagators is accomplished by perturbatively deforming the world-sheet action with bi-local operators similar to those that arise in double-trace deformations of AdS/CFT. This results in a perturbatively finite and unitary S-matrix (in the case of string theory, this claim depends on standard assumptions about unitarity in covariant string diagrammatics). The S-matrix is parameterized by arbitrary scalar VEVs, which exacerbates the vacuum degeneracy problem. However, for generic values of these parameters, quantum effects produce masses for the nonzero modes of the scalars, lifting the fluctuating components of the moduli.</subfield>
-    </datafield>
-    <datafield tag="595" ind1=" " ind2=" ">
-      <subfield code="a">LANL EDS</subfield>
-    </datafield>
-    <datafield tag="650" ind1="1" ind2="7">
-      <subfield code="2">SzGeCERN</subfield>
-      <subfield code="a">Particle Physics - Theory</subfield>
-    </datafield>
-    <datafield tag="690" ind1="C" ind2=" ">
-      <subfield code="a">PREPRINT</subfield>
-    </datafield>
-    <datafield tag="695" ind1=" " ind2=" ">
-      <subfield code="9">LANL EDS</subfield>
-      <subfield code="a">High Energy Physics - Theory</subfield>
-    </datafield>
-    <datafield tag="700" ind1=" " ind2=" ">
-      <subfield code="a">McGreevy, J</subfield>
-    </datafield>
-    <datafield tag="700" ind1=" " ind2=" ">
-      <subfield code="a">Silverstein, E</subfield>
-    </datafield>
-    <datafield tag="720" ind1=" " ind2=" ">
-      <subfield code="a">Adams, Allan</subfield>
-    </datafield>
-    <datafield tag="720" ind1=" " ind2=" ">
-      <subfield code="a">Greevy, John Mc</subfield>
-    </datafield>
-    <datafield tag="720" ind1=" " ind2=" ">
-      <subfield code="a">Silverstein, Eva</subfield>
-    </datafield>
-    <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0209226.pdf</subfield>
-    </datafield>
-    <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0209226.ps.gz</subfield>
-    </datafield>
-    <datafield tag="859" ind1=" " ind2=" ">
-      <subfield code="f">evas@slac.stanford.edu</subfield>
-    </datafield>
-    <datafield tag="916" ind1=" " ind2=" ">
-      <subfield code="s">n</subfield>
-      <subfield code="w">200239</subfield>
-    </datafield>
-    <datafield tag="960" ind1=" " ind2=" ">
-      <subfield code="a">11</subfield>
-    </datafield>
-    <datafield tag="961" ind1=" " ind2=" ">
-      <subfield code="c">20060218</subfield>
-      <subfield code="h">0013</subfield>
-      <subfield code="l">CER01</subfield>
-      <subfield code="x">20020927</subfield>
-    </datafield>
-    <datafield tag="963" ind1=" " ind2=" ">
-      <subfield code="a">PUBLIC</subfield>
-    </datafield>
-    <datafield tag="970" ind1=" " ind2=" ">
-      <subfield code="a">002341644CER</subfield>
-    </datafield>
-    <datafield tag="980" ind1=" " ind2=" ">
-      <subfield code="a">PREPRINT</subfield>
-    </datafield>
-  </record>
+<?xml version="1.0" encoding="UTF-8"?>
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">101</controlfield>
+  <datafield tag="037" ind1=" " ind2=" ">
+    <subfield code="a">BUL-NEWS-2009-003</subfield>
+  </datafield>
+  <datafield tag="041" ind1=" " ind2=" ">
+    <subfield code="a">eng</subfield>
+  </datafield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Plato</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">Atlantis (Timaeus)</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="b">&lt;!--HTML-->&lt;p class="articleHeader">This great island lay over against the Pillars of Heracles, in extent greater than Libya and Asia put together, and was the passage to other islands and to a great ocean of which the Mediterranean sea was only the harbour; and within the Pillars the empire of Atlantis reached in Europe to Tyrrhenia and in Libya to Egypt.&lt;/p>&lt;p>This mighty power was arrayed against Egypt and Hellas and all the countries&lt;/p>&lt;div class="phrwithcaption">&lt;div class="imageScale">&lt;img src="http://invenio-software.org/download/invenio-demo-site-files/icon-journal_Athanasius_Kircher_Atlantis_image.gif" alt="" />&lt;/div>&lt;p>Representation of Atlantis by Athanasius Kircher (1669)&lt;/p>&lt;/div>bordering on the Mediterranean. Then your city did bravely, and won renown over the whole earth. For at the peril of her own existence, and when the other Hellenes had deserted her, she repelled the invader, and of her own accord gave liberty to all the nations within the Pillars. A little while afterwards there were great earthquakes and floods, and your warrior race all sank into the earth; and the great island of Atlantis also disappeared in the sea. This is the explanation of the shallows which are found in that part of the Atlantic ocean. &lt;p>&lt;/p>(Excerpt from TIMAEUS, By Plato, translated By Jowett, Benjamin)&lt;br /></subfield>
+  </datafield>
+  <datafield tag="590" ind1=" " ind2=" ">
+    <subfield code="b">&lt;!--HTML-->&lt;br /></subfield>
+  </datafield>
+  <datafield tag="773" ind1=" " ind2=" ">
+    <subfield code="c">1</subfield>
+    <subfield code="n">02/2009</subfield>
+    <subfield code="t">Atlantis Times</subfield>
+  </datafield>
+  <datafield tag="773" ind1=" " ind2=" ">
+    <subfield code="c">1</subfield>
+    <subfield code="n">03/2009</subfield>
+    <subfield code="t">Atlantis Times</subfield>
+  </datafield>
+  <datafield tag="773" ind1=" " ind2=" ">
+    <subfield code="c">1</subfield>
+    <subfield code="n">04/2009</subfield>
+    <subfield code="t">Atlantis Times</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="u">http://localhost/record/101/files/journal_Athanasius_Kircher_Atlantis_image.gif</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="u">http://localhost/record/101/files/journal_Athanasius_Kircher_Atlantis_image.gif?subformat=icon</subfield>
+    <subfield code="x">icon</subfield>
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">ATLANTISTIMESNEWS</subfield>
+  </datafield>
+</record>
+</collection>
 """
         #this is not in the collection
         self.recxml2 = """
@@ -311,12 +254,11 @@ class BibMatchTest(unittest.TestCase):
 </record>
 </collection>
 """
-        #ambig match since there are 2 of these
+        #exact match: using all titles to disambiguate
         self.recxml3 = """
 <?xml version="1.0" encoding="UTF-8"?>
 <collection xmlns="http://www.loc.gov/MARC21/slim">
 <record>
-  <controlfield tag="001">26</controlfield>
   <datafield tag="020" ind1=" " ind2=" ">
     <subfield code="a">2225350574</subfield>
   </datafield>
@@ -367,7 +309,7 @@ class BibMatchTest(unittest.TestCase):
 
 </collection>
 """
-        #missing word in title
+        #fuzzy matched: quasi-normal -> quasi normal + missing word in title
         self.recxml4 = """
 <?xml version="1.0" encoding="UTF-8"?>
 <collection xmlns="http://www.loc.gov/MARC21/slim">
@@ -389,7 +331,7 @@ class BibMatchTest(unittest.TestCase):
     <subfield code="u">National Technical University of Athens</subfield>
   </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
-    <subfield code="a">Quasi-normal Modes of Electromagnetic Perturbations of Four-Dimensional Topological Black Holes</subfield>
+    <subfield code="a">Quasi normal Modes of Electromagnetic Perturbations of Four-Dimensional Topological Black Holes</subfield>
   </datafield>
   <datafield tag="260" ind1=" " ind2=" ">
     <subfield code="c">2006</subfield>
@@ -466,280 +408,6 @@ class BibMatchTest(unittest.TestCase):
   <datafield tag="980" ind1=" " ind2=" ">
     <subfield code="a">ARTICLE</subfield>
   </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[1]</subfield>
-    <subfield code="m">K. D. Kokkotas and B. G. Schmidt,</subfield>
-    <subfield code="s">Living Rev. Relativ. 2 (1999) 2</subfield>
-    <subfield code="r">gr-qc/9909058</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[2]</subfield>
-    <subfield code="m">H.-P. Nollert,</subfield>
-    <subfield code="s">Class. Quantum Gravity 16 (1999) R159</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[3]</subfield>
-    <subfield code="m">J. S. F. Chan and R. B. Mann,</subfield>
-    <subfield code="s">Phys. Rev. D 55 (1997) 7546</subfield>
-    <subfield code="r">gr-qc/9612026</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[3]</subfield>
-    <subfield code="s">Phys. Rev. D 59 (1999) 064025</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[4]</subfield>
-    <subfield code="m">G. T. Horowitz and V. E. Hubeny,</subfield>
-    <subfield code="s">Phys. Rev. D 62 (2000) 024027</subfield>
-    <subfield code="r">hep-th/9909056</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[5]</subfield>
-    <subfield code="m">V. Cardoso and J. P. S. Lemos,</subfield>
-    <subfield code="s">Phys. Rev. D 64 (2001) 084017</subfield>
-    <subfield code="r">gr-qc/0105103</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[6]</subfield>
-    <subfield code="m">B. Wang, C. Y. Lin and E. Abdalla,</subfield>
-    <subfield code="s">Phys. Lett. B 481 (2000) 79</subfield>
-    <subfield code="r">hep-th/0003295</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[7]</subfield>
-    <subfield code="m">E. Berti and K. D. Kokkotas,</subfield>
-    <subfield code="s">Phys. Rev. D 67 (2003) 064020</subfield>
-    <subfield code="r">gr-qc/0301052</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[8]</subfield>
-    <subfield code="m">F. Mellor and I. Moss,</subfield>
-    <subfield code="s">Phys. Rev. D 41 (1990) 403</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[9]</subfield>
-    <subfield code="m">C. Martinez and J. Zanelli,</subfield>
-    <subfield code="s">Phys. Rev. D 54 (1996) 3830</subfield>
-    <subfield code="r">gr-qc/9604021</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[10]</subfield>
-    <subfield code="m">M. Henneaux, C. Martinez, R. Troncoso and J. Zanelli,</subfield>
-    <subfield code="s">Phys. Rev. D 65 (2002) 104007</subfield>
-    <subfield code="r">hep-th/0201170</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[11]</subfield>
-    <subfield code="m">C. Martinez, R. Troncoso and J. Zanelli,</subfield>
-    <subfield code="s">Phys. Rev. D 67 (2003) 024008</subfield>
-    <subfield code="r">hep-th/0205319</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[12]</subfield>
-    <subfield code="m">N. Bocharova, K. Bronnikov and V. Melnikov, Vestn. Mosk. Univ. Fizika</subfield>
-    <subfield code="s">Astronomy 6 (1970) 706</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[12]</subfield>
-    <subfield code="m">J. D. Bekenstein,</subfield>
-    <subfield code="s">Ann. Phys. 82 (1974) 535</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[12]</subfield>
-    <subfield code="s">Ann. Phys. 91 (1975) 75</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[13]</subfield>
-    <subfield code="m">T. Torii, K. Maeda and M. Narita,</subfield>
-    <subfield code="s">Phys. Rev. D 64 (2001) 044007</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[14]</subfield>
-    <subfield code="m">E. Winstanley,</subfield>
-    <subfield code="s">Found. Phys. 33 (2003) 111</subfield>
-    <subfield code="r">gr-qc/0205092</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[15]</subfield>
-    <subfield code="m">T. Hertog and K. Maeda,</subfield>
-    <subfield code="s">J. High Energy Phys. 0407 (2004) 051</subfield>
-    <subfield code="r">hep-th/0404261</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[16]</subfield>
-    <subfield code="m">J. P. S. Lemos,</subfield>
-    <subfield code="s">Phys. Lett. B 353 (1995) 46</subfield>
-    <subfield code="r">gr-qc/9404041</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[17]</subfield>
-    <subfield code="m">R. B. Mann,</subfield>
-    <subfield code="s">Class. Quantum Gravity 14 (1997) L109</subfield>
-    <subfield code="r">gr-qc/9607071</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[17]</subfield>
-    <subfield code="m">R. B. Mann,</subfield>
-    <subfield code="s">Nucl. Phys. B 516 (1998) 357</subfield>
-    <subfield code="r">hep-th/9705223</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[18]</subfield>
-    <subfield code="m">L. Vanzo,</subfield>
-    <subfield code="s">Phys. Rev. D 56 (1997) 6475</subfield>
-    <subfield code="r">gr-qc/9705004</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[19]</subfield>
-    <subfield code="m">D. R. Brill, J. Louko and P. Peldan,</subfield>
-    <subfield code="s">Phys. Rev. D 56 (1997) 3600</subfield>
-    <subfield code="r">gr-qc/9705012</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[20]</subfield>
-    <subfield code="m">D. Birmingham,</subfield>
-    <subfield code="s">Class. Quantum Gravity 16 (1999) 1197</subfield>
-    <subfield code="r">hep-th/9808032</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[21]</subfield>
-    <subfield code="m">R. G. Cai and K. S. Soh,</subfield>
-    <subfield code="s">Phys. Rev. D 59 (1999) 044013</subfield>
-    <subfield code="r">gr-qc/9808067</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[22]</subfield>
-    <subfield code="s">Phys.Rev. D65 (2002) 084006</subfield>
-    <subfield code="m">B. Wang, E. Abdalla and R. B. Mann, [arXiv</subfield>
-    <subfield code="r">hep-th/0107243</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[23]</subfield>
-    <subfield code="s">Phys.Rev. D65 (2002) 084006</subfield>
-    <subfield code="m">R. B. Mann, [arXiv</subfield>
-    <subfield code="r">gr-qc/9709039</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[24]</subfield>
-    <subfield code="m">J. Crisostomo, R. Troncoso and J. Zanelli,</subfield>
-    <subfield code="s">Phys. Rev. D 62 (2000) 084013</subfield>
-    <subfield code="r">hep-th/0003271</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[25]</subfield>
-    <subfield code="m">R. Aros, R. Troncoso and J. Zanelli,</subfield>
-    <subfield code="s">Phys. Rev. D 63 (2001) 084015</subfield>
-    <subfield code="r">hep-th/0011097</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[26]</subfield>
-    <subfield code="m">R. G. Cai, Y. S. Myung and Y. Z. Zhang,</subfield>
-    <subfield code="s">Phys. Rev. D 65 (2002) 084019</subfield>
-    <subfield code="r">hep-th/0110234</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[27]</subfield>
-    <subfield code="m">M. H. Dehghani,</subfield>
-    <subfield code="s">Phys. Rev. D 70 (2004) 064019</subfield>
-    <subfield code="r">hep-th/0405206</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[28]</subfield>
-    <subfield code="m">C. Martinez, R. Troncoso and J. Zanelli,</subfield>
-    <subfield code="s">Phys. Rev. D 70 (2004) 084035</subfield>
-    <subfield code="r">hep-th/0406111</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[29]</subfield>
-    <subfield code="s">Phys.Rev. D74 (2006) 044028</subfield>
-    <subfield code="m">C. Martinez, J. P. Staforelli and R. Troncoso, [arXiv</subfield>
-    <subfield code="r">hep-th/0512022</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[29]</subfield>
-    <subfield code="m">C. Martinez and R. Troncoso, [arXiv</subfield>
-    <subfield code="s">Phys.Rev. D74 (2006) 064007</subfield>
-    <subfield code="r">hep-th/0606130</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[30]</subfield>
-    <subfield code="m">E. Winstanley,</subfield>
-    <subfield code="s">Class. Quantum Gravity 22 (2005) 2233</subfield>
-    <subfield code="r">gr-qc/0501096</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[30]</subfield>
-    <subfield code="m">E. Radu and E. Win-stanley,</subfield>
-    <subfield code="s">Phys. Rev. D 72 (2005) 024017</subfield>
-    <subfield code="r">gr-qc/0503095</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[30]</subfield>
-    <subfield code="m">A. M. Barlow, D. Doherty and E. Winstanley,</subfield>
-    <subfield code="s">Phys. Rev. D 72 (2005) 024008</subfield>
-    <subfield code="r">gr-qc/0504087</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[31]</subfield>
-    <subfield code="m">I. Papadimitriou, [arXiv</subfield>
-    <subfield code="s">JHEP 0702 (2007) 008</subfield>
-    <subfield code="r">hep-th/0606038</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[32]</subfield>
-    <subfield code="m">P. Breitenlohner and D. Z. Freedman,</subfield>
-    <subfield code="s">Phys. Lett. B 115 (1982) 197</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[32]</subfield>
-    <subfield code="s">Ann. Phys. 144 (1982) 249</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[33]</subfield>
-    <subfield code="m">L. Mezincescu and P. K. Townsend,</subfield>
-    <subfield code="s">Ann. Phys. 160 (1985) 406</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[34]</subfield>
-    <subfield code="m">V. Cardoso, J. Natario and R. Schiappa,</subfield>
-    <subfield code="s">J. Math. Phys. 45 (2004) 4698</subfield>
-    <subfield code="r">hep-th/0403132</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[35]</subfield>
-    <subfield code="m">J. Natario and R. Schiappa,</subfield>
-    <subfield code="s">Adv. Theor. Math. Phys. 8 (2004) 1001</subfield>
-    <subfield code="r">hep-th/0411267</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[36]</subfield>
-    <subfield code="m">S. Musiri, S. Ness and G. Siopsis,</subfield>
-    <subfield code="s">Phys. Rev. D 73 (2006) 064001</subfield>
-    <subfield code="r">hep-th/0511113</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[37]</subfield>
-    <subfield code="m">L. Motl and A. Neitzke,</subfield>
-    <subfield code="s">Adv. Theor. Math. Phys. 7 (2003) 307</subfield>
-    <subfield code="r">hep-th/0301173</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[38]</subfield>
-    <subfield code="m">Astron. J. M. Medved, D. Martin and M. Visser,</subfield>
-    <subfield code="s">Class. Quantum Gravity 21 (2004) 2393</subfield>
-    <subfield code="r">gr-qc/0310097</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[39]</subfield>
-    <subfield code="m">W.-H. Press, S. A. Teukolsky, W. T. Vetterling and B. P. Flannery in Numerical Recipies (Cambridge University Press, Cambridge, England, 1992).</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="o">[40]</subfield>
-    <subfield code="m">G. Koutsoumbas, S. Musiri, E. Papantonopoulos and G. Siopsis, in preparation.</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="6">
-    <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181414732-0-36-41-0-2</subfield>
-  </datafield>
 </record>
 
 </collection>
@@ -749,54 +417,64 @@ class BibMatchTest(unittest.TestCase):
 
     def test_check_existing(self):
         """bibmatch - check existing record"""
-        records = create_records(self.recxml1)
+        records = create_records(self.recxml3)
         [dummy1, matchedrecs, dummy2, dummy3] = match_records(records)
-        self.assertEqual(1,len(matchedrecs))
+        self.assertEqual(1, len(matchedrecs))
 
     def test_check_new(self):
         """bibmatch - check a new record"""
         records = create_records(self.recxml2)
         [newrecs, dummy1, dummy2, dummy3] = match_records(records)
-        self.assertEqual(1,len(newrecs))
+        self.assertEqual(1, len(newrecs))
 
     def test_check_ambiguous(self):
         """bibmatch - check an ambiguous record"""
-        records = create_records(self.recxml3)
-        [dummy1, dummy2, ambig, dummy3] = match_records(records)
-        self.assertEqual(1,len(ambig))
+        records = create_records(self.recxml1)
+        [dummy1, dummy2, ambigrecs, dummy3] = match_records(records, qrystrs=[("", "[100__a]")])
+        self.assertEqual(1, len(ambigrecs))
 
     def test_check_fuzzy(self):
         """bibmatch - check fuzzily matched record"""
         records = create_records(self.recxml4)
         [dummy1, dummy2, dummy3, fuzzyrecs] = match_records(records)
-        self.assertEqual(1,len(fuzzyrecs))
+        self.assertEqual(1, len(fuzzyrecs))
 
     def test_check_remote(self):
         """bibmatch - check remote match (Invenio demo site)"""
-        records = create_records(self.recxml1)
-        [dummy1, matchedrecs, dummy3, fuzzyrecs] = match_records(records, server_url="http://invenio-demo.cern.ch")
-        self.assertEqual(1,len(matchedrecs))
+        records = create_records(self.recxml3)
+        [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, server_url="http://invenio-demo.cern.ch")
+        self.assertEqual(1, len(matchedrecs))
 
     def test_check_textmarc(self):
         """bibmatch - check textmarc as input"""
         marcxml = transform_input_to_marcxml("", self.textmarc)
         records = create_records(marcxml)
-        [dummy1, matchedrecs, dummy3, fuzzyrecs] = match_records(records, server_url="http://invenio-demo.cern.ch")
-        self.assertEqual(2,len(matchedrecs))
+        [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, server_url="http://invenio-demo.cern.ch")
+        self.assertEqual(2, len(matchedrecs))
 
     def test_check_altered(self):
         """bibmatch - check altered match"""
-        records = create_records(self.recxml1)
+        records = create_records(self.recxml3)
         self.assertTrue(not record_has_field(records[0][0], '001'))
         [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, modify=1)
         self.assertTrue(record_has_field(matchedrecs[0][0], '001'))
 
     def test_check_qrystr(self):
         """bibmatch - check querystrings"""
-        qrystrs = ["author||reportnumber"]
-        records = create_records(self.recxml1)
-        [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, qrystrs=qrystrs)
-        self.assertEqual(1,len(matchedrecs))
+        operator = "and"
+        qrystr_old = "title||author"
+        qrystr_new = "[title] %s [author]" % (operator,)
+        querystring = Querystring(operator)
+        records = create_records(self.recxml3)
+        old_query = querystring.create_query(records[0], qrystr_old)
+        new_query = querystring.create_query(records[0], qrystr_new)
+        self.assertEqual(old_query, new_query)
+
+    def test_check_completeness(self):
+        """bibmatch - check query completeness"""
+        records = create_records(self.recxml4)
+        [dummy1, dummy2, ambigrecs, dummy3] = match_records(records, qrystrs=[("", "[088__a] [035__a]")])
+        self.assertEqual(1, len(ambigrecs))
 
 TEST_SUITE = make_test_suite(BibMatchTest)
 
