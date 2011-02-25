@@ -87,30 +87,30 @@ def get_widget_html(bfo, indico_seminar_xml, cached_filename,
     for seminar in seminars:
         html += "<li>"
         try:
-            seminar_time = seminar.getElementsByTagName("start_time")[0].firstChild.toxml()
+            seminar_time = seminar.getElementsByTagName("start_time")[0].firstChild.toxml(encoding="utf-8")
         except:
             seminar_time = ""
         try:
-            category = seminar.getElementsByTagName("category")[0].firstChild.toxml()
+            category = seminar.getElementsByTagName("category")[0].firstChild.toxml(encoding="utf-8")
         except:
             category = "Seminar"
         html += '%s %s<br/>' % (seminar_time, category)
         try:
-            title = seminar.getElementsByTagName("title")[0].firstChild.toxml()
+            title = seminar.getElementsByTagName("title")[0].firstChild.toxml(encoding="utf-8")
         except:
             title = ""
         try:
-            url = seminar.getElementsByTagName("url")[0].firstChild.toxml()
+            url = seminar.getElementsByTagName("url")[0].firstChild.toxml(encoding="utf-8")
         except:
             url = "#"
         try:
-            speaker = seminar.getElementsByTagName("speaker")[0].firstChild.toxml()
+            speaker = seminar.getElementsByTagName("speaker")[0].firstChild.toxml(encoding="utf-8")
         except:
             speaker = ""
         if (title != ""):
             html += '<strong><a href="%s">%s</a></strong>, %s<br/>' % (url, title, speaker)
         try:
-            room = seminar.getElementsByTagName("room")[0].firstChild.toxml()
+            room = seminar.getElementsByTagName("room")[0].firstChild.toxml(encoding="utf-8")
         except:
             room = ""
         html += room
@@ -140,12 +140,12 @@ def _update_seminars(indico_seminar_xml, cached_filename):
     for item in agenda_items:
         seminar_xml.extend(["<seminar>", ])
         try:
-            start_time = item.getElementsByTagName("start_time")[0].firstChild.toxml()
+            start_time = item.getElementsByTagName("start_time")[0].firstChild.toxml(encoding="utf-8")
         except:
             start_time = ""
         seminar_xml.extend(["<start_time>%s</start_time>" % start_time, ])
         try:
-            category = item.getElementsByTagName("category")[0].firstChild.toxml()
+            category = item.getElementsByTagName("category")[0].firstChild.toxml(encoding="utf-8")
             category = category.split("/")[-1]
             category = category.replace("&amp;", "")
             category = category.replace("nbsp;", "")
@@ -154,22 +154,22 @@ def _update_seminars(indico_seminar_xml, cached_filename):
             category = ""
         seminar_xml.extend(["<category>%s</category>" % category, ])
         try:
-            title = item.getElementsByTagName("title")[0].firstChild.toxml()
+            title = item.getElementsByTagName("title")[0].firstChild.toxml(encoding="utf-8")
         except:
             title = ""
         seminar_xml.extend(["<title>%s</title>" % title, ])
         try:
-            url = item.getElementsByTagName("agenda_url")[0].firstChild.toxml()
+            url = item.getElementsByTagName("agenda_url")[0].firstChild.toxml(encoding="utf-8")
         except:
             url = "#"
         seminar_xml.extend(["<url>%s</url>" % url, ])
         try:
-            speaker = item.getElementsByTagName("speaker")[0].firstChild.toxml()
+            speaker = item.getElementsByTagName("speaker")[0].firstChild.toxml(encoding="utf-8")
         except:
             speaker = ""
         seminar_xml.extend(["<speaker>%s</speaker>" % speaker, ])
         try:
-            room = item.getElementsByTagName("room")[0].firstChild.toxml()
+            room = item.getElementsByTagName("room")[0].firstChild.toxml(encoding="utf-8")
         except:
             room = ""
         seminar_xml.extend(["<room>%s</room>" % room, ])
