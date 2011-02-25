@@ -26,7 +26,6 @@ import time
 import math
 import os
 from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
 
 # Invenio imports:
 
@@ -53,6 +52,7 @@ from invenio.dateutils import convert_datetext_to_dategui, \
                               datetext_default, \
                               convert_datestruct_to_datetext
 from invenio.mailutils import send_email
+from invenio.errorlib import register_exception
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument
 from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE, \
@@ -1208,6 +1208,8 @@ def calculate_start_date(display_since):
             datetext_default is defined in miscutils/lib/dateutils and
             equals 0000-00-00 00:00:00 => MySQL format
             If bad arguement given, will return datetext_default
+            If library 'dateutil' is not found return datetext_default
+            and register exception.
     """
     time_types = {'d':0, 'w':0, 'm':0, 'y':0}
     today = datetime.today()
@@ -1231,6 +1233,13 @@ def calculate_start_date(display_since):
             yesterday = today.replace(year=final_nb_year)
     # month
     elif time_type == 'm':
+        try:
+            from dateutil.relativedelta import relativedelta
+        except ImportError:
+            # The dateutil library is only recommended: if not
+            # available, then send warning about this.
+            register_exception(alert_admin=True)
+            return datetext_default
         # obtain only the date: yyyy-mm-dd
         date_today = datetime.now().date()
         final_date = date_today - relativedelta(months=nb)
