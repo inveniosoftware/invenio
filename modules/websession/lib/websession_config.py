@@ -47,6 +47,33 @@ CFG_WEBSESSION_INFO_MESSAGES = {"GROUP_CREATED": 'You have successfully created 
 
 }
 
+# Choose the providers which will be dislayed bigger (48x48) on login page.
+# The order of the list decides the order of the login buttons.
+CFG_EXTERNAL_LOGIN_LARGE = [
+    "facebook",
+    "google",
+    "yahoo",
+    "openid"
+]
+
+# Choose the order of the login buttons. The unordered providers will be
+# displayed alphabetically after the ordered ones.
+CFG_EXTERNAL_LOGIN_BUTTON_ORDER = []
+
+# Select the labels of the username inputs for openid providers which needs
+# username for authorization.
+CFG_EXTERNAL_LOGIN_FORM_LABELS = {
+    "openid": "Your OpenID Identifier",
+    "aol": "Your AOL screenname",
+    "myopenid": "Your myOpenID username",
+    "myvidoop": "Your myvidoop username",
+    "verisign": "Your VeriSign username",
+    "wordpress": "Your WordPress username",
+    "myspace": "Your myspace username",
+    "livejournal": "Your livejournal username",
+    "blogger": "The address of your blog"
+}
+
 CFG_WEBSESSION_COOKIE_NAME = "INVENIOSESSION"
 CFG_WEBSESSION_ONE_DAY = 86400 #: how many seconds are there in one day
 CFG_WEBSESSION_CLEANUP_CHANCE = 10000 #: cleanups have 1 in CLEANUP_CHANCE chance

@@ -268,7 +268,45 @@ img_DATA = add-small.png \
            wsignout.gif \
            compare.png \
            document-preview.png \
-           ui-anim_basic_16x16.gif
+           ui-anim_basic_16x16.gif \
+           aol_icon_24.png \
+           aol_icon_48.png \
+           blogger_icon_24.png \
+           blogger_icon_48.png \
+           facebook_icon_24.png \
+           facebook_icon_48.png \
+           flickr_icon_24.png \
+           flickr_icon_48.png \
+           foursquare_icon_24.png \
+           foursquare_icon_48.png \
+           google_icon_24.png \
+           google_icon_48.png \
+           googleoauth2_icon_24.png \
+           googleoauth2_icon_48.png \
+           instagram_icon_24.png \
+           instagram_icon_48.png \
+           linkedin_icon_24.png \
+           linkedin_icon_48.png \
+           livejournal_icon_24.png \
+           livejournal_icon_48.png \
+           myopenid_icon_24.png \
+           myopenid_icon_48.png \
+           myspace_icon_24.png \
+           myspace_icon_48.png \
+           myvidoop_icon_24.png \
+           myvidoop_icon_48.png \
+           openid_icon_24.png \
+           openid_icon_48.png \
+           twitter_icon_24.png \
+           twitter_icon_48.png \
+           verisign_icon_24.png \
+           verisign_icon_48.png \
+           wordpress_icon_24.png \
+           wordpress_icon_48.png \
+           yahoo_icon_24.png \
+           yahoo_icon_48.png \
+           yammer_icon_24.png \
+           yammer_icon_48.png
 
 tmpdir=$(localstatedir)/tmp
 

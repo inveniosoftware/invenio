@@ -2,7 +2,7 @@
 * -*- mode: text; coding: utf-8; -*-
 
    This file is part of Invenio.
-   Copyright (C) 2009, 2010, 2011, 2012 CERN.
+   Copyright (C) 2009, 2010, 2011, 2012, 2013 CERN.
 
    Invenio is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -3907,4 +3907,77 @@ div.bibcircbottom {
 
 /* end od BibHarvest Holding Pen style*/
 
+div.login_button {
+    margin: 5px;
+    border-radius: 5px;
+    margin-left: auto;
+    float: left;
+}
+
+div.login_button:hover {
+    box-shadow: -1px 1px #888;
+}
+
+div.login_button_big {
+    width: 48px;
+    height: 48px;
+    border-radius: 5px;
+}
+
+div.login_button_small {
+    width: 24px;
+    height: 24px;
+    border-radius: 3px;
+}
+
+div.provider_img {
+    float: left;
+    width: 32px;
+    cursor: pointer;
+}
+
+div.login_content {
+    float: left;
+    margin: 5px;
+    width: 208px;
+}
+
+a.openid_url {
+    text-decoration: none;
+    color: inherit;
+}
+
+input.openid_input {
+    width: 140px;
+}
+
+label.openid_label {
+    font-size: 10px;
+}
+
+div.with_label {
+    margin-top: -4px;
+}
+
+div#buttons {
+    float: right;
+    width: 50%;
+}
+
+div#big_buttons, div#small_buttons {
+    width: 80%;
+    float: left;
+}
+
+#form_field {
+    float: left;
+}
+
+img.login_button_big {
+    border-radius: 5px;
+}
+
+img.login_button_small {
+    border-radius: 2px;
+}
 /* end of invenio.css */

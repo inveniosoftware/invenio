@@ -298,6 +298,8 @@ Contents
       $ make install-mediaelement      ## optional
       $ make install-solrutils         ## optional
       $ make install-js-test-driver    ## optional
+      $ make install-openid-package ## optional
+      $ make install-oauth-package ## optional
 
 1b. Configuration
 -----------------
@@ -534,6 +536,21 @@ Contents
 
           This will automatically download and install JsTestDriver
           which is needed to run JS unit tests. Recommended for developers.
+
+      $ make install-openid-package ## optional
+
+          This will automatically download and install the python-openid
+          package to use OpenID authentication.
+
+          After installation, CFG_OPENID_AUTHENTICATION should be set to 1
+
+      $ make install-oauth-package ## optional
+
+          This will automatically download and install the rauth
+          package to use for OAuth authentication.
+
+          After installation, CFG_OAUTH1_AUTHENTICATION and
+          CFG_OAUTH2_AUTHENTICATION should be set to 1
 
 2b. Configuration
 -----------------

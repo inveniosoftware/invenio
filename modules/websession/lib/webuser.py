@@ -78,7 +78,8 @@ from invenio.errorlib import register_exception
 from invenio.webgroup_dblayer import get_groups
 from invenio.external_authentication import InvenioWebAccessExternalAuthError
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
-    CFG_WEBACCESS_MSGS, CFG_WEBACCESS_WARNING_MSGS, CFG_EXTERNAL_AUTH_DEFAULT
+    CFG_WEBACCESS_MSGS, CFG_WEBACCESS_WARNING_MSGS, CFG_EXTERNAL_AUTH_DEFAULT, \
+    CFG_TEMP_EMAIL_ADDRESS
 from invenio.webuser_config import CFG_WEBUSER_USER_TABLES
 import invenio.template
 tmpl = invenio.template.load('websession')
@@ -565,7 +566,9 @@ def loginUser(req, p_un, p_pw, login_method):
     if CFG_EXTERNAL_AUTHENTICATION[login_method]: # External Authentication
         try:
             result = CFG_EXTERNAL_AUTHENTICATION[login_method].auth_user(p_email, p_pw, req)
-            if result == (None, None) or result is None:
+            if (result == (None, None) or result is None) and not login_method in ['oauth1', 'oauth2', 'openid']:
+                # There is no need to call auth_user with username for
+                # OAuth1, OAuth2 and OpenID authentication
                 result = CFG_EXTERNAL_AUTHENTICATION[login_method].auth_user(p_un, p_pw, req) ## We try to login with either the email of the nickname
             if isinstance(result, (tuple, list)) and len(result) == 2:
                 p_email, p_extid = result
@@ -573,21 +576,43 @@ def loginUser(req, p_un, p_pw, login_method):
                 ## For backward compatibility we use the email as external
                 ## identifier if it was not returned already by the plugin
                 p_email, p_extid = str(result), str(result)
+
             if p_email:
                 p_email = p_email.lower()
                 if not p_extid:
                     p_extid = p_email
+            elif not p_extid:
+                if hasattr(CFG_EXTERNAL_AUTHENTICATION[login_method], 'msg'):
+                    # OpenID and OAuth authentications have own error messages
+                    return (None, p_email, p_pw, CFG_EXTERNAL_AUTHENTICATION[login_method].msg)
+                else:
+                    return(None, p_email, p_pw, 15)
             else:
-                return (None, p_email, p_pw, 15)
+                # External login is successfull but couldn't fetch the email
+                # address.
+                generate_string = lambda: reduce((lambda x, y: x+y), [random.choice("qwertyuiopasdfghjklzxcvbnm1234567890") for i in range(32)])
+                random_string = generate_string()
+                p_email = CFG_TEMP_EMAIL_ADDRESS % random_string
+                while run_sql("SELECT * FROM user WHERE email=%s", (p_email,)):
+                    random_string = generate_string()
+                    p_email = CFG_TEMP_EMAIL_ADDRESS % random_string
+
         except InvenioWebAccessExternalAuthError:
             register_exception(req=req, alert_admin=True)
             raise
         if p_email: # Authenthicated externally
-            res = run_sql("SELECT id_user FROM userEXT WHERE id=%s and method=%s", (p_extid, login_method))
-            if res:
+            query_result = run_sql("SELECT id_user FROM userEXT WHERE id=%s and method=%s", (p_extid, login_method))
+            if query_result:
                 ## User was already registered with this external method.
-                id_user = res[0][0]
-                old_email = run_sql("SELECT email FROM user WHERE id=%s", (id_user,))[0][0].lower()
+                id_user = query_result[0][0]
+                old_email = run_sql("SELECT email FROM user WHERE id=%s", (id_user,))[0][0]
+
+                # Look if the email address matches with the template given.
+                # If it matches, use the email address saved in the database.
+                regexp = re.compile(CFG_TEMP_EMAIL_ADDRESS % r"\w*")
+                if regexp.match(p_email):
+                    p_email = old_email
+
                 if old_email != p_email:
                     ## User has changed email of reference.
                     res = run_sql("SELECT id FROM user WHERE email=%s", (p_email,))
@@ -615,10 +640,10 @@ def loginUser(req, p_un, p_pw, login_method):
                         run_sql("UPDATE user SET email=%s WHERE id=%s", (p_email, id_user))
             else:
                 ## User was not already registered with this external method.
-                res = run_sql("SELECT id FROM user WHERE email=%s", (p_email, ))
-                if res:
+                query_result = run_sql("SELECT id FROM user WHERE email=%s", (p_email, ))
+                if query_result:
                     ## The user was already known with this email
-                    id_user = res[0][0]
+                    id_user = query_result[0][0]
                     ## We fix the inconsistence in the userEXT table.
                     run_sql("INSERT INTO userEXT(id, method, id_user) VALUES(%s, %s, %s) ON DUPLICATE KEY UPDATE id=%s, method=%s, id_user=%s", (p_extid, login_method, id_user, p_extid, login_method, id_user))
                 else:
@@ -640,9 +665,11 @@ def loginUser(req, p_un, p_pw, login_method):
                         res = registerUser(req, p_email, p_pw_local, '',
                         register_without_nickname=True,
                         login_method=login_method)
-                        id_user = run_sql("SELECT id from user where email=%s", (p_email,))[0][0]
+                        query_result = run_sql("SELECT id from user where email=%s", (p_email,))
+                        id_user = query_result[0][0]
                     elif res == 0: # Everything was ok, with or without nickname.
-                        id_user = run_sql("SELECT id from user where email=%s", (p_email,))[0][0]
+                        query_result = run_sql("SELECT id from user where email=%s", (p_email,))
+                        id_user = query_result[0][0]
                     elif res == 6: # error in contacting the user via email
                         return (None, p_email, p_pw_local, 19)
                     else:

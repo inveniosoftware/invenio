@@ -3083,6 +3083,12 @@ CREATE TABLE IF NOT EXISTS userEXT (
   UNIQUE KEY (id_user, method)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS oauth1_storage (
+  token varchar(255) NOT NULL,
+  secret varchar(255) NOT NULL,
+  date_creation datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (token)
+) ENGINE=MyISAM;
 
 -- tables for usergroups
 
