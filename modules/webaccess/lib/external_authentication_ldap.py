@@ -93,14 +93,14 @@ class ExternalAuthLDAP(ExternalAuth):
     def auth_user(self, username, password, req=None):
         """
         Check USERNAME and PASSWORD against the LDAP system.
-        Return None if authentication failed, or the email address of the
+        Return (None, None) if authentication failed, or the (email address, user_dn) of the
         person if the authentication was successful.
         Raise InvenioWebAccessExternalAuthError in case of external troubles.
         Note: for SSO the parameter are discarded and overloaded by Shibboleth
         variables
         """
         if not password:
-            return None
+            return None, None
 
         query = '(|' + ''.join (['(%s=%s)' % (attrib, username)
                                  for attrib in
@@ -117,14 +117,14 @@ class ExternalAuthLDAP(ExternalAuth):
             if len(users):
                 user_dn, user_info = users [0]
             else:
-                return None
+                return None, None
             try:
                 connection.simple_bind_s(user_dn, password)
             except ldap.INVALID_CREDENTIALS:
                 # It is enough to fail on one server to consider the credential
                 # to be invalid
-                return None
-            return user_info[CFG_EXTERNAL_AUTH_LDAP_MAIL_ENTRY][0]
+                return None, None
+            return user_info[CFG_EXTERNAL_AUTH_LDAP_MAIL_ENTRY][0], user_dn
 
         return self._ldap_try(_check)
 

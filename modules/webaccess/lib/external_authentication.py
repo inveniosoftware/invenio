@@ -44,14 +44,15 @@ class ExternalAuth:
 
     def auth_user(self, username, password, req=None):
         """Authenticate user-supplied USERNAME and PASSWORD.  Return
-        None if authentication failed, or the email address of the
-        person if the authentication was successful.  In order to do
+        (None, None) if authentication failed, or the (email, ext_id), where
+        email is the email address of the person and ext_id is the external
+        identifier, if the authentication was successful.  In order to do
         this you may perhaps have to keep a translation table between
         usernames and email addresses.
         Raise InvenioWebAccessExternalAuthError in case of external troubles.
         """
         raise NotImplementedError()
-        #return None
+        #return None, None
 
     def user_exists(self, email, req=None):
         """Check the external authentication system for existance of email.

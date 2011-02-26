@@ -102,8 +102,14 @@ elif CFG_OPENAIRE_SITE:
     CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
     CFG_EXTERNAL_AUTHENTICATION = {
     "Local": None,
-    "OpenAIRE": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False),
-    "ZOpenAIRE": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
+    "OpenAIRE": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False, external_id_attribute_name="id"),
+    }
+elif CFG_INSPIRE_SITE:
+    CFG_EXTERNAL_AUTH_DEFAULT = 'arXiv'
+    CFG_EXTERNAL_AUTH_USING_SSO = False
+    CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
+    CFG_EXTERNAL_AUTHENTICATION = {
+        "arXiv": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
     }
 elif CFG_INSPIRE_SITE:
     # INSPIRE specific robot configuration

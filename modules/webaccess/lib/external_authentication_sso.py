@@ -94,7 +94,8 @@ class ExternalAuthSSO(ExternalAuth):
     def auth_user(self, username, password, req=None):
         """
         Check USERNAME and PASSWORD against the SSO system.
-        Return None if authentication failed, or the email address of the
+        Return (None, None) if authentication failed, or the
+        (email address, nickname) of the
         person if the authentication was successful.  In order to do
         this you may perhaps have to keep a translation table between
         usernames and email addresses.
@@ -108,8 +109,8 @@ class ExternalAuthSSO(ExternalAuth):
         if req:
             req.add_common_vars()
             if req.subprocess_env.has_key(CFG_EXTERNAL_AUTH_SSO_EMAIL_VARIABLE):
-                return req.subprocess_env[CFG_EXTERNAL_AUTH_SSO_EMAIL_VARIABLE]
-        return None
+                return req.subprocess_env[CFG_EXTERNAL_AUTH_SSO_EMAIL_VARIABLE], req.subprocess_env[CFG_EXTERNAL_AUTH_SSO_LOGIN_VARIABLE]
+        return None, None
 
     #def user_exists(self, email, req=None):
         #"""Checks against CERN NICE/CRA for existance of email.
