@@ -289,7 +289,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                    'msg': (str, ""),
                                    'note': (str, ''),
                                    'score': (int, 0),
-                                   'comid': (int, -1),
+                                   'comid': (int, 0),
                                    'editor_type': (str, ""),
                                    'subscribe': (str, ""),
                                    'cookie': (str, "")

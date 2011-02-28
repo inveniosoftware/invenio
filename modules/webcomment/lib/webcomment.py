@@ -1395,7 +1395,7 @@ def perform_request_add_comment_or_remark(recID=0,
                                           note=None,
                                           priority=None,
                                           reviews=0,
-                                          comID=-1,
+                                          comID=0,
                                           client_ip_address=None,
                                           editor_type='textarea',
                                           can_attach_files=False,
@@ -1417,7 +1417,7 @@ def perform_request_add_comment_or_remark(recID=0,
     @param note: title of the review
     @param priority: priority of remark (int)
     @param reviews: boolean, if enabled will add a review, if disabled will add a comment
-    @param comID: if replying, this is the comment id of the commetn are replying to
+    @param comID: if replying, this is the comment id of the comment we are replying to
     @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'
     @param can_attach_files: if user can attach files to comments or not
     @param subscribe: if True, subscribe user to receive new comments by email
