@@ -25,6 +25,7 @@ __revision__ = "$Id$"
 import time
 import math
 import os
+import cgi
 from datetime import datetime, timedelta
 
 # Invenio imports:
@@ -1558,7 +1559,10 @@ def notify_admin_of_new_comment(comID):
     Title       = %s''' % (star_score, title)
 
     washer = EmailWasher()
-    body = washer.wash(body)
+    try:
+        body = washer.wash(body)
+    except:
+        body = cgi.escape(body)
 
     record_info = webcomment_templates.tmpl_email_new_comment_admin(id_bibrec)
     out = '''
