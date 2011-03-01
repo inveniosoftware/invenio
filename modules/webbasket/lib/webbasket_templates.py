@@ -3117,6 +3117,8 @@ class Template:
             for item in items:
                 items_xml += item[4] + "\n"
             return items_xml
+        else:
+            return ""
 
     def __tmpl_public_basket_item(self,
                                   count,
