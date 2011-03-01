@@ -70,7 +70,7 @@ CFG_ACC_EMPTY_ROLE_DEFINITION_SER = None
 # List of tags containing (multiple) emails of users who should authorize
 # to access the corresponding record regardless of collection restrictions.
 if CFG_CERN_SITE:
-    CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS = ['859__f', '270__m']
+    CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS = ['859__f', '270__m', '506__m']
 else:
     CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS = ['8560_f']
 
