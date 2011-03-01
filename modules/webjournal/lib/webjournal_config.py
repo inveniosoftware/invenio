@@ -52,13 +52,14 @@ class InvenioWebJournalTemplateNotFoundError(Exception):
                'name': self.journal_name,
                'CFG_ETCDIR': CFG_ETCDIR}
 
-    def user_box(self):
+    def user_box(self, req=None):
         """
         user-friendly error message with formatting.
         Just say that page does not exist
         """
         _ = gettext_set_language(self.ln)
-        return webjournal_templates.tmpl_webjournal_error_box(self.ln,
+        return webjournal_templates.tmpl_webjournal_error_box(req,
+            self.ln,
             ' ',
             _('Page not found'),
             _('The requested page does not exist'))
@@ -85,12 +86,13 @@ class InvenioWebJournalNoArticleRuleError(Exception):
         have the form of <rule>NameOfArticleType, \
         marc_tag:ExpectedContentOfMarcTag' % self.journal_name
 
-    def user_box(self):
+    def user_box(self, req=None):
         """
         user-friendly error message with formatting.
         """
         _ = gettext_set_language(self.ln)
-        return webjournal_templates.tmpl_webjournal_error_box(self.ln,
+        return webjournal_templates.tmpl_webjournal_error_box(req,
+            self.ln,
             _("No journal articles"),
             _("Problem with the configuration of this journal"),
             "The system couldn't find the definitions for different article \
@@ -125,12 +127,13 @@ class InvenioWebJournalNoIssueNumberTagError(Exception):
         dedicated marc tag, so the system can see which is the active journal \
         publication of the date.' % self.journal_name_intl
 
-    def user_box(self):
+    def user_box(self, req=None):
         """
         user-friendly error message with formatting.
         """
         _ = gettext_set_language(self.ln)
-        return webjournal_templates.tmpl_webjournal_error_box(self.ln,
+        return webjournal_templates.tmpl_webjournal_error_box(req,
+                self.ln,
                 _("No journal issues"),
                 _("Problem with the configuration of this journal"),
                 "The system couldn't find a definition for an issue \
@@ -163,12 +166,13 @@ class InvenioWebJournalNoArticleNumberError(Exception):
         provided by internal links in any case. Maybe this was a bad direct url \
         hack. Check where the request came from.' % self.journal_name
 
-    def user_box(self):
+    def user_box(self, req=None):
         """
         user-friendly error message with formatting.
         """
         _ = gettext_set_language(self.ln)
-        return webjournal_templates.tmpl_webjournal_error_box(self.ln,
+        return webjournal_templates.tmpl_webjournal_error_box(req,
+            self.ln,
             _('Journal article error'),
             _('We could not know which article you were looking for'),
             'The url you passed did not provide an article number or the \
@@ -197,12 +201,13 @@ class InvenioWebJournalNoJournalOnServerError(Exception):
         installation of Invenio. You can try to use the sample Invenio \
         Atlantis Journal for testing.'
 
-    def user_box(self):
+    def user_box(self, req=None):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.ln)
-        return webjournal_templates.tmpl_webjournal_error_box(self.ln,
+        return webjournal_templates.tmpl_webjournal_error_box(req,
+                        self.ln,
                         _('No journals available'),
                         _('We could not provide you any journals'),
                         _('It seems that there are no journals defined on this server. '
@@ -224,12 +229,13 @@ class InvenioWebJournalNoNameError(Exception):
         return 'User probably forgot to add the name parameter for the journal\
         Maybe you also want to check if dns mappings are configured correctly.'
 
-    def user_box(self):
+    def user_box(self, req=None):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.ln)
-        return webjournal_templates.tmpl_webjournal_missing_info_box(self.ln,
+        return webjournal_templates.tmpl_webjournal_missing_info_box(req,
+                        self.ln,
                         _("Select a journal on this server"),
                         _("We couldn't guess which journal you are looking for"),
                         _("You did not provide an argument for a journal name. "
@@ -252,12 +258,13 @@ class InvenioWebJournalNoCurrentIssueError(Exception):
         journal. Is this the first time you use the journal? Otherwise, check\
         configuration.'
 
-    def user_box(self):
+    def user_box(self, req=None):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.ln)
-        return webjournal_templates.tmpl_webjournal_error_box(self.ln,
+        return webjournal_templates.tmpl_webjournal_error_box(req,
+                    self.ln,
                     _('No current issue'),
                     _('We could not find any informtion on the current issue'),
                     _('The configuration for the current issue seems to be empty. '
@@ -281,12 +288,13 @@ class InvenioWebJournalIssueNumberBadlyFormedError(Exception):
         return 'The issue number was badly formed. If this comes from the \
         user it is no problem.'
 
-    def user_box(self):
+    def user_box(self, req=None):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.ln)
-        return webjournal_templates.tmpl_webjournal_error_box(self.ln,
+        return webjournal_templates.tmpl_webjournal_error_box(req,
+                    self.ln,
                     _('Issue number badly formed'),
                     _('We could not read the issue number you provided'),
                     'The issue number you provided in the url seems to be badly\
@@ -311,12 +319,13 @@ class InvenioWebJournalArchiveDateWronglyFormedError (Exception):
         return 'The archive date was badly formed. If this comes from the \
         user it is no problem.'
 
-    def user_box(self):
+    def user_box(self, req=None):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.ln)
-        return webjournal_templates.tmpl_webjournal_error_box(self.ln,
+        return webjournal_templates.tmpl_webjournal_error_box(req,
+                    self.ln,
                     _('Archive date badly formed'),
                     _('We could not read the archive date you provided'),
                     'The archive date you provided in the form seems to be badly\
@@ -346,12 +355,13 @@ class InvenioWebJournalNoPopupRecordError(Exception):
         return 'There was no recid provided to the popup system of webjournal \
         or the recid was badly formed. The recid was %s' % repr(self.recid)
 
-    def user_box(self):
+    def user_box(self, req=None):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.ln)
-        return webjournal_templates.tmpl_webjournal_error_box(self.ln,
+        return webjournal_templates.tmpl_webjournal_error_box(req,
+                    self.ln,
                     _('No popup record'),
                     _('We could not deduce the popup article you requested'),
                     'You called a popup window on Invenio without \
@@ -379,12 +389,13 @@ class InvenioWebJournalReleaseUpdateError(Exception):
         return 'There were no updates submitted on a click on the update button.\
          This should never happen and must be due to an internal error.'
 
-    def user_box(self):
+    def user_box(self, req=None):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.ln)
-        return webjournal_templates.tmpl_webjournal_error_box(self.ln,
+        return webjournal_templates.tmpl_webjournal_error_box(req,
+                    self.ln,
                     _('Update error'),
                     _('There was an internal error'),
                     'We encountered an internal error trying to update the \
@@ -409,12 +420,13 @@ class InvenioWebJournalReleaseDBError(Exception):
         return 'There was an error in synchronizing DB times with the actual \
         Python time objects.'
 
-    def user_box(self):
+    def user_box(self, req=None):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.ln)
-        return webjournal_templates.tmpl_webjournal_error_box(self.ln,
+        return webjournal_templates.tmpl_webjournal_error_box(req,
+                    self.ln,
                     _('Journal publishing DB error'),
                     _('There was an internal error'),
                     'We encountered an internal error trying to publish the \
@@ -441,12 +453,13 @@ class InvenioWebJournalIssueNotFoundDBError(Exception):
         """
         return 'The issue %s does not seem to exist for %s.' % (self.issue_number, self.journal_name)
 
-    def user_box(self):
+    def user_box(self, req=None):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.ln)
-        return webjournal_templates.tmpl_webjournal_error_box(self.ln,
+        return webjournal_templates.tmpl_webjournal_error_box(req,
+                    self.ln,
                     _('Journal issue error'),
                     _('Issue not found'),
                     'The issue you were looking for was not found for %s' % \
@@ -471,12 +484,13 @@ class InvenioWebJournalJournalIdNotFoundDBError(Exception):
         return 'The id for journal %s was not found in the Database. Make \
         sure the entry exists!' % (self.journal_name)
 
-    def user_box(self):
+    def user_box(self, req=None):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.ln)
-        return webjournal_templates.tmpl_webjournal_error_box(self.ln,
+        return webjournal_templates.tmpl_webjournal_error_box(req,
+                    self.ln,
                     _('Journal ID error'),
                     _('We could not find the id for this journal in the Database'),
                     'We encountered an internal error trying to get the id \
@@ -503,12 +517,13 @@ class InvenioWebJournalNoCategoryError(Exception):
         return 'The specified category "%s" does not exist' % \
                self.category
 
-    def user_box(self):
+    def user_box(self, req=None):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.ln)
-        return webjournal_templates.tmpl_webjournal_error_box(self.ln,
+        return webjournal_templates.tmpl_webjournal_error_box(req,
+                    self.ln,
                     _('Category "%(category_name)s" not found') % \
                        {'category_name': cgi.escape(self.category)},
                     _('Category "%(category_name)s" not found') % \

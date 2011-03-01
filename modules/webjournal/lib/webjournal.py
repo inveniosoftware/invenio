@@ -78,7 +78,7 @@ def perform_request_index(req, journal_name, issue_number, ln,
                                                    ln)
     except InvenioWebJournalTemplateNotFoundError, e:
         register_exception(req=req)
-        return e.user_box()
+        return e.user_box(req)
 
     temp_marc = '''<record>
                         <controlfield tag="001">0</controlfield>
@@ -128,7 +128,7 @@ def perform_request_article(req, journal_name, issue_number, ln,
                                                    ln)
     except InvenioWebJournalTemplateNotFoundError, e:
         register_exception(req=req)
-        return e.user_box()
+        return e.user_box(req)
 
     # if it is cached, return it
     cached_html = get_article_page_from_cache(journal_name, category,
@@ -182,7 +182,7 @@ def perform_request_contact(req, ln, journal_name, verbose=0):
                                                      ln)
     except InvenioWebJournalTemplateNotFoundError, e:
         register_exception(req=req)
-        return e.user_box()
+        return e.user_box(req)
 
     user_info = collect_user_info(req)
     temp_marc = '''<record>
@@ -208,7 +208,7 @@ def perform_request_popup(req, ln, journal_name, record):
                                                    ln)
     except InvenioWebJournalTemplateNotFoundError, e:
         register_exception(req=req)
-        return e.user_box()
+        return e.user_box(req)
 
     user_info = collect_user_info(req)
     bfo = BibFormatObject(record, ln=ln, user_info=user_info)
@@ -230,7 +230,7 @@ def perform_request_search(req, journal_name, ln,
                                                     ln)
     except InvenioWebJournalTemplateNotFoundError, e:
         register_exception(req=req)
-        return e.user_box()
+        return e.user_box(req)
 
     if archive_select == "False" and archive_search == "False":
         temp_marc = '''<record>

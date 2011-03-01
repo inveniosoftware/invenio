@@ -38,7 +38,7 @@ from invenio.webjournal_utils import \
 class Template:
     """Templating class, refer to bibformat.py for examples of call"""
 
-    def tmpl_webjournal_missing_info_box(self, ln, title, msg_title, msg):
+    def tmpl_webjournal_missing_info_box(self, req, ln, title, msg_title, msg):
         """
         returns a box indicating that the given journal was not found on the
         server, leaving the opportunity to select an existing journal from a list.
@@ -84,9 +84,9 @@ class Template:
                                    journal,
                                    journal) for journal in all_journals]),
                        mail_msg)
-        return page(title=title, body=box)
+        return page(req=req, title=title, body=box)
 
-    def tmpl_webjournal_error_box(self, ln, title, title_msg, msg):
+    def tmpl_webjournal_error_box(self, req, ln, title, title_msg, msg):
         """
         returns an error box for webjournal errors.
         """
@@ -112,7 +112,7 @@ class Template:
             </fieldset>
         </div>
                 ''' % (title_msg, msg, mail_msg)
-        return page(title=title, body=box)
+        return page(req=req, title=title, body=box)
 
     def tmpl_admin_regenerate_success(self, ln, journal_name, issue):
         """
