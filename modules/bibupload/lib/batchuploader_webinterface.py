@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
+import cgi
 from invenio.webinterface_handler_wsgi_utils import Field
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_SITE_URL
