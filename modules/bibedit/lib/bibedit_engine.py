@@ -582,7 +582,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                     cache_dirty = False
                     undo_list = []
                     redo_list = []
-            if data['clonedRecord']:
+            if data.get('clonedRecord',''):
                 response['resultCode'] = 9
             else:
                 response['resultCode'] = 3
