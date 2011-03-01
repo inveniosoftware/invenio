@@ -2872,6 +2872,10 @@ def get_fieldvalues(recIDs, tag, repetitive_values=True):
     only.
     """
     out = []
+    try:
+        recIDs = int(recIDs)
+    except:
+        pass
     if isinstance(recIDs, (int, long)):
         recIDs =[recIDs,]
     if not isinstance(recIDs, (list, tuple)):

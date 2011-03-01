@@ -1507,6 +1507,7 @@ class WebSearchGetFieldValuesTest(unittest.TestCase):
         """websearch - get_fieldvalues() for list of recIDs"""
         self.assertEqual(get_fieldvalues([], '001___'), [])
         self.assertEqual(get_fieldvalues([], '700__a'), [])
+        self.assertEqual(get_fieldvalues('10', '001___'), ['10'])
         self.assertEqual(get_fieldvalues([10, 13], '001___'), ['10', '13'])
         self.assertEqual(get_fieldvalues([18, 13], '700__a'),
                          ['Dawson, S', 'Ellis, R K', 'Enqvist, K', 'Nanopoulos, D V'])
