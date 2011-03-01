@@ -30,7 +30,7 @@ import datetime
 
 from invenio.config import \
      CFG_LOGDIR, \
-     CFG_SITE_SUPPORT_EMAIL, \
+     CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_URL, \
      CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES, \
      CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES, \
@@ -39,7 +39,7 @@ from invenio.config import \
 from invenio.webbasket_dblayer import get_basket_owner_id, add_to_basket
 from invenio.webbasket import format_external_records
 from invenio.search_engine import perform_request_search, wash_colls, \
-get_coll_sons, is_hosted_collection
+get_coll_sons, is_hosted_collection, get_coll_normalised_name
 from invenio.webinterface_handler import wash_urlargd
 from invenio.dbquery import run_sql
 from invenio.webuser import get_email
@@ -94,11 +94,11 @@ def add_records_to_basket(records, basket_id):
             if nrec > nrec_to_add:
                 print "-> not added %i records into basket %s: %s due to maximum limit restrictions." % (nrec - nrec_to_add, basket_id, records[0][nrec_to_add:])
         try:
-            if CFG_WEBALERT_DEBUG_LEVEL < 4:
+            if CFG_WEBALERT_DEBUG_LEVEL == 0:
                 owner_uid = get_basket_owner_id(basket_id)
                 add_to_basket(owner_uid, records[0][:nrec_to_add], 0, basket_id)
             else:
-                print '   NOT ADDED, DEBUG LEVEL == 4'
+                print '   NOT ADDED, DEBUG LEVEL > 0'
         except Exception:
             register_exception()
 
@@ -118,13 +118,13 @@ def add_records_to_basket(records, basket_id):
                     if nrec > nrec_to_add:
                         print "-> not added %s external records (collection \"%s\") into basket %s: %s due to maximum limit restriction" % (nrec - nrec_to_add, external_collection_results[0], basket_id, external_collection_results[1][0][nrec_to_add:])
                 try:
-                    if CFG_WEBALERT_DEBUG_LEVEL < 4:
+                    if CFG_WEBALERT_DEBUG_LEVEL == 0:
                         owner_uid = get_basket_owner_id(basket_id)
                         collection_id = get_collection_id(external_collection_results[0])
                         added_items = add_to_basket(owner_uid, external_collection_results[1][0][:nrec_to_add], collection_id, basket_id)
                         format_external_records(added_items, of="xm")
                     else:
-                        print '   NOT ADDED, DEBUG LEVEL == 4'
+                        print '   NOT ADDED, DEBUG LEVEL > 0'
                 except Exception:
                     register_exception()
             elif nrec > 0 and CFG_WEBALERT_DEBUG_LEVEL > 0:
@@ -197,7 +197,7 @@ def email_notify(alert, records, argstr):
                    attempt_sleeptime=CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES)
     if CFG_WEBALERT_DEBUG_LEVEL == 4:
         send_email(fromaddr=webalert_templates.tmpl_alert_email_from(),
-                   toaddr=CFG_SITE_SUPPORT_EMAIL,
+                   toaddr=CFG_SITE_ADMIN_EMAIL,
                    subject=webalert_templates.tmpl_alert_email_title(alert[5]),
                    content=msg,
                    header='',
@@ -238,13 +238,23 @@ def get_record_ids(argstr, date_from, date_until):
     d1y, d1m, d1d = _date_to_tuple(date_from)
     d2y, d2m, d2d = _date_to_tuple(date_until)
 
+    #alerts might contain collections that have been deleted
+    #check if such collections are in the query, and if yes, do not include them in the search
+    cc =  get_coll_normalised_name(cc)
+    if not cc and not c: #the alarm was for an entire collection that does not exist anymore
+        return ([], ([], []))
+    if c: # some collections were defined in the query
+        c = [c_norm_name for c_norm_name in [get_coll_normalised_name(c_name) for c_name in c] if c_norm_name] #remove unknown collections from c
+        if not c: #none of the collection selected in the alert still exist
+            return ([], ([], []))
+
     washed_colls = wash_colls(cc, c, sc, 0)
     hosted_colls = washed_colls[3]
     if hosted_colls:
         req_args = "p=%s&f=%s&d1d=%s&d1m=%s&d1y=%s&d2d=%s&d2m=%s&d2y=%s&ap=%i" % (p, f, d1d, d1m, d1y, d2d, d2m, d2y, 0)
         external_records = calculate_external_records(req_args, [p, p1, p2, p3], f, hosted_colls, CFG_EXTERNAL_COLLECTION_TIMEOUT, CFG_EXTERNAL_COLLECTION_MAXRESULTS_ALERTS)
     else:
-        external_records = ([],[])
+        external_records = ([], [])
 
     recids = perform_request_search(of='id', p=p, c=c, cc=cc, f=f, so=so, sp=sp, ot=ot,
                                   aas=aas, p1=p1, f1=f1, m1=m1, op1=op1, p2=p2, f2=f2,

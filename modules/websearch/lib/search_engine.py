@@ -1316,17 +1316,24 @@ def wash_colls(cc, c, split_colls=0, verbose=0):
         debug += "<br />colls_out_for_display : %s" % colls_out_for_display
         debug += "<br />"
 
+    # FIXME: The below quoted part of the code has been commented out
+    # because it prevents searching in individual restricted daughter
+    # collections when both parent and all its public daughter
+    # collections were asked for, in addition to some restricted
+    # daughter collections.  The removal was introduced for hosted
+    # collections, so we may want to double check in this context.
+
     # the following piece of code takes care of removing collections whose ancestors are going to be searched anyway
     # list to hold the collections to be removed
-    colls_to_be_removed = []
+    #colls_to_be_removed = []
     # first calculate the collections that can safely be removed
-    for coll in colls_out_for_display:
-        for ancestor in get_coll_ancestors(coll):
-            #if ancestor in colls_out_for_display: colls_to_be_removed.append(coll)
-            if ancestor in colls_out_for_display and not is_hosted_collection(coll): colls_to_be_removed.append(coll)
+    #for coll in colls_out_for_display:
+    #    for ancestor in get_coll_ancestors(coll):
+    #        #if ancestor in colls_out_for_display: colls_to_be_removed.append(coll)
+    #        if ancestor in colls_out_for_display and not is_hosted_collection(coll): colls_to_be_removed.append(coll)
     # secondly remove the collections
-    for coll in colls_to_be_removed:
-        colls_out_for_display.remove(coll)
+    #for coll in colls_to_be_removed:
+    #    colls_out_for_display.remove(coll)
 
     if verbose:
         debug += "<br />6) --- remove collections that have ancestors about to be search, unless they are hosted ---"
@@ -1661,6 +1668,15 @@ def get_colID(c):
     if res:
         colID = res[0][0]
     return colID
+
+def get_coll_normalised_name(c):
+    """Returns normalised collection name (case sensitive) for collection name
+       C (case insensitive).
+       Returns None if no match found."""
+    try:
+        return run_sql("SELECT name FROM collection WHERE name=%s", (c,))[0][0]
+    except:
+        return None
 
 def get_coll_ancestors(coll):
     "Returns a list of ancestors for collection 'coll'."

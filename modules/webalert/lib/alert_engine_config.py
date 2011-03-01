@@ -25,6 +25,6 @@ __revision__ = \
 ## 1 = messages on the console, email sent
 ## 2 = messages on the console, no email sent
 ## 3 = many messages on the console, no email sent
-## 4 = many messages on the console, email sent to CFG_SITE_SUPPORT_EMAIL
+## 4 = many messages on the console, email sent to CFG_SITE_ADMIN_EMAIL
 CFG_WEBALERT_DEBUG_LEVEL = 0
 

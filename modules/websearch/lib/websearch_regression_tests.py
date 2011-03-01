@@ -45,7 +45,8 @@ from invenio.urlutils import same_urls_p
 from invenio.search_engine import perform_request_search, \
     guess_primary_collection_of_a_record, guess_collection_of_a_record, \
     collection_restricted_p, get_permitted_restricted_collections, \
-    get_fieldvalues, search_pattern, search_unit, search_unit_in_bibrec
+    get_fieldvalues, search_pattern, search_unit, search_unit_in_bibrec, \
+    wash_colls
 
 def parse_url(url):
     parts = urlparse.urlparse(url)
@@ -1839,6 +1840,17 @@ class WebSearchSynonymQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=%CE%B2&of=id',
                                                expected_text="[52, 59]"))
 
+class WebSearchWashCollectionsTest(unittest.TestCase):
+    """Test if the collection argument is washed correctly"""
+
+    def test_wash_coll_when_coll_restricted(self):
+        """websearch - washing of restricted daughter collections"""
+        self.assertEqual(
+            sorted(wash_colls(cc='', c=['Books & Reports', 'Theses'])[1]),
+            ['Books & Reports', 'Theses'])
+        self.assertEqual(
+            sorted(wash_colls(cc='', c=['Books & Reports', 'Theses'])[2]),
+            ['Books & Reports', 'Theses'])
 
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
@@ -1876,7 +1888,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchSPIRESSyntaxTest,
                              WebSearchDateQueryTest,
                              WebSearchTestWildcardLimit,
-                             WebSearchSynonymQueryTest)
+                             WebSearchSynonymQueryTest,
+                             WebSearchWashCollectionsTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
