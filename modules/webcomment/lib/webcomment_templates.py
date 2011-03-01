@@ -580,7 +580,7 @@ class Template:
         if CFG_CERN_SITE:
             from invenio.search_engine import get_all_collections_of_a_record
             user_info = collect_user_info(uid)
-            if 'atlas-readaccess-current-physicists [CERN]' in user_info['group']:
+            if 'atlas-readaccess-active-members [CERN]' in user_info['group']:
                 # An ATLAS member is never anonymous to its colleagues
                 # when commenting inside ATLAS collections
                 recid_collections = get_all_collections_of_a_record(recID)
