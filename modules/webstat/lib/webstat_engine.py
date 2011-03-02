@@ -66,7 +66,7 @@ def get_keyevent_trend_collection_population(args):
     # collect action dates
     lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
     upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
-    if args['collection'] == 'All':
+    if args.get('collection','All') == 'All':
         sql_query_g = ("SELECT creation_date FROM bibrec WHERE " + \
                      "creation_date > '%s' AND creation_date < '%s' " + \
                      "ORDER BY creation_date DESC") % \
@@ -145,7 +145,7 @@ def get_keyevent_trend_comments_frequency(args):
     # collect action dates
     lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
     upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
-    if args['collection'] == 'All':
+    if args.get('collection','All') == 'All':
         sql = "SELECT date_creation FROM cmtRECORDCOMMENT " + \
           "WHERE date_creation > '%s' AND date_creation < '%s'" \
           % (lower, upper) + " ORDER BY date_creation DESC"
@@ -232,7 +232,7 @@ def get_keyevent_trend_download_frequency(args):
     lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
     upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
     # Collect list of timestamps of insertion in the specific collection
-    if args['collection'] == 'All':
+    if args.get('collection','All') == 'All':
         sql = "SELECT download_time FROM rnkDOWNLOADS WHERE download_time > '%s' \
             AND download_time < '%s'  ORDER BY download_time DESC" % (lower, upper)
     else:
@@ -498,7 +498,10 @@ def get_keyevent_loan_lists(args):
             ") GROUP BY id_bibrec", param):
         loans = run_sql("SELECT COUNT(*) %s %s AND l.id_bibrec=%s" %
                         (sql_from, sql_where, rec), param)[0][0]
-        creation = run_sql("SELECT creation_date FROM bibrec WHERE id=%s", (rec, ))[0][0]
+        try:
+            creation = run_sql("SELECT creation_date FROM bibrec WHERE id=%s", (rec, ))[0][0]
+        except:
+            creation = datetime.datetime(1970, 01, 01)
         author = get_fieldvalues(rec, "100__a")
         if len(author) > 0:
             author = author[0]
@@ -546,7 +549,10 @@ def get_keyevent_loan_lists(args):
             edition = edition[0]
         else:
             edition = ""
-        creation = run_sql("SELECT creation_date FROM bibrec WHERE id=%s", (rec, ))[0][0]
+        try:
+            creation = run_sql("SELECT creation_date FROM bibrec WHERE id=%s", (rec, ))[0][0]
+        except:
+            creation = datetime.datetime(1970, 01, 01)
         res.append(('Most loaned documents', book_title_from_MARC(rec), author,
                     edition, loans, copies, creation))
     return (res)
@@ -2186,7 +2192,7 @@ def export_to_excel(data, req):
     """
     if not xlwt_imported:
         raise Exception("Module xlwt not installed")
-    book = xlwt.Workbook()
+    book = xlwt.Workbook(encoding="utf-8")
     sheet1 = book.add_sheet('Sheet 1')
     for row in range(0, len(data)):
         for col in range(0, len(data[row])):
