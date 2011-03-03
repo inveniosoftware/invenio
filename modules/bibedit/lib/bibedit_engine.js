@@ -189,6 +189,7 @@ $(function(){
   initJeditable();
   initAjax();
   initMisc();
+  createTopToolbar();
   initStateFromHash();
   gHashCheckTimerID = setInterval(initStateFromHash, gHASH_CHECK_INTERVAL);
   initHotkeys();
@@ -1129,10 +1130,11 @@ function onGetRecordSuccess(json){
   var recordRevInfo = "record revision: " + revDt;
   var revAuthorString = gRecRevAuthor;
 
-  $('.headline').html(
+  /*$('.headline').html(
     'Record Editor: Record #<span id="spnRecID">' + gRecID + '</span>' +
     '<div style="margin-left: 5px; font-size: 0.5em; color: #36c;">' +
-    recordRevInfo + ' ' + revAuthorString + '</div>').css('white-space', 'nowrap');
+    recordRevInfo + ' ' + revAuthorString + '</div>').css('white-space', 'nowrap');*/
+  $('.revisionLine').html(recordRevInfo + ' ' + revAuthorString)
   gRecord = json['record'];
   gTagFormat = json['tagFormat'];
   gRecordDirty = json['cacheDirty'];
@@ -1365,8 +1367,8 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
     gNavigatingRecordSet = false;
   }
   // Clear main content area.
-  if (resetHeadline)
-    $('.headline').text('Record Editor');
+  /*if (resetHeadline)
+    $('.headline').text('Record Editor');*/
   $('#bibEditContent').empty();
   // Clear search area.
   if (typeof(searchPattern) == 'string' || typeof(searchPattern) == 'number')

@@ -231,7 +231,7 @@ class Template:
   'boxrightbottomadd' : boxrightbottomadd,
 
   'titleprologue' : titleprologue,
-  'title' : (title and show_title_p) and '<h1 class="headline">' + cgi.escape(title) + '</h1>' or '',
+  'title' : (title and show_title_p) and '<div class="headline_div"><h1 class="headline">' + cgi.escape(title) + '</h1></div>' or '',
   'titleepilogue' : titleepilogue,
 
   'body' : body,

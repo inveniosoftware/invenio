@@ -221,7 +221,8 @@ class Template:
             'height=600,left=150,top=150,resizable=yes,scrollbars=yes\');' \
             'return false;' % CFG_SITE_URL)
 
-        return '    <div id="bibEditMenu">\n' \
+        return '    %(page_style)s\n' \
+            '    <div id="bibEditMenu">\n' \
             '      <div class="bibEditMenuSection">\n' \
             '        %(recordmenu)s\n' \
             '      </div>\n' \
@@ -248,6 +249,7 @@ class Template:
             '        %(lnkhelp)s\n' \
             '      </div>\n' \
             '    </div>\n' % {
+                'page_style': page_style(),
                 'recordmenu': recordmenu,
                 'viewmenu': viewmenu,
                 'fieldmenu': fieldmenu,
@@ -328,3 +330,125 @@ def link(value, _class='', **kargs):
     for karg in kargs:
         args += '%s="%s" ' % (karg, kargs[karg])
     return '<a %s%s>%s</a>' % (_class, args, value)
+
+def page_style():
+    """Apply styling for bibedit elements"""
+    style = """<style type="text/css">"""
+    style += """
+                .headline_div {
+                    position: fixed;
+                    top: 105px;
+                    background: #ffffff;
+                    margin-left : 166px;
+                    width : 865px;
+                    height: 45px;
+                    text-indent: -15px;
+                }
+
+                #bibEditContent {
+                    position: fixed;
+                    top: 151px;
+                    /*min-height: 180px;*/
+                    left: 40px; /*166px*/
+                    overflow: auto;
+                    width: 820px;
+                    height: 78%;
+                }
+
+                #bibEditTable {
+                    background-color: rgb(255, 255, 255);
+                    border: 1px solid #A1A1A1;
+                    border-collapse: collapse;
+                    width: 100%;
+                }
+
+                #bibEditMenu {
+                    width: 135px;
+                    position: fixed;
+                    top: 105px;/*90px;*/
+                    left: 20px;
+                    margin-bottom: 20px;
+                    font-size: 0.8em;
+                }
+
+                #bibEditMenu .bibEditMenuSection {
+                    margin-bottom: 10px;
+                }
+
+                #bibEditMenu .bibEditMenuSectionHeader {
+                    font-weight: bold;
+                }
+
+                #bibEditMenu .bibEditMenuSection table {
+                    width: 100%;
+                }
+
+                #bibEditMenu form {
+                    margin: 0px;
+                }
+
+                #bibEditMenu .bibEditImgExpandMenuSection,
+                #bibEditMenu .bibEditImgCompressMenuSection {
+                    margin: 0px;
+                    text-align: left;
+                    vertical-align: bottom;
+                }
+
+                #bibEditMenu a, #bibEditMenu button, #bibEditMenu input,
+                #bibEditMenu select {
+                    font-size: 0.8em;
+                }
+                #bibEditMenu a, #bibEditMenu button, #bibEditMenu img,
+                #bibEditMenu input, #bibEditMenu select {
+                    margin: 1px;
+                }
+                #bibEditMenu button, #bibEditMenu input, #bibEditMenu select  {
+                    width: 100%;
+                }
+                #bibEditMenu .bibEditImgCtrlEnabled {
+                    cursor: pointer;
+                    opacity: 1.0;
+                    vertical-align: bottom;
+                }
+
+                #bibEditMenu .bibEditImgCtrlDisabled {
+                    cursor: default;
+                    opacity: 0.4;
+                    vertical-align: bottom;
+                }
+
+                .revisionLine {
+                    text-align: right;
+                    padding-left: 80px;
+                }
+
+                .pagefooter {
+                    position: fixed;
+                    bottom: 0px;
+                    height: 0px;
+                }
+
+                .pagebody {
+                    padding : 0px;
+                    padding-left: 15px;
+                }
+
+                .navtrailboxbody {
+                    width: 700px;
+                }
+
+                .headline {
+                    display: none;
+                }
+
+                #topToolbarLeft {
+                }
+
+                #topToolbarRight {
+                    position: absolute;
+                    left: 790px;
+                }
+
+            """
+    style += "</style>"
+    return style

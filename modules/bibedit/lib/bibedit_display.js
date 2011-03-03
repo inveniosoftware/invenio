@@ -584,6 +584,23 @@ function createGeneralControlsPanel(){
   return result;
 }
 
+function createTopToolbar(){
+  /* XXX: New hotness */
+
+  $('.navtrailboxbody').after('<td class="revisionLine"></td>')
+  /*toolbar_html = "<span id='topToolbarLeft'>";
+  for (templatePos in fieldTemplates) {
+      toolbar_html += "<img src='/img/document-preview.png' width='45px' height='45px' ";
+      toolbar_html += "title='" + fieldTemplates[templatePos].name + "'/>";
+  }
+  toolbar_html += "</span>";*/
+  toolbar_html = "<span id='topToolbarRight'><img src='/img/document-preview.png' "
+  toolbar_html += "width='40px' height='40px' title='Preview record' /></span>"
+
+  $('.headline_div').html(toolbar_html);
+
+}
+
 /// end of the Holding Pen Connected functions
 
 function createAddFieldForm(fieldTmpNo, fieldTemplateNo){

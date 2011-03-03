@@ -27,7 +27,7 @@ function initMenu(){
    * Initialize menu.
    */
   // Position footer.
-  $('#bibEditContent').css('min-height',  $('#bibEditMenu').height()-30 + 'px');
+  //TBD $('#bibEditContent').css('min-height',  $('#bibEditMenu').height()-30 + 'px');
   // Make sure the menu is in it's initial state.
   deactivateRecordMenu();
   $('#txtSearchPattern').val('');
@@ -101,8 +101,8 @@ function expandMenuSection(){
   var deltaMenuHeight = $('#bibEditMenu').height() - currentMenuHeight;
   var currentSpacerHeight = parseInt($('#bibEditContent').css(
 			      'min-height').slice(0, -2));
-  $('#bibEditContent').css('min-height',
-    (currentSpacerHeight + deltaMenuHeight) + 'px');
+  //TBD $('#bibEditContent').css('min-height',
+  //  (currentSpacerHeight + deltaMenuHeight) + 'px');
 
   $(this).replaceWith(img('/img/bullet_toggle_minus.png', '',
 			  'bibEditImgCompressMenuSection'));
