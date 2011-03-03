@@ -159,6 +159,11 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
         self.assertEqual(self.parser.parse_query('"expr1" (expr2) expr3'),
                          ['+', '"expr1"', '+', 'expr2', '+', 'expr3'])
 
+    def test_sqpp_quoted_expr1_arrow_quoted_expr2(self):
+        """SearchQueryParenthesisedParser = \"expr1\"->\"expr2\""""
+        self.assertEqual(self.parser.parse_query('"expr1"->"expr2"'),
+                         ['+', '"expr1"->"expr2"'])
+
     def test_sqpp_paren_expr1_expr2_paren_expr3_or_expr4(self):
         """SearchQueryParenthesisedParser - (expr1) expr2 (expr3) | expr4"""
         # test parsing of queries with missing operators.
