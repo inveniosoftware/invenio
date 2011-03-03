@@ -259,8 +259,8 @@ class Template:
             'rft.series' : (str, ''),
     }
 
-    tmpl_opensearch_rss_url_syntax = "%(CFG_SITE_URL)s/rss?p={searchTerms}&amp;jrec={startIndex}&amp;rg={count}&amp;ln={language}&amp;startIndex" % {'CFG_SITE_URL': CFG_SITE_URL}
-    tmpl_opensearch_html_url_syntax = "%(CFG_SITE_URL)s/search?p={searchTerms}&amp;jrec={startIndex}&amp;rg={count}&amp;ln={language}&amp;startIndex" % {'CFG_SITE_URL': CFG_SITE_URL}
+    tmpl_opensearch_rss_url_syntax = "%(CFG_SITE_URL)s/rss?p={searchTerms}&amp;jrec={startIndex}&amp;rg={count}&amp;ln={language}" % {'CFG_SITE_URL': CFG_SITE_URL}
+    tmpl_opensearch_html_url_syntax = "%(CFG_SITE_URL)s/search?p={searchTerms}&amp;jrec={startIndex}&amp;rg={count}&amp;ln={language}" % {'CFG_SITE_URL': CFG_SITE_URL}
 
     def tmpl_openurl2invenio(self, openurl_data):
         """ Return an Invenio url corresponding to a search with the data
