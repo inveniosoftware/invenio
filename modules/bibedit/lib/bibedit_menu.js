@@ -26,8 +26,6 @@ function initMenu(){
   /*
    * Initialize menu.
    */
-  // Position footer.
-  //TBD $('#bibEditContent').css('min-height',  $('#bibEditMenu').height()-30 + 'px');
   // Make sure the menu is in it's initial state.
   deactivateRecordMenu();
   $('#txtSearchPattern').val('');
@@ -93,16 +91,8 @@ function expandMenuSection(){
   /*
    * Expand a menu section.
    */
-  var currentMenuHeight = $('#bibEditMenu').height();
   var parent = $(this).parent();
   parent.closest('.bibEditMenuSection').find('.bibEditMenuMore').show();
-
-  // Expand content spaceholder accordingly.
-  var deltaMenuHeight = $('#bibEditMenu').height() - currentMenuHeight;
-  var currentSpacerHeight = parseInt($('#bibEditContent').css(
-			      'min-height').slice(0, -2));
-  //TBD $('#bibEditContent').css('min-height',
-  //  (currentSpacerHeight + deltaMenuHeight) + 'px');
 
   $(this).replaceWith(img('/img/bullet_toggle_minus.png', '',
 			  'bibEditImgCompressMenuSection'));
@@ -204,6 +194,7 @@ function onSearchClick(event){
       cleanUp(true, null, null, true);
       updateStatus('error', gRESULT_CODES[102]);
       $('.headline').text('Record Editor: Record #' + searchPattern);
+      updateToolbar(false);
       displayMessage(102);
     }
     else{

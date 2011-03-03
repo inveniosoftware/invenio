@@ -339,20 +339,20 @@ def page_style():
                     position: fixed;
                     top: 105px;
                     background: #ffffff;
-                    margin-left : 166px;
-                    width : 865px;
+                    margin-left : 175px;
+                    width : 820px;
                     height: 45px;
                     text-indent: -15px;
                 }
 
                 #bibEditContent {
-                    position: fixed;
+                    position: absolute;
                     top: 151px;
-                    /*min-height: 180px;*/
-                    left: 40px; /*166px*/
+                    left: 40px;
                     overflow: auto;
                     width: 820px;
-                    height: 78%;
+                    height: 74%;
+                    z-index: -1;
                 }
 
                 #bibEditTable {
@@ -447,6 +447,11 @@ def page_style():
                 #topToolbarRight {
                     position: absolute;
                     left: 790px;
+                    height: 48px;
+                }
+
+                #top_toolbar_hr {
+                    padding-top: 37px;
                 }
 
             """

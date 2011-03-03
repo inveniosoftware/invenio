@@ -20,6 +20,9 @@
 
 __revision__ = "$Id"
 
+from invenio import bibrecord
+from invenio import bibformat
+
 from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL, CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL, \
     CFG_BIBEDIT_JS_CLONED_RECORD_COLOR, \
@@ -366,6 +369,9 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False, \
         cacheMTime = data['cacheMTime']
         response.update(perform_bulk_request_ajax(req, recid, uid, changes, \
                                                   undo_redo, cacheMTime))
+    elif request_type in ('preview', ):
+        response.update(perform_request_preview_record(request_type, recid, uid))
+        
     return response
 
 def perform_bulk_request_ajax(req, recid, uid, reqsData, undoRedo, cacheMTime):
@@ -1152,3 +1158,43 @@ def perform_request_bibcatalog(request_type, recid, uid):
         response['resultCode'] = 31
 
     return response
+
+def perform_request_preview_record(request_type, recid, uid):
+    """ Handle request to preview record with formatting
+
+    """
+
+    response = {}
+    if request_type == "preview":
+        if cache_exists(recid, uid):
+            dummy1, dummy2, record, dummy3, dummy4, dummy5, dummy6 = get_cache_file_contents(recid, uid)
+        else:
+            record = get_bibrecord(recid)
+    response['html_preview'] = _get_formated_record(record)
+
+    return response
+
+def _get_formated_record(record):
+    """Returns a record in a given format
+
+    @param record: BibRecord object
+    """
+
+    xml_record = bibrecord.record_xml_output(record)
+
+    result =  "<html><head><title>Record preview</title></head>"
+    result += "<script src='/MathJax/MathJax.js' type='text/javascript'></script>"
+    result += "<body><h2> Brief format preview </h2>"
+    result += bibformat.format_record(recID=None,
+                                     of="hb",
+                                     xml_record=xml_record)
+    result += "<h2> Detailed format preview </h2>"
+    
+    result += bibformat.format_record(recID=None,
+                                     of="hd",
+                                     xml_record=xml_record)
+
+    result += "</body></html>"
+
+    
+    return result

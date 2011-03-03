@@ -59,6 +59,7 @@
  *   - getRecord
  *   - onGetRecordSuccess
  *   - onSubmitClick
+ *   - onPreviewClick
  *   - onCancelClick
  *   - onCloneRecordClick
  *   - onDeleteRecordClick
@@ -160,6 +161,7 @@ var gPhysCopiesNum = 0;
 var gBibCircUrl = null;
 
 var gDisplayBibCircPanel = false;
+
 /*
  * **************************** 2. Initialization ******************************
  */
@@ -596,7 +598,7 @@ function changeAndSerializeHash(updateData){
 
 /*
  * **************************** 5. Data logic **********************************
- */
+*/
 
 function getTagsSorted(){
   /*
@@ -1197,6 +1199,7 @@ function onGetRecordSuccess(json){
 
   createReq({recID: gRecID, requestType: 'getTickets'}, onGetTicketsSuccess);
 
+  updateToolbar(true);
 }
 
 function onGetTemplateSuccess(json) {
@@ -1228,6 +1231,20 @@ function onSubmitClick(){
 
 // Enable this flag to force the next submission even if cache is outdated.
 onSubmitClick.force = false;
+
+function onPreviewClick(){
+  /*
+   * Handle 'Preview' button (preview record).
+   */
+    createReq({recID: gRecID, requestType: 'preview'
+       }, function(json){
+       // Preview was successful.
+        var html_preview = json['html_preview'];
+        var preview_window = window.open('', '', 'width=768,height=768,resizeable,scrollbars');
+        preview_window.document.write(html_preview);
+        preview_window.document.close(); // needed for chrome and safari
+       });
+}
 
 function onCancelClick(){
   /*
@@ -1261,6 +1278,7 @@ function onCancelClick(){
       updateInterfaceAccordingToMode();
       updateRevisionsHistory();
       updateUrView();
+      updateToolbar(false);
 
     }
     else {
@@ -1308,6 +1326,7 @@ function onDeleteRecordClick(){
       resetBibeditState();
       updateStatus('report', gRESULT_CODES[resCode]);
       displayMessage(resCode);
+      updateToolbar(false);
     });
   }
 }

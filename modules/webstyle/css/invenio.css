@@ -2013,6 +2013,16 @@ input.hyperlinkformSubmitButton {
   opacity: 0.4;
   vertical-align: bottom;
 }
+.bibEditImgCtrlEnabled {
+  cursor: pointer;
+  opacity: 1.0;
+  vertical-align: bottom;
+}
+.bibEditImgCtrlDisabled {
+  cursor: default;
+  opacity: 0.4;
+  vertical-align: bottom;
+}
 #bibEditContent {
   min-height: 300px;
   margin-left: 150px;
