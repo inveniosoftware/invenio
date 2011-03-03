@@ -1947,6 +1947,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO knwKB VALUES ('1','DBCOLLID2COLL','DbCollID to Coll name correspondance.', NULL);
 INSERT INTO knwKB VALUES ('2','EJOURNALS','Knowledge base of all known electronic journals.  Useful for reference linking.', NULL);
 INSERT INTO knwKB VALUES ('3','DBCOLLID2BIBTEX','Mapping between the 980 field and BibTeX entry types.', NULL);
+INSERT INTO knwKB VALUES ('4','SEARCH-SYNONYM-JOURNAL','Knowledge base of journal title synonyms.  Used during search time.', NULL);
+INSERT INTO knwKB VALUES ('5','INDEX-SYNONYM-TITLE','Knowledge base of title word synonyms.  Used during indexing time.', NULL);
 
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('ARTICLE','Published Article', '1');
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('PREPRINT','Preprint', '1');
@@ -2288,6 +2290,10 @@ INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('REPORT','techreport', '3
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('BOOK','book', '3');
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('THESIS','phdthesis', '3');
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('POETRY','unpublished', '3');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('PHRVD','Phys. Rev., D', '4');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('Phys.Rev.D','Phys. Rev., D', '4');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('beta','β', '5');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('β','beta', '5');
 
 -- crcLIBRARY demo data:
 INSERT INTO crcLIBRARY (name, address, email, phone, notes) VALUES ('Atlantis Main Library', 'CH-1211 Geneva 23', 'atlantis@cds.cern.ch', '1234567', '');

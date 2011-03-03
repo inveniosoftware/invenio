@@ -220,7 +220,7 @@ def test_web_page_content(url,
                 url_body.index(cur_expected_text)
             except ValueError:
                 raise InvenioTestUtilsBrowserException, \
-                      'ERROR: Page %s (login %s) does not contain %s, ut contains %s' % \
+                      'ERROR: Page %s (login %s) does not contain %s, but contains %s' % \
                       (url, username, cur_expected_text, url_body)
 
         # now test for UNEXPECTED_TEXT:

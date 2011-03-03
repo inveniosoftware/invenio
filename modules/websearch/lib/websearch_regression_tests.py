@@ -1375,7 +1375,6 @@ class WebSearchExtSysnoQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?sysno=000289446CER&of=id',
                                                expected_text="[95]"))
 
-
     def test_nonexisting_sysno_html_output(self):
         """websearch - external sysno query, non-existing sysno, HTML output"""
         self.assertEqual([],
@@ -1756,6 +1755,58 @@ class WebSearchSPIRESSyntaxTest(unittest.TestCase):
                                                expected_text='[9, 12, 14, 47]'))
 
 
+class WebSearchSynonymQueryTest(unittest.TestCase):
+    """Test of queries using synonyms."""
+
+    def test_journal_phrvd(self):
+        """websearch - search-time synonym search, journal title"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=PHRVD&f=journal&of=id',
+                                               expected_text="[66, 72]"))
+
+    def test_journal_phrvd_54_1996_4234(self):
+        """websearch - search-time synonym search, journal article"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=PHRVD%2054%20%281996%29%204234&f=journal&of=id',
+                                               expected_text="[66]"))
+
+    def test_journal_beta_decay_title(self):
+        """websearch - index-time synonym search, beta decay in title"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=beta+decay&f=title&of=id',
+                                               expected_text="[59]"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=%CE%B2+decay&f=title&of=id',
+                                               expected_text="[59]"))
+
+    def test_journal_beta_decay_global(self):
+        """websearch - index-time synonym search, beta decay in any field"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=beta+decay&of=id',
+                                               expected_text="[52, 59]"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=%CE%B2+decay&of=id',
+                                               expected_text="[52, 59]"))
+
+    def test_journal_beta_title(self):
+        """websearch - index-time synonym search, beta in title"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=beta&f=title&of=id',
+                                               expected_text="[59]"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=%CE%B2&f=title&of=id',
+                                               expected_text="[59]"))
+
+    def test_journal_beta_global(self):
+        """websearch - index-time synonym search, beta in any field"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=beta&of=id',
+                                               expected_text="[52, 59]"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=%CE%B2&of=id',
+                                               expected_text="[52, 59]"))
+
+
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -1790,8 +1841,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchSpanQueryTest,
                              WebSearchReferstoCitedbyTest,
                              WebSearchSPIRESSyntaxTest,
-                             WebSearchTestWildcardLimit)
-
+                             WebSearchTestWildcardLimit,
+                             WebSearchSynonymQueryTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

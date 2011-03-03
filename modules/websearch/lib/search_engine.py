@@ -62,6 +62,7 @@ from invenio.config import \
      CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
      CFG_WEBSEARCH_WILDCARD_LIMIT, \
+     CFG_WEBSEARCH_SYNONYM_KBRS, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_LOGDIR, \
@@ -79,6 +80,7 @@ from invenio.bibindex_engine_tokenizer import wash_author_name, author_name_requ
 from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel
 from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
+from invenio.bibknowledge import get_kbr_values
 from invenio.data_cacher import DataCacher
 from invenio.websearch_external_collections import print_external_results_overview, perform_external_collection_search
 from invenio.access_control_admin import acc_get_action_id
@@ -1481,6 +1483,51 @@ def lower_index_term(term):
     """
     return unicode(term, 'utf-8').lower().encode('utf-8')
 
+
+def get_synonym_terms(term, kbr_name, match_type):
+    """
+    Return list of synonyms for TERM by looking in KBR_NAME in
+    MATCH_TYPE style.
+
+    @param term: search-time term or index-time term
+    @type term: str
+    @param kbr_name: knowledge base name
+    @type kbr_name: str
+    @param match_type: specifies how the term matches against the KBR
+        before doing the lookup.  Could be `exact' (default),
+        'leading_to_comma', `leading_to_number'.
+    @type match_type: str
+    @return: list of term synonyms
+    @rtype: list of strings
+    """
+    dterms = {}
+    ## exact match is default:
+    term_for_lookup = term
+    term_remainder = ''
+    ## but maybe match different term:
+    if match_type == 'leading_to_comma':
+        mmm = re.match(r'^(.*?)(\s*,.*)$', term)
+        if mmm:
+            term_for_lookup = mmm.group(1)
+            term_remainder = mmm.group(2)
+    elif match_type == 'leading_to_number':
+        mmm = re.match(r'^(.*?)(\s*\d.*)$', term)
+        if mmm:
+            term_for_lookup = mmm.group(1)
+            term_remainder = mmm.group(2)
+    ## FIXME: workaround: escaping SQL wild-card signs, since KBR's
+    ## exact search is doing LIKE query, so would match everything:
+    term_for_lookup = term_for_lookup.replace('%', '\%')
+    ## OK, now find synonyms:
+    for kbr_values in get_kbr_values(kbr_name,
+                                     searchkey=term_for_lookup,
+                                     searchtype='e'):
+        for kbr_value in kbr_values:
+            dterms[kbr_value + term_remainder] = 1
+    ## return list of term synonyms:
+    return dterms.keys()
+
+
 def wash_output_format(format):
     """Wash output format FORMAT.  Currently only prevents input like
     'of=9' for backwards-compatible format that prints certain fields
@@ -2029,6 +2076,7 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
 
         return search_pattern(req, p, f, m, ap, of, verbose, ln, display_nearest_terms_box=display_nearest_terms_box, wl=wl)
 
+
 def search_unit(p, f=None, m=None, wl=0):
     """Search for basic search unit defined by pattern 'p' and field
        'f' and matching type 'm'.  Return hitset of recIDs.
@@ -2037,6 +2085,11 @@ def search_unit(p, f=None, m=None, wl=0):
        'p' is assumed to be already a ``basic search unit'' so that it
        is searched as such and is not broken up in any way.  Only
        wildcard and span queries are being detected inside 'p'.
+
+       If CFG_WEBSEARCH_SYNONYM_KBRS is set and we are searching in
+       one of the indexes that has defined runtime synonym knowledge
+       base, then look up there and automatically enrich search
+       results with results for synonyms.
 
        In case the wildcard limit (wl) is greater than 0 and this limit
        is reached an InvenioWebSearchWildcardLimitError will be raised.
@@ -2047,22 +2100,33 @@ def search_unit(p, f=None, m=None, wl=0):
     """
 
     ## create empty output results set:
-    set = HitSet()
+    hitset = HitSet()
     if not p: # sanity checking
-        return set
+        return hitset
+
+    ## eventually look up runtime synonyms:
+    hitset_synonyms = HitSet()
+    if CFG_WEBSEARCH_SYNONYM_KBRS.has_key(f):
+        for p_synonym in get_synonym_terms(p,
+                             CFG_WEBSEARCH_SYNONYM_KBRS[f][0],
+                             CFG_WEBSEARCH_SYNONYM_KBRS[f][1]):
+            if p_synonym != p:
+                hitset_synonyms |= search_unit(p_synonym, f, m, wl)
+
+    ## look up hits:
     if CFG_SOLR_URL and f == 'fulltext':
         # redirect to Solr/Lucene
         return search_unit_in_solr(p, f, m)
     if f == 'datecreated':
-        set = search_unit_in_bibrec(p, p, 'c')
+        hitset = search_unit_in_bibrec(p, p, 'c')
     elif f == 'datemodified':
-        set = search_unit_in_bibrec(p, p, 'm')
+        hitset = search_unit_in_bibrec(p, p, 'm')
     elif f == 'refersto':
         # we are doing search by the citation count
-        set = search_unit_refersto(p)
+        hitset = search_unit_refersto(p)
     elif f == 'citedby':
         # we are doing search by the citation count
-        set = search_unit_citedby(p)
+        hitset = search_unit_citedby(p)
     elif m == 'a' or m == 'r':
         # we are doing either phrase search or regexp search
         if f == 'fulltext':
@@ -2070,16 +2134,19 @@ def search_unit(p, f=None, m=None, wl=0):
             return search_pattern(None, p, f, 'w')
         index_id = get_index_id_from_field(f)
         if index_id != 0:
-            set = search_unit_in_idxphrases(p, f, m, wl)
+            hitset = search_unit_in_idxphrases(p, f, m, wl)
         else:
-            set = search_unit_in_bibxxx(p, f, m, wl)
+            hitset = search_unit_in_bibxxx(p, f, m, wl)
     elif p.startswith("cited:"):
         # we are doing search by the citation count
-        set = search_unit_by_times_cited(p[6:])
+        hitset = search_unit_by_times_cited(p[6:])
     else:
         # we are doing bibwords search by default
-        set = search_unit_in_bibwords(p, f, m, wl=wl)
-    return set
+        hitset = search_unit_in_bibwords(p, f, m, wl=wl)
+
+    ## merge synonym results and return total:
+    hitset |= hitset_synonyms
+    return hitset
 
 def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
     """Searches for 'word' inside bibwordsX table for field 'f' and returns hitset of recIDs."""
@@ -5392,34 +5459,3 @@ def profile(p="", f="", c=CFG_SITE_NAME):
     p = pstats.Stats("perform_request_search_profile")
     p.strip_dirs().sort_stats("cumulative").print_stats()
     return 0
-
-## test cases:
-#print wash_colls(CFG_SITE_NAME,"Library Catalogue", 0)
-#print wash_colls("Periodicals & Progress Reports",["Periodicals","Progress Reports"], 0)
-#print wash_field("wau")
-#print print_record(20,"tm","001,245")
-#print create_opft_search_units(None, "PHE-87-13","reportnumber")
-#print ":"+wash_pattern("* and % doo * %")+":\n"
-#print ":"+wash_pattern("*")+":\n"
-#print ":"+wash_pattern("ellis* ell* e*%")+":\n"
-#print run_sql("SELECT name,dbquery from collection")
-#print get_index_id("author")
-#print get_coll_ancestors("Theses")
-#print get_coll_sons("Articles & Preprints")
-#print get_coll_real_descendants("Articles & Preprints")
-#print get_collection_reclist("Theses")
-#print log(sys.stdin)
-#print search_unit_in_bibrec('2002-12-01','2002-12-12')
-#print get_nearest_terms_in_bibxxx("ellis", "author", 5, 5)
-#print call_bibformat(68, "HB_FLY")
-#print get_fieldvalues(10, "980__a")
-#print get_fieldvalues_alephseq_like(10,"001___")
-#print get_fieldvalues_alephseq_like(10,"980__a")
-#print get_fieldvalues_alephseq_like(10,"foo")
-#print get_fieldvalues_alephseq_like(10,"-1")
-#print get_fieldvalues_alephseq_like(10,"99")
-#print get_fieldvalues_alephseq_like(10,["001", "980"])
-
-## profiling:
-#profile("of the this")
-#print perform_request_search(p="ellis")

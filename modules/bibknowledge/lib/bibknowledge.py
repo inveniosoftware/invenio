@@ -238,7 +238,7 @@ def get_kbr_keys(kb_name, searchkey="", searchvalue="", searchtype='s'):
 
 def get_kbr_values(kb_name, searchkey="", searchvalue="", searchtype='s'):
     """
-    Returns an array of keys.
+    Returns an array of values.
        @param kb_name: the name of the knowledge base
        @param searchkey: search using this key
        @param searchvalue: search using this value

@@ -38,6 +38,7 @@ from invenio.config import \
      CFG_BIBINDEX_REMOVE_HTML_MARKUP, \
      CFG_BIBINDEX_REMOVE_LATEX_MARKUP, \
      CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES, \
+     CFG_BIBINDEX_SYNONYM_KBRS, \
      CFG_CERN_SITE, CFG_INSPIRE_SITE, \
      CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES, \
      CFG_BIBINDEX_SPLASH_PAGES, \
@@ -53,7 +54,8 @@ from invenio.bibdocfile import bibdocfile_url_p, \
      download_url, guess_format_from_url, BibRecDocs
 from invenio.websubmit_file_converter import convert_file, get_file_converter_logger
 from invenio.search_engine import perform_request_search, strip_accents, \
-     wash_index_term, lower_index_term, get_index_stemming_language
+     wash_index_term, lower_index_term, get_index_stemming_language, \
+     get_synonym_terms
 from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, \
      deserialize_via_marshal
 from invenio.bibindex_engine_stopwords import is_stopword
@@ -1105,6 +1107,19 @@ class WordTable:
                         wlist[recID] = []
                     new_words = get_words_function(phrase, stemming_language=self.stemming_language) # ,self.separators
                     wlist[recID] = list_union(new_words, wlist[recID])
+
+        # lookup index-time synonyms:
+        if CFG_BIBINDEX_SYNONYM_KBRS.has_key(self.index_name):
+            if len(wlist) == 0: return 0
+            recIDs = wlist.keys()
+            for recID in recIDs:
+                for word in wlist[recID]:
+                    word_synonyms = get_synonym_terms(word,
+                                                      CFG_BIBINDEX_SYNONYM_KBRS[self.index_name][0],
+                                                      CFG_BIBINDEX_SYNONYM_KBRS[self.index_name][1])
+                    if word_synonyms:
+                        print "word %s, word synonyms %s" % (word, repr(word_synonyms))
+                        wlist[recID] = list_union(word_synonyms, wlist[recID])
 
         # were there some words for these recIDs found?
         if len(wlist) == 0: return 0
