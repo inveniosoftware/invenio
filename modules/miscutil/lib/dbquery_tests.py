@@ -24,6 +24,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio import dbquery
+from invenio.config import CFG_DATABASE_NAME
 from invenio.testutils import make_test_suite, run_test_suite
 
 class TableUpdateTimesTest(unittest.TestCase):
@@ -37,7 +38,8 @@ class TableUpdateTimesTest(unittest.TestCase):
         if mysql_server_version.startswith("5."):
             # MySQL-5 provides INFORMATION_SCHEMA:
             query = """SELECT UPDATE_TIME FROM INFORMATION_SCHEMA.TABLES
-                        WHERE table_name='%s'""" % tablename
+                        WHERE table_name='%s' AND table_schema='%s'""" \
+                        % (tablename, CFG_DATABASE_NAME)
             tablename_update_time = str(dbquery.run_sql(query)[0][0])
         elif mysql_server_version.startswith("4.1"):
             # MySQL-4.1 has it on 12th position:
