@@ -814,7 +814,6 @@ ServerTokens Prod
 NameVirtualHost %(vhost_ip_address)s:80
 %(listen_directive)s
 %(wsgi_socket_directive)s
-%(xsendfile_directive)s
 WSGIRestrictStdout Off
 #WSGIImportScript %(wsgidir)s/invenio.wsgi process-group=invenio application-group=%%{GLOBAL}
 <Files *.pyc>
@@ -850,6 +849,7 @@ WSGIRestrictStdout Off
         WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP} inactivity-timeout=3600 maximum-requests=10000
         WSGIScriptAlias / %(wsgidir)s/invenio.wsgi
         WSGIPassAuthorization On
+        %(xsendfile_directive)s
         <Directory %(wsgidir)s>
            WSGIProcessGroup invenio
            WSGIApplicationGroup %%{GLOBAL}
@@ -872,8 +872,9 @@ WSGIRestrictStdout Off
                                 'WSGISocketPrefix ' or '#WSGISocketPrefix ') + \
               conf.get('Invenio', 'CFG_PREFIX') + os.sep + 'var' + os.sep + 'run',
        'xsendfile_directive' : xsendfile_directive_needed and \
-                               "XSendFile On\nXSendFileAllowAbove On" or \
-                               "#XSendFile On\n#XSendFileAllowAbove On",
+                                "XSendFile On\n        XSendFilePath %(filedir)s" or \
+                                "#XSendFile On\n        #XSendFilePath %(filedir)s" % {
+                                    'filedir': conf.get('Invenio', 'CFG_WEBSUBMIT_FILEDIR')}
        }
     apache_vhost_ssl_body = """\
 ServerSignature Off
@@ -883,7 +884,6 @@ NameVirtualHost %(vhost_ip_address)s:443
 %(ssl_pem_directive)s
 %(ssl_crt_directive)s
 %(ssl_key_directive)s
-%(xsendfile_directive)s
 WSGIRestrictStdout Off
 <Files *.pyc>
    deny from all
@@ -918,6 +918,7 @@ WSGIRestrictStdout Off
         Alias /favicon.ico %(webdir)s/favicon.ico
         WSGIScriptAlias / %(wsgidir)s/invenio.wsgi
         WSGIPassAuthorization On
+        %(xsendfile_directive)s
         <Directory %(wsgidir)s>
            WSGIProcessGroup invenio
            WSGIApplicationGroup %%{GLOBAL}
@@ -946,8 +947,9 @@ WSGIRestrictStdout Off
                             '#SSLCertificateKeyFile %s' % ssl_key_path or \
                             'SSLCertificateKeyFile %s' % ssl_key_path,
        'xsendfile_directive' : xsendfile_directive_needed and \
-                               "XSendFile On\nXSendFileAllowAbove On" or \
-                               "#XSendFile On\n#XSendFileAllowAbove On",
+                                "XSendFile On\n        XSendFilePath %(filedir)s" or \
+                                "#XSendFile On\n        #XSendFilePath %(filedir)s" % {
+                                    'filedir': conf.get('Invenio', 'CFG_WEBSUBMIT_FILEDIR')}
        }
     # write HTTP vhost snippet:
     if os.path.exists(apache_vhost_file):
