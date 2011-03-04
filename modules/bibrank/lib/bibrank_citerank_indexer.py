@@ -32,7 +32,11 @@ import datetime
 import time
 import re
 import sys
-from numpy import array, ones, zeros, int32, float32, sqrt, dot
+try:
+    from numpy import array, ones, zeros, int32, float32, sqrt, dot
+    import_numpy = 1
+except ImportError:
+    import_numpy = 0
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -750,6 +754,10 @@ def get_dates(function, config, dict_of_ids):
 def citerank(rank_method_code):
     """new ranking method based on the citation graph"""
     write_message("Running rank method: %s" % rank_method_code, verbose=0)
+    if not import_numpy:
+        write_message('The numpy package could not be imported. \
+This package is compulsory for running the citerank methods.')
+        return
     try:
         file_ = CFG_ETCDIR + "/bibrank/" + rank_method_code + ".cfg"
         config = ConfigParser.ConfigParser()
