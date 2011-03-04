@@ -135,6 +135,17 @@ class BaseSubfieldCommand:
 
 class AddSubfieldCommand(BaseSubfieldCommand):
     """Add subfield to a given field"""
+    def _perform_on_all_matching_subfields_add_subfield(self, record, tag, field_number, callback):
+        if tag not in record.keys():
+            return
+        for field in record[tag]:
+            if field[4] == field_number:
+                for subfield in field[0]:
+                    if self._condition_subfield == subfield[0]:
+                        if self._subfield_condition_match(subfield[1]):
+                            self._add_subfield_modification()
+                            callback(record, tag, field_number, None)
+
     def process_field(self, record, tag, field_number):
         """@see: BaseSubfieldCommand.process_field"""
         action = lambda record, tag, field_number, subfield_index: \
@@ -143,8 +154,8 @@ class AddSubfieldCommand(BaseSubfieldCommand):
                                          None,
                                          field_position_global=field_number)
         if self._condition != 'condition':
-            self._perform_on_all_matching_subfields(record, tag,
-                                                    field_number, action)
+            self._perform_on_all_matching_subfields_add_subfield(record, tag,
+                                                                field_number, action)
         else:
             self._add_subfield_modification()
             action(record, tag, field_number, None)
