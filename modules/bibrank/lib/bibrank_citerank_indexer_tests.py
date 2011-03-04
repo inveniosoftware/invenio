@@ -54,5 +54,8 @@ class TestCiterankIndexer(unittest.TestCase):
 TEST_SUITE = make_test_suite(TestCiterankIndexer,)
 
 if __name__ == "__main__":
-    run_test_suite(TEST_SUITE)
-
+    try: # the citerank functions can not run if numpy is not installed
+        import numpy
+        run_test_suite(TEST_SUITE)
+    except ImportError:
+        pass
