@@ -54,7 +54,7 @@ dico_collection_seealso = None
 #dico_collection_seealso = {}
 
 def print_external_results_overview(req, current_collection, pattern_list, field,
-        external_collection, verbosity_level=0, lang=CFG_SITE_LANG):
+        external_collection, verbosity_level=0, lang=CFG_SITE_LANG, print_overview=True):
     """Print the external collection overview box. Return the selected external collections and parsed query"""
     from invenio.search_engine import create_basic_search_units
     assert req
@@ -75,13 +75,16 @@ def print_external_results_overview(req, current_collection, pattern_list, field
 
     search_engines_list = external_collection_sort_engine_by_name(search_engines)
     vprint(3, 'search_engines_list (sorted) : ' + str(search_engines_list))
-    html = template.external_collection_overview(lang, search_engines_list)
-    req.write(html)
+    if print_overview:
+        html = template.external_collection_overview(lang, search_engines_list)
+        req.write(html)
 
     return (search_engines, seealso_engines, pattern, basic_search_units)
 
 def perform_external_collection_search(req, current_collection, pattern_list, field,
-        external_collection, verbosity_level=0, lang=CFG_SITE_LANG, selected_external_collections_infos=None):
+        external_collection, verbosity_level=0, lang=CFG_SITE_LANG,
+        selected_external_collections_infos=None, print_overview=True,
+        print_search_info=True, print_see_also_box=True, print_body=True):
     """Search external collection and print the seealso box."""
 
     vprint = get_verbose_print(req, 'External collection: ', verbosity_level)
@@ -90,13 +93,14 @@ def perform_external_collection_search(req, current_collection, pattern_list, fi
         (search_engines, seealso_engines, pattern, basic_search_units) = selected_external_collections_infos
     else:
         (search_engines, seealso_engines, pattern, basic_search_units) = print_external_results_overview(req,
-            current_collection, pattern_list, field, external_collection, verbosity_level, lang)
+            current_collection, pattern_list, field, external_collection, verbosity_level, lang, print_overview=print_overview)
 
     if not pattern:
         return
 
-    do_external_search(req, lang, vprint, basic_search_units, search_engines)
-    create_seealso_box(req, lang, vprint, basic_search_units, seealso_engines, pattern)
+    do_external_search(req, lang, vprint, basic_search_units, search_engines, print_search_info, print_body)
+    if print_see_also_box:
+        create_seealso_box(req, lang, vprint, basic_search_units, seealso_engines, pattern)
     vprint(3, 'end')
 
 def bind_patterns(pattern_list):
@@ -121,7 +125,6 @@ def bind_patterns(pattern_list):
 # See also box
 def create_seealso_box(req, lang, vprint, basic_search_units=None, seealso_engines=None, query=''):
     "Create the box that proposes links to other useful search engines like Google."
-
     vprint(3, 'Create seealso box')
     seealso_engines_list = external_collection_sort_engine_by_name(seealso_engines)
     vprint(3, 'seealso_engines_list = ' + str(seealso_engines_list))
@@ -180,7 +183,7 @@ def select_external_engines(collection_name, selected_external_searches):
     return (search_engines, seealso_engines)
 
 # Search
-def do_external_search(req, lang, vprint, basic_search_units, search_engines):
+def do_external_search(req, lang, vprint, basic_search_units, search_engines, print_search_info=True, print_body=True):
     """Make the external search."""
     _ = gettext_set_language(lang)
     vprint(3, 'beginning external search')
@@ -194,12 +197,12 @@ def do_external_search(req, lang, vprint, basic_search_units, search_engines):
 
     pagegetters_list = [HTTPAsyncPageGetter(engine[0]) for engine in engines_list]
 
-    def finished(pagegetter, data, current_time):
+    def finished(pagegetter, data, current_time, print_search_info=True, print_body=True):
         """Function called, each time the download of a web page finish.
         Will parse and print the results of this page."""
-        print_results(req, lang, pagegetter, data, current_time)
+        print_results(req, lang, pagegetter, data, current_time, print_search_info, print_body)
 
-    finished_list = async_download(pagegetters_list, finished, engines_list, CFG_EXTERNAL_COLLECTION_TIMEOUT)
+    finished_list = async_download(pagegetters_list, finished, engines_list, CFG_EXTERNAL_COLLECTION_TIMEOUT, print_search_info, print_body)
 
     for (finished, engine) in zip(finished_list, engines_list):
         if not finished:

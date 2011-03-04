@@ -55,14 +55,15 @@ import urlparse
 from invenio.config import CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_TIMEOUT
 CFG_EXTERNAL_COLLECTION_TIMEOUT = CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_TIMEOUT
 
-def async_download(pagegetter_list, finish_function=None, datastructure_list=None, timeout=15):
+def async_download(pagegetter_list, finish_function=None, datastructure_list=None, timeout=15, print_search_info=True, print_body=True):
     """Download web pages asynchronously with timeout.
     pagegetter_list : list of HTTPAsyncPageGetter objects
     finish_function : function called when a web page is downloaded;
-        prototype def funct(pagetter, datastructure, current_time)
+        prototype def funct(pagetter, datastructure, current_time, print_search_info(optional))
     datastructure_list : list (same size as pagegetter_list) with information to pass as datastructure
         to the finish function.
-    timeout : float, timeout in seconds."""
+    timeout : float, timeout in seconds.
+    print_search_info: boolean, whether to print the search info or not in the finish function"""
     time_start = time.time()
     finished_list = [False] * len(pagegetter_list)
 
@@ -87,7 +88,10 @@ def async_download(pagegetter_list, finish_function=None, datastructure_list=Non
                     else:
                         datastructure = None
                     current_time = time.time() - time_start
-                    finish_function(pagegetter_list[i], datastructure, current_time)
+                    try:
+                        finish_function(pagegetter_list[i], datastructure, current_time, print_search_info, print_body)
+                    except TypeError:
+                        finish_function(pagegetter_list[i], datastructure, current_time)
                 finished_list[i] = True
 
     return finished_list

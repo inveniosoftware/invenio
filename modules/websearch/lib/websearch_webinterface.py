@@ -113,7 +113,9 @@ from invenio.search_engine import check_user_can_view_record, \
      perform_request_log, \
      perform_request_search, \
      restricted_collection_cache, \
-     get_coll_normalised_name
+     get_coll_normalised_name, \
+     EM_REPOSITORY
+from invenio.websearch_webcoll import perform_display_collection
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
@@ -175,6 +177,9 @@ def wash_search_urlargd(form):
 
     del argd['action_browse']
     del argd['action_search']
+
+    if argd['em'] != "":
+        argd['em'] = argd['em'].split(",")
 
     return argd
 
@@ -1540,14 +1545,16 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
         target += make_canonical_urlargd(argd, legacy_collection_default_urlargd)
         return redirect_to_url(req, target)
 
-def display_collection(req, c, aas, verbose, ln):
+def display_collection(req, c, aas, verbose, ln, em=""):
     """Display search interface page for collection c by looking
     in the collection cache."""
     _ = gettext_set_language(ln)
 
-    req.argd = drop_default_urlargd({'aas': aas, 'verbose': verbose, 'ln': ln},
+    req.argd = drop_default_urlargd({'aas': aas, 'verbose': verbose, 'ln': ln, 'em' : em},
                                     search_interface_default_urlargd)
 
+    if em != "":
+        em = em.split(",")
     # get user ID:
     try:
         uid = getUid(req)
@@ -1585,70 +1592,18 @@ def display_collection(req, c, aas, verbose, ln):
                     language=ln,
                     req=req,
                     navmenuid='search')
-    # wash `aas' argument:
-    if not os.path.exists("%s/collections/%d/body-as=%d-ln=%s.html" % \
-                          (CFG_CACHEDIR, colID, aas, ln)):
-        # nonexistent `aas' asked for, fall back to Simple Search:
-        aas = 0
-    # display collection interface page:
-    try:
-        filedesc = open("%s/collections/%d/navtrail-as=%d-ln=%s.html" % \
-                        (CFG_CACHEDIR, colID, aas, ln), "r")
-        c_navtrail = filedesc.read()
-        filedesc.close()
-    except:
-        c_navtrail = ""
-    try:
-        filedesc = open("%s/collections/%d/body-as=%d-ln=%s.html" % \
-                        (CFG_CACHEDIR, colID, aas, ln), "r")
-        c_body = filedesc.read()
-        filedesc.close()
-    except:
-        c_body = ""
-    try:
-        filedesc = open("%s/collections/%d/portalbox-tp-ln=%s.html" % \
-                        (CFG_CACHEDIR, colID, ln), "r")
-        c_portalbox_tp = filedesc.read()
-        filedesc.close()
-    except:
-        c_portalbox_tp = ""
-    try:
-        filedesc = open("%s/collections/%d/portalbox-te-ln=%s.html" % \
-                        (CFG_CACHEDIR, colID, ln), "r")
-        c_portalbox_te = filedesc.read()
-        filedesc.close()
-    except:
-        c_portalbox_te = ""
-    try:
-        filedesc = open("%s/collections/%d/portalbox-lt-ln=%s.html" % \
-                        (CFG_CACHEDIR, colID, ln), "r")
-        c_portalbox_lt = filedesc.read()
-        filedesc.close()
-    except:
-        c_portalbox_lt = ""
-    try:
-        # show help boxes (usually located in "tr", "top right")
-        # if users have not banned them in their preferences:
-        c_portalbox_rt = ""
-        if user_preferences.get('websearch_helpbox', 1) > 0:
-            filedesc = open("%s/collections/%d/portalbox-rt-ln=%s.html" % \
-                            (CFG_CACHEDIR, colID, ln), "r")
-            c_portalbox_rt = filedesc.read()
-            filedesc.close()
-    except:
-        c_portalbox_rt = ""
-    try:
-        filedesc = open("%s/collections/%d/last-updated-ln=%s.html" % \
-                        (CFG_CACHEDIR, colID, ln), "r")
-        c_last_updated = filedesc.read()
-        filedesc.close()
-    except:
-        c_last_updated = ""
-    try:
-        title = get_coll_i18nname(c, ln)
-    except:
-        title = ""
 
+    c_body, c_navtrail, c_portalbox_lt, c_portalbox_rt, c_portalbox_tp, c_portalbox_te, \
+        c_last_updated = perform_display_collection(colID, c, aas, ln, em,
+                                            user_preferences.get('websearch_helpbox', 1))
+
+    if em == "" or EM_REPOSITORY["body"] in em:
+        try:
+            title = get_coll_i18nname(c, ln)
+        except:
+            title = ""
+    else:
+        title = ""
     show_title_p = True
     body_css_classes = []
     if c == CFG_SITE_NAME:
@@ -1704,7 +1659,9 @@ def display_collection(req, c, aas, verbose, ln):
                 navmenuid='search',
                 rssurl=rssurl,
                 body_css_classes=body_css_classes,
-                show_title_p=show_title_p)
+                show_title_p=show_title_p,
+                show_header=em == "" or EM_REPOSITORY["header"] in em,
+                show_footer=em == "" or EM_REPOSITORY["footer"] in em)
 
 class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
     """RSS 2.0 feed service pages."""

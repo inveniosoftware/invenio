@@ -111,7 +111,8 @@ class Template:
                   body="", lastupdated=None, pagefooteradd="", uid=0,
                   secure_page_p=0, navmenuid="", metaheaderadd="",
                   rssurl=CFG_SITE_URL+"/rss",
-                  show_title_p=True, body_css_classes=None):
+                  show_title_p=True, body_css_classes=None,
+                  show_header=True, show_footer=True):
 
         """Creates a complete page
 
@@ -177,6 +178,10 @@ class Template:
 
           - 'body_css_classes' *list* - list of classes to add to the body tag
 
+          - 'show_header' *boolean* - tells whether page header should be displayed or not
+
+          - 'show_footer' *boolean* - tells whether page footer should be displayed or not
+
            Output:
 
           - HTML code of the page
@@ -184,8 +189,9 @@ class Template:
 
         # load the right message language
         _ = gettext_set_language(ln)
-
-        out = self.tmpl_pageheader(req,
+        out = ''
+        if show_header:
+            out += self.tmpl_pageheader(req,
                                    ln = ln,
                                    headertitle = title,
                                    description = description,
@@ -200,7 +206,8 @@ class Template:
                                    secure_page_p = secure_page_p,
                                    navmenuid=navmenuid,
                                    rssurl=rssurl,
-                                   body_css_classes=body_css_classes) + """
+                                   body_css_classes=body_css_classes)
+        out += """
 <div class="pagebody">
   <div class="pagebodystripeleft">
     <div class="pageboxlefttop">%(boxlefttop)s</div>
@@ -241,7 +248,9 @@ class Template:
 
   'body' : body,
 
-  } + self.tmpl_pagefooter(req, ln = ln,
+  }
+        if show_footer:
+            out += self.tmpl_pagefooter(req, ln = ln,
                            lastupdated = lastupdated,
                            pagefooteradd = pagefooteradd)
         return out

@@ -27,6 +27,7 @@ import re
 import os
 import string
 import time
+import cPickle
 
 from invenio.config import \
      CFG_CERN_SITE, \
@@ -40,7 +41,7 @@ from invenio.config import \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE
 from invenio.messages import gettext_set_language, language_list_long
-from invenio.search_engine import search_pattern_parenthesised, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records
+from invenio.search_engine import search_pattern_parenthesised, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records, EM_REPOSITORY
 from invenio.dbquery import run_sql, Error, get_table_update_time
 from invenio.bibrank_record_sorter import get_bibrank_methods
 from invenio.dateutils import convert_datestruct_to_dategui
@@ -119,9 +120,7 @@ def check_nbrecs_for_all_external_collections():
     for row in res:
         coll_name = row[0]
         if (get_collection(coll_name)).check_nbrecs_for_external_collection():
-            write_message("External collection %s found updated." % coll_name, verbose=6)
             return True
-    write_message("All external collections are up to date.", verbose=6)
     return False
 
 class Collection:
@@ -255,15 +254,15 @@ class Collection:
                 descendants += tmp_descendants
         return descendants
 
-    def write_cache_file(self, filename='', filebody=''):
+    def write_cache_file(self, filename='', filebody={}):
         "Write a file inside collection cache."
         # open file:
-        dirname = "%s/collections/%d" % (CFG_CACHEDIR, self.id)
+        dirname = "%s/collections" % (CFG_CACHEDIR)
         mymkdir(dirname)
         fullfilename = dirname + "/%s.html" % filename
         try:
             os.umask(022)
-            f = open(fullfilename, "w")
+            f = open(fullfilename, "wb")
         except IOError, v:
             try:
                 (code, message) = v
@@ -276,60 +275,45 @@ class Collection:
         write_message("... creating %s" % fullfilename, verbose=6)
         sys.stdout.flush()
         # print page body:
-        f.write(filebody)
+        cPickle.dump(filebody, f, cPickle.HIGHEST_PROTOCOL)
         # close file:
         f.close()
 
-    def update_webpage_cache(self):
+    def update_webpage_cache(self, lang):
         """Create collection page header, navtrail, body (including left and right stripes) and footer, and
            call write_cache_file() afterwards to update the collection webpage cache."""
 
         ## precalculate latest additions for non-aggregate
         ## collections (the info is ln and as independent)
-        if self.dbquery and not CFG_WEBSEARCH_I18N_LATEST_ADDITIONS:
-            self.create_latest_additions_info()
+        if self.dbquery:
+            if CFG_WEBSEARCH_I18N_LATEST_ADDITIONS:
+                self.create_latest_additions_info(ln=lang)
+            else:
+                self.create_latest_additions_info()
 
-        ## do this for each language:
-        for lang, lang_fullname in language_list_long():
+        # load the right message language
+        _ = gettext_set_language(lang)
 
-            # but only if some concrete language was not chosen only:
-            if lang in task_get_option("language", [lang]):
+        # create dictionary with data
+        cache = {"te_portalbox" : self.create_portalbox(lang, 'te'),
+                 "np_portalbox" : self.create_portalbox(lang, 'np'),
+                 "ne_portalbox" : self.create_portalbox(lang, 'ne'),
+                 "tp_portalbox" : self.create_portalbox(lang, "tp"),
+                 "lt_portalbox" : self.create_portalbox(lang, "lt"),
+                 "rt_portalbox" : self.create_portalbox(lang, "rt"),
+                 "last_updated" : convert_datestruct_to_dategui(time.localtime(),
+                                                                    ln=lang)}
+        for aas in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES: # do light, simple and advanced search pages:
+            cache["navtrail_%s" % aas] = self.create_navtrail_links(aas, lang)
+            cache["searchfor_%s" % aas] = self.create_searchfor(aas, lang)
+            cache["narrowsearch_%s" % aas] = self.create_narrowsearch(aas, lang, 'r')
+            cache["focuson_%s" % aas] = self.create_narrowsearch(aas, lang, "v")+ \
+                        self.create_external_collections_box(lang)
+            cache["instantbrowse_%s" % aas] = self.create_instant_browse(aas=aas, ln=lang)
+        # write cache file
+        self.write_cache_file("%s-ln=%s"%(self.name, lang), cache)
 
-                if self.dbquery and CFG_WEBSEARCH_I18N_LATEST_ADDITIONS:
-                    self.create_latest_additions_info(ln=lang)
-
-                # load the right message language
-                _ = gettext_set_language(lang)
-
-                ## first, update navtrail:
-                for aas in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES:
-                    self.write_cache_file("navtrail-as=%s-ln=%s" % (aas, lang),
-                                          self.create_navtrail_links(aas, lang))
-
-                ## second, update page body:
-                for aas in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES: # do light, simple and advanced search pages:
-                    body = websearch_templates.tmpl_webcoll_body(
-                        ln=lang, collection=self.name,
-                        te_portalbox = self.create_portalbox(lang, 'te'),
-                        searchfor = self.create_searchfor(aas, lang),
-                        np_portalbox = self.create_portalbox(lang, 'np'),
-                        narrowsearch = self.create_narrowsearch(aas, lang, 'r'),
-                        focuson = self.create_narrowsearch(aas, lang, "v") + \
-                        self.create_external_collections_box(lang),
-                        instantbrowse = self.create_instant_browse(aas=aas, ln=lang),
-                        ne_portalbox = self.create_portalbox(lang, 'ne')
-                        )
-                    self.write_cache_file("body-as=%s-ln=%s" % (aas, lang), body)
-                ## third, write portalboxes:
-                self.write_cache_file("portalbox-tp-ln=%s" % lang, self.create_portalbox(lang, "tp"))
-                self.write_cache_file("portalbox-te-ln=%s" % lang, self.create_portalbox(lang, "te"))
-                self.write_cache_file("portalbox-lt-ln=%s" % lang, self.create_portalbox(lang, "lt"))
-                self.write_cache_file("portalbox-rt-ln=%s" % lang, self.create_portalbox(lang, "rt"))
-                ## fourth, write 'last updated' information:
-                self.write_cache_file("last-updated-ln=%s" % lang,
-                                      convert_datestruct_to_dategui(time.localtime(),
-                                                                    ln=lang))
-        return
+        return cache
 
     def create_navtrail_links(self, aas=CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
         """Creates navigation trail links, i.e. links to collection
@@ -831,6 +815,51 @@ class Collection:
         self.update_reclist_run_already = 1
         return 0
 
+def perform_display_collection(colID, colname, aas, ln, em, show_help_boxes):
+    """Returns the data needed to display a collection page
+    The arguments are as follows:
+    colID - id of the collection to display
+    colname - name of the collection to display
+    aas - 0 if simple search, 1 if advanced search
+    ln - language of the page
+    em - code to display just part of the page
+    show_help_boxes - whether to show the help boxes or not"""
+    # check and update cache if necessary
+    try:
+        cachedfile = open("%s/collections/%s-ln=%s.html" % \
+                        (CFG_CACHEDIR, colname, ln), "rb")
+        data = cPickle.load(cachedfile)
+        cachedfile.close()
+    except:
+        data = get_collection(colname).update_webpage_cache(ln)
+    # check em value to return just part of the page
+    if em != "":
+        if EM_REPOSITORY["search_box"] not in em:
+            data["searchfor_%s" % aas] = ""
+        if EM_REPOSITORY["see_also_box"] not in em:
+            data["focuson_%s" % aas] = ""
+        if EM_REPOSITORY["all_portalboxes"] not in em:
+            if EM_REPOSITORY["te_portalbox"] not in em:
+                data["te_portalbox"] = ""
+            if EM_REPOSITORY["np_portalbox"] not in em:
+                data["np_portalbox"] = ""
+            if EM_REPOSITORY["ne_portalbox"] not in em:
+                data["ne_portalbox"] = ""
+            if EM_REPOSITORY["tp_portalbox"] not in em:
+                data["tp_portalbox"] = ""
+            if EM_REPOSITORY["lt_portalbox"] not in em:
+                data["lt_portalbox"] = ""
+            if EM_REPOSITORY["rt_portalbox"] not in em:
+                data["rt_portalbox"] = ""
+    c_body = websearch_templates.tmpl_webcoll_body(ln, colID, data["te_portalbox"],
+                data["searchfor_%s"%aas], data["np_portalbox"], data["narrowsearch_%s"%aas],
+                data["focuson_%s"%aas], data["instantbrowse_%s"%aas], data["ne_portalbox"],
+                em=="" or EM_REPOSITORY["body"] in em)
+    if show_help_boxes <= 0:
+        data["rt_portalbox"] = ""
+    return (c_body, data["navtrail_%s"%aas], data["lt_portalbox"], data["rt_portalbox"],
+            data["tp_portalbox"], data["te_portalbox"], data["last_updated"])
+
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
     """Returns a date string according to the format string.
        It can handle normal date strings and shifts with respect
@@ -1055,7 +1084,8 @@ def task_run_core():
             for coll in colls:
                 i += 1
                 write_message("%s / webpage cache update" % coll.name)
-                coll.update_webpage_cache()
+                for lang in CFG_SITE_LANGS:
+                    coll.update_webpage_cache(lang)
                 task_update_progress("Part 2/2: done %d/%d" % (i, len(colls)))
                 task_sleep_now_if_required(can_stop_too=True)
 

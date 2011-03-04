@@ -124,7 +124,7 @@ def get_link_name(name):
     """Return a hash string for the string name."""
     return hex(abs(name.__hash__()))
 
-def print_results(req, lang, pagegetter, infos, current_time):
+def print_results(req, lang, pagegetter, infos, current_time, print_search_info=True, print_body=True):
     """Print results of a given search engine.
     current_time is actually the duration, expressed in seconds of execution of request.
     """
@@ -140,31 +140,33 @@ def print_results(req, lang, pagegetter, infos, current_time):
 
     html_tit = make_url(name, base_url)
 
-    num = format_number(engine.parser.parse_num_results())
-    if num:
-        if num == '0':
+    if print_search_info:
+        num = format_number(engine.parser.parse_num_results())
+        if num:
+            if num == '0':
+                html_num = _('No results found.')
+                html_sec = ''
+            else:
+                html_num = '<strong>' + \
+                           make_url(_('%s results found') % num, url) + \
+                           '</strong>'
+                html_sec = '(' + _('%s seconds') % ('%2.2f' % current_time) + ')'
+        else:
             html_num = _('No results found.')
             html_sec = ''
-        else:
-            html_num = '<strong>' + \
-                       make_url(_('%s results found') % num, user_url or url) + \
-                       '</strong>'
-            html_sec = '(' + _('%s seconds') % ('%2.2f' % current_time) + ')'
-    else:
-        html_num = _('No results found.')
-        html_sec = ''
 
-    req.write('<a name="%(internal_name)s"></a>' % locals())
-    print_info_line(req,
+        req.write('<a name="%(internal_name)s"></a>' % locals())
+        print_info_line(req,
                     html_tit,
                     html_num,
                     html_sec)
 
-    for result in results:
-        req.write(result.html + '<br />')
+    if print_body:
+        for result in results:
+            req.write(result.html + '<br />')
 
-    if not results:
-        req.write(_('No results found.') + '<br />')
+        if not results:
+            req.write(_('No results found.') + '<br />')
 
 def make_url(name, url):
     if url:

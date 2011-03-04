@@ -67,7 +67,7 @@ def page(title, body, navtrail="", description="", keywords="",
          language=CFG_SITE_LANG, verbose=1, titleprologue="",
          titleepilogue="", secure_page_p=0, req=None, errors=[], warnings=[], navmenuid="admin",
          navtrail_append_title_p=1, of="", rssurl=CFG_SITE_URL+"/rss", show_title_p=True,
-         body_css_classes=None):
+         body_css_classes=None, show_header=True, show_footer=True):
 
     """page(): display CDS web page
         input: title of the page
@@ -95,6 +95,8 @@ def page(title, body, navtrail="", description="", keywords="",
                of is an output format (use xx for xml output (e.g. AJAX))
                rssfeed is the url of the RSS feed for this page
                show_title_p is 0 or 1 and tells whether page title should be displayed in body of the page
+               show_header is 0 or 1 and tells whether page header should be displayed or not
+               show_footer is 0 or 1 and tells whether page footer should be displayed or not
        output: the final cds page with header, footer, etc.
     """
 
@@ -184,7 +186,9 @@ def page(title, body, navtrail="", description="", keywords="",
                           navmenuid = navmenuid,
                           rssurl = rssurl,
                           show_title_p = show_title_p,
-                          body_css_classes=body_css_classes)
+                          body_css_classes=body_css_classes,
+                          show_header=show_header,
+                          show_footer=show_footer)
 
 
 def pageheaderonly(title, navtrail="", description="", keywords="", uid=0,

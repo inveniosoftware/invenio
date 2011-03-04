@@ -130,6 +130,7 @@ class Template:
         'rm': (str, ""),
         'of': (str, "hb"),
         'ot': (list, []),
+        'em': (str,""),
         'aas': (int, CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE),
         'as': (int, CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE),
         'p1': (str, ""), 'f1': (str, ""), 'm1': (str, ""), 'op1':(str, ""),
@@ -157,7 +158,8 @@ class Template:
     search_interface_default_urlargd = {
         'aas': (int, CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE),
         'as': (int, CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE),
-        'verbose': (int, 0)}
+        'verbose': (int, 0),
+        'em' : (str, "")}
 
     # ...and for RSS feeds
     rss_default_urlargd = {'c'  : (list, []),
@@ -591,7 +593,7 @@ class Template:
 
     def tmpl_webcoll_body(self, ln, collection, te_portalbox,
                           searchfor, np_portalbox, narrowsearch,
-                          focuson, instantbrowse, ne_portalbox):
+                          focuson, instantbrowse, ne_portalbox, show_body=True):
 
         """ Creates the body of the main search page.
 
@@ -620,20 +622,23 @@ class Template:
         body = '''
                 <form name="search" action="%(siteurl)s/search" method="get">
                 %(searchfor)s
-                %(np_portalbox)s
-                <table cellspacing="0" cellpadding="0" border="0" class="narrowandfocusonsearchbox">
-                  <tr>
-                    <td valign="top">%(narrowsearch)s</td>
-               ''' % {
+                %(np_portalbox)s''' % {
                  'siteurl' : CFG_SITE_URL,
                  'searchfor' : searchfor,
-                 'np_portalbox' : np_portalbox,
-                 'narrowsearch' : narrowsearch,
-               }
-        if focuson:
-            body += """<td valign="top">""" + focuson + """</td>"""
-        body += """</tr></table>
-            %(ne_portalbox)s
+                 'np_portalbox' : np_portalbox
+                 }
+        if show_body:
+            body += '''
+                    <table cellspacing="0" cellpadding="0" border="0" class="narrowandfocusonsearchbox">
+                      <tr>
+                        <td valign="top">%(narrowsearch)s</td>
+                   ''' % { 'narrowsearch' : narrowsearch }
+            if focuson:
+                body += """<td valign="top">""" + focuson + """</td>"""
+            body += """</tr></table>"""
+        elif focuson:
+            body += focuson
+        body += """%(ne_portalbox)s
                </form>""" % {'ne_portalbox' : ne_portalbox}
         return body
 
@@ -3000,59 +3005,63 @@ class Template:
         out += "</td></tr></tbody></table>"
         return out
 
-    def tmpl_print_hosted_results(self, url_and_engine, ln, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
+    def tmpl_print_hosted_results(self, url_and_engine, ln, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS, display_body=True, display_add_to_basket = True):
         """Print results of a given search engine.
         """
 
-        _ = gettext_set_language(ln)
-        #url = url_and_engine[0]
-        engine = url_and_engine[1]
-        #name = _(engine.name)
-        db_id = get_collection_id(engine.name)
-        #base_url = engine.base_url
+        if display_body:
+            _ = gettext_set_language(ln)
+            #url = url_and_engine[0]
+            engine = url_and_engine[1]
+            #name = _(engine.name)
+            db_id = get_collection_id(engine.name)
+            #base_url = engine.base_url
 
-        out = ""
+            out = ""
 
-        results = engine.parser.parse_and_get_results(None, of=of, req=req, limit=limit, parseonly=True)
+            results = engine.parser.parse_and_get_results(None, of=of, req=req, limit=limit, parseonly=True)
 
-        if len(results) != 0:
-            if of == 'hb':
-                out += """
-                      <form action="%(siteurl)s/yourbaskets/add" method="post">
-                      <input type="hidden" name="colid" value="%(col_db_id)s" />
-                      <table>
-                      """ % {
-                        'siteurl' : CFG_SITE_URL,
-                        'col_db_id' : db_id,
-                      }
+            if len(results) != 0:
+                if of == 'hb':
+                    out += """
+                          <form action="%(siteurl)s/yourbaskets/add" method="post">
+                          <input type="hidden" name="colid" value="%(col_db_id)s" />
+                          <table>
+                          """ % {
+                            'siteurl' : CFG_SITE_URL,
+                            'col_db_id' : db_id,
+                          }
+            else:
+                if of == 'hb':
+                    out += """
+                          <table>
+                          """
+
+            for result in results:
+                out += result.html.replace('>Detailed record<', '>External record<').replace('>Similar records<', '>Similar external records<')
+
+            if len(results) != 0:
+                if of == 'hb':
+                    out += """</table>
+                           <br />"""
+                    if display_add_to_basket:
+                        out += """<input class="formbutton" type="submit" name="action" value="%(basket)s" />
+                    """ % {'basket' : _("Add to basket")}
+                    out += """</form>"""
+            else:
+                if of == 'hb':
+                    out += """
+                          </table>
+                          """
+
+            # we have already checked if there are results or no, maybe the following if should be removed?
+            if not results:
+                if of.startswith("h"):
+                    out = _('No results found...') + '<br />'
+
+            return out
         else:
-            if of == 'hb':
-                out += """
-                      <table>
-                      """
-
-        for result in results:
-            out += result.html.replace('>Detailed record<', '>External record<').replace('>Similar records<', '>Similar external records<')
-
-        if len(results) != 0:
-            if of == 'hb':
-                out += """</table>
-                       <br /><input class="formbutton" type="submit" name="action" value="%(basket)s" />
-                       </form>""" % {
-                         'basket' : _("Add to basket")
-                         }
-        else:
-            if of == 'hb':
-                out += """
-                      </table>
-                      """
-
-        # we have already checked if there are results or no, maybe the following if should be removed?
-        if not results:
-            if of.startswith("h"):
-                out = _('No results found...') + '<br />'
-
-        return out
+            return ""
 
     def tmpl_print_searchresultbox(self, header, body):
         """print a nicely formatted box for search results """

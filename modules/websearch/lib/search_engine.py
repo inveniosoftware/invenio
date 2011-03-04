@@ -193,6 +193,24 @@ re_latex_uppercase_y = re.compile("\\\\[\"']\\{?Y\\}?")
 re_latex_uppercase_c = re.compile("\\\\['uc]\\{?C\\}?")
 re_latex_uppercase_n = re.compile("\\\\[c'~^vu]\\{?N\\}?")
 
+## em possible values
+EM_REPOSITORY={"body" : "B",
+               "header" : "H",
+               "footer" : "F",
+               "search_box" : "S",
+               "see_also_box" : "L",
+               "basket" : "K",
+               "alert" : "A",
+               "search_info" : "I",
+               "overview" : "O",
+               "all_portalboxes" : "P",
+               "te_portalbox" : "Pte",
+               "tp_portalbox" : "Ptp",
+               "np_portalbox" : "Pnp",
+               "ne_portalbox" : "Pne",
+               "lt_portalbox" : "Plt",
+               "rt_portalbox" : "Prt"};
+
 class RestrictedCollectionDataCacher(DataCacher):
     def __init__(self):
         def cache_filler():
@@ -822,7 +840,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
     return opfts
 
 def page_start(req, of, cc, aas, ln, uid, title_message=None,
-               description='', keywords='', recID=-1, tab='', p=''):
+               description='', keywords='', recID=-1, tab='', p='', em=''):
     """
     Start page according to given output format.
 
@@ -831,7 +849,6 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
     @param keywords: keywords of the page, not escaped for HTML
     """
     _ = gettext_set_language(ln)
-
     if not req or isinstance(req, cStringIO.OutputType):
         return # we were called from CLI
 
@@ -926,7 +943,8 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
             body_css_classes.append(css)
 
         ## finally, print page header:
-        req.write(pageheaderonly(req=req, title=title_message,
+        if em == '' or EM_REPOSITORY["header"] in em:
+            req.write(pageheaderonly(req=req, title=title_message,
                                  navtrail=navtrail,
                                  description=description,
                                  keywords=keywords,
@@ -941,7 +959,7 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
     #else:
     #    req.send_http_header()
 
-def page_end(req, of="hb", ln=CFG_SITE_LANG):
+def page_end(req, of="hb", ln=CFG_SITE_LANG, em=""):
     "End page according to given output format: e.g. close XML tags, add HTML footer, etc."
     if of == "id":
         return [] # empty recID list
@@ -949,7 +967,8 @@ def page_end(req, of="hb", ln=CFG_SITE_LANG):
         return # we were called from CLI
     if of.startswith('h'):
         req.write(websearch_templates.tmpl_search_pageend(ln = ln)) # pagebody end
-        req.write(pagefooteronly(lastupdated=__lastupdated__, language=ln, req=req))
+        if em == "" or EM_REPOSITORY["footer"] in em:
+            req.write(pagefooteronly(lastupdated=__lastupdated__, language=ln, req=req))
     return
 
 def create_page_title_search_pattern_info(p, p1, p2, p3):
@@ -1000,10 +1019,15 @@ def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_
 def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, aas,
                       ln, p1, f1, m1, op1, p2, f2, m2, op2, p3, f3,
                       m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec,
-                      action=""):
+                      action="", em=""):
 
     """Create search box for 'search again in the results page' functionality."""
-
+    if em != "" and EM_REPOSITORY["search_box"] not in em:
+        if EM_REPOSITORY["body"] in em and cc != CFG_SITE_NAME:
+            return '''
+            <h1 class="headline">%(ccname)s</h1>''' % {'ccname' : cgi.escape(cc), }
+        else:
+            return ""
     # load the right message language
     _ = gettext_set_language(ln)
 
@@ -1120,7 +1144,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, aas,
              jrec = jrec,
              ec = ec,
              show_colls = show_colls,
-             show_title = show_title,
+             show_title = show_title and (em=="" or EM_REPOSITORY["body"] in em)
            )
 
 def create_navtrail_links(cc=CFG_SITE_NAME, aas=0, ln=CFG_SITE_LANG, self_p=1, tab=''):
@@ -3323,12 +3347,14 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_NAME, nb
                       aas=0, ln=CFG_SITE_LANG, p1="", p2="", p3="", f1="", f2="", f3="", m1="", m2="", m3="", op1="", op2="",
                       sc=1, pl_in_url="",
                       d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, dt="",
-                      cpu_time=-1, middle_only=0):
+                      cpu_time=-1, middle_only=0, em=""):
     """Prints stripe with the information on 'collection' and 'nb_found' results and CPU time.
        Also, prints navigation links (beg/next/prev/end) inside the results set.
        If middle_only is set to 1, it will only print the middle box information (beg/netx/prev/end/etc) links.
        This is suitable for displaying navigation links at the bottom of the search results page."""
 
+    if em != '' and EM_REPOSITORY["search_info"] not in em:
+        return ""
     # sanity check:
     if jrec < 1:
         jrec = 1
@@ -3381,13 +3407,14 @@ def print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_N
                       aas=0, ln=CFG_SITE_LANG, p1="", p2="", p3="", f1="", f2="", f3="", m1="", m2="", m3="", op1="", op2="",
                       sc=1, pl_in_url="",
                       d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, dt="",
-                      cpu_time=-1, middle_only=0):
+                      cpu_time=-1, middle_only=0, em=""):
     """Prints stripe with the information on 'collection' and 'nb_found' results and CPU time.
        Also, prints navigation links (beg/next/prev/end) inside the results set.
        If middle_only is set to 1, it will only print the middle box information (beg/netx/prev/end/etc) links.
        This is suitable for displaying navigation links at the bottom of the search results page."""
 
-    out = ""
+    if em != '' and EM_REPOSITORY["search_info"] not in em:
+        return ""
 
     # sanity check:
     if jrec < 1:
@@ -3437,10 +3464,11 @@ def print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_N
              cpu_time = cpu_time,
            )
 
-def print_results_overview(colls, results_final_nb_total, results_final_nb, cpu_time, ln=CFG_SITE_LANG, ec=[], hosted_colls_potential_results_p=False):
+def print_results_overview(colls, results_final_nb_total, results_final_nb, cpu_time, ln=CFG_SITE_LANG, ec=[], hosted_colls_potential_results_p=False, em=""):
     """Prints results overview box with links to particular collections below."""
 
-    out = ""
+    if em != "" and EM_REPOSITORY["overview"] not in em:
+        return ""
     new_colls = []
     for coll in colls:
         new_colls.append({
@@ -3459,7 +3487,7 @@ def print_results_overview(colls, results_final_nb_total, results_final_nb, cpu_
              hosted_colls_potential_results_p = hosted_colls_potential_results_p,
            )
 
-def print_hosted_results(url_and_engine, ln=CFG_SITE_LANG, of=None, req=None, no_records_found=False, search_timed_out=False, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
+def print_hosted_results(url_and_engine, ln=CFG_SITE_LANG, of=None, req=None, no_records_found=False, search_timed_out=False, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS, em = ""):
     """Prints the full results of a hosted collection"""
 
     if of.startswith("h"):
@@ -3473,8 +3501,9 @@ def print_hosted_results(url_and_engine, ln=CFG_SITE_LANG, of=None, req=None, no
         ln=ln,
         of=of,
         req=req,
-        limit=limit
-        )
+        limit=limit,
+        display_body = em == "" or EM_REPOSITORY["body"] in em,
+        display_add_to_basket = em == "" or EM_REPOSITORY["basket"] in em)
 
 def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG):
     """Sort records in 'recIDs' list according sort field 'sort_field' in order 'sort_order'.
@@ -3567,7 +3596,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         # good, no sort needed
         return recIDs
 
-def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LANG, relevances=[], relevances_prologue="(", relevances_epilogue="%%)", decompress=zlib.decompress, search_pattern='', print_records_prologue_p=True, print_records_epilogue_p=True, verbose=0, tab='', sf='', so='d', sp='', rm=''):
+def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LANG, relevances=[], relevances_prologue="(", relevances_epilogue="%%)", decompress=zlib.decompress, search_pattern='', print_records_prologue_p=True, print_records_epilogue_p=True, verbose=0, tab='', sf='', so='d', sp='', rm='', em=''):
 
     """
     Prints list of records 'recIDs' formatted according to 'format' in
@@ -3591,6 +3620,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
     any dynamic search links that may be printed.
     """
 
+    if em != "" and EM_REPOSITORY["body"] not in em:
+        return
     # load the right message language
     _ = gettext_set_language(ln)
 
@@ -3666,7 +3697,6 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                                            user_info=user_info, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm))
             elif format.startswith("hb"):
                 # HTML brief format:
-
                 display_add_to_basket = True
                 if user_info:
                     if user_info['email'] == 'guest':
@@ -3675,6 +3705,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                     else:
                         if not user_info['precached_usebaskets']:
                             display_add_to_basket = False
+                if em != "" and EM_REPOSITORY["basket"] not in em:
+                    display_add_to_basket = False
                 req.write(websearch_templates.tmpl_record_format_htmlbrief_header(
                     ln = ln))
                 for irec in range(irec_max, irec_min, -1):
@@ -4397,7 +4429,7 @@ def log_query_info(action, p, f, colls, nb_records_found_total=-1):
 def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, sf="", so="d", sp="", rm="", of="id", ot="", aas=0,
                            p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc=0, jrec=0,
                            recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="", d1="",
-                           d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=CFG_SITE_LANG, ec=None, tab="", wl=CFG_WEBSEARCH_WILDCARD_LIMIT):
+                           d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=CFG_SITE_LANG, ec=None, tab="", wl=CFG_WEBSEARCH_WILDCARD_LIMIT, em=""):
     """Perform search or browse request, without checking for
        authentication.  Return list of recIDs found, if of=id.
        Otherwise create web page.
@@ -4441,6 +4473,8 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
           ot - output only these MARC tags (e.g. "100,700,909C0b").
                Useful if only some fields are to be shown in the
                output, e.g. for library to control some fields.
+
+          em - output only part of the page.
 
          aas - advanced search ("0" means no, "1" means yes).  Whether
                search was called from within the advanced search
@@ -4595,18 +4629,18 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
         colname = exc.colname
         if of.startswith("h"):
             page_start(req, of, cc, aas, ln, getUid(req),
-                       websearch_templates.tmpl_collection_not_found_page_title(colname, ln))
+                       websearch_templates.tmpl_collection_not_found_page_title(colname, ln), em=em)
             req.write(websearch_templates.tmpl_collection_not_found_page_body(colname, ln))
-            return page_end(req, of, ln)
+            return page_end(req, of, ln, em)
         elif of == "id":
             return []
         elif of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
             print_records_epilogue(req, of)
-            return page_end(req, of, ln)
+            return page_end(req, of, ln, em)
         else:
-            return page_end(req, of, ln)
+            return page_end(req, of, ln, em)
 
     p = wash_pattern(p)
     f = wash_field(f)
@@ -4664,8 +4698,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                websearch_templates.tmpl_record_page_header_content(req, recid, ln)
 
         if req is not None and not req.header_only:
-            page_start(req, of, cc, aas, ln, uid, title, description, keywords, recid, tab)
-
+            page_start(req, of, cc, aas, ln, uid, title, description, keywords, recid, tab, em)
         # Default format is hb but we are in detailed -> change 'of'
         if of == "hb":
             of = "hd"
@@ -4675,7 +4708,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
             if of == "id":
                 return [recidx for recidx in range(recid, recidb) if record_exists(recidx)]
             else:
-                print_records(req, range(recid, recidb), -1, -9999, of, ot, ln, search_pattern=p, verbose=verbose, tab=tab, sf=sf, so=so, sp=sp, rm=rm)
+                print_records(req, range(recid, recidb), -1, -9999, of, ot, ln, search_pattern=p, verbose=verbose, tab=tab, sf=sf, so=so, sp=sp, rm=rm, em=em)
             if req and of.startswith("h"): # register detailed record page view event
                 client_ip_address = str(req.remote_ip)
                 register_page_view_event(recid, uid, client_ip_address)
@@ -4695,9 +4728,9 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
     elif action == "browse":
         ## 2 - browse needed
         of = 'hb'
-        page_start(req, of, cc, aas, ln, uid, _("Browse"), p=create_page_title_search_pattern_info(p, p1, p2, p3))
+        page_start(req, of, cc, aas, ln, uid, _("Browse"), p=create_page_title_search_pattern_info(p, p1, p2, p3), em=em)
         req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, aas, ln, p1, f1, m1, op1,
-                                    p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
+                                    p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action, em))
         try:
             if aas == 1 or (p1 or p2 or p3):
                 browse_pattern(req, colls_to_search, p1, f1, rg, ln)
@@ -4713,15 +4746,15 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                 # Print empty, but valid XML
                 print_records_prologue(req, of)
                 print_records_epilogue(req, of)
-            return page_end(req, of, ln)
+            return page_end(req, of, ln, em)
 
     elif rm and p.startswith("recid:"):
         ## 3-ter - similarity search (or old-style citation search) needed
         if req and not req.header_only:
-            page_start(req, of, cc, aas, ln, uid, _("Search Results"), p=create_page_title_search_pattern_info(p, p1, p2, p3))
+            page_start(req, of, cc, aas, ln, uid, _("Search Results"), p=create_page_title_search_pattern_info(p, p1, p2, p3), em=em)
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, aas, ln, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action, em))
         if record_exists(p[6:]) != 1:
             # record does not exist
             if of.startswith("h"):
@@ -4747,15 +4780,15 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                     req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, cc, len(results_similar_recIDs),
                                                 jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                 sc, pl_in_url,
-                                                d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
+                                                d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, em=em))
                     print_warning(req, results_similar_comments)
                     print_records(req, results_similar_recIDs, jrec, rg, of, ot, ln,
-                                  results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, search_pattern=p, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm)
+                                  results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, search_pattern=p, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm, em=em)
                 elif of=="id":
                     return results_similar_recIDs
                 elif of.startswith("x"):
                     print_records(req, results_similar_recIDs, jrec, rg, of, ot, ln,
-                                  results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, search_pattern=p, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm)
+                                  results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, search_pattern=p, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm, em=em)
             else:
                 # rank_records failed and returned some error message to display:
                 if of.startswith("h"):
@@ -4771,10 +4804,10 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
 
     elif p.startswith("cocitedwith:"):  #WAS EXPERIMENTAL
         ## 3-terter - cited by search needed
-        page_start(req, of, cc, aas, ln, uid, _("Search Results"), p=create_page_title_search_pattern_info(p, p1, p2, p3))
+        page_start(req, of, cc, aas, ln, uid, _("Search Results"), p=create_page_title_search_pattern_info(p, p1, p2, p3), em=em)
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, aas, ln, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action, em))
         recID = p[12:]
         if record_exists(recID) != 1:
             # record does not exist
@@ -4797,12 +4830,12 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                     req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, CFG_SITE_NAME, len(results_cocited_recIDs),
                                                 jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                 sc, pl_in_url,
-                                                d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
-                    print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln, search_pattern=p, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm)
+                                                d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, em=em))
+                    print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln, search_pattern=p, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm, em=em)
                 elif of=="id":
                     return results_cocited_recIDs
                 elif of.startswith("x"):
-                    print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln, search_pattern=p, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm)
+                    print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln, search_pattern=p, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm, em=em)
 
             else:
                 # cited rank_records failed and returned some error message to display:
@@ -4818,7 +4851,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
         ## 3 - common search needed
         query_in_cache = False
         query_representation_in_cache = repr((p,f,colls_to_search, wl))
-        page_start(req, of, cc, aas, ln, uid, p=create_page_title_search_pattern_info(p, p1, p2, p3))
+        page_start(req, of, cc, aas, ln, uid, p=create_page_title_search_pattern_info(p, p1, p2, p3), em=em)
 
         if of.startswith("h") and verbose and wash_colls_debug:
             print_warning(req, "wash_colls debugging info : %s" % wash_colls_debug)
@@ -4871,7 +4904,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
 
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, aas, ln, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action, em))
         t1 = os.times()[4]
         results_in_any_collection = intbitset()
         if aas == 1 or (p1 or p2 or p3):
@@ -4880,12 +4913,12 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                 results_in_any_collection = search_pattern_parenthesised(req, p1, f1, m1, ap=ap, of=of, verbose=verbose, ln=ln, wl=wl)
                 if len(results_in_any_collection) == 0:
                     if of.startswith("h"):
-                        perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+                        perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos, em=em)
                     elif of.startswith("x"):
                         # Print empty, but valid XML
                         print_records_prologue(req, of)
                         print_records_epilogue(req, of)
-                    return page_end(req, of, ln)
+                    return page_end(req, of, ln, em)
                 if p2:
                     results_tmp = search_pattern_parenthesised(req, p2, f2, m2, ap=ap, of=of, verbose=verbose, ln=ln, wl=wl)
                     if op1 == "a": # add
@@ -4899,12 +4932,12 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                             print_warning(req, "Invalid set operation %s." % cgi.escape(op1), "Error")
                     if len(results_in_any_collection) == 0:
                         if of.startswith("h"):
-                            perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+                            perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos, em=em)
                         elif of.startswith("x"):
                             # Print empty, but valid XML
                             print_records_prologue(req, of)
                             print_records_epilogue(req, of)
-                        return page_end(req, of, ln)
+                        return page_end(req, of, ln, em)
                 if p3:
                     results_tmp = search_pattern_parenthesised(req, p3, f3, m3, ap=ap, of=of, verbose=verbose, ln=ln, wl=wl)
                     if op2 == "a": # add
@@ -4920,13 +4953,13 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                 register_exception(req=req, alert_admin=True)
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
-                    perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+                    perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos, em=em)
                 elif of.startswith("x"):
                     # Print empty, but valid XML
                     print_records_prologue(req, of)
                     print_records_epilogue(req, of)
 
-                return page_end(req, of, ln)
+                return page_end(req, of, ln, em)
         else:
             ## 3B - simple search
             if search_results_cache.cache.has_key(query_representation_in_cache):
@@ -4946,17 +4979,17 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                     register_exception(req=req, alert_admin=True)
                     if of.startswith("h"):
                         req.write(create_error_box(req, verbose=verbose, ln=ln))
-                        perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
-                    return page_end(req, of, ln)
+                        perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos, em=em)
+                    return page_end(req, of, ln, em)
 
         if len(results_in_any_collection) == 0 and not hosted_colls_actual_or_potential_results_p:
             if of.startswith("h"):
-                perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+                perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos, em=em)
             elif of.startswith("x"):
                 # Print empty, but valid XML
                 print_records_prologue(req, of)
                 print_records_epilogue(req, of)
-            return page_end(req, of, ln)
+            return page_end(req, of, ln, em)
 
         # store this search query results into search results cache if needed:
         if CFG_WEBSEARCH_SEARCH_CACHE_SIZE and not query_in_cache:
@@ -4979,17 +5012,17 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
             register_exception(req=req, alert_admin=True)
             if of.startswith("h"):
                 req.write(create_error_box(req, verbose=verbose, ln=ln))
-                perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
-            return page_end(req, of, ln)
+                perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos, em=em)
+            return page_end(req, of, ln, em)
 
         if results_final == {} and not hosted_colls_actual_or_potential_results_p:
             if of.startswith("h"):
-                perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+                perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos, em=em)
             if of.startswith("x"):
                 # Print empty, but valid XML
                 print_records_prologue(req, of)
                 print_records_epilogue(req, of)
-            return page_end(req, of, ln)
+            return page_end(req, of, ln, em)
 
         # search stage 5: apply search option limits and restrictions:
         if datetext1 != "" and results_final != {}:
@@ -5007,16 +5040,16 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                 register_exception(req=req, alert_admin=True)
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
-                    perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
-                return page_end(req, of, ln)
+                    perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos, em=em)
+                return page_end(req, of, ln, em)
             if results_final == {} and not hosted_colls_actual_or_potential_results_p:
                 if of.startswith("h"):
-                    perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+                    perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos, em=em)
                 #if of.startswith("x"):
                 #    # Print empty, but valid XML
                 #    print_records_prologue(req, of)
                 #    print_records_epilogue(req, of)
-                return page_end(req, of, ln)
+                return page_end(req, of, ln, em)
 
         if pl and results_final != {}:
             pl = wash_pattern(pl)
@@ -5034,16 +5067,16 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                 register_exception(req=req, alert_admin=True)
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
-                    perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
-                return page_end(req, of, ln)
+                    perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos, em=em)
+                return page_end(req, of, ln, em)
             if results_final == {} and not hosted_colls_actual_or_potential_results_p:
                 if of.startswith("h"):
-                    perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+                    perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos, em=em)
                 if of.startswith("x"):
                     # Print empty, but valid XML
                     print_records_prologue(req, of)
                     print_records_epilogue(req, of)
-                return page_end(req, of, ln)
+                return page_end(req, of, ln, em)
 
         t2 = os.times()[4]
         cpu_time = t2 - t1
@@ -5117,8 +5150,8 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
             elif of.startswith("h"):
                 if of not in ['hcs']:
                     # added the hosted_colls_potential_results_p parameter to help print out the overview more accurately
-                    req.write(print_results_overview(colls_to_search, results_final_nb_total, results_final_nb, cpu_time, ln, ec, hosted_colls_potential_results_p=hosted_colls_potential_results_p))
-                    selected_external_collections_infos = print_external_results_overview(req, cc, [p, p1, p2, p3], f, ec, verbose, ln)
+                    req.write(print_results_overview(colls_to_search, results_final_nb_total, results_final_nb, cpu_time, ln, ec, hosted_colls_potential_results_p=hosted_colls_potential_results_p, em=em))
+                    selected_external_collections_infos = print_external_results_overview(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, print_overview=em == "" or EM_REPOSITORY["overview"] in em)
             # print number of hits found for XML outputs:
             if of.startswith("x"):
                 req.write("<!-- Search-Engine-Total-Number-Of-Results: %s -->\n" % results_final_nb_total)
@@ -5156,7 +5189,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                             req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
                                                         jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                         sc, pl_in_url,
-                                                        d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
+                                                        d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, em=em))
                         results_final_recIDs = list(results_final[coll])
                         results_final_relevances = []
                         results_final_relevances_prologue = ""
@@ -5193,13 +5226,13 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                                       sf=sf,
                                       so=so,
                                       sp=sp,
-                                      rm=rm)
-
+                                      rm=rm,
+                                      em=em)
                         if of.startswith("h"):
                             req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
                                                         jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                         sc, pl_in_url,
-                                                        d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1))
+                                                        d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1, em=em))
 
                 # store the last search results page
                 if req and not isinstance(req, cStringIO.OutputType):
@@ -5222,13 +5255,13 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                                 req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, result[0][1].name, results_final_nb[result[0][1].name],
                                                             jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                             sc, pl_in_url,
-                                                            d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
-                            req.write(print_hosted_results(url_and_engine=result[0], ln=ln, of=of, req=req, limit=rg))
+                                                            d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, em=em))
+                            req.write(print_hosted_results(url_and_engine=result[0], ln=ln, of=of, req=req, limit=rg, em=em))
                             if of.startswith("h"):
                                 req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, result[0][1].name, results_final_nb[result[0][1].name],
                                                             jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                             sc, pl_in_url,
-                                                            d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1))
+                                                            d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1, em=em))
                     if hosted_colls_timeouts:
                         # TODO: add a verbose message here
                         # TODO: check if verbose messages still work when dealing with (re)calculations of timeouts
@@ -5243,37 +5276,37 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                                         req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, result[0][1].name, -963,
                                                                     jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                                     sc, pl_in_url,
-                                                                    d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
-                                        req.write(print_hosted_results(url_and_engine=result[0], ln=ln, of=of, req=req, no_records_found=True, limit=rg))
+                                                                    d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, em=em))
+                                        req.write(print_hosted_results(url_and_engine=result[0], ln=ln, of=of, req=req, no_records_found=True, limit=rg, em=em))
                                         req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, result[0][1].name, -963,
                                                                     jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                                     sc, pl_in_url,
-                                                                    d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1))
+                                                                    d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1, em=em))
                                 else:
                                     # these are the searches that actually returned results on time
                                     if of.startswith("h"):
                                         req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, result[0][1].name, result[1],
                                                                     jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                                     sc, pl_in_url,
-                                                                    d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
-                                    req.write(print_hosted_results(url_and_engine=result[0], ln=ln, of=of, req=req, limit=rg))
+                                                                    d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, em=em))
+                                    req.write(print_hosted_results(url_and_engine=result[0], ln=ln, of=of, req=req, limit=rg, em=em))
                                     if of.startswith("h"):
                                         req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, result[0][1].name, result[1],
                                                                     jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                                     sc, pl_in_url,
-                                                                    d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1))
+                                                                    d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1, em=em))
                         if hosted_colls_timeouts_timeouts:
                             for timeout in hosted_colls_timeouts_timeouts:
                                 if of.startswith("h"):
                                     req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, timeout[1].name, -963,
                                                                 jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                                 sc, pl_in_url,
-                                                                d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
-                                    req.write(print_hosted_results(url_and_engine=timeout[0], ln=ln, of=of, req=req, search_timed_out=True, limit=rg))
+                                                                d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, em=em))
+                                    req.write(print_hosted_results(url_and_engine=timeout[0], ln=ln, of=of, req=req, search_timed_out=True, limit=rg, em=em))
                                     req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, timeout[1].name, -963,
                                                                 jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                                 sc, pl_in_url,
-                                                                d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1))
+                                                                d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1, em=em))
 
                 print_records_epilogue(req, of)
                 if f == "author" and of.startswith("h"):
@@ -5282,7 +5315,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
             # log query:
             try:
                 id_query = log_query(req.remote_host, req.args, uid)
-                if of.startswith("h") and id_query:
+                if of.startswith("h") and id_query and (em == '' or EM_REPOSITORY["alert"] in em):
                     if not of in ['hcs']:
                         # display alert/RSS teaser for non-summary formats:
                         user_info = collect_user_info(req)
@@ -5304,9 +5337,19 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
     # External searches
     if of.startswith("h"):
         if not of in ['hcs']:
-            perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+            perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos, em=em)
 
-    return page_end(req, of, ln)
+    return page_end(req, of, ln, em)
+
+def perform_external_collection_search_with_em(req, current_collection, pattern_list, field,
+        external_collection, verbosity_level=0, lang=CFG_SITE_LANG,
+        selected_external_collections_infos=None, em=""):
+    perform_external_collection_search(req, current_collection, pattern_list, field, external_collection,
+                            verbosity_level, lang, selected_external_collections_infos,
+                            print_overview=em == "" or EM_REPOSITORY["overview"] in em,
+                            print_search_info=em == "" or EM_REPOSITORY["search_info"] in em,
+                            print_see_also_box=em == "" or EM_REPOSITORY["see_also_box"] in em,
+                            print_body=em == "" or EM_REPOSITORY["body"] in em)
 
 def perform_request_cache(req, action="show"):
     """Manipulates the search engine cache."""
