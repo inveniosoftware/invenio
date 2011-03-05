@@ -389,16 +389,19 @@ def decide_format_template(bfo, of):
     for rule in output_format['rules']:
         if rule['field'].startswith('00'):
             # Rule uses controlfield
-            value = bfo.control_field(rule['field']).strip() #Remove spaces
+            values = [bfo.control_field(rule['field']).strip()] #Remove spaces
         else:
             # Rule uses datafield
-            value = bfo.field(rule['field']).strip() #Remove spaces
-        pattern = rule['value'].strip() #Remove spaces
-        match_obj = re.match(pattern, value, re.IGNORECASE)
-        if match_obj is not None and \
-               match_obj.start() == 0 and match_obj.end() == len(value):
-            return rule['template']
-
+            values = bfo.fields(rule['field'])
+        # loop over multiple occurences, but take the first match
+        if len(values) > 0:
+            for value in values:
+                value = value.strip() #Remove spaces
+                pattern = rule['value'].strip() #Remove spaces
+                match_obj = re.match(pattern, value, re.IGNORECASE)
+                if match_obj is not None and \
+                       match_obj.end() == len(value):
+                    return rule['template']
     template = output_format['default']
     if template != '':
         return template
