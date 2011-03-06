@@ -88,6 +88,7 @@ from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
 from invenio.htmlutils import get_mathjax_header
+from invenio.htmlutils import nmtoken_from_string
 from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
     collect_user_info, logoutUser, isUserSuperAdmin
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
@@ -1380,6 +1381,12 @@ def display_collection(req, c, aas, verbose, ln):
 
     if aas == -1:
         show_title_p = False
+
+    if CFG_INSPIRE_SITE == 1:
+        # INSPIRE should never show title, but instead use css to
+        # style collections
+        show_title_p = False
+        body_css_classes.append(nmtoken_from_string(c))
 
     # RSS:
     rssurl = CFG_SITE_URL + '/rss'
