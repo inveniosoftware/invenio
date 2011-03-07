@@ -68,7 +68,8 @@ from invenio.webjournal_utils import \
      get_journal_articles, \
      get_grouped_issues, \
      get_journal_issue_grouping, \
-     get_journal_languages
+     get_journal_languages, \
+     get_journal_collection_to_refresh_on_release
 from invenio.dbquery import run_sql
 from invenio.bibrecord import \
      create_record, \
@@ -783,6 +784,7 @@ def move_drafts_articles_to_ready(journal_name, issue):
                         collections_to_refresh[collection] = ''
 
     # Refresh collections
+    collections_to_refresh.update([(c, '') for c in get_journal_collection_to_refresh_on_release(journal_name)])
     for collection in collections_to_refresh.keys():
         task_low_level_submission('webcoll',
                                   'WebJournal',
