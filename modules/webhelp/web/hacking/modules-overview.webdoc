@@ -222,8 +222,8 @@ descriptions the module relationship diagram is presented.
  index terms.  If no direct match could have been found with the
  user-typed query pattern, the system proposes alternative matches as
  a search guidance.  The search indexes were designed to provide fast
- response times for middle-sized data collections of up to 106
- records. 
+ response times for middle-sized data collections of up to 10<sup>6</sup>
+ records.
 
  <br />The metadata corpus is organized into metadata collections that
  are directly accessible through the browse function, similarly to the
