@@ -486,6 +486,42 @@ def collect_identifiers(harvested_file_list):
         result.append(REGEXP_OAI_ID.findall(data))
     return result
 
+def remove_duplicates(harvested_file_list):
+    """
+    Go through a list of harvested files and remove any duplicate records.
+    """
+    harvested_identifiers = []
+    for harvested_file in harvested_file_list:
+        # Firstly, rename original file to temporary name
+        try:
+            os.rename(harvested_file, "%s~" % (harvested_file,))
+        except OSError:
+            write_message("Error renaming harvested file '%s'. Skipping.." % (harvested_file,))
+            continue
+        # Secondly, open files for writing and reading
+        try:
+            updated_harvested_file = open(harvested_file, 'w')
+            original_harvested_file = open("%s~" % (harvested_file,))
+        except IOError:
+            write_message("Error opening harvested file '%s'. Skipping.." % (harvested_file,))
+            continue
+        data = original_harvested_file.read()
+        original_harvested_file.close()
+
+        # Get and write OAI-PMH XML header data to updated file
+        header_index_end = data.find("<ListRecords>") + len("<ListRecords>")
+        updated_harvested_file.write("%s\n" % (data[:header_index_end],))
+
+        # By checking the OAI ID we write all records not written previously (in any file)
+        harvested_records = REGEXP_RECORD.findall(data)
+        for record in harvested_records:
+            oai_identifier = REGEXP_OAI_ID.search(record)
+            if oai_identifier != None and oai_identifier.group(1) not in harvested_identifiers:
+                updated_harvested_file.write("<record>%s</record>\n" % (record,))
+                harvested_identifiers.append(oai_identifier.group(1))
+        updated_harvested_file.write("</ListRecords>\n</OAI-PMH>\n")
+        updated_harvested_file.close()
+
 def add_timestamp_and_timelag(timestamp,
                               timelag):
     """ Adds a time lag in seconds to a given date (timestamp).
@@ -543,7 +579,7 @@ def oai_harvest_get(prefix, baseurl, harvestpath,
         harvested_files = [harvest_dir + os.sep + filename for \
                            filename in files \
                            if filename.startswith(harvest_filename)]
-
+        remove_duplicates(harvested_files)
         return (1, harvested_files)
     except StandardError, e:
         print e
