@@ -2256,6 +2256,12 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
         bibx = "bibrec_bib%d%dx" % (digit1, digit2)
         # construct and run query:
         if t == "001":
+            if query_addons.find('BETWEEN') > -1 or query_addons.find('=') > -1:
+                # verify that the params are integers (to avoid returning record 123 when searching for 123foo)
+                try:
+                    query_params = tuple(int(param) for param in query_params)
+                except ValueError:
+                    return HitSet()
             try:
                 res = run_sql_with_limit("SELECT id FROM bibrec WHERE id %s" % query_addons,
                               query_params, wildcard_limit=wl)
@@ -3104,7 +3110,10 @@ def record_exists(recID):
     out = 0
     res = run_sql("SELECT id FROM bibrec WHERE id=%s", (recID,), 1)
     if res:
-        recID = int(recID)
+        try: # if recid is '123foo', mysql will return id=123, and we don't want that
+            recID = int(recID)
+        except ValueError:
+            return 0
         # record exists; now check whether it isn't marked as deleted:
         dbcollids = get_fieldvalues(recID, "980__%")
         if ("DELETED" in dbcollids) or (CFG_CERN_SITE and "DUMMY" in dbcollids):
