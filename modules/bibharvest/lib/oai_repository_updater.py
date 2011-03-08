@@ -344,7 +344,7 @@ def oairepositoryupdater_task():
                                   time.strftime("%Y%m%d_%H%M%S_",
                                                 time.localtime()))
     oai_out = os.fdopen(fd, "w")
-
+    oai_out.write('<collection>')
     # Iterate over the recids
     i = 0
     for recid in recids:
@@ -427,6 +427,7 @@ def oairepositoryupdater_task():
                 oai_out.write(other_data)
                 oai_out.write("</record>\n")
 
+    oai_out.write('</collection>')
     oai_out.close()
     write_message("Wrote to file %s" % filename)
 
@@ -473,9 +474,9 @@ def marcxml_filter_out_tags(recid, fields):
         if not field[0:5] in processed_tags_and_ind:
             # Ensure that we do not process twice the same datafields
             processed_tags_and_ind.append(field[0:5])
-            for datafield in record.get(field[0:3], None):
-                if datafield[1] == field[3:4] and \
-                       datafield[2] == field[4:5]:
+            for datafield in record.get(field[0:3], []):
+                if datafield[1] == field[3:4].replace('_', ' ') and \
+                       datafield[2] == field[4:5].replace('_', ' '):
                     out += field_xml_output(datafield, field[0:3])
 
     return out
