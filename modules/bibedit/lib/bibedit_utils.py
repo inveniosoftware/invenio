@@ -550,7 +550,7 @@ def can_record_have_physical_copies(recid):
         return False
 
     col_id = get_colID(guess_primary_collection_of_a_record(recid))
-    collections = get_detailed_page_tabs(col_id)
+    collections = get_detailed_page_tabs(col_id, recid)
 
     if (not collections.has_key("holdings")) or \
         (not collections["holdings"].has_key("visible")):
