@@ -268,8 +268,12 @@ def task_run_core():
                                                          identifiers,
                                                          downloaded_material_dict)
                 if exitcode == 0:
-                    write_message("plots from %s was successfully extracted" % \
-                                  (active_file,))
+                    if err_msg != "":
+                        write_message("plots from %s was extracted, but with some errors:\n%s" % \
+                                  (active_file, err_msg))
+                    else:
+                        write_message("plots from %s was successfully extracted" % \
+                                      (active_file,))
                 else:
                     write_message("an error occurred while extracting plots from %s:\n%s" % (active_file, err_msg))
                     error_happened_p = True
@@ -299,8 +303,12 @@ def task_run_core():
                                                       identifiers,
                                                       downloaded_material_dict)
                 if exitcode == 0:
-                    write_message("references from %s was successfully extracted" % \
-                                  (active_file,))
+                    if err_msg != "":
+                        write_message("references from %s was extracted, but with some errors:\n%s" % \
+                                      (active_file, err_msg))
+                    else:
+                        write_message("references from %s was successfully extracted" % \
+                                      (active_file,))
                 else:
                     write_message("an error occurred while extracting references from %s:\n%s" % \
                                   (active_file, err_msg))
@@ -624,7 +632,7 @@ def call_plotextractor(active_file, extracted_file, harvested_identifier_list, \
     updated_xml.append('<collection>')
     i = 0
     for record_xml in record_xmls:
-        error = False
+        current_exitcode = 0
         identifier = harvested_identifier_list[i]
         i += 1
         if identifier not in downloaded_files:
@@ -632,14 +640,14 @@ def call_plotextractor(active_file, extracted_file, harvested_identifier_list, \
         updated_xml.append("<record>")
         updated_xml.append(record_xml)
         if "tarball" not in downloaded_files[identifier]:
-            exitcode, err_msg, tarball, dummy = \
+            current_exitcode, err_msg, tarball, dummy = \
                         plotextractor_harvest(identifier, active_file, selection=["tarball"])
-            if exitcode != 0:
+            if current_exitcode != 0:
+                exitcode = current_exitcode
                 all_err_msg.append(err_msg)
-                error = True
             else:
                 downloaded_files[identifier]["tarball"] = tarball
-        if not error:
+        if current_exitcode != 0:
             plotextracted_xml_path = process_single(downloaded_files[identifier]["tarball"], clean=True)
             if plotextracted_xml_path != None:
                 plotsxml_fd = open(plotextracted_xml_path, 'r')
@@ -649,7 +657,6 @@ def call_plotextractor(active_file, extracted_file, harvested_identifier_list, \
                 if re_list != []:
                     updated_xml.append(re_list[0])
             else:
-                exitcode = 1
                 all_err_msg.append("Error extracting plots from id: %s %s" % \
                              (identifier, tarball))
         updated_xml.append("</record>")
@@ -658,7 +665,7 @@ def call_plotextractor(active_file, extracted_file, harvested_identifier_list, \
     file_fd = open(extracted_file, 'w')
     file_fd.write("\n".join(updated_xml))
     file_fd.close()
-    return exitcode, err_msg
+    return exitcode, "\n".join(all_err_msg)
 
 def call_refextract(active_file, extracted_file, harvested_identifier_list,
                     downloaded_files):
@@ -678,7 +685,7 @@ def call_refextract(active_file, extracted_file, harvested_identifier_list,
     exitcode = 0
     flag = ""
     if CFG_INSPIRE_SITE == 1:
-        flag = "--inspire --kb-journal %s/bibedit/refextract-journal-titles-INSPIRE.kb" \
+        flag = "--inspire --kb-journal '%s/bibedit/refextract-journal-titles-INSPIRE.kb'" \
                 % (CFG_ETCDIR,)
     # Read in active file
     recs_fd = open(active_file, 'r')
@@ -691,7 +698,7 @@ def call_refextract(active_file, extracted_file, harvested_identifier_list,
     updated_xml.append('<collection>')
     i = 0
     for record_xml in record_xmls:
-        error = False
+        current_exitcode = 0
         identifier = harvested_identifier_list[i]
         i += 1
         if identifier not in downloaded_files:
@@ -699,28 +706,27 @@ def call_refextract(active_file, extracted_file, harvested_identifier_list,
         updated_xml.append("<record>")
         updated_xml.append(record_xml)
         if "pdf" not in downloaded_files[identifier]:
-            exitcode, err_msg, dummy, pdf = \
+            current_exitcode, err_msg, dummy, pdf = \
                         plotextractor_harvest(identifier, active_file, selection=["pdf"])
-            if exitcode != 0:
+            if current_exitcode != 0:
+                exitcode = current_exitcode
                 all_err_msg.append(err_msg)
-                error = True
             else:
                 downloaded_files[identifier]["pdf"] = pdf
-        if not error:
-            exitcode, cmd_stdout, err_msg = run_shell_command(cmd="%s/refextract %s 1:'%s'", \
-                                                             args=(CFG_BINDIR, flag, \
-                                                                   downloaded_files[identifier]["pdf"]))
-            if exitcode != 0:
+        if current_exitcode == 0:
+            current_exitcode, cmd_stdout, err_msg = run_shell_command(cmd="%s/refextract %s 1:'%s'" % \
+                                                (CFG_BINDIR, flag, downloaded_files[identifier]["pdf"]))
+            if err_msg != "" or current_exitcode != 0:
+                exitcode = current_exitcode
                 all_err_msg.append("Error extracting references from id: %s\nError:%s" % \
                          (identifier, err_msg))
             else:
-                references_xml = REGEXP_REFS.findall(cmd_stdout)
-                if len(references_xml) != 1:
-                    exitcode = 1
-                    all_err_msg.append("No references found for id: %s %s" % \
-                             (identifier, pdf))
+                references_xml = REGEXP_REFS.search(cmd_stdout)
+                if references_xml:
+                    updated_xml.append(references_xml.group(1))
                 else:
-                    updated_xml.append(references_xml[0])
+                    all_err_msg.append("No references found for id: %s %s\n" % \
+                             (identifier, pdf))
         updated_xml.append("</record>")
     updated_xml.append('</collection>')
     # Write to file
@@ -756,7 +762,7 @@ def call_fulltext(active_file, extracted_file, harvested_identifier_list,
     updated_xml.append('<collection>')
     i = 0
     for record_xml in record_xmls:
-        error = False
+        current_exitcode = 0
         identifier = harvested_identifier_list[i]
         i += 1
         if identifier not in downloaded_files:
@@ -764,14 +770,14 @@ def call_fulltext(active_file, extracted_file, harvested_identifier_list,
         updated_xml.append("<record>")
         updated_xml.append(record_xml)
         if "pdf" not in downloaded_files[identifier]:
-            exitcode, err_msg, dummy, pdf = \
+            current_exitcode, err_msg, dummy, pdf = \
                         plotextractor_harvest(identifier, active_file, selection=["pdf"])
-            if exitcode != 0:
+            if current_exitcode != 0:
+                exitcode = current_exitcode
                 all_err_msg.append(err_msg)
-                error = True
             else:
                 downloaded_files[identifier]["pdf"] = pdf
-        if not error:
+        if current_exitcode != 0:
             fulltext_xml = '  <datafield tag="FFT" ind1=" " ind2=" ">\n' + \
                    '    <subfield code="a">' + downloaded_files[identifier]["pdf"] + '</subfield>\n' + \
                    '    <subfield code="t"></subfield>\n' + \
