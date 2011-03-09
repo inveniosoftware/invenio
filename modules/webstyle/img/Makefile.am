@@ -235,7 +235,8 @@ img_DATA = add-small.png \
            wb-unsubscribe.png \
            white_field.gif \
            wsignout.gif \
-	   compare.png
+	   compare.png \
+           document-preview.png
 
 tmpdir=$(localstatedir)/tmp
 

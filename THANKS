@@ -130,10 +130,12 @@ converted from Ghostscript's 'tiger.eps'.
 <http://www.gnu.org/software/ghostscript/>
 
 Some icon images were taken from (i) the Silk icon set, (ii) the
-Function icon set, and (iii) the activity indicator icon.
+Function icon set, (iii) the activity indicator icon, and (iv) the
+Open Icon Libray.
 <http://www.famfamfam.com/lab/icons/silk/>
 <http://wefunction.com/2008/07/function-free-icon-set/>
 <http://www.badeziner.com/2008/05/04/120-free-ajax-activity-indicator-gif-icons/>
+<http://openiconlibrary.sourceforge.net/gallery2/>
 
 The unoconv.py script has been adapted from UNOCONV by Dag Wieers.
 <http://dag.wieers.com/home-made/unoconv/>
