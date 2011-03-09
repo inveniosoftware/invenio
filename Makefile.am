@@ -92,7 +92,7 @@ install-mathjax-plugin:
 	rm -rf /tmp/invenio-mathjax-plugin
 	mkdir /tmp/invenio-mathjax-plugin
 	(cd /tmp/invenio-mathjax-plugin && \
-	wget 'http://downloads.sourceforge.net/mathjax/$(MATHJAX)' && \
+	wget 'http://www.mathjax.org/dl/$(MATHJAX)' && \
 	unzip -q -u -d ${prefix}/var/www $(MATHJAX))
 	rm -fr /tmp/invenio-mathjax-plugin
 	@echo "* Installing Invenio-specific MathJax config..."
