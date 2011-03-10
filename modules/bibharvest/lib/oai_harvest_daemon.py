@@ -647,7 +647,7 @@ def call_plotextractor(active_file, extracted_file, harvested_identifier_list, \
                 all_err_msg.append(err_msg)
             else:
                 downloaded_files[identifier]["tarball"] = tarball
-        if current_exitcode != 0:
+        if current_exitcode == 0:
             plotextracted_xml_path = process_single(downloaded_files[identifier]["tarball"], clean=True)
             if plotextracted_xml_path != None:
                 plotsxml_fd = open(plotextracted_xml_path, 'r')
@@ -893,7 +893,7 @@ def call_bibfilter(bibfilterprogram, marcxmlfile):
             exitcode, cmd_stdout, cmd_stderr = run_shell_command(cmd="%s '%s'", \
                                                              args=(bibfilterprogram, \
                                                                    marcxmlfile))
-            if exitcode != 0:
+            if exitcode != 0 or cmd_stderr != "":
                 all_err_msg.append("Error while running filtering script on %s\nError:%s" % \
                          (marcxmlfile, cmd_stderr))
     else:
