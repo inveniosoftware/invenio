@@ -584,6 +584,35 @@ function createGeneralControlsPanel(){
   return result;
 }
 
+function createTopToolbar(){
+  /* Generate BibEdit top toolbar */
+
+  $('.navtrailboxbody').after('<td class="revisionLine"></td>');
+  // When Special modes are available there will be a loop through all of
+  // them and the appropriate icons will be added
+  
+  var toolbar_html = "<div id='topToolbarRight'><img id='img_preview' class='bibEditImgCtrlDisabled' src='/img/document-preview.png' ";
+  toolbar_html += "width='40px' height='40px' title='Preview record' /></div>";
+  toolbar_html += "<div id='top_toolbar_hr'><hr></div>"
+
+  $('.headline_div').html(toolbar_html);
+  $('#img_preview').bind('click', onPreviewClick);
+
+  $('#img_preview').unbind('click').removeClass(
+    'bibEditImgCtrlEnabled').addClass('bibEditImgCtrlDisabled');
+}
+
+function updateToolbar(enable) {
+    if (enable === true) {
+        $('#img_preview').bind('click', onPreviewClick).removeClass(
+        'bibEditImgCtrlDisabled').addClass('bibEditImgCtrlEnabled');
+    }
+    else {
+        $('#img_preview').unbind('click', onPreviewClick).removeClass(
+        'bibEditImgCtrlEnabled').addClass('bibEditImgCtrlDisabled');
+    }
+}
+
 /// end of the Holding Pen Connected functions
 
 function createAddFieldForm(fieldTmpNo, fieldTemplateNo){

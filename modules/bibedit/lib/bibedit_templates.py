@@ -79,7 +79,8 @@ class Template:
             '            <td colspan="3">%(btnSwitchReadOnly)s</td>\n' \
             '          </tr>' \
             '        </table>' % {
-            'imgCompressMenuSection': imgCompressMenuSection,
+            'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
+                            'bibEditImgCompressMenuSection', id='ImgRecordMenu'),
             'imgNewRecord': img('/img/table.png', 'bibEditImgCtrlEnabled',
                                 id='imgNewRecord', title='New record'), \
             'imgCloneRecord': img('/img/table_multiple.png',
@@ -121,7 +122,8 @@ class Template:
             '            <td>%(btnDeleteSelected)s</td>\n' \
             '          </tr>\n' \
             '        </table>' % {
-            'imgCompressMenuSection': imgCompressMenuSection,
+            'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
+                            'bibEditImgCompressMenuSection', id='ImgFieldMenu'),
             'imgAddField': img('/img/table_row_insert.png'),
             'btnAddField': button('button', 'Add', id='btnAddField',
                                   disabled='disabled'),
@@ -140,7 +142,8 @@ class Template:
             '            <td>%(btnTagNames)s</td>\n' \
             '          </tr>\n' \
             '        </table>' % {
-            'imgCompressMenuSection': imgCompressMenuSection,
+            'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
+                            'bibEditImgCompressMenuSection', id='ImgViewMenu'),
             'btnTagMARC': button('button', 'MARC', id='btnMARCTags',
                                  disabled='disabled'),
             'btnTagNames': button('button', 'Human', id='btnHumanTags',
@@ -158,7 +161,8 @@ class Template:
             '            </tr>\n' \
             '          </table>\n' \
             '        </div>\n'% {
-            'imgCompressMenuSection': imgCompressMenuSection,
+            'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
+                            'bibEditImgCompressMenuSection', id='ImgHistoryMenu')
             }
 
         undoredosection =  '<div class="bibEditMenuSectionHeader">\n' \
@@ -179,7 +183,8 @@ class Template:
             '                 </div>\n' \
             '             </div>\n' \
             '          </div></td></tr></table>\n' % { \
-            'imgCompressMenuSection': imgCompressMenuSection }
+            'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
+                            'bibEditImgCompressMenuSection', id='ImgUndoRedoMenu') }
 
         statusarea = '<table>\n' \
             '          <tr>\n' \
@@ -197,7 +202,8 @@ class Template:
             '      <div id="bibeditHPChanges"></div>' \
             ' </div> </td></tr></table>' \
             '        </div>\n'  % \
-            { 'imgCompressMenuSection': imgCompressMenuSection }
+            { 'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
+                            'bibEditImgCompressMenuSection', id='ImgHoldingPenMenu') }
 
         bibcirculationpanel = \
             '      <div class="bibEditMenuSection" ' \
@@ -212,7 +218,8 @@ class Template:
             'Edit physical copies</button>' \
             ' </td></tr></table></div></div>' \
             % {
-               'imgCompressMenuSection': imgCompressMenuSection,
+               'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
+                            'bibEditImgCompressMenuSection', id='ImgBibCirculationMenu')
               }
 
         lnkhelp = img('/img/help.png', '', style='vertical-align: bottom') + \
@@ -221,7 +228,8 @@ class Template:
             'height=600,left=150,top=150,resizable=yes,scrollbars=yes\');' \
             'return false;' % CFG_SITE_URL)
 
-        return '    <div id="bibEditMenu">\n' \
+        return '    %(page_style)s\n' \
+            '    <div id="bibEditMenu">\n' \
             '      <div class="bibEditMenuSection">\n' \
             '        %(recordmenu)s\n' \
             '      </div>\n' \
@@ -248,6 +256,7 @@ class Template:
             '        %(lnkhelp)s\n' \
             '      </div>\n' \
             '    </div>\n' % {
+                'page_style': page_style(),
                 'recordmenu': recordmenu,
                 'viewmenu': viewmenu,
                 'fieldmenu': fieldmenu,
@@ -328,3 +337,130 @@ def link(value, _class='', **kargs):
     for karg in kargs:
         args += '%s="%s" ' % (karg, kargs[karg])
     return '<a %s%s>%s</a>' % (_class, args, value)
+
+def page_style():
+    """Apply styling for bibedit elements"""
+    style = """<style type="text/css">"""
+    style += """
+                .headline_div {
+                    position: fixed;
+                    top: 105px;
+                    background: #ffffff;
+                    margin-left : 175px;
+                    width : 820px;
+                    height: 45px;
+                    text-indent: -15px;
+                }
+
+                #bibEditContent {
+                    position: absolute;
+                    top: 151px;
+                    left: 40px;
+                    overflow: auto;
+                    width: 820px;
+                    height: 74%;
+                    z-index: -1;
+                }
+
+                #bibEditTable {
+                    background-color: rgb(255, 255, 255);
+                    border: 1px solid #A1A1A1;
+                    border-collapse: collapse;
+                    width: 100%;
+                }
+
+                #bibEditMenu {
+                    width: 135px;
+                    position: fixed;
+                    top: 105px;/*90px;*/
+                    left: 20px;
+                    margin-bottom: 20px;
+                    font-size: 0.8em;
+                }
+
+                #bibEditMenu .bibEditMenuSection {
+                    margin-bottom: 10px;
+                }
+
+                #bibEditMenu .bibEditMenuSectionHeader {
+                    font-weight: bold;
+                }
+
+                #bibEditMenu .bibEditMenuSection table {
+                    width: 100%;
+                }
+
+                #bibEditMenu form {
+                    margin: 0px;
+                }
+
+                #bibEditMenu .bibEditImgExpandMenuSection,
+                #bibEditMenu .bibEditImgCompressMenuSection {
+                    margin: 0px;
+                    text-align: left;
+                    vertical-align: bottom;
+                }
+
+                #bibEditMenu a, #bibEditMenu button, #bibEditMenu input,
+                #bibEditMenu select {
+                    font-size: 0.8em;
+                }
+                #bibEditMenu a, #bibEditMenu button, #bibEditMenu img,
+                #bibEditMenu input, #bibEditMenu select {
+                    margin: 1px;
+                }
+                #bibEditMenu button, #bibEditMenu input, #bibEditMenu select  {
+                    width: 100%;
+                }
+                #bibEditMenu .bibEditImgCtrlEnabled {
+                    cursor: pointer;
+                    opacity: 1.0;
+                    vertical-align: bottom;
+                }
+
+                #bibEditMenu .bibEditImgCtrlDisabled {
+                    cursor: default;
+                    opacity: 0.4;
+                    vertical-align: bottom;
+                }
+
+                .revisionLine {
+                    text-align: right;
+                    padding-left: 80px;
+                }
+
+                .pagefooter {
+                    position: fixed;
+                    bottom: 0px;
+                    height: 0px;
+                }
+
+                .pagebody {
+                    padding : 0px;
+                    padding-left: 15px;
+                }
+
+                .navtrailboxbody {
+                    width: 700px;
+                }
+
+                .headline {
+                    display: none;
+                }
+
+                #topToolbarLeft {
+                }
+
+                #topToolbarRight {
+                    position: absolute;
+                    left: 790px;
+                    height: 48px;
+                }
+
+                #top_toolbar_hr {
+                    padding-top: 37px;
+                }
+
+            """
+    style += "</style>"
+    return style

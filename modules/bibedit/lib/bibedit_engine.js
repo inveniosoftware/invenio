@@ -59,6 +59,7 @@
  *   - getRecord
  *   - onGetRecordSuccess
  *   - onSubmitClick
+ *   - onPreviewClick
  *   - onCancelClick
  *   - onCloneRecordClick
  *   - onDeleteRecordClick
@@ -160,6 +161,7 @@ var gPhysCopiesNum = 0;
 var gBibCircUrl = null;
 
 var gDisplayBibCircPanel = false;
+
 /*
  * **************************** 2. Initialization ******************************
  */
@@ -189,6 +191,7 @@ $(function(){
   initJeditable();
   initAjax();
   initMisc();
+  createTopToolbar();
   initStateFromHash();
   gHashCheckTimerID = setInterval(initStateFromHash, gHASH_CHECK_INTERVAL);
   initHotkeys();
@@ -595,7 +598,7 @@ function changeAndSerializeHash(updateData){
 
 /*
  * **************************** 5. Data logic **********************************
- */
+*/
 
 function getTagsSorted(){
   /*
@@ -1129,10 +1132,11 @@ function onGetRecordSuccess(json){
   var recordRevInfo = "record revision: " + revDt;
   var revAuthorString = gRecRevAuthor;
 
-  $('.headline').html(
+  /*$('.headline').html(
     'Record Editor: Record #<span id="spnRecID">' + gRecID + '</span>' +
     '<div style="margin-left: 5px; font-size: 0.5em; color: #36c;">' +
-    recordRevInfo + ' ' + revAuthorString + '</div>').css('white-space', 'nowrap');
+    recordRevInfo + ' ' + revAuthorString + '</div>').css('white-space', 'nowrap');*/
+  $('.revisionLine').html(recordRevInfo + ' ' + revAuthorString)
   gRecord = json['record'];
   gTagFormat = json['tagFormat'];
   gRecordDirty = json['cacheDirty'];
@@ -1195,6 +1199,7 @@ function onGetRecordSuccess(json){
 
   createReq({recID: gRecID, requestType: 'getTickets'}, onGetTicketsSuccess);
 
+  updateToolbar(true);
 }
 
 function onGetTemplateSuccess(json) {
@@ -1226,6 +1231,20 @@ function onSubmitClick(){
 
 // Enable this flag to force the next submission even if cache is outdated.
 onSubmitClick.force = false;
+
+function onPreviewClick(){
+  /*
+   * Handle 'Preview' button (preview record).
+   */
+    createReq({recID: gRecID, requestType: 'preview'
+       }, function(json){
+       // Preview was successful.
+        var html_preview = json['html_preview'];
+        var preview_window = window.open('', '', 'width=768,height=768,resizeable,scrollbars');
+        preview_window.document.write(html_preview);
+        preview_window.document.close(); // needed for chrome and safari
+       });
+}
 
 function onCancelClick(){
   /*
@@ -1259,6 +1278,7 @@ function onCancelClick(){
       updateInterfaceAccordingToMode();
       updateRevisionsHistory();
       updateUrView();
+      updateToolbar(false);
 
     }
     else {
@@ -1306,6 +1326,7 @@ function onDeleteRecordClick(){
       resetBibeditState();
       updateStatus('report', gRESULT_CODES[resCode]);
       displayMessage(resCode);
+      updateToolbar(false);
     });
   }
 }
@@ -1365,8 +1386,8 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
     gNavigatingRecordSet = false;
   }
   // Clear main content area.
-  if (resetHeadline)
-    $('.headline').text('Record Editor');
+  /*if (resetHeadline)
+    $('.headline').text('Record Editor');*/
   $('#bibEditContent').empty();
   // Clear search area.
   if (typeof(searchPattern) == 'string' || typeof(searchPattern) == 'number')
