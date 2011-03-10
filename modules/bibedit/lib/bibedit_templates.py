@@ -79,7 +79,8 @@ class Template:
             '            <td colspan="3">%(btnSwitchReadOnly)s</td>\n' \
             '          </tr>' \
             '        </table>' % {
-            'imgCompressMenuSection': imgCompressMenuSection,
+            'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
+                            'bibEditImgCompressMenuSection', id='ImgRecordMenu'),
             'imgNewRecord': img('/img/table.png', 'bibEditImgCtrlEnabled',
                                 id='imgNewRecord', title='New record'), \
             'imgCloneRecord': img('/img/table_multiple.png',
@@ -121,7 +122,8 @@ class Template:
             '            <td>%(btnDeleteSelected)s</td>\n' \
             '          </tr>\n' \
             '        </table>' % {
-            'imgCompressMenuSection': imgCompressMenuSection,
+            'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
+                            'bibEditImgCompressMenuSection', id='ImgFieldMenu'),
             'imgAddField': img('/img/table_row_insert.png'),
             'btnAddField': button('button', 'Add', id='btnAddField',
                                   disabled='disabled'),
@@ -140,7 +142,8 @@ class Template:
             '            <td>%(btnTagNames)s</td>\n' \
             '          </tr>\n' \
             '        </table>' % {
-            'imgCompressMenuSection': imgCompressMenuSection,
+            'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
+                            'bibEditImgCompressMenuSection', id='ImgViewMenu'),
             'btnTagMARC': button('button', 'MARC', id='btnMARCTags',
                                  disabled='disabled'),
             'btnTagNames': button('button', 'Human', id='btnHumanTags',
@@ -158,7 +161,8 @@ class Template:
             '            </tr>\n' \
             '          </table>\n' \
             '        </div>\n'% {
-            'imgCompressMenuSection': imgCompressMenuSection,
+            'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
+                            'bibEditImgCompressMenuSection', id='ImgHistoryMenu')
             }
 
         undoredosection =  '<div class="bibEditMenuSectionHeader">\n' \
@@ -179,7 +183,8 @@ class Template:
             '                 </div>\n' \
             '             </div>\n' \
             '          </div></td></tr></table>\n' % { \
-            'imgCompressMenuSection': imgCompressMenuSection }
+            'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
+                            'bibEditImgCompressMenuSection', id='ImgUndoRedoMenu') }
 
         statusarea = '<table>\n' \
             '          <tr>\n' \
@@ -197,7 +202,8 @@ class Template:
             '      <div id="bibeditHPChanges"></div>' \
             ' </div> </td></tr></table>' \
             '        </div>\n'  % \
-            { 'imgCompressMenuSection': imgCompressMenuSection }
+            { 'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
+                            'bibEditImgCompressMenuSection', id='ImgHoldingPenMenu') }
 
         bibcirculationpanel = \
             '      <div class="bibEditMenuSection" ' \
@@ -212,7 +218,8 @@ class Template:
             'Edit physical copies</button>' \
             ' </td></tr></table></div></div>' \
             % {
-               'imgCompressMenuSection': imgCompressMenuSection,
+               'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
+                            'bibEditImgCompressMenuSection', id='ImgBibCirculationMenu')
               }
 
         lnkhelp = img('/img/help.png', '', style='vertical-align: bottom') + \

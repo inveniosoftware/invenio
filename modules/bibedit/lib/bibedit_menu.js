@@ -63,6 +63,7 @@ function initMenu(){
   // Initialize menu positioning (poll for scrolling).
   setInterval(positionMenu, gCHECK_SCROLL_INTERVAL);
   $('#btnSwitchReadOnly').bind('click', onSwitchReadOnlyMode);
+  collapseMenuSections();
 }
 
 function positionMenu(){
@@ -355,4 +356,9 @@ function updateStatus(statusType, reporttext){
   }
   $('#cellIndicator').html(image);
   $('#cellStatus').html(text);
+}
+
+function collapseMenuSections() {
+    $('#ImgHistoryMenu').trigger('click');
+    $('#ImgViewMenu').trigger('click');
 }
