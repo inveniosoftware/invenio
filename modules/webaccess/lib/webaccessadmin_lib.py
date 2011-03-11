@@ -352,7 +352,8 @@ def perform_listgroups(req):
     header = ['name']
     groups = run_sql('select name from usergroup')
 
-    output = tupletotable(header, groups)
+    output = tupletotable(header, groups, highlight_rows_p=True,
+                          alternate_row_colors_p=True)
 
     extra = """
     <dl>
@@ -470,7 +471,8 @@ def perform_rolearea(req, grep=""):
     </td></tr></table>
     """ % escape(grep)
 
-    output += tupletotable(header=header, tuple=roles2)
+    output += tupletotable(header=header, tuple=roles2, highlight_rows_p=True,
+                           alternate_row_colors_p=True)
 
     extra = """
     <dl>
@@ -567,7 +569,8 @@ def perform_actionarea(req, grep=''):
     </td></tr></table>
     """ % escape(grep)
 
-    output += tupletotable(header=header, tuple=actions2)
+    output += tupletotable(header=header, tuple=actions2, highlight_rows_p=True,
+                           alternate_row_colors_p=True)
 
     extra = """
     <dl>
@@ -636,7 +639,7 @@ def perform_userarea(req, email_user_pattern=''):
             output += '<p>found <strong>%s</strong> matching users:</p>' % \
                 (len(users1), )
             output += tupletotable(header=['id', 'email', 'roles', ''],
-                tuple=users)
+                tuple=users, highlight_rows_p=True, alternate_row_colors_p=True)
 
             if len(users1) > MAXPAGEUSERS:
                 output += '<p><strong>only showing the first %s users, ' \
@@ -733,10 +736,12 @@ def perform_resetdefaultsettings(req, superusers=[], confirm=0):
 
         output += '<p><strong>reset default settings</strong> with the users below? </p>'
         output += tupletotable(header=['e-mail address'],
-                            tuple=superusers,
-                            start=start,
-                            extracolumn=extra,
-                            end=end)
+                               tuple=superusers,
+                               start=start,
+                               extracolumn=extra,
+                               end=end,
+                               highlight_rows_p=True,
+                               alternate_row_colors_p=True)
 
         if confirm in [1, "1"]:
             res = acca.acc_reset_default_settings(superusers)
@@ -2192,7 +2197,8 @@ def roledetails(id_role=0):
     users = []
     for (id, email, dummy) in usershlp:
         users.append([id, email, '<a href="showuserdetails?id_user=%s">show user details</a>' % (id, )])
-    usertable = tupletotable(header=['id', 'email'], tuple=users)
+    usertable = tupletotable(header=['id', 'email'], tuple=users, highlight_rows_p=True,
+                             alternate_row_colors_p=True)
 
     actionshlp = acca.acc_get_role_actions(id_role)
     actions = []

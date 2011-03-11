@@ -62,8 +62,11 @@ def create_html_table_from_tuple(tableheader=None, tablebody=None, start="", end
 
     ## table body
     if len(tablebody) > 0:
+        j = 1
         for row in tablebody:
-            tblstr += """ <tr>\n"""
+            j += 1
+            tblstr += """ <tr class="admin_row_highlight %s">\n""" % \
+                      ((j % 2) and 'admin_row_color' or '')
             if type(row) not in [int, long, str, dict]:
                 for i in range(len(row)):
                     tblstr += """<td class="%s">%s</td>\n""" % (align[i], row[i])

@@ -724,6 +724,15 @@ a.footer:hover {
 .admin_wvar_nomargin {
    margin: 0px;
 }
+tr.admin_row_highlight:hover{
+   background-color:#eee;
+}
+tr.admin_row_highlight:hover td.extracolumn{
+   background-color:#fff;
+}
+.admin_row_color{
+   background-color:#EBF7FF;
+}
 .adminlabel {
    width: 100px;
    font-size: small;

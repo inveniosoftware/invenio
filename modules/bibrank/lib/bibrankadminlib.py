@@ -753,7 +753,7 @@ def addadminbox(header='', datalist=[], cls="admin_wvar"):
 
     return output
 
-def tupletotable(header=[], tuple=[], start='', end='', extracolumn=''):
+def tupletotable(header=[], tuple=[], start='', end='', extracolumn='', highlight_rows_p=False, alternate_row_colors_p=False):
     """create html table for a tuple.
 
          header - optional header for the columns
@@ -764,7 +764,12 @@ def tupletotable(header=[], tuple=[], start='', end='', extracolumn=''):
 
             end - text to be added in the end, mot likely end of a form.
 
-    extracolumn - mainly used to put in a button. """
+    extracolumn - mainly used to put in a button.
+
+      highlight_rows_p - if the cursor hovering a row should highlight the full row or not
+
+alternate_row_colors_p - if alternate background colours should be used for the rows
+    """
 
     # study first row in tuple for alignment
     align = []
@@ -793,21 +798,24 @@ def tupletotable(header=[], tuple=[], start='', end='', extracolumn=''):
 
     # extra column
     try:
-        extra = '<tr>'
+        extra = '<tr class="%s">' % (highlight_rows_p and 'admin_row_highlight' or '')
 
         if type(firstrow) not in [int, long, str, dict]:
             # for data in firstrow: extra += '<td class="%s">%s</td>\n' % ('admintd', data)
             for i in range(len(firstrow)): extra += '<td class="%s">%s</td>\n' % (align[i], firstrow[i])
         else:
             extra += '  <td class="%s">%s</td>\n' % (align[0], firstrow)
-        extra += '<td rowspan="%s" style="vertical-align: top">\n%s\n</td>\n</tr>\n' % (len(tuple), extracolumn)
+        extra += '<td class="extracolumn" rowspan="%s" style="vertical-align: top;">\n%s\n</td>\n</tr>\n' % (len(tuple), extracolumn)
     except IndexError:
         extra = ''
     tblstr += extra
 
     # for i in range(1, len(tuple)):
+    j = 0
     for row in tuple[1:]:
-        tblstr += ' <tr>\n'
+        j += 1
+        tblstr += ' <tr class="%s %s">\n' % (highlight_rows_p and 'admin_row_highlight' or '',
+                                             (j % 2 and alternate_row_colors_p) and 'admin_row_color' or '')
         # row = tuple[i]
         if type(row) not in [int, long, str, dict]:
             # for data in row: tblstr += '<td class="admintd">%s</td>\n' % (data,)
