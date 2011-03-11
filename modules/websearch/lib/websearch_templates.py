@@ -3463,6 +3463,57 @@ class Template:
 </rss>\n"""
         return out
 
+    def tmpl_xml_podcast_prologue(self, current_url=None,
+                                  previous_url=None, next_url=None,
+                                  first_url=None, last_url=None,
+                                  nb_found=None, jrec=None, rg=None):
+        """Creates XML podcast prologue."""
+        out = """<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+        <channel>
+        <title>%(sitename)s</title>
+	<link>%(siteurl)s</link>
+        <description>%(sitename)s latest documents</description>
+        <language>%(sitelang)s</language>
+        <pubDate>%(timestamp)s</pubDate>
+        <category></category>
+	<generator>CDS Invenio %(version)s</generator>
+        <webMaster>%(siteadminemail)s</webMaster>
+        <ttl>%(timetolive)s</ttl>%(previous_link)s%(next_link)s%(current_link)s
+        <image>
+            <url>%(siteurl)s/img/site_logo_rss.png</url>
+            <title>%(sitename)s</title>
+            <link>%(siteurl)s</link>
+        </image>
+        <itunes:owner>
+        <itunes:email>%(siteadminemail)s</itunes:email>
+        </itunes:owner>
+        """ % {'sitename': CFG_SITE_NAME,
+	       'siteurl': CFG_SITE_URL,
+               'sitelang': CFG_SITE_LANG,
+               'siteadminemail': CFG_SITE_ADMIN_EMAIL,
+               'timestamp': time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime()),
+               'version': CFG_VERSION,
+               'sitesupportemail': CFG_SITE_SUPPORT_EMAIL,
+	       'timetolive': CFG_WEBSEARCH_RSS_TTL,
+               'current_link': (current_url and \
+                                 '\n<atom:link rel="self" href="%s" />\n' % current_url) or '',
+               'previous_link': (previous_url and \
+                                 '\n<atom:link rel="previous" href="%s" />' % previous_url) or '',
+               'next_link': (next_url and \
+                             '\n<atom:link rel="next" href="%s" />' % next_url) or '',
+               'first_link': (first_url and \
+                             '\n<atom:link rel="first" href="%s" />' % first_url) or '',
+               'last_link': (last_url and \
+                             '\n<atom:link rel="last" href="%s" />' % last_url) or '',
+               }
+        return out
+
+    def tmpl_xml_podcast_epilogue(self):
+	"""Creates XML podcast epilogue."""
+        out = """\n</channel>
+</rss>\n"""
+        return out
+
     def tmpl_xml_nlm_prologue(self):
         """Creates XML NLM prologue."""
         out = """<articles>\n"""

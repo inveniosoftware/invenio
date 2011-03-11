@@ -3842,6 +3842,8 @@ def print_records_prologue(req, format):
         prologue = websearch_templates.tmpl_xml_endnote_prologue()
     elif format.startswith('xo'):
         prologue = websearch_templates.tmpl_xml_mods_prologue()
+    elif format.startswith('xp'):
+        prologue = websearch_templates.tmpl_xml_podcast_prologue()
     elif format.startswith('x'):
         prologue = websearch_templates.tmpl_xml_default_prologue()
     req.write(prologue)
@@ -3864,6 +3866,8 @@ def print_records_epilogue(req, format):
         epilogue = websearch_templates.tmpl_xml_endnote_epilogue()
     elif format.startswith('xo'):
         epilogue = websearch_templates.tmpl_xml_mods_epilogue()
+    elif format.startswith('xp'):
+        epilogue = websearch_templates.tmpl_xml_podcast_epilogue()
     elif format.startswith('x'):
         epilogue = websearch_templates.tmpl_xml_default_epilogue()
     req.write(epilogue)
