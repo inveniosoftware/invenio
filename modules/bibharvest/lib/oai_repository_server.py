@@ -419,6 +419,8 @@ def print_record(sysno, format='marcxml', record_exists_result=None):
 
         elif format == "xd":
             out += format_record(sysno, 'xoaidc')
+        else:
+            out += format_record(sysno, format)
 
     # print record closing tags:
 
@@ -490,6 +492,7 @@ def oailistrecords(args):
 
     if arg['resumptionToken'] != "":
         sysnos = oaicacheout(arg['resumptionToken'])
+        arg['set'] = sysnos.pop()
         arg['metadataPrefix'] = sysnos.pop()
     else:
         sysnos = oaigetsysnolist(arg['set'], arg['from'], arg['until'])
@@ -518,13 +521,18 @@ def oailistrecords(args):
                 if not (_record_exists == -1 and CFG_OAI_DELETED_POLICY == "no"):
                     #Produce output only if record exists and had to be printed
                     i = i + 1 # Increment limit only if record is returned
-                    res = print_record(sysno_, arg['metadataPrefix'], _record_exists)
+                    if arg['set'] == 'ec_fundedresources' and arg['metadataPrefix'] == 'oai_dc':
+                        ## OpenAIRE compliancy
+                        res = print_record(sysno_, 'XOAIRE', _record_exists)
+                    else:
+                        res = print_record(sysno_, arg['metadataPrefix'], _record_exists)
                     if res:
                         out += res
 
     if resumptionToken_printed:
         oaicacheclean()
         sysno.append(arg['metadataPrefix'])
+        sysno.append(arg['set'])
         oaicachein(arg['resumptionToken'], sysno)
 
     out = oai_header(args, "ListRecords") + out + oai_footer("ListRecords")
