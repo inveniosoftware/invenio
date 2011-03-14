@@ -205,6 +205,10 @@ class ExternalAuthRobot(ExternalAuth):
             raise InvenioWebAccessExternalAuthError("The provided assertion does not validate against the digest %s for robot %s" % (repr(digest), repr(robot)))
         if self.use_zlib:
             try:
+                ## Workaround to Perl implementation that does not add
+                ## any padding to the base64 encoding.
+                needed_pad = (4 - len(assertion) % 4) % 4
+                assertion += needed_pad * '='
                 assertion = decompress(base64.urlsafe_b64decode(assertion))
             except:
                 raise InvenioWebAccessExternalAuthError("The provided assertion is corrupted")
