@@ -559,10 +559,10 @@ def ranges2ids(parse_string):
 def cli_append(options, append_path):
     """Create a bibupload FFT task submission for appending a format."""
     recid = cli2recid(options)
-    comment = getattr(options, 'comment', None)
-    description = getattr(options, 'comment', None)
-    restriction = getattr(options, 'restriction', None)
-    doctype = getattr(options, 'doctype', None) or 'Main'
+    comment = cli2comment(options)
+    description = cli2description(options)
+    restriction = cli2restriction(options)
+    doctype = cli2doctype(options)
     docname = cli2docname(options, url=append_path)
     if not docname:
         raise OptionValueError, 'Not enough information to retrieve a valid docname'
