@@ -1481,6 +1481,40 @@ function onHumanTagsClick(event){
   event.preventDefault();
 }
 
+function onLnkSpecialSymbolsClick(){
+    var special_char_list = ['&#192;','&#193;','&#194;','&#195;','&#196;','&#197;',
+                            '&#198;','&#199;','&#200;','&#201;','&#202;','&#203;',
+                            '&#204;','&#205;','&#206;','&#207;','&#208;','&#209;',
+                            '&#210;','&#211;','&#212;','&#213;','&#214;','&#215;',
+                            '&#216;','&#217;','&#218;','&#219;','&#220;','&#221;',
+                            '&#222;','&#223;','&#224;','&#225;','&#226;','&#227;',
+                            '&#228;','&#229;','&#230;','&#231;','&#232;','&#233;',
+                            '&#234;','&#235;','&#236;','&#237;','&#238;','&#239;',
+                            '&#240;','&#241;','&#242;','&#243;','&#244;','&#245;',
+                            '&#246;','&#247;','&#248;','&#249;','&#250;','&#251;',
+                            '&#252;','&#253;','&#254;','&#255;'];
+    var html_content;
+    html_content = '<html><head><title>Special Symbols</title>';
+    html_content += '<style type="text/css">';
+    html_content += '#char_table_div { padding: 20px 0px 0px 20px; }';
+    html_content += '#symbol_table { border: 1px solid black; border-collapse:collapse;}';
+    html_content += 'td { border: 1px solid black; padding: 5px 5px 5px 5px;}';
+    html_content += '</style>';
+    html_content += '</head><body>';
+    html_content += '<div id="char_table_div"><table id="symbol_table"><tr>';
+    var char_list_length = special_char_list.length;
+    for (var i=0; i<char_list_length; i++) {
+        html_content += '<td>' + special_char_list[i] + '</td>';
+        if ((i+1)%10 == 0) {
+            html_content += '</tr><tr>';
+        }
+    }
+    html_content += '</tr></table></div></body></html>';
+    var special_char_window = window.open('', '', 'width=310,height=310,resizeable,scrollbars');
+    special_char_window.document.write(html_content);
+    special_char_window.document.close(); // needed for chrome and safari
+}
+
 function updateTags(){
   /*
    * Check and update all tags (also subfield codes) against the currently

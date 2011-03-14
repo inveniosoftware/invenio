@@ -60,6 +60,7 @@ function initMenu(){
   $('#bibEditURRedoListLayer').bind("mouseout", hideRedoPreview);
   $('#btnUndo').bind('click', onUndo);
   $('#btnRedo').bind('click', onRedo);
+  $('#lnkSpecSymbols').bind('click', onLnkSpecialSymbolsClick);
   // Initialize menu positioning (poll for scrolling).
   setInterval(positionMenu, gCHECK_SCROLL_INTERVAL);
   $('#btnSwitchReadOnly').bind('click', onSwitchReadOnlyMode);

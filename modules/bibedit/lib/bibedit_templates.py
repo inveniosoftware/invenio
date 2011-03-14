@@ -222,6 +222,8 @@ class Template:
                             'bibEditImgCompressMenuSection', id='ImgBibCirculationMenu')
               }
 
+        lnkSpecialChar = link('Special symbols', href='#', id='lnkSpecSymbols')
+
         lnkhelp = img('/img/help.png', '', style='vertical-align: bottom') + \
             link('Help', href='#', onclick='window.open(' \
             '\'%s/help/admin/bibedit-admin-guide#2\', \'\', \'width=640,' \
@@ -253,7 +255,7 @@ class Template:
             '        %(statusarea)s\n' \
             '      </div>\n' \
             '      <div class="bibEditMenuSection" align="right">\n' \
-            '        %(lnkhelp)s\n' \
+            '        %(lnkSpecialChar)s %(lnkhelp)s\n' \
             '      </div>\n' \
             '    </div>\n' % {
                 'page_style': page_style(),
@@ -262,6 +264,7 @@ class Template:
                 'fieldmenu': fieldmenu,
                 'statusarea': statusarea,
                 'lnkhelp': lnkhelp,
+                'lnkSpecialChar': lnkSpecialChar,
                 'holdingpenpanel': holdingpenpanel,
                 'historymenu': historymenu,
                 'undoredosection': undoredosection,
