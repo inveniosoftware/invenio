@@ -783,7 +783,26 @@ def cli_cmd_create_apache_conf(conf):
     from invenio.textutils import wrap_text_in_a_box
     apache_conf_dir = conf.get("Invenio", 'CFG_ETCDIR') + \
                       os.sep + 'apache'
+
+    ## Preparation of XSendFile directive
     xsendfile_directive_needed = int(conf.get("Invenio", 'CFG_BIBDOCFILE_USE_XSENDFILE')) != 0
+    if xsendfile_directive_needed:
+        xsendfile_directive = "XSendFile On\n"
+    else:
+        xsendfile_directive = "#XSendFile On\n"
+    for path in (conf.get('Invenio', 'CFG_WEBSUBMIT_FILEDIR'), # BibDocFile
+            conf.get('Invenio', 'CFG_WEBDIR'),
+            conf.get('Invenio', 'CFG_WEBSUBMIT_STORAGEDIR'), # WebSubmit
+            conf.get('Invenio', 'CFG_TMPDIR'),
+            os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'tmp', 'attachfile'),
+            os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'data', 'comments'),
+            os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'data', 'baskets', 'comments'),
+            '/tmp'): # BibExport
+        if xsendfile_directive_needed:
+            xsendfile_directive += '        XSendFilePath %s\n' % path
+        else:
+            xsendfile_directive += '        #XSendFilePath %s\n' % path
+    xsendfile_directive = xsendfile_directive.strip()
     ## Apache vhost conf file is distro specific, so analyze needs:
     # Gentoo (and generic defaults):
     listen_directive_needed = True
@@ -875,10 +894,7 @@ WSGIRestrictStdout Off
        'wsgi_socket_directive': (wsgi_socket_directive_needed and \
                                 'WSGISocketPrefix ' or '#WSGISocketPrefix ') + \
               conf.get('Invenio', 'CFG_PREFIX') + os.sep + 'var' + os.sep + 'run',
-       'xsendfile_directive' : xsendfile_directive_needed and \
-                                "XSendFile On\n        XSendFilePath %(filedir)s" or \
-                                "#XSendFile On\n        #XSendFilePath %(filedir)s" % {
-                                    'filedir': conf.get('Invenio', 'CFG_WEBSUBMIT_FILEDIR')}
+       'xsendfile_directive' : xsendfile_directive,
        }
     apache_vhost_ssl_body = """\
 ServerSignature Off
@@ -950,10 +966,7 @@ WSGIRestrictStdout Off
        'ssl_key_directive': ssl_pem_directive_needed and \
                             '#SSLCertificateKeyFile %s' % ssl_key_path or \
                             'SSLCertificateKeyFile %s' % ssl_key_path,
-       'xsendfile_directive' : xsendfile_directive_needed and \
-                                "XSendFile On\n        XSendFilePath %(filedir)s" or \
-                                "#XSendFile On\n        #XSendFilePath %(filedir)s" % {
-                                    'filedir': conf.get('Invenio', 'CFG_WEBSUBMIT_FILEDIR')}
+       'xsendfile_directive' : xsendfile_directive,
        }
     # write HTTP vhost snippet:
     if os.path.exists(apache_vhost_file):
