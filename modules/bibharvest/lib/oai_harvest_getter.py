@@ -33,6 +33,8 @@ try:
     import re
     import time
     import base64
+    import tempfile
+    import os
 except ImportError, e:
     print "Error: %s" % e
     sys.exit(1)
@@ -82,63 +84,44 @@ def OAI_Session(server, script, http_param_dict , method="POST", output="",
     in corresponding filepath, with a unique number appended at the end.
     This number starts at 'resume_request_nbr'.
 
-    Returns an int corresponding to the last created 'resume_request_nbr'.
+    Returns a tuple containing an int corresponding to the last created 'resume_request_nbr' and 
+    a list of harvested files.
     """
-
     sys.stderr.write("Starting the harvesting session at %s" %
         time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
     sys.stderr.write("%s - %s\n" % (server,
         http_request_parameters(http_param_dict)))
 
-    a = OAI_Request(server, script,
+    output_path, output_name = os.path.split(output)
+    harvested_files = []
+    i = resume_request_nbr
+    while True:
+        harvested_data = OAI_Request(server, script,
                     http_request_parameters(http_param_dict, method), method,
                     secure, user, password, cert_file, key_file)
-
-    rt_obj = re.search('<resumptionToken.*>(.+)</resumptionToken>',
-        a, re.DOTALL)
-
-    i = resume_request_nbr
-
-    while rt_obj is not None and rt_obj != "":
-
         if output:
-            # Write results to a file named 'output'
-            if a.lower().find('<'+http_param_dict['verb'].lower()) > -1:
-                write_file( "%s.%07d" % (output, i), a)
+            # Write results to a file specified by 'output'
+            if harvested_data.lower().find('<'+http_param_dict['verb'].lower()) > -1:
+                output_fd, output_filename = tempfile.mkstemp(suffix="_%07d.harvested" % (i,), prefix=output_name, dir=output_path)
+                os.write(output_fd, harvested_data)
+                os.close(output_fd)
+                harvested_files.append(output_filename)
             else:
-                # hmm, were there no records in output? Do not create
-                # a file and warn user
+                # No records in output? Do not create a file. Warn the user.
                 sys.stderr.write("\n<!--\n*** WARNING: NO RECORDS IN THE HARVESTED DATA: "
-                                 +  "\n" + repr(a) + "\n***\n-->\n")
+                                 +  "\n" + repr(harvested_data) + "\n***\n-->\n")
         else:
-            sys.stdout.write(a)
-
-        i = i + 1
-
-        time.sleep(1)
-
-        http_param_dict = http_param_resume(http_param_dict, rt_obj.group(1))
-
-        a = OAI_Request(server, script,
-                        http_request_parameters(http_param_dict, method), method,
-                        secure, user, password, cert_file, key_file)
+            sys.stdout.write(harvested_data)
 
         rt_obj = re.search('<resumptionToken.*>(.+)</resumptionToken>',
-            a, re.DOTALL)
-
-    if output:
-        # Write results to a file named 'output'
-        if a.lower().find('<'+http_param_dict['verb'].lower()) > -1:
-            write_file("%s.%07d" % (output, i), a)
+            harvested_data, re.DOTALL)
+        if rt_obj is not None and rt_obj != "":
+            http_param_dict = http_param_resume(http_param_dict, rt_obj.group(1))
+            i = i + 1
         else:
-            # hmm, were there no records in output? Do not create
-            # a file and warn user
-            sys.stderr.write("\n<!--\n*** WARNING: NO RECORDS IN THE HARVESTED DATA: "
-                                 +  "\n" + repr(a) + "\n***\n-->\n")
-    else:
-        sys.stdout.write(a)
+            break
 
-    return i
+    return i, harvested_files
 
 def harvest(server, script, http_param_dict , method="POST", output="",
             sets=None, secure=False, user=None, password=None,
@@ -149,7 +132,7 @@ def harvest(server, script, http_param_dict , method="POST", output="",
 
     Needed for harvesting multiple sets in one row.
 
-    Returns the number of files created by the harvesting
+    Returns a list of filepaths for harvested files.
 
         Parameters:
 
@@ -202,32 +185,27 @@ http_param_dict - *dict* the URL parameters to send to the OAI script
                   (If provided, 'key_file' must also be provided)
     """
     if sets:
-        i = 0
+        resume_request_nbr = 0
+        all_harvested_files = []
         for set in sets:
             http_param_dict['set'] = set
-            i = OAI_Session(server, script, http_param_dict, method,
-                            output, i, secure, user, password,
+            resume_request_nbr, harvested_files = OAI_Session(server, script, http_param_dict, method,
+                            output, resume_request_nbr, secure, user, password,
                             cert_file, key_file)
-            i += 1
-        return i
+            resume_request_nbr += 1
+            all_harvested_files.extend(harvested_files)
+        return all_harvested_files
     else:
-        OAI_Session(server, script, http_param_dict, method,
+        dummy, harvested_files = OAI_Session(server, script, http_param_dict, method,
                     output, secure=secure, user=user,
                     password=password, cert_file=cert_file,
                     key_file=key_file)
-        return 1
-
-def write_file(filename="harvest", a=""):
-    "Writes a to filename"
-
-    f = open(filename, "w")
-    f.write(a)
-    f.close()
+        return harvested_files
 
 def OAI_Request(server, script, params, method="POST", secure=False,
                 user=None, password=None,
                 key_file=None, cert_file=None):
-    """Handle OAI request
+    """Handle OAI request. Returns harvested data.
 
     Parameters:
 
@@ -260,6 +238,9 @@ def OAI_Request(server, script, params, method="POST", secure=False,
                  key in case the server to harvest requires
                  certificate-based authentication
                  (If provided, 'key_file' must also be provided)
+    Return:
+
+    Returns harvested data if harvest is successful.
     """
 
     headers = {"Content-type":"application/x-www-form-urlencoded",

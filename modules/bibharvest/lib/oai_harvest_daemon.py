@@ -122,8 +122,7 @@ def task_run_core():
         downloaded_material_dict = {}
         harvested_files_list = []
         # Harvest phase
-        harvestpath = filepath_prefix + "_" + str(j) + "_" + \
-                     time.strftime("%Y%m%d%H%M%S") + "_harvested"
+        harvestpath = "%s_%d_%s_" % (filepath_prefix, j, time.strftime("%Y%m%d%H%M%S"))
         if dateflag == 1:
             task_update_progress("Harvesting %s from %s to %s (%i/%i)" % \
                                  (reponame, \
@@ -228,8 +227,7 @@ def task_run_core():
                                      (reponame, \
                                       i, \
                                       len(active_files_list)))
-                updated_file = filepath_prefix + "_" + str(i) + "_" + \
-                    time.strftime("%Y%m%d%H%M%S") + "_converted"
+                updated_file = "%s.converted" % (active_file.split('.')[0],)
                 updated_files_list.append(updated_file)
                 (exitcode, err_msg) = call_bibconvert(config=str(repos[0][5]),
                                                       harvestpath=active_file,
@@ -260,8 +258,7 @@ def task_run_core():
                 task_sleep_now_if_required()
                 task_update_progress("Extracting plots from harvested material from %s (%i/%i)" % \
                                      (reponame, i, len(active_files_list)))
-                updated_file = filepath_prefix + "_" + str(i) + "_" + \
-                    time.strftime("%Y%m%d%H%M%S") + "_extracted"
+                updated_file = "%s.plotextracted" % (active_file.split('.')[0],)
                 updated_files_list.append(updated_file)
                 (exitcode, err_msg) = call_plotextractor(active_file,
                                                          updated_file,
@@ -295,8 +292,7 @@ def task_run_core():
                 task_sleep_now_if_required()
                 task_update_progress("Extracting references from material harvested from %s (%i/%i)" % \
                                      (reponame, i, len(active_files_list)))
-                updated_file = filepath_prefix + "_" + str(i) + "_" + \
-                    time.strftime("%Y%m%d%H%M%S") + "_refextracted"
+                updated_file = "%s.refextracted" % (active_file.split('.')[0],)
                 updated_files_list.append(updated_file)
                 (exitcode, err_msg) = call_refextract(active_file,
                                                       updated_file,
@@ -332,8 +328,7 @@ def task_run_core():
                 task_sleep_now_if_required()
                 task_update_progress("Attaching fulltext to records harvested from %s (%i/%i)" % \
                                      (reponame, i, len(active_files_list)))
-                updated_file = filepath_prefix + "_" + str(i) + "_" + \
-                    time.strftime("%Y%m%d%H%M%S") + "_fulltext"
+                updated_file = "%s.fulltext" % (active_file.split('.')[0],)
                 updated_files_list.append(updated_file)
                 (exitcode, err_msg) = call_fulltext(active_file,
                                                     updated_file,
@@ -577,16 +572,8 @@ def oai_harvest_get(prefix, baseurl, harvestpath,
         if setspecs:
             sets = [set.strip() for set in setspecs.split(' ')]
 
-        print "Start harvesting"
-        oai_harvest_getter.harvest(network_location, path, http_param_dict, method, harvestpath,
+        harvested_files = oai_harvest_getter.harvest(network_location, path, http_param_dict, method, harvestpath,
                                    sets, secure, user, password, cert_file, key_file)
-
-        harvest_dir, harvest_filename = os.path.split(harvestpath)
-        files = os.listdir(harvest_dir)
-        files.sort()
-        harvested_files = [harvest_dir + os.sep + filename for \
-                           filename in files \
-                           if filename.startswith(harvest_filename)]
         remove_duplicates(harvested_files)
         return (1, harvested_files)
     except StandardError, e:
@@ -777,7 +764,7 @@ def call_fulltext(active_file, extracted_file, harvested_identifier_list,
                 all_err_msg.append(err_msg)
             else:
                 downloaded_files[identifier]["pdf"] = pdf
-        if current_exitcode != 0:
+        if current_exitcode == 0:
             fulltext_xml = '  <datafield tag="FFT" ind1=" " ind2=" ">\n' + \
                    '    <subfield code="a">' + downloaded_files[identifier]["pdf"] + '</subfield>\n' + \
                    '    <subfield code="t"></subfield>\n' + \
