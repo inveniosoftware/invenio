@@ -30,9 +30,10 @@ def email_quoted_txt2html(text,
                           indent_txt='>>',
                           linebreak_txt="\n",
                           indent_html=('<div class="commentbox">', "</div>"),
-                          linebreak_html='<br/>'):
+                          linebreak_html='<br/>',
+                          indent_block=True):
     """
-    Takes a typical mail quoted text, e.g.:
+    Takes a typical mail quoted text, e.g.::
         hello,
         you told me:
         >> Your mother was a hamster and your father smelt of elderberries
@@ -40,7 +41,8 @@ def email_quoted_txt2html(text,
         >>>> Is there someone else up there we could talk to?
         >> No. Now, go away, or I shall taunt you a second time-a!
         I think we're not going to be friends!
-    and return an html formatted output, e.g.:
+
+    and return an html formatted output, e.g.::
         hello,<br/>
         you told me:<br/>
         <div>
@@ -55,13 +57,38 @@ def email_quoted_txt2html(text,
         </div>
         I think we're not going to be friends!
 
+    The behaviour is different when C{indent_block} is C{True} or C{False}.
+    When C{True} the when C{indent_html} is only added at each change of
+    level of indentation, while it is added for each line when C{False}.
+    For eg::
+        >> a
+        >> b
+        >>>> c
+
+    would result in (if C{True})::
+        <div class="commentbox">
+            a<br/>
+            b<br/>
+            <div class="commentbox">
+                c<br/>
+            </div>
+        </div>
+
+    or would be (if C{False})::
+        <div class="commentbox"> a</div><br/>
+        <div class="commentbox"> b</div><br/>
+        <div class="commentbox"><div class="commentbox"> c</div></div><br/>
+
     @param text: the text in quoted format
     @param tabs_before: number of tabulations before each line
     @param indent_txt: quote separator in email (default:'>>')
-    @param linebreak_txt: line separator in email (default: '\n')
+    @param linebreak_txt: line separator in email
     @param indent_html: tuple of (opening, closing) html tags.
                         default: ('<div class="commentbox">', "</div>")
     @param linebreak_html: line separator in html (default: '<br/>')
+    @param indent_block: if indentation should be done per 'block'
+                         i.e. only at changes of indentation level
+                         (+1, -1) or at each line.
     @return: string containing html formatted output
     """
     washer = HTMLWasher()
@@ -78,28 +105,35 @@ def email_quoted_txt2html(text,
                 line = line[len(indent_txt):]
             else:
                 break
-        if (new_nb_indent > nb_indent):
-            for dummy in range(nb_indent, new_nb_indent):
-                final_body += tabs_before*"\t" + indent_html[0] + "\n"
-                tabs_before += 1
-        elif (new_nb_indent < nb_indent):
-            for dummy in range(new_nb_indent, nb_indent):
-                tabs_before -= 1
-                final_body += (tabs_before)*"\t" + indent_html[1] + "\n"
+        if indent_block:
+            if (new_nb_indent > nb_indent):
+                for dummy in range(nb_indent, new_nb_indent):
+                    final_body += tabs_before*"\t" + indent_html[0] + "\n"
+                    tabs_before += 1
+            elif (new_nb_indent < nb_indent):
+                for dummy in range(new_nb_indent, nb_indent):
+                    tabs_before -= 1
+                    final_body += (tabs_before)*"\t" + indent_html[1] + "\n"
+            else:
+                final_body += (tabs_before)*"\t"
         else:
-            final_body += (tabs_before)*"\t"
-
+            final_body += tabs_before*"\t" + new_nb_indent * indent_html[0]
         try:
             line = washer.wash(line)
         except HTMLParseError:
             # Line contained something like "foo<bar"
             line = cgi.escape(line)
-        final_body += tabs_before*"\t" + line
+        if indent_block:
+            final_body += tabs_before*"\t"
+        final_body += line
+        if not indent_block:
+            final_body += new_nb_indent * indent_html[1]
         final_body += linebreak_html + "\n"
         nb_indent = new_nb_indent
-    for dummy in range(0, nb_indent):
-        tabs_before -= 1
-        final_body += (tabs_before)*"\t" + "</div>\n"
+    if indent_block:
+        for dummy in range(0, nb_indent):
+            tabs_before -= 1
+            final_body += (tabs_before)*"\t" + "</div>\n"
     return final_body
 
 
@@ -108,26 +142,26 @@ def email_quote_txt(text,
                     linebreak_input="\n",
                     linebreak_output="\n"):
     """
-    Takes a text and returns it in a typical mail quoted format, e.g.:
+    Takes a text and returns it in a typical mail quoted format, e.g.::
         C'est un lapin, lapin de bois.
         >>Quoi?
         Un cadeau.
         >>What?
         A present.
         >>Oh, un cadeau.
-    will return:
+
+    will return::
         >>C'est un lapin, lapin de bois.
         >>>>Quoi?
         >>Un cadeau.
         >>>>What?
         >>A present.
         >>>>Oh, un cadeau.
+
     @param text: the string to quote
     @param indent_txt: the string used for quoting (default: '>>')
     @param linebreak_input: in the text param, string used for linebreaks
-                            default: '\n'
     @param linebreak_output: linebreak used for output
-                             default: '\n'
     @return: the text as a quoted string
     """
     if (text == ""):
@@ -139,23 +173,27 @@ def email_quote_txt(text,
     return text
 
 def escape_email_quoted_text(text, indent_txt='>>', linebreak_txt='\n'):
-    """Escape text using an email-like indenting rule.
-    As an example, this text:
+    """
+    Escape text using an email-like indenting rule.
+    As an example, this text::
+        >>Brave Sir Robin ran away...
+        <img src="malicious_script />*No!*
+        >>bravely ran away away...
+        I didn't!*<script>malicious code</script>
+        >>When danger reared its ugly head, he bravely turned his tail and fled.
+        <form onload="malicious"></form>*I never did!*
 
-    >>Brave Sir Robin ran away...
-    <img src="malicious_script />*No!*
-    >>bravely ran away away...
-    I didn't!*<script>malicious code</script>
-    >>When danger reared its ugly head, he bravely turned his tail and fled.
-    <form onload="malicious"></form>*I never did!*
+    will be escaped like this::
+        >>Brave Sir Robin ran away...
+        &lt;img src="malicious_script /&gt;*No!*
+        >>bravely ran away away...
+        I didn't!*&lt;script&gt;malicious code&lt;/script&gt;
+        >>When danger reared its ugly head, he bravely turned his tail and fled.
+        &lt;form onload="malicious"&gt;&lt;/form&gt;*I never did!*
 
-    will be escaped like this:
-    >>Brave Sir Robin ran away...
-    &lt;img src="malicious_script /&gt;*No!*
-    >>bravely ran away away...
-    I didn't!*&lt;script&gt;malicious code&lt;/script&gt;
-    >>When danger reared its ugly head, he bravely turned his tail and fled.
-    &lt;form onload="malicious"&gt;&lt;/form&gt;*I never did!*
+    @param text: the string to escape
+    @param indent_txt: the string used for quoting
+    @param linebreak_txt: in the text param, string used for linebreaks
     """
     washer = HTMLWasher()
     lines = text.split(linebreak_txt)

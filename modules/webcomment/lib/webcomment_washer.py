@@ -1,4 +1,5 @@
 from invenio.htmlutils import HTMLWasher
+import htmlentitydefs
 
 class EmailWasher(HTMLWasher):
     """
@@ -29,10 +30,19 @@ class EmailWasher(HTMLWasher):
         """Function called for empty tags (e.g. <br />)"""
         self.result += ""
 
+    def handle_charref(self, name):
+        """Process character references of the form "&#ref;". Transform to text whenever possible."""
+        try:
+            self.result += unichr(int(name)).encode("utf-8")
+        except:
+            return
+
     def handle_entityref(self, name):
         """Process a general entity reference of the form "&name;".
-        Return it as it is."""
-        if name == 'nbsp':
-            self.result += ' '
-        else:
-            self.result += '&' + name + ';'
+        Transform to text whenever possible."""
+        char_code = htmlentitydefs.name2codepoint.get(name, None)
+        if char_code is not None:
+            try:
+                self.result += unichr(char_code).encode("utf-8")
+            except:
+                return

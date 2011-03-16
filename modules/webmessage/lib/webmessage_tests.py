@@ -30,8 +30,8 @@ from invenio.testutils import make_test_suite, run_test_suite
 class TestQuotingMessage(unittest.TestCase):
     """Test for quoting messages."""
 
-    def test_simple_quoting(self):
-        """webmessage - test quoting simple message"""
+    def test_simple_quoting_per_block(self):
+        """webmessage - test quoting simple message (HTML, per block)"""
         text = """Dear romeo
 I received your mail
 >>Would you like to come with me to the restaurant?
@@ -61,8 +61,37 @@ Reply to my question please.<br/>
                                                           linebreak_html='<br/>')
         self.assertEqual(res, expected_text)
 
+    def test_simple_quoting_per_line(self):
+        """webmessage - test quoting simple message (HTML, per line)"""
+        text = """Dear romeo
+I received your mail
+>>Would you like to come with me to the restaurant?
+>>I discovered a really nice one.
+Of course!
+>>>>When could we get together?
+Reply to my question please.
+    see you..."""
+        expected_text = """Dear romeo&nbsp;<br/>
+I received your mail&nbsp;<br/>
+<blockquote><div>Would you like to come with me to the restaurant?&nbsp;</div></blockquote>&nbsp;<br/>
+<blockquote><div>I discovered a really nice one.&nbsp;</div></blockquote>&nbsp;<br/>
+Of course!&nbsp;<br/>
+<blockquote><div><blockquote><div>When could we get together?&nbsp;</div></blockquote>&nbsp;</div></blockquote>&nbsp;<br/>
+Reply to my question please.&nbsp;<br/>
+    see you...&nbsp;<br/>
+"""
+        res =  webmessage_mailutils.email_quoted_txt2html(text,
+                                                          tabs_before=0,
+                                                          indent_txt='>>',
+                                                          linebreak_txt="\n",
+                                                          indent_html=('<blockquote><div>', '&nbsp;</div></blockquote>'),
+                                                          linebreak_html="&nbsp;<br/>",
+                                                          indent_block=False)
+        self.assertEqual(res, expected_text)
+
+
     def test_quoting_message(self):
-        """webmessage - test quoting message"""
+        """webmessage - test quoting message (text)"""
         text = """C'est un lapin, lapin de bois.
 >>Quoi?
 Un cadeau.

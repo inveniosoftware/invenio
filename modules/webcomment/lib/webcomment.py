@@ -26,6 +26,7 @@ import time
 import math
 import os
 import cgi
+import re
 from datetime import datetime, timedelta
 
 # Invenio imports:
@@ -818,7 +819,19 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
         # would be done without the FCKeditor. That's much better if a
         # reply to a comment is made with a browser that does not
         # support FCKeditor.
-        msg = msg.replace('\n', '').replace('\r', '').replace('<br />', '\n')
+        msg = msg.replace('\n', '').replace('\r', '')
+        msg = re.sub('<br .*?(/>)', '\n', msg)
+        # We clean the quotes that could have been introduced by
+        # FCKeditor when clicking the 'quote' button, as well as those
+        # that we have introduced when quoting the original message
+        msg = re.sub('<blockquote\s*>\s*<div.*?>', '>>', msg)
+        msg = msg.replace('</div></blockquote>', '')
+        msg = msg.replace('&nbsp;', ' ')
+        # In case additional <p> or <div> got inserted, interpret
+        # these as new lines (with a sad trick to do it only once)
+        msg = msg.replace('</div><', '</div>\n<')
+        msg = msg.replace('</p><', '</p>\n<')
+
     query = """INSERT INTO cmtRECORDCOMMENT (id_bibrec,
                                            id_user,
                                            body,
@@ -1091,6 +1104,7 @@ def email_subscribers_about_new_comment(recID, reviews, emails1,
 
     washer = EmailWasher()
     msg = washer.wash(msg)
+    msg = msg.replace('&gt;&gt;', '>')
     email_content = msg
     if note:
         email_content = note + email_content
@@ -1481,11 +1495,23 @@ def perform_request_add_comment_or_remark(recID=0,
                         msg = _("%(x_name)s wrote on %(x_date)s:")% {'x_name': user_info[2], 'x_date': date_creation}
                         textual_msg = msg
                         # 1 For FCKeditor input
-                        msg += '<br /><br />'
+                        msg += '\n\n'
                         msg += comment[3]
                         msg = email_quote_txt(text=msg)
-                        msg = email_quoted_txt2html(text=msg)
+                        # Now that we have a text-quoted version, transform into
+                        # something that FCKeditor likes, using <blockquote> that
+                        # do still enable users to insert comments inline
+                        msg = email_quoted_txt2html(text=msg,
+                                                    indent_html=('<blockquote><div>', '&nbsp;</div></blockquote>'),
+                                                    linebreak_html="&nbsp;<br/>",
+                                                    indent_block=False)
+                        # Add some space for users to easily add text
+                        # around the quoted message
                         msg = '<br/>' + msg + '<br/>'
+                        # Due to how things are done, we need to
+                        # escape the whole msg again for the editor
+                        msg = cgi.escape(msg)
+
                         # 2 For textarea input
                         textual_msg += "\n\n"
                         textual_msg += comment[3]
