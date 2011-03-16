@@ -90,6 +90,8 @@ def calculate_reading_similarity_list(recid, type="pageviews"):
        depending whether we want to obtain page view similarity or
        download similarity.
     """
+    if CFG_CERN_SITE:
+        return [] # CERN hack 2009-11-23 to ease the load
     if type == "downloads":
         tablename = "rnkDOWNLOADS"
     else: # default
