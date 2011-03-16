@@ -825,7 +825,7 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
         # FCKeditor when clicking the 'quote' button, as well as those
         # that we have introduced when quoting the original message
         msg = re.sub('<blockquote\s*>\s*<div.*?>', '>>', msg)
-        msg = msg.replace('</div></blockquote>', '')
+        msg = re.sub('</div>\s*</blockquote>', '\n', msg)
         msg = msg.replace('&nbsp;', ' ')
         # In case additional <p> or <div> got inserted, interpret
         # these as new lines (with a sad trick to do it only once)
