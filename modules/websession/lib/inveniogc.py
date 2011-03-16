@@ -216,6 +216,33 @@ def clean_documents():
     write_message("""CLEANING OF OBSOLETED DELETED DOCUMENTS FINISHED""")
     return len(records)
 
+def check_tables():
+    """
+    Check all DB tables.  Useful to run from time to time when the
+    site is idle, say once a month during a weekend night.
+
+    FIXME: should produce useful output about outcome.
+    """
+    res = run_sql("SHOW TABLES")
+    for row in res:
+        table_name = row[0]
+        write_message("checking table %s" % table_name)
+        run_sql("CHECK TABLE %s" % table_name)
+
+def optimise_tables():
+    """
+    Optimise all DB tables to defragment them in order to increase DB
+    performance.  Useful to run from time to time when the site is
+    idle, say once a month during a weekend night.
+
+    FIXME: should produce useful output about outcome.
+    """
+    res = run_sql("SHOW TABLES")
+    for row in res:
+        table_name = row[0]
+        write_message("optimising table %s" % table_name)
+        run_sql("OPTIMIZE TABLE %s" % table_name)
+
 def guest_user_garbage_collector():
     """Session Garbage Collector
 
@@ -422,9 +449,11 @@ def main():
                 "  -c, --cache\t\tClean cache by removing old files.\n" \
                 "  -d, --documents\tClean deleted documents and revisions older than %s days.\n" \
                 "  -T, --tasks\t\tClean the BibSched queue removing/archiving old DONE tasks.\n" \
-                "  -a, --all\t\tClean all of the above.\n" % CFG_DELETED_BIBDOC_MAXLIFE,
+                "  -a, --all\t\tClean all of the above (but do not run check/optimise table options below).\n" \
+                "  -k, --check-tables\tCheck DB tables to discover potential problems.\n" \
+                "  -o, --optimise-tables\tOptimise DB tables to increase performance.\n" % CFG_DELETED_BIBDOC_MAXLIFE,
             version=__revision__,
-            specific_params=("lgbdacT", ["logs", "guests", "bibxxx", "documents", "all", "cache", "tasks"]),
+            specific_params=("lgbdacTko", ["logs", "guests", "bibxxx", "documents", "all", "cache", "tasks", "check-tables", "optimise-tables"]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_submit_check_options_fnc=task_submit_check_options,
             task_run_fnc=task_run_core)
@@ -435,7 +464,9 @@ def task_submit_check_options():
        not task_get_option('bibxxx') and \
        not task_get_option('documents') and \
        not task_get_option('cache') and \
-       not task_get_option('tasks'):
+       not task_get_option('tasks') and \
+       not task_get_option('check-tables') and \
+       not task_get_option('optimise-tables'):
         task_set_option('sessions', True)
     return True
 
@@ -468,6 +499,12 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     elif key in ('-t', '--tasks'):
         task_set_option('tasks', True)
         return True
+    elif key in ('-k', '--check-tables'):
+        task_set_option('check-tables', True)
+        return True
+    elif key in ('-o', '--optimise-tables'):
+        task_set_option('optimise-tables', True)
+        return True
     elif key in ('-a', '--all'):
         task_set_option('logs', True)
         task_set_option('guests', True)
@@ -492,6 +529,10 @@ def task_run_core():
         clean_cache()
     if task_get_option('tasks'):
         gc_tasks()
+    if task_get_option('check-tables'):
+        check_tables()
+    if task_get_option('optimise-tables'):
+        optimise_tables()
     return True
 
 if __name__ == '__main__':
