@@ -38,7 +38,8 @@ from invenio.config import \
      CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES, \
      CFG_CERN_SITE, CFG_INSPIRE_SITE, \
      CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES, \
-     CFG_BIBINDEX_SPLASH_PAGES
+     CFG_BIBINDEX_SPLASH_PAGES, \
+     CFG_SOLR_URL
 from invenio.websubmit_config import CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM
 from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
     CFG_MYSQL_THREAD_TIMEOUT, \
@@ -277,7 +278,12 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
             write_message("... will extract words from %s (docid: %s) %s" % (bibdoc.get_docname(), bibdoc.get_id(), perform_ocr and 'with OCR' or ''), verbose=2)
             if not bibdoc.has_text(require_up_to_date=True):
                 bibdoc.extract_text(perform_ocr=perform_ocr)
-            return get_words_from_phrase(bibdoc.get_text(), stemming_language)
+            if CFG_SOLR_URL:
+                # we are relying on Solr to provide full-text indexing, so do
+                # nothing here (FIXME: dispatch indexing to Solr)
+                return []
+            else:
+                return get_words_from_phrase(bibdoc.get_text(), stemming_language)
         else:
             if CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY:
                 write_message("... %s is external URL but indexing only local files" % url_direct_or_indirect, verbose=2)
@@ -298,7 +304,12 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
                 os.remove(tmpdoc)
                 text = open(tmptext).read()
                 os.remove(tmptext)
-                tmpwords = get_words_from_phrase(text, stemming_language)
+                if CFG_SOLR_URL:
+                    # we are relying on Solr to provide full-text indexing, so do
+                    # nothing here (FIXME: dispatch indexing to Solr)
+                    tmpwords = []
+                else:
+                    tmpwords = get_words_from_phrase(text, stemming_language)
                 words.update(dict(map(lambda x: (x, 1), tmpwords)))
             return words.keys()
     except Exception, e:

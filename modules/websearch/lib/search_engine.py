@@ -68,7 +68,8 @@ from invenio.config import \
      CFG_BIBFORMAT_HIDDEN_TAGS, \
      CFG_SITE_URL, \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
-     CFG_BIBRANK_SHOW_CITATION_LINKS
+     CFG_BIBRANK_SHOW_CITATION_LINKS, \
+     CFG_SOLR_URL
 from invenio.search_engine_config import InvenioWebSearchUnknownCollectionError, InvenioWebSearchWildcardLimitError
 from invenio.bibrecord import create_record, record_get_field_instances
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records, is_method_valid
@@ -108,6 +109,8 @@ from invenio.search_engine_query_parser import SearchQueryParenthesisedParser, \
     SpiresToInvenioSyntaxConverter
 
 from invenio import webinterface_handler_config as apache
+from invenio.solrutils import solr_get_bitset
+
 
 try:
     import invenio.template
@@ -2047,6 +2050,9 @@ def search_unit(p, f=None, m=None, wl=0):
     set = HitSet()
     if not p: # sanity checking
         return set
+    if CFG_SOLR_URL and f == 'fulltext':
+        # redirect to Solr/Lucene
+        return search_unit_in_solr(p)
     if f == 'datecreated':
         set = search_unit_in_bibrec(p, p, 'c')
     elif f == 'datemodified':
@@ -2301,6 +2307,13 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
         #raise an exception, so we can print a nice message to the user
         raise InvenioWebSearchWildcardLimitError(set)
     return set
+
+def search_unit_in_solr(query):
+    """
+    Query the Solr full-text index and return an intbitset corressponding
+    to the result.  The query can be any Solr query, e.g. a phrase.
+    """
+    return solr_get_bitset(query, CFG_SOLR_URL)
 
 def search_unit_in_bibrec(datetext1, datetext2, type='c'):
     """
