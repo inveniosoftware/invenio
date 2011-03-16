@@ -233,6 +233,7 @@ install-fckeditor-plugin:
 	rm -r ${prefix}/var/www/fckeditor/editor/filemanager/connectors && \
 	find ${prefix}/var/www/fckeditor/fckeditor* -maxdepth 0 ! -name "fckeditor.js" -exec rm -r {} \; && \
 	rm -fr /tmp/invenio-fckeditor-plugin
+	sed -i "s/if (FCKBrowserInfo\.IsSafari){FCKTools\.AddEventListener(FCK\.EditorDocument,'paste'/if (FCKBrowserInfo.IsSafari \&\& false){FCKTools.AddEventListener(FCK.EditorDocument,'paste'/" ${prefix}/var/www/fckeditor/editor/js/fckeditorcode_gecko.js # Fix issue described at <http://dev.ckeditor.com/ticket/4960>, affecting v2.6.5, 2.6.6
 	@echo "* Installing Invenio-specific FCKeditor config..."
 	(cd $(top_srcdir)/modules/webstyle/etc && make install)
 	@echo "***********************************************************"
