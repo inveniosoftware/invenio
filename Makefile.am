@@ -143,7 +143,7 @@ install-jquery-plugins: install-jquery-plugins
 	(cd ${prefix}/var/www/js && \
 	wget http://jqueryjs.googlecode.com/files/jquery-1.3.1.min.js && \
 	mv jquery-1.3.1.min.js jquery.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/latest/jquery-1.4.4.js && \
+	wget http://code.jquery.com/jquery-1.4.4.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.effects.core.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.effects.highlight.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.ui.widget.min.js && \
