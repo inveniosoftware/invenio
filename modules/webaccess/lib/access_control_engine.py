@@ -86,5 +86,5 @@ def acc_get_authorized_emails(name_action, **arguments):
         for dummy1, email, dummy2 in acc_get_role_users(id_role):
             authorized_emails.add(email.lower().strip())
         firerole = load_role_definition(id_role)
-        authorized_emails.union(acc_firerole_extract_emails(firerole))
+        authorized_emails = authorized_emails.union(acc_firerole_extract_emails(firerole))
     return authorized_emails
