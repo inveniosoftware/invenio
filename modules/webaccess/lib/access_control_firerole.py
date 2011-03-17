@@ -170,7 +170,7 @@ def acc_firerole_extract_emails(firerole_def_obj):
                     if reg_p:
                         continue
                     if CFG_CERN_SITE and expr.endswith(' [CERN]'):
-                        authorized_emails.add(expr[:len(' [CERN]')].lower().strip() + '@cern.ch')
+                        authorized_emails.add(expr[:-len(' [CERN]')].lower().strip() + '@cern.ch')
                     emails = run_sql("SELECT user.email FROM usergroup JOIN user_usergroup ON usergroup.id=user_usergroup.id_usergroup JOIN user ON user.id=user_usergroup.id_user WHERE usergroup.name=%s", (expr, ))
                     for email in emails:
                         authorized_emails.add(email[0].lower().strip())
