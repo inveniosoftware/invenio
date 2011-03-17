@@ -1837,7 +1837,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             basic_search_unit_hitset = excp.res
             if of.startswith("h"):
                 print_warning(req, "Search term too generic, displaying only partial results...")
-        # FIXME: workaround for not having phrase index yet
+        # FIXME: print warning if we use native full-text indexing
         if bsu_f == 'fulltext' and bsu_m != 'w' and of.startswith('h') and not CFG_SOLR_URL:
             print_warning(req, _("No phrase index available for fulltext yet, looking for word combination..."))
         #check that the user is allowed to search with this tag
@@ -2523,9 +2523,12 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
     if p.startswith('%') and p.endswith('%'):
         p = p[1:-1] # fix for partial phrase
     index_id = get_index_id_from_field(f)
-    # FIXME: workaround for not having phrase index yet
     if f == 'fulltext':
-        t = 'w'
+        if CFG_SOLR_URL:
+            return _("No match found, please enter different search terms.")
+        else:
+            # FIXME: workaround for not having native phrase index yet
+            t = 'w'
     # special indexes:
     if f == 'refersto':
         return _("There are no records referring to %s.") % cgi.escape(p)
