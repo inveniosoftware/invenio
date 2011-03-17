@@ -194,7 +194,12 @@ def cli_quick_match_all_docids(options, recids=None):
     cd_doc = getattr(options, 'cd_doc', None)
     if docids is None:
         debug('Initially considering all the docids')
-        docids = intbitset(run_sql('SELECT id_bibdoc FROM bibrec_bibdoc'))
+        if recids is None:
+            recids = cli_quick_match_all_recids(options)
+        docids = intbitset()
+        for id_bibrec, id_bibdoc in run_sql('SELECT id_bibrec, id_bibdoc FROM bibrec_bibdoc'):
+            if id_bibrec in recids:
+                docids.add(id_bibdoc)
     else:
         debug('Initially considering this docids: %s' % docids)
     tmp_query = []
@@ -372,7 +377,7 @@ def cli_docids_iterator(options, recids=None, docids=None):
     if recids is None:
         recids = cli_quick_match_all_recids(options)
     if docids is None:
-        docids = cli_quick_match_all_docids(options)
+        docids = cli_quick_match_all_docids(options, recids)
     for docid in docids:
         if cli_slow_match_single_docid(options, docid, recids, docids):
             yield docid
