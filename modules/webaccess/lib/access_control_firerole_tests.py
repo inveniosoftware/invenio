@@ -28,14 +28,16 @@ from invenio.access_control_firerole import compile_role_definition, \
 from invenio.access_control_config import InvenioWebAccessFireroleError, \
         CFG_ACC_EMPTY_ROLE_DEFINITION_SER
 from invenio.testutils import make_test_suite, run_test_suite
+from invenio.webuser import collect_user_info
 
 class AccessControlFireRoleTest(unittest.TestCase):
     """Test functions related to the firewall like role definitions."""
 
     def setUp(self):
         """setting up helper variables for tests"""
-        self.user_info = {'email' : 'foo.bar@cern.ch',
+        self.user_info = {'email' : 'foo.bar@cern.ch', 'uid': 1000,
             'group' : ['patata', 'cetriolo'], 'remote_ip' : '127.0.0.1'}
+        self.guest = collect_user_info({})
 
     def test_compile_role_definition_empty(self):
         """firerole - compiling empty role definitions"""
@@ -159,6 +161,13 @@ class AccessControlFireRoleTest(unittest.TestCase):
         """firerole - firerole core testing empty matching"""
         self.assertEqual(False, acc_firerole_check_user(self.user_info,
             compile_role_definition(None)))
+
+    def test_firerole_uid(self):
+        """firerole - firerole core testing with integer uid"""
+        self.assertEqual(False, acc_firerole_check_user(self.guest,
+            compile_role_definition("deny uid '-1'\nallow all")))
+        self.assertEqual(True, acc_firerole_check_user(self.user_info,
+            compile_role_definition("deny uid '-1'\nallow all")))
 
 TEST_SUITE = make_test_suite(AccessControlFireRoleTest,)
 
