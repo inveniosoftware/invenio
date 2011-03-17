@@ -1838,7 +1838,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             if of.startswith("h"):
                 print_warning(req, "Search term too generic, displaying only partial results...")
         # FIXME: workaround for not having phrase index yet
-        if bsu_f == 'fulltext' and bsu_m != 'w' and of.startswith('h'):
+        if bsu_f == 'fulltext' and bsu_m != 'w' and of.startswith('h') and not CFG_SOLR_URL:
             print_warning(req, _("No phrase index available for fulltext yet, looking for word combination..."))
         #check that the user is allowed to search with this tag
         #if he/she tries it
@@ -2052,7 +2052,7 @@ def search_unit(p, f=None, m=None, wl=0):
         return set
     if CFG_SOLR_URL and f == 'fulltext':
         # redirect to Solr/Lucene
-        return search_unit_in_solr(p)
+        return search_unit_in_solr(p, f, m)
     if f == 'datecreated':
         set = search_unit_in_bibrec(p, p, 'c')
     elif f == 'datemodified':
@@ -2308,12 +2308,14 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
         raise InvenioWebSearchWildcardLimitError(set)
     return set
 
-def search_unit_in_solr(query):
+def search_unit_in_solr(p, f=None, m=None):
     """
-    Query the Solr full-text index and return an intbitset corressponding
-    to the result.  The query can be any Solr query, e.g. a phrase.
+    Query the Solr full-text index and return an intbitset corresponding
+    to the result.  Parameters (p,f,m) are usual search unit ones.
     """
-    return solr_get_bitset(query, CFG_SOLR_URL)
+    if m and (m == 'a' or m == 'r'): # phrase/regexp query
+        p = '"' + p + '"'
+    return solr_get_bitset(p, CFG_SOLR_URL)
 
 def search_unit_in_bibrec(datetext1, datetext2, type='c'):
     """
