@@ -319,18 +319,18 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
             return page_not_authorized(req,
                 navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
-                navmenuid='number of loans',
+                navmenuid='number of circulation loans',
                 ln=ln)
 
-        return page(title="Number of loans",
+        return page(title="Number of circulation loans",
                     body=perform_display_keyevent('number of loans', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Number of loans",
-                    keywords="CDS, statistics, Number of loans",
+                    description="CDS, Statistics, Number of circulation loans",
+                    keywords="CDS, statistics, Number of circulation loans",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='number of loans',
+                    navmenuid='number of circulation loans',
                     language=ln)
 
     def web_submissions(self, req, form):
@@ -382,18 +382,18 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
             return page_not_authorized(req,
                 navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
-                navmenuid='loans statistics',
+                navmenuid='circulation loans statistics',
                 ln=ln)
 
-        return page(title="Loans statistics",
+        return page(title="Circulation loans statistics",
                     body=perform_display_keyevent('loans statistics', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Loans statistics",
-                    keywords="CDS, statistics, Loans statistics",
+                    description="CDS, Statistics, Circulation loans statistics",
+                    keywords="CDS, statistics, Circulation loans statistics",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='loans statistics',
+                    navmenuid='circulation loans statistics',
                     language=ln)
 
     def loans_lists(self, req, form):
@@ -419,18 +419,18 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
             return page_not_authorized(req,
                 navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
-                navmenuid='loans lists',
+                navmenuid='circulation loans lists',
                 ln=ln)
 
-        return page(title="Loans lists",
+        return page(title="Circulation loans lists",
                     body=perform_display_keyevent('loans lists', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Loans lists",
-                    keywords="CDS, statistics, Loans lists",
+                    description="CDS, Statistics, Circulation oans lists",
+                    keywords="CDS, statistics, Circulation loans lists",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='loans lists',
+                    navmenuid='circulation loans lists',
                     language=ln)
 
     def renewals_lists(self, req, form):
@@ -450,18 +450,18 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
             return page_not_authorized(req,
                 navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
-                navmenuid='renewals',
+                navmenuid='circulation renewals lists',
                 ln=ln)
 
-        return page(title="Renewals lists",
+        return page(title="Circulation renewals lists",
                     body=perform_display_keyevent('renewals', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Renewals lists",
-                    keywords="CDS, statistics, Renewals lists",
+                    description="CDS, Statistics, Circulation renewals lists",
+                    keywords="CDS, statistics, Circulation renewals lists",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='renewals lists',
+                    navmenuid='circulation renewals lists',
                     language=ln)
 
     def returns_table(self, req, form):
@@ -479,18 +479,18 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
             return page_not_authorized(req,
                 navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
-                navmenuid='returns table',
+                navmenuid='Circulation returns table',
                 ln=ln)
 
-        return page(title="Returns table",
+        return page(title="Circulation returns table",
                     body=perform_display_keyevent('number returns', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Returns table",
-                    keywords="CDS, statistics, Returns table",
+                    description="CDS, Statistics, Circulation returns table",
+                    keywords="CDS, statistics, Circulation returns table",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='returns table',
+                    navmenuid='circulation returns table',
                     language=ln)
 
     def returns_graph(self, req, form):
@@ -508,18 +508,18 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
             return page_not_authorized(req,
                 navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
-                navmenuid='returns graph',
+                navmenuid='circulation returns graph',
                 ln=ln)
 
-        return page(title="Returns graph",
+        return page(title="Circulation returns graph",
                     body=perform_display_keyevent('percentage returns', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Returns graph",
-                    keywords="CDS, statistics, Returns graph",
+                    description="CDS, Statistics, Circulation returns graph",
+                    keywords="CDS, statistics, Circulation returns graph",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='returns graph',
+                    navmenuid='circulation returns graph',
                     language=ln)
 
     def ill_requests_stats(self, req, form):
@@ -540,18 +540,18 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
             return page_not_authorized(req,
                 navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
-                navmenuid='ill requests statistics',
+                navmenuid='circulation ill requests statistics',
                 ln=ln)
 
-        return page(title="ILL Requests statistics",
+        return page(title="Circulation ILL Requests statistics",
                     body=perform_display_keyevent('ill requests statistics', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, ILL Requests statistics",
-                    keywords="CDS, statistics, ILL Requests statistics",
+                    description="CDS, Statistics, Circulation ILL Requests statistics",
+                    keywords="CDS, statistics, Circulation ILL Requests statistics",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='ill requests statistics',
+                    navmenuid='circulation ill requests statistics',
                     language=ln)
 
     def ill_requests_lists(self, req, form):
@@ -571,18 +571,18 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
             return page_not_authorized(req,
                 navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
-                navmenuid='ill requests list',
+                navmenuid='circulation ill requests list',
                 ln=ln)
 
-        return page(title="ILL Requests list",
+        return page(title="Circulation ILL Requests list",
                     body=perform_display_keyevent('ill requests list', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, ILL Requests list",
-                    keywords="CDS, statistics, ILL Requests list",
+                    description="CDS, Statistics, Circulation ILL Requests list",
+                    keywords="CDS, statistics, Circulation ILL Requests list",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='ill requests list',
+                    navmenuid='circulation ill requests list',
                     language=ln)
 
     def ill_requests_graph(self, req, form):
@@ -603,19 +603,19 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
             return page_not_authorized(req,
                 navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
-                navmenuid='percentage satisfied ill requests',
+                navmenuid='percentage circulation satisfied ill requests',
                 ln=ln)
 
-        return page(title="Percentage of satisfied ILL requests",
+        return page(title="Percentage of circulation satisfied ILL requests",
                     body=perform_display_keyevent('percentage satisfied ill requests',
                                                   argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Percentage of satisfied ILL requests",
-                    keywords="CDS, statistics, Percentage of satisfied ILL requests",
+                    description="CDS, Statistics, Percentage of circulation satisfied ILL requests",
+                    keywords="CDS, statistics, Percentage of circulation satisfied ILL requests",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='percentage satisfied ill requests',
+                    navmenuid='percentage circulation satisfied ill requests',
                     language=ln)
 
     def items_stats(self, req, form):
@@ -635,18 +635,18 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
             return page_not_authorized(req,
                 navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
-                navmenuid='items stats',
+                navmenuid='circulation items stats',
                 ln=ln)
 
-        return page(title="Items statistics",
+        return page(title="Circulation items statistics",
                     body=perform_display_keyevent('items stats', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Items statistics",
-                    keywords="CDS, statistics, Items statistics",
+                    description="CDS, Statistics, Circulation items statistics",
+                    keywords="CDS, statistics, Circulation items statistics",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='items stats',
+                    navmenuid='circulation items stats',
                     language=ln)
 
     def items_list(self, req, form):
@@ -663,18 +663,18 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
             return page_not_authorized(req,
                 navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
-                navmenuid='items list',
+                navmenuid='circulation items list',
                 ln=ln)
 
-        return page(title="Items list",
+        return page(title="Circulation items list",
                     body=perform_display_keyevent('items list', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Items list",
-                    keywords="CDS, statistics, Items list",
+                    description="CDS, Statistics, Circulation items list",
+                    keywords="CDS, statistics, Circulation items list",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='items list',
+                    navmenuid='circulation items list',
                     language=ln)
 
     def loans_requests(self, req, form):
@@ -693,18 +693,18 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
             return page_not_authorized(req,
                 navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
-                navmenuid='loan request statistics',
+                navmenuid='circulation loan request statistics',
                 ln=ln)
 
-        return page(title="Hold requests statistics",
+        return page(title="Circulation hold requests statistics",
                     body=perform_display_keyevent('loan request statistics', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Hold requests statistics",
-                    keywords="CDS, statistics, Hold requests statistics",
+                    description="CDS, Statistics, Circulation hold requests statistics",
+                    keywords="CDS, statistics, Circulation hold requests statistics",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='loan request statistics',
+                    navmenuid='circulation loan request statistics',
                     language=ln)
 
     def loans_request_lists(self, req, form):
@@ -723,18 +723,18 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
             return page_not_authorized(req,
                 navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
-                navmenuid='hold request lists',
+                navmenuid='circulation hold request lists',
                 ln=ln)
 
-        return page(title="Loans request lists",
+        return page(title="Circulation loans request lists",
                     body=perform_display_keyevent('loan request lists', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Hold request lists",
-                    keywords="CDS, statistics, Hold request lists",
+                    description="CDS, Statistics, Circulation hold request lists",
+                    keywords="CDS, statistics, Circulation hold request lists",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='hold request lists',
+                    navmenuid='circulation hold request lists',
                     language=ln)
 
     def user_stats(self, req, form):
@@ -752,18 +752,18 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
             return page_not_authorized(req,
                 navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
-                navmenuid='library statistics',
+                navmenuid='circulation user statistics',
                 ln=ln)
 
-        return page(title="Users statistics",
+        return page(title="Circulation users statistics",
                     body=perform_display_keyevent('user statistics', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Users statistics",
-                    keywords="CDS, statistics, Users statistics",
+                    description="CDS, Statistics, Circulation users statistics",
+                    keywords="CDS, statistics, Circulation users statistics",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='library statistics',
+                    navmenuid='circulation user statistics',
                     language=ln)
 
     def user_lists(self, req, form):
@@ -781,18 +781,18 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
             return page_not_authorized(req,
                 navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
-                navmenuid='library lists',
+                navmenuid='circulation users lists',
                 ln=ln)
 
-        return page(title="Users lists",
+        return page(title="Circulation users lists",
                     body=perform_display_keyevent('user lists', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Users lists",
-                    keywords="CDS, statistics, Users lists",
+                    description="CDS, Statistics, Circulation users lists",
+                    keywords="CDS, statistics, Circulation users lists",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='library lists',
+                    navmenuid='circulation users lists',
                     language=ln)
 
     # CUSTOM EVENT SECTION

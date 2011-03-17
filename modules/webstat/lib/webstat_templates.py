@@ -76,22 +76,22 @@ class Template:
                     <li><a href="%(CFG_SITE_URL)s/stats/search_type_distribution%(ln_link)s">Search type distribution</a></li>
                     <li><a href="%(CFG_SITE_URL)s/stats/download_frequency%(ln_link)s">Download frequency</a></li>
                     <li><a href="%(CFG_SITE_URL)s/stats/comments_frequency%(ln_link)s">Comments frequency</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/number_of_loans%(ln_link)s">Number of loans</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/number_of_loans%(ln_link)s">Number of circulation loans</a></li>
                     <li><a href="%(CFG_SITE_URL)s/stats/web_submissions%(ln_link)s">Web submissions</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/loans_stats%(ln_link)s">Loan statistics</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/loans_lists%(ln_link)s">Loan lists</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/renewals_lists%(ln_link)s">Renewals lists</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/returns_table%(ln_link)s">Number of overdue returns</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/returns_graph%(ln_link)s">Percentage of overdue returns</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/ill_requests_stats%(ln_link)s">ILL Requests statistics</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/ill_requests_lists%(ln_link)s">ILL Requests list</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/ill_requests_graph%(ln_link)s">Percentage of satisfied ILL requests</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/items_stats%(ln_link)s">Items statistics</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/items_list%(ln_link)s">Items list</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/loans_requests%(ln_link)s">Hold requests statistics</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/loans_request_lists%(ln_link)s">Hold requests lists</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/user_stats%(ln_link)s">User statistics</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/user_lists%(ln_link)s">User lists</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/loans_stats%(ln_link)s">Circulation loan statistics</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/loans_lists%(ln_link)s">Circulation loan lists</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/renewals_lists%(ln_link)s">Circulation renewals lists</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/returns_table%(ln_link)s">Number of circulation overdue returns</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/returns_graph%(ln_link)s">Percentage of circulation overdue returns</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/ill_requests_stats%(ln_link)s">Circulation ILL Requests statistics</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/ill_requests_lists%(ln_link)s">Circulation ILL Requests list</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/ill_requests_graph%(ln_link)s">Percentage of satisfied circulation ILL requests</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/items_stats%(ln_link)s">Circulation items statistics</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/items_list%(ln_link)s">Circulation items list</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/loans_requests%(ln_link)s">Circulation hold requests statistics</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/loans_request_lists%(ln_link)s">Circulation hold requests lists</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/user_stats%(ln_link)s">Circulation user statistics</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/user_lists%(ln_link)s">Circulation user lists</a></li>
                   </ul>""" % {'CFG_SITE_URL': CFG_SITE_URL,
                               'ln_link': (CFG_SITE_LANG != ln and '?ln=' + ln) or ''}
 
@@ -588,6 +588,22 @@ class Template:
                                            open(filename, 'r').read(), ln=ln)
         except IOError:
             return "No data found"
+
+    def tmpl_display_numeric_stats(self, titles, avgs, maxs, mins):
+        """Display average, max and min values"""
+        if titles:
+            out = ""
+            for i in range(len(titles)):
+                out += """<em>%s</em><br />
+                          <b>Average:</b> %d<br />
+                          <b>Max:</b> %d<br />
+                          <b>Min:</b> %d<br />""" % (cgi.escape(titles[i]),
+                                                    avgs[i], maxs[i], mins[i])
+            return out
+        else:
+            return """<b>Average:</b> %d<br />
+                      <b>Max:</b> %d<br />
+                      <b>Min:</b> %d<br />""" % (avgs, maxs, mins)
 
     def tmpl_display_custom_summary(self, tag_name, data, title, query, tag,
                                     path, ln=CFG_SITE_LANG):

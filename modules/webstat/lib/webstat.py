@@ -94,7 +94,8 @@ from invenio.webstat_engine import get_custom_summary_data, \
 # Imports for handling outputting
 from invenio.webstat_engine import create_graph_trend, \
     create_graph_dump, \
-    create_graph_table
+    create_graph_table, \
+    get_numeric_stats
 
 # Imports for handling exports
 from invenio.webstat_engine import export_to_python, \
@@ -221,8 +222,8 @@ for all the documents.', ),
                             'multiple': None,
                             'output': 'Graph'},
                         'number of loans':
-                          {'fullname': 'Number of loans',
-                            'specificname': 'Number of loans',
+                          {'fullname': 'Number of circulation loans',
+                            'specificname': 'Number of circulation loans',
                             'description':
                                    ('The number of loans shows the total number of records loaned \
  over a time span', ),
@@ -250,8 +251,8 @@ documents using the web form.", ),
                             'multiple': None,
                             'output': 'Graph'},
                         'loans statistics':
-                          {'fullname': 'Loans statistics',
-                            'specificname': 'Loans statistics',
+                          {'fullname': 'Circulation loans statistics',
+                            'specificname': 'Circulation loans statistics',
                             'description':
                                    ('The loan statistics consist on different numbers \
 related to the records loaned. It is important to see the difference between document \
@@ -276,8 +277,8 @@ the record creation and the date of the first loan (in days)'],
                             'output': 'Table',
                             'type': 'bibcirculation'},
                          'loans lists':
-                           {'fullname': 'Loans lists',
-                            'specificname': 'Loans lists',
+                           {'fullname': 'Circulation loans lists',
+                            'specificname': 'Circulation loans lists',
                             'description':
                                    ('The loan lists show the most loaned and the never loaned \
 records in a time span. The most loaned record are calculated as the number of loans by copy.', ),
@@ -298,8 +299,8 @@ records in a time span. The most loaned record are calculated as the number of l
                             'output': 'List',
                             'type': 'bibcirculation'},
                           'renewals':
-                           {'fullname': 'Renewals',
-                            'specificname': 'Renewals',
+                           {'fullname': 'Circulation renewals',
+                            'specificname': 'Circulation renewals',
                             'description':
                                    ('Here the list of most renewed items stored is shown \
 by decreasing order', ),
@@ -313,8 +314,8 @@ by decreasing order', ),
                             'output': 'List',
                             'type': 'bibcirculation'},
                           'number returns':
-                           {'fullname': 'Number of overdue returns',
-                            'specificname': 'Number of overdue returns',
+                           {'fullname': 'Number of circulation overdue returns',
+                            'specificname': 'Number of circulation overdue returns',
                             'description':
                                    ('The number of overdue returns is the number of loans \
 that has not been returned by the due date (they may have been returned after or never).', ),
@@ -327,7 +328,7 @@ that has not been returned by the due date (they may have been returned after or
                             'output': 'Table',
                             'type': 'bibcirculation'},
                           'percentage returns':
-                           {'fullname': 'Percentage of overdue returns',
+                           {'fullname': 'Percentage of circulation overdue returns',
                             'specificname': 'Percentage of overdue returns',
                             'description':
                                    ('This graphs shows both the overdue returns and the total \
@@ -343,8 +344,8 @@ of returns.', ),
                             'output': 'Graph',
                             'type': 'bibcirculation'},
                         'ill requests statistics':
-                          {'fullname': 'ILL Requests statistics',
-                            'specificname': 'ILL Requests statistics',
+                          {'fullname': 'Circulation ILL Requests statistics',
+                            'specificname': 'Circulation ILL Requests statistics',
                             'description':
                                    ('The ILL requests statistics are different numbers \
 related to the requests to other libraries.', ),
@@ -368,8 +369,8 @@ related to the requests to other libraries.', ),
                             'output': 'Table',
                             'type': 'bibcirculation'},
                           'ill requests list':
-                           {'fullname': 'ILL Requests list',
-                            'specificname': 'ILL Requests list',
+                           {'fullname': 'Circulation ILL Requests list',
+                            'specificname': 'Circulation ILL Requests list',
                             'description':
                                    ('The ILL requests list shows 50 requests to other \
 libraries on the selected time span.', ),
@@ -384,8 +385,8 @@ libraries on the selected time span.', ),
                             'output': 'List',
                             'type': 'bibcirculation'},
                           'percentage satisfied ill requests':
-                           {'fullname': 'Percentage of satisfied ILL requests',
-                            'specificname': 'Percentage of satisfied ILL requests',
+                           {'fullname': 'Percentage of circulation satisfied ILL requests',
+                            'specificname': 'Percentage of circulation satisfied ILL requests',
                             'description':
                                    ('This graph shows both the satisfied ILL requests and \
 the total number of requests in the selected time span.', ),
@@ -403,8 +404,8 @@ the total number of requests in the selected time span.', ),
                             'output': 'Graph',
                             'type': 'bibcirculation'},
                           'items stats':
-                           {'fullname': 'Items statistics',
-                            'specificname': 'Items statistics',
+                           {'fullname': 'Circulation items statistics',
+                            'specificname': 'Circulation items statistics',
                             'description':
                                    ('The items statistics show the total number of items at \
 the moment and the number of new items in the selected time span.', ),
@@ -419,8 +420,8 @@ the moment and the number of new items in the selected time span.', ),
                             'output': 'Table',
                             'type': 'bibcirculation'},
                           'items list':
-                           {'fullname': 'Items list',
-                            'specificname': 'Items list',
+                           {'fullname': 'Circulation items list',
+                            'specificname': 'Circulation items list',
                             'description':
                                    ('The item list shows data about the existing items.', ),
                             'gatherer':
@@ -434,8 +435,8 @@ the moment and the number of new items in the selected time span.', ),
                             'output': 'List',
                             'type': 'bibcirculation'},
                         'loan request statistics':
-                          {'fullname': 'Hold requests statistics',
-                            'specificname': 'Hold requests statistics',
+                          {'fullname': 'Circulation hold requests statistics',
+                            'specificname': 'Circulation hold requests statistics',
                             'description':
                                    ('The hold requests statistics show numbers about the \
 requests for documents. For the numbers to be correct, there must be data in the loanrequest \
@@ -454,8 +455,8 @@ custom event.', ),
                             'output': 'Table',
                             'type': 'bibcirculation'},
                          'loan request lists':
-                           {'fullname': 'Hold requests lists',
-                            'specificname': 'Hold requests lists',
+                           {'fullname': 'Circulation hold requests lists',
+                            'specificname': 'Circulation hold requests lists',
                             'description':
                                    ('The hold requests list shows the most requested items.', ),
                             'gatherer':
@@ -468,8 +469,8 @@ custom event.', ),
                             'output': 'List',
                             'type': 'bibcirculation'},
                          'user statistics':
-                           {'fullname': 'Users statistics',
-                            'specificname': 'Users statistics',
+                           {'fullname': 'Circulation users statistics',
+                            'specificname': 'Circulation users statistics',
                             'description':
                                    ('The user statistics show the number of active users \
 (at least one transaction) in the selected timespan.', ),
@@ -482,8 +483,8 @@ custom event.', ),
                             'output': 'Table',
                             'type': 'bibcirculation'},
                          'user lists':
-                           {'fullname': 'Users lists',
-                            'specificname': 'Users lists',
+                           {'fullname': 'Circulation users lists',
+                            'specificname': 'Circulation users lists',
                             'description':
                                    ('The user list shows the most intensive users \
 (ILL requests + Loans)', ),
@@ -618,12 +619,28 @@ def modify_customevent(event_id=None, name=None, cols=[]):
     #modify event table
     if cols_del or cols_add:
         sql_query = ["ALTER TABLE %s " % res[0][0]]
-        for col in cols_del:
-            sql_query.append("DROP COLUMN `%s`" % col)
-            sql_query.append(", ")
-        for col in cols_add:
-            sql_query.append("ADD COLUMN `%s` MEDIUMTEXT NULL, " % col)
-            sql_query.append("ADD INDEX `%s` (`%s`(50))" % (col, col))
+        # check if a column was renamed
+        for col_del in cols_del:
+            result = -1
+            while result < 1 or result > len(cols_add) + 1:
+                print """What do you want to do with the column %s in event %s?:
+1.- Delete it""" % (col_del, event_id)
+                for i in range(len(cols_add)):
+                    print "%d.- Rename it to %s" % (i + 2, cols_add[i])
+                result = int(raw_input("\n"))
+            if result == 1:
+                sql_query.append("DROP COLUMN `%s`" % col_del)
+                sql_query.append(", ")
+            else:
+                col_add = cols_add[result-2]
+                sql_query.append("CHANGE `%s` `%s` MEDIUMTEXT NULL"%(col_del, col_add))
+                sql_query.append(", ")
+                cols_add.remove(col_add)
+
+        # add the rest of the columns
+        for col_add in cols_add:
+            sql_query.append("ADD COLUMN `%s` MEDIUMTEXT NULL, " % col_add)
+            sql_query.append("ADD INDEX `%s` (`%s`(50))" % (col_add, col_add))
             sql_query.append(", ")
         sql_query[-1] = ";"
         run_sql("".join(sql_query))
@@ -907,6 +924,9 @@ def get_url_customevent(url_dest, event_id, *arguments):
     Get an url for registers a custom event. Every time is load the
     url will register a customevent as register_customevent().
 
+    @param url_dest: url to redirect after register the event
+    @type url_dest: str
+
     @param event_id: Human-readable id of the event to be registered
     @type event_id: str
 
@@ -914,9 +934,6 @@ def get_url_customevent(url_dest, event_id, *arguments):
                        the param "WEBSTAT_IP" will tell webstat that here
                        should be the IP who request the url
     @type *arguments: [params]
-
-    @param url_dest: url to redirect after register the event
-    @type url_dest: str
 
     @return: url for register event
     @type: str
@@ -986,14 +1003,14 @@ def perform_display_current_system_health(ln=CFG_SITE_LANG):
 
     # Append new records information to the health box
     if conf.get("general", "record_box") == "True":
-        args = {'collection': CFG_SITE_NAME, 't_start': today,
+        args = {'collection': "All", 't_start': today,
                  't_end': tomorrow, 'granularity': "day",
                  't_format': "%Y-%m-%d"}
         try:
             tot_records = get_keyevent_trend_collection_population(args)[0][1]
         except IndexError:
             tot_records = 0
-        args = {'collection': CFG_SITE_NAME, 't_start': yesterday,
+        args = {'collection': "All", 't_start': yesterday,
                  't_end': today, 'granularity': "day", 't_format': "%Y-%m-%d"}
         try:
             new_records = tot_records - \
@@ -1048,8 +1065,8 @@ def perform_display_keyevent(event_id=None, args={},
     """
     Display key events using a certain output type over the given time span.
 
-    @param ids: The ids for the custom events that are to be displayed.
-    @type ids: [str]
+    @param event_id: The ids for the custom events that are to be displayed.
+    @type event_id: [str]
 
     @param args: { param name: argument value }
     @type args: { str: str }
@@ -1472,7 +1489,7 @@ def _perform_display_event(data, name, settings, ln=CFG_SITE_LANG):
     if settings["format"] == "asciidump":
         path += "_asciidump"
         create_graph_dump(data, path)
-        return TEMPLATES.tmpl_display_event_trend_ascii(settings["title"],
+        out = TEMPLATES.tmpl_display_event_trend_ascii(settings["title"],
                                                         path, ln=ln)
 
     if settings["format"] == "Table":
@@ -1481,24 +1498,28 @@ def _perform_display_event(data, name, settings, ln=CFG_SITE_LANG):
 
     create_graph_trend(data, path, settings)
     if settings["format"] == "asciiart":
-        return TEMPLATES.tmpl_display_event_trend_ascii(
+        out = TEMPLATES.tmpl_display_event_trend_ascii(
             settings["title"], path, ln=ln)
     else:
         if settings["format"] == "gnuplot":
             try:
                 import Gnuplot
             except ImportError:
-                return 'Gnuplot is not installed. Returning ASCII art.' + \
+                out = 'Gnuplot is not installed. Returning ASCII art.' + \
                        TEMPLATES.tmpl_display_event_trend_ascii(
                     settings["title"], path, ln=ln)
 
-            return TEMPLATES.tmpl_display_event_trend_image(
+            out = TEMPLATES.tmpl_display_event_trend_image(
                 settings["title"], path, ln=ln)
         elif settings["format"] == "flot":
-            return TEMPLATES.tmpl_display_event_trend_text(
+            out = TEMPLATES.tmpl_display_event_trend_text(
                 settings["title"], path, ln=ln)
-        return TEMPLATES.tmpl_display_event_trend_ascii(
-            settings["title"], path, ln=ln)
+        else:
+            out = TEMPLATES.tmpl_display_event_trend_ascii(
+                    settings["title"], path, ln=ln)
+    avgs, maxs, mins = get_numeric_stats(data, settings["multiple"] is not None)
+    return out + TEMPLATES.tmpl_display_numeric_stats(settings["multiple"],
+                    avgs, maxs, mins)
 
 
 def _get_customevents():
@@ -1650,7 +1671,7 @@ def _get_time_parameters_select_date(s_date, f_date):
     if dt_end - dt_start <= timedelta(hours=1):
         xtic_format = "%m:%s"
         granularity = 'second'
-    elif dt_end - dt_start <= timedelta(days=3):
+    elif dt_end - dt_start <= timedelta(days=1):
         xtic_format = "%H:%m"
         granularity = 'minute'
     elif dt_end - dt_start <= timedelta(days=7):
@@ -1736,7 +1757,7 @@ def _get_export_closure(typename):
     closure.
 
     @param typename: Internal type name
-    @type type: str
+    @type typename: str
 
     @return: Closure that exports data to the type's format
     @type: function

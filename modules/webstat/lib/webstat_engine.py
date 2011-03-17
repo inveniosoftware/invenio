@@ -341,17 +341,16 @@ def get_keyevent_trend_web_submissions(args, return_sql=False):
 def get_keyevent_loan_statistics(args, return_sql=False):
     """
     Data:
-    - Number of documents (=records) loaned
-    - Number of items loaned on the total number of items
-    - Number of items never loaned on the total number of items
-    - Average time between the date of the record creation and  the date of the first loan
+      - Number of documents (=records) loaned
+      - Number of items loaned on the total number of items
+      - Number of items never loaned on the total number of items
+      - Average time between the date of the record creation and  the date of the first loan
     Filter by
-    - in a specified time span
-    - by UDC (see MARC field 080__a - list to be submitted)
-    - by item status (available, missing)
-    - by date of publication (MARC field 260__c)
-    - by date of the record creation in the database
-
+      - in a specified time span
+      - by UDC (see MARC field 080__a - list to be submitted)
+      - by item status (available, missing)
+      - by date of publication (MARC field 260__c)
+      - by date of the record creation in the database
 
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
@@ -451,18 +450,18 @@ loaned on total number of items</li><li>%s</li></ol>" % \
 def get_keyevent_loan_lists(args, return_sql=False, limit=50):
     """
     Lists:
-    - List of documents (= records) never loaned
-    - List of most loaned documents  (columns: number of loans,
+      - List of documents (= records) never loaned
+      - List of most loaned documents  (columns: number of loans,
         number of copies and the creation date of the record, in
         order to calculate the number of loans by copy), sorted
         by decreasing order (50 items)
     Filter by
-    - in a specified time span
-    - by UDC (see MARC field 080__a - list to be submitted)
-    - by loan period (4 week loan, one week loan...)
-    - by a certain number of loans
-    - by date of publication (MARC field 260__c)
-    - by date of the record creation in the database
+      - in a specified time span
+      - by UDC (see MARC field 080__a - list to be submitted)
+      - by loan period (4 week loan, one week loan...)
+      - by a certain number of loans
+      - by date of publication (MARC field 260__c)
+      - by date of the record creation in the database
 
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
@@ -591,11 +590,11 @@ WHERE bx.id = bibx.id_bibxxx AND bx.tag LIKE '250__a' AND bibx.id_bibrec=%s"
 def get_keyevent_renewals_lists(args, return_sql=False, limit=50):
     """
     Lists:
-    - List of most renewed items stored by decreasing order (50 items)
+      - List of most renewed items stored by decreasing order (50 items)
     Filter by
-    - in a specified time span
-    - by UDC (see MARC field 080__a - list to be submitted)
-    - by collection
+      - in a specified time span
+      - by UDC (see MARC field 080__a - list to be submitted)
+      - by collection
 
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
@@ -659,7 +658,7 @@ GROUP BY i.id_bibrec ORDER BY SUM(number_of_renewals) DESC %s" \
 def get_keyevent_returns_table(args, return_sql=False):
     """
     Data:
-    - Number of overdue returns in a timespan
+      - Number of overdue returns in a timespan
 
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
@@ -737,10 +736,10 @@ def get_keyevent_ill_requests_statistics(args, return_sql=False):
         delivery item on a timespan
 
     Filter by
-    - in a specified time span
-    - by type of document (book or article)
-    - by status of the request (= new, sent, etc.)
-    - by supplier
+      - in a specified time span
+      - by type of document (book or article)
+      - by status of the request (= new, sent, etc.)
+      - by supplier
 
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
@@ -823,11 +822,11 @@ AND request_date IS NOT NULL" % (sql_from, sql_where)
 def get_keyevent_ill_requests_lists(args, return_sql=False, limit=50):
     """
     Lists:
-    - List of ILL requests
+      - List of ILL requests
     Filter by
-    - in a specified time span
-    - by type of request (article or book)
-    - by supplier
+      - in a specified time span
+      - by type of request (article or book)
+      - by supplier
 
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
@@ -948,12 +947,12 @@ def get_keyevent_trend_satisfied_ill_requests_percentage(args, return_sql=False)
 def get_keyevent_items_statistics(args, return_sql=False):
     """
     Data:
-    - The total number of items
-    - Total number of new items added in last year
+      - The total number of items
+      - Total number of new items added in last year
     Filter by
-    - in a specified time span
-    - by collection
-    - by UDC (see MARC field 080__a - list to be submitted)
+      - in a specified time span
+      - by collection
+      - by UDC (see MARC field 080__a - list to be submitted)
 
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
@@ -999,10 +998,10 @@ def get_keyevent_items_statistics(args, return_sql=False):
 def get_keyevent_items_lists(args, return_sql=False, limit=50):
     """
     Lists:
-    - The list of items
+      - The list of items
     Filter by
-    - by library (=physical location of the item)
-    - by status (=on loan, available, requested, missing...)
+      - by library (=physical location of the item)
+      - by status (=on loan, available, requested, missing...)
 
     @param args['library']: physical location of the item
     @type args[library'']: str
@@ -1064,12 +1063,12 @@ def get_keyevent_items_lists(args, return_sql=False, limit=50):
 def get_keyevent_loan_request_statistics(args, return_sql=False):
     """
     Data:
-    - Number of hold requests, one week after the date of request creation
-    - Number of successful hold requests transactions
-    - Average time between the hold request date and the date of delivery document  in a year
+      - Number of hold requests, one week after the date of request creation
+      - Number of successful hold requests transactions
+      - Average time between the hold request date and the date of delivery document  in a year
     Filter by
-    - in a specified time span
-    - by item status (available, missing)
+      - in a specified time span
+      - by item status (available, missing)
 
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
@@ -1124,10 +1123,10 @@ DATEDIFF(ws.creation_time, lr.request_date) >= 7" % (sql_from, custom_table, sql
 def get_keyevent_loan_request_lists(args, return_sql=False, limit=50):
     """
     Lists:
-    - List of the most requested items
+      - List of the most requested items
     Filter by
-    - in a specified time span
-    - by UDC (see MARC field 080__a - list to be submitted)
+      - in a specified time span
+      - by UDC (see MARC field 080__a - list to be submitted)
 
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
@@ -1183,10 +1182,10 @@ ORDER BY COUNT(*) DESC %s" % (sql_from, sql_where, limit)
 def get_keyevent_user_statistics(args, return_sql=False):
     """
     Data:
-    - Total number of  active users (to be defined = at least one transaction in the past year)
+      - Total number of  active users (to be defined = at least one transaction in the past year)
     Filter by
-    - in a specified time span
-    - by registration date
+      - in a specified time span
+      - by registration date
 
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
@@ -1219,10 +1218,10 @@ UNION (SELECT id_crcBORROWER user %s %s)) res" % \
 def get_keyevent_user_lists(args, return_sql=False, limit=50):
     """
     Lists:
-    - List of most intensive users (ILL requests + Loan)
+      - List of most intensive users (ILL requests + Loan)
     Filter by
-    - in a specified time span
-    - by registration date
+      - in a specified time span
+      - by registration date
 
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
@@ -1555,8 +1554,6 @@ def get_customevent_args(event_id):
 
 def get_custom_summary_data(query, tag):
     """Returns the annual report data for the specified year
-    @param year: Year of publication on the journal
-    @type year: int
 
     @param query: Search query to make customized report
     @type query: str
@@ -1763,7 +1760,7 @@ def create_graph_trend_gnu_plot(trend, path, settings):
 
     gnup = Gnuplot.Gnuplot()
 
-    gnup('set style data linespoints')
+    gnup('set style data steps')
     if 'size' in settings:
         gnup('set terminal png tiny size %s' % settings['size'])
     else:
@@ -1800,6 +1797,7 @@ def create_graph_trend_gnu_plot(trend, path, settings):
             data = []
             for row in range(rows):
                 data.append([row, trend[row][1][col]])
+            data.append([rows, trend[-1][1][col]])
             plot_items.append(Gnuplot.PlotItems
                                   .Data(data, title=settings["multiple"][col]))
             tmp_max = max([x[col] for x in data])
@@ -1815,6 +1813,7 @@ def create_graph_trend_gnu_plot(trend, path, settings):
         gnup.plot(*plot_items)
     else:
         data = [x[1] for x in trend]
+        data.append(trend[-1][1])
         y_max = max(data)
         y_min = min(data)
         if y_max - y_min < 5 and y_min != 0:
@@ -1843,8 +1842,7 @@ def create_graph_trend_flot(trend, path, settings):
                                  var div1 = sdate.split(' ');
                                  var day = div1[0].split('-');
                                  var hour = div1[1].split(':');
-                                 return new Date(day[0], day[1]-1, day[2], hour[0], hour[1], hour[2]).getTime()
-                                 - (new Date().getTimezoneOffset() * 60 * 1000) ;
+                                 return new Date(day[0], day[1]-1, day[2], hour[0], hour[1], hour[2]).getTime() - (new Date().getTimezoneOffset() * 60 * 1000) ;
                              }
                              function getData%(title)s() {""" % \
         {'site': CFG_SITE_URL, 'width': size[0], 'height': size[1], 'hwidth': int(size[0]) / 2,
@@ -1876,7 +1874,8 @@ def create_graph_trend_flot(trend, path, settings):
                     (title, _to_datetime(trend[row][0], '%Y-%m-%d \
 %H:%M:%S'), trend[row][1][col])
             out += ", [parseDate%s('%s'), %d]];\n" % (title,
-                    _to_datetime(maxx, '%Y-%m-%d %H:%M:%S') + granularity_td, trend[-1][1][col])
+                    _to_datetime(maxx, '%Y-%m-%d %H:%M:%S')+ granularity_td,
+                    trend[-1][1][col])
         out += "return [\n"
         first = 0
         for col in range(cols):
@@ -1914,13 +1913,16 @@ def create_graph_trend_flot(trend, path, settings):
                 tickDecimals : 0
         },"""
     if settings["xtic_format"] != '':
-        tics = 'xaxis: { mode:"time",min:parseDate%s("%s"),max:parseDate%s("%s")},'\
-            % (title, _to_datetime(minx, '%Y-%m-%d %H:%M:%S'), title,
-               _to_datetime(maxx, '%Y-%m-%d %H:%M:%S') + granularity_td)
+        current =  _to_datetime(maxx, '%Y-%m-%d %H:%M:%S')
+        next = current + granularity_td
+        if (granularity_td.seconds + granularity_td.days * 24 * 3600) > 2592000:
+            next = current.replace(day=31)
+        tics += 'xaxis: { mode:"time",min:parseDate%s("%s"),max:parseDate%s("%s")},'\
+            % (title, _to_datetime(minx, '%Y-%m-%d %H:%M:%S'), title, next)
 
     out += """var options%s ={
                 series: {
-                   lines: { show: true },
+                   lines: { steps: true, fill: true},
                    points: { show: false }
                 },
                 legend: {show: false},
@@ -1933,10 +1935,12 @@ def create_graph_trend_flot(trend, path, settings):
 
     out += """var startData%(title)s = getData%(title)s();
         var plot%(title)s = $.plot($("#placeholder%(title)s"), startData%(title)s, options%(title)s);
+
+        // setup overview
         var overview%(title)s = $.plot($("#overview%(title)s"), startData%(title)s, {
-                 legend: { show: true, container: $("#overviewLegend") },
+                 legend: { show: true, container: $("#overviewLegend%(title)s") },
                  series: {
-                    lines: { show: true, lineWidth: 1 },
+                    lines: { steps: true, fill: true, lineWidth: 1},
                     shadowSize: 0
                  },
                  %(tics)s
@@ -1946,8 +1950,9 @@ def create_graph_trend_flot(trend, path, settings):
                """ % {"title": title, "tics": tics}
 
         # Tooltip and zoom
-    out += """    function showTooltip(x, y, contents) {
-        $('<div id="tooltip">' + contents + '</div>').css( {
+    out += """
+    function showTooltip%(title)s(x, y, contents) {
+        $('<div id="tooltip%(title)s">' + contents + '</div>').css( {
             position: 'absolute',
             display: 'none',
             top: y - 5,
@@ -1959,40 +1964,41 @@ def create_graph_trend_flot(trend, path, settings):
         }).appendTo("body").fadeIn(200);
     }
 
-    var previousPoint = null;
+    var previousPoint%(title)s = null;
     $("#placeholder%(title)s").bind("plothover", function (event, pos, item) {
 
         if (item) {
-            if (previousPoint != item.datapoint) {
-                previousPoint = item.datapoint;
+            if (previousPoint%(title)s != item.datapoint) {
+                previousPoint%(title)s = item.datapoint;
 
-                $("#tooltip").remove();
+                $("#tooltip%(title)s").remove();
                 var y = item.datapoint[1];
 
-                showTooltip(item.pageX, item.pageY, y);
+                showTooltip%(title)s(item.pageX, item.pageY, y);
             }
         }
         else {
-            $("#tooltip").remove();
-            previousPoint = null;
+            $("#tooltip%(title)s").remove();
+            previousPoint%(title)s = null;
         }
     });
 
     $("#placeholder%(title)s").bind("plotclick", function (event, pos, item) {
         if (item) {
-            plot.highlight(item.series, item.datapoint);
+            plot%(title)s.highlight(item.series, item.datapoint);
         }
     });
-        $("#placeholder%(title)s").bind("plotselected", function (event, ranges) {
-        // clamp the zooming to prevent eternal zoom
 
+    // now connect the two
+    $("#placeholder%(title)s").bind("plotselected", function (event, ranges) {
+        // clamp the zooming to prevent eternal zoom
         if (ranges.xaxis.to - ranges.xaxis.from < 0.00001){
             ranges.xaxis.to = ranges.xaxis.from + 0.00001;}
         if (ranges.yaxis.to - ranges.yaxis.from < 0.00001){
             ranges.yaxis.to = ranges.yaxis.from + 0.00001;}
 
         // do the zooming
-        plot = $.plot($("#placeholder%(title)s"), startData%(title)s,
+        plot%(title)s = $.plot($("#placeholder%(title)s"), getData%(title)s(ranges.xaxis.from, ranges.xaxis.to),
                       $.extend(true, {}, options%(title)s, {
                           xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
                           yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
@@ -2002,7 +2008,7 @@ def create_graph_trend_flot(trend, path, settings):
         overview%(title)s.setSelection(ranges, true);
     });
     $("#overview%(title)s").bind("plotselected", function (event, ranges) {
-        plot.setSelection(ranges);
+        plot%(title)s.setSelection(ranges);
     });
 });
                 </script>
@@ -2393,8 +2399,8 @@ def _get_datetime_iter(t_start, granularity='day',
                         Possible values are [year,month,day,hour,minute,second].
     @type granularity: str
 
-    @param format: Format of the 't_start' parameter
-    @type format: str
+    @param dt_format: Format of the 't_start' parameter
+    @type dt_format: str
 
     @return: An iterator of points in time
     @type: iterator over datetime elements
