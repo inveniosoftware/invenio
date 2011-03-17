@@ -58,6 +58,7 @@ from invenio.webgroup_dblayer import get_group_infos, insert_new_group, insert_n
 from invenio.webaccessadmin_lib import cleanstring_email
 from invenio.access_control_config import MAXSELECTUSERS
 from invenio.access_control_admin import acc_get_user_email
+from invenio.access_control_engine import acc_get_authorized_emails
 from invenio.webmessage import perform_request_send
 import invenio.webbasket_dblayer as basketdb
 from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, CFG_WEBBASKET_CATEGORIES, CFG_WEBBASKET_SHARE_LEVELS_ORDERED
@@ -361,7 +362,8 @@ def displayDocument(req, doctype,categ,RN,send, ln = CFG_SITE_LANG):
             SendWarning(doctype, categ, RN, title, authors, access)
         else:
             # @todo - send in different languages
-            SendEnglish(doctype,categ,RN,title,authors,access,sysno)
+            #SendEnglish(doctype,categ,RN,title,authors,access,sysno)
+            send_approval(doctype, categ, RN, title, authors, access, sysno) 
             run_sql("update sbmAPPROVAL set dLastReq=NOW() where rn=%s",(RN,))
             confirm_send = 1
 
@@ -1611,6 +1613,38 @@ def SendEnglish(doctype,categ,RN,title,authors,access,sysno):
     # send the mail
     send_email(FROMADDR,addresses,"Request for Approval of %s" % RN, message,footer="")
     return ""
+
+def send_approval(doctype, categ, rn, title, authors, access, sysno):
+    fromaddr = '%s Submission Engine <%s>' % (CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL)
+    if not categ:
+        categ = "nocategory"
+    if not doctype:
+        doctype = "nodoctype"
+    addresses = acc_get_authorized_emails('referee', categ=categ, doctype=doctype)
+    if not addresses:
+        return SendWarning(doctype, categ, rn, title, authors, access)
+    if not authors:
+        authors = "-"
+    message = """
+    The document %s has been published as a Communication.
+    Your approval is requested for it to become an official Note.
+
+    Title: %s
+
+    Author(s): %s
+
+    To access the document(s), select the file(s) from the location:
+    <%s/record/%s/files/>
+
+    As a referee for this document, you may approve or reject it 
+    from the submission interface:
+    <%s/submit?doctype=%s>
+
+    ---------------------------------------------
+    Best regards.
+    The submission team.""" % (rn, title, authors, CFG_SITE_URL, sysno, CFG_SITE_URL, doctype)
+    # send the mail
+    return send_email(fromaddr, ', '.join(addresses), "Request for Approval of %s" % rn, message, footer="")
 
 def SendWarning(doctype,categ,RN,title,authors,access):
     FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
