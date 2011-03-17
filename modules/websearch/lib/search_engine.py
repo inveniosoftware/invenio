@@ -2314,6 +2314,8 @@ def search_unit_in_solr(p, f=None, m=None):
     to the result.  Parameters (p,f,m) are usual search unit ones.
     """
     if m and (m == 'a' or m == 'r'): # phrase/regexp query
+        if p.startswith('%') and p.endswith('%'):
+            p = p[1:-1] # fix for partial phrase
         p = '"' + p + '"'
     return solr_get_bitset(p, CFG_SOLR_URL)
 
