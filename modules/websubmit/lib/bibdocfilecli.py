@@ -261,7 +261,7 @@ def cli_slow_match_single_docid(options, docid, recids=None, docids=None):
     match or not."""
     debug('cli_slow_match_single_docid checking: %s' % docid)
     empty_docs = getattr(options, 'empty_docs', None)
-    docname = getattr(options, 'docname', None)
+    docname = cli2docname(options)
     if recids is None:
         recids = cli_quick_match_all_recids(options)
     bibdoc = BibDoc(docid)
@@ -617,9 +617,9 @@ def cli_set_batch(options):
     """Change in batch the doctype, description, comment and restriction."""
     ffts = {}
     doctype = getattr(options, 'set_doctype', None)
-    description = getattr(options, 'set_description', None)
-    comment = getattr(options, 'set_comment', None)
-    restriction = getattr(options, 'set_restriction', None)
+    description = cli2description(options)
+    comment = cli2comment(options)
+    restriction = cli2restriction(options)
     with_format = getattr(options, 'format', None)
     for docid in cli_docids_iterator(options):
         bibdoc = BibDoc(docid)
