@@ -260,7 +260,7 @@ def acc_firerole_check_user(user_info, firerole_def_obj):
                         return False
                     else:
                         break
-                elif expr.lower() == user_info[field].lower(): # Finally the easiest one!!
+                elif expr.lower() == str(user_info[field]).lower(): # Finally the easiest one!!
                     if not_p: # ...
                         break
                     else: # ...
