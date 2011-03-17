@@ -53,11 +53,13 @@ class CitationDictsDataCacher(DataCacher):
                     alldicts['citationdict_keys'] = object_value_dict.keys()
                     alldicts['citationdict_keys_intbitset'] = intbitset(object_value_dict.keys())
             return alldicts
-
         def timestamp_verifier():
             res = run_sql("""SELECT DATE_FORMAT(last_updated, '%Y-%m-%d %H:%i:%s')
                               FROM rnkMETHOD WHERE name='citation'""")
-            return res[0][0]
+            if res:
+                return res[0][0]
+            else:
+                return '0000-00-00 00:00:00'
 
         DataCacher.__init__(self, cache_filler, timestamp_verifier)
 
