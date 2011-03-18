@@ -1136,7 +1136,7 @@ def make_auth_regex_str(etal,initial_surname_author=None,surname_initial_author=
 
         7. Capture editor notation, of which can take many forms e.g.
         'eds. editors. edited by. etc.'. Authors captured in this way can be treated as
-        'editor groups', and hense processed differently if needed from standard authors
+        'editor groups', and hence processed differently if needed from standard authors
 
         @param etal: (string) The regular expression used to identify 'etal' notation
         @param author: (string) An optional argument, which replaces the default author
@@ -3065,11 +3065,10 @@ def build_formatted_xml_citation(citation_elements,line_marker):
             if cli_opts['inspire']:
                 ## ADD to current datafield
                 xml_line += """
-      <subfield code="%(sf-code-ref-title)s">%(title)s,%(volume)s,%(page)s,%(year)s</subfield>""" \
+      <subfield code="%(sf-code-ref-title)s">%(title)s,%(volume)s,%(page)s</subfield>""" \
               % { 'sf-code-ref-title'   : CFG_REFEXTRACT_SUBFIELD_TITLE,
                   'title'               : encode_for_xml(element['title']),
                   'volume'              : encode_for_xml(element['volume']),
-                  'year'                : encode_for_xml(element['year']),
                   'page'                : encode_for_xml(element['page']),
                 }
             else:
@@ -3096,11 +3095,10 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                                                                          xml_line)
                     if cli_opts['inspire']:
                         xml_line += """
-      <subfield code="%(sf-code-ref-title)s">%(title)s,%(volume)s,%(page)s,%(year)s</subfield>""" \
+      <subfield code="%(sf-code-ref-title)s">%(title)s,%(volume)s,%(page)s</subfield>""" \
                           % { 'sf-code-ref-title'   : CFG_REFEXTRACT_SUBFIELD_TITLE,
                               'title'               : encode_for_xml(IBID['title']),
                               'volume'              : encode_for_xml(IBID['volume']),
-                              'year'                : encode_for_xml(IBID['year']),
                               'page'                : encode_for_xml(IBID['page']),
                             }
                     else:
