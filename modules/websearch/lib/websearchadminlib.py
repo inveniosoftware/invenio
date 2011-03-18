@@ -69,6 +69,7 @@ from invenio.messages import gettext_set_language
 from invenio.access_control_admin import acc_get_action_id
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.errorlib import register_exception
+from invenio.intbitset import intbitset
 
 def getnavtrail(previous = ''):
     """Get the navtrail"""
@@ -76,6 +77,14 @@ def getnavtrail(previous = ''):
     navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (CFG_SITE_URL,)
     navtrail = navtrail + previous
     return navtrail
+
+def fix_collection_scores():
+    """
+    Re-calculate and re-normalize de scores of the collection relationship.
+    """
+    for id_dad in intbitset(run_sql("SELECT id_dad FROM collection_collection")):
+        for index, id_son in enumerate(run_sql("SELECT id_son FROM collection_collection WHERE id_dad=%s ORDER BY score DESC", (id_dad, ))):
+            run_sql("UPDATE collection_collection SET score=%s WHERE id_dad=%s AND id_son=%s", (index * 10 + 10, id_dad, id_son[0]))
 
 def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, callback='yes'):
     """Modify the translations of a collection
@@ -2462,7 +2471,7 @@ def perform_modifyrestricted(colID, ln, rest='', callback='yes', confirm=-1):
 def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
     """Check the configuration of the collections."""
 
-    from invenio.search_engine import collection_restricted_p
+    from invenio.search_engine import collection_restricted_p, restricted_collection_cache
 
     subtitle = """<a name="11"></a>Collection Status&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#6">?</a>]""" % CFG_SITE_URL
     output  = ""
@@ -2477,9 +2486,11 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
     rnk_list = get_def_name('', "rnkMETHOD")
     actions = []
 
+    restricted_collection_cache.recreate_cache_if_needed()
+
     for (id, name, dbquery, nbrecs) in collections:
-        reg_sons = len(get_col_tree(id, 'r'))
-        vir_sons = len(get_col_tree(id, 'v'))
+        reg_sons = col_has_son(id, 'r')
+        vir_sons = col_has_son(id, 'v')
         status = ""
         hosted = ""
 
@@ -2494,14 +2505,12 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
                 i8n += "%s, " % lang
         else:
             i8n = """<b><span class="info">None</span></b>"""
-        if (reg_sons > 1 and dbquery) or dbquery=="":
-            status = """<b><span class="warning">1:Query</span></b>"""
-        elif dbquery is None and reg_sons == 1:
-            status = """<b><span class="warning">2:Query</span></b>"""
-        elif dbquery == "" and reg_sons == 1:
-            status = """<b><span class="warning">3:Query</span></b>"""
+        if reg_sons and dbquery:
+            status = """<b><span class="warning">1:Conflict</span></b>"""
+        elif not dbquery and not reg_sons:
+            status = """<b><span class="warning">2:Empty</span></b>"""
 
-        if (reg_sons > 1 or vir_sons > 1):
+        if (reg_sons or vir_sons):
             subs = """<b><span class="info">Yes</span></b>"""
         else:
             subs = """<b><span class="info">No</span></b>"""
@@ -2509,13 +2518,13 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
         if dbquery is None:
             dbquery = """<b><span class="info">No</span></b>"""
 
-        restricted = collection_restricted_p(name)
+        restricted = collection_restricted_p(name, recreate_cache_if_needed=False)
         if restricted:
             restricted = """<b><span class="warning">Yes</span></b>"""
             if status:
-                status += """<b><span class="warning">,4:Restricted</span></b>"""
+                status += """<b><span class="warning">,3:Restricted</span></b>"""
             else:
-                status += """<b><span class="warning">4:Restricted</span></b>"""
+                status += """<b><span class="warning">3:Restricted</span></b>"""
         else:
             restricted = """<b><span class="info">No</span></b>"""
 
@@ -2667,6 +2676,10 @@ def perform_checkexternalcollections(colID, ln, icl=None, update="", confirm=0, 
         return perform_index(colID, ln, "perform_checkexternalcollections", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
+
+def col_has_son(colID, rtype='r'):
+    """Return True if the collection has at least one son."""
+    return run_sql("SELECT id_son FROM collection_collection WHERE id_dad=%s and type=%s LIMIT 1", (colID, rtype)) != ()
 
 def get_col_tree(colID, rtype=''):
     """Returns a presentation of the tree as a list. TODO: Add loop detection

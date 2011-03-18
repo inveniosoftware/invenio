@@ -707,9 +707,9 @@ the Apache groups mentioned in this column.
 <dd>If no errors was found, <em>OK</em> is displayed for each
 collection.  If an error was found, then an error number and short
 message are shown.  The meaning of the error messages is the
-following: <em>1:Query</em> means that the collection was defined via
-a query but also via subcollections too; <em>2:Query</em> means that
-the collection wasn't defined neither via query nor via
+following: <em>1:Conflict</em> means that the collection was defined
+via a query but also via subcollections too; <em>2:Empty</em> means
+that the collection wasn't defined neither via query nor via
 subcollections.
 
 </dl>

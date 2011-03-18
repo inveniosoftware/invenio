@@ -45,6 +45,7 @@ from invenio.dbquery import run_sql, Error, get_table_update_time
 from invenio.bibrank_record_sorter import get_bibrank_methods
 from invenio.dateutils import convert_datestruct_to_dategui
 from invenio.bibformat import format_record
+from invenio.intbitset import intbitset
 from invenio.websearch_external_collections import \
      external_collection_load_states, \
      dico_collection_external_searches, \
@@ -208,6 +209,7 @@ class Collection:
     def get_ancestors(self):
         "Returns list of ancestors of the current collection."
         ancestors = []
+        ancestors_ids = intbitset()
         id_son = self.id
         while 1:
             query = "SELECT cc.id_dad,c.name FROM collection_collection AS cc, collection AS c "\
@@ -216,11 +218,12 @@ class Collection:
             if res:
                 col_ancestor = get_collection(res[0][1])
                 # looking for loops
-                if col_ancestor in ancestors:
+                if self.id in ancestors_ids:
                     write_message("Loop found in collection %s" % self.name, stream=sys.stderr)
-                    raise OverflowError
+                    raise OverflowError("Loop found in collection %s" % self.name)
                 else:
                     ancestors.append(col_ancestor)
+                    ancestors_ids.add(col_ancestor.id)
                     id_son = res[0][0]
             else:
                 break
@@ -250,6 +253,7 @@ class Collection:
     def get_descendants(self, type='r'):
         "Returns list of all descendants of type 'type' for the current collection."
         descendants = []
+        descendant_ids = intbitset()
         id_dad = self.id
         query = "SELECT cc.id_son,c.name FROM collection_collection AS cc, collection AS c "\
                 "WHERE cc.id_dad=%d AND cc.type='%s' AND c.id=cc.id_son ORDER BY score DESC" % (int(id_dad), type)
@@ -257,12 +261,16 @@ class Collection:
         for row in res:
             col_desc = get_collection(row[1])
             # looking for loops
-            if col_desc in descendants:
+            if self.id in descendant_ids:
                 write_message("Loop found in collection %s" % self.name, stream=sys.stderr)
-                raise OverflowError
+                raise OverflowError("Loop found in collection %s" % self.name)
             else:
                 descendants.append(col_desc)
-                descendants += col_desc.get_descendants()
+                descendant_ids.add(col_desc.id)
+                tmp_descendants = col_desc.get_descendants()
+                for descendant in tmp_descendants:
+                    descendant_ids.add(descendant.id)
+                descendants += tmp_descendants
         return descendants
 
     def write_cache_file(self, filename='', filebody=''):
@@ -447,7 +455,6 @@ class Collection:
                 # apply special filters:
                 if self.name in ['Videos']:
                     # select only videos with movies:
-                    from invenio.intbitset import intbitset
                     recIDs = list(intbitset(recIDs) & \
                                   search_pattern(p='collection:"PUBLVIDEOMOVIE"'))
                 # sort some CERN collections specially:
