@@ -850,43 +850,41 @@ def find_personIDs_by_name_string(namestring, strict=False):
     matching_pids_names_tuple = []
 
     if use_index:
-        matching_pids_names_tuple = run_sql("select personid, data, flag from aidPERSONID use index (`tdf-b`) "
-                                            "where  tag=\'gathered_name\' and personid in "
-                                            "(select distinct personid from aidPERSONID use index (`tdf-b`) "
-                                            "where tag=\'gathered_name\' and data like %s)", (surname,))
+        matching_pids_names_tuple = run_sql("select o.personid, o.data, o.flag from aidPERSONID o use index (`ptf-b`), "
+                                            "(select i.personid as ipid from aidPERSONID i use index (`tdf-b`) where i.tag='gathered_name' and i.data like %s)"
+                                            " as dummy where  o.tag='gathered_name' and o.personid = dummy.ipid",(surname,))
+#        matching_pids_names_tuple = run_sql("select personid, data, flag from aidPERSONID use index (`ptf-b`) "
+#                                            "where  tag=\'gathered_name\' and personid in "
+#                                            "(select distinct personid from aidPERSONID use index (`tdf-b`) "
+#                                            "where tag=\'gathered_name\' and data like %s)", (surname,))
     else:
-        matching_pids_names_tuple = run_sql("select personid, data, flag from aidPERSONID "
-                                            "where  tag=\'gathered_name\' and personid in "
-                                            "(select distinct personid from aidPERSONID "
-                                            "where tag=\'gathered_name\' and data like %s)", (surname,))
+        matching_pids_names_tuple = run_sql("select o.personid, o.data, o.flag from aidPERSONID o, "
+                                            "(select i.personid as ipid from aidPERSONID i where i.tag='gathered_name' and i.data like %s)"
+                                            " as dummy where  o.tag='gathered_name' and o.personid = dummy.ipid",(surname,))
 #    print matching_pids_names_tuple
     if len(matching_pids_names_tuple) == 0 and len(surname) >= 2:
         surname = surname[0:len(surname) - 2] + '%,%'
 
         if use_index:
-            matching_pids_names_tuple = run_sql("select personid, data, flag from aidPERSONID use index (`tdf-b`) "
-                                            "where  tag=\'gathered_name\' and personid in "
-                                            "(select distinct personid from aidPERSONID use index (`tdf-b`) "
-                                            "where tag=\'gathered_name\' and data like %s)", (surname,))
+            matching_pids_names_tuple = run_sql("select o.personid, o.data, o.flag from aidPERSONID o use index (`ptf-b`), "
+                                            "(select i.personid as ipid from aidPERSONID i use index (`tdf-b`) where i.tag='gathered_name' and i.data like %s)"
+                                            " as dummy where  o.tag='gathered_name' and o.personid = dummy.ipid",(surname,))
         else:
-            matching_pids_names_tuple = run_sql("select personid, data, flag from aidPERSONID "
-                                            "where  tag=\'gathered_name\' and personid in "
-                                            "(select distinct personid from aidPERSONID "
-                                            "where tag=\'gathered_name\' and data like %s)", (surname,))
+            matching_pids_names_tuple = run_sql("select o.personid, o.data, o.flag from aidPERSONID o, "
+                                            "(select i.personid as ipid from aidPERSONID i where i.tag='gathered_name' and i.data like %s)"
+                                            " as dummy where  o.tag='gathered_name' and o.personid = dummy.ipid",(surname,))
 
     if len(matching_pids_names_tuple) == 0 and len(surname) >= 2:
         surname = '%' + surname[0:len(surname) - 2] + '%,%'
 
         if use_index:
-            matching_pids_names_tuple = run_sql("select personid, data, flag from aidPERSONID use index (`tdf-b`) "
-                                            "where  tag=\'gathered_name\' and personid in "
-                                            "(select distinct personid from aidPERSONID use index (`tdf-b`) "
-                                            "where tag=\'gathered_name\' and data like %s)", (surname,))
+            matching_pids_names_tuple = run_sql("select o.personid, o.data, o.flag from aidPERSONID o use index (`ptf-b`), "
+                                            "(select i.personid as ipid from aidPERSONID i use index (`tdf-b`) where i.tag='gathered_name' and i.data like %s)"
+                                            " as dummy where  o.tag='gathered_name' and o.personid = dummy.ipid",(surname,))
         else:
-            matching_pids_names_tuple = run_sql("select personid, data, flag from aidPERSONID "
-                                            "where  tag=\'gathered_name\' and personid in "
-                                            "(select distinct personid from aidPERSONID "
-                                            "where tag=\'gathered_name\' and data like %s)", (surname,))
+            matching_pids_names_tuple = run_sql("select o.personid, o.data, o.flag from aidPERSONID o, "
+                                            "(select i.personid as ipid from aidPERSONID i where i.tag='gathered_name' and i.data like %s)"
+                                            " as dummy where  o.tag='gathered_name' and o.personid = dummy.ipid",(surname,))
 
     matching_pids = []
 #    print matching_pids_names_tuple

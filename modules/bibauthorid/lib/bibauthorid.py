@@ -156,7 +156,7 @@ def list_creation_process(mp_queue, job_last_names, mp_termination_queue):
     @type mp_termination_queue: queue
     '''
     job_last_names = sorted(job_last_names, key=lambda k: len(k))
-    for lname in job_last_names:
+    for lname in list(job_last_names):
         if bconfig.TABLES_UTILS_DEBUG:
             print time.strftime('%H:%M:%S') + ' ' + "List_creator: working on " + str(lname.encode('UTF-8'))
 
@@ -177,7 +177,7 @@ def list_creation_process(mp_queue, job_last_names, mp_termination_queue):
         mp_queue.put(jl)
 
         for n in fullnameset:
-            if n.split(",")[0] in job_last_names:
+            if n.split(",")[0] in list(job_last_names):
                 job_last_names.remove(n.split(",")[0])
 
     if bconfig.TABLES_UTILS_DEBUG:
@@ -423,4 +423,5 @@ def _print_run_stats():
                            "=> ~%.2f%% identified"
                            % (docs, ras, orphans, ratio))
     else:
-        bconfig.LOGGER.error("No documents have been processed.")
+        bconfig.LOGGER.log(25, "No documents have been processed for this "
+                           "last name cluster.")

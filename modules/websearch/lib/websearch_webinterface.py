@@ -245,6 +245,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         is_bibauthorid = False
         bibauthorid_template = None
         personid_status_cacher = None
+        userinfo = collect_user_info(req)
 
         try:
             from invenio.bibauthorid_webapi import search_person_ids_by_name
@@ -523,13 +524,21 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         person_link = None
         
 
-        if is_bibauthorid and self.personid >= 0:
+        if (is_bibauthorid
+            and self.personid >= 0
+            and "precached_viewclaimlink" in userinfo
+            and "precached_usepaperattribution" in userinfo
+            and "precached_usepaperclaim" in userinfo
+            and userinfo["precached_viewclaimlink"]
+            and (userinfo["precached_usepaperclaim"]
+                 or userinfo["precached_usepaperattribution"])
+            ):
             person_link = self.personid
             bibauthorid_data["pid"] = self.personid
             cid = get_person_redirect_link(self.personid)
 
             if is_valid_canonical_id(cid):
-                person_link = self.pageparam
+                person_link = cid
                 bibauthorid_data["cid"] = cid
 
         time1 = time.time()
