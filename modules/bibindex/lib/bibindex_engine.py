@@ -239,6 +239,20 @@ def get_words_from_journal_tag(recID, tag):
     # return list of words and pubinfos:
     return lwords
 
+def get_author_canonical_ids_for_recid(recID):
+    """
+    Return list of author canonical IDs (e.g. `J.Ellis.1') for the
+    given record.  Done by consulting BibAuthorID module.
+    """
+    from invenio.bibauthorid_personid_tables_utils import get_persons_from_recids
+    lwords = []
+    dpersons, dpersoninfos = get_persons_from_recids([recID])
+    for aid in dpersoninfos.keys():
+        author_canonical_id = dpersoninfos[aid].get('canonical_id', '')
+        if author_canonical_id:
+            lwords.append(author_canonical_id)
+    return lwords
+
 def get_words_from_date_tag(datestring, stemming_language=None):
     """
     Special procedure to index words from tags storing date-like
@@ -738,8 +752,9 @@ def update_index_last_updated(index_id, starting_time=None):
 class WordTable:
     "A class to hold the words table."
 
-    def __init__(self, index_id, fields_to_index, table_name_pattern, default_get_words_fnc, tag_to_words_fnc_map, wash_index_terms=50, is_fulltext_index=False):
+    def __init__(self, index_name, index_id, fields_to_index, table_name_pattern, default_get_words_fnc, tag_to_words_fnc_map, wash_index_terms=50, is_fulltext_index=False):
         """Creates words table instance.
+        @param index_name: the index name
         @param index_id: the index integer identificator
         @param fields_to_index: a list of fields to index
         @param table_name_pattern: i.e. idxWORD%02dF or idxPHRASE%02dF
@@ -750,6 +765,7 @@ class WordTable:
             how many characters do we keep in the index terms; see
             max_char_length parameter of wash_index_term()
         """
+        self.index_name = index_name
         self.index_id = index_id
         self.tablename = table_name_pattern % index_id
         self.recIDs_in_mem = []
@@ -1037,7 +1053,15 @@ class WordTable:
         """Add records from RECID1 to RECID2."""
         wlist = {}
         self.recIDs_in_mem.append([recID1,recID2])
-        # secondly fetch all needed tags:
+        # special case of author indexes where we also add author
+        # canonical IDs:
+        if self.index_name in ('author', 'firstauthor', 'exactauthor'):
+            for recID in range(recID1, recID2 + 1):
+                if not wlist.has_key(recID):
+                    wlist[recID] = []
+                wlist[recID] = list_union(get_author_canonical_ids_for_recid(recID),
+                                          wlist[recID])
+        # special case of journal index:
         if self.fields_to_index == [CFG_JOURNAL_TAG]:
             # FIXME: quick hack for the journal index; a special
             # treatment where we need to associate more than one
@@ -1466,7 +1490,8 @@ def task_run_core():
                 fnc_get_words_from_phrase = get_author_family_name_words_from_phrase
             else:
                 fnc_get_words_from_phrase = get_words_from_phrase
-            wordTable = WordTable(index_id=index_id,
+            wordTable = WordTable(index_name=index_name,
+                                  index_id=index_id,
                                   fields_to_index=index_tags,
                                   table_name_pattern='idxWORD%02dF',
                                   default_get_words_fnc=fnc_get_words_from_phrase,
@@ -1481,7 +1506,8 @@ def task_run_core():
                 fnc_get_pairs_from_phrase = get_pairs_from_phrase # FIXME
             else:
                 fnc_get_pairs_from_phrase = get_pairs_from_phrase
-            wordTable = WordTable(index_id=index_id,
+            wordTable = WordTable(index_name=index_name,
+                                  index_id=index_id,
                                   fields_to_index=index_tags,
                                   table_name_pattern='idxPAIR%02dF',
                                   default_get_words_fnc=fnc_get_pairs_from_phrase,
@@ -1497,7 +1523,8 @@ def task_run_core():
                 fnc_get_phrases_from_phrase = get_exact_authors_from_phrase
             else:
                 fnc_get_phrases_from_phrase = get_phrases_from_phrase
-            wordTable = WordTable(index_id=index_id,
+            wordTable = WordTable(index_name=index_name,
+                                  index_id=index_id,
                                   fields_to_index=index_tags,
                                   table_name_pattern='idxPHRASE%02dF',
                                   default_get_words_fnc=fnc_get_phrases_from_phrase,
@@ -1524,7 +1551,8 @@ def task_run_core():
             fnc_get_words_from_phrase = get_author_family_name_words_from_phrase
         else:
             fnc_get_words_from_phrase = get_words_from_phrase
-        wordTable = WordTable(index_id=index_id,
+        wordTable = WordTable(index_name=index_name,
+                              index_id=index_id,
                               fields_to_index=index_tags,
                               table_name_pattern=reindex_prefix + 'idxWORD%02dF',
                               default_get_words_fnc=fnc_get_words_from_phrase,
@@ -1593,7 +1621,8 @@ def task_run_core():
             fnc_get_pairs_from_phrase = get_pairs_from_phrase # FIXME
         else:
             fnc_get_pairs_from_phrase = get_pairs_from_phrase
-        wordTable = WordTable(index_id=index_id,
+        wordTable = WordTable(index_name=index_name,
+                              index_id=index_id,
                               fields_to_index=index_tags,
                               table_name_pattern=reindex_prefix + 'idxPAIR%02dF',
                               default_get_words_fnc=fnc_get_pairs_from_phrase,
@@ -1661,7 +1690,8 @@ def task_run_core():
             fnc_get_phrases_from_phrase = get_exact_authors_from_phrase
         else:
             fnc_get_phrases_from_phrase = get_phrases_from_phrase
-        wordTable = WordTable(index_id=index_id,
+        wordTable = WordTable(index_name=index_name,
+                              index_id=index_id,
                               fields_to_index=index_tags,
                               table_name_pattern=reindex_prefix + 'idxPHRASE%02dF',
                               default_get_words_fnc=fnc_get_phrases_from_phrase,

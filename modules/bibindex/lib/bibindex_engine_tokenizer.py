@@ -29,11 +29,19 @@ re_pattern_fuzzy_author_dots = re.compile(r'[\.\-]+')
 re_pattern_fuzzy_author_spaces = re.compile(r'\s+')
 re_pattern_fuzzy_author_trigger = re.compile(r'[\s\,\.]')
 
+# FIXME: re_pattern_fuzzy_author_trigger could be removed and an
+# BibAuthorID API function could be called instead after we
+# double-check that there are no circular imports.
+re_pattern_author_canonical_id = re.compile(r'\.[0-9]+$')
+
 def wash_author_name(p):
     """
     Wash author name suitable for author searching.  Notably, replace
     dots and hyphens with spaces, and collapse spaces.
     """
+    if re_pattern_author_canonical_id.search(p):
+        # we have canonical author ID form, so ignore all washing
+        return p
     out = re_pattern_fuzzy_author_dots.sub(" ", p)
     return re_pattern_fuzzy_author_spaces.sub(" ", out)
 
