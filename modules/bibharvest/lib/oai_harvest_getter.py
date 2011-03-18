@@ -45,6 +45,8 @@ except ImportError, e:
     print "Error: %s" % e
     sys.exit(1)
 
+class InvenioOAIRequestError(Exception):
+    pass
 
 http_response_status_code = {
 
@@ -97,12 +99,13 @@ def OAI_Session(server, script, http_param_dict , method="POST", output="",
     i = resume_request_nbr
     while True:
         harvested_data = OAI_Request(server, script,
-                    http_request_parameters(http_param_dict, method), method,
-                    secure, user, password, cert_file, key_file)
+                                     http_request_parameters(http_param_dict, method), method,
+                                     secure, user, password, cert_file, key_file)
         if output:
             # Write results to a file specified by 'output'
             if harvested_data.lower().find('<'+http_param_dict['verb'].lower()) > -1:
-                output_fd, output_filename = tempfile.mkstemp(suffix="_%07d.harvested" % (i,), prefix=output_name, dir=output_path)
+                output_fd, output_filename = tempfile.mkstemp(suffix="_%07d.harvested" % (i,), \
+                                                              prefix=output_name, dir=output_path)
                 os.write(output_fd, harvested_data)
                 os.close(output_fd)
                 harvested_files.append(output_filename)
@@ -204,7 +207,7 @@ http_param_dict - *dict* the URL parameters to send to the OAI script
 
 def OAI_Request(server, script, params, method="POST", secure=False,
                 user=None, password=None,
-                key_file=None, cert_file=None):
+                key_file=None, cert_file=None, attempts=10):
     """Handle OAI request. Returns harvested data.
 
     Parameters:
@@ -238,6 +241,8 @@ def OAI_Request(server, script, params, method="POST", secure=False,
                  key in case the server to harvest requires
                  certificate-based authentication
                  (If provided, 'key_file' must also be provided)
+
+      attempts - *int* maximum number of attempts
     Return:
 
     Returns harvested data if harvest is successful.
@@ -253,45 +258,38 @@ def OAI_Request(server, script, params, method="POST", secure=False,
         headers["Authorization"] = "Basic " + base64.encodestring(user + ":" + password).strip()
 
     i = 0
-    while i < 10:
+    while i < attempts:
         i = i + 1
-        if secure and not (key_file and cert_file):
-            # Basic authentication over HTTPS
-            try:
+        # Try to establish a connection
+        try:
+            if secure and not (key_file and cert_file):
+                # Basic authentication over HTTPS
                 conn = httplib.HTTPSConnection(server)
-            except httplib.HTTPException, e:
-                sys.stderr.write("An error occured when trying to connect to %s: %s" % (server, e))
-                sys.exit(0)
-        elif secure and key_file and cert_file:
-            # Certificate-based authentication
-            try:
+            elif secure and key_file and cert_file:
+                # Certificate-based authentication
                 conn = httplib.HTTPSConnection(server,
                                                key_file=key_file,
                                                cert_file=cert_file)
-            except httplib.HTTPException, e:
-                sys.stderr.write("An error occured when trying to connect to %s: %s" % (server, e))
-                sys.exit(0)
-        else:
-            # Unsecured connection
-            try:
+            else:
+                # Unsecured connection
                 conn = httplib.HTTPConnection(server)
-            except httplib.HTTPException, e:
-                sys.stderr.write("An error occured when trying to connect to %s: %s\n" % (server, e))
-                sys.exit(0)
+        except (httplib.HTTPException, socket.error), e:
+            raise InvenioOAIRequestError("An error occured when trying to connect to %s: %s" % (server, e))
 
+        # Connection established, perform a request
         try:
             if method == "GET":
                 conn.request("GET", script + "?" + params, headers=headers)
             elif method == "POST":
                 conn.request("POST", script, params, headers)
         except socket.gaierror, (err, str_e):
-            sys.stderr.write("An error occured when trying to connect to %s: %s\n" % (server, str_e))
-            sys.exit(0)
+            raise InvenioOAIRequestError("An error occured when trying to request %s: %s\n" % (server, str_e))
+
+        # Request sent, get results
         try:
             response = conn.getresponse()
-        except httplib.HTTPException, e:
-            sys.stderr.write("An error occured when trying to read response from %s: %s\n" % (server, e))
-            sys.exit(0)
+        except (httplib.HTTPException, socket.error), e:
+            raise InvenioOAIRequestError("An error occured when trying to read response from %s: %s\n" % (server, e))
 
         status = "%d" % response.status
 
@@ -306,7 +304,6 @@ def OAI_Request(server, script, params, method="POST", secure=False,
                 response.reason, params))
 
         if response.status == 200:
-            i = 10
             data = response.read()
             conn.close()
             return data
@@ -347,8 +344,5 @@ def OAI_Request(server, script, params, method="POST", secure=False,
             sys.stderr.write("Retry in 10 seconds...\n")
             time.sleep(10)
 
-
-    sys.stderr.write("Harvesting interrupted (after 10 attempts) at %s: %s\n"
+    raise InvenioOAIRequestError("Harvesting interrupted (after 10 attempts) at %s: %s\n"
         % (time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()), params))
-
-    sys.exit(1)

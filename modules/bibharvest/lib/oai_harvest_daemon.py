@@ -141,8 +141,8 @@ def task_run_core():
                               (reponame, str(datelist[0]), str(datelist[1])))
                 harvested_files_list = file_list
             else:
-                write_message("an error occurred while harvesting from source %s for the dates chosen" % \
-                              (reponame,))
+                write_message("an error occurred while harvesting from source %s for the dates chosen:\n%s\n" % \
+                              (reponame, file_list))
                 error_happened_p = True
                 continue
 
@@ -161,7 +161,7 @@ def task_run_core():
                 update_lastrun(repos[0][0])
                 harvested_files_list = file_list
             else :
-                write_message("an error occurred while harvesting from source %s" % (reponame,))
+                write_message("an error occurred while harvesting from source %s:\n%s\n" % (reponame, file_list))
                 error_happened_p = True
                 continue
 
@@ -192,7 +192,7 @@ def task_run_core():
                     update_lastrun(repos[0][0])
                     harvested_files_list = file_list
                 else :
-                    write_message("an error occurred while harvesting from source %s" % (reponame,))
+                    write_message("an error occurred while harvesting from source %s:\n%s\n" % (reponame, file_list))
                     error_happened_p = True
                     continue
             else:
@@ -576,8 +576,7 @@ def oai_harvest_get(prefix, baseurl, harvestpath,
                                    sets, secure, user, password, cert_file, key_file)
         remove_duplicates(harvested_files)
         return (1, harvested_files)
-    except StandardError, e:
-        print e
+    except (StandardError, oai_harvest_getter.InvenioOAIRequestError), e:
         return (0, e)
 
 def call_bibconvert(config, harvestpath, convertpath):
