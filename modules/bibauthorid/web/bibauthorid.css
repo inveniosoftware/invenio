@@ -166,16 +166,17 @@
 }
 
 #aid_person_names {
-    margin: 30px 10px;
+    margin: 35px 10px;
 }
 
 #aid_person_names ul {
+    margin: 0px;
     list-style: none outside none;
 }
 
 #aid_person_names li {
     height: 100%;
-    margin-right: 10px;
+    margin: 0px;
     text-decoration: none;
 }
 
@@ -213,6 +214,28 @@
     margin-right: 4px;
 }
 
+.aid_reclist_selector {
+    text-align:left;
+    padding-top: 10px;
+}
+
+#aid_status_details a.aid_grey {
+    color: #ccc;
+}
+
+.aid_reclist_buttons {
+    padding-top: 10px;
+    vertical-align:middle;
+}
+
+.aid_review_rows {
+    margin-left: 20px;
+}
+
+.aid_error_line {
+    color:red;
+}
+
 /* Hack for some UI Themes since not always are these 2 classes included */
 .css_right {
 	float: right;
@@ -222,6 +245,26 @@
 	float: left;
 }
 
+.aid_btn_blue {
+      background: white url('../img/aid_btn_blue.png') repeat-x top;
+      border: 1px solid #0000FF;
+      height: 25px;
+      color: #ffffff;
+}
+
+.aid_btn_red {
+      background: white url('../img/aid_btn_red.png') repeat-x top;
+      border: 1px solid #FF0000;
+      height: 25px;
+      color: #ffffff;
+}
+
+.aid_btn_green {
+      background: white url('../img/aid_btn_green.png') repeat-x top;
+      border: 1px solid #018701;
+      height: 25px;
+      color: #ffffff;
+}
 /* Hack for the dataTables jQuery UI wrapper classes */
 .dataTables_wrapper {
     clear: both;

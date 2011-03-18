@@ -88,6 +88,7 @@ def get_information_from_dataset(va_id, ra_id= -1):
     '''
     va_data = get_virtualauthor_records(va_id)
     bibrec_id = ""
+    authorname_id = -1
 
     for va_data_item in va_data:
         if va_data_item['tag'] == "bibrec_id":

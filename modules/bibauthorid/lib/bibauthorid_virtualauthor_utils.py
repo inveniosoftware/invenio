@@ -36,7 +36,8 @@ def add_minimum_virtualauthor(orig_authornames_id,
                                        orig_name_string,
                                        bibrec_id,
                                        author_index,
-                                       authorname_p_list):
+                                       authorname_p_list,
+                                       refrec=""):
     '''
     Adds a complete virtual author to the virtual authors table.
 
@@ -51,12 +52,20 @@ def add_minimum_virtualauthor(orig_authornames_id,
     @param authorname_p_list: list of authornamesID with confidence index
         associated [[id1,p], [id2,p], .., [idn,p]]
     @type authorname_p_list: list of lists
+    @param refrec: The bibref-bibrec pair of this author on a paper in format
+        "100:14424,12441"
+    @type refrec: string
     '''
     current_va = create_new_virtualauthor(orig_authornames_id,
                                          orig_name_string)
 
     add_virtualauthor_record(current_va, 'bibrec_id', bibrec_id)
     add_virtualauthor_record(current_va, 'author_index', author_index)
+
+    if refrec:
+        pair = "%s,%s" % (refrec, bibrec_id)
+        add_virtualauthor_record(current_va, 'bibrefrecpair', pair)
+
     dat.update_log("new_vas", current_va)
     update_virtualauthor_cluster(current_va)
 
@@ -218,9 +227,9 @@ def delete_virtualauthor_record(va_id, tag):
     @param tag: tag of the record to be deleted
     @type tag: string
     '''
-    for tagupdate in [row for row in dat.VIRTUALAUTHOR_DATA
+    for tagupdate in list([row for row in dat.VIRTUALAUTHOR_DATA
                       if ((row['virtualauthorid'] == va_id)
-                          and (row['tag'] == tag))]:
+                          and (row['tag'] == tag))]):
         dat.VIRTUALAUTHOR_DATA.remove(tagupdate)
 
     dat.update_log("touched_vas", va_id)
@@ -531,8 +540,6 @@ def init_va_process_queue(mode="updated"):
                              and (row['value'] == 'False'))]:
             va_nosort[va_entry] = 0
 
-    skip_record = []
-    ## Idea for pre-sorting...
     for va_id in va_nosort:
         va_data = get_virtualauthor_records(va_id)
         authorname_string = ""
@@ -544,12 +551,6 @@ def init_va_process_queue(mode="updated"):
             elif va_data_item['tag'] == "orig_name_string":
                 authorname_string = va_data_item['value']
 
-        hepnames = get_field_values_on_condition(bibrec_id, "980", "a")
-
-        if len(hepnames) > 0:
-            if list(hepnames)[0] == "HEPNAMES":
-                skip_record.append(va_id)
-#            print "Adding %s to skip list (reason: Hepnames)" % va_id
         else:
             affiliations = get_field_values_on_condition(bibrec_id,
                             ['100', '700'], 'u', 'a', authorname_string)
@@ -567,8 +568,7 @@ def init_va_process_queue(mode="updated"):
                 va_nosort[va_id] += 1
 
     for va_entry in sorted(va_nosort.items(), key=itemgetter(1), reverse=True):
-        if va_entry[0] not in skip_record:
-            dat.VIRTUALAUTHOR_PROCESS_QUEUE.put(va_entry[0])
+        dat.VIRTUALAUTHOR_PROCESS_QUEUE.put(va_entry[0])
 
     bconfig.LOGGER.log(25, "Done with queue initialization.")
 
@@ -678,8 +678,8 @@ def delete_virtual_author(va_id):
     for tag in tags:
         delete_virtualauthor_record(va_id, tag)
 
-    for deletion_candidate in [row for row in dat.VIRTUALAUTHORS
-                               if row['virtualauthorid'] == va_id]:
+    for deletion_candidate in list([row for row in dat.VIRTUALAUTHORS
+                               if row['virtualauthorid'] == va_id]):
         dat.VIRTUALAUTHORS.remove(deletion_candidate)
 
     dat.update_log("deleted_vas", va_id)

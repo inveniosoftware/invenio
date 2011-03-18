@@ -131,8 +131,12 @@ DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights', 'deny any'),
              ('messageusers', 'Users who can use messages', 'allow any'),
              ('holdingsusers', 'Users who can view holdings', 'allow any'),
              ('statisticsusers', 'Users who can view statistics', 'allow any'),
-             ('claimpaperusers', 'Users who can use Claim This Paper', 'allow any'),
-             ('claimpaperoperators', 'Users (librarians) who can operate Claim This Paper facility and resolve conflicts', 'deny any'))
+             ('claimpaperusers', 'Users who can perform changes to their own paper attributions without the need for an operator\'s approval', 'allow any'),
+             ('claimpaperoperators', 'Users who can perform changes to _all_ paper attributions without the need for an operator\'s approval', 'deny any'),
+             ('paperclaimviewers', 'Users who can view "claim my paper" facilities.', 'allow all'),
+             ('paperattributionviewers', 'Users who can view "attribute this paper" facilities', 'allow all'),
+             ('paperattributionlinkviewers', 'Users who can see attribution links in the search', 'allow all'),
+             )
 
 # Demo site roles
 DEF_DEMO_ROLES = (('photocurator', 'Photo collection curator', 'deny any'),
@@ -143,6 +147,7 @@ DEF_DEMO_ROLES = (('photocurator', 'Photo collection curator', 'deny any'),
                   ('restrictedpicturesviewer', 'Restricted pictures viewer', 'deny any'),
                   ('curator', 'Curator', 'deny any'),
                   ('basketusers', 'Users who can use baskets', 'deny email "hyde@cds.cern.ch"\nallow any'),
+                  ('claimpaperusers', 'Users who can perform changes to their own paper attributions without the need for an operator\'s approval', 'deny email "hyde@cds.cern.ch"\nallow any'),
                   ('submit_DEMOJRN_*', 'Users who can submit (and modify) "Atlantis Times" articles', 'deny all'),
                   ('atlantiseditor', 'Users who can configure "Atlantis Times" journal', 'deny all'),
                   ('commentmoderator', 'Users who can moderate comments', 'deny all'),
@@ -150,6 +155,7 @@ DEF_DEMO_ROLES = (('photocurator', 'Photo collection curator', 'deny any'),
 
 DEF_DEMO_USER_ROLES = (('jekyll@cds.cern.ch', 'thesesviewer'),
                        ('jekyll@cds.cern.ch', 'swordcurator'),
+                       ('jekyll@cds.cern.ch', 'claimpaperusers'),
                        ('dorian.gray@cds.cern.ch', 'referee_DEMOBOO_*'),
                        ('balthasar.montague@cds.cern.ch', 'curator'),
                        ('romeo.montague@cds.cern.ch', 'restrictedpicturesviewer'),
@@ -244,7 +250,7 @@ DEF_AUTHS = (('basketusers', 'usebaskets', {}),
              ('claimpaperoperators', 'claimpaper_claim_others_papers', {}),
              ('claimpaperusers', 'claimpaper_change_own_data', {}),
              ('claimpaperoperators', 'claimpaper_change_own_data', {}),
-             ('claimpaperoperators', 'claimpaper_change_others_data', {})
+             ('claimpaperoperators', 'claimpaper_change_others_data', {}),
              )
 
 # Demo site authorizations

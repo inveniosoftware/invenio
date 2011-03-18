@@ -213,6 +213,12 @@ def compare_va_to_ra(va_id, ra_id):
                             vyear = str_to_int(vdate[0])
                             vmonth = str_to_int(vdate[1])
 
+                            if rmonth == 0:
+                                rmonth = 10
+
+                            if vmonth == 0:
+                                vmonth = 10
+
                             time_delta = (date(ryear, rmonth, 1) -
                                           date(vyear, vmonth, 1))
                             date_delta = abs(time_delta.days / 30)

@@ -65,7 +65,9 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
      CFG_CERN_SITE, \
-     CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL
+     CFG_INSPIRE_SITE, \
+     CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL, \
+     CFG_BIBAUTHORID_ENABLED
 try:
     from invenio.session import get_session
 except ImportError:
@@ -1083,7 +1085,9 @@ def collect_user_info(req, login_time=False, refresh=False):
         'precached_useapprove' : False,
         'precached_useadmin' : False,
         'precached_usestats' : False,
-        'precached_useclaimpaper' : False,
+        'precached_viewclaimlink' : False,
+        'precached_usepaperclaim' : False,
+        'precached_usepaperattribution' : False,
     }
 
     try:
@@ -1127,6 +1131,23 @@ def collect_user_info(req, login_time=False, refresh=False):
         user_info['email'] = get_email(uid) or ''
         user_info['group'] = []
         user_info['guest'] = str(isGuestUser(uid))
+
+        if user_info['guest'] == '1' and CFG_INSPIRE_SITE:
+            usepaperattribution = False
+            viewclaimlink = False
+
+            if (CFG_BIBAUTHORID_ENABLED
+                and acc_is_user_in_role(user_info, acc_get_role_id("paperattributionviewers"))):
+                usepaperattribution = True
+
+            if (CFG_BIBAUTHORID_ENABLED
+                and usepaperattribution
+                and acc_is_user_in_role(user_info, acc_get_role_id("paperattributionlinkviewers"))):
+                viewclaimlink = True
+
+            user_info['precached_viewclaimlink'] = viewclaimlink
+            user_info['precached_usepaperattribution'] = usepaperattribution
+
         if user_info['guest'] == '0':
             user_info['group'] = [group[1] for group in get_groups(uid)]
             prefs = get_user_preferences(uid)
@@ -1183,12 +1204,26 @@ def collect_user_info(req, login_time=False, refresh=False):
                 user_info['precached_viewsubmissions'] = isUserSubmitter(user_info)
                 user_info['precached_useapprove'] = isUserReferee(user_info)
                 user_info['precached_useadmin'] = isUserAdmin(user_info)
+                usepaperclaim = False
+                usepaperattribution = False
+                viewclaimlink = False
 
-                auth_claim = False
-                if (acc_authorize_action(user_info, 'claimpaper_claim_own_papers')[0] == 0
-                    or acc_authorize_action(user_info, 'claimpaper_claim_others_papers')[0] == 0):
-                    auth_claim = True
-                user_info['precached_useclaimpaper'] = auth_claim
+                if (CFG_BIBAUTHORID_ENABLED
+                    and acc_is_user_in_role(user_info, acc_get_role_id("paperclaimviewers"))):
+                    usepaperclaim = True
+
+                if (CFG_BIBAUTHORID_ENABLED
+                    and acc_is_user_in_role(user_info, acc_get_role_id("paperattributionviewers"))):
+                    usepaperattribution = True
+
+                if (CFG_BIBAUTHORID_ENABLED
+                    and ((usepaperclaim or usepaperattribution)
+                         and acc_is_user_in_role(user_info, acc_get_role_id("paperattributionlinkviewers")))):
+                    viewclaimlink = True
+
+                user_info['precached_viewclaimlink'] = viewclaimlink
+                user_info['precached_usepaperclaim'] = usepaperclaim
+                user_info['precached_usepaperattribution'] = usepaperattribution
 
     except Exception, e:
         register_exception()

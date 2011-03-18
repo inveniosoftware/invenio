@@ -250,7 +250,7 @@ def get_name_bibrefs(authorname_id):
     return bibref_string
 
 
-def update_doclist(bibrec_id, authorname_id=""):
+def update_doclist(bibrec_id, authorname_id="", bibref=""):
     """
     Update doclist table given bibrec_id and processed author. (inserts a new
     document in the doclist table)
@@ -269,23 +269,88 @@ def update_doclist(bibrec_id, authorname_id=""):
 #                procedure necessary. Descision might be harder.
 #                Performance tests might help.
         for record in records:
+            refrec = (authorname_id, bibref)
+
             if ((authorname_id) and
-                (authorname_id not in record['authornameids'])):
+                (authorname_id not in record['authornameids']) and
+                (refrec not in record['authornameid_bibrefrec'])):
                 record['authornameids'] += [authorname_id]
+                record['authornameid_bibrefrec'] += [refrec]
+            elif ((authorname_id) and
+                (authorname_id in record['authornameids']) and
+                (refrec not in record['authornameid_bibrefrec'])):
+                record['authornameid_bibrefrec'] += [refrec]
             else:
-                bconfig.LOGGER.warn("Bibrec has already been processed. That's"
-                                  + " OK. Skipping record.")
+                bconfig.LOGGER.warn("The author has already been processed on."
+                                    " the record. That's OK. Skipping entry.")
                 return False
     else:
         if authorname_id:
+            refrec = (authorname_id, bibref)
             dat.DOC_LIST.append({'bibrecid': bibrec_id,
-                                 'authornameids': [authorname_id]})
+                                 'authornameids': [authorname_id],
+                                 'authornameid_bibrefrec': [refrec]})
         else:
             dat.DOC_LIST.append({'bibrecid': bibrec_id,
-                                 'authornameids': []})
+                                 'authornameids': [],
+                                 'authornameid_bibrefrec': []})
 
     return True
 
+def soft_compare_names(origin_name, target_name):
+    '''
+    Soft comparison of names, to use in search engine an similar
+    Base results:
+    If surname is equal in [0.6,1.0]
+    If surname similar in [0.4,0.8]
+    If surname differs in [0.0,0.4]
+    all depending on average compatibility of names and initials.
+    '''
+    jaro_fctn = None
+
+    try:
+        from Levenshtein import jaro_winkler
+        jaro_fctn = jaro_winkler
+    except ImportError:
+        jaro_fctn = jaro_winkler_str_similarity
+    score = 0.0
+    oname = deepcopy(origin_name)
+    tname = deepcopy(target_name)
+    orig_name = split_name_parts(oname.lower())
+    targ_name = split_name_parts(tname.lower())
+    orig_name[0] = clean_name_string(orig_name[0],
+                                     replacement="",
+                                     keep_whitespace=False)
+    targ_name[0] = clean_name_string(targ_name[0],
+                                     replacement="",
+                                     keep_whitespace=False)
+    if orig_name[0] == targ_name[0]:
+        score += 0.6
+    else:
+        if ((jaro_fctn(orig_name[0].lower(), targ_name[0].lower()) < .95)
+            or min(len(orig_name[0]), len(targ_name[0])) <= 4):
+            score += 0.0
+        else:
+            score += 0.4
+
+    if orig_name[1] and targ_name[1]:
+        max_initials = max(len(orig_name[1]), len(targ_name[1]))
+        matching_i = 0
+        if len(orig_name[1]) >= 1 and len(targ_name[1]) >= 1:
+            for i in orig_name[1]:
+                if i in targ_name[1]:
+                    matching_i += 1
+        max_names = max(len(orig_name[2]), len(targ_name[2]))
+        matching_n = 0
+        if len(orig_name[2]) >= 1 and len(targ_name[2]) >= 1:
+            cleaned_targ_name = [clean_name_string(i, replacement="", keep_whitespace=False) for i in targ_name[2]]
+            for i in orig_name[2]:
+                if clean_name_string(i, replacement="", keep_whitespace=False) in cleaned_targ_name:
+                    matching_n += 1
+
+        name_score = (matching_i + matching_n) * 0.4 / (max_names + max_initials)
+        score += name_score
+    return score
 
 def compare_names(origin_name, target_name):
     """

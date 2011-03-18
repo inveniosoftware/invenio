@@ -3832,7 +3832,9 @@ CREATE TABLE IF NOT EXISTS `aidPERSONID` (
   INDEX `personid-b` (`personid`),
   INDEX `tag-b` (`tag`),
   INDEX `data-b` (`data`),
-  INDEX `flag-b` (`flag`)
+  INDEX `flag-b` (`flag`),
+  INDEX `tdf-b` (`tag`,`data`,`flag`),
+  INDEX `ptf-b` (`personid`,`tag`,`flag`)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS `aidUSERINPUTLOG` (

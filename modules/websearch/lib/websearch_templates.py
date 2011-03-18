@@ -3363,12 +3363,10 @@ class Template:
                                         {'class': "moreinfo"})
             else:
                 out += "<!--not showing citations links-->"
-
         if display_claim_link: #Maybe we want not to show the link to who cannot use id?
             out += '<span class="moreinfo"> - %s</span>' % \
-                create_html_link(CFG_SITE_URL + '/person/batchprocess', {'mfind_bibref':'claim',
-                                                                         'selected_bibrecs':str(recID),
-                                                                        }, 'Claim this paper',
+                create_html_link(CFG_SITE_URL + '/person/action', {'claim':'True','selection':str(recID)}, 
+                                                                        'Attribute this paper',
                                                                         {'class': "moreinfo"})
 
         if CFG_WEBCOMMENT_ALLOW_COMMENTS and CFG_WEBSEARCH_SHOW_COMMENT_COUNT:
@@ -3891,7 +3889,7 @@ class Template:
         return out
 
     def tmpl_author_information(self, req, pubs, authorname, num_downloads, aff_pubdict,
-                                citedbylist, kwtuples, authors, vtuples, names_dict, admin_link, is_bibauthorid, ln):
+                                citedbylist, kwtuples, authors, vtuples, names_dict, person_link, bibauthorid_data, ln):
         """Prints stuff about the author given as authorname.
            1. Author name + his/her institutes. Each institute I has a link
               to papers where the auhtor has I as institute.
@@ -3935,27 +3933,61 @@ class Template:
         names_box = self.tmpl_print_searchresultbox(header, "<br />\n".join(content))
         # construct an extended search as an interim solution for author id
         # searches. Will build "(exactauthor:v1 OR exactauthor:v2)" strings
+#        extended_author_search_str = ""
+
+#        if bibauthorid_data["is_baid"]:
+#            if len(names_dict.keys()) > 1:
+#                extended_author_search_str = '('
+#
+#            for name_index, name_query in enumerate(names_dict.keys()):
+#                if name_index > 0:
+#                    extended_author_search_str += " OR "
+#
+#                extended_author_search_str += 'exactauthor:"' + name_query + '"'
+#
+#            if len(names_dict.keys()) > 1:
+#                extended_author_search_str += ')'
+#     rec_query = 'exactauthor:"' + authorname + '"'
+#
+#        if bibauthorid_data["is_baid"] and extended_author_search_str:
+#            rec_query = extended_author_search_str
+
+
+        baid_query = ""
         extended_author_search_str = ""
 
-        if is_bibauthorid:
-            if len(names_dict.keys()) > 1:
-                extended_author_search_str = '('
+        if 'is_baid' in bibauthorid_data and bibauthorid_data['is_baid']:
+            if bibauthorid_data["cid"]:
+                baid_query = 'author:%s' % bibauthorid_data["cid"]
+            elif bibauthorid_data["pid"] > -1:
+                baid_query = 'author:%s' % bibauthorid_data["pid"]
+            ## todo: figure out if the author index is filled with pids/cids.
+            ## if not: fall back to exactauthor search.
+            # if not index:
+            #    baid_query = ""
 
-            for name_index, name_query in enumerate(names_dict.keys()):
-                if name_index > 0:
-                    extended_author_search_str += " OR "
+        if not baid_query:
+            baid_query = 'exactauthor:"' + authorname + '"'
 
-                extended_author_search_str += 'exactauthor:"' + name_query + '"'
+            if bibauthorid_data['is_baid']:
+                if len(names_dict.keys()) > 1:
+                    extended_author_search_str = '('
 
-            if len(names_dict.keys()) > 1:
-                extended_author_search_str += ')'
+                for name_index, name_query in enumerate(names_dict.keys()):
+                    if name_index > 0:
+                        extended_author_search_str += " OR "
 
+                    extended_author_search_str += 'exactauthor:"' + name_query + '"'
+
+                if len(names_dict.keys()) > 1:
+                    extended_author_search_str += ')'
+
+            if bibauthorid_data['is_baid'] and extended_author_search_str:
+                baid_query = extended_author_search_str
+
+        baid_query = baid_query + " "
         # construct papers box
-        rec_query = 'exactauthor:"' + authorname + '"'
-
-        if is_bibauthorid and extended_author_search_str:
-            rec_query = extended_author_search_str
-
+        rec_query = baid_query
         searchstr = create_html_link(self.build_search_url(p=rec_query),
                                      {}, "All papers (" + str(len(pubs)) + ")",)
         line1 = "<strong>" + _("Papers") + "</strong>"
@@ -3987,11 +4019,7 @@ class Template:
         colls = collsd.keys()
         colls.sort(lambda x, y: cmp(len(collsd[y]), len(collsd[x]))) # sort by number of papers
         for coll in colls:
-            rec_query = 'exactauthor:"' + authorname + '" ' + 'collection:' + coll
-
-            if is_bibauthorid and extended_author_search_str:
-                rec_query = extended_author_search_str + ' collection:' + coll
-
+            rec_query = baid_query + 'collection:' + coll
             line2 += "<br />" + create_html_link(self.build_search_url(p=rec_query),
                                                                        {}, coll + " (" + str(len(collsd[coll])) + ")",)
 
@@ -4028,11 +4056,7 @@ class Template:
             for (kw, freq) in kwtuples:
                 if keywstr:
                     keywstr += '<br>'
-                rec_query = 'exactauthor:"' + authorname + '" ' + 'keyword:"' + kw + '"'
-
-                if is_bibauthorid and extended_author_search_str:
-                    rec_query = extended_author_search_str + ' keyword:"' + kw + '"'
-
+                rec_query = baid_query + 'keyword:"' + kw + '"'
                 searchstr = create_html_link(self.build_search_url(p=rec_query),
                                                                    {}, kw + " (" + str(freq) + ")",)
                 keywstr = keywstr + " " + searchstr
@@ -4048,14 +4072,11 @@ class Template:
 
         header = "<strong>" + _("Frequent co-authors") + "</strong>"
         content = []
-        sorted_coauthors = sorted(sorted(authors.iteritems(), key=itemgetter(0)), key=itemgetter(1), reverse=True)
+        sorted_coauthors = sorted(sorted(authors.iteritems(), key=itemgetter(0)), 
+                                  key=itemgetter(1), reverse=True)
 
         for name, frequency in sorted_coauthors:
-            rec_query = 'exactauthor:"' + authorname + '" ' + 'exactauthor:"' + name + '"'
-
-            if is_bibauthorid and extended_author_search_str:
-                rec_query = extended_author_search_str + ' exactauthor:"' + name + '"'
-
+            rec_query = baid_query + 'exactauthor:"' + name + '"'
             lnk = create_html_link(self.build_search_url(p=rec_query), {}, "%s (%s)" % (name, frequency),)
             content.append("%s" % lnk)
 
@@ -4066,10 +4087,10 @@ class Template:
 
         req.write("<h1>%s</h1>" % authorname)
 
-        if admin_link:
-            req.write('<div><a href="%s/person/%s">%s</div>'
-                      % (CFG_SITE_URL, admin_link,
-                         _("Start Person/Author Manager for this entity")))
+        if person_link:
+            req.write('<div><a href="%s/person/%s">%s</a></div>'
+                      % (CFG_SITE_URL, person_link,
+                         _("Report problem!")))
 
         req.write("<table width=80%><tr valign=top><td>")
         req.write(names_box)
@@ -4086,10 +4107,7 @@ class Template:
         req.write("</td></tr></table>")
 
         # print citations:
-        rec_query = 'exactauthor:"' + authorname + '"'
-
-        if is_bibauthorid and extended_author_search_str:
-            rec_query = extended_author_search_str
+        rec_query = baid_query
 
         if len(citedbylist):
             line1 = "<strong>" + _("Citations:") + "</strong>"

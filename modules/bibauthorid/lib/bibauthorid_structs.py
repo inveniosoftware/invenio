@@ -50,10 +50,12 @@ DOC_LIST
 Structure:
     [{tag: value}*]
 Example:
-    [{'bibrecid': 680600L
-    'authornameids': [305005L, 44341L]},
-    {'bibrecid': 681822L
-    'authornameids': [305005L]}]
+    [{'bibrecid': 680600L,
+      'authornameids': [305005L, 44341L],
+      'authornameid_bibrefrec' : [(305005L, "100:133,680600")]},
+     {'bibrecid': 681822L,
+      'authornameids': [305005L],
+      'authornameid_bibrefrec' : [(305005L, "100:133,681822")]}]
 '''
 
 REALAUTHORS = []

@@ -142,7 +142,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST',
                        'CFG_WEBSEARCH_RSS_I18N_COLLECTIONS',
                        'CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY',
-                       'CFG_BATCHUPLOADER_WEB_ROBOT_AGENT']:
+                       'CFG_BATCHUPLOADER_WEB_ROBOT_AGENT',
+                       'CFG_BIBAUTHORID_EXTERNAL_CLAIMED_RECORDS_KEY']:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:
@@ -168,7 +169,11 @@ def convert_conf_option(option_name, option_value):
     ## 3g) special cases: float
     if option_name in ['CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY',
                        'CFG_BIBMATCH_LOCAL_SLEEPTIME',
-                       'CFG_BIBMATCH_REMOTE_SLEEPTIME']:
+                       'CFG_BIBMATCH_REMOTE_SLEEPTIME',
+                       'CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_BCTKD_RA',
+                       'CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_NEW_RA',
+                       'CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH',
+                       'CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N']:
         option_value = float(option_value[1:-1])
 
     ## 4) finally, return output line:

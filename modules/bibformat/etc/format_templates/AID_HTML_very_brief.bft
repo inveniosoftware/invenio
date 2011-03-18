@@ -16,7 +16,4 @@ separator="] [" link="no"/>
 prefix = '<small class="quicknote"> ['
 suffix="]</small> " />
 
-<BFE_ABSTRACT limit="1" prefix="<br /><small>" suffix="</small>"
-highlight="no" contextual="no"/>
-
 <BFE_PUBLI_INFO prefix="<br /><small>Published in <strong>" suffix="</strong></small>" />

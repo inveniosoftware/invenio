@@ -533,7 +533,16 @@ def _prepare_data_files_from_db(data_dir_name="grid_data",
                                     stream=sys.stdout, verbose=0)
             break
 
-        lname = last_name_queue.get()
+        lname_list = last_name_queue.get()
+        lname = None
+
+        if lname_list:
+            lname = lname_list[0]
+            del(lname_list[0])
+        else:
+            bconfig.LOGGER.warning("Got an empty Queue element. "
+                                   "Queue seems corrupted.")
+            continue
 
         job_lnames.append(lname)
         bibtask.task_update_progress('Preparing job %d of %d: %s.'
@@ -558,8 +567,8 @@ def _prepare_data_files_from_db(data_dir_name="grid_data",
             removed_names = []
 
             for post_remove_name in post_remove_names:
-                if post_remove_name in last_name_queue.queue:
-                    last_name_queue.queue.remove(post_remove_name)
+                if post_remove_name in lname_list:
+                    lname_list.remove(post_remove_name)
                     removed_names.append(post_remove_name)
                     removed += 1
 
@@ -568,6 +577,9 @@ def _prepare_data_files_from_db(data_dir_name="grid_data",
                                     % (removed, removed_names),
                                     stream=sys.stdout, verbose=0)
             total -= removed
+
+        if lname_list:
+            last_name_queue.put(lname_list)
 
         if len(dat.RELEVANT_RECORDS) >= max_records:
             if not os.path.exists(data_dir):
@@ -629,7 +641,20 @@ def _update_authorid_universe():
             for author_id in docs['authornameids']:
                 author_name = [an['name'] for an in dat.AUTHOR_NAMES
                                if an['id'] == author_id]
-                if author_name:
+                refrecs = [ref[1] for ref in docs['authornameid_bibrefrec']
+                           if ref[0] == author_id]
+                refrec = -1
+
+                if len(refrecs) > 1:
+                    print "SCREEEEEEWWWWWWED!!! Several bibrefs on one paper?!"
+                    refrec = refrecs[0]
+                elif refrecs:
+                    refrec = refrecs[0]
+
+                if refrec and author_name:
+                    add_minimum_virtualauthor(author_id, author_name[0],
+                                              docs['bibrecid'], 0, [], refrec)
+                elif author_name:
                     add_minimum_virtualauthor(author_id, author_name[0],
                                               docs['bibrecid'], 0, [])
 

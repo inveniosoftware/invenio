@@ -20,6 +20,7 @@ pylibdir=$(libdir)/python/invenio/bibauthorid_comparison_functions
 
 pylib_DATA = aid_cmp_affiliations.py \
              aid_cmp_coauthorship.py \
+             aid_cmp_inspireids.py \
              aid_cmp_names.py \
              aid_cmp_paperequality.py \
              aid_cmp_topcites.py \

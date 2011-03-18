@@ -3879,10 +3879,11 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
     _ = gettext_set_language(ln)
 
     display_claim_this_paper = False
+
     try:
-         display_claim_this_paper = user_info["precached_useclaimpaper"]
+        display_claim_this_paper = user_info["precached_viewclaimlink"]
     except (KeyError, TypeError):
-         display_claim_this_paper = False
+        display_claim_this_paper = False
     #check from user information if the user has the right to see hidden fields/tags in the
     #records as well
     can_see_hidden = (acc_authorize_action(user_info, 'runbibedit')[0] == 0)

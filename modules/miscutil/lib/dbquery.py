@@ -32,6 +32,7 @@ from MySQLdb import Warning, Error, InterfaceError, DataError, \
                     DatabaseError, OperationalError, IntegrityError, \
                     InternalError, NotSupportedError, \
                     ProgrammingError
+import os
 import string
 import time
 import marshal
@@ -77,8 +78,8 @@ class InvenioDbQueryWildcardLimitError(Exception):
         """Initialization."""
         self.res = res
 
-
 def _db_login(relogin = 0):
+
     """Login to the database."""
 
     ## Note: we are using "use_unicode=False", because we want to
@@ -98,7 +99,7 @@ def _db_login(relogin = 0):
                        passwd=CFG_DATABASE_PASS,
                        use_unicode=False, charset='utf8')
     else:
-        thread_ident = get_ident()
+        thread_ident = (os.getpid(), get_ident())
     if relogin:
         _DB_CONN[thread_ident] = connect(host=CFG_DATABASE_HOST,
                                          port=int(CFG_DATABASE_PORT),
@@ -122,7 +123,18 @@ def _db_login(relogin = 0):
 def _db_logout():
     """Close a connection."""
     try:
-        del _DB_CONN[get_ident()]
+        del _DB_CONN[(os.getpid(), get_ident())]
+    except KeyError:
+        pass
+
+def close_connection():
+    """
+    Enforce the closing of a connection
+    Highly relevant in multi-processing and multi-threaded modules
+    """
+    try:
+        _DB_CONN[(os.getpid(), get_ident())].close()
+        del(_DB_CONN[(os.getpid(), get_ident())])
     except KeyError:
         pass
 
@@ -185,7 +197,7 @@ def run_sql(sql, param=None, n=0, with_desc=0):
             return recset
     else:
         if string.upper(string.split(sql)[0]) == "INSERT":
-            rc =  cur.lastrowid
+            rc = cur.lastrowid
         return rc
 
 def run_sql_many(query, params, limit=CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT):
@@ -209,12 +221,12 @@ def run_sql_many(query, params, limit=CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT):
         try:
             db = _db_login()
             cur = db.cursor()
-            rc = cur.executemany(query, params[i:i+limit])
+            rc = cur.executemany(query, params[i:i + limit])
         except OperationalError:
             try:
                 db = _db_login(relogin=1)
                 cur = db.cursor()
-                rc = cur.executemany(query, params[i:i+limit])
+                rc = cur.executemany(query, params[i:i + limit])
             except OperationalError:
                 raise
         ## collect its result:
@@ -293,7 +305,7 @@ def get_table_update_time(tablename):
     # MySQL-5.0, we can employ a much cleaner technique of using
     # SELECT UPDATE_TIME FROM INFORMATION_SCHEMA.TABLES WHERE
     # table_name='collection'.
-    res = run_sql("SHOW TABLE STATUS LIKE %s", (tablename, ))
+    res = run_sql("SHOW TABLE STATUS LIKE %s", (tablename,))
     update_times = [] # store all update times
     for row in res:
         if type(row[10]) is long or \
@@ -314,7 +326,7 @@ def get_table_status_info(tablename):
        etc.  If TABLENAME does not exist, return empty dict.
     """
     # Note: again a hack so that it works on all MySQL 4.0, 4.1, 5.0
-    res = run_sql("SHOW TABLE STATUS LIKE %s", (tablename, ))
+    res = run_sql("SHOW TABLE STATUS LIKE %s", (tablename,))
     table_status_info = {} # store all update times
     for row in res:
         if type(row[10]) is long or \

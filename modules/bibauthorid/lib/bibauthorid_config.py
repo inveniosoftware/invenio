@@ -26,10 +26,28 @@ bibauthorid_config
 import logging.handlers
 import sys
 import os.path as osp
+from invenio.access_control_config import SUPERADMINROLE
+
+
+GLOBAL_CONFIG = True
+
+try:
+    from invenio.config import CFG_BIBAUTHORID_PERSONID_SQL_MAX_THREADS, \
+        CFG_BIBAUTHORID_MAX_PROCESSES, \
+        CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_BCTKD_RA, \
+        CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_NEW_RA, \
+        CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH, \
+        CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N, \
+        CFG_BIBAUTHORID_EXTERNAL_CLAIMED_RECORDS_KEY, \
+        CFG_BIBAUTHORID_ATTACH_VA_TO_MULTIPLE_RAS ,\
+        CFG_BIBAUTHORID_ENABLED, \
+        CFG_BIBAUTHORID_ON_AUTHORPAGES
+except ImportError:
+    GLOBAL_CONFIG = False
 
 
 # Current version of the framework
-VERSION = '0.1.11'
+VERSION = '1.1.0'
 
 # make sure current directory is importable
 FILE_PATH = osp.dirname(osp.abspath(__file__))
@@ -40,28 +58,89 @@ if FILE_PATH not in sys.path:
 # Permission definitions as in actions defined in roles
 CLAIMPAPER_ADMIN_ROLE = "claimpaperoperators"
 CLAIMPAPER_USER_ROLE = "claimpaperusers"
+CMP_ENABLED_ROLE = "paperclaimviewers"
+CHP_ENABLED_ROLE = "paperattributionviewers"
+AID_LINKS_ROLE = "paperattributionlinkviewers"
+
 CLAIMPAPER_VIEW_PID_UNIVERSE = 'claimpaper_view_pid_universe'
 CLAIMPAPER_CHANGE_OWN_DATA = 'claimpaper_change_own_data'
 CLAIMPAPER_CHANGE_OTHERS_DATA = 'claimpaper_change_others_data'
 CLAIMPAPER_CLAIM_OWN_PAPERS = 'claimpaper_claim_own_papers'
 CLAIMPAPER_CLAIM_OTHERS_PAPERS = 'claimpaper_claim_others_papers'
 
+CMPROLESLCUL = {'guest': 0,
+                CLAIMPAPER_USER_ROLE: 25,
+                CLAIMPAPER_ADMIN_ROLE: 50,
+                SUPERADMINROLE: 50}
+
+# Globally enable AuthorID Interfaces.
+#     If False: No guest, user or operator will have access to the system.
+if GLOBAL_CONFIG:
+    AID_ENABLED = CFG_BIBAUTHORID_ENABLED
+else:
+    AID_ENABLED = True
+
+
+# Enable AuthorID information on the author pages.
+if GLOBAL_CONFIG:
+    AID_ON_AUTHORPAGES = CFG_BIBAUTHORID_ON_AUTHORPAGES
+else:
+    AID_ON_AUTHORPAGES = True
+
+# Limit the disambiguation to a specific collections. Leave empty for all
+# Collections are to be defined as a list of strings
+LIMIT_TO_COLLECTIONS = []
+
+# Exclude documents that are visible in a collection mentioned here:
+EXCLUDE_COLLECTIONS = ["HEPNAMES", "INST"]
+
 # User info keys for externally claimed records
-EXTERNAL_CLAIMED_RECORDS_KEY = ["external_arxivids"]
+# e.g. for arXiv SSO: ["external_arxivids"]
+if GLOBAL_CONFIG and CFG_BIBAUTHORID_EXTERNAL_CLAIMED_RECORDS_KEY:
+    EXTERNAL_CLAIMED_RECORDS_KEY = CFG_BIBAUTHORID_EXTERNAL_CLAIMED_RECORDS_KEY
+else:
+    EXTERNAL_CLAIMED_RECORDS_KEY = []
+
+# Lists all filters that are valid to filter the export by.
+# An example is 'arxiv' to return only papers with a 037 entry named arxiv
+VALID_EXPORT_FILTERS = ["arxiv"]
 
 # Max number of threads to parallelize sql queryes in table_utils updates
-PERSONID_SQL_MAX_THREADS = 4
+if GLOBAL_CONFIG and CFG_BIBAUTHORID_PERSONID_SQL_MAX_THREADS:
+    PERSONID_SQL_MAX_THREADS = CFG_BIBAUTHORID_PERSONID_SQL_MAX_THREADS
+else:
+    PERSONID_SQL_MAX_THREADS = 4
+
+# Max number of processes spawned by the disambiguation algorithm
+if GLOBAL_CONFIG and CFG_BIBAUTHORID_MAX_PROCESSES:
+    BIBAUTHORID_MAX_PROCESSES = CFG_BIBAUTHORID_MAX_PROCESSES
+else:
+    BIBAUTHORID_MAX_PROCESSES = 4
 
 # Threshold for connecting a paper to a person: BCTKD are the papers from the
 # backtracked RAs found searching back for the papers already connected to the
 # persons, NEW is for the newly found one
-PERSONID_MIN_P_FROM_BCTKD_RA = 0.5
-PERSONID_MIN_P_FROM_NEW_RA = 0.5
+if GLOBAL_CONFIG and CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_BCTKD_RA:
+    PERSONID_MIN_P_FROM_BCTKD_RA = CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_BCTKD_RA
+else:
+    PERSONID_MIN_P_FROM_BCTKD_RA = 0.5
+
+if GLOBAL_CONFIG and CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_NEW_RA:
+    PERSONID_MIN_P_FROM_NEW_RA = CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_NEW_RA
+else:
+    PERSONID_MIN_P_FROM_NEW_RA = 0.5
 
 # Minimum threshold for the compatibility list of persons to an RA: if no RA
 # is more compatible that that it will create a new person
-PERSONID_MAX_COMP_LIST_MIN_TRSH = 0.5
-PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N = 0.5
+if GLOBAL_CONFIG and CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH:
+    PERSONID_MAX_COMP_LIST_MIN_TRSH = CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH
+else:
+    PERSONID_MAX_COMP_LIST_MIN_TRSH = 0.5
+
+if GLOBAL_CONFIG and CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N:
+    PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N = CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N
+else:
+    PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N = 0.5
 
 #Create_new_person flags thresholds
 PERSONID_CNP_FLAG_1 = 0.75
@@ -77,7 +156,11 @@ TABLES_UTILS_DEBUG = False
 
 # Is the authorid algorithm allowed to attach a virtual author to multiple
 # real authors in the last run of the orphan processing?
-ATTACH_VA_TO_MULTIPLE_RAS = False
+if GLOBAL_CONFIG and CFG_BIBAUTHORID_ATTACH_VA_TO_MULTIPLE_RAS:
+    ATTACH_VA_TO_MULTIPLE_RAS = CFG_BIBAUTHORID_ATTACH_VA_TO_MULTIPLE_RAS
+else:
+    ATTACH_VA_TO_MULTIPLE_RAS = False
+
 # Log Level for the message output.
 # Log Levels are defined in the Python logging system
 # 0 - 50 (log everything - log exceptions)

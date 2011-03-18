@@ -233,6 +233,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         self.pageparam = cgi.escape(pageparam.replace("+", " "))
         self.personid = -1
         self.authorname = " "
+        self.person_data_available = False
 
     def _lookup(self, component, path):
         """This handler parses dynamic URLs (/author/John+Doe)."""
@@ -242,17 +243,30 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
     def __call__(self, req, form):
         """Serve the page in the given language."""
         is_bibauthorid = False
+        bibauthorid_template = None
+        personid_status_cacher = None
 
         try:
             from invenio.bibauthorid_webapi import search_person_ids_by_name
             from invenio.bibauthorid_webapi import get_papers_by_person_id
             from invenio.bibauthorid_webapi import get_person_names_from_id
             from invenio.bibauthorid_webapi import get_person_db_names_from_id
+            from invenio.bibauthorid_webapi import get_person_id_from_canonical_id
+            from invenio.bibauthorid_webapi import get_person_redirect_link
+            from invenio.bibauthorid_webapi import is_valid_canonical_id
+            from invenio.bibauthorid_webapi import get_personid_status_cacher
             from invenio.bibauthorid_utils import create_normalized_name
             from invenio.bibauthorid_utils import split_name_parts
-            from invenio.bibauthorid_config import CLAIMPAPER_CLAIM_OTHERS_PAPERS
-            from invenio.access_control_admin import acc_find_user_role_actions
-            is_bibauthorid = True
+#            from invenio.bibauthorid_config import CLAIMPAPER_CLAIM_OTHERS_PAPERS
+            from invenio.bibauthorid_config import AID_ENABLED
+            from invenio.bibauthorid_config import AID_ON_AUTHORPAGES
+            bibauthorid_template = invenio.template.load('bibauthorid')
+#            from invenio.access_control_admin import acc_find_user_role_actions
+            
+            if not AID_ENABLED or not AID_ON_AUTHORPAGES:
+                is_bibauthorid = False
+            else:
+                is_bibauthorid = True
         except (ImportError):
             is_bibauthorid = False
 
@@ -267,12 +281,8 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         verbose = argd['verbose']
         req.argd = argd #needed since perform_req_search
         param_recid = argd['recid']
+        bibauthorid_data = {"is_baid": is_bibauthorid, "pid": -1, "cid": ""}
 
-        # start page
-        req.content_type = "text/html"
-        req.send_http_header()
-        uid = getUid(req)
-        page_start(req, "hb", "", "", ln, uid)
         pubs = []
         authors = []
         recid = None
@@ -286,11 +296,25 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         genstart = time1
         time2 = time.time()
 
-        #check if it is a person id:
+        if is_bibauthorid:
+            personid_status_cacher = get_personid_status_cacher()
+            personid_status_cacher.recreate_cache_if_needed()
+            self.person_data_available = personid_status_cacher.cache
+
+        if not self.person_data_available:
+            is_bibauthorid = False
+        #check if it is a person id (e.g. 144):
         try:
             self.personid = int(self.pageparam)
         except (ValueError, TypeError):
             self.personid = -1
+
+        #check if it is a canonical ID (e.g. Ellis_J_1):
+        if is_bibauthorid and is_valid_canonical_id(self.pageparam):
+            try:
+                self.personid = int(get_person_id_from_canonical_id(self.pageparam))
+            except (ValueError, TypeError):
+                self.personid = -1
 
         if self.personid < 0 and is_bibauthorid:
             if param_recid > -1:
@@ -316,25 +340,57 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                 nquery = self.pageparam
 
             sorted_results = search_person_ids_by_name(nquery)
+            test_results = None
 
-            for results in sorted_results:
-                pid = results[0]
-                authorpapers = get_papers_by_person_id(pid, -1)
-                authorpapers = sorted(authorpapers, key=itemgetter(0),
-                                      reverse=True)
+            if recid:
+                for results in sorted_results:
+                    pid = results[0]
+                    authorpapers = get_papers_by_person_id(pid, -1)
+                    authorpapers = sorted(authorpapers, key=itemgetter(0),
+                                          reverse=True)
 
-                if (recid and
-                    not (str(recid) in [row[0] for row in authorpapers])):
-                    continue
+                    if (recid and
+                        not (str(recid) in [row[0] for row in authorpapers])):
+                        continue
 
-                authors.append([results[0], results[1],
-                                authorpapers[0:4]])
+                    authors.append([results[0], results[1],
+                                    authorpapers[0:4]])
 
-            search_results = authors
+                test_results = authors
+            else:
+                test_results = [i for i in sorted_results if i[1][0][2] > .8]
 
-            if len(search_results) == 1:
-                self.personid = search_results[0][0]
+
+            if len(test_results) == 1:
+                self.personid = test_results[0][0]
             #@todo: Show selection of possible Person entities if len > 1
+            elif len(test_results) > 1:
+                if bibauthorid_template and nquery:
+                    authors = []
+
+                    for results in sorted_results:
+                        pid = results[0]
+                        authorpapers = get_papers_by_person_id(pid, -1)
+                        authorpapers = sorted(authorpapers, key=itemgetter(0),
+                                              reverse=True)
+                        authors.append([results[0], results[1],
+                                        authorpapers[0:4]])
+
+                    srch = bibauthorid_template.tmpl_author_search
+                    mha = bibauthorid_template.tmpl_meta_includes()
+                    body = srch(nquery, authors, author_papges_mode=True)
+                    title = _("Did you mean...")
+                    return page(title=title,
+                                metaheaderadd=mha,
+                                body=body,
+                                req=req,
+                                language=ln)
+
+        # start page
+        req.content_type = "text/html"
+        req.send_http_header()
+        uid = getUid(req)
+        page_start(req, "hb", "", "", ln, uid)
 
         if self.personid < 0 or not is_bibauthorid:
             # Well, no person. Fall back to the exact author name search then.
@@ -344,7 +400,10 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                 return websearch_templates.tmpl_author_information(req, {},
                                                             self.authorname,
                                                             0, {}, {}, {},
-                                                            {}, {}, {}, {}, False, ln)
+                                                            {}, {}, {},
+                                                            None,
+                                                            bibauthorid_data,
+                                                            ln)
 
             #search the publications by this author
             pubs = perform_request_search(req=None, p=self.authorname, f="exactauthor")
@@ -461,13 +520,17 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
         #get cited by..
         citedbylist = get_cited_by_list(pubs)
-        admin_link = None
-
+        person_link = None
+        
 
         if is_bibauthorid and self.personid >= 0:
-            if [i[1] for i in acc_find_user_role_actions({'uid': uid})
-                     if i[1] == CLAIMPAPER_CLAIM_OTHERS_PAPERS]:
-                admin_link = self.personid
+            person_link = self.personid
+            bibauthorid_data["pid"] = self.personid
+            cid = get_person_redirect_link(self.personid)
+
+            if is_valid_canonical_id(cid):
+                person_link = self.pageparam
+                bibauthorid_data["cid"] = cid
 
         time1 = time.time()
         if verbose == 9:
@@ -479,30 +542,37 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                                                     author_aff_pubs,
                                                     citedbylist, kwtuples,
                                                     coauthors, vtuples,
-                                                    db_names_dict, admin_link,
-                                                    is_bibauthorid, ln)
+                                                    db_names_dict, person_link,
+                                                    bibauthorid_data, ln)
         time1 = time.time()
         #cited-by summary
-        rec_query = 'exactauthor:"' + self.authorname + '"'
-
+        rec_query = ""
         extended_author_search_str = ""
 
-        if is_bibauthorid:
-            if len(db_names_dict.keys()) > 1:
-                extended_author_search_str = '('
+        if bibauthorid_data['is_baid']:
+            if bibauthorid_data["cid"]:
+                rec_query = 'author:"%s"' % bibauthorid_data["cid"]
+            elif bibauthorid_data["pid"] > -1:
+                rec_query = 'author:"%s"' % bibauthorid_data["pid"]
 
-            for name_index, name_query in enumerate(db_names_dict.keys()):
-                if name_index > 0:
-                    extended_author_search_str += " OR "
+        if not rec_query:
+            rec_query = 'exactauthor:"' + self.authorname + '"'
 
-                extended_author_search_str += 'exactauthor:"' + name_query + '"'
+            if is_bibauthorid:
+                if len(db_names_dict.keys()) > 1:
+                    extended_author_search_str = '('
 
-            if len(db_names_dict.keys()) > 1:
-                extended_author_search_str += ')'
+                for name_index, name_query in enumerate(db_names_dict.keys()):
+                    if name_index > 0:
+                        extended_author_search_str += " OR "
 
-        if is_bibauthorid and extended_author_search_str:
-            rec_query = extended_author_search_str
+                    extended_author_search_str += 'exactauthor:"' + name_query + '"'
 
+                if len(db_names_dict.keys()) > 1:
+                    extended_author_search_str += ')'
+
+            if is_bibauthorid and extended_author_search_str:
+                rec_query = extended_author_search_str
 
         if pubs:
             req.write(summarize_records(intbitset(pubs), 'hcs', ln, rec_query, req=req))

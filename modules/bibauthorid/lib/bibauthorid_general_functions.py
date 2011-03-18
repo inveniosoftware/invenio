@@ -136,6 +136,9 @@ def cmp_virtual_to_real_author(va_id, ra_id):
 
     comparison_result = (sum_result / sum_count) * mult_result
 
+    if comparison_result > 1.0:
+        comparison_result = 1.0
+
     bconfig.LOGGER.log(25, "|--> Final comparison: [%s] => %s / %s = %s"
                   % (comparison_result_str, sum_count * comparison_result,
                      sum_count, comparison_result))

@@ -26,10 +26,10 @@ $(document).ready(function() {
         $('.more-' + x).toggle();
         var toggleimg = $this.find('img').attr('src');
 
-        if (toggleimg == '../img/plus-9x9.png') {
-            $this.find('img').attr({src:'../img/minus-9x9.png'});
+        if (toggleimg == '../img/aid_plus_16.png') {
+            $this.find('img').attr({src:'../img/aid_minus_16.png'});
         } else {
-            $this.find('img').attr({src:'../img/plus-9x9.png'});
+            $this.find('img').attr({src:'../img/aid_plus_16.png'});
         }
         return false;
     });
@@ -55,7 +55,7 @@ $(document).ready(function() {
     }
 
     // Initialize DataTable
-    oTable = $('.paperstable').dataTable({
+    $('.paperstable').dataTable({
                 "bJQueryUI": true,
                 "sPaginationType": "full_numbers",
                 "aoColumns": [
@@ -63,9 +63,15 @@ $(document).ready(function() {
                           "sWidth": "" },
                         { "bSortable": false,
                           "sWidth": "" },
+                        { "sWidth": "" },
                         { "sWidth": "120px" },
                         { "sWidth": "320px" }
-                ]
+                ],
+                "aLengthMenu": [75],
+                'iDisplayLength': 75,
+                "fnDrawCallback": function() {
+                    $('.dataTables_length').css('display','none');
+                }
     });
 
     $('.reviewstable').dataTable({
@@ -78,7 +84,12 @@ $(document).ready(function() {
                           "sWidth": "" },
                         { "bSortable": false,
                           "sWidth": "120px" }
-                ]
+                ],
+                "aLengthMenu": [50],
+                'iDisplayLength': 50,
+                "fnDrawCallback": function() {
+                    $('.dataTables_length').css('display','none');
+                }
     });
 
 
@@ -121,7 +132,7 @@ $(document).ready(function() {
         return false;
     });
 
-    update_action_links();
+//    update_action_links();
 
 });
 
@@ -134,7 +145,7 @@ function confirm_bibref(claimid) {
     $('#bibref'+cid).load('/person/status', { 'pid': $('span[id^=pid]').attr('id').substring(3),
                                                 'bibref': claimid,
                                                 'action': 'confirm_status' } );
-    update_action_links();
+//    update_action_links();
 }
 
 
@@ -146,7 +157,7 @@ function repeal_bibref(claimid) {
     $('#bibref'+cid).load('/person/status', { 'pid': $('span[id^=pid]').attr('id').substring(3),
                                                 'bibref': claimid,
                                                 'action': 'repeal_status' } );
-    update_action_links();
+//    update_action_links();
 }
 
 
@@ -157,7 +168,7 @@ function reset_bibref(claimid) {
     $('#bibref'+cid).load('/person/status', { 'pid': $('span[id^=pid]').attr('id').substring(3),
                                                 'bibref': claimid,
                                                 'action': 'reset_status' } );
-    update_action_links();
+//    update_action_links();
 }
 
 
@@ -175,7 +186,7 @@ function action_request(claimid, action) {
                         buttons: {
                             Ok: function() {
                                 $( this ).dialog( "close" );
-                                update_action_links();
+//                                update_action_links();
                             }
                         }
                     });
@@ -195,11 +206,11 @@ function action_request(claimid, action) {
                                 }
 
                                 $( this ).dialog( "close" );
-                                update_action_links();
+//                                update_action_links();
                             },
                             Cancel: function() {
                                 $( this ).dialog( "close" );
-                                update_action_links();
+//                                update_action_links();
                             }
                         }
                     });
@@ -212,9 +223,9 @@ function action_request(claimid, action) {
                     } else if (action == "reset") {
                         reset_bibref(claimid);
                     }
-                    update_action_links();
+//                    update_action_links();
                 } else {
-                    update_action_links();
+//                    update_action_links();
                 }
 
             } else {
@@ -246,14 +257,14 @@ function processJson(data) {
 }
 
 
-function update_action_links() {
-    // Alter claim links in the DOM (ensures following the non-destructive JS paradigm)
-    $('div[id^=bibref]').each(function() {
-        var claimid = $(this).attr('id').substring(6);
-        var cid = claimid.replace(/\,/g, "\\," );
-        var cid = cid.replace(/\:/g, "\\:");
-        $("#bibref"+ cid +" > #aid_status_details > #aid_confirm").attr("href", "javascript:action_request('"+ claimid +"', 'confirm')");
-        $("#bibref"+ cid +" > #aid_status_details > #aid_reset").attr("href", "javascript:action_request('"+ claimid +"', 'reset')");
-        $("#bibref"+ cid +" > #aid_status_details > #aid_repeal").attr("href", "javascript:action_request('"+ claimid +"', 'repeal')");
-   });
-}
+//function update_action_links() {
+//    // Alter claim links in the DOM (ensures following the non-destructive JS paradigm)
+//    $('div[id^=bibref]').each(function() {
+//        var claimid = $(this).attr('id').substring(6);
+//        var cid = claimid.replace(/\,/g, "\\," );
+//        var cid = cid.replace(/\:/g, "\\:");
+//        $("#bibref"+ cid +" > #aid_status_details > #aid_confirm").attr("href", "javascript:action_request('"+ claimid +"', 'confirm')");
+//        $("#bibref"+ cid +" > #aid_status_details > #aid_reset").attr("href", "javascript:action_request('"+ claimid +"', 'reset')");
+//        $("#bibref"+ cid +" > #aid_status_details > #aid_repeal").attr("href", "javascript:action_request('"+ claimid +"', 'repeal')");
+//   });
+//}

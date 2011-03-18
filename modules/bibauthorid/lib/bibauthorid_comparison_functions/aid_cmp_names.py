@@ -58,7 +58,7 @@ def compare_va_to_ra(va_id, ra_id):
 #    print "RA Names: ", ra_names
 #    print "VA Name: ", va_name
 
-
+    authorname_id = -1
     if va_nameid_recs:
         authorname_id = va_nameid_recs[0]['value']
 

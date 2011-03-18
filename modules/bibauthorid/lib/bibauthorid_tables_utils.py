@@ -27,13 +27,30 @@ import random
 import bibauthorid_config as bconfig
 import bibauthorid_structs as dat
 
-from search_engine import get_record
-from bibrank_citation_searcher import get_citation_dict
-from dbquery import run_sql
-from dbquery import OperationalError, ProgrammingError
 from bibauthorid_utils import split_name_parts, create_normalized_name
 from bibauthorid_utils import clean_name_string
 from bibauthorid_authorname_utils import update_doclist
+
+try:
+    from search_engine import get_record
+    from search_engine import get_fieldvalues
+    from bibrank_citation_searcher import get_citation_dict
+    from dbquery import run_sql, run_sql_many
+    from dbquery import OperationalError, ProgrammingError
+except ImportError:
+    from invenio.search_engine import get_fieldvalues
+    from invenio.search_engine import get_record
+    from invenio.bibrank_citation_searcher import get_citation_dict
+    from invenio.dbquery import run_sql, run_sql_many
+    from invenio.dbquery import OperationalError, ProgrammingError
+
+try:
+    import unidecode
+    UNIDECODE_ENABLED = True
+except ImportError:
+    bconfig.LOGGER.error("Authorid will run without unidecode support! "
+                         "This is not recommended! Please install unidecode!")
+    UNIDECODE_ENABLED = False
 
 
 def get_papers_recently_modified(date=''):
@@ -52,6 +69,7 @@ def get_papers_recently_modified(date=''):
     else:
         min_date = run_sql("select now()")
     return papers, min_date
+
 
 def populate_authornames_bibrefs_from_authornames():
     '''
@@ -168,6 +186,7 @@ def authornames_tables_gc(bunch_size=50):
                             (str(bunch_start - 1), str(bunch_size)))
         bunch_start += bunch_size
 
+
 def update_authornames_tables_from_paper(papers_list=[]):
     """
     Updates the authornames tables with the names on the given papers list
@@ -181,6 +200,7 @@ def update_authornames_tables_from_paper(papers_list=[]):
         maybe there is a way to rethink everything not to use bibrefs? How to address
         authors then?
     """
+
 
     def update_authornames_tables(name, bibref):
         '''
@@ -228,9 +248,20 @@ def update_authornames_tables_from_paper(papers_list=[]):
 
             else:
                 artifact_removal = re.compile("[^a-zA-Z0-9]")
-                raw_name = artifact_removal.sub("", name)
+                authorname = ""
+
+                test_name = name.decode('utf-8')
+
+                if UNIDECODE_ENABLED:
+                    test_name = unidecode.unidecode(name.decode('utf-8'))
+
+                raw_name = artifact_removal.sub("", test_name)
+
                 if len(raw_name) > 1:
-                    dbname = name
+                    authorname = name.decode('utf-8')
+
+                if len(raw_name) > 1:
+                    dbname = authorname
                 else:
                     dbname = 'Error in name parsing!'
 
@@ -252,6 +283,7 @@ def update_authornames_tables_from_paper(papers_list=[]):
                 name = run_sql(sqlstr+"%s", (str(ref[0]),))
                 if len(name) >= 1:
                     update_authornames_tables(name[0][0], table[3] + ':' + str(ref[0]))
+
 
 def populate_authornames():
     """
@@ -286,17 +318,17 @@ def populate_authornames():
         querylimiter_max = eval('max' + str(table_number) + '[0][0]')
         if bconfig.TABLES_UTILS_DEBUG:
             print "\nProcessing %s (%s entries):" % (table, querylimiter_max)
-        sys.stdout.write("0% ")
-        sys.stdout.flush()
+            sys.stdout.write("0% ")
+            sys.stdout.flush()
 
         while querylimiter_start <= querylimiter_max:
-
-            sys.stdout.write(".")
-            sys.stdout.flush()
-            percentage = int(((querylimiter_start + max_rows_per_run) * 100)
-                               / querylimiter_max)
-            sys.stdout.write(".%s%%." % (percentage))
-            sys.stdout.flush()
+            if bconfig.TABLES_UTILS_DEBUG:
+                sys.stdout.write(".")
+                sys.stdout.flush()
+                percentage = int(((querylimiter_start + max_rows_per_run) * 100)
+                                   / querylimiter_max)
+                sys.stdout.write(".%s%%." % (percentage))
+                sys.stdout.flush()
 
 #            Query the Database for a list of authors from the correspondent
 #            tables--several thousands at a time
@@ -321,10 +353,15 @@ def populate_authornames():
                 if not i[1]:
                     continue
 
-                raw_name = artifact_removal.sub("", i[1])
+                test_name = i[1].decode('utf-8')
+
+                if UNIDECODE_ENABLED:
+                    test_name = unidecode.unidecode(i[1].decode('utf-8'))
+
+                raw_name = artifact_removal.sub("", test_name)
 
                 if len(raw_name) > 1:
-                    authorname = i[1]
+                    authorname = i[1].decode('utf-8')
 
                 if not authorname:
                     continue
@@ -339,8 +376,11 @@ def populate_authornames():
                 if not authornames_is_empty:
 #                    Find duplicates in the database and append id if
 #                    duplicate is found
-                    authorexists = run_sql("SELECT id,Name,bibrefs,db_name FROM aidAUTHORNAMES "
-                                           "WHERE db_name = %s", (authorname,))
+                    authorexists = run_sql("SELECT id, name, bibrefs, db_name "
+                                           "FROM aidAUTHORNAMES "
+                                           "WHERE db_name = %s",
+                                           (authorname.encode("utf-8"),))
+
 
                 bibrefs = "%s:%s" % (table_number, i[0])
 
@@ -348,17 +388,29 @@ def populate_authornames():
                     insert_name = ""
 
                     if len(authorname) > 240:
-                        bconfig.LOGGER.warn("\nName too long, truncated to 240"
+                        bconfig.LOGGER.warn("\nName too long, truncated to 254"
                                             " chars: %s" % (authorname))
                         insert_name = authorname[0:254]
                     else:
                         insert_name = authorname
 
+                    cnn = create_normalized_name
+                    snp = split_name_parts
+
+                    aid_name = authorname
+
+                    if UNIDECODE_ENABLED:
+                        aid_name = cnn(snp(unidecode.unidecode(insert_name)))
+                        aid_name = aid_name.replace("\"", "")
+                    else:
+                        aid_name = cnn(snp(insert_name))
+                        aid_name = aid_name.replace(u"\u201c", "")
+                        aid_name = aid_name.replace(u"\u201d", "")
+
                     run_sql("INSERT INTO aidAUTHORNAMES VALUES"
                             " (NULL, %s, %s, %s)",
-                            (create_normalized_name(
-                                                split_name_parts(insert_name)),
-                                                bibrefs, insert_name))
+                            (aid_name.encode('utf-8'), bibrefs,
+                             insert_name.encode('utf-8')))
 
                     if authornames_is_empty:
                         authornames_is_empty = 0
@@ -371,6 +423,27 @@ def populate_authornames():
         if bconfig.TABLES_UTILS_DEBUG:
             sys.stdout.write(" Done.")
             sys.stdout.flush()
+
+
+def get_bibref_name_string(bibref):
+    '''
+    Returns the name string associated with the given bibref
+    @param: bibref ((100:123,),)
+    '''
+    name = run_sql("select db_name from aidAUTHORNAMES where id=(select Name_id from aidAUTHORNAMESBIBREFS where bibref=%s)", (str(bibref[0][0]),))
+    if len(name) > 0:
+        return name[0][0]
+    else:
+        return ''
+
+
+def get_bibrefs_from_name_string(string):
+    '''
+    Returns bibrefs associated to a name string
+    @param: string: name
+    '''
+    bibrefs = run_sql("select bibrefs from aidAUTHORNAMES where db_name=%s ", (str(string),))
+    return bibrefs
 
 
 def get_diff_marc10x70x_to_anames():
@@ -395,7 +468,7 @@ def get_diff_marc10x70x_to_anames():
     return diff
 
 
-def populate_doclist_for_author_surname(surname):
+def populate_doclist_for_author_surname(surname, surname_variations=None):
     """
     Searches for all the documents containing a given surname and processes
     them: creates the virtual author for each author on a document.
@@ -403,21 +476,24 @@ def populate_doclist_for_author_surname(surname):
     @param surname: The search is based on this last name.
     @type surname: string
     """
-    if not dat.CITES_DICT:
-        cites = get_citation_dict("citationdict")
-
-        for key in cites:
-            dat.CITES_DICT[key] = cites[key]
-
-    if not dat.CITED_BY_DICT:
-        cited_by = get_citation_dict("reversedict")
-
-        for key in cited_by:
-            dat.CITED_BY_DICT[key] = cited_by[key]
+#    if not dat.CITES_DICT:
+#        cites = get_citation_dict("citationdict")
+#
+#        for key in cites:
+#            dat.CITES_DICT[key] = cites[key]
+#
+#    if not dat.CITED_BY_DICT:
+#        cited_by = get_citation_dict("reversedict")
+#
+#        for key in cited_by:
+#            dat.CITED_BY_DICT[key] = cited_by[key]
 
     bconfig.LOGGER.log(25, "Populating document list for %s" % (surname))
 
-    init_authornames(surname)
+    if surname_variations:
+        init_authornames(surname, surname_variations)
+    else:
+        init_authornames(surname)
 
     authors = [row for row in dat.AUTHOR_NAMES if not row['processed']]
 
@@ -439,24 +515,59 @@ def populate_doclist_for_author_surname(surname):
         bibrecs = []
 
         if marc_100:
-            bibrecs_100 = run_sql("SELECT id_bibrec FROM bibrec_bib10x"
-                                  + " WHERE id_bibxxx = %s"
-                                  % (" OR id_bibxxx = ".join(marc_100)))
+            for m100 in marc_100:
+                refinfo = run_sql("SELECT id_bibrec FROM bibrec_bib10x "
+                                  "WHERE id_bibxxx = %s", (m100,))
 
-            for j in bibrecs_100:
-                bibrecs.append(j[0])
+                if refinfo:
+                    for recid in refinfo:
+                        bibrecs.append((recid[0], "100:%s" % m100))
 
         if marc_700:
-            bibrecs_700 = run_sql("SELECT id_bibrec FROM bibrec_bib70x"
-                                  + " WHERE id_bibxxx = %s"
-                                  % (" OR id_bibxxx = ".join(marc_700)))
+            for m700 in marc_700:
+                refinfo = run_sql("SELECT id_bibrec FROM bibrec_bib70x "
+                                  "WHERE id_bibxxx = %s", (m700,))
 
-            for j in bibrecs_700:
-                bibrecs.append(j[0])
+                if refinfo:
+                    for recid in refinfo:
+                        bibrecs.append((recid[0], "700:%s" % m700))
 
-        if load_records_to_mem_cache(bibrecs):
-            for bibrec in bibrecs:
-                update_doclist(bibrec, authorname_id=author['id'])
+        relevant_records = []
+
+        for bibrec in bibrecs:
+            go_next = False
+
+            for value in get_fieldvalues(bibrec[0], "980__c"):
+                if value.lower().count('delete'):
+                    go_next = True
+
+            if go_next:
+                continue
+
+            for value in get_fieldvalues(bibrec[0], "980__a"):
+                if value.lower().count('delet'):
+                    go_next = True
+
+                if bconfig.EXCLUDE_COLLECTIONS:
+                    if value in bconfig.EXCLUDE_COLLECTIONS:
+                        go_next = True
+                        break
+
+                if bconfig.LIMIT_TO_COLLECTIONS:
+                    if not value in bconfig.LIMIT_TO_COLLECTIONS:
+                        go_next = True
+                    else:
+                        go_next = False
+                        break
+
+            if go_next:
+                continue
+
+            relevant_records.append(bibrec)
+
+        if load_records_to_mem_cache([br[0] for br in relevant_records]):
+            for bibrec in relevant_records:
+                update_doclist(bibrec[0], author['id'], bibrec[1])
 
 
 def load_records_to_mem_cache(bibrec_ids):
@@ -519,12 +630,14 @@ def load_records_to_mem_cache(bibrec_ids):
             cited_by = []
 
             try:
-                cites = dat.CITES_DICT[bibrec]
+#                cites = dat.CITES_DICT[bibrec]
+                cites = get_citation_dict("citationdict")[bibrec]
             except KeyError:
                 pass
 
             try:
-                cited_by = dat.CITED_BY_DICT[bibrec]
+#                cited_by = dat.CITED_BY_DICT[bibrec]
+                cited_by = get_citation_dict("reversedict")[bibrec]
             except KeyError:
                 pass
 
@@ -534,7 +647,7 @@ def load_records_to_mem_cache(bibrec_ids):
     return True
 
 
-def init_authornames(surname):
+def init_authornames(surname, lastname_variations=None):
     '''
     Initializes the AUTHOR_NAMES memory storage
 
@@ -556,10 +669,10 @@ def init_authornames(surname):
                 updated['processed'] = True
             _perform_authornames_init(surname)
     else:
-        _perform_authornames_init(surname)
+        _perform_authornames_init(surname, lastname_variations)
 
 
-def _perform_authornames_init(surname):
+def _perform_authornames_init(surname, lastname_variations=None):
     '''
     Performs the actual AUTHOR_NAMES memory storage init by reading values
     from the database
@@ -567,25 +680,76 @@ def _perform_authornames_init(surname):
     @param surname: The surname to search for
     @type surname: string
     '''
+    db_authors = None
 
-    # instead of replacing with ' ', this will construct the regex for the
-    # SQL query as well as the next if statement.
-    surname = clean_name_string(surname,
-                                replacement=".{0,3}",
-                                keep_whitespace=False)
+    if len(surname) < 4 and not lastname_variations:
+        lastname_variations = [surname]
 
-    if not surname.startswith(".{0,3}"):
-        surname = "^['`-]*%s" % (surname)
+    if (not lastname_variations
+        or (lastname_variations
+            and [nm for nm in lastname_variations if nm.count("\\")])):
 
-    sql_query = ("SELECT id, name, bibrefs, db_name "
-                 "FROM aidAUTHORNAMES WHERE name REGEXP \"%s\""
-                 % (surname))
+        sql_query = (r"SELECT id, name, bibrefs, db_name FROM aidAUTHORNAMES "
+                     "WHERE name REGEXP %s")
 
-    for author in run_sql(sql_query):
+        if (lastname_variations
+            and [nm for nm in lastname_variations if nm.count("\\")]):
+            x = sorted(lastname_variations, key=lambda k:len(k), reverse=True)
+            # In order to fight escaping problems, we fall back to regexp mode
+            # if we find a backslash somewhere.
+            surname = x[0]
+
+        # instead of replacing with ' ', this will construct the regex for the
+        # SQL query as well as the next if statements.
+        surname = clean_name_string(surname,
+                                    replacement="[^0-9a-zA-Z]{0,2}",
+                                    keep_whitespace=False)
+
+        if not surname.startswith("[^0-9a-zA-Z]{0,2}"):
+            surname = "[^0-9a-zA-Z]{0,2}%s" % (surname)
+
+        if not surname.startswith("^"):
+            surname = "^%s" % surname
+
+        surname = surname + "[^0-9a-zA-Z ]{1,2}"
+
+        if surname.count("\\"):
+            surname.replace("\\", ".")
+
+        try:
+            db_authors = run_sql(sql_query, (surname,))
+        except (OperationalError, ProgrammingError), emsg:
+            bconfig.LOGGER.exception("Not able to select author name: %s" % emsg)
+
+    else:
+        qnames = []
+        vari_query = ""
+
+        for vname in lastname_variations:
+            if vari_query:
+                vari_query += " OR"
+            vari_query += ' name like %s'
+            vname_r = r"""%s""" % vname
+            qnames.append(vname_r + ", %")
+
+        if not vari_query:
+            return
+
+        sql_query = ("SELECT id, name, bibrefs, db_name "
+                     "FROM aidAUTHORNAMES WHERE" + vari_query)
+        try:
+            db_authors = run_sql(sql_query, tuple(qnames))
+        except (OperationalError, ProgrammingError), emsg:
+            bconfig.LOGGER.exception("Not able to select author name: %s" % emsg)
+
+    if not db_authors:
+        return
+
+    for author in db_authors:
         dat.AUTHOR_NAMES.append({'id': author[0],
-                                 'name': author[1],
+                                 'name': author[1].decode('utf-8'),
                                  'bibrefs': author[2],
-                                 'db_name': author[3],
+                                 'db_name': author[3].decode('utf-8'),
                                  'processed': False})
 
 
@@ -600,8 +764,12 @@ def find_all_last_names():
     last_names = set()
 
 
-    for name in all_names:
-        last_name = split_name_parts(name[0])[0]
+    for dbname in all_names:
+        if not dbname:
+            continue
+
+        full_name = dbname[0]
+        name = split_name_parts(full_name.decode('utf-8'))[0]
 
         # For mental sanity, exclude things that are not names...
         #   - Single letter names
@@ -612,14 +780,25 @@ def find_all_last_names():
         # Yes, I know!
         # However, these statistical outlaws are harmful to the data set.
         artifact_removal = re.compile("[^a-zA-Z0-9]")
-        last_name_test = artifact_removal.sub("", last_name)
+        authorname = None
 
-        if len(last_name_test) > 1:
-            last_names.add("%s," % (last_name,))
+        test_name = name
 
-#    for name in all_names:
-#        last_names.add([split_name_parts(name[0]), name[0]])
+        if UNIDECODE_ENABLED:
+            test_name = unidecode.unidecode(name)
 
+        raw_name = artifact_removal.sub("", test_name)
+
+        if len(raw_name) > 1:
+            authorname = name
+
+        if not authorname:
+            continue
+
+        if len(raw_name) > 1:
+            last_names.add(authorname)
+
+    del(all_names)
     return list(last_names)
 
 
@@ -674,168 +853,158 @@ def write_mem_cache_to_tables(sanity_checks=False):
                                                         va_id_offset,
                                                         cluster_id_offset))
 
-    batch_max = bconfig.TABLE_POPULATION_BUNCH_SIZE
+#    batch_max = bconfig.TABLE_POPULATION_BUNCH_SIZE
 
     query = []
+    query_prelude = ("INSERT INTO aidVIRTUALAUTHORSCLUSTERS (cluster_name)"
+                     " VALUES (%s)")
 
     for va_cluster in dat.VIRTUALAUTHOR_CLUSTERS:
-        if len(query) >= batch_max:
-            try:
-                run_sql(''.join(query))
-            except:
-                bconfig.LOGGER.critical("Inserting into virtual author "
-                                        "cluster table failed")
-                return False
+        encoded_value = None
+        not_encoded_value = va_cluster['clustername']
 
-            query = []
+        try:
+            if isinstance(not_encoded_value, unicode):
+                encoded_value = not_encoded_value[0:59].encode('utf-8')
+            elif isinstance(not_encoded_value, str):
+                encoded_value = not_encoded_value[0:59]
+            else:
+                encoded_value = str(not_encoded_value)[0:59]
+        except (UnicodeEncodeError, UnicodeDecodeError), emsg:
+            bconfig.LOGGER.error("Cluster Data encoding error (%s): %s"
+                                 % (type(not_encoded_value), emsg))
+            continue
 
-        query.append("INSERT INTO aidVIRTUALAUTHORSCLUSTERS (cluster_name) "
-                      "VALUES (\"%s\"); "
-                     % (va_cluster['clustername'],))
+        query.append((encoded_value,))
 
     if query:
         try:
-            run_sql(''.join(query))
-        except:
+            run_sql_many(query_prelude, tuple(query))
+        except (OperationalError, ProgrammingError), emsg:
             bconfig.LOGGER.critical("Inserting into virtual author "
-                                    "cluster table failed")
+                                    "cluster table failed: %s" % emsg)
             return False
 
         query = []
+
+    query_prelude = ("INSERT INTO aidVIRTUALAUTHORSDATA "
+                     "(virtualauthorID, tag, value) VALUES "
+                     "(%s, %s, %s)")
 
     for va_data in dat.VIRTUALAUTHOR_DATA:
-        if len(query) >= batch_max:
-            try:
-                run_sql(''.join(query))
-            except:
-                bconfig.LOGGER.critical("Inserting into virtual author "
-                                        "data table failed")
-                return False
+        encoded_value = None
+        not_encoded_value = va_data['value']
 
-            query = []
+        try:
+            if isinstance(not_encoded_value, unicode):
+                encoded_value = not_encoded_value[0:254].encode('utf-8')
+            elif isinstance(not_encoded_value, str):
+                encoded_value = not_encoded_value[0:254]
+            else:
+                encoded_value = str(not_encoded_value)[0:254]
+        except (UnicodeEncodeError, UnicodeDecodeError), emsg:
+            bconfig.LOGGER.error("VA Data encoding error (%s): %s"
+                                 % (type(not_encoded_value), emsg))
+            continue
 
-        query.append("INSERT INTO aidVIRTUALAUTHORSDATA "
-                      "(virtualauthorID, tag, value) VALUES "
-                      "(%d, \"%s\", \"%s\"); "
-                     % (va_data['virtualauthorid'] + va_id_offset,
-                        va_data['tag'], va_data['value']))
+        query.append((va_data['virtualauthorid'] + va_id_offset,
+                        va_data['tag'], encoded_value))
 
     if query:
         try:
-            run_sql(''.join(query))
-        except:
+            run_sql_many(query_prelude, tuple(query))
+        except (OperationalError, ProgrammingError), emsg:
             bconfig.LOGGER.critical("Inserting into virtual author "
-                                    "data table failed")
+                                    "data table failed: %s" % emsg)
             return False
 
         query = []
 
+    query_prelude = ("INSERT INTO aidVIRTUALAUTHORS "
+                     "(virtualauthorID, authornamesID, p, clusterID) "
+                     "VALUES (%s, %s, %s, %s)")
+
     for va_entry in dat.VIRTUALAUTHORS:
-        if len(query) >= batch_max:
-            try:
-                run_sql(''.join(query))
-            except:
-                bconfig.LOGGER.critical("Inserting into virtual author "
-                                        "table failed")
-                return False
-
-            query = []
-
-        query.append("INSERT INTO aidVIRTUALAUTHORS "
-                      "(virtualauthorID, authornamesID, p, clusterID) VALUES "
-                      "(%d, %d, \"%s\", %d); "
-                     % (va_entry['virtualauthorid'] + va_id_offset,
+        query.append((va_entry['virtualauthorid'] + va_id_offset,
                         va_entry['authornamesid'], va_entry['p'],
                         va_entry['clusterid'] + cluster_id_offset))
 
     if query:
         try:
-            run_sql(''.join(query))
-        except:
+            run_sql_many(query_prelude, tuple(query))
+        except (OperationalError, ProgrammingError), emsg:
             bconfig.LOGGER.critical("Inserting into virtual author "
-                                    "table failed")
+                                    "table failed: %s" % emsg)
             return False
         query = []
 
+    query_prelude = ("INSERT INTO aidREALAUTHORDATA "
+                      "(realauthorID, tag, value, va_count, "
+                      "va_names_p, va_p) VALUES "
+                      "(%s, %s, %s, %s, %s, %s)")
+
     for ra_data in dat.REALAUTHOR_DATA:
-        if len(query) >= batch_max:
-            try:
-                run_sql(''.join(query))
-            except:
-                bconfig.LOGGER.critical("Inserting into real author "
-                                        "data table failed")
-                return False
-
-            query = []
-
         if not ra_data['tag'] == 'outgoing_citation':
-            query.append("INSERT INTO aidREALAUTHORDATA "
-                          "(realauthorID, tag, value, va_count, "
-                          "va_names_p, va_p) VALUES "
-                          "(%d, \"%s\", \"%s\", %d, "
-                          "%f, %f); "
-                         % (ra_data['realauthorid'] + ra_id_offset,
-                            ra_data['tag'], ra_data['value'],
+            encoded_value = None
+            not_encoded_value = ra_data['value']
+
+            try:
+                if isinstance(not_encoded_value, unicode):
+                    encoded_value = not_encoded_value[0:254].encode('utf-8')
+                elif isinstance(not_encoded_value, str):
+                    encoded_value = not_encoded_value[0:254]
+                else:
+                    encoded_value = str(not_encoded_value)[0:254]
+            except (UnicodeEncodeError, UnicodeDecodeError), emsg:
+                bconfig.LOGGER.error("RA Data encoding error (%s): %s"
+                                     % (type(not_encoded_value), emsg))
+                continue
+
+            query.append((ra_data['realauthorid'] + ra_id_offset,
+                            ra_data['tag'],
+                            encoded_value,
                             ra_data['va_count'], ra_data['va_np'],
                             ra_data['va_p']))
 
     if query:
         try:
-            run_sql(''.join(query))
-        except:
+            run_sql_many(query_prelude, tuple(query))
+        except (OperationalError, ProgrammingError), emsg:
             bconfig.LOGGER.critical("Inserting into real author "
-                                    "data table failed")
+                                    "data table failed: %s" % emsg)
             return False
         query = []
 
-    for ra_entry in dat.REALAUTHORS:
-        if len(query) >= batch_max:
-            try:
-                run_sql(''.join(query))
-            except:
-                bconfig.LOGGER.critical("Inserting into real author "
-                                        "table failed")
-                return False
-            query = []
+    query_prelude = ("INSERT INTO aidREALAUTHORS "
+                  "(realauthorID, virtualauthorID, p) VALUES (%s, %s, %s)")
 
-        query.append("INSERT INTO aidREALAUTHORS "
-                      "(realauthorID, virtualauthorID, p) VALUES "
-                      "(%d, %d, %f); "
-                     % (ra_entry['realauthorid'] + ra_id_offset,
+    for ra_entry in dat.REALAUTHORS:
+        query.append((ra_entry['realauthorid'] + ra_id_offset,
                         ra_entry['virtualauthorid'] + va_id_offset,
                         ra_entry['p']))
 
     if query:
         try:
-            run_sql(''.join(query))
-        except:
+            run_sql_many(query_prelude, tuple(query))
+        except (OperationalError, ProgrammingError), emsg:
             bconfig.LOGGER.critical("Inserting into real author "
-                                    "table failed")
+                                    "table failed: %s" % emsg)
             return False
         query = []
 
-    for doc in dat.DOC_LIST:
-        if len(query) >= batch_max:
-            try:
-                run_sql(''.join(query))
-            except:
-                bconfig.LOGGER.critical("Inserting into doc list "
-                                        "table failed")
-                return False
-            query = []
+    query_prelude = ("INSERT INTO aidDOCLIST "
+                     "(bibrecID, processed_author) VALUES (%s, %s)")
 
+    for doc in dat.DOC_LIST:
         for processed_author in doc['authornameids']:
-            query.append("INSERT INTO aidDOCLIST "
-                         "(bibrecID, processed_author) VALUES "
-                         "(%d, %d); "
-                          % (doc['bibrecid'], processed_author))
+            query.append((doc['bibrecid'], processed_author))
 
     if query:
         try:
-            run_sql(''.join(query))
-        except:
+            run_sql_many(query_prelude, tuple(query))
+        except (OperationalError, ProgrammingError), emsg:
             bconfig.LOGGER.critical("Inserting into doc list "
-                                    "table failed")
+                                    "table failed: %s" % emsg)
             return False
         query = []
 
@@ -874,6 +1043,7 @@ def get_existing_last_names():
     for i in db_names:
         db_lnames.add(i[0].split(',')[0])
 
+    del(db_names)
     return list(db_lnames)
 
 
@@ -882,7 +1052,7 @@ def get_len_authornames_bibrefs():
     Reads the lengths of authornames and bibrefs.
     Used to determine if esstential tables already exist.
 
-    @return: dict({'names': -1, 'bibrefs': -1})
+    @return: dict({'names':-1, 'bibrefs':-1})
     @rtype: dict
     '''
     lengths = {'names':-1,
@@ -1202,9 +1372,14 @@ def update_tables_from_mem_cache(sanity_checks=False, return_ra_updates=False):
 
             query = []
 
+        if len(va_cluster['clustername']) > 150:
+            bconfig.LOGGER.warning("Value for cluster table insertion "
+                                   "truncated to 150 characters: %s"
+                                   % (str(va_cluster['clustername'])))
+
         query.append("INSERT INTO aidVIRTUALAUTHORSCLUSTERS (cluster_name) "
                       "VALUES (\"%s\"); "
-                     % (va_cluster['clustername'],))
+                     % (va_cluster['clustername'][0:149],))
 
     if query:
         try:
@@ -1326,6 +1501,11 @@ def update_tables_from_mem_cache(sanity_checks=False, return_ra_updates=False):
 
             query = []
 
+        if len(ra_data['value']) > 254:
+            bconfig.LOGGER.warning("Value for ra data table insertion "
+                                   "truncated to 255 characters: %s"
+                                   % (str(ra_data['value'])))
+
         if not ra_data['tag'] == 'outgoing_citation':
             query.append("INSERT INTO aidREALAUTHORDATA "
                           "(realauthorID, tag, value, va_count, "
@@ -1333,7 +1513,7 @@ def update_tables_from_mem_cache(sanity_checks=False, return_ra_updates=False):
                           "(%d, \"%s\", \"%s\", %d, "
                           "%f, %f); "
                          % (ra_data['realauthorid'],
-                            ra_data['tag'], ra_data['value'],
+                            ra_data['tag'], ra_data['value'][0:254],
                             ra_data['va_count'], ra_data['va_np'],
                             ra_data['va_p']))
 

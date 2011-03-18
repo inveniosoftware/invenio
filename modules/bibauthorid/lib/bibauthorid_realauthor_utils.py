@@ -465,7 +465,8 @@ def update_realauthor_data_by_vid(ra_id, va_id):
 
     for i in va_data:
         if ((i['tag'] != "updated") and (i['tag'] != "connected")
-            and (i['tag'] != "authorIndex")):
+            and (i['tag'] != "authorIndex")
+            and (i['tag'] != "bibrefrecpair")):
             existant_data = [row for row in dat.REALAUTHOR_DATA
                              if ((row['realauthorid'] == ra_id)
                                  and (row['tag'] == i['tag'])

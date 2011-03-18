@@ -27,16 +27,36 @@ import re
 import bibauthorid_config as bconfig
 import bibauthorid_structs as dat
 
+try:
+    from invenio.search_engine import get_record
+except ImportError:
+    pass
+
 
 def string_partition(s, sep, dir='l'):
-    if dir=='r':
+    '''
+    Partition a string by the first occurrence of the separator.
+    Mimics the string.partition function, which is not available in Python2.4
+
+    @param s: string to be partitioned
+    @type s: string
+    @param sep: separator to partition by
+    @type sep: string
+    @param dir: direction (left 'l' or right 'r') to search the separator from
+    @type dir: string
+
+    @return: tuple of (left or sep, sep, right of sep)
+    @rtype: tuple
+    '''
+    if dir == 'r':
         i = s.rfind(sep)
     else:
         i = s.find(sep)
     if i < 0:
-        return (s,'','')
+        return (s, '', '')
     else:
-        return (s[0:i],s[i:i+1],s[i+1:])
+        return (s[0:i], s[i:i + 1], s[i + 1:])
+
 
 def split_name_parts(name_string, delete_name_additions=True,
                      override_surname_sep=''):
@@ -52,6 +72,9 @@ def split_name_parts(name_string, delete_name_additions=True,
     @type name: string
     @param delete_name_additions: determines whether to delete name additions
     @type delete_name_additions: boolean
+    @param override_surname_sep: Define alternative surname separator
+    @type override_surname_sep: string
+    @param reverse_name_surname: if true names come first
 
     @return: list of [surname string, initials list, names list]
         e.g. split_name_parts("Ellis, John R.")
@@ -73,17 +96,25 @@ def split_name_parts(name_string, delete_name_additions=True,
         for name_addition in name_additions:
             name_string = name_string.replace(name_addition, '')
 
+    surname = ""
+    rest_of_name = ""
     found_sep = ''
+    name_string = name_string.strip()
+
     for sep in surname_separators:
         if name_string.count(sep) >= 1:
             found_sep = sep
-            surname, rest_of_name = string_partition(name_string,sep)[0::2]
+            surname, rest_of_name = string_partition(name_string, sep)[0::2]
             break
+
     if not found_sep:
-        rest_of_name, surname = string_partition(name_string,' ',dir='r')[0::2]
+        if name_string.count(" ") > 0:
+            rest_of_name, surname = string_partition(name_string, ' ', dir='r')[0::2]
+        else:
+            return [name_string, [], []]
 
     if rest_of_name.count(","):
-        rest_of_name = string_partition(rest_of_name,",")[0]
+        rest_of_name = string_partition(rest_of_name, ",")[0]
 
     substitution_regexp = re.compile('[%s]' % (name_separators))
     initials_names_list = substitution_regexp.sub(' ', rest_of_name).split()
@@ -130,10 +161,10 @@ def split_name_parts_old(name_string, delete_name_additions=True):
         for name_addition in name_additions:
             name_string = name_string.replace(name_addition, '')
 
-    surname, rest_of_name = string_partition(name_string,',')[0::2]
+    surname, rest_of_name = string_partition(name_string, ',')[0::2]
 
     if rest_of_name.count(","):
-        rest_of_name = string_partition(rest_of_name,",")[0]
+        rest_of_name = string_partition(rest_of_name, ",")[0]
 
     substitution_regexp = re.compile('[%s]' % (name_separators))
     initials_names_list = substitution_regexp.sub(' ', rest_of_name).split()
@@ -150,6 +181,15 @@ def split_name_parts_old(name_string, delete_name_additions=True):
     return [surname, initials, names]
 
 
+def create_canonical_name(name):
+    canonical_name =  create_unified_name(name, reverse=True)
+    artifact_removal = re.compile("[^a-zA-Z0-9]")
+    whitespace_removal = re.compile("[ ]{1,10}")
+    canonical_name = artifact_removal.sub(" ", canonical_name)
+    canonical_name = whitespace_removal.sub(" ", canonical_name)
+    canonical_name = canonical_name.strip().replace(" ", ".")
+    return canonical_name
+
 def create_normalized_name(splitted_name):
     '''
     Creates a normalized name from a given name array. A normalized name
@@ -163,6 +203,9 @@ def create_normalized_name(splitted_name):
     '''
     name = splitted_name[0] + ','
 
+    if not splitted_name[1] and not splitted_name[2]:
+        return name
+
     for i in splitted_name[2]:
         name = name + ' ' + i
 
@@ -172,7 +215,7 @@ def create_normalized_name(splitted_name):
     return name
 
 
-def create_unified_name(name):
+def create_unified_name(name, reverse=False):
     '''
     Creates unified name. E.g. Ellis, John Richard T. (Jr.)
     will become Ellis, J. R. T.
@@ -180,15 +223,23 @@ def create_unified_name(name):
     @param name: The name to be unified
     @type name: string
 
+    @param reverse: if true, names come first
+
     @return: The unified name
     @rtype: string
 
     '''
     split_name = split_name_parts(name)
 
-    unified_name = "%s, " % (split_name[0])
-    for i in split_name[1]:
-        unified_name += "%s. " % (i)
+    if reverse:
+        unified_name = ''
+        for i in split_name[1]:
+            unified_name += "%s. " % (i)
+        unified_name += "%s" % (split_name[0])
+    else:
+        unified_name = "%s, " % (split_name[0])
+        for i in split_name[1]:
+            unified_name += "%s. " % (i)
 
     if unified_name.count("ollabo"):
         unified_name = unified_name.replace("ollaborations", "ollaboration")
@@ -300,8 +351,10 @@ def get_field_values_on_condition(bibrecid, get_table="", get_tag="",
     if source == "MEM":
         rec = dat.RELEVANT_RECORDS.get(bibrecid)
     elif source == "API":
-        from search_engine import get_record
         rec = get_record(bibrecid)
+
+    if condition_value and isinstance(condition_value, str):
+        condition_value = condition_value.decode('utf-8')
 
     returnset = set()
 
@@ -333,7 +386,7 @@ def get_field_values_on_condition(bibrecid, get_table="", get_tag="",
                             if field[0] == condition_tag:
                                 condition_holds = False
                                 try:
-                                    condition_holds = not eval(("field[1] %s"
+                                    condition_holds = not eval(("field[1].decode('utf-8') %s"
                                         + " condition_value") % (condition))
                                 except (TypeError, NameError, IndexError):
                                     condition_holds = False
@@ -344,7 +397,7 @@ def get_field_values_on_condition(bibrecid, get_table="", get_tag="",
                                     break
                         elif get_tag:
                             if get_tag == field[0]:
-                                returnset.add(field[1])
+                                returnset.add(field[1].decode('utf-8'))
                         else:
                             retlist = {}
 
@@ -359,7 +412,7 @@ def get_field_values_on_condition(bibrecid, get_table="", get_tag="",
                     if is_condition and not is_skip_entry:
                         for field in recordentries[0]:
                             if field[0] == get_tag:
-                                returnset.add(field[1])
+                                returnset.add(field[1].decode('utf-8'))
 
         if len(returnset) == 0:
             returnset = set()

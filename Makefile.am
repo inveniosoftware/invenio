@@ -143,19 +143,19 @@ install-jquery-plugins: install-jquery-plugins
 	(cd ${prefix}/var/www/js && \
 	wget http://jqueryjs.googlecode.com/files/jquery-1.3.1.min.js && \
 	mv jquery-1.3.1.min.js jquery.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.7/jquery-1.4.4.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.7/ui/minified/jquery.effects.core.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.7/ui/minified/jquery.effects.highlight.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.7/ui/minified/jquery.ui.widget.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.7/ui/minified/jquery.ui.tabs.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.7/ui/minified/jquery.ui.slider.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.7/ui/minified/jquery.ui.sortable.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.7/ui/minified/jquery.ui.button.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.7/ui/minified/jquery.ui.dialog.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.7/ui/minified/jquery.ui.mouse.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.7/ui/minified/jquery.ui.draggable.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.7/ui/minified/jquery.ui.position.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.7/ui/minified/jquery.ui.resizable.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/jquery-1.4.4.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.effects.core.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.effects.highlight.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.widget.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.tabs.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.slider.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.sortable.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.button.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.dialog.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.mouse.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.draggable.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.position.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.resizable.min.js && \
 	wget http://www.appelsiini.net/download/jquery.jeditable.mini.js && \
 	wget http://github.com/malsup/form/raw/master/jquery.form.js --no-check-certificate && \
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
