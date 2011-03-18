@@ -36,7 +36,7 @@ websearch_templates = invenio.template.load('websearch')
 ## results according to collections?
 if CFG_INSPIRE_SITE:
     CFG_CITESUMMARY_COLLECTIONS = [['All papers', 'collection:citeable'],
-                                   ['Published only', 'collection:citeable collection:published']]
+                                   ['Published only', 'collection:published']]
 else:
     CFG_CITESUMMARY_COLLECTIONS = [['All papers', ''],
                                    ['Published only', 'collection:article']]
