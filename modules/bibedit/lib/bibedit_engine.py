@@ -400,6 +400,8 @@ def perform_request_search(data):
     """Handle search requests."""
     response = {}
     searchType = data['searchType']
+    if searchType is None:
+        searchType = "anywhere"
     searchPattern = data['searchPattern']
     if searchType == 'anywhere':
         pattern = searchPattern
