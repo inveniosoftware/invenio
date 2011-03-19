@@ -161,6 +161,9 @@ if GLOBAL_CONFIG and CFG_BIBAUTHORID_ATTACH_VA_TO_MULTIPLE_RAS:
 else:
     ATTACH_VA_TO_MULTIPLE_RAS = False
 
+# Shall we send from locally defined eMail address or from the users one
+# when we send out a ticket? Default is True -> send with user's email
+TICKET_SENDING_FROM_USER_EMAIL = True
 # Log Level for the message output.
 # Log Levels are defined in the Python logging system
 # 0 - 50 (log everything - log exceptions)

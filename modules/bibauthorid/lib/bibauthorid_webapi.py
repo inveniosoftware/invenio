@@ -1096,9 +1096,10 @@ def create_request_ticket(userinfo, ticket):
     m("User Information:")
 
     for k, v in userinfo.iteritems():
-        m("    %s: %s" % (k, v))
+        if v:
+            m("    %s: %s" % (k, v))
 
-    m("\nLinks to all issued Person-based requests:")
+    m("\nLinks to all issued Person-based requests:\n")
 
     for i in userinfo:
         udata.append([i,userinfo[i]])
@@ -1132,12 +1133,21 @@ def create_request_ticket(userinfo, ticket):
         tu.update_request_ticket(pid, data)
         pidlink = get_person_redirect_link(pid)
 
-        m("%s/person/%s" % (CFG_SITE_URL, pidlink))
+        m("%s/person/%s#tabTickets" % (CFG_SITE_URL, pidlink))
 
-    send_email(CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL,
-               CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL,
-               subject="[Author] Change Request",
-               content="\n".join(mailcontent))
+    m("\nPlease remember that you have to be logged in "
+      "in order to see the ticket of a person.\n")
+
+    if ticket and tic and mailcontent:
+        sender = CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
+
+        if bconfig.TICKET_SENDING_FROM_USER_EMAIL and userinfo['email']:
+            sender = userinfo['email']
+
+        send_email(sender,
+                   CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL,
+                   subject="[Author] Change Request",
+                   content="\n".join(mailcontent))
 
     return True
 
@@ -1195,6 +1205,8 @@ def execute_action(action, pid, bibref, uid, userinfo='', comment=''):
         return False
     elif pid < 0:
         return False
+    elif pid == -3:
+        pid = tu.create_new_person(uid, uid_is_owner=False)
     elif not is_valid_bibref(bibref):
         return False
 

@@ -91,7 +91,7 @@ from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
 from invenio.bibcirculation_webinterface import WebInterfaceHoldingsPages
-from invenio.webpage import page, create_error_box
+from invenio.webpage import page, pageheaderonly, create_error_box
 from invenio.messages import gettext_set_language
 from invenio.search_engine import check_user_can_view_record, \
      collection_reclist_cache, \
@@ -125,6 +125,7 @@ from invenio.errorlib import register_exception
 from invenio.bibedit_webinterface import WebInterfaceEditPages
 from invenio.bibeditmulti_webinterface import WebInterfaceMultiEditPages
 from invenio.bibmerge_webinterface import WebInterfaceMergePages
+from invenio.search_engine import get_record
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -238,14 +239,14 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
     def _lookup(self, component, path):
         """This handler parses dynamic URLs (/author/John+Doe)."""
         return WebInterfaceAuthorPages(component), path
-
-
+    
     def __call__(self, req, form):
         """Serve the page in the given language."""
         is_bibauthorid = False
         bibauthorid_template = None
         personid_status_cacher = None
         userinfo = collect_user_info(req)
+        metaheaderadd = ""
 
         try:
             from invenio.bibauthorid_webapi import search_person_ids_by_name
@@ -291,11 +292,23 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         names_dict = {}
         db_names_dict = {}
         _ = gettext_set_language(ln)
+        title_message = "Author Details"
 
         #let's see what takes time..
         time1 = time.time()
         genstart = time1
         time2 = time.time()
+
+        if is_bibauthorid:
+            metaheaderadd = bibauthorid_template.tmpl_meta_includes()
+
+        # Start the page in clean manner:
+        req.content_type = "text/html"
+        req.send_http_header()
+        req.write(pageheaderonly(req=req, title=title_message,
+                                 metaheaderadd=metaheaderadd,
+                                 language=ln))
+        req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
 
         if is_bibauthorid:
             personid_status_cacher = get_personid_status_cacher()
@@ -361,10 +374,9 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             else:
                 test_results = [i for i in sorted_results if i[1][0][2] > .8]
 
-
             if len(test_results) == 1:
                 self.personid = test_results[0][0]
-            #@todo: Show selection of possible Person entities if len > 1
+
             elif len(test_results) > 1:
                 if bibauthorid_template and nquery:
                     authors = []
@@ -378,26 +390,68 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                                         authorpapers[0:4]])
 
                     srch = bibauthorid_template.tmpl_author_search
-                    mha = bibauthorid_template.tmpl_meta_includes()
-                    body = srch(nquery, authors, author_papges_mode=True)
-                    title = _("Did you mean...")
-                    return page(title=title,
-                                metaheaderadd=mha,
-                                body=body,
-                                req=req,
-                                language=ln)
-
+                    body = srch(nquery, authors, author_pages_mode=True)
+                    req.write(body)
+                    return
         # start page
-        req.content_type = "text/html"
-        req.send_http_header()
-        uid = getUid(req)
-        page_start(req, "hb", "", "", ln, uid)
+#        req.content_type = "text/html"
+#        req.send_http_header()
+#        uid = getUid(req)
+#        page_start(req, "hb", "", "", ln, uid)
 
-        if self.personid < 0 or not is_bibauthorid:
+        if self.personid < 0 and is_bibauthorid:
             # Well, no person. Fall back to the exact author name search then.
-            self.authorname = self.pageparam
+            ptitle = ''
+            if recid:
+                try:
+                    ptitle = get_record(recid)['245'][0][0][0][1]  
+                except (IndexError,TypeError):
+                    ptitle = '"Title not available"'
 
-            if not self.authorname:
+            self.authorname = self.pageparam
+            title = ''
+            pmsg = ''
+
+            if ptitle:
+                pmsg = " on paper '%s'" % ptitle
+
+            # We're sorry we're introducing html tags where they weren't before. XXX
+            message = ""
+
+            if CFG_INSPIRE_SITE:
+                message += ("<p>We are in the process of attributing papers to people so that we can "
+                            "improve publication lists.</p>\n")
+
+            message += ("<p>We have not generated the publication list for author '%s'%s.  Please be patient as we "
+                        "continue to match people to author names and publications. '%s' may be attributed in the next "
+                        "few weeks.</p>" % (self.pageparam, pmsg, self.pageparam))
+
+            req.write('<div id="header">%s</div><br>' % title)
+            req.write('%s <br>' % message)
+
+            if not nquery:
+                nquery = self.pageparam
+
+            if not authors:
+                authors = []
+                sorted_results = search_person_ids_by_name(nquery)
+
+                for results in sorted_results:
+                    pid = results[0]
+                    authorpapers = get_papers_by_person_id(pid, -1)
+                    authorpapers = sorted(authorpapers, key=itemgetter(0),
+                                          reverse=True)
+                    authors.append([results[0], results[1],
+                                    authorpapers[0:4]])
+
+            srch = bibauthorid_template.tmpl_author_search
+            body = srch(nquery, authors, author_pages_mode=True)
+            req.write(body)
+            return
+#            return self._psearch(req, form, is_fallback=True, fallback_query=self.pageparam,  fallback_title=title, fallback_message=message)
+
+        elif self.personid < 0 and not is_bibauthorid:
+            if not self.pageparam:
                 return websearch_templates.tmpl_author_information(req, {},
                                                             self.authorname,
                                                             0, {}, {}, {},
@@ -406,6 +460,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                                                             bibauthorid_data,
                                                             ln)
 
+            self.authorname = self.pageparam
             #search the publications by this author
             pubs = perform_request_search(req=None, p=self.authorname, f="exactauthor")
             names_dict[self.authorname] = len(pubs)
@@ -529,7 +584,6 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             and "precached_viewclaimlink" in userinfo
             and "precached_usepaperattribution" in userinfo
             and "precached_usepaperclaim" in userinfo
-            and userinfo["precached_viewclaimlink"]
             and (userinfo["precached_usepaperclaim"]
                  or userinfo["precached_usepaperattribution"])
             ):
@@ -594,7 +648,19 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 #        req.write(simauthbox)
         if verbose == 9:
             req.write("<br/>all: " + str(time.time() - genstart) + "<br/>")
+            
         return page_end(req, 'hb', ln)
+
+    def _psearch(self, req, form, is_fallback=True, fallback_query='',  fallback_title='', fallback_message=''):
+        html = []
+        h = html.append
+        if fallback_title:
+                h('<div id="header">%s</div><br>' % fallback_title)
+        if fallback_message:
+                h('%s <br>' % fallback_message)
+        h(' We may have \'%s\' partially matched; <a href=/person/search?q=%s>click here</a> ' % (fallback_query, fallback_query))
+        h('to see what we have so far.  (Note: this is likely to update frequently.')
+        return "\n".join(html)
 
 
     def get_institute_pub_dict(self, recids, names_list):

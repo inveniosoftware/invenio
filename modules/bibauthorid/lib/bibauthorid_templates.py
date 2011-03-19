@@ -27,6 +27,7 @@
 from invenio.config import CFG_SITE_LANG
 from invenio.config import CFG_SITE_URL
 from invenio.config import CFG_SITE_SUPPORT_EMAIL
+from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 from invenio.bibformat import format_record
 from invenio.session import get_session
 from invenio.search_engine import get_fieldvalues
@@ -487,8 +488,27 @@ class Template:
 
         pp_html = []
         h = pp_html.append
+
         h('<form id="%s" action="/person/action" method="post">'
                    % (form_id))
+
+        h('<div class="aid_reclist_selector">'+self._(' On all pages: '))
+        h('<a rel="group_1" href="#select_all">'+self._('Select All')+'</a> | ')
+        h('<a rel="group_1" href="#select_none">'+self._('Select None')+'</a> | ')
+        h('<a rel="group_1" href="#invert_selection">'+self._('Invert Selection')+'</a>')
+        h('</div>')
+
+        h('<div class="aid_reclist_buttons">')
+        h(('<img src="%s/img/aid_90low_right.png" alt="∟" />')
+          % (CFG_SITE_URL))
+        h('<input type="hidden" name="pid" value="%s" />' % (person_id))
+        h('<input type="submit" name="confirm" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_confirm'])
+        h('<input type="submit" name="repeal" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_repeal'])
+        h('<input type="submit" name="to_other_person" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_to_others'])
+        h('<input type="submit" name="reset" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_forget'])
+        h("  </div>")
+
+
         h('<table  class="paperstable" cellpadding="3" width="100%">')
         h("<thead>")
         h("  <tr>")
@@ -543,7 +563,7 @@ class Template:
         h('</div>')
 
         h('<div class="aid_reclist_buttons">')
-        h(('<img src="%s/img/aid_90low_right.png" alt="∟" />'+self._(' With selected do: '))
+        h(('<img src="%s/img/aid_90low_right.png" alt="∟" />')
           % (CFG_SITE_URL))
         h('<input type="hidden" name="pid" value="%s" />' % (person_id))
         h('<input type="submit" name="confirm" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_confirm'])
@@ -638,13 +658,15 @@ class Template:
         h = html.append
         #class="ui-tabs ui-widget ui-widget-content ui-corner-all">
         h('<div id="aid_person_names"')
-        h('<p><strong>'+self._('Names of the person as collected from the records attached')+'</strong></p>')
+        h('<p><strong>'+self._('Names variants:')+'</strong></p>')
         h("<p>")
         h('<!--<span class="aid_lowlight_text">Person ID: <span id="pid%s">%s</span></span><br />!-->'
                       % (person_id, person_id))
 
         for name in names:
-            h(("%s "+self._('as appeared on')+" %s"+self._(' records')+"<br />")
+#            h(("%s "+self._('as appeared on')+" %s"+self._(' records')+"<br />")
+#                             % (name[0], name[1]))
+            h(("%s (%s); ")
                              % (name[0], name[1]))
 
         h("</p>")
@@ -822,8 +844,9 @@ class Template:
                         h('%(action)s - %(name)s on %(title)s'
                       % ({'action':a[0], 'url':CFG_SITE_URL, 'pid':str(person_id), 'bib':a[1], 'name':pname, 'title':title, 'rt':t[1]}))
                     if 'del_entry' in ticket_links:
-                        h(' - <a id="action" href="%(url)s/person/action?cancel_rt_ticket=True&pid=%(pid)s&selection=%(bib)s&rt_id=%(rt)s&rt_action=%(action)s"> Delete this entry </a> <br>'
+                        h(' - <a id="action" href="%(url)s/person/action?cancel_rt_ticket=True&pid=%(pid)s&selection=%(bib)s&rt_id=%(rt)s&rt_action=%(action)s"> Delete this entry </a>'
                       % ({'action':a[0], 'url':CFG_SITE_URL, 'pid':str(person_id), 'bib':a[1], 'name':pname, 'title':title, 'rt':t[1]}))
+                    h(' - <a id="show_paper" target="_blank" href="%(url)s/record/%(record)s"> View record <br>' % ({'url':CFG_SITE_URL, 'record':str(bibrec)}))
                 h('</dd>')
                 h('</dd><br>')
 #            h(str(open_rt_tickets))
@@ -957,8 +980,8 @@ class Template:
         h = html.append
         h('<div id="aid_menu">')
         h('  <ul>')
-        h('    <li><a href="#">'+self._('Navigation:')+'</a></li>')
-        h(('    <li><a href="%s/person/search">'+self._('Person Search')+'</a></li>') % CFG_SITE_URL)
+        h('    <li>'+self._('Navigation:')+'</li>')
+        h(('    <li><a href="%s/person/search">'+self._('Run paper attribution for another author')+'</a></li>') % CFG_SITE_URL)
         h('    <!--<li><a href="#">'+self._('Person Interface FAQ')+'</a></li>!-->')
         h('  </ul>')
         h('</div>')
@@ -1016,7 +1039,7 @@ class Template:
             h('<img src="%s/img/aid_warning_granted.png" '
               'alt="%s" width="30" height="30" />'
               % (CFG_SITE_URL, self._("Confirmation needed to continue")))
-            h(self._('The result of this request will be visible immediately but we need your confirmation to do so'))
+            h(self._('The result of this request will be visible immediately but we need your confirmation to do so for this paper have been manually claimed before'))
             h('</span><br />')
             h('<span style="margin-left:25px; vertical-align:middle;">')
             h('<img src="%s/img/aid_denied.png" '
@@ -1094,7 +1117,7 @@ class Template:
         html = []
         h = html.append
 
-        h(html_icon_legend())
+#        h(html_icon_legend())
 
         if "checkout_faulty_fields" in pinfo and pinfo["checkout_faulty_fields"]:
             h(self.tmpl_error_box(self._("Please Check your entries"), self._("Sorry.")))
@@ -1259,7 +1282,9 @@ class Template:
 
 
     def tmpl_author_search(self, query, results,
-                           search_ticket=None, author_papges_mode=False):
+                           search_ticket=None, author_pages_mode=True,
+                           fallback_mode=False, fallback_title='',
+                           fallback_message='', new_person_link=False):
         '''
         Generates the search for Person entities.
 
@@ -1273,7 +1298,7 @@ class Template:
         '''
         linktarget = "person"
 
-        if author_papges_mode:
+        if author_pages_mode:
             linktarget = "author"
 
         if not query:
@@ -1282,13 +1307,17 @@ class Template:
         html = []
         h = html.append
 
-        if not author_papges_mode:
-            h('<div id="header">Search for a person</div>')
-            h('<form id="searchform" action="/person/search" method="GET">')
-            h('<input type="text" name="q" style="border:1px solid #333; width:500px;" '
-                        'maxlength="250" value="%s" class="focus" />' % query)
-            h('<input type="submit" value="Search" />')
-            h('</form>')
+        h('<form id="searchform" action="/person/search" method="GET">')
+        h('<input type="text" name="q" style="border:1px solid #333; width:500px;" '
+                    'maxlength="250" value="%s" class="focus" />' % query)
+        h('<input type="submit" value="Search" />')
+        h('</form>')
+
+        if fallback_mode:
+            if fallback_title:
+                h('<div id="header">%s</div>' % fallback_title)
+            if fallback_message:
+                h('%s' % fallback_message)
 
         if not results and not query:
             h('</div>')
@@ -1297,11 +1326,15 @@ class Template:
         h("<p>&nbsp;</p>")
 
         if query and not results:
-            h(('<strong>'+self._('Sorry, no results could be found for the query')+' "%s"</strong>') % query)
+            authemail = CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
+            h(('<strong>'+self._("We do not have a publication list for '%s'." +
+                                 " Try using a less specific author name, or check" +
+                                 " back in a few days as attributions are updated " +
+                                 "frequently.  Or you can send us feedback, at ") +
+                                 "<a href=\"mailto:%s\">%s</a>.</strong>") % (query, authemail, authemail))
             h('</div>')
             return "\n".join(html)
 
-        h(('<p><strong>'+self._('Results for the query ')+'"%s"</strong></p>') % query)
         base_color = 100
         row_color = 0
 
@@ -1331,7 +1364,7 @@ class Template:
                         '<img src="../img/aid_plus_16.png" '
                         'alt = "toggle additional information." '
                         'width="11" height="11"/> '
-                        +self._('Show additional information')+
+                        +self._('Recent Papers')+
                         '</a></em>' )
                         % (pid))
 
@@ -1344,16 +1377,16 @@ class Template:
                 h(('<span style="margin-left: 40px;">'
                             '<em><a href="%s" id="confirmlink">'
                             '<strong>'+self._('YES!')+'</strong>'
-                            +self._(' Assign papers to ')+
+                            +self._(' Attribute Papers To ')+
                             '%s (PersonID: %d )</a></em></span>')
                             % (link, get_person_redirect_link(pid), pid))
             else:
                 h(('<span style="margin-left: 40px;">'
                             '<em><a href="%s/%s/%s" id="aid_moreinfolink">'
-                            +self._('Show author page ')+'(person ID: %s - %d)</a></em></span>')
+                            +self._('Publication List ')+'(%s)</a></em></span>')
                             % (CFG_SITE_URL, linktarget,
                                get_person_redirect_link(pid),
-                               get_person_redirect_link(pid), pid))
+                               get_person_redirect_link(pid)))
             h('<div class="more-mpid%s" id="aid_moreinfo">' % (pid))
 
             if papers:
@@ -1368,11 +1401,21 @@ class Template:
             else:
                 h("<p>"+self._('Sorry, there are no documents known for this person')+"</p>")
 
-            h(('<p><a href="%s/perons/%d" target="_blank">'
-                        +self._('Show more information about this person in a new window or tab')+
-                        '</a></p>') % (CFG_SITE_URL, pid))
+            h(('<span style="margin-left: 40px;">'
+                        '<em><a href="%s/%s/%s" target="_blank" id="aid_moreinfolink">'
+                        +self._('Publication List ')+'(%s)</a> (in a new window or tab)</em></span>')
+                        % (CFG_SITE_URL, linktarget,
+                           get_person_redirect_link(pid),
+                           get_person_redirect_link(pid)))
             h('</div>')
             h('</div>')
+
+            if new_person_link:
+                h('<div>')
+                h('<a href="%s/person/action?confirm=True&pid=-3">' % (CFG_SITE_URL))
+                h(self._("Create a new Person for your search"))
+                h('</a>')
+                h('</div>')
 
         return "\n".join(html)
 

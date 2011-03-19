@@ -3990,7 +3990,7 @@ class Template:
         # construct papers box
         rec_query = baid_query
         searchstr = create_html_link(self.build_search_url(p=rec_query),
-                                     {}, "All papers (" + str(len(pubs)) + ")",)
+                                     {}, "<strong>" + "All papers (" + str(len(pubs)) + ")" + "</strong>",)
         line1 = "<strong>" + _("Papers") + "</strong>"
         line2 = searchstr
 
@@ -4086,12 +4086,15 @@ class Template:
 
         coauthor_box = self.tmpl_print_searchresultbox(header, "<br />\n".join(content))
 
-        req.write("<h1>%s</h1>" % authorname)
+        pubs_to_papers_link = create_html_link(self.build_search_url(p=baid_query), {}, str(len(pubs)))
+        req.write('<h1>%s <span style="font-size:50%%;">(%s papers)</span></h1>'
+                  % (authorname, pubs_to_papers_link))
+#        req.write("<h1>%s</h1>" % (authorname))
 
         if person_link:
-            req.write('<div><a href="%s/person/%s">%s</a></div>'
+            req.write('<div><a href="%s/person/%s?open_claim=True">%s</a></div>'
                       % (CFG_SITE_URL, person_link,
-                         _("Report problem!")))
+                         _("This is me.  Verify my publication list.")))
 
         req.write("<table width=80%><tr valign=top><td>")
         req.write(names_box)
