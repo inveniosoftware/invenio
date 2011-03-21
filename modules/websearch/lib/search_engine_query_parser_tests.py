@@ -489,10 +489,17 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         self._compare_searches(inv_search, spi_search)
 
     def test_distribution_without_spacing(self):
-        """SPIRES search syntax - find t this and that ->title:this and title:that"""
+        """SPIRES search syntax - find aff SLAC and Stanford ->affiliation:SLAC and affiliation:Stanford"""
         # motivated by trac-187
         spi_search = "find aff SLAC and Stanford"
         inv_search = "affiliation:SLAC and affiliation:Stanford"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_distribution_with_phrases(self):
+        """SPIRES search syntax - find aff Penn State U -> affiliation:"Penn State U"""
+        # motivated by trac-517
+        spi_search = "find aff Penn State U"
+        inv_search = "affiliation:\"Penn State U\""
         self._compare_searches(inv_search, spi_search)
 
     def test_keyword_as_kw(self):

@@ -582,7 +582,21 @@ class SpiresToInvenioSyntaxConverter:
         # test index
         'test' : '',
         'testindex' : '',
-        }
+    }
+
+    _INVENIO_KEYWORDS_FOR_SPIRES_PHRASE_SEARCHES = [
+        'affiliation:',
+        #'cited:', # topcite is technically a phrase index - this isn't necessary
+        '773__y:', # journal-year
+        '773__c:', # journal-page
+        '773__w:', # cnum
+        '044__a:', # country code
+        '65017a:', # field code
+        '690C_a:', # type code
+        '035__z:', # texkey
+        # also exact expno, corp-auth, url, abstract, doi, mycite, citing
+        # but we have no invenio equivalents for these ATM
+    ]
 
     def __init__(self):
         """Initialize the state of the converter"""
@@ -633,6 +647,9 @@ class SpiresToInvenioSyntaxConverter:
 
         # for finding (and changing) a variety of different SPIRES search keywords
         self._re_spires_find_keyword = re.compile('^(?P<find>f|fin|find)\s+(?P<query>.*)$', re.IGNORECASE)
+
+        # for finding boolean expressions
+        self._re_boolean_expression = re.compile(r' and | or | not | and not ')
 
         # patterns for subbing out spaces within quotes temporarily
         self._re_pattern_single_quotes = re.compile("'(.*?)'")
@@ -850,19 +867,27 @@ class SpiresToInvenioSyntaxConverter:
             result = ''
             content = content.strip()
 
+
             # replace spaces within quotes by __SPACE__ temporarily:
             content = self._re_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", content)
             content = self._re_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", content)
             content = self._re_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", content)
 
-            words = content.split()
-            if len(words) > 1:
-                result = '(' + term + words[0]
-                for word in words[1:]:
-                    result += ' and ' + term + word
-                result += ')'
+            if term in self._INVENIO_KEYWORDS_FOR_SPIRES_PHRASE_SEARCHES \
+                    and not self._re_boolean_expression.search(content) and ' ' in content:
+                # the case of things which should be searched as phrases
+                result = term + '"' + content + '"'
+
             else:
-                result = term + words[0]
+                words = content.split()
+                if len(words) > 1:
+                    result = '(' + term + words[0]
+                    for word in words[1:]:
+                        result += ' and ' + term + word
+                    result += ')'
+                else:
+                    result = term + words[0]
+
             # replace back __SPACE__ by spaces:
             result = self._re_pattern_space.sub(" ", result)
             return result.strip()
