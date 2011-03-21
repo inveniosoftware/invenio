@@ -465,6 +465,12 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = "find t 'compton scattering' and a mele"
         self._compare_searches(inv_search, spi_search)
 
+    def test_equals_sign(self):
+        """SPIRES search syntax - find a beacom and date = 2000"""
+        inv_search = "author:beacom year:2000"
+        spi_search = "find a beacom and date = 2000"
+        self._compare_searches(inv_search, spi_search)
+
     def test_fin_to_find_trans(self):
         """SPIRES search syntax - fin a ellis, j == find a ellis, j"""
         fin_search = "fin a ellis, j"

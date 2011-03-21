@@ -639,6 +639,7 @@ class SpiresToInvenioSyntaxConverter:
         self._re_pattern_double_quotes = re.compile("\"(.*?)\"")
         self._re_pattern_regexp_quotes = re.compile("\/(.*?)\/")
         self._re_pattern_space = re.compile("__SPACE__")
+        self._re_pattern_equals = re.compile("__EQUALS__")
 
     def is_applicable(self, query):
         """Is this converter applicable to this query?
@@ -661,6 +662,9 @@ class SpiresToInvenioSyntaxConverter:
             # Everywhere else make the assumption that all and only queries
             # starting with 'find' are SPIRES queries.  Turn fin into find.
             query = self._re_spires_find_keyword.sub(lambda m: 'find '+m.group('query'), query)
+
+            # a holdover from SPIRES syntax is e.g. date = 2000 rather than just date 2000
+            query = self._remove_extraneous_equals_signs(query)
 
             # these calls are before keywords replacement because when keywords
             # are replaced, date keyword is replaced by specific field search
@@ -872,6 +876,18 @@ class SpiresToInvenioSyntaxConverter:
             current_position = match.end()
         result += query[current_position : len(query)]
         return result.strip()
+
+    def _remove_extraneous_equals_signs(self, query):
+        """In SPIRES, both date = 2000 and date 2000 are acceptable. Get rid of the ="""
+        query = self._re_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), '=', '__EQUALS__')+"'", query)
+        query = self._re_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), '=', '__EQUALS__')+'\"', query)
+        query = self._re_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), '=', '__EQUALS__')+"/", query)
+
+        query = query.translate(None, '=')
+
+        query = self._re_pattern_equals.sub("=", query)
+
+        return query
 
     def _convert_spires_truncation_to_invenio_truncation(self, query):
         """Replace SPIRES truncation symbol # with invenio trancation symbol *"""
