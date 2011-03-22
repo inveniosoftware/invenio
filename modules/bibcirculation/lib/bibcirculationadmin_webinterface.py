@@ -22,6 +22,7 @@ __revision__ = ""
 import invenio.bibcirculationadminlib as bal
 from invenio.config import CFG_SITE_URL
 from invenio.urlutils import redirect_to_url
+from invenio.config import CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF
 
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 
@@ -32,16 +33,15 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         'get_pending_requests', 'item_search_result', 'loan_return', 'loan_on_desk_step1',
         'loan_on_desk_step2', 'loan_on_desk_step3', 'loan_on_desk_step4', 'loan_on_desk_confirm',
         'register_new_loan', 'loan_return_confirm', 'get_next_waiting_loan_request',
-        'update_next_loan_request_status', 'all_requests', 'get_item_req_historical_overview',
-        'get_item_loans_historical_overview', 'all_loans_test', 'all_loans',
+        'make_new_loan_from_request', 'all_requests', 'get_item_req_historical_overview',
+        'get_item_loans_historical_overview', 'all_loans',
         'bor_loans_historical_overview', 'bor_requests_historical_overview',
         'get_item_requests_details', 'get_item_loans_details', 'get_borrower_details',
         'get_item_details', 'get_library_details', 'get_borrower_requests_details',
         'get_borrower_loans_details', 'borrower_search_result', 'associate_barcode',
         'get_borrower_notes', 'get_loans_notes', 'get_item_loans_notes', 'new_item',
         'add_new_borrower_step1', 'add_new_borrower_step2', 'add_new_borrower_step3',
-        'update_borrower_info_step1', 'update_borrower_info_step2', 'update_borrower_info_step3',
-        'update_borrower_info_step4', 'update_borrower_info_step5', 'add_new_library_step1',
+        'update_borrower_info_step1', 'update_borrower_info_step2', 'add_new_library_step1',
         'add_new_library_step2', 'add_new_library_step3', 'update_library_info_step1',
         'update_library_info_step2', 'update_library_info_step3', 'update_library_info_step4',
         'update_library_info_step5', 'new_book_step1', 'new_book_step2', 'add_new_copy_step1',
@@ -74,8 +74,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         'register_ill_article_request_step2', 'register_ill_article_request_step3', 'ill_search',
         'ill_search_result', 'bor_ill_historical_overview',
         'delete_copy_step1', 'delete_copy_step2',
-        'merge_libraries_step1', 'merge_libraries_step2', 'merge_libraries_step3',
-        'all_library_items']
+        'merge_libraries_step1', 'merge_libraries_step2', 'merge_libraries_step3']
 
     def index(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation"""
@@ -86,12 +85,20 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
     def borrower_search(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/borrowers_search"""
-        argd = wash_urlargd(form, {'empty_barcode': (str, None), 'redirect': (str, "no"),
+        argd = wash_urlargd(form, {'empty_barcode': (str, None),
+                                   'redirect_to_new_request': (str, "no"),
                                     'ln': (str, "en")})
         empty_barcode = argd['empty_barcode']
-        redirect = argd['redirect']
+        redirect_to_new_request = argd['redirect_to_new_request']
         ln = argd['ln']
-        return bal.borrower_search(req, empty_barcode, redirect=redirect, ln=ln)
+
+        if redirect_to_new_request == 'yes':
+            redirect_to_new_request = True
+        else:
+            redirect_to_new_request = False
+
+        return bal.borrower_search(req, empty_barcode,
+                                   redirect_to_new_request=redirect_to_new_request, ln=ln)
 
 
     def item_search(self, req, form):
@@ -102,17 +109,16 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
     def item_search_result(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/item_search_result"""
-        argd = wash_urlargd(form, {'p': (str, None), 'f': (str, None),
-                                   'library_id': (str, 'all'), 'ln': (str, "en")})
+        argd = wash_urlargd(form, {'p': (str, ''), 'f': (str, ''),
+                                   'ln': (str, "en")})
         p  = argd['p']
         f  = argd['f']
-        library_id = argd['library_id']
         ln = argd['ln']
 
         if p is not None:
             p = p.strip()
 
-        return bal.item_search_result(req, p, f, library_id, ln)
+        return bal.item_search_result(req, p, f, ln)
 
     def borrower_notification(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/borrower_notification"""
@@ -140,12 +146,11 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
     def get_pending_requests(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/get_pending_requests"""
         argd = wash_urlargd(form, {'request_id': (str, None), 'print_data': (str, None),
-                                        'ln': (str, "en")})
+                                   'ln': (str, "en")})
         request_id = argd['request_id']
         print_data = argd['print_data']
         ln = argd['ln']
         return bal.get_pending_requests(req, request_id, print_data, ln)
-
 
 
 
@@ -289,15 +294,15 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         return bal.get_next_waiting_loan_request(req, recid, barcode, check_id, ln)
 
 
-    def update_next_loan_request_status(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_next_loan_request_status"""
+    def make_new_loan_from_request(self, req, form):
+        """http://cdsweb.cern.ch/admin2/bibcirculation/make_new_loan_from_request"""
         argd = wash_urlargd(form, {'check_id': (str, None), 'barcode': (str, None),
                                     'ln': (str, "en")})
         check_id = argd['check_id']
         barcode  = argd['barcode']
         ln       = argd['ln']
 
-        return bal.update_next_loan_request_status(req, check_id, barcode, ln)
+        return bal.make_new_loan_from_request(req, check_id, barcode, ln)
 
 
     def all_requests(self, req, form):
@@ -324,11 +329,11 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         return bal.get_item_loans_historical_overview(req, recid, ln)
 
 
-    def all_loans_test(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/all_loans"""
-        argd = wash_urlargd(form, {'ln': (str, "en")})
-        ln = argd['ln']
-        return bal.all_loans_test(req, ln)
+    #def all_loans_test(self, req, form):
+    #    """http://cdsweb.cern.ch/admin2/bibcirculation/all_loans"""
+    #    argd = wash_urlargd(form, {'ln': (str, "en")})
+    #    ln = argd['ln']
+    #    return bal.all_loans_test(req, ln)
 
 
     def all_loans(self, req, form):
@@ -446,15 +451,20 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
     def borrower_search_result(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/borrower_search_result"""
         argd = wash_urlargd(form, {'column': (str, "name"), 'string': (str, ''),
-                                    'redirect': (str, "no"), 'ln': (str, "en")})
+                                   'redirect_to_new_request': (str, "no"), 'ln': (str, "en")})
         column = argd['column']
         string = argd['string']
-        redirect = argd['redirect']
+        redirect_to_new_request = argd['redirect_to_new_request']
         ln = argd['ln']
 
         string = string.strip()
+        if redirect_to_new_request == 'yes':
+            redirect_to_new_request = True
+        else:
+            redirect_to_new_request = False
 
-        return bal.borrower_search_result(req, column, string, redirect=redirect, ln=ln)
+        return bal.borrower_search_result(req, column, string,
+                                          redirect_to_new_request=redirect_to_new_request, ln=ln)
 
 
     def associate_barcode(self, req, form):
@@ -546,49 +556,17 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         return bal.add_new_borrower_step2(req, name, email, phone, address,
                                           mailbox, notes, ln)
 
-
-    def add_new_borrower_step3(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/add_new_borrower_step3"""
-        argd = wash_urlargd(form, {'tup_infos': (str, None), 'ln': (str, "en")})
-        tup_infos = argd['tup_infos']
-        ln = argd['ln']
-        tup_infos = eval(tup_infos) #function not in use
-
-        return bal.add_new_borrower_step3(req, tup_infos, ln)
-
-
     def update_borrower_info_step1(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/update_borrower_info_step1"""
-        argd = wash_urlargd(form, {'ln': (str, "en")})
+        argd = wash_urlargd(form, {'borrower_id': (str, None), 'ln': (str, "en")})
+        borrower_id = argd['borrower_id']
         ln = argd['ln']
-        return bal.update_borrower_info_step1(req, ln)
+        return bal.update_borrower_info_step1(req, borrower_id, ln)
 
 
     def update_borrower_info_step2(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/update_borrower_info_step2"""
-        argd = wash_urlargd(form, {'column': (str, None), 'string': (str, None),
-                                    'ln': (str, "en")})
-        column = argd['column']
-        string = argd['string']
-        ln = argd['ln']
-
-        if string is not None:
-            string = string.strip()
-
-        return bal.update_borrower_info_step2(req, column, string, ln)
-
-
-    def update_borrower_info_step3(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_borrower_info_step3"""
-        argd = wash_urlargd(form, {'borrower_id': (str, None), 'ln': (str, "en")})
-        borrower_id = argd['borrower_id']
-        ln = argd['ln']
-        return bal.update_borrower_info_step3(req, borrower_id, ln)
-
-
-    def update_borrower_info_step4(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_borrower_info_step4"""
-        argd = wash_urlargd(form, {'borrower_id': (str, None), 'name': (str, ''),
+        argd = wash_urlargd(form, {'borrower_id': (int, None), 'name': (str, ''),
             'email': (str, ''), 'phone': (str, ''), 'address': (str, ''),
             'mailbox': (str, ''), 'ln': (str, "en")})
 
@@ -606,27 +584,8 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         address = address.strip()
         mailbox = mailbox.strip()
 
-        return bal.update_borrower_info_step4(req, borrower_id, name, email, phone, address,
+        return bal.update_borrower_info_step2(req, borrower_id, name, email, phone, address,
                                               mailbox, ln)
-
-
-    def update_borrower_info_step5(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_borrower_info_step5"""
-        argd = wash_urlargd(form, {'borrower_id': (str, None), 'name': (str, None),
-            'email': (str, None), 'phone': (str, None), 'address': (str, None),
-            'mailbox': (str, None), 'ln': (str, "en")})
-
-        name = argd['name']
-        email = argd['email']
-        phone = argd['phone']
-        address = argd['address']
-        mailbox = argd['mailbox']
-        borrower_id = argd['borrower_id']
-        ln = argd['ln']
-
-        return bal.update_borrower_info_step5(req, borrower_id, name, email, phone, address,
-                                              mailbox, ln)
-
 
     def add_new_library_step1(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/add_new_library_step1"""
@@ -888,7 +847,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'barcode': (str, ''), 'old_barcode': (str, ''),
             'library': (int, 0), 'location': (str, 'Unknown'), 'collection': (str, 'Unknown'),
             'description': (str, ''), 'loan_period': (str, '4 weeks'),
-            'status': (str, 'on shelf'), 'expected_arrival_date': (str, ''),
+            'status': (str, CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF), 'expected_arrival_date': (str, ''),
             'recid': (int, 0), 'ln': (str, "en")})
 
         barcode = argd['barcode']
@@ -922,7 +881,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'barcode': (str, '-'), 'old_barcode': (str, '-'),
             'library_id': (int, 0), 'location': (str, 'Unknown'), 'collection': (str, 'Unknown'),
             'description': (str, ''), 'loan_period': (str, '4 weeks'),
-            'status': (str, 'on shelf'), 'expected_arrival_date': (str, ''),
+            'status': (str, CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF), 'expected_arrival_date': (str, ''),
             'recid': (int, 0), 'ln': (str, "en")})
 
         barcode = argd['barcode']
@@ -1237,7 +1196,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
     def get_purchase_notes(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/get_purchase_notes"""
         argd = wash_urlargd(form, {'purchase_id': (str, None), 'delete_key': (str, None),
-                                    'library_notes': (str, None), 'ln': (str, "en")})
+                                   'library_notes': (str, None), 'ln': (str, "en")})
         purchase_id = argd['purchase_id']
         delete_key = argd['delete_key']
         library_notes = argd['library_notes']
@@ -1870,52 +1829,52 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         return bal.register_ill_book_request_from_borrower_page(req, borrower_id, ln)
 
 
-    def register_ill_book_request_from_borrower_page_result(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/item_search_result"""
-        argd = wash_urlargd(form, {'borrower_id': (str, None), 'p': (str, None),
-                                    'f': (str, None), 'ln': (str, "en")})
-        borrower_id = argd['borrower_id']
-        p = argd['p']
-        f = argd['f']
-        ln = argd['ln']
-
-        return bal.register_ill_book_request_from_borrower_page_result(req, borrower_id, p, f, ln)
-
-
-    def register_ill_request_from_borrower_page_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/register_ill_request_with_no_recid_step1"""
-        argd = wash_urlargd(form, {'borrower_id': (str, None), 'ln': (str, "en")})
-        borrower_id = argd['borrower_id']
-        ln = argd['ln']
-
-        return bal.register_ill_request_from_borrower_page_step1(req, borrower_id, ln)
-
-
-    def register_ill_request_from_borrower_page_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/register_ill_request_with_no_recid_step2"""
-        argd = wash_urlargd(form, {'borrower_id': (str, None), 'title': (str, None),
-            'authors': (str, None), 'place': (str, None), 'publisher': (str, None),
-            'year': (str, None), 'edition': (str, None), 'isbn': (str, None),
-            'period_of_interest_from': (str, None), 'period_of_interest_to': (str, None),
-            'additional_comments': (str, None), 'only_edition': (str, None), 'ln': (str, "en")})
-        borrower_id = argd['borrower_id']
-        title = argd['title']
-        authors = argd['authors']
-        place = argd['place']
-        publisher = argd['publisher']
-        year = argd['year']
-        edition = argd['edition']
-        isbn = argd['isbn']
-        period_of_interest_from = argd['period_of_interest_from']
-        period_of_interest_to = argd['period_of_interest_to']
-        additional_comments = argd['additional_comments']
-        only_edition = argd['only_edition']
-        ln = argd['ln']
-
-        return bal.register_ill_request_from_borrower_page_step2(req, borrower_id, title,
-                                                authors, place, publisher, year, edition, isbn,
-                                                period_of_interest_from, period_of_interest_to,
-                                                additional_comments, only_edition, ln)
+    #def register_ill_book_request_from_borrower_page_result(self, req, form):
+    #    """http://cdsweb.cern.ch/admin2/bibcirculation/item_search_result"""
+    #    argd = wash_urlargd(form, {'borrower_id': (str, None), 'p': (str, None),
+    #                                'f': (str, None), 'ln': (str, "en")})
+    #    borrower_id = argd['borrower_id']
+    #    p = argd['p']
+    #    f = argd['f']
+    #    ln = argd['ln']
+    #
+    #    return bal.register_ill_book_request_from_borrower_page_result(req, borrower_id, p, f, ln)
+    #
+    #
+    #def register_ill_request_from_borrower_page_step1(self, req, form):
+    #    """http://cdsweb.cern.ch/admin2/bibcirculation/register_ill_request_with_no_recid_step1"""
+    #    argd = wash_urlargd(form, {'borrower_id': (str, None), 'ln': (str, "en")})
+    #    borrower_id = argd['borrower_id']
+    #    ln = argd['ln']
+    #
+    #    return bal.register_ill_request_from_borrower_page_step1(req, borrower_id, ln)
+    #
+    #
+    #def register_ill_request_from_borrower_page_step2(self, req, form):
+    #    """http://cdsweb.cern.ch/admin2/bibcirculation/register_ill_request_with_no_recid_step2"""
+    #    argd = wash_urlargd(form, {'borrower_id': (str, None), 'title': (str, None),
+    #        'authors': (str, None), 'place': (str, None), 'publisher': (str, None),
+    #        'year': (str, None), 'edition': (str, None), 'isbn': (str, None),
+    #        'period_of_interest_from': (str, None), 'period_of_interest_to': (str, None),
+    #        'additional_comments': (str, None), 'only_edition': (str, None), 'ln': (str, "en")})
+    #    borrower_id = argd['borrower_id']
+    #    title = argd['title']
+    #    authors = argd['authors']
+    #    place = argd['place']
+    #    publisher = argd['publisher']
+    #    year = argd['year']
+    #    edition = argd['edition']
+    #    isbn = argd['isbn']
+    #    period_of_interest_from = argd['period_of_interest_from']
+    #    period_of_interest_to = argd['period_of_interest_to']
+    #    additional_comments = argd['additional_comments']
+    #    only_edition = argd['only_edition']
+    #    ln = argd['ln']
+    #
+    #    return bal.register_ill_request_from_borrower_page_step2(req, borrower_id, title,
+    #                                            authors, place, publisher, year, edition, isbn,
+    #                                            period_of_interest_from, period_of_interest_to,
+    #                                            additional_comments, only_edition, ln)
 
 
     def register_ill_article_request_step1(self, req, form):
@@ -1968,7 +1927,9 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
                 'author': (str, ''), 'report_number': (str, ''), 'volume': (str, ''),
                 'issue': (str, ''), 'page': (str, ''), 'year': (str, ''), 'issn': (str, ''),
                 'user_info': (str, None), 'request_details': (str, '()'),
-                'ln': (str, "en")})
+                'ln': (str, "en"), 'period_of_interest_from': (str, ''),
+                'period_of_interest_to': (str, ''), 'budget_code': (str, ''),
+                'additional_comments': (str, '')})
 
         periodical_title = argd['periodical_title']
         article_title = argd['article_title']
@@ -1982,8 +1943,13 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         user_info = argd['user_info']
         request_details = argd['request_details']
         ln = argd['ln']
+        period_of_interest_from = argd['period_of_interest_from']
+        period_of_interest_to = argd['period_of_interest_to']
+        budget_code = argd['budget_code']
+        additional_comments = argd['additional_comments']
 
-        request_details = request_details.split(',')
+        request_details = (period_of_interest_from, period_of_interest_to,
+                           budget_code, additional_comments)
 
         if user_info is not None:
             user_info = user_info.split(',')
@@ -2055,16 +2021,6 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         ln = argd['ln']
 
         return bal.merge_libraries_step3(req, library_from, library_to, ln)
-
-    def all_library_items(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/merge_libraries_step2"""
-        argd = wash_urlargd(form, {'library_id': (int, None), 'ln': (str, "en")})
-
-        library_id = argd['library_id']
-        ln = argd['ln']
-
-        return bal.all_library_items(req, library_id, ln)
-
 
     def __call__(self, req, form):
         """Redirect calls without final slash."""

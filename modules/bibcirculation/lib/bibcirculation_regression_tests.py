@@ -53,7 +53,7 @@ class BibCirculationAdminsWebPagesAvailabilityTest(unittest.TestCase):
         baseurl = CFG_SITE_URL + '/admin2/bibcirculation'
 
         self.assertEqual([], test_web_page_content(baseurl,
-                                                   expected_text="BibCirculation Admin"))
+                                        expected_text="BibCirculation Admin"))
 
         return
 
@@ -61,10 +61,10 @@ class BibCirculationAdminsWebPagesAvailabilityTest(unittest.TestCase):
         """bibcirculation - availability of borrower search"""
 
         baseurl = CFG_SITE_URL + '/admin2/bibcirculation/' \
-                               + 'borrower_search_result?column=name&string=john'
+                              + 'borrower_search_result?column=name&string=john'
 
         self.assertEqual([], test_web_page_content(baseurl, username='admin',
-                                                   expected_text='Borrower search result'))
+                                        expected_text='Borrower search result'))
 
         return
 

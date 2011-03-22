@@ -142,7 +142,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST',
                        'CFG_WEBSEARCH_RSS_I18N_COLLECTIONS',
                        'CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY',
-                       'CFG_BATCHUPLOADER_WEB_ROBOT_AGENT']:
+                       'CFG_BATCHUPLOADER_WEB_ROBOT_AGENT',
+                       'CFG_BIBCIRCULATION_ITEM_STATUS_OPTIONAL']:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:

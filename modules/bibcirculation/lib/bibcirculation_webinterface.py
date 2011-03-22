@@ -48,7 +48,7 @@ from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
 import invenio.template
-webstyle_templates  = invenio.template.load('webstyle')
+webstyle_templates = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
 
 # bibcirculation imports
@@ -64,12 +64,12 @@ from invenio.bibcirculation import perform_new_request, \
                                    ill_register_request, \
                                    ill_request_with_recid, \
                                    ill_register_request_with_recid
+from invenio.bibcirculation_config import CFG_BIBCIRCULATION_ILL_STATUS_NEW
 import time
 
 
 class WebInterfaceYourLoansPages(WebInterfaceDirectory):
     """Defines the set of /yourloans pages."""
-
 
     _exports = ['', 'display', 'loanshistoricaloverview']
 
@@ -158,7 +158,7 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         if not user_info['precached_useloans']:
             return page_not_authorized(req, "../", \
-                                       text = _("You are not authorized to use loans."))
+                            text = _("You are not authorized to use loans."))
 
         body = perform_loanshistoricaloverview(uid=uid,
                                                ln=argd['ln'])
@@ -176,8 +176,10 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
     """Defines the set of /ill pages."""
 
 
-    _exports = ['', 'register_request', 'book_request_step1','book_request_step2','book_request_step3',
-                'article_request_step1', 'article_request_step2', 'article_request_step3']
+    _exports = ['', 'register_request', 'book_request_step1',
+                'book_request_step2','book_request_step3',
+                'article_request_step1', 'article_request_step2',
+                'article_request_step3']
 
     def index(self, req, form):
         """ The function called by default
@@ -218,7 +220,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
 
 
         ### get borrower_id ###
-        borrower_id = search_user('email',user_info['email'])
+        borrower_id = search_user('email', user_info['email'])
         if borrower_id == ():
             body = "wrong user id"
         else:
@@ -313,9 +315,9 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use ill."))
 
         if CFG_CERN_SITE:
-            borrower_id = search_user('ccid',user_info['external_hidden_personid'])
+            borrower_id = search_user('ccid', user_info['external_hidden_personid'])
         else:
-            borrower_id = search_user('email',user_info['email'])
+            borrower_id = search_user('email', user_info['email'])
 
         if borrower_id != ():
             borrower_id = borrower_id[0][0]
@@ -399,19 +401,23 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use ill."))
 
-        book_info = {'title': title, 'authors': authors, 'place': place, 'publisher': publisher,
-                 'year' : year,  'edition': edition, 'isbn' : isbn}
+        book_info = {'title': title, 'authors': authors, 'place': place,
+                     'publisher': publisher, 'year' : year,
+                     'edition': edition, 'isbn' : isbn}
 
         ill_request_notes = {}
         if library_notes:
             ill_request_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
 
         ### budget_code ###
-        db.ill_register_request_on_desk(borrower_id, book_info, period_of_interest_from,
-                                    period_of_interest_to, 'new',
-                                    str(ill_request_notes), only_edition, 'book', budget_code)
+        db.ill_register_request_on_desk(borrower_id, book_info,
+                                        period_of_interest_from,
+                                        period_of_interest_to,
+                                        CFG_BIBCIRCULATION_ILL_STATUS_NEW,
+                                        str(ill_request_notes), only_edition,
+                                        'book', budget_code)
 
-        infos=[]
+        infos = []
         infos.append('Interlibrary loan request done.')
         body = bibcirculation_templates.tmpl_infobox(infos, ln)
 
@@ -456,7 +462,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
 
 
         ### get borrower_id ###
-        borrower_id = search_user('email',user_info['email'])
+        borrower_id = search_user('email', user_info['email'])
         if borrower_id == ():
             body = "Wrong user id"
         else:
@@ -506,33 +512,36 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         if not user_info['precached_useloans']:
             return page_not_authorized(req, "../", \
-                                       text = _("You are not authorized to use ill."))
+                                text = _("You are not authorized to use ill."))
 
-        borrower_id = search_user('email',user_info['email'])
+        borrower_id = search_user('email', user_info['email'])
         if borrower_id != ():
             borrower_id = borrower_id[0][0]
-            notes=argd['additional_comments']
+            notes = argd['additional_comments']
             ill_request_notes = {}
             if notes:
                 ill_request_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(notes)
 
             item_info = {'periodical_title': argd['periodical_title'],
-                'title': argd['article_title'], 'authors': argd['author'], 'place': "",
-                'publisher': "", 'year' : argd['year'], 'edition': "", 'issn' : argd['issn'],
-                'volume': argd['volume'], 'page': argd['page'], 'issue': argd['issue'] }
+                'title': argd['article_title'], 'authors': argd['author'],
+                'place': "", 'publisher': "", 'year' : argd['year'],
+                'edition': "", 'issn' : argd['issn'], 'volume': argd['volume'],
+                'page': argd['page'], 'issue': argd['issue'] }
 
             ### budget_code ###
             db.ill_register_request_on_desk(borrower_id, item_info,
                                     argd['period_of_interest_from'],
-                                    argd['period_of_interest_to'], 'new',
-                                    str(ill_request_notes), 'No', 'article', argd['budget_code'])
+                                    argd['period_of_interest_to'],
+                                    CFG_BIBCIRCULATION_ILL_STATUS_NEW,
+                                    str(ill_request_notes), 'No', 'article',
+                                    argd['budget_code'])
 
-            infos=[]
+            infos = []
             infos.append('Interlibrary loan request done.')
             body = bibcirculation_templates.tmpl_infobox(infos, argd['ln'])
 
         else:
-            body = "Wrong user id"
+            body = _("Wrong user id")
 
         return page(title       = _("Interlibrary loan request for books"),
                     body        = body,

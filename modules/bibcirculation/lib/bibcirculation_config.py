@@ -26,6 +26,34 @@ __revision__ = "$Id$"
 from invenio.config import CFG_CERN_SITE, \
                            CFG_SITE_URL
 
+from invenio.config import \
+    CFG_BIBCIRCULATION_ITEM_STATUS_OPTIONAL, \
+    CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN, \
+    CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF, \
+    CFG_BIBCIRCULATION_ITEM_STATUS_CANCELLED, \
+    CFG_BIBCIRCULATION_ITEM_STATUS_IN_PROCESS, \
+    CFG_BIBCIRCULATION_ITEM_STATUS_NOT_ARRIVED, \
+    CFG_BIBCIRCULATION_ITEM_STATUS_ON_ORDER, \
+    CFG_BIBCIRCULATION_ITEM_STATUS_CLAIMED, \
+    CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN, \
+    CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED, \
+    CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED, \
+    CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING, \
+    CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING, \
+    CFG_BIBCIRCULATION_REQUEST_STATUS_DONE, \
+    CFG_BIBCIRCULATION_REQUEST_STATUS_CANCELLED, \
+    CFG_BIBCIRCULATION_ILL_STATUS_NEW, \
+    CFG_BIBCIRCULATION_ILL_STATUS_REQUESTED, \
+    CFG_BIBCIRCULATION_ILL_STATUS_ON_LOAN, \
+    CFG_BIBCIRCULATION_ILL_STATUS_RETURNED, \
+    CFG_BIBCIRCULATION_ILL_STATUS_CANCELLED, \
+    CFG_BIBCIRCULATION_ILL_STATUS_RECEIVED, \
+    CFG_BIBCIRCULATION_LIBRARY_TYPE_INTERNAL, \
+    CFG_BIBCIRCULATION_LIBRARY_TYPE_EXTERNAL, \
+    CFG_BIBCIRCULATION_LIBRARY_TYPE_MAIN, \
+    CFG_BIBCIRCULATION_LIBRARY_TYPE_HIDDEN, \
+    CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY
+
 
 # templates used to notify borrowers
 if CFG_CERN_SITE == 1:
@@ -188,8 +216,6 @@ else:
         'EMPTY': 'Please choose one template'
         }
 
-CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY = '1T6P3M3TDMW9HWJ212R2'
-
 if CFG_CERN_SITE == 1:
     CFG_BIBCIRCULATION_OVERDUE_LETTER_SENDER = 'CERN Library<library.desk@cern.ch>'
     CFG_BIBCIRCULATION_LIBRARIAN_EMAIL = 'CERN Library<library.desk@cern.ch>'
@@ -199,22 +225,50 @@ else:
     CFG_BIBCIRCULATION_LIBRARIAN_EMAIL = 'Atlantis Library<balthasar.montague@cds.cern.ch>'
     CFG_BIBCIRCULATION_LOANS_EMAIL = CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
 
-CFG_BIBCIRCULATION_HOLIDAYS = ['2010-12-22', '2010-12-23', '2010-12-24', '2010-12-25',
-                               '2010-12-26', '2010-12-27', '2010-12-28', '2010-12-29',
-                               '2010-12-30', '2010-12-31', '2011-01-01', '2011-01-02',
-                               '2011-01-03', '2011-01-04', '2011-01-05']
+CFG_BIBCIRCULATION_HOLIDAYS = []
 
 CFG_BIBCIRCULATION_WORKING_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
-CFG_BIBCIRCULATION_ITEM_STATUS = ['missing', 'on shelf', 'on loan', 'out of print',
-                                  'in process', 'on order', 'in binding', 'untraceable',
-                                  'cancelled', 'order delayed', 'not arrived', 'ordered',
-                                  'not published', 'claimed']
+# You can edit this variable if you want to have customized statuses
+
+
+CFG_BIBCIRCULATION_ITEM_STATUS = CFG_BIBCIRCULATION_ITEM_STATUS_OPTIONAL + \
+                                 [CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF,
+                                  CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN,
+                                  CFG_BIBCIRCULATION_ITEM_STATUS_IN_PROCESS,
+                                  CFG_BIBCIRCULATION_ITEM_STATUS_CANCELLED,
+                                  CFG_BIBCIRCULATION_ITEM_STATUS_NOT_ARRIVED,
+                                  CFG_BIBCIRCULATION_ITEM_STATUS_ON_ORDER,
+                                  CFG_BIBCIRCULATION_ITEM_STATUS_CLAIMED]
+
+CFG_BIBCIRCULATION_LOAN_STATUS = [CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN,
+                                  CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED,
+                                  CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED]
+
+CFG_BIBCIRCULATION_REQUEST_STATUS = [CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING,
+                                     CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING,
+                                     CFG_BIBCIRCULATION_REQUEST_STATUS_DONE,
+                                     CFG_BIBCIRCULATION_REQUEST_STATUS_CANCELLED]
+
+CFG_BIBCIRCULATION_ILL_STATUS = [CFG_BIBCIRCULATION_ILL_STATUS_NEW,
+                                 CFG_BIBCIRCULATION_ILL_STATUS_REQUESTED,
+                                 CFG_BIBCIRCULATION_ILL_STATUS_ON_LOAN,
+                                 CFG_BIBCIRCULATION_ILL_STATUS_RETURNED,
+                                 CFG_BIBCIRCULATION_ILL_STATUS_RECEIVED,
+                                 CFG_BIBCIRCULATION_ILL_STATUS_CANCELLED]
 
 CFG_BIBCIRCULATION_ITEM_LOAN_PERIOD = ['4 weeks', '1 week', 'Reference']
 
-CFG_BIBCIRCULATION_COLLECTION = ["Monograph", "Reference", "Archives", "Library", "Conference",
-                                 "LSL Depot", "Oversize", "Official", "Pamphlet", "CDROM",
-                                 "Standards", "Video & Trainings", "Periodical"]
+CFG_BIBCIRCULATION_COLLECTION = ['Monograph', 'Reference', 'Archives',
+                                 'Library', 'Conference', 'LSL Depot',
+                                 'Oversize', 'Official', 'Pamphlet', 'CDROM',
+                                 'Standards', 'Video & Trainings', 'Periodical']
 
-CFG_BIBCIRCULATION_LIBRARY_TYPE = ['internal', 'external', 'main', 'hidden']
+## move these 2 to local config file and delete from here
+#CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY = 1T6P3M3TDMW9HWJ212R2
+#CFG_BIBCIRCULATION_ITEM_STATUS_OPTIONAL = missing, out of print, in binding, untraceable, order delayed, not published, claimed
+
+CFG_BIBCIRCULATION_LIBRARY_TYPE = [CFG_BIBCIRCULATION_LIBRARY_TYPE_INTERNAL,
+                                   CFG_BIBCIRCULATION_LIBRARY_TYPE_EXTERNAL,
+                                   CFG_BIBCIRCULATION_LIBRARY_TYPE_MAIN,
+                                   CFG_BIBCIRCULATION_LIBRARY_TYPE_HIDDEN]

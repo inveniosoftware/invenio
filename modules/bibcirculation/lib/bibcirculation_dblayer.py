@@ -22,6 +22,21 @@
 __revision__ = "$Id$"
 
 from invenio.dbquery import run_sql
+from invenio.bibcirculation_config import \
+    CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN, \
+    CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN, \
+    CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED, \
+    CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED, \
+    CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING, \
+    CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING, \
+    CFG_BIBCIRCULATION_REQUEST_STATUS_DONE, \
+    CFG_BIBCIRCULATION_REQUEST_STATUS_CANCELLED, \
+    CFG_BIBCIRCULATION_ILL_STATUS_RETURNED, \
+    CFG_BIBCIRCULATION_ILL_STATUS_RECEIVED, \
+    CFG_BIBCIRCULATION_LIBRARY_TYPE_INTERNAL, \
+    CFG_BIBCIRCULATION_LIBRARY_TYPE_EXTERNAL, \
+    CFG_BIBCIRCULATION_LIBRARY_TYPE_MAIN, \
+    CFG_BIBCIRCULATION_LIBRARY_TYPE_HIDDEN
 
 def verify_office_reference(uid):
     """
@@ -40,29 +55,6 @@ def verify_office_reference(uid):
 
     return res
 
-#def get_holdings_info(recid):
-#    """
-#    Get information about holding, using recid.
-#
-#    @param recid: identify the record. Primary key of bibrec.
-#    @type recid: int
-#
-#    @return holdings information
-#    """
-#    res = run_sql("""
-#                 SELECT count(lr.id_bibrec),
-#                        it.loan_period,
-#                        DATE_FORMAT(max(lr.period_of_interest_to),'%%Y-%%m-%%d'),
-#                        lib.name
-#                   FROM crcLOANREQUEST lr, crcITEM it, crcLIBRARY lib
-#                  WHERE lib.id = it.id_crcLIBRARY and
-#                        lr.id_bibrec=it.id_bibrec and
-#                        it.id_bibrec=%s and
-#                        lr.status = 'waiting' GROUP BY (lr.id_bibrec)
-#                  """, (recid, ))
-#    return res
-
-
 def get_holdings_information(recid, include_hidden_libraries=True):
     """
     Get information about holding, using recid.
@@ -75,38 +67,39 @@ def get_holdings_information(recid, include_hidden_libraries=True):
 
     if include_hidden_libraries:
         res = run_sql("""SELECT it.barcode,
-                            lib.name,
-                            it.collection,
-                            it.location,
-                            it.description,
-                            it.loan_period,
-                            it.status,
-                            DATE_FORMAT(ln.due_date, '%%Y-%%m-%%d')
-                       FROM crcITEM it
-                            left join crcLOAN ln
-                            on it.barcode = ln.barcode and ln.status != 'returned'
-                            left join crcLIBRARY lib
-                            on lib.id = it.id_crcLIBRARY
-                      WHERE it.id_bibrec=%s""",
-                  (recid, ))
+                                lib.name,
+                                it.collection,
+                                it.location,
+                                it.description,
+                                it.loan_period,
+                                it.status,
+                                DATE_FORMAT(ln.due_date, '%%Y-%%m-%%d')
+                           FROM crcITEM it
+                                left join crcLOAN ln
+                                on it.barcode = ln.barcode and ln.status != %s
+                                left join crcLIBRARY lib
+                                on lib.id = it.id_crcLIBRARY
+                          WHERE it.id_bibrec=%s
+                    """, (CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED, recid))
 
     else:
         res = run_sql("""SELECT it.barcode,
-                            lib.name,
-                            it.collection,
-                            it.location,
-                            it.description,
-                            it.loan_period,
-                            it.status,
-                            DATE_FORMAT(ln.due_date, '%%Y-%%m-%%d')
-                       FROM crcITEM it
-                            left join crcLOAN ln
-                            on it.barcode = ln.barcode and ln.status != 'returned'
-                            left join crcLIBRARY lib
-                            on lib.id = it.id_crcLIBRARY
-                      WHERE it.id_bibrec=%s
-                        AND lib.type<>'hidden' """,
-                  (recid, ))
+                                lib.name,
+                                it.collection,
+                                it.location,
+                                it.description,
+                                it.loan_period,
+                                it.status,
+                                DATE_FORMAT(ln.due_date, '%%Y-%%m-%%d')
+                           FROM crcITEM it
+                                left join crcLOAN ln
+                                on it.barcode = ln.barcode and ln.status != %s
+                                left join crcLIBRARY lib
+                                on lib.id = it.id_crcLIBRARY
+                          WHERE it.id_bibrec=%s
+                            AND lib.type<>%s
+                    """, (CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED, recid,
+                          CFG_BIBCIRCULATION_LIBRARY_TYPE_HIDDEN))
 
     return res
 
@@ -128,24 +121,6 @@ def get_holdings_details(recid):
 
     return res
 
-def get_loan_details(recid):
-    """
-    Get details about a loan (barcode and status).
-
-    @param recid: identify the record. Primary key of bibrec.
-    @type recid: int
-
-    @return loan details
-    """
-
-    res = run_sql("""SELECT barcode, status
-                     FROM crcITEM
-                     WHERE id_bibrec=%s and status = "on shelf" limit 1;
-                  """, (recid, ))
-
-
-    return res
-
 def get_due_date_loan(recid):
     """
     Get the due date of a loan.
@@ -158,8 +133,8 @@ def get_due_date_loan(recid):
 
     res = run_sql("""SELECT DATE_FORMAT(max(due_date),'%%Y-%%m-%%d')
                      FROM crcLOAN
-                     WHERE id_bibrec=%s and status != 'returned'
-                  """, (recid, ))
+                     WHERE id_bibrec=%s and status != %s
+                  """, (recid, CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED))
 
     if res:
         return res[0][0]
@@ -271,7 +246,7 @@ def update_item_status(status, barcode):
 
     @return
     """
-    if status == 'on loan':
+    if status == CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN:
         return int(run_sql("""UPDATE  crcITEM
                                  SET  status=%s,
                                       number_of_requests = number_of_requests + 1
@@ -313,10 +288,9 @@ def new_hold_request(borrower_id, recid, barcode, date_from, date_to, status):
                                                 period_of_interest_to,
                                                 status,
                                                 request_date)
-                                                VALUES (%s, %s, %s, %s, %s, %s, NOW())
-                                                """, (borrower_id, recid, barcode,
-                                                      date_from, date_to,
-                                                      status))
+                        VALUES (%s, %s, %s, %s, %s, %s, NOW())
+                    """, (borrower_id, recid, barcode, date_from,
+                          date_to, status))
 
     return res
 
@@ -372,14 +346,15 @@ def get_requests(recid, status):
 
     @return number of request (int)
     """
-    res =  run_sql("""SELECT id,
+    res = run_sql("""SELECT id,
                              DATE_FORMAT(period_of_interest_from,'%%Y-%%m-%%d'),
                              DATE_FORMAT(period_of_interest_to,'%%Y-%%m-%%d'),
                              DATE_FORMAT(request_date,'%%Y-%%m-%%d')
                         FROM crcLOANREQUEST
-                       WHERE id_bibrec=%s AND status=%s
-                         AND period_of_interest_from<=NOW()
-                         AND period_of_interest_to>=NOW()
+                       WHERE id_bibrec=%s
+                         AND status=%s
+                         AND period_of_interest_from <= NOW()
+                         AND period_of_interest_to >= NOW()
                     ORDER BY request_date
                    """, (recid, status))
 
@@ -392,13 +367,13 @@ def get_number_requests2(barcode, request_id):
 
     @param request_id: identify the (hold) request. Primary key of crcLOANREQUEST.
     @type request_id: int
-
     """
 
-    res =  run_sql("""SELECT id_bibrec
+    res = run_sql("""SELECT id_bibrec
                       FROM crcLOANREQUEST
-                      WHERE id < %s and barcode=%s and status != 'done'
-                   """, (request_id, barcode))
+                      WHERE id < %s and barcode=%s and status != %s
+                   """, (request_id, barcode,
+                         CFG_BIBCIRCULATION_REQUEST_STATUS_DONE))
 
     return res
 
@@ -430,8 +405,9 @@ def get_borrower_id(barcode):
     res = run_sql(""" SELECT id_crcBORROWER
                         FROM crcLOAN
                        WHERE barcode=%s and
-                             (status='on loan' or status='expired')""",
-                  (barcode, ))
+                             (status=%s or status=%s)""",
+                  (barcode, CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN,
+                   CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED))
     try:
         return res[0][0]
     except IndexError:
@@ -474,10 +450,13 @@ def get_next_waiting_loan_request(recid):
                             lr.request_date
                        FROM crcLOANREQUEST lr,
                             crcBORROWER bor
-                      WHERE lr.id_crcBORROWER=bor.id AND
-                            (lr.status='waiting' OR lr.status='pending') AND lr.id_bibrec=%s
+                      WHERE lr.id_crcBORROWER=bor.id
+                        AND (lr.status=%s OR lr.status=%s)
+                        AND lr.id_bibrec=%s
                    ORDER BY lr.request_date""",
-                  (recid, ))
+                  (CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING,
+                   CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING,
+                   recid))
 
     return res
 
@@ -498,9 +477,12 @@ def return_loan(barcode):
     """
 
     return int(run_sql("""UPDATE crcLOAN
-                             SET returned_on=NOW(), status='returned', due_date=NULL
-                           WHERE barcode=%s
-                      """, (barcode,)))
+                             SET returned_on=NOW(), status=%s, due_date=NULL
+                           WHERE barcode=%s and (status=%s or status=%s)
+                      """, (CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED,
+                            barcode,
+                            CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN,
+                            CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED)))
 
 
 def get_item_copies_details(recid):
@@ -520,12 +502,12 @@ def get_item_copies_details(recid):
                             DATE_FORMAT(ln.due_date,'%%Y-%%m-%%d')
                      FROM crcITEM it
                             left join crcLOAN ln
-                            on it.barcode = ln.barcode and ln.status != 'returned'
+                            on it.barcode = ln.barcode and ln.status != %s
                             left join crcLIBRARY lib
                             on lib.id = it.id_crcLIBRARY
                      WHERE it.id_bibrec=%s
                      ORDER BY it.creation_date
-                  """, (recid, ))
+                  """, (CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED, recid))
 
     return res
 
@@ -559,9 +541,9 @@ def get_library_copies(library_id):
                             DATE_FORMAT(ln.due_date,'%%Y-%%m-%%d')
                        FROM crcITEM it
                             left join crcLOAN ln
-                            on it.barcode = ln.barcode and ln.status != 'returned'
+                            on it.barcode = ln.barcode and ln.status != %s
                       WHERE it.id_crcLIBRARY=%s
-                  """, (library_id, ))
+                  """, (CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED, library_id))
 
     return res
 
@@ -576,12 +558,29 @@ def get_number_copies(recid):
     @return number_of_copies
     """
 
-    res = run_sql("""SELECT count(barcode)
+    if type(recid) is not int:
+        return 0
+
+    else:
+
+        res = run_sql("""SELECT count(barcode)
                      FROM crcITEM
                      WHERE id_bibrec=%s
                   """, (recid, ))
 
-    return res[0][0]
+        return res[0][0]
+
+def has_copies(recid):
+    """
+    Indicate if there are any physical copies of a document described
+    by the record
+
+    @param recid: The identifier of the record
+    @type recid: int
+
+    @return True or False according to the state
+    """
+    return get_number_copies(recid) != 0
 
 
 def bor_loans_historical_overview(borrower_id):
@@ -593,8 +592,7 @@ def bor_loans_historical_overview(borrower_id):
 
     @return list with loans historical overview.
     """
-    res = run_sql("""
-                     SELECT l.id_bibrec,
+    res = run_sql("""SELECT l.id_bibrec,
                             l.barcode,
                             lib.name,
                             it.location,
@@ -607,8 +605,8 @@ def bor_loans_historical_overview(borrower_id):
                      WHERE l.id_crcBORROWER=%s and
                            lib.id = it.id_crcLIBRARY and
                            it.barcode = l.barcode and
-                           l.status = 'returned' """,
-                   (borrower_id, ))
+                           l.status = %s
+                """, (borrower_id, CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED))
     return res
 
 def bor_requests_historical_overview(borrower_id):
@@ -627,12 +625,12 @@ def bor_requests_historical_overview(borrower_id):
                             DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
                             DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d'),
                             lr.request_date
-                     FROM crcLOANREQUEST lr, crcITEM it, crcLIBRARY lib
-                     WHERE lr.id_crcBORROWER=%s and
-                           lib.id = it.id_crcLIBRARY and
-                           it.barcode = lr.barcode and
-                           lr.status ='done' """
-                  , (borrower_id, ))
+                       FROM crcLOANREQUEST lr, crcITEM it, crcLIBRARY lib
+                      WHERE lr.id_crcBORROWER=%s and
+                            lib.id = it.id_crcLIBRARY and
+                            it.barcode = lr.barcode and
+                            lr.status =%s
+                """, (borrower_id, CFG_BIBCIRCULATION_REQUEST_STATUS_DONE))
     return res
 
 def get_item_loans_historical_overview(recid):
@@ -655,8 +653,8 @@ def get_item_loans_historical_overview(recid):
                            lib.id = it.id_crcLIBRARY and
                            it.barcode = l.barcode and
                            l.id_bibrec = %s and
-                           l.status = 'returned' """
-                  , (recid, ))
+                           l.status = %s """
+                  , (recid, CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED))
 
     return res
 
@@ -681,8 +679,8 @@ def get_item_requests_historical_overview(recid):
                         lib.id = it.id_crcLIBRARY and
                         it.barcode = lr.barcode and
                         lr.id_bibrec = %s and
-                        lr.status = 'done'
-                  """, (recid, ))
+                        lr.status = %s
+                  """, (recid, CFG_BIBCIRCULATION_REQUEST_STATUS_DONE))
 
     return res
 
@@ -709,8 +707,8 @@ def get_main_libraries():
     """
     res = run_sql("""SELECT id, name
                      FROM crcLIBRARY
-                     WHERE type='main'
-                     """)
+                     WHERE type=%s
+                     """, (CFG_BIBCIRCULATION_LIBRARY_TYPE_MAIN, ))
 
     if res:
         return res
@@ -727,13 +725,14 @@ def get_loan_request_details(req_id):
                             DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
                             DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d'),
                             lr.request_date
-                     FROM   crcLOANREQUEST lr,
+                       FROM crcLOANREQUEST lr,
                             crcBORROWER bor,
                             crcITEM it,
                             crcLIBRARY lib
-                     WHERE  lr.id_crcBORROWER=bor.id AND it.barcode=lr.barcode AND
-                            lib.id = it.id_crcLIBRARY AND
-                            lr.id=%s""", (req_id, ))
+                      WHERE lr.id_crcBORROWER=bor.id AND it.barcode=lr.barcode
+                        AND lib.id = it.id_crcLIBRARY
+                        AND lr.id=%s
+                   """, (req_id, ))
 
     if res:
         return res[0]
@@ -744,25 +743,29 @@ def get_loan_request_by_status(status):
     """
     status: request status.
     """
-    res = run_sql("""SELECT DISTINCT
-                            lr.id,
-                            lr.id_bibrec,
-                            bor.name,
-                            bor.id,
-                            lib.name,
-                            it.location,
-                            DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
-                            DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d'),
-                            lr.request_date
-                       FROM crcLOANREQUEST lr,
-                            crcBORROWER bor,
-                            crcITEM it,
-                            crcLIBRARY lib
-                      WHERE lr.id_crcBORROWER=bor.id AND it.barcode=lr.barcode AND
-                            lib.id = it.id_crcLIBRARY AND lr.status=%s
-                  """ ,
-                     (status, ))
+
+    query = """SELECT DISTINCT
+                        lr.id,
+                        lr.id_bibrec,
+                        bor.name,
+                        bor.id,
+                        lib.name,
+                        it.location,
+                        DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
+                        DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d'),
+                        lr.request_date
+                   FROM crcLOANREQUEST lr,
+                        crcBORROWER bor,
+                        crcITEM it,
+                        crcLIBRARY lib
+                  WHERE lr.id_crcBORROWER=bor.id AND it.barcode=lr.barcode AND
+                        lib.id = it.id_crcLIBRARY AND lr.status=%s """
+
+
+    res = run_sql(query , (status, ))
     return res
+
+
 
 def update_loan_request_status(request_id, status):
     """
@@ -785,16 +788,17 @@ def get_all_requests():
                             bor.name,
                             lr.id_bibrec,
                             lr.status,
-                            DATE_FORMAT(lr.period_of_interest_from,'%Y-%m-%d'),
-                            DATE_FORMAT(lr.period_of_interest_to,'%Y-%m-%d'),
+                            DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
+                            DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d'),
                             lr.request_date
                      FROM   crcLOANREQUEST lr,
                             crcBORROWER bor
                      WHERE  bor.id = lr.id_crcBORROWER
-                            AND (lr.status='waiting' OR lr.status='pending')
+                            AND (lr.status=%s OR lr.status=%s)
                             AND lr.period_of_interest_to >= CURDATE()
                             ORDER BY lr.request_date
-                            """)
+                    """, (CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING,
+                          CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING))
 
     return res
 
@@ -818,9 +822,11 @@ def get_item_requests(recid):
                             crcITEM it,
                             crcLIBRARY lib
                      WHERE  bor.id = lr.id_crcBORROWER and lr.id_bibrec=%s
-                            and lr.status!='done' and lr.status!='cancelled'
+                            and lr.status!=%s and lr.status!=%s
                             and lr.barcode = it.barcode and lib.id = it.id_crcLIBRARY
-                     """, (recid, ))
+                     """, (recid,
+                           CFG_BIBCIRCULATION_REQUEST_STATUS_DONE,
+                           CFG_BIBCIRCULATION_REQUEST_STATUS_CANCELLED))
 
     return res
 
@@ -838,8 +844,11 @@ def get_all_requests_for_item_order_by_status(recid):
                             DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr,
                             crcBORROWER bor
-                     WHERE  bor.id = lr.id_crcBORROWER and lr.id_bibrec=%s and lr.status!='done' ORDER BY status
-                     """, (recid, ))
+                     WHERE  bor.id = lr.id_crcBORROWER
+                       AND  lr.id_bibrec=%s
+                       AND  lr.status!=%s
+                   ORDER BY status
+                     """, (recid, CFG_BIBCIRCULATION_REQUEST_STATUS_DONE))
 
     return res
 
@@ -856,8 +865,11 @@ def get_all_requests_for_item_order_by_name(recid):
                             DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr,
                             crcBORROWER bor
-                     WHERE  bor.id = lr.id_crcBORROWER and lr.id_bibrec=%s and lr.status!='done' ORDER BY name
-                     """, (recid, ))
+                     WHERE  bor.id = lr.id_crcBORROWER
+                       AND  lr.id_bibrec=%s
+                       AND  lr.status!=%s
+                   ORDER BY name
+                     """, (recid, CFG_BIBCIRCULATION_REQUEST_STATUS_DONE))
 
     return res
 
@@ -869,12 +881,12 @@ def get_all_requests_order_by_status():
                             bor.name,
                             lr.id_bibrec,
                             lr.status,
-                            DATE_FORMAT(lr.period_of_interest_from,'%Y-%m-%d'),
-                            DATE_FORMAT(lr.period_of_interest_to,'%Y-%m-%d')
+                            DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
+                            DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr,
                             crcBORROWER bor
-                     WHERE  bor.id = lr.id_crcBORROWER and lr.status!='done' ORDER BY status
-                            """)
+                     WHERE  bor.id = lr.id_crcBORROWER and lr.status!=%s ORDER BY status
+                           """, (CFG_BIBCIRCULATION_REQUEST_STATUS_DONE, ))
 
     return res
 
@@ -886,13 +898,12 @@ def get_all_requests_order_by_name():
                             bor.name,
                             lr.id_bibrec,
                             lr.status,
-                            DATE_FORMAT(lr.period_of_interest_from,'%Y-%m-%d'),
-                            DATE_FORMAT(lr.period_of_interest_to,'%Y-%m-%d')
+                            DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
+                            DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr,
                             crcBORROWER bor
-                     WHERE  bor.id = lr.id_crcBORROWER and lr.status!='done' ORDER BY name
-                            """)
-
+                     WHERE  bor.id = lr.id_crcBORROWER and lr.status!=%s ORDER BY name
+                         """, (CFG_BIBCIRCULATION_REQUEST_STATUS_DONE, ))
     return res
 
 
@@ -905,12 +916,12 @@ def get_all_requests_order_by_item():
                             bor.name,
                             lr.id_bibrec,
                             lr.status,
-                            DATE_FORMAT(lr.period_of_interest_from,'%Y-%m-%d'),
-                            DATE_FORMAT(lr.period_of_interest_to,'%Y-%m-%d')
+                            DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
+                            DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr,
                             crcBORROWER bor
-                     WHERE  bor.id = lr.id_crcBORROWER and lr.status!='done' ORDER BY id_bibrec
-                            """)
+                     WHERE  bor.id = lr.id_crcBORROWER and lr.status!=%s ORDER BY id_bibrec
+                  """, (CFG_BIBCIRCULATION_REQUEST_STATUS_DONE, ))
 
     return res
 
@@ -936,7 +947,8 @@ def get_borrower_name(borrower_id):
     """
     res = run_sql("""SELECT name
                      FROM crcBORROWER
-                     WHERE id=%s""", (borrower_id, ))
+                     WHERE id=%s
+                  """, (borrower_id, ))
 
     if res:
         return res[0][0]
@@ -967,7 +979,7 @@ def search_borrower_by_name(string):
     res = run_sql("""SELECT id, name
                      FROM crcBORROWER
                      WHERE upper(name) like upper('%%%s%%') ORDER BY name
-                     """ % (string))
+                  """ % (string))
 
     return res
 
@@ -1004,8 +1016,8 @@ def search_borrower_by_id(string):
     """
 
     res = run_sql("""SELECT id, name
-                     FROM crcBORROWER
-                     WHERE id=%s
+                       FROM crcBORROWER
+                      WHERE id=%s
                      """, (string, ))
 
     return res
@@ -1016,8 +1028,8 @@ def search_borrower_by_ccid(string):
     """
 
     res = run_sql("""SELECT id, name
-                     FROM crcBORROWER
-                     WHERE ccid=%s
+                       FROM crcBORROWER
+                      WHERE ccid regexp %s
                      """, (string, ))
 
     return res
@@ -1027,10 +1039,9 @@ def search_user_by_email(string):
     string: search pattern.
     """
 
-    res = run_sql("""
-                  SELECT id, email
-                  FROM user
-                  WHERE email regexp %s
+    res = run_sql(""" SELECT id, email
+                        FROM user
+                       WHERE email regexp %s
                   """, (string, ))
 
     return res
@@ -1054,9 +1065,11 @@ def get_borrower_loan_details(borrower_id):
                          l.notes,
                          l.id,
                          l.status
-                  FROM crcLOAN l, crcITEM it
-                  WHERE l.barcode=it.barcode and id_crcBORROWER=%s and l.status!='returned'
-    """, (borrower_id, ))
+                    FROM crcLOAN l, crcITEM it
+                   WHERE l.barcode=it.barcode
+                     AND id_crcBORROWER=%s
+                     AND l.status!=%s
+    """, (borrower_id, CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED))
 
     return res
 
@@ -1078,9 +1091,12 @@ def get_borrower_request_details(borrower_id):
                      FROM   crcLOANREQUEST lr,
                             crcITEM it,
                             crcLIBRARY lib
-                     WHERE  lr.id_crcBORROWER =%s and (lr.status='waiting' or lr.status='pending')
+                     WHERE  lr.id_crcBORROWER=%s
+                       AND  (lr.status=%s OR lr.status=%s)
                             and lib.id = it.id_crcLIBRARY and lr.barcode = it.barcode
-                            """, (borrower_id, ))
+                            """, (borrower_id,
+                                  CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING,
+                                  CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING))
 
     return res
 
@@ -1095,9 +1111,10 @@ def get_borrower_request_details_order_by_item(borrower_id):
                             lr.status,
                             DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
                             DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d')
-                     FROM   crcLOANREQUEST lr
-                     WHERE  lr.id_crcBORROWER =%s and lr.status!='done' ORDER BY id_bibrec
-                            """, (borrower_id, ))
+                       FROM crcLOANREQUEST lr
+                      WHERE lr.id_crcBORROWER =%s and lr.status!=%s
+                   ORDER BY id_bibrec
+                    """, (borrower_id, CFG_BIBCIRCULATION_REQUEST_STATUS_DONE))
 
     return res
 
@@ -1113,9 +1130,11 @@ def get_borrower_request_details_order_by_status(borrower_id):
                             lr.status,
                             DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
                             DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d')
-                     FROM   crcLOANREQUEST lr
-                     WHERE  lr.id_crcBORROWER =%s and lr.status!='done' ORDER BY status
-                            """, (borrower_id, ))
+                       FROM crcLOANREQUEST lr
+                      WHERE lr.id_crcBORROWER =%s and lr.status!=%s
+                      ORDER BY status
+                            """, (borrower_id,
+                                  CFG_BIBCIRCULATION_REQUEST_STATUS_DONE))
 
     return res
 
@@ -1131,9 +1150,11 @@ def get_borrower_request_details_order_by_from(borrower_id):
                             lr.status,
                             DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
                             DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d')
-                     FROM   crcLOANREQUEST lr
-                     WHERE  lr.id_crcBORROWER =%s and lr.status!='done' ORDER BY period_of_interest_from
-                            """, (borrower_id, ))
+                       FROM crcLOANREQUEST lr
+                      WHERE lr.id_crcBORROWER =%s and lr.status!=%s
+                   ORDER BY period_of_interest_from
+                            """, (borrower_id,
+                                  CFG_BIBCIRCULATION_REQUEST_STATUS_DONE))
 
     return res
 
@@ -1150,8 +1171,9 @@ def get_borrower_request_details_order_by_to(borrower_id):
                             DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
                             DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr
-                     WHERE  lr.id_crcBORROWER =%s and lr.status!='done' ORDER BY period_of_interest_to
-                            """, (borrower_id, ))
+                     WHERE  lr.id_crcBORROWER =%s and lr.status!=%s
+                   ORDER BY period_of_interest_to
+                """, (borrower_id, CFG_BIBCIRCULATION_REQUEST_STATUS_DONE))
 
     return res
 
@@ -1216,8 +1238,8 @@ def get_item_loans(recid):
     WHERE l.id_crcBORROWER = bor.id
           and l.barcode=it.barcode
           and l.id_bibrec=%s
-          and l.status!='returned'
-    """, (recid, ))
+          and l.status!=%s
+    """, (recid, CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED))
 
     return res
 
@@ -1241,10 +1263,10 @@ def get_all_loans(limit):
           FROM crcLOAN l, crcBORROWER bor, crcITEM it
          WHERE l.id_crcBORROWER = bor.id
            AND l.barcode = it.barcode
-           AND l.status = 'on loan'
+           AND l.status = %s
       ORDER BY 5 DESC
          LIMIT 0,%s
-    """, (limit,))
+    """, (CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN, limit))
 
     return res
 
@@ -1258,19 +1280,20 @@ def get_all_expired_loans():
            bor.name,
            it.id_bibrec,
            l.barcode,
-           DATE_FORMAT(l.loaned_on,'%Y-%m-%d'),
-           DATE_FORMAT(l.due_date,'%Y-%m-%d'),
+           DATE_FORMAT(l.loaned_on,'%%Y-%%m-%%d'),
+           DATE_FORMAT(l.due_date,'%%Y-%%m-%%d'),
            l.number_of_renewals,
            l.overdue_letter_number,
-           DATE_FORMAT(l.overdue_letter_date,'%Y-%m-%d'),
+           DATE_FORMAT(l.overdue_letter_date,'%%Y-%%m-%%d'),
            l.notes,
            l.id
     FROM crcLOAN l, crcBORROWER bor, crcITEM it
     WHERE l.id_crcBORROWER = bor.id
           and l.barcode = it.barcode
-          and ( (l.status = 'on loan' and l.due_date < CURDATE())
-                  or l.status = 'expired' )
-    """)
+          and ((l.status = %s and l.due_date < CURDATE())
+                  or l.status = %s )
+    """, (CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN,
+          CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED))
 
     return res
 
@@ -1296,8 +1319,8 @@ def get_overdue_loans():
     FROM crcLOAN l, crcBORROWER bor, crcITEM it
     WHERE l.id_crcBORROWER = bor.id
           and l.barcode = it.barcode
-          and (l.status = 'on loan' and l.due_date < CURDATE())
-    """)
+          and (l.status = %s and l.due_date < CURDATE())
+    """, (CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN))
 
     return res
 
@@ -1314,16 +1337,18 @@ def get_borrower_loans(borrower_id):
                              DATE_FORMAT(due_date,'%%Y-%%m-%%d'),
                              type
                       FROM crcLOAN
-                      WHERE id_crcBORROWER=%s and status != 'returned'
-                  """, (borrower_id, ))
+                      WHERE id_crcBORROWER=%s and status != %s
+                  """, (borrower_id, CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED))
 
     return res
 
 def get_current_loan_id(barcode):
     res = run_sql(""" SELECT id
-                      FROM crcLOAN
-                      WHERE barcode=%s and (status='on loan' or status = 'expired')
-                  """, (barcode, ))
+                        FROM crcLOAN
+                       WHERE barcode=%s
+                         AND (status=%s OR status=%s)
+                  """, (barcode, CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN,
+                        CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED))
 
     if res:
         return res[0][0]
@@ -1344,34 +1369,27 @@ def update_due_date(loan_id, new_due_date):
 def renew_loan(loan_id, new_due_date):
     run_sql("""UPDATE  crcLOAN
                   SET  due_date=%s,
-                       number_of_renewals = number_of_renewals + 1,
-                       overdue_letter_number = 0,
-                       status = 'on loan'
-                WHERE  id=%s""", (new_due_date, loan_id))
-
-def update_due_date_borrower(borrower_id, new_due_date):
-    """
-    borrower_id: identify the borrower. It is also the primary key of
-             the table crcBORROWER.
-
-    new_due_date: new due date.
-    """
-    return int(run_sql("""UPDATE  crcLOAN
-                             SET  due_date=%s,
-                                  number_of_renewals = number_of_renewals + 1
-                           WHERE  id_crcBORROWER=%s and status='on loan'
-                           """, (new_due_date, borrower_id)))
+                       number_of_renewals=number_of_renewals+1,
+                       overdue_letter_number=0,
+                       status=%s
+                WHERE  id=%s""", (new_due_date,
+                                  CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN,
+                                  loan_id))
 
 def get_queue_request(recid):
     """
     recid: identify the record. It is also the primary key of
            the table bibrec.
     """
-    res = run_sql(""" SELECT id_crcBORROWER, status, DATE_FORMAT(request_date,'%%Y-%%m-%%d') as rd
-                      FROM crcLOANREQUEST
-                      WHERE id_bibrec=%s and (status='pending' or status='waiting')
-                      ORDER BY rd
-                  """, (recid, ))
+    res = run_sql("""SELECT id_crcBORROWER,
+                            status,
+                            DATE_FORMAT(request_date,'%%Y-%%m-%%d') as rd
+                       FROM crcLOANREQUEST
+                      WHERE id_bibrec=%s
+                        and (status=%s or status=%s)
+                   ORDER BY rd
+                  """, (recid, CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING,
+                   CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING))
 
     return res
 
@@ -1383,10 +1401,10 @@ def get_recid_borrower_loans(borrower_id):
 
     res = run_sql(""" SELECT id, id_bibrec, barcode
                       FROM crcLOAN
-                      WHERE id_crcBORROWER=%s and
-                            status != 'returned'and
-                            type != 'ill'
-                  """, (borrower_id, ))
+                      WHERE id_crcBORROWER=%s
+                        AND status != %s
+                        AND type != 'ill'
+                  """, (borrower_id, CFG_BIBCIRCULATION_ILL_STATUS_RETURNED))
 
 
     return res
@@ -1420,8 +1438,9 @@ def get_historical_overview(borrower_id):
                             returned_on,
                             number_of_renewals
                      FROM crcLOAN
-                     WHERE id_crcBORROWER = %s and status = "returned";
-                  """, (borrower_id, ))
+                     WHERE id_crcBORROWER=%s and status=%s;
+                  """, (borrower_id,
+                        CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED))
 
     return res
 
@@ -1439,8 +1458,9 @@ def get_borrower_requests(borrower_id):
                          status
                   FROM   crcLOANREQUEST
                   WHERE  id_crcBORROWER=%s and
-                         (status='pending' or status='waiting')""",
-                  (borrower_id, ))
+                         (status=%s or status=%s)""",
+                  (borrower_id, CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING,
+                   CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING))
 
     return res
 
@@ -1451,11 +1471,12 @@ def cancel_request(request_id):
                 cancelled. It is also the primary key of
                 the crcLOANREQUEST table.
     status: The new status of the hold request. In this case
-            it will be 'cancelled'.
+            it will be CFG_BIBCIRCULATION_REQUEST_STATUS_CANCELLED.
     """
-    run_sql("""UPDATE crcLOANREQUEST set status='cancelled'
-               WHERE id=%s
-            """, (request_id,))
+    run_sql("""UPDATE crcLOANREQUEST
+                  SET status=%s
+                WHERE id=%s
+            """, (CFG_BIBCIRCULATION_REQUEST_STATUS_CANCELLED, request_id))
 
 def get_nb_copies_on_loan(recid):
     """
@@ -1464,12 +1485,12 @@ def get_nb_copies_on_loan(recid):
            of this record will be retrieved.
     """
 
-    res = run_sql("""SELECT id_bibrec
-                     FROM crcLOAN
-                     WHERE id_bibrec=%s and status='on loan';
-                     """, (recid, ))
+    res = run_sql("""SELECT count(barcode)
+                     FROM crcITEM
+                     WHERE id_bibrec=%s and status=%s;
+                     """, (recid, CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN))
 
-    return res
+    return res[0][0]
 
 
 def get_loans_notes(loan_id):
@@ -1517,20 +1538,20 @@ def add_new_loan_note(new_note, loan_id):
                WHERE id=%s;
                 """, (new_note, loan_id))
 
+def get_borrower_id_by_email(email):
+    """
+    Retrieve borrower's id by email.
+    """
 
-def is_borrower(email):
-    """
-    Verify if someone is a borrower, using the email.
-    email: borrower's email.
-    """
     res = run_sql("""SELECT id
-                     FROM crcBORROWER
-                     WHERE email=%s""",
+                       FROM crcBORROWER
+                      WHERE email=%s""",
                   (email, ))
+
     if res:
         return res[0][0]
     else:
-        return 0
+        return None
 
 def new_borrower(ccid, name, email, phone, address, mailbox, notes):
     """
@@ -1541,17 +1562,18 @@ def new_borrower(ccid, name, email, phone, address, mailbox, notes):
     address: borrower's address.
     """
 
-    run_sql("""insert into crcBORROWER ( ccid,
-                                         name,
-                                         email,
-                                         phone,
-                                         address,
-                                         mailbox,
-                                         borrower_since,
-                                         borrower_until,
-                                         notes)
-               values(%s, %s, %s, %s, %s, %s, NOW(), '0000-00-00 00:00:00', %s)""",
-            (ccid, name, email, phone, address, mailbox, notes))
+    return run_sql("""insert into crcBORROWER ( ccid,
+                                                name,
+                                                email,
+                                                phone,
+                                                address,
+                                                mailbox,
+                                                borrower_since,
+                                                borrower_until,
+                                                notes)
+        values(%s, %s, %s, %s, %s, %s, NOW(), '0000-00-00 00:00:00', %s)""",
+        (ccid, name, email, phone, address, mailbox, notes))
+    # IntegrityError: (1062, "Duplicate entry '665119' for key 2")
 
 def get_borrower_address(email):
     """
@@ -1808,8 +1830,10 @@ def get_internal_libraries():
 
     res = run_sql("""SELECT id, name
                        FROM crcLIBRARY
-                       WHERE (type='internal' OR type='main')
-                       ORDER BY name""")
+                       WHERE (type=%s OR type=%s)
+                       ORDER BY name
+                  """, (CFG_BIBCIRCULATION_LIBRARY_TYPE_INTERNAL,
+                        CFG_BIBCIRCULATION_LIBRARY_TYPE_MAIN))
 
     return res
 
@@ -1820,8 +1844,9 @@ def get_hidden_libraries():
 
     res = run_sql("""SELECT id, name
                        FROM crcLIBRARY
-                       WHERE (type='hidden')
-                       ORDER BY name""")
+                       WHERE type=%s
+                       ORDER BY name
+                  """, (CFG_BIBCIRCULATION_LIBRARY_TYPE_HIDDEN, ))
 
     return res
 
@@ -1878,10 +1903,10 @@ def add_new_copy(barcode, recid, library_id, collection, location, description,
     """
 
     run_sql("""insert into crcITEM (barcode, id_bibrec, id_crcLIBRARY,
-                                    collection, location, description, loan_period,
-                                    status, expected_arrival_date, creation_date,
-                                    modification_date)
-                            values (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())""",
+                                collection, location, description, loan_period,
+                                status, expected_arrival_date, creation_date,
+                                modification_date)
+                values (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())""",
             (barcode, recid, library_id, collection, location, description,
              loan_period, status, expected_arrival_date))
 
@@ -1952,11 +1977,10 @@ def update_item_recid(barcode, new_recid):
                 the table crcLIBRARY.
     """
 
-    res =run_sql("""UPDATE crcITEM
-                       SET id_bibrec=%s,
-                           modification_date=NOW()
-                     WHERE barcode=%s""",
-                (new_recid, barcode))
+    res = run_sql("""UPDATE crcITEM
+                        SET id_bibrec=%s,
+                            modification_date=NOW()
+                      WHERE barcode=%s""", (new_recid, barcode))
 
     return res
 
@@ -2057,8 +2081,9 @@ def get_number_requests_per_copy(barcode):
     res = run_sql("""SELECT count(barcode)
                        FROM crcLOANREQUEST
                       WHERE barcode=%s and
-                            (status != 'done' and status != 'cancelled')""",
-                  (barcode, ))
+                            (status != %s and status != %s)""",
+                  (barcode, CFG_BIBCIRCULATION_REQUEST_STATUS_DONE,
+                   CFG_BIBCIRCULATION_REQUEST_STATUS_CANCELLED))
 
     return res[0][0]
 
@@ -2101,9 +2126,10 @@ def get_borrower_loans_barcodes(borrower_id):
     res = run_sql("""SELECT barcode
                        FROM crcLOAN
                       WHERE id_crcBORROWER=%s
-                        AND (status='on loan' OR status='expired')
+                        AND (status=%s OR status=%s)
                          """,
-                  (borrower_id,))
+                  (borrower_id, CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN,
+                   CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED))
 
     list_of_barcodes = []
     for bc in res:
@@ -2179,9 +2205,10 @@ def is_item_on_loan(barcode):
 
     res = run_sql("""SELECT id
                        FROM crcLOAN
-                      WHERE (status='on loan' or status='expired')
+                      WHERE (status=%s or status=%s)
                         and barcode=%s""",
-                  (barcode, ))
+                  (CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN,
+                   CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED, barcode))
 
     try:
         return res[0][0]
@@ -2196,7 +2223,8 @@ def order_new_copy(recid, vendor_id, order_date, cost,
     Register a new copy that has been ordered.
     """
 
-    run_sql("""insert into crcPURCHASE(id_bibrec, id_crcVENDOR, ordered_date, price,
+    run_sql("""insert into crcPURCHASE(id_bibrec, id_crcVENDOR,
+                                       ordered_date, price,
                                        status, notes, expected_date)
                            values (%s, %s, %s, %s, %s, %s, %s)""",
                                     (recid, vendor_id, order_date, cost,
@@ -2262,55 +2290,64 @@ def ill_register_request(item_info, borrower_id, period_of_interest_from,
     """
     """
 
-    run_sql("""insert into crcILLREQUEST(id_crcBORROWER, period_of_interest_from,
+    run_sql("""insert into crcILLREQUEST(id_crcBORROWER,
+                                period_of_interest_from,
                                 period_of_interest_to, status, item_info,
-                                borrower_comments, only_this_edition, request_type, budget_code)
+                                borrower_comments, only_this_edition,
+                                request_type, budget_code)
                     values (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-                        (borrower_id, period_of_interest_from, period_of_interest_to,
-                         status, str(item_info), additional_comments, only_edition,
+                        (borrower_id, period_of_interest_from,
+                         period_of_interest_to, status, str(item_info),
+                         additional_comments, only_edition,
                          request_type, budget_code))
 
 
-def ill_register_request_on_desk(borrower_id, item_info, period_of_interest_from,
-                                 period_of_interest_to, status, notes,
-                                 only_edition, request_type, budget_code=''):
+def ill_register_request_on_desk(borrower_id, item_info,
+                                 period_of_interest_from,
+                                 period_of_interest_to,
+                                 status, notes, only_edition, request_type,
+                                 budget_code=''):
     """
     """
 
-    run_sql("""insert into crcILLREQUEST(id_crcBORROWER, period_of_interest_from,
-                                    period_of_interest_to, status, item_info,
-                                    only_this_edition, library_notes, request_type, budget_code)
+    run_sql("""insert into crcILLREQUEST(id_crcBORROWER,
+                                period_of_interest_from, period_of_interest_to,
+                                status, item_info, only_this_edition,
+                                library_notes, request_type, budget_code)
                            values (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-            (borrower_id, period_of_interest_from, period_of_interest_to, status,
-             str(item_info), only_edition, notes, request_type, budget_code))
+            (borrower_id, period_of_interest_from, period_of_interest_to,
+             status, str(item_info), only_edition, notes, request_type,
+             budget_code))
 
 
 def get_ill_requests(status):
     """
     """
 
-    all_of_them = """SELECT ill.id, ill.id_crcBORROWER, bor.name,
-                            ill.id_crcLIBRARY, ill.status,
-                            DATE_FORMAT(ill.period_of_interest_from,'%Y-%m-%d'),
-                            DATE_FORMAT(ill.period_of_interest_to,'%Y-%m-%d'),
-                            DATE_FORMAT(ill.due_date,'%Y-%m-%d'),
-                            ill.item_info, ill.request_type
-                       FROM crcILLREQUEST ill, crcBORROWER bor
-                      WHERE ill.id_crcBORROWER=bor.id ORDER BY ill.id desc"""
+    all_of_them = """
+                SELECT ill.id, ill.id_crcBORROWER, bor.name,
+                       ill.id_crcLIBRARY, ill.status,
+                       DATE_FORMAT(ill.period_of_interest_from,'%Y-%m-%d'),
+                       DATE_FORMAT(ill.period_of_interest_to,'%Y-%m-%d'),
+                       DATE_FORMAT(ill.due_date,'%Y-%m-%d'),
+                       ill.item_info, ill.request_type
+                  FROM crcILLREQUEST ill, crcBORROWER bor
+                 WHERE ill.id_crcBORROWER=bor.id ORDER BY ill.id desc"""
 
     if status == None:
         res = run_sql(all_of_them)
     else:
-        res = run_sql("""SELECT ill.id, ill.id_crcBORROWER, bor.name,
-                                ill.id_crcLIBRARY, ill.status,
-                                DATE_FORMAT(ill.period_of_interest_from,'%%Y-%%m-%%d'),
-                                DATE_FORMAT(ill.period_of_interest_to,'%%Y-%%m-%%d'),
-                                DATE_FORMAT(ill.due_date,'%%Y-%%m-%%d'),
-                                ill.item_info, ill.request_type
-                           FROM crcILLREQUEST ill, crcBORROWER bor
-                          WHERE ill.id_crcBORROWER=bor.id
-                            AND ill.status=%s
-                       ORDER BY ill.id desc""", (status, ))
+        res = run_sql("""
+                SELECT ill.id, ill.id_crcBORROWER, bor.name,
+                       ill.id_crcLIBRARY, ill.status,
+                       DATE_FORMAT(ill.period_of_interest_from,'%%Y-%%m-%%d'),
+                       DATE_FORMAT(ill.period_of_interest_to,'%%Y-%%m-%%d'),
+                       DATE_FORMAT(ill.due_date,'%%Y-%%m-%%d'),
+                       ill.item_info, ill.request_type
+                  FROM crcILLREQUEST ill, crcBORROWER bor
+                 WHERE ill.id_crcBORROWER=bor.id
+                   AND ill.status=%s
+              ORDER BY ill.id desc""", (status, ))
 
     return res
 
@@ -2339,18 +2376,19 @@ def search_ill_requests_title(title, date_from, date_to):
 
 def search_ill_requests_id(reqid, date_from, date_to):
 
-    res = run_sql("""SELECT ill.id, ill.id_crcBORROWER, bor.name,
-                            ill.id_crcLIBRARY, ill.status,
-                            DATE_FORMAT(ill.period_of_interest_from,'%%Y-%%m-%%d'),
-                            DATE_FORMAT(ill.period_of_interest_to,'%%Y-%%m-%%d'),
-                            DATE_FORMAT(ill.due_date,'%%Y-%%m-%%d'),
-                            ill.item_info, ill.request_type
-                       FROM crcILLREQUEST ill, crcBORROWER bor
-                      WHERE ill.id_crcBORROWER=bor.id
-                        AND ill.id = %s
-                        AND DATE_FORMAT(ill.request_date,'%%Y-%%m-%%d') >=%s
-                        AND DATE_FORMAT(ill.request_date,'%%Y-%%m-%%d') <=%s
-                   ORDER BY ill.id desc""", (reqid, date_from, date_to))
+    res = run_sql("""
+                SELECT ill.id, ill.id_crcBORROWER, bor.name,
+                       ill.id_crcLIBRARY, ill.status,
+                       DATE_FORMAT(ill.period_of_interest_from,'%%Y-%%m-%%d'),
+                       DATE_FORMAT(ill.period_of_interest_to,'%%Y-%%m-%%d'),
+                       DATE_FORMAT(ill.due_date,'%%Y-%%m-%%d'),
+                       ill.item_info, ill.request_type
+                  FROM crcILLREQUEST ill, crcBORROWER bor
+                 WHERE ill.id_crcBORROWER=bor.id
+                   AND ill.id = %s
+                   AND DATE_FORMAT(ill.request_date,'%%Y-%%m-%%d') >=%s
+                   AND DATE_FORMAT(ill.request_date,'%%Y-%%m-%%d') <=%s
+              ORDER BY ill.id desc""", (reqid, date_from, date_to))
 
     return res
 
@@ -2394,13 +2432,14 @@ def get_ill_request_borrower_details(ill_request_id):
     """
     """
 
-    res = run_sql("""SELECT ill.id_crcBORROWER, bor.name, bor.email, bor.mailbox,
-                            DATE_FORMAT(ill.period_of_interest_from,'%%Y-%%m-%%d'),
-                            DATE_FORMAT(ill.period_of_interest_to,'%%Y-%%m-%%d'),
-                            ill.item_info, ill.borrower_comments,
-                            ill.only_this_edition, request_type
-                       FROM crcILLREQUEST ill, crcBORROWER bor
-                      WHERE ill.id_crcBORROWER=bor.id and ill.id=%s""", (ill_request_id, ))
+    res = run_sql("""
+        SELECT ill.id_crcBORROWER, bor.name, bor.email, bor.mailbox,
+               DATE_FORMAT(ill.period_of_interest_from,'%%Y-%%m-%%d'),
+               DATE_FORMAT(ill.period_of_interest_to,'%%Y-%%m-%%d'),
+               ill.item_info, ill.borrower_comments,
+               ill.only_this_edition, request_type
+          FROM crcILLREQUEST ill, crcBORROWER bor
+         WHERE ill.id_crcBORROWER=bor.id and ill.id=%s""", (ill_request_id, ))
 
     if res:
         return res[0]
@@ -2470,15 +2509,15 @@ def get_external_libraries():
 
     res = run_sql("""SELECT id, name
                        FROM crcLIBRARY
-                      WHERE type='external'
-                """)
+                      WHERE type=%s
+                """, (CFG_BIBCIRCULATION_LIBRARY_TYPE_EXTERNAL, ))
 
     return res
 
 
-def update_ill_request(ill_request_id, library_id, request_date, expected_date,
-                          arrival_date, due_date, return_date, status, cost, barcode,
-                          library_notes):
+def update_ill_request(ill_request_id, library_id, request_date,
+                       expected_date, arrival_date, due_date, return_date,
+                       status, cost, barcode, library_notes):
     """
     Update an ILL request.
     """
@@ -2817,12 +2856,13 @@ def update_ill_loan_status(borrower_id, barcode, return_date, loan_type):
     """
 
     run_sql("""UPDATE crcLOAN
-                  SET status = 'returned',
+                  SET status = %s,
                       returned_on = %s
                 WHERE id_crcBORROWER = %s
                   AND barcode = %s
                   AND type = %s """,
-            (return_date, borrower_id, barcode, loan_type))
+            (CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED,
+             return_date, borrower_id, barcode, loan_type))
 
 def get_recid(barcode):
     """
@@ -2838,7 +2878,7 @@ def get_recid(barcode):
 
     try:
         return res[0][0]
-    except:
+    except IndexError:
         return None
 
 def get_ill_requests_details(borrower_id):
@@ -2853,8 +2893,10 @@ def get_ill_requests_details(borrower_id):
                             status, library_notes
                        FROM crcILLREQUEST
                       WHERE id_crcBORROWER=%s
-                        AND status!='returned'
-                        AND status!='received'""", (borrower_id, ))
+                        AND status!=%s
+                        AND status!=%s
+                  """, (borrower_id, CFG_BIBCIRCULATION_ILL_STATUS_RETURNED,
+                        CFG_BIBCIRCULATION_ILL_STATUS_RECEIVED))
 
     return res
 
@@ -2870,7 +2912,9 @@ def bor_ill_historical_overview(borrower_id):
                             status, library_notes
                        FROM crcILLREQUEST
                       WHERE id_crcBORROWER=%s
-                        AND (status='returned' OR status='received') """, (borrower_id, ))
+                        AND (status=%s OR status=%s)
+                        """, (borrower_id, CFG_BIBCIRCULATION_ILL_STATUS_RETURNED,
+                              CFG_BIBCIRCULATION_ILL_STATUS_RECEIVED))
 
     return res
 
@@ -2902,8 +2946,11 @@ def is_on_loan(barcode):
 
     res = run_sql("""SELECT id
                        FROM crcLOAN
-                      WHERE barcode=%s and status='on loan'
-                      """, (barcode, ))
+                      WHERE barcode=%s
+                        AND (status=%s or status=%s)
+                      """, (barcode,
+                            CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN,
+                            CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED))
 
     if res:
         return True
@@ -2917,8 +2964,10 @@ def is_requested(barcode):
     res = run_sql("""SELECT id
                        FROM crcLOANREQUEST
                       WHERE barcode=%s
-                        AND (status = 'pending' or status = 'waiting')
-                    """, (barcode, ))
+                        AND (status = %s or status = %s)
+                    """, (barcode,
+                          CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING,
+                          CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING))
 
     try:
         return res
@@ -2977,19 +3026,22 @@ def get_expired_loans_with_requests():
                             lr.id_crcBORROWER,
                             it.id_crcLIBRARY,
                             it.location,
-                            DATE_FORMAT(lr.period_of_interest_from,'%Y-%m-%d'),
-                            DATE_FORMAT(lr.period_of_interest_to,'%Y-%m-%d'),
+                            DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
+                            DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d'),
                             lr.request_date
                        FROM crcLOANREQUEST lr,
                             crcITEM it,
                             crcLOAN l
                       WHERE it.barcode=l.barcode
                         AND lr.id_bibrec=it.id_bibrec
-                        AND (lr.status='pending' or lr.status='waiting')
-                        AND l.status='on loan'
-                        AND l.due_date < CURDATE()
+                        AND (lr.status=%s or lr.status=%s)
+                        AND (l.status=%s or (l.status=%s
+                        AND l.due_date < CURDATE()))
                    ORDER BY lr.request_date;
-                  """)
+                  """, ( CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING,
+                         CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING,
+                         CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED,
+                         CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN))
     return res
 
 def get_total_of_loans():
@@ -2998,7 +3050,8 @@ def get_total_of_loans():
 
     res = run_sql("""SELECT count(id)
                        FROM crcLOAN
-                      WHERE status='on loan';""")
+                      WHERE status=%s
+                  """, (CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN))
 
     return res[0][0]
 
@@ -3051,16 +3104,6 @@ def get_ill_book_info(ill_request_id):
     else:
         return None
 
-def get_ill_ids():
-    """
-    """
-
-    res = run_sql("""SELECT id
-                       FROM crcILLREQUEST
-                      WHERE status!='document received, request closed'""")
-
-    return res
-
 def get_copies_status(recid):
     """
     """
@@ -3069,14 +3112,14 @@ def get_copies_status(recid):
                        FROM crcITEM
                       WHERE id_bibrec=%s""", (recid, ))
 
-    l = []
-    for r in res:
-        l.append(r[0])
+    list_of_statuses = []
+    for status in res:
+        list_of_statuses.append(status[0])
 
-    if l == []:
+    if list_of_statuses == []:
         return None
     else:
-        return l
+        return list_of_statuses
 
     #if res:
     #    return res[0]
@@ -3110,10 +3153,10 @@ def update_loan_recid(barcode, new_recid):
 
 def update_barcode(old_barcode, barcode):
 
-    r = run_sql("""UPDATE crcITEM
-                      SET barcode=%s
-                    WHERE barcode=%s
-                    """, (barcode, old_barcode))
+    res = run_sql("""UPDATE crcITEM
+                        SET barcode=%s
+                      WHERE barcode=%s
+                """, (barcode, old_barcode))
 
     run_sql("""UPDATE crcLOAN
                   SET barcode=%s
@@ -3125,14 +3168,15 @@ def update_barcode(old_barcode, barcode):
                 WHERE barcode=%s
                 """, (barcode, old_barcode))
 
-    return r > 0
+    return res > 0
 
 def tag_requests_as_done(barcode, user_id):
-    res = run_sql("""UPDATE crcLOANREQUEST
-                        SET status='done'
-                      WHERE barcode=%s
-                        and id_crcBORROWER=%s
-                """,  (barcode, user_id))
+    run_sql("""UPDATE crcLOANREQUEST
+                  SET status=%s
+                WHERE barcode=%s
+                  and id_crcBORROWER=%s
+          """,  (CFG_BIBCIRCULATION_REQUEST_STATUS_DONE,
+                 barcode, user_id))
 
 def get_expected_arrival_date(barcode):
     res = run_sql("""SELECT expected_arrival_date
@@ -3172,12 +3216,12 @@ def get_borrower_ccid(user_id):
 
 def update_borrower(user_id, name, email, phone, address, mailbox):
     return run_sql(""" UPDATE crcBORROWER
-                   SET name=%s,
-                       email=%s,
-                       phone=%s,
-                       address=%s,
-                       mailbox=%s
-                 WHERE id=%s
+                          SET name=%s,
+                              email=%s,
+                              phone=%s,
+                              address=%s,
+                              mailbox=%s
+                        WHERE id=%s
             """, (name, email, phone, address, mailbox, user_id))
 
 def get_all_borrowers():

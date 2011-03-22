@@ -33,10 +33,10 @@ from base64 import decodestring
 # CFG_CERN_LDAP_BIND = "n=%s,ou=users,o=cern,c=ch"
 # CFG_CERN_LDAP_BASE = "O=CERN,C=CH"
 
-
 CFG_CERN_LDAP_URI  = "ldap://xldap.cern.ch:389"
-# CFG_CERN_LDAP_BIND = "n=%s,ou=users,o=cern,c=ch"
-CFG_CERN_LDAP_BASE = "ou=users,ou=organic units,dc=cern,dc=ch"
+#CFG_CERN_LDAP_BASE = "ou=users,ou=organic units,dc=cern,dc=ch"
+
+CFG_CERN_LDAP_BASE = "dc=cern,dc=ch"
 
 # This one also works but the previous one is recommended
 # CFG_CERN_LDAP_URI  = "ldap://ldap.cern.ch"
@@ -70,7 +70,8 @@ def get_user_info_from_ldap(nickname="", email="", ccid=""):
         return {}
 
     try:
-        result = connection.search_st(CFG_CERN_LDAP_BASE, ldap.SCOPE_SUBTREE, query, timeout=5)
+        result = connection.search_st(CFG_CERN_LDAP_BASE, ldap.SCOPE_SUBTREE,
+                                      query, timeout=5)
         if result and nickname:
             return result[0][1]
         else:

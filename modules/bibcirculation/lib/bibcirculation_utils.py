@@ -27,10 +27,20 @@ from invenio.bibtask import task_low_level_submission
 from invenio.textutils import encode_for_xml
 from invenio.config import CFG_SITE_URL, CFG_TMPDIR, CFG_SITE_LANG
 
-from invenio.bibcirculation_config import CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY, \
-                                          CFG_BIBCIRCULATION_WORKING_DAYS, \
-                                          CFG_BIBCIRCULATION_HOLIDAYS, \
-                                          CFG_CERN_SITE
+from invenio.bibcirculation_config import \
+                                CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY, \
+                                CFG_BIBCIRCULATION_WORKING_DAYS, \
+                                CFG_BIBCIRCULATION_HOLIDAYS, \
+                                CFG_CERN_SITE, \
+                                CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN, \
+                                CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF, \
+                                CFG_BIBCIRCULATION_ITEM_STATUS_IN_PROCESS, \
+                                CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING, \
+                                CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING, \
+                                CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN, \
+                                CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED, \
+                                CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED
+
 
 from invenio.messages import gettext_set_language
 import datetime, time
@@ -39,9 +49,7 @@ def search_user(column, string):
     if string is not None:
         string = string.strip()
 
-
     if CFG_CERN_SITE == 1:
-
         if column == 'name':
             result = db.search_borrower_by_name(string)
         else:
@@ -52,12 +60,13 @@ def search_user(column, string):
                     result = ()
             else:
                 try:
-                    result = db.search_borrower_by_ccid(int(string))
+                    result = db.search_borrower_by_ccid(string)
                 except:
                     result = ()
 
             if result == ():
-                from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
+                from invenio.bibcirculation_cern_ldap \
+                     import get_user_info_from_ldap
 
                 ldap_info = 'busy'
                 while ldap_info == 'busy':
@@ -97,7 +106,11 @@ def search_user(column, string):
                     except KeyError:
                         ccid = ""
 
-                    db.new_borrower(ccid, name, email, phone, address, mailbox, '')
+                    try:
+                        db.new_borrower(ccid, name, email, phone,
+                                    address, mailbox, '')
+                    except:
+                        pass
                     result = db.search_borrower_by_ccid(int(ccid))
 
     else:
@@ -143,123 +156,6 @@ def update_user_info_from_ldap(user_id):
         db.update_borrower(user_id, name, email, phone, address, mailbox)
         result = db.search_borrower_by_ccid(int(ccid))
     return result
-
-#def hold_request_mail(recid, barcode, borrower_id):
-#    """
-#    Create the mail who will be sent for each hold requests.
-#
-#    @param recid: identify the record. Primary key of bibrec.
-#    @type recid: int
-#
-#    @param borrower_id: identify the borrower. Primary key of crcBORROWER.
-#    @type borrower_id: int
-#
-#    @return email(body)
-#    """
-#
-#    (book_title, book_year, book_author,
-#    book_isbn, book_editor) = book_information_from_MARC(recid)
-#
-#    ############## need some code refactoring ###############
-#
-#    more_holdings_infos = db.get_holdings_details(recid)
-#    borrower_infos = db.get_borrower_details(borrower_id)
-#
-#    #########################################################
-#
-#    title_link = create_html_link(CFG_SITE_URL +
-#                                  '/admin2/bibcirculation/get_item_details',
-#                                  {'recid': recid},
-#                                  (book_title))
-#
-#    (borrower_id, ccid, name, email, phone, address, mailbox) = borrower_infos
-#
-#    ## Register request
-#    #nb_requests = db.get_number_requests_per_copy(barcode)
-#    #is_on_loan = db.is_item_on_loan(barcode)
-#    #
-#    #if nb_requests == 0 and is_on_loan is not None:
-#    #    status = 'waiting'
-#    #elif nb_requests == 0 and is_on_loan is None:
-#    #    status = 'pending'
-#    #else:
-#    #    status = 'waiting'
-#    #
-#    #is_borrower = db.is_borrower(email)
-#    #
-#    #if is_borrower == 0:
-#    #    db.new_borrower(ccid, name, email, phone, address, mailbox, '')
-#    #    is_borrower = db.is_borrower(email)
-#    #
-#    #req_id = db.new_hold_request(is_borrower, recid, barcode,
-#    #                        period_from, period_to, status)
-#    #db.update_item_status('requested', barcode)
-#    #
-#    #if status == 'pending':
-#    (title, year, author, isbn, publisher) = book_information_from_MARC(int(recid))
-#    details = db.get_loan_request_details(req_id)
-#    if details:
-#        library  = details[3]
-#        location = details[4]
-#        request_date = details[7]
-#    else:
-#        location = ''
-#        library = ''
-#        request_date = ''
-#
-#    link_to_holdings_details = create_html_link(CFG_SITE_URL +
-#                                    '/record/%s/holdings'%str(recid),
-#                                    {'ln': ln},
-#                                    (CFG_SITE_URL +
-#                                    '/record/%s/holdings'%str(recid)))
-#    subject = 'New request'
-#    message = load_template('notification')
-#
-#    message = message % (name, ccid, email, address, mailbox, title,
-#                         author, publisher, year, isbn, location, library,
-#                         link_to_holdings_details, request_date)
-#
-#
-#    send_email(fromaddr = CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-#            toaddr   = CFG_BIBCIRCULATION_LOANS_EMAIL,
-#            subject  = subject,
-#            content  = message,
-#            header   = '',
-#            footer   = '',
-#            attempt_times=1,
-#            attempt_sleeptime=10
-#            )
-#    send_email(fromaddr = CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-#            toaddr   = email,
-#            subject  = subject,
-#            content  = message,
-#            header   = '',
-#            footer   = '',
-#            attempt_times=1,
-#            attempt_sleeptime=10
-#            )
-#    out = """
-#
-#           This is an automatic email for confirming the hold request for a
-#           book on behalf of:
-#
-#            %s (email: %s)
-#
-#            title: %s
-#            author: %s
-#            location: %s
-#            library: %s
-#            publisher: %s
-#            year: %s
-#            isbn: %s
-#
-#    """ % (borrower_infos[1], borrower_infos[2],
-#           title_link, book_author, more_holdings_infos[0][1],
-#           more_holdings_infos[0][2],
-#           book_editor, book_year, book_isbn)
-#
-#    return out
-
 
 def get_book_cover(isbn):
     """
@@ -329,7 +225,6 @@ def book_information_from_MARC(recid):
 
     return (book_title, book_year, book_author, book_isbn, book_editor)
 
-
 def book_title_from_MARC(recid):
     """
     Retrieve book's title from MARC
@@ -344,11 +239,11 @@ def book_title_from_MARC(recid):
 
     book_title = ''
     i = 0
-    while book_title == '' and i<len(title_tags):
-        l = get_fieldvalues(recid,title_tags[i])
+    while book_title == '' and i < len(title_tags):
+        l = get_fieldvalues(recid, title_tags[i])
         for candidate in l:
             book_title = book_title + candidate + ': '
-        i+=1
+        i += 1
 
     book_title = book_title[:-2]
 
@@ -364,8 +259,8 @@ def update_status_if_expired(loan_id):
 
     loan_status = db.get_loan_status(loan_id)
 
-    if loan_status == 'expired':
-        db.update_loan_status('on loan', loan_id)
+    if loan_status == CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED:
+        db.update_loan_status(CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN, loan_id)
 
     return
 
@@ -386,7 +281,8 @@ def get_next_day(date_string):
     tmp_date = time.strptime(date_string, '%Y-%m-%d')
 
     # calculate the new date (next day)
-    next_day = datetime.datetime(*tmp_date[:3]) + more_1_day
+    next_day = datetime.datetime(tmp_date[0], tmp_date[1], tmp_date[2]) \
+                                                                + more_1_day
 
     return next_day
 
@@ -412,7 +308,8 @@ def generate_new_due_date(days):
     due_date_validated = False
 
     while not due_date_validated:
-        if week_day in CFG_BIBCIRCULATION_WORKING_DAYS and due_date not in CFG_BIBCIRCULATION_HOLIDAYS:
+        if week_day in CFG_BIBCIRCULATION_WORKING_DAYS \
+           and due_date not in CFG_BIBCIRCULATION_HOLIDAYS:
             due_date_validated = True
 
         else:
@@ -443,7 +340,8 @@ def renew_loan_for_X_days(barcode):
 
 def make_copy_available(request_id):
     """
-    Change the status of a copy for 'on shelf' when
+    Change the status of a copy for
+    CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF when
     an hold request was cancelled.
 
     @param request_id: identify the request: Primary key of crcLOANREQUEST
@@ -451,17 +349,17 @@ def make_copy_available(request_id):
     """
 
     barcode_requested = db.get_requested_barcode(request_id)
-    db.update_item_status('on shelf', barcode_requested)
+    db.update_item_status(CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF, barcode_requested)
+    update_requests_statuses(barcode_requested)
 
-    return
 
-def print_new_loan_information(req):
+def print_new_loan_information(req, ln=CFG_SITE_LANG):
     """
     Create a printable format with the information of the last
     loan who has been registered on the table crcLOAN.
     """
 
-    _ = gettext_set_language(CFG_SITE_LANG)
+    _ = gettext_set_language(ln)
 
     # get the last loan from crcLOAN
     (recid, borrower_id, due_date) = db.get_last_loan()
@@ -501,21 +399,26 @@ def print_new_loan_information(req):
     out += """</table><br />"""
     out += """<table style='color: #79d; font-size: 82%; width:95%;
                             margin:auto; max-width: 400px;'>"""
-    out += """<tr>
-                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
-                  </tr>
-                  <tr>
-                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
-                  </tr>
-                  <tr>
-                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
-                  </tr>
-                  <tr>
-                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
-                  </tr>
-                   <tr>
-                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
-                  </tr>
+    out += """  <tr>
+                    <td width="70"><strong>%s</strong></td>
+                    <td style='color: black;'>%s</td>
+                </tr>
+                <tr>
+                    <td width="70"><strong>%s</strong></td>
+                    <td style='color: black;'>%s</td>
+                </tr>
+                <tr>
+                    <td width="70"><strong>%s</strong></td>
+                    <td style='color: black;'>%s</td>
+                </tr>
+                <tr>
+                    <td width="70"><strong>%s</strong></td>
+                    <td style='color: black;'>%s</td>
+                </tr>
+                <tr>
+                    <td width="70"><strong>%s</strong></td>
+                    <td style='color: black;'>%s</td>
+                </tr>
                   """ % (_("Title"),  book_title,
                          _("Author"), book_author,
                          _("Editor"), book_editor,
@@ -577,7 +480,6 @@ def print_new_loan_information(req):
 
     return "\n"
 
-
 def print_pending_hold_requests_information(req, ln):
     """
     Create a printable format with all the information about all
@@ -586,7 +488,7 @@ def print_pending_hold_requests_information(req, ln):
 
     _ = gettext_set_language(ln)
 
-    requests = db.get_pdf_request_data('pending')
+    requests = db.get_pdf_request_data(CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING)
 
     req.content_type = "text/html"
     req.send_http_header()
@@ -597,15 +499,21 @@ def print_pending_hold_requests_information(req, ln):
                      <td><img src="%s/img/CERN_CDS_logo.png"></td>
                    </tr>
                   </table><br />""" % (CFG_SITE_URL)
-    out += """<table style='color: #79d; font-size: 82%; width:95%; margin:auto; max-width: 1024px;'>"""
+    out += """<table style='color: #79d; font-size: 82%;
+                     width:95%; margin:auto; max-width: 1024px;'>"""
 
-    out += """ <tr><td align="center"><h2><strong>%s</strong></h2></td></tr>""" % (_("List of pending hold requests"))
+    out += """  <tr>
+                    <td align="center"><h2><strong>%s</strong></h2></td>
+                </tr>""" % (_("List of pending hold requests"))
 
-    out += """ <tr><td align="center"><strong>%s</strong></td></tr>""" % (time.ctime())
+    out += """  <tr>
+                    <td align="center"><strong>%s</strong></td>
+                </tr>""" % (time.ctime())
 
     out += """</table><br/>"""
 
-    out += """<table style='color: #79d; font-size: 82%; width:95%; margin:auto; max-width: 1024px;'>"""
+    out += """<table style='color: #79d; font-size: 82%;
+                     width:95%; margin:auto; max-width: 1024px;'>"""
 
     out += """<tr>
                        <td><strong>%s</strong></td>
@@ -624,7 +532,8 @@ def print_pending_hold_requests_information(req, ln):
                               _("To"),
                               _("Request date"))
 
-    for (recid, borrower_name, library_name, location, date_from, date_to, request_date) in requests:
+    for (recid, borrower_name, library_name, location,
+         date_from, date_to, request_date) in requests:
 
         out += """<tr style='color: black;'>
                          <td class="bibcirccontent">%s</td>
@@ -635,20 +544,24 @@ def print_pending_hold_requests_information(req, ln):
                          <td class="bibcirccontent">%s</td>
                          <td class="bibcirccontent">%s</td>
                       </tr>
-                         """ % (borrower_name, book_title_from_MARC(recid), library_name,
-                                location, date_from, date_to, request_date)
+                         """ % (borrower_name, book_title_from_MARC(recid),
+                                library_name, location, date_from, date_to,
+                                request_date)
 
     out += """</table>
               <br />
               <br />
-                  <table style='color: #79d; font-size: 82%; width:95%; margin:auto; max-width: 1024px;'>
+                  <table style='color: #79d; font-size: 82%;
+                  width:95%; margin:auto; max-width: 1024px;'>
                   <tr>
                     <td>
                       <input type=button value='Back' onClick="history.go(-1)"
-                      style='color: #fff; background: #36c; font-weight: bold;'>
+                             style='color: #fff; background: #36c;
+                             font-weight: bold;'>
 
                       <input type="button" onClick='window.print()'
-                      value='Print' style='color: #fff; background: #36c; font-weight: bold;'>
+                      value='Print' style='color: #fff;
+                                background: #36c; font-weight: bold;'>
                     </td>
                   </tr>
                   </table>"""
@@ -696,9 +609,11 @@ def update_request_data(request_id):
     is_on_loan = db.is_item_on_loan(barcode)
 
     if is_on_loan is not None:
-        db.update_item_status('on loan', barcode)
+        db.update_item_status(CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN, barcode)
     else:
-        db.update_item_status('on shelf', barcode)
+        db.update_item_status(CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF, barcode)
+
+    update_requests_statuses(barcode)
 
 
     return True
@@ -789,7 +704,8 @@ def create_ill_record(book_info):
     xml_file.close()
 
     # Pass XML file to BibUpload.
-    task_low_level_submission('bibupload', 'bibcirculation', '-P', '5', '-i', file_path)
+    task_low_level_submission('bibupload', 'bibcirculation',
+                              '-P', '5', '-i', file_path)
 
     return ill_record
 
@@ -813,21 +729,6 @@ def wash_recid_from_ILL_request(ill_request_id):
         recid = None
 
     return recid
-
-def get_list_of_ILL_requests():
-    """
-    Get list with all recids related with ILL requests
-    """
-
-    list_of_recids = []
-    ill_requests = db.get_ill_ids()
-
-    for i in range(len(ill_requests)):
-        recid = wash_recid_from_ILL_request(ill_requests[i][0])
-        if recid:
-            list_of_recids.append(recid)
-
-    return list_of_recids
 
 def all_copies_are_missing(recid):
     """
@@ -853,25 +754,25 @@ def all_copies_are_missing(recid):
         else:
             return False
 
-def has_copies(recid):
-    """
-    Verify if a recid is item (has copies)
-
-    @param recid: identify the record. Primary key of bibrec
-    @type recid: int
-
-    @return boolean
-    """
-
-    copies_status = db.get_copies_status(recid)
-
-    if copies_status is None:
-        return False
-    else:
-        if len(copies_status) == 0:
-            return False
-        else:
-            return True
+#def has_copies(recid):
+#    """
+#    Verify if a recid is item (has copies)
+#
+#    @param recid: identify the record. Primary key of bibrec
+#    @type recid: int
+#
+#    @return boolean
+#    """
+#
+#    copies_status = db.get_copies_status(recid)
+#
+#    if copies_status is None:
+#        return False
+#    else:
+#        if len(copies_status) == 0:
+#            return False
+#        else:
+#            return True
 
 def generate_email_body(template, loan_id):
     """
@@ -896,8 +797,9 @@ def generate_email_body(template, loan_id):
     return out
 
 def create_item_details_url(recid, ln):
-    url = '/admin2/bibcirculation/get_item_details?ln=%s&recid=%s' % (ln, str(recid))
-    return CFG_SITE_URL+url
+    url = '/admin2/bibcirculation/get_item_details?ln=%s&recid=%s' % (ln,
+                                                                    str(recid))
+    return CFG_SITE_URL + url
 
 def tag_all_requests_as_done(barcode, user_id):
     recid = db.get_recid(barcode)
@@ -905,34 +807,44 @@ def tag_all_requests_as_done(barcode, user_id):
     for bc in list_of_barcodes:
         db.tag_requests_as_done(bc, user_id)
 
-def update_requests_statuses(barcode):
-    recid = db.get_recid(barcode)
-    list_of_pending_requests = db.get_requests(recid, 'pending')
+def update_requests_statuses(barcode, recid=None):
+    if recid == None:
+        recid = db.get_recid(barcode)
+    list_of_pending_requests = db.get_requests(recid,
+                                    CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING)
     some_copy_available = False
     copies_status = db.get_copies_status(recid)
-    for status in copies_status:
-        if status == 'on shelf':
-            some_copy_available = True
+    if copies_status is not None:
+        for status in copies_status:
+            if status in (CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF,
+                          CFG_BIBCIRCULATION_ITEM_STATUS_IN_PROCESS):
+                some_copy_available = True
 
     if len(list_of_pending_requests) == 1:
         if not some_copy_available:
-            db.update_loan_request_status(list_of_pending_requests[0][0], 'waiting')
+            db.update_loan_request_status(list_of_pending_requests[0][0],
+                                    CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING)
         else:
             return list_of_pending_requests[0][0]
 
     elif len(list_of_pending_requests) == 0:
         if some_copy_available:
-            list_of_waiting_requests = db.get_requests(recid, 'waiting')
+            list_of_waiting_requests = db.get_requests(recid,
+                                    CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING)
             if len(list_of_waiting_requests) > 0:
-                db.update_loan_request_status(list_of_waiting_requests[0][0], 'pending')
+                db.update_loan_request_status(list_of_waiting_requests[0][0],
+                                    CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING)
                 return list_of_waiting_requests[0][0]
 
     elif len(list_of_pending_requests) > 1:
         for request in list_of_pending_requests:
-            db.update_loan_request_status(request[0], 'waiting')
-        list_of_waiting_requests = db.get_requests(recid, 'waiting')
+            db.update_loan_request_status(request[0],
+                                    CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING)
+        list_of_waiting_requests = db.get_requests(recid,
+                                    CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING)
         if some_copy_available:
-            db.update_loan_request_status(list_of_waiting_requests[0][0], 'pending')
+            db.update_loan_request_status(list_of_waiting_requests[0][0],
+                                    CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING)
             return list_of_waiting_requests[0][0]
 
     return None
@@ -940,6 +852,72 @@ def update_requests_statuses(barcode):
 def is_periodical(recid):
     rec_type = get_fieldvalues(recid, "690C_a")
     if len(rec_type) > 0:
-        return rec_type[0] == 'PERI'
-    else:
+        for value in rec_type:
+            if value == 'PERI':
+                return True
+
+    return False
+
+def has_date_format(date):
+
+    if type(date) is not str:
         return False
+
+    date = date.strip()
+
+    if len(date) is not 10:
+        return False
+    elif date[4] is not '-' and date[7] is not '-':
+        return False
+    else:
+        year = date[:4]
+        month = date[5:7]
+        day = date[8:]
+
+        return year.isdigit() and month.isdigit() and day.isdigit()
+
+def check_database():
+
+    from invenio.dbquery import run_sql
+
+    r1 = run_sql(""" SELECT it.barcode, it.status, ln.status
+                       FROM crcITEM it, crcLOAN ln
+                      WHERE ln.barcode=it.barcode
+                        AND it.status=%s
+                        AND ln.status!=%s
+                        AND ln.status!=%s
+                        AND ln.status!=%s
+                 """, (CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN,
+                        CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN,
+                        CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED,
+                        CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED))
+
+    r2 = run_sql(""" SELECT it.barcode
+                       FROM crcITEM it, crcLOAN ln
+                      WHERE ln.barcode=it.barcode
+                        AND it.status=%s
+                        AND (ln.status=%s or ln.status=%s)
+                 """, (CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF,
+                        CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN,
+                        CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED))
+
+    r3 = run_sql(""" SELECT l1.barcode, l1.id,
+                            DATE_FORMAT(l1.loaned_on,'%%Y-%%m-%%d %%H:%%i:%%s'),
+                            DATE_FORMAT(l2.loaned_on,'%%Y-%%m-%%d %%H:%%i:%%s')
+                       FROM crcLOAN l1,
+                            crcLOAN l2
+                      WHERE l1.id!=l2.id
+                        AND l1.status!=%s
+                        AND l1.status=l2.status
+                        AND l1.barcode=l2.barcode
+                   ORDER BY l1.loaned_on
+                 """, (CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED, ))
+
+    r4 = run_sql(""" SELECT id, id_crcBORROWER, barcode,
+                            due_date, number_of_renewals
+                       FROM crcLOAN
+                      WHERE status=%s
+                        AND due_date>NOW()
+                 """, (CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED, ))
+
+    return (len(r1), len(r2), len(r3), len(r4))
