@@ -96,7 +96,7 @@ def untar(original_tarball, sdir):
         # if neither, maybe it is TeX or an image anyway, otherwise,
         # we don't care
         else:
-            if extracted_file.split('.')[-1] == tex_file_extension:
+            if extracted_file.split('.')[-1].lower() == tex_file_extension:
                 # we might have tex source!
                 might_be_tex.append(extracted_file)
             elif extracted_file.split('.')[-1] in ['eps', 'png', \
