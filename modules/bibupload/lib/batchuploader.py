@@ -24,6 +24,7 @@
     documents are expected to be found has to be specified
     in the invenio config file.
 """
+import os.path
 
 __revision__ = "$Id$"
 
@@ -60,18 +61,25 @@ def task_run_core():
         Files are then moved to the corresponding DONE folders.
     """
     tempfile.tempdir = CFG_TMPDIR
+    daemon_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
+                 or CFG_PREFIX + '/' + CFG_BATCHUPLOADER_DAEMON_DIR
+    # Check if directory /batchupload exists
     if not task_get_option('documents'):
         # Metadata upload
-        daemon_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
-                     or CFG_PREFIX + '/' + CFG_BATCHUPLOADER_DAEMON_DIR
         parent_dir = daemon_dir + "/metadata/"
         progress = 0
+        try:
+            os.makedirs(parent_dir)
+        except OSError:
+            pass
         for folder in ["insert/", "append/", "correct/", "replace/"]:
             files_dir = parent_dir + folder
             files_done_dir = files_dir + "DONE/"
             try:
                 files = os.listdir(files_dir)
             except OSError, e:
+                os.mkdir(files_dir)
+                files = []
                 write_message(e, sys.stderr)
             # Create directory DONE/ if doesn't exist
             try:
@@ -95,11 +103,17 @@ def task_run_core():
             task_update_progress("Done %d out of 4." % progress)
     else:
         # Documents upload
-        daemon_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
-                     or CFG_PREFIX + '/' + CFG_BATCHUPLOADER_DAEMON_DIR
         parent_dir = daemon_dir + "/documents/"
+        try:
+            os.makedirs(parent_dir)
+        except OSError:
+            pass
         matching_order = CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY
         for folder in ["append/", "revise/"]:
+            try:
+                os.mkdir(parent_dir + folder)
+            except:
+                pass
             for matching in matching_order:
                 errors = document_upload(folder=parent_dir + folder, matching=matching, mode=folder[:-1])[0]
                 if not errors:
