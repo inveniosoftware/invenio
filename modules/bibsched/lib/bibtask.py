@@ -69,6 +69,7 @@ from invenio.webuser import get_user_preferences, get_email
 from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
     CFG_BIBTASK_DEFAULT_TASK_SETTINGS
 from invenio.dateutils import parse_runtime_limit
+from invenio.shellutils import escape_shell_arg
 
 # Global _TASK_PARAMS dictionary.
 _TASK_PARAMS = {
@@ -184,11 +185,13 @@ def task_low_level_submission(name, user, *argv):
         if special_name:
             name = '%s:%s' % (name, special_name)
 
+        verbose_argv = 'Will execute: %s' % ' '.join([escape_shell_arg(str(arg)) for arg in argv])
+
         ## submit task:
         task_id = run_sql("""INSERT INTO schTASK (proc,user,
             runtime,sleeptime,status,progress,arguments,priority)
-            VALUES (%s,%s,NOW(),'','WAITING','',%s,%s)""",
-            (name, user, marshal.dumps(argv), priority))
+            VALUES (%s,%s,NOW(),'','WAITING',%s,%s,%s)""",
+            (name, user, verbose_argv, marshal.dumps(argv), priority))
 
     except Exception:
         register_exception(alert_admin=True)
@@ -669,11 +672,12 @@ def _task_submit(argv, authorization_action, authorization_msg):
     else:
         task_name = _TASK_PARAMS['task_name']
     write_message("storing task options %s\n" % argv, verbose=9)
+    verbose_argv = 'Will execute: %s' % ' '.join([escape_shell_arg(str(arg)) for arg in argv])
     _TASK_PARAMS['task_id'] = run_sql("""INSERT INTO schTASK (proc,user,
                                            runtime,sleeptime,status,progress,arguments,priority)
-                                         VALUES (%s,%s,%s,%s,'WAITING','',%s, %s)""",
+                                         VALUES (%s,%s,%s,%s,'WAITING',%s,%s, %s)""",
         (task_name, _TASK_PARAMS['user'], _TASK_PARAMS["runtime"],
-         _TASK_PARAMS["sleeptime"], marshal.dumps(argv), _TASK_PARAMS['priority']))
+         _TASK_PARAMS["sleeptime"], verbose_argv, marshal.dumps(argv), _TASK_PARAMS['priority']))
 
     ## update task number:
     write_message("Task #%d submitted." % _TASK_PARAMS['task_id'])
@@ -775,14 +779,17 @@ def _task_run(task_run_fnc):
     finally:
         task_status = task_read_status()
         if sleeptime:
+            argv = _task_get_options(_TASK_PARAMS['task_id'], _TASK_PARAMS['task_name'])
+            verbose_argv = 'Will execute: %s' % ' '.join([escape_shell_arg(str(arg)) for arg in argv])
+
             new_runtime = get_datetime(sleeptime)
             ## The task is a daemon. We resubmit it
             if task_status == 'DONE':
                 ## It has finished in a good way. We recycle the database row
-                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress='' WHERE id=%s", (new_runtime, _TASK_PARAMS['task_id']))
+                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s WHERE id=%s", (new_runtime, verbose_argv, _TASK_PARAMS['task_id']))
                 write_message("Task #%d finished and resubmitted." % _TASK_PARAMS['task_id'])
             elif task_status == 'STOPPED':
-                run_sql("UPDATE schTASK SET status='WAITING', progress='' WHERE id=%s", (_TASK_PARAMS['task_id'], ))
+                run_sql("UPDATE schTASK SET status='WAITING', progress=%s WHERE id=%s", (verbose_argv, _TASK_PARAMS['task_id'], ))
                 write_message("Task #%d stopped and resubmitted." % _TASK_PARAMS['task_id'])
             else:
                 ## We keep the bad result and we resubmit with another id.
