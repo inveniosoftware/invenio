@@ -777,7 +777,11 @@ def cut_out_snippet(text, patterns, nb_words_around, max_words, right_boundary =
             i += 1
         # if the snippet is ready (i.e. we didn't just find a new match)
         if snippet != "" and i < len(tokens) and not matches_any(i):
-            max_words -= len(snippet.split())
+            split_snippet = snippet.split()
+            #temporary rule of a thumb to make sure snippets aren't too long
+            if len(split_snippet) > nb_words_around * 4:
+                snippet = " ".join(split_snippet[0:(nb_words_around * 3)])
+            max_words -= len(snippet.split()) #potentially new length
             snippets.append(highlight_matches(snippet, compiled_pattern))
             snippet = ""
 
