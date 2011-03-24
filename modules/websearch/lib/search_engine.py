@@ -1825,9 +1825,9 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         # fulltext/caption search warnings for INSPIRE:
         fields_to_be_searched = [f for o,p,f,m in basic_search_units]
         if 'fulltext' in fields_to_be_searched:
-            print_warning(req, _("Warning: full-text search is only available for a subset of papers mostly from 2006-2010."))
+            print_warning(req, _("Warning: full-text search is only available for a subset of papers mostly from 2006-2011."))
         elif 'caption' in fields_to_be_searched:
-            print_warning(req, _("Warning: figure caption search is only available for a subset of papers mostly from 2008-2010."))
+            print_warning(req, _("Warning: figure caption search is only available for a subset of papers mostly from 2008-2011."))
 
     for idx_unit in xrange(len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
