@@ -4232,7 +4232,7 @@ def call_bibformat(recID, format="HD", ln=CFG_SITE_LANG, search_pattern=None, us
     keywords = []
     if search_pattern is not None:
         units = create_basic_search_units(None, str(search_pattern), None)
-        keywords = [unit[1] for unit in units if unit[0] != '-']
+        keywords = [unit[1] for unit in units if (unit[0] != '-' and unit[2] in [None, 'fulltext'])]
 
     out = format_record(recID,
                          of=format,
