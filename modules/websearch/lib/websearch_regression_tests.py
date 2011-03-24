@@ -45,7 +45,7 @@ from invenio.urlutils import same_urls_p
 from invenio.search_engine import perform_request_search, \
     guess_primary_collection_of_a_record, guess_collection_of_a_record, \
     collection_restricted_p, get_permitted_restricted_collections, \
-    get_fieldvalues
+    get_fieldvalues, search_pattern
 
 def parse_url(url):
     parts = urlparse.urlparse(url)
@@ -645,16 +645,21 @@ class WebSearchTestWildcardLimit(unittest.TestCase):
     """Checks if the wildcard limit is correctly passed and that
     users without autorization can not exploit it"""
 
-    def test_wildcard_limit_correctly_passed_when_default(self):
+    def test_wildcard_limit_correctly_passed_when_not_set(self):
         """websearch - wildcard limit is correctly passed when default"""
-        self.assertEqual(perform_request_search(p="e*", f='author'),
-                            perform_request_search(p="e*", f='author', wl=1000))
+        self.assertEqual(search_pattern(p='e*', f='author'),
+                         search_pattern(p='e*', f='author', wl=1000))
 
     def test_wildcard_limit_correctly_passed_when_set(self):
         """websearch - wildcard limit is correctly passed when set"""
         self.assertEqual([],
             test_web_page_content(CFG_SITE_URL + '/search?p=e*&f=author&of=id&wl=5',
                                   expected_text="[9, 10, 11, 17, 46, 48, 50, 51, 52, 53, 54, 67, 72, 74, 81, 88, 92, 96]"))
+
+    def test_wildcard_limit_correctly_not_active(self):
+        """websearch - wildcard limit is not active when there is no wildcard query"""
+        self.assertEqual(search_pattern(p='ellis', f='author'),
+                         search_pattern(p='ellis', f='author', wl=1))
 
     def test_wildcard_limit_increased_by_authorized_users(self):
         """websearch - wildcard limit increased by authorized user"""

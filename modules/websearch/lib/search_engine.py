@@ -2159,6 +2159,7 @@ def search_unit_in_idxphrases(p, f, type, wl=0):
     set = HitSet() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
     limit_reached = 0 # flag for knowing if the query limit has been reached
+    use_query_limit = False # flag for knowing if to limit the query results or not
     # deduce in which idxPHRASE table we will search:
     idxphraseX = "idxPHRASE%02dF" % get_index_id_from_field("anyfield")
     if f:
@@ -2171,16 +2172,19 @@ def search_unit_in_idxphrases(p, f, type, wl=0):
     if type == 'r':
         query_addons = "REGEXP %s"
         query_params = (p,)
+        use_query_limit = True
     else:
         p = string.replace(p, '*', '%') # we now use '*' as the truncation character
         ps = string.split(p, "->", 1) # check for span query:
         if len(ps) == 2 and not (ps[0].endswith(' ') or ps[1].startswith(' ')):
             query_addons = "BETWEEN %s AND %s"
             query_params = (ps[0], ps[1])
+            use_query_limit = True
         else:
             if string.find(p, '%') > -1:
                 query_addons = "LIKE %s"
                 query_params = (p,)
+                use_query_limit = True
             else:
                 query_addons = "= %s"
                 query_params = (p,)
@@ -2192,12 +2196,15 @@ def search_unit_in_idxphrases(p, f, type, wl=0):
             query_params_washed += (wash_author_name(query_param),)
         query_params = query_params_washed
     # perform search:
-    try:
-        res = run_sql_with_limit("SELECT term,hitlist FROM %s WHERE term %s" % (idxphraseX, query_addons),
+    if use_query_limit:
+        try:
+            res = run_sql_with_limit("SELECT term,hitlist FROM %s WHERE term %s" % (idxphraseX, query_addons),
                       query_params, wildcard_limit=wl)
-    except InvenioDbQueryWildcardLimitError, excp:
-        res = excp.res
-        limit_reached = 1 # set the limit reached flag to true
+        except InvenioDbQueryWildcardLimitError, excp:
+            res = excp.res
+            limit_reached = 1 # set the limit reached flag to true
+    else:
+        res = run_sql("SELECT term,hitlist FROM %s WHERE term %s" % (idxphraseX, query_addons), query_params)
     # fill the result set:
     for word, hitlist in res:
         hitset_bibphrase = HitSet(hitlist)
@@ -2223,6 +2230,7 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
         return search_unit_in_bibwords(p, f, wl=wl)
     p_orig = p # saving for eventual future 'no match' reporting
     limit_reached = 0 # flag for knowing if the query limit has been reached
+    use_query_limit = False  # flag for knowing if to limit the query results or not
     query_addons = "" # will hold additional SQL code for the query
     query_params = () # will hold parameters for the query (their number may vary depending on TYPE argument)
     # wash arguments:
@@ -2230,16 +2238,19 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
     if type == 'r':
         query_addons = "REGEXP %s"
         query_params = (p,)
+        use_query_limit = True
     else:
         p = string.replace(p, '*', '%') # we now use '*' as the truncation character
         ps = string.split(p, "->", 1) # check for span query:
         if len(ps) == 2 and not (ps[0].endswith(' ') or ps[1].startswith(' ')):
             query_addons = "BETWEEN %s AND %s"
             query_params = (ps[0], ps[1])
+            use_query_limit = True
         else:
             if string.find(p, '%') > -1:
                 query_addons = "LIKE %s"
                 query_params = (p,)
+                use_query_limit = True
             else:
                 query_addons = "= %s"
                 query_params = (p,)
@@ -2268,12 +2279,16 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
                     query_params = tuple(int(param) for param in query_params)
                 except ValueError:
                     return HitSet()
-            try:
-                res = run_sql_with_limit("SELECT id FROM bibrec WHERE id %s" % query_addons,
+            if use_query_limit:
+                try:
+                    res = run_sql_with_limit("SELECT id FROM bibrec WHERE id %s" % query_addons,
                               query_params, wildcard_limit=wl)
-            except InvenioDbQueryWildcardLimitError, excp:
-                res = excp.res
-                limit_reached = 1 # set the limit reached flag to true
+                except InvenioDbQueryWildcardLimitError, excp:
+                    res = excp.res
+                    limit_reached = 1 # set the limit reached flag to true
+            else:
+                res = run_sql("SELECT id FROM bibrec WHERE id %s" % query_addons,
+                              query_params)
         else:
             query = "SELECT bibx.id_bibrec FROM %s AS bx LEFT JOIN %s AS bibx ON bx.id=bibx.id_bibxxx WHERE bx.value %s" % \
                     (bx, bibx, query_addons)
@@ -2281,19 +2296,19 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
                 # wildcard query, or only the beginning of field 't'
                 # is defined, so add wildcard character:
                 query += " AND bx.tag LIKE %s"
+                query_params = query_params + (t + '%',)
+            else:
+                # exact query for 't':
+                query += " AND bx.tag=%s"
+                query_params = query_params + (t,)
+            if use_query_limit:
                 try:
-                    res = run_sql_with_limit(query, query_params + (t + '%',), wildcard_limit=wl)
+                    res = run_sql_with_limit(query, query_params, wildcard_limit=wl)
                 except InvenioDbQueryWildcardLimitError, excp:
                     res = excp.res
                     limit_reached = 1 # set the limit reached flag to true
             else:
-                # exact query for 't':
-                query += " AND bx.tag=%s"
-                try:
-                    res = run_sql_with_limit(query, query_params + (t,), wildcard_limit=wl)
-                except InvenioDbQueryWildcardLimitError, excp:
-                    res = excp.res
-                    limit_reached = 1 # set the limit reached flag to true
+                res = run_sql(query, query_params)
         # fill the result set:
         for id_bibrec in res:
             if id_bibrec[0]:
