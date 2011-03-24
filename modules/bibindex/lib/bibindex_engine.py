@@ -246,7 +246,12 @@ def get_author_canonical_ids_for_recid(recID):
     """
     from invenio.bibauthorid_personid_tables_utils import get_persons_from_recids
     lwords = []
-    dpersons, dpersoninfos = get_persons_from_recids([recID])
+    res = get_persons_from_recids([recID])
+    if res is None:
+        ## BibAuthorID is not enabled
+        return lwords
+    else:
+        dpersons, dpersoninfos = res
     for aid in dpersoninfos.keys():
         author_canonical_id = dpersoninfos[aid].get('canonical_id', '')
         if author_canonical_id:
