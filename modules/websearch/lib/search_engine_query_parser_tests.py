@@ -294,6 +294,20 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
         self.assertEqual(sorted(perform_request_search(p='ellis and (kaluza-klein or r-parity)')),
                          sorted(perform_request_search(p='ellis and (r-parity or kaluza-klein)')))
 
+    def test_sqpp_e_plus_e_minus(self):
+        """SearchQueryParenthesisedParser - e(+)e(-)"""
+        self.assertEqual(self.parser.parse_query('e(+)e(-)'), ['+', 'e(+)e(-)'])
+
+    def test_sqpp_fe_2_plus(self):
+        """SearchQueryParenthesisedParser - Fe(2+)"""
+        self.assertEqual(self.parser.parse_query('Fe(2+)'), ['+', 'fe(2+)'])
+
+    def test_sqpp_giant_evil_title_string(self):
+        """SearchQueryParenthesisedParser - Measurements of CP-conserving trilinear gauge boson couplings WWV (V gamma, Z) in e(+)e(-) collisions at LEP2"""
+        self.assertEqual(self.parser.parse_query('Measurements of CP-conserving trilinear gauge boson couplings WWV (V gamma, Z) in e(+)e(-) collisions at LEP2'),
+                         ['+', 'measurements', '+', 'of', '+', 'cp-conserving', '+', 'trilinear', '+', 'gauge', \
+                          '+', 'boson', '+', 'couplings', '+', 'wwv', '+', 'v + gamma, + z', \
+                          '+', 'in', '+', 'e(+)e(-)', '+', 'collisions', '+', 'at', '+', 'lep2'])
 
 class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
     """Test SPIRES query parsing and translation to Invenio syntax."""

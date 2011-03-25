@@ -58,6 +58,16 @@ class SearchQueryParenthesisedParser(object):
     * substitution_dict: a dictionary mapping strings to other strings.  By
       default, maps 'and', 'or' and 'not' to '+', '|', and '-'.  Dictionary
       values will be treated as valid operators for output.
+
+    A note (valkyrie 25.03.2011):
+    Based on looking through the prod search logs, it is evident that users,
+    when they are using parentheses to do searches, only run word characters
+    up against parens when they intend the parens to be part of the word (e.g.
+    U(1)), and when they are using parentheses to combine operators, they put
+    a space before and after them.  As of writing, this is the behavior that
+    SQPP now expects, in order that it be able to handle such queries as
+    e(+)e(-) that contain operators in parentheses that should be interpreted
+    as words.
     """
 
     def __init__(self, substitution_dict = {'and': '+', 'or': '|', 'not': '-'}):
@@ -224,6 +234,12 @@ class SearchQueryParenthesisedParser(object):
         "expr1|expr2 (expr3-(expr4 or expr5))"
         becomes:
         ['expr1', '|', 'expr2', '(', 'expr3', '-', '(', 'expr4', 'or', 'expr5', ')', ')']
+
+        special case:
+        "e(+)e(-)" interprets '+' and '-' as word characters since they are in parens with
+        word characters run up against them.
+        it becomes:
+        ['e(+)e(-)']
         """
         ###
         # Invariants:
@@ -241,8 +257,13 @@ class SearchQueryParenthesisedParser(object):
             """
             s = ' '+s
             s = s.replace('->', '####DATE###RANGE##OP#') # XXX: Save '->'
-            s = re.sub('(?P<outside>[a-zA-Z0-9_,]+)\((?P<inside>[a-zA-Z0-9_,]*)\)',
+            s = re.sub('(?P<outside>[a-zA-Z0-9_,=]+)\((?P<inside>[a-zA-Z0-9_,+-/]*)\)',
                        '#####\g<outside>####PAREN###\g<inside>##PAREN#', s) # XXX: Save U(1) and SL(2,Z)
+            s = re.sub('####PAREN###(?P<content0>[.0-9/-]*)(?P<plus>[+])(?P<content1>[.0-9/-]*)##PAREN#',
+                       '####PAREN###\g<content0>##PLUS##\g<content1>##PAREN#', s)
+            s = re.sub('####PAREN###(?P<content0>([.0-9/]|##PLUS##)*)(?P<minus>[-])' +\
+                                   '(?P<content1>([.0-9/]|##PLUS##)*)##PAREN#',
+                       '####PAREN###\g<content0>##MINUS##\g<content1>##PAREN#', s) # XXX: Save e(+)e(-)
             for char in self.specials:
                 if char == '-':
                     s = s.replace(' -', ' '+char+' ')
@@ -250,7 +271,9 @@ class SearchQueryParenthesisedParser(object):
                     s = s.replace('-(', ' '+char+' (')
                 else:
                     s = s.replace(char, ' '+char+' ')
-            s = re.sub('#####(?P<outside>[a-zA-Z0-9_,]+)####PAREN###(?P<inside>[a-zA-Z0-9_,]*)##PAREN#',
+            s = re.sub('##PLUS##', '+', s)
+            s = re.sub('##MINUS##', '-', s) # XXX: Restore e(+)e(-)
+            s = re.sub('#####(?P<outside>[a-zA-Z0-9_,=]+)####PAREN###(?P<inside>[a-zA-Z0-9_,+-/]*)##PAREN#',
                        '\g<outside>(\g<inside>)', s) # XXX: Restore U(1) and SL(2,Z)
             s = s.replace('####DATE###RANGE##OP#', '->') # XXX: Restore '->'
             return s.split()
@@ -340,7 +363,7 @@ class SearchQueryParenthesisedParser(object):
                 elif token == ')':
                     if parsed_values[-1] in op_symbols:
                         parsed_values = parsed_values[:-1]
-                    if parsed_values[0] == '+' and parsed_values[1] in op_symbols:
+                    if len(parsed_values) > 1 and parsed_values[0] == '+' and parsed_values[1] in op_symbols:
                         parsed_values = parsed_values[1:]
                     return parsed_values
                 elif token in op_symbols:
