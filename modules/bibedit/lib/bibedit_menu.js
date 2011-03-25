@@ -61,33 +61,9 @@ function initMenu(){
   $('#btnUndo').bind('click', onUndo);
   $('#btnRedo').bind('click', onRedo);
   $('#lnkSpecSymbols').bind('click', onLnkSpecialSymbolsClick);
-  // Initialize menu positioning (poll for scrolling).
-  setInterval(positionMenu, gCHECK_SCROLL_INTERVAL);
   $('#btnSwitchReadOnly').bind('click', onSwitchReadOnlyMode);
   collapseMenuSections();
 }
-
-function positionMenu(){
-  /*
-   * Dynamically position menu based on vertical scroll distance.
-   */
-  var newYscroll = $(document).scrollTop();
-  // Only care if there has been some major scrolling.
-  if (Math.abs(newYscroll - positionMenu.yScroll) > 10){
-    // If scroll distance is less then 200px, position menu in sufficient
-    // distance from header.
-    if (newYscroll < 200)
-      $('#bibEditMenu').animate({
-	'top': 220 - newYscroll}, 'fast');
-    // If scroll distance has crossed 200px, fix menu 50px from top.
-    else if (positionMenu.yScroll < 200 && newYscroll > 200)
-      $('#bibEditMenu').animate({
-	'top': 50}, 'fast');
-    positionMenu.yScroll = newYscroll;
-  }
-}
-// Last Y-scroll value
-positionMenu.yScroll = 0;
 
 function expandMenuSection(){
   /*
@@ -106,16 +82,8 @@ function compressMenuSection(){
   /*
    * Compress a menu section.
    */
-  var currentMenuHeight = $('#bibEditMenu').height();
   var parent = $(this).parent();
   parent.closest('.bibEditMenuSection').find('.bibEditMenuMore').hide();
-
-  // Reduce content spaceholder accordingly.
-  var deltaMenuHeight = $('#bibEditMenu').height() - currentMenuHeight;
-  var currentSpacerHeight = parseInt($('#bibEditContent').css(
-			      'min-height').slice(0, -2));
-  $('#bibEditContent').css('min-height',
-    (currentSpacerHeight + deltaMenuHeight) + 'px');
 
   $(this).replaceWith(img('/img/bullet_toggle_plus.png', '',
 			  'bibEditImgExpandMenuSection'));

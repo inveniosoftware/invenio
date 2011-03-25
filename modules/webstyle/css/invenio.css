@@ -1976,52 +1976,7 @@ input.hyperlinkformSubmitButton {
 .bibEditBtnBold {
   font-weight: bold
 }
-#bibEditMenu {
-  width: 136px;
-  position: fixed;
-  top: 220px;
-  left: 20px;
-  margin-bottom: 20px;
-  font-size: 0.8em;
-}
-#bibEditMenu .bibEditMenuSection {
-  margin-bottom: 10px;
-}
-#bibEditMenu .bibEditMenuSectionHeader {
-  font-weight: bold;
-}
-#bibEditMenu .bibEditMenuSection table {
-  width: 100%;
-}
-#bibEditMenu form {
-  margin: 0px;
-}
-#bibEditMenu .bibEditImgExpandMenuSection,
-#bibEditMenu .bibEditImgCompressMenuSection {
-  margin: 0px;
-  text-align: left;
-  vertical-align: bottom;
-}
-#bibEditMenu a, #bibEditMenu button, #bibEditMenu input, #bibEditMenu select {
-  font-size: 0.8em;
-}
-#bibEditMenu a, #bibEditMenu button, #bibEditMenu img,
-#bibEditMenu input, #bibEditMenu select {
-  margin: 1px;
-}
-#bibEditMenu button, #bibEditMenu input, #bibEditMenu select  {
-  width: 100%;
-}
-#bibEditMenu .bibEditImgCtrlEnabled {
-  cursor: pointer;
-  opacity: 1.0;
-  vertical-align: bottom;
-}
-#bibEditMenu .bibEditImgCtrlDisabled {
-  cursor: default;
-  opacity: 0.4;
-  vertical-align: bottom;
-}
+
 .bibEditImgCtrlEnabled {
   cursor: pointer;
   opacity: 1.0;
@@ -2032,10 +1987,7 @@ input.hyperlinkformSubmitButton {
   opacity: 0.4;
   vertical-align: bottom;
 }
-#bibEditContent {
-  min-height: 300px;
-  margin-left: 150px;
-}
+
 #bibEditTable {
   background-color: rgb(255, 255, 255);
   border: 1px solid #A1A1A1;

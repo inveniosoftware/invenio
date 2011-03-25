@@ -66,7 +66,6 @@
  *   - onMergeClick
  *   - bindNewRecordHandlers
  *   - cleanUp
- *   - positionBibEditPanel
  *
  * 7. Editor UI
  *   - colorFields
@@ -1414,25 +1413,6 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
   gPhysCopiesNum = 0;
 }
 
-function positionBibEditPanel(minimalPosition){
-    /*
-     * Dynamically position menu based on vertical scroll distance.
-     */
-    var newYscroll = $(document).scrollTop();
-    // Only care if there has been some major scrolling.
-    if (Math.abs(newYscroll - positionMenu.yScroll) > 10){
-      // If scroll distance is less then 200px, position menu in sufficient
-      // distance from header.
-      if (newYscroll < 200)
-        $('#bibEditMenu').animate({
-    'top': 220 - newYscroll}, 'fast');
-      // If scroll distance has crossed 200px, fix menu 50px from top.
-      else if (positionMenu.yScroll < 200 && newYscroll > 200)
-        $('#bibEditMenu').animate({
-    'top': 50}, 'fast');
-      positionMenu.yScroll = newYscroll;
-    }
-  }
 /*
  * **************************** 7. Editor UI ***********************************
  */

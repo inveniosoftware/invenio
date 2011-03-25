@@ -35,8 +35,6 @@ class Template:
     def menu(self):
         """Create the menu."""
 
-        imgCompressMenuSection = img('/img/bullet_toggle_minus.png',
-                            'bibEditImgCompressMenuSection')
         recordmenu = '<div class="bibEditMenuSectionHeader">\n' \
             '          %(imgCompressMenuSection)sRecord\n' \
             '          %(imgNewRecord)s\n' \
@@ -345,11 +343,24 @@ def page_style():
     """Apply styling for bibedit elements"""
     style = """<style type="text/css">"""
     style += """
-                .headline_div {
+                .pagefooter {
                     position: fixed;
-                    top: 105px;
+                    bottom: 0px;
+                    height: 0px;
+                    margin-top: 0px;
+                }
+
+                .pagebodystripemiddle {
+                    position:absolute;
+                    margin: 0px;
+                    padding: 0px;
+                    height: 100%;
+                }
+
+                .headline_div {
+                    position: absolute;
                     background: #ffffff;
-                    margin-left : 175px;
+                    padding-left : 175px;
                     width : 820px;
                     height: 45px;
                     text-indent: -15px;
@@ -357,28 +368,21 @@ def page_style():
 
                 #bibEditContent {
                     position: absolute;
-                    top: 151px;
-                    left: 40px;
+                    margin-top: 45px;
+                    margin-left: 175px;
                     overflow: auto;
                     width: 820px;
-                    height: 74%;
+                    height: 80%;
                     z-index: -1;
-                }
-
-                #bibEditTable {
-                    background-color: rgb(255, 255, 255);
-                    border: 1px solid #A1A1A1;
-                    border-collapse: collapse;
-                    width: 100%;
                 }
 
                 #bibEditMenu {
                     width: 135px;
-                    position: fixed;
-                    top: 105px;/*90px;*/
-                    left: 20px;
-                    margin-bottom: 20px;
+                    position: absolute;
+                    top: 0px;
+                    padding-left: 10px;
                     font-size: 0.8em;
+                    left: 0px;
                 }
 
                 #bibEditMenu .bibEditMenuSection {
@@ -387,6 +391,13 @@ def page_style():
 
                 #bibEditMenu .bibEditMenuSectionHeader {
                     font-weight: bold;
+                }
+
+                #bibEditTable {
+                    background-color: rgb(255, 255, 255);
+                    border: 1px solid #A1A1A1;
+                    border-collapse: collapse;
+                    width: 100%;
                 }
 
                 #bibEditMenu .bibEditMenuSection table {
@@ -429,18 +440,7 @@ def page_style():
 
                 .revisionLine {
                     text-align: right;
-                    padding-left: 80px;
-                }
-
-                .pagefooter {
-                    position: fixed;
-                    bottom: 0px;
-                    height: 0px;
-                }
-
-                .pagebody {
-                    padding : 0px;
-                    padding-left: 15px;
+                    padding-left: 125px;
                 }
 
                 .navtrailboxbody {
@@ -451,12 +451,9 @@ def page_style():
                     display: none;
                 }
 
-                #topToolbarLeft {
-                }
-
                 #topToolbarRight {
                     position: absolute;
-                    left: 790px;
+                    padding-left: 790px;
                     height: 48px;
                 }
 
