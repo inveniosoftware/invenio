@@ -645,6 +645,7 @@ class SpiresToInvenioSyntaxConverter:
 
             # call to _replace_spires_keywords_with_invenio_keywords should be at the
             # beginning because the next methods use the result of the replacement
+            query = self._standardize_already_invenio_keywords(query)
             query = self._replace_spires_keywords_with_invenio_keywords(query)
             query = self._remove_spaces_in_comma_separated_journal(query)
             query = self._distribute_keywords_across_combinations(query)
@@ -948,6 +949,20 @@ class SpiresToInvenioSyntaxConverter:
             current_position = match.end()
         result += query[current_position : ]
         return result
+
+    def _standardize_already_invenio_keywords(self, query):
+        """Replaces invenio keywords kw with "and kw" in order to
+           parse them correctly further down the line."""
+
+        unique_invenio_keywords = set(self._SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS.values())
+        unique_invenio_keywords.remove('') # for the ones that don't have invenio equivalents
+
+        for invenio_keyword in unique_invenio_keywords:
+            query = re.sub("(?<!... \+|... -| and |. or | not |....:)"+invenio_keyword, "and "+invenio_keyword, query)
+            query = re.sub("\+"+invenio_keyword, "and "+invenio_keyword, query)
+            query = re.sub("-"+invenio_keyword, "and not "+invenio_keyword, query)
+
+        return query
 
     def _replace_spires_keywords_with_invenio_keywords(self, query):
         """Replaces SPIRES keywords that have directly
