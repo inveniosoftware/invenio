@@ -163,7 +163,7 @@ def force_webcoll(recid):
     from invenio import websearch_webcoll
     reload(websearch_webcoll)
     index_id, index_name, index_tags = bibindex_engine.get_word_tables("collection")[0]
-    bibindex_engine.WordTable(index_id, index_tags, "idxWORD%02dF", default_get_words_fnc=bibindex_engine.get_words_from_phrase, tag_to_words_fnc_map={'8564_u': bibindex_engine.get_words_from_fulltext}).add_recIDs([[recid, recid]], 1)
+    bibindex_engine.WordTable(index_name, index_id, index_tags, "idxWORD%02dF", default_get_words_fnc=bibindex_engine.get_words_from_phrase, tag_to_words_fnc_map={'8564_u': bibindex_engine.get_words_from_fulltext}).add_recIDs([[recid, recid]], 1)
     c = websearch_webcoll.Collection()
     c.calculate_reclist()
     c.update_reclist()
