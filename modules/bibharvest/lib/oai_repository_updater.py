@@ -34,7 +34,6 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from stat import ST_SIZE
 from tempfile import mkstemp
 
 from invenio.config import \
@@ -345,6 +344,7 @@ def oairepositoryupdater_task():
                                                 time.localtime()))
     oai_out = os.fdopen(fd, "w")
     oai_out.write('<collection>')
+    has_updated_records = False
     # Iterate over the recids
     i = 0
     for recid in recids:
@@ -355,13 +355,14 @@ def oairepositoryupdater_task():
 
         # Check if an OAI identifier is already in the record or
         # not.
-        oai_id_entry = ""
+        oai_id_entry = "<subfield code=\"%s\">oai:%s:%s</subfield>\n" % \
+                       (CFG_OAI_ID_FIELD[5:6], CFG_OAI_ID_PREFIX, recid)
+        already_has_oai_id = True
         oai_ids = [_oai_id for _oai_id in \
                    get_fieldvalues(recid, CFG_OAI_ID_FIELD) \
                    if _oai_id.strip() != '']
         if len(oai_ids) == 0:
-            oai_id_entry = "<subfield code=\"%s\">oai:%s:%s</subfield>\n" % \
-                         (CFG_OAI_ID_FIELD[5:6], CFG_OAI_ID_PREFIX, recid)
+            already_has_oai_id = False
 
         # Get the sets to which this record already belongs according
         # to the metadata
@@ -374,19 +375,22 @@ def oairepositoryupdater_task():
         # settings
         updated_oai_sets = set(\
             [_set for _set, _recids in recids_for_set.iteritems()
-             if recid in _recids])
+             if recid in _recids if _set])
 
         # Ok, we have the old sets and the new sets. If they are equal
         # and oai ID does not need to be added, then great, nothing to
         # change . Otherwise apply the new sets.
-        if current_oai_sets == updated_oai_sets and not oai_id_entry:
+        if current_oai_sets == updated_oai_sets and already_has_oai_id:
             continue # Jump to next recid
+
+        has_updated_records = True
 
         # Generate the xml sets entry
         oai_set_entry = '\n'.join(["<subfield code=\"%s\">%s</subfield>" % \
-                                 (CFG_OAI_SET_FIELD[5:6], _oai_set) \
-                                 for _oai_set in updated_oai_sets]) + \
-                                 "\n"
+                                   (CFG_OAI_SET_FIELD[5:6], _oai_set) \
+                                   for _oai_set in updated_oai_sets if \
+                                   _oai_set]) + \
+                                   "\n"
 
         # Also get all the datafields with tag and indicator matching
         # CFG_OAI_SET_FIELD[:5] and CFG_OAI_ID_FIELD[:5] but with
@@ -395,37 +399,34 @@ def oairepositoryupdater_task():
         other_data = marcxml_filter_out_tags(recid, [CFG_OAI_SET_FIELD,
                                                      CFG_OAI_ID_FIELD])
 
-        if oai_id_entry or oai_set_entry:
-            if CFG_OAI_ID_FIELD[0:5] == CFG_OAI_SET_FIELD[0:5]:
-                # Put set and OAI ID in the same datafield
-                oai_out.write("<record>\n")
-                oai_out.write("<controlfield tag=\"001\">%s"
-                    "</controlfield>\n" % recid)
-                oai_out.write(DATAFIELD_ID_HEAD)
-                oai_out.write("\n")
-                #if oai_id_entry:
-                oai_out.write(oai_id_entry)
-                #if oai_set_entry:
-                oai_out.write(oai_set_entry)
-                oai_out.write("</datafield>\n")
-                oai_out.write(other_data)
-                oai_out.write("</record>\n")
-            else:
-                oai_out.write("<record>\n")
-                oai_out.write("<controlfield tag=\"001\">%s"
-                    "</controlfield>\n" % recid)
-                if oai_id_entry:
-                    oai_out.write(DATAFIELD_ID_HEAD)
-                    oai_out.write("\n")
-                    oai_out.write(oai_id_entry)
-                    oai_out.write("</datafield>\n")
-                if oai_set_entry:
-                    oai_out.write(DATAFIELD_SET_HEAD)
-                    oai_out.write("\n")
-                    oai_out.write(oai_set_entry)
-                    oai_out.write("</datafield>\n")
-                oai_out.write(other_data)
-                oai_out.write("</record>\n")
+        if CFG_OAI_ID_FIELD[0:5] == CFG_OAI_SET_FIELD[0:5]:
+            # Put set and OAI ID in the same datafield
+            oai_out.write("<record>\n")
+            oai_out.write("<controlfield tag=\"001\">%s"
+                "</controlfield>\n" % recid)
+            oai_out.write(DATAFIELD_ID_HEAD)
+            oai_out.write("\n")
+            #if oai_id_entry:
+            oai_out.write(oai_id_entry)
+            #if oai_set_entry:
+            oai_out.write(oai_set_entry)
+            oai_out.write("</datafield>\n")
+            oai_out.write(other_data)
+            oai_out.write("</record>\n")
+        else:
+            oai_out.write("<record>\n")
+            oai_out.write("<controlfield tag=\"001\">%s"
+                "</controlfield>\n" % recid)
+            oai_out.write(DATAFIELD_ID_HEAD)
+            oai_out.write("\n")
+            oai_out.write(oai_id_entry)
+            oai_out.write("</datafield>\n")
+            oai_out.write(DATAFIELD_SET_HEAD)
+            oai_out.write("\n")
+            oai_out.write(oai_set_entry)
+            oai_out.write("</datafield>\n")
+            oai_out.write(other_data)
+            oai_out.write("</record>\n")
 
     oai_out.write('</collection>')
     oai_out.close()
@@ -433,9 +434,7 @@ def oairepositoryupdater_task():
 
     if not no_upload:
         task_sleep_now_if_required(can_stop_too=True)
-        # Check if file is empty or not:
-        len_file = os.stat(filename)[ST_SIZE]
-        if len_file > 0:
+        if has_updated_records:
             command = "%s/bibupload -c %s -u oairepository" % (CFG_BINDIR, filename)
             os.system(command)
         else:
@@ -476,8 +475,9 @@ def marcxml_filter_out_tags(recid, fields):
             processed_tags_and_ind.append(field[0:5])
             for datafield in record.get(field[0:3], []):
                 if datafield[1] == field[3:4].replace('_', ' ') and \
-                       datafield[2] == field[4:5].replace('_', ' '):
-                    out += field_xml_output(datafield, field[0:3])
+                       datafield[2] == field[4:5].replace('_', ' ') and \
+                       datafield[0]:
+                    out += field_xml_output(datafield, field[0:3]) + '\n'
 
     return out
 

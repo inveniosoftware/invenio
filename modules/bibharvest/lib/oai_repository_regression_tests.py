@@ -172,13 +172,13 @@ class TestOAIRepositoryUpdater(unittest.TestCase):
     def test_marcxml_filtering(self):
         """oairepository - test MARCXML filtering"""
         self.assertEqual(oai_repository_updater.marcxml_filter_out_tags(98, ['088__a']),
-                         '  <datafield tag="088" ind1=" " ind2=" ">\n    <subfield code="9">SCAN-9709037</subfield>\n  </datafield>  <datafield tag="088" ind1=" " ind2=" ">\n  </datafield>')
+                         '  <datafield tag="088" ind1=" " ind2=" ">\n    <subfield code="9">SCAN-9709037</subfield>\n  </datafield>\n')
 
         self.assertEqual(oai_repository_updater.marcxml_filter_out_tags(98, ['088__c']),
-                         '  <datafield tag="088" ind1=" " ind2=" ">\n    <subfield code="9">SCAN-9709037</subfield>\n  </datafield>  <datafield tag="088" ind1=" " ind2=" ">\n    <subfield code="a">UCRL-8417</subfield>\n  </datafield>')
+                         '  <datafield tag="088" ind1=" " ind2=" ">\n    <subfield code="9">SCAN-9709037</subfield>\n  </datafield>\n  <datafield tag="088" ind1=" " ind2=" ">\n    <subfield code="a">UCRL-8417</subfield>\n  </datafield>\n')
 
         self.assertEqual(oai_repository_updater.marcxml_filter_out_tags(98, ['0248_p']),
-                         '  <datafield tag="024" ind1="8" ind2=" ">\n    <subfield code="a">oai:cds.cern.ch:SCAN-9709037</subfield>\n  </datafield>  <datafield tag="024" ind1="8" ind2=" ">\n  </datafield>')
+                         '  <datafield tag="024" ind1="8" ind2=" ">\n    <subfield code="a">oai:cds.cern.ch:SCAN-9709037</subfield>\n  </datafield>\n')
 
 TEST_SUITE = make_test_suite(OAIRepositoryWebPagesAvailabilityTest,
                              TestSelectiveHarvesting,
