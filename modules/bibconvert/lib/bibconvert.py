@@ -1005,25 +1005,18 @@ def FormatField(value, fn):
             out = value
 
     elif (fn == "WORDS"):
-        tmp2 = [value]
+        wordlist = [value]
         par = set_par_defaults(par, ",")
+        max_num_words = int(par[0])
         if (par[1] == "R"):
-            tmp = value.split(" ")
-            tmp2 = []
-            i = 0
-            while (i < string.atoi(par[0])):
-                tmp2.append(tmp[i])
-                i = i + 1
+            words = value.split(" ")
+            wordlist = words[:max_num_words]
         if (par[1] == "L"):
-            tmp = value.split(" ")
-            tmp.reverse()
-            tmp2 = []
-            i = 0
-            while (i < string.atoi(par[0])):
-                tmp2.append(tmp[i])
-                i = i + 1
-            tmp2.reverse()
-        out = string.join(tmp2, " ")
+            words = value.split(" ")
+            words.reverse()
+            wordlist = words[:max_num_words]
+            wordlist.reverse()
+        out = " ".join(wordlist)
 
     elif (fn == "MINL"):
 
