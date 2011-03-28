@@ -109,6 +109,7 @@ def language_list_long(enabled_langs_only=True):
                           'it': 'Italiano',
                           'ka': 'ქართული',
                           'rw': 'Kinyarwanda',
+                          'lt': 'Lietuvių',
                           'hu': 'Magyar',
                           'ja': '日本語',
                           'no': 'Norsk/Bokmål',

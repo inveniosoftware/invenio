@@ -112,6 +112,7 @@ class Template:
         'fr': 'fr_FR',
         'it': 'it_IT',
         'ka': 'ka_GE',
+        'lt': 'lt_LT',
         'ro': 'ro_RO',
         'ru': 'ru_RU',
         'rw': 'rw_RW',
@@ -3365,7 +3366,7 @@ class Template:
                 out += "<!--not showing citations links-->"
         if display_claim_link: #Maybe we want not to show the link to who cannot use id?
             out += '<span class="moreinfo"> - %s</span>' % \
-                create_html_link(CFG_SITE_URL + '/person/action', {'claim':'True','selection':str(recID)}, 
+                create_html_link(CFG_SITE_URL + '/person/action', {'claim':'True','selection':str(recID)},
                                                                         'Attribute this paper',
                                                                         {'class': "moreinfo"})
 
@@ -4072,7 +4073,7 @@ class Template:
 
         header = "<strong>" + _("Frequent co-authors") + "</strong>"
         content = []
-        sorted_coauthors = sorted(sorted(authors.iteritems(), key=itemgetter(0)), 
+        sorted_coauthors = sorted(sorted(authors.iteritems(), key=itemgetter(0)),
                                   key=itemgetter(1), reverse=True)
 
         for name, frequency in sorted_coauthors:
