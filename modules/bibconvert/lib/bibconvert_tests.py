@@ -203,6 +203,12 @@ class TestWords(unittest.TestCase):
         self.assertEqual("Sep",
                          bibconvert.FormatField(test_input, "WORDS(1,R)"))
 
+    def test_words_exceed_wordcount(self):
+        """bibconvert - WORDS(2,R) when less then 2 words in value"""
+        test_input = "ab"
+        self.assertEqual(test_input,
+                         bibconvert.FormatField(test_input, "WORDS(2,R)"))
+
 class TestBCCL(unittest.TestCase):
     """Test bibconvert BCCL compliance"""
 
