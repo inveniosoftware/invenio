@@ -166,7 +166,10 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
             g('set boxwidth 0.6 relative')
             g('set style fill solid 0.250000 border -1')
             g('set xtics rotate')
-            g('set xrange [%s:%s]' % (str(intervals[0]), str(intervals[len_intervals-1])))
+            if len(intervals) > 1:
+                g('set xrange [%s:%s]' % (str(intervals[0]), str(intervals[len_intervals-1])))
+            else:
+                g('set xrange [%s:%s]' % (str(intervals[0]-1), str(intervals[0]+1)))
             g('set yrange [0:%s]' %str(y_max+2))
             plot_text = """plot "% s" index 0:0 using 1:2 title "" w steps lt %s lw 3"""  % (data_file, color_line_list[1])
 
