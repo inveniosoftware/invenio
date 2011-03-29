@@ -38,10 +38,11 @@ from htmlentitydefs import entitydefs
 from optparse import OptionParser
 
 try:
-    from invenio.hocrlib import create_pdf, extract_hocr
-    CFG_HAS_REPORTLAB = True
+    from invenio.hocrlib import create_pdf, extract_hocr, CFG_PPM_RESOLUTION
+    from pyPdf import PdfFileReader, PdfFileWriter
+    CFG_CAN_DO_OCR = True
 except ImportError:
-    CFG_HAS_REPORTLAB = False
+    CFG_CAN_DO_OCR = False
 
 from invenio.shellutils import run_process_with_timeout, run_shell_command
 from invenio.config import CFG_TMPDIR, CFG_ETCDIR, CFG_PYLIBDIR, \
@@ -168,15 +169,11 @@ def get_conversion_map():
     if CFG_PATH_PDFTOTEXT:
         ret['.pdf']['.txt'] = (pdf2text, {})
         ret['.pdf;pdfa']['.txt'] = (pdf2text, {})
-    if CFG_PATH_PDFTOPPM and CFG_PATH_OCROSCRIPT and CFG_PATH_PAMFILE:
-        ret['.pdf']['.hocr'] = (pdf2hocr, {})
     ret['.txt']['.txt'] = (txt2text, {})
     ret['.csv']['.txt'] = (txt2text, {})
     ret['.html']['.txt'] = (html2text, {})
     ret['.htm']['.txt'] = (html2text, {})
     ret['.xml']['.txt'] = (html2text, {})
-    if CFG_HAS_REPORTLAB:
-        ret['.hocr']['.pdf'] = (hocr2pdf, {})
     if CFG_PATH_TIFF2PDF:
         ret['.tiff']['.pdf'] = (tiff2pdf, {})
         ret['.tif']['.pdf'] = (tiff2pdf, {})
@@ -320,6 +317,10 @@ def can_pdfa(verbose=False):
 
 def can_perform_ocr(verbose=False):
     """Return True if it's possible to perform OCR."""
+    if not CFG_CAN_DO_OCR:
+        if verbose:
+            print >> sys.stderr, "OCR is not supported because either the pyPdf of ReportLab Python libraries are missing"
+        return False
     if not CFG_PATH_OCROSCRIPT:
         if verbose:
             print >> sys.stderr, "OCR is not supported because the ocroscript executable is not available"
@@ -712,8 +713,53 @@ def ps2pdf(input_file, output_file=None, pdfopt=True, **dummy):
     clean_working_dir(working_dir)
     return output_file
 
+def pdf2pdfhocr(input_pdf, text_hocr, output_pdf, rotations=None, font='Courier', draft=False):
+    """
+    Adds the OCRed text to the original pdf.
+    @param rotations: a list of angles by which pages should be rotated
+    """
+    def _get_page_rotation(i):
+        if len(rotations) > i:
+            return rotations[i]
+        return 0
 
-def pdf2hocr(input_file, output_file=None, ln='en', return_working_dir=False, extract_only_text=False, **dummy):
+    if rotations is None:
+        rotations = []
+    input_pdf, hocr_pdf, dummy = prepare_io(input_pdf, output_ext='.pdf', need_working_dir=False)
+    create_pdf(extract_hocr(open(text_hocr).read()), hocr_pdf, font, draft)
+    input1 = PdfFileReader(file(input_pdf, "rb"))
+    input2 = PdfFileReader(file(hocr_pdf, "rb"))
+    output = PdfFileWriter()
+
+    info = input1.getDocumentInfo()
+    if info:
+        infoDict = output._info.getObject()
+        infoDict.update(info)
+
+    for i in range(0, input1.getNumPages()):
+        orig_page = input1.getPage(i)
+        text_page = input2.getPage(i)
+        angle = _get_page_rotation(i)
+        if angle != 0:
+            print >> sys.stderr,  "Rotating page %d by %d degrees." % (i, angle)
+            text_page = text_page.rotateClockwise(angle)
+        if draft:
+            below, above = orig_page, text_page
+        else:
+            below, above = text_page, orig_page
+        below.mergePage(above)
+        if angle != 0 and not draft:
+            print >> sys.stderr,  "Rotating back page %d by %d degrees." % (i, angle)
+            below.rotateCounterClockwise(angle)
+        output.addPage(below)
+    outputStream = file(output_pdf, "wb")
+    output.write(outputStream)
+    outputStream.close()
+    os.remove(hocr_pdf)
+    return output_pdf
+
+
+def pdf2hocr2pdf(input_file, output_file=None, ln='en', return_working_dir=False, extract_only_text=False, pdfopt=True, font='Courier', draft=False, **dummy):
     """
     Return the text content in input_file.
     @param ln is a two letter language code to give the OCR tool a hint.
@@ -722,22 +768,22 @@ def pdf2hocr(input_file, output_file=None, ln='en', return_working_dir=False, ex
 
     def _perform_rotate(working_dir, imagefile, angle):
         """Rotate imagefile of the corresponding angle. Creates a new file
-        with rotated- as prefix."""
+        with rotated.ppm."""
         get_file_converter_logger().debug('Performing rotate on %s by %s degrees' % (imagefile, angle))
         if not angle:
             #execute_command('%s %s %s', CFG_PATH_CONVERT, os.path.join(working_dir, imagefile), os.path.join(working_dir, 'rotated-%s' % imagefile))
-            shutil.copy(os.path.join(working_dir, imagefile), os.path.join(working_dir, 'rotated-%s' % imagefile))
+            shutil.copy(os.path.join(working_dir, imagefile), os.path.join(working_dir, 'rotated.ppm'))
         else:
-            execute_command(CFG_PATH_CONVERT, os.path.join(working_dir, imagefile), '-rotate', str(angle), os.path.join(working_dir, 'rotated-%s' % imagefile))
+            execute_command(CFG_PATH_CONVERT, os.path.join(working_dir, imagefile), '-rotate', str(angle), '-depth', str(8), os.path.join(working_dir, 'rotated.ppm'))
         return True
 
-    def _perform_deskew(working_dir, imagefile):
+    def _perform_deskew(working_dir):
         """Perform ocroscript deskew. Expect to work on rotated-imagefile.
-        Creates deskewed-imagefile.
+        Creates deskewed.ppm.
         Return True if deskewing was fine."""
-        get_file_converter_logger().debug('Performing deskew on %s' % imagefile)
+        get_file_converter_logger().debug('Performing deskew')
         try:
-            dummy, stderr = execute_command_with_stderr(CFG_PATH_OCROSCRIPT, os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'deskew.lua'), os.path.join(working_dir, 'rotated-%s' % imagefile), os.path.join(working_dir, 'deskewed-%s' % imagefile))
+            dummy, stderr = execute_command_with_stderr(CFG_PATH_OCROSCRIPT, os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'deskew.lua'), os.path.join(working_dir, 'rotated.ppm'), os.path.join(working_dir, 'deskewed.ppm'))
             if stderr.strip():
                 get_file_converter_logger().debug('Errors found during deskewing')
                 return False
@@ -747,16 +793,16 @@ def pdf2hocr(input_file, output_file=None, ln='en', return_working_dir=False, ex
             get_file_converter_logger().debug('Deskewing error: %s' % err)
             return False
 
-    def _perform_recognize(working_dir, imagefile):
-        """Perform ocroscript recognize. Expect to work on deskewed-imagefile.
+    def _perform_recognize(working_dir):
+        """Perform ocroscript recognize. Expect to work on deskewed.ppm.
         Creates recognized.out Return True if recognizing was fine."""
-        get_file_converter_logger().debug('Performing recognize on %s' % imagefile)
+        get_file_converter_logger().debug('Performing recognize')
         if extract_only_text:
             output_mode = 'text'
         else:
             output_mode = 'hocr'
         try:
-            dummy, stderr = execute_command_with_stderr(CFG_PATH_OCROSCRIPT, 'recognize', '--tesslanguage=%s' % ln, '--output-mode=%s' % output_mode, os.path.join(working_dir, 'deskewed-%s' % imagefile), filename_out=os.path.join(working_dir, 'recognize.out'))
+            dummy, stderr = execute_command_with_stderr(CFG_PATH_OCROSCRIPT, 'recognize', '--tesslanguage=%s' % ln, '--output-mode=%s' % output_mode, os.path.join(working_dir, 'deskewed.ppm'), filename_out=os.path.join(working_dir, 'recognize.out'))
             if stderr.strip():
                 ## There was some output on stderr
                 get_file_converter_logger().debug('Errors found in recognize.err')
@@ -766,118 +812,91 @@ def pdf2hocr(input_file, output_file=None, ln='en', return_working_dir=False, ex
             get_file_converter_logger().debug('Recognizer error: %s' % err)
             return False
 
-    def _perform_dummy_recognize(working_dir, imagefile):
+    def _perform_dummy_recognize(working_dir):
         """Return an empty text or an empty hocr referencing the image."""
-        get_file_converter_logger().debug('Performing dummy recognize on %s' % imagefile)
+        get_file_converter_logger().debug('Performing dummy recognize')
         if extract_only_text:
             out = ''
         else:
-            stdout = stderr = ''
-            try:
-                ## Since pdftoppm is returning a netpbm image, we use
-                ## pamfile to retrieve the size of the image, in order to
-                ## create an empty .hocr file containing just the
-                ## desired file and a reference to its size.
-                stdout, stderr = execute_command_with_stderr(CFG_PATH_PAMFILE, os.path.join(working_dir, imagefile))
-                g = re.search(r'(?P<width>\d+) by (?P<height>\d+)', stdout)
-                if g:
-                    width = int(g.group('width'))
-                    height = int(g.group('height'))
-
-                    out = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-    <html xmlns="http://www.w3.org/1999/xhtml"><head><meta content="ocr_line ocr_page" name="ocr-capabilities"/><meta content="en" name="ocr-langs"/><meta content="Latn" name="ocr-scripts"/><meta content="" name="ocr-microformats"/><title>OCR Output</title></head>
-    <body><div class="ocr_page" title="bbox 0 0 %s %s; image %s">
-    </div></body></html>""" % (width, height, os.path.join(working_dir, imagefile))
-                else:
-                    raise InvenioWebSubmitFileConverterError()
-            except Exception, err:
-                raise InvenioWebSubmitFileConverterError('It\'s impossible to retrieve the size of %s needed to perform a dummy OCR. The stdout of pamfile was: %s, the stderr was: %s. (%s)' % (imagefile, stdout, stderr, err))
+            out = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta content="ocr_line ocr_page" name="ocr-capabilities"/><meta content="en" name="ocr-langs"/><meta content="Latin" name="ocr-scripts"/><meta content="" name="ocr-microformats"/><title>OCR Output</title></head>
+<body><div class="ocr_page" title="bbox 0 0 1 1; image deskewed.ppm">
+</div></body></html>"""
         open(os.path.join(working_dir, 'recognize.out'), 'w').write(out)
 
+    def _find_image_file(working_dir, imageprefix, page):
+        ret = '%s-%d.ppm' % (imageprefix, page)
+        if os.path.exists(os.path.join(working_dir, ret)):
+            return ret
+        ret = '%s-%02d.ppm' % (imageprefix, page)
+        if os.path.exists(os.path.join(working_dir, ret)):
+            return ret
+        ret = '%s-%03d.ppm' % (imageprefix, page)
+        if os.path.exists(os.path.join(working_dir, ret)):
+            return ret
+        ret = '%s-%04d.ppm' % (imageprefix, page)
+        if os.path.exists(os.path.join(working_dir, ret)):
+            return ret
+        ret = '%s-%05d.ppm' % (imageprefix, page)
+        if os.path.exists(os.path.join(working_dir, ret)):
+            return ret
+        ret = '%s-%06d.ppm' % (imageprefix, page)
+        if os.path.exists(os.path.join(working_dir, ret)):
+            return ret
+        ## I guess we won't have documents with more than million pages
+        return None
+
+    def _ocr(tmp_output_file):
+        """
+        Append to tmp_output_file the partial results of OCROpus recognize.
+        Return a list of rotations.
+        """
+        page = 0
+        rotations = []
+        while True:
+            page += 1
+            get_file_converter_logger().debug('Page %d.' % page)
+            execute_command(CFG_PATH_PDFTOPPM, '-f', str(page), '-l', str(page), '-r', str(CFG_PPM_RESOLUTION), '-aa', 'yes', '-freetype', 'yes', input_file, os.path.join(working_dir, 'image'))
+            imagefile = _find_image_file(working_dir, 'image', page)
+            if imagefile == None:
+                break
+            for angle in (0, 180, 90, 270):
+                get_file_converter_logger().debug('Trying %d degrees...' % angle)
+                if _perform_rotate(working_dir, imagefile, angle) and _perform_deskew(working_dir) and _perform_recognize(working_dir):
+                    rotations.append(angle)
+                    break
+            else:
+                get_file_converter_logger().debug('Dummy recognize')
+                rotations.append(0)
+                _perform_dummy_recognize(working_dir)
+            open(tmp_output_file, 'a').write(open(os.path.join(working_dir, 'recognize.out')).read())
+            # clean
+            os.remove(os.path.join(working_dir, imagefile))
+        return rotations
+
+
     if CFG_PATH_OCROSCRIPT:
-        ln = CFG_TWO2THREE_LANG_CODES.get(ln, 'eng')
+        if len(ln) == 2:
+            ln = CFG_TWO2THREE_LANG_CODES.get(ln, 'eng')
         if extract_only_text:
-            output_format = '.txt'
+            input_file, output_file, working_dir = prepare_io(input_file, output_file, output_ext='.txt')
+            _ocr(output_file)
         else:
-            output_format = '.hocr'
-        input_file, output_file, working_dir = prepare_io(input_file, output_file, output_format)
-        #execute_command('pdfimages %s %s', input_file, os.path.join(working_dir, 'image'))
-        execute_command(CFG_PATH_PDFTOPPM, '-r', '300', '-aa', 'yes', '-freetype', 'yes', input_file, os.path.join(working_dir, 'image'))
-
-        images = os.listdir(working_dir)
-        images.sort()
-        for imagefile in images:
-            if imagefile.startswith('image-'):
-                for angle in (0, 90, 180, 270):
-                    if _perform_rotate(working_dir, imagefile, angle) and _perform_deskew(working_dir, imagefile) and _perform_recognize(working_dir, imagefile):
-                        ## Things went nicely! So we can remove the original
-                        ## pbm picture which is soooooo huuuuugeee.
-                        os.remove(os.path.join(working_dir, 'rotated-%s' % imagefile))
-                        os.remove(os.path.join(working_dir, imagefile))
-                        break
-                else:
-                    _perform_dummy_recognize(working_dir, imagefile)
-                open(output_file, 'a').write(open(os.path.join(working_dir, 'recognize.out')).read())
-
-        if return_working_dir:
-            return output_file, working_dir
-        else:
-            clean_working_dir(working_dir)
-            return output_file
-
-    else:
-        raise InvenioWebSubmitFileConverterError("It's impossible to generate HOCR output from PDF. OCROpus is not available.")
-
-
-def hocr2pdf(input_file, output_file=None, working_dir=None, font="Courier", author=None, keywords=None, subject=None, title=None, draft=False, pdfopt=True, **dummy):
-    """
-    @param working_dir the directory containing images to build the PDF.
-    @param font the default font (e.g. Courier, Times-Roman).
-    @param author the author name.
-    @param subject the subject of the document.
-    @param title the title of the document.
-    @param draft whether to enable debug information in the output.
-    """
-    if working_dir:
-        working_dir = os.path.abspath(working_dir)
-    else:
-        working_dir = os.path.abspath(os.path.dirname(input_file))
-
-    if pdfopt:
-        input_file, tmp_output_file, dummy = prepare_io(input_file, output_ext='.pdf', need_working_dir=False)
-    else:
-        input_file, output_file, dummy = prepare_io(input_file, output_file=output_file, need_working_dir=False)
-        tmp_output_file = output_file
-
-    create_pdf(extract_hocr(open(input_file).read()), tmp_output_file, font=font, author=author, keywords=keywords, subject=subject, title=title, image_path=working_dir, draft=draft)
-
-    if pdfopt:
-        output_file = pdf2pdfopt(tmp_output_file, output_file)
-        silent_remove(tmp_output_file)
+            input_file, tmp_output_hocr, working_dir = prepare_io(input_file, output_ext='.hocr')
+            rotations = _ocr(tmp_output_hocr)
+            if pdfopt:
+                input_file, tmp_output_pdf, dummy = prepare_io(input_file, output_ext='.pdf', need_working_dir=False)
+                tmp_output_pdf, output_file, dummy = prepare_io(tmp_output_pdf, output_file, output_ext='.pdf', need_working_dir=False)
+                pdf2pdfhocr(input_file, tmp_output_hocr, tmp_output_pdf, rotations=rotations, font=font, draft=draft)
+                pdf2pdfopt(tmp_output_pdf, output_file)
+                os.remove(tmp_output_pdf)
+            else:
+                input_file, output_file, dummy = prepare_io(input_file, output_file, output_ext='.pdf', need_working_dir=False)
+                pdf2pdfhocr(input_file, tmp_output_hocr, output_file, rotations=rotations, font=font, draft=draft)
+        clean_working_dir(working_dir)
         return output_file
     else:
-        return tmp_output_file
-
-
-def pdf2hocr2pdf(input_file, output_file=None, font="Courier", author=None, keywords=None, subject=None, title=None, draft=False, ln='en', pdfopt=True, **dummy):
-    """
-    Transform a scanned PDF into a PDF with OCRed text.
-    @param font the default font (e.g. Courier, Times-Roman).
-    @param author the author name.
-    @param subject the subject of the document.
-    @param title the title of the document.
-    @param draft whether to enable debug information in the output.
-    @param ln is a two letter language code to give the OCR tool a hint.
-    """
-    input_file, output_hocr_file, dummy = prepare_io(input_file, output_ext='.hocr', need_working_dir=False)
-    output_hocr_file, working_dir = pdf2hocr(input_file, output_file=output_hocr_file, ln=ln, return_working_dir=True)
-    try:
-        output_file = hocr2pdf(output_hocr_file, output_file, working_dir, font=font, author=author, keywords=keywords, subject=subject, title=title, draft=draft, pdfopt=pdfopt)
-    finally:
-        clean_working_dir(working_dir)
-        silent_remove(output_hocr_file)
-    return output_file
-
+        raise InvenioWebSubmitFileConverterError("It's impossible to generate HOCR output from PDF. OCROpus is not available.")
 
 def pdf2text(input_file, output_file=None, perform_ocr=True, ln='en', **dummy):
     """
@@ -886,7 +905,7 @@ def pdf2text(input_file, output_file=None, perform_ocr=True, ln='en', **dummy):
     input_file, output_file, dummy = prepare_io(input_file, output_file, '.txt', need_working_dir=False)
     execute_command(CFG_PATH_PDFTOTEXT, '-enc', 'UTF-8', '-eol', 'unix', '-nopgbrk', input_file, output_file)
     if perform_ocr and can_perform_ocr():
-        ocred_output = pdf2hocr(input_file, ln=ln, extract_only_text=True)
+        ocred_output = pdf2hocr2pdf(input_file, ln=ln, extract_only_text=True)
         try:
             output = open(output_file, 'a')
             for row in open(ocred_output):

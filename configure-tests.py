@@ -132,12 +132,12 @@ except ImportError, msg:
     ** IMPORT WARNING %s
     *****************************************************
     ** Note that Psyco is not really required but we   **
-    ** recommend it for faster Invenio operation   **
+    ** recommend it for faster Invenio operation       **
     ** if you are running in 32-bit operating system.  **
     **                                                 **
-    ** You can safely continue installing Invenio  **
+    ** You can safely continue installing Invenio      **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your Invenio installation is put **
+    ** even after your Invenio installation is put     **
     ** into production.)                               **
     *****************************************************
     """ % msg
@@ -155,9 +155,9 @@ except ImportError, msg:
     ** to work with the automatic classification of    **
     ** documents based on RDF-based taxonomies.        **
     **                                                 **
-    ** You can safely continue installing Invenio  **
+    ** You can safely continue installing Invenio      **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your Invenio installation is put **
+    ** even after your Invenio installation is put     **
     ** into production.)                               **
     *****************************************************
     """ % msg
@@ -173,9 +173,9 @@ except ImportError, msg:
     ** Note that PyRXP is not really required but      **
     ** we recommend it for fast XML MARC parsing.      **
     **                                                 **
-    ** You can safely continue installing Invenio  **
+    ** You can safely continue installing Invenio      **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your Invenio installation is put **
+    ** even after your Invenio installation is put     **
     ** into production.)                               **
     *****************************************************
     """ % msg
@@ -192,9 +192,9 @@ except ImportError, msg:
     ** we recommend it for user-friendly date          **
     ** parsing.                                        **
     **                                                 **
-    ** You can safely continue installing Invenio  **
+    ** You can safely continue installing Invenio      **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your Invenio installation is put **
+    ** even after your Invenio installation is put     **
     ** into production.)                               **
     *****************************************************
     """ % msg
@@ -211,9 +211,9 @@ except ImportError, msg:
     ** we recommend it for XML metadata conversions    **
     ** and for fast XML parsing.                       **
     **                                                 **
-    ** You can safely continue installing Invenio  **
+    ** You can safely continue installing Invenio      **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your Invenio installation is put **
+    ** even after your Invenio installation is put     **
     ** into production.)                               **
     *****************************************************
     """ % msg
@@ -229,9 +229,9 @@ except ImportError, msg:
     ** Note that libxslt is not really required but    **
     ** we recommend it for XML metadata conversions.   **
     **                                                 **
-    ** You can safely continue installing Invenio  **
+    ** You can safely continue installing Invenio      **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your Invenio installation is put **
+    ** even after your Invenio installation is put     **
     ** into production.)                               **
     *****************************************************
     """ % msg
@@ -249,9 +249,9 @@ except ImportError, msg:
     ** and citation history graphs on Detailed record  **
     ** pages.                                          **
     **                                                 **
-    ** You can safely continue installing Invenio  **
+    ** You can safely continue installing Invenio      **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your Invenio installation is put **
+    ** even after your Invenio installation is put     **
     ** into production.)                               **
     *****************************************************
     """ % msg
@@ -270,9 +270,9 @@ except ImportError, msg:
     ** but we recommend it in order to have detailed   **
     ** content information about fulltext files.       **
     **                                                 **
-    ** You can safely continue installing Invenio  **
+    ** You can safely continue installing Invenio      **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your Invenio installation is put **
+    ** even after your Invenio installation is put     **
     ** into production.)                               **
     *****************************************************
     """ % msg
@@ -285,9 +285,9 @@ except StandardError:
     ** the one supported by Invenio. Please refer to   **
     ** the INSTALL file for more details.              **
     **                                                 **
-    ** You can safely continue installing Invenio  **
+    ** You can safely continue installing Invenio      **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your Invenio installation is put **
+    ** even after your Invenio installation is put     **
     ** into production.)                               **
     *****************************************************
     """
@@ -303,13 +303,33 @@ except ImportError, msg:
     ** required, but we recommend it you want to       **
     ** enrich PDF with OCR information.                **
     **                                                 **
-    ** You can safely continue installing Invenio  **
+    ** You can safely continue installing Invenio      **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your Invenio installation is put **
+    ** even after your Invenio installation is put     **
     ** into production.)                               **
     *****************************************************
     """ % msg
     wait_for_user("Press ENTER to continue the installation...")
+
+try:
+    import pyPdf
+except ImportError, msg:
+    print """
+    *****************************************************
+    ** IMPORT WARNING %s
+    *****************************************************
+    ** Note that pyPdf module is not really            **
+    ** required, but we recommend it you want to       **
+    ** enrich PDF with OCR information.                **
+    **                                                 **
+    ** You can safely continue installing Invenio      **
+    ** now, and add this module anytime later.  (I.e.  **
+    ** even after your Invenio installation is put     **
+    ** into production.)                               **
+    *****************************************************
+    """ % msg
+    wait_for_user("Press ENTER to continue the installation...")
+
 
 ## 4) check for versions of some important modules:
 if MySQLdb.__version__ < cfg_min_mysqldb_version:

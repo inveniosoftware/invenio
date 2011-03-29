@@ -38,7 +38,7 @@ Contents
               gs-common clisp gettext libapache2-mod-wsgi unzip \
               python-dateutil python-rdflib \
               python-gnuplot python-magic pdftk html2text giflib-tools \
-              pstotext netpbm
+              pstotext netpbm python-pypdf
 
         You may also want to install some of the following packages,
         if you have them available on your concrete architecture:
@@ -169,10 +169,10 @@ Contents
               <http://code.google.com/p/ocropus/>
           - to perform different image elaborations: ImageMagick
               <http://www.imagemagick.org/>
-          - to generate PDF after OCR: ReportLab
-              <http://www.reportlab.org/rl_toolkit.html>
-          - to analyze images to generate PDF after OCR: netpbm
+          - to generate PDF after OCR: netpbm, ReportLab and pyPdf
               <http://netpbm.sourceforge.net/>
+              <http://www.reportlab.org/rl_toolkit.html>
+              <http://pybrary.net/pyPdf/>
 
      h) If you have chosen to install fast XML MARC Python processors
         in the step d) above, then you have to install the parsers
