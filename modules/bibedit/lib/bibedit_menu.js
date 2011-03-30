@@ -330,4 +330,5 @@ function updateStatus(statusType, reporttext){
 function collapseMenuSections() {
     $('#ImgHistoryMenu').trigger('click');
     $('#ImgViewMenu').trigger('click');
+    $('#ImgRecordMenu').trigger('click');
 }
