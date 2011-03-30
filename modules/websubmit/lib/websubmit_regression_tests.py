@@ -23,8 +23,10 @@ __revision__ = "$Id$"
 
 import unittest
 import os
+import sys
 
-from invenio.config import CFG_SITE_URL, CFG_PREFIX
+from invenio.errorlib import register_exception
+from invenio.config import CFG_SITE_URL, CFG_PREFIX, CFG_TMPDIR
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 from invenio import websubmit_file_stamper
@@ -81,7 +83,7 @@ class WebSubmitWebPagesAvailabilityTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/help/submit-guide',
                                                expected_text="Submit Guide"))
 
-class WebSubmitTestLegacyURLs(unittest.TestCase):
+class WebSubmitLegacyURLsTest(unittest.TestCase):
     """ Check that the application still responds to legacy URLs"""
 
     def test_legacy_help_page_link(self):
@@ -127,6 +129,56 @@ class WebSubmitXSSVulnerabilityTest(unittest.TestCase):
                           '/submit?doctype=DEMOTHE&access=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&act=SBI',                                               expected_text='Invalid parameters', username="jekyll",
                           password="j123ekyll"))
 
+def WebSubmitFileConverterTestGenerator():
+    from invenio.websubmit_file_converter import get_conversion_map, can_convert
+    for from_format in get_conversion_map().keys():
+        input_file = os.path.join(CFG_PREFIX, 'lib', 'webtest', 'invenio', 'test%s' % from_format)
+        if not os.path.exists(input_file):
+            ## Can't run such a test because there is no test example
+            continue
+        for to_format in get_conversion_map().keys():
+            if from_format == to_format:
+                continue
+            if not can_convert(from_format, to_format):
+                continue
+            yield WebSubmitFileConverterTest(input_file, from_format, to_format)
+
+class WebSubmitFileConverterTest(unittest.TestCase):
+    """Test WebSubmit file converter tool"""
+
+    def __init__(self, input_file, from_format, to_format):
+        from invenio.websubmit_file_converter import get_file_converter_logger
+        from logging import StreamHandler, DEBUG
+        from cStringIO import StringIO
+        self.logger = get_file_converter_logger()
+        self.log = StringIO()
+        self.logger.setLevel(DEBUG)
+        for handler in self.logger.handlers:
+            self.logger.removeHandler(handler)
+        handler = StreamHandler(self.log)
+        self.logger.addHandler(handler)
+        self.from_format = from_format
+        self.to_format = to_format
+        self.input_file = input_file
+        self._testMethodDoc = """websubmit - test %s to %s conversion""" % (self.from_format, self.to_format)
+        self._testMethodName = "test_conversion"
+
+        # """test_conversion_from_%s_to_%s""" % (self.from_format.replace(';', '_').replace('.', '_'), self.to_format.replace(';', '_').replace('.', '_'))
+
+    def test_conversion(self):
+        from invenio.websubmit_file_converter import InvenioWebSubmitFileConverterError, convert_file
+        try:
+            tmpdir_snapshot1 = set(os.listdir(CFG_TMPDIR))
+            output_file = convert_file(self.input_file, output_format=self.to_format)
+            tmpdir_snapshot2 = set(os.listdir(CFG_TMPDIR))
+            tmpdir_snapshot2.discard(os.path.basename(output_file))
+            if not os.path.exists(output_file):
+                raise InvenioWebSubmitFileConverterError("output_file %s was not correctly created" % output_file)
+            if tmpdir_snapshot2 - tmpdir_snapshot1:
+                raise InvenioWebSubmitFileConverterError("Some temporary files were left over: %s" % (tmpdir_snapshot2 - tmpdir_snapshot1))
+        except Exception, err:
+            register_exception(alert_admin=True)
+            self.fail("ERROR: when converting from %s to %s: %s, the log contained: %s" % (self.from_format, self.to_format, err, self.log.getvalue()))
 
 class WebSubmitStampingTest(unittest.TestCase):
     """Test WebSubmit file stamping tool"""
@@ -193,9 +245,12 @@ class WebSubmitStampingTest(unittest.TestCase):
 
 
 TEST_SUITE = make_test_suite(WebSubmitWebPagesAvailabilityTest,
-                             WebSubmitTestLegacyURLs,
+                             WebSubmitLegacyURLsTest,
                              WebSubmitXSSVulnerabilityTest,
                              WebSubmitStampingTest)
+
+for test in WebSubmitFileConverterTestGenerator():
+    TEST_SUITE.addTest(test)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
