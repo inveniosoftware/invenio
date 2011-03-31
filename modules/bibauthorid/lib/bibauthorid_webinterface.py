@@ -1645,7 +1645,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         bibrefs = None
 
         session = get_session(req)
-#        uid = getUid(req)
+        uid = getUid(req)
         pinfo = session["personinfo"]
         ulevel = pinfo["ulevel"]
         ticket = pinfo["ticket"]
@@ -1819,19 +1819,26 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                 pid = argd['pid']
             else:
                 return self._error_page(req, ln,
-                                        "Fatal: cannot create ticket without a person id.")
+                                        "Fatal: cannot create ticket without a person id!")
 
             if 'selection' in argd and len(argd['selection']) > 0:
                 bibrefs = argd['selection']
             else:
-                return self._error_page(req, ln,
-                                        "Fatal: cannot create ticket without any bibrefrec")
+                if pid == -3:
+                    return self._error_page(req, ln,
+                                        "Fatal: Please select a paper to assign to the new person first!")
+                else:
+                    return self._error_page(req, ln,
+                                        "Fatal: cannot create ticket without any paper selected!")
 
             if 'rt_id' in argd and argd['rt_id']:
                 rt_id = argd['rt_id']
                 for b in bibrefs:
                     self._cancel_transaction_from_rt_ticket(rt_id, pid, action, b)
             #create temporary ticket
+            if pid == -3:
+                pid = webapi.create_new_person(uid)
+                
             for bibref in bibrefs:
                 tempticket.append({'pid':pid, 'bibref':bibref, 'action':action})
 
@@ -1846,6 +1853,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             session.save()
 
             #start ticket processing chain
+            pinfo["claimpaper_admin_last_viewed_pid"] = pid
             return self.adf['ticket_dispatch'][ulevel](req)
 #            return self.perform(req, form)
 

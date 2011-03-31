@@ -1333,6 +1333,18 @@ class Template:
                                  "frequently.  Or you can send us feedback, at ") +
                                  "<a href=\"mailto:%s\">%s</a>.</strong>") % (query, authemail, authemail))
             h('</div>')
+            if new_person_link:
+                if search_ticket:
+                    link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, '-3')
+                    for r in search_ticket['bibrefs']:
+                        link = link + '&selection=%s' % str(r)
+                else:
+                    link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, '-3')
+                h('<div>')
+                h('<a href="%s">' % (link))
+                h(self._("Create a new Person for your search"))
+                h('</a>')
+                h('</div>')
             return "\n".join(html)
 
         base_color = 100
@@ -1411,8 +1423,14 @@ class Template:
             h('</div>')
 
             if new_person_link:
+                if search_ticket:
+                    link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, '-3')
+                    for r in search_ticket['bibrefs']:
+                        link = link + '&selection=%s' % str(r)
+                else:
+                    link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, '-3')
                 h('<div>')
-                h('<a href="%s/person/action?confirm=True&pid=-3">' % (CFG_SITE_URL))
+                h('<a href="%s">' % (link))
                 h(self._("Create a new Person for your search"))
                 h('</a>')
                 h('</div>')

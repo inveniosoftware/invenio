@@ -1183,6 +1183,11 @@ def _resolve_maximum_acces_rights(uid):
     return max_role
 
 
+
+def create_new_person(uid, uid_is_owner=False):
+    pid = tu.create_new_person(uid, uid_is_owner=False)
+    return pid
+    
 def execute_action(action, pid, bibref, uid, userinfo='', comment=''):
     '''
     Executes the action, setting the last user right according to uid
