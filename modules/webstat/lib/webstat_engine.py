@@ -18,13 +18,14 @@
 __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
-import calendar, commands, datetime, time, os, cPickle, random
-try:
-    import xlwt
-    xlwt_imported = True
-except ImportError:
-    xlwt_imported = False
-from invenio.config import CFG_TMPDIR, CFG_SITE_URL, CFG_SITE_NAME, CFG_BINDIR
+import calendar, commands, datetime, time, os, cPickle, random, cgi
+from operator import itemgetter
+from invenio.config import CFG_TMPDIR, \
+    CFG_SITE_URL, \
+    CFG_SITE_NAME, \
+    CFG_BINDIR, \
+    CFG_CERN_SITE
+from invenio.bibindex_engine import CFG_JOURNAL_TAG
 from invenio.urlutils import redirect_to_url
 from invenio.search_engine import perform_request_search, \
     get_collection_reclist, \
@@ -43,7 +44,7 @@ WEBSTAT_GRAPH_TOKENS = '-=#+@$%&XOSKEHBC'
 
 # KEY EVENT TREND SECTION
 
-def get_keyevent_trend_collection_population(args):
+def get_keyevent_trend_collection_population(args, return_sql=False):
     """
     Returns the quantity of documents in Invenio for
     the given timestamp range.
@@ -65,35 +66,85 @@ def get_keyevent_trend_collection_population(args):
     """
     # collect action dates
     lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
-    upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
-    if args.get('collection','All') == 'All':
-        sql_query_g = ("SELECT creation_date FROM bibrec WHERE " + \
-                     "creation_date > '%s' AND creation_date < '%s' " + \
-                     "ORDER BY creation_date DESC") % \
-                     (lower, upper)
-        sql_query_i = "SELECT COUNT(id) FROM bibrec " + \
-                "WHERE creation_date < '%s'" % (lower)
+    if args.get('collection', 'All') == 'All':
+        sql_query_g = _get_sql_query("creation_date", args['granularity'],
+                        "bibrec")
+        sql_query_i = "SELECT COUNT(id) FROM bibrec WHERE creation_date < %s"
+        initial_quantity = run_sql(sql_query_i, (lower, ))[0][0]
+        return _get_keyevent_trend(args, sql_query_g, initial_quantity=initial_quantity,
+                            return_sql=return_sql, sql_text=
+                            "Previous count: %s<br />Current count: %%s" % (sql_query_i),
+                            acumulative=True)
     else:
-        ids = perform_request_search(cc=args['collection'])
+        ids = get_collection_reclist(args['collection'])
         if len(ids) == 0:
             return []
-        ids_str = str(ids).replace('[', '(').replace(']', ')')
-        sql_query_g = ("SELECT creation_date FROM bibrec WHERE id IN %s AND " + \
-                     "creation_date > '%s' AND creation_date < '%s' " + \
-                     "ORDER BY creation_date DESC") % \
-                     (ids_str, lower, upper)
-        sql_query_i = "SELECT COUNT(id) FROM bibrec " + \
-                "WHERE id IN %s AND creation_date < '%s'" % (ids_str, lower)
-
-    action_dates = [x[0] for x in run_sql(sql_query_g)]
-    initial_quantity = run_sql(sql_query_i)[0][0]
-
-    return _get_trend_from_actions(action_dates, initial_quantity,
-                                   args['t_start'], args['t_end'],
-                                   args['granularity'], args['t_format'])
+        g = get_keyevent_trend_new_records(args, return_sql, True)
+        sql_query_i = "SELECT id FROM bibrec WHERE creation_date < %s"
+        if return_sql:
+            return "Previous count: %s<br />Current count: %s" % (sql_query_i % lower, g)
+        initial_quantity = len(filter(lambda x: x[0] in ids, run_sql(sql_query_i, (lower, ))))
+        return _get_trend_from_actions(g, initial_quantity, args['t_start'],
+                          args['t_end'], args['granularity'], args['t_format'], acumulative=True)
 
 
-def get_keyevent_trend_search_frequency(args):
+def get_keyevent_trend_new_records(args, return_sql=False, only_action=False):
+    """
+    Returns the number of new records uploaded during the given timestamp range.
+
+    @param args['collection']: A collection name
+    @type args['collection']: str
+
+    @param args['t_start']: Date and time of start point
+    @type args['t_start']: str
+
+    @param args['t_end']: Date and time of end point
+    @type args['t_end']: str
+
+    @param args['granularity']: Granularity of date and time
+    @type args['granularity']: str
+
+    @param args['t_format']: Date and time formatting string
+    @type args['t_format']: str
+    """
+
+    if args.get('collection', 'All') == 'All':
+        return _get_keyevent_trend(args, _get_sql_query("creation_date", args['granularity'],
+                            "bibrec"),
+                            return_sql=return_sql)
+    else:
+        lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
+        upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
+        ids = get_collection_reclist(args['collection'])
+        if len(ids) == 0:
+            return []
+        sql = _get_sql_query("creation_date", args["granularity"], "bibrec",
+                             extra_select=", id", group_by=False, count=False)
+        if return_sql:
+            return sql % (lower, upper)
+
+        recs = run_sql(sql, (lower, upper))
+        if recs:
+            def add_count(i_list, element):
+                """ Reduce function to create a dictionary with the count of ids
+                for each date """
+                if i_list and element == i_list[-1][0]:
+                    i_list[-1][1] += 1
+                else:
+                    i_list.append([element, 1])
+                return i_list
+            action_dates = reduce(add_count,
+                            map(lambda x: x[0], filter(lambda x: x[1] in ids, recs)),
+                            [])
+        else:
+            action_dates = []
+        if only_action:
+            return action_dates
+        return _get_trend_from_actions(action_dates, 0, args['t_start'],
+                          args['t_end'], args['granularity'], args['t_format'])
+
+
+def get_keyevent_trend_search_frequency(args, return_sql=False):
     """
     Returns the number of searches (of any kind) carried out
     during the given timestamp range.
@@ -110,19 +161,13 @@ def get_keyevent_trend_search_frequency(args):
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
     """
-    # collect action dates
-    lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
-    upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
-    sql = "SELECT date FROM query INNER JOIN user_query ON id=id_query " + \
-          "WHERE date > '%s' AND date < '%s' ORDER BY date DESC" % \
-          (lower, upper)
-    action_dates = [x[0] for x in run_sql(sql)]
 
-    return _get_trend_from_actions(action_dates, 0, args['t_start'],
-                          args['t_end'], args['granularity'], args['t_format'])
+    return _get_keyevent_trend(args, _get_sql_query("date", args["granularity"],
+                "query INNER JOIN user_query ON id=id_query"),
+                            return_sql=return_sql)
 
 
-def get_keyevent_trend_comments_frequency(args):
+def get_keyevent_trend_comments_frequency(args, return_sql=False):
     """
     Returns the number of comments (of any kind) carried out
     during the given timestamp range.
@@ -142,29 +187,17 @@ def get_keyevent_trend_comments_frequency(args):
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
     """
-    # collect action dates
-    lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
-    upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
-    if args.get('collection','All') == 'All':
-        sql = "SELECT date_creation FROM cmtRECORDCOMMENT " + \
-          "WHERE date_creation > '%s' AND date_creation < '%s'" \
-          % (lower, upper) + " ORDER BY date_creation DESC"
+    if args.get('collection', 'All') == 'All':
+        sql = _get_sql_query("date_creation", args["granularity"],
+            "cmtRECORDCOMMENT")
     else:
-        ids = get_collection_reclist(args['collection']).tolist()
-        if len(ids) == 0:
-            return []
-        ids_str = str(ids).replace('[', '(').replace(']', ')')
-        sql = "SELECT date_creation FROM cmtRECORDCOMMENT \
-            WHERE date_creation > '%s' AND date_creation < '%s'  \
-            AND id_bibrec IN %s ORDER BY date_creation DESC" \
-            % (lower, upper, ids_str)
-    action_dates = [x[0] for x in run_sql(sql)]
-
-    return _get_trend_from_actions(action_dates, 0, args['t_start'],
-                          args['t_end'], args['granularity'], args['t_format'])
+        sql = _get_sql_query("date_creation", args["granularity"],
+            "cmtRECORDCOMMENT", conditions=
+            _get_collection_recids_for_sql_query(args['collection']))
+    return _get_keyevent_trend(args, sql, return_sql=return_sql)
 
 
-def get_keyevent_trend_search_type_distribution(args):
+def get_keyevent_trend_search_type_distribution(args, return_sql=False):
     """
     Returns the number of searches carried out during the given
     timestamp range, but also partion them by type Simple and
@@ -182,33 +215,30 @@ def get_keyevent_trend_search_type_distribution(args):
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
     """
-    lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
-    upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
-
     # SQL to determine all simple searches:
-    sql = "SELECT date FROM query INNER JOIN user_query ON id=id_query " + \
-          "WHERE urlargs LIKE '%p=%' " + \
-          "AND date > '%s' AND date < '%s' ORDER BY date DESC" % (lower, upper)
-    simple = [x[0] for x in run_sql(sql)]
+    simple = _get_sql_query("date", args["granularity"],
+                    "query INNER JOIN user_query ON id=id_query",
+                    conditions="urlargs LIKE '%%p=%%'")
 
     # SQL to determine all advanced searches:
-    sql = "SELECT date FROM query INNER JOIN user_query ON id=id_query " + \
-          "WHERE urlargs LIKE '%as=1%' " + \
-          "AND date > '%s' AND date < '%s' ORDER BY date DESC" % (lower, upper)
-    advanced = [x[0] for x in run_sql(sql)]
+    advanced = _get_sql_query("date", args["granularity"],
+                    "query INNER JOIN user_query ON id=id_query",
+                    conditions="urlargs LIKE '%%as=1%%'")
 
     # Compute the trend for both types
-    s_trend = _get_trend_from_actions(simple, 0, args['t_start'],
-                         args['t_end'], args['granularity'], args['t_format'])
-    a_trend = _get_trend_from_actions(advanced, 0, args['t_start'],
-                         args['t_end'], args['granularity'], args['t_format'])
+    s_trend = _get_keyevent_trend(args, simple,
+                        return_sql=return_sql, sql_text="Simple: %s")
+    a_trend = _get_keyevent_trend(args, advanced,
+                        return_sql=return_sql, sql_text="Advanced: %s")
 
     # Assemble, according to return type
+    if return_sql:
+        return "%s <br /> %s" % (s_trend, a_trend)
     return [(s_trend[i][0], (s_trend[i][1], a_trend[i][1]))
             for i in range(len(s_trend))]
 
 
-def get_keyevent_trend_download_frequency(args):
+def get_keyevent_trend_download_frequency(args, return_sql=False):
     """
     Returns the number of full text downloads carried out
     during the given timestamp range.
@@ -228,28 +258,33 @@ def get_keyevent_trend_download_frequency(args):
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
     """
-
-    lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
-    upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
     # Collect list of timestamps of insertion in the specific collection
-    if args.get('collection','All') == 'All':
-        sql = "SELECT download_time FROM rnkDOWNLOADS WHERE download_time > '%s' \
-            AND download_time < '%s'  ORDER BY download_time DESC" % (lower, upper)
+    if args.get('collection', 'All') == 'All':
+        return _get_keyevent_trend(args, _get_sql_query("download_time",
+                args["granularity"], "rnkDOWNLOADS"), return_sql=return_sql)
     else:
-        ids = get_collection_reclist(args['collection']).tolist()
+        lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
+        upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
+        ids = get_collection_reclist(args['collection'])
         if len(ids) == 0:
             return []
-        ids_str = str(ids).replace('[', '(').replace(']', ')')
-        sql = "SELECT download_time FROM rnkDOWNLOADS WHERE download_time > '%s' \
-            AND download_time < '%s' AND id_bibrec IN %s \
-            ORDER BY download_time DESC" % (lower, upper, ids_str)
-    actions = [x[0] for x in run_sql(sql)]
+        sql = _get_sql_query("download_time", args["granularity"], "rnkDOWNLOADS",
+                             extra_select=", GROUP_CONCAT(id_bibrec)")
+        if return_sql:
+            return sql % (lower, upper)
 
-    return _get_trend_from_actions(actions, 0, args['t_start'],
+        action_dates = []
+        for result in run_sql(sql, (lower, upper)):
+            count = result[1]
+            for id in result[2].split(","):
+                if id == '' or not int(id) in ids:
+                    count -= 1
+            action_dates.append((result[0], count))
+        return _get_trend_from_actions(action_dates, 0, args['t_start'],
                           args['t_end'], args['granularity'], args['t_format'])
 
 
-def get_keyevent_trend_number_of_loans(args):
+def get_keyevent_trend_number_of_loans(args, return_sql=False):
     """
     Returns the number of loans carried out
     during the given timestamp range.
@@ -266,19 +301,11 @@ def get_keyevent_trend_number_of_loans(args):
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
     """
-    # collect action dates
-    lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
-    upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
-    sql = "SELECT loaned_on FROM crcLOAN " + \
-          "WHERE loaned_on > '%s' AND loaned_on < '%s' ORDER BY loaned_on DESC"\
-          % (lower, upper)
-    action_dates = [x[0] for x in run_sql(sql)]
-
-    return _get_trend_from_actions(action_dates, 0, args['t_start'],
-                          args['t_end'], args['granularity'], args['t_format'])
+    return _get_keyevent_trend(args, _get_sql_query("loaned_on",
+            args["granularity"], "crcLOAN"), return_sql=return_sql)
 
 
-def get_keyevent_trend_web_submissions(args):
+def get_keyevent_trend_web_submissions(args, return_sql=False):
     """
     Returns the quantity of websubmissions in Invenio for
     the given timestamp range.
@@ -298,25 +325,20 @@ def get_keyevent_trend_web_submissions(args):
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
     """
-    # collect action dates
-    lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
-    upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
     if args['doctype'] == 'all':
-        sql_query = "SELECT cd FROM sbmSUBMISSIONS " + \
-            "WHERE action='SBI' AND cd > '%s' AND cd < '%s'" % (lower, upper) + \
-            " AND status='finished' ORDER BY cd DESC"
+        sql = _get_sql_query("cd", args["granularity"], "sbmSUBMISSIONS",
+                conditions="action='SBI' AND status='finished'")
+        res = _get_keyevent_trend(args, sql, return_sql=return_sql)
     else:
-        sql_query = "SELECT cd FROM sbmSUBMISSIONS " + \
-            "WHERE doctype='%s' AND action='SBI' " % args['doctype'] + \
-            "AND cd > '%s' AND cd < '%s' " % (lower, upper) + \
-            "AND status='finished' ORDER BY cd DESC"
-    action_dates = [x[0] for x in run_sql(sql_query)]
-    return _get_trend_from_actions(action_dates, 0,
-                                   args['t_start'], args['t_end'],
-                                   args['granularity'], args['t_format'])
+        sql = _get_sql_query("cd", args["granularity"], "sbmSUBMISSIONS",
+                conditions="doctype=%s AND action='SBI' AND status='finished'")
+        res = _get_keyevent_trend(args, sql, extra_param=[args['doctype']],
+                                  return_sql=return_sql)
+
+    return res
 
 
-def get_keyevent_loan_statistics(args):
+def get_keyevent_loan_statistics(args, return_sql=False):
     """
     Data:
     - Number of documents (=records) loaned
@@ -325,7 +347,6 @@ def get_keyevent_loan_statistics(args):
     - Average time between the date of the record creation and  the date of the first loan
     Filter by
     - in a specified time span
-    - by user address (=Department)
     - by UDC (see MARC field 080__a - list to be submitted)
     - by item status (available, missing)
     - by date of publication (MARC field 260__c)
@@ -337,9 +358,6 @@ def get_keyevent_loan_statistics(args):
 
     @param args['t_end']: Date and time of end point
     @type args['t_end']: str
-
-    @param args['user_address']: borrower address
-    @type args['user_address']: str
 
     @param args['udc']: MARC field 080__a
     @type args['udc']: str
@@ -356,62 +374,81 @@ def get_keyevent_loan_statistics(args):
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
     """
+    # collect action dates
     lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
     upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
 
     sql_from = "FROM crcLOAN l "
-    sql_where = "WHERE loaned_on > '%s' AND loaned_on < '%s' " % (lower, upper)
+    sql_where = "WHERE loaned_on > %s AND loaned_on < %s "
 
-    if 'user_address' in args and args['user_address'] != '':
-        sql_from += ", crcBORROWER bor "
-        sql_where += """AND l.id_crcBORROWER = bor.id AND
-             bor.address LIKE '%%%s%%' """ % args['user_address']
+    param = [lower, upper]
     if 'udc' in args and args['udc'] != '':
-        sql_where += "AND l.id_bibrec IN ( SELECT brb.id_bibrec \
-                  FROM bibrec_bib08x brb, bib08x b \
-                  WHERE brb.id_bibxxx = b.id AND tag='080__a' \
-                  AND value LIKE '%%%s%%')" % args['udc']
+        sql_where += "AND l." + _check_udc_value_where()
+        param.append(_get_udc_truncated(args['udc']))
     if 'item_status' in args and args['item_status'] != '':
         sql_from += ", crcITEM i "
-        sql_where += "AND l.barcode = i.barcode AND i.status = '%s' " % args['item_status']
+        sql_where += "AND l.barcode = i.barcode AND i.status = %s "
+        param.append(args['item_status'])
     if 'publication_date' in args and args['publication_date'] != '':
         sql_where += "AND l.id_bibrec IN ( SELECT brb.id_bibrec \
-                                   FROM bibrec_bib26x brb, bib26x b \
-                                   WHERE brb.id_bibxxx = b.id AND tag='260__c' \
-                               AND value LIKE '%%%s%%') " % args['publication_date']
+FROM bibrec_bib26x brb, bib26x b WHERE brb.id_bibxxx = b.id AND tag='260__c' \
+AND value LIKE %s)"
+        param.append('%%%s%%' % args['publication_date'])
     if 'creation_date' in args and args['creation_date'] != '':
         sql_from += ", bibrec br "
-        sql_where += """AND br.id=l.id_bibrec AND br.creation_date
-            LIKE '%%%s%%' """ % args['creation_date']
+        sql_where += "AND br.id=l.id_bibrec AND br.creation_date LIKE %s "
+        param.append('%%%s%%' % args['creation_date'])
+    param = tuple(param)
+
     # Number of loans:
-    loans = run_sql("SELECT COUNT(DISTINCT l.id_bibrec) " + sql_from + sql_where)[0][0]
-
-    # Number of items loaned on the total number of items:
-    items_loaned = run_sql("SELECT COUNT(DISTINCT l.barcode) " + sql_from + sql_where)[0][0]
-    total_items = run_sql("SELECT COUNT(*) FROM crcITEM")[0][0]
-    loaned_on_total = float(items_loaned) / float(total_items)
-
-    # Number of items never loaned on the total number of items
-    never_loaned_on_total = float(total_items - items_loaned) / float(total_items)
+    loans_sql = "SELECT COUNT(DISTINCT l.id_bibrec) " + sql_from + sql_where
+    items_loaned_sql = "SELECT COUNT(DISTINCT l.barcode) " + sql_from + sql_where
+    # Only the CERN site wants the items of the collection "Books & Proceedings"
+    if CFG_CERN_SITE:
+        items_in_book_coll = _get_collection_recids_for_sql_query("Books & Proceedings")
+        if items_in_book_coll == "":
+            total_items_sql = 0
+        else:
+            total_items_sql = "SELECT COUNT(*) FROM crcITEM WHERE %s" % \
+                                    items_in_book_coll
+    else: # The rest take all the items
+        total_items_sql = "SELECT COUNT(*) FROM crcITEM"
 
     # Average time between the date of the record creation and  the date of the first loan
-    avg_sql = "SELECT DATEDIFF(MIN(loaned_on), MIN(br.creation_date)) " + sql_from
+    avg_sql = "SELECT AVG(DATEDIFF(loaned_on, br.creation_date)) " + sql_from
     if not ('creation_date' in args and args['creation_date'] != ''):
         avg_sql += ", bibrec br "
     avg_sql += sql_where
     if not ('creation_date' in args and args['creation_date'] != ''):
         avg_sql += "AND br.id=l.id_bibrec "
-    avg_sql += "GROUP BY l.id_bibrec, br.id"
-    res_avg = run_sql(avg_sql)
-    if len(res_avg) > 0:
-        avg = res_avg[0][0]
+    if return_sql:
+        return "<ol><li>%s</li><li>Items loaned * 100 / Number of items <ul><li>\
+Items loaned: %s </li><li>Number of items: %s</li></ul></li><li>100 - Items \
+loaned on total number of items</li><li>%s</li></ol>" % \
+            (loans_sql % param, items_loaned_sql % param, total_items_sql, avg_sql % param)
+    loans = run_sql(loans_sql, param)[0][0]
+    items_loaned = run_sql(items_loaned_sql, param)[0][0]
+    if total_items_sql:
+        total_items = run_sql(total_items_sql)[0][0]
     else:
-        avg = 0
-
+        total_items = 0
+    if total_items == 0:
+        loaned_on_total = 0
+        never_loaned_on_total = 0
+    else:
+        # Number of items loaned on the total number of items:
+        loaned_on_total = float(items_loaned) * 100 / float(total_items)
+        # Number of items never loaned on the total number of items:
+        never_loaned_on_total = 100L - loaned_on_total
+    avg = run_sql(avg_sql, param)[0][0]
+    if avg:
+        avg = float(avg)
+    else:
+        avg = 0L
     return ((loans, ), (loaned_on_total, ), (never_loaned_on_total, ), (avg, ))
 
 
-def get_keyevent_loan_lists(args):
+def get_keyevent_loan_lists(args, return_sql=False, limit=50):
     """
     Lists:
     - List of documents (= records) never loaned
@@ -426,7 +463,6 @@ def get_keyevent_loan_lists(args):
     - by a certain number of loans
     - by date of publication (MARC field 260__c)
     - by date of the record creation in the database
-    - by user address (=Department)
 
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
@@ -452,113 +488,107 @@ def get_keyevent_loan_lists(args):
     @param args['creation_date']: date of the record creation in the database
     @type args['creation_date']: str
 
-    @param args['user_address']: borrower address
-    @type args['user_address']: str
-
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
     """
     lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
     upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
 
-    sql_from = "FROM crcLOAN l "
-    sql_where = "WHERE type = 'normal' AND loaned_on > %s AND loaned_on < %s "
-    param = [lower, upper]
+    sql_where = []
+    param = []
+    sql_from = ""
 
-    if 'user_address' in args and args['user_address'] != '':
-        sql_from += ", crcBORROWER bor "
-        sql_where += "AND l.id_crcBORROWER = bor.id AND bor.address LIKE %s "
-        param.append('%%%s%%' % args['user_address'])
     if 'udc' in args and args['udc'] != '':
-        sql_where += "AND l.id_bibrec IN ( SELECT brb.id_bibrec \
-                  FROM bibrec_bib08x brb, bib08x b \
-                  WHERE brb.id_bibxxx = b.id AND tag='080__a' \
-                  AND value LIKE %s)"
-        param.append('%%%s%%' % args['udc'])
+        sql_where.append("i." + _check_udc_value_where())
+        param.append(_get_udc_truncated(args['udc']))
     if 'loan_period' in args and args['loan_period'] != '':
-        sql_from += ", crcITEM i "
-        sql_where += "AND l.barcode = i.barcode AND i.loan_period = %s "
+        sql_where.append("loan_period = %s")
         param.append(args['loan_period'])
     if 'publication_date' in args and args['publication_date'] != '':
-        sql_where += "AND l.id_bibrec IN ( SELECT brb.id_bibrec \
-                                   FROM bibrec_bib26x brb, bib26x b \
-                                   WHERE brb.id_bibxxx = b.id AND tag='260__c' \
-                               AND value LIKE %s) "
+        sql_where.append("i.id_bibrec IN ( SELECT brb.id_bibrec \
+FROM bibrec_bib26x brb, bib26x b WHERE brb.id_bibxxx = b.id AND tag='260__c' \
+AND value LIKE %s)")
         param.append('%%%s%%' % args['publication_date'])
     if 'creation_date' in args and args['creation_date'] != '':
-        sql_from += ", bibrec br "
-        sql_where += "AND br.id=l.id_bibrec AND br.creation_date LIKE %s "
+        sql_from += ", bibrec br"
+        sql_where.append("br.id=i.id_bibrec AND br.creation_date LIKE %s")
         param.append('%%%s%%' % args['creation_date'])
-    param = tuple(param)
-    res = [("", "Title", "Author", "Edition", "Number of loans",
-            "Number of copies", "Date of creation of the record")]
-    # Documents (= records) never loaned:
-    for rec, copies in run_sql("""SELECT id_bibrec, COUNT(*) FROM crcITEM WHERE
-            id_bibrec NOT IN (SELECT l.id_bibrec """ + sql_from + sql_where +
-            ") GROUP BY id_bibrec", param):
-        loans = run_sql("SELECT COUNT(*) %s %s AND l.id_bibrec=%s" %
-                        (sql_from, sql_where, rec), param)[0][0]
-        try:
-            creation = run_sql("SELECT creation_date FROM bibrec WHERE id=%s", (rec, ))[0][0]
-        except:
-            creation = datetime.datetime(1970, 01, 01)
-        author = get_fieldvalues(rec, "100__a")
-        if len(author) > 0:
-            author = author[0]
-        else:
-            author = ""
-        edition = get_fieldvalues(rec, "250__a")
-        if len(edition) > 0:
-            edition = edition[0]
-        else:
-            edition = ""
-        res.append(('Documents never loaned', book_title_from_MARC(rec), author,
-                    edition, loans, copies, creation))
+    if sql_where:
+        sql_where = "WHERE %s AND" % " AND ".join(sql_where)
+    else:
+        sql_where = "WHERE"
+    param = tuple(param + [lower, upper])
 
-    # Most loaned documents
-    most_loaned = []
-    check_num_loans = ""
+    # SQL for both queries
+    check_num_loans = "HAVING "
     if 'min_loans' in args and args['min_loans'] != '':
         check_num_loans += "COUNT(*) >= %s" % args['min_loans']
     if 'max_loans' in args and args['max_loans'] != '' and args['max_loans'] != 0:
-        if check_num_loans != "":
+        if check_num_loans != "HAVING ":
             check_num_loans += " AND "
         check_num_loans += "COUNT(*) <= %s" % args['max_loans']
-    if check_num_loans != "":
-        check_num_loans = " HAVING " + check_num_loans
-    mldocs = run_sql("SELECT l.id_bibrec, COUNT(*) " + sql_from + sql_where +
-                " GROUP BY l.id_bibrec " + check_num_loans, param)
+    # Optimized to get all the data in only one query (not call get_fieldvalues several times)
+    mldocs_sql = "SELECT i.id_bibrec, COUNT(*) \
+FROM crcLOAN l, crcITEM i%s %s l.barcode=i.barcode AND type = 'normal' AND \
+loaned_on > %%s AND loaned_on < %%s GROUP BY i.id_bibrec %s" % \
+        (sql_from, sql_where, check_num_loans)
+    limit_n = ""
+    if limit > 0:
+        limit_n = "LIMIT %d" % limit
+    nldocs_sql = "SELECT id_bibrec, COUNT(*) FROM crcITEM i%s %s \
+barcode NOT IN (SELECT id_bibrec FROM crcLOAN WHERE loaned_on > %%s AND \
+loaned_on < %%s AND type = 'normal') GROUP BY id_bibrec ORDER BY COUNT(*) DESC %s" % \
+        (sql_from, sql_where, limit_n)
 
-    for rec, loans in mldocs:
-        copies = run_sql("SELECT COUNT(*) FROM crcITEM WHERE id_bibrec=%s", (rec, ))[0][0]
-        most_loaned.append((rec, loans, copies, loans / copies))
-    if most_loaned == []:
-        return (res)
-    most_loaned.sort(cmp=lambda x, y: cmp(x[3], y[3]))
-    if len(most_loaned) > 50:
-        most_loaned = most_loaned[:49]
-    most_loaned.reverse()
-    for rec, loans, copies, _ in most_loaned:
-        author = get_fieldvalues(rec, "100__a")
-        if len(author) > 0:
-            author = author[0]
-        else:
-            author = ""
-        edition = get_fieldvalues(rec, "250__a")
-        if len(edition) > 0:
-            edition = edition[0]
-        else:
-            edition = ""
-        try:
-            creation = run_sql("SELECT creation_date FROM bibrec WHERE id=%s", (rec, ))[0][0]
-        except:
-            creation = datetime.datetime(1970, 01, 01)
-        res.append(('Most loaned documents', book_title_from_MARC(rec), author,
-                    edition, loans, copies, creation))
+    items_sql = "SELECT id_bibrec, COUNT(*) items FROM crcITEM GROUP BY id_bibrec"
+    creation_date_sql = "SELECT creation_date FROM bibrec WHERE id=%s"
+    authors_sql = "SELECT bx.value FROM bib10x bx, bibrec_bib10x bibx \
+WHERE bx.id = bibx.id_bibxxx AND bx.tag LIKE '100__a' AND bibx.id_bibrec=%s"
+    title_sql = "SELECT GROUP_CONCAT(bx.value SEPARATOR ' ') value FROM bib24x bx, bibrec_bib24x bibx \
+WHERE bx.id = bibx.id_bibxxx AND bx.tag LIKE %s AND bibx.id_bibrec=%s GROUP BY bibx.id_bibrec"
+    edition_sql = "SELECT bx.value FROM bib25x bx, bibrec_bib25x AS bibx \
+WHERE bx.id = bibx.id_bibxxx AND bx.tag LIKE '250__a' AND bibx.id_bibrec=%s"
+
+    if return_sql:
+        return "Most loaned: %s<br \>Never loaned: %s" % \
+            (mldocs_sql % param, nldocs_sql % param)
+
+    mldocs = run_sql(mldocs_sql, param)
+    items = dict(run_sql(items_sql))
+    order_m = []
+    for mldoc in mldocs:
+        order_m.append([mldoc[0], mldoc[1], items[mldoc[0]], \
+                      float(mldoc[1]) / float(items[mldoc[0]])])
+    order_m = sorted(order_m, key=itemgetter(3))
+    order_m.reverse()
+    # Check limit values
+
+    if limit > 0:
+        order_m = order_m[:limit]
+
+    res = [("", "Title", "Author", "Edition", "Number of loans",
+            "Number of copies", "Date of creation of the record")]
+    for mldoc in order_m:
+        res.append(("Most loaned documents",
+            _check_empty_value(run_sql(title_sql, ('245__%%', mldoc[0], ))),
+            _check_empty_value(run_sql(authors_sql, (mldoc[0], ))),
+            _check_empty_value(run_sql(edition_sql, (mldoc[0], ))),
+            mldoc[1], mldoc[2],
+            _check_empty_value(run_sql(creation_date_sql, (mldoc[0], )))))
+
+    nldocs = run_sql(nldocs_sql, param)
+    for nldoc in nldocs:
+        res.append(("Not loaned documents",
+            _check_empty_value(run_sql(title_sql, ('245__%%', nldoc[0], ))),
+            _check_empty_value(run_sql(authors_sql, (nldoc[0], ))),
+            _check_empty_value(run_sql(edition_sql, (nldoc[0], ))),
+            0, items[nldoc[0]],
+            _check_empty_value(run_sql(creation_date_sql, (nldoc[0], )))))
+#    nldocs = run_sql(nldocs_sql, param_n)
     return (res)
 
 
-def get_keyevent_renewals_lists(args):
+def get_keyevent_renewals_lists(args, return_sql=False, limit=50):
     """
     Lists:
     - List of most renewed items stored by decreasing order (50 items)
@@ -566,7 +596,6 @@ def get_keyevent_renewals_lists(args):
     - in a specified time span
     - by UDC (see MARC field 080__a - list to be submitted)
     - by collection
-    - by user address (=Department)
 
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
@@ -580,9 +609,6 @@ def get_keyevent_renewals_lists(args):
     @param args['collection']: collection of the record
     @type args['collection']: str
 
-    @param args['user_address']: borrower address
-    @type args['user_address']: str
-
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
     """
@@ -592,27 +618,28 @@ def get_keyevent_renewals_lists(args):
     sql_from = "FROM crcLOAN l, crcITEM i "
     sql_where = "WHERE loaned_on > %s AND loaned_on < %s AND i.barcode = l.barcode "
     param = [lower, upper]
-    if 'user_address' in args and args['user_address'] != '':
-        sql_from += ", crcBORROWER bor "
-        sql_where += "AND l.id_crcBORROWER = bor.id AND bor.address LIKE %s "
-        param.append('%%%s%%' % args['user_address'])
     if 'udc' in args and args['udc'] != '':
-        sql_where += "AND l.id_bibrec IN ( SELECT brb.id_bibrec \
-                  FROM bibrec_bib08x brb, bib08x b \
-                  WHERE brb.id_bibxxx = b.id AND tag='080__a' \
-                  AND value LIKE %s)"
-        param.append('%%%s%%' % args['udc'])
+        sql_where += "AND l." + _check_udc_value_where()
+        param.append(_get_udc_truncated(args['udc']))
     filter_coll = False
     if 'collection' in args and args['collection'] != '':
         filter_coll = True
         recid_list = get_collection_reclist(args['collection'])
 
     param = tuple(param)
+
+    if limit > 0:
+        limit = "LIMIT %d" % limit
+    else:
+        limit = ""
+    sql = "SELECT i.id_bibrec, SUM(number_of_renewals) %s %s \
+GROUP BY i.id_bibrec ORDER BY SUM(number_of_renewals) DESC %s" \
+            % (sql_from, sql_where, limit)
+    if return_sql:
+        return sql % param
     # Results:
     res = [("Title", "Author", "Edition", "Number of renewals")]
-    for rec, renewals in run_sql("SELECT i.id_bibrec, SUM(number_of_renewals) "
-            + sql_from + sql_where +
-            " GROUP BY i.id_bibrec ORDER BY SUM(number_of_renewals) DESC LIMIT 50", param):
+    for rec, renewals in run_sql(sql, param):
         if filter_coll and rec not in recid_list:
             continue
         author = get_fieldvalues(rec, "100__a")
@@ -629,10 +656,10 @@ def get_keyevent_renewals_lists(args):
     return (res)
 
 
-def get_keyevent_returns_table(args):
+def get_keyevent_returns_table(args, return_sql=False):
     """
     Data:
-    - Number of overdue returns in a year
+    - Number of overdue returns in a timespan
 
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
@@ -647,15 +674,15 @@ def get_keyevent_returns_table(args):
     upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
 
     # Overdue returns:
-    returns = run_sql("SELECT COUNT(*) FROM crcLOAN l \
-                     WHERE loaned_on > %s AND loaned_on < %s AND \
-                         due_date < NOW() AND (returned_on = '0000-00-00 00:00:00' \
-                         OR returned_on > due_date)", (lower, upper))[0][0]
+    sql = "SELECT COUNT(*) FROM crcLOAN l WHERE loaned_on > %s AND loaned_on < %s AND \
+due_date < NOW() AND (returned_on IS NULL OR returned_on > due_date)"
 
-    return ((returns, ), )
+    if return_sql:
+        return sql % (lower, upper)
+    return ((run_sql(sql, (lower, upper))[0][0], ), )
 
 
-def get_keyevent_trend_returns_percentage(args):
+def get_keyevent_trend_returns_percentage(args, return_sql=False):
     """
     Returns the number of overdue returns and the total number of returns
 
@@ -671,54 +698,47 @@ def get_keyevent_trend_returns_percentage(args):
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
     """
-    lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
-    upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
-
     # SQL to determine overdue returns:
-    sql = "SELECT due_date FROM crcLOAN " + \
-          "WHERE  loaned_on > %s AND loaned_on < %s AND " + \
-            "due_date < NOW() AND (returned_on = '0000-00-00 00:00:00' " + \
-            "OR returned_on > due_date) ORDER BY due_date DESC"
-    overdue = [x[0] for x in run_sql(sql, (lower, upper))]
+    overdue = _get_sql_query("due_date", args["granularity"], "crcLOAN",
+                conditions="due_date < NOW() AND due_date IS NOT NULL \
+AND (returned_on IS NULL OR returned_on > due_date)",
+                dates_range_param="loaned_on")
 
     # SQL to determine all returns:
-    sql = "SELECT due_date FROM crcLOAN " + \
-          "WHERE loaned_on > %s AND loaned_on < %s AND " + \
-           "due_date < NOW() ORDER BY due_date DESC"
-    total = [x[0] for x in run_sql(sql, (lower, upper))]
+    total = _get_sql_query("due_date", args["granularity"], "crcLOAN",
+                conditions="due_date < NOW() AND due_date IS NOT NULL",
+                dates_range_param="loaned_on")
 
     # Compute the trend for both types
-    s_trend = _get_trend_from_actions(overdue, 0, args['t_start'],
-                         args['t_end'], args['granularity'], args['t_format'])
-    a_trend = _get_trend_from_actions(total, 0, args['t_start'],
-                         args['t_end'], args['granularity'], args['t_format'])
+    o_trend = _get_keyevent_trend(args, overdue,
+                        return_sql=return_sql, sql_text="Overdue: %s")
+    t_trend = _get_keyevent_trend(args, total,
+                        return_sql=return_sql, sql_text="Total: %s")
 
     # Assemble, according to return type
-    return [(s_trend[i][0], (s_trend[i][1], a_trend[i][1]))
-            for i in range(len(s_trend))]
+    if return_sql:
+        return "%s <br /> %s" % (o_trend, t_trend)
+    return [(o_trend[i][0], (o_trend[i][1], t_trend[i][1]))
+            for i in range(len(o_trend))]
 
 
-def get_keyevent_ill_requests_statistics(args):
+def get_keyevent_ill_requests_statistics(args, return_sql=False):
     """
     Data:
     - Number of ILL requests
-    - Number of satisfied ILL requests 3 months after the date of request
-        creation on a period of one year
-    - Percentage of satisfied ILL requests 3 months after the date of
-        request creation on a period of one year
+    - Number of satisfied ILL requests 2 weeks after the date of request
+        creation on a timespan
 
     - Average time between the date and  the hour of the ill request
         date and the date and the hour of the delivery item to the user
-        on a period of one year (with flexibility in the choice of the dates)
+        on a timespan
     - Average time between the date and  the hour the ILL request
         was sent to the supplier and the date and hour of the
-        delivery item on a period of one year (with flexibility in
-        the choice of the dates)
+        delivery item on a timespan
 
     Filter by
     - in a specified time span
     - by type of document (book or article)
-    - by user address
     - by status of the request (= new, sent, etc.)
     - by supplier
 
@@ -737,9 +757,6 @@ def get_keyevent_ill_requests_statistics(args):
     @param args['supplier']: supplier
     @type args['supplier']: str
 
-    @param args['user_address']: borrower address
-    @type args['user_address']: str
-
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
     """
@@ -751,52 +768,59 @@ def get_keyevent_ill_requests_statistics(args):
 
     param = [lower, upper]
 
-    if 'user_address' in args and args['user_address'] != '':
-        sql_from += ", crcBORROWER bor "
-        sql_where += "AND ill.id_crcBORROWER = bor.id AND bor.address LIKE %s "
-        param.append('%%%s%%' % args['user_address'])
     if 'doctype' in args and args['doctype'] != '':
         sql_where += "AND  ill.request_type=%s"
         param.append(args['doctype'])
     if 'status' in args and args['status'] != '':
         sql_where += "AND ill.status = %s "
         param.append(args['status'])
+    else:
+        sql_where += "AND ill.status != %s "
+        param.append("cancelled") #FIXME: change to CFG variable
     if 'supplier' in args and args['supplier'] != '':
         sql_from += ", crcLIBRARY lib "
         sql_where += "AND lib.id=ill.id_crcLIBRARY AND lib.name=%s "
         param.append(args['supplier'])
 
     param = tuple(param)
-
+    requests_sql = "SELECT COUNT(*) %s %s" % (sql_from, sql_where)
+    satrequests_sql = "SELECT COUNT(*) %s %s \
+AND arrival_date IS NOT NULL AND \
+DATEDIFF(arrival_date, period_of_interest_from) < 14 " % (sql_from, sql_where)
+    avgdel_sql = "SELECT AVG(TIMESTAMPDIFF(DAY, period_of_interest_from, arrival_date)) %s %s \
+AND arrival_date IS NOT NULL" % (sql_from, sql_where)
+    avgsup_sql = "SELECT AVG(TIMESTAMPDIFF(DAY, request_date, arrival_date)) %s %s \
+AND arrival_date IS NOT NULL \
+AND request_date IS NOT NULL" % (sql_from, sql_where)
+    if return_sql:
+        return "<ol><li>%s</li><li>%s</li><li>%s</li><li>%s</li></ol>" % \
+            (requests_sql % param, satrequests_sql % param,
+             avgdel_sql % param, avgsup_sql % param)
     # Number of requests:
-    requests = run_sql("SELECT COUNT(*) " + sql_from + sql_where, param)[0][0]
+    requests = run_sql(requests_sql, param)[0][0]
 
-    # Number of satisfied ILL requests 3 months after the date of request creation:
-    satrequests = run_sql("SELECT COUNT(*) " + sql_from + sql_where +
-                          "AND arrival_date != '0000-00-00 00:00:00' AND \
-                          DATEDIFF(arrival_date, period_of_interest_from) < 90 ", param)[0][0]
+    # Number of satisfied ILL requests 2 weeks after the date of request creation:
+    satrequests = run_sql(satrequests_sql, param)[0][0]
 
     # Average time between the date and the hour of the ill request date and
     # the date and the hour of the delivery item to the user
-    avgdel = run_sql("SELECT AVG(TIMESTAMPDIFF(HOUR, period_of_interest_from, request_date)) "
-                     + sql_from + sql_where, param)[0][0]
-    if avgdel is int:
-        avgdel = int(avgdel)
+    avgdel = run_sql(avgdel_sql, param)[0][0]
+    if avgdel:
+        avgdel = float(avgdel)
     else:
         avgdel = 0
     # Average time between the date and  the hour the ILL request was sent to
     # the supplier and the date and hour of the delivery item
-    avgsup = run_sql("SELECT AVG(TIMESTAMPDIFF(HOUR, arrival_date, request_date)) "
-                     + sql_from + sql_where, param)[0][0]
-    if avgsup is int:
-        avgsup = int(avgsup)
+    avgsup = run_sql(avgsup_sql, param)[0][0]
+    if avgsup:
+        avgsup = float(avgsup)
     else:
         avgsup = 0
 
     return ((requests, ), (satrequests, ), (avgdel, ), (avgsup, ))
 
 
-def get_keyevent_ill_requests_lists(args):
+def get_keyevent_ill_requests_lists(args, return_sql=False, limit=50):
     """
     Lists:
     - List of ILL requests
@@ -824,32 +848,40 @@ def get_keyevent_ill_requests_lists(args):
     upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
 
     sql_from = "FROM crcILLREQUEST ill "
-    sql_where = "WHERE request_date > %s AND request_date < %s "
+    sql_where = "WHERE status != 'cancelled' AND request_date > %s AND request_date < %s " #FIXME: change 'cancelled' to CFG variable
 
     param = [lower, upper]
 
     if 'doctype' in args and args['doctype'] != '':
-        sql_where += "AND  ill.request_type=%s"
+        sql_where += "AND ill.request_type=%s "
         param.append(args['doctype'])
     if 'supplier' in args and args['supplier'] != '':
         sql_from += ", crcLIBRARY lib "
         sql_where += "AND lib.id=ill.id_crcLIBRARY AND lib.name=%s "
         param.append(args['supplier'])
+    param = tuple(param)
 
+    if limit > 0:
+        limit = "LIMIT %d" % limit
+    else:
+        limit = ""
+    sql = "SELECT ill.id, item_info %s %s %s" % (sql_from, sql_where, limit)
+    if return_sql:
+        return sql % param
     # Results:
-    res = [("Title", "Author", "Edition")]
-    for item_info in run_sql("SELECT item_info " + sql_from + sql_where + " LIMIT 100", param):
-        item_info = eval(item_info[0])
+    res = [("Id", "Title", "Author", "Edition")]
+    for req_id, item_info in run_sql(sql, param):
+        item_info = eval(item_info)
         try:
-            res.append((item_info['title'], item_info['authors'], item_info['edition']))
+            res.append((req_id, item_info['title'], item_info['authors'], item_info['edition']))
         except KeyError:
-            None
+            pass
     return (res)
 
 
-def get_keyevent_trend_satisfied_ill_requests_percentage(args):
+def get_keyevent_trend_satisfied_ill_requests_percentage(args, return_sql=False):
     """
-    Returns the number of satisfied ILL requests 3 months after the date of request
+    Returns the number of satisfied ILL requests 2 weeks after the date of request
     creation and the total number of ILL requests
 
     @param args['t_start']: Date and time of start point
@@ -867,60 +899,53 @@ def get_keyevent_trend_satisfied_ill_requests_percentage(args):
     @param args['supplier']: supplier
     @type args['supplier']: str
 
-    @param args['user_address']: borrower address
-    @type args['user_address']: str
-
     @param args['granularity']: Granularity of date and time
     @type args['granularity']: str
 
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
     """
-    lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
-    upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
+    sql_from = "crcILLREQUEST ill "
+    sql_where = ""
+    param = []
 
-    sql_from = "FROM crcILLREQUEST ill "
-    sql_where = "WHERE request_date > %s AND request_date < %s "
-    param = [lower, upper]
-
-    if 'user_address' in args and args['user_address'] != '':
-        sql_from += ", crcBORROWER bor "
-        sql_where += "AND ill.id_crcBORROWER = bor.id AND bor.address LIKE %s "
-        param.append('%%%s%%' % args['user_address'])
     if 'doctype' in args and args['doctype'] != '':
-        sql_where += "AND  ill.request_type=%s"
+        sql_where += "AND ill.request_type=%s"
         param.append(args['doctype'])
     if 'status' in args and args['status'] != '':
         sql_where += "AND ill.status = %s "
         param.append(args['status'])
+    else:
+        sql_where += "AND ill.status != %s "
+        param.append("cancelled") #FIXME: change to CFG variable
     if 'supplier' in args and args['supplier'] != '':
         sql_from += ", crcLIBRARY lib "
         sql_where += "AND lib.id=ill.id_crcLIBRARY AND lib.name=%s "
         param.append(args['supplier'])
 
     # SQL to determine satisfied ILL requests:
-    sql = "SELECT request_date " + sql_from + sql_where + \
-            "AND ADDDATE(request_date, 90) < NOW() AND (arrival_date != '0000-00-00 00:00:00' " + \
-            "OR arrival_date < ADDDATE(request_date, 90)) ORDER BY request_date DESC"
-    satisfied = [x[0] for x in run_sql(sql, param)]
+    satisfied = _get_sql_query("request_date", args["granularity"], sql_from,
+                  conditions="ADDDATE(request_date, 14) < NOW() AND \
+(arrival_date IS NULL OR arrival_date < ADDDATE(request_date, 14)) " + sql_where)
 
     # SQL to determine all ILL requests:
-    sql = "SELECT request_date " + sql_from + sql_where + \
-           " AND ADDDATE(request_date, 90) < NOW() ORDER BY request_date DESC"
-    total = [x[0] for x in run_sql(sql, param)]
+    total = _get_sql_query("request_date", args["granularity"], sql_from,
+                  conditions="ADDDATE(request_date, 14) < NOW() "+ sql_where)
 
     # Compute the trend for both types
-    s_trend = _get_trend_from_actions(satisfied, 0, args['t_start'],
-                         args['t_end'], args['granularity'], args['t_format'])
-    a_trend = _get_trend_from_actions(total, 0, args['t_start'],
-                         args['t_end'], args['granularity'], args['t_format'])
+    s_trend = _get_keyevent_trend(args, satisfied, extra_param=param,
+                        return_sql=return_sql, sql_text="Satisfied: %s")
+    t_trend = _get_keyevent_trend(args, total, extra_param=param,
+                        return_sql=return_sql, sql_text="Total: %s")
 
     # Assemble, according to return type
-    return [(s_trend[i][0], (s_trend[i][1], a_trend[i][1]))
+    if return_sql:
+        return "%s <br /> %s" % (s_trend, t_trend)
+    return [(s_trend[i][0], (s_trend[i][1], t_trend[i][1]))
             for i in range(len(s_trend))]
 
 
-def get_keyevent_items_statistics(args):
+def get_keyevent_items_statistics(args, return_sql=False):
     """
     Data:
     - The total number of items
@@ -951,29 +976,27 @@ def get_keyevent_items_statistics(args):
     param = []
 
     if 'udc' in args and args['udc'] != '':
-        sql_where += "i.id_bibrec IN ( SELECT brb.id_bibrec \
-                  FROM bibrec_bib08x brb, bib08x b \
-                  WHERE brb.id_bibxxx = b.id AND tag='080__a' \
-                  AND value LIKE %s)"
-        param.append('%%%s%%' % args['udc'])
+        sql_where += "i." + _check_udc_value_where()
+        param.append(_get_udc_truncated(args['udc']))
 
     # Number of items:
     if sql_where == "WHERE ":
         sql_where = ""
-    items = run_sql("SELECT COUNT(i.id_bibrec) " + sql_from + sql_where, param)[0][0]
+    items_sql = "SELECT COUNT(i.id_bibrec) %s %s" % (sql_from, sql_where)
 
     # Number of new items:
-    param += [lower, upper]
     if sql_where == "":
         sql_where = "WHERE creation_date > %s AND creation_date < %s "
     else:
         sql_where += " AND creation_date > %s AND creation_date < %s "
-    new_items = run_sql("SELECT COUNT(i.id_bibrec) " + sql_from + sql_where, param)[0][0]
+    new_items_sql = "SELECT COUNT(i.id_bibrec) %s %s" % (sql_from, sql_where)
 
-    return ((items, ), (new_items, ))
+    if return_sql:
+        return "Total: %s <br />New: %s" % (items_sql % tuple(param), new_items_sql % tuple(param + [lower, upper]))
+    return ((run_sql(items_sql, tuple(param))[0][0], ), (run_sql(new_items_sql, tuple(param + [lower, upper]))[0][0], ))
 
 
-def get_keyevent_items_lists(args):
+def get_keyevent_items_lists(args, return_sql=False, limit=50):
     """
     Lists:
     - The list of items
@@ -1003,17 +1026,24 @@ def get_keyevent_items_lists(args):
             sql_where += "AND "
         sql_where += "i.status = %s "
         param.append(args['status'])
-
+    param = tuple(param)
     # Results:
     res = [("Title", "Author", "Edition", "Barcode", "Publication date")]
     if sql_where == "WHERE ":
         sql_where = ""
-    if len(param) == 0:
-        sqlres = run_sql("SELECT i.barcode, i.id_bibrec " +
-                       sql_from + sql_where + " LIMIT 100")
+    if limit > 0:
+        limit = "LIMIT %d" % limit
     else:
-        sqlres = run_sql("SELECT i.barcode, i.id_bibrec " +
-                       sql_from + sql_where + " LIMIT 100", tuple(param))
+        limit = ""
+    sql = "SELECT i.barcode, i.id_bibrec %s %s %s" % (sql_from, sql_where, limit)
+    if len(param) == 0:
+        sqlres = run_sql(sql)
+    else:
+        sqlres = run_sql(sql, tuple(param))
+        sql = sql % param
+    if return_sql:
+        return sql
+
     for barcode, rec in sqlres:
         author = get_fieldvalues(rec, "100__a")
         if len(author) > 0:
@@ -1031,7 +1061,7 @@ def get_keyevent_items_lists(args):
     return (res)
 
 
-def get_keyevent_loan_request_statistics(args):
+def get_keyevent_loan_request_statistics(args, return_sql=False):
     """
     Data:
     - Number of hold requests, one week after the date of request creation
@@ -1065,37 +1095,39 @@ def get_keyevent_loan_request_statistics(args):
         sql_from += ", crcITEM i "
         sql_where += "AND lr.barcode = i.barcode AND i.status = %s "
         param.append(args['item_status'])
+    param = tuple(param)
 
     custom_table = get_customevent_table("loanrequest")
     # Number of hold requests, one week after the date of request creation:
-    holds = run_sql("""SELECT COUNT(*) %s, %s ws %s AND ws.request_id=lr.id AND
-        DATEDIFF(ws.creation_time, lr.request_date) >= 7""" %
-        (sql_from, custom_table, sql_where), param)[0][0]
+    holds = "SELECT COUNT(*) %s, %s ws %s AND ws.request_id=lr.id AND \
+DATEDIFF(ws.creation_time, lr.request_date) >= 7" % (sql_from, custom_table, sql_where)
 
     # Number of successful hold requests transactions
-    succesful_holds = run_sql("SELECT COUNT(*) %s %s AND lr.status='done'" %
-                              (sql_from, sql_where), param)[0][0]
+    succesful_holds = "SELECT COUNT(*) %s %s AND lr.status='done'" % (sql_from, sql_where)
 
     # Average time between the hold request date and the date of delivery document in a year
-    avg = run_sql("""SELECT AVG(DATEDIFF(ws.creation_time, lr.request_date))
-        %s, %s ws %s AND ws.request_id=lr.id""" %
-        (sql_from, custom_table, sql_where), param)[0][0]
+    avg_sql = "SELECT AVG(DATEDIFF(ws.creation_time, lr.request_date)) \
+%s, %s ws %s AND ws.request_id=lr.id" % (sql_from, custom_table, sql_where)
 
+    if return_sql:
+        return "<ol><li>%s</li><li>%s</li><li>%s</li></ol>" % \
+            (holds % param, succesful_holds % param, avg_sql % param)
+    avg = run_sql(avg_sql, param)[0][0]
     if avg is int:
         avg = int(avg)
     else:
         avg = 0
-    return ((holds, ), (succesful_holds, ), (avg, ))
+    return ((run_sql(holds, param)[0][0], ),
+        (run_sql(succesful_holds, param)[0][0], ), (avg, ))
 
 
-def get_keyevent_loan_request_lists(args):
+def get_keyevent_loan_request_lists(args, return_sql=False, limit=50):
     """
     Lists:
     - List of the most requested items
     Filter by
     - in a specified time span
     - by UDC (see MARC field 080__a - list to be submitted)
-    - by user address (=Department)
 
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
@@ -1105,9 +1137,6 @@ def get_keyevent_loan_request_lists(args):
 
     @param args['udc']: MARC field 080__a
     @type args['udc']: str
-
-    @param args['user_address']: borrower address
-    @type args['user_address']: str
 
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
@@ -1120,22 +1149,21 @@ def get_keyevent_loan_request_lists(args):
 
     param = [lower, upper]
 
-    if 'user_address' in args and args['user_address'] != '':
-        sql_from += ", crcBORROWER bor "
-        sql_where += "AND lr.id_crcBORROWER = bor.id AND bor.address LIKE %s "
-        param.append('%%%s%%' % args['user_address'])
     if 'udc' in args and args['udc'] != '':
-        sql_where += "AND lr.id_bibrec IN ( SELECT brb.id_bibrec \
-                  FROM bibrec_bib08x brb, bib08x b \
-                  WHERE brb.id_bibxxx = b.id AND tag='080__a' \
-                  AND value LIKE %s)"
-        param.append('%%%s%%' % args['udc'])
-
+        sql_where += "AND lr." + _check_udc_value_where()
+        param.append(_get_udc_truncated(args['udc']))
+    if limit > 0:
+        limit = "LIMIT %d" % limit
+    else:
+        limit = ""
+    sql = "SELECT lr.barcode %s %s GROUP BY barcode \
+ORDER BY COUNT(*) DESC %s" % (sql_from, sql_where, limit)
+    if return_sql:
+        return sql
     res = [("Title", "Author", "Edition", "Barcode")]
 
     # Most requested items:
-    for barcode in run_sql("SELECT lr.barcode " + sql_from + sql_where +
-                           " GROUP BY barcode ORDER BY COUNT(*) DESC", param):
+    for barcode in run_sql(sql, param):
         rec = get_id_bibrec(barcode[0])
         author = get_fieldvalues(rec, "100__a")
         if len(author) > 0:
@@ -1152,13 +1180,12 @@ def get_keyevent_loan_request_lists(args):
     return (res)
 
 
-def get_keyevent_user_statistics(args):
+def get_keyevent_user_statistics(args, return_sql=False):
     """
     Data:
     - Total number of  active users (to be defined = at least one transaction in the past year)
     Filter by
     - in a specified time span
-    - by user address
     - by registration date
 
     @param args['t_start']: Date and time of start point
@@ -1166,9 +1193,6 @@ def get_keyevent_user_statistics(args):
 
     @param args['t_end']: Date and time of end point
     @type args['t_end']: str
-
-    @param args['user_address']: borrower address
-    @type args['user_address']: str
 
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
@@ -1180,30 +1204,24 @@ def get_keyevent_user_statistics(args):
     sql_from_loan = "FROM crcLOAN l "
     sql_where_ill = "WHERE request_date > %s AND request_date < %s "
     sql_where_loan = "WHERE loaned_on > %s AND loaned_on < %s "
-    sql_address = ""
-    param = [lower, upper, lower, upper]
-    if 'user_address' in args and args['user_address'] != '':
-        sql_address += ", crcBORROWER bor WHERE id = user AND \
-                       address LIKE %s "
-        param.append('%%%s%%' % args['user_address'])
+    param = (lower, upper, lower, upper)
 
     # Total number of  active users:
-    users = run_sql("""SELECT COUNT(DISTINCT user)
-        FROM ((SELECT id_crcBORROWER user %s %s) UNION
-        (SELECT id_crcBORROWER user %s %s)) res %s""" %
-        (sql_from_ill, sql_where_ill, sql_from_loan,
-         sql_where_loan, sql_address), param)[0][0]
+    users = "SELECT COUNT(DISTINCT user) FROM ((SELECT id_crcBORROWER user %s %s) \
+UNION (SELECT id_crcBORROWER user %s %s)) res" % \
+        (sql_from_ill, sql_where_ill, sql_from_loan, sql_where_loan)
 
-    return ((users, ), )
+    if return_sql:
+        return users % param
+    return ((run_sql(users, param)[0][0], ), )
 
 
-def get_keyevent_user_lists(args):
+def get_keyevent_user_lists(args, return_sql=False, limit=50):
     """
     Lists:
     - List of most intensive users (ILL requests + Loan)
     Filter by
     - in a specified time span
-    - by user address
     - by registration date
 
     @param args['t_start']: Date and time of start point
@@ -1212,34 +1230,31 @@ def get_keyevent_user_lists(args):
     @param args['t_end']: Date and time of end point
     @type args['t_end']: str
 
-    @param args['user_address']: borrower address
-    @type args['user_address']: str
-
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
     """
     lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
     upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
 
-    sql_from_ill = "FROM crcILLREQUEST ill "
-    sql_from_loan = "FROM crcLOAN l "
-    sql_where_ill = "WHERE request_date > %s AND request_date < %s "
-    sql_where_loan = "WHERE loaned_on > %s AND loaned_on < %s "
-    sql_address = ""
-    param = [lower, upper, lower, upper]
-    if 'user_address' in args and args['user_address'] != '':
-        sql_address += ", crcBORROWER bor WHERE id = user AND \
-                       address LIKE %s "
-        param.append('%%%s%%' % args['user_address'])
+    param = (lower, upper, lower, upper)
 
+    if limit > 0:
+        limit = "LIMIT %d" % limit
+    else:
+        limit = ""
+    sql = "SELECT user, SUM(trans) FROM \
+((SELECT id_crcBORROWER user, COUNT(*) trans FROM crcILLREQUEST ill \
+WHERE request_date > %%s AND request_date < %%s GROUP BY id_crcBORROWER) UNION \
+(SELECT id_crcBORROWER user, COUNT(*) trans FROM crcLOAN l WHERE loaned_on > %%s AND \
+loaned_on < %%s GROUP BY id_crcBORROWER)) res GROUP BY user ORDER BY SUM(trans) DESC \
+%s" % (limit)
+
+    if return_sql:
+        return sql % param
     res = [("Name", "Address", "Mailbox", "E-mail", "Number of transactions")]
 
     # List of most intensive users (ILL requests + Loan):
-    for borrower_id, trans in run_sql("SELECT user, SUM(trans) FROM \
-             ((SELECT id_crcBORROWER user, COUNT(*) trans %s %s GROUP BY id_crcBORROWER) UNION \
-             (SELECT id_crcBORROWER user, COUNT(*) trans %s %s GROUP BY id_crcBORROWER)) res %s \
-             GROUP BY user ORDER BY SUM(trans) DESC"
-    % (sql_from_ill, sql_where_ill, sql_from_loan, sql_where_loan, sql_address), param):
+    for borrower_id, trans in run_sql(sql, param):
         name, address, mailbox, email = get_borrower_data(borrower_id)
         res.append((name, address, mailbox, email, int(trans)))
 
@@ -1322,9 +1337,11 @@ def get_keyevent_bibcirculation_report(freq='yearly'):
         datefrom = datetime.date.today().strftime("%Y-%m-01 00:00:00")
     else: #yearly
         datefrom = datetime.date.today().strftime("%Y-01-01 00:00:00")
-    loans, renewals, returns = run_sql("""SELECT COUNT(*),
-        SUM(number_of_renewals), COUNT(returned_on<>'0000-00-00')
-        FROM crcLOAN WHERE loaned_on > %s""", (datefrom, ))[0]
+    loans, renewals = run_sql("SELECT COUNT(*), \
+SUM(number_of_renewals) \
+FROM crcLOAN WHERE loaned_on > %s", (datefrom, ))[0]
+    returns = run_sql("SELECT COUNT(*) FROM crcLOAN \
+WHERE returned_on!='0000-00-00 00:00:00' and loaned_on > %s", (datefrom, ))[0][0]
     illrequests = run_sql("SELECT COUNT(*) FROM crcILLREQUEST WHERE request_date > %s",
                           (datefrom, ))[0][0]
     holdrequest = run_sql("SELECT COUNT(*) FROM crcLOANREQUEST WHERE request_date > %s",
@@ -1390,32 +1407,32 @@ def get_customevent_trend(args):
     tbl_name = get_customevent_table(args['event_id'])
     col_names = get_customevent_args(args['event_id'])
 
-    sql_query = ["SELECT creation_time FROM %s WHERE creation_time > '%s'"
-                 % (tbl_name, lower)]
-    sql_query.append("AND creation_time < '%s'" % upper)
-    sql_param = []
+    where = []
+    sql_param = [lower, upper]
     for col_bool, col_title, col_content in args['cols']:
         if not col_title in col_names:
             continue
         if col_content:
-            if col_bool == "and" or col_bool == "":
-                sql_query.append("AND %s"
+            if col_bool == "" or not where:
+                where.append(wash_table_column_name(col_title))
+            elif col_bool == "and":
+                where.append("AND %s"
                                  % wash_table_column_name(col_title))
             elif col_bool == "or":
-                sql_query.append("OR %s"
+                where.append("OR %s"
                                  % wash_table_column_name(col_title))
             elif col_bool == "and_not":
-                sql_query.append("AND NOT %s"
+                where.append("AND NOT %s"
                                  % wash_table_column_name(col_title))
             else:
                 continue
-            sql_query.append(" LIKE %s")
+            where.append(" LIKE %s")
             sql_param.append("%" + col_content + "%")
-    sql_query.append("ORDER BY creation_time DESC")
-    sql = ' '.join(sql_query)
 
-    dates = [x[0] for x in run_sql(sql, tuple(sql_param))]
-    return _get_trend_from_actions(dates, 0, args['t_start'], args['t_end'],
+    sql = _get_sql_query("creation_time", args['granularity'], tbl_name, " ".join(where))
+
+    return _get_trend_from_actions(run_sql(sql, tuple(sql_param)), 0,
+                                   args['t_start'], args['t_end'],
                                    args['granularity'], args['t_format'])
 
 
@@ -1550,7 +1567,7 @@ def get_custom_summary_data(query, tag):
 
     # Check arguments
     if tag == '':
-        tag = "909C4p"
+        tag = CFG_JOURNAL_TAG.replace("%", "p")
 
     # First get records of the year
     recids = perform_request_search(p=query, of="id")
@@ -1558,14 +1575,22 @@ def get_custom_summary_data(query, tag):
     # Then return list by tag
     pub = list(get_most_popular_field_values(recids, tag))
 
-    sel = 0
-    for elem in pub:
-        sel += elem[1]
     if len(pub) == 0:
         return []
-    if len(recids) - sel != 0:
-        pub.append(('Others', len(recids) - sel))
-    pub.append(('TOTAL', len(recids)))
+    others = 0
+    total = 0
+    first_other = -1
+    for elem in pub:
+        total += elem[1]
+        if elem[1] < 2:
+            if first_other == -1:
+                first_other = pub.index(elem)
+            others += elem[1]
+    del pub[first_other:]
+
+    if others != 0:
+        pub.append(('Others', others))
+    pub.append(('TOTAL', total))
 
     return pub
 
@@ -1589,8 +1614,8 @@ def create_custom_summary_graph(data, path, title):
     # make a square figure and axes
     matplotlib.rcParams['font.size'] = 8
     labels = [x[0] for x in data]
-    numb_elem = float(len(labels))
-    width = 6 + numb_elem / 7
+    numb_elem = len(labels)
+    width = 6 + float(numb_elem) / 7
     gfile = plt.figure(1, figsize=(width, 6))
 
     plt.axes([0.1, 0.1, 4.2 / width, 0.7])
@@ -1602,7 +1627,7 @@ def create_custom_summary_graph(data, path, title):
 
     random.seed()
     for i in range(numb_elem):
-        col = 0.5 + float(i) / (numb_elem * 2.0)
+        col = 0.5 + float(i) / (float(numb_elem) * 2.0)
         rand = random.random() / 2.0
         if i % 3 == 0:
             red = col
@@ -1648,7 +1673,7 @@ def create_graph_trend(trend, path, settings):
     @type settings: dict
     """
     # If no input, we don't bother about anything
-    if len(trend) == 0:
+    if not trend or len(trend) == 0:
         return
 
     # If no filename is given, we'll assume STD-out format and ASCII.
@@ -1679,7 +1704,7 @@ def create_graph_trend_ascii_art(trend, path, settings):
 
     width = 82
 
-     # Figure out the max length of the xtics, in order to left align
+    # Figure out the max length of the xtics, in order to left align
     xtic_max_len = max([len(_to_datetime(x[0]).strftime(
                     settings["xtic_format"])) for x in trend])
 
@@ -1718,11 +1743,11 @@ def create_graph_trend_ascii_art(trend, path, settings):
             except ZeroDivisionError:
                 break
 
-         # Print sentinel, and the total
+        # Print sentinel, and the total
         out += out_row + '>' + ' ' * (xtic_max_len + 4 +
                                     width - len(out_row)) + str(total) + '\n'
 
-     # Write to destination file
+    # Write to destination file
     if path == '':
         print out
     else:
@@ -1801,26 +1826,34 @@ def create_graph_trend_gnu_plot(trend, path, settings):
 
 def create_graph_trend_flot(trend, path, settings):
     """Creates the graph trend using the flot library"""
+    size = settings.get("size", "500,400").split(",")
+    title = cgi.escape(settings["title"].replace(" ", "")[:10])
     out = """<!--[if IE]><script language="javascript" type="text/javascript"
                     src="%(site)s/js/excanvas.min.js"></script><![endif]-->
               <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.flot.min.js"></script>
               <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.flot.selection.min.js"></script>
               <script id="source" language="javascript" type="text/javascript">
-                     document.write('<div style="float:left"><div id="placeholder" style="width:500px;height:400px"></div></div>'+
-              '<div id="miniature" style="float:left;margin-left:20px;margin-top:50px">' +
-              '<div id="overview" style="width:250px;height:200px"></div>' +
-              '<p id="overviewLegend" style="margin-left:10px"></p>' +
+                     document.write('<div style="float:left"><div id="placeholder%(title)s" style="width:%(width)spx;height:%(height)spx"></div></div>'+
+              '<div id="miniature%(title)s" style="float:left;margin-left:20px;margin-top:50px">' +
+              '<div id="overview%(title)s" style="width:%(hwidth)dpx;height:%(hheigth)dpx"></div>' +
+              '<p id="overviewLegend%(title)s" style="margin-left:10px"></p>' +
               '</div>');
                      $(function () {
-                             function parseDate(sdate){
+                             function parseDate%(title)s(sdate){
                                  var div1 = sdate.split(' ');
                                  var day = div1[0].split('-');
                                  var hour = div1[1].split(':');
                                  return new Date(day[0], day[1]-1, day[2], hour[0], hour[1], hour[2]).getTime()
                                  - (new Date().getTimezoneOffset() * 60 * 1000) ;
                              }
-                             function getData() {""" % \
-        {'site': CFG_SITE_URL}
+                             function getData%(title)s() {""" % \
+        {'site': CFG_SITE_URL, 'width': size[0], 'height': size[1], 'hwidth': int(size[0]) / 2,
+         'hheigth': int(size[1]) / 2, 'title': title}
+    if(len(trend) > 1):
+        granularity_td = (_to_datetime(trend[1][0], '%Y-%m-%d %H:%M:%S') -
+                        _to_datetime(trend[0][0], '%Y-%m-%d %H:%M:%S'))
+    else:
+        granularity_td = datetime.timedelta()
     # Create variables with the format dn = [[x1,y1], [x2,y2]]
     minx = trend[0][0]
     maxx = trend[0][0]
@@ -1839,10 +1872,11 @@ def create_graph_trend_flot(trend, path, settings):
                     minx = trend[row][0]
                 if trend[row][0] > maxx:
                     maxx = trend[row][0]
-                out += '[parseDate("%s"),%d]' % \
-                    (_to_datetime(trend[row][0], '%Y-%m-%d \
-                     %H:%M:%S'), trend[row][1][col])
-            out += "];\n"
+                out += '[parseDate%s("%s"),%d]' % \
+                    (title, _to_datetime(trend[row][0], '%Y-%m-%d \
+%H:%M:%S'), trend[row][1][col])
+            out += ", [parseDate%s('%s'), %d]];\n" % (title,
+                    _to_datetime(maxx, '%Y-%m-%d %H:%M:%S') + granularity_td, trend[-1][1][col])
         out += "return [\n"
         first = 0
         for col in range(cols):
@@ -1866,52 +1900,50 @@ def create_graph_trend_flot(trend, path, settings):
                 first = 1
             else:
                 out += ', '
-            out += '[parseDate("%s"),%d]' % \
-                (_to_datetime(trend[row][0], '%Y-%m-%d %H:%M:%S'),
+            out += '[parseDate%s("%s"),%d]' % \
+                (title, _to_datetime(trend[row][0], '%Y-%m-%d %H:%M:%S'),
                  trend[row][1])
-        out += """];
+        out += """, [parseDate%s("%s"), %d]];
                      return [d1];
                       }
-            """
-
+            """ % (title, _to_datetime(maxx, '%Y-%m-%d %H:%M:%S') +
+                   granularity_td, trend[-1][1])
 
     # Set options
-    tics = ""
-    if settings["xtic_format"] != '':
-        tics = 'xaxis: { mode:"time",min:parseDate("%s"),max:parseDate("%s")},'\
-            % (_to_datetime(minx, '%Y-%m-%d %H:%M:%S'),
-               _to_datetime(maxx, '%Y-%m-%d %H:%M:%S'))
-    tics += """
-        yaxis: {
+    tics = """yaxis: {
                 tickDecimals : 0
-        },
-        """
-    out += """var options ={
+        },"""
+    if settings["xtic_format"] != '':
+        tics = 'xaxis: { mode:"time",min:parseDate%s("%s"),max:parseDate%s("%s")},'\
+            % (title, _to_datetime(minx, '%Y-%m-%d %H:%M:%S'), title,
+               _to_datetime(maxx, '%Y-%m-%d %H:%M:%S') + granularity_td)
+
+    out += """var options%s ={
                 series: {
                    lines: { show: true },
                    points: { show: false }
                 },
-                legend: { show : false},
+                legend: {show: false},
                 %s
                 grid: { hoverable: true, clickable: true },
                 selection: { mode: "xy" }
                 };
-                """ % tics
+                """ % (title, tics, )
         # Write the plot method in javascript
 
-    out += """var startData = getData();
-        var plot = $.plot($("#placeholder"), startData, options);
-        var overview = $.plot($("#overview"), startData, {
+    out += """var startData%(title)s = getData%(title)s();
+        var plot%(title)s = $.plot($("#placeholder%(title)s"), startData%(title)s, options%(title)s);
+        var overview%(title)s = $.plot($("#overview%(title)s"), startData%(title)s, {
                  legend: { show: true, container: $("#overviewLegend") },
                  series: {
                     lines: { show: true, lineWidth: 1 },
                     shadowSize: 0
                  },
-                 %s
+                 %(tics)s
                  grid: { color: "#999" },
                  selection: { mode: "xy" }
                });
-               """ % tics
+               """ % {"title": title, "tics": tics}
 
         # Tooltip and zoom
     out += """    function showTooltip(x, y, contents) {
@@ -1928,7 +1960,7 @@ def create_graph_trend_flot(trend, path, settings):
     }
 
     var previousPoint = null;
-    $("#placeholder").bind("plothover", function (event, pos, item) {
+    $("#placeholder%(title)s").bind("plothover", function (event, pos, item) {
 
         if (item) {
             if (previousPoint != item.datapoint) {
@@ -1946,12 +1978,12 @@ def create_graph_trend_flot(trend, path, settings):
         }
     });
 
-    $("#placeholder").bind("plotclick", function (event, pos, item) {
+    $("#placeholder%(title)s").bind("plotclick", function (event, pos, item) {
         if (item) {
             plot.highlight(item.series, item.datapoint);
         }
     });
-        $("#placeholder").bind("plotselected", function (event, ranges) {
+        $("#placeholder%(title)s").bind("plotselected", function (event, ranges) {
         // clamp the zooming to prevent eternal zoom
 
         if (ranges.xaxis.to - ranges.xaxis.from < 0.00001){
@@ -1960,23 +1992,38 @@ def create_graph_trend_flot(trend, path, settings):
             ranges.yaxis.to = ranges.yaxis.from + 0.00001;}
 
         // do the zooming
-        plot = $.plot($("#placeholder"), startData,
-                      $.extend(true, {}, options, {
+        plot = $.plot($("#placeholder%(title)s"), startData%(title)s,
+                      $.extend(true, {}, options%(title)s, {
                           xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
                           yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
                       }));
 
         // don't fire event on the overview to prevent eternal loop
-        overview.setSelection(ranges, true);
+        overview%(title)s.setSelection(ranges, true);
     });
-    $("#overview").bind("plotselected", function (event, ranges) {
+    $("#overview%(title)s").bind("plotselected", function (event, ranges) {
         plot.setSelection(ranges);
     });
 });
                 </script>
 <noscript>Your browser does not support JavaScript!
-Please, select another output format</noscript>"""
+Please, select another output format</noscript>""" % {'title' : title}
     open(path, 'w').write(out)
+
+
+def get_numeric_stats(data, multiple):
+    """ Returns average, max and min values for data """
+    data = [x[1] for x in data]
+    if data == []:
+        return (0, 0, 0)
+    if multiple:
+        lists = []
+        for i in range(len(data[0])):
+            lists.append([x[i] for x in data])
+        return ([float(sum(x)) / len(x) for x in lists], [max(x) for x in lists],
+                [min(x) for x in lists])
+    else:
+        return (float(sum(data)) / len(data), max(data), min(data))
 
 
 def create_graph_table(data, path, settings):
@@ -2179,9 +2226,9 @@ def export_to_csv(data, req):
     _export('text/csv', '\n'.join(csv_list), req)
 
 
-def export_to_excel(data, req):
+def export_to_file(data, req):
     """
-    Exports the data to excel.
+    Exports the data to a file.
 
     @param data: The Python data that should be exported
     @type data: []
@@ -2189,18 +2236,24 @@ def export_to_excel(data, req):
     @param req: The Apache request object
     @type req:
     """
-    if not xlwt_imported:
-        raise Exception("Module xlwt not installed")
-    book = xlwt.Workbook(encoding="utf-8")
-    sheet1 = book.add_sheet('Sheet 1')
-    for row in range(0, len(data)):
-        for col in range(0, len(data[row])):
-            sheet1.write(row, col, "%s" % data[row][col])
-    filename = CFG_TMPDIR + "/webstat_export_" + \
-        str(time.time()).replace('.', '') + '.xls'
-    book.save(filename)
-    redirect_to_url(req, '%s/stats/export?filename=%s&mime=%s' \
+    try:
+        import xlwt
+        book = xlwt.Workbook(encoding="utf-8")
+        sheet1 = book.add_sheet('Sheet 1')
+        for row in range(0, len(data)):
+            for col in range(0, len(data[row])):
+                sheet1.write(row, col, "%s" % data[row][col])
+        filename = CFG_TMPDIR + "/webstat_export_" + \
+            str(time.time()).replace('.', '') + '.xls'
+        book.save(filename)
+        redirect_to_url(req, '%s/stats/export?filename=%s&mime=%s' \
                         % (CFG_SITE_URL, os.path.basename(filename), 'application/vnd.ms-excel'))
+    except ImportError:
+        csv_list = []
+        for row in data:
+            row = ['"%s"' % str(col) for col in row]
+            csv_list.append(",".join(row))
+        _export('text/csv', '\n'.join(csv_list), req)
 # INTERNAL
 
 def _export(mime, content, req):
@@ -2217,7 +2270,7 @@ def _export(mime, content, req):
 
 
 def _get_trend_from_actions(action_dates, initial_value,
-                            t_start, t_end, granularity, dt_format):
+                            t_start, t_end, granularity, dt_format, acumulative=False):
     """
     Given a list of dates reflecting some sort of action/event, and some additional parameters,
     an internal data format is returned. 'initial_value' set to zero, means that the frequency
@@ -2229,11 +2282,11 @@ def _get_trend_from_actions(action_dates, initial_value,
     @param initial_value: The numerical offset the first action's value should make use of.
     @type initial_value: int
 
-    @param t_start: Start time for the time domain in format %Y-%m-%d %H:%M:%S
+    @param t_start: Start time for the time domain in dt_format
     @type t_start: str
 
-    @param t_stop: End time for the time domain in format %Y-%m-%d %H:%M:%S
-    @type t_stop: str
+    @param t_end: End time for the time domain in dt_format
+    @type t_end: str
 
     @param granularity: The granularity of the time domain, span between values.
                         Possible values are [year,month,day,hour,minute,second].
@@ -2246,51 +2299,85 @@ def _get_trend_from_actions(action_dates, initial_value,
     @type: [(str, int)]
     """
     # Append the maximum date as a sentinel indicating we're done
-    action_dates.insert(0, datetime.datetime.max)
-
-    # Create an iterator running from the first day of activity
-    dt_iter = _get_datetime_iter(t_start, granularity, dt_format)
+    action_dates = list(action_dates)
 
     # Construct the datetime tuple for the stop time
     stop_at = _to_datetime(t_end, dt_format) - datetime.timedelta(seconds=1)
 
-    # If our t_start is more recent than the initial action_dates, we need to
-    # drop those.
-    t_start_dt = _to_datetime(t_start, dt_format)
-    while action_dates[-1] < t_start_dt:
-        action_dates = action_dates[:-1]
-
     vector = [(None, initial_value)]
-    # pylint: disable=E1101
-    old = dt_iter.next()
-    # pylint: enable=E1101
-    upcoming_action = action_dates.pop()
 
-    for current in dt_iter:
+    try:
+        upcoming_action = action_dates.pop()
+        #Do not count null values (when year, month or day is 0)
+        if granularity in ("year", "month", "day") and upcoming_action[0] == 0:
+            upcoming_action = action_dates.pop()
+    except IndexError:
+        upcoming_action = (datetime.datetime.max, 0)
+
+    # Create an iterator running from the first day of activity
+    for current in _get_datetime_iter(t_start, granularity, dt_format):
         # Counter of action_dates in the current span, set the initial value to
         # zero to avoid accumlation.
-        if initial_value != 0:
+        if acumulative:
             actions_here = vector[-1][1]
         else:
             actions_here = 0
-
         # Check to see if there's an action date in the current span
-        while old <= upcoming_action < current:
-            actions_here += 1
+        if upcoming_action[0] == {"year": current.year,
+            "month": current.month,
+            "day": current.day,
+            "hour": current.hour,
+            "minute": current.minute,
+            "second": current.second
+            }[granularity]:
+            actions_here += upcoming_action[1]
             try:
                 upcoming_action = action_dates.pop()
             except IndexError:
-                upcoming_action = datetime.datetime.max
+                upcoming_action = (datetime.datetime.max, 0)
 
-        vector.append((old.strftime('%Y-%m-%d %H:%M:%S'), actions_here))
-        old = current
+        vector.append((current.strftime('%Y-%m-%d %H:%M:%S'), actions_here))
 
         # Make sure to stop the iteration at the end time
-        if current > stop_at:
+        if {"year": current.year >= stop_at.year,
+            "month": current.month >= stop_at.month and current.year == stop_at.year,
+            "day": current.day >= stop_at.day and current.month == stop_at.month,
+            "hour": current.hour >= stop_at.hour and current.day == stop_at.day,
+            "minute": current.minute >= stop_at.minute and current.hour == stop_at.hour,
+            "second": current.second >= stop_at.second and current.minute == stop_at.minute
+            }[granularity]:
             break
-
     # Remove the first bogus tuple, and return
     return vector[1:]
+
+
+def _get_keyevent_trend(args, sql, initial_quantity=0, extra_param=[],
+                        return_sql=False, sql_text='%s', acumulative=False):
+    """
+    Returns the trend for the sql passed in the given timestamp range.
+
+    @param args['t_start']: Date and time of start point
+    @type args['t_start']: str
+
+    @param args['t_end']: Date and time of end point
+    @type args['t_end']: str
+
+    @param args['granularity']: Granularity of date and time
+    @type args['granularity']: str
+
+    @param args['t_format']: Date and time formatting string
+    @type args['t_format']: str
+    """
+    # collect action dates
+    lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
+    upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
+    param = tuple([lower, upper] + extra_param)
+    if return_sql:
+        sql = sql % param
+        return sql_text % sql
+
+    return _get_trend_from_actions(run_sql(sql, param), initial_quantity, args['t_start'],
+                          args['t_end'], args['granularity'], args['t_format'], acumulative)
 
 
 def _get_datetime_iter(t_start, granularity='day',
@@ -2395,7 +2482,8 @@ def _get_libraries():
     """Returns all the possible libraries"""
     dts = []
     for dat in run_sql("SELECT name FROM crcLIBRARY ORDER BY name ASC"):
-        dts.append((dat[0], dat[0]))
+        if not CFG_CERN_SITE or not "CERN" in dat[0]: # do not add internal libraries for CERN site
+            dts.append((dat[0], dat[0]))
     return dts
 
 
@@ -2418,3 +2506,63 @@ def _get_tag_name(tag):
     if res:
         return res[0][0]
     return ''
+
+def _get_collection_recids_for_sql_query(coll):
+    ids = get_collection_reclist(coll).tolist()
+    if len(ids) == 0:
+        return ""
+    return "id_bibrec IN %s" % str(ids).replace('[', '(').replace(']', ')')
+
+def _check_udc_value_where():
+    return "id_bibrec IN (SELECT brb.id_bibrec \
+FROM bibrec_bib08x brb, bib08x b WHERE brb.id_bibxxx = b.id AND tag='080__a' \
+AND value LIKE %s) "
+
+def _get_udc_truncated(udc):
+    if udc[-1] == '*':
+        return "%s%%" % udc[:-1]
+    if udc[0] == '*':
+        return "%%%s" % udc[1:]
+    return "%s" % udc
+
+def _check_empty_value(value):
+    if len(value) == 0:
+        return ""
+    else:
+        return value[0][0]
+
+def _get_granularity_sql_functions(granularity):
+    try:
+        return {
+            "year": ("YEAR",),
+            "month": ("YEAR", "MONTH",),
+            "day": ("MONTH", "DAY",),
+            "hour": ("DAY", "HOUR",),
+            "minute": ("HOUR", "MINUTE",),
+            "second": ("MINUTE", "SECOND")
+            }[granularity]
+    except KeyError:
+        return ("MONTH", "DAY",)
+
+def _get_sql_query(creation_time_name, granularity, tables_from, conditions="",
+                   extra_select="", dates_range_param="", group_by=True, count=True):
+    if len(dates_range_param) == 0:
+        dates_range_param = creation_time_name
+    conditions = "%s > %%s AND %s < %%s %s" % (dates_range_param, dates_range_param,
+                                    len(conditions) > 0 and "AND %s" % conditions or "")
+    values = {'creation_time_name': creation_time_name,
+         'granularity_sql_function': _get_granularity_sql_functions(granularity)[-1],
+         'count': count and ", COUNT(*)" or "",
+         'tables_from': tables_from,
+         'conditions': conditions,
+         'extra_select': extra_select,
+         'group_by': ""}
+    if group_by:
+        values['group_by'] = "GROUP BY "
+        for fun in _get_granularity_sql_functions(granularity):
+            values['group_by'] += "%s(%s), " % (fun, creation_time_name)
+        values['group_by'] = values['group_by'][:-2]
+    return "SELECT %(granularity_sql_function)s(%(creation_time_name)s) %(count)s %(extra_select)s \
+FROM %(tables_from)s WHERE %(conditions)s \
+%(group_by)s \
+ORDER BY %(creation_time_name)s DESC" % values
