@@ -375,7 +375,6 @@ function onAjaxSuccess(json, onSuccess){
   }
   else if (resCode == 110){
     displayMessage(resCode, true, [json['errors'].toString()]);
-    $(document).scrollTop(0);
     updateStatus('error', gRESULT_CODES[resCode]);
   }
   else{
@@ -1704,15 +1703,47 @@ function applyFieldTemplate(jQRowGroupID, formData, fieldTmpNo){
 }
 
 function createAddFieldInterface(initialContent, initialTemplateNo){
-  // Create form and scroll close to the top of the table.
-  $(document).scrollTop(0);
+  /* Create form to add a new field. If only one field is selected, the
+   * new field will be inserted below it. Otherwise, the new field will
+   * be inserted in the 3rd position
+   */
+
+  // Check if we are in the use case of adding in a specific position
+  var selected_fields = getSelectedFields();
+  var insert_below_selected = false;
+  if (selected_fields != undefined) {
+      var count_fields = 0;
+      var selected_local_field_pos;
+      var selected_tag;
+      for (var tag in selected_fields.fields) {
+          for (var localFieldPos in selected_fields.fields[tag]) {
+              count_fields++;
+              selected_local_field_pos = localFieldPos;
+          }
+          selected_tag = tag;
+      }
+      if (count_fields === 1)
+          insert_below_selected = true;
+  }
+
   var fieldTmpNo = onAddFieldClick.addFieldFreeTmpNo++;
   var jQRowGroupID = '#rowGroupAddField_' + fieldTmpNo;
   $('#bibEditColFieldTag').css('width', '90px');
   var tbodyElements = $('#bibEditTable tbody');
-  var insertionPoint = (tbodyElements.length >= 4) ? 3 : tbodyElements.length-1;
-  $('#bibEditTable tbody').eq(insertionPoint).after(
-    createAddFieldForm(fieldTmpNo, initialTemplateNo));
+
+  // If only one field selected, add below the selected field
+  if (insert_below_selected === true) {
+      $('#rowGroup' + '_' + selected_tag + '_' + selected_local_field_pos).after(
+      createAddFieldForm(fieldTmpNo, initialTemplateNo));
+      $(jQRowGroupID).data('insertionPoint', parseInt(selected_local_field_pos) + 1);
+      $(jQRowGroupID).data('selected_tag', selected_tag);
+  }
+  else {
+      var insertionPoint = (tbodyElements.length >= 4) ? 3 : tbodyElements.length-1;
+      $('#bibEditTable tbody').eq(insertionPoint).after(
+      createAddFieldForm(fieldTmpNo, initialTemplateNo));
+  }
+  
   $(jQRowGroupID).data('freeSubfieldTmpNo', 1);
 
   // Bind event handlers.
@@ -1745,7 +1776,6 @@ function createAddFieldInterface(initialContent, initialTemplateNo){
   }else{
     $(jQRowGroupID).data('isControlfield', false);
   }
-
   reColorFields();
   $('#txtAddFieldTag_' + fieldTmpNo).focus();
   // Color the new form for a short period.
@@ -1911,6 +1941,10 @@ function addFieldSave(fieldTmpNo)
   var value = $('#txtAddFieldValue_' + fieldTmpNo + '_0').val();
   var subfields = [], ind1 = ' ', ind2 = ' ';
 
+  // variables used when we are adding a field in a specific position
+  var insertPosition = $(jQRowGroupID).data('insertionPoint');
+  var selected_tag = $(jQRowGroupID).data('selected_tag');
+
   if (controlfield){
     // Controlfield. Validate and prepare to update.
     if (fieldIsProtected(tag)){
@@ -1987,7 +2021,13 @@ function addFieldSave(fieldTmpNo)
       return;
     }
     var field = [subfields, ind1, ind2, '', 0];
-    var fieldPosition = getFieldPositionInTag(tag, field);
+    var fieldPosition;
+    if ((insertPosition != undefined) && (tag == selected_tag)) {
+        fieldPosition = $(jQRowGroupID).data('insertionPoint');
+    }
+    else {
+        fieldPosition = getFieldPositionInTag(tag, field);
+    }
   }
 
   // adding an undo handler
@@ -2020,8 +2060,9 @@ function addFieldSave(fieldTmpNo)
   // Continue local updating.
   var fields = gRecord[tag];
   // New field?
-  if (!fields)
+  if (!fields) {
     gRecord[tag] = [field];
+  }
   else{
     fields.splice(fieldPosition, 0, field);
   }
@@ -2032,9 +2073,9 @@ function addFieldSave(fieldTmpNo)
   // Redraw all fields with the same tag and recolor the full table.
   redrawFields(tag);
   reColorFields();
-  // Scroll to and color the new field for a short period.
+  // Scroll and color the new field for a short period.
   var rowGroup = $('#rowGroup_' + tag + '_' + fieldPosition);
-  $(document).scrollTop($(rowGroup).position().top - $(window).height()*0.5);
+  $('#bibEditContent').scrollTop($(rowGroup).position().top);
   $(rowGroup).effect('highlight', {color: gNEW_CONTENT_COLOR},
          gNEW_CONTENT_COLOR_FADE_DURATION);
 }
