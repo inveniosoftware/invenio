@@ -76,9 +76,13 @@ class Template:
 
         # comments
         comment_rows = ''
-        max_comment_round_name = comments[-1][0]
+        last_comment_round_name = None
+        comment_round_names = [comment[0] for comment in comments]
+        if comment_round_names:
+            last_comment_round_name = comment_round_names[-1]
+
         for comment_round_name, comments_list in comments:
-            comment_rows += '<div id="cmtRound%i" class="cmtRound">' % (comment_round_name)
+            comment_rows += '<div id="cmtRound%s" class="cmtRound">' % (comment_round_name)
             comment_rows += _('%(x_nb)i comments for round "%(x_name)s"') % {'x_nb': len(comments_list), 'x_name': comment_round_name}  + "<br/>"
             for comment in comments_list:
                 if comment[c_nickname]:
@@ -142,8 +146,8 @@ class Template:
              'write_button_form': write_button_form,
              'nb_comments': len(comments)
             }
-        else:
-            out = """
+            else:
+                out = """
 <!--  comments title table -->
 <table>
   <tr>
@@ -227,9 +231,13 @@ class Template:
 
         #comment row
         comment_rows = ' '
-        max_comment_round_name = comments[-1][0]
+        last_comment_round_name = None
+        comment_round_names = [comment[0] for comment in comments]
+        if comment_round_names:
+            last_comment_round_name = comment_round_names[-1]
+
         for comment_round_name, comments_list in comments:
-            comment_rows += '<div id="cmtRound%i" class="cmtRound">' % (comment_round_name)
+            comment_rows += '<div id="cmtRound%s" class="cmtRound">' % (comment_round_name)
             comment_rows += _('%(x_nb)i comments for round "%(x_name)s"') % {'x_nb': len(comments_list), 'x_name': comment_round_name} + "<br/>"
             for comment in comments_list:
                 if comment[c_nickname]:
