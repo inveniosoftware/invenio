@@ -200,7 +200,7 @@ try:
     from invenio.bibsword_webinterface import \
          WebInterfaceSword
 except:
-    register_exception(alert_admin=True, subject='EMERGENCE')
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceSword = WebInterfaceDumbPages
 
 try:
