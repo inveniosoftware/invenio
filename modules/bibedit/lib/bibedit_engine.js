@@ -1714,7 +1714,6 @@ function applyFieldTemplate(jQRowGroupID, formData, fieldTmpNo){
 }
 
 function createAddFieldInterface(initialContent, initialTemplateNo){
-<<<<<<< HEAD
   /* Create form to add a new field. If only one field is selected, the
    * new field will be inserted below it. Otherwise, the new field will
    * be inserted in the 3rd position
@@ -1739,12 +1738,6 @@ function createAddFieldInterface(initialContent, initialTemplateNo){
   }
 
   var fieldTmpNo = onAddFieldClick.addFieldFreeTmpNo++;
-=======
-  // Create form and scroll close to the top of the table.
-  $(document).scrollTop(0);
-  var fieldTmpNo = onAddFieldClick.addFieldFreeTmpNo;
-  onAddFieldClick.addFieldFreeTmpNo += 1;
->>>>>>> 7e182d3... BibEdit: Cleaning of the JavaScript code
   var jQRowGroupID = '#rowGroupAddField_' + fieldTmpNo;
   $('#bibEditColFieldTag').css('width', '90px');
   var tbodyElements = $('#bibEditTable tbody');
