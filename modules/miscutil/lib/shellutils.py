@@ -149,21 +149,67 @@ def run_shell_command(cmd, args=None, filename_out=None, filename_err=None):
     # return results:
     return cmd_exit_code, cmd_out, cmd_err
 
-def run_process_with_timeout(args, filename_in=None, filename_out=None, filename_err=None, cwd=None, timeout=CFG_MISCUTIL_DEFAULT_PROCESS_TIMEOUT):
-    stdin = subprocess.PIPE
+def run_process_with_timeout(args, filename_in=None, filename_out=None, filename_err=None, cwd=None, timeout=CFG_MISCUTIL_DEFAULT_PROCESS_TIMEOUT, sudo=None):
+    """Execute the specified process but within a certain timeout.
+
+    @param args: the actuall process. This should be a list of string as in:
+         ['/usr/bin/foo', '--bar', 'baz']
+    @type args: list of string
+
+    @param filename_in: the path to a file that should be provided as standard
+        input to the process. If None this will default to /dev/null
+    @type filename_in: string
+
+    @param filename_out: Desired filename for stdout output
+        (optional; see below).
+    @type filename_out: string
+
+    @param filename_err: Desired filename for stderr output
+        (optional; see below).
+    @type filename_err: string
+
+    @param cwd: the path from where to execute the process
+    @type cwd: string
+
+    @param timeout: the timeout in seconds after which to consider the
+        process execution as failed. a Timeout exception will be raised
+    @type timeout: int
+
+    @param sudo: the optional name of the user under which to execute the
+        process (by using sudo, without prompting for a password)
+    @type sudo: string
+
+    @return: Tuple (exit code, string containing stdout output buffer,
+        string containing stderr output buffer).
+
+        However, if either filename_out or filename_err are defined,
+        then the output buffers are not passed back but rather written
+        into filename_out/filename_err pathnames.  This is useful for
+        commands that produce big files, for which it is not practical
+        to pass results back to the callers in a Python text buffer.
+        Note that it is the client's responsibility to name these
+        files in the proper fashion (e.g. to be unique) and to close
+        these files after use.
+    @rtype: (number, string, string)
+
+    @raise Timeout: if the process does not terminate within the timeout
+    """
     stdout = stderr = None
-    if filename_in:
+    if filename_in is not None:
         stdin = open(filename_in)
+    else:
+        ## FIXME: should use NUL on Windows
+        stdin = open('/dev/null', 'r')
     if filename_out:
         stdout = open(filename_out, 'w')
     if filename_err:
         stderr = open(filename_err, 'w')
     tmp_stdout = StringIO()
     tmp_stderr = StringIO()
-    s("filename_in: %s, filename_out: %s, filename_err: %s, stdin: %s, stdout: %s, stderr: %s, tmp_stdout: %s, tmp_stderr: %s" % (filename_in, filename_out, filename_err, stdin, stdout, stderr, tmp_stdout, tmp_stderr))
+    if sudo is not None:
+        args = ['sudo', '-u', sudo, '-S'] + list(args)
     ## See: <http://stackoverflow.com/questions/3876886/timeout-a-subprocess>
     process = subprocess.Popen(args, stdin=stdin, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True, cwd=cwd, preexec_fn=os.setpgrp)
-    s("process: %s, pid: %s, args: %s, cwd: %s" % (process, process.pid, args, cwd))
 
     ## See: <http://stackoverflow.com/questions/375427/non-blocking-read-on-a-stream-in-python>
     fd = process.stdout.fileno()
@@ -178,9 +224,9 @@ def run_process_with_timeout(args, filename_in=None, filename_out=None, filename
     t1 = time.time()
     try:
         while process.poll() is None:
-            s("polling")
             if time.time() - t1 >= timeout:
-                process.stdin.close()
+                if process.stdin is not None:
+                    process.stdin.close()
                 time.sleep(1)
                 if process.poll() is None:
                     ## See: <http://stackoverflow.com/questions/3876886/timeout-a-subprocess>
@@ -196,20 +242,21 @@ def run_process_with_timeout(args, filename_in=None, filename_out=None, filename
             for fd, event in poller.poll(500):
                 if fd == process.stdout.fileno():
                     buf = process.stdout.read(65536)
-                    tmp_stdout.write(buf)
-                    if stdout is not None:
+                    if stdout is None:
+                        tmp_stdout.write(buf)
+                    else:
                         stdout.write(buf)
                 elif fd == process.stderr.fileno():
                     buf = process.stderr.read(65536)
-                    tmp_stderr.write(buf)
-                    if stderr is not None:
+                    if stderr is None:
+                        tmp_stderr.write(buf)
+                    else:
                         stderr.write(buf)
                 else:
                     raise OSError("fd %s is not a valid file descriptor" % fd)
     finally:
         while True:
             ## Let's just read what is remaining to read.
-            s("flushing")
             for fd, event in poller.poll(500):
                 if fd == process.stdout.fileno():
                     buf = process.stdout.read(65536)

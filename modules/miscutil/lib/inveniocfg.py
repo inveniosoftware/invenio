@@ -512,64 +512,18 @@ def cli_check_openoffice(conf):
     If OpenOffice.org integration is enabled, checks whether the system is
     properly configured.
     """
-    from invenio.textutils import wrap_text_in_a_box
-    from invenio.websubmit_file_converter import unoconv, CFG_OPENOFFICE_TMPDIR, \
-    get_file_converter_logger
-    from invenio.config import CFG_OPENOFFICE_USER, \
-        CFG_PATH_OPENOFFICE_PYTHON, \
-        CFG_OPENOFFICE_SERVER_HOST, \
-        CFG_BIBSCHED_PROCESS_USER,\
-        CFG_BINDIR, CFG_TMPDIR
-    from logging import basicConfig, DEBUG
-    from invenio.bibtask import guess_apache_process_user, \
-        check_running_process_user
-    from invenio.websubmit_file_converter import unoconv, convert_file
+    from invenio.bibtask import check_running_process_user
+    from invenio.websubmit_file_converter import can_unoconv, get_file_converter_logger
+    logger = get_file_converter_logger()
+    for handler in logger.handlers:
+        logger.removeHandler(handler)
     check_running_process_user()
-    print ">>> Checking if OpenOffice is correctly integrated...",
-    if CFG_OPENOFFICE_SERVER_HOST:
-        try:
-            #basicConfig()
-            #get_file_converter_logger().setLevel(DEBUG)
-            test = os.path.join(CFG_TMPDIR, 'test.txt')
-            open(test, 'w').write('test')
-            output = unoconv(test, output_format='pdf')
-            output2 = convert_file(output, output_format='.txt')
-            if 'test' not in open(output2).read():
-                raise Exception("Coulnd't produce a valid PDF with OpenOffice")
-            os.remove(output2)
-            os.remove(output)
-            os.remove(test)
-        except Exception, err:
-            print wrap_text_in_a_box("""\
-OpenOffice.org can't properly create files in the OpenOffice.org temporary
-directory %(tmpdir)s, as the user %(nobody)s (as configured in
-CFG_OPENOFFICE_USER invenio(-local).conf variable): %(err)s.
-
-In your /etc/sudoers file, you should authorize the %(apache)s user to run
- %(unoconv)s as %(nobody)s user as in:
-
-
-%(apache)s ALL=(%(nobody)s) NOPASSWD: %(unoconv)s
-
-
-You should then run the following commands:
-
-$ sudo mkdir -p %(tmpdir)s
-
-$ sudo chown %(nobody)s %(tmpdir)s
-
-$ sudo chmod 755 %(tmpdir)s""" % {
-            'tmpdir' : CFG_OPENOFFICE_TMPDIR,
-            'nobody' : CFG_OPENOFFICE_USER,
-            'err' : err,
-            'apache' : CFG_BIBSCHED_PROCESS_USER or guess_apache_process_user(),
-            'python' : CFG_PATH_OPENOFFICE_PYTHON,
-            'unoconv' : os.path.join(CFG_BINDIR, 'inveniounoconv')
-            })
-            sys.exit(1)
+    print ">>> Checking if Libre/OpenOffice.org is correctly integrated...",
+    sys.stdout.flush()
+    if can_unoconv(True):
         print "ok"
     else:
-        print "OpenOffice.org integration not enabled"
+        sys.exit(1)
 
 def test_db_connection():
     """

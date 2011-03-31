@@ -557,6 +557,15 @@ Contents
           "make install" process.  We continue by setting up the
           Apache web server.
 
+      $ sudo -u www-data /opt/invenio/bin/inveniocfg --check-openoffice
+
+          If you plan to support MS Office or Open Document Format files
+          in your installation, and you want to check whether LibreOffice
+          or OpenOffice.org is well integrated with Invenio, run this
+          command to check if your setup is correct.
+          In case of any problem the process will output guidelines to
+          follow in order to properly further configure your system.
+
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --load-webstat-conf
 
           Load the configuration file of webstat module. It will create

@@ -180,6 +180,11 @@ else:
         self.failIf('PID != PGID' in stdout, 'PID != PGID was found in current output: %s (%s)' % (stdout, stderr))
         self.failUnless('PID == PGID' in stdout, 'PID == PGID wasn\'t found in current output: %s (%s)' % (stdout, stderr))
 
+    def test_run_cmd_viasudo_no_password(self):
+        """shellutils - running simple command via sudo should not wait for password"""
+        exitstatus, stdout, stderr = run_process_with_timeout([self.script_path, '5'], timeout=10, sudo='foo')
+        self.assertNotEqual(exitstatus, 0)
+
 TEST_SUITE = make_test_suite(EscapeShellArgTest,
                              RunShellCommandTest,
                              RunProcessWithTimeoutTest)

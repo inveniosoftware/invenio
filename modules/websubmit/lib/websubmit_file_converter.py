@@ -44,6 +44,7 @@ try:
 except ImportError:
     CFG_CAN_DO_OCR = False
 
+from invenio.textutils import wrap_text_in_a_box
 from invenio.shellutils import run_process_with_timeout, run_shell_command
 from invenio.config import CFG_TMPDIR, CFG_ETCDIR, CFG_PYLIBDIR, \
     CFG_PATH_ANY2DJVU, \
@@ -67,7 +68,8 @@ from invenio.config import CFG_TMPDIR, CFG_ETCDIR, CFG_PYLIBDIR, \
     CFG_OPENOFFICE_USER, \
     CFG_PATH_CONVERT, \
     CFG_PATH_PAMFILE, \
-    CFG_BINDIR
+    CFG_BINDIR, \
+    CFG_BIBSCHED_PROCESS_USER
 
 from invenio.websubmit_config import \
     CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM, \
@@ -457,7 +459,7 @@ def _register_unoconv():
     _UNOCONV_DAEMON_LOCK.acquire()
     try:
         if not _UNOCONV_DAEMON:
-            _UNOCONV_DAEMON = subprocess.Popen(['sudo', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-s', CFG_OPENOFFICE_SERVER_HOST, '-p', str(CFG_OPENOFFICE_SERVER_PORT), '-l'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            _UNOCONV_DAEMON = subprocess.Popen(['sudo', '-S', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-s', CFG_OPENOFFICE_SERVER_HOST, '-p', str(CFG_OPENOFFICE_SERVER_PORT), '-l'], stdin=open('/dev/null', 'r'), stdout=open('/dev/null', 'r'), stderr=open('/dev/null', 'r'))
             time.sleep(3)
     finally:
         _UNOCONV_DAEMON_LOCK.release()
@@ -470,12 +472,7 @@ def _unregister_unoconv():
     _UNOCONV_DAEMON_LOCK.acquire()
     try:
         if _UNOCONV_DAEMON:
-            subprocess.call(['sudo', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-k'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            try:
-                _UNOCONV_DAEMON.stdin.close()
-            except AttributeError:
-                ## To skip: "'NoneType' object has no attribute 'close'"
-                pass
+            subprocess.call(['sudo', '-S', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-k'], stdin=open('/dev/null', 'r'), stdout=open('/dev/null', 'r'), stderr=open('/dev/null', 'r'))
             time.sleep(1)
             if _UNOCONV_DAEMON.poll():
                 try:
@@ -501,37 +498,40 @@ def unoconv(input_file, output_file=None, output_format='txt', pdfopt=True, **du
     else:
         unoconv_format = output_format
     try:
-        ## We copy the input file and we make it available to OpenOffice
-        ## with the user nobody
-        from invenio.bibdocfile import decompose_file
-        input_format = decompose_file(input_file, skip_version=True)[2]
-        fd, tmpinputfile = tempfile.mkstemp(dir=CFG_TMPDIR, suffix=normalize_format(input_format))
-        os.close(fd)
-        shutil.copy(input_file, tmpinputfile)
-        get_file_converter_logger().debug("Prepared input file %s" % tmpinputfile)
-        os.chmod(tmpinputfile, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
-        tmpoutputfile = tempfile.mktemp(dir=CFG_OPENOFFICE_TMPDIR, suffix=normalize_format(output_format))
-        get_file_converter_logger().debug("Prepared output file %s" % tmpoutputfile)
         try:
-            execute_command('sudo', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-s', CFG_OPENOFFICE_SERVER_HOST, '-p', str(CFG_OPENOFFICE_SERVER_PORT), '--output', tmpoutputfile, '-f', unoconv_format, tmpinputfile)
-        except:
-            register_exception(alert_admin=True)
-            raise
-    except InvenioWebSubmitFileConverterError:
-        ## Ok maybe OpenOffice hanged. Let's better kill it and restarted!
-        _unregister_unoconv()
-        _register_unoconv()
-        time.sleep(5)
-        try:
-            execute_command('sudo', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-s', CFG_OPENOFFICE_SERVER_HOST, '-p', str(CFG_OPENOFFICE_SERVER_PORT), '--output', tmpoutputfile, '-f', unoconv_format, tmpinputfile)
+            ## We copy the input file and we make it available to OpenOffice
+            ## with the user nobody
+            from invenio.bibdocfile import decompose_file
+            input_format = decompose_file(input_file, skip_version=True)[2]
+            fd, tmpinputfile = tempfile.mkstemp(dir=CFG_TMPDIR, suffix=normalize_format(input_format))
+            os.close(fd)
+            shutil.copy(input_file, tmpinputfile)
+            get_file_converter_logger().debug("Prepared input file %s" % tmpinputfile)
+            os.chmod(tmpinputfile, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
+            tmpoutputfile = tempfile.mktemp(dir=CFG_OPENOFFICE_TMPDIR, suffix=normalize_format(output_format))
+            get_file_converter_logger().debug("Prepared output file %s" % tmpoutputfile)
+            try:
+                execute_command(os.path.join(CFG_BINDIR, 'inveniounoconv'), '-s', CFG_OPENOFFICE_SERVER_HOST, '-p', str(CFG_OPENOFFICE_SERVER_PORT), '--output', tmpoutputfile, '-f', unoconv_format, tmpinputfile, sudo=CFG_OPENOFFICE_USER)
+            except:
+                register_exception(alert_admin=True)
+                raise
         except InvenioWebSubmitFileConverterError:
-            execute_command('sudo', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-k')
-            if not os.path.exists(tmpoutputfile) or not os.path.getsize(tmpoutputfile):
-                raise InvenioWebSubmitFileConverterError('No output was generated by OpenOffice')
-            else:
-                ## Sometimes OpenOffice crashes but we don't care :-)
-                ## it still have created a nice file.
-                pass
+            ## Ok maybe OpenOffice hanged. Let's better kill it and restarted!
+            _unregister_unoconv()
+            _register_unoconv()
+            time.sleep(5)
+            try:
+                execute_command(os.path.join(CFG_BINDIR, 'inveniounoconv'), '-s', CFG_OPENOFFICE_SERVER_HOST, '-p', str(CFG_OPENOFFICE_SERVER_PORT), '--output', tmpoutputfile, '-f', unoconv_format, tmpinputfile, sudo=CFG_OPENOFFICE_USER)
+            except InvenioWebSubmitFileConverterError:
+                execute_command(os.path.join(CFG_BINDIR, 'inveniounoconv'), '-k', sudo=CFG_OPENOFFICE_USER)
+                if not os.path.exists(tmpoutputfile) or not os.path.getsize(tmpoutputfile):
+                    raise InvenioWebSubmitFileConverterError('No output was generated by OpenOffice')
+                else:
+                    ## Sometimes OpenOffice crashes but we don't care :-)
+                    ## it still have created a nice file.
+                    pass
+    except Exception, err:
+        raise InvenioWebSubmitFileConverterError(get_unoconv_installation_guideline(err))
 
     output_format = normalize_format(output_format)
 
@@ -539,9 +539,67 @@ def unoconv(input_file, output_file=None, output_format='txt', pdfopt=True, **du
         pdf2pdfopt(tmpoutputfile, output_file)
     else:
         shutil.copy(tmpoutputfile, output_file)
-    execute_command('sudo', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-r', tmpoutputfile)
+    execute_command(os.path.join(CFG_BINDIR, 'inveniounoconv'), '-r', tmpoutputfile, sudo=CFG_OPENOFFICE_USER)
     os.remove(tmpinputfile)
     return output_file
+
+def get_unoconv_installation_guideline(err):
+    """Return the Libre/OpenOffice installation guideline (embedding the
+    current error message).
+    """
+    from invenio.bibtask import guess_apache_process_user
+    return wrap_text_in_a_box("""\
+OpenOffice.org can't properly create files in the OpenOffice.org temporary
+directory %(tmpdir)s, as the user %(nobody)s (as configured in
+CFG_OPENOFFICE_USER invenio(-local).conf variable): %(err)s.
+
+In your /etc/sudoers file, you should authorize the %(apache)s user to run
+ %(unoconv)s as %(nobody)s user as in:
+
+
+%(apache)s ALL=(%(nobody)s) NOPASSWD: %(unoconv)s
+
+
+You should then run the following commands:
+
+$ sudo mkdir -p %(tmpdir)s
+
+$ sudo chown -R %(nobody)s %(tmpdir)s
+
+$ sudo chmod 755 %(tmpdir)s""" % {
+            'tmpdir' : CFG_OPENOFFICE_TMPDIR,
+            'nobody' : CFG_OPENOFFICE_USER,
+            'err' : err,
+            'apache' : CFG_BIBSCHED_PROCESS_USER or guess_apache_process_user(),
+            'python' : CFG_PATH_OPENOFFICE_PYTHON,
+            'unoconv' : os.path.join(CFG_BINDIR, 'inveniounoconv')
+            })
+
+def can_unoconv(verbose=False):
+    """
+    If OpenOffice.org integration is enabled, checks whether the system is
+    properly configured.
+    """
+    if CFG_PATH_OPENOFFICE_PYTHON and CFG_OPENOFFICE_SERVER_HOST:
+        try:
+            test = os.path.join(CFG_TMPDIR, 'test.txt')
+            open(test, 'w').write('test')
+            output = unoconv(test, output_format='pdf')
+            output2 = convert_file(output, output_format='.txt')
+            if 'test' not in open(output2).read():
+                raise Exception("Coulnd't produce a valid PDF with Libre/OpenOffice.org")
+            os.remove(output2)
+            os.remove(output)
+            os.remove(test)
+            return True
+        except Exception, err:
+            if verbose:
+                print >> sys.stderr, get_unoconv_installation_guideline(err)
+            return False
+    else:
+        if verbose:
+            print >> sys.stderr, "Libre/OpenOffice.org integration not enabled"
+        return False
 
 
 def any2djvu(input_file, output_file=None, resolution=400, ocr=True, input_format=5, **dummy):
@@ -1106,7 +1164,7 @@ def execute_command(*args, **argd):
     """Wrapper to run_process_with_timeout."""
     get_file_converter_logger().debug("Executing: %s" % (args, ))
     args = [str(arg) for arg in args]
-    res, stdout, stderr = run_process_with_timeout(args, cwd=argd.get('cwd'), filename_out=argd.get('filename_out'), filename_err=argd.get('filename_err'))
+    res, stdout, stderr = run_process_with_timeout(args, cwd=argd.get('cwd'), filename_out=argd.get('filename_out'), filename_err=argd.get('filename_err'), sudo=argd.get('sudo'))
     get_file_converter_logger().debug('res: %s, stdout: %s, stderr: %s' % (res, stdout, stderr))
     if res != 0:
         message = "ERROR: Error in running %s\n stdout:\n%s\nstderr:\n%s\n" % (args, stdout, stderr)
@@ -1118,7 +1176,7 @@ def execute_command(*args, **argd):
 def execute_command_with_stderr(*args, **argd):
     """Wrapper to run_process_with_timeout."""
     get_file_converter_logger().debug("Executing: %s" % (args, ))
-    res, stdout, stderr = run_process_with_timeout(args, cwd=argd.get('cwd'), filename_out=argd.get('filename_out'))
+    res, stdout, stderr = run_process_with_timeout(args, cwd=argd.get('cwd'), filename_out=argd.get('filename_out'), sudo=argd.get('sudo'))
     if res != 0:
         message = "ERROR: Error in running %s\n stdout:\n%s\nstderr:\n%s\n" % (args, stdout, stderr)
         get_file_converter_logger().error(message)

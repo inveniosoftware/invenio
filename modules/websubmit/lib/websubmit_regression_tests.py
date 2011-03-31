@@ -150,20 +150,19 @@ class WebSubmitFileConverterTest(unittest.TestCase):
         from invenio.websubmit_file_converter import get_file_converter_logger
         from logging import StreamHandler, DEBUG
         from cStringIO import StringIO
-        self.logger = get_file_converter_logger()
+        logger = get_file_converter_logger()
         self.log = StringIO()
-        self.logger.setLevel(DEBUG)
-        for handler in self.logger.handlers:
-            self.logger.removeHandler(handler)
+        logger.setLevel(DEBUG)
+        for handler in logger.handlers:
+            logger.removeHandler(handler)
         handler = StreamHandler(self.log)
-        self.logger.addHandler(handler)
+        handler.setLevel(DEBUG)
+        logger.addHandler(handler)
         self.from_format = from_format
         self.to_format = to_format
         self.input_file = input_file
         self._testMethodDoc = """websubmit - test %s to %s conversion""" % (self.from_format, self.to_format)
         self._testMethodName = "test_conversion"
-
-        # """test_conversion_from_%s_to_%s""" % (self.from_format.replace(';', '_').replace('.', '_'), self.to_format.replace(';', '_').replace('.', '_'))
 
     def test_conversion(self):
         from invenio.websubmit_file_converter import InvenioWebSubmitFileConverterError, convert_file
