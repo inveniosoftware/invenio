@@ -112,7 +112,8 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
                                    'matching': (str, ""),
                                    'mode': (str, ""),
                                    'submit_date': (str, ""),
-                                   'submit_time': (str, "")})
+                                   'submit_time': (str, ""),
+                                   'priority': (str, "")})
         _ = gettext_set_language(argd['ln'])
 
         not_authorized = user_authorization(req, argd['ln'])
@@ -142,7 +143,8 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
             redirect_to_url(req, "%s/batchuploader/documents?error=4&mode=%s&docfolder=%s&matching=%s&submit_time=%s"
                             % (CFG_SITE_URL, argd['mode'], argd['docfolder'], argd['matching'], argd['submit_time']))
 
-        errors, info = document_upload(req, argd['docfolder'], argd['matching'], argd['mode'], date, time, argd['ln'])
+        errors, info = document_upload(req, argd['docfolder'], argd['matching'],
+                                       argd['mode'], date, time, argd['ln'], argd['priority'])
 
         body = batchuploader_templates.tmpl_display_menu(argd['ln'])
         uid = getUid(req)
@@ -185,7 +187,8 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
                                    'mode': (str, None),
                                    'submit_date': (str, None),
                                    'submit_time': (str, None),
-                                   'filename': (str, None)})
+                                   'filename': (str, None),
+                                   'priority': (str, None)})
         _ = gettext_set_language(argd['ln'])
 
         not_authorized = user_authorization(req, argd['ln'])
@@ -223,7 +226,8 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
         #Function where bibupload queues the file
         auth_code, auth_message = metadata_upload(req,
                                   argd['metafile'], argd['filetype'], argd['mode'].split()[0],
-                                  date, time, argd['filename'], argd['ln'])
+                                  date, time, argd['filename'], argd['ln'],
+                                  argd['priority'])
 
         if auth_code != 0:
             referer = '/batchuploader/'

@@ -41,6 +41,10 @@ class Template:
         .italics{
             font-style:italic
         }
+        .italics_small{
+            font-style:italic;
+            font-size: 0.9em;
+        }
 
         #content {width:750px; font:90.1% arial, sans-serif;}
 
@@ -74,6 +78,10 @@ class Template:
             border: 3px black solid;
             border-width: thin;
             width: 750px;
+        }
+
+        img.img_link {
+            border-style: none;
         }
 
         </style>
@@ -142,15 +150,15 @@ class Template:
                 <div><b>%(msg)s</b></div>
                 """ % {'msg': _("Warning: Please, select a valid date")}
         body_content += """
-    <div><span class="mandatory_field""> * </span> %(txt1)s:<input type="file" name="metafile" size="30" onChange="filename.value=(this.value)"></div>
+    <div><span class="mandatory_field""> * </span> %(txt_file)s:<input type="file" name="metafile" size="30" onChange="filename.value=(this.value)"></div>
     <input type="hidden" name="filename" id="filename" value="">
-    <div><span class="mandatory_field""> * </span> %(txt2)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <div><span class="mandatory_field""> * </span> %(txt_file_type)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <select name="filetype">
             <option %(type_sel1)s value="marcxml">MarcXML</option>
             <option %(type_sel2)s value="textmarc">TextMARC</option>
         </select>
     </div>
-    <div><span class="mandatory_field""> * </span> %(txt3)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <div><span class="mandatory_field""> * </span> %(txt_upload_mode)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <select name="mode">
             <option %(mode_sel1)s>--insert</option>
             <option %(mode_sel2)s>--replace</option>
@@ -158,24 +166,32 @@ class Template:
             <option %(mode_sel4)s>--append</option>
             <option %(mode_sel5)s>-ir insert-or-replace</option>
         </select>
-    </div><br/>
-    <div>%(txt4)s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="italics">%(txt5)s:</span>
+    <a href="%(site_url)s/help/admin/bibupload-admin-guide#3.3" target="_blank"><img class="img_link" src="/img/help.png" title="Upload mode help"></a>
+    </div>
+    <div>&nbsp;&nbsp;%(txt_priority)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <select name="priority">
+            <option value="1">normal</option>
+            <option value="5">high</option>
+        </select>
+    <br/>
+    <div>%(txt_upload_later)s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="italics">%(txt_date)s:</span>
     <input type="text" id="datepicker" name="submit_date" value=%(submit_date)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
-    &nbsp;&nbsp;<span class="italics">%(txt6)s:</span>
+    &nbsp;&nbsp;<span class="italics">%(txt_time)s:</span>
     <input type="text" name="submit_time" value=%(submit_time)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
-    <span class="italics">%(txt7)s: 2009-12-20 19:22:18</span>
-    <div><i>%(txt8)s</i></div>
+    <span class="italics">%(txt_example)s: 2009-12-20 19:22:18</span>
+    <div><i>%(txt_mandatory)s</i></div>
     <div> <input type="submit" value="Upload" class="adminbutton"> </div>
 </fieldset>
-""" % {'txt1': _("Select file to upload"),
-        'txt2': _("File type"),
-        'txt3': _("Upload mode"),
-        'txt4': _("Upload later? then select:"),
-        'txt5': _("Date"),
-        'txt6': _("Time"),
-        'txt7': _("Example"),
-        'txt8': _("All fields with %(x_fmt_open)s*%(x_fmt_close)s are mandatory") % \
+""" % {'txt_file': _("Select file to upload"),
+        'txt_file_type': _("File type"),
+        'txt_upload_mode': _("Upload mode"),
+        'txt_upload_later': _("Upload later? then select:"),
+        'txt_date': _("Date"),
+        'txt_time': _("Time"),
+        'txt_example': _("Example"),
+        'txt_mandatory': _("All fields with %(x_fmt_open)s*%(x_fmt_close)s are mandatory") % \
                   {'x_fmt_open': '<span class="mandatory_field">', 'x_fmt_close': '</span>'},
+        'txt_priority': _("Upload priority"),
         'type_sel1': filetype == 'marcxml' and "selected" or "",
         'type_sel2': filetype == 'textmarc' and "selected" or "",
         'mode_sel1': mode == '--insert' and "selected" or "",
@@ -183,6 +199,7 @@ class Template:
         'mode_sel3': mode == '--correct' and "selected" or "",
         'mode_sel4': mode == '--append' and "selected" or "",
         'mode_sel5': mode == '-ir insert-or-replace' and "selected" or "",
+        'site_url': CFG_SITE_URL,
         'submit_date': cgi.escape(submit_date),
         'submit_time': cgi.escape(submit_time)}
 
@@ -332,7 +349,7 @@ class Template:
         body_content += """
         <div id="content">
         <fieldset>
-        <div><span class="mandatory_field""> * </span> %(txt1)s:&nbsp;&nbsp;<input type="text" name="docfolder" size="30" />
+        <div><span class="mandatory_field""> * </span> %(txt1)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="docfolder" size="30" />
         <span class="italics">%(txt2)s: /afs/cern.ch/user/j/user/public/foo/</span></div>
         <div><span class="mandatory_field""> * </span> %(txt3)s:
         <select name="matching">
@@ -340,9 +357,14 @@ class Template:
             <option>recid</option>
         </select>
         </div>
-        <div><span class="mandatory_field""> * </span> %(txt4)s: <input type="radio" name="mode" value="append" "checked" id="appendcheckbox"/><label for="appendcheckbox">append</label>
+        <div><span class="mandatory_field""> * </span> %(txt4)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="mode" value="append" "checked" id="appendcheckbox"/><label for="appendcheckbox">append</label>
                                                                 <input type="radio" name="mode" value="correct" id="revisecheckbox"/><label for="revisecheckbox">revise</label>
         </div>
+        <div>&nbsp;&nbsp;%(txt_priority)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <select name="priority">
+            <option value="1">normal</option>
+            <option value="5">high</option>
+        </select>
         <br/>
         <div>%(txt5)s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="italics">%(txt6)s:</span>
         <input type="text" id="datepicker" name="submit_date" value=%(submit_date)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
@@ -356,6 +378,7 @@ class Template:
         </form></div>
         """ % {'submit_date': submit_date,
                'submit_time': submit_time,
+               'txt_priority': _("Upload priority"),
                'txt1': _("Input directory"),
                'txt2': _("Example"),
                'txt3': _("Filename matching"),
