@@ -172,6 +172,14 @@ To match using BibConvert formats to manipulate fieldvalues. See <a href="<CFG_S
 </pre>
 </blockquote>
 
+To match records in specific collection(s):
+
+<blockquote>
+<pre>
+ $ bibmatch -x 'Books,Articles' < input.xml
+</pre>
+</blockquote>
+
 Command line options:
 
 <blockquote>
@@ -202,25 +210,30 @@ Command line options:
  -a,  --alter-recid        The recid (controlfield 001) of matched or fuzzy matched records in
                            output will be replaced by the 001 value of the matched record.
                            Note: Useful if you want to replace matched records using BibUpload.
- -c,  --clean              clean queries before searching
+ -z,  --clean              clean queries before searching
+
  -h,  --help               print this help and exit
  -V,  --version            print version information and exit
 
  Advanced options:
 
- -c --config=(config-filename)
- -m --mode=(a|e|o|p|r) perform an advanced search using special search mode.
-    Where mode is:
-      "a" all of the words,
-      "o" any of the words,
-      "e" exact phrase,
-      "p" partial phrase,
-      "r" regular expression.
+ -c --config=filename      load querystrings from a config file. Each line starting with QRYSTR will
+                           be added as a query. i.e. QRYSTR --- [title] [author]
 
- -o --operator(a|o) used to concatenate identical fields in search query (i.e. several report-numbers)
-    Where operator is:
-      "a" boolean AND (default)
-      "o" boolean OR
+ -x --collection           only perform queries in certain collection(s).
+                           Note: matching against restricted collections does not work.
 
+ -m --mode=(a|e|o|p|r)     perform an advanced search using special search mode.
+                             Where mode is:
+                               "a" all of the words,
+                               "o" any of the words,
+                               "e" exact phrase,
+                               "p" partial phrase,
+                               "r" regular expression.
+
+ -o --operator(a|o)        used to concatenate identical fields in search query (i.e. several report-numbers)
+                             Where operator is:
+                               "a" boolean AND (default)
+                               "o" boolean OR
 </pre>
 </blockquote>
