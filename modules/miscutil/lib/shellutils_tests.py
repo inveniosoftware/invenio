@@ -121,25 +121,69 @@ class RunProcessWithTimeoutTest(unittest.TestCase):
         script = open(self.script_path, 'w')
         print >> script, "#!/bin/sh"
         print >> script, "date"
+        print >> script, "echo 'foo'"
+        print >> script, "echo 'bar' > /dev/stderr"
         print >> script, "sleep $1"
         print >> script, "date"
         script.close()
         os.chmod(self.script_path, 0700)
+        self.python_script_path = os.path.join(CFG_TMPDIR, 'test_sleeping.py')
+        script = open(self.python_script_path, 'w')
+        print >> script, """\
+#!/usr/bin/env python
+import os
+print os.getpid(), os.getpgrp()
+if os.getpid() == os.getpgrp():
+    print "PID == PGID"
+else:
+    print "PID != PGID"
+"""
+        script.close()
+        os.chmod(self.python_script_path, 0700)
 
     def tearDown(self):
         os.remove(self.script_path)
+        os.remove(self.python_script_path)
 
     def test_run_cmd_timeout(self):
         """shellutils - running simple command with expiring timeout"""
         t1 = time.time()
         self.assertRaises(Timeout, run_process_with_timeout, (self.script_path, '15'), timeout=5)
-        self.failUnless(time.time() - t1 < 7)
+        self.failUnless(time.time() - t1 < 8, "%s < 8" % (time.time() - t1))
 
-    def test_run_cmd_no_timeout(self):
-        """shellutils - running simple command with non expiring timeout"""
+    def test_run_cmd_timeout_no_zombie(self):
+        """shellutils - running simple command no zombie"""
         t1 = time.time()
-        self.assertEqual(3, len(run_process_with_timeout((self.script_path, '5'), timeout=15)[1].split('\n')))
-        self.failUnless(time.time() - t1 < 7)
+        self.assertRaises(Timeout, run_process_with_timeout, (self.script_path, '15', "THISISATEST"), timeout=5)
+        ps_output = run_shell_command('ps aux')[1]
+        self.failIf('THISISATEST' in ps_output)
+        self.failIf('sleep' in ps_output)
+
+    def test_run_cmd_timeout_no_timeout(self):
+        """shellutils - running simple command without expiring timeout"""
+        exitstatus, stdout, stderr = run_process_with_timeout([self.script_path, '5'], timeout=10)
+        self.failUnless('foo' in stdout)
+        self.failUnless('bar' in stderr)
+        self.assertEqual(exitstatus, 0)
+
+    def test_run_cmd_timeout_big_stdout(self):
+        """shellutils - running simple command with a big standard output"""
+        from invenio.config import CFG_PYLIBDIR
+        test_file = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibcirculation_templates.py')
+        exitstatus, stdout, stderr = run_process_with_timeout(['cat', test_file], timeout=10)
+        self.assertEqual(open(test_file).read(), stdout)
+        self.assertEqual(exitstatus, 0)
+
+    def test_run_cmd_timeout_pgid(self):
+        """shellutils - running simple command should have PID == PGID"""
+        exitstatus, stdout, stderr = run_process_with_timeout([self.python_script_path, '5'])
+        self.failIf('PID != PGID' in stdout, 'PID != PGID was found in current output: %s (%s)' % (stdout, stderr))
+        self.failUnless('PID == PGID' in stdout, 'PID == PGID wasn\'t found in current output: %s (%s)' % (stdout, stderr))
+
+    def test_run_cmd_viasudo_no_password(self):
+        """shellutils - running simple command via sudo should not wait for password"""
+        exitstatus, stdout, stderr = run_process_with_timeout([self.script_path, '5'], timeout=10, sudo='foo')
+        self.assertNotEqual(exitstatus, 0)
 
 TEST_SUITE = make_test_suite(EscapeShellArgTest,
                              RunShellCommandTest,

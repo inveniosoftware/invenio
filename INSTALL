@@ -38,7 +38,7 @@ Contents
               gs-common clisp gettext libapache2-mod-wsgi unzip \
               python-dateutil python-rdflib \
               python-gnuplot python-magic pdftk html2text giflib-tools \
-              pstotext netpbm
+              pstotext netpbm python-pypdf
 
         You may also want to install some of the following packages,
         if you have them available on your concrete architecture:
@@ -169,10 +169,10 @@ Contents
               <http://code.google.com/p/ocropus/>
           - to perform different image elaborations: ImageMagick
               <http://www.imagemagick.org/>
-          - to generate PDF after OCR: ReportLab
-              <http://www.reportlab.org/rl_toolkit.html>
-          - to analyze images to generate PDF after OCR: netpbm
+          - to generate PDF after OCR: netpbm, ReportLab and pyPdf
               <http://netpbm.sourceforge.net/>
+              <http://www.reportlab.org/rl_toolkit.html>
+              <http://pybrary.net/pyPdf/>
 
      h) If you have chosen to install fast XML MARC Python processors
         in the step d) above, then you have to install the parsers
@@ -257,6 +257,7 @@ Contents
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --load-webstat-conf
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --create-apache-conf
       $ sudo /etc/init.d/apache2 restart
+      $ sudo -u www-data /opt/invenio/bin/inveniocfg --check-openoffice
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --create-demo-site
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --load-demo-records
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --run-unit-tests
@@ -620,6 +621,16 @@ Contents
 
           Please ask your webserver administrator to restart the
           Apache server after the above "httpd.conf" changes.
+
+      $ sudo -u www-data /opt/invenio/bin/inveniocfg --check-openoffice
+
+          If you plan to support MS Office or Open Document Format
+          files in your installation, you should check whether
+          LibreOffice or OpenOffice.org is well integrated with
+          Invenio by running the above command.  You may be asked to
+          create a temporary directory for converting office files
+          with special ownership (typically as user nobody) and
+          permissions.  Note that you can do this step later.
 
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --create-demo-site
 

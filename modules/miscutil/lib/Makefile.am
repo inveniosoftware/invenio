@@ -50,7 +50,6 @@ pylib_DATA = __init__.py \
              shellutils_tests.py \
              pluginutils.py \
              pluginutils_tests.py \
-             asyncproc.py \
              plotextractor.py \
              plotextractor_converter.py \
              plotextractor_getter.py \
