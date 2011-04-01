@@ -23,90 +23,24 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-import cgi
 from invenio.webinterface_handler_wsgi_utils import Field
-from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_SITE_URL
 from invenio.urlutils import redirect_to_url
 from invenio.messages import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.webuser import getUid, page_not_authorized, collect_user_info
+from invenio.webuser import getUid, page_not_authorized
 from invenio.webpage import page
 
 from invenio.batchuploader_engine import metadata_upload, cli_upload, \
      get_user_metadata_uploads, get_user_document_uploads, document_upload, \
-     get_daemon_doc_files, get_daemon_meta_files, cli_allocate_record
-
-import re
-import calendar
+     get_daemon_doc_files, get_daemon_meta_files, cli_allocate_record, \
+     check_date, check_time, user_authorization
 
 try:
     import invenio.template
     batchuploader_templates = invenio.template.load('batchuploader')
 except:
     pass
-
-def check_date(date):
-    """ Check if date is correct
-        @return:
-            0 - Default or correct date
-            3 - Incorrect format
-            4 - Date does not exist
-    """
-    if not date or date == "yyyy-mm-dd":
-        return 0
-    correct_format = re.match("2[01]\d\d-[01]?\d-[0-3]?\d", date)
-    if not correct_format:
-        return 3
-    #separate year, month, day
-    date = correct_format.group(0).split("-")
-    try:
-        calendar.weekday(int(date[0]), int(date[1]), int(date[2]))
-    except ValueError:
-        return 4
-    return 0
-
-def check_time(time):
-    """ Check if time is correct
-        @return:
-            0 - Default or correct time
-            1 - Incorrect format
-    """
-    if not time or time == "hh:mm:ss":
-        return 0
-    correct_format = re.match("[0-2]\d:[0-5]\d:[0-5]\d", time)
-    if not correct_format:
-        return 1
-    return 0
-
-def check_file(name):
-    """ Simple check to avoid blank filename and bad extensions
-        @return:
-            0 - Correct file name
-            1 - File name not correct
-    """
-    if not name.endswith('.xml'):
-        return 1
-    return 0
-
-def user_authorization(req, ln):
-    """ Check user authorization to visit page """
-    _ = gettext_set_language(ln)
-    user_info = collect_user_info(req)
-    if user_info['email'] == 'guest':
-        auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader')
-        referer = '/batchuploader/'
-        error_msg = _("Guests are not authorized to run batchuploader")
-        return page_not_authorized(req=req, referer=referer,
-                                   text=error_msg, navmenuid="batchuploader")
-    else:
-        auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader')
-        if auth_code != 0:
-            referer = '/batchuploader/'
-            error_msg = _("The user '%s' is not authorized to run batchuploader" % \
-                          (cgi.escape(user_info['nickname'])))
-            return page_not_authorized(req=req, referer=referer,
-                                       text=error_msg, navmenuid="batchuploader")
 
 
 class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
@@ -122,6 +56,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
     def metadata(self, req, form):
         """ Display Metadata file upload form """
         argd = wash_urlargd(form, {'error': (int, 0),
+                                    'filetype': (str, ""),
                                     'mode': (str, ""),
                                     'submit_date': (str, "yyyy-mm-dd"),
                                     'submit_time': (str, "hh:mm:ss")})
@@ -133,7 +68,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
         uid = getUid(req)
         body = batchuploader_templates.tmpl_display_menu(argd['ln'], ref="metadata")
         body += batchuploader_templates.tmpl_display_web_metaupload_form(argd['ln'],
-                argd['error'], argd['mode'], argd['submit_date'],
+                argd['error'], argd['filetype'], argd['mode'], argd['submit_date'],
                 argd['submit_time'])
 
         title = _("Metadata batch upload")
@@ -246,7 +181,8 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
             Checks if input fields are correct before uploading.
         """
         argd = wash_urlargd(form, {'metafile': (Field, None),
-                                   'mode': (str,None),
+                                   'filetype': (str, None),
+                                   'mode': (str, None),
                                    'submit_date': (str, None),
                                    'submit_time': (str, None),
                                    'filename': (str, None)})
@@ -258,20 +194,19 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
         #Check if input fields are correct, if not, redirect to upload form
         correct_date = check_date(argd['submit_date'])
         correct_time = check_time(argd['submit_time'])
-        correct_file = check_file(argd['filename'])
         if correct_time != 0:
             redirect_to_url(req,
-            "%s/batchuploader/metadata?error=1&mode=%s&submit_date=%s"
-            % (CFG_SITE_URL, argd['mode'], argd['submit_date']))
-        if correct_file != 0:
+            "%s/batchuploader/metadata?error=1&filetype=%s&mode=%s&submit_date=%s"
+            % (CFG_SITE_URL, argd['filetype'], argd['mode'], argd['submit_date']))
+        if not argd['metafile'].value: # Empty file
             redirect_to_url(req,
-            "%s/batchuploader/metadata?error=2&mode=%s&submit_date=%s&submit_time=%s"
-            % (CFG_SITE_URL, argd['mode'], argd['submit_date'],
+            "%s/batchuploader/metadata?error=2&filetype=%s&mode=%s&submit_date=%s&submit_time=%s"
+            % (CFG_SITE_URL, argd['filetype'], argd['mode'], argd['submit_date'],
             argd['submit_time']))
         if correct_date != 0:
             redirect_to_url(req,
-            "%s/batchuploader/metadata?error=%s&mode=%s&submit_time=%s"
-            % (CFG_SITE_URL, correct_date, argd['mode'], argd['submit_time']))
+            "%s/batchuploader/metadata?error=%s&filetype=%s&mode=%s&submit_time=%s"
+            % (CFG_SITE_URL, correct_date, argd['filetype'], argd['mode'], argd['submit_time']))
 
         date = argd['submit_date'] not in ['yyyy-mm-dd', ''] \
                 and argd['submit_date'] or ''
@@ -279,15 +214,15 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
                 and argd['submit_time'] or ''
 
         if date != '' and time == '':
-            redirect_to_url(req, "%s/batchuploader/metadata?error=1&mode=%s&submit_date=%s"
-            % (CFG_SITE_URL, argd['mode'], argd['submit_date']))
+            redirect_to_url(req, "%s/batchuploader/metadata?error=1&filetype=%s&mode=%s&submit_date=%s"
+            % (CFG_SITE_URL, argd['filetype'], argd['mode'], argd['submit_date']))
         elif date == '' and time != '':
-            redirect_to_url(req, "%s/batchuploader/metadata?error=4&mode=%s&submit_time=%s"
-            % (CFG_SITE_URL, argd['mode'], argd['submit_time']))
+            redirect_to_url(req, "%s/batchuploader/metadata?error=4&filetype=%s&mode=%s&submit_time=%s"
+            % (CFG_SITE_URL, argd['filetype'], argd['mode'], argd['submit_time']))
 
         #Function where bibupload queues the file
         auth_code, auth_message = metadata_upload(req,
-                                  argd['metafile'], argd['mode'].split()[0],
+                                  argd['metafile'], argd['filetype'], argd['mode'].split()[0],
                                   date, time, argd['filename'], argd['ln'])
 
         if auth_code != 0:

@@ -100,7 +100,8 @@ class Template:
 
         return styles
 
-    def tmpl_display_web_metaupload_form(self, ln=CFG_SITE_LANG, error=0, mode=1, submit_date="yyyy-mm-dd", submit_time="hh:mm:ss"):
+    def tmpl_display_web_metaupload_form(self, ln=CFG_SITE_LANG, error=0, filetype="marcxml", mode="--insert",
+                                        submit_date="yyyy-mm-dd", submit_time="hh:mm:ss"):
         """ Displays Metadata upload form
             @param error: defines the type of error to be displayed
             @param mode: upload mode
@@ -145,16 +146,17 @@ class Template:
     <input type="hidden" name="filename" id="filename" value="">
     <div><span class="mandatory_field""> * </span> %(txt2)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <select name="filetype">
-            <option>MarcXML</option>
+            <option %(type_sel1)s value="marcxml">MarcXML</option>
+            <option %(type_sel2)s value="textmarc">TextMARC</option>
         </select>
     </div>
     <div><span class="mandatory_field""> * </span> %(txt3)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <select name="mode">
-            <option %(sel1)s>--insert</option>
-            <option %(sel2)s>--replace</option>
-            <option %(sel3)s>--correct</option>
-            <option %(sel4)s>--append</option>
-            <option %(sel5)s>-ir insert-or-replace</option>
+            <option %(mode_sel1)s>--insert</option>
+            <option %(mode_sel2)s>--replace</option>
+            <option %(mode_sel3)s>--correct</option>
+            <option %(mode_sel4)s>--append</option>
+            <option %(mode_sel5)s>-ir insert-or-replace</option>
         </select>
     </div><br/>
     <div>%(txt4)s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="italics">%(txt5)s:</span>
@@ -174,11 +176,13 @@ class Template:
         'txt7': _("Example"),
         'txt8': _("All fields with %(x_fmt_open)s*%(x_fmt_close)s are mandatory") % \
                   {'x_fmt_open': '<span class="mandatory_field">', 'x_fmt_close': '</span>'},
-        'sel1': mode == '--insert' and "selected" or "",
-        'sel2': mode == '--replace' and "selected" or "",
-        'sel3': mode == '--correct' and "selected" or "",
-        'sel4': mode == '--append' and "selected" or "",
-        'sel5': mode == '-ir insert-or-replace' and "selected" or "",
+        'type_sel1': filetype == 'marcxml' and "selected" or "",
+        'type_sel2': filetype == 'textmarc' and "selected" or "",
+        'mode_sel1': mode == '--insert' and "selected" or "",
+        'mode_sel2': mode == '--replace' and "selected" or "",
+        'mode_sel3': mode == '--correct' and "selected" or "",
+        'mode_sel4': mode == '--append' and "selected" or "",
+        'mode_sel5': mode == '-ir insert-or-replace' and "selected" or "",
         'submit_date': cgi.escape(submit_date),
         'submit_time': cgi.escape(submit_time)}
 

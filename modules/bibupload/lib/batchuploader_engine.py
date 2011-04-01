@@ -22,13 +22,18 @@ Batch Uploader core functions. Uploading metadata and documents.
 """
 
 import os
-import pwd, grp
+import pwd
+import grp
+import sys
 import time
 import tempfile
+import cgi
+import re
+import calendar
 
 from invenio.dbquery import run_sql
 from invenio.access_control_engine import acc_authorize_action
-from invenio.webuser import collect_user_info
+from invenio.webuser import collect_user_info, page_not_authorized
 from invenio.config import CFG_BINDIR, CFG_TMPDIR, CFG_LOGDIR, \
                             CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
                             CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
@@ -40,9 +45,15 @@ from invenio.webinterface_handler_wsgi_utils import Field
 from invenio.textutils import encode_for_xml
 from invenio.bibtask import task_low_level_submission
 from invenio.messages import gettext_set_language
+from invenio.textmarc2xmlmarc import transform_file
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 PERMITTED_MODES = ['-i', '-r', '-c', '-a', '-ir',
-                        '--insert', '--replace', '--correct', '--append']
+                   '--insert', '--replace', '--correct', '--append']
 
 def cli_allocate_record(req):
     req.content_type = "text/plain"
@@ -121,7 +132,8 @@ def cli_upload(req, file_content=None, mode=None):
     _log(msg)
     return _write(req, msg)
 
-def metadata_upload(req, metafile=None, mode=None, exec_date=None, exec_time=None, metafilename=None, ln=CFG_SITE_LANG):
+def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None,
+                    exec_time=None, metafilename=None, ln=CFG_SITE_LANG):
     """
     Metadata web upload service. Get upload parameters and exec bibupload for the given file.
     Finally, write upload history.
@@ -134,7 +146,11 @@ def metadata_upload(req, metafile=None, mode=None, exec_date=None, exec_time=Non
     req.send_http_header()
 
     # write temporary file:
-    metafile = metafile.value
+    if filetype == 'marcxml':
+        metafile = metafile.value
+    else:
+        metafile = _transform_input_to_marcxml(file_input=metafile.value)
+
     user_info = collect_user_info(req)
     tempfile.tempdir = CFG_TMPDIR
     filename = tempfile.mktemp(prefix="batchupload_" + \
@@ -358,6 +374,54 @@ def get_daemon_meta_files():
             pass
     return files
 
+def check_date(date):
+    """ Check if date is correct
+        @return:
+            0 - Default or correct date
+            3 - Incorrect format
+            4 - Date does not exist
+    """
+    if not date or date == "yyyy-mm-dd":
+        return 0
+    correct_format = re.match("2[01]\d\d-[01]?\d-[0-3]?\d", date)
+    if not correct_format:
+        return 3
+    #separate year, month, day
+    date = correct_format.group(0).split("-")
+    try:
+        calendar.weekday(int(date[0]), int(date[1]), int(date[2]))
+    except ValueError:
+        return 4
+    return 0
+
+def check_time(time):
+    """ Check if time is correct
+        @return:
+            0 - Default or correct time
+            1 - Incorrect format
+    """
+    if not time or time == "hh:mm:ss":
+        return 0
+    correct_format = re.match("[0-2]\d:[0-5]\d:[0-5]\d", time)
+    if not correct_format:
+        return 1
+    return 0
+
+def user_authorization(req, ln):
+    """ Check user authorization to visit page """
+    _ = gettext_set_language(ln)
+    user_info = collect_user_info(req)
+    auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader')
+    if auth_code != 0:
+        referer = '/batchuploader/'
+        if user_info['email'] == 'guest':
+            error_msg = _("Guests are not authorized to run batchuploader")
+        else:
+            error_msg = _("The user '%s' is not authorized to run batchuploader" % \
+                          (cgi.escape(user_info['nickname'])))
+        return page_not_authorized(req=req, referer=referer,
+                                   text=error_msg, navmenuid="batchuploader")
+
 def _get_client_ip(req):
     """Return client IP address from req object."""
     return str(req.remote_ip)
@@ -478,25 +542,46 @@ def _detect_collections_from_marcxml_file(recs):
                                                      ind2=sysno_tag[4],
                                                      code=sysno_tag[5]):
                 record = find_record_from_sysno(tag_sysno)
-                collection = guess_collection_of_a_record(int(record))
-                dbcollids[collection] = 1
+                if record:
+                    collection = guess_collection_of_a_record(int(record))
+                    dbcollids[collection] = 1
             for tag_oaiid in record_get_field_values(rec, tag=oaiid_tag[:3],
                                                      ind1=oaiid_tag[3],
                                                      ind2=oaiid_tag[4],
                                                      code=oaiid_tag[5]):
                 record = find_records_from_extoaiid(tag_oaiid)
-                collection = guess_collection_of_a_record(int(record))
-                dbcollids[collection] = 1
+                if record:
+                    collection = guess_collection_of_a_record(int(record))
+                    dbcollids[collection] = 1
             for tag_oai in record_get_field_values(rec, tag=oai_tag[0:3],
                                                    ind1=oai_tag[3],
                                                    ind2=oai_tag[4],
                                                    code=oai_tag[5]):
                 record = find_record_from_oaiid(tag_oai)
-                collection = guess_collection_of_a_record(int(record))
-                dbcollids[collection] = 1
+                if record:
+                    collection = guess_collection_of_a_record(int(record))
+                    dbcollids[collection] = 1
     return dbcollids.keys()
 
+def _transform_input_to_marcxml(file_input=""):
+    """
+    Takes text-marc as input and transforms it
+    to MARCXML.
+    """
+    # Create temporary file to read from
+    tmp_fd, filename = tempfile.mkstemp(dir=CFG_TMPDIR)
+    os.write(tmp_fd, file_input)
+    os.close(tmp_fd)
+    try:
+        # Redirect output, transform, restore old references
+        old_stdout = sys.stdout
+        new_stdout = StringIO()
+        sys.stdout = new_stdout
 
+        transform_file(filename)
+    finally:
+        sys.stdout = old_stdout
+    return new_stdout.getvalue()
 
 def _log(msg, logfile="webupload.log"):
     """
