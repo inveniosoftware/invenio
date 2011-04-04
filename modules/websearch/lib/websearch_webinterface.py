@@ -86,6 +86,7 @@ from invenio.config import \
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
+from invenio.htmlutils import get_mathjax_header
 from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
     collect_user_info, logoutUser, isUserSuperAdmin
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
@@ -239,7 +240,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
     def _lookup(self, component, path):
         """This handler parses dynamic URLs (/author/John+Doe)."""
         return WebInterfaceAuthorPages(component), path
-    
+
     def __call__(self, req, form):
         """Serve the page in the given language."""
         is_bibauthorid = False
@@ -264,7 +265,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             from invenio.bibauthorid_config import AID_ON_AUTHORPAGES
             bibauthorid_template = invenio.template.load('bibauthorid')
 #            from invenio.access_control_admin import acc_find_user_role_actions
-            
+
             if not AID_ENABLED or not AID_ON_AUTHORPAGES:
                 is_bibauthorid = False
             else:
@@ -404,7 +405,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             ptitle = ''
             if recid:
                 try:
-                    ptitle = get_record(recid)['245'][0][0][0][1]  
+                    ptitle = get_record(recid)['245'][0][0][0][1]
                 except (IndexError,TypeError):
                     ptitle = '"Title not available"'
 
@@ -577,7 +578,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         #get cited by..
         citedbylist = get_cited_by_list(pubs)
         person_link = None
-        
+
 
         if (is_bibauthorid
             and self.personid >= 0
@@ -648,7 +649,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 #        req.write(simauthbox)
         if verbose == 9:
             req.write("<br/>all: " + str(time.time() - genstart) + "<br/>")
-            
+
         return page_end(req, 'hb', ln)
 
     def _psearch(self, req, form, is_fallback=True, fallback_query='',  fallback_title='', fallback_message=''):
@@ -1392,9 +1393,7 @@ def display_collection(req, c, aas, verbose, ln):
         rssurl += '?' + '&amp;'.join(rssurl_params)
 
     if 'hb' in CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS:
-        metaheaderadd = """
-<script src='/MathJax/MathJax.js' type='text/javascript'></script>
-"""
+        metaheaderadd = get_mathjax_header()
     else:
         metaheaderadd = ''
 

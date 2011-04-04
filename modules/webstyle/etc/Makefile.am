@@ -15,13 +15,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-mathjaxwebdir=$(localstatedir)/www/MathJax/config
-mathjaxweb_DATA=MathJax.js
-
 fckeditorwebdir=$(localstatedir)/www/fckeditor
 fckeditorweb_DATA=invenio-fckeditor-config.js journal-editor-config.js \
                   journal-editor-styles.xml journal-editor-templates.xml
 
-EXTRA_DIST = $(mathjaxweb_DATA) $(fckeditorweb_DATA)
+EXTRA_DIST = $(fckeditorweb_DATA)
 
 CLEANFILES = *~ *.tmp

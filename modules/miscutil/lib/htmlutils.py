@@ -21,7 +21,7 @@
 __revision__ = "$Id$"
 
 from HTMLParser import HTMLParser
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_URL, CFG_MATHJAX_HOSTING
 from invenio.textutils import indent_text
 import re
 import cgi
@@ -231,6 +231,30 @@ class HTMLWasher(HTMLParser):
         """Process a general entity reference of the form "&name;".
         Return it as it is."""
         self.result += '&' + name + ';'
+
+def get_mathjax_header():
+    """
+    Return the snippet of HTML code to put in HTML HEAD tag, in order to
+    enable MathJax support.
+    @note: with new releases of MathJax, update this function toghether with
+           $MJV variable in the root Makefile.am
+    """
+    if CFG_MATHJAX_HOSTING.lower() == 'cdn':
+        mathjax_path = "http://cdn.mathjax.org/mathjax/1.1-latest"
+    else:
+        mathjax_path = "/MathJax"
+    return """<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {inlineMath: [['$','$']]},
+  showProcessingMessages: false,
+  messageStyle: "none"
+});
+</script>
+<script src="%(mathjax_path)s/MathJax.js?config=TeX-AMS_HTML" type="text/javascript">
+</script>""" % {
+    'mathjax_path': mathjax_path
+}
+
 
 def get_html_text_editor(name, id=None, content='', textual_content=None, width='300px', height='200px',
                          enabled=True, file_upload_url=None, toolbar_set="Basic",

@@ -53,6 +53,7 @@ from invenio.search_engine import create_navtrail_links, \
      get_colID
 from invenio.urlutils import redirect_to_url, \
                              make_canonical_urlargd
+from invenio.htmlutils import get_mathjax_header
 from invenio.errorlib import register_exception
 from invenio.messages import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
@@ -229,7 +230,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
             mathjaxheader = ''
             if CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS:
-                mathjaxheader = """<script src='/MathJax/MathJax.js' type='text/javascript'></script>"""
+                mathjaxheader = get_mathjax_header()
             jqueryheader = '''
             <script src="%(CFG_SITE_URL)s/js/jquery.min.js" type="text/javascript" language="javascript"></script>
             <script src="%(CFG_SITE_URL)s/js/jquery.MultiFile.pack.js" type="text/javascript" language="javascript"></script>

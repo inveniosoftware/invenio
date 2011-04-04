@@ -92,6 +92,7 @@ from invenio.dbquery import DatabaseError, deserialize_via_marshal, InvenioDbQue
 from invenio.access_control_engine import acc_authorize_action
 from invenio.errorlib import register_exception
 from invenio.textutils import encode_for_xml, wash_for_utf8
+from invenio.htmlutils import get_mathjax_header
 
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
@@ -819,9 +820,7 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
         ## add MathJax if displaying single records (FIXME: find
         ## eventual better place to this code)
         if of.lower() in CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS:
-            metaheaderadd = """
-  <script src='/MathJax/MathJax.js' type='text/javascript'></script>
-"""
+            metaheaderadd = get_mathjax_header()
         else:
             metaheaderadd = ''
 

@@ -25,9 +25,9 @@ EXTRA_DIST = UNINSTALL THANKS RELEASE-NOTES configure-tests.py config.nice.in \
 
 
 # current MathJax version and packages
-
-MJV = 1.0.1a
-MATHJAX = MathJax-v$(MJV).zip
+# See also modules/miscutil/lib/htmlutils.py (get_mathjax_header)
+MJV = 1.1
+MATHJAX = https://github.com/mathjax/MathJax/zipball/v$(MJV)
 
 # current FCKeditor version
 FCKV = 2.6.6
@@ -91,12 +91,12 @@ install-mathjax-plugin:
 	@echo "***********************************************************"
 	rm -rf /tmp/invenio-mathjax-plugin
 	mkdir /tmp/invenio-mathjax-plugin
+	mkdir -p ${prefix}/var/www/MathJax
 	(cd /tmp/invenio-mathjax-plugin && \
-	wget 'http://www.mathjax.org/dl/$(MATHJAX)' && \
-	unzip -q -u -d ${prefix}/var/www $(MATHJAX))
+	wget '$(MATHJAX)' -O mathjax.zip --no-check-certificate && \
+	unzip -q mathjax.zip && cd mathjax-MathJax-* && cp -ur * \
+	${prefix}/var/www/MathJax)
 	rm -fr /tmp/invenio-mathjax-plugin
-	@echo "* Installing Invenio-specific MathJax config..."
-	(cd $(top_srcdir)/modules/webstyle/etc && make install)
 	@echo "************************************************************"
 	@echo "** The MathJax plugin was successfully installed.         **"
 	@echo "** Please do not forget to properly set the option        **"
