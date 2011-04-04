@@ -22,6 +22,8 @@ Run-Unoconv-as-nobody wrapper.
 """
 
 try:
+    import sys
+    sys.path.append("@prefix@/lib/python")
     from invenio.unoconv import main
 except ImportError, e:
     print "Error: %s" % e
