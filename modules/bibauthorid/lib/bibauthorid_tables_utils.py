@@ -274,6 +274,9 @@ def update_authornames_tables_from_paper(papers_list=[]):
                     print 'update_authornames_tables: Created new name ' + str(authornamesid) + ' ' + str(name) + ' ' + str(bibref)
 
     tables = [['bibrec_bib10x', 'bib10x', '100__a', '100'], ['bibrec_bib70x', 'bib70x', '700__a', '700']]
+    
+    if not papers_list:
+        papers_list = run_sql("select id from bibrec")
     for paper in papers_list:
         for table in tables:
             sqlstr = "select id_bibxxx from %s where id_bibrec=" % table[0]

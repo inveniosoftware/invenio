@@ -1422,18 +1422,18 @@ class Template:
             h('</div>')
             h('</div>')
 
-            if new_person_link:
-                if search_ticket:
-                    link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, '-3')
-                    for r in search_ticket['bibrefs']:
-                        link = link + '&selection=%s' % str(r)
-                else:
-                    link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, '-3')
-                h('<div>')
-                h('<a href="%s">' % (link))
-                h(self._("Create a new Person for your search"))
-                h('</a>')
-                h('</div>')
+        if new_person_link:
+            if search_ticket:
+                link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, '-3')
+                for r in search_ticket['bibrefs']:
+                    link = link + '&selection=%s' % str(r)
+            else:
+                link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, '-3')
+            h('<div>')
+            h('<a href="%s">' % (link))
+            h(self._("Create a new Person for your search"))
+            h('</a>')
+            h('</div>')
 
         return "\n".join(html)
 
