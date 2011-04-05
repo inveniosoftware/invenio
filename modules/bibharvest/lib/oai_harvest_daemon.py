@@ -42,7 +42,8 @@ from invenio.config import \
      CFG_BINDIR, \
      CFG_TMPDIR, \
      CFG_ETCDIR, \
-     CFG_INSPIRE_SITE
+     CFG_INSPIRE_SITE, \
+     CFG_CERN_SITE
 from invenio.dbquery import run_sql
 from invenio.bibtask import \
      task_get_task_param, \
@@ -602,7 +603,7 @@ def call_plotextractor(active_file, extracted_file, harvested_identifier_list, \
     @param extracted_file: path to the file where the final results will be saved
     @param harvested_identifier_list: list of OAI identifiers for this active_file
     @param downloaded_files: dict of identifier -> dict mappings for downloaded material.
-    
+
     @return: exitcode and any error messages as: (exitcode, err_msg)
     """
     all_err_msg = []
@@ -655,7 +656,7 @@ def call_plotextractor(active_file, extracted_file, harvested_identifier_list, \
 
 def call_refextract(active_file, extracted_file, harvested_identifier_list,
                     downloaded_files):
-    """ 
+    """
     Function that calls refextractor to extract references and attach them to
     harvested records. It will download the fulltext-pdf for each identifier
     if necessary.
@@ -664,7 +665,7 @@ def call_refextract(active_file, extracted_file, harvested_identifier_list,
     @param extracted_file: path to the file where the final results will be saved
     @param harvested_identifier_list: list of OAI identifiers for this active_file
     @param downloaded_files: dict of identifier -> dict mappings for downloaded material.
-    
+
     @return: exitcode and any error messages as: (exitcode, all_err_msg)
     """
     all_err_msg = []
@@ -723,7 +724,7 @@ def call_refextract(active_file, extracted_file, harvested_identifier_list,
 
 def call_fulltext(active_file, extracted_file, harvested_identifier_list,
                   downloaded_files):
-    """ 
+    """
     Function that calls attach FFT tag for full-text pdf to harvested records.
     It will download the fulltext-pdf for each identifier if necessary.
 
@@ -731,8 +732,8 @@ def call_fulltext(active_file, extracted_file, harvested_identifier_list,
     @param extracted_file: path to the file where the final results will be saved
     @param harvested_identifier_list: list of OAI identifiers for this active_file
     @param downloaded_files: dict of identifier -> dict mappings for downloaded material.
-    
-    @return: exitcode and any error messages as: (exitcode, err_msg)    
+
+    @return: exitcode and any error messages as: (exitcode, err_msg)
     """
     all_err_msg = []
     exitcode = 0
@@ -742,7 +743,15 @@ def call_fulltext(active_file, extracted_file, harvested_identifier_list,
     records = recs_fd.read()
     recs_fd.close()
 
-    # Find all record
+    # Set doctype FIXME: Remove when parameters are introduced to post-process steps
+    if CFG_INSPIRE_SITE == 1:
+        doctype = "arXiv"
+    elif CFG_CERN_SITE == 1:
+        doctype = ""
+    else:
+        doctype = ""
+
+    # Find all records
     record_xmls = REGEXP_RECORD.findall(records)
     updated_xml = ['<?xml version="1.0" encoding="UTF-8"?>']
     updated_xml.append('<collection>')
@@ -764,10 +773,11 @@ def call_fulltext(active_file, extracted_file, harvested_identifier_list,
             else:
                 downloaded_files[identifier]["pdf"] = pdf
         if current_exitcode == 0:
-            fulltext_xml = '  <datafield tag="FFT" ind1=" " ind2=" ">\n' + \
-                   '    <subfield code="a">' + downloaded_files[identifier]["pdf"] + '</subfield>\n' + \
-                   '    <subfield code="t"></subfield>\n' + \
-                   '  </datafield>'
+            fulltext_xml = """  <datafield tag="FFT" ind1=" " ind2=" ">
+    <subfield code="a">%(url)s</subfield>
+    <subfield code="t">%(doctype)s</subfield>
+  </datafield>""" % {'url': downloaded_files[identifier]["pdf"],
+                     'doctype': doctype}
             updated_xml.append(fulltext_xml)
         updated_xml.append("</record>")
     updated_xml.append('</collection>')
