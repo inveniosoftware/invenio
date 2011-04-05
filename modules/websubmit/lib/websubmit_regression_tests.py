@@ -147,6 +147,7 @@ class WebSubmitFileConverterTest(unittest.TestCase):
     """Test WebSubmit file converter tool"""
 
     def __init__(self, input_file, from_format, to_format):
+        super(WebSubmitFileConverterTest, self).__init__('runTest')
         from invenio.websubmit_file_converter import get_file_converter_logger
         from logging import StreamHandler, DEBUG
         from cStringIO import StringIO
@@ -161,10 +162,11 @@ class WebSubmitFileConverterTest(unittest.TestCase):
         self.from_format = from_format
         self.to_format = to_format
         self.input_file = input_file
-        self._testMethodDoc = """websubmit - test %s to %s conversion""" % (self.from_format, self.to_format)
-        self._testMethodName = "test_conversion"
 
-    def test_conversion(self):
+    def shortDescription(self):
+        return """websubmit - test %s to %s conversion""" % (self.from_format, self.to_format)
+
+    def runTest(self):
         from invenio.websubmit_file_converter import InvenioWebSubmitFileConverterError, convert_file
         try:
             tmpdir_snapshot1 = set(os.listdir(CFG_TMPDIR))
