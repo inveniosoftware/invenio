@@ -280,7 +280,7 @@ def get_keyevent_trend_number_of_loans(args):
 
 def get_keyevent_trend_web_submissions(args):
     """
-    Returns the quantity of websubmissions in CDS Invenio for
+    Returns the quantity of websubmissions in Invenio for
     the given timestamp range.
 
     @param args['doctype']: A doctype name
