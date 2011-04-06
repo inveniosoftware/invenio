@@ -217,6 +217,15 @@ class Template:
               'x_url2_close': "</a>"}
         return body_content
 
+    def tmpl_invalid_marcxml(self, ln=CFG_SITE_LANG):
+        """ Displays message when the MARCXML is not valid """
+        _ = gettext_set_language(ln)
+        body_content = """<br/>"""
+        body_content += _("The MARCXML submitted is not valid. Please, review the file and %(x_url2_open)sresubmit it%(x_url2_close)s") %\
+             {'x_url2_open': "<a href=\"%s/batchuploader/metadata\">" % CFG_SITE_URL,
+              'x_url2_close': "</a>"}
+        return body_content
+
     def tmpl_upload_history(self, ln=CFG_SITE_LANG, upload_meta_list="", upload_doc_list=""):
         """Displays upload history of a given user"""
         _ = gettext_set_language(ln)
