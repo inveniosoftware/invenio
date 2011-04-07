@@ -502,6 +502,9 @@ class SpiresToInvenioSyntaxConverter:
         # topcite
         'topcite' : 'cited:',
 
+        # captions
+        'caption' : 'caption:',
+
         # second-order operators
         'refersto' : 'refersto:',
         'refs': 'refersto:',
@@ -510,7 +513,6 @@ class SpiresToInvenioSyntaxConverter:
         # replace all the keywords without match with empty string
         # this will remove the noise from the unknown keywrds in the search
         # and will in all fields for the words following the keywords
-
 
         # category
         'arx' : '037__c:',

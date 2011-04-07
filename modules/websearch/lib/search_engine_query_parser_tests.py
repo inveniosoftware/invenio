@@ -433,6 +433,18 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = "find topcite 50+"
         self._compare_searches(inv_search, spi_search)
 
+    def test_caption(self):
+        """SPIRES search syntax - find caption muon"""
+        inv_search = "caption:muon"
+        spi_search = "find caption muon"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_caption_multi_word(self):
+        """SPIRES search syntax - find caption quark mass"""
+        inv_search = "caption:quark and caption:mass"
+        spi_search = "find caption quark mass"
+        self._compare_searches(inv_search, spi_search)
+
     def test_quotes(self):
         """SPIRES search syntax - find t 'compton scattering' and a mele"""
         inv_search = "title:'compton scattering' and author:mele"
