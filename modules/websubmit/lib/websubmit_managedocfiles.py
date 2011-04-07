@@ -124,7 +124,8 @@ def create_file_upload_interface(recid,
                                  doctypes_to_default_filename=None,
                                  max_files_for_doctype=None,
                                  sbm_indir=None, sbm_doctype=None, sbm_access=None,
-                                 uid=None, sbm_curdir=None):
+                                 uid=None, sbm_curdir=None,
+                                 display_hidden_files=False, protect_hidden_files=True):
     """
     Returns the HTML for the file upload interface.
 
@@ -359,6 +360,16 @@ def create_file_upload_interface(recid,
     @param uid: the user id
     @type uid: int
 
+    @param display_hidden_files: if bibdoc containing bibdocfiles
+                                 flagged as 'HIDDEN' should be
+                                 displayed or not.
+    @type display_hidden_files: boolean
+
+    @param protect_hidden_files: if bibdoc containing bibdocfiles
+                                 flagged as 'HIDDEN' can be edited
+                                 (revise, delete, add format) or not.
+    @type protect_hidden_files: boolean
+
     @return Tuple (errorcode, html)
     """
     # Clean and set up a few parameters
@@ -469,7 +480,8 @@ def create_file_upload_interface(recid,
          comment_label, restrictions_and_desc,
          can_restrict_doctypes,
          restriction_label, doctypes_to_default_filename,
-         max_files_for_doctype, print_outside_form_tag) = parameters
+         max_files_for_doctype, print_outside_form_tag,
+         display_hidden_files, protect_hidden_files) = parameters
     except:
         # Initial display of the interface: save configuration to
         # disk for later reuse
@@ -484,7 +496,8 @@ def create_file_upload_interface(recid,
                       comment_label, restrictions_and_desc,
                       can_restrict_doctypes,
                       restriction_label, doctypes_to_default_filename,
-                      max_files_for_doctype, print_outside_form_tag)
+                      max_files_for_doctype, print_outside_form_tag,
+                      display_hidden_files, protect_hidden_files)
         _write_file_revision_interface_configuration_to_disk(working_dir, parameters)
 
     # Get the existing bibdocs as well as the actions performed during
@@ -503,7 +516,8 @@ def create_file_upload_interface(recid,
     # "merge":
     abstract_bibdocs = build_updated_files_list(bibdocs,
                                                 performed_actions,
-                                                recid or -1)
+                                                recid or -1,
+                                                display_hidden_files)
 
     # If any, process form submitted by user
     if form:
@@ -515,6 +529,14 @@ def create_file_upload_interface(recid,
          keep_default, can_describe_doctypes, can_comment_doctypes,
          can_rename_doctypes, can_name_new_files, can_restrict_doctypes,
          doctypes_to_default_filename, working_dir)
+
+        if protect_hidden_files and \
+               (file_action in ['revise', 'addFormat', 'delete']) and \
+               is_hidden_for_docname(file_target, abstract_bibdocs):
+            # Sanity check. We should not let editing
+            file_action = ''
+            body += '<script>alert("%s");</script>' % \
+                    _("The file you want to edit is protected against modifications. Your action has not been applied")
 
         ## Check the last action performed by user, and log it if
         ## everything is ok
@@ -735,7 +757,8 @@ def create_file_upload_interface(recid,
     else:
         bibdocs = []
 
-    abstract_bibdocs = build_updated_files_list(bibdocs, performed_actions, recid or -1)
+    abstract_bibdocs = build_updated_files_list(bibdocs, performed_actions,
+                                                recid or -1, display_hidden_files)
     abstract_bibdocs.sort(lambda x, y: x['order'] - y['order'])
 
     # Display form and necessary CSS + Javscript
@@ -808,7 +831,8 @@ def create_file_upload_interface(recid,
                                     can_restrict_doctypes,
                                     even=not (i % 2),
                                     ln=ln,
-                                    form_url_params=form_url_params)
+                                    form_url_params=form_url_params,
+                                    protect_hidden_files=protect_hidden_files)
     body += '</table>'
     if len(cleaned_doctypes) > 0:
         body += '''<input type="button" onclick="%(display_revise_panel)s;updateForm('%(defaultSelectedDoctype)s', %(can_describe_doctypes)s, %(can_comment_doctypes)s, %(can_restrict_doctypes)s);return false;" value="%(add_new_file)s"/>''' % \
@@ -886,7 +910,8 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
                     can_describe_doctypes, can_comment_doctypes,
                     can_keep_doctypes, can_add_format_to_doctypes,
                     doctypes_list, show_links, can_restrict_doctypes,
-                    even=False, ln=CFG_SITE_LANG, form_url_params=''):
+                    even=False, ln=CFG_SITE_LANG, form_url_params='',
+                    protect_hidden_files=True):
     """
     Creates a row in the files list representing the given abstract_bibdoc
 
@@ -930,6 +955,11 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
     @param form_url_params: the
     @type form_url_params: string
 
+    @param protect_hidden_files: if bibdoc containing bibdocfiles
+                                 flagged as 'HIDDEN' can be edited
+                                 (revise, delete, add format) or not.
+    @type protect_hidden_files: boolean
+
     @return: an HTML formatted "file" row
     @rtype: string
     """
@@ -950,15 +980,18 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
         main_bibdocfile_description = ''
 
     updated = abstract_bibdoc['updated'] # Has BibDoc been updated?
+    hidden_p = abstract_bibdoc['hidden_p']
 
     # Main file row
     out = '<tr%s>' % (even and ' class="even"' or '')
-    out += '<td class="reviseControlFileColumn">'
-    if not updated and show_links:
+    out += '<td class="reviseControlFileColumn"%s>' % (hidden_p and ' style="color:#99F"' or '')
+    if not updated and show_links and not hidden_p:
         out += '<a target="_blank" href="' + main_bibdocfile.get_url() \
            + '">'
     out += abstract_bibdoc['get_docname']
-    if not updated and show_links:
+    if hidden_p:
+        out += ' <span style="font-size:small;font-style:italic;color:#888">(hidden)</span>'
+    if not updated and show_links and not hidden_p:
         out += '</a>'
     if main_bibdocfile_description:
         out += ' (<em>' + main_bibdocfile_description + '</em>)'
@@ -970,7 +1003,7 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
     # Revise link
     out += '<td class="reviseControlActionColumn">'
     if main_bibdocfile.get_type() in can_revise_doctypes or \
-           '*' in can_revise_doctypes:
+           '*' in can_revise_doctypes and not (hidden_p and protect_hidden_files):
         out += '[<a href="" onclick="%(display_revise_panel)s;return false;">%(revise)s</a>]' % \
                {'display_revise_panel': javascript_display_revise_panel(
             action='revise',
@@ -991,7 +1024,7 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
 
     # Delete link
     if main_bibdocfile.get_type() in can_delete_doctypes or \
-           '*' in can_delete_doctypes:
+           '*' in can_delete_doctypes and not (hidden_p and protect_hidden_files):
         out += '''[<a href="" onclick="return askDelete('%(bibdocname)s', '%(form_url_params)s')">%(delete)s</a>]
         ''' % {'bibdocname': abstract_bibdoc['get_docname'].replace("'", "\\'").replace('"', '&quot;'),
                'delete': _("delete"),
@@ -1000,21 +1033,21 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
 
     # Format row
     out += '''<tr%s>
-    <td class="reviseControlFormatColumn">
+    <td class="reviseControlFormatColumn"%s>
         <img src="%s/img/tree_branch.gif" alt="">
-    ''' % (even and ' class="even"' or '', CFG_SITE_URL)
+    ''' % (even and ' class="even"' or '', hidden_p and ' style="color:#999"' or '', CFG_SITE_URL)
     for bibdocfile in abstract_bibdoc['list_latest_files']:
-        if not updated and show_links:
+        if not updated and show_links and not hidden_p:
             out += '<a target="_blank" href="' + bibdocfile.get_url() + '">'
         out += bibdocfile.get_format().strip('.')
-        if not updated and show_links:
+        if not updated and show_links and not hidden_p:
             out += '</a>'
         out += ' '
 
     # Add format link
     out += '<td class="reviseControlActionColumn">'
     if main_bibdocfile.get_type() in can_add_format_to_doctypes or \
-           '*' in can_add_format_to_doctypes:
+           '*' in can_add_format_to_doctypes and not (hidden_p and protect_hidden_files):
         out += '[<a href="" onclick="%(display_revise_panel)s;return false;">%(add_format)s</a>]' % \
         {'display_revise_panel':javascript_display_revise_panel(
             action='addFormat',
@@ -1036,7 +1069,7 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
 
     return out
 
-def build_updated_files_list(bibdocs, actions, recid):
+def build_updated_files_list(bibdocs, actions, recid, display_hidden_files=False):
     """
     Parses the list of BibDocs and builds an updated version to reflect
     the changes performed by the user of the file
@@ -1053,10 +1086,19 @@ def build_updated_files_list(bibdocs, actions, recid):
                     updated file list
 
     @param recid: the record ID to which the files belong
+
+    @param display_hidden_files: if bibdoc containing bibdocfiles
+                                 flagged as 'HIDDEN' should be
+                                 displayed or not.
+    @type display_hidden_files: boolean
     """
     abstract_bibdocs = {}
     i = 0
     for bibdoc in bibdocs:
+        hidden_p = True in [bibdocfile.hidden_p() for bibdocfile in bibdoc.list_latest_files()]
+        if not display_hidden_files and hidden_p:
+            # Do not consider hidden files
+            continue
         i += 1
         status = bibdoc.get_status()
         if status == "DELETED":
@@ -1068,7 +1110,8 @@ def build_updated_files_list(bibdocs, actions, recid):
              'updated': False,
              'get_type': bibdoc.get_type(),
              'get_status': status,
-             'order': i}
+             'order': i,
+             'hidden_p': hidden_p}
 
     for action, bibdoc_name, file_path, rename, description, \
             comment, doctype, keep_previous_versions, \
@@ -1109,7 +1152,8 @@ def build_updated_files_list(bibdocs, actions, recid):
                  'get_type': doctype,
                  'updated': True,
                  'get_status': file_restriction,
-                 'order': order}
+                 'order': order,
+                 'hidden_p': False}
             abstract_bibdocs[(rename or bibdoc_name)]['updated'] = True
         elif action == "revise" and not file_path:
             # revision of attributes of a file (description, name,
@@ -1363,6 +1407,24 @@ def get_extensions_for_docname(docname, abstract_bibdocs):
                 in bibdocfiles[0]]
     return []
 
+def is_hidden_for_docname(docname, abstract_bibdocs):
+    """
+    Returns True if the bibdoc with given docname in abstract_bibdocs
+    should be hidden. Also return True if docname cannot be found in
+    abstract_bibdocs.
+
+    @param docname: the name of the bibdoc for wich we want to
+                    check if it is hidden or not
+
+    @param abstract_bibdocs: the list of bibdocs from which we want to
+                             look for the given docname
+    """
+    bibdocs = [bibdoc for bibdoc in abstract_bibdocs \
+                   if bibdoc['get_docname'] == docname]
+    if len(bibdocs) > 0:
+        return bibdocs[0]['hidden_p']
+    return True
+
 def get_description_and_comment(bibdocfiles):
     """
     Returns the first description and comment as tuple (description,
@@ -1535,14 +1597,14 @@ def wash_form_parameters(form, abstract_bibdocs, can_keep_doctypes,
     # Action performed ...
     if form.has_key("fileAction") and \
            form['fileAction'] in CFG_ALLOWED_ACTIONS:
-        file_action = form['fileAction'] # "add", "revise",
-                                         # "addFormat" or "delete"
+        file_action = str(form['fileAction']) # "add", "revise",
+                                              # "addFormat" or "delete"
     else:
         file_action = ""
 
     # ... on file ...
     if form.has_key("fileTarget"):
-        file_target = form['fileTarget'] # contains bibdocname
+        file_target = str(form['fileTarget']) # contains bibdocname
         # Also remember its doctype to make sure we do valid actions
         # on it
         corresponding_bibdoc = get_bibdoc_for_docname(file_target,
@@ -1561,7 +1623,7 @@ def wash_form_parameters(form, abstract_bibdocs, can_keep_doctypes,
     file_doctype = file_target_doctype
     if form.has_key("fileDoctype") and \
            file_action == 'add':
-        file_doctype = form['fileDoctype']
+        file_doctype = str(form['fileDoctype'])
 
     # ... keeping previous version? ...
     if file_target_doctype != '' and \
@@ -1591,7 +1653,7 @@ def wash_form_parameters(form, abstract_bibdocs, can_keep_doctypes,
           (file_action == 'add' and \
            (file_doctype in can_describe_doctypes))) \
          or '*' in can_describe_doctypes):
-        file_description = form['description']
+        file_description = str(form['description'])
     else:
         file_description = ''
 
@@ -1602,7 +1664,7 @@ def wash_form_parameters(form, abstract_bibdocs, can_keep_doctypes,
           (file_action == 'add' and \
            (file_doctype in can_comment_doctypes))) \
          or '*' in can_comment_doctypes):
-        file_comment = form['comment']
+        file_comment = str(form['comment'])
     else:
         file_comment = ''
 
@@ -1613,7 +1675,7 @@ def wash_form_parameters(form, abstract_bibdocs, can_keep_doctypes,
            '*'  in can_rename_doctypes)) or \
          (file_action == "add" and \
           can_name_new_files)):
-        file_rename = form['rename'] # contains new bibdocname if applicable
+        file_rename = str(form['rename']) # contains new bibdocname if applicable
     elif file_action == "add" and \
              doctypes_to_default_filename.has_key(file_doctype):
         # Admin-chosen name. Ensure it is unique by appending a suffix
@@ -1634,7 +1696,7 @@ def wash_form_parameters(form, abstract_bibdocs, can_keep_doctypes,
     if form.has_key("fileRestriction"):
         # We cannot clean that value as it could be a restriction
         # declared in another submission. We keep this value.
-        file_restriction = form['fileRestriction']
+        file_restriction = str(form['fileRestriction'])
 
     # ... and the file itself ? ...
     if form.has_key('myfile') and \

@@ -450,7 +450,8 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                 restrictions_and_desc=[('', 'Public'),
                                        ('restricted', 'Restricted')],
                 uid=uid,
-                sbm_access=access)[1]
+                sbm_access=access,
+                display_hidden_files=True)[1]
 
             body += '''<br />
             <form method="post" action="%(CFG_SITE_URL)s/submit/managedocfiles">
