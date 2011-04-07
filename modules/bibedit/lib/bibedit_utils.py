@@ -50,7 +50,8 @@ from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG, CFG_TMPSHAREDDIR
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.bibedit_dblayer import get_bibupload_task_opts, \
-    get_marcxml_of_record_revision, get_record_revisions
+    get_marcxml_of_record_revision, get_record_revisions, \
+    get_info_of_record_revision
 from invenio.search_engine import get_fieldvalues, print_record, \
      record_exists, get_colID, guess_primary_collection_of_a_record, \
      get_record
@@ -317,7 +318,6 @@ def get_record_revision_timestamps(recid):
 def get_record_revision_ids(recid):
     """Return list of all record revision IDs.
     Return revision IDs in chronologically decreasing order (latest first).
-
     """
     res = []
     tmp_res =  get_record_revisions(recid)
@@ -339,10 +339,28 @@ def get_marcxml_of_revision(recid, revid):
 def get_marcxml_of_revision_id(revid):
     """Return MARCXML string of revision.
     Return empty string if revision does not exist. REVID should be a string.
-
     """
     recid, job_date = split_revid(revid, 'datetext')
     return get_marcxml_of_revision(recid, job_date);
+
+def get_info_of_revision_id(revid):
+    """Return info string regarding revision.
+    Return empty string if revision does not exist. REVID should be a string.
+    """
+    recid, job_date = split_revid(revid, 'datetext')
+    res = ''
+    tmp_res = get_info_of_record_revision(recid, job_date)
+    if tmp_res:
+        task_id = str(tmp_res[0][0])
+        author = tmp_res[0][1]
+        if not author:
+            author = 'N/A'
+        res += '%s%s%s' % (revid.ljust(22), task_id.ljust(15), author.ljust(15))
+        job_details = tmp_res[0][2].split()
+        upload_mode = job_details[0] + job_details[1][:-1]
+        upload_file = job_details[2] + job_details[3][:-1]
+        res += '%s %s' % (upload_mode, upload_file)
+    return res
 
 def revision_format_valid_p(revid):
     """Test validity of revision ID format (=RECID.REVDATE)."""
