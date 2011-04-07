@@ -142,6 +142,13 @@ class HTTPAsyncPageGetter(asyncore.dispatcher_with_send):
         self.done = True
         self.close()
 
+    def log_info(self, message, type='info'):
+        """
+        Workaround broken asyncore log_info method that tries to print
+        to stdout.
+        """
+        print >> sys.stderr, "%s: %s" % (type, message)
+
 def build_request(uri):
     """Build an http request for a specific url."""
 
