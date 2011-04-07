@@ -23,11 +23,19 @@ __revision__ = "$Id$"
 
 import unittest
 
+try:
+    import chardet
+    CHARDET_AVAILABLE = True
+except ImportError:
+    CHARDET_AVAILABLE = False
+
 from invenio.textutils import \
      wrap_text_in_a_box, \
      guess_minimum_encoding, \
      wash_for_xml, \
-     wash_for_utf8
+     wash_for_utf8, \
+     decode_to_unicode, \
+     translate_latex2unicode
 
 from invenio.testutils import make_test_suite, run_test_suite
 
@@ -390,9 +398,30 @@ At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praese
 """
         self.assertEqual(wrap_text_in_a_box(text), result)
 
+class DecodeToUnicodeTest(unittest.TestCase):
+    """Test functions related to decode_to_unicode function."""
+
+    if CHARDET_AVAILABLE:
+        def test_decode_to_unicode(self):
+            """textutils - decode_to_unicode."""
+            self.assertEqual(decode_to_unicode('\202\203\204\205', failover_encoding='latin1'), u'\x82\x83\x84\x85')
+            self.assertEqual(decode_to_unicode('àèéìòù'), u'\xe0\xe8\xe9\xec\xf2\xf9')
+            self.assertEqual(decode_to_unicode('Ιθάκη'), u'\u0399\u03b8\u03ac\u03ba\u03b7')
+
+class Latex2UnicodeTest(unittest.TestCase):
+    """Test functions related to translating LaTeX symbols to Unicode."""
+
+    if CHARDET_AVAILABLE:
+        def test_latex_to_unicode(self):
+            """textutils - latex_to_unicode"""
+            self.assertEqual(translate_latex2unicode("\\'a \\'i \\'U").encode('utf-8'), "á í Ú")
+            self.assertEqual(translate_latex2unicode("\\'N \\k{i}"), u'\u0143 \u012f')
+            self.assertEqual(translate_latex2unicode("\\AAkeson"), u'\u212bkeson')
+            self.assertEqual(translate_latex2unicode("$\\mathsl{\\Zeta}$"), u'\U0001d6e7')
 
 TEST_SUITE = make_test_suite(WrapTextInABoxTest, GuessMinimumEncodingTest,
-                             WashForXMLTest, WashForUTF8Test)
+                             WashForXMLTest, WashForUTF8Test, DecodeToUnicodeTest,
+                             Latex2UnicodeTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
