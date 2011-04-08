@@ -429,6 +429,24 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = 'find fa ellis'
         self._compare_searches(inv_search, spi_search)
 
+    def test_citedby_author(self):
+        """SPIRES search syntax - find citedby author doggy"""
+        inv_search = 'citedby:author:doggy'
+        spi_search = 'find citedby author doggy'
+        self._compare_searches(inv_search, spi_search)
+
+    def test_refersto_author(self):
+        """SPIRES search syntax - find refersto author kitty"""
+        inv_search = 'refersto:author:kitty'
+        spi_search = 'find refersto author kitty'
+        self._compare_searches(inv_search, spi_search)
+
+    def test_citedby_refersto_author(self):
+        """SPIRES search syntax - find citedby refersto author penguin"""
+        inv_search = 'refersto:citedby:author:penguin'
+        spi_search = 'find refersto citedby author penguin'
+        self._compare_searches(inv_search, spi_search)
+
     def test_irn_processing(self):
         """SPIRES search syntax - find irn 1360337 == find irn SPIRES-1360337"""
         # Added for trac-130

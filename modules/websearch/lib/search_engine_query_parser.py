@@ -528,11 +528,6 @@ class SpiresToInvenioSyntaxConverter:
         # captions
         'caption' : 'caption:',
 
-        # second-order operators
-        'refersto' : 'refersto:',
-        'refs': 'refersto:',
-        'citedby' : 'citedby:',
-
         # replace all the keywords without match with empty string
         # this will remove the noise from the unknown keywrds in the search
         # and will in all fields for the words following the keywords
@@ -584,6 +579,12 @@ class SpiresToInvenioSyntaxConverter:
         'testindex' : '',
     }
 
+    _SECOND_ORDER_KEYWORD_MATCHINGS = {
+        'refersto' : 'refersto:',
+        'refs': 'refersto:',
+        'citedby' : 'citedby:'
+    }
+
     _INVENIO_KEYWORDS_FOR_SPIRES_PHRASE_SEARCHES = [
         'affiliation:',
         #'cited:', # topcite is technically a phrase index - this isn't necessary
@@ -621,13 +622,14 @@ class SpiresToInvenioSyntaxConverter:
         self._re_topcite_match = re.compile(r'(?P<x>cited:\d+)\+')
 
         # regular expression that matches author patterns
-        self._re_author_match = re.compile(r'\bauthor:\s*(?P<name>.+?)\s*(?= and not | and | or | not |$)', re.IGNORECASE)
+        # and author patterns with second-order-ops on top
+        self._re_author_match = re.compile(r'\b((?P<secondorderop>[^\s]+:)?)author:\s*(?P<name>.+?)\s*(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # regular expression that matches exact author patterns
         # the group defined in this regular expression is used in method
         # _convert_spires_exact_author_search_to_invenio_author_search(...)
         # in case of changes correct also the code in this method
-        self._re_exact_author_match = re.compile(r'\bexactauthor:(?P<author_name>[^\'\"].*?[^\'\"]\b)(?= and not | and | or | not |$)', re.IGNORECASE)
+        self._re_exact_author_match = re.compile(r'\b((?P<secondorderop>[^\s]+:)?)exactauthor:(?P<author_name>[^\'\"].*?[^\'\"]\b)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # match search term, its content (words that are searched) and
         # the operator preceding the term.
@@ -646,7 +648,7 @@ class SpiresToInvenioSyntaxConverter:
         self._re_keysubbed_date_expr = re.compile(r'\b(?P<term>(' + self._DATE_ADDED_FIELD + ')|(' + self._DATE_UPDATED_FIELD + ')|(' + self._DATE_FIELD + '))(?P<content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # for finding (and changing) a variety of different SPIRES search keywords
-        self._re_spires_find_keyword = re.compile('^(?P<find>f|fin|find)\s+(?P<query>.*)$', re.IGNORECASE)
+        self._re_spires_find_keyword = re.compile('^(f|fin|find)\s+', re.IGNORECASE)
 
         # for finding boolean expressions
         self._re_boolean_expression = re.compile(r' and | or | not | and not ')
@@ -675,10 +677,7 @@ class SpiresToInvenioSyntaxConverter:
 
         # SPIRES syntax allows searches with 'find' or 'fin'.
         if self.is_applicable(query):
-
-            # Everywhere else make the assumption that all and only queries
-            # starting with 'find' are SPIRES queries.  Turn fin into find.
-            query = self._re_spires_find_keyword.sub(lambda m: 'find '+m.group('query'), query)
+            query = re.sub(self._re_spires_find_keyword, 'find ', query)
 
             # a holdover from SPIRES syntax is e.g. date = 2000 rather than just date 2000
             query = self._remove_extraneous_equals_signs(query)
@@ -942,6 +941,8 @@ class SpiresToInvenioSyntaxConverter:
         current_position = 0
         for match in self._re_author_match.finditer(query):
             result += query[current_position : match.start() ]
+            if match.group('secondorderop'):
+                result += match.group('secondorderop')
             scanned_name = NameScanner.scan(match.group('name'))
             author_atoms = self._create_author_search_pattern_from_fuzzy_name_dict(scanned_name)
             if author_atoms.find(' ') == -1:
@@ -1020,7 +1021,8 @@ class SpiresToInvenioSyntaxConverter:
         """Replaces invenio keywords kw with "and kw" in order to
            parse them correctly further down the line."""
 
-        unique_invenio_keywords = set(self._SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS.values())
+        unique_invenio_keywords = set(self._SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS.values()) |\
+                                  set(self._SECOND_ORDER_KEYWORD_MATCHINGS.values())
         unique_invenio_keywords.remove('') # for the ones that don't have invenio equivalents
 
         for invenio_keyword in unique_invenio_keywords:
@@ -1070,19 +1072,29 @@ class SpiresToInvenioSyntaxConverter:
         corresponding Invenio keywords"""
 
         for spires_keyword, invenio_keyword in self._SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS.iteritems():
-            query = self._replace_keyword(query, spires_keyword, \
-                                          invenio_keyword)
+            query = self._replace_keyword(query, spires_keyword, invenio_keyword)
+        for spires_keyword, invenio_keyword in self._SECOND_ORDER_KEYWORD_MATCHINGS.iteritems():
+            query = self._replace_second_order_keyword(query, spires_keyword, invenio_keyword)
 
         return query
 
     def _replace_keyword(self, query, old_keyword, new_keyword):
         """Replaces old keyword in the query with a new keyword"""
-        # perform case insensitive replacement with regular expression
 
-        regex_string = r'\b(?P<operator>(find|and|or|not)\b[\s\(]*)' + \
+        regex_string = r'(?P<operator>(^find|\band|\bor|\bnot|\brefersto|\bcitedby|^)\b[:\s\(]*)' + \
                        old_keyword + r'(?P<end>[\s\(]+|$)'
         regular_expression = re.compile(regex_string, re.IGNORECASE)
         result = regular_expression.sub(r'\g<operator>' + new_keyword + r'\g<end>', query)
+        result = re.sub(':\s+', ':', result)
+        return result
+
+    def _replace_second_order_keyword(self, query, old_keyword, new_keyword):
+        """Replaces old second-order keyword in the query with a new keyword"""
+
+        regex_string = r'(?P<operator>(^find|\band|\bor|\bnot|\brefersto|\bcitedby|^)\b[:\s\(]*)' + \
+                       old_keyword + r'(?P<endorop>\s*[a-z]+:|[\s\(]+|$)'
+        regular_expression = re.compile(regex_string, re.IGNORECASE)
+        result = regular_expression.sub(r'\g<operator>' + new_keyword + r'\g<endorop>', query)
         result = re.sub(':\s+', ':', result)
         return result
 
