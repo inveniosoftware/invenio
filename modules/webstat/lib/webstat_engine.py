@@ -24,7 +24,17 @@ from invenio.config import CFG_TMPDIR, \
     CFG_SITE_URL, \
     CFG_SITE_NAME, \
     CFG_BINDIR, \
-    CFG_CERN_SITE
+    CFG_CERN_SITE, \
+    CFG_BIBCIRCULATION_ITEM_STATUS_CANCELLED, \
+    CFG_BIBCIRCULATION_ITEM_STATUS_CLAIMED, \
+    CFG_BIBCIRCULATION_ITEM_STATUS_IN_PROCESS, \
+    CFG_BIBCIRCULATION_ITEM_STATUS_NOT_ARRIVED, \
+    CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN, \
+    CFG_BIBCIRCULATION_ITEM_STATUS_ON_ORDER, \
+    CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF, \
+    CFG_BIBCIRCULATION_ITEM_STATUS_OPTIONAL, \
+    CFG_BIBCIRCULATION_REQUEST_STATUS_DONE, \
+    CFG_BIBCIRCULATION_ILL_STATUS_CANCELLED
 from invenio.bibindex_engine import CFG_JOURNAL_TAG
 from invenio.urlutils import redirect_to_url
 from invenio.search_engine import perform_request_search, \
@@ -561,7 +571,6 @@ WHERE bx.id = bibx.id_bibxxx AND bx.tag LIKE '250__a' AND bibx.id_bibrec=%s"
     order_m = sorted(order_m, key=itemgetter(3))
     order_m.reverse()
     # Check limit values
-
     if limit > 0:
         order_m = order_m[:limit]
 
@@ -775,7 +784,7 @@ def get_keyevent_ill_requests_statistics(args, return_sql=False):
         param.append(args['status'])
     else:
         sql_where += "AND ill.status != %s "
-        param.append("cancelled") #FIXME: change to CFG variable
+        param.append(CFG_BIBCIRCULATION_ILL_STATUS_CANCELLED)
     if 'supplier' in args and args['supplier'] != '':
         sql_from += ", crcLIBRARY lib "
         sql_where += "AND lib.id=ill.id_crcLIBRARY AND lib.name=%s "
@@ -847,7 +856,8 @@ def get_keyevent_ill_requests_lists(args, return_sql=False, limit=50):
     upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
 
     sql_from = "FROM crcILLREQUEST ill "
-    sql_where = "WHERE status != 'cancelled' AND request_date > %s AND request_date < %s " #FIXME: change 'cancelled' to CFG variable
+    sql_where = "WHERE status != '%s' AND request_date > %%s AND request_date < %%s " \
+                    % CFG_BIBCIRCULATION_ITEM_STATUS_CANCELLED
 
     param = [lower, upper]
 
@@ -916,7 +926,7 @@ def get_keyevent_trend_satisfied_ill_requests_percentage(args, return_sql=False)
         param.append(args['status'])
     else:
         sql_where += "AND ill.status != %s "
-        param.append("cancelled") #FIXME: change to CFG variable
+        param.append(CFG_BIBCIRCULATION_ILL_STATUS_CANCELLED)
     if 'supplier' in args and args['supplier'] != '':
         sql_from += ", crcLIBRARY lib "
         sql_where += "AND lib.id=ill.id_crcLIBRARY AND lib.name=%s "
@@ -1102,7 +1112,8 @@ def get_keyevent_loan_request_statistics(args, return_sql=False):
 DATEDIFF(ws.creation_time, lr.request_date) >= 7" % (sql_from, custom_table, sql_where)
 
     # Number of successful hold requests transactions
-    succesful_holds = "SELECT COUNT(*) %s %s AND lr.status='done'" % (sql_from, sql_where)
+    succesful_holds = "SELECT COUNT(*) %s %s AND lr.status='%s'" % (sql_from, sql_where,
+                                                        CFG_BIBCIRCULATION_REQUEST_STATUS_DONE)
 
     # Average time between the hold request date and the date of delivery document in a year
     avg_sql = "SELECT AVG(DATEDIFF(ws.creation_time, lr.request_date)) \
@@ -2466,8 +2477,14 @@ def _get_doctypes():
 
 def _get_item_statuses():
     """Returns all the possible status of an item"""
-    return [("available", "Available"), ("requested", "Requested"),
-            ("on loan", "On loan"), ("missing", "Missing")]
+    return [(CFG_BIBCIRCULATION_ITEM_STATUS_CANCELLED, "Cancelled"),
+            (CFG_BIBCIRCULATION_ITEM_STATUS_CLAIMED, "Claimed"),
+            (CFG_BIBCIRCULATION_ITEM_STATUS_IN_PROCESS, "In process"),
+            (CFG_BIBCIRCULATION_ITEM_STATUS_NOT_ARRIVED, "Not arrived"),
+            (CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN, "On loan"),
+            (CFG_BIBCIRCULATION_ITEM_STATUS_ON_ORDER, "On order"),
+            (CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF, "On shelf")] + \
+            [(status, status) for status in CFG_BIBCIRCULATION_ITEM_STATUS_OPTIONAL]
 
 
 def _get_item_doctype():
