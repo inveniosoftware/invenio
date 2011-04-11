@@ -41,6 +41,8 @@ FIXME:
 """
 import urllib
 import urllib2
+import mechanize
+import ClientForm
 import xml.sax
 import re
 import tempfile
@@ -50,20 +52,23 @@ import sys
 
 try:
     # if we are running locally, we can optimize :-)
-    from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
+    from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD, CFG_CERN_SITE
     from invenio.bibtask import task_low_level_submission
     from invenio.search_engine import perform_request_search, collection_restricted_p
     from invenio.bibformat import format_records
     LOCAL_SITE_URL = CFG_SITE_URL
 except ImportError:
     LOCAL_SITE_URL = None
+    CFG_CERN_SITE = 0
 
-class InvenioConnector:
+CFG_CDS_URL = "http://cdsweb.cern.ch/"
+
+class InvenioConnector(object):
     """
     Creates an connector to a server running Invenio
     """
 
-    def __init__(self, url, local_import_path="invenio"):
+    def __init__(self, url=LOCAL_SITE_URL, user="", password="", login_method=None, local_import_path="invenio"):
         """
         Initialize a new instance of the server at given URL.
 
@@ -72,19 +77,51 @@ class InvenioConnector:
         you can choose from which base path to import the necessary file
         specifying the local_import_path parameter.
 
-        Parameters:
-                       url - *str* the url to which this instance will
-                             be connected
-
-         local_import_path - *str* the base path from which the
-                             connector should try to load the local
-                             connector, if available. Eg "invenio"
-                             will lead to "import invenio.dbquery"
+        @param url: the url to which this instance will be connected
+        @type url: string
+        @param user: the optional username for interacting with the Invenio
+            instance in an authenticated way.
+        @type user: string
+        @param password: the corresponding password.
+        @type password: string
+        @param login_method: the name of the login method the Invenio instance
+            is expecting for this user (in case there is more than one).
+        @type login_method: string
+        @param local_import_path: the base path from which the connector should
+            try to load the local connector, if available. Eg "invenio" will
+            lead to "import invenio.dbquery"
+        @type local_import_path: string
          """
         self.server_url = url
+        self.local = self.server_url == LOCAL_SITE_URL
         self.cached_queries = {}
         self.cached_records = {}
         self.cached_baskets = {}
+        self.user = user
+        self.password = password
+        self.login_method = login_method
+        self.browser = None
+        if self.user:
+            self._init_browser()
+            self._check_credentials()
+
+    def _init_browser(self):
+        """
+        Ovveride this method with the appropriate way to prepare a logged in
+        browser.
+        """
+        self.browser = mechanize.Browser()
+        self.browser.set_handle_robots(False)
+        self.browser.open(self.server_url + "/youraccount/login")
+        self.browser.select_form(nr=0)
+        self.browser['p_un'] = self.user
+        self.browser['p_pw'] = self.password
+        self.browser['login_method'] = self.login_method
+        self.browser.submit()
+
+    def _check_credentials(self):
+        if not 'youraccount/logout' in self.browser.response().read():
+            raise ValueError("It was not possible to successfully login with the provided credentials")
 
     def search(self, p="", f="", c="", rg=10, sf="", so="d", sp="",
                rm="", of="", ot="", p1="", f1="", m1="", op1="",
@@ -142,7 +179,10 @@ class InvenioConnector:
                 results = format_records(results, of)
         else:
             if not self.cached_queries.has_key(params + str(parse_results)) or not read_cache:
-                results = urllib2.urlopen(self.server_url + "/search?" + params)
+                if self.user:
+                    results = self.browser.open(self.server_url + "/search?" + params)
+                else:
+                    results = urllib2.urlopen(self.server_url + "/search?" + params)
             else:
                 return self.cached_queries[params + str(parse_results)]
 
@@ -217,12 +257,20 @@ class InvenioConnector:
         """
         return self.search(p="recid:" + str(recid), rm="citation")
 
-    def get_records_from_basket(self, bskid, read_cache=True):
+    def get_records_from_basket(self, bskid, group_basket=False, read_cache=True):
         """
         Returns the records from the (public) basket with given bskid
         """
         if not self.cached_baskets.has_key(bskid) or not read_cache:
-            results = urllib2.urlopen(self.server_url + \
+            if self.user:
+                if group_basket:
+                    group_basket = '&category=G'
+                else:
+                    group_basket = ''
+                results = self.browser.open(self.server_url + \
+                        "/yourbaskets/display?of=xm&bskid=" + str(bskid) + group_basket)
+            else:
+                results = urllib2.urlopen(self.server_url + \
                         "/yourbaskets/display_public?of=xm&bskid=" + str(bskid))
         else:
             return self.cached_baskets[bskid]
@@ -268,6 +316,7 @@ class InvenioConnector:
         else:
             params = urllib.urlencode({'file': marcxml,
                                         'mode': mode})
+            ## We don't use self.browser as batchuploader is protected by IP
             return urllib2.urlopen(self.server_url + "/batchuploader/robotupload", params)
 
     def _parse_results(self, results, cached_records):
@@ -344,6 +393,45 @@ class Record(dict):
             return self.server_url + "/"+ CFG_SITE_RECORD +"/" + str(self.recid)
         else:
             return None
+
+class _SGMLParserFactory( mechanize.DefaultFactory):
+    """
+    Black magic to be able to interact with CERN SSO forms.
+    """
+    def __init__(self, i_want_broken_xhtml_support=False):
+        forms_factory = mechanize.FormsFactory(
+            form_parser_class=ClientForm.XHTMLCompatibleFormParser)
+        mechanize.Factory.__init__(
+            self,
+            forms_factory=forms_factory,
+            links_factory=mechanize.LinksFactory(),
+            title_factory=mechanize.TitleFactory(),
+            response_type_finder=mechanize._html.ResponseTypeFinder(
+                allow_xhtml=i_want_broken_xhtml_support),
+            )
+
+class CDSInvenioConnector(InvenioConnector):
+    def __init__(self, user="", password="", local_import_path="invenio"):
+        """
+        This is a specialized InvenioConnector class suitable to connecte
+        to the CERN Document Server (CDS), which uses centralize SSO.
+        """
+        super(CDSInvenioConnector, self).__init__(CFG_CDS_URL, user, password, local_import_path=local_import_path)
+
+    def _init_browser(self):
+        """
+        @note: update this everytime the CERN SSO login form is refactored.
+        """
+        self.browser = mechanize.Browser(factory=_SGMLParserFactory(i_want_broken_xhtml_support=True))
+        self.browser.set_handle_robots(False)
+        self.browser.open(self.server_url)
+        self.browser.follow_link(text_regex="login")
+        self.browser.select_form(nr=0)
+        self.browser.form['ctl00$ContentPlaceHolder1$txtFormsLogin'] = self.user
+        self.browser.form['ctl00$ContentPlaceHolder1$txtFormsPassword'] = self.password
+        self.browser.submit()
+        self.browser.select_form(nr=0)
+        self.browser.submit()
 
 class RecordsHandler(xml.sax.handler.ContentHandler):
     "MARCXML Parser"
