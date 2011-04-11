@@ -80,14 +80,14 @@ install-data-local:
 		mkdir -p $(localstatedir)$$d ;		\
 	done
 	@echo "************************************************************"
-	@echo "** Invenio software has been successfully installed!  **"
+	@echo "** Invenio software has been successfully installed!      **"
 	@echo "**                                                        **"
 	@echo "** You may proceed to customizing your installation now.  **"
 	@echo "************************************************************"
 
 install-mathjax-plugin:
 	@echo "***********************************************************"
-	@echo "** Installing MathJax plugin, please wait...              **"
+	@echo "** Installing MathJax plugin, please wait...             **"
 	@echo "***********************************************************"
 	rm -rf /tmp/invenio-mathjax-plugin
 	mkdir /tmp/invenio-mathjax-plugin
@@ -97,21 +97,21 @@ install-mathjax-plugin:
 	rm -fr /tmp/invenio-mathjax-plugin
 	@echo "* Installing Invenio-specific MathJax config..."
 	(cd $(top_srcdir)/modules/webstyle/etc && make install)
-	@echo "***********************************************************"
+	@echo "************************************************************"
 	@echo "** The MathJax plugin was successfully installed.         **"
-	@echo "** Please do not forget to properly set the option       **"
+	@echo "** Please do not forget to properly set the option        **"
 	@echo "** CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS in invenio.conf. **"
-	@echo "***********************************************************"
+	@echo "************************************************************"
 
 uninstall-mathjax-plugin:
 	@rm -rvf ${prefix}/var/www/MathJax
 	@echo "***********************************************************"
-	@echo "** The MathJax plugin was successfully uninstalled.       **"
+	@echo "** The MathJax plugin was successfully uninstalled.      **"
 	@echo "***********************************************************"
 
 install-jscalendar-plugin:
 	@echo "***********************************************************"
-	@echo "** Installing jsCalendar plugin, please wait...              **"
+	@echo "** Installing jsCalendar plugin, please wait...          **"
 	@echo "***********************************************************"
 	rm -rf /tmp/invenio-jscalendar-plugin
 	mkdir /tmp/invenio-jscalendar-plugin
@@ -315,7 +315,7 @@ update-v0.7.1-tables:
 	@echo "**********************************************************"
 	@echo "** Do not forget to run the basket migration now:       **"
 	@echo "**    @PYTHON@ modules/webbasket/lib/webbasket_migration_kit.py "
-	@echo "** Please see the RELEASE-NOTES for details.           **"
+	@echo "** Please see the RELEASE-NOTES for details.            **"
 	@echo "**********************************************************"
 	@echo "INSERT INTO oaiARCHIVE (id, setName, setSpec, setDescription, setDefinition, setRecList) SELECT id, setName, setSpec, CONCAT_WS('', setDescription), setDefinition, setRecList FROM oaiSET;"
 
