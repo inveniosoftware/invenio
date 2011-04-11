@@ -115,20 +115,6 @@ CFG_EXTERNAL_COLLECTIONS = {
          'search_url': 'http://invenio-demo.cern.ch/search?cc=Articles&p=',
          'record_url': 'http://invenio-demo.cern.ch/record/',
          'selected_by_default': True},
-    'CDS DEV':
-        {'engine': 'Invenio',
-         'base_url': 'http://cdsdev.cern.ch/',
-         'parser_params':
-            {'host': 'cdsdev.cern.ch',
-             'path': '',
-             'parser': InvenioXMLExternalCollectionResultsParser,
-             'fetch_format': 'xm',
-             'num_results_regex_str': r'<!-- Search-Engine-Total-Number-Of-Results: ([0-9,]+?) -->',
-             'nbrecs_regex_str': r'<!-- Search-Engine-Total-Number-Of-Results: ([0-9,]+?) -->',
-             'nbrecs_url': 'http://cdsdev.cern.ch/search?rg=0&of=xm'},
-         'search_url': 'http://cdsdev.cern.ch/search?p=',
-         'record_url': 'http://cdsdev.cern.ch/record/',
-         'selected_by_default': True},
 }
 
 CFG_EXTERNAL_COLLECTION_STATES_NAME = {0: 'Disabled', 1: 'See also', 2: 'External search', 3:'External search checked'}
