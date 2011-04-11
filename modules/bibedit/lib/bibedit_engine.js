@@ -2341,6 +2341,7 @@ function onContentClick(cell){
     $(cell).addClass('edit_area').removeAttr('onclick');
     convertFieldIntoEditable(cell, shouldSelect);
     $(cell).trigger('click');
+    $(cell).find('TEXTAREA').bind('keydown', 'return', function(event){ $(event.target).parent().submit();} );
   }
 }
 
