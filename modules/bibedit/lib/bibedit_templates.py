@@ -445,6 +445,13 @@ def page_style():
                     border: 1px solid #A1A1A1;
                     border-collapse: collapse;
                     width: 100%;
+                    table-layout:fixed;
+                }
+
+                #bibEditTable td {
+                    max-width: 500px;
+                    overflow:hidden;
+                    word-wrap: break-word;
                 }
 
                 #bibEditMenu .bibEditMenuSection table {
@@ -507,6 +514,8 @@ def page_style():
                 #top_toolbar_hr {
                     padding-top: 37px;
                 }
+
+
 
             """
     style += "</style>"

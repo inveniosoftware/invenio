@@ -230,6 +230,8 @@ function initJeditable(){
         textarea.width(settings.width);
       }
       $(this).append(textarea);
+      textarea.bind('keydown', 'return', function(event){ $(event.target).parent().submit(); event.preventDefault(); return false;})
+      textarea.css('width', '670px');
       return(textarea);
     },
     plugin: function(settings, original){
@@ -2324,7 +2326,6 @@ function convertFieldIntoEditable(cell, shouldSelect){
       onblur: 'submit',
       select: shouldSelect,
       autogrow: {
-        lineHeight: 16,
         minHeight: 36
       }
     });

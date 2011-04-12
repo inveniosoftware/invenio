@@ -159,7 +159,7 @@ function initHotkeys(){
 
   // Edit focused subfield.
   $(document).bind('keydown', 'return',
-		   onKeyReturn);
+		   function (event)  { onKeyReturn(event); return false; } );
   // Save content and jump to next content field.
   $(document).bind('keydown', 'tab', onKeyTab);
 
