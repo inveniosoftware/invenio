@@ -1118,7 +1118,6 @@ class WordTable:
                                                       CFG_BIBINDEX_SYNONYM_KBRS[self.index_name][0],
                                                       CFG_BIBINDEX_SYNONYM_KBRS[self.index_name][1])
                     if word_synonyms:
-                        print "word %s, word synonyms %s" % (word, repr(word_synonyms))
                         wlist[recID] = list_union(word_synonyms, wlist[recID])
 
         # were there some words for these recIDs found?
