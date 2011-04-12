@@ -808,7 +808,7 @@ class SpiresToInvenioSyntaxConverter:
                 position = match.end()
             result += query[position : ]
             return result
-	
+
         if GOT_DATEUTIL:
             query = mangle_with_dateutils(query)
         # else do nothing with the dates
@@ -908,7 +908,7 @@ class SpiresToInvenioSyntaxConverter:
         query = self._re_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), '=', '__EQUALS__')+'\"', query)
         query = self._re_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), '=', '__EQUALS__')+"/", query)
 
-        query = query.translate(None, '=')
+        query = query.replace('=', '')
 
         query = self._re_pattern_equals.sub("=", query)
 
