@@ -1218,6 +1218,7 @@ function onSubmitClick(){
       cleanUp(!gNavigatingRecordSet, '', null, true);
       updateStatus('report', gRESULT_CODES[resCode]);
       displayMessage(resCode);
+      updateToolbar(false);
       resetBibeditState()
     });
     onSubmitClick.force = false;
