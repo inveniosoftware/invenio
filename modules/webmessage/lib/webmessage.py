@@ -25,7 +25,8 @@ import invenio.webmessage_dblayer as db
 from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
                                       CFG_WEBMESSAGE_RESULTS_FIELD, \
                                       CFG_WEBMESSAGE_SEPARATOR, \
-                                      CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA
+                                      CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA, \
+                                      InvenioWebMessageError
 from invenio.config import CFG_SITE_LANG, \
      CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE
 from invenio.messages import gettext_set_language
@@ -37,6 +38,7 @@ try:
     webmessage_templates = invenio.template.load('webmessage')
 except:
     pass
+from invenio.errorlib import register_exception
 
 def perform_request_display_msg(uid, msgid, ln=CFG_SITE_LANG):
     """
@@ -44,15 +46,20 @@ def perform_request_display_msg(uid, msgid, ln=CFG_SITE_LANG):
     @param uid:   user id
     @param msgid: message id
 
-    @return: a (body, errors[], warnings[]) formed tuple
+    @return: body
     """
-    errors = []
-    warnings = []
+    _ = gettext_set_language(ln)
+
     body = ""
 
     if (db.check_user_owns_message(uid, msgid) == 0):
         # The user doesn't own this message
-        errors.append(('ERR_WEBMESSAGE_NOTOWNER',))
+        try:
+            raise InvenioWebMessageError(_('Sorry, this message in not in your mailbox.'))
+        except InvenioWebMessageError, exc:
+            register_exception()
+            body = webmessage_templates.tmpl_error(exc.message, ln)
+            return body
     else:
         (msg_id,
          msg_from_id, msg_from_nickname,
@@ -64,7 +71,12 @@ def perform_request_display_msg(uid, msgid, ln=CFG_SITE_LANG):
         if (msg_id == ""):
             # The message exists in table user_msgMESSAGE
             # but not in table msgMESSAGE => table inconsistency
-            errors.append(('ERR_WEBMESSAGE_NOMESSAGE',))
+            try:
+                raise InvenioWebMessageError('This message does not exist.')
+            except InvenioWebMessageError, exc:
+                register_exception()
+                body = webmessage_templates.tmpl_error(exc.message, ln)
+                return body
         else:
             if (msg_status == CFG_WEBMESSAGE_STATUS_CODE['NEW']):
                 db.set_message_status(uid, msgid,
@@ -80,14 +92,14 @@ def perform_request_display_msg(uid, msgid, ln=CFG_SITE_LANG):
                                                 msg_sent_date,
                                                 msg_received_date,
                                                 ln)
-    return (body, errors, warnings)
+    return body
 
-def perform_request_display(uid, errors=[], warnings=[], infos=[], ln=CFG_SITE_LANG):
+def perform_request_display(uid, warnings=[], infos=[], ln=CFG_SITE_LANG):
     """
     Displays the user's Inbox
     @param uid:   user id
 
-    @return: a (body, [errors], [warnings]) formed tuple
+    @return: body with warnings
     """
     body = ""
     rows = []
@@ -103,7 +115,7 @@ def perform_request_display(uid, errors=[], warnings=[], infos=[], ln=CFG_SITE_L
                                                    nb_messages=nb_messages,
                                                    no_quota=no_quota,
                                                    ln=ln)
-    return (body, errors, warnings)
+    return body
 
 def perform_request_delete_msg(uid, msgid, ln=CFG_SITE_LANG):
     """
@@ -111,23 +123,28 @@ def perform_request_delete_msg(uid, msgid, ln=CFG_SITE_LANG):
     @param uid: user id (int)
     @param msgid: message id (int)
     @param ln: language
-    @return: a (body, errors, warning tuple)
+    @return: body with warnings
     """
     _ = gettext_set_language(ln)
 
-    errors = []
     warnings = []
     infos = []
+    body = ""
 
     if (db.check_user_owns_message(uid, msgid) == 0):
         # The user doesn't own this message
-        errors.append(('ERR_WEBMESSAGE_NOTOWNER',))
+        try:
+            raise InvenioWebMessageError(_('Sorry, this message in not in your mailbox.'))
+        except InvenioWebMessageError, exc:
+            register_exception()
+            body = webmessage_templates.tmpl_error(exc.message, ln)
+            return body
     else:
         if (db.delete_message_from_user_inbox(uid, msgid) == 0):
             warnings.append(_("The message could not be deleted."))
         else:
             infos.append(_("The message was successfully deleted."))
-    return perform_request_display(uid, errors, warnings, infos, ln)
+    return perform_request_display(uid, warnings, infos, ln)
 
 def perform_request_delete_all(uid, confirmed=False, ln=CFG_SITE_LANG):
     """
@@ -135,19 +152,18 @@ def perform_request_delete_all(uid, confirmed=False, ln=CFG_SITE_LANG):
     @param uid: user id (int)
     @param confirmed: 0 will produce a confirmation message
     @param ln: language
-    @return: a (body, errors, warnings) tuple
+    @return: body with warnings
     """
     infos = []
     warnings = []
-    errors = []
     _ = gettext_set_language(ln)
     if confirmed:
         db.delete_all_messages(uid)
         infos = [_("Your mailbox has been emptied.")]
-        return perform_request_display(uid, warnings, errors, infos, ln)
+        return perform_request_display(uid, warnings, infos, ln)
     else:
         body = webmessage_templates.tmpl_confirm_delete(ln)
-        return (body, errors, warnings)
+        return body
 
 def perform_request_write(uid,
                           msg_reply_id="",
@@ -173,19 +189,22 @@ def perform_request_write(uid,
     @type msg_body: string
     @param ln: language.
     @type ln: string
-    @return: (body, errors, warnings).
-    @rtype: tuple
+    @return: body with warnings.
     """
-    errors = []
     warnings = []
     body = ""
-
+    _ = gettext_set_language(ln)
     msg_from_nickname = ""
     msg_id = 0
     if (msg_reply_id):
         if (db.check_user_owns_message(uid, msg_reply_id) == 0):
             # The user doesn't own this message
-            errors.append(('ERR_WEBMESSAGE_NOTOWNER',))
+            try:
+                raise InvenioWebMessageError(_('Sorry, this message in not in your mailbox.'))
+            except InvenioWebMessageError, exc:
+                register_exception()
+                body = webmessage_templates.tmpl_error(exc.message, ln)
+                return body
         else:
             # dummy == variable name to make pylint and pychecker happy!
             (msg_id,
@@ -196,7 +215,12 @@ def perform_request_write(uid,
             if (msg_id == ""):
                 # The message exists in table user_msgMESSAGE
                 # but not in table msgMESSAGE => table inconsistency
-                errors.append(('ERR_WEBMESSAGE_NOMESSAGE',))
+                try:
+                    raise InvenioWebMessageError('This message does not exist.')
+                except InvenioWebMessageError, exc:
+                    register_exception()
+                    body = webmessage_templates.tmpl_error(exc.message, ln)
+                    return body
             else:
                 msg_to = msg_from_nickname or str(msg_from_id)
 
@@ -207,7 +231,7 @@ def perform_request_write(uid,
                                            msg_body=msg_body,
                                            warnings=[],
                                            ln=ln)
-    return (body, errors, warnings)
+    return body
 
 def perform_request_write_with_search(
                         uid,
@@ -239,10 +263,9 @@ def perform_request_write_with_search(
     @param mode_user: if 1 display user search box, else group search box
     @param add_values: if 1 users_to_add will be added to msg_to_user field..
     @param ln: language
-    @return: a (body, errors, warnings) formed tuple.
+    @return: body with warnings
     """
     warnings = []
-    errors = []
     search_results_list = []
     def cat_names(name1, name2):
         """ name1, name2 => 'name1, name2' """
@@ -289,7 +312,7 @@ def perform_request_write_with_search(
                             search_pattern=search_pattern,
                             results_field=results_field,
                             ln=ln)
-    return (body, errors, warnings)
+    return body
 
 def perform_request_send(uid,
                          msg_to_user="",
@@ -312,7 +335,7 @@ def perform_request_send(uid,
     @param msg_send_month: send this message on month y (int)
     @param msg_send_day: send this message on day z (int)
     @param ln: language
-    @return: a (body, errors, warnings) tuple
+    @return: body with warnings
     """
     _ = gettext_set_language(ln)
 
@@ -328,9 +351,7 @@ def perform_request_send(uid,
     if groups_to == ['']:
         groups_to = []
 
-
     warnings = []
-    errors = []
     infos = []
     problem = None
 
@@ -412,7 +433,7 @@ def perform_request_send(uid,
                                                ln=ln)
         title =  _("Write a message")
         navtrail = get_navtrail(ln, title)
-        return (body, errors, warnings, title, navtrail)
+        return (body, title, navtrail)
     else:
         msg_id = db.create_message(uid,
                                    users_to_str, groups_to_str,
@@ -432,12 +453,10 @@ def perform_request_send(uid,
             infos.append(_("Your message has been sent."))
         else:
             db.check_if_need_to_delete_message_permanently([msg_id])
-        (body, errors, warnings) = perform_request_display(uid,
-                                                           errors,
-                                                           warnings,
-                                                           infos, ln)
+        body = perform_request_display(uid, warnings,
+                                       infos, ln)
         title = _("Your Messages")
-        return (body, errors, warnings, title, get_navtrail(ln))
+        return (body, title, get_navtrail(ln))
 
 def account_new_mail(uid, ln=CFG_SITE_LANG):
     """

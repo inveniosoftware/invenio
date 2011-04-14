@@ -24,14 +24,6 @@ quotas, and some db related fields...
 
 __revision__ = "$Id$"
 
-# error messages. (should not happen, except in case of reload, or url
-# altering)
-CFG_WEBMESSAGE_ERROR_MESSAGES = \
-{   'ERR_WEBMESSAGE_NOTOWNER':  '_("This message is not in your mailbox")',
-    'ERR_WEBMESSAGE_NONICKNAME':'_("No nickname or user for uid #%s")',
-    'ERR_WEBMESSAGE_NOMESSAGE': '_("This message doesn\'t exist")'
-}
-
 # status of message (table user_msgMESSAGE)
 CFG_WEBMESSAGE_STATUS_CODE = \
 {
@@ -53,4 +45,7 @@ CFG_WEBMESSAGE_SEPARATOR = ','
 # list of roles (find them in accROLE table) without quota
 CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA = ['superadmin']
 
-
+# Exceptions: errors
+class InvenioWebMessageError(Exception):
+    """A generic error for WebMessage."""
+    pass

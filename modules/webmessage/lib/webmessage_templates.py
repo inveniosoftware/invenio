@@ -527,7 +527,6 @@ class Template:
             infobox += lines[-1] + "</div><br />\n"
         return infobox
 
-
     def tmpl_warning(self, warnings, ln=CFG_SITE_LANG):
         """
         Display len(warnings) warning fields
@@ -550,6 +549,21 @@ class Template:
             warningbox += "</div><br />\n"
         return warningbox
 
+    def tmpl_error(self, error, ln=CFG_SITE_LANG):
+        """
+        Display error
+        @param error: string
+        @param ln=language
+        @return: html output
+        """
+        _ = gettext_set_language(ln)
+        errorbox = ""
+        if error != "":
+            errorbox = "<div class=\"errorbox\">\n  <b>Error:</b>\n"
+            errorbox += "  <p>"
+            errorbox += error + "  </p>"
+            errorbox += "</div><br />\n"
+        return errorbox
 
     def tmpl_quota(self, nb_messages=0, ln=CFG_SITE_LANG):
         """

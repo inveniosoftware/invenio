@@ -81,8 +81,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use messages."))
 
-        (body, errors, warnings) = perform_request_display(uid=uid,
-                                                           ln=argd['ln'])
+        body = perform_request_display(uid=uid,
+                                       ln=argd['ln'])
 
         return page(title       = _("Your Messages"),
                     body        = body,
@@ -91,8 +91,6 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     lastupdated = __lastupdated__,
                     req         = req,
                     language    = argd['ln'],
-                    errors      = errors,
-                    warnings    = warnings,
                     navmenuid   = "yourmessages",
                     secure_page_p=1)
 
@@ -136,14 +134,14 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use messages."))
 
         # Request the composing page
-        (body, errors, warnings) = perform_request_write(
-                                        uid=uid,
-                                        msg_reply_id=argd['msg_reply_id'],
-                                        msg_to=argd['msg_to'],
-                                        msg_to_group=argd['msg_to_group'],
-                                        msg_subject=argd['msg_subject'],
-                                        msg_body=argd['msg_body'],
-                                        ln=argd['ln'])
+        body = perform_request_write(
+                                     uid=uid,
+                                     msg_reply_id=argd['msg_reply_id'],
+                                     msg_to=argd['msg_to'],
+                                     msg_to_group=argd['msg_to_group'],
+                                     msg_subject=argd['msg_subject'],
+                                     msg_body=argd['msg_body'],
+                                     ln=argd['ln'])
         title = _("Write a message")
 
         return page(title       = title,
@@ -153,8 +151,6 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     lastupdated = __lastupdated__,
                     req         = req,
                     language    = argd['ln'],
-                    errors      = errors,
-                    warnings    = warnings,
                     navmenuid   = "yourmessages",
                     secure_page_p=1)
 
@@ -191,8 +187,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         @param *button: which button was pressed.
         @param ln: language.
         @type ln: string
-        @return: a (body, errors, warnings) formed tuple.
-        @rtype: tuple
+        @return: body.
         """
         argd = wash_urlargd(form, {'msg_to_user': (str, ""),
                                    'msg_to_group': (str, ""),
@@ -233,7 +228,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use messages."))
 
         if argd['send_button']:
-            (body, errors, warnings, title, navtrail) = perform_request_send(
+            (body, title, navtrail) = perform_request_send(
                             uid=uid,
                             msg_to_user=argd['msg_to_user'],
                             msg_to_group=argd['msg_to_group'],
@@ -253,7 +248,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
             add_values = 0
             if argd['add_group'] or argd['add_user']:
                 add_values = 1
-            (body, errors, warnings) = perform_request_write_with_search(
+            body = perform_request_write_with_search(
                             uid=uid,
                             msg_to_user=argd['msg_to_user'],
                             msg_to_group=argd['msg_to_group'],
@@ -274,8 +269,6 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     lastupdated = __lastupdated__,
                     req         = req,
                     language    = argd['ln'],
-                    errors      = errors,
-                    warnings    = warnings,
                     navmenuid   = "yourmessages",
                     secure_page_p=1)
 
@@ -312,9 +305,9 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use messages."))
 
         # Generate content
-        (body, errors, warnings) = perform_request_delete_msg(uid,
-                                                              argd['msgid'],
-                                                              argd['ln'])
+        body = perform_request_delete_msg(uid,
+                                          argd['msgid'],
+                                          argd['ln'])
         return page(title       = _("Your Messages"),
                     body        = body,
                     navtrail    = get_navtrail(argd['ln']),
@@ -322,8 +315,6 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     lastupdated = __lastupdated__,
                     req         = req,
                     language    = argd['ln'],
-                    errors      = errors,
-                    warnings    = warnings,
                     navmenuid   = "yourmessages",
                     secure_page_p=1)
 
@@ -360,9 +351,9 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use messages."))
 
         # Generate content
-        (body, errors, warnings) = perform_request_delete_all(uid,
-                                                              argd['confirmed'],
-                                                              argd['ln'])
+        body = perform_request_delete_all(uid,
+                                          argd['confirmed'],
+                                          argd['ln'])
         return page(title       = _("Your Messages"),
                     body        = body,
                     navtrail    = get_navtrail(argd['ln']),
@@ -370,8 +361,6 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     lastupdated = __lastupdated__,
                     req         = req,
                     language    = argd['ln'],
-                    errors      = errors,
-                    warnings    = warnings,
                     navmenuid   = "yourmessages",
                     secure_page_p=1)
 
@@ -408,9 +397,9 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use messages."))
 
         # Generate content
-        (body, errors, warnings) = perform_request_display_msg(uid,
-                                                               argd['msgid'],
-                                                               argd['ln'])
+        body = perform_request_display_msg(uid,
+                                           argd['msgid'],
+                                           argd['ln'])
         title = _("Read a message")
         return page(title       = title,
                     body        = body,
@@ -419,8 +408,6 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     lastupdated = __lastupdated__,
                     req         = req,
                     language    = argd['ln'],
-                    errors      = errors,
-                    warnings    = warnings,
                     navmenuid   = "yourmessages",
                     secure_page_p=1)
 
