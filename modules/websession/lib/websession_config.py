@@ -35,27 +35,6 @@ CFG_WEBSESSION_USERGROUP_STATUS = {'ADMIN':  'A',
                                    'PENDING':'P'
                                    }
 
-CFG_WEBSESSION_ERROR_MESSAGES = {
-    'ERR_WEBSESSION_DB_ERROR': '_("Sorry there was an error with the database.")',
-    'ERR_WEBSESSION_GROUP_NO_RIGHTS': '_("Sorry, You don\'t have sufficient rights on this group.")'
-}
-
-CFG_WEBSESSION_WARNING_MESSAGES = {
-    'WRN_WEBSESSION_NO_GROUP_NAME': '_("Please enter a group name.")',
-    'WRN_WEBSESSION_NOT_VALID_GROUP_NAME': '_("Please enter a valid group name.")',
-    'WRN_WEBSESSION_GROUP_NAME_EXISTS': '_("Group name already exists. Please choose another group name.")',
-    'WRN_WEBSESSION_NO_JOIN_POLICY': '_("Please choose a group join policy.")',
-    'WRN_WEBSESSION_MULTIPLE_GROUPS': '_("Please select only one group.")',
-    'WRN_WEBSESSION_NO_GROUP_SELECTED': '_("Please select one group.")',
-    'WRN_WEBSESSION_GROUP_ALREADY_DELETED': '_("The group has already been deleted.")',
-    'WRN_WEBSESSION_ALREADY_MEMBER': '_("You are already member of the group.")',
-    'WRN_WEBSESSION_NO_MEMBER_SELECTED': '_("Please choose a member if you want to remove him from the group.")',
-    'WRN_WEBSESSION_NO_USER_SELECTED_ADD': '_("Please choose a user from the list if you want him to be added to the group.")',
-    'WRN_WEBSESSION_ALREADY_MEMBER_ADD': '_("The user is already member of the group.")',
-    'WRN_WEBSESSION_ALREADY_MEMBER_REJECT': '_("The user request for joining group has already been rejected.")',
-    'WRN_WEBSESSION_NO_USER_SELECTED_DEL': '_("Please choose a user from the list if you want him to be removed from waiting list.")'
-}
-
 CFG_WEBSESSION_INFO_MESSAGES = {"GROUP_CREATED": 'You have successfully created a new group.',
                                 "JOIN_GROUP": 'You have successfully joined a new group.',
                                 "GROUP_UPDATED": 'You have successfully updated a group.',
@@ -83,3 +62,13 @@ CFG_WEBSESSION_CLEANUP_CHANCE = 10000 #: cleanups have 1 in CLEANUP_CHANCE chanc
 ## could been handled at the same time. This is quite limited and, anyway
 ## there's already local locking available thanks to our MySQL backend.
 CFG_WEBSESSION_ENABLE_LOCKING = False
+
+# Exceptions: errors
+class InvenioWebSessionError(Exception):
+    """A generic error for WebSession."""
+    pass
+
+# Exceptions: warnings
+class InvenioWebSessionWarning(Exception):
+    """A generic warning for WebSession."""
+    pass

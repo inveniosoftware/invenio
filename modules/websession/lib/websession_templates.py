@@ -1370,32 +1370,6 @@ class Template:
 
     def tmpl_warning(self, warnings, ln=CFG_SITE_LANG):
         """
-        Prepare the warnings list
-        @param warnings: list of warning tuples (warning_msg, arg1, arg2, etc)
-        @return: html string of warnings
-        """
-        from invenio.errorlib import get_msgs_for_code_list
-        span_class = 'important'
-        out = ""
-        if type(warnings) is not list:
-            warnings = [warnings]
-        if len(warnings) > 0:
-            warnings_parsed = get_msgs_for_code_list(warnings, 'warning', ln)
-            for (warning_code, warning_text) in warnings_parsed:
-                if not warning_code.startswith('WRN'):
-                    #display only warnings that begin with WRN to user
-                    continue
-                span_class = 'important'
-                out += '''
-                    <span class="%(span_class)s">%(warning)s</span><br />''' % \
-                    {   'span_class'    :   span_class,
-                        'warning'       :   warning_text         }
-            return out
-        else:
-            return ""
-
-    def tmpl_warnings(self, warnings, ln=CFG_SITE_LANG):
-        """
         Display len(warnings) warning fields
         @param infos: list of strings
         @param ln=language
@@ -1414,6 +1388,22 @@ class Template:
                 warningbox += lines[-1] + "  </p>"
             warningbox += "</div><br />\n"
         return warningbox
+
+    def tmpl_error(self, error, ln=CFG_SITE_LANG):
+        """
+        Display error
+        @param error: string
+        @param ln=language
+        @return: html output
+        """
+        _ = gettext_set_language(ln)
+        errorbox = ""
+        if error != "":
+            errorbox = "<div class=\"errorbox\">\n  <b>Error:</b>\n"
+            errorbox += "  <p>"
+            errorbox += error + "  </p>"
+            errorbox += "</div><br />\n"
+        return errorbox
 
     def tmpl_display_all_groups(self,
                                 infos,
