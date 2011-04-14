@@ -332,14 +332,14 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use baskets."))
 
-        (body, warnings, navtrail) = perform_request_display(uid=uid,
-                                                             selected_category=argd['category'],
-                                                             selected_topic=argd['topic'],
-                                                             selected_group_id=argd['group'],
-                                                             selected_bskid=argd['bskid'],
-                                                             selected_recid=argd['recid'],
-                                                             of=argd['of'],
-                                                             ln=argd['ln'])
+        (body, [], navtrail) = perform_request_display(uid=uid,
+                                                   selected_category=argd['category'],
+                                                   selected_topic=argd['topic'],
+                                                   selected_group_id=argd['group'],
+                                                   selected_bskid=argd['bskid'],
+                                                   selected_recid=argd['recid'],
+                                                   of=argd['of'],
+                                                   ln=argd['ln'])
 
         if isGuestUser(uid):
             body = create_guest_warning_box(argd['ln']) + body
@@ -378,7 +378,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     language    = argd['ln'],
-                    warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
@@ -420,15 +419,15 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use baskets."))
 
-        (body, warnings, navtrail) = perform_request_search(uid=uid,
-                                                            selected_category=argd['category'],
-                                                            selected_topic=argd['topic'],
-                                                            selected_group_id=argd['group'],
-                                                            p=argd['p'],
-                                                            b=argd['b'],
-                                                            n=argd['n'],
-                                                            #format=argd['of'],
-                                                            ln=argd['ln'])
+        (body, navtrail) = perform_request_search(uid=uid,
+                                                  selected_category=argd['category'],
+                                                  selected_topic=argd['topic'],
+                                                  selected_group_id=argd['group'],
+                                                  p=argd['p'],
+                                                  b=argd['b'],
+                                                  n=argd['n'],
+#                                                  format=argd['of'],
+                                                  ln=argd['ln'])
 
         # register event in webstat
         if user_info['email']:
@@ -446,7 +445,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     language    = argd['ln'],
-                    warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
@@ -486,14 +484,14 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use baskets."))
 
-        (body, warnings, navtrail) = perform_request_write_note(uid=uid,
-                                                                category=argd['category'],
-                                                                topic=argd['topic'],
-                                                                group_id=argd['group'],
-                                                                bskid=argd['bskid'],
-                                                                recid=argd['recid'],
-                                                                cmtid=argd['cmtid'],
-                                                                ln=argd['ln'])
+        (body, navtrail) = perform_request_write_note(uid=uid,
+                                                      category=argd['category'],
+                                                      topic=argd['topic'],
+                                                      group_id=argd['group'],
+                                                      bskid=argd['bskid'],
+                                                      recid=argd['recid'],
+                                                      cmtid=argd['cmtid'],
+                                                      ln=argd['ln'])
 
         # register event in webstat
         basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
@@ -512,7 +510,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     language    = argd['ln'],
-                    warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
@@ -554,17 +551,17 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use baskets."))
 
-        (body, warnings, navtrail) = perform_request_save_note(uid=uid,
-                                                               category=argd['category'],
-                                                               topic=argd['topic'],
-                                                               group_id=argd['group'],
-                                                               bskid=argd['bskid'],
-                                                               recid=argd['recid'],
-                                                               note_title=argd['note_title'],
-                                                               note_body=argd['note_body'],
-                                                               editor_type=argd['editor_type'],
-                                                               ln=argd['ln'],
-                                                               reply_to=argd['reply_to'])
+        (body, navtrail) = perform_request_save_note(uid=uid,
+                                                    category=argd['category'],
+                                                    topic=argd['topic'],
+                                                    group_id=argd['group'],
+                                                    bskid=argd['bskid'],
+                                                    recid=argd['recid'],
+                                                    note_title=argd['note_title'],
+                                                    note_body=argd['note_body'],
+                                                    editor_type=argd['editor_type'],
+                                                    ln=argd['ln'],
+                                                    reply_to=argd['reply_to'])
 
         # TODO: do not stat event if save was not succussful
         # register event in webstat
@@ -584,7 +581,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     language    = argd['ln'],
-                    warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
@@ -632,14 +628,14 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use baskets."))
 
-        (body, warnings, navtrail) = perform_request_delete_note(uid=uid,
-                                                                 category=argd['category'],
-                                                                 topic=argd['topic'],
-                                                                 group_id=argd['group'],
-                                                                 bskid=argd['bskid'],
-                                                                 recid=argd['recid'],
-                                                                 cmtid=argd['cmtid'],
-                                                                 ln=argd['ln'])
+        (body, navtrail) = perform_request_delete_note(uid=uid,
+                                                       category=argd['category'],
+                                                       topic=argd['topic'],
+                                                       group_id=argd['group'],
+                                                       bskid=argd['bskid'],
+                                                       recid=argd['recid'],
+                                                       cmtid=argd['cmtid'],
+                                                       ln=argd['ln'])
 
         # TODO: do not stat event if delete was not succussful
         # register event in webstat
@@ -660,7 +656,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     language    = argd['ln'],
-                    warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
@@ -722,20 +717,20 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if not argd['referer']:
             argd['referer'] = get_referer(req)
 
-        (body, warnings, navtrail) = perform_request_add(uid=uid,
-                                                         recids=argd['recid'],
-                                                         colid=argd['colid'],
-                                                         bskid=argd['bskid'],
-                                                         es_title=argd['es_title'],
-                                                         es_desc=argd['es_desc'],
-                                                         es_url=argd['es_url'],
-                                                         note_body=argd['note_body'],
-                                                         editor_type=argd['editor_type'],
-                                                         category=argd['category'],
-                                                         b=argd['b'],
-                                                         copy=argd['copy'],
-                                                         referer=argd['referer'],
-                                                         ln=argd['ln'])
+        (body, navtrail) = perform_request_add(uid=uid,
+                                               recids=argd['recid'],
+                                               colid=argd['colid'],
+                                               bskid=argd['bskid'],
+                                               es_title=argd['es_title'],
+                                               es_desc=argd['es_desc'],
+                                               es_url=argd['es_url'],
+                                               note_body=argd['note_body'],
+                                               editor_type=argd['editor_type'],
+                                               category=argd['category'],
+                                               b=argd['b'],
+                                               copy=argd['copy'],
+                                               referer=argd['referer'],
+                                               ln=argd['ln'])
 
         if isGuestUser(uid):
             body = create_guest_warning_box(argd['ln']) + body
@@ -758,7 +753,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     language    = argd['ln'],
-                    warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
@@ -797,13 +791,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use baskets."))
 
-        (body, warnings)=perform_request_delete(uid=uid,
-                                                bskid=argd['bskid'],
-                                                confirmed=argd['confirmed'],
-                                                category=argd['category'],
-                                                selected_topic=argd['topic'],
-                                                selected_group_id=argd['group'],
-                                                ln=argd['ln'])
+        body=perform_request_delete(uid=uid,
+                                    bskid=argd['bskid'],
+                                    confirmed=argd['confirmed'],
+                                    category=argd['category'],
+                                    selected_topic=argd['topic'],
+                                    selected_group_id=argd['group'],
+                                    ln=argd['ln'])
         if argd['confirmed']:
             if argd['category'] == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
                 argd['topic'] = wash_topic(uid, argd['topic'])[0]
@@ -842,7 +836,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         uid         = uid,
                         lastupdated = __lastupdated__,
                         language    = argd['ln'],
-                        warnings    = warnings,
                         req         = req,
                         navmenuid   = 'yourbaskets',
                         of          = argd['of'],
@@ -897,17 +890,17 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         elif argd['action'] == CFG_WEBBASKET_ACTIONS['COPY']:
             title = _("Copy record to basket")
             referer = get_referer(req)
-            (body, warnings, navtrail) = perform_request_add(uid=uid,
-                                                             recids=argd['recid'],
-                                                             copy=True,
-                                                             referer=referer,
-                                                             ln=argd['ln'])
+            (body, navtrail) = perform_request_add(uid=uid,
+                                                   recids=argd['recid'],
+                                                   copy=True,
+                                                   referer=referer,
+                                                   ln=argd['ln'])
             if isGuestUser(uid):
                 body = create_guest_warning_box(argd['ln']) + body
         else:
             title = ''
             body = ''
-            warnings = [('WRN_WEBBASKET_UNDEFINED_ACTION',)]
+#            warnings = [('WRN_WEBBASKET_UNDEFINED_ACTION',)]
         navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
                    '%s</a>'
         navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
@@ -935,7 +928,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     language    = argd['ln'],
-                    warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
@@ -996,7 +988,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                              bskid=argd['bskid'],
                                              topic=argd['topic'],
                                              ln=argd['ln'])
-            warnings = []
+#            warnings = []
         elif (argd['add_group'] and argd['new_group']) or argd['group_cancel']:
             if argd['add_group']:
                 perform_request_add_group(uid=uid,
@@ -1004,20 +996,20 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                           topic=argd['topic'],
                                           group_id=argd['new_group'],
                                           ln=argd['ln'])
-            (body, warnings) = perform_request_edit(uid=uid,
-                                                    bskid=argd['bskid'],
-                                                    topic=argd['topic'],
-                                                    ln=argd['ln'])
+            body = perform_request_edit(uid=uid,
+                                        bskid=argd['bskid'],
+                                        topic=argd['topic'],
+                                        ln=argd['ln'])
         elif argd['submit']:
-            (body, warnings) = perform_request_edit(uid=uid,
-                                                    bskid=argd['bskid'],
-                                                    topic=argd['topic'],
-                                                    new_name=argd['new_name'],
-                                                    new_topic=argd['new_topic'],
-                                                    new_topic_name=argd['new_topic_name'],
-                                                    groups=argd['groups'],
-                                                    external=argd['external'],
-                                                    ln=argd['ln'])
+            body = perform_request_edit(uid=uid,
+                                        bskid=argd['bskid'],
+                                        topic=argd['topic'],
+                                        new_name=argd['new_name'],
+                                        new_topic=argd['new_topic'],
+                                        new_topic_name=argd['new_topic_name'],
+                                        groups=argd['groups'],
+                                        external=argd['external'],
+                                        ln=argd['ln'])
             if argd['new_topic'] != "-1":
                 argd['topic'] = argd['new_topic']
             url = CFG_SITE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s' % \
@@ -1025,7 +1017,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                    argd['topic'], argd['ln'])
             redirect_to_url(req, url)
         else:
-            (body, warnings) = perform_request_edit(uid=uid,
+            body = perform_request_edit(uid=uid,
                                                     bskid=argd['bskid'],
                                                     topic=argd['topic'],
                                                     ln=argd['ln'])
@@ -1060,7 +1052,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     language    = argd['ln'],
-                    warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
@@ -1114,10 +1105,10 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             f = open("/tmp/skata", "w")
             f.write("submit: " + argd['topic'] + " |+| " + argd['new_name'] + "\n")
             f.close()
-            (body, warnings) = perform_request_edit_topic(uid=uid,
-                                                          topic=argd['topic'],
-                                                          new_name=argd['new_name'],
-                                                          ln=argd['ln'])
+            body = perform_request_edit_topic(uid=uid,
+                                              topic=argd['topic'],
+                                              new_name=argd['new_name'],
+                                              ln=argd['ln'])
             #url = CFG_SITE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s' % \
             #      (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
             #       argd['topic'], argd['ln'])
@@ -1128,7 +1119,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             f = open("/tmp/skata", "w")
             f.write("normal: " + argd['topic'] + " |+| " + argd['new_name'] + "\n")
             f.close()
-            (body, warnings) = perform_request_edit_topic(uid=uid,
+            body = perform_request_edit_topic(uid=uid,
                                                           topic=argd['topic'],
                                                           ln=argd['ln'])
 
@@ -1162,7 +1153,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     language    = argd['ln'],
-                    warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
@@ -1202,6 +1192,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if argd['new_basket_name'] and \
                 (argd['new_topic_name'] or argd['create_in_topic'] != "-1"):
             topic = perform_request_create_basket(
+                            req,
                             uid=uid,
                             new_basket_name=argd['new_basket_name'],
                             new_topic_name=argd['new_topic_name'],
@@ -1223,12 +1214,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'], topic, argd['ln'])
             redirect_to_url(req, url)
         else:
-            (body, warnings) = perform_request_create_basket(uid=uid,
-                                                             new_basket_name=argd['new_basket_name'],
-                                                             new_topic_name=argd['new_topic_name'],
-                                                             create_in_topic=argd['create_in_topic'],
-                                                             topic=argd['topic'],
-                                                             ln=argd['ln'])
+            body = perform_request_create_basket(req,
+                                                 uid=uid,
+                                                 new_basket_name=argd['new_basket_name'],
+                                                 new_topic_name=argd['new_topic_name'],
+                                                 create_in_topic=argd['create_in_topic'],
+                                                 topic=argd['topic'],
+                                                 ln=argd['ln'])
             navtrail = '<a class="navtrail" href="%s/youraccount/'\
                        'display?ln=%s">%s</a>'
             navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
@@ -1240,7 +1232,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         uid         = uid,
                         lastupdated = __lastupdated__,
                         language    = argd['ln'],
-                        warnings    = warnings,
                         req         = req,
                         navmenuid   = 'yourbaskets',
                         of          = argd['of'],
@@ -1264,7 +1255,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
 
         if not argd['bskid']:
-            (body, warnings, navtrail) = perform_request_list_public_baskets(uid)
+            (body, navtrail) = perform_request_list_public_baskets(uid)
             title = _('List of public baskets')
 
             # register event in webstat
@@ -1278,11 +1269,11 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                 register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
         else:
-            (body, warnings, navtrail) = perform_request_display_public(uid=uid,
-                                                                        selected_bskid=argd['bskid'],
-                                                                        selected_recid=argd['recid'],
-                                                                        of=argd['of'],
-                                                                        ln=argd['ln'])
+            (body, [], navtrail) = perform_request_display_public(uid=uid,
+                                                                  selected_bskid=argd['bskid'],
+                                                                  selected_recid=argd['recid'],
+                                                                  of=argd['of'],
+                                                                  ln=argd['ln'])
             title = _('Public basket')
 
             # register event in webstat
@@ -1316,7 +1307,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     language    = argd['ln'],
-                    warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
@@ -1344,12 +1334,12 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         nb_views_show = acc_authorize_action(user_info, 'runwebstatadmin')
         nb_views_show_p = not(nb_views_show[0])
 
-        (body, warnings, navtrail) = perform_request_list_public_baskets(uid,
-                                                                         argd['limit'],
-                                                                         argd['sort'],
-                                                                         argd['asc'],
-                                                                         nb_views_show_p,
-                                                                         argd['ln'])
+        (body, navtrail) = perform_request_list_public_baskets(uid,
+                                                               argd['limit'],
+                                                               argd['sort'],
+                                                               argd['asc'],
+                                                               nb_views_show_p,
+                                                               argd['ln'])
 
         return page(title = _("List of public baskets"),
                     body        = body,
@@ -1357,7 +1347,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     language    = argd['ln'],
-                    warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
@@ -1394,7 +1383,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use baskets."))
 
         if not argd['bskid']:
-            (body, warnings, navtrail) = perform_request_list_public_baskets(uid)
+            (body, navtrail) = perform_request_list_public_baskets(uid)
             title = _('List of public baskets')
 
         else:
@@ -1402,13 +1391,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             #req.content_type = "text/xml"
             #req.send_http_header()
             #return perform_request_display_public(bskid=argd['bskid'], of=argd['of'], ln=argd['ln'])
-            (subscribe_warnings_html, subscribe_warnings) = perform_request_subscribe(uid, argd['bskid'], argd['ln'])
-            (body, warnings, navtrail) = perform_request_display_public(uid=uid,
-                                                                        selected_bskid=argd['bskid'],
-                                                                        selected_recid=0,
-                                                                        of=argd['of'],
-                                                                        ln=argd['ln'])
-            warnings.extend(subscribe_warnings)
+            subscribe_warnings_html = perform_request_subscribe(uid, argd['bskid'], argd['ln'])
+            (body, [], navtrail) = perform_request_display_public(uid=uid,
+                                                               selected_bskid=argd['bskid'],
+                                                               selected_recid=0,
+                                                               of=argd['of'],
+                                                               ln=argd['ln'])
+            #warnings.extend(subscribe_warnings)
             body = subscribe_warnings_html + body
             title = _('Public basket')
 
@@ -1418,7 +1407,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     language    = argd['ln'],
-                    warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
@@ -1455,7 +1443,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use baskets."))
 
         if not argd['bskid']:
-            (body, warnings, navtrail) = perform_request_list_public_baskets(uid)
+            (body, navtrail) = perform_request_list_public_baskets(uid)
             title = _('List of public baskets')
 
         else:
@@ -1463,13 +1451,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             #req.content_type = "text/xml"
             #req.send_http_header()
             #return perform_request_display_public(bskid=argd['bskid'], of=argd['of'], ln=argd['ln'])
-            (unsubscribe_warnings_html, unsubscribe_warnings) = perform_request_unsubscribe(uid, argd['bskid'], argd['ln'])
-            (body, warnings, navtrail) = perform_request_display_public(uid=uid,
-                                                                        selected_bskid=argd['bskid'],
-                                                                        selected_recid=0,
-                                                                        of=argd['of'],
-                                                                        ln=argd['ln'])
-            warnings.extend(unsubscribe_warnings)
+            unsubscribe_warnings_html = perform_request_unsubscribe(uid, argd['bskid'], argd['ln'])
+            (body, [], navtrail) = perform_request_display_public(uid=uid,
+                                                              selected_bskid=argd['bskid'],
+                                                              selected_recid=0,
+                                                              of=argd['of'],
+                                                              ln=argd['ln'])
+           # warnings.extend(unsubscribe_warnings)
             body = unsubscribe_warnings_html + body
             title = _('Public basket')
 
@@ -1479,7 +1467,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     language    = argd['ln'],
-                    warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
@@ -1517,11 +1504,11 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use baskets."))
 
-        (body, warnings, navtrail) = perform_request_write_public_note(uid=uid,
-                                                                       bskid=argd['bskid'],
-                                                                       recid=argd['recid'],
-                                                                       cmtid=argd['cmtid'],
-                                                                       ln=argd['ln'])
+        (body, navtrail) = perform_request_write_public_note(uid=uid,
+                                                            bskid=argd['bskid'],
+                                                            recid=argd['recid'],
+                                                            cmtid=argd['cmtid'],
+                                                            ln=argd['ln'])
 
         # register event in webstat
         basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
@@ -1540,7 +1527,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     language    = argd['ln'],
-                    warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
@@ -1580,7 +1566,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use baskets."))
 
-        (body, warnings, navtrail) = perform_request_save_public_note(uid=uid,
+        (body, navtrail) = perform_request_save_public_note(uid=uid,
                                                                       bskid=argd['bskid'],
                                                                       recid=argd['recid'],
                                                                       note_title=argd['note_title'],
@@ -1607,7 +1593,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     language    = argd['ln'],
-                    warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],

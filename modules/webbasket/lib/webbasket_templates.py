@@ -1803,20 +1803,19 @@ class Template:
 
     def tmpl_warnings(self, warnings=[], ln=CFG_SITE_LANG):
         """ returns HTML for warnings """
-
-        from invenio.errorlib import get_msgs_for_code_list
-
-        out = ""
         if type(warnings) is not list:
             warnings = [warnings]
+        warningbox = ""
         if warnings:
-            warnings_parsed = get_msgs_for_code_list(warnings, 'warning', ln)
-            for (dummy, warning_text) in warnings_parsed:
-                out += """
-<p class="important">%s</p>
-""" % warning_text
-
-        return out
+            warningbox = "<div class=\"important\">\n"
+            for warning in warnings:
+                lines = warning.split("\n")
+                warningbox += "  <p>"
+                for line in lines[0:-1]:
+                    warningbox += line + "    <br />\n"
+                warningbox += lines[-1] + "  </p>"
+            warningbox += "</div><br />\n"
+        return warningbox
 
     def tmpl_back_link(self, link, ln=CFG_SITE_LANG):
         """ returns HTML for a link whose label should be
