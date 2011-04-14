@@ -20,17 +20,90 @@
 """Regression tests for BibKnowledge."""
 
 import unittest
-from os import remove
+
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_TMPDIR
-from invenio.bibknowledge import kb_exists, get_kba_values, \
-     get_kbr_keys, get_kbd_values_for_bibedit, get_kbs_info, add_kb, add_dynamic_kb, \
-     delete_kb, add_kb_mapping, remove_kb_mapping, get_kb_name, kb_mapping_exists, \
-     get_kbt_items_for_bibedit, get_existing_kbd_values_for_bibedit
+from invenio.bibknowledge import kb_exists, get_kba_values, get_kbr_values, \
+     get_kbr_keys, get_kbs_info, add_kb, delete_kb, add_kb_mapping, \
+     remove_kb_mapping, get_kb_name, kb_mapping_exists, add_dynamic_kb, \
+     get_kbt_items_for_bibedit, get_kbd_values, get_kbd_values_for_bibedit, \
+     update_kb_attributes, get_kb_id
+from invenio.bibknowledge_dblayer import get_kb_description
 from invenio.testutils import make_test_suite, run_test_suite, test_web_page_content
 
 
-class BibknowledgeTests(unittest.TestCase):
-    """Test functions for bibknowledge."""
+class BibknowledgeUnitTests(unittest.TestCase):
+    """Unit test functions for bibknowledge."""
+
+    def _randomstring(self):
+        from random import shuffle
+        sl = list('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+        shuffle(sl)
+        return ''.join(sl)
+
+    def _name_a_db(self):
+        return "unittest_dynamic_kb_"+self._randomstring()
+
+    def setUp(self):
+        """bibknowledge unit test setup"""
+        new_kb_id = add_dynamic_kb(self._name_a_db(), "100__a", searchwith="245__:*%*")
+        self.dyn_kbname = get_kb_name(new_kb_id)
+
+    def test_get_kbd_values(self):
+        """bibknowledge - search a "find x by y" kb"""
+        vals = get_kbd_values(self.dyn_kbname, "Rodentia")
+        self.assertEqual(1, len(vals))
+        self.assertEqual(vals[0], 'Charles Darwin')
+
+    def test_kbd_export_as_list(self):
+        """bibknowledge - export dynamic kb to web as list of values"""
+        kbpage = CFG_SITE_URL+"/kb/export?kbname="+self.dyn_kbname
+        errs = test_web_page_content(kbpage, expected_text=['Charles Darwin', 'Witten, Edward'])
+        self.assertEqual([], errs)
+
+    def test_kbd_export_as_json(self):
+        """bibknowledge - export dynamic kb to web as json list"""
+        kbpage = CFG_SITE_URL+"/kb/export?kbname="+self.dyn_kbname+'&format=jquery'
+        errs = test_web_page_content(kbpage, expected_text=['["Charles Darwin",', '"\\u674e\\u767d"]'])
+        self.assertEqual([], errs)
+
+    def test_kbd_search_as_json(self):
+        """bibknowledge - search dynamic kb on web; get json hits"""
+        kbpage = CFG_SITE_URL+"/kb/export?kbname="+self.dyn_kbname+'&format=jquery&term=Rodentia'
+        errs = test_web_page_content(kbpage, expected_text='["Charles Darwin"]')
+        self.assertEqual([], errs)
+
+    def test_kb_for_bibedit(self):
+        """bibknowledge - test a bibedit-style *very* dynamic kb"""
+        myvalues = get_kbd_values_for_bibedit("100__a", searchwith="Ellis", expression="100__a:*%*")
+        self.assertEqual(1, len(myvalues))
+
+    def test_kb_attribute_update(self):
+        """bibknowledge - attribute modifications persist in database"""
+        # NB: Tested here because with the excetpion of get_kb_description,
+        #     these are exported by module bibknowledge. This mostly is
+        #     exercising bibknowledge_dblayer, though.
+        dyn_kb_oldname = self.dyn_kbname
+        dyn_kb_newname = self._name_a_db()
+        junk_desc      = self._randomstring()
+        dyn_kb_id      = get_kb_id(dyn_kb_oldname)
+        # we created it so we know it has no desc
+        self.assertEqual('', get_kb_description(dyn_kb_oldname))
+        # now check that we can rename it
+        update_kb_attributes(dyn_kb_oldname, dyn_kb_newname)
+        self.assertEqual(None, get_kb_id(dyn_kb_oldname))
+        self.assertEqual(dyn_kb_id, get_kb_id(dyn_kb_newname))
+        # now check that we can tag it with a description
+        update_kb_attributes(dyn_kb_newname, dyn_kb_newname, junk_desc)
+        self.assertEqual(junk_desc, get_kb_description(dyn_kb_newname))
+        update_kb_attributes(dyn_kb_newname, dyn_kb_oldname)
+
+    def tearDown(self):
+        """bbibknowledge unit test cleanup"""
+        delete_kb(self.dyn_kbname)
+
+
+class BibknowledgeRegressionTests(unittest.TestCase):
+    """Regression test functions for bibknowledge."""
 
     def test_kb_pages_available(self):
         """bibknowledge - test /kb page availability"""
@@ -58,14 +131,26 @@ class BibknowledgeTests(unittest.TestCase):
         self.assertEqual(myinfo["name"],"EJOURNALS")
 
     def test_EJOURNALS_keys(self):
-        """bibknowledge - test a left/right rule"""
+        """bibknowledge - test a left/right rule (key lookup)"""
         mykeys = get_kbr_keys("EJOURNALS", "Acta")
         self.assertEqual(2, len(mykeys))
 
-    def test_get_kba_values(self):
+    def test_EJOURNALS_values(self):
+        """bibknowledge - test a left/right rule (value lookup)"""
+        vals = get_kbr_values("EJOURNALS", "Astron.")
+        self.assertEqual(29, len(vals))
+
+    def test_get_EJOURNALS_kba_values(self):
         """bibknowledge - test recovering just values"""
         mylist = get_kba_values("EJOURNALS")
         self.assertEqual(327, len(mylist))
+
+    def test_EJOURNALS_export_as_json(self):
+        """bibknowledge - export key-value mappings to web as json list"""
+        kbpage = CFG_SITE_URL+"/kb/export?kbname=EJOURNALS&format=jquery"
+        expected = '[{"value": "AAS Photo Bull.", "label": "AAS Photo Bull."},'
+        errs = test_web_page_content(kbpage, expected_text=expected)
+        self.assertEqual([], errs)
 
     def test_add_get_remove(self):
         """bibknowledge - test creating a kb, adding a mapping, removing it, removing kb"""
@@ -81,23 +166,10 @@ class BibknowledgeTests(unittest.TestCase):
         still_there = kb_exists(new_name)
         self.assertEqual(False, still_there)
 
-    def test_kb_for_bibedit(self):
-        """bibknowledge - test a dynamic db"""
-        myvalues = get_kbd_values_for_bibedit("100__a", "", "Ellis", "100__a:%")
-        self.assertEqual(1, len(myvalues))
-
-
-    def test_existing_kb_values_for_bibedit(self):
-        """bibknowledge - create a "find x by y" db and search it"""
-        #create..
-        new_kb_id = add_dynamic_kb("test_dyn","100__a", "245__:%")
-        kbname = get_kb_name(new_kb_id)
-        vals = get_existing_kbd_values_for_bibedit(kbname,"Rio Macâe")
-        self.assertEqual(1, len(vals))
-        self.assertEqual(vals[0], 'Charles Darwin')
-
     def test_taxonomy(self):
-        """bibknowledge - test a taxonomy"""
+        """bibknowledge - test a taxonomy (must run as bibsched user)"""
+        import mechanize
+        from os import remove
         username = "balthasar"
         password = "b123althasar"
         #create a new taxonomy kb
@@ -105,7 +177,6 @@ class BibknowledgeTests(unittest.TestCase):
         #what was the name?
         new_kb_name = get_kb_name(new_kb_id)
         #get the taxonomy file
-        import mechanize
         response = mechanize.urlopen("http://invenio-software.org/download/invenio-demo-site-files/HEP.rdf")
         content = response.read()
         f = open(CFG_TMPDIR+"/HEP.rdf","w")
@@ -141,7 +212,9 @@ class BibknowledgeTests(unittest.TestCase):
         still_there = kb_exists(new_kb_name)
         self.assertEqual(False, still_there)
 
-TEST_SUITE = make_test_suite(BibknowledgeTests)
+
+TEST_SUITE = make_test_suite(BibknowledgeUnitTests, BibknowledgeRegressionTests)
+
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

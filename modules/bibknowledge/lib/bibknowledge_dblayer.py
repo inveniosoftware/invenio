@@ -164,6 +164,7 @@ def get_kb_dyn_config(kb_id):
 
 def save_kb_dyn_config(kb_id, field, expression, collection=""):
     """Saves a dynamic knowledge base configuration
+
     @param kb_id the id
     @param field the field where values are extracted
     @param expression ..using this expression
@@ -182,6 +183,7 @@ def save_kb_dyn_config(kb_id, field, expression, collection=""):
 
 def get_kb_description(kb_name):
     """Returns the description of the given kb
+
     @param kb_id the id
     @return string
     """
@@ -232,8 +234,8 @@ def kb_exists(kb_name):
     else:
         return False
 
-def update_kb(kb_name, new_name, new_description):
-    """Updates given kb with new name and new description"""
+def update_kb(kb_name, new_name, new_description=''):
+    """Updates given kb with new name and (optionally) new description"""
     k_id = get_kb_id(kb_name)
     run_sql("""UPDATE knwKB
                   SET name = %s , description = %s

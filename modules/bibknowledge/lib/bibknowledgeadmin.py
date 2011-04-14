@@ -582,6 +582,7 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
 def kb_export(req, kbname="", format="kbr", searchkey="", searchvalue="", searchtype="s", ln=CFG_SITE_LANG):
     """
     Exports the given kb so that it is listed in stdout (the browser).
+
     @param req the request
     @param kbname knowledge base name
     @param expression evaluate this for the returned lines
@@ -634,7 +635,7 @@ def kb_export(req, kbname="", format="kbr", searchkey="", searchvalue="", search
             req.content_type = 'application/json'
             return json.dumps(ret)
         if not mappings:
-            body = _("There is no knowledge base named %sor it is empty") % cgi.escape(kbname),
+            body = _("There is no knowledge base named %s or it is empty") % cgi.escape(kbname),
             return page(title=_("No such knowledge base"),
                         body=body,
                         language=ln,
@@ -659,8 +660,14 @@ def kb_export(req, kbname="", format="kbr", searchkey="", searchvalue="", search
         res = bibknowledge.get_kbd_values(kbname, searchvalue)
         if not res:
             req.write("\n") #in order to say something
-        for r in res:
-            req.write(r+"\n") #output values
+        if format == 'jquery':
+            req.content_type = "application/json"
+            for r in res:
+                return json.dumps(res)
+        else:
+            for r in res:
+                req.write(r+"\n") #output values
+
     if kbtype == 't': #taxonomy: output the file
         kbfilename = CFG_WEBDIR+"/kbfiles/"+str(kbid)+".rdf"
         try:

@@ -109,9 +109,8 @@ def get_kb_name(kb_id):
     """
     return bibknowledge_dblayer.get_kb_name(kb_id)
 
-def update_kb_attributes(kb_name, new_name, new_description):
-    """
-    Updates given kb_name with a new name and new description
+def update_kb_attributes(kb_name, new_name, new_description=''):
+    """Update kb kb_name with a new name and (optionally) description
 
     @param kb_name: the name of the kb to update
     @param new_name: the new name for the kb
@@ -141,7 +140,7 @@ def add_kb(kb_name="Untitled", kb_type=None):
 def add_dynamic_kb(kbname, tag, collection="", searchwith=""):
     """A convenience method"""
     kb_id = add_kb(kb_name=kbname, kb_type='dynamic')
-    bibknowledge_dblayer.save_kb_dyn_config(kb_id, tag, collection, searchwith)
+    bibknowledge_dblayer.save_kb_dyn_config(kb_id, tag, searchwith, collection)
     return kb_id
 
 def kb_mapping_exists(kb_name, key):
@@ -244,11 +243,12 @@ def get_kbr_keys(kb_name, searchkey="", searchvalue="", searchtype='s'):
 
 def get_kbr_values(kb_name, searchkey="", searchvalue="", searchtype='s'):
     """
-    Returns an array of values.
-       @param kb_name: the name of the knowledge base
-       @param searchkey: search using this key
-       @param searchvalue: search using this value
-       @param searchtype: s = substring, e=exact
+    Return a tuple of values from key-value mapping kb.
+
+    @param kb_name:     the name of the knowledge base
+    @param searchkey:   search using this key
+    @param searchvalue: search using this value
+    @param searchtype:  s=substring; e=exact
    """
     return bibknowledge_dblayer.get_kbr_values(kb_name, searchkey,
                                                searchvalue, searchtype)
@@ -266,9 +266,9 @@ def get_kbr_items(kb_name, searchkey="", searchvalue="", searchtype='s'):
                                               searchvalue, searchtype)
 
 def get_kbd_values(kbname, searchwith=""):
-    """
-    To be used by bibedit. Returns a list of values based on a dynamic kb.
-    @param kbname: name of the knowledge base
+    """Return a list of values by searching a dynamic kb.
+
+    @param kbname:     name of the knowledge base
     @param searchwith: a term to search with
     """
     import search_engine
@@ -288,7 +288,6 @@ def get_kbd_values(kbname, searchwith=""):
         return []
     if not confdict.has_key('field'):
         return []
-    myefield = None #the field by wich to search, in expression
     field = confdict['field']
     expression = confdict['expression']
     collection = ""
@@ -298,19 +297,6 @@ def get_kbd_values(kbname, searchwith=""):
     if searchwith and expression:
         if (expression.count('%') > 0):
             expression = expression.replace("%", searchwith)
-            #take the field, unnecessary except for debugging..
-            # XXX: Can this be done with a regular expression more efficiently?
-            myval = ""
-            found = expression.find(":")
-            if (found > -1):
-                myefield = expression[:found]
-                myval = expression[found+1:]
-                # check if myval is quoted..
-                if not (myval.startswith("'") or myval.startswith('"')):
-                    myval = "'"+myval
-                if not (myval.endswith("'") or myval.endswith('"')):
-                    myval = myval+"'"
-                expression = myefield+":"+myval
             reclist = search_engine.perform_request_search(p=expression,
                                                            cc=collection)
         else:
@@ -339,32 +325,29 @@ def get_kbd_values(kbname, searchwith=""):
     return [] #in case nothing worked
 
 
-def get_existing_kbd_values_for_bibedit(kb_name, searchwith=""):
+def get_kbd_values_for_bibedit(tag, collection="", searchwith="", expression=""):
     """
-    Get values from a configured dynamic kb
-    @param kb_name the name of the knowledge base
-    @param searchwith search by this
-    """
-    return get_kbd_values(kb_name, searchwith)
+    Dynamically create a dynamic KB for a specific search; search; then destroy it.
 
-
-def get_kbd_values_for_bibedit(tag, collection="", searchwith="", expression="", dkbname=None):
-    """
-    A specific convenience method: use or create a temporary dynamic knowledge base
-    a return its values.
+    This probably isn't the method you want.
 
     Example1: tag=100__a : return values of 100__a
     Example2: tag=100__a, searchwith=Jill: return values of 100__a that match with Jill
+    Example3: tag=100__a, searchwith=Ellis, expression="700__a:*%*: return values of
+              100__a for which Ellis matches some 700__a
 
     Note: the performace of this function is ok compared to a plain
-    perform req search / get most popular fields -pair. The overhead is about 5% with large record sets.
-    @param tag: the tag like 100__a
+          perform_request_search / get most popular fields -pair. The overhead
+          is about 5% with large record sets; the lookups are the xpensive part.
+
+    @param tag:        the tag like 100__a
     @param collection: collection id
     @param searchwith: the string to search. If empty, match all.
-    @
+    @param expression: the search expression for perform_request_search; if
+                       present, '%' is substituted with /searcwith/.  If absent,
+                       /searchwith/ is searched for in /tag/.
     """
-    if dkbname == None:
-        dkbname = "tmp_dynamic_"+tag+'_'+expression
+    dkbname = "tmp_dynamic_"+tag+'_'+expression
     kb_id = add_kb(kb_name=dkbname, kb_type='dynamic')
     #get the kb name since it may be catenated by a number
     #in case there are concurrent calls.
