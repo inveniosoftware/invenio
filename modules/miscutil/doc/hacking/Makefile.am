@@ -21,7 +21,8 @@ webdoclib_DATA = \
 	miscutil-internals.webdoc \
 	miscutil-dbquery.webdoc \
 	miscutil-errorlib.webdoc \
-	miscutil-dateutils.webdoc
+	miscutil-dateutils.webdoc \
+	miscutil-remote-debugger.webdoc
 
 EXTRA_DIST = $(webdoclib_DATA)
 

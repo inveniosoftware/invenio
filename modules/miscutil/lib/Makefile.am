@@ -58,7 +58,10 @@ pylib_DATA = __init__.py \
              plotextractor_tests.py \
              plotextractor_regression_tests.py \
              plotextractor_config.py \
-             solrutils.py
+             solrutils.py \
+             remote_debugger.py \
+             remote_debugger_config.py \
+             remote_debugger_wsgi_reload.py
 
 noinst_DATA = testimport.py \
               kwalitee.py \

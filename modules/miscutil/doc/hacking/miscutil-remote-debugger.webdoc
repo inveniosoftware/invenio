@@ -1,0 +1,100 @@
+## -*- mode: html; coding: utf-8; -*-
+
+## This file is part of Invenio.
+## Copyright (C) 2011 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+<!-- WebDoc-Page-Title: Remote Debugger -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking Invenio</a> &gt; <a class="navtrail" href="<CFG_SITE_URL>/help/hacking/miscutil-internals">MiscUtil Internals</a> -->
+<!-- WebDoc-Page-Navbar-Select: hacking-miscutil-remote-debugger -->
+
+<h2>Contents</h2>
+
+<strong>1. <a href="#1">Introduction</a></strong><br />
+<strong>2. <a href="#2">Configuration</a></strong><br />
+
+<a name="1"></a><h2>1. Introduction</h2>
+
+<p>The remote debugger is a module that makes it easy to plug in
+different debugging facilities. Debugging is automatically activated
+using url param <i>debug</i> and can be switched on/off on demand.
+The module itself is not a debugger, but facilitates calling of
+diverse debuggers (pdb, gpdb, pydev). This module is <b>meant for
+Invenio developers and other people who want to edit the Python code, please
+do not use this module in production environment!</b>.</p>
+
+
+<p>Debug mode is enabled by passing debug=X in the url parameter, example:
+
+<blockquote>
+<pre>
+http://invenio-ubu/record/94/keywords?ln=en&debug=3
+</pre>
+</blockquote>
+
+This will run the web application in an interactive mode, debugger in this case is Eclipse/Pydev.
+</p>
+
+<p>From the module documentation:
+
+<blockquote>
+<pre>
+Each debugger has its own number:
+local winpdb: debug=1
+remote winpdb: debug=2
+remote pydev: debug=3
+
+If debug parameter is empty, the code runs normally. You can also
+roll out your own debugging functions, assign it new number - look into
+get_debugger()
+
+If you want to change behaviour of the debugger interactively, you can
+pass arguments encoded in the url, example:
+http://someurl/collection/X?debug=3|ip:192.168.31.1|port:9999|stderr:0
+look at the method signature of each debugger function to see available
+arguments.
+</pre>
+</blockquote>
+
+<a name="2"></a><h2>2. Configuration</h2>
+
+If you want to use the remote debugger for Invenio, then make sure
+your local <code>remote_debugger_config.py</code> file contains:
+
+<blockquote>
+<pre>
+CFG_REMOTE_DEBUGGER_ENABLED = 1
+</pre>
+</blockquote>
+
+And if also want to edit modules while Apache is running and see the results immediately,
+this will force Apache to reload the changed python modules located inside 'lib/python/invenio'
+but it will not reload anything if you edit var/www/*.py modules.
+
+<blockquote>
+<pre>
+CFG_REMOTE_DEBUGGER_WSGI_RELOAD = ['lib/python/invenio/*.py']
+</pre>
+</blockquote>
+
+For a more detailed configuration and instructions how to activate individual debuggers, please
+see the comments inside the
+remote_debugger.py module -- as this module is for developers, I assume you will find it
+very easy to understand the rest.
+
+<strong>Note:</strong> if you are using <em>winpdb</em>, then you may
+want to set the number of WSGI processes to 1 in your
+<code>/opt/invenio/etc/apache/invenio-apache-vhost.conf</code>.

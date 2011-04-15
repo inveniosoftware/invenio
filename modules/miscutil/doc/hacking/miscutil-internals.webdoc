@@ -34,5 +34,8 @@ the MiscUtil internals.
 
   <dt><a href="miscutil-dateutils">Date handling library</a> </dt>
   <dd>Explains how to handle dates in Invenio. All mentioned functions are represented with signature and additional explanations.</dd>
+
+  <dt><a href="miscutil-remote-debugger">Remote Debugger</a> </dt>
+  <dd>Explains how to (remote) debug Apache WSGI applications.</dd>
  </dl>
 </blockquote>
