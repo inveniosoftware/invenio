@@ -1219,8 +1219,10 @@ def log_action(log_dir, action, bibdoc_name, file_path, rename,
     Logs a new action performed by user on a BibDoc file.
 
     The log file record one action per line, each column being split
-    by '---' ('---' is escaped from values 'rename', 'description',
-    'comment' and 'bibdoc_name')
+    by '<--->' ('---' is escaped from values 'rename', 'description',
+    'comment' and 'bibdoc_name'). The original request for this
+    format was motivated by the need to have it easily readable by
+    other scripts. Not sure it still makes sense nowadays...
 
     Newlines are also reserved, and are escaped from the input values
     (necessary for the 'comment' field, which is the only one allowing
@@ -1263,14 +1265,14 @@ def log_action(log_dir, action, bibdoc_name, file_path, rename,
         file_desc = open(log_file, "a+")
         # We must escape new lines from comments in some way:
         comment = str(comment).replace('\\', '\\\\').replace('\r\n', '\\n\\r')
-        msg = action                                 + '---' + \
-              bibdoc_name.replace('---', '___')      + '---' + \
-              file_path                              + '---' + \
-              str(rename).replace('---', '___')      + '---' + \
-              str(description).replace('---', '___') + '---' + \
-              comment.replace('---', '___')          + '---' + \
-              doctype                                + '---' + \
-              str(int(keep_previous_versions))       + '---' + \
+        msg = action                                 + '<--->' + \
+              bibdoc_name.replace('---', '___')      + '<--->' + \
+              file_path                              + '<--->' + \
+              str(rename).replace('---', '___')      + '<--->' + \
+              str(description).replace('---', '___') + '<--->' + \
+              comment.replace('---', '___')          + '<--->' + \
+              doctype                                + '<--->' + \
+              str(int(keep_previous_versions))       + '<--->' + \
               file_restriction + '\n'
         file_desc.write("%s --> %s" %(time.strftime("%Y-%m-%d %H:%M:%S"), msg))
         file_desc.close()
@@ -1297,7 +1299,7 @@ def read_actions_log(log_dir):
             try:
                 (action, bibdoc_name, file_path, rename, description,
                  comment, doctype, keep_previous_versions,
-                 file_restriction) = action.rstrip('\n').split('---')
+                 file_restriction) = action.rstrip('\n').split('<--->')
             except ValueError, e:
                 # Malformed action log
                 pass
