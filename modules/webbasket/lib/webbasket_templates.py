@@ -1147,8 +1147,16 @@ class Template:
                                       title=_("Create a new basket"),
                                       body=create_html)
 
-    def tmpl_create_basket(self, new_basket_name='',
-                           new_topic_name='', create_in_topic=None, topics=[],
+    def tmpl_create_basket(self,
+                           new_basket_name='',
+                           new_topic_name='',
+                           create_in_topic=None,
+                           topics=[],
+                           recids=[],
+                           colid=-1,
+                           es_title='',
+                           es_desc='',
+                           es_url='',
                            ln=CFG_SITE_LANG):
         """Template for basket creation
         @param new_basket_name: prefilled value (string)
@@ -1162,6 +1170,11 @@ class Template:
   <input type="hidden" name="ln" value="%(ln)s" />
   <div style="padding:10px;">
     %(create_box)s
+    %(recids)s
+    %(es_title)s
+    %(es_desc)s
+    %(es_url)s
+    <input type="hidden" name="colid" value="%(colid)s" />
     <input type="submit" value="%(label)s" class="formbutton"/>
   </div>
 </form>""" % {'action': CFG_SITE_URL + '/yourbaskets/create_basket',
@@ -1171,6 +1184,18 @@ class Template:
                                                  topics=topics,
                                                  selected_topic=create_in_topic,
                                                  ln=ln),
+              'recids': recids and '\n'.join(['<input type="hidden" name="recid" value="%s" />' % \
+                                              recid for recid in recids]) or '',
+              'es_title': es_title and \
+                '<input type="hidden" name="es_title" value="%s" />' % \
+                (es_title,) or '',
+              'es_desc': es_desc and \
+                '<input type="hidden" name="es_desc" value="%s" />' % \
+                (es_desc,) or '',
+              'es_url': es_url and \
+                '<input type="hidden" name="es_url" value="%s" />' % \
+                (es_url,) or '',
+              'colid': colid,
               'label': _("Create new basket")}
         return out
 
@@ -1295,9 +1320,13 @@ class Template:
 
             return out
 
-        #If no recids were specified the page is asking which external item to add, so we remind to the user to use the search engine for internal items
         out=""
+
+        #If no recids were specified the page is asking which external item to add,
+        #so we remind to the user to use the search engine for internal items.
+        #(having no recids specified is just like having a colid equal -1)
         if len(recids) == 0:
+        #if colid == -1:
             out += """
     <table class="bskbasket">
       <thead class="bskbasketheader">
@@ -1399,7 +1428,15 @@ class Template:
 </table>""" % {'header_label': _("Adding %i items to your baskets") % (colid == -1 and 1 or len(recids)),
                'create_new_basket': _("Please choose a basket: %(x_basket_selection_box)s %(x_fmt_open)s(or %(x_url_open)screate a new one%(x_url_close)s first)%(x_fmt_close)s") % \
                                     {'x_basket_selection_box': '&nbsp;<select name="b">%s</select>' % select_options,
-                                     'x_url_open': '<a href="%s/yourbaskets/create_basket">' % CFG_SITE_URL,
+                                     'x_url_open': colid == -1 and ('''<a href="%s/yourbaskets/create_basket?colid=-1" onClick="this.href+= \
+                                                                        '&es_title=' + encodeURIComponent(document.add_to_basket.es_title.value) + \
+                                                                        '&es_url=' + encodeURIComponent(document.add_to_basket.es_url.value) + \
+                                                                        '&es_desc=' + encodeURIComponent(document.add_to_basket.es_desc.value);">''' % \
+                                                                    (CFG_SITE_URL,))
+                                                                or ('<a href="%s/yourbaskets/create_basket?colid=%i&recid=%s">' % \
+                                                                    (CFG_SITE_URL,
+                                                                     colid,
+                                                                     '&recid='.join(str(recid) for recid in recids))),
                                      'x_url_close': '</a>',
                                      'x_fmt_open': '<br /><small>',
                                      'x_fmt_close': '</small>'},
@@ -3721,7 +3758,7 @@ class Template:
 <br />
 <strong>URL:</strong> <a class="note" target="_blank" href="%s">%s</a>
 </small>
-""" % (es_title, es_desc, es_url, prettify_url(es_url))
+""" % (es_title, es_desc, es_url, cgi.escape(prettify_url(es_url)))
 
         if of == 'xm':
             # TODO: xml output...

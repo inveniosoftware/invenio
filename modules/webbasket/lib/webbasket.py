@@ -1583,6 +1583,7 @@ def perform_request_add(uid,
                         b='',
                         successful_add=False,
                         copy=False,
+                        wait=False,
                         referer='',
                         ln=CFG_SITE_LANG):
     """Add records to baskets
@@ -1765,7 +1766,7 @@ def perform_request_add(uid,
                 except InvenioWebBasketWarning, exc:
                     register_exception(stream='warning')
                     #warnings.append(exc.message)
-            if not warnings_html:
+            if not warnings_html and not wait:
                 if colid == -1:
                     es_title = es_title
                     es_desc = nl2br(es_desc)
@@ -2053,6 +2054,11 @@ def perform_request_create_basket(req, uid,
                                   new_basket_name='',
                                   new_topic_name='', create_in_topic="-1",
                                   topic="-1",
+                                  recids=[],
+                                  colid=-1,
+                                  es_title='',
+                                  es_desc='',
+                                  es_url='',
                                   ln=CFG_SITE_LANG):
     """if new_basket_name and topic infos are given create a basket and return topic number,
     else return body with warnings of basket creation form.
@@ -2075,9 +2081,9 @@ def perform_request_create_basket(req, uid,
             topic = new_topic_name
         else:
             topic = create_in_topic
-        db.create_basket(uid, new_basket_name, topic)
+        bskid = db.create_basket(uid, new_basket_name, topic)
         #topics = map(lambda x: x[0], topics_infos)
-        return topic
+        return (bskid, topic)
     else:
         referer = get_referer(req) # URL of the referring page
         url = CFG_SITE_URL + '/yourbaskets/create_basket'
@@ -2103,6 +2109,11 @@ def perform_request_create_basket(req, uid,
                                                       new_topic_name,
                                                       create_in_topic,
                                                       topics,
+                                                      recids,
+                                                      colid,
+                                                      es_title,
+                                                      es_desc,
+                                                      es_url,
                                                       ln)
         if warnings:
             warnings_html += webbasket_templates.tmpl_warnings(warnings, ln)

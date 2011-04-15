@@ -65,7 +65,7 @@ from invenio.webbasket_config import CFG_WEBBASKET_CATEGORIES, \
                                      CFG_WEBBASKET_SHARE_LEVELS
 from invenio.webbasket_dblayer import get_basket_name, \
      get_max_user_rights_on_basket
-from invenio.urlutils import get_referer, redirect_to_url, make_canonical_urlargd
+from invenio.urlutils import get_referer, redirect_to_url, make_canonical_urlargd, quote
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webstat import register_customevent
 from invenio.errorlib import register_exception
@@ -674,6 +674,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'editor_type': (str, ""),
                                    'b': (str, ""),
                                    'copy': (int, 0),
+                                   'wait': (int, 0),
                                    'referer': (str, ""),
                                    "of" : (str, ''),
                                    'ln': (str, CFG_SITE_LANG)})
@@ -715,6 +716,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                category=argd['category'],
                                                b=argd['b'],
                                                copy=argd['copy'],
+                                               wait=argd['wait'],
                                                referer=argd['referer'],
                                                ln=argd['ln'])
 
@@ -1151,6 +1153,11 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'new_topic_name' : (str, ""),
                                    'create_in_topic': (str, "-1"),
                                    'topic'          : (str, ""),
+                                   'recid'          : (list, []),
+                                   'colid'          : (int, -1),
+                                   'es_title'       : (str, ''),
+                                   'es_desc'        : (str, ''),
+                                   'es_url'         : (str, ''),
                                    'of'             : (str, ''),
                                    'ln'             : (str, CFG_SITE_LANG)})
 
@@ -1177,13 +1184,18 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         if argd['new_basket_name'] and \
                 (argd['new_topic_name'] or argd['create_in_topic'] != "-1"):
-            topic = perform_request_create_basket(
-                            req,
-                            uid=uid,
-                            new_basket_name=argd['new_basket_name'],
-                            new_topic_name=argd['new_topic_name'],
-                            create_in_topic=argd['create_in_topic'],
-                            ln=argd['ln'])
+            (bskid, topic) = perform_request_create_basket(
+                                req,
+                                uid=uid,
+                                new_basket_name=argd['new_basket_name'],
+                                new_topic_name=argd['new_topic_name'],
+                                create_in_topic=argd['create_in_topic'],
+                                recids=argd['recid'],
+                                colid=argd['colid'],
+                                es_title=argd['es_title'],
+                                es_desc=argd['es_desc'],
+                                es_url=argd['es_url'],
+                                ln=argd['ln'])
 
             # register event in webstat
             basket_str = "%s ()" % argd['new_basket_name']
@@ -1196,8 +1208,25 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             except:
                 register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
-            url = CFG_SITE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s'
-            url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'], topic, argd['ln'])
+            if ( argd['recid'] and argd['colid'] >= 0 ):
+                url = CFG_SITE_URL + '/yourbaskets/add?category=%s&bskid=%i&colid=%i&recid=%s&wait=1&ln=%s'
+                url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                        bskid,
+                        argd['colid'],
+                        '&recid='.join(str(recid) for recid in argd['recid']),
+                        argd['ln'])
+            elif ( argd['es_title'] and argd['es_desc'] and argd['es_url'] and argd['colid'] == -1 ):
+                url = CFG_SITE_URL + '/yourbaskets/add?category=%s&bskid=%i&colid=%i&es_title=%s&es_desc=%s&es_url=%s&wait=1&ln=%s'
+                url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                        bskid,
+                        argd['colid'],
+                        quote(argd['es_title']),
+                        quote(argd['es_desc']),
+                        quote(argd['es_url']),
+                        argd['ln'])
+            else:
+                url = CFG_SITE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s'
+                url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'], topic, argd['ln'])
             redirect_to_url(req, url)
         else:
             body = perform_request_create_basket(req,
@@ -1206,6 +1235,11 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                  new_topic_name=argd['new_topic_name'],
                                                  create_in_topic=argd['create_in_topic'],
                                                  topic=argd['topic'],
+                                                 recids=argd['recid'],
+                                                 colid=argd['colid'],
+                                                 es_title=argd['es_title'],
+                                                 es_desc=argd['es_desc'],
+                                                 es_url=argd['es_url'],
                                                  ln=argd['ln'])
             navtrail = '<a class="navtrail" href="%s/youraccount/'\
                        'display?ln=%s">%s</a>'
