@@ -19,7 +19,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_ETCDIR
+from invenio.config import CFG_ETCDIR, CFG_LOGDIR
 
 import os
 
@@ -180,3 +180,7 @@ CFG_BIBEDIT_KEYWORD_TAXONOMY = "" #'HEP.RDF'
 CFG_BIBEDIT_KEYWORD_TAG = "" # '6531_a'
 #what label inside the RDF file contains the term
 CFG_BIBEDIT_KEYWORD_RDFLABEL = "" #'prefLabel'
+
+#should we create a log file containing information useful when debuging BibEdit ?
+CFG_BIBEDIT_LOG = True
+CFG_BIBEDIT_LOGFILE = "%s/bibedit.log" % (CFG_LOGDIR, )

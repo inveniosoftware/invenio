@@ -22,6 +22,10 @@ test_DATA = test_bibedit_access_curator_coll.html \
             test_bibedit_access_curator_none.html \
             test_bibedit_basic_record_locking.html
 
-EXTRA_DIST = $(doc_DATA) $(test_DATA)
+
+stylesdir=$(localstatedir)/www/css
+styles_DATA = bibedit.css
+
+EXTRA_DIST = $(doc_DATA) $(test_DATA) $(styles_DATA)
 
 CLEANFILES = *~ *.tmp

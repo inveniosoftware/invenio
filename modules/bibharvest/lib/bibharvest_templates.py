@@ -524,18 +524,30 @@ class Template:
 
     def tmpl_view_holdingpen_headers(self):
         """
-            returning the HTML headers necessary in order to open the view holdingpen page
+            returning the HTML headers necessary in order to open the view
+            holdingpen page
         """
-        return """
-    <script type="text/javascript" src="%s/js/jquery.min.js"></script>
-    <script type="text/javascript" src="%s/js/jquery-treeview/jquery.treeview.js"></script>
-    <script type="text/javascript" src="%s/js/jquery-treeview/jquery.treeview.async.js"></script>
-    <script type="text/javascript" src="%s/js/ui.core.js"></script>
-    <script type="text/javascript" src="%s/js/jquery.ajaxPager.js"></script>
-    <link rel="stylesheet" href="%s/js/jquery-treeview/jquery.treeview.css" />
-    <link rel="stylesheet" href="%s/img/jquery.ajaxPager.css" />
+        jquery_scripts = ["jquery.min.js", "jquery.ui.core.js", "jquery.ui.widget.js",
+                          "jquery-treeview/jquery.treeview.js",
+                          "jquery-treeview/jquery.treeview.async.js",
+                          "jquery.ajaxPager.js"]
+        jquery_scripts_strings = []
+        for script in jquery_scripts:
+            entry_str = """    <script type="text/javascript" src="%(baseurl)s/js/jquery/%(sname)s"></script>\n""" % {
+                    "baseurl": CFG_SITE_URL,
+                    "sname" : script
+                }
+            jquery_scripts_strings.append(entry_str)
+        jquery_scripts_string = "".join(jquery_scripts_strings)
+
+        return """ %(scriptsstring)s
+    <link rel="stylesheet" href="%(baseurl)s/js/jquery/jquery-treeview/jquery.treeview.css" />
+    <link rel="stylesheet" href="%(baseurl)s/img/jquery.ajaxPager.css" />
     <script type="text/javascript">
-        var serverAddress = '%s';
+        var serverAddress = '%(baseurl)s';
     </script>
-    <script type="text/javascript" src="%s/js/oai_harvest_admin.js"> </script>
-""" % (CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL)
+    <script type="text/javascript" src="%(baseurl)s/js/oai_harvest_admin.js"> </script>
+""" % {
+            "baseurl" : CFG_SITE_URL,
+            "scriptsstring" : jquery_scripts_string
+       }

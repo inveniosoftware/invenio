@@ -165,7 +165,6 @@ def delete_holdingpen_entry(hpupdate_id):
     run_sql(query, (hpupdate_id, ))
 
 
-
 def get_holdingpen_day_fragment(year, month, day, limit, start, filter):
     """
        returning the entries form the a particular day
@@ -174,7 +173,7 @@ def get_holdingpen_day_fragment(year, month, day, limit, start, filter):
     filterSql = ""
     if filter != "":
         filterSql = " and oai_id like '%%%s%%' " % (filter, )
-    query = "SELECT oai_id, changeset_date, changeset_id FROM bibHOLDINGPEN WHERE changeset_date > '%i-%i-%i 00:00:00' and changeset_date <= '%i-%i-%i 23:59:59' %s ORDER BY changeset_date LIMIT %i, %i" % (year, month, day, year, month, day, filterSql, start, limit)
+    query = "SELECT oai_id, changeset_date, changeset_id FROM bibHOLDINGPEN WHERE changeset_date >= '%i-%i-%i 00:00:00' and changeset_date <= '%i-%i-%i 23:59:59' %s ORDER BY changeset_date LIMIT %i, %i" % (year, month, day, year, month, day, filterSql, start, limit)
     query_results = run_sql(query)
     return query_results
 

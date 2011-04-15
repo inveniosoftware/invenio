@@ -549,9 +549,15 @@ def getHoldingPenData(req, elementId):
         for i in range(0, numberOfPages):
             pages += [
             {
-            "url": "%s/admin/bibharvest/oaiharvestadmin.py/get_entries_fragment?year=%s&month=%s&day=%s&start=%i&limit=%i&filter=%s" % (CFG_SITE_URL, nodeYear, nodeMonth, nodeDay, i * resultsPerPage, resultsPerPage, urlFilter),
-            "selector": False,
-            "type": "ajax",
+              "baseurl": "%s/admin/bibharvest/oaiharvestadmin.py/get_entries_fragment" % (CFG_SITE_URL, ),
+              "selector": False,
+              "type": "ajax",
+              "year" : nodeYear,
+              "month" : nodeMonth,
+              "day" : nodeDay,
+              "start": i * resultsPerPage,
+              "limit": resultsPerPage,
+              "filter": urlFilter
             }]
 
         additionalData = {
@@ -566,14 +572,19 @@ def getHoldingPenData(req, elementId):
 
 #        return "<li id=\"ajax_generated_li\"><span>Ajax generated position " + element_id + "</span><ul id=\"ble_ajaxgenerated_ul\"><li>element</li></ul></li>"
 
-def get_entries_fragment(req, year, month, day, start, limit, filter):
+def get_entries_fragment(req, year, month, day, start, limit, filter, pagerPrefix, pageNumber):
+    """ Serve the request of getting only part of the result set """
     try:
         uid = getUid(req)
     except Error, e:
         return "unauthorised access !"
+    result = { "pagerPrefix": pagerPrefix,
+               "pageNumber": pageNumber,
+        }
     auth = check_user(req, 'cfgoaiharvest')
     if not auth[0]:
-        return oha.perform_request_gethpdayfragment(int(year), int(month), int(day), int(limit), int(start), filter)
+        result["html"] = oha.perform_request_gethpdayfragment(int(year), int(month), int(day), int(limit), int(start), filter)
+        return json.dumps(result)
     else:
         return "unauthorised access !"
 

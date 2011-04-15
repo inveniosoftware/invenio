@@ -38,7 +38,7 @@ from datetime import datetime
 
 from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
     CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX, \
-    CFG_BIBEDIT_FIELD_TEMPLATES_PATH
+    CFG_BIBEDIT_FIELD_TEMPLATES_PATH, CFG_BIBEDIT_LOG, CFG_BIBEDIT_LOGFILE
 from invenio.bibedit_dblayer import get_record_last_modification_date, \
     delete_hp_change
 from invenio.bibrecord import create_record, create_records, \
@@ -75,8 +75,10 @@ re_ftmpl_description = re.compile('<!-- BibEdit-Field-Template-Description: (.*)
 def assert_undo_redo_lists_correctness(undo_list, redo_list):
     for undoItem in undo_list:
         assert undoItem != None;
+        assert undoItem != 0
     for redoItem in redo_list:
         assert redoItem != None;
+        assert redoItem != 0
 
 # Operations on the BibEdit cache file
 def cache_exists(recid, uid):
@@ -142,7 +144,7 @@ def get_cache_file_contents(recid, uid):
     if cache_file:
         cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list = cPickle.load(cache_file)
         cache_file.close()
-        assert_undo_redo_lists_correctness(undo_list, redo_list);
+#        assert_undo_redo_lists_correctness(undo_list, redo_list);
 
         return cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list
 
@@ -151,9 +153,10 @@ def update_cache_file_contents(recid, uid, record_revision, record, pending_chan
     time.
 
     """
+    assert_undo_redo_lists_correctness(undo_list, redo_list)
     cache_file = _get_cache_file(recid, uid, 'w')
     if cache_file:
-        assert_undo_redo_lists_correctness(undo_list, redo_list);
+        assert_undo_redo_lists_correctness(undo_list, redo_list)
         cPickle.dump([True, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list], cache_file)
         cache_file.close()
         return get_cache_mtime(recid, uid)
@@ -558,3 +561,10 @@ def can_record_have_physical_copies(recid):
 
     return collections["holdings"]["visible"] == True
 
+def bibedit_log(message):
+    """If logging is enabled, writes a log information into the bibedit log file"""
+    if CFG_BIBEDIT_LOG:
+        # more verbose logging requested
+        f = open(CFG_BIBEDIT_LOGFILE, "a")
+        f.write("{\"datetime\": '%s', \n \"data\" : %s}, \n\n" % (str(datetime.now()), message))
+        f.close()

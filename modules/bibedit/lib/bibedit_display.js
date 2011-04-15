@@ -52,14 +52,14 @@ function displayRecord(){
     if (!validMARC.reControlTag.test(tag))
       break;
     fields = gRecord[tag];
-    for (var j=0, m=fields.length; j<m; j++)
+    for (var j = 0, m = fields.length; j < m; j++)
       table += createControlField(tag, fields[j], j);
   }
   // For each instance of each field, create row(s).
   for (n=tags.length; i<n; i++){
     tag = tags[i];
     fields = gRecord[tag];
-    for (var j=0, m=fields.length; j<m; j++){
+    for (var j = 0, m = fields.length; j < m; j++){
       table += createField(tag, fields[j], j);
     }
   }
@@ -107,8 +107,8 @@ function createField(tag, field, fieldPosition){
    */
   var subfields = field[0], ind1 = field[1], ind2 = field[2];
   var fieldID = tag + '_' + fieldPosition;
-  ind1 = (ind1 != ' ' && ind1 != '') ? ind1 : '_';
-  ind2 = (ind2 != ' ' && ind2 != '') ? ind2 : '_';
+  ind1 = (ind1 != ' ' && ind1 !== '') ? ind1 : '_';
+  ind2 = (ind2 != ' ' && ind2 !== '') ? ind2 : '_';
   var protectedField = fieldIsProtected(tag + ind1 + ind2);
   var subfieldsLength = subfields.length;
   var result = '<tbody ' + 'id="rowGroup_' + fieldID + '">';
@@ -137,8 +137,19 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
   var autosuggest = false;
   var autocomplete = false;
   var autokeyword = false;
-  for (var i=0;i<gAUTOSUGGEST_TAGS.length;i++) { if (MARC == gAUTOSUGGEST_TAGS[i]) { autosuggest = true; }}
-  for (var i=0;i<gAUTOCOMPLETE_TAGS.length;i++) { if (MARC == gAUTOCOMPLETE_TAGS[i]) { autocomplete = true; }}
+
+  for (var i = 0; i < gAUTOSUGGEST_TAGS.length; i++) {
+    if (MARC == gAUTOSUGGEST_TAGS[i]) {
+      autosuggest = true;
+    }
+  }
+
+  for (var i = 0; i < gAUTOCOMPLETE_TAGS.length; i++) {
+    if (MARC == gAUTOCOMPLETE_TAGS[i]) {
+      autocomplete = true;
+    }
+  }
+
   if (MARC == gKEYWORD_TAG) { autokeyword = true; }
   if (!protectedField){
     // Enable features for unprotected fields.
@@ -164,7 +175,7 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
   var subfieldTagToPrint = getSubfieldTag(MARC);
   var btnAddSubfield = '';
   // If first subfield, add tag and selection box, remove up arrow.
-  if (subfieldIndex == 0){
+  if (subfieldIndex === 0){
     boxField = input('checkbox', 'boxField_' + fieldID, 'bibEditBoxField',
       {onclick: 'onFieldBoxClick(this)', tabindex: -1});
     cellFieldTagAttrs = 'id="fieldTag_' + fieldID +
@@ -417,7 +428,7 @@ function addChangeControl(changeNum, skipAddedField){
     return;
   }
   changeType = gHoldingPenChanges[changeNum]["change_type"];
-  if ( changeType == "field_added" && skipAddedField != true){
+  if ( changeType == "field_added" && skipAddedField !== true){
     addFieldAddedControl(changeNum);
   }
   if ( changeType == "subfield_changed"){
@@ -446,13 +457,8 @@ function createFieldPreviewCore(tag, indicators, subfields){
   var result = "";
 
   for (subfield in subfields){
-    result += "<tr><td>"
-         + headerData
-         + "</td><td>$$"
-         + subfields[subfield][0]
-         + "&nbsp;&nbsp;&nbsp;</td><td>"
-         + subfields[subfield][1]
-         + "</td></tr>";
+    result += "<tr><td>" + headerData + "</td><td>$$" + subfields[subfield][0] +
+         "&nbsp;&nbsp;&nbsp;</td><td>" + subfields[subfield][1] + "</td></tr>";
     headerData = "";
   }
   return result;
@@ -514,8 +520,8 @@ function createHoldingPenChangePreview(record){
    *     record - A content of the record that should be previewed
    */
 
-  return createRecordPreview(record)
-  + "<br><button onClick=\"onToggleDetailsVisibility(" + changesetNumber + ");\">Hide preview</button>";
+  return createRecordPreview(record) +
+    "<br><button onClick=\"onToggleDetailsVisibility(" + changesetNumber + ");\">Hide preview</button>";
 }
 
 function createHoldingPenPanelEntry(changesetNumber, changesetDatetime){
@@ -558,7 +564,7 @@ function createHoldingPenPanelEntry(changesetNumber, changesetDatetime){
       "Loading... <br>"  +
       "<br><button onClick=\"onToggleDetailsVisibility(" + changesetNumber + ");\">Hide preview</button></div>"; // a toggle button ;
 
-  previewSection = previewOpener + previewLayer
+  previewSection = previewOpener + previewLayer;
 
   result =   "<div class=\"bibeditHPPanelEntry\" id=\"bibeditHoldingPenPanelEntry_" + changesetNumber + "\">" +
       "<div class=\"bibeditHPEntryCol1\">" +
@@ -622,7 +628,7 @@ function createAddFieldForm(fieldTmpNo, fieldTemplateNo){
    * fieldTemplateNo - a number of template that should be selected by default
    */
 
-  fieldTemplatesData = []
+  fieldTemplatesData = [];
   for (templatePos in fieldTemplates){
     fieldTemplatesData.push({"value" : templatePos , "description": fieldTemplates[templatePos].name});
   }
@@ -684,7 +690,7 @@ function createAddFieldRow(fieldTmpNo, subfieldTmpNo, defaultCode, defaultValue)
 
   var txtAddFieldTag = '', txtAddFieldInd1 = '', txtAddFieldInd2 = '',
     btnAddFieldRemove = '';
-  if (subfieldTmpNo == 0){
+  if (subfieldTmpNo === 0){
     txtAddFieldTag = input('text', 'txtAddFieldTag_' + fieldTmpNo,
             'bibEditTxtTag', {maxlength: 3});
     txtAddFieldInd1 = input('text', 'txtAddFieldInd1_' + fieldTmpNo,
@@ -736,7 +742,7 @@ function createAddSubfieldsRow(fieldID, subfieldTmpNo, defSubCode, defValue){
    * Create a row in the 'Add subfields' form.
    */
   var subfieldID = fieldID + '_' + subfieldTmpNo;
-  var btnRemove = (subfieldTmpNo == 0) ? '' : img('/img/delete.png',
+  var btnRemove = (subfieldTmpNo === 0) ? '' : img('/img/delete.png',
     'btnAddSubfieldsRemove_' + subfieldID, '', {title: 'Remove subfield'});
   return '' +
     '<tr id="rowAddSubfields_' + subfieldID + '">' +
@@ -823,6 +829,7 @@ function displayMessage(msgCode, keepContent, args){
       break;
     default:
       msg = 'Result code: <b>' + msgCode + '</b>';
+      break;
   }
   if (!keepContent)
     $('#bibEditContent').html('<div id="bibEditMessage">' + msg + '</div>');
@@ -965,11 +972,16 @@ function displayAlert(msgType, args){
       break;
     default:
       msg = msgType;
+      break;
   }
-  if (popUpType == 'confirm')
+
+  if (popUpType == 'confirm') {
     return confirm(msg);
-  else
+  }
+  else {
     alert(msg);
+    return 1; // the equivalent of clicking ok in the confirm dialog
+  }
 }
 
 function notImplemented(event){
@@ -1016,11 +1028,17 @@ function input(type, id, _class, attrs, defvalue){
   id = id ? 'id="' + id + '" ' : '';
   _class = _class ? 'class="' + _class + '" ' : '';
   var strAttrs = '';
+
   for (var attr in attrs){
     strAttrs += attr + '="' + attrs[attr] + '" ';
   }
+
   myval = '';
-  if ((defvalue != null) && (defvalue != ""))  { myval = ' value="'+defvalue+'" '; }
+
+  if ((defvalue !== null) && (defvalue !== "")) {
+    myval = ' value="' + defvalue + '" ';
+  }
+
   return '<input ' + type + id + _class + strAttrs + myval + '/>';
 }
 

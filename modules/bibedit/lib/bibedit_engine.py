@@ -37,7 +37,7 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_TAG_FORMAT, CFG_BIBEDIT_AJAX_RESULT_CODES_REV, \
     CFG_BIBEDIT_AUTOSUGGEST_TAGS, CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS,\
     CFG_BIBEDIT_KEYWORD_TAXONOMY, CFG_BIBEDIT_KEYWORD_TAG, \
-    CFG_BIBEDIT_KEYWORD_RDFLABEL
+    CFG_BIBEDIT_KEYWORD_RDFLABEL, CFG_BIBEDIT_LOG, CFG_BIBEDIT_LOGFILE
 
 from invenio.config import CFG_SITE_LANG, CFG_DEVEL_SITE
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
@@ -54,7 +54,7 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     update_cache_file_contents, get_field_templates, get_marcxml_of_revision, \
     revision_to_timestamp, timestamp_to_revision, \
     get_record_revision_timestamps, record_revision_exists, \
-    can_record_have_physical_copies
+    can_record_have_physical_copies, bibedit_log
 
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
@@ -220,31 +220,22 @@ def perform_request_init(uid, ln, req, lastupdated):
             'gAUTOCOMPLETE_TAGS' : CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS.keys(),
             'gKEYWORD_TAG' : '"' + CFG_BIBEDIT_KEYWORD_TAG  + '"'
             }
-    body += '<script type="text/javascript">\n'
-    for key in data:
-        body += '    var %s = %s;\n' % (key, data[key])
-    body += '    </script>\n'
 
-    # Adding the information about field templates
     fieldTemplates = get_available_fields_templates()
-    body += "<script>\n" + \
-            "   var fieldTemplates = %s\n" % (json.dumps(fieldTemplates), ) + \
-            "</script>\n"
-    # Add scripts (the ordering is NOT irrelevant).
-    scripts = ['jquery.min.js', 'jquery.effects.core.min.js',
-               'jquery.effects.highlight.min.js', 'jquery.autogrow.js',
-               'jquery.jeditable.mini.js', 'jquery.hotkeys.min.js', 'json2.js',
-               'bibedit_display.js', 'bibedit_engine.js', 'bibedit_keys.js',
+
+    jquery_scripts = ['jquery.min.js', 'jquery.effects.core.min.js',
+                          'jquery.effects.highlight.min.js',
+                          'jquery.autogrow.js', 'jquery.jeditable.mini.js',
+                          'jquery.hotkeys.min.js', 'json2.js']
+
+    scripts = ['bibedit_display.js', 'bibedit_engine.js', 'bibedit_keys.js',
                'bibedit_menu.js', 'bibedit_holdingpen.js', 'marcxml.js',
                'bibedit_clipboard.js']
 
-    for script in scripts:
-        body += '    <script type="text/javascript" src="%s/js/%s">' \
-            '</script>\n' % (CFG_SITE_URL, script)
+    stylesheets = ['bibedit.css']
 
-    # Build page structure and menu.
-    # rec = create_record(format_record(235, "xm"))[0]
-    #oaiId = record_extract_oai_id(rec)
+    body += bibedit_templates.page_headers(jquery_scripts, scripts,
+                                           stylesheets, data, fieldTemplates)
 
     body += bibedit_templates.menu()
     body += '    <div id="bibEditContent"></div>\n'
@@ -312,9 +303,13 @@ def perform_request_newticket(recid, uid):
         errmsg = "ticket_submit failed"
     return (errmsg, t_url)
 
+
 def perform_request_ajax(req, recid, uid, data, isBulk = False, \
                          ln = CFG_SITE_LANG):
     """Handle Ajax requests by redirecting to appropriate function."""
+
+    bibedit_log( str(data) )
+
     response = {}
     request_type = data['requestType']
     undo_redo = None
@@ -844,7 +839,7 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
             # This is a genuine operation - we have to add a new descriptor
             # to the undo list and cancel the redo unless the operation is
             # a bulk operation
-            if undoRedoOp != None:
+            if undoRedoOp != None and undoRedoOp != 0:
                 undo_list = undo_list + [undoRedoOp]
                 redo_list = []
             else:
