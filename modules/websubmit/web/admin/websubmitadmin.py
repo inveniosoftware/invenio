@@ -37,16 +37,14 @@ def index(req, ln=CFG_SITE_LANG):
     (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (body, errors, warnings) = perform_request_list_doctypes()
+        body = perform_request_list_doctypes()
         return page(title       = "Available WebSubmit Document Types",
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -61,16 +59,14 @@ def showall(req, ln=CFG_SITE_LANG):
     (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (body, errors, warnings) = perform_request_list_doctypes()
+        body = perform_request_list_doctypes()
         return page(title       = "Available WebSubmit Document Types",
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -85,16 +81,14 @@ def doctypelist(req, ln=CFG_SITE_LANG):
     (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (body, errors, warnings) = perform_request_list_doctypes()
+        body = perform_request_list_doctypes()
         return page(title       = "Available WebSubmit Document Types",
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -110,16 +104,14 @@ def jschecklist(req, ln=CFG_SITE_LANG):
     (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (body, errors, warnings) = perform_request_list_jschecks()
+        body = perform_request_list_jschecks()
         return page(title       = "Available WebSubmit Checking Functions",
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -135,16 +127,14 @@ def actionlist(req, ln=CFG_SITE_LANG):
     (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (body, errors, warnings) = perform_request_list_actions()
+        body = perform_request_list_actions()
         return page(title       = "Available WebSubmit Actions",
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -160,16 +150,14 @@ def functionlist(req, ln=CFG_SITE_LANG):
     (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (body, errors, warnings) = perform_request_list_functions()
+        body = perform_request_list_functions()
         return page(title       = "Available WebSubmit Functions",
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -184,16 +172,14 @@ def elementlist(req, ln=CFG_SITE_LANG):
     (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (body, errors, warnings) = perform_request_list_elements()
+        body = perform_request_list_elements()
         return page(title       = "Available WebSubmit Elements",
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -218,16 +204,14 @@ def actionadd(req, actid=None, actname=None, working_dir=None, status_text=None,
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
-        (title, body, errors, warnings) = perform_request_add_action(actid, actname, working_dir, status_text, actcommit)
+        (title, body) = perform_request_add_action(actid, actname, working_dir, status_text, actcommit)
         return page(title       = title,
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -249,16 +233,14 @@ def actionedit(req, actid, actname=None, working_dir=None, status_text=None, act
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
-        (title, body, errors, warnings) = perform_request_edit_action(actid, actname, working_dir, status_text, actcommit)
+        (title, body) = perform_request_edit_action(actid, actname, working_dir, status_text, actcommit)
         return page(title       = title,
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -282,16 +264,14 @@ def jscheckadd(req, chname=None, chdesc=None, chcommit="", ln=CFG_SITE_LANG):
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
-        (title, body, errors, warnings) = perform_request_add_jscheck(chname, chdesc, chcommit)
+        (title, body) = perform_request_add_jscheck(chname, chdesc, chcommit)
         return page(title       = title,
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -313,16 +293,14 @@ def jscheckedit(req, chname, chdesc=None, chcommit="", ln=CFG_SITE_LANG):
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
-        (title, body, errors, warnings) = perform_request_edit_jscheck(chname, chdesc, chcommit)
+        (title, body) = perform_request_edit_jscheck(chname, chdesc, chcommit)
         return page(title       = title,
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -354,19 +332,17 @@ def elementadd(req, elname=None, elmarccode=None, eltype=None, elsize=None, elro
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
-        (title, body, errors, warnings) = perform_request_add_element(elname, elmarccode, eltype, \
-                                                                       elsize, elrows, elcols, elmaxlength, \
-                                                                       elval, elfidesc, elmodifytext, \
-                                                                       elcommit)
+        (title, body) = perform_request_add_element(elname, elmarccode, eltype, \
+                                                    elsize, elrows, elcols, elmaxlength, \
+                                                    elval, elfidesc, elmodifytext, \
+                                                    elcommit)
         return page(title       = title,
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -399,19 +375,17 @@ def elementedit(req, elname, elmarccode=None, eltype=None, elsize=None, elrows=N
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
-        (title, body, errors, warnings) = perform_request_edit_element(elname, elmarccode, eltype, \
-                                                                       elsize, elrows, elcols, elmaxlength, \
-                                                                       elval, elfidesc, elmodifytext, \
-                                                                       elcommit)
+        (title, body) = perform_request_edit_element(elname, elmarccode, eltype, \
+                                                     elsize, elrows, elcols, elmaxlength, \
+                                                     elval, elfidesc, elmodifytext, \
+                                                     elcommit)
         return page(title       = title,
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -426,10 +400,9 @@ def functionadd(req, funcname=None, funcdescr=None, funcaddcommit="", ln=CFG_SIT
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
-        (title, body, errors, warnings) = perform_request_add_function(funcname=funcname,
-                                                                       funcdescr=funcdescr,
-                                                                       funcaddcommit=funcaddcommit
-                                                                      )
+        (title, body) = perform_request_add_function(funcname=funcname,
+                                                     funcdescr=funcdescr,
+                                                     funcaddcommit=funcaddcommit)
 
         return page(title       = title,
                     body        = body,
@@ -437,9 +410,7 @@ def functionadd(req, funcname=None, funcdescr=None, funcaddcommit="", ln=CFG_SIT
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -455,14 +426,14 @@ def functionedit(req, funcname=None, funcdescr=None, funceditaddparam=None, func
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
-        (title, body, errors, warnings) = perform_request_edit_function(funcname=funcname,
-                                                                        funcdescr=funcdescr,
-                                                                        funceditdelparam=funceditdelparam,
-                                                                        funceditaddparam=funceditaddparam,
-                                                                        funceditaddparamfree=funceditaddparamfree,
-                                                                        funcdescreditcommit=funcdescreditcommit,
-                                                                        funcparamdelcommit=funcparamdelcommit,
-                                                                        funcparamaddcommit=funcparamaddcommit
+        (title, body) = perform_request_edit_function(funcname=funcname,
+                                                      funcdescr=funcdescr,
+                                                      funceditdelparam=funceditdelparam,
+                                                      funceditaddparam=funceditaddparam,
+                                                      funceditaddparamfree=funceditaddparamfree,
+                                                      funcdescreditcommit=funcdescreditcommit,
+                                                      funcparamdelcommit=funcparamdelcommit,
+                                                      funcparamaddcommit=funcparamaddcommit
                                                                        )
 
         return page(title       = title,
@@ -471,9 +442,7 @@ def functionedit(req, funcname=None, funcdescr=None, funceditaddparam=None, func
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -492,16 +461,14 @@ def functionusage(req, funcname, ln=CFG_SITE_LANG):
     (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (body, errors, warnings) = perform_request_function_usage(funcname)
+        body = perform_request_function_usage(funcname)
         return page(title       = "WebSubmit Function Usage",
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -520,18 +487,16 @@ def doctyperemove(req, doctype="", doctypedelete="", doctypedeleteconfirm="", ln
     (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (title, body, errors, warnings) = perform_request_remove_doctype(doctype=doctype,
-                                                                         doctypedelete=doctypedelete,
-                                                                         doctypedeleteconfirm=doctypedeleteconfirm)
+        (title, body) = perform_request_remove_doctype(doctype=doctype,
+                                                       doctypedelete=doctypedelete,
+                                                       doctypedeleteconfirm=doctypedeleteconfirm)
         return page(title       = title,
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -545,7 +510,7 @@ def doctypeadd(req, doctype=None, doctypename=None, doctypedescr=None, clonefrom
     (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (title, body, errors, warnings) = perform_request_add_doctype(doctype=doctype,
+        (title, body) = perform_request_add_doctype(doctype=doctype,
                                                                       doctypename=doctypename,
                                                                       doctypedescr=doctypedescr,
                                                                       clonefrom=clonefrom,
@@ -558,9 +523,7 @@ def doctypeadd(req, doctype=None, doctypename=None, doctypedescr=None, clonefrom
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -589,7 +552,7 @@ def doctypeconfiguresubmissionpageelements(req,
     (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (title, body, errors, warnings) = perform_request_configure_doctype_submissionpage_elements(doctype=doctype,
+        (title, body) = perform_request_configure_doctype_submissionpage_elements(doctype=doctype,
                                                                                                     action=action,
                                                                                                     pagenum=pagenum,
                                                                                                     movefieldfromposn=movefieldfromposn,
@@ -610,9 +573,7 @@ def doctypeconfiguresubmissionpageelements(req,
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -630,18 +591,16 @@ def doctypeconfiguresubmissionpagespreview(req,
     (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (title, body, errors, warnings) = perform_request_configure_doctype_submissionpage_preview(doctype=doctype,
-                                                                                                   action=action,
-                                                                                                   pagenum=pagenum)
+        (title, body) = perform_request_configure_doctype_submissionpage_preview(doctype=doctype,
+                                                                                 action=action,
+                                                                                 pagenum=pagenum)
         return page(title       = title,
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
 
     else:
         ## user is not authorised to use WebSubmit Admin:
@@ -667,7 +626,7 @@ def doctypeconfiguresubmissionpages(req,
     (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (title, body, errors, warnings) = perform_request_configure_doctype_submissionpages(doctype=doctype,
+        (title, body) = perform_request_configure_doctype_submissionpages(doctype=doctype,
                                                                                             action=action,
                                                                                             pagenum=pagenum,
                                                                                             movepage=movepage,
@@ -681,9 +640,7 @@ def doctypeconfiguresubmissionpages(req,
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -729,7 +686,7 @@ def doctypeconfiguresubmissionfunctionsparameters(req,
     (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (title, body, errors, warnings) =\
+        (title, body) =\
           perform_request_configure_doctype_submissionfunctions_parameters(doctype=doctype,
                                                                            action=action,
                                                                            functionname=functionname,
@@ -749,9 +706,7 @@ def doctypeconfiguresubmissionfunctionsparameters(req,
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -788,7 +743,7 @@ def doctypeconfiguresubmissionfunctions(req,
     (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (title, body, errors, warnings) = \
+        (title, body) = \
                 perform_request_configure_doctype_submissionfunctions(doctype=doctype,
                                                                       action=action,
                                                                       moveupfunctionname=moveupfunctionname,
@@ -818,9 +773,7 @@ def doctypeconfiguresubmissionfunctions(req,
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -869,37 +822,37 @@ def doctypeconfigure(req,
     (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (title, body, errors, warnings) = perform_request_configure_doctype(doctype=doctype,
-                                                                            doctypename=doctypename,
-                                                                            doctypedescr=doctypedescr,
-                                                                            doctypedetailsedit=doctypedetailsedit,
-                                                                            doctypedetailscommit=doctypedetailscommit,
-                                                                            doctypecategoryadd=doctypecategoryadd,
-                                                                            doctypecategoryedit=doctypecategoryedit,
-                                                                            doctypecategoryeditcommit=doctypecategoryeditcommit,
-                                                                            doctypecategorydelete=doctypecategorydelete,
-                                                                            doctypesubmissionadd=doctypesubmissionadd,
-                                                                            doctypesubmissiondelete=doctypesubmissiondelete,
-                                                                            doctypesubmissiondeleteconfirm=doctypesubmissiondeleteconfirm,
-                                                                            doctypesubmissionedit=doctypesubmissionedit,
-                                                                            doctypesubmissionaddclonechosen=doctypesubmissionaddclonechosen,
-                                                                            doctypesubmissionadddetailscommit=doctypesubmissionadddetailscommit,
-                                                                            doctypesubmissioneditdetailscommit=doctypesubmissioneditdetailscommit,
-                                                                            categid=categid,
-                                                                            categdescr=categdescr,
-                                                                            movecategup=movecategup,
-                                                                            movecategdown=movecategdown,
-                                                                            jumpcategout=jumpcategout,
-                                                                            jumpcategin=jumpcategin,
-                                                                            action=action,
-                                                                            displayed=displayed,
-                                                                            buttonorder=buttonorder,
-                                                                            statustext=statustext,
-                                                                            level=level,
-                                                                            score=score,
-                                                                            stpage=stpage,
-                                                                            endtxt=endtxt,
-                                                                            doctype_cloneactionfrom=doctype_cloneactionfrom)
+        (title, body) = perform_request_configure_doctype(doctype=doctype,
+                                                          doctypename=doctypename,
+                                                          doctypedescr=doctypedescr,
+                                                          doctypedetailsedit=doctypedetailsedit,
+                                                          doctypedetailscommit=doctypedetailscommit,
+                                                          doctypecategoryadd=doctypecategoryadd,
+                                                          doctypecategoryedit=doctypecategoryedit,
+                                                          doctypecategoryeditcommit=doctypecategoryeditcommit,
+                                                          doctypecategorydelete=doctypecategorydelete,
+                                                          doctypesubmissionadd=doctypesubmissionadd,
+                                                          doctypesubmissiondelete=doctypesubmissiondelete,
+                                                          doctypesubmissiondeleteconfirm=doctypesubmissiondeleteconfirm,
+                                                          doctypesubmissionedit=doctypesubmissionedit,
+                                                          doctypesubmissionaddclonechosen=doctypesubmissionaddclonechosen,
+                                                          doctypesubmissionadddetailscommit=doctypesubmissionadddetailscommit,
+                                                          doctypesubmissioneditdetailscommit=doctypesubmissioneditdetailscommit,
+                                                          categid=categid,
+                                                          categdescr=categdescr,
+                                                          movecategup=movecategup,
+                                                          movecategdown=movecategdown,
+                                                          jumpcategout=jumpcategout,
+                                                          jumpcategin=jumpcategin,
+                                                          action=action,
+                                                          displayed=displayed,
+                                                          buttonorder=buttonorder,
+                                                          statustext=statustext,
+                                                          level=level,
+                                                          score=score,
+                                                          stpage=stpage,
+                                                          endtxt=endtxt,
+                                                          doctype_cloneactionfrom=doctype_cloneactionfrom)
 
         return page(title       = title,
                     body        = body,
@@ -907,9 +860,7 @@ def doctypeconfigure(req,
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
@@ -938,7 +889,7 @@ def organisesubmissionpage(req,
     (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (title, body, errors, warnings) = \
+        (title, body) = \
          perform_request_organise_submission_page(doctype=doctype,
                                                   sbmcolid=sbmcolid,
                                                   catscore=catscore,
@@ -958,9 +909,7 @@ def organisesubmissionpage(req,
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = ln,
-                    errors      = errors,
-                    warnings    = warnings)
+                    language    = ln)
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
