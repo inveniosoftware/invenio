@@ -21,11 +21,13 @@ __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
      CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN
+from invenio.webcomment_config import InvenioWebCommentWarning
 from invenio.webcomment import query_get_comment, \
      get_reply_order_cache_data
 from invenio.urlutils import wash_url_argument
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language, wash_language
+from invenio.errorlib import register_exception
 from invenio.webuser import get_user_info, collect_user_info, \
                             isUserAdmin
 from invenio.access_control_engine import acc_authorize_action, \
@@ -101,6 +103,8 @@ def perform_request_index(ln=CFG_SITE_LANG):
 def perform_request_delete(comID=-1, recID=-1, uid=-1, reviews="", ln=CFG_SITE_LANG):
     """
     """
+    _ = gettext_set_language(ln)
+
     from search_engine import record_exists
 
     warnings = []
@@ -114,8 +118,13 @@ def perform_request_delete(comID=-1, recID=-1, uid=-1, reviews="", ln=CFG_SITE_L
     if comID is not None and recID is not None and uid is not None:
         if comID <= 0 and recID <= 0 and uid <= 0:
             if comID != -1:
-                warnings.append(("WRN_WEBCOMMENT_ADMIN_INVALID_COMID",))
-            return (webcomment_templates.tmpl_admin_delete_form(ln, warnings), None, warnings)
+                try:
+                    raise InvenioWebCommentWarning(_('Invalid comment ID.'))
+                except InvenioWebCommentWarning, exc:
+                    register_exception(stream='warning')
+                    warnings.append((exc.message, ''))
+                #warnings.append(("WRN_WEBCOMMENT_ADMIN_INVALID_COMID",))
+            return webcomment_templates.tmpl_admin_delete_form(ln, warnings)
 
         if comID > 0 and not recID > 0:
             comment = query_get_comment(comID)
@@ -129,8 +138,13 @@ def perform_request_delete(comID=-1, recID=-1, uid=-1, reviews="", ln=CFG_SITE_L
                     reviews = 0
                 return (perform_request_comments(ln=ln, comID=comID, recID=recID, reviews=reviews), None, warnings)
             else:
-                warnings.append(('WRN_WEBCOMMENT_ADMIN_COMID_INEXISTANT', comID))
-                return (webcomment_templates.tmpl_admin_delete_form(ln, warnings), None, warnings)
+                try:
+                    raise InvenioWebCommentWarning(_('Comment ID %s does not exist.') % comID)
+                except InvenioWebCommentWarning, exc:
+                    register_exception(stream='warning')
+                    warnings.append((exc.message, ''))
+                #warnings.append(('WRN_WEBCOMMENT_ADMIN_COMID_INEXISTANT', comID))
+                return webcomment_templates.tmpl_admin_delete_form(ln, warnings)
 
         elif recID > 0:
             if record_exists(recID):
@@ -138,13 +152,18 @@ def perform_request_delete(comID=-1, recID=-1, uid=-1, reviews="", ln=CFG_SITE_L
                 reviews = wash_url_argument(reviews, 'int')
                 return (perform_request_comments(ln=ln, comID=comID, recID=recID, reviews=reviews), None, warnings)
             else:
-                warnings.append(('WRN_WEBCOMMENT_ADMIN_RECID_INEXISTANT', comID))
-                return (webcomment_templates.tmpl_admin_delete_form(ln, warnings), None, warnings)
+                try:
+                    raise InvenioWebCommentWarning(_('Record ID %s does not exist.') % comID)
+                except InvenioWebCommentWarning, exc:
+                    register_exception(stream='warning')
+                    warnings.append((exc.message, ''))
+                #warnings.append(('WRN_WEBCOMMENT_ADMIN_RECID_INEXISTANT', comID))
+                return webcomment_templates.tmpl_admin_delete_form(ln, warnings)
         else:
-            return (webcomment_templates.tmpl_admin_delete_form(ln, warnings), None, warnings)
+            return webcomment_templates.tmpl_admin_delete_form(ln, warnings)
 
     else:
-        return (webcomment_templates.tmpl_admin_delete_form(ln, warnings), None, warnings)
+        return webcomment_templates.tmpl_admin_delete_form(ln, warnings)
 
 def perform_request_users(ln=CFG_SITE_LANG):
     """

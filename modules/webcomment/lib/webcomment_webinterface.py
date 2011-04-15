@@ -68,7 +68,9 @@ from invenio.access_control_mailcookie import \
      InvenioWebAccessMailCookieError
 from invenio.webcomment_config import \
      CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE, \
-     CFG_WEBCOMMENT_MAX_ATTACHED_FILES
+     CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
+     InvenioWebCommentError, \
+     InvenioWebCommentWarning
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
@@ -181,7 +183,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
         (ok, problem) = check_recID_is_in_range(self.recid, check_warnings, argd['ln'])
         if ok:
-            (body, errors, warnings) = perform_request_display_comments_or_remarks(req=req, recID=self.recid,
+            body = perform_request_display_comments_or_remarks(req=req, recID=self.recid,
                 display_order=argd['do'],
                 display_since=argd['ds'],
                 nb_per_page=argd['nb'],
@@ -258,7 +260,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         verbose=1,
                         req=req,
                         language=argd['ln'],
-                        warnings=check_warnings, errors=[],
                         navmenuid='search')
 
     # Return the same page wether we ask for /CFG_SITE_RECORD/123 or /CFG_SITE_RECORD/123/
@@ -332,7 +333,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         if not auth_code and (user_info['email'] != 'guest'):
             can_attach_files = True
 
-        warning_msgs = []
+        warning_msgs = [] # list of warning tuples (warning_text, warning_color)
         added_files = {}
         if can_attach_files:
             # User is allowed to attach files. Process the files
@@ -385,7 +386,12 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                             # dismiss all uploaded files and re-ask to
                             # upload again
                             file_too_big = True
-                            warning_msgs.append(('WRN_WEBCOMMENT_MAX_FILE_SIZE_REACHED', cgi.escape(filename), str(file_size/1024) + 'KB', str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/1024) + 'KB'))
+                            try:
+                                raise InvenioWebCommentWarning(_('The size of file \\"%s\\" (%s) is larger than maximum allowed file size (%s). Select files again.') % (cgi.escape(filename), str(file_size/1024) + 'KB', str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/1024) + 'KB'))
+                            except InvenioWebCommentWarning, exc:
+                                register_exception(stream='warning')
+                                warning_msgs.append((exc.message, ''))
+                            #warning_msgs.append(('WRN_WEBCOMMENT_MAX_FILE_SIZE_REACHED', cgi.escape(filename), str(file_size/1024) + 'KB', str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/1024) + 'KB'))
                         else:
                             added_files[filename] = os.path.join(dir_to_open, filename)
 
@@ -443,22 +449,22 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 # User is not already subscribed, and asked to subscribe
                 subscribe = True
 
-            (body, errors, warnings) = perform_request_add_comment_or_remark(recID=self.recid,
-                                                                             ln=argd['ln'],
-                                                                             uid=uid,
-                                                                             action=argd['action'],
-                                                                             msg=argd['msg'],
-                                                                             note=argd['note'],
-                                                                             score=argd['score'],
-                                                                             reviews=self.discussion,
-                                                                             comID=argd['comid'],
-                                                                             client_ip_address=client_ip_address,
-                                                                             editor_type=argd['editor_type'],
-                                                                             can_attach_files=can_attach_files,
-                                                                             subscribe=subscribe,
-                                                                             req=req,
-                                                                             attached_files=added_files,
-                                                                             warnings=warning_msgs)
+            body = perform_request_add_comment_or_remark(recID=self.recid,
+                                                         ln=argd['ln'],
+                                                         uid=uid,
+                                                         action=argd['action'],
+                                                         msg=argd['msg'],
+                                                         note=argd['note'],
+                                                         score=argd['score'],
+                                                         reviews=self.discussion,
+                                                         comID=argd['comid'],
+                                                         client_ip_address=client_ip_address,
+                                                         editor_type=argd['editor_type'],
+                                                         can_attach_files=can_attach_files,
+                                                         subscribe=subscribe,
+                                                         req=req,
+                                                         attached_files=added_files,
+                                                         warnings=warning_msgs)
 
             if self.discussion:
                 title = _("Add Review")
@@ -476,8 +482,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         uid=uid,
                         language=CFG_SITE_LANG,
                         verbose=1,
-                        errors=errors,
-                        warnings=warnings,
                         req=req,
                         navmenuid='search',
                         metaheaderadd=jqueryheader)
@@ -488,7 +492,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         uid=uid,
                         verbose=1,
                         req=req,
-                        warnings=check_warnings, errors=[],
                         navmenuid='search')
 
     def vote(self, req, form):

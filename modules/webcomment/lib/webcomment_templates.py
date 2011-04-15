@@ -60,7 +60,7 @@ class Template:
         @param ln: language
         @param comments: tuple as returned from webcomment.py/query_retrieve_comments_or_remarks
         @param nb_comments_total: total number of comments for this record
-        @param warnings: list of warning tuples (warning_msg, arg1, arg2, ...)
+        @param warnings: list of warning tuples (warning_text, warning_color)
         @return: html of comments
         """
 
@@ -195,7 +195,7 @@ class Template:
         @param comments: tuple as returned from webcomment.py/query_retrieve_comments_or_remarks
         @param nb_comments_total: total number of comments for this record
         @param avg_score: average score of all reviews
-        @param warnings: list of warning tuples (warning_msg, arg1, arg2, ...)
+        @param warnings: list of warning tuples (warning_text, warning_color)
         @return: html of comments
         """
         # load the right message language
@@ -573,7 +573,7 @@ class Template:
         @param comments: tuple as returned from webcomment.py/query_retrieve_comments_or_remarks
         @param total_nb_comments: total number of comments for this record
         @param avg_score: average score of reviews for this record
-        @param warnings: list of warning tuples (warning_msg, color)
+        @param warnings: list of warning tuples (warning_text, warning_color)
         @param border: boolean, active if want to show border around each comment/review
         @param reviews: boolean, enabled for reviews, disabled for comments
         @param can_send_comments: boolean, if user can send comments or not
@@ -1043,41 +1043,47 @@ class Template:
 </form>"""
         return output
 
-    def tmpl_warnings(self, warnings, ln=CFG_SITE_LANG):
+    def tmpl_warnings(self, warnings=[], ln=CFG_SITE_LANG):
         """
-        Prepare the warnings list
-        @param warnings: list of warning tuples (warning_msg, arg1, arg2, etc)
-        @return: html string of warnings
+        Display len(warnings) warning fields
+        @param warnings: list of warning tuples (warning_text, warning_color)
+        @param ln=language
+        @return: html output
         """
-        red_text_warnings = ['WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED',
-                            'WRN_WEBCOMMENT_ALREADY_VOTED']
-        green_text_warnings = ['WRN_WEBCOMMENT_FEEDBACK_RECORDED',
-                               'WRN_WEBCOMMENT_SUBSCRIBED',
-                               'WRN_WEBCOMMENT_UNSUBSCRIBED']
-        from invenio.errorlib import get_msgs_for_code_list
-        span_class = 'important'
-        out = ""
         if type(warnings) is not list:
             warnings = [warnings]
-        if len(warnings) > 0:
-            warnings_parsed = get_msgs_for_code_list(warnings, 'warning', ln)
-            for (warning_code, warning_text) in warnings_parsed:
-                if not warning_code.startswith('WRN'):
-                    #display only warnings that begin with WRN to user
-                    continue
-                if warning_code in red_text_warnings:
-                    span_class = 'important'
-                elif warning_code in green_text_warnings:
+        warningbox = ""
+        if warnings:
+            for i in range(len(warnings)):
+                warning_text = warnings[i][0]
+                warning_color = warnings[i][1]
+                if warning_color == 'green':
                     span_class = 'exampleleader'
                 else:
                     span_class = 'important'
-                out += '''
+                warningbox += '''
                     <span class="%(span_class)s">%(warning)s</span><br />''' % \
                     {   'span_class'    :   span_class,
                         'warning'       :   warning_text         }
-            return out
+            return warningbox
         else:
             return ""
+
+    def tmpl_error(self, error, ln=CFG_SITE_LANG):
+        """
+        Display error
+        @param error: string
+        @param ln=language
+        @return: html output
+        """
+        _ = gettext_set_language(ln)
+        errorbox = ""
+        if error != "":
+            errorbox = "<div class=\"errorbox\">\n  <b>Error:</b>\n"
+            errorbox += "  <p>"
+            errorbox += error + "  </p>"
+            errorbox += "</div><br />\n"
+        return errorbox
 
     def tmpl_add_comment_form(self, recID, uid, nickname, ln, msg,
                               warnings, textual_msg=None, can_attach_files=False,
@@ -1091,7 +1097,7 @@ class Template:
                     warning, or when replying to a comment
         @param textual_msg: same as 'msg', but contains the textual
                             version in case user cannot display FCKeditor
-        @param warnings: list of warning tuples (warning_msg, color)
+        @param warnings: list of warning tuples (warning_text, warning_color)
         @param can_attach_files: if user can upload attach file to record or not
         @param user_is_subscribed_to_discussion: True if user already receives new comments by email
         @param reply_to: the ID of the comment we are replying to. None if not replying
@@ -1206,7 +1212,7 @@ class Template:
         @param textual_msg: the textual version of 'msg' when user cannot display FCKeditor
         @param score: review score
         @param note: review title
-        @param warnings: list of warning tuples (warning_msg, color)
+        @param warnings: list of warning tuples (warning_text, warning_color)
         @param show_title_p: if True, prefix the form with "Add Review" as title
         @param can_attach_files: if user can upload attach file to record or not
         @return: html add review form
@@ -1458,8 +1464,8 @@ class Template:
         """
         Display admin interface to fetch list of records to delete
 
-        @param warnings: list of warning_tuples where warning_tuple is (warning_message, text_color)
-                         see tmpl_warnings, color is optional
+        @param warnings: list of warning tuples (warning_text, warning_color)
+                         see tmpl_warnings, warning_color is optional
         """
         # load the right message language
         _ = gettext_set_language(ln)
