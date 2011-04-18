@@ -95,7 +95,7 @@ def perform_request_index(req, journal_name, issue_number, ln,
 
     html = format_with_format_template(index_page_template,
                                        bfo,
-                                       verbose=verbosity)[0]
+                                       verbose=verbosity)
     return html
 
 def perform_request_article(req, journal_name, issue_number, ln,
@@ -164,7 +164,7 @@ def perform_request_article(req, journal_name, issue_number, ln,
         verbosity = verbose
     html_out = format_with_format_template(index_page_template,
                                            bfo,
-                                           verbose=verbosity)[0]
+                                           verbose=verbosity)
     # cache if not in editor mode, and if database is not down
     if not editor and not CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
         cache_article_page(html_out, journal_name, category,
@@ -194,7 +194,7 @@ def perform_request_contact(req, ln, journal_name, verbose=0):
                           user_info=user_info)
     bfo.req = req
     html = format_with_format_template(contact_page_template,
-                                       bfo)[0]
+                                       bfo)
 
     return html
 
@@ -214,7 +214,7 @@ def perform_request_popup(req, ln, journal_name, record):
     bfo = BibFormatObject(record, ln=ln, user_info=user_info)
     bfo.req = req
     html = format_with_format_template(popup_page_template,
-                                       bfo)[0]
+                                       bfo)
 
     return html
 
@@ -245,7 +245,7 @@ def perform_request_search(req, journal_name, ln,
         bfo.req = req
         html = format_with_format_template(search_page_template,
                                            bfo,
-                                           verbose=verbose)[0]
+                                           verbose=verbose)
         return html
 
     elif archive_select == "Go":
