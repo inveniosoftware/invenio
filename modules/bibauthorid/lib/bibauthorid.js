@@ -67,8 +67,8 @@ $(document).ready(function() {
                         { "sWidth": "120px" },
                         { "sWidth": "320px" }
                 ],
-                "aLengthMenu": [75],
-                'iDisplayLength': 75,
+                "aLengthMenu": [500],
+                'iDisplayLength': 500,
                 "fnDrawCallback": function() {
                     $('.dataTables_length').css('display','none');
                 }
@@ -85,8 +85,8 @@ $(document).ready(function() {
                         { "bSortable": false,
                           "sWidth": "120px" }
                 ],
-                "aLengthMenu": [50],
-                'iDisplayLength': 50,
+                "aLengthMenu": [500],
+                'iDisplayLength': 500,
                 "fnDrawCallback": function() {
                     $('.dataTables_length').css('display','none');
                 }
@@ -133,8 +133,20 @@ $(document).ready(function() {
     });
 
 //    update_action_links();
-
 });
+
+
+function toggle_claimed_rows() {
+    $("img[alt^=Confirmed.]").parents("tr").toggle()
+
+    if ($("#toggle_claimed_rows").attr("alt") == 'hide') {
+        $("#toggle_claimed_rows").attr("alt", 'show');
+        $("#toggle_claimed_rows").html("Show successful claims");
+    } else {
+        $("#toggle_claimed_rows").attr("alt", 'hide');
+        $("#toggle_claimed_rows").html("Hide successful claims");
+    }
+}
 
 
 function confirm_bibref(claimid) {

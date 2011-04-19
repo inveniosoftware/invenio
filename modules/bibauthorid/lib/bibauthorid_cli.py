@@ -150,15 +150,24 @@ Daemon mode options:
                             the frontend (and the backend).
       --clean-cache         Clean the cache from out of date contents
                             (deleted documents).
+      --repair-personid     Deletes untouched person entities to then
+                            re-create and updated these entities.
 
  Options:
+  -r, --record-ids=NUM      Specifies a list of record ids. To use as on option
+                            for --update-universe to limit the update to the
+                            selected records. Must be space less CSVs.
+  --all-records             To use as on option for --update-universe to
+                            perform the update an all existing record ids. Be
+                            WARNED that this will empty and re-fill all aid*
+                            tables in the process!
   -d, --data-dir=DIRNAME    Specifies the data directory, in which the data for
                             the grid preparation will be stored to or loaded
                             from. It requires the -G or -R switch.
   -p, --prefix=STRING       Specifies the prefix of the directories created
                             under the --data-dir directory. Optional.
                             Defaults to 'job'. It requires the -G switch.
-  -m, --max-records         Specifies the number of records that
+  -m, --max-records=NUM     Specifies the number of records that
                             shall be stored per job package. Optional.
                             Defaults to 4000 and requires -G switch.
 
@@ -214,15 +223,19 @@ def _read_options(options_string):
         "load_grid_results": False,
         "update": False,
         "update_cache": False,
-        "clean_cache": False
+        "clean_cache": False,
+        "record_ids" : None,
+        "all_records": False,
+        "repair_pid": False
     }
 
     try:
-        short_flags = "n:v:i:d:p:j:m:USGRahV"
+        short_flags = "r:n:v:i:d:p:j:m:USGRahV"
         long_flags = ["lastname=", "verbose=", "recid=",
             "process-all", "help", "version", "prepare-grid", "prefix=",
             "data-dir=", "standalone", "job-dir=", "max-records=",
-            "load-grid-results", "update-universe", "update-cache", "clean-cache"]
+            "load-grid-results", "update-universe", "update-cache",
+            "clean-cache", "record-ids=", "all-records", "repair-personid"]
         opts, args = getopt.gnu_getopt(options_string, short_flags, long_flags)
     except getopt.GetoptError, err1:
         print >> sys.stderr, "Parameter problem: %s" % err1
@@ -240,7 +253,9 @@ def _read_options(options_string):
         "-j": "job_dir",
         "--job-dir": "job_dir",
         "-m": "max_records",
-        "--max-records": "max_records"
+        "--max-records": "max_records",
+        "--record-ids": "record_ids",
+        "-r": "record_ids"
     }
 
     without_argument = {
@@ -254,8 +269,10 @@ def _read_options(options_string):
         "--standalone": "standalone",
         "-R": "load_grid_results",
         "--load-grid-results": "load_grid_results",
-        "--update-cache" : "update_cache",
-        "--clean-cache" : "clean_cache"
+        "--update-cache": "update_cache",
+        "--clean-cache": "clean_cache",
+        "--all-records": "all_records",
+        "--repair-personid": "repair_pid"
     }
 
     for option, argument in opts:

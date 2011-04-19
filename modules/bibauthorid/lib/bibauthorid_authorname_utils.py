@@ -19,7 +19,7 @@
 
 '''
 bibauthorid_authornames_utils
-    Helper for accessing the author names data structure
+Helper for accessing the author names data structure
 '''
 
 import bibauthorid_utils
@@ -162,6 +162,7 @@ def get_name_id(name_string):
         Returns -1 if the string is not found.
     @return: int
     """
+    name_id = -1
     name = [row['id'] for row in dat.AUTHOR_NAMES
                if row['name'] == name_string]
     try:
@@ -217,7 +218,7 @@ def get_name_and_db_name_strings(authorname_id):
     @rtype: dict
     '''
     names_dict = {"name": "",
-                  "db_name" : ""}
+                  "db_name": ""}
     name = [row for row in dat.AUTHOR_NAMES
             if row['id'] == authorname_id]
 
@@ -297,6 +298,7 @@ def update_doclist(bibrec_id, authorname_id="", bibref=""):
 
     return True
 
+
 def soft_compare_names(origin_name, target_name):
     '''
     Soft comparison of names, to use in search engine an similar
@@ -351,6 +353,7 @@ def soft_compare_names(origin_name, target_name):
         name_score = (matching_i + matching_n) * 0.4 / (max_names + max_initials)
         score += name_score
     return score
+
 
 def compare_names(origin_name, target_name):
     """

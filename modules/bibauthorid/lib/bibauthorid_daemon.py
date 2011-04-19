@@ -43,6 +43,7 @@ from bibauthorid_tables_utils import get_papers_recently_modified
 from bibauthorid_tables_utils import update_authornames_tables_from_paper
 from bibauthorid_tables_utils import authornames_tables_gc
 from bibauthorid_tables_utils import update_tables_from_mem_cache
+from bibauthorid_tables_utils import empty_aid_tables
 from bibauthorid_virtualauthor_utils import add_minimum_virtualauthor
 from bibauthorid_virtualauthor_utils import get_va_ids_by_recid_lname
 from bibauthorid_virtualauthor_utils import delete_virtual_author
@@ -62,6 +63,7 @@ from bibauthorid_personid_tables_utils import get_user_log
 from bibauthorid_personid_tables_utils import insert_user_log
 from bibauthorid_personid_tables_utils import update_personID_table_from_paper
 from bibauthorid_personid_tables_utils import update_personID_from_algorithm
+from bibauthorid_personid_tables_utils import personid_remove_automatically_assigned_papers
 
 import bibtask
 
@@ -119,9 +121,18 @@ Examples:
                             the frontend (and the backend).
       --clean-cache         Clean the cache from out of date contents
                             (deleted documents).
+  -r, --record-ids          Specifies a list of record ids. To use as on option
+                            for --update-universe to limit the update to the
+                            selected records
+  --all-records             To use as on option for --update-universe to
+                            perform the update an all existing record ids. Be
+                            WARNED that this will empty and re-fill all aid*
+                            tables in the process!
+  --repair-personid         Deletes untouched person entities to then
+                            re-create and updated these entities.
 """,
         version="Invenio Bibauthorid v%s" % bconfig.VERSION,
-        specific_params=("d:n:p:m:GRa",
+        specific_params=("r:d:n:p:m:GURa",
             [
              "data-dir=",
              "lastname=",
@@ -132,7 +143,10 @@ Examples:
              "load-grid-results",
              "update-universe",
              "update-cache",
-             "clean-cache"
+             "clean-cache",
+             "record-ids=",
+             "all-records",
+             "repair-personid"
             ]),
         task_submit_elaborate_specific_parameter_fnc=
             _task_submit_elaborate_specific_parameter,
@@ -183,6 +197,19 @@ def _task_submit_elaborate_specific_parameter(key, value, opts, args):
     elif key in ("--clean-cache",):
         bibtask.task_set_option("clean_cache", True)
 
+    elif key in ("--record-ids", '-r'):
+        if value.count("="):
+            value = value[1:]
+
+        value = value.split(",")
+        bibtask.task_set_option("record_ids", value)
+
+    elif key in ("--all-records"):
+        bibtask.task_set_option("all_records", True)
+
+    elif key in ("--repair-personid"):
+        bibtask.task_set_option("repair_pid", True)
+
     else:
         return False
 
@@ -204,7 +231,13 @@ def _task_run_core():
     update = bibtask.task_get_option('update')
     clean_cache = bibtask.task_get_option('clean_cache')
     update_cache = bibtask.task_get_option('update_cache')
+    record_ids = bibtask.task_get_option('record_ids')
+    record_ids_nested = None
+    all_records = bibtask.task_get_option('all_records')
+    repair_pid = bibtask.task_get_option('repair_pid')
 
+    if record_ids:
+        record_ids_nested = [[p] for p in record_ids]
 #    automated_daemon_mode_p = True
 
     if lastname:
@@ -283,7 +316,7 @@ def _task_run_core():
                               " papers", stream=sys.stdout, verbose=0)
         bibtask.task_update_progress('update-cache: Processing recently'
                                      ' updated papers')
-        _run_update_authornames_tables_from_paper()
+        _run_update_authornames_tables_from_paper(record_ids_nested, all_records)
         bibtask.write_message("update-cache: Finished processing papers",
                               stream=sys.stdout, verbose=0)
         bibtask.task_update_progress('update-cache: DONE')
@@ -292,7 +325,7 @@ def _task_run_core():
         bibtask.write_message("updating authorid universe",
                               stream=sys.stdout, verbose=0)
         bibtask.task_update_progress('updating authorid universe')
-        _update_authorid_universe()
+        _update_authorid_universe(record_ids, all_records)
         bibtask.write_message("done updating authorid universe",
                               stream=sys.stdout, verbose=0)
         bibtask.task_update_progress('done updating authorid universe')
@@ -307,10 +340,26 @@ def _task_run_core():
                               "tables", stream=sys.stdout, verbose=0)
         bibtask.task_update_progress('clean-cache: Processing recently updated'
                                      ' papers for persons')
-        _run_update_personID_table_from_paper()
+        _run_update_personID_table_from_paper(record_ids_nested, all_records)
         bibtask.write_message("update-cache: Finished cleaning PersonID"
                               " table", stream=sys.stdout, verbose=0)
         bibtask.task_update_progress('clean-cache: DONE')
+
+    if repair_pid:
+        bibtask.task_update_progress('Updating names cache...')
+        _run_update_authornames_tables_from_paper()
+        bibtask.task_sleep_now_if_required(can_stop_too=False)
+        bibtask.task_update_progress('Removing person entities not touched by '
+                                     'humans...')
+        personid_remove_automatically_assigned_papers()
+        bibtask.task_sleep_now_if_required(can_stop_too=False)
+        bibtask.task_update_progress('Updating person entities...')
+        update_personID_from_algorithm()
+        bibtask.task_sleep_now_if_required(can_stop_too=False)
+        bibtask.task_update_progress('Cleaning person tables...')
+        _run_update_personID_table_from_paper()
+        bibtask.task_sleep_now_if_required(can_stop_too=False)
+        bibtask.task_update_progress('All repairs done.')
 
     return 1
 
@@ -329,6 +378,15 @@ def _task_submit_check_options():
     update = bibtask.task_get_option('update')
     clean_cache = bibtask.task_get_option('clean_cache')
     update_cache = bibtask.task_get_option('update_cache')
+    record_ids = bibtask.task_get_option('record_ids')
+    all_records = bibtask.task_get_option('all_records')
+    repair_pid = bibtask.task_get_option('repair_pid')
+
+    if (record_ids and all_records):
+        bibtask.write_message("ERROR: conflicting options: --record-ids and "
+                              "--all-records cannot be specified at the same "
+                              "time.", stream=sys.stdout, verbose=0)
+        return False
 
     if (lastname == "None," or lastname == "None"):
         lastname = False
@@ -342,9 +400,9 @@ def _task_submit_check_options():
         return False
     elif not (bool(lastname) ^ bool(process_all) ^ bool(update)
               ^ bool(prepare_grid) ^ bool(load_grid) ^ bool(clean_cache)
-              ^ bool(update_cache)):
+              ^ bool(update_cache) ^ bool(repair_pid)):
         bibtask.write_message("ERROR: Options -a -n -U -R -G --clean-cache "
-                              "--update-cache are mutually"
+                              "--update-cache --repair-personid are mutually"
                               " exclusive!", stream=sys.stdout, verbose=0)
         return False
     elif ((not prepare_grid and (data_dir or prefix or max_records)) and
@@ -533,6 +591,7 @@ def _prepare_data_files_from_db(data_dir_name="grid_data",
                                     stream=sys.stdout, verbose=0)
             break
 
+        bibtask.task_sleep_now_if_required(can_stop_too=False)
         lname_list = last_name_queue.get()
         lname = None
 
@@ -551,8 +610,8 @@ def _prepare_data_files_from_db(data_dir_name="grid_data",
                                     % (lname, status, total),
                                     stream=sys.stdout, verbose=0)
 
+        bibtask.task_sleep_now_if_required(can_stop_too=False)
         populate_doclist_for_author_surname(lname)
-
         post_remove_names = set()
 
         for name in [row['name'] for row in dat.AUTHOR_NAMES
@@ -588,6 +647,7 @@ def _prepare_data_files_from_db(data_dir_name="grid_data",
             work_dir = "%s%s%s" % (data_dir, workdir_prefix, job_id)
 
             _write_to_files(work_dir, job_lnames)
+            bibtask.task_sleep_now_if_required(can_stop_too=True)
             job_lnames = []
             job_id += 1
 
@@ -600,11 +660,12 @@ def _prepare_data_files_from_db(data_dir_name="grid_data",
         work_dir = "%s%s%s" % (data_dir, workdir_prefix, job_id)
 
         _write_to_files(work_dir, job_lnames)
+        bibtask.task_sleep_now_if_required(can_stop_too=True)
 
     return True
 
 
-def _update_authorid_universe():
+def _update_authorid_universe(record_ids=None, all_records=False):
     '''
     Updates all data related to the authorid algorithm.
 
@@ -646,7 +707,6 @@ def _update_authorid_universe():
                 refrec = -1
 
                 if len(refrecs) > 1:
-                    print "SCREEEEEEWWWWWWED!!! Several bibrefs on one paper?!"
                     refrec = refrecs[0]
                 elif refrecs:
                     refrec = refrecs[0]
@@ -659,36 +719,56 @@ def _update_authorid_universe():
                                               docs['bibrecid'], 0, [])
 
     dat.reset_mem_cache(True)
-    last_log = get_user_log(userinfo='daemon',
-                            action='update_aid',
-                            only_most_recent=True)
+    last_log = None
     updated_records = []
 
-    if last_log:
-        #select only the most recent papers
-        recently_modified, last_update_time = get_papers_recently_modified(
+    if not record_ids and not all_records:
+        last_log = get_user_log(userinfo='daemon',
+                                action='update_aid',
+                                only_most_recent=True)
+        if last_log:
+            #select only the most recent papers
+            recently_modified, last_update_time = get_papers_recently_modified(
                                                         date=last_log[0][2])
-        insert_user_log('daemon', '-1', 'update_aid', 'bibsched', 'status',
-                    comment='bibauthorid_daemon, update_authorid_universe',
-                    timestamp=last_update_time[0][0])
-        bibtask.write_message("Update authorid will operate on %s records."
-                              % (len(recently_modified)), stream=sys.stdout,
-                              verbose=0)
-
-        if not recently_modified:
+            insert_user_log('daemon', '-1', 'update_aid', 'bibsched', 'status',
+                        comment='bibauthorid_daemon, update_authorid_universe',
+                        timestamp=last_update_time[0][0])
+            bibtask.write_message("Update authorid will operate on %s records."
+                                  % (len(recently_modified)), stream=sys.stdout,
+                                  verbose=0)
+    
+            if not recently_modified:
+                bibtask.write_message("Update authorid: Nothing to do",
+                                      stream=sys.stdout, verbose=0)
+                return
+    
+            for rec in recently_modified:
+                updated_records.append(rec[0])
+                dat.update_log("rec_updates", rec[0])
+    
+        else:
             bibtask.write_message("Update authorid: Nothing to do",
                                   stream=sys.stdout, verbose=0)
             return
 
-        for rec in recently_modified:
-            updated_records.append(rec[0])
-            dat.update_log("rec_updates", rec[0])
+    elif record_ids and not all_records:
+        updated_records = record_ids
 
-    else:
-        bibtask.write_message("Update authorid: Nothing to do",
+    elif not record_ids and all_records:
+        bibtask.write_message("Update is going to empty all aid tables...",
                               stream=sys.stdout, verbose=0)
+        empty_aid_tables()
+        bibtask.write_message("Update authorid will operate on all! records.",
+                              stream=sys.stdout, verbose=0)
+        bibtask.task_update_progress('Update is operating on all! records.')
+        start_full_disambiguation(process_orphans=True,
+                                  db_exists=False,
+                                  populate_doclist=True,
+                                  write_to_db=True)
+        bibtask.task_update_progress('Update is done.')
         return
 
+    bibtask.task_sleep_now_if_required(can_stop_too=True)
     authors = []
     author_last_names = set()
 
@@ -724,6 +804,7 @@ def _update_authorid_universe():
                                 'last_name': last_name})
 
     for status, author_last_name in enumerate(author_last_names):
+        bibtask.task_sleep_now_if_required(can_stop_too=False)
         current_authors = [row for row in authors
                            if row['last_name'] == author_last_name]
         total_lnames = len(author_last_names)
@@ -799,12 +880,14 @@ def _update_authorid_universe():
             create_vas_from_specific_doclist(current_author['records'])
 
         bconfig.LOGGER.log(25, "-- Relevant data pre-processed successfully.")
+        bibtask.task_sleep_now_if_required(can_stop_too=False)
         start_computation(process_doclist=False,
                           process_orphans=True,
                           print_stats=True)
         bconfig.LOGGER.log(25, "-- Computation finished. Will write back to "
                                "the database now.")
         update_db_result = update_tables_from_mem_cache(return_ra_updates=True)
+        bibtask.task_sleep_now_if_required(can_stop_too=True)
 
         if not update_db_result[0]:
             bconfig.LOGGER.log(25, "Writing to persistence layer failed.")
@@ -826,6 +909,7 @@ def _update_authorid_universe():
                        "create person IDs for %s newly created and changed "
                        "authors." % len(updated_ras))
     bibtask.task_update_progress('Updating persistent Person IDs')
+    bibtask.task_sleep_now_if_required(can_stop_too=False)
     update_personID_from_algorithm(personid_ra_format)
     bconfig.LOGGER.log(25, "Done updating everything. Thanks for flying "
                        "with bibauthorid!")
@@ -853,31 +937,44 @@ def _write_to_files(work_dir, job_lnames):
     write_mem_cache_to_files(work_dir, job_lnames)
     dat.reset_mem_cache(True)
 
-def _run_update_authornames_tables_from_paper():
+
+def _run_update_authornames_tables_from_paper(record_ids=None, all_records=False):
     '''
     Runs the update on the papers which have been modified since the last run
 
     @note: This should be run as often as possible to keep authornames and
            authornames_bibrefs cache tables up to date.
     '''
-    last_log = get_user_log(userinfo='daemon', action='UATFP', only_most_recent=True)
-    if len(last_log) >= 1:
-        #select only the most recent papers
-        recently_modified, min_date = get_papers_recently_modified(date=last_log[0][2])
-        insert_user_log('daemon', '-1', 'UATFP', 'bibsched', 'status', comment='bibauthorid_daemon, update_authornames_tables_from_paper', timestamp=min_date[0][0])
-        bibtask.write_message("update_authornames_tables_from_paper: Running on: " + str(recently_modified), stream=sys.stdout, verbose=0)
-        update_authornames_tables_from_paper(recently_modified)
+    if not all_records and not record_ids:
+        last_log = get_user_log(userinfo='daemon', action='UATFP', only_most_recent=True)
+        if len(last_log) >= 1:
+            #select only the most recent papers
+            recently_modified, min_date = get_papers_recently_modified(date=last_log[0][2])
+            insert_user_log('daemon', '-1', 'UATFP', 'bibsched', 'status', comment='bibauthorid_daemon, update_authornames_tables_from_paper', timestamp=min_date[0][0])
+
+            if not recently_modified:
+                bibtask.write_message("update_authornames_tables_from_paper: "
+                                      "All names up to date.",
+                                      stream=sys.stdout, verbose=0)
+            else:
+                bibtask.write_message("update_authornames_tables_from_paper: Running on %s papers " % str(len(recently_modified)), stream=sys.stdout, verbose=0)
+                update_authornames_tables_from_paper(recently_modified)
+        else:
+            #this is the first time the utility is run, run on all the papers?
+            #Probably better to write the log on the first authornames population
+            #@todo: authornames population writes the log
+            recently_modified, min_date = get_papers_recently_modified()
+            insert_user_log('daemon', '-1', 'UATFP', 'bibsched', 'status', comment='bibauthorid_daemon, update_authornames_tables_from_paper', timestamp=min_date[0][0])
+            bibtask.write_message("update_authornames_tables_from_paper: Running on %s papers " % str(len(recently_modified)), stream=sys.stdout, verbose=0)
+            update_authornames_tables_from_paper(recently_modified)
     else:
-        #this is the first time the utility is run, run on all the papers?
-        #Probably better to write the log on the first authornames population
-        #@todo: authornames population writes the log
-        recently_modified, min_date = get_papers_recently_modified()
-        insert_user_log('daemon', '-1', 'UATFP', 'bibsched', 'status', comment='bibauthorid_daemon, update_authornames_tables_from_paper', timestamp=min_date[0][0])
-        bibtask.write_message("update_authornames_tables_from_paper: Running on: " + str(recently_modified), stream=sys.stdout, verbose=0)
-        update_authornames_tables_from_paper(recently_modified)
+        bibtask.write_message("update_authornames_tables_from_paper: Running "
+                              "on all papers ",
+                              stream=sys.stdout, verbose=0)
+        update_authornames_tables_from_paper(record_ids)
 
 
-def _run_update_personID_table_from_paper():
+def _run_update_personID_table_from_paper(record_ids=None, all_records=False):
     '''
     Runs the update on the papers which have been modified since the last run
     This is removing no-longer existing papers from the personid table.
@@ -885,26 +982,35 @@ def _run_update_personID_table_from_paper():
     @note: Update recommended monthly.
     @warning: quite resource intensive.
     '''
-    last_log = get_user_log(userinfo='daemon', action='UPITFP', only_most_recent=True)
-    if len(last_log) >= 1:
-        #select only the most recent papers
-        recently_modified, min_date = get_papers_recently_modified(date=last_log[0][2])
-        insert_user_log('daemon', '-1', 'UPITFP', 'bibsched', 'status', comment='bibauthorid_daemon, update_personID_table_from_paper', timestamp=min_date[0][0])
-        bibtask.write_message("update_personID_table_from_paper: Running on: " + str(recently_modified), stream=sys.stdout, verbose=0)
-        update_personID_table_from_paper(recently_modified)
+    if not record_ids and not all_records:
+        last_log = get_user_log(userinfo='daemon', action='UPITFP', only_most_recent=True)
+        if len(last_log) >= 1:
+            #select only the most recent papers
+            recently_modified, min_date = get_papers_recently_modified(date=last_log[0][2])
+            insert_user_log('daemon', '-1', 'UPITFP', 'bibsched', 'status', comment='bibauthorid_daemon, update_personID_table_from_paper', timestamp=min_date[0][0])
+
+            if not recently_modified:
+                bibtask.write_message("update_personID_table_from_paper: "
+                                      "All person entities up to date.",
+                                      stream=sys.stdout, verbose=0)
+            else:
+                bibtask.write_message("update_personID_table_from_paper: Running on: " + str(recently_modified), stream=sys.stdout, verbose=0)
+                update_personID_table_from_paper(recently_modified)
+        else:
+            # Should not process all papers, hence authornames population writes
+            # the appropriate log. In case the log is missing, process everything.
+            recently_modified, min_date = get_papers_recently_modified()
+            insert_user_log('daemon', '-1', 'UPITFP', 'bibsched', 'status', comment='bibauthorid_daemon, update_personID_table_from_paper', timestamp=min_date[0][0])
+            bibtask.write_message("update_personID_table_from_paper: Running on: " + str(recently_modified), stream=sys.stdout, verbose=0)
+            update_personID_table_from_paper(recently_modified)
+        # @todo: develop a method that removes the respective VAs from the database
+        # as well since no reference will be there for them any longer. VAs can be
+        # found by searching for the authornames ID in the VA table. The
+        # method has to kill RA data based on the VA (cf. del_ra_data_by_vaid in
+        # ra utils as a reference), all VA2RA links, all VA data, all VAs and
+        # finally all doclist refs that point to the respective bibrefs.
     else:
-        # Should not process all papers, hence authornames population writes
-        # the appropriate log. In case the log is missing, process everything.
-        recently_modified, min_date = get_papers_recently_modified()
-        insert_user_log('daemon', '-1', 'UPITFP', 'bibsched', 'status', comment='bibauthorid_daemon, update_personID_table_from_paper', timestamp=min_date[0][0])
-        bibtask.write_message("update_personID_table_from_paper: Running on: " + str(recently_modified), stream=sys.stdout, verbose=0)
-        update_personID_table_from_paper(recently_modified)
-    # @todo: develop a method that removes the respective VAs from the database
-    # as well since no reference will be there for them any longer. VAs can be
-    # found by searching for the authornames ID in the VA table. The
-    # method has to kill RA data based on the VA (cf. del_ra_data_by_vaid in
-    # ra utils as a reference), all VA2RA links, all VA data, all VAs and
-    # finally all doclist refs that point to the respective bibrefs.
+        update_personID_table_from_paper(record_ids)
 
 
 def _run_authornames_tables_gc():
@@ -914,4 +1020,3 @@ def _run_authornames_tables_gc():
     '''
     insert_user_log('daemon', '-1', 'ANTGC', 'bibsched', 'status', comment='bibauthorid_daemon, authornames_tables_gc')
     authornames_tables_gc()
-

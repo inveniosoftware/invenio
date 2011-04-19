@@ -56,6 +56,9 @@ def add_minimum_virtualauthor(orig_authornames_id,
         "100:14424,12441"
     @type refrec: string
     '''
+    if authorname_p_list:
+        pass
+
     current_va = create_new_virtualauthor(orig_authornames_id,
                                          orig_name_string)
 
