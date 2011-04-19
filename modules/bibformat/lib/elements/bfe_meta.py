@@ -22,34 +22,34 @@
 __revision__ = "$Id$"
 
 from invenio.bibformat_utils import parse_tag
-from invenio.bibformat_elements.bfe_field import format as field_format
+from invenio.bibformat_elements.bfe_field import format_element as field_format
 from invenio.htmlutils import create_html_tag
 from invenio.bibindex_engine import get_field_tags
 
-def format(bfo, name, tag_name='', tag = '', escape=4):
+def format_element(bfo, name, tag_name='', tag = '', escape=4):
     """Prints a custom field in a way suitable to be used in HTML META
     tags.  In particular conforms to Google Scholar harvesting protocol as
     defined http://scholar.google.com/intl/en/scholar/inclusion.html
 
 
     @param tag_name: the name, from tag table, of the field to be exported
-    looks initially for names prefixed by "meta-"<tagname>
+    looks initially for names prefixed by "meta-"<tag_name>
     then looks for exact name, then falls through to "tag"
     @param tag: the MARC tag to be exported (only if not defined by tag_name)
     @param name: name to be displayed in the meta headers, labelling this value
 
     """
     tags = []
-    if len(tag_name) > 0:
+    if tag_name:
         # First check for special meta named tags
         tags = get_field_tags("meta-" + tag_name)
-        if len(tags) == 0:
+        if not tags:
             #then check for regular tags
             tags = get_field_tags(tag_name)
-    if (len(tags) == 0 and len(tag)) > 0:
+    if not tags and tag:
         # fall back to explicit marc tag
         tags = [tag]
-    if len(tags) == 0:
+    if not tags:
         return ''
     out = []
     values = [bfo.fields(marctag,escape=escape) for marctag in tags]
@@ -60,6 +60,10 @@ def format(bfo, name, tag_name='', tag = '', escape=4):
             out += value.values()
         else:
             out.append(value)
+
+    for value in out:
+        if name == 'citation_date':
+            value = value.replace('-', '/')
 
     return '\n'.join([create_html_tag('meta', name=name, content=value) for value in out])
 
