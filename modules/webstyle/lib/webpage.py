@@ -32,7 +32,6 @@ from invenio.webuser import \
      create_useractivities_menu, \
      create_adminactivities_menu, \
      getUid
-from invenio.errorlib import get_msgs_for_code_list, register_errors
 
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
@@ -65,7 +64,7 @@ def page(title, body, navtrail="", description="", keywords="",
          cdspageboxleftbottomadd="", cdspageboxrighttopadd="",
          cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="",
          language=CFG_SITE_LANG, verbose=1, titleprologue="",
-         titleepilogue="", secure_page_p=0, req=None, errors=[], warnings=[], navmenuid="admin",
+         titleepilogue="", secure_page_p=0, req=None, errors=None, warnings=None, navmenuid="admin",
          navtrail_append_title_p=1, of="", rssurl=CFG_SITE_URL+"/rss", show_title_p=True,
          body_css_classes=None):
 
@@ -87,7 +86,6 @@ def page(title, body, navtrail="", description="", keywords="",
                titleprologue is to be printed right before page title
                titleepilogue is to be printed right after page title
                req is the mod_python request object
-               errors is the list of error codes as defined in the moduleName_config.py file of the calling module
                log is the string of data that should be appended to the log file (errors automatically logged)
                secure_page_p is 0 or 1 and tells whether we are to use HTTPS friendly page elements or not
                navmenuid the section of the website this page belongs (search, submit, baskets, etc.)
@@ -116,43 +114,9 @@ def page(title, body, navtrail="", description="", keywords="",
         body_text = output.createCDATASection(unicode(body, 'utf_8'))
         body_node.appendChild(body_text)
         root.appendChild(body_node)
-        if errors:
-            errors_node = output.createElement('errors')
-            errors = get_msgs_for_code_list(errors, 'error', language)
-            register_errors(errors, 'error', req)
-            for (error_code, error_msg) in errors:
-                error_node = output.createElement('error')
-                error_node.setAttribute('code', error_code)
-                error_text = output.createTextNode(error_msg)
-                error_node.appendChild(error_text)
-                errors_node.appendChild(error_node)
-            root.appendChild(errors_node)
-        if warnings:
-            warnings_node = output.createElement('warnings')
-            warnings = get_msgs_for_code_list(warnings, 'warning', language)
-            register_errors(warnings, 'warning')
-            for (warning_code, warning_msg) in warnings:
-                warning_node = output.createElement('warning')
-                warning_node.setAttribute('code', warning_code)
-                warning_text = output.createTextNode(warning_msg)
-                warning_node.appendChild(warning_text)
-                warnings_node.appendChild(warning_node)
-            root.appendChild(warnings_node)
         return output.toprettyxml(encoding="utf-8" )
 
     else:
-        #usual output
-        # if there are event
-        if warnings:
-            warnings = get_msgs_for_code_list(warnings, 'warning', language)
-            register_errors(warnings, 'warning')
-
-        # if there are errors
-        if errors:
-            errors = get_msgs_for_code_list(errors, 'error', language)
-            register_errors(errors, 'error', req)
-            body = create_error_box(req, errors=errors, ln=language)
-
         return webstyle_templates.tmpl_page(req, ln=language,
                           description = description,
                           keywords = keywords,
@@ -259,4 +223,3 @@ def adderrorbox(header='', datalist=[]):
         output += '</tr>'
     output += '</tbody></table>'
     return output
-
