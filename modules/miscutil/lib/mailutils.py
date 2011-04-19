@@ -52,7 +52,8 @@ from invenio.config import \
 
 from invenio.messages import wash_language, gettext_set_language
 from invenio.textutils import guess_minimum_encoding
-from invenio.errorlib import get_msgs_for_code_list, register_errors, register_exception
+from invenio.errorlib import register_exception
+from invenio.miscutil_config import InvenioMiscUtilError
 
 def scheduled_send_email(fromaddr,
                toaddr,
@@ -171,8 +172,15 @@ This message would have been sent to the following recipients:
     body = forge_email(fromaddr, toaddr, subject, content, html_content,
                        html_images, usebcc, header, footer, html_header,
                        html_footer, ln, charset)
+
+    _ = gettext_set_language(CFG_SITE_LANG)
+
     if attempt_times < 1 or not toaddr:
-        log('ERR_MISCUTIL_NOT_ATTEMPTING_SEND_EMAIL', fromaddr, toaddr, body)
+        try:
+            raise InvenioMiscUtilError(_('The system is not attempting to send an email from %s, to %s, with body %s.') % (fromaddr, toaddr, body))
+        except InvenioMiscUtilError, exc:
+            register_exception()
+#        log('ERR_MISCUTIL_NOT_ATTEMPTING_SEND_EMAIL', fromaddr, toaddr, body)
         return False
     sent = False
     while not sent and attempt_times > 0:
@@ -188,14 +196,22 @@ This message would have been sent to the following recipients:
         except (smtplib.SMTPException, socket.error):
             register_exception()
             if debug_level > 1:
-                log('ERR_MISCUTIL_CONNECTION_SMTP', attempt_sleeptime,
-                    sys.exc_info()[0], fromaddr, toaddr, body)
+                try:
+                    raise InvenioMiscUtilError(_('Error in connecting to the SMPT server waiting %s seconds. Exception is %s, while sending email from %s to %s with body %s.') % (attempt_sleeptime, sys.exc_info()[0], fromaddr, toaddr, body))
+                except InvenioMiscUtilError, exc:
+                    register_exception()
+#                log('ERR_MISCUTIL_CONNECTION_SMTP', attempt_sleeptime,
+#                    sys.exc_info()[0], fromaddr, toaddr, body)
         if not sent:
             attempt_times -= 1
             if attempt_times > 0: # sleep only if we shall retry again
                 sleep(attempt_sleeptime)
     if not sent:
-        log('ERR_MISCUTIL_SENDING_EMAIL', fromaddr, toaddr, body)
+        try:
+            raise InvenioMiscUtilError(_('Error in sending email from %s to %s with body %s.') % (fromaddr, toaddr, body))
+        except InvenioMiscUtilError, exc:
+            register_exception()
+#        log('ERR_MISCUTIL_SENDING_EMAIL', fromaddr, toaddr, body)
     return sent
 
 def email_header(ln=CFG_SITE_LANG):
@@ -391,12 +407,3 @@ def email_strip_html(html_content):
         out_format.add_flowing_data(row)
         out_format.end_paragraph(1)
     return out.getvalue()
-
-
-def log(*error):
-    """Register error
-    @param error: tuple of the form(ERR_, arg1, arg2...)
-    """
-    _ = gettext_set_language(CFG_SITE_LANG)
-    errors = get_msgs_for_code_list([error], 'error', CFG_SITE_LANG)
-    register_errors(errors, 'error')
