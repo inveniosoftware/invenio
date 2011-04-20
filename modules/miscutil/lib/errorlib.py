@@ -208,6 +208,9 @@ def get_pretty_traceback(req=None, exc_info=None):
 
         ## Let's extract the traceback:
         tracestack_data_stream = StringIO()
+        print >> tracestack_data_stream, \
+                "\n** Traceback details \n"
+        traceback.print_exc(file=tracestack_data_stream)
         tb = sys.exc_info()[2]
         while 1:
             if not tb.tb_next:
@@ -221,7 +224,7 @@ def get_pretty_traceback(req=None, exc_info=None):
         stack.reverse()
         stack = stack[-10:] ## Let's just take the last few frames
         print >> tracestack_data_stream, \
-                "\n** Traceback details"
+                "\n** Stack frame details"
         values_to_hide = set()
         for frame in stack:
             print >> tracestack_data_stream
