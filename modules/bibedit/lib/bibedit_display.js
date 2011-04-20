@@ -1035,7 +1035,7 @@ function input(type, id, _class, attrs, defvalue){
 
   myval = '';
 
-  if ((defvalue !== null) && (defvalue !== "")) {
+  if ((defvalue !== undefined) && (defvalue !== "")) {
     myval = ' value="' + defvalue + '" ';
   }
 
