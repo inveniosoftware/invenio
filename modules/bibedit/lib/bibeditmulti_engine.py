@@ -355,7 +355,7 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
     @param compute_modifications: if equals 0 do not compute else compute modifications
     @type compute_modifications: int
     """
-    RECORDS_PER_PAGE = 10
+    RECORDS_PER_PAGE = 100
     response = {}
 
     if collection == "Any collection":
