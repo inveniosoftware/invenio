@@ -90,6 +90,7 @@ var gFieldActionTypes = {
 
 function updateView() {
 	$("#displayTemplates").hide();
+        $('#buttonSubmitChanges').attr('disabled', 'true').addClass('buttonDisabled');
 }
 
 function createCommandsList(){
@@ -159,6 +160,7 @@ function onButtonTestSearchClick() {
 	gOutputFormat = gOutputFormatPreview;
 	gPageToDiplay = 1;
 	performAJAXRequest();
+        $('#buttonSubmitChanges').attr('disabled', 'true').addClass('buttonDisabled');
 }
 
 function onButtonPreviewResultsClick() {
@@ -171,6 +173,7 @@ function onButtonPreviewResultsClick() {
 	gPageToDiplay = 1;
         gComputeModifications = 1;
 	performAJAXRequest();
+        $('#buttonSubmitChanges').removeAttr('disabled').removeClass('buttonDisabled');
 }
 
 function onButtonBackToResultsClick() {
