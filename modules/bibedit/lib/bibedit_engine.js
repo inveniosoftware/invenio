@@ -2937,6 +2937,7 @@ function onRevertClick(revisionId){
       updateStatus('report', gRESULT_CODES[resCode]);
       displayMessage(resCode);
       // clear the list of record revisions
+      updateToolbar(false);
       resetBibeditState();
     });
     onSubmitClick.force = false;
