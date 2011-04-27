@@ -62,7 +62,7 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, order="", doctype="", deletedI
         doctype = row[0]
         docname = row[1]
         reftext = ""
-        if isRefereed(doctype) and isReferee(req, doctype):
+        if isRefereed(doctype) and __isReferee(req, doctype):
             referees.append ({'doctype': doctype,
                               'docname': docname,
                               'categories': None})
@@ -72,7 +72,7 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, order="", doctype="", deletedI
             for row2 in res2:
                 category = row2[0]
                 categname = row2[1]
-                if isRefereed(doctype, category) and isReferee(req, doctype, category):
+                if isRefereed(doctype, category) and __isReferee(req, doctype, category):
                     categories.append({
                                         'id' : category,
                                         'name' : categname,
@@ -98,7 +98,7 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, order="", doctype="", deletedI
                 req=req,
                 navmenuid='yourapprovals')
 
-def isReferee(req, doctype="", categ="*"):
+def __isReferee(req, doctype="", categ="*"):
     (auth_code, auth_message) = acc_authorize_action(req, "referee", doctype=doctype, categ=categ)
     if auth_code == 0:
         return 1
