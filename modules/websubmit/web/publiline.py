@@ -45,12 +45,12 @@ from invenio.config import \
      CFG_SITE_SECURE_URL
 from invenio.dbquery import run_sql, Error, OperationalError
 from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import *
+from invenio.access_control_admin import acc_get_role_users, acc_get_role_id
 from invenio.webpage import page, create_error_box
-from invenio.webuser import getUid, get_email, page_not_authorized
+from invenio.webuser import getUid, get_email, page_not_authorized, collect_user_info
 from invenio.messages import gettext_set_language, wash_language
-from invenio.websubmit_config import *
-from invenio.search_engine import search_pattern, get_fieldvalues
+#from invenio.websubmit_config import *
+from invenio.search_engine import search_pattern, get_fieldvalues,check_user_can_view_record
 from invenio.websubmit_functions.Retrieve_Data import Get_Field
 from invenio.mailutils import send_email
 from invenio.urlutils import wash_url_argument
@@ -84,7 +84,6 @@ def perform_request_save_comment(*args, **kwargs):
     return
 
 def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send="",flow="",apptype="", action="", email_user_pattern="", id_user="", id_user_remove="", validate="", id_user_val="", msg_subject="", msg_body="", reply="", commentId=""):
-    global uid
 
     ln = wash_language(ln)
     categ = wash_url_argument(categ, 'str')
@@ -126,9 +125,9 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send=""
         elif RN == "":
             t = selectCplxDocument(doctype, categ, apptype, ln)
         elif action == "":
-            t = displayCplxDocument(req, doctype, categ, RN, apptype, reply, commentId, ln)
+            t = __displayCplxDocument(req, doctype, categ, RN, apptype, reply, commentId, ln)
         else:
-            t = doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, id_user, id_user_remove, validate, id_user_val, msg_subject, msg_body, reply, commentId, ln)
+            t = __doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, id_user, id_user_remove, validate, id_user_val, msg_subject, msg_body, reply, commentId, ln)
         return page(title=_("Document Approval Workflow"),
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display">%(account)s</a>""" % {
                                  'sitesecureurl' : CFG_SITE_SECURE_URL,
@@ -149,7 +148,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send=""
         elif RN == "":
             t = selectDocument(doctype, categ, ln)
         else:
-            t = displayDocument(req, doctype, categ, RN, send, ln)
+            t = __displayDocument(req, doctype, categ, RN, send, ln)
         return page(title=_("Approval and Refereeing Workflow"),
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display">%(account)s</a>""" % {
                                  'sitesecureurl' : CFG_SITE_SECURE_URL,
@@ -308,7 +307,7 @@ def selectCplxDocument(doctype,categ,apptype, ln = CFG_SITE_LANG):
         )
     return t
 
-def displayDocument(req, doctype,categ,RN,send, ln = CFG_SITE_LANG):
+def __displayDocument(req, doctype,categ,RN,send, ln = CFG_SITE_LANG):
 
     # load the right message language
     _ = gettext_set_language(ln)
@@ -340,21 +339,27 @@ def displayDocument(req, doctype,categ,RN,send, ln = CFG_SITE_LANG):
     ##     'report-number'    : '',  ## String - the item's report number
     ##     'authors'          : [],  ## List   - the item's authors
     ##   }
+
     if item_details is not None:
         authors = ", ".join(item_details['authors'])
         newrn = item_details['report-number']
         title = item_details['title']
         sysno = item_details['recid']
     else:
-        ## FIXME!
-        ## For backward compatibility reasons, it we failed to find the item's
-        ## details, we will try the old way, which includes searching for files
-        ## like TI, TIF in the submission's working directory.
-        ## This is not nice and should be removed.
-        try:
-            (authors,title,sysno,newrn) = getInfo(doctype,categ,RN)
-        except TypeError:
-            return _("Unable to display document.")
+        ## ## FIXME!
+        ## ## For backward compatibility reasons, it we failed to find the item's
+        ## ## details, we will try the old way, which includes searching for files
+        ## ## like TI, TIF in the submission's working directory.
+        ## ## This is not nice and should be removed.
+        ## try:
+        ##     (authors,title,sysno,newrn) = getInfo(doctype,categ,RN)
+        ## except TypeError:
+        return _("Unable to display document.")
+
+    user_info = collect_user_info(req)
+    can_view_record_p, msg = check_user_can_view_record(user_info, sysno)
+    if can_view_record_p != 0:
+        return msg
 
     confirm_send = 0
     if send == _("Send Again"):
@@ -398,7 +403,7 @@ def displayDocument(req, doctype,categ,RN,send, ln = CFG_SITE_LANG):
         )
     return t
 
-def displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln = CFG_SITE_LANG):
+def __displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln = CFG_SITE_LANG):
     # load the right message language
     _ = gettext_set_language(ln)
 
@@ -465,6 +470,11 @@ def displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln = CF
         isReferee = None
         isProjectLeader = None
         isAuthor = None
+
+    user_info = collect_user_info(req)
+    can_view_record_p, msg = check_user_can_view_record(user_info, sysno)
+    if can_view_record_p != 0:
+        return msg
 
     t += websubmit_templates.tmpl_publiline_displaycplxdoc(
           ln = ln,
@@ -602,7 +612,7 @@ def __db_set_PubComRecom_time (key):
 def __db_set_status ((RN,apptype), status):
     run_sql("UPDATE sbmCPLXAPPROVAL SET status=%s, dProjectLeaderAction=NOW() WHERE  rn=%s and type=%s", (status,RN,apptype,))
 
-def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, id_user, id_user_remove, validate, id_user_val, msg_subject, msg_body, reply, commentId, ln=CFG_SITE_LANG):
+def __doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, id_user, id_user_remove, validate, id_user_val, msg_subject, msg_body, reply, commentId, ln=CFG_SITE_LANG):
     """
     Perform complex action. Note: all argume,ts are supposed to be washed already.
     Return HTML body for the paget.
@@ -684,7 +694,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
             if dEdBoardSel == None:
                 __db_set_EdBoardSel_time (key)
                 perform_request_send (uid, "", RN, TEXT_RPB_EdBoardSel_MSG_EDBOARD_SUBJECT, TEXT_RPB_EdBoardSel_MSG_EDBOARD_BODY)
-            return displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
+            return __displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
 
         id_EdBoardGroup = __db_check_EdBoardGroup (key, id_EdBoardGroup, uid, TEXT_RPB_EdBoardSel_EDBOARD_GROUP_DESCR)
 
@@ -819,7 +829,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
                 group_name = run_sql("""SELECT name FROM usergroup WHERE id = %s""", (id_group, ))[0][0]
                 perform_request_send (int(id_user_val), "", group_name, TEXT_RefereeSel_MSG_GROUP_SUBJECT, TEXT_RefereeSel_MSG_GROUP_BODY)
                 sendMailToGroup(doctype,categ,RN,id_group,authors)
-            return displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
+            return __displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
 
         subtitle1 = _('Referee selection')
 
@@ -956,7 +966,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
 #                sendMailToProjectLeader(doctype, categ, RN, email, authors, "referee", msg_body)
                 sendMailtoCommitteeChair(doctype, categ, RN, user_addr, authors)
                 __db_set_RefereeRecom_time (key)
-            return displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
+            return __displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
 
         t = websubmit_templates.tmpl_publiline_displaycplxrecom (
               ln = ln,
@@ -997,7 +1007,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
             if dEdBoardRecom == None:
                 perform_request_send (uid, user_addr, "", msg_subject, msg_body)
                 __db_set_EdBoardRecom_time (key)
-            return displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
+            return __displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
 
         t = websubmit_templates.tmpl_publiline_displaycplxrecom (
               ln = ln,
@@ -1053,7 +1063,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
                 perform_request_send (uid, user_addr, "", msg_subject, msg_body, 0, 0, 0, ln, 1)
                 sendMailToProjectLeader(doctype, categ, RN, user_addr, authors, "publication committee chair", msg_body)
                 __db_set_PubComRecom_time (key)
-            return displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
+            return __displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
 
         t = websubmit_templates.tmpl_publiline_displaycplxrecom (
               ln = ln,
@@ -1146,12 +1156,12 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
         if validate == "approve":
             if dProjectLeaderAction == None:
                 __db_set_status (key, 'approved')
-            return displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
+            return __displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
 
         elif validate == "reject":
             if dProjectLeaderAction == None:
                 __db_set_status (key, 'rejected')
-            return displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
+            return __displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
 
         t = """<p>
                  <form action="publiline.py">
@@ -1195,7 +1205,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
 
         if validate == "go":
             __db_set_status (key, 'cancelled')
-            return displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
+            return __displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
 
         t = """<p>
                  <form action="publiline.py">
