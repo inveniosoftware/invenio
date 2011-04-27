@@ -228,7 +228,10 @@ def ziplist(*lists):
        [[f1, p1, op1], [f2, p2, op2], [f3, p3, '']]
 
     FIXME: This is handy to have, and should live somewhere else, like
-    miscutil.really_useful_functions or something.
+           miscutil.really_useful_functions or something.
+    XXX: Starting in python 2.6, the same can be achieved (faster) by
+         using itertools.izip_longest(); when the minimum recommended Python
+         is bumped, we should use that instead.
     """
     def l(*items):
         return list(items)
@@ -2412,6 +2415,12 @@ def search_unit_in_bibrec(datetext1, datetext2, type='c'):
         type = "modification_date"
     else:
         type = "creation_date" # by default we are searching for creation dates
+
+    parts = datetext1.split('->')
+    if len(parts) > 1 and datetext1 == datetext2:
+        datetext1 = parts[0]
+        datetext2 = parts[1]
+
     if datetext1 == datetext2:
         res = run_sql("SELECT id FROM bibrec WHERE %s LIKE %%s" % (type,),
                       (datetext1 + '%',))

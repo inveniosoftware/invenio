@@ -45,7 +45,7 @@ from invenio.urlutils import same_urls_p
 from invenio.search_engine import perform_request_search, \
     guess_primary_collection_of_a_record, guess_collection_of_a_record, \
     collection_restricted_p, get_permitted_restricted_collections, \
-    get_fieldvalues, search_pattern
+    get_fieldvalues, search_pattern, search_unit, search_unit_in_bibrec
 
 def parse_url(url):
     parts = urlparse.urlparse(url)
@@ -1754,6 +1754,39 @@ class WebSearchSPIRESSyntaxTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL +'/search?p=find+a+ellis%2C+j+and+not+a+enqvist&of=id&ap=0',
                                                expected_text='[9, 12, 14, 47]'))
 
+    def test_dadd_search(self):
+        'websearch - find da > today - 3650'
+        # XXX: assumes we've reinstalled our site in the last 10 years
+        # should return every document in the system
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL +'/search?ln=en&p=find+da+%3E+today+-+3650&f=&of=id',
+                                               expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104]'))
+
+
+class WebSearchDateQueryTest(unittest.TestCase):
+    """Test various date queries."""
+
+    def setUp(self):
+        """Establish variables we plan to re-use"""
+        from invenio.intbitset import intbitset as HitSet
+        self.empty = HitSet()
+
+    def test_search_unit_hits_for_datecreated_previous_millenia(self):
+        """websearch - search_unit with datecreated returns >0 hits for docs in the last 1000 years"""
+        self.assertNotEqual(self.empty, search_unit('1000-01-01->9999', 'datecreated'))
+
+    def test_search_unit_hits_for_datemodified_previous_millenia(self):
+        """websearch - search_unit with datemodified returns >0 hits for docs in the last 1000 years"""
+        self.assertNotEqual(self.empty, search_unit('1000-01-01->9999', 'datemodified'))
+
+    def test_search_unit_in_bibrec_for_datecreated_previous_millenia(self):
+        """websearch - search_unit_in_bibrec with creationdate gets >0 hits for past 1000 years"""
+        self.assertNotEqual(self.empty, search_unit_in_bibrec("1000-01-01", "9999-12-31", 'creationdate'))
+
+    def test_search_unit_in_bibrec_for_datecreated_next_millenia(self):
+        """websearch - search_unit_in_bibrec with creationdate gets 0 hits for after year 3000"""
+        self.assertEqual(self.empty, search_unit_in_bibrec("3000-01-01", "9999-12-31", 'creationdate'))
+
 
 class WebSearchSynonymQueryTest(unittest.TestCase):
     """Test of queries using synonyms."""
@@ -1841,6 +1874,7 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchSpanQueryTest,
                              WebSearchReferstoCitedbyTest,
                              WebSearchSPIRESSyntaxTest,
+                             WebSearchDateQueryTest,
                              WebSearchTestWildcardLimit,
                              WebSearchSynonymQueryTest)
 
