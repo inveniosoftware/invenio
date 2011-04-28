@@ -406,9 +406,8 @@ def rotate_image(filename, line, sdir, image_list):
         return False
 
     degrees = str(0 - int(degrees))
-
-    dummy, dummy, cmd_err = run_process_with_timeout('mogrify -rotate %s %s' % \
-                                                     (degrees, file_loc), shell=True)
+    cmd_list = ['mogrify', '-rotate', degrees, file_loc]
+    dummy, dummy, cmd_err = run_process_with_timeout(cmd_list)
     if cmd_err != '':
         return True
     else:
