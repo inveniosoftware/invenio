@@ -499,6 +499,8 @@ def calculate_desired_collection_list(c, cc, sc):
     washed_c = filter(is_not_hosted_collection, c)
 
     # try to simulate the wash_colls function behavior when calculating the collections to return
+    if not washed_c and not washed_cc_sons: #no collections found: cc has no sons, c not defined
+        return cc
     if washed_cc_sons == washed_c:
         if sc == 0:
             return cc

@@ -505,7 +505,8 @@ class Template:
         recids_by_collection = {}
         for recid in records[0]:
             primary_collection = guess_primary_collection_of_a_record(recid)
-            if primary_collection in collection_list:
+            if primary_collection in collection_list or \
+                primary_collection == CFG_SITE_NAME: # common case, when the primary coll can not be guessed
                 if not recids_by_collection.has_key(primary_collection):
                     recids_by_collection[primary_collection] = []
                 recids_by_collection[primary_collection].append(recid)
