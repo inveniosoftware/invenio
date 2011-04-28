@@ -25,12 +25,26 @@ from invenio import bibknowledge_dblayer
 from invenio.bibformat_config  import CFG_BIBFORMAT_ELEMENTS_PATH
 from invenio.config import CFG_WEBDIR
 import os
+import sys
 import re
 
+if sys.hexversion < 0x2060000:
+    try:
+        import simplejson as json
+    except ImportError:
+        # Okay, no Ajax app will be possible, but continue anyway,
+        # since this package is only recommended, not mandatory.
+        pass
+else:
+    import json
+
+
 def get_kb_mappings(kb_name="", key="", value="", match_type="s"):
-    """Get mappings from kb kb_name. If key given, give only those with
-       left side (mapFrom) = key. If value given, give only those with
-       right side (mapTo) = value.
+    """Get leftside/rightside mappings from kb kb_name.
+
+       If key given, give only those with left side (mapFrom) = key.
+       If value given, give only those with right side (mapTo) = value.
+
        @param kb_name: the name of the kb
        @param key: include only lines matching this on left side in the results
        @param value: include only lines matching this on right side in the results
@@ -95,6 +109,26 @@ def update_kb_mapping(kb_name, old_key, key, value):
             pass #no, don't change
         else:
             bibknowledge_dblayer.update_kb_mapping(kb_name, old_key, key, value)
+
+def get_kb_mappings_json(kb_name="", key="", value="", match_type="s"):
+    """Get leftside/rightside mappings from kb kb_name formatted as json dict.
+
+       If key given, give only those with left side (mapFrom) = key.
+       If value given, give only those with right side (mapTo) = value.
+
+       @param kb_name: the name of the kb
+       @param key: include only lines matching this on left side in the results
+       @param value: include only lines matching this on right side in the results
+       @param match_type: s = substring match, e = exact match
+       @return a list of mappings
+    """
+    mappings = get_kb_mappings(kb_name, key, value, match_type)
+    ret = []
+    for m in mappings:
+        label = m['value'] or m['key']
+        value = m['key'] or m['value']
+        ret.append({'label': label, 'value': value})
+    return json.dumps(ret)
 
 def kb_exists(kb_name):
     """Returns True if a kb with the given name exists
@@ -323,6 +357,18 @@ def get_kbd_values(kbname, searchwith=""):
             val_list.append(val)
         return val_list
     return [] #in case nothing worked
+
+
+def get_kbd_values_json(kbname, searchwith=""):
+    """Return values from searching a dynamic kb as a json-formatted string.
+
+    This IS probably the method you want.
+
+    @param kbname:     name of the knowledge base
+    @param searchwith: a term to search with
+    """
+    res = get_kbd_values(kbname, searchwith)
+    return json.dumps(res)
 
 
 def get_kbd_values_for_bibedit(tag, collection="", searchwith="", expression=""):

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
 ## Copyright (C) 2009, 2010, 2011 CERN.
 ##
@@ -15,17 +17,30 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/invenio
+"""Unit tests for BibKnowledge."""
 
-pylib_DATA = bibknowledge_webinterface.py \
-             bibknowledge.py \
-             bibknowledgeadmin.py \
-             bibknowledgeadminlib.py \
-             bibknowledge_templates.py \
-             bibknowledge_dblayer.py \
-			 bibknowledge_unit_tests.py \
-             bibknowledge_regression_tests.py
+import unittest
 
-EXTRA_DIST = $(pylib_DATA)
+from invenio.testutils import make_test_suite, run_test_suite, test_web_page_content
 
-CLEANFILES = *~ *.tmp *.pyc
+
+class BibknowledgeTests(unittest.TestCase):
+    """Unit test functions for bibknowledge."""
+    pass
+
+    def setUp(self):
+        """bibknowledge unit test setup"""
+        pass
+
+    def tearDown(self):
+        """bbibknowledge unit test cleanup"""
+        pass
+
+
+TEST_SUITE = make_test_suite(BibknowledgeTests)
+
+
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE)
+
+
