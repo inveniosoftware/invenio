@@ -526,7 +526,7 @@ class Manager:
         if status in ('RUNNING', 'CONTINUING', 'ABOUT TO SLEEP', 'SLEEPING'):
             if status == 'SLEEPING':
                 bibsched_send_signal(process, task_id, signal.SIGCONT)
-                count = 5
+                count = 10
                 while bibsched_get_status(task_id) == 'SLEEPING':
                     if count <= 0:
                         bibsched_set_status(task_id, 'ERROR', 'SLEEPING')
@@ -917,7 +917,7 @@ class BibSched:
                     bibsched_set_status(task_id, "SCHEDULED")
                     Log("Task #%d (%s) started" % (task_id, proc))
                     os.system(COMMAND)
-                    count = 5
+                    count = 10
                     while run_sql("SELECT status FROM schTASK WHERE id=%s AND status='SCHEDULED'", (task_id, )):
                         ## Polling to wait for the task to really start,
                         ## in order to avoid race conditions.
