@@ -1576,6 +1576,15 @@ def get_colID(c):
         colID = res[0][0]
     return colID
 
+def get_coll_normalised_name(c):
+    """Returns normalised collection name (case sensitive) for collection name
+       C (case insensitive).
+       Returns None if no match found."""
+    try:
+        return run_sql("SELECT name FROM collection WHERE name=%s", (c,))[0][0]
+    except:
+        return None
+
 def get_coll_ancestors(coll):
     "Returns a list of ancestors for collection 'coll'."
     coll_ancestors = []
@@ -2798,10 +2807,15 @@ def guess_collection_of_a_record(recID, referer=None):
        primary collection."""
     if referer:
         dummy, hostname, path, dummy, query, dummy = urlparse.urlparse(referer)
+        #requests can come from different invenio installations, with different collections
+        if CFG_SITE_URL.find(hostname) < 0:
+            return guess_primary_collection_of_a_record(recID)
         g = _re_collection_url.match(path)
         if g:
             name = urllib.unquote_plus(g.group(1))
-            if recID in get_collection_reclist(name):
+            #check if this collection actually exist (also normalize the name if case-insensitive)
+            name = get_coll_normalised_name(name)
+            if name and recID in get_collection_reclist(name):
                 return name
         elif path.startswith('/search'):
             query = cgi.parse_qs(query)
