@@ -3008,10 +3008,15 @@ def guess_collection_of_a_record(recID, referer=None, recreate_cache_if_needed=T
        primary collection."""
     if referer:
         dummy, hostname, path, dummy, query, dummy = urlparse.urlparse(referer)
+        #requests can come from different invenio installations, with different collections
+        if CFG_SITE_URL.find(hostname) < 0:
+            return guess_primary_collection_of_a_record(recID)
         g = _re_collection_url.match(path)
         if g:
             name = urllib.unquote_plus(g.group(1))
-            if recID in get_collection_reclist(name):
+            #check if this collection actually exist (also normalize the name if case-insensitive)
+            name = get_coll_normalised_name(name)
+            if name and recID in get_collection_reclist(name):
                 return name
         elif path.startswith('/search'):
             if recreate_cache_if_needed:
