@@ -63,6 +63,7 @@ class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
         ln = argd['ln']
         kb = argd['kb']
         search = argd['search']
+        term = argd['term']
         descriptiontoo = argd['descriptiontoo']
         action = argd['action']
         chosen_option = argd['chosen_option']
@@ -90,7 +91,7 @@ class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
             return bibknowledgeadmin.kb_upload(req, kb=kb, ln=ln)
         #check if this is "export"
         if self.extrapath == "export":
-            return bibknowledgeadmin.kb_export(req, kbname=kbname, format=format, searchvalue=search, ln=ln)
+            return bibknowledgeadmin.kb_export(req, kbname=kbname, format=format, searchvalue=term, ln=ln)
 
         #first check if this is a specific action
         if action == "new":
