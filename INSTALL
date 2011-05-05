@@ -123,6 +123,9 @@ Contents
              <http://rdflib.net/>
           - (optional) mechanize, to run regression web test suite:
              <http://wwwsearch.sourceforge.net/mechanize/>
+          - (optional) hashlib, needed only for Python-2.4 and only
+             if you would like to use AWS connectivity:
+             <http://pypi.python.org/pypi/hashlib>
 
         Note: MySQLdb version 1.2.1_p2 or higher is recommended.  If
               you are using an older version of MySQLdb, you may get
