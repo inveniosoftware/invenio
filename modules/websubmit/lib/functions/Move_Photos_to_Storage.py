@@ -408,7 +408,7 @@ def create_photos_manager_interface(sysno, session_id, uid,
                     'scriptData' : {'type': 'File', 'uid': %(uid)s, 'session_id': '%(session_id)s', 'indir': '%(indir)s', 'doctype': '%(doctype)s', 'access': '%(access)s'},
                     'displayDate': 'percentage',
                     'buttonText': 'Browse',
-                    'fileDataName': 'NewFile' /* be compatible with FCKeditor */,
+                    'fileDataName': 'NewFile' /* be compatible with CKEditor */,
                     'onSelectOnce': function(event, data) {
 
                      },

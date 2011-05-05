@@ -81,7 +81,7 @@ pylib_DATA = __init__.py \
              User_is_Record_Owner_or_Curator.py \
              Shared_Functions.py \
              Move_Files_to_Storage.py \
-             Move_FCKeditor_Files_to_Storage.py \
+             Move_CKEditor_Files_to_Storage.py \
              Create_Upload_Files_Interface.py \
              Move_Uploaded_Files_to_Storage.py \
              Move_Revised_Files_to_Storage.py \

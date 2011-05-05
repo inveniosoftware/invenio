@@ -72,17 +72,14 @@ from invenio.errorlib import register_exception
 from invenio.webuser import collect_user_info
 from invenio.webcomment import check_user_can_attach_file_to_comments
 from invenio.access_control_engine import acc_authorize_action
-try:
-    from invenio.fckeditor_invenio_connector import FCKeditorConnectorInvenio
-    fckeditor_available = True
-except ImportError, e:
-    fckeditor_available = False
+from htmlutils import is_html_text_editor_installed
+from ckeditor_invenio_connector import process_CKEditor_upload, send_response
 from invenio.bibdocfile import stream_file
 
 class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
     """Handle upload and access to files for comments in WebBasket.
 
-       The upload is currently only available through the FCKeditor.
+       The upload is currently only available through the CKEditor.
     """
 
     def _lookup(self, component, path):
@@ -100,7 +97,7 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
             recid = path[1] # Record id
             uid = path[2]   # uid of the submitter
             file_type = path[3]  # file, image, flash or media (as
-                                 # defined by FCKeditor)
+                                 # defined by CKEditor)
 
             if file_type in ['file', 'image', 'flash', 'media']:
                 file_name = '/'.join(path[4:]) # the filename
@@ -191,13 +188,13 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
 
     def _put(self, req, form):
         """
-        Process requests received from FCKeditor to upload files, etc.
+        Process requests received from CKEditor to upload files, etc.
 
         URL eg:
         CFG_SITE_URL/yourbaskets/attachments/put/31/91/
                                              bskid/recid/
         """
-        if not fckeditor_available:
+        if not is_html_text_editor_installed():
             return
 
         argd = wash_urlargd(form, {'bskid': (int, 0),
@@ -217,12 +214,6 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
                                     'recid': argd['recid'],
                                     'bskid': argd['bskid'],
                                     'CFG_PREFIX': CFG_PREFIX}
-        # Create a Connector instance to handle the request
-        conn = FCKeditorConnectorInvenio(form, recid=argd['recid'], uid=uid,
-                                         allowed_commands=['QuickUpload'],
-                                         allowed_types = ['File', 'Image', 'Flash', 'Media'],
-                                         user_files_path = user_files_path,
-                                         user_files_absolute_path = user_files_absolute_path)
 
         # Check that user can
         # 1. is logged in
@@ -234,31 +225,26 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         (auth_code, dummy) = check_user_can_attach_file_to_comments(user_info, argd['recid'])
 
+        fileurl = ''
+        callback_function = ''
         if user_info['email'] == 'guest':
             # 1. User is guest: must login prior to upload
-            data = conn.sendUploadResults(1, '', '', 'Please login before uploading file.')
+            data ='Please login before uploading file.'
         if not user_info['precached_usebaskets']:
-            data = conn.sendUploadResults(1, '', '', 'Sorry, you are not allowed to use WebBasket')
+            msg = 'Sorry, you are not allowed to use WebBasket'
         elif not check_user_can_comment(uid, argd['bskid']):
             # 2. User cannot edit comment of this basket
-            data = conn.sendUploadResults(1, '', '', 'Sorry, you are not allowed to submit files')
+            msg = 'Sorry, you are not allowed to submit files'
         elif auth_code:
             # 3. User cannot submit
-            data = conn.sendUploadResults(1, '', '', 'Sorry, you are not allowed to submit files.')
+            msg = 'Sorry, you are not allowed to submit files.'
         else:
             # Process the upload and get the response
-            data = conn.doResponse()
+            (msg, uploaded_file_path, filename, fileurl, callback_function) = \
+                      process_CKEditor_upload(form, uid, user_files_path, user_files_absolute_path,
+                                              recid=argd['recid'])
 
-        # Transform the headers into something ok for mod_python
-        for header in conn.headers:
-            if not header is None:
-                if header[0] == 'Content-Type':
-                    req.content_type = header[1]
-                else:
-                    req.headers_out[header[0]] = header[1]
-        # Send our response
-        req.send_http_header()
-        req.write(data)
+        send_response(req, msg, fileurl, callback_function)
 
 
 class WebInterfaceYourBasketsPages(WebInterfaceDirectory):

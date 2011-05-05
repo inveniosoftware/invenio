@@ -1052,7 +1052,7 @@ class Template:
 
     def tmpl_quote_comment_html(self, title, uid, nickname, date, body, ln=CFG_SITE_LANG):
         """Return a comment in a quoted form (i.e. indented using HTML
-        table) for HTML output (i.e. in FCKeditor).
+        table) for HTML output (i.e. in CKEditor).
 
         @param title: title of comment to quote
         @param uid: user id of user who posted comment to quote

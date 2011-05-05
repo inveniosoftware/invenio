@@ -15,10 +15,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-fckeditorwebdir=$(localstatedir)/www/fckeditor
-fckeditorweb_DATA=invenio-fckeditor-config.js journal-editor-config.js \
-                  journal-editor-styles.xml journal-editor-templates.xml
+ckeditorwebdir=$(localstatedir)/www/ckeditor
+ckeditorweb_DATA=invenio-ckeditor-config.js journal-editor-config.js \
+                  journal-editor-styles.js journal-editor-templates.js \
+                  invenio-ckeditor-content.css
 
-EXTRA_DIST = $(fckeditorweb_DATA)
+EXTRA_DIST = $(ckeditorweb_DATA)
 
 CLEANFILES = *~ *.tmp

@@ -851,7 +851,7 @@ WSGIRestrictStdout Off
         Alias /export/ %(webdir)s/export/
         Alias /MathJax/ %(webdir)s/MathJax/
         Alias /jsCalendar/ %(webdir)s/jsCalendar/
-        Alias /fckeditor/ %(webdir)s/fckeditor/
+        Alias /ckeditor/ %(webdir)s/ckeditor/
         AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1
         Alias /robots.txt %(webdir)s/robots.txt
         Alias /favicon.ico %(webdir)s/favicon.ico
@@ -920,7 +920,7 @@ WSGIRestrictStdout Off
         Alias /export/ %(webdir)s/export/
         Alias /MathJax/ %(webdir)s/MathJax/
         Alias /jsCalendar/ %(webdir)s/jsCalendar/
-        Alias /fckeditor/ %(webdir)s/fckeditor/
+        Alias /ckeditor/ %(webdir)s/ckeditor/
         AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1
         Alias /robots.txt %(webdir)s/robots.txt
         Alias /favicon.ico %(webdir)s/favicon.ico

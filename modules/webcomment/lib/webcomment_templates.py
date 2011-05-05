@@ -1095,7 +1095,7 @@ class Template:
         @param msg: comment body contents for when refreshing due to
                     warning, or when replying to a comment
         @param textual_msg: same as 'msg', but contains the textual
-                            version in case user cannot display FCKeditor
+                            version in case user cannot display CKeditor
         @param warnings: list of warning tuples (warning_text, warning_color)
         @param can_attach_files: if user can upload attach file to record or not
         @param user_is_subscribed_to_discussion: True if user already receives new comments by email
@@ -1133,7 +1133,7 @@ class Template:
         warnings = self.tmpl_warnings(warnings, ln)
 
         # Prepare file upload settings. We must enable file upload in
-        # the fckeditor + a simple file upload interface (independant from editor)
+        # the ckeditor + a simple file upload interface (independant from editor)
         file_upload_url = None
         simple_attach_file_interface = ''
         if isGuestUser(uid):
@@ -1165,7 +1165,8 @@ class Template:
                                       height='400px',
                                       enabled=CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR,
                                       file_upload_url=file_upload_url,
-                                      toolbar_set = "WebComment")
+                                      toolbar_set = "WebComment",
+                                      ln=ln)
 
         subscribe_to_discussion = ''
         if not user_is_subscribed_to_discussion:
@@ -1208,7 +1209,7 @@ class Template:
         @param uid: user id
         @param ln: language
         @param msg: comment body contents for when refreshing due to warning
-        @param textual_msg: the textual version of 'msg' when user cannot display FCKeditor
+        @param textual_msg: the textual version of 'msg' when user cannot display Ckeditor
         @param score: review score
         @param note: review title
         @param warnings: list of warning tuples (warning_text, warning_color)
@@ -1272,7 +1273,8 @@ class Template:
                                       height='400px',
                                       enabled=CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR,
 #                                      file_upload_url=file_upload_url,
-                                      toolbar_set = "WebComment")
+                                      toolbar_set = "WebComment",
+                                      ln=ln)
         form = """%(add_review)s
                 <table style="width: 100%%">
                     <tr>
@@ -2187,9 +2189,9 @@ class Template:
             window.onbeforeunload = confirmExit;
             function confirmExit() {
                 var editor_type_field = document.getElementById('%(name)seditortype');
-                if (editor_type_field && editor_type_field.value == 'fckeditor') {
-                    var oEditor = FCKeditorAPI.GetInstance('%(name)s');
-                    if (user_must_confirm_before_leaving_page && oEditor.IsDirty()) {
+                if (editor_type_field && editor_type_field.value == 'ckeditor') {
+                    var oEditor = CKEDITOR.instances.%(name)s;
+                    if (user_must_confirm_before_leaving_page && oEditor.checkDirty()) {
                         /* Might give false positives, when editor pre-loaded
                            with content. But is better than the opposite */
                         return "%(message)s";

@@ -60,7 +60,9 @@ from invenio.bibdocfile import BibRecDocs, normalize_format, file_strip_ext, \
     stream_restricted_icon, BibDoc, InvenioWebSubmitFileError, stream_file, \
     decompose_file, propose_next_docname, get_subformat_from_format
 from invenio.errorlib import register_exception
+from invenio.htmlutils import is_html_text_editor_installed
 from invenio.websubmit_icon_creator import create_icon, InvenioWebSubmitIconCreatorError
+from ckeditor_invenio_connector import process_CKEditor_upload, send_response
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 from invenio.websearchadminlib import get_detailed_page_tabs
@@ -68,11 +70,6 @@ from invenio.session import get_session
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
-try:
-    from invenio.fckeditor_invenio_connector import FCKeditorConnectorInvenio
-    fckeditor_available = True
-except ImportError, e:
-    fckeditor_available = False
 
 from invenio.websubmit_managedocfiles import \
      create_file_upload_interface, \
@@ -768,103 +765,93 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
     def attachfile(self, req, form):
         """
-        Process requests received from FCKeditor to upload files.
+        Process requests received from CKEditor to upload files.
         If the uploaded file is an image, create an icon version
         """
-        if not fckeditor_available:
+        if not is_html_text_editor_installed():
             return apache.HTTP_NOT_FOUND
 
         if not form.has_key('type'):
             form['type'] = 'File'
 
-        if not form.has_key('NewFile') or \
+        if not form.has_key('upload') or \
                not form['type'] in \
                ['File', 'Image', 'Flash', 'Media']:
-            return apache.HTTP_NOT_FOUND
+            #return apache.HTTP_NOT_FOUND
+            pass
+        filetype = form['type'].lower()
 
         uid = getUid(req)
+
 
         # URL where the file can be fetched after upload
         user_files_path = '%(CFG_SITE_URL)s/submit/getattachedfile/%(uid)s' % \
                           {'uid': uid,
-                           'CFG_SITE_URL': CFG_SITE_URL}
+                           'CFG_SITE_URL': CFG_SITE_URL,
+                           'filetype': filetype}
 
         # Path to directory where uploaded files are saved
-        user_files_absolute_path = '%(CFG_PREFIX)s/var/tmp/attachfile/%(uid)s' % \
+        user_files_absolute_path = '%(CFG_PREFIX)s/var/tmp/attachfile/%(uid)s/%(filetype)s' % \
                                    {'uid': uid,
-                                    'CFG_PREFIX': CFG_PREFIX}
+                                    'CFG_PREFIX': CFG_PREFIX,
+                                    'filetype': filetype}
         try:
             os.makedirs(user_files_absolute_path)
         except:
             pass
 
-        # Create a Connector instance to handle the request
-        conn = FCKeditorConnectorInvenio(form, recid=-1, uid=uid,
-                                         allowed_commands=['QuickUpload'],
-                                         allowed_types = ['File', 'Image', 'Flash', 'Media'],
-                                         user_files_path = user_files_path,
-                                         user_files_absolute_path = user_files_absolute_path)
-
         user_info = collect_user_info(req)
         (auth_code, auth_message) = acc_authorize_action(user_info, 'attachsubmissionfile')
+        msg = ""
         if user_info['email'] == 'guest':
             # User is guest: must login prior to upload
-            data = conn.sendUploadResults(1, '', '', 'Please login before uploading file.')
+            msg = 'Please login before uploading file.'
         elif auth_code:
             # User cannot submit
-            data = conn.sendUploadResults(1, '', '', 'Sorry, you are not allowed to submit files.')
+            msg = 'Sorry, you are not allowed to submit files.'
+        ## elif len(form['upload']) != 1:
+        ##     msg = 'Sorry, you must upload one single file'
         else:
             # Process the upload and get the response
-            data = conn.doResponse()
+            (msg, uploaded_file_path, uploaded_file_name, uploaded_file_url, callback_function) = \
+                  process_CKEditor_upload(form, uid, user_files_path, user_files_absolute_path)
 
-            # At this point, the file has been uploaded. The FCKeditor
-            # submit the image in form['NewFile']. However, the image
-            # might have been renamed in between by the FCK connector on
-            # the server side, by appending (%04d) at the end of the base
-            # name. Retrieve that file
-            uploaded_file_path = os.path.join(user_files_absolute_path,
-                                              form['type'].lower(),
-                                              form['NewFile'].filename)
-            uploaded_file_path = retrieve_most_recent_attached_file(uploaded_file_path)
-            uploaded_file_name = os.path.basename(uploaded_file_path)
+            if uploaded_file_path:
+                # Create an icon
+                if form.get('type','') == 'Image':
+                    try:
+                        (icon_path, icon_name) = create_icon(
+                            { 'input-file'           : uploaded_file_path,
+                              'icon-name'            : os.path.splitext(uploaded_file_name)[0],
+                              'icon-file-format'     : os.path.splitext(uploaded_file_name)[1][1:] or 'gif',
+                              'multipage-icon'       : False,
+                              'multipage-icon-delay' : 100,
+                              'icon-scale'           : "300>", # Resize only if width > 300
+                              'verbosity'            : 0,
+                              })
 
-            # Create an icon
-            if form.get('type','') == 'Image':
-                try:
-                    (icon_path, icon_name) = create_icon(
-                        { 'input-file'           : uploaded_file_path,
-                          'icon-name'            : os.path.splitext(uploaded_file_name)[0],
-                          'icon-file-format'     : os.path.splitext(uploaded_file_name)[1][1:] or 'gif',
-                          'multipage-icon'       : False,
-                          'multipage-icon-delay' : 100,
-                          'icon-scale'           : "300>", # Resize only if width > 300
-                          'verbosity'            : 0,
-                          })
+                        # Move original file to /original dir, and replace it with icon file
+                        original_user_files_absolute_path = os.path.join(user_files_absolute_path,
+                                                                         'original')
+                        if not os.path.exists(original_user_files_absolute_path):
+                            # Create /original dir if needed
+                            os.mkdir(original_user_files_absolute_path)
+                        os.rename(uploaded_file_path,
+                                  original_user_files_absolute_path + os.sep + uploaded_file_name)
+                        os.rename(icon_path + os.sep + icon_name,
+                                  uploaded_file_path)
+                    except InvenioWebSubmitIconCreatorError, e:
+                        pass
 
-                    # Move original file to /original dir, and replace it with icon file
-                    original_user_files_absolute_path = os.path.join(user_files_absolute_path,
-                                                                     'image', 'original')
-                    if not os.path.exists(original_user_files_absolute_path):
-                        # Create /original dir if needed
-                        os.mkdir(original_user_files_absolute_path)
-                    os.rename(uploaded_file_path,
-                              original_user_files_absolute_path + os.sep + uploaded_file_name)
-                    os.rename(icon_path + os.sep + icon_name,
-                              uploaded_file_path)
-                except InvenioWebSubmitIconCreatorError, e:
-                    pass
+                user_files_path += '/' + filetype + '/' + uploaded_file_name
 
-            # Transform the headers into something ok for mod_python
-            for header in conn.headers:
-                if not header is None:
-                    if header[0] == 'Content-Type':
-                        req.content_type = header[1]
-                    else:
-                        req.headers_out[header[0]] = header[1]
+            else:
+                user_files_path = ''
+                if not msg:
+                    msg = 'No valid file found'
 
         # Send our response
-        req.send_http_header()
-        req.write(data)
+        send_response(req, msg, user_files_path, callback_function)
 
     def _lookup(self, component, path):
         """ This handler is invoked for the dynamic URLs (for getting
@@ -876,7 +863,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
             uid = path[0] # uid of the submitter
             file_type = path[1] # file, image, flash or media (as
-                                # defined by FCKeditor)
+                                # defined by CKEditor)
 
             if file_type in ['file', 'image', 'flash', 'media']:
                 file_name = '/'.join(path[2:]) # the filename
@@ -896,7 +883,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
     def getattachedfile(self, req, form):
         """
         Returns a file uploaded to the submission 'drop box' by the
-        FCKeditor.
+        CKEditor.
         """
         argd = wash_urlargd(form, {'file': (str, None),
                                    'type': (str, None),
@@ -1167,29 +1154,29 @@ def print_warning(msg, type='', prologue='<br />', epilogue='<br />'):
     else:
         return ''
 
-def retrieve_most_recent_attached_file(file_path):
-    """
-    Retrieve the latest file that has been uploaded with the
-    FCKeditor. This is the only way to retrieve files that the
-    FCKeditor has renamed after the upload.
+## def retrieve_most_recent_attached_file(file_path):
+##     """
+##     Retrieve the latest file that has been uploaded with the
+##     CKEditor. This is the only way to retrieve files that the
+##     CKEditor has renamed after the upload.
 
-    Eg: 'prefix/image.jpg' was uploaded but did already
-    exist. FCKeditor silently renamed it to 'prefix/image(1).jpg':
-    >>> retrieve_most_recent_attached_file('prefix/image.jpg')
-    'prefix/image(1).jpg'
-    """
-    (base_path, filename) = os.path.split(file_path)
-    base_name = os.path.splitext(filename)[0]
-    file_ext = os.path.splitext(filename)[1][1:]
-    most_recent_filename = filename
-    i = 0
-    while True:
-        i += 1
-        possible_filename = "%s(%d).%s" % \
-                            (base_name, i, file_ext)
-        if os.path.exists(base_path + os.sep + possible_filename):
-            most_recent_filename = possible_filename
-        else:
-            break
+##     Eg: 'prefix/image.jpg' was uploaded but did already
+##     exist. CKEditor silently renamed it to 'prefix/image(1).jpg':
+##     >>> retrieve_most_recent_attached_file('prefix/image.jpg')
+##     'prefix/image(1).jpg'
+##     """
+##     (base_path, filename) = os.path.split(file_path)
+##     base_name = os.path.splitext(filename)[0]
+##     file_ext = os.path.splitext(filename)[1][1:]
+##     most_recent_filename = filename
+##     i = 0
+##     while True:
+##         i += 1
+##         possible_filename = "%s(%d).%s" % \
+##                             (base_name, i, file_ext)
+##         if os.path.exists(base_path + os.sep + possible_filename):
+##             most_recent_filename = possible_filename
+##         else:
+##             break
 
-    return os.path.join(base_path, most_recent_filename)
+##     return os.path.join(base_path, most_recent_filename)

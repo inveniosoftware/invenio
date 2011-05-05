@@ -459,7 +459,7 @@ def perform_request_save_public_note(uid,
     @param title: title of comment (string)
     @param text: comment's body (string)
     @param ln: language (string)
-    @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'
+    @param editor_type: the kind of editor/input used for the comment: 'textarea', 'ckeditor'
     @param reply_to: the id of the comment we are replying to
     """
     optional_params = {}
@@ -476,7 +476,7 @@ def perform_request_save_public_note(uid,
         #warnings_rights = ['WRN_WEBBASKET_RESTRICTED_WRITE_NOTES']
         warnings_html += webbasket_templates.tmpl_warnings(warnings_rights, ln)
     else:
-        if not note_title or not note_body: # FIXME: improve check when fckeditor
+        if not note_title or not note_body: # FIXME: improve check when ckeditor
             optional_params["Incomplete note"] = (note_title, note_body)
             try:
                 raise InvenioWebBasketWarning(_('You must fill in both the subject and the body of the note.'))
@@ -484,13 +484,13 @@ def perform_request_save_public_note(uid,
                 register_exception(stream='warning')
                 optional_params["Warnings"] = exc.message
         else:
-            if editor_type == 'fckeditor':
-                # Here we remove the line feeds introduced by FCKeditor (they
+            if editor_type == 'ckeditor':
+                # Here we remove the line feeds introduced by CKEditor (they
                 # have no meaning for the user) and replace the HTML line
                 # breaks by linefeeds, so that we are close to an input that
-                # would be done without the FCKeditor. That's much better if a
+                # would be done without the CKEditor. That's much better if a
                 # reply to a comment is made with a browser that does not
-                # support FCKeditor.
+                # support CKEditor.
                 note_body = note_body.replace('\n', '').replace('\r', '').replace('<br />', '\n')
             if not(db.save_note(uid, bskid, recid, note_title, note_body, reply_to)):
                 # TODO: The note could not be saved. DB problem?
@@ -1462,7 +1462,7 @@ def perform_request_save_note(uid,
     @param title: title of comment (string)
     @param text: comment's body (string)
     @param ln: language (string)
-    @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'
+    @param editor_type: the kind of editor/input used for the comment: 'textarea', 'ckeditor'
     @param reply_to: the id of the comment we are replying to
     """
     _ = gettext_set_language(ln)
@@ -1481,8 +1481,8 @@ def perform_request_save_note(uid,
         warnings_html += webbasket_templates.tmpl_warnings(exc.message, ln)
     else:
         if not note_title or \
-           ((not note_body and editor_type != 'fckeditor') or \
-            (not remove_html_markup(note_body, '').replace('\n', '').replace('\r', '').strip() and editor_type == 'fckeditor')):
+           ((not note_body and editor_type != 'ckeditor') or \
+            (not remove_html_markup(note_body, '').replace('\n', '').replace('\r', '').strip() and editor_type == 'ckeditor')):
             optional_params["Incomplete note"] = (note_title, note_body)
             try:
                 raise InvenioWebBasketWarning(_('You must fill in both the subject and the body of the note.'))
@@ -1490,13 +1490,13 @@ def perform_request_save_note(uid,
                 register_exception(stream='warning')
                 optional_params["Warnings"] = exc.message
         else:
-            if editor_type == 'fckeditor':
-                # Here we remove the line feeds introduced by FCKeditor (they
+            if editor_type == 'ckeditor':
+                # Here we remove the line feeds introduced by CKEditor (they
                 # have no meaning for the user) and replace the HTML line
                 # breaks by linefeeds, so that we are close to an input that
-                # would be done without the FCKeditor. That's much better if a
+                # would be done without the CKEditor. That's much better if a
                 # reply to a comment is made with a browser that does not
-                # support FCKeditor.
+                # support CKEditor.
                 note_body = note_body.replace('\n', '').replace('\r', '').replace('<br />', '\n')
             if not(db.save_note(uid, bskid, recid, note_title, note_body, reply_to)):
                 # TODO: The note could not be saved. DB problem?
@@ -1771,16 +1771,16 @@ def perform_request_add(uid,
                     es_desc = nl2br(es_desc)
                 added_items = db.add_to_basket(uid, validated_recids, colid, bskid, es_title, es_desc, es_url)
                 if added_items:
-                    if (note_body and editor_type != 'fckeditor') or \
-                           (editor_type == 'fckeditor' and \
+                    if (note_body and editor_type != 'ckeditor') or \
+                           (editor_type == 'ckeditor' and \
                             remove_html_markup(note_body, '').replace('\n', '').replace('\r', '').strip()):
-                        if editor_type == 'fckeditor':
-                            # Here we remove the line feeds introduced by FCKeditor (they
+                        if editor_type == 'ckeditor':
+                            # Here we remove the line feeds introduced by CKEditor (they
                             # have no meaning for the user) and replace the HTML line
                             # breaks by linefeeds, so that we are close to an input that
-                            # would be done without the FCKeditor. That's much better if a
+                            # would be done without the CKEditor. That's much better if a
                             # reply to a comment is made with a browser that does not
-                            # support FCKeditor.
+                            # support CKEditor.
                             note_title = ''
                             note_body = note_body.replace('\n', '').replace('\r', '').replace('<br />', '\n')
                         else:

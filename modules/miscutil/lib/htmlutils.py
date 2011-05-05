@@ -21,16 +21,15 @@
 __revision__ = "$Id$"
 
 from HTMLParser import HTMLParser
-from invenio.config import CFG_SITE_URL, CFG_MATHJAX_HOSTING
+from invenio.config import CFG_SITE_URL, \
+     CFG_MATHJAX_HOSTING, \
+     CFG_SITE_LANG, \
+     CFG_WEBDIR
 from invenio.textutils import indent_text
 import re
 import cgi
+import os
 
-try:
-    from invenio.fckeditor import fckeditor
-    fckeditor_available = True
-except ImportError, e:
-    fckeditor_available = False
 try:
     from BeautifulSoup import BeautifulSoup
     CFG_BEAUTIFULSOUP_INSTALLED = True
@@ -297,12 +296,20 @@ MathJax.Hub.Config({
     'mathjax_path': mathjax_path
 }
 
+def is_html_text_editor_installed():
+    """
+    Returns True if the wysiwyg editor (CKeditor) is installed
+    """
+    return os.path.exists(os.path.join(CFG_WEBDIR, 'ckeditor', 'ckeditor.js'))
+
+ckeditor_available = is_html_text_editor_installed()
 
 def get_html_text_editor(name, id=None, content='', textual_content=None, width='300px', height='200px',
                          enabled=True, file_upload_url=None, toolbar_set="Basic",
-                         custom_configurations_path='/fckeditor/invenio-fckeditor-config.js'):
+                         custom_configurations_path='/ckeditor/invenio-ckeditor-config.js',
+                         ln=CFG_SITE_LANG):
     """
-    Returns a wysiwyg editor (FCKeditor) to embed in html pages.
+    Returns a wysiwyg editor (CKEditor) to embed in html pages.
 
     Fall back to a simple textarea when the library is not installed,
     or when the user's browser is not compatible with the editor, or
@@ -310,11 +317,11 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
 
     NOTE that the output also contains a hidden field named
     'editor_type' that contains the kind of editor used, 'textarea' or
-    'fckeditor'.
+    'ckeditor'.
 
     Based on 'editor_type' you might want to take different actions,
     like replace CRLF with <br/> when editor_type equals to
-    'textarea', but not when editor_type equals to 'fckeditor'.
+    'textarea', but not when editor_type equals to 'ckeditor'.
 
     @param name: *str* the name attribute of the returned editor
 
@@ -345,12 +352,12 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
         When value is not given, the file upload is disabled.
 
     @param toolbar_set: *str* the name of the toolbar layout to
-        use. FCKeditor comes by default with 'Basic' and
+        use. CKeditor comes by default with 'Basic' and
         'Default'. To define other sets, customize the
         config file in
-        /opt/invenio/var/www/fckeditor/invenio-fckconfig.js
+        /opt/cds-invenio/var/www/ckeditor/invenio-ckconfig.js
 
-    @param custom_configurations_path: *str* value for the FCKeditor config
+    @param custom_configurations_path: *str* value for the CKeditor config
         variable 'CustomConfigurationsPath',
         which allows to specify the path of a
         file that contains a custom configuration
@@ -364,54 +371,63 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
 
     editor = ''
 
-    if enabled and fckeditor_available:
+    if enabled and ckeditor_available:
         # Prepare upload path settings
+        file_upload_script = ''
         if file_upload_url is not None:
-            file_upload_script = '''
-            oFCKeditor.Config["LinkUploadURL"] = '%(file_upload_url)s';
-            oFCKeditor.Config["ImageUploadURL"] = '%(file_upload_url)s?type=Image';
-            oFCKeditor.Config["FlashUploadURL"] = '%(file_upload_url)s?type=Flash';
-            oFCKeditor.Config["MediaUploadURL"] = '%(file_upload_url)s?type=Media';
-            oFCKeditor.Config["LinkUpload"] = true;
-            oFCKeditor.Config["ImageUpload"] = true;
-            oFCKeditor.Config["FlashUpload"] = true;
+            file_upload_script = ''',
+            filebrowserLinkUploadUrl: '%(file_upload_url)s',
+            filebrowserImageUploadUrl: '%(file_upload_url)s?type=Image',
+            filebrowserFlashUploadUrl: '%(file_upload_url)s?type=Flash'
             ''' % {'file_upload_url': file_upload_url}
-        else:
-            file_upload_script = '''
-            oFCKeditor.Config["LinkUpload"] = false;
-            oFCKeditor.Config["ImageUpload"] = false;
-            oFCKeditor.Config["FlashUpload"] = false;
-            '''
 
         # Prepare code to instantiate an editor
         editor += '''
-        <script type="text/javascript" src="%(CFG_SITE_URL)s/fckeditor/fckeditor.js"></script>
-        <input type="hidden" name="editor_type" id="%(name)seditortype" value="textarea" />
+        <script language="javascript">
+        /* Load the script only once, or else multiple instance of the editor on the same page will not work */
+        var INVENIO_CKEDITOR_ALREADY_LOADED
+            if (INVENIO_CKEDITOR_ALREADY_LOADED != 1) {
+	        document.write("<script src='%(CFG_SITE_URL)s/ckeditor/ckeditor.js'><\/script>");
+                INVENIO_CKEDITOR_ALREADY_LOADED = 1;
+            }
+	</script>
+        <input type="hidden" name="editor_type" id="%(id)seditortype" value="textarea" />
         <textarea id="%(id)s" name="%(name)s" style="width:%(width)s;height:%(height)s">%(textual_content)s</textarea>
-        <textarea id="%(id)shtmlvalue" name="%(name)shtmlvalue" style="display:None;width:%(width)s;height:%(height)s">%(html_content)s</textarea>
+        <textarea id="%(id)shtmlvalue" name="%(name)shtmlvalue" style="display:none;width:%(width)s;height:%(height)s">%(html_content)s</textarea>
         <script type="text/javascript">
-          var oFCKeditor = new FCKeditor('%(name)s', '%(width)s', '%(height)s', '%(toolbar)s') ;
-          oFCKeditor.BasePath = "/fckeditor/" ;
-          oFCKeditor.Config["CustomConfigurationsPath"] = '%(custom_configurations_path)s';
-          /* Set paths to upload files */
-          %(file_upload_script)s
-          /* Disable browsing on the server, which would not work anyway */
-          oFCKeditor.Config["LinkBrowser"] = false;
-          oFCKeditor.Config["ImageBrowser"] = false;
-          oFCKeditor.Config["FlashBrowser"] = false;
+          var CKEDITOR_BASEPATH = '/ckeditor/';
 
-          oFCKeditor.ReplaceTextarea() ;
+          CKEDITOR.replace( '%(name)s',
+                            {customConfig: '%(custom_configurations_path)s',
+                            toolbar: '%(toolbar)s',
+                            width: '%(width)s',
+                            height:'%(height)s',
+                            language: '%(ln)s'
+                            %(file_upload_script)s
+                            });
 
-          function FCKeditor_OnComplete( editorInstance )
+        CKEDITOR.on('instanceReady',
+          function( evt )
           {
-            /* If FCKeditor was correctly loaded, display the nice HTML representation */
-            var oEditor = FCKeditorAPI.GetInstance('%(name)s');
-            var html_editor = document.getElementById('%(id)shtmlvalue');
-            oEditor.SetHTML(html_editor.value);
-            var editor_type_field = document.getElementById('%(name)seditortype');
-            editor_type_field.value = 'fckeditor';
-            oEditor.ResetIsDirty();
-          }
+            /* If CKeditor was correctly loaded, display the nice HTML representation */
+            var oEditor = evt.editor;
+            editor_id = oEditor.id
+            editor_name = oEditor.name
+            var html_editor = document.getElementById(editor_name + 'htmlvalue');
+            oEditor.setData(html_editor.value);
+            var editor_type_field = document.getElementById(editor_name + 'editortype');
+            editor_type_field.value = 'ckeditor';
+            var writer = oEditor.dataProcessor.writer;
+            writer.indentationChars = ''; /*Do not indent source code with tabs*/
+            oEditor.resetDirty();
+            /* Workaround: http://dev.ckeditor.com/ticket/3674 */
+             evt.editor.on( 'contentDom', function( ev )
+             {
+             ev.removeListener();
+             evt.editor.resetDirty();
+             } );
+            /* End workaround */
+          })
 
         </script>
         ''' % \
@@ -424,10 +440,11 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
            'custom_configurations_path': custom_configurations_path,
            'toolbar': toolbar_set,
            'file_upload_script': file_upload_script,
-           'CFG_SITE_URL': CFG_SITE_URL}
+           'CFG_SITE_URL': CFG_SITE_URL,
+           'ln': ln}
 
     else:
-        # FCKedior is not installed
+        # CKedior is not installed
         textarea = '<textarea %(id)s name="%(name)s" style="width:%(width)s;height:%(height)s">%(content)s</textarea>' \
                      % {'content': cgi.escape(textual_content),
                         'width': width,

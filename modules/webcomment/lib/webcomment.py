@@ -856,7 +856,7 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
     @param note: comment title
     @param score: review star score
     @param priority: remark priority #!FIXME
-    @param editor_type: the kind of editor used to submit the comment: 'textarea', 'fckeditor'
+    @param editor_type: the kind of editor used to submit the comment: 'textarea', 'ckeditor'
     @param req: request object. If provided, email notification are sent after we reply to user request.
     @param reply_to: the id of the comment we are replying to with this inserted comment.
     @return: integer >0 representing id if successful, integer 0 if not
@@ -868,6 +868,7 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
     #change general unicode back to utf-8
     msg = msg.encode('utf-8')
     note = note.encode('utf-8')
+    msg_original = msg
     (restriction, round_name) = get_record_status(recID)
     if attached_files is None:
         attached_files = {}
@@ -883,30 +884,40 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
         comment = query_get_comment(reply_to)
         if comment:
             (round_name, restriction) = comment[10:12]
-    if editor_type == 'fckeditor':
-        # Here we remove the line feeds introduced by FCKeditor (they
+    if editor_type == 'ckeditor':
+        # Here we remove the line feeds introduced by CKEditor (they
         # have no meaning for the user) and replace the HTML line
         # breaks by linefeeds, so that we are close to an input that
-        # would be done without the FCKeditor. That's much better if a
+        # would be done without the CKEditor. That's much better if a
         # reply to a comment is made with a browser that does not
-        # support FCKeditor.
+        # support CKEditor.
         msg = msg.replace('\n', '').replace('\r', '')
-        msg = re.sub('<br .*?(/>)', '\n', msg)
-        msg = msg.replace('&nbsp;', ' ')
+
         # We clean the quotes that could have been introduced by
-        # FCKeditor when clicking the 'quote' button, as well as those
-        # that we have introduced when quoting the original message
-        msg = re.sub('<blockquote.*?>\s*<div.*?>', '>>', msg)
-        msg = re.sub('</div>\s*</blockquote>', '', msg)
+        # CKEditor when clicking the 'quote' button, as well as those
+        # that we have introduced when quoting the original message.
+        # We can however not use directly '>>' chars to quote, as it
+        # will be washed/fixed when calling tidy_html(): double-escape
+        # all &gt; first, and use &gt;&gt;
+        msg = msg.replace('&gt;', '&amp;gt;')
+        msg = re.sub('<blockquote.*?>\s*<(p|div).*?>', '&gt;&gt;', msg)
+        msg = re.sub('</(p|div)>\s*</blockquote>', '', msg)
         # Then definitely remove any blockquote, whatever it is
         msg = re.sub('<blockquote.*?>', '<div>', msg)
         msg = re.sub('</blockquote>', '</div>', msg)
         # Tidy up the HTML
         msg = tidy_html(msg)
+        # Now that HTML has been cleaned, unescape &gt;
+        msg = msg.replace('&gt;', '>')
+        msg = msg.replace('&amp;gt;', '&gt;')
+        msg = re.sub('<br .*?(/>)', '\n', msg)
+        msg = msg.replace('&nbsp;', ' ')
         # In case additional <p> or <div> got inserted, interpret
         # these as new lines (with a sad trick to do it only once)
-        msg = msg.replace('</div><', '</div>\n<')
-        msg = msg.replace('</p><', '</p>\n<')
+        # (note that it has been deactivated, as it is messing up
+        # indentation with >>)
+        #msg = msg.replace('</div><', '</div>\n<')
+        #msg = msg.replace('</p><', '</p>\n<')
 
     query = """INSERT INTO cmtRECORDCOMMENT (id_bibrec,
                                            id_user,
@@ -1140,7 +1151,7 @@ def email_subscribers_about_new_comment(recID, reviews, emails1,
     @param msg: comment body
     @param note: comment title
     @param score: review star score
-    @param editor_type: the kind of editor used to submit the comment: 'textarea', 'fckeditor'
+    @param editor_type: the kind of editor used to submit the comment: 'textarea', 'ckeditor'
     @rtype: bool
     @return: True if email was sent okay, False if it was not.
     """
@@ -1537,7 +1548,7 @@ def perform_request_add_comment_or_remark(recID=0,
     @param priority: priority of remark (int)
     @param reviews: boolean, if enabled will add a review, if disabled will add a comment
     @param comID: if replying, this is the comment id of the comment we are replying to
-    @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'
+    @param editor_type: the kind of editor/input used for the comment: 'textarea', 'ckeditor'
     @param can_attach_files: if user can attach files to comments or not
     @param subscribe: if True, subscribe user to receive new comments by email
     @param req: request object. Used to register callback to send email notification
@@ -1608,18 +1619,18 @@ def perform_request_add_comment_or_remark(recID=0,
                     user_info = get_user_info(comment[2])
                     if user_info:
                         date_creation = convert_datetext_to_dategui(str(comment[4]))
-                        # Build two msg: one mostly textual, the other one with HTML markup, for the FCKeditor.
+                        # Build two msg: one mostly textual, the other one with HTML markup, for the CkEditor.
                         msg = _("%(x_name)s wrote on %(x_date)s:")% {'x_name': user_info[2], 'x_date': date_creation}
                         textual_msg = msg
-                        # 1 For FCKeditor input
+                        # 1 For CkEditor input
                         msg += '\n\n'
                         msg += comment[3]
                         msg = email_quote_txt(text=msg)
                         # Now that we have a text-quoted version, transform into
-                        # something that FCKeditor likes, using <blockquote> that
+                        # something that CkEditor likes, using <blockquote> that
                         # do still enable users to insert comments inline
                         msg = email_quoted_txt2html(text=msg,
-                                                    indent_html=('<blockquote><div>', '&nbsp;</div></blockquote>'),
+                                                    indent_html=('<blockquote><div>', '&nbsp;&nbsp;</div></blockquote>'),
                                                     linebreak_html="&nbsp;<br/>",
                                                     indent_block=False)
                         # Add some space for users to easily add text

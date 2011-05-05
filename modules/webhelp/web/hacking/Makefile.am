@@ -27,7 +27,7 @@ webdoclib_DATA = \
 	directory-organization.webdoc \
 	release-numbering.webdoc \
 	test-suite.webdoc \
-	fckeditor.webdoc
+	ckeditor.webdoc
 
 EXTRA_DIST = $(webdoclib_DATA) $(img_DATA)
 

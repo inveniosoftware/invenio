@@ -74,11 +74,6 @@ from invenio.webcomment_config import \
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
-try:
-    from invenio.fckeditor_invenio_connector import FCKeditorConnectorInvenio
-    fckeditor_available = True
-except ImportError, e:
-    fckeditor_available = False
 import os
 from invenio import webinterface_handler_config as apache
 from invenio.bibdocfile import \
@@ -279,7 +274,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         @param note: title of the review
         @param comid: comment id, needed for replying
         @param editor_type: the type of editor used for submitting the
-                            comment: 'textarea', 'fckeditor'.
+                            comment: 'textarea', 'ckeditor'.
         @param subscribe: if set, subscribe user to receive email
                           notifications when new comment are added to
                           this discussion
@@ -665,7 +660,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 class WebInterfaceCommentsFiles(WebInterfaceDirectory):
     """Handle <strike>upload and </strike> access to files for comments.
 
-       <strike>The upload is currently only available through the FCKeditor.</strike>
+       <strike>The upload is currently only available through the Ckeditor.</strike>
     """
 
     #_exports = ['put'] # 'get' is handled by _lookup(..)
@@ -766,53 +761,3 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
                     body=_('The requested file could not be found'),
                     req=req,
                     language=argd['ln'])
-
-##     def put(self, req, form):
-##         """
-##         Process requests received from FCKeditor to upload files, etc.
-##         """
-##         if not fckeditor_available:
-##             return
-
-##         uid = getUid(req)
-
-##         # URL where the file can be fetched after upload
-##         user_files_path = '%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/%(recid)i/comments/attachments/get/%(uid)s' % \
-##                           {'uid': uid,
-##                            'recid': self.recid,
-##                            'CFG_SITE_URL': CFG_SITE_URL}
-##         # Path to directory where uploaded files are saved
-##         user_files_absolute_path = '%(CFG_PREFIX)s/var/data/comments/%(recid)s/%(uid)s' % \
-##                                    {'uid': uid,
-##                                     'recid': self.recid,
-##                                     'CFG_PREFIX': CFG_PREFIX}
-##         # Create a Connector instance to handle the request
-##         conn = FCKeditorConnectorInvenio(form, recid=self.recid, uid=uid,
-##                                          allowed_commands=['QuickUpload'],
-##                                          allowed_types = ['File', 'Image', 'Flash', 'Media'],
-##                                          user_files_path = user_files_path,
-##                                          user_files_absolute_path = user_files_absolute_path)
-
-##         # Check that user can upload attachments for comments.
-##         user_info = collect_user_info(req)
-##         (auth_code, auth_msg) = check_user_can_attach_file_to_comments(user_info, self.recid)
-##         if user_info['email'] == 'guest':
-##             # User is guest: must login prior to upload
-##             data = conn.sendUploadResults(1, '', '', 'Please login before uploading file.')
-##         elif auth_code:
-##             # User cannot submit
-##             data = conn.sendUploadResults(1, '', '', 'Sorry, you are not allowed to submit files.')
-##         else:
-##             # Process the upload and get the response
-##             data = conn.doResponse()
-
-##         # Transform the headers into something ok for mod_python
-##         for header in conn.headers:
-##             if not header is None:
-##                 if header[0] == 'Content-Type':
-##                     req.content_type = header[1]
-##                 else:
-##                     req.headers_out[header[0]] = header[1]
-##         # Send our response
-##         req.send_http_header()
-##         req.write(data)

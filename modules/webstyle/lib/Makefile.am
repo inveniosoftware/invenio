@@ -28,7 +28,7 @@ pylib_DATA = webdoc.py \
              webinterface_handler.py \
              webinterface_tests.py \
              webinterface_layout.py \
-             fckeditor_invenio_connector.py \
+             ckeditor_invenio_connector.py \
              webinterface_handler_wsgi.py \
              webinterface_handler_wsgi_utils.py \
              webinterface_handler_config.py \

@@ -448,7 +448,7 @@ INSERT INTO sbmALLFUNCDESCR VALUES ('User_is_Record_Owner_or_Curator','Check if 
 INSERT INTO sbmALLFUNCDESCR VALUES ('Move_Files_to_Storage','Attach files received from chosen file input element(s)');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Move_Revised_Files_to_Storage','Revise files initially uploaded with "Move_Files_to_Storage"');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Make_Dummy_MARC_XML_Record','');
-INSERT INTO sbmALLFUNCDESCR VALUES ('Move_FCKeditor_Files_to_Storage','Transfer files attached to the record with the FCKeditor');
+INSERT INTO sbmALLFUNCDESCR VALUES ('Move_CKEditor_Files_to_Storage','Transfer files attached to the record with the CKEditor');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Create_Upload_Files_Interface','Display generic interface to add/revise/delete files. To be used before function "Move_Uploaded_Files_to_Storage"');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Move_Uploaded_Files_to_Storage','Attach files uploaded with "Create_Upload_Files_Interface"');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Move_Photos_to_Storage','Attach/edit the pictures uploaded with the "create_photos_manager_interface()" function');
@@ -574,7 +574,7 @@ INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','new_file_na
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','stamp');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','layer');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','switch_file');
-INSERT INTO sbmFUNDESC VALUES ('Move_FCKeditor_Files_to_Storage','input_fields');
+INSERT INTO sbmFUNDESC VALUES ('Move_CKEditor_Files_to_Storage','input_fields');
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','maxsize');
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','minsize');
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','doctypes');
