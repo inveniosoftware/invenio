@@ -1672,6 +1672,8 @@ class BibDoc:
                     raise InvenioWebSubmitFileError, "%s seems to be empty" % filename
                 if format is None:
                     format = decompose_file(filename)[2]
+                else:
+                    format = normalize_format(format)
                 destination = "%s/%s%s;%i" % (self.basedir, self.docname, format, myversion)
                 try:
                     shutil.copyfile(filename, destination)
@@ -1732,6 +1734,8 @@ class BibDoc:
                     raise InvenioWebSubmitFileError, "%s seems to be empty" % filename
                 if format is None:
                     format = decompose_file(filename)[2]
+                else:
+                    format = normalize_format(format)
                 destination = "%s/%s%s;%i" % (self.basedir, self.docname, format, version)
                 if os.path.exists(destination):
                     raise InvenioWebSubmitFileError, "A file for docname '%s' for the recid '%s' already exists for the format '%s'" % (self.docname, self.recid, format)
