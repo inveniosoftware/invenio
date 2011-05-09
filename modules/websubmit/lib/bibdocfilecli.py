@@ -513,30 +513,35 @@ def print_info(recid, docid, info):
     """Nicely print info about a recid, docid pair."""
     print '%i:%i:%s' % (recid, docid, info)
 
-def bibupload_ffts(ffts, append=False, debug=False):
+def bibupload_ffts(ffts, append=False, debug=False, interactive=True):
     """Given an ffts dictionary it creates the xml and submit it."""
     xml = ffts_to_xml(ffts)
     if xml:
-        print xml
+        if interactive:
+            print xml
         tmp_file_fd, tmp_file_name = mkstemp(suffix='.xml', prefix="bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"), dir=CFG_TMPDIR)
         os.write(tmp_file_fd, xml)
         os.close(tmp_file_fd)
         os.chmod(tmp_file_name, 0644)
         if append:
-            wait_for_user("This will be appended via BibUpload")
+            if interactive:
+                wait_for_user("This will be appended via BibUpload")
             if debug:
                 task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file_name, '-N', 'FFT', '-S2', '-v9')
             else:
                 task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file_name, '-N', 'FFT', '-S2')
-            print "BibUpload append submitted with id %s" % task
+            if interactive:
+                print "BibUpload append submitted with id %s" % task
         else:
-            wait_for_user("This will be corrected via BibUpload")
+            if interactive:
+                wait_for_user("This will be corrected via BibUpload")
             if debug:
                 task = task_low_level_submission('bibupload', 'bibdocfile', '-c', tmp_file_name, '-N', 'FFT', '-S2', '-v9')
             else:
                 task = task_low_level_submission('bibupload', 'bibdocfile', '-c', tmp_file_name, '-N', 'FFT', '-S2')
-            print "BibUpload correct submitted with id %s" % task
-    else:
+            if interactive:
+                print "BibUpload correct submitted with id %s" % task
+    elif interactive:
         print >> sys.stderr, "WARNING: no MARC to upload."
     return True
 
@@ -691,7 +696,7 @@ def cli_fix_all(options):
             ffts[recid].append({'docname' : docname, 'doctype' : 'FIX-ALL'})
     return bibupload_ffts(ffts, append=False)
 
-def cli_fix_marc(options, explicit_recid_set=None):
+def cli_fix_marc(options, explicit_recid_set=None, interactive=True):
     """Fix all the records of a recid_set."""
     ffts = {}
     if explicit_recid_set is not None:
@@ -700,7 +705,7 @@ def cli_fix_marc(options, explicit_recid_set=None):
     else:
         for recid in cli_recids_iterator(options):
             ffts[recid] = [{'doctype' : 'FIX-MARC'}]
-    return bibupload_ffts(ffts, append=False)
+    return bibupload_ffts(ffts, append=False, interactive=interactive)
 
 def cli_check_format(options):
     """Check if any format-related inconsistences exists."""
