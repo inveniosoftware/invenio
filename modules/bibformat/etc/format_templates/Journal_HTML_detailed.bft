@@ -9,5 +9,6 @@
 <BFE_WEBJOURNAL_ARTICLE_AUTHOR prefix="<br/>by " suffix="<br/>"/>
 <BFE_WEBJOURNAL_ARTICLE_BODY />
 
+<BFE_ADDTHIS />
 
 </div>
