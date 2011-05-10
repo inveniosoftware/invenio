@@ -168,8 +168,10 @@ def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None
 
     # run upload command:
     if exec_date:
-        date = "\'" + exec_date + ' ' + exec_time + "\'"
-        jobid = task_low_level_submission('bibupload', user_info['nickname'], mode, "--name=" + metafilename, "--priority=" + priority,"-t", date, filename)
+        date = exec_date
+        if exec_time:
+            date += ' ' + exec_time
+        jobid = task_low_level_submission('bibupload', user_info['nickname'], mode, "--name=" + metafilename, "--priority=" + priority, "-t", date, filename)
     else:
         jobid = task_low_level_submission('bibupload', user_info['nickname'], mode, "--name=" + metafilename, "--priority=" + priority, filename)
 
