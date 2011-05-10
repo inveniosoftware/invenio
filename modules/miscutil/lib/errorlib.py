@@ -253,9 +253,17 @@ def get_pretty_traceback(req=None, exc_info=None):
                 pass
             for key, value in frame.f_locals.items():
                 print >> tracestack_data_stream, "\t%20s = " % key,
+                try:
+                    value = repr(value)
+                except Exception, err:
+                    ## We shall gracefully accept errors when repr() of
+                    ## a value fails (e.g. when we are trying to repr() a
+                    ## variable that was not fully initialized as the
+                    ## exception was raised during its __init__ call).
+                    value = "ERROR: when representing the value: %s" % (err)
                 for to_hide in values_to_hide:
                     ## Let's hide passwords
-                    value = repr(value).replace(to_hide, '<*****>')
+                    value = value.replace(to_hide, '<*****>')
                 try:
                     print >> tracestack_data_stream, \
                         _truncate_dynamic_string(value)
