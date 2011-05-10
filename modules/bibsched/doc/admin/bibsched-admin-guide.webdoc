@@ -174,3 +174,53 @@ interface, only the latest log will be displayed.</p>
 
 </pre>
 </p>
+
+<h2>BibSched Tasklets</h2>
+<p>If you have very particular needs to write your self a bibtask that can
+be scheduled through the bibliographic scheduler, and you are able to write
+a Python function you can write a <strong>BibTaskLet</strong></p>
+
+<p>Suppose that you have Python function:
+<pre>
+def foo(arg1, arg2='default'):
+    pass
+</pre>
+that you want to execute through the bibliographic scheduler. Just put such
+a function in the <tt>/opt/cds-invenio/lib/python/invenio/bibsched_tasklets</tt> in a file called e.g. <tt>bst_foo.py</tt> (the <em>bst_</em> prefix and the <em>.py</em> extension are compulsory) and rename the function to <tt>bst_foo</tt> (the name of the function must be identical to the name of the file).</p>
+
+<p>A BibTaskLet can be executed through the <tt>bibtasklet</tt> BibTask. E.g.:
+<pre>
+$ # To list the available bibtasklets
+$ sudo -u apache /opt/cds-invenio/bin/bibtasklet -l
+Available tasklets:
+
+
+╔══════════════════════════════════════════════════════════════════╗
+║ def bst_fibonacci(n=30)                                          ║
+╠══════════════════════════════════════════════════════════════════╣
+║                                                                  ║
+║     Small tasklets that prints the the Fibonacci sequence for n. ║
+║     @param n: how many Fibonacci numbers to print.               ║
+║     @type n: int                                                 ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
+
+╔════════════════════════════════════╗
+║ def bst_foo(arg1, arg2='default')  ║
+╠════════════════════════════════════╣
+║                                    ║
+║     No documentation.              ║
+║                                    ║
+╚════════════════════════════════════╝
+
+Broken tasklets:
+
+$ # To schedule a bibtasklet
+$ sudo -u apache /opt/cds-invenio/bin/bibtasklet -T bst_foo -a "arg1=bar"
+</pre>
+
+All the above bibtask options are available for any bibtasklet.
+</p>
+
+<p>See <tt>/opt/cds-invenio/lib/python/invenio/bibsched_tasklets/bst_fibonacci.py</tt> for an example on how a bibtasklet look like.
+</p>

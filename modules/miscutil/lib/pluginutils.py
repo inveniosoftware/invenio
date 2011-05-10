@@ -27,12 +27,14 @@ import glob
 import inspect
 
 from invenio.config import CFG_PYLIBDIR
+from invenio.textutils import wrap_text_in_a_box
 
 class InvenioPluginContainerError(Exception):
     """
     Exception raised when some error happens during plugin loading.
     """
     pass
+
 
 class PluginContainer(object):
     """
@@ -84,6 +86,7 @@ class PluginContainer(object):
         get_broken_plugins,get_plugin,reload_plugins
 
     """
+
     def __init__(self,
             plugin_pathnames=None,
             plugin_builder=None,
@@ -288,8 +291,7 @@ class PluginContainer(object):
         try:
             plugin_name = self.get_plugin_name(plugin_path)
             plugin_import_path = plugin_path[
-                len(CFG_PYLIBDIR) + 1:-len('.py')
-            ].replace('/', '.')
+                len(CFG_PYLIBDIR) + 1:-len('.py')].replace('/', '.')
 
             ## Let's refresh Python's own cache.
             if plugin_import_path in self._cached_modules:
@@ -325,19 +327,19 @@ class PluginContainer(object):
                 check_signature(plugin_name, self._plugin_signature, plugin)
 
             self._plugin_map[plugin_name] = {
-                'plugin' : plugin,
-                'error' : None,
-                'plugin_path' : plugin_path,
-                'enabled' : enabled,
-                'api_version' : api_version,
+                'plugin': plugin,
+                'error': None,
+                'plugin_path': plugin_path,
+                'enabled': enabled,
+                'api_version': api_version,
             }
         except Exception:
             self._plugin_map[plugin_name] = {
-                'plugin' : None,
-                'error' : sys.exc_info(),
-                'plugin_path' : plugin_path,
-                'enabled' : False,
-                'api_version' : api_version,
+                'plugin': None,
+                'error': sys.exc_info(),
+                'plugin_path': plugin_path,
+                'enabled': False,
+                'api_version': api_version,
             }
 
     def __getitem__(self, plugin_name):
@@ -356,7 +358,8 @@ class PluginContainer(object):
                 self._plugin_map[plugin_name]['enabled'] is True:
             return self._plugin_map[plugin_name]['plugin']
         else:
-            raise KeyError('"%s" does not exists or is not correctly enabled')
+            raise KeyError('"%s" does not exists or is not correctly enabled' %
+                plugin_name)
 
     def __contains__(self, plugin_name):
         """
@@ -492,6 +495,7 @@ class PluginContainer(object):
                 ret[plugin_name] = plugin['plugin']
         return ret
 
+
 def check_signature(object_name, reference_object, other_object):
     """
     Given a reference class or function check if an other class or function
@@ -517,12 +521,10 @@ def check_signature(object_name, reference_object, other_object):
                     ## exists in the the latter, wethever they recursively have
                     ## the same signature.
                     reference_object_map = dict(
-                        inspect.getmembers(reference_object, inspect.isroutine)
-                    )
+                        inspect.getmembers(reference_object,
+                            inspect.isroutine))
                     for other_method_name, other_method_code in \
-                            inspect.getmembers(
-                                other_object, inspect.isroutine
-                            ):
+                        inspect.getmembers(other_object, inspect.isroutine):
                         if other_method_name in reference_object_map:
                             check_signature(object_name,
                                 reference_object_map[other_method_name],
@@ -533,17 +535,14 @@ def check_signature(object_name, reference_object, other_object):
                     ## latter should exist in the former and they should
                     ## recursively have the same signature.
                     other_object_map = dict(
-                        inspect.getmembers(other_object, inspect.isroutine)
-                    )
+                        inspect.getmembers(other_object, inspect.isroutine))
                     for reference_method_name, reference_method_code in \
-                            inspect.getmembers(
-                                reference_object, inspect.isroutine
-                            ):
+                        inspect.getmembers(
+                            reference_object, inspect.isroutine):
                         if reference_method_name in other_object_map:
                             check_signature(
                                 object_name, reference_method_code,
-                                other_method_code
-                            )
+                                other_method_code)
                         else:
                             raise InvenioPluginContainerError('"%s", which'
                                 ' exists in the reference class, does not'
@@ -564,7 +563,7 @@ def check_signature(object_name, reference_object, other_object):
                 reference_args, reference_varargs, reference_varkw, \
                     reference_defaults = inspect.getargspec(reference_object)
                 other_args, other_varargs, other_varkw, \
-                    other_defaults =  inspect.getargspec(other_object)
+                    other_defaults = inspect.getargspec(other_object)
                 ## We normalize the reference_defaults to be a list
                 if reference_defaults is not None:
                     reference_defaults = list(reference_defaults)
@@ -632,3 +631,237 @@ def check_signature(object_name, reference_object, other_object):
         raise InvenioPluginContainerError('Error in checking signature for'
             ' "%s" as defined at "%s" (line %s): %s' %
             (object_name, sourcefile, sourceline, err))
+
+
+def create_enhanced_plugin_builder(
+        compulsory_objects=None, optional_objects=None, other_data=None):
+    """
+    Creates a plugin_builder function suitable to extract some specific
+    objects (either compulsory or optional) and other simpler data
+
+    >>> def dummy_needed_funct1(foo, bar):
+    ...     pass
+    >>> class dummy_needed_class1:
+    ...     def __init__(self, baz):
+    ...         pass
+    >>> def dummy_optional_funct2(boo):
+    ...     pass
+    >>> create_enhanced_plugin_builder(
+    ...    compulsory_objects={
+    ...         'needed_funct1' : dummy_needed_funct1,
+    ...         'needed_class1' : dummy_needed_class1
+    ...     },
+    ...     optional_objects={
+    ...         'optional_funct2' : dummy_optional_funct2,
+    ...     },
+    ...     other_data={
+    ...         'CFG_SOME_DATA' : (str, ''),
+    ...         'CFG_SOME_INT' : (int, 0),
+    ...     })
+    <function plugin_builder at 0xb7812064>
+
+    @param compulsory_objects: map of name of an object to look for inside
+        the C{plugin_code} and a I{signature} for a class or callable. Every
+        name specified in this map B{must exists} in the plugin_code, otherwise
+        the plugin will fail to load.
+    @type compulsory_objects: dict
+    @param optional_objects: map of name of an object to look for inside
+        the C{plugin_code} and a I{signature} for a class or callable. Every
+        name specified in this map must B{can exists} in the plugin_code.
+    @type optional_objects: dict
+    @param other_data: map of other simple data that can be loaded from
+        the plugin_code. The map has the same format of the C{content}
+        parameter of L{invenio.webinterface_handler.wash_urlargd}.
+    @type other_data: dict
+    @return: a I{plugin_builder} function that can be used with the
+        C{PluginContainer} constructor. Such function will build the plugin
+        in the form of a map, where every key is one of the keys inside
+        the three maps provided as parameters and the corresponding value
+        is the expected class or callable or simple data.
+    """
+    from invenio.webinterface_handler import wash_urlargd
+
+    def plugin_builder(plugin_name, plugin_code):
+        """
+        Enhanced plugin_builder created by L{create_enhanced_plugin_builder}.
+
+        @param plugin_name: the name of the plugin.
+        @type plugin_name: string
+        @param plugin_code: the code of the module as just read from
+            filesystem.
+        @type plugin_code: module
+        @return: the plugin in the form of a map.
+        """
+        plugin = {}
+
+        if compulsory_objects:
+            for object_name, object_signature in \
+                    compulsory_objects.iteritems():
+                the_object = getattr(plugin_code, object_name, None)
+                if the_object is None:
+                    raise InvenioPluginContainerError('Plugin "%s" does not '
+                        'contain compulsory object "%s"' % (plugin_name,
+                        object_name))
+                try:
+                    check_signature(object_name, the_object, object_signature)
+                except InvenioPluginContainerError, err:
+                    raise InvenioPluginContainerError('Plugin "%s" contains '
+                        'object "%s" with a wrong signature: %s' %
+                        (plugin_name, object_name, err))
+                plugin[object_name] = the_object
+
+        if optional_objects:
+            for object_name, object_signature in optional_objects.iteritems():
+                the_object = getattr(plugin_code, object_name, None)
+                if the_object is not None:
+                    try:
+                        check_signature(
+                            object_name,
+                            the_object,
+                            object_signature)
+                    except InvenioPluginContainerError, err:
+                        raise InvenioPluginContainerError('Plugin "%s" '
+                            'contains object "%s" with a wrong signature: %s' %
+                            (plugin_name, object_name, err))
+                    plugin[object_name] = the_object
+
+        if other_data:
+            the_other_data = {}
+            for data_name, (dummy, data_default) in other_data.iteritems():
+                the_other_data[data_name] = getattr(
+                    plugin_code, data_name, data_default)
+
+            try:
+                the_other_data = wash_urlargd(the_other_data, other_data)
+            except Exception, err:
+                raise InvenioPluginContainerError('Plugin "%s" contains other '
+                    'data with problems: %s' % (plugin_name, err))
+
+            plugin.update(the_other_data)
+        return plugin
+
+    return plugin_builder
+
+
+def get_callable_signature_as_string(the_callable):
+    """
+    Returns a string representing a callable as if it would have been
+    declared on the prompt.
+
+    >>> def foo(arg1, arg2, arg3='val1', arg4='val2', *args, **argd):
+    ...     pass
+    >>> get_callable_signature_as_string(foo)
+    def foo(arg1, arg2, arg3='val1', arg4='val2', *args, **argd)
+
+    @param the_callable: the callable to be analyzed.
+    @type the_callable: function/callable.
+    @return: the signature.
+    @rtype: string
+    """
+    args, varargs, varkw, defaults = inspect.getargspec(the_callable)
+    tmp_args = list(args)
+    args_dict = {}
+    if defaults:
+        defaults = list(defaults)
+    else:
+        defaults = []
+    while defaults:
+        args_dict[tmp_args.pop()] = defaults.pop()
+
+    while tmp_args:
+        args_dict[tmp_args.pop()] = None
+
+    args_list = []
+    for arg in args:
+        if args_dict[arg] is not None:
+            args_list.append("%s=%s" % (arg, repr(args_dict[arg])))
+        else:
+            args_list.append(arg)
+
+    if varargs:
+        args_list.append("*%s" % varargs)
+
+    if varkw:
+        args_list.append("**%s" % varkw)
+
+    args_string = ', '.join(args_list)
+
+    return "def %s(%s)" % (the_callable.__name__, args_string)
+
+
+def get_callable_documentation(the_callable):
+    """
+    Returns a string with the callable signature and its docstring.
+
+    @param the_callable: the callable to be analyzed.
+    @type the_callable: function/callable.
+    @return: the signature.
+    @rtype: string
+    """
+    return wrap_text_in_a_box(
+        title=get_callable_signature_as_string(the_callable),
+        body=(getattr(the_callable, '__doc__') or 'No documentation').replace(
+            '\n', '\n\n'),
+        style='ascii_double')
+
+
+def check_arguments_compatibility(the_callable, argd):
+    """
+    Check if calling the_callable with the given arguments would be correct
+    or not.
+
+    >>> def foo(arg1, arg2, arg3='val1', arg4='val2', *args, **argd):
+    ...     pass
+    >>> try: check_arguments_compatibility(foo, {'arg1': 'bla', 'arg2': 'blo'})
+    ... except ValueError, err: print 'failed'
+    ... else: print 'ok'
+    ok
+    >>> try: check_arguments_compatibility(foo, {'arg1': 'bla'})
+    ... except ValueError, err: print 'failed'
+    ... else: print 'ok'
+    failed
+
+    Basically this function is simulating the call:
+    >>> the_callable(**argd)
+    but it only checks for the correctness of the arguments, without
+    actually calling the_callable.
+
+    @param the_callable: the callable to be analyzed.
+    @type the_callable: function/callable
+    @param argd: the arguments to be passed.
+    @type argd: dict
+    @raise ValueError: in case of uncompatibility
+    """
+    if not argd:
+        argd = {}
+    args, dummy, varkw, defaults = inspect.getargspec(the_callable)
+    tmp_args = list(args)
+    args_dict = {}
+    if defaults:
+        defaults = list(defaults)
+    else:
+        defaults = []
+    while defaults:
+        args_dict[tmp_args.pop()] = defaults.pop()
+
+    while tmp_args:
+        args_dict[tmp_args.pop()] = None
+
+    for arg, value in argd.iteritems():
+        if arg in args_dict:
+            del args_dict[arg]
+        elif not varkw:
+            raise ValueError('Argument %s not expected when calling callable '
+                '"%s" with arguments %s' % (
+                    arg, get_callable_signature_as_string(the_callable), argd))
+
+    for arg, value in args_dict.items():
+        if value:
+            del args_dict[arg]
+
+    if args_dict:
+        raise ValueError('Arguments %s not specified when calling callable '
+            '"%s" with arguments %s' % (
+                ', '.join(args_dict.keys()),
+                get_callable_signature_as_string(the_callable),
+                argd))

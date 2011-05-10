@@ -231,7 +231,8 @@ DEF_ACTIONS = (
                ('claimpaper_claim_own_papers', 'Clam papers to his own personID', '', 'no'),
                ('claimpaper_claim_others_papers', 'Claim papers for others', '', 'no'),
                ('claimpaper_change_own_data', 'Change data associated to his own person ID', '', 'no'),
-               ('claimpaper_change_others_data', 'Change data of any person ID', '', 'no')
+               ('claimpaper_change_others_data', 'Change data of any person ID', '', 'no'),
+               ('runbibtasklet', 'run BibTaskLet', '', 'no')
               )
 
 # Default authorizations

@@ -84,12 +84,12 @@ def send_email(fromaddr,
     @param footer: [string] footer to add, None for the Default
     @param html_header: [string] header to add to the html part, None for the Default
     @param html_footer: [string] footer to add to the html part, None for the Default
-    @param copy_to_admin: [int] if 1 add emailamin in receivers
-    @attempt_times: [int] number of tries
-    @attempt_sleeptime: [int] seconds in between tries
-    @debug_level: [int] debug level
-    @ln: [string] invenio language
-    @charset: [string] the content charset. By default is None which means
+    @param copy_to_admin: [int] if 1 add CFG_SITE_ADMIN_EMAIL in receivers
+    @param attempt_times: [int] number of tries
+    @param attempt_sleeptime: [int] seconds in between tries
+    @param debug_level: [int] debug level
+    @param ln: [string] invenio language
+    @param charset: [string] the content charset. By default is None which means
     to try to encode the email as ascii, then latin1 then utf-8.
 
     If sending fails, try to send it ATTEMPT_TIMES, and wait for
