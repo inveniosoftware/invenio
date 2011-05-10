@@ -2916,7 +2916,8 @@ CREATE TABLE IF NOT EXISTS accMAILCOOKIE (
   kind varchar(32) NOT NULL,
   onetime boolean NOT NULL default 0,
   status char(1) NOT NULL default 'W',
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  KEY expiration (expiration)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS accACTION (
