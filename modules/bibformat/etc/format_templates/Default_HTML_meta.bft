@@ -1,7 +1,7 @@
 <name>Default HTML meta</name>
 <description>HTML Meta tags suitable to be parsed by search engines (e.g. Google Scholar)</description>
 
-<BFE_META tag_name="title" name="citation_title" />
+<BFE_META tag="245__a" name="citation_title" />
 <BFE_META tag="100__a" tag_name="first author" name="citation_author" />
 <BFE_META tag="700__a" tag_name="additional author" name="citation_author" />
 <BFE_META tag="260__b" name="citation_publisher" />
