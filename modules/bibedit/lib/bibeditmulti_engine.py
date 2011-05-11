@@ -490,6 +490,9 @@ def _get_formated_record(record_id, output_format, update_commands, language, ou
                 for tag in outputTags:
                     if tag in line.split()[1]:
                         result += line.strip() + '\n'
+                    elif '<strong' in line:
+                        if tag in line.split()[3]:
+                            result += line.strip() + '\n'
         else:
             result += _get_record_diff(record_id, old_record, updated_record)
 
