@@ -23,9 +23,12 @@ __revision__ = "$Id$"
 import os
 import re
 import time
+import fcntl
+import errno
 
 from invenio.config import CFG_WEBSUBMIT_COUNTERSDIR
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
+from invenio.shellutils import mymkdir
 
 def Report_Number_Generation(parameters, curdir, form, user_info=None):
     """
@@ -160,7 +163,7 @@ def Report_Number_Generation(parameters, curdir, form, user_info=None):
                 rn = oldrn
                 return ""
         # create it
-        rn = Create_Reference(counter_path, rn_format, nb_length)
+        rn = create_reference(counter_path, rn_format, nb_length)
         rn = rn.replace("\n", "")
         rn = rn.replace("\r", "")
         rn = rn.replace("\015", "")
@@ -187,78 +190,58 @@ def Report_Number_Generation(parameters, curdir, form, user_info=None):
     fp.close()
     return ""
 
-
-
-def Create_Reference(counter_path, ref_format, nb_length=3):
+def create_reference(counter_path, ref_format, nb_length=3):
     """From the counter-file for this document submission, get the next
        reference number and create the reference.
     """
     ## Does the WebSubmit CFG_WEBSUBMIT_COUNTERSDIR directory exist? Create it if not.
-    if not os.path.exists(CFG_WEBSUBMIT_COUNTERSDIR):
-        ## counters dir doesn't exist. Create:
-        try:
-            os.mkdir(CFG_WEBSUBMIT_COUNTERSDIR)
-        except:
-            ## Unable to create the CFG_WEBSUBMIT_COUNTERSDIR Dir.
-            msg = "File System: Cannot create counters directory %s" % CFG_WEBSUBMIT_COUNTERSDIR
-            raise InvenioWebSubmitFunctionError(msg)
+    full_path = os.path.split(os.path.join(CFG_WEBSUBMIT_COUNTERSDIR, counter_path))[0]
+    try:
+        mymkdir(full_path)
+    except:
+        ## Unable to create the CFG_WEBSUBMIT_COUNTERSDIR Dir.
+        msg = "File System: Cannot create counters directory %s" % full_path
+        raise InvenioWebSubmitFunctionError(msg)
 
-    ## Now, take the "counter_path", and split it into the head (the path
-    ## to the counter file) and tail (the name of the counter file itself).
-    (head_cpath, tail_cpath) = os.path.split(counter_path)
-    if head_cpath.strip() != "":
-        ## There is a "head" for counter-path. If these directories
-        ## don't exist, make them:
-        if not os.path.exists("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, head_cpath)):
-            try:
-                os.makedirs(os.path.normpath("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, head_cpath)))
-            except OSError:
-                msg = "File System: no permission to create counters " \
-                      "directory [%s/%s]" % (CFG_WEBSUBMIT_COUNTERSDIR, head_cpath)
-                raise InvenioWebSubmitFunctionError(msg)
+    counter = os.path.join(CFG_WEBSUBMIT_COUNTERSDIR, counter_path)
 
     ## Now, if the counter-file itself doesn't exist, create it:
-    if not os.path.exists("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_path)):
+    if not os.path.exists(counter):
+        fp = open(counter, "a+", 0)
         try:
-            fp = open("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_path),"w")
-        except:
-            msg = "File System: no permission to write in counters " \
-                  "directory %s" % CFG_WEBSUBMIT_COUNTERSDIR
-            raise InvenioWebSubmitFunctionError(msg)
+            fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except IOError, err:
+            ## See: http://docs.python.org/library/fcntl.html#fcntl.lockf
+            ## This might mean that some other process is already creating
+            ## the file, so no need to initialized as well.
+            if err.errno not in (errno.EACCES, errno.EAGAIN):
+                raise
         else:
-            fp.write("0")
-            fp.close()
-    ## retrieve current counter value
+            try:
+                if not fp.read():
+                    fp.write("0")
+            finally:
+                fp.flush()
+                fcntl.lockf(fp, fcntl.LOCK_UN)
+                fp.close()
+
+    fp = open(counter, "r+", 0)
+    fcntl.lockf(fp, fcntl.LOCK_EX)
     try:
-        fp = open("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_path), "r")
-    except IOError:
-        ## Unable to open the counter file for reading:
-        msg = "File System: Unable to read from counter-file [%s/%s]." \
-              % (CFG_WEBSUBMIT_COUNTERSDIR, counter_path)
-        raise InvenioWebSubmitFunctionError(msg)
-    else:
         id = fp.read()
-        fp.close()
-
-    if id == "":
-        ## The counter file seems to have been empty. Set the value to 0:
-        id = 0
-
-    ## increment the counter by 1:
-    id = int(id) + 1
-
-    ## store the new value in the counter file:
-    try:
-        fp = open("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_path), "w")
-    except IOError:
-        ## Unable to open the counter file for writing:
-        msg = "File System: Unable to write to counter-file [%s/%s]. " \
-              % (CFG_WEBSUBMIT_COUNTERSDIR, counter_path)
-        raise InvenioWebSubmitFunctionError(msg)
-    else:
+        if id.strip() == '':
+            id = 0
+        else:
+            id = int(id)
+        id += 1
+        fp.seek(0)
         fp.write(str(id))
+        ## create final value
+        reference = ("%s-%0" + str(nb_length) + "d") % (ref_format,id)
+        ## Return the report number prelude with the id concatenated on at the end
+        return reference
+    finally:
+        fp.flush()
+        fcntl.lockf(fp, fcntl.LOCK_UN)
         fp.close()
-    ## create final value
-    reference = ("%s-%0" + str(nb_length) + "d") % (ref_format,id)
-    ## Return the report number prelude with the id concatenated on at the end
-    return reference
+
