@@ -227,6 +227,7 @@ DEF_ACTIONS = (
                ('runbibcirculation', 'run BibCirculation', '', 'no'),
                ('moderatecomments', 'moderate comments', 'collection', 'no'),
                ('runbatchuploader', 'run batchuploader', 'collection', 'yes'),
+               ('runbibtasklet', 'run BibTaskLet', '', 'no'),
                ('claimpaper_view_pid_universe', 'View the Claim Paper interface', '', 'no'),
                ('claimpaper_claim_own_papers', 'Clam papers to his own personID', '', 'no'),
                ('claimpaper_claim_others_papers', 'Claim papers for others', '', 'no'),
