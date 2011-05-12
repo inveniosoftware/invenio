@@ -300,6 +300,9 @@ class SimulatedModPythonRequest(object):
     def get_cleanups(self):
         return self.__cleanups
 
+    def get_referer(self):
+        return self.headers_in.get('referer')
+
     def __str__(self):
         from pprint import pformat
         out = ""
@@ -330,6 +333,7 @@ class SimulatedModPythonRequest(object):
     form = property(get_post_form)
     remote_ip = property(get_remote_ip)
     remote_host = property(get_remote_host)
+    referer = property(get_referer)
 
 def alert_admin_for_server_status_p(status, referer):
     """
