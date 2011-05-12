@@ -299,13 +299,15 @@ def guess_minimum_encoding(text, charsets=('ascii', 'latin1', 'utf8')):
             pass
     return (text_in_unicode.encode('utf8'), 'utf8')
 
-def encode_for_xml(text, wash=False, xml_version='1.0'):
+def encode_for_xml(text, wash=False, xml_version='1.0', quote=False):
     """Encodes special characters in a text so that it would be
     XML-compliant.
     @param text: text to encode
     @return: an encoded text"""
     text = text.replace('&', '&amp;')
     text = text.replace('<', '&lt;')
+    if quote:
+        text = text.replace('"', '&quot;')
     if wash:
         text = wash_for_xml(text, xml_version=xml_version)
     return text
