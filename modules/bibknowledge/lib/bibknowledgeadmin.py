@@ -20,6 +20,7 @@
 import MySQLdb
 import os
 import cgi
+import sys
 
 from invenio import bibknowledge, bibknowledgeadminlib
 from invenio.bibrankadminlib import check_user
@@ -569,7 +570,7 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
 
-def kb_export(req, kbname="", format="kbr", searchkey="", searchvalue="", searchtype="s", ln=CFG_SITE_LANG):
+def kb_export(req, kbname="", format="kbr", searchkey="", searchvalue="", searchtype="s", limit=None, ln=CFG_SITE_LANG):
     """
     Exports the given kb so that it is listed in stdout (the browser).
 
@@ -581,6 +582,7 @@ def kb_export(req, kbname="", format="kbr", searchkey="", searchvalue="", search
     @param searchkey include only lines that match this on the left side
     @param searchvalue include only lines that match this on the right side
     @param searchtype s = substring match, e = exact match
+    @param limit how many results to return. None means all
     @param ln language
     """
     ln = wash_language(ln)
@@ -618,20 +620,12 @@ def kb_export(req, kbname="", format="kbr", searchkey="", searchvalue="", search
         # left side / right side KB
         mappings = bibknowledge.get_kb_mappings(kbname, searchkey, \
                                                 searchvalue, searchtype)
-        if not mappings:
-            body = _("There is no knowledge base named %s or it is empty") % cgi.escape(kbname),
-            return page(title=_("No such knowledge base"),
-                        body=body,
-                        language=ln,
-                        navtrail=navtrail_previous_links,
-                        lastupdated=__lastupdated__,
-                        req=req)
 
         if format and format[0] == 'j':
             # as JSON formatted string
             req.content_type = 'application/json'
             return bibknowledge.get_kb_mappings_json(kbname, searchkey, \
-                                                    searchvalue, searchtype)
+                                                    searchvalue, searchtype, limit)
 
         elif format == 'right' or format == 'kba':
             # as authority sequence
