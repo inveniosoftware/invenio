@@ -212,8 +212,8 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
         commands_list = []
 
         upload_mode_replace = False
-        for current_subfield in subfields:
 
+        for current_subfield in subfields:
             action = current_subfield["action"]
             subfield_code = current_subfield["subfieldCode"]
             value = current_subfield["value"]

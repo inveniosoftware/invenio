@@ -107,8 +107,9 @@ function createCommandsList(){
 		subfields = currentField.subfields;
 		var subfieldID = "";
 		for (subfieldID in subfields) {
-			currentSubfield = subfields[subfieldID];
-			subfieldsList.push(currentSubfield);
+                    currentSubfield = subfields[subfieldID];
+                    if (currentSubfield != "None")
+                        subfieldsList.push(currentSubfield);
 		}
 
 		var field = {
