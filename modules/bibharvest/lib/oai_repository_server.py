@@ -43,8 +43,10 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_URL
 
+from invenio.intbitset import intbitset
 from invenio.dbquery import run_sql
-from invenio.search_engine import record_exists, perform_request_search
+from invenio.search_engine import record_exists, perform_request_search, \
+    get_all_restricted_recids
 from invenio.bibformat_dblayer import get_preformatted_record
 from invenio.bibformat import format_record
 from invenio.textutils import encode_for_xml
@@ -721,6 +723,7 @@ def oaigetsysno(identifier):
 
 def oaigetsysnolist(set="", fromdate="", untildate=""):
     "Returns list of system numbers for the OAI set 'set', modified from 'fromdate' until 'untildate'."
+    from invenio.oai_repository_updater import get_set_definitions
 
     if fromdate != "":
         fromdate = normalize_date(fromdate, "T00:00:00Z")
@@ -732,13 +735,18 @@ def oaigetsysnolist(set="", fromdate="", untildate=""):
     else:
         untildate = get_latest_datestamp()
 
+    collections = []
+    for set_definition in get_set_definitions(set):
+        collections.extend(coll.strip() for coll in set_definition['c'].split(','))
     recids = perform_request_search(f1=CFG_OAI_ID_FIELD, p1="oai:*", m1="e", op1='a',
                                     f2=((set and CFG_OAI_SET_FIELD) or ""), p2=set, m2="e",
                                     d1=utc_to_localtime(fromdate),
                                     d2=utc_to_localtime(untildate),
+                                    c=collections,
                                     dt='m',
                                     ap=0)
-    return recids
+    ## Let's discard non public records
+    return list(intbitset(recids) - get_all_restricted_recids())
 
 def oaigenresumptionToken():
     "Generates unique ID for resumption token management."
