@@ -119,7 +119,7 @@ from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
 from invenio.bibformat import format_records
 from invenio.bibformat_engine import get_output_formats
-from invenio.websearch_webcoll import mymkdir, get_collection
+from invenio.websearch_webcoll import get_collection
 from invenio.intbitset import intbitset
 from invenio.bibupload import find_record_from_sysno
 from invenio.bibrank_citation_searcher import get_cited_by_list
@@ -130,6 +130,7 @@ from invenio.bibedit_webinterface import WebInterfaceEditPages
 from invenio.bibeditmulti_webinterface import WebInterfaceMultiEditPages
 from invenio.bibmerge_webinterface import WebInterfaceMergePages
 from invenio.search_engine import get_record
+from invenio.shellutils import mymkdir
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')

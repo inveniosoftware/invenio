@@ -48,6 +48,7 @@ else:
 from cPickle import loads, dumps
 from zlib import decompress, compress
 
+from invenio.shellutils import mymkdir
 from invenio.external_authentication import ExternalAuth, InvenioWebAccessExternalAuthError
 from invenio.config import CFG_ETCDIR, CFG_SITE_URL, CFG_SITE_SECURE_URL
 
@@ -389,7 +390,6 @@ def update_robot_key(login_method, robot, key=None):
     @type key: string
     @note: if the secret is empty the corresponding key will be removed.
     """
-    from invenio.websearch_webcoll import mymkdir
     robot_keys = load_robot_keys()
     if key is None and login_method in robot_keys and robot in robot_keys[login_method]:
         del robot_keys[login_method][robot]
