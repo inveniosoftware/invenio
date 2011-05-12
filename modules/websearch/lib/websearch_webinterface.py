@@ -112,7 +112,8 @@ from invenio.search_engine import check_user_can_view_record, \
      perform_request_cache, \
      perform_request_log, \
      perform_request_search, \
-     restricted_collection_cache
+     restricted_collection_cache, \
+     get_coll_normalised_name
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
@@ -1289,6 +1290,7 @@ def display_collection(req, c, aas, verbose, ln):
     req.content_type = "text/html"
     req.send_http_header()
     # deduce collection id:
+    c = get_coll_normalised_name(c)
     colID = get_colID(c)
     if type(colID) is not int:
         page_body = '<p>' + (_("Sorry, collection %s does not seem to exist.") % ('<strong>' + str(c) + '</strong>')) + '</p>'

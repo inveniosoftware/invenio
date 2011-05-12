@@ -252,6 +252,16 @@ def get_permitted_restricted_collections(user_info, recreate_cache_if_needed=Tru
             ret.append(collection)
     return ret
 
+def get_all_restricted_recids():
+    """
+    Return the set of all the restricted recids, i.e. the ids of those records
+    which belong to at least one restricted collection.
+    """
+    ret = HitSet()
+    for collection in restricted_collection_cache.cache:
+        ret |= get_collection_reclist(collection)
+    return ret
+
 def get_restricted_collections_for_recid(recid, recreate_cache_if_needed=True):
     """
     Return the list of restricted collection names to which recid belongs.
@@ -3042,7 +3052,8 @@ def guess_collection_of_a_record(recID, referer=None, recreate_cache_if_needed=T
                 collection_reclist_cache.recreate_cache_if_needed()
             query = cgi.parse_qs(query)
             for name in query.get('cc', []) + query.get('c', []):
-                if recID in get_collection_reclist(name, recreate_cache_if_needed=False):
+                name = get_coll_normalised_name(name)
+                if name and recID in get_collection_reclist(name, recreate_cache_if_needed=False):
                     return name
     return guess_primary_collection_of_a_record(recID)
 
