@@ -528,7 +528,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                 pending_changes = []
                 disabled_hp_changes = {}
             if read_only_mode:
-                if data.has_key('recordRevision'):
+                if data.has_key('recordRevision') and data['recordRevision'] != 'sampleValue':
                     record_revision_ts = data['recordRevision']
                     record_xml = get_marcxml_of_revision(recid, \
                                                          record_revision_ts)
