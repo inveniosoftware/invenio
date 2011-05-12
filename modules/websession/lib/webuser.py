@@ -31,20 +31,15 @@ It also contains Apache-related user authentication stuff.
 
 __revision__ = "$Id$"
 
-from invenio import webinterface_handler_config as apache
-
 import cgi
 import urllib
 import urlparse
 from socket import gaierror
-import os
-import crypt
 import socket
 import smtplib
 import re
 import random
 import datetime
-import base64
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
@@ -53,15 +48,12 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN, \
      CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS, \
      CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
-     CFG_APACHE_GROUP_FILE, \
-     CFG_APACHE_PASSWORD_FILE, \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_SECURE_URL, \
-     CFG_TMPDIR, \
      CFG_SITE_URL, \
      CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
      CFG_CERN_SITE, \
@@ -219,7 +211,7 @@ def getUid(req):
         elif CFG_ACCESS_CONTROL_LEVEL_GUESTS >= 1:
             return -1
     else:
-        res = run_sql("SELECT note FROM user WHERE id=%s", (uid, ))
+        res = run_sql("SELECT note FROM user WHERE id=%s", (uid,))
         if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 0:
             return uid
         elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1 and res and res[0][0] in [1, "1"]:
@@ -279,7 +271,7 @@ def session_param_list(req):
 
 def get_last_login(uid):
     """Return the last_login datetime for uid if any, otherwise return the Epoch."""
-    res = run_sql('SELECT last_login FROM user WHERE id=%s', (uid, ), 1)
+    res = run_sql('SELECT last_login FROM user WHERE id=%s', (uid,), 1)
     if res and res[0][0]:
         return res[0][0]
     else:
@@ -294,7 +286,7 @@ def get_user_info(uid, ln=CFG_SITE_LANG):
     query = """SELECT id, nickname
                FROM user
                WHERE id=%s"""
-    res = run_sql(query, (uid, ))
+    res = run_sql(query, (uid,))
     if res:
         if res[0]:
             user = list(res[0])
@@ -310,7 +302,7 @@ def get_uid_from_email(email):
     """Return the uid corresponding to an email.
     Return -1 when the email does not exists."""
     try:
-        res = run_sql("SELECT id FROM user WHERE email=%s", (email, ))
+        res = run_sql("SELECT id FROM user WHERE email=%s", (email,))
         if res:
             return res[0][0]
         else:
@@ -404,7 +396,7 @@ def confirm_email(email):
     elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
         return -1
     run_sql('UPDATE user SET note=%s where email=%s', (activated, email))
-    res = run_sql('SELECT id FROM user where email=%s', (email, ))
+    res = run_sql('SELECT id FROM user where email=%s', (email,))
     if res:
         if CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS:
             send_new_admin_account_warning(email, CFG_SITE_ADMIN_EMAIL)
@@ -562,6 +554,17 @@ def loginUser(req, p_un, p_pw, login_method):
                     return([], p_email, p_pw_local, 19)
                 else:
                     return([], p_email, p_pw_local, 13)
+            elif CFG_EXTERNAL_AUTHENTICATION[login_method].enforce_external_nicknames:
+                ## Let's still fetch a possibly upgraded nickname.
+                try: # Let's discover the external nickname!
+                    p_nickname = CFG_EXTERNAL_AUTHENTICATION[login_method].fetch_user_nickname(p_email, p_pw, req)
+                    if nickname_valid_p(p_nickname) and nicknameUnique(p_nickname) == 0:
+                        updateDataUser(query_result[0][0], p_email, p_nickname)
+                except (AttributeError, NotImplementedError):
+                    pass
+                except:
+                    register_exception(alert_admin=True)
+                    raise
             try:
                 groups = CFG_EXTERNAL_AUTHENTICATION[login_method].fetch_user_groups_membership(p_email, p_pw, req)
                 # groups is a dictionary {group_name : group_description,}
@@ -628,7 +631,7 @@ def loginUser(req, p_un, p_pw, login_method):
         else:
             return ([], p_email, p_pw, 14)
     # Login successful! Updating the last access time
-    run_sql("UPDATE user SET last_login=NOW() WHERE email=%s", (p_email, ))
+    run_sql("UPDATE user SET last_login=NOW() WHERE email=%s", (p_email,))
     return (query_result, p_email, p_pw, 0)
 
 
@@ -790,17 +793,17 @@ def create_userinfobox_body(req, uid, language="en"):
     try:
         return tmpl.tmpl_create_userinfobox(ln=language,
                                             url_referer=url_referer,
-                                            guest = isGuestUser(uid),
-                                            username = get_nickname_or_email(uid),
-                                            submitter = user_info['precached_viewsubmissions'],
-                                            referee = user_info['precached_useapprove'],
-                                            admin = user_info['precached_useadmin'],
-                                            usebaskets = user_info['precached_usebaskets'],
-                                            usemessages = user_info['precached_usemessages'],
-                                            usealerts = user_info['precached_usealerts'],
-                                            usegroups = user_info['precached_usegroups'],
-                                            useloans = user_info['precached_useloans'],
-                                            usestats = user_info['precached_usestats']
+                                            guest=isGuestUser(uid),
+                                            username=get_nickname_or_email(uid),
+                                            submitter=user_info['precached_viewsubmissions'],
+                                            referee=user_info['precached_useapprove'],
+                                            admin=user_info['precached_useadmin'],
+                                            usebaskets=user_info['precached_usebaskets'],
+                                            usemessages=user_info['precached_usemessages'],
+                                            usealerts=user_info['precached_usealerts'],
+                                            usegroups=user_info['precached_usegroups'],
+                                            useloans=user_info['precached_useloans'],
+                                            usestats=user_info['precached_usestats']
                                             )
     except OperationalError:
         return ""
@@ -843,17 +846,17 @@ def create_useractivities_menu(req, uid, navmenuid, ln="en"):
             ln=ln,
             selected=is_user_menu_selected,
             url_referer=url_referer,
-            guest = isGuestUser(uid),
-            username = get_nickname_or_email(uid),
-            submitter = user_info['precached_viewsubmissions'],
-            referee = user_info['precached_useapprove'],
-            admin = user_info['precached_useadmin'],
-            usebaskets = user_info['precached_usebaskets'],
-            usemessages = user_info['precached_usemessages'],
-            usealerts = user_info['precached_usealerts'],
-            usegroups = user_info['precached_usegroups'],
-            useloans = user_info['precached_useloans'],
-            usestats = user_info['precached_usestats']
+            guest=isGuestUser(uid),
+            username=get_nickname_or_email(uid),
+            submitter=user_info['precached_viewsubmissions'],
+            referee=user_info['precached_useapprove'],
+            admin=user_info['precached_useadmin'],
+            usebaskets=user_info['precached_usebaskets'],
+            usemessages=user_info['precached_usemessages'],
+            usealerts=user_info['precached_usealerts'],
+            usegroups=user_info['precached_usegroups'],
+            useloans=user_info['precached_useloans'],
+            usestats=user_info['precached_usestats']
             )
     except OperationalError:
         return ""
@@ -890,7 +893,7 @@ def create_adminactivities_menu(req, uid, navmenuid, ln="en"):
     # current record whenever possible
     if activities.has_key(_("Run Record Editor")) or \
            activities.has_key(_("Run Document File Manager")) and \
-           user_info['uri'].startswith('/'+ CFG_SITE_RECORD +'/'):
+           user_info['uri'].startswith('/' + CFG_SITE_RECORD + '/'):
         try:
             # Get record ID and try to cast it to an int
             current_record_id = int(urlparse.urlparse(user_info['uri'])[2].split('/')[2])
@@ -907,18 +910,18 @@ def create_adminactivities_menu(req, uid, navmenuid, ln="en"):
             ln=ln,
             selected=navmenuid == 'admin',
             url_referer=url_referer,
-            guest = isGuestUser(uid),
-            username = get_nickname_or_email(uid),
-            submitter = user_info['precached_viewsubmissions'],
-            referee = user_info['precached_useapprove'],
-            admin = user_info['precached_useadmin'],
-            usebaskets = user_info['precached_usebaskets'],
-            usemessages = user_info['precached_usemessages'],
-            usealerts = user_info['precached_usealerts'],
-            usegroups = user_info['precached_usegroups'],
-            useloans = user_info['precached_useloans'],
-            usestats = user_info['precached_usestats'],
-            activities = activities
+            guest=isGuestUser(uid),
+            username=get_nickname_or_email(uid),
+            submitter=user_info['precached_viewsubmissions'],
+            referee=user_info['precached_useapprove'],
+            admin=user_info['precached_useadmin'],
+            usebaskets=user_info['precached_usebaskets'],
+            usemessages=user_info['precached_usemessages'],
+            usealerts=user_info['precached_usealerts'],
+            usegroups=user_info['precached_usegroups'],
+            useloans=user_info['precached_useloans'],
+            usestats=user_info['precached_usestats'],
+            activities=activities
             )
     except OperationalError:
         return ""
@@ -1071,7 +1074,7 @@ def collect_user_info(req, login_time=False, refresh=False):
         'referer' : '',
         'uri' : '',
         'agent' : '',
-        'uid' : -1,
+        'uid' :-1,
         'nickname' : '',
         'email' : '',
         'group' : [],
@@ -1202,7 +1205,7 @@ def collect_user_info(req, login_time=False, refresh=False):
                         set_user_preferences(uid, prefs)
                         prefs = get_user_preferences(uid)
 
-                    run_sql('UPDATE user SET last_login=NOW() WHERE id=%s', (uid, ))
+                    run_sql('UPDATE user SET last_login=NOW() WHERE id=%s', (uid,))
             if prefs:
                 for key, value in prefs.iteritems():
                     user_info[key.lower()] = value
