@@ -2450,10 +2450,8 @@ class BibDoc:
                 if not afile.startswith('.'):
                     try:
                         filepath = os.path.join(self.basedir, afile)
-                        fileversion = int(re.sub(".*;", "", afile))
-                        fullname = afile.replace(";%s" % fileversion, "")
+                        dirname, basename, format, fileversion = decompose_file_with_version(filepath)
                         checksum = self.md5s.get_checksum(afile)
-                        (dirname, basename, format) = decompose_file(fullname)
                         # we can append file:
                         self.docfiles.append(BibDocFile(filepath, self.doctype,
                             fileversion, basename, format,
