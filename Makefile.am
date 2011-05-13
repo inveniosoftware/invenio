@@ -160,8 +160,8 @@ install-jquery-plugins: install-jquery-plugins
 	wget http://github.com/malsup/form/raw/master/jquery.form.js --no-check-certificate && \
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
 	wget http://plugins.jquery.com/files/jquery.autogrow-1.2.2.zip && \
-	wget http://tablesorter.com/jquery.tablesorter.zip && \
-	wget http://www.uploadify.com/wp-content/uploads/Uploadify-v2.1.3.zip -O uploadify.zip && \
+	wget http://autobahn.tablesorter.com/jquery.tablesorter.zip && \
+	wget http://plugins.jquery.com/files/Uploadify-v2.1.3.zip -O uploadify.zip && \
 	wget http://www.datatables.net/download/build/jquery.dataTables.min.js && \
 	unzip jquery.tablesorter.zip && \
 	rm jquery.tablesorter.zip && \
@@ -222,8 +222,8 @@ uninstall-jquery-plugins:
 	rm -f jquery.autogrow.js && \
 	rm -f json2.js && \
 	rm -f jquery.uploadify.min.js && \
-	rm -f jquery.ui.slider.min.js && \
-	rm -f jquery.ui.sortable.min.js && \
+	rm -f ui.slider.min.js && \
+	rm -f ui.sortable.min.js && \
 	rm -f jquery.ui.tabs.min.js && \
 	rm -rf tablesorter && \
 	rm -f jquery.hotkeys.min.js && \
