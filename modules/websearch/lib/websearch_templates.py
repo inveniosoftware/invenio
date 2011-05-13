@@ -59,7 +59,7 @@ from invenio.config import \
      CFG_BIBINDEX_CHARS_PUNCTUATION, \
      CFG_WEBCOMMENT_ALLOW_COMMENTS, \
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
-     CFG_WEBSEARCH_WILDCARD_LIMIT,\
+     CFG_WEBSEARCH_WILDCARD_LIMIT, \
      CFG_WEBSEARCH_SHOW_COMMENT_COUNT, \
      CFG_WEBSEARCH_SHOW_REVIEW_COUNT, \
      CFG_SITE_RECORD
@@ -3368,7 +3368,7 @@ class Template:
                 out += "<!--not showing citations links-->"
         if display_claim_link: #Maybe we want not to show the link to who cannot use id?
             out += '<span class="moreinfo"> - %s</span>' % \
-                create_html_link(CFG_SITE_URL + '/person/action', {'claim':'True','selection':str(recID)},
+                create_html_link(CFG_SITE_URL + '/person/action', {'claim':'True', 'selection':str(recID)},
                                                                         'Attribute this paper',
                                                                         {'class': "moreinfo"})
 
@@ -3376,7 +3376,7 @@ class Template:
             num_comments = get_nb_comments(recID, count_deleted=False)
             if num_comments:
                 out += '<span class="moreinfo"> - %s</span>' % \
-                        create_html_link(CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + str(recID)
+                        create_html_link(CFG_SITE_URL + '/' + CFG_SITE_RECORD + '/' + str(recID)
                         + '/comments?ln=%s' % ln, {}, num_comments > 1 and _("%i comments")
                         % (num_comments) or _("1 comment"),
                         {'class': "moreinfo"})
@@ -3387,7 +3387,7 @@ class Template:
             num_reviews = get_nb_reviews(recID, count_deleted=False)
             if num_reviews:
                 out += '<span class="moreinfo"> - %s</span>' % \
-                        create_html_link(CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + str(recID)
+                        create_html_link(CFG_SITE_URL + '/' + CFG_SITE_RECORD + '/' + str(recID)
                         + '/reviews?ln=%s' % ln, {}, num_reviews > 1 and _("%i reviews")
                         % (num_reviews) or _("1 review"), {'class': "moreinfo"})
             else:
@@ -3490,12 +3490,12 @@ class Template:
         out = """<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
         <channel>
         <title>%(podcast_title)s</title>
-	<link>%(siteurl)s</link>
+    	<link>%(siteurl)s</link>
         <description>%(podcast_description)s</description>
         <language>%(sitelang)s</language>
         <pubDate>%(timestamp)s</pubDate>
         <category></category>
-	<generator>Invenio %(version)s</generator>
+	    <generator>Invenio %(version)s</generator>
         <webMaster>%(siteadminemail)s</webMaster>
         <ttl>%(timetolive)s</ttl>%(previous_link)s%(next_link)s%(current_link)s
         <image>
@@ -3507,13 +3507,13 @@ class Template:
         <itunes:email>%(siteadminemail)s</itunes:email>
         </itunes:owner>
         """ % {'sitename': CFG_SITE_NAME,
-	       'siteurl': CFG_SITE_URL,
+               'siteurl': CFG_SITE_URL,
                'sitelang': CFG_SITE_LANG,
                'siteadminemail': CFG_SITE_ADMIN_EMAIL,
                'timestamp': time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime()),
                'version': CFG_VERSION,
                'sitesupportemail': CFG_SITE_SUPPORT_EMAIL,
-	       'timetolive': CFG_WEBSEARCH_RSS_TTL,
+               'timetolive': CFG_WEBSEARCH_RSS_TTL,
                'current_link': (current_url and \
                                  '\n<atom:link rel="self" href="%s" />\n' % current_url) or '',
                'previous_link': (previous_url and \
@@ -3530,7 +3530,7 @@ class Template:
         return out
 
     def tmpl_xml_podcast_epilogue(self):
-	"""Creates XML podcast epilogue."""
+        """Creates XML podcast epilogue."""
         out = """\n</channel>
 </rss>\n"""
         return out

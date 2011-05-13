@@ -11498,8 +11498,8 @@ msgstr ""
 #~ msgid "older versions"
 #~ msgstr "старые версии"
 
-#~ msgid "Many thanks for helping us make CDS Invenio better."
-#~ msgstr "Большое спасибо за помощь в улучшении работы CDS Invenio."
+#~ msgid "Many thanks for helping us make Invenio better."
+#~ msgstr "Большое спасибо за помощь в улучшении работы Invenio."
 
 #~ msgid "Run BibEdit"
 #~ msgstr "Запуск BibEdit"
@@ -11724,8 +11724,8 @@ msgstr ""
 #~ msgid "Please send an error report to the Administrator."
 #~ msgstr "Пожалуйста отошлите сообщение об ошибке Администратору."
 
-#~ msgid "Hacking CDS Invenio"
-#~ msgstr "Документация для разработчиков CDS Invenio"
+#~ msgid "Hacking Invenio"
+#~ msgstr "Документация для разработчиков Invenio"
 
 #~ msgid "Invalid parameter"
 #~ msgstr "неверный параметр"
