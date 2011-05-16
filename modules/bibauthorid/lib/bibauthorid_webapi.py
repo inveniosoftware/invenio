@@ -45,7 +45,6 @@ from invenio.config import CFG_SITE_URL
 from invenio.mailutils import send_email
 
 
-
 def get_person_redirect_link(pid):
     '''
     Returns the canonical name of a pid if found, the pid itself otherwise
@@ -69,7 +68,7 @@ def get_person_id_from_canonical_id(canonical_id):
     @rtype: int
     '''
     if not canonical_id or not isinstance(canonical_id, str):
-        return -1
+        return - 1
 
     pid = -1
 
@@ -154,7 +153,7 @@ def get_person_id_from_paper(bibref=None):
     @rtype: int
     '''
     if not is_valid_bibref(bibref):
-        return -1
+        return - 1
 
     person_id = -1
     db_data = tu.get_papers_status([(bibref,)])
@@ -197,7 +196,8 @@ def get_papers_by_person_id(person_id= -1, rec_status= -2, ext_out=False):
     db_data = tu.get_person_papers((person_id,),
                                    rec_status,
                                    show_author_name=True,
-                                   show_title=False)
+                                   show_title=False,
+                                   show_rt_status=True)
     if not ext_out:
         records = [[row["data"].split(",")[1], row["data"], row["flag"],
                     row["authorname"]] for row in db_data]
@@ -207,6 +207,7 @@ def get_papers_by_person_id(person_id= -1, rec_status= -2, ext_out=False):
             bibref = row["data"]
             flag = row["flag"]
             authorname = row["authorname"]
+            rt_status = row['rt_status']
             gfoc = get_field_values_on_condition
             authoraff = ", ".join(gfoc(recid, ["100", "700"], "u", "a",
                                        authorname, source="API"))
@@ -215,7 +216,8 @@ def get_papers_by_person_id(person_id= -1, rec_status= -2, ext_out=False):
             except (IndexError):
                 date = ""
 
-            records.append([recid, bibref, flag, authorname, authoraff, date])
+            records.append([recid, bibref, flag, authorname,
+                            authoraff, date, rt_status])
 
 
     return records
@@ -239,7 +241,7 @@ def get_papers_cluster(bibref):
 
     return papers
 
-def get_person_request_ticket(pid=-1, tid=None):
+def get_person_request_ticket(pid= -1, tid=None):
     '''
     Returns the list of request tickets associated to a person.
     @param pid: person id
@@ -295,7 +297,7 @@ def get_person_db_names_from_id(person_id= -1):
     return tu.get_person_db_names_count((person_id,))
 
 
-def get_longest_name_from_pid(person_id=-1):
+def get_longest_name_from_pid(person_id= -1):
     '''
     Finds the longest name of a person to be representative for this person.
 
@@ -320,12 +322,38 @@ def get_longest_name_from_pid(person_id=-1):
         return "This person does not seem to have a name!"
 
 
-def get_paper_status(person_id, bibref):
+def get_most_frequent_name_from_pid(person_id= -1):
+    '''
+    Finds the most frequent name of a person to be
+    representative for this person.
+
+    @param person_id: the person ID to look at
+    @type person_id: int
+
+    @return: returns the most frequent normalized name of a person
+    @rtype: string
+    '''
+    if (not person_id > -1) or (not isinstance(person_id, int)):
+        return "'%s' doesn't look like a person ID!" % person_id
+
+    mf_name = ""
+
+    try:
+        nn = tu.get_person_names_count((person_id,))
+        mf_name = sorted(nn, key=lambda k:k[1], reverse=True)[0][0]
+    except IndexError:
+        pass
+
+    if mf_name:
+        return mf_name
+    else:
+        return "This person does not seem to have a name!"
+
+
+def get_paper_status(bibref):
     '''
     Finds an returns the status of a bibrec to person assignment
 
-    @param person_id: the id of the person to check against
-    @type person_id: int
     @param bibref: the bibref-bibrec pair that unambiguously identifies a paper
     @type bibref: string
     '''
@@ -414,16 +442,21 @@ def is_valid_canonical_id(cid):
     if not cid.count("."):
         return False
 
+    xcheck = -1
     sp = cid.split(".")
+
     if not (len(sp) > 1 and sp[-1]):
         return False
 
     try:
-        x = int(sp[-1])
+        xcheck = int(sp[-1])
     except (ValueError, TypeError, IndexError):
         return False
 
-    return True
+    if xcheck and xcheck > -1:
+        return True
+    else:
+        return False
 
 
 def confirm_person_bibref_assignments(person_id, bibrefs, uid):
@@ -879,14 +912,14 @@ def arxiv_login(req):
 
     found_bibrecs = []
     for arx in arxiv_p_ids:
-        t = search_engine.perform_request_search(p='037:'+str(arx), of='id')
+        t = search_engine.perform_request_search(p='037:' + str(arx), of='id')
         for i in t:
             found_bibrecs.append(i)
     #found_bibrecs = [78]
 
     bibrec_names = []
     for b in found_bibrecs:
-        bibrec_names.append([b, bu.get_field_values_on_condition(b, source='API', get_table=['100','700'], get_tag='a')])
+        bibrec_names.append([b, bu.get_field_values_on_condition(b, source='API', get_table=['100', '700'], get_tag='a')])
 
     for n in list(bibrec_names):
         for i in list(n[1]):
@@ -903,33 +936,36 @@ def arxiv_login(req):
             if len(bibrefs) < 1:
                 continue
             for bibref in bibrefs[0][0].split(','):
-                bibrefrecs.append(str(bibref)+','+str(bibrec[0]))
+                bibrefrecs.append(str(bibref) + ',' + str(bibrec[0]))
     #bibrefrec = ['100:116,78', '700:505,78']
 
 
     brr = [[i] for i in bibrefrecs]
     possible_persons = tu.get_possible_personids_from_paperlist(brr)
     #[[0L, ['700:316,10']]]
-    possible_persons = sorted(possible_persons, key = lambda k: len(k[1]))
+    possible_persons = sorted(possible_persons, key=lambda k: len(k[1]))
 
+    person_papers = []
     if len(possible_persons) > 1:
         if len(possible_persons[0][1]) > len(possible_persons[1][1]):
             pid = tu.assign_person_to_uid(uid, possible_persons[0][0])
+            person_papers = possible_persons[0][1]
         else:
             pid = tu.assign_person_to_uid(uid, -1)
     elif len(possible_persons) == 1:
         pid = tu.assign_person_to_uid(uid, possible_persons[0][0])
+        person_papers = possible_persons[0][1]
     else:
         pid = tu.assign_person_to_uid(uid, -1)
 
     tempticket = []
     #now we have to open the tickets...
-    for bibref in bibrefrecs:
+    for bibref in person_papers:
         tempticket.append({'pid':pid, 'bibref':bibref, 'action':'confirm'})
 
-    done_bibrecs = [b.split(',')[1] for b in bibrefrecs]
+    done_bibrecs = [b.split(',')[1] for b in person_papers]
     for b in found_bibrecs:
-        if b not in done_bibrecs:
+        if str(b) not in done_bibrecs:
             tempticket.append({'pid':pid, 'bibref':str(b), 'action':'confirm'})
 
     #check if ticket targets (bibref for pid) are already in ticket
@@ -942,13 +978,15 @@ def arxiv_login(req):
     return pid
 
 
-def user_can_perform_action(uid, action, target_pid):
+def external_user_can_perform_action(uid):
     '''
-    ArXive login and stuff checking
-    @param uid: the user ID to check permissions for
-    @param action: in ['claim_own_paper','claim_other_paper']
+    Check for SSO user and if external claims will affect the
+    decision wether or not the user may use the Invenio claiming platform
 
-    @return: is user allowed to perform action?
+    @param uid: the user ID to check permissions for
+    @type uid: int
+
+    @return: is user allowed to perform actions?
     @rtype: boolean
     '''
     #If no EXTERNAL_CLAIMED_RECORDS_KEY we bypass this check
@@ -969,16 +1007,42 @@ def user_can_perform_action(uid, action, target_pid):
 
     return full_key
 
+def is_external_user(uid):
+    '''
+    Check for SSO user and if external claims will affect the
+    decision wether or not the user may use the Invenio claiming platform
 
-def check_transaction_permissions(uid, ulevel, bibref, pid, action):
+    @param uid: the user ID to check permissions for
+    @type uid: int
+
+    @return: is user allowed to perform actions?
+    @rtype: boolean
+    '''
+    #If no EXTERNAL_CLAIMED_RECORDS_KEY we bypass this check
+    if not bconfig.EXTERNAL_CLAIMED_RECORDS_KEY:
+        return False
+
+    uinfo = collect_user_info(uid)
+    keys = []
+    for k in bconfig.EXTERNAL_CLAIMED_RECORDS_KEY:
+        if k in uinfo:
+            keys.append(k)
+
+    full_key = False
+    for k in keys:
+        if uinfo[k]:
+            full_key = True
+            break
+
+    return full_key
+
+def check_transaction_permissions(uid, bibref, pid, action):
     '''
     Check if the user can perform the given action on the given pid,bibrefrec pair.
     return in: granted, denied, warning_granted, warning_denied
 
     @param uid: The internal ID of a user
     @type uid: int
-    @param ulevel: the level of the currently logged in user
-    @type ulevel: string
     @param bibref: the bibref pair to check permissions for
     @type bibref: string
     @param pid: the Person ID to check on
@@ -986,13 +1050,13 @@ def check_transaction_permissions(uid, ulevel, bibref, pid, action):
     @param action: the action that is to be performed
     @type action: string
 
-    @return: granted, denied, warning_granted, warning_denied
+    @return: granted, denied, warning_granted xor warning_denied
     @rtype: string
     '''
     c_own = True
     c_override = False
     is_superadmin = False
-    if isUserSuperAdmin({'uid':uid}):
+    if isUserSuperAdmin({'uid': uid}):
         is_superadmin = True
 
     access_right = _resolve_maximum_acces_rights(uid)
@@ -1020,7 +1084,7 @@ def check_transaction_permissions(uid, ulevel, bibref, pid, action):
         action = bconfig.CLAIMPAPER_CLAIM_OWN_PAPERS
     else:
         action = bconfig.CLAIMPAPER_CLAIM_OTHERS_PAPERS
-    auth = acc_authorize_action(uid,action)
+    auth = acc_authorize_action(uid, action)
     if auth[0] != 0:
         return "denied"
 
@@ -1030,7 +1094,7 @@ def check_transaction_permissions(uid, ulevel, bibref, pid, action):
     else:
         action = 'claim_other_paper'
 
-    ext_permission = user_can_perform_action(uid, action, pid)
+    ext_permission = external_user_can_perform_action(uid)
 
     #if we are here invenio is allowing the thing and we are not overwriting a
     #user with higher privileges, if externals are ok we go on!
@@ -1041,6 +1105,7 @@ def check_transaction_permissions(uid, ulevel, bibref, pid, action):
             return "warning_granted"
 
     return "denied"
+
 
 def delete_request_ticket(pid, ticket):
     '''
@@ -1061,7 +1126,7 @@ def delete_transaction_from_request_ticket(pid, tid, action, bibref):
     '''
     rt = get_person_request_ticket(pid, tid)
     if len(rt) > 0:
-        rt_num = rt[0][1]
+#        rt_num = rt[0][1]
         rt = rt[0][0]
     else:
         return
@@ -1102,7 +1167,7 @@ def create_request_ticket(userinfo, ticket):
     m("\nLinks to all issued Person-based requests:\n")
 
     for i in userinfo:
-        udata.append([i,userinfo[i]])
+        udata.append([i, userinfo[i]])
 
     tic = {}
     for t in ticket:
@@ -1121,19 +1186,19 @@ def create_request_ticket(userinfo, ticket):
         if t['action'] == 'assign':
             t['action'] = 'confirm'
 
-        tic[t['pid']].append([t['action'],t['bibref']])
+        tic[t['pid']].append([t['action'], t['bibref']])
 
     for pid in tic:
         data = []
         for i in udata:
             data.append(i)
-        data.append(['date',ctime()])
+        data.append(['date', ctime()])
         for i in tic[pid]:
             data.append(i)
         tu.update_request_ticket(pid, data)
         pidlink = get_person_redirect_link(pid)
 
-        m("%s/person/%s#tabTickets" % (CFG_SITE_URL, pidlink))
+        m("%s/person/%s?open_claim=True#tabTickets" % (CFG_SITE_URL, pidlink))
 
     m("\nPlease remember that you have to be logged in "
       "in order to see the ticket of a person.\n")
@@ -1154,7 +1219,7 @@ def create_request_ticket(userinfo, ticket):
 
 def user_can_view_CMP(uid):
     action = bconfig.CLAIMPAPER_VIEW_PID_UNIVERSE
-    auth = acc_authorize_action(uid,action)
+    auth = acc_authorize_action(uid, action)
     if auth[0] == 0:
         return True
     else:
@@ -1168,7 +1233,7 @@ def _resolve_maximum_acces_rights(uid):
     Always returns the maximum privilege.
     '''
 
-    roles= {bconfig.CLAIMPAPER_ADMIN_ROLE: acc_get_role_id(bconfig.CLAIMPAPER_ADMIN_ROLE),
+    roles = {bconfig.CLAIMPAPER_ADMIN_ROLE: acc_get_role_id(bconfig.CLAIMPAPER_ADMIN_ROLE),
             bconfig.CLAIMPAPER_USER_ROLE: acc_get_role_id(bconfig.CLAIMPAPER_USER_ROLE)}
     uroles = acc_get_user_roles(uid)
 
@@ -1183,11 +1248,23 @@ def _resolve_maximum_acces_rights(uid):
     return max_role
 
 
-
 def create_new_person(uid, uid_is_owner=False):
-    pid = tu.create_new_person(uid, uid_is_owner=False)
+    '''
+    Create a new person.
+
+    @param uid: User ID to attach to the person
+    @type uid: int
+    @param uid_is_owner: Is the uid provided owner of the new person?
+    @type uid_is_owner: bool
+
+    @return: the resulting person ID of the new person
+    @rtype: int
+    '''
+    pid = tu.create_new_person(uid, uid_is_owner=uid_is_owner)
+
     return pid
-    
+
+
 def execute_action(action, pid, bibref, uid, userinfo='', comment=''):
     '''
     Executes the action, setting the last user right according to uid

@@ -31,7 +31,7 @@ import cgi
 import re
 import calendar
 
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.webuser import collect_user_info, page_not_authorized
 from invenio.config import CFG_BINDIR, CFG_TMPDIR, CFG_LOGDIR, \
@@ -168,8 +168,10 @@ def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None
 
     # run upload command:
     if exec_date:
-        date = "\'" + exec_date + ' ' + exec_time + "\'"
-        jobid = task_low_level_submission('bibupload', user_info['nickname'], mode, "--name=" + metafilename, "--priority=" + priority,"-t", date, filename)
+        date = exec_date
+        if exec_time:
+            date += ' ' + exec_time
+        jobid = task_low_level_submission('bibupload', user_info['nickname'], mode, "--name=" + metafilename, "--priority=" + priority, "-t", date, filename)
     else:
         jobid = task_low_level_submission('bibupload', user_info['nickname'], mode, "--name=" + metafilename, "--priority=" + priority, filename)
 
@@ -550,8 +552,12 @@ def _detect_collections_from_marcxml_file(recs):
                                                      ind1=oaiid_tag[3],
                                                      ind2=oaiid_tag[4],
                                                      code=oaiid_tag[5]):
-                record = find_records_from_extoaiid(tag_oaiid)
-                if record:
+                try:
+                    records = find_records_from_extoaiid(tag_oaiid)
+                except Error:
+                    records = []
+                if records:
+                    record = records.pop()
                     collection = guess_collection_of_a_record(int(record))
                     dbcollids[collection] = 1
             for tag_oai in record_get_field_values(rec, tag=oai_tag[0:3],

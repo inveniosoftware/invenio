@@ -18,7 +18,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-import bibauthorid_tables_utils as baidtu
 import bibauthorid_utils as baidu
 import bibauthorid_authorname_utils as bau
 from invenio.testutils import make_test_suite, run_test_suite

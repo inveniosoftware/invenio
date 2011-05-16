@@ -1,4 +1,4 @@
 <name>Default HTML files</name>
 <description>Outputs the available files for a record</description>
 
-<BFE_FULLTEXT_mini show_icons="yes" separator='<br />' default='<br/><br/><span style="color:#aaa;">_(No fulltext)_</span>'/>
+<BFE_FULLTEXT_mini show_icons="yes" separator='<br />' default='<br/>'/>

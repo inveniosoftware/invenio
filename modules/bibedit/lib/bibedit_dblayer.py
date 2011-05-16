@@ -49,6 +49,14 @@ def get_marcxml_of_record_revision(recid, job_date):
                        WHERE id_bibrec=%s AND job_date=%s""",
                    (recid, job_date))
 
+def get_info_of_record_revision(recid, job_date):
+    """Return info string regarding record revision specified by RECID and JOB_DATE.
+
+    """
+    return run_sql("""SELECT job_id, job_person, job_details FROM hstRECORD
+                       WHERE id_bibrec=%s AND job_date=%s""",
+                   (recid, job_date))
+
 def get_record_revisions(recid):
     """Return dates for all known revisions of record RECID.
       returns a list of tuples (record_id, revision_date)

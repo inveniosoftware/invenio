@@ -20,16 +20,6 @@
 import MySQLdb
 import os
 import cgi
-import sys
-if sys.hexversion < 0x2060000:
-    try:
-        import simplejson as json
-    except ImportError:
-        # Okay, no Ajax app will be possible, but continue anyway,
-        # since this package is only recommended, not mandatory.
-        pass
-else:
-    import json
 
 from invenio import bibknowledge, bibknowledgeadminlib
 from invenio.bibrankadminlib import check_user
@@ -582,10 +572,12 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
 def kb_export(req, kbname="", format="kbr", searchkey="", searchvalue="", searchtype="s", ln=CFG_SITE_LANG):
     """
     Exports the given kb so that it is listed in stdout (the browser).
+
     @param req the request
     @param kbname knowledge base name
     @param expression evaluate this for the returned lines
-    @param format kba for an authority file, kbr for a leftside-rightside kb
+    @param format 'kba' for authority file, 'kbr' for leftside-rightside, json
+                  for json-formatted dictionaries
     @param searchkey include only lines that match this on the left side
     @param searchvalue include only lines that match this on the right side
     @param searchtype s = substring match, e = exact match
@@ -621,47 +613,54 @@ def kb_export(req, kbname="", format="kbr", searchkey="", searchvalue="", search
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__,
                     req=req)
+
     if kbtype == None or kbtype == 'w':
-        #get the kb and print it
+        # left side / right side KB
         mappings = bibknowledge.get_kb_mappings(kbname, searchkey, \
                                                 searchvalue, searchtype)
-        if format == 'jquery':
-            ret = []
-            for m in mappings:
-                label = m['value'] or m['key']
-                value = m['key'] or m['value']
-                ret.append({'label': label, 'value': value})
-            req.content_type = 'application/json'
-            return json.dumps(ret)
         if not mappings:
-            body = _("There is no knowledge base named %sor it is empty") % cgi.escape(kbname),
+            body = _("There is no knowledge base named %s or it is empty") % cgi.escape(kbname),
             return page(title=_("No such knowledge base"),
                         body=body,
                         language=ln,
                         navtrail=navtrail_previous_links,
                         lastupdated=__lastupdated__,
                         req=req)
-        else: #there were mappings
-            seq = [] #sequence: right sides need to made unique
+
+        if format and format[0] == 'j':
+            # as JSON formatted string
+            req.content_type = 'application/json'
+            return bibknowledge.get_kb_mappings_json(kbname, searchkey, \
+                                                    searchvalue, searchtype)
+
+        elif format == 'right' or format == 'kba':
+            # as authority sequence
+            seq = [m['value'] for m in mappings]
+            seq = uniq(sorted(seq))
+            for s in seq:
+                req.write(s+"\n");
+            return
+
+        else:
+            # as regularly formatted left-right mapping
             for m in mappings:
-                mkey = m['key']
-                mvalue = m['value']
-                if format == "right" or format == "kba":
-                    seq.append(mvalue)
-                else:
-                    req.write(mkey+"---"+mvalue+"\n")
-            #make unique seq and print it
-            useq = uniq(seq)
-            for s in useq:
-                req.write(s+"\n")
-    if kbtype == 'd': #dynamic type: call export
-        #ok, let's search..
-        res = bibknowledge.get_kbd_values(kbname, searchvalue)
-        if not res:
-            req.write("\n") #in order to say something
-        for r in res:
-            req.write(r+"\n") #output values
-    if kbtype == 't': #taxonomy: output the file
+                req.write(m['key'] + '---' + m['value'] + '\n')
+            return
+
+    elif kbtype == 'd':
+        # dynamic kb, another interface for perform_request_search
+        if format and format[0] == 'j':
+            req.content_type = "application/json"
+            return bibknowledge.get_kbd_values_json(kbname, searchvalue)
+
+        else:
+            # print it as a list of values
+            for hit in bibknowledge.get_kbd_values(kbname, searchvalue):
+                req.write(hit + '\n')
+            req.write('\n')
+            return
+
+    elif kbtype == 't': #taxonomy: output the file
         kbfilename = CFG_WEBDIR+"/kbfiles/"+str(kbid)+".rdf"
         try:
             f = open(kbfilename, 'r')
@@ -670,6 +669,11 @@ def kb_export(req, kbname="", format="kbr", searchkey="", searchvalue="", search
             f.close()
         except:
             req.write("Reading the file "+kbfilename+" failed.")
+
+    else:
+        # This situation should never happen
+        raise ValueError, "Unsupported KB Type: %s" % kbtype
+
 
 def kb_add(req, ln=CFG_SITE_LANG, sortby="to", kbtype=""):
     """

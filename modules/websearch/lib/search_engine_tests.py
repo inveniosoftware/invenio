@@ -268,6 +268,7 @@ class TestQueryParser(unittest.TestCase):
         self._check('author:  "Ellis, J"', None, None,
                     [['+', 'Ellis, J', 'author', 'a']])
 
+
 TEST_SUITE = make_test_suite(TestWashQueryParameters,
                              TestStripAccents,
                              TestQueryParser,

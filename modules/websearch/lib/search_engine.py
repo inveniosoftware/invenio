@@ -228,7 +228,10 @@ def ziplist(*lists):
        [[f1, p1, op1], [f2, p2, op2], [f3, p3, '']]
 
     FIXME: This is handy to have, and should live somewhere else, like
-    miscutil.really_useful_functions or something.
+           miscutil.really_useful_functions or something.
+    XXX: Starting in python 2.6, the same can be achieved (faster) by
+         using itertools.izip_longest(); when the minimum recommended Python
+         is bumped, we should use that instead.
     """
     def l(*items):
         return list(items)
@@ -1313,17 +1316,24 @@ def wash_colls(cc, c, split_colls=0, verbose=0):
         debug += "<br />colls_out_for_display : %s" % colls_out_for_display
         debug += "<br />"
 
+    # FIXME: The below quoted part of the code has been commented out
+    # because it prevents searching in individual restricted daughter
+    # collections when both parent and all its public daughter
+    # collections were asked for, in addition to some restricted
+    # daughter collections.  The removal was introduced for hosted
+    # collections, so we may want to double check in this context.
+
     # the following piece of code takes care of removing collections whose ancestors are going to be searched anyway
     # list to hold the collections to be removed
-    colls_to_be_removed = []
+    #colls_to_be_removed = []
     # first calculate the collections that can safely be removed
-    for coll in colls_out_for_display:
-        for ancestor in get_coll_ancestors(coll):
-            #if ancestor in colls_out_for_display: colls_to_be_removed.append(coll)
-            if ancestor in colls_out_for_display and not is_hosted_collection(coll): colls_to_be_removed.append(coll)
+    #for coll in colls_out_for_display:
+    #    for ancestor in get_coll_ancestors(coll):
+    #        #if ancestor in colls_out_for_display: colls_to_be_removed.append(coll)
+    #        if ancestor in colls_out_for_display and not is_hosted_collection(coll): colls_to_be_removed.append(coll)
     # secondly remove the collections
-    for coll in colls_to_be_removed:
-        colls_out_for_display.remove(coll)
+    #for coll in colls_to_be_removed:
+    #    colls_out_for_display.remove(coll)
 
     if verbose:
         debug += "<br />6) --- remove collections that have ancestors about to be search, unless they are hosted ---"
@@ -1658,6 +1668,15 @@ def get_colID(c):
     if res:
         colID = res[0][0]
     return colID
+
+def get_coll_normalised_name(c):
+    """Returns normalised collection name (case sensitive) for collection name
+       C (case insensitive).
+       Returns None if no match found."""
+    try:
+        return run_sql("SELECT name FROM collection WHERE name=%s", (c,))[0][0]
+    except:
+        return None
 
 def get_coll_ancestors(coll):
     "Returns a list of ancestors for collection 'coll'."
@@ -2412,6 +2431,12 @@ def search_unit_in_bibrec(datetext1, datetext2, type='c'):
         type = "modification_date"
     else:
         type = "creation_date" # by default we are searching for creation dates
+
+    parts = datetext1.split('->')
+    if len(parts) > 1 and datetext1 == datetext2:
+        datetext1 = parts[0]
+        datetext2 = parts[1]
+
     if datetext1 == datetext2:
         res = run_sql("SELECT id FROM bibrec WHERE %s LIKE %%s" % (type,),
                       (datetext1 + '%',))
@@ -2983,10 +3008,15 @@ def guess_collection_of_a_record(recID, referer=None, recreate_cache_if_needed=T
        primary collection."""
     if referer:
         dummy, hostname, path, dummy, query, dummy = urlparse.urlparse(referer)
+        #requests can come from different invenio installations, with different collections
+        if CFG_SITE_URL.find(hostname) < 0:
+            return guess_primary_collection_of_a_record(recID)
         g = _re_collection_url.match(path)
         if g:
             name = urllib.unquote_plus(g.group(1))
-            if recID in get_collection_reclist(name):
+            #check if this collection actually exist (also normalize the name if case-insensitive)
+            name = get_coll_normalised_name(name)
+            if name and recID in get_collection_reclist(name):
                 return name
         elif path.startswith('/search'):
             if recreate_cache_if_needed:

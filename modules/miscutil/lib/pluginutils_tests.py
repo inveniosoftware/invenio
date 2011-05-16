@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 import os
 
 from invenio.config import CFG_PYLIBDIR
-from invenio.pluginutils import PluginContainer
+from invenio.pluginutils import PluginContainer, create_enhanced_plugin_builder
 from invenio.bibformat_config import CFG_BIBFORMAT_ELEMENTS_PATH
 from invenio.external_authentication import ExternalAuth
 from invenio.testutils import make_test_suite, run_test_suite
@@ -39,12 +39,24 @@ class TestPluginContainer(unittest.TestCase):
     """
     def test_plugin_container_wrapping_bibformat_elements(self):
         """pluginutils - wrapping bibformat elements"""
-        def bibformat_signature(bfo, *args, **argd):
+        def format_signature(bfo, *args, **argd):
             pass
-        bibformat_elements = PluginContainer(os.path.join(CFG_BIBFORMAT_ELEMENTS_PATH, 'bfe_*.py'), plugin_signature=bibformat_signature, plugin_builder=lambda plugin_name, plugin_code: getattr(plugin_code, 'format_element'))
+
+        def escape_values_signature(bfo):
+            pass
+
+        plugin_builder = create_enhanced_plugin_builder(
+            compulsory_objects={
+                'format_element' : format_signature,
+            },
+            optional_objects={
+                'escape_values' : escape_values_signature,
+            })
+        bibformat_elements = PluginContainer(os.path.join(CFG_BIBFORMAT_ELEMENTS_PATH, 'bfe_*.py'),
+            plugin_builder=plugin_builder)
 
         self.failUnless(bibformat_elements['bfe_fulltext'])
-        self.failUnless(callable(bibformat_elements['bfe_fulltext']))
+        self.failUnless(callable(bibformat_elements['bfe_fulltext']['format_element']))
         self.failUnless(len(bibformat_elements) >= 50)
 
     def test_plugin_container_wrapping_websubmit_functions(self):
@@ -54,7 +66,7 @@ class TestPluginContainer(unittest.TestCase):
         self.failUnless(websubmit_functions['Is_Referee'])
         self.failUnless(websubmit_functions['CaseEDS'])
         self.failUnless(callable(websubmit_functions['CaseEDS']))
-        self.failUnless(len(websubmit_functions) >= 62)
+        self.failUnless(len(websubmit_functions) >= 62, 'There should exist at least 62 websubmit_functions. Found: %s' % len(websubmit_functions))
         ## Retrieve_Data and Shared_Functions are not real plugins
         self.failUnless(len(websubmit_functions.get_broken_plugins()) >= 2)
         self.failIf(websubmit_functions.get('Shared_Functions'))

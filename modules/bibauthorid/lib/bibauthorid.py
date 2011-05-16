@@ -291,16 +291,18 @@ def computation_process_starter(i, mp_termination_queue, job_mp_queue,
             if populate_doclist:
                 populate_doclist_for_author_surname(lname, job_last_names)
 
-            start_computation(process_orphans=process_orphans)
+            start_computation(process_orphans=process_orphans,
+                              process_doclist=process_doclist,
+                              print_stats=print_stats)
             post_remove_names = set()
 
-            # The following snippet finds additionally processed last names
-            # and removes them from the processing queue. E.g. 't hooft and t'hooft
+            # The following snippet finds additionally processed last names and
+            # removes them from the processing queue. E.g. 't hooft and t'hooft
             for name in [row['name'] for row in dat.AUTHOR_NAMES
                          if not row['processed']]:
-                potential_removal = "%s" % (name.split(',')[0],)
+                potential_removal = "%s" % (name.split(',')[0])
 
-                if not potential_removal == "%s" % (lname,):
+                if not potential_removal == "%s" % (lname):
                     post_remove_names.add(potential_removal)
 
             if len(post_remove_names) > 0:

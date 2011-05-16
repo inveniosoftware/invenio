@@ -223,6 +223,10 @@ div .boxleft_2 {
     color:#000000;
 }
 
+.buttonDisabled{
+    background:grey;
+}
+
 </style>
         """
         return styles

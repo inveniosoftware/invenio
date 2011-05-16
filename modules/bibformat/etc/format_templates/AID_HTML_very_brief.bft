@@ -12,8 +12,6 @@ prefix = '<small class="quicknote"> ['
 suffix="]</small> "
 separator="] [" link="no"/>
 
-<BFE_DATE /><BFE_PRIMARY_REPORT_NUMBER
-prefix = '<small class="quicknote"> ['
-suffix="]</small> " />
+<BFE_DATE />
 
 <BFE_PUBLI_INFO prefix="<br /><small>Published in <strong>" suffix="</strong></small>" />

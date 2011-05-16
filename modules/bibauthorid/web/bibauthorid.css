@@ -46,9 +46,8 @@
     color:white;
     padding:5px 0px 5px 0px;
     border:1px solid #99cc33;
-        background:#c2e085;
+    background:#c2e085;
     vertical-align:middle;
-
 }
 
 #aid_message-overlay span {
@@ -75,7 +74,7 @@
 }
 
 #aid_moreinfo {
-    background: #E6EEEE;
+    background: #F0F0F6;
     margin: 10px;
     padding: 10px;
 }
@@ -99,22 +98,23 @@
 #aid_result0 {
     background: #fff;
     margin: 5px;
-    padding: 10px;
+    padding: 20px 15px;
 }
 
 #aid_result1 {
     background: #F0F0F6;
     margin: 5px;
-    padding: 10px;
+    padding: 20px 15px;
 }
 
 #aid_moreinfolink {
     font-size:12px;
+    text-decoration: none;
 }
 
 #aid_message-ribbon {
-	border:solid 1px #ccc;
-	background:#ABC8E2; margin: 10px 0;
+    border:solid 1px #ccc;
+    background:#ABC8E2; margin: 10px 0;
   	padding:10px;
 }
 
@@ -166,6 +166,12 @@
 
 #aid_person_names {
     margin: 35px 10px;
+}
+
+#aid_checkout_teaser {
+    color:#009900;
+    font-weight:bold;
+    font-size:1.2em;
 }
 
 #aid_person_names ul {
@@ -265,6 +271,7 @@
       height: 25px;
       color: #ffffff;
 }
+
 /* Hack for the dataTables jQuery UI wrapper classes */
 .dataTables_wrapper {
     clear: both;

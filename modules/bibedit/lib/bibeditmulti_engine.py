@@ -355,7 +355,7 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
     @param compute_modifications: if equals 0 do not compute else compute modifications
     @type compute_modifications: int
     """
-    RECORDS_PER_PAGE = 10
+    RECORDS_PER_PAGE = 100
     response = {}
 
     if collection == "Any collection":
@@ -490,6 +490,9 @@ def _get_formated_record(record_id, output_format, update_commands, language, ou
                 for tag in outputTags:
                     if tag in line.split()[1]:
                         result += line.strip() + '\n'
+                    elif '<strong' in line:
+                        if tag in line.split()[3]:
+                            result += line.strip() + '\n'
         else:
             result += _get_record_diff(record_id, old_record, updated_record)
 

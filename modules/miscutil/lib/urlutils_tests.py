@@ -84,59 +84,57 @@ class TestUrls(unittest.TestCase):
                                                  'b': ('str', 2)}),
                          "?b%26=2%3D&amp;%3A=%3F%26&amp;b=2")
 
-    def test_signed_aws_request_creation(self):
-        """urlutils - test creation of signed AWS requests"""
+    if HASHLIB_IMPORTED:
+        def test_signed_aws_request_creation(self):
+            """urlutils - test creation of signed AWS requests"""
 
-        if not HASHLIB_IMPORTED:
-            self.fail("SKIPPED: Hashlib not available, test skipped.")
+            signed_aws_request_url = create_AWS_request_url("http://webservices.amazon.com/onca/xml",
+                                                            {'AWSAccessKeyId': '00000000000000000000',
+                                                             'Service': 'AWSECommerceService',
+                                                             'Operation': 'ItemLookup',
+                                                             'ItemId': '0679722769',
+                                                             'ResponseGroup': 'ItemAttributes,Offers,Images,Reviews',
+                                                             'Version': '2009-01-06'},
+                                                            "1234567890",
+                                                            _timestamp="2009-01-01T12:00:00Z")
 
-        signed_aws_request_url = create_AWS_request_url("http://webservices.amazon.com/onca/xml",
-                                                        {'AWSAccessKeyId': '00000000000000000000',
-                                                         'Service': 'AWSECommerceService',
-                                                         'Operation': 'ItemLookup',
-                                                         'ItemId': '0679722769',
-                                                         'ResponseGroup': 'ItemAttributes,Offers,Images,Reviews',
-                                                         'Version': '2009-01-06'},
-                                                        "1234567890",
-                                                        _timestamp="2009-01-01T12:00:00Z")
+            # Are we at least acccessing correct base url?
+            self.assert_(signed_aws_request_url.startswith("http://webservices.amazon.com/onca/xml"))
 
-        # Are we at least acccessing correct base url?
-        self.assert_(signed_aws_request_url.startswith("http://webservices.amazon.com/onca/xml"))
+            # Check that parameters with special characters (, :) get correctly
+            # encoded/decoded
+            ## Note: using parse_qs() url-decodes the string
+            self.assertEqual(parse_qs(signed_aws_request_url)["ResponseGroup"],
+                             ['ItemAttributes,Offers,Images,Reviews'])
+            self.assert_('ItemAttributes%2COffers%2CImages%2CReviews' \
+                         in signed_aws_request_url)
 
-        # Check that parameters with special characters (, :) get correctly
-        # encoded/decoded
-        ## Note: using parse_qs() url-decodes the string
-        self.assertEqual(parse_qs(signed_aws_request_url)["ResponseGroup"],
-                         ['ItemAttributes,Offers,Images,Reviews'])
-        self.assert_('ItemAttributes%2COffers%2CImages%2CReviews' \
-                     in signed_aws_request_url)
+            self.assertEqual(parse_qs(signed_aws_request_url)["Timestamp"],
+                             ['2009-01-01T12:00:00Z'])
 
-        self.assertEqual(parse_qs(signed_aws_request_url)["Timestamp"],
-                         ['2009-01-01T12:00:00Z'])
+            # Check signature exists and is correct
+            self.assertEqual(parse_qs(signed_aws_request_url)["Signature"],
+                             ['Nace+U3Az4OhN7tISqgs1vdLBHBEijWcBeCqL5xN9xg='])
+            self.assert_('Nace%2BU3Az4OhN7tISqgs1vdLBHBEijWcBeCqL5xN9xg%3D&Operation' \
+                         in signed_aws_request_url)
 
-        # Check signature exists and is correct
-        self.assertEqual(parse_qs(signed_aws_request_url)["Signature"],
-                         ['Nace+U3Az4OhN7tISqgs1vdLBHBEijWcBeCqL5xN9xg='])
-        self.assert_('Nace%2BU3Az4OhN7tISqgs1vdLBHBEijWcBeCqL5xN9xg%3D&Operation' \
-                     in signed_aws_request_url)
-
-        # Continute with an additional request
-        signed_aws_request_url_2 = \
-                                 create_AWS_request_url("http://ecs.amazonaws.co.uk/onca/xml",
-                                                        {'AWSAccessKeyId': '00000000000000000000',
-                                                         'Actor': 'Johnny Depp',
-                                                         'AssociateTag': 'mytag-20',
-                                                         'Operation': 'ItemSearch',
-                                                         'ResponseGroup': 'ItemAttributes,Offers,Images,Reviews,Variations',
-                                                         'SearchIndex': 'DVD',
-                                                         'Service': 'AWSECommerceService',
-                                                         'Sort': 'salesrank',
-                                                         'Version': '2009-01-01'},
-                                                        "1234567890",
-                                                        _timestamp="2009-01-01T12:00:00Z")
-        # Check signature exists and is correct
-        self.assertEqual(parse_qs(signed_aws_request_url_2)["Signature"],
-                         ['TuM6E5L9u/uNqOX09ET03BXVmHLVFfJIna5cxXuHxiU='])
+            # Continute with an additional request
+            signed_aws_request_url_2 = \
+                                     create_AWS_request_url("http://ecs.amazonaws.co.uk/onca/xml",
+                                                            {'AWSAccessKeyId': '00000000000000000000',
+                                                             'Actor': 'Johnny Depp',
+                                                             'AssociateTag': 'mytag-20',
+                                                             'Operation': 'ItemSearch',
+                                                             'ResponseGroup': 'ItemAttributes,Offers,Images,Reviews,Variations',
+                                                             'SearchIndex': 'DVD',
+                                                             'Service': 'AWSECommerceService',
+                                                             'Sort': 'salesrank',
+                                                             'Version': '2009-01-01'},
+                                                            "1234567890",
+                                                            _timestamp="2009-01-01T12:00:00Z")
+            # Check signature exists and is correct
+            self.assertEqual(parse_qs(signed_aws_request_url_2)["Signature"],
+                             ['TuM6E5L9u/uNqOX09ET03BXVmHLVFfJIna5cxXuHxiU='])
 
     def test_same_urls_p(self):
         """urlutils - test checking URLs equality"""

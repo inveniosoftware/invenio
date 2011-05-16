@@ -3965,24 +3965,6 @@ class Template:
         _ = gettext_set_language(ln)
         ib_pubs = intbitset(pubs)
 
-        # Prepare data for display
-        # construct names box
-        header = "<strong>" + _("Name variants") + "</strong>"
-        content = []
-
-        for name, frequency in sorted(names_dict.iteritems(),
-                                      key=itemgetter(1),
-                                      reverse=True):
-            name_lnk = create_html_link(self.build_search_url(p=name,
-                                                              f='exactauthor'),
-                                                              {},
-                                                              str(frequency),)
-            content.append("%s (%s)" % (name, name_lnk))
-
-        if not content:
-            content = [_("No Name Variants")]
-
-        names_box = self.tmpl_print_searchresultbox(header, "<br />\n".join(content))
         # construct an extended search as an interim solution for author id
         # searches. Will build "(exactauthor:v1 OR exactauthor:v2)" strings
 #        extended_author_search_str = ""
@@ -4038,6 +4020,27 @@ class Template:
                 baid_query = extended_author_search_str
 
         baid_query = baid_query + " "
+        
+        sorted_names_list = sorted(names_dict.iteritems(), key=itemgetter(1),
+                                   reverse=True)
+
+        # Prepare data for display
+        # construct names box
+        header = "<strong>" + _("Name variants") + "</strong>"
+        content = []
+
+        for name, frequency in sorted_names_list:
+            prquery = baid_query + " exactauthor:" + name
+            name_lnk = create_html_link(self.build_search_url(p=prquery),
+                                                              {},
+                                                              str(frequency),)
+            content.append("%s (%s)" % (name, name_lnk))
+
+        if not content:
+            content = [_("No Name Variants")]
+
+        names_box = self.tmpl_print_searchresultbox(header, "<br />\n".join(content))
+
         # construct papers box
         rec_query = baid_query
         searchstr = create_html_link(self.build_search_url(p=rec_query),
@@ -4138,8 +4141,15 @@ class Template:
         coauthor_box = self.tmpl_print_searchresultbox(header, "<br />\n".join(content))
 
         pubs_to_papers_link = create_html_link(self.build_search_url(p=baid_query), {}, str(len(pubs)))
+        display_name = ""
+
+        try:
+            display_name = sorted_names_list[0][0]
+        except IndexError:
+            display_name = "&nbsp;"
+
         req.write('<h1>%s <span style="font-size:50%%;">(%s papers)</span></h1>'
-                  % (authorname, pubs_to_papers_link))
+                  % (display_name, pubs_to_papers_link))
 #        req.write("<h1>%s</h1>" % (authorname))
 
         if person_link:

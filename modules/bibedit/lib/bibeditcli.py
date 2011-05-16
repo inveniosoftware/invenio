@@ -29,6 +29,7 @@ General options:
 
 Options to inspect record history:
    --list-revisions [recid]              list all revisions of a record
+   --list-revisions-details [recid]      list detailed revisions of a record
    --get-revision [recid.revdate]        print MARCXML of given record revision
    --diff-revisions [recidA.revdateB]    print MARCXML difference between
                     [recidC.revdateD]    record A dated B and record C dated D
@@ -44,7 +45,7 @@ import sys
 from invenio.bibedit_utils import get_marcxml_of_revision_id, \
     get_record_revision_ids, get_xml_comparison, record_locked_by_other_user, \
     record_locked_by_queue, revision_format_valid_p, save_xml_record, \
-    split_revid
+    split_revid, get_info_of_revision_id
 
 def print_usage():
     """Print help."""
@@ -54,17 +55,22 @@ def print_version():
     """Print version information."""
     print __revision__
 
-def cli_list_revisions(recid):
+def cli_list_revisions(recid, details=False):
     """Print list of all known record revisions (=RECID.REVDATE) for record
     RECID.
-
     """
     try:
         recid = int(recid)
     except ValueError:
         print 'ERROR: record ID must be integer, not %s.' % recid
         sys.exit(1)
-    out = '\n'.join(get_record_revision_ids(recid))
+    record_rev_list = get_record_revision_ids(recid)
+    if not details:
+        out = '\n'.join(record_rev_list)
+    else:
+        out = "%s%s%s%s\n" % ("# Revision".ljust(22), "# Task ID".ljust(15),
+                              "# Author".ljust(15), "# Job Details")
+        out += '\n'.join([get_info_of_revision_id(revid) for revid in record_rev_list])
     if out:
         print out
     else:
@@ -153,7 +159,14 @@ def main():
             except IndexError:
                 print_usage()
                 sys.exit(1)
-            cli_list_revisions(recid)
+            cli_list_revisions(recid, details=False)
+        elif cmd == '--list-revisions-details':
+            try:
+                recid = opts[0]
+            except IndexError:
+                print_usage()
+                sys.exit(1)
+            cli_list_revisions(recid, details=True)
         elif cmd == '--get-revision':
             try:
                 revid = opts[0]

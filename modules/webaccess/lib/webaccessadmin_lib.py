@@ -1,4 +1,3 @@
-
 ## This file is part of Invenio.
 ## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
 ##
@@ -262,7 +261,7 @@ You should enable at least on robot based login method in <tt>access_control_con
                     'url': escape(url)
                 })
                 action = ''
-        forms = """<p class="info">Existing login_method: <ul>%s</ul></p>""" % ''.join(["<li>%s (robots: %s)</li>" % (method, ', '.join(robot_keys.get(login_method, {}))) for method in available_robot_login_methods])
+        forms = """<p class="info">Existing login_method: <ul>%s</ul></p>""" % ''.join(["<li><a href=\"%s/admin/webaccess/webaccessadmin.py/managerobotlogin?login_method=%s\">%s (robots: %s)</a></li>" % (CFG_SITE_SECURE_URL, method, method, ', '.join(robot_keys.get(method, {}))) for method in available_robot_login_methods])
         forms += """<p class="info">Existing robot names (for login_method %s): <ul>%s</ul></p>""" % (escape(login_method), ''.join(["<li>%s</li>" % name for name in robot_keys.get(login_method, {})]))
         confirm_field = """<input type="hidden" name="confirm" value="0" />"""
         if action == 'changepwd':
@@ -296,7 +295,7 @@ You should enable at least on robot based login method in <tt>access_control_con
         forms += """<td><form method="POST">
             <input type="hidden" name="action" value="createurl" />
             <table><tbody>
-            <tr valign="top"><td align="right"><strong>Login method:</strong> </td><td align="left"%(login_method_boxes)s</td></tr>
+            <tr valign="top"><td align="right"><strong>Login method:</strong> </td><td align="left">%(login_method_boxes)s</td></tr>
             <tr valign="top"><td align="right"><label for="robot_name"><strong>Robot name:</strong> </label></td><td align="left"><input type="text" name="robot_name" value="%(robot_name)s" id="robot_name" /></td></tr>
             <tr valign="top"><td align="right"><label for="timeout"><strong>Timeout (in seconds):</strong> </label></td><td align="left"><input type="text" name="timeout" value="%(timeout)s" id="timeout" /></td></tr>
             <tr valign="top"><td align="right"><label for="referer"><strong>Referer (where to go after login):</strong> </label></td><td align="left"><input type="text" name="referer" value="%(referer)s" id="referer" /></td></tr>

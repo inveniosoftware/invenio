@@ -90,6 +90,7 @@ var gFieldActionTypes = {
 
 function updateView() {
 	$("#displayTemplates").hide();
+        $('#buttonSubmitChanges').attr('disabled', 'true').addClass('buttonDisabled');
 }
 
 function createCommandsList(){
@@ -106,8 +107,9 @@ function createCommandsList(){
 		subfields = currentField.subfields;
 		var subfieldID = "";
 		for (subfieldID in subfields) {
-			currentSubfield = subfields[subfieldID];
-			subfieldsList.push(currentSubfield);
+                    currentSubfield = subfields[subfieldID];
+                    if (currentSubfield != "None")
+                        subfieldsList.push(currentSubfield);
 		}
 
 		var field = {
@@ -159,6 +161,7 @@ function onButtonTestSearchClick() {
 	gOutputFormat = gOutputFormatPreview;
 	gPageToDiplay = 1;
 	performAJAXRequest();
+        $('#buttonSubmitChanges').attr('disabled', 'true').addClass('buttonDisabled');
 }
 
 function onButtonPreviewResultsClick() {
@@ -171,6 +174,7 @@ function onButtonPreviewResultsClick() {
 	gPageToDiplay = 1;
         gComputeModifications = 1;
 	performAJAXRequest();
+        $('#buttonSubmitChanges').removeAttr('disabled').removeClass('buttonDisabled');
 }
 
 function onButtonBackToResultsClick() {

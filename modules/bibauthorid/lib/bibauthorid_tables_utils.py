@@ -53,19 +53,19 @@ except ImportError:
     UNIDECODE_ENABLED = False
 
 
-def get_papers_recently_modified(date=''):
+def get_papers_recently_modified(date='00-00-00 00:00:00'):
     '''
     Returns the bibrecs with modification date more recent then date, or all
     the bibrecs if no date is specified.
     @param date: date
     '''
-    papers = run_sql("select id from bibrec where  modification_date > %s",
+    papers = run_sql("select id from bibrec where modification_date > %s",
                      (str(date),))
     if papers:
         bibrecs = [i[0] for i in papers]
         bibrecs.append(-1)
         min_date = run_sql("select max(modification_date) from bibrec where "
-                           "id in %s", (tuple(bibrecs),))
+                           "id in " + str(tuple(bibrecs)))
     else:
         min_date = run_sql("select now()")
     return papers, min_date
@@ -88,6 +88,7 @@ def populate_authornames_bibrefs_from_authornames():
             run_sql("insert into aidAUTHORNAMESBIBREFS (Name_id, bibref) "
                     "values (%s,%s)", (str(nid[0]), str(bibref)))
 
+
 def authornames_tables_gc(bunch_size=50):
     '''
     Performs garbage collecting on the authornames tables.
@@ -99,8 +100,8 @@ def authornames_tables_gc(bunch_size=50):
     else:
         return
 
-    abfs_ids_bunch = run_sql("select id,Name_id,bibref from aidAUTHORNAMESBIBREFS limit %s, %s"
-                            , (str(bunch_start - 1), str(bunch_size)))
+    abfs_ids_bunch = run_sql("select id,Name_id,bibref from aidAUTHORNAMESBIBREFS limit "
+                            + str(bunch_start - 1) + "," + str(bunch_size))
     bunch_start += bunch_size
 
     while len(abfs_ids_bunch) >= 1:
@@ -178,16 +179,16 @@ def authornames_tables_gc(bunch_size=50):
                             (bibreflist, id_to_remove[1]))
                     if bconfig.TABLES_UTILS_DEBUG:
                         print "authornames_tables_gc: aidAUTHORNAMES updating " + str(authrow) + ' with ' + str(bibreflist)
-            except:
+            except (OperationalError, ProgrammingError, KeyError, IndexError,
+                    ValueError, TypeError):
                 pass
 
-
-        abfs_ids_bunch = run_sql("select id,Name_id,bibref from aidAUTHORNAMESBIBREFS limit %s,%s" ,
-                            (str(bunch_start - 1), str(bunch_size)))
+        abfs_ids_bunch = run_sql("select id,Name_id,bibref from aidAUTHORNAMESBIBREFS limit " +
+                            str(bunch_start - 1) + ',' + str(bunch_size))
         bunch_start += bunch_size
 
 
-def update_authornames_tables_from_paper(papers_list=[]):
+def update_authornames_tables_from_paper(papers_list=None):
     """
     Updates the authornames tables with the names on the given papers list
     @param papers_list: list of the papers which have been updated (bibrecs) ((1,),)
@@ -273,17 +274,18 @@ def update_authornames_tables_from_paper(papers_list=[]):
                 if bconfig.TABLES_UTILS_DEBUG:
                     print 'update_authornames_tables: Created new name ' + str(authornamesid) + ' ' + str(name) + ' ' + str(bibref)
 
-    tables = [['bibrec_bib10x', 'bib10x', '100__a', '100'], ['bibrec_bib70x', 'bib70x', '700__a', '700']]
-    
+    tables = [['bibrec_bib10x', 'bib10x', '100__a', '100'],
+              ['bibrec_bib70x', 'bib70x', '700__a', '700']]
+
     if not papers_list:
         papers_list = run_sql("select id from bibrec")
     for paper in papers_list:
         for table in tables:
             sqlstr = "select id_bibxxx from %s where id_bibrec=" % table[0]
-            bibrefs = run_sql(sqlstr+"%s", (str(paper[0]),))
+            bibrefs = run_sql(sqlstr + "%s", (str(paper[0]),))
             for ref in bibrefs:
                 sqlstr = "select value from %s where tag='%s' and id=" % (table[1], table[2])
-                name = run_sql(sqlstr+"%s", (str(ref[0]),))
+                name = run_sql(sqlstr + "%s", (str(ref[0]),))
                 if len(name) >= 1:
                     update_authornames_tables(name[0][0], table[3] + ':' + str(ref[0]))
 
@@ -1343,8 +1345,6 @@ def update_tables_from_mem_cache(sanity_checks=False, return_ra_updates=False):
                         dat.UPDATES_LOG['touched_vas'])
     bconfig.LOGGER.log(25, "Writing to persistence layer")
 
-    batch_max = bconfig.TABLE_POPULATION_BUNCH_SIZE
-
     ra_id_db_max = run_sql("SELECT max(realauthorID) FROM"
                            " aidREALAUTHORS")[0][0]
     va_id_db_max = run_sql("SELECT max(virtualauthorID) FROM"
@@ -1361,36 +1361,37 @@ def update_tables_from_mem_cache(sanity_checks=False, return_ra_updates=False):
 
     if not insert_ra_ids or not insert_va_ids:
         bconfig.LOGGER.log(25, "Saving update to persistence layer finished "
-                               "with success! (There was nothing to do.)")
+                               "with success! (There was nothing to do)")
         return (True, [])
 
+    query_prelude = ("INSERT INTO aidVIRTUALAUTHORSCLUSTERS (cluster_name)"
+                     " VALUES (%s)")
+
     for va_cluster in new_clusters:
-        if len(query) >= batch_max:
-            try:
-                run_sql(''.join(query))
-            except:
-                bconfig.LOGGER.critical("Inserting into virtual author "
-                                        "cluster table failed")
-                return (False, [])
+        encoded_value = None
+        not_encoded_value = va_cluster['clustername']
 
-            query = []
+        try:
+            if isinstance(not_encoded_value, unicode):
+                encoded_value = not_encoded_value[0:59].encode('utf-8')
+            elif isinstance(not_encoded_value, str):
+                encoded_value = not_encoded_value[0:59]
+            else:
+                encoded_value = str(not_encoded_value)[0:59]
+        except (UnicodeEncodeError, UnicodeDecodeError), emsg:
+            bconfig.LOGGER.error("Cluster Data encoding error (%s): %s"
+                                 % (type(not_encoded_value), emsg))
+            continue
 
-        if len(va_cluster['clustername']) > 150:
-            bconfig.LOGGER.warning("Value for cluster table insertion "
-                                   "truncated to 150 characters: %s"
-                                   % (str(va_cluster['clustername'])))
-
-        query.append("INSERT INTO aidVIRTUALAUTHORSCLUSTERS (cluster_name) "
-                      "VALUES (\"%s\"); "
-                     % (va_cluster['clustername'][0:149],))
+        query.append((encoded_value,))
 
     if query:
         try:
-            run_sql(''.join(query))
-        except:
+            run_sql_many(query_prelude, tuple(query))
+        except (OperationalError, ProgrammingError), emsg:
             bconfig.LOGGER.critical("Inserting into virtual author "
-                                    "cluster table failed")
-            return (False, [])
+                                    "cluster table failed: %s" % emsg)
+            return False
 
         query = []
 
@@ -1415,61 +1416,58 @@ def update_tables_from_mem_cache(sanity_checks=False, return_ra_updates=False):
                                  "in the database. Aborting update mission.")
             return (False, [])
 
+    query_prelude = ("INSERT INTO aidVIRTUALAUTHORSDATA "
+                     "(virtualauthorID, tag, value) VALUES "
+                     "(%s, %s, %s)")
+
     for va_data in va_data_to_insert:
-        if len(query) >= batch_max:
-            try:
-                run_sql(''.join(query))
-            except:
-                bconfig.LOGGER.critical("Inserting into virtual author "
-                                        "data table failed")
-                return (False, [])
+        encoded_value = None
+        not_encoded_value = va_data['value']
 
-            query = []
+        try:
+            if isinstance(not_encoded_value, unicode):
+                encoded_value = not_encoded_value[0:254].encode('utf-8')
+            elif isinstance(not_encoded_value, str):
+                encoded_value = not_encoded_value[0:254]
+            else:
+                encoded_value = str(not_encoded_value)[0:254]
+        except (UnicodeEncodeError, UnicodeDecodeError), emsg:
+            bconfig.LOGGER.error("VA Data encoding error (%s): %s"
+                                 % (type(not_encoded_value), emsg))
+            continue
 
-        query.append("INSERT INTO aidVIRTUALAUTHORSDATA "
-                      "(virtualauthorID, tag, value) VALUES "
-                      "(%d, \"%s\", \"%s\"); "
-                     % (va_data['virtualauthorid'],
-                        va_data['tag'], va_data['value']))
+        query.append((va_data['virtualauthorid'],
+                        va_data['tag'], encoded_value))
 
     if query:
         try:
-            run_sql(''.join(query))
-        except:
+            run_sql_many(query_prelude, tuple(query))
+        except (OperationalError, ProgrammingError), emsg:
             bconfig.LOGGER.critical("Inserting into virtual author "
-                                    "data table failed")
-            return (False, [])
+                                    "data table failed: %s" % emsg)
+            return False
 
         query = []
 
     vas_to_insert = [row for row in dat.VIRTUALAUTHORS
                          if row['virtualauthorid'] in insert_va_ids]
 
+    query_prelude = ("INSERT INTO aidVIRTUALAUTHORS "
+                     "(virtualauthorID, authornamesID, p, clusterID) "
+                     "VALUES (%s, %s, %s, %s)")
+
     for va_entry in vas_to_insert:
-        if len(query) >= batch_max:
-            try:
-                run_sql(''.join(query))
-            except:
-                bconfig.LOGGER.critical("Inserting into virtual author "
-                                        "table failed")
-                return (False, [])
-
-            query = []
-
-        query.append("INSERT INTO aidVIRTUALAUTHORS "
-                      "(virtualauthorID, authornamesID, p, clusterID) VALUES "
-                      "(%d, %d, \"%s\", %d); "
-                     % (va_entry['virtualauthorid'],
+        query.append((va_entry['virtualauthorid'],
                         va_entry['authornamesid'], va_entry['p'],
                         va_entry['clusterid']))
 
     if query:
         try:
-            run_sql(''.join(query))
-        except:
+            run_sql_many(query_prelude, tuple(query))
+        except (OperationalError, ProgrammingError), emsg:
             bconfig.LOGGER.critical("Inserting into virtual author "
-                                    "table failed")
-            return (False, [])
+                                    "table failed: %s" % emsg)
+            return False
         query = []
 
     if sanity_checks:
@@ -1493,70 +1491,62 @@ def update_tables_from_mem_cache(sanity_checks=False, return_ra_updates=False):
     ra_data_to_insert = [row for row in dat.REALAUTHOR_DATA
                          if row['realauthorid'] in insert_ra_ids]
 
+    query_prelude = ("INSERT INTO aidREALAUTHORDATA "
+                      "(realauthorID, tag, value, va_count, "
+                      "va_names_p, va_p) VALUES "
+                      "(%s, %s, %s, %s, %s, %s)")
+
     for ra_data in ra_data_to_insert:
-        if len(query) >= batch_max:
-            try:
-                run_sql(''.join(query))
-            except:
-                bconfig.LOGGER.critical("Inserting into real author "
-                                        "data table failed")
-                return (False, [])
-
-            query = []
-
-        if len(ra_data['value']) > 254:
-            bconfig.LOGGER.warning("Value for ra data table insertion "
-                                   "truncated to 255 characters: %s"
-                                   % (str(ra_data['value'])))
-
         if not ra_data['tag'] == 'outgoing_citation':
-            query.append("INSERT INTO aidREALAUTHORDATA "
-                          "(realauthorID, tag, value, va_count, "
-                          "va_names_p, va_p) VALUES "
-                          "(%d, \"%s\", \"%s\", %d, "
-                          "%f, %f); "
-                         % (ra_data['realauthorid'],
-                            ra_data['tag'], ra_data['value'][0:254],
+            encoded_value = None
+            not_encoded_value = ra_data['value']
+
+            try:
+                if isinstance(not_encoded_value, unicode):
+                    encoded_value = not_encoded_value[0:254].encode('utf-8')
+                elif isinstance(not_encoded_value, str):
+                    encoded_value = not_encoded_value[0:254]
+                else:
+                    encoded_value = str(not_encoded_value)[0:254]
+            except (UnicodeEncodeError, UnicodeDecodeError), emsg:
+                bconfig.LOGGER.error("RA Data encoding error (%s): %s"
+                                     % (type(not_encoded_value), emsg))
+                continue
+
+            query.append((ra_data['realauthorid'],
+                            ra_data['tag'],
+                            encoded_value,
                             ra_data['va_count'], ra_data['va_np'],
                             ra_data['va_p']))
 
     if query:
         try:
-            run_sql(''.join(query))
-        except:
+            run_sql_many(query_prelude, tuple(query))
+        except (OperationalError, ProgrammingError), emsg:
             bconfig.LOGGER.critical("Inserting into real author "
-                                    "data table failed")
-            return (False, [])
+                                    "data table failed: %s" % emsg)
+            return False
+
         query = []
+
+    query_prelude = ("INSERT INTO aidREALAUTHORS "
+                  "(realauthorID, virtualauthorID, p) VALUES (%s, %s, %s)")
 
     ras_to_insert = [row for row in dat.REALAUTHORS
                          if row['realauthorid'] in insert_ra_ids]
 
-
     for ra_entry in ras_to_insert:
-        if len(query) >= batch_max:
-            try:
-                run_sql(''.join(query))
-            except:
-                bconfig.LOGGER.critical("Inserting into real author "
-                                        "table failed")
-                return (False, [])
-            query = []
-
-        query.append("INSERT INTO aidREALAUTHORS "
-                      "(realauthorID, virtualauthorID, p) VALUES "
-                      "(%d, %d, %f); "
-                     % (ra_entry['realauthorid'],
+        query.append((ra_entry['realauthorid'],
                         ra_entry['virtualauthorid'],
                         ra_entry['p']))
 
     if query:
         try:
-            run_sql(''.join(query))
-        except:
+            run_sql_many(query_prelude, tuple(query))
+        except (OperationalError, ProgrammingError), emsg:
             bconfig.LOGGER.critical("Inserting into real author "
-                                    "table failed")
-            return (False, [])
+                                    "table failed: %s" % emsg)
+            return False
         query = []
 
     if sanity_checks:
@@ -1588,29 +1578,20 @@ def update_tables_from_mem_cache(sanity_checks=False, return_ra_updates=False):
         doclist_insert = [row for row in dat.DOC_LIST
                           if row['bibrecid'] in dat.UPDATES_LOG["rec_updates"]]
 
-        for doc in doclist_insert:
-            if len(query) >= batch_max:
-                try:
-                    run_sql(''.join(query))
-                except:
-                    bconfig.LOGGER.critical("Inserting into doc list "
-                                            "table failed")
-                    return (False, [])
-                query = []
+        query_prelude = ("INSERT INTO aidDOCLIST "
+                         "(bibrecID, processed_author) VALUES (%s, %s)")
 
+        for doc in doclist_insert:
             for processed_author in doc['authornameids']:
-                query.append("INSERT INTO aidDOCLIST "
-                             "(bibrecID, processed_author) VALUES "
-                             "(%d, %d); "
-                              % (doc['bibrecid'], processed_author))
+                query.append((doc['bibrecid'], processed_author))
 
         if query:
             try:
-                run_sql(''.join(query))
-            except:
+                run_sql_many(query_prelude, tuple(query))
+            except (OperationalError, ProgrammingError), emsg:
                 bconfig.LOGGER.critical("Inserting into doc list "
-                                        "table failed")
-                return (False, [])
+                                        "table failed: %s" % emsg)
+                return False
             query = []
 
     bconfig.LOGGER.log(25, "Saving update to persistence layer finished "
@@ -1620,3 +1601,17 @@ def update_tables_from_mem_cache(sanity_checks=False, return_ra_updates=False):
         return (True, ra_ids)
     else:
         return (True, [])
+
+
+def empty_aid_tables():
+    '''
+    Will empty all tables needed for a re-run of the algorithm.
+    Exceptions are aidAUTHORNAMES*, which have to be updated apriori and
+    aidPERSONID, which has to be updated from algorithm after the re-run. 
+    '''
+    run_sql("TRUNCATE `aidDOCLIST`;"
+            "TRUNCATE `aidREALAUTHORDATA`;"
+            "TRUNCATE `aidREALAUTHORS`;"
+            "TRUNCATE `aidVIRTUALAUTHORS`;"
+            "TRUNCATE `aidVIRTUALAUTHORSCLUSTERS`;"
+            "TRUNCATE `aidVIRTUALAUTHORSDATA`;")

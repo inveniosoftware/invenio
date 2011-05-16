@@ -182,7 +182,7 @@ def split_name_parts_old(name_string, delete_name_additions=True):
 
 
 def create_canonical_name(name):
-    canonical_name =  create_unified_name(name, reverse=True)
+    canonical_name = create_unified_name(name, reverse=True)
     artifact_removal = re.compile("[^a-zA-Z0-9]")
     whitespace_removal = re.compile("[ ]{1,10}")
     canonical_name = artifact_removal.sub(" ", canonical_name)

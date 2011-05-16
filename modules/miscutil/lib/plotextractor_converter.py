@@ -46,8 +46,8 @@ def untar(original_tarball, sdir):
     if re.search(tarball_output, cmd_out) == None:
         run_shell_command('rm %s', (tarball,))
         return ([], [], None)
-    dummy1, cmd_out, cmd_err = run_process_with_timeout('tar xvf %s -C %s' %
-                                                        (tarball, sdir), shell=True)
+    cmd_list = ['tar', 'xvf', tarball, '-C', sdir]
+    dummy1, cmd_out, cmd_err = run_process_with_timeout(cmd_list)
 
     if cmd_err != '':
         return ([], [], None)
@@ -181,10 +181,9 @@ def convert_images(image_list):
             # for sure it can do EPS->PNG and JPG->PNG and PS->PNG
             # and PSTEX->PNG
             converted_image_file = get_converted_image_name(image_file)
+            cmd_list = ['convert', image_file, converted_image_file]
             try:
-                dummy1, cmd_out, cmd_err = run_process_with_timeout('convert %s %s'\
-                                                   % (image_file, \
-                                                      converted_image_file), shell=True)
+                dummy1, cmd_out, cmd_err = run_process_with_timeout(cmd_list)
                 if cmd_err == '':
                     ret_list.append(converted_image_file)
                 else:
@@ -205,8 +204,8 @@ def extract_text(tarball):
     """
     try:
         os.stat(tarball + '.pdf')
-        dummy1, dummy2, cmd_err = run_process_with_timeout('pdftotext %s %s' % \
-                                     (tarball + '.pdf ', tarball + '.txt'), shell=True)
+        cmd_list = ['pdftotext', tarball + '.pdf ', tarball + '.txt']
+        dummy1, dummy2, cmd_err = run_process_with_timeout(cmd_list)
         if cmd_err != '':
             return - 1
         write_message('generated ' + tarball + '.txt from ' + tarball + '.pdf')

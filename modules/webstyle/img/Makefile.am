@@ -39,6 +39,7 @@ img_DATA = add-small.png \
            aid_warning_granted.png \
            aid_check_gray.png \
            aid_check.png \
+           aid_operator.png \
            aid_reject_gray.png \
            aid_reject.png \
            aid_reset_gray.png \
