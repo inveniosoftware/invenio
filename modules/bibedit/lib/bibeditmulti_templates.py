@@ -253,7 +253,7 @@ div .boxleft_2 {
             <b>%(text_search_criteria)s:</b>
         </div>
         <div class="boxleft_2">
-            <input type="text" id="textBoxSearchCriteria"  size="40" onkeypress="onEnter(event);"> <br />
+            <input type="text" id="textBoxSearchCriteria"  size="40"> <br />
         </div>
     </div>
     <div class="boxContainer">
@@ -269,7 +269,7 @@ div .boxleft_2 {
             <b>%(text_output_tags)s:</b>
         </div>
         <div class="boxleft_2">
-            <div><input class="inputValueGrey" type="text" id="textBoxOutputTags" value="All tags" size="28" onkeypress="onEnter(event);">&nbsp;&nbsp;<i>Ex. 100, 700</i><br/></div>
+            <div><input class="inputValueGrey" type="text" id="textBoxOutputTags" value="All tags" size="28">&nbsp;&nbsp;<i>Ex. 100, 700</i><br/></div>
         </div>
     </div>
     <div class="boxContainer">
@@ -381,7 +381,7 @@ div .boxleft_2 {
     <tr class="tagTableRow">
         <td />
         <td>
-        <input class="textBoxFieldTag txtTag" type="Text" onkeypress="onPressEsc(event);" maxlength="3" /><input class="textBoxFieldInd1 txtInd" onkeypress="onPressEsc(event);" type="Text" maxlength="1" /><input class="textBoxFieldInd2 txtInd" onkeypress="onPressEsc(event);" type="text" maxlength="1" />
+        <input class="textBoxFieldTag txtTag" type="Text" maxlength="3" /><input class="textBoxFieldInd1 txtInd" type="Text" maxlength="1" /><input class="textBoxFieldInd2 txtInd" type="text" maxlength="1" />
         </td>
         <td />
         <td />

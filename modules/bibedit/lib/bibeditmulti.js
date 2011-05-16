@@ -215,8 +215,7 @@ function rebindControls() {
 	rebindActionsRelatedControls();
 	initTextBoxes();
 
-
-	$("#buttonTestSearch").live("click", onButtonTestSearchClick);
+        $("#buttonTestSearch").live("click", onButtonTestSearchClick);
 	$("#buttonPreviewResults").live("click", onButtonPreviewResultsClick);
 	$("#buttonSubmitChanges").live("click", onButtonSubmitChangesClick);
 	$(".buttonBackToResults").live("click", onButtonBackToResultsClick);
@@ -224,8 +223,7 @@ function rebindControls() {
 	$(".buttonOutputFormatHTMLBrief").live("click", onButtonOutputFormatHTMLBriefClick);
 	$(".buttonOutputFormatHTMLDetailed").live("click", onButtonOutputFormatHTMLDetailedClick);
 	$(".buttonOutputFormatMARC").live("click", onButtonOutputFormatMARCClick);
-	/*$(".resultItem").live("click", onResultItemClick);*/
-	$(".buttonGoToFirstPage").live("click", onButtonGoToFirstPageClick);
+        $(".buttonGoToFirstPage").live("click", onButtonGoToFirstPageClick);
 	$(".buttonGoToPreviousPage").live("click", onButtonGoToPreviousPageClick);
 	$(".buttonGoToNextPage").live("click", onButtonGoToNextPageClick);
 }
@@ -452,6 +450,7 @@ function onActOnFieldsClick() {
     }
 
     unbindControls('true');
+    initTextBoxes();
 }
 
 function onActOnFieldsRemoveClick() {
@@ -510,8 +509,6 @@ function addMessage(fieldID, actionText) {
         templateMsg.find(".msg").eq(0).text("Warning: add one subfield action before applying changes");
 
         $("#actionsDisplayArea .lastRow").before(templateMsg);
-
-        //rebindControls();
     }
 }
 
@@ -620,7 +617,7 @@ function onButtonNewSubfieldClick(instance) {
     displayProperSubfieldInformation(templateNewSubfield);
     templateField.after(templateNewSubfield);
 
-    //rebindControls();
+    initTextBoxes();
 }
 
 function onButtonCancelNewSubfieldClick() {
@@ -631,8 +628,6 @@ function onButtonNewFieldClick() {
     var templateNewField = $("#displayTemplates .templateNewField").clone();
     templateNewField.attr("id", generateFieldDisplayID());
     $("#actionsDisplayArea .lastRow").before(templateNewField);
-
-    //rebindControls();
 }
 
 function onButtonCancelNewFieldClick(instance) {
@@ -700,7 +695,6 @@ function onButtonSaveNewSubfieldClick() {
     templateNewSubfield.replaceWith(templateDisplaySubfield );
 
     deleteMsg(fieldID);
-    //rebindControls();
 }
 
 function onButtonDeleteSubfieldClick() {
@@ -753,7 +747,6 @@ function onButtonSaveNewFieldClick(instance) {
 
     templateNewField.replaceWith(templateDisplayField);
 
-    //rebindControls();
     addMessage(fieldID, actionText);
 }
 
@@ -875,6 +868,10 @@ function rebindActionsRelatedControls() {
     $("#textBoxConditionDisplay").live("change", onTextBoxConditionDisplayChange);
     $("#textBoxConditionFieldDisplay").live("change", onTextBoxConditionFieldDisplayChange);
     $("#textBoxConditionSubfieldDisplay").live("change", onTextBoxConditionSubfieldDisplayChange);
+    // Cancel text boxes
+    $(".txtTag, .txtInd").live("keyup", onPressEsc);
+    // Submit form when pressing Enter
+    $("#textBoxSearchCriteria, #textBoxOutputTags").live("keyup", onEnter);
 }
 
 function onSelectOutputFormatChange(value){
