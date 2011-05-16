@@ -556,6 +556,24 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = "find a beacom and date = 2000"
         self._compare_searches(inv_search, spi_search)
 
+    def test_type_code(self):
+        """SPIRES search syntax - find tc review"""
+        inv_search = "collection:review"
+        spi_search = "find tc review"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_field_code(self):
+        """SPIRES search syntax - f f p"""
+        inv_search = "subject:p"
+        spi_search = "f f p"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_coden(self):
+        """SPIRES search syntax - find coden aphys"""
+        inv_search = "journal:aphys"
+        spi_search = "find coden aphys"
+        self._compare_searches(inv_search, spi_search)
+
     def test_fin_to_find_trans(self):
         """SPIRES search syntax - fin a ellis, j == find a ellis, j"""
         fin_search = "fin a ellis, j"

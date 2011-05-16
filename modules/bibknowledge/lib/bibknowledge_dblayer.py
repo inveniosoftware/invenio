@@ -363,8 +363,14 @@ def get_kbr_keys(kb_name, searchkey="", searchvalue="", searchtype='s'):
                         AND id_knwKB = %s""",
                   (searchvalue, searchkey, k_id))
 
-def get_kbr_values(kb_name, searchkey="", searchvalue="", searchtype='s'):
+def get_kbr_values(kb_name, searchkey="%", searchvalue="", searchtype='s'):
     """Returns values from a knowledge base
+
+       Note the intentional asymmetry between searchkey and searchvalue: 
+       If searchkey is unspecified or empty for substring, it matches anything,
+       but if it is empty for exact, it matches nothing.
+       If searchvalue is unspecified or empty, it matches anything in all cases.
+
        @param kb_name the name of the knowledge base
        @param searchkey search using this key
        @param searchvalue search using this value
@@ -372,7 +378,7 @@ def get_kbr_values(kb_name, searchkey="", searchvalue="", searchtype='s'):
        @return a list of values
     """
     k_id = get_kb_id(kb_name)
-    if searchtype == 's' and searchkey:
+    if searchtype == 's':
         searchkey = '%'+searchkey+'%'
     if searchtype == 's' and searchvalue:
         searchvalue = '%'+searchvalue+'%'
@@ -380,8 +386,6 @@ def get_kbr_values(kb_name, searchkey="", searchvalue="", searchtype='s'):
         searchvalue = searchvalue+'%'
     if not searchvalue:
         searchvalue = '%'
-    if not searchkey:
-        searchkey = '%'
     return run_sql("""SELECT m_value FROM knwKBRVAL
                       WHERE m_value LIKE %s
                       AND m_key LIKE %s

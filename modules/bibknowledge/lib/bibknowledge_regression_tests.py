@@ -78,9 +78,15 @@ class BibknowledgeRegressionTests(unittest.TestCase):
         self.assertEqual(myinfo["name"],"EJOURNALS")
 
     def test_EJOURNALS_keys(self):
-        """bibknowledge - test a left/right rule (key lookup)"""
+        """bibknowledge - test left/right rules (key lookups)"""
         mykeys = get_kbr_keys("EJOURNALS", "Acta")
         self.assertEqual(2, len(mykeys))
+        mykeys = get_kbr_values("EJOURNALS", '', searchtype='e')
+        self.assertEqual(0, len(mykeys))
+        mykeys = get_kbr_values("EJOURNALS", searchtype='s')
+        self.assertEqual(327, len(mykeys))
+        mykeys = get_kbr_values("EJOURNALS", searchkey='', searchtype='s')
+        self.assertEqual(327, len(mykeys))
 
     def test_EJOURNALS_values(self):
         """bibknowledge - test a left/right rule (value lookup)"""
