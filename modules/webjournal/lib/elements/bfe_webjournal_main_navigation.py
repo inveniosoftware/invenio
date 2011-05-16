@@ -62,6 +62,9 @@ def format_element(bfo, category_prefix, category_suffix, separator=" | ",
         linkattrd = {}
         if category.lower() == selected_category.lower():
             linkattrd = {'class':'selectedNavigationPage'}
+        if journal_name == 'CERNBulletin' and \
+               category == 'Training and Development':
+            category = 'Training'
         category_link = create_html_link(category_url, {},
                                          _(category),
                                          linkattrd=linkattrd)
@@ -89,3 +92,5 @@ dummy = _("Official News")
 dummy = _("Training and Development")
 dummy = _("General Information")
 dummy = _("Announcements")
+dummy = _("Training")
+dummy = _("Events")
