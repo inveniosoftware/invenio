@@ -175,6 +175,11 @@ class BibDocsTest(unittest.TestCase):
         self.assertEqual(my_new_bibdoc.deleted_p(), True)
         #undelete
         my_new_bibdoc.undelete(previous_status='')
+        #expunging
+        my_new_bibdoc.expunge()
+        my_bibrecdoc.build_bibdoc_list()
+        self.failIf('new_name' in my_bibrecdoc.get_bibdoc_names())
+        self.failUnless(my_bibrecdoc.get_bibdoc_names())
 
     def tearDown(self):
         my_bibrecdoc = BibRecDocs(2)
