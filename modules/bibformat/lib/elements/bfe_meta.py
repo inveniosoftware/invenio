@@ -44,7 +44,7 @@ def format_element(bfo, name, tag_name='', tag = '', escape=4):
         # First check for special meta named tags
         tags = get_field_tags("meta-" + tag_name)
         if not tags:
-            #then check for regular tags
+            # then check for regular tags
             tags = get_field_tags(tag_name)
     if not tags and tag:
         # fall back to explicit marc tag
@@ -61,9 +61,9 @@ def format_element(bfo, name, tag_name='', tag = '', escape=4):
         else:
             out.append(value)
 
-    for value in out:
-        if name == 'citation_date':
-            value = value.replace('-', '/')
+    if name == 'citation_date':
+        for idx in range(len(out)):
+            out[idx] = out[idx].replace('-', '/')
 
     return '\n'.join([create_html_tag('meta', name=name, content=value) for value in out])
 
