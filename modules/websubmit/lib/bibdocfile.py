@@ -377,6 +377,23 @@ def normalize_version(version):
             return ''
     return str(version)
 
+def compose_file(dirname, docname, extension, subformat=None, version=None):
+    """
+    Construct back a fullpath given the separate components.
+    """
+    if version:
+        version = ";%i" % int(version)
+    else:
+        version = ""
+    if subformat:
+        if not subformat.startswith(";"):
+            subformat = ";%s" % subformat
+    else:
+        subformat = ""
+    if extension and not extension.startswith("."):
+        extension = ".%s" % extension
+    return os.path.join(dirname, docname + extension + subformat + version)
+
 def decompose_file(afile, skip_version=False, only_known_extensions=False,
         allow_subformat=True):
     """
