@@ -697,42 +697,6 @@ class BibRecDocs:
         """
         return [bibdoc.docname for bibdoc in self.list_bibdocs(doctype)]
 
-    def check_file_exists(self, path):
-        """
-        Check if a file with the same content of the file pointed in C{path}
-        is already attached to this record.
-
-        @param path: the file to be checked against.
-        @type path: string
-        @return: True if a file with the requested content is already attached
-        to the record.
-        @rtype: bool
-        """
-        size = os.path.getsize(path)
-
-        # Let's consider all the latest files
-        files = self.list_latest_files()
-
-        # Let's consider all the latest files with same size
-        potential = [afile for afile in files if afile.get_size() == size]
-
-        if potential:
-            checksum = calculate_md5(path)
-
-            # Let's consider all the latest files with the same size and the
-            # same checksum
-            potential = [afile for afile in potential if afile.get_checksum() == checksum]
-
-            if potential:
-                potential = [afile for afile in potential if filecmp.cmp(afile.get_full_path(), path)]
-
-                if potential:
-                    return True
-                else:
-                    # Gosh! How unlucky, same size, same checksum but not same
-                    # content!
-                    pass
-        return False
 
     def propose_unique_docname(self, docname):
         """
@@ -2559,6 +2523,23 @@ class BibDoc:
         version = int(version)
         return [docfile for docfile in self.docfiles if docfile.get_version() == version and (list_hidden or not docfile.hidden_p())]
 
+    def check_file_exists(self, path):
+        """
+        Check if a file with the same content of the file pointed in C{path}
+        is already attached to this record.
+
+        @param path: the file to be checked against.
+        @type path: string
+        @return: True if a file with the requested content is already attached
+        to the record.
+        @rtype: bool
+        """
+        # Let's consider all the latest files
+        for afile in self.list_latest_files():
+            if afile.is_identical_to(path):
+                return True
+        return False
+
     def get_latest_version(self):
         """ Returns the latest existing version number for the given bibdoc.
         If no file is associated to this bibdoc, returns '0'.
@@ -2707,6 +2688,17 @@ class BibDocFile:
                  nice_size = nice_size(self.size),
                  description = self.description or ''
                )
+
+    def is_identical_to(self, path):
+        """
+        @path: the path of another file on disk.
+        @return: True if L{path} is contains bitwise the same content.
+        """
+        if os.path.getsize(path) != self.size:
+            return False
+        if calculate_md5(path) != self.checksum:
+            return False
+        return filecmp.cmp(self.get_full_path(), path)
 
     def is_restricted(self, user_info):
         """Returns restriction state. (see acc_authorize_action return values)"""

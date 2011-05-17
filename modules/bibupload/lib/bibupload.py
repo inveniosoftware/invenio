@@ -1045,9 +1045,14 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
         """Adds a new format for a given bibdoc. Returns True when everything's fine."""
         write_message('Add new format to %s url: %s, format: %s, docname: %s, doctype: %s, newname: %s, description: %s, comment: %s, flags: %s' % (repr(bibdoc), url, format, docname, doctype, newname, description, comment, flags), verbose=9)
         try:
+            if url:
+                tmpurl = download_url(url, format)
+                if bibdoc.check_file_exists(tmpurl):
+                    ## The url is already attached! Better ignore it
+                    write_message("WARNING: not adding new format %s from the URL %s to docname %s, as it seems the file has already been attached." % (format, url, docname), stream=sys.stderr)
+                    url = ""
             if not url: # Not requesting a new url. Just updating comment & description
                 return _update_description_and_comment(bibdoc, docname, format, description, comment, flags, pretend=pretend)
-            tmpurl = download_url(url, format)
             try:
                 try:
                     if not pretend:
@@ -1066,9 +1071,14 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
         """Adds a new version for a given bibdoc. Returns True when everything's fine."""
         write_message('Add new version to %s url: %s, format: %s, docname: %s, doctype: %s, newname: %s, description: %s, comment: %s, flags: %s' % (repr(bibdoc), url, format, docname, doctype, newname, description, comment, flags))
         try:
+            if url:
+                tmpurl = download_url(url, format)
+                if bibdoc.check_file_exists(tmpurl):
+                    ## The url is already attached! Better ignore it
+                    write_message("WARNING: not adding new version for format %s from the URL %s to docname %s, as it seems the file has already been attached." % (format, url, docname), stream=sys.stderr)
+                    url = ""
             if not url:
                 return _update_description_and_comment(bibdoc, docname, format, description, comment, flags, pretend=pretend)
-            tmpurl = download_url(url, format)
             try:
                 try:
                     if not pretend:
