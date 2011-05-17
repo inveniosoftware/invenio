@@ -346,15 +346,14 @@ def __displayDocument(req, doctype,categ,RN,send, ln = CFG_SITE_LANG):
         title = item_details['title']
         sysno = item_details['recid']
     else:
-        ## ## FIXME!
-        ## ## For backward compatibility reasons, it we failed to find the item's
-        ## ## details, we will try the old way, which includes searching for files
-        ## ## like TI, TIF in the submission's working directory.
-        ## ## This is not nice and should be removed.
-        ## try:
-        ##     (authors,title,sysno,newrn) = getInfo(doctype,categ,RN)
-        ## except TypeError:
-        return _("Unable to display document.")
+        # Was not found in the pending directory. Already approved?
+        try:
+            (authors, title, sysno) = getInfo(RN)
+            newrn = RN
+            if sysno is None:
+                return _("Unable to display document.")
+        except:
+            return _("Unable to display document.")
 
     user_info = collect_user_info(req)
     can_view_record_p, msg = check_user_can_view_record(user_info, sysno)
@@ -368,7 +367,7 @@ def __displayDocument(req, doctype,categ,RN,send, ln = CFG_SITE_LANG):
         else:
             # @todo - send in different languages
             #SendEnglish(doctype,categ,RN,title,authors,access,sysno)
-            send_approval(doctype, categ, RN, title, authors, access, sysno) 
+            send_approval(doctype, categ, RN, title, authors, access, sysno)
             run_sql("update sbmAPPROVAL set dLastReq=NOW() where rn=%s",(RN,))
             confirm_send = 1
 
@@ -1505,12 +1504,22 @@ def get_brief_doc_details_from_repository(reportnumber):
 
 
 # Retrieve info about document
-def getInfo(doctype,categ,RN):
-    """FIXME: DEPRECATED!"""
-    result = getInPending(doctype,categ,RN)
-    if not result:
-        result = getInAlice(doctype,categ,RN)
-    return result
+def getInfo(RN):
+    """
+    Retrieve basic info from record with given report number.
+    Returns (authors, title, sysno)
+    """
+    authors = None
+    title = None
+    sysno = None
+
+    recids = search_pattern(p=RN, f='037__a')
+    if len(recids) == 1:
+        sysno = int(recids.tolist()[0])
+        authors = ','.join(get_fieldvalues(sysno, "100__a") + get_fieldvalues(sysno, "700__a"))
+        title = ','.join(get_fieldvalues(sysno, "245__a"))
+
+    return (authors, title, sysno)
 
 #seek info in pending directory
 def getInPending(doctype,categ,RN):

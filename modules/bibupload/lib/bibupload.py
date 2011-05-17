@@ -1285,6 +1285,8 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
                                 try:
                                     if not pretend:
                                         bibdoc.change_name(newname)
+                                        ## Let's refresh the list of bibdocs.
+                                        bibrecdocs.build_bibdoc_list()
                                 except StandardError, e:
                                     write_message(e, stream=sys.stderr)
                                     raise
@@ -1331,6 +1333,8 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
                                 assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname, first_description, first_comment, first_flags, pretend=pretend))
                                 for (url, format, description, comment, flags) in other_urls:
                                     assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment, flags, pretend=pretend))
+                        ## Let's refresh the list of bibdocs.
+                        bibrecdocs.build_bibdoc_list()
                 if not found_bibdoc:
                     if not pretend:
                         bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
@@ -1344,6 +1348,8 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
                                 try:
                                     if not pretend:
                                         bibdoc.change_name(newname)
+                                        ## Let's refresh the list of bibdocs.
+                                        bibrecdocs.build_bibdoc_list()
                                 except StandardError, e:
                                     write_message('Error in renaming %s to %s: %s' % (docname, newname, e), stream=sys.stderr)
                                     raise
@@ -1387,6 +1393,8 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
                                 assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname, first_description, first_comment, first_flags, pretend=pretend))
                                 for (url, format, description, comment, flags) in other_urls:
                                     assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment, flags, pretend=pretend))
+                        ## Let's refresh the list of bibdocs.
+                        bibrecdocs.build_bibdoc_list()
                 if not found_bibdoc:
                     if doctype in ('PURGE', 'DELETE', 'EXPUNGE', 'FIX-ALL', 'FIX-MARC', 'DELETE-FILE', 'REVERT'):
                         write_message("('%s', '%s', '%s') not performed because '%s' docname didn't existed." % (doctype, newname, urls, docname), stream=sys.stderr)

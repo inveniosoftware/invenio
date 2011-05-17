@@ -1760,7 +1760,7 @@ class Template:
             else:
                 classtext = ""
 
-            out += """<a href="" onclick="document.forms[0].categ.value='%(id)s';document.forms[0].submit();return false;"><small %(classtext)s>%(id)s</small></a><small> (%(num)s document(s)""" % {
+            out += """<a href="" onclick="document.forms[0].categ.value='%(id)s';document.forms[0].submit();return false;"><span %(classtext)s>%(id)s</span></a> (%(num)s document(s)""" % {
                      'id' : categ['id'],
                      'classtext' : classtext,
                      'num' : num,
@@ -1783,7 +1783,7 @@ class Template:
                           'rejected_text' : _("Rejected"),
                           'images' : CFG_SITE_URL + '/img',
                         }
-            out += ")</small><br />"
+            out += ")<br />"
 
         out += """
                     </td>
@@ -2430,7 +2430,7 @@ class Template:
                     <input type="hidden" name="apptype" value="%(apptype)s" />
                     <input type="hidden" name="action" value="" />
                     <input type="hidden" name="ln" value="%(ln)s" />
-                  <small>""" % {
+                  """ % {
                  'rn' : rn,
                  'categ' : categ,
                  'doctype' : doctype,
@@ -2607,7 +2607,7 @@ class Template:
                     out += displaycplxdoc_displayauthaction (action="AuthorCancel", linkText=_("Cancel"))
                 out += '<br />'
 
-        out += """    </small></form>
+        out += """    </form>
                       <br />
                     </td>
                    </tr>
@@ -2745,7 +2745,7 @@ class Template:
                  </tr>
                  <tr>
                    <td class="portalboxbody">
-                     <small>""" % {
+                     """ % {
                    'image' : image,
                    'rn' : rn,
                  }
@@ -2773,8 +2773,7 @@ class Template:
                      'ln' : ln,
                    }
 
-        out += """      </small>
-                      <br />
+        out += """  <br />
                     </td>
                    </tr>
                  </table>"""
@@ -2929,7 +2928,7 @@ class Template:
                  </tr>
                  <tr>
                    <td class="portalboxbody">
-                     <small>""" % {
+                    """ % {
                    'image' : image,
                    'rn' : rn,
                  }
@@ -2957,8 +2956,7 @@ class Template:
                      'ln' : ln,
                    }
 
-        out += """      </small>
-                      <br />
+        out += """    <br />
                     </td>
                    </tr>
                  </table>"""

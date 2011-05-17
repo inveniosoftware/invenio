@@ -255,6 +255,11 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
             ind1 = current_field["ind1"]
             ind2 = current_field["ind2"]
             action = current_field["action"]
+            conditionSubfield = current_field["conditionSubfield"]
+            condition = current_field["condition"]
+            condition_exact_match = False
+            if int(current_field["conditionSubfieldExactMatch"]) == 0:
+                condition_exact_match = True
 
             subfields = current_field["subfields"]
             subfield_commands, upload_mode_replace = self._create_subfield_commands_list(subfields)
@@ -264,7 +269,7 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
             if action == self._field_action_types.add:
                 command = multi_edit_engine.AddFieldCommand(tag, ind1, ind2, subfield_commands)
             elif action == self._field_action_types.delete:
-                command = multi_edit_engine.DeleteFieldCommand(tag, ind1, ind2, subfield_commands)
+                command = multi_edit_engine.DeleteFieldCommand(tag, ind1, ind2, subfield_commands, conditionSubfield, condition, condition_exact_match)
                 upload_mode = '-r'
             elif action == self._field_action_types.update:
                 command = multi_edit_engine.UpdateFieldCommand(tag, ind1, ind2, subfield_commands)

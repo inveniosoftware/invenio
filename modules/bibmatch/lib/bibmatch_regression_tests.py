@@ -476,6 +476,14 @@ class BibMatchTest(unittest.TestCase):
         [dummy1, dummy2, ambigrecs, dummy3] = match_records(records, qrystrs=[("", "[088__a] [035__a]")])
         self.assertEqual(1, len(ambigrecs))
 
+    def test_check_collection(self):
+        """bibmatch - check collection"""
+        records = create_records(self.recxml3)
+        [nomatchrecs, dummy1, dummy2, dummy3] = match_records(records, collections=["Articles"])
+        self.assertEqual(1, len(nomatchrecs))
+        [dummy1, matchedrecs, dummy2, dummy3] = match_records(records, collections=["Books"])
+        self.assertEqual(1, len(matchedrecs))
+
 TEST_SUITE = make_test_suite(BibMatchTest)
 
 if __name__ == "__main__":

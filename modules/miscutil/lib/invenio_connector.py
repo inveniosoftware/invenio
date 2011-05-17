@@ -52,7 +52,7 @@ try:
     # if we are running locally, we can optimize :-)
     from invenio.config import CFG_SITE_URL
     from invenio.bibtask import task_low_level_submission
-    from invenio.search_engine import perform_request_search
+    from invenio.search_engine import perform_request_search, collection_restricted_p
     from invenio.bibformat import format_records
     LOCAL_SITE_URL = CFG_SITE_URL
 except ImportError:
@@ -86,7 +86,7 @@ class InvenioConnector:
         self.cached_records = {}
         self.cached_baskets = {}
 
-    def search(self, p="", f="", c="", rg=10, sf="", so="d", sp="",
+    def search(self, p="", f="", c=None, rg=10, sf="", so="d", sp="",
                rm="", of="", ot="", p1="", f1="", m1="", op1="",
                p2="", f2="", m2="", op2="", p3="", f3="", m3="",
                jrec=0, recid=-1, recidb=-1, d1="", d1y=0, d1m=0,
@@ -114,12 +114,22 @@ class InvenioConnector:
             del params['recid']
         if recidb == -1:
             del params['recidb']
-        params = urllib.urlencode(params)
+        params = urllib.urlencode(params, doseq=1)
 
         # Are we running locally? If so, better directly access the
         # search engine directly
         if LOCAL_SITE_URL == self.server_url and \
                of != 't':
+            # See if user tries to search any restricted collection
+            if type(c) is list:
+                colls = c
+            else:
+                colls = [c]
+            for collection in colls:
+                if collection_restricted_p(collection):
+                    sys.stderr.write("Searching local restricted collections\
+is NOT allowed. Aborting search.\n")
+                    return []
             results = perform_request_search(p=p, f=f, c=c, rg=rg, sf=sf, so=so, sp=so, rm=rm,
                                             p1=p1, f1=f1, m1=m1, op1=op1,
                                             p2=p2, f2=f2, m2=m2, op2=op2,
