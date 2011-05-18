@@ -40,7 +40,7 @@ single record, do global replacements, and other cataloguing tasks.</p>
 <a name="2"></a><h2>2. Edit records via Web interface</h2>
 
 <p>To edit records via the web interface, please go to <a
-href="<CFG_SITE_URL>/record/edit/">BibEdit Admin
+href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/edit/">BibEdit Admin
 Interface</a>.  This interface will let you to add, change or
 delete fields in a record.</p>
 
@@ -131,7 +131,7 @@ bibdocfile command line tool.</p>
 
 <a name="3"></a><h2>3. Edit multiple records via web interface</h2>
 
-<p>The purpose of the <a href="<CFG_SITE_URL>/record/multiedit/">Multi-Record Editor Web interface</a> is to allow cataloguers to easily edit more than one record in one go.</p>
+<p>The purpose of the <a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/multiedit/">Multi-Record Editor Web interface</a> is to allow cataloguers to easily edit more than one record in one go.</p>
 
 <p>The Multi-Record Editor allows cataloguers to easily look up various records in
 the system in order to find record sets upon which to operate, and then to allow
@@ -236,7 +236,7 @@ proper form <code>Ellis, J</code>.</p>
 <li> Download the record in XML MARC.  For example, download record ID 1234:
 
         <pre>
-         $ wget -O z.xml 'http://your.site/record/1234?of=xm'
+         $ wget -O z.xml 'http://your.site/<CFG_SITE_RECORD>/1234?of=xm'
         </pre>
 
     or download latest 5,000 public documents written by <code>Qllis, J</code>:
@@ -297,7 +297,7 @@ record IDs are ensured to stay permanent.</p>
 v0.1.x development branch is to download its XML MARC:
 
        <pre>
-       $ wget -O z.xml 'http://your.site/record/1234?of=xm'
+       $ wget -O z.xml 'http://your.site/<CFG_SITE_RECORD>/1234?of=xm'
        </pre>
 
 and to mark it as deleted by adding the indicator ``DELETED'' into the
@@ -326,7 +326,7 @@ and watch the progress via <code>bibsched</code>, as mentioned in the
 <p>This procedure will remove the record from the collection cache so
 that the record won't be findable anymore.  In addition, if the users
 try to access this record via direct URL such as distributed by the
-alert engine (record/1234) or via their baskets, they will
+alert engine (<CFG_SITE_RECORD>/1234) or via their baskets, they will
 see a message ``This record has been deleted''.  Please note though
 that the original MARCXML of the record stays kept in the database,
 for example you can access it by:
@@ -344,7 +344,7 @@ case the best it to alter its collection tag (980) to some
 non-existent collection, for example:
 
 <pre>
-   $ wget -O z.xml 'http:://localhost/record/1234?of=xm'
+   $ wget -O z.xml 'http:://localhost/<CFG_SITE_RECORD>/1234?of=xm'
    $ perl -pi -e 's,<subfield code="a">ARTICLE</subfield>,<subfield code="a">HIDDENARTICLE</subfield>,g' z.xml
    $ bibupload -r z.xml
 </pre>

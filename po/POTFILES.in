@@ -61,6 +61,7 @@ modules/bibformat/bin/bibreformat.in
 modules/bibformat/lib/bibformat_engine_tests.py
 modules/bibformat/lib/bibformat_templates.py
 modules/bibformat/lib/bibformatadminlib.py
+modules/bibformat/lib/elements/bfe_aid_authors.py
 modules/bibformat/lib/elements/bfe_authors.py
 modules/bibformat/lib/elements/bfe_fulltext.py
 modules/bibformat/lib/elements/bfe_fulltext_mini.py
@@ -265,3 +266,5 @@ modules/bibknowledge/lib/bibknowledge_templates.py
 modules/bibknowledge/lib/bibknowledgeadmin.py
 modules/bibsword/lib/bibsword_webinterface.py
 modules/bibupload/lib/batchuploader_engine.py
+modules/bibauthorid/lib/bibauthorid_webinterface.py
+modules/bibauthorid/lib/bibauthorid_templates.py

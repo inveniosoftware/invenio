@@ -28,7 +28,8 @@ from mechanize import Browser, LinkNotFoundError, HTTPError
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_WEBDIR, \
-     CFG_TMPDIR
+     CFG_TMPDIR, \
+     CFG_SITE_RECORD
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 from invenio.dbquery import run_sql
@@ -51,7 +52,7 @@ class WebCommentWebPagesAvailabilityTest(unittest.TestCase):
     def test_your_baskets_pages_availability(self):
         """webcomment - availability of comments pages"""
 
-        baseurl = CFG_SITE_URL + '/record/10/comments/'
+        baseurl = CFG_SITE_URL + '/%s/10/comments/' % CFG_SITE_RECORD
 
         _exports = ['', 'display', 'add', 'vote', 'report']
 
@@ -92,7 +93,7 @@ class WebCommentWebPagesAvailabilityTest(unittest.TestCase):
 
     def test_webcomment_mini_review_availability(self):
         """webcomment - availability of mini-review panel on detailed record page"""
-        url = CFG_SITE_URL + '/record/12'
+        url = CFG_SITE_URL + '/%s/12' % CFG_SITE_RECORD
         error_messages = test_web_page_content(url,
                                                expected_text="(Not yet reviewed)")
 
@@ -186,19 +187,19 @@ class WebCommentRestrictionsTest(unittest.TestCase):
         """webcomment - accessing "public" comment in a "public" discussion of a restricted record"""
         # Guest user should not be able to access it
         self.assertNotEqual([],
-                         test_web_page_content("%s/record/%i/comments/" % (CFG_SITE_URL, self.restr_record),
+                         test_web_page_content("%s/%s/%i/comments/" % (CFG_SITE_URL, CFG_SITE_RECORD, self.restr_record),
                                                expected_text=self.msg2))
 
         # Accessing a non existing file for a restricted comment should also ask to login
         self.assertEqual([],
-                         test_web_page_content("%s/record/%i/comments/attachments/get/%i/not_existing_file" % \
-                                               (CFG_SITE_URL, self.restr_record, self.restr_comid_1),
+                         test_web_page_content("%s/%s/%i/comments/attachments/get/%i/not_existing_file" % \
+                                               (CFG_SITE_URL, CFG_SITE_RECORD, self.restr_record, self.restr_comid_1),
                                                expected_text='You can use your nickname or your email address to login'))
 
         # Check accessing file of a restricted comment
         self.assertEqual([],
-                         test_web_page_content("%s/record/%i/comments/attachments/get/%i/file2" % \
-                                               (CFG_SITE_URL, self.restr_record, self.restr_comid_1),
+                         test_web_page_content("%s/%s/%i/comments/attachments/get/%i/file2" % \
+                                               (CFG_SITE_URL, CFG_SITE_RECORD, self.restr_record, self.restr_comid_1),
                                                expected_text='You can use your nickname or your email address to login'))
 
 
@@ -206,19 +207,19 @@ class WebCommentRestrictionsTest(unittest.TestCase):
         """webcomment - accessing "public" comment in a "public" discussion of a restricted record"""
         # Guest user should not be able to access it
         self.assertNotEqual([],
-                         test_web_page_content("%s/record/%i/comments/" % (CFG_SITE_URL, self.restr_record),
+                         test_web_page_content("%s/%s/%i/comments/" % (CFG_SITE_URL, CFG_SITE_RECORD, self.restr_record),
                                                expected_text=self.msg2))
 
         # Accessing a non existing file for a restricted comment should also ask to login
         self.assertEqual([],
-                         test_web_page_content("%s/record/%i/comments/attachments/get/%i/not_existing_file" % \
-                                               (CFG_SITE_URL, self.restr_record, self.restr_comid_1),
+                         test_web_page_content("%s/%s/%i/comments/attachments/get/%i/not_existing_file" % \
+                                               (CFG_SITE_URL, CFG_SITE_RECORD, self.restr_record, self.restr_comid_1),
                                                expected_text='You can use your nickname or your email address to login'))
 
         # Check accessing file of a restricted comment
         self.assertEqual([],
-                         test_web_page_content("%s/record/%i/comments/attachments/get/%i/file2" % \
-                                               (CFG_SITE_URL, self.restr_record, self.restr_comid_1),
+                         test_web_page_content("%s/%s/%i/comments/attachments/get/%i/file2" % \
+                                               (CFG_SITE_URL, CFG_SITE_RECORD, self.restr_record, self.restr_comid_1),
                                                expected_text='You can use your nickname or your email address to login'))
 
         # Juliet should not be able to access the comment
@@ -228,7 +229,7 @@ class WebCommentRestrictionsTest(unittest.TestCase):
         br['p_un'] = 'juliet'
         br['p_pw'] = 'j123uliet'
         br.submit()
-        br.open("%s/record/%i/comments/" % (CFG_SITE_URL, self.restr_record))
+        br.open("%s/%s/%i/comments/" % (CFG_SITE_URL, CFG_SITE_RECORD, self.restr_record))
         response = br.response().read()
         if not self.msg2 in response:
             pass
@@ -236,8 +237,8 @@ class WebCommentRestrictionsTest(unittest.TestCase):
             self.fail("Oops, this user should not have access to this comment")
 
         # Juliet should not be able to access the attached files
-        br.open("%s/record/%i/comments/attachments/get/%i/file2" % \
-                     (CFG_SITE_URL, self.restr_record, self.restr_comid_1))
+        br.open("%s/%s/%i/comments/attachments/get/%i/file2" % \
+                     (CFG_SITE_URL, CFG_SITE_RECORD, self.restr_record, self.restr_comid_1))
         response = br.response().read()
         if "You are not authorized" in response:
             pass
@@ -251,14 +252,14 @@ class WebCommentRestrictionsTest(unittest.TestCase):
         br['p_un'] = 'jekyll'
         br['p_pw'] = 'j123ekyll'
         br.submit()
-        br.open("%s/record/%i/comments/" % (CFG_SITE_URL, self.restr_record))
+        br.open("%s/%s/%i/comments/" % (CFG_SITE_URL, CFG_SITE_RECORD, self.restr_record))
         response = br.response().read()
         if not self.msg2 in response:
             self.fail("Oops, this user should have access to this comment")
 
         # Jekyll should be able to access the attached files
-        br.open("%s/record/%i/comments/attachments/get/%i/file2" % \
-                     (CFG_SITE_URL, self.restr_record, self.restr_comid_1))
+        br.open("%s/%s/%i/comments/attachments/get/%i/file2" % \
+                     (CFG_SITE_URL, CFG_SITE_RECORD, self.restr_record, self.restr_comid_1))
         response = br.response().read()
         self.assertEqual(self.attached_file2_content, response)
 
@@ -266,19 +267,19 @@ class WebCommentRestrictionsTest(unittest.TestCase):
         """webcomment - accessing "public" comment in a restricted discussion of a public record"""
         # Guest user should not be able to access it
         self.assertNotEqual([],
-                         test_web_page_content("%s/record/%i/comments/" % (CFG_SITE_URL, self.restricted_discussion),
+                         test_web_page_content("%s/%s/%i/comments/" % (CFG_SITE_URL, CFG_SITE_RECORD, self.restricted_discussion),
                                                expected_text=self.msg2))
 
         # Accessing a non existing file for a restricted comment should also ask to login
         self.assertEqual([],
-                         test_web_page_content("%s/record/%i/comments/attachments/get/%i/not_existing_file" % \
-                                               (CFG_SITE_URL, self.restricted_discussion, self.restr_comid_5),
+                         test_web_page_content("%s/%s/%i/comments/attachments/get/%i/not_existing_file" % \
+                                               (CFG_SITE_URL, CFG_SITE_RECORD, self.restricted_discussion, self.restr_comid_5),
                                                expected_text='You can use your nickname or your email address to login'))
 
         # Check accessing file of a restricted comment
         self.assertEqual([],
-                         test_web_page_content("%s/record/%i/comments/attachments/get/%i/file2" % \
-                                               (CFG_SITE_URL, self.restricted_discussion, self.restr_comid_5),
+                         test_web_page_content("%s/%s/%i/comments/attachments/get/%i/file2" % \
+                                               (CFG_SITE_URL, CFG_SITE_RECORD, self.restricted_discussion, self.restr_comid_5),
                                                expected_text='You can use your nickname or your email address to login'))
 
         # Juliet should not be able to access the comment
@@ -288,7 +289,7 @@ class WebCommentRestrictionsTest(unittest.TestCase):
         br['p_un'] = 'juliet'
         br['p_pw'] = 'j123uliet'
         br.submit()
-        br.open("%s/record/%i/comments/" % (CFG_SITE_URL, self.restricted_discussion))
+        br.open("%s/%s/%i/comments/" % (CFG_SITE_URL, CFG_SITE_RECORD, self.restricted_discussion))
         response = br.response().read()
         if not self.msg6 in response:
             pass
@@ -296,8 +297,8 @@ class WebCommentRestrictionsTest(unittest.TestCase):
             self.fail("Oops, this user should not have access to this comment")
 
         # Juliet should not be able to access the attached files
-        br.open("%s/record/%i/comments/attachments/get/%i/file2" % \
-                     (CFG_SITE_URL, self.restricted_discussion, self.restr_comid_5))
+        br.open("%s/%s/%i/comments/attachments/get/%i/file2" % \
+                     (CFG_SITE_URL, CFG_SITE_RECORD, self.restricted_discussion, self.restr_comid_5))
         response = br.response().read()
         if "You are not authorized" in response:
             pass
@@ -311,14 +312,14 @@ class WebCommentRestrictionsTest(unittest.TestCase):
         br['p_un'] = 'romeo'
         br['p_pw'] = 'r123omeo'
         br.submit()
-        br.open("%s/record/%i/comments/" % (CFG_SITE_URL, self.restricted_discussion))
+        br.open("%s/%s/%i/comments/" % (CFG_SITE_URL, CFG_SITE_RECORD, self.restricted_discussion))
         response = br.response().read()
         if not self.msg6 in response:
             self.fail("Oops, this user should have access to this comment")
 
         # Romeo should be able to access the attached files
-        br.open("%s/record/%i/comments/attachments/get/%i/file2" % \
-                     (CFG_SITE_URL, self.restricted_discussion, self.restr_comid_5))
+        br.open("%s/%s/%i/comments/attachments/get/%i/file2" % \
+                     (CFG_SITE_URL, CFG_SITE_RECORD, self.restricted_discussion, self.restr_comid_5))
         response = br.response().read()
         self.assertEqual(self.attached_file2_content, response)
 

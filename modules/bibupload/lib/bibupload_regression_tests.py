@@ -40,7 +40,8 @@ from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, CFG_SITE_URL, CFG_TMPDI
      CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
      CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
      CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG, \
-     CFG_WEBDIR
+     CFG_WEBDIR, \
+     CFG_SITE_RECORD
 from invenio.access_control_config import CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
 from invenio import bibupload
 from invenio.search_engine import print_record
@@ -2269,18 +2270,18 @@ class BibUploadFFTModeTest(GenericBibUploadTest):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
-        """ % {'siteurl': CFG_SITE_URL}
+        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
-        """ % {'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" \
-            % {'siteurl': CFG_SITE_URL}
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
+        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
@@ -2331,18 +2332,18 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
-        """ % {'siteurl': CFG_SITE_URL}
+        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
-        """ % {'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" \
-            % {'siteurl': CFG_SITE_URL}
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
+        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
@@ -2397,22 +2398,22 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
          <datafield tag="980" ind1=" " ind2=" ">
           <subfield code="a">ARTICLE</subfield>
          </datafield>
         </record>
-        """ % {'siteurl': CFG_SITE_URL}
+        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
         980__ $$aARTICLE
-        """ % {'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" \
-            % {'siteurl': CFG_SITE_URL}
+        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
@@ -2486,10 +2487,11 @@ allow any</subfield>
           <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/test.ps.Z</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/test.ps.Z</subfield>
          </datafield>
         </record>
         """ % {'siteurl': CFG_SITE_URL,
+            'CFG_SITE_RECORD': CFG_SITE_RECORD,
             'email_tag': email_tag,
             'email_ind1': email_ind1 == '_' and ' ' or email_ind1,
             'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
@@ -2500,16 +2502,17 @@ allow any</subfield>
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
         %(email_tag)s%(email_ind1)s%(email_ind2)s $$%(email_code)sjekyll@cds.cern.ch
-        8564_ $$u%(siteurl)s/record/123456789/files/test.ps.Z
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/test.ps.Z
         """ % {'siteurl': CFG_SITE_URL,
+            'CFG_SITE_RECORD': CFG_SITE_RECORD,
             'email_tag': email_tag,
             'email_ind1': email_ind1 == ' ' and '_' or email_ind1,
             'email_ind2': email_ind2 == ' ' and '_' or email_ind2,
             'email_code': email_code}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/test.ps.Z" \
-               % {'siteurl': CFG_SITE_URL}
-        testrec_expected_url2 = "%(siteurl)s/record/123456789/files/test?format=ps.Z" \
-               % {'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/test.ps.Z" \
+               % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_url2 = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/test?format=ps.Z" \
+               % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
@@ -2607,26 +2610,26 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/CIDIESSE.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/CIDIESSE.gif</subfield>
           <subfield code="y">This is a description</subfield>
           <subfield code="z">This is a comment</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/CIDIESSE.jpeg</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/CIDIESSE.jpeg</subfield>
           <subfield code="y">This is a description</subfield>
           <subfield code="z">This is a second comment</subfield>
          </datafield>
         </record>
-        """ % {'siteurl': CFG_SITE_URL}
+        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/CIDIESSE.gif$$yThis is a description$$zThis is a comment
-        8564_ $$u%(siteurl)s/record/123456789/files/CIDIESSE.jpeg$$yThis is a description$$zThis is a second comment
-        """ % {'siteurl': CFG_SITE_URL}
-        testrec_expected_url1 = "%(siteurl)s/record/123456789/files/CIDIESSE.gif" % {'siteurl': CFG_SITE_URL}
-        testrec_expected_url2 = "%(siteurl)s/record/123456789/files/CIDIESSE.jpeg" % {'siteurl': CFG_SITE_URL}
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/CIDIESSE.gif$$yThis is a description$$zThis is a comment
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/CIDIESSE.jpeg$$yThis is a description$$zThis is a second comment
+        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_url1 = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/CIDIESSE.gif" % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_url2 = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/CIDIESSE.jpeg" % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
@@ -2694,10 +2697,10 @@ allow any</subfield>
           <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon</subfield>
           <subfield code="x">icon</subfield>
          </datafield>
          <datafield tag="980" ind1=" " ind2=" ">
@@ -2705,6 +2708,7 @@ allow any</subfield>
          </datafield>
         </record>
         """ % {'siteurl': CFG_SITE_URL,
+            'CFG_SITE_RECORD': CFG_SITE_RECORD,
             'email_tag': email_tag,
             'email_ind1': email_ind1 == '_' and ' ' or email_ind1,
             'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
@@ -2715,18 +2719,19 @@ allow any</subfield>
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
         %(email_tag)s%(email_ind1)s%(email_ind2)s $$%(email_code)sjekyll@cds.cern.ch
-        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
-        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon$$xicon
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon$$xicon
         980__ $$aARTICLE
         """ % {'siteurl': CFG_SITE_URL,
+            'CFG_SITE_RECORD': CFG_SITE_RECORD,
             'email_tag': email_tag,
             'email_ind1': email_ind1 == ' ' and '_' or email_ind1,
             'email_ind2': email_ind2 == ' ' and '_' or email_ind2,
             'email_code': email_code}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" \
-            % {'siteurl': CFG_SITE_URL}
-        testrec_expected_icon = "%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon" \
-            % {'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_icon = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
@@ -2784,25 +2789,25 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon</subfield>
           <subfield code="x">icon</subfield>
          </datafield>
         </record>
-        """ % {'siteurl': CFG_SITE_URL}
+        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
-        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon$$xicon
-        """ % {'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" \
-            % {'siteurl': CFG_SITE_URL}
-        testrec_expected_icon = "%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon" \
-            % {'siteurl': CFG_SITE_URL}
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon$$xicon
+        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_icon = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
@@ -2844,7 +2849,7 @@ allow any</subfield>
           <subfield code="a">%(siteurl)s/img/head.gif</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">%(siteurl)s/record/95/files/9809057.pdf</subfield>
+          <subfield code="a">%(siteurl)s/%(CFG_SITE_RECORD)s/95/files/9809057.pdf</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">%(prefix)s/var/tmp/demobibdata.xml</subfield>
@@ -2852,7 +2857,8 @@ allow any</subfield>
         </record>
         """ % {
             'prefix': CFG_PREFIX,
-            'siteurl': CFG_SITE_URL
+            'siteurl': CFG_SITE_URL,
+            'CFG_SITE_RECORD': CFG_SITE_RECORD,
         }
         testrec_expected_xm = """
         <record>
@@ -2863,32 +2869,32 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/9809057.pdf</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/9809057.pdf</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/demobibdata.xml</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/demobibdata.xml</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/head.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
-        """ % { 'siteurl': CFG_SITE_URL}
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/9809057.pdf
-        8564_ $$u%(siteurl)s/record/123456789/files/demobibdata.xml
-        8564_ $$u%(siteurl)s/record/123456789/files/head.gif
-        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
-        """ % { 'siteurl': CFG_SITE_URL}
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/9809057.pdf
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/demobibdata.xml
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         # insert test record:
         testrec_expected_urls = []
         for files in ('site_logo.gif', 'head.gif', '9809057.pdf', 'demobibdata.xml'):
-            testrec_expected_urls.append('%(siteurl)s/record/123456789/files/%(files)s' % {'siteurl' : CFG_SITE_URL, 'files' : files})
+            testrec_expected_urls.append('%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/%(files)s' % {'siteurl' : CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD, 'files' : files})
         recs = bibupload.xml_marc_to_records(test_to_upload)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
         # replace test buffers with real recid of inserted test record:
@@ -2898,7 +2904,7 @@ allow any</subfield>
                                                           str(recid))
         testrec_expected_urls = []
         for files in ('site_logo.gif', 'head.gif', '9809057.pdf', 'demobibdata.xml'):
-            testrec_expected_urls.append('%(siteurl)s/record/%(recid)s/files/%(files)s' % {'siteurl' : CFG_SITE_URL, 'files' : files, 'recid' : recid})
+            testrec_expected_urls.append('%(siteurl)s/%(CFG_SITE_RECORD)s/%(recid)s/files/%(files)s' % {'siteurl' : CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD, 'files' : files, 'recid' : recid})
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
@@ -2952,18 +2958,18 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
-        """ % { 'siteurl': CFG_SITE_URL}
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
-        """ % { 'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" \
-            % {'siteurl': CFG_SITE_URL}
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
@@ -3020,10 +3026,10 @@ allow any</subfield>
           <subfield code="u">%(siteurl)s/img/site_logo.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
-        """ % { 'siteurl': CFG_SITE_URL}
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_xm = """
         <record>
         <controlfield tag="001">123456789</controlfield>
@@ -3101,7 +3107,7 @@ allow any</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
           <subfield code="z">BibEdit Comment</subfield>
-          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
           <subfield code="y">BibEdit Description</subfield>
           <subfield code="x">01</subfield>
          </datafield>
@@ -3109,7 +3115,7 @@ allow any</subfield>
           <subfield code="u">http://cern.ch/</subfield>
          </datafield>
         </record>
-        """ % { 'siteurl': CFG_SITE_URL}
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
 
         testrec_expected_xm = str(test_to_replace)
         testrec_expected_hm = """
@@ -3117,11 +3123,11 @@ allow any</subfield>
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
         8564_ $$uhttp://www.google.com/
-        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif$$x01$$yBibEdit Description$$zBibEdit Comment
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif$$x01$$yBibEdit Description$$zBibEdit Comment
         8564_ $$uhttp://cern.ch/
-        """ % { 'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" \
-            % {'siteurl': CFG_SITE_URL}
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
@@ -3197,20 +3203,20 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/patata.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif</subfield>
           <subfield code="y">Next Try</subfield>
           <subfield code="z">Comment</subfield>
          </datafield>
         </record>
-        """ % { 'siteurl': CFG_SITE_URL}
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/patata.gif$$yNext Try$$zComment
-        """ % { 'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/patata.gif" \
-            % {'siteurl': CFG_SITE_URL}
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif$$yNext Try$$zComment
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
 
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -3283,20 +3289,20 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/patata.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif</subfield>
           <subfield code="y">Try</subfield>
           <subfield code="z">Next Comment</subfield>
          </datafield>
         </record>
-        """ % { 'siteurl': CFG_SITE_URL}
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/patata.gif$$yTry$$zNext Comment
-        """ % { 'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/patata.gif" \
-            % {'siteurl': CFG_SITE_URL}
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif$$yTry$$zNext Comment
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
 
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -3361,19 +3367,19 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon</subfield>
           <subfield code="x">icon</subfield>
          </datafield>
         </record>
-        """ % { 'siteurl': CFG_SITE_URL}
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon$$xicon
-        """ % { 'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif?subformat=icon" \
-            % {'siteurl': CFG_SITE_URL}
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon$$xicon
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
 
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -3456,18 +3462,18 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/patata.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif</subfield>
          </datafield>
         </record>
-        """ % { 'siteurl': CFG_SITE_URL}
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/patata.gif
-        """ % { 'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/patata.gif" \
-            % {'siteurl': CFG_SITE_URL}
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
 
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -3550,21 +3556,21 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/head.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
-        """ % { 'siteurl': CFG_SITE_URL}
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/record/123456789/files/head.gif
-        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
-        """ % { 'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" % { 'siteurl': CFG_SITE_URL}
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
 
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -3661,10 +3667,11 @@ allow any</subfield>
           <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
         """ % {'siteurl': CFG_SITE_URL,
+            'CFG_SITE_RECORD': CFG_SITE_RECORD,
             'email_tag': email_tag,
             'email_ind1': email_ind1 == '_' and ' ' or email_ind1,
             'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
@@ -3674,13 +3681,14 @@ allow any</subfield>
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
         %(email_tag)s%(email_ind1)s%(email_ind2)s $$%(email_code)sjekyll@cds.cern.ch
-        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
         """ % {'siteurl': CFG_SITE_URL,
+            'CFG_SITE_RECORD': CFG_SITE_RECORD,
             'email_tag': email_tag,
             'email_ind1': email_ind1 == ' ' and '_' or email_ind1,
             'email_ind2': email_ind2 == ' ' and '_' or email_ind2,
             'email_code': email_code}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" % { 'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
 
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -3720,9 +3728,9 @@ allow any</subfield>
         expected_content_version2 = urlopen('%s/img/head.gif' % CFG_SITE_URL).read()
         expected_content_version3 = expected_content_version1
 
-        self.assertEqual(test_web_page_content('%s/record/%s/files/site_logo.gif?version=1' % (CFG_SITE_URL, recid), 'jekyll', 'j123ekyll', expected_content_version1), [])
-        self.assertEqual(test_web_page_content('%s/record/%s/files/site_logo.gif?version=2' % (CFG_SITE_URL, recid), 'jekyll', 'j123ekyll', expected_content_version2), [])
-        self.assertEqual(test_web_page_content('%s/record/%s/files/site_logo.gif?version=3' % (CFG_SITE_URL, recid), 'jekyll', 'j123ekyll', expected_content_version3), [])
+        self.assertEqual(test_web_page_content('%s/%s/%s/files/site_logo.gif?version=1' % (CFG_SITE_URL, CFG_SITE_RECORD, recid), 'jekyll', 'j123ekyll', expected_content_version1), [])
+        self.assertEqual(test_web_page_content('%s/%s/%s/files/site_logo.gif?version=2' % (CFG_SITE_URL, CFG_SITE_RECORD, recid), 'jekyll', 'j123ekyll', expected_content_version2), [])
+        self.assertEqual(test_web_page_content('%s/%s/%s/files/site_logo.gif?version=3' % (CFG_SITE_URL, CFG_SITE_RECORD, recid), 'jekyll', 'j123ekyll', expected_content_version3), [])
 
 
     def test_simple_fft_replace(self):
@@ -3786,11 +3794,12 @@ allow any</subfield>
           <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/record/123456789/files/head.gif</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif</subfield>
          </datafield>
         </record>
         """ % {
              'siteurl': CFG_SITE_URL,
+            'CFG_SITE_RECORD': CFG_SITE_RECORD,
             'email_tag': email_tag,
             'email_ind1': email_ind1 == '_' and ' ' or email_ind1,
             'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
@@ -3801,14 +3810,15 @@ allow any</subfield>
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
         %(email_tag)s%(email_ind1)s%(email_ind2)s $$%(email_code)sjekyll@cds.cern.ch
-        8564_ $$u%(siteurl)s/record/123456789/files/head.gif
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif
         """ % {
             'siteurl': CFG_SITE_URL,
+            'CFG_SITE_RECORD': CFG_SITE_RECORD,
             'email_tag': email_tag,
             'email_ind1': email_ind1 == ' ' and '_' or email_ind1,
             'email_ind2': email_ind2 == ' ' and '_' or email_ind2,
             'email_code': email_code}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/head.gif" % { 'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif" % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
 
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)

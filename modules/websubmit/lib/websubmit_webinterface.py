@@ -37,7 +37,8 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_PREFIX, \
-     CFG_CERN_SITE
+     CFG_CERN_SITE, \
+     CFG_SITE_RECORD
 from invenio import webinterface_handler_config as apache
 from invenio.dbquery import run_sql
 from invenio.access_control_config import VIEWRESTRCOLL
@@ -85,7 +86,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
         self.recid = recid
 
     def _lookup(self, component, path):
-        # after /record/<recid>/files/ every part is used as the file
+        # after /<CFG_SITE_RECORD>/<recid>/files/ every part is used as the file
         # name
         filename = component
 
@@ -104,7 +105,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 verbose = 0
 
             if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE > 1:
-                return page_not_authorized(req, "/record/%s" % self.recid,
+                return page_not_authorized(req, "/%s/%s" % (CFG_SITE_RECORD, self.recid),
                                            navmenuid='submit')
 
             if record_exists(self.recid) < 1:
@@ -239,7 +240,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             if ln != CFG_SITE_LANG:
                 link_ln = '?ln=%s' % ln
             tabs = [(unordered_tabs[tab_id]['label'], \
-                     '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
+                     '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
                      tab_id == 'files',
                      unordered_tabs[tab_id]['enabled']) \
                     for (tab_id, order) in ordered_tabs_id
@@ -253,9 +254,9 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             title, description, keywords = websearch_templates.tmpl_record_page_header_content(req, self.recid, args['ln'])
             return pageheaderonly(title=title,
                         navtrail=create_navtrail_links(cc=cc, aas=0, ln=ln) + \
-                                        ''' &gt; <a class="navtrail" href="%s/record/%s">%s</a>
+                                        ''' &gt; <a class="navtrail" href="%s/%s/%s">%s</a>
                                         &gt; %s''' % \
-                        (CFG_SITE_URL, self.recid, title, _("Access to Fulltext")),
+                        (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, title, _("Access to Fulltext")),
 
                         description="",
                         keywords="keywords",
@@ -271,7 +272,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
         return getfile, []
 
     def __call__(self, req, form):
-        """Called in case of URLs like /record/123/files without
+        """Called in case of URLs like /CFG_SITE_RECORD/123/files without
            trailing slash.
         """
         args = wash_urlargd(form, websubmit_templates.files_default_urlargd)
@@ -280,7 +281,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
         if ln != CFG_SITE_LANG:
             link_ln = '?ln=%s' % ln
 
-        return redirect_to_url(req, '%s/record/%s/files/%s' % (CFG_SITE_URL, self.recid, link_ln))
+        return redirect_to_url(req, '%s/%s/%s/files/%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, link_ln))
 
 def websubmit_legacy_getfile(req, form):
     """ Handle legacy /getfile.py URLs """
@@ -318,7 +319,7 @@ def websubmit_legacy_getfile(req, form):
 
         format = normalize_format(format)
 
-        redirect_to_url(req, '%s/record/%s/files/%s%s?ln=%s%s' % (CFG_SITE_URL, recid, name, format, ln, version and 'version=%s' % version or ''), apache.HTTP_MOVED_PERMANENTLY)
+        redirect_to_url(req, '%s/%s/%s/files/%s%s?ln=%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, recid, name, format, ln, version and 'version=%s' % version or ''), apache.HTTP_MOVED_PERMANENTLY)
 
     return _getfile_py(req, **args)
 

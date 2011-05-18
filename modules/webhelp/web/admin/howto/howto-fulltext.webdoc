@@ -66,7 +66,7 @@ Options:
                         matches documents created between date1 and date2;
                         dates can be expressed relatively
     --url=URL           matches the document referred by the URL, e.g. "http:/
-                        /pcsk.cern.ch/record/1/files/foobar.pdf?version=2"
+                        /pcsk.cern.ch/<CFG_SITE_RECORD>/1/files/foobar.pdf?version=2"
     --path=PATH         matches the document referred by the internal
                         filesystem path, e.g. /opt/cds-
                         dev/var/data/files/g0/1/foobar.pdf\;1

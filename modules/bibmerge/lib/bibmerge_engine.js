@@ -951,14 +951,14 @@ function getFieldTag(fieldGroupDiv) {
 
 function onclickLinkToBibEdit1() {
   if (gHash!='' && gRecID1!=null)
-    window.location = '/record/edit/#state=edit&recid='+gRecID1;
+    window.location = '/'+ gSITE_RECORD +'/edit/#state=edit&recid='+gRecID1;
   else
     showMessage('ErrorMsg', 'A valid record id must be selected', 6000);
   return false;
 }
 function onclickLinkToBibEdit2() {
   if (gHash!='' && gRecord2Mode=='recid' && gRecID2!=null)
-    window.location = '/record/edit/#state=edit&recid='+gRecID2;
+    window.location = '/'+ gSITE_RECORD +'/edit/#state=edit&recid='+gRecID2;
   else
     showMessage('ErrorMsg', 'A valid record id must be selected', 6000);
   return false;

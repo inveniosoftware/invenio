@@ -112,7 +112,8 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_TMPDIR, CFG_TMPSHAREDDIR, CFG_PATH_MD5SUM, \
     CFG_WEBSUBMIT_STORAGEDIR, \
     CFG_BIBDOCFILE_USE_XSENDFILE, \
-    CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY
+    CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY, \
+    CFG_SITE_RECORD
 from invenio.websubmit_config import CFG_WEBSUBMIT_ICON_SUBFORMAT_RE, \
     CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT
 import invenio.template
@@ -1877,8 +1878,8 @@ class BibDoc:
             if url:
                 ## Given a url
                 url = url[0]
-                if url == '%s/record/%s/files/' % (CFG_SITE_URL, self.recid):
-                    ## If it is a traditional /record/1/files/ one
+                if url == '%s/%s/%s/files/' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid):
+                    ## If it is a traditional /CFG_SITE_RECORD/1/files/ one
                     ## We have global description/comment for all the formats
                     description = field_get_subfield_values(field, 'y')
                     if description:
@@ -2624,11 +2625,11 @@ class BibDocFile:
         self.name = name
         self.dir = os.path.dirname(fullpath)
         if self.subformat:
-            self.url = create_url('%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, self.name, self.superformat), {'subformat' : self.subformat})
-            self.fullurl = create_url('%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, self.name, self.superformat), {'subformat' : self.subformat, 'version' : self.version})
+            self.url = create_url('%s/%s/%s/files/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, self.name, self.superformat), {'subformat' : self.subformat})
+            self.fullurl = create_url('%s/%s/%s/files/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, self.name, self.superformat), {'subformat' : self.subformat, 'version' : self.version})
         else:
-            self.url = create_url('%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, self.name, self.superformat), {})
-            self.fullurl = create_url('%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, self.name, self.superformat), {'version' : self.version})
+            self.url = create_url('%s/%s/%s/files/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, self.name, self.superformat), {})
+            self.fullurl = create_url('%s/%s/%s/files/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, self.name, self.superformat), {'version' : self.version})
         self.etag = '"%i%s%i"' % (self.docid, self.format, self.version)
         self.magic = None
 
@@ -3241,27 +3242,27 @@ def calculate_md5(filename, force_internal=False):
 
 
 def bibdocfile_url_to_bibrecdocs(url):
-    """Given an URL in the form CFG_SITE_[SECURE_]URL/record/xxx/files/... it returns
+    """Given an URL in the form CFG_SITE_[SECURE_]URL/CFG_SITE_RECORD/xxx/files/... it returns
     a BibRecDocs object for the corresponding recid."""
 
     recid = decompose_bibdocfile_url(url)[0]
     return BibRecDocs(recid)
 
 def bibdocfile_url_to_bibdoc(url):
-    """Given an URL in the form CFG_SITE_[SECURE_]URL/record/xxx/files/... it returns
+    """Given an URL in the form CFG_SITE_[SECURE_]URL/CFG_SITE_RECORD/xxx/files/... it returns
     a BibDoc object for the corresponding recid/docname."""
 
     docname = decompose_bibdocfile_url(url)[1]
     return bibdocfile_url_to_bibrecdocs(url).get_bibdoc(docname)
 
 def bibdocfile_url_to_bibdocfile(url):
-    """Given an URL in the form CFG_SITE_[SECURE_]URL/record/xxx/files/... it returns
+    """Given an URL in the form CFG_SITE_[SECURE_]URL/CFG_SITE_RECORD/xxx/files/... it returns
     a BibDocFile object for the corresponding recid/docname/format."""
     dummy, dummy, format = decompose_bibdocfile_url(url)
     return bibdocfile_url_to_bibdoc(url).get_file(format)
 
 def bibdocfile_url_to_fullpath(url):
-    """Given an URL in the form CFG_SITE_[SECURE_]URL/record/xxx/files/... it returns
+    """Given an URL in the form CFG_SITE_[SECURE_]URL/CFG_SITE_RECORD/xxx/files/... it returns
     the fullpath for the corresponding recid/docname/format."""
 
     return bibdocfile_url_to_bibdocfile(url).get_full_path()
@@ -3271,7 +3272,7 @@ def bibdocfile_url_p(url):
     fulltext owned by a system."""
     if url.startswith('%s/getfile.py' % CFG_SITE_URL) or url.startswith('%s/getfile.py' % CFG_SITE_SECURE_URL):
         return True
-    if not (url.startswith('%s/record/' % CFG_SITE_URL) or url.startswith('%s/record/' % CFG_SITE_SECURE_URL)):
+    if not (url.startswith('%s/%s/' % (CFG_SITE_URL, CFG_SITE_RECORD)) or url.startswith('%s/%s/' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD))):
         return False
     splitted_url = url.split('/files/')
     return len(splitted_url) == 2 and splitted_url[0] != '' and splitted_url[1] != ''
@@ -3306,22 +3307,22 @@ def decompose_bibdocfile_url(url):
     """Given a bibdocfile_url return a triple (recid, docname, format)."""
     if url.startswith('%s/getfile.py' % CFG_SITE_URL) or url.startswith('%s/getfile.py' % CFG_SITE_SECURE_URL):
         return decompose_bibdocfile_very_old_url(url)
-    if url.startswith('%s/record/' % CFG_SITE_URL):
-        recid_file = url[len('%s/record/' % CFG_SITE_URL):]
-    elif url.startswith('%s/record/' % CFG_SITE_SECURE_URL):
-        recid_file = url[len('%s/record/' % CFG_SITE_SECURE_URL):]
+    if url.startswith('%s/%s/' % (CFG_SITE_URL, CFG_SITE_RECORD)):
+        recid_file = url[len('%s/%s/' % (CFG_SITE_URL, CFG_SITE_RECORD)):]
+    elif url.startswith('%s/%s/' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD)):
+        recid_file = url[len('%s/%s/' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD)):]
     else:
         raise InvenioWebSubmitFileError, "Url %s doesn't correspond to a valid record inside the system." % url
     recid_file = recid_file.replace('/files/', '/')
     recid, docname, format = decompose_file(urllib.unquote(recid_file))
     if not recid and docname.isdigit():
-        ## If the URL was something similar to CFG_SITE_URL/record/123
+        ## If the URL was something similar to CFG_SITE_URL/CFG_SITE_RECORD/123
         return (int(docname), '', '')
     return (int(recid), docname, format)
 
-re_bibdocfile_old_url = re.compile(r'/record/(\d*)/files/')
+re_bibdocfile_old_url = re.compile(r'/%s/(\d*)/files/' % CFG_SITE_RECORD)
 def decompose_bibdocfile_old_url(url):
-    """Given a bibdocfile old url (e.g. CFG_SITE_URL/record/123/files)
+    """Given a bibdocfile old url (e.g. CFG_SITE_URL/CFG_SITE_RECORD/123/files)
     it returns the recid."""
     g = re_bibdocfile_old_url.search(url)
     if g:

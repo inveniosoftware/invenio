@@ -39,7 +39,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.bibedit_engine import perform_request_ajax, perform_request_init, \
     perform_request_newticket, perform_request_compare
 from invenio.bibedit_utils import json_unicode_to_utf8
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_RECORD
 from invenio.messages import gettext_set_language
 from invenio.search_engine import guess_primary_collection_of_a_record
 from invenio.urlutils import redirect_to_url
@@ -110,7 +110,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
                                                                'runbibedit')
                 referer = '/edit/'
                 if self.recid:
-                    referer = '/record/%s/edit/' % self.recid
+                    referer = '/%s/%s/edit/' % (CFG_SITE_RECORD, self.recid)
                 return page_not_authorized(req=req, referer=referer,
                                            text=auth_message, navtrail=navtrail)
             else:
@@ -121,8 +121,8 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         elif self.recid:
             # Handle RESTful calls from logged in users by redirecting to
             # generic URL.
-            redirect_to_url(req, '%s/record/edit/#state=edit&recid=%s&recrev=%s' % (
-                    CFG_SITE_URL, self.recid, ""))
+            redirect_to_url(req, '%s/%s/edit/#state=edit&recid=%s&recrev=%s' % (
+                    CFG_SITE_URL, CFG_SITE_RECORD, self.recid, ""))
 
         elif recid is not None:
             json_response.update({'recID': recid})
@@ -217,7 +217,8 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
     def __call__(self, req, form):
         """Redirect calls without final slash."""
         if self.recid:
-            redirect_to_url(req, '%s/record/%s/edit/' % (CFG_SITE_URL,
+            redirect_to_url(req, '%s/%s/%s/edit/' % (CFG_SITE_URL,
+                                                         CFG_SITE_RECORD,
                                                          self.recid))
         else:
-            redirect_to_url(req, '%s/record/edit/' % CFG_SITE_URL)
+            redirect_to_url(req, '%s/%s/edit/' % CFG_SITE_URL, CFG_SITE_RECORD)

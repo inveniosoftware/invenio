@@ -23,7 +23,7 @@ import re
 import operator
 
 from invenio.config import CFG_SITE_URL, \
-     CFG_SITE_LANG
+     CFG_SITE_LANG, CFG_SITE_RECORD
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datetext_to_dategui, convert_datestruct_to_dategui
 from invenio.urlutils import create_html_link
@@ -1142,7 +1142,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        title = _("record") + ' #' + '<a href="%s/record/%s">%s</a>' % (CFG_SITE_URL, recid, recid)
+        title = _("record") + ' #' + '<a href="%s/%s/%s">%s</a>' % (CFG_SITE_URL, CFG_SITE_RECORD, recid, recid)
         if docname != "":
             title += ' ' + _("document") + ' #' + str(docname)
         if version != "":
@@ -1225,9 +1225,10 @@ class Template:
                    }
         for version in versions:
             if version['previous']:
-                versiontext =  """<br />(%(see)s <a href="%(siteurl)s/record/%(recID)s/files/?docname=%(docname)s&amp;version=all%(ln_link)s">%(previous)s</a>)""" % {
+                versiontext =  """<br />(%(see)s <a href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/files/?docname=%(docname)s&amp;version=all%(ln_link)s">%(previous)s</a>)""" % {
                                  'see' : _("see"),
                                  'siteurl' : CFG_SITE_URL,
+                                 'CFG_SITE_RECORD': CFG_SITE_RECORD,
                                  'docname' : urllib.quote(docname),
                                  'recID': recid,
                                  'previous': _("previous"),
@@ -1281,8 +1282,9 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        urlbase = '%s/record/%s/files/%s' % (
+        urlbase = '%s/%s/%s/files/%s' % (
             CFG_SITE_URL,
+            CFG_SITE_RECORD,
             recid,
             '%s%s' % (name, superformat))
 
@@ -2333,12 +2335,13 @@ class Template:
                    }
         if sysno != "":
             out += """<strong class="headline">%(more)s</strong>
-                        <a href="%(siteurl)s/record/%(sysno)s?ln=%(ln)s">%(click)s</a>
+                        <a href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(sysno)s?ln=%(ln)s">%(click)s</a>
                         <br /><br />
                    """ % {
                      'more' : _("More information:"),
                      'click' : _("Click here"),
                      'siteurl' : CFG_SITE_URL,
+                     'CFG_SITE_RECORD': CFG_SITE_RECORD,
                      'sysno' : sysno,
                      'ln' : ln,
                    }
@@ -2455,12 +2458,13 @@ class Template:
         out += "<tr height='30px'><td width='120px'>"
         if sysno != "":
             out += """<strong class="headline">%(more)s</strong>
-                        </td><td><a href="%(siteurl)s/record/%(sysno)s?ln=%(ln)s">%(click)s</a>
+                        </td><td><a href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(sysno)s?ln=%(ln)s">%(click)s</a>
                         </td></tr>
                    """ % {
                      'more' : _("More information:"),
                      'click' : _("Click here"),
                      'siteurl' : CFG_SITE_URL,
+                     'CFG_SITE_RECORD': CFG_SITE_RECORD,
                      'sysno' : sysno,
                      'ln' : ln,
                    }
@@ -2763,12 +2767,13 @@ class Template:
                    }
         if sysno != "":
             out += """<strong class="headline">%(more)s</strong>
-                        <a href="%(siteurl)s/record/%(sysno)s?ln=%(ln)s">%(click)s</a>
+                        <a href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(sysno)s?ln=%(ln)s">%(click)s</a>
                         <br /><br />
                    """ % {
                      'more' : _("More information:"),
                      'click' : _("Click here"),
                      'siteurl' : CFG_SITE_URL,
+                     'CFG_SITE_RECORD': CFG_SITE_RECORD,
                      'sysno' : sysno,
                      'ln' : ln,
                    }
@@ -2946,12 +2951,13 @@ class Template:
                    }
         if sysno != "":
             out += """<strong class="headline">%(more)s</strong>
-                        <a href="%(siteurl)s/record/%(sysno)s?ln=%(ln)s">%(click)s</a>
+                        <a href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(sysno)s?ln=%(ln)s">%(click)s</a>
                         <br /><br />
                    """ % {
                      'more' : _("More information:"),
                      'click' : _("Click here"),
                      'siteurl' : CFG_SITE_URL,
+                     'CFG_SITE_RECORD': CFG_SITE_RECORD,
                      'sysno' : sysno,
                      'ln' : ln,
                    }

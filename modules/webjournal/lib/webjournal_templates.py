@@ -26,7 +26,8 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_ETCDIR, \
      CFG_SITE_URL, \
-     CFG_SITE_LANG
+     CFG_SITE_LANG, \
+     CFG_SITE_RECORD
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webjournal_utils import \
@@ -174,13 +175,14 @@ class Template:
         for (recid, img_url) in featured_records:
             out += '''<tr style="background-color:#%(color)s">
                <td class="admintd"><img src="%(img_url)s" alt="" height="40px"/></td>
-               <td class="admintdleft"><a href="%(CFG_SITE_URL)s/record/%(recid)s">Record %(recid)s</a></td>
+               <td class="admintdleft"><a href="%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/%(recid)s">Record %(recid)s</a></td>
                <td class="admintdright"><a href="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/feature_record?journal_name=%(journal_name)s&amp;action=askremove&amp;recid=%(recid)s">remove</a></td>
             </tr>''' % {'color': color,
                         'journal_name': journal_name,
                         'recid': recid,
                         'img_url': img_url,
-                        'CFG_SITE_URL': CFG_SITE_URL}
+                        'CFG_SITE_URL': CFG_SITE_URL,
+                        'CFG_SITE_RECORD': CFG_SITE_RECORD}
             if color == 'fff':
                 color = 'EBF7FF'
             else:

@@ -32,7 +32,8 @@ from invenio.websubmit_config import InvenioWebSubmitFunctionError, \
 from invenio.config import CFG_CERN_SITE, \
                            CFG_SITE_NAME, \
                            CFG_SITE_URL, \
-                           CFG_SITE_SUPPORT_EMAIL
+                           CFG_SITE_SUPPORT_EMAIL, \
+                           CFG_SITE_RECORD
 from invenio.access_control_admin import acc_get_role_users, acc_get_role_id
 from invenio.websubmit_functions.Shared_Functions import ParamFromFile
 from invenio.errorlib import register_exception
@@ -50,7 +51,7 @@ follows:
  Author(s): %(authors)s
 
 You can see the details of the record at the following address:
- <%(site-url)s/record/%(record-id)s>
+ <%(site-url)s/%(CFG_SITE_RECORD)s/%(record-id)s>
 
 Please register your decision by following the instructions at the
 following address:
@@ -387,6 +388,7 @@ def Mail_Approval_Request_to_Referee(parameters, curdir, form, user_info=None):
     mail_subj = "Request for approval of [%s]" % rn
     mail_body = CFG_MAIL_BODY % \
                 { 'site-name'               : CFG_SITE_NAME,
+                  'CFG_SITE_RECORD'          : CFG_SITE_RECORD,
                   'report-number-fieldname' : edsrn_file,
                   'report-number'           : rn,
                   'title'                   : rec_title,

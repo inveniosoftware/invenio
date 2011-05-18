@@ -45,7 +45,8 @@ from invenio.config import \
      CFG_PREFIX, \
      CFG_WEBCOMMENT_ALLOW_COMMENTS,\
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
-     CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS
+     CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS, \
+     CFG_SITE_RECORD
 from invenio.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.search_engine import create_navtrail_links, \
@@ -207,7 +208,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             if argd['ln'] != CFG_SITE_LANG:
                 link_ln = '?ln=%s' % argd['ln']
             tabs = [(unordered_tabs[tab_id]['label'], \
-                     '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
+                     '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
                      tab_id in ['comments', 'reviews'],
                      unordered_tabs[tab_id]['enabled']) \
                     for (tab_id, order) in ordered_tabs_id
@@ -223,7 +224,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
             if navtrail:
                 navtrail += ' &gt; '
-            navtrail += '<a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
+            navtrail += '<a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
             navtrail += title
             navtrail += '</a>'
             navtrail += ' &gt; <a class="navtrail">%s</a>' % (self.discussion==1 and _("Reviews") or _("Comments"))
@@ -260,7 +261,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         warnings=check_warnings, errors=[],
                         navmenuid='search')
 
-    # Return the same page wether we ask for /record/123 or /record/123/
+    # Return the same page wether we ask for /CFG_SITE_RECORD/123 or /CFG_SITE_RECORD/123/
     __call__ = index
 
     def add(self, req, form):
@@ -407,10 +408,11 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid))
             if navtrail:
                 navtrail += ' &gt; '
-            navtrail += '<a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
+            navtrail += '<a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
             navtrail += title
             navtrail += '</a>'
-            navtrail += '&gt; <a class="navtrail" href="%s/record/%s/%s/?ln=%s">%s</a>' % (CFG_SITE_URL,
+            navtrail += '&gt; <a class="navtrail" href="%s/%s/%s/%s/?ln=%s">%s</a>' % (CFG_SITE_URL,
+                                                                                           CFG_SITE_RECORD,
                                                                                            self.recid,
                                                                                            self.discussion==1 and 'reviews' or 'comments',
                                                                                            argd['ln'],
@@ -428,7 +430,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
                     argd.update(cookie_argd)
                 except InvenioWebAccessMailCookieDeletedError, e:
-                    return redirect_to_url(req, CFG_SITE_URL + '/record/' + \
+                    return redirect_to_url(req, CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + \
                                            str(self.recid) + (self.discussion==1 and \
                                                               '/reviews' or '/comments'))
                 except InvenioWebAccessMailCookieError, e:
@@ -547,8 +549,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             redirect_to_url(req, argd['referer'])
         else:
             #Note: sent to comments display
-            referer = "%s/record/%s/%s?&amp;ln=%s&amp;voted=1"
-            referer %= (CFG_SITE_URL, self.recid, self.discussion == 1 and 'reviews' or 'comments', argd['ln'])
+            referer = "%s/%s/%s/%s?&amp;ln=%s&amp;voted=1"
+            referer %= (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, self.discussion == 1 and 'reviews' or 'comments', argd['ln'])
             redirect_to_url(req, referer)
 
     def report(self, req, form):
@@ -606,8 +608,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             redirect_to_url(req, argd['referer'])
         else:
             #Note: sent to comments display
-            referer = "%s/record/%s/%s/display?ln=%s&amp;voted=1"
-            referer %= (CFG_SITE_URL, self.recid, self.discussion==1 and 'reviews' or 'comments', argd['ln'])
+            referer = "%s/%s/%s/%s/display?ln=%s&amp;voted=1"
+            referer %= (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, self.discussion==1 and 'reviews' or 'comments', argd['ln'])
             redirect_to_url(req, referer)
 
     def subscribe(self, req, form):
@@ -632,8 +634,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 text = auth_msg)
 
         success = subscribe_user_to_discussion(self.recid, uid)
-        display_url = "%s/record/%s/comments/display?subscribed=%s&ln=%s" % \
-                      (CFG_SITE_URL, self.recid, str(success), argd['ln'])
+        display_url = "%s/%s/%s/comments/display?subscribed=%s&ln=%s" % \
+                      (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, str(success), argd['ln'])
         redirect_to_url(req, display_url)
 
     def unsubscribe(self, req, form):
@@ -653,8 +655,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             return redirect_to_url(req, target, norobot=True)
 
         success = unsubscribe_user_from_discussion(self.recid, uid)
-        display_url = "%s/record/%s/comments/display?subscribed=%s&ln=%s" % \
-                      (CFG_SITE_URL, self.recid, str(-success), argd['ln'])
+        display_url = "%s/%s/%s/comments/display?subscribed=%s&ln=%s" % \
+                      (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, str(-success), argd['ln'])
         redirect_to_url(req, display_url)
 
 class WebInterfaceCommentsFiles(WebInterfaceDirectory):
@@ -672,7 +674,7 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
     def _lookup(self, component, path):
         """ This handler is invoked for the dynamic URLs (for getting
         <strike>and putting attachments</strike>) Eg:
-        CFG_SITE_URL/record/5953/comments/attachments/get/652/myfile.pdf
+        CFG_SITE_URL/CFG_SITE_RECORD/5953/comments/attachments/get/652/myfile.pdf
         """
         if component == 'get' and len(path) > 1:
 
@@ -696,7 +698,7 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
         Returns a file attached to a comment.
 
         Example:
-        CFG_SITE_URL/record/5953/comments/attachments/get/652/myfile.pdf
+        CFG_SITE_URL/CFG_SITE_RECORD/5953/comments/attachments/get/652/myfile.pdf
         where 652 is the comment ID
         """
         argd = wash_urlargd(form, {'file': (str, None),
@@ -772,7 +774,7 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
 ##         uid = getUid(req)
 
 ##         # URL where the file can be fetched after upload
-##         user_files_path = '%(CFG_SITE_URL)s/record/%(recid)i/comments/attachments/get/%(uid)s' % \
+##         user_files_path = '%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/%(recid)i/comments/attachments/get/%(uid)s' % \
 ##                           {'uid': uid,
 ##                            'recid': self.recid,
 ##                            'CFG_SITE_URL': CFG_SITE_URL}

@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_RECORD
 from invenio.testutils import make_test_suite, \
                               run_test_suite, \
                               test_web_page_content
@@ -43,7 +43,7 @@ class BibFormatAPITest(unittest.TestCase):
                                user_info=None,
                                on_the_fly=True)
 
-        pageurl = CFG_SITE_URL + '/record/73?of=hx'
+        pageurl = CFG_SITE_URL + '/%s/73?of=hx' % CFG_SITE_RECORD
         result = test_web_page_content(pageurl,
                                        expected_text=result)
 
@@ -69,7 +69,7 @@ class BibFormatBibTeXTest(unittest.TestCase):
     def test_bibtex_output(self):
         """bibformat - BibTeX output"""
 
-        pageurl = CFG_SITE_URL + '/record/74?of=hx'
+        pageurl = CFG_SITE_URL + '/%s/74?of=hx' % CFG_SITE_RECORD
         result = test_web_page_content(pageurl,
                                        expected_text=self.record_74_hx)
         self.assertEqual([], result)
@@ -123,14 +123,14 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
         self.record_7_hd_abstract = '''<p><span class="blocknote">
  Caption</span><br /> <small>Conference "Internet, Web, What's next?" on 26 June 1998 at CERN : Tim Berners-Lee, inventor of the World-Wide Web and Director of the W3C, explains how the Web came to be and give his views on the future.</small></p><p><span class="blocknote">
  Légende</span><br /><small>Conference "Internet, Web, What's next?" le 26 juin 1998 au CERN: Tim Berners-Lee, inventeur du World-Wide Web et directeur du W3C, explique comment le Web est ne, et donne ses opinions sur l'avenir.</small></p>'''
-        self.record_7_hd_resource = '''<img src="%s/record/7/files/9806033.gif?subformat=icon" alt="9806033" style="max-width:250px;_width:250px;" />''' % CFG_SITE_URL
-        self.record_7_hd_resource_link = '%s/record/7/files/9806033.jpeg' %  CFG_SITE_URL
+        self.record_7_hd_resource = '''<img src="%s/%s/7/files/9806033.gif?subformat=icon" alt="9806033" style="max-width:250px;_width:250px;" />''' % (CFG_SITE_URL, CFG_SITE_RECORD)
+        self.record_7_hd_resource_link = '%s/%s/7/files/9806033.jpeg' %  (CFG_SITE_URL, CFG_SITE_RECORD)
 
     def test_detailed_html_output(self):
         """bibformat - Detailed HTML output"""
 
         # Test record 74 (Article)
-        pageurl = CFG_SITE_URL + '/record/74?of=hd'
+        pageurl = CFG_SITE_URL + '/%s/74?of=hd' % CFG_SITE_RECORD
         result = test_web_page_content(pageurl,
                                        expected_text=[self.record_74_hd_header,
                                                       self.record_74_hd_title,
@@ -144,7 +144,7 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
         self.assertEqual([], result)
 
         # Test record 7 (Picture)
-        pageurl = CFG_SITE_URL + '/record/7?of=hd'
+        pageurl = CFG_SITE_URL + '/%s/7?of=hd' % CFG_SITE_RECORD
         result = test_web_page_content(pageurl,
                                        expected_text=[self.record_7_hd_header,
                                                       self.record_7_hd_title,
@@ -156,7 +156,7 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
 
     def test_detailed_html_edit_record(self):
         """bibformat - Detailed HTML output edit record link presence"""
-        pageurl = CFG_SITE_URL + '/record/74?of=hd'
+        pageurl = CFG_SITE_URL + '/%s/74?of=hd' % CFG_SITE_RECORD
         result = test_web_page_content(pageurl, username='admin',
                                        expected_text="Edit This Record")
         self.assertEqual([], result)
@@ -164,13 +164,13 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
     def test_detailed_html_no_error_message(self):
         """bibformat - Detailed HTML output without error message"""
         # No error message should be displayed in the web interface, whatever happens
-        pageurl = CFG_SITE_URL + '/record/74?of=hd'
+        pageurl = CFG_SITE_URL + '/%s/74?of=hd' % CFG_SITE_RECORD
         result = test_web_page_content(pageurl, username='admin',
                                        expected_text=["Exception",
                                                       "Could not"])
         self.assertNotEqual([], result)
 
-        pageurl = CFG_SITE_URL + '/record/7?of=hd'
+        pageurl = CFG_SITE_URL + '/%s/7?of=hd' % CFG_SITE_RECORD
         result = test_web_page_content(pageurl, username='admin',
                                        expected_text=["Exception",
                                                       "Could not"])
@@ -212,9 +212,9 @@ class BibFormatNLMTest(unittest.TestCase):
       <volume>05</volume>
       <fpage/>
       <lpage/>
-      <self-uri xlink:href="%(siteurl)s/record/70"/>
-      <self-uri xlink:href="%(siteurl)s/record/70/files/0003291.pdf"/>
-      <self-uri xlink:href="%(siteurl)s/record/70/files/0003291.ps.gz"/>
+      <self-uri xlink:href="%(siteurl)s/%(CFG_SITE_RECORD)s/70"/>
+      <self-uri xlink:href="%(siteurl)s/%(CFG_SITE_RECORD)s/70/files/0003291.pdf"/>
+      <self-uri xlink:href="%(siteurl)s/%(CFG_SITE_RECORD)s/70/files/0003291.ps.gz"/>
     </article-meta>
     <abstract>In its Euclidean formulation, the AdS/CFT correspondence begins as a study of Yang-Mills conformal field theories on the sphere, S^4. It has been successfully extended, however, to S^1 X S^3 and to the torus T^4. It is natural tohope that it can be made to work for any manifold on which it is possible to define a stable Yang-Mills conformal field theory. We consider a possible classification of such manifolds, and show how to deal with the most obviousobjection : the existence of manifolds which cannot be represented as boundaries. We confirm Witten's suggestion that this can be done with the help of a brane in the bulk.</abstract>
   </front>
@@ -222,12 +222,12 @@ class BibFormatNLMTest(unittest.TestCase):
   <ref/>
 </article>
 
-</articles>''' % {'siteurl': CFG_SITE_URL}
+</articles>''' % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
 
     def test_nlm_output(self):
         """bibformat - NLM output"""
 
-        pageurl = CFG_SITE_URL + '/record/70?of=xn'
+        pageurl = CFG_SITE_URL + '/%s/70?of=xn' % CFG_SITE_RECORD
         result = test_web_page_content(pageurl,
                                        expected_text=self.record_70_xn)
         try:
@@ -259,7 +259,7 @@ class BibFormatBriefHTMLTest(unittest.TestCase):
 
     def test_brief_html_output(self):
         """bibformat - Brief HTML output"""
-        pageurl = CFG_SITE_URL + '/record/76?of=HB'
+        pageurl = CFG_SITE_URL + '/%s/76?of=HB' % CFG_SITE_RECORD
         result = test_web_page_content(pageurl,
                                        expected_text=self.record_76_hb)
         self.assertEqual([], result)
@@ -339,7 +339,7 @@ class BibFormatMARCXMLTest(unittest.TestCase):
 
     def test_marcxml_output(self):
         """bibformat - MARCXML output"""
-        pageurl = CFG_SITE_URL + '/record/9?of=xm'
+        pageurl = CFG_SITE_URL + '/%s/9?of=xm' % CFG_SITE_RECORD
         result = test_web_page_content(pageurl,
                                        expected_text=self.record_9_xm)
         self.assertEqual([], result)
@@ -369,7 +369,7 @@ class BibFormatMARCTest(unittest.TestCase):
     def test_marc_output(self):
         """bibformat - MARC output"""
 
-        pageurl = CFG_SITE_URL + '/record/29?of=hm'
+        pageurl = CFG_SITE_URL + '/%s/29?of=hm' % CFG_SITE_RECORD
         result = test_web_page_content(pageurl,
                                        expected_text=self.record_29_hm)
         self.assertEqual([], result)
@@ -434,7 +434,7 @@ class BibFormatPublInfoFormattingTest(unittest.TestCase):
     def test_publinfo_in_html_detailed(self):
         """bibformat - publication reference info in HTML detailed formats"""
         self.assertEqual([],
-          test_web_page_content(CFG_SITE_URL + '/record/84',
+          test_web_page_content(CFG_SITE_URL + '/%s/84' % CFG_SITE_RECORD,
             expected_text="Nucl. Phys. B: 656 (2003) pp. 23-36"))
 
 TEST_SUITE = make_test_suite(BibFormatBibTeXTest,

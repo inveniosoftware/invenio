@@ -24,7 +24,7 @@ __revision__ = \
 
 from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_LANG, \
      CFG_SITE_SECURE_URL, CFG_SITE_SUPPORT_EMAIL, CFG_CERN_SITE, \
-     CFG_OPENAIRE_SITE
+     CFG_OPENAIRE_SITE, CFG_SITE_RECORD
 from invenio.messages import gettext_set_language
 
 
@@ -282,10 +282,10 @@ _ = gettext_set_language(CFG_SITE_LANG)
 
 # Activities (i.e. actions) for which exists an administrative web interface.
 CFG_ACC_ACTIVITIES_URLS = {
-    'runbibedit' : (_("Run Record Editor"), "%s/record/edit/?ln=%%s" % CFG_SITE_URL),
-    'runbibeditmulti' : (_("Run Multi-Record Editor"), "%s/record/multiedit/?ln=%%s" % CFG_SITE_URL),
+    'runbibedit' : (_("Run Record Editor"), "%s/%s/edit/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
+    'runbibeditmulti' : (_("Run Multi-Record Editor"), "%s/%s/multiedit/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
     'runbibdocfile' : (_("Run Document File Manager"), "%s/submit/managedocfiles?ln=%%s" % CFG_SITE_URL),
-    'runbibmerge' : (_("Run Record Merger"), "%s/record/merge/?ln=%%s" % CFG_SITE_URL),
+    'runbibmerge' : (_("Run Record Merger"), "%s/%s/merge/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
     'runbibswordclient' : (_("Run BibSword client"), "%s/bibsword/?ln=%%s" % CFG_SITE_URL),
     'cfgbibknowledge' : (_("Configure BibKnowledge"), "%s/kb?ln=%%s" % CFG_SITE_URL),
     'cfgbibformat' : (_("Configure BibFormat"), "%s/admin/bibformat/bibformatadmin.py?ln=%%s" % CFG_SITE_URL),

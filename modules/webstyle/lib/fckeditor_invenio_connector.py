@@ -69,7 +69,7 @@ class FCKeditorConnectorInvenio(FCKeditorConnectorBase,
 
           user_files_path - *str* the URL where the file should be
                             accessible after upload. Eg:
-                            (CFG_SITE_URL)s/record/%(recid)i/comments/attachments/get/%(uid)s
+                            %(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/%(recid)i/comments/attachments/get/%(uid)s
                             (the next parts of the URL will be append
                             automatically)
 

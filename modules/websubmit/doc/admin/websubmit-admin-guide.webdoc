@@ -1518,7 +1518,7 @@ submission</a> how-to from this guide.</p>
 <p>The document type is an attribute of a file. It can be seen as a
 category which lets you organize your files: "Main" file,
 "Additional", "Figures", "source", whatever you need. It is not so
-much used excepted on <code>record/XXX/files/</code> pages to group
+much used excepted on <code><CFG_SITE_RECORD>/XXX/files/</code> pages to group
 files by category.  It can however come handy during file upload
 processes, to assign different kinds of restrictions based on the
 document type, or simply to make the configuration of the submission

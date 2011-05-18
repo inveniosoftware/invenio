@@ -26,6 +26,7 @@ from invenio.dbquery import run_sql
 from invenio.bibtask import task_init, task_get_option, task_set_option, \
                             task_has_option, task_update_progress, write_message
 from invenio.webstat_config import CFG_WEBSTAT_CONFIG_PATH
+from invenio.config import CFG_SITE_RECORD
 
 
 def main():
@@ -171,7 +172,7 @@ nb-histogram-items-to-print = 20
 exclude-ip-list = ("137.138.249.162")
 home-collection = "Atlantis Institute of Fictive Science"
 search-interface-url = "/?"
-detailed-record-url = "/record/"
+detailed-record-url = "/%s/"
 search-engine-url = "/search?"
 search-engine-url-old-style = "/search.py?"
 basket-url = "/yourbaskets/"
@@ -181,7 +182,7 @@ display-public-basket-url = "/yourbaskets/display_public"
 alert-url = "/youralerts/"
 display-your-alerts-url = "/youralerts/list"
 display-your-searches-url = "/youralerts/display"
-"""
+""" % CFG_SITE_RECORD
         sys.exit(0)
 
     elif task_has_option("load_config"):

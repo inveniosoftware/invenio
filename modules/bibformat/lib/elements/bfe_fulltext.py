@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 import re
 from invenio.bibdocfile import BibRecDocs, file_strip_ext
 from invenio.messages import gettext_set_language
-from invenio.config import CFG_SITE_URL, CFG_CERN_SITE
+from invenio.config import CFG_SITE_URL, CFG_CERN_SITE, CFG_SITE_RECORD
 from invenio.websubmit_config import CFG_WEBSUBMIT_ICON_SUBFORMAT_RE
 from cgi import escape, parse_qs
 from urlparse import urlparse
@@ -84,11 +84,11 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
 
     additional_str = ''
     if additionals:
-        additional_str = ' <small>(<a '+style+' href="'+CFG_SITE_URL+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("additional files")
+        additional_str = ' <small>(<a '+style+' href="'+CFG_SITE_URL+'/%s/' % CFG_SITE_RECORD + str(bfo.recID)+'/files/">%s</a>)</small>' % _("additional files")
 
     versions_str = ''
     #if old_versions:
-        #versions_str = ' <small>(<a '+style+' href="'+CFG_SITE_URL+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("older versions")
+        #versions_str = ' <small>(<a '+style+' href="'+CFG_SITE_URL+'/CFG_SITE_RECORD/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("older versions")
 
     if main_urls:
         last_name = ""
@@ -167,9 +167,9 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
      considered as icons should be returned
 
     'parsed_urls' is a dictionary in the form:
-    {'main_urls' : {'Main'      : [('http://CFG_SITE_URL/record/1/files/aFile.pdf', 'aFile', 'PDF'),
-                                   ('http://CFG_SITE_URL/record/1/files/aFile.gif', 'aFile', 'GIF')],
-                    'Additional': [('http://CFG_SITE_URL/record/1/files/bFile.pdf', 'bFile', 'PDF')]},
+    {'main_urls' : {'Main'      : [('http://CFG_SITE_URL/CFG_SITE_RECORD/1/files/aFile.pdf', 'aFile', 'PDF'),
+                                   ('http://CFG_SITE_URL/CFG_SITE_RECORD/1/files/aFile.gif', 'aFile', 'GIF')],
+                    'Additional': [('http://CFG_SITE_URL/CFG_SITE_RECORD/1/files/bFile.pdf', 'bFile', 'PDF')]},
 
      'other_urls': [('http://externalurl.com/aFile.pdf', 'Fulltext'),      # url(8564_u), description(8564_z/y)
                     ('http://externalurl.com/bFile.pdf', 'Fulltext')],

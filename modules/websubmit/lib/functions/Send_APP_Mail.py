@@ -36,7 +36,8 @@ import re
 from invenio.config import CFG_SITE_NAME, \
      CFG_SITE_URL, \
      CFG_SITE_SUPPORT_EMAIL,  \
-     CFG_CERN_SITE
+     CFG_CERN_SITE, \
+     CFG_SITE_RECORD
 from invenio.access_control_admin import acc_get_role_users, acc_get_role_id
 from invenio.dbquery import run_sql
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
@@ -252,7 +253,7 @@ def Send_APP_Mail (parameters, curdir, form, user_info=None):
     if decision == "approve":
         mailtitle = "%s has been approved" % rn
         mailbody = "The %s %s has been approved." % (docname,rn)
-        mailbody += "\nIt will soon be accessible here:\n\n<%s/record/%s>" % (CFG_SITE_URL,sysno)
+        mailbody += "\nIt will soon be accessible here:\n\n<%s/%s/%s>" % (CFG_SITE_URL,CFG_SITE_RECORD,sysno)
     else:
         mailtitle = "%s has been rejected" % rn
         mailbody = "The %s %s has been rejected." % (docname,rn)

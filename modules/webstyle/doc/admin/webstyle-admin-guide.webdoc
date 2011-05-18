@@ -314,7 +314,7 @@ boxes, etc).</p>
 <h2><a name="det_page">2. Detailed Record Pages</a></h2>
 
 <p>The web pages displaying the details of a record (such as
-<a href="<CFG_SITE_URL>/record/1"><CFG_SITE_URL>/record/1</a>) do not only show metadata, but
+<a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/1"><CFG_SITE_URL>/<CFG_SITE_RECORD>/1</a>) do not only show metadata, but
 also users' comments and reviews, statistics, etc. This information is
 organized into tabs.</p>
 
@@ -359,27 +359,27 @@ The following tabs are available:
   <tr>
     <td>Information</td>
     <td>Show the formatted metadata of the record</td>
-    <td><a href="<CFG_SITE_URL>/record/10"><CFG_SITE_URL>/record/10</a></td>
+    <td><a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/10"><CFG_SITE_URL>/<CFG_SITE_RECORD>/10</a></td>
   </tr>
   <tr>
     <td>References</td>
     <td>Displays the references (bibliography) of the record</td>
-    <td><a href="<CFG_SITE_URL>/record/10/references"><CFG_SITE_URL>/record/10/references</a></td>
+    <td><a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/10/references"><CFG_SITE_URL>/<CFG_SITE_RECORD>/10/references</a></td>
   </tr>
   <tr>
     <td>Discussion</td>
     <td>Displays the users' comments and reviews</td>
-    <td><a href="<CFG_SITE_URL>/record/10/comments"><CFG_SITE_URL>/record/10/comments</a><br/>
-        <a href="<CFG_SITE_URL>/record/10/reviews"><CFG_SITE_URL>/record/10/reviews</a></td>
+    <td><a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/10/comments"><CFG_SITE_URL>/<CFG_SITE_RECORD>/10/comments</a><br/>
+        <a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/10/reviews"><CFG_SITE_URL>/<CFG_SITE_RECORD>/10/reviews</a></td>
   </tr>
   <tr>
     <td>Usage Statistics</td>
     <td>Statistics data and graph about file downloads/views</td>
-    <td><a href="<CFG_SITE_URL>/record/10/usage"><CFG_SITE_URL>/record/10/usage</a></td>
+    <td><a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/10/usage"><CFG_SITE_URL>/<CFG_SITE_RECORD>/10/usage</a></td>
   </tr>
   <tr><td>Files</td>
     <td>Link(s) to full-text and associated file(s)</td>
-    <td><a href="<CFG_SITE_URL>/record/10/files"><CFG_SITE_URL>/record/10/files</a></td>
+    <td><a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/10/files"><CFG_SITE_URL>/<CFG_SITE_RECORD>/10/files</a></td>
   </tr>
 </table>
 
@@ -415,7 +415,7 @@ etc pages.</p>
 <p>Here are some behaviours you should expect when changing the tabs
 configuration:</p>
 <ul>
-  <li>Given that search results pages always link to <CFG_SITE_URL>/record/10,
+  <li>Given that search results pages always link to <CFG_SITE_URL>/<CFG_SITE_RECORD>/10,
   and given the above comment about accessibility of tabs when they
   are not displayed, the content of the <em>Information</em> will always be
   show when clicking on <a href="#" class="moreinfo">detailed record</a> link in search results, even

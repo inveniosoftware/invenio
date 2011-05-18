@@ -43,7 +43,8 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_PATH_PHP, \
      CFG_SITE_URL, \
-     CFG_BIBFORMAT_HIDDEN_TAGS
+     CFG_BIBFORMAT_HIDDEN_TAGS, \
+     CFG_SITE_RECORD
 from invenio.bibformat_config import \
      CFG_BIBFORMAT_USE_OLD_BIBFORMAT, \
      CFG_BIBFORMAT_ENABLE_I18N_BRIEF_FORMAT
@@ -433,8 +434,8 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; "):
         if req: req.write("<table>")
         for recID in recIDs:
             row = '<tr>'
-            row += '<td><a href="%(CFG_SITE_URL)s/record/%(recID)i">%(recID)i</a></td>' % \
-                   {'recID': recID, 'CFG_SITE_URL': CFG_SITE_URL}
+            row += '<td><a href="%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/%(recID)i">%(recID)i</a></td>' % \
+                   {'recID': recID, 'CFG_SITE_RECORD': CFG_SITE_RECORD, 'CFG_SITE_URL': CFG_SITE_URL}
             for field in ot:
                 row += '<td>' + \
                        ot_sep.join(bibformat_utils.get_all_fieldvalues(recID, field)) + \

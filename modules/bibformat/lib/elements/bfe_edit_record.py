@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 from invenio.urlutils import create_html_link
 from invenio.messages import gettext_set_language
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
 from invenio.access_control_engine import acc_authorize_action
 from invenio.search_engine import guess_primary_collection_of_a_record
 
@@ -46,7 +46,7 @@ def format_element(bfo, style):
         if style != '':
             linkattrd['style'] = style
         out += create_html_link(CFG_SITE_URL +
-               '/record/edit/?ln=%s#state=edit&recid=%s' % (bfo.lang, str(bfo.recID)),
+               '/%s/edit/?ln=%s#state=edit&recid=%s' % (CFG_SITE_RECORD, bfo.lang, str(bfo.recID)),
                {},
                link_label=_("Edit This Record"),
                linkattrd=linkattrd)

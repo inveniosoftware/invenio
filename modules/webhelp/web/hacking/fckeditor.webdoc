@@ -243,7 +243,7 @@ saved. Eg:<code>%(CFG_PREFIX)s/var/data/comments/%(recid)s/%(uid)s</code></dd>
 <dd>the base URL where the files can be accessed from the web, if
 <code>user_files_absolute_path</code> is not a web accessible
 folder. Eg:
-<code>%(CFG_SITE_URL)s/record/%(recid)i/comments/attachments/get/%(uid)s</code></dd>
+<code>%(CFG_SITE_URL)s/<CFG_SITE_RECORD>/%(recid)i/comments/attachments/get/%(uid)s</code></dd>
 </dl>
 </p>
 

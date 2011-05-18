@@ -28,7 +28,8 @@ from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
 from invenio.config import \
         CFG_SITE_URL, \
         CFG_PREFIX, \
-        CFG_WEBSUBMIT_FILEDIR
+        CFG_WEBSUBMIT_FILEDIR, \
+        CFG_SITE_RECORD
 
 
 
@@ -67,7 +68,7 @@ class BibRecDocsTest(unittest.TestCase):
         self.assert_("<small><b>Main</b>" in value)
         #get xml 8564
         value = my_bibrecdoc.get_xml_8564()
-        self.assert_('/record/2/files/img_test.jpg</subfield>' in value)
+        self.assert_('/'+ CFG_SITE_RECORD +'/2/files/img_test.jpg</subfield>' in value)
         #check duplicate docnames
         self.assertEqual(my_bibrecdoc.check_duplicate_docnames(), True)
 
@@ -199,7 +200,7 @@ class BibDocFilesTest(unittest.TestCase):
         my_new_bibdoc = my_bibrecdoc.get_bibdoc("img_test")
         my_new_bibdocfile = my_new_bibdoc.list_all_files()[0]
         #get url
-        self.assertEqual(my_new_bibdocfile.get_url(), CFG_SITE_URL + '/record/2/files/img_test.jpg')
+        self.assertEqual(my_new_bibdocfile.get_url(), CFG_SITE_URL + '/%s/2/files/img_test.jpg' % CFG_SITE_RECORD)
         #get type
         self.assertEqual(my_new_bibdocfile.get_type(), 'Main')
         #get path

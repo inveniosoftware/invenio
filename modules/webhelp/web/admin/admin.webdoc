@@ -176,7 +176,7 @@ data are uploaded in Invenio, you may want to modify them via
   record, do global replacements, and other cataloguing tasks.
 </td>
 <td>
-  <a href="<CFG_SITE_URL>/record/edit/">BibEdit Admin Interface</a>
+  <a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/edit/">BibEdit Admin Interface</a>
 </td>
 <td>
   <a href="bibedit-admin-guide">BibEdit Admin Guide</a>
