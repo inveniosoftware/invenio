@@ -35,7 +35,8 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_ETCDIR, \
      CFG_BINDIR, \
-     CFG_LOGDIR
+     CFG_LOGDIR, \
+     CFG_SITE_RECORD
 from invenio.oai_harvest_config import CFG_OAI_POSSIBLE_POSTMODES
 from invenio.bibrankadminlib import \
      write_outcome, \
@@ -671,7 +672,7 @@ def build_history_row(item, ln, show_selection, show_oai_source, show_record_ids
             cssclass=cssclass)
 
         record_details_link = create_html_link(CFG_SITE_URL + \
-                                               "/record/" + str(item.record_id),
+                                               "/"+ CFG_SITE_RECORD +"/" + str(item.record_id),
                                                urlargd={'ln': ln},
                                                link_label=str(item.record_id))
         cssclass = get_cssclass(cssclass)

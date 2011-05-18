@@ -32,7 +32,8 @@ import os
 
 from invenio.config import CFG_SITE_URL, \
      CFG_SITE_NAME, \
-     CFG_SITE_SUPPORT_EMAIL
+     CFG_SITE_SUPPORT_EMAIL, \
+     CFG_SITE_RECORD
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
 from invenio.websubmit_functions.Retrieve_Data import Get_Field
@@ -87,7 +88,7 @@ def Send_SRV_Mail(parameters, curdir, form, user_info=None):
     author = Get_Field('100__a',sysno)
     author += Get_Field('700__a',sysno)
     # create message
-    message = "A revised version of document %s has been submitted.\n\nTitle: %s\nAuthor(s): %s\nURL: <%s/record/%s>%s" % (rn,title,author,CFG_SITE_URL,sysno,note)
+    message = "A revised version of document %s has been submitted.\n\nTitle: %s\nAuthor(s): %s\nURL: <%s/%s/%s>%s" % (rn,title,author,CFG_SITE_URL,CFG_SITE_RECORD,sysno,note)
 
     # send the email
     send_email(FROMADDR, SuE, "%s revised" % rn, message, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)

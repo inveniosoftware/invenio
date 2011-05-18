@@ -26,7 +26,7 @@ import urllib
 from invenio.bibdocfile import decompose_file
 from invenio.config import \
      CFG_SITE_URL, \
-     CFG_PREFIX
+     CFG_PREFIX, CFG_SITE_RECORD
 
 re_fckeditor_link = re.compile('"' + CFG_SITE_URL + \
                                r'/submit/getattachedfile/(?P<uid>\d+)/(?P<type>(image|file|media|flash))/(?P<filename>.*?)"')
@@ -122,7 +122,7 @@ def build_url(sysno, name, file_type, extension, is_icon=False):
     @param file_type: as chosen by FCKeditor: 'File', 'Image', 'Flash', 'Media'
     @param extension: file extension, including '.'
     """
-    return CFG_SITE_URL + '/record/' + str(sysno) + \
+    return CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + str(sysno) + \
            '/files/' + build_docname(name, file_type, extension) + \
            (is_icon and '?subformat=icon' or '')
 

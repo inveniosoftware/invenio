@@ -33,7 +33,8 @@ import re
 
 from invenio.config import CFG_SITE_URL, \
      CFG_SITE_NAME, \
-     CFG_SITE_SUPPORT_EMAIL
+     CFG_SITE_SUPPORT_EMAIL, \
+     CFG_SITE_RECORD
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
 
@@ -83,7 +84,7 @@ def Send_Modify_Mail (parameters, curdir, form, user_info=None):
     email_txt = "Dear Sir or Madam, \n%s %s has just been modified.\nModified fields: %s\n\n" % (type,rn,fields)
     if CFG_SITE_URL != "" and sysno != "":
         email_txt += "You can check the modified document here:\n"
-        email_txt += "<%s/record/%s>\n\n" % (CFG_SITE_URL,sysno)
+        email_txt += "<%s/%s/%s>\n\n" % (CFG_SITE_URL,CFG_SITE_RECORD,sysno)
     email_txt += "Please note that the modifications will be taken into account in a couple of minutes.\n\nBest regards,\nThe %s Server support Team" % CFG_SITE_NAME
     # send the mail
     send_email(FROMADDR,sub,"%s modified" % rn,email_txt,copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)

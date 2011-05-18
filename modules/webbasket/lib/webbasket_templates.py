@@ -35,7 +35,8 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_SITE_LANG, \
      CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS, \
-     CFG_WEBBASKET_USE_RICH_TEXT_EDITOR
+     CFG_WEBBASKET_USE_RICH_TEXT_EDITOR, \
+     CFG_SITE_RECORD
 from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui
 
@@ -2281,7 +2282,7 @@ class Template:
               <span class="moreinfo">"""
 
         if item[0] > 0:
-            detailed_record = """<a class="moreinfo" href="%(siteurl)s/record/%(recid)s">%(detailed_record_label)s</a>"""
+            detailed_record = """<a class="moreinfo" href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(recid)s">%(detailed_record_label)s</a>"""
             out += detailed_record + (view_notes and " - " or "")
             external_url = ""
         else:
@@ -2329,6 +2330,7 @@ class Template:
                      'add_and_view_notes_label': nb_cmt and _('Notes') + ' (' + str(nb_cmt) + ')' or add_notes and _('Add a note...') or '',
                      'last_cmt': last_cmt,
                      'siteurl': CFG_SITE_URL,
+                     'CFG_SITE_RECORD': CFG_SITE_RECORD,
                      'bskid': bskid,
                      'recid': recid,
                      'external_url': external_url,
@@ -3165,7 +3167,7 @@ class Template:
               <span class="moreinfo">"""
 
         if item[0] > 0:
-            detailed_record = """<a class="moreinfo" href="%(siteurl)s/record/%(recid)s">%(detailed_record_label)s</a>"""
+            detailed_record = """<a class="moreinfo" href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(recid)s">%(detailed_record_label)s</a>"""
             out += detailed_record + (view_notes and " - " or "")
             external_url = ""
         else:
@@ -3204,6 +3206,7 @@ class Template:
                      'add_and_view_notes_label': nb_cmt and _('Notes') + ' (' + str(nb_cmt) + ')' or _('Add a note...'),
                      'last_cmt': last_cmt,
                      'siteurl': CFG_SITE_URL,
+                     'CFG_SITE_RECORD': CFG_SITE_RECORD,
                      'bskid': bskid,
                      'recid': recid,
                      'external_url': external_url,

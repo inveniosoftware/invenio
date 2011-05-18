@@ -27,7 +27,7 @@ import cgi
 
 from invenio.urlutils import create_html_link
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, \
-     CFG_CERN_SITE, CFG_SITE_SECURE_URL
+     CFG_CERN_SITE, CFG_SITE_SECURE_URL, CFG_SITE_RECORD
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
 from invenio.messages import gettext_set_language
 
@@ -240,7 +240,7 @@ class Template:
         # verify if all copies are missing
         elif all_copies_are_missing(recid):
 
-            ill_link = """<a href='%s/record/%s/holdings/ill_request_with_recid'>ILL services</a>""" % (CFG_SITE_URL, recid)
+            ill_link = """<a href='%s/%s/%s/holdings/ill_request_with_recid'>ILL services</a>""" % (CFG_SITE_URL, CFG_SITE_RECORD, recid)
 
             out = """<div align="center"
                      <div class="infoboxmsg">
@@ -294,10 +294,10 @@ class Template:
             if status == 'Not for loan':
                 request_button = '-'
             else:
-                request_button = """<input type=button onClick="location.href='%s/record/%s/holdings/request?barcode=%s'"
+                request_button = """<input type=button onClick="location.href='%s/%s/%s/holdings/request?barcode=%s'"
                                     value='%s' class="bibcircbutton" onmouseover="this.className='bibcircbuttonover'"
-                                    onmouseout="this.className='bibcircbutton'">""" % (CFG_SITE_URL, recid, barcode,
-                                                                                       _("Request"))
+                                    onmouseout="this.className='bibcircbutton'">""" % (CFG_SITE_URL, CFG_SITE_RECORD, recid,
+                                                                                       barcode, _("Request"))
             if status == 'missing':
                 out += """ """
             else:
@@ -526,7 +526,7 @@ class Template:
                             _("Action(s)"))
 
             for(recid, barcode, loaned_on, due_date, loan_type) in loans:
-                record_link = "<a href=" + CFG_SITE_URL + "/record/%s>" % recid + \
+                record_link = "<a href=" + CFG_SITE_URL + "/%s/%s>" % (CFG_SITE_RECORD, recid) + \
                               (book_title_from_MARC(recid)) + "</a>"
 
                 if loan_type == 'ill':
@@ -629,7 +629,7 @@ class Template:
 
             for(request_id, recid, request_date, status) in requests:
 
-                record_link = "<a href=" + CFG_SITE_URL + "/record/%s>" % recid + \
+                record_link = "<a href=" + CFG_SITE_URL + "/%s/%s>" % (CFG_SITE_RECORD, recid) + \
                               (book_title_from_MARC(recid)) + "</a>"
 
                 cancel_request_link = create_html_link(CFG_SITE_URL +
@@ -715,7 +715,7 @@ class Template:
 
         for(recid, loaned_on, returned_on, nb_renewalls) in result:
 
-            record_link = "<a href=" + CFG_SITE_URL + "/record/%s>" % recid + \
+            record_link = "<a href=" + CFG_SITE_URL + "/%s/%s>" % (CFG_SITE_RECORD, recid) + \
                           (book_title_from_MARC(recid)) + "</a>"
 
             out += """
@@ -753,7 +753,7 @@ class Template:
 
         @param uid: user ID
         @param recid: recID - Invenio record identifier
-        @param barcode: book's barcode
+        @param barcode: book barcode
         @param ln: language
         """
 
@@ -761,7 +761,7 @@ class Template:
 
         today = datetime.date.today()
         out = """
-        <form name="request_form" action="%s/record/%s/holdings/send" method="get" >
+        <form name="request_form" action="%s/%s/%s/holdings/send" method="get" >
         <div class="bibcirctableheader" align="center">%s</div>
         <br />
              <table class="bibcirctable_contents">
@@ -772,6 +772,7 @@ class Template:
                        <td class="bibcirctableheader">%s</td>
                   </tr>
         """ % (CFG_SITE_URL,
+               CFG_SITE_RECORD,
                recid,
                _("Enter your period of interest"),
                _("From"),
@@ -866,7 +867,7 @@ class Template:
         <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
         <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
-        <form name="request_form" action="%s/record/%s/holdings/send" method="get" >
+        <form name="request_form" action="%s/%s/%s/holdings/send" method="get" >
         <br />
         <div align=center>
           <table class="bibcirctable_contents" align=center>
@@ -921,7 +922,7 @@ class Template:
           <br />
         </form>
         """ % (CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL,
-               CFG_SITE_URL, recid,
+               CFG_SITE_URL, CFG_SITE_RECORD, recid,
                _("Enter your period of interest"),
                _("From"),CFG_SITE_URL, today, _("To"), CFG_SITE_URL, more_6_months,
                barcode, _("Back"), _("Confirm"))
@@ -2767,7 +2768,7 @@ class Template:
         else:
             book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
-        link_to_detailed_record = "<a href='%s/record/%s' target='_blank'>%s</a>" % (CFG_SITE_URL, recid, book_title)
+        link_to_detailed_record = "<a href='%s/%s/%s' target='_blank'>%s</a>" % (CFG_SITE_URL, CFG_SITE_RECORD, recid, book_title)
 
         out += """
            <div class="bibcircbottom">
@@ -2803,7 +2804,7 @@ class Template:
                         <td>%s</td>
                      </tr>
                      </table>
-                      <input type=button onClick="window.open('%s/record/%s/edit')"
+                      <input type=button onClick="window.open('%s/%s/%s/edit')"
                       value='%s' class="formbutton">
                      </td>
                      <td>
@@ -2823,7 +2824,7 @@ class Template:
                    _("Year"), book_year,
                    _("Publisher"), book_editor,
                    _("ISBN"), book_isbn,
-                   CFG_SITE_URL, recid,
+                   CFG_SITE_URL, CFG_SITE_RECORD, recid,
                    _("Edit this record"),
                    str(book_cover),
                    _("Additional details"))
@@ -10676,7 +10677,7 @@ class Template:
         out += """
            <div align="center">
            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-           <form name="update_item_info_step4_form" action="%s/record/%s/holdings/ill_register_request_with_recid" method="get" >
+           <form name="update_item_info_step4_form" action="%s/%s/%s/holdings/ill_register_request_with_recid" method="get" >
                 <table class="bibcirctable">
                   <tr align="center">
                     <td><h1 class="headline">%s</h1></td>
@@ -10713,7 +10714,7 @@ class Template:
                      <br />
                      <br />
 
-           """  % (CFG_SITE_URL, recid,
+           """  % (CFG_SITE_URL, CFG_SITE_RECORD, recid,
                    _('Interlibrary loan request for books'),
                    _("Item details"),
                    recid,

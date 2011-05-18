@@ -24,7 +24,8 @@ import cgi
 from invenio.config import CFG_SITE_URL, CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSING,\
                            CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING,\
                            CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING_TIME,\
-                           CFG_SITE_ADMIN_EMAIL
+                           CFG_SITE_ADMIN_EMAIL, \
+                           CFG_SITE_RECORD
 from invenio.messages import gettext_set_language
 
 
@@ -764,27 +765,29 @@ div .boxleft_2 {
 
         if status == 0:
             body = """
-                   <div class="clean-ok"><div>Changes have been sent to the server. It will take some time before they are applied. You can <a href=%s/record/multiedit>reset </a> the editor.</div>
-                   """ % (CFG_SITE_URL)
+                   <div class="clean-ok"><div>Changes have been sent to the server. It will take some time before they are applied. You can <a href=%s/%s/multiedit>reset </a> the editor.</div>
+                   """ % (CFG_SITE_URL, CFG_SITE_RECORD)
         elif status in [1, 2]:
             body = """
                    <div class="clean-ok">You are submitting a file that manipulates more than %s records. Your job will therefore be processed only during <strong>%s</strong>. <br /><br />
             If you are not happy about this, please contact %s, quoting your file <strong>%s</strong> <br /><br />
-            You can <a href=%s/record/multiedit>reset</a> the editor.</div>
+            You can <a href=%s/%s/multiedit>reset</a> the editor.</div>
                    """ % (CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSING,
                           CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING_TIME,
                           CFG_SITE_ADMIN_EMAIL,
                           file_path,
-                          CFG_SITE_URL)
+                          CFG_SITE_URL,
+                          CFG_SITE_RECORD)
         else:
             body = """
                    <div class="clean-error">Sorry, you are submitting a file that manipulates more than %s records. You don't have enough rights for this.
                    <br /> <br />
                    If you are not happy about this, please contact %s, quoting your file %s <br /><br />
-                   You can <a href=%s/record/multiedit>reset</a> the editor.</div>
+                   You can <a href=%s/%s/multiedit>reset</a> the editor.</div>
                    """ % (CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING,
                           CFG_SITE_ADMIN_EMAIL,
                           file_path,
-                          CFG_SITE_URL)
+                          CFG_SITE_URL,
+                          CFG_SITE_RECORD)
         return body
 

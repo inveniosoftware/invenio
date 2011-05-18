@@ -64,7 +64,7 @@ from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_modify_controlfield, record_get_field_values, \
     record_get_subfields
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
-    CFG_SITE_URL
+    CFG_SITE_URL, CFG_SITE_RECORD
 from invenio.search_engine import record_exists, search_pattern
 from invenio.webuser import session_param_get, session_param_set
 from invenio.bibcatalog import bibcatalog_system
@@ -195,6 +195,7 @@ def perform_request_init(uid, ln, req, lastupdated):
             'gTAG_NAMES': tag_names,
             'gPROTECTED_FIELDS': protected_fields,
             'gSITE_URL': '"' + CFG_SITE_URL + '"',
+            'gSITE_RECORD': '"' + CFG_SITE_RECORD + '"',
             'gHISTORY_URL': history_url,
             'gCERN_SITE': cern_site,
             'gHASH_CHECK_INTERVAL': CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL,

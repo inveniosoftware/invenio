@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
 from invenio.dbquery import run_sql
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
@@ -104,7 +104,7 @@ class BibRankCitationRankingTest(unittest.TestCase):
     def test_detailed_record_citations_tab(self):
         """bibrank - detailed record, citations tab"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/record/79/citations',
+                         test_web_page_content(CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/79/citations',
                                                expected_text=["Cited by: 1 records",
                                                               "Co-cited with: 2 records"]))
 

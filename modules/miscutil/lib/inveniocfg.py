@@ -301,7 +301,7 @@ def cli_cmd_update_dbexec(conf):
 def cli_cmd_update_bibconvert_tpl(conf):
     """
     Update bibconvert/config/*.tpl files looking for 856
-    http://.../record/ lines, replacing URL with CFG_SITE_URL taken
+    http://.../CFG_SITE_RECORD lines, replacing URL with CFG_SITE_URL taken
     from conf file.  Note: this edits tpl files in situ, taking a
     backup first.  Use only when you know what you are doing.
     """
@@ -317,10 +317,11 @@ def cli_cmd_update_bibconvert_tpl(conf):
             shutil.copy(tplfile, tplfile + '.OLD')
             out = ''
             for line in open(tplfile, 'r').readlines():
-                match = re.search(r'^(.*)http://.*?/record/(.*)$', line)
+                match = re.search(r'^(.*)http://.*?/%s/(.*)$' % conf.get("Invenio", 'CFG_SITE_RECORD'), line)
                 if match:
-                    out += "%s%s/record/%s\n" % (match.group(1),
+                    out += "%s%s/%s/%s\n" % (match.group(1),
                                                  conf.get("Invenio", 'CFG_SITE_URL'),
+                                                 conf.get("Invenio", 'CFG_SITE_RECORD'),
                                                  match.group(2))
                 else:
                     out += line

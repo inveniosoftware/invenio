@@ -863,7 +863,7 @@ function displayCacheOutdatedScreen(requestType){
    * discovered when fetching or when submitting the record.
    */
   $('#bibEditMessage').remove();
-  var recordURL = gSITE_URL + '/record/' + gRecID + '/';
+  var recordURL = gSITE_URL + '/'+ gSITE_RECORD +'/' + gRecID + '/';
   var viewMARCURL = recordURL + '?of=hm';
   var viewMARCXMLURL = recordURL + '?of=xm';
   var msg = '';
@@ -1080,7 +1080,7 @@ function displayRevisionHistoryEntry(recId, revisionId){
   compareImgId = 'imgCompareWithCurrent_' + revisionId;
   revertImgId = 'imgRevert_' + revisionId;
 
-  var mergeUrl = '/record/merge#recid1=' + recId + '&recid2=' + recId + '.' + revisionId;
+  var mergeUrl = '/'+ gSITE_RECORD +'/merge#recid1=' + recId + '&recid2=' + recId + '.' + revisionId;
   var mergeWithNewestControl = '<a href="' + mergeUrl +
     '" title="Merge with the newest revision" class="bibEditRevHistoryLink">' +
     img('/img/merge-small.png', mergeImgId, 'bibEditRevHistoryLinkImg') + '</a>';

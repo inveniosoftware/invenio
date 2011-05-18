@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 from invenio.bibformat_elements.bfe_fulltext import get_files, sort_alphanumerically
 from invenio.messages import gettext_set_language
-from invenio.config import CFG_SITE_URL, CFG_CERN_SITE
+from invenio.config import CFG_SITE_URL, CFG_CERN_SITE, CFG_SITE_RECORD
 from cgi import escape
 
 def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_file='yes', show_subformat_icons='no'):
@@ -58,11 +58,11 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
 
     additional_str = ''
     if additionals:
-        additional_str = separator + '<small>(<a '+style+' href="'+CFG_SITE_URL+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("additional files")
+        additional_str = separator + '<small>(<a '+style+' href="'+CFG_SITE_URL+'/'+ CFG_SITE_RECORD +'/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("additional files")
 
     versions_str = ''
     #if old_versions:
-        #versions_str = separator + '<small>(<a '+style+' href="'+CFG_SITE_URL+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("older versions")
+        #versions_str = separator + '<small>(<a '+style+' href="'+CFG_SITE_URL+'/CFG_SITE_RECORD/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("older versions")
 
     if main_urls:
         # Put a big file icon if only one file

@@ -29,8 +29,8 @@ from invenio.config import CFG_SITE_LANG, \
                            CFG_SITE_URL, \
                            CFG_SITE_SECURE_URL, \
                            CFG_ACCESS_CONTROL_LEVEL_SITE, \
-                           CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS
-
+                           CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
+                           CFG_SITE_RECORD
 
 from invenio.webuser import getUid, page_not_authorized, isGuestUser, \
                             collect_user_info
@@ -365,7 +365,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         if argd['ln'] != CFG_SITE_LANG:
             link_ln = '?ln=%s' % argd['ln']
         tabs = [(unordered_tabs[tab_id]['label'], \
-                 '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
+                 '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
                  tab_id in ['holdings'],
                  unordered_tabs[tab_id]['enabled']) \
                 for (tab_id, _order) in ordered_tabs_id
@@ -379,7 +379,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
 
         title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
-        navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
+        navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
         navtrail += title
         navtrail += '</a>'
 
@@ -397,7 +397,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                               websearch_templates.tmpl_search_pageend(argd['ln']) + \
                               pagefooteronly(lastupdated=__lastupdated__, language=argd['ln'], req=req)
 
-    # Return the same page wether we ask for /record/123 or /record/123/
+    # Return the same page wether we ask for /CFG_SITE_RECORD/123 or /CFG_SITE_RECORD/123/
     __call__ = index
 
 
@@ -424,8 +424,9 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                 return redirect_to_url(req, "%s/youraccount/login%s" % (
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
-                    'referer' : "%s/record/%s/holdings/request%s" % (
+                    'referer' : "%s/%s/%s/holdings/request%s" % (
                         CFG_SITE_URL,
+                        CFG_SITE_RECORD,
                         self.recid,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})), norobot=True)
@@ -454,7 +455,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         if argd['ln'] != CFG_SITE_LANG:
             link_ln = '?ln=%s' % argd['ln']
         tabs = [(unordered_tabs[tab_id]['label'], \
-                 '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
+                 '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
                  tab_id in ['holdings'],
                  unordered_tabs[tab_id]['enabled']) \
                 for (tab_id, _order) in ordered_tabs_id
@@ -468,7 +469,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
 
         title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
-        navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
+        navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
         navtrail += title
         navtrail += '</a>'
 
@@ -531,7 +532,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         if argd['ln'] != CFG_SITE_LANG:
             link_ln = '?ln=%s' % ln
         tabs = [(unordered_tabs[tab_id]['label'], \
-                 '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
+                 '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
                  tab_id in ['holdings'],
                  unordered_tabs[tab_id]['enabled']) \
                 for (tab_id, _order) in ordered_tabs_id
@@ -545,7 +546,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
 
         title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
-        navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
+        navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
         navtrail += title
         navtrail += '</a>'
 
@@ -589,8 +590,9 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                 return redirect_to_url(req, "%s/youraccount/login%s" % (
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
-                    'referer' : "%s/record/%s/holdings/ill_request_with_recid%s" % (
+                    'referer' : "%s/%s/%s/holdings/ill_request_with_recid%s" % (
                         CFG_SITE_URL,
+                        CFG_SITE_RECORD,
                         self.recid,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
@@ -619,7 +621,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         if argd['ln'] != CFG_SITE_LANG:
             link_ln = '?ln=%s' % argd['ln']
         tabs = [(unordered_tabs[tab_id]['label'], \
-                 '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
+                 '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
                  tab_id in ['holdings'],
                  unordered_tabs[tab_id]['enabled']) \
                 for (tab_id, _order) in ordered_tabs_id
@@ -633,7 +635,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
 
         title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
-        navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
+        navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
         navtrail += title
         navtrail += '</a>'
 
@@ -687,8 +689,9 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                 return redirect_to_url(req, "%s/youraccount/login%s" % (
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
-                    'referer' : "%s/record/%s/holdings/ill_request_with_recid%s" % (
+                    'referer' : "%s/%s/%s/holdings/ill_request_with_recid%s" % (
                         CFG_SITE_URL,
+                        CFG_SITE_RECORD,
                         self.recid,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
@@ -717,7 +720,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         if argd['ln'] != CFG_SITE_LANG:
             link_ln = '?ln=%s' % argd['ln']
         tabs = [(unordered_tabs[tab_id]['label'], \
-                 '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
+                 '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
                  tab_id in ['holdings'],
                  unordered_tabs[tab_id]['enabled']) \
                 for (tab_id, _order) in ordered_tabs_id
@@ -731,7 +734,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
 
         title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
-        navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
+        navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
         navtrail += title
         navtrail += '</a>'
 

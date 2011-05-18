@@ -50,7 +50,7 @@ import sys
 
 try:
     # if we are running locally, we can optimize :-)
-    from invenio.config import CFG_SITE_URL
+    from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
     from invenio.bibtask import task_low_level_submission
     from invenio.search_engine import perform_request_search, collection_restricted_p
     from invenio.bibformat import format_records
@@ -340,7 +340,7 @@ class Record(dict):
         """
         if self.server_url is not None and \
             self.recid is not None:
-            return self.server_url + "/record/" + str(self.recid)
+            return self.server_url + "/"+ CFG_SITE_RECORD +"/" + str(self.recid)
         else:
             return None
 

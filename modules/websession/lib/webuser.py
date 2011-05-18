@@ -67,7 +67,9 @@ from invenio.config import \
      CFG_CERN_SITE, \
      CFG_INSPIRE_SITE, \
      CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL, \
-     CFG_BIBAUTHORID_ENABLED
+     CFG_BIBAUTHORID_ENABLED, \
+     CFG_SITE_RECORD
+
 try:
     from invenio.session import get_session
 except ImportError:
@@ -888,7 +890,7 @@ def create_adminactivities_menu(req, uid, navmenuid, ln="en"):
     # current record whenever possible
     if activities.has_key(_("Run Record Editor")) or \
            activities.has_key(_("Run Document File Manager")) and \
-           user_info['uri'].startswith('/record/'):
+           user_info['uri'].startswith('/'+ CFG_SITE_RECORD +'/'):
         try:
             # Get record ID and try to cast it to an int
             current_record_id = int(urlparse.urlparse(user_info['uri'])[2].split('/')[2])
@@ -1153,10 +1155,10 @@ def collect_user_info(req, login_time=False, refresh=False):
                     viewlink = False
             else:
                 viewlink = False
-                
+
             if (CFG_BIBAUTHORID_ENABLED
                 and usepaperattribution
-                and viewlink): 
+                and viewlink):
                     viewclaimlink = True
 
             user_info['precached_viewclaimlink'] = viewclaimlink
@@ -1229,7 +1231,7 @@ def collect_user_info(req, login_time=False, refresh=False):
                 if (CFG_BIBAUTHORID_ENABLED
                     and acc_is_user_in_role(user_info, acc_get_role_id("paperattributionviewers"))):
                     usepaperattribution = True
-                
+
                 if is_req:
                     session = get_session(req)
                     viewlink = False
@@ -1239,10 +1241,10 @@ def collect_user_info(req, login_time=False, refresh=False):
                         viewlink = False
                 else:
                     viewlink = False
-                    
+
                 if (CFG_BIBAUTHORID_ENABLED
                     and usepaperattribution
-                    and viewlink): 
+                    and viewlink):
                         viewclaimlink = True
 
 #                if (CFG_BIBAUTHORID_ENABLED

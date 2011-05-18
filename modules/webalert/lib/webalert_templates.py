@@ -25,7 +25,8 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_URL, \
-     CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
+     CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL, \
+     CFG_SITE_RECORD
 from invenio.messages import gettext_set_language
 from invenio.htmlparser import get_as_text, wrap, wrap_records
 from invenio.urlutils import create_html_link
@@ -648,7 +649,7 @@ Need human intervention?  Contact <%s>
 
         if recid != 0:
             out = wrap_records(get_as_text(record_id=recid))
-            out += "\nDetailed record: <%s/record/%s>" % (CFG_SITE_URL, recid)
+            out += "\nDetailed record: <%s/%s/%s>" % (CFG_SITE_URL, CFG_SITE_RECORD, recid)
         elif xml_record:
             out = wrap_records(get_as_text(xml_record=xml_record))
             # TODO: add Detailed record url for external records?

@@ -30,7 +30,8 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_VERSION, \
      CFG_DATABASE_HOST, \
-     CFG_DATABASE_NAME
+     CFG_DATABASE_NAME, \
+     CFG_SITE_RECORD
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
     SUPERADMINROLE, CFG_EXTERNAL_AUTH_DEFAULT
@@ -360,7 +361,7 @@ def create_login_page_box(referer='', ln=CFG_SITE_LANG):
 
     login_referrer2msg = (
         (re.compile(r"/search"), "<p>" + _("This collection is restricted.  If you think you have right to access it, please authenticate yourself.") + "</p>"),
-        (re.compile(r"/record/\d+/files/.+"), "<p>" + _("This file is restricted.  If you think you have right to access it, please authenticate yourself.") + "</p>"),
+        (re.compile(r"/%s/\d+/files/.+" % CFG_SITE_RECORD), "<p>" + _("This file is restricted.  If you think you have right to access it, please authenticate yourself.") + "</p>"),
     )
 
     msg = ""

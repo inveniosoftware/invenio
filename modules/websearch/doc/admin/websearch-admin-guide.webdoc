@@ -514,7 +514,7 @@ href="#4">section 4</a>).
 <a name="3.12"></a><h3>3.12 Detailed record page options</h3>
 
 <p>These settings let you define how the detailed view (such as <a
-href="<CFG_SITE_URL>/record/1"><CFG_SITE_URL>/record/1</a>) of records in this
+href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/1"><CFG_SITE_URL>/<CFG_SITE_RECORD>/1</a>) of records in this
 collection will look like. <br/>
 
 More details are available in the <a

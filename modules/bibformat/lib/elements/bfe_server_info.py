@@ -19,7 +19,8 @@
 __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, \
-        CFG_SITE_NAME, CFG_VERSION, CFG_SITE_NAME_INTL, CFG_SITE_SUPPORT_EMAIL
+        CFG_SITE_NAME, CFG_VERSION, CFG_SITE_NAME_INTL, CFG_SITE_SUPPORT_EMAIL, \
+        CFG_SITE_RECORD
 
 def format_element(bfo, var=''):
     '''
@@ -50,6 +51,8 @@ def format_element(bfo, var=''):
         out = CFG_SITE_ADMIN_EMAIL
     elif var in ['support_email', 'CFG_SITE_SUPPORT_EMAIL']:
         out = CFG_SITE_SUPPORT_EMAIL
+    elif var in ['CFG_SITE_RECORD']:
+        out = CFG_SITE_RECORD
     elif var in ['weburl', 'CFG_SITE_URL']:
         out = CFG_SITE_URL
         if not out.endswith('/'):
@@ -62,7 +65,7 @@ def format_element(bfo, var=''):
         out = CFG_SITE_URL
         if not out.endswith('/'):
             out += '/'
-        out += 'record/' + str(recID)
+        out += CFG_SITE_RECORD +'/' + str(recID)
     else:
         out = 'Unknown variable: %s' % (var)
     return out

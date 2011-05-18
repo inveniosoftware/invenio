@@ -82,7 +82,8 @@ from invenio.config import \
      CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
      CFG_WEBSEARCH_RSS_I18N_COLLECTIONS, \
      CFG_INSPIRE_SITE, \
-     CFG_WEBSEARCH_WILDCARD_LIMIT
+     CFG_WEBSEARCH_WILDCARD_LIMIT, \
+     CFG_SITE_RECORD
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
@@ -200,7 +201,7 @@ class WebInterfaceUnAPIPages(WebInterfaceDirectory):
                 'mods' : 'xo'
             }.get(argd['format'], argd['format'])
             if format in formats:
-                redirect_to_url(req, '%s/record/%s/export/%s' % (CFG_SITE_URL, argd['id'], format))
+                redirect_to_url(req, '%s/%s/%s/export/%s' % (CFG_SITE_URL, CFG_SITE_RECORD, argd['id'], format))
             else:
                 raise apache.SERVER_RETURN, apache.HTTP_NOT_ACCEPTABLE
         elif argd['id']:
@@ -717,7 +718,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
 
 class WebInterfaceRecordPages(WebInterfaceDirectory):
-    """ Handling of a /record/<recid> URL fragment """
+    """ Handling of a /CFG_SITE_RECORD/<recid> URL fragment """
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage',
                 'references', 'export', 'citations', 'holdings', 'edit',
@@ -790,7 +791,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         else:
             return out
 
-    # Return the same page wether we ask for /record/123 or /record/123/
+    # Return the same page wether we ask for /CFG_SITE_RECORD/123 or /CFG_SITE_RECORD/123/
     index = __call__
 
 class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
@@ -868,7 +869,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         else:
             return out
 
-    # Return the same page wether we ask for /record/123 or /record/123/
+    # Return the same page wether we ask for /CFG_SITE_RECORD/123 or /CFG_SITE_RECORD/123/
     index = __call__
 
 class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
@@ -1059,9 +1060,9 @@ class WebInterfaceLegacySearchPages(WebInterfaceDirectory):
         argd = wash_search_urlargd(form)
 
         # We either jump into the generic search form, or the specific
-        # /record/... display if a recid is requested
+        # /CFG_SITE_RECORD/... display if a recid is requested
         if argd['recid'] != -1:
-            target = '/record/%d' % argd['recid']
+            target = '/%s/%d' % (CFG_SITE_RECORD,argd['recid'])
             del argd['recid']
 
         else:
@@ -1138,19 +1139,19 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             return answer, []
 
 
-        elif component == 'record' and path and path[0] == 'merge':
+        elif component == CFG_SITE_RECORD and path and path[0] == 'merge':
             return WebInterfaceMergePages(), path[1:]
 
-        elif component == 'record' and path and path[0] == 'edit':
+        elif component == CFG_SITE_RECORD and path and path[0] == 'edit':
             return WebInterfaceEditPages(), path[1:]
 
-        elif component == 'record' and path and path[0] == 'multiedit':
+        elif component == CFG_SITE_RECORD and path and path[0] == 'multiedit':
             return WebInterfaceMultiEditPages(), path[1:]
 
-        elif component == 'record' or component == 'record-restricted':
+        elif component == CFG_SITE_RECORD or component == 'record-restricted':
             try:
                 if CFG_WEBSEARCH_USE_ALEPH_SYSNOS:
-                    # let us try to recognize /record/<SYSNO> style of URLs:
+                    # let us try to recognize /<CFG_SITE_RECORD>/<SYSNO> style of URLs:
                     x = get_mysql_recid_from_aleph_sysno(path[0])
                     if x:
                         recid = x
@@ -1159,18 +1160,18 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 else:
                     recid = int(path[0])
             except IndexError:
-                # display record #1 for URL /record without a number
+                # display record #1 for URL /CFG_SITE_RECORD without a number
                 recid = 1
             except ValueError:
                 if path[0] == '':
-                    # display record #1 for URL /record/ without a number
+                    # display record #1 for URL /CFG_SITE_RECORD/ without a number
                     recid = 1
                 else:
-                    # display page not found for URLs like /record/foo
+                    # display page not found for URLs like /CFG_SITE_RECORD/foo
                     return None, []
 
             if recid <= 0:
-                # display page not found for URLs like /record/-5 or /record/0
+                # display page not found for URLs like /CFG_SITE_RECORD/-5 or /CFG_SITE_RECORD/0
                 return None, []
 
             format = None
@@ -1188,7 +1189,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 #                    tab = ''
 #                    format = path[1]
                 else:
-                    # display page not found for URLs like /record/references
+                    # display page not found for URLs like /CFG_SITE_RECORD/references
                     # for a collection where 'references' tabs is not visible
                     return None, []
 
@@ -1542,7 +1543,7 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
 
 
 class WebInterfaceRecordExport(WebInterfaceDirectory):
-    """ Handling of a /record/<recid>/export/<format> URL fragment """
+    """ Handling of a /<CFG_SITE_RECORD>/<recid>/export/<format> URL fragment """
 
     _exports = output_formats
 
@@ -1601,5 +1602,5 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
         else:
             return out
 
-    # Return the same page wether we ask for /record/123/export/xm or /record/123/export/xm/
+    # Return the same page wether we ask for /CFG_SITE_RECORD/123/export/xm or /CFG_SITE_RECORD/123/export/xm/
     index = __call__

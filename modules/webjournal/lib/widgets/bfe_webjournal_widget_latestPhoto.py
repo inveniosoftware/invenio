@@ -21,7 +21,7 @@ WebJournal widget - display photos from given collections
 """
 from invenio.bibformat_engine import BibFormatObject
 from invenio.search_engine import perform_request_search
-from invenio.config import CFG_CERN_SITE, CFG_SITE_URL
+from invenio.config import CFG_CERN_SITE, CFG_SITE_URL, CFG_SITE_RECORD
 
 def format_element(bfo, collections, max_photos="3", separator="<br/>"):
     """
@@ -98,6 +98,6 @@ def get_widget_html(language, max_photos, collections, separator, ln):
                         break # Just one image per record
 
     # Build output
-    html_out = separator.join(['<a href="%s/record/%i?ln=%s"><img class="phr" width="100" height="67" src="%s"/>%s</a>' % (CFG_SITE_URL, recid, ln, photo_url, title) for (recid, photo_url, title) in images_urls])
+    html_out = separator.join(['<a href="%s/%s/%i?ln=%s"><img class="phr" width="100" height="67" src="%s"/>%s</a>' % (CFG_SITE_URL, CFG_SITE_RECORD, recid, ln, photo_url, title) for (recid, photo_url, title) in images_urls])
 
     return html_out

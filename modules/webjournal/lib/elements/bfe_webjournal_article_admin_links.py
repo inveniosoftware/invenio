@@ -22,7 +22,8 @@ WebJournal Element - Display admin links
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_NAME, \
-     CFG_SITE_NAME_INTL
+     CFG_SITE_NAME_INTL, \
+     CFG_SITE_RECORD
 from invenio.access_control_engine import acc_authorize_action
 from invenio.webjournal_utils import \
      parse_url_string, \
@@ -59,12 +60,13 @@ def format_element(bfo):
     <a href="%(CFG_SITE_URL)s/submit/direct?%(identifier_element)s=%(identifier)s&amp;sub=MBI%(doctype)s" target="_blank"> >> edit article</a>
   </p>
   <p>
-    <a href="%(CFG_SITE_URL)s/record/%(recid)s" target="_blank"> >> record in %(CFG_SITE_NAME_INTL)s</a>
+    <a href="%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/%(recid)s" target="_blank"> >> record in %(CFG_SITE_NAME_INTL)s</a>
   </p>
   <p>
     <a href="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/regenerate?journal_name=%(journal_name)s&amp;issue=%(issue_number)s"> >> publish changes</a>
   </p>
 </div>''' % {'CFG_SITE_URL': CFG_SITE_URL,
+             'CFG_SITE_RECORD': CFG_SITE_RECORD,
              'identifier': identifier,
              'recid': recid,
              'journal_name': journal_name,

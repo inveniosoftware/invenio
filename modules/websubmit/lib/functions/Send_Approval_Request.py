@@ -34,7 +34,8 @@ import re
 
 from invenio.config import CFG_SITE_NAME, \
      CFG_SITE_URL, \
-     CFG_SITE_SUPPORT_EMAIL
+     CFG_SITE_SUPPORT_EMAIL, \
+     CFG_SITE_RECORD
 from invenio.dbquery import run_sql
 from invenio.access_control_admin import acc_get_role_users,acc_get_role_id
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
@@ -137,7 +138,7 @@ def Send_Approval_Request (parameters, curdir, form, user_info=None):
     title_referee = "Request for approval of %s" % rn
     mail_referee = "The document %s has been submitted to the %s Server..\nYour approval is requested on it.\n\n" % (rn,CFG_SITE_NAME)
     mail_referee +="Title: %s\n\nAuthor(s): %s\n\n" % (title,author)
-    mail_referee +="To access the document(s), select the file(s) from the location:<%s/record/%s/files/>\n\n" % (CFG_SITE_URL,sysno)
+    mail_referee +="To access the document(s), select the file(s) from the location:<%s/%s/%s/files/>\n\n" % (CFG_SITE_URL,CFG_SITE_RECORD,sysno)
     mail_referee +="To approve/reject the document, you should go to this URL:\n<%s/approve.py?%s>\n" % (CFG_SITE_URL,access)
     mail_referee +="---------------------------------------------\nBest regards.\nThe submission team.\n"
     #Send mail to referee

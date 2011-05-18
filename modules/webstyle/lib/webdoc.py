@@ -32,6 +32,7 @@ from invenio.config import \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \
+     CFG_SITE_RECORD, \
      CFG_VERSION, \
      CFG_SITE_NAME_INTL, \
      CFG_CACHEDIR
@@ -131,6 +132,7 @@ defined_tags = {'<CFG_SITE_NAME>': CFG_SITE_NAME,
                 '<CFG_SITE_ADMIN_EMAIL>': CFG_SITE_ADMIN_EMAIL,
                 '<CFG_SITE_URL>': CFG_SITE_URL,
                 '<CFG_SITE_SECURE_URL>': CFG_SITE_SECURE_URL,
+                '<CFG_SITE_RECORD>': CFG_SITE_RECORD,
                 '<CFG_VERSION>': CFG_VERSION,
                 '<CFG_SITE_NAME_INTL>': CFG_SITE_NAME_INTL}
 

@@ -70,7 +70,9 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_BIBRANK_SHOW_CITATION_LINKS, \
-     CFG_SOLR_URL
+     CFG_SOLR_URL, \
+     CFG_SITE_RECORD
+
 from invenio.search_engine_config import InvenioWebSearchUnknownCollectionError, InvenioWebSearchWildcardLimitError
 from invenio.bibrecord import create_record, record_get_field_instances
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records, is_method_valid
@@ -837,8 +839,8 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
             # the nav. trail to have a link back to main record. (Due
             # to the way perform_request_search() works, hb
             # (lowercase) is equal to hd)
-            navtrail += ' <a class="navtrail" href="%s/record/%s">%s</a>' % \
-                            (CFG_SITE_URL, recID, title_message)
+            navtrail += ' <a class="navtrail" href="%s/%s/%s">%s</a>' % \
+                            (CFG_SITE_URL, CFG_SITE_RECORD, recID, title_message)
             if (of != '' or of.lower() != 'hd') and of != 'hb':
                 # Export
                 format_name = of
@@ -3103,10 +3105,6 @@ def get_fieldvalues(recIDs, tag, repetitive_values=True):
     only.
     """
     out = []
-    try:
-        recIDs = int(recIDs)
-    except:
-        pass
     if isinstance(recIDs, (int, long)):
         recIDs =[recIDs,]
     if not isinstance(recIDs, (list, tuple)):
@@ -3727,7 +3725,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                             references = len(record_get_field_instances(tmprec, reftag[0:3], reftag[3], reftag[4]))
 
                     tabs = [(unordered_tabs[tab_id]['label'], \
-                             '%s/record/%s/%s%s' % (CFG_SITE_URL, recid_to_display, tab_id, link_ln), \
+                             '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, recid_to_display, tab_id, link_ln), \
                              tab_id == tab,
                              unordered_tabs[tab_id]['enabled']) \
                             for (tab_id, order) in ordered_tabs_id

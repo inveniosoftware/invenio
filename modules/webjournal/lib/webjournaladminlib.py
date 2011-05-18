@@ -38,7 +38,8 @@ from invenio.config import \
      CFG_ETCDIR, \
      CFG_CACHEDIR, \
      CFG_TMPDIR, \
-     CFG_SITE_SUPPORT_EMAIL
+     CFG_SITE_SUPPORT_EMAIL, \
+     CFG_SITE_RECORD
 from invenio.messages import gettext_set_language
 from invenio.mailutils import send_email
 from invenio.access_control_engine import acc_authorize_action
@@ -194,14 +195,16 @@ def perform_feature_record(journal_name,
         result = add_featured_record(journal_name, recid, img_url)
         if result == 0:
             msg ='''<span style="color:#0f0">Successfully featured
-            <a href="%(CFG_SITE_URL)s/record/%(recid)s">record %(recid)s</a>.
+            <a href="%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/%(recid)s">record %(recid)s</a>.
         Go to the <a href="%(CFG_SITE_URL)s/journal/%(name)s">%(name)s journal</a> to
         see the result.</span>''' % {'CFG_SITE_URL': CFG_SITE_URL,
+                                  'CFG_SITE_RECORD': CFG_SITE_RECORD,
                                   'name': journal_name,
                                   'recid': recid}
         elif result == 1:
-            msg = '''<span style="color:#f00"><a href="%(CFG_SITE_URL)s/record/%(recid)s">record %(recid)s</a> is already featured. Choose another one or remove it first.</span>''' % \
+            msg = '''<span style="color:#f00"><a href="%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/%(recid)s">record %(recid)s</a> is already featured. Choose another one or remove it first.</span>''' % \
                   {'CFG_SITE_URL': CFG_SITE_URL,
+                   'CFG_SITE_RECORD': CFG_SITE_RECORD,
                    'recid': recid}
         else:
             msg = '''<span style="color:#f00">Record could not be featured. Check file permission.</span>'''
@@ -213,7 +216,7 @@ def perform_feature_record(journal_name,
                                              msg=msg)
     elif action == 'askremove':
         msg = '''<fieldset style="display:inline;margin-left:auto;margin-right:auto;">
-        <legend>Remove featured record</legend><span style="color:#f00">Are you sure you want to remove <a href="%(CFG_SITE_URL)s/record/%(recid)s">record %(recid)s</a> from the list of featured record?
+        <legend>Remove featured record</legend><span style="color:#f00">Are you sure you want to remove <a href="%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/%(recid)s">record %(recid)s</a> from the list of featured record?
         <form action="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/feature_record">
         <input type="hidden" name="journal_name" value="%(name)s" />
         <input type="hidden" name="recid" value="%(recid)s" />
@@ -221,6 +224,7 @@ def perform_feature_record(journal_name,
         <input class="formbutton" type="submit" name="action" value="%(cancel)s" />
         </form></span></fieldset>''' % \
             {'CFG_SITE_URL': CFG_SITE_URL,
+             'CFG_SITE_RECORD': CFG_SITE_RECORD,
              'name': journal_name,
              'recid': recid,
              'cancel': _("Cancel"),
@@ -232,9 +236,10 @@ def perform_feature_record(journal_name,
                                              msg=msg)
     elif action == _("Remove"):
         result = remove_featured_record(journal_name, recid)
-        msg = '''<span style="color:#f00"><a href="%(CFG_SITE_URL)s/record/%(recid)s">Record %(recid)s</a>
+        msg = '''<span style="color:#f00"><a href="%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/%(recid)s">Record %(recid)s</a>
         has been removed.</span>''' % \
             {'CFG_SITE_URL': CFG_SITE_URL,
+             'CFG_SITE_RECORD': CFG_SITE_RECORD,
              'recid': recid}
         featured_records = get_featured_records(journal_name)
         return wjt.tmpl_admin_feature_record(ln=ln,

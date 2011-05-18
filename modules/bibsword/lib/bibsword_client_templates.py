@@ -21,7 +21,7 @@
 BibSWORD Client Templates
 '''
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_NAME
+from invenio.config import CFG_SITE_URL, CFG_SITE_NAME, CFG_SITE_RECORD
 
 class BibSwordTemplate:
     '''
@@ -768,7 +768,7 @@ class BibSwordTemplate:
         <td>%(id_server)s: <a href="%(server_infos)s">
             %(server_name)s</a></td>
         <td>%(user_name)s <br/> %(user_email)s</td
-        <td>%(id_bibrec)s: <a href="%(cfg_site_url)s/record/%(id_bibrec)s"
+        <td>%(id_bibrec)s: <a href="%(cfg_site_url)s/%(CFG_SITE_RECORD)s/%(id_bibrec)s"
             target="_blank">%(no_bibrec)s</a></td>
         <td><a href="%(url_base_remote)s/%(id_remote)s" target="_blank">
             %(id_remote)s</a></td>
@@ -800,7 +800,8 @@ class BibSwordTemplate:
             'metadata_link'        : str(submission['link_metadata']),
             'status_link'          : str(submission['link_status']),
             'url_base_remote'      : str(submission['url_base_remote']),
-            'cfg_site_url'         : CFG_SITE_URL
+            'cfg_site_url'         : CFG_SITE_URL,
+            'CFG_SITE_RECORD'       : CFG_SITE_RECORD
         } for submission in submissions])
 
 

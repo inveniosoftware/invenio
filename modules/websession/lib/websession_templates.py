@@ -32,7 +32,8 @@ from invenio.config import \
      CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS, \
      CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
      CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
-     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
+     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
+     CFG_SITE_RECORD
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
         CFG_EXTERNAL_AUTH_LOGOUT_SSO
 from invenio.urlutils import make_canonical_urlargd, create_url, create_html_link
@@ -1084,15 +1085,15 @@ class Template:
             tmp_out = ''
             for action in activities:
                 if action == "runbibedit":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/record/edit/">%s</a>""" % (CFG_SITE_URL, _("Run Record Editor"))
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/%s/edit/">%s</a>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run Record Editor"))
                 if action == "runbibeditmulti":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/record/multiedit/">%s</a>""" % (CFG_SITE_URL, _("Run Multi-Record Editor"))
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/%s/multiedit/">%s</a>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run Multi-Record Editor"))
                 if action == "runbibcirculation":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibcirculation/bibcirculationadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run BibCirculation"))
                 if action == "runbibmerge":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/record/merge/">%s</a>""" % (CFG_SITE_URL, _("Run Record Merger"))
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/%s/merge/">%s</a>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run Record Merger"))
                 if action == "runbibswordclient":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/record/bibsword/">%s</a>""" % (CFG_SITE_URL, _("Run BibSword Client"))
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/%s/bibsword/">%s</a>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run BibSword Client"))
                 if action == "runbatchuploader":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/batchuploader/metadata?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run Batch Uploader"))
                 if action == "cfgbibformat":

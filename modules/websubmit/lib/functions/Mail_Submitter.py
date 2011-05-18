@@ -41,7 +41,8 @@ import re
 
 from invenio.config import CFG_SITE_NAME, \
      CFG_SITE_URL, \
-     CFG_SITE_SUPPORT_EMAIL
+     CFG_SITE_SUPPORT_EMAIL, \
+     CFG_SITE_RECORD
 
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
@@ -119,7 +120,7 @@ def Mail_Submitter(parameters, curdir, form, user_info=None):
     if parameters['status'] == "APPROVAL":
         email_txt =  email_txt + "An email has been sent to the referee. You will be warned by email as soon as the referee takes his/her decision regarding your document.\n\n"
     elif parameters['status'] == "ADDED":
-        email_txt = email_txt + "It will be soon added to our Document Server.\n\nOnce inserted, you will be able to check the  bibliographic information and the quality of the electronic documents at this URL:\n<%s/record/%s>\nIf you detect an error please let us know by sending an email to %s. \n\n" % (CFG_SITE_URL,sysno,CFG_SITE_SUPPORT_EMAIL)
+        email_txt = email_txt + "It will be soon added to our Document Server.\n\nOnce inserted, you will be able to check the  bibliographic information and the quality of the electronic documents at this URL:\n<%s/%s/%s>\nIf you detect an error please let us know by sending an email to %s. \n\n" % (CFG_SITE_URL,CFG_SITE_RECORD,sysno,CFG_SITE_SUPPORT_EMAIL)
     email_txt += get_nice_bibsched_related_message(curdir)
     email_txt = email_txt + "Thank you for using %s Submission Interface.\n" % CFG_SITE_NAME
 

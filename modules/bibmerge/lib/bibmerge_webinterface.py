@@ -34,7 +34,7 @@ else:
     import json
 
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_RECORD
 from invenio.search_engine import guess_primary_collection_of_a_record
 from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized, collect_user_info
@@ -101,7 +101,7 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
         elif self.recid:
             # Handle RESTful call by storing recid and redirecting to
             # generic URL.
-            redirect_to_url(req, '%s/record/merge/' % CFG_SITE_URL )
+            redirect_to_url(req, '%s/%s/merge/' % (CFG_SITE_URL, CFG_SITE_RECORD) )
 
         if recid1 is not None:
             # Authorize access to record 1.
@@ -144,5 +144,5 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
 
     def __call__(self, req, form):
         """Redirect calls without final slash."""
-        redirect_to_url(req, '%s/record/merge/' % CFG_SITE_URL)
+        redirect_to_url(req, '%s/%s/merge/' % (CFG_SITE_URL, CFG_SITE_RECORD))
 

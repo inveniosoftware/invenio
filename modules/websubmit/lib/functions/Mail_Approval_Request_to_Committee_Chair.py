@@ -39,7 +39,8 @@ __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_NAME, \
      CFG_SITE_URL, \
-     CFG_SITE_SUPPORT_EMAIL
+     CFG_SITE_SUPPORT_EMAIL, \
+     CFG_SITE_RECORD
 
 from invenio.mailutils import send_email
 from invenio.access_control_admin import acc_get_role_id, acc_get_role_users
@@ -148,14 +149,14 @@ def Mail_Approval_Request_to_Committee_Chair(parameters, curdir, form, user_info
     Author(s): %s
 
     To access the document(s), select the file(s) from the location:
-    <%s/record/%s>
+    <%s/%s/%s>
 
     To select a referee, please go to:
     <%s/publiline.py?flow=cplx&doctype=%s&categ=%s&apptype=%s&RN=%s&ln=en>
 
     ---------------------------------------------
     Best regards.
-    The submission team.""" % (rn,item_details['title'],authors,CFG_SITE_URL,sysno,CFG_SITE_URL,res[0][0],res[0][1],res[0][3],rn)
+    The submission team.""" % (rn,item_details['title'],authors,CFG_SITE_URL,CFG_SITE_RECORD,sysno,CFG_SITE_URL,res[0][0],res[0][1],res[0][3],rn)
     # send the mail
 
     send_email(FROMADDR,pubcomchair_address,"Request for Referee Selection : Document %s" % rn, message,footer="")

@@ -42,7 +42,8 @@ from invenio.config import \
      CFG_PYLIBDIR, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_SITE_SUPPORT_EMAIL, \
-     CFG_SITE_SECURE_URL
+     CFG_SITE_SECURE_URL, \
+     CFG_SITE_RECORD
 from invenio.dbquery import run_sql, Error, OperationalError
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_get_role_users, acc_get_role_id
@@ -1621,14 +1622,14 @@ def SendEnglish(doctype,categ,RN,title,authors,access,sysno):
     Author(s): %s
 
     To access the document(s), select the file(s) from the location:
-    <%s/record/%s/files/>
+    <%s/%s/%s/files/>
 
     To approve/reject the document, you should go to this URL:
     <%s/approve.py?%s>
 
     ---------------------------------------------
     Best regards.
-    The submission team.""" % (RN,title,authors,CFG_SITE_URL,sysno,CFG_SITE_URL,access)
+    The submission team.""" % (RN,title,authors,CFG_SITE_URL,CFG_SITE_RECORD,sysno,CFG_SITE_URL,access)
     # send the mail
     send_email(FROMADDR,addresses,"Request for Approval of %s" % RN, message,footer="")
     return ""
@@ -1655,7 +1656,7 @@ def send_approval(doctype, categ, rn, title, authors, access, sysno):
     To access the document(s), select the file(s) from the location:
     <%s/record/%s/files/>
 
-    As a referee for this document, you may approve or reject it 
+    As a referee for this document, you may approve or reject it
     from the submission interface:
     <%s/submit?doctype=%s>
 
@@ -1716,7 +1717,7 @@ def sendMailToReferee(doctype,categ,RN,email,authors):
     Author(s): %s
 
     To access the document(s), select the file(s) from the location:
-    <%s/record/%s>
+    <%s/%s/%s>
 
     To make a reccommendation, you should go to this URL:
     <%s>
@@ -1730,6 +1731,7 @@ def sendMailToReferee(doctype,categ,RN,email,authors):
                                str(categ),
                                str(item_details['title']),
                                authors,
+                               CFG_SITE_URL,
                                CFG_SITE_URL,
                                str(item_details['recid']),
                                str(CFG_SITE_URL + "/publiline.py?flow=cplx&doctype="+doctype+"&ln=en&apptype=RRP&categ="+categ+"&RN="+RN+"&action=RefereeRecom"),
@@ -1763,7 +1765,7 @@ def sendMailToGroup(doctype,categ,RN,group_id,authors):
     Author(s): %s
 
     To access the document(s), select the file(s) from the location:
-    <%s/record/%s>
+    <%s/%s/%s>
 
     To leave a comment or check the status of the approval process, you should go to this URL:
     <%s>
@@ -1773,6 +1775,7 @@ def sendMailToGroup(doctype,categ,RN,group_id,authors):
            str(item_details['title']),
            authors,
            CFG_SITE_URL,
+           CFG_SITE_RECORD,
            str(item_details['recid']),
            str(CFG_SITE_URL + "/publiline.py?flow=cplx&doctype="+doctype+"&ln=en&apptype=RRP&categ="+categ+"&RN="+RN))
 
@@ -1807,7 +1810,7 @@ def sendMailToProjectLeader(doctype, categ, RN, email, authors, actor, recommend
     Author(s): %s
 
     To access the document(s), select the file(s) from the location:
-    <%s/record/%s>
+    <%s/%s/%s>
 
     The %s has made a recommendation for the document. He/she said the following:
 
@@ -1824,6 +1827,7 @@ def sendMailToProjectLeader(doctype, categ, RN, email, authors, actor, recommend
            str(item_details['title']),
            authors,
            CFG_SITE_URL,
+           CFG_SITE_RECORD,
            str(item_details['recid']),
            actor,
            recommendation,
@@ -1883,7 +1887,7 @@ def sendMailtoCommitteeChair(doctype, categ, RN, email, authors):
     Author(s): %s
 
     To access the document(s), select the file(s) from the location:
-    <%s/record/%s>
+    <%s/%s/%s>
 
     You can make a reccommendation by visiting this page:
     <%s>
@@ -1891,6 +1895,7 @@ def sendMailtoCommitteeChair(doctype, categ, RN, email, authors):
            str(item_details['title']),
            authors,
            CFG_SITE_URL,
+           CFG_SITE_RECORD,
            str(item_details['recid']),
            str(CFG_SITE_URL + "/publiline.py?flow=cplx&doctype="+doctype+"&ln=en&apptype=RRP&categ="+categ+"&RN="+RN))
 

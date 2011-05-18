@@ -32,12 +32,13 @@ import os
 
 from invenio.search_engine import get_collection_reclist
 from invenio.dbquery import run_sql
-from invenio.config import CFG_SITE_URL, CFG_WEBDIR, CFG_ETCDIR
+from invenio.config import CFG_SITE_URL, CFG_WEBDIR, CFG_ETCDIR, \
+    CFG_SITE_RECORD
 from invenio.intbitset import intbitset
 from invenio.websearch_webcoll import Collection
 from invenio.messages import language_list_long
 from invenio.bibtask import write_message, task_update_progress
-       
+
 
 DEFAULT_TIMEZONE = '+01:00'
 
@@ -292,7 +293,7 @@ def generate_sitemaps(collection_names, fulltext_filter=''):
                 sitemap_id += 1
                 writer = SitemapWriter(CFG_WEBDIR + '/sitemap-%s.xml' % sitemap_id)
                 sitemaps.append(writer.get_name())
-        nb_urls = writer.add_url(CFG_SITE_URL + '/record/%s' % recid,
+        nb_urls = writer.add_url(CFG_SITE_URL + '/%s/%s' % (CFG_SITE_RECORD, recid),
                                  lastmod = lastmod,
                                  changefreq = DEFAULT_CHANGEFREQ_RECORDS,
                                  priority = DEFAULT_PRIORITY_RECORDS)
@@ -325,7 +326,7 @@ def generate_sitemaps(collection_names, fulltext_filter=''):
                 sitemap_id += 1
                 writer = SitemapWriter(CFG_WEBDIR + '/sitemap-%s.xml' % sitemap_id)
                 sitemaps.append(writer.get_name())
-        nb_urls = writer.add_url(CFG_SITE_URL + '/record/%s/files' % recid,
+        nb_urls = writer.add_url(CFG_SITE_URL + '/%s/%s/files' % (CFG_SITE_RECORD, recid),
                                  lastmod = lastmod,
                                  changefreq = DEFAULT_CHANGEFREQ_FULLTEXTS,
                                  priority = DEFAULT_PRIORITY_FULLTEXTS)
@@ -341,7 +342,7 @@ def generate_sitemaps(collection_names, fulltext_filter=''):
                 sitemap_id += 1
                 writer = SitemapWriter(CFG_WEBDIR + '/sitemap-%s.xml' % sitemap_id)
                 sitemaps.append(writer.get_name())
-        nb_urls = writer.add_url(CFG_SITE_URL + '/record/%s/comments' % recid,
+        nb_urls = writer.add_url(CFG_SITE_URL + '/%s/%s/comments' % (CFG_SITE_RECORD, recid),
                                  lastmod = lastmod,
                                  changefreq = DEFAULT_CHANGEFREQ_COMMENTS,
                                  priority = DEFAULT_PRIORITY_COMMENTS)
@@ -356,7 +357,7 @@ def generate_sitemaps(collection_names, fulltext_filter=''):
                 sitemap_id += 1
                 writer = SitemapWriter(CFG_WEBDIR + '/sitemap-%s.xml' % sitemap_id)
                 sitemaps.append(writer.get_name())
-        nb_urls = writer.add_url(CFG_SITE_URL + '/record/%s/reviews' % recid,
+        nb_urls = writer.add_url(CFG_SITE_URL + '/%s/%s/reviews' % (CFG_SITE_RECORD, recid),
                                  lastmod = lastmod,
                                  changefreq = DEFAULT_CHANGEFREQ_REVIEWS,
                                  priority = DEFAULT_PRIORITY_REVIEWS)

@@ -3373,7 +3373,7 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
     detailed record pages.
 
     Returned structured is a dict with
-      - key : last component of the url that leads to detailed record tab: http:www.../record/74/key
+      - key : last component of the url that leads to detailed record tab: http:www.../CFG_SITE_RECORD/74/key
       - values: a dictionary with the following keys:
                                          - label: *string* label to be printed as tab (Not localized here)
                                          - visible: *boolean* if False, tab should not be shown

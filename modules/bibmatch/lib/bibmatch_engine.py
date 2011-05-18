@@ -36,7 +36,8 @@ from invenio.config import CFG_SITE_URL, CFG_BIBMATCH_FUZZY_WORDLIMITS, \
                            CFG_BIBMATCH_QUERY_TEMPLATES, \
                            CFG_BIBMATCH_FUZZY_EMPTY_RESULT_LIMIT, \
                            CFG_BIBMATCH_LOCAL_SLEEPTIME, \
-                           CFG_BIBMATCH_REMOTE_SLEEPTIME
+                           CFG_BIBMATCH_REMOTE_SLEEPTIME, \
+                           CFG_SITE_RECORD
 from invenio.invenio_connector import InvenioConnector
 from invenio.bibrecord import create_records, \
     record_get_field_values, record_xml_output, record_modify_controlfield, \
@@ -488,8 +489,8 @@ def match_result_output(recID_list, server_url, query, matchmode="no match"):
     """
     result = []
     for recID in recID_list:
-        result.append("<!-- BibMatch-Matching-Found: %s/record/%s -->" \
-                             % (server_url, recID))
+        result.append("<!-- BibMatch-Matching-Found: %s/%s/%s -->" \
+                             % (server_url, CFG_SITE_RECORD, recID))
     result.append("<!-- BibMatch-Matching-Mode: %s -->" \
                               % (matchmode,))
     result.append("<!-- BibMatch-Matching-Criteria: %s -->\n" \
