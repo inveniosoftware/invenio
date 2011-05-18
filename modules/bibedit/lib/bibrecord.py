@@ -909,6 +909,11 @@ def field_get_subfield_values(field_instance, code):
             for subfield_code, subfield_value in field_instance[0]
             if subfield_code == code]
 
+def field_get_subfield_codes(field_instance):
+    """Return subfield codes of the field instance FIELD."""
+    return [subfield_code
+            for subfield_code, subfield_value in field_instance[0]]
+
 def field_add_subfield(field, code, value):
     """Adds a subfield to field 'field'"""
     field[0].append((code, value))

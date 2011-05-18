@@ -44,12 +44,16 @@ from invenio.bibedit_dblayer import get_record_last_modification_date, \
 from invenio.bibrecord import create_record, create_records, \
     record_get_field_value, record_has_field, record_xml_output, \
     record_strip_empty_fields, record_strip_empty_volatile_subfields, \
-    record_order_subfields, record_get_field_instances
+    record_order_subfields, record_get_field_instances, \
+    record_add_field, field_get_subfield_codes, field_add_subfield, \
+    field_get_subfield_values
+
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
     CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG, CFG_TMPSHAREDDIR, \
-    CFG_BIBEDIT_QUEUE_CHECK_METHOD
+    CFG_BIBEDIT_QUEUE_CHECK_METHOD, \
+    CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.bibedit_dblayer import get_bibupload_task_opts, \
     get_marcxml_of_record_revision, get_record_revisions, \
@@ -657,3 +661,35 @@ def can_record_have_physical_copies(recid):
 
     return collections["holdings"]["visible"] == True
 
+def extend_record_with_template(recid):
+    """ Determine if the record has to be extended with the content
+    of a template as defined in CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE
+    @return: template name to be applied to record or False if no template
+    has to be applied
+    """
+    rec_collection = guess_primary_collection_of_a_record(recid)
+    if rec_collection in CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE:
+        return CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE[rec_collection]
+    return False
+
+def merge_record_with_template(rec, template_name):
+    """ Extend the record rec with the contents of the template and return it"""
+    template = get_record_template(template_name)
+    template_bibrec = create_record(template)[0]
+
+    for field_tag in template_bibrec:
+        if not record_has_field(rec, field_tag):
+            for field_instance in template_bibrec[field_tag]:
+                record_add_field(rec, field_tag, field_instance[1],
+                                 field_instance[2], subfields=field_instance[0])
+        else:
+            for template_field_instance in template_bibrec[field_tag]:
+                subfield_codes_template = field_get_subfield_codes(template_field_instance)
+                for field_instance in rec[field_tag]:
+                    subfield_codes = field_get_subfield_codes(field_instance)
+                    for code in subfield_codes_template:
+                        if code not in subfield_codes:
+                            field_add_subfield(field_instance, code,
+                                               field_get_subfield_values(template_field_instance,
+                                               code)[0])
+    return rec

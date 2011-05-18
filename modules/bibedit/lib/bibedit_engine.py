@@ -61,7 +61,8 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     update_cache_file_contents, get_field_templates, get_marcxml_of_revision, \
     revision_to_timestamp, timestamp_to_revision, \
     get_record_revision_timestamps, record_revision_exists, \
-    can_record_have_physical_copies
+    can_record_have_physical_copies, extend_record_with_template, \
+    merge_record_with_template
 
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
@@ -599,6 +600,12 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             bibcirc_details_URL = create_item_details_url(recid, ln)
             can_have_copies = can_record_have_physical_copies(recid)
 
+            # For some collections, merge template with record
+            template_to_merge = extend_record_with_template(recid)
+            if template_to_merge:
+                record = merge_record_with_template(record, template_to_merge)
+                create_cache_file(recid, uid, record, True)
+                
             response['cacheDirty'], response['record'], \
                 response['cacheMTime'], response['recordRevision'], \
                 response['revisionAuthor'], response['lastRevision'], \
