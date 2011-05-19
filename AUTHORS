@@ -277,7 +277,7 @@ order:
      the WebAccess module.  Guest user sessions garbage collector,
      for the WebSession module.
 
- - Erik Simon <erik.simon@unine.ch>
+ - Erik Simon <erik.simon@unine.ch>, Eric Simon <eric.simon@unine.ch>
      Alert engine, for the WebAlert module.
 
  - Roberta Faggian <roberta.faggian@cern.ch>
