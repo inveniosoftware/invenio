@@ -413,6 +413,71 @@ class BibMatchTest(unittest.TestCase):
 
 </collection>
 """ % CFG_SITE_RECORD
+        # Restricted record in thesis collection
+        self.recxml5 = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <collection xmlns="http://www.loc.gov/MARC21/slim">
+    <record>
+      <controlfield tag="001">42</controlfield>
+      <datafield tag="041" ind1=" " ind2=" ">
+        <subfield code="a">eng</subfield>
+      </datafield>
+      <datafield tag="088" ind1=" " ind2=" ">
+        <subfield code="a">LBL-28106</subfield>
+      </datafield>
+      <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Bertsche, K J</subfield>
+        <subfield code="u">Calif. Univ. Berkeley</subfield>
+      </datafield>
+      <datafield tag="245" ind1=" " ind2=" ">
+        <subfield code="a">A small low energy cyclotron for radioisotope measurements</subfield>
+      </datafield>
+      <datafield tag="260" ind1=" " ind2=" ">
+        <subfield code="a">Berkeley, CA</subfield>
+        <subfield code="b">Lawrence Berkeley Nat. Lab.</subfield>
+        <subfield code="c">Nov 1989</subfield>
+      </datafield>
+      <datafield tag="300" ind1=" " ind2=" ">
+        <subfield code="a">155 p</subfield>
+      </datafield>
+      <datafield tag="502" ind1=" " ind2=" ">
+        <subfield code="a">Thesis : Calif. Univ. Berkeley</subfield>
+      </datafield>
+      <datafield tag="650" ind1="1" ind2="7">
+        <subfield code="2">SzGeCERN</subfield>
+        <subfield code="a">Accelerators and Storage Rings</subfield>
+      </datafield>
+      <datafield tag="653" ind1="1" ind2=" ">
+        <subfield code="a">bibliography</subfield>
+      </datafield>
+      <datafield tag="690" ind1="C" ind2=" ">
+        <subfield code="a">REPORT</subfield>
+      </datafield>
+      <datafield tag="690" ind1="C" ind2=" ">
+        <subfield code="a">THESIS</subfield>
+      </datafield>
+      <datafield tag="909" ind1="C" ind2="0">
+        <subfield code="b">14</subfield>
+      </datafield>
+      <datafield tag="909" ind1="C" ind2="0">
+        <subfield code="y">1989</subfield>
+      </datafield>
+      <datafield tag="909" ind1="C" ind2="1">
+        <subfield code="c">1990-02-28</subfield>
+        <subfield code="l">50</subfield>
+        <subfield code="m">2002-03-22</subfield>
+        <subfield code="o">BATCH</subfield>
+      </datafield>
+      <datafield tag="909" ind1="C" ind2="S">
+        <subfield code="s">h</subfield>
+        <subfield code="w">199010n</subfield>
+      </datafield>
+      <datafield tag="980" ind1=" " ind2=" ">
+        <subfield code="a">THESIS</subfield>
+      </datafield>
+    </record>
+    </collection>
+    """
         return
 
 
@@ -431,7 +496,8 @@ class BibMatchTest(unittest.TestCase):
     def test_check_ambiguous(self):
         """bibmatch - check an ambiguous record"""
         records = create_records(self.recxml1)
-        [dummy1, dummy2, ambigrecs, dummy3] = match_records(records, qrystrs=[("", "[100__a]")])
+        [dummy1, dummy2, ambigrecs, dummy3] = match_records(records, \
+                                                            qrystrs=[("", "[100__a]")])
         self.assertEqual(1, len(ambigrecs))
 
     def test_check_fuzzy(self):
@@ -443,14 +509,16 @@ class BibMatchTest(unittest.TestCase):
     def test_check_remote(self):
         """bibmatch - check remote match (Invenio demo site)"""
         records = create_records(self.recxml3)
-        [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, server_url="http://invenio-demo.cern.ch")
+        [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, \
+                                                              server_url="http://invenio-demo.cern.ch")
         self.assertEqual(1, len(matchedrecs))
 
     def test_check_textmarc(self):
         """bibmatch - check textmarc as input"""
         marcxml = transform_input_to_marcxml("", self.textmarc)
         records = create_records(marcxml)
-        [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, server_url="http://invenio-demo.cern.ch")
+        [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, \
+                                                              server_url="http://invenio-demo.cern.ch")
         self.assertEqual(2, len(matchedrecs))
 
     def test_check_altered(self):
@@ -474,16 +542,59 @@ class BibMatchTest(unittest.TestCase):
     def test_check_completeness(self):
         """bibmatch - check query completeness"""
         records = create_records(self.recxml4)
-        [dummy1, dummy2, ambigrecs, dummy3] = match_records(records, qrystrs=[("", "[088__a] [035__a]")])
+        [dummy1, dummy2, ambigrecs, dummy3] = match_records(records, \
+                                                            qrystrs=[("", "[088__a] [035__a]")])
         self.assertEqual(1, len(ambigrecs))
 
     def test_check_collection(self):
         """bibmatch - check collection"""
         records = create_records(self.recxml3)
-        [nomatchrecs, dummy1, dummy2, dummy3] = match_records(records, collections=["Articles"])
+        [nomatchrecs, dummy1, dummy2, dummy3] = match_records(records, \
+                                                              collections=["Articles"])
         self.assertEqual(1, len(nomatchrecs))
-        [dummy1, matchedrecs, dummy2, dummy3] = match_records(records, collections=["Books"])
+        [dummy1, matchedrecs, dummy2, dummy3] = match_records(records, \
+                                                              collections=["Books"])
         self.assertEqual(1, len(matchedrecs))
+
+    def test_restricted_collections_local(self):
+        """bibmatch - check restricted collections local search"""
+        records = create_records(self.recxml5)
+        # Jekyll should have access
+        [dummy1, matchedrecs, dummy2, dummy3] = match_records(records, \
+                                                              qrystrs=[("", "[088__a]")], \
+                                                              collections=["Theses"], \
+                                                              user="jekyll",
+                                                              password="j123ekyll")
+        self.assertEqual(1, len(matchedrecs))
+        # Hyde should not have access
+        [nomatchrecs, dummy1, dummy2, dummy3] = match_records(records, \
+                                                              qrystrs=[("", "[088__a]")], \
+                                                              collections=["Theses"], \
+                                                              user="hyde", \
+                                                              password="h123yde",
+                                                              verbose=0)
+        self.assertEqual(1, len(matchedrecs))
+
+    def test_restricted_collections_remote(self):
+        """bibmatch - check restricted collections remote search"""
+        records = create_records(self.recxml5)
+        # Jekyll should have access
+        [dummy1, matchedrecs, dummy2, dummy3] = match_records(records, \
+                                                              qrystrs=[("", "[088__a]")], \
+                                                              collections=["Theses"], \
+                                                              server_url="https://invenio-demo.cern.ch", \
+                                                              user="jekyll", \
+                                                              password="j123ekyll")
+        self.assertEqual(1, len(matchedrecs))
+        # Hyde should not have access
+        [nomatchrecs, dummy1, dummy2, dummy3] = match_records(records, \
+                                                              qrystrs=[("", "[088__a]")], \
+                                                              collections=["Theses"], \
+                                                              server_url="https://invenio-demo.cern.ch", \
+                                                              user="hyde", \
+                                                              password="h123yde",
+                                                              verbose=0)
+        self.assertEqual(1, len(nomatchrecs))
 
 TEST_SUITE = make_test_suite(BibMatchTest)
 

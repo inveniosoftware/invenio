@@ -29,16 +29,18 @@ if sys.hexversion < 0x2040000:
 import os
 import getopt
 import re
+import getpass
 from tempfile import mkstemp
 from time import sleep
 
-from invenio.config import CFG_SITE_URL, CFG_BIBMATCH_FUZZY_WORDLIMITS, \
+from invenio.config import CFG_SITE_SECURE_URL, CFG_BIBMATCH_FUZZY_WORDLIMITS, \
                            CFG_BIBMATCH_QUERY_TEMPLATES, \
                            CFG_BIBMATCH_FUZZY_EMPTY_RESULT_LIMIT, \
                            CFG_BIBMATCH_LOCAL_SLEEPTIME, \
                            CFG_BIBMATCH_REMOTE_SLEEPTIME, \
                            CFG_SITE_RECORD
-from invenio.invenio_connector import InvenioConnector
+from invenio.invenio_connector import InvenioConnector, \
+                                      InvenioConnectorAuthError
 from invenio.bibrecord import create_records, \
     record_get_field_values, record_xml_output, record_modify_controlfield, \
     record_has_field, record_add_field
@@ -99,12 +101,6 @@ def usage():
 
  Advanced options:
 
- -c --config=filename      load querystrings from a config file. Each line starting with QRYSTR will
-                           be added as a query. i.e. QRYSTR --- [title] [author]
-
- -x --collection           only perform queries in certain collection(s).
-                           Note: matching against restricted collections does not work.
-
  -m --mode=(a|e|o|p|r)     perform an advanced search using special search mode.
                              Where mode is:
                                "a" all of the words,
@@ -117,6 +113,15 @@ def usage():
                              Where operator is:
                                "a" boolean AND (default)
                                "o" boolean OR
+
+ -c --config=filename      load querystrings from a config file. Each line starting with QRYSTR will
+                           be added as a query. i.e. QRYSTR --- [title] [author]
+
+ -x --collection           only perform queries in certain collection(s).
+                           Note: matching against restricted collections requires authentication.
+
+ --user=USERNAME           username to use when connecting to Invenio instance. Useful when searching
+                           restricted collections. You will be prompted for password.
 
  QUERYSTRINGS
    Querystrings determine which type of query/strategy to use when searching for the
@@ -193,7 +198,8 @@ def usage():
  $ bibmatch --print-ambiguous -q title-author < input.xml > ambigmatched.xml
  $ bibmatch -q "980:Thesis 773__p:\"[773__p]\" 100__a:[100__a]" -r "http://inspirebeta.net" < input.xml
 
- $ bibmatch -x 'Books,Articles' < input.xml
+ $ bibmatch --collection 'Books,Articles' < input.xml
+ $ bibmatch --collection 'Theses' --user admin < input.xml
     """ % (sys.argv[0],)
     sys.exit(1)
 
@@ -498,8 +504,8 @@ def match_result_output(recID_list, server_url, query, matchmode="no match"):
     return "\n".join(result)
 
 def match_records(records, qrystrs=None, search_mode=None, operator="and", verbose=1, \
-                  server_url=CFG_SITE_URL, modify=0, sleeptime=CFG_BIBMATCH_LOCAL_SLEEPTIME, \
-                  clean=False, collections=[]):
+                  server_url=CFG_SITE_SECURE_URL, modify=0, sleeptime=CFG_BIBMATCH_LOCAL_SLEEPTIME, \
+                  clean=False, collections=[], user="", password=""):
     """
     Match passed records with existing records on a local or remote Invenio
     installation. Returns which records are new (no match), which are matched,
@@ -539,16 +545,27 @@ def match_records(records, qrystrs=None, search_mode=None, operator="and", verbo
     @param collections: list of collections to search, if specified
     @type collections: list
 
+    @param user: username in case of authenticated search requests
+    @type user: string
+
+    @param password: password in case of authenticated search requests
+    @type password: string
+
     @rtype: list of lists
     @return an array of arrays of records, like this [newrecs,matchedrecs,
                                                       ambiguousrecs,fuzzyrecs]
     """
-    server = InvenioConnector(server_url)
-
     newrecs = []
     matchedrecs = []
     ambiguousrecs = []
     fuzzyrecs = []
+
+    try:
+        server = InvenioConnector(server_url, user=user, password=password)
+    except InvenioConnectorAuthError as error:
+        if verbose > 0:
+            sys.stderr.write(str(error))
+        return [newrecs, matchedrecs, ambiguousrecs, fuzzyrecs]
 
     ## Go through each record and try to find matches using defined querystrings
     record_counter = 0
@@ -587,7 +604,12 @@ def match_records(records, qrystrs=None, search_mode=None, operator="and", verbo
                 search_params = dict(p=query, f=field, of='id', c=collections)
 
             ## Perform the search with retries
-            result_recids = server.search_with_retry(**search_params)
+            try:
+                result_recids = server.search_with_retry(**search_params)
+            except InvenioConnectorAuthError as error:
+                if verbose > 0:
+                    sys.stderr.write(str(error))
+                break
             if (verbose > 8):
                 if len(result_recids) > 10:
                     sys.stderr.write("\nSearching with values %s result=%s\n" %
@@ -638,7 +660,12 @@ def match_records(records, qrystrs=None, search_mode=None, operator="and", verbo
                 for current_operator, qry in fuzzy_query_list:
                     current_resultset = None
                     search_params = dict(p=qry, f=field, of='id', c=collections)
-                    current_resultset = server.search_with_retry(**search_params)
+                    try:
+                        current_resultset = server.search_with_retry(**search_params)
+                    except InvenioConnectorAuthError as error:
+                        if (verbose > 0):
+                            sys.stderr.write(str(error))
+                        break
                     if (verbose > 8):
                         if len(current_resultset) > 10:
                             sys.stderr.write("\nSearching with values %s result=%s\n" %
@@ -662,23 +689,23 @@ def match_records(records, qrystrs=None, search_mode=None, operator="and", verbo
                             result_hitset = list(set(result_hitset) - set(current_resultset))
                         elif current_operator == '|':
                             result_hitset = list(set(result_hitset) | set(current_resultset))
-
-                if result_hitset and len(result_hitset) < 10:
-                    # This was a fuzzy match
-                    query_out = " #Fuzzy# ".join([q for dummy, q in fuzzy_query_list])
-                    if len(result_hitset) == 1 and complete:
-                        if modify:
-                            add_recid(rec[0], result_hitset[0])
-                        fuzzy_results.append((result_hitset, query_out))
-                        if (verbose > 8):
-                            sys.stderr.write("Fuzzy: %s\n" % (result_hitset,))
-                    else:
-                        # We treat the result as ambiguous (uncertain) when:
-                        # - query is not complete
-                        # - more then one result
-                        ambiguous_results.append((result_hitset, query_out))
-                        if (verbose > 8):
-                            sys.stderr.write("Ambiguous\n")
+                else:
+                    if result_hitset and len(result_hitset) < 10:
+                        # This was a fuzzy match
+                        query_out = " #Fuzzy# ".join([q for dummy, q in fuzzy_query_list])
+                        if len(result_hitset) == 1 and complete:
+                            if modify:
+                                add_recid(rec[0], result_hitset[0])
+                            fuzzy_results.append((result_hitset, query_out))
+                            if (verbose > 8):
+                                sys.stderr.write("Fuzzy: %s\n" % (result_hitset,))
+                        else:
+                            # We treat the result as ambiguous (uncertain) when:
+                            # - query is not complete
+                            # - more then one result
+                            ambiguous_results.append((result_hitset, query_out))
+                            if (verbose > 8):
+                                sys.stderr.write("Ambiguous\n")
 
         ## Evaluate final results for record
         # Add matched record iff number found is equal to one, otherwise return fuzzy, ambiguous or no match
@@ -766,7 +793,8 @@ def main():
                    "text-marc-output",
                    "alter-recid",
                    "clean",
-                   "collection="
+                   "collection=",
+                   "user="
                  ])
 
     except getopt.GetoptError, e:
@@ -781,7 +809,7 @@ def main():
     records = []
     batch_output = ""                         # print stuff in files
     f_input = ""                              # read from where, if param "i"
-    server_url = CFG_SITE_URL                 # url to server performing search, local by default
+    server_url = CFG_SITE_SECURE_URL          # url to server performing search, local by default
     modify = 0                                # alter output with matched record identifiers
     textmarc_output = 0                       # output in MARC instead of MARCXML
     field = ""
@@ -789,6 +817,8 @@ def main():
     sleeptime = CFG_BIBMATCH_LOCAL_SLEEPTIME  # the amount of time to sleep between queries, changes on remote queries
     clean = False                             # should queries be sanitized?
     collections = []                          # only search certain collections?
+    user = ""
+    password = ""
 
     for opt, opt_value in opts:
         if opt in ["-0", "--print-new"]:
@@ -847,10 +877,12 @@ def main():
                     qrystrs.append((field, tmp[1]))
         if opt in ["-x", "--collection"]:
             colls = opt_value.split(',')
-            print opt_value
             for collection in colls:
                 if collection not in collections:
                     collections.append(collection)
+        if opt in ["--user"]:
+            user = opt_value
+            password = getpass.getpass()
 
     if verbose:
         sys.stderr.write("\nBibMatch: Parsing input file %s..." % (f_input,))
@@ -891,7 +923,9 @@ def main():
                                   modify,
                                   sleeptime,
                                   clean,
-                                  collections)
+                                  collections,
+                                  user,
+                                  password)
 
     # set the output according to print..
     # 0-newrecs 1-matchedrecs 2-ambiguousrecs 3-fuzzyrecs

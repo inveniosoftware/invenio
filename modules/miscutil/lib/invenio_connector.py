@@ -52,23 +52,44 @@ import sys
 
 try:
     # if we are running locally, we can optimize :-)
-    from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD, CFG_CERN_SITE
+    from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_RECORD, CFG_CERN_SITE
     from invenio.bibtask import task_low_level_submission
     from invenio.search_engine import perform_request_search, collection_restricted_p
     from invenio.bibformat import format_records
-    LOCAL_SITE_URL = CFG_SITE_URL
+    LOCAL_SITE_URLS = [CFG_SITE_URL, CFG_SITE_SECURE_URL]
 except ImportError:
-    LOCAL_SITE_URL = None
+    LOCAL_SITE_URLS = None
     CFG_CERN_SITE = 0
 
 CFG_CDS_URL = "http://cdsweb.cern.ch/"
+
+class InvenioConnectorAuthError(Exception):
+    """
+    This exception is called by InvenioConnector when authentication fails during
+    remote or local connections.
+    """
+    def __init__(self, value):
+        """
+        Set the internal "value" attribute to that of the passed "value" parameter.
+        @param value: an error string to display to the user.
+        @type value: string
+        """
+        Exception.__init__(self)
+        self.value = value
+    def __str__(self):
+        """
+        Return oneself as a string (actually, return the contents of self.value).
+        @return: representation of error
+        @rtype: string
+        """
+        return str(self.value)
 
 class InvenioConnector(object):
     """
     Creates an connector to a server running Invenio
     """
 
-    def __init__(self, url=LOCAL_SITE_URL, user="", password="", login_method=None, local_import_path="invenio"):
+    def __init__(self, url=LOCAL_SITE_URLS, user="", password="", login_method="Local", local_import_path="invenio"):
         """
         Initialize a new instance of the server at given URL.
 
@@ -93,7 +114,7 @@ class InvenioConnector(object):
         @type local_import_path: string
          """
         self.server_url = url
-        self.local = self.server_url == LOCAL_SITE_URL
+        self.local = self.server_url in LOCAL_SITE_URLS
         self.cached_queries = {}
         self.cached_records = {}
         self.cached_baskets = {}
@@ -102,6 +123,8 @@ class InvenioConnector(object):
         self.login_method = login_method
         self.browser = None
         if self.user:
+            if not self.server_url.startswith('https://'):
+                raise InvenioConnectorAuthError("You have to use a secure URL (HTTPS) to login")
             self._init_browser()
             self._check_credentials()
 
@@ -116,12 +139,14 @@ class InvenioConnector(object):
         self.browser.select_form(nr=0)
         self.browser['p_un'] = self.user
         self.browser['p_pw'] = self.password
+        # Set login_method to be writable
+        self.browser.form.find_control('login_method').readonly = False
         self.browser['login_method'] = self.login_method
         self.browser.submit()
 
     def _check_credentials(self):
         if not 'youraccount/logout' in self.browser.response().read():
-            raise ValueError("It was not possible to successfully login with the provided credentials")
+            raise InvenioConnectorAuthError("It was not possible to successfully login with the provided credentials")
 
     def search(self, p="", f="", c="", rg=10, sf="", so="d", sp="",
                rm="", of="", ot="", p1="", f1="", m1="", op1="",
@@ -131,6 +156,8 @@ class InvenioConnector(object):
                read_cache=True):
         """
         Returns records corresponding to the given search query.
+
+        @raise InvenioConnectorAuthError: if authentication fails
         """
         parse_results = False
         if of == "":
@@ -155,8 +182,7 @@ class InvenioConnector(object):
 
         # Are we running locally? If so, better directly access the
         # search engine directly
-        if LOCAL_SITE_URL == self.server_url and \
-               of != 't':
+        if self.server_url in LOCAL_SITE_URLS and of != 't':
             # See if user tries to search any restricted collection
             if c != "":
                 if type(c) is list:
@@ -165,9 +191,10 @@ class InvenioConnector(object):
                     colls = [c]
                 for collection in colls:
                     if collection_restricted_p(collection):
-                        sys.stderr.write("Searching local restricted collections\
-    is NOT allowed. Aborting search.\n")
-                        return []
+                        if self.user:
+                            self._check_credentials()
+                            continue
+                        raise InvenioConnectorAuthError("You are trying to search a restricted collection. Please authenticate yourself.\n")
             results = perform_request_search(p=p, f=f, c=c, rg=rg, sf=sf, so=so, sp=so, rm=rm,
                                             p1=p1, f1=f1, m1=m1, op1=op1,
                                             p2=p2, f2=f2, m2=m2, op2=op2,
@@ -183,6 +210,9 @@ class InvenioConnector(object):
                     results = self.browser.open(self.server_url + "/search?" + params)
                 else:
                     results = urllib2.urlopen(self.server_url + "/search?" + params)
+                if 'youraccount/login' in results.geturl():
+                    # Current user not able to search collection
+                    raise InvenioConnectorAuthError("You are trying to search a restricted collection. Please authenticate yourself.\n")
             else:
                 return self.cached_queries[params + str(parse_results)]
 
@@ -305,7 +335,7 @@ class InvenioConnector(object):
             raise NameError, "Incorrect mode " + str(mode)
 
         # Are we running locally? If so, submit directly
-        if LOCAL_SITE_URL == self.server_url:
+        if self.server_url in LOCAL_SITE_URLS:
             (code, marcxml_filepath) = tempfile.mkstemp(prefix="upload_%s" % \
                                                         time.strftime("%Y%m%d_%H%M%S_",
                                                                       time.localtime()))
