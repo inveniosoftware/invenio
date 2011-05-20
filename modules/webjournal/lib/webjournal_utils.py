@@ -1656,7 +1656,7 @@ def get_recid_from_legacy_number(issue_number, category, number):
     for recid in recids:
         bfo = BibFormatObject(recid)
         order = [subfield['c'] for subfield in bfo.fields('773__') if \
-                 issue_number in subfield['n']]
+                 issue_number in subfield.get('n', '')]
 
         if len(order) > 0:
             # If several orders are defined for the same article and
