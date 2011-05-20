@@ -34,7 +34,7 @@ It is different from the standard RSS output in the following ways:
 This stylesheet is provided only as an example of transformation.
 
 Considers only records having subfield 8564_u ending with .mp4 or
-.mp3, or 8567_u where $x is mp3128 or mp4 or mp4podcast.
+.mp3, or 8567_u where $x is mp3128 or mp40600 or mp4podcast.
 
 Note that due to how Podcast readers identify compatible files, it
 might be that links to Invenio "subformats" might not be accepted. For
@@ -59,7 +59,7 @@ exclude-result-prefixes="marc fn">
 
 <xsl:template match="/">
 
- <xsl:for-each select="//datafield[(@tag='856' and @ind1='4' and @ind2=' ' and (substring(subfield[@code='u'], string-length(subfield[@code='u']) - string-length('.mp4') + 1) = '.mp4') or (substring(subfield[@code='u'], string-length(subfield[@code='u']) - string-length('.mp3') + 1) = '.mp3')) or (@tag='856' and @ind1='7' and @ind2=' ' and (subfield[@code='x']='mp3128' or subfield[@code='x']='mp4' or subfield[@code='x']='mp4podcast'))]/subfield[@code='u']">
+ <xsl:for-each select="//datafield[(@tag='856' and @ind1='4' and @ind2=' ' and (substring(subfield[@code='u'], string-length(subfield[@code='u']) - string-length('.mp4') + 1) = '.mp4') or (substring(subfield[@code='u'], string-length(subfield[@code='u']) - string-length('.mp3') + 1) = '.mp3')) or (@tag='856' and @ind1='7' and @ind2=' ' and (subfield[@code='x']='mp3128' or subfield[@code='x']='mp40600' or subfield[@code='x']='mp4podcast'))]/subfield[@code='u']">
         <item>
 	  <!-- <xsl:value-of select="substring-after(., '.')" />-->
         <xsl:variable name="tirage" select="../subfield[@code='8']" />
@@ -101,7 +101,7 @@ exclude-result-prefixes="marc fn">
                 <xsl:when test="../subfield[@code='x']='mp3128' or (substring(., string-length(.) - string-length('.mp3') + 1) = '.mp3')">
                     <xsl:attribute name="type">audio/mpeg</xsl:attribute>
                 </xsl:when>
-		<xsl:when test="../subfield[@code='x']='mp4' or (substring(., string-length(.) - string-length('.mp4') + 1) = '.mp4')">
+		<xsl:when test="../subfield[@code='x']='mp40600' or (substring(., string-length(.) - string-length('.mp4') + 1) = '.mp4')">
                     <xsl:attribute name="type">video/mp4</xsl:attribute>
                 </xsl:when>
              </xsl:choose>
