@@ -404,6 +404,8 @@ class SpiresToInvenioSyntaxConverter:
     # and their corresponding Invenio keywords or fields
     # SPIRES keyword : Invenio keyword or field
     _SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS = {
+        # address
+        'address' : 'address:',
         # affiliation
         'affiliation' : 'affiliation:',
         'affil' : 'affiliation:',
@@ -496,6 +498,10 @@ class SpiresToInvenioSyntaxConverter:
         'old-t' : '246__a:',
         'ex-ti' : '246__a:',
         'et' : '246__a:',
+        #postal code
+        'postalcode' : 'postalcode:',
+        'zip' : 'postalcode:',
+        'cc' : 'postalcode:',
         # ppf subject
         'ppf-subject' : '650__a:',
         'ps' : '650__a:',
