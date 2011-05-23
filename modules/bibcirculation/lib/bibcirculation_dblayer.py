@@ -33,6 +33,7 @@ from invenio.bibcirculation_config import \
     CFG_BIBCIRCULATION_REQUEST_STATUS_CANCELLED, \
     CFG_BIBCIRCULATION_ILL_STATUS_RETURNED, \
     CFG_BIBCIRCULATION_ILL_STATUS_RECEIVED, \
+    CFG_BIBCIRCULATION_ILL_STATUS_CANCELLED, \
     CFG_BIBCIRCULATION_LIBRARY_TYPE_INTERNAL, \
     CFG_BIBCIRCULATION_LIBRARY_TYPE_EXTERNAL, \
     CFG_BIBCIRCULATION_LIBRARY_TYPE_MAIN, \
@@ -925,20 +926,18 @@ def get_all_requests_order_by_item():
 
     return res
 
-
 def get_borrower_details(borrower_id):
     """
     borrower_id: identify the borrower. It is also the primary key of
                  the table crcBORROWER.
     """
     res =  run_sql("""SELECT id, ccid, name, email, phone, address, mailbox
-                      FROM   crcBORROWER
-                      WHERE  id=%s""", (borrower_id, ))
+                        FROM crcBORROWER
+                       WHERE id=%s""", (borrower_id, ))
     if res:
         return res[0]
     else:
         return None
-
 
 def get_borrower_name(borrower_id):
     """
@@ -946,8 +945,8 @@ def get_borrower_name(borrower_id):
                  the table crcBORROWER.
     """
     res = run_sql("""SELECT name
-                     FROM crcBORROWER
-                     WHERE id=%s
+                       FROM crcBORROWER
+                      WHERE id=%s
                   """, (borrower_id, ))
 
     if res:
@@ -964,8 +963,8 @@ def loan_on_desk_confirm(barcode, borrower_id):
                  the table crcBORROWER.
     """
     res = run_sql("""SELECT it.id_bibrec, bor.name
-                     FROM crcITEM it, crcBORROWER bor
-                     WHERE it.barcode=%s and bor.id=%s
+                       FROM crcITEM it, crcBORROWER bor
+                      WHERE it.barcode=%s and bor.id=%s
                   """, (barcode, borrower_id))
 
     return res
@@ -977,8 +976,9 @@ def search_borrower_by_name(string):
     string = string.replace("'", "\\'")
 
     res = run_sql("""SELECT id, name
-                     FROM crcBORROWER
-                     WHERE upper(name) like upper('%%%s%%') ORDER BY name
+                       FROM crcBORROWER
+                      WHERE upper(name) like upper('%%%s%%')
+                   ORDER BY name
                   """ % (string))
 
     return res
@@ -989,8 +989,8 @@ def search_borrower_by_email(string):
     """
 
     res = run_sql("""SELECT id, name
-                     FROM crcBORROWER
-                     WHERE email regexp %s
+                       FROM crcBORROWER
+                      WHERE email regexp %s
                      """, (string, ))
 
     return res
@@ -1003,8 +1003,8 @@ def search_borrower_by_phone(string):
     """
 
     res = run_sql("""SELECT id, name
-                     FROM crcBORROWER
-                     WHERE phone regexp %s
+                       FROM crcBORROWER
+                      WHERE phone regexp %s
                      """, (string, ))
 
     return res
@@ -2324,18 +2324,19 @@ def get_ill_requests(status):
     """
     """
 
-    all_of_them = """
+    if status == None:
+        res = run_sql("""
                 SELECT ill.id, ill.id_crcBORROWER, bor.name,
                        ill.id_crcLIBRARY, ill.status,
-                       DATE_FORMAT(ill.period_of_interest_from,'%Y-%m-%d'),
-                       DATE_FORMAT(ill.period_of_interest_to,'%Y-%m-%d'),
-                       DATE_FORMAT(ill.due_date,'%Y-%m-%d'),
+                       DATE_FORMAT(ill.period_of_interest_from,'%%Y-%%m-%%d'),
+                       DATE_FORMAT(ill.period_of_interest_to,'%%Y-%%m-%%d'),
+                       DATE_FORMAT(ill.due_date,'%%Y-%%m-%%d'),
                        ill.item_info, ill.request_type
                   FROM crcILLREQUEST ill, crcBORROWER bor
-                 WHERE ill.id_crcBORROWER=bor.id ORDER BY ill.id desc"""
-
-    if status == None:
-        res = run_sql(all_of_them)
+                 WHERE ill.id_crcBORROWER=bor.id
+                   AND (ill.request_type=%s OR ill.request_type=%s)
+              ORDER BY ill.id desc
+              """, ('article', 'book'))
     else:
         res = run_sql("""
                 SELECT ill.id, ill.id_crcBORROWER, bor.name,
@@ -2346,11 +2347,44 @@ def get_ill_requests(status):
                        ill.item_info, ill.request_type
                   FROM crcILLREQUEST ill, crcBORROWER bor
                  WHERE ill.id_crcBORROWER=bor.id
+                   AND (ill.request_type=%s OR ill.request_type=%s)
                    AND ill.status=%s
-              ORDER BY ill.id desc""", (status, ))
+              ORDER BY ill.id desc
+              """, ('article', 'book', status))
 
     return res
 
+def get_acquisitions(status):
+    """
+    """
+
+    if status == None:
+        res = run_sql("""
+                SELECT ill.id, ill.id_crcBORROWER, bor.name,
+                       ill.id_crcLIBRARY, ill.status,
+                       DATE_FORMAT(ill.period_of_interest_from,'%%Y-%%m-%%d'),
+                       DATE_FORMAT(ill.period_of_interest_to,'%%Y-%%m-%%d'),
+                       DATE_FORMAT(ill.due_date,'%%Y-%%m-%%d'),
+                       ill.item_info, ill.cost, ill.request_type
+                  FROM crcILLREQUEST ill, crcBORROWER bor
+                 WHERE ill.id_crcBORROWER=bor.id
+                   AND (ill.request_type=%s OR ill.request_type=%s)
+              ORDER BY ill.id desc""", ('acq-standard', 'acq-book'))
+    else:
+        res = run_sql("""
+                SELECT ill.id, ill.id_crcBORROWER, bor.name,
+                       ill.id_crcLIBRARY, ill.status,
+                       DATE_FORMAT(ill.period_of_interest_from,'%%Y-%%m-%%d'),
+                       DATE_FORMAT(ill.period_of_interest_to,'%%Y-%%m-%%d'),
+                       DATE_FORMAT(ill.due_date,'%%Y-%%m-%%d'),
+                       ill.item_info, ill.cost, ill.request_type
+                  FROM crcILLREQUEST ill, crcBORROWER bor
+                 WHERE ill.id_crcBORROWER=bor.id
+                   AND (ill.request_type=%s OR ill.request_type=%s)
+                   AND ill.status=%s
+              ORDER BY ill.id desc""", ('acq-standard', 'acq-book', status))
+
+    return res
 
 def search_ill_requests_title(title, date_from, date_to):
 
@@ -2388,13 +2422,58 @@ def search_ill_requests_id(reqid, date_from, date_to):
                    AND ill.id = %s
                    AND DATE_FORMAT(ill.request_date,'%%Y-%%m-%%d') >=%s
                    AND DATE_FORMAT(ill.request_date,'%%Y-%%m-%%d') <=%s
-              ORDER BY ill.id desc""", (reqid, date_from, date_to))
+              ORDER BY ill.id desc
+                  """, (reqid, date_from, date_to))
+
+    return res
+
+def search_acq_requests_cost(cost, date_from, date_to):
+
+    cost = cost.replace("'", "\\'")
+
+    res = run_sql("""
+                SELECT ill.id, ill.id_crcBORROWER, bor.name,
+                       ill.id_crcLIBRARY, ill.status,
+                       DATE_FORMAT(ill.period_of_interest_from,'%%Y-%%m-%%d'),
+                       DATE_FORMAT(ill.period_of_interest_to,'%%Y-%%m-%%d'),
+                       DATE_FORMAT(ill.due_date,'%%Y-%%m-%%d'),
+                       ill.item_info, ill.cost, ill.request_type
+                  FROM crcILLREQUEST ill, crcBORROWER bor
+                 WHERE ill.id_crcBORROWER=bor.id
+                   AND ill.cost like upper('%%%s%%')
+                   AND (ill.request_type='acq-book'
+                        OR ill.request_type='acq-standard')
+                   AND DATE_FORMAT(ill.request_date,'%%Y-%%m-%%d') >= %s
+                   AND DATE_FORMAT(ill.request_date,'%%Y-%%m-%%d') <= %s
+              ORDER BY ill.id desc
+                  """ % (cost.upper(), date_from, date_to))
+
+    return res
+
+def search_acq_requests_notes(notes, date_from, date_to):
+
+    notes = notes.replace("'", "\\'")
+
+    res = run_sql("""
+                SELECT ill.id, ill.id_crcBORROWER, bor.name,
+                       ill.id_crcLIBRARY, ill.status,
+                       DATE_FORMAT(ill.period_of_interest_from,'%%Y-%%m-%%d'),
+                       DATE_FORMAT(ill.period_of_interest_to,'%%Y-%%m-%%d'),
+                       DATE_FORMAT(ill.due_date,'%%Y-%%m-%%d'),
+                       ill.item_info, ill.cost, ill.request_type
+                  FROM crcILLREQUEST ill, crcBORROWER bor
+                 WHERE ill.id_crcBORROWER=bor.id
+                   AND ill.library_notes like upper('%%%s%%')
+                   AND (ill.request_type='acq-book'
+                        OR ill.request_type='acq-standard')
+                   AND DATE_FORMAT(ill.request_date,'%%Y-%%m-%%d') >= %s
+                   AND DATE_FORMAT(ill.request_date,'%%Y-%%m-%%d') <= %s
+              ORDER BY ill.id desc
+                  """ % (notes.upper(), date_from, date_to))
 
     return res
 
 def get_ill_request_details(ill_request_id):
-    """
-    """
 
     res = run_sql("""SELECT id_crcLIBRARY,
                             DATE_FORMAT(request_date,'%%Y-%%m-%%d'),
@@ -2437,7 +2516,25 @@ def get_ill_request_borrower_details(ill_request_id):
                DATE_FORMAT(ill.period_of_interest_from,'%%Y-%%m-%%d'),
                DATE_FORMAT(ill.period_of_interest_to,'%%Y-%%m-%%d'),
                ill.item_info, ill.borrower_comments,
-               ill.only_this_edition, request_type
+               ill.only_this_edition, ill.request_type
+          FROM crcILLREQUEST ill, crcBORROWER bor
+         WHERE ill.id_crcBORROWER=bor.id and ill.id=%s""", (ill_request_id, ))
+
+    if res:
+        return res[0]
+    else:
+        return None
+
+def get_acq_request_borrower_details(ill_request_id):
+    """
+    """
+
+    res = run_sql("""
+        SELECT ill.id_crcBORROWER, bor.name, bor.email, bor.mailbox,
+               DATE_FORMAT(ill.period_of_interest_from,'%%Y-%%m-%%d'),
+               DATE_FORMAT(ill.period_of_interest_to,'%%Y-%%m-%%d'),
+               ill.item_info, ill.borrower_comments,
+               ill.only_this_edition, ill.budget_code, ill.request_type
           FROM crcILLREQUEST ill, crcBORROWER bor
          WHERE ill.id_crcBORROWER=bor.id and ill.id=%s""", (ill_request_id, ))
 
@@ -2538,6 +2635,29 @@ def update_ill_request(ill_request_id, library_id, request_date,
              arrival_date, due_date, return_date, status, cost,
              barcode, library_notes, ill_request_id))
 
+def update_acq_request(ill_request_id, library_id, request_date,
+                       expected_date, arrival_date, due_date, return_date,
+                       status, cost, budget_code, library_notes):
+    """
+    Update an ILL request.
+    """
+
+    run_sql("""UPDATE crcILLREQUEST
+                  SET id_crcLIBRARY=%s,
+                      request_date=%s,
+                      expected_date=%s,
+                      arrival_date=%s,
+                      due_date=%s,
+                      return_date=%s,
+                      status=%s,
+                      cost=%s,
+                      budget_code=%s,
+                      library_notes=%s
+                WHERE id=%s""",
+            (library_id, request_date, expected_date,
+             arrival_date, due_date, return_date, status, cost,
+             budget_code, library_notes, ill_request_id))
+
 def update_ill_request_status(ill_request_id, new_status):
 
     run_sql("""UPDATE crcILLREQUEST
@@ -2637,7 +2757,7 @@ def get_order_details(purchase_id):
     else:
         return None
 
-def uptade_purchase(purchase_id, recid, vendor_id, price,
+def update_purchase(purchase_id, recid, vendor_id, price,
                     status, order_date, expected_date, notes):
 
     """
@@ -2890,13 +3010,15 @@ def get_ill_requests_details(borrower_id):
                             DATE_FORMAT(expected_date,'%%Y-%%m-%%d'),
                             DATE_FORMAT(arrival_date,'%%Y-%%m-%%d'),
                             DATE_FORMAT(due_date,'%%Y-%%m-%%d'),
-                            status, library_notes
+                            status, library_notes, request_type
                        FROM crcILLREQUEST
                       WHERE id_crcBORROWER=%s
                         AND status!=%s
                         AND status!=%s
+                        AND status!=%s
                   """, (borrower_id, CFG_BIBCIRCULATION_ILL_STATUS_RETURNED,
-                        CFG_BIBCIRCULATION_ILL_STATUS_RECEIVED))
+                        CFG_BIBCIRCULATION_ILL_STATUS_RECEIVED,
+                        CFG_BIBCIRCULATION_ILL_STATUS_CANCELLED))
 
     return res
 
@@ -2909,7 +3031,7 @@ def bor_ill_historical_overview(borrower_id):
                             DATE_FORMAT(expected_date,'%%Y-%%m-%%d'),
                             DATE_FORMAT(arrival_date,'%%Y-%%m-%%d'),
                             DATE_FORMAT(due_date,'%%Y-%%m-%%d'),
-                            status, library_notes
+                            status, library_notes, request_type
                        FROM crcILLREQUEST
                       WHERE id_crcBORROWER=%s
                         AND (status=%s OR status=%s)

@@ -30,7 +30,8 @@ from invenio.dbquery import run_sql
 from invenio.bibtask import task_init, \
                             task_sleep_now_if_required, \
                             task_update_progress, \
-                            task_set_option, task_get_option
+                            task_set_option, \
+                            task_get_option
 from invenio.mailutils import send_email
 import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
@@ -49,8 +50,11 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """
     if key in ('-o', '--overdue-letters'):
         task_set_option('overdue-letters', True)
-        return True
-    return False
+    elif key in ('-b', '--update-borrowers'):
+        task_set_option('update_borrowers', True)
+    else:
+        return False
+    return True
 
 def get_expired_loan():
     """
@@ -61,7 +65,7 @@ def get_expired_loan():
                        from crcLOAN
                       where (status=%s and due_date<NOW())
                          or (status=%s)
-                """ % (CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN,
+                """, (CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN,
                        CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED))
     return res
 
@@ -74,11 +78,12 @@ def update_expired_loan(loan_id):
     """
 
     run_sql("""update crcLOAN
-                  set overdue_letter_number = overdue_letter_number + 1,
-                      status = '%s',
-                      overdue_letter_date = NOW()
-                where id = %s
-               """, (CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED, loan_id))
+                  set overdue_letter_number=overdue_letter_number+1,
+                       status=%s,
+                       overdue_letter_date=NOW()
+                where id=%s
+               """, (CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED,
+                     loan_id))
 
 def get_overdue_letters_info(loan_id):
     """
@@ -153,7 +158,7 @@ def must_send_third_recall(date_letters):
     today = datetime.date.today()
 
     time_tuple = time.strptime(date_letters, "%Y-%m-%d")
-    #datetime.strptime(date_letters, "%Y-%m-%d") doesn't work (only on 2.5).
+    #datetime.strptime(date_letters, "%Y-%m-%d") doesn't work (only on Python 2.5)
     tmp_date = datetime.datetime(*time_tuple[0:3]) + datetime.timedelta(days=3)
 
     if tmp_date.strftime("%Y-%m-%d") <= today.strftime("%Y-%m-%d"):
@@ -173,14 +178,27 @@ def task_run_core():
     run daemon
     """
 
+
+    if task_get_option("update-borrowers"):
+        list_of_borrowers = db.get_all_borrowers()
+
+        total_borrowers = len(list_of_borrowers)
+        done  = 0
+
+        for (user_id, ccid) in list_of_borrowers:
+            update_user_info_from_ldap(user_id)
+            done+=1
+            task_update_progress("Done %d out of %d." % (done, total_borrowers))
+            task_sleep_now_if_required(can_stop_too=True)
+
     if task_get_option("overdue-letters"):
         expired_loans = db.get_all_expired_loans()
 
         total_expired_loans = len(expired_loans)
         done  = 0
 
-        for (borrower_id, _bor_name, recid, _barcode,
-             _loaned_on, _due_date, _number_of_renewals, number_of_letters,
+        for (borrower_id, _bor_name, recid, _barcode, _loaned_on,
+             _due_date, _number_of_renewals, number_of_letters,
              date_letters, _notes, loan_id) in expired_loans:
 
             number_of_letters=int(number_of_letters)
@@ -209,18 +227,6 @@ def task_run_core():
             task_sleep_now_if_required(can_stop_too=True)
             time.sleep(1)
 
-    if task_get_option("update-borrowers"):
-        list_of_borrowers = db.get_all_borrowers()
-
-        total_borrowers = len(list_of_borrowers)
-        done  = 0
-
-        for (user_id, ccid) in list_of_borrowers:
-            update_user_info_from_ldap(user_id)
-            done+=1
-            task_update_progress("Done %d out of %d." % (done, total_borrowers))
-            task_sleep_now_if_required(can_stop_too=True)
-
     return 1
 
 def main():
@@ -229,14 +235,14 @@ def main():
     """
     task_init(authorization_action='runbibcircd',
               authorization_msg="BibCirculation Task Submission",
-              help_specific_usage="""-o,  --overdue-letters\tCheck overdue loans and send recall emails if necessary.\n-u,  --update-borrowers\tUpdate borrowers information from ldap.\n""",
+              help_specific_usage="""-o,  --overdue-letters\tCheck overdue loans and send recall emails if necessary.\n-b,  --update-borrowers\tUpdate borrowers information from ldap.\n""",
               description="""Examples:
               %s -u admin
               """ % (sys.argv[0]),
-              specific_params=("o", ["overdue-letters"]),
-              task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
-              version=__revision__,
-              task_run_fnc = task_run_core)
+              specific_params=("ob", ["overdue-letters", "update-borrowers"]),
+                task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
+                version=__revision__,
+                task_run_fnc = task_run_core)
 
 if __name__ == '__main__':
     main()

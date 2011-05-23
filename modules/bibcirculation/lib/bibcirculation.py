@@ -218,10 +218,11 @@ def perform_new_request_send(uid, recid, period_from, period_to,
         if db.is_item_on_loan(bc) is None:
             all_copies_on_loan = False
 
-    if nb_requests == 0 and all_copies_on_loan:
-        status = CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING
-    elif nb_requests == 0 and not all_copies_on_loan:
-        status = CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING
+    if nb_requests == 0:
+        if all_copies_on_loan:
+            status = CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING
+        else:
+            status = CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING
     else:
         status = CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING
 
@@ -245,8 +246,6 @@ def perform_new_request_send(uid, recid, period_from, period_to,
 
         req_id = db.new_hold_request(borrower_id, recid, barcode,
                                 period_from, period_to, status)
-
-        # is_on_loan=db.is_item_on_loan(barcode)
 
         details = db.get_loan_request_details(req_id)
         if details:
@@ -279,15 +278,16 @@ def perform_new_request_send(uid, recid, period_from, period_to,
                                         link_to_item_request_details,
                                         request_date)
 
-        send_email(fromaddr = CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                   toaddr   = CFG_BIBCIRCULATION_LOANS_EMAIL,
-                   subject  = subject,
-                   content  = message_for_librarian,
-                   header   = '',
-                   footer   = '',
-                   attempt_times=1,
-                   attempt_sleeptime=10
-                  )
+        if status == CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING:
+            send_email(fromaddr = CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
+                       toaddr   = CFG_BIBCIRCULATION_LOANS_EMAIL,
+                       subject  = subject,
+                       content  = message_for_librarian,
+                       header   = '',
+                       footer   = '',
+                       attempt_times=1,
+                       attempt_sleeptime=10
+                      )
 
         send_email(fromaddr = CFG_BIBCIRCULATION_LOANS_EMAIL,
                    toaddr   = email,

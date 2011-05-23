@@ -63,7 +63,14 @@ from invenio.bibcirculation_config import \
     CFG_BIBCIRCULATION_ILL_STATUS_RETURNED, \
     CFG_BIBCIRCULATION_ILL_STATUS_CANCELLED, \
     CFG_BIBCIRCULATION_ILL_STATUS_RECEIVED, \
-    CFG_BIBCIRCULATION_ITEM_LOAN_PERIOD
+    CFG_BIBCIRCULATION_ITEM_LOAN_PERIOD, \
+    CFG_BIBCIRCULATION_ACQ_STATUS_NEW, \
+    CFG_BIBCIRCULATION_ACQ_STATUS_ON_ORDER, \
+    CFG_BIBCIRCULATION_ACQ_STATUS_PARTIAL_RECEIPT, \
+    CFG_BIBCIRCULATION_ACQ_STATUS_RECEIVED, \
+    CFG_BIBCIRCULATION_ACQ_STATUS_CANCELLED, \
+    CFG_BIBCIRCULATION_ACQ_TYPE, \
+    CFG_BIBCIRCULATION_ACQ_STATUS
 
 
 def load_menu(ln=CFG_SITE_LANG):
@@ -90,7 +97,7 @@ def load_menu(ln=CFG_SITE_LANG):
     </li>
 
     <li>
-        <a href="%(url)s/admin2/bibcirculation/borrower_search?redirect_to_new_request='yes'&ln=%(ln)s">%(Request)s</a>
+        <a href="%(url)s/admin2/bibcirculation/borrower_search?redirect_to_new_request=yes&ln=%(ln)s">%(Request)s</a>
     </li>
 
     <li>
@@ -148,18 +155,18 @@ def load_menu(ln=CFG_SITE_LANG):
            'Last_loans': _("Last loans"),
            'Overdue_loans': _("Overdue loans"),
            'Items_on_shelf_with_holds': _("Items on shelf with holds"),
-            'Items_on_loan_with_holds': _("Items on loan with holds"),
-            'Overdue_loans_with_holds': _("Overdue loans with holds"),
-            'Ordered_books': _("Ordered books"), 'Others': _("Others"),
-            'Libraries': _("Libraries"), 'Search': _("Search"),
-            'Add_new_library': _("Add new library"),
-            'Update_info': _("Update info"),
-            'Acquisitions': _("Acquisitions"),
-            'List_of_ordered_books': _("List of ordered books"),
-            'Order_new_book': _("Order new book"),
-            'Vendors': _("Vendors"),
-            'Add_new_vendor': _("Add new vendor"),
-            'ln': ln}
+           'Items_on_loan_with_holds': _("Items on loan with holds"),
+           'Overdue_loans_with_holds': _("Overdue loans with holds"),
+           'Ordered_books': _("Ordered books"), 'Others': _("Others"),
+           'Libraries': _("Libraries"), 'Search': _("Search"),
+           'Add_new_library': _("Add new library"),
+           'Update_info': _("Update info"),
+           'Acquisitions': _("Acquisitions"),
+           'List_of_ordered_books': _("List of ordered books"),
+           'Order_new_book': _("Order new book"),
+           'Vendors': _("Vendors"),
+           'Add_new_vendor': _("Add new vendor"),
+           'ln': ln}
 
     _MENU_ += """
 
@@ -167,12 +174,15 @@ def load_menu(ln=CFG_SITE_LANG):
         <ul class="submenu">
             <li><a href="%(url)s/admin2/bibcirculation/register_ill_book_request?ln=%(ln)s">%(Register_Book_request)s</a></li>
             <li><a href="%(url)s/admin2/bibcirculation/register_ill_article_request_step1">%(Register_Article)s request</a></li>
+             <li><a href="%(url)s/admin2/bibcirculation/register_purchase_request_step1?ln=%(ln)s">%(Register_Purchase_request)s</a></li>
             <li><a href="%(url)s/admin2/bibcirculation/ill_search?ln=%(ln)s">%(Search)s...</a></li>
             <li><a href="#">%(Lists)s</a>
                 <ul class="subsubmenu">
-                    <li><a href="%(url)s/admin2/bibcirculation/list_ill_request?status=new&ln=%(ln)s">%(New)s</a></li>
-                    <li><a href="%(url)s/admin2/bibcirculation/list_ill_request?status=requested&ln=%(ln)s">%(Requested)s</a></li>
-                    <li><a href="%(url)s/admin2/bibcirculation/list_ill_request?status=on loan&ln=%(ln)s">%(On_loan)s</a></li>
+                    <li><a href="%(url)s/admin2/bibcirculation/list_ill_request?status=new&ln=%(ln)s">%(ILL)s - %(ill-new)s</a></li>
+                    <li><a href="%(url)s/admin2/bibcirculation/list_ill_request?status=requested&ln=%(ln)s">%(ILL)s - %(Requested)s</a></li>
+                    <li><a href="%(url)s/admin2/bibcirculation/list_ill_request?status=on loan&ln=%(ln)s">%(ILL)s - %(On_loan)s</a></li>
+                    <li><a href="%(url)s/admin2/bibcirculation/list_acquisition?status=%(acq-new)s&ln=%(ln)s">%(Purchase)s - %(acq-new)s</a></li>
+                    <li><a href="%(url)s/admin2/bibcirculation/list_acquisition?status=%(on_order)s&ln=%(ln)s">%(Purchase)s - %(on_order)s</a></li>
                 </ul>
             </li>
         </ul>
@@ -193,11 +203,15 @@ def load_menu(ln=CFG_SITE_LANG):
     """ % {'url': CFG_SITE_URL, 'ILL': _("ILL"),
            'Register_Book_request': _("Register Book request"),
            'Register_Article': _("Register Article"),
+           'Register_Purchase_request': _("Register purchase request"),
            'Search': _("Search"),
            'Lists': _("Lists"),
-           'New':  _(CFG_BIBCIRCULATION_ILL_STATUS_NEW), #_("New"),
-           'Requested': _(CFG_BIBCIRCULATION_ILL_STATUS_REQUESTED), #_("Requested"),
-           'On_loan':  _(CFG_BIBCIRCULATION_ILL_STATUS_ON_LOAN), #_("On loan"),
+           'Purchase': _("Purchase"),
+           'ill-new':  _(CFG_BIBCIRCULATION_ILL_STATUS_NEW),
+           'acq-new':  _(CFG_BIBCIRCULATION_ACQ_STATUS_NEW),
+           'on_order': _(CFG_BIBCIRCULATION_ACQ_STATUS_ON_ORDER),
+           'Requested': _(CFG_BIBCIRCULATION_ILL_STATUS_REQUESTED),
+           'On_loan':  _(CFG_BIBCIRCULATION_ILL_STATUS_ON_LOAN),
            'Help': _("Help"),
            'Admin_guide': _("Admin guide"),
            'Contact_Support': _("Contact Support"),
@@ -464,21 +478,23 @@ class Template:
 
     def tmpl_message_request_send_fail_cern(self, ln=CFG_SITE_LANG):
         _ = gettext_set_language(ln)
-        message = _("It is not possible to validate your request.")
-        message += _("Your office address is not available.")
+        message = _("It is not possible to validate your request. ")
+        message += _("Your office address is not available. ")
         message += _("Please contact %(librarian_email)s") \
                     % {'librarian_email': CFG_BIBCIRCULATION_LIBRARIAN_EMAIL}
-
         return message
 
     def tmpl_message_request_send_fail_other(self, ln=CFG_SITE_LANG):
         _ = gettext_set_language(ln)
-        message = _("It is not possible to validate your request.")
-        message += _("Your office address is not available.")
+        message = _("It is not possible to validate your request. ")
+        message += _("Your office address is not available. ")
         message += _("Please contact %(librarian_email)s") \
                     % {'librarian_email': CFG_BIBCIRCULATION_LIBRARIAN_EMAIL}
+        return message
 
-
+    def tmpl_message_purchase_request_send_ok_other(self, ln=CFG_SITE_LANG):
+        _ = gettext_set_language(ln)
+        message = _("Your purchase request has been registered.")
         return message
 
     def tmpl_display_infos(self, infos, ln=CFG_SITE_LANG):
@@ -562,14 +578,14 @@ class Template:
 
 
             for (borrower_id, name) in result:
-                if not redirect_to_new_request:
-                    borrower_link = create_html_link(CFG_SITE_URL +
-                                '/admin2/bibcirculation/get_borrower_details',
-                                {'borrower_id': borrower_id, 'ln': ln}, (name))
-                else:
+                if redirect_to_new_request:
                     borrower_link = create_html_link(CFG_SITE_URL +
                             '/admin2/bibcirculation/create_new_request_step1',
                             {'borrower_id': borrower_id, 'ln': ln}, (name))
+                else:
+                    borrower_link = create_html_link(CFG_SITE_URL +
+                                '/admin2/bibcirculation/get_borrower_details',
+                                {'borrower_id': borrower_id, 'ln': ln}, (name))
 
                 out += """
             <tr align="center">
@@ -1598,7 +1614,7 @@ onClick="location.href='%s/admin2/bibcirculation/associate_barcode?ln=%s&request
 
         out += """
         <form name="return_form"
-              action="%s/admin2/bibcirculation/loan_return_confirm?ln=%s" method="get">
+              action="%s/admin2/bibcirculation/loan_return_confirm?ln=%s" method="post">
         <div class="bibcircbottom">
         <br />
         <br />
@@ -1640,7 +1656,7 @@ onClick="location.href='%s/admin2/bibcirculation/associate_barcode?ln=%s&request
 
         return out
 
-    def tmpl_loan_return_confirm(self, borrower_name, borrower_id, recid,
+    def tmpl_loan_return_confirm(self, infos, borrower_name, borrower_id, recid,
                                 barcode, return_date, result, ln=CFG_SITE_LANG):
         """
         @param borrower_name: person who returned the book
@@ -1648,6 +1664,7 @@ onClick="location.href='%s/admin2/bibcirculation/associate_barcode?ln=%s&request
         @param barcode: book's barcode
         @param ln: language
         """
+
         _ = gettext_set_language(ln)
 
         out = load_menu(ln)
@@ -1662,10 +1679,9 @@ onClick="location.href='%s/admin2/bibcirculation/associate_barcode?ln=%s&request
                                     {'recid': recid, 'ln': ln},
                                     (book_title_from_MARC(recid)))
 
-        if len(result) == 0:
+        if len(result) == 0 and len(infos) == 0:
             out += """
             <script type="text/javascript" language='JavaScript' src="%(url)s/js/jquery.min.js">
-
             </script>
             <script type="text/javascript">
                 $(window).keydown(function(event){
@@ -1682,10 +1698,14 @@ onClick="location.href='%s/admin2/bibcirculation/associate_barcode?ln=%s&request
              <div class="infoboxsuccess">""" % (CFG_SITE_URL, ln)
 
         out += _("The item %(x_strong_tag_open)s%(x_title)s%(x_strong_tag_close)s, with barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s, has been returned with success.") % {'x_title': book_title_from_MARC(recid), 'x_barcode': barcode, 'x_strong_tag_open': '<strong>', 'x_strong_tag_close': '</strong>'}
+        out += """</div>
+                  <br />"""
 
-        out += """</div> """
+        for info in infos:
+                out += """<div class="infobox">"""
+                out += info
+                out += """</div> <br /> """
 
-            #""" % (CFG_SITE_URL, _("The item <strong>%s</strong>, with barcode <strong>%s</strong>, has been returned with success." % (book_title_from_MARC(recid), barcode)))
         if len(result) > 0:
             out += """
              <br />
@@ -1945,7 +1965,6 @@ onClick="location.href='%s/admin2/bibcirculation/associate_barcode?ln=%s&request
                     </script>
                  </td>
                </tr>
-
         """ % (CFG_SITE_URL,
                _("Search borrower by"), id_string,
                _("name"), _("email"),
@@ -2007,8 +2026,8 @@ onClick="location.href='%s/admin2/bibcirculation/associate_barcode?ln=%s&request
         <table class="bibcirctable">
           <tr align="center">
             <td class="bibcirctableheader">%s
-              <input type="radio" name="f" value="" checked>%s
-              <input type="radio" name="f" value="barcode">%s
+              <input type="radio" name="f" value="">%s
+              <input type="radio" name="f" value="barcode" checked>%s
               <input type="radio" name="f" value="recid">%s
         <!---
               <input type="radio" name="f" value="author">%s
@@ -2647,13 +2666,14 @@ onClick="location.href='%s/admin2/bibcirculation/associate_barcode?ln=%s&request
 
         return out
 
-    def tmpl_register_new_loan(self, borrower_info, recid, ln=CFG_SITE_LANG):
+    def tmpl_register_new_loan(self, borrower_info, infos,
+                               recid, ln=CFG_SITE_LANG):
         """
         @param ln: language of the page
         """
 
-        (borrower_id, ccid, name, email, phone,
-         address, mailbox) = borrower_info
+        (borrower_id, ccid, name,
+         email, phone, address, mailbox) = borrower_info
         (book_title, book_year, book_author,
          book_isbn, book_editor) = book_information_from_MARC(recid)
 
@@ -2666,75 +2686,78 @@ onClick="location.href='%s/admin2/bibcirculation/associate_barcode?ln=%s&request
             id_string = _("CCID")
 
         out = load_menu(ln)
+        out += "<br />"
+        out += self.tmpl_infobox(infos, ln)
 
         out += """
-        <br />
-        <div class="bibcircinfoboxsuccess">%s</div>
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <div class="bibcircbottom">
-        <br />
         <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
-        <tr>
-          <th width="100">%s</th>
-          <td>%s</td>
-        </tr>
-        <tr>
-          <th width="100">%s</th>
-          <td>%s</td>
-        </tr>
-        <tr>
-          <th width="100">%s</th>
-          <td>%s</td>
-        </tr>
-        <tr>
-          <th width="100">%s</th>
-          <td>%s</td>
-        </tr>
-        <tr>
-          <th width="100">%s</th>
-          <td>%s</td>
-        </tr>
+            <tr>
+                <th width="100">%s</th>
+                <td>%s</td>
+            </tr>
+            <tr>
+                <th width="100">%s</th>
+                <td>%s</td>
+            </tr>
+            <tr>
+                <th width="100">%s</th>
+                <td>%s</td>
+            </tr>
+            <tr>
+                <th width="100">%s</th>
+                <td>%s</td>
+            </tr>
+            <tr>
+                <th width="100">%s</th>
+                <td>%s</td>
+            </tr>
         </table>
         <br />
         <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
-          <tr>
-            <th width="100">%s</th>
-            <td>%s</td>
-          </tr>
-          <tr>
-            <th width="100">%s</th>
-            <td>%s</td>
-          </tr>
-          <tr>
-            <th width="100">%s</th>
-            <td>%s</td>
-          </tr>
-          <tr>
-            <th width="100">%s</th>
-            <td>%s</td>
-          </tr>
-          <tr>
-            <th width="100">%s</th>
-            <td>%s</td>
-          </tr>
-          <tr>
-            <th width="100">%s</th>
-            <td>%s</td>
-          </tr>
+            <tr>
+                <th width="100">%s</th>
+                <td>%s</td>
+            </tr>
+            <tr>
+                <th width="100">%s</th>
+                <td>%s</td>
+            </tr>
+            <tr>
+                <th width="100">%s</th>
+                <td>%s</td>
+            </tr>
+            <tr>
+                <th width="100">%s</th>
+                <td>%s</td>
+            </tr>
+            <tr>
+                <th width="100">%s</th>
+                <td>%s</td>
+            </tr>
+            <tr>
+                <th width="100">%s</th>
+                <td>%s</td>
+            </tr>
         </table>
         <br />
         <table class="bibcirctable">
             <td>
                 <input type="button"
-            onClick="location.href='%s/admin2/bibcirculation/register_new_loan?ln=%s&print_data=true'"
-            value="%s" class="formbutton">
+                       value="%s" class="formbutton"
+                    onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s'"
+                >
+                <input type="button"
+                       value="%s" class="formbutton"
+    onClick="location.href='%s/admin2/bibcirculation/register_new_loan?ln=%s&print_data=true'"
+                >
             </td>
         </table>
         <br />
         <br />
         </div>
-        """ % (_("A new loan has been registered."),
-               id_string, display_id,
+        """ % (id_string, display_id,
                _("Name"), name,
                _("Address"), address,
                _("Mailbox"), mailbox,
@@ -2745,8 +2768,10 @@ onClick="location.href='%s/admin2/bibcirculation/associate_barcode?ln=%s&request
                _("Year"), book_year,
                _("Publisher"), book_editor,
                _("ISBN"), book_isbn,
+               _("Back to home"),
                CFG_SITE_URL, ln,
-               _("Print loan information"))
+               _("Print loan information"),
+               CFG_SITE_URL, ln)
 
         return out
 
@@ -3255,9 +3280,9 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
                  """ % (_("Select an action"),
                         barcode, _("Update"),
                         recid, barcode, _("Add similar copy"),
-                        _("New request"),
+                        barcode, _("New request"),
                         _("New loan"),
-                        barcode, _("Delete copy"))
+                        _("Delete copy"))
 
             elif status == 'missing':
                 out += """
@@ -4496,7 +4521,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_loans_historical_overv
         if CFG_CERN_SITE:
             out += """
             <input type=button onClick=
-"location.href='%s/admin2/bibcirculation/get_borrower_details?ln=%sborrower_id=%s&update=True'"
+"location.href='%s/admin2/bibcirculation/get_borrower_details?ln=%s&borrower_id=%s&update=True'"
                 value="%s" class='formbutton'>
             """ % (CFG_SITE_URL, ln, borrower_id, _("Update"))
 
@@ -6840,15 +6865,16 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
         <table class="bibcirctable">
           <tr align="center">
             <td class="bibcirccontent">
-               <strong>%s library(ies) found</strong>
+               <strong>%s libraries found</strong>
             </td>
           </tr>
         </table>
         <br />
-        <table class="tablesortersmall" border="0" cellpadding="0" cellspacing="1">
+        <table class="tablesortersmall" border="0"
+               cellpadding="0" cellspacing="1">
          <th align="center">%s</th>
 
-        """ % (len(result), _("Library(ies)"))
+        """ % (len(result), _("Libraries"))
 
         for (library_id, name) in result:
             library_link = create_html_link(CFG_SITE_URL +
@@ -7759,36 +7785,37 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
         out += load_menu(ln)
 
         out += """
+            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <div class="bibcircbottom">
             <form name="add_new_copy_step4_form"
                   action="%s/admin2/bibcirculation/add_new_copy_step5"
                   method="get" >
               <br />
               <br />
-              <table class="bibcirctable">
+              <table class="tablesorterborrower">
                 <tr>
-                    <td width="90">%s</td> <td class="bibcirccontent">%s</td>
+                    <th width="90">%s</th> <td class="bibcirccontent">%s</td>
                 </tr>
                 <tr>
-                    <td width="90">%s</td> <td class="bibcirccontent">%s</td>
+                    <th width="90">%s</th> <td class="bibcirccontent">%s</td>
                 </tr>
                 <tr>
-                    <td width="90">%s</td> <td class="bibcirccontent">%s</td>
+                    <th width="90">%s</th> <td class="bibcirccontent">%s</td>
                 </tr>
                 <tr>
-                    <td width="90">%s</td> <td class="bibcirccontent">%s</td>
+                    <th width="90">%s</th> <td class="bibcirccontent">%s</td>
                 </tr>
                 <tr>
-                    <td width="90">%s</td> <td class="bibcirccontent">%s</td>
+                    <th width="90">%s</th> <td class="bibcirccontent">%s</td>
                  </tr>
                  <tr>
-                    <td width="90">%s</td> <td class="bibcirccontent">%s</td>
+                    <th width="90">%s</th> <td class="bibcirccontent">%s</td>
                  </tr>
                  <tr>
-                    <td width="90">%s</td> <td class="bibcirccontent">%s</td>
+                    <th width="90">%s</th> <td class="bibcirccontent">%s</td>
                  </tr>
                  <tr>
-                    <td width="90">%s</td> <td class="bibcirccontent">%s</td>
+                    <th width="90">%s</th> <td class="bibcirccontent">%s</td>
                  </tr>
                 </table>
                 <br />
@@ -8645,7 +8672,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
         <table class="bibcirctable">
             <tr align="center">
                 <td class="bibcirccontent">
-                    <strong>%s library(ies) found</strong>
+                    <strong>%s libraries found</strong>
                 </td>
             </tr>
         </table>
@@ -8653,7 +8680,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
         <table class="tablesortersmall" border="0" cellpadding="0" cellspacing="1">
           <th align="center">%s</th>
 
-        """ % (len(result), _("Library(ies)"))
+        """ % (len(result), _("Libraries"))
 
             for (library_id, name) in result:
 
@@ -11494,8 +11521,125 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
 
     def tmpl_list_ill_request(self, ill_req, ln=CFG_SITE_LANG):
         """
-        @param ill_req: informations about a given ILL request
+        @param ill_req: informations about ILL requests
         @type ill_req: tuple
+        """
+
+        _ = gettext_set_language(ln)
+
+        out = """ """
+
+        out += load_menu(ln)
+
+        out += """
+        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <script src="/js/jquery.min.js" type="text/javascript"></script>
+        <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
+        <script type="text/javascript">
+        $(document).ready(function() {
+          $('#table_ill').tablesorter({widthFixed: true, widgets: ['zebra']})
+        });
+        </script>
+        <div class="bibcircbottom">
+            <br />
+            <table id="table_ill" class="tablesorter" border="0"
+                                   cellpadding="0" cellspacing="1">
+                <thead>
+                    <tr>
+                        <th>%s</th>
+                        <th>%s</th>
+                        <th>%s</th>
+                        <th>%s</th>
+                        <th>%s</th>
+                        <th>%s</th>
+                        <th>%s</th>
+                        <th>%s</th>
+                        <th>%s</th>
+                    </tr>
+                </thead>
+                <tbody>
+            """% (_("Borrower"),
+                  _("Item"),
+                  _("Supplier"),
+                  _("Status"),
+                  _("ID"),
+                  _("Interest from"),
+                  _("Due date"),
+                  _("Type"),
+                  _("Option(s)"))
+
+        for (ill_request_id, borrower_id, borrower_name, library_id,
+             ill_status, period_from, _period_to, due_date, item_info,
+             request_type) in ill_req:
+
+            borrower_link = create_html_link(CFG_SITE_URL +
+                                '/admin2/bibcirculation/get_borrower_details',
+                                {'borrower_id': borrower_id, 'ln': ln},
+                                (borrower_name))
+
+            if library_id:
+                if request_type in CFG_BIBCIRCULATION_ACQ_TYPE:
+                    library_name = db.get_vendor_name(library_id)
+                else:
+                    library_name = db.get_library_name(library_id)
+            else:
+                library_name = '-'
+
+            item_info = eval(item_info)
+
+            try:
+                title_link = create_html_link(CFG_SITE_URL +
+                                    '/admin2/bibcirculation/get_item_details',
+                                    {'recid': item_info['recid'], 'ln': ln},
+                                (book_title_from_MARC(int(item_info['recid']))))
+            except KeyError:
+                if request_type in ['book'] + CFG_BIBCIRCULATION_ACQ_TYPE:
+                    title_link = item_info['title']
+                else:
+                    title_link = item_info['periodical_title']
+
+            out += """
+                   <tr>
+                    <td class="bibcirccontent">%s</td>
+                    <td class="bibcirccontent">%s</td>
+                    <td class="bibcirccontent">%s</td>
+                    <td class="bibcirccontent">%s</td>
+                    <td class="bibcirccontent">%s</td>
+                    <td class="bibcirccontent">%s</td>
+                    <td class="bibcirccontent">%s</td>
+                    <td class="bibcirccontent">%s</td>
+                    <td align="center">
+                    """ % (borrower_link, title_link, library_name, ill_status,
+                           ill_request_id, period_from, due_date or '-',
+                           request_type)
+
+            if request_type in CFG_BIBCIRCULATION_ACQ_TYPE:
+                out += """
+                       <input type=button onClick="location.href='%s/admin2/bibcirculation/acq_details_step1?ill_request_id=%s'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
+                       value="%s" class='bibcircbutton'>
+                    </td>
+                   </tr>
+                    """ % (CFG_SITE_URL, ill_request_id, _('select'))
+            else:
+                out += """
+                       <input type=button onClick="location.href='%s/admin2/bibcirculation/ill_request_details_step1?ill_request_id=%s'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
+                       value="%s" class='bibcircbutton'>
+                    </td>
+                   </tr>
+                    """ % (CFG_SITE_URL, ill_request_id, _('select'))
+
+        out += """
+           </tbody>
+          </table>
+         </div>
+        """
+
+        return out
+
+    def tmpl_list_acquisition(self, ill_req, ln=CFG_SITE_LANG):
+        """
+        @param acq_req: informations about acquisition requests
+        @type acq_req: tuple
         """
 
         _ = gettext_set_language(ln)
@@ -11534,15 +11678,15 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
             """% (_("Borrower"),
                   _("Item"),
                   _("Supplier"),
+                  _("Cost"),
                   _("Status"),
                   _("ID"),
-                  _("Interest from"),
-                  _("Due date"),
+                  _("Date requested"),
                   _("Type"),
-                  _("Option(s)"))
+                  _("Options"))
 
-        for (ill_request_id, borrower_id, borrower_name, library_id,
-             ill_status, period_from, _period_to, due_date, item_info,
+        for (ill_request_id, borrower_id, borrower_name, vendor_id,
+             ill_status, period_from, _period_to, due_date, item_info, cost,
              request_type) in ill_req:
 
             borrower_link = create_html_link(CFG_SITE_URL +
@@ -11550,10 +11694,10 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                                 {'borrower_id': borrower_id, 'ln': ln},
                                 (borrower_name))
 
-            if library_id:
-                library_name = db.get_library_name(library_id)
+            if vendor_id:
+                vendor_name = db.get_vendor_name(vendor_id)
             else:
-                library_name = '-'
+                vendor_name = '-'
 
             item_info = eval(item_info)
 
@@ -11563,11 +11707,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                                     {'recid': item_info['recid'], 'ln': ln},
                                 (book_title_from_MARC(int(item_info['recid']))))
             except KeyError:
-                if request_type == 'book':
-                    title_link = item_info['title']
-                else:
-                    title_link = item_info['periodical_title']
-
+                title_link = item_info['title']
 
             out += """
                    <tr>
@@ -11580,14 +11720,16 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                     <td class="bibcirccontent">%s</td>
                     <td class="bibcirccontent">%s</td>
                     <td align="center">
-                       <input type=button onClick="location.href='%s/admin2/bibcirculation/ill_request_details_step1?ill_request_id=%s'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
+                    """ % (borrower_link, title_link, vendor_name,
+                           cost, ill_status, ill_request_id,
+                           period_from, request_type)
+
+            out += """
+                       <input type=button onClick="location.href='%s/admin2/bibcirculation/acq_details_step1?ill_request_id=%s'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                        value="%s" class='bibcircbutton'>
                     </td>
                    </tr>
-                    """ % (borrower_link, title_link, library_name, ill_status,
-                           ill_request_id, period_from, due_date or '-',
-                           request_type, CFG_SITE_URL,
-                           ill_request_id, _('select'))
+                    """ % (CFG_SITE_URL, ill_request_id, _('select'))
 
         out += """
            </tbody>
@@ -11630,6 +11772,8 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                             CFG_BIBCIRCULATION_ILL_STATUS_RECEIVED,
                             CFG_BIBCIRCULATION_ILL_STATUS_CANCELLED]
 
+        acq_statuses = []
+
         _ = gettext_set_language(ln)
 
         out = load_menu(ln)
@@ -11650,11 +11794,6 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
          return_date, cost, barcode, library_notes,
          ill_status) = ill_request_details
         #request_ok = True
-
-        if cost:
-            (value, currency) = cost.split()
-        else:
-            (value, currency) = (0, 'EUR')
 
         if library_notes == '' or library_notes == None:
             previous_library_notes = {}
@@ -11970,25 +12109,94 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                          _("Year"), item_info['year'],
                          str(book_cover))
 
-                         #<!---
-                         #<tr>
-                         #   <th width="100">%s</th>
-                         #   <td>
-                         #       <textarea name='issue' rows="1"
-                         #           style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
-                         #   </td>
-                         #</tr>
-                         #<tr>
-                         #   <th width="100">%s</th>
-                         #   <td>
-                         #       <textarea name='page' rows="1"
-                         #           style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
-                         #   </td>
-                         #</tr>
-                         #--->
+            elif str(request_type) == 'acq-book':
+                out += """
+                <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+                <form name="ill_req_form"
+                      action="%s/admin2/bibcirculation/ill_request_details_step2"
+                      method="get">
+                   <div class="bibcircbottom">
+                   <input type=hidden name=ill_request_id value="%s">
+                    <br />
+                    <table class="bibcirctable">
+                      <tr>
+                        <td class="bibcirctableheader" width="10">%s</td>
+                      </tr>
+                    </table>
+                    <table class="bibcirctable">
+                     <tr valign='top'>
+                       <td width="800">
+                        <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='title' rows="2"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='authors' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='place' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='publisher' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='year' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='edition' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                          <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='isbn' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                        </table>
+                      </td>
+                        <td class="bibcirccontent">
+                            <img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/>
+                        </td>
+                      </tr>
+                  </table>
+                  <br />
+                  """ % (CFG_SITE_URL, ill_request_id,
+                          _("Item details"),
+                          _("Title"), item_info['title'],
+                          _("Author(s)"), item_info['authors'],
+                          _("Place"), item_info['place'],
+                          _("Publisher"), item_info['publisher'],
+                          _("Year"), item_info['year'],
+                          _("Edition"), item_info['edition'],
+                          _("ISBN"), item_info['isbn'],
+                          str(book_cover))
 
             else:
-                out += """something is missing, isn't it?"""
+                out += """Wrong type."""
 
         out += """
         <table class="bibcirctable">
@@ -12055,11 +12263,13 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                               <td>
                                 <select style='border: 1px solid #cfcfcf'
                                 onchange="location = this.options[this.selectedIndex].value;">
-        """ % (ill_status, _("Status"))
+             """ % (ill_status, _("Status"))
 
         if request_type == 'book':
             statuses = book_statuses
-        else:
+        elif request_type in CFG_BIBCIRCULATION_ACQ_TYPE:
+            statuses = CFG_BIBCIRCULATION_ACQ_STATUS
+        elif request_type == 'article':
             statuses = article_statuses
 
         for status in statuses:
@@ -12186,35 +12396,13 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                       <td class="bibcirccontent">
                         <input type="text" size="12" name="cost"
                                value="%s" style='border: 1px solid #cfcfcf'>
-                        <select name="currency"  style='border: 1px solid #cfcfcf'>
-
                         """ % (_("Request date"),
                                CFG_SITE_URL, today,
                                _("Expected date"),
                                CFG_SITE_URL, within_a_week,
-                               _("Cost"), value)
-
-
-            if currency == 'EUR':
-                out += """
-                <option value="EUR" selected>EUR</option>
-                <option value="CHF">CHF</option>
-                <option value="USD">USD</option> """
-
-            elif currency == 'CHF':
-                out += """
-                <option value="EUR">EUR</option>
-                <option value="CHF" selected>CHF</option>
-                <option value="USD">USD</option> """
-
-            else:
-                out += """
-                <option value="EUR">EUR</option>
-                <option value="CHF">CHF</option>
-                <option value="USD" selected>USD</option> """
+                               _("Cost"), cost)
 
             out += """
-                        </select>
                       </td>
                     </tr>
                     <tr>
@@ -12321,30 +12509,8 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                         <tr>
                           <th width="100">%s</th>
                           <td class="bibcirccontent"><input type="text" size="12" name="cost" value="%s" style='border: 1px solid #cfcfcf'>
-                            <select name="currency"  style='border: 1px solid #cfcfcf'>
-
-                    """ % (_("Cost"), value)
-
-            if currency == 'EUR':
-                out += """
-                <option value="EUR" selected>EUR</option>
-                <option value="CHF">CHF</option>
-                <option value="USD">USD</option> """
-
-            elif currency == 'CHF':
-                out += """
-                <option value="EUR">EUR</option>
-                <option value="CHF" selected>CHF</option>
-                <option value="USD">USD</option> """
-
-            else:
-                out += """
-                <option value="EUR">EUR</option>
-                <option value="CHF">CHF</option>
-                <option value="USD" selected>USD</option> """
-
+                    """ % (_("Cost"), cost)
             out += """
-                            </select>
                           </td>
                         </tr>
                         <tr>
@@ -12435,31 +12601,11 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                           <td class="bibcirccontent">
                             <input type="text" size="12" name="cost"
                                    value="%s" style='border: 1px solid #cfcfcf'>
-                            <select name="currency"  style='border: 1px solid #cfcfcf'>
         """ % (_("ILL request ID"), ill_request_id, _("Library"),
             library_name, _("Request date"), request_date, _("Expected date"),
             expected_date, _("Arrival date"), arrival_date, _("Due date"),
             due_date, _("Return date"), CFG_SITE_URL, date1, request_date,
-            expected_date, arrival_date, due_date, library_id, _("Cost"), value)
-
-
-            if currency == 'EUR':
-                out += """
-                <option value="EUR" selected>EUR</option>
-                <option value="CHF">CHF</option>
-                <option value="USD">USD</option> """
-
-            elif currency == 'CHF':
-                out += """
-                <option value="EUR">EUR</option>
-                <option value="CHF" selected>CHF</option>
-                <option value="USD">USD</option> """
-
-            else:
-                out += """
-                <option value="EUR">EUR</option>
-                <option value="CHF">CHF</option>
-                <option value="USD" selected>USD</option> """
+            expected_date, arrival_date, due_date, library_id, _("Cost"), cost)
 
             out += """
                             </select>
@@ -12540,33 +12686,12 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                           <th width="100">%s</th>
                           <td class="bibcirccontent"><input type="text" size="12"
                               name="cost" value="%s" style='border: 1px solid #cfcfcf'>
-                            <select name="currency"  style='border: 1px solid #cfcfcf'>
         """ % (_("ILL request ID"), ill_request_id, _("Library"), library_name,
             _("Request date"), request_date, _("Expected date"), expected_date,
             _("Arrival date"), CFG_SITE_URL, date1, request_date, expected_date,
-            library_id, _("Cost"), value)
-
-
-            if currency == 'EUR':
-                out += """
-                <option value="EUR" selected>EUR</option>
-                <option value="CHF">CHF</option>
-                <option value="USD">USD</option> """
-
-            elif currency == 'CHF':
-                out += """
-                <option value="EUR">EUR</option>
-                <option value="CHF" selected>CHF</option>
-                <option value="USD">USD</option> """
-
-            else:
-                out += """
-                <option value="EUR">EUR</option>
-                <option value="CHF">CHF</option>
-                <option value="USD" selected>USD</option> """
+            library_id, _("Cost"), cost)
 
             out += """
-                            </select>
                           </td>
                         </tr>
                         <tr>
@@ -12588,6 +12713,812 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                         <tr>
                           <th valign="top" width="100">%s</th>
                           <td>
+                            <textarea name='library_notes' rows="6" cols="74"
+                                      style='border: 1px solid #cfcfcf'></textarea>
+                          </td>
+                        </tr>
+                      </table>
+                     </td>
+                   </tr>
+                 </table>
+
+                      """ % (_("Library notes"))
+
+###### END STATUSES ######
+
+        out += """
+             <br />
+             <table class="bibcirctable">
+                <tr>
+                  <td>
+                       <input type=button value="%s"
+                              onClick="history.go(-1)" class="formbutton">
+                       <input type="submit"
+                              value="%s" class="formbutton">
+                  </td>
+                 </tr>
+             </table>
+             </div>
+             </form>
+             <br />
+             <br />
+               """ % (_("Back"), _("Continue"))
+
+        return out
+
+    def tmpl_acq_details_step1(self, ill_request_id,
+                                     ill_request_details, libraries,
+                                     ill_request_borrower_details,
+                                     ln=CFG_SITE_LANG):
+
+        _ = gettext_set_language(ln)
+
+        out = load_menu(ln)
+
+        out += """
+            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <script type="text/javascript" language='JavaScript'
+                    src="%s/js/jquery.min.js"></script>
+            <script type="text/javascript" language='JavaScript'
+                    src="%s/js/ui.datepicker.min.js"></script>
+            """% (CFG_SITE_URL, CFG_SITE_URL)
+
+        (_borrower_id, borrower_name, borrower_email,
+         borrower_mailbox, period_from, period_to,
+         item_info, borrower_comments, only_this_edition,
+         budget_code, request_type) = ill_request_borrower_details
+
+        (library_id, request_date, expected_date, arrival_date, due_date,
+         return_date, cost, barcode, library_notes,
+         ill_status) = ill_request_details
+
+        if library_notes == '' or library_notes == None:
+            previous_library_notes = {}
+        else:
+            previous_library_notes = eval(library_notes)
+
+        key_array = previous_library_notes.keys()
+        key_array.sort()
+
+        item_info = eval(item_info)
+
+        today = datetime.date.today()
+        within_a_week = (datetime.date.today()
+                       + datetime.timedelta(days=7)).strftime('%Y-%m-%d')
+        within_a_month = (datetime.date.today()
+                        + datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+
+        notes = ''
+        for key in key_array:
+            delete_note = create_html_link(CFG_SITE_URL +
+                        '/admin2/bibcirculation/acq_details_step1',
+                        {'delete_key': key, 'ill_request_id': ill_request_id,
+                        'ln': ln}, (_("[delete]")))
+
+            notes += """<tr class="bibcirccontent">
+                            <td class="bibcircnotes" width="160" valign="top"
+                                align="center"><b>%s</b></td>
+                            <td width="400"><i>%s</i></td>
+                            <td width="65" align="center">%s</td>
+                        </tr>
+                     """ % (key, previous_library_notes[key], delete_note)
+
+        if library_id:
+            library_name = db.get_vendor_name(library_id)
+        else:
+            library_name = '-'
+
+        try:
+            (book_title, book_year, book_author, book_isbn,
+             book_editor) = book_information_from_MARC(int(item_info['recid']))
+
+            if book_isbn:
+                book_cover = get_book_cover(book_isbn)
+            else:
+                book_cover = """%s/img/book_cover_placeholder.gif
+                                """ % (CFG_SITE_URL)
+
+            out += """
+            <form name="ill_req_form"
+                  action="%s/admin2/bibcirculation/acq_details_step2" method="get" >
+            <div class="bibcircbottom">
+            <input type=hidden name=ill_request_id value="%s">
+                <br />
+                <table class="bibcirctable">
+                    <tr>
+                        <td class="bibcirctableheader" width="10">%s</td>
+                    </tr>
+                </table>
+                <table class="bibcirctable">
+                 <tr valign='top'>
+                   <td width="400">
+                    <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                     <tr>
+                        <th width="100">%s</th>
+                        <td>%s</td>
+                     </tr>
+                     <tr>
+                        <th width="100">%s</th>
+                        <td>%s</td>
+                     </tr>
+                     <tr>
+                        <th width="100">%s</th>
+                        <td>%s</td>
+                     </tr>
+                     <tr>
+                        <th width="100">%s</th>
+                        <td>%s</td>
+                     </tr>
+                     <tr>
+                        <th width="100">%s</th>
+                        <td>%s</td>
+                     </tr>
+                    </table>
+                   </td>
+                   <td class="bibcirccontent">
+                       <img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/>
+                   </td>
+                 </tr>
+                </table>
+                <br />
+              """ % (CFG_SITE_URL,
+                      ill_request_id,
+                      _("Item details"),
+                      _("Name"),
+                      book_title,
+                      _("Author(s)"),
+                      book_author,
+                      _("Year"),
+                      book_year,
+                      _("Publisher"),
+                      book_editor,
+                      _("ISBN"),
+                      book_isbn,
+                      str(book_cover))
+
+        except KeyError:
+            try:
+                book_cover = get_book_cover(item_info['isbn'])
+            except KeyError:
+                book_cover = """%s/img/book_cover_placeholder.gif
+                            """ % (CFG_SITE_URL)
+
+            if str(request_type) in CFG_BIBCIRCULATION_ACQ_TYPE:
+                out += """
+                <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+                <form name="ill_req_form"
+                      action="%s/admin2/bibcirculation/acq_details_step2"
+                      method="get">
+                   <div class="bibcircbottom">
+                   <input type=hidden name=ill_request_id value="%s">
+                    <br />
+                    <table class="bibcirctable">
+                      <tr>
+                        <td class="bibcirctableheader" width="10">%s</td>
+                      </tr>
+                    </table>
+                    <table class="bibcirctable">
+                     <tr valign='top'>
+                       <td width="800">
+                        <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='title' rows="2"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='authors' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='place' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='publisher' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='year' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='edition' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='isbn' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='standard_number' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                        </table>
+                      </td>
+                        <td class="bibcirccontent">
+                            <img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/>
+                        </td>
+                      </tr>
+                  </table>
+                  <br />
+                  """ % (CFG_SITE_URL, ill_request_id,
+                          _("Item details"),
+                          _("Title"), item_info['title'],
+                          _("Author(s)"), item_info['authors'],
+                          _("Place"), item_info['place'],
+                          _("Publisher"), item_info['publisher'],
+                          _("Year"), item_info['year'],
+                          _("Edition"), item_info['edition'],
+                          _("ISBN"), item_info['isbn'],
+                          _("Standard number"), item_info['standard_number'],
+                          str(book_cover))
+
+            else:
+                out += """Wrong type."""
+
+        out += """
+        <table class="bibcirctable">
+          <tr valign='top'>
+            <td width="550">
+              <table>
+                <tr>
+                  <td class="bibcirctableheader">%s</td>
+                </tr>
+              </table>
+              <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                <tr>
+                  <th width="150">%s</th>
+                  <td>%s</td>
+                </tr>
+                <tr>
+                  <th width="150">%s</th>
+                  <td>%s</td>
+                </tr>
+                <tr>
+                  <th width="150">%s</th>
+                  <td>%s</td>
+                </tr>
+                <tr>
+                  <th width="150">%s</th>
+                  <td>%s</td>
+                </tr>
+                <tr>
+                  <th width="150">%s</th>
+                  <td>%s</td>
+                </tr>
+                <tr>
+                   <th width="150">%s</th>
+                   <td width="350"><i>%s</i></td>
+                </tr>
+                <tr>
+                  <th width="150">%s</th>
+                  <td>%s</td>
+                </tr>
+              </table>
+              </td>
+              <td>
+              <table>
+                <tr>
+                     <td class="bibcirctableheader">%s</td>
+                </tr>
+             </table>
+
+             """ % (_("Borrower request"), _("Name"), borrower_name,
+                    _("Email"), borrower_email,
+                    _("Mailbox"), borrower_mailbox,
+                    _("Period of interest (From)"), period_from,
+                    _("Period of interest (To)"), period_to,
+                    _("Borrower comments"), borrower_comments or '-',
+                    _("Only this edition?"), only_this_edition or 'No',
+                    _("Request details"))
+
+
+        out += """
+                        <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                            <tr>
+                                <input type=hidden name=new_status value="%s">
+                              <th width="100">%s</th>
+                              <td colspan="3">
+                                <select style='border: 1px solid #cfcfcf'
+                                onchange="location = this.options[this.selectedIndex].value;">
+             """ % (ill_status, _("Status"))
+
+        for status in CFG_BIBCIRCULATION_ACQ_STATUS:
+            if status == ill_status:
+                out += """
+            <option value ="acq_details_step1?ill_request_id=%s&new_status=%s" selected>
+                    %s
+                    </option>
+            """ % (ill_request_id, status, status)
+            else:
+                out += """
+            <option value ="acq_details_step1?ill_request_id=%s&new_status=%s">
+                    %s
+                    </option>
+            """ % (ill_request_id, status, status)
+
+        out += """
+                                </select>
+                              </td>
+                            </tr>
+            """
+
+######## NEW ########
+        if ill_status == CFG_BIBCIRCULATION_ACQ_STATUS_NEW \
+           or ill_status == None \
+           or ill_status == '':
+
+            out += """
+                            <tr>
+                              <th width="150">%s</th>
+                              <td>%s</td>
+                              <th width="150">%s</th>
+                              <td>%s</td>
+                            </tr>
+                            <tr>
+                              <th width="150">%s</th>
+                              <td colspan="3">
+                                <input type="text" size="12"
+                                       name="budget_code"
+                                       value="%s"
+                                       style='border: 1px solid #cfcfcf'>
+                              </td>
+                            </tr>
+                            <tr>
+                              <th width="100" valign="top">%s</th>
+                              <td colspan="3">
+                                <table class="bibcircnotes">
+                    """ % (_("ILL request ID"), ill_request_id,
+                           _("Type"), request_type,
+                           _("Budget code"), budget_code,
+                           _("Previous notes"))
+
+            out += notes
+
+            out += """
+                            </table>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th valign="top" width="100">%s</th>
+                          <td colspan="3">
+                            <textarea name='library_notes' rows="6" cols="74"
+                                      style='border: 1px solid #cfcfcf'>
+                            </textarea>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+                      """ % (_("Library notes"))
+
+############# ON ORDER ##############
+        elif ill_status ==  CFG_BIBCIRCULATION_ACQ_STATUS_ON_ORDER:
+
+            out += """
+                            <tr>
+                              <th width="150">%s</th>
+                              <td class="bibcirccontent">%s</td>
+                              <th width="150">%s</th>
+                              <td class="bibcirccontent">%s</td>
+                            </tr>
+                        """ % (_("ILL request ID"), ill_request_id,
+                               _("Type"), request_type)
+
+            out += """
+                            <tr>
+                              <th width="150">%s</th>
+                              <td class="bibcirccontent" colspan="3">
+                                <select name="library_id"  style='border: 1px solid #cfcfcf'>
+                        """ % (_("Vendor"))
+
+            for(lib_id, name) in libraries:
+                if lib_id == library_id:
+                    out += """       <option value="%s" selected>%s</option>
+                            """ % (lib_id, name)
+                else:
+                    out += """       <option value="%s">%s</option>
+                            """ % (lib_id, name)
+
+            out += """
+                         </select>
+                       </td>
+                     </tr>
+                     <tr>
+                       <th width="150">%s</th>
+                       <td class="bibcirccontent" colspan="3">
+
+                        <script type="text/javascript">
+                             $(function(){
+                                 $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd',
+                                   showOn: 'button', buttonImage: "%s/img/calendar.gif",
+                                   buttonImageOnly: true});
+                             });
+                        </script>
+                        <input type="text" size="10" id="date_picker1"
+                               name="request_date" value="%s" style='border: 1px solid #cfcfcf'>
+
+                      </td>
+                    </tr>
+                    <tr>
+                      <th width="150">%s</th>
+                      <td class="bibcirccontent" colspan="3">
+                        <script type="text/javascript">
+                             $(function() {
+                                 $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd',
+                                        showOn: 'button', buttonImage: "%s/img/calendar.gif",
+                                        buttonImageOnly: true});
+                             });
+                        </script>
+                        <input type="text" size="10" id="date_picker2"
+                               name="expected_date" value="%s" style='border: 1px solid #cfcfcf'>
+
+                      </td>
+                    </tr>
+                    <tr>
+                      <th width="100">%s</th>
+                      <td class="bibcirccontent" colspan="3">
+                        <input type="text" size="12" name="cost"
+                               value="%s" style='border: 1px solid #cfcfcf'>
+                        """ % (_("Request date"),
+                               CFG_SITE_URL, today,
+                               _("Expected date"),
+                               CFG_SITE_URL, within_a_week,
+                               _("Cost"), cost)
+
+            out += """
+                      </td>
+                    </tr>
+                    <tr>
+                      <th width="100">%s</th>
+                      <td class="bibcirccontent" colspan="3">
+                            <input type="text" size="12" name="budget_code"
+                                   value="%s" style='border: 1px solid #cfcfcf'>
+                      </td>
+                    </tr>
+                    <tr>
+                          <th width="100" valign="top">%s</th>
+                          <td colspan="3">
+                            <table class="bibcircnotes">
+                    """ % (_("Budget code"), budget_code,
+                           _("Previous notes"))
+
+            out += notes
+
+            out += """
+                            </table>
+                          </td>
+                    </tr>
+                    <tr>
+                        <th valign="top" width="150">%s</th>
+                            <td colspan="3">
+                                <textarea name='library_notes' rows="6" cols="74"
+                                          style='border: 1px solid #cfcfcf'></textarea>
+                            </td>
+                    </tr>
+                   </table>
+                 </td>
+               </tr>
+             </table>
+                      """ % (_("Library notes"))
+
+##### PARTIAL RECEIPT ##############
+        elif ill_status == CFG_BIBCIRCULATION_ACQ_STATUS_PARTIAL_RECEIPT:
+
+            out += """
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent">%s</td>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent">%s</td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3">%s</td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3">%s</td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3">%s</td>
+                        </tr>
+                    """ % (_("ILL request ID"), ill_request_id,
+                           _("Type"), request_type, _("Library"),
+                           library_name, _("Request date"), request_date,
+                           _("Expected date"), expected_date)
+
+            if str(arrival_date) == '0000-00-00':
+                date1 = today
+            else:
+                date1 = arrival_date
+
+            if str(due_date) == '0000-00-00':
+                date2 = within_a_month
+            else:
+                date2 = due_date
+
+
+            out += """
+                    <tr>
+                       <th width="150">%s</th>
+                       <td class="bibcirccontent" colspan="3">
+
+                        <script type="text/javascript">
+                             $(function() {
+                                 $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                             });
+                        </script>
+                        <input type="text" size="10" id="date_picker1" name="arrival_date" value="%s" style='border: 1px solid #cfcfcf'>
+
+                      </td>
+                    </tr>
+                    <tr>
+                      <th width="150">%s</th>
+                      <td class="bibcirccontent" colspan="3">
+
+                        <script type="text/javascript">
+                             $(function() {
+                                 $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                             });
+                        </script>
+                        <input type="text" size="10" id="date_picker2" name="due_date" value="%s" style='border: 1px solid #cfcfcf'>
+                        <input type="hidden" name="request_date" value="%s">
+                        <input type="hidden" name="expected_date" value="%s">
+                        <input type="hidden" name="library_id" value="%s">
+                      </td>
+                    </tr>
+            """ % (_("Arrival date"), CFG_SITE_URL, date1, _("Due date"),
+                CFG_SITE_URL, date2, request_date, expected_date, library_id)
+
+            out += """
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3">
+                            <input type="text" size="12" name="cost" value="%s"
+                                   style='border: 1px solid #cfcfcf'>
+                    """ % (_("Cost"), cost)
+
+            out += """
+                          </td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3">
+                            <input type="text" size="12" name="budget_code"
+                                   value="%s" style='border: 1px solid #cfcfcf'>
+                        </tr>
+                        <tr>
+                          <th width="100" valign="top">%s</th>
+                          <td colspan="3">
+                            <table class="bibcircnotes">
+                        """ % (_("Budget code"), budget_code, _("Previous notes"))
+
+            out += notes
+
+
+            out += """
+                            </table>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th valign="top" width="100">%s</th>
+                          <td colspan="3">
+                            <textarea name='library_notes' rows="6" cols="74"
+                                      style='border: 1px solid #cfcfcf'></textarea>
+                          </td>
+                        </tr>
+                      </table>
+                     </td>
+                   </tr>
+                 </table>
+
+                      """ % (_("Library notes"))
+
+
+##### CANCELED ##############
+        elif ill_status == CFG_BIBCIRCULATION_ACQ_STATUS_CANCELLED:
+
+            date1 = return_date
+
+            if ill_status == CFG_BIBCIRCULATION_ILL_STATUS_RETURNED and \
+               str(return_date)=='0000-00-00':
+                date1 = today
+
+            out += """
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent">%s</td>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent">%s</td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3">%s</td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3">%s</td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3">%s</td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3">%s</td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3">%s</td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3">
+                            <script type="text/javascript">
+                                $(function() {
+                                    $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd',
+                                        showOn: 'button', buttonImage: "%s/img/calendar.gif",
+                                        buttonImageOnly: true});
+                                });
+                            </script>
+                            <input type="text" size="10" id="date_picker1" name="return_date"
+                                   value="%s" style='border: 1px solid #cfcfcf'>
+                            <input type="hidden" name="request_date"  value="%s">
+                            <input type="hidden" name="expected_date" value="%s">
+                            <input type="hidden" name="arrival_date"  value="%s">
+                            <input type="hidden" name="due_date"      value="%s">
+                            <input type="hidden" name="library_id"    value="%s">
+                            <input type="hidden" name="budget_code"   value="%s">
+                          </td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3">
+                            <input type="text" size="12" name="cost"
+                                   value="%s" style='border: 1px solid #cfcfcf'>
+        """ % (_("ILL request ID"), ill_request_id, _("Type"), request_type,
+               _("Library"), library_name, _("Request date"), request_date,
+               _("Expected date"), expected_date, _("Arrival date"),
+               arrival_date, _("Due date"), due_date, _("Return date"),
+               CFG_SITE_URL, date1, request_date, expected_date, arrival_date,
+               due_date, library_id, budget_code, _("Cost"), cost)
+
+            out += """
+                          </td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3">%s</td>
+                        </tr>
+                        <tr>
+                          <th width="100" valign="top">%s</th>
+                          <td colspan="3">
+                            <table class="bibcircnotes">
+                    """ % (_("Budget code"), budget_code, _("Previous notes"))
+
+            out += notes
+
+            out += """
+                            </table>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th valign="top" width="100">%s</th>
+                          <td colspan="3">
+                            <textarea name='library_notes' rows="6" cols="74"
+                                      style='border: 1px solid #cfcfcf'></textarea>
+                          </td>
+                        </tr>
+                      </table>
+                     </td>
+                   </tr>
+                 </table>
+
+                      """ % (_("Library notes"))
+
+##### RECEIVED ##############
+        elif ill_status == CFG_BIBCIRCULATION_ACQ_STATUS_RECEIVED:
+            if str(arrival_date) == '0000-00-00':
+                date1 = today
+            else:
+                date1 = arrival_date
+
+            out += """
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent">%s</td>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent">%s</td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3">%s</td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3">%s</td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3">%s</td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3">
+                            <script type="text/javascript">
+                                $(function() {
+                                    $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd',
+                                        showOn: 'button', buttonImage: "%s/img/calendar.gif",
+                                        buttonImageOnly: true});
+                                });
+                            </script>
+                            <input type="text" size="10" id="date_picker1"
+                               name="arrival_date" value="%s" style='border: 1px solid #cfcfcf'>
+                            <input type="hidden" name="request_date" value="%s">
+                            <input type="hidden" name="expected_date" value="%s">
+                            <input type="hidden" name="library_id" value="%s">
+                          </td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3"><input type="text" size="12"
+                              name="cost" value="%s" style='border: 1px solid #cfcfcf'>
+        """ % (_("ILL request ID"), ill_request_id, _("Type"), request_type,
+               _("Library"), library_name, _("Request date"), request_date,
+               _("Expected date"), expected_date, _("Arrival date"),
+               CFG_SITE_URL, date1, request_date, expected_date, library_id,
+               _("Cost"), cost)
+
+            out += """
+                          </td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent" colspan="3"><input type="text" size="12"
+                            name="budget_code" value="%s" style='border: 1px solid #cfcfcf'></td>
+                        </tr>
+                        <tr>
+                          <th width="100" valign="top">%s</th>
+                          <td colspan="3">
+                            <table class="bibcircnotes">
+                """ % (_("Budget code"), budget_code, _("Previous notes"))
+
+            out += notes
+
+            out += """
+                            </table>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th valign="top" width="100">%s</th>
+                          <td colspan="3">
                             <textarea name='library_notes' rows="6" cols="74"
                                       style='border: 1px solid #cfcfcf'></textarea>
                           </td>
@@ -12624,866 +13555,6 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
 
         return out
 
-    #def tmpl_ill_request_details_step2(self, ill_req_details, request_info,
-    #                                   ill_status, ill_request_borrower_details,
-    #                                   ln=CFG_SITE_LANG):
-    #    """
-    #    @param ill_req_details: informations about a given ILL request
-    #    @type ill_req_details: tuple
-    #
-    #    @param request_info:
-    #    @type request_info: tuple
-    #
-    #    @param ill_status: status of an ILL request
-    #    @type ill_status: string
-    #
-    #    @param ill_request_borrower_details: borrower's informations
-    #    @type ill_request_borrower_details: tuple
-    #    """
-    #
-    #    _ = gettext_set_language(ln)
-    #
-    #    out = load_menu(ln)
-    #
-    #    (_borrower_id, borrower_name, borrower_email, borrower_mailbox,
-    #     period_from, period_to, book_info,
-    #     borrower_comments, only_this_edition) = ill_request_borrower_details
-    #
-    #    book_info = eval(book_info)
-    #
-    #    try:
-    #        (book_title, book_year, book_author,
-    #         book_isbn, book_editor) = \
-    #                book_information_from_MARC(int(book_info['recid']))
-    #
-    #        if book_isbn:
-    #            book_cover = get_book_cover(book_isbn)
-    #        else:
-    #            book_cover = """%s/img/book_cover_placeholder.gif
-    #                         """ % (CFG_SITE_URL)
-    #
-    #        out += """
-    #        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-    #        <form name="ill_req_form"
-    #              action="%s/admin2/bibcirculation/ill_request_details_step3" method="get" >
-    #        <div class="bibcircbottom">
-    #        <input type=hidden name=request_info value="%s">
-    #            <br />
-    #            <table class="bibcirctable">
-    #                <tr>
-    #                    <td class="bibcirctableheader" width="10">%s</td>
-    #                </tr>
-    #            </table>
-    #            <table class="bibcirctable">
-    #             <tr valign='top'>
-    #               <td width="400">
-    #                <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-    #                 <tr>
-    #                    <th width="100">%s</th>
-    #                    <td class="bibcirccontent">%s</td>
-    #                 </tr>
-    #                 <tr>
-    #                    <th width="100">%s</th>
-    #                    <td class="bibcirccontent">%s</td>
-    #                 </tr>
-    #                 <tr>
-    #                    <th width="100">%s</th>
-    #                    <td class="bibcirccontent">%s</td>
-    #                 </tr>
-    #                 <tr>
-    #                    <th width="100">%s</th>
-    #                    <td class="bibcirccontent">%s</td>
-    #                 </tr>
-    #                 <tr>
-    #                    <th width="100">%s</th>
-    #                    <td class="bibcirccontent">%s</td>
-    #                 </tr>
-    #                 </table>
-    #                 </td>
-    #                 <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf'
-    #                     src="%s" alt="Book Cover"/></td>
-    #                 </tr>
-    #          </table>
-    #          <br />
-    #
-    #          """ % (CFG_SITE_URL,
-    #                  request_info,
-    #                  _("Item details"),
-    #                  _("Name"),
-    #                  book_title,
-    #                  _("Author(s)"),
-    #                  book_author,
-    #                  _("Year"),
-    #                  book_year,
-    #                  _("Publisher"),
-    #                  book_editor,
-    #                  _("ISBN"),
-    #                  book_isbn,
-    #                  str(book_cover))
-    #
-    #    except KeyError:
-    #
-    #        try:
-    #            book_cover = get_book_cover(book_info['isbn'])
-    #        except KeyError:
-    #            book_cover = """%s/img/book_cover_placeholder.gif
-    #                        """ % (CFG_SITE_URL)
-    #
-    #        out += """
-    #        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-    #        <form name="ill_req_form"
-    #              action="%s/admin2/bibcirculation/ill_request_details_step3" method="get" >
-    #        <div class="bibcircbottom">
-    #        <input type=hidden name=request_info value="%s">
-    #            <br />
-    #            <table class="bibcirctable">
-    #              <tr>
-    #                <td class="bibcirctableheader" width="10">%s</td>
-    #              </tr>
-    #            </table>
-    #            <table class="bibcirctable">
-    #             <tr valign='top'>
-    #               <td width="400">
-    #                <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-    #                 <tr>
-    #                    <th width="100">%s</th>
-    #                    <td class="bibcirccontent">%s</td>
-    #                 </tr>
-    #                 <tr>
-    #                    <th width="100">%s</th>
-    #                    <td class="bibcirccontent">%s</td>
-    #                 </tr>
-    #                 <tr>
-    #                    <th width="100">%s</th>
-    #                    <td class="bibcirccontent">%s</td>
-    #                     </tr>
-    #                 <tr>
-    #                    <th width="100">%s</th>
-    #                    <td class="bibcirccontent">%s</td>
-    #                 </tr>
-    #                 <tr>
-    #                    <th width="100">%s</th>
-    #                    <td class="bibcirccontent">%s</td>
-    #                 </tr>
-    #                 <tr>
-    #                    <th width="100">%s</th>
-    #                    <td class="bibcirccontent">%s</td>
-    #                 </tr>
-    #                 <tr>
-    #                    <th width="100">%s</th>
-    #                    <td class="bibcirccontent">%s</td>
-    #                 </tr>
-    #            </table>
-    #              </td>
-    #                <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
-    #              </tr>
-    #          </table>
-    #          <br />
-    #
-    #          """ % (CFG_SITE_URL,
-    #                  request_info,
-    #                  _("Item details"),
-    #                  _("Name"),
-    #                  book_info['title'],
-    #                  _("Author(s)"),
-    #                  book_info['authors'],
-    #                  _("Place"),
-    #                  book_info['place'],
-    #                  _("Publisher"),
-    #                  book_info['publisher'],
-    #                  _("Year"),
-    #                  book_info['year'],
-    #                  _("Edition"),
-    #                  book_info['edition'],
-    #                  _("ISBN"),
-    #                  book_info['isbn'],
-    #                  str(book_cover))
-    #
-    #    out += """
-    #
-    #    <table class="bibcirctable">
-    #      <tr valign='top'>
-    #        <td width="550">
-    #          <table>
-    #            <tr>
-    #              <td class="bibcirctableheader">%s</td>
-    #            </tr>
-    #          </table>
-    #          <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-    #            <tr>
-    #              <th width="150">%s</th>
-    #              <td class="bibcirccontent">%s</td>
-    #            </tr>
-    #            <tr>
-    #              <th width="150">%s</th>
-    #              <td class="bibcirccontent">%s</td>
-    #            </tr>
-    #            <tr>
-    #              <th width="150">%s</th>
-    #              <td class="bibcirccontent">%s</td>
-    #            </tr>
-    #            <tr>
-    #              <th width="150">%s</th>
-    #              <td class="bibcirccontent">%s</td>
-    #            </tr>
-    #            <tr>
-    #              <th width="150">%s</th>
-    #              <td class="bibcirccontent">%s</td>
-    #            </tr>
-    #            <tr>
-    #               <th width="150">%s</th>
-    #               <td width="350" class="bibcirccontent"><i>%s</i></td>
-    #            </tr>
-    #            <tr>
-    #              <th width="150">%s</th>
-    #              <td class="bibcirccontent">%s</td>
-    #            </tr>
-    #          </table>
-    #          </td>
-    #          <td>
-    #          <table>
-    #            <tr>
-    #                 <td class="bibcirctableheader">%s</td>
-    #            </tr>
-    #         </table>
-    #
-    #         """ % (_("Borrower request"), _("Name"), borrower_name,
-    #                _("Email"), borrower_email,
-    #                _("Mailbox"), borrower_mailbox,
-    #                _("Period of interest - From"), period_from,
-    #                _("Period of interest - To"), period_to,
-    #                _("Borrower comments"), borrower_comments or '-',
-    #                _("Only this edition?"), only_this_edition,
-    #                _("ILL request details"))
-    #
-    #    if ill_status == CFG_BIBCIRCULATION_ILL_STATUS_NEW:
-    #
-    #        if not ill_req_details:
-    #            previous_library_notes = {}
-    #        else:
-    #            previous_library_notes = eval(ill_req_details[8])
-    #
-    #        (ill_request_id, library_notes) = request_info
-    #
-    #        out += """
-    #        <input type=hidden name=ill_status value="%s">
-    #        <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent"><b>%s</b></td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100" valign="top">%s</th>
-    #             <td>
-    #               <table class="bibcircnotes">
-    #            """ % (ill_status, _("Status"), ill_status,
-    #                _("ILL request ID"), ill_request_id, _("Previous notes"))
-    #
-    #        key_array = previous_library_notes.keys()
-    #        key_array.sort()
-    #
-    #        for key in key_array:
-    #            delete_note = create_html_link(CFG_SITE_URL +
-    #                        '/admin2/bibcirculation/ill_request_details_step2',
-    #                    {'delete_key': key, 'ill_request_id': ill_request_id,
-    #                'ill_status': ill_status, 'library_notes': library_notes,
-    #                'ln': ln}, (_("[delete]")))
-    #
-    #            out += """<tr class="bibcirccontent">
-    #                        <td class="bibcircnotes" width="160" valign="top" align="center"><b>%s</b></td>
-    #                        <td width="400"><i>%s</i></td>
-    #                        <td width="65" align="center">%s</td>
-    #                      </tr>
-    #
-    #                  """ % (key, previous_library_notes[key], delete_note)
-    #
-    #
-    #        out += """
-    #                        </table>
-    #                      </td>
-    #                    </tr>
-    #                    <tr>
-    #                      <th width="100">%s</th>
-    #                      <td class="bibcirccontent"><i>%s</i></td>
-    #                    </tr>
-    #                  </table>
-    #                </td>
-    #              </tr>
-    #            </table>
-    #
-    #                 """ % (_("Library notes"), library_notes or '-')
-    #
-    #    elif ill_status ==  CFG_BIBCIRCULATION_ILL_STATUS_REQUESTED:
-    #
-    #        if not ill_req_details:
-    #            previous_library_notes = {}
-    #        else:
-    #            previous_library_notes = eval(ill_req_details[8])
-    #
-    #        (ill_request_id, library_id, request_date, expected_date,
-    #         cost, currency, barcode, library_notes) = request_info
-    #
-    #        if library_id:
-    #            library_name = db.get_library_name(library_id)
-    #        else:
-    #            library_name = '-'
-    #
-    #        out += """
-    #        <input type=hidden name=ill_status value="%s">
-    #        <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent"><b>%s</b></td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #              <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s %s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100" valign="top">%s</th>
-    #             <td>
-    #               <table class="bibcircnotes">
-    #            """ % (ill_status, _("Status"), ill_status,
-    #                   _("ILL request ID"), ill_request_id,
-    #                   _("Library/Supplier"), library_name,
-    #                   _("Request date"), request_date,
-    #                   _("Expected date"), expected_date,
-    #                   _("Cost"), cost, currency,
-    #                   _("Barcode"), barcode,
-    #                   _("Previous notes"))
-    #
-    #        key_array = previous_library_notes.keys()
-    #        key_array.sort()
-    #
-    #        for key in key_array:
-    #            delete_note = create_html_link(CFG_SITE_URL +
-    #                        '/admin2/bibcirculation/ill_request_details_step2',
-    #                {'delete_key': key, 'ill_request_id': ill_request_id,
-    #                'ill_status': ill_status, 'library_notes': library_notes,
-    #                'ln': ln}, (_("[delete]")))
-    #
-    #            out += """<tr class="bibcirccontent">
-    #                        <td class="bibcircnotes" width="160" valign="top" align="center"><b>%s</b></td>
-    #                        <td width="400"><i>%s</i></td>
-    #                        <td width="65" align="center">%s</td>
-    #                      </tr>
-    #
-    #                  """ % (key, previous_library_notes[key], delete_note)
-    #
-    #
-    #        out += """
-    #                        </table>
-    #                      </td>
-    #                    </tr>
-    #           <tr>
-    #               <th width="100">%s</th>
-    #               <td class="bibcirccontent"><i>%s</i></td>
-    #           </tr>
-    #          </table>
-    #          </td>
-    #          </tr>
-    #          </table>
-    #          """ % (_("Library notes"), library_notes or '-')
-    #
-    #    elif ill_status == 'request cancelled':
-    #        (library_id, request_date, expected_date,
-    #         previous_library_notes) = ill_req_details
-    #
-    #        if not previous_library_notes:
-    #            previous_library_notes = {}
-    #        else:
-    #            previous_library_notes = eval(previous_library_notes)
-    #
-    #        (ill_request_id, cost, currency,
-    #         barcode, library_notes) = request_info
-    #
-    #        if library_id:
-    #            library_name = db.get_library_name(library_id)
-    #        else:
-    #            library_name = '-'
-    #
-    #        out += """
-    #        <input type=hidden name=ill_status value="%s">
-    #        <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent"><b>%s</b></td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #              <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #              <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s %s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100" valign="top">%s</th>
-    #             <td>
-    #               <table class="bibcircnotes">
-    #            """ % (ill_status, _("Status"), ill_status,
-    #                    _("ILL request ID"), ill_request_id,
-    #                    _("Library/Supplier"), library_name,
-    #                    _("Request date"), request_date,
-    #                    _("Expected date"), expected_date,
-    #                    _("Cost"), cost, currency,
-    #                    _("Barcode"), barcode,
-    #                    _("Previous notes"))
-    #
-    #        key_array = previous_library_notes.keys()
-    #        key_array.sort()
-    #
-    #        for key in key_array:
-    #            delete_note = create_html_link(CFG_SITE_URL +
-    #                        '/admin2/bibcirculation/ill_request_details_step2',
-    #                    {'delete_key': key, 'ill_request_id': ill_request_id,
-    #                     'ill_status': ill_status,
-    #                     'library_notes': library_notes, 'ln': ln},
-    #                    (_("[delete]")))
-    #
-    #            out += """<tr class="bibcirccontent">
-    #                        <td class="bibcircnotes" width="160" valign="top" align="center"><b>%s</b></td>
-    #                        <td width="400"><i>%s</i></td>
-    #                        <td width="65" align="center">%s</td>
-    #                      </tr>
-    #
-    #                  """ % (key, previous_library_notes[key], delete_note)
-    #
-    #
-    #        out += """
-    #                        </table>
-    #                      </td>
-    #                    </tr>
-    #           <tr>
-    #               <th width="100">%s</th>
-    #               <td class="bibcirccontent"><i>%s</i></td>
-    #           </tr>
-    #          </table>
-    #          </td>
-    #          </tr>
-    #          </table>
-    #          """ % (_("Library notes"), library_notes or '-')
-    #
-    #    elif ill_status == 'item received, due date defined':
-    #
-    #        (library_id, request_date, expected_date,
-    #         previous_library_notes) = ill_req_details
-    #
-    #        if not previous_library_notes:
-    #            previous_library_notes = {}
-    #        else:
-    #            previous_library_notes = eval(previous_library_notes)
-    #
-    #        (ill_request_id, arrival_date, due_date, cost, currency, barcode,
-    #         library_notes) = request_info
-    #
-    #        if library_id:
-    #            library_name = db.get_library_name(library_id)
-    #        else:
-    #            library_name = '-'
-    #
-    #        out += """
-    #        <input type=hidden name=ill_status value="%s">
-    #        <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent"><b>%s</b></td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #              <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #              <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #             <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s %s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100" valign="top">%s</th>
-    #             <td>
-    #               <table class="bibcircnotes">
-    #            """ % (ill_status, _("Status"), ill_status,
-    #                     _("ILL request ID"), ill_request_id,
-    #                     _("Library/Supplier"), library_name,
-    #                     _("Request date"), request_date,
-    #                     _("Expected date"), expected_date,
-    #                     _("Arrival date"), arrival_date,
-    #                     _("Due date"), due_date,
-    #                     _("Cost"), cost, currency,
-    #                     _("Barcode"), barcode,
-    #                     _("Previous notes"))
-    #
-    #        key_array = previous_library_notes.keys()
-    #        key_array.sort()
-    #
-    #        for key in key_array:
-    #            delete_note = create_html_link(CFG_SITE_URL +
-    #                        '/admin2/bibcirculation/ill_request_details_step2',
-    #                {'delete_key': key, 'ill_request_id': ill_request_id,
-    #                'ill_status': ill_status, 'library_notes': library_notes,
-    #                'ln': ln}, (_("[delete]")))
-    #
-    #            out += """<tr class="bibcirccontent">
-    #                        <td class="bibcircnotes" width="160" valign="top" align="center"><b>%s</b></td>
-    #                        <td width="400"><i>%s</i></td>
-    #                        <td width="65" align="center">%s</td>
-    #                      </tr>
-    #
-    #                  """ % (key, previous_library_notes[key], delete_note)
-    #
-    #
-    #        out += """
-    #                        </table>
-    #                      </td>
-    #                    </tr>
-    #           <tr>
-    #               <th width="100">%s</th>
-    #               <td class="bibcirccontent"><i>%s</i></td>
-    #           </tr>
-    #          </table>
-    #          </td>
-    #          </tr>
-    #          </table>
-    #          """ % (_("Library notes"), library_notes or '-')
-    #
-    #    elif ill_status == 'item returned':
-    #
-    #        (library_id, request_date, expected_date, arrival_date, due_date,
-    #         barcode, previous_library_notes) = ill_req_details
-    #
-    #        previous_library_notes = eval(previous_library_notes)
-    #
-    #        (ill_request_id, return_date, cost,
-    #         currency, library_notes) = request_info
-    #
-    #        library_name = db.get_library_name(library_id)
-    #
-    #        out += """
-    #        <input type=hidden name=ill_status value="%s">
-    #        <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent"><b>%s</b></td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #              <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #            <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s %s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100" valign="top">%s</th>
-    #             <td>
-    #               <table class="bibcircnotes">
-    #               """ % (ill_status, _("Status"), ill_status,
-    #                        _("ILL request ID"), ill_request_id,
-    #                        _("Library/Supplier"), library_name,
-    #                        _("Request date"), request_date,
-    #                        _("Expected date"), expected_date,
-    #                        _("Arrival date"), arrival_date,
-    #                        _("Due date"), due_date,
-    #                        _("Return date"), return_date,
-    #                        _("Cost"), cost, currency,
-    #                        _("Barcode"), barcode,
-    #                        _("Previous notes"))
-    #
-    #        key_array = previous_library_notes.keys()
-    #        key_array.sort()
-    #
-    #        for key in key_array:
-    #            delete_note = create_html_link(CFG_SITE_URL +
-    #                    '/admin2/bibcirculation/ill_request_details_step2',
-    #                    {'delete_key': key, 'ill_request_id': ill_request_id,
-    #                     'ill_status': ill_status,
-    #                     'library_notes': library_notes, 'ln': ln},
-    #                     (_("[delete]")))
-    #
-    #            out += """<tr class="bibcirccontent">
-    #                        <td class="bibcircnotes" width="160" valign="top" align="center"><b>%s</b></td>
-    #                        <td width="400"><i>%s</i></td>
-    #                        <td width="65" align="center">%s</td>
-    #                      </tr>
-    #
-    #                  """ % (key, previous_library_notes[key], delete_note)
-    #
-    #
-    #        out += """
-    #                        </table>
-    #                      </td>
-    #                    </tr>
-    #           <tr>
-    #               <th width="100">%s</th>
-    #               <td class="bibcirccontent"><i>%s</i></td>
-    #           </tr>
-    #          </table>
-    #          </td>
-    #          </tr>
-    #          </table>
-    #          """ % (_("Library notes"), library_notes or '-')
-    #
-    #    else:
-    #
-    #        (library_id, request_date, expected_date, arrival_date,
-    #                     due_date, return_date, cost, barcode,
-    #                     previous_library_notes) = ill_req_details
-    #
-    #        previous_library_notes = eval(previous_library_notes)
-    #
-    #        (value, currency) = cost.split()
-    #
-    #        (ill_request_id, library_notes) = request_info
-    #
-    #        library_name = db.get_library_name(library_id)
-    #
-    #        out += """
-    #        <input type=hidden name=ill_status value="%s">
-    #        <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent"><b>%s</b></td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #              <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #            <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s %s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100">%s</th>
-    #             <td class="bibcirccontent">%s</td>
-    #           </tr>
-    #           <tr>
-    #             <th width="100" valign="top">%s</th>
-    #             <td>
-    #               <table class="bibcircnotes">
-    #               """ % (ill_status, _("Status"), ill_status,
-    #                    _("ILL request ID"), ill_request_id,
-    #                    _("Library/Supplier"), library_name,
-    #                    _("Request date"), request_date,
-    #                    _("Expected date"), expected_date,
-    #                    _("Arrival date"), arrival_date,
-    #                    _("Due date"), due_date,
-    #                    _("Return date"), return_date,
-    #                    _("Cost"), value, currency,
-    #                    _("Barcode"), barcode,
-    #                    _("Previous notes"))
-    #
-    #        key_array = previous_library_notes.keys()
-    #        key_array.sort()
-    #
-    #        for key in key_array:
-    #            delete_note = create_html_link(CFG_SITE_URL +
-    #                        '/admin2/bibcirculation/ill_request_details_step2',
-    #                    {'delete_key': key, 'ill_request_id': ill_request_id,
-    #                     'ill_status': ill_status,
-    #                     'library_notes': library_notes, 'ln': ln},
-    #                    (_("[delete]")))
-    #
-    #            out += """<tr class="bibcirccontent">
-    #                        <td class="bibcircnotes" width="160" valign="top" align="center"><b>%s</b></td>
-    #                        <td width="400"><i>%s</i></td>
-    #                        <td width="65" align="center">%s</td>
-    #                      </tr>
-    #
-    #                  """ % (key, previous_library_notes[key], delete_note)
-    #
-    #
-    #        out += """
-    #                        </table>
-    #                      </td>
-    #                    </tr>
-    #           <tr>
-    #               <th width="100">%s</th>
-    #               <td class="bibcirccontent"><i>%s</i></td>
-    #           </tr>
-    #          </table>
-    #          </td>
-    #          </tr>
-    #          </table>
-    #          """ % (_("Library notes"), library_notes or '-')
-    #
-    #    out += """
-    #         <br />
-    #         <table class="bibcirctable">
-    #            <tr>
-    #              <td>
-    #                   <input type=button value="%s"
-    #                    onClick="history.go(-1)" class="formbutton">
-    #
-    #                   <input type="submit"
-    #                   value="%s" class="formbutton">
-    #
-    #              </td>
-    #             </tr>
-    #         </table>
-    #         </div>
-    #         </form>
-    #         <br />
-    #         <br />
-    #           """ % (_("Back"), _("Continue"))
-    #
-    #    return out
-
-    #def tmpl_ill_request_details_step3(self, ln=CFG_SITE_LANG):
-    #    """
-    #    Last step of the request procedure.
-    #
-    #    @param ln: language of the page
-    #    """
-    #
-    #    _ = gettext_set_language(ln)
-    #
-    #    out = """ """
-    #
-    #    out += load_menu(ln)
-    #
-    #
-    #    out += """
-    #    <div class="bibcircbottom">
-    #    <br />
-    #    <br />
-    #    <table class="bibcirctable">
-    #    <tr>
-    #    <td class="bibcirccontent" width="30">%s</td>
-    #    </tr>
-    #    </table>
-    #    <br />
-    #    <br />
-    #    <table class="bibcirctable">
-    #    <td>
-    #        <input type=button
-    #            onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s'"
-    #            value='%s' class='formbutton'>
-    #    </td>
-    #    </table>
-    #    <br />
-    #    <br />
-    #    </div>
-    #
-    #    """ % (_("An ILL request has been updated with success."),
-    #           CFG_SITE_URL, ln, _("Back to home"))
-    #
-    #
-    #    return out
 
     def tmpl_ordered_book_details_step1(self, order_details, list_of_vendors,
                                         ln=CFG_SITE_LANG):
@@ -15540,24 +15611,31 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
           </tr>
         </thead>
         <tbody>
-         """% (_("ILL ID"),
-               _("Item"),
-               _("Supplier"),
-               _("Request date"),
-               _("Expected date"),
-               _("Arrival date"),
-               _("Due date"),
-               _("Status"),
-               _("Library notes"))
+         """ % (_("ILL ID"),
+                _("Item"),
+                _("Supplier"),
+                _("Request date"),
+                _("Expected date"),
+                _("Arrival date"),
+                _("Due date"),
+                _("Status"),
+                _("Library notes"))
 
         for (ill_id, book_info, supplier_id, request_date,
              expected_date, arrival_date, due_date, status,
-             library_notes) in result:
+             library_notes, request_type) in result:
 
             #get supplier name
             if supplier_id:
-                library_name = db.get_library_name(supplier_id)
-                library_link = create_html_link(CFG_SITE_URL +
+                if request_type in CFG_BIBCIRCULATION_ACQ_TYPE:
+                    library_name = db.get_vendor_name(supplier_id)
+                    library_link = create_html_link(CFG_SITE_URL +
+                                '/admin2/bibcirculation/get_vendor_details',
+                                {'vendor_id': supplier_id, 'ln': ln},
+                                (library_name))
+                else:
+                    library_name = db.get_library_name(supplier_id)
+                    library_link = create_html_link(CFG_SITE_URL +
                                 '/admin2/bibcirculation/get_library_details',
                                 {'library_id': supplier_id, 'ln': ln},
                                 (library_name))
@@ -15574,14 +15652,16 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
             except KeyError:
                 title_link = book_info['title']
 
-            try:
+            if request_type in CFG_BIBCIRCULATION_ACQ_TYPE:
+                ill_id_link = create_html_link(CFG_SITE_URL +
+                            '/admin2/bibcirculation/acq_details_step1',
+                            {'ill_request_id': str(ill_id), 'ln': ln},
+                            str(ill_id))
+            else:
                 ill_id_link = create_html_link(CFG_SITE_URL +
                             '/admin2/bibcirculation/ill_request_details_step1',
                             {'ill_request_id': str(ill_id), 'ln': ln},
                             str(ill_id))
-
-            except KeyError:
-                title_link = book_info['title']
 
             # links to notes pages
             lib_no_notes_link = create_html_link(CFG_SITE_URL +
@@ -15609,7 +15689,6 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
               <td>%s</td>
               <td>%s</td>
             </tr>
-
             """ % (ill_id_link, title_link, library_link, request_date,
                    expected_date, arrival_date, due_date, status,
                    notes_link)
@@ -16644,6 +16723,506 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
     #
     #    return out
 
+    def tmpl_register_purchase_request_step1(self, infos, fields, admin=True,
+                                             ln=CFG_SITE_LANG):
+        """
+        @param infos: informations
+        @type infos: list
+        """
+
+        _ = gettext_set_language(ln)
+
+        if admin:
+            form_url = CFG_SITE_URL + \
+                    '/admin2/bibcirculation/register_purchase_request_step2'
+        else:
+            form_url = CFG_SITE_URL+'/ill/acq_request_step2'
+
+        if fields is not None:
+            (type, title, authors, place, publisher, year, edition,
+             this_edition_only, isbn, standard_number, budget_code, cash,
+             period_of_interest_from, period_of_interest_to,
+             additional_comments) = fields
+
+        if cash:
+            checked_cash = 'checked'
+        else:
+            checked_cash = ''
+
+        if this_edition_only == 'Yes':
+            checked_edition = 'checked'
+        else:
+            checked_edition = ''
+
+        out = ''
+
+        if admin:
+            out += load_menu(ln)
+
+        out += """<br />""" + self.tmpl_infobox(infos, ln)
+
+        if not admin:
+            out += _("According to a decision from the Scientific Information Policy Board, books purchased with budget codes other than Team accounts will be added to the Library catalogue, with the indication of the purchaser.")
+        out += """
+          <div class="bibcircbottom" align="center">
+          <br />
+          <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+          """
+        out += """
+            <form name="display_ill_form" action="%s" method="post">
+                """ % (form_url)
+        out += """
+                <table class="bibcirctable">
+                    <tr align="center">
+                        <td class="bibcirctableheader" width="10">%s</td>
+                    </tr>
+                </table>
+                <table class="tablesorterborrower" border="0"
+                       cellpadding="0" cellspacing="1">
+                    <tr>
+                        <th width="100">%s</th>
+                        <td>
+                            <SELECT name="type" style='border: 1px solid #cfcfcf'>
+                """ % (_("Document details"), _("Document type"))
+
+        for acq_type in CFG_BIBCIRCULATION_ACQ_TYPE:
+            if type == acq_type or type == '':
+                out += """
+                                <OPTION VALUE="%s" selected="selected">%s
+                """ % (acq_type, acq_type)
+            else:
+                out += """
+                                <OPTION VALUE="%s">%s
+                """ % (acq_type, acq_type)
+
+        out += """
+                            </SELECT>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="100">%s</th>
+                        <td>
+                            <input type="text" size="45" name="title"
+                                   id='title' value='%s'
+                                   style='border: 1px solid #cfcfcf'>
+                            <script language="javascript" type="text/javascript">
+                                    document.getElementById("title").focus();
+                            </script>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="100">%s</th>
+                        <td>
+                            <input type="text" size="45" name="authors"
+                                   value='%s'
+                                   style='border: 1px solid #cfcfcf'>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="100">%s</th>
+                        <td>
+                            <input type="text" size="30" name="place"
+                                   value='%s'
+                                   style='border: 1px solid #cfcfcf'>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="100">%s</th>
+                        <td>
+                            <input type="text" size="30" name="publisher"
+                                   value='%s'
+                                   style='border: 1px solid #cfcfcf'>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="100">%s</th>
+                        <td>
+                            <input type="text" size="30" name="year"
+                                   value='%s'
+                                   style='border: 1px solid #cfcfcf'>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="100">%s</th>
+                        <td>
+                            <input type="text" size="30" name="edition"
+                                   value='%s'
+                                   style='border: 1px solid #cfcfcf'>
+                                   <br />
+                            <input name="this_edition_only"
+                                   type="checkbox" value="Yes" %s/>%s</td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="100">%s</th>
+                        <td>
+                            <input type="text" size="30" name="isbn"
+                                   value='%s'
+                                   style='border: 1px solid #cfcfcf'>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="100">%s</th>
+                        <td>
+                            <input type="text" size="30" name="standard_number"
+                                   value='%s'
+                                   style='border: 1px solid #cfcfcf'>
+                        </td>
+                    </tr>
+                </table>
+            <br />
+           """ % (_("Title"), title,
+                  _("Author(s)"), authors,
+                  _("Place"), place,
+                  _("Publisher"), publisher,
+                  _("Year"), year,
+                  _("Edition"), edition,
+                  checked_edition, _("This edition only"),
+                  _("ISBN"), isbn,
+                  _("Standard number"), standard_number)
+        # type, title, author, place, publisher, year, edition, isbn, standard_number
+
+        out += """
+            <script type="text/javascript" language='JavaScript'
+                    src="%s/js/jquery.min.js"></script>
+            <script type="text/javascript" language='JavaScript'
+                    src="%s/js/ui.datepicker.min.js"></script>
+
+             <table class="bibcirctable">
+                <tr align="center">
+                     <td class="bibcirctableheader">%s</td>
+                </tr>
+             </table>
+             <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
+                <tr>
+                    <th width="100">%s</th>
+                    <td>
+                        <input type="text" size="30" name="budget_code"
+                               style='border: 1px solid #cfcfcf'>
+                        <input name="cash" type="checkbox" value="Yes" %s/>%s</td>
+                </tr>
+                <tr>
+                    <th width="150">%s</th>
+                    <td>
+                        <script type="text/javascript">
+                            $(function(){
+                            $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd',
+                                         showOn: 'button', buttonImage: "%s/img/calendar.gif",
+                                         buttonImageOnly: true});
+                            });
+                        </script>
+                        <input type="text" size="12" id="date_picker1"
+                               name="period_of_interest_from" value="%s"
+                               style='border: 1px solid #cfcfcf'>
+                    </td>
+                </tr>
+                <tr>
+                    <th width="150">%s</th>
+                    <td>
+                        <script type="text/javascript">
+                            $(function(){
+                            $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd',
+                                        showOn: 'button', buttonImage: "%s/img/calendar.gif",
+                                        buttonImageOnly: true});
+                            });
+                        </script>
+                        <input type="text" size="12" id="date_picker2"
+                               name="period_of_interest_to" value="%s"
+                               style='border: 1px solid #cfcfcf'>
+                    </td>
+                </tr>
+                <tr>
+                   <th valign="top" width="150">%s</th>
+                    <td>
+                        <textarea name='additional_comments' rows="6" cols="30"
+                                  style='border: 1px solid #cfcfcf'></textarea>
+                        </td>
+                </tr>
+              </table>
+              <table class="bibcirctable">
+                <tr align="center">
+                    <td>
+                        <input type=button value="%s"
+                               onClick="history.go(-1)" class="formbutton">
+                        <input type="submit"
+                               value="%s" class="formbutton">
+                    </td>
+                </tr>
+              </table>
+              </form>
+              <br />
+              </div>
+    """ % (CFG_SITE_URL, CFG_SITE_URL, _("Request details"),
+           _("Budget code"), checked_cash, _("Cash"),
+           _("Period of interest - From"), CFG_SITE_URL,
+           datetime.date.today().strftime('%Y-%m-%d'),
+           _("Period of interest - To"), CFG_SITE_URL,
+    (datetime.date.today() + datetime.timedelta(days=365)).strftime('%Y-%m-%d'),
+          _("Additional comments"), _("Back"), _("Continue"))
+
+        return out
+
+    def tmpl_register_purchase_request_step2(self, infos, fields, result,
+                                             p, f, ln=CFG_SITE_LANG):
+
+        if fields is not None:
+            (type, title, authors, place, publisher, year, edition,
+             this_edition_only, isbn, standard_number, budget_code, cash,
+             period_of_interest_from, period_of_interest_to,
+             additional_comments) = fields
+
+        _ = gettext_set_language(ln)
+
+        out = self.tmpl_infobox(infos, ln)
+
+        out += load_menu(ln)
+
+        out += """
+        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <div class="bibcircbottom">
+         <form name="step2_form1"
+               action="%s/admin2/bibcirculation/register_purchase_request_step2"
+               method="get">
+        <br />
+          <table class="bibcirctable">
+                  <tr>
+                     <td class="bibcirctableheader" width="10">%s</td>
+                  </tr>
+                </table>
+                <table class="bibcirctable">
+                  <tr>
+                    <td width="500" valign='top'>
+                      <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                        <tr>
+                          <th width="100">%s</th>
+                          <td>%s</td><input type=hidden name=type value="%s">
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td>%s</td><input type=hidden name=title value="%s">
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td>%s</td><input type=hidden name=authors value="%s">
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td>%s</td><input type=hidden name=place value="%s">
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td>%s</td><input type=hidden name=publisher value="%s">
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td>%s</td><input type=hidden name=year value="%s">
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td>%s</td><input type=hidden name=edition value="%s">
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td>%s</td><input type=hidden name=isbn value="%s">
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td>%s</td><input type=hidden name=standard_number value="%s">
+                        </tr>
+                      </table>
+                      <table>
+                         <tr>
+                           <td class="bibcirctableheader">%s</td>
+                        </tr>
+                       </table>
+                       <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                        <tr>
+                            <th width="100">%s</th>
+                            <td>%s</td><input type=hidden name=budget_code value="%s">
+                        </tr>
+
+                        <tr>
+                          <th width="100">%s</th>
+                          <td>%s</td><input type=hidden name=period_of_interest_from value="%s">
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td>%s</td><input type=hidden name=period_of_interest_to value="%s">
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td>%s</td><input type=hidden name=additional_comments value="%s">
+                        </tr>
+                      </table>
+                     </td>
+                     <td width="200" align='center' valign='top'>
+                     </td>
+        """ % (CFG_SITE_URL,
+             _("Item details"),
+             _("Type"), type, type,
+             _("Title"), title, title,
+             _("Author(s)"), authors, authors,
+             _("Place"), place, place,
+             _("Publisher"), publisher, publisher,
+             _("Year"), year, year,
+             _("Edition"), edition, edition,
+             _("ISBN"), isbn, isbn,
+             _("Standard number"), standard_number, standard_number,
+             _("Request details"),
+             _("Budget code"), budget_code, budget_code,
+             _("Period of interest - From"),
+             period_of_interest_from, period_of_interest_from,
+             _("Period of interest - To"),
+             period_of_interest_to, period_of_interest_to,
+             _("Additional comments"),
+             additional_comments, additional_comments)
+
+        out += """
+        <td valign='top' align='center'>
+         <table>
+            """
+
+        if CFG_CERN_SITE == 1:
+            out += """
+                <tr>
+                   <td class="bibcirctableheader" align="center">%s
+                   """ % (_("Search user by"))
+
+            if f == 'email':
+                out += """
+                   <input type="radio" name="f" value="ccid">%s
+                   <input type="radio" name="f" value="name">%s
+                   <input type="radio" name="f" value="email" checked>%s
+                   """ % ('ccid', _('name'), _('email'))
+
+            elif f == 'name':
+                out += """
+                   <input type="radio" name="f" value="ccid">%s
+                   <input type="radio" name="f" value="name" checked>%s
+                   <input type="radio" name="f" value="email">%s
+                   """ % ('ccid', _('name'), _('email'))
+
+            else:
+                out += """
+                   <input type="radio" name="f" value="ccid" checked>%s
+                   <input type="radio" name="f" value="name">%s
+                   <input type="radio" name="f" value="email">%s
+                   """ % ('ccid', _('name'), _('email'))
+
+        else:
+            out += """
+                 <tr>
+                   <td align="center" class="bibcirctableheader">%s
+                   """ % (_("Search borrower by"))
+
+            if f == 'email':
+                out += """
+                   <input type="radio" name="f" value="id">%s
+                   <input type="radio" name="f" value="name">%s
+                   <input type="radio" name="f" value="email" checked>%s
+                   """ % (_('id'), _('name'), _('email'))
+
+            elif f == 'id':
+                out += """
+                   <input type="radio" name="f" value="id" checked>%s
+                   <input type="radio" name="f" value="name">%s
+                   <input type="radio" name="f" value="email">%s
+                   """ % (_('id'), _('name'), _('email'))
+
+            else:
+                out += """
+                   <input type="radio" name="f" value="id">%s
+                   <input type="radio" name="f" value="name" checked>%s
+                   <input type="radio" name="f" value="email">%s
+                   """ % (_('id'), _('name'), _('email'))
+
+        out += """
+                    <br><br>
+                    </td>
+                    </tr>
+                    <tr>
+                        <td align="center">
+                            <input type="text" size="40" id="string" name="p"
+                                   value='%s'  style='border: 1px solid #cfcfcf'>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">
+                            <br>
+                            <input type="submit" value="%s" class="formbutton">
+                        </td>
+                    </tr>
+                   </table>
+          </form>
+
+        """ % (p or '', _("Search"))
+
+        if result:
+            out += """
+            <br />
+            <form name="step1_form2"
+                  action="%s/admin2/bibcirculation/register_purchase_request_step3"
+                  method="post" >
+            <input type=hidden name=type value="%s">
+            <input type=hidden name=title value="%s">
+            <input type=hidden name=authors value="%s">
+            <input type=hidden name=place value="%s">
+            <input type=hidden name=publisher value="%s">
+            <input type=hidden name=year value="%s">
+            <input type=hidden name=edition value="%s">
+            <input type=hidden name=this_edition_only value="%s">
+            <input type=hidden name=isbn value="%s">
+            <input type=hidden name=standard_number value="%s">
+            <input type=hidden name=budget_code value="%s">
+            <input type=hidden name=cash value="%s">
+            <input type=hidden name=period_of_interest_from value="%s">
+            <input type=hidden name=period_of_interest_to value="%s">
+            <input type=hidden name=additional_comments value="%s">
+            <table class="bibcirctable">
+              <tr width="200">
+                <td align="center">
+                    <select name="borrower_id" size="8"
+                          style='border: 1px solid #cfcfcf'>
+            """ % (CFG_SITE_URL, type, title, authors, place, publisher, year,
+                   edition, this_edition_only, isbn, standard_number,
+                   budget_code, cash, period_of_interest_from,
+                   period_of_interest_to, additional_comments)
+
+            for (borrower_id, ccid, name, email,
+                 phone, address, mailbox) in result:
+                out += """
+                       <option value =%s>%s</option>
+                       """ % (borrower_id, name)
+
+            out += """
+                    </select>
+                </td>
+              </tr>
+            </table>
+            <table class="bibcirctable">
+                <tr>
+                    <td align="center">
+                        <input type="submit" value='%s' class="formbutton">
+                    </td>
+                </tr>
+            </table>
+
+            </form>
+            """ % (_("Select user"))
+
+        out += """
+                  </td>
+                </tr>
+              </table>
+              <br />
+              <br />
+              <br />
+              <br />
+              </div>
+              """
+
+        return out
+
     def tmpl_register_ill_article_request_step1(self, infos, admin=True,
                                                 ln=CFG_SITE_LANG):
         """
@@ -17144,9 +17723,6 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
 
         out += load_menu(ln)
 
-#<input type=hidden name=start value="0">
-#<input type=hidden name=end value="10">
-
         out += """
         <div class="bibcircbottom">
         <link rel=\"stylesheet\" href=\"%(site_url)s/img/jquery-ui.css\" type=\"text/css\" />
@@ -17168,6 +17744,8 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
             <td class="bibcirctableheader">%s
               <input type="radio" name="f" value="title" checked>%s
               <input type="radio" name="f" value="ILL_request_ID">%s
+              <input type="radio" name="f" value="cost">%s
+              <input type="radio" name="f" value="notes">%s
             </td>
           </tr>
         </table>
@@ -17184,7 +17762,8 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                 </td>
             </tr>
         </table>
-        """ % (_("Search ILL request by"), _("title"), _("ILL request id"))
+        """ % (_("Search ILL request by"), _("title"),
+               _("ILL request id"), _("cost"), _("notes"))
 
         out += """
         <br />
