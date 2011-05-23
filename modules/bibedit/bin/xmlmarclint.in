@@ -12,7 +12,7 @@
 ## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -61,20 +61,20 @@ for opt in opts:
         except ValueError:
             print "Error: verbose must be an integer."
             sys.exit(2)
-    
+
 try:
     xmlfile = args[0]
 except IndexError:
     sys.stderr.write(cmdusage)
     sys.exit(0)
-      
+
 try:
     xmltext = open(xmlfile,'r').read()
 except IOError:
     print "Error: File %s not found." % xmlfile
     import sys
     sys.exit(1)
-    
+
 listofrecs = create_records(xmltext, 0, 1)
 badr = filter((lambda x: x[1]==0), listofrecs)
 badrecords = map((lambda x:x[0]), badr)
@@ -83,7 +83,8 @@ s = ''
 e = ''
 
 if xmltext and not listofrecs:
-    print "Warning: no valid record detected."
+    print "Error: no valid record detected."
+    sys.exit(1)
 
 if verbose:
     if verbose <= 3:
@@ -95,7 +96,7 @@ else:
     if badrecords:
         print "Error: Bad records detected.  For more information, increase verbosity."
         sys.exit(1)
-        
+
 if s != '' or e != '':
     print s
     print e
