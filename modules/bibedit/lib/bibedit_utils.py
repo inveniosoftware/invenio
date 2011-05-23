@@ -486,13 +486,14 @@ def get_templates(templatesDir, tmpl_name, tmpl_description, extractContent = Fa
 
     templates = []
     for fname in template_fnames:
-        template_file = open('%s%s%s' % (
-                templatesDir, os.sep, fname),'r')
+        filepath = '%s%s%s' % (templatesDir, os.sep, fname)
+        template_file = open(filepath,'r')
         template = template_file.read()
         template_file.close()
         fname_stripped = os.path.splitext(fname)[0]
         mo_name = tmpl_name.search(template)
         mo_description = tmpl_description.search(template)
+        date_modified = time.ctime(os.path.getmtime(filepath))
         if mo_name:
             name = mo_name.group(1)
         else:
@@ -509,7 +510,7 @@ def get_templates(templatesDir, tmpl_name, tmpl_description, extractContent = Fa
             else:
                 raise "Problem when parsing the template %s" % (fname, )
         else:
-            templates.append([fname_stripped, name, description])
+            templates.append([fname_stripped, name, description, date_modified])
 
     return templates
 

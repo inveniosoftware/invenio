@@ -1118,3 +1118,31 @@ function escapeHTML(value){
   return value;
 }
 
+
+/*
+ * **************************** Functions related to Template interface ****************************************
+ */
+
+function createTemplateList(){
+  /*
+   * Display list of templates available with their description and links to
+   * edit them.
+   */
+  var msg = '';
+  var templatesCount = gRECORD_TEMPLATES.length;
+  if (!templatesCount)
+    msg += '<tr><td style="padding-left: 10px;">No record templates found' +
+      '</td></tr>';
+  else{
+    for (var i=0, n=templatesCount; i<n; i++)
+      msg += '<tr style="border-width: 1px;">' +
+  '<td style="padding-left: 10px; padding-right: 10px;">' +
+  '<a href="#" id="lnkEditTemplateRecord_' + i + '" title="Click to edit"><b>' +
+  gRECORD_TEMPLATES[i][1] + '</b></a></td>' +
+  '<td style="padding-left: 10px; padding-right: 10px;">' +
+  '<td>' + gRECORD_TEMPLATES[i][2] + '</td> <td>&nbsp;&nbsp;&nbsp;<i>Last modified (' +
+  gRECORD_TEMPLATES[i][3] + ')</i></td></tr><br />';
+  }
+  msg += '</table></li>';
+  $('#bibEditTemplateList').html(msg);
+}

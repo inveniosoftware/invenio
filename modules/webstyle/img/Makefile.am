@@ -96,6 +96,7 @@ img_DATA = add-small.png \
            icon-journal_hms_beagle.gif \
            iconcross.gif \
            iconcross2.gif \
+           page_edit.png \
            pix.png \
            plus_orange.png \
            iconeye.gif \

@@ -1202,3 +1202,61 @@ def _get_formated_record(record):
 
 
     return result
+
+########### Functions related to templates web interface #############
+
+def perform_request_init_template_interface():
+    """Handle a request to manage templates"""
+    errors   = []
+    warnings = []
+    body = ''
+
+    # Add script data.
+    record_templates = get_record_templates()
+    record_templates.sort()
+
+    data = {'gRECORD_TEMPLATES': record_templates,
+            'gSITE_RECORD': '"' + CFG_SITE_RECORD + '"',
+            'gSITE_URL': '"' + CFG_SITE_URL + '"'}
+
+    body += '<script type="text/javascript">\n'
+    for key in data:
+        body += '    var %s = %s;\n' % (key, data[key])
+    body += '    </script>\n'
+
+    # Add scripts (the ordering is NOT irrelevant).
+    scripts = ['jquery.min.js', 'jquery.effects.core.min.js',
+               'jquery.effects.highlight.min.js',
+               'json2.js', 'bibedit_display.js', 'bibedit_template_interface.js']
+
+    for script in scripts:
+        body += '    <script type="text/javascript" src="%s/js/%s">' \
+            '</script>\n' % (CFG_SITE_URL, script)
+
+    body += '    <div id="bibEditTemplateList"></div>\n'
+    body += '    <div id="bibEditTemplateEdit"></div>\n'
+
+    return body, errors, warnings
+
+def perform_request_ajax_template_interface(data):
+    """Handle Ajax requests by redirecting to appropriate function."""
+    response = {}
+    request_type = data['requestType']
+
+    if request_type == 'editTemplate':
+        # Edit a template request.
+        response.update(perform_request_edit_template(data))
+
+    return response
+
+def perform_request_edit_template(data):
+    """ Handle request to edit a template """
+    response = {}
+    template_filename = data['templateFilename']
+    template = get_record_template(template_filename)
+    if not template:
+        response['resultCode']  = 1
+    else:
+        response['templateMARCXML'] = template
+
+    return response

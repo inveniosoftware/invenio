@@ -1037,6 +1037,12 @@ function onNewRecordClick(event){
   event.preventDefault();
 }
 
+function onTemplateRecordClick(event){
+    /* Handle 'Template management' button */
+    var template_window = window.open('/record/edit/templates', '', 'resizeable,scrollbars');
+    template_window.document.close(); // needed for chrome and safari
+}
+
 function getRecord(recID, recRev, onSuccess){
   /* A function retrieving the bibliographic record, using an AJAX request.
    *
