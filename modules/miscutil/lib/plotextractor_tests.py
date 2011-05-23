@@ -24,35 +24,16 @@ __revision__ = "$Id$"
 import os
 import unittest
 
-from invenio.plotextractor import get_defaults, \
-     put_it_together, \
-     find_open_and_close_braces, \
-     intelligently_find_filenames, \
-     assemble_caption
-from invenio.plotextractor_output_utils import remove_dups, get_converted_image_name
+from invenio.plotextractor import put_it_together, \
+                                  find_open_and_close_braces, \
+                                  intelligently_find_filenames, \
+                                  assemble_caption
+from invenio.plotextractor_output_utils import remove_dups, \
+                                               get_converted_image_name
 
 from invenio.config import CFG_TMPDIR, CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.shellutils import run_shell_command
-
-class GetDefaultsTest(unittest.TestCase):
-    """Test function to get default values."""
-    def setUp(self):
-        self.arXiv_id = "arXiv:0901.4942"
-        self.tarball = "/opt/cds-invenio/var/tmp/arXiv:0901.4942/arXiv:0901.4942"
-
-    def test_get_defaults(self):
-        """plotextractor - get defaults"""
-        sdir = None
-        sdir_should_be = os.path.join(CFG_TMPDIR, self.arXiv_id + '_plots')
-
-        sdir, refno = get_defaults(self.tarball, sdir, "http://inspirebeta.net")
-        if sdir != None:
-            run_shell_command("rm -rf %s" % (sdir,))
-        self.assertTrue(sdir == sdir_should_be, \
-                         "didn\'t get correct default scratch dir")
-        self.assertTrue(refno == "812227", \
-                         'didn\'t get correct default reference number')
 
 class PutItTogetherTest(unittest.TestCase):
     """Test functions related to the put_it_together function."""
@@ -337,7 +318,7 @@ class TestGetConvertedImageName(unittest.TestCase):
         converted_image = get_converted_image_name(image)
         self.assertTrue(converted_image == '/path/to/image.png', 'didn\'t change extension')
 
-TEST_SUITE = make_test_suite(GetDefaultsTest, PutItTogetherTest, TestFindOpenAndCloseBraces, \
+TEST_SUITE = make_test_suite(PutItTogetherTest, TestFindOpenAndCloseBraces, \
                              TestIntelligentlyFindFilenames, TestAssembleCaption, TestRemoveDups, \
                              TestGetConvertedImageName) # FIXME
 

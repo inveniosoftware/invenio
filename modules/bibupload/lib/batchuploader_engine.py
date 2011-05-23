@@ -46,6 +46,8 @@ from invenio.textutils import encode_for_xml
 from invenio.bibtask import task_low_level_submission
 from invenio.messages import gettext_set_language
 from invenio.textmarc2xmlmarc import transform_file
+from invenio.shellutils import run_shell_command
+
 
 try:
     from cStringIO import StringIO
@@ -125,10 +127,17 @@ def cli_upload(req, file_content=None, mode=None):
             _log(msg)
             return _write(req, msg)
 
-    # run upload command:
-    cmd = CFG_BINDIR + '/bibupload -u batchupload ' + arg_mode + ' ' + filename
-    os.system(cmd)
-    msg = "[INFO] %s" % cmd
+    # check validity of marcxml
+    xmlmarclint_path = CFG_BINDIR + '/xmlmarclint'
+    xmlmarclint_output, dummy1, dummy2 = run_shell_command('%s %s' % (xmlmarclint_path, filename))
+    if xmlmarclint_output != 0:
+        msg = "[ERROR] MARCXML is not valid."
+        _log(msg)
+        return _write(req, msg)
+    # run upload command
+    bibupload_path = CFG_BINDIR + '/bibupload -u batchupload'
+    run_shell_command('%s %s %s' % (bibupload_path, arg_mode, filename))
+    msg = "[INFO] %s %s %s" % (bibupload_path, arg_mode, filename)
     _log(msg)
     return _write(req, msg)
 
@@ -146,6 +155,7 @@ def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None
     req.content_type = "text/html"
     req.send_http_header()
 
+    error_codes = {'not_authorized': 1, 'invalid_marc': 2}
     # write temporary file:
     if filetype == 'marcxml':
         metafile = metafile.value
@@ -156,7 +166,7 @@ def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None
     tempfile.tempdir = CFG_TMPDIR
     filename = tempfile.mktemp(prefix="batchupload_" + \
         user_info['nickname'] + "_" + time.strftime("%Y%m%d%H%M%S",
-        time.localtime()) + "_" + metafilename + "_")
+        time.localtime()) + "_")
     filedesc = open(filename, 'w')
     filedesc.write(metafile)
     filedesc.close()
@@ -164,8 +174,16 @@ def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None
     # check if this client can run this file:
     allow = _check_client_can_submit_file(req=req, metafile=metafile, webupload=1, ln=ln)
     if allow[0] != 0:
-        return (allow[0], allow[1])
+        return (error_codes['not_authorized'], allow[1])
 
+    # check MARCXML validity
+    if filetype == 'marcxml':
+        # check validity of marcxml
+        xmlmarclint_path = CFG_BINDIR + '/xmlmarclint'
+        xmlmarclint_output, dummy1, dummy2 = run_shell_command('%s %s' % (xmlmarclint_path, filename))
+        if xmlmarclint_output != 0:
+            msg = "[ERROR] MARCXML is not valid."
+            return (error_codes['invalid_marc'], msg)
     # run upload command:
     if exec_date:
         date = exec_date
@@ -468,7 +486,7 @@ def _check_client_can_submit_file(client_ip="", metafile="", req=None, webupload
             if not webupload:
                 return False
             else:
-                return(1, "Invalid tag 980 value")
+                return(1, "Invalid collection in tag 980")
         if not webupload:
             if not filename_tag980_value in CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS[client_ip]:
                 return False

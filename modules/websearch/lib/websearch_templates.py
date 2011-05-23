@@ -4031,7 +4031,7 @@ class Template:
         content = []
 
         for name, frequency in sorted_names_list:
-            prquery = baid_query + " exactauthor:" + name
+            prquery = baid_query + ' exactauthor:"' + name + '"'
             name_lnk = create_html_link(self.build_search_url(p=prquery),
                                                               {},
                                                               str(frequency),)

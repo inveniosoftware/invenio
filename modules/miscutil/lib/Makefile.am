@@ -41,6 +41,7 @@ pylib_DATA = __init__.py \
              testutils.py \
              testutils_regression_tests.py \
              invenio_connector.py \
+             invenio_connector_regression_tests.py \
              urlutils.py \
              urlutils_tests.py \
              w3c_validator.py \
@@ -55,6 +56,7 @@ pylib_DATA = __init__.py \
              plotextractor_getter.py \
              plotextractor_output_utils.py \
              plotextractor_tests.py \
+             plotextractor_regression_tests.py \
              plotextractor_config.py \
              solrutils.py
 

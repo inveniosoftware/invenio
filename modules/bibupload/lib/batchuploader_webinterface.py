@@ -229,15 +229,19 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
                                   date, time, argd['filename'], argd['ln'],
                                   argd['priority'])
 
-        if auth_code != 0:
+        if auth_code == 1: # not authorized
             referer = '/batchuploader/'
             return page_not_authorized(req=req, referer=referer,
                         text=auth_message, navmenuid="batchuploader")
         else:
             uid = getUid(req)
             body = batchuploader_templates.tmpl_display_menu(argd['ln'])
-            body += batchuploader_templates.tmpl_upload_successful(argd['ln'])
-            title = _("Upload successful")
+            if auth_code == 2: # invalid MARCXML
+                body += batchuploader_templates.tmpl_invalid_marcxml(argd['ln'])
+                title = _("Invalid MARCXML")
+            else:
+                body += batchuploader_templates.tmpl_upload_successful(argd['ln'])
+                title = _("Upload successful")
             navtrail = '''<a class="navtrail" href="%s/batchuploader/metadata">%s</a>''' % \
                             (CFG_SITE_URL, _("Metadata batch upload"))
             return page(title = title,

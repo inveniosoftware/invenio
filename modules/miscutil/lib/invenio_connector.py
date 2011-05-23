@@ -86,7 +86,7 @@ class InvenioConnector:
         self.cached_records = {}
         self.cached_baskets = {}
 
-    def search(self, p="", f="", c=None, rg=10, sf="", so="d", sp="",
+    def search(self, p="", f="", c="", rg=10, sf="", so="d", sp="",
                rm="", of="", ot="", p1="", f1="", m1="", op1="",
                p2="", f2="", m2="", op2="", p3="", f3="", m3="",
                jrec=0, recid=-1, recidb=-1, d1="", d1y=0, d1m=0,
@@ -121,15 +121,16 @@ class InvenioConnector:
         if LOCAL_SITE_URL == self.server_url and \
                of != 't':
             # See if user tries to search any restricted collection
-            if type(c) is list:
-                colls = c
-            else:
-                colls = [c]
-            for collection in colls:
-                if collection_restricted_p(collection):
-                    sys.stderr.write("Searching local restricted collections\
-is NOT allowed. Aborting search.\n")
-                    return []
+            if c != "":
+                if type(c) is list:
+                    colls = c
+                else:
+                    colls = [c]
+                for collection in colls:
+                    if collection_restricted_p(collection):
+                        sys.stderr.write("Searching local restricted collections\
+    is NOT allowed. Aborting search.\n")
+                        return []
             results = perform_request_search(p=p, f=f, c=c, rg=rg, sf=sf, so=so, sp=so, rm=rm,
                                             p1=p1, f1=f1, m1=m1, op1=op1,
                                             p2=p2, f2=f2, m2=m2, op2=op2,

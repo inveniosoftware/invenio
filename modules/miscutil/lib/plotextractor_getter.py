@@ -351,12 +351,12 @@ def harvest_single(single, to_dir, selection=("tarball", "pdf")):
             idno = idno[-1]
         yymm = int(idno[:4])
         yymm_dir = make_useful_directories(yymm, to_dir)
-        individual_dir = make_single_directory(yymm_dir, 'arXiv:' + id_str)
         url_for_file = CFG_PLOTEXTRACTOR_ARXIV_BASE + CFG_PLOTEXTRACTOR_ARXIV_E_PRINT + \
                        id_str
         url_for_pdf = CFG_PLOTEXTRACTOR_ARXIV_BASE + CFG_PLOTEXTRACTOR_ARXIV_PDF + \
                       id_str
         individual_file = 'arXiv:' + id_str.replace('/', '_')
+        individual_dir = make_single_directory(yymm_dir, individual_file)
         abs_path = os.path.join(individual_dir, individual_file)
         tarball = abs_path
         pdf = abs_path + '.pdf'

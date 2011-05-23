@@ -1071,6 +1071,7 @@ function onNewRecordClick(event){
   displayNewRecordScreen();
   bindNewRecordHandlers();
   updateStatus('ready');
+  updateToolbar(false);
   event.preventDefault();
 }
 
