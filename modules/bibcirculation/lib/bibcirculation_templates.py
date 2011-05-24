@@ -7351,7 +7351,8 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
         return out
 
     def tmpl_add_new_copy_step3(self, recid, result, libraries,
-                                original_copy_barcode, infos, ln=CFG_SITE_LANG):
+                                original_copy_barcode, tmp_barcode,
+                                infos, ln=CFG_SITE_LANG):
         """
         @param ln: language of the page
         """
@@ -7599,7 +7600,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                     <th>%s</th>
                     <td %s>
                       <input type="text" style='border: 1px solid #cfcfcf' size=35
-                             name="barcode">
+                             name="barcode" value='%s'>
                     </td>
                 </tr>
                 <tr>
@@ -7607,8 +7608,8 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                     <td %s>
                       <select name="library"  style='border: 1px solid #cfcfcf'>
 
-                """ % (_("New copy details"), _("Barcode"), colspan,
-                       _("Library"), colspan)
+                """ % (_("New copy details"), _("Barcode"),
+                       colspan, tmp_barcode, _("Library"), colspan)
 
         main_library = db.get_main_libraries()
         if main_library is not None:

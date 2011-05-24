@@ -43,7 +43,7 @@ from invenio.bibcirculation_config import \
 
 
 from invenio.messages import gettext_set_language
-import datetime, time
+import datetime, time, random
 
 def search_user(column, string):
     if string is not None:
@@ -875,6 +875,17 @@ def has_date_format(date):
         day = date[8:]
 
         return year.isdigit() and month.isdigit() and day.isdigit()
+
+def generate_tmp_barcode():
+
+    tmp_barcode = 'tmp-' + str(random.random())[-8:]
+
+    while(db.barcode_in_use(tmp_barcode)):
+        random_number = generate
+        tmp_barcode = 'tmp-' + str(random.random())[-8:]
+
+    return tmp_barcode
+
 
 def check_database():
 

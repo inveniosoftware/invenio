@@ -53,7 +53,8 @@ from invenio.bibcirculation_utils import book_title_from_MARC, \
       tag_all_requests_as_done, \
       update_user_info_from_ldap, \
       update_requests_statuses, \
-      has_date_format
+      has_date_format, \
+      generate_tmp_barcode
       #is_periodical, \
       #create_ill_record, \
       #create_item_details_url
@@ -71,6 +72,7 @@ bc_templates = invenio.template.load('bibcirculation')
 from invenio.config import \
     CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN, \
     CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF, \
+    CFG_BIBCIRCULATION_ITEM_STATUS_IN_PROCESS, \
     CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN, \
     CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED, \
     CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING, \
@@ -3035,10 +3037,13 @@ def add_new_copy_step3(req, recid, barcode, ln=CFG_SITE_LANG):
         if not db.barcode_in_use(barcode):
             barcode = None
 
+    tmp_barcode = generate_tmp_barcode()
+
     body = bc_templates.tmpl_add_new_copy_step3(recid=recid,
                                                 result=result,
                                                 libraries=libraries,
                                                 original_copy_barcode=barcode,
+                                                tmp_barcode=tmp_barcode,
                                                 infos=infos,
                                                 ln=ln)
 
@@ -3069,28 +3074,44 @@ def add_new_copy_step4(req, barcode, library, location, collection, description,
 
     infos = []
 
+    result = db.get_item_copies_details(recid)
+    libraries = db.get_internal_libraries()
+
     if db.barcode_in_use(barcode):
         infos.append(_("The given barcode <strong>%s</strong> is already in use." % barcode))
-        result = db.get_item_copies_details(recid)
-        libraries = db.get_internal_libraries()
         title = _("Add new copy") + " - III"
         body  = bc_templates.tmpl_add_new_copy_step3(recid=recid,
                                                     result=result,
                                                     libraries=libraries,
                                                     original_copy_barcode=None,
+                                                    tmp_barcode=None,
                                                     infos=infos,
                                                     ln=ln)
     elif not barcode:
         infos.append(_("The given barcode is empty."))
-        result = db.get_item_copies_details(recid)
-        libraries = db.get_internal_libraries()
         title = _("Add new copy") + " - III"
         body  = bc_templates.tmpl_add_new_copy_step3(recid=recid,
                                                     result=result,
                                                     libraries=libraries,
                                                     original_copy_barcode=None,
+                                                    tmp_barcode=None,
                                                     infos=infos,
                                                     ln=ln)
+    elif barcode[:3] == 'tmp' \
+        and status in [CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF,
+                       CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN,
+                       CFG_BIBCIRCULATION_ITEM_STATUS_IN_PROCESS]:
+            infos.append(_("The status selected does not accept tamporary barcodes."))
+            title = _("Add new copy") + " - III"
+            tmp_barcode = generate_tmp_barcode()
+            body  = bc_templates.tmpl_add_new_copy_step3(recid=recid,
+                                                    result=result,
+                                                    libraries=libraries,
+                                                    original_copy_barcode=None,
+                                                    tmp_barcode=tmp_barcode,
+                                                    infos=infos,
+                                                    ln=ln)
+
 
     else:
         library_name = db.get_library_name(library)
