@@ -875,7 +875,7 @@ def _task_sig_dumb(sig, frame):
     """Dumb signal handler."""
     pass
 
-_RE_PSLINE = re.compile('^\s*(.+?)\s+(.+?)\s*$')
+_RE_PSLINE = re.compile('^\s*(\w+)\s+(\w+)')
 def guess_apache_process_user_from_ps():
     """Guess Apache process user by parsing the list of running processes."""
     apache_users = []
@@ -884,8 +884,8 @@ def guess_apache_process_user_from_ps():
         for line in os.popen('ps -A -o user,comm').readlines():
             g = _RE_PSLINE.match(line)
             if g:
-                username = g.group(2)
-                process = os.path.basename(g.group(1))
+                username = g.group(1)
+                process = os.path.basename(g.group(2))
                 if process in ('apache', 'apache2', 'httpd') :
                     if username not in apache_users and username != 'root':
                         apache_users.append(username)
