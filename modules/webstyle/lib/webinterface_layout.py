@@ -165,6 +165,12 @@ except:
     WebInterfaceYourLoansPages = WebInterfaceDumbPages
 
 try:
+    from invenio.bibcirculation_webinterface import WebInterfaceILLPages
+except:
+    register_exception(alert_admin=True, subject='EMERGENCY')
+    WebInterfaceILLPages = WebInterfaceDumbPages
+
+try:
     from invenio.webjournal_webinterface import WebInterfaceJournalPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
@@ -209,6 +215,13 @@ except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceBibAuthorIDPages = WebInterfaceDumbPages
 
+try:
+    from invenio.bibcirculationadmin_webinterface import \
+         WebInterfaceBibCirculationAdminPages
+except:
+    register_exception(alert_admin=True, subject='EMERGENCY')
+    WebInterfaceBibCirculationAdminPages = WebInterfaceDumbPages
+
 if CFG_DEVEL_SITE:
     try:
         from invenio.httptest_webinterface import WebInterfaceHTTPTestPages
@@ -219,6 +232,12 @@ if CFG_DEVEL_SITE:
 else:
     test_exports = []
 
+class WebInterfaceAdminPages(WebInterfaceDirectory):
+    """This class implements /admin2 admin pages."""
+    _exports = ['index', 'bibcirculation']
+    def index(self, req, form):
+        return "FIXME: return /help/admin content"
+    bibcirculation = WebInterfaceBibCirculationAdminPages()
 
 class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     """ The global URL layout is composed of the search API plus all
@@ -231,6 +250,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'yourbaskets',
         'yourmessages',
         'yourloans',
+        'ill',
         'yourgroups',
         'yourtickets',
         'comments',
@@ -247,7 +267,8 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'kb',
         'batchuploader',
         'bibsword',
-        'person'
+        'person',
+        'admin2',
         ] + test_exports
 
     def __init__(self):
@@ -262,6 +283,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     yourbaskets = WebInterfaceYourBasketsPages()
     yourmessages = WebInterfaceYourMessagesPages()
     yourloans = WebInterfaceYourLoansPages()
+    ill = WebInterfaceILLPages()
     yourgroups = WebInterfaceYourGroupsPages()
     yourtickets = WebInterfaceYourTicketsPages()
     comments = WebInterfaceCommentsPages()
@@ -274,6 +296,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     unapi = WebInterfaceUnAPIPages()
     exporter = WebInterfaceFieldExporterPages()
     kb = WebInterfaceBibKnowledgePages()
+    admin2 = WebInterfaceAdminPages()
     batchuploader = WebInterfaceBatchUploaderPages()
     bibsword = WebInterfaceSword()
     person = WebInterfaceBibAuthorIDPages()

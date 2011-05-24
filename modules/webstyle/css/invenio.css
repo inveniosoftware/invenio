@@ -2432,6 +2432,7 @@ text-decoration:underline;
     padding:0;
     position:relative;
     padding-bottom:9px;
+    z-index:5;
 }
 #bibcircmenu ul {
     padding-top:9px;
@@ -2456,7 +2457,6 @@ text-decoration:underline;
     padding-right:5px;
     margin-right:10px;
     background: transparent url(list_sep_blue.gif) no-repeat left center;
-
 }
 #bibcircmenu li.hassubmenu{
     position:relative;
@@ -2486,41 +2486,79 @@ text-decoration:underline;
     margin-left:0;
     background-image:none;
 }
+
 #bibcircmenu li a{
     white-space:nowrap;
     text-decoration:none;
     margin:0;
     padding:3px 6px;
 }
-#bibcircmenu li ul.subsubmenu {
+
+#bibcircmenu li ul.submenu {
     display:none;
     position: absolute;
     background-image:none;
     top: 1em;
-    left: 0;
+    left: 0px;
+    z-index:10;
 }
-#bibcircmenu li ul.subsubmenu li {
+
+#bibcircmenu li ul.submenu li{
     background:#FFFFFF none repeat scroll 0 0;
     border-bottom:1px solid #3366CC;
     border-left:1px solid #3366CC;
     border-right:1px solid #3366CC;
-    display:list-item !important;
+    display:block !important;
     float:none !important;
     position:relative;
-    z-index:50;
 }
-#bibcircmenu li ul.subsubmenu li a, #bibcircmenu li ul.subsubmenu li a:hover, #bibcircmenu li ul.subsubmenu li a:visited{
-    background:transparent none;
-    display:block;
+
+#bibcircmenu li ul.subsubmenu{
+    left: 7em;
+    top: -5px;
+    background:#FFFFFF none repeat scroll 0 0;
+    border-bottom:none;
+    border-left:none;
+    border-right:none;
+    display:none !important;
+    float:left !important;
+    position:absolute;
+    z-index:20;
+}
+
+#bibcircmenu li ul.subsubmenu li{
+    background:#FFFFFF none repeat scroll 0 0;
+    border-bottom:1px solid #3366CC;
+    border-left:1px solid #3366CC;
+    border-right:1px solid #3366CC;
+    border-top:1px solid #3366CC;
+    display:block !important;
+    float:none !important;
+    position:relative;
+    z-index:20;
+}
+
+#bibcircmenu li ul.submenu li:hover ul.subsubmenu{
+   display:block !important;
+}
+
+#bibcircmenu li ul.submenu li ul.subsubmenu:hover{
+   display:block !important;
+}
+
+#bibcircmenu li ul.submenu li a, #bibcircmenu li ul.submenu li a:hover, #bibcircmenu li ul.submenu li a:visited{
+    display:block !important;
     color:#36c;
 }
-#bibcircmenu li ul.subsubmenu li a:hover{
+
+#bibcircmenu li ul.submenu li a:hover{
     text-decoration:underline
 }
+
 #bibcircmenu li:hover ul {
     display:block;
-    position: absolute;
 }
+
 
 div.bibcircbottom {
     clear:both;
@@ -2530,6 +2568,7 @@ div.bibcircbottom {
     padding:0;
     position:relative;
     padding-bottom:9px;
+    z-index:0;
 }
 
 .bibcirctable {
@@ -2562,6 +2601,10 @@ div.bibcircbottom {
     color: #f16f10;
 }
 
+.clear {
+   clear: both;
+}
+
 .bibcircok {
     color: #060;
 }
@@ -2588,17 +2631,7 @@ div.bibcircbottom {
     border-color:#cdcdcd;
 }
 
-div.title {
-    width: 600px;
-    padding-left: 5px;
-    color: #36c;
-    font-size: 20px;
-    font-weight: bold;
-    font-variant: small-caps;
-    padding-bottom:2px;
-}
-
-div.subtitle {
+.bibcircsubtitle {
     width: 600px;
     padding-left: 5px;
     color: #36c;
@@ -2634,7 +2667,7 @@ div.subtitle {
     -moz-border-radius: 0px;
 }
 
-.infoboxsuccess{
+.bibcircinfoboxsuccess{
     background-color: #dcfdc1;
     padding: 20px;
     color: #3e5e25;
@@ -2644,7 +2677,7 @@ div.subtitle {
     width: 50%;
 }
 
-.infoboxmsg{
+.bibcircinfoboxmsg{
     background-color: #cadff5;
     padding: 20px;
     color: #336598;
@@ -2654,10 +2687,6 @@ div.subtitle {
     width: 50%;
 }
 
-.clear {
-    clear:both;
-    line-height:1px;
-}
 
 /* Rollover menus */
 

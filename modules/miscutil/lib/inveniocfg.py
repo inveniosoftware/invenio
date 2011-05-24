@@ -151,7 +151,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_WEBSEARCH_RSS_I18N_COLLECTIONS',
                        'CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY',
                        'CFG_BATCHUPLOADER_WEB_ROBOT_AGENT',
-                       'CFG_BIBAUTHORID_EXTERNAL_CLAIMED_RECORDS_KEY']:
+                       'CFG_BIBAUTHORID_EXTERNAL_CLAIMED_RECORDS_KEY',
+                       'CFG_BIBCIRCULATION_ITEM_STATUS_OPTIONAL']:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:

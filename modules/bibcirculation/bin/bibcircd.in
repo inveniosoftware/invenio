@@ -1,5 +1,6 @@
-## $Id: Makefile.am,v 1.4 2008/08/25 13:23:38 joaquim Exp $
-
+#!@PYTHON@
+## -*- mode: python; coding: utf-8; -*-
+##
 ## This file is part of Invenio.
 ## Copyright (C) 2008, 2009, 2010, 2011 CERN.
 ##
@@ -17,20 +18,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibcirculation.py \
-	     bibcirculationadminlib.py \
-	     bibcirculationadmin_webinterface.py \
-	     bibcirculation_templates.py \
-             bibcirculation_webinterface.py \
-             bibcirculation_dblayer.py \
-	     bibcirculation_config.py \
-	     bibcirculation_daemon.py \
-	     bibcirculation_utils.py \
-	     bibcirculation_cern_ldap.py \
-             bibcirculation_regression_tests.py
+__revision__ = "$Id$"
 
-EXTRA_DIST = $(pylib_DATA)
+try:
+    from invenio.bibcirculation_daemon import main
+except ImportError, e:
+    print "Error: %s" % e
+    import sys
+    sys.exit(1)
 
-CLEANFILES = *~ *.tmp *.pyc
+main()

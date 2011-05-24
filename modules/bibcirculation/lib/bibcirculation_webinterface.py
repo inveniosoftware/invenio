@@ -30,7 +30,8 @@ from invenio.config import CFG_SITE_LANG, \
                            CFG_SITE_SECURE_URL, \
                            CFG_ACCESS_CONTROL_LEVEL_SITE, \
                            CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
-                           CFG_SITE_RECORD
+                           CFG_SITE_RECORD, \
+                           CFG_CERN_SITE
 
 from invenio.webuser import getUid, page_not_authorized, isGuestUser, \
                             collect_user_info
@@ -41,6 +42,7 @@ from invenio.search_engine import create_navtrail_links, \
      record_exists
 from invenio.urlutils import redirect_to_url, \
                              make_canonical_urlargd
+
 from invenio.messages import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.websearchadminlib import get_detailed_page_tabs
@@ -51,22 +53,29 @@ webstyle_templates = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
 
 # bibcirculation imports
-bibcirculation_templates = invenio.template.load('bibcirculation')
+bc_templates = invenio.template.load('bibcirculation')
+import invenio.bibcirculation_dblayer as db
+
+from invenio.bibcirculation_utils import search_user
 from invenio.bibcirculation import perform_new_request, \
                                    perform_new_request_send, \
                                    perform_get_holdings_information, \
                                    perform_borrower_loans, \
                                    perform_loanshistoricaloverview, \
-                                   display_ill_form, \
                                    ill_register_request, \
                                    ill_request_with_recid, \
                                    ill_register_request_with_recid
+from invenio.bibcirculation_config import CFG_BIBCIRCULATION_ILL_STATUS_NEW, \
+                                          CFG_BIBCIRCULATION_ACQ_STATUS_NEW
+import time
 
 class WebInterfaceYourLoansPages(WebInterfaceDirectory):
     """Defines the set of /yourloans pages."""
 
-
     _exports = ['', 'display', 'loanshistoricaloverview']
+
+    def __init__(self, recid=-1):
+        self.recid = recid
 
     def index(self, req, form):
         """ The function called by default
@@ -83,7 +92,8 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
 
         argd = wash_urlargd(form, {'barcode': (str, ""),
                                    'borrower_id': (int, 0),
-                                   'request_id': (int, 0)})
+                                   'request_id': (int, 0),
+                                   'action': (str, "")})
 
         # Check if user is logged
         uid = getUid(req)
@@ -96,9 +106,9 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourloans/display%s" % (
-                        CFG_SITE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})), norobot=True)
+                        CFG_SITE_URL, make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})),
+                    norobot=True)
 
         _ = gettext_set_language(argd['ln'])
 
@@ -111,6 +121,7 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
                                       barcode=argd['barcode'],
                                       borrower_id=argd['borrower_id'],
                                       request_id=argd['request_id'],
+                                      action=argd['action'],
                                       ln=argd['ln'])
 
         return page(title       = _("Your Loans"),
@@ -149,7 +160,7 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         if not user_info['precached_useloans']:
             return page_not_authorized(req, "../", \
-                                       text = _("You are not authorized to use loans."))
+                            text = _("You are not authorized to use loans."))
 
         body = perform_loanshistoricaloverview(uid=uid,
                                                ln=argd['ln'])
@@ -168,15 +179,19 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
     """Defines the set of /ill pages."""
 
 
-    _exports = ['', 'display', 'register_request']
+    _exports = ['', 'register_request', 'book_request_step1',
+                'book_request_step2','book_request_step3',
+                'article_request_step1', 'article_request_step2',
+                'article_request_step3', 'acq_request_step1',
+                'acq_request_step2']
 
     def index(self, req, form):
         """ The function called by default
         """
-        redirect_to_url(req, "%s/ill/display?%s" % (CFG_SITE_URL,
+        redirect_to_url(req, "%s/ill/book_request_step1?%s" % (CFG_SITE_URL,
                                                           req.args))
 
-    def display(self, req, form):
+    def book_request_step1(self, req, form):
         """
         Displays all loans of a given user
         @param ln:  language
@@ -188,14 +203,14 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         # Check if user is logged
         uid = getUid(req)
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "%s/ill/display" % \
+            return page_not_authorized(req, "%s/ill/book_request_step1" % \
                                        (CFG_SITE_URL,),
                                        navmenuid="ill")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
-                    'referer' : "%s/ill/display%s" % (
+                    'referer' : "%s/ill/book_request_step1%s" % (
                         CFG_SITE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})), norobot=True)
@@ -207,7 +222,510 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use ill."))
 
-        body = display_ill_form(ln=argd['ln'])
+        ### get borrower_id ###
+        borrower_id = search_user('email', user_info['email'])
+        if borrower_id == ():
+            body = "wrong user id"
+        else:
+            body = bc_templates.tmpl_register_ill_request_with_no_recid_step1([], None, False, argd['ln'])
+        #body = display_ill_form(ln=argd['ln'])
+
+        return page(title       = _("Interlibrary loan request for books"),
+                    body        = body,
+                    uid         = uid,
+                    lastupdated = __lastupdated__,
+                    req         = req,
+                    language    = argd['ln'],
+                    navmenuid   = "ill")
+
+    def book_request_step2(self, req, form):
+        """
+        Displays all loans of a given user
+        @param ln:  language
+        @return the page for inbox
+        """
+
+        argd = wash_urlargd(form, {'title': (str, None), 'authors': (str, None),
+            'place': (str, None), 'publisher': (str, None), 'year': (str, None),
+            'edition': (str, None), 'isbn': (str, None), 'budget_code': (str, ''),
+            'period_of_interest_from': (str, None), 'period_of_interest_to': (str, None),
+            'additional_comments': (str, None), 'only_edition': (str, 'No'),'ln': (str, "en")})
+
+        title = argd['title']
+        authors = argd['authors']
+        place = argd['place']
+        publisher = argd['publisher']
+        year = argd['year']
+        edition = argd['edition']
+        isbn = argd['isbn']
+        budget_code = argd['budget_code']
+        period_of_interest_from = argd['period_of_interest_from']
+        period_of_interest_to = argd['period_of_interest_to']
+        additional_comments = argd['additional_comments']
+        only_edition = argd['only_edition']
+        #key = argd['key']
+        #string = argd['string']
+        #borrower_id = argd['borrower_id']
+        ln = argd['ln']
+
+        #if borrower_id == 'None':
+        #    borrower_id = None
+        #else:
+        #    borrower_id = borrower_id.strip()
+
+        if title is not None:
+            title = title.strip()
+        if authors is not None:
+            authors = authors.strip()
+        if place is not None:
+            place = place.strip()
+        if publisher is not None:
+            publisher = publisher.strip()
+        if year is not None:
+            year = year.strip()
+        if edition is not None:
+            edition =  edition.strip()
+        if isbn is not None:
+            isbn = isbn.strip()
+        if budget_code is not None:
+            budget_code = budget_code.strip()
+        if period_of_interest_from is not None:
+            period_of_interest_from = period_of_interest_from.strip()
+        if period_of_interest_to is not None:
+            period_of_interest_to = period_of_interest_to.strip()
+        #string = string.strip()
+
+        # Check if user is logged
+        uid = getUid(req)
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/ill/book_request_step2" % \
+                                       (CFG_SITE_URL,),
+                                       navmenuid="ill")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : "%s/ill/book_request_step2%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : ln}, {})), norobot=True)
+
+        _ = gettext_set_language(ln)
+
+        user_info = collect_user_info(req)
+        if not user_info['precached_useloans']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use ill."))
+
+        if CFG_CERN_SITE:
+            borrower_id = search_user('ccid', user_info['external_hidden_personid'])
+        else:
+            borrower_id = search_user('email', user_info['email'])
+
+        if borrower_id != ():
+            borrower_id = borrower_id[0][0]
+
+            book_info = (title, authors, place, publisher,
+                         year, edition, isbn)
+            user_info = db.get_borrower_data_by_id(borrower_id)
+
+            request_details = (budget_code, period_of_interest_from,
+                               period_of_interest_to, additional_comments,
+                               only_edition)
+            body = bc_templates.tmpl_register_ill_request_with_no_recid_step3(
+                                        book_info, user_info, request_details, False, ln)
+
+        else:
+            body = "wrong user id"
+
+        return page(title       = _("Interlibrary loan request for books"),
+                    body        = body,
+                    uid         = uid,
+                    lastupdated = __lastupdated__,
+                    req         = req,
+                    language    = ln,
+                    navmenuid   = "ill")
+
+    def book_request_step3(self, req, form):
+        """
+        Displays all loans of a given user
+        @param ln:  language
+        @return the page for inbox
+        """
+
+        argd = wash_urlargd(form, {'title': (str, None), 'authors': (str, None),
+            'place': (str, None), 'publisher': (str, None), 'year': (str, None),
+            'edition': (str, None), 'isbn': (str, None), 'borrower_id': (str, None),
+            'budget_code': (str, ''), 'period_of_interest_from': (str, None),
+            'period_of_interest_to': (str, None), 'additional_comments': (str, None),
+            'only_edition': (str, None), 'ln': (str, "en")})
+
+        title = argd['title']
+        authors = argd['authors']
+        place = argd['place']
+        publisher = argd['publisher']
+        year = argd['year']
+        edition = argd['edition']
+        isbn = argd['isbn']
+
+        borrower_id = argd['borrower_id']
+
+        budget_code = argd['budget_code']
+        period_of_interest_from = argd['period_of_interest_from']
+        period_of_interest_to = argd['period_of_interest_to']
+        library_notes = argd['additional_comments']
+        only_edition = argd['only_edition']
+
+        ln = argd['ln']
+
+        book_info = (title, authors, place, publisher, year, edition, isbn)
+        #request_details = (budget_code, period_of_interest_from, period_of_interest_to,
+        #                    library_notes, only_edition)
+
+        # Check if user is logged
+        uid = getUid(req)
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/ill/book_request_step2" % \
+                                       (CFG_SITE_URL,),
+                                       navmenuid="ill")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : "%s/ill/book_request_step2%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})), norobot=True)
+
+        _ = gettext_set_language(argd['ln'])
+
+        user_info = collect_user_info(req)
+        if not user_info['precached_useloans']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use ill."))
+
+        book_info = {'title': title, 'authors': authors, 'place': place,
+                     'publisher': publisher, 'year' : year,
+                     'edition': edition, 'isbn' : isbn}
+
+        ill_request_notes = {}
+        if library_notes:
+            ill_request_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
+
+        ### budget_code ###
+        db.ill_register_request_on_desk(borrower_id, book_info,
+                                        period_of_interest_from,
+                                        period_of_interest_to,
+                                        CFG_BIBCIRCULATION_ILL_STATUS_NEW,
+                                        str(ill_request_notes), only_edition,
+                                        'book', budget_code)
+
+        infos = []
+        infos.append('Interlibrary loan request done.')
+        body = bc_templates.tmpl_infobox(infos, ln)
+
+        return page(title       = _("Interlibrary loan request for books"),
+                    body        = body,
+                    uid         = uid,
+                    lastupdated = __lastupdated__,
+                    req         = req,
+                    language    = argd['ln'],
+                    navmenuid   = "ill")
+
+    def acq_request_step1(self, req, form):
+        """
+        Displays all loans of a given user
+        @param ln:  language
+        @return the page for inbox
+        """
+
+        argd = wash_urlargd(form, {'type': (str, 'acq-book'),
+                'title': (str, ''), 'authors': (str, ''), 'place': (str, ''),
+                'publisher': (str, ''), 'year': (str, ''), 'edition': (str, ''),
+                'this_edition_only': (str, 'No'),
+                'isbn': (str, ''), 'standard_number': (str, ''),
+                'budget_code': (str, ''), 'cash': (str, 'No'),
+                'period_of_interest_from': (str, ''),
+                'period_of_interest_to': (str, ''),
+                'additional_comments': (str, ''), 'ln': (str, "en")})
+
+        type = argd['type'].strip()
+        title = argd['title'].strip()
+        authors = argd['authors'].strip()
+        place = argd['place'].strip()
+        publisher = argd['publisher'].strip()
+        year = argd['year'].strip()
+        edition = argd['edition'].strip()
+        this_edition_only = argd['this_edition_only'].strip()
+        isbn = argd['isbn'].strip()
+        standard_number = argd['standard_number'].strip()
+        budget_code = argd['budget_code'].strip()
+        cash = argd['cash'] == 'Yes'
+        period_of_interest_from = argd['period_of_interest_from'].strip()
+        period_of_interest_to = argd['period_of_interest_to'].strip()
+        additional_comments = argd['additional_comments'].strip()
+        ln = argd['ln']
+
+        fields = (type, title, authors, place, publisher, year, edition,
+                  this_edition_only, isbn, standard_number, budget_code,
+                  cash, period_of_interest_from, period_of_interest_to,
+                  additional_comments)
+
+        # Check if user is logged
+        uid = getUid(req)
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/ill/acq_request_step1" % \
+                                       (CFG_SITE_URL,),
+                                       navmenuid="ill")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : "%s/ill/acq_request_step1%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})), norobot=True)
+
+        _ = gettext_set_language(argd['ln'])
+
+        user_info = collect_user_info(req)
+        if not user_info['precached_useloans']:
+            return page_not_authorized(req, "../", \
+                                text = _("You are not authorized to use ill."))
+
+        ### get borrower_id ###
+        borrower_id = search_user('email', user_info['email'])
+        if borrower_id == ():
+            body = "wrong user id"
+        else:
+            body = bc_templates.tmpl_register_purchase_request_step1([], fields,
+                                                            False, argd['ln'])
+
+        return page(title       = _("Purchase request"),
+                    body        = body,
+                    uid         = uid,
+                    lastupdated = __lastupdated__,
+                    req         = req,
+                    language    = argd['ln'],
+                    navmenuid   = "ill")
+
+    def acq_request_step2(self, req, form):
+
+        argd = wash_urlargd(form, {'type': (str, 'acq-book'),
+                'title': (str, ''), 'authors': (str, ''), 'place': (str, ''),
+                'publisher': (str, ''), 'year': (str, ''), 'edition': (str, ''),
+                'this_edition_only': (str, 'No'),
+                'isbn': (str, ''), 'standard_number': (str, ''),
+                'budget_code': (str, ''), 'cash': (str, 'No'),
+                'period_of_interest_from': (str, ''),
+                'period_of_interest_to': (str, ''),
+                'additional_comments': (str, ''), 'ln': (str, "en")})
+
+        type = argd['type'].strip()
+        title = argd['title'].strip()
+        authors = argd['authors'].strip()
+        place = argd['place'].strip()
+        publisher = argd['publisher'].strip()
+        year = argd['year'].strip()
+        edition = argd['edition'].strip()
+        this_edition_only = argd['this_edition_only'].strip()
+        isbn = argd['isbn'].strip()
+        standard_number = argd['standard_number'].strip()
+        budget_code = argd['budget_code'].strip()
+        cash = argd['cash'] == 'Yes'
+        period_of_interest_from = argd['period_of_interest_from'].strip()
+        period_of_interest_to = argd['period_of_interest_to'].strip()
+        additional_comments = argd['additional_comments'].strip()
+        ln = argd['ln']
+
+        fields = (type, title, authors, place, publisher, year, edition,
+                  this_edition_only, isbn, standard_number, budget_code,
+                  cash, period_of_interest_from, period_of_interest_to,
+                  additional_comments)
+
+        # Check if user is logged
+        uid = getUid(req)
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/ill/acq_request_step1" % \
+                                       (CFG_SITE_URL,),
+                                       navmenuid="ill")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : "%s/ill/acq_request_step2%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})), norobot=True)
+
+        _ = gettext_set_language(argd['ln'])
+
+        user_info = collect_user_info(req)
+        if not user_info['precached_useloans']:
+            return page_not_authorized(req, "../", \
+                                text = _("You are not authorized to use ill."))
+
+        infos = []
+
+        if budget_code == '' and not cash:
+            infos.append(_("Payment method information is mandatory. Please, type your budget code or tick the 'cash' checkbox."))
+            body = bc_templates.tmpl_register_purchase_request_step1(infos=infos,
+                                    fields=(type, title, authors, place, publisher,
+                                            year, edition, this_edition_only,
+                                            isbn, standard_number,
+                                            budget_code, cash,
+                                            period_of_interest_from,
+                                            period_of_interest_to,
+                                            additional_comments),
+                                    ln=ln)
+        else:
+            borrower_id = db.get_borrower_id_by_email(\
+                                            db.get_invenio_user_email(uid))
+
+            item_info = {'title': title, 'authors': authors, 'place': place,
+                         'publisher': publisher, 'year' : year,
+                         'edition': edition, 'isbn' : isbn,
+                         'standard_number': standard_number}
+
+            ill_request_notes = {}
+            if additional_comments:
+                ill_request_notes[time.strftime("%Y-%m-%d %H:%M:%S")] \
+                                                      = str(additional_comments)
+
+            if cash and budget_code == '':
+                budget_code = 'cash'
+
+            db.ill_register_request_on_desk(borrower_id, item_info,
+                                            period_of_interest_from,
+                                            period_of_interest_to,
+                                            CFG_BIBCIRCULATION_ACQ_STATUS_NEW,
+                                            str(ill_request_notes),
+                                            this_edition_only, type,
+                                            budget_code)
+
+            body = bc_templates.tmpl_message_purchase_request_send_ok_other(ln=ln)
+
+        return page(title=_("Register purchase request"),
+                    uid=uid,
+                    req=req,
+                    body=body,
+                    language=ln,
+                    metaheaderadd='<link rel="stylesheet" ' \
+                                        'href="%s/img/jquery-ui.css" ' \
+                                        'type="text/css" />' % CFG_SITE_URL,
+                    lastupdated=__lastupdated__)
+
+    def article_request_step1(self, req, form):
+        """
+        Displays all loans of a given user
+        @param ln:  language
+        @return the page for inbox
+        """
+
+        argd = wash_urlargd(form, {})
+
+        # Check if user is logged
+        uid = getUid(req)
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/ill/article_request_step1" % \
+                                       (CFG_SITE_URL,),
+                                       navmenuid="ill")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : "%s/ill/article_request_step1%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})), norobot=True)
+
+        _ = gettext_set_language(argd['ln'])
+
+        user_info = collect_user_info(req)
+        if not user_info['precached_useloans']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use ill."))
+
+        ### get borrower_id ###
+        borrower_id = search_user('email', user_info['email'])
+        if borrower_id == ():
+            body = "Wrong user id"
+        else:
+            body = bc_templates.tmpl_register_ill_article_request_step1([], False, argd['ln'])
+
+        return page(title       = _("Interlibrary loan request for articles"),
+                    body        = body,
+                    uid         = uid,
+                    lastupdated = __lastupdated__,
+                    req         = req,
+                    language    = argd['ln'],
+                    navmenuid   = "ill")
+
+    def article_request_step2(self, req, form):
+        """
+        Displays all loans of a given user
+        @param ln:  language
+        @return the page for inbox
+        """
+
+        argd = wash_urlargd(form, {'periodical_title': (str, None), 'article_title': (str, None),
+            'author': (str, None), 'report_number': (str, None), 'volume': (str, None),
+            'issue': (str, None), 'page': (str, None), 'year': (str, None),
+            'budget_code': (str, ''), 'issn': (str, None),
+            'period_of_interest_from': (str, None), 'period_of_interest_to': (str, None),
+            'additional_comments': (str, None), 'key': (str, None), 'string': (str, None),
+            'ln': (str, "en")})
+
+        # Check if user is logged
+        uid = getUid(req)
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/ill/article_request_step2" % \
+                                       (CFG_SITE_URL,),
+                                       navmenuid="ill")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : "%s/ill/article_request_step2%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})), norobot=True)
+
+        _ = gettext_set_language(argd['ln'])
+
+        user_info = collect_user_info(req)
+        if not user_info['precached_useloans']:
+            return page_not_authorized(req, "../", \
+                                text = _("You are not authorized to use ill."))
+
+        borrower_id = search_user('email', user_info['email'])
+        if borrower_id != ():
+            borrower_id = borrower_id[0][0]
+            notes = argd['additional_comments']
+            ill_request_notes = {}
+            if notes:
+                ill_request_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(notes)
+
+            item_info = {'periodical_title': argd['periodical_title'],
+                'title': argd['article_title'], 'authors': argd['author'],
+                'place': "", 'publisher': "", 'year' : argd['year'],
+                'edition': "", 'issn' : argd['issn'], 'volume': argd['volume'],
+                'page': argd['page'], 'issue': argd['issue'] }
+
+            ### budget_code ###
+            db.ill_register_request_on_desk(borrower_id, item_info,
+                                    argd['period_of_interest_from'],
+                                    argd['period_of_interest_to'],
+                                    CFG_BIBCIRCULATION_ILL_STATUS_NEW,
+                                    str(ill_request_notes), 'No', 'article',
+                                    argd['budget_code'])
+
+            infos = []
+            infos.append('Interlibrary loan request done.')
+            body = bc_templates.tmpl_infobox(infos, argd['ln'])
+
+        else:
+            body = _("Wrong user id")
 
         return page(title       = _("Interlibrary loan request for books"),
                     body        = body,
@@ -224,7 +742,6 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         @param ln:  language
         @return the page for inbox
         """
-
 
         argd = wash_urlargd(form, {'ln': (str, ""),
                                    'title': (str, ""),
@@ -261,23 +778,23 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         if not user_info['precached_useloans']:
             return page_not_authorized(req, "../", \
-                                       text = _("You are not authorized to use ill."))
+                                text = _("You are not authorized to use ill."))
 
         body = ill_register_request(uid=uid,
-                                    title=argd['title'],
-                                    authors=argd['authors'],
-                                    place=argd['place'],
-                                    publisher=argd['publisher'],
-                                    year=argd['year'],
-                                    edition=argd['edition'],
-                                    isbn=argd['isbn'],
-                                    period_of_interest_from =  argd['period_of_interest_from'],
-                                    period_of_interest_to =  argd['period_of_interest_to'],
-                                    additional_comments =  argd['additional_comments'],
-                                    conditions = argd['conditions'],
-                                    only_edition = argd['only_edition'],
-                                    request_type='book',
-                                    ln=argd['ln'])
+                        title=argd['title'],
+                        authors=argd['authors'],
+                        place=argd['place'],
+                        publisher=argd['publisher'],
+                        year=argd['year'],
+                        edition=argd['edition'],
+                        isbn=argd['isbn'],
+                        period_of_interest_from=argd['period_of_interest_from'],
+                        period_of_interest_to=argd['period_of_interest_to'],
+                        additional_comments=argd['additional_comments'],
+                        conditions=argd['conditions'],
+                        only_edition=argd['only_edition'],
+                        request_type='book',
+                        ln=argd['ln'])
 
         return page(title       = _("Interlibrary loan request for books"),
                     body        = body,
@@ -292,7 +809,8 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
 class WebInterfaceHoldingsPages(WebInterfaceDirectory):
     """Defines the set of /holdings pages."""
 
-    _exports = ['', 'display', 'request', 'send', 'ill_request_with_recid', 'ill_register_request_with_recid']
+    _exports = ['', 'display', 'request', 'send', 'ill_request_with_recid',
+                'ill_register_request_with_recid']
 
     def __init__(self, recid=-1):
         self.recid = recid
@@ -313,10 +831,11 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'do': (str, "od"),
                                    'ds': (str, "all"),
                                    'nb': (int, 100),
-                                   'p': (int, 1),
+                                   'p' : (int, 1),
                                    'voted': (int, -1),
                                    'reported': (int, -1),
                                    })
+
         _ = gettext_set_language(argd['ln'])
 
         record_exists_p = record_exists(self.recid)
@@ -327,7 +846,9 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                 msg = _("Requested record does not seem to exist.")
             msg = '<span class="quicknote">' + msg + '</span>'
             title, description, keywords = \
-                   websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])
+                websearch_templates.tmpl_record_page_header_content(req,
+                                                                    self.recid,
+                                                                    argd['ln'])
             return page(title = title,
                         show_title_p = False,
                         body = msg,
@@ -342,23 +863,22 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
 
         uid = getUid(req)
 
-
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
-        if auth_code and user_info['email'] == 'guest':
-            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
+        if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL,
+                                {'collection': guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
-                make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri']}, {})
+                    make_canonical_urlargd({'action': cookie, 'ln': argd['ln'],
+                                'referer': CFG_SITE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target, norobot=True)
         elif auth_code:
-            return page_not_authorized(req, "../", \
-                text = auth_msg)
+            return page_not_authorized(req, "../", text=auth_msg)
 
 
-        unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
-                                                    self.recid,
-                                                    ln=argd['ln'])
+        unordered_tabs = get_detailed_page_tabs(get_colID(\
+                    guess_primary_collection_of_a_record(self.recid)),
+                    self.recid, ln=argd['ln'])
         ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
         ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
         link_ln = ''
@@ -445,10 +965,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                 text = auth_msg)
 
 
-
-        unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
-                                                    self.recid,
-                                                    ln=argd['ln'])
+        unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)), self.recid, ln=argd['ln'])
         ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
         ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
         link_ln = ''
@@ -499,15 +1016,20 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
 
         uid = getUid(req)
 
+        period_from = argd['period_from']
+        period_to = argd['period_to']
+        period_from = period_from.strip()
+        period_to = period_to.strip()
+        barcode = argd['barcode']
+
         body = perform_new_request_send(recid=self.recid,
                                         uid=uid,
                                         period_from=argd['period_from'],
                                         period_to=argd['period_to'],
-                                        barcode=argd['barcode'])
+                                        barcode=barcode)
 
         ln = CFG_SITE_LANG
         _ = gettext_set_language(ln)
-
 
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
@@ -521,11 +1043,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                 text = auth_msg)
 
-
-
-        unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
-                                                    self.recid,
-                                                    ln=ln)
+        unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)), self.recid, ln=ln)
         ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
         ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
         link_ln = ''
@@ -562,16 +1080,13 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                               top + body + bottom + \
                               websearch_templates.tmpl_search_pageend(argd['ln']) + \
                               pagefooteronly(lastupdated=__lastupdated__,
-                                             language=argd['ln'], req=req)
-
-
+                              language=argd['ln'], req=req)
 
 
     def ill_request_with_recid(self, req, form):
         """
         Show ILL request form.
         """
-
 
         argd = wash_urlargd(form, {'ln': (str, "")})
 
