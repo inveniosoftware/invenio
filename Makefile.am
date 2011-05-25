@@ -159,7 +159,6 @@ install-jquery-plugins: install-jquery-plugins
 	wget http://www.appelsiini.net/download/jquery.jeditable.mini.js && \
 	wget http://github.com/malsup/form/raw/master/jquery.form.js --no-check-certificate && \
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
-	wget http://plugins.jquery.com/files/jquery.autogrow-1.2.2.zip && \
 	wget http://autobahn.tablesorter.com/jquery.tablesorter.zip && \
 	wget http://plugins.jquery.com/files/Uploadify-v2.1.3.zip -O uploadify.zip && \
 	wget http://www.datatables.net/download/build/jquery.dataTables.min.js && \
@@ -176,8 +175,6 @@ install-jquery-plugins: install-jquery-plugins
 	mv uploadify/cancel.png uploadify/uploadify.css uploadify/uploadify.allglyphs.swf uploadify/uploadify.fla uploadify/uploadify.swf ../img/ && \
 	mv uploadify/jquery.uploadify.v2.1.3.min.js ./jquery.uploadify.min.js && \
 	rm uploadify.zip && rm -r uploadify && \
-	unzip jquery.autogrow-1.2.2.zip jquery.autogrow.js && \
-	rm jquery.autogrow-1.2.2.zip && \
 	wget --no-check-certificate https://github.com/douglascrockford/JSON-js/raw/master/json2.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.datepicker.min.js && \
 	wget -O jquery.hotkeys.min.js http://js-hotkeys.googlecode.com/files/jquery.hotkeys-0.7.8-packed.js && \
@@ -219,7 +216,6 @@ uninstall-jquery-plugins:
 	rm -f jquery.tablesorter.js && \
 	rm -f jquery.tablesorter.pager.js && \
 	rm -f ui.datepicker.min.js && \
-	rm -f jquery.autogrow.js && \
 	rm -f json2.js && \
 	rm -f jquery.uploadify.min.js && \
 	rm -f ui.slider.min.js && \

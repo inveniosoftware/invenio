@@ -2046,9 +2046,6 @@ input.hyperlinkformSubmitButton {
 #bibEditTable .bibEditCellContentProtected {
   font-weight: bold;
 }
-#bibEditTable textarea {
-  min-height: 36px;
-}
 #bibEditTable .bibEditCellAddSubfields {
   vertical-align: bottom;
 }

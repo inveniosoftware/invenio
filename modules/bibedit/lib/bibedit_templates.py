@@ -398,7 +398,21 @@ def page_style():
                     border: 1px solid #A1A1A1;
                     border-collapse: collapse;
                     width: 100%;
+                    table-layout:fixed;
                 }
+
+                #bibEditTable td {
+                    max-width: 500px;
+                    overflow:hidden;
+                    word-wrap: break-word;
+                 }
+                 #bibEditTable td textarea{
+                    max-width: 675px;
+                    min-height: 65px;
+                    max-height: 600px;
+
+                }
+
 
                 #bibEditMenu .bibEditMenuSection table {
                     width: 100%;
