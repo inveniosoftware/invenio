@@ -3269,6 +3269,18 @@ def get_fieldvalues_alephseq_like(recID, tags_in, can_see_hidden=False):
                         out += "$$%s%s" % (field[-1:], value)
     return out
 
+def get_merged_recid(recID):
+    """ Return the record ID of the record with
+    which the given record has been merged.
+    @param recID: deleted record recID
+    @type recID: int
+    @return: merged record recID
+    @rtype: int
+    """
+    merged_recid = get_fieldvalues(recID, "970__d")
+    if merged_recid:
+        return int(merged_recid[0])
+
 def record_exists(recID):
     """Return 1 if record RECID exists.
        Return 0 if it doesn't exist.
@@ -3723,9 +3735,12 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
             elif format.startswith("hd"):
                 # HTML detailed format:
                 for irec in range(irec_max, irec_min, -1):
-                    if record_exists(recIDs[irec]) == -1:
+                    merged_recid = get_merged_recid(recIDs[irec])
+                    if record_exists(recIDs[irec]) == -1 and not merged_recid:
                         print_warning(req, _("The record has been deleted."))
                         continue
+                    if merged_recid:
+                        recIDs[irec] = merged_recid
                     unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(recIDs[irec])),
                                                             recIDs[irec], ln=ln)
                     ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
@@ -4030,11 +4045,14 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
         if format == '':
             format = 'hd'
 
-        if record_exist_p == -1 and get_output_format_content_type(format) == 'text/html':
+        merged_recid = get_merged_recid(recID)
+        if record_exist_p == -1 and not merged_recid and get_output_format_content_type(format) == 'text/html':
             # HTML output displays a default value for deleted records.
             # Other format have to deal with it.
             out += _("The record has been deleted.")
         else:
+            if merged_recid:
+                recID = merged_recid
             out += call_bibformat(recID, format, ln, search_pattern=search_pattern,
                                   user_info=user_info, verbose=verbose)
 

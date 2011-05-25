@@ -1021,7 +1021,9 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 
     def __call__(self, req, form):
         argd = wash_search_urlargd(form)
+
         argd['recid'] = self.recid
+
         argd['tab'] = self.tab
 
         if self.format is not None:
@@ -1062,6 +1064,17 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                 text=auth_msg, \
                 navmenuid='search')
+
+        from invenio.search_engine import record_exists, get_merged_recid
+        # check if the current record has been deleted
+        # and has been merged, case in which the deleted record
+        # will be redirect to the new one
+        record_status = record_exists(argd['recid'])
+        merged_recid = get_merged_recid(argd['recid'])
+        if record_status == -1 and merged_recid:
+            url = CFG_SITE_URL + '/record/%s?ln=%s'
+            url %= (str(merged_recid), argd['ln'])
+            redirect_to_url(req, url)
 
         # mod_python does not like to return [] in case when of=id:
         out = perform_request_search(req, **argd)

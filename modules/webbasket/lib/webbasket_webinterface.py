@@ -511,6 +511,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'recid': (int, 0),
                                    'note_title': (str, ""),
                                    'note_body': (str, ""),
+                                   'date_creation': (str, ""),
                                    'editor_type': (str, ""),
                                    'of': (str, ''),
                                    'ln': (str, CFG_SITE_LANG),
@@ -538,16 +539,17 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use baskets."))
 
         (body, navtrail) = perform_request_save_note(uid=uid,
-                                                    category=argd['category'],
-                                                    topic=argd['topic'],
-                                                    group_id=argd['group'],
-                                                    bskid=argd['bskid'],
-                                                    recid=argd['recid'],
-                                                    note_title=argd['note_title'],
-                                                    note_body=argd['note_body'],
-                                                    editor_type=argd['editor_type'],
-                                                    ln=argd['ln'],
-                                                    reply_to=argd['reply_to'])
+                                                     category=argd['category'],
+                                                     topic=argd['topic'],
+                                                     group_id=argd['group'],
+                                                     bskid=argd['bskid'],
+                                                     recid=argd['recid'],
+                                                     note_title=argd['note_title'],
+                                                     note_body=argd['note_body'],
+                                                     date_creation=argd['date_creation'],
+                                                     editor_type=argd['editor_type'],
+                                                     ln=argd['ln'],
+                                                     reply_to=argd['reply_to'])
 
         # TODO: do not stat event if save was not succussful
         # register event in webstat
@@ -671,6 +673,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'es_desc': (str, ""),
                                    'es_url': (str, ""),
                                    'note_body': (str, ""),
+                                   'date_creation': (str, ""),
                                    'editor_type': (str, ""),
                                    'b': (str, ""),
                                    'copy': (int, 0),
@@ -712,6 +715,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                es_desc=argd['es_desc'],
                                                es_url=argd['es_url'],
                                                note_body=argd['note_body'],
+                                               date_creation=argd['date_creation'],
                                                editor_type=argd['editor_type'],
                                                category=argd['category'],
                                                b=argd['b'],

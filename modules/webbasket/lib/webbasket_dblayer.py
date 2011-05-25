@@ -833,7 +833,6 @@ def add_to_basket(uid,
                   es_desc="",
                   es_url=""):
     """Add items (recids) basket (bskid)."""
-
     if (recids or (colid == -1 and es_title and es_desc and es_url)) and bskid > 0:
         query_max_score = """   SELECT   MAX(score)
                                 FROM     bskREC
@@ -2149,8 +2148,13 @@ def get_note(cmtid):
         return res[0]
     return out
 
-def save_note(uid, bskid, recid, title, body, reply_to=None):
-    """Save then given note (title, body) on the given item in the given basket."""
+def save_note(uid, bskid, recid, title, body, date_creation=None, reply_to=None):
+    """Save then given note (title, body) on the given item in the given basket.
+    @param date_creation: date in which the note was created
+    @type date_creation: None or String, e.g: '2011-07-04 14:20:57'
+
+    Note: convert_datestruct_to_datetext((2005, 11, 16, 15, 11, 44, 2, 320, 0)) -> '2005-11-16 15:11:44'
+    """
     if reply_to and CFG_WEBBASKET_MAX_COMMENT_THREAD_DEPTH >= 0:
         # Check that we have not reached max depth
         note_ancestors = get_note_ancestors(reply_to)
@@ -2160,7 +2164,11 @@ def save_note(uid, bskid, recid, title, body, reply_to=None):
             else:
                 reply_to = note_ancestors[CFG_WEBBASKET_MAX_COMMENT_THREAD_DEPTH - 1]
 
-    date = convert_datestruct_to_datetext(localtime())
+    if not date_creation:
+        date = convert_datestruct_to_datetext(localtime())
+    else: #the date comes with the proper format
+        date = date_creation
+
     res = run_sql("""INSERT INTO bskRECORDCOMMENT (id_user, id_bskBASKET,
                        id_bibrec_or_bskEXTREC, title, body, date_creation, in_reply_to_id_bskRECORDCOMMENT)
                      VALUES (%s, %s, %s, %s, %s, %s, %s)""",
