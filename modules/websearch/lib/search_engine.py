@@ -3918,7 +3918,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
     else:
         print_warning(req, _("Use different search terms."))
 
-def print_records_prologue(req, format):
+def print_records_prologue(req, format, cc=None):
     """
     Print the appropriate prologue for list of records in the given
     format.
@@ -3931,13 +3931,13 @@ def print_records_prologue(req, format):
     elif format.startswith('xw'):
         prologue = websearch_templates.tmpl_xml_refworks_prologue()
     elif format.startswith('xr'):
-        prologue = websearch_templates.tmpl_xml_rss_prologue()
+        prologue = websearch_templates.tmpl_xml_rss_prologue(cc=cc)
     elif format.startswith('xe'):
         prologue = websearch_templates.tmpl_xml_endnote_prologue()
     elif format.startswith('xo'):
         prologue = websearch_templates.tmpl_xml_mods_prologue()
     elif format.startswith('xp'):
-        prologue = websearch_templates.tmpl_xml_podcast_prologue()
+        prologue = websearch_templates.tmpl_xml_podcast_prologue(cc=cc)
     elif format.startswith('x'):
         prologue = websearch_templates.tmpl_xml_default_prologue()
     req.write(prologue)
@@ -5158,7 +5158,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
             else:
                 if len(colls_to_search)>1:
                     cpu_time = -1 # we do not want to have search time printed on each collection
-                print_records_prologue(req, of)
+                print_records_prologue(req, of, cc=cc)
                 for coll in colls_to_search:
                     if results_final.has_key(coll) and len(results_final[coll]):
                         if of.startswith("h"):
