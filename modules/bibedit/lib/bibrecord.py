@@ -1061,6 +1061,7 @@ def record_strip_empty_fields(rec, tag=None):
                 for subfield in field[0]:
                     # check if the subfield has been given a value
                     if subfield[1]:
+                        subfield = (subfield[0], subfield[1].strip()) # Always strip values
                         subfields.append(subfield)
                 if len(subfields) > 0:
                     new_field = create_field(subfields, field[1], field[2],

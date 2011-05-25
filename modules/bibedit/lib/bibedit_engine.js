@@ -1991,6 +1991,7 @@ function addFieldSave(fieldTmpNo)
         var txtValue = $('#txtAddFieldValue_' + fieldTmpNo + '_' +
     subfieldTmpNo);
         var value = $(txtValue).val();
+        value = value.replace(/^\s+|\s+$/g,""); // Remove whitespace from the ends of strings
         var isStillVolatile = txtValue.hasClass('bibEditVolatileSubfield');
 
         if (!$(this).hasClass('bibEditInputError')
@@ -2593,6 +2594,7 @@ function onContentChange(value, th){
   var tag_ind = tag + field[1] + field[2];
   var oldValue = "";
   value = value.replace(/\n/g, ' '); // Replace newlines with spaces.
+  value = value.replace(/^\s+|\s+$/g,""); // Remove whitespace from the ends of strings
   if (subfieldIndex == undefined){
     // Controlfield or modifying a field tag
     if (tmpArray[0] == 'fieldTag') {
