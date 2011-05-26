@@ -357,6 +357,18 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spires_search = "find a ellis and not t hadronic and not t collisions"
         self._compare_searches(invenio_search, spires_search)
 
+    def test_absorbs_naked_a_search(self):
+        """SPIRES search syntax - a ellis"""
+        invenio_search = "author:ellis"
+        naked_search = "a ellis"
+        self._compare_searches(invenio_search, naked_search)
+
+    def test_absorbs_naked_author_search(self):
+        """SPIRES search syntax - author ellis"""
+        invenio_search = "author:ellis"
+        naked_search = "author ellis"
+        self._compare_searches(invenio_search, naked_search)
+
     def test_author_simplest(self):
         """SPIRES search syntax - find a ellis"""
         invenio_search = 'author:ellis'
@@ -761,11 +773,22 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = converter.is_applicable("fin t p")
         self.assertEqual(spi_search, True)
 
-    def test_spires_syntax_detected_find(self):
-        """SPIRES search syntax - test detection find t p"""
-        # trac #261
+    def test_spires_syntax_detected_naked_a(self):
+        """SPIRES search syntax - test detection a ellis"""
         converter = search_engine_query_parser.SpiresToInvenioSyntaxConverter()
-        spi_search = converter.is_applicable("find t p")
+        spi_search = converter.is_applicable("a ellis")
+        self.assertEqual(spi_search, True)
+
+    def test_spires_syntax_detected_naked_author(self):
+        """SPIRES search syntax - test detection author ellis"""
+        converter = search_engine_query_parser.SpiresToInvenioSyntaxConverter()
+        spi_search = converter.is_applicable("author ellis")
+        self.assertEqual(spi_search, True)
+
+    def test_spires_syntax_detected_naked_author_leading_spaces(self):
+        """SPIRES search syntax - test detection              author ellis"""
+        converter = search_engine_query_parser.SpiresToInvenioSyntaxConverter()
+        spi_search = converter.is_applicable("             author ellis")
         self.assertEqual(spi_search, True)
 
     def test_spires_syntax_detected_invenio(self):
