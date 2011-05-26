@@ -42,8 +42,6 @@ Requirements:
   - uploadify.swf, uploadify.allglyphs.swf and uploadify.fla
 """
 
-__revision__ = "$Id: Move_Photos_to_Storage.py,v 1.7 2009/11/26 14:29:05 jerome Exp $"
-
 import os
 import time
 import re
@@ -61,6 +59,16 @@ def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
     The function moves files received from the submission's form
     through the PHOTO_MANAGER element and its asynchronous uploads at
     CFG_SITE_URL/submit/uploadfile.
+
+    Parameters:
+        @iconsize - Seperate multiple sizes with commas. The ImageMagick geometry inputs are supported.
+              Use type 'geometry' as defined in ImageMagick.
+              (eg. 320 or 320x240 or 100> or 5%)
+              Example: "180>,700>" will create two icons, one with maximum dimension 180px, one 700px
+        @iconformat - Allowed extensions (as defined in websubmit_icon_creator.py) are:
+                "pdf", "gif", "jpg",
+                "jpeg", "ps", "png", "bmp"
+                "eps", "epsi", "epsf"
 
     The PHOTO_MANAGER elements builds the following file organization
     in the directory curdir::
@@ -101,6 +109,9 @@ def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
     global sysno
 
     icon_sizes = parameters.get('iconsize').split(',')
+    icon_format = parameters.get('iconformat')
+    if not icon_format:
+        icon_format = 'gif'
 
     PHOTO_MANAGER_ICONS = read_param_file(curdir, 'PHOTO_MANAGER_ICONS', split_lines=True)
     photo_manager_icons_dict = dict([value.split('/', 1) \
@@ -142,7 +153,7 @@ def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
                             (icon_path, icon_name) = create_icon(
                                 { 'input-file'           : filepath,
                                   'icon-name'            : icon_filename,
-                                  'icon-file-format'     : 'gif',
+                                  'icon-file-format'     : icon_format,
                                   'multipage-icon'       : False,
                                   'multipage-icon-delay' : 100,
                                   'icon-scale'           : icon_size, # Resize only if width > 300
