@@ -656,7 +656,7 @@ class SpiresToInvenioSyntaxConverter:
         # those should not be touched
         self._re_author_match = re.compile(r'''(?ix)    # verbose, ignorecase
             \b((?P<secondorderop>[^\s]+:)?)     # do we have a second-order-op on top?
-            author:(?P<name>
+            ((?P<first>first)?)author:(?P<name>
                         [^\'\"]     # first character not a quotemark
                         [^()]+?     # some stuff that isn't parentheses (that is dealt with in pp)
                         [^\'\"])    # last character not a quotemark
@@ -988,6 +988,8 @@ class SpiresToInvenioSyntaxConverter:
                 result += match.group('secondorderop')
             scanned_name = NameScanner.scan(match.group('name'))
             author_atoms = self._create_author_search_pattern_from_fuzzy_name_dict(scanned_name)
+            if match.group('first'):
+                author_atoms = author_atoms.replace('author:', 'firstauthor:')
             if author_atoms.find(' ') == -1:
                 result += author_atoms + ' '
             else:

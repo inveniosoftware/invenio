@@ -446,6 +446,18 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = 'find fa ellis'
         self._compare_searches(inv_search, spi_search)
 
+    def test_find_first_author_initial(self):
+        """SPIRES search syntax - find fa j ellis"""
+        inv_search = 'firstauthor:"ellis, j*"'
+        spi_search = 'find fa j ellis'
+        self._compare_searches(inv_search, spi_search)
+
+    def test_first_author_full_initial(self):
+        """SPIRES search syntax - find fa klebanov, ig.r."""
+        inv_search = 'firstauthor:"klebanov, ig* r*" or exactfirstauthor:"klebanov, i r"'
+        spi_search = "find fa klebanov, ig.r."
+        self._compare_searches(inv_search, spi_search)
+
     def test_citedby_author(self):
         """SPIRES search syntax - find citedby author doggy"""
         inv_search = 'citedby:author:doggy'
