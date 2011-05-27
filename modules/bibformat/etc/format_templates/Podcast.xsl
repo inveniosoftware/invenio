@@ -54,6 +54,7 @@ xmlns:fn="http://cdsweb.cern.ch/bibformat/fn"
 xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
 xmlns:dc="http://purl.org/dc/elements/1.1/"
 xmlns:media="http://search.yahoo.com/mrss/"
+xmlns:jwplayer="http://developer.longtailvideo.com/trac/"
 exclude-result-prefixes="marc fn">
 <xsl:output method="xml"  indent="yes" encoding="UTF-8" omit-xml-declaration="yes"/>
 
@@ -106,7 +107,12 @@ exclude-result-prefixes="marc fn">
                 </xsl:when>
              </xsl:choose>
         </enclosure>
-
+	<!-- Some specific fields for the Longtail video player (in the context of MediaArchive, CERN) -->
+	<xsl:if test="starts-with(., 'http://mediaarchive.cern.ch/MediaArchive/')">
+	  <jwplayer:file><xsl:value-of select="substring(., 42)"/></jwplayer:file>
+	  <jwplayer:provider>rtmp</jwplayer:provider>
+	  <jwplayer:streamer>rtmp://flashmsuds.cern.ch/vod</jwplayer:streamer>
+        </xsl:if>
 
         <media:content>
         <xsl:attribute name="url"><xsl:value-of select="."/></xsl:attribute>
@@ -146,6 +152,12 @@ exclude-result-prefixes="marc fn">
                         <xsl:value-of select="." /><xsl:text>, </xsl:text>
                 </xsl:for-each>
         </itunes:keywords>
+
+	<!-- Content duration. Assuming it is in a good format, in well defined field. See BFE for details -->
+	<xsl:variable name="duration" select="fn:eval_bibformat(../../controlfield[@tag=001],'&lt;BFE_DURATION >')" />
+	<xsl:if test="$duration !=''">
+	    <itunes:duration xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"><xsl:value-of select="$duration" /></itunes:duration>
+        </xsl:if>
         </item>
     </xsl:for-each>
 
