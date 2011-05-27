@@ -76,27 +76,34 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
         else:
             file_icon = ''
 
-        last_name = ""
         main_urls_keys = sort_alphanumerically(main_urls.keys())
         for descr in main_urls_keys:
             urls = main_urls[descr]
             out += '<div><small class="detailedRecordActions">%s:</small> ' % descr
-            url_list = []
-            ## FIXME: This is so ugly!
             urls_dict = {}
-            for url, name, format in urls:
-                urls_dict[url] = (name, format)
-            urls_dict_keys = sort_alphanumerically(urls_dict.keys())
-            for url in urls_dict_keys:
-                name, format = urls_dict[url]
-                if not name == last_name and len(main_urls) > 1:
-                    print_name = "<em>%s</em> - " % name
+            for url, name, url_format in urls:
+                if name not in urls_dict:
+                    urls_dict[name] = [(url, url_format)]
                 else:
-                    print_name = ""
-                last_name = name
-                url_list.append(print_name + '<a '+style+' href="'+escape(url)+'">'+file_icon+format.upper()+'</a>')
-            out += separator + separator.join(url_list) + \
-                   additional_str + versions_str + '</div>'
+                    urls_dict[name].append((url, url_format))
+            for name, urls_and_format in urls_dict.items():
+                if len(urls_dict) > 1:
+                    print_name = "<em>%s</em> - " % name
+                    url_list = [print_name]
+                else:
+                    url_list = []
+                for url, url_format in urls_and_format:
+                    if CFG_CERN_SITE and url_format == 'ps.gz' and len(urls_and_format) > 1:
+                        ## We skip old PS.GZ files
+                        continue
+                    url_list.append('<a %(style)s href="%(url)s">%(file_icon)s%(url_format)s</a>' % {
+                        'style': style,
+                        'url': escape(url, True),
+                        'file_icon': file_icon,
+                        'url_format': escape(url_format.upper())
+                    })
+                out += separator + " ".join(url_list)
+            out += additional_str + versions_str + separator + "</div>"
 
     if CFG_CERN_SITE and cern_urls:
         # Put a big file icon if only one file
