@@ -23,6 +23,7 @@ __lastupdated__ = """$Date$"""
 from invenio import webinterface_handler_config as apache
 
 import os
+import cgi
 from invenio.config import CFG_SITE_URL, \
                            CFG_ACCESS_CONTROL_LEVEL_SITE, \
                            CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
@@ -57,7 +58,8 @@ from invenio.webbasket import \
      wash_topic, \
      wash_group, \
      perform_request_export_xml, \
-     page_start
+     page_start, \
+     page_end
 from invenio.webbasket_config import CFG_WEBBASKET_CATEGORIES, \
                                      CFG_WEBBASKET_ACTIONS, \
                                      CFG_WEBBASKET_SHARE_LEVELS
@@ -352,12 +354,23 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         except:
             register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
+        rssurl = CFG_SITE_URL + "/rss"
+
         if argd['of'] != 'hb':
             page_start(req, of=argd['of'])
 
             if argd['of'].startswith('x'):
-                xml = perform_request_export_xml(body)
-                return xml
+                req.write(body)
+                page_end(req, of=argd['of'])
+                return
+
+        elif argd['bskid']:
+            rssurl = "%s/yourbaskets/display?category=%s&topic=%s&group=%i&bskid=%i&of=xr" % \
+                     (CFG_SITE_URL,
+                      cgi.escape(argd['category']),
+                      cgi.escape(argd['topic']),
+                      argd['group'],
+                      argd['bskid'])
 
         return page(title       = _("Display baskets"),
                     body        = body,
@@ -370,7 +383,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
                     navtrail_append_title_p = 0,
-                    secure_page_p=1)
+                    secure_page_p=1,
+                    rssurl=rssurl)
 
     def search(self, req, form):
         """Search baskets interface."""
@@ -1282,9 +1296,19 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             except:
                 register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
-        if argd['of'] == 'xm':
+        rssurl = CFG_SITE_URL + "/rss"
+
+        if argd['of'] != 'hb':
             page_start(req, of=argd['of'])
-            return perform_request_export_xml(body)
+
+            if argd['of'].startswith('x'):
+                req.write(body)
+                page_end(req, of=argd['of'])
+                return
+        elif argd['bskid']:
+            rssurl = "%s/yourbaskets/display_public?&bskid=%i&of=xr" % \
+                     (CFG_SITE_URL,
+                      argd['bskid'])
 
         return page(title       = title,
                     body        = body,
@@ -1297,7 +1321,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
                     navtrail_append_title_p = 0,
-                    secure_page_p=1)
+                    secure_page_p=1,
+                    rssurl=rssurl)
 
     def list_public_baskets(self, req, form):
         """List of public baskets interface."""

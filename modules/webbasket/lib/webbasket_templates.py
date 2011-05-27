@@ -3112,7 +3112,7 @@ class Template:
             items_html += """
   </tbody>"""
             return items_html
-        elif of == 'xm':
+        elif of.startswith('x'):
             items_xml = ""
             for item in items:
                 items_xml += item[4] + "\n"
@@ -3749,7 +3749,7 @@ class Template:
                                    public=False):
         """Tamplate that creates a bullet list of export as formats for a basket or an item."""
 
-        list_of_export_as_formats = [('BibTeX','hx'), ('DC','xd'), ('EndNote','xe'), ('MARCXML', 'xm'), ('NLM','xn'), ('RefWorks','xw')]
+        list_of_export_as_formats = [('BibTeX','hx'), ('DC','xd'), ('EndNote','xe'), ('MARCXML', 'xm'), ('NLM','xn'), ('RefWorks','xw'), ('RSS','xr')]
 
         recid = item and "&recid=" + str(item[0]) or ""
 
