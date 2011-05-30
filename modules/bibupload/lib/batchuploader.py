@@ -33,7 +33,7 @@ import os
 import time
 import tempfile
 import shutil
-from invenio.config import CFG_TMPDIR, \
+from invenio.config import CFG_TMPSHAREDDIR, \
                            CFG_BATCHUPLOADER_DAEMON_DIR, \
                            CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY, \
                            CFG_PREFIX
@@ -60,7 +60,7 @@ def task_run_core():
         and uploads them.
         Files are then moved to the corresponding DONE folders.
     """
-    tempfile.tempdir = CFG_TMPDIR
+    tempfile.tempdir = CFG_TMPSHAREDDIR
     daemon_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
                  or CFG_PREFIX + '/' + CFG_BATCHUPLOADER_DAEMON_DIR
     # Check if directory /batchupload exists

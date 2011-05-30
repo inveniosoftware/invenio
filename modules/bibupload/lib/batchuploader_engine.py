@@ -34,7 +34,7 @@ import calendar
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.webuser import collect_user_info, page_not_authorized
-from invenio.config import CFG_BINDIR, CFG_TMPDIR, CFG_LOGDIR, \
+from invenio.config import CFG_BINDIR, CFG_TMPSHAREDDIR, CFG_LOGDIR, \
                             CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
                             CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
                             CFG_OAI_ID_FIELD, CFG_BATCHUPLOADER_DAEMON_DIR, \
@@ -108,7 +108,7 @@ def cli_upload(req, file_content=None, mode=None):
         arg_file = arg_file.value
 
     # write temporary file:
-    tempfile.tempdir = CFG_TMPDIR
+    tempfile.tempdir = CFG_TMPSHAREDDIR
 
     filename = tempfile.mktemp(prefix="batchupload_" + \
                time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_")
@@ -163,7 +163,7 @@ def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None
         metafile = _transform_input_to_marcxml(file_input=metafile.value)
 
     user_info = collect_user_info(req)
-    tempfile.tempdir = CFG_TMPDIR
+    tempfile.tempdir = CFG_TMPSHAREDDIR
     filename = tempfile.mktemp(prefix="batchupload_" + \
         user_info['nickname'] + "_" + time.strftime("%Y%m%d%H%M%S",
         time.localtime()) + "_")
@@ -282,7 +282,7 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
                 error_msg = err_desc[5] % file_collection
                 errors.append((docfile, error_msg))
                 continue
-            tempfile.tempdir = CFG_TMPDIR
+            tempfile.tempdir = CFG_TMPSHAREDDIR
             # Move document to be uploaded to temporary folder
             tmp_file = tempfile.mktemp(prefix=identifier + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_", suffix=extension)
             shutil.copy(os.path.join(folder, docfile), tmp_file)
@@ -594,7 +594,7 @@ def _transform_input_to_marcxml(file_input=""):
     to MARCXML.
     """
     # Create temporary file to read from
-    tmp_fd, filename = tempfile.mkstemp(dir=CFG_TMPDIR)
+    tmp_fd, filename = tempfile.mkstemp(dir=CFG_TMPSHAREDDIR)
     os.write(tmp_fd, file_input)
     os.close(tmp_fd)
     try:
