@@ -221,4 +221,4 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
                                                          CFG_SITE_RECORD,
                                                          self.recid))
         else:
-            redirect_to_url(req, '%s/%s/edit/' % CFG_SITE_URL, CFG_SITE_RECORD)
+            redirect_to_url(req, '%s/%s/edit/' % (CFG_SITE_URL, CFG_SITE_RECORD))

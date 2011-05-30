@@ -51,6 +51,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_ADMIN_EMAIL, \
+     CFG_CERN_SITE, \
      CFG_INSPIRE_SITE, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
@@ -3399,8 +3400,14 @@ class Template:
     def tmpl_xml_rss_prologue(self, current_url=None,
                               previous_url=None, next_url=None,
                               first_url=None, last_url=None,
-                              nb_found=None, jrec=None, rg=None):
+                              nb_found=None, jrec=None, rg=None, cc=None):
         """Creates XML RSS 2.0 prologue."""
+        title = CFG_SITE_NAME
+        description = '%s latest documents' % CFG_SITE_NAME
+        if cc and cc != CFG_SITE_NAME:
+            title += ': ' + cgi.escape(cc)
+            description += ' in ' + cgi.escape(cc)
+
         out = """<rss version="2.0"
         xmlns:media="http://search.yahoo.com/mrss/"
         xmlns:atom="http://www.w3.org/2005/Atom"
@@ -3408,9 +3415,9 @@ class Template:
         xmlns:dcterms="http://purl.org/dc/terms/"
         xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">
       <channel>
-        <title>%(sitename)s</title>
+        <title>%(rss_title)s</title>
         <link>%(siteurl)s</link>
-        <description>%(sitename)s latest documents</description>
+        <description>%(rss_description)s</description>
         <language>%(sitelang)s</language>
         <pubDate>%(timestamp)s</pubDate>
         <category></category>
@@ -3454,6 +3461,8 @@ class Template:
                              '\n<opensearch:startIndex>%i</opensearch:startIndex>' % jrec) or '',
                'items_per_page': (rg and \
                              '\n<opensearch:itemsPerPage>%i</opensearch:itemsPerPage>' % rg) or '',
+               'rss_title': title,
+               'rss_description': description
         }
         return out
 
@@ -3467,17 +3476,26 @@ class Template:
     def tmpl_xml_podcast_prologue(self, current_url=None,
                                   previous_url=None, next_url=None,
                                   first_url=None, last_url=None,
-                                  nb_found=None, jrec=None, rg=None):
+                                  nb_found=None, jrec=None, rg=None, cc=None):
         """Creates XML podcast prologue."""
+        title = CFG_SITE_NAME
+        description = '%s latest documents' % CFG_SITE_NAME
+        if CFG_CERN_SITE:
+            title = 'CERN'
+            description = 'CERN latest documents'
+        if cc and cc != CFG_SITE_NAME:
+            title += ': ' + cgi.escape(cc)
+            description += ' in ' + cgi.escape(cc)
+
         out = """<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
         <channel>
-        <title>%(sitename)s</title>
+        <title>%(podcast_title)s</title>
 	<link>%(siteurl)s</link>
-        <description>%(sitename)s latest documents</description>
+        <description>%(podcast_description)s</description>
         <language>%(sitelang)s</language>
         <pubDate>%(timestamp)s</pubDate>
         <category></category>
-	<generator>CDS Invenio %(version)s</generator>
+	<generator>Invenio %(version)s</generator>
         <webMaster>%(siteadminemail)s</webMaster>
         <ttl>%(timetolive)s</ttl>%(previous_link)s%(next_link)s%(current_link)s
         <image>
@@ -3506,6 +3524,8 @@ class Template:
                              '\n<atom:link rel="first" href="%s" />' % first_url) or '',
                'last_link': (last_url and \
                              '\n<atom:link rel="last" href="%s" />' % last_url) or '',
+                'podcast_title': title,
+                'podcast_description': description
                }
         return out
 

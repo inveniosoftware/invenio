@@ -586,8 +586,12 @@ def get_pdf_snippets(recID, patterns,
         if bd.get_text():
             text_path = bd.get_text_path()
             text_path_courtesy = bd.get_status()
-            if not text_path_courtesy and CFG_INSPIRE_SITE:
+            if CFG_INSPIRE_SITE and not text_path_courtesy:
+                # get courtesy from doctype, since docstatus was empty:
                 text_path_courtesy = bd.get_type()
+                if text_path_courtesy == 'INSPIRE-PUBLIC':
+                    # but ignore 'INSPIRE-PUBLIC' doctype
+                    text_path_courtesy = ''
             break # stop at the first good PDF textable file
 
     if text_path:

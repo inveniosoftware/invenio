@@ -91,7 +91,6 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
         #versions_str = ' <small>(<a '+style+' href="'+CFG_SITE_URL+'/CFG_SITE_RECORD/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("older versions")
 
     if main_urls:
-        last_name = ""
         main_urls_keys = sort_alphanumerically(main_urls.keys())
         for descr in main_urls_keys:
             urls = main_urls[descr]
@@ -103,22 +102,29 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
                 # Main/Additional/Plot etc.
                 continue
             out += "<strong>%s:</strong> " % descr
-            url_list = []
-            ## FIXME: This is so ugly!
             urls_dict = {}
             for url, name, url_format in urls:
-                urls_dict[url] = (name, url_format)
-            urls_dict_keys = sort_alphanumerically(urls_dict.keys())
-            for url in urls_dict_keys:
-                name, url_format = urls_dict[url]
-                if not name == last_name and len(main_urls) > 1:
-                    print_name = "<em>%s</em> - " % name
+                if name not in urls_dict:
+                    urls_dict[name] = [(url, url_format)]
                 else:
-                    print_name = ""
-                last_name = name
-                url_list.append(print_name + '<a '+style+' href="'+escape(url)+'">'+ \
-                                file_icon + url_format.upper()+'</a>')
-            out += separator.join(url_list) + additional_str + versions_str + '<br />'
+                    urls_dict[name].append((url, url_format))
+            for name, urls_and_format in urls_dict.items():
+                if len(urls_dict) > 1:
+                    print_name = "<em>%s</em> - " % name
+                    url_list = [print_name]
+                else:
+                    url_list = []
+                for url, url_format in urls_and_format:
+                    if CFG_CERN_SITE and url_format == 'ps.gz' and len(urls_and_format) > 1:
+                        ## We skip old PS.GZ files
+                        continue
+                    url_list.append('<a %(style)s href="%(url)s">%(file_icon)s%(url_format)s</a>' % {
+                        'style': style,
+                        'url': escape(url, True),
+                        'file_icon': file_icon,
+                        'url_format': escape(url_format.upper())
+                    })
+            out += " ".join(url_list) + additional_str + versions_str + separator
 
     if CFG_CERN_SITE and cern_urls:
         link_word = len(cern_urls) == 1 and _('%(x_sitename)s link') or _('%(x_sitename)s links')
@@ -225,9 +231,11 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
             if url_format.startswith('.'):
                 url_format = url_format[1:]
 
-            descr = ''
+            descr = _("Fulltext")
             if complete_url.has_key('y'):
                 descr = complete_url['y']
+                if descr == 'Fulltext':
+                    descr = _("Fulltext")
             if not url.startswith(CFG_SITE_URL): # Not a bibdoc?
                 if not descr: # For not bibdoc let's have a description
                     # Display the URL in full:

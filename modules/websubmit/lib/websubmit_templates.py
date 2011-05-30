@@ -23,7 +23,7 @@ import re
 import operator
 
 from invenio.config import CFG_SITE_URL, \
-     CFG_SITE_LANG, CFG_SITE_RECORD
+     CFG_SITE_LANG, CFG_SITE_RECORD, CFG_INSPIRE_SITE
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datetext_to_dategui, convert_datestruct_to_dategui
 from invenio.urlutils import create_html_link
@@ -1179,7 +1179,9 @@ class Template:
 
         out = ""
         for mytype in types:
-            out += "<small><b>%s</b> %s:</small>" % (mytype['name'], _("file(s)"))
+            if mytype['name']:
+                if not (CFG_INSPIRE_SITE and mytype['name'] == 'INSPIRE-PUBLIC'):
+                    out += "<small><b>%s</b> %s:</small>" % (mytype['name'], _("file(s)"))
             out += "<ul>"
             for content in mytype['content']:
                 out += content

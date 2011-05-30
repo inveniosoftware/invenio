@@ -30,7 +30,7 @@ pylib_DATA = bfe_field.py bfe_title.py bfe_authors.py bfe_abstract.py bfe_affili
 	     bfe_pagination.py bfe_fulltext_mini.py bfe_year.py bfe_isbn.py \
 	     bfe_appears_in_collections.py bfe_photos.py bfe_record_stats.py \
 	     bfe_edit_files.py bfe_plots.py bfe_plots_thumb.py bfe_sword_push.py \
-	     bfe_aid_authors.py bfe_doi.py bfe_addthis.py
+	     bfe_aid_authors.py bfe_doi.py bfe_addthis.py bfe_duration.py
 
 
 tmpdir = $(prefix)/var/tmp/tests_bibformat_elements

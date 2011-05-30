@@ -177,7 +177,7 @@ def usage():
      Common predefined fields used in querystrings: (for Invenio demo site, your fields may vary!)
 
      'abstract', 'affiliation', 'anyfield', 'author', 'coden', 'collaboration',
-     'collection', 'datecreated', 'datemodified', 'division', 'exactauthor',
+     'collection', 'datecreated', 'datemodified', 'division', 'exactauthor', 'exactfirstauthor',
      'experiment', 'fulltext', 'isbn', 'issn', 'journal', 'keyword', 'recid',
      'reference', 'reportnumber', 'subject', 'title', 'year'
 

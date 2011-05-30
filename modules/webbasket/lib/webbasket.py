@@ -46,7 +46,9 @@ from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
 from invenio.webuser import isGuestUser, collect_user_info
 from invenio.search_engine import \
      record_exists, \
-     check_user_can_view_record
+     check_user_can_view_record, \
+     print_records_prologue, \
+     print_records_epilogue
 #from invenio.webcomment import check_user_can_attach_file_to_comments
 import invenio.webbasket_dblayer as db
 try:
@@ -2199,11 +2201,19 @@ def page_start(req, of='xm'):
 
     if of.startswith('x'):
         req.content_type = "text/xml"
+        if of == 'xr':
+            req.content_type = "application/rss+xml"
         req.send_http_header()
         req.write("""<?xml version="1.0" encoding="UTF-8"?>\n""")
+        print_records_prologue(req, of)
     else: # assuming HTML by default
         req.content_type = "text/html"
         req.send_http_header()
+
+def page_end(req, of='xm'):
+    """Print page footer"""
+    if of.startswith('x'):
+        print_records_epilogue(req, of)
 
 def perform_request_export_xml(body):
     """Export an xml representation of the selected baskets/items."""
@@ -2424,7 +2434,7 @@ def wash_bskid(uid, category, bskid):
 def wash_of(of):
     """Wash the output format"""
 
-    list_of_accepted_formats = ['hb', 'xm', 'hx', 'xd', 'xe', 'xn', 'xw']
+    list_of_accepted_formats = ['hb', 'xm', 'hx', 'xd', 'xe', 'xn', 'xw', 'xr', 'xp']
 
     if of in list_of_accepted_formats:
         return (of, None)

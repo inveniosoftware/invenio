@@ -909,11 +909,13 @@ def perform_accesspolicy(req, callback='yes', confirm=0):
     account_policy[1] = "Users can register new accounts. Admin users must activate the accounts."
     account_policy[2] = "Only admin can register new accounts. User cannot edit email address."
     account_policy[3] = "Only admin can register new accounts. User cannot edit email address or password."
-    account_policy[4] = "Only admin can register new accounts. User cannot edit email address,password or login method."
+    account_policy[4] = "Only admin can register new accounts. User cannot edit email address, password or login method."
+    account_policy[5] = "Only admin can register new accounts. User cannot edit email address, password or login method and information about how to get an account is hidden from the login page."
     site_policy = {}
     site_policy[0] = "Normal operation of the site."
     site_policy[1] = "Read-only site, all write operations temporarily closed."
     site_policy[2] = "Site fully closed."
+    site_policy[3] = "Site fully closed. Database connection disabled."
 
     output = "(Modifications must be done in access_control_config.py)<br />"
     output += "<br /><b>Current settings:</b><br />"

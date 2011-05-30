@@ -1503,7 +1503,8 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
                                                       next_url=next_url,
                                                       first_url=first_url, last_url=last_url,
                                                       nb_found=nb_found,
-                                                      jrec=argd['jrec'], rg=argd['rg']) + '\n'
+                                                      jrec=argd['jrec'], rg=argd['rg'],
+                                                      cc=argd['cc']) + '\n'
             req.write(rss_prologue)
             rss_body = format_records(recIDs,
                                       of='xr',

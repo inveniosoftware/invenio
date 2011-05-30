@@ -650,6 +650,9 @@ class SpiresToInvenioSyntaxConverter:
         # for finding (and changing) a variety of different SPIRES search keywords
         self._re_spires_find_keyword = re.compile('^(f|fin|find)\s+', re.IGNORECASE)
 
+        # for determining if we have a naked author search
+        self._re_naked_author_search = re.compile('^\s*(a|author)\s+', re.IGNORECASE)
+
         # for finding boolean expressions
         self._re_boolean_expression = re.compile(r' and | or | not | and not ')
 
@@ -664,8 +667,9 @@ class SpiresToInvenioSyntaxConverter:
         """Is this converter applicable to this query?
 
         Returns True IFF the query starts with SPIRES' 'find' keyword or some
-        acceptable variation thereof."""
-        if self._re_spires_find_keyword.match(query.lower()):
+        acceptable variation thereof or with "a " or "author "."""
+        if self._re_spires_find_keyword.match(query.lower()) or\
+                self._re_naked_author_search.match(query.lower()):
             return True
         else:
             return False
@@ -678,6 +682,7 @@ class SpiresToInvenioSyntaxConverter:
         # SPIRES syntax allows searches with 'find' or 'fin'.
         if self.is_applicable(query):
             query = re.sub(self._re_spires_find_keyword, 'find ', query)
+            query = re.sub(self._re_naked_author_search, 'find a ', query)
 
             # a holdover from SPIRES syntax is e.g. date = 2000 rather than just date 2000
             query = self._remove_extraneous_equals_signs(query)
