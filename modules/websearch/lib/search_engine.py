@@ -671,7 +671,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
         if f and p[0] == '"' and p[-1] == '"':
             ## B0 - does 'p' start and end by double quote, and is 'f' defined? => doing ACC search
             opfts.append(['+', p[1:-1], f, 'a'])
-        elif f in ('author', 'firstauthor', 'exactauthor') and author_name_requires_phrase_search(p):
+        elif f in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor') and author_name_requires_phrase_search(p):
             ## B1 - do we search in author, and does 'p' contain space/comma/dot/etc?
             ## => doing washed ACC search
             opfts.append(['+', p, f, 'a'])
@@ -2277,7 +2277,7 @@ def search_unit_in_idxphrases(p, f, type, wl=0):
                 query_params = (p,)
 
     # special washing for fuzzy author index:
-    if f in ('author', 'firstauthor', 'exactauthor'):
+    if f in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor'):
         query_params_washed = ()
         for query_param in query_params:
             query_params_washed += (wash_author_name(query_param),)

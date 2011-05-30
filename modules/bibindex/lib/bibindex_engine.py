@@ -1068,7 +1068,7 @@ class WordTable:
         self.recIDs_in_mem.append([recID1,recID2])
         # special case of author indexes where we also add author
         # canonical IDs:
-        if self.index_name in ('author', 'firstauthor', 'exactauthor'):
+        if self.index_name in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor'):
             for recID in range(recID1, recID2 + 1):
                 if not wlist.has_key(recID):
                     wlist[recID] = []
@@ -1544,7 +1544,7 @@ def task_run_core():
 
             if index_name in ('author', 'firstauthor'):
                 fnc_get_phrases_from_phrase = get_fuzzy_authors_from_phrase
-            elif index_name == 'exactauthor':
+            elif index_name in ('exactauthor', 'exactfirstauthor'):
                 fnc_get_phrases_from_phrase = get_exact_authors_from_phrase
             else:
                 fnc_get_phrases_from_phrase = get_phrases_from_phrase
@@ -1711,7 +1711,7 @@ def task_run_core():
         # Let's work on phrases now
         if index_name in ('author', 'firstauthor'):
             fnc_get_phrases_from_phrase = get_fuzzy_authors_from_phrase
-        elif index_name == 'exactauthor':
+        elif index_name in ('exactauthor', 'exactfirstauthor'):
             fnc_get_phrases_from_phrase = get_exact_authors_from_phrase
         else:
             fnc_get_phrases_from_phrase = get_phrases_from_phrase
