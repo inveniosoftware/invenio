@@ -791,6 +791,18 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = converter.is_applicable("             author ellis")
         self.assertEqual(spi_search, True)
 
+    def test_spires_syntax_detected_naked_title(self):
+        """SPIRES search syntax - test detection t muon"""
+        converter = search_engine_query_parser.SpiresToInvenioSyntaxConverter()
+        spi_search = converter.is_applicable("t muon")
+        self.assertEqual(spi_search, True)
+
+    def test_spires_syntax_detected_second_keyword(self):
+        """SPIRES search syntax - test detection author:ellis and t muon"""
+        converter = search_engine_query_parser.SpiresToInvenioSyntaxConverter()
+        spi_search = converter.is_applicable("author:ellis and t muon")
+        self.assertEqual(spi_search, True)
+
     def test_spires_syntax_detected_invenio(self):
         """SPIRES search syntax - test detection Not SPIRES"""
         # trac #261
