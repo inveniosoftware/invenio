@@ -862,30 +862,33 @@ function isRevisionID(str) {
 function onclickSubmitButton() {
   var checkbox = $('#bibMergeDupeCheckbox').attr('checked');
 
-  var _data = {
-    requestType: 'submit',
-    recID1: gRecID1
-  };
-  if (checkbox == true)
-    _data['duplicate'] = gRecID2;
+  if (displayAlert('confirmSubmit')){
+      var _data = {
+        requestType: 'submit',
+        recID1: gRecID1
+      };
+      if (checkbox == true)
+        _data['duplicate'] = gRecID2;
 
-  showMessage('LoadingMsg', 'Submitting...');
-  ajaxRequest(_data, function(html){
-    window.location.hash = '';
-  });
-
-  if (checkbox == true)
-    $('#bibMergeDupeCheckbox').attr('checked', false);
+      showMessage('LoadingMsg', 'Submitting...');
+      ajaxRequest(_data, function(html){
+        window.location.hash = '';
+      });
+      if (checkbox == true)
+          $('#bibMergeDupeCheckbox').attr('checked', false);
+  }
 }
 function onclickCancelButton() {
-  var _data = {
-    requestType: 'cancel',
-    recID1: gRecID1
-  };
-  showMessage('LoadingMsg', 'Cancelling...');
-  ajaxRequest(_data, function(html){
+  if (displayAlert('confirmCancel')){
+    var _data = {
+        requestType: 'cancel',
+        recID1: gRecID1
+    };
+    showMessage('LoadingMsg', 'Cancelling...');
+    ajaxRequest(_data, function(html){
     window.location.hash = '';
-  });
+    });
+  }
 }
 function ajaxRequest(data, onSuccessFunc){
   /* Create Ajax request. */
@@ -969,4 +972,25 @@ function panelDisabled(disabled) {
     $('#bibMergePanel').find('button, input, optgroup, option, select, textarea').attr('disabled', true);
   else
     $('#bibMergePanel').find('button, input, optgroup, option, select, textarea').removeAttr('disabled');
+}
+
+function displayAlert(msgType) {
+   /*
+    * Display confirmation pop-up.
+    * Could be extended for all kind of alerts
+    */
+   var msg;
+   var popUpType = 'confirm';
+   switch(msgType) {
+        case 'confirmSubmit':
+            msg = 'Submit your changes to this record?\n\n';
+            popUpType = 'confirm';
+            break;
+        case 'confirmCancel':
+            msg = 'Discard your changes?\n\n';
+            popUpType = 'confirm';
+            break;
+   }
+   if (popUpType == 'confirm')
+       return confirm(msg);
 }
