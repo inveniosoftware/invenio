@@ -141,7 +141,7 @@ class Template:
       <tr>
       <td> <button type="button" id="bibMergeBtnSubmit">Submit</button> </td>
       <td> <input type="checkbox" id="bibMergeDupeCheckbox"></input> </td>
-      <td>candidate record is duplicate</td>
+      <td>delete slave record as duplicate</td>
       </tr>
     </table>
   </div>
