@@ -166,16 +166,19 @@ def get_pylint_results(filename):
     nb_msg_fatal) for FILENAME.  If score cannot be detected, print an
     error and return (-999999999, -999999999, 0, 0, 0, 0, 0).
     """
-    process = subprocess.Popen(['pylint', '--rcfile=/dev/null',
+    process = subprocess.Popen(['pylint',
+                                '--output-format=parseable',
+                                '--rcfile=/dev/null',
                                 filename],
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
+
     pylint_output, pylint_error = process.communicate()
     if pylint_error:
         print "[ERROR]", pylint_error
 
     # detect number of missing docstrings:
-    nb_missing_docstrings = pylint_output.count(": Missing docstring")
+    nb_missing_docstrings = pylint_output.count("] Missing docstring")
 
     # detect pylint score:
     pylint_score = -999999999
@@ -187,11 +190,11 @@ def get_pylint_results(filename):
         print "ERROR: cannot detect pylint score for %s" % filename
 
     # detect pylint messages
-    nb_msg_convention = pylint_output.count("\nC:")
-    nb_msg_refactor = pylint_output.count("\nR:")
-    nb_msg_warning = pylint_output.count("\nW:")
-    nb_msg_error = pylint_output.count("\nE:")
-    nb_msg_fatal = pylint_output.count("\nF:")
+    nb_msg_convention = pylint_output.count(": [C")
+    nb_msg_refactor = pylint_output.count(": [R")
+    nb_msg_warning = pylint_output.count(": [W")
+    nb_msg_error = pylint_output.count(": [E")
+    nb_msg_fatal = pylint_output.count(": [F")
 
     # return results:
     return (nb_missing_docstrings, float(pylint_score),
@@ -605,12 +608,11 @@ def get_python_filenames_from_pathnames(pathnames, extension='.py'):
     return out
 
 
-def print_heading(phrase, prefix='\033[1m', suffix='\033[0;0m'):
-    """Print heading phrase in a special style (default=bold)."""
+def print_heading(phrase, prefix='', suffix='', stream='INFO'):
+    """Print heading phrase in a special style."""
     if QUIET_MODE:
         return
-    print prefix + '>>> ' + phrase + suffix
-    print
+    print prefix + '[' + stream + '] ' + phrase + suffix
 
 
 def print_usage():
@@ -625,54 +627,74 @@ def print_version():
 
 def cmd_check_all(filenames):
     """Run all checks on filenames."""
-    cmd_check_errors(filenames)
-    cmd_check_variables(filenames)
-    cmd_check_indentation(filenames)
-    cmd_check_whitespace(filenames)
-    cmd_check_docstrings(filenames)
-    cmd_check_pep8(filenames)
+    errors_found_p = False
+    if cmd_check_errors(filenames):
+        errors_found_p = True
+    if cmd_check_variables(filenames):
+        errors_found_p = True
+    if cmd_check_indentation(filenames):
+        errors_found_p = True
+    if cmd_check_whitespace(filenames):
+        errors_found_p = True
+    if cmd_check_docstrings(filenames):
+        errors_found_p = True
+    if cmd_check_pep8(filenames):
+        errors_found_p = True
+    return errors_found_p
 
 
 def cmd_check_some(filenames):
     """Run some (important) checks on filenames."""
-    cmd_check_errors(filenames)
-    cmd_check_variables(filenames)
-    cmd_check_indentation(filenames)
-    cmd_check_whitespace(filenames)
+    errors_found_p = False
+    if cmd_check_errors(filenames):
+        errors_found_p = True
+    if cmd_check_variables(filenames):
+        errors_found_p = True
+    if cmd_check_indentation(filenames):
+        errors_found_p = True
+    if cmd_check_whitespace(filenames):
+        errors_found_p = True
+    return errors_found_p
 
 
 def cmd_check_errors(filenames):
     """Run pylint error check on filenames."""
+    errors_found_p = False
     print_heading('Checking Python errors...')
     for filename in filenames:
         out = ''
         process = subprocess.Popen(['pylint', '--rcfile=/dev/null',
+                                    '--output-format=parseable',
                                     '--errors-only', filename],
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
         out, err = process.communicate()
         if err:
+            errors_found_p = True
             print "[ERROR]", err
         if out:
-            print '***', filename
+            errors_found_p = True
             print out
+    return errors_found_p
 
 
 def cmd_check_variables(filenames):
     """Run pylint variable check on filenames."""
+    errors_found_p = False
     print_heading('Checking Python variables...')
     for filename in filenames:
         out = ''
         process = subprocess.Popen(['pylint', '--rcfile=/dev/null',
+                                    '--output-format=parseable',
                                     '--reports=n', filename],
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
         pylint_output, pylint_error = process.communicate()
         if pylint_error:
+            errors_found_p = True
             print "[ERROR]", pylint_error
         for line in pylint_output.split('\n'): # pylint: disable=E1103
-            if line.startswith('F:') or line.startswith('E:') or \
-                   line.startswith('W:'):
+            if '; [F' in line or ': [E' in line or ': [W' in line:
                 if 'variable' in line or \
                    'name' in line or \
                    'global' in line or \
@@ -680,32 +702,38 @@ def cmd_check_variables(filenames):
                    'Redefining' in line:
                     out += line + '\n'
         if out:
-            print '***', filename
+            errors_found_p = True
             print out
+    return errors_found_p
 
 
 def cmd_check_indentation(filenames):
     """Run pylint indendation check on filenames."""
+    errors_found_p = False
     print_heading('Checking Python indentation...')
     for filename in filenames:
         out = ''
         process = subprocess.Popen(['pylint', '--rcfile=/dev/null',
+                                    '--output-format=parseable',
                                     '--reports=n', filename],
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
         process_output, process_error = process.communicate()
         if process_error:
+            errors_found_p = True
             print "[ERROR]", process_error
         for line in process_output.split('\n'): # pylint: disable=E1103
             if 'indent' in line:
                 out += line + '\n'
         if out:
-            print '***', filename
+            errors_found_p = True
             print out
+    return errors_found_p
 
 
 def cmd_check_whitespace(filenames):
     """Run trailing whitespace check on filenames."""
+    errors_found_p = False
     print_heading('Checking trailing whitespace...')
     for filename in filenames:
         out = ''
@@ -714,17 +742,20 @@ def cmd_check_whitespace(filenames):
                                    stderr=subprocess.PIPE)
         process_output, process_error = process.communicate()
         if process_error:
+            errors_found_p = True
             print "[ERROR]", process_error
         for line in process_output.split('\n'): # pylint: disable=E1103
             if line:
                 out += line + '\n'
         if out:
-            print '***', filename
+            errors_found_p = True
             print out
+    return errors_found_p
 
 
 def cmd_check_docstrings(filenames):
     """Run epydoc doctrings check on filenames."""
+    errors_found_p = False
     print_heading('Checking Python docstrings compliance...')
     for filename in filenames:
         out = ''
@@ -734,6 +765,7 @@ def cmd_check_docstrings(filenames):
                                    stderr=subprocess.PIPE)
         process_output, process_error = process.communicate()
         if process_error:
+            errors_found_p = True
             print "[ERROR]", process_error
         for line in process_output.split('\n'): # pylint: disable=E1103
             if line.startswith('  [......'):
@@ -746,12 +778,14 @@ def cmd_check_docstrings(filenames):
                 out += line + '\n'
         if out and out.strip() != 'Warning: Undocumented:':
             # something other than sole __package__ was found
-            print '***', filename
+            errors_found_p = True
             print out
+    return errors_found_p
 
 
 def cmd_check_pep8(filenames):
     """Run PEP8 compliance check on filenames."""
+    errors_found_p = False
     print_heading('Checking PEP8 compliance...')
     path_to_pep8 = sys.argv[0].replace('kwalitee.py', 'pep8.py')
     for filename in filenames:
@@ -762,10 +796,12 @@ def cmd_check_pep8(filenames):
                                    stderr=subprocess.PIPE)
         out, err = process.communicate()
         if err:
+            errors_found_p = True
             print "[ERROR]", err
         if out:
-            print '***', filename
+            errors_found_p = True
             print out
+    return errors_found_p
 
 
 def cmd_stats(filenames):
@@ -830,17 +866,13 @@ def main():
                 # respective tests, and after cleaning advertize it in
                 # the --help page.
                 cmd_filenames = cmd_pathnames
-            eval('cmd_' + cmd_option)(cmd_filenames)
+            errors_found_p = eval('cmd_' + cmd_option)(cmd_filenames)
+            if errors_found_p:
+                print_heading('Kwalitee problems found.  Please fix.',
+                              stream='ERROR')
+                sys.exit(1)
         print_heading('Done.')
     return
 
-
-def test():
-    """Test stuff."""
-    print get_pylint_results("/opt/invenio/lib/python/"
-                             "invenio/bibrecord.py")
-
-
 if __name__ == "__main__":
-    #test()
     main()
