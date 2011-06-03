@@ -437,7 +437,7 @@ def _task_build_params(
                 _TASK_PARAMS["runtime_limit"] = parse_runtime_limit(opt[1])
             elif opt[0] in ("--profile", ):
                 _TASK_PARAMS["profile"] += opt[1].split(',')
-            elif opt[0] in ("--post-process"):
+            elif opt[0] in ("--post-process", ):
                 _TASK_PARAMS["post-process"] += [opt[1]];
             elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
                 not task_submit_elaborate_specific_parameter_fnc(opt[0],
@@ -800,10 +800,10 @@ def _task_run(task_run_fnc):
     if task_get_task_param("post-process"):
 
         split = re.compile(r"(bst_.*)\[(.*)\]")
-        for tasklet in task_get_task_param("post-process") :
-            re.search(r"\[.*\]", tasklet)
-            if not(split.match(tasklet)): # wrong syntax
-                _usage(1, "Bib_takslet bad syntax")
+        for tasklet in task_get_task_param("post-process"):
+            if not split.match(tasklet): # wrong syntax
+                _usage(1, "There is an error in the post processing option "
+                        "for this task.")
 
             aux_tasklet = split.match(tasklet)
             _TASKLETS[aux_tasklet.group(1)](**eval("dict(%s)" % (aux_tasklet.group(2))))
@@ -837,8 +837,8 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
     sys.stderr.write("  -v, --verbose=LEVEL\tVerbose level (0=min,"
         " 1=default, 9=max).\n")
     sys.stderr.write("      --profile=STATS\tPrint profile information. STATS is a comma-separated\n\t\t\tlist of desired output stats (calls, cumulative,\n\t\t\tfile, line, module, name, nfl, pcalls, stdname, time).\n")
-    sys.stderr.write("  --post-process=BIB_TASKLET_NAME[parameters]\tPostprocesses the specified bibtasklet with the given parameters BETWEEN SQUARE BRACKETS.\n")
-    sys.stderr.write("\t\t\tExample:--post-process \"bst_send_email[fromaddr='foo@xxx.com', toaddr='bar@xxx.com', subject='hello', content='hellp']\" -v9\n")
+    sys.stderr.write("  --post-process=BIB_TASKLET_NAME[parameters]\tPostprocesses the specified\n\t\t\tbibtasklet with the given parameters between square\n\t\t\tbrackets.\n")
+    sys.stderr.write("\t\t\tExample:--post-process \"bst_send_email[fromaddr=\n\t\t\t'foo@xxx.com', toaddr='bar@xxx.com', subject='hello',\n\t\t\tcontent='help']\"\n")
     if description:
         sys.stderr.write(description)
     sys.exit(exitcode)
