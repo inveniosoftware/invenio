@@ -67,6 +67,7 @@ from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
 from invenio.htmlutils import remove_html_markup, get_links_in_html_page
 from invenio.textutils import wash_for_utf8
+from invenio.search_engine_utils import get_fieldvalues
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -124,17 +125,6 @@ def kill_sleepy_mysql_threads(max_threads=CFG_MAX_MYSQL_THREADS, thread_timeout=
                 run_sql("KILL %s", (r_id,))
                 write_message("WARNING: too many DB threads, killing thread %s" % r_id, verbose=1)
     return
-
-## MARC-21 tag/field access functions
-def get_fieldvalues(recID, tag):
-    """Returns list of values of the MARC-21 'tag' fields for the record
-       'recID'."""
-    bibXXx = "bib" + tag[0] + tag[1] + "x"
-    bibrec_bibXXx = "bibrec_" + bibXXx
-    query = "SELECT value FROM %s AS b, %s AS bb WHERE bb.id_bibrec=%%s AND bb.id_bibxxx=b.id AND tag LIKE %%s" \
-            % (bibXXx, bibrec_bibXXx)
-    res = run_sql(query, (recID, tag))
-    return [row[0] for row in res]
 
 def get_associated_subfield_value(recID, tag, value, associated_subfield_code):
     """Return list of ASSOCIATED_SUBFIELD_CODE, if exists, for record

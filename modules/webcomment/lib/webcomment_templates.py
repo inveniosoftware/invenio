@@ -49,7 +49,7 @@ from invenio.htmlutils import get_html_text_editor
 from invenio.messages import gettext_set_language
 from invenio.bibformat import format_record
 from invenio.access_control_engine import acc_authorize_action
-from invenio.websearch_templates import get_fieldvalues
+from invenio.search_engine_utils import get_fieldvalues
 
 class Template:
     """templating class, refer to webcomment.py for examples of call"""

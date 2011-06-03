@@ -32,7 +32,7 @@ from invenio.config import CFG_SITE_URL
 from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 from invenio.bibformat import format_record
 from invenio.session import get_session
-from invenio.search_engine import get_fieldvalues
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibauthorid_webapi import get_bibref_name_string, get_person_redirect_link, get_canonical_id_from_person_id
 from invenio.messages import gettext_set_language, wash_language
 #from invenio.textutils import encode_for_xml

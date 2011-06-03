@@ -9,7 +9,7 @@
 ## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -25,6 +25,7 @@ pylib_DATA = \
 	search_engine.py \
 	search_engine_config.py \
 	search_engine_tests.py \
+	search_engine_utils.py \
 	search_engine_query_parser.py \
 	search_engine_query_parser_tests.py \
 	websearch_webcoll.py \
@@ -38,7 +39,7 @@ pylib_DATA = \
 	websearch_external_collections_searcher.py \
 	websearch_external_collections_templates.py \
 	websearch_external_collections_tests.py \
-	websearch_external_collections_utils.py 
+	websearch_external_collections_utils.py
 
 EXTRA_DIST = $(pylib_DATA)
 

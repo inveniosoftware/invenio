@@ -41,6 +41,7 @@ from invenio.dbquery import run_sql
 from invenio.urlutils import string_to_numeric_char_reference
 from invenio.textutils import encode_for_xml
 from invenio.shellutils import run_shell_command
+from invenio.search_engine_utils import get_fieldvalues
 
 def highlight_matches(text, compiled_pattern, \
                       prefix_tag='<strong>', suffix_tag="</strong>"):
@@ -182,24 +183,6 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
     @return: the xml string of the record
     """
     from invenio.search_engine import record_exists
-
-    def get_fieldvalues(recID, tag):
-        """Return list of field values for field TAG inside record RECID."""
-        out = []
-        if tag == "001___":
-            # we have asked for recID that is not stored in bibXXx tables
-            out.append(str(recID))
-        else:
-            # we are going to look inside bibXXx tables
-            digit = tag[0:2]
-            bx = "bib%sx" % digit
-            bibx = "bibrec_bib%sx" % digit
-            query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND bx.tag LIKE '%s'" \
-                    "ORDER BY bibx.field_number, bx.tag ASC" % (bx, bibx, recID, tag)
-            res = run_sql(query)
-            for row in res:
-                out.append(row[0])
-        return out
 
     def get_creation_date(recID, fmt="%Y-%m-%d"):
         "Returns the creation date of the record 'recID'."

@@ -28,26 +28,7 @@ import zlib
 import time
 
 from invenio.dbquery import run_sql
-
-## MARC-21 tag/field access functions
-def get_fieldvalues(recID, tag):
-    """
-    Returns list of values of the MARC-21 'tag' fields for the record
-    'recID'.
-
-    @param recID: record ID to retrieve value from
-    @param tag: tag to consider
-    @return: a list of values matching X{tag} in record X{recID}
-    """
-    out = []
-    bibXXx = "bib" + tag[0] + tag[1] + "x"
-    bibrec_bibXXx = "bibrec_" + bibXXx
-    query = "SELECT value FROM %s AS b, %s AS bb WHERE bb.id_bibrec=%s AND bb.id_bibxxx=b.id AND tag LIKE '%s'" \
-            % (bibXXx, bibrec_bibXXx, recID, tag)
-    res = run_sql(query)
-    for row in res:
-        out.append(row[0])
-    return out
+from invenio.search_engine_utils import get_fieldvalues
 
 def localtime_to_utc(date, fmt="%Y-%m-%dT%H:%M:%SZ"):
     """

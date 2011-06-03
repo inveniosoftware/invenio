@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.search_engine import get_fieldvalues
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibtask import task_low_level_submission
 import invenio.bibcirculation_dblayer as db
 from invenio.urlutils import create_html_link

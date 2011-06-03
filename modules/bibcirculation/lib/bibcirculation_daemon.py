@@ -32,7 +32,7 @@ from invenio.mailutils import send_email
 import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
      CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
-from invenio.search_engine import get_fieldvalues
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibcirculation_utils import generate_email_body
 
 

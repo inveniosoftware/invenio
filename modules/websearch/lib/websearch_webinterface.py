@@ -103,7 +103,6 @@ from invenio.search_engine import check_user_can_view_record, \
      create_similarly_named_authors_link_box, \
      get_colID, \
      get_coll_i18nname, \
-     get_fieldvalues, \
      get_fieldvalues_alephseq_like, \
      get_most_popular_field_values, \
      get_mysql_recid_from_aleph_sysno, \
@@ -115,6 +114,7 @@ from invenio.search_engine import check_user_can_view_record, \
      perform_request_search, \
      restricted_collection_cache, \
      get_coll_normalised_name
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
@@ -321,7 +321,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         #look up self.pageparam in cache table
         #if up to date return it
         #if not up to date:
-        #    if exists: 
+        #    if exists:
         #        return it and update
         #    else:
         #        create, update, return

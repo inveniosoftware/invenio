@@ -43,10 +43,8 @@ from invenio.config import \
      CFG_BINDIR, \
      CFG_SITE_NAME, \
      CFG_TMPDIR
-from invenio.search_engine import \
-     perform_request_search, \
-     get_fieldvalues, \
-     get_record
+from invenio.search_engine import perform_request_search, get_record
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.intbitset import intbitset as HitSet
 from invenio.dbquery import run_sql
 from invenio.bibtask import \

@@ -43,7 +43,8 @@ from invenio.webuser import email_valid_p, emailUnique
 from invenio.webuser import get_email_from_username, get_uid_from_email, isUserSuperAdmin
 from invenio.access_control_admin import acc_find_user_role_actions
 from invenio.access_control_admin import acc_get_user_roles, acc_get_role_id
-from invenio.search_engine import perform_request_search, get_fieldvalues, sort_records
+from invenio.search_engine import perform_request_search, sort_records
+from invenio.search_engine_utils import get_fieldvalues
 
 import invenio.bibauthorid_webapi as webapi
 import invenio.bibauthorid_config as bconfig

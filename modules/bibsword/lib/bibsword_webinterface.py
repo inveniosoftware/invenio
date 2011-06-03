@@ -39,7 +39,7 @@ from invenio.messages import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.websubmit_functions.Get_Recid import \
                                            get_existing_records_for_reportnumber
-from invenio.search_engine import get_fieldvalues
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibsword_config import CFG_MARC_REPORT_NUMBER, CFG_MARC_ADDITIONAL_REPORT_NUMBER
 
 class WebInterfaceSword(WebInterfaceDirectory):

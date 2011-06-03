@@ -70,9 +70,9 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.search_engine import \
      guess_primary_collection_of_a_record, \
      check_user_can_view_record, \
-     get_fieldvalues, \
      get_collection_reclist, \
      get_colID
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.webcomment_washer import EmailWasher
 try:
     import invenio.template

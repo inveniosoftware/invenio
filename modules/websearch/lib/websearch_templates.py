@@ -76,29 +76,10 @@ from invenio.intbitset import intbitset
 from invenio.websearch_external_collections import external_collection_get_state, get_external_collection_engine
 from invenio.websearch_external_collections_utils import get_collection_id
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
+from invenio.search_engine_utils import get_fieldvalues
 
 _RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
 _RE_SPACES = re.compile(r"\s+")
-
-def get_fieldvalues(recID, tag):
-    """Return list of field values for field TAG inside record RECID.
-       FIXME: should be imported commonly for search_engine too."""
-    out = []
-    if tag == "001___":
-        # we have asked for recID that is not stored in bibXXx tables
-        out.append(str(recID))
-    else:
-        # we are going to look inside bibXXx tables
-        digit = tag[0:2]
-        bx = "bib%sx" % digit
-        bibx = "bibrec_bib%sx" % digit
-        query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND bx.tag LIKE '%s'" \
-                "ORDER BY bibx.field_number, bx.tag ASC" % (bx, bibx, recID, tag)
-        res = run_sql(query)
-        for row in res:
-            out.append(row[0])
-    return out
-
 
 class Template:
 

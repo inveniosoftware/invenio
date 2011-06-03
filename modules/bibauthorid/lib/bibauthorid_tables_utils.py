@@ -33,12 +33,12 @@ from bibauthorid_authorname_utils import update_doclist
 
 try:
     from search_engine import get_record
-    from search_engine import get_fieldvalues
+    from search_engine_utils import get_fieldvalues
     from bibrank_citation_searcher import get_citation_dict
     from dbquery import run_sql, run_sql_many
     from dbquery import OperationalError, ProgrammingError
 except ImportError:
-    from invenio.search_engine import get_fieldvalues
+    from invenio.search_engine_utils import get_fieldvalues
     from invenio.search_engine import get_record
     from invenio.bibrank_citation_searcher import get_citation_dict
     from invenio.dbquery import run_sql, run_sql_many
@@ -1607,7 +1607,7 @@ def empty_aid_tables():
     '''
     Will empty all tables needed for a re-run of the algorithm.
     Exceptions are aidAUTHORNAMES*, which have to be updated apriori and
-    aidPERSONID, which has to be updated from algorithm after the re-run. 
+    aidPERSONID, which has to be updated from algorithm after the re-run.
     '''
     run_sql("TRUNCATE `aidDOCLIST`;"
             "TRUNCATE `aidREALAUTHORDATA`;"

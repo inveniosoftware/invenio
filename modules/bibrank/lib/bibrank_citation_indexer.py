@@ -32,8 +32,8 @@ if sys.hexversion < 0x2040000:
 
 from invenio.dbquery import run_sql, serialize_via_marshal, \
                             deserialize_via_marshal
-from invenio.search_engine import search_pattern, get_fieldvalues, \
-                           search_unit
+from invenio.search_engine import search_pattern, search_unit
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibformat_utils import parse_tag
 from invenio.bibtask import write_message, task_get_option, \
                      task_update_progress, task_sleep_now_if_required, \

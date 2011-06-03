@@ -785,7 +785,7 @@ A possible skeleton for a response element could be: (FIXME: Check...)
 <pre class="code">
 import os
 from invenio.websubmit_functions.ParamFile import ParamFromFile
-from invenio.search_engine import get_fieldvalues
+from invenio.search_engine_utils import get_fieldvalues
 
 this_element_name = "DEMOART_TEST" # This would be your element name
 

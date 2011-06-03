@@ -25,27 +25,7 @@ from invenio.config import \
      CFG_CERN_SITE
 from invenio.dbquery import run_sql
 from invenio.bibrank_downloads_indexer import database_tuples_to_single_list
-
-def get_fieldvalues(recID, tag):
-    """Return list of field values for field TAG inside record RECID.
-    Copy from search_engine"""
-    out = []
-    if tag == "001___":
-        # we have asked for recID that is not stored in bibXXx tables
-        out.append(str(recID))
-    else:
-        # we are going to look inside bibXXx tables
-        digit = tag[0:2]
-        bx = "bib%sx" % digit
-        bibx = "bibrec_bib%sx" % digit
-        query = "SELECT bx.value FROM %s AS bx, %s AS bibx " \
-                " WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND " \
-                " bx.tag LIKE '%s' ORDER BY bibx.field_number, bx.tag ASC" % \
-                (bx, bibx, recID, tag)
-        res = run_sql(query)
-        for row in res:
-            out.append(row[0])
-    return out
+from invenio.search_engine_utils import get_fieldvalues
 
 def record_exists(recID):
     """Return 1 if record RECID exists.

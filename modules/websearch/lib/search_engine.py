@@ -74,6 +74,7 @@ from invenio.config import \
      CFG_SITE_RECORD
 
 from invenio.search_engine_config import InvenioWebSearchUnknownCollectionError, InvenioWebSearchWildcardLimitError
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibrecord import create_record, record_get_field_instances
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records, is_method_valid
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
@@ -3131,55 +3132,6 @@ def get_field_tags(field):
     res = run_sql(query, (field, ))
     for val in res:
         out.append(val[0])
-    return out
-
-
-def get_fieldvalues(recIDs, tag, repetitive_values=True):
-    """
-    Return list of field values for field TAG for the given record ID
-    or list of record IDs.  (RECIDS can be both an integer or a list
-    of integers.)
-
-    If REPETITIVE_VALUES is set to True, then return all values even
-    if they are doubled.  If set to False, then return unique values
-    only.
-    """
-    out = []
-    if isinstance(recIDs, (int, long)):
-        recIDs =[recIDs,]
-    if not isinstance(recIDs, (list, tuple)):
-        return []
-    if len(recIDs) == 0:
-        return []
-    if tag == "001___":
-        # we have asked for tag 001 (=recID) that is not stored in bibXXx tables
-        out = [str(recID) for recID in recIDs]
-    else:
-        # we are going to look inside bibXXx tables
-        digits = tag[0:2]
-        try:
-            intdigits = int(digits)
-            if intdigits < 0 or intdigits > 99:
-                raise ValueError
-        except ValueError:
-            # invalid tag value asked for
-            return []
-        bx = "bib%sx" % digits
-        bibx = "bibrec_bib%sx" % digits
-        queryparam = []
-        for recID in recIDs:
-            queryparam.append(recID)
-        if not repetitive_values:
-            queryselect = "DISTINCT(bx.value)"
-        else:
-            queryselect = "bx.value"
-        query = "SELECT %s FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec IN (%s) " \
-                " AND bx.id=bibx.id_bibxxx AND bx.tag LIKE %%s " \
-                " ORDER BY bibx.field_number, bx.tag ASC" % \
-                (queryselect, bx, bibx, ("%s,"*len(queryparam))[:-1])
-        res = run_sql(query, tuple(queryparam) + (tag,))
-        for row in res:
-            out.append(row[0])
     return out
 
 def get_fieldvalues_alephseq_like(recID, tags_in, can_see_hidden=False):
