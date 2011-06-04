@@ -582,7 +582,7 @@ class Template:
         h('<input type="submit" name="to_other_person" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_to_others'])
         h('<input type="submit" name="reset" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_forget'])
         h("  </div>")
-
+        h("</form>")
         return "\n".join(pp_html)
 
 
