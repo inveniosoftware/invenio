@@ -211,11 +211,13 @@ def get_papers_by_person_id(person_id= -1, rec_status= -2, ext_out=False):
             gfoc = get_field_values_on_condition
             authoraff = ", ".join(gfoc(recid, ["100", "700"], "u", "a",
                                        authorname, source="API"))
-            try:
-                date = list(gfoc(recid, "269", "c"))[0]
-            except (IndexError):
-                date = ""
 
+            #Date retrival disabled to increase UI speed.
+            #try:
+            #    date = list(gfoc(recid, "269", "c"))[0]
+            #except (IndexError):
+            #    date = ""
+            date = ""
             records.append([recid, bibref, flag, authorname,
                             authoraff, date, rt_status])
 

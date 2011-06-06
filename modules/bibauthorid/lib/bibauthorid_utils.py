@@ -78,7 +78,8 @@ def split_name_parts(name_string, delete_name_additions=True,
 
     @return: list of [surname string, initials list, names list]
         e.g. split_name_parts("Ellis, John R.")
-        --> ['Ellis', ['J', 'R'], ['John']]
+        --> ['Ellis', ['J', 'R'], ['John'], [0]]
+        --> ['Ellis', ['K', 'J', 'R'], ['John', 'Rob'], [1,2]]
     @rtype: list of lists
     '''
     if not override_surname_sep:
@@ -120,15 +121,19 @@ def split_name_parts(name_string, delete_name_additions=True,
     initials_names_list = substitution_regexp.sub(' ', rest_of_name).split()
     names = []
     initials = []
-
+    positions = []
+    pos_counter = 0
     for i in initials_names_list:
         if len(i) == 1:
             initials.append(i.capitalize())
+            pos_counter += 1
         else:
             names.append(i.capitalize())
             initials.append(i[0].capitalize())
+            positions.append(pos_counter)
+            pos_counter += 1
 
-    return [surname, initials, names]
+    return [surname, initials, names, positions]
 
 
 def split_name_parts_old(name_string, delete_name_additions=True):
@@ -206,12 +211,12 @@ def create_normalized_name(splitted_name):
     if not splitted_name[1] and not splitted_name[2]:
         return name
 
-    for i in splitted_name[2]:
-        name = name + ' ' + i
-
-    for i in  splitted_name[1][len(splitted_name[2]):]:
-        name = name + ' ' + i + '.'
-
+    for i in splitted_name[1]:
+        try:
+            fname = splitted_name[2][splitted_name[3].index(splitted_name[1].index(i))]
+            name = name + ' ' + fname
+        except:
+            name = name + ' ' + i + '.'
     return name
 
 

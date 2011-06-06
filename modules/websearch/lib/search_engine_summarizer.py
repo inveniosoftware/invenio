@@ -61,7 +61,7 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
     """
     if of == 'hcs':
         # this is HTML cite summary
-
+        html = []
         # 1) hcs prologue:
         d_recids = {}
         d_total_recs = {}
@@ -71,7 +71,13 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
             else:
                 d_recids[coll] = recids & search_engine.search_pattern(p=colldef)
             d_total_recs[coll] = len(d_recids[coll])
-        req.write(websearch_templates.tmpl_citesummary_prologue(d_total_recs, CFG_CITESUMMARY_COLLECTIONS, searchpattern, searchfield, ln))
+
+        prologue = websearch_templates.tmpl_citesummary_prologue(d_total_recs, CFG_CITESUMMARY_COLLECTIONS, searchpattern, searchfield, ln)
+
+        if not req:
+            html.append(prologue)
+        elif hasattr(req, "write"):
+            req.write(prologue)
 
         # 2) hcs overview:
         d_recid_citers = {}
@@ -89,7 +95,12 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
                     d_recid_citecount_l[coll].append((recid, len(lciters)))
             if d_total_cites[coll] != 0:
                 d_avg_cites[coll] = d_total_cites[coll] * 1.0 / d_total_recs[coll]
-        req.write(websearch_templates.tmpl_citesummary_overview(d_total_cites, d_avg_cites, CFG_CITESUMMARY_COLLECTIONS, ln))
+        overview = websearch_templates.tmpl_citesummary_overview(d_total_cites, d_avg_cites, CFG_CITESUMMARY_COLLECTIONS, ln)
+
+        if not req:
+            html.append(overview)
+        elif hasattr(req, "write"):
+            req.write(overview)
 
         # 3) hcs break down by fame:
         for low, high, fame in CFG_CITESUMMARY_FAME_THRESHOLDS:
@@ -102,7 +113,12 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
                         numcites = len(lciters)
                     if numcites >= low and numcites <= high:
                         d_cites[coll] += 1
-            req.write(websearch_templates.tmpl_citesummary_breakdown_by_fame(d_cites, low, high, fame, CFG_CITESUMMARY_COLLECTIONS, searchpattern, searchfield, ln))
+            fame_info = websearch_templates.tmpl_citesummary_breakdown_by_fame(d_cites, low, high, fame, CFG_CITESUMMARY_COLLECTIONS, searchpattern, searchfield, ln)
+
+            if not req:
+                html.append(fame_info)
+            elif hasattr(req, "write"):
+                req.write(fame_info)
 
         # 4) hcs calculate h index
         d_h_factors = {}
@@ -121,11 +137,25 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
                 if d_h_factors[coll] > citecount[1]:
                     d_h_factors[coll] -= 1
                     break
-        req.write(websearch_templates.tmpl_citesummary_h_index(d_h_factors, CFG_CITESUMMARY_COLLECTIONS, ln))
+        h_idx = websearch_templates.tmpl_citesummary_h_index(d_h_factors, CFG_CITESUMMARY_COLLECTIONS, ln)
+
+        if not req:
+            html.append(h_idx)
+        elif hasattr(req, "write"):
+            req.write(h_idx)
 
         # 5) hcs epilogue:
-        req.write(websearch_templates.tmpl_citesummary_epilogue(ln))
-        return ''
+        eplilogue = websearch_templates.tmpl_citesummary_epilogue(ln)
+
+        if not req:
+            html.append(eplilogue)
+        elif hasattr(req, "write"):
+            req.write(eplilogue)
+
+        if not req:
+            return "\n".join(html)
+        else:
+            return ''
 
     elif of == 'xcs':
         # this is XML cite summary

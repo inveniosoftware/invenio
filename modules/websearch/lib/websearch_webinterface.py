@@ -26,6 +26,7 @@ import time
 import sys
 from urllib import quote
 from invenio import webinterface_handler_config as apache
+import threading
 
 #maximum number of collaborating authors etc shown in GUI
 MAX_COLLAB_LIST = 10
@@ -214,6 +215,30 @@ class WebInterfaceUnAPIPages(WebInterfaceDirectory):
 
     index = __call__
 
+
+class WebInterfaceAuthorPagesCacheUpdater(threading.Thread):
+    '''
+    Handle asynchronous cache updates in the background as a loose Thread.
+    '''
+    def __init__(self, req, form, identifier, current_cache):
+        threading.Thread.__init__(self)
+        self.req = req
+        self.form = form
+        self.identifier = identifier
+        self.current_cache = current_cache
+
+    def run(self):
+        webint = WebInterfaceAuthorPages()
+        webint.pageparam = self.identifier
+        c = datetime.datetime.now() - self.current_cache[4]
+        delay = (c.microseconds + (c.seconds + c.days * 24 * 3600) * 10 ** 6) / 10 ** 6
+        if delay < 3600 * 1:
+            pass
+        else:
+            webint.update_cache_timestamp(self.identifier)
+            page = webint.create_authorpage(self.req, self.form, return_html=True)
+            webint.update_cache(self.identifier, page)
+
 class WebInterfaceAuthorPages(WebInterfaceDirectory):
     """
     Handle /author/Doe%2C+John page requests as well as
@@ -240,25 +265,92 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         self.personid = -1
         self.authorname = " "
         self.person_data_available = False
+        self.person_search_results = None
+        self.cache_supported = False
+        self.pt = None
+        try:
+            import bibauthorid_personid_tables_utils as pt
+            self.cache_supported = True
+            self.pt = pt
+        except ImportError:
+            self.cache_supported = False
+        self.pt = pt
 
     def _lookup(self, component, path):
         """This handler parses dynamic URLs (/author/John+Doe)."""
         return WebInterfaceAuthorPages(component), path
 
-    def __call__(self, req, form):
-        """Serve the page in the given language."""
-        is_bibauthorid = False
-        bibauthorid_template = None
-        personid_status_cacher = None
-        userinfo = collect_user_info(req)
-        metaheaderadd = ""
 
+    def update_cache_timestamp(self, pageparam):
+        '''
+        update cache timestamp to prevent multiple threads computing the same page
+        at the same time
+        '''
+        if not pageparam:
+            return
+
+        if not self.cache_supported:
+            return
+
+        self.pt.update_cached_author_page_timestamp(pageparam)
+
+    def update_cache(self, pageparam, page):
+        '''
+        Triggers the update to the DB
+        @param pageparam: identifier for the cache
+        @type pageparam: string
+        @param page: content to write to cache
+        @type page: string
+        '''
+        #TABLE: id, tag, identifier, data, date
+        if not pageparam:
+            return
+
+        if not page:
+            return
+
+        if not self.cache_supported:
+            return
+
+        self.pt.update_cached_author_page(pageparam, page)
+
+
+    def __call__(self, req, form):
+        '''
+        Cache manager for the author pages.
+        #look up self.pageparam in cache table
+        #if up to date return it
+        #if not up to date:
+        #    if exists: 
+        #        return it and update
+        #    else:
+        #        create, update, return
+        @param req: Apache request object
+        @type req: Apache request object
+        @param form: Parameters
+        @type form: dict
+
+        @return: HTML code for the author or author search page
+        @rtype: string
+        '''
+        argd = wash_urlargd(form,
+                            {'ln': (str, CFG_SITE_LANG),
+                             'verbose': (int, 0),
+                             'recid': (int, -1)
+                             })
+        param_recid = argd['recid']
+        ln = argd['ln']
+        req.argd = argd #needed since perform_req_search
+        _ = gettext_set_language(ln)
+        title_message = "Author Details"
+        page_content = ""
+
+        is_bibauthorid = False
         try:
             from invenio.bibauthorid_webapi import search_person_ids_by_name
             from invenio.bibauthorid_webapi import get_papers_by_person_id
             from invenio.bibauthorid_webapi import get_person_names_from_id
             from invenio.bibauthorid_webapi import get_person_db_names_from_id
-            from invenio.bibauthorid_webapi import get_person_id_from_canonical_id
             from invenio.bibauthorid_webapi import get_person_redirect_link
             from invenio.bibauthorid_webapi import is_valid_canonical_id
             from invenio.bibauthorid_webapi import get_personid_status_cacher
@@ -268,6 +360,64 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             from invenio.bibauthorid_config import AID_ENABLED
             from invenio.bibauthorid_config import AID_ON_AUTHORPAGES
             bibauthorid_template = invenio.template.load('bibauthorid')
+            import bibauthorid_personid_tables_utils as pt
+            is_bibauthorid = True
+        except ImportError:
+            return self.create_authorpage(req, form)
+
+        if not AID_ENABLED or not AID_ON_AUTHORPAGES:
+                is_bibauthorid = False
+
+        self.resolve_personid(param_recid)
+
+        if self.personid > -1:
+            identifier = self.personid
+        else:
+            identifier = self.pageparam
+
+        cached_page = pt.get_cached_author_page(identifier)
+
+        if cached_page:
+            page_content = cached_page[3]
+            background = WebInterfaceAuthorPagesCacheUpdater(req, form,
+                                                             identifier,
+                                                             cached_page)
+            background.start()
+
+        else:
+            page = self.create_authorpage(req, form, return_html=True)
+            self.update_cache(identifier, page)
+            page_content = page
+
+        metaheaderadd = ""
+        if is_bibauthorid:
+            metaheaderadd = bibauthorid_template.tmpl_meta_includes()
+
+        # Start the page in clean manner:
+        req.content_type = "text/html"
+        req.send_http_header()
+        req.write(pageheaderonly(req=req, title=title_message,
+                                 metaheaderadd=metaheaderadd, language=ln))
+        req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
+        req.write(page_content)
+
+        return page_end(req, 'hb', ln)
+
+
+    def resolve_personid(self, param_recid):
+        '''
+        Resolves the Person ID from a given string.
+
+        @param param_recid: record ID parameter
+        @type param_recid: int
+        '''
+        try:
+            from invenio.bibauthorid_webapi import search_person_ids_by_name
+            from invenio.bibauthorid_webapi import get_papers_by_person_id
+            from invenio.bibauthorid_webapi import get_person_id_from_canonical_id
+            from invenio.bibauthorid_webapi import is_valid_canonical_id
+            from invenio.bibauthorid_config import AID_ENABLED
+            from invenio.bibauthorid_config import AID_ON_AUTHORPAGES
 #            from invenio.access_control_admin import acc_find_user_role_actions
 
             if not AID_ENABLED or not AID_ON_AUTHORPAGES:
@@ -279,54 +429,18 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
         from operator import itemgetter
 
-        argd = wash_urlargd(form,
-                            {'ln': (str, CFG_SITE_LANG),
-                             'verbose': (int, 0),
-                             'recid': (int, -1)
-                             })
-        ln = argd['ln']
-        verbose = argd['verbose']
-        req.argd = argd #needed since perform_req_search
-        param_recid = argd['recid']
-        bibauthorid_data = {"is_baid": is_bibauthorid, "pid": -1, "cid": ""}
-
-        pubs = []
         authors = []
         recid = None
         nquery = ""
-        names_dict = {}
-        db_names_dict = {}
-        _ = gettext_set_language(ln)
-        title_message = "Author Details"
 
-        #let's see what takes time..
-        time1 = time.time()
-        genstart = time1
-        time2 = time.time()
-
-        if is_bibauthorid:
-            metaheaderadd = bibauthorid_template.tmpl_meta_includes()
-
-        # Start the page in clean manner:
-        req.content_type = "text/html"
-        req.send_http_header()
-        req.write(pageheaderonly(req=req, title=title_message,
-                                 metaheaderadd=metaheaderadd,
-                                 language=ln))
-        req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
-
-        if is_bibauthorid:
-            personid_status_cacher = get_personid_status_cacher()
-            personid_status_cacher.recreate_cache_if_needed()
-            self.person_data_available = personid_status_cacher.cache
-
-        if not self.person_data_available:
-            is_bibauthorid = False
         #check if it is a person id (e.g. 144):
         try:
             self.personid = int(self.pageparam)
         except (ValueError, TypeError):
             self.personid = -1
+
+        if self.personid > -1:
+            return
 
         #check if it is a canonical ID (e.g. Ellis_J_1):
         if is_bibauthorid and is_valid_canonical_id(self.pageparam):
@@ -381,12 +495,106 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
             if len(test_results) == 1:
                 self.personid = test_results[0][0]
+            else:
+                self.person_search_results = sorted_results
 
-            elif len(test_results) > 1:
+
+    def create_authorpage(self, req, form, return_html=False):
+        '''
+        Creates an author page in a given language
+        If no author is found, return person search or an empty author page
+        @param req: Apache request object
+        @type req: Apache request object
+        @param form: URL parameters
+        @type form: dict
+        @param return_html: if False: write to req object consecutively else
+        construct and return html code for the caches
+        @type return_html: boolean
+        '''
+        is_bibauthorid = False
+        bibauthorid_template = None
+        personid_status_cacher = None
+        userinfo = collect_user_info(req)
+        metaheaderadd = ""
+        html = []
+
+        try:
+            from invenio.bibauthorid_webapi import search_person_ids_by_name
+            from invenio.bibauthorid_webapi import get_papers_by_person_id
+            from invenio.bibauthorid_webapi import get_person_names_from_id
+            from invenio.bibauthorid_webapi import get_person_db_names_from_id
+            from invenio.bibauthorid_webapi import get_person_redirect_link
+            from invenio.bibauthorid_webapi import is_valid_canonical_id
+            from invenio.bibauthorid_webapi import get_personid_status_cacher
+            from invenio.bibauthorid_utils import create_normalized_name
+            from invenio.bibauthorid_utils import split_name_parts
+#            from invenio.bibauthorid_config import CLAIMPAPER_CLAIM_OTHERS_PAPERS
+            from invenio.bibauthorid_config import AID_ENABLED
+            from invenio.bibauthorid_config import AID_ON_AUTHORPAGES
+            bibauthorid_template = invenio.template.load('bibauthorid')
+#            from invenio.access_control_admin import acc_find_user_role_actions
+
+            if not AID_ENABLED or not AID_ON_AUTHORPAGES:
+                is_bibauthorid = False
+            else:
+                is_bibauthorid = True
+        except (ImportError):
+            is_bibauthorid = False
+
+        from operator import itemgetter
+
+        argd = wash_urlargd(form,
+                            {'ln': (str, CFG_SITE_LANG),
+                             'verbose': (int, 0),
+                             'recid': (int, -1)
+                             })
+        ln = argd['ln']
+        verbose = argd['verbose']
+        req.argd = argd #needed since perform_req_search
+        param_recid = argd['recid']
+        bibauthorid_data = {"is_baid": is_bibauthorid, "pid":-1, "cid": ""}
+
+        pubs = []
+        authors = []
+        recid = None
+        nquery = ""
+        names_dict = {}
+        db_names_dict = {}
+        _ = gettext_set_language(ln)
+        title_message = "Author Details"
+
+        #let's see what takes time..
+        time1 = time.time()
+        genstart = time1
+        time2 = time.time()
+
+        if is_bibauthorid:
+            metaheaderadd = bibauthorid_template.tmpl_meta_includes()
+        if not return_html:
+            # Start the page in clean manner:
+            req.content_type = "text/html"
+            req.send_http_header()
+            req.write(pageheaderonly(req=req, title=title_message,
+                                     metaheaderadd=metaheaderadd,
+                                     language=ln))
+            req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
+
+        if is_bibauthorid:
+            personid_status_cacher = get_personid_status_cacher()
+            personid_status_cacher.recreate_cache_if_needed()
+            self.person_data_available = personid_status_cacher.cache
+
+        if not self.person_data_available:
+            is_bibauthorid = False
+
+        if is_bibauthorid:
+            self.resolve_personid(param_recid)
+
+            if self.person_search_results:
                 if bibauthorid_template and nquery:
                     authors = []
 
-                    for results in sorted_results:
+                    for results in self.person_search_results:
                         pid = results[0]
                         authorpapers = get_papers_by_person_id(pid, -1)
                         authorpapers = sorted(authorpapers, key=itemgetter(0),
@@ -396,8 +604,13 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
                     srch = bibauthorid_template.tmpl_author_search
                     body = srch(nquery, authors, author_pages_mode=True)
-                    req.write(body)
-                    return
+
+                    if return_html:
+                        html.append(body)
+                        return "\n".join(html)
+                    else:
+                        req.write(body)
+                        return
         # start page
 #        req.content_type = "text/html"
 #        req.send_http_header()
@@ -410,7 +623,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             if recid:
                 try:
                     ptitle = get_record(recid)['245'][0][0][0][1]
-                except (IndexError,TypeError):
+                except (IndexError, TypeError, KeyError):
                     ptitle = '"Title not available"'
 
             self.authorname = self.pageparam
@@ -431,8 +644,13 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                         "continue to match people to author names and publications. '%s' may be attributed in the next "
                         "few weeks.</p>" % (self.pageparam, pmsg, self.pageparam))
 
-            req.write('<div id="header">%s</div><br>' % title)
-            req.write('%s <br>' % message)
+            if return_html:
+                html.append('<div id="header">%s</div><br>' % title)
+                html.append('%s <br>' % message)
+
+            else:
+                req.write('<div id="header">%s</div><br>' % title)
+                req.write('%s <br>' % message)
 
             if not nquery:
                 nquery = self.pageparam
@@ -451,7 +669,13 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
             srch = bibauthorid_template.tmpl_author_search
             body = srch(nquery, authors, author_pages_mode=True)
-            req.write(body)
+
+            if return_html:
+                html.append(body)
+                return "\n".join(html)
+            else:
+                req.write(body)
+
             return
 #            return self._psearch(req, form, is_fallback=True, fallback_query=self.pageparam,  fallback_title=title, fallback_message=message)
 
@@ -463,7 +687,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                                                             {}, {}, {},
                                                             None,
                                                             bibauthorid_data,
-                                                            ln)
+                                                            ln, return_html)
 
             self.authorname = self.pageparam
             #search the publications by this author
@@ -473,7 +697,11 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
         elif is_bibauthorid and self.personid > -1:
             #yay! Person found! find only papers not disapproved by humans
-            req.write("<!-- Authorpages are Bibauthorid-powered !-->")
+            if return_html:
+                html.append("<!-- Authorpages are Bibauthorid-powered !-->")
+            else:
+                req.write("<!-- Authorpages are Bibauthorid-powered !-->")
+
             full_pubs = get_papers_by_person_id(self.personid, -1)
             pubs = [int(row[0]) for row in full_pubs]
             longest_name = ""
@@ -491,22 +719,35 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                     longest_name = norm_name
 
             for aname, acount in get_person_db_names_from_id(self.personid):
-                aname = aname.replace('"','').strip()
+                aname = aname.replace('"', '').strip()
                 db_names_dict[aname] = acount
 
             self.authorname = longest_name
 
         if not pubs and param_recid > -1:
-            req.write("<p>")
-            req.write(_("We're sorry. The requested author \"%s\" seems not to be listed on the specified paper."
-                        % (self.pageparam,)))
-            req.write("<br />")
-            req.write(_("Please try the following link to start a broader search on the author: "))
-            req.write('<a href="%s/author/%s">%s</a>'
-                      % (CFG_SITE_URL, self.pageparam, self.pageparam))
-            req.write("</p>")
+            if return_html:
+                html.append("<p>")
+                html.append(_("We're sorry. The requested author \"%s\" seems not to be listed on the specified paper."
+                            % (self.pageparam,)))
+                html.append("<br />")
+                html.append(_("Please try the following link to start a broader search on the author: "))
+                html.append('<a href="%s/author/%s">%s</a>'
+                          % (CFG_SITE_URL, self.pageparam, self.pageparam))
+                html.append("</p>")
 
-            return page_end(req, 'hb', ln)
+                return "\n".join(html)
+            else:
+
+                req.write("<p>")
+                req.write(_("We're sorry. The requested author \"%s\" seems not to be listed on the specified paper."
+                            % (self.pageparam,)))
+                req.write("<br />")
+                req.write(_("Please try the following link to start a broader search on the author: "))
+                req.write('<a href="%s/author/%s">%s</a>'
+                          % (CFG_SITE_URL, self.pageparam, self.pageparam))
+                req.write("</p>")
+
+                return page_end(req, 'hb', ln)
 
         #get most frequent authors of these pubs
         popular_author_tuples = get_most_popular_field_values(pubs, (AUTHOR_TAG, COAUTHOR_TAG))
@@ -520,13 +761,13 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                 break
 
         time1 = time.time()
-        if verbose == 9:
+        if verbose == 9 and not return_html:
             req.write("<br/>popularized authors: " + str(time1 - time2) + "<br/>")
 
         #and publication venues
         venuetuples = get_most_popular_field_values(pubs, (VENUE_TAG))
         time2 = time.time()
-        if verbose == 9:
+        if verbose == 9 and not return_html:
             req.write("<br/>venues: " + str(time2 - time1) + "<br/>")
 
 
@@ -550,7 +791,8 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                     kwtuples_filtered += ((kw, num),)
             kwtuples = kwtuples_filtered
         time1 = time.time()
-        if verbose == 9:
+
+        if verbose == 9 and not return_html:
             req.write("<br/>keywords: " + str(time1 - time2) + "<br/>")
 
         #construct a simple list of tuples that contains keywords that appear
@@ -560,14 +802,14 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         vtuples = venuetuples[0:MAX_VENUE_LIST]
 
         time2 = time.time()
-        if verbose == 9:
+        if verbose == 9 and not return_html:
             req.write("<br/>misc: " + str(time2 - time1) + "<br/>")
 
         #a dict. keys: affiliations, values: lists of publications
         author_aff_pubs = self.get_institute_pub_dict(pubs, db_names_dict.keys())
 
         time1 = time.time()
-        if verbose == 9:
+        if verbose == 9 and not return_html:
             req.write("<br/>affiliations: " + str(time1 - time2) + "<br/>")
 
         totaldownloads = 0
@@ -601,17 +843,31 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                 bibauthorid_data["cid"] = cid
 
         time1 = time.time()
-        if verbose == 9:
+        if verbose == 9 and not return_html:
             req.write("<br/>citedby: " + str(time1 - time2) + "<br/>")
 
         #finally all stuff there, call the template
-        websearch_templates.tmpl_author_information(req, pubs, self.authorname,
+        if return_html:
+            html.append(websearch_templates.tmpl_author_information(req, pubs,
+                                                    self.authorname,
                                                     totaldownloads,
                                                     author_aff_pubs,
                                                     citedbylist, kwtuples,
                                                     coauthors, vtuples,
                                                     db_names_dict, person_link,
-                                                    bibauthorid_data, ln)
+                                                    bibauthorid_data, ln,
+                                                    return_html))
+        else:
+            websearch_templates.tmpl_author_information(req, pubs,
+                                                    self.authorname,
+                                                    totaldownloads,
+                                                    author_aff_pubs,
+                                                    citedbylist, kwtuples,
+                                                    coauthors, vtuples,
+                                                    db_names_dict, person_link,
+                                                    bibauthorid_data, ln,
+                                                    return_html)
+
         time1 = time.time()
         #cited-by summary
         rec_query = ""
@@ -643,20 +899,26 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                 rec_query = extended_author_search_str
 
         if pubs:
-            req.write(summarize_records(intbitset(pubs), 'hcs', ln, rec_query, req=req))
+            if return_html:
+                html.append(summarize_records(intbitset(pubs), 'hcs', ln, rec_query))
+            else:
+                req.write(summarize_records(intbitset(pubs), 'hcs', ln, rec_query, req=req))
 
         time2 = time.time()
-        if verbose == 9:
+        if verbose == 9 and not return_html:
             req.write("<br/>summarizer: " + str(time2 - time1) + "<br/>")
 
 #        simauthbox = create_similarly_named_authors_link_box(self.authorname)
 #        req.write(simauthbox)
-        if verbose == 9:
+        if verbose == 9 and not return_html:
             req.write("<br/>all: " + str(time.time() - genstart) + "<br/>")
 
-        return page_end(req, 'hb', ln)
+        if return_html:
+            return "\n".join(html)
+        else:
+            return page_end(req, 'hb', ln)
 
-    def _psearch(self, req, form, is_fallback=True, fallback_query='',  fallback_title='', fallback_message=''):
+    def _psearch(self, req, form, is_fallback=True, fallback_query='', fallback_title='', fallback_message=''):
         html = []
         h = html.append
         if fallback_title:
@@ -774,7 +1036,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
 
-        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req,'runbibedit')[0] != 0:
+        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req, 'runbibedit')[0] != 0:
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
         if auth_code and user_info['email'] == 'guest':
@@ -849,7 +1111,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
             except (KeyError, ValueError):
                 pass
 
-        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req,'runbibedit')[0] != 0:
+        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req, 'runbibedit')[0] != 0:
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
         record_primary_collection = guess_primary_collection_of_a_record(self.recid)
@@ -915,7 +1177,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                 except KeyError:
                     pass
 
-        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req,'runbibedit')[0] != 0:
+        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req, 'runbibedit')[0] != 0:
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
         involved_collections = set()
@@ -977,7 +1239,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         #check if the user has rights to set a high wildcard limit
         #if not, reduce the limit set by user, with the default one
         if CFG_WEBSEARCH_WILDCARD_LIMIT > 0 and (argd['wl'] > CFG_WEBSEARCH_WILDCARD_LIMIT or argd['wl'] == 0):
-            auth_code, auth_message = acc_authorize_action(req,'runbibedit')
+            auth_code, auth_message = acc_authorize_action(req, 'runbibedit')
             if auth_code != 0:
                 argd['wl'] = CFG_WEBSEARCH_WILDCARD_LIMIT
 
@@ -1024,7 +1286,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         #check if the user has rights to set a high wildcard limit
         #if not, reduce the limit set by user, with the default one
         if CFG_WEBSEARCH_WILDCARD_LIMIT > 0 and (argd['wl'] > CFG_WEBSEARCH_WILDCARD_LIMIT or argd['wl'] == 0):
-            auth_code, auth_message = acc_authorize_action(req,'runbibedit')
+            auth_code, auth_message = acc_authorize_action(req, 'runbibedit')
             if auth_code != 0:
                 argd['wl'] = CFG_WEBSEARCH_WILDCARD_LIMIT
 
@@ -1065,7 +1327,7 @@ class WebInterfaceLegacySearchPages(WebInterfaceDirectory):
         # We either jump into the generic search form, or the specific
         # /CFG_SITE_RECORD/... display if a recid is requested
         if argd['recid'] != -1:
-            target = '/%s/%d' % (CFG_SITE_RECORD,argd['recid'])
+            target = '/%s/%d' % (CFG_SITE_RECORD, argd['recid'])
             del argd['recid']
 
         else:
@@ -1592,7 +1854,7 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
 
-        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req,'runbibedit')[0] != 0:
+        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req, 'runbibedit')[0] != 0:
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
         if auth_code and user_info['email'] == 'guest':

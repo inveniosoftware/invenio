@@ -136,7 +136,6 @@
 }
 
 #aid_menu li {
-    background: url("list_sep_blue.gif") no-repeat scroll left center transparent;
     display: block;
     float: left;
     height: 100%;

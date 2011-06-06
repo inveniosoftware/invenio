@@ -25,16 +25,26 @@ import time
 import threading
 import datetime
 import bibauthorid_config as bconfig
+import re
+import os
 
+from invenio.config import CFG_ETCDIR
 from bibauthorid_utils import split_name_parts, create_normalized_name, create_canonical_name
 from bibauthorid_utils import clean_name_string, get_field_values_on_condition
 from bibauthorid_authorname_utils import soft_compare_names, compare_names
+#from bibauthorid_authorname_utils import create_name_tuples
+from bibauthorid_authorname_utils import names_are_equal_composites
+from bibauthorid_authorname_utils import names_are_equal_gender
+from bibauthorid_authorname_utils import names_are_substrings
+from bibauthorid_authorname_utils import names_are_synonymous
+from bibauthorid_authorname_utils import names_minimum_levenshtein_distance
 from bibauthorid_tables_utils import get_bibrefs_from_name_string
 
 from threading import Thread
+from operator import itemgetter
 
 try:
-    from dbquery import run_sql, close_connection
+    from dbquery import run_sql, close_connection#, deserialize_via_marshal
     from dbquery import OperationalError, ProgrammingError
     from access_control_engine import acc_authorize_action
 #    from webuser import collect_user_info
@@ -42,6 +52,7 @@ try:
 except ImportError:
     from invenio.data_cacher import DataCacher
     from invenio.dbquery import run_sql, close_connection
+    from invenio.dbquery import deserialize_via_marshal
     from invenio.dbquery import OperationalError, ProgrammingError
     from invenio.access_control_engine import acc_authorize_action
 #    from invenio.webuser import collect_user_info
@@ -86,11 +97,120 @@ class PersonIDStatusDataCacher(DataCacher):
         DataCacher.__init__(self, cache_filler, timestamp_verifier)
 
 
+def remove_empty_personids():
+    pids = run_sql("select distinct personid from aidPERSONID order by personid")
+    for pid in pids:
+        #print "Considering: ", pid[0]
+        papers = run_sql("select * from aidPERSONID where personid=%s and tag='paper'", (pid[0],))
+        if len(papers) < 1:
+            print "Considering: ", pid[0]
+            print '|- no papers, deleting!'
+            run_sql("delete from aidPERSONID where personid=%s", (pid[0],))
+        else:
+            positive_papers = run_sql("select * from aidPERSONID where personid=%s and tag='paper' and flag > '-2'", (pid[0],))
+            if len(positive_papers) < 1:
+                print "Considering: ", pid[0]
+                print '|- no positive papers, deleting!'
+                run_sql("delete from aidPERSONID where personid=%s", (pid[0],))
+
+def populate_authorpages_cache(pids=None):
+    '''
+    Populates / updates author pages caches for all pids or pids in given list
+    @param pids: optional (('pid1',), ('pid2',), ...)
+    '''
+#    from invenio.websearch_webinterface import WebInterfaceAuthorPages
+
+    if not pids:
+        pids = run_sql("select distinct personid from aidPERSONID order by personid")
+
+#    class blah(object):
+#        argd = ""
+#        def __init__(self):
+#            pass
+
+#    class blah(object):
+#       argd = ""
+#       _session = {'_accessed': 1304323116.8829861,
+#                    '_created': 1304323116.8829839,
+#                    '_data': {'uid': 1,
+#                    'user_info': {'agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_7) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.696.57 Safari/534.24',
+#                    'email': 'samuele.carli@cern.ch',
+#                    'group': [],
+#                    'guest': '0',
+#                    'language': 'en',
+#                    'login_method': 'Local',
+#                    'nickname': 'admin',
+#                    'precached_permitted_restricted_collections': [],
+#                    'precached_useadmin': True,
+#                    'precached_usealerts': True,
+#                    'precached_useapprove': True,
+#                    'precached_usebaskets': True,
+#                    'precached_usegroups': True,
+#                    'precached_useloans': True,
+#                    'precached_usemessages': True,
+#                    'precached_usepaperattribution': True,
+#                    'precached_usepaperclaim': True,
+#                    'precached_usestats': True,
+#                    'precached_viewclaimlink': False,
+#                    'precached_viewsubmissions': False,
+#                    'referer': 'https://pcgssiz80.cern.ch/youraccount/login',
+#                    'remote_host': '',
+#                    'remote_ip': '128.141.29.224',
+#                    'session': '43b0d28b299d491e88eb0966334f66d5',
+#                    'uid': 1,
+#                    'uri': '/youraccount/login?'}},
+#                    '_http_ip': None,
+#                    '_https_ip': '128.141.29.224',
+#                    '_remember_me': False,
+#                    '_timeout': 172800}
+#       def __init__(self):
+#           pass
+
+    for pid in pids:
+        print 'Updating cache for pid: ', str(pid[0])
+#        iid = str(pid[0])
+#        ap = WebInterfaceAuthorPages(iid)
+#        ap._update_cache(iid, ap._real__call__(blah(), {}, return_html=True))
+#        del ap
+        os.system('wget -O -  http://pcgssiz80.cern.ch/author/%s > /dev/null' % str(pid[0]))
+        print '     ... done.'
+
+
+def get_cached_author_page(pageparam):
+    '''
+    Return cached authorpage
+    @param: pageparam (int personid)
+    @return (id, 'authorpage_cache', personid, authorpage_html, date_cached)
+    '''
+            #TABLE: id, tag, identifier, data, date
+    caches = run_sql("select * from aidCACHE where object_name='authorpage_cache' and object_key=%s", (str(pageparam),))
+    if len(caches) >= 1:
+        return caches[0]
+    else:
+        return []
+def update_cached_author_page_timestamp(pageparam):
+    '''
+    Updates cached author page timestamp
+    @param pageparam: int personid
+    '''
+    #TABLE: id, tag, identifier, data, date
+    run_sql("update aidCACHE set last_updated=now() where object_name='authorpage_cache' and object_key=%s", (str(pageparam),))
+
+def update_cached_author_page(pageparam, page):
+    '''
+    Updates cached author page, deleting old caches for same pageparam
+    @param pageparam: int personid
+    @param page: string html authorpage
+    '''
+            #TABLE: id, tag, identifier, data, date
+    run_sql("delete from aidCACHE where object_name='authorpage_cache' and object_key=%s", (str(pageparam),))
+    run_sql("insert into aidCACHE values (Null,'authorpage_cache',%s,%s,now())", (str(pageparam), str(page)))
+
 def personid_remove_automatically_assigned_papers(pids=None):
     '''
     Part of the person repair facility.
     Removes every person entity that has no prior human interaction.
-    Will run on all person entities if pids==None
+    Will run on all person entities if pids == None
     @param pids: List of tuples of person IDs
     @type pids: list of tuples
     '''
@@ -112,6 +232,285 @@ def personid_remove_automatically_assigned_papers(pids=None):
             continue
 
 
+def _load_gender_firstnames_dict(files=''):
+    if not files:
+        files = {'boy': CFG_ETCDIR + '/bibauthorid/name_authority_files/male_firstnames.txt',
+                                        'girl': CFG_ETCDIR + '/bibauthorid/name_authority_files/female_firstnames.txt'}
+
+    boyf = open(files['boy'], 'r')
+    boyn = [x.strip().lower() for x in boyf.readlines()]
+    boyf.close()
+    girlf = open(files['girl'], 'r')
+    girln = [x.strip().lower() for x in girlf.readlines()]
+    girlf.close()
+    return {'boys':boyn, 'girls':girln}
+
+
+def _load_firstname_variations(filename=''):
+    #will load an array of arrays: [['rick','richard','dick'],['john','jhonny']]
+    if not filename:
+        filename = CFG_ETCDIR + '/bibauthorid/name_authority_files/name_variants.txt'
+    retval = []
+    r = re.compile("\n")
+    fp = open(filename)
+
+    for l in fp.readlines():
+        lr = r.sub("", l)
+        retval.append([clean_name_string(name.lower(), "", False, True)
+                       for name in lr.split(";") if name])
+
+    fp.close()
+
+    return retval
+
+
+def personid_split_person_with_mixed_firstname_new(pids=None, SPLIT_TRSH=1):
+    gendernames = _load_gender_firstnames_dict()
+    name_variations = _load_firstname_variations()
+
+    if not pids:
+        pids = run_sql("select distinct personid from aidPERSONID")
+
+    for p in pids:
+        pid = -1
+        if isinstance(p, list) or isinstance(p, tuple):
+            pid = p[0]
+        elif isinstance(p, int):
+            pid = p
+        else:
+            print "The PID list is invalid."
+
+        _perform_split_person_on_pid(pid, gendernames, name_variations, SPLIT_TRSH)
+
+
+def _perform_split_person_on_pid(pid, gendernames, name_variations,
+                                 levenshtein_split_threshold):
+    print_plot_stats = False
+    print_debug = True
+    print_ignored = False
+    perform_names_update_on_split = True
+    new_clusters = {}
+    new_cluster_index = 0
+    names = {} # bibref: name
+    variants = {} # name: list of bibrefs for the same unified name
+    variants_with_names = set()
+    variants_paper_count = {}
+    already_clustered = set()
+
+    # find all papers, bibrefs and names for this person...
+    papers = run_sql("select data from aidPERSONID where tag=%s and "
+                     "personid=%s", ('paper', str(pid)))
+    bibrefs = {}
+
+    for pap in papers:
+        try:
+            bibrefs[pap[0].split(',')[0]] += 1
+        except Exception:
+            bibrefs[pap[0].split(',')[0]] = 1
+
+    for i in bibrefs.items():
+        name = run_sql("select Name from aidAUTHORNAMES where "
+                       "id = (select Name_id from aidAUTHORNAMESBIBREFS "
+                       "where bibref = %s)", (i[0],))
+        if len(name) > 0:
+            if len(name[0][0]) > 2:
+                names[i[0]] = name[0][0]
+
+    for n in names.items():
+        if n[1] not in variants:
+            variants[n[1]] = [n[0]]
+        else:
+            variants[n[1]].append(n[0])
+
+    for n in variants.items():
+        if len(split_name_parts(n[0])[2]) > 0:
+            variants_with_names.add(n[0])
+
+    if len(variants_with_names) <= 1:
+        #print '    Nothing to do here...' # 0..1 name only
+        if print_ignored:
+            print "  |-- IGNORED #names < 2: %s" % variants_with_names
+        return
+    else:
+        for variant_with_name in variants_with_names:
+            if not variant_with_name in variants:
+                continue
+            for ref in variants[variant_with_name]:
+                if variant_with_name in variants_paper_count:
+                    variants_paper_count[variant_with_name] += bibrefs[ref]
+                else:
+                    variants_paper_count[variant_with_name] = bibrefs[ref]
+
+    if print_debug:
+        print "|-- Considering PID %s" % pid
+
+    # Perform hierarchical decomposition...
+    sorted_variants_paper_count = sorted(variants_paper_count.items(),
+                                           key=itemgetter(1), reverse=True)
+
+    for vpc_index, vpc in enumerate(sorted_variants_paper_count):
+        if vpc_index in already_clustered:
+            continue
+
+        if print_debug:
+            print "  |-- HC Reference (%s): %s" % (vpc_index, vpc[0])
+
+        already_clustered.add(vpc_index)
+        new_clusters[new_cluster_index] = [vpc_index]
+        ref_name = vpc[0]
+
+        for cmp_eidx, comp in enumerate(sorted_variants_paper_count[vpc_index + 1:]):
+            cmp_idx = cmp_eidx + vpc_index + 1
+
+            if cmp_idx in already_clustered:
+                continue
+
+            if print_debug:
+                print "    |-- Compare to (%s): %s" % (cmp_idx, comp[0])
+
+            split = False
+            name1 = split_name_parts(ref_name)
+            name2 = split_name_parts(comp[0])
+            composits_eq = names_are_equal_composites(name1, name2)
+            gender_eq = names_are_equal_gender(name1, name2, gendernames)
+            ldist = names_minimum_levenshtein_distance(name1, name2)
+            vars_eq = names_are_synonymous(name1, name2, name_variations)
+            substr_eq = names_are_substrings(name1, name2)
+            onames = name1[2]
+            tnames = name2[2]
+            oname = "".join(onames).lower()
+            tname = "".join(tnames).lower()
+            minlen = min(len(oname), len(tname))
+            maxlen = max(len(oname), len(tname))
+
+            if (not composits_eq
+                and (not gender_eq
+                     or (((ldist == 1 and (float(ldist) / float(minlen) > .32))
+                          or (ldist == 2 and (float(ldist) / float(minlen) > .39))
+                          or ldist > 2)
+                         and not vars_eq
+                         and (not substr_eq and ldist > 1)))):
+                split = True
+
+            if print_plot_stats:
+                if (not composits_eq and gender_eq and ldist > 0
+                    and not vars_eq and not substr_eq):
+
+                    print("[%s,%s,%s] ... %s and %s on pid %s"
+                          % (ldist, (ldist / float(minlen)),
+                             (ldist / float(maxlen)), oname, tname, pid))
+
+            if print_debug:
+                print "      |-- Composites: %s" % composits_eq
+                print "      |-- Gender eq: %s" % gender_eq
+                print "      |-- L dist: %s" % ldist
+                print "      |-- Synonyms: %s" % vars_eq
+                print "      |-- Substr: %s" % substr_eq
+                print "      |-- Split: %s" % split
+
+            if not split:
+                if not new_cluster_index in new_clusters:
+                    new_clusters[new_cluster_index] = []
+
+                already_clustered.add(cmp_idx)
+                new_clusters[new_cluster_index].append(cmp_idx)
+
+                if print_debug:
+                    print("      |-- Adding idx %s to cluster %s"
+                          % (cmp_idx, new_cluster_index))
+#            else:
+#                if print_plot_stats:
+#                    name1 = split_name_parts(ref_name)
+#                    name2 = split_name_parts(comp[0])
+#                    onames = name1[2]
+#                    tnames = name2[2]
+#                    oname = "".join(onames).lower()
+#                    tname = "".join(tnames).lower()
+#                    minlen = min(len(oname), len(tname))
+#                    maxlen = max(len(oname), len(tname))
+#                    print("[%s,%s,%s] ... %s and %s on pid %s"
+#                          % (ldist, (ldist/float(minlen)), 
+#                             (ldist/float(maxlen)), oname, tname, pid))
+#                    print("for %s and %s on pid %s" % (oname, tname, pid))
+
+        new_cluster_index += 1
+
+    # perform the split into n new clusters...
+    updated_pids = []
+
+    if print_debug:
+        print "  |-- Creating %s new PIDs..." % (len(new_clusters) - 1)
+
+    for key in new_clusters:
+        if key == 0:
+            updated_pids.append(pid)
+            if not print_debug:
+                continue
+
+            cluster_names = []
+
+            for member in new_clusters[key]:
+                cluster_names.append(sorted_variants_paper_count[member][0])
+
+            if print_debug:
+                print "    |-- Will leave %s with pid %s" % (" and ".join(cluster_names), pid)
+
+            continue
+
+        cluster_names = []
+        split_bibrefs = set()
+
+        for member in new_clusters[key]:
+            cluster_names.append(sorted_variants_paper_count[member][0])
+
+        for cname in cluster_names:
+            if cname in variants:
+                for bref in variants[cname]:
+                    split_bibrefs.add(bref)
+
+        if print_debug:
+            print "    |-- Will put %s in a new cluster" % (" and ".join(cluster_names))
+            print "      |-- Creating new Person for bibrefs %s" % ", ".join(split_bibrefs)
+
+
+        newpid = run_sql("select max(personid)+1 from aidPERSONID")
+        lineids = []
+
+        for i in split_bibrefs:
+            lines = run_sql("select id from aidPERSONID where personid=%s and "
+                            "data like %s", (str(pid), str(i) + '%'))
+
+            for line in lines:
+                if line[0] not in lineids:
+                    lineids.append(line[0])
+
+        lineids.append(-1)
+        lineids.append(-1)
+        s = ("update aidPERSONID set personid='%s' "
+             "where flag < '2' and id in %s")
+        updated_lines = run_sql(s, (newpid[0][0], lineids))
+
+        if updated_lines > 0:
+            updated_pids.append(newpid[0][0])
+
+        if print_debug:
+            if updated_lines > 0:
+                print "      |-- Done. New personid: %s" % newpid[0][0]
+            else:
+                print "      |-- A human claim protected the split."
+
+    if perform_names_update_on_split and len(updated_pids) > 1:
+        if print_debug:
+            print "  |-- Updating names for updated person IDs"
+
+        pidlist = [[i] for i in updated_pids]
+        update_personID_names_string_set(pidlist)
+
+    if print_debug:
+        print "  "
+    # All done for this person...
+
+
 def personid_count_names_variants(pids=None):
     '''
     Experimental code to output as html a display of persons with not 'so much' compatible names
@@ -130,7 +529,7 @@ def personid_count_names_variants(pids=None):
         for p in papers:
             try:
                 bibrefs[p[0].split(',')[0]] += 1
-            except Exception:
+            except (KeyError, IndexError):
                 bibrefs[p[0].split(',')[0]] = 1
         #print "Found bibrefs: ", bibrefs.items(), '<br>'
         names = {}
@@ -160,7 +559,7 @@ def personid_count_names_variants(pids=None):
         s = s + namess + ' \n debug:' + '\n comparisons: ' + str(comparisons) + '\n nlist: ' + str(nlist) + '\n nlistbibrefs: ' + str(names.items())
         try:
             c = min(comparisons)
-        except Exception:
+        except (KeyError, IndexError):
             c = 1.0
         g = str(hex(int(c * 255)))[2:]
         r = str(hex(int(255 - c * 255)))[2:]
@@ -173,7 +572,6 @@ def personid_count_names_variants(pids=None):
 ) + '<br><br>\n\n'
 
             print '<font color="#' + r + g + '00"><span title="%s">&#9744;</span>' % s + '</font>'
-        #print 'WARNING!!!!!!!||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||', '<br>'
 
 def create_new_person(uid, uid_is_owner=False):
     #creates a new person
@@ -269,7 +667,7 @@ def get_canonical_id_from_personid(pid):
 def get_persons_with_open_tickets_list():
     '''
     Finds all the persons with open tickets and returns pids and count of tickets
-    @return: [[pid,ticket_count]]
+    @return: [[pid, ticket_count]]
     '''
     try:
         return run_sql("select o.personid, count(distinct o.flag) from "
@@ -299,10 +697,10 @@ def get_request_ticket(person_id, matching=None, ticket_id=None):
     '''
     Retrieves one or many requests tickets from a person
     @param: person_id: person id integer
-    @param: matching: couple of values to match ('tag','value')
+    @param: matching: couple of values to match ('tag', 'value')
     @param: ticket_id: ticket id (flag) value
-    @returns: [[[('tag','value')],ticket_id]]
-        [[[('a', 'va'), ('b', 'vb')], 1L],[[('b', 'daOEIaoe'), ('a', 'caaoOUIe')], 2L]]
+    @returns: [[[('tag', 'value')], ticket_id]]
+        [[[('a', 'va'), ('b', 'vb')], 1L], [[('b', 'daOEIaoe'), ('a', 'caaoOUIe')], 2L]]
     '''
     use_index = True
     tickets = []
@@ -343,16 +741,18 @@ def get_request_ticket(person_id, matching=None, ticket_id=None):
         ticket = []
         for line in row:
             ticket.append((line[0][3:], line[1]))
-        tickets.append([ticket, row[0][2]])
-
+        try:
+            tickets.append([ticket, row[0][2]])
+        except IndexError:
+            pass
     return tickets
 
 
 def update_request_ticket(person_id, tag_data_tuple, ticket_id=None):
     '''
-    Creates/updates a request ticket for a personID
+    Creates / updates a request ticket for a personID
     @param: personid int
-    @param: tag_data_tuples 'image' of the ticket: (('paper','700:316,10'),('owner','admin'),('external_id','ticket_18'))
+    @param: tag_data_tuples 'image' of the ticket: (('paper', '700:316,10'), ('owner', 'admin'), ('external_id', 'ticket_18'))
     @return: ticketid
     '''
     #tags: rt_owner (the owner of the ticket, associating the rt_number to the transaction)
@@ -454,7 +854,7 @@ def update_personID_canonical_names(persons_list=None, overwrite=False, suggeste
 
 def update_personID_table_from_paper(papers_list=None, personid=None):
     '''
-    Updates the personID table removing the bibrec/bibrefs couples no longer existing (after a paper has been
+    Updates the personID table removing the bibrec / bibrefs couples no longer existing (after a paper has been
     updated (name changed))
     @param: list of papers to consider for the update (bibrecs) (('1'),)
     @param: limit to given personid (('1',),)

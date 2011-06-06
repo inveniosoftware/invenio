@@ -2214,7 +2214,10 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             authors = []
 
             if query.count(":"):
-                left, right = query.split(":")
+                try:
+                    left, right = query.split(":")
+                except ValueError:
+                    pass
 
                 try:
                     recid = int(left)
@@ -2232,15 +2235,18 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
 
             sorted_results = webapi.search_person_ids_by_name(nquery)
 
-            for results in sorted_results:
+            for index, results in enumerate(sorted_results):
                 pid = results[0]
 #                authorpapers = webapi.get_papers_by_person_id(pid, -1)
 #                authorpapers = sorted(authorpapers, key=itemgetter(0),
 #                                      reverse=True)
-                authorpapers = [[paper] for paper in
-                                sort_records(None, [i[0] for i in
-                                             webapi.get_papers_by_person_id(pid, -1)],
-                                             sort_field="year", sort_order="a")]
+                if index < bconfig.PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT:
+                    authorpapers = [[paper] for paper in
+                                    sort_records(None, [i[0] for i in
+                                                 webapi.get_papers_by_person_id(pid, -1)],
+                                                 sort_field="year", sort_order="a")]
+                else:
+                    authorpapers = [['Not retrieved to increase performances.']]
 
                 if (recid and
                     not (str(recid) in [row[0] for row in authorpapers])):
