@@ -45,7 +45,8 @@ Contents
 
           $ sudo aptitude install rxp python-psyco sbcl cmucl \
               pylint pychecker pyflakes python-profiler python-epydoc \
-              libapache2-mod-xsendfile openoffice.org
+              libapache2-mod-xsendfile openoffice.org python-utidylib \
+              python-beautifulsoup
 
         Moreover, you should install some Message Transfer Agent (MTA)
         such as Postfix so that Invenio can email notification
@@ -128,6 +129,10 @@ Contents
           - (optional) hashlib, needed only for Python-2.4 and only
              if you would like to use AWS connectivity:
              <http://pypi.python.org/pypi/hashlib>
+          - (optional) utidylib, for HTML washing:
+	     <http://utidylib.berlios.de/>
+          - (optional) Beautiful Soup, for HTML washing:
+	     <http://www.crummy.com/software/BeautifulSoup/>
 
         Note: MySQLdb version 1.2.1_p2 or higher is recommended.  If
               you are using an older version of MySQLdb, you may get

@@ -50,6 +50,7 @@ from invenio.config import CFG_PREFIX, \
 from invenio.webmessage_mailutils import \
      email_quote_txt, \
      email_quoted_txt2html
+from invenio.htmlutils import tidy_html
 from invenio.webuser import get_user_info, get_email, collect_user_info
 from invenio.dateutils import convert_datetext_to_dategui, \
                               datetext_default, \
@@ -830,7 +831,8 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
         # Then definitely remove any blockquote, whatever it is
         msg = re.sub('<blockquote.*?>', '<div>', msg)
         msg = re.sub('</blockquote>', '</div>', msg)
-        # TODO: tidy up the HTML
+        # Tidy up the HTML
+        msg = tidy_html(msg)
         msg = msg.replace('&nbsp;', ' ')
         # In case additional <p> or <div> got inserted, interpret
         # these as new lines (with a sad trick to do it only once)

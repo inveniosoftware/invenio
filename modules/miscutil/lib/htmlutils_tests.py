@@ -24,7 +24,8 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio.htmlutils import HTMLWasher, nmtoken_from_string, \
-     remove_html_markup
+     remove_html_markup, CFG_TIDY_INSTALLED, \
+     CFG_BEAUTIFULSOUP_INSTALLED, tidy_html
 from invenio.testutils import make_test_suite, run_test_suite
 
 class XSSEscapingTest(unittest.TestCase):
@@ -136,6 +137,72 @@ class HTMLWashingTest(unittest.TestCase):
         self.assertEqual(self.washer.wash(html_buffer=test_str),
                          'styled text')
 
+class HTMLTidyingTest(unittest.TestCase):
+    """Test functions related to tidying up HTML source"""
+
+    html_buffer_1 = 'test</blockquote >'
+    html_buffer_2 = '<blockquote >test </div><div>test2'
+    html_buffer_3 = '''<UL>
+<LI>
+<UL>
+<LI><A HREF="rememberwhenb.html">Next</A>
+<LI><A HREF="daysofourlives.html">Back</A>
+<LI><A HREF="newstuff.html">New Stuff</A>
+</UL>
+</UL>
+
+<UL>
+<LI>Merge adjacent lists
+</UL>
+
+<UL>
+
+<UL>
+<LI><A HREF="one.html">One</A>
+<LI><A HREF="two.html">Two</A>
+<LI><A HREF="three.html">Three</A>
+</UL>''' # Input test 427841 from Tidy
+
+    def test_tidy_html_with_utidylib(self):
+        """htmlutils - Tidying up HTML with µTidylib """
+        res1 = tidy_html(self.html_buffer_1, 'utidylib')
+        res2 = tidy_html(self.html_buffer_2, 'utidylib')
+        res3 = tidy_html(self.html_buffer_3, 'utidylib')
+        if CFG_TIDY_INSTALLED:
+            self.assertEqual(res1.replace('\n', '').replace(' ', ''),
+                             'test')
+            self.assertEqual(res2.replace('\n', '').replace(' ', ''),
+                             '<blockquote>test<div>test2</div></blockquote>')
+            self.assertEqual(res3.replace('\n', '').replace(' ', ''),
+                             '<ul><li><ul><li><ahref="rememberwhenb.html">Next</a></li><li><ahref="daysofourlives.html">Back</a></li><li><ahref="newstuff.html">NewStuff</a></li></ul></li></ul><ul><li>Mergeadjacentlists</li></ul><divstyle="margin-left:2em"><ul><li><ahref="one.html">One</a></li><li><ahref="two.html">Two</a></li><li><ahref="three.html">Three</a></li></ul></div>')
+        else:
+            self.assertEqual(res1, res1)
+            self.assertEqual(res2, res2)
+            self.assertEqual(res3, res3)
+
+    def test_tidy_html_with_beautifulsoup(self):
+        """htmlutils - Tidying up HTML with BeautifulSoup"""
+        res1 = tidy_html(self.html_buffer_1, 'beautifulsoup')
+        res2 = tidy_html(self.html_buffer_2, 'beautifulsoup')
+        res3 = tidy_html(self.html_buffer_3, 'beautifulsoup')
+        if CFG_TIDY_INSTALLED:
+            self.assertEqual(res1.replace('\n', '').replace(' ', ''),
+                             'test')
+            self.assertEqual(res2.replace('\n', '').replace(' ', ''),
+                             '<blockquote>test<div>test2</div></blockquote>')
+            self.assertEqual(res3.replace('\n', '').replace(' ', ''),
+                             '<ul><li><ul><li><ahref="rememberwhenb.html">Next</a></li><li><ahref="daysofourlives.html">Back</a></li><li><ahref="newstuff.html">NewStuff</a></li></ul></li></ul><ul><li>Mergeadjacentlists</li></ul><ul><ul><li><ahref="one.html">One</a></li><li><ahref="two.html">Two</a></li><li><ahref="three.html">Three</a></li></ul></ul>')
+        else:
+            self.assertEqual(res1, res1)
+            self.assertEqual(res2, res2)
+            self.assertEqual(res3, res3)
+
+    def test_tidy_html_with_unknown_lib(self):
+        """htmlutils - Tidying up HTML with non existing library"""
+        res = tidy_html(self.html_buffer_1, 'foo')
+        self.assertEqual(res.replace('\n', '').replace(' ', ''),
+                         self.html_buffer_1.replace('\n', '').replace(' ', ''))
+
 class HTMLMarkupRemovalTest(unittest.TestCase):
     """Test functions related to removing HTML markup."""
 
@@ -156,7 +223,8 @@ class HTMLMarkupRemovalTest(unittest.TestCase):
 TEST_SUITE = make_test_suite(XSSEscapingTest,
                              CharactersEscapingTest,
                              HTMLWashingTest,
-                             HTMLMarkupRemovalTest)
+                             HTMLMarkupRemovalTest,
+                             HTMLTidyingTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

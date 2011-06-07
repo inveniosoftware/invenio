@@ -31,6 +31,17 @@ try:
     fckeditor_available = True
 except ImportError, e:
     fckeditor_available = False
+try:
+    from BeautifulSoup import BeautifulSoup
+    CFG_BEAUTIFULSOUP_INSTALLED = True
+except ImportError:
+      CFG_BEAUTIFULSOUP_INSTALLED = False
+try:
+    import tidy
+    CFG_TIDY_INSTALLED = True
+except ImportError:
+    CFG_TIDY_INSTALLED = False
+
 # List of allowed tags (tags that won't create any XSS risk)
 cfg_html_buffer_allowed_tag_whitelist = ('a',
                                          'p', 'br', 'blockquote',
@@ -231,6 +242,37 @@ class HTMLWasher(HTMLParser):
         """Process a general entity reference of the form "&name;".
         Return it as it is."""
         self.result += '&' + name + ';'
+
+def tidy_html(html_buffer, cleaning_lib='utidylib'):
+    """
+    Tidy up the input HTML using one of the installed cleaning
+    libraries.
+
+    @param html_buffer: the input HTML to clean up
+    @type html_buffer: string
+    @param cleaning_lib: chose the preferred library to clean the HTML. One of:
+                         - utidylib
+                         - beautifulsoup
+    @return: a cleaned version of the input HTML
+    @note: requires uTidylib or BeautifulSoup to be installed. If the chosen library is missing, the input X{html_buffer} is returned I{as is}.
+    """
+
+    if CFG_TIDY_INSTALLED and cleaning_lib == 'utidylib':
+        options = dict(output_xhtml=1,
+                       show_body_only=1)
+        try:
+            output = str(tidy.parseString(html_buffer, **options))
+        except:
+            output = html_buffer
+    elif CFG_BEAUTIFULSOUP_INSTALLED and cleaning_lib == 'beautifulsoup':
+        try:
+            output = str(BeautifulSoup(html_buffer).prettify())
+        except:
+            output = html_buffer
+    else:
+        output = html_buffer
+
+    return output
 
 def get_mathjax_header():
     """
