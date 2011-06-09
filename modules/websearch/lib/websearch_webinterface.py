@@ -772,7 +772,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
 
-        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
+        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req,'runbibedit')[0] != 0:
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
         if auth_code and user_info['email'] == 'guest':
@@ -847,7 +847,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
             except (KeyError, ValueError):
                 pass
 
-        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
+        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req,'runbibedit')[0] != 0:
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
         record_primary_collection = guess_primary_collection_of_a_record(self.recid)
@@ -913,7 +913,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                 except KeyError:
                     pass
 
-        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
+        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req,'runbibedit')[0] != 0:
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
         involved_collections = set()
@@ -1590,7 +1590,7 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
 
-        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
+        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req,'runbibedit')[0] != 0:
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
         if auth_code and user_info['email'] == 'guest':
