@@ -28,6 +28,7 @@ from invenio.testutils import make_test_suite, \
                               run_test_suite, \
                               test_web_page_content
 from invenio.bibformat import format_record
+from invenio.bibformat_engine import BibFormatObject
 
 class BibFormatAPITest(unittest.TestCase):
     """Check BibFormat API"""
@@ -46,6 +47,31 @@ class BibFormatAPITest(unittest.TestCase):
         pageurl = CFG_SITE_URL + '/%s/73?of=hx' % CFG_SITE_RECORD
         result = test_web_page_content(pageurl,
                                        expected_text=result)
+
+class BibFormatObjectAPITest(unittest.TestCase):
+    """Check BibFormatObject (bfo) APIs"""
+
+    bfo_test_1 = BibFormatObject(12)
+
+    def test_knowledge_base(self):
+        """bibformat - Checking BibFormatObject KB bridge"""
+        self.assertEqual(self.bfo_test_1.kb('DBCOLLID2BIBTEX', 'THESIS'),
+                         'phdthesis')
+
+        self.assertEqual(self.bfo_test_1.kb('DBCOLLID2BIBTEX', 'THESIS', 'bar'),
+                         'phdthesis')
+
+        self.assertEqual(self.bfo_test_1.kb('DBCOLLID2BIBTEX', 'foo'),
+                         '')
+
+        self.assertEqual(self.bfo_test_1.kb('DBCOLLID2BIBTEX', 'foo', 'bar'),
+                         'bar')
+
+        self.assertEqual(self.bfo_test_1.kb('DBCOLLID2BIBTEX', ''),
+                         '')
+
+        self.assertEqual(self.bfo_test_1.kb('DBCOLLID2BIBTEX', '', 'bar'),
+                         'bar')
 
 class BibFormatBibTeXTest(unittest.TestCase):
     """Check output produced by BibFormat for BibTeX output for
@@ -444,6 +470,7 @@ TEST_SUITE = make_test_suite(BibFormatBibTeXTest,
                              BibFormatMARCTest,
                              BibFormatMARCXMLTest,
                              BibFormatAPITest,
+                             BibFormatObjectAPITest,
                              BibFormatTitleFormattingTest,
                              BibFormatISBNFormattingTest,
                              BibFormatPublInfoFormattingTest)
