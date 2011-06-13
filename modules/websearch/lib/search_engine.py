@@ -2080,6 +2080,7 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
         # parse the query. The result is list of [op1, expr1, op2, expr2, ..., opN, exprN]
         parsing_result = parser.parse_query(p)
         if verbose  and of.startswith("h"):
+            print_warning(req, "Search stage 1: search_pattern_parenthesised() searched %s." % repr(p))
             print_warning(req, "Search stage 1: search_pattern_parenthesised() returned %s." % repr(parsing_result))
 
         # go through every pattern

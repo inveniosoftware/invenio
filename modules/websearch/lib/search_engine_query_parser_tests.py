@@ -309,6 +309,11 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
                           '+', 'boson', '+', 'couplings', '+', 'wwv', '+', 'v + gamma, + z', \
                           '+', 'in', '+', 'e(+)e(-)', '+', 'collisions', '+', 'at', '+', 'lep2'])
 
+    def test_sqpp_second_order_operator_operates_on_parentheses(self):
+        """SearchQueryParenthesisedParser - refersto:(author:ellis or author:hawking)"""
+        self.assertEqual(self.parser.parse_query('refersto:(author:ellis or author:hawking)'),
+                         ['+', 'refersto:"author:ellis | author:hawking"'])
+
 class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
     """Test SPIRES query parsing and translation to Invenio syntax."""
 
@@ -453,6 +458,18 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = 'find refersto author kitty'
         self._compare_searches(inv_search, spi_search)
 
+    def test_refersto_author_multi_name(self):
+        """SPIRES search syntax - find a ellis and refersto author \"parke, sj\""""
+        inv_search = 'author:ellis refersto:author:"parke, s. j."'
+        spi_search = 'find a ellis and refersto author "parke, s. j."'
+        self._compare_searches(inv_search, spi_search)
+
+    def test_refersto_author_multi_name_no_quotes(self):
+        """SPIRES search syntax - find a ellis and refersto author parke, sj"""
+        inv_search = 'author:ellis refersto:(author:"parke, sj*"  or exactauthor:"parke, s *"  or exactauthor:"parke, s")'
+        spi_search = "find a ellis and refersto author parke, sj"
+        self._compare_searches(inv_search, spi_search)
+
     def test_citedby_refersto_author(self):
         """SPIRES search syntax - find citedby refersto author penguin"""
         inv_search = 'refersto:citedby:author:penguin'
@@ -530,6 +547,12 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         # motivated by trac-517
         spi_search = "find aff Penn State U"
         inv_search = "affiliation:\"Penn State U\""
+        self._compare_searches(inv_search, spi_search)
+
+    def test_distribution_with_many_clauses(self):
+        """SPIRES search syntax - find a mele and brooks and holtkamp and o'connell"""
+        spi_search = "find a mele and brooks and holtkamp and o'connell"
+        inv_search = "author:mele author:brooks author:holtkamp author:o'connell"
         self._compare_searches(inv_search, spi_search)
 
     def test_keyword_as_kw(self):

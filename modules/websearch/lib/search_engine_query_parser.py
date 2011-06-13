@@ -227,7 +227,7 @@ class SearchQueryParenthesisedParser(object):
         """Given a query string, return a list of tokens from that string.
 
         * Isolates meaningful punctuation: ( ) + | -
-        * Keeps single- and doubl-quoted strings together without interpretation.
+        * Keeps single- and double-quoted strings together without interpretation.
         * Splits everything else on whitespace.
 
         i.e.:
@@ -257,7 +257,7 @@ class SearchQueryParenthesisedParser(object):
             """
             s = ' '+s
             s = s.replace('->', '####DATE###RANGE##OP#') # XXX: Save '->'
-            s = re.sub('(?P<outside>[a-zA-Z0-9_,=]+)\((?P<inside>[a-zA-Z0-9_,+-/]*)\)',
+            s = re.sub('(?P<outside>[a-zA-Z0-9_,=:]+)\((?P<inside>[a-zA-Z0-9_,+-/]*)\)',
                        '#####\g<outside>####PAREN###\g<inside>##PAREN#', s) # XXX: Save U(1) and SL(2,Z)
             s = re.sub('####PAREN###(?P<content0>[.0-9/-]*)(?P<plus>[+])(?P<content1>[.0-9/-]*)##PAREN#',
                        '####PAREN###\g<content0>##PLUS##\g<content1>##PAREN#', s)
@@ -266,14 +266,14 @@ class SearchQueryParenthesisedParser(object):
                        '####PAREN###\g<content0>##MINUS##\g<content1>##PAREN#', s) # XXX: Save e(+)e(-)
             for char in self.specials:
                 if char == '-':
-                    s = s.replace(' -', ' '+char+' ')
-                    s = s.replace(')-', ') '+char+' ')
-                    s = s.replace('-(', ' '+char+' (')
+                    s = s.replace(' -', ' - ')
+                    s = s.replace(')-', ') - ')
+                    s = s.replace('-(', ' - (')
                 else:
                     s = s.replace(char, ' '+char+' ')
             s = re.sub('##PLUS##', '+', s)
             s = re.sub('##MINUS##', '-', s) # XXX: Restore e(+)e(-)
-            s = re.sub('#####(?P<outside>[a-zA-Z0-9_,=]+)####PAREN###(?P<inside>[a-zA-Z0-9_,+-/]*)##PAREN#',
+            s = re.sub('#####(?P<outside>[a-zA-Z0-9_,=:]+)####PAREN###(?P<inside>[a-zA-Z0-9_,+-/]*)##PAREN#',
                        '\g<outside>(\g<inside>)', s) # XXX: Restore U(1) and SL(2,Z)
             s = s.replace('####DATE###RANGE##OP#', '->') # XXX: Restore '->'
             return s.split()
@@ -342,6 +342,14 @@ class SearchQueryParenthesisedParser(object):
         self.__tl_len = len(token_list)
 
         def inner_parse(token_list, open_parens=False):
+            '''
+                although it's not in the API, it seems sensible to comment
+                this function a bit.
+
+                dist_token here is a token (e.g. a second-order operator)
+                which needs to be distributed across other tokens inside
+                the inner parens
+            '''
 
             if open_parens:
                 parsed_values = []
@@ -354,10 +362,20 @@ class SearchQueryParenthesisedParser(object):
                 if i > 0 and parsed_values[-1] not in op_symbols:
                     parsed_values.append('+')
                 if token == '(':
+                    # if we need to distribute something over the tokens inside the parens
+                    # we will know it because... it will end in a :
+                    # that part of the list will be 'px', '+', '('
+                    distributing = (len(parsed_values) > 2 and parsed_values[-2].endswith(':') and parsed_values[-1] == '+')
+                    if distributing:
+                        # we don't need the + if we are distributing
+                        parsed_values = parsed_values[:-1]
                     offset = self.__tl_len - len(token_list)
                     inner_value = inner_parse(token_list[i+1:], True)
                     inner_value = ' '.join(inner_value)
-                    parsed_values.append(inner_value)
+                    if distributing:
+                        parsed_values[-1] = parsed_values[-1] + '"' + inner_value + '"'
+                    else:
+                        parsed_values.append(inner_value)
                     self.__tl_idx += 1
                     i = self.__tl_idx - offset
                 elif token == ')':
@@ -621,7 +639,12 @@ class SpiresToInvenioSyntaxConverter:
         self._re_quotes_match = re.compile('[^\\\\](".*?[^\\\\]")|[^\\\\](\'.*?[^\\\\]\')')
 
         # match cases where a keyword distributes across a conjunction
-        self._re_distribute_keywords = re.compile(r'\b(?P<keyword>\S*:)(?P<content>.+?)\s*(?P<combination>and not | and | or | not )\s*(?P<last_content>[^:]*?)(?= and not | and | or | not |$)', re.IGNORECASE)
+        self._re_distribute_keywords = re.compile(r'''(?ix)     # verbose, ignorecase on
+                  \b(?P<keyword>\S*:)            # a keyword is anything that's not whitespace with a colon
+                  (?P<content>.+?)\s*            # content is the part that comes after the keyword
+                  (?P<combination>\ and\ not\ |\ and\ |\ or\ |\ not\ )\s*
+                  (?P<last_content>[^:]*?)       # oh look, content without a keyword!
+                  (?=\ and\ not\ |\ and\ |\ or\ |\ not\ |$)''')
 
         # massaging SPIRES quirks
         self._re_pattern_IRN_search = re.compile(r'970__a:(?P<irn>\d+)')
@@ -629,7 +652,15 @@ class SpiresToInvenioSyntaxConverter:
 
         # regular expression that matches author patterns
         # and author patterns with second-order-ops on top
-        self._re_author_match = re.compile(r'\b((?P<secondorderop>[^\s]+:)?)author:\s*(?P<name>.+?)\s*(?= and not | and | or | not |$)', re.IGNORECASE)
+        # does not match names with " or ' around them, since
+        # those should not be touched
+        self._re_author_match = re.compile(r'''(?ix)    # verbose, ignorecase
+            \b((?P<secondorderop>[^\s]+:)?)     # do we have a second-order-op on top?
+            author:(?P<name>
+                        [^\'\"]     # first character not a quotemark
+                        [^()]+?     # some stuff that isn't parentheses (that is dealt with in pp)
+                        [^\'\"])    # last character not a quotemark
+            (?=\ and\ not\ |\ and\ |\ or\ |\ not\ |$)''')
 
         # regular expression that matches exact author patterns
         # the group defined in this regular expression is used in method
@@ -1103,11 +1134,21 @@ class SpiresToInvenioSyntaxConverter:
     def _replace_second_order_keyword(self, query, old_keyword, new_keyword):
         """Replaces old second-order keyword in the query with a new keyword"""
 
-        regex_string = r'(?P<operator>(^find|\band|\bor|\bnot|\brefersto|\bcitedby|^)\b[:\s\(]*)' + \
-                       old_keyword + r'(?P<endorop>\s*[a-z]+:|[\s\(]+|$)'
-        regular_expression = re.compile(regex_string, re.IGNORECASE)
+        regular_expression =\
+                re.compile(r'''(?ix)  # verbose, ignorecase
+                            (?P<operator>
+                                 (^find|\band|\bor|\bnot|\brefersto|\bcitedby|^)\b  # operator preceding our operator
+                                 [:\s\(]*   # trailing colon, spaces, parens, etc. for that operator
+                            )
+                             %s  # the keyword we're searching for
+                            (?P<endorop>
+                                 \s*[a-z]+:|  # either an operator (like author:)
+                                 [\s\(]+|     # or a paren opening
+                                 $            # or the end of the string
+                            )''' % old_keyword)
         result = regular_expression.sub(r'\g<operator>' + new_keyword + r'\g<endorop>', query)
         result = re.sub(':\s+', ':', result)
+
         return result
 
     def _distribute_keywords_across_combinations(self, query):
@@ -1121,5 +1162,10 @@ class SpiresToInvenioSyntaxConverter:
                    ' ' +  match.group('combination') + ' ' + match.group('keyword') + \
                    match.group('last_content')
 
-        query = self._re_distribute_keywords.sub(create_replacement_pattern, query)
+        still_matches = True
+
+        while still_matches:
+            query = self._re_distribute_keywords.sub(create_replacement_pattern, query)
+            still_matches = self._re_distribute_keywords.search(query)
+        query = re.sub(r'\s+', ' ', query)
         return query
