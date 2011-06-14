@@ -287,7 +287,7 @@ def perform_request_join_group(uid,
                     group_name=group_name,
                     grpID=grpID,
                     ln=ln)
-                (body, errors, warnings, dummy, dummy) = \
+                (body, dummy, dummy) = \
                     perform_request_send(uid,
                         msg_to_user=admin,
                         msg_to_group="",
@@ -497,7 +497,7 @@ def  perform_request_delete_group(uid, grpID, confirmed=0, ln=CFG_SITE_LANG):
             group_name = group_infos[0][1]
             msg_subjet, msg_body = websession_templates.tmpl_delete_msg(
                 group_name=group_name, ln=ln)
-            (body, errors, warnings, dummy, dummy) = perform_request_send(
+            (body, dummy, dummy) = perform_request_send(
                 uid,
                 msg_to_user="",
                 msg_to_group=group_name,
@@ -639,7 +639,7 @@ def perform_request_add_member(uid, grpID, user_id, ln=CFG_SITE_LANG):
             user = get_user_info(user_id, ln)[2]
             msg_subjet, msg_body = websession_templates.tmpl_member_msg(
                 group_name=group_name, accepted=1, ln=ln)
-            (body, errors, warnings, dummy, dummy) = perform_request_send(
+            (body, dummy, dummy) = perform_request_send(
                 uid, msg_to_user=user, msg_to_group="", msg_subject=msg_subjet,
                 msg_body=msg_body, ln=ln)
             (body, errors, warnings) = perform_request_manage_member(uid,
@@ -696,7 +696,7 @@ def perform_request_reject_member(uid,
                 group_name=group_name,
                 accepted=0,
                 ln=ln)
-            (body, errors, warnings, dummy, dummy) = perform_request_send(
+            (body, dummy, dummy) = perform_request_send(
                 uid,
                 msg_to_user=user,
                 msg_to_group="",
