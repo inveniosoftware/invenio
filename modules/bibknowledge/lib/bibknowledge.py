@@ -110,7 +110,7 @@ def update_kb_mapping(kb_name, old_key, key, value):
         else:
             bibknowledge_dblayer.update_kb_mapping(kb_name, old_key, key, value)
 
-def get_kb_mappings_json(kb_name="", key="", value="", match_type="s"):
+def get_kb_mappings_json(kb_name="", key="", value="", match_type="s", limit=None):
     """Get leftside/rightside mappings from kb kb_name formatted as json dict.
 
        If key given, give only those with left side (mapFrom) = key.
@@ -120,6 +120,7 @@ def get_kb_mappings_json(kb_name="", key="", value="", match_type="s"):
        @param key: include only lines matching this on left side in the results
        @param value: include only lines matching this on right side in the results
        @param match_type: s = substring match, e = exact match
+       @param limit: maximum number of results to return (are ALL if set to None)
        @return a list of mappings
     """
     mappings = get_kb_mappings(kb_name, key, value, match_type)
@@ -128,6 +129,8 @@ def get_kb_mappings_json(kb_name="", key="", value="", match_type="s"):
         label = m['value'] or m['key']
         value = m['key'] or m['value']
         ret.append({'label': label, 'value': value})
+    if limit is not None:
+        ret = ret[:limit]
     return json.dumps(ret)
 
 def kb_exists(kb_name):

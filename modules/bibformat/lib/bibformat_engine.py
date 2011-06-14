@@ -1968,7 +1968,7 @@ class BibFormatObject:
         @param string: the string we want to translate
         @param default: a default value returned if 'string' not found in 'kb'
         """
-        if string is None:
+        if not string:
             return default
 
         val = get_kbr_values(kb, searchkey=string, searchtype='e')

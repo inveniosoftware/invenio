@@ -76,6 +76,7 @@ _TASK_PARAMS = {
         'task_stop_helper_fnc': None,
         'task_name': os.path.basename(sys.argv[0]),
         'task_specific_name': '',
+        'task_id': 0,
         'user': '',
         # If the task is not initialized (usually a developer debugging
         # a single method), output all messages.
@@ -438,7 +439,6 @@ def _task_build_params(
                 _TASK_PARAMS["profile"] += opt[1].split(',')
             elif opt[0] in ("--post-process"):
                 _TASK_PARAMS["post-process"] += [opt[1]];
-
             elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
                 not task_submit_elaborate_specific_parameter_fnc(opt[0],
                     opt[1], opts, args):

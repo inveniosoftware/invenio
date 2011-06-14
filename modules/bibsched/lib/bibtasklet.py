@@ -120,9 +120,9 @@ def task_run_core():
     arguments = task_get_option('arguments', {})
     write_message('Starting tasklet "%s" (with arguments %s)' %
         (tasklet, arguments))
-    task_update_progress('%s started')
+    task_update_progress('%s started' % tasklet)
     ret = _TASKLETS[tasklet](**arguments)
-    task_update_progress('%s finished')
+    task_update_progress('%s finished' % tasklet)
     write_message('Finished tasklet "%s" (with arguments %s)' %
         (tasklet, arguments))
     if ret is not None:

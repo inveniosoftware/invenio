@@ -410,10 +410,13 @@ def interface(req,
             filename = os.path.basename(filename.split('\\')[-1])
             filename = filename.strip()
             if filename != "":
-                # This may be dangerous if the file size is bigger than the available memory
                 fp = open(os.path.join(dir_to_open, filename), "w")
-                while formfields.file:
-                    fp.write(formfields.file.read(10240))
+                while True:
+                    buf = formfields.file.read(10240)
+                    if buf:
+                        fp.write(buf)
+                    else:
+                        break
                 fp.close()
                 fp = open(os.path.join(curdir, "lastuploadedfile"), "w")
                 fp.write(filename)
@@ -967,10 +970,13 @@ def endaction(req,
             filename = os.path.basename(filename.split('\\')[-1])
             filename = filename.strip()
             if filename != "":
-                # This may be dangerous if the file size is bigger than the available memory
-                data = formfields.file.read()
                 fp = open(os.path.join(dir_to_open, filename), "w")
-                fp.write(data)
+                while True:
+                    buf = formfields.file.read(10240)
+                    if buf:
+                        fp.write(buf)
+                    else:
+                        break
                 fp.close()
                 fp = open(os.path.join(curdir, "lastuploadedfile"), "w")
                 fp.write(filename)

@@ -45,6 +45,7 @@ from invenio.dbquery import run_sql, Error, get_table_update_time
 from invenio.bibrank_record_sorter import get_bibrank_methods
 from invenio.dateutils import convert_datestruct_to_dategui
 from invenio.bibformat import format_record
+from invenio.shellutils import mymkdir
 from invenio.intbitset import intbitset
 from invenio.websearch_external_collections import \
      external_collection_load_states, \
@@ -89,25 +90,6 @@ def get_collection(colname):
     return COLLECTION_HOUSE[colname]
 
 ## auxiliary functions:
-def mymkdir(newdir, mode=0777):
-    """works the way a good mkdir should :)
-        - already exists, silently complete
-        - regular file in the way, raise an exception
-        - parent directory(ies) does not exist, make them as well
-    """
-    if os.path.isdir(newdir):
-        pass
-    elif os.path.isfile(newdir):
-        raise OSError("a file with the same name as the desired " \
-                      "dir, '%s', already exists." % newdir)
-    else:
-        head, tail = os.path.split(newdir)
-        if head and not os.path.isdir(head):
-            mymkdir(head, mode)
-        if tail:
-            os.umask(022)
-            os.mkdir(newdir, mode)
-
 def is_selected(var, fld):
     "Checks if the two are equal, and if yes, returns ' selected'.  Useful for select boxes."
     if var == fld:

@@ -33,7 +33,7 @@ from invenio.webinterface_handler import WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url
 
 class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
-    _exports = ["", "post1", "post2", "sso", "dumpreq", "whatismyip"]
+    _exports = ["", "post1", "post2", "sso", "dumpreq", "complexpost", "whatismyip"]
 
     def __call__(self, req, form):
         redirect_to_url(req, CFG_SITE_URL + '/httptest/post1')
@@ -89,6 +89,21 @@ class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
             return page("test2", body=body, req=req)
         path, mimetype = handle_file_post(req)
         return stream_file(req, path, mime=mimetype)
+
+    def complexpost(self, req, form):
+        body = """
+            <form action="/httptest/dumpreq" method="POST">
+                A file: <input name="file1" type="file" /><br />
+                Another file: <input name="file2" type="file" /><br />
+                <select name="cars" multiple="multiple">
+                    <option value="volvo">Volvo</option>
+                    <option value="saab">Saab</option>
+                    <option value="fiat" selected="selected">Fiat</option>
+                    <option value="audi">Audi</option>
+                </select>
+                <input type="submit" />
+            </form>"""
+        return page("Complex POST", body=body, req=req)
 
     def whatismyip(self, req, form):
         """

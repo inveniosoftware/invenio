@@ -78,11 +78,11 @@ from urllib import urlencode
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_URL, \
-     CFG_BINDIR, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_TMPDIR, \
      CFG_SITE_SUPPORT_EMAIL
 from invenio.messages import gettext_set_language
+from invenio.bibdocfilecli import cli_fix_marc
 from invenio.bibdocfile import BibRecDocs, \
      decompose_file, calculate_md5, BibDocFile, \
      InvenioWebSubmitFileError, BibDocMoreInfo
@@ -90,7 +90,6 @@ from invenio.websubmit_functions.Shared_Functions import \
      createRelatedFormats
 from invenio.errorlib import register_exception
 from invenio.dbquery import run_sql
-from invenio.shellutils import run_shell_command
 from invenio.websubmit_icon_creator import \
      create_icon, InvenioWebSubmitIconCreatorError
 from invenio.urlutils import create_html_mailto
@@ -1817,13 +1816,13 @@ def move_uploaded_files_to_storage(working_dir, recid, icon_sizes,
             delete(bibdoc_name, recid, working_dir, pending_bibdocs,
                    bibrecdocs)
 
-    # Update the MARC
-    bibdocfile_bin = os.path.join(CFG_BINDIR, 'bibdocfile --yes-i-know')
-    run_shell_command(bibdocfile_bin + " --fix-marc --recid=%s", (str(recid),))
-
     # Delete the HB BibFormat cache in the DB, so that the fulltext
     # links do not point to possible dead files
     run_sql("DELETE from bibfmt WHERE format='HB' AND id_bibrec=%s", (recid,))
+
+    # Update the MARC
+    cli_fix_marc(None, [recid], interactive=False)
+
 
 def add(file_path, bibdoc_name, rename, doctype, description, comment,
         file_restriction, recid, working_dir, icon_sizes, create_icon_doctypes,

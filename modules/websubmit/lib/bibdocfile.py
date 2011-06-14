@@ -2586,11 +2586,39 @@ class BibDoc:
             (self.recid, self.id, version, format,
             userid, ip_address,))
 
+def generic_path2bidocfile(fullpath):
+    """
+    Returns a BibDocFile objects that wraps the given fullpath.
+    @note: the object will contain the minimum information that can be
+        guessed from the fullpath (e.g. docname, format, subformat, version,
+        md5, creation_date, modification_date). It won't contain for example
+        a comment, a description, a doctype, a restriction.
+    """
+    fullpath = os.path.abspath(fullpath)
+    try:
+        path, name, format, version = decompose_file_with_version(fullpath)
+    except ValueError:
+        ## There is no version
+        version = 0
+        path, name, format = decompose_file(fullpath)
+    md5folder = Md5Folder(path)
+    checksum = md5folder.get_checksum(os.path.basename(fullpath))
+    return BibDocFile(fullpath=fullpath,
+        doctype=None,
+        version=version,
+        name=name,
+        format=format,
+        recid=0,
+        docid=0,
+        status=None,
+        checksum=checksum,
+        more_info=None)
+
 class BibDocFile:
     """This class represents a physical file in the Invenio filesystem.
     It should never be instantiated directly"""
 
-    def __init__(self, fullpath, doctype, version, name, format, recid, docid, status, checksum, more_info, human_readable=False):
+    def __init__(self, fullpath, doctype, version, name, format, recid, docid, status, checksum, more_info=None, human_readable=False):
         self.fullpath = os.path.abspath(fullpath)
         self.doctype = doctype
         self.docid = docid
@@ -2599,7 +2627,14 @@ class BibDocFile:
         self.status = status
         self.checksum = checksum
         self.human_readable = human_readable
-        self.description = more_info.get_description(format, version)
+        if more_info:
+            self.description = more_info.get_description(format, version)
+            self.comment = more_info.get_comment(format, version)
+            self.flags = more_info.get_flags(format, version)
+        else:
+            self.description = None
+            self.comment = None
+            self.flags = []
         self.format = normalize_format(format)
         self.superformat = get_superformat_from_format(self.format)
         self.subformat = get_subformat_from_format(self.format)
@@ -2613,8 +2648,6 @@ class BibDocFile:
             if self.mime is None:
                 self.mime = "application/octet-stream"
         self.more_info = more_info
-        self.comment = more_info.get_comment(format, version)
-        self.flags = more_info.get_flags(format, version)
         self.hidden = 'HIDDEN' in self.flags
         self.size = os.path.getsize(fullpath)
         self.md = datetime.fromtimestamp(os.path.getmtime(fullpath))

@@ -314,6 +314,7 @@ function updateStatus(statusType, reporttext){
 				  gSTATUS_INFO_TIME);
       break;
     case 'error':
+      updateToolbar(false);
       image = img('/img/circle_red.png');
       text = reporttext;
       clearTimeout(updateStatus.statusResetTimerID);

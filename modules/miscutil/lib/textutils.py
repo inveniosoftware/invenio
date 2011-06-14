@@ -27,6 +27,14 @@ import sys
 import re
 import textwrap
 import invenio.template
+from invenio.config import CFG_ETCDIR
+try:
+    import chardet
+    CHARDET_AVAILABLE = True
+except ImportError:
+    CHARDET_AVAILABLE = False
+
+CFG_LATEX_UNICODE_TRANSLATION_CONST = {}
 
 CFG_WRAP_TEXT_IN_A_BOX_STYLES = {
     '__DEFAULT' : {
@@ -291,15 +299,17 @@ def guess_minimum_encoding(text, charsets=('ascii', 'latin1', 'utf8')):
             pass
     return (text_in_unicode.encode('utf8'), 'utf8')
 
-def encode_for_xml(text, wash=False, xml_version='1.0'):
+def encode_for_xml(text, wash=False, xml_version='1.0', quote=False):
     """Encodes special characters in a text so that it would be
     XML-compliant.
     @param text: text to encode
     @return: an encoded text"""
     text = text.replace('&', '&amp;')
     text = text.replace('<', '&lt;')
+    if quote:
+        text = text.replace('"', '&quot;')
     if wash:
-        text = wash_for_xml(text, xml_version='1.0')
+        text = wash_for_xml(text, xml_version=xml_version)
     return text
 
 try:
@@ -378,3 +388,116 @@ def remove_line_breaks(text):
     separator', 'paragraph separator', and 'next line' characters.
     """
     return unicode(text, 'utf-8').replace('\f', '').replace('\n', '').replace('\r', '').replace(u'\xe2\x80\xa8', '').replace(u'\xe2\x80\xa9', '').replace(u'\xc2\x85', '').encode('utf-8')
+
+def decode_to_unicode(text, failover_encoding='utf-8'):
+    """
+    Decode input text into Unicode representation by first attempting to detect
+    the type of encoding used in the given text. This is useful when input encoding
+    is unknown.
+
+    For optimal results, it is recommended that the chardet module is installed.
+    NOTE: Beware that this might be slow for large strings.
+
+    If chardet detection fails, it will try to decode the string using the basic
+    detection function guess_minimum_encoding(). Should that fail, it will decode
+    the string in the given "failover-encoding" (defaults to UTF-8).
+
+    Also, bear in mind that it is impossible to detect the correct encoding at all
+    times, other then taking educated guesses. With that said, this function will
+    always return some decoded Unicode string, however the data returned may not
+    be the same as original data in some cases.
+
+    @param text: the text to decode
+    @type text: string
+
+    @param failover_encoding: the 'backup' character encoding to use. Optional.
+    @type failover_encoding: string
+
+    @return: input text as Unicode
+    @rtype: string
+    """
+    detected_encoding = None
+    if CHARDET_AVAILABLE:
+        # We can use chardet to perform detection
+        res = chardet.detect(text)
+        if res['confidence'] >= 0.8:
+            detected_encoding = res['encoding']
+    if detected_encoding == None:
+        # chardet unsuccessful, then try to make a basic guess
+        dummy, detected_encoding = guess_minimum_encoding(text)
+    try:
+        return text.decode(detected_encoding)
+    except (UnicodeError, LookupError):
+        pass
+    return text.decode(failover_encoding)
+
+def translate_latex2unicode(text, kb_file="%s/bibconvert/KB/latex-to-unicode.kb" % \
+                            (CFG_ETCDIR,)):
+    """
+    This function will take given text, presumably containing LaTeX symbols,
+    and attempts to translate it to Unicode using the given or default KB
+    translation table located under CFG_ETCDIR/bibconvert/KB/latex-to-unicode.kb.
+    The translated Unicode string will then be returned.
+
+    If the translation table and compiled regular expression object is not
+    previously generated in the current session, they will be.
+
+    @param text: a text presumably containing LaTeX symbols.
+    @type text: string
+
+    @param kb_file: full path to file containing latex2unicode translations.
+                    Defaults to CFG_ETCDIR/bibconvert/KB/latex-to-unicode.kb
+    @type kb_file: string
+
+    @return: Unicode representation of translated text
+    @rtype: unicode
+    """
+    # First decode input text to Unicode
+    try:
+        text = decode_to_unicode(text)
+    except UnicodeDecodeError:
+        text = unicode(wash_for_utf8(text))
+    # Load translation table, if required
+    if CFG_LATEX_UNICODE_TRANSLATION_CONST == {}:
+        _load_latex2unicode_constants(kb_file)
+    # Find all matches and replace text
+    for match in CFG_LATEX_UNICODE_TRANSLATION_CONST['regexp_obj'].finditer(text):
+        # If LaTeX style markers {, } and $ are before or after the matching text, it
+        # will replace those as well
+        text = re.sub("[\{\$]?%s[\}\$]?" % (re.escape(match.group()),), \
+                      CFG_LATEX_UNICODE_TRANSLATION_CONST['table'][match.group()], \
+                      text)
+    # Return Unicode representation of translated text
+    return text
+
+def _load_latex2unicode_constants(kb_file="%s/bibconvert/KB/latex-to-unicode.kb" % \
+                            (CFG_ETCDIR,)):
+    """
+    Load LaTeX2Unicode translation table dictionary and regular expression object
+    from KB to a global dictionary.
+
+    @param kb_file: full path to file containing latex2unicode translations.
+                    Defaults to CFG_ETCDIR/bibconvert/KB/latex-to-unicode.kb
+    @type kb_file: string
+
+    @return: dict of type: {'regexp_obj': regexp match object,
+                            'table': dict of LaTeX -> Unicode mappings}
+    @rtype: dict
+    """
+    try:
+        data = open(kb_file)
+    except IOError:
+        # File not found or similar
+        sys.stderr.write("\nCould not open LaTeX to Unicode KB file. Aborting translation.\n")
+        return CFG_LATEX_UNICODE_TRANSLATION_CONST
+    latex_symbols = []
+    translation_table = {}
+    for line in data:
+        # The file has form of latex|--|utf-8. First decode to Unicode.
+        line = line.decode('utf-8')
+        mapping = line.split('|--|')
+        translation_table[mapping[0].rstrip('\n')] = mapping[1].rstrip('\n')
+        latex_symbols.append(re.escape(mapping[0].rstrip('\n')))
+    data.close()
+    CFG_LATEX_UNICODE_TRANSLATION_CONST['regexp_obj'] = re.compile("|".join(latex_symbols))
+    CFG_LATEX_UNICODE_TRANSLATION_CONST['table'] = translation_table

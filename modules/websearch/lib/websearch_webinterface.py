@@ -88,6 +88,7 @@ from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
 from invenio.htmlutils import get_mathjax_header
+from invenio.htmlutils import nmtoken_from_string
 from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
     collect_user_info, logoutUser, isUserSuperAdmin
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
@@ -111,13 +112,14 @@ from invenio.search_engine import check_user_can_view_record, \
      perform_request_cache, \
      perform_request_log, \
      perform_request_search, \
-     restricted_collection_cache
+     restricted_collection_cache, \
+     get_coll_normalised_name
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
 from invenio.bibformat import format_records
 from invenio.bibformat_engine import get_output_formats
-from invenio.websearch_webcoll import mymkdir, get_collection
+from invenio.websearch_webcoll import get_collection
 from invenio.intbitset import intbitset
 from invenio.bibupload import find_record_from_sysno
 from invenio.bibrank_citation_searcher import get_cited_by_list
@@ -128,6 +130,7 @@ from invenio.bibedit_webinterface import WebInterfaceEditPages
 from invenio.bibeditmulti_webinterface import WebInterfaceMultiEditPages
 from invenio.bibmerge_webinterface import WebInterfaceMergePages
 from invenio.search_engine import get_record
+from invenio.shellutils import mymkdir
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -771,7 +774,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
 
-        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
+        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req,'runbibedit')[0] != 0:
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
         if auth_code and user_info['email'] == 'guest':
@@ -846,7 +849,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
             except (KeyError, ValueError):
                 pass
 
-        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
+        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req,'runbibedit')[0] != 0:
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
         record_primary_collection = guess_primary_collection_of_a_record(self.recid)
@@ -912,7 +915,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                 except KeyError:
                     pass
 
-        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
+        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req,'runbibedit')[0] != 0:
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
         involved_collections = set()
@@ -1288,7 +1291,7 @@ def display_collection(req, c, aas, verbose, ln):
     req.content_type = "text/html"
     req.send_http_header()
     # deduce collection id:
-    colID = get_colID(c)
+    colID = get_colID(get_coll_normalised_name(c))
     if type(colID) is not int:
         page_body = '<p>' + (_("Sorry, collection %s does not seem to exist.") % ('<strong>' + str(c) + '</strong>')) + '</p>'
         page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + CFG_SITE_URL + '?ln=' + ln + '">' + get_coll_i18nname(CFG_SITE_NAME, ln) + '</a>')) + '</p>'
@@ -1380,6 +1383,12 @@ def display_collection(req, c, aas, verbose, ln):
 
     if aas == -1:
         show_title_p = False
+
+    if CFG_INSPIRE_SITE == 1:
+        # INSPIRE should never show title, but instead use css to
+        # style collections
+        show_title_p = False
+        body_css_classes.append(nmtoken_from_string(c))
 
     # RSS:
     rssurl = CFG_SITE_URL + '/rss'
@@ -1583,7 +1592,7 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
 
-        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
+        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req,'runbibedit')[0] != 0:
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
         if auth_code and user_info['email'] == 'guest':

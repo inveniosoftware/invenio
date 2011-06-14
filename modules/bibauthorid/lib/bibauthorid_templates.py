@@ -189,7 +189,7 @@ class Template:
             else:
                 pbibrec = paper
             h("<li>%s</li>"
-                   % (format_record(pbibrec, "ha", on_the_fly=True)))
+                   % (format_record(pbibrec, "ha")))
         h("</ul>")
         h('<a id="checkout" href="action?cancel_search_ticket=True">' + self._('Quit searching.') + '</a>')
 #        h('DBGticket - ' + str(search_ticket))
@@ -414,7 +414,7 @@ class Template:
             else:
                 pbibrec = paper
             h("<li>%s</li>"
-                       % (format_record(pbibrec, "ha", on_the_fly=True)))
+                       % (format_record(pbibrec, "ha")))
             h("</ul>")
 
         pp_html = []
@@ -528,7 +528,7 @@ class Template:
 
             h('    <td><input type="checkbox" name="selection" '
                            'value="%s" /> </td>' % (paper['bibref']))
-            rec_info = format_record(paper['recid'], "ha", on_the_fly=True)
+            rec_info = format_record(paper['recid'], "ha")
 
             h("    <td>%s</td>" % (rec_info))
             h("    <td>%s</td>" % (paper['authorname'].encode("utf-8")))
@@ -582,7 +582,7 @@ class Template:
         h('<input type="submit" name="to_other_person" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_to_others'])
         h('<input type="submit" name="reset" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_forget'])
         h("  </div>")
-
+        h("</form>")
         return "\n".join(pp_html)
 
 
@@ -623,7 +623,7 @@ class Template:
             h('  <tr>')
             h('    <td><input type="checkbox" name="selected_bibrecs" '
                        'value="%s" /> </td>' % (paper))
-            rec_info = format_record(paper[0], "ha", on_the_fly=True)
+            rec_info = format_record(paper[0], "ha")
 
             if not admin:
                 rec_info = rec_info.replace("person/search?q=", "author/")
@@ -1447,7 +1447,7 @@ class Template:
 
                 for paper in papers:
                     h("<li>%s</li>"
-                           % (format_record(paper[0], "ha", on_the_fly=True)))
+                           % (format_record(paper[0], "ha")))
 
                 h("</ul>")
             else:

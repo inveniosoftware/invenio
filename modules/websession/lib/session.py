@@ -59,10 +59,10 @@ def get_session(req, sid=None):
     @rtype: InvenioSession
     @raise ValueError: if C{sid} is provided and it doesn't correspond to a
         valid session.
-    @note: if the session has already been retrieved once within the current
-        request handling, the same session object will be returned and, if
-        provided, the C{sid} parameter will be ignored.
     """
+    if sid is not None:
+        req._session = InvenioSession(req, sid)
+        return req._session
     if not hasattr(req, '_session'):
         req._session = InvenioSession(req, sid)
     return req._session

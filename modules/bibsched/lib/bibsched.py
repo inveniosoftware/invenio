@@ -49,6 +49,16 @@ from invenio.errorlib import register_exception, register_emergency
 
 CFG_VALID_STATUS = ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING', '% DELETED', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'STOPPED', 'SLEEPING', 'KILLED')
 
+
+def get_editor():
+    """
+    Return the first available editor.
+    """
+    for editor in os.environ.get('EDITOR'), '/usr/bin/vim', '/usr/bin/emacs', '/usr/bin/vi', '/usr/bin/nano':
+        if editor and os.path.exists(editor):
+            return editor
+
+
 shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
     """Returns a date string according to the format string.
@@ -187,14 +197,13 @@ class Manager:
         self.helper_modules = CFG_BIBTASK_VALID_TASKS
         self.running = 1
         #self.footer_move_mode = "[KeyUp/KeyDown Move] [M Select mode] [Q Quit]"
-        self.footer_auto_mode = "Automatic Mode [A Manual] [1/2/3 Display] [P Purge] [l/L Log] [O Opts] [Q Quit]"
-        self.footer_select_mode = "Manual Mode [A Automatic] [1/2/3 Display Type] [P Purge] [l/L Log] [O Opts] [Q Quit]"
+        self.footer_auto_mode = "Automatic Mode [A Manual] [1/2/3 Display] [P Purge] [l/L Log] [O Opts] [E Edit motd] [Q Quit]"
+        self.footer_select_mode = "Manual Mode [A Automatic] [1/2/3 Display Type] [P Purge] [l/L Log] [O Opts] [E Edit motd] [Q Quit]"
         self.footer_waiting_item = "[R Run] [D Delete] [N Priority]"
         self.footer_running_item = "[S Sleep] [T Stop] [K Kill]"
         self.footer_stopped_item = "[I Initialise] [D Delete] [K Acknowledge]"
         self.footer_sleeping_item   = "[W Wake Up] [T Stop] [K Kill]"
         self.item_status = ""
-        self.selected_line = 2
         self.rows = []
         self.panel = None
         self.display = 2
@@ -203,6 +212,16 @@ class Manager:
         self.auto_mode = 0
         self.currentrow = None
         self.current_attr = 0
+        self.header_lines = 2
+        try:
+            motd_path = os.path.join(CFG_PREFIX, "var", "run", "bibsched.motd")
+            self.motd = open(motd_path).read()
+            if len(self.motd) > 0:
+                self.motd = "MOTD [%s] " % time.strftime("%Y-%m-%d %H:%M",time.localtime(os.path.getmtime(motd_path))) + self.motd
+                self.header_lines = 3
+        except IOError:
+            self.motd = ""
+        self.selected_line = self.header_lines
         wrapper(self.start)
 
     def handle_keys(self, chr):
@@ -216,7 +235,7 @@ class Manager:
                                            ord("q"), ord("Q"), ord("a"),
                                            ord("A"), ord("1"), ord("2"), ord("3"),
                                            ord("p"), ord("P"), ord("o"), ord("O"),
-                                           ord("l"), ord("L"))):
+                                           ord("l"), ord("L"), ord("e"), ord("E"))):
             self.display_in_footer("in automatic mode")
             self.stdscr.refresh()
         #elif self.move_mode and (chr not in (self.curses.KEY_UP,
@@ -231,28 +250,28 @@ class Manager:
                 #if self.move_mode:
                     #self.move_up()
                 #else:
-                self.selected_line = max(self.selected_line - 1, 2)
+                self.selected_line = max(self.selected_line - 1, self.header_lines)
                 self.repaint()
             if chr == self.curses.KEY_PPAGE:
-                self.selected_line = max(self.selected_line - 10, 2)
+                self.selected_line = max(self.selected_line - 10, self.header_lines)
                 self.repaint()
             elif chr == self.curses.KEY_DOWN:
                 #if self.move_mode:
                     #self.move_down()
                 #else:
-                self.selected_line = min(self.selected_line + 1, len(self.rows) + 1 )
+                self.selected_line = min(self.selected_line + 1, len(self.rows) + self.header_lines - 1)
                 self.repaint()
             elif chr == self.curses.KEY_NPAGE:
-                self.selected_line = min(self.selected_line + 10, len(self.rows) + 1 )
+                self.selected_line = min(self.selected_line + 10, len(self.rows) + self.header_lines - 1)
                 self.repaint()
             elif chr == self.curses.KEY_HOME:
                 self.first_visible_line = 0
-                self.selected_line = 2
+                self.selected_line = self.header_lines
             elif chr == ord("g"):
-                self.selected_line = 2
+                self.selected_line = self.header_lines
                 self.repaint()
             elif chr == ord("G"):
-                self.selected_line = len(self.rows) + 1
+                self.selected_line = len(self.rows) + self.header_lines - 1
                 self.repaint()
             elif chr in (ord("a"), ord("A")):
                 self.change_auto_mode()
@@ -286,20 +305,22 @@ class Manager:
                 self.purge_done()
             elif chr in (ord("o"), ord("O")):
                 self.display_task_options()
+            elif chr in (ord("e"), ord("E")):
+                self.edit_motd()
             elif chr == ord("1"):
                 self.display = 1
                 self.first_visible_line = 0
-                self.selected_line = 2
+                self.selected_line = self.header_lines
                 self.display_in_footer("only done processes are displayed")
             elif chr == ord("2"):
                 self.display = 2
                 self.first_visible_line = 0
-                self.selected_line = 2
+                self.selected_line = self.header_lines
                 self.display_in_footer("only not done processes are displayed")
             elif chr == ord("3"):
                 self.display = 3
                 self.first_visible_line = 0
-                self.selected_line = 2
+                self.selected_line = self.header_lines
                 self.display_in_footer("only archived processes are displayed")
             elif chr in (ord("q"), ord("Q")):
                 if self.curses.panel.top_panel() == self.panel:
@@ -325,6 +346,36 @@ class Manager:
                 self.old_stdout.flush()
                 raw_input()
                 self.curses.panel.update_panels()
+
+    def edit_motd(self):
+        """Add, delete or change the motd message that will be shown when the
+        bibsched monitor starts."""
+        editor = get_editor()
+        if editor:
+            motdpath = os.path.join(CFG_PREFIX, "var", "run", "bibsched.motd")
+            previous = self.motd
+            self.curses.endwin()
+            os.system("%s %s" % (editor, motdpath))
+            self.curses.panel.update_panels()
+            try:
+                self.motd = open(motdpath).read()
+            except IOError:
+                self.motd = ""
+            if len(self.motd) > 0:
+                self.motd = "MOTD [%s] " % time.strftime("%m-%d-%Y %H:%M",time.localtime(os.path.getmtime(motdpath))) + self.motd
+            if previous[24:] != self.motd[24:]:
+                if len(previous) == 0:
+                    Log('motd set to "%s"' % self.motd.strip().replace("\n", "|"))
+                    self.selected_line += 1
+                    self.header_lines += 1
+                elif len(self.motd) == 0:
+                    Log('motd deleted')
+                    self.selected_line -= 1
+                    self.header_lines -= 1
+                else:
+                    Log('motd changed to "%s"' % self.motd.strip().replace("\n", "|"))
+        else:
+            self._display_message_box("No editor was found")
 
     def display_task_options(self):
         """Nicely display information about current process."""
@@ -460,6 +511,29 @@ class Manager:
         self.curses.noecho()
         return ret
 
+    def _display_message_box(self, msg):
+        """Utility to display message boxes."""
+        rows = msg.split('\n')
+        height = len(rows) + 2
+        width = max([len(row) for row in rows]) + 3
+        self.win = self.curses.newwin(
+            height,
+            width,
+            (self.height - height) / 2 + 1,
+            (self.width - width) / 2 + 1
+            )
+        self.panel = self.curses.panel.new_panel( self.win )
+        self.panel.top()
+        self.win.border()
+        i = 1
+        for row in rows:
+            self.win.addstr(i, 2, row, self.current_attr)
+            i += 1
+        self.win.refresh()
+        self.win.move(height - 2, 2)
+        self.win.getkey()
+        self.curses.noecho()
+
     def purge_done(self):
         """Garbage collector."""
         if self._display_YN_box("You are going to purge the list of DONE tasks.\n\n"
@@ -547,7 +621,7 @@ class Manager:
         if status not in ('RUNNING', 'CONTINUING', 'SLEEPING', 'SCHEDULED', 'ABOUT TO STOP', 'ABOUT TO SLEEP'):
             bibsched_set_status(task_id, "%s_DELETED" % status, status)
             self.display_in_footer("process deleted")
-            self.selected_line = max(self.selected_line, 2)
+            self.selected_line = max(self.selected_line, self.header_lines)
         else:
             self.display_in_footer("Cannot delete running processes")
 
@@ -596,7 +670,7 @@ class Manager:
         #self.display_in_footer("not implemented yet")
         #self.stdscr.refresh()
 
-    def put_line(self, row, header=False):
+    def put_line(self, row, header=False, motd=False):
         col_w = [7 , 15, 10, 21, 7, 11, 25]
         maxx = self.width
         if self.y == self.selected_line - self.first_visible_line and self.y > 1:
@@ -608,7 +682,9 @@ class Manager:
                 #attr = self.curses.color_pair(8) + self.curses.A_STANDOUT + self.curses.A_BOLD + self.current.A_REVERSE
             self.item_status = row[5]
             self.currentrow = row
-        if self.y == 0:
+        if motd:
+            attr = self.curses.color_pair(1) + self.curses.A_BOLD
+        elif self.y == self.header_lines - 2:
             if self.auto_mode:
                 attr = self.curses.color_pair(2) + self.curses.A_STANDOUT + self.curses.A_BOLD
             #elif self.move_mode:
@@ -684,8 +760,10 @@ class Manager:
         self.height, self.width = self.stdscr.getmaxyx()
         maxy = self.height - 2
         #maxx = self.width
-        self.put_line(("ID", "PROC [PRI]", "USER", "RUNTIME", "SLEEP", "STATUS", "PROGRESS"), True)
-        self.put_line(("------", "---------", "----", "-------------------", "-----", "-----", "--------"), True)
+        if len(self.motd) > 0:
+            self.put_line((self.motd.strip().replace("\n"," - ")[:79], "", "", "", "", "", "", "", ""), header=False, motd=True)
+        self.put_line(("ID", "PROC [PRI]", "USER", "RUNTIME", "SLEEP", "STATUS", "PROGRESS"), header=True)
+        self.put_line(("------", "---------", "----", "-------------------", "-----", "-----", "--------"), header=True)
         if self.selected_line > maxy + self.first_visible_line - 1:
             self.first_visible_line = self.selected_line - maxy + 1
         if self.selected_line < self.first_visible_line + 2:
@@ -732,6 +810,8 @@ class Manager:
         if server_pid():
             self.auto_mode = 1
         ring = 4
+        if len(self.motd) > 0:
+            self._display_message_box(self.motd + "\nPress any key to close")
         while self.running:
             if ring == 4:
                 if self.display == 1:

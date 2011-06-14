@@ -159,4 +159,8 @@ with Invenio was downloaded from
 The git-version-gen script was taken from gnulib 20100704+stable-1.
 <http://www.gnu.org/software/gnulib/>
 
+The LaTeX-to-Unicode translation table was compiled from:
+FX, <http://stackoverflow.com/questions/4578912/replace-all-accented-characters-by-their-latex-equivalent>
+Lea Wiemann <LeWiemann@gmail.com>, <http://docutils.sourceforge.net/docutils/writers/newlatex2e/unicode_map.py>
+
 - end of file -

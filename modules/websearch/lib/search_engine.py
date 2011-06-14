@@ -95,6 +95,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.errorlib import register_exception
 from invenio.textutils import encode_for_xml, wash_for_utf8
 from invenio.htmlutils import get_mathjax_header
+from invenio.htmlutils import nmtoken_from_string
 
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
@@ -251,6 +252,16 @@ def get_permitted_restricted_collections(user_info, recreate_cache_if_needed=Tru
             ret.append(collection)
     return ret
 
+def get_all_restricted_recids():
+    """
+    Return the set of all the restricted recids, i.e. the ids of those records
+    which belong to at least one restricted collection.
+    """
+    ret = HitSet()
+    for collection in restricted_collection_cache.cache:
+        ret |= get_collection_reclist(collection)
+    return ret
+
 def get_restricted_collections_for_recid(recid, recreate_cache_if_needed=True):
     """
     Return the list of restricted collection names to which recid belongs.
@@ -298,6 +309,8 @@ def check_user_can_view_record(user_info, recid):
     authorization is not granted
     @rtype: (int, string)
     """
+    if isinstance(recid, str):
+        recid = int(recid)
     if record_public_p(recid):
         ## The record is already known to be public.
         return (0, '')
@@ -861,6 +874,18 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
             navtrail += ": " + cgi.escape(p)
             title_message = cgi.escape(p) + " - " + title_message
 
+        body_css_classes = []
+        if cc:
+            # we know the collection, lets allow page styles based on cc
+
+            #collection names may not satisfy rules for css classes which
+            #are something like:  -?[_a-zA-Z]+[_a-zA-Z0-9-]*
+            #however it isn't clear what we should do about cases with
+            #numbers, so we leave them to fail.  Everything else becomes "_"
+
+            css = nmtoken_from_string(cc).replace('.','_').replace('-','_').replace(':','_')
+            body_css_classes.append(css)
+
         ## finally, print page header:
         req.write(pageheaderonly(req=req, title=title_message,
                                  navtrail=navtrail,
@@ -871,7 +896,8 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
                                  language=ln,
                                  navmenuid='search',
                                  navtrail_append_title_p=0,
-                                 rssurl=rssurl))
+                                 rssurl=rssurl,
+                                 body_css_classes=body_css_classes))
         req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
     #else:
     #    req.send_http_header()
@@ -1024,6 +1050,9 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, aas,
         show_title = False
 
     if cc == CFG_SITE_NAME:
+        show_title = False
+
+    if CFG_INSPIRE_SITE:
         show_title = False
 
     return websearch_templates.tmpl_search_box(
@@ -3025,7 +3054,8 @@ def guess_collection_of_a_record(recID, referer=None, recreate_cache_if_needed=T
                 collection_reclist_cache.recreate_cache_if_needed()
             query = cgi.parse_qs(query)
             for name in query.get('cc', []) + query.get('c', []):
-                if recID in get_collection_reclist(name, recreate_cache_if_needed=False):
+                name = get_coll_normalised_name(name)
+                if name and recID in get_collection_reclist(name, recreate_cache_if_needed=False):
                     return name
     return guess_primary_collection_of_a_record(recID)
 
