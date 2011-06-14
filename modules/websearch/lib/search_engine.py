@@ -309,6 +309,8 @@ def check_user_can_view_record(user_info, recid):
     authorization is not granted
     @rtype: (int, string)
     """
+    if isinstance(recid, str):
+        recid = int(recid)
     if record_public_p(recid):
         ## The record is already known to be public.
         return (0, '')
