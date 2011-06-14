@@ -171,7 +171,7 @@ class ExternalCollectionResultsParser(object):
             pass
 
 class CDSIndicoCollectionResutsParser(ExternalCollectionResultsParser):
-    """Parser for CDS Indico"""
+    """Parser for Indico"""
 
     num_results_regex = re.compile(r'<h3 style="float:right">Hits: ([0-9]+?)</h3>')
 
