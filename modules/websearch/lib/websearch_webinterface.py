@@ -1291,8 +1291,7 @@ def display_collection(req, c, aas, verbose, ln):
     req.content_type = "text/html"
     req.send_http_header()
     # deduce collection id:
-    c = get_coll_normalised_name(c)
-    colID = get_colID(c)
+    colID = get_colID(get_coll_normalised_name(c))
     if type(colID) is not int:
         page_body = '<p>' + (_("Sorry, collection %s does not seem to exist.") % ('<strong>' + str(c) + '</strong>')) + '</p>'
         page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + CFG_SITE_URL + '?ln=' + ln + '">' + get_coll_i18nname(CFG_SITE_NAME, ln) + '</a>')) + '</p>'
