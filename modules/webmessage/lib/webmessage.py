@@ -335,7 +335,7 @@ def perform_request_send(uid,
     @param msg_send_month: send this message on month y (int)
     @param msg_send_day: send this message on day z (int)
     @param ln: language
-    @return: body with warnings
+    @return: (body with warnings, title, navtrail)
     """
     _ = gettext_set_language(ln)
 
