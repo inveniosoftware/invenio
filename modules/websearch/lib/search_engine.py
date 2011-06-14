@@ -1927,12 +1927,19 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
 
     for idx_unit in xrange(len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
+        if len(bsu_f) < 2 and not bsu_f == '':
+            if of.startswith("h"):
+                print_warning(req, _("There is no index %s.  Searching for %s in all fields." % (bsu_f, bsu_p)))
+            bsu_f = ''
+            bsu_m = 'w'
+            if of.startswith("h") and verbose:
+                print_warning(req, _('Instead searching %s.' % str([bsu_o, bsu_p, bsu_f, bsu_m])))
         try:
             basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m, wl)
         except InvenioWebSearchWildcardLimitError, excp:
             basic_search_unit_hitset = excp.res
             if of.startswith("h"):
-                print_warning(req, "Search term too generic, displaying only partial results...")
+                print_warning(req, _("Search term too generic, displaying only partial results..."))
         # FIXME: print warning if we use native full-text indexing
         if bsu_f == 'fulltext' and bsu_m != 'w' and of.startswith('h') and not CFG_SOLR_URL:
             print_warning(req, _("No phrase index available for fulltext yet, looking for word combination..."))
@@ -2373,7 +2380,7 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
                 query_params = (p,)
     # construct 'tl' which defines the tag list (MARC tags) to search in:
     tl = []
-    if str(f[0]).isdigit() and str(f[1]).isdigit():
+    if len(f) >= 2 and str(f[0]).isdigit() and str(f[1]).isdigit():
         tl.append(f) # 'f' seems to be okay as it starts by two digits
     else:
         # deduce desired MARC tags on the basis of chosen 'f'

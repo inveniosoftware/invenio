@@ -743,6 +743,19 @@ class WebSearchNearestTermsTest(unittest.TestCase):
                                                expected_link_target=CFG_SITE_URL+"/search?ln=en&p=author%3Afabbro",
                                                expected_link_label='fabbro'))
 
+    def test_nearest_terms_box_in_query_with_invalid_index(self):
+        """ websearch - nearest terms box for queries with invalid indexes specified """
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=bednarz%3Aellis',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=bednarz",
+                                               expected_link_label='bednarz'))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=1%3Aellis',
+                                               expected_text="no index 1.",
+                                               expected_link_target=CFG_SITE_URL+"/record/47?ln=en",
+                                               expected_link_label="Detailed record"))
+
     def test_nearest_terms_box_in_unsuccessful_phrase_query(self):
         """ websearch - nearest terms box for unsuccessful phrase query """
         self.assertEqual([],

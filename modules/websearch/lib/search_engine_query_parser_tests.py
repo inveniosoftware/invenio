@@ -611,6 +611,24 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         inv_search = "journal:Phys.Lett,0903,024"
         self._compare_searches(inv_search, spi_search)
 
+    def test_journal_search_with_colon(self):
+        """SPIRES search syntax - find j physics 1:195 -> journal:physics,1,195"""
+        spi_search = "find j physics 1:195"
+        inv_search = "journal:physics,1,195"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_journal_non_triple_syntax(self):
+        """SPIRES search syntax - find j physics jcap"""
+        spi_search = "find j physics jcap"
+        inv_search = "journal:physics and journal:jcap"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_journal_triple_with_many_spaces(self):
+        """SPIRES search syntax - find j physics        0903            024"""
+        spi_search = 'find j physics        0903            024'
+        inv_search = 'journal:physics,0903,024'
+        self._compare_searches(inv_search, spi_search)
+
     def test_distribution_of_search_terms(self):
         """SPIRES search syntax - find t this and that ->title:this and title:that"""
         spi_search = "find t this and that"
@@ -872,9 +890,9 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         self.assertEqual(inv_search, False)
 
     def test_spires_keyword_distribution_before_conjunctions(self):
-        """SPIRES search syntax - test find journal phys.lett 0903 024 => journal:phys.lett and journal:0903 and journal:024"""
-        spi_search = 'find journal phys.lett 0903 024'
-        inv_search = '(journal:phys.lett and journal:0903 and journal:024)'
+        """SPIRES search syntax - test find journal phys.lett. 0903 024"""
+        spi_search = 'find journal phys.lett. 0903 024'
+        inv_search = '(journal:phys.lett.,0903,024)'
         self._compare_searches(inv_search, spi_search)
 
     def test_spires_keyword_distribution_with_parens(self):

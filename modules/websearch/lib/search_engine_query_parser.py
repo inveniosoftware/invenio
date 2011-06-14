@@ -686,8 +686,11 @@ class SpiresToInvenioSyntaxConverter:
         # the operator preceding the term.
         self._re_search_term_pattern_match = re.compile(r'\b(?P<combine_operator>find|and|or|not)\s+(?P<search_term>\S+:)(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
-        # match journal searches with a comma at end and no keyword after
-        self._re_search_term_is_journal = re.compile(r'\b(?P<combine_operator>find|and|or|not)\s+(?P<search_term>journal|j):(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+        # match journal searches
+        self._re_search_term_is_journal = re.compile(r'''(?ix)  # verbose, ignorecase
+                \b(?P<leading>(find|and|or|not)\s+journal:) # first combining operator and index
+                (?P<search_content>.+?)     # what we are searching
+                (?=\ and\ not\ |\ and\ |\ or\ |\ not\ |$)''')
 
         # regular expression matching date after pattern
         self._re_date_after_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(after|>)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
@@ -749,7 +752,7 @@ class SpiresToInvenioSyntaxConverter:
             # beginning because the next methods use the result of the replacement
             query = self._standardize_already_invenio_keywords(query)
             query = self._replace_spires_keywords_with_invenio_keywords(query)
-            query = self._remove_spaces_in_comma_separated_journal(query)
+            query = self._normalise_journal_page_format(query)
             query = self._distribute_keywords_across_combinations(query)
             query = self._distribute_and_quote_second_order_ops(query)
 
@@ -1065,14 +1068,28 @@ class SpiresToInvenioSyntaxConverter:
 
         return search_pattern
 
-    def _remove_spaces_in_comma_separated_journal(self, query):
+    def _normalise_journal_page_format(self, query):
         """Phys.Lett, 0903, 024 -> Phys.Lett,0903,024"""
+
+        def _is_triple(search):
+            return (len(re.findall('\s+', search)) + len(re.findall(':', search))) == 2
+
+        def _normalise_spaces_and_colons_to_commas_in_triple(search):
+            if not _is_triple(search):
+                return search
+            search = re.sub(',\s+', ',', search)
+            search = re.sub('\s+', ',', search)
+            search = re.sub(':', ',', search)
+            return search
+
         result = ""
         current_position = 0
         for match in self._re_search_term_is_journal.finditer(query):
             result += query[current_position : match.start()]
-            result += match.group('combine_operator') + ' ' + match.group('search_term') + ':'
-            result += re.sub(',\s+', ',', match.group('search_content'))
+            result += match.group('leading')
+            search = match.group('search_content')
+            search = _normalise_spaces_and_colons_to_commas_in_triple(search)
+            result += search
             current_position = match.end()
         result += query[current_position : ]
         return result
