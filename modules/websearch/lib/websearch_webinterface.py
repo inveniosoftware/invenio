@@ -294,25 +294,25 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
         self.pt.update_cached_author_page_timestamp(pageparam)
 
-    def update_cache(self, pageparam, page):
+    def update_cache(self, pageparam, pagecontent):
         '''
         Triggers the update to the DB
         @param pageparam: identifier for the cache
         @type pageparam: string
-        @param page: content to write to cache
-        @type page: string
+        @param pagecontent: content to write to cache
+        @type pagecontent: string
         '''
         #TABLE: id, tag, identifier, data, date
         if not pageparam:
             return
 
-        if not page:
+        if not pagecontent:
             return
 
         if not self.cache_supported:
             return
 
-        self.pt.update_cached_author_page(pageparam, page)
+        self.pt.update_cached_author_page(pageparam, pagecontent)
 
 
     def __call__(self, req, form):
@@ -385,9 +385,9 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             background.start()
 
         else:
-            page = self.create_authorpage(req, form, return_html=True)
-            self.update_cache(identifier, page)
-            page_content = page
+            pagecontent = self.create_authorpage(req, form, return_html=True)
+            self.update_cache(identifier, pagecontent)
+            page_content = pagecontent
 
         metaheaderadd = ""
         if is_bibauthorid:
