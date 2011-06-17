@@ -167,8 +167,12 @@ def get_refersto_hitset(ahitset):
     cache_cited_by_dictionary = get_citation_dict("citationdict")
     out = intbitset()
     if ahitset:
-        for recid in ahitset:
-            out = out | intbitset(cache_cited_by_dictionary.get(recid, []))
+        try:
+            for recid in ahitset:
+                out = out | intbitset(cache_cited_by_dictionary.get(recid, []))
+        except OverflowError:
+            # ignore attempt to iterate over infinite ahitset
+            pass
     return out
 
 def get_citedby_hitset(ahitset):
@@ -179,8 +183,12 @@ def get_citedby_hitset(ahitset):
     cache_cited_by_dictionary = get_citation_dict("reversedict")
     out = intbitset()
     if ahitset:
-        for recid in ahitset:
-            out = out | intbitset(cache_cited_by_dictionary.get(recid, []))
+        try:
+            for recid in ahitset:
+                out = out | intbitset(cache_cited_by_dictionary.get(recid, []))
+        except OverflowError:
+            # ignore attempt to iterate over infinite ahitset
+            pass
     return out
 
 def get_cited_by_weight(recordlist):
