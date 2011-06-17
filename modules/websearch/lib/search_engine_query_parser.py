@@ -668,6 +668,14 @@ class SpiresToInvenioSyntaxConverter:
         # in case of changes correct also the code in this method
         self._re_exact_author_match = re.compile(r'\b((?P<secondorderop>[^\s]+:)?)exactauthor:(?P<author_name>[^\'\"].*?[^\'\"]\b)(?= and not | and | or | not |$)', re.IGNORECASE)
 
+        # match a second-order operator with no operator following it
+        self._re_second_order_op_no_index_match = re.compile(r'''(?ix) # ignorecase, verbose
+                (^|\b|:)(?P<second_order_op>(refersto|citedby):)
+                    (?P<search_terms>[^\"\'][^:]+?)       # anything without an index should be absorbed here
+                \s*
+                (?P<conjunction_or_next_keyword>(\ and\ |\ not\ |\ or\ |\ \w+:\w+|$))
+            ''')
+
         # match search term, its content (words that are searched) and
         # the operator preceding the term.
         self._re_search_term_pattern_match = re.compile(r'\b(?P<combine_operator>find|and|or|not)\s+(?P<search_term>\S+:)(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
@@ -737,6 +745,7 @@ class SpiresToInvenioSyntaxConverter:
             query = self._replace_spires_keywords_with_invenio_keywords(query)
             query = self._remove_spaces_in_comma_separated_journal(query)
             query = self._distribute_keywords_across_combinations(query)
+            query = self._distribute_and_quote_second_order_ops(query)
 
             query = self._convert_dates(query)
             query = self._convert_irns_to_spires_irns(query)
@@ -1158,8 +1167,6 @@ class SpiresToInvenioSyntaxConverter:
         # method used for replacement with regular expression
 
         def create_replacement_pattern(match):
-            # the regular expression where this group name is defined is in
-            # the method _compile_regular_expressions()
             return match.group('keyword') + match.group('content') + \
                    ' ' +  match.group('combination') + ' ' + match.group('keyword') + \
                    match.group('last_content')
@@ -1169,5 +1176,17 @@ class SpiresToInvenioSyntaxConverter:
         while still_matches:
             query = self._re_distribute_keywords.sub(create_replacement_pattern, query)
             still_matches = self._re_distribute_keywords.search(query)
+        query = re.sub(r'\s+', ' ', query)
+        return query
+
+    def _distribute_and_quote_second_order_ops(self, query):
+        """refersto:s parke -> refersto:\"s parke\""""
+        def create_replacement_pattern(match):
+            return match.group('second_order_op') + '"' +\
+                        match.group('search_terms') + '"' +\
+                   match.group('conjunction_or_next_keyword')
+
+        for match in self._re_second_order_op_no_index_match.finditer(query):
+            query = self._re_second_order_op_no_index_match.sub(create_replacement_pattern, query)
         query = re.sub(r'\s+', ' ', query)
         return query

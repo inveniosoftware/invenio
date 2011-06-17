@@ -482,6 +482,12 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = "find a ellis and refersto author parke, sj"
         self._compare_searches(inv_search, spi_search)
 
+    def test_refersto_multi_word_no_quotes_no_index(self):
+        """SPIRES search syntax - find refersto s parke"""
+        inv_search = 'refersto:"s parke"'
+        spi_search = 'find refersto s parke'
+        self._compare_searches(inv_search, spi_search)
+
     def test_citedby_refersto_author(self):
         """SPIRES search syntax - find citedby refersto author penguin"""
         inv_search = 'refersto:citedby:author:penguin'
