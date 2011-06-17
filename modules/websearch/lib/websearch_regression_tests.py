@@ -1745,6 +1745,18 @@ class WebSearchReferstoCitedbyTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=citedby%3Aauthor%3A%22Klebanov,%20I%22&of=id&ap=0',
                                                expected_text='[95]'))
 
+    def test_refersto_bad_query(self):
+        'websearch - refersto:title:'
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=refersto%3Atitle%3A',
+                                               expected_text='There are no records referring to title:.'))
+
+    def test_citedby_bad_query(self):
+        'websearch - citedby:title:'
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=citedby%3Atitle%3A',
+                                               expected_text='There are no records cited by title:.'))
+
 
 class WebSearchSPIRESSyntaxTest(unittest.TestCase):
     """Test of SPIRES syntax issues"""
