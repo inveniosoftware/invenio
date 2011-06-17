@@ -1644,7 +1644,9 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
              'commit_rt_ticket': (str, None),
              'rt_id': (int, None),
              'rt_action': (str, None),
-             'selection': (list, [])})
+             'selection': (list, []),
+             'set_canonical_name': (str, None),
+             'canonical_name': (str, None)})
 
         ln = wash_language(argd['ln'])
         pid = None
@@ -1694,6 +1696,8 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             action = 'to_other_person'
         elif 'claim' in argd and argd['claim']:
             action = 'claim'
+        elif 'set_canonical_name' in argd and argd['set_canonical_name']:
+            action = 'set_canonical_name'
 
         no_access = self._page_access_permission_wall(req, pid)
 
@@ -1910,6 +1914,23 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                 return self._cancel_rt_ticket(req, bibref[0], pid)
             elif action == 'commit_rt_ticket':
                 return self._commit_rt_ticket(req, bibref[0], pid)
+
+        elif action == 'set_canonical_name':
+            if 'pid' in argd and argd['pid'] > -1:
+                pid = argd['pid']
+            else:
+                return self._error_page(req, ln,
+                                        "Fatal: cannot set canonical name to unknown person")
+            if 'canonical_name' in argd and argd['canonical_name']:
+                cname = argd['canonical_name']
+            else:
+                return self._error_page(req, ln,
+                        "Fatal: cannot set a custom canonical name without a suggestion")
+
+            webapi.update_person_canonical_name(pid, cname)
+
+            return redirect_to_url(req, "/person/%s" % webapi.get_person_redirect_link(pid))
+
         else:
             return self._error_page(req, ln,
                                     "Fatal: What were I supposed to do?")

@@ -33,7 +33,7 @@ from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 from invenio.bibformat import format_record
 from invenio.session import get_session
 from invenio.search_engine import get_fieldvalues
-from invenio.bibauthorid_webapi import get_bibref_name_string, get_person_redirect_link
+from invenio.bibauthorid_webapi import get_bibref_name_string, get_person_redirect_link, get_canonical_id_from_person_id
 from invenio.messages import gettext_set_language, wash_language
 #from invenio.textutils import encode_for_xml
 
@@ -524,13 +524,14 @@ class Template:
         h("</thead>")
         h("<tbody>")
 
-        for paper in bibrecids:
+
+        for idx, paper in enumerate(bibrecids):
             h('  <tr style="padding-top: 6px; padding-bottom: 6px;">')
 
             h('    <td><input type="checkbox" name="selection" '
                            'value="%s" /> </td>' % (paper['bibref']))
             rec_info = format_record(paper['recid'], "ha")
-
+            rec_info = str(idx + 1) + '.  ' + rec_info
             h("    <td>%s</td>" % (rec_info))
             h("    <td>%s</td>" % (paper['authorname'].encode("utf-8")))
             aff = ""
@@ -887,7 +888,16 @@ class Template:
             h('  <div id="tabData">')
             r = verbiage_dict['data_ns']
             h('<noscript><h5>%s</h5></noscript>' % r)
-            h('  <b>' + self._('This tab is currently under construction') + '</p>')
+            canonical_name = get_canonical_id_from_person_id(person_id)
+            h('<div> <strong> Canonical name setup </strong>')
+            h('<div style="margin-top: 15px;"> Current canonical name: %s  <form method="GET" action="%s/person/action">' % (canonical_name, CFG_SITE_URL))
+            h('<input type="hidden" name="set_canonical_name" value="True" />')
+            h('<input name="canonical_name" id="canonical_name" type="text" style="border:1px solid #333; width:500px;" value="%s" /> ' % canonical_name)
+            h('<input type="hidden" name="pid" value="%s" />' % person_id)
+            h('<input type="submit" value="set canonical name" class="aid_btn_blue" />')
+            h('</form> </div></div>')
+
+            h('  <b><b>' + self._('... This tab is currently under construction ... ') + '</p>')
             h("  </div>")
 
         h("</div>")

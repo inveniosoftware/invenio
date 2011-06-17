@@ -574,7 +574,9 @@ def personid_count_names_variants(pids=None):
             print '<font color="#' + r + g + '00"><span title="%s">&#9744;</span>' % s + '</font>'
 
 def create_new_person(uid, uid_is_owner=False):
-    #creates a new person
+    '''
+    Create a new person. Set the uid as owner if requested.
+    '''
     pid = run_sql("select max(personid) from aidPERSONID")[0][0]
 
     if pid:

@@ -56,6 +56,35 @@ def get_person_redirect_link(pid):
     else:
         return str(pid)
 
+def update_person_canonical_name(person_id, canonical_name):
+    '''
+    Updates a person's canonical name
+    @param person_id: person id
+    @param canonical_name: string 
+    '''
+    tu.update_personID_canonical_names(persons_list=[[person_id]], overwrite=True, suggested=canonical_name)
+
+def get_canonical_id_from_person_id(person_id):
+    '''
+    Finds the person  canonical name from personid (e.g. 1)
+
+    @param person_id: the canonical ID
+    @type person_id: string
+
+    @return: result from the request or person_id on failure
+    @rtype: int
+    '''
+    if not person_id or not (isinstance(person_id, str) or isinstance(person_id, int)):
+        return person_id
+
+    canonical_name = person_id
+
+    try:
+        canonical_name = tu.get_canonical_id_from_personid(person_id)[0][0]
+    except IndexError:
+        pass
+
+    return canonical_name
 
 def get_person_id_from_canonical_id(canonical_id):
     '''
