@@ -294,6 +294,21 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
         self.assertEqual(self.parser.parse_query('(U(1) or SL(2,Z))'),
                          ['+', 'u(1) | sl(2,z)'])
 
+    def test_sqpp_alternation_of_quote_marks_double(self):
+        """SearchQueryParenthesisedParser - Test refersto:(author:"s parke" or author:ellis)"""
+        self.assertEqual(self.parser.parse_query('refersto:(author:"s parke" or author:ellis)'),
+                         ['+', 'refersto:\'author:"s parke" | author:ellis\''])
+
+    def test_sqpp_alternation_of_quote_marks_single(self):
+        """SearchQueryParenthesisedParser - Test refersto:(author:'s parke' or author:ellis)"""
+        self.assertEqual(self.parser.parse_query('refersto:(author:\'s parke\' or author:ellis)'),
+                         ['+', 'refersto:"author:\'s parke\' | author:ellis"'])
+
+    def test_sqpp_alternation_of_quote_marks(self):
+        """SearchQueryParenthesisedParser - Test refersto:(author:"s parke")"""
+        self.assertEqual(self.parser.parse_query('refersto:(author:"s parke")'),
+                         ['+', 'refersto:author:"s parke"'])
+
     def test_sqpp_distributed_ands_equivalent(self):
         """SearchQueryParenthesisedParser - ellis and (kaluza-klein or r-parity) == ellis and (r-parity or kaluza-klein)"""
         self.assertEqual(sorted(perform_request_search(p='ellis and (kaluza-klein or r-parity)')),

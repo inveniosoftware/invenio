@@ -370,7 +370,14 @@ class SearchQueryParenthesisedParser(object):
                     inner_value = inner_parse(token_list[i+1:], True)
                     inner_value = ' '.join(inner_value)
                     if distributing:
-                        parsed_values[-1] = parsed_values[-1] + '"' + inner_value + '"'
+                        if len(self.tokenize(inner_value)) == 1:
+                            parsed_values[-1] = parsed_values[-1] + inner_value
+                        elif "'" in inner_value:
+                            parsed_values[-1] = parsed_values[-1] + '"' + inner_value + '"'
+                        elif '"' in inner_value:
+                            parsed_values[-1] = parsed_values[-1] + "'" + inner_value + "'"
+                        else:
+                            parsed_values[-1] = parsed_values[-1] + '"' + inner_value + '"'
                     else:
                         parsed_values.append(inner_value)
                     self.__tl_idx += 1
