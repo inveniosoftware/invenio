@@ -17,8 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Call BibFormat engine and create HTML brief (and other) formats for
-   bibliographic records.  Upload formats via BibUpload."""
+"""Call BibFormat engine and create HTML brief (and other) formats cache for
+   bibliographic records."""
 
 __revision__ = "$Id$"
 
@@ -53,6 +53,15 @@ except ImportError, e:
 def bibreformat_task(fmt, sql, sql_queries, cds_query, process_format, process, recids):
     """
     BibReformat main task
+
+    @param fmt: output format to use
+    @param sql: dictionary with pre-created sql queries for various cases (for selecting records). Some of these queries will be picked depending on the case
+    @param sql_queries: a list of sql queries to be executed to select records to reformat.
+    @param cds_query: a search query to be executed to select records to reformat
+    @param process_format:
+    @param process:
+    @param recids: a list of record IDs to reformat
+    @return: None
     """
     t1 = os.times()[4]
 
@@ -162,7 +171,12 @@ def bibreformat_task(fmt, sql, sql_queries, cds_query, process_format, process, 
 ###
 
 def without_fmt(sql):
-    "List of record IDs to be reformated, not having the specified format yet"
+    """
+    List of record IDs to be reformated, not having the specified format yet
+
+    @param sql: a dictionary with sql queries to pick from
+    @return: a list of record ID without pre-created format cache
+    """
 
     rec_ids_with_cache = []
     all_rec_ids = []
@@ -183,7 +197,13 @@ def without_fmt(sql):
 ### (see iterate_over_old further down)
 
 def iterate_over_new(list, fmt):
-    "Iterate over list of IDs"
+    """
+    Iterate over list of IDs
+
+    @param list: the list of record IDs to format
+    @param fmt: the output format to use
+    @return: tuple (total number of records, time taken to format, time taken to insert)
+    """
     global total_rec
 
     formatted_records = ''      # (string-)List of formatted record of an iteration
@@ -213,7 +233,13 @@ def iterate_over_new(list, fmt):
     return (tot, tbibformat, tbibupload)
 
 def iterate_over_old(list, fmt):
-    "Iterate over list of IDs"
+    """
+    Iterate over list of IDs
+
+    @param list: the list of record IDs to format
+    @param fmt: the output format to use
+    @return: tuple (total number of records, time taken to format, time taken to insert)
+    """
 
     n_rec       = 0
     n_max       = 10000
@@ -468,7 +494,13 @@ def task_submit_check_options():
     return True
 
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
-    """Elaborate specific CLI parameters of BibReformat."""
+    """
+    Elaborate specific CLI parameters of BibReformat.
+
+    @param key: a parameter key to check
+    @param value: a value associated to parameter X{Key}
+    @return: True for known X{Key} else False.
+    """
     if key in ("-a", "--all"):
         task_set_option("all", 1)
         task_set_option("without", 1)

@@ -41,22 +41,22 @@ def format_element(bfo, limit, separator='; ',
     """
     Prints the list of authors of a record.
 
-    @param limit the maximum number of authors to display
-    @param separator the separator between authors.
-    @param extension a text printed if more authors than 'limit' exist
-    @param print_links if yes, prints the authors as HTML link to their publications
-    @param print_affiliations if yes, make each author name followed by its affiliation
-    @param affiliation_prefix prefix printed before each affiliation
-    @param affiliation_suffix suffix printed after each affiliation
-    @param print_affiliation_first if 'yes', affiliation is printed before the author
-    @param interactive if yes, enable user to show/hide authors when there are too many (html + javascript)
-    @param highlight highlights authors corresponding to search query if set to 'yes'
-    @param affiliations_separator separates affiliation groups
-    @param name_last_first if yes (default) print last, first  otherwise first last
-    @param collaboration if yes (default) uses collaboration name in place of long author list, if available
-    @param id_links if yes (default = no) prints link based on INSPIRE IDs if available - only used if print_links = yes
-    @param markup html (default) or latex controls small markup differences
-    @param link_extension if 'yes' link the extension to the detailed
+    @param limit: the maximum number of authors to display
+    @param separator: the separator between authors.
+    @param extension: a text printed if more authors than 'limit' exist
+    @param print_links: if yes, prints the authors as HTML link to their publications
+    @param print_affiliations: if yes, make each author name followed by its affiliation
+    @param affiliation_prefix: prefix printed before each affiliation
+    @param affiliation_suffix: suffix printed after each affiliation
+    @param print_affiliation_first: if 'yes', affiliation is printed before the author
+    @param interactive: if yes, enable user to show/hide authors when there are too many (html + javascript)
+    @param highlight: highlights authors corresponding to search query if set to 'yes'
+    @param affiliations_separator: separates affiliation groups
+    @param name_last_first: if yes (default) print last, first  otherwise first last
+    @param collaboration: if yes (default) uses collaboration name in place of long author list, if available
+    @param id_links: if yes (default = no) prints link based on INSPIRE IDs if available - only used if print_links = yes
+    @param markup: html (default) or latex controls small markup differences
+    @param link_extension: if 'yes' link the extension to the detailed
     record page
 
     """

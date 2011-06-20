@@ -31,8 +31,14 @@ from invenio.dbquery import run_sql
 
 ## MARC-21 tag/field access functions
 def get_fieldvalues(recID, tag):
-    """Returns list of values of the MARC-21 'tag' fields for the record
-       'recID'."""
+    """
+    Returns list of values of the MARC-21 'tag' fields for the record
+    'recID'.
+
+    @param recID: record ID to retrieve value from
+    @param tag: tag to consider
+    @return: a list of values matching X{tag} in record X{recID}
+    """
     out = []
     bibXXx = "bib" + tag[0] + tag[1] + "x"
     bibrec_bibXXx = "bibrec_" + bibXXx
@@ -44,7 +50,15 @@ def get_fieldvalues(recID, tag):
     return out
 
 def localtime_to_utc(date, fmt="%Y-%m-%dT%H:%M:%SZ"):
-    "Convert localtime to UTC"
+    """
+    Convert localtime to UTC
+
+    @param date: the date to convert to UTC
+    @type date: string
+    @param fmt: the output format for the returned date
+    @return: a UTC version of input X{date}
+    @rtype: string
+    """
 
     ldate = date.split(" ")[0]
     ltime = date.split(" ")[1]
@@ -62,7 +76,14 @@ def localtime_to_utc(date, fmt="%Y-%m-%dT%H:%M:%SZ"):
     return timetoconvert
 
 def get_creation_date(sysno, fmt="%Y-%m-%dT%H:%M:%SZ"):
-    "Returns the creation date of the record 'sysno'."
+    """
+    Returns the creation date of the record 'sysno'.
+
+    @param sysno: the record ID for which we want to retrieve creation date
+    @param fmt: output format for the returned date
+    @return: creation date of the record
+    @rtype: string
+    """
     out   = ""
     res = run_sql("SELECT DATE_FORMAT(creation_date, '%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec WHERE id=%s", (sysno,), 1)
     if res[0][0]:
@@ -70,7 +91,14 @@ def get_creation_date(sysno, fmt="%Y-%m-%dT%H:%M:%SZ"):
     return out
 
 def get_modification_date(sysno, fmt="%Y-%m-%dT%H:%M:%SZ"):
-    "Returns the date of last modification for the record 'sysno'."
+    """
+    Returns the date of last modification for the record 'sysno'.
+
+    @param sysno: the record ID for which we want to retrieve modification date
+    @param fmt: output format for the returned date
+    @return: modification date of the record
+    @rtype: string
+    """
     out = ""
     res = run_sql("SELECT DATE_FORMAT(modification_date,'%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec WHERE id=%s", (sysno,), 1)
     if res and res[0][0]:
@@ -81,6 +109,9 @@ def get_modification_date(sysno, fmt="%Y-%m-%dT%H:%M:%SZ"):
 def get_tag_from_name(name):
     """
     Returns the marc code corresponding the given name
+
+    @param name: name for which we want to retrieve the tag
+    @return: a tag corresponding to X{name} or None if not found
     """
     res = run_sql("SELECT value FROM tag WHERE name LIKE %s", (name,))
     if len(res)>0:
@@ -92,6 +123,9 @@ def get_tags_from_name(name):
     """
     Returns the marc codes corresponding the given name,
     ordered by value
+
+    @param name: name for which we want to retrieve the tags
+    @return: list of tags corresponding to X{name} or None if not found
     """
     res = run_sql("SELECT value FROM tag WHERE name LIKE %s ORDER BY value", (name,))
     if len(res)>0:
@@ -102,6 +136,9 @@ def get_tags_from_name(name):
 def tag_exists_for_name(name):
     """
     Returns True if a tag exists for name in 'tag' table.
+
+    @param name: name for which we want to check if a tag exist
+    @return: True if a tag exist for X{name} or False
     """
     rows = run_sql("SELECT value FROM tag WHERE name LIKE %s", (name,))
     if len(rows) > 0:
@@ -111,6 +148,9 @@ def tag_exists_for_name(name):
 def get_name_from_tag(tag):
     """
     Returns the name corresponding to a marc code
+
+    @param tag: tag to consider
+    @return: a name corresponding to X{tag}
     """
     res = run_sql("SELECT name FROM tag WHERE value LIKE %s", (tag,))
     if len(res)>0:
@@ -121,6 +161,9 @@ def get_name_from_tag(tag):
 def name_exists_for_tag(tag):
     """
     Returns True if a name exists for tag in 'tag' table.
+
+    @param tag: tag for which we want to check if a name exist
+    @return: True if a name exist for X{tag} or False
     """
     rows = run_sql("SELECT name FROM tag WHERE value LIKE %s", (tag,))
     if len(rows) > 0:
@@ -153,6 +196,7 @@ def get_output_format_id(code):
 
     Output formats are located inside 'format' table
 
+    @param code: the code of an output format
     @return: the id in the database of the output format. None if not found
     """
     f_code = code
@@ -174,6 +218,8 @@ def add_output_format(code, name="", description="", content_type="text/html", v
     @param name: a new for the new format
     @param description: a description for the new format
     @param content_type: the content_type (if applicable) of the new output format
+    @param visibility: if the output format is shown to users (1) or not (0)
+    @return: None
     """
     output_format_id = get_output_format_id(code);
     if output_format_id is None:
@@ -189,7 +235,8 @@ def remove_output_format(code):
     If code does not exist in database, do nothing
     The function also removes all localized names in formatname table
 
-    @param the: code of the output format to remove
+    @param code: the code of the output format to remove
+    @return: None
     """
     output_format_id = get_output_format_id(code);
     if output_format_id is None:
@@ -225,6 +272,7 @@ def set_output_format_description(code, description):
 
     @param code: the code of the output format to update
     @param description: the new description
+    @return: None
     """
     output_format_id = get_output_format_id(code)
     if output_format_id is None:
@@ -239,6 +287,8 @@ def get_output_format_visibility(code):
     Returns the visibility of the output format, given by its code
 
     If code does not exist, return 0
+
+    @param code: the code of an output format
     @return: output format visibility (0 if not visible, 1 if visible
     """
     res = run_sql("SELECT visibility FROM format WHERE code=%s", (code,))
@@ -256,6 +306,7 @@ def set_output_format_visibility(code, visibility):
 
     @param code: the code of the output format to update
     @param visibility: the new visibility (0: not visible, 1:visible)
+    @return: None
     """
     output_format_id = get_output_format_id(code)
     if output_format_id is None:
@@ -309,6 +360,7 @@ def set_output_format_content_type(code, content_type):
 
     @param code: the code of the output format to update
     @param content_type: the content type for the format
+    @return: None
     """
     output_format_id = get_output_format_id(code)
     if output_format_id is None:
@@ -327,9 +379,10 @@ def get_output_format_names(code):
     The returned object is a dict with keys 'ln' (for long name) and 'sn' (for short name),
     containing each a dictionary with languages as keys.
     The key 'generic' contains the generic name of the output format (for use in admin interface)
-    For eg:  {'ln':{'en': "a long name", 'fr': "un long nom", 'de': "ein lange Name"},
-              'sn':{'en': "a name", 'fr': "un nom", 'de': "ein Name"}
-              'generic': "a name"}
+    For eg::
+           {'ln':{'en': "a long name", 'fr': "un long nom", 'de': "ein lange Name"},
+           'sn':{'en': "a name", 'fr': "un nom", 'de': "ein Name"}
+           'generic': "a name"}
 
     The returned dictionary is never None. The keys 'ln' and 'sn' are always present. However
     only languages present in the database are in dicts 'sn' and 'ln'. language "CFG_SITE_LANG" is always
@@ -370,6 +423,7 @@ def set_output_format_name(code, name, lang="generic", type='ln'):
     @param type: either 'ln' (for long name) and 'sn' (for short name)
     @param lang: the language in which the name is given
     @param name: the name to give to the output format
+    @return: None
     """
 
     if len(name) > 256:
@@ -399,6 +453,7 @@ def change_output_format_code(old_code, new_code):
 
     @param old_code: the code of the output format to change
     @param new_code: the new code
+    @return: None
     """
     output_format_id = get_output_format_id(old_code);
     if output_format_id is None:

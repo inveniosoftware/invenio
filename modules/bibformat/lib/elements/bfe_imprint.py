@@ -27,11 +27,11 @@ def format_element(bfo, place_label, publisher_label, date_label,
     """
     Print imprint (Order: Name of publisher, place of publication and date of publication).
     Parameter <code>date_format</code> allows to specify the string representation of the output.
-    The format string has the same behaviour as the strftime() function.
-    <pre>Eg: 1982-09-24 07:32:00
-         "%d %B %Y"   -> 24 September 1982
-         "%I:%M"      -> 07:32
-    </pre>
+    The format string has the same behaviour as the strftime() function::
+        <pre>Eg: 1982-09-24 07:32:00
+             "%d %B %Y"   -> 24 September 1982
+             "%I:%M"      -> 07:32
+        </pre>
     @param separator: a separator between the elements of imprint
     @param place_label: a label to print before the publication place value
     @param publisher_label: a label to print before the publisher name

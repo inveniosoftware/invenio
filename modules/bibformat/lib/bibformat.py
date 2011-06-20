@@ -18,17 +18,20 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Format records using specified format.
+Format records using chosen format.
 
-API functions: format_record, format_records, create_excel,
-get_output_format_content_type
+The main APIs are:
+  - format_record
+  - format_records
+  - create_excel
+  - get_output_format_content_type
 
-Used to wrap the BibFormat engine and associated functions. This is
-also where special formatting functions of multiple records (that the
-engine does not handle, as it works on a single record basis) should
-be defined, with name C{def create_*}.
+This module wraps the BibFormat engine and its associated
+functions. This is also where special formatting functions of multiple
+records (that the engine does not handle, as it works on a single
+record basis) should be defined, with name C{def create_*}.
 
-SEE: bibformat_utils.py
+@see: bibformat_utils.py
 """
 
 __revision__ = "$Id$"
@@ -55,49 +58,12 @@ import sys
 # Functions to format a single record
 ##
 
-def filter_hidden_fields(recxml, user_info=None, filter_tags=CFG_BIBFORMAT_HIDDEN_TAGS,
-                         force_filtering=False):
-    """
-    Filter out tags specified by filter_tags from MARCXML. If the user
-    is allowed to run bibedit, then filter nothing, unless
-    force_filtering is set to True.
-
-    @param recxml: marcxml presentation of the record
-    @param user_info: user information; if None, then assume invoked via CLI with all rights
-    @param filter_tags: list of MARC tags to be filtered
-    @param force_filtering: do we force filtering regardless of user rights?
-    @return: recxml without the hidden fields
-    """
-    if force_filtering:
-        pass
-    else:
-        if user_info is None:
-            #by default
-            return recxml
-        else:
-            if (acc_authorize_action(user_info, 'runbibedit')[0] == 0):
-                #no need to filter
-                return recxml
-    #filter..
-    out = ""
-    omit = False
-    for line in recxml.splitlines(True):
-        #check if this block needs to be omitted
-        for htag in filter_tags:
-            if line.count('datafield tag="'+str(htag)+'"'):
-                omit = True
-        if not omit:
-            out += line
-        if omit and line.count('</datafield>'):
-            omit = False
-    return out
-
 def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                   xml_record=None, user_info=None, on_the_fly=False):
     """
-    Formats a record in given output format.
+    Format a record in given output format.
 
-    Returns a formatted version of the record in the specified
+    Return a formatted version of the record in the specified
     language, search pattern, and with the specified output format.
     The function will define which format template must be applied.
 
@@ -226,7 +192,6 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                                                                  recID = recID,
                                                                  )
 
-
 def record_get_xml(recID, format='xm', decompress=zlib.decompress):
     """
     Returns an XML string of the record given by recID.
@@ -243,6 +208,8 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
     If record does not exist, returns empty string.
 
     @param recID: the id of the record to retrieve
+    @param format: the format to use
+    @param decompress: the library to use to decompress cache from DB
     @return: the xml string of the record
     """
     return bibformat_utils.record_get_xml(recID=recID, format=format, decompress=decompress)
@@ -397,7 +364,9 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; "):
     output is produced on the basis of the fields that 'ot' defines
     (see search_engine.perform_request_search(..) 'ot' param).
 
+    @param req: the request object
     @param recIDs: a list of record IDs
+    @param ln: language
     @param ot: a list of fields that should be included in the excel output as columns(see perform_request_search 'ot' param)
     @param ot_sep: a separator used to separate values for the same record, in the same columns, if any
     @return: a string in Excel format
@@ -458,6 +427,42 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; "):
 
 # Utility functions
 ##
+def filter_hidden_fields(recxml, user_info=None, filter_tags=CFG_BIBFORMAT_HIDDEN_TAGS,
+                         force_filtering=False):
+    """
+    Filter out tags specified by filter_tags from MARCXML. If the user
+    is allowed to run bibedit, then filter nothing, unless
+    force_filtering is set to True.
+
+    @param recxml: marcxml presentation of the record
+    @param user_info: user information; if None, then assume invoked via CLI with all rights
+    @param filter_tags: list of MARC tags to be filtered
+    @param force_filtering: do we force filtering regardless of user rights?
+    @return: recxml without the hidden fields
+    """
+    if force_filtering:
+        pass
+    else:
+        if user_info is None:
+            #by default
+            return recxml
+        else:
+            if (acc_authorize_action(user_info, 'runbibedit')[0] == 0):
+                #no need to filter
+                return recxml
+    #filter..
+    out = ""
+    omit = False
+    for line in recxml.splitlines(True):
+        #check if this block needs to be omitted
+        for htag in filter_tags:
+            if line.count('datafield tag="'+str(htag)+'"'):
+                omit = True
+        if not omit:
+            out += line
+        if omit and line.count('</datafield>'):
+            omit = False
+    return out
 
 def get_output_format_content_type(of):
     """
@@ -465,6 +470,7 @@ def get_output_format_content_type(of):
     of the given output format.
 
     @param of: the code of output format for which we want to get the content type
+    @return: the content-type to use for this output format
     """
     content_type = bibformat_dblayer.get_output_format_content_type(of)
 
@@ -474,7 +480,13 @@ def get_output_format_content_type(of):
     return content_type
 
 def usage(exitcode=1, msg=""):
-    """Prints usage info."""
+    """
+    Prints usage info.
+
+    @param exitcode: exit code to use (eg. 1 for error, 0 for okay)
+    @param msg: message to print
+    @return: exit the process
+    """
     if msg:
         sys.stderr.write("Error: %s.\n" % msg)
     print """BibFormat: outputs the result of the formatting of a record.
@@ -502,7 +514,11 @@ def usage(exitcode=1, msg=""):
     sys.exit(exitcode)
 
 def main():
-    """main entry point for biformat via command line"""
+    """
+    Main entry point for biformat via command line
+
+    @return: formatted record(s) as specified by options, or help/errors
+    """
 
     options = {} # will hold command-line options
     options["verbose"] = 0

@@ -31,7 +31,6 @@ def format_element(bfo, width="", caption="yes", max="-1"):
     Display image of the plot if we are in selected plots collections
 
     @param width: the width of the returned image (Eg: '100px')
-    @param separator: a separator between images
     @param caption: display the captions or not?
     @param max: the maximum number of plots to display (-1 is all plots)
     """

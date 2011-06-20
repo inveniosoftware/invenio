@@ -397,11 +397,13 @@ class Template:
         """
         Shows the dependencies (on elements) of the given format.
 
+        @param ln: language
         @param name: the name of the template
         @param filename: the filename of the template
         @param format_elements: the elements (and list of tags in each element) this template depends on
         @param output_formats: the output format that depend on this template
         @param tags: the tags that are called by format elements this template depends on.
+        @return: HTML markup
         """
         _ = gettext_set_language(ln)    # load the right message language
 
@@ -473,15 +475,18 @@ class Template:
 
     def tmpl_admin_format_template_show(self, ln, name, description, code, filename, ln_for_preview, pattern_for_preview, editable, content_type_for_preview, content_types):
         """
-        Returns the editor for format templates. Edit 'format'
+        Returns the editor for format templates. Edit format with given X{name}
 
         @param ln: language
-        @param format: the format to edit
+        @param name: the format to edit
+        @param description: the description of the format template
+        @param code: the code of the template of the editor
         @param filename: the filename of the template
         @param ln_for_preview: the language for the preview (for bfo)
         @param pattern_for_preview: the search pattern to be used for the preview (for bfo)
         @param editable: True if we let user edit, else False
-        @param code: the code of the template of the editor
+        @param content_type_for_preview: content-type to use for preview
+        @param content_types: list of available content-types
         @return: editor for 'format'
         """
         _ = gettext_set_language(ln)    # load the right message language
@@ -754,6 +759,7 @@ class Template:
 
         @param ln: language
         @param format_elements: a list of format elements structures as returned by get_format_elements
+        @return: HTML markup
         """
         out = '''
         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -1452,9 +1458,11 @@ class Template:
         """
         Shows the dependencies of the given format.
 
+        @param ln: language
         @param name: the name of the output format
         @param code: the code of the output format
         @param format_templates: format templates that depend on this format (and also elements and tags)
+        @return: HTML markup
         """
         _ = gettext_set_language(ln)    # load the right message language
         out = '''
@@ -1518,7 +1526,7 @@ class Template:
         associated administration tools.
 
         @param ln: language
-        @param formats: a list of dictionaries with formats elements attributes
+        @param format_elements: a list of dictionaries with formats elements attributes
         @return: main management console as html
         """
 
@@ -1592,6 +1600,7 @@ class Template:
         @param name: the name of the element
         @param attributes: the attributes of the element, as returned by get_format_element_attrs_from_*
         @param print_see_also: if True, prints links to other sections related to element
+        @return: HTML markup
         """
         params_names = ""
         for param in attributes['params']:
@@ -1659,9 +1668,11 @@ class Template:
         """
         Shows the dependencies of the given format element
 
+        @param ln: language
         @param name: the name of the element
         @param format_templates: format templates that depend on this element
         @param tags: the tags that are called by this format element
+        @return: HTML markup
         """
         out = '''
         <p>Go back to <a href="format_elements_doc?ln=%(ln)s#%(name)s">documentation</a></p>
@@ -1713,6 +1724,7 @@ class Template:
         @param param_values: a list of values for parameters
         @param param_descriptions: a list of description for parameters
         @param result: the result of the evaluation
+        @return: HTML markup
         """
 
         out = '''
@@ -1761,6 +1773,7 @@ class Template:
         Shows how to add a format element (mainly doc)
 
         @param ln: language
+        @return: HTML markup
         """
         _ = gettext_set_language(ln)    # load the right message language
 
@@ -1777,7 +1790,9 @@ class Template:
         'floater' will let users of Dreamweaver to insert Format elements
         into their code right from the floater.
 
+        @param ln: language
         @param format_elements: an ordered list of format elements structures as returned by get_format_elements
+        @return: HTML markup (according to Dreamweaver specs)
         """
         names_list = [] # list of element names such as ['Authors', 'Title']
         codes_list = [] # list of element code such as ['<BFE_AUTHORS limit="" separator="," />', '<BFE_TITLE />']
@@ -1886,6 +1901,7 @@ class Template:
 
         @param ln: language
         @param errors: a list of tuples (error code, string error message)
+        @return: HTML markup
         """
         _ = gettext_set_language(ln)    # load the right message language
         out = ""
@@ -1911,6 +1927,7 @@ class Template:
         @param title: the title of the dialog box
         @param message: a formatted message to display inside dialog box
         @param options: a list of string options to display as button to the user
+        @return: HTML markup
         """
 
         out = ""

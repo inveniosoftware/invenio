@@ -19,9 +19,23 @@
 
 """
 Formats a single XML Marc record using specified format.
-There is no API for the engine. Instead use bibformat.py.
+There is no API for the engine. Instead use module L{bibformat}.
 
-SEE: bibformat.py, bibformat_utils.py
+You can have a look at the various escaping modes available in
+X{BibFormatObject} in function L{escape_field}
+
+Still it is useful sometimes for debugging purpose to use the
+L{BibFormatObject} class directly. For eg:
+
+   >>> from invenio.bibformat_engine import BibFormatObject
+   >>> bfo = BibFormatObject(102)
+   >>> bfo.field('245__a')
+   The order Rodentia in South America
+   >>> from invenio.bibformat_elements import bfe_title
+   >>> bfe_title.format_element(bfo)
+   The order Rodentia in South America
+
+@see: bibformat.py, bibformat_utils.py
 """
 
 __revision__ = "$Id$"
@@ -190,15 +204,16 @@ def call_old_bibformat(recID, of="HD", on_the_fly=False, verbose=0):
     FIXME: REMOVE FUNCTION WHEN MIGRATION IS DONE
     Calls BibFormat for the record RECID in the desired output format 'of'.
 
-    @param recID: record ID to format
-    @param of: output format to be used for formatting
-    @param on_the_fly: if False, try to return an already preformatted version of the record in the database
-    @param verbose: verbosity
-
     Note: this functions always try to return HTML, so when
     bibformat returns XML with embedded HTML format inside the tag
     FMT $g, as is suitable for prestoring output formats, we
     perform un-XML-izing here in order to return HTML body only.
+
+    @param recID: record ID to format
+    @param of: output format to be used for formatting
+    @param on_the_fly: if False, try to return an already preformatted version of the record in the database
+    @param verbose: verbosity
+    @return: a formatted output using old BibFormat
     """
 
     out = ""
@@ -372,7 +387,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
 def decide_format_template(bfo, of):
     """
     Returns the format template name that should be used for formatting
-    given output format and BibFormatObject.
+    given output format and L{BibFormatObject}.
 
     Look at of rules, and take the first matching one.
     If no rule matches, returns None
@@ -380,8 +395,9 @@ def decide_format_template(bfo, of):
     To match we ignore lettercase and spaces before and after value of
     rule and value of record
 
-    @param bfo: a BibFormatObject
+    @param bfo: a L{BibFormatObject}
     @param of: the code of the output format to use
+    @return: name of a format template
     """
 
     output_format = get_output_format(of)
@@ -479,15 +495,15 @@ def eval_format_template_elements(format_template, bfo, verbose=0):
     Also returns errors.
 
     Prepare the format template content so that we can directly replace the marc code by their value.
-    This implies: 1) Look for special tags
-                  2) replace special tags by their evaluation
+    This implies:
+      1. Look for special tags
+      2. replace special tags by their evaluation
 
     @param format_template: the format template code
     @param bfo: the object containing parameters for the current formatting
     @param verbose: the level of verbosity from 0 to 9 (O: silent,
-                                                       5: errors,
-                                                       7: errors and warnings,
-                                                       9: errors and warnings, stop if error (debug mode ))
+                    5: errors, 7: errors and warnings,
+                    9: errors and warnings, stop if error (debug mode ))
     @return: tuple (result, errors)
     """
     errors_ = []
@@ -547,11 +563,11 @@ def eval_format_template_elements(format_template, bfo, verbose=0):
 def eval_format_element(format_element, bfo, parameters=None, verbose=0):
     """
     Returns the result of the evaluation of the given format element
-    name, with given BibFormatObject and parameters. Also returns
+    name, with given L{BibFormatObject} and parameters. Also returns
     the errors of the evaluation.
 
     @param format_element: a format element structure as returned by get_format_element
-    @param bfo: a BibFormatObject used for formatting
+    @param bfo: a L{BibFormatObject} used for formatting
     @param parameters: a dict of parameters to be used for formatting. Key is parameter and value is value of parameter
     @param verbose: the level of verbosity from 0 to 9 (O: silent,
                                                        5: errors,
@@ -817,11 +833,10 @@ def get_format_template(filename, with_attributes=False):
     Returns the structured content of the given formate template.
 
     if 'with_attributes' is true, returns the name and description. Else 'attrs' is not
-    returned as key in dictionary (it might, if it has already been loaded previously)
-
-    {'code':"<b>Some template code</b>"
-     'attrs': {'name': "a name", 'description': "a description"}
-    }
+    returned as key in dictionary (it might, if it has already been loaded previously)::
+      {'code':"<b>Some template code</b>"
+       'attrs': {'name': "a name", 'description': "a description"}
+      }
 
     @param filename: the filename of an format template
     @param with_attributes: if True, fetch the attributes (names and description) for format'
@@ -882,14 +897,16 @@ def get_format_templates(with_attributes=False):
     Returns the list of all format templates, as dictionary with filenames as keys
 
     if 'with_attributes' is true, returns the name and description. Else 'attrs' is not
-    returned as key in each dictionary (it might, if it has already been loaded previously)
+    returned as key in each dictionary (it might, if it has already been loaded previously)::
 
-    [{'code':"<b>Some template code</b>"
-      'attrs': {'name': "a name", 'description': "a description"}
-     },
-    ...
-    }
+      [{'code':"<b>Some template code</b>"
+        'attrs': {'name': "a name", 'description': "a description"}
+       },
+      ...
+      }
+
     @param with_attributes: if True, fetch the attributes (names and description) for formats
+    @return: the list of format templates (with code and info)
     """
     format_templates = {}
     files = os.listdir(CFG_BIBFORMAT_TEMPLATES_PATH)
@@ -909,7 +926,8 @@ def get_format_template_attrs(filename):
     The attributes are {'name', 'description'}
     Caution: the function does not check that path exists or
     that the format element is valid.
-    @param the: path to a format element
+    @param filename: the name of a format template
+    @return: a structure with detailed information about given format template
     """
     attrs = {}
     attrs['name'] = ""
@@ -954,10 +972,11 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
     Return None if element cannot be loaded (file not found, not readable or
     invalid)
 
-    The returned structure is {'attrs': {some attributes in dict. See get_format_element_attrs_from_*}
-                               'code': the_function_code,
-                               'type':"field" or "python" depending if element is defined in file or table,
-                               'escape_function': the function to call to know if element output must be escaped}
+    The returned structure is::
+      {'attrs': {some attributes in dict. See get_format_element_attrs_from_*}
+      'code': the_function_code,
+      'type':"field" or "python" depending if element is defined in file or table,
+      'escape_function': the function to call to know if element output must be escaped}
 
     @param element_name: the name of the format element to load
     @param verbose: the level of verbosity from 0 to 9 (O: silent,
@@ -1090,15 +1109,15 @@ def get_format_elements(with_built_in_params=False):
     Returns the list of format elements attributes as dictionary structure
 
     Elements declared in files have priority over element declared in 'tag' table
-    The returned object has this format:
-    {element_name1: {'attrs': {'description':..., 'seealso':...
+    The returned object has this format::
+      {element_name1: {'attrs': {'description':..., 'seealso':...
                                'params':[{'name':..., 'default':..., 'description':...}, ...]
                                'builtin_params':[{'name':..., 'default':..., 'description':...}, ...]
                               },
                      'code': code_of_the_element
                     },
-     element_name2: {...},
-     ...}
+       element_name2: {...},
+       ...}
 
      Returns only elements that could be loaded (not error in code)
 
@@ -1128,15 +1147,14 @@ def get_format_elements(with_built_in_params=False):
 
 def get_format_element_attrs_from_function(function, element_name,
                                            with_built_in_params=False):
-    """ Returns the attributes of the
-    function given as parameter.
+    """
+    Returns the attributes of the function given as parameter.
 
     It looks for standard parameters of the function, default
     values and comments in the docstring.
-    The attributes are {'description', 'seealso':['element.py', ...],
-    'params':{name:{'name', 'default', 'description'}, ...], name2:{}}
 
-    The attributes are {'name' : "name of element" #basically the name of 'name' parameter
+    The attributes are::
+                        {'name' : "name of element" #basically the name of 'name' parameter
                         'description': "a string description of the element",
                         'seealso' : ["element_1.py", "element_2.py", ...] #a list of related elements
                         'params': [{'name':"param_name",   #a list of parameters for this element (except 'bfo')
@@ -1145,10 +1163,11 @@ def get_format_element_attrs_from_function(function, element_name,
                         'builtin_params': {name: {'name':"param_name",#the parameters builtin for all elem of this kind
                                             'default':"default value",
                                             'description': "a description"}, ...},
-                       }
+                        }
     @param function: the formatting function of a format element
     @param element_name: the name of the element
     @param with_built_in_params: if True, load the parameters built in all elements
+    @return: a structure with detailed information of a function
     """
 
     attrs = {}
@@ -1260,7 +1279,8 @@ def get_format_element_attrs_from_table(element_name,
 
     Returns None if element_name does not exist in tag table.
 
-    The attributes are {'name' : "name of element" #basically the name of 'element_name' parameter
+    The attributes are::
+                       {'name' : "name of element" #basically the name of 'element_name' parameter
                         'description': "a string description of the element",
                         'seealso' : [] #a list of related elements. Always empty in this case
                         'params': [],  #a list of parameters for this element. Always empty in this case
@@ -1273,6 +1293,7 @@ def get_format_element_attrs_from_table(element_name,
     @param element_name: an element name in database
     @param element_name: the name of the element
     @param with_built_in_params: if True, load the parameters built in all elements
+    @return: a structure with detailed information of an element found in DB
     """
 
     attrs = {}
@@ -1355,23 +1376,22 @@ def get_output_format(code, with_attributes=False, verbose=0):
 
     if output format corresponding to 'code' is not found return an empty structure.
 
-    See get_output_format_attrs() to learn more on the attributes
+    See get_output_format_attrs() to learn more about the attributes::
 
-
-    {'rules': [ {'field': "980__a",
-                 'value': "PREPRINT",
-                 'template': "filename_a.bft",
-                },
-                {...}
-              ],
-     'attrs': {'names': {'generic':"a name", 'sn':{'en': "a name", 'fr':"un nom"}, 'ln':{'en':"a long name"}}
-               'description': "a description"
-               'code': "fnm1",
-               'content_type': "application/ms-excel",
-               'visibility': 1
-              }
-     'default':"filename_b.bft"
-    }
+        {'rules': [ {'field': "980__a",
+                     'value': "PREPRINT",
+                     'template': "filename_a.bft",
+                    },
+                    {...}
+                  ],
+         'attrs': {'names': {'generic':"a name", 'sn':{'en': "a name", 'fr':"un nom"}, 'ln':{'en':"a long name"}}
+                   'description': "a description"
+                   'code': "fnm1",
+                   'content_type': "application/ms-excel",
+                   'visibility': 1
+                  }
+         'default':"filename_b.bft"
+        }
 
     @param code: the code of an output_format
     @param with_attributes: if True, fetch the attributes (names and description) for format
@@ -1462,14 +1482,14 @@ def get_output_format_attrs(code, verbose=0):
     The 'names' dict always contais 'generic', 'ln' (for long name) and 'sn' (for short names)
     keys. 'generic' is the default name for output format. 'ln' and 'sn' contain long and short
     localized names of the output format. Only the languages for which a localization exist
-    are used.
+    are used::
 
-    {'names': {'generic':"a name", 'sn':{'en': "a name", 'fr':"un nom"}, 'ln':{'en':"a long name"}}
-     'description': "a description"
-     'code': "fnm1",
-     'content_type': "application/ms-excel",
-     'visibility': 1
-    }
+        {'names': {'generic':"a name", 'sn':{'en': "a name", 'fr':"un nom"}, 'ln':{'en':"a long name"}}
+         'description': "a description"
+         'code': "fnm1",
+         'content_type': "application/ms-excel",
+         'visibility': 1
+        }
 
     @param code: the short identifier of the format
     @param verbose: the level of verbosity from 0 to 9 (O: silent,
@@ -1506,24 +1526,26 @@ def get_output_formats(with_attributes=False):
     If 'with_attributes' is true, also returns the names and description of the output formats,
     else 'attrs' is not returned in dicts (it might, if it has already been loaded previously).
 
-    See get_output_format_attrs() to learn more on the attributes
+    See get_output_format_attrs() to learn more on the attributes::
 
-    {'filename_1.bfo': {'rules': [ {'field': "980__a",
-                                    'value': "PREPRINT",
-                                    'template': "filename_a.bft",
-                                   },
-                                   {...}
-                                 ],
-                        'attrs': {'names': {'generic':"a name", 'sn':{'en': "a name", 'fr':"un nom"}, 'ln':{'en':"a long name"}}
-                                  'description': "a description"
-                                  'code': "fnm1"
-                                 }
-                        'default':"filename_b.bft"
-                       },
+        {'filename_1.bfo': {'rules': [ {'field': "980__a",
+                                        'value': "PREPRINT",
+                                        'template': "filename_a.bft",
+                                       },
+                                       {...}
+                                     ],
+                            'attrs': {'names': {'generic':"a name", 'sn':{'en': "a name", 'fr':"un nom"}, 'ln':{'en':"a long name"}}
+                                      'description': "a description"
+                                      'code': "fnm1"
+                                     }
+                            'default':"filename_b.bft"
+                           },
 
-     'filename_2.bfo': {...},
-      ...
-    }
+         'filename_2.bfo': {...},
+          ...
+        }
+    @param with_attributes: if returned output formats contain detailed info, or not
+    @type with_attributes: boolean
     @return: the list of output formats
     """
     output_formats = {}
@@ -1536,9 +1558,9 @@ def get_output_formats(with_attributes=False):
 
     return output_formats
 
-def resolve_format_element_filename(string):
+def resolve_format_element_filename(element_name):
     """
-    Returns the filename of element corresponding to string
+    Returns the filename of element corresponding to x{element_name}
 
     This is necessary since format templates code call
     elements by ignoring case, for eg. <BFE_AUTHOR> is the
@@ -1548,14 +1570,14 @@ def resolve_format_element_filename(string):
 
     The name of the element has to start with "BFE_".
 
-    @param name: a name for a format element
+    @param element_name: a name for a format element
     @return: the corresponding filename, with right case
     """
 
-    if not string.endswith(".py"):
-        name = string.replace(" ", "_").upper() +".PY"
+    if not element_name.endswith(".py"):
+        name = element_name.replace(" ", "_").upper() +".PY"
     else:
-        name = string.replace(" ", "_").upper()
+        name = element_name.replace(" ", "_").upper()
 
     files = os.listdir(CFG_BIBFORMAT_ELEMENTS_PATH)
     for filename in files:
@@ -1616,7 +1638,7 @@ def get_fresh_format_template_filename(name):
 
     Returns (unique_filename, modified_name)
 
-    @param a: name for a format template
+    @param name: name for a format template
     @return: the corresponding filename, and modified name if necessary
     """
     #name = re.sub(r"\W", "", name) #Remove non alphanumeric chars
@@ -1687,6 +1709,7 @@ def clear_caches():
     """
     Clear the caches (Output Format, Format Templates and Format Elements)
 
+    @return: None
     """
     global format_templates_cache, format_elements_cache, format_outputs_cache
     format_templates_cache = {}
@@ -1736,19 +1759,20 @@ class BibFormatObject:
 
         'user_info' allows to grant access to some functionalities on
         a page depending on the user's priviledges. It is a dictionary
-        in the following form:
-        user_info = {
-            'remote_ip' : '',
-            'remote_host' : '',
-            'referer' : '',
-            'uri' : '',
-            'agent' : '',
-            'uid' : -1,
-            'nickname' : '',
-            'email' : '',
-            'group' : [],
-            'guest' : '1'
-        }
+        in the following form::
+
+            user_info = {
+                'remote_ip' : '',
+                'remote_host' : '',
+                'referer' : '',
+                'uri' : '',
+                'agent' : '',
+                'uid' : -1,
+                'nickname' : '',
+                'email' : '',
+                'group' : [],
+                'guest' : '1'
+                }
 
         @param recID: the id of a record
         @param ln: the language in which the record has to be formatted
@@ -1776,7 +1800,7 @@ class BibFormatObject:
 
     def get_record(self):
         """
-        Returns the record structure of this BibFormatObject instance
+        Returns the record structure of this L{BibFormatObject} instance
 
         @return: the record structure as defined by BibRecord library
         """
@@ -1822,17 +1846,17 @@ class BibFormatObject:
 
         'escape' parameter allows to escape special characters
         of the field. The value of escape can be:
-                      0 - no escaping
-                      1 - escape all HTML characters
-                      2 - remove unsafe HTML tags (Eg. keep <br />)
-                      3 - Mix of mode 1 and 2. If value of field starts with
-                          <!-- HTML -->, then use mode 2. Else use mode 1.
-                      4 - Remove all HTML tags
-                      5 - Same as 2, with more tags allowed (like <img>)
-                      6 - Same as 3, with more tags allowed (like <img>)
-                      7 - Mix of mode 0 and mode 1. If field_value
-                          starts with <!--HTML-->, then use mode
-                          0. Else use mode 1.
+                      0. no escaping
+                      1. escape all HTML characters
+                      2. remove unsafe HTML tags (Eg. keep <br />)
+                      3. Mix of mode 1 and 2. If value of field starts with
+                      <!-- HTML -->, then use mode 2. Else use mode 1.
+                      4. Remove all HTML tags
+                      5. Same as 2, with more tags allowed (like <img>)
+                      6. Same as 3, with more tags allowed (like <img>)
+                      7. Mix of mode 0 and mode 1. If field_value
+                      starts with <!--HTML-->, then use mode 0.
+                      Else use mode 1.
 
         @param tag: the marc code of a field
         @param escape: 1 if returned value should be escaped. Else 0. (see above for other modes)
@@ -1857,15 +1881,15 @@ class BibFormatObject:
         are the subcodes and the values are the values of tag.subcode.
         If the tag has a subcode, simply returns list of values
         corresponding to tag.
-        Eg. for given MARC:
+        Eg. for given MARC::
             999C5 $a value_1a $b value_1b
             999C5 $b value_2b
             999C5 $b value_3b $b value_3b_bis
 
-            >> bfo.fields('999C5b')
-            >> ['value_1b', 'value_2b', 'value_3b', 'value_3b_bis']
-            >> bfo.fields('999C5')
-            >> [{'a':'value_1a', 'b':'value_1b'},
+            >>> bfo.fields('999C5b')
+            >>> ['value_1b', 'value_2b', 'value_3b', 'value_3b_bis']
+            >>> bfo.fields('999C5')
+            >>> [{'a':'value_1a', 'b':'value_1b'},
                 {'b':'value_2b'},
                 {'b':'value_3b'}]
 
@@ -1879,12 +1903,13 @@ class BibFormatObject:
         instead of a list).  You can allow repeatable subfields by
         setting 'repeatable_subfields_p' parameter to True. In
         this mode, the above example would return:
-            >> bfo.fields('999C5b', repeatable_subfields_p=True)
-            >> ['value_1b', 'value_2b', 'value_3b']
-            >> bfo.fields('999C5', repeatable_subfields_p=True)
-            >> [{'a':['value_1a'], 'b':['value_1b']},
+            >>> bfo.fields('999C5b', repeatable_subfields_p=True)
+            >>> ['value_1b', 'value_2b', 'value_3b']
+            >>> bfo.fields('999C5', repeatable_subfields_p=True)
+            >>> [{'a':['value_1a'], 'b':['value_1b']},
                 {'b':['value_2b']},
                 {'b':['value_3b', 'value3b_bis']}]
+
         NOTICE THAT THE RETURNED STRUCTURE IS DIFFERENT.  Also note
         that whatever the value of 'repeatable_subfields_p' is,
         bfo.fields('999C5b') always show all fields, even repeatable
@@ -1893,17 +1918,17 @@ class BibFormatObject:
 
         'escape' parameter allows to escape special characters
         of the fields. The value of escape can be:
-                      0 - no escaping
-                      1 - escape all HTML characters
-                      2 - remove unsafe HTML tags (Eg. keep <br />)
-                      3 - Mix of mode 1 and 2. If value of field starts with
-                          <!-- HTML -->, then use mode 2. Else use mode 1.
-                      4 - Remove all HTML tags
-                      5 - Same as 2, with more tags allowed (like <img>)
-                      6 - Same as 3, with more tags allowed (like <img>)
-                      7 - Mix of mode 0 and mode 1. If field_value
-                          starts with <!--HTML-->, then use mode 0.
-                          Else use mode 1.
+                      0. No escaping
+                      1. Escape all HTML characters
+                      2. Remove unsafe HTML tags (Eg. keep <br />)
+                      3. Mix of mode 1 and 2. If value of field starts with
+                      <!-- HTML -->, then use mode 2. Else use mode 1.
+                      4. Remove all HTML tags
+                      5. Same as 2, with more tags allowed (like <img>)
+                      6. Same as 3, with more tags allowed (like <img>)
+                      7. Mix of mode 0 and mode 1. If field_value
+                      starts with <!--HTML-->, then use mode 0.
+                      Else use mode 1.
 
         @param tag: the marc code of a field
         @param escape: 1 if returned values should be escaped. Else 0.
@@ -1967,6 +1992,7 @@ class BibFormatObject:
         @param kb: a knowledge base name
         @param string: the string we want to translate
         @param default: a default value returned if 'string' not found in 'kb'
+        @return: a string value corresponding to translated input with given kb
         """
         if not string:
             return default
@@ -1982,18 +2008,22 @@ def escape_field(value, mode=0):
     """
     Utility function used to escape the value of a field in given mode.
 
-    - mode 0: no escaping
-    - mode 1: escaping all HTML/XML characters (escaped chars are shown as escaped)
-    - mode 2: escaping unsafe HTML tags to avoid XSS, but
-              keep basic one (such as <br />)
-              Escaped tags are removed.
-    - mode 3: mix of mode 1 and mode 2. If field_value starts with <!--HTML-->,
-              then use mode 2. Else use mode 1.
-    - mode 4: escaping all HTML/XML tags (escaped tags are removed)
-    - mode 5: same as 2, but allows more tags, like <img>
-    - mode 6: same as 3, but allows more tags, like <img>
-    - mode 7: mix of mode 0 and mode 1. If field_value starts with <!--HTML-->,
-              then use mode 0. Else use mode 1.
+      - mode 0: no escaping
+      - mode 1: escaping all HTML/XML characters (escaped chars are shown as escaped)
+      - mode 2: escaping unsafe HTML tags to avoid XSS, but
+        keep basic one (such as <br />)
+        Escaped tags are removed.
+      - mode 3: mix of mode 1 and mode 2. If field_value starts with <!--HTML-->,
+        then use mode 2. Else use mode 1.
+      - mode 4: escaping all HTML/XML tags (escaped tags are removed)
+      - mode 5: same as 2, but allows more tags, like <img>
+      - mode 6: same as 3, but allows more tags, like <img>
+      - mode 7: mix of mode 0 and mode 1. If field_value starts with <!--HTML-->,
+        then use mode 0. Else use mode 1.
+
+    @param value: value to escape
+    @param mode: escaping mode to use
+    @return: an escaped version of X{value} according to chosen X{mode}
     """
     if mode == 1:
         return cgi.escape(value)
@@ -2064,6 +2094,8 @@ def escape_field(value, mode=0):
 def bf_profile():
     """
     Runs a benchmark
+
+    @return: None
     """
     for i in range(1, 51):
         format_record(i, "HD", ln=CFG_SITE_LANG, verbose=9, search_pattern=[])

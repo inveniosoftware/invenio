@@ -24,8 +24,8 @@ def format_element(bfo, reference_prefix, reference_suffix):
     """
     Prints the references of this record
 
-    @param reference_prefix a prefix displayed before each reference
-    @param reference_suffix a suffix displayed after each reference
+    @param reference_prefix: a prefix displayed before each reference
+    @param reference_suffix: a suffix displayed after each reference
     """
     from invenio.config import CFG_SITE_URL, CFG_ADS_SITE
     from invenio.search_engine import get_mysql_recid_from_aleph_sysno, \

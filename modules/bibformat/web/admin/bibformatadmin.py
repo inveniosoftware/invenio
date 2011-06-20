@@ -42,7 +42,9 @@ def index(req, ln=CFG_SITE_LANG):
     Displays a warning if we find out that etc/biformat dir is not writable by us
     (as most opeation of BibFormat must write in this directory).
 
+    @param req: the request object
     @param ln: language
+    @return: a web page
     """
     warnings = []
 
@@ -81,8 +83,11 @@ def index(req, ln=CFG_SITE_LANG):
 def output_formats_manage(req, ln=CFG_SITE_LANG, sortby="code"):
     """
     Main page for output formats management. Check for authentication and print output formats list.
+
+    @param req: the request object
     @param ln: language
     @param sortby: the sorting crieteria (can be 'code' or 'name')
+    @return: a web page
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -146,14 +151,16 @@ def output_format_show(req, bfo, ln=CFG_SITE_LANG,
     totally normal and expected behaviour)
 
 
-
-    @param ln: language
+    @param req: the request object
     @param bfo: the filename of the output format to show
+    @param ln: language
     @param r_fld: the list of 'field' attribute for each rule
     @param r_val: the list of 'value' attribute for each rule
     @param r_tpl: the list of 'template' attribute for each rule
     @param default: the default format template used by this output format
     @param r_upd: the rule that we want to increase/decrease in order of evaluation
+    @param chosen_option: emptry string when user has not yet confirmed to go on
+    @return: a web page
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -223,8 +230,10 @@ def output_format_show_attributes(req, bfo, ln=CFG_SITE_LANG):
     """
     Page for output format names and descrition attributes edition.
 
+    @param req: the request object
     @param ln: language
     @param bfo: the filename of the template to show
+    @return: a web page
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -268,8 +277,10 @@ def output_format_show_dependencies(req, bfo, ln=CFG_SITE_LANG):
     """
     Show the dependencies of the given output format.
 
+    @param req: the request object
     @param ln: language
     @param bfo: the filename of the output format to show
+    @return: a web page
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -316,6 +327,7 @@ def output_format_update_attributes(req, bfo, ln=CFG_SITE_LANG,
     """
     Update the name, description and code of given output format
 
+    @param req: the request object
     @param ln: language
     @param description: the new description
     @param name: the new name
@@ -324,6 +336,7 @@ def output_format_update_attributes(req, bfo, ln=CFG_SITE_LANG,
     @param bfo: the filename of the output format to update
     @param names_trans: the translations in the same order as the languages from get_languages()
     @param visibility: the visibility of the output format in the output formats list (public pages)
+    @return: a web page (or redirection to a web page)
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -360,7 +373,11 @@ def output_format_delete(req, bfo, ln=CFG_SITE_LANG, chosen_option=""):
     """
     Delete an output format
 
+    @param req: the request object
     @param bfo: the filename of the output format to delete
+    @param ln: language
+    @param chosen_option: empty string when user has not yet confirmed, else "Delete" to apply
+    @return: a web page (or redirection to a web page)
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -396,6 +413,10 @@ def output_format_delete(req, bfo, ln=CFG_SITE_LANG, chosen_option=""):
 def output_format_add(req, ln=CFG_SITE_LANG):
     """
     Adds a new output format
+
+    @param req: the request object
+    @param ln: language
+    @return: a web page (or redirection to a web page)
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -423,8 +444,11 @@ def output_format_add(req, ln=CFG_SITE_LANG):
 def format_templates_manage(req, ln=CFG_SITE_LANG, checking='0'):
     """
     Main page for formats templates management. Check for authentication and print formats list.
+
+    @param req: the request object
     @param ln: language
     @param checking: if 0, basic checking. Else perform extensive checking (time-consuming)
+    @return: a web page
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -459,6 +483,7 @@ def format_template_show(req, bft, code=None, ln=CFG_SITE_LANG,
     """
     Main page for template edition. Check for authentication and print formats editor.
 
+    @param req: the request object
     @param ln: language
     @param code: the code being edited
     @param bft: the name of the template to show
@@ -466,6 +491,7 @@ def format_template_show(req, bft, code=None, ln=CFG_SITE_LANG,
     @param pattern_for_preview: the search pattern to be used for the preview (for bfo)
     @param content_type_for_preview: the (MIME) content type of the preview
     @param chosen_option: returned value for dialog_box warning
+    @return: a web page
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -536,9 +562,11 @@ def format_template_show_attributes(req, bft, ln=CFG_SITE_LANG, new=0):
     False and we can offer specific option to user (for ex
     let him make a duplicate of existing template).
 
+    @param req: the request object
     @param ln: language
     @param bft: the name of the template to show
     @param new: if "False", the template has not just been added
+    @return: a web page
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -582,8 +610,10 @@ def format_template_show_dependencies(req, bft, ln=CFG_SITE_LANG):
     """
     Show the dependencies (on elements) of the given format.
 
+    @param req: the request object
     @param ln: language
     @param bft: the filename of the template to show
+    @return: a web page
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -616,11 +646,13 @@ def format_template_update_attributes(req, bft, ln=CFG_SITE_LANG,
     """
     Update the name and description of given format template
 
+    @param req: the request object
     @param ln: language
     @param description: the new description
     @param name: the new name
     @param bft: the filename of the template to update
     @param duplicate: the filename of template that we want to copy (the code)
+    @return: a web page (or redirection to a web page)
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -649,6 +681,12 @@ def format_template_update_attributes(req, bft, ln=CFG_SITE_LANG,
 def format_template_delete(req, bft, ln=CFG_SITE_LANG, chosen_option=""):
     """
     Delete a format template
+
+    @param req: the request object
+    @param bft: the filename of the template to delete
+    @param ln: language
+    @param chosen_option: empty string when user has not yet confirm. Else "Delete" to confirm
+    @return: a web page (or redirection to a web page)
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -685,6 +723,10 @@ def format_template_delete(req, bft, ln=CFG_SITE_LANG, chosen_option=""):
 def format_template_add(req, ln=CFG_SITE_LANG):
     """
     Adds a new format template
+
+    @param req: the request object
+    @param ln: language
+    @return: a web page (or redirection to a web page)
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -712,12 +754,16 @@ def format_template_show_preview_or_save(req, bft, ln=CFG_SITE_LANG, code=None,
     Print the preview of a record with a format template. To be included inside Format template
     editor. If the save_action has a value, then the code should also be saved at the same time
 
+    @param req: the request object
     @param code: the code of a template to use for formatting
+    @param ln: language
     @param ln_for_preview: the language for the preview (for bfo)
     @param pattern_for_preview: the search pattern to be used for the preview (for bfo)
+    @param content_type_for_preview: the content-type to use to serve the preview page
     @param save_action: has a value if the code has to be saved
     @param bft: the filename of the template to save
-    @param navtrail: standard navtrail
+    @param navtrail: navigation trail
+    @return: a web page
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -798,9 +844,10 @@ def format_template_show_short_doc(req, ln=CFG_SITE_LANG, search_doc_pattern="")
     Prints the format elements documentation in a brief way. To be included inside Format template
     editor.
 
+    @param req: the request object
     @param ln: language
     @param search_doc_pattern: a search pattern that specified which elements to display
-    @param bft: the name of the template to show
+    @return: a web page
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -821,7 +868,10 @@ def format_template_show_short_doc(req, ln=CFG_SITE_LANG, search_doc_pattern="")
 def format_elements_doc(req, ln=CFG_SITE_LANG):
     """
     Main page for format elements documentation. Check for authentication and print format elements list.
+
+    @param req: the request object
     @param ln: language
+    @return: a web page
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -850,8 +900,11 @@ def format_element_show_dependencies(req, bfe, ln=CFG_SITE_LANG):
     """
     Shows format element dependencies
 
+    @param req: the request object
+    @param req: the request object
     @param bfe: the name of the bfe to show
     @param ln: language
+    @return: a web page
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -882,9 +935,11 @@ def format_element_test(req, bfe, ln=CFG_SITE_LANG, param_values=None):
     function of the element as parameters, in the order ...
     If params is None, this means that they have not be defined by user yet.
 
+    @param req: the request object
     @param bfe: the name of the element to test
     @param ln: language
     @param param_values: the list of parameters to pass to element format function
+    @return: a web page
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -921,10 +976,12 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
     The page only shows the status of one of the format, depending on
     the specified one. If multiple are specified, shows the first one.
 
+    @param req: the request object
     @param ln: language
     @param bfo: an output format 6 chars code
     @param bft: a format element filename
     @param bfe: a format element name
+    @return: a web page
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -1023,6 +1080,9 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
 def download_dreamweaver_floater(req):
     """
     Trigger download of a BibFormat palette for Dreamweaver.
+
+    @param req: the request object
+    @return: the palette code to be used within Dreamweaver
     """
     #bibformat_templates = invenio.template.load('bibformat')
     req.content_type = 'text/html'
@@ -1038,8 +1098,14 @@ def dialog_box(req, url="", ln=CFG_SITE_LANG, navtrail="",
 
     The page that will receive the result must take 'chosen_option' as parameter.
 
+    @param req: the request object
     @param url: the url used to submit the options chosen by the user
+    @param ln: language
+    @param navtrail: navigation trail
+    @param title: title of the page/dialog
+    @param message: message to display in the dialog box
     @param options: the list of labels for the buttons given as choice to user
+    @return: a dialog page
     """
     import invenio
     bibformat_templates = invenio.template.load('bibformat')
@@ -1058,6 +1124,9 @@ def dialog_box(req, url="", ln=CFG_SITE_LANG, navtrail="",
 def error_page(req):
     """
     Returns a default error page
+
+    @param req: the request object
+    @return: a web page
     """
     return page(title="Internal Error",
                 body = create_error_box(req, ln=CFG_SITE_LANG),

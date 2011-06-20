@@ -26,11 +26,11 @@ def format_element(bfo, date_format='%d %B %Y'):
     """
     Prints the imprint publication date. If <code>format</code> is specified,
     Parameter <code>date_format</code> allows to specify the string representation of the output.
-    The format string has the same behaviour as the strftime() function.
-    <pre>Eg: 1982-09-24 07:32:00
-        "%d %B %Y"   -> 24 September 1982
-        "%I:%M"      -> 07:32
-    </pre>
+    The format string has the same behaviour as the strftime() function::
+        <pre>Eg: 1982-09-24 07:32:00
+            "%d %B %Y"   -> 24 September 1982
+            "%I:%M"      -> 07:32
+        </pre>
     @see: pagination.py, publisher.py, reprints.py, imprint.py, place.py
     @param date_format date format
     """
