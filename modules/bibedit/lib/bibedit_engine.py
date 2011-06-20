@@ -102,9 +102,9 @@ re_revdate_split = re.compile('^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
 
 def get_empty_fields_templates():
     """
-    Returning the templates of empty fields :
-    - an empty data field
-    - an empty control field
+    Returning the templates of empty fields::
+     -an empty data field
+     -an empty control field
     """
     return [{
                 "name": "Empty field",
@@ -430,9 +430,9 @@ def perform_request_user(req, request_type, recid, data):
 def perform_request_holdingpen(request_type, recId, changeId=None):
     """
     A method performing the holdingPen ajax request. The following types of
-    requests can be made:
-       getHoldingPenUpdates - retrieving the holding pen updates pending
-                              for a given record
+    requests can be made::
+     -getHoldingPenUpdates: retrieving the holding pen updates pending
+                            for a given record
     """
     response = {}
     if request_type == 'getHoldingPenUpdates':
@@ -775,13 +775,13 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
 def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
                                   hpChanges, undoRedoOp, isBulk=False, \
                                   ln=CFG_SITE_LANG):
-    """Handle record update requests like adding, modifying, moving or deleting
-    of fields or subfields. Possible common error situations:
-    - Missing cache file
-    - Cache file modified in other editor
-    Explanation of some parameters:
-       undoRedoOp - Indicates in "undo"/"redo"/undo_descriptor operation is
-                    performed by a current request.
+    """
+    Handle record update requests like adding, modifying, moving or deleting
+    of fields or subfields. Possible common error situations::
+     - Missing cache file
+     - Cache file modified in other editor
+    @param undoRedoOp: Indicates in "undo"/"redo"/undo_descriptor operation is
+                       performed by a current request.
     """
 
     response = {}
@@ -1043,12 +1043,11 @@ def perform_request_autocomplete(request_type, recid, uid, data):
     Perfrom an AJAX request associated with the retrieval of autocomplete
     data.
 
-    Arguments:
-        request_type: Type of the currently served request
-        recid: the identifer of the record
-        uid: The identifier of the user being currently logged in
-        data: The request data containing possibly important additional
-              arguments
+    @param request_type: Type of the currently served request
+    @param recid: the identifer of the record
+    @param uid: The identifier of the user being currently logged in
+    @param data: The request data containing possibly important additional
+                 arguments
     """
     response = {}
     # get the values based on which one needs to search

@@ -944,11 +944,12 @@ def record_extract_oai_id(record):
     return ""
 
 def print_rec(rec, format=1, tags=None):
-    """prints a record
-       format = 1 -- XML
-       format = 2 -- HTML (not implemented)
-       @tags: list of tags to be printed
-      """
+    """
+    prints a record
+    format = 1 -- XML
+    format = 2 -- HTML (not implemented)
+    @param tags: list of tags to be printed
+    """
     if tags is None:
         tags = []
     if format == 1:
@@ -959,11 +960,11 @@ def print_rec(rec, format=1, tags=None):
     return text
 
 def print_recs(listofrec, format=1, tags=None):
-    """prints a list of records
-       format = 1 -- XML
-       format = 2 -- HTML (not implemented)
-       @tags: list of tags to be printed
-       if 'listofrec' is not a list it returns empty string
+    """
+    prints a list of records
+    @param format: 1 XML, 2 HTML (not implemented)
+    @param tags: list of tags to be printed
+           if 'listofrec' is not a list it returns empty string
     """
     if tags is None:
         tags = []
@@ -984,8 +985,10 @@ def concat(alist):
     return newl
 
 def print_errors(alist):
-    """Creates a unique string with the strings in list, using '\n' as
-    a separator."""
+    """
+    Creates a unique string with the strings in list, using '\n' as
+    a separator.
+    """
     text = ""
     for l in alist:
         text = '%s\n%s'% (text, l)
@@ -1236,13 +1239,13 @@ def _create_record_rxp(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
     """Creates a record object using the RXP parser.
 
     If verbose>3 then the parser will be strict and will stop in case of
-        well-formedness errors or DTD errors.
+    well-formedness errors or DTD errors.
     If verbose=0, the parser will not give warnings.
     If 0 < verbose <= 3, the parser will not give errors, but will warn
-        the user about possible mistakes
+    the user about possible mistakes
 
     correct != 0 -> We will try to correct errors such as missing
-        attributes
+    attributes
     correct = 0 -> there will not be any attempt to correct errors"""
     if correct:
         # Note that with pyRXP < 1.13 a memory leak has been found
