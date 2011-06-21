@@ -40,7 +40,7 @@ from invenio.config import \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE
 from invenio.messages import gettext_set_language, language_list_long
-from invenio.search_engine import HitSet, search_pattern, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records
+from invenio.search_engine import HitSet, search_pattern_parenthesised, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records
 from invenio.dbquery import run_sql, Error, get_table_update_time
 from invenio.bibrank_record_sorter import get_bibrank_methods
 from invenio.dateutils import convert_datestruct_to_dategui
@@ -423,12 +423,12 @@ class Collection:
                     last_year = str(int(this_year) - 1)
                     # detect recIDs only from this and past year:
                     recIDs = list(self.reclist & \
-                                  search_pattern(p='year:%s or year:%s' % \
+                                  search_pattern_parenthesised(p='year:%s or year:%s' % \
                                                  (this_year, last_year)))
                 elif self.name in ['VideosXXX']:
                     # detect recIDs only from this year:
                     recIDs = list(self.reclist & \
-                                  search_pattern(p='year:%s' % this_year))
+                                  search_pattern_parenthesised(p='year:%s' % this_year))
                 elif self.name == 'CMS Physics Analysis Summaries' and \
                          1281585 in self.reclist:
                     # REALLY, REALLY temporary hack
@@ -438,7 +438,7 @@ class Collection:
                 if self.name in ['Videos']:
                     # select only videos with movies:
                     recIDs = list(intbitset(recIDs) & \
-                                  search_pattern(p='collection:"PUBLVIDEOMOVIE"'))
+                                  search_pattern_parenthesised(p='collection:"PUBLVIDEOMOVIE"'))
                 # sort some CERN collections specially:
                 if self.name in ['Videos',
                                  'Video Clips',
@@ -745,10 +745,10 @@ class Collection:
             # B - collection does have dbquery, so compute it:
             #     (note: explicitly remove DELETED records)
             if CFG_CERN_SITE:
-                reclist = search_pattern(None, self.dbquery + \
+                reclist = search_pattern_parenthesised(None, self.dbquery + \
                                          ' -980__:"DELETED" -980__:"DUMMY"')
             else:
-                reclist = search_pattern(None, self.dbquery + ' -980__:"DELETED"')
+                reclist = search_pattern_parenthesised(None, self.dbquery + ' -980__:"DELETED"')
             reclist_with_nonpublic_subcolls = copy.deepcopy(reclist)
         # store the results:
         self.nbrecs = len(reclist_with_nonpublic_subcolls)
