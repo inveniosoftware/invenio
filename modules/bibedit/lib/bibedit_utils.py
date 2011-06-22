@@ -43,7 +43,8 @@ from invenio.bibedit_dblayer import get_record_last_modification_date, \
     delete_hp_change
 from invenio.bibrecord import create_record, create_records, \
     record_get_field_value, record_has_field, record_xml_output, \
-    record_strip_empty_fields, record_strip_empty_volatile_subfields
+    record_strip_empty_fields, record_strip_empty_volatile_subfields, \
+    record_order_subfields
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
@@ -110,6 +111,8 @@ def create_cache_file(recid, uid, record='', cache_dirty=False, pending_changes=
     """
     if not record:
         record = get_bibrecord(recid)
+        # Order subfields alphabetically after loading the record
+        record_order_subfields(record)
         if not record:
             return
 
@@ -194,6 +197,10 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
     # clean the record from unfilled volatile fields
     record_strip_empty_volatile_subfields(record)
     record_strip_empty_fields(record)
+
+    # order subfields alphabetically before saving the record
+    record_order_subfields(record)
+
     xml_to_write = record_xml_output(record)
 
     # Write XML file.
