@@ -787,8 +787,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
     return response
 
 def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
-                                  hpChanges, undoRedoOp, isBulk=False, \
-                                  ln=CFG_SITE_LANG):
+                                  hpChanges, undoRedoOp, isBulk=False):
     """
     Handle record update requests like adding, modifying, moving or deleting
     of fields or subfields. Possible common error situations::
@@ -1189,15 +1188,48 @@ def perform_request_preview_record(request_type, recid, uid):
             record = get_bibrecord(recid)
     response['html_preview'] = _get_formated_record(record)
 
+    # clean the record from unfilled volatile fields
+    record_strip_empty_volatile_subfields(record)
+    record_strip_empty_fields(record)
+    response['html_preview'] = _get_formated_record(record, data['new_window'])
+
     return response
 
-def _get_formated_record(record):
+def perform_request_get_pdf_url(recid):
+    """ Handle request to get the URL of the attached PDF
+    """
+    response = {}
+    rec_info = BibRecDocs(recid)
+    docs = rec_info.list_bibdocs()
+    try:
+        doc = docs[0]
+        response['pdf_url'] = doc.get_file('pdf').get_url()
+    except (IndexError, InvenioWebSubmitFileError):
+        # FIXME, return here some information about error.
+        # We could allow the user to specify a URl and add the FFT tags automatically
+        response['pdf_url'] = ''
+    return response
+
+def perform_request_record_has_pdf(recid, uid):
+    """ Check if record has a pdf attached
+    """
+    response = {'record_has_pdf': True}
+    rec_info = BibRecDocs(recid)
+    docs = rec_info.list_bibdocs()
+    try:
+        doc = docs[0]
+    except IndexError:
+        response['record_has_pdf'] = False
+    finally:
+        return response
+
+def _get_formated_record(record, new_window):
     """Returns a record in a given format
 
     @param record: BibRecord object
     """
 
-    xml_record = bibrecord.record_xml_output(record)
+    xml_record = wash_for_xml(bibrecord.record_xml_output(record))
 
     result =  "<html><head><title>Record preview</title></head>"
     result += get_mathjax_header(True)

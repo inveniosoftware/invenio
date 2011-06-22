@@ -560,7 +560,7 @@ function initStateFromHash(){
     case 'deleteRecord':
       cleanUp(true, '', null, true);
       $('.headline').text('Record Editor: Record #' + tmpRecID);
-      displayMessage(6);
+      displayMessage(10);
       updateStatus('ready');
         break;
     }
@@ -1688,13 +1688,14 @@ function addFieldAddSubfieldEditor(jQRowGroupID, fieldTmpNo, defaultCode, defaul
   $('#btnAddFieldRemove_' + fieldTmpNo + '_' + subfieldTmpNo).bind('click', function(){
     $('#rowAddField_' + this.id.slice(this.id.indexOf('_')+1)).remove();
   });
-  $('#txtAddFieldValue_' + fieldTmpNo + '_' + subfieldTmpNo).bind(
-    'focus', function(){
+  $('#txtAddFieldValue_' + fieldTmpNo + '_' + subfieldTmpNo).on(
+    'focus', function(e){
       if ($(this).hasClass('bibEditVolatileSubfield')){
         $(this).select();
         $(this).removeClass("bibEditVolatileSubfield");
       }
-    });
+    }
+  ).on("mouseup", function(e) { e.preventDefault(); });
   var contentEditorId = '#txtAddFieldValue_' + fieldTmpNo + '_' + subfieldTmpNo;
   $(contentEditorId).bind('keyup', function(e){
     onAddFieldValueKeyPressed(e, jQRowGroupID, fieldTmpNo, subfieldTmpNo);
@@ -1703,14 +1704,20 @@ function addFieldAddSubfieldEditor(jQRowGroupID, fieldTmpNo, defaultCode, defaul
 }
 
 function onAddFieldJumpToNextSubfield(jQRowGroupID, fieldTmpNo, subfieldTmpNo){
-  // checking, how many subfields are there and if last, submitting the form
-  var numberOfSubfields = $(jQRowGroupID).data('freeSubfieldTmpNo');
-  if (subfieldTmpNo < (numberOfSubfields - 1)){
-    var elementCode = "#txtAddFieldSubfieldCode_" + fieldTmpNo + "_" + (subfieldTmpNo + 1);
-    $(elementCode)[0].focus();
-  }
-  else{
+  /* Gets all the open text boxes for the current field and submits the changes
+   * if it is the last one.
+   */
+  var fieldOpenInputs = $('input[id^="txtAddFieldValue_' + fieldTmpNo + '"]');
+
+  var currentInputSelector = "#txtAddFieldValue_" + fieldTmpNo + "_" + subfieldTmpNo;
+  var currentInput = $(currentInputSelector);
+  var currentInputIndex = fieldOpenInputs.index(currentInput);
+
+  if (currentInputIndex === fieldOpenInputs.length-1) {
     addFieldSave(fieldTmpNo);
+  }
+  else {
+    fieldOpenInputs[currentInputIndex+1].focus();
   }
 }
 
@@ -2100,7 +2107,7 @@ function addFieldSave(fieldTmpNo)
   /* Loop through all subfields to look for new subfields in the format
    * $$aContent$$bMore content and split them accordingly */
   var subfieldsExtended = [];
-  for (var i=0; i<subfields.length;i++) {
+  for (var i=0, n=subfields.length; i<n ;i++) {
       if (valueContainsSubfields(subfields[i][1])) {
           var subfieldsToAdd = new Array(), subfieldCode = subfields[i][0];
           splitContentSubfields(subfields[i][1], subfieldCode, subfieldsToAdd);
@@ -2112,7 +2119,7 @@ function addFieldSave(fieldTmpNo)
   }
   if (typeof subfieldsExtended[0] != 'undefined') {
       /* We have split some subfields */
-      for (var i=0;i<subfieldsExtended.length;i++) {
+      for (var i=0, n=subfieldsExtended.length; i < n; i++) {
           subfields[i] = subfieldsExtended[i];
       }
   }
@@ -2162,7 +2169,9 @@ function addFieldSave(fieldTmpNo)
   reColorFields();
   // Scroll and color the new field for a short period.
   var rowGroup = $('#rowGroup_' + tag + '_' + fieldPosition);
-  $('#bibEditContent').scrollTop($(rowGroup).position().top);
+  if (insertPosition === undefined) {
+    $('#bibEditContent').scrollTop($(rowGroup).position().top);
+  }
   $(rowGroup).effect('highlight', {color: gNEW_CONTENT_COLOR},
          gNEW_CONTENT_COLOR_FADE_DURATION);
 }
@@ -2691,7 +2700,7 @@ function onAutosuggest(event) {
                mytarget.value = replacement;
             }
             //for the rest, create new subfields
-            for (var i=1;i<suggestions.length;i++) {
+            for (var i=1, n=suggestions.length; i < n; i++) {
                 var valuein = suggestions[i];
                 var addhereID = maintag+"_"+fieldPosition; //an id to indicate where the new subfield goes
                 addSubfield(addhereID, subfieldcode, valuein);
@@ -2706,7 +2715,7 @@ function onAutosuggest(event) {
             //make a nice box..
             mysel = '<table width="400" border="0"><tr><td><span class="bibeditscrollArea"><ul>';
             //create the select items..
-            for (var i=0;i<suggestions.length;i++) {
+            for (var i=0, n=suggestions.length; i < n; i++) {
                tmpid = select_id+"-"+suggestions[i];
                mysel = mysel +'<li onClick="onAutosuggestSelect(\''+tmpid+'\');">'+suggestions[i]+"</li>";
             }
@@ -2770,7 +2779,7 @@ function check_subjects_KB(value) {
      */
     /* If KB is not defined in the system, just return value*/
     if ($.inArray(gKBSubject,gAVAILABLE_KBS) == -1)
-        return value
+        return value;
     var response='';
     $.ajaxSetup({async:false});
     $.getJSON("/kb/export",
@@ -2807,10 +2816,18 @@ function splitContentSubfields(value, subfieldCode, subfieldsToAdd) {
      *
      */
     var splitValue = value.split('$$');
-    subfieldsToAdd[0] = new Array(subfieldCode, splitValue[0]);
-    for (var i=1; i<splitValue.length; i++) {
-        subfieldsToAdd[i] = new Array(splitValue[i][0], splitValue[i].substring(1));
+    subfieldsToAdd.push(new Array(subfieldCode, splitValue[0]));
+    for (var i=1, n=splitValue.length; i<n; i++) {
+        subfieldsToAdd.push(new Array(splitValue[i][0], splitValue[i].substring(1)));
     }
+}
+
+function is_reference_manually_curated(field){
+    for (var i=0, n=field[0].length; i < n; i++) {
+        if (field[0][i][0] == '9' && field[0][i][1] == "CURATOR")
+            return true;
+    }
+    return false;
 }
 
 function onContentChange(value, th){
@@ -2865,17 +2882,12 @@ function onContentChange(value, th){
         }
     }
     else {
+        var subfieldsToAdd = new Array(), bulkOperation = false, subfield_offset;
         /* Edit subfield value */
-        /* If editing subject field, check KB */
-        if (tag_ind == '65017' && field[0][subfieldIndex][0] == 'a') {
-            value = check_subjects_KB(value);
-        }
         /* Check if there are subfields inside of the content value
          * e.g 999C5 $$mThis a test$$hThis is a second subfield */
         if (valueContainsSubfields(value)) {
-            var bulkOperation = true;
-            var subfieldsToAdd = new Array();
-            oldSubfieldCode = field[0][subfieldIndex][0];
+            bulkOperation = true;
             splitContentSubfields(value, oldSubfieldCode, subfieldsToAdd);
             field[0].splice(subfieldIndex, 1); // update gRecord, remove old content
             field[0].push.apply(field[0], subfieldsToAdd); // update gRecord, add new subfields
@@ -2883,7 +2895,23 @@ function onContentChange(value, th){
         }
         else if (field[0][subfieldIndex][1] == value)
             return escapeHTML(value);
+        }
+        /* If editing reference field, add $$9 subfield */
+        else if (tag_ind == '999C5' && !is_reference_manually_curated(field)){
+            bulkOperation = true;
+            field[0][subfieldIndex][1] = value;
+            subfieldsToAdd.push.apply(subfieldsToAdd, field[0]);
+            subfieldsToAdd.push(new Array("9", "CURATOR"));
+            field[0].splice(0, field[0].length);
+            field[0].push.apply(field[0], subfieldsToAdd); // update gRecord, add new
+            subfield_offset = subfieldsToAdd.length - 1;
+        }
         else {
+            /* If editing subject field, check KB */
+            if (tag_ind == '65017' && field[0][subfieldIndex][0] == 'a') {
+              value = check_subjects_KB(value);
+              newValue = value;
+            }
             oldValue = field[0][subfieldIndex][1]; // get old subfield value from gRecord
             field[0][subfieldIndex][1] = value; // update gRecord
         }
@@ -3231,7 +3259,7 @@ function updateRevisionsHistory(){
 
 function encodeXml(str){
     var resultString = "";
-    for (var i=0;i<str.length;i++){
+    for (var i=0, n=str.length; i<n; i++){
         var c = str.charAt(i);
         switch (c){
         case '<':
@@ -4048,7 +4076,7 @@ function urPerformRemoveSubfields(tag, fieldPosition, subfields, isUndo){
   toDelete[tag] = {};
   toDelete[tag][fieldPosition] = []
   var startingPosition = gRecord[tag][fieldPosition][0].length - subfields.length;
-  for (var i=startingPosition; i<gRecord[tag][fieldPosition][0].length ; i++){
+  for (var i=startingPosition, n=gRecord[tag][fieldPosition][0].length; i<n ; i++){
     toDelete[tag][fieldPosition].push(i);
   }
 
