@@ -862,6 +862,12 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         inv_search = '(journal:phys.lett and journal:0903 and journal:024)'
         self._compare_searches(inv_search, spi_search)
 
+    def test_spires_keyword_distribution_with_parens(self):
+        """SPIRES search syntax - test find cn d0 and (a abachi or abbott or abazov)"""
+        spi_search = "find cn d0 and (a abachi or abbott or abazov)"
+        inv_search = "collaboration:d0 and (author:abachi or author:abbott or author:abazov)"
+        self._compare_searches(inv_search, spi_search)
+
     def test_simple_syntax_mixing(self):
         """SPIRES and invenio search syntax - find a ellis and citedby:hawking"""
         combo_search = "find a ellis and citedby:hawking"

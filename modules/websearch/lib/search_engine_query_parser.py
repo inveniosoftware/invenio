@@ -638,10 +638,12 @@ class SpiresToInvenioSyntaxConverter:
         # match cases where a keyword distributes across a conjunction
         self._re_distribute_keywords = re.compile(r'''(?ix)     # verbose, ignorecase on
                   \b(?P<keyword>\S*:)            # a keyword is anything that's not whitespace with a colon
-                  (?P<content>.+?)\s*            # content is the part that comes after the keyword
+                  (?P<content>[^:]+?)\s*         # content is the part that comes after the keyword; it should NOT
+                                                 # have colons in it!  that implies that we might be distributing
+                                                 # a keyword OVER another keyword.  see ticket #701
                   (?P<combination>\ and\ not\ |\ and\ |\ or\ |\ not\ )\s*
                   (?P<last_content>[^:]*?)       # oh look, content without a keyword!
-                  (?=\ and\ not\ |\ and\ |\ or\ |\ not\ |$)''')
+                  (?=\ and\ |\ or\ |\ not\ |$)''')
 
         # massaging SPIRES quirks
         self._re_pattern_IRN_search = re.compile(r'970__a:(?P<irn>\d+)')
@@ -1165,7 +1167,7 @@ class SpiresToInvenioSyntaxConverter:
 
         def create_replacement_pattern(match):
             return match.group('keyword') + match.group('content') + \
-                   ' ' +  match.group('combination') + ' ' + match.group('keyword') + \
+                   match.group('combination') + match.group('keyword') + \
                    match.group('last_content')
 
         still_matches = True
