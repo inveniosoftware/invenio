@@ -42,7 +42,7 @@
 </pre>
 </p>
 
-<p>Having an internal representation of a record you can manipulate it by means of bibrecord functions like <tt>record_get_field_instances</tt>, <tt>record_has_field</tt>, <tt>record_add_field</tt>, <tt>record_delete_field</tt>, <tt>record_delete_subfield</tt>, <tt>record_add_or_modify_subfield</tt>, record_add_subfield, <tt>record_does_field_exist</tt>, <tt>record_filter_fields</tt>, <tt>record_replace_in_subfields</tt>, <tt>record_get_field_value</tt>, <tt>record_get_field_values</tt>...</p>
+<p>Having an internal representation of a record you can manipulate it by means of bibrecord functions like <tt>record_get_field_instances</tt>, <tt>record_has_field</tt>, <tt>record_add_field</tt>, <tt>record_delete_field</tt>, <tt>record_delete_subfield</tt>, <tt>record_add_or_modify_subfield</tt>, <tt>record_add_subfield</tt>, <tt>record_does_field_exist</tt>, <tt>record_filter_fields</tt>, <tt>record_replace_in_subfields</tt>, <tt>record_get_field_value</tt>, <tt>record_get_field_values</tt>...</p>
 
 <p>At the end, if you want the MARCXML representation of the record you can use <tt>record_xml_output</tt>:
 <pre>
