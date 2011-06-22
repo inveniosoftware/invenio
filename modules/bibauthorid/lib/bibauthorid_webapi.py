@@ -56,13 +56,14 @@ def get_person_redirect_link(pid):
     else:
         return str(pid)
 
-def update_person_canonical_name(person_id, canonical_name):
+def update_person_canonical_name(person_id, canonical_name, userinfo=''):
     '''
     Updates a person's canonical name
     @param person_id: person id
     @param canonical_name: string 
     '''
     tu.update_personID_canonical_names(persons_list=[[person_id]], overwrite=True, suggested=canonical_name)
+    tu.insert_user_log(userinfo, person_id, 'data_update', 'CMPUI_changecanonicalname', '', 'Canonical name manually updated.')
 
 def get_canonical_id_from_person_id(person_id):
     '''

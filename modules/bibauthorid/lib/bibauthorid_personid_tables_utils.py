@@ -96,6 +96,34 @@ class PersonIDStatusDataCacher(DataCacher):
 
         DataCacher.__init__(self, cache_filler, timestamp_verifier)
 
+def get_recids_affected_since(last_timestamp):
+    '''
+    Returns a list of recids which have been manually changed since timestamp
+    @TODO: extend the system to track and signal even automatic updates (unless a full reindex is
+        acceptable in case of magic automatic update)
+    @param: last_timestamp: last update, datetime.datetime
+    '''
+    vset = set()
+    values = run_sql("select value from aidUSERINPUTLOG where timestamp > %s", (last_timestamp,))
+    for v in values:
+        if ',' in v[0] and ':' in v[0]:
+            vset.add(v[0].split(',')[1])
+
+    pids = run_sql("select distinct personid from aidUSERINPUTLOG where  timestamp > %s", (last_timestamp,))
+    pidlist = [p[0] for p in pids if p[0] >= 0]
+    values = []
+    if len(pidlist) > 1:
+        values = run_sql("select data from aidPERSONID where tag='paper' and personid in %s", (pidlist,))
+    elif len(pidlist) == 1:
+        values = run_sql("select data from aidPERSONID where tag='paper' and personid = %s", (pidlist[0],))
+    for v in values:
+        if ',' in v[0] and ':' in v[0]:
+            vset.add(v[0].split(',')[1])
+    return list(vset)
+
+def get_persons_affected_since(last_timestamp, return_alt_names=False, return_all_person_papers=False):
+    recids = get_recids_affected_since(last_timestamp)
+    return get_persons_from_recids(recids, return_alt_names, return_all_person_papers)
 
 def remove_empty_personids():
     pids = run_sql("select distinct personid from aidPERSONID order by personid")
@@ -429,7 +457,7 @@ def _perform_split_person_on_pid(pid, gendernames, name_variations,
 #                    minlen = min(len(oname), len(tname))
 #                    maxlen = max(len(oname), len(tname))
 #                    print("[%s,%s,%s] ... %s and %s on pid %s"
-#                          % (ldist, (ldist/float(minlen)), 
+#                          % (ldist, (ldist/float(minlen)),
 #                             (ldist/float(maxlen)), oname, tname, pid))
 #                    print("for %s and %s on pid %s" % (oname, tname, pid))
 

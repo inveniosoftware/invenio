@@ -1927,7 +1927,9 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                 return self._error_page(req, ln,
                         "Fatal: cannot set a custom canonical name without a suggestion")
 
-            webapi.update_person_canonical_name(pid, cname)
+            uid = getUid(req)
+            userinfo = "%s||%s" % (uid, req.remote_ip)
+            webapi.update_person_canonical_name(pid, cname, userinfo)
 
             return redirect_to_url(req, "/person/%s" % webapi.get_person_redirect_link(pid))
 
