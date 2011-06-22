@@ -2360,7 +2360,7 @@ class Template:
                      'movedown': movedown,
                      'count': count,
                      'icon': external_item_img,
-                     'content': colid >= 0 and val or self.tmpl_create_pseudo_item(val),
+                     'content': colid >= 0 and val or val and self.tmpl_create_pseudo_item(val) or _("This record does not seem to exist any more"),
                      'add_and_view_notes_action': nb_cmt and 'display' or 'write_note',
                      'add_and_view_notes_inline_anchor': not nb_cmt and '#note' or '',
                      'add_and_view_notes_label': nb_cmt and _('Notes') + ' (' + str(nb_cmt) + ')' or add_notes and _('Add a note...') or '',
@@ -2715,7 +2715,7 @@ class Template:
       </td>
     </tr>""" % {'count': index_item,
                 'icon': external_item_img,
-                'content': colid >=0 and val or self.tmpl_create_pseudo_item(val),
+                'content': colid >=0 and val or val and self.tmpl_create_pseudo_item(val) or _("This record does not seem to exist any more"),
                 'last_cmt': last_cmt,
                 'siteurl': CFG_SITE_URL,
                 'bskid': bskid,
@@ -3236,7 +3236,7 @@ class Template:
     </tr>"""
         out = out % {'count': count,
                      'icon': external_item_img,
-                     'content': colid >= 0 and val or self.tmpl_create_pseudo_item(val),
+                     'content': colid >= 0 and val or val and self.tmpl_create_pseudo_item(val) or _("This record does not seem to exist any more"),
                      'add_and_view_notes_action': nb_cmt and 'display_public' or 'write_public_note',
                      'add_and_view_notes_inline_anchor': not nb_cmt and '#note' or '',
                      'add_and_view_notes_label': nb_cmt and _('Notes') + ' (' + str(nb_cmt) + ')' or _('Add a note...'),
@@ -3536,7 +3536,7 @@ class Template:
       </td>
     </tr>""" % {'count': index_item,
                 'icon': external_item_img,
-                'content': colid >= 0 and val or self.tmpl_create_pseudo_item(val),
+                'content': colid >= 0 and val or val and self.tmpl_create_pseudo_item(val) or _("This record does not seem to exist any more"),
                 'notes': notes,
                 'ln': ln}
 
@@ -3747,6 +3747,11 @@ class Template:
 
     def tmpl_create_pseudo_item(self, item, of='hb'):
         """"""
+
+        if not item:
+            # normally this function should never be run if "item"
+            # is empty or does not exist anyway.
+            return ""
 
         if of == 'hb':
             (es_title, es_desc, es_url) = tuple(item.split('\n'))
