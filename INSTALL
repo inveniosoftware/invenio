@@ -133,6 +133,9 @@ Contents
 	     <http://utidylib.berlios.de/>
           - (optional) Beautiful Soup, for HTML washing:
 	     <http://www.crummy.com/software/BeautifulSoup/>
+          - (optional) Python Twitter (and its dependencies) if you want
+             to use the Twitter Fetcher bibtasklet:
+             <http://code.google.com/p/python-twitter/>
 
         Note: MySQLdb version 1.2.1_p2 or higher is recommended.  If
               you are using an older version of MySQLdb, you may get
