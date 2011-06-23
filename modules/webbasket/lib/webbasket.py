@@ -27,6 +27,8 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
+from invenio.intbitset import intbitset
+
 import cgi
 from httplib import urlsplit, HTTPConnection
 #from socket import getdefaulttimeout, setdefaulttimeout
@@ -1121,7 +1123,7 @@ def perform_request_search(uid,
         total_no_all_public_search_results = 0
         # Let's precalculate the local search resutls
         # and the pattern for the external search results
-        local_search_results = set(search_unit(p))
+        local_search_results = search_unit(p)
 
         # How strict should the pattern be? Look for the exact word
         # (using word boundaries: \b) or is any substring enough?
@@ -1163,7 +1165,7 @@ def perform_request_search(uid,
                 basket_name = local_info_per_basket[1]
                 topic       = local_info_per_basket[2]
                 recid_list  = local_info_per_basket[3]
-                local_recids_per_basket = set(eval(recid_list + ','))
+                local_recids_per_basket = intbitset(map(int, recid_list.strip(',').split(',')))
                 intsec = local_search_results.intersection(local_recids_per_basket)
                 if intsec:
                     personal_search_results[bskid] = [basket_name, topic, len(intsec), list(intsec)]
@@ -1193,7 +1195,7 @@ def perform_request_search(uid,
                     basket_name = info_per_basket_by_matching_notes[1]
                     topic       = info_per_basket_by_matching_notes[2]
                     recid_list  = info_per_basket_by_matching_notes[3]
-                    recids_per_basket_by_matching_notes = set(eval(recid_list + ','))
+                    recids_per_basket_by_matching_notes = set(map(int, recid_list.strip(',').split(',')))
                     if personal_search_results.has_key(bskid):
                         no_personal_search_results_per_basket_so_far = personal_search_results[bskid][2]
                         personal_search_results[bskid][3] = list(set(personal_search_results[bskid][3]).union(recids_per_basket_by_matching_notes))
@@ -1215,7 +1217,7 @@ def perform_request_search(uid,
                 grpid       = local_info_per_basket[2]
                 group_name  = local_info_per_basket[3]
                 recid_list  = local_info_per_basket[4]
-                local_recids_per_basket = set(eval(recid_list + ','))
+                local_recids_per_basket = intbitset(map(int, recid_list.strip(',').split(',')))
                 intsec = local_search_results.intersection(local_recids_per_basket)
                 if intsec:
                     group_search_results[bskid] = [basket_name, grpid, group_name, len(intsec), list(intsec)]
@@ -1247,7 +1249,7 @@ def perform_request_search(uid,
                     grpid       = info_per_basket_by_matching_notes[2]
                     group_name  = info_per_basket_by_matching_notes[3]
                     recid_list  = info_per_basket_by_matching_notes[4]
-                    recids_per_basket_by_matching_notes = set(eval(recid_list + ','))
+                    recids_per_basket_by_matching_notes = set(map(int, recid_list.strip(',').split(',')))
                     if group_search_results.has_key(bskid):
                         no_group_search_results_per_basket_so_far = group_search_results[bskid][3]
                         group_search_results[bskid][4] = list(set(group_search_results[bskid][4]).union(recids_per_basket_by_matching_notes))
@@ -1267,7 +1269,7 @@ def perform_request_search(uid,
                 bskid       = local_info_per_basket[0]
                 basket_name = local_info_per_basket[1]
                 recid_list  = local_info_per_basket[2]
-                local_recids_per_basket = set(eval(recid_list + ','))
+                local_recids_per_basket = intbitset(map(int, recid_list.strip(',').split(',')))
                 intsec = local_search_results.intersection(local_recids_per_basket)
                 if intsec:
                     public_search_results[bskid] = [basket_name, len(intsec), list(intsec)]
@@ -1295,7 +1297,7 @@ def perform_request_search(uid,
                     bskid       = info_per_basket_by_matching_notes[0]
                     basket_name = info_per_basket_by_matching_notes[1]
                     recid_list  = info_per_basket_by_matching_notes[2]
-                    recids_per_basket_by_matching_notes = set(eval(recid_list + ','))
+                    recids_per_basket_by_matching_notes = set(map(int, recid_list.strip(',').split(',')))
                     if public_search_results.has_key(bskid):
                         no_public_search_results_per_basket_so_far = public_search_results[bskid][1]
                         public_search_results[bskid][2] = list(set(public_search_results[bskid][2]).union(recids_per_basket_by_matching_notes))
@@ -1315,7 +1317,7 @@ def perform_request_search(uid,
                 bskid       = local_info_per_basket[0]
                 basket_name = local_info_per_basket[1]
                 recid_list  = local_info_per_basket[2]
-                local_recids_per_basket = set(eval(recid_list + ','))
+                local_recids_per_basket = intbitset(map(int, recid_list.strip(',').split(',')))
                 intsec = local_search_results.intersection(local_recids_per_basket)
                 if intsec:
                     all_public_search_results[bskid] = [basket_name, len(intsec), list(intsec)]
@@ -1343,7 +1345,7 @@ def perform_request_search(uid,
                     bskid       = info_per_basket_by_matching_notes[0]
                     basket_name = info_per_basket_by_matching_notes[1]
                     recid_list  = info_per_basket_by_matching_notes[2]
-                    recids_per_basket_by_matching_notes = set(eval(recid_list + ','))
+                    recids_per_basket_by_matching_notes = set(map(int, recid_list.strip(',').split(',')))
                     if all_public_search_results.has_key(bskid):
                         no_all_public_search_results_per_basket_so_far = all_public_search_results[bskid][1]
                         all_public_search_results[bskid][2] = list(set(all_public_search_results[bskid][2]).union(recids_per_basket_by_matching_notes))

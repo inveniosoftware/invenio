@@ -773,7 +773,7 @@ class Template:
         </td>
       </tr>""" % {'in_basket_label': _('In %(x_linked_basket_name)s') % \
                                      {'x_linked_basket_name': basket_link},
-                  'items_found': _('%i items found') % personal_search_result[1][2]}
+                  'items_found': _('%i items found') % all_public_search_result[1][1]}
             out += """
       <tr>
         <td>
