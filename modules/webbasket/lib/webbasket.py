@@ -538,6 +538,7 @@ def perform_request_display(uid,
     warnings = []
     warnings_html = ""
 
+    valid_category_choice = False
     selected_basket_info = []
     content = ""
     search_box = ""
@@ -566,6 +567,7 @@ def perform_request_display(uid,
     personal_info = db.get_all_personal_basket_ids_and_names_by_topic(uid)
     personal_baskets_info = ()
     if personal_info and selected_category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
+        valid_category_choice = True
         if selected_topic:
             # (A) tuples parsing check
             valid_topic_names = [personal_info_topic[0] for personal_info_topic in personal_info]
@@ -632,6 +634,7 @@ def perform_request_display(uid,
     group_baskets_info = ()
     selected_group_name = ""
     if group_info and selected_category == CFG_WEBBASKET_CATEGORIES['GROUP']:
+        valid_category_choice = True
         if selected_group_id:
             # (A) tuples parsing check
             valid_group_ids = [group_info_group[0] for group_info_group in group_info]
@@ -719,6 +722,7 @@ def perform_request_display(uid,
 
     public_info = db.get_all_external_basket_ids_and_names(uid)
     if public_info and selected_category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
+        valid_category_choice = True
         if selected_bskid:
             valid_bskids = [(valid_basket[0], valid_basket[3]) for valid_basket in public_info]
             if (selected_bskid, 0) in valid_bskids:
@@ -744,14 +748,15 @@ def perform_request_display(uid,
                 warnings_html += webbasket_templates.tmpl_warnings(exc.message, ln)
                 selected_bskid = 0
 
-    if not personal_info:
-        if not group_info:
-            if not public_info:
-                selected_category = CFG_WEBBASKET_CATEGORIES['ALLPUBLIC']
-            else:
-                selected_category = CFG_WEBBASKET_CATEGORIES['EXTERNAL']
-        else:
+    if not valid_category_choice:
+        if personal_info:
+            selected_category = CFG_WEBBASKET_CATEGORIES['PRIVATE']
+        elif group_info:
             selected_category = CFG_WEBBASKET_CATEGORIES['GROUP']
+        elif public_info:
+            selected_category = CFG_WEBBASKET_CATEGORIES['EXTERNAL']
+        else:
+            selected_category = CFG_WEBBASKET_CATEGORIES['ALLPUBLIC']
 
     if not of.startswith('x'):
         directory_box = webbasket_templates.tmpl_create_directory_box(selected_category,

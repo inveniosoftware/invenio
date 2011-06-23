@@ -1090,9 +1090,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                    argd['topic'], argd['ln'])
             redirect_to_url(req, url)
         elif argd['submit']:
-            f = open("/tmp/skata", "w")
-            f.write("submit: " + argd['topic'] + " |+| " + argd['new_name'] + "\n")
-            f.close()
             body = perform_request_edit_topic(uid=uid,
                                               topic=argd['topic'],
                                               new_name=argd['new_name'],
@@ -1104,12 +1101,9 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                   (CFG_WEBBASKET_CATEGORIES['PRIVATE'], argd['ln'])
             redirect_to_url(req, url)
         else:
-            f = open("/tmp/skata", "w")
-            f.write("normal: " + argd['topic'] + " |+| " + argd['new_name'] + "\n")
-            f.close()
             body = perform_request_edit_topic(uid=uid,
-                                                          topic=argd['topic'],
-                                                          ln=argd['ln'])
+                                              topic=argd['topic'],
+                                              ln=argd['ln'])
 
         navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
                    '%s</a>'
