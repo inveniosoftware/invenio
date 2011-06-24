@@ -3051,7 +3051,7 @@ class Template:
         <tr class="mailboxfooter">
          <td>
              <select name="validate">
-                 <option> %(select)s</option>
+                 <option value="%(select)s"> %(select)s</option>
                  <option value="approve">%(approve)s</option>
                  <option value="reject">%(reject)s</option>
              </select>

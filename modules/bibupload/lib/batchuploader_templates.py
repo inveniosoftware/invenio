@@ -362,8 +362,8 @@ class Template:
         <span class="italics">%(txt2)s: /afs/cern.ch/user/j/user/public/foo/</span></div>
         <div><span class="mandatory_field""> * </span> %(txt3)s:
         <select name="matching">
-            <option>reportnumber</option>
-            <option>recid</option>
+            <option value="reportnumber">reportnumber</option>
+            <option value="recid">recid</option>
         </select>
         </div>
         <div><span class="mandatory_field""> * </span> %(txt4)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="mode" value="append" "checked" id="appendcheckbox"/><label for="appendcheckbox">append</label>

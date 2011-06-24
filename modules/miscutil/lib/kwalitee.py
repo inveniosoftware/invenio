@@ -38,6 +38,7 @@ Check options::
    --check-whitespace       check trailing whitespace
    --check-docstrings       check Python doctrings compliance
    --check-pep8             check PEP8 compliance
+   --check-html-options     check <option> missing 'value' attribute
 
 Examples::
    $ python kwalitee.py --stats ~/private/src/invenio/
@@ -146,7 +147,6 @@ def get_list_of_web_test_files(modulesdir, modulename):
 def get_nb_lines_in_file(filename):
     """Return number of lines in FILENAME."""
     return len(open(filename).readlines())
-
 
 def get_nb_test_cases_in_file(filename):
     """Return number of test cases in FILENAME."""
@@ -640,6 +640,8 @@ def cmd_check_all(filenames):
         errors_found_p = True
     if cmd_check_pep8(filenames):
         errors_found_p = True
+    if cmd_check_html_options(filenames):
+        errors_found_p = True
     return errors_found_p
 
 
@@ -652,7 +654,7 @@ def cmd_check_some(filenames):
         errors_found_p = True
     if cmd_check_indentation(filenames):
         errors_found_p = True
-    if cmd_check_whitespace(filenames):
+    if cmd_check_html_options(filenames):
         errors_found_p = True
     return errors_found_p
 
@@ -752,6 +754,40 @@ def cmd_check_whitespace(filenames):
             print out
     return errors_found_p
 
+def cmd_check_html_options(filenames):
+    """
+    Check cases where an C{<option>} element has been used without its
+    C{value} attribute, in filenames.
+
+    It is better to avoid missing C{value} attribute in C{<option>}
+    elements as some browsers/plugins might automatically translate
+    the label of the option, which I{could} then become the
+    (unexpected) value of the option.
+
+    @note: the check is very simple, and will miss cases such as
+    C{<option class="">}
+    """
+    errors_found_p = False
+    print_heading('Checking <option> without \'value\' attribute...')
+    for filename in filenames:
+        if filename.endswith('kwalitee.py'):
+            # Skip this file with false positives
+            continue
+        out = ''
+        process = subprocess.Popen(['grep', '-Hni', '<option\s*>', filename],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        process_output, process_error = process.communicate()
+        if process_error:
+            errors_found_p = True
+            print "[ERROR]", process_error
+        for line in process_output.split('\n'): # pylint: disable=E1103
+            if line:
+                out += line + '\n'
+        if out:
+            errors_found_p = True
+            print out
+    return errors_found_p
 
 def cmd_check_docstrings(filenames):
     """Run epydoc doctrings check on filenames."""
@@ -839,7 +875,8 @@ def main():
             if opt in ('--stats', '--check-all', '--check-some',
                        '--check-errors', '--check-variables',
                        '--check-indentation', '--check-whitespace',
-                       '--check-docstrings', '--check-pep8'):
+                       '--check-docstrings', '--check-pep8',
+                       '--check-html-options'):
                 cmd_option = opt[2:].replace('-', '_')
             elif opt in ('-q', '--quiet'):
                 QUIET_MODE = True

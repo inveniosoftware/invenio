@@ -602,12 +602,12 @@ function buildSelectList(mode) {
   if (mode=='forSearch') {
     _list = gSearchResults;
     for (var i=0, n=_list[0].length; i<n; i++)
-      _optionsHtml += "<option title=\""+ _list[2][i] +"\">"+ _list[1][i] +"</option>\n";
+      _optionsHtml += "<option value=\""+ _list[1][i] +\"" title=\""+ _list[2][i] +"\">"+ _list[1][i] +"</option>\n";
   }
   else {
     _list = gRevisions;
     for (var i=0, n=_list[0].length; i<n; i++)
-      _optionsHtml += "<option>"+ _list[1][i] +"</option>\n";
+      _optionsHtml += "<option value=\""+ _list[1][i] +"\">"+ _list[1][i] +"</option>\n";
   }
   $('#bibMergeSelectListRow select').html(_optionsHtml);
 }

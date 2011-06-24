@@ -512,10 +512,10 @@ def create_html_select(options, selected=None, attrs=None, **other_attrs):
 
         >>> print create_html_select(["foo", "bar"], selected="bar", name="baz")
         <select name="baz">
-          <option selected="selected">
+          <option selected="selected" value="bar">
             bar
           </option>
-          <option>
+          <option value="foo">
             foo
           </option>
         </select>
@@ -532,7 +532,7 @@ def create_html_select(options, selected=None, attrs=None, **other_attrs):
     @param options: this can either be a sequence of strings or a map of
         C{key->value}. In the former case, the C{select} tag will contain
         a list of C{option} tags (in alphabetical order), where the
-        C{value} attribute is not specified. In the latter case, the
+        C{value} attribute is set to C{value}. In the latter case, the
         C{value} attribute will be set to the C{key}, while the body
         of the C{option} will be set to C{value}.
     @type options: sequence or map
@@ -548,6 +548,10 @@ def create_html_select(options, selected=None, attrs=None, **other_attrs):
     @rtype: string
 
     @note: the values and keys will be escaped for HTML.
+
+    @note: it is important that parameter C{value} is always
+        specified, in case some browser plugin play with the
+        markup, for eg. when translating the page.
     """
     body = []
     try:
@@ -560,7 +564,7 @@ def create_html_select(options, selected=None, attrs=None, **other_attrs):
         options.sort()
         for value in options:
             option_attrs = value == selected and {"selected": "selected"} or {}
-            body.append(create_html_tag("option", body=value, escape_body=True, attrs=option_attrs))
+            body.append(create_html_tag("option", body=value, escape_body=True, value=value, attrs=option_attrs))
     return create_html_tag("select", body='\n'.join(body), attrs=attrs, **other_attrs)
 
 class _LinkGetter(HTMLParser):

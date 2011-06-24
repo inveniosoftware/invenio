@@ -24,7 +24,8 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio.htmlutils import HTMLWasher, nmtoken_from_string, \
-     remove_html_markup, CFG_TIDY_INSTALLED, \
+     remove_html_markup, create_html_select, \
+     CFG_TIDY_INSTALLED, \
      CFG_BEAUTIFULSOUP_INSTALLED, tidy_html
 from invenio.testutils import make_test_suite, run_test_suite
 
@@ -220,11 +221,21 @@ class HTMLMarkupRemovalTest(unittest.TestCase):
         self.assertEqual(remove_html_markup(test_input, 'X'),
                          test_expected)
 
+class HTMLCreation(unittest.TestCase):
+    """Test functions related to creation of HTML markup."""
+
+    def test_create_html_select(self):
+        """htmlutils - create HTML <select> list """
+        self.assertEqual(create_html_select(["foo", '"bar"'], selected="bar", name="baz"),
+                         '<select name="baz">\n  <option value="&quot;bar&quot;">\n    "bar"\n  </option>\n  <option value="foo">\n    foo\n  </option>\n</select>')
+
+
 TEST_SUITE = make_test_suite(XSSEscapingTest,
                              CharactersEscapingTest,
                              HTMLWashingTest,
                              HTMLMarkupRemovalTest,
-                             HTMLTidyingTest)
+                             HTMLTidyingTest,
+                             HTMLCreation)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

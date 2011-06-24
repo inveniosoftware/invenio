@@ -1125,7 +1125,7 @@ def __doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern,
 
         validation = """
     <select name="validate">
-      <option> %(select)s</option>
+      <option value="%(select)s"> %(select)s</option>
       <option value="approve">%(approve)s</option>
       <option value="reject">%(reject)s</option>
     </select>

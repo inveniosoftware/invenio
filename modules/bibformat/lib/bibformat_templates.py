@@ -1890,7 +1890,7 @@ class Template:
         </html>
         ''' % {'docs': ', '.join(["'"+x+"'" for x in docs_list]).replace('\n','\\n'),
                'codes': ', '.join(["'"+x+"'" for x in codes_list]).replace('\n','\\n'),
-               'names': '\n'.join(['<option>'+x+'</option>' for x in names_list])}
+               'names': '\n'.join(['<option value="'+x+'">'+x+'</option>' for x in names_list])}
 
         return out
 
