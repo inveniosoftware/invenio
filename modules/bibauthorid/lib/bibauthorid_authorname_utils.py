@@ -441,8 +441,8 @@ def compare_names(origin_name, target_name):
     if orig_name[2] and targ_name[2]:
         if len(orig_name[2]) > 1 or len(targ_name[2]) > 1:
             variation_ps = []
-            oname_variations = _create_ntuples(orig_name[2])
-            tname_variations = _create_ntuples(targ_name[2])
+            oname_variations = create_name_tuples(orig_name[2])
+            tname_variations = create_name_tuples(targ_name[2])
 
             for oname_variation in oname_variations:
                 for tname_variation in tname_variations:
@@ -631,7 +631,7 @@ def _compare_first_names(orig_name, targ_name):
     return names_p_weight
 
 
-def _create_ntuples(names):
+def create_name_tuples(names):
     '''
     Find name combinations, i.e. permutations of the names in different
     positions of the name
@@ -811,3 +811,219 @@ def jaro_winkler_str_similarity(str1, str2):
     jaro_weight = jaro_str_distance(str1, str2)
 
     return _winkler_modifier(str1, str2, jaro_weight)
+
+
+def names_are_equal_composites(name1, name2):
+    '''
+    Checks if names are equal composites; e.g. "guangsheng" vs. "guang sheng"
+
+    @param name1: Name string of the first name (w/ last name)
+    @type name1: string
+    @param name2: Name string of the second name (w/ last name)
+    @type name2: string
+
+    @return: Are the names equal composites?
+    @rtype: boolean
+    '''
+    if not isinstance(name1, list):
+        name1 = split_name_parts(name1)
+
+    if not isinstance(name2, list):
+        name2 = split_name_parts(name2)
+
+    is_equal_composite = False
+    oname_variations = create_name_tuples(name1[2])
+    tname_variations = create_name_tuples(name2[2])
+
+    for oname_variation in oname_variations:
+        for tname_variation in tname_variations:
+            oname = clean_name_string(oname_variation.lower(), "", False, True)
+            tname = clean_name_string(tname_variation.lower(), "", False, True)
+
+            if oname == tname:
+                is_equal_composite = True
+                break
+
+    return is_equal_composite
+
+
+def names_are_equal_gender(name1, name2, gendernames):
+    '''
+    Checks on gender equality of two names baes on a word list
+
+    @param name1: Name string of the first name (w/ last name)
+    @type name1: string
+    @param name2: Name string of the second name (w/ last name)
+    @type name2: string
+    @param gendernames: dictionary of male/female names
+    @type gendernames: dict
+
+    @return: Are names gender-equal?
+    @rtype: boolean
+    '''
+    if not isinstance(name1, list):
+        name1 = split_name_parts(name1)
+
+    if not isinstance(name2, list):
+        name2 = split_name_parts(name2)
+
+    print_debug = False
+    names_are_equal_gender_b = True
+    ogender = None
+    tgender = None
+    oname = name1[2][0].lower()
+    tname = name2[2][0].lower()
+    oname = clean_name_string(oname, "", False, True)
+    tname = clean_name_string(tname, "", False, True)
+
+    if oname in gendernames['boys']:
+        ogender = 'Male'
+    elif oname in gendernames['girls']:
+        ogender = 'Female'
+
+    if tname in gendernames['boys']:
+        tgender = 'Male'
+    elif tname in gendernames['girls']:
+        tgender = 'Female'
+
+    if print_debug:
+        print '     Gender check: ', oname, ' is a ', ogender
+        print '     Gender check: ', tname, ' is a ', tgender
+
+    if ogender and tgender:
+        if ogender != tgender:
+            if print_debug:
+                print '    Gender differs, force split!'
+
+            names_are_equal_gender_b = False
+
+    return names_are_equal_gender_b
+
+
+def names_are_synonymous(name1, name2, name_variations):
+    '''
+    Checks if two names are synonymous; e.g. "Robert" vs. "Bob"
+
+    @param name1: Name string of the first name (w/ last name)
+    @type name1: string
+    @param name2: Name string of the second name (w/ last name)
+    @type name2: string
+    @param name_variations: name variations list
+    @type name_variations: list of lists
+
+    @return: are names synonymous
+    @rtype: boolean
+    '''
+    if not isinstance(name1, list):
+        name1 = split_name_parts(name1)
+
+    if not isinstance(name2, list):
+        name2 = split_name_parts(name2)
+
+    print_debug = False
+    names_are_synonymous_b = False
+    max_matches = min(len(name1[2]), len(name2[2]))
+    matches = []
+
+    for i in xrange(max_matches):
+        matches.append(False)
+
+    for nvar in name_variations:
+        for i in xrange(max_matches):
+            oname = name1[2][i].lower()
+            tname = name2[2][i].lower()
+            oname = clean_name_string(oname, "", False, True)
+            tname = clean_name_string(tname, "", False, True)
+
+            if oname in nvar and tname in nvar:
+                if print_debug:
+                    print '      ', oname, ' and ', tname, ' are synonyms! Not splitting!'
+
+                matches[i] = True
+
+        if sum(matches) == max_matches:
+            names_are_synonymous_b = True
+            break
+
+    return names_are_synonymous_b
+
+
+def names_are_substrings(name1, name2):
+    '''
+    Checks if two names are substrings of each other; e.g. "Christoph" vs. "Ch"
+    Only checks for the beginning of the names. 
+
+    @param name1: Name string of the first name (w/ last name)
+    @type name1: string
+    @param name2: Name string of the second name (w/ last name)
+    @type name2: string
+
+    @return: are names synonymous
+    @rtype: boolean
+    '''
+    if not isinstance(name1, list):
+        name1 = split_name_parts(name1)
+
+    if not isinstance(name2, list):
+        name2 = split_name_parts(name2)
+
+    onames = name1[2]
+    tnames = name2[2]
+#    oname = "".join(onames).lower()
+#    tname = "".join(tnames).lower()
+    oname = clean_name_string("".join(onames).lower(), "", False, True)
+    tname = clean_name_string("".join(tnames).lower(), "", False, True)
+    names_are_substrings_b = False
+
+    if (oname.startswith(tname)
+        or tname.startswith(oname)):
+        names_are_substrings_b = True
+
+    return names_are_substrings_b
+
+
+def names_minimum_levenshtein_distance(name1, name2):
+    '''
+    Determines the minimum distance D between two names.
+    Comparison is base on the minimum number of first names.
+    Examples:
+    D("guang", "guang sheng") = 0
+    D("guang", "guangsheng") = 5
+    D("guang sheng", "guangsheng") = 5
+    D("guang sheng", "guang shing") = 1
+    D("guang ming", "guang fin") = 2
+
+    @precondition: Names have been checked for composition equality.
+    @param name1: Name string of the first name (w/ last name)
+    @type name1: string
+    @param name2: Name string of the second name (w/ last name)
+    @type name2: string
+
+    @return: the minimum Levenshtein distance between two names
+    @rtype: int
+    '''
+    try:
+        from Levenshtein import distance
+    except ImportError:
+        bconfig.LOGGER.exception("Levenshtein Module not available!")
+        return - 1
+
+    if not isinstance(name1, list):
+        name1 = split_name_parts(name1)
+
+    if not isinstance(name2, list):
+        name2 = split_name_parts(name2)
+
+    onames = name1[2]
+    tnames = name2[2]
+#    min_names_count = min(len(onames), len(tnames))
+#
+#    if min_names_count <= 0:
+#        return -1
+#
+#    oname = "".join(onames[:min_names_count]).lower()
+#    tname = "".join(tnames[:min_names_count]).lower()
+    oname = clean_name_string("".join(onames).lower(), "", False, True)
+    tname = clean_name_string("".join(tnames).lower(), "", False, True)
+
+    return distance(oname, tname)

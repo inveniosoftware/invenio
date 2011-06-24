@@ -1927,12 +1927,19 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
 
     for idx_unit in xrange(len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
+        if len(bsu_f) < 2 and not bsu_f == '':
+            if of.startswith("h"):
+                print_warning(req, _("There is no index %s.  Searching for %s in all fields." % (bsu_f, bsu_p)))
+            bsu_f = ''
+            bsu_m = 'w'
+            if of.startswith("h") and verbose:
+                print_warning(req, _('Instead searching %s.' % str([bsu_o, bsu_p, bsu_f, bsu_m])))
         try:
             basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m, wl)
         except InvenioWebSearchWildcardLimitError, excp:
             basic_search_unit_hitset = excp.res
             if of.startswith("h"):
-                print_warning(req, "Search term too generic, displaying only partial results...")
+                print_warning(req, _("Search term too generic, displaying only partial results..."))
         # FIXME: print warning if we use native full-text indexing
         if bsu_f == 'fulltext' and bsu_m != 'w' and of.startswith('h') and not CFG_SOLR_URL:
             print_warning(req, _("No phrase index available for fulltext yet, looking for word combination..."))
@@ -2080,6 +2087,7 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
         # parse the query. The result is list of [op1, expr1, op2, expr2, ..., opN, exprN]
         parsing_result = parser.parse_query(p)
         if verbose  and of.startswith("h"):
+            print_warning(req, "Search stage 1: search_pattern_parenthesised() searched %s." % repr(p))
             print_warning(req, "Search stage 1: search_pattern_parenthesised() returned %s." % repr(parsing_result))
 
         # go through every pattern
@@ -2372,7 +2380,7 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
                 query_params = (p,)
     # construct 'tl' which defines the tag list (MARC tags) to search in:
     tl = []
-    if str(f[0]).isdigit() and str(f[1]).isdigit():
+    if len(f) >= 2 and str(f[0]).isdigit() and str(f[1]).isdigit():
         tl.append(f) # 'f' seems to be okay as it starts by two digits
     else:
         # deduce desired MARC tags on the basis of chosen 'f'
@@ -2719,6 +2727,8 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
                         break
                 else:
                     if string.find(argd_px, f+':'+p) > -1:
+                        if string.find(term.strip(), ' ') > -1:
+                            term = '"' + term + '"'
                         argd[px] = string.replace(argd_px, f+':'+p, f+':'+term)
                         break
                     elif string.find(argd_px, f+':"'+p+'"') > -1:

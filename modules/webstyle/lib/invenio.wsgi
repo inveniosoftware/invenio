@@ -20,4 +20,10 @@
 mod_wsgi Invenio application loader.
 """
 
+try:
+    from invenio import remote_debugger
+    remote_debugger.start_file_changes_monitor()
+except:
+    pass
+
 from invenio.webinterface_handler_wsgi import application

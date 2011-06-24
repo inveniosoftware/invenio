@@ -3991,4 +3991,15 @@ CREATE TABLE IF NOT EXISTS `aidVIRTUALAUTHORSCLUSTERS` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS `aidCACHE` (
+  `id` int(15) NOT NULL auto_increment,
+  `object_name` varchar(120) NOT NULL,
+  `object_key` varchar(120) NOT NULL,
+  `object_value` text,
+  `last_updated` datetime NOT NULL,
+  PRIMARY KEY  (`id`),
+  INDEX `name-b` (`object_name`),
+  INDEX `key-b` (`object_key`),
+  INDEX `last_updated-b` (`last_updated`)
+) ENGINE=MyISAM;
 -- end of file

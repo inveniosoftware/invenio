@@ -23,6 +23,7 @@ import os
 import cgi
 import inspect
 from fnmatch import fnmatch
+from urlparse import urlparse
 
 from wsgiref.validate import validator
 from wsgiref.util import FileWrapper, guess_scheme
@@ -39,7 +40,7 @@ from invenio.webinterface_handler_config import \
     HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
     HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR
 from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
-    CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE
+    CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE, CFG_SITE_URL
 from invenio.errorlib import register_exception, get_pretty_traceback
 
 ## Static files are usually handled directly by the webserver (e.g. Apache)
@@ -185,6 +186,13 @@ class SimulatedModPythonRequest(object):
         return self.__environ['QUERY_STRING']
 
     def get_remote_ip(self):
+        if 'X-FORWARDED-FOR' in self.__headers_in and \
+                self.__headers_in.get('X-FORWARDED-SERVER', '') == \
+                self.__headers_in.get('X-FORWARDED-HOST', '') == \
+                urlparse(CFG_SITE_URL)[1]:
+            ip = self.__headers_in['X-FORWARDED-FOR'].split(',')[0]
+            if ip:
+                return ip
         return self.__environ.get('REMOTE_ADDR')
 
     def get_remote_host(self):

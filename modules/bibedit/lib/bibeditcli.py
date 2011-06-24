@@ -23,18 +23,18 @@ BibEdit CLI tool.
 
 Usage: bibedit [options]
 
-General options:
-   -h, --help                          print this help
-   -V, --version                       print version number
+General options::
+     -h, --help                     print this help
+     -V, --version                  print version number
 
-Options to inspect record history:
-   --list-revisions [recid]              list all revisions of a record
-   --list-revisions-details [recid]      list detailed revisions of a record
-   --get-revision [recid.revdate]        print MARCXML of given record revision
-   --diff-revisions [recidA.revdateB]    print MARCXML difference between
-                    [recidC.revdateD]    record A dated B and record C dated D
-   --revert-to-revision [recid.revdate]  submit given record revision to
-                                         become current revision
+Options to inspect record history::
+    --list-revisions [recid]              list all revisions of a record
+    --list-revisions-details [recid]      list detailed revisions of a record
+    --get-revision [recid.revdate]        print MARCXML of given record revision
+    --diff-revisions [recidA.revdateB]    print MARCXML difference between
+    [recidC.revdateD]    record A dated B and record C dated D
+    --revert-to-revision [recid.revdate]  submit given record revision to
+    become current revision
 
 """
 

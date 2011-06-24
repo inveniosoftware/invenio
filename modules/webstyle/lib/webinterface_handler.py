@@ -27,6 +27,12 @@ specification,...
 
 __revision__ = "$Id$"
 
+## Import the remote debugger as a first thing, if allowed
+try:
+    import invenio.remote_debugger as remote_debugger
+except:
+    remote_debugger = None
+
 import urlparse
 import cgi
 import sys
@@ -331,6 +337,19 @@ def create_handler(root):
             profile_dump += '\nYou can use profile=%s or profile=memory' % existing_sorts
             req.write("\n<pre>%s</pre>" % profile_dump)
             return ret
+        elif 'debug' in args and args['debug']:
+            #remote_debugger.start(["3"]) # example starting debugger on demand
+            if remote_debugger:
+                debug_starter = remote_debugger.get_debugger(args['debug'])
+                if debug_starter:
+                    try:
+                        debug_starter()
+                    except Exception, msg:
+                        # TODO - should register_exception?
+                        raise Exception('Cannot start the debugger %s, please read instructions inside remote_debugger module. %s' % (debug_starter.__name__, msg))
+                else:
+                    raise Exception('Debugging requested, but no debugger registered: "%s"' % args['debug'])
+            return _handler(req)
         else:
             return _handler(req)
 
@@ -388,6 +407,13 @@ def create_handler(root):
                     register_exception(req=req, alert_admin=True)
                 raise
             except Exception:
+                # send the error message, much more convenient than log hunting
+                if remote_debugger:
+                    args = {}
+                    if req.args:
+                        args = cgi.parse_qs(req.args)
+                        if 'debug' in args:
+                            remote_debugger.error_msg(args['debug'])
                 register_exception(req=req, alert_admin=True)
                 raise
 

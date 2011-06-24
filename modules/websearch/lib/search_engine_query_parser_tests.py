@@ -159,6 +159,11 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
         self.assertEqual(self.parser.parse_query('"expr1" (expr2) expr3'),
                          ['+', '"expr1"', '+', 'expr2', '+', 'expr3'])
 
+    def test_sqpp_quoted_expr1_arrow_quoted_expr2(self):
+        """SearchQueryParenthesisedParser = \"expr1\"->\"expr2\""""
+        self.assertEqual(self.parser.parse_query('"expr1"->"expr2"'),
+                         ['+', '"expr1"->"expr2"'])
+
     def test_sqpp_paren_expr1_expr2_paren_expr3_or_expr4(self):
         """SearchQueryParenthesisedParser - (expr1) expr2 (expr3) | expr4"""
         # test parsing of queries with missing operators.
@@ -289,6 +294,21 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
         self.assertEqual(self.parser.parse_query('(U(1) or SL(2,Z))'),
                          ['+', 'u(1) | sl(2,z)'])
 
+    def test_sqpp_alternation_of_quote_marks_double(self):
+        """SearchQueryParenthesisedParser - Test refersto:(author:"s parke" or author:ellis)"""
+        self.assertEqual(self.parser.parse_query('refersto:(author:"s parke" or author:ellis)'),
+                         ['+', 'refersto:\'author:"s parke" | author:ellis\''])
+
+    def test_sqpp_alternation_of_quote_marks_single(self):
+        """SearchQueryParenthesisedParser - Test refersto:(author:'s parke' or author:ellis)"""
+        self.assertEqual(self.parser.parse_query('refersto:(author:\'s parke\' or author:ellis)'),
+                         ['+', 'refersto:"author:\'s parke\' | author:ellis"'])
+
+    def test_sqpp_alternation_of_quote_marks(self):
+        """SearchQueryParenthesisedParser - Test refersto:(author:"s parke")"""
+        self.assertEqual(self.parser.parse_query('refersto:(author:"s parke")'),
+                         ['+', 'refersto:author:"s parke"'])
+
     def test_sqpp_distributed_ands_equivalent(self):
         """SearchQueryParenthesisedParser - ellis and (kaluza-klein or r-parity) == ellis and (r-parity or kaluza-klein)"""
         self.assertEqual(sorted(perform_request_search(p='ellis and (kaluza-klein or r-parity)')),
@@ -308,6 +328,11 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
                          ['+', 'measurements', '+', 'of', '+', 'cp-conserving', '+', 'trilinear', '+', 'gauge', \
                           '+', 'boson', '+', 'couplings', '+', 'wwv', '+', 'v + gamma, + z', \
                           '+', 'in', '+', 'e(+)e(-)', '+', 'collisions', '+', 'at', '+', 'lep2'])
+
+    def test_sqpp_second_order_operator_operates_on_parentheses(self):
+        """SearchQueryParenthesisedParser - refersto:(author:ellis or author:hawking)"""
+        self.assertEqual(self.parser.parse_query('refersto:(author:ellis or author:hawking)'),
+                         ['+', 'refersto:"author:ellis | author:hawking"'])
 
 class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
     """Test SPIRES query parsing and translation to Invenio syntax."""
@@ -441,6 +466,18 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = 'find fa ellis'
         self._compare_searches(inv_search, spi_search)
 
+    def test_find_first_author_initial(self):
+        """SPIRES search syntax - find fa j ellis"""
+        inv_search = 'firstauthor:"ellis, j*"'
+        spi_search = 'find fa j ellis'
+        self._compare_searches(inv_search, spi_search)
+
+    def test_first_author_full_initial(self):
+        """SPIRES search syntax - find fa klebanov, ig.r."""
+        inv_search = 'firstauthor:"klebanov, ig* r*" or exactfirstauthor:"klebanov, i r"'
+        spi_search = "find fa klebanov, ig.r."
+        self._compare_searches(inv_search, spi_search)
+
     def test_citedby_author(self):
         """SPIRES search syntax - find citedby author doggy"""
         inv_search = 'citedby:author:doggy'
@@ -451,6 +488,24 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         """SPIRES search syntax - find refersto author kitty"""
         inv_search = 'refersto:author:kitty'
         spi_search = 'find refersto author kitty'
+        self._compare_searches(inv_search, spi_search)
+
+    def test_refersto_author_multi_name(self):
+        """SPIRES search syntax - find a ellis and refersto author \"parke, sj\""""
+        inv_search = 'author:ellis refersto:author:"parke, s. j."'
+        spi_search = 'find a ellis and refersto author "parke, s. j."'
+        self._compare_searches(inv_search, spi_search)
+
+    def test_refersto_author_multi_name_no_quotes(self):
+        """SPIRES search syntax - find a ellis and refersto author parke, sj"""
+        inv_search = 'author:ellis refersto:(author:"parke, sj*"  or exactauthor:"parke, s *"  or exactauthor:"parke, s")'
+        spi_search = "find a ellis and refersto author parke, sj"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_refersto_multi_word_no_quotes_no_index(self):
+        """SPIRES search syntax - find refersto s parke"""
+        inv_search = 'refersto:"s parke"'
+        spi_search = 'find refersto s parke'
         self._compare_searches(inv_search, spi_search)
 
     def test_citedby_refersto_author(self):
@@ -532,6 +587,12 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         inv_search = "affiliation:\"Penn State U\""
         self._compare_searches(inv_search, spi_search)
 
+    def test_distribution_with_many_clauses(self):
+        """SPIRES search syntax - find a mele and brooks and holtkamp and o'connell"""
+        spi_search = "find a mele and brooks and holtkamp and o'connell"
+        inv_search = "author:mele author:brooks author:holtkamp author:o'connell"
+        self._compare_searches(inv_search, spi_search)
+
     def test_keyword_as_kw(self):
         """SPIRES search syntax - find kw something ->keyword:something"""
         spi_search = "find kw meson"
@@ -548,6 +609,24 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         """SPIRES search syntax - journal Phys.Lett, 0903, 024 -> journal:Phys.Lett,0903,024"""
         spi_search = "find j Phys.Lett, 0903, 024"
         inv_search = "journal:Phys.Lett,0903,024"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_journal_search_with_colon(self):
+        """SPIRES search syntax - find j physics 1:195 -> journal:physics,1,195"""
+        spi_search = "find j physics 1:195"
+        inv_search = "journal:physics,1,195"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_journal_non_triple_syntax(self):
+        """SPIRES search syntax - find j physics jcap"""
+        spi_search = "find j physics jcap"
+        inv_search = "journal:physics and journal:jcap"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_journal_triple_with_many_spaces(self):
+        """SPIRES search syntax - find j physics        0903            024"""
+        spi_search = 'find j physics        0903            024'
+        inv_search = 'journal:physics,0903,024'
         self._compare_searches(inv_search, spi_search)
 
     def test_distribution_of_search_terms(self):
@@ -811,9 +890,15 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         self.assertEqual(inv_search, False)
 
     def test_spires_keyword_distribution_before_conjunctions(self):
-        """SPIRES search syntax - test find journal phys.lett 0903 024 => journal:phys.lett and journal:0903 and journal:024"""
-        spi_search = 'find journal phys.lett 0903 024'
-        inv_search = '(journal:phys.lett and journal:0903 and journal:024)'
+        """SPIRES search syntax - test find journal phys.lett. 0903 024"""
+        spi_search = 'find journal phys.lett. 0903 024'
+        inv_search = '(journal:phys.lett.,0903,024)'
+        self._compare_searches(inv_search, spi_search)
+
+    def test_spires_keyword_distribution_with_parens(self):
+        """SPIRES search syntax - test find cn d0 and (a abachi or abbott or abazov)"""
+        spi_search = "find cn d0 and (a abachi or abbott or abazov)"
+        inv_search = "collaboration:d0 and (author:abachi or author:abbott or author:abazov)"
         self._compare_searches(inv_search, spi_search)
 
     def test_simple_syntax_mixing(self):

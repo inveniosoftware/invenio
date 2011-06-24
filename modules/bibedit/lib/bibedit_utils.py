@@ -107,7 +107,7 @@ def cache_expired(recid, uid):
 def create_cache_file(recid, uid, record='', cache_dirty=False, pending_changes=[], disabled_hp_changes = {}, undo_list = [], redo_list=[]):
     """Create a BibEdit cache file, and return revision and record. This will
     overwrite any existing cache the user has for this record.
-datetime.
+    datetime.
 
     """
     if not record:
@@ -176,9 +176,9 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
     a BibEdit cache file, filter out the unchanged volatile subfields,
     write it back to an XML file and then pass this file to BibUpload.
 
-    @param xml_record - give XML as string in stead of reading cache file
-    @param to_upload - pass the XML file to BibUpload
-    @param to_merge - prepare an XML file for BibMerge to use
+    @param xml_record: give XML as string in stead of reading cache file
+    @param to_upload: pass the XML file to BibUpload
+    @param to_merge: prepare an XML file for BibMerge to use
 
     """
     if not xml_record:
@@ -565,7 +565,7 @@ def can_record_have_physical_copies(recid):
     (addable through the bibCirculation module).
     The information is derieved using the tabs displayed for a given record.
     Only records already saved within the collection may have the physical copies
-    @result True or False
+    @return: True or False
     """
     if get_record(recid) == None:
         return False

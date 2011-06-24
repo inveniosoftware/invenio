@@ -3961,8 +3961,10 @@ class Template:
             out = '<tr><td>' + scite + '</td></tr>'
         return out
 
-    def tmpl_author_information(self, req, pubs, authorname, num_downloads, aff_pubdict,
-                                citedbylist, kwtuples, authors, vtuples, names_dict, person_link, bibauthorid_data, ln):
+    def tmpl_author_information(self, req, pubs, authorname, num_downloads,
+                                aff_pubdict, citedbylist, kwtuples, authors,
+                                vtuples, names_dict, person_link,
+                                bibauthorid_data, ln, return_html=False):
         """Prints stuff about the author given as authorname.
            1. Author name + his/her institutes. Each institute I has a link
               to papers where the auhtor has I as institute.
@@ -3985,6 +3987,7 @@ class Template:
         from operator import itemgetter
         _ = gettext_set_language(ln)
         ib_pubs = intbitset(pubs)
+        html = []
 
         # construct an extended search as an interim solution for author id
         # searches. Will build "(exactauthor:v1 OR exactauthor:v2)" strings
@@ -4041,7 +4044,6 @@ class Template:
                 baid_query = extended_author_search_str
 
         baid_query = baid_query + " "
-
         sorted_names_list = sorted(names_dict.iteritems(), key=itemgetter(1),
                                    reverse=True)
 
@@ -4169,28 +4171,52 @@ class Template:
         except IndexError:
             display_name = "&nbsp;"
 
-        req.write('<h1>%s <span style="font-size:50%%;">(%s papers)</span></h1>'
-                  % (display_name, pubs_to_papers_link))
-#        req.write("<h1>%s</h1>" % (authorname))
+        headertext = ('<h1>%s <span style="font-size:50%%;">(%s papers)</span></h1>'
+                      % (display_name, pubs_to_papers_link))
+
+        if return_html:
+            html.append(headertext)
+        else:
+            req.write(headertext)
+            #req.write("<h1>%s</h1>" % (authorname))
 
         if person_link:
-            req.write('<div><a href="%s/person/%s?open_claim=True">%s</a></div>'
+            cmp_link = ('<div><a href="%s/person/%s?open_claim=True">%s</a></div>'
                       % (CFG_SITE_URL, person_link,
                          _("This is me.  Verify my publication list.")))
+            if return_html:
+                html.append(cmp_link)
+            else:
+                req.write(cmp_link)
 
-        req.write("<table width=80%><tr valign=top><td>")
-        req.write(names_box)
-        req.write("<br />")
-        req.write(papers_box)
-        req.write("<br />")
-        req.write(keyword_box)
-        req.write("</td>")
-        req.write("<td>&nbsp;</td>")
-        req.write("<td>")
-        req.write(affiliations_box)
-        req.write("<br />")
-        req.write(coauthor_box)
-        req.write("</td></tr></table>")
+        if return_html:
+            html.append("<table width=80%><tr valign=top><td>")
+            html.append(names_box)
+            html.append("<br />")
+            html.append(papers_box)
+            html.append("<br />")
+            html.append(keyword_box)
+            html.append("</td>")
+            html.append("<td>&nbsp;</td>")
+            html.append("<td>")
+            html.append(affiliations_box)
+            html.append("<br />")
+            html.append(coauthor_box)
+            html.append("</td></tr></table>")
+        else:
+            req.write("<table width=80%><tr valign=top><td>")
+            req.write(names_box)
+            req.write("<br />")
+            req.write(papers_box)
+            req.write("<br />")
+            req.write(keyword_box)
+            req.write("</td>")
+            req.write("<td>&nbsp;</td>")
+            req.write("<td>")
+            req.write(affiliations_box)
+            req.write("<br />")
+            req.write(coauthor_box)
+            req.write("</td></tr></table>")
 
         # print citations:
         rec_query = baid_query
@@ -4202,7 +4228,15 @@ class Template:
             if not pubs:
                 line2 = _("No Citation Information available")
 
-            req.write(self.tmpl_print_searchresultbox(line1, line2))
+            sr_box = self.tmpl_print_searchresultbox(line1, line2)
+
+            if return_html:
+                html.append(sr_box)
+            else:
+                req.write(sr_box)
+
+        if return_html:
+            return "\n".join(html)
 
         # print frequent co-authors:
 #        collabstr = ""

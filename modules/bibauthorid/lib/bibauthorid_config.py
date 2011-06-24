@@ -39,7 +39,7 @@ try:
         CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH, \
         CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N, \
         CFG_BIBAUTHORID_EXTERNAL_CLAIMED_RECORDS_KEY, \
-        CFG_BIBAUTHORID_ATTACH_VA_TO_MULTIPLE_RAS ,\
+        CFG_BIBAUTHORID_ATTACH_VA_TO_MULTIPLE_RAS , \
         CFG_BIBAUTHORID_ENABLED, \
         CFG_BIBAUTHORID_ON_AUTHORPAGES
 except ImportError:
@@ -67,6 +67,9 @@ CLAIMPAPER_CHANGE_OWN_DATA = 'claimpaper_change_own_data'
 CLAIMPAPER_CHANGE_OTHERS_DATA = 'claimpaper_change_others_data'
 CLAIMPAPER_CLAIM_OWN_PAPERS = 'claimpaper_claim_own_papers'
 CLAIMPAPER_CLAIM_OTHERS_PAPERS = 'claimpaper_claim_others_papers'
+
+#Number of persons in a search result for which the first five papers will be shown
+PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT = 10
 
 CMPROLESLCUL = {'guest': 0,
                 CLAIMPAPER_USER_ROLE: 25,

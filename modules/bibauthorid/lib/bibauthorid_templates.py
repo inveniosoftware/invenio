@@ -26,13 +26,14 @@
 #from cgi import escape
 #from urllib import quote
 #
+import invenio.bibauthorid_config as bconfig
 from invenio.config import CFG_SITE_LANG
 from invenio.config import CFG_SITE_URL
 from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 from invenio.bibformat import format_record
 from invenio.session import get_session
 from invenio.search_engine import get_fieldvalues
-from invenio.bibauthorid_webapi import get_bibref_name_string, get_person_redirect_link
+from invenio.bibauthorid_webapi import get_bibref_name_string, get_person_redirect_link, get_canonical_id_from_person_id
 from invenio.messages import gettext_set_language, wash_language
 #from invenio.textutils import encode_for_xml
 
@@ -523,13 +524,14 @@ class Template:
         h("</thead>")
         h("<tbody>")
 
-        for paper in bibrecids:
+
+        for idx, paper in enumerate(bibrecids):
             h('  <tr style="padding-top: 6px; padding-bottom: 6px;">')
 
             h('    <td><input type="checkbox" name="selection" '
                            'value="%s" /> </td>' % (paper['bibref']))
             rec_info = format_record(paper['recid'], "ha")
-
+            rec_info = str(idx + 1) + '.  ' + rec_info
             h("    <td>%s</td>" % (rec_info))
             h("    <td>%s</td>" % (paper['authorname'].encode("utf-8")))
             aff = ""
@@ -886,7 +888,16 @@ class Template:
             h('  <div id="tabData">')
             r = verbiage_dict['data_ns']
             h('<noscript><h5>%s</h5></noscript>' % r)
-            h('  <b>' + self._('This tab is currently under construction') + '</p>')
+            canonical_name = get_canonical_id_from_person_id(person_id)
+            h('<div> <strong> Canonical name setup </strong>')
+            h('<div style="margin-top: 15px;"> Current canonical name: %s  <form method="GET" action="%s/person/action">' % (canonical_name, CFG_SITE_URL))
+            h('<input type="hidden" name="set_canonical_name" value="True" />')
+            h('<input name="canonical_name" id="canonical_name" type="text" style="border:1px solid #333; width:500px;" value="%s" /> ' % canonical_name)
+            h('<input type="hidden" name="pid" value="%s" />' % person_id)
+            h('<input type="submit" value="set canonical name" class="aid_btn_blue" />')
+            h('</form> </div></div>')
+
+            h('  <b><b>' + self._('... This tab is currently under construction ... ') + '</p>')
             h("  </div>")
 
         h("</div>")
@@ -1157,79 +1168,14 @@ class Template:
             and "tickets" in pinfo["checkout_faulty_fields"]):
             h(self.tmpl_error_box(self._("Please provide at least one transaction."), self._("Error:")))
 
-        h('<div id="aid_checkout_teaser">' +
-          self._('Almost done! Please use the button "Confirm these changes" '
-                 'at the end of the page to send this request to an operator '
-                 'for review!') + '</div>')
+#        h('<div id="aid_checkout_teaser">' +
+#          self._('Almost done! Please use the button "Confirm these changes" '
+#                 'at the end of the page to send this request to an operator '
+#                 'for review!') + '</div>')
 
         h('<div id="aid_person_names" '
           'class="ui-tabs ui-widget ui-widget-content ui-corner-all"'
           'style="padding:10px;">')
-
-        h('<table width="100%" border="0" cellspacing="0" cellpadding="4">')
-
-        if not ulevel == "guest":
-            h('<tr>')
-            h("<td colspan='5'><h4>" + self._('Mark as your documents') + "</h4></td>")
-            h('</tr>')
-
-            if mark_yours:
-                for idx, ticket in enumerate(mark_yours):
-                    h('<tr id="aid_result%s">' % ((idx + 1) % 2))
-                    h(mk_ticket_row(ticket))
-                    h('</tr>')
-            else:
-                h('<tr>')
-                h('<td width="25">&nbsp;</td>')
-                h('<td colspan="4">Nothing staged as yours</td>')
-                h("</tr>")
-
-            h('<tr>')
-            h("<td colspan='5'><h4>" + self._("Mark as _not_ your documents") + "</h4></td>")
-            h('</tr>')
-
-            if mark_not_yours:
-                for idx, ticket in enumerate(mark_not_yours):
-                    h('<tr id="aid_result%s">' % ((idx + 1) % 2))
-                    h(mk_ticket_row(ticket))
-                    h('</tr>')
-            else:
-                h('<tr>')
-                h('<td width="25">&nbsp;</td>')
-                h('<td colspan="4">' + self._('Nothing staged as not yours') + '</td>')
-                h("</tr>")
-
-        h('<tr>')
-        h("<td colspan='5'><h4>" + self._('Mark as their documents') + "</h4></td>")
-        h('</tr>')
-
-        if mark_theirs:
-            for idx, ticket in enumerate(mark_theirs):
-                h('<tr id="aid_result%s">' % ((idx + 1) % 2))
-                h(mk_ticket_row(ticket))
-                h('</tr>')
-        else:
-            h('<tr>')
-            h('<td width="25">&nbsp;</td>')
-            h('<td colspan="4">' + self._('Nothing staged in this category') + '</td>')
-            h("</tr>")
-
-        h('<tr>')
-        h("<td colspan='5'><h4>" + self._('Mark as _not_ their documents') + "</h4></td>")
-        h('</tr>')
-
-        if mark_not_theirs:
-            for idx, ticket in enumerate(mark_not_theirs):
-                h('<tr id="aid_result%s">' % ((idx + 1) % 2))
-                h(mk_ticket_row(ticket))
-                h('</tr>')
-        else:
-            h('<tr>')
-            h('<td width="25">&nbsp;</td>')
-            h('<td colspan="4">' + self._('Nothing staged in this category') + '</td>')
-            h("</tr>")
-
-        h('</table>')
 
         h("<h4>" + self._('Please provide your information') + "</h4>")
         h('<form id="final_review" action="%s/person/action" method="post">'
@@ -1304,6 +1250,75 @@ class Template:
         h('</span>')
         h('</div>')
         h("</form>")
+        h('</div>')
+
+        h('<div id="aid_person_names" '
+          'class="ui-tabs ui-widget ui-widget-content ui-corner-all"'
+          'style="padding:10px;">')
+        h('<table width="100%" border="0" cellspacing="0" cellpadding="4">')
+
+        if not ulevel == "guest":
+            h('<tr>')
+            h("<td colspan='5'><h4>" + self._('Mark as your documents') + "</h4></td>")
+            h('</tr>')
+
+            if mark_yours:
+                for idx, ticket in enumerate(mark_yours):
+                    h('<tr id="aid_result%s">' % ((idx + 1) % 2))
+                    h(mk_ticket_row(ticket))
+                    h('</tr>')
+            else:
+                h('<tr>')
+                h('<td width="25">&nbsp;</td>')
+                h('<td colspan="4">Nothing staged as yours</td>')
+                h("</tr>")
+
+            h('<tr>')
+            h("<td colspan='5'><h4>" + self._("Mark as _not_ your documents") + "</h4></td>")
+            h('</tr>')
+
+            if mark_not_yours:
+                for idx, ticket in enumerate(mark_not_yours):
+                    h('<tr id="aid_result%s">' % ((idx + 1) % 2))
+                    h(mk_ticket_row(ticket))
+                    h('</tr>')
+            else:
+                h('<tr>')
+                h('<td width="25">&nbsp;</td>')
+                h('<td colspan="4">' + self._('Nothing staged as not yours') + '</td>')
+                h("</tr>")
+
+        h('<tr>')
+        h("<td colspan='5'><h4>" + self._('Mark as their documents') + "</h4></td>")
+        h('</tr>')
+
+        if mark_theirs:
+            for idx, ticket in enumerate(mark_theirs):
+                h('<tr id="aid_result%s">' % ((idx + 1) % 2))
+                h(mk_ticket_row(ticket))
+                h('</tr>')
+        else:
+            h('<tr>')
+            h('<td width="25">&nbsp;</td>')
+            h('<td colspan="4">' + self._('Nothing staged in this category') + '</td>')
+            h("</tr>")
+
+        h('<tr>')
+        h("<td colspan='5'><h4>" + self._('Mark as _not_ their documents') + "</h4></td>")
+        h('</tr>')
+
+        if mark_not_theirs:
+            for idx, ticket in enumerate(mark_not_theirs):
+                h('<tr id="aid_result%s">' % ((idx + 1) % 2))
+                h(mk_ticket_row(ticket))
+                h('</tr>')
+        else:
+            h('<tr>')
+            h('<td width="25">&nbsp;</td>')
+            h('<td colspan="4">' + self._('Nothing staged in this category') + '</td>')
+            h("</tr>")
+
+        h('</table>')
         h("</div>")
         h("<p>")
         h(self._("  * You can come back to this page later. Nothing will be lost. <br />"))
@@ -1412,13 +1427,14 @@ class Template:
                             % (name[0]))
             h('</div>')
             h('<em style="padding-left:1.5em;">')
-            h(('<a href="#" id="aid_moreinfolink" class="mpid%s">'
-                        '<img src="../img/aid_plus_16.png" '
-                        'alt = "toggle additional information." '
-                        'width="11" height="11"/> '
-                        + self._('Recent Papers') +
-                        '</a></em>')
-                        % (pid))
+            if index < bconfig.PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT:
+                h(('<a href="#" id="aid_moreinfolink" class="mpid%s">'
+                            '<img src="../img/aid_plus_16.png" '
+                            'alt = "toggle additional information." '
+                            'width="11" height="11"/> '
+                            + self._('Recent Papers') +
+                            '</a></em>')
+                            % (pid))
 
             if search_ticket:
                 link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, pid)
@@ -1441,7 +1457,7 @@ class Template:
                                get_person_redirect_link(pid)))
             h('<div class="more-mpid%s" id="aid_moreinfo">' % (pid))
 
-            if papers:
+            if papers and index < bconfig.PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT:
                 h((self._('Showing the') + ' %d ' + self._('most recent documents:')) % len(papers))
                 h("<ul>")
 
@@ -1450,8 +1466,10 @@ class Template:
                            % (format_record(paper[0], "ha")))
 
                 h("</ul>")
-            else:
+            elif not papers:
                 h("<p>" + self._('Sorry, there are no documents known for this person') + "</p>")
+            elif index >= bconfig.PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT:
+                h("<p>" + self._('Information not shown to increase performances. Please refine your search.') + "</p>")
 
             h(('<span style="margin-left: 40px;">'
                         '<em><a href="%s/%s/%s" target="_blank" id="aid_moreinfolink">'

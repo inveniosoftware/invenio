@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: Invenio 1.0.0-rc0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2010-12-21 09:26+0100\n"
-"PO-Revision-Date: 2011-03-30 16:29+0200\n"
+"PO-Revision-Date: 2011-06-15 10:47+0200\n"
 "Last-Translator: Andrey Tremba <metandrey@gmail.com>\n"
 "Language-Team: RU <info@invenio-software.org>\n"
 "Language: \n"
@@ -7187,9 +7187,8 @@ msgid "Hacking Pages"
 msgstr "Документация для разработчиков"
 
 #: modules/webstyle/lib/webdoc_webinterface.py:157
-#, fuzzy
 msgid "Hacking Invenio"
-msgstr ""
+msgstr "Документация для разработчиков Invenio"
 
 #: modules/webstyle/lib/webdoc_webinterface.py:159
 msgid "Latest modifications:"
@@ -11723,9 +11722,6 @@ msgstr ""
 
 #~ msgid "Please send an error report to the Administrator."
 #~ msgstr "Пожалуйста отошлите сообщение об ошибке Администратору."
-
-#~ msgid "Hacking Invenio"
-#~ msgstr "Документация для разработчиков Invenio"
 
 #~ msgid "Invalid parameter"
 #~ msgstr "неверный параметр"
