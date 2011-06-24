@@ -599,6 +599,12 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         inv_search = "keyword:meson"
         self._compare_searches(inv_search, spi_search)
 
+    def test_recid(self):
+        """SPIRES search syntax - find recid 11111"""
+        spi_search = 'find recid 111111'
+        inv_search = 'recid:111111'
+        self._compare_searches(inv_search, spi_search)
+
     def test_desy_keyword_translation(self):
         """SPIRES search syntax - find dk "B --> pi pi" """
         spi_search = "find dk \"B --> pi pi\""

@@ -529,6 +529,8 @@ class SpiresToInvenioSyntaxConverter:
         'ps' : '650__a:',
         'scl' : '650__a:',
         'status' : '650__a:',
+        # recid
+        'recid' : 'recid:',
         # report number
         'r' : 'reportnumber:',
         'rn' : 'reportnumber:',
