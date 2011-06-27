@@ -27,7 +27,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-import datetime, time, cgi, types
+import datetime, time, types
 
 # Others Invenio imports
 from invenio.config import \
@@ -1131,7 +1131,7 @@ def register_new_loan(req, barcode, borrower_id,
                 register_customevent("loanrequest", [request_id, last_id])
             except:
                 register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
-            requested_barcode = db.get_requested_barcode(request_id)
+            #requested_barcode = db.get_requested_barcode(request_id)
 
             tag_all_requests_as_done(barcode, borrower_id)
 
@@ -3117,17 +3117,16 @@ def add_new_copy_step4(req, barcode, library, location, collection, description,
         and status in [CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF,
                        CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN,
                        CFG_BIBCIRCULATION_ITEM_STATUS_IN_PROCESS]:
-            infos.append(_("The status selected does not accept tamporary barcodes."))
-            title = _("Add new copy") + " - III"
-            tmp_barcode = generate_tmp_barcode()
-            body  = bc_templates.tmpl_add_new_copy_step3(recid=recid,
-                                                    result=result,
-                                                    libraries=libraries,
-                                                    original_copy_barcode=None,
-                                                    tmp_barcode=tmp_barcode,
-                                                    infos=infos,
-                                                    ln=ln)
-
+        infos.append(_("The status selected does not accept tamporary barcodes."))
+        title = _("Add new copy") + " - III"
+        tmp_barcode = generate_tmp_barcode()
+        body  = bc_templates.tmpl_add_new_copy_step3(recid=recid,
+                                                     result=result,
+                                                     libraries=libraries,
+                                                     original_copy_barcode=None,
+                                                     tmp_barcode=tmp_barcode,
+                                                     infos=infos,
+                                                     ln=ln)
 
     else:
         library_name = db.get_library_name(library)
@@ -5020,7 +5019,7 @@ def acq_details_step1(req, delete_key, ill_request_id, new_status,
 def ill_request_details_step2(req, delete_key, ill_request_id, new_status,
                               library_id, request_date, expected_date,
                               arrival_date, due_date, return_date,
-                              cost, currency, barcode, library_notes,
+                              cost, _currency, barcode, library_notes,
                               book_info, article_info, ln=CFG_SITE_LANG):
 
     #id_user = getUid(req)
@@ -5094,15 +5093,15 @@ def acq_details_step2(req, delete_key, ill_request_id, new_status,
         library_previous_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = \
                                                             str(library_notes)
 
-    if new_status == CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED:
-        borrower_id = db.get_ill_borrower(ill_request_id)
+    #if new_status == CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED:
+    #    borrower_id = db.get_ill_borrower(ill_request_id)
 
     db.update_acq_request(ill_request_id, library_id, request_date,
                           expected_date, arrival_date, due_date, return_date,
                           new_status, cost, budget_code,
                           str(library_previous_notes))
 
-    request_type = db.get_ill_request_type(ill_request_id)
+    #request_type = db.get_ill_request_type(ill_request_id)
 
     db.update_ill_request_item_info(ill_request_id, item_info)
 
@@ -6188,7 +6187,7 @@ def register_ill_request_from_borrower_page_step2(req, borrower_id, title,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def register_purchase_request_step1(req, recid, req_type, title, authors,
+def register_purchase_request_step1(req, recid, request_type, title, authors,
                         place, publisher, year, edition, this_edition_only,
                         isbn, standard_number,
                         budget_code, cash, period_of_interest_from,
@@ -6216,7 +6215,7 @@ def register_purchase_request_step1(req, recid, req_type, title, authors,
          isbn, publisher) = book_information_from_MARC(int(recid))
 
     body = bc_templates.tmpl_register_purchase_request_step1(infos=infos,
-                                fields=(req_type, title, authors, place, publisher,
+                                fields=(request_type, title, authors, place, publisher,
                                         year, edition, this_edition_only,
                                         isbn, standard_number,
                                         budget_code, cash,
@@ -6236,7 +6235,7 @@ def register_purchase_request_step1(req, recid, req_type, title, authors,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def register_purchase_request_step2(req, type, title, authors,
+def register_purchase_request_step2(req, request_type, title, authors,
                         place, publisher, year, edition, this_edition_only,
                         isbn, standard_number,
                         budget_code, cash, period_of_interest_from,
@@ -6262,7 +6261,7 @@ def register_purchase_request_step2(req, type, title, authors,
     if cash and budget_code == '':
         budget_code = 'cash'
 
-    fields = (type, title, authors, place, publisher, year, edition,
+    fields = (request_type, title, authors, place, publisher, year, edition,
               this_edition_only, isbn, standard_number, budget_code,
               cash, period_of_interest_from, period_of_interest_to,
               additional_comments)
@@ -6332,7 +6331,7 @@ def register_purchase_request_step2(req, type, title, authors,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def register_purchase_request_step3(req, type, title, authors,
+def register_purchase_request_step3(req, request_type, title, authors,
                         place, publisher, year, edition, this_edition_only,
                         isbn, standard_number,
                         budget_code, cash, period_of_interest_from,
@@ -6358,7 +6357,7 @@ def register_purchase_request_step3(req, type, title, authors,
     if budget_code == '' and not cash:
         infos.append(_("Payment method information is mandatory. Please, type your budget code or tick the 'cash' checkbox."))
         body = bc_templates.tmpl_register_purchase_request_step1(infos=infos,
-                                fields=(type, title, authors, place, publisher,
+                                fields=(request_type, title, authors, place, publisher,
                                         year, edition, this_edition_only,
                                         isbn, standard_number,
                                         budget_code, cash,
@@ -6387,7 +6386,7 @@ def register_purchase_request_step3(req, type, title, authors,
                                         period_of_interest_to,
                                         CFG_BIBCIRCULATION_ACQ_STATUS_NEW,
                                         str(ill_request_notes),
-                                        this_edition_only, type, budget_code)
+                                        this_edition_only, request_type, budget_code)
 
         return redirect_to_url(req,
                 '%s/admin2/bibcirculation/list_acquisition?ln=%s&status=%s' % \

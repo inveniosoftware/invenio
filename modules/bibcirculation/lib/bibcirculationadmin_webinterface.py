@@ -1895,7 +1895,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
                 'additional_comments': (str, ''), 'ln': (str, "en")})
 
         recid = argd['recid'].strip()
-        req_type = argd['type'].strip()
+        request_type = argd['type'].strip()
         title = argd['title'].strip()
         authors = argd['authors'].strip()
         place = argd['place'].strip()
@@ -1912,7 +1912,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         additional_comments = argd['additional_comments'].strip()
         ln = argd['ln']
 
-        return bal.register_purchase_request_step1(req, recid, req_type, title,
+        return bal.register_purchase_request_step1(req, recid, request_type, title,
                                 authors, place, publisher, year, edition,
                                 this_edition_only, isbn, standard_number,
                                 budget_code, cash, period_of_interest_from,
@@ -1932,7 +1932,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
                 'additional_comments': (str, ''), 'p': (str, ''),
                 'f': (str, ''), 'ln': (str, "en")})
 
-        type = argd['type'].strip()
+        request_type = argd['type'].strip()
         title = argd['title'].strip()
         authors = argd['authors'].strip()
         place = argd['place'].strip()
@@ -1951,7 +1951,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         f = argd['f'].strip()
         ln = argd['ln']
 
-        return bal.register_purchase_request_step2(req, type, title, authors,
+        return bal.register_purchase_request_step2(req, request_type, title, authors,
                         place, publisher, year, edition, this_edition_only,
                         isbn, standard_number, budget_code, cash,
                         period_of_interest_from, period_of_interest_to,
@@ -1970,7 +1970,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
                 'additional_comments': (str, ''),
                 'borrower_id': (str, ''), 'ln': (str, "en")})
 
-        type = argd['type'].strip()
+        request_type = argd['type'].strip()
         title = argd['title'].strip()
         authors = argd['authors'].strip()
         place = argd['place'].strip()
@@ -1988,7 +1988,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         borrower_id = argd['borrower_id'].strip()
         ln = argd['ln']
 
-        return bal.register_purchase_request_step3(req, type, title, authors,
+        return bal.register_purchase_request_step3(req, request_type, title, authors,
                         place, publisher, year, edition, this_edition_only,
                         isbn, standard_number,
                         budget_code, cash, period_of_interest_from,

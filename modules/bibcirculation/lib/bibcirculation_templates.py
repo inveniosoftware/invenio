@@ -1682,9 +1682,9 @@ onClick="location.href='%s/admin2/bibcirculation/associate_barcode?ln=%s&request
                   <br />"""
 
         for info in infos:
-                out += """<div class="infobox">"""
-                out += info
-                out += """</div> <br /> """
+            out += """<div class="infobox">"""
+            out += info
+            out += """</div> <br /> """
 
         if len(result) > 0:
             out += """
@@ -3107,7 +3107,6 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
             </style>
             <script src="/js/jquery/jquery.min.js" type="text/javascript"></script>
             <script src="/js/jquery/jquery.tablesorter.js" type="text/javascript"></script>
-
             <style type="text/css">
                 @import url("/js/jquery/tablesorter/themes/blue/style.css");
             </style>
@@ -11631,7 +11630,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                   _("Options"))
 
         for (ill_request_id, borrower_id, borrower_name, vendor_id,
-             ill_status, period_from, _period_to, due_date, item_info, cost,
+             ill_status, period_from, _period_to, _due_date, item_info, cost,
              request_type) in ill_req:
 
             borrower_link = create_html_link(CFG_SITE_URL +
@@ -11716,8 +11715,6 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                             CFG_BIBCIRCULATION_ILL_STATUS_REQUESTED,
                             CFG_BIBCIRCULATION_ILL_STATUS_RECEIVED,
                             CFG_BIBCIRCULATION_ILL_STATUS_CANCELLED]
-
-        acq_statuses = []
 
         _ = gettext_set_language(ln)
 
@@ -12697,7 +12694,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
         out = load_menu(ln)
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style  type="text/css"> @import url("/img/tablesorter.css"); </style>
             <script type="text/javascript" language='JavaScript'
                     src="%s/js/jquery/jquery.min.js"></script>
             <script type="text/javascript" language='JavaScript'
@@ -12710,7 +12707,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
          budget_code, request_type) = ill_request_borrower_details
 
         (library_id, request_date, expected_date, arrival_date, due_date,
-         return_date, cost, barcode, library_notes,
+         return_date, cost, _barcode, library_notes,
          ill_status) = ill_request_details
 
         if library_notes == '' or library_notes == None:
@@ -16670,10 +16667,10 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
             form_url = CFG_SITE_URL+'/ill/acq_request_step2'
 
         if fields is not None:
-            (type, title, authors, place, publisher, year, edition,
-             this_edition_only, isbn, standard_number, budget_code, cash,
-             period_of_interest_from, period_of_interest_to,
-             additional_comments) = fields
+            (request_type, title, authors, place, publisher, year, edition,
+             this_edition_only, isbn, standard_number, _budget_code, cash,
+             _period_of_interest_from, _period_of_interest_to,
+             _additional_comments) = fields
 
         if cash:
             checked_cash = 'checked'
@@ -16717,7 +16714,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                 """ % (_("Document details"), _("Document type"))
 
         for acq_type in CFG_BIBCIRCULATION_ACQ_TYPE:
-            if type == acq_type or type == '':
+            if request_type == acq_type or request_type == '':
                 out += """
                                 <OPTION VALUE="%s" selected="selected">%s
                 """ % (acq_type, acq_type)
@@ -16811,7 +16808,6 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                   checked_edition, _("This edition only"),
                   _("ISBN"), isbn,
                   _("Standard number"), standard_number)
-        # type, title, author, place, publisher, year, edition, isbn, standard_number
 
         out += """
             <script type="text/javascript" language='JavaScript'
@@ -16897,7 +16893,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                                              p, f, ln=CFG_SITE_LANG):
 
         if fields is not None:
-            (type, title, authors, place, publisher, year, edition,
+            (request_type, title, authors, place, publisher, year, edition,
              this_edition_only, isbn, standard_number, budget_code, cash,
              period_of_interest_from, period_of_interest_to,
              additional_comments) = fields
@@ -16990,7 +16986,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                      </td>
         """ % (CFG_SITE_URL,
              _("Item details"),
-             _("Type"), type, type,
+             _("Type"), request_type, request_type,
              _("Title"), title, title,
              _("Author(s)"), authors, authors,
              _("Place"), place, place,
@@ -17119,8 +17115,9 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                    budget_code, cash, period_of_interest_from,
                    period_of_interest_to, additional_comments)
 
-            for (borrower_id, ccid, name, email,
-                 phone, address, mailbox) in result:
+            for borrower_info in result:
+                borrower_id = borrower_info[0]
+                name = borrower_info[2]
                 out += """
                        <option value =%s>%s</option>
                        """ % (borrower_id, name)

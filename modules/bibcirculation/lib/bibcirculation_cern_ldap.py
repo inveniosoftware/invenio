@@ -26,7 +26,7 @@ except (ImportError, IOError):
     CFG_BIBCIRCULATION_HAS_LDAP = False
 
 from thread import get_ident
-from base64 import decodestring
+# from base64 import decodestring
 
 # This is the old configuration
 # CFG_CERN_LDAP_URI  = "ldaps://ldap.cern.ch:636"
@@ -71,9 +71,9 @@ def get_user_info_from_ldap(nickname="", email="", ccid=""):
 
     try:
 
-        filter = "(& %s (| (employeetype=primary) (employeetype=external) ) )" % query
+        query_filter = "(& %s (| (employeetype=primary) (employeetype=external) ) )" % query
         result = connection.search_st(CFG_CERN_LDAP_BASE, ldap.SCOPE_SUBTREE,
-                                      filter, timeout=5)
+                                      query_filter, timeout=5)
         if result and nickname:
             return result[0][1]
         else:

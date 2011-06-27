@@ -882,7 +882,6 @@ def generate_tmp_barcode():
     tmp_barcode = 'tmp-' + str(random.random())[-8:]
 
     while(db.barcode_in_use(tmp_barcode)):
-        random_number = generate
         tmp_barcode = 'tmp-' + str(random.random())[-8:]
 
     return tmp_barcode

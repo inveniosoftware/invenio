@@ -169,7 +169,8 @@ def must_send_third_recall(date_letters):
 def update_borrowers_information():
     list_of_borrowers = db.get_all_borrowers()
 
-    for (user_id, ccid) in list_of_borrowers:
+    for borrower in list_of_borrowers:
+        user_id = borrower[0]
         update_user_info_from_ldap(user_id)
 
 
@@ -184,7 +185,8 @@ def task_run_core():
         total_borrowers = len(list_of_borrowers)
         done  = 0
 
-        for (user_id, ccid) in list_of_borrowers:
+        for borrower in list_of_borrowers:
+            user_id = borrower[0]
             update_user_info_from_ldap(user_id)
             done+=1
             task_update_progress("Done %d out of %d." % (done, total_borrowers))

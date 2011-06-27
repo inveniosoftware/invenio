@@ -448,7 +448,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                 'period_of_interest_to': (str, ''),
                 'additional_comments': (str, ''), 'ln': (str, "en")})
 
-        type = argd['type'].strip()
+        request_type = argd['type'].strip()
         title = argd['title'].strip()
         authors = argd['authors'].strip()
         place = argd['place'].strip()
@@ -465,7 +465,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         additional_comments = argd['additional_comments'].strip()
         ln = argd['ln']
 
-        fields = (type, title, authors, place, publisher, year, edition,
+        fields = (request_type, title, authors, place, publisher, year, edition,
                   this_edition_only, isbn, standard_number, budget_code,
                   cash, period_of_interest_from, period_of_interest_to,
                   additional_comments)
@@ -498,7 +498,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
             body = "wrong user id"
         else:
             body = bc_templates.tmpl_register_purchase_request_step1([], fields,
-                                                            False, argd['ln'])
+                                                            False, ln)
 
         return page(title       = _("Purchase request"),
                     body        = body,
@@ -520,7 +520,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                 'period_of_interest_to': (str, ''),
                 'additional_comments': (str, ''), 'ln': (str, "en")})
 
-        type = argd['type'].strip()
+        request_type = argd['type'].strip()
         title = argd['title'].strip()
         authors = argd['authors'].strip()
         place = argd['place'].strip()
@@ -537,7 +537,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         additional_comments = argd['additional_comments'].strip()
         ln = argd['ln']
 
-        fields = (type, title, authors, place, publisher, year, edition,
+        fields = (request_type, title, authors, place, publisher, year, edition,
                   this_edition_only, isbn, standard_number, budget_code,
                   cash, period_of_interest_from, period_of_interest_to,
                   additional_comments)
@@ -569,14 +569,8 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         if budget_code == '' and not cash:
             infos.append(_("Payment method information is mandatory. Please, type your budget code or tick the 'cash' checkbox."))
             body = bc_templates.tmpl_register_purchase_request_step1(infos=infos,
-                                    fields=(type, title, authors, place, publisher,
-                                            year, edition, this_edition_only,
-                                            isbn, standard_number,
-                                            budget_code, cash,
-                                            period_of_interest_from,
-                                            period_of_interest_to,
-                                            additional_comments),
-                                    ln=ln)
+                                                                fields=fields,
+                                                                ln=ln)
         else:
             borrower_id = db.get_borrower_id_by_email(\
                                             db.get_invenio_user_email(uid))
@@ -599,7 +593,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                                             period_of_interest_to,
                                             CFG_BIBCIRCULATION_ACQ_STATUS_NEW,
                                             str(ill_request_notes),
-                                            this_edition_only, type,
+                                            this_edition_only, request_type,
                                             budget_code)
 
             body = bc_templates.tmpl_message_purchase_request_send_ok_other(ln=ln)
