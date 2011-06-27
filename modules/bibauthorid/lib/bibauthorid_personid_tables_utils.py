@@ -119,7 +119,8 @@ def get_recids_affected_since(last_timestamp):
     for v in values:
         if ',' in v[0] and ':' in v[0]:
             vset.add(v[0].split(',')[1])
-    return list(vset)
+    # transform output to list of integers, since we are returning recIDs:
+    return [int(recid) for recid in list(vset)]
 
 def get_persons_affected_since(last_timestamp, return_alt_names=False, return_all_person_papers=False):
     recids = get_recids_affected_since(last_timestamp)

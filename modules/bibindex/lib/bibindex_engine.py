@@ -1061,6 +1061,17 @@ class WordTable:
             write_message( "No new records added. %s is up to date" % self.tablename)
         else:
             self.add_recIDs(alist, opt_flush)
+        # special case of author indexes where we need to re-index
+        # those records that were affected by changed BibAuthorID
+        # attributions:
+        if self.index_name in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor'):
+            from invenio.bibauthorid_personid_tables_utils import get_recids_affected_since
+            # dates[1] is ignored, since BibAuthorID API does not offer upper limit search
+            alist = create_range_list(get_recids_affected_since(dates[0]))
+            if not alist:
+                write_message( "No new records added by author canonical IDs. %s is up to date" % self.tablename)
+            else:
+                self.add_recIDs(alist, opt_flush)
 
     def add_recID_range(self, recID1, recID2):
         """Add records from RECID1 to RECID2."""
