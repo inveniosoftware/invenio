@@ -154,6 +154,13 @@ PERSONID_CNP_FLAG_MINUS1 = 0.5
 PERSONID_UPFA_PPLMF = -1
 
 
+# Update/disambiguation process surname list creation method
+# Can be either 'mysql' or 'regexp'.
+# 'mysql' is inerently slow but accurate, 'regexp' is really really fast, but with potentially
+#different results. 'mysql' left in for compatibility.
+BIBAUTHORID_LIST_CREATION_METHOD = 'regexp'
+
+
 #Tables Utils debug output
 TABLES_UTILS_DEBUG = False
 
@@ -228,6 +235,9 @@ LOGGER = logging.getLogger("Dummy")
 LOGGER.addHandler(DEFAULT_HANDLER)
 LOGGER.setLevel(LOG_LEVEL)
 
+## force skip ui arxiv stub page (specific fore inspire)
+BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = True
+BIBAUTHORID_CFG_INSPIRE_LOGIN = 'https://arxiv.org/inspire_login'
 
 if not LOGGERS:
     LOGGERS.append(logging.getLogger("Dummy"))

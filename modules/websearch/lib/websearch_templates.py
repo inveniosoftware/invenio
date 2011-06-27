@@ -4273,7 +4273,7 @@ class Template:
             #req.write("<h1>%s</h1>" % (authorname))
 
         if person_link:
-            cmp_link = ('<div><a href="%s/person/%s?open_claim=True">%s</a></div>'
+            cmp_link = ('<div><a href="%s/person/claimstub?person=%s">%s</a></div>'
                       % (CFG_SITE_URL, person_link,
                          _("This is me.  Verify my publication list.")))
             if return_html:

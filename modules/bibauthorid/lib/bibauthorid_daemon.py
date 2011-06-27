@@ -64,6 +64,7 @@ from bibauthorid_personid_tables_utils import insert_user_log
 from bibauthorid_personid_tables_utils import update_personID_table_from_paper
 from bibauthorid_personid_tables_utils import update_personID_from_algorithm
 from bibauthorid_personid_tables_utils import personid_remove_automatically_assigned_papers
+from bibauthorid_personid_tables_utils import personid_fast_assign_papers
 
 import bibtask
 
@@ -130,6 +131,8 @@ Examples:
                             tables in the process!
   --repair-personid         Deletes untouched person entities to then
                             re-create and updated these entities.
+  --fast-update-personid    Updates personid adding not yet assigned papers to the system,
+                            in a fast, best effort basis.
 """,
         version="Invenio Bibauthorid v%s" % bconfig.VERSION,
         specific_params=("r:d:n:p:m:GURa",
@@ -146,7 +149,8 @@ Examples:
              "clean-cache",
              "record-ids=",
              "all-records",
-             "repair-personid"
+             "repair-personid",
+             "fast-update-personid="
             ]),
         task_submit_elaborate_specific_parameter_fnc=
             _task_submit_elaborate_specific_parameter,
@@ -210,6 +214,9 @@ def _task_submit_elaborate_specific_parameter(key, value, opts, args):
     elif key in ("--repair-personid"):
         bibtask.task_set_option("repair_pid", True)
 
+    elif key in ("--fast-update-personid"):
+        bibtask.task_set_option("fast_update_personid", value)
+
     else:
         return False
 
@@ -235,9 +242,13 @@ def _task_run_core():
     record_ids_nested = None
     all_records = bibtask.task_get_option('all_records')
     repair_pid = bibtask.task_get_option('repair_pid')
+    fast_update_personid = bibtask.task_get_option('fast_update_personid')
 
     if record_ids:
         record_ids_nested = [[p] for p in record_ids]
+
+    if fast_update_personid:
+        fast_update_personid = [[p] for p in fast_update_personid]
 #    automated_daemon_mode_p = True
 
     if lastname:
@@ -361,6 +372,11 @@ def _task_run_core():
         bibtask.task_sleep_now_if_required(can_stop_too=False)
         bibtask.task_update_progress('All repairs done.')
 
+    if fast_update_personid:
+        bibtask.task_update_progress('Updating personid...')
+        _run_personid_fast_assign_papers(fast_update_personid)
+        bibtask.task_update_progress('Update finished...')
+        #TODO: remember to pass the papers list!
     return 1
 
 
@@ -381,6 +397,7 @@ def _task_submit_check_options():
     record_ids = bibtask.task_get_option('record_ids')
     all_records = bibtask.task_get_option('all_records')
     repair_pid = bibtask.task_get_option('repair_pid')
+    fast_update_personid = bibtask.task_get_option('fast_update_personid')
 
     if (record_ids and all_records):
         bibtask.write_message("ERROR: conflicting options: --record-ids and "
@@ -393,16 +410,17 @@ def _task_submit_check_options():
 
     if (not lastname and not process_all and not update
         and not prepare_grid and not load_grid and not clean_cache
-        and not update_cache):
+        and not update_cache and not fast_update_personid):
         bibtask.write_message("ERROR: One of the options -a, -n, -U, -G, -R, "
-                              "--clean-cache, --update-cache is"
+                              "--clean-cache, --update-cache, --fast-update-personid is"
                               " required!", stream=sys.stdout, verbose=0)
         return False
     elif not (bool(lastname) ^ bool(process_all) ^ bool(update)
               ^ bool(prepare_grid) ^ bool(load_grid) ^ bool(clean_cache)
-              ^ bool(update_cache) ^ bool(repair_pid)):
+              ^ bool(update_cache) ^ bool(repair_pid) ^ bool(fast_update_personid)):
         bibtask.write_message("ERROR: Options -a -n -U -R -G --clean-cache "
-                              "--update-cache --repair-personid are mutually"
+                              "--update-cache --repair-personid --fast-update-personid "
+                              "are mutually"
                               " exclusive!", stream=sys.stdout, verbose=0)
         return False
     elif ((not prepare_grid and (data_dir or prefix or max_records)) and
@@ -736,16 +754,16 @@ def _update_authorid_universe(record_ids=None, all_records=False):
             bibtask.write_message("Update authorid will operate on %s records."
                                   % (len(recently_modified)), stream=sys.stdout,
                                   verbose=0)
-    
+
             if not recently_modified:
                 bibtask.write_message("Update authorid: Nothing to do",
                                       stream=sys.stdout, verbose=0)
                 return
-    
+
             for rec in recently_modified:
                 updated_records.append(rec[0])
                 dat.update_log("rec_updates", rec[0])
-    
+
         else:
             bibtask.write_message("Update authorid: Nothing to do",
                                   stream=sys.stdout, verbose=0)
@@ -1020,3 +1038,7 @@ def _run_authornames_tables_gc():
     '''
     insert_user_log('daemon', '-1', 'ANTGC', 'bibsched', 'status', comment='bibauthorid_daemon, authornames_tables_gc')
     authornames_tables_gc()
+
+def _run_personid_fast_assign_papers(paperslist):
+    insert_user_log('daemon', '-1', 'PFAP', 'bibsched', 'status', comment='bibauthorid_daemon, personid_fast_assign_papers')
+    personid_fast_assign_papers(paperslist)

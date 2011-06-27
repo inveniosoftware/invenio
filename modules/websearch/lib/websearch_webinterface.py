@@ -619,12 +619,14 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
         if self.personid < 0 and is_bibauthorid:
             # Well, no person. Fall back to the exact author name search then.
-            ptitle = ''
+            ptitle = None
             if recid:
                 try:
                     ptitle = get_record(recid)['245'][0][0][0][1]
                 except (IndexError, TypeError, KeyError):
                     ptitle = '"Title not available"'
+            else:
+                return redirect_to_url(req, "%s/person/search" % (CFG_SITE_URL))
 
             self.authorname = self.pageparam
             title = ''

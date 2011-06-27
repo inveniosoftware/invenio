@@ -30,6 +30,7 @@ from bibauthorid_virtualauthor_utils import get_virtualauthor_records
 from bibauthorid_authorname_utils import get_name_and_db_name_strings
 from math import exp
 import bibauthorid_config as bconfig
+import bibauthorid_structs as dat
 
 # NAME: Defines the name of the module for display purposes. [A-Za-z0-9 \-_]
 MODULE_NAME = "IID Comparison"
@@ -56,6 +57,9 @@ def get_information_from_dataset(va_id, ra_id=-1):
     @return: True, if ra_id is set OR A list of the data
     @rtype: True if ra_id > -1 or list of strings
     '''
+    if dat.RUNTIME_CONFIG["populate_aid_from_personid"]:
+        return True
+
     va_data = get_virtualauthor_records(va_id)
     bibrec_id = ""
     authorname_id = ""

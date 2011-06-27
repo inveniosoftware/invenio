@@ -30,6 +30,8 @@ import time
 import bibauthorid_structs as dat
 import bibauthorid_config as bconfig
 import gc
+#import random
+import re
 
 from bibauthorid_realauthor_utils import process_updated_virtualauthors
 from bibauthorid_realauthor_utils import find_and_process_orphans
@@ -52,11 +54,28 @@ except ImportError:
                            "installing the python multiprocessing module")
 
 
+def debugmsg(identity, msg):
+    '''
+    Prints a debug statement to std out. Especially needed in unbuffered
+    python execution in multiprocessing and multi-threaded environments
+    @param identity: The ID of the process
+    @type identity: string or int
+    @param msg: The message to print
+    @type msg: string
+    '''
+    if bconfig.TABLES_UTILS_DEBUG:
+        print (time.strftime('%H:%M:%S')
+               + ' '
+               + str(identity) + ': '
+               + msg)
+
+
 def start_full_disambiguation(last_names="all",
                          process_orphans=False,
                          db_exists=False,
                          populate_doclist=True,
-                         write_to_db=True):
+                         write_to_db=True,
+                         populate_aid_from_personid=False):
     '''
     Starts the disambiguation process on a specified set of authors or on all
     authors while respecting specified preconditions
@@ -71,6 +90,9 @@ def start_full_disambiguation(last_names="all",
     @type populate_doclist: boolean
     @param write_to_db: write the results back to the database?
     @type write_to_db: boolean
+    @param populate_aid_from_personid: Populate all AID tables as a backtrack
+        from aidPERSONID?
+    @type populate_aid_from_personid: boolean
 
     @return: True if the process went through smoothly, False if it didn't
     @rtype: boolean
@@ -94,6 +116,9 @@ def start_full_disambiguation(last_names="all",
         bconfig.LOGGER.error("Failed to detect parameter type. Exiting.")
         return False
 
+    if populate_aid_from_personid:
+        dat.RUNTIME_CONFIG['populate_aid_from_personid'] = True
+
     if db_exists:
         db_lnames = get_existing_last_names()
 
@@ -113,17 +138,25 @@ def start_full_disambiguation(last_names="all",
     if MP_ENABLED:
         mp_queue = multiprocessing.Queue()
         mp_termination_queue = multiprocessing.Queue(1)
-        mp_queue.put([])
         db_write_lock = multiprocessing.Lock()
 
         process_list = []
 
-        lc = multiprocessing.Process(target=list_creation_process, name='baid-listgen', args=(mp_queue, job_last_names, mp_termination_queue))
+        lc = multiprocessing.Process(target=list_creation_process,
+                                     name='baid-listgen',
+                                     args=(mp_queue, job_last_names,
+                                           mp_termination_queue))
         lc.start()
         del(job_last_names)
 
         for i in range(bconfig.BIBAUTHORID_MAX_PROCESSES):
-            p = multiprocessing.Process(target=computation_process_starter, name='baid-worker-' + str(i), args=(i, mp_termination_queue, mp_queue, db_write_lock, populate_doclist, True, process_orphans, True, write_to_db))
+            p = multiprocessing.Process(target=computation_process_starter,
+                                        name='baid-worker-' + str(i),
+                                        args=(i, mp_termination_queue,
+                                              mp_queue, db_write_lock,
+                                              populate_doclist, True,
+                                              process_orphans, True,
+                                              write_to_db))
             process_list.append(p)
             p.start()
         for p in process_list:
@@ -133,17 +166,20 @@ def start_full_disambiguation(last_names="all",
     else:
         mp_queue = Queue.Queue()
         mp_termination_queue = Queue.Queue()
-        mp_queue.put([])
         db_write_lock = None
         list_creation_process(mp_queue, job_last_names, mp_termination_queue)
         del(job_last_names)
-        computation_process_starter(0, mp_termination_queue, mp_queue, db_write_lock, populate_doclist, True, process_orphans, True, write_to_db)
+        computation_process_starter(0, mp_termination_queue, mp_queue,
+                                    db_write_lock, populate_doclist, True,
+                                    process_orphans, True, write_to_db)
 
 #    status = 1
     bconfig.LOGGER.log(25, "Done. Loaded %s last names." % (totale))
 
 
-def list_creation_process(mp_queue, job_last_names, mp_termination_queue):
+def list_creation_process(mp_queue, job_last_names, mp_termination_queue,
+                          process_pool_n=bconfig.BIBAUTHORID_MAX_PROCESSES,
+                          method=bconfig.BIBAUTHORID_LIST_CREATION_METHOD):
     '''
     Sub process to build the pre-clustered last name blocks
 
@@ -154,40 +190,137 @@ def list_creation_process(mp_queue, job_last_names, mp_termination_queue):
     @param mp_termination_queue: queue holding the exit token for the processes
         to terminate upon finishing all queue elements
     @type mp_termination_queue: queue
+    @param method: 'mysql' or 'regexp'
     '''
-    #job_last_names = sorted(job_last_names, key=lambda k: len(k))
-    variations_set = set()
-    jl = []
 
-    for lname in job_last_names:
-        if lname in variations_set:
-            continue
+    if method == 'regexp':
+        debugmsg(0, "List_creator: starting names list computation in REGEXP mode")
+        all_lnames = job_last_names
+        rm_nonalphanumerics = re.compile("[^a-zA-Z0-9]")
+        name_vars = {}
 
-        if bconfig.TABLES_UTILS_DEBUG:
-            print time.strftime('%H:%M:%S') + ' ' + "List_creator: working on " + str(lname.encode('UTF-8'))
+        for name in all_lnames:
+            rname = rm_nonalphanumerics.sub("", name).lower()
 
-        dat.reset_mem_cache(True)
-        init_authornames(lname)
-        nameset = set([x['name'].split(",")[0] for x in dat.AUTHOR_NAMES])
+            if rname in name_vars:
+                name_vars[rname].append(name)
+            else:
+                name_vars[rname] = [name]
+        debugmsg(0, "List_creator: appending names list:")
+        for k in name_vars:
+            if name_vars[k]:
+                mp_queue.put(name_vars[k])
+        debugmsg(0, "List_creator: All names appended!")
+        debugmsg(0, "List_creator: putting exit token")
+        mp_termination_queue.put(True)
+        return
 
-        if bconfig.TABLES_UTILS_DEBUG:
-            print time.strftime('%H:%M:%S') + ' ' + "List_creator: computation finished, getting queue"
+    if method == 'mysql':
+        mp_variation_set = multiprocessing.Queue()
 
-        jl[:] = mp_queue.get()
+        list_pusher = multiprocessing.Process(target=nameset_list_pusher,
+                                              args=(mp_queue, mp_variation_set,
+                                                    mp_termination_queue))
+        list_pusher.start()
 
-        if bconfig.TABLES_UTILS_DEBUG:
-            print time.strftime('%H:%M:%S') + ' ' + "List_creator: appending " + str(nameset) + ' with still ' + str(len(jl)) + ' elements in queue'
+        process_list = []
+        c = 0
+        for lname in job_last_names:
+            c = c + 1
+            if c > process_pool_n :
+                loop = True
+                ic = 0
+                while loop:
+                    for i, j in enumerate(process_list):
+                        if not j.is_alive():
+                            loop = False
+                            debugmsg(i, "List_creator: joining %s to create %s"
+                                     % (str(i), str(c)))
+                            process_list[i].join()
+                            process_list[i] = multiprocessing.Process(target=nameset_comp, args=(c, lname, mp_variation_set))
+                            process_list[i].start()
+                            ic = 0
+                            break
+                    ic += 1
+                    if ic > 1:
+                        debugmsg(0, "List_creator: busy waiting cycle...."
+                                    "zzZ zzZ zzZ zzZ zzZ zzZ zzZ zzZ")
+                        time.sleep(0.5)
+                        ic = 0
+            else:
+                p = multiprocessing.Process(target=nameset_comp, args=(c, lname, mp_variation_set))
+                process_list.append(p)
+                p.start()
+        for p in process_list:
+            p.join()
 
-        jl.append(list(nameset))
-        mp_queue.put(jl)
+        debugmsg(0, "List_creator: putting exit token")
 
-        for n in nameset:
-            variations_set.add(n)
+        mp_termination_queue.put(True)
+        list_pusher.join()
+        return
 
-    if bconfig.TABLES_UTILS_DEBUG:
-        print time.strftime('%H:%M:%S') + ' ' + "List_creator: putting exit token"
 
-    mp_termination_queue.put(True)
+def nameset_comp(c, lname, mp_variation_set):
+    try:
+        debugmsg(c, "List_creator: %s" % str(c)
+                 + "  working on " + str(lname.encode('UTF-8')))
+    except:
+        debugmsg(c, "List_creator: %s" % str(c) + "  working on "
+                 + str('Error encoding name'))
+
+#    old_variations_set = mp_variaton_set.get()
+#    mp_variaton_set.put(old_variations_set)
+#    if lname in old_variations_set:
+#        if bconfig.TABLES_UTILS_DEBUG:
+#            print time.strftime('%H:%M:%S') + ' ' + "List_creator: %s" % str(c) + "  computation DROPPED."
+#        return
+
+    dat.reset_mem_cache(True)
+    init_authornames(lname)
+    nameset = set([x['name'].split(",")[0] for x in dat.AUTHOR_NAMES])
+
+
+    debugmsg(c, "List_creator: %s" % str(c) + "  computation finished, pushing varset")
+
+    mp_variation_set.put([lname, list(nameset)])
+
+    debugmsg(c, "List_creator: %s" % str(c) + " current variations pushed")
+
+
+def nameset_list_pusher(mp_queue, mp_variations_set, mp_termination_queue):
+#    jl = []
+    varset = []
+    while mp_termination_queue.empty():
+        if not mp_variations_set.empty():
+            debugmsg(0, "List_creator: list pusher: getting from varset queue")
+            partset = mp_variations_set.get()
+
+            if partset[0] not in varset:
+                varset = varset + partset[1]
+                nameset = partset[1]
+#                debugmsg(0, "List_creator: list pusher:  computation finished, getting queue")
+#
+#                jl[:] = mp_queue.get()
+#
+#                debugmsg(0, "List_creator: list pusher:  computation finished, got queue")
+#
+#                debugmsg(0, "List_creator: list pusher:   appending " + str(nameset) + ' with still ' + str(len(jl)) + ' elements in queue')
+#
+#                jl.append(nameset)
+                debugmsg(0, "List_creator: list pusher:   appending "
+                         + str(nameset) + ' with still '
+                         + str(mp_queue.qsize()) + ' elements in queue')
+                mp_queue.put(nameset)
+
+                debugmsg(0, "List_creator: list pusher:   queue append finished")
+            else:
+                debugmsg(0, "List_creator: list pusher:   DROPPED name %s" % partset[0])
+        else:
+            time.sleep(0.5)
+
+    debugmsg(0, "List_creator: list pusher: empty variations and exit token, quitting...")
+
     return
 
 
@@ -222,45 +355,26 @@ def computation_process_starter(i, mp_termination_queue, job_mp_queue,
     @param write_to_db: write the results back to the database?
     @type write_to_db: boolean
     '''
-
     while True:
-        if bconfig.TABLES_UTILS_DEBUG:
-            print time.strftime('%H:%M:%S') + ' ' + str(i) + ': getting name from queue'
-        job_last_names_list = job_mp_queue.get()
-        if bconfig.TABLES_UTILS_DEBUG:
-            print time.strftime('%H:%M:%S') + ' ' + str(i) + ': got queue'
-        if len(job_last_names_list) > 0:
-            job_last_names = job_last_names_list[0]
-
-            if len(job_last_names_list) > 1:
-                job_mp_queue.put(job_last_names_list[1:])
-                if bconfig.TABLES_UTILS_DEBUG:
-                    print time.strftime('%H:%M:%S') + ' ' + str(i) + ': put non empty list'
-            else:
-                job_mp_queue.put([])
-                if bconfig.TABLES_UTILS_DEBUG:
-                    print time.strftime('%H:%M:%S') + ' ' + str(i) + ': put empty list'
+        debugmsg(i, "getting name from queue")
+        if job_mp_queue.qsize() > 0:
+            job_last_names = job_mp_queue.get()
+            debugmsg(i, "got queue item! %s items left in queue"
+                        % job_mp_queue.qsize())
 
         else:
-            if bconfig.TABLES_UTILS_DEBUG:
-                print time.strftime('%H:%M:%S') + ' ' + str(i) + ': we got an empty list...'
-            job_mp_queue.put([])
-            if bconfig.TABLES_UTILS_DEBUG:
-                print time.strftime('%H:%M:%S') + ' ' + str(i) + ': put empty list'
+            debugmsg(i, "Queue is currently empty...")
             if not mp_termination_queue.empty():
-                if bconfig.TABLES_UTILS_DEBUG:
-                    print time.strftime('%H:%M:%S') + ' ' + str(i) + ': token there, exiting!'
+                debugmsg(i, "Exit token there, Process %s salutes to quit!" % i)
                 return
             else:
-                if bconfig.TABLES_UTILS_DEBUG:
-                    print time.strftime('%H:%M:%S') + ' ' + str(i) + ': token not there, continuing!'
+                debugmsg(i, "Exit token not present, continuing in 15s!")
                 time.sleep(15)
                 continue
 
         last_name_queue = Queue.Queue()
 
         last_name_queue.put(sorted(job_last_names))
-        del(job_last_names_list)
 
         gc.collect()
 
@@ -272,8 +386,7 @@ def computation_process_starter(i, mp_termination_queue, job_mp_queue,
             if last_name_queue.empty():
                 bconfig.LOGGER.log(25, "Done with all names.")
                 break
-            if bconfig.TABLES_UTILS_DEBUG:
-                print time.strftime('%H:%M:%S') + ' ' + str(i) + ': starting with queue: ' + str(last_name_queue.queue)
+            debugmsg(i, "starting with queue: " + str(last_name_queue.queue))
 
             lname_list = last_name_queue.get()
             lname = None

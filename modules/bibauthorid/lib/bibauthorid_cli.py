@@ -152,6 +152,8 @@ Daemon mode options:
                             (deleted documents).
       --repair-personid     Deletes untouched person entities to then
                             re-create and updated these entities.
+      --fast-update-personid    Updates personid adding not yet assigned papers to the system,
+                            in a fast, best effort basis.
 
  Options:
   -r, --record-ids=NUM      Specifies a list of record ids. To use as on option
@@ -226,7 +228,8 @@ def _read_options(options_string):
         "clean_cache": False,
         "record_ids" : None,
         "all_records": False,
-        "repair_pid": False
+        "repair_pid": False,
+        "fast_update_personid":False
     }
 
     try:
@@ -235,7 +238,8 @@ def _read_options(options_string):
             "process-all", "help", "version", "prepare-grid", "prefix=",
             "data-dir=", "standalone", "job-dir=", "max-records=",
             "load-grid-results", "update-universe", "update-cache",
-            "clean-cache", "record-ids=", "all-records", "repair-personid"]
+            "clean-cache", "record-ids=", "all-records", "repair-personid",
+            "fast-update-personid="]
         opts, args = getopt.gnu_getopt(options_string, short_flags, long_flags)
     except getopt.GetoptError, err1:
         print >> sys.stderr, "Parameter problem: %s" % err1
@@ -255,7 +259,8 @@ def _read_options(options_string):
         "-m": "max_records",
         "--max-records": "max_records",
         "--record-ids": "record_ids",
-        "-r": "record_ids"
+        "-r": "record_ids",
+        "--fast-update-personid":"fast_update_personid"
     }
 
     without_argument = {

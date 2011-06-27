@@ -235,6 +235,8 @@ UPDATES_LOG
 Structure:
     {"tag": set of ids}
 '''
+
+RUNTIME_CONFIG = {"populate_aid_from_personid": False}
 # pylint: enable=W0105
 
 

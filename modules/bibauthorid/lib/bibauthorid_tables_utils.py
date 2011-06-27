@@ -32,14 +32,14 @@ from bibauthorid_utils import clean_name_string
 from bibauthorid_authorname_utils import update_doclist
 
 try:
-    from search_engine import get_record
-    from search_engine_utils import get_fieldvalues
+    from search_engine import get_record, perform_request_search
+#    from search_engine_utils import get_fieldvalues
     from bibrank_citation_searcher import get_citation_dict
     from dbquery import run_sql, run_sql_many
     from dbquery import OperationalError, ProgrammingError
 except ImportError:
-    from invenio.search_engine_utils import get_fieldvalues
-    from invenio.search_engine import get_record
+#    from invenio.search_engine_utils import get_fieldvalues
+    from invenio.search_engine import get_record, perform_request_search
     from invenio.bibrank_citation_searcher import get_citation_dict
     from invenio.dbquery import run_sql, run_sql_many
     from invenio.dbquery import OperationalError, ProgrammingError
@@ -303,9 +303,6 @@ def populate_authornames():
     if max_rows_per_run == -1:
         max_rows_per_run = 5000
 
-    max100 = run_sql("SELECT COUNT(id) FROM bib10x WHERE tag = '100__a'")
-    max700 = run_sql("SELECT COUNT(id) FROM bib70x WHERE tag = '700__a'")
-
     tables = "bib10x", "bib70x"
     authornames_is_empty_checked = 0
     authornames_is_empty = 1
@@ -536,43 +533,79 @@ def populate_doclist_for_author_surname(surname, surname_variations=None):
                 if refinfo:
                     for recid in refinfo:
                         bibrecs.append((recid[0], "700:%s" % m700))
+#
+#        relevant_records = []
+#
+#        for bibrec in bibrecs:
+#            go_next = False
+#
+#            for value in get_fieldvalues(bibrec[0], "980__c"):
+#                if value.lower().count('delete'):
+#                    go_next = True
+#
+#            if go_next:
+#                continue
+#
+#            for value in get_fieldvalues(bibrec[0], "980__a"):
+#                if value.lower().count('delet'):
+#                    go_next = True
+#
+#                if bconfig.EXCLUDE_COLLECTIONS:
+#                    if value in bconfig.EXCLUDE_COLLECTIONS:
+#                        go_next = True
+#                        break
+#
+#                if bconfig.LIMIT_TO_COLLECTIONS:
+#                    if not value in bconfig.LIMIT_TO_COLLECTIONS:
+#                        go_next = True
+#                    else:
+#                        go_next = False
+#                        break
+#
+#            if go_next:
+#                continue
+#
+#            relevant_records.append(bibrec)
+#
+#        if load_records_to_mem_cache([br[0] for br in relevant_records]):
+#            for bibrec in relevant_records:
+#                update_doclist(bibrec[0], author['id'], bibrec[1])
+
+#    authornames = [row["name"] for row in authors]
 
         relevant_records = []
+        coll_limit = ""
+        coll_excl = ""
+        authorqry = ""
+        query = ""
+#        recqry = ""
 
-        for bibrec in bibrecs:
-            go_next = False
+        if bconfig.EXCLUDE_COLLECTIONS:
+            coll_excl = 'and not (collection:"%s")' % '" or collection:"'.join(bconfig.EXCLUDE_COLLECTIONS)
 
-            for value in get_fieldvalues(bibrec[0], "980__c"):
-                if value.lower().count('delete'):
-                    go_next = True
+        if bconfig.LIMIT_TO_COLLECTIONS:
+            coll_limit = 'and (collection:"%s")' % '" or collection:"'.join(bconfig.LIMIT_TO_COLLECTIONS)
 
-            if go_next:
-                continue
+#        if bibrecs:
+#            recqry = '(recid:%s)' % ' or recid:'.join([str(r) for r in bibrecs])
+        if author["db_name"]:
+            authorqry = '(exactauthor:"%s")' % author["db_name"]
 
-            for value in get_fieldvalues(bibrec[0], "980__a"):
-                if value.lower().count('delet'):
-                    go_next = True
+        if authorqry:
+            query = "%s %s %s" % (authorqry, coll_excl, coll_limit)
+            query = query.strip()
 
-                if bconfig.EXCLUDE_COLLECTIONS:
-                    if value in bconfig.EXCLUDE_COLLECTIONS:
-                        go_next = True
-                        break
+        if query:
+            se_results = list(perform_request_search(p=query))
+            relevant_records = [row for row in bibrecs
+                                if int(row[0]) in se_results]
 
-                if bconfig.LIMIT_TO_COLLECTIONS:
-                    if not value in bconfig.LIMIT_TO_COLLECTIONS:
-                        go_next = True
-                    else:
-                        go_next = False
-                        break
-
-            if go_next:
-                continue
-
-            relevant_records.append(bibrec)
-
-        if load_records_to_mem_cache([br[0] for br in relevant_records]):
-            for bibrec in relevant_records:
-                update_doclist(bibrec[0], author['id'], bibrec[1])
+            if dat.RUNTIME_CONFIG["populate_aid_from_personid"]:
+                for bibrec in relevant_records:
+                    update_doclist(bibrec[0], author['id'], bibrec[1])
+            elif load_records_to_mem_cache([r[0] for r in relevant_records]):
+                for bibrec in relevant_records:
+                    update_doclist(bibrec[0], author['id'], bibrec[1])
 
 
 def load_records_to_mem_cache(bibrec_ids):
@@ -699,7 +732,7 @@ def _perform_authornames_init(surname, lastname_variations=None):
 
         if (lastname_variations
             and [nm for nm in lastname_variations if nm.count("\\")]):
-            x = sorted(lastname_variations, key=lambda k:len(k), reverse=True)
+            x = sorted(lastname_variations, key=len, reverse=True)
             # In order to fight escaping problems, we fall back to regexp mode
             # if we find a backslash somewhere.
             surname = x[0]
@@ -824,7 +857,7 @@ def write_mem_cache_to_tables(sanity_checks=False):
     cluster_id_offset = run_sql("SELECT max(id) FROM"
                                 " aidVIRTUALAUTHORSCLUSTERS")[0][0]
 
-    if not ra_id_offset:
+    if not ra_id_offset or dat.RUNTIME_CONFIG['populate_aid_from_personid']:
         ra_id_offset = 0
 
     if not va_id_offset:

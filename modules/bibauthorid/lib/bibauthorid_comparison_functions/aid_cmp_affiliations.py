@@ -28,6 +28,7 @@ from bibauthorid_virtualauthor_utils import get_virtualauthor_records
 from bibauthorid_authorname_utils import get_name_and_db_name_strings
 from math import exp
 from datetime import date
+import bibauthorid_structs as dat
 
 import bibauthorid_config as bconfig
 
@@ -56,6 +57,10 @@ def get_information_from_dataset(va_id, ra_id= -1):
     @return: A list of affiliations or simply True, if ra_id is set.
     @rtype: list of strings or True if ra_id > -1
     '''
+    src = "MEM"
+
+    if bconfig.STANDALONE or dat.RUNTIME_CONFIG["populate_aid_from_personid"]:
+        src = "API"
 
     va_data = get_virtualauthor_records(va_id)
     authorname_id = -1
@@ -72,8 +77,8 @@ def get_information_from_dataset(va_id, ra_id= -1):
                   % (va_id, authorname_strings["name"], bibrec_id))
     affiliations = get_field_values_on_condition(
                                         bibrec_id, ['100', '700'], 'u', 'a',
-                                        authorname_strings["db_name"])
-    record_date = get_field_values_on_condition(bibrec_id, '269', 'c')
+                                        authorname_strings["db_name"], source=src)
+    record_date = get_field_values_on_condition(bibrec_id, '269', 'c', source=src)
     constructed_date = []
     datearray = []
 

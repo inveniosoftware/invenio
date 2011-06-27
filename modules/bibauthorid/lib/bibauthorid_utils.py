@@ -33,7 +33,7 @@ except ImportError:
     pass
 
 
-def string_partition(s, sep, dir='l'):
+def string_partition(s, sep, direc='l'):
     '''
     Partition a string by the first occurrence of the separator.
     Mimics the string.partition function, which is not available in Python2.4
@@ -48,7 +48,7 @@ def string_partition(s, sep, dir='l'):
     @return: tuple of (left or sep, sep, right of sep)
     @rtype: tuple
     '''
-    if dir == 'r':
+    if direc == 'r':
         i = s.rfind(sep)
     else:
         i = s.find(sep)
@@ -110,7 +110,7 @@ def split_name_parts(name_string, delete_name_additions=True,
 
     if not found_sep:
         if name_string.count(" ") > 0:
-            rest_of_name, surname = string_partition(name_string, ' ', dir='r')[0::2]
+            rest_of_name, surname = string_partition(name_string, ' ', direc='r')[0::2]
         else:
             return [name_string, [], []]
 

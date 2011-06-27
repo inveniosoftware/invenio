@@ -543,6 +543,14 @@ def init_va_process_queue(mode="updated"):
                              and (row['value'] == 'False'))]:
             va_nosort[va_entry] = 0
 
+    if dat.RUNTIME_CONFIG["populate_aid_from_personid"]:
+        for va_entry in va_nosort:
+            dat.VIRTUALAUTHOR_PROCESS_QUEUE.put(va_entry)
+
+        bconfig.LOGGER.log(25, "Done with queue initialization.")
+
+        return
+
     for va_id in va_nosort:
         va_data = get_virtualauthor_records(va_id)
         authorname_string = ""
@@ -553,22 +561,21 @@ def init_va_process_queue(mode="updated"):
                 bibrec_id = va_data_item['value']
             elif va_data_item['tag'] == "orig_name_string":
                 authorname_string = va_data_item['value']
-
-        else:
-            affiliations = get_field_values_on_condition(bibrec_id,
-                            ['100', '700'], 'u', 'a', authorname_string)
-            coauthors = get_field_values_on_condition(bibrec_id,
-                            ['100', '700'], 'a', 'a', authorname_string, "!=")
-            collaboration = get_field_values_on_condition(bibrec_id, "710", "g")
-
-            if affiliations:
-                va_nosort[va_id] += 1
-
-            if coauthors:
-                va_nosort[va_id] += 1
-
-            if collaboration:
-                va_nosort[va_id] += 1
+            else:
+                affiliations = get_field_values_on_condition(bibrec_id,
+                                ['100', '700'], 'u', 'a', authorname_string)
+                coauthors = get_field_values_on_condition(bibrec_id,
+                                ['100', '700'], 'a', 'a', authorname_string, "!=")
+                collaboration = get_field_values_on_condition(bibrec_id, "710", "g")
+    
+                if affiliations:
+                    va_nosort[va_id] += 1
+    
+                if coauthors:
+                    va_nosort[va_id] += 1
+    
+                if collaboration:
+                    va_nosort[va_id] += 1
 
     for va_entry in sorted(va_nosort.items(), key=itemgetter(1), reverse=True):
         dat.VIRTUALAUTHOR_PROCESS_QUEUE.put(va_entry[0])
