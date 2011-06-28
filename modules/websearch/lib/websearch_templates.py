@@ -5080,3 +5080,90 @@ class Template:
             if default_values:
                 default_args[item] = default_values[1]
         return default_args
+
+    def tmpl_yoursearches_display(self,
+                                  ln,
+                                  nb_queries_total,
+                                  nb_queries_distinct,
+                                  search_queries,
+                                  guest,
+                                  guesttxt):
+        """
+        Display the user's search history.
+
+        Parameters:
+
+          - 'ln' *string* - The language to display the interface in
+
+          - 'nb_queries_total' *string* - The number of personal queries in the last period
+
+          - 'nb_queries_distinct' *string* - The number of distinct queries in the last period
+
+          - 'search_queries' *array* - The existing queries:
+
+              - 'id' *string* - The id of the associated query
+
+              - 'args' *string* - The query string
+
+              - 'textargs' *string* - The textual description of the query string
+
+              - 'lastrun' *string* - The last running date (only for personal queries)
+
+          - 'guest' *bool* - If the user is a guest user
+
+          - 'guesttxt' *string* - The HTML content of the warning box for guest users (produced by webaccount.tmpl_warning_guest_user)
+        """
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        if not search_queries:
+            out = _("You have not executed any search yet. Please go to the %(x_url_open)ssearch interface%(x_url_close)s first.") % \
+                {'x_url_open': '<a href="' + CFG_SITE_URL + '/?ln=' + ln +'">',
+                 'x_url_close': '</a>'}
+            return out
+
+        out = ''
+
+        # display message: number of items in the list
+        msg = _("You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during the last 30 days or so.") % {'x_nb1': nb_queries_total,
+                                                                                                                           'x_nb2': nb_queries_distinct}
+        out += '<p>' + msg + '</p>'
+
+        # display the list of searches
+        out += """<table class="alrtTable">
+                    <tr class="pageboxlefttop">
+                      <td style="font-weight: bold">%(no)s</td>
+                      <td style="font-weight: bold">%(question)s</td>
+                      <td style="font-weight: bold">%(action)s</td>""" % {
+                      'no' : "#",
+                      'question' : _("Question"),
+                      'action' : _("Action")
+                    }
+        out += '<td  style="font-weight: bold">%s</td>' % _("Last Run")
+        out += "</tr>\n"
+        i = 0
+        for search_query in search_queries :
+            i += 1
+            # id, pattern, base, search url and search set alert, date
+            out += """<tr>
+                        <td style="font-style: italic;">#%(index)d</td>
+                        <td>%(textargs)s</td>
+                        <td><a href="%(siteurl)s/search?%(args)s">%(execute_query)s</a><br />
+                            <a href="%(siteurl)s/youralerts/input?ln=%(ln)s&amp;idq=%(id)d">%(set_alert)s</a></td>""" % {
+                     'index' : i,
+                     'textargs' : search_query['textargs'],
+                     'siteurl' : CFG_SITE_URL,
+                     'args' : cgi.escape(search_query['args']),
+                     'id' : search_query['id'],
+                     'ln': ln,
+                     'execute_query' : _("Execute search"),
+                     'set_alert' : _("Set new alert")
+                   }
+            out += '<td>%s</td>' % search_query['lastrun']
+            out += """</tr>\n"""
+        out += "</table><br />\n"
+        if guest :
+            out += guesttxt
+
+        return out

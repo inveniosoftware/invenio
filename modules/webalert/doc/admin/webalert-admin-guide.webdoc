@@ -53,7 +53,7 @@ module to permit this functionality.
 <h2>Configuring Alert Queries</h2>
 
 <p>Users may set up alert queries for example from their <a
-href="<CFG_SITE_URL>/youralerts/display">search history</a> pages.
+href="<CFG_SITE_URL>/yoursearches/display">search history</a> pages.
 
 <p>Administrators may edit existing users' alerts by modifying the
 <code>user_query_basket</code> table.  (There is no web interface yet

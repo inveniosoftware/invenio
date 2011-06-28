@@ -18,6 +18,7 @@
 """WebSearch URL handler."""
 
 __revision__ = "$Id$"
+__lastupdated__ = """$Date$"""
 
 import cgi
 import os
@@ -56,14 +57,17 @@ from invenio.config import \
      CFG_WEBSEARCH_RSS_I18N_COLLECTIONS, \
      CFG_INSPIRE_SITE, \
      CFG_WEBSEARCH_WILDCARD_LIMIT, \
-     CFG_SITE_RECORD
+     CFG_SITE_RECORD, \
+     CFG_ACCESS_CONTROL_LEVEL_SITE, \
+     CFG_SITE_NAME_INTL
+
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
 from invenio.htmlutils import get_mathjax_header
 from invenio.htmlutils import nmtoken_from_string
 from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
-    collect_user_info, logoutUser, isUserSuperAdmin
+    collect_user_info, logoutUser, isUserSuperAdmin, isGuestUser
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
 from invenio.weblinkback_webinterface import WebInterfaceRecordLinkbacksPages
 from invenio.bibcirculation_webinterface import WebInterfaceHoldingsPages
@@ -108,6 +112,7 @@ from invenio.bibmerge_webinterface import WebInterfaceMergePages
 from invenio.bibdocfile_webinterface import WebInterfaceManageDocFilesPages, WebInterfaceFilesPages
 from invenio.bibfield import get_record
 from invenio.shellutils import mymkdir
+from invenio.websearch_yoursearches import perform_request_yoursearches_display
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -1197,3 +1202,75 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
 
     # Return the same page wether we ask for /CFG_SITE_RECORD/123/export/xm or /CFG_SITE_RECORD/123/export/xm/
     index = __call__
+
+class WebInterfaceYourSearchesPages(WebInterfaceDirectory):
+    """
+    Handles the /yoursearches pages
+    """
+
+    _exports = ['', 'display']
+
+    def index(self, req, form):
+        """
+        """
+        redirect_to_url(req, '%s/yoursearches/display' % CFG_SITE_URL)
+
+    def display(self, req, form):
+        """
+        Display the user's search latest history.
+        """
+
+        argd = wash_urlargd(form, {'ln': (str, "en")})
+
+        uid = getUid(req)
+
+        # load the right language
+        _ = gettext_set_language(argd['ln'])
+
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/yoursearches/display" % \
+                                            (CFG_SITE_URL,),
+                                       navmenuid="yoursearches")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % \
+                                        (CFG_SITE_SECURE_URL,
+                                         make_canonical_urlargd(
+                                            {'referer' : "%s/yoursearches/display%s" % (
+                                                CFG_SITE_URL,
+                                                make_canonical_urlargd(argd, {})),
+                                             'ln' : argd['ln']},
+                                            {})
+                                         )
+            )
+
+        user_info = collect_user_info(req)
+        #if not user_info['precached_usealerts']:
+        #    return page_not_authorized(req, "../", \
+        #                               text = _("You are not authorized to use alerts."))
+
+        # register event in webstat
+        if user_info['email']:
+            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
+        else:
+            user_str = ""
+        try:
+            register_customevent("searches", ["display", "", user_str])
+        except:
+            register_exception(
+                suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
+
+        return page(title=_("Your Searches"),
+                    body=perform_request_yoursearches_display(uid, ln=argd['ln']),
+                    navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
+                                 'sitesecureurl' : CFG_SITE_SECURE_URL,
+                                 'ln': argd['ln'],
+                                 'account' : _("Your Account"),
+                              },
+                    description=_("%s Personalize, Display searches") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                    uid=uid,
+                    language=argd['ln'],
+                    req=req,
+                    lastupdated=__lastupdated__,
+                    navmenuid='yoursearches',
+                    secure_page_p=1)

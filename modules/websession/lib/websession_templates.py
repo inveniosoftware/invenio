@@ -600,7 +600,7 @@ class Template:
                    }
 
         out += """
-        <dt><a href="../youralerts/display?ln=%(ln)s">%(your_searches)s</a></dt>
+        <dt><a href="../yoursearches/display?ln=%(ln)s">%(your_searches)s</a></dt>
         <dd>%(search_explain)s</dd>""" % {
           'ln' : ln,
           'your_searches' : _("Your Searches"),
@@ -625,7 +625,7 @@ class Template:
         if guest and CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
             out += self.tmpl_warning_guest_user(ln = ln, type = "baskets")
         out += """</dd>
-        <dt><a href="../youralerts/list?ln=%(ln)s">%(your_alerts)s</a></dt>
+        <dt><a href="../youralerts/display?ln=%(ln)s">%(your_alerts)s</a></dt>
         <dd>%(explain_alerts)s""" % {
           'ln' : ln,
           'your_alerts' : _("Your Alerts"),
@@ -667,6 +667,8 @@ class Template:
             msg = _("You are logged in as a guest user, so your baskets will disappear at the end of the current session.") + ' '
         elif (type=='alerts'):
             msg = _("You are logged in as a guest user, so your alerts will disappear at the end of the current session.") + ' '
+        elif (type=='searches'):
+            msg = _("You are logged in as a guest user, so your searches will disappear at the end of the current session.") + ' '
         msg += _("If you wish you can %(x_url_open)slogin or register here%(x_url_close)s.") % {'x_url_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/login?ln=' + ln + '">',
                                                                                                'x_url_close': '</a>'}
         return """<table class="errorbox" summary="">
@@ -778,10 +780,10 @@ class Template:
                                      'x_url_close': '</a>'}
             out += self.tmpl_account_template(_("Your Comments"), comments_description, ln, '/yourcomments/?ln=%s' % ln)
         if alerts:
-            out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln, '/youralerts/list?ln=%s' % ln)
+            out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln, '/youralerts/display?ln=%s' % ln)
 
         if searches:
-            out += self.tmpl_account_template(_("Your Searches"), searches, ln, '/youralerts/display?ln=%s' % ln)
+            out += self.tmpl_account_template(_("Your Searches"), searches, ln, '/yoursearches/display?ln=%s' % ln)
 
         if groups:
             groups_description = _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are administering or are a member of.")
@@ -1438,7 +1440,7 @@ class Template:
                 'account' : _('Your account')
                 }
         if usealerts or guest:
-            out += '<li><a href="%(CFG_SITE_SECURE_URL)s/youralerts/list?ln=%(ln)s">%(alerts)s</a></li>'  % {
+            out += '<li><a href="%(CFG_SITE_SECURE_URL)s/youralerts/display?ln=%(ln)s">%(alerts)s</a></li>'  % {
                 'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
                 'ln' : ln,
                 'alerts' : _('Your alerts')
@@ -1486,7 +1488,7 @@ class Template:
                 'submissions' : _('Your submissions')
                 }
         if usealerts or guest:
-            out += '<li><a href="%(CFG_SITE_SECURE_URL)s/youralerts/display?ln=%(ln)s">%(searches)s</a></li>'  % {
+            out += '<li><a href="%(CFG_SITE_SECURE_URL)s/yoursearches/display?ln=%(ln)s">%(searches)s</a></li>'  % {
                 'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
                 'ln' : ln,
                 'searches' : _('Your searches')

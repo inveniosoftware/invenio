@@ -22,6 +22,7 @@ jsdir=$(localstatedir)/www/js
 webdir=$(localstatedir)/www/img
 
 pylib_DATA = \
+	websearch_yoursearches.py \
 	websearchadminlib.py \
 	websearch_templates.py \
 	websearch_webinterface.py \

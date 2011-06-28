@@ -46,6 +46,7 @@ from invenio.webpage import page
 from invenio import webaccount
 from invenio import webbasket
 from invenio import webalert
+from invenio import websearch_yoursearches
 from invenio.dbquery import run_sql
 from invenio.webmessage import account_new_mail
 from invenio.access_control_engine import acc_authorize_action
@@ -241,7 +242,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         user_info = webuser.collect_user_info(req)
         bask = user_info['precached_usebaskets'] and webbasket.account_list_baskets(uid, ln=args['ln']) or ''
         aler = user_info['precached_usealerts'] and webalert.account_list_alerts(uid, ln=args['ln']) or ''
-        sear = webalert.account_list_searches(uid, ln=args['ln'])
+        sear = websearch_yoursearches.account_list_searches(uid, ln=args['ln'])
         msgs = user_info['precached_usemessages'] and account_new_mail(uid, ln=args['ln']) or ''
         grps = user_info['precached_usegroups'] and webgroup.account_group(uid, ln=args['ln']) or ''
         appr = user_info['precached_useapprove']
