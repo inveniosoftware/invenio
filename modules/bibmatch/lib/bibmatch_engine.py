@@ -562,9 +562,10 @@ def match_records(records, qrystrs=None, search_mode=None, operator="and", verbo
 
     try:
         server = InvenioConnector(server_url, user=user, password=password)
-    except InvenioConnectorAuthError as error:
+    except InvenioConnectorAuthError, error:
         if verbose > 0:
-            sys.stderr.write(str(error))
+            sys.stderr.write("Authentication error when connecting to server: %s" \
+                             % (str(error),))
         return [newrecs, matchedrecs, ambiguousrecs, fuzzyrecs]
 
     ## Go through each record and try to find matches using defined querystrings
@@ -606,9 +607,10 @@ def match_records(records, qrystrs=None, search_mode=None, operator="and", verbo
             ## Perform the search with retries
             try:
                 result_recids = server.search_with_retry(**search_params)
-            except InvenioConnectorAuthError as error:
+            except InvenioConnectorAuthError, error:
                 if verbose > 0:
-                    sys.stderr.write(str(error))
+                    sys.stderr.write("Authentication error when searching: %s" \
+                                     % (str(error),))
                 break
             if (verbose > 8):
                 if len(result_recids) > 10:
@@ -662,9 +664,10 @@ def match_records(records, qrystrs=None, search_mode=None, operator="and", verbo
                     search_params = dict(p=qry, f=field, of='id', c=collections)
                     try:
                         current_resultset = server.search_with_retry(**search_params)
-                    except InvenioConnectorAuthError as error:
+                    except InvenioConnectorAuthError, error:
                         if (verbose > 0):
-                            sys.stderr.write(str(error))
+                            sys.stderr.write("Authentication error when searching: %s" \
+                                             % (str(error),))
                         break
                     if (verbose > 8):
                         if len(current_resultset) > 10:
