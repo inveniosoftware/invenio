@@ -350,7 +350,7 @@ def Stamp_Replace_Single_File_Approval(parameters, \
     ## Put the input file and output file into the file_stamper_options
     ## dictionary:
     file_stamper_options['input-file'] = bibdocfile_file_to_stamp.fullpath
-    file_stamper_options['output-file'] = bibdocfile_file_to_stamp.fullname
+    file_stamper_options['output-file'] = bibdocfile_file_to_stamp.get_full_name()
     ##
     ## Before attempting to stamp the file, log the dictionary of arguments
     ## that will be passed to websubmit_file_stamper:
@@ -417,7 +417,7 @@ def Stamp_Replace_Single_File_Approval(parameters, \
             ## do so.
             if new_file_name != "":
                 try:
-                    bibdoc_file_to_stamp.change_name(new_file_name)
+                    bibrecdocs.change_name(newname = new_file_name, docid = bibdoc_file_to_stamp.id)
                 except (IOError, InvenioBibDocFileError):
                     ## Unable to change the name
                     wrn_msg = "Warning in Stamp_Replace_Single_File_Approval" \

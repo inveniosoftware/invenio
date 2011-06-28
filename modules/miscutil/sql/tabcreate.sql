@@ -2923,11 +2923,11 @@ CREATE TABLE IF NOT EXISTS tag (
 CREATE TABLE IF NOT EXISTS bibdoc (
   id mediumint(9) unsigned NOT NULL auto_increment,
   status text NOT NULL default '',
-  docname varchar(250) COLLATE utf8_bin NOT NULL default 'file',
+  docname varchar(250) COLLATE utf8_bin default NULL, -- now NULL means that this is new version bibdoc
   creation_date datetime NOT NULL default '0000-00-00',
   modification_date datetime NOT NULL default '0000-00-00',
   text_extraction_date datetime NOT NULL default '0000-00-00',
-  more_info mediumblob NULL default NULL,
+  doctype varchar(255),
   PRIMARY KEY  (id),
   KEY docname (docname),
   KEY creation_date (creation_date),
@@ -2937,17 +2937,37 @@ CREATE TABLE IF NOT EXISTS bibdoc (
 CREATE TABLE IF NOT EXISTS bibrec_bibdoc (
   id_bibrec mediumint(9) unsigned NOT NULL default '0',
   id_bibdoc mediumint(9) unsigned NOT NULL default '0',
+  docname varchar(250) COLLATE utf8_bin NOT NULL default 'file',
   type varchar(255),
+  KEY docname (docname),
   KEY  (id_bibrec),
   KEY  (id_bibdoc)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibdoc_bibdoc (
-  id_bibdoc1 mediumint(9) unsigned NOT NULL,
-  id_bibdoc2 mediumint(9) unsigned NOT NULL,
-  type varchar(255),
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  id_bibdoc1 mediumint(9) unsigned DEFAULT NULL,
+  version1 tinyint(4) unsigned, -- NULL means all versions
+  format1 varchar(50),
+  id_bibdoc2 mediumint(9) unsigned DEFAULT NULL,
+  version2 tinyint(4) unsigned, -- NULL means all versions
+  format2 varchar(50),
+  rel_type varchar(255),
   KEY  (id_bibdoc1),
-  KEY  (id_bibdoc2)
+  KEY  (id_bibdoc2),
+  KEY  (id)
+) ENGINE=MyISAM;
+
+-- Storage of moreInfo fields
+CREATE TABLE IF NOT EXISTS bibdocmoreinfo (
+  id_bibdoc mediumint(9) unsigned DEFAULT NULL,
+  version tinyint(4) unsigned DEFAULT NULL, -- NULL means all versions
+  format VARCHAR(50) DEFAULT NULL,
+  id_rel mediumint(9) unsigned DEFAULT NULL,
+  namespace VARCHAR(25) DEFAULT NULL, -- namespace in the moreinfo dictionary
+  data_key VARCHAR(25), -- key in the moreinfo dictionary
+  data_value MEDIUMBLOB,
+  KEY (id_bibdoc, version, format, id_rel, namespace, data_key)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibdocfsinfo (
@@ -4251,5 +4271,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_07_xtrjob_last_r
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_27_new_selfcite_tables',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_12_11_new_citation_errors_table',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_01_08_new_goto_table',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_15_bibdocfile_model',NOW());
 
 -- end of file

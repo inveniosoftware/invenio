@@ -196,6 +196,7 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
           files. Otherwise returns all the files as main. This is only
           enabled if distinguish_main_and_additional_files is set to True
     """
+
     _ = gettext_set_language(bfo.lang)
 
     urls = bfo.fields("8564_")
@@ -221,7 +222,6 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
     if len(bibarchive.list_bibdocs(doctype='Main')) > 0 and \
            distinguish_main_and_additional_files:
         distinct_main_and_additional_files = True
-
     # Parse URLs
     for complete_url in urls:
         if complete_url.has_key('u'):
@@ -233,7 +233,6 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
             url_format = filename[len(name):]
             if url_format.startswith('.'):
                 url_format = url_format[1:]
-
             if compose_format(url_format, subformat) in _CFG_NORMALIZED_BIBFORMAT_HIDDEN_FILE_FORMATS:
                 ## This format should be hidden.
                 continue
@@ -278,14 +277,14 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
                 for doc in bibarchive.list_bibdocs():
                     if int(doc.get_latest_version()) > 1:
                         old_versions = True
-                    if True in [f.fullname.startswith(filename) \
-                                for f in doc.list_all_files()]:
+                    if True in [f.get_full_name().startswith(filename) \
+                                    for f in doc.list_all_files()]:
                         assigned = True
                         if not include_subformat_icons and \
                                CFG_BIBDOCFILE_ICON_SUBFORMAT_RE.match(subformat):
                             # This is an icon and we want to skip it
                             continue
-                        if not doc.doctype == 'Main' and \
+                        if not doc.get_doctype(bfo.recID) == 'Main' and \
                                distinct_main_and_additional_files == True:
                             # In that case we record that there are
                             # additional files, but don't add them to
@@ -304,7 +303,6 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
                     if not descr:
                         descr = filename
                     parsed_urls['others_urls'].append((url, descr)) # Let's put it in a general other url
-
     return (parsed_urls, old_versions, additionals)
 
 _RE_SPLIT = re.compile(r"\d+|\D+")

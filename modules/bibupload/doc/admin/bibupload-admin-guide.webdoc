@@ -32,6 +32,11 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5. <a href="#3.5">Updating preformatted output formats</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.6. <a href="#3.6">Uploading fulltext files</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.7. <a href="#3.7">Obtaining feedbacks</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.8. <a href="#3.8">Assigning additional informations to documents and other entities</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.8.1 <a href="#3.8.1">Uploading relations between documents</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.8.2 <a href="#3.8.2">Using temporary identifiers</a><br />
+
+
 <strong>4. <a href="#4">Batch Uploader</a></strong><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1. <a href="#4.1">Web interface - Cataloguers</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1. <a href="#4.2">Web interface - Robots</a><br />
@@ -262,6 +267,10 @@ semantic:
         $v  ...  version (used only with REVERT and DELETE-FILE, see below)
         $x  ...  url/path for an icon (optional)
         $z  ...  comment (optional)
+        $w  ... MoreInfo modification of the document
+        $p  ... MoreInfo modification of a current version of the document
+        $b  ... MoreInfo modification of a current version and format of the document
+        $u  ... MoreInfo modification of a format (of any version) of the document
 </pre>
 </p>
 
@@ -449,7 +458,7 @@ feedback that aknowledges the outcome of a bibupload execution. To this aim
 the <tt>--callback-url</tt> command line parameter can be used. This parameter
 expects a <em>URL</em> to be specified to which a
 <strong><a href="http://json.org/" alt="JSON" target="_blank">JSON</a>-serialized</strong>
-response will <strong>POSTed</strong>.<p>
+response will <strong>POSTed</strong>.</p>
 
 <p>Say, you have an external service reachable via the URL
 <tt>http://www.example.org/accept_feedback</tt>. If the argument:
@@ -534,6 +543,154 @@ where value can be any string you wish. Such string will be then added to the JS
 }
 </pre>
 </p>
+
+<a name="3.8"></a><h3>3.8 Assigning additional informations to documents and other entities</h3>
+<p>Some bits of meta-data should not be viewed by Invenio users directly and stored in the MARC format.
+This includes all types of non-standard data related to records and documents, for example flags realted to documetns (sepcified inside of a FFT tage) or bits of semantic information related to entities managed in Invenio.
+This type of data is usually machine generated and should be used by modules of Invenio internally.
+</p>
+
+<p>
+Invenio provides a general mechanism allowing to store objects related to different entities of Invenio.
+This mechanism is called MoreInfo and resembles well known more-info solutions.
+Every entity (document, version of a document, format of a particular version of a document,
+relation between documents) can be assigned a dictionary of arbitrary values.
+The dictionary is divided into namespaces, which allow to separate data from different modules and serving different purposes.
+</p>
+
+<p> BibUpload, the only gateway to uploading data into the Invenio database, allows to populate MoreInfo structures.
+MoreInfo related to a given entity can be modified by providing a Pickle-serialised byte64 encoded Python object having following structure:
+</p>
+<pre>
+{
+    "namespace": {
+        "key": "value",
+       	"key2": "value2"
+    }
+}
+</pre>
+
+<p>For example the above dictionary should be uploaded as</p>
+<pre>KGRwMQpTJ25hbWVzcGFjZScKcDIKKGRwMwpTJ2tleTInCnA0ClMndmFsdWUyJwpwNQpzUydrZXknCnA2ClMndmFsdWUnCnA3CnNzLg==</pre>
+<p>Which is a base-64 encoded representation of the string</p>
+<pre>(dp0\nS'namespace'\np1\n(dp2\nS'key2'\np3\nS'value2'\np4\nsS'key'\np5\nS'value'\np6\nss.</pre>
+
+<p> Removing of data keys from a dictionary can happen by providing None value as a value. Empty namespaces are considered non-existent.
+</p>
+
+<p>The string representation of modifications to the MoreInfo dictionary can be provided in several places, depending, to which object it should be attached.
+The most general upload method, the BDM tag has following semantic:</p>
+
+<pre>
+    BDM $r  ... Identifier of a relation between documents (optional)
+        $i  ... Identifier of a BibDoc (optional)
+        $v  ... Version of a BibDoc (optional)
+        $n  ... Name of a BibDoc (within a current record) (optional)
+        $f  ... Format of a BibDoc (optional)
+        $m  ... Serialised update to the MoreInfo dictionary
+</pre>
+<p>All (except $m) subfields are optional and allow to identify an entity to which MoreInfo should refer.</p>
+<p>Besides the BDM tag, MoreInfo can be transfered using special subfields of FFT and BDR tags.
+The first one allows to modify MoreInfo of a newly uploaded document, the second of a relation.
+The additional subfields have following semantic:</p>
+<pre>
+    FFT $w  ... MoreInfo modification of the document
+        $p  ... MoreInfo modification of a current version of the document
+        $s  ... MoreInfo modification of a current version and format of the document
+        $u  ... MoreInfo modification of a format (of any version) of the document
+    BDR $m  ... MoreInfo modification of a relation between BibDocs
+</pre>
+
+<a name="3.8.1"></a><h4>3.8.1 Uploading relations between documents</h4>
+<p>One of additional pieces of non-MARC data which can be uploaded to Invenio are relations between documents.
+Similarly to MoreInfos, relations are intended to be used by Invenio modules.
+The semantics of BDR field allowing to upload relations looks as follows</p>
+<pre>
+    BDR $r  ... Identifier of the relation (optional, can be provided if modifying a known relation)
+
+        $i  ... Identifier of the first document
+        $n  ... Name of the first document (within the current record) (optional)
+        $v  ... Version of the first document (optional)
+        $f  ... Format of the first document (optional)
+
+        $j  ... Identifier of the second document
+        $o  ... Name of the second document (within the current record) (optional)
+        $w  ... Version of the second document (optional)
+        $g  ... Format of the second document (optional)
+
+        $t  ... Type of the relation
+        $m  ... Modification of the MoreInfo of the relation
+        $d  ... Special field. if value=DELETE, relation is removed
+</pre>
+<p>
+Behavious of BDR tag in different upload modes:
+</p>
+<table border="1">
+<tr><td>insert, append</td><td>Inserts new relation if necessary. Appends fields to the MoreInfo structure</td></tr>
+<tr><td>correct, replace</td><td>Creates new relation if necessary, replaces the entire content of MoreInfo field.</td></tr>
+</table>
+<a name="3.8.2"></a><h4>3.8.2 Using temporary identifiers</h4>
+<p>In many cases, users want to upload large collections of documents using single BibUpload tasks.
+The infrastructure described in the rest of this manual allows easy upload of multiple documents,
+but lacks facilities for relating them to each other.
+A sample use-case which can not be satisfied by simple usage of FFT tags is uploading a document
+and relating it to another which is either already in the database or is being uploaded within
+the same BibUpload task.
+BibUpload provides a mechanism of temportaty identifiers which allows to serve scenarios similar to the aforementioned.
+</p>
+
+<p>Temporary identifier is a string (unique in the context of a single MARC XML document), which replaces document number or a version number.
+In the context of BibDoc manipulations (FFT, BDR and BDM tags), temporary identifeirs can appear everywhere where version or numerical id are required.
+If a temporary identifier appears in a context of document already having an ID assigned, it will be interpreted as this already existent number.
+If newly created document is assigned a temporary identifier, the newly generated numerical ID is assigned to the temporary id.
+In order to be recognised as a temporary identifier, a string has to begin with a prefix <strong>TMP:</strong>.
+The mechanism of temporary identifiers can not be used in the con text of records, but only with BibDocs.
+</p>
+
+<p>A BibUpload input using temporary identifiers can look like:</p>
+
+<pre>
+
+&lt;collection xmlns=&quot;http://www.loc.gov/MARC21/slim&quot;&gt;
+  &lt;record&gt;
+    &lt;datafield tag=&quot;100&quot; ind1=&quot; &quot; ind2=&quot; &quot;&gt;
+      &lt;subfield code=&quot;a&quot;&gt;This is a record of the publication&lt;/subfield&gt;
+    &lt;/datafield&gt;
+    &lt;datafield tag=&quot;FFT&quot; ind1=&quot; &quot; ind2=&quot; &quot;&gt;
+      &lt;subfield code=&quot;a&quot;&gt;http://somedomain.com/document.pdf&lt;/subfield&gt;
+      &lt;subfield code=&quot;t&quot;&gt;Main&lt;/subfield&gt;
+      &lt;subfield code=&quot;n&quot;&gt;docname&lt;/subfield&gt;
+      &lt;subfield code=&quot;i&quot;&gt;TMP:id_identifier1&lt;/subfield&gt;
+      &lt;subfield code=&quot;v&quot;&gt;TMP:ver_identifier1&lt;/subfield&gt;
+    &lt;/datafield&gt;
+  &lt;/record&gt;
+
+  &lt;record&gt;
+    &lt;datafield tag=&quot;100&quot; ind1=&quot; &quot; ind2=&quot; &quot;&gt;
+      &lt;subfield code=&quot;a&quot;&gt;This is a record of a dataset extracted from the publication&lt;/subfield&gt;
+    &lt;/datafield&gt;
+
+    &lt;datafield tag=&quot;FFT&quot; ind1=&quot; &quot; ind2=&quot; &quot;&gt;
+      &lt;subfield code=&quot;a&quot;&gt;http://sample.com/dataset.data&lt;/subfield&gt;
+      &lt;subfield code=&quot;t&quot;&gt;Main&lt;/subfield&gt;
+      &lt;subfield code=&quot;n&quot;&gt;docname2&lt;/subfielxd&gt;
+      &lt;subfield code=&quot;i&quot;&gt;TMP:id_identifier2&lt;/subfield&gt;
+      &lt;subfield code=&quot;v&quot;&gt;TMP:ver_identifier2&lt;/subfield&gt;
+    &lt;/datafield&gt;
+
+    &lt;datafield tag=&quot;BDR&quot; ind1=&quot; &quot; ind2=&quot; &quot;&gt;
+      &lt;subfield code=&quot;i&quot;&gt;TMP:id_identifier1&lt;/subfield&gt;
+      &lt;subfield code=&quot;v&quot;&gt;TMP:ver_identifier1&lt;/subfield&gt;
+      &lt;subfield code=&quot;j&quot;&gt;TMP:id_identifier2&lt;/subfield&gt;
+      &lt;subfield code=&quot;w&quot;&gt;TMP:ver_identifier2&lt;/subfield&gt;
+
+      &lt;subfield code=&quot;t&quot;&gt;is_extracted_from&lt;/subfield&gt;
+    &lt;/datafield&gt;
+  &lt;/record&gt;
+
+&lt;/collection&gt;
+</pre>
+
 <a name="4"></a><h2>4. Batch Uploader</h2>
 <a name="4.1"></a><h3>4.1 Web interface - Cataloguers</h3>
 <p>The batchuploader web interface can be used either to upload metadata files or documents. Opposed to daemon mode, actions will be executed only once.</p>

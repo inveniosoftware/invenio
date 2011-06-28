@@ -15,6 +15,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+bibdocfilepluginsdir = $(libdir)/python/invenio/bibdocfile_plugins
+
+bibdocfileplugins_DATA = bom_*.py
+
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = bibdocfile_config.py file.py \
@@ -27,6 +31,6 @@ pylib_DATA = bibdocfile_config.py file.py \
 
 noinst_DATA = fulltext_files_migration_kit.py icon_migration_kit.py
 
-EXTRA_DIST = $(pylib_DATA) $(noinst_DATA)
+EXTRA_DIST = $(pylib_DATA) $(noinst_DATA) $(bibdocfileplugins)
 
 CLEANFILES = *~ *.tmp *.pyc

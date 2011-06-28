@@ -141,7 +141,8 @@ def Move_Revised_Files_to_Storage(parameters, curdir, form, user_info=None):
             files_in_record = bibrecdocs.list_bibdocs(doctype)
             if len(files_in_record) == 1:
                 # Ok, we can revise
-                bibdoc_name = files_in_record[0].get_docname()
+
+                bibdoc_name = bibrecdocs.get_docname(files_in_record[0].id)
                 revise(bibrecdocs, curdir, sysno, file_path,
                        bibdoc_name, doctype, iconsize,
                        create_icon_doctypes,
@@ -180,7 +181,8 @@ def add(bibrecdocs, curdir, sysno, file_path, doctype,
         bibdoc = bibrecdocs.add_new_file(file_path,
                                          doctype,
                                          never_fail=True)
-        _do_log(curdir, '  Added ' + bibdoc.get_docname() + ': ' + \
+
+        _do_log(curdir, '  Added ' + bibrecdocs.get_docname(bibdoc.id) + ': ' + \
                 file_path)
 
         # Add icon
@@ -191,7 +193,7 @@ def add(bibrecdocs, curdir, sysno, file_path, doctype,
             if iconpath is not None:
                 bibdoc.add_icon(iconpath)
                 _do_log(curdir, '  Added icon to ' + \
-                        bibdoc.get_docname() + ': ' + iconpath)
+                        bibrecdocs.get_docname(bibdoc.id) + ': ' + iconpath)
 
         # Automatically create additional formats when
         # possible.
@@ -201,10 +203,10 @@ def add(bibrecdocs, curdir, sysno, file_path, doctype,
                                                       overwrite=False)
         for additional_format in additional_formats:
             bibdoc.add_new_format(additional_format,
-                                  bibdoc.get_docname())
+                                  bibrecdocs.get_docname(bibdoc.id))
             # Log
             _do_log(curdir, '  Added format ' + additional_format + \
-                    ' to ' + bibdoc.get_docname() + ': ' + iconpath)
+                    ' to ' + bibrecdocs.get_docname(bibdoc.id) + ': ' + iconpath)
 
 
     except InvenioBibDocFileError, e:
@@ -235,7 +237,7 @@ def revise(bibrecdocs, curdir, sysno, file_path, bibdoc_name, doctype,
                                                 bibdoc_name,
                                                 prev_desc,
                                                 prev_comment)
-            _do_log(curdir, '  Revised ' + bibdoc.get_docname() + \
+            _do_log(curdir, '  Revised ' + bibrecdocs.get_docname(bibdoc.id) + \
                     ' with : ' + file_path)
 
         else:
@@ -253,7 +255,7 @@ def revise(bibrecdocs, curdir, sysno, file_path, bibdoc_name, doctype,
                                                  never_fail=True,
                                                  description=prev_desc,
                                                  comment=prev_comment)
-                _do_log(curdir, '  Added ' + bibdoc.get_docname() + ': ' + \
+                _do_log(curdir, '  Added ' + bibrecdocs.get_docname(bibdoc.id) + ': ' + \
                         file_path)
 
             except InvenioBibDocFileError, e:
@@ -272,7 +274,7 @@ def revise(bibrecdocs, curdir, sysno, file_path, bibdoc_name, doctype,
             if iconpath is not None:
                 bibdoc.add_icon(iconpath)
                 _do_log(curdir, 'Added icon to ' + \
-                        bibdoc.get_docname() + ': ' + iconpath)
+                        bibrecdocs.get_docname(bibdoc.id) + ': ' + iconpath)
 
         # Automatically create additional formats when
         # possible.
@@ -287,7 +289,7 @@ def revise(bibrecdocs, curdir, sysno, file_path, bibdoc_name, doctype,
                                   prev_comment)
             # Log
             _do_log(curdir, '  Addeded format ' + additional_format + \
-                    ' to ' + bibdoc.get_docname() + ': ' + iconpath)
+                    ' to ' + bibrecdocs.get_docname(bibdoc.id) + ': ' + iconpath)
 
     except InvenioBibDocFileError, e:
         # Format already existed.  How come? We should

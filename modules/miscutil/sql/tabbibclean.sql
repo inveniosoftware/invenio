@@ -322,6 +322,7 @@ TRUNCATE rnkWORD01R;
 TRUNCATE bibdoc;
 TRUNCATE bibrec_bibdoc;
 TRUNCATE bibdoc_bibdoc;
+TRUNCATE bibdocmoreinfo;
 TRUNCATE bibdocfsinfo;
 TRUNCATE sbmAPPROVAL;
 TRUNCATE sbmSUBMISSIONS;

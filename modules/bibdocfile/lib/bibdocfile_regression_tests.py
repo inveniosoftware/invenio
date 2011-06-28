@@ -24,8 +24,10 @@ __revision__ = "$Id$"
 import os
 import unittest
 from invenio.testutils import make_test_suite, run_test_suite
-from invenio.bibdocfile import BibRecDocs, check_bibdoc_authorization, bibdocfile_url_p, guess_format_from_url, CFG_HAS_MAGIC
+from invenio.bibdocfile import BibRecDocs, BibRelation, MoreInfo, \
+	check_bibdoc_authorization, bibdocfile_url_p, guess_format_from_url, CFG_HAS_MAGIC
 from invenio.dbquery import run_sql
+
 from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
 from invenio.config import \
         CFG_SITE_URL, \
@@ -34,7 +36,7 @@ from invenio.config import \
         CFG_SITE_RECORD, \
         CFG_WEBDIR, \
         CFG_TMPDIR
-
+import invenio.template
 from datetime import datetime
 import time
 
@@ -169,7 +171,7 @@ class BibRecDocsTest(unittest.TestCase):
         my_added_bibdoc = my_bibrecdoc.get_bibdoc('file')
         #add bibdocfile in empty bibdoc
         my_added_bibdoc.add_file_new_version(CFG_PREFIX + '/lib/webtest/invenio/test.gif', \
-        description= 'added in empty bibdoc', comment=None, format=None, flags=['PERFORM_HIDE_PREVIOUS'])
+        description= 'added in empty bibdoc', comment=None, docformat=None, flags=['PERFORM_HIDE_PREVIOUS'])
         #propose unique docname
         self.assertEqual(my_bibrecdoc.propose_unique_docname('file'), 'file_2')
         #has docname
@@ -180,15 +182,18 @@ class BibRecDocsTest(unittest.TestCase):
         #check file exists
         self.assertEqual(my_bibrecdoc.check_file_exists(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', '.jpg'), True)
         #get bibdoc names
-        self.assertEqual(my_bibrecdoc.get_bibdoc_names('Main')[0], '0104007_02')
-        self.assertEqual(my_bibrecdoc.get_bibdoc_names('Main')[1],'img_test')
+        # we can not rely on the order !
+        names = set([my_bibrecdoc.get_bibdoc_names('Main')[0], my_bibrecdoc.get_bibdoc_names('Main')[1]])
+        self.assertTrue('0104007_02' in names)
+        self.assertTrue('img_test' in names)
+
         #get total size
         self.assertEqual(my_bibrecdoc.get_total_size(), 1647591)
         #get total size latest version
         self.assertEqual(my_bibrecdoc.get_total_size_latest_version(), 1647591)
         #display
-        value = my_bibrecdoc.display(docname='img_test', version='', doctype='', ln='en', verbose=0, display_hidden=True)
-        self.assert_("<small><b>Main</b>" in value)
+        #value = my_bibrecdoc.display(docname='img_test', version='', doctype='', ln='en', verbose=0, display_hidden=True)
+        #self.assert_("<small><b>Main</b>" in value)
         #get xml 8564
         value = my_bibrecdoc.get_xml_8564()
         self.assert_('/'+ CFG_SITE_RECORD +'/2/files/img_test.jpg</subfield>' in value)
@@ -200,6 +205,7 @@ class BibRecDocsTest(unittest.TestCase):
         #delete
         my_bibrecdoc.delete_bibdoc('img_test')
         my_bibrecdoc.delete_bibdoc('file')
+        my_bibrecdoc.delete_bibdoc('test')
 
 class BibDocsTest(unittest.TestCase):
     """regression tests about BibDocs"""
@@ -216,11 +222,12 @@ class BibDocsTest(unittest.TestCase):
         #get total file (bibdoc)
         self.assertEqual(my_new_bibdoc.get_total_size(), 91750)
         #get recid
-        self.assertEqual(my_new_bibdoc.get_recid(), 2)
+        self.assertEqual(my_new_bibdoc.bibrec_links[0]["recid"], 2)
         #change name
-        my_new_bibdoc.change_name('new_name')
+        my_new_bibdoc.change_name(2, 'new_name')
         #get docname
-        self.assertEqual(my_new_bibdoc.get_docname(), 'new_name')
+        my_bibrecdoc = BibRecDocs(2)
+        self.assertEqual(my_bibrecdoc.get_docname(my_new_bibdoc.id), 'new_name')
         #get type
         self.assertEqual(my_new_bibdoc.get_type(), 'Main')
         #get id
@@ -235,7 +242,7 @@ class BibDocsTest(unittest.TestCase):
         self.assertEqual(my_new_bibdoc.get_file_number(), 1)
         #add file new version
         timestamp2 = datetime(*(time.strptime("2010-09-08 07:06:05", "%Y-%m-%d %H:%M:%S")[:6]))
-        my_new_bibdoc.add_file_new_version(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', description= 'the new version', comment=None, format=None, flags=["PERFORM_HIDE_PREVIOUS"], modification_date=timestamp2)
+        my_new_bibdoc.add_file_new_version(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', description= 'the new version', comment=None, docformat=None, flags=["PERFORM_HIDE_PREVIOUS"], modification_date=timestamp2)
         self.assertEqual(my_new_bibdoc.list_versions(), [1, 2])
         #revert
         timestamp3 = datetime.now()
@@ -252,9 +259,9 @@ class BibDocsTest(unittest.TestCase):
         self.assertEqual(my_new_bibdoc.list_latest_files()[0].get_version(), 3)
         #list version files
         self.assertEqual(len(my_new_bibdoc.list_version_files(1, list_hidden=True)), 1)
-        #display
-        value = my_new_bibdoc.display(version='', ln='en', display_hidden=True)
-        self.assert_('>test add new file<' in value)
+        #display # No Display facility inside of an object !
+#        value = my_new_bibdoc.display(version='', ln='en', display_hidden=True)
+#        self.assert_('>test add new file<' in value)
         #format already exist
         self.assertEqual(my_new_bibdoc.format_already_exists_p('.jpg'), True)
         #get file
@@ -281,7 +288,7 @@ class BibDocsTest(unittest.TestCase):
         my_new_bibdoc.delete_file('.jpg', 3)
         #add new format
         timestamp4 = datetime(*(time.strptime("2012-11-10 09:08:07", "%Y-%m-%d %H:%M:%S")[:6]))
-        my_new_bibdoc.add_file_new_format(CFG_PREFIX + '/lib/webtest/invenio/test.gif', version=None, description=None, comment=None, format=None, modification_date=timestamp4)
+        my_new_bibdoc.add_file_new_format(CFG_PREFIX + '/lib/webtest/invenio/test.gif', version=None, description=None, comment=None, docformat=None, modification_date=timestamp4)
         self.assertEqual(len(my_new_bibdoc.list_all_files()), 2)
         #check modification time
         self.assertEqual(my_new_bibdoc.get_file('.jpg', version=1).md, timestamp1)
@@ -299,9 +306,15 @@ class BibDocsTest(unittest.TestCase):
         #hidden?
         self.assertEqual(my_new_bibdoc.hidden_p('.jpg', version=1), True)
         #add and get icon
+
         my_new_bibdoc.add_icon( CFG_PREFIX + '/lib/webtest/invenio/icon-test.gif', modification_date=timestamp4)
-        value =  my_bibrecdoc.list_bibdocs()[1]
-        self.assertEqual(value.get_icon(), my_new_bibdoc.get_icon())
+
+        my_bibrecdoc = BibRecDocs(2)
+        value =  my_bibrecdoc.get_bibdoc("new_name")
+        self.assertEqual(value.get_icon().docid, my_new_bibdoc.get_icon().docid)
+        self.assertEqual(value.get_icon().version, my_new_bibdoc.get_icon().version)
+        self.assertEqual(value.get_icon().format, my_new_bibdoc.get_icon().format)
+
         #check modification time
         self.assertEqual(my_new_bibdoc.get_icon().md, timestamp4)
         #delete icon
@@ -312,7 +325,7 @@ class BibDocsTest(unittest.TestCase):
         my_new_bibdoc.delete()
         self.assertEqual(my_new_bibdoc.deleted_p(), True)
         #undelete
-        my_new_bibdoc.undelete(previous_status='')
+        my_new_bibdoc.undelete(previous_status='', recid=2)
         #expunging
         my_new_bibdoc.expunge()
         my_bibrecdoc.build_bibdoc_list()
@@ -326,6 +339,59 @@ class BibDocsTest(unittest.TestCase):
         my_bibrecdoc.delete_bibdoc('new_name')
 
 
+
+class BibRelationTest(unittest.TestCase):
+    """ regression tests for BibRelation"""
+    def test_RelationCreation_Version(self):
+        """
+        Testing relations between particular versions of a document
+        We create two relations differing only on the BibDoc version
+        number and verify that they are indeed differen (store different data)
+        """
+
+        rel1 = BibRelation.create(bibdoc1_id = 10, bibdoc2_id=12,
+                                  bibdoc1_ver = 1, bibdoc2_ver = 1,
+                                  rel_type = "some_rel")
+
+        rel2 = BibRelation.create(bibdoc1_id = 10, bibdoc2_id=12,
+                                  bibdoc1_ver = 1, bibdoc2_ver = 2,
+                                  rel_type = "some_rel")
+
+        rel1["key1"] = "value1"
+        rel1["key2"] = "value2"
+        rel2["key1"] = "value3"
+
+        # now testing the retrieval of data
+        new_rel1 = BibRelation(bibdoc1_id = 10, bibdoc2_id = 12,
+                               rel_type = "some_rel", bibdoc1_ver = 1,
+                               bibdoc2_ver = 1)
+
+        new_rel2 = BibRelation(bibdoc1_id = 10, bibdoc2_id = 12,
+                               rel_type = "some_rel", bibdoc1_ver = 1,
+                               bibdoc2_ver = 2)
+
+        self.assertEqual(new_rel1["key1"], "value1")
+        self.assertEqual(new_rel1["key2"], "value2")
+        self.assertEqual(new_rel2["key1"], "value3")
+
+        # now testing the deletion of relations
+        new_rel1.delete()
+        new_rel2.delete()
+
+        newer_rel1 = BibRelation.create(bibdoc1_id = 10, bibdoc2_id=12,
+                                  bibdoc1_ver = 1, bibdoc2_ver = 1,
+                                  rel_type = "some_rel")
+
+        newer_rel2 = BibRelation.create(bibdoc1_id = 10, bibdoc2_id=12,
+                                  bibdoc1_ver = 1, bibdoc2_ver = 2,
+                                  rel_type = "some_rel")
+
+        self.assertEqual("key1" in newer_rel1, False)
+        self.assertEqual("key1" in newer_rel2, False)
+
+        newer_rel1.delete()
+        newer_rel2.delete()
+
 class BibDocFilesTest(unittest.TestCase):
     """regression tests about BibDocFiles"""
 
@@ -335,6 +401,7 @@ class BibDocFilesTest(unittest.TestCase):
         my_bibrecdoc = BibRecDocs(2)
         timestamp = datetime(*(time.strptime("2010-09-08 07:06:05", "%Y-%m-%d %H:%M:%S")[:6]))
         my_bibrecdoc.add_new_file(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', 'Main', 'img_test', False, 'test add new file', 'test', '.jpg', modification_date=timestamp)
+
         my_new_bibdoc = my_bibrecdoc.get_bibdoc("img_test")
         my_new_bibdocfile = my_new_bibdoc.list_all_files()[0]
         #get url
@@ -342,8 +409,10 @@ class BibDocFilesTest(unittest.TestCase):
         #get type
         self.assertEqual(my_new_bibdocfile.get_type(), 'Main')
         #get path
-        self.assert_(my_new_bibdocfile.get_path().startswith(CFG_BIBDOCFILE_FILEDIR))
-        self.assert_(my_new_bibdocfile.get_path().endswith('/img_test.jpg;1'))
+        # we should not test for particular path ! this is in the gestion of the underlying implementation,
+        # not the interface which should ne tested
+        #        self.assert_(my_new_bibdocfile.get_path().startswith(CFG_BIBDOCFILE_FILEDIR))
+        #        self.assert_(my_new_bibdocfile.get_path().endswith('/img_test.jpg;1'))
         #get bibdocid
         self.assertEqual(my_new_bibdocfile.get_bibdocid(), my_new_bibdoc.get_id())
         #get name
@@ -351,8 +420,8 @@ class BibDocFilesTest(unittest.TestCase):
         #get full name
         self.assertEqual(my_new_bibdocfile.get_full_name() , 'img_test.jpg')
         #get full path
-        self.assert_(my_new_bibdocfile.get_full_path().startswith(CFG_BIBDOCFILE_FILEDIR))
-        self.assert_(my_new_bibdocfile.get_full_path().endswith('/img_test.jpg;1'))
+        #self.assert_(my_new_bibdocfile.get_full_path().startswith(CFG_BIBDOCFILE_FILEDIR))
+        #self.assert_(my_new_bibdocfile.get_full_path().endswith('/img_test.jpg;1'))
         #get format
         self.assertEqual(my_new_bibdocfile.get_format(), '.jpg')
         #get version
@@ -372,7 +441,8 @@ class BibDocFilesTest(unittest.TestCase):
         #check
         self.assertEqual(my_new_bibdocfile.check(), True)
         #display
-        value = my_new_bibdocfile.display(ln='en')
+        tmpl = invenio.template.load("bibdocfile")
+        value = tmpl.tmpl_display_bibdocfile(my_new_bibdocfile, ln='en')
         assert 'files/img_test.jpg?version=1">' in value
         #hidden?
         self.assertEqual(my_new_bibdocfile.hidden_p(), False)
@@ -407,11 +477,79 @@ class BibDocFileURLTest(unittest.TestCase):
         self.failUnless(bibdocfile_url_p(CFG_SITE_URL + '/%s/98/files/9709037.pdf' % CFG_SITE_RECORD))
         self.failUnless(bibdocfile_url_p(CFG_SITE_URL + '/%s/098/files/9709037.pdf' % CFG_SITE_RECORD))
 
+
+class MoreInfoTest(unittest.TestCase):
+    """regression tests about BibDocFiles"""
+
+    def test_initialData(self):
+        """Testing if passing the initial data really enriches the existing structure"""
+        more_info = MoreInfo(docid = 134)
+
+        more_info.set_data("ns1", "k1", "vsrjklfh23478956@#%@#@#%")
+        more_info2 = MoreInfo(docid = 134, initial_data = {"ns1" : { "k2" : "weucb2324@#%@#$%@"}})
+        self.assertEqual(more_info.get_data("ns1", "k2"), "weucb2324@#%@#$%@")
+        self.assertEqual(more_info.get_data("ns1", "k1"), "vsrjklfh23478956@#%@#@#%")
+        self.assertEqual(more_info2.get_data("ns1", "k2"), "weucb2324@#%@#$%@")
+        self.assertEqual(more_info2.get_data("ns1", "k1"), "vsrjklfh23478956@#%@#@#%")
+        more_info3 = MoreInfo(docid = 134)
+        self.assertEqual(more_info3.get_data("ns1", "k2"), "weucb2324@#%@#$%@")
+        self.assertEqual(more_info3.get_data("ns1", "k1"), "vsrjklfh23478956@#%@#@#%")
+
+        more_info.del_key("ns1", "k1")
+        more_info.del_key("ns1", "k2")
+
+    def test_createSeparateRead(self):
+        """MoreInfo - testing if information saved using one instance is accessible via
+        a new one"""
+        more_info = MoreInfo(docid = 13)
+        more_info.set_data("some_namespace", "some_key", "vsrjklfh23478956@#%@#@#%")
+
+        more_info2 = MoreInfo(docid = 13)
+        self.assertEqual(more_info.get_data("some_namespace", "some_key"), "vsrjklfh23478956@#%@#@#%")
+        self.assertEqual(more_info2.get_data("some_namespace", "some_key"), "vsrjklfh23478956@#%@#@#%")
+        more_info2.del_key("some_namespace", "some_key")
+
+    def test_DictionaryBehaviour(self):
+        """moreinfo - tests assignments of data, both using the general interface and using
+           namespaces"""
+        more_info = MoreInfo()
+        more_info.set_data("namespace1", "key1", "val1")
+        more_info.set_data("namespace1", "key2", "val2")
+        more_info.set_data("namespace2", "key1", "val3")
+        self.assertEqual(more_info.get_data("namespace1", "key1"), "val1")
+        self.assertEqual(more_info.get_data("namespace1", "key2"), "val2")
+        self.assertEqual(more_info.get_data("namespace2", "key1"), "val3")
+
+    def test_inMemoryMoreInfo(self):
+        """test that MoreInfo is really stored only in memory (no database accesses)"""
+        m1 = MoreInfo(docid = 101, version = 12, cache_only = True)
+        m2 = MoreInfo(docid = 101, version = 12, cache_reads = False) # The most direct DB access
+        m1.set_data("n1", "k1", "v1")
+        self.assertEqual(m2.get_data("n1","k1"), None)
+        self.assertEqual(m1.get_data("n1","k1"), "v1")
+
+    def test_readCacheMoreInfo(self):
+        """we verify that if value is not present in the cache, read will happen from the database"""
+        m1 = MoreInfo(docid = 102, version = 12)
+        m2 = MoreInfo(docid = 102, version = 12) # The most direct DB access
+        self.assertEqual(m2.get_data("n11","k11"), None)
+        self.assertEqual(m1.get_data("n11","k11"), None)
+
+        m1.set_data("n11", "k11", "some value")
+        self.assertEqual(m1.get_data("n11","k11"), "some value")
+        self.assertEqual(m2.get_data("n11","k11"), "some value") # read from a different instance
+
+        m1.delete()
+        m2.delete()
+
+
 TEST_SUITE = make_test_suite(BibRecDocsTest,
                              BibDocsTest,
                              BibDocFilesTest,
-                             CheckBibDocAuthorizationTest,
+                             MoreInfoTest,
+                             BibRelationTest,
                              BibDocFileURLTest,
+                             CheckBibDocAuthorizationTest,
                              BibDocFsInfoTest,
                              BibDocFileGuessFormat)
 if __name__ == "__main__":

@@ -61,18 +61,17 @@ def fix_bibdoc_bibdoc(id_bibdoc1, id_bibdoc2, logfile):
     """
 
     try:
-        the_bibdoc = BibDoc(id_bibdoc1)
+        the_bibdoc = BibDoc.create_instance(id_bibdoc1)
     except Exception, err:
         msg = "WARNING: when opening docid %s: %s" % (id_bibdoc1, err)
         print >> logfile, msg
         print msg
         return True
     try:
-        recid = the_bibdoc.get_recid()
-        msg = "Fixing icon for recid %s: document %s (docid %s)" % (recid, the_bibdoc.get_docname(), id_bibdoc1)
+        msg = "Fixing icon for the document %s" % (id_bibdoc1, )
         print msg,
         print >> logfile, msg,
-        the_icon = BibDoc(id_bibdoc2)
+        the_icon = BibDoc.create_instance(id_bibdoc2)
         for a_file in the_icon.list_latest_files():
             the_bibdoc.add_icon(a_file.get_full_path(), format=a_file.get_format())
         the_icon.delete()
@@ -150,8 +149,10 @@ In order for the script to go further they need to be removed.""", style='import
         except:
             logfile.close()
             register_exception()
-            print wrap_text_in_a_box(title="INTERRUPTED BECAUSE OF ERROR!", body="""Please see the log file %s for what was the status of record %s prior to the error. Contact %s in case of problems, attaching the log.""" % (logfilename, BibDoc(id_bibdoc1).get_recid(), CFG_SITE_SUPPORT_EMAIL),
-            style='conclusion')
+            print wrap_text_in_a_box(
+                title = "INTERRUPTED BECAUSE OF ERROR!",
+                body = """Please see the log file %s for what was the status prior to the error. Contact %s in case of problems, attaching the log.""" % (logfilename, CFG_SITE_SUPPORT_EMAIL),
+            style = 'conclusion')
             sys.exit(1)
     finally:
         print "Scheduling FIX-MARC to synchronize MARCXML for updated records."

@@ -327,7 +327,7 @@ def create_photos_manager_interface(sysno, session_id, uid,
                     #photo_files.append((format, url))
                     if not description and bibdoc_file.get_comment():
                         description = escape(bibdoc_file.get_comment())
-                name = doc.get_docname()
+                name = bibarchive.get_docname(doc.id)
                 photo_manager_descriptions_dict[doc_id] = description
                 photo_manager_icons_dict[doc_id] = icon_url
                 photo_manager_order_list.append(doc_id) # FIXME: respect order
