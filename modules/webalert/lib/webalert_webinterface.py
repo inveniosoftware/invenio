@@ -24,7 +24,13 @@ __lastupdated__ = """$Date$"""
 from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_NAME, \
   CFG_ACCESS_CONTROL_LEVEL_SITE, CFG_SITE_NAME_INTL
 from invenio.webpage import page
-from invenio import webalert
+from invenio.webalert import perform_input_alert, \
+                             perform_request_youralerts_display, \
+                             perform_add_alert, \
+                             perform_update_alert, \
+                             perform_remove_alert, \
+                             perform_request_youralerts_popular, \
+                             AlertError
 from invenio.webuser import getUid, page_not_authorized, isGuestUser
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
@@ -39,72 +45,28 @@ webalert_templates = invenio.template.load('webalert')
 class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
     """Defines the set of /youralerts pages."""
 
-    _exports = ['', 'display', 'input', 'modify', 'list', 'add',
-                'update', 'remove']
+    _exports = ['',
+                'display',
+                'input',
+                'modify',
+                'list',
+                'add',
+                'update',
+                'remove',
+                'popular']
 
     def index(self, req, dummy):
         """Index page."""
-        redirect_to_url(req, '%s/youralerts/list' % CFG_SITE_SECURE_URL)
 
-    def display(self, req, form):
-        """Display search history page.  A misnomer."""
+        redirect_to_url(req, '%s/youralerts/display' % CFG_SITE_SECURE_URL)
 
-        argd = wash_urlargd(form, {'p': (str, "n")
-                                   })
+    def list(self, req, form):
+        """
+        Legacy youralerts list page.
+        Now redirects to the youralerts display page.
+        """
 
-        uid = getUid(req)
-
-        # load the right language
-        _ = gettext_set_language(argd['ln'])
-
-        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "%s/youralerts/display" % \
-                                             (CFG_SITE_SECURE_URL,),
-                                       navmenuid="youralerts")
-        elif uid == -1 or isGuestUser(uid):
-            return redirect_to_url(req, "%s/youraccount/login%s" % (
-                CFG_SITE_SECURE_URL,
-                make_canonical_urlargd({
-                    'referer' : "%s/youralerts/display%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
-
-        user_info = collect_user_info(req)
-        if not user_info['precached_usealerts']:
-            return page_not_authorized(req, "../", \
-                                       text = _("You are not authorized to use alerts."))
-
-        if argd['p'] == 'y':
-            _title = _("Popular Searches")
-        else:
-            _title = _("Your Searches")
-
-        # register event in webstat
-        if user_info['email']:
-            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
-        else:
-            user_str = ""
-        try:
-            register_customevent("alerts", ["display", "", user_str])
-        except:
-            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
-
-        return page(title=_title,
-                    body=webalert.perform_display(argd['p'], uid, ln=argd['ln']),
-                    navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
-                                 'sitesecureurl' : CFG_SITE_SECURE_URL,
-                                 'ln': argd['ln'],
-                                 'account' : _("Your Account"),
-                              },
-                    description=_("%s Personalize, Display searches") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
-                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
-                    uid=uid,
-                    language=argd['ln'],
-                    req=req,
-                    lastupdated=__lastupdated__,
-                    navmenuid='youralerts',
-                    secure_page_p=1)
+        redirect_to_url(req, '%s/youralerts/display' % (CFG_SITE_SECURE_URL,))
 
     def input(self, req, form):
 
@@ -139,9 +101,9 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use alerts."))
 
         try:
-            html = webalert.perform_input_alert("add", argd['idq'], argd['name'], argd['freq'],
+            html = perform_input_alert("add", argd['idq'], argd['name'], argd['freq'],
                                                 argd['notif'], argd['idb'], uid, ln=argd['ln'])
-        except webalert.AlertError, msg:
+        except AlertError, msg:
             return page(title=_("Error"),
                         body=webalert_templates.tmpl_errorMsg(ln=argd['ln'], error_msg=msg),
                         navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
@@ -224,9 +186,9 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use alerts."))
 
         try:
-            html = webalert.perform_input_alert("update", argd['idq'], argd['name'], argd['freq'],
+            html = perform_input_alert("update", argd['idq'], argd['name'], argd['freq'],
                                                 argd['notif'], argd['idb'], uid, argd['old_idb'], ln=argd['ln'])
-        except webalert.AlertError, msg:
+        except AlertError, msg:
             return page(title=_("Error"),
                         body=webalert_templates.tmpl_errorMsg(ln=argd['ln'], error_msg=msg),
                         navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
@@ -275,21 +237,21 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                     lastupdated=__lastupdated__,
                     navmenuid='youralerts')
 
-    def list(self, req, form):
+    def display(self, req, form):
 
         argd = wash_urlargd(form, {})
 
         uid = getUid(req)
 
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "%s/youralerts/list" % \
+            return page_not_authorized(req, "%s/youralerts/display" % \
                                              (CFG_SITE_SECURE_URL,),
                                        navmenuid="youralerts")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
-                    'referer' : "%s/youralerts/list%s" % (
+                    'referer' : "%s/youralerts/display%s" % (
                         CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
@@ -307,12 +269,12 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         else:
             user_str = ""
         try:
-            register_customevent("alerts", ["list", "", user_str])
+            register_customevent("alerts", ["display", "", user_str])
         except:
             register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
         return page(title=_("Your Alerts"),
-                    body=webalert.perform_list_alerts(uid, ln = argd['ln']),
+                    body=perform_request_youralerts_display(uid, ln = argd['ln']),
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
                                  'sitesecureurl' : CFG_SITE_SECURE_URL,
                                  'ln': argd['ln'],
@@ -358,9 +320,9 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use alerts."))
 
         try:
-            html = webalert.perform_add_alert(argd['name'], argd['freq'], argd['notif'],
+            html = perform_add_alert(argd['name'], argd['freq'], argd['notif'],
                                               argd['idb'], argd['idq'], uid, ln=argd['ln'])
-        except webalert.AlertError, msg:
+        except AlertError, msg:
             return page(title=_("Error"),
                         body=webalert_templates.tmpl_errorMsg(ln=argd['ln'], error_msg=msg),
                         navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
@@ -435,9 +397,9 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use alerts."))
 
         try:
-            html = webalert.perform_update_alert(argd['name'], argd['freq'], argd['notif'],
+            html = perform_update_alert(argd['name'], argd['freq'], argd['notif'],
                                                  argd['idb'], argd['idq'], argd['old_idb'], uid, ln=argd['ln'])
-        except webalert.AlertError, msg:
+        except AlertError, msg:
             return page(title=_("Error"),
                         body=webalert_templates.tmpl_errorMsg(ln=argd['ln'], error_msg=msg),
                         navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
@@ -509,9 +471,9 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use alerts."))
 
         try:
-            html = webalert.perform_remove_alert(argd['name'], argd['idq'],
+            html = perform_remove_alert(argd['name'], argd['idq'],
                                                  argd['idb'], uid, ln=argd['ln'])
-        except webalert.AlertError, msg:
+        except AlertError, msg:
             return page(title=_("Error"),
                         body=webalert_templates.tmpl_errorMsg(ln=argd['ln'], error_msg=msg),
                         navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
@@ -554,3 +516,63 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='youralerts')
+
+    def popular(self, req, form):
+        """
+        Display a list of popular alerts.
+        """
+
+        argd = wash_urlargd(form, {'ln': (str, "en")})
+
+        uid = getUid(req)
+
+        # load the right language
+        _ = gettext_set_language(argd['ln'])
+
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/youralerts/popular" % \
+                                            (CFG_SITE_SECURE_URL,),
+                                       navmenuid="youralerts")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % \
+                                        (CFG_SITE_SECURE_URL,
+                                         make_canonical_urlargd(
+                                            {'referer' : "%s/youralerts/popular%s" % (
+                                                CFG_SITE_SECURE_URL,
+                                                make_canonical_urlargd(argd, {})),
+                                             'ln' : argd['ln']},
+                                            {})
+                                         )
+            )
+
+        user_info = collect_user_info(req)
+        if not user_info['precached_usealerts']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use alerts."))
+
+        # register event in webstat
+        if user_info['email']:
+            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
+        else:
+            user_str = ""
+        try:
+            register_customevent("alerts", ["popular", "", user_str])
+        except:
+            register_exception(
+                suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
+
+        return page(title=_("Popular Alerts"),
+                    body = perform_request_youralerts_popular(ln=argd['ln']),
+                    navtrail = """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
+                                  'sitesecureurl' : CFG_SITE_SECURE_URL,
+                                  'ln': argd['ln'],
+                                  'account' : _("Your Account"),
+                                  },
+                    description=_("%s Personalize, Popular Alerts") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                    uid=uid,
+                    language=argd['ln'],
+                    req=req,
+                    lastupdated=__lastupdated__,
+                    navmenuid='youralerts',
+                    secure_page_p=1)

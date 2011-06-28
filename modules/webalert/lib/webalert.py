@@ -54,8 +54,10 @@ def check_alert_name(alert_name, uid, ln=CFG_SITE_LANG):
         raise AlertError( _("You already have an alert named %s.") % ('<b>' + cgi.escape(alert_name) + '</b>',) )
 
 def get_textual_query_info_from_urlargs(urlargs, ln=CFG_SITE_LANG):
-    """Return nicely formatted search pattern and catalogue from urlargs of the search query.
-    Suitable for 'your searches' display."""
+    """
+    Return nicely formatted search pattern and catalogue from urlargs of the search query.
+    """
+
     out = ""
     args = cgi.parse_qs(urlargs)
     return webalert_templates.tmpl_textual_query_info_from_urlargs(
@@ -63,71 +65,6 @@ def get_textual_query_info_from_urlargs(urlargs, ln=CFG_SITE_LANG):
              args = args,
            )
     return out
-
-def perform_display(permanent, uid, ln=CFG_SITE_LANG):
-    """display the searches performed by the current user
-    input:  default permanent="n"; permanent="y" display permanent queries(most popular)
-    output: list of searches in formatted html
-    """
-    # load the right language
-    _ = gettext_set_language(ln)
-
-    # first detect number of queries:
-    nb_queries_total = 0
-    nb_queries_distinct = 0
-    query = "SELECT COUNT(*),COUNT(DISTINCT(id_query)) FROM user_query WHERE id_user=%s"
-    res = run_sql(query, (uid,), 1)
-    try:
-        nb_queries_total = res[0][0]
-        nb_queries_distinct = res[0][1]
-    except:
-        pass
-
-    # query for queries:
-    params = ()
-    if permanent == "n":
-        SQL_query = "SELECT DISTINCT(q.id),q.urlargs "\
-                    "FROM query q, user_query uq "\
-                    "WHERE uq.id_user=%s "\
-                    "AND uq.id_query=q.id "\
-                    "ORDER BY q.id DESC"
-        params = (uid,)
-    else:
-        # permanent="y"
-        SQL_query = "SELECT q.id,q.urlargs "\
-                    "FROM query q "\
-                    "WHERE q.type='p'"
-    query_result = run_sql(SQL_query, params)
-
-    queries = []
-    if len(query_result) > 0:
-        for row in query_result :
-            if permanent == "n":
-                res = run_sql("SELECT DATE_FORMAT(MAX(date),'%%Y-%%m-%%d %%H:%%i:%%s') FROM user_query WHERE id_user=%s and id_query=%s",
-                              (uid, row[0]))
-                try:
-                    lastrun = res[0][0]
-                except:
-                    lastrun = _("unknown")
-            else:
-                lastrun = ""
-            queries.append({
-                           'id' : row[0],
-                           'args' : row[1],
-                           'textargs' : get_textual_query_info_from_urlargs(row[1], ln=ln),
-                           'lastrun' : lastrun,
-                          })
-
-
-    return webalert_templates.tmpl_display_alerts(
-             ln = ln,
-             permanent = permanent,
-             nb_queries_total = nb_queries_total,
-             nb_queries_distinct = nb_queries_distinct,
-             queries = queries,
-             guest = isGuestUser(uid),
-             guesttxt = warning_guest_user(type="alerts", ln=ln)
-           )
 
 def check_user_can_add_alert(id_user, id_query):
     """Check if ID_USER has really alert adding rights on ID_QUERY
@@ -236,11 +173,20 @@ def perform_add_alert(alert_name, frequency, notification,
     run_sql(query, params)
     out = _("The alert %s has been added to your profile.")
     out %= '<b>' + cgi.escape(alert_name) + '</b>'
-    out += perform_list_alerts(uid, ln=ln)
+    out += perform_request_youralerts_display(uid, ln=ln)
     return out
 
-def perform_list_alerts(uid, ln=CFG_SITE_LANG):
-    """perform_list_alerts display the list of alerts for the connected user"""
+def perform_request_youralerts_display(uid,
+                                       ln=CFG_SITE_LANG):
+    """
+    Display a list of the user defined alerts.
+    @param uid: The user id
+    @type uid: int
+    @param ln: The interface language
+    @type ln: string
+    @return: HTML formatted list of the user defined alerts.
+    """
+
     # set variables
     out = ""
 
@@ -284,9 +230,10 @@ Here are all the alerts defined by this user: %s""" % (uid, repr(res)))
             register_exception(alert_admin=True)
 
     # link to the "add new alert" form
-    out = webalert_templates.tmpl_list_alerts(ln=ln, alerts=alerts,
-                                              guest=isGuestUser(uid),
-                                              guesttxt=warning_guest_user(type="alerts", ln=ln))
+    out = webalert_templates.tmpl_youralerts_display(ln=ln,
+                                                     alerts=alerts,
+                                                     guest=isGuestUser(uid),
+                                                     guesttxt=warning_guest_user(type="alerts", ln=ln))
     return out
 
 def perform_remove_alert(alert_name, id_query, id_basket, uid, ln=CFG_SITE_LANG):
@@ -314,7 +261,7 @@ def perform_remove_alert(alert_name, id_query, id_basket, uid, ln=CFG_SITE_LANG)
         out += "The alert <b>%s</b> has been removed from your profile.<br /><br />\n" % cgi.escape(alert_name)
     else:
         out += "Unable to remove alert <b>%s</b>.<br /><br />\n" % cgi.escape(alert_name)
-    out += perform_list_alerts(uid, ln=ln)
+    out += perform_request_youralerts_display(uid, ln=ln)
     return out
 
 
@@ -374,7 +321,7 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, id_quer
     run_sql(query, params)
 
     out += _("The alert %s has been successfully updated.") % ("<b>" + cgi.escape(alert_name) + "</b>",)
-    out += "<br /><br />\n" + perform_list_alerts(uid, ln=ln)
+    out += "<br /><br />\n" + perform_request_youralerts_display(uid, ln=ln)
     return out
 
 def is_selected(var, fld):
@@ -409,21 +356,32 @@ def account_list_alerts(uid, ln=CFG_SITE_LANG):
 
     return webalert_templates.tmpl_account_list_alerts(ln=ln, alerts=alerts)
 
-def account_list_searches(uid, ln=CFG_SITE_LANG):
-    """ account_list_searches: list the searches of the user
-        input:  the user id
-        output: resume of the searches"""
-    out = ""
-    # first detect number of queries:
-    nb_queries_total = 0
-    res = run_sql("SELECT COUNT(*) FROM user_query WHERE id_user=%s", (uid,), 1)
-    try:
-        nb_queries_total = res[0][0]
-    except:
-        pass
-
+def perform_request_youralerts_popular(ln=CFG_SITE_LANG):
+    """
+    Display popular alerts.
+    @param uid: the user id
+    @type uid: integer
+    @return: A list of searches queries in formatted html.
+    """
+    
     # load the right language
     _ = gettext_set_language(ln)
 
-    out += _("You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s is available with a possibility to (a) view search results and (b) subscribe to an automatic email alerting service for these queries.") % {'x_nb': nb_queries_total, 'x_url_open': '<a href="../youralerts/display?ln=%s">' % ln, 'x_url_close': '</a>'}
-    return out
+    # fetch the popular queries
+    query = """ SELECT      q.id,
+                            q.urlargs
+                FROM        query q
+                WHERE       q.type='p'"""
+    result = run_sql(query)
+
+    search_queries = []
+    if result:
+        for search_query in result:
+            search_query_id = search_query[0]
+            search_query_args = search_query[1]
+            search_queries.append({'id' : search_query_id,
+                                   'args' : search_query_args,
+                                   'textargs' : get_textual_query_info_from_urlargs(search_query_args, ln=ln)})
+
+    return webalert_templates.tmpl_youralerts_popular(ln = ln,
+                                                       search_queries = search_queries)
