@@ -53,7 +53,6 @@ import traceback
 import xml.sax
 import thread
 import time
-import weakref
 
 import bibclassify_config as bconfig
 log = bconfig.get_logger("bibclassify.ontology_reader")

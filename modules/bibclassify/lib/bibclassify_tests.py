@@ -342,36 +342,39 @@ class BibClassifyTest(unittest.TestCase):
         # set cache readable/writable but corrupted (must rebuild itself)
         open(cache, 'w').close()
         try:
-            os.rename(taxonomy_path, taxonomy_path + 'x')
-            open(taxonomy_path, 'w').close()
-            bibclassify_ontology_reader.get_regular_expressions(taxonomy_name, rebuild=False, no_cache=False)
-        except:
-            pass
+            try:
+                os.rename(taxonomy_path, taxonomy_path + 'x')
+                open(taxonomy_path, 'w').close()
+                bibclassify_ontology_reader.get_regular_expressions(taxonomy_name, rebuild=False, no_cache=False)
+            except:
+                pass
         finally:
             os.rename(taxonomy_path+'x', taxonomy_path)
 
         # make cache ok, but corrupt source
         bibclassify_ontology_reader.get_regular_expressions(taxonomy_name, rebuild=True, no_cache=False)
         try:
-            os.rename(taxonomy_path, taxonomy_path + 'x')
-            open(taxonomy_path, 'w').close()
-            time.sleep(.1)
-            os.utime(cache, (time.time() + 100, time.time() + 100))  #touch the taxonomy to be older
-            bibclassify_ontology_reader.get_regular_expressions(taxonomy_name, rebuild=False, no_cache=False)
-        except:
-            os.rename(taxonomy_path+'x', taxonomy_path)
-            raise Exception('Cache exists and is ok, but was ignored')
+            try:
+                os.rename(taxonomy_path, taxonomy_path + 'x')
+                open(taxonomy_path, 'w').close()
+                time.sleep(.1)
+                os.utime(cache, (time.time() + 100, time.time() + 100))  #touch the taxonomy to be older
+                bibclassify_ontology_reader.get_regular_expressions(taxonomy_name, rebuild=False, no_cache=False)
+            except:
+                os.rename(taxonomy_path+'x', taxonomy_path)
+                raise Exception('Cache exists and is ok, but was ignored')
         finally:
             os.rename(taxonomy_path+'x', taxonomy_path)
 
         # make cache ok (but old), and corrupt source
         bibclassify_ontology_reader.get_regular_expressions(taxonomy_name, rebuild=True, no_cache=False)
         try:
-            os.rename(taxonomy_path, taxonomy_path + 'x')
-            open(taxonomy_path, 'w').close()
-            bibclassify_ontology_reader.get_regular_expressions(taxonomy_name, rebuild=False, no_cache=False)
-        except:
-            pass
+            try:
+                os.rename(taxonomy_path, taxonomy_path + 'x')
+                open(taxonomy_path, 'w').close()
+                bibclassify_ontology_reader.get_regular_expressions(taxonomy_name, rebuild=False, no_cache=False)
+            except:
+                pass
         finally:
             os.rename(taxonomy_path+'x', taxonomy_path)
 
