@@ -2239,19 +2239,21 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             if query.count(":"):
                 try:
                     left, right = query.split(":")
-                except ValueError:
-                    pass
-
-                try:
-                    recid = int(left)
-                    nquery = str(right)
-                except (ValueError, TypeError):
                     try:
-                        recid = int(right)
-                        nquery = str(left)
+                        recid = int(left)
+                        nquery = str(right)
                     except (ValueError, TypeError):
-                        recid = None
-                        nquery = query
+                        try:
+                            recid = int(right)
+                            nquery = str(left)
+                        except (ValueError, TypeError):
+                            recid = None
+                            nquery = query
+                except ValueError:
+                    recid = None
+                    nquery = query
+
+
 
             else:
                 nquery = query
