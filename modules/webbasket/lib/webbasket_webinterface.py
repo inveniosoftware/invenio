@@ -332,7 +332,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use baskets."))
 
-        (body, [], navtrail) = perform_request_display(uid=uid,
+        (body, dummy, navtrail) = perform_request_display(uid=uid,
                                                    selected_category=argd['category'],
                                                    selected_topic=argd['topic'],
                                                    selected_group_id=argd['group'],
@@ -1269,7 +1269,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                 register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
         else:
-            (body, [], navtrail) = perform_request_display_public(uid=uid,
+            (body, dummy, navtrail) = perform_request_display_public(uid=uid,
                                                                   selected_bskid=argd['bskid'],
                                                                   selected_recid=argd['recid'],
                                                                   of=argd['of'],
@@ -1392,7 +1392,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             #req.send_http_header()
             #return perform_request_display_public(bskid=argd['bskid'], of=argd['of'], ln=argd['ln'])
             subscribe_warnings_html = perform_request_subscribe(uid, argd['bskid'], argd['ln'])
-            (body, [], navtrail) = perform_request_display_public(uid=uid,
+            (body, dummy, navtrail) = perform_request_display_public(uid=uid,
                                                                selected_bskid=argd['bskid'],
                                                                selected_recid=0,
                                                                of=argd['of'],
@@ -1452,7 +1452,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             #req.send_http_header()
             #return perform_request_display_public(bskid=argd['bskid'], of=argd['of'], ln=argd['ln'])
             unsubscribe_warnings_html = perform_request_unsubscribe(uid, argd['bskid'], argd['ln'])
-            (body, [], navtrail) = perform_request_display_public(uid=uid,
+            (body, dummy, navtrail) = perform_request_display_public(uid=uid,
                                                               selected_bskid=argd['bskid'],
                                                               selected_recid=0,
                                                               of=argd['of'],
