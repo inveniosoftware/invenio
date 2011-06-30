@@ -892,6 +892,7 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
         # support FCKeditor.
         msg = msg.replace('\n', '').replace('\r', '')
         msg = re.sub('<br .*?(/>)', '\n', msg)
+        msg = msg.replace('&nbsp;', ' ')
         # We clean the quotes that could have been introduced by
         # FCKeditor when clicking the 'quote' button, as well as those
         # that we have introduced when quoting the original message
@@ -902,7 +903,6 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
         msg = re.sub('</blockquote>', '</div>', msg)
         # Tidy up the HTML
         msg = tidy_html(msg)
-        msg = msg.replace('&nbsp;', ' ')
         # In case additional <p> or <div> got inserted, interpret
         # these as new lines (with a sad trick to do it only once)
         msg = msg.replace('</div><', '</div>\n<')
