@@ -30,6 +30,7 @@ from invenio.config import CFG_SITE_LANG, CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR
 from invenio.access_control_engine import acc_authorize_action
 from invenio.errorlib import register_exception
 from invenio.websubmitadmin_config import InvenioWebSubmitWarning
+from invenio.messages import gettext_set_language
 
 import invenio.template
 
@@ -3894,7 +3895,7 @@ def _configure_doctype_move_field_on_submissionpage(doctype, action, pagenum, mo
     _ = gettext_set_language(CFG_SITE_LANG)
     movefield_res = move_field_on_submissionpage_from_positionx_to_positiony(doctype=doctype, action=action, pagenum=pagenum,
                                                                              movefieldfrom=movefieldfromposn, movefieldto=movefieldtoposn)
-    
+
     if movefield_res == 1:
         ## invalid field numbers
         try:
