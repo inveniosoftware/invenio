@@ -172,9 +172,10 @@ def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None
     filedesc.close()
 
     # check if this client can run this file:
-    allow = _check_client_can_submit_file(req=req, metafile=metafile, webupload=1, ln=ln)
-    if allow[0] != 0:
-        return (error_codes['not_authorized'], allow[1])
+    if req is not None:
+        allow = _check_client_can_submit_file(req=req, metafile=metafile, webupload=1, ln=ln)
+        if allow[0] != 0:
+            return (error_codes['not_authorized'], allow[1])
 
     # check MARCXML validity
     if filetype == 'marcxml':
@@ -276,12 +277,13 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
                 if len(errors) > num_errors:
                     continue
             # Check if user has rights to upload file
-            file_collection = guess_collection_of_a_record(int(rec_id))
-            auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader', collection=file_collection)
-            if auth_code != 0:
-                error_msg = err_desc[5] % file_collection
-                errors.append((docfile, error_msg))
-                continue
+            if req is not None:
+                file_collection = guess_collection_of_a_record(int(rec_id))
+                auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader', collection=file_collection)
+                if auth_code != 0:
+                    error_msg = err_desc[5] % file_collection
+                    errors.append((docfile, error_msg))
+                    continue
             tempfile.tempdir = CFG_TMPSHAREDDIR
             # Move document to be uploaded to temporary folder
             tmp_file = tempfile.mktemp(prefix=identifier + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_", suffix=extension)
@@ -302,8 +304,10 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
             filedesc.write(marc_content)
             filedesc.close()
             info[1].append(docfile)
-            user_info = collect_user_info(req)
-            user = user_info['nickname']
+            user = ""
+            if req is not None:
+                user_info = collect_user_info(req)
+                user = user_info['nickname']
             if not user:
                 user = "batchupload"
             # Execute bibupload with the appropiate mode
