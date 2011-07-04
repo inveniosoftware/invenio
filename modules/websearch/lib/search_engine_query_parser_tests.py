@@ -907,6 +907,12 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         inv_search = "collaboration:d0 and (author:abachi or author:abbott or author:abazov)"
         self._compare_searches(inv_search, spi_search)
 
+    def test_super_short_author_name(self):
+        """SPIRES search syntax - test fin a er and cn cms"""
+        spi_search = "fin a er and cn cms"
+        inv_search = "author:er collaboration:cms"
+        self._compare_searches(inv_search, spi_search)
+
     def test_simple_syntax_mixing(self):
         """SPIRES and invenio search syntax - find a ellis and citedby:hawking"""
         combo_search = "find a ellis and citedby:hawking"

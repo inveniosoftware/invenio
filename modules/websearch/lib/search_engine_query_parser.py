@@ -666,7 +666,7 @@ class SpiresToInvenioSyntaxConverter:
             \b((?P<secondorderop>[^\s]+:)?)     # do we have a second-order-op on top?
             ((?P<first>first)?)author:(?P<name>
                         [^\'\"]     # first character not a quotemark
-                        [^()]+?     # some stuff that isn't parentheses (that is dealt with in pp)
+                        [^()]*?     # some stuff that isn't parentheses (that is dealt with in pp)
                         [^\'\"])    # last character not a quotemark
             (?=\ and\ not\ |\ and\ |\ or\ |\ not\ |$)''')
 
