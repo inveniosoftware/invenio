@@ -43,7 +43,6 @@ except:
 from datetime import datetime, timedelta
 import cPickle
 import os
-import rdflib
 import re
 import sys
 import tempfile
@@ -53,6 +52,11 @@ import traceback
 import xml.sax
 import thread
 import time
+
+try:
+    import rdflib
+except ImportError:
+    rdflib = None
 
 import bibclassify_config as bconfig
 log = bconfig.get_logger("bibclassify.ontology_reader")
@@ -130,7 +134,6 @@ def get_regular_expressions(taxonomy_name, rebuild=False, no_cache=False):
     cache_path = _get_cache_path(onto_name)
     log.debug('Taxonomy discovered, now we load it (from cache: %s, onto_path: %s, cache_path: %s)'
               % (not no_cache, onto_path, cache_path))
-
 
 
 
@@ -498,10 +501,14 @@ def _build_cache(source_file, skip_cache=False):
     @var source_file: source file of the taxonomy, RDF file
     @keyword skip_cache: boolean, if True, build cache will not be
         saved (pickled) - it is saved as <source_file.db> """
-    if rdflib.__version__ >= '2.3.2':
-        store = rdflib.ConjunctiveGraph()
+
+    if rdflib:
+        if rdflib.__version__ >= '2.3.2':
+            store = rdflib.ConjunctiveGraph()
+        else:
+            store = rdflib.Graph()
     else:
-        store = rdflib.Graph()
+        store = None
 
 
     if skip_cache:
@@ -529,7 +536,11 @@ def _build_cache(source_file, skip_cache=False):
     single_keywords, composite_keywords = {}, {}
 
     try:
+        if not rdflib:
+            raise ImportError() # will be caught below
+
         log.info("Building RDFLib's conjunctive graph from: %s" % source_file)
+
         try:
             store.parse(source_file)
         except urllib2.URLError, exc:
@@ -544,7 +555,7 @@ def _build_cache(source_file, skip_cache=False):
         log.error(traceback.format_exc())
         raise rdflib.exceptions.Error(e)
 
-    except xml.sax.SAXParseException, e:
+    except (xml.sax.SAXParseException, ImportError), e:
         # File is not a RDF file. We assume it is a controlled vocabulary.
         log.error(e)
         log.error("The ontology file is probably not a valid RDF file. \
@@ -582,7 +593,7 @@ def _build_cache(source_file, skip_cache=False):
     cached_data["single"] = single_keywords
     cached_data["composite"] = composite_keywords
     cached_data["creation_time"] = time.gmtime()
-    cached_data["version_info"] = {'rdflib': rdflib.__version__, 'bibclassify': bconfig.VERSION}
+    cached_data["version_info"] = {'rdflib': rdflib and rdflib.__version__, 'bibclassify': bconfig.VERSION}
 
 
     log.debug("Building taxonomy... %d terms built in %.1f sec." %
@@ -626,7 +637,8 @@ def _build_cache(source_file, skip_cache=False):
                               store=store, namespace=namespace)
 
     # house-cleaning
-    store.close()
+    if store:
+        store.close()
 
     return (single_keywords, composite_keywords)
 
@@ -712,7 +724,7 @@ def _get_cache(cache_file, source_file=None):
         #bibclassify_ontology_reader = sys.modules['bibclassify_ontology_reader']
         cached_data = cPickle.load(filestream)
 
-        if cached_data['version_info']['rdflib'] != rdflib.__version__ or \
+        if cached_data['version_info']['rdflib'] != (rdflib and rdflib.__version__) or \
            cached_data['version_info']['bibclassify'] != bconfig.VERSION:
             raise KeyError
     except (cPickle.UnpicklingError, AttributeError, DeprecationWarning, EOFError), e:
@@ -854,8 +866,13 @@ def _is_regex(string):
 def check_taxonomy(taxonomy):
     """Checks the consistency of the taxonomy and outputs a list of
     errors and warnings."""
+
+    if not rdflib:
+        raise Exception("The taxonomy checking is possible only with RDFLIB")
+
+
     log.info("Building graph with Python RDFLib version %s" %
-        rdflib.__version__, stream=sys.stdout, verbose=0)
+        rdflib.__version__)
 
     if rdflib.__version__ >= '2.3.2':
         store = rdflib.ConjunctiveGraph()
