@@ -105,6 +105,7 @@ class Template:
     # This dictionary maps Invenio language code to locale codes (ISO 639)
     tmpl_localemap = {
         'bg': 'bg_BG',
+        'ar': 'ar_AR',
         'ca': 'ca_ES',
         'de': 'de_DE',
         'el': 'el_GR',

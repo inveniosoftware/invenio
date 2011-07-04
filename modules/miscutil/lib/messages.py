@@ -96,6 +96,7 @@ def language_list_long(enabled_langs_only=True):
     translations in webdoc sources or bibformat templates.
     """
     all_language_names = {'af': 'Afrikaans',
+                          'ar': 'العربية',
                           'bg': 'Български',
                           'ca': 'Català',
                           'cs': 'Česky',
