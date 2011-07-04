@@ -18,7 +18,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-__revision__ = "$Id$"
+
 
 import os
 import sys
@@ -32,10 +32,12 @@ from invenio.config import \
 from invenio.search_engine import perform_request_search, HitSet
 from invenio.bibrank_citation_indexer import get_citation_weight, print_missing, get_cit_dict, insert_into_cit_db
 from invenio.bibrank_downloads_indexer import *
-from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal
+from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal, \
+     wash_table_column_name, get_table_update_time
 from invenio.errorlib import register_exception
 from invenio.bibtask import task_get_option, write_message, task_sleep_now_if_required
 from invenio.bibindex_engine import create_range_list
+from invenio.intbitset import intbitset
 
 options = {}
 
@@ -480,4 +482,65 @@ def showtime(timeused):
     write_message("Time used: %d second(s)." % timeused, verbose=9)
 
 def citation(run):
+    return bibrank_engine(run)
+
+
+# Hack to put index based sorting here, but this is very similar to tag
+#based method and should re-use a lot of this code, so better to have here
+#than separate
+#
+
+def index_term_count_exec(rank_method_code, name, config):
+    """Creating the rank method data"""
+    write_message("Recreating index weighting data")
+    begin_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    # we must recalculate these every time for all records, since the
+    # weighting of a record is determined by the index entries of _other_
+    # records
+
+    rnkset = calculate_index_term_count(config)
+    intoDB(rnkset, begin_date, rank_method_code)
+
+def calculate_index_term_count(config):
+    """Calculate the weight of a record set based on number of enries of a
+    tag from the record in another index...useful for authority files"""
+
+    records = []
+
+    if config.has_section("index_term_count"):
+        index = config.get("index_term_count","index_table_name")
+        tag = config.get("index_term_count","index_term_value_from_tag")
+        # check against possible SQL injection:
+        dummy = get_table_update_time(index)
+        tag = wash_table_column_name(tag)
+    else:
+        raise Exception("Config file " + config + " does not have index_term_count section")
+        return()
+
+    task_sleep_now_if_required(can_stop_too=True)
+    write_message("......Processing all records")
+    query = "SELECT id_bibrec, value FROM bib%sx, bibrec_bib%sx WHERE tag=%%s AND id_bibxxx=id" % \
+            (tag[0:2], tag[0:2]) # we checked that tag is safe
+    records = list(run_sql(query, (tag,)))
+    write_message("Number of records found with the necessary tags: %s" % len(records))
+
+
+    rnkset = {}
+    for key, value in records:
+        hits = 0
+        if len(value):
+            query = "SELECT hitlist from %s where term = %%s" % index # we checked that index is a table
+            row = run_sql(query, (value,))
+            if row and row[0] and row[0][0]:
+                #has to be prepared for corrupted data!
+                try:
+                    hits = len(intbitset(row[0][0]))
+                except:
+                    hits = 0
+        rnkset[key] = hits
+    write_message("Number of records available in rank method: %s" % len(rnkset))
+    return rnkset
+
+
+def index_term_count(run):
     return bibrank_engine(run)

@@ -9,7 +9,7 @@
 ## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -36,7 +36,9 @@ etc_DATA = bibrankgkb.cfg \
            citation.cfg \
            citerank_citation_t.cfg \
            citerank_pagerank_c.cfg \
-           citerank_pagerank_t.cfg
+           citerank_pagerank_t.cfg \
+           demo_itc_collection.cfg \
+           template_index_term_count.cfg
 
 EXTRA_DIST = bibrankgkb.cfg.in \
              bibrankgkb_jif_conv.kb \
@@ -57,6 +59,8 @@ EXTRA_DIST = bibrankgkb.cfg.in \
              citation.cfg \
              citerank_citation_t.cfg \
              citerank_pagerank_c.cfg \
-             citerank_pagerank_t.cfg
+             citerank_pagerank_t.cfg \
+             demo_itc_collection.cfg \
+             template_index_term_count.cfg
 
 CLEANFILES = *~ *.tmp
