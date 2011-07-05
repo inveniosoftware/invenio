@@ -499,14 +499,15 @@ def cli_cmd_reset_fieldnames(conf):
                                  "citerank_pagerank_c": _("all-time-best cite rank"),
                                  "citerank_pagerank_t": _("time-decay cite rank"),}
         for (rankmethod_id, rankmethod_name) in rankmethod_id_name_list:
-            try:
-                run_sql("""INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES
-                            (%s,%s,%s,%s)""", (rankmethod_id, lang, 'ln',
-                                               rankmethod_name_names[rankmethod_name]))
-            except IntegrityError:
-                run_sql("""UPDATE rnkMETHODNAME SET value=%s
-                            WHERE id_rnkMETHOD=%s AND ln=%s AND type=%s""",
-                        (rankmethod_name_names[rankmethod_name], rankmethod_id, lang, 'ln',))
+            if rankmethod_name_names.has_key(rankmethod_name):
+                try:
+                    run_sql("""INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES
+                                (%s,%s,%s,%s)""", (rankmethod_id, lang, 'ln',
+                                                   rankmethod_name_names[rankmethod_name]))
+                except IntegrityError:
+                    run_sql("""UPDATE rnkMETHODNAME SET value=%s
+                                WHERE id_rnkMETHOD=%s AND ln=%s AND type=%s""",
+                            (rankmethod_name_names[rankmethod_name], rankmethod_id, lang, 'ln',))
 
     print ">>> I18N field names reset successfully."
 
