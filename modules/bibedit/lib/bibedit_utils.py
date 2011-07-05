@@ -54,12 +54,13 @@ from invenio.bibedit_dblayer import get_bibupload_task_opts, \
     get_marcxml_of_record_revision, get_record_revisions, \
     get_info_of_record_revision
 from invenio.search_engine import print_record, record_exists, get_colID, \
-        guess_primary_collection_of_a_record, get_record
+     guess_primary_collection_of_a_record, get_record, \
+     get_all_collections_of_a_record
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.webuser import get_user_info
 from invenio.dbquery import run_sql
 from invenio.websearchadminlib import get_detailed_page_tabs
-
+from invenio.access_control_engine import acc_authorize_action
 
 # Precompile regexp:
 re_file_option = re.compile(r'^%s' % CFG_TMPSHAREDDIR)
@@ -71,6 +72,21 @@ re_tmpl_name = re.compile('<!-- BibEdit-Template-Name: (.*) -->')
 re_tmpl_description = re.compile('<!-- BibEdit-Template-Description: (.*) -->')
 re_ftmpl_name = re.compile('<!-- BibEdit-Field-Template-Name: (.*) -->')
 re_ftmpl_description = re.compile('<!-- BibEdit-Field-Template-Description: (.*) -->')
+
+
+# Authorization
+
+def user_can_edit_record_collection(req, recid):
+    """ Check if user has authorization to modify a collection
+    the recid belongs to
+    """
+    record_collections = get_all_collections_of_a_record(recid)
+    for collection in record_collections:
+        auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
+                                                       collection=collection)
+        if auth_code == 0:
+            return True
+    return False
 
 # Helper functions
 

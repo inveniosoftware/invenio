@@ -38,10 +38,9 @@ else:
 from invenio.access_control_engine import acc_authorize_action
 from invenio.bibedit_engine import perform_request_ajax, perform_request_init, \
     perform_request_newticket, perform_request_compare
-from invenio.bibedit_utils import json_unicode_to_utf8
+from invenio.bibedit_utils import json_unicode_to_utf8, user_can_edit_record_collection
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_RECORD
 from invenio.messages import gettext_set_language
-from invenio.search_engine import guess_primary_collection_of_a_record
 from invenio.urlutils import redirect_to_url
 from invenio.webinterface_handler import WebInterfaceDirectory, wash_urlargd
 from invenio.webpage import page
@@ -127,9 +126,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         elif recid is not None:
             json_response.update({'recID': recid})
             # Authorize access to record.
-            auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
-                collection=guess_primary_collection_of_a_record(recid))
-            if auth_code != 0:
+            if not user_can_edit_record_collection(req, recid):
                 json_response.update({'resultCode': 101})
                 return json.dumps(json_response)
 
