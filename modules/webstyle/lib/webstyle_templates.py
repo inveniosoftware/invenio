@@ -37,7 +37,7 @@ from invenio.config import \
      CFG_VERSION, \
      CFG_WEBSTYLE_INSPECT_TEMPLATES, \
      CFG_WEBSTYLE_TEMPLATE_SKIN
-from invenio.messages import gettext_set_language, language_list_long
+from invenio.messages import gettext_set_language, language_list_long, is_language_rtl
 from invenio.urlutils import make_canonical_urlargd, create_html_link
 from invenio.dateutils import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
@@ -332,7 +332,7 @@ template function generated it.
  <meta name="keywords" content="%(keywords)s" />
  %(metaheaderadd)s
 </head>
-<body%(body_css_classes)s lang="%(ln_iso_639_a)s">
+<body%(body_css_classes)s lang="%(ln_iso_639_a)s"%(rtl_direction)s>
 <div class="pageheader">
 %(inspect_templates_message)s
 <!-- replaced page header -->
@@ -394,6 +394,7 @@ template function generated it.
 %(pageheaderadd)s
 </div>
         """ % {
+          'rtl_direction': is_language_rtl(ln) and ' dir="rtl"' or '',
           'siteurl' : CFG_SITE_URL,
           'sitesecureurl' : CFG_SITE_SECURE_URL,
           'cssurl' : secure_page_p and CFG_SITE_SECURE_URL or CFG_SITE_URL,

@@ -132,3 +132,17 @@ def language_list_long(enabled_langs_only=True):
     else:
         return [[lang, lang_long] for lang, lang_long in \
                                       all_language_names.iteritems()]
+
+def is_language_rtl(ln):
+    """
+    Returns True or False depending on whether language is
+    right-to-left direction.
+
+    @param ln: language
+    @type ln: str
+    @return: is language right-to-left direction?
+    @rtype: bool
+    """
+    if ln in ('ar',):
+        return True
+    return False

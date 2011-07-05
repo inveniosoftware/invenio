@@ -79,6 +79,14 @@ class MessagesLanguageTest(unittest.TestCase):
                                                   '22']),
                          CFG_SITE_LANG)
 
+    def test_rtl_direction(self):
+        """messages - right-to-left language detection"""
+        # Arabic is right-to-left:
+        self.assertEqual(messages.is_language_rtl('ar'), True)
+        # English is not right-to-left:
+        self.assertEqual(messages.is_language_rtl('en'), False)
+
+
 TEST_SUITE = make_test_suite(MessagesLanguageTest,)
 
 if __name__ == "__main__":
