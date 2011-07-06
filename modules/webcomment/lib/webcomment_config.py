@@ -73,9 +73,19 @@ CFG_WEBCOMMENT_ACTION_CODE = {
 # Exceptions: errors
 class InvenioWebCommentError(Exception):
     """A generic error for WebComment."""
-    pass
+    def __init__(self, message):
+        """Initialisation."""
+        self.message = message
+    def __str__(self):
+        """String representation."""
+        return repr(self.message)
 
 # Exceptions: warnings
 class InvenioWebCommentWarning(Exception):
     """A generic warning for WebComment."""
-    pass
+    def __init__(self, message):
+        """Initialisation."""
+        self.message = message
+    def __str__(self):
+        """String representation."""
+        return repr(self.message)

@@ -72,7 +72,7 @@ def perform_request_display_msg(uid, msgid, ln=CFG_SITE_LANG):
             # The message exists in table user_msgMESSAGE
             # but not in table msgMESSAGE => table inconsistency
             try:
-                raise InvenioWebMessageError('This message does not exist.')
+                raise InvenioWebMessageError(_('This message does not exist.'))
             except InvenioWebMessageError, exc:
                 register_exception()
                 body = webmessage_templates.tmpl_error(exc.message, ln)
@@ -216,7 +216,7 @@ def perform_request_write(uid,
                 # The message exists in table user_msgMESSAGE
                 # but not in table msgMESSAGE => table inconsistency
                 try:
-                    raise InvenioWebMessageError('This message does not exist.')
+                    raise InvenioWebMessageError(_('This message does not exist.'))
                 except InvenioWebMessageError, exc:
                     register_exception()
                     body = webmessage_templates.tmpl_error(exc.message, ln)

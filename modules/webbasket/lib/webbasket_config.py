@@ -63,4 +63,9 @@ CFG_WEBBASKET_MAX_NUMBER_OF_NOTES = 100
 # Exceptions: warnings
 class InvenioWebBasketWarning(Exception):
     """A generic warning for WebBasket."""
-    pass
+    def __init__(self, message):
+        """Initialisation."""
+        self.message = message
+    def __str__(self):
+        """String representation."""
+        return repr(self.message)

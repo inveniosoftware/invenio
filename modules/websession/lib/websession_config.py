@@ -66,9 +66,19 @@ CFG_WEBSESSION_ENABLE_LOCKING = False
 # Exceptions: errors
 class InvenioWebSessionError(Exception):
     """A generic error for WebSession."""
-    pass
+    def __init__(self, message):
+        """Initialisation."""
+        self.message = message
+    def __str__(self):
+        """String representation."""
+        return repr(self.message)
 
 # Exceptions: warnings
 class InvenioWebSessionWarning(Exception):
     """A generic warning for WebSession."""
-    pass
+    def __init__(self, message):
+        """Initialisation."""
+        self.message = message
+    def __str__(self):
+        """String representation."""
+        return repr(self.message)

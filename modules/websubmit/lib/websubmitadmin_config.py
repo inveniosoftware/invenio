@@ -52,7 +52,12 @@ class InvenioWebSubmitAdminWarningReferentialIntegrityViolation(Exception):
 
 class InvenioWebSubmitWarning(Exception):
     """A generic warning for WebSubmit."""
-    pass
+    def __init__(self, message):
+        """Initialisation."""
+        self.message = message
+    def __str__(self):
+        """String representation."""
+        return repr(self.message)
 
 ## List of the names of functions for which the parameters are files that can be edited.
 ## In particular, this applies to the record creation functions that make use of bibconvert.
