@@ -114,7 +114,7 @@ class InvenioConnector(object):
         @type local_import_path: string
          """
         self.server_url = url
-        self.local = self.server_url in LOCAL_SITE_URLS
+        self.local = LOCAL_SITE_URLS and self.server_url in LOCAL_SITE_URLS
         self.cached_queries = {}
         self.cached_records = {}
         self.cached_baskets = {}
@@ -182,7 +182,7 @@ class InvenioConnector(object):
 
         # Are we running locally? If so, better directly access the
         # search engine directly
-        if self.server_url in LOCAL_SITE_URLS and of != 't':
+        if self.local and of != 't':
             # See if user tries to search any restricted collection
             if c != "":
                 if type(c) is list:
@@ -335,7 +335,7 @@ class InvenioConnector(object):
             raise NameError, "Incorrect mode " + str(mode)
 
         # Are we running locally? If so, submit directly
-        if self.server_url in LOCAL_SITE_URLS:
+        if self.local:
             (code, marcxml_filepath) = tempfile.mkstemp(prefix="upload_%s" % \
                                                         time.strftime("%Y%m%d_%H%M%S_",
                                                                       time.localtime()))
