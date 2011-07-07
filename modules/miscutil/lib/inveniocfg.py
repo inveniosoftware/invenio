@@ -155,7 +155,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_WEBSEARCH_RSS_I18N_COLLECTIONS',
                        'CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY',
                        'CFG_BATCHUPLOADER_WEB_ROBOT_AGENT',
-                       'CFG_BIBAUTHORID_EXTERNAL_CLAIMED_RECORDS_KEY']:
+                       'CFG_BIBAUTHORID_EXTERNAL_CLAIMED_RECORDS_KEY',
+                       'CFG_PLOTEXTRACTOR_DISALLOWED_TEX']:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:
@@ -185,7 +186,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_BCTKD_RA',
                        'CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_NEW_RA',
                        'CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH',
-                       'CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N']:
+                       'CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N',
+                       'CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT']:
         option_value = float(option_value[1:-1])
 
     ## 4) finally, return output line:

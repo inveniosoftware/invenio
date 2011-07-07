@@ -43,7 +43,8 @@ from invenio.config import \
      CFG_TMPDIR, \
      CFG_ETCDIR, \
      CFG_INSPIRE_SITE, \
-     CFG_CERN_SITE
+     CFG_CERN_SITE, \
+     CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT
 from invenio.dbquery import run_sql
 from invenio.bibtask import \
      task_get_task_param, \
@@ -807,6 +808,7 @@ def plotextractor_harvest(identifier, active_file, selection=["pdf", "tarball"])
     active_name = "_".join(active_name.split('_')[:-2]) + "_material"
     extract_path = make_single_directory(active_dir, active_name)
     tarball, pdf = harvest_single(identifier, extract_path, selection)
+    time.sleep(CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT)
     if tarball == None and "tarball" in selection:
         all_err_msg.append("Error harvesting tarball from id: %s %s" % \
                      (identifier, extract_path))
