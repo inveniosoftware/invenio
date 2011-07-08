@@ -517,6 +517,14 @@ Contents
           This will automatically download and install the MediaElementJS
           HTML5 video player that is needed for videos on the DEMO site.
 
+      $ make install-solrutils  ## optional
+
+          This will automatically download and install a Solr instance
+          which can be used for full-text searching.  See CFG_SOLR_URL
+          variable in the invenio.conf.  Note that the admin later has
+          to take care of running init.d scripts which would start the
+          Solr instance automatically.
+
 2b. Configuration
 -----------------
 

@@ -1,0 +1,10 @@
+org/invenio_software/solr/BitSetFieldCollector.java
+org/invenio_software/solr/FieldCollectorBase.java
+org/invenio_software/solr/FieldCollector.java
+org/invenio_software/solr/IntFieldCollector.java
+org/invenio_software/solr/InvenioBitSet.java
+org/invenio_software/solr/InvenioBitsetStreamResponseWriter.java
+org/invenio_software/solr/InvenioFacetComponent.java
+org/invenio_software/solr/InvenioQueryComponent.java
+org/invenio_software/solr/StringFieldCollector.java
+

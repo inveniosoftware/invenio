@@ -37,6 +37,14 @@ CKEDITOR = ckeditor_$(CKV).zip
 MEV = master
 MEDIAELEMENT = http://github.com/johndyer/mediaelement/zipball/$(MEV)
 
+#for solrutils
+INVENIO_JAVA_PATH = org/invenio_software/solr
+solrdirname = apache-solr-3.1.0
+solrdir = $(prefix)/lib/$(solrdirname)
+solrutils_dir=$(CURDIR)/modules/miscutil/lib/solrutils
+
+CLASSPATH=.:${solrdir}/dist/solrj-lib/commons-io-1.4.jar:${solrdir}/dist/apache-solr-core-*jar:${solrdir}/contrib/jzlib-1.0.7.jar:${solrdir}/dist/apache-solr-solrj-3.1.0.jar:${solrdir}/dist/solrj-lib/slf4j-api-1.5.5.jar:${solrdir}/dist/*:${solrdir}/contrib/basic-lucene-libs/*:${solrdir}/contrib/analysis-extras/lucene-libs/*:${solrdir}/dist/solrj-lib/*
+
 # git-version-get stuff:
 BUILT_SOURCES = $(top_srcdir)/.version
 $(top_srcdir)/.version:
@@ -274,6 +282,32 @@ uninstall-pdfa-helper-files:
 	@echo "***********************************************************"
 	@echo "** The PDF/A helper files were successfully uninstalled. **"
 	@echo "***********************************************************"
+
+#Solrutils allows automatic installation, running and searching of an external Solr index.
+install-solrutils:
+	@echo "***********************************************************"
+	@echo "** Installing Solrutils and solr, please wait...         **"
+	@echo "***********************************************************"
+	cd $(prefix)/lib && \
+	if test -d apache-solr*; then echo A solr directory already exists in `pwd` . \
+	Please remove it manually, if you are sure it is not needed; exit 2; fi ; \
+        if test -f apache-solr*; then echo solr tarball already exists in `pwd` . \
+        Please remove it manually.; exit 2; fi ; \
+	wget http://www.apache.org/dist//lucene/solr/3.1.0/apache-solr-3.1.0.tgz && \
+	tar -xzf apache-solr-3.1.0.tgz && \
+	rm apache-solr-3.1.0.tgz
+	cd $(solrdir)/contrib/ ;\
+	wget http://mirrors.ibiblio.org/pub/mirrors/maven2/com/jcraft/jzlib/1.0.7/jzlib-1.0.7.jar && \
+	cd $(solrdir)/contrib/ ;\
+	jar -xf ../example/webapps/solr.war WEB-INF/lib/lucene-core-3.1.0.jar ; \
+        if test -d basic-lucene-libs; then rm -rf basic-lucene-libs; fi ; \
+        mv WEB-INF/lib/ basic-lucene-libs ; \
+        cp $(solrutils_dir)/schema.xml $(solrdir)/example/solr/conf/
+	cp $(solrutils_dir)/solrconfig.xml $(solrdir)/example/solr/conf/
+	cd $(solrutils_dir) && \
+	javac -classpath $(CLASSPATH) -d $(solrdir)/contrib @$(solrutils_dir)/java_sources.txt && \
+	cd $(solrdir)/contrib/ && \
+	jar -cf invenio-solr.jar org/invenio_software/solr/*class
 
 update-v0.3.0-tables update-v0.3.1-tables:
 	echo "ALTER TABLE idxINDEXNAME CHANGE id_idxINDEX id_idxINDEX mediumint(9) unsigned NOT NULL FIRST;" | ${prefix}/bin/dbexec
