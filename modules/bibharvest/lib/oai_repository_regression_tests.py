@@ -25,18 +25,21 @@ import unittest
 import time
 import re
 
+from cStringIO import StringIO
+
 from invenio.config import CFG_SITE_URL, \
      CFG_OAI_SLEEP, \
      CFG_OAI_LOAD, \
      CFG_OAI_ID_FIELD
-from invenio import oai_repository_server, search_engine, oai_repository_updater
+from invenio.intbitset import intbitset
+from invenio import oai_repository_server, search_engine
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 
 class OAIRepositoryWebPagesAvailabilityTest(unittest.TestCase):
     """Check OAI Repository web pages whether they are up or not."""
 
-    def test_your_baskets_pages_availability(self):
+    def test_oai_server_pages_availability(self):
         """oairepository - availability of OAI server pages"""
 
         baseurl = CFG_SITE_URL + '/oai2d'
@@ -71,21 +74,23 @@ class TestSelectiveHarvesting(unittest.TestCase):
 
     def test_set(self):
         """oairepository - testing selective harvesting with 'set' parameter"""
-        self.assertNotEqual([], oai_repository_server.oaigetsysnolist(set="cern:experiment"))
+        self.assertEqual(intbitset([10, 17]), oai_repository_server.oai_get_recid_list(set_spec="cern:experiment"))
         self.assert_("Multifractal analysis of minimum bias events" in \
                      ''.join([oai_repository_server.print_record(recID) for recID in \
-                              oai_repository_server.oaigetsysnolist(set="cern:experiment")]))
+                              oai_repository_server.oai_get_recid_list(set_spec="cern:experiment")]))
         self.assert_("Multifractal analysis of minimum bias events" not in \
                      ''.join([oai_repository_server.print_record(recID) for recID in \
-                              oai_repository_server.oaigetsysnolist(set="cern:theory")]))
-        self.assertEqual([], oai_repository_server.oaigetsysnolist(set="nonExistingSet"))
+                              oai_repository_server.oai_get_recid_list(set_spec="cern:theory")]))
+        self.failIf(oai_repository_server.oai_get_recid_list(set_spec="nonExistingSet"))
 
     def test_from_and_until(self):
         """oairepository - testing selective harvesting with 'from' and 'until' parameters"""
 
+        req = StringIO()
         # List available records, get datestamps and play with them
-        identifiers = oai_repository_server.oailistidentifiers("")
-        datestamps = re.findall('<identifier>(?P<id>.*)</identifier>\s*<datestamp>(?P<date>.*)</datestamp>', identifiers)
+        oai_repository_server.oai_list_records_or_identifiers(req, {'verb': 'ListIdentifiers', 'metadataPrefix': 'marcxml'})
+        identifiers = req.getvalue()
+        datestamps = re.findall('<identifier>(?P<id>.*?)</identifier>\s*<datestamp>(?P<date>.*?)</datestamp>', identifiers, re.M)
 
         sample_datestamp = datestamps[0][1] # Take one datestamp
         sample_oai_id = datestamps[0][0] # Take corresponding oai id
@@ -96,26 +101,26 @@ class TestSelectiveHarvesting(unittest.TestCase):
         self.assertNotEqual([], datestamps)
 
         # We must be able to retrieve an id with the date we have just found
-        self.assert_(sample_id in oai_repository_server.oaigetsysnolist(fromdate=sample_datestamp))
-        self.assert_(sample_id in oai_repository_server.oaigetsysnolist(untildate=sample_datestamp))
-        self.assert_(sample_id in oai_repository_server.oaigetsysnolist(untildate=sample_datestamp, \
+        self.assert_(sample_id in oai_repository_server.oai_get_recid_list(fromdate=sample_datestamp))
+        self.assert_(sample_id in oai_repository_server.oai_get_recid_list(untildate=sample_datestamp))
+        self.assert_(sample_id in oai_repository_server.oai_get_recid_list(untildate=sample_datestamp, \
                                                                  fromdate=sample_datestamp))
 
         # Same, with short format date. Eg 2007-12-13
-        self.assert_(sample_id in oai_repository_server.oaigetsysnolist(fromdate=sample_datestamp.split('T')[0]))
-        self.assert_(sample_id in oai_repository_server.oaigetsysnolist(untildate=sample_datestamp.split('T')[0]))
-        self.assert_(sample_id in oai_repository_server.oaigetsysnolist(fromdate=sample_datestamp.split('T')[0], \
+        self.assert_(sample_id in oai_repository_server.oai_get_recid_list(fromdate=sample_datestamp.split('T')[0]))
+        self.assert_(sample_id in oai_repository_server.oai_get_recid_list(untildate=sample_datestamp.split('T')[0]))
+        self.assert_(sample_id in oai_repository_server.oai_get_recid_list(fromdate=sample_datestamp.split('T')[0], \
                                                                  untildate=sample_datestamp.split('T')[0]))
 
         # At later date (year after) we should not find our id again
         sample_datestamp_year = int(sample_datestamp[0:4])
         sample_datestamp_rest = sample_datestamp[4:]
         later_datestamp = str(sample_datestamp_year + 1) + sample_datestamp_rest
-        self.assert_(sample_id not in oai_repository_server.oaigetsysnolist(fromdate=later_datestamp))
+        self.assert_(sample_id not in oai_repository_server.oai_get_recid_list(fromdate=later_datestamp))
 
         # At earlier date (year before) we should not find our id again
         earlier_datestamp = str(sample_datestamp_year - 1) + sample_datestamp_rest
-        self.assert_(sample_id not in oai_repository_server.oaigetsysnolist(untildate=earlier_datestamp))
+        self.assert_(sample_id not in oai_repository_server.oai_get_recid_list(untildate=earlier_datestamp))
 
         # From earliest date to latest date must include all oai records
         dates = [(time.mktime(time.strptime(date[1], "%Y-%m-%dT%H:%M:%SZ")), date[1]) for date in datestamps]
@@ -124,13 +129,17 @@ class TestSelectiveHarvesting(unittest.TestCase):
         sorted_times.sort()
         earliest_datestamp = dates[sorted_times[0]]
         latest_datestamp = dates[sorted_times[-1]]
-        self.assertEqual(len(oai_repository_server.oaigetsysnolist()), \
-                         len(oai_repository_server.oaigetsysnolist(fromdate=earliest_datestamp, \
-                                                            untildate=latest_datestamp)))
+        self.assertEqual(oai_repository_server.oai_get_recid_list(), \
+                         oai_repository_server.oai_get_recid_list(fromdate=earliest_datestamp, \
+                                                            untildate=latest_datestamp))
+
     def test_resumption_token(self):
         """oairepository - testing harvesting with bad resumption token"""
         # Non existing resumptionToken
-        self.assert_('badResumptionToken' in oai_repository_server.oailistrecords('resumptionToken=foobar&verb=ListRecords'))
+        req = StringIO()
+        oai_repository_server.oai_list_records_or_identifiers(req, {'resumptionToken': 'foobar', 'verb': 'ListRecords'})
+
+        self.assert_('badResumptionToken' in req.getvalue())
 
 class TestPerformance(unittest.TestCase):
     """Test performance of the repository """
@@ -138,7 +147,7 @@ class TestPerformance(unittest.TestCase):
     def setUp(self):
         """Setting up some variables"""
         # Determine how many records are served
-        self.number_of_records = oai_repository_server.oaigetsysnolist("", "", "")
+        self.number_of_records = len(oai_repository_server.oai_get_recid_list("", "", ""))
         if CFG_OAI_LOAD < self.number_of_records:
             self.number_of_records = CFG_OAI_LOAD
 
@@ -148,7 +157,7 @@ class TestPerformance(unittest.TestCase):
 
         # Test oai ListRecords performance
         t0 = time.time()
-        oai_repository_server.oailistrecords('metadataPrefix=oai_dc&verb=ListRecords')
+        oai_repository_server.oai_list_records_or_identifiers(StringIO(), {'metadataPrefix': 'oai_dc', 'verb': 'ListRecords'})
         t = time.time() - t0
         if t > self.number_of_records * allowed_seconds_per_record_oai:
             self.fail("""Response for ListRecords with metadataPrefix=oai_dc took too much time:
@@ -161,7 +170,7 @@ Limit: %s seconds""" % (t, self.number_of_records * allowed_seconds_per_record_o
 
         # Test marcxml ListRecords performance
         t0 = time.time()
-        oai_repository_server.oailistrecords('metadataPrefix=marcxml&verb=ListRecords')
+        oai_repository_server.oai_list_records_or_identifiers(StringIO(), argd={'metadataPrefix': 'marcxml', 'verb': 'ListRecords'})
         t = time.time() - t0
         if t > self.number_of_records * allowed_seconds_per_record_marcxml:
             self.fail("""Response for ListRecords with metadataPrefix=marcxml took too much time:\n
@@ -169,24 +178,9 @@ Limit: %s seconds""" % (t, self.number_of_records * allowed_seconds_per_record_o
 Limit: %s seconds""" % (t, self.number_of_records * allowed_seconds_per_record_marcxml))
 
 
-class TestOAIRepositoryUpdater(unittest.TestCase):
-    """Test functions in OAI_repository_updater"""
-
-    def test_marcxml_filtering(self):
-        """oairepository - test MARCXML filtering"""
-        self.assertEqual(oai_repository_updater.marcxml_filter_out_tags(98, ['088__a']),
-                         '  <datafield tag="088" ind1=" " ind2=" ">\n    <subfield code="9">SCAN-9709037</subfield>\n  </datafield>\n')
-
-        self.assertEqual(oai_repository_updater.marcxml_filter_out_tags(98, ['088__c']),
-                         '  <datafield tag="088" ind1=" " ind2=" ">\n    <subfield code="9">SCAN-9709037</subfield>\n  </datafield>\n  <datafield tag="088" ind1=" " ind2=" ">\n    <subfield code="a">UCRL-8417</subfield>\n  </datafield>\n')
-
-        self.assertEqual(oai_repository_updater.marcxml_filter_out_tags(98, ['0248_p']),
-                         '  <datafield tag="024" ind1="8" ind2=" ">\n    <subfield code="a">oai:cds.cern.ch:SCAN-9709037</subfield>\n  </datafield>\n')
-
 TEST_SUITE = make_test_suite(OAIRepositoryWebPagesAvailabilityTest,
                              TestSelectiveHarvesting,
-                             TestPerformance,
-                             TestOAIRepositoryUpdater)
+                             TestPerformance)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

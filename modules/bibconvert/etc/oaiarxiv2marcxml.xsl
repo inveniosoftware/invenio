@@ -452,10 +452,18 @@
        <xsl:when test="OAI-PMH:header[@status='deleted']">
          <record>
          <xsl:if test="./OAI-PMH:header/OAI-PMH:identifier | ./OAI-PMH:header/OAI-PMH:setSpec">
-           <datafield tag="909" ind1="C" ind2="O">
-             <subfield code="o"><xsl:value-of select="./OAI-PMH:header/OAI-PMH:identifier"/></subfield>
-             <subfield code="p"><xsl:value-of select="./OAI-PMH:header/OAI-PMH:setSpec"/></subfield>
-           </datafield>
+          <datafield tag="035" ind1=" " ind2=" ">
+            <subfield code="a"><xsl:value-of select="./OAI-PMH:header/OAI-PMH:identifier" /></subfield>
+            <subfield code="u"><xsl:value-of select="//OAI-PMH:request" /></subfield>
+            <subfield code="d"><xsl:value-of select="./OAI-PMH:header/OAI-PMH:datestamp" /></subfield>
+            <subfield code="h"><xsl:value-of select="//OAI-PMH:responseDate" /></subfield>
+            <subfield code="m"><xsl:value-of select="//OAI-PMH:request/@metadataPrefix" /></subfield>
+            <xsl:if test="./OAI-PMH:about/provenance/originDescription">
+              <subfield code="o"><xsl:copy-of select="./OAI-PMH:about/provenance/originDescription" /></subfield>
+            </xsl:if>
+            <subfield code="t">false</subfield>
+            <subfield code="9">arXiv</subfield>
+          </datafield>
          </xsl:if>
            <datafield tag="980" ind1="" ind2="">
              <subfield code="c">DELETED</subfield>
@@ -486,8 +494,16 @@
            <!-- MARC FIELD 035_$$9,a  = metadata/header/identifier  -->
            <xsl:if test="./OAI-PMH:header/OAI-PMH:identifier">
              <datafield tag="035" ind1=" " ind2=" ">
-                <subfield code="9">arXiv</subfield>
-                <subfield code="a"><xsl:value-of select="./OAI-PMH:header/OAI-PMH:identifier"/></subfield>
+               <subfield code="a"><xsl:value-of select="./OAI-PMH:header/OAI-PMH:identifier" /></subfield>
+               <subfield code="u"><xsl:value-of select="//OAI-PMH:request" /></subfield>
+               <subfield code="d"><xsl:value-of select="./OAI-PMH:header/OAI-PMH:datestamp" /></subfield>
+               <subfield code="h"><xsl:value-of select="//OAI-PMH:responseDate" /></subfield>
+               <subfield code="m"><xsl:value-of select="//OAI-PMH:request/@metadataPrefix" /></subfield>
+               <xsl:if test="./OAI-PMH:about/provenance/originDescription">
+                 <subfield code="o"><xsl:copy-of select="./OAI-PMH:about/provenance/originDescription" /></subfield>
+               </xsl:if>
+               <subfield code="t">false</subfield>
+               <subfield code="9">arXiv</subfield>
              </datafield>
            </xsl:if>
 

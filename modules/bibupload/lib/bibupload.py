@@ -44,7 +44,8 @@ from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_STRONG_TAGS, \
      CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS, \
      CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE, \
-     CFG_SITE_URL, CFG_SITE_RECORD
+     CFG_SITE_URL, CFG_SITE_RECORD, \
+     CFG_OAI_PROVENANCE_ALTERED_SUBFIELD
 
 from invenio.jsonutils import json, CFG_JSON_AVAILABLE
 from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
@@ -203,6 +204,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         # Update Mode
         # Retrieve the old record to update
         rec_old = get_record(rec_id)
+        record_had_altered_bit = record_get_field_values(rec_old, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4], CFG_OAI_PROVENANCE_ALTERED_SUBFIELD)
         # Also save a copy to restore previous situation in case of errors
         original_record = get_record(rec_id)
         if rec_old is None:
@@ -234,6 +236,15 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             record = append_new_tag_to_old_record(record, rec_old,
                 opt_tag, opt_mode)
             write_message("   -Append new tags to the old record: DONE", verbose=2)
+
+        # if record_had_altered_bit, this must be set to true, since the
+        # record has been altered.
+        if record_had_altered_bit:
+            oai_provenance_fields = record_get_field_instances(record, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4])
+            for oai_provenance_field in oai_provenance_fields:
+                for i, (code, dummy_value) in enumerate(oai_provenance_field[0]):
+                    if code == CFG_OAI_PROVENANCE_ALTERED_SUBFIELD:
+                        oai_provenance_field[0][i] = (code, 'true')
 
         # now we clear all the rows from bibrec_bibxxx from the old
         # record (they will be populated later (if needed) during

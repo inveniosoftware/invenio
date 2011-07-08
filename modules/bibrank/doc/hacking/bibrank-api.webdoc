@@ -37,11 +37,11 @@ programs via a high-level API and a mid-mid level API.
       the same parameters are given.
 
       There are three thing to note: (i) When a search is done, the
-      search engine is sending a HitSet containing all the records that
-      matches the query. Since only records in the HitSet are ranked, a
-      HitSet must be created containing wished records to rank and be sent
+      search engine is sending a intbitset containing all the records that
+      matches the query. Since only records in the intbitset are ranked, a
+      intbitset must be created containing wished records to rank and be sent
       as a parameter to the function. (ii) Some rank methods may choose to
-      ignore the HitSet, like the "Similar Records" function. (iii) In case
+      ignore the intbitset, like the "Similar Records" function. (iii) In case
       of an error ranking the records, the returned data is different.
 
    Signature:
@@ -53,7 +53,7 @@ programs via a high-level API and a mid-mid level API.
        rank_limit_relevance - a number defining the threshold of which
        to rank records, may be ignored by rank method.
        hitset_global, search engine hits, if all records should be
-       ranked, fill the HitSet with ones.
+       ranked, fill the intbitset with ones.
        pattern, search engine query or record ID, must be a
        list. ['CERN', 'fermilab'] or ['recid:12345']
        verbose, verbose level - 0-9 defines how much debug information

@@ -20,13 +20,26 @@
 __revision__ = "$Id$"
 
 import os
-import urllib
 import time
-from invenio import webinterface_handler_config as apache
+import cStringIO
 
+from invenio import webinterface_handler_config as apache
 from invenio import oai_repository_server
-from invenio.config import CFG_CACHEDIR, CFG_OAI_SLEEP
+from invenio.errorlib import register_exception
+from invenio.config import CFG_CACHEDIR, CFG_OAI_SLEEP, CFG_DEVEL_SITE, \
+    CFG_ETCDIR
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+
+CFG_VALIDATE_RESPONSES = False
+OAI_PMH_VALIDATOR = None
+
+if CFG_DEVEL_SITE:
+    try:
+        from lxml import etree
+        OAI_PMH_VALIDATOR = etree.XMLSchema(etree.parse(open(os.path.join(CFG_ETCDIR, 'bibharvest', 'OAI-PMH.xsd'))))
+        CFG_VALIDATE_RESPONSES = True
+    except ImportError:
+        pass
 
 class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
     """Defines the set of /oai2d OAI provider pages."""
@@ -34,7 +47,7 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
     _exports = ['']
 
     def __call__(self, req, form):
-        "OAI repository interface"
+        """OAI repository interface"""
 
         # Clean input arguments. The protocol specifies that an error
         # has to be returned if the same argument is specified several
@@ -51,6 +64,9 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
                                    'identifier': (list, []),
                                    'resumptionToken': (list, []),
                                    })
+
+        if CFG_VALIDATE_RESPONSES:
+            req.track_writings = True
 
         ## wash_urlargd(..) function cleaned everything, but also added
         ## unwanted parameters. Remove them now
@@ -72,12 +88,12 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
 
         ## check request for OAI compliancy
         ## also transform all the list arguments into string
-        oai_error = oai_repository_server.check_argd(argd)
+        oai_errors = oai_repository_server.check_argd(argd)
 
         ## check availability (OAI requests for Identify, ListSets and
         ## ListMetadataFormats are served immediately, otherwise we
         ## shall wait for CFG_OAI_SLEEP seconds between requests):
-        if os.path.exists("%s/RTdata/RTdata" % CFG_CACHEDIR) and (argd['verb'] not in ["Identify", "ListMetadataFormats", "ListSets"]):
+        if os.path.exists("%s/RTdata/RTdata" % CFG_CACHEDIR) and (argd['verb'] not in ["Identify", "ListMetadataFormats", "ListSets"] and not argd.get('resumptionToken')):
             time_gap = int(time.time() - os.path.getmtime("%s/RTdata/RTdata" % CFG_CACHEDIR))
             if(time_gap < CFG_OAI_SLEEP):
                 req.headers_out["Status-Code"] = "503"
@@ -87,67 +103,45 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
         command = "touch %s/RTdata/RTdata" % CFG_CACHEDIR
         os.system(command)
 
-        ## construct args (argd string equivalent) for the
-        ## oai_repository_server business logic (later it may be good if it
-        ## takes argd directly):
-        args = urllib.urlencode(argd)
 
         ## create OAI response
-
         req.content_type = "text/xml"
         req.send_http_header()
 
-        if oai_error == "":
-
+        if not oai_errors:
             ## OAI Identify
-
             if argd['verb']   == "Identify":
-                req.write(oai_repository_server.oaiidentify(args, script_url=req.uri))
-
+                req.write(oai_repository_server.oai_identify(argd))
 
             ## OAI ListSets
-
             elif argd['verb'] == "ListSets":
-                req.write(oai_repository_server.oailistsets(args))
+                req.write(oai_repository_server.oai_list_sets(argd))
 
-
-            ## OAI ListIdentifiers
-
-            elif argd['verb'] == "ListIdentifiers":
-                req.write(oai_repository_server.oailistidentifiers(args))
-
-
-            ## OAI ListRecords
-
-            elif argd['verb'] == "ListRecords":
-                req.write(oai_repository_server.oailistrecords(args))
-
+            ## OAI ListIdentifiers or OAI ListRecords
+            elif argd['verb'] in ("ListIdentifiers", "ListRecords"):
+                oai_repository_server.oai_list_records_or_identifiers(req, argd)
 
             ## OAI GetRecord
-
             elif argd['verb'] == "GetRecord":
-                req.write(oai_repository_server.oaigetrecord(args))
-
+                req.write(oai_repository_server.oai_get_record(argd))
 
             ## OAI ListMetadataFormats
-
             elif argd['verb'] == "ListMetadataFormats":
-                req.write(oai_repository_server.oailistmetadataformats(args))
-
+                req.write(oai_repository_server.oai_list_metadata_formats(argd))
 
             ## Unknown verb
 
-            else:
-                req.write(oai_repository_server.oai_error("badVerb","Illegal OAI verb"))
-
-
         ## OAI error
-
         else:
-            req.write(oai_repository_server.oai_header(args,""))
-            req.write(oai_error)
-            req.write(oai_repository_server.oai_footer(""))
+            req.write(oai_repository_server.oai_error(argd, oai_errors))
 
+        if CFG_VALIDATE_RESPONSES:
+            req.track_writings = False
+            try:
+                OAI_PMH_VALIDATOR.assertValid(etree.parse(cStringIO.StringIO(req.what_was_written)))
+            except etree.DocumentInvalid:
+                register_exception(req=req, alert_admin=True)
+                raise
         return "\n"
 
     ## Return the same page wether we ask for /oai2d?verb or /oai2d/?verb

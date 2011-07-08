@@ -226,8 +226,8 @@ class HTMLCreation(unittest.TestCase):
 
     def test_create_html_select(self):
         """htmlutils - create HTML <select> list """
-        self.assertEqual(create_html_select(["foo", '"bar"'], selected="bar", name="baz"),
-                         '<select name="baz">\n  <option value="&quot;bar&quot;">\n    "bar"\n  </option>\n  <option value="foo">\n    foo\n  </option>\n</select>')
+        self.assertEqual(create_html_select(["foo", "bar"], selected="bar", name="baz"),
+                         '<select name="baz"><option value="foo">foo</option>\n<option selected="selected" value="bar">bar</option></select>')
 
 
 TEST_SUITE = make_test_suite(XSSEscapingTest,
@@ -239,5 +239,3 @@ TEST_SUITE = make_test_suite(XSSEscapingTest,
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
-
-

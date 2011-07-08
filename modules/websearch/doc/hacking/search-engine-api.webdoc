@@ -275,7 +275,7 @@ via both a high-level and low-level API interface.
       know anything about collection.  The function does not wash its
       arguments, it expects them to be `clean' already.  The pattern
       is split into `basic search units' for which a boolean query is
-      launched.  The function returns an instance of the HitSet class.
+      launched.  The function returns an instance of the intbitset class.
       Note that if you want to obtain the list of recIDs (as with the
       high-level API), you can invoke the ``tolist()'' method on a
       hitset.
@@ -332,7 +332,7 @@ via both a high-level and low-level API interface.
       The low-level API is provided by search_unit() function that
       assumes its arguments to be already the basic search units.
       Therefore it does not know anything about boolean queries, etc.
-      The function returns an instance of the HitSet class.  Note that
+      The function returns an instance of the intbitset class.  Note that
       if you want to obtain the list of recIDs (as with the high-level
       API), you can invoke the ``tolist()'' method on a hitset.
 

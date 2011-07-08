@@ -42,10 +42,13 @@ __revision__ = "$Id$"
 import sys
 import os
 
+from warnings import warn
+
 from invenio.config import \
      CFG_ETCDIR, \
      CFG_SITE_URL
 from invenio.bibconvert import FormatField
+from invenio.textutils import encode_for_xml
 
 # The namespace used for BibConvert functions
 CFG_BIBCONVERT_FUNCTION_NS = "http://cdsweb.cern.ch/bibconvert/fn"
@@ -77,7 +80,7 @@ if processor_type == -1:
 
 CFG_BIBCONVERT_XSL_PATH = "%s%sbibconvert%sconfig" % (CFG_ETCDIR, os.sep, os.sep)
 
-def bibconvert_function_libxslt(ctx, value, func):
+def bibconvert_function_libxslt(dummy_ctx, value, func):
     """
     libxslt extension function:
     Bridge between BibConvert formatting functions and XSL stylesheets.
@@ -108,8 +111,29 @@ def bibconvert_function_libxslt(ctx, value, func):
 
     return ''
 
+def bibconvert_escape_libxslt(dummy_ctx, value):
+    """
+    Bridge to libxslt to escape the provided value.
+    """
+    try:
+        if isinstance(value, str):
+            string_value = value
+        elif isinstance(value, (int, long)):
+            string_value = str(value)
+        else:
+            string_value = libxml2.xmlNode(_obj=value[0]).serialize('utf8')
 
-def bibconvert_function_4suite(ctx, value, func):
+        return encode_for_xml(string_value)
+
+    except Exception, err:
+        sys.stderr.write("Error during formatting function evaluation: " + \
+                         str(err) + \
+                         '\n')
+
+    return ''
+
+
+def bibconvert_function_4suite(dummy_ctx, value, func):
     """
     4suite extension function:
     Bridge between BibConvert formatting functions and XSL stylesheets.
@@ -139,6 +163,14 @@ def bibconvert_function_4suite(ctx, value, func):
                          '\n')
 
     return ''
+
+def bibconvert_escape_4suite(dummy_ctx, value):
+    """
+    Bridge to 4suite to escape the provided value.
+    """
+    ##FIXME: this does not work with 4suite. How one does serialize a Node?
+    warn("Invenio fn:escape is currently broken, when using 4suite")
+    return value
 
 def convert(xmltext, template_filename=None, template_source=None):
     """
@@ -192,6 +224,9 @@ def convert(xmltext, template_filename=None, template_source=None):
         libxslt.registerExtModuleFunction("format",
                                           CFG_BIBCONVERT_FUNCTION_NS,
                                           bibconvert_function_libxslt)
+        libxslt.registerExtModuleFunction("escape",
+                                          CFG_BIBCONVERT_FUNCTION_NS,
+                                          bibconvert_escape_libxslt)
 
         # Load template and source
         try:
@@ -227,6 +262,9 @@ def convert(xmltext, template_filename=None, template_source=None):
         processor.registerExtensionFunction(CFG_BIBCONVERT_FUNCTION_NS,
                                             "format",
                                             bibconvert_function_4suite)
+        processor.registerExtensionFunction(CFG_BIBCONVERT_FUNCTION_NS,
+                                          "escape",
+                                          bibconvert_escape_4suite)
 
         # Load template and source
         transform = InputSource.DefaultFactory.fromString(template,

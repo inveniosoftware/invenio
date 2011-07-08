@@ -167,4 +167,7 @@ The scientificchar plugin for the CKEditor was adapted from the
 specialchar plugin from Frederico Knabben.
 <http://ckeditor.com/>
 
+The oai2.xsl.v1.0 OAI to HTML XSLT Style Sheet was taken from EPrints.
+<http://www.eprints.org/software/xslt.php>
+
 - end of file -

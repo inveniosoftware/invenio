@@ -132,7 +132,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_WEBCOMMENT_ROUND_DATAFIELD',
                        'CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS',
                        'CFG_BIBSCHED_NODE_TASKS',
-                       'CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE']:
+                       'CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE',
+                       'CFG_OAI_METADATA_FORMATS']:
         option_value = option_value[1:-1]
 
     ## 3cbis) very special cases: dicts with backward compatible string
@@ -158,7 +159,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY',
                        'CFG_BATCHUPLOADER_WEB_ROBOT_AGENT',
                        'CFG_BIBAUTHORID_EXTERNAL_CLAIMED_RECORDS_KEY',
-                       'CFG_PLOTEXTRACTOR_DISALLOWED_TEX']:
+                       'CFG_PLOTEXTRACTOR_DISALLOWED_TEX',
+                       'CFG_OAI_FRIENDS']:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:
@@ -695,7 +697,10 @@ def cli_cmd_load_demo_records(conf):
                 "%s/bin/webcoll -u admin" % CFG_PREFIX,
                 "%s/bin/webcoll 4" % CFG_PREFIX,
                 "%s/bin/bibrank -u admin" % CFG_PREFIX,
-                "%s/bin/bibrank 5" % CFG_PREFIX,]:
+                "%s/bin/bibrank 5" % CFG_PREFIX,
+                "%s/bin/oairepositoryupdater -u admin" % CFG_PREFIX,
+                "%s/bin/oairepositoryupdater 6" % CFG_PREFIX,
+                "%s/bin/bibupload 7" % CFG_PREFIX,]:
         if os.system(cmd):
             print "ERROR: failed execution of", cmd
             sys.exit(1)

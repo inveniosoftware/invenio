@@ -40,7 +40,7 @@ from invenio.config import \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE
 from invenio.messages import gettext_set_language, language_list_long
-from invenio.search_engine import HitSet, search_pattern_parenthesised, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records
+from invenio.search_engine import search_pattern_parenthesised, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records
 from invenio.dbquery import run_sql, Error, get_table_update_time
 from invenio.bibrank_record_sorter import get_bibrank_methods
 from invenio.dateutils import convert_datestruct_to_dategui
@@ -131,7 +131,7 @@ class Collection:
         "Creates collection instance by querying the DB configuration database about 'name'."
         self.calculate_reclist_run_already = 0 # to speed things up without much refactoring
         self.update_reclist_run_already = 0 # to speed things up without much refactoring
-        self.reclist_with_nonpublic_subcolls = HitSet()
+        self.reclist_with_nonpublic_subcolls = intbitset()
         # used to store the temporary result of the calculation of nbrecs of an external collection
         self.nbrecs_tmp = None
         if not name:
@@ -139,7 +139,7 @@ class Collection:
             self.id = 1
             self.dbquery = None
             self.nbrecs = None
-            self.reclist = HitSet()
+            self.reclist = intbitset()
         else:
             self.name = name
             try:
@@ -151,14 +151,14 @@ class Collection:
                     self.dbquery = res[0][2]
                     self.nbrecs = res[0][3]
                     try:
-                        self.reclist = HitSet(res[0][4])
+                        self.reclist = intbitset(res[0][4])
                     except:
-                        self.reclist = HitSet()
+                        self.reclist = intbitset()
                 else: # collection does not exist!
                     self.id = None
                     self.dbquery = None
                     self.nbrecs = None
-                    self.reclist = HitSet()
+                    self.reclist = intbitset()
             except Error, e:
                 print "Error %d: %s" % (e.args[0], e.args[1])
                 sys.exit(1)
@@ -739,8 +739,8 @@ class Collection:
             # do we have to recalculate?
             return (self.reclist, self.reclist_with_nonpublic_subcolls)
         write_message("... calculating reclist of %s" % self.name, verbose=6)
-        reclist = HitSet() # will hold results for public sons only; good for storing into DB
-        reclist_with_nonpublic_subcolls = HitSet() # will hold results for both public and nonpublic sons; good for deducing total
+        reclist = intbitset() # will hold results for public sons only; good for storing into DB
+        reclist_with_nonpublic_subcolls = intbitset() # will hold results for both public and nonpublic sons; good for deducing total
                                                    # number of documents
         if not self.dbquery:
             # A - collection does not have dbquery, so query recursively all its sons

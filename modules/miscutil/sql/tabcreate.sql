@@ -2667,7 +2667,7 @@ CREATE TABLE IF NOT EXISTS collection_collection (
 CREATE TABLE IF NOT EXISTS oaiREPOSITORY (
   id mediumint(9) unsigned NOT NULL auto_increment,
   setName varchar(255) NOT NULL default '',
-  setSpec varchar(255) NOT NULL default '',
+  setSpec varchar(255) NOT NULL default 'GLOBAL_SET',
   setCollection varchar(255) NOT NULL default '',
   setDescription text NOT NULL default '',
   setDefinition text NOT NULL default '',

@@ -1,0 +1,317 @@
+<schema targetNamespace="http://www.openarchives.org/OAI/2.0/"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified">
+
+  <annotation>
+    <documentation>
+    XML Schema which can be used to validate replies to all OAI-PMH
+    v2.0 requests. Herbert Van de Sompel, 2002-05-13.
+    Validated with XML Spy v.4.3 on 2002-05-13.
+    Validated with XSV 1.203.2.45/1.106.2.22 on 2002-05-13.
+    Added definition of protocolVersionType instead of using anonymous
+    type. No change of function. Simeon Warner, 2004-03-29.
+    Tightened definition of UTCdatetimeType to enforce the restriction
+    to UTC Z notation. Simeon Warner, 2004-09-14.
+    Corrected pattern matches for setSpecType and metadataPrefixType
+    to agree with protocol specification. Simeon Warner, 2004-10-12.
+    Spelling correction. Simeon Warner, 2008-12-07.
+    $Date: 2004/10/12 15:20:29 $
+    </documentation>
+  </annotation>
+
+  <element name="OAI-PMH" type="oai:OAI-PMHtype"/>
+
+  <complexType name="OAI-PMHtype">
+    <sequence>
+      <element name="responseDate" type="dateTime"/>
+      <element name="request" type="oai:requestType"/>
+      <choice>
+        <element name="error" type="oai:OAI-PMHerrorType" maxOccurs="unbounded"/>
+        <element name="Identify" type="oai:IdentifyType"/>
+        <element name="ListMetadataFormats" type="oai:ListMetadataFormatsType"/>
+        <element name="ListSets" type="oai:ListSetsType"/>
+        <element name="GetRecord" type="oai:GetRecordType"/>
+        <element name="ListIdentifiers" type="oai:ListIdentifiersType"/>
+        <element name="ListRecords" type="oai:ListRecordsType"/>
+      </choice>
+    </sequence>
+  </complexType>
+
+  <complexType name="requestType">
+    <annotation>
+      <documentation>Define requestType, indicating the protocol request that
+      led to the response. Element content is BASE-URL, attributes are arguments
+      of protocol request, attribute-values are values of arguments of protocol
+      request</documentation>
+    </annotation>
+    <simpleContent>
+      <extension base="anyURI">
+        <attribute name="verb" type="oai:verbType" use="optional"/>
+        <attribute name="identifier" type="oai:identifierType" use="optional"/>
+        <attribute name="metadataPrefix" type="oai:metadataPrefixType" use="optional"/>
+        <attribute name="from" type="oai:UTCdatetimeType" use="optional"/>
+        <attribute name="until" type="oai:UTCdatetimeType" use="optional"/>
+        <attribute name="set" type="oai:setSpecType" use="optional"/>
+        <attribute name="resumptionToken" type="string" use="optional"/>
+      </extension>
+    </simpleContent>
+  </complexType>
+
+  <simpleType name="verbType">
+    <restriction base="string">
+      <enumeration value="Identify"/>
+      <enumeration value="ListMetadataFormats"/>
+      <enumeration value="ListSets"/>
+      <enumeration value="GetRecord"/>
+      <enumeration value="ListIdentifiers"/>
+      <enumeration value="ListRecords"/>
+    </restriction>
+  </simpleType>
+
+  <!-- define OAI-PMH error conditions -->
+  <!-- =============================== -->
+
+  <complexType name="OAI-PMHerrorType">
+    <simpleContent>
+      <extension base="string">
+        <attribute name="code" type="oai:OAI-PMHerrorcodeType" use="required"/>
+      </extension>
+    </simpleContent>
+  </complexType>
+
+  <simpleType name="OAI-PMHerrorcodeType">
+    <restriction base="string">
+      <enumeration value="cannotDisseminateFormat"/>
+      <enumeration value="idDoesNotExist"/>
+      <enumeration value="badArgument"/>
+      <enumeration value="badVerb"/>
+      <enumeration value="noMetadataFormats"/>
+      <enumeration value="noRecordsMatch"/>
+      <enumeration value="badResumptionToken"/>
+      <enumeration value="noSetHierarchy"/>
+    </restriction>
+  </simpleType>
+
+  <!-- define OAI-PMH verb containers -->
+  <!-- ============================== -->
+
+  <complexType name="IdentifyType">
+    <sequence>
+      <element name="repositoryName" type="string"/>
+      <element name="baseURL" type="anyURI"/>
+      <element name="protocolVersion" type="oai:protocolVersionType"/>
+      <element name="adminEmail" type="oai:emailType" maxOccurs="unbounded"/>
+      <element name="earliestDatestamp" type="oai:UTCdatetimeType"/>
+      <element name="deletedRecord" type="oai:deletedRecordType"/>
+      <element name="granularity" type="oai:granularityType"/>
+      <element name="compression" type="string" minOccurs="0" maxOccurs="unbounded"/>
+      <element name="description" type="oai:descriptionType"
+               minOccurs="0" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="ListMetadataFormatsType">
+    <sequence>
+      <element name="metadataFormat" type="oai:metadataFormatType" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="ListSetsType">
+    <sequence>
+      <element name="set" type="oai:setType" maxOccurs="unbounded"/>
+      <element name="resumptionToken" type="oai:resumptionTokenType" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="GetRecordType">
+    <sequence>
+      <element name="record" type="oai:recordType"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="ListRecordsType">
+    <sequence>
+      <element name="record" type="oai:recordType" maxOccurs="unbounded"/>
+      <element name="resumptionToken" type="oai:resumptionTokenType" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="ListIdentifiersType">
+    <sequence>
+      <element name="header" type="oai:headerType" maxOccurs="unbounded"/>
+      <element name="resumptionToken" type="oai:resumptionTokenType" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <!-- define basic types used in replies to
+       GetRecord, ListRecords, ListIdentifiers -->
+  <!-- ======================================= -->
+
+  <complexType name="recordType">
+    <annotation>
+      <documentation>A record has a header, a metadata part, and
+        an optional about container</documentation>
+    </annotation>
+    <sequence>
+      <element name="header" type="oai:headerType"/>
+      <element name="metadata" type="oai:metadataType" minOccurs="0"/>
+      <element name="about" type="oai:aboutType" minOccurs="0" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="headerType">
+    <annotation>
+      <documentation>A header has a unique identifier, a datestamp,
+        and setSpec(s) in case the item from which
+        the record is disseminated belongs to set(s).
+        the header can carry a deleted status indicating
+        that the record is deleted.</documentation>
+    </annotation>
+    <sequence>
+      <element name="identifier" type="oai:identifierType"/>
+      <element name="datestamp" type="oai:UTCdatetimeType"/>
+      <element name="setSpec" type="oai:setSpecType" minOccurs="0" maxOccurs="unbounded"/>
+    </sequence>
+    <attribute name="status" type="oai:statusType" use="optional"/>
+  </complexType>
+
+  <simpleType name="identifierType">
+    <restriction base="anyURI"/>
+  </simpleType>
+
+  <simpleType name="statusType">
+    <restriction base="string">
+      <enumeration value="deleted"/>
+    </restriction>
+  </simpleType>
+
+  <complexType name="metadataType">
+    <annotation>
+      <documentation>Metadata must be expressed in XML that complies
+       with another XML Schema (namespace=#other). Metadata must be
+       explicitly qualified in the response.</documentation>
+    </annotation>
+    <sequence>
+      <any namespace="##other" processContents="lax"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="aboutType">
+    <annotation>
+      <documentation>Data "about" the record must be expressed in XML
+      that is compliant with an XML Schema defined by a community.</documentation>
+    </annotation>
+    <sequence>
+      <any namespace="##other" processContents="lax"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="resumptionTokenType">
+    <annotation>
+      <documentation>A resumptionToken may have 3 optional attributes
+       and can be used in ListSets, ListIdentifiers, ListRecords
+       responses.</documentation>
+    </annotation>
+    <simpleContent>
+      <extension base="string">
+        <attribute name="expirationDate" type="dateTime" use="optional"/>
+        <attribute name="completeListSize" type="positiveInteger" use="optional"/>
+        <attribute name="cursor" type="nonNegativeInteger" use="optional"/>
+      </extension>
+    </simpleContent>
+  </complexType>
+
+  <complexType name="descriptionType">
+    <annotation>
+      <documentation>The descriptionType is used for the description
+      element in Identify and for setDescription element in ListSets.
+      Content must be compliant with an XML Schema defined by a
+      community.</documentation>
+    </annotation>
+    <sequence>
+      <any namespace="##other" processContents="lax"/>
+    </sequence>
+  </complexType>
+
+  <simpleType name="UTCdatetimeType">
+    <annotation>
+      <documentation>Datestamps are to either day (type date)
+      or to seconds granularity (type oai:UTCdateTimeZType)</documentation>
+    </annotation>
+    <union memberTypes="date oai:UTCdateTimeZType"/>
+  </simpleType>
+
+  <simpleType name="UTCdateTimeZType">
+    <restriction base="dateTime">
+      <pattern value=".*Z"/>
+    </restriction>
+  </simpleType>
+
+  <!-- define types used for Identify verb only -->
+  <!-- ======================================== -->
+
+  <simpleType name="protocolVersionType">
+    <restriction base="string">
+      <enumeration value="2.0"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="emailType">
+    <restriction base="string">
+      <pattern value="\S+@(\S+\.)+\S+"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="deletedRecordType">
+    <restriction base="string">
+      <enumeration value="no"/>
+      <enumeration value="persistent"/>
+      <enumeration value="transient"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="granularityType">
+    <restriction base="string">
+      <enumeration value="YYYY-MM-DD"/>
+      <enumeration value="YYYY-MM-DDThh:mm:ssZ"/>
+    </restriction>
+  </simpleType>
+
+  <!-- define types used for ListMetadataFormats verb only -->
+  <!-- =================================================== -->
+
+  <complexType name="metadataFormatType">
+    <sequence>
+      <element name="metadataPrefix" type="oai:metadataPrefixType"/>
+      <element name="schema" type="anyURI"/>
+      <element name="metadataNamespace" type="anyURI"/>
+    </sequence>
+  </complexType>
+
+  <simpleType name="metadataPrefixType">
+    <restriction base="string">
+      <pattern value="[A-Za-z0-9\-_\.!~\*'\(\)]+"/>
+    </restriction>
+  </simpleType>
+
+  <!-- define types used for ListSets verb -->
+  <!-- =================================== -->
+
+  <complexType name="setType">
+    <sequence>
+      <element name="setSpec" type="oai:setSpecType"/>
+      <element name="setName" type="string"/>
+      <element name="setDescription" type="oai:descriptionType"
+               minOccurs="0" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+  <simpleType name="setSpecType">
+    <restriction base="string">
+      <pattern value="([A-Za-z0-9\-_\.!~\*'\(\)])+(:[A-Za-z0-9\-_\.!~\*'\(\)]+)*"/>
+    </restriction>
+  </simpleType>
+
+</schema>

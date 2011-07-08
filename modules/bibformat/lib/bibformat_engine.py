@@ -80,8 +80,8 @@ from invenio.bibformat_utils import \
      parse_tag
 from invenio.htmlutils import \
      HTMLWasher, \
-     cfg_html_buffer_allowed_tag_whitelist, \
-     cfg_html_buffer_allowed_attribute_whitelist
+     CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST, \
+     CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST
 from invenio.webuser import collect_user_info
 from invenio.bibknowledge import get_kbr_values
 from HTMLParser import HTMLParseError
@@ -2028,8 +2028,8 @@ def escape_field(value, mode=0):
     if mode == 1:
         return cgi.escape(value)
     elif mode in [2, 5]:
-        allowed_attribute_whitelist = cfg_html_buffer_allowed_attribute_whitelist
-        allowed_tag_whitelist = cfg_html_buffer_allowed_tag_whitelist + \
+        allowed_attribute_whitelist = CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST
+        allowed_tag_whitelist = CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST + \
                                 ('class',)
         if mode == 5:
             allowed_attribute_whitelist += ('src', 'alt',
@@ -2051,8 +2051,8 @@ def escape_field(value, mode=0):
             return cgi.escape(value)
     elif mode in [3, 6]:
         if value.lstrip(' \n').startswith(html_field):
-            allowed_attribute_whitelist = cfg_html_buffer_allowed_attribute_whitelist
-            allowed_tag_whitelist = cfg_html_buffer_allowed_tag_whitelist + \
+            allowed_attribute_whitelist = CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST
+            allowed_tag_whitelist = CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST + \
                                     ('class',)
             if mode == 6:
                 allowed_attribute_whitelist += ('src', 'alt',

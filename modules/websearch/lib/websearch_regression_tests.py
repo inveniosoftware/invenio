@@ -1832,8 +1832,8 @@ class WebSearchDateQueryTest(unittest.TestCase):
 
     def setUp(self):
         """Establish variables we plan to re-use"""
-        from invenio.intbitset import intbitset as HitSet
-        self.empty = HitSet()
+        from invenio.intbitset import intbitset
+        self.empty = intbitset()
 
     def test_search_unit_hits_for_datecreated_previous_millenia(self):
         """websearch - search_unit with datecreated returns >0 hits for docs in the last 1000 years"""
