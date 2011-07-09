@@ -165,7 +165,8 @@ install-jquery-plugins: install-jquery-plugins
 	unzip jquery.tablesorter.zip && \
 	rm jquery.tablesorter.zip && \
 	unzip -u uploadify.zip && \
-	mv -T jquery.uploadify-v2.1.3 uploadify && \
+	rm -rf uploadify && \
+	mv jquery.uploadify-v2.1.3 uploadify && \
 	wget http://flot.googlecode.com/files/flot-0.6.zip && \
 	wget http://trentrichardson.com/examples/timepicker/js/jquery-ui-timepicker-addon.js && \
 	unzip -u flot-0.6.zip && \
