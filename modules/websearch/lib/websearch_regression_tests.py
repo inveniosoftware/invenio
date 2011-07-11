@@ -63,6 +63,49 @@ def parse_url(url):
 
     return parts[2].split('/')[1:], query
 
+def string_combinations(str_list):
+    """Returns all the possible combinations of the strings in the list.
+    Example: for the list ['A','B','Cd'], it will return
+    [['Cd', 'B', 'A'], ['B', 'A'], ['Cd', 'A'], ['A'], ['Cd', 'B'], ['B'], ['Cd'], []]
+    It adds "B", "H", "F" and "S" values to the results so different
+    combinations of them are also checked.
+    """
+    out_list = []
+    for i in range(len(str_list) + 1):
+        out_list += list(combinations(str_list, i))
+    for i in range(len(out_list)):
+        out_list[i] = (list(out_list[i]) + {
+            0: lambda: ["B", "H", "S"],
+            1: lambda: ["B", "H", "F"],
+            2: lambda: ["B", "F", "S"],
+            3: lambda: ["B", "F"],
+            4: lambda: ["B", "S"],
+            5: lambda: ["B", "H"],
+            6: lambda: ["B"]
+        }[i % 7]())
+    return out_list
+
+def combinations(iterable, r):
+    """Return r length subsequences of elements from the input iterable."""
+    # combinations('ABCD', 2) --> AB AC AD BC BD CD
+    # combinations(range(4), 3) --> 012 013 023 123
+    pool = tuple(iterable)
+    n = len(pool)
+    if r > n:
+        return
+    indices = range(r)
+    yield tuple(pool[i] for i in indices)
+    while True:
+        for i in reversed(range(r)):
+            if indices[i] != i + n - r:
+                break
+        else:
+            return
+        indices[i] += 1
+        for j in range(i+1, r):
+            indices[j] = indices[j-1] + 1
+        yield tuple(pool[i] for i in indices)
+
 class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
     """Check WebSearch web pages whether they are up or not."""
 
@@ -441,6 +484,36 @@ class WebSearchTestCollections(unittest.TestCase):
         self.failUnlessEqual(len(found), 10)
         return
 
+    def test_em_parameter(self):
+        """ websearch - check different values of em return different parts of the collection page"""
+        for combi in string_combinations(["L", "P", "Prt"]):
+            url = '/collection/Articles?em=%s' % ','.join(combi)
+            expected_text = ["<strong>Development of photon beam diagnostics for VUV radiation from a SASE FEL</strong>"]
+            unexpected_text = []
+            if "H" in combi:
+                expected_text.append(">Atlantis Institute of Fictive Science</a>")
+            else:
+                unexpected_text.append(">Atlantis Institute of Fictive Science</a>")
+            if "F" in combi:
+                expected_text.append("This site is also available in the following languages:")
+            else:
+                unexpected_text.append("This site is also available in the following languages:")
+            if "S" in combi:
+                expected_text.append('value="Search"')
+            else:
+                unexpected_text.append('value="Search"')
+            if "L" in combi:
+                expected_text.append('Search also:')
+            else:
+                unexpected_text.append('Search also:')
+            if "Prt" in combi or "P" in combi:
+                expected_text.append('<div class="portalboxheader">ABOUT ARTICLES</div>')
+            else:
+                unexpected_text.append('<div class="portalboxheader">ABOUT ARTICLES</div>')
+            self.assertEqual([], test_web_page_content(make_url(url),
+                                           expected_text=expected_text,
+                                           unexpected_text=unexpected_text))
+        return
 
 class WebSearchTestBrowse(unittest.TestCase):
 
@@ -680,6 +753,45 @@ class WebSearchTestSearch(unittest.TestCase):
                                                     p="Ellis, R S",
                                                     f='author',
                                                     ln='en')))
+
+    def test_em_parameter(self):
+        """ websearch - check different values of em return different parts of the search page"""
+        for combi in string_combinations(["K", "A", "I", "O"]):
+            url = '/search?ln=en&cc=Articles+%%26+Preprints&sc=1&c=Articles&c=Preprints&em=%s' % ','.join(combi)
+            expected_text = ["<strong>Development of photon beam diagnostics for VUV radiation from a SASE FEL</strong>"]
+            unexpected_text = []
+            if "H" in combi:
+                expected_text.append(">Atlantis Institute of Fictive Science</a>")
+            else:
+                unexpected_text.append(">Atlantis Institute of Fictive Science</a>")
+            if "F" in combi:
+                expected_text.append("This site is also available in the following languages:")
+            else:
+                unexpected_text.append("This site is also available in the following languages:")
+            if "S" in combi:
+                expected_text.append('value="Search"')
+            else:
+                unexpected_text.append('value="Search"')
+            if "K" in combi:
+                expected_text.append('value="Add to basket"')
+            else:
+                unexpected_text.append('value="Add to basket"')
+            if "A" in combi:
+                expected_text.append('Interested in being notified about new results for this query?')
+            else:
+                unexpected_text.append('Interested in being notified about new results for this query?')
+            if "I" in combi:
+                expected_text.append('jump to record:')
+            else:
+                unexpected_text.append('jump to record:')
+            if "O" in combi:
+                expected_text.append('<th class="searchresultsboxheader"><strong>Results overview:</strong> Found <strong>')
+            else:
+                unexpected_text.append('<th class="searchresultsboxheader"><strong>Results overview:</strong> Found <strong>')
+            self.assertEqual([], test_web_page_content(make_url(url),
+                                           expected_text=expected_text,
+                                           unexpected_text=unexpected_text))
+        return
 
 class WebSearchTestWildcardLimit(unittest.TestCase):
     """Checks if the wildcard limit is correctly passed and that

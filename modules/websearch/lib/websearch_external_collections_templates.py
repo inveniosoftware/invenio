@@ -131,7 +131,6 @@ def print_results(req, lang, pagegetter, infos, current_time, print_search_info=
     _ = gettext_set_language(lang)
     url = infos[0]
     engine = infos[1]
-    user_url = infos[2]
     internal_name = get_link_name(engine.name)
     name = _(engine.name)
     base_url = engine.base_url
