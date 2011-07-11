@@ -178,7 +178,6 @@ def task_run_core():
     run daemon
     """
 
-
     if task_get_option("update-borrowers"):
         list_of_borrowers = db.get_all_borrowers()
 

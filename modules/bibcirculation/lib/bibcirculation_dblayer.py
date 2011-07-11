@@ -2404,18 +2404,24 @@ def search_ill_requests_title(title, date_from, date_to):
     date_from = date_from.replace("'", "\\'")
     date_to   = date_to.replace("'", "\\'")
 
+    tokens = title.split()
+    tokens_query = ""
+    for token in tokens:
+        tokens_query += " AND ill.item_info like '%%%s%%' " % token
+
+
     query = """SELECT ill.id, ill.id_crcBORROWER, bor.name,
                       ill.id_crcLIBRARY, ill.status,
-                      DATE_FORMAT(ill.period_of_interest_from,'%%Y-%%m-%%d'),
-                      DATE_FORMAT(ill.period_of_interest_to,'%%Y-%%m-%%d'),
-                      DATE_FORMAT(ill.due_date,'%%Y-%%m-%%d'),
+                      DATE_FORMAT(ill.period_of_interest_from,'%Y-%m-%d'),
+                      DATE_FORMAT(ill.period_of_interest_to,'%Y-%m-%d'),
+                      DATE_FORMAT(ill.due_date,'%Y-%m-%d'),
                       ill.item_info, ill.request_type
                  FROM crcILLREQUEST ill, crcBORROWER bor
-                WHERE ill.id_crcBORROWER=bor.id
-                  AND ill.item_info like '%%%s%%'
-                  AND DATE_FORMAT(ill.request_date,'%%Y-%%m-%%d') >= '%s'
+                WHERE ill.id_crcBORROWER=bor.id """
+    query += tokens_query
+    query += """  AND DATE_FORMAT(ill.request_date,'%%Y-%%m-%%d') >= '%s'
                   AND DATE_FORMAT(ill.request_date,'%%Y-%%m-%%d') <= '%s'
-             ORDER BY ill.id desc""" % (title, date_from, date_to)
+             ORDER BY ill.id desc""" % (date_from, date_to)
 
     return run_sql(query)
 
