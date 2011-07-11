@@ -44,7 +44,7 @@ from invenio.bibedit_dblayer import get_record_last_modification_date, \
 from invenio.bibrecord import create_record, create_records, \
     record_get_field_value, record_has_field, record_xml_output, \
     record_strip_empty_fields, record_strip_empty_volatile_subfields, \
-    record_order_subfields
+    record_order_subfields, record_get_field_instances
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
@@ -95,6 +95,56 @@ def assert_undo_redo_lists_correctness(undo_list, redo_list):
         assert undoItem != None;
     for redoItem in redo_list:
         assert redoItem != None;
+
+def record_find_matching_fields(key, rec, tag="", ind1=" ", ind2=" ", \
+                                exact_match=False):
+    """
+    This utility function will look for any fieldvalues containing or equal
+    to, if exact match is wanted, given keyword string. The found fields will be
+    returned as a list of field instances per tag. The fields to search can be
+    narrowed down to tag/indicator level.
+
+    @param key: keyword to search for
+    @type key: string
+
+    @param rec: a record structure as returned by bibrecord.create_record()
+    @type rec: dict
+
+    @param tag: a 3 characters long string
+    @type tag: string
+
+    @param ind1: a 1 character long string
+    @type ind1: string
+
+    @param ind2: a 1 character long string
+    @type ind2: string
+
+    @return: a list of found fields in a tuple per tag: (tag, field_instances) where
+        field_instances is a list of (Subfields, ind1, ind2, value, field_position_global)
+        and subfields is list of (code, value)
+    @rtype: list
+    """
+    if not tag:
+        all_field_instances = rec.items()
+    else:
+        all_field_instances = [(tag, record_get_field_instances(rec, tag, ind1, ind2))]
+    matching_field_instances = []
+    for current_tag, field_instances in all_field_instances:
+        found_fields = []
+        for field_instance in field_instances:
+            # Get values to match: controlfield_value + subfield values
+            values_to_match = [field_instance[3]] + \
+                              [val for code, val in field_instance[0]]
+            if exact_match and key in values_to_match:
+                found_fields.append(field_instance)
+            else:
+                for value in values_to_match:
+                    if value.find(key) > -1:
+                        found_fields.append(field_instance)
+                        break
+        if len(found_fields) > 0:
+            matching_field_instances.append((current_tag, found_fields))
+    return matching_field_instances
 
 # Operations on the BibEdit cache file
 def cache_exists(recid, uid):
