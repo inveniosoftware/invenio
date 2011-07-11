@@ -170,7 +170,8 @@ class BibCatalogSystemRT(BibCatalogSystem):
                     tickets.append(tnum)
         return tickets
 
-    def ticket_submit(self, uid, subject, recordid, text="", queue="", priority="", owner=""):
+    def ticket_submit(self, uid, subject, recordid, text="", queue="",
+        priority="", owner="", requestor=""):
         """creates a ticket. return ticket num on success, otherwise None"""
         if not CFG_BIBCATALOG_SYSTEM_RT_URL:
             return None
@@ -185,6 +186,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
         priorityset = ""
         ownerset = ""
         subjectset = ""
+        requestorset = ""
         if subject:
             subjectset = " subject=" + escape_shell_arg(subject)
         recidset = " CF-RecordID=" + escape_shell_arg(str(recordid))
@@ -194,6 +196,8 @@ class BibCatalogSystemRT(BibCatalogSystem):
             priorityset = " priority=" + escape_shell_arg(str(priority))
         if queue:
             queueset = " queue=" + escape_shell_arg(queue)
+        if requestor:
+            requestorset = " requestor=" + escape_shell_arg(requestor)
         if owner:
             #get the owner name from prefs
             ownerprefs = invenio.webuser.get_user_preferences(owner)
@@ -203,7 +207,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
         #make a command.. note that all set 'set' parts have been escaped
 
         command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " create -t ticket set " + subjectset + recidset + \
-                  queueset + textset + priorityset + ownerset
+                  queueset + textset + priorityset + ownerset + requestorset
 
         passwd = escape_shell_arg(passwd)
         #make a call.. passwd and command have been escaped (see above)

@@ -65,7 +65,7 @@ class BibCatalogSystem:
         """
         pass
 
-    def ticket_submit(self, uid, subject, recordid, text="", queue="", priority="", owner=""):
+    def ticket_submit(self, uid, subject, recordid, text="", queue="", priority="", owner="",requestor=""):
         """submit a ticket. Return ticket number on success, otherwise None
            @param uid: invenio user id
            @type uid: number
@@ -81,6 +81,8 @@ class BibCatalogSystem:
            @type priority: number
            @param owner: set ticket owner to this uid.
            @type owner: number
+           @param requestor: set ticket requestor to this email.
+           @type requestor: string
            @return: new ticket id or None
         """
         pass
