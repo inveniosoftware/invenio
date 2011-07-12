@@ -6387,7 +6387,7 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
             return recIDs
 
         elif of.startswith("h"):
-            if of not in ['hcs', 'hcs2']:
+            if of not in ['hcs', 'hcs2', 'hcv', 'htcv', 'tlcv']:
                 # added the hosted_colls_potential_results_p parameter to help print out the overview more accurately
                 req.write(print_results_overview(colls_to_search, results_final_nb_total, results_final_nb, cpu_time,
                             ln, ec, hosted_colls_potential_results_p=kwargs['hosted_colls_potential_results_p'], em=em))
@@ -6399,6 +6399,9 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
         # print records:
         if of in ['hcs', 'hcs2']:
             prs_summarize_records(kwargs=kwargs, **kwargs)
+        elif of in ['hcv', 'htcv', 'tlcv'] and CFG_INSPIRE_SITE:
+            from invenio.search_engine_cvifier import cvify_records
+            cvify_records(results_final_for_all_selected_colls, of, req, so)
         else:
             prs_print_records(kwargs=kwargs, **kwargs)
 
