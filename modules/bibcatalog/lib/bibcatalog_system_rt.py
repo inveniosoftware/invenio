@@ -30,45 +30,60 @@ from invenio.bibcatalog_system import BibCatalogSystem, get_bibcat_from_prefs
 from invenio.config import CFG_BIBCATALOG_SYSTEM, \
                            CFG_BIBCATALOG_SYSTEM_RT_CLI, \
                            CFG_BIBCATALOG_SYSTEM_RT_URL, \
-                           CFG_BIBCATALOG_QUEUES
+                           CFG_BIBCATALOG_QUEUES, \
+                           CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_USER, \
+                           CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_PWD
 
 class BibCatalogSystemRT(BibCatalogSystem):
 
     BIBCATALOG_RT_SERVER = "" #construct this by http://user:password@RT_URL
 
-    def check_system(self, uid):
+    def check_system(self, uid=None):
         """return an error string if there are problems"""
-        user_pref = invenio.webuser.get_user_preferences(uid)
-        if not user_pref.has_key('bibcatalog_username'):
-            return "user " + str(uid) + " has no bibcatalog_username"
-        rtuid = user_pref['bibcatalog_username']
-        if not user_pref.has_key('bibcatalog_password'):
-            return "user " + str(uid) + " has no bibcatalog_password"
-        rtpw = user_pref['bibcatalog_password']
+        if uid:
+            user_pref = invenio.webuser.get_user_preferences(uid)
+            if not user_pref.has_key('bibcatalog_username'):
+                return "user " + str(uid) + " has no bibcatalog_username"
+            rtuid = user_pref['bibcatalog_username']
+            if not user_pref.has_key('bibcatalog_password'):
+                return "user " + str(uid) + " has no bibcatalog_password"
+            rtpw = user_pref['bibcatalog_password']
+        else:
+            # Assume default RT user
+            rtuid = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_USER
+            rtpw = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_PWD
+
+        if not rtuid and not rtpw:
+            return "No valid RT user login specified"
         if not CFG_BIBCATALOG_SYSTEM == 'RT':
             return "CFG_BIBCATALOG_SYSTEM is not RT though this is an RT module"
         if not CFG_BIBCATALOG_SYSTEM_RT_CLI:
             return "CFG_BIBCATALOG_SYSTEM_RT_CLI not defined or empty"
         if not os.path.exists(CFG_BIBCATALOG_SYSTEM_RT_CLI):
             return "CFG_BIBCATALOG_SYSTEM_RT_CLI " + CFG_BIBCATALOG_SYSTEM_RT_CLI + " file does not exists"
-        #check that you can execute it.. this is a safe call unless someone can fake CFG_BIBCATALOG_SYSTEM_RT_CLI (unlikely)
+
+        # Check that you can execute the binary.. this is a safe call unless someone can fake CFG_BIBCATALOG_SYSTEM_RT_CLI (unlikely)
         dummy, myout, myerr = run_shell_command(CFG_BIBCATALOG_SYSTEM_RT_CLI + " help")
         helpfound = False
         if myerr.count("help") > 0:
             helpfound = True
         if not helpfound:
             return "Execution of CFG_BIBCATALOG_SYSTEM_RT_CLI " + CFG_BIBCATALOG_SYSTEM_RT_CLI + " help did not produce output 'help'"
+
         if not CFG_BIBCATALOG_SYSTEM_RT_URL:
             return "CFG_BIBCATALOG_SYSTEM_RT_URL not defined or empty"
-        #construct.. split RT_URL at //
+        # Construct URL, split RT_URL at //
         if not CFG_BIBCATALOG_SYSTEM_RT_URL.startswith('http://') and \
            not CFG_BIBCATALOG_SYSTEM_RT_URL.startswith('https://'):
             return "CFG_BIBCATALOG__SYSTEM_RT_URL does not start with 'http://' or 'https://'"
         httppart, siteandpath = CFG_BIBCATALOG_SYSTEM_RT_URL.split("//")
+        # Assemble by http://user:password@RT_URL
         BIBCATALOG_RT_SERVER = httppart + "//" + rtuid + ":" + rtpw + "@" + siteandpath
+
         #set as env var
         os.environ["RTUSER"] = rtuid
         os.environ["RTSERVER"] = BIBCATALOG_RT_SERVER
+
         #try to talk to RT server
         #this is a safe call since rtpw is the only variable in it, and it is escaped
         rtpw = escape_shell_arg(rtpw)
@@ -81,9 +96,10 @@ class BibCatalogSystemRT(BibCatalogSystem):
             return CFG_BIBCATALOG_SYSTEM_RT_CLI + " returned " + myout + " instead of 'matching' or '1'"
         if not CFG_BIBCATALOG_QUEUES:
             return "CFG_BIBCATALOG_QUEUES not defined or empty"
-        (username, dummy) = get_bibcat_from_prefs(uid)
-        if (username is None):
-            return "Cannot find user preference bibcatalog_username for uid "+str(uid)
+        if uid:
+            (username, dummy) = get_bibcat_from_prefs(uid)
+            if (username is None):
+                return "Cannot find user preference bibcatalog_username for uid "+str(uid)
         return ""
 
     def ticket_search(self, uid, recordid=-1, subject="", text="", creator="", owner="", \
@@ -170,12 +186,16 @@ class BibCatalogSystemRT(BibCatalogSystem):
                     tickets.append(tnum)
         return tickets
 
-    def ticket_submit(self, uid, subject, recordid, text="", queue="",
+    def ticket_submit(self, uid=None, subject="", recordid=-1, text="", queue="",
         priority="", owner="", requestor=""):
         """creates a ticket. return ticket num on success, otherwise None"""
         if not CFG_BIBCATALOG_SYSTEM_RT_URL:
             return None
-        (username, passwd) = get_bibcat_from_prefs(uid)
+        if uid:
+            username, passwd = get_bibcat_from_prefs(uid)
+        else:
+            username = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_USER
+            passwd = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_PWD
         httppart, siteandpath = CFG_BIBCATALOG_SYSTEM_RT_URL.split("//")
         BIBCATALOG_RT_SERVER = httppart + "//" + username + ":" + passwd + "@" + siteandpath
         #set as env var

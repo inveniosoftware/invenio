@@ -30,9 +30,9 @@ class BibCatalogSystem:
 
     TICKET_ATTRIBUTES = ['ticketid', 'priority', 'recordid', 'subject', 'text', 'creator', 'owner', 'date', 'status', 'queue', 'url_display', 'url_modify', 'url_close']
 
-    def check_system(self, uid):
+    def check_system(self, uid=None):
         """Check connectivity. Return a string describing the error or an empty str
-           @param uid: invenio user id
+           @param uid: invenio user id. optional
            @type uid: number
            @return: empty string on success. Otherwise a string describing error.
            @rtype: string
@@ -65,9 +65,9 @@ class BibCatalogSystem:
         """
         pass
 
-    def ticket_submit(self, uid, subject, recordid, text="", queue="", priority="", owner="",requestor=""):
+    def ticket_submit(self, uid=None, subject="", recordid=-1, text="", queue="", priority="", owner="",requestor=""):
         """submit a ticket. Return ticket number on success, otherwise None
-           @param uid: invenio user id
+           @param uid: invenio user id. optional
            @type uid: number
            @param subject: set this as the ticket's subject.
            @type subject: string
