@@ -29,6 +29,16 @@
 var gSelectionModeOn = false;
 var gReady = true;
 
+/** a functor allowing skipping the usage of hotkeys plugin in the case of inputs */
+function disableInInput(fn){
+    return function(event){
+	//TODO: Piotr: Here a check if the even is fired on the input
+	if (event.target.tagName.toLowerCase() != "input"){
+	    fn(event);
+	}
+    }
+}
+
 function initHotkeys(){
   /*
    * Initialize all hotkeys.
@@ -36,81 +46,71 @@ function initHotkeys(){
   // New record.
   // disableInInput
   $(document).bind('keydown', 'shift+n',
-    function(event){
+    disableInInput(function(event){
       $('#imgNewRecord').trigger('click');
       event.preventDefault();
-  });
+  }));
     // Clone record.
     // disableInInput
   $(document).bind('keydown', 'shift+l',
-    function(event){
+    disableInInput(function(event){
       var imgCloneRecord = $('#imgCloneRecord');
       if (!imgCloneRecord.hasClass('bibEditImgFaded')){
 	imgCloneRecord.trigger('click');
 	event.preventDefault();
       }
-  });
+  }));
   // Focus on record selection field.
   // disableInInput
   $(document).bind('keydown','g',
-    function(event){
+    disableInInput(function(event){
       $('#txtSearchPattern').focus();
       event.preventDefault();
-  });
+  }));
   // Previous record.
   // disableInInput
   $(document).bind('keydown', 'ctrl+right',
-    function(event){
+    disableInInput(function(event){
       var btnNext = $('#btnNext');
       if (!btnNext.attr('disabled')){
 	btnNext.trigger('click');
 	event.preventDefault();
       }
-  });
+  }));
   // Next record.
   // disableInInput
   $(document).bind('keydown', 'ctrl+left',
-    function(event){
+    disableInInput(function(event){
       var btnPrev = $('#btnPrev');
       if (!btnPrev.attr('disabled')){
 	btnPrev.trigger('click');
 	event.preventDefault();
       }
-  });
+  }));
   // Submit record.
   // disableInInput
   $(document).bind('keydown','shift+s',
-    function(event){
+    disableInInput(function(event){
       var btnSubmit = $('#btnSubmit');
       if (!btnSubmit.attr('disabled')){
 	btnSubmit.trigger('click');
 	event.preventDefault();
       }
-  });
+  }));
   // Cancel editing.
   // disableInInput
   $(document).bind('keydown','shift+c',
-    function(event){
+    disableInInput(function(event){
       var btnCancel = $('#btnCancel');
       if (!btnCancel.attr('disabled')){
 	btnCancel.trigger('click');
 	event.preventDefault();
       }
-  });
-  // Delete record.
-  // disableInInput
-  $(document).bind('keydown','shift+d',
-    function(event){
-      var btnDeleteRecord = $('#btnDeleteRecord');
-      if (!btnDeleteRecord.attr('disabled')){
-	btnDeleteRecord.trigger('click');
-	event.preventDefault();
-      }
-  });
+  }));
   // Toggle MARC/human tags.
   // disableInInput
   $(document).bind('keydown','shift+t',
-    function(event){
+    disableInInput(function(event){
       if (gTagFormat == 'MARC'){
 	var btnHumanTags = $('#btnHumanTags');
 	if (!btnHumanTags.attr('disabled')){
@@ -125,30 +125,28 @@ function initHotkeys(){
 	  event.preventDefault();
 	}
       }
-  });
+  }));
   // Add new field.
   // disableInInput
   $(document).bind('keydown', 'a',
-    function(event){
+    disableInInput(function(event){
       var btnAddField = $('#btnAddField');
       if (!btnAddField.attr('disabled')){
 	btnAddField.trigger('click');
 	event.preventDefault();
       }
-  });
+  }));
   // Delete selected field(s).
   // disableInInput
   $(document).bind('keydown', 'del',
-    function(event){
+    disableInInput(function(event){
       var btnDeleteSelected = $('#btnDeleteSelected');
       if (!btnDeleteSelected.attr('disabled')){
 	onDeleteClick(event);
 	event.preventDefault();
       }
-  });
+  }));
 
-  // Toggle 'selection mode'.
-  $(document).bind('keydown', 's', onKeyS);
   // Edit focused subfield.
   $(document).bind('keydown', 'return',
 		   onKeyReturn);
@@ -163,12 +161,6 @@ function initHotkeys(){
   // Save content and jump to previous content field.
   $(document).bind('keydown', 'shift+tab',
 		   onKeyTab);
-  // Select focused subfield.
-  $(document).bind('keydown', 'space',
-		   onKeySpace);
-  // Select focused subfields parent field.
-  $(document).bind('keydown', 'shift+space',
-		   onKeySpace);
   // Move selected field/subfield up.
   $(document).bind('keydown', 'ctrl+up', onKeyCtrlUp);
   // Move selected field/subfield down.
@@ -186,38 +178,13 @@ function initHotkeys(){
     onTriggerFormControl('Clear', event);
   });
   // Add subfield in form.
-  $(document).bind('keydown', 'ctrl+shift+e', onKeyCtrlShiftE);
+  $(document).bind('keydown', 'ctrl+e', onKeyCtrlShiftE);
   // Remove subfield from form.
   $(document).bind('keydown', 'ctrl+shift+d', onKeyCtrlShiftD);
   // Binding the undo/redo operations
 
   $(document).bind('keydown', 'ctrl+shift+z', onUndo);
   $(document).bind('keydown', 'ctrl+shift+y', onRedo);
-}
-
-function onKeyS(event){
-  /*
-   * Handle key 's' (toggle selection mode).
-   */
-  if (gRecID){
-    if (gSelectionModeOn){
-      $('#bibEditTable').unbind('mouseover.selection');
-      gSelectionModeOn = false;
-      updateStatus('report', 'Selection mode: Off');
-    }
-    else{
-      $('#bibEditTable').bind('mouseover.selection', function(event){
-	var targetID = event.target.id;
-	if (targetID.slice(0, targetID.indexOf('_')) == 'content' &&
-	    !$(event.target).hasClass('bibEditSelected'))
-	  onKeySpace(event);
-      });
-      gSelectionModeOn = true;
-      updateStatus('report', 'Selection mode: On');
-    }
-    if (!event.isDefaultPrevented())
-      event.preventDefault();
-  }
 }
 
 function onKeyReturn(event){
@@ -252,34 +219,6 @@ function onKeyTab(event){
     else
       $(contentCells).eq($(contentCells).index(cell)-1).trigger('click');
     event.preventDefault();
-  }
-}
-
-function onKeySpace(event){
-  /*
-   * Handle key space/shift+space (edit subfield/field).
-   */
-  if (event.target.nodeName == 'TD'){
-    var targetID = event.target.id;
-    var type = targetID.slice(0, targetID.indexOf('_'));
-    if (type == 'content'){
-      var id = targetID.slice(targetID.indexOf('_')+1);
-      var tmpArray = id.split('_');
-      if (event.shiftKey){
-	// Shift is pressed. Select the full field.
-	id = (tmpArray.length == 3) ? tmpArray.slice(0, -1).join('_') :
-	  tmpArray.join('_');
-	$('#boxField_' + id).trigger('click');
-      }
-      else{
-	// Just select the subfield itself.
-	if (tmpArray.length == 3)
-	  $('#boxSubfield_' + id).trigger('click');
-	else
-	  $('#boxField_' + id).trigger('click');
-      }
-      event.preventDefault();
-    }
   }
 }
 

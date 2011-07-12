@@ -256,6 +256,7 @@ function initJeditable(){
    * to textboxes corresponding to fields in gTagsToAutocomplete
    */
   $.editable.types['textarea'].element = function(settings, original) {
+    var form = this;
     var textarea = $('<textarea />');
     if (settings.rows) {
         textarea.attr('rows', settings.rows);
@@ -279,6 +280,7 @@ function initJeditable(){
     if ($.inArray(fieldInfo + $(original).siblings('#' + subfield_id).text(), gTagsToAutocomplete) != -1) {
         addHandler_autocompleteAffiliations(textarea);
     }
+    textarea.bind('keydown', 'return', function(event){ form.submit(); return false;});
     return(textarea);
   }
 }
