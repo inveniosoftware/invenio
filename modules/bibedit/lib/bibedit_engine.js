@@ -214,30 +214,26 @@ function failInReadOnly(){
 }
 
 function initJeditable(){
-  /* Initialize Jeditable with the Autogrow extension. Used for in-place
-   * content editing.
+  /* Initialize Jeditable overwriting the element function for textareas so
+   * that the return key is correctly binded
    */
-  $.editable.addInputType('autogrow', {
-    element: function(settings, original){
-      var textarea = $('<textarea>');
-      if (settings.rows){
+  $.editable.types['textarea'].element = function(settings, original) {
+    var form = this;
+    var textarea = $('<textarea />');
+    if (settings.rows) {
         textarea.attr('rows', settings.rows);
-      } else {
+    } else if (settings.height != "none") {
         textarea.height(settings.height);
-      }if (settings.cols) {
-        textarea.attr('cols', settings.cols);
-      } else {
-        textarea.width(settings.width);
-      }
-      $(this).append(textarea);
-      textarea.bind('keydown', 'return', function(event){ $(event.target).parent().submit(); event.preventDefault(); return false;})
-      textarea.css('width', '670px');
-      return(textarea);
-    },
-    plugin: function(settings, original){
-      $('textarea', this).autogrow(settings.autogrow);
     }
-  });
+    if (settings.cols) {
+        textarea.attr('cols', settings.cols);
+    } else if (settings.width != "none") {
+        textarea.width(settings.width);
+    }
+    $(this).append(textarea);
+    textarea.bind('keydown', 'return', function(event){ form.submit(); return false;});
+    return(textarea);
+  }
 }
 
 function initClipboard(){
@@ -2277,7 +2273,7 @@ function convertFieldIntoEditable(cell, shouldSelect){
 
       return newVal;
     }, {
-      type: 'autogrow',
+      type: 'textarea',
       callback: function(data, settings){
         var tmpArray = this.id.split('_');
         var tag = tmpArray[1], fieldPosition = tmpArray[2],
@@ -2325,10 +2321,7 @@ function convertFieldIntoEditable(cell, shouldSelect){
       placeholder: '',
       width: '100%',
       onblur: 'submit',
-      select: shouldSelect,
-      autogrow: {
-        minHeight: 36
-      }
+      select: shouldSelect
     });
 }
 
@@ -2346,7 +2339,6 @@ function onContentClick(cell){
     convertFieldIntoEditable(cell, shouldSelect);
     $(cell).trigger('click');
   }
-  $(cell).find('TEXTAREA').bind('keydown', 'return', function(event){ $(event.target).parent().submit();} );
 }
 
 function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex,
