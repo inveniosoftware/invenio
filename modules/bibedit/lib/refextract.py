@@ -414,9 +414,9 @@ def filter_processed_references(out):
         for i in range(len(ref_lines)):
             ## Checks to see that the datafield has the attribute ind2="6",
             ## Before looking to see if the subfield code attribute is 'a'
-            if ref_lines[i].find('<datafield tag="999" ind1="C" ind2="6">') <> -1 and (len(ref_lines)-1) > i:
+            if ref_lines[i].find('<datafield tag="999" ind1="C" ind2="6">') != -1 and (len(ref_lines)-1) > i:
                 ## For each line in this datafield element, try to find the subfield whose code attribute is 'a'
-                while ref_lines[i].find('</datafield>') <> -1 and (len(ref_lines)-1) > i:
+                while ref_lines[i].find('</datafield>') != -1 and (len(ref_lines)-1) > i:
                     i+=1
                     ## <subfield code="a">Invenio/X.XX.X refextract/X.XX.X-timestamp-err-repnum-title-URL-misc
                     if a_tag.search(ref_lines[i]):  ## remake the "a" tag for new numbe of "m" tags
@@ -1230,7 +1230,6 @@ re_numeration_yr_vol_page = (re.compile(r"""
                                       '<cds.YR>(\\g<2>)</cds.YR> ' \
                                       '<cds.PG>\\g<6></cds.PG> '))
 
-
 ## Pattern used to locate references of a doi inside a citation
 ## This pattern matches both url (http) and 'doi:' or 'DOI' formats
 re_doi = (re.compile("""
@@ -1243,23 +1242,54 @@ re_doi = (re.compile("""
     [\w\-_;\(\)\/])                         #any character excluding a full stop
     """, re.VERBOSE))
 
+def get_author_affiliation_numeration_str(punct=None):
+    """The numeration which can be applied to author names. Numeration
+    is sometimes found next to authors of papers.
+    @return: (string), which can be compiled into a regex; identifies
+    numeration next to an author name.
+    """
+    ## Number to look for, either general or specific
+    re_number = '(?:\d\d?)'
+    re_chained_numbers = "(?:(?:[,;]\s*%s\.?\s*))*" % re_number
+    ## Punctuation surrounding the number, either general or specific again
+    if punct is None:
+        re_punct = "(?:[\{\(\]]?)"
+    else:
+        re_punct = re.escape(punct)
+
+    ## Generic number finder (MUST NOT INCLUDE NAMED GROUPS!!!)
+    numeration_str =  """
+    (?:\s*(%(punct)s)\s*            ## Left numeration punctuation
+        (%(num)s\s*                 ## Core numeration item, either specific or generic
+            %(num_chain)s           ## Extra numeration, either generic or empty
+        )
+        (?:(%(punct)s)|[^\d])       ## Right numeration punctuation
+    )""" % {'num'       : re_number,
+            'num_chain' : re_chained_numbers,
+            'punct'     : re_punct}
+    return numeration_str
+
 def get_single_and_extra_author_pattern():
     """Generates a simple, one-hit-only, author name pattern, matching just one author
     name, but ALSO INCLUDING author names generated from the knowledge base. The author
     patterns are the same ones used inside the main 'author group' pattern generator.
-    This function is used not for reference extraction, but for author extraction."""
+    This function is used not for reference extraction, but for author extraction.
+    @return: (string) the union of the built-in author pattern, with the kb defined
+    patterns."""
     return get_single_author_pattern()+"|"+make_extra_author_regex_str()
 
-def get_single_author_pattern(incl_numeration=True):
+def get_single_author_pattern():
     """Generates a simple, one-hit-only, author name pattern, matching just one author
     name in either of the 'S I' or 'I S' formats. The author patterns are the same
     ones used inside the main 'author group' pattern generator. This function is used
     not for reference extraction, but for author extraction. Numeration is appended
     to author patterns by default.
     @return (string): Just the author name pattern designed to identify single author names
-    in both SI and IS formats. (NO 'et al', editors, 'and'... matching)"""
-    return "(?:"+get_initial_surname_author_pattern(incl_numeration)+"|"+\
-            get_surname_initial_author_pattern(incl_numeration)+")"
+    in both SI and IS formats. (NO 'et al', editors, 'and'... matching)
+    @return: (string) the union of 'initial surname' and 'surname initial'
+    authors"""
+    return "(?:"+get_initial_surname_author_pattern(incl_numeration=True)+"|"+\
+            get_surname_initial_author_pattern(incl_numeration=True)+")"
 
 def get_initial_surname_author_pattern(incl_numeration=False):
     """Return a standard author, with a maximum of 6 initials, and a surname.
@@ -1271,7 +1301,7 @@ def get_initial_surname_author_pattern(incl_numeration=False):
     ## Possible inclusion of superscript numeration at the end of author names
     ## Will match the empty string
     if incl_numeration:
-        append_num_re = "(?:\s*[\{\(]?\s*\d*\.?\s*[\}\)]?)"
+        append_num_re = get_author_affiliation_numeration_str()+'?'
     return u"""
     (
         (?<![Vv]olume\s)(?:[A-Z]((\.)|(\’)|(\-[A-Z]?[\s\.\,\’])) ## Initials (1-6) (EACH MUST PRECEED A DOT, APOS. or HYPHEN) (cannot follow 'Volume\s')
@@ -1297,7 +1327,7 @@ def get_surname_initial_author_pattern(incl_numeration=False):
     append_num_re = ""
     ## Possible inclusion of superscript numeration at the end of author names
     if incl_numeration:
-        append_num_re = "(?:\d*)"
+        append_num_re = get_author_affiliation_numeration_str()+'?'
     return u"""
     (
                                                                  ## The optional surname prefix:
@@ -1444,6 +1474,48 @@ def make_auth_regex_str(etal, initial_surname_author=None, surname_initial_autho
             'i_s_author' : initial_surname_author,
             's_i_author' : surname_initial_author }
 
+## Finding an et. al, before author names indicates a bad match!!!
+## I.e. could be a title match... ignore it
+etal_matches = (' et al.,',' et. al.,',' et. al.',' et.al.,',' et al.',' et al')
+
+## Standard et al ('and others') pattern for author recognition
+re_etal = u"""[Ee][Tt](?:(?:(?:,|\.)\s*)|(?:(?:,|\.)?\s+))[Aa][Ll][,\.]?[,\.]?"""
+
+## The pattern used to identify authors inside references
+re_auth = (re.compile(make_auth_regex_str(re_etal),re.VERBOSE|re.UNICODE))
+
+## Used as a weak mechanism to classify possible authors above identified affiliations
+## (start) Firstname SurnamePrefix Surname (end)
+re_ambig_auth = re.compile(u"^\s*[A-Z][^\s_<>0-9]+\s+([^\s_<>0-9]{1,3}\.?\s+)?[A-Z][^\s_<>0-9]+\s*$", \
+                           re.UNICODE)
+
+## Obtain the compiled expression which includes the proper author numeration
+## (The pattern used to identify authors of papers)
+## This pattern will match groups of authors, from the start of the line
+re_auth_with_number = (re.compile(make_auth_regex_str(re_etal, \
+                                get_initial_surname_author_pattern(incl_numeration=True), \
+                                get_surname_initial_author_pattern(incl_numeration=True)), \
+                                re.VERBOSE | re.UNICODE))
+
+## Used to obtain authors chained by connectives across multiple lines
+re_comma_or_and_at_start = re.compile("^(,|((,\s*)?[Aa][Nn][Dd]|&))\s", re.UNICODE)
+
+## Given an Auth hit, some misc text, and then another Auth hit straight after,
+## (OR a bad_and was found)
+## check the entire misc text to see if is 'looks' like an author group, which didn't match
+## as a normal author. In which case, append it to the single author group.
+## PLEASE use this pattern only against space stripped text.
+## IF a bad_and was found (from above).. do re.search using this pattern
+## ELIF an auth-misc-auth combo was hit, do re.match using this pattern
+
+re_weaker_author = """
+      (?:([A-Z]((\.\s?)|(\.?\s+)|(\-))){1,5}             ## look closely for initials, and less closely at the last name.
+      (?:[^\s_<>0-9]+(?:(?:[,\.]\s*)|(?:[,\.]?\s+)))+)"""
+
+## End of line MUST match, since the next string is definitely a portion of an author group (append '$')
+re_auth_near_miss = (re.compile(make_auth_regex_str(re_etal,"("+re_weaker_author+")+$"),re.VERBOSE|re.UNICODE))
+
+
 def make_extra_author_regex_str():
     """ From the authors knowledge-base, construct a single regex holding the or'd possibilities of patterns
     which should be included in $h subfields. The word 'Collaboration' is also converted to 'Coll', and
@@ -1479,7 +1551,7 @@ def make_extra_author_regex_str():
                              % (fpath, str(line_num)), sys.stderr, verbose=0)
             halt(err=UnicodeError, \
                  msg="Error: Unable to parse author kb (line: %s)" % str(line_num), exit_code=1)
-        if (len(rawline) > 0) and (rawline.strip()[0] != '#'):
+        if (len(rawline.strip()) > 0) and (rawline.strip()[0] != '#'):
             add_to_auth_list(rawline)
             ## Shorten collaboration to 'coll'
             if rawline.lower().endswith('collaboration\n'):
@@ -1531,6 +1603,13 @@ re_extra_auth = re.compile(make_extra_author_regex_str(), re.IGNORECASE)
 re_arxiv_notation = re.compile("""
     (arxiv)|(e[\-\s]?print:?\s*arxiv)
     """, re.VERBOSE)
+
+## Targets single author names
+re_single_author_pattern_with_numeration = re.compile(get_single_and_extra_author_pattern(), re.VERBOSE)
+
+re_author_tag = \
+    re.compile(r"^\s*((prepared|(?P<editor>edited)|written)\sby|authors?)\s*[,:;]?", \
+               re.UNICODE | re.IGNORECASE)
 
 # et. al. before J. /// means J is a journal
 
@@ -2089,7 +2168,6 @@ def build_titles_knowledge_base(fpath):
     return (kb, standardised_titles, seek_phrases)
 
 
-
 def get_affiliation_canonical_value(proposed_affil):
     """Given a proposed affiliation, look for a canonical form in the
     affils knowledge base
@@ -2105,7 +2183,6 @@ def get_affiliation_canonical_value(proposed_affil):
         def get_kb_mapping_value(kb_name, key):
             """ if we have no kb, just accept affiliations as they are"""
             return None   #default
-
 
 
 def standardize_and_markup_numeration_of_citations_in_line(line):
@@ -2440,7 +2517,6 @@ def identify_and_tag_authors(line):
                     + p['author'].strip(".,:;- []") + CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL + line[p['end']:]
         return line
 
-
     output_line = line
     tmp_line = line
     ## Firstly, go through and change ALL TAGS and their contents to underscores
@@ -2539,7 +2615,7 @@ def identify_and_tag_authors(line):
             if m['etal'] and not(m['ed_start'] or m['ed_end'] or dump_in_misc):
                 ## Insert the etal tag...
                 ## Replace the found 'et al' phrase with the standardised version
-                tmp_stnd_etal_line = re.sub(re_etal,'et al',output_line[start:end].strip(".,:;- []()"), re.IGNORECASE)
+                tmp_stnd_etal_line = re.sub(re_etal, 'et al', output_line[start:end].strip(".,:;- []()"), re.IGNORECASE)
                 output_line = output_line[:start] + "<cds.AUTHetal>" \
                     + tmp_stnd_etal_line \
                     + CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL + add_to_misc + output_line[end:]
@@ -2766,9 +2842,6 @@ def account_for_stripped_whitespace(spaces_keys,
     ## return the new values for replacement indices with stripped
     ## whitespace accounted for:
     return (true_replacement_index, extras)
-
-
-
 
 def create_marc_xml_reference_line(line_marker,
                                    working_line,
@@ -3651,17 +3724,6 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                 count_reportnum += 1
                 cur_misc_txt = u""
 
-<<<<<<< HEAD
-                identified_citation_element =   {   'type'       : "REPORTNUMBER",
-                                                    'misc_txt'   : "%s" % cur_misc_txt,
-                                                    'report_num' : "%s" % report_num,
-                                                }
-                count_reportnum += 1
-                cur_misc_txt = u""
-
-=======
->>>>>>> Identifies Authors in citations. Splits references based on the
-
         elif tag_type == "URL":
             ## This tag is an identified URL:
 
@@ -3709,20 +3771,20 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
             count_doi += 1
             cur_misc_txt = u""
 
-        elif tag_type.find("AUTH") <> -1:
+        elif tag_type.find("AUTH") != -1:
             ## This tag is an identified Author:
 
             auth_type = ""
             ## extract the title from the line:
-            if tag_type.find("stnd") <> -1:
+            if tag_type.find("stnd") != -1:
                 auth_type = "stnd"
                 idx_closing_tag_nearest = processed_line.find(\
                     CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND, tag_match_end)
-            elif tag_type.find("etal") <> -1:
+            elif tag_type.find("etal") != -1:
                 auth_type = "etal"
                 idx_closing_tag_nearest = processed_line.find(\
                     CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL, tag_match_end)
-            elif tag_type.find("incl") <> -1:
+            elif tag_type.find("incl") != -1:
                 auth_type = "incl"
                 idx_closing_tag_nearest = processed_line.find(\
                     CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL, tag_match_end)
@@ -3787,7 +3849,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                                            CFG_REFEXTRACT_MARKER_CLOSING_PAGE)
             identified_citation_element = None
 
-        if identified_citation_element <> None:
+        if identified_citation_element != None:
             ## Append the found tagged data and current misc text
             citation_elements.append(identified_citation_element)
             identified_citation_element = None
@@ -4677,6 +4739,7 @@ def get_first_reference_line_numeration_marker_patterns_via_numbers():
     for p in patterns:
         compiled_patterns.append(re.compile(p, re.I|re.UNICODE))
     return compiled_patterns
+
 def get_post_reference_section_title_patterns():
     """Return a list of compiled regex patterns used to search for the title
        of the section after the reference section in a full-text document.
@@ -4771,6 +4834,8 @@ def perform_regex_search_upon_line_with_pattern_list(line, patterns):
             break
     return m
 
+re_aff_email = re.compile(r"^.*?@.*?$")
+
 def get_post_author_section_keyword_patterns():
     """ Return a list of compiled regex's based on keywords used as an indication of the
         end of a possible author section on the title page of a document.
@@ -4785,299 +4850,948 @@ def get_post_author_section_keyword_patterns():
     ptns = map(_create_regex_pattern_add_optional_spaces_to_word_characters, keywords)
     ## Add an optional chapter numeration (1., 1.1, i, A..) to the start of each pattern
     ptns = ['\s*([ai1]\s*\.?\s*[1]?\s*\.?\s*)?'+x for x in ptns]
-
-    ## Page number 1
-    ptns.append('\s*(page)?\s*[i\d]\s*\.?\s*$')
+    ## Page number 1 ... must force a 'page' match, sometimes numeration is broken
+    ptns.append('\s*page\s*[i\d]\s*\.?\s*$')
     ## Number one at the start of a possible chapter
-    ptns.append('\s*\d\.?\s*$')
-
+    #ptns.append('\s*\d\.?\s*$')
     compiled_patterns = []
     for p in ptns:
-        compiled_patterns.append(re.compile(p, re.I|re.UNICODE))
+        compiled_patterns.append(re.compile(p, re.I | re.UNICODE))
     return compiled_patterns
-
-def standardise_line_affiliations(line):
-    ## Removes numeration, 'the'/'and', and replace titles
-    line = line.strip()
-    line = re.sub(r"^Livermore","LLNL, Livermore",line)
-    line = re.sub(r".*?Stanford Linear Accelerator Center.*?","SLAC",line)
-    line = re.sub(r"^Fermi National Accelerator Laboratory","Fermilab",line)
-    line = re.sub(r"\s[tT][hH][eE]\s"," ",line)
-    line = re.sub(r"\s[aA][nN][dD]\s"," ",line)
-    return line
 
 re_aff_num = re.compile(r"(^[\d]+[A-Z])")
 re_aff_name = re.compile(r"(univ|institut|laborator)", re.I)
-re_aff_univ = re.compile(r"univ[a-z]+\s+(of)?\s+([a-z\s\-]+)|([a-z\s\-]+)\s+(?!univ[a-z]+\sof)univ[a-z]+",re.I)
-re_aff_email = re.compile(r"^.*?@.*?$")
+re_aff_univ = re.compile(r"univ[a-z]+\s+(of)?\s+([a-z\s\-]+)|([a-z\s\-]+)\s+(?!univ[a-z]+\sof)univ[a-z]+", re.I)
 
-## Used to validate a set of words found above an affiliation
-## This is used when no authors have been found for a paper, but an affiliation has
-## Will try to match a single ambiguous author, such as "William J. Smith"
-re_ambig_auth = re.compile(r"\s*[A-Z][^\s_<>0-9]+\s+([^\s_<>0-9]{1,3}\.?\s+)?[A-Z][^\s_<>0-9]+\s*(\d*)\s*$",re.UNICODE)
+re_splitting_comma = re.compile(",[^\d]", re.UNICODE)
 
-def find_affiliations(docbody, use_to_find_authors=False):
+def arrange_possible_authors(line):
+    ## Replace and's with commas
+    comma_split_line = re.sub(r"(^\s*|\s)([Aa][Nn][Dd]|&)\s", ", ", line)
+    ## Split by commas
+    possible_authors = re_splitting_comma.split(comma_split_line.strip())
+    ## Remove empty stuff
+    possible_authors = filter(lambda x: x.strip(), possible_authors)
+    return possible_authors
+
+def gather_numerated_authors_affiliations(lines, aff_positions, number_to_find):
+    """Use the found affiliation to try and help with author extraction"""
+    def has_number(possible_auth, number_to_find):
+        """Does this possible author have the numeration I want?"""
+        (auth_nums, auth_num_match) = obtain_author_affiliation_numeration_list(possible_auth)
+        return number_to_find in auth_nums
+
+    def remove_excess_numeration(author_match):
+        return re.sub("^\d+|\d+$", "", author_match)
+
+#    def make_numerated_author_pattern(list_of_numerated_authors):
+#        patterns = []
+#        for num_auth in list_of_numerated_authors:
+#            num_auth = re.sub("[a-z]", "[a-z]", num_auth)
+#            num_auth = re.sub("(?<=%s)+?%s" % (re.escape("[a-z][a-z]"), re.escape("[a-z]")), "+", num_auth)
+#
+#            num_auth = re.sub("[A-Z]", "[A-Z]", num_auth)
+#            num_auth = re.sub("(?<=%s)+?%s" % (re.escape("[A-Z][A-Z]"), re.escape("[A-Z]")), "+", num_auth)
+#
+#            num_auth = re.sub("[0-9]", "[0-9]", num_auth)
+#            num_auth = re.sub("(?<=%s)+?%s" % (re.escape("[0-9][0-9]"), re.escape("[0-9]")), "+", num_auth)
+#
+#            num_auth = re.sub("[\-]", "", num_auth)
+#            num_auth = re.sub("\s", "\\s", num_auth)
+#            num_auth = re.escape(num_auth)
+#            patterns.append(num_auth)
+#        return patterns
+
+    ## Holds numerated authors.
+    numerated_authors = []
+    all_split_authors = []
+    ## Make a copy of the list of above lines [must be a copy due to pop()]
+    lines_to_check = lines[:]
+    while lines_to_check:
+        line = lines_to_check.pop().strip()
+        position = len(lines_to_check)
+        if aff_positions and (position in aff_positions):
+            continue
+        ## Split according to commas/'and's
+        possible_authors = arrange_possible_authors(line)
+        ## Make a list of ok authors found in the split line, for this affiliation
+        numerated_authors.extend(filter(lambda a: has_number(a, number_to_find), possible_authors))
+        ## So, on this line, a numerated author was found. So,
+        ## make sure to save the rest of the split authors in this line.
+        if numerated_authors:
+            all_split_authors.extend(possible_authors)
+#            numerated_author_patterns.extend(make_numerated_author_pattern(numerated_authors))
+
+    return (map(remove_excess_numeration, numerated_authors), \
+            map(remove_excess_numeration, all_split_authors))
+
+def initiate_affiliated_author_search(affiliations, top_lines, aff_positions):
+    """ Using obtained affiliation details, try to find authors, using primarily the
+    numeration-associated method (pairing numerated authors with numerated affiliations,
+    and as a fall-back, the 'lines-above' affiliation.
+    @param affiliations: (dictionary) Already collected affiliations, with their possible
+    numeration too.
+    @param top_lines: (list) The top lines (search space) of the document
+    @param aff_positions: (list) A numeric list of positions where known affiliations
+    exist (ignores these lines; prevents returning an affiliation as a possible author)
+    @return: (tuple) affiliation data, and loose authors (all authors found)
+    """
+    ## Used to validate a set of words found above an affiliation
+    ## This is used when no authors have been found for a paper, but an affiliation has
+    ## Will try to match a single ambiguous author, such as "William J. Smith"
+    tried_numeration = []
+    ## Holds all split items in a line where numerated authors were found!
+    loose_authors = []
+
+    for cur_aff in affiliations:
+        position_above = cur_aff['position']-1
+        ## Using numerated affiliations
+        if cur_aff['aff_nums']:
+            numerated_authors = []
+            for num in cur_aff['aff_nums']:
+                if not num in tried_numeration:
+                    ## For this single, new, affiliation numeration val
+                    ## use it to find authors, given:
+                    ## 1. Lines above the affiliation
+                    ## 2. The already identified affiliation positions
+                    ## 3. The affiliation number, for authors, to look for
+                    (numerated_authors_single_num, all_split_authors) = \
+                        gather_numerated_authors_affiliations(top_lines, \
+                                                              aff_positions, \
+                                                              number_to_find=num)
+                    numerated_authors.extend(numerated_authors_single_num)
+                    ## Save all split authors, if at least one numerated author was found!
+                    ## Otherwise, this is just an empty addition
+                    loose_authors.extend(all_split_authors)
+                    tried_numeration.append(num)
+
+            ## Substantially reliable
+            cur_aff['author_data'] = {'authors'  : numerated_authors,
+                                      'strength' : 1}
+
+        else:
+            ## Using (line-above) NON-numerated affiliations to look for authors
+            ## This method is far less accurate than using numeration, but nonetheless
+            ## correct in a wide variety of situations.
+            ## Get the next non-empty line above the affiliation
+            while (position_above >= assumed_top_section_start) and \
+                    (position_above >= 0) and \
+                    (not top_lines[position_above].strip()):
+                position_above -= 1
+
+            ## The position above is a line which is another affiliation
+            ##i.e. no 'non-blank' possible author line inbetween
+            if position_above in aff_positions:
+                position_above = -1
+
+            ## If a valid line (not empty & not another affiliation) was found above the affiliation
+            if position_above >= 0:
+                lines_above = [top_lines[position_above]]
+                ## For each line, look for an 'and' start and collect them up
+                while re_comma_or_and_at_start.search(top_lines[position_above]) and \
+                        (not position_above in aff_positions):
+                    try:
+                        lines_above.append(top_lines[position_above-1])
+                    except IndexError:
+                        break
+                    position_above -= 1
+                ## For each 'possible author' line above the affiliation
+                ## Build a list of weakly-matched authors
+                for line_above in lines_above:
+                    ## Insert commas over 'and's and split using commas
+                    split_line_above = arrange_possible_authors(line_above)
+                    ## If the list of comma separated line elements in the above line
+                    ## is longer than 1 (i.e. it has commas separating components)
+                    if len(split_line_above) > 1:
+                        ## This makes for a more reliable match (comma separated line above aff)
+                        strength_for_this_line_above = 1
+                    else:
+                        ## This match isnt so reliable
+                        strength_for_this_line_above = 0
+
+                    ## Far less reliable than the numerated version
+                    cur_aff['author_data'] = {'authors'   : filter(lambda a: re_ambig_auth.search(a), split_line_above),
+                                              'strength'  : strength_for_this_line_above,}
+
+#    ## Check all numerated authors which were found
+#    all_numerated_authors = []
+#    all_numerated_authors.extend([a for a in cur_aff['author_data'] if a not in all_numerated_authors])
+#    if all_numerated_authors:
+#        ## Extend the standard set of authors, in the event numerated authors are found
+#        topline_standard_authors = collect_standard_authors(top_lines, 0)
+
+    return (affiliations, loose_authors)
+
+def build_start_end_numeration_str(predefined_punct=None):
+    """Pieces together the leading and trailing numeration strings,
+    for affiliations and authors.
+    @param predefined_number: (int) punctuation which surrounds numeration.
+    (e.g. brackets)
+    @return: (regex) The regex which will match both starting and ending
+    numeration on a line, with any additional punctuation included."""
+    numeration_str = "^"+get_author_affiliation_numeration_str(predefined_punct) \
+                    +"|"+get_author_affiliation_numeration_str(predefined_punct) \
+                    +"$"
+    return numeration_str
+
+def obtain_author_affiliation_numeration_list(line, punct=None):
+    """Extract the leading or trailing numeration from the line.
+    @param line: (string) a line of text (possibly holding an affiliation)
+    @param punct: (string) the punctuation known to surround numeration
+    elements. (makes the search more strict)
+    @return: (list) stripped and raw integer numeration"""
+    ## List of integer numeration associated with this author/affiliation
+    i_stripped_nums = []
+    ## Given a line with an affiliation, see if numeration is on the line
+    re_numeration = \
+        re.compile(build_start_end_numeration_str(punct), re.UNICODE|re.VERBOSE)
+    num_match = re.search(re_numeration, line.strip())
+    ## Numeration exists for this affiliation
+    if num_match:
+        ## Get the start/end number match (or string of separated numbers)!
+        str_num = num_match.group(2) or num_match.group(5)
+        ## Split if multiple numbers
+        if ";" in str_num:
+            stripped_nums = str_num.split(";")
+        elif "," in str_num:
+            stripped_nums = str_num.split(",")
+        else:
+            stripped_nums = [str_num]
+        ## Attempt to convert each numeration value to an integer
+        try:
+            i_stripped_nums = map(lambda n: int(n.strip()), stripped_nums)
+        except ValueError:
+            pass
+    ## num_match is used to obtain punctuation around the numeration
+    return (i_stripped_nums, num_match)
+
+def standardise_affiliation_names(line):
+    """  Standardise some affiliations. Convert some
+    domain specific HEP names to a standard form.
+    This will very likely be moved out into a kb soon.
+    @param line: (string) Line from the document holding a
+    possibly unstandardised affiliation.
+    @return: the line holding now standardised affiliations
+    """
+    ## Removes numeration, 'the'/'and', and replace titles
+    line = line.strip()
+    line = re.sub(r"^Livermore", "LLNL, Livermore", line)
+    line = re.sub(r".*?Stanford Linear Accelerator Center.*?", "SLAC", line)
+    line = re.sub(r"^Fermi National Accelerator Laboratory", "Fermilab", line)
+    line = re.sub(r"\s[tT][hH][eE]\s", " ", line)
+    line = re.sub(r"\s[aA][nN][dD]\s", " ", line)
+    return line
+
+def standardise_affiliation_formats(line):
+    """ Standardise some affiliations. This will remove numeration,
+    and will convert university names into a standard format.
+    @param line: (string) Line from the document holding a
+    possibly unstandardised affiliation.
+    @return: the line holding now standardised formats of affiliations
+    """
+    ## Kill numeration
+    line = re.sub(r"[0-9]","",line)
+    ## Format the found affiliation
+    univ_name = re_aff_univ.search(line)
+    if univ_name:
+        ## Get the University name
+        line = (univ_name.group(2) or univ_name.group(3)) + " U."
+    ## Check and set an institution
+    for inst in CFG_INSTITUTIONS:
+        if line.find(inst) != -1:
+            line = inst
+            break
+    return line
+
+def extract_numerated_affiliations(num_position, num_section, num_find, num_punct):
+    """ Collect numerated affiliations, using a section of the document, and
+    the number which to search for. The punctuation surrounding any numeration (the
+    first number found) (if any) is used to improve the strictness of the search.
+    @param num_position: (int) position in section from where to look
+    for numerated affiliations
+    @param num_section: (list) section holding numerated affiliations
+    @param num_find: (int) number to find, paired with affiliations
+    @param num_punct: (string) punctuation around affiliation numeration (if any)
+    @return: (list) of dictionary elements corresponding to the position,
+    content and numeration data of an affiliation.
+    """
+    affs = []
+    if num_section:
+        ## First line
+        line = num_section[0].strip()
+        ## A number has been found before this iteration
+        ## Use previous number, and previous punctuation!
+        (aff_nums, specific_num_match) = obtain_author_affiliation_numeration_list(line, num_punct)
+        if num_find in aff_nums:
+            ## Attempt to get numeration for this affiliation
+            try:
+                num_find = num_find + 1
+            except ValueError:
+                sys.stderr.write("Error: Unable to obtain integer affiliation numeration.")
+                sys.exit(1)
+            ## Save the punctuation surrounding the numeration
+            affs.append({'position'             : num_position,
+                         'line'                 : standardise_affiliation_formats(line),
+                         'aff_nums'             : aff_nums,
+                         'author_data'          : None})
+
+        ## Do until end of docbody section (num_section)
+        affs.extend(extract_numerated_affiliations(num_position+1, \
+                                                   num_section[1:], \
+                                                   num_find,
+                                                   num_punct))
+    return affs
+
+## Numeration at the start of the line
+re_start_numeration = re.compile("^%s$" % get_author_affiliation_numeration_str(), \
+                                 re.VERBOSE|re.UNICODE)
+
+def realign_numeration(docbody):
+    """ Create a duplicate document body, but with starting numeration
+    replicated on the next line. This is to do with the reparation
+    of numeration across multiple lines, from the pdftottext conversion.
+    Both of these docbody's are later checked, and the one which makes
+    sense in terms of numeration positioning is used from then onwards.
+    Essentially means that the conversion of pdf to text is less likely
+    to hinder numeration searching.
+    @param docbody: (list) List of lines of the entire input document.
+    @return: (list) The list of lines of the entire input document,
+    with any start-line numeration shifted accordingly.
+    """
+    docbody_alternate = docbody[:]
+    ## Get the positions of all single '1's
+    starting_numeration = []
+    for position, line in enumerate(docbody):
+        num_match = re_start_numeration.search(line)
+        if num_match:
+            try:
+                i_num = int(num_match.group(2))
+                if i_num == 1:
+                    ## If this number found is
+                    starting_numeration.append(position)
+            except ValueError:
+                continue
+    ## Now, using the positions of the '1's, go forward and locate
+    ## subsequent numeration, and replicate on the following line if need be
+    num = 1
+    for start in starting_numeration:
+        for position, line in enumerate(docbody[start:]):
+            num_match = re_start_numeration.search(line)
+            if num_match:
+                try:
+                    i_num = int(num_match.group(2))
+                    if i_num == num:
+                        ## If this number found is
+                        docbody_alternate[start+position] = "\n"
+                        docbody_alternate[start+position+1] = num_match.group(0).strip() + docbody_alternate[start+position+1]
+                        num = num + 1
+                except IndexError:
+                    break
+                except ValueError:
+                    continue
+
+    return docbody_alternate
+
+def find_affiliations(lines, start, end=None, use_to_find_authors=False):
     """ Given a possible author section, attempt to retrieve any affliations.
-        @param docbody: The document body as a list of lines.
-        @param use_to_find_authors: Boolean, whether or not the affiliations found
+        @param docbody: (list) The entire document body as a list of lines.
+        @param start: (int) The start position, from where to start finding
+        affiliations.
+        @param end: (int) The boundary position: Stop searching here.
+        @param use_to_find_authors: (boolean) whether or not the affiliations found
         within this function should be used to support the identification of authors.
         (This will be True in the case when '--authors' is selected, and no authors
         have been found using the specific author regular expression during the first
         method.)
         @return (tuple): Affilations and the possibly improved author section.
     """
-    top_section = find_top_section(docbody)
-    ## Must find the top_section
-    if not top_section:
-        return None
-
-    top_lines = top_section['lines']
+    def get_smaller(x, y):
+        if x < y:
+            return x
+        return y
 
     affiliations = []
-    affiliation_positions = []
+    starting_num_position = None
+    numerated_aff_num_punct_ptn = None
+    top = None
 
-    for position in range(len(top_lines)):
-        second_try_authors = []
-        line = standardise_line_affiliations(top_lines[position])
-        if cli_opts['verbosity'] > 2:
-            print "(find affiliations) examining " + line.encode("utf8")
+    if not start:
+        start = 0
 
-        ## Obtain either a single university/institution, or the entire line
-        ## Also look for the emails
-        if re_aff_num.search(line) or re_aff_name.search(line) or re_aff_email.search(line):
-            line = re.sub(r"[0-9]", "", line)
-            ## Format the found affiliation
-            univ_name = re_aff_univ.search(line)
-            if univ_name:
-                ## Get the University name
-                line = (univ_name.group(2) or univ_name.group(3)) + " U."
-            ## Check and set an institution
-            for inst in CFG_INSTITUTIONS:
-                if line.find(inst) != -1:
-                    line = inst
+    ## If a keyword was found, then use it to limit the search space
+    if end:
+        top_lines_orig = lines[start:end]
+    else:
+        top_lines_orig = lines[start:]
+
+    ## Get an alternative version of the top section, of the same length
+    ## but with some alone numeration replicated on the next line!
+    top_lines_alt = realign_numeration(top_lines_orig)
+
+    for position in range(len(top_lines_orig)):
+        ## Standardise some affiliations
+        line = standardise_affiliation_names(top_lines_orig[position].strip())
+        line_alt = standardise_affiliation_names(top_lines_alt[position].strip())
+
+        ## If a previous numeration value was found in the previous iteration
+        ## check for the increment of this value on this line
+        if re_aff_num.search(line) or re_aff_name.search(line):
+            ## Check numeration in replica docbody
+            (aff_nums, num_match) = obtain_author_affiliation_numeration_list(line)
+            ## Check numeration in the numeration-realigned docbody
+            (aff_nums_alt, num_match_alt) = obtain_author_affiliation_numeration_list(line_alt)
+            ## Set the information to the correct top_section, depending on
+            ## if the numeration was found split across lines or not.
+            if aff_nums or not aff_nums_alt:
+                top = top_lines_orig
+            elif aff_nums_alt:
+                top = top_lines_alt
+                aff_nums = aff_nums_alt
+                num_match = num_match_alt
+
+            ## Aff number '1' numeration found
+            if aff_nums and num_match and 1 in aff_nums:
+                starting_num_position = position
+                numerated_aff_num_punct_ptn = num_match.group(1)
+            ## So, an AFFILIATION KEYWORD was found on this line, but this is not a '1'!
+            ## Move up lines to get the starting affiliation position, using NUMERATION
+            elif aff_nums and num_match:
+                ## Get the smallest affiliation number, and minus 1 from it
+                find_num = reduce(lambda x, y: get_smaller(x, y), aff_nums) - 1
+                reversed_position = position - 1
+                ## Attempt to go back and find the start of this numeration section
+                ## Get numeration for this line
+                while (reversed_position >= 0) and (starting_num_position is None):
+                    ## Check numeration in the numeration-realigned docbody
+                    (rev_aff_nums, rev_num_match) = \
+                        obtain_author_affiliation_numeration_list(top[reversed_position])
+                    ## Check for numeration n, n = 1
+                    if find_num == 1 and (find_num in rev_aff_nums):
+                        starting_num_position = reversed_position
+                        numerated_aff_num_punct_ptn = rev_num_match.group(1)
+                    ## Check for numeration n, 1 < n < last found
+                    elif find_num in rev_aff_nums:
+                        find_num = find_num - 1
+                    ## Move position up one line
+                    reversed_position = reversed_position - 1
+
+                ## Starting numeration was found..!
+                if not starting_num_position:
+                    ## Could not find start. Abort everything.
                     break
+            else:
+                ## The normal way of appending lines with affiliation names
+                affiliations.append({'position'     : position,
+                                     'line'         : standardise_affiliation_formats(line),
+                                     'aff_nums'     : None,
+                                     'author_data'  : None,})
 
-            ## Save the line number of this identified affiliation
-            affiliation_positions.append(position)
+        ## Stop searching if a keyworded and numerated affiliation has been found
+        if starting_num_position is not None:
+            break
 
-            ## Try to obtain more authors, if needed
-            if use_to_find_authors == True:
-                ## Use the found affiliation to try and help with author extraction
-                if ((position - 1) > 0) and not ((position - 1) in affiliation_positions):
-                    ## Replace 'and' or '&' with a comma
-                    tmp_line = re.sub(r"\s([Aa][Nn][Dd]|&)\s", ", ", top_lines[position-1])
-                    possible_authors = tmp_line.strip().split(",")
-                    ## Make a list of ok authors found in the split line, for this affiliation
-                    second_try_authors = filter(lambda x: re_ambig_auth.match(x), possible_authors)
+    ## In the situation where numeration has been found for an affiliation
+    ## Collect up all of the following numerated affiliations,
+    ## or go backwards and obtain them
+    if starting_num_position:
+        affiliations = extract_numerated_affiliations(starting_num_position, \
+                                                      top[starting_num_position:], \
+                                                      1, \
+                                                      numerated_aff_num_punct_ptn)
 
-            ## Add the institution to the list of institutions for this document
-            affiliations.append((line, second_try_authors))
+    loose_authors = []
 
-    return affiliations
+    ## Try to obtain more authors, if needed
+    if use_to_find_authors:
+        aff_positions = [aff['position'] for aff in affiliations]
+        ## Then, if the above didn't work, do the 'line above' method
+        (affiliations, loose_authors) = initiate_affiliated_author_search(affiliations, \
+                                                                          top, \
+                                                                          aff_positions)
 
-def find_top_section(docbody, first_author=None):
-    """From the lines of text of the document body, attempt to locate
-    a subset of lines which correspond to the top section of the docbody.
-    The top section is classed as that which encapsulates the authors and any
-    affiliations of the document. Author name and affiliation patterns
-    are used to feature-equipped top section finder """
+    for tmp_aff in affiliations:
+        tmp_aff['line'] = replace_undesirable_characters(standardise_affiliation_formats(tmp_aff['line']).strip(".,:;- []()*\\"))
 
-    def check_for_end_of_author_section_match_keywords(line):
+    return (affiliations, loose_authors)
+
+def collect_standard_authors(top_lines, position):
+    """Obtain standard authors [recursive]
+    @param top_lines: (list) top lines of document
+    @param position: (int) position in top lines
+    @return: list holding the list of collected authors,
+    and the position of the last author line
+    """
+    authors_on_line = []
+    if position < len(top_lines):
+        line = top_lines[position]
+        ## Get all standard author matches for this line
+        total_author_matches = re_auth_with_number.search(line)
+        if total_author_matches:
+            ## Save the matching strings in a list
+            authors_on_line = total_author_matches.group('author_names')
+            (position, more_authors) = collect_standard_authors(top_lines, position+1)
+            ## Recurse on the next position
+            authors_on_line.extend(more_authors)
+    ## Authors for this line
+    return (position, authors_on_line)
+
+def collect_tagged_authors(top_section, position, first_line=None, \
+                               orig_blank_lines=None, cur_blank_lines=None):
+    """Recursively try to obtain authors after an 'author tag' has been
+    found.
+    @param top_section: (list) Lines corresponding to the document's top section
+    @param position: (integer) Current position in the top_section
+    @param first_line: (string) An optional, over-riding line to be processed on the
+    first iteration
+    @param orig_blank_lines: (integer) The static gap width, calculated when finding the
+    first non-empty line, before collecting subsequent lines. The blank line count is
+    reset to this value for each tagged author collected.
+    @param cur_blank_lines: (integer) An optional, blank line count, which is calculated
+    after traversing lines after a tag, before iterating. This is then used to find possible
+    subsequent authors.
+    @return: list holding the list of collected tagged authors,
+    and the position of the last author line
+    """
+    def leading_comma(line):
+        return line.rstrip().endswith(",")
+
+    line_parts = []
+    if position < len(top_section):
+        if first_line:
+            line = first_line.strip()
+        else:
+            line = top_section[position].strip()
+
+        if orig_blank_lines and not cur_blank_lines:
+            dec_blank_lines = orig_blank_lines - 1
+        elif cur_blank_lines:
+            dec_blank_lines = cur_blank_lines - 1
+        else:
+            dec_blank_lines = orig_blank_lines
+
+        comma_subd_line = re.sub(r"\s([Aa][Nn][Dd]|&)\s", ", ", line)
+        line_has_leading_comma = leading_comma(comma_subd_line)
+        line_parts = comma_subd_line.split(",")
+
+        #FIXME possibly generate a pattern from the tagged author match, to be used to verify other authors! (pattern from FIRST match)
+
+        ## Check to see if this line starts with an 'and'
+        ## or a comma, or has an author form. In either case it's likely
+        ## that more author names preceed it.
+        author_match = re_single_author_pattern_with_numeration.search(line)
+        if line_has_leading_comma or author_match:
+            if line_has_leading_comma:
+                ## Reset and reuse the blank line count (comma found at the end of the line)
+                dec_blank_lines = orig_blank_lines
+            else:
+                ## Do not consider any more blank lines when searching
+                dec_blank_lines = 0
+            (position, more_line_parts) = collect_tagged_authors(top_section, \
+                                                                     position+1, \
+                                                                     first_line=None, \
+                                                                     orig_blank_lines=orig_blank_lines, \
+                                                                     cur_blank_lines=dec_blank_lines)
+            ## Extend the parts found on this line, with the parts found
+            ## in previous iterations. (going backwards)
+            line_parts.extend(more_line_parts)
+        ## Or if it is known that there exists blank lines between tagged authors,
+        ## and this line has a leading comma (evidence for more authors somewhere),
+        ## or is blank then continue to look for authors, until the gap width
+        ## (blank line count) is reached
+        elif cur_blank_lines > 0 and ((not line) or line_has_leading_comma):
+            (position, more_line_parts) = collect_tagged_authors(top_section, \
+                                                                     position+1, \
+                                                                     first_line=None, \
+                                                                     orig_blank_lines=orig_blank_lines, \
+                                                                     cur_blank_lines=dec_blank_lines)
+            ## Nothing gets added from this line, just pass the line to the next iteration
+            line_parts = more_line_parts
+
+    return (position, line_parts)
+
+## Used in the event that no keyword is found (max length of top section)
+assumed_top_section_length = 100
+
+## Used to force the validity of found keywords
+## (Valid if they appear after this position)
+assumed_top_section_start = 1
+
+## Was extract_authors_from_fulltext
+def extract_top_document_information_from_fulltext(docbody, first_author=None):
+    """ Given a list of lines from a document body, obtain author/affiliation
+        information of the document. This is done via the examination of the top
+        section of the document, via similar regex's used to identify authors in
+        references, and also author tags and the use of affiliation information.
+        Tagged authors always have the highest level of precedence when deciding
+        which group of authors to output for this document. In general,
+        affiliated authors have a higher precedence level than standard authors,
+        however, this can change depending on the method used to identify
+        the affiliated authors, and whether or not the affiliated authors is a
+        smaller subset of the standard author list.
+
+        The number of lines which will constitute the search-space, is
+        identified through two configuration values, and more importantly, by
+        using usual 'start-of-document-body' keyword (abstract, introduction etc..)
+
+        Author identification is completed by running through three, partially-
+        separated steps:
+
+        1. Obtain authors which are explicitly tagged as such
+
+        2. Collect up standard-authors, using the re_auth comprehensive regex.
+
+        3. Attempt to collect authors using affiliation matches.
+            3.1 Lean on numerated affiliations to allow for the accurate extraction
+            of paired numerated authors.
+            3.2 Look at the lines above affiliations, and check for possible authors.
+        @param docbody: (list) List of lines corresponding to the entire text version
+        of the input document.
+        @param first_author: (string) An optional first author from where to start
+        @return: (tuple) The top document information, holding affiliations
+        and the chosen set of author names. Also holds two status values.
+    """
+
+    def check_for_end_of_author_section_match_keywords(docbody):
         """ Given a lowercase, stripped line from the start of a document, try to find a match the
             line exactly for a keyword. A match should indicate the end of the author section.
             @param line: The line to be checked for ending section keywords.
             @return (match object): The match object returned when a keyword match is found.
         """
-        found_keyword = perform_regex_match_upon_line_with_pattern_list(line, \
-                                     get_post_author_section_keyword_patterns())
-        if found_keyword:
-            return found_keyword
-        else:
-            return False
 
-    top_section = None
-    ## Author match positions (first/last)
-    first_matched_author_line = None
-    last_matched_author_line = None
-    ## Affiliation match position(last)
-    last_matched_aff_line = None
-    ## Keyword match position (first)
-    keyword_line = None
+        found_ending_keyword = None
+        found_author_tag = None
+        ending_keyword_ptns = get_post_author_section_keyword_patterns()
+        for position, line in enumerate(docbody):
+            ## Find top section ending keywords
+            ## Must exceed the first 3 lines
+            keyword_hit = perform_regex_match_upon_line_with_pattern_list(line, ending_keyword_ptns)
+            if keyword_hit and not found_ending_keyword and (position > 3):
+                if cli_opts['verbosity'] > 7:
+                    print "--- ending keyword on line: %s, position: %d" % (line.strip(), position)
+                found_ending_keyword = position
 
-    ## In an unfortunate case, this line position will be treated
-    ## as the start of the top-section
-    start_line = 0
+            ## Look for author tags
+            author_tag_hit = re_author_tag.search(line)
+            if author_tag_hit and not found_author_tag:
+                if cli_opts['verbosity'] > 7:
+                    print "--- author tag on line: %s, position: %d" % (line.strip(), position)
+                found_author_tag= position
 
-    ## The number of lines to jump forward, in the event of an author/aff match
-    ## together with a non-existant top-section keyword match
-    forward_jump = 30
+            ## Only in the top X lines
+            if (found_ending_keyword and found_author_tag) \
+                    or position >= assumed_top_section_length:
+                break
 
-    ## Obtain the compiled expression which includes the proper author numeration
-    ## (The pattern used to identify authors of papers)
-    total_author_pattern = (re.compile(make_auth_regex_str(re_etal, \
-                                       get_initial_surname_author_pattern(incl_numeration=True), \
-                                       get_surname_initial_author_pattern(incl_numeration=True)), \
-                                       re.VERBOSE|re.UNICODE))
+        return (found_ending_keyword, found_author_tag)
 
-    ## Obtain the compiled expression which includes the user-specified 'extra' authors
-    extra_author_pattern = re_extra_auth
+    ## Example docbody
+    #docbody = ['Some title', 'Some date', 'Chris Hayward, Tim Smith, Joe Harris', 'University of Bath', '', 'Abstract']
+    #docbody = ['Some title', 'Some date', \
+    #               'Authors:', 'Chris Hayward,', '', 'Tim Smith,', '', 'Joe Harris', 'University of Bath', '', 'Abstract']
 
-    ## Holds the matched authors/affiliations whilst finding the end of the top section
-    collected_authors = []
-    collected_affiliations = []
+    affiliations = []
+    ## end-of-top-section-keyword position, if any
+    (pre_ending_keyword, pre_author_tag) = check_for_end_of_author_section_match_keywords(docbody)
+    ## Default return values
+    status = how_found_start = 0
 
-    ## obtain the line numbers of lines which hold authors
-    for position in range(len(docbody)):
-        line = docbody[position]
-        if cli_opts['verbosity'] > 2:
-            print "looking for authors in: " + line.encode("utf8").strip()
-            #print "re -> " + start_pattern.pattern
+    if pre_ending_keyword:
+        top_section = docbody[:pre_ending_keyword]
+    elif len(docbody) < assumed_top_section_length:
+        ## Half total length
+        top_section = docbody
+    else:
+        ## First 100 lines?
+        top_section = docbody[:assumed_top_section_length]
 
-        ## Check for post-author-section keywords in the line which signifies the end of an
-        ## author section
-        keyword_match = check_for_end_of_author_section_match_keywords(line.strip().lower())
+    tagged_author_information = []
+    just_tagged_authors = []
+    first_author_tag_position = None
 
-        if keyword_match:
-            if cli_opts['verbosity'] > 2:
-                print "! Keyword match on line: %s" % line
-            ## Always save this line position with the ending keyword
-            keyword_line = position
-            ## Stop the search immediately
+    ## METHOD 1 -------------- Look for tagged authors.
+    for position in range(len(top_section)):
+        line = top_section[position]
+        ## 'Prepared/edited/written by:', or 'authors:'
+        if re_author_tag.search(line):
+            ## We know there's a tag, save this position
+            first_author_tag_position = last_tagged_author_position = position
+            ## Remove the tag, and check content
+            detagged_line = re_author_tag.sub('', line, 1).strip()
+            if detagged_line:
+                ## From this point, go on and collect tagged authors
+                (last_tagged_author_position, tagged_authors) = \
+                    collect_tagged_authors(top_section, \
+                                               position, \
+                                               first_line=detagged_line)
+            else:
+                ## So, in this situation, there is nothing following the
+                ## author tag on the same line, but a tag is present, meaning
+                ## that authors are below the tag somewhere!
+                ## Get the next non-empty line, and look at that.
+                position_find = position + 1
+                tagged_authors = None
+                ## From this point
+                while (position_find < len(top_section)) and (not tagged_authors):
+                    ## Hit a non-blank line after a tag, start searching recursively from here
+                    if top_section[position_find].strip() != '':
+                        gap_width = position_find - position
+                        (last_tagged_author_position, tagged_authors) = \
+                            collect_tagged_authors(top_section, \
+                                                       position_find, \
+                                                       orig_blank_lines=gap_width)
+                        ## Save the position of the last author line
+                    position_find += 1
+
+            if tagged_authors:
+                tagged_author_information = [{'authors'      : tagged_authors,
+                                              'affiliation'  : None,}]
+                just_tagged_authors = tagged_authors
+            ## Break with whatever was collected from the author tag.
             break
 
-        ## Affiliation in line
-        elif re_aff_num.search(line) or re_aff_name.search(line) or re_aff_email.search(line):
-            if cli_opts['verbosity'] > 2:
-                print "! Affiliation match on line: %s" % line
-            last_matched_aff_line = position
-            collected_affiliations.append(line)
+    ## METHOD 2 -------------- look for standard authors (basic pattern)
+    ## Look for standard (initials surname, or surname initials) authors.
+    ## This is done before affiliation-assisted author-search is initiated
+    ## since the positions can be used to improve affiliation detection.
+    first_standard_author_position = None
+    standard_authors = []
+    for position in range(len(top_section)):
+        ## An author tag was found, delay the search until the tag position is reached
+        if first_author_tag_position and (position < first_author_tag_position):
+            continue
 
-        ## Set the ending position to equal this line number
-        ## (This could be the last author or one of many)
-        else:
-            standard_author_pattern_match = total_author_pattern.search(line)
-            extra_author_pattern_match = extra_author_pattern.search(line)
-            if standard_author_pattern_match or extra_author_pattern_match:
-                if not first_matched_author_line:
-                    first_matched_author_line = position
-                last_matched_author_line = position
+        line = top_section[position]
+        ## 'Initial Surname' / 'Surname Initials' authors or
+        ## Knowledge-base specified authors
+#        if re_auth_with_number.search(line) or re_extra_auth.search(line):
+            ## Keep a list of standard authors, and their positions
+#            (last_standard_author_position, standard_authors) = collect_standard_authors(top_section, \
+#                                                                                             position)
+            ## Use the first matched author from WHERE TO START
+#            first_standard_author_position = position
 
-                if standard_author_pattern_match:
-                    ## Append the matched author string (standard pattern)
-                    collected_authors.append(standard_author_pattern_match.group('author_names'))
-                if extra_author_pattern_match:
-                    ## Append the matched author string (extra pattern)
-                    collected_authors.append(extra_author_pattern_match.group('extra_auth'))
+        standard_author_pattern_match = re_auth_with_number.search(line)
+        extra_author_pattern_match = re_extra_auth.search(line)
+        if standard_author_pattern_match or extra_author_pattern_match:
+            if not first_standard_author_position:
+                first_standard_author_position = position
+            last_standard_author_position = position
+            if standard_author_pattern_match:
+                ## Append the matched author string (standard pattern)
+                standard_authors.append(standard_author_pattern_match.group('author_names'))
+            if extra_author_pattern_match:
+                ## Append the matched author string (extra pattern)
+                standard_authors.append(extra_author_pattern_match.group('extra_auth'))
 
-                if cli_opts['verbosity'] > 2:
-                    print "! Author pattern match on line: %s" % line
+            if cli_opts['verbosity'] > 7:
+                print "--- author pattern match on line: %s, position: %d" % (line.strip(), position)
 
-    if cli_opts['verbosity'] > 2:
-        print "TOP SECTION COLLECTED AUTHORS"
-        print collected_authors
-        print "TOP SECTION COLLECTED AFFILIATIONS"
-        print collected_affiliations
+    ## By this point, we've managed to try and get tagged authors,
+    ## as well as anything in the top section that looks like an author
+    ## according to the main author regex.
 
-    final_tagged_authors = []
-    ## If the number of author LINES is equal to the affiliation count,
-    ## associate the two
-    if len(collected_authors) == len(collected_affiliations):
-        for x in range(len(collected_authors)):
-            rebuilt_collected_authors = rebuild_author_lines(list(collected_authors[x]), \
-                                                                 re_single_author_pattern)
-            ## Associate authors with affiliations
-            tagged_authors = ["%s%s%s%s" % \
-                                  ("<cds.AUTHstnd>", \
-                                       an_author, \
-                                       CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND, \
-                                       collected_affiliations[x]) for an_author in rebuilt_collected_authors]
-        ## Increase stength for this (when len(aff)=len(auth))?
-    else:
-        ## Assemble into a list, with one author name per line, without affiliations
-        rebuilt_collected_authors = rebuild_author_lines(collected_authors, re_single_author_pattern)
-        tagged_authors = ["%s%s%s" % ("<cds.AUTHstnd>", \
-                                          an_author, \
-                                          CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND) for an_author in rebuilt_collected_authors]
+    ## Attempt to obtain authors using affiliation positions.
+    ## A tagged author position is considered the best.
+    ## Otherwise start from the top of the section.
+    ## Always attempt to find authors too.
+    (affiliations, loose_authors) = find_affiliations(top_section, \
+                                                          start=first_author_tag_position, \
+                                                          use_to_find_authors=True)
 
-    ## Only returns a top section if a solid indicator was found
-    if keyword_line or last_matched_aff_line or last_matched_author_line:
+    ## METHOD 3 -------------- Look for authors using affiliations
+    ## and handle the assembly of standard authors too
 
-        ## Set the starting position of the start of the top section
-        if first_matched_author_line:
-            start_line = first_matched_author_line
+    affiliation_associated_affiliated_authors = []
+    affiliation_associated_standard_authors = []
 
-        ## Set the end line position of the end of the top section
-        if keyword_line:
-            ## (Top-section keyword termination) Best case scenario
-            ## Ending was found using a keyword, safe to use from the word go
-            new_end = keyword_line
-        elif last_matched_aff_line:
-            ## Next best thing: use found affiliations
-            ## (Affiliation terminates the end of the top section)
-            new_end = last_matched_aff_line + forward_jump
-        else:
-            ## Cater for this author line, and an affiliation line afterwards
-            ## (Author terminates the end of the top section)
-            new_end = last_matched_author_line + forward_jump
+    just_standard_authors = []
+    just_affiliated_authors = []
 
-        try:
-            ## Top section details
-            top_section = {'start'        : start_line,
-                           'end'          : new_end,
-                           'lines'        : docbody[start_line:new_end],
-                           'authors'      : tagged_authors, ## list of author strings!
-                           'affiliations' : collected_affiliations,
-                           }
-        except IndexError, err:
-            ## Overshoots the length of the document body, completely abort.
-            pass
+    if affiliations is not None:
+        ## Attempt to pair together standard authors with identified affiliations.
+        ## If the number of affiliation is equal to the number of author lines
+        if len(affiliations) == len(standard_authors):
+            ## Increase stength for this (when len(aff)=len(auth))?
+            for x in range(len(standard_authors)):
+                rebuilt_standard_authors = rebuild_author_lines([standard_authors[x]], \
+                                                                     re_single_author_pattern_with_numeration)
+                ## Associate authors with affiliations
+                affiliation_associated_standard_authors.append({'authors'     : rebuilt_standard_authors,
+                                                                'affiliation' : affiliations[x]['line']})
+                just_standard_authors.extend(rebuilt_standard_authors)
+        ## Now assemble affiliated authors, with their affiliations
+        for aff in affiliations:
+            ## Append any affiliation supported authors.
+            ## [!Do not include repeated authors, may be repeated from double numeration]
+            if aff['author_data']:
+                author_list_for_affiliation = aff['author_data']['authors']
+                affiliated_author_strength = aff['author_data']['strength']
+            else:
+                author_list_for_affiliation = []
+                affiliated_author_strength = None
+            affiliation_associated_affiliated_authors.append( \
+                {'authors'       : [auth for auth in author_list_for_affiliation if auth not in just_affiliated_authors],
+                 'affiliation'   : aff['line'],
+                 'strength'      : affiliated_author_strength,})
+            just_affiliated_authors.extend([auth for auth in author_list_for_affiliation])
 
-        print "TAGGED AUTHORS FROM FIND_TOP_SECTION"
-        print top_section['authors']
+    ## In the event that standard authors were not paired with affiliations
+    ## then just make a list of dictionaries of authors without affiliations
+    if standard_authors and not affiliation_associated_standard_authors:
+        rebuilt_standard_authors = \
+            [rebuild_author_lines([std_auth_line], re_single_author_pattern_with_numeration) \
+                 for std_auth_line in standard_authors]
+        for r in rebuilt_standard_authors:
+            affiliation_associated_standard_authors.append({'authors'     : r,
+                                                            'affiliation' : None,})
+            just_standard_authors.extend(r)
 
-    return top_section
+    if cli_opts['verbosity'] > 7:
+        sys.stdout.write("--- Author extraction results:\n")
+        sys.stdout.write("---- tagged: %s\n" % tagged_author_information)
+        sys.stdout.write("---- standard: %s\n" % affiliation_associated_standard_authors)
+        sys.stdout.write("---- affilated: %s\n" % affiliation_associated_affiliated_authors)
 
-def find_simple_authors(docbody, author_marker = None, first_author = None):
-    """Search in document body for its author section.
-       Looks top down for things that look like an author list.  This will
-       work generally poorly unless one is using the LaTeX in some way, or
-       if one knows the first author. Both of these methods are tried
-       first, falling back to a default search for the first line
-       matching
-          [A-Z]\w+, [A-Z]\.?\s?[A-Z]?\.?\s?\d*
-          (i.e. a word starting with caps, followed by comma, space, one
-          or two initials with possible periods and then possibly a number.
+    ## Given three lists of authors, which have been 'extracted' using three different methods
+    ## decide which list to return as a set of reliable authors (if any)
+    final_authors = choose_author_method(tagged_author_information, \
+                                             affiliation_associated_standard_authors, \
+                                             affiliation_associated_affiliated_authors, \
+                                             just_tagged_authors, \
+                                             just_standard_authors, \
+                                             just_affiliated_authors)
 
-       @param docbody: (list) of strings - the full document body.
-       @param author_marker: (string) optional (regexp) marker embedded by latex
-       for beginning and end of author section
-       @param first_author: (string) optional (regexp) first author to help find
-       beginning of section
-       @return: (dictionary) :
-          { 'start_line' : (integer) - index in docbody of 1st author line,
-            'end_line' : (integer) - index of last author line
-          }
-                 Much of this information is used by later functions to rebuild
-                 a reference section.
-         -- OR --
-                (None) - when the reference section could not be found.
+    if cli_opts['verbosity'] > 7:
+        sys.stdout.write("--- Selected authors info: %s\n" % final_authors)
+
+    marked_up_authors = mark_up_authors_with_affiliations(final_authors)
+
+    document_information = {'authors'           : final_authors,
+                            'affiliations'      : affiliations,
+                            'marked_up_authors' : marked_up_authors,}
+
+    return (document_information, status, how_found_start)
+
+def mark_up_authors_with_affiliations(final_authors):
+    """ Prepare authors and any possible associated affiliations
+    into marked-up (tagged) lines according to identified authors.
+    @param final_authors: (list) Holding dictionary items
+    holding lists of authors with their optional affiliation.
+    @return: (list) A list of lines, holding marked-up authors
+    and their affiliations.
     """
-    ## Single author pattern (this is just used to split the output lines as 'markers')
-    ## Top section of the document (if any)
-    top_section = find_top_section(docbody, first_author)
+    ## Pair authors and affiliations together, in the event that
+    ## affiliated supported authors were found!
+    tagged_authors = []
 
-    ## Top section was found, with basic authors
-    if top_section and top_section['authors']:
-        ## Return dictionary containing details of author section:
-        ## (The pattern used is just a single name matching author pattern,
-        ## and not the full author pattern. This allows for each author group
-        ## to be split into separate author names, within the output xml.)
-        auth_section = top_section
+    def process_auth(a):
+        ## Also remove numeration
+        a = re.sub('\d+', '', a)
+        a = replace_undesirable_characters(a).strip(".,:;- []()*\\")
+        return a
+
+    def process_aff(a):
+        a = replace_undesirable_characters(a).strip(".,:;- []()*\\")
+        return a
+
+    for aff_auth_dict in final_authors:
+        for auth in aff_auth_dict['authors']:
+            ## Otherwise the closing element tag dissappears (!?)
+            if auth:
+                if not aff_auth_dict['affiliation']:
+                    aff_for_auth = ''
+                else:
+                    aff_for_auth = aff_auth_dict['affiliation']
+                tagged_authors.append("%s%s%s%s" % ("<cds.AUTHstnd>", \
+                                                        process_auth(auth), \
+                                                        CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND, \
+                                                        process_aff(aff_for_auth)))
+    return tagged_authors
+
+def choose_author_method(tagged_info, std_info, aff_info, \
+                             tagged_authors, std_authors, aff_authors):
+    """Decide which list of authors to treat as the most accurate and
+    reliable list of authors for a document. This is accomplished
+    primarily through set operations of the author values, and the methods
+    by which they were extracted.
+    @param tagged_info: (dict) Affiliation and author information for authors
+    obtained using explicit in-document author notation (tags).
+    @param std_info: (dict) Affiliation and author information for authors
+    obtained using the comphrehensive author pattern.
+    @param aff_info: (dict) Affiliation and author information for authors
+    obtained using two types of affiliation-context (numeration, and positioning).
+    @param tagged_authors: (list) List of purely tagged authors.
+    @param std_authors: (list) List of purely standard-matched authors.
+    @param aff_authors: (list) List of purely affiliated authors.
+    @return: (dict) Affiliation and author information which is deemed to be
+    the most accurate for the document.
+    """
+
+    ## Immediately discard non-sets of authors (hold duplicate entries)
+    if len(tagged_authors) != len(set(tagged_authors)):
+        tagged_info = []
+    if len(std_authors) != len(set(std_authors)):
+        std_info = []
+    if len(aff_authors) != len(set(aff_authors)):
+        aff_info = []
+
+    tagged_authors = map(lambda x: x.strip(" ,"), tagged_authors)
+    std_authors = map(lambda y: y.strip(" ,"), std_authors)
+    aff_authors = map(lambda z: z.strip(" ,"), aff_authors)
+
+    ## False if there is a 'weak' affiliation-supported author match
+    ## AND none of them are found in the list of standard authors
+    weak_affiliated_authors = False
+
+    ## True if 'weak' affiliated authors are present, and at least one of
+    ## those authors has, as a subset, an author from the standard author list
+    author_match_with_standard_authors = False
+
+    ## If standard authors and affiliated authors exist
+    ## Otherwise there's no point in deciding which to take
+    if std_authors and aff_authors:
+        ## Is there a 'line-above' author line?
+        weak_affiliated_authors = filter(lambda tmp_aff: \
+                                             ((tmp_aff['strength'] is 0) and tmp_aff['authors']), aff_info)
+
+        for f in aff_info:
+            if (f['strength'] is 0) and f['authors']:
+                ## Given that there exists at least one 'line above' set of authors
+                ## See if any of these so-called weak authors also exist in the
+                ## set of standard authors (even as substrings)
+                for auth in f['authors']:
+                    ## If there exists a standard author which is a substring
+                    ## of at least one affiliated author
+                    author_match_with_standard_authors = filter(lambda tmp_std: \
+                                                                    auth.find(tmp_std), std_authors)
+                    ## Do not place precedence on the standard authors
+                    if author_match_with_standard_authors:
+                        break
+                ## Do not give precedence to standard authors when there exists
+                ## a line-above author in the list of standard authors
+                if author_match_with_standard_authors:
+                    weak_affiliated_authors = False
+                    break
+
+    aff_authors_is_a_subset_of_std_authors = False
+    if set(aff_authors).difference(std_authors) and set(aff_authors).issubset(std_authors):
+        ## Is the set of affiliated authors a subset of standard authors
+        ## And do they differ?!
+        aff_authors_is_a_subset_of_std_authors = True
+
+    ## The situations where std_info has precendence over aff_info
+    ## 1. There exists at least one 'line above affiliation' (weakly) found author
+    ## 2. Affiliated authors are a subset of standard authors
+    ## 3. Standard authors double the number of affiliated authors
+    standard_over_affiliated = weak_affiliated_authors or \
+        aff_authors_is_a_subset_of_std_authors or \
+        ((len(aff_authors) * 2) < len(std_authors))
+
+    ## Make the choice, with the appropriate precedence
+    if standard_over_affiliated:
+        return tagged_info or std_info or aff_info
     else:
-        ## No basic author names were found when locating the top section.
-        auth_section = None
-
-    return auth_section
+        return tagged_info or aff_info or std_info
 
 def find_reference_section(docbody):
     """Search in document body for its reference section. More precisely, find
@@ -5801,16 +6515,12 @@ def rebuild_author_lines(author_lines, author_pattern):
         """ given an author in the match obj, pushes it on the stack of lines
         """
         ## Append author and remove undesirable unicode characters for this author list
-        authors.append(replace_undesirable_characters(matchobj.group(0)))
-        if cli_opts['verbosity'] > 1:
-            print "Found author -> "+ matchobj.group(0)+ "\n"
+        authors.append(matchobj.group(0))
         return ' '
     authors = []
     ## Kill the new line characters in the author lines
-    ## FIXME Need to remove the numeration character for authors
     author_string = ' '.join([x.strip() for x in author_lines])
     author_pattern.sub(found_author, author_string)
-
     return authors
 
 def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
@@ -5864,7 +6574,7 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
         if m_ref_line_marker is not None:
             ## Reference line marker found! : Append this reference to the
             ## list of fixed references and reset the working_line to 'blank'
-            if current_string <> '':
+            if current_string != '':
                 ## If it's not a blank line to separate refs .
                 if current_string[len(current_string) - 1] in (u'-', u' '):
                     ## space or hyphenated word at the end of the
@@ -5939,8 +6649,6 @@ def get_lines(docbody,
         ## Pass title line
         start_idx += 1
 
-
-
     ## now rebuild reference lines:
     if type(end_line) is int:
         lines = \
@@ -5950,8 +6658,6 @@ def get_lines(docbody,
         lines = rebuild_reference_lines(docbody[start_idx:], \
                                             marker_ptn)
     return lines
-
-
 
 def get_reference_lines(docbody,
                         ref_sect_start_line,
@@ -6012,172 +6718,6 @@ def get_reference_lines(docbody,
 ## ----> Glue - logic for finding and extracting reference section:
 
 def extract_references_from_fulltext(fulltext):
-    """Locate and extract references from a fulltext document.
-       Return the extracted reference section as a list of strings, whereby each
-       string in the list is considered to be a single reference line.
-        E.g. a string could be something like:
-        '[19] Wilson, A. Unpublished (1986).
-        wrapper for more general extract_section_from_fulltext()
-
-       @param fulltext: (list) of strings, whereby each string is a line of the
-        document.
-       @return: (list) of strings, where each string is an extracted reference
-        line.
-    """
-    return extract_section_from_fulltext(fulltext, 'references')
-
-## Custom weightings, the higher the value, the more valuable the method
-context_method_weightings = {'numeration_accoc': 1,
-                             'strict_pattern'  : 0.5,
-                             'line_above_aff'  : 0.4,
-                             'keyword_body'    : 0.3,
-                             'weak_pattern'    : 0.2,}
-
-def choose_author_method(p_authors, c_authors):
-    """Decide which list of possible authors to return.
-    """
-
-    ## Immediately discard non-sets of authors (hold multiple entries of the same name)
-    if len(p_authors['matches']) != len(set(p_authors['matches'])):
-        p_authors['matches'] = []
-
-    if len(c_authors['matches']) != len(set(c_authors['matches'])):
-        c_authors['matches'] = []
-
-    if p_authors or c_authors:
-        ## Discard a list of authors if it is small (what is small?)
-        
-
-        ## Here we look at which set of authors to choose, depending on their perceived accuracy
-        pattern_data = (p_authors['method'], p_authors['strength'], p_authors['authors'])
-        context_data = (c_authors['method'], c_authors['strength'], c_authors['authors'])
-
-        ##
-        for_pattern = 0
-        for_context = 0
-
-        ## Compare the list of authors found by both method groups
-#        for a in p_authors['authors']:
-#            if a in c_authors['authors']:
-
-
-        for n in range(3):
-            p = pattern_data[n]
-            c = context_data[n]
-            try:
-                int_p = 1/int(p)
-                int_c = 1/int(c)
-            except ValueError:
-                int_p = method_weightings[p]
-                int_c = method_weightings[c]
-
-            ## indicating a very poor match
-            if int_p == 0 or int_c == 0:
-                if int_p == 0:
-                    for_pattern -= int_p
-                if int_c == 0:
-                    for_context -= int_c
-            else:
-                ## Here we have a value between 0 and 1, for a feature
-                ## Bias is always placed on the context
-                if int_p > int_c:
-                    for_pattern += 1
-                else:
-                    for_context += 1
-
-        ## Make the desision, depending on the larger pattern or context value
-        if for_pattern > for_context:
-            chosen_author_section = p_authors
-        else:
-            ## Again, bias is placed on using context
-            chosen_author_section = c_authors
-
-    else:
-        ## Both lists are empty
-        chosen_author_section = []
-
-    return chosen_author_section
-
-def extract_authors_from_fulltext(fulltext):
-    """Locate and extract authors of a paper, from a fulltext document.
-       Return the extracted authors section as a list of strings, whereby each
-       string in the list is considered to be line holding authors.
-        E.g. a string could be something like:
-        'Wilson, A., T Wells. A. Einstein ...'
-        wrapper for more general extract_section_from_fulltext()
-
-       @param fulltext: (list) of strings, whereby each string is a line of the
-        document.
-       @return: (list) of strings, where each string is an extracted author
-        line.
-    """
-
-    status = how_found_start = 0
-    author_section = []
-
-    ## EXTRACTION 1
-    ## This will attempt to find the top section of the document using
-    ## author pattern matches as boundaries only (single author names are markers)
-
-    ## For author extraction, this entire encapsulating function will only
-    ## return authors which are found using the pattern (initials surname, etc...)
-    authors_using_pattern = find_simple_authors(fulltext, first_author=cli_opts['first_author'])
-
-#    fulltext = ['Some title', 'Some date', 'Chris Hayward, Tim Smith, Joe Harris', 'University of Bath', '', 'Abstract']
-#    authors_using_pattern = extract_section_from_fulltext(fulltext, 'authors')
-
-    ## EXTRACTION 2
-    ## Now attempt to find authors in the context of nearby affiliations
-    aff_auth_pairs = find_affiliations(fulltext, use_to_find_authors=True)
-
-    ## Append the affiliation-supported authors, if affiliations were found
-    affiliation_supported_authors = []
-    if aff_auth_pairs is not None:
-        for pair in aff_auth_pairs:
-            ## For each (affiliation, author list) pair, add tagged authors, and associated affiliation
-            affiliation_supported_authors.append("%s%s%s%s" % \
-                                                     ("<cds.AUTHstnd>", \
-                                                          pair[1], \
-                                                          CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND, \
-                                                          pair[0]))
-
-    authors_using_affiliations = map(replace_undesirable_characters, affiliation_supported_authors)
-
-    ## VERIFICATION 1
-    ## Compare possible authors against a list of authors in the references (confirmed)
-
-    ## VERIFICATION 2
-    ## Compare long words in a line against the rest of the document body (negative)
-
-    ## Given two lists of authors, which have been 'extracted' using two different methods
-    ## decide which list to take as a set of reliable authors (if any)
-#    author_section = choose_author_method(authors_using_pattern, authors_using_affiliations)
-
-    ## temp
-    if authors_using_affiliations:
-        author_lines = authors_using_affiliations
-    elif authors_using_pattern:
-        author_lines = authors_using_pattern['authors']
-
-    return (author_lines, status, how_found_start)
-
-def extract_affiliations_from_fulltext(fulltext):
-    """Locate and extract affiliations of a paper, from a fulltext document.
-       Return the extracted affiliations section as a list of strings, whereby each
-       string in the list is considered to be line holding affiliations.
-        E.g. a string could be something like:
-        'U. Bath, CERN ...'
-       This function does not involve itself with extract_section_from_fulltext()
-
-       @param fulltext: (list) of strings, whereby each string is a line of the
-        document.
-       @return: (list) of strings, where each string is an extracted affiliations
-        line.
-    """
-    aff_auth_pairs = find_affiliations(fulltext)
-    return ([aff[0] for aff in aff_auth_pairs], 0, 0)
-
-def extract_references_from_fulltext(fulltext):
     """Locate and extract the reference section from a fulltext document.
        Return the extracted section as a list of strings, whereby each
        string in the list is considered to be a single line.
@@ -6231,7 +6771,7 @@ def extract_references_from_fulltext(fulltext):
 
         ## Attempt to find the end of the section in the case where references are being
         ## extracted, and a first pass failed at finding the end of the reference section
-        if (sect_end is None) and (section == 'references'):
+        if sect_end is None:
             sect_end = \
                      find_end_of_reference_section(fulltext, \
                                                    sect_start["start_line"], \
@@ -6514,11 +7054,11 @@ def get_cli_options():
             ## a 'configuration file'-specified kb
             cli_opts['kb-report-number'] = o[1]
         elif o[0] in ("-a", "--authors"):
-            cli_opts['authors'] = 1;
+            cli_opts['authors'] = 1
         elif o[0] in ("-f", "--affiliations"):
-            cli_opts['affiliations'] = 1;
+            cli_opts['affiliations'] = 1
         elif o[0] in ("--first_author"):
-            cli_opts['first_author'] = 1;
+            cli_opts['first_author'] = 1
         if len(myargs) == 0:
             ## no arguments: error message
             usage(wmsg="Error: no full-text.")
@@ -6788,22 +7328,20 @@ def begin_extraction(daemon_cli_options=None):
                 ## don't search for sections in the document body:
                 ## treat entire input as relevant section:
                 extract_lines = docbody
-
             else:
-
                 ## launch search for the relevant section in the document body:
-                if cli_opts['authors'] == 1:
-                    (tagged_lines, extract_error, how_found_start) = \
-                        extract_authors_from_fulltext(docbody)
-                elif cli_opts['affiliations'] == 1:
-                    (tagged_lines, extract_error, how_found_start) = \
-                        extract_affiliations_from_fulltext(docbody)
+                if cli_opts['authors'] == 1 or cli_opts['affiliations'] == 1:
+                    (document_info, extract_error, how_found_start) = \
+                        extract_top_document_information_from_fulltext(docbody, first_author=cli_opts['first_author'])
+                    if cli_opts['authors']:
+                        extract_lines = document_info['authors']
+                    elif cli_opts['affiliations']:
+                        extract_lines = document_info['affiliations']
                 else:
                     (extract_lines, extract_error, how_found_start) = \
                         extract_references_from_fulltext(docbody)
 
             if not cli_opts['authors'] and not cli_opts['affiliations']:
-
                 if len(extract_lines) == 0 and extract_error == 0:
                     extract_error = 6
                 write_message("-----extract_references_from_fulltext " \
