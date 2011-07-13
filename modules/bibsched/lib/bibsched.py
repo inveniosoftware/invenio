@@ -215,7 +215,7 @@ class Manager:
         self.header_lines = 2
         try:
             motd_path = os.path.join(CFG_PREFIX, "var", "run", "bibsched.motd")
-            self.motd = open(motd_path).read()
+            self.motd = open(motd_path).read().strip()
             if len(self.motd) > 0:
                 self.motd = "MOTD [%s] " % time.strftime("%Y-%m-%d %H:%M",time.localtime(os.path.getmtime(motd_path))) + self.motd
                 self.header_lines = 3
@@ -358,14 +358,14 @@ class Manager:
             os.system("%s %s" % (editor, motdpath))
             self.curses.panel.update_panels()
             try:
-                self.motd = open(motdpath).read()
+                self.motd = open(motdpath).read().strip()
             except IOError:
                 self.motd = ""
             if len(self.motd) > 0:
                 self.motd = "MOTD [%s] " % time.strftime("%m-%d-%Y %H:%M",time.localtime(os.path.getmtime(motdpath))) + self.motd
             if previous[24:] != self.motd[24:]:
                 if len(previous) == 0:
-                    Log('motd set to "%s"' % self.motd.strip().replace("\n", "|"))
+                    Log('motd set to "%s"' % self.motd.replace("\n", "|"))
                     self.selected_line += 1
                     self.header_lines += 1
                 elif len(self.motd) == 0:
@@ -373,7 +373,7 @@ class Manager:
                     self.selected_line -= 1
                     self.header_lines -= 1
                 else:
-                    Log('motd changed to "%s"' % self.motd.strip().replace("\n", "|"))
+                    Log('motd changed to "%s"' % self.motd.replace("\n", "|"))
         else:
             self._display_message_box("No editor was found")
 
@@ -761,7 +761,7 @@ class Manager:
         maxy = self.height - 2
         #maxx = self.width
         if len(self.motd) > 0:
-            self.put_line((self.motd.strip().replace("\n"," - ")[:79], "", "", "", "", "", "", "", ""), header=False, motd=True)
+            self.put_line((self.motd.replace("\n"," - ")[:79], "", "", "", "", "", "", "", ""), header=False, motd=True)
         self.put_line(("ID", "PROC [PRI]", "USER", "RUNTIME", "SLEEP", "STATUS", "PROGRESS"), header=True)
         self.put_line(("------", "---------", "----", "-------------------", "-----", "-----", "--------"), header=True)
         if self.selected_line > maxy + self.first_visible_line - 1:
