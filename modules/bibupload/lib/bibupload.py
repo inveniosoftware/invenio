@@ -1180,7 +1180,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
             # Let's discover the desired format
             format = field_get_subfield_values(fft, 'f')
             if format:
-                format = format[0]
+                format = normalize_format(format[0])
             else:
                 if url:
                     format = guess_format_from_url(url)
