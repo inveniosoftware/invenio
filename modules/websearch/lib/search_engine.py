@@ -3809,6 +3809,16 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                         import bibclassify_webinterface
                         recid = recIDs[irec]
                         bibclassify_webinterface.main_page(req, recid, tabs, ln, webstyle_templates)
+                    elif tab == 'plots':
+                        req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
+                                                                                   tabs,
+                                                                                   ln))
+                        content = websearch_templates.tmpl_record_plots(recID=recIDs[irec],
+                                                                         ln=ln)
+                        req.write(content)
+                        req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
+                                                                                      tabs,
+                                                                                      ln))
 
                     else:
                         # Metadata tab

@@ -290,6 +290,14 @@ class WebSearchTestRecord(unittest.TestCase):
                                                expected_text='001__'))
         return
 
+    def test_plots_tab(self):
+        """ websearch - test to ensure the plots tab is working """
+        browser = Browser()
+        self.assertEqual([],
+                         test_web_page_content(make_url('/%s/8/plots' % CFG_SITE_RECORD),
+                                               expected_text='div id="clip"',
+                                               unexpected_text='Abstract'))
+
 class WebSearchTestCollections(unittest.TestCase):
 
     def test_traversal_links(self):
