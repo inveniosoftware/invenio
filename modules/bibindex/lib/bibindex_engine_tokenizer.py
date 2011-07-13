@@ -155,17 +155,19 @@ class BibIndexFuzzyNameTokenizer(BibIndexTokenizer):
 
             Sample output for the name 'Jingleheimer Schmitt, John Jacob, XVI.' is:
             {
-                'TOKEN_TAG_LIST' : ['lastnames', 'nonlastnames', 'titles'],
+                'TOKEN_TAG_LIST' : ['lastnames', 'nonlastnames', 'titles', 'raw'],
                 'lastnames'      : ['Jingleheimer', 'Schmitt'],
                 'nonlastnames'   : ['John', 'Jacob'],
-                'titles'         : ['XVI.']
+                'titles'         : ['XVI.'],
+                'raw'            : 'Jingleheimer Schmitt, John Jacob, XVI.'
             }
         @rtype: dict
         """
-        retval = {'TOKEN_TAG_LIST' : ['lastnames', 'nonlastnames', 'titles'],
+        retval = {'TOKEN_TAG_LIST' : ['lastnames', 'nonlastnames', 'titles', 'raw'],
                   'lastnames'      : [],
                   'nonlastnames'   : [],
-                  'titles'         : []}
+                  'titles'         : [],
+                  'raw'            : s}
         l = s.split(',')
         if len(l) < 2:
             # No commas means a simple name
@@ -249,6 +251,7 @@ class BibIndexFuzzyNameTokenizer(BibIndexTokenizer):
         last_parts = scanned['lastnames']
         first_parts = scanned['nonlastnames']
         titles = scanned['titles']
+        raw = scanned['raw']
 
         if len(first_parts) == 0:                       # rare single-name case
             return scanned['lastnames']
@@ -389,4 +392,3 @@ if __name__ == "__main__":
 
     tokenizer = BibIndexFuzzyNameTokenizer()
     print "Tokenizes as:", tokenizer.tokenize(test_str)
-

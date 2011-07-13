@@ -39,101 +39,101 @@ class TestFuzzyNameTokenizerScanning(unittest.TestCase):
         """BibIndexFuzzyNameTokenizer - scanning single names like 'Dido'"""
         teststr = "Dido"
         output = self.scan(teststr)
-        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'], 'lastnames': ['Dido'], 'nonlastnames': [], 'titles': []}
+        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'], 'lastnames': ['Dido'], 'nonlastnames': [], 'titles': [], 'raw' : teststr}
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_simple_western_forward(self):
         """BibIndexFuzzyNameTokenizer - scanning simple Western-style: first last"""
         teststr = "Ringo Starr"
         output = self.scan(teststr)
-        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'], 'lastnames': ['Starr'], 'nonlastnames': ['Ringo'], 'titles': []}
+        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'], 'lastnames': ['Starr'], 'nonlastnames': ['Ringo'], 'titles': [], 'raw' : teststr}
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_simple_western_reverse(self):
         """BibIndexFuzzyNameTokenizer - scanning simple Western-style: last, first"""
         teststr = "Starr, Ringo"
         output = self.scan(teststr)
-        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'], 'lastnames': ['Starr'], 'nonlastnames': ['Ringo'], 'titles': []}
+        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'], 'lastnames': ['Starr'], 'nonlastnames': ['Ringo'], 'titles': [], 'raw' : teststr}
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_multiname_forward(self):
         """BibIndexFuzzyNameTokenizer - scanning multiword: first middle last"""
         teststr = "Michael Edward Peskin"
         output = self.scan(teststr)
-        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                       'lastnames': ['Peskin'], 'nonlastnames': ['Michael', 'Edward'], 'titles': []}
+        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                       'lastnames': ['Peskin'], 'nonlastnames': ['Michael', 'Edward'], 'titles': [], 'raw' : teststr}
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_multiname_dotcrammed(self):
         """BibIndexFuzzyNameTokenizer - scanning multiword: f.m. last"""
         teststr = "M.E. Peskin"
         output = self.scan(teststr)
-        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                       'lastnames': ['Peskin'], 'nonlastnames': ['M', 'E'], 'titles': []}
+        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                       'lastnames': ['Peskin'], 'nonlastnames': ['M', 'E'], 'titles': [], 'raw' : teststr}
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_multiname_dotcrammed_reversed(self):
         """BibIndexFuzzyNameTokenizer - scanning multiword: last, f.m."""
         teststr = "Peskin, M.E."
         output = self.scan(teststr)
-        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                       'lastnames': ['Peskin'], 'nonlastnames': ['M', 'E'], 'titles': []}
+        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                       'lastnames': ['Peskin'], 'nonlastnames': ['M', 'E'], 'titles': [], 'raw' : teststr}
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_multiname_dashcrammed(self):
         """BibIndexFuzzyNameTokenizer - scanning multiword: first-middle last"""
         teststr = "Jean-Luc Picard"
         output = self.scan(teststr)
-        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                       'lastnames': ['Picard'], 'nonlastnames': ['Jean', 'Luc'], 'titles': []}
+        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                       'lastnames': ['Picard'], 'nonlastnames': ['Jean', 'Luc'], 'titles': [], 'raw' : teststr}
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_multiname_dashcrammed_reversed(self):
         """BibIndexFuzzyNameTokenizer - scanning multiword: last, first-middle"""
         teststr = "Picard, Jean-Luc"
         output = self.scan(teststr)
-        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                       'lastnames': ['Picard'], 'nonlastnames': ['Jean', 'Luc'], 'titles': []}
+        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                       'lastnames': ['Picard'], 'nonlastnames': ['Jean', 'Luc'], 'titles': [], 'raw' : teststr}
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_compound_lastname_dashes(self):
         """BibIndexFuzzyNameTokenizer - scanning multiword: first middle last-last"""
         teststr = "Cantina Octavia Jones-Smith"
         output = self.scan(teststr)
-        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                       'lastnames': ['Jones', 'Smith'], 'nonlastnames': ['Cantina', 'Octavia'], 'titles': []}
+        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                       'lastnames': ['Jones', 'Smith'], 'nonlastnames': ['Cantina', 'Octavia'], 'titles': [], 'raw' : teststr}
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_compound_lastname_dashes_reverse(self):
         """BibIndexFuzzyNameTokenizer - scanning multiword: last-last, first middle"""
         teststr = "Jones-Smith, Cantina Octavia"
         output = self.scan(teststr)
-        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                       'lastnames': ['Jones', 'Smith'], 'nonlastnames': ['Cantina', 'Octavia'], 'titles': []}
+        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                       'lastnames': ['Jones', 'Smith'], 'nonlastnames': ['Cantina', 'Octavia'], 'titles': [], 'raw' : teststr}
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_compound_lastname_reverse(self):
         """BibIndexFuzzyNameTokenizer - scanning compound last: last last, first"""
         teststr = "Alvarez Gaume, Joachim"
         output = self.scan(teststr)
-        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                       'lastnames': ['Alvarez', 'Gaume'], 'nonlastnames': ['Joachim'], 'titles': []}
+        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                       'lastnames': ['Alvarez', 'Gaume'], 'nonlastnames': ['Joachim'], 'titles': [], 'raw' : teststr}
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_titled(self):
         """BibIndexFuzzyNameTokenizer - scanning title-bearing: last, first, title"""
         teststr = "Epstein, Brian, The Fifth Beatle"
         output = self.scan(teststr)
-        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                       'lastnames': ['Epstein'], 'nonlastnames': ['Brian'], 'titles': ['The Fifth Beatle']}
+        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                       'lastnames': ['Epstein'], 'nonlastnames': ['Brian'], 'titles': ['The Fifth Beatle'], 'raw' : teststr}
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_wildly_interesting(self):
         """BibIndexFuzzyNameTokenizer - scanning last last last, first first, title, title"""
         teststr = "Ibanez y Gracia, Maria Luisa, II., ed."
         output = self.scan(teststr)
-        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                       'lastnames': ['Ibanez', 'y', 'Gracia'], 'nonlastnames': ['Maria', 'Luisa'], 'titles': ['II.', 'ed.']}
+        anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                       'lastnames': ['Ibanez', 'y', 'Gracia'], 'nonlastnames': ['Maria', 'Luisa'], 'titles': ['II.', 'ed.'], 'raw' : teststr}
         self.assertEqual(output, anticipated)
 
 
@@ -149,8 +149,8 @@ class TestFuzzyNameTokenizerTokens(unittest.TestCase):
 
         Ronaldo
         """
-        tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                 'lastnames': ['Ronaldo'], 'nonlastnames': [], 'titles': []}
+        tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                 'lastnames': ['Ronaldo'], 'nonlastnames': [], 'titles': [], 'raw' : 'Ronaldo'}
         output = self.get_index_tokens(tagged_data)
         anticipated = ['Ronaldo']
         self.assertEqual(output, anticipated)
@@ -160,8 +160,8 @@ class TestFuzzyNameTokenizerTokens(unittest.TestCase):
 
         Ringo Starr
         """
-        tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                 'lastnames': ['Starr'], 'nonlastnames': ['Ringo'], 'titles': []}
+        tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                 'lastnames': ['Starr'], 'nonlastnames': ['Ringo'], 'titles': [], 'raw' : 'Ringo Starr'}
         output = self.get_index_tokens(tagged_data)
         anticipated = ['R Starr', 'Ringo Starr', 'Starr, R', 'Starr, Ringo']
         self.assertEqual(output, anticipated)
@@ -171,8 +171,8 @@ class TestFuzzyNameTokenizerTokens(unittest.TestCase):
 
         Starr, Ringo
         """
-        tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                 'lastnames': ['Starr'], 'nonlastnames': ['Ringo'], 'titles': []}
+        tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                 'lastnames': ['Starr'], 'nonlastnames': ['Ringo'], 'titles': [], 'raw' : 'Starr, Ringo'}
         output = self.get_index_tokens(tagged_data)
         anticipated = ['R Starr', 'Ringo Starr', 'Starr, R', 'Starr, Ringo']
         self.assertEqual(output, anticipated)
@@ -182,8 +182,8 @@ class TestFuzzyNameTokenizerTokens(unittest.TestCase):
 
         Michael Edward Peskin
         """
-        tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                 'lastnames': ['Peskin'], 'nonlastnames': ['Michael', 'Edward'], 'titles': []}
+        tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                 'lastnames': ['Peskin'], 'nonlastnames': ['Michael', 'Edward'], 'titles': [], 'raw' : 'Michael Edward Peskin'}
         output = self.get_index_tokens(tagged_data)
         anticipated = ['E Peskin', 'Edward Peskin', 'M E Peskin', 'M Edward Peskin', 'M Peskin',
                        'Michael E Peskin', 'Michael Edward Peskin', 'Michael Peskin',
@@ -197,8 +197,8 @@ class TestFuzzyNameTokenizerTokens(unittest.TestCase):
 
         Alvarez Gaume, Joachim
         """
-        tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                 'lastnames': ['Alvarez', 'Gaume'], 'nonlastnames': ['Joachim'], 'titles': []}
+        tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                 'lastnames': ['Alvarez', 'Gaume'], 'nonlastnames': ['Joachim'], 'titles': [], 'raw' : 'Alvarez Gaume, Joachim'}
         output = self.get_index_tokens(tagged_data)
         anticipated = ['Alvarez Gaume, J', 'Alvarez Gaume, Joachim', 'Alvarez, J', 'Alvarez, Joachim', 'Gaume, J',
                        'Gaume, Joachim', 'J Alvarez', 'J Alvarez Gaume', 'J Gaume', 'Joachim Alvarez',
@@ -210,8 +210,8 @@ class TestFuzzyNameTokenizerTokens(unittest.TestCase):
 
         Epstein, Brian, The Fifth Beatle
         """
-        tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                 'lastnames': ['Epstein'], 'nonlastnames': ['Brian'], 'titles': ['The Fifth Beatle']}
+        tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                 'lastnames': ['Epstein'], 'nonlastnames': ['Brian'], 'titles': ['The Fifth Beatle'], 'raw' : 'Epstein, Brian, The Fifth Beatle'}
         output = self.get_index_tokens(tagged_data)
         anticipated = ['B Epstein', 'B Epstein, The Fifth Beatle', 'Brian Epstein',
                        'Brian Epstein, The Fifth Beatle', 'Epstein, B', 'Epstein, B, The Fifth Beatle',
@@ -223,8 +223,8 @@ class TestFuzzyNameTokenizerTokens(unittest.TestCase):
 
         Ibanez y Gracia, Maria Luisa, II, (ed.)
         """
-        tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                 'lastnames': ['Ibanez', 'y', 'Gracia'], 'nonlastnames': ['Maria', 'Luisa'], 'titles': ['II', '(ed.)']}
+        tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                 'lastnames': ['Ibanez', 'y', 'Gracia'], 'nonlastnames': ['Maria', 'Luisa'], 'titles': ['II', '(ed.)'], 'raw' : 'Ibanez y Gracia, Maria Luisa, II, (ed.)'}
         output = self.get_index_tokens(tagged_data)
         anticipated = ['Gracia, L', 'Gracia, Luisa', 'Gracia, M', 'Gracia, M L', 'Gracia, M Luisa',
             'Gracia, Maria', 'Gracia, Maria L', 'Gracia, Maria Luisa',
@@ -257,8 +257,8 @@ class TestFuzzyNameTokenizerTokens(unittest.TestCase):
 
         W K H Panofsky
         """
-        tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
-                 'lastnames': ['Panofsky'], 'nonlastnames': ['W', 'K', 'H'], 'titles': []}
+        tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+                 'lastnames': ['Panofsky'], 'nonlastnames': ['W', 'K', 'H'], 'titles': [], 'raw' : 'W K H Panofsky'}
         output = self.get_index_tokens(tagged_data)
         anticipated = ['H Panofsky', 'K H Panofsky', 'K Panofsky', 'Panofsky, H', 'Panofsky, K',
                        'Panofsky, K H', 'Panofsky, W', 'Panofsky, W H', 'Panofsky, W K',

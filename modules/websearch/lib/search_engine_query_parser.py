@@ -1024,12 +1024,15 @@ class SpiresToInvenioSyntaxConverter:
         author_name = ''
         author_middle_name = ''
         author_surname = ''
+        full_search = ''
         if len(fuzzy_name['nonlastnames']) > 0:
             author_name = fuzzy_name['nonlastnames'][0]
         if len(fuzzy_name['nonlastnames']) == 2:
             author_middle_name = fuzzy_name['nonlastnames'][1]
         if len(fuzzy_name['nonlastnames']) > 2:
             author_middle_name = ' '.join(fuzzy_name['nonlastnames'][1:])
+        if fuzzy_name['raw']:
+            full_search = fuzzy_name['raw']
         author_surname = ' '.join(fuzzy_name['lastnames'])
 
         NAME_IS_INITIAL = (len(author_name) == 1)
@@ -1067,6 +1070,8 @@ class SpiresToInvenioSyntaxConverter:
         if NAME_IS_NOT_INITIAL:
             for i in range(1,len(author_name)):
                 search_pattern += ' or ' + self._EA_TAG + "\"%s, %s\"" % (author_surname, author_name[0:i])
+
+        search_pattern += ' or %s"%s, *"' % (self._A_TAG, full_search)
 
         return search_pattern
 
