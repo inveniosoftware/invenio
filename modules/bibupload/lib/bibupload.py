@@ -1045,25 +1045,16 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
         """Adds a new format for a given bibdoc. Returns True when everything's fine."""
         write_message('Add new format to %s url: %s, format: %s, docname: %s, doctype: %s, newname: %s, description: %s, comment: %s, flags: %s' % (repr(bibdoc), url, format, docname, doctype, newname, description, comment, flags), verbose=9)
         try:
-            if url:
-                tmpurl = download_url(url, format)
-                if bibdoc.check_file_exists(tmpurl):
-                    ## The url is already attached! Better ignore it
-                    write_message("WARNING: not adding new format %s from the URL %s to docname %s, as it seems the file has already been attached." % (format, url, docname), stream=sys.stderr)
-                    url = ""
             if not url: # Not requesting a new url. Just updating comment & description
                 return _update_description_and_comment(bibdoc, docname, format, description, comment, flags, pretend=pretend)
             try:
-                try:
-                    if not pretend:
-                        bibdoc.add_file_new_format(tmpurl, description=description, comment=comment, flags=flags)
-                except StandardError, e:
-                    write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because format already exists (%s)." % (url, format, docname, doctype, newname, description, comment, flags, e), stream=sys.stderr)
-                    raise
-            finally:
-                os.remove(tmpurl)
+                if not pretend:
+                    bibdoc.add_file_new_format(url, description=description, comment=comment, flags=flags)
+            except StandardError, e:
+                write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because format already exists (%s)." % (url, format, docname, doctype, newname, description, comment, flags, e), stream=sys.stderr)
+                raise
         except Exception, e:
-            write_message("Error in downloading '%s' because of: %s" % (url, e), stream=sys.stderr)
+            write_message("Error in adding '%s' as a new format because of: %s" % (url, e), stream=sys.stderr)
             raise
         return True
 
@@ -1071,25 +1062,16 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
         """Adds a new version for a given bibdoc. Returns True when everything's fine."""
         write_message('Add new version to %s url: %s, format: %s, docname: %s, doctype: %s, newname: %s, description: %s, comment: %s, flags: %s' % (repr(bibdoc), url, format, docname, doctype, newname, description, comment, flags))
         try:
-            if url:
-                tmpurl = download_url(url, format)
-                if bibdoc.check_file_exists(tmpurl):
-                    ## The url is already attached! Better ignore it
-                    write_message("WARNING: not adding new version for format %s from the URL %s to docname %s, as it seems the file has already been attached." % (format, url, docname), stream=sys.stderr)
-                    url = ""
             if not url:
                 return _update_description_and_comment(bibdoc, docname, format, description, comment, flags, pretend=pretend)
             try:
-                try:
-                    if not pretend:
-                        bibdoc.add_file_new_version(tmpurl, description=description, comment=comment, flags=flags)
-                except StandardError, e:
-                    write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because '%s'." % (url, format, docname, doctype, newname, description, comment, flags, e), stream=sys.stderr)
-                    raise
-            finally:
-                os.remove(tmpurl)
+                if not pretend:
+                    bibdoc.add_file_new_version(url, description=description, comment=comment, flags=flags)
+            except StandardError, e:
+                write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because '%s'." % (url, format, docname, doctype, newname, description, comment, flags, e), stream=sys.stderr)
+                raise
         except Exception, e:
-            write_message("Error in downloading '%s' because of: %s" % (url, e), stream=sys.stderr)
+            write_message("Error in adding '%s' as a new version because of: %s" % (url, e), stream=sys.stderr)
             raise
         return True
 
@@ -1263,6 +1245,46 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
 
         # Preprocessed data elaboration
         bibrecdocs = BibRecDocs(rec_id)
+
+        ## Let's pre-download all the URLs to see if, in case of mode 'correct'
+        ## we can avoid creating a new revision.
+        for docname, (doctype, newname, restriction, version, urls) in docs.items():
+            downloaded_urls = []
+            try:
+                bibdoc = bibrecdocs.get_docname(docname)
+            except InvenioWebSubmitFileError:
+                ## A bibdoc with the given docname does not exists.
+                ## So there is no chance we are going to revise an existing
+                ## format with an identical file :-)
+                bibdoc = None
+
+            new_revision_needed = False
+            for url, format, description, comment, flags in urls:
+                if url:
+                    try:
+                        downloaded_url = download_url(url, format)
+                        downloaded_urls.append((downloaded_url, format, description, comment, flags))
+                    except Exception, err:
+                        write_message("Error in downloading '%s' because of: %s" % (url, err), stream=sys.stderr)
+                        raise
+                    if mode == 'correct' and bibdoc is not None and not new_revision_needed:
+                        if not bibdoc.check_file_exists(downloaded_url):
+                            new_revision_needed = True
+                        else:
+                            write_message("WARNING: %s is already attached to bibdoc %s for recid %s" % (url, docname, rec_id), stream=sys.stderr)
+                else:
+                    downloaded_urls.append(('', format, description, comment, flags))
+            if mode == 'correct' and bibdoc is not None and not new_revision_needed:
+                ## Since we don't need a new revision (because all the files
+                ## that are being uploaded are different)
+                ## we can simply remove the urls but keep the other information
+                write_message("No need to add a new revision for docname %s for recid %s" % (docname, rec_id), verbose=2)
+                docs[docname] = (doctype, newname, restriction, version, [('', format, description, comment, flags) for (dummy, format, description, comment, flags) in downloaded_urls])
+                for downloaded_url, dummy, dummy, dummy, dummy in downloaded_urls:
+                    ## Let's free up some space :-)
+                    os.remove(downloaded_url)
+            else:
+                docs[docname] = (doctype, newname, restriction, version, downloaded_urls)
 
         if mode == 'replace': # First we erase previous bibdocs
             if not pretend:

@@ -2234,7 +2234,6 @@ class BibUploadFFTModeTest(GenericBibUploadTest):
     """
     Testing treatment of fulltext file transfer import mode.
     """
-
     def _test_bibdoc_status(self, recid, docname, status):
         res = run_sql('SELECT bd.status FROM bibrec_bibdoc as bb JOIN bibdoc as bd ON bb.id_bibdoc = bd.id WHERE bb.id_bibrec = %s AND bd.docname = %s', (recid, docname))
         self.failUnless(res)
@@ -3007,9 +3006,22 @@ allow any</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
+          <subfield code="d">a description</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%(siteurl)s/img/help.png</subfield>
+          <subfield code="n">site_logo</subfield>
+          <subfield code="d">another description</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">%(siteurl)s/img/rss.png</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%(siteurl)s/img/line.gif</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%(siteurl)s/img/merge.png</subfield>
+          <subfield code="n">line</subfield>
          </datafield>
         </record>
         """ % {
@@ -3020,10 +3032,23 @@ allow any</subfield>
         <controlfield tag="001">123456789</controlfield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
+          <subfield code="d">a second description</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%(siteurl)s/img/help.png</subfield>
+          <subfield code="n">site_logo</subfield>
+          <subfield code="d">another second description</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">%(siteurl)s/img/refresh.png</subfield>
           <subfield code="n">rss</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%(siteurl)s/img/line.gif</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%(siteurl)s/img/merge-small.png</subfield>
+          <subfield code="n">line</subfield>
          </datafield>
         </record>
         """ % {
@@ -3039,10 +3064,21 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(siteurl)s/record/123456789/files/line.gif</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(siteurl)s/record/123456789/files/line.png</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
           <subfield code="u">%(siteurl)s/record/123456789/files/rss.png</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
           <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
+          <subfield code="y">a second description</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.png</subfield>
+          <subfield code="y">another second description</subfield>
          </datafield>
         </record>
         """ % { 'siteurl': CFG_SITE_URL}
@@ -3050,12 +3086,21 @@ allow any</subfield>
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
+        8564_ $$u%(siteurl)s/record/123456789/files/line.gif
+        8564_ $$u%(siteurl)s/record/123456789/files/line.png
         8564_ $$u%(siteurl)s/record/123456789/files/rss.png
-        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif
+        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif$$ya second description
+        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.png$$yanother second description
         """ % { 'siteurl': CFG_SITE_URL}
         testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL}
         testrec_expected_url2 = "%(siteurl)s/record/123456789/files/rss.png" \
+            % {'siteurl': CFG_SITE_URL}
+        testrec_expected_url3 = "%(siteurl)s/record/123456789/files/site_logo.png" \
+            % {'siteurl': CFG_SITE_URL}
+        testrec_expected_url4 = "%(siteurl)s/record/123456789/files/line.png" \
+            % {'siteurl': CFG_SITE_URL}
+        testrec_expected_url5 = "%(siteurl)s/record/123456789/files/line.gif" \
             % {'siteurl': CFG_SITE_URL}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -3069,6 +3114,12 @@ allow any</subfield>
                                                           str(recid))
         testrec_expected_url2 = testrec_expected_url2.replace('123456789',
                                                           str(recid))
+        testrec_expected_url3 = testrec_expected_url3.replace('123456789',
+                                                          str(recid))
+        testrec_expected_url4 = testrec_expected_url4.replace('123456789',
+                                                          str(recid))
+        testrec_expected_url5 = testrec_expected_url5.replace('123456789',
+                                                          str(recid))
         test_to_correct = test_to_correct.replace('123456789',
                                                           str(recid))
         # correct test record with new FFT:
@@ -3080,6 +3131,9 @@ allow any</subfield>
         inserted_hm = print_record(recid, 'hm')
         self.failUnless(try_url_download(testrec_expected_url))
         self.failUnless(try_url_download(testrec_expected_url2))
+        self.failUnless(try_url_download(testrec_expected_url3))
+        self.failUnless(try_url_download(testrec_expected_url4))
+        self.failUnless(try_url_download(testrec_expected_url5))
         self.assertEqual(compare_xmbuffers(inserted_xm,
                                           testrec_expected_xm), '')
         self.assertEqual(compare_hmbuffers(inserted_hm,
@@ -3088,6 +3142,7 @@ allow any</subfield>
         bibrecdocs = BibRecDocs(recid)
         self.failUnless(bibrecdocs.get_bibdoc('rss').list_versions(), [1, 2])
         self.failUnless(bibrecdocs.get_bibdoc('site_logo').list_versions(), [1])
+        self.failUnless(bibrecdocs.get_bibdoc('line').list_versions(), [1, 2])
 
     def test_fft_implicit_fix_marc(self):
         """bibupload - FFT implicit FIX-MARC"""
