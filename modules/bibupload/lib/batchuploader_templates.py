@@ -22,10 +22,14 @@
 __revision__ = "$Id$"
 
 import cgi
+from invenio.bibrankadminlib import addadminbox
+from invenio.bibrankadminlib import tupletotable
+from invenio.config import CFG_SITE_LANG
+from invenio.config import CFG_SITE_URL
 from invenio.dbquery import run_sql
-from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
-from invenio.bibrankadminlib import addadminbox, tupletotable
+from invenio.urlutils import auto_version_url
+
 
 class Template:
     """Invenio Template class for creating Web Upload interface"""
@@ -46,18 +50,41 @@ class Template:
             font-size: 0.9em;
         }
 
+        .clean_ok{
+            border:solid 1px #349534;
+            background:#C9FFCA;
+            color:#008000;
+            font-size:14px;
+            font-weight:bold;
+            padding:4px;
+            text-align:center;
+            width: 650px;
+        }
+
+        .clean_error{
+            border:solid 1px #CC0000;
+            background:#F7CBCA;
+            color:#CC0000;
+            font-size:14px;
+            font-weight:bold;
+            padding:4px;
+            text-align:center;
+            width: 650px;
+        }
+
         #content {width:750px; font:90.1% arial, sans-serif;}
 
-        #uploadform {margin:0 0 1em 0}
+        .uploadform {margin:0 0 1em 0}
 
-
-        #uploadform div {margin:0.5em 0}
-        #uploadform fieldset {border:1px solid #657; padding:0.8em 1em; margin:2em 10px}
+        .uploadform div {margin:0.5em 0}
+        .uploadform fieldset {border:1px solid #657; padding:0.8em 1em; margin:2em 10px}
 
         #docuploadform {margin:0 0 1em 0}
 
         #docuploadform div {margin:0.5em 0}
         #docuploadform fieldset {border:1px solid #657; padding:0.8em 1em; margin:2em 10px}
+
+        #error_div {color: red; font-style: bold; }
 
         div.ui-datepicker{
             font-size:12px;
@@ -84,6 +111,31 @@ class Template:
             border-style: none;
         }
 
+        fieldset label {
+            float: left;
+            width: 150px;
+        }
+
+        label.nowidth {
+            width: auto;
+        }
+
+        .batchuploader_error {
+            max-width: 650px;
+            max-height: 326px;
+            border:solid 1px #CC0000;
+            background:#F7CBCA;
+            overflow: auto;
+        }
+
+        #batchuploader_error_list{
+            list-style-type: none;
+            padding-left: 10px;
+        }
+
+        #batchuploader_error_list li{
+            margin-bottom: 10px;
+        }
         </style>
 
         """
@@ -103,11 +155,13 @@ class Template:
             }
         </script>
         <script type="text/javascript" src="%(site_url)s/js/jquery-ui.min.js"></script>
-        """ % {'site_url':CFG_SITE_URL}
+        <script type="text/javascript" src="%(site_url)s/%(script)s"></script>
+        """ % {'site_url':CFG_SITE_URL,
+               'script': auto_version_url("js/batchuploader.js")}
 
         return styles
 
-    def tmpl_display_web_metaupload_form(self, ln=CFG_SITE_LANG, error=0, filetype="marcxml", mode="--insert",
+    def tmpl_display_web_metaupload_form(self, ln=CFG_SITE_LANG, filetype="marcxml", mode="--insert",
                                         submit_date="yyyy-mm-dd", submit_time="hh:mm:ss"):
         """ Displays Metadata upload form
             @param error: defines the type of error to be displayed
@@ -117,37 +171,21 @@ class Template:
             @return: the form in HTML format
         """
         _ = gettext_set_language(ln)
-        body_content = ""
-        body_content += """
+        body_content = """
         <script type="text/javascript">
             $(function() {
                 $("#datepicker").datepicker({dateFormat: 'yy-mm-dd'});
             });
         </script>
         """
-        body_content += """<form id="uploadform" method="post" action="%(site_url)s/batchuploader/metasubmit" enctype="multipart/form-data">""" \
+        body_content += """<form class="uploadform" method="post" action="%(site_url)s/batchuploader/confirm" enctype="multipart/form-data">""" \
                                        % {'site_url': CFG_SITE_URL}
         body_content += """
-<div id="content">
-<fieldset>
-"""
-        if error != 0:
-            if error == 1:
-                body_content += """
-                <div><b>%(msg)s</b></div>
-                """ % {'msg':_("Warning: Please, select a valid time")}
-            elif error == 2:
-                body_content += """
-                <div><b>%(msg)s</b></div>
-                """ % {'msg':_("Warning: Please, select a valid file")}
-            elif error == 3:
-                body_content += """
-                <div><b>%(msg)s</b></div>
-                """ % {'msg': _("Warning: The date format is not correct")}
-            elif error == 4:
-                body_content += """
-                <div><b>%(msg)s</b></div>
-                """ % {'msg': _("Warning: Please, select a valid date")}
+    <div id="content">
+        <fieldset>
+        <div id="error_div"></div>
+        """
+
         body_content += """
     <div><span class="mandatory_field""> * </span> %(txt_file)s:<input type="file" name="metafile" size="30" onChange="filename.value=(this.value)"></div>
     <input type="hidden" name="filename" id="filename" value="">
@@ -177,8 +215,9 @@ class Template:
     <div>%(txt_upload_later)s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="italics">%(txt_date)s:</span>
     <input type="text" id="datepicker" name="submit_date" value=%(submit_date)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
     &nbsp;&nbsp;<span class="italics">%(txt_time)s:</span>
-    <input type="text" name="submit_time" value=%(submit_time)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
-    <span class="italics">%(txt_example)s: 2009-12-20 19:22:18</span>
+    <input type="text" name="submit_time" id="submit_time" value=%(submit_time)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
+    <span class="italics">%(txt_example)s: 2012-12-20 19:22:18</span>
+    </div>
     <div><i>%(txt_mandatory)s</i></div>
     <div> <input type="submit" value="Upload" class="adminbutton"> </div>
 </fieldset>
@@ -215,15 +254,6 @@ class Template:
              {'x_url1_open': "<a href=\"%s/batchuploader/history\">" % CFG_SITE_URL,
               'x_url1_close': "</a>",
               'x_url2_open': "<a href=\"%s/batchuploader/metadata\">" % CFG_SITE_URL,
-              'x_url2_close': "</a>"}
-        return body_content
-
-    def tmpl_invalid_marcxml(self, ln=CFG_SITE_LANG):
-        """ Displays message when the MARCXML is not valid """
-        _ = gettext_set_language(ln)
-        body_content = """<br/>"""
-        body_content += _("The MARCXML submitted is not valid. Please, review the file and %(x_url2_open)sresubmit it%(x_url2_close)s") %\
-             {'x_url2_open': "<a href=\"%s/batchuploader/metadata\">" % CFG_SITE_URL,
               'x_url2_close': "</a>"}
         return body_content
 
@@ -357,32 +387,61 @@ class Template:
         body_content += """<form id="docuploadform" method="post" action="%(site_url)s/batchuploader/docsubmit" enctype="multipart/form-data">""" \
                            % {'site_url': CFG_SITE_URL}
         body_content += """
-        <div id="content">
+    <div id="content">
         <fieldset>
-        <div><span class="mandatory_field""> * </span> %(txt1)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="docfolder" size="30" />
-        <span class="italics">%(txt2)s: /afs/cern.ch/user/j/user/public/foo/</span></div>
-        <div><span class="mandatory_field""> * </span> %(txt3)s:
-        <select name="matching">
-            <option value="reportnumber">reportnumber</option>
-            <option value="recid">recid</option>
-        </select>
+        <div id="error_div"></div>
+        <div>
+            <label for="docfolder">
+                <span class="mandatory_field""> * </span>
+                %(txt1)s:
+            </label>
+            <input type="text" name="docfolder" size="30" />
+            <span class="italics"> %(txt2)s: /afs/cern.ch/user/j/user/public/foo/
+            </span>
         </div>
-        <div><span class="mandatory_field""> * </span> %(txt4)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="mode" value="append" "checked" id="appendcheckbox"/><label for="appendcheckbox">append</label>
-                                                                <input type="radio" name="mode" value="correct" id="revisecheckbox"/><label for="revisecheckbox">revise</label>
+        <div>
+            <label for="matching">
+                <span class="mandatory_field""> * </span>
+                %(txt3)s:
+            </label>
+            <select name="matching">
+                <option value="reportnumber">reportnumber</option>
+                <option value="recid">recid</option>
+            </select>
         </div>
-        <div>&nbsp;&nbsp;%(txt_priority)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <select name="priority">
-            <option value="1">normal</option>
-            <option value="5">high</option>
-        </select>
-        <br/>
-        <div>%(txt5)s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="italics">%(txt6)s:</span>
-        <input type="text" id="datepicker" name="submit_date" value=%(submit_date)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
-        &nbsp;&nbsp;<span class="italics">%(txt7)s:</span>
-        <input type="text" name="submit_time" value=%(submit_time)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
-        <span class="italics">%(txt8)s: 2009-12-20 19:22:18</span>
-        <br/>
-        <div><i>%(txt9)s</i></div>
+        <div>
+            <label for="mode">
+                <span class="mandatory_field""> * </span>
+                %(txt4)s:
+            </label>
+            <input type="radio" name="mode" value="append" "checked" id="appendcheckbox"/>
+            append
+        </div>
+        <div>
+            <label for="mode">&nbsp;</label>
+            <input type="radio" name="mode" value="correct" id="revisecheckbox"/>
+            revise
+        </div>
+        <div>
+            <label for="priority">
+                &nbsp;&nbsp;%(txt_priority)s:
+            </label>
+            <select name="priority">
+                <option value="1">normal</option>
+                <option value="5">high</option>
+            </select>
+            <br/>
+        </div>
+        <div>
+            %(txt5)s&nbsp;&nbsp;&nbsp;
+            <span class="italics">%(txt6)s:</span>
+            <input type="text" id="datepicker" name="submit_date" value=%(submit_date)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
+            &nbsp;&nbsp;<span class="italics">%(txt7)s:</span>
+            <input type="text" name="submit_time" id="submit_time" value=%(submit_time)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
+            <span class="italics">%(txt8)s: 2009-12-20 19:22:18</span>
+            <br/>
+            <div><i>%(txt9)s</i></div>
+        </div>
         <div> <input type="submit" value="Upload" class="adminbutton"> </div>
         </fieldset>
         </form></div>
@@ -401,6 +460,79 @@ class Template:
                         {'x_fmt_open': '<span class="mandatory_field">', 'x_fmt_close': '</span>'}
                }
         return body_content
+
+    def tmpl_display_confirm_page(self, ln=CFG_SITE_LANG,
+                metafile=None, filetype=None, mode=None, submit_date=None,
+                submit_time=None, file_name=None, priority=None,
+                errors_upload=''):
+        """ Display a confirmation page before uploading metadata
+        """
+        _ = gettext_set_language(ln)
+
+        priority_map = {'1' : 'Normal', '5': 'High'}
+        display_schedule = (submit_date != '')
+        schedule_msg = """%(text_confirm6)s <strong>%(submit_date)s</strong> at <strong>%(submit_time)s</strong>
+                            <br/><br/>""" % {'text_confirm6': _('The job is scheduled to run on'),
+                                             'submit_date': submit_date,
+                                             'submit_time': submit_time}
+
+        error_msgs = ['<ol id="batchuploader_error_list">']
+        for error in errors_upload.splitlines():
+            error_msgs.append("<li>%s</li>" % error)
+        error_msgs.append("</ol>")
+
+        errors_textarea = """%(text_error1)s
+                              <div class="batchuploader_error"> %(error_msgs)s </div>
+                              <br />
+                           """ % {'text_error1': '<div class="clean_error">Some errors have been found during the upload simulation</div>',
+                                  'error_msgs': '\n'.join(error_msgs)}
+
+        body_content = """<form class="uploadform" method="post" action="%(site_url)s/batchuploader/metasubmit">""" \
+                                       % {'site_url': CFG_SITE_URL}
+        body_content += """
+                        <div id="content">
+                        <input type="hidden" name="filetype" value=%(filetype)s>
+                        <input type="hidden" name="mode" value=%(mode)s>
+                        <input type="hidden" name="submit_date" value=%(submit_date)s>
+                        <input type="hidden" name="submit_time" value=%(submit_time)s>
+                        <input type="hidden" name="filename" value=%(filename)s>
+                        <input type="hidden" name="priority" value=%(priority_num)s>
+                        <div> %(errors_textarea)s %(text_confirm1)s <strong>%(filetype)s</strong> %(text_confirm2)s <strong>%(filename)s</strong> %(text_confirm3)s: <br /><br />
+                            <textarea style="background-color: lightyellow" name="metafile" rows="20" cols="80">%(filecontent)s</textarea>
+                            <br /><br />
+                            %(text_confirm4)s <strong>%(priority_txt)s</strong> %(text_confirm5)s <strong>%(mode)s</strong>.
+                            <br/><br/>
+                            %(schedule_msg)s
+                            %(text_confirm7)s (<strong>%(num_rec)s</strong> %(text_confirm8)s)
+                            <table>
+                            <tr>
+                                <td><input type="submit" value="Confirm" class="adminbutton" %(confirm_disabled)s></td>
+                                <td><input type="button" value="Cancel" class="adminbutton" onclick="window.location.href = './'"></td>
+                            </tr>
+                            </table>
+                        </div>
+                        """ % {'text_confirm1': _('You are about to submit a'),
+                               'text_confirm2': _('file with name'),
+                               'text_confirm3': _('and content'),
+                               'text_confirm4': _('This file will be uploaded with priority'),
+                               'text_confirm5': _('and in mode'),
+                               'text_confirm7': _('Do you want to submit the changes?'),
+                               'text_confirm8': _('record(s) will be affected'),
+                               'schedule_msg' : display_schedule and schedule_msg or '',
+                               'filetype': filetype,
+                               'filename': file_name,
+                               'filecontent': metafile.value,
+                               'priority_num': priority,
+                               'priority_txt': priority_map[priority],
+                               'mode': mode,
+                               'num_rec': metafile.value.count('<record>'),
+                               'submit_date': submit_date,
+                               'submit_time': submit_time,
+                               'errors_textarea': errors_upload and errors_textarea or '<div class="clean_ok">No errors were found during the upload simulation</div><br/>',
+                               'confirm_disabled': errors_upload and 'DISABLED style="background:grey;"' or ''}
+        body_content += """</div></form> """
+        return body_content
+
 
     def tmpl_display_web_docupload_result(self, ln=CFG_SITE_LANG, errors=None, info=None):
         """ Display results from the document upload """
