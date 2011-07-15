@@ -1246,12 +1246,12 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
         # Preprocessed data elaboration
         bibrecdocs = BibRecDocs(rec_id)
 
-        ## Let's pre-download all the URLs to see if, in case of mode 'correct'
+        ## Let's pre-download all the URLs to see if, in case of mode 'correct' or 'append'
         ## we can avoid creating a new revision.
         for docname, (doctype, newname, restriction, version, urls) in docs.items():
             downloaded_urls = []
             try:
-                bibdoc = bibrecdocs.get_docname(docname)
+                bibdoc = bibrecdocs.get_bibdoc(docname)
             except InvenioWebSubmitFileError:
                 ## A bibdoc with the given docname does not exists.
                 ## So there is no chance we are going to revise an existing
@@ -1263,15 +1263,23 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
                 if url:
                     try:
                         downloaded_url = download_url(url, format)
-                        downloaded_urls.append((downloaded_url, format, description, comment, flags))
+                        write_message("%s saved into %s" % (url, downloaded_url), verbose=9)
                     except Exception, err:
                         write_message("Error in downloading '%s' because of: %s" % (url, err), stream=sys.stderr)
                         raise
                     if mode == 'correct' and bibdoc is not None and not new_revision_needed:
+                        downloaded_urls.append((downloaded_url, format, description, comment, flags))
                         if not bibdoc.check_file_exists(downloaded_url):
                             new_revision_needed = True
                         else:
                             write_message("WARNING: %s is already attached to bibdoc %s for recid %s" % (url, docname, rec_id), stream=sys.stderr)
+                    elif mode == 'append' and bibdoc is not None:
+                        if not bibdoc.check_file_exists(downloaded_url):
+                            downloaded_urls.append((downloaded_url, format, description, comment, flags))
+                        else:
+                            write_message("WARNING: %s is already attached to bibdoc %s for recid %s" % (url, docname, rec_id), stream=sys.stderr)
+                    else:
+                        downloaded_urls.append((downloaded_url, format, description, comment, flags))
                 else:
                     downloaded_urls.append(('', format, description, comment, flags))
             if mode == 'correct' and bibdoc is not None and not new_revision_needed:
@@ -1282,9 +1290,15 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
                 docs[docname] = (doctype, newname, restriction, version, [('', format, description, comment, flags) for (dummy, format, description, comment, flags) in downloaded_urls])
                 for downloaded_url, dummy, dummy, dummy, dummy in downloaded_urls:
                     ## Let's free up some space :-)
-                    os.remove(downloaded_url)
+                    if downloaded_url and os.path.exists(downloaded_url):
+                        os.remove(downloaded_url)
             else:
-                docs[docname] = (doctype, newname, restriction, version, downloaded_urls)
+                if downloaded_urls or mode != 'append':
+                    docs[docname] = (doctype, newname, restriction, version, downloaded_urls)
+                else:
+                    ## In case we are in append mode and there are no urls to append
+                    ## we discard the whole FFT
+                    del docs[docname]
 
         if mode == 'replace': # First we erase previous bibdocs
             if not pretend:

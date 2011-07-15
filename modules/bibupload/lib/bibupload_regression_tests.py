@@ -2995,7 +2995,7 @@ allow any</subfield>
         self._test_bibdoc_status(recid, 'site_logo', '')
 
     def test_fft_correct_already_exists(self):
-        """bibupload - FFT correct with already existing file"""
+        """bibupload - FFT correct with already identical existing file"""
         # define the test case:
         test_to_upload = """
         <record>
@@ -3143,6 +3143,98 @@ allow any</subfield>
         self.failUnless(bibrecdocs.get_bibdoc('rss').list_versions(), [1, 2])
         self.failUnless(bibrecdocs.get_bibdoc('site_logo').list_versions(), [1])
         self.failUnless(bibrecdocs.get_bibdoc('line').list_versions(), [1, 2])
+
+    def test_fft_append_already_exists(self):
+        """bibupload - FFT append with already identical existing file"""
+        # define the test case:
+        test_to_upload = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
+          <subfield code="d">a description</subfield>
+         </datafield>
+        </record>
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
+        test_to_append = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
+          <subfield code="d">a second description</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%(siteurl)s/img/help.png</subfield>
+          <subfield code="n">site_logo</subfield>
+          <subfield code="d">another second description</subfield>
+         </datafield>
+        </record>
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
+
+        testrec_expected_xm = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.gif</subfield>
+          <subfield code="y">a description</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(siteurl)s/record/123456789/files/site_logo.png</subfield>
+          <subfield code="y">another second description</subfield>
+         </datafield>
+        </record>
+        """ % { 'siteurl': CFG_SITE_URL}
+        testrec_expected_hm = """
+        001__ 123456789
+        003__ SzGeCERN
+        100__ $$aTest, John$$uTest University
+        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.gif$$ya description
+        8564_ $$u%(siteurl)s/record/123456789/files/site_logo.png$$yanother second description
+        """ % { 'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/site_logo.gif" \
+            % {'siteurl': CFG_SITE_URL}
+        testrec_expected_url2 = "%(siteurl)s/record/123456789/files/site_logo.png" \
+            % {'siteurl': CFG_SITE_URL}
+        # insert test record:
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
+        # replace test buffers with real recid of inserted test record:
+        testrec_expected_xm = testrec_expected_xm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_hm = testrec_expected_hm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_url = testrec_expected_url.replace('123456789',
+                                                          str(recid))
+        test_to_append = test_to_append.replace('123456789',
+                                                          str(recid))
+        # correct test record with new FFT:
+        recs = bibupload.xml_marc_to_records(test_to_append)
+        bibupload.bibupload(recs[0], opt_mode='append')
+
+        # compare expected results:
+        inserted_xm = print_record(recid, 'xm')
+        inserted_hm = print_record(recid, 'hm')
+        self.failUnless(try_url_download(testrec_expected_url))
+        self.failUnless(try_url_download(testrec_expected_url2))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
+
+        bibrecdocs = BibRecDocs(recid)
 
     def test_fft_implicit_fix_marc(self):
         """bibupload - FFT implicit FIX-MARC"""
@@ -3576,7 +3668,8 @@ allow any</subfield>
           <subfield code="r">Restricted</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/okay.gif</subfield>
+          <subfield code="n">site_logo</subfield>
           <subfield code="f">.jpeg</subfield>
           <subfield code="d">Try jpeg</subfield>
           <subfield code="z">Comment jpeg</subfield>
@@ -3590,7 +3683,8 @@ allow any</subfield>
         <record>
         <controlfield tag="001">123456789</controlfield>
          <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
+          <subfield code="a">%(siteurl)s/img/loading.gif</subfield>
+          <subfield code="n">site_logo</subfield>
           <subfield code="m">patata</subfield>
           <subfield code="f">.gif</subfield>
           <subfield code="r">New restricted</subfield>
