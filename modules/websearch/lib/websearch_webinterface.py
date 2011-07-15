@@ -225,9 +225,9 @@ class WebInterfaceUnAPIPages(WebInterfaceDirectory):
 class WebInterfaceRecordPages(WebInterfaceDirectory):
     """ Handling of a /CFG_SITE_RECORD/<recid> URL fragment """
 
-    _exports = ['', 'files', 'reviews', 'comments', 'usage',
-                'references', 'export', 'citations', 'holdings', 'edit',
-                'keywords', 'multiedit', 'merge', 'plots', 'linkbacks']
+    _exports = ['', 'files', 'reviews', 'comments', 'usage', 'references',
+                'export', 'citations', 'holdings', 'edit', 'keywords',
+                'multiedit', 'merge', 'plots', 'linkbacks', 'hepdata']
 
     #_exports.extend(output_formats)
 
@@ -245,6 +245,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         self.holdings = WebInterfaceHoldingsPages(self.recid)
         self.citations = self
         self.plots = self
+        self.hepdata = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
         self.edit = WebInterfaceEditPages(self.recid)
         self.merge = WebInterfaceMergePages(self.recid)
@@ -258,6 +259,8 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         argd['recid'] = self.recid
 
         argd['tab'] = self.tab
+
+        # do we really enter here ?
 
         if self.format is not None:
             argd['of'] = self.format
@@ -330,9 +333,9 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
     """ Handling of a /record-restricted/<recid> URL fragment """
 
-    _exports = ['', 'files', 'reviews', 'comments', 'usage',
-                'references', 'export', 'citations', 'holdings', 'edit',
-                'keywords', 'multiedit', 'merge', 'plots', 'linkbacks']
+    _exports = ['', 'files', 'reviews', 'comments', 'usage', 'references',
+                'export', 'citations', 'holdings', 'edit', 'keywords',
+                'multiedit', 'merge', 'plots', 'linkbacks', 'hepdata']
 
     #_exports.extend(output_formats)
 
@@ -354,8 +357,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         self.edit = WebInterfaceEditPages(self.recid)
         self.merge = WebInterfaceMergePages(self.recid)
         self.linkbacks = WebInterfaceRecordLinkbacksPages(self.recid)
-
-        return
+        self.hepdata = self
 
     def __call__(self, req, form):
         argd = wash_search_urlargd(form)
@@ -737,7 +739,8 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             try:
                 if path[1] in ['', 'files', 'reviews', 'comments', 'usage',
                                'references', 'citations', 'holdings', 'edit',
-                               'keywords', 'multiedit', 'merge', 'plots', 'linkbacks']:
+                               'keywords', 'multiedit', 'merge', 'plots',
+                               'linkbacks', 'hepdata']:
                     tab = path[1]
                 elif path[1] == 'export':
                     tab = ''

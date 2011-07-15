@@ -789,6 +789,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/miscutil/bin/dbexec \
      modules/miscutil/bin/inveniocfg \
      modules/miscutil/bin/plotextractor \
+     modules/miscutil/bin/hepdataharvest \
      modules/miscutil/demo/Makefile \
      modules/miscutil/doc/Makefile \
      modules/miscutil/doc/hacking/Makefile \

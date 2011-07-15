@@ -1,0 +1,6 @@
+<name>Detailed HEPDATA dataset</name>
+<description>This is the default HTML detailed format for HEPData dataset records.</description>
+
+<BFE_HEPDATA_PARENTS prefix="" suffix="" default="" escape="" />
+
+<BFE_HEPDATA_TABLE prefix="" suffix="" default="" escape="" />

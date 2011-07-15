@@ -4507,6 +4507,25 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                       tabs,
                                                                                       ln))
 
+                    elif tab == 'hepdata':
+                        req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
+                                                                                   tabs,
+                                                                                   ln, include_jquery = True,
+                                                                                   include_mathjax = True))
+                        from invenio import hepdatautils
+                        from invenio import hepdatadisplayutils
+                        data = hepdatautils.retrieve_data_for_record(recIDs[irec])
+                        heplink = hepdatadisplayutils.get_hepdata_link(recIDs[irec])
+
+                        if data:
+                            content = websearch_templates.tmpl_record_hepdata(data, recIDs[irec], True)
+                        else:
+                            content = websearch_templates.tmpl_record_no_hepdata()
+
+                        req.write(content)
+                        req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
+                                                                                      tabs,
+                                                                                      ln))
                     else:
                         # Metadata tab
                         req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],

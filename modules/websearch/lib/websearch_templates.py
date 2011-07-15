@@ -63,7 +63,10 @@ from invenio.config import \
      CFG_WEBSEARCH_SHOW_COMMENT_COUNT, \
      CFG_WEBSEARCH_SHOW_REVIEW_COUNT, \
      CFG_SITE_RECORD, \
-     CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT
+     CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
+     CFG_HEPDATA_URL, \
+     CFG_HEPDATA_PLOTSIZE
+
 from invenio.search_engine_config import CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT
 from invenio.websearch_services import \
      CFG_WEBSEARCH_MAX_SEARCH_COLL_RESULTS_TO_PRINT
@@ -83,6 +86,9 @@ from invenio.websearch_external_collections_utils import get_collection_id
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 from invenio.search_engine_utils import get_fieldvalues
 
+import sys
+
+from invenio import hepdatadisplayutils
 _RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
 _RE_SPACES = re.compile(r"\s+")
 
@@ -3907,6 +3913,41 @@ class Template:
                     'back': create_html_link(wlq, {}, _("Back to search"), {'class': "moreinfo"})}
         return out
 
+    def tmpl_record_hepdata(self, data, recid, isLong=True):
+        """ Generate a page for HepData records
+        """
+        c = []
+
+        c.append("<div style=\"background-color: #ecece0;\">")
+        c.append("<div style=\"background-color: #ececec;\">")
+        c.append("<h3>This data comes from the <a href=\"%s\">Durham HepData project</a></h3>" % ("http://hepdata.cedar.ac.uk/view/ins%s" % (str(recid), ), ));
+        c.append("<h3>Summary:</h3>")
+        c.append("""<div class="hepdataSummary">%s</div>""" % (data.comment, ))
+
+        if data.systematics and data.systematics.strip() != "":
+            c.append("<h3>Systematic data: </h3>")
+            c.append(data.systematics)
+            c.append("</div>")
+
+        if data.additional_data_links:
+            c.append("<h3>Additional data:</h3>")
+            for link in data.additional_data_links:
+                if "href" in link and "description" in link:
+                    c.append("<a href=\"%s/%s\">%s</a><br>" % (CFG_HEPDATA_URL, link["href"], link["description"]))
+
+        seq = 0
+
+        for dataset in data.datasets:
+            seq += 1
+            c.append(hepdatadisplayutils.render_hepdata_dataset_html(dataset, recid, seq))
+
+        c.append("</div>")
+
+        return "\n".join(c)
+
+    def tmpl_record_no_hepdata(self):
+        return "This record does not have HEP data associated"
+
     def tmpl_record_plots(self, recID, ln):
         """
           Displays little tables containing the images and captions contained in the specified document.
@@ -3932,6 +3973,13 @@ class Template:
         for fld in flds:
             image = field_get_subfield_values(fld, 'u')
             caption = field_get_subfield_values(fld, 'y')
+            data_urls = field_get_subfield_values(fld, 'z')
+            if type(data_urls) == list and len(data_urls) > 0:
+                data_urls = str(data_urls[0])
+                if data_urls.startswith("HEPDATA:"):
+                    data_urls = data_urls[8:].split(";")
+                else:
+                    data_urls = []
 
             if type(image) == list and len(image) > 0:
                 image = image[0]
@@ -3947,21 +3995,32 @@ class Template:
                 continue
 
             if len(caption) >= 5:
-                images.append((int(caption[:5]), image, caption[5:]))
+                images.append((int(caption[:5]), image, caption[5:], data_urls))
             else:
                 # we don't have any idea of the order... just put it on
-                images.append(99999, image, caption)
+                images.append(99999, image, caption, data_urls)
 
         images = sorted(images, key=lambda x: x[0])
 
-        for (index, image, caption) in images:
+        for (index, image, caption, data_urls) in images:
             # let's put everything in nice little subtables with the image
             # next to the caption
+            data_string_list = []
+            seq_num = 1
+
+            for data_url in data_urls:
+                val = ""
+                if len(data_urls) > 1:
+                    val = " %i" % seq_num
+                data_string_list.append("<br><a href=\"%s\">Data%s</a>" % (str(data_url), val))
+                seq_num += 1
+
+            data_string = "".join(data_string_list)
             out = out + '<table width="95%" style="display: inline;">' + \
                  '<tr><td width="66%"><a name="' + str(index) + '" ' + \
                  'href="' + image + '">' + \
                  '<img src="' + image + '" width="95%"/></a></td>' + \
-                 '<td width="33%">' + caption + '</td></tr>' + \
+                 '<td width="33%">' + caption +  data_string + '</td></tr>' + \
                  '</table>'
 
         out = out + '<br /><br />'

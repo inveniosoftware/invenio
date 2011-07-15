@@ -94,7 +94,10 @@ pylib_DATA = __init__.py \
              memoiseutils.py \
              memoiseutils_unit_tests.py \
              crossrefutils.py \
-             containerutils.py
+             containerutils.py \
+             hepdatautils.py \
+             hepdatadisplayutils.py \
+             hepdatautils_unit_tests.py
 
 jsdir=$(localstatedir)/www/js
 

@@ -58,6 +58,12 @@ from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
 from invenio.bibauthorid_backinterface import update_personID_external_ids
 
 
+# Imports related to hepnames update form
+from invenio.bibedit_utils import get_bibrecord
+from invenio.bibrecord import record_get_field_value, record_get_field_values, \
+                              record_get_field_instances, field_get_subfield_values
+
+
 TEMPLATE = load('bibauthorid')
 
 class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
@@ -73,7 +79,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         /person/export
         /person/claimstub
     """
-    _exports = ['', 'action', 'welcome', 'search', 'you', 'export', 'tickets_admin', 'claimstub']
+    _exports = ['', 'action', 'welcome', 'search', 'you', 'export', 'tickets_admin', 'claimstub', 'update']
 
 
     def __init__(self, person_id=None):
@@ -999,6 +1005,18 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             return bibref_check_required
 
         for t in ticket:
+            #FIXME: Net to catch a bug! It happens that self._ticket_review_bibref_check(req) return ""
+            #even if a ticket exists such that bibref is not table:ref,rec but only rec.
+            #Did not manage to reproduce in controlled conditions and exception dump does not include
+            #enough information, needs debug info dump in order to be fixable. This performs the dump,
+            #so we know what to look for.
+            if not webapi.is_valid_bibref(t['bibref']):
+                import pickle,datetime
+                date=str(datetime.datetime.now()).replace(" ",'.')
+                o = open("/tmp/BibAuthorID-temporary-dbg-%s" %date,'w')
+                pickle.dump(session,o)
+                o.close()
+
             t['status'] = webapi.check_transaction_permissions(uid,
                                                                t['bibref'],
                                                                t['pid'],
@@ -2084,7 +2102,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             req=req,
             language=ln)
 
-
     def _ticket_open_assign_to_other_person(self, req, bibrefs, form):
         '''
         Initializes search to find a person to attach the selected records to
@@ -2426,6 +2443,72 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                     body=body,
                     req=req,
                     language=ln)
+
+    def update(self, req, form):
+        """
+        Generate hepnames update form
+        """
+        argd = wash_urlargd(form,
+                            {'ln': (str, CFG_SITE_LANG),
+                             'email': (str, ''),
+                             'IRN': (str, ''),
+                            })
+        # Retrieve info for HEP name based on email or IRN
+        recids = []
+        if argd['email']:
+            recids = perform_request_search(p="371__m:%s" % argd['email'], cc="HepNames")
+        elif argd['IRN']:
+            recids = perform_request_search(p="001:%s" % argd['IRN'], cc="HepNames")
+        else:
+            redirect_to_url(req, "%s/collection/HepNames" % (CFG_SITE_URL))
+
+        if not recids:
+            redirect_to_url(req, "%s/collection/HepNames" % (CFG_SITE_URL))
+        else:
+            hepname_bibrec = get_bibrecord(recids[0])
+
+        # Extract all info from recid that should be included in the form
+        full_name = record_get_field_value(hepname_bibrec, tag="100", ind1="", ind2="", code="a")
+        display_name = record_get_field_value(hepname_bibrec, tag="880", ind1="", ind2="", code="a")
+        email = record_get_field_value(hepname_bibrec, tag="371", ind1="", ind2="", code="m")
+        status = record_get_field_value(hepname_bibrec, tag="100", ind1="", ind2="", code="g")
+        keynumber = record_get_field_value(hepname_bibrec, tag="970", ind1="", ind2="", code="a")
+        try:
+            keynumber = keynumber.split('-')[1]
+        except IndexError:
+            pass
+        research_field_list = record_get_field_values(hepname_bibrec, tag="650", ind1="1", ind2="7", code="a")
+        institution_list = []
+        for instance in record_get_field_instances(hepname_bibrec, tag="371", ind1="", ind2=""):
+            if not instance or field_get_subfield_values(instance, "m"):
+                continue
+            institution_info = ["", "", "", "", ""]
+            if field_get_subfield_values(instance, "a"):
+                institution_info[0] = field_get_subfield_values(instance, "a")[0]
+            if field_get_subfield_values(instance, "r"):
+                institution_info[1] = field_get_subfield_values(instance, "r")[0]
+            if field_get_subfield_values(instance, "s"):
+                institution_info[2] = field_get_subfield_values(instance, "s")[0]
+            if field_get_subfield_values(instance, "t"):
+                institution_info[3] = field_get_subfield_values(instance, "t")[0]
+            if field_get_subfield_values(instance, "z"):
+                institution_info[4] = field_get_subfield_values(instance, "z")[0]
+            institution_list.append(institution_info)
+        phd_advisor_list = record_get_field_values(hepname_bibrec, tag="701", ind1="", ind2="", code="a")
+        experiment_list = record_get_field_values(hepname_bibrec, tag="693", ind1="", ind2="", code="e")
+        web_page = record_get_field_value(hepname_bibrec, tag="856", ind1="1", ind2="", code="u")
+
+        # Create form and pass as parameters all the content from the record
+        body = TEMPLATE.tmpl_update_hep_name(full_name, display_name, email,
+                                             status, research_field_list,
+                                             institution_list, phd_advisor_list,
+                                             experiment_list, web_page, keynumber)
+        title = "HEPNames"
+        return page(title=title,
+                    metaheaderadd = TEMPLATE.tmpl_update_hep_name_headers(),
+                    body=body,
+                    req=req,
+                    )
 
     def welcome(self, req, form):
         '''

@@ -48,6 +48,7 @@ from invenio.dateutils import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
 from invenio.bibformat import format_record
 from invenio import template
+from invenio.htmlutils import get_mathjax_header
 websearch_templates = template.load('websearch')
 
 class Template:
@@ -304,7 +305,12 @@ class Template:
 
           - HTML code of the page headers
         """
+        # Including HEPData headers ( Ugly hack but no obvious way to avoid this ...)
 
+        hepDataAdditions = """<script type="text/javascript" src="%s/js/hepdata.js"></script>""" \
+            % (CFG_SITE_URL, )
+        hepDataAdditions += """<link rel="stylesheet" href="%s/img/hepdata.css" type="text/css" />""" \
+            % (CFG_SITE_URL, )
         # load the right message language
         _ = gettext_set_language(ln)
 
@@ -371,6 +377,7 @@ template function generated it.
  <link rel="search" type="application/opensearchdescription+xml" href="%(siteurl)s/opensearchdescription" title="%(sitename)s" />
  <link rel="unapi-server" type="application/xml" title="unAPI" href="%(unAPIurl)s" />
  %(linkbackTrackbackLink)s
+ %(hepDataAdditions)s
  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
  <meta http-equiv="Content-Language" content="%(ln)s" />
  <meta name="description" content="%(description)s" />
@@ -481,6 +488,7 @@ template function generated it.
           'msg_help' : _("Help"),
           'unAPIurl' : cgi.escape('%s/unapi' % CFG_SITE_URL),
           'linkbackTrackbackLink': headerLinkbackTrackbackLink,
+          'hepDataAdditions': hepDataAdditions,
           'inspect_templates_message' : inspect_templates_message
         }
         return out
@@ -755,7 +763,8 @@ URI: http://%(host)s%(page)s
                                       show_similar_rec_p=True,
                                       creationdate=None,
                                       modificationdate=None, show_short_rec_p=True,
-                                      citationnum=-1, referencenum=-1, discussionnum=-1):
+                                      citationnum=-1, referencenum=-1, discussionnum=-1,
+                                      include_jquery = False, include_mathjax = False):
         """Prints the box displayed in detailed records pages, with tabs at the top.
 
         Returns content as it is if the number of tabs for this record
@@ -846,9 +855,18 @@ URI: http://%(host)s%(page)s
                          <div style="clear:both;height:1px">&nbsp;</div>
                          ''' % {'record_brief': record_brief}
 
+        additional_scripts = ""
+        if include_jquery:
+            additional_scripts += """<script type="text/javascript" src="%s/js/jquery.min.js">' \
+            '</script>\n""" % (CFG_SITE_URL, )
+        if include_mathjax:
+
+            additional_scripts += get_mathjax_header()
+
+
         # Print the content
         out = """
-    <div class="detailedrecordbox">
+        %(additional_scripts)s<div class="detailedrecordbox">
         %(tabs)s
         <div class="detailedrecordboxcontent">
             <div class="top-left-folded"></div>
@@ -857,7 +875,8 @@ URI: http://%(host)s%(page)s
                 <!--<div style="height:0.1em;">&nbsp;</div>
                 <p class="notopgap">&nbsp;</p>-->
                 %(record_brief)s
-                """ % {'tabs':out_tabs,
+                """ % {'additional_scripts': additional_scripts,
+                       'tabs':out_tabs,
                        'record_brief':record_brief}
 
         out = restriction_flag + out
