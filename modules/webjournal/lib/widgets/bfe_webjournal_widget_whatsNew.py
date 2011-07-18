@@ -151,9 +151,9 @@ def format_element(bfo, latest_issue_only='yes', newest_articles_only='yes',
                                               'category': category,
                                               'recid': '',
                                               'ln': bfo.lang})
-                html_out += '" class="whatsNewCategory">%s</a>' % category
+                html_out += '" class="whatsNewCategory">%s</a>' % _(category)
             else:
-                html_out += '<span class="whatsNewCategory">%s</span>' % category
+                html_out += '<span class="whatsNewCategory">%s</span>' % _(category)
 
             html_out += '<ul class="whatsNewItem">'
             html_out += html_articles_in_category
