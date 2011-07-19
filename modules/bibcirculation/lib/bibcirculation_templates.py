@@ -7094,7 +7094,7 @@ class Template:
 
         out += """
            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-           <form name="update_item_info_step4_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step5" method="get" >
+           <form name="update_item_info_step4_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step6" method="get" >
            <div class="bibcircbottom">
                 <br />
                      <table class="bibcirctable">
@@ -7162,7 +7162,7 @@ class Template:
                <tr>
                  <th width="100">%s</th>
                  <td>
-                   <select name="library"  style='border: 1px solid #cfcfcf'>
+                   <select name="library_id"  style='border: 1px solid #cfcfcf'>
 
                 """ % (_("Update copy information"),
                        _("Barcode"), result[0], result[0],
@@ -7350,7 +7350,7 @@ class Template:
                       <option value = "Video & Trainings">Video & Trainings</option>
                    """
 
-        elif result[3] == 'Standarts':
+        elif result[3] == 'Standards':
             out += """
                       <option value = "Monography">Monography</option>
                       <option value = "Reference">Reference</option>
