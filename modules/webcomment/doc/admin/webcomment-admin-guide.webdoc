@@ -110,7 +110,7 @@ It is possible to enable LaTeX rendering in comments with the MathJax module. In
 Replies to comments can be organized in threads. It is possible to
 configure the maximum depth of the threads with
 the <code>CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH</code> variable in
-the <code>webcomment_config.py</code> file. <br/>
+the <code>invenio-local.conf</code> file. <br/>
 Set <code>CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH = -1</code> to not limit the depth.<br/>
 Set <code>CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH = 0</code> for a "flat" discussion.<br/>
 Set <code>CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH = 1</code> for one-level deep threads (<b>default</b>)<br/>
@@ -334,7 +334,7 @@ commented record must specify the name of the current group to which new
 comments have to be attached. The MARC field specifying the round "name"
 can be configured with
 the <code>CFG_WEBCOMMENT_ROUND_DATAFIELD</code> of
-the <code>webcomment_config.py</code> file. There you can set the MARC code
+the <code>invenio-local.conf</code> file. There you can set the MARC code
 that contains the round name, for each collection you want to enable rounds.
 </p>
 
@@ -383,7 +383,7 @@ submitting a comment, WebComment checks in the record metadata if some
 restriction should be applied. The field where WebComment is looking
 for restrictions can be configured in the
 the <code>CFG_WEBCOMMENT_RESTRICTION_DATAFIELD</code> of
-the <code>webcomment_config.py</code> file. There you can define for each
+the <code>invenio-local.conf</code> file. There you can define for each
 collection the MARC code containing the restriction information.
 </p>
 <p>
@@ -416,7 +416,7 @@ default no user (except admin) can attach files.</p>
 <p>
 In addition, you can configure the maximum number of allowed attachments with the
 <code>CFG_WEBCOMMENT_MAX_ATTACHED_FILES</code> (default 5) variable of
-the the <code>webcomment_config.py</code>
+the the <code>invenio-local.conf</code>
 file. Set <code>CFG_WEBCOMMENT_MAX_ATTACHED_FILES = 0</code> for
 unlimited number of files.<br/>
 Note that this is only applicable only if you installed the jQuery plugins
@@ -426,7 +426,7 @@ with <code>make install-jquery-plugins</code>.
 <p>
 You can set up the maximum size (in bytes) of attachments with
 the <code>CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE</code> variable of the
-the <code>webcomment_config.py</code> file.
+the <code>invenio-local.conf</code> file.
 </p>
 
 <a name="3.7"></a><h3>3.7 Configuring email notifications</h3>
@@ -443,6 +443,6 @@ document.
 WebComment checks for automatic notifications of comments in the MARC
 record.  It specifically looks for emails in fields defined by
 the <code>CFG_WEBCOMMENT_EMAIL_REPLIES_TO</code> variable of the
-the <code>webcomment_config.py</code> file. There you can define
+the <code>invenio-local.conf</code> file. There you can define
 the fields to look for for specific collections.
 </p>

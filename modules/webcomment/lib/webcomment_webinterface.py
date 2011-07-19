@@ -46,7 +46,9 @@ from invenio.config import \
      CFG_WEBCOMMENT_ALLOW_COMMENTS,\
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
      CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS, \
-     CFG_SITE_RECORD
+     CFG_SITE_RECORD, \
+     CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE, \
+     CFG_WEBCOMMENT_MAX_ATTACHED_FILES
 from invenio.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.search_engine import create_navtrail_links, \
@@ -67,8 +69,6 @@ from invenio.access_control_mailcookie import \
      InvenioWebAccessMailCookieDeletedError, \
      InvenioWebAccessMailCookieError
 from invenio.webcomment_config import \
-     CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE, \
-     CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
      InvenioWebCommentError, \
      InvenioWebCommentWarning
 import invenio.template

@@ -46,7 +46,11 @@ from invenio.config import CFG_PREFIX, \
      CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,\
      CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS,\
      CFG_WEBCOMMENT_DEFAULT_MODERATOR, \
-     CFG_SITE_RECORD
+     CFG_SITE_RECORD, \
+     CFG_WEBCOMMENT_EMAIL_REPLIES_TO, \
+     CFG_WEBCOMMENT_ROUND_DATAFIELD, \
+     CFG_WEBCOMMENT_RESTRICTION_DATAFIELD, \
+     CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH
 from invenio.webmessage_mailutils import \
      email_quote_txt, \
      email_quoted_txt2html
@@ -60,10 +64,6 @@ from invenio.errorlib import register_exception
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument
 from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE, \
-     CFG_WEBCOMMENT_EMAIL_REPLIES_TO, \
-     CFG_WEBCOMMENT_ROUND_DATAFIELD, \
-     CFG_WEBCOMMENT_RESTRICTION_DATAFIELD, \
-     CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH, \
      InvenioWebCommentError, \
      InvenioWebCommentWarning
 from invenio.access_control_engine import acc_authorize_action
