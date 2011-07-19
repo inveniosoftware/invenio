@@ -1928,7 +1928,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
 
     for idx_unit in xrange(len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
-        if len(bsu_f) < 2 and not bsu_f == '':
+        if bsu_f and len(bsu_f) < 2:
             if of.startswith("h"):
                 print_warning(req, _("There is no index %s.  Searching for %s in all fields." % (bsu_f, bsu_p)))
             bsu_f = ''
@@ -2421,19 +2421,19 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
                 # wildcard query, or only the beginning of field 't'
                 # is defined, so add wildcard character:
                 query += " AND bx.tag LIKE %s"
-                query_params = query_params + (t + '%',)
+                query_params_and_tag = query_params + (t + '%',)
             else:
                 # exact query for 't':
                 query += " AND bx.tag=%s"
-                query_params = query_params + (t,)
+                query_params_and_tag = query_params + (t,)
             if use_query_limit:
                 try:
-                    res = run_sql_with_limit(query, query_params, wildcard_limit=wl)
+                    res = run_sql_with_limit(query, query_params_and_tag, wildcard_limit=wl)
                 except InvenioDbQueryWildcardLimitError, excp:
                     res = excp.res
                     limit_reached = 1 # set the limit reached flag to true
             else:
-                res = run_sql(query, query_params)
+                res = run_sql(query, query_params_and_tag)
         # fill the result set:
         for id_bibrec in res:
             if id_bibrec[0]:
