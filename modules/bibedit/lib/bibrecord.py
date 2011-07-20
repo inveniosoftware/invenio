@@ -1085,6 +1085,8 @@ def record_order_subfields(rec, tag=None):
     @param tag: tag where the subfields will be ordered
     @type tag: string
     """
+    if rec is None:
+        return rec
     if tag is None:
         tags = rec.keys()
         for tag in tags:
