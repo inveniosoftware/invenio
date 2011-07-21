@@ -21,7 +21,7 @@ config.toolbar_WebComment = [
 			     ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
 			     ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote'],
 			     ['Link','Unlink'],
-                             ['HorizontalRule','Smiley','SpecialChar']
+                             ['HorizontalRule','Smiley','SpecialChar','ScientificChar']
 			     ];
 
 config.skin = 'v2';
@@ -41,4 +41,6 @@ config.contentsCss = ['/img/invenio.css', '/ckeditor/invenio-ckeditor-content.cs
 */
 config.enterMode = CKEDITOR.ENTER_BR;
 
+/* Load our Scientific Characters panel */
+config.extraPlugins = 'scientificchar';
 }

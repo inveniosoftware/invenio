@@ -707,6 +707,9 @@ AC_CONFIG_FILES([config.nice  \
      modules/miscutil/etc/Makefile \
      modules/miscutil/etc/bash_completion.d/Makefile \
      modules/miscutil/etc/bash_completion.d/inveniocfg \
+     modules/miscutil/etc/ckeditor_scientificchar/Makefile \
+     modules/miscutil/etc/ckeditor_scientificchar/dialogs/Makefile \
+     modules/miscutil/etc/ckeditor_scientificchar/lang/Makefile \
      modules/miscutil/lib/Makefile \
      modules/miscutil/sql/Makefile \
      modules/miscutil/web/Makefile \
