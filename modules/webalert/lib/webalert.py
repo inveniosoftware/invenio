@@ -385,3 +385,26 @@ def perform_request_youralerts_popular(ln=CFG_SITE_LANG):
 
     return webalert_templates.tmpl_youralerts_popular(ln = ln,
                                                        search_queries = search_queries)
+
+def count_user_alerts_for_given_query(id_user,
+                                      id_query):
+    """
+    Count the alerts the user has defined based on a specific query.
+
+    @param user_id: The user id.
+    @type user_id: integer
+
+    @param user_id: The query id.
+    @type user_id: integer
+
+    @return: The number of alerts.
+    """
+
+    query = """ SELECT  COUNT(id_query)
+                FROM    user_query_basket AS uqb
+                WHERE   id_user=%s
+                    AND id_query=%s"""
+    params = (id_user, id_query)
+    result = run_sql(query, params)
+
+    return result[0][0]
