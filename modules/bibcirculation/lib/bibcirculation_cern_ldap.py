@@ -71,7 +71,7 @@ def get_user_info_from_ldap(nickname="", email="", ccid=""):
 
     try:
 
-        filter = "(& (| (employeetype=primary) (employeetype=external) ) %s )" % query
+        filter = "(& %s (| (employeetype=primary) (employeetype=external) ) )" % query
         result = connection.search_st(CFG_CERN_LDAP_BASE, ldap.SCOPE_SUBTREE,
                                       filter, timeout=5)
         if result and nickname:
