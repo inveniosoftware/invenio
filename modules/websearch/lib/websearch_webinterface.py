@@ -1213,14 +1213,17 @@ class WebInterfaceYourSearchesPages(WebInterfaceDirectory):
     def index(self, req, form):
         """
         """
-        redirect_to_url(req, '%s/yoursearches/display' % CFG_SITE_URL)
+        redirect_to_url(req, '%s/yoursearches/display' % CFG_SITE_SECURE_URL)
 
     def display(self, req, form):
         """
         Display the user's search latest history.
         """
 
-        argd = wash_urlargd(form, {'ln': (str, "en")})
+        argd = wash_urlargd(form, {'ln':    (str, 'en'),
+                                   'page':  (int, 1),
+                                   'step':  (int, 20),
+                                   'p':  (str, '')})
 
         uid = getUid(req)
 
@@ -1229,14 +1232,14 @@ class WebInterfaceYourSearchesPages(WebInterfaceDirectory):
 
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/yoursearches/display" % \
-                                            (CFG_SITE_URL,),
+                                            (CFG_SITE_SECURE_URL,),
                                        navmenuid="yoursearches")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % \
                                         (CFG_SITE_SECURE_URL,
                                          make_canonical_urlargd(
                                             {'referer' : "%s/yoursearches/display%s" % (
-                                                CFG_SITE_URL,
+                                                CFG_SITE_SECURE_URL,
                                                 make_canonical_urlargd(argd, {})),
                                              'ln' : argd['ln']},
                                             {})
@@ -1260,7 +1263,11 @@ class WebInterfaceYourSearchesPages(WebInterfaceDirectory):
                 suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
         return page(title=_("Your Searches"),
-                    body=perform_request_yoursearches_display(uid, ln=argd['ln']),
+                    body=perform_request_yoursearches_display(uid,
+                                                              page=argd['page'],
+                                                              step=argd['step'],
+                                                              p=argd['p'],
+                                                              ln=argd['ln']),
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
                                  'sitesecureurl' : CFG_SITE_SECURE_URL,
                                  'ln': argd['ln'],

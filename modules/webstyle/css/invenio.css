@@ -2568,6 +2568,7 @@ a:hover.bibMergeImgClickable img {
 	background:Yellow;
 }
 /* end of BibMerge module */
+
 /* WebAlert module */
 .alrtTable{
     border: 1px solid black;
@@ -2580,6 +2581,93 @@ a:hover.bibMergeImgClickable img {
     padding: 3px;
 }
 /* end of WebAlert module */
+
+/* WebSearch module - YourSearches */
+.websearch_yoursearches_table {
+   border: 1px solid #bbbbbb;
+}
+.websearch_yoursearches_table_header td {
+/*   background-color: #63a5cd;*/
+   background-color: #7a9bdd;
+   color: white;
+   padding: 2px;
+   font-weight: bold;
+   font-size: 75%;
+   text-transform: uppercase;
+/*   border-bottom: 1px solid #327aa5;
+   border-right: 1px solid #327aa5;*/
+   border-bottom: 1px solid #3366cc;
+   border-right: 1px solid #3366cc;
+   white-space: nowrap;
+   vertical-align: top;
+}
+.websearch_yoursearches_table_footer td {
+/*   background-color: #63a5cd;*/
+   background-color: #7a9bdd;
+   color: white;
+   padding: 5px;
+   font-size: 80%;
+   text-align: center;
+/*   border-bottom: 1px solid #327aa5;
+   border-right: 1px solid #327aa5;*/
+   border-bottom: 1px solid #3366cc;
+   border-right: 1px solid #3366cc;
+   white-space: nowrap;
+}
+.websearch_yoursearches_table_footer img {
+   border: none;
+   margin: 0px 3px;
+   vertical-align: bottom;
+}
+.websearch_yoursearches_footer a, .websearch_yoursearches_footer a:link, .websearch_yoursearches_footer a:visited, .websearch_yoursearches_footer a:active {
+   text-decoration: none;
+   color: #000;
+}
+.websearch_yoursearches_footer a:hover {
+   text-decoration: underline;
+   color: #000;
+}
+.websearch_yoursearches_footer img {
+   border: none;
+   vertical-align: bottom;
+}
+.websearch_yoursearches_table_content {
+   background-color: #f2f2fa;
+   padding: 5px;
+   text-align: left;
+   vertical-align: top;
+}
+.websearch_yoursearches_table_content_mouseover {
+   background-color: #ebebfa;
+   padding: 5px;
+   text-align: left;
+   vertical-align: top;
+}
+.websearch_yoursearches_table_counter {
+   background-color: #f2f2fa;
+   padding: 5px 2px;
+   text-align: right;
+   vertical-align: top;
+   font-size: 80%;
+   color: grey;
+}
+.websearch_yoursearches_table_content_options {
+   margin: 5px;
+   font-size: 80%;
+}
+.websearch_yoursearches_table_content_options img{
+   vertical-align: middle;
+   margin-right: 3px;
+}
+.websearch_yoursearches_table_content_options a, .websearch_yoursearches_table_content_options a:link, .websearch_yoursearches_table_content_options a:visited, .websearch_yoursearches_table_content_options a:active {
+   text-decoration: underline;
+   color: #333;
+}
+.websearch_yoursearches_table_content_options a:hover {
+   text-decoration: underline;
+   color: #000;
+}
+/* end of WebSearches module - YourSearches */
 
 /* BibClassify module */
 .bibclassify {
