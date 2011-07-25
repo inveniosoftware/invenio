@@ -3992,7 +3992,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_loans_historical_overv
                                     {'library_id': library_id},
                                     (_("Notes about this library")))
 
-        if notes == "":
+        if notes == "" or str(notes) == '{}':
             notes_link = no_notes_link
         else:
             notes_link = see_notes_link
@@ -4185,7 +4185,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_loans_historical_overv
                                     '/admin2/bibcirculation/get_library_notes',
                                     {'library_id': library_id_1},
                                     (_("Notes about this library")))
-            if notes_1 == "":
+            if notes_1 == "" or str(notes) == '{}':
                 notes_link_1 = no_notes_link_1
             else:
                 notes_link_1 = see_notes_link_1
@@ -4201,7 +4201,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_loans_historical_overv
                                     {'library_id': library_id_2},
                                     (_("Notes about this library")))
 
-            if notes_2 == "":
+            if notes_2 == "" or str(notes) == '{}':
                 notes_link_2 = no_notes_link_2
             else:
                 notes_link_2 = see_notes_link_2
@@ -4812,7 +4812,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                                     {'loan_id': loan_id, 'ln': ln},
                                     (_("See notes")))
 
-                if notes == "":
+                if notes == "" or str(notes) == '{}':
                     check_notes = no_notes_link
                 else:
                     check_notes = see_notes_link
@@ -5000,9 +5000,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                                 {'loan_id': loan_id, 'ln': ln}, (_("no notes")))
 
 
-                if notes == "":
-                    check_notes = no_notes_link
-                elif str(notes) == '{}':
+                if notes == "" or str(notes) == '{}':
                     check_notes = no_notes_link
                 else:
                     check_notes = see_notes_link
@@ -5182,9 +5180,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                                  (_("no notes")))
 
 
-                if notes == "":
-                    check_notes = no_notes_link
-                elif str(notes) == '{}':
+                if notes == "" or str(notes) == '{}':
                     check_notes = no_notes_link
                 else:
                     check_notes = see_notes_link
@@ -5456,7 +5452,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                                 '/admin2/bibcirculation/get_loans_notes',
                                {'loan_id': loan_id, 'ln': ln}, (_("See notes")))
 
-                if notes == "":
+                if notes == "" or str(notes) == '{}':
                     check_notes = no_notes_link
                 else:
                     check_notes = see_notes_link
@@ -10932,7 +10928,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                                     {'purchase_id': purchase_id},
                                     (_("See notes")))
 
-            if notes == "":
+            if notes == "" or str(notes) == '{}':
                 notes_link = no_notes_link
             else:
                 notes_link = see_notes_link
@@ -14636,7 +14632,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                                     {'vendor_id': vendor_id},
                                     (_("Notes about this vendor")))
 
-        if notes == "":
+        if notes == "" or str(notes) == '{}':
             notes_link = no_notes_link
         else:
             notes_link = see_notes_link
