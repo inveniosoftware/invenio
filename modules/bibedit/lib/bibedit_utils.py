@@ -81,11 +81,18 @@ def user_can_edit_record_collection(req, recid):
     the recid belongs to
     """
     record_collections = get_all_collections_of_a_record(recid)
-    for collection in record_collections:
+    if not record_collections:
+        # Check if user has access to all collections
         auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
-                                                       collection=collection)
+                                                       collection='')
         if auth_code == 0:
             return True
+    else:
+        for collection in record_collections:
+            auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
+                                                           collection=collection)
+            if auth_code == 0:
+                return True
     return False
 
 # Helper functions
