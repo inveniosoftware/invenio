@@ -239,7 +239,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
     def display(self, req, form):
 
-        argd = wash_urlargd(form, {})
+        argd = wash_urlargd(form, {'idq': (int, None),
+                                   })
 
         uid = getUid(req)
 
@@ -274,12 +275,13 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
             register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
         return page(title=_("Your Alerts"),
-                    body=perform_request_youralerts_display(uid, ln = argd['ln']),
-                    navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
-                                 'sitesecureurl' : CFG_SITE_SECURE_URL,
-                                 'ln': argd['ln'],
-                                 'account' : _("Your Account"),
-                              },
+                    body=perform_request_youralerts_display(uid,
+                                                            idq=argd['idq'],
+                                                            ln=argd['ln']),
+                    navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % \
+                              {'sitesecureurl' : CFG_SITE_SECURE_URL,
+                               'ln': argd['ln'],
+                               'account' : _("Your Account")},
                     description=_("%s Personalize, Display alerts") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
                     keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
                     uid=uid,

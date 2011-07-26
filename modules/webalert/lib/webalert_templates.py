@@ -19,19 +19,23 @@ __revision__ = "$Id$"
 
 import cgi
 import time
+from urlparse import parse_qs
+from datetime import date as datetime_date
 
 from invenio.config import \
      CFG_WEBALERT_ALERT_ENGINE_EMAIL, \
      CFG_SITE_NAME, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_URL, \
+     CFG_SITE_LANG, \
+     CFG_SITE_SECURE_URL, \
      CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL, \
      CFG_SITE_RECORD
 from invenio.messages import gettext_set_language
 from invenio.htmlparser import get_as_text, wrap, wrap_records
 from invenio.urlutils import create_html_link
-
 from invenio.search_engine import guess_primary_collection_of_a_record, get_coll_ancestors
+from invenio.dateutils import convert_datetext_to_datestruct
 
 class Template:
     def tmpl_errorMsg(self, ln, error_msg, rest = ""):
@@ -260,10 +264,13 @@ class Template:
     def tmpl_youralerts_display(self,
                                 ln,
                                 alerts,
+                                idq,
                                 guest,
                                 guesttxt):
         """
-        Displays the list of alerts
+        Displays an HTML formatted list of the user alerts.
+        If the user has specified a query id, only the user alerts based on that
+        query will appear.
 
         @param ln: The language to display the interface in
         @type ln: string
@@ -282,6 +289,9 @@ class Template:
             'lastrun' *string* - The last running date            
         @type alerts: list of dictionaries
 
+        @param idq: The specified query id for which to display the user alerts
+        @type idq: int
+
         @param guest: Whether the user is a guest or not
         @type guest: boolean
 
@@ -293,108 +303,153 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = '<p>' + _("Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %(x_url2_open)spopular alerts%(x_url2_close)s, or the input form.") + '</p>'
-        out %= {'x_url1_open': '<a href="' + CFG_SITE_URL + '/yoursearches/display?ln=' + ln + '">',
-                'x_url1_close': '</a>',
-                'x_url2_open': '<a href="' + CFG_SITE_URL + '/youralerts/popular?ln=' + ln + '">',
-                'x_url2_close': '</a>',
-                }
-        if len(alerts):
-            out += """<table class="alrtTable">
-                          <tr class="pageboxlefttop" style="text-align: center;">
-                            <td style="font-weight: bold">%(no)s</td>
-                            <td style="font-weight: bold">%(name)s</td>
-                            <td style="font-weight: bold">%(search_freq)s</td>
-                            <td style="font-weight: bold">%(notification)s</td>
-                            <td style="font-weight: bold">%(result_basket)s</td>
-                            <td style="font-weight: bold">%(date_run)s</td>
-                            <td style="font-weight: bold">%(date_created)s</td>
-                            <td style="font-weight: bold">%(query)s</td>
-                            <td style="font-weight: bold">%(action)s</td></tr>""" % {
-                       'no' : _("No"),
-                       'name' : _("Name"),
-                       'search_freq' : _("Search checking frequency"),
-                       'notification' : _("Notification by email"),
-                       'result_basket' : _("Result in basket"),
-                       'date_run' : _("Date last run"),
-                       'date_created' : _("Creation date"),
-                       'query' : _("Query"),
-                       'action' : _("Action"),
-                     }
-            i = 0
-            for alert in alerts:
-                i += 1
-                if alert['frequency'] == "day":
-                    frequency = _("daily")
-                else:
-                    if alert['frequency'] == "week":
-                        frequency = _("weekly")
-                    else:
-                        frequency = _("monthly")
+        # In case the user has not yet defined any alerts display only the
+        # following message
+        if not alerts:
+            if idq:
+                msg = _('You have not defined any alerts yet based on that search query.')
+                msg += "<br />"
+                msg += _('You may want to %(new_alert)s or display all %(youralerts)s.') % \
+                       {'new_alert': '<a href="%s/youralerts/input?ln=%s&amp;idq=%i">%s</a>' % (CFG_SITE_SECURE_URL, ln, idq, _('define one now')),
+                        'youralerts': '<a href="%s/youralerts/display?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('your alerts'))}
+            else:
+                msg = _('You have not defined any alerts yet.')
+                msg += '<br />'
+                msg += _('You may define new alert based on %(yoursearches)s, the %(popular_alerts)s or just by %(search_interface)s.') % \
+                       {'yoursearches': '<a href="%s/yoursearches/display?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('your searches')),
+                        'popular_alerts': '<a href="%s/youralerts/popular?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('popular alerts')),
+                        'search_interface': '<a href="%s/?ln=%s">%s</a>' %(CFG_SITE_URL, ln, _('searching for something new'))}
+            out = '<p>' + msg + '</p>'
+            return out
 
-                if alert['notification'] == "y":
-                    notification = _("yes")
-                else:
-                    notification = _("no")
+        # Diplay a message about the number of alerts.
+        if idq:
+            msg = _('You have defined %(number_of_alerts)s alerts based on that search query.') % \
+                  {'number_of_alerts': '<strong>' + str(len(alerts)) + '</strong>'}
+            msg += '<br />'
+            msg += _('You may want to %(new_alert)s or display all %(youralerts)s.') % \
+                   {'new_alert': '<a href="%s/youralerts/input?ln=%s&amp;idq=%i">%s</a>' % (CFG_SITE_SECURE_URL, ln, idq, _('define a new one')),
+                    'youralerts': '<a href="%s/youralerts/display?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('your alerts'))}
+        else:
+            msg = _('You have defined a total of %(number_of_alerts)s alerts.') % \
+                  {'number_of_alerts': '<strong>' + str(len(alerts)) + '</strong>'}
+            msg += '<br />'
+            msg += _('You may define new alert based on %(yoursearches)s, the %(popular_alerts)s or just by %(search_interface)s.') % \
+                   {'yoursearches': '<a href="%s/yoursearches/display?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('your searches')),
+                    'popular_alerts': '<a href="%s/youralerts/popular?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('popular alerts')),
+                    'search_interface': '<a href="%s/?ln=%s">%s</a>' %(CFG_SITE_URL, ln, _('searching for something new'))}
+        out = '<p>' + msg + '</p>'
 
-                # we clean up the HH:MM part of lastrun, since it is always 00:00
-                lastrun = alert['lastrun'].split(',')[0]
-                created = alert['created'].split(',')[0]
+        counter = 0
+        youralerts_display_html = ""
+        for alert in alerts:
+            counter += 1
+            alert_name = alert['alertname']
+            alert_query_id = alert['queryid']
+            alert_query_args = alert['queryargs']
+            # We don't need the text args, we'll use a local function to do a
+            # better job.
+            #alert_text_args = alert['textargs']
+            # We don't need the user id. The alerts page is a logged in user
+            # only page anyway.
+            #alert_user_id = alert['userid']
+            alert_basket_id = alert['basketid']
+            alert_basket_name = alert['basketname']
+            alert_frequency = alert['frequency']
+            alert_notification = alert['notification']
+            alert_creation_date = alert['created']
+            alert_last_run_date = alert['lastrun']
 
-                out += """<tr>
-                              <td style="font-style: italic">#%(index)d</td>
-                              <td style="font-weight: bold; text-wrap:none;">%(alertname)s</td>
-                              <td>%(frequency)s</td>
-                              <td style="text-align:center">%(notification)s</td>
-                              <td style="text-wrap:none;">%(basketname)s</td>
-                              <td style="text-wrap:none;">%(lastrun)s</td>
-                              <td style="text-wrap:none;">%(created)s</td>
-                              <td>%(textargs)s</td>
-                              <td>
-                                 %(remove_link)s<br />
-                                 %(modify_link)s<br />
-                                 <a href="%(siteurl)s/search?%(queryargs)s&amp;ln=%(ln)s" style="white-space:nowrap">%(search)s</a>
-                             </td>
-                            </tr>""" % {
-                    'index' : i,
-                    'alertname' : cgi.escape(alert['alertname']),
-                    'frequency' : frequency,
-                    'notification' : notification,
-                    'basketname' : alert['basketname'] and cgi.escape(alert['basketname']) \
-                                                       or "- " + _("no basket") + " -",
-                    'lastrun' : lastrun,
-                    'created' : created,
-                    'textargs' : alert['textargs'],
-                    'queryid' : alert['queryid'],
-                    'basketid' : alert['basketid'],
-                    'freq' : alert['frequency'],
-                    'notif' : alert['notification'],
-                    'ln' : ln,
-                    'modify_link': create_html_link("./modify",
-                                                    {'ln': ln,
-                                                     'idq': alert['queryid'],
-                                                     'name': alert['alertname'],
-                                                     'freq': frequency,
-                                                     'notif':notification,
-                                                     'idb':alert['basketid'],
-                                                     'old_idb':alert['basketid']},
-                                                    _("Modify")),
-                    'remove_link': create_html_link("./remove",
-                                                    {'ln': ln,
-                                                     'idq': alert['queryid'],
-                                                     'name': alert['alertname'],
-                                                     'idb':alert['basketid']},
-                                                    _("Remove")),
-                    'siteurl' : CFG_SITE_URL,
-                    'search' : _("Execute search"),
-                    'queryargs' : cgi.escape(alert['queryargs'])
-                  }
+            alert_details_frequency = _('Runs') + '&nbsp;' + \
+                                      (alert_frequency == 'day' and '<strong>' + _('daily') + '</strong>' or \
+                                       alert_frequency == 'week' and '<strong>' + _('weekly') + '</strong>' or \
+                                       alert_frequency == 'month' and '<strong>' + _('monthly') + '</strong>')
+            alert_details_notification = alert_notification == 'y' and _('You are notified by <strong>e-mail</strong>') or \
+                                         alert_notification == 'n' and ''
+            alert_details_basket = alert_basket_name and _('The results are automatically added to your basket:') + \
+                                                         '&nbsp;' + '<strong>' + cgi.escape(alert_basket_name) + '</strong>' or ''
+            alert_details_frequency_notification_basket = alert_details_frequency + \
+                                                          (alert_details_notification and \
+                                                           '&nbsp;/&nbsp;' + \
+                                                           alert_details_notification) + \
+                                                          (alert_details_basket and \
+                                                           '&nbsp;/&nbsp;' + \
+                                                           alert_details_basket)
 
-            out += '</table>'
+            alert_details_search_query = get_html_user_friendly_alert_query_args(alert_query_args, ln)
 
-        out += '<p>' + (_("You have defined %s alerts.") % ('<b>' + str(len(alerts)) + '</b>' )) + '</p>'
-        if guest:
-            out += guesttxt
+            alert_details_creation_date = get_html_user_friendly_date_from_datetext(alert_creation_date, True, False, ln)
+            alert_details_last_run_date = get_html_user_friendly_date_from_datetext(alert_last_run_date, True, False, ln)
+            alert_details_creation_last_run_dates = _('Created:') + '&nbsp;' + \
+                                                    alert_details_creation_date + \
+                                                    '&nbsp;/&nbsp;' + \
+                                                    _('Last run:') + '&nbsp;' + \
+                                                    alert_details_last_run_date
+
+            alert_details_options_edit = create_html_link('%s/youralerts/modify' % \
+                                                          (CFG_SITE_SECURE_URL,),
+                                                          {'ln'     :   ln,
+                                                           'idq'    :   alert_query_id,
+                                                           'name'   :   alert_name,
+                                                           'freq'   :   alert_frequency,
+                                                           'notif'  :   alert_notification,
+                                                           'idb'    :   alert_basket_id,
+                                                           'old_idb':   alert_basket_id},
+                                                          _('Edit'))
+            alert_details_options_delete = create_html_link('%s/youralerts/remove' % \
+                                                            (CFG_SITE_SECURE_URL,),
+                                                            {'ln'     :   ln,
+                                                             'idq'    :   alert_query_id,
+                                                             'name'   :   alert_name,
+                                                             'idb'    :   alert_basket_id},
+                                                            _('Delete'))
+            alert_details_options = '<img src="%s/img/youralerts_alert_edit.png" />' % (CFG_SITE_URL,) + \
+                                    alert_details_options_edit + \
+                                    '&nbsp;&nbsp;&nbsp;' + \
+                                    '<img src="%s/img/youralerts_alert_delete.png" />' % (CFG_SITE_URL,) + \
+                                    alert_details_options_delete
+
+            youralerts_display_html += """
+    <tr>
+      <td class="youralerts_display_table_counter">
+        %(counter)i.
+      </td>
+      <td class="youralerts_display_table_content" onMouseOver='this.className="youralerts_display_table_content_mouseover"' onMouseOut='this.className="youralerts_display_table_content"'>
+        <div class="youralerts_display_table_content_container_left">
+          <div class="youralerts_display_table_content_name">%(alert_name)s</div>
+          <div class="youralerts_display_table_content_details">%(alert_details_frequency_notification_basket)s</div>
+          <div class="youralerts_display_table_content_search_query">%(alert_details_search_query)s</div>
+        </div>
+        <div class="youralerts_display_table_content_container_right">
+          <div class="youralerts_display_table_content_options">%(alert_details_options)s</div>
+        </div>
+        <div class="youralerts_display_table_content_clear"></div>
+        <div class="youralerts_display_table_content_dates">%(alert_details_creation_last_run_dates)s</div>
+      </td>
+    </tr>""" % {'counter': counter,
+                'alert_name': cgi.escape(alert_name),
+                'alert_details_frequency_notification_basket': alert_details_frequency_notification_basket,
+                'alert_details_search_query': alert_details_search_query,
+                'alert_details_options': alert_details_options,
+                'alert_details_creation_last_run_dates': alert_details_creation_last_run_dates}
+
+        out += """
+<table class="youralerts_display_table" cellspacing="2px">
+  <thead class="youralerts_display_table_header">
+    <tr>
+      <td colspan="2"></td>
+    </tr>
+  </thead>
+  <tfoot class="youralerts_display_table_footer">
+    <tr>
+      <td colspan="2"></td>
+    </tr>
+  </tfoot>
+  <tbody>
+    %(youralerts_display_html)s
+  </tbody>
+</table>""" % {'youralerts_display_html': youralerts_display_html}
+
         return out
 
     def tmpl_alert_email_title(self, name):
@@ -627,3 +682,150 @@ Need human intervention?  Contact <%s>
         out += "</table><br />\n"
 
         return out
+
+def get_html_user_friendly_alert_query_args(args,
+                                             ln=CFG_SITE_LANG):
+    """
+    Internal function.
+    Returns an HTML formatted user friendly description of a search query's
+    arguments.
+
+    @param args: The search query arguments as they apear in the search URL
+    @type args: string
+
+    @param ln: The language to display the interface in
+    @type ln: string
+
+    @return: HTML formatted user friendly description of a search query's
+             arguments
+    """
+
+    # Load the right language
+    _ = gettext_set_language(ln)
+
+    # Arguments dictionary
+    dict = parse_qs(args)
+
+    if not dict.has_key('p') and not dict.has_key('p1') and not dict.has_key('p2') and not dict.has_key('p3'):
+        search_patterns_html = _('Searching for everything')
+    else:
+        search_patterns_html = _('Searching for') + ' '
+        if dict.has_key('p'):
+            search_patterns_html += '<strong>' + cgi.escape(dict['p'][0]) + '</strong>'
+            if dict.has_key('f'):
+                search_patterns_html += ' ' + _('as') + ' ' + '<strong>' + cgi.escape(dict['f'][0]) + '</strong>'
+        if dict.has_key('p1'):
+            if dict.has_key('p'):
+                search_patterns_html += ' ' + _('and') + ' '
+            search_patterns_html += '<strong>' + cgi.escape(dict['p1'][0]) + '</strong>'
+            if dict.has_key('f1'):
+                search_patterns_html += ' ' + _('as') + ' ' + '<strong>' + cgi.escape(dict['f1'][0]) + '</strong>'
+        if dict.has_key('p2'):
+            if dict.has_key('p') or dict.has_key('p1'):
+                if dict.has_key('op1'):
+                    search_patterns_html += ' %s ' % (dict['op1'][0] == 'a' and _('and') or \
+                                                      dict['op1'][0] == 'o' and _('or') or \
+                                                      dict['op1'][0] == 'n' and _('and not') or
+                                                      ', ',)
+            search_patterns_html += '<strong>' + cgi.escape(dict['p2'][0]) + '</strong>'
+            if dict.has_key('f2'):
+                search_patterns_html += ' ' + _('as') + ' ' + '<strong>' + cgi.escape(dict['f2'][0]) + '</strong>'
+        if dict.has_key('p3'):
+            if dict.has_key('p') or dict.has_key('p1') or dict.has_key('p2'):
+                if dict.has_key('op2'):
+                    search_patterns_html += ' %s ' % (dict['op2'][0] == 'a' and _('and') or \
+                                                      dict['op2'][0] == 'o' and _('or') or \
+                                                      dict['op2'][0] == 'n' and _('and not') or
+                                                      ', ',)
+            search_patterns_html += '<strong>' + cgi.escape(dict['p3'][0]) + '</strong>'
+            if dict.has_key('f3'):
+                search_patterns_html += ' ' + _('as') + ' ' + '<strong>' + cgi.escape(dict['f3'][0]) + '</strong>'
+
+    if not dict.has_key('c') and not dict.has_key('cc'):
+        collections_html = _('in all the collections')
+    else:
+        collections_html = _('in the following collection(s)') + ': '
+        if dict.has_key('c'):
+            collections_html += ', '.join('<strong>' + cgi.escape(collection) + '</strong>' for collection in dict['c'])
+        elif dict.has_key('cc'):
+            collections_html += '<strong>' + cgi.escape(dict['cc'][0]) + '</strong>'
+
+    search_query_args_html = search_patterns_html + '<br />' + collections_html
+
+    return search_query_args_html
+
+
+def get_html_user_friendly_date_from_datetext(given_date,
+                                              show_full_date=True,
+                                              show_full_time=True,
+                                              ln=CFG_SITE_LANG):
+    """
+    Internal function.
+    Returns an HTML formatted user friendly description of a search query's
+    last run date.
+
+    @param given_date: The search query last run date in the following format:
+        '2005-11-16 15:11:57'
+    @type given_date: string
+
+    @param show_full_date: show the full date as well
+    @type show_full_date: boolean
+
+    @param show_full_time: show the full time as well
+    @type show_full_time: boolean
+
+    @param ln: The language to display the interface in
+    @type ln: string
+
+    @return: HTML formatted user friendly description of a search query's
+             last run date
+    """
+
+    # Load the right language
+    _ = gettext_set_language(ln)
+
+    # Calculate how many days old the search query is base on the given date
+    # and today
+    # given_date_datestruct[0] --> year
+    # given_date_datestruct[1] --> month
+    # given_date_datestruct[2] --> day in month
+    given_date_datestruct = convert_datetext_to_datestruct(given_date)
+    today = datetime_date.today()
+    if given_date_datestruct[0] != 0 and \
+       given_date_datestruct[1] != 0 and \
+       given_date_datestruct[2] != 0:
+        days_old = (today - datetime_date(given_date_datestruct.tm_year,
+                                          given_date_datestruct.tm_mon,
+                                          given_date_datestruct.tm_mday)).days
+        if days_old == 0:
+            out = _('Today')
+        elif days_old < 7:
+            out = str(days_old) + ' ' + _('day(s) ago')
+        elif days_old == 7:
+            out = _('A week ago')
+        elif days_old < 14:
+            out = _('More than a week ago')
+        elif days_old == 14:
+            out = _('Two weeks ago')
+        elif days_old < 30:
+            out = _('More than two weeks ago')
+        elif days_old == 30:
+            out = _('A month ago')
+        elif days_old < 180:
+            out = _('More than a month ago')
+        elif days_old < 365:
+            out = _('More than six months ago')
+        else:
+            out = _('More than a year ago')
+        if show_full_date:
+            out += '<span style="color: gray;">' + \
+                   '&nbsp;' + _('on') + '&nbsp;' + \
+                   given_date.split()[0] + '</span>'
+            if show_full_time:
+                out += '<span style="color: gray;">' + \
+                       '&nbsp;' + _('at') + '&nbsp;' + \
+                       given_date.split()[1] + '</span>'
+    else:
+        out = _('Unknown')
+
+    return out

@@ -173,59 +173,88 @@ def perform_add_alert(alert_name, frequency, notification,
     run_sql(query, params)
     out = _("The alert %s has been added to your profile.")
     out %= '<b>' + cgi.escape(alert_name) + '</b>'
-    out += perform_request_youralerts_display(uid, ln=ln)
+    out += perform_request_youralerts_display(uid, idq=None, ln=ln)
     return out
 
 def perform_request_youralerts_display(uid,
+                                       idq=None,
                                        ln=CFG_SITE_LANG):
     """
-    Display a list of the user defined alerts.
+    Display a list of the user defined alerts. If a specific query id is defined
+    only the user alerts based on that query appear.
+
     @param uid: The user id
     @type uid: int
+
+    @param idq: The specified query id for which to display the user alerts
+    @type idq: int
+
     @param ln: The interface language
     @type ln: string
+
     @return: HTML formatted list of the user defined alerts.
     """
 
     # set variables
     out = ""
 
+    if idq:
+        idq_clause = "AND uqb.id_query=%i" % (idq,)
+    else:
+        idq_clause = ""
+
     # query the database
-    query = """ SELECT q.id, q.urlargs,
-                       a.id_basket, b.name,
-                       a.alert_name, a.frequency,a.notification,
-                       DATE_FORMAT(a.date_creation,'%%Y-%%m-%%d %%H:%%i:%%s'),
-                       DATE_FORMAT(a.date_lastrun,'%%Y-%%m-%%d %%H:%%i:%%s')
-                FROM user_query_basket a LEFT JOIN query q ON a.id_query=q.id
-                                         LEFT JOIN bskBASKET b ON a.id_basket=b.id
-                WHERE a.id_user=%s
-                ORDER BY a.alert_name ASC """
-    res = run_sql(query, (uid,))
+    query = """ SELECT      q.id,
+                            q.urlargs,
+                            uqb.id_basket,
+                            bsk.name,
+                            uqb.alert_name,
+                            uqb.frequency,
+                            uqb.notification,
+                            DATE_FORMAT(uqb.date_creation,'%s'),
+                            DATE_FORMAT(uqb.date_lastrun,'%s')
+                FROM        user_query_basket uqb
+                LEFT JOIN   query q
+                    ON      uqb.id_query=q.id
+                LEFT JOIN   bskBASKET bsk
+                    ON      uqb.id_basket=bsk.id
+                WHERE       uqb.id_user=%%s
+                    %s
+                ORDER BY    uqb.alert_name ASC""" % ('%%Y-%%m-%%d %%H:%%i:%%s',
+                                                     '%%Y-%%m-%%d %%H:%%i:%%s',
+                                                     idq_clause,)
+    params = (uid,)
+    result = run_sql(query, params)
+
     alerts = []
-    for (qry_id, qry_args,
-         bsk_id, bsk_name,
-         alrt_name, alrt_frequency, alrt_notification, alrt_creation, alrt_last_run) in res:
+    for (query_id,
+         query_args,
+         bsk_id,
+         bsk_name,
+         alert_name,
+         alert_frequency,
+         alert_notification,
+         alert_creation,
+         alert_last_run) in result:
         try:
-            if not qry_id:
+            if not query_id:
                 raise StandardError("""\
 Warning: I have detected a bad alert for user id %d.
 It seems one of his/her alert queries was deleted from the 'query' table.
 Please check this and delete it if needed.
 Otherwise no problem, I'm continuing with the other alerts now.
-Here are all the alerts defined by this user: %s""" % (uid, repr(res)))
-            alerts.append({
-                 'queryid' : qry_id,
-                 'queryargs' : qry_args,
-                 'textargs' : get_textual_query_info_from_urlargs(qry_args, ln=ln),
-                 'userid' : uid,
-                 'basketid' : bsk_id,
-                 'basketname' : bsk_name,
-                 'alertname' : alrt_name,
-                 'frequency' : alrt_frequency,
-                 'notification' : alrt_notification,
-                 'created' : convert_datetext_to_dategui(alrt_creation),
-                 'lastrun' : convert_datetext_to_dategui(alrt_last_run)
-                 })
+Here are all the alerts defined by this user: %s""" % (uid, repr(result)))
+            alerts.append({'queryid' : query_id,
+                           'queryargs' : query_args,
+                           'textargs' : get_textual_query_info_from_urlargs(query_args, ln=ln),
+                           'userid' : uid,
+                           'basketid' : bsk_id,
+                           'basketname' : bsk_name,
+                           'alertname' : alert_name,
+                           'frequency' : alert_frequency,
+                           'notification' : alert_notification,
+                           'created' : alert_creation,
+                           'lastrun' : alert_last_run})
         except StandardError:
             register_exception(alert_admin=True)
 
@@ -233,6 +262,7 @@ Here are all the alerts defined by this user: %s""" % (uid, repr(res)))
     out = webalert_templates.tmpl_youralerts_display(ln=ln,
                                                      alerts=alerts,
                                                      guest=isGuestUser(uid),
+                                                     idq=idq,
                                                      guesttxt=warning_guest_user(type="alerts", ln=ln))
     return out
 
@@ -261,7 +291,7 @@ def perform_remove_alert(alert_name, id_query, id_basket, uid, ln=CFG_SITE_LANG)
         out += "The alert <b>%s</b> has been removed from your profile.<br /><br />\n" % cgi.escape(alert_name)
     else:
         out += "Unable to remove alert <b>%s</b>.<br /><br />\n" % cgi.escape(alert_name)
-    out += perform_request_youralerts_display(uid, ln=ln)
+    out += perform_request_youralerts_display(uid, idq=None, ln=ln)
     return out
 
 
@@ -321,7 +351,7 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, id_quer
     run_sql(query, params)
 
     out += _("The alert %s has been successfully updated.") % ("<b>" + cgi.escape(alert_name) + "</b>",)
-    out += "<br /><br />\n" + perform_request_youralerts_display(uid, ln=ln)
+    out += "<br /><br />\n" + perform_request_youralerts_display(uid, idq=None, ln=ln)
     return out
 
 def is_selected(var, fld):

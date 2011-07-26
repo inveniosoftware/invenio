@@ -29,6 +29,7 @@ import locale
 from urllib import quote, urlencode
 from urlparse import parse_qs
 from xml.sax.saxutils import escape as xml_escape
+from datetime import date as datetime_date
 
 from invenio.config import \
      CFG_WEBSEARCH_LIGHTSEARCH_PATTERN_BOX_WIDTH, \
@@ -82,9 +83,7 @@ from invenio.htmlutils import nmtoken_from_string
 from invenio.webinterface_handler import wash_urlargd
 from invenio.bibrank_citation_searcher import get_cited_by_count
 from invenio.webuser import session_param_get
-
 from invenio.intbitset import intbitset
-
 from invenio.websearch_external_collections import external_collection_get_state, get_external_collection_engine
 from invenio.websearch_external_collections_utils import get_collection_id
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
@@ -95,9 +94,6 @@ from invenio.search_engine_utils import record_exists
 from invenio import hepdatadisplayutils
 
 from invenio.dateutils import convert_datetext_to_datestruct
-from datetime import date as datetime_date
-
-#from invenio.websearch_yoursearches import count_user_alerts_for_given_query
 
 _RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
 _RE_SPACES = re.compile(r"\s+")
@@ -5145,26 +5141,27 @@ class Template:
         # following message
         if not search_queries:
             if p:
-                out = _("You have not searched for anything yet including the terms %(p)s. You may perform that %(x_url_open)ssearch%(x_url_close)s for the first time now.") % \
+                msg = _("You have not searched for anything yet including the terms %(p)s. You may perform that %(x_url_open)ssearch%(x_url_close)s for the first time now.") % \
                     {'p': '<strong>' + cgi.escape(p) + '</strong>',
                      'x_url_open': '<a href="' + CFG_SITE_SECURE_URL + '/search?ln=' + ln + '&amp;p=' + cgi.escape(p) + '">',
                      'x_url_close': '</a>'}
             else:
-                out = _("You have not searched for anything yet. You may want to start by the %(x_url_open)ssearch interface%(x_url_close)s first.") % \
+                msg = _("You have not searched for anything yet. You may want to start by the %(x_url_open)ssearch interface%(x_url_close)s first.") % \
                     {'x_url_open': '<a href="' + CFG_SITE_SECURE_URL + '/?ln=' + ln +'">',
                      'x_url_close': '</a>'}
+            out = '<p>' + msg + '</p>'
             return out
 
         # Diplay a message about the number of searches.
         if p:
             msg = _("You have performed %(searches_distinct)s unique searches in a total of %(searches_total)s searches including the term %(p)s.") % \
-                {'searches_distinct': nb_queries_distinct,
-                 'searches_total': nb_queries_total,
+                {'searches_distinct': '<strong>' + str(nb_queries_distinct) + '</strong>',
+                 'searches_total': '<strong>' + str(nb_queries_total) + '</strong>',
                  'p': '<strong>' + cgi.escape(p) + '</strong>'}
         else:
             msg = _("You have performed %(searches_distinct)s unique searches in a total of %(searches_total)s searches.") % \
-                {'searches_distinct': nb_queries_distinct,
-                 'searches_total': nb_queries_total}
+                {'searches_distinct': '<strong>' + str(nb_queries_distinct) + '</strong>',
+                 'searches_total': '<strong>' + str(nb_queries_total) + '</strong>'}
         out = '<p>' + msg + '</p>'
 
         # Search form
@@ -5191,7 +5188,7 @@ class Template:
 
             search_query_details = get_html_user_friendly_search_query_args(search_query_args, ln)
 
-            search_query_last_performed = get_html_user_friendly_search_query_lastrun(search_query_lastrun, ln)
+            search_query_last_performed = get_html_user_friendly_date_from_datetext(search_query_lastrun, ln)
 
             search_query_options_search = """<a href="%s/search?%s"><img src="%s/img/yoursearches_search.png" />%s</a>""" % \
                                           (CFG_SITE_SECURE_URL, cgi.escape(search_query_args), CFG_SITE_URL, _('Search again'))
@@ -5337,16 +5334,24 @@ def get_html_user_friendly_search_query_args(args,
     return search_query_args_html
 
 
-def get_html_user_friendly_search_query_lastrun(lastrun,
-                                                ln=CFG_SITE_LANG):
+def get_html_user_friendly_date_from_datetext(given_date,
+                                              show_full_date=True,
+                                              show_full_time=True,
+                                              ln=CFG_SITE_LANG):
     """
     Internal function.
     Returns an HTML formatted user friendly description of a search query's
     last run date.
 
-    @param lastrun: The search query last run date in the following format:
+    @param given_date: The search query last run date in the following format:
         '2005-11-16 15:11:57'
-    @type lastrun: string
+    @type given_date: string
+
+    @param show_full_date: show the full date as well
+    @type show_full_date: boolean
+
+    @param show_full_time: show the full time as well
+    @type show_full_time: boolean
 
     @param ln: The language to display the interface in
     @type ln: string
@@ -5358,16 +5363,19 @@ def get_html_user_friendly_search_query_lastrun(lastrun,
     # Load the right language
     _ = gettext_set_language(ln)
 
-    # Calculate how many days old the search query is base on the lastrun date
+    # Calculate how many days old the search query is base on the given date
     # and today
-    lastrun_datestruct = convert_datetext_to_datestruct(lastrun)
+    # given_date_datestruct[0] --> year
+    # given_date_datestruct[1] --> month
+    # given_date_datestruct[2] --> day in month
+    given_date_datestruct = convert_datetext_to_datestruct(given_date)
     today = datetime_date.today()
-    if lastrun_datestruct.tm_year != 0 and \
-       lastrun_datestruct.tm_mon != 0 and \
-       lastrun_datestruct.tm_mday != 0:
-        days_old = (today - datetime_date(lastrun_datestruct.tm_year,
-                                          lastrun_datestruct.tm_mon,
-                                          lastrun_datestruct.tm_mday)).days
+    if given_date_datestruct[0] != 0 and \
+       given_date_datestruct[1] != 0 and \
+       given_date_datestruct[2] != 0:
+        days_old = (today - datetime_date(given_date_datestruct.tm_year,
+                                          given_date_datestruct.tm_mon,
+                                          given_date_datestruct.tm_mday)).days
         if days_old == 0:
             out = _('Today')
         elif days_old < 7:
@@ -5388,10 +5396,14 @@ def get_html_user_friendly_search_query_lastrun(lastrun,
             out = _('More than six months ago')
         else:
             out = _('More than a year ago')
-        out += '<span style="color: gray;">' + \
-               '&nbsp;' + _('on') + '&nbsp;' + lastrun.split()[0] + \
-               '&nbsp;' + _('at') + '&nbsp;' + lastrun.split()[1] + \
-               '</span>'
+        if show_full_date:
+            out += '<span style="color: gray;">' + \
+                   '&nbsp;' + _('on') + '&nbsp;' + \
+                   given_date.split()[0] + '</span>'
+            if show_full_time:
+                out += '<span style="color: gray;">' + \
+                       '&nbsp;' + _('at') + '&nbsp;' + \
+                       given_date.split()[1] + '</span>'            
     else:
         out = _('Unknown')
 
