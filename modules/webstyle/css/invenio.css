@@ -2580,6 +2580,120 @@ a:hover.bibMergeImgClickable img {
     border: 1px solid black;
     padding: 3px;
 }
+
+.youralerts_display_table {
+   border: 1px solid #bbbbbb;
+}
+.youralerts_display_table_header td {
+   background-color: #7a9bdd;
+   padding: 2px;
+   border-bottom: 1px solid #3366cc;
+   border-right: 1px solid #3366cc;
+}
+.youralerts_display_table_footer td {
+   background-color: #7a9bdd;
+   color: white;
+   padding: 2px;
+   font-size: 80%;
+   text-align: center;
+   border-bottom: 1px solid #3366cc;
+   border-right: 1px solid #3366cc;
+   white-space: nowrap;
+}
+.youralerts_display_table_footer img {
+   border: none;
+   margin: 0px 3px;
+   vertical-align: bottom;
+}
+.youralerts_display_footer a, .youralerts_display_footer a:link, .youralerts_display_footer a:visited, .youralerts_display_footer a:active {
+   text-decoration: none;
+   color: #333;
+}
+.youralerts_display_footer a:hover {
+   text-decoration: underline;
+   color: #000;
+}
+.youralerts_display_footer img {
+   border: none;
+   vertical-align: bottom;
+}
+.youralerts_display_table_content {
+   background-color: #f2f2fa;
+   padding: 5px;
+   text-align: left;
+   vertical-align: top;
+}
+.youralerts_display_table_content_mouseover {
+   background-color: #ebebfa;
+   padding: 5px;
+   text-align: left;
+   vertical-align: top;
+}
+.youralerts_display_table_content_container_left {
+   float: left;
+   width: 75%;
+}
+.youralerts_display_table_content_container_right {
+   float: right;
+   width: 25%;
+}
+.youralerts_display_table_content_clear {
+   clear: both;
+}
+.youralerts_display_table_counter {
+   background-color: #f2f2fa;
+   padding: 5px 2px;
+   text-align: right;
+   vertical-align: top;
+   font-size: 80%;
+   color: gray;
+}
+.youralerts_display_table_content_name {
+   margin-bottom: 5px;
+   font-weight: bold;
+   position: relative;
+   left: 0px;
+   top: 0px;
+}
+.youralerts_display_table_content_details {
+   margin-bottom: 5px;
+   font-size: 80%;
+   position: relative;
+   left: 0px;
+}
+.youralerts_display_table_content_search_query {
+   margin-bottom: 5px;
+   font-size: 80%;
+   position: relative;
+   left: 0px;
+}
+.youralerts_display_table_content_dates {
+   position: relative;
+   font-size: 70%;
+   text-align: right;
+   white-space: nowrap;
+   color: gray;
+}
+.youralerts_display_table_content_options {
+   position: relative;
+   top: 0px;
+   right: 0px;
+   margin-bottom: 5px;
+   font-size: 80%;
+   text-align: right;
+}
+.youralerts_display_table_content_options img{
+   vertical-align: top;
+   margin-right: 3px;
+}
+.youralerts_display_table_content_options a, .youralerts_display_table_content_options a:link, .youralerts_display_table_content_options a:visited, .youralerts_display_table_content_options a:active {
+   text-decoration: underline;
+   color: #333;
+}
+.youralerts_display_table_content_options a:hover {
+   text-decoration: underline;
+   color: #000;
+}
 /* end of WebAlert module */
 
 /* WebSearch module - YourSearches */
@@ -2587,29 +2701,23 @@ a:hover.bibMergeImgClickable img {
    border: 1px solid #bbbbbb;
 }
 .websearch_yoursearches_table_header td {
-/*   background-color: #63a5cd;*/
    background-color: #7a9bdd;
    color: white;
    padding: 2px;
    font-weight: bold;
    font-size: 75%;
    text-transform: uppercase;
-/*   border-bottom: 1px solid #327aa5;
-   border-right: 1px solid #327aa5;*/
    border-bottom: 1px solid #3366cc;
    border-right: 1px solid #3366cc;
    white-space: nowrap;
    vertical-align: top;
 }
 .websearch_yoursearches_table_footer td {
-/*   background-color: #63a5cd;*/
    background-color: #7a9bdd;
    color: white;
    padding: 5px;
    font-size: 80%;
    text-align: center;
-/*   border-bottom: 1px solid #327aa5;
-   border-right: 1px solid #327aa5;*/
    border-bottom: 1px solid #3366cc;
    border-right: 1px solid #3366cc;
    white-space: nowrap;
@@ -2656,7 +2764,7 @@ a:hover.bibMergeImgClickable img {
    font-size: 80%;
 }
 .websearch_yoursearches_table_content_options img{
-   vertical-align: middle;
+   vertical-align: top;
    margin-right: 3px;
 }
 .websearch_yoursearches_table_content_options a, .websearch_yoursearches_table_content_options a:link, .websearch_yoursearches_table_content_options a:visited, .websearch_yoursearches_table_content_options a:active {
