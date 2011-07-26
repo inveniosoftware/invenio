@@ -24,7 +24,7 @@ __revision__ = \
 
 from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_LANG, \
      CFG_SITE_SECURE_URL, CFG_SITE_SUPPORT_EMAIL, CFG_CERN_SITE, \
-     CFG_OPENAIRE_SITE, CFG_SITE_RECORD
+     CFG_OPENAIRE_SITE, CFG_SITE_RECORD, CFG_INSPIRE_SITE
 from invenio.messages import gettext_set_language
 
 
@@ -104,6 +104,16 @@ elif CFG_OPENAIRE_SITE:
     "Local": None,
     "OpenAIRE": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False),
     "ZOpenAIRE": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
+    }
+elif CFG_INSPIRE_SITE:
+    # FIXME: remove after HTTPS certificates are in place for INSPIRE
+    CFG_EXTERNAL_AUTH_DEFAULT = 'Local'
+    CFG_EXTERNAL_AUTH_USING_SSO = False
+    CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
+    CFG_EXTERNAL_AUTHENTICATION = {
+    "Local": None,
+    "Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False, check_user_ip=False),
+    "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True, check_user_ip=False)
     }
 else:
     CFG_EXTERNAL_AUTH_DEFAULT = 'Local'
