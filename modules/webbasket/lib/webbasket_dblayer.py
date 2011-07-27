@@ -32,8 +32,10 @@ from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      CFG_WEBBASKET_ACTIONS, \
                                      CFG_WEBBASKET_SHARE_LEVELS_ORDERED, \
                                      CFG_WEBBASKET_MAX_COMMENT_THREAD_DEPTH
+from invenio.config import CFG_SITE_URL
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
+from invenio.search_engine import get_fieldvalues
 
 ########################### Table of contents ################################
 #
@@ -63,6 +65,7 @@ from invenio.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
 #    - get_basket_record
 #    - get_basket_content
 #    - get_basket_item
+#    - get_basket_item_title_and_URL
 #    - share_basket_with_group
 #    - update_rights
 #    - move_item
@@ -678,6 +681,55 @@ def get_basket_item(bskid, recid, format='hb'):
         return (res[0], res_previous and res_previous[0][0] or 0, res_next and res_next[0][0] or 0, res_index)
     else:
         return ()
+
+def get_basket_item_title_and_URL(recid):
+    """
+    Retrieves the title and URL for the specified item in the specified basket.
+
+    @param bskid: The basked id
+    @type bskid: int
+
+    @param recid: The record (item) id
+    @type recid: int
+
+    @return: A tuple containing the title as a sting and the URL as a string.
+    """
+
+    if recid > 0:
+        # This is a local record, we can easily retrieve the title using the
+        # search engine's get_fieldvalues function and the MARC field and tag.
+        title_list = get_fieldvalues(recid, '245___')
+        # Check if the main title is always the first element in the list
+        title = title_list[0]
+        url = '%s/record/%i' % (CFG_SITE_URL, recid)
+    elif recid < 0:
+        # This is an external record or item, use 
+        title = "This is an external record or item."
+        url = '%s' % (CFG_SITE_URL,)
+
+        query = """ SELECT  rec.collection_id,
+                            rec.original_url,
+                            fmt.value
+                    FROM    bskEXTREC as rec,
+                            bskEXTFMT as fmt
+                    WHERE   rec.id=%s
+                        AND fmt.id_bskEXTREC=%s
+                        AND fmt.format='hb'"""
+        params = (-recid, -recid)
+        result = run_sql(query, params)
+        if result:
+            item = __decompress_last(result[0])
+            collection = item[0]
+            url = item[1]
+            hb = item[2]
+            if collection == 0:
+                # This is an external item
+                title = hb.split('\n',1)[0]
+            elif collection > 0:
+                # This is an external record from a hosted collection
+                title = hb.split('</strong>',1)[0].split('<strong>')[-1]
+
+    return (title, url)
 
 def share_basket_with_group(bskid, group_id,
                             share_level=CFG_WEBBASKET_SHARE_LEVELS['READITM']):

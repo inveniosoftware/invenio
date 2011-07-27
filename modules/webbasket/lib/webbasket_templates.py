@@ -39,6 +39,7 @@ from invenio.config import \
      CFG_SITE_RECORD
 from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui
+from invenio.webbasket_dblayer import get_basket_item_title_and_URL
 
 class Template:
     """Templating class for webbasket module"""
@@ -675,6 +676,18 @@ class Template:
       </tr>""" % {'in_basket_label': _('In %(x_linked_basket_name)s') % \
                                      {'x_linked_basket_name': basket_link},
                   'items_found': _('%i items found') % personal_search_result[1][2]}
+
+                # TESTING: list found records and items.
+                out += "<tr><td style=\"font-size: 80%; color: gray;\">"
+                personal_search_result_record_ids = personal_search_result[1][3]
+                for personal_search_result_record_id in personal_search_result_record_ids:
+                    personal_search_result_record_details = get_basket_item_title_and_URL(personal_search_result_record_id)
+                    personal_search_result_record_title = personal_search_result_record_details[0]
+                    personal_search_result_record_url = personal_search_result_record_details[1]
+                    out += '<a href="%s">%s</a><br />' % (personal_search_result_record_url,
+                                                          cgi.escape(personal_search_result_record_title))
+                out += "</td></tr>"
+
             out += """
       <tr>
         <td>
