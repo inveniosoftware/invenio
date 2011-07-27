@@ -396,6 +396,7 @@ def page_style():
 
                 .warningMsg{
                     padding: 10px 10px 2px 10px;
+                    background-color: #FAD163;
                 }
 
                 div.refextracted {

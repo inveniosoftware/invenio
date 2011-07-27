@@ -622,6 +622,7 @@ function updateToolbar(enable) {
         $('#img_open_pdf').unbind('click', onOpenPDFClick).removeClass(
         'bibEditImgCtrlEnabled').addClass('bibEditImgCtrlDisabled');
         $('.revisionLine').hide();
+        $('#bibEditMessage').hide();
     }
 }
 
@@ -831,13 +832,18 @@ function displayMessage(msgCode, keepContent, args){
     case 111:
       msg = 'Internal error. Cache file format is incorrect. Try to open the record again';
       break;
+    case 113:
+      msg = 'An error ocurred during the upload simulation: <br /><br />' + args[0] + '<br />';
+      break;
     default:
       msg = 'Result code: <b>' + msgCode + '</b>';
   }
-  if (!keepContent)
-    $('#bibEditContentTable').html('<div id="bibEditMessage">' + msg + '</div>');
-  else
-    $('#bibEditMessage').html(msg).slideDown('slow');
+  if (!keepContent) {
+    $('#bibEditContentTable').html('<div class="warningMsg">' + msg + '</div>');
+  }
+  else {
+    $('#bibEditMessage').html('<div class="warningMsg">' + msg + '</div>').slideDown('slow');
+  }
 }
 
 function displayNewRecordScreen(){

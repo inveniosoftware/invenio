@@ -148,7 +148,8 @@ CFG_BIBEDIT_AJAX_RESULT_CODES = {
     109: 'Error: Invalid template file',
     110: 'Error: Invalid content in record',
     111: 'Error: Wrong cache file format',
-    112: 'Error: Physical copies of this record exist'
+    112: 'Error: Physical copies of this record exist',
+    113: 'Error: Upload simulation found some errors'
 }
 
 ## CFG_BIBEDIT_MAX_SEARCH_RESULTS

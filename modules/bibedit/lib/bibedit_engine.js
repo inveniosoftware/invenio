@@ -409,17 +409,19 @@ function onAjaxSuccess(json, onSuccess){
   else if ($.inArray(resCode, [101, 102, 103, 104, 105, 106, 107, 108, 109]) != -1) {
     cleanUp(!gNavigatingRecordSet, null, null, true, true);
     displayMessage(resCode);
-    if (resCode == 107)
-      return;
+    if (resCode == 107) {
+      //return;
       $('#lnkGetRecord').bind('click', function(event){
         getRecord(recID);
         event.preventDefault();
       });
+    }
     updateStatus('error', gRESULT_CODES[resCode]);
   }
-  else if (resCode == 110){
+  else if ($.inArray(resCode, [110, 113]) != -1){
     displayMessage(resCode, true, [json['errors'].toString()]);
-    updateStatus('error', gRESULT_CODES[resCode]);
+    /* Warn the user leaving toolbar active */
+    updateStatus('error', gRESULT_CODES[resCode], true);
   }
   else{
     var cacheOutdated = json['cacheOutdated'];

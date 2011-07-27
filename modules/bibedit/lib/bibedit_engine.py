@@ -84,6 +84,8 @@ from invenio.textutils import wash_for_xml
 from invenio.bibknowledge import get_kbd_values_for_bibedit, get_kbr_values, \
      get_kbt_items_for_bibedit, kb_exists
 
+from invenio.batchuploader_engine import perform_upload_check
+
 from invenio.bibcirculation_dblayer import get_number_copies, has_copies
 from invenio.bibcirculation_utils import create_item_details_url
 
@@ -684,7 +686,13 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
 
                 xml_record = wash_for_xml(print_rec(record))
                 record, status_code, list_of_errors = create_record(xml_record)
-                if status_code == 0:
+
+                # Simulate upload to catch errors
+                errors_upload = perform_upload_check(xml_record, '--replace')
+                if errors_upload:
+                    response['resultCode'], response['errors'] = 113, \
+                        errors_upload
+                elif status_code == 0:
                     response['resultCode'], response['errors'] = 110, \
                         list_of_errors
                 elif not data['force'] and \

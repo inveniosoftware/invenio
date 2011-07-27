@@ -288,12 +288,16 @@ function onGetTicketsSuccess(json){
   }
 }
 
-function updateStatus(statusType, reporttext){
+function updateStatus(statusType, reporttext, enableToolbar){
   /*
    * Update status (in the bottom of the menu).
    */
   var image, text;
 	gCurrentStatus = statusType;
+
+  if (enableToolbar === undefined) {
+    enableToolbar = false;
+  }
   switch (statusType){
     case 'ready':
       image = img('/img/circle_green.png');
@@ -312,7 +316,7 @@ function updateStatus(statusType, reporttext){
 				  gSTATUS_INFO_TIME);
       break;
     case 'error':
-      updateToolbar(false);
+      updateToolbar(enableToolbar);
       image = img('/img/circle_red.png');
       text = reporttext;
       clearTimeout(updateStatus.statusResetTimerID);

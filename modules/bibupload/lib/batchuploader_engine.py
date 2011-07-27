@@ -46,7 +46,13 @@ from invenio.bibtask import task_low_level_submission
 from invenio.messages import gettext_set_language
 from invenio.textmarc2xmlmarc import transform_file
 from invenio.shellutils import run_shell_command
+from invenio.bibupload import xml_marc_to_records, bibupload
 
+import invenio.bibupload as bibupload_module
+
+from invenio.bibrecord import create_records, \
+                              record_strip_empty_volatile_subfields, \
+                              record_strip_empty_fields
 
 try:
     from cStringIO import StringIO
@@ -451,7 +457,61 @@ def user_authorization(req, ln):
             error_msg = _("The user '%s' is not authorized to run batchuploader" % \
                           (cgi.escape(user_info['nickname'])))
         return page_not_authorized(req=req, referer=referer,
-                                   text=error_msg, navmenuid="batchuploader")
+                                   text=auth_message, navmenuid="batchuploader")
+    else:
+        return None
+
+def perform_basic_upload_checks(xml_record):
+    """ Performs tests that would provoke the bibupload task to fail with
+    an exit status 1, to prevent batchupload from crashing while alarming
+    the user wabout the issue
+    """
+    from bibupload import writing_rights_p
+
+    errors = []
+    if not writing_rights_p():
+        errors.append("Error: BibUpload does not have rights to write fulltext files.")
+    recs = create_records(xml_record, 1, 1)
+    if recs == []:
+        errors.append("Error: Cannot parse MARCXML file.")
+    elif recs[0][0] is None:
+        errors.append("Error: MARCXML file has wrong format: %s" % recs)
+    return errors
+
+def perform_upload_check(xml_record, mode):
+    """ Performs a upload simulation with the given record and mode
+    @return: string describing errors
+    @rtype: string
+    """
+    error_cache = []
+    def my_writer(msg, stream=sys.stdout, verbose=1):
+        if verbose == 1:
+            if 'DONE' not in msg:
+                error_cache.append(msg.strip())
+
+    orig_writer = bibupload_module.write_message
+    bibupload_module.write_message = my_writer
+
+    error_cache.extend(perform_basic_upload_checks(xml_record))
+    if error_cache:
+        # There has been some critical error
+        return '\n'.join(error_cache)
+
+    recs = xml_marc_to_records(xml_record)
+    try:
+        upload_mode = mode[2:]
+        # Adapt input data for bibupload function
+        if upload_mode == "r insert-or-replace":
+            upload_mode = "replace_or_insert"
+        for record in recs:
+            if record:
+                record_strip_empty_volatile_subfields(record)
+                record_strip_empty_fields(record)
+                bibupload(record, opt_mode=upload_mode, pretend=True)
+    finally:
+        bibupload_module.write_message = orig_writer
+
+    return '\n'.join(error_cache)
 
 def _get_client_ip(req):
     """Return client IP address from req object."""
