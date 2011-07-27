@@ -144,6 +144,7 @@ install-jquery-plugins: install-jquery-plugins
 	@echo "** Installing various jQuery plugins, please wait...     **"
 	@echo "***********************************************************"
 	mkdir -p ${prefix}/var/www/js
+	mkdir -p $(prefix)/var/www/css
 	(cd ${prefix}/var/www/js && \
 	wget http://jqueryjs.googlecode.com/files/jquery-1.3.1.min.js && \
 	mv jquery-1.3.1.min.js jquery.min.js && \
@@ -166,6 +167,7 @@ install-jquery-plugins: install-jquery-plugins
 	wget http://autobahn.tablesorter.com/jquery.tablesorter.zip && \
 	wget http://plugins.jquery.com/files/Uploadify-v2.1.3.zip -O uploadify.zip && \
 	wget http://www.datatables.net/download/build/jquery.dataTables.min.js && \
+	wget http://keith-wood.name/zip/jquery.bookmark.package-1.4.0.zip && \
 	unzip jquery.tablesorter.zip && \
 	rm jquery.tablesorter.zip && \
 	unzip -u uploadify.zip && \
@@ -194,6 +196,11 @@ install-jquery-plugins: install-jquery-plugins
 	mv js/jquery-ui-1.7.3.custom.min.js jquery-ui-1.7.3.custom.min.js && \
 	rm -rf development-bundle && \
 	rm jquery-ui-1.7.3.custom.zip && \
+	unzip jquery.bookmark.package-1.4.0.zip && \
+	rm -f jquery.bookmark.ext.* bookmarks-big.png bookmarkBasic.html jquery.bookmark.js jquery.bookmark.pack.js && \
+	mv bookmarks.png ../img/ && \
+	mv jquery.bookmark.css ../css/ && \
+	rm -f jquery.bookmark.package-1.4.0.zip && \
 	mkdir -p ${prefix}/var/www/img && \
 	cd ${prefix}/var/www/img && \
 	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.7.3/themes/base/ && \
@@ -232,10 +239,14 @@ uninstall-jquery-plugins:
 	rm -f jquery.ajaxPager.js && \
 	rm -f jquery.form.js && \
 	rm -f jquery.dataTables.min.js && \
-	rm -f ui.core.js) && \
+	rm -f ui.core.js
+	rm -f jquery.bookmark.min.js) && \
 	(cd ${prefix}/var/www/img && \
 	rm -f cancel.png uploadify.css uploadify.swf uploadify.allglyphs.swf uploadify.fla && \
-	rm -f datatables_jquery-ui.css)
+	rm -f datatables_jquery-ui.css \
+	rm -f bookmarks.png) && \
+	(cd ${prefix}/var/www/css && \
+	rm -f jquery.bookmark.css)
 	@echo "***********************************************************"
 	@echo "** The jquery plugins were successfully uninstalled.     **"
 	@echo "***********************************************************"
