@@ -850,7 +850,8 @@ def call_bibupload(marcxmlfile, mode=None, oai_src_id= -1):
     if os.path.exists(marcxmlfile):
         try:
             args = mode
-            args.append(marcxmlfile)
+            # Add priority 6 and file to upload to arguments #FIXME: allow per-harvest priority
+            args.extend(["-P","6",marcxmlfile])
             task_id = task_low_level_submission("bibupload", "oaiharvest", *tuple(args))
             create_oaiharvest_log(task_id, oai_src_id, marcxmlfile)
         except Exception, msg:
