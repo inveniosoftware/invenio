@@ -166,6 +166,28 @@ def bibreformat_task(fmt, sql, sql_queries, cds_query, process_format, process, 
     message = " bibupload: %2f sec" % tbibupload
     write_message(message)
 
+def check_validity_input_formats(input_formats):
+    """
+    Checks the validity of every input format.
+    @param input_formats: list of given formats
+    @type input_formats: list
+    @return: if there is any invalid input format it returns this value
+    @rtype: string
+    """
+    from invenio.search_engine import get_visible_output_formats
+    valid_formats = get_visible_output_formats()
+
+    # let's to extract the values of the available formats
+    format_values = []
+    for aformat in valid_formats:
+        format_values.append(aformat['value'])
+
+    invalid_format = ''
+    for aformat in input_formats:
+        if aformat.lower() not in format_values:
+            invalid_format = aformat.lower()
+            break
+    return invalid_format
 
 ### Identify recIDs of records with missing format
 ###
@@ -368,55 +390,52 @@ def task_run_core():
     """Runs the task by fetching arguments from the BibSched task queue.  This is what BibSched will be invoking via daemon call."""
 
     ## initialize parameters
+    for fmt in task_get_option('formats').split(','):
+        sql = {
+            "all" : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt,
+            "last": "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='%s' and bf.last_updated < br.modification_date" % fmt,
+            "q1"  : "select br.id from bibrec as br",
+            "q2"  : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt
+        }
+        sql_queries = []
+        cds_query = {}
+        if task_has_option("all"):
+            sql_queries.append(sql['all'])
+        if task_has_option("last"):
+            sql_queries.append(sql['last'])
+        if task_has_option("collection"):
+            cds_query['collection'] = task_get_option('collection')
+        else:
+            cds_query['collection'] = ""
 
-    fmt = task_get_option('format')
-    sql = {
-        "all" : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt,
-        "last": "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='%s' and bf.last_updated < br.modification_date" % fmt,
-        "q1"  : "select br.id from bibrec as br",
-        "q2"  : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt
-    }
-    sql_queries = []
-    cds_query = {}
-    if task_has_option("all"):
-        sql_queries.append(sql['all'])
-    if task_has_option("last"):
-        sql_queries.append(sql['last'])
-    if task_has_option("collection"):
-        cds_query['collection'] = task_get_option('collection')
-    else:
-        cds_query['collection'] = ""
+        if task_has_option("field"):
+            cds_query['field']      = task_get_option('field')
+        else:
+            cds_query['field']      = ""
 
-    if task_has_option("field"):
-        cds_query['field']      = task_get_option('field')
-    else:
-        cds_query['field']      = ""
+        if task_has_option("pattern"):
+            cds_query['pattern']      = task_get_option('pattern')
+        else:
+            cds_query['pattern']      = ""
 
-    if task_has_option("pattern"):
-        cds_query['pattern']      = task_get_option('pattern')
-    else:
-        cds_query['pattern']      = ""
+        if task_has_option("matching"):
+            cds_query['matching']      = task_get_option('matching')
+        else:
+            cds_query['matching']      = ""
 
-    if task_has_option("matching"):
-        cds_query['matching']      = task_get_option('matching')
-    else:
-        cds_query['matching']      = ""
+        recids = intbitset()
+        if task_has_option("recids"):
+            for recid in task_get_option('recids').split(','):
+                if ":" in recid:
+                    start = int(recid.split(':')[0])
+                    end = int(recid.split(':')[1])
+                    recids += range(start, end)
+                else:
+                    recids.add(int(recid))
 
-    recids = intbitset()
-    if task_has_option("recids"):
-        for recid in task_get_option('recids').split(','):
-            if ":" in recid:
-                start = int(recid.split(':')[0])
-                end = int(recid.split(':')[1])
-                recids += range(start, end)
-            else:
-                recids.add(int(recid))
-
-### sql commands to be executed during the script run
-###
-
-    bibreformat_task(fmt, sql, sql_queries, cds_query, task_has_option('without'), not task_has_option('noprocess'), recids)
-
+    ### sql commands to be executed during the script run
+    ###
+        bibreformat_task(fmt, sql, sql_queries, cds_query, task_has_option('without'), not task_has_option('noprocess'), recids)
     return True
 
 def main():
@@ -445,6 +464,7 @@ Option -c prevents from finding records in private collections.
 Examples:
   bibreformat                    Format all new or modified records (in HB).
   bibreformat -o HD              Format all new or modified records in HD.
+  bibreformat -o HD,HB           Format all new or modified records in HD and HB.
 
   bibreformat -a                 Force reformatting all records (in HB).
   bibreformat -c 'Photos'        Force reformatting all records in 'Photos' collection (in HB).
@@ -458,7 +478,7 @@ Examples:
   bibreformat -n -c 'Articles'   Show how many records are to be (re)formatted in 'Articles' collection.
 
   bibreformat -oHB -s1h          Format all new and modified records every hour, in HB.
-""", help_specific_usage="""  -o,  --format         \t Specify output format (default HB)
+""", help_specific_usage="""  -o,  --formats         \t Specify output format/s (default HB)
   -n,  --noprocess      \t Count records to be formatted (no processing done)
 Reformatting options:
   -a,  --all            \t Force reformatting all records
@@ -477,7 +497,7 @@ Pattern options:
                  "matching=",
                  "field=",
                  "pattern=",
-                 "format=",
+                 "formats=",
                  "noprocess",
                  "id="]),
             task_submit_check_options_fnc=task_submit_check_options,
@@ -514,8 +534,19 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         task_set_option("pattern", value)
     elif key in ("-m", "--matching"):
         task_set_option("matching", value)
-    elif key in ("-o","--format"):
-        task_set_option("format", value)
+    elif key in ("-o","--formats"):
+        input_formats = value.split(',')
+        ## check the validity of the given output formats
+        invalid_format = check_validity_input_formats(input_formats)
+        if invalid_format:
+            try:
+                raise Exception('Invalid output format.')
+            except Exception:
+                from invenio.errorlib import register_exception
+                register_exception(prefix="The given output format '%s' is not available or is invalid. Please try again" % invalid_format, alert_admin=True)
+                return
+        else: # every given format is available
+            task_set_option("formats", value)
     elif key in ("-i","--id"):
         task_set_option("recids", value)
     else:

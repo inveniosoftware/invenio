@@ -429,6 +429,24 @@ def get_collection_reclist(coll, recreate_cache_if_needed=True):
     # finally, return reclist:
     return collection_reclist_cache.cache[coll]
 
+def get_visible_output_formats():
+    """ Return the list of available visible formats """
+
+    formats = []
+    query = """SELECT code,name FROM format WHERE visibility='1' ORDER BY name ASC"""
+    res = run_sql(query)
+    if res:
+        # propose found formats:
+        for code, name in res:
+            formats.append({ 'value' : code,
+                             'text' : name
+                           })
+    else:
+        formats.append({'value' : 'hb',
+                        'text' : "HTML brief"
+                       })
+    return formats
+
 class SearchResultsCache(DataCacher):
     """
     Provides temporary lazy cache for Search Results.
@@ -1028,19 +1046,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, aas,
                        'text' : name,
                      })
 
-    formats = []
-    query = """SELECT code,name FROM format WHERE visibility='1' ORDER BY name ASC"""
-    res = run_sql(query)
-    if res:
-        # propose found formats:
-        for code, name in res:
-            formats.append({ 'value' : code,
-                             'text' : name
-                           })
-    else:
-        formats.append({'value' : 'hb',
-                        'text' : _("HTML brief")
-                       })
+    formats = get_visible_output_formats()
 
     # show collections in the search box? (not if there is only one
     # collection defined, and not if we are in light search)
