@@ -38,6 +38,11 @@ import cgi
 re_href = re.compile(r'<a[^>]*href="?([^">]*)"?[^>]*>', re.IGNORECASE)
 re_img = re.compile(r'<img[^>]*src="?([^">]*)"?[^>]*>', re.IGNORECASE)
 
+try:
+    import libxml2
+except ImportError:
+    pass
+
 def correct_url(htmlcode, host, path):
     """This function is used to correct urls in html code.
 
@@ -487,3 +492,70 @@ class InvenioXMLExternalCollectionResultsParser(ExternalCollectionResultsParser)
         except AttributeError:
             # in case there were no results found an Attribute error is raised
             return ([], {})
+
+class ScienceCinemaXMLExternalCollectionResultsParser(ExternalCollectionResultsParser):
+    """XML parser for ScienceCinema"""
+
+    def parse_num_results(self):
+        """Returns the number of results"""
+        return self.buffer.split('</audio>')[0].count('<record>')
+
+    def parse(self, of='hb', req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
+        """Parse buffer to extract records. Format the records using the selected output format."""
+
+        def process_audio_record(record_node):
+            """Return HTML formatted version of an audio record_node"""
+            ostiId = ''
+            title = ''
+            description = ''
+            link = ''
+            image = ''
+            snippets = ''
+            subnode = record_node.children
+            while subnode is not None:
+                if subnode.name == 'ostiId':
+                    ostiId = str(subnode.content)
+                elif subnode.name == 'title':
+                    title = str(subnode.content)
+                elif subnode.name == 'description':
+                    description = str(subnode.content)
+                elif subnode.name == 'link':
+                    link = str(subnode.content)
+                elif subnode.name == 'image':
+                    image = str(subnode.content)
+                elif subnode.name == 'snippets':
+                    snippets = str(subnode.content)
+                subnode = subnode.next
+            return """<table><tr><td><img style="max-width:180px" src="%(image)s"/></td><td valign="top"><b>%(title)s</b><br/>
+%(description)s<br/>
+<a href="%(link)s">%(link)s</a></td></tr></table>
+            """ % \
+        {'title': title,
+         'ostiId': ostiId,
+         'description': description,
+         'link': link,
+         'image': image,
+         'snippets': snippets}
+
+        def process_metadata_record(record_node):
+            """Return HTML formatted version of a metadata record_node"""
+            return process_audio_record(record_node)
+
+        try:
+            document = libxml2.parseDoc(self.buffer)
+            node = document.getRootElement().children
+            while node is not None:
+                current_nodename = node.name
+                if current_nodename in ['audio']: # Currently ignore 'metadata' nodes
+                    result = node.children
+                    while result is not None:
+                        if result.name == 'record':
+                            if current_nodename == 'audio':
+                                self.add_html_result(process_audio_record(result))
+                            elif current_nodename == 'metadata':
+                                self.add_html_result(process_metadata_record(result))
+                        result = result.next
+                node = node.next
+            document.freeDoc()
+        except Exception, e:
+            return

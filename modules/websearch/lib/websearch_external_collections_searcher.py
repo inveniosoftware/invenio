@@ -33,7 +33,7 @@ from invenio.websearch_external_collections_parser import CDSIndicoCollectionRes
     KISSExternalCollectionResultsParser, GoogleScholarExternalCollectionResultsParser, \
     GoogleBooksExternalCollectionResultsParser, KISSBooksExternalCollectionResultsParser, \
     SPIRESExternalCollectionResultsParser, SCIRUSExternalCollectionResultsParser, \
-    CiteSeerExternalCollectionResultsParser
+    CiteSeerExternalCollectionResultsParser, ScienceCinemaXMLExternalCollectionResultsParser
 
 def format_basic(basic):
     """Format a basic query"""
@@ -643,6 +643,18 @@ class InvenioSearchEngine(ExternalSearchEngine):
         for recid in recids:
             recids_urls.append((recid, self.record_url + recid))
         return recids_urls
+
+# ScienceCinema
+
+class ScienceCinemaSearchEngine(ExternalSearchEngine):
+    """ScienceCinema"""
+
+    def __init__(self, configuration):
+        super(ScienceCinemaSearchEngine, self).__init__(configuration)
+        self.base_url = "http://www.osti.gov/sciencecinema"
+        self.search_url = "http://www.osti.gov/sciencecinema/searchxml?audio="
+        self.user_search_url = "http://www.osti.gov/sciencecinema/basicsearch.jsp?act=Search&searchFor="
+        self.parser = ScienceCinemaXMLExternalCollectionResultsParser()
 
 external_collections_dictionary = {}
 

@@ -87,6 +87,8 @@ CFG_EXTERNAL_COLLECTIONS = {
         {'engine': 'SPIRES'},
     'SLAC Library Catalog':
         {'engine': 'SPIRESBooks'},
+    'ScienceCinema':
+        {'engine': 'ScienceCinema'},
     'Atlantis Institute Books':
         {'engine': 'Invenio',
          'base_url': 'http://invenio-demo.cern.ch/',
