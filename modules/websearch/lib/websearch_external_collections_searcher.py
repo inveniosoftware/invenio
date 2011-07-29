@@ -614,7 +614,8 @@ class InvenioSearchEngine(ExternalSearchEngine):
                 search_url_params += '&d2y=' + req_args_dict['d2y'][0]
             if req_args_dict.has_key('ap'):
                 search_url_params += '&ap=' + req_args_dict['ap'][0]
-            search_url_params += '&of=' + self.fetch_format
+            if not '&userurl=true' in req_args:
+                search_url_params += '&of=' + self.fetch_format
             return self.search_url + search_url_params
         else:
             units = self.build_units(basic_search_units)
@@ -623,6 +624,12 @@ class InvenioSearchEngine(ExternalSearchEngine):
             request = self.combine_units(units)
             url_request = urllib.quote(request)
             return self.search_url + url_request + '&rg=' + str(limit) + '&of=' + self.fetch_format
+
+    def build_user_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
+        """Build a user search URL for a specific set of search_units."""
+        if type(req_args) is str:
+            req_args += '&userurl=true'
+        return self.build_search_url(basic_search_units, req_args, lang, limit)
 
     def build_search_unit_unit(self, basic):
         """Build a search string from a search unit. Reconstructs original user query"""

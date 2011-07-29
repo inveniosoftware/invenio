@@ -487,14 +487,13 @@ class InvenioXMLExternalCollectionResultsParser(ExternalCollectionResultsParser)
         """Parse buffer to extract records. Format the records using the selected output format."""
 
         (recids, records) = self.parse_and_extract_records(of)
-
         if req and cgi.parse_qs(req.args).has_key('jrec'):
             counter = int(cgi.parse_qs(req.args)['jrec'][0]) - 1
         else:
             counter = 0
         for recid in recids:
             counter += 1
-            if of == 'hb':
+            if of in ['hb', None]:
                 html = """
                         <tr><td valign="top" align="right" style="white-space: nowrap;">
                         <input name="recid" type="checkbox" value="%(recid)s" />
