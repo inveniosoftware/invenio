@@ -149,7 +149,7 @@ class SortedFieldsSearchEngine(ExternalSearchEngine):
 class CDSIndicoSearchEngine(ExternalSearchEngine):
     """Global class for CDS Search Engines."""
 
-    index_translator = {'title' : 'title', 'author': 'speaker', 'fulltext': 'fulltext'}
+    index_translator = {'title' : 'title', 'author': 'author', 'fulltext': 'fulltext', 'abstract': 'abstract', 'affiliation': 'affiliation', 'keyword': 'keyword'}
     lang_translator = {
         'ca': 'ca', 'cs': 'cs', 'de': 'de', 'el': 'el', 'en': 'en', 'es': 'es',
         'fr': 'fr', 'it': 'it', 'ja': 'ja', 'no': 'no', 'pl': 'pl', 'pt': 'pt',
@@ -157,8 +157,9 @@ class CDSIndicoSearchEngine(ExternalSearchEngine):
 
     def __init__(self, configuration):
         super(CDSIndicoSearchEngine, self).__init__(configuration)
-        self.base_url = 'http://indicosearch.cern.ch/'
-        self.search_url = 'http://indicosearchpublic.cern.ch/search?cc=INDICOPUBLIC&p='
+        self.base_url = 'http://indico.cern.ch/'
+        #self.search_url = 'http://indicosearchpublic.cern.ch/search?cc=INDICOPUBLIC&p='
+        self.search_url = 'http://indico.cern.ch/search.py?p='
         self.parser = CDSIndicoCollectionResutsParser()
 
     def build_search_unit_unit(self, basic):
