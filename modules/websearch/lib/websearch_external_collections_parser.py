@@ -31,6 +31,12 @@ import re
 from invenio.config import CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_MAXRESULTS
 CFG_EXTERNAL_COLLECTION_MAXRESULTS = CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_MAXRESULTS
 
+try:
+    from BeautifulSoup import BeautifulSoup
+    CFG_BEAUTIFULSOUP_INSTALLED = True
+except ImportError:
+    CFG_BEAUTIFULSOUP_INSTALLED = False
+
 from invenio.bibformat import format_record
 from invenio.websearch_external_collections_getter import fetch_url_content
 import cgi
@@ -172,8 +178,7 @@ class ExternalCollectionResultsParser(object):
 class CDSIndicoCollectionResutsParser(ExternalCollectionResultsParser):
     """Parser for Indico"""
 
-    num_results_regex = re.compile(r'<strong>([0-9]+?)</strong> records found')
-    result_regex = re.compile(r'<tr><td valign="top" align="right" style="white-space: nowrap;">\s*<input name="recid" type="checkbox" value="[0-9]+" \/>\s*([0-9]+\.)\s*</td><td valign="top">(.*?)<div class="moreinfo">.*?</div></td></tr>', re.MULTILINE + re.DOTALL)
+    num_results_regex = re.compile(r'<h3 style="float:right">Hits: ([0-9]+?)</h3>')
 
     def __init__(self, host="", path=""):
         super(CDSIndicoCollectionResutsParser, self).__init__(host, path)
@@ -181,12 +186,61 @@ class CDSIndicoCollectionResutsParser(ExternalCollectionResultsParser):
     def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
 
-        results = self.result_regex.finditer(self.buffer)
-        for result in results:
-            num = result.group(1)
-            html = result.group(2)
+        if CFG_BEAUTIFULSOUP_INSTALLED:
+            soup = BeautifulSoup(self.buffer)
 
-            self.add_html_result(num + ' ' + html  + '<br />', limit)
+            # Remove "more" links that include Indico Javascript
+            more_links = soup.findAll('a', { "class" : "searchResultLink", "href": "#"})
+            [more_link.extract() for more_link in more_links]
+
+            # Events
+            event_results = soup.findAll('li', {"class" : "searchResultEvent"})
+            event_index = 1
+            for result in event_results:
+                self.add_html_result((event_index == 1 and '<b>Events:</b><br/>' or '') + \
+                                     str(result)  + '<br />', limit)
+                event_index += 1
+            # Contributions
+            contribution_results = soup.findAll('li', {"class" : "searchResultContribution"})
+            contribution_index = 1
+            for result in contribution_results:
+                self.add_html_result((contribution_index == 1 and '<b>Contributions:</b><br/>' or '') + \
+                                     str(result)  + '<br />', limit)
+                contribution_index += 1
+        else:
+            # Markup is complex. Do whatever we can...
+            # Events
+            split_around_events = self.buffer.split('<li class="searchResultEvent">')
+            if len(split_around_events) > 1:
+                event_index = 1
+                for html_chunk in split_around_events[1:]:
+                    output = '<li class="searchResultEvent">'
+                    if event_index == len(split_around_events) -1:
+                        split_around_link = html_chunk.split('searchResultLink')
+                        split_around_ul = 'searchResultLink'.join(split_around_link[1:]).split('</ul>')
+                        output += split_around_link[0] + 'searchResultLink' + \
+                                  split_around_ul[0] + '</ul>' + split_around_ul[1]
+                    else:
+                        output += html_chunk
+                    self.add_html_result((event_index == 1 and '<b>Events:</b><br/>' or '') + \
+                                     output  + '<br />', limit)
+                    event_index += 1
+            # Contributions
+            split_around_contributions = self.buffer.split('<li class="searchResultContribution">')
+            if len(split_around_contributions) > 1:
+                contribution_index = 1
+                for html_chunk in split_around_contributions[1:]:
+                    output = '<li class="searchResultContribution">'
+                    if contribution_index == len(split_around_contributions) -1:
+                        split_around_link = html_chunk.split('searchResultLink')
+                        split_around_ul = 'searchResultLink'.join(split_around_link[1:]).split('</ul>')
+                        output += split_around_link[0] + 'searchResultLink' + \
+                                  split_around_ul[0] + '</ul>' + split_around_ul[1]
+                    else:
+                        output += html_chunk
+                    self.add_html_result((contribution_index == 1 and '<b>Contributions:</b><br/>' or '') + \
+                                     output  + '<br />', limit)
+                    contribution_index += 1
 
 class KISSExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """Parser for Kiss."""
