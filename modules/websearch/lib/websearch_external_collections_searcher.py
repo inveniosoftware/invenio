@@ -56,6 +56,7 @@ class ExternalSearchEngine(object):
 
     def __init__(self, configuration):
         self.search_url = ""
+        self.user_search_url = None
         self.combiner = " "
         self.name = None
         self.parser_params = None
@@ -87,7 +88,15 @@ class ExternalSearchEngine(object):
         return None
 
     def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
-        """Build a URL for a specific set of search_units."""
+        """
+        Build a search URL for a specific set of search_units.
+
+        This is the URL accessed by the engine to retrieve the records
+        to embed on the results page. Use C{self.search_url} as base
+        URL when L{search_url} is not set.
+
+        @see: L{build_user_search_url}
+        """
 
         units = self.build_units(basic_search_units)
         if len(units) == 0:
@@ -96,6 +105,32 @@ class ExternalSearchEngine(object):
         url_request = urllib.quote(request)
 
         return self.search_url + url_request
+
+    def build_user_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
+        """
+        Build a user search URL for a specific set of search_units.
+
+        This is the URL that users can follow to retrieve the full set
+        of results on the remote search engine. It can return a
+        different URL from L{build_search_url} when it retrieves for
+        eg. XML results, while this function would link to an HTML
+        page. Use L{self.user_search_url} as base URL.
+
+        Returns C{None} when the URL returned by L{build_search_url}
+        should be used instead.
+
+        @see: L{build_search_url}
+        """
+        if self.user_search_url is None:
+            return None
+
+        units = self.build_units(basic_search_units)
+        if len(units) == 0:
+            return None
+        request = self.combine_units(units)
+        url_request = urllib.quote(request)
+
+        return self.user_search_url + url_request
 
     def combine_units(self, units):
         """Combine the units to make a boolean AND query."""
