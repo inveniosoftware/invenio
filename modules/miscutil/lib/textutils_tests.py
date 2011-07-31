@@ -29,13 +29,20 @@ try:
 except ImportError:
     CHARDET_AVAILABLE = False
 
+try:
+    from unidecode import unidecode
+    UNIDECODE_AVAILABLE = True
+except ImportError:
+    UNIDECODE_AVAILABLE = False
+
 from invenio.textutils import \
      wrap_text_in_a_box, \
      guess_minimum_encoding, \
      wash_for_xml, \
      wash_for_utf8, \
      decode_to_unicode, \
-     translate_latex2unicode
+     translate_latex2unicode, \
+     translate_to_ascii
 
 from invenio.testutils import make_test_suite, run_test_suite
 
@@ -415,17 +422,28 @@ class DecodeToUnicodeTest(unittest.TestCase):
 class Latex2UnicodeTest(unittest.TestCase):
     """Test functions related to translating LaTeX symbols to Unicode."""
 
-    if CHARDET_AVAILABLE:
-        def test_latex_to_unicode(self):
-            """textutils - latex_to_unicode"""
-            self.assertEqual(translate_latex2unicode("\\'a \\'i \\'U").encode('utf-8'), "á í Ú")
-            self.assertEqual(translate_latex2unicode("\\'N \\k{i}"), u'\u0143 \u012f')
-            self.assertEqual(translate_latex2unicode("\\AAkeson"), u'\u212bkeson')
-            self.assertEqual(translate_latex2unicode("$\\mathsl{\\Zeta}$"), u'\U0001d6e7')
+    def test_latex_to_unicode(self):
+        """textutils - latex_to_unicode"""
+        self.assertEqual(translate_latex2unicode("\\'a \\'i \\'U").encode('utf-8'), "á í Ú")
+        self.assertEqual(translate_latex2unicode("\\'N \\k{i}"), u'\u0143 \u012f')
+        self.assertEqual(translate_latex2unicode("\\AAkeson"), u'\u212bkeson')
+        self.assertEqual(translate_latex2unicode("$\\mathsl{\\Zeta}$"), u'\U0001d6e7')
+
+class TranslateToAsciiTest(unittest.TestCase):
+    """Test functions related to transliterating text to ascii."""
+
+    def test_text_to_ascii(self):
+        """textutils - translate_to_ascii"""
+        self.assertEqual(translate_to_ascii(["á í Ú", "H\xc3\xb6hne", "Åge Øst Vær", "normal"]), \
+                                            ["a i U", "Hohne", "Age Ost Vaer", "normal"])
+        self.assertEqual(translate_to_ascii("àèéìòù"), ["aeeiou"])
+        self.assertEqual(translate_to_ascii(None), None)
+        self.assertEqual(translate_to_ascii([]), [])
+        self.assertEqual(translate_to_ascii([None]), [None])
 
 TEST_SUITE = make_test_suite(WrapTextInABoxTest, GuessMinimumEncodingTest,
                              WashForXMLTest, WashForUTF8Test, DecodeToUnicodeTest,
-                             Latex2UnicodeTest)
+                             Latex2UnicodeTest, TranslateToAsciiTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
