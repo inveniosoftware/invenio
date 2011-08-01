@@ -1435,8 +1435,10 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                     # display page not found for URLs like /CFG_SITE_RECORD/foo
                     return None, []
 
-            if recid <= 0:
-                # display page not found for URLs like /CFG_SITE_RECORD/-5 or /CFG_SITE_RECORD/0
+            from invenio.intbitset import __maxelem__
+            if recid <= 0 or recid > __maxelem__:
+                # __maxelem__ = 2147483647
+                # display page not found for URLs like /CFG_SITE_RECORD/-5 or /CFG_SITE_RECORD/0 or /CFG_SITE_RECORD/2147483649
                 return None, []
 
             format = None
