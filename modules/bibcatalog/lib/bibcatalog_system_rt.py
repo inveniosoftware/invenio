@@ -30,7 +30,6 @@ from invenio.bibcatalog_system import BibCatalogSystem, get_bibcat_from_prefs
 from invenio.config import CFG_BIBCATALOG_SYSTEM, \
                            CFG_BIBCATALOG_SYSTEM_RT_CLI, \
                            CFG_BIBCATALOG_SYSTEM_RT_URL, \
-                           CFG_BIBCATALOG_QUEUES, \
                            CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_USER, \
                            CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_PWD
 
@@ -41,13 +40,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
     def check_system(self, uid=None):
         """return an error string if there are problems"""
         if uid:
-            user_pref = invenio.webuser.get_user_preferences(uid)
-            if not user_pref.has_key('bibcatalog_username'):
-                return "user " + str(uid) + " has no bibcatalog_username"
-            rtuid = user_pref['bibcatalog_username']
-            if not user_pref.has_key('bibcatalog_password'):
-                return "user " + str(uid) + " has no bibcatalog_password"
-            rtpw = user_pref['bibcatalog_password']
+            rtuid, rtpw = get_bibcat_from_prefs(uid)
         else:
             # Assume default RT user
             rtuid = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_USER
@@ -55,6 +48,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
 
         if not rtuid and not rtpw:
             return "No valid RT user login specified"
+
         if not CFG_BIBCATALOG_SYSTEM == 'RT':
             return "CFG_BIBCATALOG_SYSTEM is not RT though this is an RT module"
         if not CFG_BIBCATALOG_SYSTEM_RT_CLI:
@@ -94,16 +88,10 @@ class BibCatalogSystemRT(BibCatalogSystem):
         saneoutput = (myout.count('matching') > 0) or (myout.count('1') > 0)
         if not saneoutput:
             return CFG_BIBCATALOG_SYSTEM_RT_CLI + " returned " + myout + " instead of 'matching' or '1'"
-        if not CFG_BIBCATALOG_QUEUES:
-            return "CFG_BIBCATALOG_QUEUES not defined or empty"
-        if uid:
-            (username, dummy) = get_bibcat_from_prefs(uid)
-            if (username is None):
-                return "Cannot find user preference bibcatalog_username for uid "+str(uid)
         return ""
 
     def ticket_search(self, uid, recordid=-1, subject="", text="", creator="", owner="", \
-                      date_from="", date_until="", status="", priority=""):
+                      date_from="", date_until="", status="", priority="", queue=""):
         """returns a list of ticket ID's related to this record or by
            matching the subject, creator or owner of the ticket."""
 
@@ -144,26 +132,22 @@ class BibCatalogSystemRT(BibCatalogSystem):
                 pass
             if (intpri > -1):
                 search_atoms.append("Priority = " + str(intpri))
+        if queue:
+            search_atoms.append("Queue = " + escape_shell_arg(queue))
         searchexp = " and ".join(search_atoms)
         tickets = []
-        if not CFG_BIBCATALOG_SYSTEM_RT_URL:
-            return tickets
 
-        httppart, siteandpath = CFG_BIBCATALOG_SYSTEM_RT_URL.split("//")
-        (username, passwd) = get_bibcat_from_prefs(uid)
-        BIBCATALOG_RT_SERVER = httppart + "//" + username + ":" + passwd + "@" + siteandpath
-        #set as env var
-        os.environ["RTUSER"] = username
-        os.environ["RTSERVER"] = BIBCATALOG_RT_SERVER
-        #search..
         if len(searchexp) == 0:
             #just make an expression that is true for all tickets
             searchexp = "Created > '1900-01-01'"
-        passwd = escape_shell_arg(passwd)
-        #make a call. This is safe since passwd and all variables in searchexp have been escaped.
-        dummy, myout, dummyerr = run_shell_command("echo "+passwd+" | " + CFG_BIBCATALOG_SYSTEM_RT_CLI + " ls -l \"" + searchexp + "\"")
+
+        command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " ls -l \"" + searchexp + "\""
+        command_out = self._run_rt_command(command, uid)
+        if command_out == None:
+            return tickets
+
         statuses = []
-        for line in myout.split("\n"):
+        for line in command_out.split("\n"):
             #if there are matching lines they will look like NUM:subj.. so pick num
             if (line.count('id: ticket/') > 0):
                 dummy, tnum = line.split('/') #get the ticket id
@@ -189,18 +173,6 @@ class BibCatalogSystemRT(BibCatalogSystem):
     def ticket_submit(self, uid=None, subject="", recordid=-1, text="", queue="",
         priority="", owner="", requestor=""):
         """creates a ticket. return ticket num on success, otherwise None"""
-        if not CFG_BIBCATALOG_SYSTEM_RT_URL:
-            return None
-        if uid:
-            username, passwd = get_bibcat_from_prefs(uid)
-        else:
-            username = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_USER
-            passwd = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_PWD
-        httppart, siteandpath = CFG_BIBCATALOG_SYSTEM_RT_URL.split("//")
-        BIBCATALOG_RT_SERVER = httppart + "//" + username + ":" + passwd + "@" + siteandpath
-        #set as env var
-        os.environ["RTUSER"] = username
-        os.environ["RTSERVER"] = BIBCATALOG_RT_SERVER
         queueset = ""
         textset = ""
         priorityset = ""
@@ -210,8 +182,6 @@ class BibCatalogSystemRT(BibCatalogSystem):
         if subject:
             subjectset = " subject=" + escape_shell_arg(subject)
         recidset = " CF-RecordID=" + escape_shell_arg(str(recordid))
-        if text:
-            textset = " text=" + escape_shell_arg(text)
         if priority:
             priorityset = " priority=" + escape_shell_arg(str(priority))
         if queue:
@@ -224,16 +194,20 @@ class BibCatalogSystemRT(BibCatalogSystem):
             if ownerprefs.has_key("bibcatalog_username"):
                 owner = ownerprefs["bibcatalog_username"]
                 ownerset = " owner=" + escape_shell_arg(owner)
-        #make a command.. note that all set 'set' parts have been escaped
-
+        if text:
+            if '\n' in text:
+                # contains newlines (\n) return with error
+                return "Newlines are not allowed in text parameter. Use ticket_comment() instead."
+            else:
+                textset = " text=" + escape_shell_arg(text)
+        # make a command.. note that all set 'set' parts have been escaped
         command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " create -t ticket set " + subjectset + recidset + \
                   queueset + textset + priorityset + ownerset + requestorset
-
-        passwd = escape_shell_arg(passwd)
-        #make a call.. passwd and command have been escaped (see above)
-        dummy, myout, dummyerr = run_shell_command("echo "+passwd+" | " + command)
+        command_out = self._run_rt_command(command, uid)
+        if command_out == None:
+            return None
         inum = -1
-        for line in myout.split("\n"):
+        for line in command_out.split("\n"):
             if line.count(' ') > 0:
                 stuff = line.split(' ')
                 try:
@@ -243,6 +217,15 @@ class BibCatalogSystemRT(BibCatalogSystem):
         if inum > 0:
             return inum
         return None
+
+    def ticket_comment(self, uid, ticketid, comment):
+        """comment on a given ticket. Returns 1 on success, 0 on failure"""
+        command = '%s comment -m %s %s' % (CFG_BIBCATALOG_SYSTEM_RT_CLI, \
+                                           escape_shell_arg(comment), str(ticketid))
+        command_out = self._run_rt_command(command, uid)
+        if command_out == None:
+            return None
+        return 1
 
     def ticket_assign(self, uid, ticketid, to_user):
         """assign a ticket to an RT user. Returns 1 on success, 0 on failure"""
@@ -283,30 +266,20 @@ class BibCatalogSystemRT(BibCatalogSystem):
         if (attribute == 'queue'):
             setme = " set queue='" + escape_shell_arg(new_value) +"'"
 
-        if not CFG_BIBCATALOG_SYSTEM_RT_URL:
-            return 0
         #make sure ticketid is numeric
         try:
             dummy = int(ticketid)
         except:
             return 0
-        (username, passwd) = get_bibcat_from_prefs(uid)
-        httppart, siteandpath = CFG_BIBCATALOG_SYSTEM_RT_URL.split("//")
-        BIBCATALOG_RT_SERVER = httppart + "//" + username + ":" + passwd + "@" + siteandpath
-        #set as env var
-        os.environ["RTUSER"] = username
-        os.environ["RTSERVER"] = BIBCATALOG_RT_SERVER
-        passwd = escape_shell_arg(passwd)
-        #make a call. safe since passwd and all variables in 'setme' have been escaped
-        dummy, myout, dummyerr = run_shell_command("echo "+passwd+" | " + CFG_BIBCATALOG_SYSTEM_RT_CLI + " edit ticket/" + str(ticketid) + setme)
-        respOK = False
-        mylines = myout.split("\n")
+
+        command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " edit ticket/" + str(ticketid) + setme
+        command_out = self._run_rt_command(command, uid)
+        if command_out == None:
+            return 0
+        mylines = command_out.split("\n")
         for line in mylines:
             if line.count('updated') > 0:
-                respOK = True
-        if respOK:
-            return 1
-            #print str(mylines)
+                return 1
         return 0
 
     def ticket_get_attribute(self, uid, ticketid, attribute):
@@ -320,8 +293,6 @@ class BibCatalogSystemRT(BibCatalogSystem):
         """return ticket info as a dictionary of pre-defined attribute names.
            Or just those listed in attrlist.
            Returns None on failure"""
-        if not CFG_BIBCATALOG_SYSTEM_RT_URL:
-            return 0
         #make sure ticketid is numeric
         try:
             dummy = int(ticketid)
@@ -329,37 +300,44 @@ class BibCatalogSystemRT(BibCatalogSystem):
             return 0
         if attributes is None:
             attributes = []
-        (username, passwd) = get_bibcat_from_prefs(uid)
-        httppart, siteandpath = CFG_BIBCATALOG_SYSTEM_RT_URL.split("//")
-        BIBCATALOG_RT_SERVER = httppart + "//" + username + ":" + passwd + "@" + siteandpath
-        #set as env var
-        os.environ["RTUSER"] = username
-        os.environ["RTSERVER"] = BIBCATALOG_RT_SERVER
-        passwd = escape_shell_arg(passwd)
-        #make a call. This is safe.. passwd escaped, ticketid numeric
-        dummy, myout, dummyerr = run_shell_command("echo "+passwd+" | " + CFG_BIBCATALOG_SYSTEM_RT_CLI + " show ticket/" + str(ticketid))
+
+        command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " show ticket/" + str(ticketid)
+        command_out = self._run_rt_command(command, uid)
+        print command_out
+        if command_out == None:
+            return 0
+
         tdict = {}
-        for line in myout.split("\n"):
+        for line in command_out.split("\n"):
             if line.count(": ") > 0:
                 tattr, tvaluen = line.split(": ")
                 tvalue = tvaluen.rstrip()
                 tdict[tattr] = tvalue
+
         #query again to get attachments -> Contents
-        dummy, myout, dummyerr = run_shell_command("echo "+passwd+" | " + CFG_BIBCATALOG_SYSTEM_RT_CLI + " show ticket/" + str(ticketid) + "/attachments/")
+        command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " show ticket/" + str(ticketid) + "/attachments/"
+        command_out = self._run_rt_command(command, uid)
+        if command_out == None:
+            return 0
+
         attachments = []
-        for line in myout.split("\n"):
+        for line in command_out.split("\n"):
             if line.count(": ") > 1: #there is a line Attachments: 40: xxx
                 aline = line.split(": ")
                 attachments.append(aline[1])
+
         #query again for each attachment
         for att in attachments:
-            #passwd still escaped..
-            dummy, myout, dummyerr = run_shell_command("echo "+passwd+" | " + CFG_BIBCATALOG_SYSTEM_RT_CLI + " show ticket/" + str(ticketid) + "/attachments/" + att)
+            command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " show ticket/" + str(ticketid) + "/attachments/" + att
+            command_out = self._run_rt_command(command, uid)
+            if command_out == None:
+                return 0
             #get the contents line
-            for line in myout.split("\n"):
+            for line in command_out.split("\n"):
                 if line.count("Content: ") > 0:
                     cstuff = line.split("Content: ")
                     tdict['Text'] = cstuff[1].rstrip()
+
         if (len(tdict) > 0):
             #iterate over TICKET_ATTRIBUTES to make a canonical ticket
             candict = {}
@@ -393,5 +371,38 @@ class BibCatalogSystemRT(BibCatalogSystem):
                 return tdict
         else:
             return None
+
+    def _run_rt_command(self, command, uid=None):
+        """
+        This function will run a RT CLI command as given user. If no user is specified
+        the default RT user will be used, if configured.
+
+        Should any of the configuration parameters be missing this function will return
+        None. Otherwise it will return the standard output from the CLI command.
+
+        @param command: RT CLI command to execute
+        @type command: string
+
+        @param uid: the Invenio user id to submit on behalf of. Optional.
+        @type uid: int
+
+        @return: standard output from the command given. None, if any errors.
+        @rtype: string
+        """
+        if not CFG_BIBCATALOG_SYSTEM_RT_URL:
+            return None
+        if uid:
+            username, passwd = get_bibcat_from_prefs(uid)
+        else:
+            username = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_USER
+            passwd = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_PWD
+        httppart, siteandpath = CFG_BIBCATALOG_SYSTEM_RT_URL.split("//")
+        BIBCATALOG_RT_SERVER = httppart + "//" + username + ":" + passwd + "@" + siteandpath
+        #set as env var
+        os.environ["RTUSER"] = username
+        os.environ["RTSERVER"] = BIBCATALOG_RT_SERVER
+        passwd = escape_shell_arg(passwd)
+        dummy, myout, dummyerr = run_shell_command("echo "+passwd+" | " + command)
+        return myout
 
 
