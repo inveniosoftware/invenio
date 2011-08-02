@@ -617,17 +617,20 @@ def kb_export(req, kbname="", format="kbr", searchkey="", searchvalue="", search
                     req=req)
 
     if kbtype == None or kbtype == 'w':
-        # left side / right side KB
-        mappings = bibknowledge.get_kb_mappings(kbname, searchkey, \
-                                                searchvalue, searchtype)
-
-        if format and format[0] == 'j':
+        if format and format == "ejson":
+            req.content_type = 'application/json'
+            return bibknowledge.get_kb_mappings_embedded_json(kbname, searchkey, \
+                                                    searchvalue, searchtype, limit)
+        elif format and format[0] == 'j':
             # as JSON formatted string
             req.content_type = 'application/json'
             return bibknowledge.get_kb_mappings_json(kbname, searchkey, \
                                                     searchvalue, searchtype, limit)
 
-        elif format == 'right' or format == 'kba':
+        # left side / right side KB
+        mappings = bibknowledge.get_kb_mappings(kbname, searchkey, \
+                                                searchvalue, searchtype)
+        if format == 'right' or format == 'kba':
             # as authority sequence
             seq = [m['value'] for m in mappings]
             seq = uniq(sorted(seq))

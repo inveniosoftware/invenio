@@ -125,12 +125,37 @@ def get_kb_mappings_json(kb_name="", key="", value="", match_type="s", limit=Non
     """
     mappings = get_kb_mappings(kb_name, key, value, match_type)
     ret = []
-    for m in mappings:
+    if limit is None:
+        limit = len(mappings)
+    for m in mappings[:limit]:
         label = m['value'] or m['key']
         value = m['key'] or m['value']
         ret.append({'label': label, 'value': value})
-    if limit is not None:
-        ret = ret[:limit]
+    return json.dumps(ret)
+
+def get_kb_mappings_embedded_json(kb_name="", key="", value="", match_type="s", limit=None):
+    """Get leftside/rightside mappings from kb kb_name formatted as json dict.
+       The rightside is actually considered as a json string and hence embedded
+       within the final result.
+
+       If key given, give only those with left side (mapFrom) = key.
+       If value given, give only those with right side (mapTo) = value.
+
+       @param kb_name: the name of the kb
+       @param key: include only lines matching this on left side in the results
+       @param value: include only lines matching this on right side in the results
+       @param match_type: s = substring match, e = exact match
+       @param limit: maximum number of results to return (are ALL if set to None)
+       @return a list of mappings
+    """
+    mappings = get_kb_mappings(kb_name, key, value, match_type)
+    ret = []
+    if limit is None:
+        limit = len(mappings)
+    for m in mappings[:limit]:
+        label = m['value'] or m['key']
+        value = m['key'] or m['value']
+        ret.append({'label': label, 'value': json.loads(value)})
     return json.dumps(ret)
 
 def kb_exists(kb_name):
