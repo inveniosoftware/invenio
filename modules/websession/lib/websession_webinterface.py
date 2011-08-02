@@ -37,7 +37,8 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_SITE_URL, \
      CFG_CERN_SITE, \
-     CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
+     CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
+     CFG_OPENAIRE_SITE
 from invenio import webuser
 from invenio.webpage import page
 from invenio import webaccount
@@ -689,7 +690,11 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         Implement logout method for external service providers.
         """
         webuser.logoutUser(req)
-        redirect_to_url(req, "%s/img/pix.png" % CFG_SITE_URL)
+        if CFG_OPENAIRE_SITE:
+            from invenio.config import CFG_OPENAIRE_PORTAL_URL
+            redirect_to_url(req, CFG_OPENAIRE_PORTAL_URL)
+        else:
+            redirect_to_url(req, "%s/img/pix.png" % CFG_SITE_URL)
 
     def robotlogin(self, req, form):
         """
@@ -729,6 +734,9 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
             # login successful!
             if args['referer']:
+                if CFG_OPENAIRE_SITE and args['referer'].startswith('https://openaire.cern.ch/deposit'):
+                    ## HACK for OpenAIRE
+                    args['referer'] = args['referer'].replace('https://openaire.cern.ch/deposit', 'http://openaire.cern.ch/deposit')
                 redirect_to_url(req, args['referer'])
             else:
                 return self.display(req, form)
@@ -760,6 +768,15 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'action': (str, ''),
             'remember_me' : (str, ''),
             'referer': (str, '')})
+
+        if CFG_OPENAIRE_SITE:
+            from invenio.config import CFG_OPENAIRE_PORTAL_URL
+            if CFG_OPENAIRE_PORTAL_URL:
+                from invenio.urlutils import create_url
+                from base64 import encodestring
+                invenio_loginurl = args['referer'] or '%s/youraccount/display?ln=%s' % (CFG_SITE_SECURE_URL, args['ln'])
+                loginurl = create_url(CFG_OPENAIRE_PORTAL_URL, {"option": "com_openaire", "view": "login", "return": encodestring(invenio_loginurl)})
+                redirect_to_url(req, loginurl)
 
         # sanity checks:
         args['login_method'] = wash_login_method(args['login_method'])

@@ -31,7 +31,7 @@ from invenio.webinterface_handler import create_handler
 from invenio.errorlib import register_exception
 from invenio.webinterface_handler import WebInterfaceDirectory
 from invenio import webinterface_handler_config as apache
-from invenio.config import CFG_DEVEL_SITE
+from invenio.config import CFG_DEVEL_SITE, CFG_OPENAIRE_SITE
 
 class WebInterfaceDumbPages(WebInterfaceDirectory):
     """This class implements a dumb interface to use as a fallback in case of
@@ -209,6 +209,17 @@ except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceBibAuthorIDPages = WebInterfaceDumbPages
 
+if CFG_OPENAIRE_SITE:
+    try:
+        from invenio.openaire_deposit_webinterface import \
+            WebInterfaceOpenAIREDepositPages
+    except:
+        register_exception(alert_admin=True, subject='EMERGENCY')
+        WebInterfaceOpenAIREDepositPages = WebInterfaceDumbPages
+    openaire_exports = ['deposit']
+else:
+    openaire_exports = []
+
 if CFG_DEVEL_SITE:
     try:
         from invenio.httptest_webinterface import WebInterfaceHTTPTestPages
@@ -246,14 +257,16 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'exporter',
         'kb',
         'batchuploader',
-        'bibsword',
-        'person'
-        ] + test_exports
+        'person',
+        'bibsword'
+        ] + test_exports + openaire_exports
 
     def __init__(self):
         self.getfile = websubmit_legacy_getfile
         if CFG_DEVEL_SITE:
             self.httptest = WebInterfaceHTTPTestPages()
+        if CFG_OPENAIRE_SITE:
+            self.deposit = WebInterfaceOpenAIREDepositPages()
 
     author = WebInterfaceAuthorPages()
     submit = WebInterfaceSubmitPages()
