@@ -179,8 +179,7 @@ def task_run_core():
             if proceed == 0 or proceed == -1 : #update needed!
                 write_message("source %s is going to be updated" % (reponame,))
                 fromdate = str(repos[0][7])
-                fromdate = fromdate.split()[0] # get rid of time
-                                               # of the day for the moment
+                fromdate = fromdate.split()[0] # get rid of time of the day for the moment
                 task_update_progress("Harvesting %s (%i/%i)" % \
                                      (reponame,
                                      j, \
@@ -850,8 +849,9 @@ def call_bibupload(marcxmlfile, mode=None, oai_src_id= -1):
     if os.path.exists(marcxmlfile):
         try:
             args = mode
-            # Add priority 6 and file to upload to arguments #FIXME: allow per-harvest priority
-            args.extend(["-P","6",marcxmlfile])
+            # Add custom name 'oai' with priority 6 and file to upload to arguments
+            #FIXME: allow per-harvest arguments
+            args.extend(["-N", "oai","-P","6",marcxmlfile])
             task_id = task_low_level_submission("bibupload", "oaiharvest", *tuple(args))
             create_oaiharvest_log(task_id, oai_src_id, marcxmlfile)
         except Exception, msg:
