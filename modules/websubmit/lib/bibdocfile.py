@@ -1333,6 +1333,24 @@ class BibRecDocs:
                 self.merge_bibdocs(docname, new_docname)
             docnames.add(docname)
 
+    def check_file_exists(self, path):
+        """
+        Check if a file with the same content of the file pointed in C{path}
+        is already attached to this record.
+
+        @param path: the file to be checked against.
+        @type path: string
+        @return: True if a file with the requested content is already attached
+        to the record.
+        @rtype: bool
+        """
+        # Let's consider all the latest files
+        for bibdoc in self.list_bibdocs():
+            if bibdoc.check_file_exists(path):
+                return True
+        return False
+
+
 class BibDoc:
     """
     This class represents one document (i.e. a set of files with different
