@@ -33,7 +33,7 @@ from invenio.websearch_external_collections_parser import CDSIndicoCollectionRes
     KISSExternalCollectionResultsParser, GoogleScholarExternalCollectionResultsParser, \
     GoogleBooksExternalCollectionResultsParser, KISSBooksExternalCollectionResultsParser, \
     SPIRESExternalCollectionResultsParser, SCIRUSExternalCollectionResultsParser, \
-    CiteSeerExternalCollectionResultsParser
+    CiteSeerExternalCollectionResultsParser, ScienceCinemaXMLExternalCollectionResultsParser
 
 def format_basic(basic):
     """Format a basic query"""
@@ -56,6 +56,7 @@ class ExternalSearchEngine(object):
 
     def __init__(self, configuration):
         self.search_url = ""
+        self.user_search_url = None
         self.combiner = " "
         self.name = None
         self.parser_params = None
@@ -87,7 +88,15 @@ class ExternalSearchEngine(object):
         return None
 
     def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
-        """Build a URL for a specific set of search_units."""
+        """
+        Build a search URL for a specific set of search_units.
+
+        This is the URL accessed by the engine to retrieve the records
+        to embed on the results page. Use C{self.search_url} as base
+        URL when L{search_url} is not set.
+
+        @see: L{build_user_search_url}
+        """
 
         units = self.build_units(basic_search_units)
         if len(units) == 0:
@@ -96,6 +105,32 @@ class ExternalSearchEngine(object):
         url_request = urllib.quote(request)
 
         return self.search_url + url_request
+
+    def build_user_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
+        """
+        Build a user search URL for a specific set of search_units.
+
+        This is the URL that users can follow to retrieve the full set
+        of results on the remote search engine. It can return a
+        different URL from L{build_search_url} when it retrieves for
+        eg. XML results, while this function would link to an HTML
+        page. Use L{self.user_search_url} as base URL.
+
+        Returns C{None} when the URL returned by L{build_search_url}
+        should be used instead.
+
+        @see: L{build_search_url}
+        """
+        if self.user_search_url is None:
+            return None
+
+        units = self.build_units(basic_search_units)
+        if len(units) == 0:
+            return None
+        request = self.combine_units(units)
+        url_request = urllib.quote(request)
+
+        return self.user_search_url + url_request
 
     def combine_units(self, units):
         """Combine the units to make a boolean AND query."""
@@ -149,7 +184,7 @@ class SortedFieldsSearchEngine(ExternalSearchEngine):
 class CDSIndicoSearchEngine(ExternalSearchEngine):
     """Global class for CDS Search Engines."""
 
-    index_translator = {'title' : 'title', 'author': 'speaker', 'fulltext': 'fulltext'}
+    index_translator = {'title' : 'title', 'author': 'author', 'fulltext': 'fulltext', 'abstract': 'abstract', 'affiliation': 'affiliation', 'keyword': 'keyword'}
     lang_translator = {
         'ca': 'ca', 'cs': 'cs', 'de': 'de', 'el': 'el', 'en': 'en', 'es': 'es',
         'fr': 'fr', 'it': 'it', 'ja': 'ja', 'no': 'no', 'pl': 'pl', 'pt': 'pt',
@@ -157,8 +192,9 @@ class CDSIndicoSearchEngine(ExternalSearchEngine):
 
     def __init__(self, configuration):
         super(CDSIndicoSearchEngine, self).__init__(configuration)
-        self.base_url = 'http://indicosearch.cern.ch/'
-        self.search_url = 'http://indicosearchpublic.cern.ch/search?cc=INDICOPUBLIC&p='
+        self.base_url = 'http://indico.cern.ch/'
+        #self.search_url = 'http://indicosearchpublic.cern.ch/search?cc=INDICOPUBLIC&p='
+        self.search_url = 'http://indico.cern.ch/search.py?p='
         self.parser = CDSIndicoCollectionResutsParser()
 
     def build_search_unit_unit(self, basic):
@@ -578,7 +614,8 @@ class InvenioSearchEngine(ExternalSearchEngine):
                 search_url_params += '&d2y=' + req_args_dict['d2y'][0]
             if req_args_dict.has_key('ap'):
                 search_url_params += '&ap=' + req_args_dict['ap'][0]
-            search_url_params += '&of=' + self.fetch_format
+            if not '&userurl=true' in req_args:
+                search_url_params += '&of=' + self.fetch_format
             return self.search_url + search_url_params
         else:
             units = self.build_units(basic_search_units)
@@ -587,6 +624,12 @@ class InvenioSearchEngine(ExternalSearchEngine):
             request = self.combine_units(units)
             url_request = urllib.quote(request)
             return self.search_url + url_request + '&rg=' + str(limit) + '&of=' + self.fetch_format
+
+    def build_user_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
+        """Build a user search URL for a specific set of search_units."""
+        if type(req_args) is str:
+            req_args += '&userurl=true'
+        return self.build_search_url(basic_search_units, req_args, lang, limit)
 
     def build_search_unit_unit(self, basic):
         """Build a search string from a search unit. Reconstructs original user query"""
@@ -608,6 +651,18 @@ class InvenioSearchEngine(ExternalSearchEngine):
         for recid in recids:
             recids_urls.append((recid, self.record_url + recid))
         return recids_urls
+
+# ScienceCinema
+
+class ScienceCinemaSearchEngine(ExternalSearchEngine):
+    """ScienceCinema"""
+
+    def __init__(self, configuration):
+        super(ScienceCinemaSearchEngine, self).__init__(configuration)
+        self.base_url = "http://www.osti.gov/sciencecinema"
+        self.search_url = "http://www.osti.gov/sciencecinema/searchxml?audio="
+        self.user_search_url = "http://www.osti.gov/sciencecinema/basicsearch.jsp?act=Search&searchFor="
+        self.parser = ScienceCinemaXMLExternalCollectionResultsParser()
 
 external_collections_dictionary = {}
 
