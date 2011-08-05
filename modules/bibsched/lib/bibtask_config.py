@@ -40,64 +40,65 @@ CFG_BIBTASK_NON_REPETITIVE_TASK = ('bibupload')
 # to find initialized. Webcoll is empty because current webcoll algorithms
 # relays on parameters not being initialized at all.
 CFG_BIBTASK_DEFAULT_TASK_SETTINGS = {
-    'inveniogc' : {
-        'logs' : False,
-        'guests' : False,
-        'bibxxx' : False,
-        'documents' : False,
-        'cache' : False,
-        'tasks' : False,
+    'inveniogc': {
+        'logs': False,
+        'guests': False,
+        'bibxxx': False,
+        'documents': False,
+        'cache': False,
+        'tasks': False,
     },
-    'oaiharvest' : {
-        'repository' : None,
-        'dates' : None,
+    'oaiharvest': {
+        'repository': None,
+        'dates': None,
     },
-    'oairepositoryupdater' : {
-        'no_upload' : 0,
+    'oairepositoryupdater': {
+        'no_upload': 0,
     },
-    'bibupload' : {
-        'mode' : None,
-        'verbose' : 1,
-        'tag' : None,
-        'file_path' : None,
-        'notimechange' : 0,
-        'stage_to_start_from' : 1,
-        'pretend' : False,
+    'bibupload': {
+        'mode': None,
+        'verbose': 1,
+        'tag': None,
+        'file_path': None,
+        'notimechange': 0,
+        'stage_to_start_from': 1,
+        'pretend': False,
+        'force': False,
     },
-    'bibindex' : {
-        'cmd' : 'add',
-        'id' : [],
-        'modified' : [],
-        'collection' : [],
-        'maxmem' : 0,
-        'flush' : 10000,
-        'windex' : None,
-        'reindex' : False,
+    'bibindex': {
+        'cmd': 'add',
+        'id': [],
+        'modified': [],
+        'collection': [],
+        'maxmem': 0,
+        'flush': 10000,
+        'windex': None,
+        'reindex': False,
     },
-    'bibrank' : {
-        'quick' : 'yes',
-        'cmd' : 'add',
-        'flush' : 100000,
-        'collection' : [],
-        'id' : [],
-        'check' : "",
-        'stat' : "",
-        'modified' : "",
-        'last_updated' : 'last_updated',
-        'run' : [],
+    'bibrank': {
+        'quick': 'yes',
+        'cmd': 'add',
+        'flush': 100000,
+        'collection': [],
+        'id': [],
+        'check': "",
+        'stat': "",
+        'modified': "",
+        'last_updated': 'last_updated',
+        'run': [],
     },
-    'webcoll' : {
+    'webcoll': {
     },
-    'bibreformat' : {
-        'format' : 'hb',
+    'bibreformat': {
+        'format': 'hb',
     },
-    'bibtaskex' : {
-        'number' : 30,
+    'bibtaskex': {
+        'number': 30,
     },
-    'bibexport' : {
-        'wjob' : None,
+    'bibexport': {
+        'wjob': None,
     },
-    'dbdump' : {
+    'dbdump': {
         'output': CFG_LOGDIR,
         'number': 5,
     },
