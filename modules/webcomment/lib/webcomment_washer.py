@@ -9,22 +9,36 @@ class EmailWasher(HTMLWasher):
     def handle_starttag(self, tag, attrs):
         """Function called for new opening tags"""
         if tag.lower() in self.allowed_tag_whitelist:
-            if tag.lower() in ['ul', 'ol']:
-                self.result += '\n'
+            if tag.lower() == 'ol':
+                # we need a list to store the last
+                # number used  in the previous ordered lists
+                self.previous_nbs.append(self.nb)
+                self.nb = 0
+                # we need to know which is the tag list
+                self.previous_type_lists.append(tag.lower())
+            elif tag.lower() == 'ul':
+                self.previous_type_lists.append(tag.lower())
             elif tag.lower() == 'li':
-                self.result += '* '
+                if self.previous_type_lists[-1] == 'ol':
+                    self.nb += 1
+                    self.result += str(self.nb) + '. '
+                else:
+                    self.result += '* '
             elif tag.lower() == 'a':
+                self.previous_type_lists.append(tag.lower())
                 for (attr, value) in attrs:
                     if attr.lower() == 'href':
-                        self.result += '<' + value + '>' + '('
+                        self.url = value
+                        self.result += '<' + value + '>'
 
     def handle_endtag(self, tag):
         """Function called for ending of tags"""
         if tag.lower() in self.allowed_tag_whitelist:
-            if tag.lower() in ['li', 'ul', 'ol']:
-                self.result += '\n'
-            elif tag.lower() == 'a':
-                self.result += ')'
+            if tag.lower() in ['ul', 'ol']:
+                self.previous_type_lists = self.previous_type_lists[:-1]
+                if tag.lower() == 'ol':
+                    self.nb = self.previous_nbs[-1]
+                    self.previous_nbs = self.previous_nbs[:-1]
 
     def handle_startendtag(self, tag, attrs):
         """Function called for empty tags (e.g. <br />)"""

@@ -122,6 +122,10 @@ class HTMLWasher(HTMLParser):
         """ Constructor; initializes washer """
         HTMLParser.__init__(self)
         self.result = ''
+        self.nb = 0
+        self.previous_nbs = []
+        self.previous_type_lists = []
+        self.url = ''
         self.render_unallowed_tags = False
         self.allowed_tag_whitelist = \
                 cfg_html_buffer_allowed_tag_whitelist
@@ -165,6 +169,10 @@ class HTMLWasher(HTMLParser):
         """
         self.reset()
         self.result = ''
+        self.nb = 0
+        self.previous_nbs = []
+        self.previous_type_lists = []
+        self.url = ''
         self.render_unallowed_tags = render_unallowed_tags
         self.allowed_tag_whitelist = allowed_tag_whitelist
         self.allowed_attribute_whitelist = allowed_attribute_whitelist
@@ -196,7 +204,15 @@ class HTMLWasher(HTMLParser):
     def handle_data(self, data):
         """Function called for text nodes"""
         if not self.silent:
-            self.result += cgi.escape(data, True)
+            # let's to check if data contains a link
+            import string
+            if string.find(str(data),'http://') == -1:
+                self.result += cgi.escape(data, True)
+            else:
+                if self.url:
+                    if self.url <> data:
+                        self.url = ''
+                        self.result += '(' + cgi.escape(data, True) + ')'
 
     def handle_endtag(self, tag):
         """Function called for ending of tags"""
