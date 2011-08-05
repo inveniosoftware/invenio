@@ -37,7 +37,8 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_SITE_URL, \
      CFG_PYLIBDIR, \
-     CFG_WEBSUBMIT_STORAGEDIR
+     CFG_WEBSUBMIT_STORAGEDIR, \
+     CFG_DEVEL_SITE
 from invenio.dbquery import Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role
@@ -1048,7 +1049,10 @@ def endaction(req,
     except InvenioWebSubmitFunctionError, e:
         register_exception(req=req, alert_admin=True, prefix='doctype="%s", action="%s", step="%s", form="%s", start_time="%s"' % (doctype, act, step, form, start_time))
         ## There was a serious function-error. Execution ends.
-        return warningMsg(_("A serious function-error has been encountered. Adminstrators have been alerted. <br /><em>Please not that this might be due to wrong characters inserted into the form</em> (e.g. by copy and pasting some text from a PDF file)."), req, c, ln)
+        if CFG_DEVEL_SITE:
+            raise
+        else:
+            return warningMsg(_("A serious function-error has been encountered. Adminstrators have been alerted. <br /><em>Please not that this might be due to wrong characters inserted into the form</em> (e.g. by copy and pasting some text from a PDF file)."), req, c, ln)
     except InvenioWebSubmitFunctionStop, e:
         ## For one reason or another, one of the functions has determined that
         ## the data-processing phase (i.e. the functions execution) should be
