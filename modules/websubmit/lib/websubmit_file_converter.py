@@ -186,7 +186,7 @@ def get_conversion_map():
         ret['.sxw']['.odt'] = (unoconv, {'output_format': 'odt'})
         ret['.odt']['.doc'] = (unoconv, {'output_format': 'doc'})
         ret['.odt']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
-        ret['.odt']['.txt'] = (unoconv, {'output_format': 'text'})
+        ret['.odt']['.txt'] = (unoconv, {'output_format': 'txt'})
         ret['.ppt']['.odp'] = (unoconv, {'output_format': 'odp'})
         ret['.pptx']['.odp'] = (unoconv, {'output_format': 'odp'})
         ret['.sxi']['.odp'] = (unoconv, {'output_format': 'odp'})
