@@ -104,7 +104,7 @@ class TestCompareNames(unittest.TestCase):
     def test_compare_names(self):
         """bibauthorid - test names comparison funcions"""
 
-        self.assertEqual(0.94999999999999996,
+        self.assertEqual(1.0,
             bau.compare_names('Ellis, j.', 'Ellis, j.'))
 
         self.assertEqual(1.0,
@@ -122,7 +122,7 @@ class TestCompareNames(unittest.TestCase):
         self.assertEqual(0.0,
             bau.compare_names('Ellis, John', 'Mark, John'))
 
-        self.assertEqual(0.0,
+        self.assertEqual(1.0,
             bau.compare_names('', ''))
 
 

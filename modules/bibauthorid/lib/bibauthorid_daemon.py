@@ -132,7 +132,10 @@ Examples:
   --repair-personid         Deletes untouched person entities to then
                             re-create and updated these entities.
   --fast-update-personid    Updates personid adding not yet assigned papers to the system,
-                            in a fast, best effort basis.
+                            in a fast, best effort basis. Use -r to limit to a comma separated
+                            set of records.
+  --personid-gc             Garbage collects personid for stale records. Use -r to limit to a comma 
+                            separated set of records.
 """,
         version="Invenio Bibauthorid v%s" % bconfig.VERSION,
         specific_params=("r:d:n:p:m:GURa",
@@ -150,7 +153,8 @@ Examples:
              "record-ids=",
              "all-records",
              "repair-personid",
-             "fast-update-personid="
+             "fast-update-personid",
+             "personid-gc"
             ]),
         task_submit_elaborate_specific_parameter_fnc=
             _task_submit_elaborate_specific_parameter,
@@ -215,7 +219,10 @@ def _task_submit_elaborate_specific_parameter(key, value, opts, args):
         bibtask.task_set_option("repair_pid", True)
 
     elif key in ("--fast-update-personid"):
-        bibtask.task_set_option("fast_update_personid", value)
+        bibtask.task_set_option("fast_update_personid", True)
+
+    elif key in ("--personid-gc"):
+        bibtask.task_set_option("personid_gc", True)
 
     else:
         return False
@@ -243,12 +250,11 @@ def _task_run_core():
     all_records = bibtask.task_get_option('all_records')
     repair_pid = bibtask.task_get_option('repair_pid')
     fast_update_personid = bibtask.task_get_option('fast_update_personid')
+    personid_gc = bibtask.task_get_option('personid_gc')
 
     if record_ids:
         record_ids_nested = [[p] for p in record_ids]
 
-    if fast_update_personid:
-        fast_update_personid = [[p] for p in fast_update_personid]
 #    automated_daemon_mode_p = True
 
     if lastname:
@@ -374,8 +380,13 @@ def _task_run_core():
 
     if fast_update_personid:
         bibtask.task_update_progress('Updating personid...')
-        _run_personid_fast_assign_papers(fast_update_personid)
-        bibtask.task_update_progress('Update finished...')
+        _run_personid_fast_assign_papers(record_ids_nested)
+        bibtask.task_update_progress('PersonID update finished!')
+
+    if personid_gc:
+        bibtask.task_update_progress('Updating personid (GC)...')
+        _run_personid_gc(record_ids_nested)
+        bibtask.task_update_progress('PersonID update finished (GC)!')
         #TODO: remember to pass the papers list!
     return 1
 
@@ -398,6 +409,7 @@ def _task_submit_check_options():
     all_records = bibtask.task_get_option('all_records')
     repair_pid = bibtask.task_get_option('repair_pid')
     fast_update_personid = bibtask.task_get_option('fast_update_personid')
+    personid_gc = bibtask.task_get_option('personid_gc')
 
     if (record_ids and all_records):
         bibtask.write_message("ERROR: conflicting options: --record-ids and "
@@ -410,17 +422,18 @@ def _task_submit_check_options():
 
     if (not lastname and not process_all and not update
         and not prepare_grid and not load_grid and not clean_cache
-        and not update_cache and not fast_update_personid):
+        and not update_cache and not fast_update_personid and not personid_gc):
         bibtask.write_message("ERROR: One of the options -a, -n, -U, -G, -R, "
-                              "--clean-cache, --update-cache, --fast-update-personid is"
-                              " required!", stream=sys.stdout, verbose=0)
+                              "--clean-cache, --update-cache, --fast-update-personid "
+                              "--personid-gc is required!", stream=sys.stdout, verbose=0)
         return False
     elif not (bool(lastname) ^ bool(process_all) ^ bool(update)
               ^ bool(prepare_grid) ^ bool(load_grid) ^ bool(clean_cache)
-              ^ bool(update_cache) ^ bool(repair_pid) ^ bool(fast_update_personid)):
+              ^ bool(update_cache) ^ bool(repair_pid) ^ bool(fast_update_personid)
+              ^ bool(personid_gc)):
         bibtask.write_message("ERROR: Options -a -n -U -R -G --clean-cache "
                               "--update-cache --repair-personid --fast-update-personid "
-                              "are mutually"
+                              "--personid-gc are mutually"
                               " exclusive!", stream=sys.stdout, verbose=0)
         return False
     elif ((not prepare_grid and (data_dir or prefix or max_records)) and
@@ -968,22 +981,30 @@ def _run_update_authornames_tables_from_paper(record_ids=None, all_records=False
         if len(last_log) >= 1:
             #select only the most recent papers
             recently_modified, min_date = get_papers_recently_modified(date=last_log[0][2])
-            insert_user_log('daemon', '-1', 'UATFP', 'bibsched', 'status', comment='bibauthorid_daemon, update_authornames_tables_from_paper', timestamp=min_date[0][0])
+            insert_user_log('daemon', '-1', 'UATFP', 'bibsched', 'status',
+                            comment='bibauthorid_daemon, update_authornames_tables_from_paper',
+                            timestamp=min_date[0][0])
 
             if not recently_modified:
                 bibtask.write_message("update_authornames_tables_from_paper: "
                                       "All names up to date.",
                                       stream=sys.stdout, verbose=0)
             else:
-                bibtask.write_message("update_authornames_tables_from_paper: Running on %s papers " % str(len(recently_modified)), stream=sys.stdout, verbose=0)
+                bibtask.write_message(
+                                "update_authornames_tables_from_paper: Running on %s papers " % str(
+                                len(recently_modified)), stream=sys.stdout, verbose=0)
                 update_authornames_tables_from_paper(recently_modified)
         else:
             #this is the first time the utility is run, run on all the papers?
             #Probably better to write the log on the first authornames population
             #@todo: authornames population writes the log
             recently_modified, min_date = get_papers_recently_modified()
-            insert_user_log('daemon', '-1', 'UATFP', 'bibsched', 'status', comment='bibauthorid_daemon, update_authornames_tables_from_paper', timestamp=min_date[0][0])
-            bibtask.write_message("update_authornames_tables_from_paper: Running on %s papers " % str(len(recently_modified)), stream=sys.stdout, verbose=0)
+            insert_user_log('daemon', '-1', 'UATFP', 'bibsched', 'status',
+                            comment='bibauthorid_daemon, update_authornames_tables_from_paper',
+                            timestamp=min_date[0][0])
+            bibtask.write_message(
+                            "update_authornames_tables_from_paper: Running on %s papers " % str(
+                            len(recently_modified)), stream=sys.stdout, verbose=0)
             update_authornames_tables_from_paper(recently_modified)
     else:
         bibtask.write_message("update_authornames_tables_from_paper: Running "
@@ -1005,21 +1026,27 @@ def _run_update_personID_table_from_paper(record_ids=None, all_records=False):
         if len(last_log) >= 1:
             #select only the most recent papers
             recently_modified, min_date = get_papers_recently_modified(date=last_log[0][2])
-            insert_user_log('daemon', '-1', 'UPITFP', 'bibsched', 'status', comment='bibauthorid_daemon, update_personID_table_from_paper', timestamp=min_date[0][0])
+            insert_user_log('daemon', '-1', 'UPITFP', 'bibsched', 'status',
+                            comment='bibauthorid_daemon, update_personID_table_from_paper',
+                            timestamp=min_date[0][0])
 
             if not recently_modified:
                 bibtask.write_message("update_personID_table_from_paper: "
                                       "All person entities up to date.",
                                       stream=sys.stdout, verbose=0)
             else:
-                bibtask.write_message("update_personID_table_from_paper: Running on: " + str(recently_modified), stream=sys.stdout, verbose=0)
+                bibtask.write_message("update_personID_table_from_paper: Running on: " +
+                                      str(recently_modified), stream=sys.stdout, verbose=0)
                 update_personID_table_from_paper(recently_modified)
         else:
             # Should not process all papers, hence authornames population writes
             # the appropriate log. In case the log is missing, process everything.
             recently_modified, min_date = get_papers_recently_modified()
-            insert_user_log('daemon', '-1', 'UPITFP', 'bibsched', 'status', comment='bibauthorid_daemon, update_personID_table_from_paper', timestamp=min_date[0][0])
-            bibtask.write_message("update_personID_table_from_paper: Running on: " + str(recently_modified), stream=sys.stdout, verbose=0)
+            insert_user_log('daemon', '-1', 'UPITFP', 'bibsched', 'status',
+                            comment='bibauthorid_daemon, update_personID_table_from_paper',
+                            timestamp=min_date[0][0])
+            bibtask.write_message("update_personID_table_from_paper: Running on: "
+                                  + str(recently_modified), stream=sys.stdout, verbose=0)
             update_personID_table_from_paper(recently_modified)
         # @todo: develop a method that removes the respective VAs from the database
         # as well since no reference will be there for them any longer. VAs can be
@@ -1036,9 +1063,27 @@ def _run_authornames_tables_gc():
     Runs the garbage collector on the authornames tables, to get rid of
     deleted bibrefs in the respective author tables
     '''
-    insert_user_log('daemon', '-1', 'ANTGC', 'bibsched', 'status', comment='bibauthorid_daemon, authornames_tables_gc')
+    insert_user_log('daemon', '-1', 'ANTGC', 'bibsched', 'status',
+                    comment='bibauthorid_daemon, authornames_tables_gc')
     authornames_tables_gc()
 
 def _run_personid_fast_assign_papers(paperslist):
-    insert_user_log('daemon', '-1', 'PFAP', 'bibsched', 'status', comment='bibauthorid_daemon, personid_fast_assign_papers')
-    personid_fast_assign_papers(paperslist)
+    insert_user_log('daemon', '-1', 'PFAP', 'bibsched', 'status',
+                    comment='bibauthorid_daemon, personid_fast_assign_papers on ' + str(paperslist))
+    if not paperslist:
+        #update_authornames_tables_from_paper()
+        personid_fast_assign_papers()
+    else:
+        #update_authornames_tables_from_paper(paperslist)
+        personid_fast_assign_papers(paperslist)
+
+def _run_personid_gc(paperslist):
+    insert_user_log('daemon', '-1', 'PGC', 'bibsched', 'status',
+                    comment='bibauthorid_daemon, personid_gc (update_personid_from_papers) on '
+                    + str(paperslist))
+    if not paperslist:
+        #update_authornames_tables_from_paper()
+        update_personID_table_from_paper()
+    else:
+        #update_authornames_tables_from_paper(paperslist)
+        update_personID_table_from_paper(paperslist)

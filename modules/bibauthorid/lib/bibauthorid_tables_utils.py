@@ -303,6 +303,9 @@ def populate_authornames():
     if max_rows_per_run == -1:
         max_rows_per_run = 5000
 
+    max100 = run_sql("SELECT COUNT(id) FROM bib10x WHERE tag = '100__a'")
+    max700 = run_sql("SELECT COUNT(id) FROM bib70x WHERE tag = '700__a'")
+
     tables = "bib10x", "bib70x"
     authornames_is_empty_checked = 0
     authornames_is_empty = 1
@@ -1648,3 +1651,32 @@ def empty_aid_tables():
             "TRUNCATE `aidVIRTUALAUTHORS`;"
             "TRUNCATE `aidVIRTUALAUTHORSCLUSTERS`;"
             "TRUNCATE `aidVIRTUALAUTHORSDATA`;")
+
+def update_authornames_name_from_dbname():
+    try:
+        import unidecode
+        UNIDECODE_ENABLED = True
+    except ImportError:
+        print("Authorid will run without unidecode support! "
+                             "This is not recommended! Please install unidecode!")
+        UNIDECODE_ENABLED = False
+
+
+    authornames = run_sql("select * from aidAUTHORNAMES")
+
+    for row in authornames:
+        insert_name = create_normalized_name(split_name_parts(row[3]))
+        if UNIDECODE_ENABLED:
+            aid_name = unidecode.unidecode(insert_name)
+            aid_name = aid_name.replace("\"", "")
+        else:
+            aid_name = insert_name
+            aid_name = aid_name.replace(u"\u201c", "")
+            aid_name = aid_name.replace(u"\u201d", "")
+
+        print row[0], row[3], "->", aid_name, "(instead of", row[1], ")"
+        try:
+            run_sql("update aidAUTHORNAMES set name=%s where id=%s", (aid_name.encode('utf-8'), row[0]))
+        except Exception, e:
+            print "ERROR: Could not store", row[0], row[3], "->", aid_name, "(instead of", row[1], ")"
+            print "ERROR message:", e

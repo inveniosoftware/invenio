@@ -1,4 +1,3 @@
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011 CERN.
 ##
@@ -16,6 +15,4 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = bin doc lib web etc
-
-CLEANFILES = *~
+SUBDIRS = name_authority_files

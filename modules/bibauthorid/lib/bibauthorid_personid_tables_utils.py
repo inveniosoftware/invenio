@@ -42,11 +42,11 @@ from bibauthorid_utils import split_name_parts, create_normalized_name, create_c
 from bibauthorid_utils import clean_name_string, get_field_values_on_condition
 from bibauthorid_authorname_utils import soft_compare_names, compare_names
 #from bibauthorid_authorname_utils import create_name_tuples
-from bibauthorid_authorname_utils import names_are_equal_composites
-from bibauthorid_authorname_utils import names_are_equal_gender
-from bibauthorid_authorname_utils import names_are_substrings
-from bibauthorid_authorname_utils import names_are_synonymous
-from bibauthorid_authorname_utils import names_minimum_levenshtein_distance
+from bibauthorid_authorname_utils import full_names_are_equal_composites
+from bibauthorid_authorname_utils import full_names_are_equal_gender
+from bibauthorid_authorname_utils import full_names_are_substrings
+from bibauthorid_authorname_utils import full_names_are_synonymous
+from bibauthorid_authorname_utils import full_names_minimum_levenshtein_distance
 from bibauthorid_tables_utils import get_bibrefs_from_name_string, update_authornames_tables_from_paper
 from invenio.search_engine import perform_request_search
 
@@ -409,11 +409,11 @@ def _perform_split_person_on_pid(pid, gendernames, name_variations):
             split = False
             name1 = split_name_parts(ref_name)
             name2 = split_name_parts(comp[0])
-            composits_eq = names_are_equal_composites(name1, name2)
-            gender_eq = names_are_equal_gender(name1, name2, gendernames)
-            ldist = names_minimum_levenshtein_distance(name1, name2)
-            vars_eq = names_are_synonymous(name1, name2, name_variations)
-            substr_eq = names_are_substrings(name1, name2)
+            composits_eq = full_names_are_equal_composites(name1, name2)
+            gender_eq = full_names_are_equal_gender(name1, name2, gendernames)
+            ldist = full_names_minimum_levenshtein_distance(name1, name2)
+            vars_eq = full_names_are_synonymous(name1, name2, name_variations)
+            substr_eq = full_names_are_substrings(name1, name2)
             onames = name1[2]
             tnames = name2[2]
             oname = "".join(onames).lower()
@@ -908,9 +908,9 @@ def update_personID_table_from_paper(papers_list=None, personid=None):
         Extracts bibrec from a record like 100:312,53. In the given example the function will return 53.
         '''
         try:
-            return paper[0].split(',')[1]
+            return paper.split(',')[1]
         except IndexError:
-            return paper[0]
+            return paper
 
 
     def list_2_SQL_str(items, f):
@@ -933,7 +933,7 @@ def update_personID_table_from_paper(papers_list=None, personid=None):
         If the index is not found the function ignores it.
         """
 
-        if personid:
+        if person:
             try:
                 query = "%s %s %s and personid in %s %s" % (select, index, where, person, limit)
                 return run_sql(query)
@@ -954,13 +954,11 @@ def update_personID_table_from_paper(papers_list=None, personid=None):
             Thread.__init__(self)
             self.q = q
 
-
         def run(self):
             while self.q.empty() == False:
                 self.paper = self.q.get()
                 self.check_paper()
                 self.q.task_done()
-
 
         def check_paper(self):
             if bconfig.TABLES_UTILS_DEBUG:
@@ -995,17 +993,22 @@ def update_personID_table_from_paper(papers_list=None, personid=None):
                                                                where="where tag='paper' and data like '%%,%s'" % (self.paper[0],),
                                                                person=personid_q)
 
-                    other_bibrefs = [b[3] for b in pid_rows_lazy if b[1] == row[1] and b[3] != row[3]]
+                    other_bibrefs = [b[0] for b in pid_rows_lazy if b[1] == row[1] and b[3] != row[3]]
                     run_sql("delete from aidPERSONID where id = %s", (row[0],))
                     if bconfig.TABLES_UTILS_DEBUG:
                         print "*   deleting record with missing bibref: id = %s, personid = %s, tag = %s, data = %s, flag = %s, lcul = %s" % row
+                        print "found %d other records with the same personid and bibrec" % len(other_bibrefs)
                     if len(other_bibrefs) == 1:
                         #we have one and only one sobstitute, we can switch them!
-                        run_sql("update aidPERSONID set flag=%s,lcul=%s where id=%s", (str(row[4]), str(row[5]), str(other_bibrefs[0][0])))
+                        run_sql("update aidPERSONID set flag=%s,lcul=%s where id=%s", (str(row[4]), str(row[5]), str(other_bibrefs[0])))
+                        if bconfig.TABLES_UTILS_DEBUG:
+                            print "updating id=%d with flag=%d,lcul=%d" % (other_bibrefs[0], row[4], row[5])
 
             persons_to_update = set([(p[1],) for p in self.paper[1]])
             update_personID_canonical_names(persons_to_update)
 
+    if papers_list:
+        papers_list = frozenset([int(x[0]) for x in papers_list])
 
     deleted_recs = run_sql("select o.id_bibrec from bibrec_bib98x o, \
                             (select i.id as iid from bib98x i \
@@ -1021,12 +1024,8 @@ def update_personID_table_from_paper(papers_list=None, personid=None):
     else:
         personid_q = None
 
-    if papers_list:
-        if not (isinstance(papers_list, set) or isinstance(papers_list, frozenset)):
-            papers_list = frozenset(papers_list)
-
     counter = 0
-    rows_limit = 1000000
+    rows_limit = 10000000
     end_loop = False
     while not end_loop:
         papers_data = collect_person_id_data(select="select id, personid, tag, data, flag, lcul from aidPERSONID",
@@ -1049,7 +1048,7 @@ def update_personID_table_from_paper(papers_list=None, personid=None):
         for p in papers_data:
             if int(p[0]) in deleted_recs:
                 to_remove.add(p[1][0])
-            elif not papers_list or p[0] in papers_list:
+            elif not papers_list or int(p[0]) in papers_list:
                 jobs[p[0]] = jobs.get(p[0], []) + [p[1]]
         del(papers_data)
 

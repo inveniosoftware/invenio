@@ -565,6 +565,8 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibauthorid/doc/hacking/Makefile \
      modules/bibauthorid/lib/Makefile \
      modules/bibauthorid/lib/bibauthorid_comparison_functions/Makefile \
+     modules/bibauthorid/etc/Makefile \
+     modules/bibauthorid/etc/name_authority_files/Makefile \
      modules/bibauthorid/web/Makefile \
      modules/bibcatalog/Makefile \
      modules/bibcatalog/doc/Makefile \
