@@ -3685,7 +3685,6 @@ class Template:
           @return: html output """
 
         _ = gettext_set_language(ln)
-
         try:
             wlq = session_param_get(req, 'websearch-last-query')
         # displayed concrete record having not done any search before
@@ -3724,15 +3723,14 @@ class Template:
             else:
                 return ''
 
-        out = '''<br/><br/><table align="right">'''
+        out = '''<br/><br/><div align="right">'''
         # if there is only one hit,
         # show only the "back" option
         if totalrec == 1:
             # go back to the last search results page
-            out += '''<tr><td valign= "baseline" align="right"><span class="moreinfo"
-                            style="margin-right: 23px"> %(back)s </span></tr></td>''' % {
+            out += '''<div style="padding-bottom:2px;"><span class="moreinfo" style="margin-right:10px;">
+                        %(back)s </span></div></div><br/>''' % {
                     'back': create_html_link(wlq, {}, _("Back to search"), {'class': "moreinfo"})}
-            out += '</table><br/>'''
         elif totalrec > 1:
             pos = recIDs.index(recID)
             numrec = pos + 1
@@ -3740,8 +3738,8 @@ class Template:
                 recIDnext = recIDs[pos + 1]
                 recIDlast = recIDs[totalrec - 1]
                 # show only next and last options
-                out += '''<tr><td valign= "baseline" align="right"><span class="moreinfo"
-                                style="margin-right: 23px"> %(numrec)s %(totalrec)s %(next)s %(last)s </span></tr></td>''' % {
+                out += '''<div><span class="moreinfo" style="margin-right:10px;">
+                                    %(numrec)s %(totalrec)s %(next)s %(last)s </span></div> ''' % {
                                 'numrec': _("%s of") % ('<strong>' + self.tmpl_nice_number(numrec, ln) + '</strong>'),
                                 'totalrec': ("%s") % ('<strong>' + self.tmpl_nice_number(totalrec, ln) + '</strong>'),
                                 'next': create_html_link(self.build_search_url(recid=recIDnext, ln=ln),
@@ -3752,8 +3750,8 @@ class Template:
                 recIDfirst = recIDs[0]
                 recIDprev = recIDs[pos - 1]
                 # show only first and previous potions
-                out += '''<tr><td valign= "baseline" align="right"><span class="moreinfo"
-                                style="margin-right: 23px"> %(first)s %(previous)s %(numrec)s %(totalrec)s</span></tr></td>''' % {
+                out += '''<div><span class="moreinfo" style="margin-right:10px;">
+                                    %(first)s %(previous)s %(numrec)s %(totalrec)s</span></div>''' % {
                                 'first': create_html_link(self.build_search_url(recid=recIDfirst, ln=ln),
                                             {}, ('<font size="4">&laquo;</font>'), {'class': "moreinfo"}),
                                 'previous': create_html_link(self.build_search_url(recid=recIDprev, ln=ln),
@@ -3765,9 +3763,9 @@ class Template:
                 recIDprev = recIDs[pos - 1]
                 recIDnext = recIDs[pos + 1]
                 recIDlast = recIDs[len(recIDs) - 1]
-                out += '''<tr><td valign= "baseline" align="right"> <span class="moreinfo"
-                                style="margin-right: 23px"> %(first)s %(previous)s
-                                    %(numrec)s %(totalrec)s %(next)s %(last)s </span></tr></td>''' % {
+                out += '''<div><span class="moreinfo" style="margin-right:10px;">
+                                    %(first)s %(previous)s
+                                    %(numrec)s %(totalrec)s %(next)s %(last)s </span></div>''' % {
                                 'first': create_html_link(self.build_search_url(recid=recIDfirst, ln=ln),
                                             {}, ('<font size="4">&laquo;</font>'),
                                             {'class': "moreinfo"}),
@@ -3780,10 +3778,9 @@ class Template:
                                 'last': create_html_link(self.build_search_url(recid=recIDlast, ln=ln),
                                             {}, ('<font size="4">&raquo;</font>'), {'class': "moreinfo"})}
             # go back to the last search results page
-            out += '''<tr><td valign= "baseline" align="right"><span class="moreinfo"
-                            style="margin-right: 23px"> %(back)s </span></tr></td>''' % {
+            out += '''<div style="padding-bottom:2px;"><span class="moreinfo" style="margin-right:10px;">
+                        %(back)s </span></div></div>''' % {
                     'back': create_html_link(wlq, {}, _("Back to search"), {'class': "moreinfo"})}
-            out += '</table><br/><br/>'''
         return out
 
     def tmpl_record_plots(self, recID, ln):

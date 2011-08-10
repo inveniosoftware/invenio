@@ -819,11 +819,11 @@ URI: http://%(host)s%(page)s
         _ = gettext_set_language(ln)
 
         out = """
-                <p class="nobottomgap" >&nbsp;</p>
-            </div>
             <div class="bottom-left-folded">%(dates)s</div>
-            <div class="bottom-right-folded" style="text-align:right"><span class="moreinfo" style="margin-right:25px">%(similar)s</span></div>
-        </div>
+            <div class="bottom-right-folded" style="text-align:right" style="padding-bottom:2px;">
+                <span class="moreinfo" style="margin-right:10px;">%(similar)s</span></div>
+          </div>
+      </div>
     </div>
     <br/>
     """ % {'similar':create_html_link(
