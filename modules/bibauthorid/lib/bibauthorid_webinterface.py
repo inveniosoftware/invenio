@@ -1499,7 +1499,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         elif user_role_id in user_roles:
             role = 'user'
 
-        if webapi.is_external_user(uid):
+        if role == 'guest' and webapi.is_external_user(uid):
             role = 'user'
 
         return role
