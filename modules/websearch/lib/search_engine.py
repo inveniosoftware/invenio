@@ -69,14 +69,13 @@ from invenio.config import \
      CFG_BIBFORMAT_HIDDEN_TAGS, \
      CFG_SITE_URL, \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
-     CFG_BIBRANK_SHOW_CITATION_LINKS, \
      CFG_SOLR_URL, \
      CFG_SITE_RECORD, \
      CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT
 
 from invenio.search_engine_config import InvenioWebSearchUnknownCollectionError, InvenioWebSearchWildcardLimitError
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.bibrecord import create_record, record_get_field_instances
+from invenio.bibrecord import create_record
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records, is_method_valid
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibindex_engine_stemmer import stem
@@ -90,7 +89,7 @@ from invenio.websearch_external_collections import print_external_results_overvi
 from invenio.access_control_admin import acc_get_action_id
 from invenio.access_control_config import VIEWRESTRCOLL, \
     CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
-from invenio.websearchadminlib import get_detailed_page_tabs
+from invenio.websearchadminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
 from invenio.intbitset import intbitset as HitSet
 from invenio.dbquery import DatabaseError, deserialize_via_marshal, InvenioDbQueryWildcardLimitError
 from invenio.access_control_engine import acc_authorize_action
@@ -103,7 +102,7 @@ import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 webcomment_templates = invenio.template.load('webcomment')
 
-from invenio.bibrank_citation_searcher import get_cited_by_count, calculate_cited_by_list, \
+from invenio.bibrank_citation_searcher import calculate_cited_by_list, \
     calculate_co_cited_with_list, get_records_with_num_cites, get_self_cited_by, \
     get_refersto_hitset, get_citedby_hitset
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
@@ -3705,19 +3704,6 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                             # internal recid.
                             pass
 
-                    citedbynum = 0 #num of citations, to be shown in the cit tab
-                    references = -1 #num of references
-                    if CFG_BIBRANK_SHOW_CITATION_LINKS:
-                        citedbynum = get_cited_by_count(recid)
-                    if not CFG_CERN_SITE:#FIXME:should be replaced by something like CFG_SHOW_REFERENCES
-                        reftag = ""
-                        reftags = get_field_tags("reference")
-                        if reftags:
-                            reftag = reftags[0]
-                        tmprec = get_record(recid)
-                        if reftag and len(reftag) > 4:
-                            references = len(record_get_field_instances(tmprec, reftag[0:3], reftag[3], reftag[4]))
-
                     tabs = [(unordered_tabs[tab_id]['label'], \
                              '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, recid_to_display, tab_id, link_ln), \
                              tab_id == tab,
@@ -3725,13 +3711,19 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                             for (tab_id, order) in ordered_tabs_id
                             if unordered_tabs[tab_id]['visible'] == True]
 
+                    tabs_counts = get_detailed_page_tabs_counts(recid)
+                    citedbynum = tabs_counts['Citations']
+                    references = tabs_counts['References']
+                    discussions = tabs_counts['Discussions']
+
                     # load content
                     if tab == 'usage':
                         req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
                                                      tabs,
                                                      ln,
                                                      citationnum=citedbynum,
-                                                     referencenum=references))
+                                                     referencenum=references,
+                                                     discussionnum=discussions))
                         r = calculate_reading_similarity_list(recIDs[irec], "downloads")
                         downloadsimilarity = None
                         downloadhistory = None
@@ -3758,7 +3750,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                                                      tabs,
                                                      ln,
                                                      citationnum=citedbynum,
-                                                     referencenum=references))
+                                                     referencenum=references,
+                                                     discussionnum=discussions))
                         req.write(websearch_templates.tmpl_detailed_record_citations_prologue(recid, ln))
 
                         # Citing
@@ -3801,7 +3794,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                                                      tabs,
                                                      ln,
                                                      citationnum=citedbynum,
-                                                     referencenum=references))
+                                                     referencenum=references,
+                                                     discussionnum=discussions))
 
                         req.write(format_record(recIDs[irec], 'HDREF', ln=ln, user_info=user_info, verbose=verbose))
                         req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
@@ -3828,7 +3822,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                                                      tabs,
                                                      ln,
                                                      show_short_rec_p=False,
-                                                     citationnum=citedbynum, referencenum=references))
+                                                     citationnum=citedbynum, referencenum=references,
+                                                     discussionnum=discussions))
 
                         creationdate = None
                         modificationdate = None
@@ -4645,6 +4640,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
 
         if req is not None and not req.header_only:
             page_start(req, of, cc, aas, ln, uid, title, description, keywords, recid, tab)
+
         # Default format is hb but we are in detailed -> change 'of'
         if of == "hb":
             of = "hd"

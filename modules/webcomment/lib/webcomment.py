@@ -150,15 +150,13 @@ def perform_request_display_comments_or_remarks(req, recID, display_order='od', 
     # Query the database and filter results
     user_info = collect_user_info(uid)
     res = query_retrieve_comments_or_remarks(recID, display_order, display_since, reviews, user_info=user_info)
-    res2 = query_retrieve_comments_or_remarks(recID, display_order, display_since, not reviews, user_info=user_info)
-
+    # res2 = query_retrieve_comments_or_remarks(recID, display_order, display_since, not reviews, user_info=user_info)
     nb_res = len(res)
-    if reviews:
-        nb_reviews = nb_res
-        nb_comments = len(res2)
-    else:
-        nb_reviews = len(res2)
-        nb_comments = nb_res
+
+    from invenio.webcommentadminlib import get_nb_reviews, get_nb_comments
+
+    nb_reviews = get_nb_reviews(recID, count_deleted=False)
+    nb_comments = get_nb_comments(recID, count_deleted=False)
 
     # checking non vital arguemnts - will be set to default if wrong
     #if page <= 0 or page.lower() != 'all':
@@ -1355,24 +1353,6 @@ def calculate_start_date(display_since):
         delta = timedelta(days=nb)
         yesterday = today - delta
     return yesterday.strftime("%Y-%m-%d %H:%M:%S")
-
-def count_comments(recID):
-    """
-    Returns the number of comments made on a record.
-    """
-    recID = int(recID)
-    query = """SELECT count(id) FROM cmtRECORDCOMMENT
-                                WHERE id_bibrec=%s AND star_score=0"""
-    return run_sql(query, (recID,))[0][0]
-
-def count_reviews(recID):
-    """
-    Returns the number of reviews made on a record.
-    """
-    recID = int(recID)
-    query = """SELECT count(id) FROM cmtRECORDCOMMENT
-                                WHERE id_bibrec=%s AND star_score>0"""
-    return run_sql(query, (recID,))[0][0]
 
 def get_first_comments_or_remarks(recID=-1,
                                   ln=CFG_SITE_LANG,

@@ -60,7 +60,7 @@ from invenio.htmlutils import get_mathjax_header
 from invenio.errorlib import register_exception
 from invenio.messages import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.websearchadminlib import get_detailed_page_tabs
+from invenio.websearchadminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import \
      mail_cookie_create_authorize_action, \
@@ -124,7 +124,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         @param subscribed: int, 1 if user just subscribed to discussion, -1 if unsubscribed
         @return the full html page.
         """
-
         argd = wash_urlargd(form, {'do': (str, "od"),
                                    'ds': (str, "all"),
                                    'nb': (int, 100),
@@ -171,6 +170,37 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             user_is_subscribed_to_discussion = False
             user_can_unsubscribe_from_discussion = False
 
+        unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
+                                                    self.recid,
+                                                    ln=argd['ln'])
+        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
+        ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
+        link_ln = ''
+        if argd['ln'] != CFG_SITE_LANG:
+            link_ln = '?ln=%s' % argd['ln']
+
+        tabs = [(unordered_tabs[tab_id]['label'], \
+                 '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
+                 tab_id in ['comments', 'reviews'],
+                 unordered_tabs[tab_id]['enabled']) \
+                for (tab_id, order) in ordered_tabs_id
+                if unordered_tabs[tab_id]['visible'] == True]
+
+        tabs_counts = get_detailed_page_tabs_counts(self.recid)
+        citedbynum = tabs_counts['Citations']
+        references = tabs_counts['References']
+        discussions = tabs_counts['Discussions']
+
+        top = webstyle_templates.detailed_record_container_top(self.recid,
+                                                               tabs,
+                                                               argd['ln'],
+                                                               citationnum=citedbynum,
+                                                               referencenum=references,
+                                                               discussionnum=discussions)
+        bottom = webstyle_templates.detailed_record_container_bottom(self.recid,
+                                                                     tabs,
+                                                                     argd['ln'])
+
         #display_comment_rounds = [cmtgrp for cmtgrp in argd['cmtgrp'] if cmtgrp.isdigit() or cmtgrp == "all" or cmtgrp == "-1"]
         display_comment_rounds = argd['cmtgrp']
 
@@ -195,27 +225,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 user_can_unsubscribe_from_discussion=user_can_unsubscribe_from_discussion,
                 display_comment_rounds=display_comment_rounds
                 )
-
-            unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
-                                                    self.recid,
-                                                    ln=argd['ln'])
-            ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
-            ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
-            link_ln = ''
-            if argd['ln'] != CFG_SITE_LANG:
-                link_ln = '?ln=%s' % argd['ln']
-            tabs = [(unordered_tabs[tab_id]['label'], \
-                     '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
-                     tab_id in ['comments', 'reviews'],
-                     unordered_tabs[tab_id]['enabled']) \
-                    for (tab_id, order) in ordered_tabs_id
-                    if unordered_tabs[tab_id]['visible'] == True]
-            top = webstyle_templates.detailed_record_container_top(self.recid,
-                                                                    tabs,
-                                                                    argd['ln'])
-            bottom = webstyle_templates.detailed_record_container_bottom(self.recid,
-                                                                         tabs,
-                                                                         argd['ln'])
 
             title, description, keywords = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])
             navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])

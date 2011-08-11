@@ -36,8 +36,11 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_URL,\
-     CFG_WEBCOMMENT_ALLOW_COMMENTS,\
-     CFG_WEBCOMMENT_ALLOW_REVIEWS,\
+     CFG_WEBCOMMENT_ALLOW_COMMENTS, \
+     CFG_WEBSEARCH_SHOW_COMMENT_COUNT, \
+     CFG_WEBCOMMENT_ALLOW_REVIEWS, \
+     CFG_WEBSEARCH_SHOW_REVIEW_COUNT, \
+     CFG_BIBRANK_SHOW_CITATION_LINKS, \
      CFG_INSPIRE_SITE, \
      CFG_CERN_SITE
 from invenio.bibrankadminlib import \
@@ -70,6 +73,8 @@ from invenio.access_control_admin import acc_get_action_id
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.errorlib import register_exception
 from invenio.intbitset import intbitset
+from invenio.bibrank_citation_searcher import get_cited_by_count
+from invenio.bibrecord import record_get_field_instances
 
 def getnavtrail(previous = ''):
     """Get the navtrail"""
@@ -3477,3 +3482,42 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
 
     return tabs
 
+def get_detailed_page_tabs_counts(recID):
+    """
+    Returns the number of citations, references and comments/reviews
+    that have to be shown on the corresponding tabs in the
+    detailed record pages
+    @param recID: record id
+    @return: dictionary with following keys
+                'Citations': number of citations to be shown in the "Citations" tab
+                'References': number of references to be shown in the "References" tab
+                'Discussions': number of comments and reviews to be shown in the "Discussion" tab
+    """
+
+    num_comments = 0 #num of comments
+    num_reviews = 0 #num of reviews
+    tabs_counts = {'Citations'   : 0,
+                   'References'  : -1,
+                   'Discussions' : 0
+                   }
+    from invenio.search_engine import get_field_tags, get_record
+    if CFG_BIBRANK_SHOW_CITATION_LINKS:
+        tabs_counts['Citations'] = get_cited_by_count(recID)
+    if not CFG_CERN_SITE:#FIXME:should be replaced by something like CFG_SHOW_REFERENCES
+        reftag = ""
+        reftags = get_field_tags("reference")
+        if reftags:
+            reftag = reftags[0]
+        tmprec = get_record(recID)
+        if reftag and len(reftag) > 4:
+            tabs_counts['References'] = len(record_get_field_instances(tmprec, reftag[0:3], reftag[3], reftag[4]))
+    # obtain number of comments/reviews
+    from invenio.webcommentadminlib import get_nb_reviews, get_nb_comments
+    if CFG_WEBCOMMENT_ALLOW_COMMENTS and CFG_WEBSEARCH_SHOW_COMMENT_COUNT:
+        num_comments = get_nb_comments(recID, count_deleted=False)
+    if CFG_WEBCOMMENT_ALLOW_REVIEWS and CFG_WEBSEARCH_SHOW_REVIEW_COUNT:
+        num_reviews = get_nb_reviews(recID, count_deleted=False)
+    if num_comments or num_reviews:
+        tabs_counts['Discussions'] = num_comments + num_reviews
+
+    return tabs_counts

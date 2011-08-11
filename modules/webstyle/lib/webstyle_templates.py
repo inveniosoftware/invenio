@@ -697,7 +697,7 @@ URI: http://%(host)s%(page)s
                                       show_similar_rec_p=True,
                                       creationdate=None,
                                       modificationdate=None, show_short_rec_p=True,
-                                      citationnum=-1, referencenum=-1):
+                                      citationnum=-1, referencenum=-1, discussionnum=-1):
         """Prints the box displayed in detailed records pages, with tabs at the top.
 
         Returns content as it is if the number of tabs for this record
@@ -714,6 +714,7 @@ URI: http://%(host)s%(page)s
         @param show_short_rec_p: *boolean* - prints a very short version of the record as reminder.
         @param citationnum: show (this) number of citations in the citations tab
         @param referencenum: show (this) number of references in the references tab
+        @param discussionnum: show (this) number of comments/reviews in the discussion tab
         """
         # If no tabs, returns nothing
         if len(tabs) <= 1:
@@ -732,6 +733,9 @@ URI: http://%(host)s%(page)s
                     addnum = "(" + str(citationnum) + ")"
                 if (referencenum > -1) and url.count("/references") == 1:
                     addnum = "(" + str(referencenum) + ")"
+                if (discussionnum > -1) and url.count("/comments") == 1:
+                    addnum = "(" + str(discussionnum) + ")"
+
                 css_class = []
                 if selected:
                     css_class.append('on')
