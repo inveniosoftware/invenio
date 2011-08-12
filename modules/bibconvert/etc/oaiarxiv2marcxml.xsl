@@ -60,8 +60,8 @@
  </xsl:template>
 
 
-<!-- FUNCTION   output-695a-subfields -->
-<xsl:template name="output-695a-subfields">
+ <!-- FUNCTION   output-695a-subfields -->
+ <xsl:template name="output-695a-subfields">
       <xsl:param name="list" />
       <xsl:variable name="newlist" select="concat(normalize-space($list), ' ')" />
       <xsl:variable name="first" select="substring-before($newlist, ' ')" />
@@ -77,11 +77,11 @@
               <xsl:with-param name="list" select="$remaining" />
           </xsl:call-template>
       </xsl:if>
-</xsl:template>
+ </xsl:template>
 
 
-<!-- FUNCTION   output-65017a-subfields -->
-<xsl:template name="output-65017a-subfields">
+ <!-- FUNCTION   output-65017a-subfields -->
+ <xsl:template name="output-65017a-subfields">
       <xsl:param name="list" />
       <xsl:variable name="newlist" select="concat(normalize-space($list), ' ')" />
       <xsl:variable name="first" select="substring-before($newlist, ' ')" />
@@ -97,11 +97,11 @@
               <xsl:with-param name="list" select="$remaining" />
           </xsl:call-template>
       </xsl:if>
-</xsl:template>
+ </xsl:template>
 
 
-<!-- FUNCTION   output-65027a-subfields -->
-<xsl:template name="output-65027a-subfields">
+ <!-- FUNCTION   output-65027a-subfields -->
+ <xsl:template name="output-65027a-subfields">
       <xsl:param name="list" />
       <xsl:variable name="newlist" select="concat(normalize-space($list), ' ')" />
       <xsl:variable name="first" select="substring-before($newlist, ' ')" />
@@ -117,7 +117,7 @@
               <xsl:with-param name="list" select="$remaining" />
           </xsl:call-template>
       </xsl:if>
-</xsl:template>
+ </xsl:template>
 
 
 
@@ -148,11 +148,11 @@
         <xsl:variable name="todetect" select="substring-before( normalize-space($detectPR), '@') "/>
         <xsl:call-template name="matchPR773pSUB">
           <xsl:with-param name="todetect" select="$todetect"/>
-	  <xsl:with-param name="commentsf" select="$commentsf"/>
+  <xsl:with-param name="commentsf" select="$commentsf"/>
         </xsl:call-template>
         <xsl:call-template name="matchPR773p">
           <xsl:with-param name="detectPR" select="$after"/>
-          <xsl:with-param name="commentsf" select="$commentsf"/> 
+          <xsl:with-param name="commentsf" select="$commentsf"/>
         </xsl:call-template>
       </xsl:when>
     </xsl:choose>
@@ -199,14 +199,11 @@
  <!-- FUNCTION cern-detect : returns the appropriatate 690C subfield if it is a CERN parper and nothing otherwise -->
  <xsl:template name="cern-detect">
     <xsl:param name="reportnumber"/>
-    <xsl:choose>
-      <xsl:when test="contains($reportnumber, 'CERN')">
-         <datafield tag="690" ind1="C" ind2=" ">
-           <subfield code="a">CERN</subfield>
-         </datafield>
-     </xsl:when>
-      <xsl:otherwise><xsl:call-template name="cern-detect-aff"/></xsl:otherwise>
-    </xsl:choose>
+    <xsl:if test="contains($reportnumber, 'CERN') or ./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author/arXiv:affiliation[.='CERN']">
+      <datafield tag="690" ind1="C" ind2=" ">
+        <subfield code="a">CERN</subfield>
+      </datafield>
+    </xsl:if>
  </xsl:template>
 
  <!-- FUNCTION Print sets values separated by ;  -->
@@ -214,49 +211,15 @@
     <xsl:for-each select="./OAI-PMH:header/OAI-PMH:setSpec"><xsl:value-of select="."/>;</xsl:for-each>
  </xsl:template>
 
-
- <!-- FUNCTION cern-detect-aff : used by cern-detect : detects if the srting  CERN is present in affiaitons  -->
- <xsl:template name="cern-detect-aff">
- <xsl:for-each select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author">
-   <!-- <xsl:if test="./arXiv:affiliation"/> -->
-      <xsl:if test="contains(./arXiv:affiliation, 'CERN') or contains(./arXiv:affiliation, 'cern') ">
-         <datafield tag="690" ind1="C" ind2=" ">
-          <subfield code="a">CERN</subfield>
-         </datafield>
-      </xsl:if>
-    <!-- </xsl:if>  -->
- </xsl:for-each>
- </xsl:template>
-
-
  <!-- FUNCTION cern-detect9 : returns the appropriatate 690C subfield if it is a CERN parper and nothing otherwise -->
  <xsl:template name="cern-detect9">
     <xsl:param name="reportnumber"/>
-    <xsl:choose>
-      <xsl:when test="contains($reportnumber, 'CERN')">
-         <datafield tag="980" ind1=" " ind2=" ">
-           <subfield code="a">CERN</subfield>
-         </datafield>
-     </xsl:when>
-      <xsl:otherwise><xsl:call-template name="cern-detect-aff9"/></xsl:otherwise>
-    </xsl:choose>
+    <xsl:if test="contains($reportnumber, 'CERN') or ./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author/arXiv:affiliation[.='CERN']">
+      <datafield tag="980" ind1=" " ind2=" ">
+        <subfield code="a">CERN</subfield>
+      </datafield>
+    </xsl:if>
  </xsl:template>
-
-
- <!-- FUNCTION cern-detect-aff9 : used by cern-detect : detects if the srting  CERN is present in affiaitons  -->
- <xsl:template name="cern-detect-aff9">
- <xsl:for-each select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author">
-   <!-- <xsl:if test="./arXiv:affiliation"/> -->
-      <xsl:if test="contains(./arXiv:affiliation, 'CERN') or contains(./arXiv:affiliation, 'cern') ">
-         <datafield tag="980" ind1=" " ind2=" ">
-          <subfield code="a">CERN</subfield>
-         </datafield>
-      </xsl:if>
-    <!-- </xsl:if>  -->
- </xsl:for-each>
- </xsl:template>
-
-
 
  <!-- FUNCTION  reformat-date : from 3 params (YYYY,MM,DD)  to "DD Mmm YYYY" -->
  <xsl:template name="reformat-date">
@@ -311,68 +274,68 @@
    <subfield code="a">
      <xsl:choose>
        <xsl:when test="not(contains($node/arXiv:forenames, 'Collaboration:')) and not(contains($node/arXiv:forenames, 'Consortium:'))">
-	 <xsl:variable name="fnames">
-	   <xsl:value-of select="normalize-space($node/arXiv:forenames)"/>
-	 </xsl:variable>
-	 <xsl:value-of select="$node/arXiv:keyname"/>, <xsl:call-template name="replace-string"><xsl:with-param name="text" select="$fnames"/><xsl:with-param name="from" select="'.'"/><xsl:with-param name="to" select="''"/></xsl:call-template>
+         <xsl:variable name="fnames">
+           <xsl:value-of select="normalize-space($node/arXiv:forenames)"/>
+         </xsl:variable>
+         <xsl:value-of select="$node/arXiv:keyname"/>, <xsl:call-template name="replace-string"><xsl:with-param name="text" select="$fnames"/><xsl:with-param name="from" select="'.'"/><xsl:with-param name="to" select="''"/></xsl:call-template>
        </xsl:when>
        <xsl:when test="contains($node/arXiv:forenames, 'Collaboration:')">
-	 <xsl:variable name="fnames">
-	   <xsl:value-of select="normalize-space(substring-after($node/arXiv:forenames, 'Collaboration:'))"/>
-	 </xsl:variable>
-	 <xsl:value-of select="$node/arXiv:keyname"/>, <xsl:call-template name="replace-string"><xsl:with-param name="text" select="$fnames"/><xsl:with-param name="from" select="'.'"/><xsl:with-param name="to" select="''"/></xsl:call-template>
+         <xsl:variable name="fnames">
+           <xsl:value-of select="normalize-space(substring-after($node/arXiv:forenames, 'Collaboration:'))"/>
+         </xsl:variable>
+         <xsl:value-of select="$node/arXiv:keyname"/>, <xsl:call-template name="replace-string"><xsl:with-param name="text" select="$fnames"/><xsl:with-param name="from" select="'.'"/><xsl:with-param name="to" select="''"/></xsl:call-template>
        </xsl:when>
        <xsl:when test="contains($node/arXiv:forenames, 'Consortium:')">
-	 <xsl:variable name="fnames">
-	   <xsl:value-of select="normalize-space(substring-after($node/arXiv:forenames, 'Consortium:'))"/>
-	 </xsl:variable>
-	 <xsl:value-of select="$node/arXiv:keyname"/>, <xsl:call-template name="replace-string"><xsl:with-param name="text" select="$fnames"/><xsl:with-param name="from" select="'.'"/><xsl:with-param name="to" select="''"/></xsl:call-template>
+         <xsl:variable name="fnames">
+           <xsl:value-of select="normalize-space(substring-after($node/arXiv:forenames, 'Consortium:'))"/>
+         </xsl:variable>
+         <xsl:value-of select="$node/arXiv:keyname"/>, <xsl:call-template name="replace-string"><xsl:with-param name="text" select="$fnames"/><xsl:with-param name="from" select="'.'"/><xsl:with-param name="to" select="''"/></xsl:call-template>
        </xsl:when>
      </xsl:choose>
    </subfield>
-   
+
    <xsl:for-each select="$node/arXiv:affiliation">
      <xsl:variable name="knlow"><xsl:value-of select="normalize-space(translate(., $ucletters, $lcletters))"/></xsl:variable>
      <xsl:if test="not (contains($knlow,'collab') or contains($knlow,'team') or contains($knlow,'group') or contains($knlow, 'for the'))">
        <subfield code="u"><xsl:value-of select="."/></subfield>
      </xsl:if>
-   </xsl:for-each> 
+   </xsl:for-each>
  </xsl:template>
- 
+
  <xsl:template name="extractCollaborationSimple">
    <xsl:param name="node"/>
-   <!-- Extracting collaboration from the simple author field 
-	( containing only collaboration ) -->
+   <!-- Extracting collaboration from the simple author field
+        ( containing only collaboration ) -->
    <xsl:variable name="knlowc" select="normalize-space(translate($node/arXiv:affiliation, $ucletters, $lcletters))" />
    <xsl:variable name="knlowfn" select="normalize-space(translate($node/arXiv:forenames, $ucletters, $lcletters))" />
    <xsl:variable name="knlowkn" select="normalize-space(translate($node/arXiv:keyname, $ucletters, $lcletters))" />
    <xsl:variable name="knlow" select="concat($knlowc,$knlowfn,$knlowkn)" />
-   
+
    <xsl:if test="contains($knlow, 'collab') or contains($knlow, 'team') or contains($knlow,'group') or contains($knlow, 'for the') ">
-     
+
      <xsl:choose>
        <xsl:when test="contains($knlowc, 'collab') or contains($knlowc, 'team') or contains($knlowc,'group') or contains($knlowc, 'for the')">
-	 <xsl:value-of select="$node/arXiv:affiliation"/> 
+         <xsl:value-of select="$node/arXiv:affiliation"/>
        </xsl:when>
        <xsl:when test="contains($knlowfn, 'collab') or contains($knlowfn, 'team') or contains($knlowfn,'group') or contains($knlowfn, 'for the')">
-	 <xsl:value-of select="concat($node/arXiv:keyname , ' ', $node/arXiv:forenames)"/> 
+         <xsl:value-of select="concat($node/arXiv:keyname , ' ', $node/arXiv:forenames)"/>
        </xsl:when>
        <xsl:when test="contains($knlowkn, 'collab') or contains($knlowkn, 'team') or contains($knlowkn,'group') or contains($knlowkn, 'for the')">
-	 <xsl:value-of select="concat($node/arXiv:forenames, ' ', $node/arXiv:keyname)"/> 
+         <xsl:value-of select="concat($node/arXiv:forenames, ' ', $node/arXiv:keyname)"/>
        </xsl:when>
        <xsl:otherwise>
-	 <xsl:value-of select="concat($node/arXiv:forenames, ' ', $node/arXiv:keyname, ' ', $node/arXiv:affiliation)"/> 
+         <xsl:value-of select="concat($node/arXiv:forenames, ' ', $node/arXiv:keyname, ' ', $node/arXiv:affiliation)"/>
        </xsl:otherwise>
      </xsl:choose>
-     
+
    </xsl:if>
  </xsl:template>
- 
- 
+
+
  <xsl:template name="extractCollaborationComplex">
    <xsl:param name="node"/>
    <!-- Extracting collaboration in case when the same field contains
-	collaboration and author information -->
+        collaboration and author information -->
    <xsl:choose>
      <xsl:when test="contains($node/arXiv:forenames, 'Consortium')">
        <xsl:value-of select="concat(substring-before($node/arXiv:forenames,'Consortium:'), ' consortium')"/>
@@ -382,7 +345,7 @@
      </xsl:when>
    </xsl:choose>
  </xsl:template>
- 
+
  <xsl:template name="extractCollaboration">
    <xsl:param name="node"/>
    <datafield tag="595" ind1=" " ind2=" ">
@@ -391,21 +354,21 @@
    <datafield tag="710" ind1=" " ind2=" ">
      <subfield code="g">
        <xsl:choose>
-	 <xsl:when test="contains($node/arXiv:forenames, 'Collaboration:') or contains($node/arXiv:forenames, 'Consortium:')">
-	   <xsl:call-template name="extractCollaborationComplex">
-	     <xsl:with-param name="node" select="$node"/>
-	   </xsl:call-template>
-	 </xsl:when>
-	 <xsl:otherwise>
-	   <xsl:call-template name="extractCollaborationSimple">
-	     <xsl:with-param name="node" select="$node"/>
-	   </xsl:call-template>
-	 </xsl:otherwise>
+         <xsl:when test="contains($node/arXiv:forenames, 'Collaboration:') or contains($node/arXiv:forenames, 'Consortium:')">
+           <xsl:call-template name="extractCollaborationComplex">
+             <xsl:with-param name="node" select="$node"/>
+           </xsl:call-template>
+         </xsl:when>
+         <xsl:otherwise>
+           <xsl:call-template name="extractCollaborationSimple">
+             <xsl:with-param name="node" select="$node"/>
+           </xsl:call-template>
+         </xsl:otherwise>
        </xsl:choose>
      </subfield>
    </datafield>
  </xsl:template>
- 
+
  <xsl:template name="firstAuthor">
    <xsl:param name="firstNode"/> <!-- Full XML node ( with structure !) -->
    <datafield tag = "100" ind1 = " " ind2= " ">
@@ -414,7 +377,7 @@
      </xsl:call-template>
    </datafield>
  </xsl:template>
- 
+
  <xsl:template name="furtherAuthor">
    <xsl:param name="node"/> <!-- Full XML node ( with structure !) -->
    <datafield tag="700" ind1=" " ind2=" ">
@@ -423,15 +386,15 @@
      </xsl:call-template>
    </datafield>
  </xsl:template>
- 
+
  <xsl:template name="collaboration">
    <xsl:param name="node"/> <!-- Full XML node ( with structure !) -->
    <xsl:call-template name="extractCollaboration">
      <xsl:with-param name="node" select="$node"/>
    </xsl:call-template>
  </xsl:template>
- 
- 
+
+
 <!-- ************ MAIN CODE ************ -->
 
 <xsl:template match="/">
@@ -455,7 +418,7 @@
   <xsl:variable name="commentslow">
     <xsl:value-of select="translate(./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments,$ucletters,$lcletters)"/>
   </xsl:variable>
- 
+
   <xsl:variable name="detectPR">accepted@appear@press@publ@review@submitted"></xsl:variable>
 
   <!-- *** END GLOBAL RECIRD VARS *** -->
@@ -517,7 +480,7 @@
 
 
            <!-- MARC FIELD 003  -->
-             <controlfield tag="003">SzGeCERN</controlfield>
+           <controlfield tag="003">SzGeCERN</controlfield>
 
 
            <!-- MARC FIELD 035_$$9,a  = metadata/header/identifier  -->
@@ -550,18 +513,13 @@
              </datafield>
            </xsl:if>
 
-
            <!-- MARC FIELD 041$$a = default value: eng for english  -->
            <datafield tag="041" ind1=" " ind2=" ">
                 <subfield code="a">eng</subfield>
            </datafield>
 
-
-
-
-
            <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:report-no">
-	     <!-- MARC FIELD 088$$a = metadata/arXiv/report-no   -->
+             <!-- MARC FIELD 088$$a = metadata/arXiv/report-no   -->
              <xsl:variable name="RN0">
                <xsl:value-of select="translate(./OAI-PMH:metadata/arXiv:arXiv/arXiv:report-no, $lcletters, $ucletters)"/>
              </xsl:variable>
@@ -572,116 +530,103 @@
                <xsl:call-template name="replace-string"><xsl:with-param name="text" select="$RN1"/><xsl:with-param name="from" select="';'"/><xsl:with-param name="to" select="','"/></xsl:call-template>
              </xsl:variable>
              <xsl:variable name="RN3">
-	       <xsl:call-template name="replace-string"><xsl:with-param name="text" select="$RN2"/><xsl:with-param name="from" select="', '"/><xsl:with-param name="to" select="','"/></xsl:call-template>
+               <xsl:call-template name="replace-string"><xsl:with-param name="text" select="$RN2"/><xsl:with-param name="from" select="', '"/><xsl:with-param name="to" select="','"/></xsl:call-template>
              </xsl:variable>
-	     <xsl:call-template name="rn-extract"><xsl:with-param name="text" select="$RN3"/></xsl:call-template>
+             <xsl:call-template name="rn-extract"><xsl:with-param name="text" select="$RN3"/></xsl:call-template>
 
-	     <!-- Detection of CERN Reports -->
+             <!-- Detection of CERN Reports -->
 
-	     <xsl:if test="contains(./OAI-PMH:metadata/arXiv:arXiv/arXiv:report-no, 'CERN-PH-TH')">
-	       <datafield tag="084" ind1 = " " ind2 = " ">
-		 <subfield code="a">
-		   <xsl:variable name="reportdate" select="substring-after(./OAI-PMH:metadata/arXiv:arXiv/arXiv:report-no, 'CERN-PH-TH/')"/>
-		   TH-<xsl:choose>
-		   <xsl:when test="contains($reportdate,',')">
-		     <xsl:value-of select="substring-before($reportdate, ',')"/>
-		   </xsl:when>
-		   <xsl:otherwise>
-		     <xsl:value-of select="$reportdate"/>
-		   </xsl:otherwise>
-		 </xsl:choose>
+             <xsl:if test="contains(./OAI-PMH:metadata/arXiv:arXiv/arXiv:report-no, 'CERN-PH-TH')">
+               <datafield tag="084" ind1 = " " ind2 = " ">
+                 <subfield code="a">
+                   <xsl:variable name="reportdate" select="substring-after(./OAI-PMH:metadata/arXiv:arXiv/arXiv:report-no, 'CERN-PH-TH/')"/>
+                   TH-<xsl:choose>
+                   <xsl:when test="contains($reportdate,',')">
+                     <xsl:value-of select="substring-before($reportdate, ',')"/>
+                   </xsl:when>
+                   <xsl:otherwise>
+                     <xsl:value-of select="$reportdate"/>
+                   </xsl:otherwise>
+                 </xsl:choose>
+                 </subfield>
+                 <subfield code="2">CERN Library</subfield>
+               </datafield>
+               <datafield tag="710" ind1 = " " ind2 = " ">
+                 <subfield code="5">PH-TH</subfield>
+               </datafield>
+             </xsl:if>
 
-		 </subfield>
-		 <subfield code="2">CERN Library</subfield>
-	       </datafield>
-	       <datafield tag="710" ind1 = " " ind2 = " ">
-		 <subfield code="5">PH-TH</subfield>
-	       </datafield>
-	     </xsl:if>
+             <xsl:if test="contains(./OAI-PMH:metadata/arXiv:arXiv/arXiv:report-no, 'CERN-PH-EP')">
+               <datafield tag="084" ind1 = " " ind2 = " ">
+                 <subfield code="a">
+                   <xsl:variable name="reportdate" select="substring-after(./OAI-PMH:metadata/arXiv:arXiv/arXiv:report-no, 'CERN-PH-EP/')"/>
+                   PH-EP-<xsl:choose>
+                   <xsl:when test="contains($reportdate,',')">
+                     <xsl:value-of select="substring-before($reportdate, ',')"/>
+                   </xsl:when>
+                   <xsl:otherwise>
+                     <xsl:value-of select="$reportdate"/>
+                   </xsl:otherwise>
+                 </xsl:choose>
+                 </subfield>
+                 <subfield code="2">CERN Library</subfield>
+               </datafield>
+               <datafield tag="710" ind1 = " " ind2 = " ">
+                 <subfield code="5">PH-EP</subfield>
+               </datafield>
+             </xsl:if>
 
-	     <xsl:if test="contains(./OAI-PMH:metadata/arXiv:arXiv/arXiv:report-no, 'CERN-PH-EP')">
-	       <datafield tag="084" ind1 = " " ind2 = " ">
-		 <subfield code="a">
-		   <xsl:variable name="reportdate" select="substring-after(./OAI-PMH:metadata/arXiv:arXiv/arXiv:report-no, 'CERN-PH-EP/')"/>
-		   PH-EP-<xsl:choose>
-		   <xsl:when test="contains($reportdate,',')">
-		     <xsl:value-of select="substring-before($reportdate, ',')"/>
-		   </xsl:when>
-		   <xsl:otherwise>
-		     <xsl:value-of select="$reportdate"/>
-		   </xsl:otherwise>
-		 </xsl:choose>
-		   
-		 </subfield>
-		 <subfield code="2">CERN Library</subfield>
-	       </datafield>
-	       <datafield tag="710" ind1 = " " ind2 = " ">
-		 <subfield code="5">PH-EP</subfield>
-	       </datafield>
-	     </xsl:if>
-	     
            </xsl:if>
-
-
-
-
 
            <!-- MARC FIELDS [1,7]00$$a,u  = metadata/arXiv/[author,affiliation]
                 N.B.: $$v not used, all affiliations are repeated in $$u   -->
 
            <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author">
+               <xsl:variable name="containingCollaboration"
+                             select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author[
+                                     contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'CONSORTIUM') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'CONSORTIUM') or contains(translate(./arXiv:affiliation, $lcletters, $ucletters) , 'CONSORTIUM')
+                                     or contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'COLLAB') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'COLLAB') or contains(translate(./arXiv:affiliation, $lcletters, $ucletters) , 'COLLAB')
+                                     or contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'TEAM') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'TEAM') or contains(translate(./arXiv:affiliation, $lcletters, $ucletters) , 'TEAM')
+                                     or contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'GROUP') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'GROUP') or contains(translate(./arXiv:affiliation, $lcletters, $ucletters) , 'GROUP')
+                                     or contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'FOR THE') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'FOR THE') or contains(translate(./arXiv:affiliation, $lcletters, $ucletters) , 'FOR THE')
+                                     ]"
+                             />
+               <xsl:variable name="containingAuthor"
+                             select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author[
+                                     not(
+                                         contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'CONSORTIUM') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'CONSORTIUM')
+                                         or contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'COLLAB') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'COLLAB')
+                                         or contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'TEAM') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'TEAM')
+                                         or contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'GROUP') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'GROUP')
+                                     or contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'FOR THE') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'FOR THE') or contains(translate(./arXiv:affiliation, $lcletters, $ucletters) , 'FOR THE')
+                                     )
+                                     or contains(./arXiv:forenames, 'Collaboration:')
+                                     or contains(./arXiv:forenames, 'Consortium:')
+                                     ]" />
 
-	   
-	   <xsl:variable name="containingCollaboration" 
-			 select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author[
-				 contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'CONSORTIUM') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'CONSORTIUM') or contains(translate(./arXiv:affiliation, $lcletters, $ucletters) , 'CONSORTIUM')
-				 or contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'COLLAB') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'COLLAB') or contains(translate(./arXiv:affiliation, $lcletters, $ucletters) , 'COLLAB')
-				 or contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'TEAM') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'TEAM') or contains(translate(./arXiv:affiliation, $lcletters, $ucletters) , 'TEAM')
-				 or contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'GROUP') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'GROUP') or contains(translate(./arXiv:affiliation, $lcletters, $ucletters) , 'GROUP')
-				 or contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'FOR THE') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'FOR THE') or contains(translate(./arXiv:affiliation, $lcletters, $ucletters) , 'FOR THE')
-				 ]"
-			 />
-	   
-	   <xsl:variable name="containingAuthor" 
-			 select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author[
-				 not(
-				     contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'CONSORTIUM') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'CONSORTIUM') 
-				     or contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'COLLAB') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'COLLAB') 
-				     or contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'TEAM') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'TEAM') 
-				     or contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'GROUP') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'GROUP') 
-				 or contains(translate(./arXiv:forenames, $lcletters, $ucletters), 'FOR THE') or contains(translate(./arXiv:keyname, $lcletters, $ucletters) , 'FOR THE') or contains(translate(./arXiv:affiliation, $lcletters, $ucletters) , 'FOR THE')
-				 ) 
-				 or contains(./arXiv:forenames, 'Collaboration:') 
-				 or contains(./arXiv:forenames, 'Consortium:') 
-				 ]" />
+               <xsl:call-template name="firstAuthor">
+                 <xsl:with-param name="firstNode" select="$containingAuthor[1]"/>
+               </xsl:call-template>
 
-	   <xsl:call-template name="firstAuthor">
-	     <xsl:with-param name="firstNode" select="$containingAuthor[1]"/>
-	   </xsl:call-template> 
-	   
-	   <xsl:for-each select="$containingAuthor[position() > 1]">
-	     <xsl:call-template name="furtherAuthor">
-	       <xsl:with-param name="node" select="."/>
-	     </xsl:call-template> 
-	     <author></author>
-	   </xsl:for-each>
-	   
-	   <xsl:for-each select="$containingCollaboration">
-	     <xsl:call-template name="collaboration">
-	       <xsl:with-param name="node" select="."/>
-	     </xsl:call-template> 
-	     <collaboration></collaboration>
-	   </xsl:for-each>
-	   
-	   <xsl:for-each select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author[contains(./arXiv:affiliation,'CERN')]">
-	     <datafield tag="690" ind1="C" ind2=" ">
-	       <subfield code="a">CERN</subfield>
-	     </datafield>
-	   </xsl:for-each>
+               <xsl:for-each select="$containingAuthor[position() > 1]">
+                 <xsl:call-template name="furtherAuthor">
+                   <xsl:with-param name="node" select="."/>
+                 </xsl:call-template>
+               </xsl:for-each>
+
+               <xsl:for-each select="$containingCollaboration">
+                 <xsl:call-template name="collaboration">
+                   <xsl:with-param name="node" select="."/>
+                 </xsl:call-template>
+                 <collaboration></collaboration>
+               </xsl:for-each>
+               <!--
+               <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author[contains(./arXiv:affiliation,'CERN')]">
+                 <datafield tag="690" ind1="C" ind2=" ">
+                   <subfield code="a">CERN</subfield>
+                 </datafield>
+               </xsl:if>-->
            </xsl:if>
-
-
-
 
            <!-- MARC FIELD 8564   <subfield code="y">Access to fulltext document</subfield> -->
            <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:id">
@@ -689,7 +634,6 @@
                   <subfield code="u">http://arxiv.org/pdf/<xsl:value-of select="substring-after(./OAI-PMH:header/OAI-PMH:identifier, '.org:')"/>.pdf</subfield>
              </datafield>
            </xsl:if>
-
 
              <!-- Filling 962$$b  LKR$$b - conference detection in comments field  -->
              <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments">
@@ -773,7 +717,7 @@
 
            <!-- MARC FIELD 595$$a -->
            <!--xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments"-->
-	   <datafield tag="595" ind1=" " ind2=" ">
+           <datafield tag="595" ind1=" " ind2=" ">
                <subfield code="a">LANL EDS</subfield>
            </datafield>
            <!-- /xsl:if-->
@@ -797,9 +741,9 @@
            <!-- MARC FIELD 773$$p  - publication detection in comments field -->
            <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref or ./OAI-PMH:metadata/arXiv:arXiv/arXiv:doi">
                <datafield tag="773" ind1=" " ind2=" ">
-                  <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref">                                     
+                  <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref">
                       <subfield code="o"><xsl:value-of select="normalize-space(./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref)"/></subfield>
-                  </xsl:if>   
+                  </xsl:if>
                   <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:doi">
                     <subfield code="a"><xsl:value-of select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:doi"/></subfield>
                   </xsl:if>
@@ -808,9 +752,9 @@
 
              <!-- MARC FIELD 773$$p  - publication detection in comments field
              <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments">
-	       <xsl:variable name="commentsf">
-	         <xsl:value-of select="translate(./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments,$ucletters,$lcletters)"/>
-	       </xsl:variable>
+               <xsl:variable name="commentsf">
+                 <xsl:value-of select="translate(./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments,$ucletters,$lcletters)"/>
+               </xsl:variable>
              <xsl:call-template name="matchPR773p"><xsl:with-param name="detectPR" select="$detectPR"/><xsl:with-param name="commentsf" select="$commentsf"/></xsl:call-template>
              </xsl:if> -->
 
@@ -824,7 +768,7 @@
              </xsl:variable>
 
              <xsl:choose>
-               <xsl:when test="contains($jref,',')"> 
+               <xsl:when test="contains($jref,',')">
 
                <xsl:variable name="jref-beforecoma">
                  <xsl:value-of select="normalize-space(substring-before($jref,','))"/>
@@ -860,26 +804,26 @@
 
 
                <datafield tag="773" ind1=" " ind2=" ">
-		  <xsl:if test="string-length($jref-title2)>0">
+                  <xsl:if test="string-length($jref-title2)>0">
                     <subfield code="p"><xsl:value-of select="normalize-space($jref-title2)"/></subfield>
-		  </xsl:if>
-		  <xsl:if test="string-length($jref-volume)>0">
+                  </xsl:if>
+                  <xsl:if test="string-length($jref-volume)>0">
                     <subfield code="v"><xsl:value-of select="$jref-volume"/></subfield>
-		  </xsl:if>
-		  <xsl:if test="string-length($jref-year)>0">
+                  </xsl:if>
+                  <xsl:if test="string-length($jref-year)>0">
                     <subfield code="y"><xsl:value-of select="$jref-year"/></subfield>
-		  </xsl:if>
-		  <xsl:if test="string-length($jref-pages-base)>0">
+                  </xsl:if>
+                  <xsl:if test="string-length($jref-pages-base)>0">
                     <subfield code="c"><xsl:value-of select="$jref-pages-base"/></subfield>
-		  </xsl:if>
+                  </xsl:if>
                </datafield>
 
 
-	       <xsl:if test="string-length($jref-year)>0">
+               <xsl:if test="string-length($jref-year)>0">
                <datafield tag="260" ind1=" " ind2=" ">
                    <subfield code="c"><xsl:value-of select="$jref-year"/></subfield>
                </datafield>
-	       </xsl:if>
+               </xsl:if>
 
 
              </xsl:when>
@@ -930,25 +874,25 @@
                </xsl:variable>
 
                <datafield tag="773" ind1=" " ind2=" ">
-		  <xsl:if test="string-length($jref-title2)>0">
+                  <xsl:if test="string-length($jref-title2)>0">
                     <subfield code="p"><xsl:value-of select="normalize-space($jref-title2)"/></subfield>
-		  </xsl:if>
-		  <xsl:if test="string-length($jref-volume)>0">
+                  </xsl:if>
+                  <xsl:if test="string-length($jref-volume)>0">
                     <subfield code="v"><xsl:value-of select="$jref-volume"/></subfield>
-		  </xsl:if>
-		  <xsl:if test="string-length($jref-year)>0">
+                  </xsl:if>
+                  <xsl:if test="string-length($jref-year)>0">
                      <subfield code="y"><xsl:value-of select="$jref-year"/></subfield>
-		  </xsl:if>
-		  <xsl:if test="string-length($jref-pages)>0">
+                  </xsl:if>
+                  <xsl:if test="string-length($jref-pages)>0">
                     <subfield code="c"><xsl:value-of select="$jref-pages"/></subfield>
-		  </xsl:if>
+                  </xsl:if>
                </datafield>
 
-	       <xsl:if test="string-length($jref-year)>0">
+               <xsl:if test="string-length($jref-year)>0">
                <datafield tag="260" ind1=" " ind2=" ">
                    <subfield code="c"><xsl:value-of select="$jref-year"/></subfield>
                </datafield>
-	       </xsl:if>
+               </xsl:if>
 
              </xsl:otherwise>
            </xsl:choose>
