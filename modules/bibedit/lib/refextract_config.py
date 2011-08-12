@@ -36,8 +36,9 @@ CFG_REFEXTRACT_KB_REPORT_NUMBERS = "%s/bibedit/refextract-report-numbers.kb" % C
 CFG_REFEXTRACT_KB_AUTHORS = "%s/bibedit/refextract-authors.kb" % CFG_ETCDIR
 
 ## Institutions, paired with author and affiliation extraction 
-CFG_INSTITUTIONS = ['CERN','DESY','Rutherford','Fermilab','SLAC','TRIUMF','Brookhaven Livermore','Argonne']
+CFG_REFEXTRACT_INSTITUTIONS = ['CERN','DESY','Rutherford','Fermilab','SLAC','TRIUMF','Brookhaven Livermore','Argonne']
 
+CFG_REFEXTRACT_AFFILIATION_NUMERATION_ALLOWABLE_GAP = 2
 
 ## MARC Fields and subfields used by refextract:
 
