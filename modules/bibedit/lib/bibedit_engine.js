@@ -2618,6 +2618,23 @@ function onAutosuggestSelect(selectidandselval){
   autosugg_in.innerHTML = "";
 }
 
+function check_subjects_KB(value) {
+    /*
+     * Query Subjects KB to look for a match
+     */
+    var response='';
+    $.ajaxSetup({async:false});
+    $.getJSON("/kb/export",
+             { kbname: 'Subjects', format: 'json', searchkey: value},
+             function(data) {if (data[0]) {response = data[0].label;}}
+             );
+    $.ajaxSetup({async:true});
+    if (response) {
+        return response;
+    }
+    return value;
+}
+
 function onContentChange(value, th){
   /*
    * Handle 'Save' button in editable content fields.
@@ -2661,6 +2678,10 @@ function onContentChange(value, th){
         }
     }
     else {
+        // If editing subject field, check KB
+        if (tag_ind == '65017' && field[0][subfieldIndex][0] == 'a') {
+            value = check_subjects_KB(value);
+        }
         if (field[0][subfieldIndex][1] == value)
             return escapeHTML(value);
         // Regular field
@@ -2672,10 +2693,9 @@ function onContentChange(value, th){
     var subfieldCode = field[0][subfieldIndex][0];
   }
 
-  // setting the undo/redo handlers
   var newValue = escapeHTML(value);
+  // setting the undo/redo handlers
   var code;
-
   var urHandler;
   var operation_type;
   if (tmpArray[0] == 'subfieldTag') {
