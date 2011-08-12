@@ -37,7 +37,7 @@ class BibCatalogSystem:
            @return: empty string on success. Otherwise a string describing error.
            @rtype: string
         """
-        raise NotImplementedError("This class cannot be instantiated")
+        return "this class cannot be instantiated"
 
     def ticket_search(self, uid, recordid=-1, subject="", text="", creator="", owner="", \
                       date_from="", date_until="", status="", priority="", queue=""):
@@ -65,7 +65,7 @@ class BibCatalogSystem:
            @param queue: search criteria - specific queue to search within
            @type queue: string
         """
-        raise NotImplementedError("This class cannot be instantiated")
+        pass
 
     def ticket_submit(self, uid=None, subject="", recordid=-1, text="", queue="", priority="", owner="",requestor=""):
         """submit a ticket. Return ticket number on success, otherwise None
@@ -87,7 +87,7 @@ class BibCatalogSystem:
            @type requestor: string
            @return: new ticket id or None
         """
-        raise NotImplementedError("This class cannot be instantiated")
+        pass
 
     def ticket_assign(self, uid, ticketid, to_user):
         """assign a ticket to a user. Return 1 on success
@@ -100,7 +100,7 @@ class BibCatalogSystem:
            @return: 1 on success, 0 otherwise
            @rtype: number
         """
-        raise NotImplementedError("This class cannot be instantiated")
+        pass
 
     def ticket_set_attribute(self, uid, ticketid, attribute, new_value):
         """set an attribute of a ticket. Return 1 on success
@@ -115,7 +115,7 @@ class BibCatalogSystem:
            @return: 1 on success, 0 otherwise
            @rtype: number
         """
-        raise NotImplementedError("This class cannot be instantiated")
+        pass
 
     def ticket_get_attribute(self, uid, ticketid, attribute):
         """return an attribute
@@ -128,7 +128,7 @@ class BibCatalogSystem:
            @return: the value of the attribute, or None if the ticket or attribute does not exist
            @rtype: string
         """
-        raise NotImplementedError("This class cannot be instantiated")
+        pass
 
     def ticket_get_info(self, uid, ticketid, attributes = None):
         """Return the attributes of a ticket as a dictionary whose fields are TICKET_ATTRIBUTES.
@@ -141,7 +141,7 @@ class BibCatalogSystem:
            @return: dictionary whose fields are TICKET_ATTRIBUTES
            @rtype: dictionary
         """
-        raise NotImplementedError("This class cannot be instantiated")
+        pass
 
     def ticket_comment(self, uid, ticketid, comment):
         """Submit a comment to specified ticket. Accepts multi-line text.
@@ -154,7 +154,7 @@ class BibCatalogSystem:
            @return: 1 on success, otherwise 0
            @rtype: int
         """
-        raise NotImplementedError("This class cannot be instantiated")
+        pass
 
 
 def get_bibcat_from_prefs(uid):
