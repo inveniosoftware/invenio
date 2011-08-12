@@ -89,12 +89,33 @@ class InvenioConnectorAuthError(Exception):
         """
         return str(self.value)
 
+class InvenioConnectorServerError(Exception):
+    """
+    This exception is called by InvenioConnector when using it on a machine with no
+    Invenio installed and no remote server URL is given during instantiation.
+    """
+    def __init__(self, value):
+        """
+        Set the internal "value" attribute to that of the passed "value" parameter.
+        @param value: an error string to display to the user.
+        @type value: string
+        """
+        Exception.__init__(self)
+        self.value = value
+    def __str__(self):
+        """
+        Return oneself as a string (actually, return the contents of self.value).
+        @return: representation of error
+        @rtype: string
+        """
+        return str(self.value)
+
 class InvenioConnector(object):
     """
     Creates an connector to a server running Invenio
     """
 
-    def __init__(self, url=LOCAL_SITE_URLS, user="", password="", login_method="Local", local_import_path="invenio"):
+    def __init__(self, url=None, user="", password="", login_method="Local", local_import_path="invenio"):
         """
         Initialize a new instance of the server at given URL.
 
@@ -103,7 +124,8 @@ class InvenioConnector(object):
         you can choose from which base path to import the necessary file
         specifying the local_import_path parameter.
 
-        @param url: the url to which this instance will be connected
+        @param url: the url to which this instance will be connected.
+            Defaults to CFG_SITE_URL, if available.
         @type url: string
         @param user: the optional username for interacting with the Invenio
             instance in an authenticated way.
@@ -117,8 +139,16 @@ class InvenioConnector(object):
             try to load the local connector, if available. Eg "invenio" will
             lead to "import invenio.dbquery"
         @type local_import_path: string
-         """
-        self.server_url = url
+
+        @raise InvenioConnectorAuthError: if no secure URL is given for authentication
+        @raise InvenioConnectorServerError: if no URL is given on a machine without Invenio installed
+        """
+        if url == None and LOCAL_SITE_URLS != None:
+            self.server_url = LOCAL_SITE_URLS[0] # Default to CFG_SITE_URL
+        elif url == None:
+            raise InvenioConnectorServerError("You do not seem to have Invenio installed and no remote URL is given")
+        else:
+            self.server_url = url
         self.local = LOCAL_SITE_URLS and self.server_url in LOCAL_SITE_URLS
         self.cached_queries = {}
         self.cached_records = {}
@@ -158,42 +188,28 @@ class InvenioConnector(object):
         if not 'youraccount/logout' in self.browser.response().read():
             raise InvenioConnectorAuthError("It was not possible to successfully login with the provided credentials")
 
-    def search(self, p="", f="", c="", rg=10, sf="", so="d", sp="",
-               rm="", of="", ot="", p1="", f1="", m1="", op1="",
-               p2="", f2="", m2="", op2="", p3="", f3="", m3="",
-               jrec=0, recid=-1, recidb=-1, d1="", d1y=0, d1m=0,
-               d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", ap=0,
-               read_cache=True):
+    def search(self, read_cache=True, **kwparams):
         """
         Returns records corresponding to the given search query.
+
+        See docstring of invenio.search_engine.perform_request_search()
+        for an overview of available parameters.
 
         @raise InvenioConnectorAuthError: if authentication fails
         """
         parse_results = False
+        of = kwparams.get('of', "")
         if of == "":
             parse_results = True
             of = "xm"
-
-        params = {'p': p, 'f': f, 'c': c, 'rg': rg,
-                  'sf': sf, 'so': so, 'sp': sp,
-                  'rm': rm, 'of': of,
-                  'p1':p1, 'f1': f1, 'm1': m1, 'op1': op1,
-                  'p2': p2, 'f2': f2, 'm2': m2, 'op2': op2,
-                  'p3': p3, 'f3': f3, 'm3': m3, 'jrec':jrec,
-                  'd1': d1, 'd1y':d1y, 'd1m': d1m, 'd1d': d1d,
-                  'd2': d2, 'd2y': d2y, 'd2m': d2m, 'd2d': d2d,
-                  'dt': dt, 'ap': ap , 'recid': recid, 'recidb': recidb,
-                   'ot': ot}
-        if recid == -1:
-            del params['recid']
-        if recidb == -1:
-            del params['recidb']
-        params = urllib.urlencode(params, doseq=1)
+            kwparams['of'] = of
+        params = urllib.urlencode(kwparams, doseq=1)
 
         # Are we running locally? If so, better directly access the
         # search engine directly
         if self.local and of != 't':
             # See if user tries to search any restricted collection
+            c = kwparams.get('c', "")
             if c != "":
                 if type(c) is list:
                     colls = c
@@ -205,13 +221,8 @@ class InvenioConnector(object):
                             self._check_credentials()
                             continue
                         raise InvenioConnectorAuthError("You are trying to search a restricted collection. Please authenticate yourself.\n")
-            results = perform_request_search(p=p, f=f, c=c, rg=rg, sf=sf, so=so, sp=so, rm=rm,
-                                            p1=p1, f1=f1, m1=m1, op1=op1,
-                                            p2=p2, f2=f2, m2=m2, op2=op2,
-                                            p3=p3, f3=f3, m3=m3, jrec=jrec,
-                                            recid=recid, recidb=recidb, of='id', ot=ot,
-                                            d1=d1, d1y=d1y, d1m=d1m, d1d=d1d,
-                                            d2=d2, d2y=d2y, d2m=d2m, d2d=d2d, dt=dt, ap=ap)
+            kwparams['of'] = 'id'
+            results = perform_request_search(**kwparams)
             if of.lower() != 'id':
                 results = format_records(results, of)
         else:
