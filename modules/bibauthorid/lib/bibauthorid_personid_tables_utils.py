@@ -27,8 +27,13 @@ import datetime
 import bibauthorid_config as bconfig
 import re
 import os
-import multiprocessing
-from multiprocessing import Queue
+try:
+    import multiprocessing
+    from multiprocessing import Queue # FIXME: Queue import below override this!
+except ImportError:
+    # FIXME: multiprocessing is not required dependency, so should be
+    # optional
+    pass
 from Queue import Empty
 from Queue import Queue
 
@@ -3119,7 +3124,7 @@ def personid_fast_assign_papers(paperslist=None):
     '''
     Assign papers to the most compatible person.
     Compares only the name to find the right person to assign to. If nobody seems compatible,
-    create a new person. 
+    create a new person.
     '''
 
 
