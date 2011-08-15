@@ -35,9 +35,17 @@ CFG_REFEXTRACT_KB_REPORT_NUMBERS = "%s/bibedit/refextract-report-numbers.kb" % C
 # authors which should be recognised as such
 CFG_REFEXTRACT_KB_AUTHORS = "%s/bibedit/refextract-authors.kb" % CFG_ETCDIR
 
-## Institutions, paired with author and affiliation extraction 
-CFG_REFEXTRACT_INSTITUTIONS = ['CERN','DESY','Rutherford','Fermilab','SLAC','TRIUMF','Brookhaven Livermore','Argonne']
+## Lines holding key matches will be replaced with the value at extraction time
+CFG_REFEXTRACT_INSTITUTION_REPLACEMENTS = {r'^Livermore' : 'LLNL, Livermore', \
+                                               r'.*?Stanford Linear Accelerator Center.*?' : 'SLAC', \
+                                               r'^Fermi National Accelerator Laboratory' : 'Fermilab'}
 
+## Lines holding these institutions will be reduced solely to the institution at extraction time
+CFG_REFEXTRACT_INSTITUTION_REDUCTIONS = ['CERN', 'DESY', 'Rutherford', 'Fermilab', 'SLAC', \
+                                             'TRIUMF', 'Brookhaven Livermore', 'Argonne']
+
+## The allowable distance between consecutively numerated affiliations
+## A small distance value could limit the number of numerated affiliations obtained (default: 2)
 CFG_REFEXTRACT_AFFILIATION_NUMERATION_ALLOWABLE_GAP = 2
 
 ## MARC Fields and subfields used by refextract:

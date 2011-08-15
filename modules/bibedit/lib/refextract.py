@@ -34,7 +34,8 @@ try:
                   CFG_REFEXTRACT_KB_JOURNAL_TITLES, \
                   CFG_REFEXTRACT_KB_REPORT_NUMBERS, \
                   CFG_REFEXTRACT_KB_AUTHORS, \
-                  CFG_REFEXTRACT_INSTITUTIONS, \
+                  CFG_REFEXTRACT_INSTITUTION_REPLACEMENTS, \
+                  CFG_REFEXTRACT_INSTITUTION_REDUCTIONS, \
                   CFG_REFEXTRACT_AFFILIATION_NUMERATION_ALLOWABLE_GAP, \
                   CFG_REFEXTRACT_CTRL_FIELD_RECID, \
                   CFG_REFEXTRACT_TAG_ID_REFERENCE, \
@@ -72,7 +73,8 @@ except ImportError:
     CFG_REFEXTRACT_KB_JOURNAL_TITLES = "%s/etc/refextract-journal-titles.kb" % '..'
     CFG_REFEXTRACT_KB_REPORT_NUMBERS = "%s/etc/refextract-report-numbers.kb" % '..'
     CFG_REFEXTRACT_KB_AUTHORS        = "%s/etc/refextract-authors.kb" % '..'
-    CFG_REFEXTRACT_INSTITUTIONS = []
+    CFG_REFEXTRACT_INSTITUTION_REDUCTIONS = []
+    CFG_REFEXTRACT_INSTITUTION_REPLACEMENTS = {}
     CFG_REFEXTRACT_AFFILIATION_NUMERATION_ALLOWABLE_GAP = 2
     CFG_REFEXTRACT_CTRL_FIELD_RECID          = "001" ## control-field recid
     CFG_REFEXTRACT_TAG_ID_REFERENCE          = "999" ## ref field tag
@@ -181,8 +183,9 @@ Command options:
                        Output raw references, as extracted from the document.
                        No MARC XML mark-up - just each extracted line, prefixed
                        by the recid of the document that it came from.
-   -a, --authors       extract authors, not references.  most other options
-                       work as expected
+   -a, --authors       extract the authors of the document. Attempt to
+                       return associations between authors and affiliations
+                       whenever possible.
    --first_author      use the following regexp as the first author, helps for
                        author extraction, ignored otherwise
    -l, --affiliations
@@ -304,7 +307,7 @@ def get_subfield_content(line,subfield_code):
     content = content.split('</subfield>')[0]
     return content
 
-def compress_subfields(out,subfield_code):
+def compress_subfields(out, subfield_code):
     """
     For each datafield, compress multiple subfields of type 'subfield_code' into a single one
     e.g. for MISC text, change xml format from:
@@ -404,13 +407,12 @@ def restrict_m_subfields(reference_lines):
             new_reference_lines.append(reference_lines[i])
     return m_restricted,new_reference_lines
 
-def filter_processed_references(out):
-
+def filter_processed_lines(out):
     """ apply filters to reference lines found - to remove junk"""
-    reference_lines = out.split('\n')
+    processed_lines = out.split('\n')
 
     ## Remove too long and too short m tags
-    (m_restricted,ref_lines) = restrict_m_subfields(reference_lines)
+    (m_restricted, ref_lines) = restrict_m_subfields(processed_lines)
 
     if m_restricted:
         a_tag=re.compile('\<subfield code=\"a\"\>(.*?)\<\/subfield\>')
@@ -440,9 +442,9 @@ def filter_processed_references(out):
         if rec:
             new_out += rec + '\n'
             len_filtered += 1
-    if len(reference_lines) != len_filtered:
-        write_message("-----Filter results: unfilter references line length is %d and filtered length is %d\n" \
-              %  (len(reference_lines),len_filtered), verbose=2)
+    if len(processed_lines) != len_filtered:
+        write_message("-----Filter results: unfiltered section line length is %d and filtered length is %d\n" \
+              %  (len(processed_lines),len_filtered), verbose=2)
     return new_out
 
 def get_url_repair_patterns():
@@ -1251,6 +1253,9 @@ def get_author_affiliation_numeration_str(punct=None):
     @return: (string), which can be compiled into a regex; identifies
     numeration next to an author name.
     """
+
+    ##FIXME cater for start or end numeration (ie two puncs)
+
     ## Number to look for, either general or specific
     re_number = '(?:\d\d?)'
     re_chained_numbers = "(?:(?:[,;]\s*%s\.?\s*))*" % re_number
@@ -1266,7 +1271,7 @@ def get_author_affiliation_numeration_str(punct=None):
         (%(num)s\s*                 ## Core numeration item, either specific or generic
             %(num_chain)s           ## Extra numeration, either generic or empty
         )
-        (?:(%(punct)s)|[^\d])       ## Right numeration punctuation
+        (?:(%(punct)s))       ## Right numeration punctuation
     )""" % {'num'       : re_number,
             'num_chain' : re_chained_numbers,
             'punct'     : re_punct}
@@ -3005,7 +3010,7 @@ def create_marc_xml_reference_line(line_marker,
      count_url, \
      count_doi, \
      count_auth_group) = \
-         convert_processed_reference_line_to_marc_xml(line_marker, \
+         convert_processed_line_to_marc_xml(line_marker, \
                                                       tagged_line.replace('\n',''), \
                                                       identified_dois, \
                                                       identified_urls)
@@ -3530,7 +3535,7 @@ def build_formatted_xml_citation(citation_elements,line_marker):
 
 
 
-def convert_processed_reference_line_to_marc_xml(line_marker,
+def convert_processed_line_to_marc_xml(line_marker,
                                                  line,
                                                  identified_dois,
                                                  identified_urls):
@@ -4235,12 +4240,6 @@ def create_marc_xml_reference_section(ref_sect,
         ## Find DOI sections in citation
         (working_line1, identified_dois) = identify_and_tag_DOI(working_line1)
 
-
-
-        ## Find DOI sections in citation
-        (working_line1, identified_dois) = identify_and_tag_DOI(working_line1)
-
-
         ## Identify and replace URLs in the line:
         (working_line1, identified_urls) = identify_and_tag_URLs(working_line1)
 
@@ -4868,16 +4867,19 @@ re_aff_univ = re.compile(r"univ[a-z]+\s+(of)?\s+([a-z\s\-]+)|([a-z\s\-]+)\s+(?!u
 
 re_splitting_comma = re.compile(",[^\d]", re.UNICODE)
 
-def arrange_possible_authors(line):
-    ## Replace and's with commas
-    comma_split_line = re.sub(r"(^\s*|\s)([Aa][Nn][Dd]|&)\s", ", ", line)
+def arrange_possible_authors(line, delimiter=None):
+    if not delimiter:
+        delimiter = ","
+    ## Replace and's with delimiter (comma as standard)
+    delimited_line = re.sub(r"(^\s*|\s)([Aa][Nn][Dd]|&)\s", delimiter, line)
     ## Split by commas
-    possible_authors = re_splitting_comma.split(comma_split_line.strip())
+#    possible_authors = re_splitting_comma.split(comma_split_line.strip())
+    possible_authors = delimited_line.split(delimiter)
     ## Remove empty stuff
     possible_authors = filter(lambda x: x.strip(), possible_authors)
     return possible_authors
 
-def gather_numerated_authors_affiliations(lines, aff_positions, number_to_find):
+def gather_affiliated_authors_by_numeration(lines, aff_positions, number_to_find):
     """Use the found affiliation to try and help with author extraction"""
     def has_number(possible_auth, number_to_find):
         """Does this possible author have the numeration I want?"""
@@ -4912,11 +4914,14 @@ def gather_numerated_authors_affiliations(lines, aff_positions, number_to_find):
     lines_to_check = lines[:]
     while lines_to_check:
         line = lines_to_check.pop().strip()
-        position = len(lines_to_check)
-        if aff_positions and (position in aff_positions):
+        popped_position = len(lines_to_check)
+        if aff_positions and (popped_position in aff_positions):
             continue
-        ## Split according to commas/'and's
-        possible_authors = arrange_possible_authors(line)
+        ## Shift numeration around delimiters if needed
+        ##FIXME shouldnt have to do this again here.. was done earlier for finding std authors
+        (shifted_line, num_delimiter) = realign_shifted_line_numeration_around_commas(line)
+        ## Split according to delimiter (default is comma)
+        possible_authors = arrange_possible_authors(shifted_line, num_delimiter)
         ## Make a list of ok authors found in the split line, for this affiliation
         numerated_authors.extend(filter(lambda a: has_number(a, number_to_find), possible_authors))
         ## So, on this line, a numerated author was found. So,
@@ -4929,7 +4934,7 @@ def gather_numerated_authors_affiliations(lines, aff_positions, number_to_find):
             map(remove_excess_numeration, all_split_authors))
 
 def initiate_affiliated_author_search(affiliations, top_lines, aff_positions):
-    """ Using obtained affiliation details, try to find authors, using primarily the
+    """Using obtained affiliation details, try to find authors, using primarily the
     numeration-associated method (pairing numerated authors with numerated affiliations,
     and as a fall-back, the 'lines-above' affiliation.
     @param affiliations: (dictionary) Already collected affiliations, with their possible
@@ -4947,21 +4952,22 @@ def initiate_affiliated_author_search(affiliations, top_lines, aff_positions):
     loose_authors = []
 
     for cur_aff in affiliations:
-        position_above = cur_aff['position']-1
+        if cli_opts['verbosity'] >= 2:
+            sys.stdout.write("---Finding affiliated authors for %s...\n" % cur_aff['line'].encode("UTF-8").strip())
         ## Using numerated affiliations
         if cur_aff['aff_nums']:
             numerated_authors = []
             for num in cur_aff['aff_nums']:
                 if not num in tried_numeration:
                     ## For this single, new, affiliation numeration val
-                    ## use it to find authors, given:
+                    ## use it to find authors, using:
                     ## 1. Lines above the affiliation
                     ## 2. The already identified affiliation positions
                     ## 3. The affiliation number, for authors, to look for
                     (numerated_authors_single_num, all_split_authors) = \
-                        gather_numerated_authors_affiliations(top_lines, \
-                                                              aff_positions, \
-                                                              number_to_find=num)
+                        gather_affiliated_authors_by_numeration(top_lines, \
+                                                                    aff_positions, \
+                                                                    number_to_find=num)
                     numerated_authors.extend(numerated_authors_single_num)
                     ## Save all split authors, if at least one numerated author was found!
                     ## Otherwise, this is just an empty addition
@@ -4971,12 +4977,14 @@ def initiate_affiliated_author_search(affiliations, top_lines, aff_positions):
             ## Substantially reliable
             cur_aff['author_data'] = {'authors'  : numerated_authors,
                                       'strength' : 1}
-
+            if cli_opts['verbosity'] >= 7:
+                sys.stdout.write("----Found %d strong affiliated authors.\n" % len(numerated_authors))
         else:
             ## Using (line-above) NON-numerated affiliations to look for authors
             ## This method is far less accurate than using numeration, but nonetheless
             ## correct in a wide variety of situations.
             ## Get the next non-empty line above the affiliation
+            position_above = cur_aff['position']-1
             while (position_above >= assumed_top_section_start) and \
                     (position_above >= 0) and \
                     (not top_lines[position_above].strip()):
@@ -4998,6 +5006,8 @@ def initiate_affiliated_author_search(affiliations, top_lines, aff_positions):
                     except IndexError:
                         break
                     position_above -= 1
+
+                collected_line_above_authors = []
                 ## For each 'possible author' line above the affiliation
                 ## Build a list of weakly-matched authors
                 for line_above in lines_above:
@@ -5011,10 +5021,14 @@ def initiate_affiliated_author_search(affiliations, top_lines, aff_positions):
                     else:
                         ## This match isnt so reliable
                         strength_for_this_line_above = 0
+                    collected_line_above_authors = filter(lambda a: re_ambig_auth.search(a), split_line_above)
 
-                    ## Far less reliable than the numerated version
-                    cur_aff['author_data'] = {'authors'   : filter(lambda a: re_ambig_auth.search(a), split_line_above),
-                                              'strength'  : strength_for_this_line_above,}
+                ## Far less reliable than the numerated version
+                cur_aff['author_data'] = {'authors'   : collected_line_above_authors,
+                                          'strength'  : strength_for_this_line_above,}
+
+                if cli_opts['verbosity'] >= 7:
+                    sys.stdout.write("----Found %d weak affiliated authors.\n" % len(collected_line_above_authors))
 
 #    ## Check all numerated authors which were found
 #    all_numerated_authors = []
@@ -5032,8 +5046,9 @@ def build_start_end_numeration_str(predefined_punct=None):
     (e.g. brackets)
     @return: (regex) The regex which will match both starting and ending
     numeration on a line, with any additional punctuation included."""
-    numeration_str = "^"+get_author_affiliation_numeration_str(predefined_punct) \
-                    +"|"+get_author_affiliation_numeration_str(predefined_punct) \
+    ## It is important that the regex matches the number AND something else relevant on the line
+    numeration_str = "^"+get_author_affiliation_numeration_str(predefined_punct)+r"[^\d](?:(?:.*?)[^\d\s\.,\:;\-\[\]\(\)\*\\](?:.*?))" \
+                    +"|"+r"(?:(?:.*?)[^\s\.,\:;\-\[\]\(\)\*\\](?:.*?))[^\d]"+get_author_affiliation_numeration_str(predefined_punct) \
                     +"$"
     return numeration_str
 
@@ -5068,7 +5083,7 @@ def obtain_author_affiliation_numeration_list(line, punct=None):
     ## num_match is used to obtain punctuation around the numeration
     return (i_stripped_nums, num_match)
 
-def standardise_affiliation_names(line):
+def replace_affiliation_names(line):
     """  Standardise some affiliations. Convert some
     domain specific HEP names to a standard form.
     This will very likely be moved out into a kb soon.
@@ -5078,14 +5093,13 @@ def standardise_affiliation_names(line):
     """
     ## Removes numeration, 'the'/'and', and replace titles
     line = line.strip()
-    line = re.sub(r"^Livermore", "LLNL, Livermore", line)
-    line = re.sub(r".*?Stanford Linear Accelerator Center.*?", "SLAC", line)
-    line = re.sub(r"^Fermi National Accelerator Laboratory", "Fermilab", line)
+    for term, repl in CFG_REFEXTRACT_INSTITUTION_REPLACEMENTS.items():
+        line = re.sub(term, repl, line)
     line = re.sub(r"\s[tT][hH][eE]\s", " ", line)
     line = re.sub(r"\s[aA][nN][dD]\s", " ", line)
     return line
 
-def standardise_affiliation_formats(line):
+def reduce_affiliation_names(line):
     """ Standardise some affiliations. This will remove numeration,
     and will convert university names into a standard format.
     @param line: (string) Line from the document holding a
@@ -5100,13 +5114,13 @@ def standardise_affiliation_formats(line):
         ## Get the University name
         line = (univ_name.group(2) or univ_name.group(3)) + " U."
     ## Check and set an institution
-    for inst in CFG_REFEXTRACT_INSTITUTIONS:
+    for inst in CFG_REFEXTRACT_INSTITUTION_REDUCTIONS:
         if line.find(inst) != -1:
             line = inst
             break
     return line
 
-def extract_numerated_affiliations(num_position, num_section, num_find, num_punct, missing):
+def extract_numerated_affiliations(num_data, num_find, missing):
     """ Collect numerated affiliations, using a section of the document, and
     the number which to search for. The punctuation surrounding any numeration (the
     first number found) (if any) is used to improve the strictness of the search.
@@ -5119,12 +5133,13 @@ def extract_numerated_affiliations(num_position, num_section, num_find, num_punc
     content and numeration data of an affiliation.
     """
     affs = []
-    if num_section:
+
+    if num_data['position'] < len(num_data['top']):
         ## First line, holding first affiliation with the number 1
-        line = num_section[0].strip()
+        line = num_data['top'][num_data['position']].strip()
         ## A number has been found before this iteration
         ## Use previous number, and previous punctuation!
-        (aff_nums, specific_num_match) = obtain_author_affiliation_numeration_list(line, num_punct)
+        (aff_nums, specific_num_match) = obtain_author_affiliation_numeration_list(line, num_data['punc'])
         if num_find in aff_nums:
             ## Attempt to get numeration for this affiliation
             try:
@@ -5134,21 +5149,22 @@ def extract_numerated_affiliations(num_position, num_section, num_find, num_punc
                 sys.stderr.write("Error: Unable to obtain integer affiliation numeration.")
                 sys.exit(1)
             ## Save the punctuation surrounding the numeration
-            affs.append({'position'             : num_position,
-                         'line'                 : standardise_affiliation_formats(line),
+            affs.append({'position'             : num_data['position'],
+                         'line'                 : reduce_affiliation_names(line),
                          'aff_nums'             : aff_nums,
                          'author_data'          : None})
+#            print "--Found aff: %s" % line
 
         elif num_find in missing:
             ## Get the next non missing number and use that
             while num_find in missing:
                 num_find += 1
 
+        ## Increment position and remove top line
+        num_data['position'] += 1
         ## Do until end of docbody section (num_section)
-        affs.extend(extract_numerated_affiliations(num_position+1, \
-                                                       num_section[1:], \
+        affs.extend(extract_numerated_affiliations(num_data, \
                                                        num_find, \
-                                                       num_punct, \
                                                        missing))
     return affs
 
@@ -5184,6 +5200,8 @@ def realign_numeration(toplines):
             except ValueError:
                 continue
 
+    numeration_swaps = 0
+
     ## Now, using the positions of the '1's, go forward and locate
     ## subsequent numeration, and replicate on the following line if need be
     missing_nums = []
@@ -5191,7 +5209,6 @@ def realign_numeration(toplines):
         alignment_error = 0
         num = 1
         for position, line in enumerate(toplines[start:]):
-#            print "start pos: %d, now on num: %d" % (start, num)
             num_match = re_start_numeration.search(line)
 
             if num_match:
@@ -5201,13 +5218,10 @@ def realign_numeration(toplines):
                 except ValueError:
                     continue
 
-#                print "got num %d, position %d, on line %s" % (i_num, start+position, line.strip())
-
                 ## Hit a number which is not expected, and is not just 2 ahead
                 if (i_num != num) and ((i_num < num) or ((i_num - num) > \
                                                              CFG_REFEXTRACT_AFFILIATION_NUMERATION_ALLOWABLE_GAP)):
-                    #alignment_error = 1
-                    ## Skipping can occur, but only twice in a row before exiting
+                    ## Skipping can occur, but only whilst the number is within the allowable gap
                     continue
                 else:
                     ## When there exists an acceptable missed number, for whatever reason
@@ -5241,6 +5255,7 @@ def realign_numeration(toplines):
 #                                    print "new line: %s" % toplines_alternate[lookahead]
                                     ## Increment the next number to look for
                                     num += 1
+                                    numeration_swaps += 1
                                     break
                             except IndexError:
                                 alignment_error = 4
@@ -5249,15 +5264,15 @@ def realign_numeration(toplines):
                                 ## To dangerous to continue.
                                 alignment_error = 5
 
-#            elif line.strip():
-#                print "Stopping, num: %d, line: %s" % (num, line.strip())
-#                break
-
             if alignment_error:
-                print "alignment error: %d (1 or 2 is bad)" % alignment_error
+                if cli_opts['verbosity'] >= 1:
+                    sys.stdout.write("---Warning: Realign numeration problem #%d.\n" % alignment_error)
                 ## Scrap the alternate version
                 toplines_alternate = toplines
                 break
+
+    if cli_opts['verbosity'] >= 8:
+        sys.stdout.write("---realign numeration made %d changes.\n" % numeration_swaps)
 
     return (toplines_alternate, missing_nums)
 
@@ -5280,10 +5295,9 @@ def find_affiliations(lines, start, end=None, use_to_find_authors=False):
         return y
 
     affiliations = []
-    starting_num_position = None
-    numerated_aff_num_punct_ptn = None
-    top = None
-
+    numerated_aff_data = {'position' : None,
+                          'punc'     : None,
+                          'top'      : None,}
     if not start:
         start = 0
 
@@ -5293,46 +5307,42 @@ def find_affiliations(lines, start, end=None, use_to_find_authors=False):
     else:
         top_lines_orig = lines[start:]
 
-#    print "top_lines"
-#    print top_lines_orig
-
     ## Get an alternative version of the top section, of the same length
     ## but with some alone numeration replicated on the next line!
     (top_lines_alt, missing_nums) = realign_numeration(top_lines_orig)
 
-#    print "top_lines_alt:"
-#    print top_lines_alt
-
     for position in range(len(top_lines_orig)):
         ## Standardise some affiliations
-        line = standardise_affiliation_names(top_lines_orig[position].strip())
-        line_alt = standardise_affiliation_names(top_lines_alt[position].strip())
+        line = replace_affiliation_names(top_lines_orig[position].strip())
+        line_alt = replace_affiliation_names(top_lines_alt[position].strip())
 
         ## If a previous numeration value was found in the previous iteration
         ## check for the increment of this value on this line
         if re_aff_num.search(line) or re_aff_name.search(line):
 
-            print "AFF match on line: %s" % line
-
-            ## Check numeration in replica docbody
+            ## Check numeration in line from original & realigned docbodies
             (aff_nums, num_match) = obtain_author_affiliation_numeration_list(line)
-            ## Check numeration in the numeration-realigned docbody
             (aff_nums_alt, num_match_alt) = obtain_author_affiliation_numeration_list(line_alt)
+
             ## Set the information to the correct top_section, depending on
             ## if the numeration was found split across lines or not.
             if aff_nums or not aff_nums_alt:
-                print "using orig lines"
-                top = top_lines_orig
-            elif aff_nums_alt:
-                print "using alt lines"
-                top = top_lines_alt
+                top_version_for_line = top_lines_orig
+            else:
+                top_version_for_line = top_lines_alt
                 aff_nums = aff_nums_alt
                 num_match = num_match_alt
 
+            if cli_opts['verbosity'] >= 4:
+                sys.stdout.write("---Affiliation match on line: %s\n" % \
+                                     top_version_for_line[position].encode("UTF-8").strip())
+
             ## Aff number '1' numeration found, save position and punctuation
-            if aff_nums and num_match and 1 in aff_nums:
-                starting_num_position = position
-                numerated_aff_num_punct_ptn = num_match.group(1)
+            if aff_nums and num_match and (1 in aff_nums):
+                ## Set the top version to use, depending on how this initial aff was found
+                numerated_aff_data = {'position'         : position,
+                                      'top'              : top_version_for_line,
+                                      'punc'             : num_match.group(1),}
             ## So, an AFFILIATION KEYWORD was found on this line, but this is not a '1'!
             ## Move up lines to get the starting affiliation position, using NUMERATION
             elif aff_nums and num_match:
@@ -5341,58 +5351,71 @@ def find_affiliations(lines, start, end=None, use_to_find_authors=False):
                 reversed_position = position - 1
                 ## Attempt to go back and find the start of this numeration section
                 ## Get numeration for this line
-                while (reversed_position >= 0) and (starting_num_position is None):
+                while (reversed_position >= 0) and (numerated_aff_data['position'] is None):
                     ## Check numeration in the numeration-realigned docbody
                     (rev_aff_nums, rev_num_match) = \
-                        obtain_author_affiliation_numeration_list(top[reversed_position])
+                        obtain_author_affiliation_numeration_list(top_version_for_line[reversed_position])
                     ## Check for numeration n, n = 1
                     if find_num == 1 and (find_num in rev_aff_nums):
-                        starting_num_position = reversed_position
-                        numerated_aff_num_punct_ptn = rev_num_match.group(1)
+                        ## Set the top version to use, depending on how this initial aff was found
+                        numerated_aff_data = {'position'         : reversed_position,
+                                              'top'              : top_version_for_line,
+                                              'punc'             : rev_num_match.group(1),}
                     ## Check for numeration n, 1 < n < last found
                     elif find_num in rev_aff_nums:
                         find_num = find_num - 1
                     ## Move position up one line
                     reversed_position = reversed_position - 1
 
-                ## Starting numeration was found..!
-                if not starting_num_position:
+                if not numerated_aff_data['position']:
                     ## Could not find start. Abort everything.
                     break
             else:
-                ## The normal way of appending lines with affiliation names
+                ## No numeration -- append affiliation normally
                 affiliations.append({'position'     : position,
-                                     'line'         : standardise_affiliation_formats(line),
+                                     'line'         : reduce_affiliation_names(line),
                                      'aff_nums'     : None,
                                      'author_data'  : None,})
 
-        ## Stop searching if a keyworded and numerated affiliation has been found
-        if starting_num_position is not None:
+        ## Stop searching if a starting numerated affiliation has been found
+        if numerated_aff_data['position'] is not None:
             break
 
-    ## In the situation where numeration has been found for an affiliation
-    ## Collect up all of the following numerated affiliations,
-    ## or go backwards and obtain them
-    if starting_num_position:
-        print "Going to extract numerated affiliations..."
-        affiliations = extract_numerated_affiliations(starting_num_position, \
-                                                          top[starting_num_position:], \
+    starting_aff_position = None
+    ## Collect all numerated affiliations, using the starting affiliation
+    ## Missing numeration was detected during the realignment process
+    if numerated_aff_data['position'] is not None:
+        ## Need to save this, since finding numerated affs will change it
+        starting_aff_position = numerated_aff_data['position']
+
+        affiliations = extract_numerated_affiliations(numerated_aff_data, \
                                                           1, \
-                                                          numerated_aff_num_punct_ptn, \
                                                           missing_nums)
+        if cli_opts['verbosity'] >= 4:
+            sys.stdout.write("---The collection of numerated affiliations returned %d affiliations.\n" % len(affiliations))
 
     loose_authors = []
-
-    ## Try to obtain more authors, if needed
+    ## Get affiliated authors, if specified
     if use_to_find_authors:
-        aff_positions = [aff['position'] for aff in affiliations]
-        ## Then, if the above didn't work, do the 'line above' method
-        (affiliations, loose_authors) = initiate_affiliated_author_search(affiliations, \
-                                                                          top, \
-                                                                          aff_positions)
+        top_to_use_to_find_authors = numerated_aff_data['top'] or top_lines_orig
 
+        ## If numerated affiliations are being used, only look at the lines above
+        ## the first numerated affiliation
+        if numerated_aff_data['position']:
+            top_to_use_to_find_authors = top_to_use_to_find_authors[:starting_aff_position]
+        aff_positions = [aff['position'] for aff in affiliations]
+        ## Look for authors associated with obtained affiliations
+        (affiliations, loose_authors) = initiate_affiliated_author_search(affiliations, \
+                                                                              top_to_use_to_find_authors, \
+                                                                              aff_positions)
+        if cli_opts['verbosity'] >= 4:
+            sys.stdout.write("---The collection of affiliated authors returned authors for %d affiliations.\n" % \
+                                 len([x['author_data']['authors'] for x in affiliations if (x['author_data'] and x['author_data']['authors'])]))
+
+    ## Remove undesirable characters
     for tmp_aff in affiliations:
-        tmp_aff['line'] = replace_undesirable_characters(standardise_affiliation_formats(tmp_aff['line']).strip(".,:;- []()*\\"))
+        tmp_aff['line'] = replace_undesirable_characters( \
+            reduce_affiliation_names(tmp_aff['line']).strip(".,:;- []()*\\"))
 
     return (affiliations, loose_authors)
 
@@ -5500,14 +5523,13 @@ def collect_tagged_authors(top_section, position, first_line=None, \
     return (position, line_parts)
 
 re_misaligned_numeration_around_comma = re.compile("(.*?)(?P<delim>[,;])\s*(\d{1,3})")
-
 def realign_shifted_line_numeration_around_commas(line):
     ## First see how many swap substitutions will take place, before-hand.
     swaps = [x for x in re_misaligned_numeration_around_comma.finditer(line)]
     delimiter = None
     if len(swaps) >= 1:
         ## Get the first matches' delimiter, which can be reused to split a line later.
-        delimeter = swaps[0].group("delim")
+        delimiter = swaps[0].group("delim")
         ## Do the swapping.
         line = re_misaligned_numeration_around_comma.sub(r"\g<1>\g<3>,", line).strip(",")
     return (line, delimiter)
@@ -5569,16 +5591,18 @@ def extract_top_document_information_from_fulltext(docbody, first_author=None):
             ## Must exceed the first 3 lines
             keyword_hit = perform_regex_match_upon_line_with_pattern_list(line, ending_keyword_ptns)
             if keyword_hit and not found_ending_keyword and (position > 3):
-                if cli_opts['verbosity'] > 7:
-                    print "--- ending keyword on line: %s, position: %d" % (line.strip(), position)
+                if cli_opts['verbosity'] >= 7:
+                    sys.stdout.write("---Ending keyword match: %s, position: %d\n" % \
+                                         (keyword_hit.group(0).strip(), position))
                 found_ending_keyword = position
 
             ## Look for author tags
             author_tag_hit = re_author_tag.search(line)
             if author_tag_hit and not found_author_tag:
-                if cli_opts['verbosity'] > 7:
-                    print "--- author tag on line: %s, position: %d" % (line.strip(), position)
-                found_author_tag= position
+                if cli_opts['verbosity'] >= 7:
+                    sys.stdout.write("---Author tag match: %s, position: %d\n" % \
+                                         (author_tag_hit.group(0).strip(), position))
+                found_author_tag = position
 
             ## Only in the top X lines
             if (found_ending_keyword and found_author_tag) \
@@ -5593,24 +5617,36 @@ def extract_top_document_information_from_fulltext(docbody, first_author=None):
     #               'Authors:', 'Chris Hayward,', '', 'Tim Smith,', '', 'Joe Harris', 'University of Bath', '', 'Abstract']
 
     affiliations = []
-    ## end-of-top-section-keyword position, if any
-    (pre_ending_keyword, pre_author_tag) = check_for_end_of_author_section_match_keywords(docbody)
+
+    ## Always find the position of the start of the reference section.
+    ## Strip from document body.
+    refs_start = get_reference_section_beginning(docbody)
+
+    ## Strip references. This will prevent analysing this section for authors.
+    if refs_start:
+        docbody = docbody[:refs_start['start_line']]
+
     ## Default return values
     status = how_found_start = 0
 
-    print "Top Section Ending:"
+    ## end-of-top-section-keyword position, if any
+    (pre_ending_keyword, pre_author_tag) = check_for_end_of_author_section_match_keywords(docbody)
 
     if pre_ending_keyword:
-        print "---keyword!"
+        if cli_opts['verbosity'] >= 4:
+            sys.stdout.write("---Using top section keyword as a delimiter.\n")
         top_section = docbody[:pre_ending_keyword]
     elif len(docbody) < assumed_top_section_length:
         ## Half total length
+        if cli_opts['verbosity'] >= 4:
+            sys.stdout.write("---Using entire document body as top section.\n")
         top_section = docbody
-        print "--whole!"
     else:
-        ## First 100 lines?
+        ## First N lines
+        if cli_opts['verbosity'] >= 4:
+            sys.stdout.write("---Using first %d lines as top section.\n" % \
+                                 (assumed_top_section_length))
         top_section = docbody[:assumed_top_section_length]
-        print "--first 100"
 
     tagged_author_information = []
     just_tagged_authors = []
@@ -5665,36 +5701,21 @@ def extract_top_document_information_from_fulltext(docbody, first_author=None):
     first_standard_author_position = None
     standard_authors = []
     standard_author_matches = []
+
+    ## Either original, or shifted, using numeration
+    top_section_version = None
+
     for position in range(len(top_section)):
         ## An author tag was found, delay the search until the tag position is reached
         if first_author_tag_position and (position < first_author_tag_position):
             continue
 
-        ## 'Initial Surname' / 'Surname Initials' authors or
-        ## Knowledge-base specified authors
-#        if re_auth_with_number.search(line) or re_extra_auth.search(line):
-            ## Keep a list of standard authors, and their positions
-#            (last_standard_author_position, standard_authors) = collect_standard_authors(top_section, \
-#                                                                                             position)
-            ## Use the first matched author from WHERE TO START
-#            first_standard_author_position = position
-
-#        (first_standard_author_position, std_authors, \
-#            last_standard_author_position) = collect_standard_authors(top_section)
-
-#        line = top_section[position]
-#        line_alt = realign_shifted_line_numeration_around_commas(line)
-
-#        print line_alt
-#        print position
-
-        ## Match on non-rearranged lines
-#        standard_author_pattern_match = re_auth_with_number.search(line)
-#        extra_author_pattern_match = re_extra_auth.search(line)
-
         line = top_section[position]
-        (shifted_line, numeration_delimiter) = realign_shifted_line_numeration_around_commas(line)
+        (shifted_line, numeration_delimiter) = \
+            realign_shifted_line_numeration_around_commas(line)
 
+        ## Look for authors (with or without numeration) on the original line
+        ## and on the augmented line (with numeration shifted)
         author_matches = \
             [x for x in re_single_author_pattern_with_numeration.finditer(line)]
         author_matches_alt = \
@@ -5705,10 +5726,6 @@ def extract_top_document_information_from_fulltext(docbody, first_author=None):
                 first_standard_author_position = position
             last_standard_author_position = position
 
-            print "from line: %s" % line
-
-            use_line = "orig"
-
             if author_matches and author_matches_alt:
                 ## Save the list of matching authors in a list
                 if len(author_matches) <= len(author_matches_alt):
@@ -5717,21 +5734,11 @@ def extract_top_document_information_from_fulltext(docbody, first_author=None):
                 use_line = "alt"
 
             if use_line == "alt":
-                which_line = re.sub("[Aa][Nn][Dd]|&", ",", shifted_line.strip())
+                which_line = re.sub("\s([Aa][Nn][Dd]|&)\s", ",", shifted_line.strip())
                 standard_author_matches = author_matches_alt
-                print "USING ALT"
             else:
-                which_line = re.sub("[Aa][Nn][Dd]|&", ",", line.strip())
+                which_line = re.sub("\s([Aa][Nn][Dd]|&)\s", ",", line.strip())
                 standard_author_matches = author_matches
-                print "USING NORM"
-
-            ## Remove matches from string
-#            for s in standard_author_matches:
-#                m_start = s.start()
-#                m_end = s.end()
-#                esc_line = esc_line[:m_start]+((m_end - m_start) * "_")+esc_line[m_end:]
-
-#            print "esc_line: %s" % esc_line
 
             new_standard_authors = [x.group(0) for x in standard_author_matches]
 
@@ -5740,7 +5747,6 @@ def extract_top_document_information_from_fulltext(docbody, first_author=None):
             if len(standard_author_matches) >= 2:
                 first_matched_auth = standard_author_matches[0].group(0)
                 second_matched_auth = standard_author_matches[1].group(0)
-
                 try:
                     delimiter = None
                     ## Take either the delimiter from two author matches
@@ -5752,75 +5758,18 @@ def extract_top_document_information_from_fulltext(docbody, first_author=None):
                         delimiter = numeration_delimiter
                     if delimiter:
                         split_authors = [n for n in which_line.split(delimiter) if n.strip(", ")]
+                        ## Take the authors obtained from splitting the line
                         if len(split_authors) >= len(new_standard_authors):
                             new_standard_authors = split_authors
-                            sys.stdout.write("WOOP! adding missed authors: %s\n" % new_standard_authors)
-                    else:
-                        print "NO DELIMITER :(" ## WHY FOR THE FIRST AUTHOR LINE??? FIX THIS FIRST
                 except IndexError:
                     pass
-#                else:
-#                    skipped_auths = [y.group(0) for y in \
-#                                         re.finditer("[^\d,;&_]\s*([,;&]|[Aa][Nn][Dd]|$)\s*\d{0,3}", esc_line)]
 
             ## Standard author strings
-            sys.stdout.write("appending std authors: %s\n" % new_standard_authors)
             standard_authors.append(new_standard_authors)
 
-
-        ## Match on rearranged lines
-#        standard_author_pattern_match_alt = re_auth_with_number.search(line_alt)
-#        extra_author_pattern_match_alt = re_extra_auth.search(line_alt)
-
-#        if standard_author_pattern_match or extra_author_pattern_match \
-#                or standard_author_pattern_match_alt or extra_author_pattern_match_alt:
-
-#            if not first_standard_author_position:
-#                first_standard_author_position = position
-#            last_standard_author_position = position
-
-#            if standard_author_pattern_match or standard_author_pattern_match_alt:
-#                if standard_author_pattern_match and standard_author_pattern_match_alt:
-#                    if len(standard_author_pattern_match) > len(standard_author_pattern_match_alt):
-#                        std_match = standard_author_pattern_match
-#                    else:
-#                        std_match = standard_author_pattern_match_alt
-#                else:
-#                    std_match = standard_author_pattern_match or standard_author_pattern_match_alt
-
-                ## Append the matched author string (standard pattern)
-#                print "from line: %s" % line
-#                print "appending std authors: %s" % std_match.group('author_names')
-#                standard_authors.append(std_match.group('author_names'))
-
-#            if extra_author_pattern_match or extra_author_pattern_match_alt:
-#                if extra_author_pattern_match and extra_author_pattern_match_alt:
-#                    if len(extra_author_pattern_match) > len(extra_author_pattern_match_alt):
-#                        ext_match = extra_author_pattern_match
-#                    else:
-#                        ext_match = extra_author_pattern_match_alt
-#                else:
-#                    ext_match = extra_author_pattern_match or extra_author_pattern_match_alt
-                ## Append the matched author string (extra pattern)
-#                standard_authors.append(ext_match.group('extra_auth'))
-
-#            if cli_opts['verbosity'] > 7:
-#                print "--- author pattern match on line: %s, position: %d" % (line.strip(), position)
-
-    ## By this point, we've managed to try and get tagged authors,
-    ## as well as anything in the top section that looks like an author
-    ## according to the main author regex.
-
-#    print "STANDARD AUTHORS: %d" % len(standard_authors)
-#    print standard_authors
-
-    ## Attempt to obtain authors using affiliation positions.
-    ## A tagged author position is considered the best.
-    ## Otherwise start from the top of the section.
-    ## Always attempt to find authors too.
-    (affiliations, loose_authors) = find_affiliations(top_section, \
-                                                          start=first_author_tag_position, \
-                                                          use_to_find_authors=True)
+    ## By this point, we've managed to try and get tagged authors, as well
+    ## as anything in the top section that looks like an author using the standard
+    ## author pattern.
 
     ## METHOD 3 -------------- Look for authors using affiliations
     ## and handle the assembly of standard authors too
@@ -5831,72 +5780,85 @@ def extract_top_document_information_from_fulltext(docbody, first_author=None):
     just_standard_authors = []
     just_affiliated_authors = []
 
+    ## Now, attempt to obtain authors using affiliation positions.
+    ## A tagged author position is considered the best starting point.
+    ## Otherwise start from the top of the section.
+    ## Always attempt to find authors too.
+    (affiliations, loose_authors) = find_affiliations(top_section, \
+                                                          start=first_author_tag_position, \
+                                                          use_to_find_authors=True)
+
     if affiliations is not None:
         ## Attempt to pair together standard authors with identified affiliations.
         ## If the number of affiliation is equal to the number of author lines
         if len(affiliations) == len(standard_authors):
             ## Increase strength for this (when len(aff)=len(auth))?
             for x in range(len(standard_authors)):
-
-#                rebuilt_standard_authors = rebuild_author_lines([standard_authors[x]], \
-#                                                                     re_single_author_pattern_with_numeration)
-
                 ## Associate authors with affiliations
                 affiliation_associated_standard_authors.append({'authors'     : standard_authors[x],
                                                                 'affiliation' : affiliations[x]['line']})
                 just_standard_authors.extend(standard_authors[x])
         ## Now assemble affiliated authors, with their affiliations
         for aff in affiliations:
-            ## Append any affiliation supported authors.
-            ## [!Do not include repeated authors, may be repeated from double numeration]
+            ## Append any affiliation supported authors, but only if authors exist.
             if aff['author_data']:
                 author_list_for_affiliation = aff['author_data']['authors']
                 affiliated_author_strength = aff['author_data']['strength']
-            else:
-                author_list_for_affiliation = []
-                affiliated_author_strength = None
-            affiliation_associated_affiliated_authors.append( \
-                {'authors'       : [auth for auth in author_list_for_affiliation if auth not in just_affiliated_authors],
-                 'affiliation'   : aff['line'],
-                 'strength'      : affiliated_author_strength,})
-            just_affiliated_authors.extend([auth for auth in author_list_for_affiliation])
+                affiliation_associated_affiliated_authors.append( \
+                    {'authors'       : [auth for auth in author_list_for_affiliation if auth not in just_affiliated_authors],
+                     'affiliation'   : aff['line'],
+                     'strength'      : affiliated_author_strength,})
+                just_affiliated_authors.extend([auth for auth in author_list_for_affiliation])
 
     ## In the event that standard authors were not paired with affiliations
     ## then just make a list of dictionaries of authors without affiliations
     if standard_authors and not affiliation_associated_standard_authors:
-#        rebuilt_standard_authors = \
-#            [rebuild_author_lines([std_auth_line], re_single_author_pattern_with_numeration) \
-#                 for std_auth_line in standard_authors]
         for s in standard_authors:
             affiliation_associated_standard_authors.append({'authors'     : s,
                                                             'affiliation' : None,})
             just_standard_authors.extend(s)
 
-    if cli_opts['verbosity'] > 7:
-        sys.stdout.write("--- Author extraction results:\n")
-        sys.stdout.write("---- tagged: %s\n" % tagged_author_information)
-        sys.stdout.write("---- standard: %s\n" % affiliation_associated_standard_authors)
-        sys.stdout.write("---- affilated: %s\n" % affiliation_associated_affiliated_authors)
+    ## Print the extracted author counts
+    if cli_opts['verbosity'] >= 4:
+        sys.stdout.write("---Author counts for each extraction type:\n")
+        sys.stdout.write("----1. Tagged, count %d.\n" % \
+                             (len([l for l in just_tagged_authors if l.strip()])))
+        sys.stdout.write("----2. Standard, count %d.\n" % \
+                             (len([k for k in just_standard_authors if k.strip()])))
+        sys.stdout.write("----3. Affiliated, count %d.\n" % \
+                             (len([j for j in just_affiliated_authors if j.strip()])))
 
-    ## Given three lists of authors, which have been 'extracted' using three different methods
-    ## decide which list to return as a set of reliable authors (if any)
-    final_authors = choose_author_method(tagged_author_information, \
-                                             affiliation_associated_standard_authors, \
-                                             affiliation_associated_affiliated_authors, \
-                                             just_tagged_authors, \
-                                             just_standard_authors, \
-                                             just_affiliated_authors)
+    ## Print the physical author matches
+    if cli_opts['verbosity'] == 9:
+        sys.stdout.write("---Author extraction type contents:\n")
+        sys.stdout.write("----1. Tagged authors:\n%s\n" % \
+                             tagged_author_information)
+        sys.stdout.write("----2. Standard authors:\n%s\n" % \
+                             affiliation_associated_standard_authors)
+        sys.stdout.write("----3. Affiliated authors:\n%s\n" % \
+                             [x['authors'] for x in affiliation_associated_affiliated_authors])
 
-    if cli_opts['verbosity'] > 7:
-        sys.stdout.write("--- Selected authors info: %s\n" % final_authors)
+    ## Given three lists of authors, which have been extracted using
+    ## three different methods decide which list to return as the most
+    ## reliable representation of this paper's authors (if any)
+    (final_authors, chosen_type) = choose_author_method(tagged_author_information, \
+                                                            affiliation_associated_standard_authors, \
+                                                            affiliation_associated_affiliated_authors, \
+                                                            just_tagged_authors, \
+                                                            just_standard_authors, \
+                                                            just_affiliated_authors)
 
-    marked_up_authors = mark_up_authors_with_affiliations(final_authors)
+    ## Display the results of choosing the set of authors
+    if cli_opts['verbosity'] >= 8:
+        sys.stdout.write("---Chosen author-type: %d\n" % chosen_type)
+        sys.stdout.write("\n********************\nExtracted top data:\n" % final_authors)
+        sys.stdout.write("   Authors:\n\t%s\n" % final_authors)
+        sys.stdout.write("   Affiliations:\n\t%s\n********************\n\n" % affiliations)
 
     document_information = {'authors'           : final_authors,
-                            'affiliations'      : affiliations,
-                            'marked_up_authors' : marked_up_authors,}
+                            'affiliations'      : affiliations}
 
-    return (document_information, status, how_found_start)
+    return (document_information, status, chosen_type)
 
 def mark_up_authors_with_affiliations(final_authors):
     """ Prepare authors and any possible associated affiliations
@@ -5910,7 +5872,7 @@ def mark_up_authors_with_affiliations(final_authors):
     ## affiliated supported authors were found!
     tagged_authors = []
 
-    def process_auth(a):
+    def process_authors(a):
         ## Also remove numeration
         a = re.sub('\d+', '', a)
         a = replace_undesirable_characters(a).strip(".,:;- []()*\\")
@@ -5921,17 +5883,17 @@ def mark_up_authors_with_affiliations(final_authors):
         return a
 
     for aff_auth_dict in final_authors:
-        for auth in aff_auth_dict['authors']:
+        for authors in aff_auth_dict['authors']:
             ## Otherwise the closing element tag dissappears (!?)
-            if auth:
+            if authors:
                 if not aff_auth_dict['affiliation']:
-                    aff_for_auth = ''
+                    aff_for_authors = ''
                 else:
-                    aff_for_auth = aff_auth_dict['affiliation']
+                    aff_for_authors = aff_auth_dict['affiliation']
                 tagged_authors.append("%s%s%s%s" % ("<cds.AUTHstnd>", \
-                                                        process_auth(auth), \
+                                                        process_authors(authors), \
                                                         CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND, \
-                                                        process_aff(aff_for_auth)))
+                                                        process_aff(aff_for_authors)))
     return tagged_authors
 
 def choose_author_method(tagged_info, std_info, aff_info, \
@@ -5955,20 +5917,18 @@ def choose_author_method(tagged_info, std_info, aff_info, \
 
     ## Immediately discard non-sets of authors (hold duplicate entries)
     if len(tagged_authors) != len(set(tagged_authors)):
+        sys.stdout.write("Warning: tagged authors list has duplicates.\n")
         tagged_info = []
     if len(std_authors) != len(set(std_authors)):
+        sys.stdout.write("Warning: standard authors list has duplicates.\n")
         std_info = []
     if len(aff_authors) != len(set(aff_authors)):
+        sys.stdout.write("Warning: affiliated authors list has duplicates.\n")
         aff_info = []
 
     tagged_authors = map(lambda x: x.strip(" ,"), tagged_authors)
     std_authors = map(lambda y: y.strip(" ,"), std_authors)
     aff_authors = map(lambda z: z.strip(" ,"), aff_authors)
-
-    sys.stdout.write("tagged authors: %d\n\n" % len(tagged_authors))
-    sys.stdout.write("std authors: %d\n\n" % len(std_authors))
-    sys.stdout.write("aff authors: %d\n\n" % len(aff_authors))
-
 
     ## False if there is a 'weak' affiliation-supported author match
     ## AND none of them are found in the list of standard authors
@@ -6018,11 +5978,31 @@ def choose_author_method(tagged_info, std_info, aff_info, \
         aff_authors_is_a_subset_of_std_authors or \
         ((len(aff_authors) * 2) < len(std_authors))
 
+    if not (tagged_authors or std_authors or aff_authors):
+        if cli_opts['verbosity'] >= 4:
+            sys.stdout.write("---Unable to find any authors.\n")
+        return ([], 0)
+    elif tagged_authors:
+        if cli_opts['verbosity'] >= 4:
+            sys.stdout.write("---Choosing tagged authors.\n")
+        return (tagged_info, 1)
     ## Make the choice, with the appropriate precedence
-    if standard_over_affiliated:
-        return tagged_info or std_info or aff_info
+    elif standard_over_affiliated:
+        if cli_opts['verbosity'] >= 4:
+            sys.stdout.write("---Choosing standard over affiliated authors.\n")
+        if std_info:
+            return (std_info, 2)
+        else:
+            return (aff_info, 3)
+#        return ((std_info or aff_info), 2)
     else:
-        return tagged_info or aff_info or std_info
+        if cli_opts['verbosity'] >= 4:
+            sys.stdout.write("---Choosing affiliated over standard authors.\n")
+        if aff_info:
+            return (aff_info, 3)
+        else:
+            return (std_info, 2)
+#        return ((aff_info or std_info), 3)
 
 def find_reference_section(docbody):
     """Search in document body for its reference section. More precisely, find
@@ -6976,7 +6956,7 @@ def get_reference_section_beginning(fulltext):
 
 ## ----> Glue - logic for finding and extracting reference section:
 
-def extract_references_from_fulltext(fulltext, sect_start):
+def extract_references_from_fulltext(fulltext):
     """Locate and extract the reference section from a fulltext document.
        Return the extracted section as a list of strings, whereby each
        string in the list is considered to be a single line.
@@ -6996,7 +6976,7 @@ def extract_references_from_fulltext(fulltext, sect_start):
     #How ref section found flag
     how_found_start = 0
 
-    #sect_start = get_reference_section_beginning(fulltext)
+    sect_start = get_reference_section_beginning(fulltext)
 
     if sect_start is None:
         ## No lines
@@ -7304,14 +7284,14 @@ def get_cli_options():
             cli_opts['kb-report-number'] = o[1]
         elif o[0] in ("-a", "--authors"):
             cli_opts['authors'] = 1
-        elif o[0] in ("-f", "--affiliations"):
+        elif o[0] in ("-l", "--affiliations"):
             cli_opts['affiliations'] = 1
         elif o[0] in ("--first_author"):
             cli_opts['first_author'] = 1
         if len(myargs) == 0:
             ## no arguments: error message
             usage(wmsg="Error: no full-text.")
-        
+
     # What journal title format are we using?
     if cli_opts['verbosity'] > 0 and cli_opts['inspire']:
         sys.stdout.write("--- Using inspire journal title form\n")
@@ -7535,8 +7515,9 @@ def begin_extraction(daemon_cli_options=None):
         extract_top_section_metadata = cli_opts['authors'] or cli_opts['affiliations']
 
         ## 1. Get this document body as plaintext:
-        (docbody, extract_error) = get_plaintext_document_body(curitem[1], \
-                                                                extract_top_section_metadata)
+        (docbody, extract_error) = \
+            get_plaintext_document_body(curitem[1], \
+                                            extract_top_section_metadata)
         if extract_error == 1:
             ## Non-existent or unreadable pdf/text directory.
             write_message("***%s\n\n" % curitem[1], sys.stderr, verbose=0)
@@ -7555,9 +7536,9 @@ def begin_extraction(daemon_cli_options=None):
                 try:
                     ofilehdl = open(cli_opts['xmlfile'], 'w')
                     ofilehdl.write("%s\n" \
-                          % CFG_REFEXTRACT_XML_VERSION.encode("utf-8"))
+                                       % CFG_REFEXTRACT_XML_VERSION.encode("utf-8"))
                     ofilehdl.write("%s\n" \
-                          % CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8"))
+                                       % CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8"))
                     ofilehdl.flush()
                 except Exception, err:
                     write_message("***%s\n%s\n" % (cli_opts['xmlfile'], err), \
@@ -7568,9 +7549,9 @@ def begin_extraction(daemon_cli_options=None):
             ## else, write the xml lines to the stdout
             else:
                 sys.stdout.write("%s\n" \
-                          % CFG_REFEXTRACT_XML_VERSION.encode("utf-8"))
+                                     % CFG_REFEXTRACT_XML_VERSION.encode("utf-8"))
                 sys.stdout.write("%s\n" \
-                          % CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8"))
+                                     % CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8"))
             done_coltags = 1
 
         if len(docbody) > 0:
@@ -7581,64 +7562,89 @@ def begin_extraction(daemon_cli_options=None):
                 ## treat entire input as relevant section:
                 extract_lines = docbody
             else:
-                ## Always find the position of the start of the reference section.
-                ## This can be worked on, or stripped, later.
-                refs_start = get_reference_section_beginning(docbody)
-
                 ## launch search for the relevant section in the document body
                 if extract_top_section_metadata:
-                    ## Strip references. This will prevent analysing this section for authors.
-                    if refs_start:
-                        docbody = docbody[:refs_start['start_line']]
-
-                    (document_info, extract_error, how_found_start) = \
+                    (document_info, extract_error, author_type) = \
                         extract_top_document_information_from_fulltext(docbody, first_author=cli_opts['first_author'])
-
-                    if cli_opts['authors']:
-                        extract_lines = document_info['authors']
-                    elif cli_opts['affiliations']:
-                        extract_lines = document_info['affiliations']
                 else:
                     (extract_lines, extract_error, how_found_start) = \
-                        extract_references_from_fulltext(docbody, refs_start)
+                        extract_references_from_fulltext(docbody)
 
+            ## I want references!
             if not extract_top_section_metadata:
                 if len(extract_lines) == 0 and extract_error == 0:
                     extract_error = 6
                 write_message("-----extract_references_from_fulltext " \
                                      "gave len(reflines): %s overall error: " \
                                      "%s\n" \
-                                     % (str(len(reflines)), str(extract_error)), verbose=2)
+                                     % (str(len(extract_lines)), str(extract_error)))
+                    if cli_opts['verbosity'] >= 4:
+                        sys.stdout.write('-----reference lines extracted:\n%s\n\n' % extract_lines)
 
-            ## 3. Standardise the reference lines:
-            #reflines = test_get_reference_lines()
-            (processed_references, count_misc, \
-             count_title, count_reportnum, \
-             count_url, count_doi, count_auth_group, \
-             record_titles_count) = \
-              create_marc_xml_reference_section(extract_lines,
-                                                preprint_repnum_search_kb=\
-                                                  preprint_reportnum_sre,
-                                                preprint_repnum_standardised_categs=\
-                                                  standardised_preprint_reportnum_categs,
-                                                periodical_title_search_kb=\
-                                                  title_search_kb,
-                                                standardised_periodical_titles=\
-                                                  title_search_standardised_titles,
-                                                periodical_title_search_keys=\
-                                                  title_search_keys)
+                ## 3. Standardise the reference lines:
+                (processed_lines, count_misc, \
+                 count_title, count_reportnum, \
+                 count_url, count_doi, count_auth_group, \
+                 record_titles_count) = \
+                  create_marc_xml_reference_section(extract_lines,
+                                                    preprint_repnum_search_kb=\
+                                                      preprint_reportnum_sre,
+                                                    preprint_repnum_standardised_categs=\
+                                                      standardised_preprint_reportnum_categs,
+                                                    periodical_title_search_kb=\
+                                                      title_search_kb,
+                                                    standardised_periodical_titles=\
+                                                      title_search_standardised_titles,
+                                                    periodical_title_search_keys=\
+                                                      title_search_keys)
 
-            ## Add the count of 'bad titles' found in this line to the total
-            ## for the reference section:
-            all_found_titles_count = \
-                                   sum_2_dictionaries(all_found_titles_count, \
-                                                      record_titles_count)
+                ## Add the count of 'bad titles' found in this line to the total
+                ## for the reference section:
+                all_found_titles_count = \
+                                       sum_2_dictionaries(all_found_titles_count, \
+                                                          record_titles_count)
+            ## I want authors/affiliations!
+            else:
+                ## Handle the xml processing separately, in the case that authors/
+                ## affiliations are being extracted
+                if cli_opts['authors']:
+                    extract_lines = document_info['authors']
+                    ## Assoiciate authors with their affiliations if possible
+                    out_lines = mark_up_authors_with_affiliations(extract_lines)
+                else:
+                    extract_lines = document_info['affiliations']
+                    ## Just the list of affiliations
+                    out_lines = set([aff['line'] for aff in extract_lines])
 
+                if not document_info and extract_error == 0:
+                    extract_error = 6
+                elif extract_error == 2:
+                    extract_lines = []
 
+                if cli_opts['verbosity'] >= 1:
+                    sys.stdout.write("-----author/affiliation extraction " \
+                                         "gave len(extract_lines): %s overall error: " \
+                                         "%s\n" \
+                                         % (str(len(extract_lines)), str(extract_error)))
+
+                processed_lines = []
+                for l in out_lines:
+                    (xml_line, \
+                     count_misc, \
+                     count_title, \
+                     count_reportnum, \
+                     count_url, \
+                     count_doi, \
+                     count_auth_group) = \
+                     convert_processed_line_to_marc_xml("", \
+                                                            l.replace('\n',''), \
+                                                            None, \
+                                                            None)
+                    processed_lines.append(xml_line)
         else:
             ## document body is empty, therefore the reference section is empty:
             extract_lines = []
-            processed_references = []
+            processed_lines = []
 
         ## 4. Display the extracted references, status codes, etc:
         if cli_opts['output_raw']:
@@ -7672,12 +7678,13 @@ def begin_extraction(daemon_cli_options=None):
                                  count_misc, \
                                  count_auth_group, \
                                  recid, \
-                                 processed_references)
+                                 processed_lines)
 
         ## Filter the processed reference lines to remove junk
-        out = filter_processed_references(out)  ## Be sure to call this BEFORE compress_subfields
-                                                ## since filter_processed_references expects the
-                                                ## original xml format.
+        out = filter_processed_lines(out)  ## Be sure to call this BEFORE compress_subfields
+                                           ## since filter_processed_lines expects the
+                                           ## original xml format.
+
         ## Compress mulitple 'm' subfields in a datafield
         out = compress_subfields(out, CFG_REFEXTRACT_SUBFIELD_MISC)
         ## Compress multiple 'h' subfields in a datafield
@@ -7698,13 +7705,13 @@ def begin_extraction(daemon_cli_options=None):
     if done_coltags:
         if (cli_opts['xmlfile']):
             ofilehdl.write("%s\n" \
-                          % CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8"))
+                               % CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8"))
             ofilehdl.close()
             ## limit m tag data to something less than infinity
             limit_m_tags(cli_opts['xmlfile'], 2024)
         else:
             sys.stdout.write("%s\n" \
-                          % CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8"))
+                                 % CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8"))
 
     ## If the option to write the statistics about all periodical titles matched
     ## during the extraction-job was selected, do so using the specified file.
@@ -7819,3 +7826,5 @@ def test_get_reference_lines():
                ]
     return reflines
 
+if __name__ == '__main__':
+    main()
