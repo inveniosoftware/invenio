@@ -3470,10 +3470,10 @@ def check_valid_url(url):
     except Exception, e:
         raise StandardError, "%s is not a correct url: %s" % (url, e)
 
-def safe_mkstemp(suffix):
+def safe_mkstemp(suffix, prefix='bibdocfile_'):
     """Create a temporary filename that don't have any '.' inside a part
     from the suffix."""
-    tmpfd, tmppath = tempfile.mkstemp(suffix=suffix, dir=CFG_TMPDIR)
+    tmpfd, tmppath = tempfile.mkstemp(suffix=suffix, prefix=prefix, dir=CFG_TMPDIR)
     # Close the file and leave the responsability to the client code to
     # correctly open/close it.
     os.close(tmpfd)
@@ -3483,7 +3483,7 @@ def safe_mkstemp(suffix):
         return tmppath
     while '.' in os.path.basename(tmppath)[:-len(suffix)]:
         os.remove(tmppath)
-        tmpfd, tmppath = tempfile.mkstemp(suffix=suffix, dir=CFG_TMPDIR)
+        tmpfd, tmppath = tempfile.mkstemp(suffix=suffix, prefix=prefix, dir=CFG_TMPDIR)
         os.close(tmpfd)
     return tmppath
 
