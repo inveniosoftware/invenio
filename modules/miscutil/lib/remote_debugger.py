@@ -91,7 +91,7 @@ if not CFG_REMOTE_DEBUGGER_ENABLED:
 for path, name in CFG_REMOTE_DEBUGGER_IMPORT.items():
     try:
         if '.' in path:
-            globals()[name] = __import__(path, fromlist=path.split('.'))
+            globals()[name] = __import__(path, globals(), locals(), path.split('.'))
         else:
             globals()[name] = __import__(path)
     except Exception:
