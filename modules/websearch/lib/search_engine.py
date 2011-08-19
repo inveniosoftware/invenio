@@ -544,7 +544,7 @@ def get_index_id_from_field(field):
     Example: field='author', output=4.
     """
     out = 0
-    if field == '':
+    if not field:
         field = 'global' # empty string field means 'global' index (field 'anyfield')
 
     # first look in the index table:
