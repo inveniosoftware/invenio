@@ -390,7 +390,11 @@ def task_run_core():
     """Runs the task by fetching arguments from the BibSched task queue.  This is what BibSched will be invoking via daemon call."""
 
     ## initialize parameters
-    for fmt in task_get_option('formats').split(','):
+    if task_get_option('format'):
+        fmts = task_get_option('format')
+    else:
+        fmts = 'HB' # default value if no format option given
+    for fmt in fmts.split(','):
         sql = {
             "all" : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt,
             "last": "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='%s' and bf.last_updated < br.modification_date" % fmt,
@@ -497,7 +501,7 @@ Pattern options:
                  "matching=",
                  "field=",
                  "pattern=",
-                 "formats=",
+                 "format=",
                  "noprocess",
                  "id="]),
             task_submit_check_options_fnc=task_submit_check_options,
@@ -534,7 +538,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         task_set_option("pattern", value)
     elif key in ("-m", "--matching"):
         task_set_option("matching", value)
-    elif key in ("-o","--formats"):
+    elif key in ("-o","--format"):
         input_formats = value.split(',')
         ## check the validity of the given output formats
         invalid_format = check_validity_input_formats(input_formats)
@@ -546,7 +550,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
                 register_exception(prefix="The given output format '%s' is not available or is invalid. Please try again" % invalid_format, alert_admin=True)
                 return
         else: # every given format is available
-            task_set_option("formats", value)
+            task_set_option("format", value)
     elif key in ("-i","--id"):
         task_set_option("recids", value)
     else:
