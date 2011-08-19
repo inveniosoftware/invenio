@@ -862,7 +862,6 @@ NameVirtualHost %(vhost_ip_address)s:80
 %(listen_directive)s
 %(wsgi_socket_directive)s
 WSGIRestrictStdout Off
-#WSGIImportScript %(wsgidir)s/invenio.wsgi process-group=invenio application-group=%%{GLOBAL}
 <Files *.pyc>
    deny from all
 </Files>
@@ -896,6 +895,7 @@ WSGIRestrictStdout Off
         Alias /robots.txt %(webdir)s/robots.txt
         Alias /favicon.ico %(webdir)s/favicon.ico
         WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP} inactivity-timeout=3600 maximum-requests=10000
+        WSGIImportScript %(wsgidir)s/invenio.wsgi process-group=invenio application-group=%%{GLOBAL}
         WSGIScriptAlias / %(wsgidir)s/invenio.wsgi
         WSGIPassAuthorization On
         %(xsendfile_directive)s

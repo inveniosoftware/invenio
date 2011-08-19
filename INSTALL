@@ -141,13 +141,9 @@ Contents
               you are using an older version of MySQLdb, you may get
               into problems with character encoding.
 
-     e) mod_wsgi Apache module.
+     e) mod_wsgi Apache module.  Versions 3.x and above are
+        recommended.
           <http://code.google.com/p/modwsgi/>
-
-        Note: for the time being, the WSGI daemon must be run with
-              threads=1, because Invenio is not fully thread safe yet.
-              This will come later.  The Apache configuration example
-              snippets (created below) will use threads=1.
 
         Note: if you are using Python 2.4 or earlier, then you should
               also install the wsgiref Python module, available from:
@@ -623,12 +619,24 @@ Contents
 
           Note that you may need to adapt generated vhost file
           snippets to match your concrete operating system specifics.
+          For example, the generated configuration snippet will
+          preload Invenio WSGI daemon application upon Apache start up
+          for faster site response.  The generated configuration
+          assumes that you are using mod_wsgi version 3 or later.  If
+          you are using the old legacy mod_wsgi version 2, then you
+          would need to comment out the WSGIImportScript directive
+          from the generated snippet, or else move the WSGI daemon
+          setup to the top level, outside of the VirtualHost section.
 
-          Note also that you may want to tweak the generated example
-          configurations, especially with respect to the
-          WSGIDaemonProcess parameters.  E.g. increase the `processes'
-          parameter if you have lots of RAM and many concurrent users
-          accessing your site in parallel.
+          Note also that you may want to tweak the generated Apache
+          vhost snippet for performance reasons, especially with
+          respect to WSGIDaemonProcess parameters.  For example, you
+          can increase the number of processes from the default value
+          `processes=5' if you have lots of RAM and if many concurrent
+          users may access your site in parallel.  However, note that
+          you must use `threads=1' there, because Invenio WSGI daemon
+          processes are not fully thread safe yet.  This may change in
+          the future.
 
       $ sudo /etc/init.d/apache2 restart
 
