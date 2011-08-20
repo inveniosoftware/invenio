@@ -41,14 +41,19 @@ FIXME:
 """
 import urllib
 import urllib2
-import mechanize
-import ClientForm
 import xml.sax
 import re
 import tempfile
 import os
 import time
 import sys
+
+try:
+    import mechanize
+    import ClientForm
+    MECHANIZE_AVAILABLE = True
+except ImportError:
+    MECHANIZE_AVAILABLE = False
 
 try:
     # if we are running locally, we can optimize :-)
@@ -125,8 +130,13 @@ class InvenioConnector(object):
         if self.user:
             if not self.server_url.startswith('https://'):
                 raise InvenioConnectorAuthError("You have to use a secure URL (HTTPS) to login")
-            self._init_browser()
-            self._check_credentials()
+            if MECHANIZE_AVAILABLE:
+                self._init_browser()
+                self._check_credentials()
+            else:
+                self.user = None
+                raise InvenioConnectorAuthError("The Python modules Mechanize and ClientForm must" \
+                                                " be installed to perform authenticated requests.")
 
     def _init_browser(self):
         """
