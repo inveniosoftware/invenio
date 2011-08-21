@@ -31,6 +31,8 @@ class Template(DefaultTemplate):
         """ make a pretty html body of tickets that belong to the user given as param """
         ln = wash_language(ln)
         _ = gettext_set_language(ln)
+        if bibcatalog_system is None:
+            return _("Error: No BibCatalog system configured.")
         #errors? tell what happened and get out
         bibcat_probs = bibcatalog_system.check_system(uid)
         if bibcat_probs:

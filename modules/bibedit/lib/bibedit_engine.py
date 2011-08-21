@@ -294,14 +294,17 @@ def perform_request_newticket(recid, uid):
     @return: (error_msg, url)
 
     """
-    t_id = bibcatalog_system.ticket_submit(uid, "", recid, "")
     t_url = ""
     errmsg = ""
-    if t_id:
-        #get the ticket's URL
-        t_url = bibcatalog_system.ticket_get_attribute(uid, t_id, 'url_modify')
+    if bibcatalog_system is not None:
+        t_id = bibcatalog_system.ticket_submit(uid, "", recid, "")
+        if t_id:
+            #get the ticket's URL
+            t_url = bibcatalog_system.ticket_get_attribute(uid, t_id, 'url_modify')
+        else:
+            errmsg = "ticket_submit failed"
     else:
-        errmsg = "ticket_submit failed"
+        errmsg = "No ticket system configured"
     return (errmsg, t_url)
 
 def perform_request_ajax(req, recid, uid, data, isBulk = False, \
@@ -1128,14 +1131,15 @@ def perform_request_bibcatalog(request_type, recid, uid):
 
     if request_type == 'getTickets':
         # Insert the ticket data in the response, if possible
-        if uid:
+        if bibcatalog_system is None:
+            response['tickets'] = "<!--No ticket system configured-->"
+        elif bibcatalog_system and uid:
             bibcat_resp = bibcatalog_system.check_system(uid)
             if bibcat_resp == "":
                 tickets_found = bibcatalog_system.ticket_search(uid, \
                     status=['new', 'open'], recordid=recid)
                 t_url_str = '' #put ticket urls here, formatted for HTML display
                 for t_id in tickets_found:
-
                     #t_url = bibcatalog_system.ticket_get_attribute(uid, \
                     #    t_id, 'url_display')
                     ticket_info = bibcatalog_system.ticket_get_info( \
@@ -1156,7 +1160,6 @@ def perform_request_bibcatalog(request_type, recid, uid):
                 #put something in the tickets container, for debug
                 response['tickets'] = "<!--"+bibcat_resp+"-->"
         response['resultCode'] = 31
-
     return response
 
 def perform_request_preview_record(request_type, recid, uid):
