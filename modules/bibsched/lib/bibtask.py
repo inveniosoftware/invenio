@@ -178,6 +178,12 @@ def task_low_level_submission(name, user, *argv):
         if not name in CFG_BIBTASK_VALID_TASKS:
             raise StandardError('%s is not a valid task name' % name)
 
+        new_argv = []
+        for arg in argv:
+            if isinstance(arg, unicode):
+                arg = arg.encode('utf8')
+            new_argv.append(arg)
+        argv = new_argv
         priority = get_priority(argv)
         special_name = get_special_name(argv)
         argv = tuple([os.path.join(CFG_BINDIR, name)] + list(argv))
@@ -786,10 +792,10 @@ def _task_run(task_run_fnc):
             ## The task is a daemon. We resubmit it
             if task_status == 'DONE':
                 ## It has finished in a good way. We recycle the database row
-                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s WHERE id=%s", (new_runtime, verbose_argv, _TASK_PARAMS['task_id']))
+                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s, host=''  WHERE id=%s", (new_runtime, verbose_argv, _TASK_PARAMS['task_id']))
                 write_message("Task #%d finished and resubmitted." % _TASK_PARAMS['task_id'])
             elif task_status == 'STOPPED':
-                run_sql("UPDATE schTASK SET status='WAITING', progress=%s WHERE id=%s", (verbose_argv, _TASK_PARAMS['task_id'], ))
+                run_sql("UPDATE schTASK SET status='WAITING', progress=%s, host=''  WHERE id=%s", (verbose_argv, _TASK_PARAMS['task_id'], ))
                 write_message("Task #%d stopped and resubmitted." % _TASK_PARAMS['task_id'])
             else:
                 ## We keep the bad result and we resubmit with another id.
@@ -828,7 +834,7 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
     if help_specific_usage:
         sys.stderr.write("Command options:\n")
         sys.stderr.write(help_specific_usage)
-    sys.stderr.write("Scheduling options:\n")
+    sys.stderr.write("  Scheduling options:\n")
     sys.stderr.write("  -u, --user=USER\tUser name under which to submit this"
         " task.\n")
     sys.stderr.write("  -t, --runtime=TIME\tTime to execute the task. [default=now]\n"
@@ -841,8 +847,8 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
         "\t\t\tExamples: 22:00-03:00, Sunday 01:00-05:00.\n"
         "\t\t\tSyntax: [Wee[kday]] [hh[:mm][-hh[:mm]]].\n")
     sys.stderr.write("  -P, --priority=PRI\tTask priority (0=default, 1=higher, etc).\n")
-    sys.stderr.write("  -N, --name=NAME\tTask specific name (advanced option).\n")
-    sys.stderr.write("General options:\n")
+    sys.stderr.write("  -N, --name=NAME\tTask specific name (advanced option).\n\n")
+    sys.stderr.write("  General options:\n")
     sys.stderr.write("  -h, --help\t\tPrint this help.\n")
     sys.stderr.write("  -V, --version\t\tPrint version information.\n")
     sys.stderr.write("  -v, --verbose=LEVEL\tVerbose level (0=min,"
