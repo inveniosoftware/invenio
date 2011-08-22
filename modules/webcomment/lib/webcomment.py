@@ -1360,7 +1360,8 @@ def get_first_comments_or_remarks(recID=-1,
                                   nb_reviews='all',
                                   voted=-1,
                                   reported=-1,
-                                  user_info=None):
+                                  user_info=None,
+                                  show_reviews=False):
     """
     Gets nb number comments/reviews or remarks.
     In the case of comments, will get both comments and reviews
@@ -1430,25 +1431,26 @@ def get_first_comments_or_remarks(recID=-1,
         if CFG_WEBCOMMENT_ALLOW_COMMENTS: # normal comments
             grouped_comments = group_comments_by_round(first_res_comments, ranking=0)
             comments = webcomment_templates.tmpl_get_first_comments_without_ranking(recID, ln, grouped_comments, nb_res_comments, warnings)
-        if CFG_WEBCOMMENT_ALLOW_REVIEWS: # ranked comments
-            #calculate average score
-            avg_score = calculate_avg_score(res_reviews)
-            if voted > 0:
-                try:
-                    raise InvenioWebCommentWarning(_('Your feedback has been recorded, many thanks.'))
-                except InvenioWebCommentWarning, exc:
-                    register_exception(stream='warning')
-                    warnings.append((exc.message, 'green'))
-                #warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED_GREEN_TEXT',))
-            elif voted == 0:
-                try:
-                    raise InvenioWebCommentWarning(_('Your feedback could not be recorded, please try again.'))
-                except InvenioWebCommentWarning, exc:
-                    register_exception(stream='warning')
-                    warnings.append((exc.message, ''))
-                #warnings.append(('WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED_RED_TEXT',))
-            grouped_reviews = group_comments_by_round(first_res_reviews, ranking=0)
-            reviews = webcomment_templates.tmpl_get_first_comments_with_ranking(recID, ln, grouped_reviews, nb_res_reviews, avg_score, warnings)
+        if show_reviews:
+            if CFG_WEBCOMMENT_ALLOW_REVIEWS: # ranked comments
+                #calculate average score
+                avg_score = calculate_avg_score(res_reviews)
+                if voted > 0:
+                    try:
+                        raise InvenioWebCommentWarning(_('Your feedback has been recorded, many thanks.'))
+                    except InvenioWebCommentWarning, exc:
+                        register_exception(stream='warning')
+                        warnings.append((exc.message, 'green'))
+                    #warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED_GREEN_TEXT',))
+                elif voted == 0:
+                    try:
+                        raise InvenioWebCommentWarning(_('Your feedback could not be recorded, please try again.'))
+                    except InvenioWebCommentWarning, exc:
+                        register_exception(stream='warning')
+                        warnings.append((exc.message, ''))
+                    #warnings.append(('WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED_RED_TEXT',))
+                grouped_reviews = group_comments_by_round(first_res_reviews, ranking=0)
+                reviews = webcomment_templates.tmpl_get_first_comments_with_ranking(recID, ln, grouped_reviews, nb_res_reviews, avg_score, warnings)
         return (comments, reviews)
     # remark
     else:

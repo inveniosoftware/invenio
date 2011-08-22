@@ -3237,4 +3237,162 @@ div.subtitle {
     border: solid 1px #000000;
 }
 
+/* WebComment Refactor */
+
+.webcomment_review_title_table {
+	border: 0px;
+	border-collapse: separate;
+	border-spacing: 5px;
+	padding: 5px;
+	width: 100%;
+}
+
+.webcomment_deleted_comment_message,
+.webcomment_reported_comment_message,
+.webcomment_comment_pending_approval_message,
+.webcomment_review_pending_approval_message,
+.webcomment_deleted_review_message {
+	color:#a3a3a3;font-style:italic;
+}
+
+.webcomment_deleted_comment_undelete,
+.webcomment_reported_comment_unreport,
+.webcomment_deleted_review_undelete,
+.webcomment_reported_review_unreport,
+.webcomment_comment_delete,
+.webcomment_review_delete {
+	color:#8B0000;
+}
+
+.webcomment_comment_box {
+	margin-bottom:20px;
+	background:#F9F9F9;
+	border:1px solid #DDD;
+}
+
+.webcomment_comment_box blockquote {
+	margin: 10px;
+}
+
+.webcomment_comment_options {
+	margin: 0 0px 5px 0;
+	float:right;
+}
+
+.webcomment_comment_title {
+	background-color:#EEE;
+	padding:2px;
+	height: 26px;
+	line-height: 26px;
+	vertical-align: middle;
+}
+
+.webcomment_review_box {
+	background:#F9F9F9;
+	border:1px solid #DDD;
+}
+
+.webcomment_review_box_inner {
+	background-color:#EEE;
+	padding:2px;
+}
+.webcomment_review_box_inner > img {
+	margin-right:10px;
+}
+
+.webcomment_review_title {
+	font-weight: bold;
+}
+
+.webcomment_review_label_reviewed {
+
+}
+
+.webcomment_review_label_useful {
+
+}
+
+.webcomment_comment_table {
+	border: 0px solid black;
+	width: 95%;
+	margin:10px;
+	font-size:small;
+}
+
+.webcomment_container {
+	margin-left:10px;
+	margin-right:10px;
+}
+
+.clearer {
+	clear: both;
+}
+
+.webcomment_header_comments {
+
+}
+
+.webcomment_header_ratings {
+
+}
+
+.websomment_header_comments_label {
+
+}
+
+.webcomment_comment_report {
+
+}
+
+.webcomment_comment_reply {
+
+}
+
+.webcomment_comment_delete {
+
+}
+
+.webcomment_comment_date {
+	display: inline;
+	margin: 0 0 0 10px;
+	color: #666;
+}
+
+.webcomment_comment_author {
+
+}
+
+.webcomment_comment_avatar {
+	float: left;
+	margin: 2px 10px 2px 5px;
+}
+
+
+.webcomment_comment_content {
+}
+
+.webcomment_comment_options > a {
+	margin: 0 10px 0 0;
+}
+
+.commentbox {
+	width: auto;
+}
+
+.webcomment_comment_depth_1 {
+	margin-left: 20px;
+}
+
+.webcomment_comment_round_header {
+
+}
+
+.webcomment_view_all_comments {
+
+}
+
+.webcomment_review_first_introduction {
+
+}
+
 /* end of invenio.css */
