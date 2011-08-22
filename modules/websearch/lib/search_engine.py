@@ -429,11 +429,18 @@ def get_collection_reclist(coll, recreate_cache_if_needed=True):
     # finally, return reclist:
     return collection_reclist_cache.cache[coll]
 
-def get_visible_output_formats():
-    """ Return the list of available visible formats """
+def get_available_output_formats(visible_only=False):
+    """
+    Return the list of available output formats.  When visible_only is
+    True, returns only those output formats that have visibility flag
+    set to 1.
+    """
 
     formats = []
-    query = """SELECT code,name FROM format WHERE visibility='1' ORDER BY name ASC"""
+    query = "SELECT code,name FROM format"
+    if visible_only:
+        query += " WHERE visibility='1'"
+    query += " ORDER BY name ASC"
     res = run_sql(query)
     if res:
         # propose found formats:
@@ -1046,7 +1053,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, aas,
                        'text' : name,
                      })
 
-    formats = get_visible_output_formats()
+    formats = get_available_output_formats(visible_only=True)
 
     # show collections in the search box? (not if there is only one
     # collection defined, and not if we are in light search)

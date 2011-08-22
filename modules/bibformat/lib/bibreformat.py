@@ -174,8 +174,8 @@ def check_validity_input_formats(input_formats):
     @return: if there is any invalid input format it returns this value
     @rtype: string
     """
-    from invenio.search_engine import get_visible_output_formats
-    valid_formats = get_visible_output_formats()
+    from invenio.search_engine import get_available_output_formats
+    valid_formats = get_available_output_formats()
 
     # let's to extract the values of the available formats
     format_values = []
