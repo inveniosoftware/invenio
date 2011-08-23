@@ -65,7 +65,7 @@ def perform_request_yoursearches_display(uid,
     if p:
         p_stripped = p.strip()
         p_stripped_args = p.split()
-        sql_p_stripped_args = ['\'%%' + quote(p_stripped_arg) + '%%\'' for p_stripped_arg in p_stripped_args]
+        sql_p_stripped_args = ['\'%%' + quote(p_stripped_arg).replace('%','%%') + '%%\'' for p_stripped_arg in p_stripped_args]
         for sql_p_stripped_arg in sql_p_stripped_args:
             search_clause += """ AND q.urlargs LIKE %s""" % (sql_p_stripped_arg,)
 
