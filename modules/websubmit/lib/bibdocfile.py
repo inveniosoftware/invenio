@@ -393,6 +393,19 @@ def compose_file(dirname, docname, extension, subformat=None, version=None):
         extension = ".%s" % extension
     return os.path.join(dirname, docname + extension + subformat + version)
 
+def compose_format(extension, subformat=None):
+    """
+    Construct the format string
+    """
+    if not extension.startswith("."):
+        extension = ".%s" % extension
+    if subformat:
+        if not subformat.startswith(";"):
+            subformat = ";%s" % subformat
+    else:
+        subformat = ""
+    return extension + subformat
+
 def decompose_file(afile, skip_version=False, only_known_extensions=False,
         allow_subformat=True):
     """
@@ -1438,7 +1451,7 @@ class BibDoc:
                 if recid:
                     res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s LIMIT 1", (recid, docname), 1)
                     if res:
-                        raise InvenioWebSubmitFileError, "A bibdoc called %s already exists for recid %s" % (docname, recid)
+                        raise InvenioWebSubmitFileError("A bibdoc called %s already exists for recid %s" % (docname, recid))
                 self.id = run_sql("INSERT INTO bibdoc (status,docname,creation_date,modification_date) "
                     "values(%s,%s,NOW(),NOW())", (self.status, docname))
                 if self.id:
@@ -2817,14 +2830,14 @@ class BibDocFile:
         """Return True if the checksum corresponds to the file."""
         return calculate_md5(self.fullpath) == self.checksum
 
-    def stream(self, req):
+    def stream(self, req, download=False):
         """Stream the file.  Note that no restriction check is being
         done here, since restrictions have been checked previously
         inside websubmit_webinterface.py."""
         if os.path.exists(self.fullpath):
             if random.random() < CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY and calculate_md5(self.fullpath) != self.checksum:
                 raise InvenioWebSubmitFileError, "File %s, version %i, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
-            stream_file(req, self.fullpath, "%s%s" % (self.name, self.superformat), self.mime, self.encoding, self.etag, self.checksum, self.fullurl)
+            stream_file(req, self.fullpath, "%s%s" % (self.name, self.superformat), self.mime, self.encoding, self.etag, self.checksum, self.fullurl, download=download)
             raise apache.SERVER_RETURN, apache.DONE
         else:
             req.status = apache.HTTP_NOT_FOUND
@@ -2895,7 +2908,7 @@ def check_bibdoc_authorization(user_info, status):
     return (0, CFG_WEBACCESS_WARNING_MSGS[0])
 
 
-def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=None, md5=None, location=None):
+def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=None, md5=None, location=None, download=False):
     """This is a generic function to stream a file to the user.
     If fullname, mime, encoding, and location are not provided they will be
     guessed based on req and fullpath.
@@ -3058,7 +3071,10 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         if os.path.exists(fullpath):
             if fullname is None:
                 fullname = os.path.basename(fullpath)
-            req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
+            if download:
+                req.headers_out["Content-Disposition"] = 'attachment; filename="%s"' % fullname.replace('"', '\\"')
+            else:
+                req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
             req.headers_out["X-Sendfile"] = fullpath
             if mime is None:
                 format = decompose_file(fullpath)[2]
@@ -3098,7 +3114,10 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
             req.headers_out["ETag"] = etag
         if md5 is not None:
             req.headers_out["Content-MD5"] = base64.encodestring(binascii.unhexlify(md5.upper()))[:-1]
-        req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
+        if download:
+            req.headers_out["Content-Disposition"] = 'attachment; filename="%s"' % fullname.replace('"', '\\"')
+        else:
+            req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
         size = os.path.getsize(fullpath)
         if not size:
             try:

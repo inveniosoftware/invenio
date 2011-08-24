@@ -76,6 +76,7 @@ from invenio.websubmit_managedocfiles import \
      get_upload_file_interface_javascript, \
      get_upload_file_interface_css, \
      move_uploaded_files_to_storage
+     
 
 class WebInterfaceFilesPages(WebInterfaceDirectory):
 
@@ -169,6 +170,11 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
 
             if not version:
                 version = args['version']
+                
+            ## Download as attachment
+            is_download = False
+            if args['download']:
+                is_download = True
 
             # version could be either empty, or all or an integer
             try:
@@ -205,7 +211,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                                     ip = str(req.remote_ip)
                                     res = doc.register_download(ip, version, format, uid)
                                 try:
-                                    return docfile.stream(req)
+                                    return docfile.stream(req, download=is_download)
                                 except InvenioWebSubmitFileError, msg:
                                     register_exception(req=req, alert_admin=True)
                                     req.status = apache.HTTP_INTERNAL_SERVER_ERROR
@@ -328,7 +334,8 @@ from invenio.websubmit_engine import home, action, interface, endaction
 class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
     _exports = ['summary', 'sub', 'direct', '', 'attachfile', 'uploadfile', \
-                'getuploadedfile', 'managedocfiles', 'managedocfilesasync']
+                'getuploadedfile', 'managedocfiles', 'managedocfilesasync', \
+                'upload_video']
 
     def managedocfiles(self, req, form):
         """
@@ -505,7 +512,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             try:
                 assert(working_dir == os.path.abspath(working_dir))
             except AssertionError:
-                return apache.HTTP_UNAUTHORIZED
+                raise apache.SERVER_RETURN(apache.HTTP_UNAUTHORIZED)
             try:
                 # Retrieve recid from working_dir, safer.
                 recid_fd = file(os.path.join(working_dir, 'SN'))
@@ -535,7 +542,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             recid = argd['recid']
 
         if auth_code:
-            return apache.HTTP_UNAUTHORIZED
+            raise apache.SERVER_RETURN(apache.HTTP_UNAUTHORIZED)
 
         return create_file_upload_interface(recid=recid,
                                             ln=argd['ln'],
@@ -589,7 +596,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         if not form.has_key("indir") or \
                not form.has_key("doctype") or \
                not form.has_key("access"):
-            return apache.HTTP_BAD_REQUEST
+            raise apache.SERVER_RETURN(apache.HTTP_BAD_REQUEST)
         else:
             curdir = os.path.join(CFG_WEBSUBMIT_STORAGEDIR,
                                   argd['indir'],
@@ -607,7 +614,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             try:
                 session = get_session(req=req, sid=argd['session_id'])
             except ValueError, e:
-                return apache.HTTP_BAD_REQUEST
+                raise apache.SERVER_RETURN(apache.HTTP_BAD_REQUEST)
 
             # Retrieve user information. We cannot rely on the session here.
             res = run_sql("SELECT uid FROM session WHERE session_key=%s", (argd['session_id'],))
@@ -628,7 +635,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                                                      act=action)
         if acc_is_role("submit", doctype=argd['doctype'], act=action) and auth_code != 0:
             # User cannot submit
-            return apache.HTTP_UNAUTHORIZED
+            raise apache.SERVER_RETURN(apache.HTTP_UNAUTHORIZED)
         else:
             # Process the upload and get the response
             added_files = {}
@@ -644,14 +651,14 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                         assert(dir_to_open.startswith(CFG_WEBSUBMIT_STORAGEDIR))
                     except AssertionError:
                         register_exception(req=req, prefix='curdir="%s", key="%s"' % (curdir, key))
-                        return apache.HTTP_FORBIDDEN
+                        raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
 
                     if not os.path.exists(dir_to_open):
                         try:
                             os.makedirs(dir_to_open)
                         except:
                             register_exception(req=req, alert_admin=True)
-                            return apache.HTTP_FORBIDDEN
+                            raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
 
                     filename = formfields.filename
                     ## Before saving the file to disc, wash the filename (in particular
@@ -704,11 +711,254 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                             added_files[key] = {'name': filename}
                             continue
                     else:
-                        return apache.HTTP_BAD_REQUEST
+                        raise apache.SERVER_RETURN(apache.HTTP_BAD_REQUEST)
 
             # Send our response
             if simplejson_available:
                 return json.dumps(added_files)
+
+
+    def upload_video(self, req, form):
+        """
+        A clone of uploadfile but for (large) videos.
+        Does not copy the uploaded file to the websubmit directory.
+        Instead, the path to the file is stored inside the submission directory.
+        """
+        
+        def gcd(a,b):
+            """ the euclidean algorithm """
+            while a:
+                a, b = b%a, a
+            return b
+        
+        from invenio.bibencode_extract import extract_frames
+        from invenio.bibencode_config import CFG_BIBENCODE_WEBSUBMIT_ASPECT_SAMPLE_DIR, CFG_BIBENCODE_WEBSUBMIT_ASPECT_SAMPLE_FNAME
+        from invenio.bibencode_encode import determine_aspect
+        from invenio.bibencode_utils import probe
+        from invenio.bibencode_metadata import ffprobe_metadata
+        from invenio.websubmit_config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
+        
+        if sys.hexversion < 0x2060000:
+            try:
+                import simplejson as json
+                simplejson_available = True
+            except ImportError:
+                # Okay, no Ajax app will be possible, but continue anyway,
+                # since this package is only recommended, not mandatory.
+                simplejson_available = False
+        else:
+            import json
+            simplejson_available = True
+
+        argd = wash_urlargd(form, {
+            'doctype': (str, ''),
+            'access': (str, ''),
+            'indir': (str, ''),
+            'session_id': (str, ''),
+            'rename': (str, ''),
+            })
+
+        curdir = None
+        if not form.has_key("indir") or \
+               not form.has_key("doctype") or \
+               not form.has_key("access"):
+            raise apache.SERVER_RETURN(apache.HTTP_BAD_REQUEST)
+        else:
+            curdir = os.path.join(CFG_WEBSUBMIT_STORAGEDIR,
+                                  argd['indir'],
+                                  argd['doctype'],
+                                  argd['access'])
+
+        user_info = collect_user_info(req)
+        if form.has_key("session_id"):
+            # Are we uploading using Flash, which does not transmit
+            # cookie? The expect to receive session_id as a form
+            # parameter.  First check that IP addresses do not
+            # mismatch. A ValueError will be raises if there is
+            # something wrong
+            session = get_session(req=req, sid=argd['session_id'])
+            try:
+                session = get_session(req=req, sid=argd['session_id'])
+            except ValueError, e:
+                raise apache.SERVER_RETURN(apache.HTTP_BAD_REQUEST)
+
+            # Retrieve user information. We cannot rely on the session here.
+            res = run_sql("SELECT uid FROM session WHERE session_key=%s", (argd['session_id'],))
+            if len(res):
+                uid = res[0][0]
+                user_info = collect_user_info(uid)
+                try:
+                    act_fd = file(os.path.join(curdir, 'act'))
+                    action = act_fd.read()
+                    act_fd.close()
+                except:
+                    act = ""
+
+        # Is user authorized to perform this action?
+        (auth_code, auth_message) = acc_authorize_action(uid, "submit",
+                                                     verbose=0,
+                                                     doctype=argd['doctype'],
+                                                     act=action)
+        if acc_is_role("submit", doctype=argd['doctype'], act=action) and auth_code != 0:
+            # User cannot submit
+            raise apache.SERVER_RETURN(apache.HTTP_UNAUTHORIZED)
+        else:
+            # Process the upload and get the response
+            json_response = {}
+            for key, formfields in form.items():
+                filename = key.replace("[]", "")
+                if hasattr(formfields, "filename") and formfields.filename:
+                    dir_to_open = os.path.abspath(os.path.join(curdir,
+                                                               'files',
+                                                               str(user_info['uid']),
+                                                               key))
+                    try:
+                        assert(dir_to_open.startswith(CFG_WEBSUBMIT_STORAGEDIR))
+                    except AssertionError:
+                        register_exception(req=req, prefix='curdir="%s", key="%s"' % (curdir, key))
+                        raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
+
+                    if not os.path.exists(dir_to_open):
+                        try:
+                            os.makedirs(dir_to_open)
+                        except:
+                            register_exception(req=req, alert_admin=True)
+                            raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
+
+                    filename = formfields.filename
+                    ## Before saving the file to disc, wash the filename (in particular
+                    ## washing away UNIX and Windows (e.g. DFS) paths):
+                    filename = os.path.basename(filename.split('\\')[-1])
+                    filename = filename.strip()
+                    if filename != "":
+                        # Check that file does not already exist
+                        while os.path.exists(os.path.join(dir_to_open, filename)):
+                            #dirname, basename, extension = decompose_file(new_destination_path)
+                            basedir, name, extension = decompose_file(filename)
+                            new_name = propose_next_docname(name)
+                            filename = new_name + extension
+                        
+                        #-------------#
+                        # VIDEO STUFF #
+                        #-------------#
+                        
+                        ## Remove all previous uploads
+                        filelist = os.listdir(os.path.split(formfields.file.name)[0])
+                        for afile in filelist:
+                            if argd['access'] in afile:
+                                os.remove(os.path.join(os.path.split(formfields.file.name)[0], afile))
+                        
+                        ## Check if the file is a readable video
+                        ## We must exclude all image and audio formats that are readable by ffprobe
+                        if (os.path.splitext(filename)[1] in ['jpg', 'jpeg', 'gif', 'tiff', 'bmp', 'png', 'tga',
+                                                              'jp2', 'j2k', 'jpf', 'jpm', 'mj2', 'biff', 'cgm',
+                                                              'exif', 'img', 'mng', 'pic', 'pict', 'raw', 'wmf', 'jpe', 'jif', 
+                                                              'jfif', 'jfi', 'tif', 'webp', 'svg', 'ai', 'ps', 'psd',
+                                                              'wav', 'mp3', 'pcm', 'aiff', 'au', 'flac', 'wma', 'm4a', 'wv', 'oga', 
+                                                              'm4a', 'm4b', 'm4p', 'm4r', 'aac', 'mp4', 'vox', 'amr', 'snd']
+                                                              or not probe(formfields.file.name)):
+                            formfields.file.close()
+                            raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
+                        
+                        ## We have no "delete" attribute in Python 2.4
+                        if sys.hexversion < 0x2050000:
+                            ## We need to rename first and create a dummy file
+                            ## Rename the temporary file for the garbage collector
+                            new_tmp_fullpath = os.path.split(formfields.file.name)[0] + "/" + CFG_WEBSUBMIT_TMP_VIDEO_PREFIX + argd['access'] + "_" + os.path.split(formfields.file.name)[1]
+                            os.rename(formfields.file.name, new_tmp_fullpath)
+                            dummy = open(formfields.file.name, "w")
+                            dummy.close()
+                            formfields.file.close()
+                        else:
+                            # Mark the NamedTemporatyFile as not to be deleted
+                            formfields.file.delete = False
+                            formfields.file.close()
+                            ## Rename the temporary file for the garbage collector
+                            new_tmp_fullpath = os.path.split(formfields.file.name)[0] + "/" + CFG_WEBSUBMIT_TMP_VIDEO_PREFIX + argd['access'] + "_" + os.path.split(formfields.file.name)[1]
+                            os.rename(formfields.file.name, new_tmp_fullpath)
+                        
+                        # Write the path to the temp file to a file in STORAGEDIR
+                        fp = open(os.path.join(dir_to_open, "filepath"), "w")
+                        fp.write(new_tmp_fullpath)
+                        fp.close()
+                        
+                        fp = open(os.path.join(dir_to_open, "filename"), "w")
+                        fp.write(filename)
+                        fp.close()
+                        
+                        ## We are going to extract some thumbnails for websubmit ##
+                        sample_dir = os.path.join(curdir, 'files', str(user_info['uid']), CFG_BIBENCODE_WEBSUBMIT_ASPECT_SAMPLE_DIR)
+                        try:
+                            ## Remove old thumbnails
+                            shutil.rmtree(sample_dir)
+                        except OSError:
+                            register_exception(req=req, alert_admin=False)
+                        try:
+                            os.makedirs(os.path.join(curdir, 'files', str(user_info['uid']), sample_dir))
+                        except OSError:
+                            register_exception(req=req, alert_admin=False)
+                        try:
+                            extract_frames(input_file=new_tmp_fullpath, 
+                                        output_file=os.path.join(sample_dir, CFG_BIBENCODE_WEBSUBMIT_ASPECT_SAMPLE_FNAME), 
+                                        size="600x600", 
+                                        numberof=5)
+                            json_response['frames'] = []
+                            for extracted_frame in os.listdir(sample_dir):
+                                json_response['frames'].append(extracted_frame)
+                        except:
+                            ## If the frame extraction fails, something was bad with the video
+                            os.remove(new_tmp_fullpath)
+                            register_exception(req=req, alert_admin=False)
+                            raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
+                                
+                        ## Try to detect the aspect. if this fails, the video is not readable
+                        ## or a wrong file might have been uploaded
+                        try:
+                            (aspect, width, height) = determine_aspect(new_tmp_fullpath)
+                            if aspect:
+                                aspx, aspy = aspect.split(':')
+                            else:
+                                the_gcd = gcd(width, height)
+                                aspx = str(width / the_gcd)
+                                aspy = str(height / the_gcd)
+                            json_response['aspx'] = aspx
+                            json_response['aspy'] = aspy
+                        except TypeError:
+                            ## If the aspect detection completely fails
+                            os.remove(new_tmp_fullpath)
+                            register_exception(req=req, alert_admin=False)
+                            raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
+                        
+                        ## Try to extract some metadata from the video container
+                        metadata = ffprobe_metadata(new_tmp_fullpath)
+                        json_response['meta_title'] = metadata['format'].get('TAG:title')
+                        json_response['meta_description'] = metadata['format'].get('TAG:description')
+                        json_response['meta_year'] = metadata['format'].get('TAG:year')
+                        json_response['meta_author'] = metadata['format'].get('TAG:author')
+                    ## Empty file name
+                    else:
+                        raise apache.SERVER_RETURN(apache.HTTP_BAD_REQUEST)
+                    ## We found our file, we can break the loop
+                    break;
+
+            # Send our response
+            if simplejson_available:
+                
+                dumped_response = json.dumps(json_response)
+                
+                # store the response in the websubmit directory
+                # this is needed if the submission is not finished and continued later
+                response_dir = os.path.join(curdir, 'files', str(user_info['uid']), "response")
+                try:
+                    os.makedirs(response_dir)
+                except OSError:
+                    # register_exception(req=req, alert_admin=False)
+                    pass
+                fp = open(os.path.join(response_dir, "response"), "w")
+                fp.write(dumped_response)
+                fp.close()
+                
+                return dumped_response
 
     def getuploadedfile(self, req, form):
         """
@@ -723,10 +973,11 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                                    'access': (str, None),
                                    'icon': (int, 0),
                                    'key': (str, None),
-                                   'filename': (str, None)})
+                                   'filename': (str, None),
+                                   'nowait': (int, 0)})
 
         if None in argd.values():
-            return apache.HTTP_BAD_REQUEST
+            raise apache.SERVER_RETURN(apache.HTTP_BAD_REQUEST)
 
         uid = getUid(req)
 
@@ -755,13 +1006,17 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         if abs_file_path.startswith(CFG_WEBSUBMIT_STORAGEDIR):
             # Check if file exist. Note that icon might not yet have
             # been created.
-            for i in range(5):
+            if not argd['nowait']:
+                for i in range(5):
+                    if os.path.exists(abs_file_path):
+                        return stream_file(req, abs_file_path)
+                    time.sleep(1)
+            else:
                 if os.path.exists(abs_file_path):
-                    return stream_file(req, abs_file_path)
-                time.sleep(1)
+                        return stream_file(req, abs_file_path)
 
         # Send error 404 in all other cases
-        return apache.HTTP_NOT_FOUND
+        raise apache.SERVER_RETURN(apache.HTTP_NOT_FOUND)
 
     def attachfile(self, req, form):
         """

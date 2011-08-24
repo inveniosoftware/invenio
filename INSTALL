@@ -218,7 +218,7 @@ Contents
 	platform, with Python 2.3 to 2.6
 	   <http://pypi.python.org/pypi/xlwt>
 
-     l) (recommended) matplotlib 1.0.0 is a python 2D plotting library
+     m) (recommended) matplotlib 1.0.0 is a python 2D plotting library
      	which produces publication quality figures in a variety of
 	hardcopy formats and interactive environments across
 	platforms. matplotlib can be used in python scripts, the
@@ -227,6 +227,40 @@ Contents
 	toolkits. It is used to generate pie graphs in the custom
 	summary query (WebStat)
 	   <http://matplotlib.sourceforge.net>
+
+     n) (optional) FFmpeg, an open-source tools an libraries collection
+        to convert video and audio files. It makes use of both internal
+        as well as external libraries to generate videos for the web, such
+        as Theora, WebM and H.264 out of almost any thinkable video input.
+        FFmpeg is needed to run video related modules and submission workflows
+        in Invenio. The minimal configuration of ffmpeg for the Invenio demo site
+        requires a number of external libraries. It is highly recommended
+        to remove all installed versions and packages that are comming with
+        various Linux distributions and install the latest versions from
+        sources. Additionally, you will need the Mediainfo Library for multimedia
+        metadata handling.
+        Minimum libraries for the demo site:
+        - the ffmpeg multimedia encoder tools
+          <http://ffmpeg.org/>
+        - a library for jpeg images needed for thumbnail extraction
+          <http://www.openjpeg.org/>
+        - a library for the ogg container format, needed for Vorbis and Theora
+          <http://www.xiph.org/ogg/>
+        - the OGG Vorbis audi codec library
+          <http://www.vorbis.com/>
+        - the OGG Theora video codec library
+          <http://www.theora.org/>
+        - the WebM video codec library
+          <http://www.webmproject.org/>
+        - the mediainfo library for multimedia metadata
+          <http://mediainfo.sourceforge.net/>
+        Recommended for H.264 video (!be aware of licensing issues!):
+        - a library for H.264 video encoding
+          <http://www.videolan.org/developers/x264.html>
+        - a library for Advanced Audi Coding
+          <http://www.audiocoding.com/faac.html>
+        - a library for MP3 encoding
+          <http://lame.sourceforge.net/>
 
    Note that the configure script checks whether you have all the
    prerequisite software installed and that it won't let you continue
@@ -255,6 +289,7 @@ Contents
       $ make install-jquery-plugins    ## optional
       $ make install-ckeditor-plugin  ## optional
       $ make install-pdfa-helper-files ## optional
+      $ make install-mediaelement ## optional
 
 1b. Configuration
 -----------------
@@ -473,6 +508,11 @@ Contents
           place the helper files needed to create PDF/A files out of
           existing PDF files.
 
+      $ make install-mediaelement ## optional
+
+          This will automatically download and install the MediaElementJS
+          HTML5 video player that is needed for videos on the DEMO site.
+
 2b. Configuration
 -----------------
 
@@ -539,6 +579,35 @@ Contents
           file and it will override any default options with the ones
           you have specifield in your local file.  This cascading of
           configuration parameters will ease your future upgrades.
+
+          If you want to have multiple Invenio instances for distributed
+          video encoding, you need to share the same configuration amongs
+          them and make some of the folders of the Invenio installation
+          available for all nodes.
+
+            Configure the allowed tasks for every node:
+
+              CFG_BIBSCHED_NODE_TASKS = {
+                  "hostname_machine1" : ["bibindex", "bibupload",
+                      "bibreformat","webcoll", "bibtaskex", "bibrank",
+                      "oaiharvest", "oairepositoryupdater", "inveniogc",
+                      "webstatadmin", "bibclassify", "bibexport",
+                      "dbdump", "batchuploader", "bibauthorid", "bibtasklet"],
+                  "hostname_machine2" : ['bibencode',]
+              }
+
+            Share the following directories among Invenio instances:
+
+              /var/tmp-shared
+                 hosts video uploads in a temporary form
+              /var/tmp-shared/bibencode/jobs
+                 hosts new job files for the video encoding daemon
+              /var/tmp-shared/bibencode/jobs/done
+                 hosts job files that have been processed by the daemon
+              /var/data/files
+                 hosts fulltext and media files associated to records
+              /var/data/submit
+                 hosts files created during submissions
 
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
 

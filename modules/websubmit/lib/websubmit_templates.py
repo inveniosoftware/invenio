@@ -40,7 +40,8 @@ class Template:
         'docname': (str, ""), # the docname (optional)
         'format' : (str, ""), # the format
         'verbose' : (int, 0), # the verbosity
-        'subformat' : (str, ""), # the subformat
+        'subformat': (str, ""), # the subformat
+        'download': (int, 0), # download as attachment
         }
 
 

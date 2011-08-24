@@ -94,6 +94,8 @@ CFG_WEBSUBMIT_ICON_SUBFORMAT_RE = re.compile(r"icon.*")
 ## when creating new icons.
 CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT = "icon"
 
+## Prefix for video uploads, Garbage Collector
+CFG_WEBSUBMIT_TMP_VIDEO_PREFIX = "video_upload_"
 
 class InvenioWebSubmitFunctionError(Exception):
     """This exception should only ever be raised by WebSubmit functions.

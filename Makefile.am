@@ -33,6 +33,10 @@ MATHJAX = https://github.com/mathjax/MathJax/zipball/v$(MJV)
 CKV = 3.6.1
 CKEDITOR = ckeditor_$(CKV).zip
 
+# current MediaElement.js version
+MEV = master
+MEDIAELEMENT = http://github.com/johndyer/mediaelement/zipball/$(MEV)
+
 # git-version-get stuff:
 BUILT_SOURCES = $(top_srcdir)/.version
 $(top_srcdir)/.version:
@@ -271,6 +275,22 @@ install-pdfa-helper-files:
 	wget 'http://invenio-software.org/download/invenio-demo-site-files/ISOCoatedsb.icc' -O ${prefix}/etc/websubmit/file_converter_templates/ISOCoatedsb.icc
 	@echo "***********************************************************"
 	@echo "** The PDF/A helper files were successfully installed.   **"
+	@echo "***********************************************************"
+
+install-mediaelement:
+	@echo "***********************************************************"
+	@echo "** MediaElement.js, please wait...                       **"
+	@echo "***********************************************************"
+	rm -rf /tmp/mediaelement
+	mkdir /tmp/mediaelement
+	wget 'http://github.com/johndyer/mediaelement/zipball/master' -O '/tmp/mediaelement/mediaelement.zip' --no-check-certificate
+	unzip -u -d '/tmp/mediaelement' '/tmp/mediaelement/mediaelement.zip'
+	rm -rf ${prefix}/var/www/mediaelement
+	mkdir ${prefix}/var/www/mediaelement
+	mv /tmp/mediaelement/johndyer-mediaelement-*/build/* ${prefix}/var/www/mediaelement
+	rm -rf /tmp/mediaelement
+	@echo "***********************************************************"
+	@echo "** MediaElement.js was successfully installed.           **"
 	@echo "***********************************************************"
 
 uninstall-pdfa-helper-files:

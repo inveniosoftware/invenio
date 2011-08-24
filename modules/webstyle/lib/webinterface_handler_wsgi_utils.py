@@ -55,7 +55,7 @@ import cgi
 import cStringIO
 import tempfile
 from types import TypeType, ClassType, BuiltinFunctionType, MethodType, ListType
-from invenio.config import CFG_TMPDIR
+from invenio.config import CFG_TMPDIR, CFG_TMPSHAREDDIR
 from invenio.webinterface_handler_config import \
     SERVER_RETURN, \
     HTTP_LENGTH_REQUIRED, \
@@ -443,7 +443,7 @@ class FieldList(list):
 
 class FieldStorage:
 
-    def __init__(self, req, keep_blank_values=0, strict_parsing=0, file_callback=None, field_callback=None):
+    def __init__(self, req, keep_blank_values=0, strict_parsing=0, file_callback=None, field_callback=None, to_tmp_shared=False):
         #
         # Whenever readline is called ALWAYS use the max size EVEN when
         # not expecting a long line. - this helps protect against
@@ -578,7 +578,10 @@ class FieldStorage:
                 if file_callback and callable(file_callback):
                     file = file_callback(disp_options["filename"])
                 else:
-                    file = tempfile.NamedTemporaryFile(dir=CFG_TMPDIR)
+                    if to_tmp_shared:
+                        file = tempfile.NamedTemporaryFile(dir=CFG_TMPSHAREDDIR)
+                    else:
+                        file = tempfile.NamedTemporaryFile(dir=CFG_TMPDIR)
             else:
                 if field_callback and callable(field_callback):
                     file = field_callback()

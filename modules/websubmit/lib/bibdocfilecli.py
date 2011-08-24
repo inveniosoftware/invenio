@@ -36,7 +36,7 @@ from tempfile import mkstemp
 
 from invenio.errorlib import register_exception
 from invenio.config import CFG_TMPDIR, CFG_SITE_URL, CFG_WEBSUBMIT_FILEDIR, \
-    CFG_SITE_RECORD
+    CFG_SITE_RECORD, CFG_TMPSHAREDDIR
 from invenio.bibdocfile import BibRecDocs, BibDoc, InvenioWebSubmitFileError, \
     nice_size, check_valid_url, clean_url, get_docname_from_url, \
     guess_format_from_url, KEEP_OLD_VALUE, decompose_bibdocfile_fullpath, \
@@ -525,7 +525,7 @@ def bibupload_ffts(ffts, append=False, debug=False, interactive=True):
     if xml:
         if interactive:
             print xml
-        tmp_file_fd, tmp_file_name = mkstemp(suffix='.xml', prefix="bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"), dir=CFG_TMPDIR)
+        tmp_file_fd, tmp_file_name = mkstemp(suffix='.xml', prefix="bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"), dir=CFG_TMPSHAREDDIR)
         os.write(tmp_file_fd, xml)
         os.close(tmp_file_fd)
         os.chmod(tmp_file_name, 0644)

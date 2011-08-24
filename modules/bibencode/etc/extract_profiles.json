@@ -1,0 +1,58 @@
+// -*- coding: utf-8 -*-
+//
+// This file is part of Invenio.
+// Copyright (C) 2011 CERN.
+//
+// Invenio is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as
+// published by the Free Software Foundation; either version 2 of the
+// License, or (at your option) any later version.
+//
+// Invenio is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Invenio; if not, write to the Free Software Foundation, Inc.,
+// 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+{
+// The new profiles. Better for batch processing and fits HTML5 wording!
+	"POSTER": {
+		"width": 180,
+		"positions": [5],
+		"extension": "jpg"
+	},
+	"SMALLTHUMBS": {
+		"width": 80,
+		"numberof": 10,
+		"extension": "jpg"
+	},
+	"BIGTHUMBS": {
+		"width": 640,
+		"numberof": 10,
+		"extension": "jpg"
+	},
+// YouTube like posterframes, that are displayed as a preview before the video is started
+	"POSTER_360p": {
+		"width": 360,
+		"positions": [5],
+		"extension": "jpg"
+	},
+	"POSTER_480p": {
+		"width": 360,
+		"positions": [5],
+		"extension": "jpg"
+	},
+	"POSTER_720p": {
+		"width": 720,
+		"positions": [5],
+		"extension": "jpg"
+	},
+	"POSTER_1080p": {
+		"width": 1080,
+		"positions": [5],
+		"extension": "jpg"
+	}
+}

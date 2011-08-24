@@ -21,7 +21,8 @@ submission_templates_DATA = DEMOPIC.tpl DEMOPICcreate.tpl DEMOPICmodify.tpl \
            DEMOART.tpl DEMOARTcreate.tpl DEMOARTmodify.tpl \
            DEMOPOE.tpl DEMOPOEcreate.tpl DEMOPOEmodify.tpl \
            DEMOBOO.tpl DEMOBOOcreate.tpl DEMOBOOmodify.tpl \
-           DEMOJRN.tpl DEMOJRNcreate.tpl DEMOJRNmodify.tpl
+           DEMOJRN.tpl DEMOJRNcreate.tpl DEMOJRNmodify.tpl \
+           DEMOVID.tpl DEMOVIDcreate.tpl DEMOVIDmodify.tpl
 
 stamper_templatesdir = $(sysconfdir)/websubmit/file_stamper_templates
 stamper_templates_DATA = demo-stamp-left.tex demo-stamp-left-logo.png

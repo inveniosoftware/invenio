@@ -30,13 +30,14 @@ import os
 try:
     from invenio.dbquery import run_sql
     from invenio.config import CFG_LOGDIR, CFG_TMPDIR, CFG_CACHEDIR, \
-         CFG_WEBSEARCH_RSS_TTL, \
+         CFG_TMPSHAREDDIR, CFG_WEBSEARCH_RSS_TTL, \
          CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS
     from invenio.bibtask import task_init, task_set_option, task_get_option, \
          write_message, write_messages
     from invenio.access_control_mailcookie import mail_cookie_gc
     from invenio.bibdocfile import BibDoc
     from invenio.bibsched import gc_tasks
+    from invenio.websubmit_config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
 except ImportError, e:
     print "Error: %s" % (e, )
     sys.exit(1)
@@ -63,6 +64,8 @@ CFG_WEBJOURNAL_TTL = 7
 CFG_MAX_ATIME_ZIP_BIBSWORD = 7
 # After how many days to remove obsolete bibsword xml log files
 CFG_MAX_ATIME_RM_BIBSWORD = 28
+# After how many days to remove temporary video uploads
+CFG_MAX_ATIME_WEBSUBMIT_TMP_VIDEO = 3
 
 def gc_exec_command(command):
     """ Exec the command logging in appropriate way its output."""
@@ -125,6 +128,12 @@ def clean_logs():
     gc_exec_command('find %s -name "bibsword_*"'
         ' -atime +%s -exec gzip %s -9 {} \;' \
             % (CFG_TMPDIR, CFG_MAX_ATIME_ZIP_BIBSWORD, vstr))
+
+    # DELETE ALL FILES CREATED DURING VIDEO SUBMISSION
+    write_message("- deleting old video submissions")
+    gc_exec_command('find %s -name %s* -atime +%s -exec rm %s -f {} \;' \
+                    % (CFG_TMPSHAREDDIR, CFG_WEBSUBMIT_TMP_VIDEO_PREFIX,
+                       CFG_MAX_ATIME_WEBSUBMIT_TMP_VIDEO, vstr))
 
     write_message("""CLEANING OF LOG FILES FINISHED""")
 

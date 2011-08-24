@@ -1104,11 +1104,12 @@ hr {
     background-color: #999;
     border-width: 0;
 }
-input,select {
+form input, form select {
     color: #000;
     background: #fff;
+    border: 1px solid #555;
 }
-input[disabled], input[disabled="true"]{
+form input[disabled], form input[disabled="true"]{
    /* <http://reference.sitepoint.com/css/attributeselector#compatibilitysection> */
    color: #666;
 }
@@ -1910,7 +1911,7 @@ form.hyperlinkform {
    height: 0;
    width: 0;
 }
-input.hyperlinkformHiddenInput {
+form input.hyperlinkformHiddenInput {
    /* used in a hidden input tag for a form that should be hidden, but contains a button styled like a hyperlink */
    display: inline;
    padding: 0;
@@ -1918,7 +1919,7 @@ input.hyperlinkformHiddenInput {
    height: 0;
    width: 0;
 }
-input.hyperlinkformSubmitButton {
+form input.hyperlinkformSubmitButton {
    /* used in a submit input tag for a form that should be hidden, but contains a button styled like a hyperlink */
    display: inline;
    padding: 0;
@@ -3392,6 +3393,226 @@ div.subtitle {
 }
 
 .webcomment_review_first_introduction {
+
+}
+
+/* DEMOVID SUBMISSION */
+
+.websubmit_demovid_form table{
+	background-color: #d6e5f4;
+}
+
+.websubmit_demovid_radio {
+	display: inline;
+	margin: 10px 15px 0 0;
+}
+
+#websubmit_demovid_samples_wrapper {
+	background-color: #FFF;
+	border: 1px solid #85b1de;
+	padding: 3px;
+	margin-bottom: 10px;
+	width: 533px;
+	height: 300px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+#websubmit_demovid_samples {
+	position: relative;
+	width: 533px;
+	height: 300px;
+	background-color: #000;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+#websubmit_demovid_samples img {
+	position:absolute;
+	top:0;
+	left:0;
+	z-index:8;
+}
+#websubmit_demovid_samples img.active {
+	z-index:10;
+}
+#websubmit_demovid_samples img.last-active {
+	z-index:9;
+}
+.websubmit_demovid_form label {
+	display: block;
+	font-size: 12px;
+	font-weight: normal;
+}
+
+.websubmit_demovid_form > label.error {
+	color: #C00;
+	margin-bottom: 15px;
+	font-weight: bold;
+}
+
+.websubmit_demovid_form > div > label.error {
+	color: #C00;
+	position: relative;
+	top: 22px;
+	left: 130px;
+	font-weight: bold;
+}
+
+.websubmit_demovid_form > div > object {
+
+}
+
+.websubmit_demovid_form > input {
+	border: 1px solid #85b1de;
+	display: block;
+	margin-bottom: 15px;
+	padding: 3px;
+	font-size: 14px;
+	height: 22px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+.websubmit_demovid_form > input:focus, .websubmit_demovid_form > textarea:focus {
+	border: solid 1px #33677F;
+}
+
+.websubmit_demovid_form > textarea {
+	border: 1px solid #85b1de;
+	display: block;
+	margin-bottom: 13px;
+	font-size: 14px;
+	padding: 3px;
+	line-height: 22px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+.websubmit_demovid_form > input.error {
+	display: block;
+	margin-bottom: 3px;
+	border: 1px solid #C00;
+}
+.websubmit_demovid_form > textarea.error {
+	display: block;
+	margin-bottom: 3px;
+	border: 1px solid #C00;
+}
+
+.websubmit_demovid_form object {
+	display: block;
+	margin-bottom: 0px;
+}
+
+#websubmit_demovid_error {
+	border: 1px solid #C00;
+	background-color: #fff;
+	padding: 10px;
+	margin: 15px 0 15px 0;
+	width: 516px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+#websubmit_demovid_preview {
+	margin: 0 0 10px 0;
+	font-size: 12px;
+	font-weight: normal;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+.websubmit_demovid_radio input {
+	border: 1px solid #85b1de;
+	text-align: center;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+.websubmit_demovid_submit {
+	position: relative;
+	font-weight: bold;
+	top: -30px;
+	right: 0px;
+	height: 29px;
+	padding: 0 15px 0 15px;
+	text-align: center;
+	border: none;
+	background-color: #444;
+	color: #fff;
+	font-size: 13px;
+	border-radius: 2px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, rgb(65,65,65)),
+		color-stop(0.7, rgb(95,95,95))
+	);
+	background-image: -moz-linear-gradient(
+		center bottom,
+		rgb(65,65,65) 0%,
+		rgb(95,95,95) 70%
+	);
+}
+
+.websubmit_demovid_form .uploadifyQueueItem {
+	border: 1px solid #666;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+#uploadify_loading {
+	display: none;
+	float: left;
+	background-color: #fff;
+	border: 1px solid #85B1DE;
+	height: 29px;
+	width: 29px;
+	border-radius: 2px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	margin-right: 5px;
+}
+
+#uploadify_loading > img {
+	height: 29px;
+	width: 29px;
+}
+
+.websubmit_demovid_radio label {
+	display: inline;
+}
+
+/* VIDEO FORMAT ELEMENTS */
+
+.video_brief_container {
+
+}
+
+.video_brief_thumb {
+	padding: 2px;
+	border: 1px solid #ccc;
+	float: left;
+	margin: 0 15px 0 0;
+}
+
+.video_brief_abstract {
+
+}
+
+.video_brief_info {
 
 }
 

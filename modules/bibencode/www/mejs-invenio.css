@@ -1,0 +1,57 @@
+.pagebody {
+	padding: 0;
+}
+
+.mediaelement-wrapper {
+	background-color: #000;
+	margin-top: 20px;
+}
+
+.mediaelement-center {
+}
+
+.mejs-container {
+	display: block;
+	margin: 0 auto;
+}
+
+.mjes-metadata-wrapper {
+	
+}
+
+.mjes-metadata {
+	padding: 0 20px 0 20px;
+}
+
+.mejs-container .mejs-controls .mejs-resolution {
+	width: 35px;
+	overflow: hidden;
+}
+#mejs-resolution {
+	-webkit-appearance: none;
+	background: transparent;
+	width: auto;
+	margin-top: 7px;
+	height: 17px;
+	text-align: left;
+	color: #fff;
+	border: none;
+	width: 43px;
+	font-size: 11px;
+}
+
+#mejs-resolution > option {
+	background: #000;
+	color: #fff;
+	text-align: center;
+}
+
+#mejs-resolution > option:focus {
+	border: none;
+	outline: none;
+}
+
+#mejs-resolution:focus {
+	border: none;
+	outline: none;
+}

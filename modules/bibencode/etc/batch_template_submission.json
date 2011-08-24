@@ -1,0 +1,192 @@
+// -*- coding: utf-8 -*-
+//
+// This file is part of Invenio.
+// Copyright (C) 2011 CERN.
+//
+// Invenio is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as
+// published by the Free Software Foundation; either version 2 of the
+// License, or (at your option) any later version.
+//
+// Invenio is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Invenio; if not, write to the Free Software Foundation, Inc.,
+// 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+// Batch Job Template Example for a fresh submission
+{
+	// MUST
+	// Defines that this JSOn dokument describes a batch job
+	"isbatch": true,
+
+	// MUST
+	// The input file that is to be processed. Only one input for the whole
+	// batch is possible
+	"input": "/opt/invenio/var/tmp/movie02.mp4",
+
+	// MUST
+	// The recid that will the batch process is going to work on
+	"recid": 124,
+
+	// OPTIONAL
+	// Alters the collection to the specified after the batch job is completed
+	// Makes use of MARCXML and BibUpload
+	"collection": "VIDEO",
+
+	// OPTIONAL
+	// Defines if the master video (input file) should be appended to the record
+	"add_master": true,
+
+	// OPTIONAL
+	// Defines the bibdoc name for the master and all slaves, neces. for the demo
+	// websubmit workflow because we use temporary filenames
+	"bibdoc_master_docname": "DEMOVIDEO",
+
+	// OPTIONAL
+	// Defines bibdoc extension for the master, necessary for the demo
+	// websubmit workflow because we use temporary filenames without extension
+	"bibdoc_master_extension": "mp4",
+
+	// OPTIONAL
+	// Defines the bibdoc comment, description and subformat for the master
+	// Highly recommended to set this for reprocessing existing records
+	"bibdoc_master_comment": "MASTER",
+	"bibdoc_master_description": "MASTER",
+	"bibdoc_master_subformat": "master",
+
+	// OPTIONAL
+	// Removes jobs from the batch that are not suitable for the input video
+	// e.g. high resolution profiles are not suitable for low res material
+	"assure_quality": true,
+
+	// OPTIONAL
+	// Aspect ratio support. If BibEncode cannot detect the aspect, this
+	// value is used as a fallback value for the encoder
+	"aspect": "16:9",
+
+	// OPTIONAL
+	// Sends notifications to the user/admin in case of failure/success
+	"notify_user": "bjorn.oltmanns@cern.ch",
+	"notify_admin": "bjorn.oltmanns@cern.ch",
+
+	// OPTIONAL
+	// The original name of the file uploaded and the title of the submission
+	// Used in the notification email
+	"submission_filename": "movie02.mp4",
+	"submission_title": "A demo video",
+
+	// OPTIONAL
+	// Deletes the input file after the batch process was successfull
+	"delete_input": true,
+
+	// OPTIONAL
+	// Only deletes if pattern is in the input name
+	"delete_input_pattern": "video_upload_",
+
+	// OPTIONAL
+	// Creates a BibUpload containing extracted Metadata
+	"add_master_metadata": true,
+
+	// OPTIONAL
+	// Creates a pcore metadata bibdoc for the master
+	"add_master_pbcore": true,
+
+	//OPTIONAL
+	// Uploads a given MARCXML file after the processing
+	// "marc_snippet" : "/opt/invenio/var/tmp-shared/snippet.xml"
+
+	// MUST
+	// Dictionary of the jobs to process
+	"jobs": [
+		{
+			// MUST
+			// Mode in wich BibEncode shoud run
+			"mode": "encode",
+
+			// OPTIONAL
+			// Profile to use, here for encoding
+			"profile": "WEBM_480P",
+
+			// OPTIONAL
+			// Bibdoc subformat, comment, description for this specific job
+			// Higly recommended! In case of multiple slaves with the same
+			// extension previously created files would be overwritten!
+			"bibdoc_subformat": "480p",
+
+			// OPTIONAL
+			// Bibdoc comment and description
+			"bibdoc_comment": "WEBM_480P",
+			"bibdoc_description": "WEBM_480P"
+
+			// Sets the job as fallback
+			// If assure_quality is set, the job will be used if no job
+			// That is not marked as fallback surives. Multiple fallbacks
+			// are possible. If assure_quality is not set. The job will
+			// never be executed.
+			// "fallback": true,
+
+			// Sets the job as enforced, executed regardless other options.
+			// If assure_quality is set, the job will not be evaluated and
+			// used in any case. Having one job set to enforce will deaktivate
+			// fallback jobs. If assure_quality is not set, the job will also
+			// be executed.
+			// "enforce": true
+		},
+		{
+			"mode": "encode",
+			"profile": "WEBM_720P",
+			"bibdoc_subformat": "720p",
+			"bibdoc_comment": "WEBM_720P",
+			"bibdoc_description": "WEBM_720P"
+		},
+		{
+			"mode": "encode",
+			"profile": "MP4_480P",
+			"bibdoc_subformat": "480p",
+			"bibdoc_comment": "MP4_480P",
+			"bibdoc_description": "MP4_480P"
+		},
+		{
+			"mode": "encode",
+			"profile": "MP4_720P",
+			"bibdoc_subformat": "720p",
+			"bibdoc_comment": "MP4_720P",
+			"bibdoc_description": "MP4_720P"
+		},
+		{
+			"mode": "extract",
+			"profile": "POSTER",
+
+			// OPTIONAL
+			// Bibdoc docname for the extracted frame. Substitutable
+			// strings are possible, see bibencode extraction documentation.
+			"bibdoc_docname": "${bibdoc_master_docname}_POSTER",
+			"bibdoc_comment": "POSTER",
+			"bibdoc_description": "POSTER"
+		},
+		{
+			"mode": "extract",
+			"profile": "BIGTHUMBS",
+			"substitute": true,
+			// For the batch engine to  try to substitute the docname with
+			// the master docname, this is the notation:
+			"bibdoc_docname": "${bibdoc_master_docname}_%(number)02d",
+			"bibdoc_subformat": "big",
+			"bibdoc_comment": "BIGTHUMB",
+			"bibdoc_description": "BIGTHUMB"
+		},
+		{
+			"mode": "extract",
+			"profile": "SMALLTHUMBS",
+			"substitute": true,
+			"bibdoc_docname": "${bibdoc_master_docname}_%(number)02d",
+			"bibdoc_subformat": "small",
+			"bibdoc_comment": "SMALLTHUMB",
+			"bibdoc_description": "SMALLTHUMB"
+		}
+	]
+}
