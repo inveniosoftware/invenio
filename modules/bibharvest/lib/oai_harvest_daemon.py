@@ -783,7 +783,7 @@ def call_refextract(active_file, extracted_file, harvested_identifier_list,
             else:
                 downloaded_files[identifier]["pdf"] = pdf
         if current_exitcode == 0:
-            current_exitcode, cmd_stdout, err_msg = run_shell_command(cmd="%s/refextract %s 1:'%s'" % \
+            current_exitcode, cmd_stdout, err_msg = run_shell_command(cmd="%s/refextract %s -f 1:'%s'" % \
                                                 (CFG_BINDIR, flag, downloaded_files[identifier]["pdf"]))
             if err_msg != "" or current_exitcode != 0:
                 exitcode = current_exitcode

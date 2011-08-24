@@ -33,7 +33,7 @@ CFG_REFEXTRACT_KB_JOURNAL_TITLES = "%s/bibedit/refextract-journal-titles.kb" % C
 # report numbers knowledge base:
 CFG_REFEXTRACT_KB_REPORT_NUMBERS = "%s/bibedit/refextract-report-numbers.kb" % CFG_ETCDIR
 # authors which should be recognised as such
-CFG_REFEXTRACT_KB_AUTHORS = "%s/bibedit/refextract-authors.kb" % CFG_ETCDIR 
+CFG_REFEXTRACT_KB_AUTHORS = "%s/bibedit/refextract-authors.kb" % CFG_ETCDIR
 
 
 ## MARC Fields and subfields used by refextract:
@@ -80,3 +80,8 @@ CFG_REFEXTRACT_XML_COLLECTION_OPEN  = u"""<collection xmlns="http://www.loc.gov/
 CFG_REFEXTRACT_XML_COLLECTION_CLOSE = u"""</collection>\n"""
 CFG_REFEXTRACT_XML_RECORD_OPEN      = u"<record>"
 CFG_REFEXTRACT_XML_RECORD_CLOSE     = u"</record>"
+
+## Job task file valid parameters
+CFG_REFEXTRACT_JOB_FILE_PARAMS = ('collection', 'raw-references',
+                                  'output-raw-refs', 'xmlfile', 'dictfile',
+                                  'inspire', 'kb-journal', 'kb-report-number', 'verbose')
