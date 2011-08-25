@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2011 CERN.
@@ -15,17 +16,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+'''
+    This file contains the functions, which are used by the search engine
+    to extract information about the authors.
+'''
 
-pylibdir=$(libdir)/python/invenio/bibauthorid_comparison_functions
-
-pylib_DATA = aid_cmp_affiliations.py \
-             aid_cmp_coauthorship.py \
-             aid_cmp_inspireids.py \
-             aid_cmp_names.py \
-             aid_cmp_paperequality.py \
-             aid_cmp_topcites.py \
-             __init__.py
-
-EXTRA_DIST = $(pylib_DATA)
-
-CLEANFILES = *~ *.tmp *.pyc
+from bibauthorid_dbinterface import get_cached_author_page              #emitting
+from bibauthorid_dbinterface import update_cached_author_page           #emitting
+from bibauthorid_dbinterface import update_cached_author_page_timestamp #emitting
+from bibauthorid_dbinterface import get_person_bibrecs                  #emitting
+from bibauthorid_dbinterface import get_personids_from_bibrec           #emitting

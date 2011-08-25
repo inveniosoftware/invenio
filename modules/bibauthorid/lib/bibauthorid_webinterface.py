@@ -25,7 +25,12 @@ from cgi import escape
 from copy import deepcopy
 from pprint import pformat
 
-from invenio.jsonutils import json, CFG_JSON_AVAILABLE
+try:
+    from invenio.jsonutils import json, CFG_JSON_AVAILABLE
+except:
+    CFG_JSON_AVAILABLE = False
+    json = None
+    
 from invenio.bibauthorid_config import CLAIMPAPER_ADMIN_ROLE
 from invenio.bibauthorid_config import CLAIMPAPER_USER_ROLE
 #from invenio.bibauthorid_config import EXTERNAL_CLAIMED_RECORDS_KEY
@@ -50,6 +55,12 @@ from invenio.search_engine_utils import get_fieldvalues
 
 import invenio.bibauthorid_webapi as webapi
 import invenio.bibauthorid_config as bconfig
+
+from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
+from invenio.bibauthorid_frontinterface import update_personID_names_string_set
+
+from pprint import pformat
+
 
 TEMPLATE = load('bibauthorid')
 
@@ -686,6 +697,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                                                     'alt_to_other': _('To other person!')}}
 
         return self._generate_tabs_admin(req, form, ln, show_tabs=tabs, ticket_links=links,
+                                         show_reset_button=False,
                                          open_tickets=[], verbiage_dict=verbiage_dict,
                                          buttons_verbiage_dict=buttons_verbiage_dict)
 
@@ -802,7 +814,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
     def _generate_tabs_admin(self, req, form, ln,
                              show_tabs=['records', 'repealed', 'review', 'comments', 'tickets', 'data'],
                              open_tickets=None, ticket_links=['delete', 'commit', 'del_entry', 'commit_entry'],
-                             verbiage_dict=None, buttons_verbiage_dict=None):
+                             verbiage_dict=None, buttons_verbiage_dict=None, show_reset_button=True):
         '''
         Generate the tabs content for an admin user
         @param req: Apache Request Object
@@ -850,7 +862,8 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                             'authorname': paper[3],
                             'authoraffiliation': paper[4],
                             'paperdate': paper[5],
-                            'rt_status': paper[6]})
+                            'rt_status': paper[6],
+                            'paperexperiment': paper[7]})
 
         rejected_papers = [row for row in records if row['flag'] < -1]
         rest_of_papers = [row for row in records if row['flag'] >= -1]
@@ -882,7 +895,8 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                                             show_tabs=show_tabs,
                                             ticket_links=ticket_links,
                                             verbiage_dict=verbiage_dict,
-                                            buttons_verbiage_dict=buttons_verbiage_dict)
+                                            buttons_verbiage_dict=buttons_verbiage_dict,
+                                            show_reset_button=show_reset_button)
 
         return tabs
 
@@ -1278,7 +1292,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                 del(ticket[tt])
                 continue
 
-            tt['authorname_rec'] = webapi.get_bibref_name_string(tt['bibref'])
+            tt['authorname_rec'] = get_bibrefrec_name_string(tt['bibref'])
             tt['person_name'] = webapi.get_most_frequent_name_from_pid(tt['pid'])
 
         mark_yours = []
@@ -1337,9 +1351,12 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         if "user_email" in pinfo:
             userinfo['email'] = pinfo["user_email"]
 
+        pids_to_update = set()
         for t in ticket:
             t['execution_result'] = webapi.execute_action(t['action'], t['pid'], t['bibref'], uid,
+                                                          pids_to_update,
                                                           userinfo['uid-ip'], str(userinfo))
+        update_personID_names_string_set(pids_to_update)
         session.save()
 
 
@@ -1365,13 +1382,17 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         if "user_email" in pinfo:
             userinfo['email'] = pinfo["user_email"]
 
+        pids_to_update = set()
         for t in list(ticket):
             if t['status'] in ['granted', 'warning_granted']:
                 t['execution_result'] = webapi.execute_action(t['action'],
                                                     t['pid'], t['bibref'], uid,
+                                                    pids_to_update,
                                                     userinfo['uid-ip'], str(userinfo))
                 ok_tickets.append(t)
                 ticket.remove(t)
+
+        update_personID_names_string_set(pids_to_update)
 
         if ticket:
             webapi.create_request_ticket(userinfo, ticket)
@@ -2243,8 +2264,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                 except ValueError:
                     recid = None
                     nquery = query
-
-
 
             else:
                 nquery = query

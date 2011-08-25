@@ -22,16 +22,14 @@ Point of access to the documents clustering facility.
 Provides utilities to safely interact with stored data.
 '''
 
-import invenio.bibauthorid_personid_tables_utils as tu
-import invenio.bibauthorid_tables_utils as tu0
+from invenio.bibauthorid_general_utils import get_field_values_on_condition
 import invenio.bibauthorid_config as bconfig
-import invenio.bibauthorid_utils as bu
-import invenio.bibauthorid_authorname_utils as bau
-import invenio.search_engine as search_engine
+import invenio.bibauthorid_frontinterface as dbapi
+import invenio.bibauthorid_name_utils as nameapi
 
+import invenio.search_engine as search_engine
 from cgi import escape
 from time import gmtime, strftime, ctime
-from invenio.bibauthorid_utils import get_field_values_on_condition
 from invenio.dbquery import OperationalError
 from invenio.access_control_admin import acc_find_user_role_actions
 from invenio.webuser import collect_user_info, get_session, getUid
@@ -44,13 +42,12 @@ from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 from invenio.config import CFG_SITE_URL
 from invenio.mailutils import send_email
 
-
 def get_person_redirect_link(pid):
     '''
     Returns the canonical name of a pid if found, the pid itself otherwise
     @param pid: int
     '''
-    cname = tu.get_canonical_id_from_personid(pid)
+    cname = dbapi.get_canonical_id_from_personid(pid)
     if len(cname) > 0:
         return str(cname[0][0])
     else:
@@ -62,8 +59,8 @@ def update_person_canonical_name(person_id, canonical_name, userinfo=''):
     @param person_id: person id
     @param canonical_name: string 
     '''
-    tu.update_personID_canonical_names(persons_list=[[person_id]], overwrite=True, suggested=canonical_name)
-    tu.insert_user_log(userinfo, person_id, 'data_update', 'CMPUI_changecanonicalname', '', 'Canonical name manually updated.')
+    dbapi.update_personID_canonical_names(persons_list=[[person_id]], overwrite=True, suggested=canonical_name)
+    dbapi.insert_user_log(userinfo, person_id, 'data_update', 'CMPUI_changecanonicalname', '', 'Canonical name manually updated.')
 
 def get_canonical_id_from_person_id(person_id):
     '''
@@ -81,7 +78,7 @@ def get_canonical_id_from_person_id(person_id):
     canonical_name = person_id
 
     try:
-        canonical_name = tu.get_canonical_id_from_personid(person_id)[0][0]
+        canonical_name = dbapi.get_canonical_id_from_personid(person_id)[0][0]
     except IndexError:
         pass
 
@@ -103,7 +100,7 @@ def get_person_id_from_canonical_id(canonical_id):
     pid = -1
 
     try:
-        pid = tu.get_person_id_from_canonical_id(canonical_id)[0][0]
+        pid = dbapi.get_person_id_from_canonical_id(canonical_id)[0][0]
     except IndexError:
         pass
 
@@ -122,7 +119,7 @@ def get_bibrefs_from_bibrecs(bibreclist):
     '''
     lists = []
     for bibrec in bibreclist:
-        lists.append([bibrec, tu.get_possible_bibrecref([''], bibrec,
+        lists.append([bibrec, dbapi.get_possible_bibrecref([''], bibrec,
                                                         always_match=True)])
     return lists
 
@@ -135,10 +132,10 @@ def get_possible_bibrefs_from_pid_bibrec(pid, bibreclist, always_match=False):
     '''
     pid = wash_integer_id(pid)
 
-    pid_names = tu.get_person_names_set([pid])
+    pid_names = dbapi.get_person_names_set([pid])
     lists = []
     for bibrec in bibreclist:
-        lists.append([bibrec, tu.get_possible_bibrecref([n[0] for n in pid_names], bibrec,
+        lists.append([bibrec, dbapi.get_possible_bibrecref([n[0] for n in pid_names], bibrec,
                                                         always_match)])
     return lists
 
@@ -155,7 +152,7 @@ def get_pid_from_uid(uid):
     if not isinstance(uid, tuple):
         uid = ((uid,),)
 
-    return tu.get_personid_from_uid(uid)
+    return dbapi.get_personid_from_uid(uid)
 
 
 def get_user_level(uid):
@@ -169,7 +166,7 @@ def get_user_level(uid):
     @rtype: int
     '''
     actions = [row[1] for row in acc_find_user_role_actions({'uid': uid})]
-    return max([tu.resolve_paper_access_right(acc) for acc in actions])
+    return max([dbapi.resolve_paper_access_right(acc) for acc in actions])
 
 
 def get_person_id_from_paper(bibref=None):
@@ -186,7 +183,7 @@ def get_person_id_from_paper(bibref=None):
         return -1
 
     person_id = -1
-    db_data = tu.get_papers_status([(bibref,)])
+    db_data = dbapi.get_papers_status([(bibref,)])
 
     try:
         person_id = db_data[0][1]
@@ -223,7 +220,7 @@ def get_papers_by_person_id(person_id= -1, rec_status= -2, ext_out=False):
         return []
 
     records = []
-    db_data = tu.get_person_papers((person_id,),
+    db_data = dbapi.get_person_papers((person_id,),
                                    rec_status,
                                    show_author_name=True,
                                    show_title=False,
@@ -243,13 +240,18 @@ def get_papers_by_person_id(person_id= -1, rec_status= -2, ext_out=False):
                                        authorname, source="API"))
 
             #Date retrival disabled to increase UI speed.
-            #try:
-            #    date = list(gfoc(recid, "269", "c"))[0]
-            #except (IndexError):
-            #    date = ""
-            date = ""
+            try:
+                date = list(gfoc(recid, "269", "c"))[0]
+            except (IndexError):
+                date = "Not Available"
+
+            try:
+                exp = list(gfoc(recid, "693", "e"))[0]
+            except (IndexError):
+                exp = "Not Available"
+            #date = ""
             records.append([recid, bibref, flag, authorname,
-                            authoraff, date, rt_status])
+                            authoraff, date, rt_status, exp])
 
 
     return records
@@ -283,14 +285,14 @@ def get_person_request_ticket(pid= -1, tid=None):
     if pid < 0:
         return []
     else:
-        return tu.get_request_ticket(pid, ticket_id=tid)
+        return dbapi.get_request_ticket(pid, ticket_id=tid)
 
 def get_persons_with_open_tickets_list():
     '''
     Finds all the persons with open tickets and returns pids and count of tickets
     @return: [[pid,ticket_count]]
     '''
-    return tu.get_persons_with_open_tickets_list()
+    return dbapi.get_persons_with_open_tickets_list()
 
 def get_person_names_from_id(person_id= -1):
     '''
@@ -307,7 +309,7 @@ def get_person_names_from_id(person_id= -1):
     if (not person_id > -1) or (not isinstance(person_id, int)):
         return []
 
-    return tu.get_person_names_count((person_id,))
+    return dbapi.get_person_names_count((person_id,))
 
 
 def get_person_db_names_from_id(person_id= -1):
@@ -326,7 +328,7 @@ def get_person_db_names_from_id(person_id= -1):
     if (not person_id > -1) or (not isinstance(person_id, int)):
         return []
 
-    return tu.get_person_db_names_count((person_id,))
+    return dbapi.get_person_db_names_count((person_id,))
 
 
 def get_longest_name_from_pid(person_id= -1):
@@ -344,7 +346,7 @@ def get_longest_name_from_pid(person_id= -1):
 
     longest_name = ""
 
-    for name in tu.get_person_names_count((person_id,)):
+    for name in dbapi.get_person_names_count((person_id,)):
         if name and len(name[0]) > len(longest_name):
             longest_name = name[0]
 
@@ -374,7 +376,7 @@ def get_most_frequent_name_from_pid(person_id= -1):
     mf_name = ""
 
     try:
-        nn = tu.get_person_names_count((person_id,))
+        nn = dbapi.get_person_names_count((person_id,))
         mf_name = sorted(nn, key=lambda k:k[1], reverse=True)[0][0]
     except IndexError:
         pass
@@ -392,7 +394,7 @@ def get_paper_status(bibref):
     @param bibref: the bibref-bibrec pair that unambiguously identifies a paper
     @type bibref: string
     '''
-    db_data = tu.get_papers_status([[bibref]])
+    db_data = dbapi.get_papers_status([[bibref]])
     #data,PersonID,flag
     status = None
 
@@ -494,121 +496,121 @@ def is_valid_canonical_id(cid):
         return False
 
 
-def confirm_person_bibref_assignments(person_id, bibrefs, uid):
-    '''
-    Confirms a bibref-bibrec assignment to a person. That internally
-    raises the flag of the entry to 2, which means 'user confirmed' and
-    sets the user level to the highest level of the user provided as param
-
-    @param person_id: the id of the person to confirm the assignment to
-    @type person_id: int
-    @param bibrefs: the bibref-bibrec pairs that unambiguously identify records
-    @type bibrefs: list of strings
-    @param uid: the id of the user that arranges the confirmation
-    @type uid: int
-
-    @return: True if the process ran smoothly, False if there was an error
-    @rtype: boolean
-    '''
-    pid = wash_integer_id(person_id)
-    refs = []
-
-    if pid < 0:
-        return False
-
-    if not isinstance(bibrefs, list) or not len(bibrefs):
-        return False
-    else:
-        for bibref in bibrefs:
-            if is_valid_bibref(bibref):
-                refs.append((bibref,))
-            else:
-                return False
-
-    try:
-        tu.confirm_papers_to_person((pid,), refs, get_user_level(uid))
-    except OperationalError:
-        return False
-
-    return True
-
-
-def repeal_person_bibref_assignments(person_id, bibrefs, uid):
-    '''
-    Repeals a bibref-bibrec assignment from a person. That internally
-    sets the flag of the entry to -2, which means 'user repealed' and
-    sets the user level to the highest level of the user provided as param
-
-    @param person_id: the id of the person to repeal the assignment from
-    @type person_id: int
-    @param bibrefs: the bibref-bibrec pairs that unambiguously identify records
-    @type bibrefs: list of strings
-    @param uid: the id of the user that arranges the repulsion
-    @type uid: int
-
-    @return: True if the process ran smoothly, False if there was an error
-    @rtype: boolean
-    '''
-    pid = wash_integer_id(person_id)
-    refs = []
-
-    if pid < 0:
-        return False
-
-    if not isinstance(bibrefs, list) or not len(bibrefs):
-        return False
-    else:
-        for bibref in bibrefs:
-            if is_valid_bibref(bibref):
-                refs.append((bibref,))
-            else:
-                return False
-
-    try:
-        tu.reject_papers_from_person((pid,), refs, get_user_level(uid))
-    except OperationalError:
-        return False
-
-    return True
-
-
-def reset_person_bibref_decisions(person_id, bibrefs):
-    '''
-    Resets a bibref-bibrec assignment of a person. That internally
-    sets the flag of the entry to 0, which means 'no user interaction' and
-    sets the user level to 0 to give the record free for claiming/curation
-
-    @param person_id: the id of the person to reset the assignment from
-    @type person_id: int
-    @param bibrefs: the bibref-bibrec pairs that unambiguously identify records
-    @type bibrefs: list of strings
-
-    @return: True if the process ran smoothly, False if there was an error
-    @rtype: boolean
-    '''
-    pid = wash_integer_id(person_id)
-    refs = []
-
-    if pid < 0:
-        return False
-
-    if not isinstance(bibrefs, list) or not len(bibrefs):
-        return False
-    else:
-        for bibref in bibrefs:
-            if is_valid_bibref(bibref):
-                refs.append((bibref,))
-            else:
-                return False
-
-    try:
-        tu.reset_papers_flag((person_id,), refs)
-    except OperationalError:
-        return False
-
-    return True
-
-
+#def confirm_person_bibref_assignments(person_id, bibrefs, uid):
+#    '''
+#    Confirms a bibref-bibrec assignment to a person. That internally
+#    raises the flag of the entry to 2, which means 'user confirmed' and
+#    sets the user level to the highest level of the user provided as param
+#
+#    @param person_id: the id of the person to confirm the assignment to
+#    @type person_id: int
+#    @param bibrefs: the bibref-bibrec pairs that unambiguously identify records
+#    @type bibrefs: list of strings
+#    @param uid: the id of the user that arranges the confirmation
+#    @type uid: int
+#
+#    @return: True if the process ran smoothly, False if there was an error
+#    @rtype: boolean
+#    '''
+#    pid = wash_integer_id(person_id)
+#    refs = []
+#
+#    if pid < 0:
+#        return False
+#
+#    if not isinstance(bibrefs, list) or not len(bibrefs):
+#        return False
+#    else:
+#        for bibref in bibrefs:
+#            if is_valid_bibref(bibref):
+#                refs.append((bibref,))
+#            else:
+#                return False
+#
+#    try:
+#        dbapi.confirm_papers_to_person((pid,), refs, get_user_level(uid))
+#    except OperationalError:
+#        return False
+#
+#    return True
+#
+#
+#def repeal_person_bibref_assignments(person_id, bibrefs, uid):
+#    '''
+#    Repeals a bibref-bibrec assignment from a person. That internally
+#    sets the flag of the entry to -2, which means 'user repealed' and
+#    sets the user level to the highest level of the user provided as param
+#
+#    @param person_id: the id of the person to repeal the assignment from
+#    @type person_id: int
+#    @param bibrefs: the bibref-bibrec pairs that unambiguously identify records
+#    @type bibrefs: list of strings
+#    @param uid: the id of the user that arranges the repulsion
+#    @type uid: int
+#
+#    @return: True if the process ran smoothly, False if there was an error
+#    @rtype: boolean
+#    '''
+#    pid = wash_integer_id(person_id)
+#    refs = []
+#
+#    if pid < 0:
+#        return False
+#
+#    if not isinstance(bibrefs, list) or not len(bibrefs):
+#        return False
+#    else:
+#        for bibref in bibrefs:
+#            if is_valid_bibref(bibref):
+#                refs.append((bibref,))
+#            else:
+#                return False
+#
+#    try:
+#        dbapi.reject_papers_from_person((pid,), refs, get_user_level(uid))
+#    except OperationalError:
+#        return False
+#
+#    return True
+#
+#
+#def reset_person_bibref_decisions(person_id, bibrefs):
+#    '''
+#    Resets a bibref-bibrec assignment of a person. That internally
+#    sets the flag of the entry to 0, which means 'no user interaction' and
+#    sets the user level to 0 to give the record free for claiming/curation
+#
+#    @param person_id: the id of the person to reset the assignment from
+#    @type person_id: int
+#    @param bibrefs: the bibref-bibrec pairs that unambiguously identify records
+#    @type bibrefs: list of strings
+#
+#    @return: True if the process ran smoothly, False if there was an error
+#    @rtype: boolean
+#    '''
+#    pid = wash_integer_id(person_id)
+#    refs = []
+#
+#    if pid < 0:
+#        return False
+#
+#    if not isinstance(bibrefs, list) or not len(bibrefs):
+#        return False
+#    else:
+#        for bibref in bibrefs:
+#            if is_valid_bibref(bibref):
+#                refs.append((bibref,))
+#            else:
+#                return False
+#
+#    try:
+#        dbapi.reset_papers_flag((person_id,), refs)
+#    except OperationalError:
+#        return False
+#
+#    return True
+#
+#
 def add_person_comment(person_id, message):
     '''
     Adds a comment to a person after enriching it with meta-data (date+time)
@@ -632,7 +634,7 @@ def add_person_comment(person_id, message):
     strtimestamp = strftime("%Y-%m-%d %H:%M:%S", gmtime())
     msg = escape(msg, quote=True)
     dbmsg = "%s;;;%s" % (strtimestamp, msg)
-    tu.set_person_data(pid, "comment", dbmsg)
+    dbapi.set_person_data(pid, "comment", dbmsg)
 
     return dbmsg
 
@@ -655,7 +657,7 @@ def get_person_comments(person_id):
     except (ValueError, TypeError):
         return False
 
-    for row in tu.get_person_data(pid, "comment"):
+    for row in dbapi.get_person_data(pid, "comment"):
         comments.append(row[1])
 
     return comments
@@ -684,10 +686,10 @@ def search_person_ids_by_name(namequery):
     else:
         return []
 
-    return tu.find_personIDs_by_name_string(escaped_query)
+    return dbapi.find_personIDs_by_name_string(escaped_query)
 
 
-def log(userinfo, personid, action, tag, value, comment='', transactionid=0):
+def deprecated_log(userinfo, personid, action, tag, value, comment='', transactionid=0):
     '''
     Log an action performed by a user
 
@@ -732,7 +734,7 @@ def log(userinfo, personid, action, tag, value, comment='', transactionid=0):
         except (ValueError, TypeError):
             return -1
 
-    return tu.insert_user_log(userinfo, personid, action, tag,
+    return dbapi.insert_user_log(userinfo, personid, action, tag,
                        value, comment, transactionid)
 
 
@@ -762,7 +764,7 @@ def user_can_modify_data(uid, pid):
         except (ValueError, TypeError):
             raise ValueError("Person ID has to be a number!")
 
-    return tu.user_can_modify_data(uid, pid)
+    return dbapi.user_can_modify_data(uid, pid)
 
 
 def user_can_modify_paper(uid, paper):
@@ -788,7 +790,7 @@ def user_can_modify_paper(uid, paper):
     if not paper:
         raise ValueError("A bibref is expected!")
 
-    return tu.user_can_modify_paper(uid, paper)
+    return dbapi.user_can_modify_paper(uid, paper)
 
 
 def person_bibref_is_touched(pid, bibref):
@@ -812,7 +814,7 @@ def person_bibref_is_touched(pid, bibref):
     if not bibref:
         raise ValueError("A bibref is expected!")
 
-    return tu.person_bibref_is_touched(pid, bibref)
+    return dbapi.person_bibref_is_touched(pid, bibref)
 
 
 def assign_uid_to_person(uid, pid, create_new_pid=False):
@@ -825,7 +827,7 @@ def assign_uid_to_person(uid, pid, create_new_pid=False):
     pid = wash_integer_id(pid)
     uid = wash_integer_id(uid)
 
-    tu.assign_uid_to_person(uid, pid, create_new_pid)
+    dbapi.assign_uid_to_person(uid, pid, create_new_pid)
 
 
 def get_review_needing_records(pid):
@@ -835,7 +837,7 @@ def get_review_needing_records(pid):
     @param pid: pid
     '''
     pid = wash_integer_id(pid)
-    db_data = tu.get_person_papers_to_be_manually_reviewed(pid)
+    db_data = dbapi.get_person_papers_to_be_manually_reviewed(pid)
 
     return [int(row[1]) for row in db_data if row[1]]
 
@@ -848,7 +850,7 @@ def add_review_needing_record(pid, bibrec_id):
     '''
     pid = wash_integer_id(pid)
     bibrec_id = wash_integer_id(bibrec_id)
-    tu.add_person_paper_needs_manual_review(pid, bibrec_id)
+    dbapi.add_person_paper_needs_manual_review(pid, bibrec_id)
 
 
 def del_review_needing_record(pid, bibrec_id):
@@ -859,7 +861,7 @@ def del_review_needing_record(pid, bibrec_id):
     '''
     pid = wash_integer_id(pid)
     bibrec_id = wash_integer_id(bibrec_id)
-    tu.del_person_papers_needs_manual_review(pid, bibrec_id)
+    dbapi.del_person_papers_needs_manual_review(pid, bibrec_id)
 
 
 def get_processed_external_recids(pid):
@@ -873,7 +875,7 @@ def get_processed_external_recids(pid):
     @rtype: list of strings
     '''
 
-    list_str = tu.get_processed_external_recids(pid)
+    list_str = dbapi.get_processed_external_recids(pid)
 
     return list_str.split(";")
 
@@ -890,7 +892,7 @@ def set_processed_external_recids(pid, recid_list):
     if isinstance(recid_list, list):
         recid_list_str = ";".join(recid_list)
 
-    tu.set_processed_external_recids(pid, recid_list_str)
+    dbapi.set_processed_external_recids(pid, recid_list_str)
 
 
 def arxiv_login(req):
@@ -925,11 +927,6 @@ def arxiv_login(req):
     pinfo = session['personinfo']
     ticket = session['personinfo']['ticket']
 
-    uid = getUid(req)
-    curren_pid = tu.get_personid_from_uid([[uid]])
-    if curren_pid[1]:
-        return curren_pid[0][0]
-
     uinfo = collect_user_info(req)
     pinfo['external_first_entry'] = True
     session.save()
@@ -938,7 +935,7 @@ def arxiv_login(req):
     name = ''
     surname = ''
     try:
-        for i in  uinfo['external_arxivids'].split(';'):
+        for i in uinfo['external_arxivids'].split(';'):
             arxiv_p_ids.append(i)
         name = uinfo['external_firstname']
         surname = uinfo['external_familyname']
@@ -955,13 +952,20 @@ def arxiv_login(req):
             found_bibrecs.append(i)
     #found_bibrecs = [78]
 
+    uid = getUid(req)
+    pid = dbapi.get_personid_from_uid([[uid]])
+    if pid[1]:
+        pid_bibrecs = dbapi.get_all_personids_recs(pid[0][0])
+        pid_bibrecs = set(pid_bibrecs)
+        found_bibrecs = [bib for bib in found_bibrecs if int(bib) in pid_bibrecs]
+
     bibrec_names = []
     for b in found_bibrecs:
-        bibrec_names.append([b, bu.get_field_values_on_condition(b, source='API', get_table=['100', '700'], get_tag='a')])
+        bibrec_names.append([b, get_field_values_on_condition(b, source='API', get_table=['100', '700'], get_tag='a')])
 
     for n in list(bibrec_names):
         for i in list(n[1]):
-            if bau.soft_compare_names(surname, i.encode('utf-8')) < 0.4:
+            if nameapi.soft_compare_names(surname, i.encode('utf-8')) < 0.4:
                 n[1].remove(i)
     #bibrec_names = [[78, set([u'M\xfcck, W'])]]
 
@@ -970,38 +974,40 @@ def arxiv_login(req):
 
     for bibrec in bibrec_names:
         for name in bibrec[1]:
-            bibrefs = tu0.get_bibrefs_from_name_string(name.encode('utf-8'))
+            bibrefs = dbapi.get_bibrefs_from_name_string(name.encode('utf-8'))
             if len(bibrefs) < 1:
                 continue
             for bibref in bibrefs[0][0].split(','):
                 bibrefrecs.append(str(bibref) + ',' + str(bibrec[0]))
     #bibrefrec = ['100:116,78', '700:505,78']
 
-
-    brr = [[i] for i in bibrefrecs]
-    possible_persons = tu.get_possible_personids_from_paperlist(brr)
-    #[[0L, ['700:316,10']]]
-    possible_persons = sorted(possible_persons, key=lambda k: len(k[1]))
-
     person_papers = []
-    if len(possible_persons) > 1:
-        if len(possible_persons[0][1]) > len(possible_persons[1][1]):
-            pid = tu.assign_person_to_uid(uid, possible_persons[0][0])
+    if not pid[1]:
+        brr = [[i] for i in bibrefrecs]
+        possible_persons = dbapi.get_possible_personids_from_paperlist(brr)
+        #[[0L, ['700:316,10']]]
+        possible_persons = sorted(possible_persons, key=lambda k: len(k[1]))
+
+        if len(possible_persons) > 1:
+            if len(possible_persons[0][1]) > len(possible_persons[1][1]):
+                pid = dbapi.assign_person_to_uid(uid, possible_persons[0][0])
+                person_papers = possible_persons[0][1]
+            else:
+                pid = dbapi.assign_person_to_uid(uid, -1)
+        elif len(possible_persons) == 1:
+            pid = dbapi.assign_person_to_uid(uid, possible_persons[0][0])
             person_papers = possible_persons[0][1]
         else:
-            pid = tu.assign_person_to_uid(uid, -1)
-    elif len(possible_persons) == 1:
-        pid = tu.assign_person_to_uid(uid, possible_persons[0][0])
-        person_papers = possible_persons[0][1]
+            pid = dbapi.assign_person_to_uid(uid, -1)
     else:
-        pid = tu.assign_person_to_uid(uid, -1)
+        pid = long(pid[0][0])
 
     tempticket = []
     #now we have to open the tickets...
     for bibref in person_papers:
         tempticket.append({'pid':pid, 'bibref':bibref, 'action':'confirm'})
 
-    done_bibrecs = [b.split(',')[1] for b in person_papers]
+    done_bibrecs = set(b.split(',')[1] for b in person_papers)
     for b in found_bibrecs:
         if str(b) not in done_bibrecs:
             tempticket.append({'pid':pid, 'bibref':str(b), 'action':'confirm'})
@@ -1096,7 +1102,7 @@ def check_transaction_permissions(uid, bibref, pid, action):
     is_superadmin = isUserSuperAdmin({'uid': uid})
 
     access_right = _resolve_maximum_acces_rights(uid)
-    bibref_status = tu.get_bibref_modification_status(bibref)
+    bibref_status = dbapi.get_bibref_modification_status(bibref)
     old_flag = bibref_status[0]
 
     if old_flag == 2 or old_flag == -2:
@@ -1109,7 +1115,7 @@ def check_transaction_permissions(uid, bibref, pid, action):
         if old_flag != new_flag:
             c_override = True
 
-    uid_pid = tu.get_personid_from_uid([[uid]])
+    uid_pid = dbapi.get_personid_from_uid([[uid]])
     if not uid_pid[1] or pid != uid_pid[0][0]:
         c_own = False
 
@@ -1157,7 +1163,7 @@ def delete_request_ticket(pid, ticket):
     @param pid: pid (int)
     @param ticket: ticket id (int)
     '''
-    tu.delete_request_ticket(pid, ticket)
+    dbapi.delete_request_ticket(pid, ticket)
 
 
 def delete_transaction_from_request_ticket(pid, tid, action, bibref):
@@ -1187,7 +1193,7 @@ def delete_transaction_from_request_ticket(pid, tid, action, bibref):
         delete_request_ticket(pid, tid)
         return
 
-    tu.update_request_ticket(pid, rt, tid)
+    dbapi.update_request_ticket(pid, rt, tid)
 
 
 def create_request_ticket(userinfo, ticket):
@@ -1239,7 +1245,7 @@ def create_request_ticket(userinfo, ticket):
         data.append(['date', ctime()])
         for i in tic[pid]:
             data.append(i)
-        tu.update_request_ticket(pid, data)
+        dbapi.update_request_ticket(pid, data)
         pidlink = get_person_redirect_link(pid)
 
         m("%s/person/%s?open_claim=True#tabTickets" % (CFG_SITE_URL, pidlink))
@@ -1341,12 +1347,12 @@ def create_new_person(uid, uid_is_owner=False):
     @return: the resulting person ID of the new person
     @rtype: int
     '''
-    pid = tu.create_new_person(uid, uid_is_owner=uid_is_owner)
+    pid = dbapi.create_new_person(uid, uid_is_owner=uid_is_owner)
 
     return pid
 
 
-def execute_action(action, pid, bibref, uid, userinfo='', comment=''):
+def execute_action(action, pid, bibref, uid, gather_list, userinfo='', comment=''):
     '''
     Executes the action, setting the last user right according to uid
 
@@ -1369,52 +1375,29 @@ def execute_action(action, pid, bibref, uid, userinfo='', comment=''):
     elif pid < 0:
         return False
     elif pid == -3:
-        pid = tu.create_new_person(uid, uid_is_owner=False)
+        pid = dbapi.create_new_person(uid, uid_is_owner=False)
     elif not is_valid_bibref(bibref):
         return False
 
     user_level = _resolve_maximum_acces_rights(uid)[1]
 
     if action in ['confirm', 'assign']:
-        tu.insert_user_log(userinfo, pid, 'assign', 'CMPUI_ticketcommit', bibref, comment)
-        tu.confirm_papers_to_person([pid], [[bibref]], user_level)
+        dbapi.insert_user_log(userinfo, pid, 'assign', 'CMPUI_ticketcommit', bibref, comment)
+        dbapi.confirm_papers_to_person((str(pid),), [[bibref]], gather_list, user_level)
     elif action in ['repeal']:
-        tu.insert_user_log(userinfo, pid, 'repeal', 'CMPUI_ticketcommit', bibref, comment)
-        tu.reject_papers_from_person([pid], [[bibref]], user_level)
+        dbapi.insert_user_log(userinfo, pid, 'repeal', 'CMPUI_ticketcommit', bibref, comment)
+        dbapi.reject_papers_from_person((str(pid),), [[bibref]], gather_list, user_level)
     elif action in ['reset']:
-        tu.insert_user_log(userinfo, pid, 'reset', 'CMPUI_ticketcommit', bibref, comment)
-        tu.reset_papers_flag([pid], [[bibref]])
+        dbapi.insert_user_log(userinfo, pid, 'reset', 'CMPUI_ticketcommit', bibref, comment)
+        dbapi.reset_papers_flag((str(pid),), [[bibref]], gather_list)
     else:
         return False
+
+    #This is the only point which modifies a person, so this can trigger the 
+    #deletion of a cached page
+    dbapi.delete_cached_author_page(pid)
+
     return True
-
-
-def get_bibref_name_string(bibref):
-    '''
-    Returns the name string associated to a name string
-    @param bibref: bibrefrec '100:123,123'
-    @return: string
-    '''
-    name = ""
-    ref = ""
-
-    if not (bibref and isinstance(bibref, str) and bibref.count(":")):
-        return name
-
-    if bibref.count(","):
-        try:
-            ref = bibref.split(",")[0]
-        except (ValueError, TypeError, IndexError):
-            return name
-    else:
-        ref = bibref
-
-    dbname = tu0.get_bibref_name_string(((ref,),))
-
-    if dbname:
-        name = dbname
-
-    return name
 
 
 def sign_assertion(robotname, assertion):
@@ -1453,4 +1436,4 @@ def get_personid_status_cacher():
     @return: DataCacher Object
     @rtype: DataCacher
     '''
-    return tu.get_personid_status_cacher()
+    return dbapi.get_personid_status_cacher()

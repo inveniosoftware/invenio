@@ -16,27 +16,28 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = bibauthorid_comparison_functions
-
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibauthorid.py \
-             bibauthorid_general_functions.py \
-             bibauthorid_realauthor_utils.py \
-             bibauthorid_tables_utils.py \
-             bibauthorid_virtualauthor_utils.py \
-             bibauthorid_authorname_utils.py \
-             bibauthorid_personid_tables_utils.py \
-             bibauthorid_structs.py \
-             bibauthorid_templates.py \
-             bibauthorid_utils.py \
-             bibauthorid_webinterface.py \
-             bibauthorid_config.py \
+pylib_DATA = bibauthorid_backinterface.py \
              bibauthorid_cli.py \
+             bibauthorid_cluster_set.py \
+             bibauthorid_comparison.py \
+             bibauthorid_config.py \
              bibauthorid_daemon.py \
-             bibauthorid_file_utils.py \
+             bibauthorid_dbinterface.py \
+             bibauthorid_frontinterface.py \
+             bibauthorid_general_utils.py \
+             bibauthorid_name_utils.py \
+             bibauthorid_personid_maintenance.py \
+             bibauthorid_prob_matrix.py \
+             bibauthorid_searchinterface.py \
+             bibauthorid_string_utils.py \
+             bibauthorid_templates.py \
              bibauthorid_webapi.py \
-             bibauthorid_tests.py
+             bibauthorid_webinterface.py \
+             bibauthorid_wedge.py \
+             __init__.py
+
 
 jsdir=$(localstatedir)/www/js
 

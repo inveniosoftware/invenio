@@ -28,14 +28,6 @@ import time
 import os.path as osp
 
 import bibauthorid_config as bconfig
-import bibauthorid as engine
-import bibauthorid_structs as dat
-
-from bibauthorid_file_utils import populate_structs_from_files
-from bibauthorid_file_utils import write_mem_cache_to_files
-from bibauthorid_file_utils import make_directory
-
-#log = bconfig.get_logger("bibauthor.cli")
 
 
 def main():
@@ -46,64 +38,13 @@ def main():
         bconfig.LOGGER.error("Please provide parameters!")
         _display_help()
 
-    run_daemon = True
-    standalone_option = ("-S", "--standalone", "-j", "--job-dir")
+    try:
+        import bibauthorid_daemon as daemon
+    except ImportError:
+        bconfig.LOGGER.error("Hmm...No Daemon process running.")
+        return
 
-    for option in standalone_option:
-        for arg in arguments:
-            if arg.startswith(option):
-                run_daemon = False
-
-    if run_daemon:
-        daemon = None
-        try:
-            import bibauthorid_daemon as daemon
-        except ImportError:
-            bconfig.LOGGER.error("Hmm...No Daemon process running.")
-
-        if daemon:
-            daemon.bibauthorid_daemon()
-    else:
-        options = _read_options(arguments)
-
-        if options["job_dir"]:
-            job_dir = options["job_dir"]
-
-            if job_dir.endswith("/"):
-                job_dir = job_dir[0:-1]
-
-            log_name = osp.abspath(job_dir).split("/")
-            logfile = "%s/%s.log" % (job_dir, log_name[-1])
-
-            start = time.time()
-
-            bconfig.init_logger(logfile)
-            populate_structs_from_files(job_dir)
-
-            bconfig.LOGGER.debug("| Loaded %s records."
-                                 % len(dat.RELEVANT_RECORDS))
-
-            engine.start_computation(process_doclist=True,
-                             process_orphans=True,
-                             print_stats=True)
-
-            result_path = "%s/results/" % (job_dir,)
-
-            if make_directory(result_path):
-                write_mem_cache_to_files(result_path, is_result=True)
-            else:
-                bconfig.LOGGER.error("Cannot write to destination: "
-                                     "Cannot create directory")
-
-            end = time.time() - start
-
-            bconfig.LOGGER.log(25, "Finish! The computation finished in %.2fs"
-                               % (end))
-            bconfig.stop_and_close_logger()
-        else:
-            bconfig.LOGGER.error("Standalone mode without parameters "
-                                 "does not do anything helpful. Please"
-                                 "consult -h help message for usage")
+    daemon.bibauthorid_daemon()
 
 
 def _display_help():
@@ -120,36 +61,9 @@ General options:
                             below the number will be ignored. Equal and above
                             will be shovn. Debugging=10, Info=20, Bibauthorid
                             default log=25, Warnings=30, Errors=40]
-  -S, --standalone          Switches on stand alone mode. This is required
-                            for jobs that should run on a set of files rather
-                            than on the database (e.g. this is needed on the
-                            grid). Without this switch no standalone job will
-                            start or perform.
 
 Daemon mode options:
  Commands:
-  NOTE: Options -n, -a, -U, -G and -R are mutually exclusive (XOR)!
-  -n, --lastname=STRING     Process only authors with this last name.
-  -a, --process-all         The option for cleaning all authors.
-  -U, --update-universe     Update bibauthorid universe. Find modified and
-                            newly entered records and process all the authors
-                            on these records.
-  -G, --prepare-grid        Prepares a set of files that supply the
-                            pre-clustered data needed for stand alone job to
-                            run (e.g. needed on the grid). The behavior of
-                            this export can be controlled with the
-                            options -d (required), -p and -m (both optional).
-  -R, --load-grid-results   Loads the results from the grid jobs
-                            and writes them to the database. The behavior of
-                            this import can be controlled with the
-                            options -d (required).
-      --update-cache        Updates caches to the newly introduced changes
-                            (new and modified documents).
-                            This should be called daily or better more then
-                            once per day, to ensure the correct operation of
-                            the frontend (and the backend).
-      --clean-cache         Clean the cache from out of date contents
-                            (deleted documents).
       --repair-personid     Deletes untouched person entities to then
                             re-create and updated these entities.
       --fast-update-personid    Updates personid adding not yet assigned papers to the system,
@@ -164,25 +78,8 @@ Daemon mode options:
                             perform the update an all existing record ids. Be
                             WARNED that this will empty and re-fill all aid*
                             tables in the process!
-  -d, --data-dir=DIRNAME    Specifies the data directory, in which the data for
-                            the grid preparation will be stored to or loaded
-                            from. It requires the -G or -R switch.
-  -p, --prefix=STRING       Specifies the prefix of the directories created
-                            under the --data-dir directory. Optional.
-                            Defaults to 'job'. It requires the -G switch.
-  -m, --max-records=NUM     Specifies the number of records that
-                            shall be stored per job package. Optional.
-                            Defaults to 4000 and requires -G switch.
 
-Standalone mode options:
-  -j, --job-dir=DIRECTORY   Run the job on the files found under the path
-                            specified here. Supplying a directory is mandatory.
-                            The results of the process will be stored in a
-                            sub directory of --job-dir named 'results'. These
-                            results can be loaded into the db with the -R
-                            option of this command line tool.
-
-Examples (daemon mode):
+Examples:
   - Process all records that hold an author with last name 'Ellis':
       $ bibauthorid -u admin --lastname "Ellis"
   - Process all records and regard all authors:
@@ -192,10 +89,6 @@ Examples (daemon mode):
   - Prepare job packages in folder 'gridfiles' with the sub directories
     prefixed with 'task' and a maximum number of 2000 records per package:
       $ bibauthorid -u admin --prepare-grid -d gridfiles -p task -m 2000
-
-Examples (standalone mode):
-  - Process the job package stored in folder 'grid_data/job0'
-      $ bibauthorid -S --job-dir=grid_data/job0
 """
     sys.exit(1)
 
@@ -214,19 +107,6 @@ def _read_options(options_string):
     """Reads the options, test if the specified values are consistent and
     populates the options dictionary."""
     options = {
-        "lastname": "None,",
-        "do_all": False,
-        "output_limit": 20,
-        "prepare_grid": False,
-        "prefix": "job",
-        "data_dir": "data_dir",
-        "standalone": False,
-        "job_dir": False,
-        "max_records": 4000,
-        "load_grid_results": False,
-        "update": False,
-        "update_cache": False,
-        "clean_cache": False,
         "record_ids" : None,
         "all_records": False,
         "repair_pid": False,
@@ -235,13 +115,9 @@ def _read_options(options_string):
     }
 
     try:
-        short_flags = "r:n:v:i:d:p:j:m:USGRahV"
-        long_flags = ["lastname=", "verbose=", "recid=",
-            "process-all", "help", "version", "prepare-grid", "prefix=",
-            "data-dir=", "standalone", "job-dir=", "max-records=",
-            "load-grid-results", "update-universe", "update-cache",
-            "clean-cache", "record-ids=", "all-records", "repair-personid",
-            "fast-update-personid", "personid-gc"]
+        short_flags = "hVv:r:"
+        long_flags = ["verbose=", "help", "version", "record-ids=", "all-records",
+                      "repair-personid", "fast-update-personid", "personid-gc"]
         opts, args = getopt.gnu_getopt(options_string, short_flags, long_flags)
     except getopt.GetoptError, err1:
         print >> sys.stderr, "Parameter problem: %s" % err1
@@ -250,33 +126,11 @@ def _read_options(options_string):
     # 2 dictionaries containing the option linked to its destination in the
     # options dictionary.
     with_argument = {
-        "-n": "lastname",
-        "--lastname": "lastname",
-        "-d": "data_dir",
-        "--data-dir": "data_dir",
-        "-p": "prefix",
-        "--prefix": "prefix",
-        "-j": "job_dir",
-        "--job-dir": "job_dir",
-        "-m": "max_records",
-        "--max-records": "max_records",
         "--record-ids": "record_ids",
         "-r": "record_ids"
     }
 
     without_argument = {
-        "-a": "do_all",
-        "--process-all": "do_all",
-        "-U": "update",
-        "--update-universe": "update",
-        "-G": "prepare_grid",
-        "--prepare-grid": "prepare_grid",
-        "-S": "standalone",
-        "--standalone": "standalone",
-        "-R": "load_grid_results",
-        "--load-grid-results": "load_grid_results",
-        "--update-cache": "update_cache",
-        "--clean-cache": "clean_cache",
         "--all-records": "all_records",
         "--repair-personid": "repair_pid",
         "--fast-update-personid":"fast_update_personid",

@@ -26,7 +26,11 @@ bibauthorid_config
 import logging.handlers
 import sys
 import os.path as osp
-from invenio.access_control_config import SUPERADMINROLE
+
+try:
+    from invenio.access_control_config import SUPERADMINROLE
+except ImportError:
+    SUPERADMINROLE = "Superadmin"
 
 
 GLOBAL_CONFIG = True
@@ -44,6 +48,7 @@ try:
         CFG_BIBAUTHORID_ON_AUTHORPAGES, \
         CFG_BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE, \
         CFG_INSPIRE_SITE
+
 except ImportError:
     GLOBAL_CONFIG = False
 
@@ -147,6 +152,10 @@ if GLOBAL_CONFIG and CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N:
 else:
     PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N = 0.5
 
+#personid fast assign papers minimum name threshold: names below will create new persons,
+#names over will add the paper to the most compatible one
+PERSONID_FAST_ASSIGN_PAPERS_MIN_NAME_TRSH = 0.8
+
 #Create_new_person flags thresholds
 PERSONID_CNP_FLAG_1 = 0.75
 PERSONID_CNP_FLAG_MINUS1 = 0.5
@@ -238,16 +247,21 @@ LOGGER = logging.getLogger("Dummy")
 LOGGER.addHandler(DEFAULT_HANDLER)
 LOGGER.setLevel(LOG_LEVEL)
 
+
 ## force skip ui arxiv stub page (specific for inspire)
 BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = True
 
 if GLOBAL_CONFIG and CFG_INSPIRE_SITE:
     BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = CFG_BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE
+else:
+    BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = True
+
 
 ## URL for the remote INSPIRE login that shall be shown on (arXiv stub page.)
 BIBAUTHORID_CFG_INSPIRE_LOGIN = ""
 
-if CFG_INSPIRE_SITE:
+
+if GLOBAL_CONFIG and CFG_INSPIRE_SITE:
     BIBAUTHORID_CFG_INSPIRE_LOGIN = 'https://arxiv.org/inspire_login'
 
 if not LOGGERS:

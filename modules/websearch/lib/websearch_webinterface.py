@@ -265,16 +265,17 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         self.personid = -1
         self.authorname = " "
         self.person_data_available = False
+        self.must_fallback_on_person_search = False
         self.person_search_results = None
-        self.cache_supported = False
-        self.pt = None
+        self.search_query = None
         try:
-            import bibauthorid_personid_tables_utils as pt
+            import invenio.bibauthorid_searchinterface as pt
             self.cache_supported = True
             self.pt = pt
         except ImportError:
             self.cache_supported = False
-        self.pt = pt
+            self.pt = None
+            raise AssertionError
 
     def _lookup(self, component, path):
         """This handler parses dynamic URLs (/author/John+Doe)."""
@@ -354,13 +355,13 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             from invenio.bibauthorid_webapi import get_person_redirect_link
             from invenio.bibauthorid_webapi import is_valid_canonical_id
             from invenio.bibauthorid_webapi import get_personid_status_cacher
-            from invenio.bibauthorid_utils import create_normalized_name
-            from invenio.bibauthorid_utils import split_name_parts
+            from invenio.bibauthorid_name_utils import create_normalized_name
+            from invenio.bibauthorid_name_utils import split_name_parts
 #            from invenio.bibauthorid_config import CLAIMPAPER_CLAIM_OTHERS_PAPERS
             from invenio.bibauthorid_config import AID_ENABLED
             from invenio.bibauthorid_config import AID_ON_AUTHORPAGES
             bibauthorid_template = invenio.template.load('bibauthorid')
-            import bibauthorid_personid_tables_utils as pt
+            import bibauthorid_searchinterface as pt
             is_bibauthorid = True
         except ImportError:
             return self.create_authorpage(req, form)
@@ -441,7 +442,6 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
         if self.personid > -1:
             return
-
         #check if it is a canonical ID (e.g. Ellis_J_1):
         if is_bibauthorid and is_valid_canonical_id(self.pageparam):
             try:
@@ -497,7 +497,8 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                 self.personid = test_results[0][0]
             else:
                 self.person_search_results = sorted_results
-
+                self.search_query = nquery
+                self.must_fallback_on_person_search = True
 
     def create_authorpage(self, req, form, return_html=False):
         '''
@@ -526,8 +527,8 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             from invenio.bibauthorid_webapi import get_person_redirect_link
             from invenio.bibauthorid_webapi import is_valid_canonical_id
             from invenio.bibauthorid_webapi import get_personid_status_cacher
-            from invenio.bibauthorid_utils import create_normalized_name
-            from invenio.bibauthorid_utils import split_name_parts
+            from invenio.bibauthorid_name_utils import create_normalized_name
+            from invenio.bibauthorid_name_utils import split_name_parts
 #            from invenio.bibauthorid_config import CLAIMPAPER_CLAIM_OTHERS_PAPERS
             from invenio.bibauthorid_config import AID_ENABLED
             from invenio.bibauthorid_config import AID_ON_AUTHORPAGES
@@ -542,6 +543,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             is_bibauthorid = False
 
         from operator import itemgetter
+        import time
 
         argd = wash_urlargd(form,
                             {'ln': (str, CFG_SITE_LANG),
@@ -590,8 +592,8 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         if is_bibauthorid:
             self.resolve_personid(param_recid)
 
-            if self.person_search_results:
-                if bibauthorid_template and nquery:
+            if self.must_fallback_on_person_search:
+                if bibauthorid_template and self.search_query:
                     authors = []
 
                     for results in self.person_search_results:
@@ -603,7 +605,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                                         authorpapers[0:4]])
 
                     srch = bibauthorid_template.tmpl_author_search
-                    body = srch(nquery, authors, author_pages_mode=True)
+                    body = srch(self.search_query, authors, author_pages_mode=True)
 
                     if return_html:
                         html.append(body)
@@ -611,6 +613,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                     else:
                         req.write(body)
                         return
+        import time
         # start page
 #        req.content_type = "text/html"
 #        req.send_http_header()
