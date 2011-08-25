@@ -102,7 +102,6 @@ class Template:
                 }
             }
         </script>
-        <script type="text/javascript" src="%(site_url)s/js/jquery.min.js"></script>
         <script type="text/javascript" src="%(site_url)s/js/ui.datepicker.min.js"></script>
         """ % {'site_url':CFG_SITE_URL}
 

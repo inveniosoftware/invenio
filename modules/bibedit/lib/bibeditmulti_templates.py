@@ -749,8 +749,7 @@ div .boxleft_2 {
     def scripts(self):
         """Returns the scripts that should be imported."""
 
-        scripts = ["jquery.min.js",
-                   "json2.js",
+        scripts = ["json2.js",
                    "bibeditmulti.js"]
 
         result = ""

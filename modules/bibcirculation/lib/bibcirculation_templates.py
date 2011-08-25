@@ -864,7 +864,6 @@ class Template:
         out = """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />
-        <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
         <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
         <form name="request_form" action="%s/%s/%s/holdings/send" method="get" >
@@ -921,7 +920,7 @@ class Template:
           <br />
           <br />
         </form>
-        """ % (CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL,
+        """ % (CFG_SITE_URL, CFG_SITE_URL,
                CFG_SITE_URL, CFG_SITE_RECORD, recid,
                _("Enter your period of interest"),
                _("From"),CFG_SITE_URL, today, _("To"), CFG_SITE_URL, more_6_months,
@@ -1008,7 +1007,6 @@ class Template:
             <style type="text/css"> @import url("/js/tablesorter/themes/blue/style.css"); </style>
             <style type="text/css"> @import url("/js/tablesorter/addons/pager/jquery.tablesorter.pager.css"); </style>
 
-            <script src="/js/jquery.min.js" type="text/javascript"></script>
             <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script src="/js/tablesorter/addons/pager/jquery.tablesorter.pager.js" type="text/javascript"></script>
             <script type="text/javascript">
@@ -1194,7 +1192,6 @@ class Template:
             <style type="text/css"> @import url("/js/tablesorter/themes/blue/style.css"); </style>
             <style type="text/css"> @import url("/js/tablesorter/addons/pager/jquery.tablesorter.pager.css"); </style>
 
-            <script src="/js/jquery.min.js" type="text/javascript"></script>
             <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script src="/js/tablesorter/addons/pager/jquery.tablesorter.pager.js" type="text/javascript"></script>
             <script type="text/javascript">
@@ -2248,7 +2245,6 @@ class Template:
                           </tr>
                 </table>
 
-                <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
                 <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
                 <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
@@ -2271,7 +2267,7 @@ class Template:
                         _("Address"), address,
                         _("Mailbox"), mailbox,
                         _("List of borrowed books"),
-                        CFG_SITE_URL,CFG_SITE_URL,
+                        CFG_SITE_URL,
                         _("Item"), _("Barcode"),
                         _("Library"), _("Location"),
                         _("Due date"), _("Write note(s)"))
@@ -4057,7 +4053,6 @@ class Template:
             <style type="text/css"> @import url("/js/tablesorter/themes/blue/style.css"); </style>
             <style type="text/css"> @import url("/js/tablesorter/addons/pager/jquery.tablesorter.pager.css"); </style>
 
-            <script src="/js/jquery.min.js" type="text/javascript"></script>
             <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script src="/js/tablesorter/addons/pager/jquery.tablesorter.pager.js" type="text/javascript"></script>
             <script type="text/javascript">
@@ -4237,7 +4232,6 @@ class Template:
             <style type="text/css"> @import url("/js/tablesorter/themes/blue/style.css"); </style>
             <style type="text/css"> @import url("/js/tablesorter/addons/pager/jquery.tablesorter.pager.css"); </style>
 
-            <script src="/js/jquery.min.js" type="text/javascript"></script>
             <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script src="/js/tablesorter/addons/pager/jquery.tablesorter.pager.js" type="text/javascript"></script>
             <script type="text/javascript">
@@ -7919,7 +7913,6 @@ class Template:
 
         out += """
 
-            <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
             <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
             <table class="bibcirctable">
@@ -7935,7 +7928,7 @@ class Template:
               </tr>
             </table>
             <br />
-            """ % (CFG_SITE_URL, CFG_SITE_URL,
+            """ % (CFG_SITE_URL,
                     _("New due date: "), CFG_SITE_URL, due_date)
 
 
@@ -8416,7 +8409,6 @@ class Template:
 
         out += """
 
-        <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
         <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
         <form name="request_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/create_new_request_step4" method="get" >
@@ -8463,7 +8455,7 @@ class Template:
         </table>
         <br />
         <br />
-       """ % (CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL,
+       """ % (CFG_SITE_URL, CFG_SITE_URL,
               _("Enter the period of interest"),
               _("From:  "), CFG_SITE_URL, datetime.date.today().strftime('%Y-%m-%d'),
               _("To:  "), CFG_SITE_URL, (datetime.date.today() + datetime.timedelta(days=365)).strftime('%Y-%m-%d'))
@@ -8903,7 +8895,6 @@ class Template:
 
         out += """
 
-                <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
                 <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
 
@@ -8958,7 +8949,7 @@ class Template:
                 <br />
                 <br />
                 </div>
-                """ % (CFG_SITE_URL ,CFG_SITE_URL,
+                """ % (CFG_SITE_URL,
                         _("Enter the period of interest"),
                         _("From:  "), CFG_SITE_URL, datetime.date.today().strftime('%Y-%m-%d'),
                         _("To:  "),  CFG_SITE_URL, (datetime.date.today() + datetime.timedelta(days=365)).strftime('%Y-%m-%d'),
@@ -9361,7 +9352,6 @@ class Template:
 
         out += """
 
-                <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
                 <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
                 <table class="bibcirctable">
@@ -9417,7 +9407,7 @@ class Template:
                 <br />
                 <br />
                 </div>
-                """ % (CFG_SITE_URL, CFG_SITE_URL,
+                """ % (CFG_SITE_URL,
                        _("Loan information"),
                        _("Loan date"),  datetime.date.today().strftime('%Y-%m-%d'),
                        _("Due date"), CFG_SITE_URL, renew_loan_for_X_days(barcode),
@@ -9526,7 +9516,6 @@ class Template:
 
         out += """
 
-        <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
         <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
              <table class="bibcirctable">
@@ -9547,7 +9536,7 @@ class Template:
                  <td>
                    <select name="vendor_id"  style='border: 1px solid #cfcfcf'>
 
-                """ % (CFG_SITE_URL, CFG_SITE_URL,
+                """ % (CFG_SITE_URL,
                        _("Order details"), _("Barcode"),  _("Vendor"))
 
         for(vendor_id, name) in list_of_vendors:
@@ -10733,9 +10722,8 @@ class Template:
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
             <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
-            """% (CFG_SITE_URL, CFG_SITE_URL)
+            """% CFG_SITE_URL
 
         out += """
              <table class="bibcirctable">
@@ -11143,9 +11131,8 @@ class Template:
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
             <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
-            """% (CFG_SITE_URL, CFG_SITE_URL)
+            """% (CFG_SITE_URL)
 
         (_borrower_id, borrower_name, borrower_email, borrower_mailbox,
          period_from, period_to, item_info, borrower_comments, only_this_edition, request_type) = ill_request_borrower_details
@@ -13062,7 +13049,6 @@ class Template:
 
         out += """
 
-        <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
         <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
              <table class="bibcirctable">
@@ -13076,7 +13062,7 @@ class Template:
                     <td class="bibcirccontent">
                     <select name="vendor_id"  style='border: 1px solid #cfcfcf'>
 
-                    """ % (CFG_SITE_URL, CFG_SITE_URL, _("Order details"), _("Vendor"))
+                    """ % (CFG_SITE_URL, _("Order details"), _("Vendor"))
 
         for(vendor_id, name) in list_of_vendors:
             if vendor_id == vendor:
@@ -14340,7 +14326,6 @@ class Template:
         conditions_link = """<a href="http://library.web.cern.ch/library/Library/ill_faq.html" target="_blank">conditions</a>"""
 
         out += """
-        <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
         <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
              <table class="bibcirctable">
@@ -14362,7 +14347,7 @@ class Template:
 
                     </td>
                 </tr>
-                """% (CFG_SITE_URL, CFG_SITE_URL,
+                """% (CFG_SITE_URL,
                       _("ILL request details"),
                       _("Period of interest (From)"),
                       CFG_SITE_URL,
@@ -15267,7 +15252,6 @@ class Template:
             <style type="text/css"> @import url("/js/tablesorter/themes/blue/style.css"); </style>
             <style type="text/css"> @import url("/js/tablesorter/addons/pager/jquery.tablesorter.pager.css"); </style>
 
-            <script src="/js/jquery.min.js" type="text/javascript"></script>
             <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script src="/js/tablesorter/addons/pager/jquery.tablesorter.pager.js" type="text/javascript"></script>
             <script type="text/javascript">
@@ -16174,7 +16158,6 @@ class Template:
         #conditions_link = """<a href="http://library.web.cern.ch/library/Library/ill_faq.html" target="_blank">conditions</a>"""
 
         out += """
-            <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
             <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
              <table class="bibcirctable">
@@ -16228,7 +16211,7 @@ class Template:
              <br />
              <br />
              </div>
-             """ % (CFG_SITE_URL,CFG_SITE_URL,_("ILL request details"),
+             """ % (CFG_SITE_URL,_("ILL request details"),
                     _("Period of interest - From"), CFG_SITE_URL, datetime.date.today().strftime('%Y-%m-%d'),
                     _("Period of interest - To"), CFG_SITE_URL, (datetime.date.today() + datetime.timedelta(days=365)).strftime('%Y-%m-%d'),
                     _("Additional comments"),
@@ -16513,7 +16496,6 @@ class Template:
         out += """
         <div class="bibcircbottom">
         <link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />
-        <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
         <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
         <form name="search_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ill_search_result" method="get" >
         <br />
@@ -16535,7 +16517,7 @@ class Template:
                 <td width=10><input type="text" size="50" name="p" style='border: 1px solid #cfcfcf'></td>
             </tr>
         </table>
-        """ % (CFG_SITE_URL,CFG_SITE_URL,CFG_SITE_URL,CFG_SITE_URL)
+        """ % (CFG_SITE_URL,CFG_SITE_URL,CFG_SITE_URL)
 
         out += """
         <br />

@@ -137,12 +137,11 @@ class Template:
         """
         Generates the statistics of the last errors
         """
-        out = """<script src="%s/js/jquery.min.js"></script>
-                 <h4>Invenio error log</h4>
+        out = """<h4>Invenio error log</h4>
                  <h5>Ranking</h5>
                  <pre>%s</pre>
                  <h5>Last errors</h5>
-""" % (CFG_SITE_URL, cgi.escape(invenio_ranking))
+""" % (cgi.escape(invenio_ranking))
         lines = invenio_last_errors.splitlines()
         error_number = len(lines)
         for line in lines:
@@ -778,8 +777,7 @@ Distribution across %s
                 f_date = datetime.datetime.now().strftime("%m/%d/%Y %H:%M")
             sel += """<link rel="stylesheet" href="%(CFG_SITE_URL)s/img/jquery-ui.css"
                         type="text/css" />
-                      <script language="javascript" type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery.min.js"></script>
-                     <script language="javascript" type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui-1.7.3.custom.min.js"></script>
+                      <script language="javascript" type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui-1.7.3.custom.min.js"></script>
                       <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui-timepicker-addon.js"></script>
 
                       <div id="selectDateTxt" onload style="position:relative;display:none">

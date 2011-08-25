@@ -51,6 +51,12 @@ js_DATA = bibedit_display.js \
           bibedit_clipboard.js \
           bibedit_template_interface.js
 
+install-data-hook:
+	## Let's initialize an empty jquery.min.js, so that if the admin does not
+	## run make install-jquery-plugins, at least when jquery.min.js is
+	## downloaded by the client browser, no 404 error is raised.
+	@touch $(jsdir)/jquery.min.js
+
 EXTRA_DIST = $(pylib_DATA) \
              $(js_DATA)
 

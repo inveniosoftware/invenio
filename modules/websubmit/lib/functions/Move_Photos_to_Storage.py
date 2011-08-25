@@ -384,7 +384,6 @@ def create_photos_manager_interface(sysno, session_id, uid,
     </div>
 
 
-    <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery.min.js"></script>
     <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery.uploadify.min.js"></script>
     <script type="text/javascript" src="%(CFG_SITE_URL)s/js/swfobject.js"></script>
     <script type="text/javascript" src="%(CFG_SITE_URL)s/js/ui.core.js"></script>

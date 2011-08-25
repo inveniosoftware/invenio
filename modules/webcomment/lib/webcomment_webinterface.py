@@ -239,7 +239,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             if CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS:
                 mathjaxheader = get_mathjax_header()
             jqueryheader = '''
-            <script src="%(CFG_SITE_URL)s/js/jquery.min.js" type="text/javascript" language="javascript"></script>
             <script src="%(CFG_SITE_URL)s/js/jquery.MultiFile.pack.js" type="text/javascript" language="javascript"></script>
             ''' % {'CFG_SITE_URL': CFG_SITE_URL}
 
@@ -476,7 +475,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 title = _("Add Comment")
 
             jqueryheader = '''
-            <script src="%(CFG_SITE_URL)s/js/jquery.min.js" type="text/javascript" language="javascript"></script>
             <script src="%(CFG_SITE_URL)s/js/jquery.MultiFile.pack.js" type="text/javascript" language="javascript"></script>
             ''' % {'CFG_SITE_URL': CFG_SITE_URL}
 

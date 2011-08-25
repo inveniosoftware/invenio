@@ -1803,7 +1803,6 @@ def create_graph_trend_flot(trend, path, settings):
     """Creates the graph trend using the flot library"""
     out = """<!--[if IE]><script language="javascript" type="text/javascript"
                     src="%(site)s/js/excanvas.min.js"></script><![endif]-->
-              <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.min.js"></script>
               <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.flot.min.js"></script>
               <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.flot.selection.min.js"></script>
               <script id="source" language="javascript" type="text/javascript">

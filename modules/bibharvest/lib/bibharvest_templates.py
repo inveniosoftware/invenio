@@ -527,7 +527,6 @@ class Template:
             returning the HTML headers necessary in order to open the view holdingpen page
         """
         return """
-    <script type="text/javascript" src="%s/js/jquery.min.js"></script>
     <script type="text/javascript" src="%s/js/jquery-treeview/jquery.treeview.js"></script>
     <script type="text/javascript" src="%s/js/jquery-treeview/jquery.treeview.async.js"></script>
     <script type="text/javascript" src="%s/js/ui.core.js"></script>
@@ -538,4 +537,4 @@ class Template:
         var serverAddress = '%s';
     </script>
     <script type="text/javascript" src="%s/js/oai_harvest_admin.js"> </script>
-""" % (CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL)
+""" % (CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL)
