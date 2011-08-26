@@ -6084,7 +6084,7 @@ def begin_extraction(daemon_cli_options=None):
 
         if not done_coltags:
             ## Output opening XML collection tags:
-            ## Initialise ouput xml file if the relevant cli flag/arg exists
+            ## Initialise output xml file if the relevant cli flag/arg exists
             if cli_opts['xmlfile']:
                 try:
                     ofilehdl = open(cli_opts['xmlfile'], 'w')
@@ -6093,11 +6093,12 @@ def begin_extraction(daemon_cli_options=None):
                     ofilehdl.write("%s\n" \
                           % CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8"))
                     ofilehdl.flush()
-                except:
-                    write_message("***%s\n\n" % cli_opts['xmlfile'], \
-                                  sys.stderr, verbose=0)
+                except Exception, err:
+                    write_message("***%s\n%s\n" % (cli_opts['xmlfile'], err), \
+                                      sys.stderr, verbose=0)
                     halt(err=IOError, msg="Error: Unable to write to '%s'" \
-                                  % cli_opts['xmlfile'], exit_code=1)
+                             % cli_opts['xmlfile'], exit_code=1)
+
             ## else, write the xml lines to the stdout
             else:
                 sys.stdout.write("%s\n" \

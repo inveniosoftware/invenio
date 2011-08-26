@@ -19,7 +19,8 @@
 
 """Initialise Refextract task
 """
-import sys, os
+import sys, os, time
+from shutil import copyfile
 from invenio.bibtask import task_init, task_set_option, \
                             task_get_option, write_message, \
                             task_has_option, task_get_task_param
@@ -36,6 +37,7 @@ from invenio.refextract import begin_extraction
 from invenio.refextract import help_message
 from invenio.refextract_config import CFG_REFEXTRACT_JOB_FILE_PARAMS
 
+from tempfile import mkstemp
 
 try:
     ## Used to obtain the file-type of input documents
@@ -369,7 +371,21 @@ def _task_run_core():
         ## enrich the meta-data of the affected records, via bibupload
         ## Only if a named file was given as input
         if task_options:
-            cmd = "%s/bibupload -n -c '%s' " % (CFG_BINDIR, task_options['xmlfile'])
+            try:
+                ## Move contents of file holding xml into a file
+                ## with a timestamp
+                perm_file_fd, perm_file_name = \
+                    mkstemp(suffix='.xml', prefix="refextract_%s" % \
+                                time.strftime("%Y-%m-%d_%H:%M:%S"), \
+                                dir=os.path.join(CFG_TMPDIR, "refextract"))
+                copyfile(daemon_cli_opts['xmlfile'], perm_file_name)
+                os.close(perm_file_fd)
+            except IOError, err:
+                write_message("Error: Unable to copy content to timestamped XML file, %s" \
+                                  % err)
+                return 0
+
+            cmd = "%s/bibupload -n -c '%s' " % (CFG_BINDIR, perm_file_name)
             errcode = 0
             try:
                 errcode = os.system(cmd)
@@ -391,6 +407,9 @@ def _task_run_core():
                 run_sql("INSERT INTO xtrJOB (name, last_updated) VALUES (%s, NOW())", \
                         (task_options['name'],))
 
+            write_message("Reference extraction complete. Saved extraction-job XML file to %s" \
+                              % (perm_file_name))
+
         ## When not calling a predefined extraction-job, display the
         ## directory of the outputted references.
         else:
@@ -404,13 +423,13 @@ def _generate_default_xml_out():
     to this refextract task id. This will be called in a user specified
     xml out file has not been provided.
     @return: (string) output xml file directory"""
+    results_dir = os.path.join(CFG_TMPDIR, "refextract")
     # Write the changes to a temporary file.
-    tmp_directory = "%s/refextract" % CFG_TMPDIR
     filename = "refextract_task_%d.xml" % task_get_task_param('task_id', 0)
-    abs_path = os.path.join(tmp_directory, filename)
+    abs_path = os.path.join(results_dir, filename)
     ## Make the folder, if not exists
-    if not os.path.isdir(tmp_directory):
-        os.mkdir(tmp_directory)
+    if not os.path.isdir(results_dir):
+        os.mkdir(results_dir)
     return abs_path
 
 def _task_submit_check_options():

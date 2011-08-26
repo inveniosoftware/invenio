@@ -63,6 +63,8 @@ CFG_WEBJOURNAL_TTL = 7
 CFG_MAX_ATIME_ZIP_BIBSWORD = 7
 # After how many days to remove obsolete bibsword xml log files
 CFG_MAX_ATIME_RM_BIBSWORD = 28
+# After how many days to remove obsolete refextract xml output files
+CFG_MAX_ATIME_RM_REFEXTRACT = 7
 
 def gc_exec_command(command):
     """ Exec the command logging in appropriate way its output."""
@@ -125,6 +127,12 @@ def clean_logs():
     gc_exec_command('find %s -name "bibsword_*"'
         ' -atime +%s -exec gzip %s -9 {} \;' \
             % (CFG_TMPDIR, CFG_MAX_ATIME_ZIP_BIBSWORD, vstr))
+
+    write_message("- deleting temporary old "
+            "RefExtract files")
+    gc_exec_command('find %s -name "refextract_task_*"'
+        ' -atime +%s -exec rm %s -f {} \;' \
+            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_REFEXTRACT, vstr))
 
     write_message("""CLEANING OF LOG FILES FINISHED""")
 
