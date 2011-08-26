@@ -40,7 +40,7 @@ from invenio.config import CFG_TMPDIR, CFG_SITE_URL, CFG_WEBSUBMIT_FILEDIR, \
 from invenio.bibdocfile import BibRecDocs, BibDoc, InvenioWebSubmitFileError, \
     nice_size, check_valid_url, clean_url, get_docname_from_url, \
     guess_format_from_url, KEEP_OLD_VALUE, decompose_bibdocfile_fullpath, \
-    bibdocfile_url_to_bibdoc, decompose_bibdocfile_url
+    bibdocfile_url_to_bibdoc, decompose_bibdocfile_url, CFG_BIBDOCFILE_AVAILABLE_FLAGS
 
 from invenio.intbitset import intbitset
 from invenio.search_engine import perform_request_search
@@ -306,6 +306,19 @@ def cli2docid(options, recids=None, docids=None):
     else:
         raise StandardError, "No docids matched"
 
+def cli2flags(options):
+    """
+    Transform a comma separated list of flags into a list of valid flags.
+    """
+    flags = getattr(options, 'flags', None)
+    if flags:
+        flags = [flag.strip().upper() for flag in flags.split(',')]
+        for flag in flags:
+            if flag not in CFG_BIBDOCFILE_AVAILABLE_FLAGS:
+                raise StandardError("%s is not among the valid flags: %s" % (flag, ', '.join(CFG_BIBDOCFILE_AVAILABLE_FLAGS)))
+        return flags
+    return []
+
 def cli2description(options):
     """Return a good value for the description."""
     description = getattr(options, 'set_description', None)
@@ -438,6 +451,8 @@ Examples:
         # (note the ^M or \\n before 'allow any')
         # See also $r subfield in <%(site)s/help/admin/bibupload-admin-guide#3.6>
         # and Firerole in <%(site)s/help/admin/webaccess-admin-guide#6>
+    $ bibdocfile --append x.pdf --recid=1 --with-flags='PDF/A,OCRED' # append
+        # to record 1 the file x.pdf specifying the PDF/A and OCRED flags
     """ % {'site': CFG_SITE_URL}
     query_options = OptionGroup(parser, 'Query options')
 
@@ -492,6 +507,7 @@ Examples:
     revising_options.add_option("--with-versions", dest="version", help="specifies the version(s) to be used with hard-delete, hide, revert, e.g.: 1-2,3 or all")
     revising_options.add_option("--with-format", dest="format", help='to specify a format when appending/revising/deleting/reverting a document, e.g. "pdf"', metavar='FORMAT')
     revising_options.add_option("--with-hide-previous", dest='hide_previous', action='store_true', help='when revising, hides previous versions', default=False)
+    revising_options.add_option("--with-flags", dest='flags', help='comma-separated optional list of flags used when appending/revising a document. Valid flags are: %s' % ', '.join(CFG_BIBDOCFILE_AVAILABLE_FLAGS), default=None)
     parser.add_option_group(revising_options)
 
     housekeeping_options = OptionGroup(parser, 'Actions for housekeeping')
@@ -575,6 +591,7 @@ def cli_append(options, append_path):
     restriction = cli2restriction(options)
     doctype = cli2doctype(options)
     docname = cli2docname(options, url=append_path)
+    flags = cli2flags(options)
     if not docname:
         raise OptionValueError, 'Not enough information to retrieve a valid docname'
     format = cli2format(options, append_path)
@@ -592,7 +609,8 @@ def cli_append(options, append_path):
         'restriction' : restriction,
         'doctype' : doctype,
         'format' : format,
-        'url' : url
+        'url' : url,
+        'options': flags
     }]}
     return bibupload_ffts(ffts, append=True)
 
@@ -604,6 +622,9 @@ def cli_revise(options, revise_path):
     restriction = cli2restriction(options)
     docname = cli2docname(options, url=revise_path)
     hide_previous = getattr(options, 'hide_previous', None)
+    flags = cli2flags(options)
+    if hide_previous and 'PERFORM_HIDE_PREVIOUS' not in flags:
+        flags.append('PERFORM_HIDE_PREVIOUS')
     if not docname:
         raise OptionValueError, 'Not enough information to retrieve a valid docname'
     format = cli2format(options, revise_path)
@@ -620,7 +641,7 @@ def cli_revise(options, revise_path):
         'doctype' : doctype,
         'format' : format,
         'url' : url,
-        'options' : hide_previous and ['PERFORM_HIDE_PREVIOUS'] or None
+        'options' : flags
     }]}
     return bibupload_ffts(ffts)
 
