@@ -390,6 +390,13 @@ def _task_run_core():
                 ## This task does not exist in the db, add it
                 run_sql("INSERT INTO xtrJOB (name, last_updated) VALUES (%s, NOW())", \
                         (task_options['name'],))
+
+        ## When not calling a predefined extraction-job, display the
+        ## directory of the outputted references.
+        else:
+            write_message("Reference extraction complete. Saved references XML file to %s" \
+                              % (daemon_cli_opts['xmlfile']))
+
     return True
 
 def _generate_default_xml_out():
