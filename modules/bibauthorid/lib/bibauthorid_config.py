@@ -242,7 +242,7 @@ if GLOBAL_CONFIG:
     BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = CFG_BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE
 else:
     BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = True
-BIBAUTHORID_CFG_INSPIRE_LOGIN = 'https://arxiv.org/inspire_login'
+BIBAUTHORID_CFG_INSPIRE_LOGIN = 'http://arxiv.org/inspire_login'
 
 if not LOGGERS:
     LOGGERS.append(logging.getLogger("Dummy"))
