@@ -103,8 +103,8 @@ CFG_BIBTASK_DEFAULT_TASK_SETTINGS = {
         'number': 5,
     },
     'refextract' : {
-        'recid'       : [],
-        'collection'  : [],
+        'recids'       : [],
+        'collections'  : [],
     },
 }
 

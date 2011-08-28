@@ -82,6 +82,6 @@ CFG_REFEXTRACT_XML_RECORD_OPEN      = u"<record>"
 CFG_REFEXTRACT_XML_RECORD_CLOSE     = u"</record>"
 
 ## Job task file valid parameters
-CFG_REFEXTRACT_JOB_FILE_PARAMS = ('collection', 'raw-references',
+CFG_REFEXTRACT_JOB_FILE_PARAMS = ('collection', 'recid', 'raw-references',
                                   'output-raw-refs', 'xmlfile', 'dictfile',
                                   'inspire', 'kb-journal', 'kb-report-number', 'verbose')

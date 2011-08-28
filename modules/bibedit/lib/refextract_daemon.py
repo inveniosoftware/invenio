@@ -67,14 +67,28 @@ def _recid_exists(recid):
         return True
     return False
 
+## What differs here from the extraction-job params: collection*s* and recid*s*
+possible_task_option_keys = ('collections', 'recids', 'raw-references',
+                             'output-raw-refs', 'xmlfile', 'dictfile',
+                             'inspire', 'kb-journal', 'kb-report-number', 'verbose')
+
 def _task_submit_elaborate_specific_parameter(key, value, opts, args):
     """ Must be defined for bibtask to create a task """
     if args and len(args) > 0:
         ## There should be no standalone arguments for any refextract job
         ## This will catch args before the job is shipped to Bibsched
         raise StandardError("Error: Unrecognised argument '%s'.\n" % args[0])
+
     ## Task name specified
     if key in ('-e', '--extraction-job'):
+
+        ## Make sure that the user is not mixing job name with other defined
+        ## Refextract flags on the command line
+        if filter(lambda p: task_get_option(p), possible_task_option_keys):
+            write_message("Error: cli and extraction-job extraction parameters specified together.")
+            write_message("The extraction-job flag cannot be mixed with other cli flags.")
+            return False
+
         ## ---- Get the task file with this name
         task_file_dir = os.path.join(CFG_ETCDIR, 'bibedit')
         ## The job file name
@@ -92,22 +106,24 @@ def _task_submit_elaborate_specific_parameter(key, value, opts, args):
         ## ---- Get the database 'last_updated' value for this name
         xtrJOB_row = _task_name_exists(value)
         ## Build the information for this extraction job
-        ## These dictionarys will be extended with extra file parameters
+        ## These dictionaries will be extended with extra file parameters
         if xtrJOB_row:
             task_info = {'id'           :   xtrJOB_row[0][0],
                          'name'         :   xtrJOB_row[0][1],
                          'last_updated' :   xtrJOB_row[0][2],
-                         'collection'   :   [],}
+                         'collections'  :   [],
+                         'recids'       :   [],}
         else:
             ## Save the name as the input argument for this job
             task_info = {'name'         :   value,
                          'last_updated' :   None,
-                         'collection'   :   [],}
+                         'collections'  :   [],
+                         'recids'       :   [],}
         ## ---- Save job parameters
         for p in file_params:
             p = p.strip()
             ## Ignore comments and titles, and skip blank lines
-            if not p or p.startswith('#') or p.startswith("["):
+            if (not p) or p.startswith('#') or p.startswith("["):
                 continue
             ## Split arguments just once
             p_args = map(lambda x: x.strip(), p.split("=", 1))
@@ -121,84 +137,126 @@ def _task_submit_elaborate_specific_parameter(key, value, opts, args):
             if p_args[0] == 'collection':
                 ## Separate and strip collections
                 collections = map(lambda c: c.strip(), p_args[1].split(','))
-                for coll in collections:
-                    if coll:
-                        task_info['collection'].append(coll)
+                task_info['collections'].extend([c for c in collections if c.strip()])
+
 #FIXME add author extraction functionality
 #            elif p_args[0] == 'extraction-mode':
 #                if p_args[0] == 'authors':
 #                    task_set_option('authors', p_args[1])
+
+            elif p_args[0] == 'recid':
+                recids = p_args[1].split(",")
+                task_info['recids'].extend([r for r in recids if r.strip()])
             elif len(p_args) == 2:
                 ## All other flags
                 task_info[p_args[0]] = p_args[1]
             else:
                 ## Standalone flag
                 task_info[p_args[0]] = 1
-        ## ---- Set job information for this task
+
+        if not ('xmlfile' in task_info):
+            task_info['xmlfile'] = _generate_default_xml_out()
+
+        ## Used to flag the creation of a bibupload task
         task_set_option('extraction-job', task_info)
-    # Recid option
-    elif key in ("-i", "--recid"):
-        split_recids = value.split(":")
-        if len(split_recids) == 2:
-            first = last = valid_range = None
-            try:
-                first = int(split_recids[0])
-                last = int(split_recids[1])
-                valid_range = first < last
-            except ValueError:
-                write_message("Error: Range values for --recid must be integers, "
-                    "not '%s'." % value, stream=sys.stdout, verbose=0)
-            if first is None or last is None:
-                return False
-            if not _recid_exists(first) or not _recid_exists(last) or not valid_range:
-                write_message("Error: '%s' is not a valid range of record ID's." % value,
-                    stream=sys.stdout, verbose=0)
-                return False
-            task_get_option('recid').extend(range(first, last))
-        else:
-            int_val = None
-            try:
-                int_val = int(value)
-            except ValueError:
-                write_message("Error: The value specified for --recid must be a "
-                    "valid integer, not '%s'." % value, stream=sys.stdout,
-                    verbose=0)
-            if not _recid_exists(value) or int_val is None:
-                write_message("Error: '%s' is not a valid record ID." % value,
-                    stream=sys.stdout, verbose=0)
-                return False
-            task_get_option('recid').append(value)
-    # Collection option
-    elif key in ("-c", "--collection"):
-        collection_row = _collection_exists(value)
-        if not collection_row:
-            write_message("Error: '%s' is not a valid collection." % value,
-                stream=sys.stdout, verbose=0)
+
+        ## using the extraction-job options...
+        ## set the task options
+        for option, value in task_info.items():
+            if option == 'collections':
+                for collection in value:
+                    collection_row = _collection_exists(collection)
+                    if not collection_row:
+                        write_message("Error: '%s' is not a valid collection." % collection,
+                            stream=sys.stdout, verbose=0)
+                        return 0
+                    ## Use the collection name matched from the database
+                    task_get_option(option).append(collection_row[0][0])
+            elif option == 'recids':
+                for recid in value:
+                    if not _recid_exists(recid):
+                        write_message("Error: '%s' is not a valid record id." % recid,
+                            stream=sys.stdout, verbose=0)
+                        return 0
+                    ## Add this valid record id to the list of record ids
+                    task_get_option(option).append(recid)
+            elif option not in ('id', 'name', 'last_updated'):
+                ## Usual way of setting options, but this time from the extraction-job file
+                task_set_option(option, value)
+
+    else:
+        ## Quick check to see if an extraction job has also been specified
+        if task_has_option('extraction-job'):
+            write_message("Error: cli and extraction-job extraction parameters specified together.")
+            write_message("The extraction-job flag cannot be mixed with other cli flags.")
             return False
-        task_get_option('collection').append(collection_row[0][0])
-    elif key in ('-z', '--raw-references'):
-        task_set_option('raw-references', 1)
-    elif key in ('-r', '--output-raw-refs'):
-        task_set_option('output-raw-refs', 1)
-    elif key in ('-x', '--xmlfile'):
-        task_set_option('xmlfile', value)
-    elif key in ('-d', '--dictfile'):
-        task_set_option('dictfile', value)
-    elif key in ('-p', '--inspire'):
-        task_set_option('inspire', 1)
-    elif key in ('-j', '--kb-journal'):
-        task_set_option('kb-journal', value)
-    elif key in ('-n', '--kb-report-number'):
-        task_set_option('kb-report-number', value)
+
+        # Recid option
+        elif key in ("-i", "--recid"):
+            split_recids = value.split(":")
+            if len(split_recids) == 2:
+                first = last = valid_range = None
+                try:
+                    first = int(split_recids[0])
+                    last = int(split_recids[1])
+                    valid_range = first < last
+                except ValueError:
+                    write_message("Error: Range values for --recid must be integers, "
+                        "not '%s'." % value, stream=sys.stdout, verbose=0)
+                if first is None or last is None:
+                    return False
+                if not _recid_exists(first) or not _recid_exists(last) or not valid_range:
+                    write_message("Error: '%s' is not a valid range of record ID's." % value,
+                        stream=sys.stdout, verbose=0)
+                    return False
+                task_get_option('recids').extend(range(first, last))
+            else:
+                int_val = None
+                try:
+                    int_val = int(value)
+                except ValueError:
+                    write_message("Error: The value specified for --recid must be a "
+                        "valid integer, not '%s'." % value, stream=sys.stdout,
+                        verbose=0)
+                if not _recid_exists(value) or int_val is None:
+                    write_message("Error: '%s' is not a valid record ID." % value,
+                        stream=sys.stdout, verbose=0)
+                    return False
+                task_get_option('recids').append(value)
+        # Collection option
+        elif key in ("-c", "--collection"):
+            collection_row = _collection_exists(value)
+            if not collection_row:
+                write_message("Error: '%s' is not a valid collection." % value,
+                    stream=sys.stdout, verbose=0)
+                return False
+            task_get_option('collections').append(collection_row[0][0])
+        elif key in ('-z', '--raw-references'):
+            task_set_option('raw-references', True)
+        elif key in ('-r', '--output-raw-refs'):
+            task_set_option('output-raw-refs', True)
+        elif key in ('-x', '--xmlfile'):
+            task_set_option('xmlfile', value)
+        elif key in ('-d', '--dictfile'):
+            task_set_option('dictfile', value)
+        elif key in ('-p', '--inspire'):
+            task_set_option('inspire', True)
+        elif key in ('-j', '--kb-journal'):
+            task_set_option('kb-journal', value)
+        elif key in ('-n', '--kb-report-number'):
+            task_set_option('kb-report-number', value)
     return True
 
-def _get_fulltext_args_from_recids(recids, task_options):
+def _get_fulltext_args_from_recids(recids, task_info):
     """Get list of fulltext locations for input recids
     @param recids: (list) list of recids
     @return: (list) list of strings of the form 'recid:fulltext dir'
     """
     fulltext_arguments = []
-    last_updated = task_get_option('last_updated')
+    last_updated = None
+    if task_info:
+        last_updated = task_info['last_updated']
+
     if recids:
         if last_updated:
             q_get_outdated = "SELECT id FROM bibrec WHERE id IN (%s) AND " \
@@ -251,11 +309,11 @@ def _get_fulltext_args_from_recids(recids, task_options):
                 else:
                     write_message("W: No files exist for recid %s" % \
                                   str(record), stream=sys.stdout, verbose=0)
-        elif task_options:
+        elif task_info:
             ## In the event that no records have been modified since the
             ## last reference extraction
             write_message("No newly modified records for extraction-job '%s'." \
-                          % task_options['name'], stream=sys.stdout, verbose=0)
+                          % task_info['name'], stream=sys.stdout, verbose=0)
     return fulltext_arguments
 
 def _task_run_core():
@@ -288,28 +346,9 @@ def _task_run_core():
                         'kb-report-number'           : 0,
                         'extraction-mode'            : 'ref',
                       }
-    task_options = None
 
-    ## Before appending the Refextract cli options...
-    ## construct all extra task options using file data via extraction-job
-    if task_has_option('extraction-job'):
-        ## Append arguments from named task file
-        task_options = task_get_option('extraction-job')
-        task_options_items = task_options.items()
-        for option in task_options_items:
-            if option[0] == 'collection':
-                for collection in option[1]:
-                    collection_row = _collection_exists(collection)
-                    if not collection_row:
-                        write_message("Error: '%s' is not a valid collection." % collection,
-                            stream=sys.stdout, verbose=0)
-                        return 0
-                    ## Use the collection name matched from the database
-                    task_get_option('collection').append(collection_row[0][0])
-            elif option[0] not in ('id', 'name', 'last_updated'):
-                ## Usual way of setting options, but this time from the extraction-job file
-                task_set_option(option[0], option[1])
-        task_set_option('last_updated', task_options['last_updated'])
+    ## holds the name of the extraction job, and if it's already in the db
+    task_info = task_get_option('extraction-job')
 
     ## Now set the cli options, from the set task options list
     if task_has_option('verbose'):
@@ -334,28 +373,28 @@ def _task_run_core():
         daemon_cli_opts['kb-journal'] = task_get_option('kb-journal')
     if task_has_option('kb-report-number'):
         daemon_cli_opts['kb-report-number'] = task_get_option('kb-report-number')
-    if task_has_option('recid'):
+    if task_get_option('recids'):
         ## Construct the fulltext argument equivalent from record id's
         ## (records, and arguments, which have valid files)
         try:
             fulltexts_for_collection = \
-                _get_fulltext_args_from_recids(task_get_option('recid'), task_options)
+                _get_fulltext_args_from_recids(task_get_option('recids'), task_info)
             daemon_cli_opts['fulltext'].extend(fulltexts_for_collection)
         except Exception, err:
             write_message('Error: Unable to obtain fulltexts for recid %s. %s' \
-                           % (str(task_get_option('recid')), err), \
+                           % (str(task_get_option('recids')), err), \
                            stream=sys.stdout, verbose=0)
             raise StandardError
-    if task_has_option('collection'):
+    if task_get_option('collections'):
         ## Construct the fulltext argument equivalent from record id's
         recids_from_collection = []
-        for collection in task_get_option('collection'):
+        for collection in task_get_option('collections'):
             recids_from_collection = \
                 _append_recid_collection_list(collection, recids_from_collection)
         ## Construct the fulltext argument equivalent for collection recid's
         ## (records, and arguments, which have valid files)
         fulltexts_for_collection = \
-            _get_fulltext_args_from_recids(recids_from_collection, task_options)
+            _get_fulltext_args_from_recids(recids_from_collection, task_info)
         daemon_cli_opts['fulltext'].extend(fulltexts_for_collection)
 
     ## If some records exist which actually need to have their references extracted
@@ -370,7 +409,7 @@ def _task_run_core():
         ## Now, given the references have been output to option 'xmlfile'
         ## enrich the meta-data of the affected records, via bibupload
         ## Only if a named file was given as input
-        if task_options:
+        if task_has_option('extraction-job'):
             try:
                 ## Move contents of file holding xml into a file
                 ## with a timestamp
@@ -398,14 +437,14 @@ def _task_run_core():
                 return 0
             ## Update the extraction_date for each record id,
             ## (only those which have been given to Refextract)
-            if task_options['last_updated']:
+            if task_info['last_updated']:
                 ## If the last updated time exists in the db.. update it
                 run_sql("UPDATE xtrJOB SET last_updated = NOW() WHERE name=%s", \
-                        (task_options['name'],))
+                        (task_info['name'],))
             else:
                 ## This task does not exist in the db, add it
                 run_sql("INSERT INTO xtrJOB (name, last_updated) VALUES (%s, NOW())", \
-                        (task_options['name'],))
+                        (task_info['name'],))
 
             write_message("Reference extraction complete. Saved extraction-job XML file to %s" \
                               % (perm_file_name))
@@ -437,25 +476,14 @@ def _task_submit_check_options():
     before submitting the task, in order for example to provide default
     values. It must return False if there are errors in the options.
     """
-    if task_has_option('extraction-job'):
-        ## Make sure that the user is not mixing job name with other defined
-        ## Refextract flags on the command line
-        if filter(lambda p: task_get_option(p), CFG_REFEXTRACT_JOB_FILE_PARAMS):
-            write_message("Error: cli and extraction-job extraction parameters specified together.")
-            write_message("The extraction-job flag cannot be mixed with other cli flags.")
-            return False
-        job = task_get_option('extraction-job')
-        if not job.has_key('xmlfile'):
-            job['xmlfile'] = _generate_default_xml_out()
-    else:
-        if not task_get_option('recid') and not task_get_option('collection'):
-            write_message('Error: No input file specified', stream=sys.stdout, verbose=0),
-            return False
-        ## Output to a file in tmp, if the user has not specified an output file
-        if not task_get_option('xmlfile', default=False):
-            abs_path = _generate_default_xml_out()
-            ## Set the output
-            task_set_option('xmlfile', abs_path)
+    if not task_get_option('recids') and not task_get_option('collections'):
+        write_message('Error: No input file specified', stream=sys.stdout, verbose=0),
+        return False
+    ## Output to a file in tmp, if the user has not specified an output file
+    if not task_get_option('xmlfile', default=False):
+        abs_path = _generate_default_xml_out()
+        ## Set the output
+        task_set_option('xmlfile', abs_path)
     return True
 
 def refextract_daemon():
