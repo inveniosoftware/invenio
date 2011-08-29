@@ -16,7 +16,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 etcdir = $(sysconfdir)/bibedit/
-etc_DATA = MARC21slim.dtd refextract-journal-titles.kb refextract-report-numbers.kb refextract-authors.kb
+etc_DATA = MARC21slim.dtd refextract-journal-titles.kb refextract-report-numbers.kb \
+	refextract-authors.kb refextract-job-preprints.cfg
 
 rectmpldir = $(etcdir)/record_templates/
 rectmpl_DATA = poem.xml

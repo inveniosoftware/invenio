@@ -30,7 +30,7 @@ CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
                            "oaiharvest", "oairepositoryupdater", "inveniogc",
                            "webstatadmin", "bibclassify", "bibexport",
                            "dbdump", "batchuploader", "bibauthorid", 'bibencode',
-                           "bibtasklet")
+                           "bibtasklet", "refextract")
 
 # Task that should not be reinstatiated
 CFG_BIBTASK_NON_REPETITIVE_TASK = ('bibupload')
@@ -102,8 +102,12 @@ CFG_BIBTASK_DEFAULT_TASK_SETTINGS = {
         'output': CFG_LOGDIR,
         'number': 5,
     },
-    'bibencode' : {               
-    }
+    'bibencode' : {
+    },
+    'refextract' : {
+        'recids'       : [],
+        'collections'  : [],
+    },
 }
 
 CFG_BIBTASK_TASKLETS_PATH = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibsched_tasklets')

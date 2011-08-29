@@ -27,7 +27,7 @@ import sys, re
 import os, getopt
 from time import mktime, localtime, ctime
 
-# make refextract runnable without having to have done the full Invenio installation:
+# make refextract runnable without requiring the full Invenio installation:
 try:
     from invenio.refextract_config \
            import CFG_REFEXTRACT_VERSION, \
@@ -69,6 +69,7 @@ except ImportError:
     CFG_REFEXTRACT_VERSION = "Invenio/%s refextract/%s" % ('standalone', 'standalone')
     CFG_REFEXTRACT_KB_JOURNAL_TITLES = "%s/etc/refextract-journal-titles.kb" % '..'
     CFG_REFEXTRACT_KB_REPORT_NUMBERS = "%s/etc/refextract-report-numbers.kb" % '..'
+    CFG_REFEXTRACT_KB_AUTHORS        = "%s/etc/refextract-authors.kb" % '..'
     CFG_REFEXTRACT_CTRL_FIELD_RECID          = "001" ## control-field recid
     CFG_REFEXTRACT_TAG_ID_REFERENCE          = "999" ## ref field tag
     CFG_REFEXTRACT_IND1_REFERENCE            = "C"   ## ref field ind1
@@ -101,14 +102,20 @@ except ImportError:
     CFG_REFEXTRACT_XML_RECORD_OPEN      = u"<record>"
     CFG_REFEXTRACT_XML_RECORD_CLOSE     = u"</record>"
 
-# make refextract runnable without having to have done the full Invenio installation:
+# make refextract runnable without requiring the full Invenio installation:
 try:
     from invenio.config import CFG_PATH_GFILE, CFG_PATH_PDFTOTEXT
 except ImportError:
     CFG_PATH_GFILE='/usr/bin/file'
     CFG_PATH_PDFTOTEXT='/usr/bin/pdftotext'
 
-# make refextract runnable without having to have done the full Invenio installation:
+# used as a directory for knowledge bases
+try:
+    from invenio.config import CFG_ETCDIR
+except ImportError:
+    CFG_ETCDIR = ".."
+
+# make refextract runnable without requiring the full Invenio installation:
 try:
     from invenio.textutils import encode_for_xml
 except ImportError:
@@ -119,9 +126,24 @@ except ImportError:
         s = string.replace(s, '<', '&lt;')
         return s
 
+## Try to get the bibtask functions, necessary when running refextract
+## as a bibsched task. They won't be needed for standalone execution of
+## Refextract however.
+try:
+    from invenio.bibtask import write_message as \
+                             bibtask_write_message
+    from invenio.bibtask import task_update_progress as \
+                             bibtask_task_update_progress
+    from invenio.bibtask import task_sleep_now_if_required as \
+                             bibtask_task_sleep_now_if_required
+except ImportError:
+    pass
+
+## Holds command line settings
 cli_opts = {}
 
 ## The minimum length of a reference's misc text to be deemed insignificant.
+## when comparing misc text with semi-colon defined sub-references.
 ## Values higher than this value reflect meaningful misc text.
 ## Hence, upon finding a correct semi-colon, but having current misc text
 ## length less than this value (without other meaningful reference objects:
@@ -134,6 +156,117 @@ semi_colon_misc_text_sensitivity = 60
 ## than this value is found, then the latter author group is dumped into misc.
 ## (A higher value will increase splitting strictness. i.e. Fewer splits)
 adjacent_auth_misc_separation = 10
+
+## Help message, used by bibtask's 'task_init()' and 'usage()'
+help_message = """
+
+Refextract tries to extract the reference section from a full-text document.
+Extracted reference lines are processed and any recognised citations are
+marked up using MARC XML. Recognises author names, URL's, DOI's, and also
+journal titles and report numbers as per the relevant knowledge bases. Results
+are output to the standard output stream as default, or instead to an xml file.
+
+Command options:
+  -h, --help           Print this help
+  -V, --version        Print version information
+  -v, --verbose        Verbosity level (0=mute, 1=default info msg,
+                       2=display reference section extraction analysis,
+                       3=display reference line citation processing analysis,
+                       9=max information)
+  -r, --output-raw-refs
+                       Output raw references, as extracted from the document.
+                       No MARC XML mark-up - just each extracted line, prefixed
+                       by the recid of the document that it came from.
+  -x, --xmlfile        Write the extracted references, in xml form, to a file
+                       rather than standard output.
+  -d, --dictfile       Write statistics about all matched title abbreviations
+                       (i.e. LHS terms in the titles knowledge base) to a file.
+  -z, --raw-references Treat the input file as pure references. i.e. skip the
+                       stage of trying to locate the reference section within a
+                       document and instead move to the stage of recognition
+                       and standardisation of citations within lines.
+  -p, --inspire        Output journal standard reference form in the INSPIRE
+                       recognised format: [series]volume,page.
+  -j, --kb-journal     Manually specify the location of a journal title
+                       knowledge-base file.
+  -n, --kb-report-number
+                       Manually specify the location of a report number
+                       knowledge-base file.
+
+Standalone Refextract options:
+  -f, --fulltext       A single pdf or text document (with appended record id)
+                       from where to extract references. [id:path]
+"""
+
+## Is refextract running standalone? (Default = yes)
+running_independently = True
+
+## Default write_message function will dump messages
+## straight onto the specified stream
+## If running as a bibtask, then write_message is overridden
+## with a bibtask version, so messages are logged
+def standalone_write_message(msg, stream=None, verbose=2):
+    """ Acts as the default method, in place of the bibtask defined
+    method when Refextract runs standalone. This will be overridden
+    when Refextract runs as a bibtask (it is scheduled to bibsched) allowing
+    for the messages to be written to the bibsched log instead.
+    @param msg: (string) The message to be written to stdout as default
+    @param stream: (stream) The stream object to be used instead of stdout
+    @param verbose: (integer) The minimum verbosity level when to write this
+    message."""
+    ## cli_opts is a global variable
+    if (not cli_opts.has_key('verbosity')) or cli_opts['verbosity'] >= verbose:
+        if not stream:
+            stream = sys.stdout
+        elif stream not in (sys.stderr, sys.stdout):
+            sys.stderr.write('W: Bad stream.')
+            stream = sys.stdout
+        stream.write(msg.strip()+'\n')
+
+def standalone_task_update_progress(msg):
+    """ Acts as the default method, in place of the bibtask defined
+    method when Refextract runs standalone. This will be overridden
+    when Refextract runs as a bibtask (it is scheduled to bibsched) allowing
+    for the progress column of this task to be updated.
+    @param msg: (string) The message to write to stdout by default."""
+    write_message('--- '+msg)
+
+def standalone_task_sleep_now_if_required(can_stop_too=False):
+    """ Acts as the default method, in place of the bibtask defined
+    method when Refextract runs standalone. This will be overridden
+    when Refextract runs as a bibtask (it is scheduled to bibsched) allowing
+    for the Refextract job to sleep between extracting documents."""
+    return can_stop_too
+
+## Set in begin_extraction, depending on whether Refextract is running
+## as standalone, or as a bibsched task
+## Default functions apply to running in standalone mode
+write_message = standalone_write_message
+task_update_progress = standalone_task_update_progress
+task_sleep_now_if_required = standalone_task_sleep_now_if_required
+
+
+def halt(err=StandardError, msg="", exit_code=1):
+    """ Stop extraction, and deal with the error in the appropriate
+    manner, based on whether Refextract is running in standalone or
+    bibsched mode.
+    @param err: (exception) The exception raised from an error, if any
+    @param msg: (string) The brief error message, either displayed
+    on the bibsched interface, or written to stderr.
+    @param exit_code: (integer) Either 0 or 1, depending on the cause
+    of the halting. This is only used when running standalone."""
+    ## If refextract is running independently, exit.
+    ## 'running_independently' is a global variable
+    if running_independently:
+        if msg:
+            write_message(msg, stream=sys.stderr, verbose=0)
+        sys.exit(exit_code)
+    ## Else, raise an exception so Bibsched will flag this task.
+    else:
+        if msg:
+            ## Update the status of refextract inside the Bibsched UI
+            task_update_progress(msg.strip())
+        raise err(msg)
 
 def massage_arxiv_reportnumber(report_number):
     """arXiv report numbers need some massaging
@@ -295,10 +428,9 @@ def filter_processed_references(out):
         if rec:
             new_out += rec + '\n'
             len_filtered += 1
-    if cli_opts['verbosity'] >= 1 and len(reference_lines) != len_filtered:
-        sys.stdout.write("-----Filter results: unfilter references line length is %d and filtered length is %d\n" \
-              %  (len(reference_lines),len_filtered))
-
+    if len(reference_lines) != len_filtered:
+        write_message("-----Filter results: unfilter references line length is %d and filtered length is %d\n" \
+              %  (len(reference_lines),len_filtered), verbose=2)
     return new_out
 
 def get_url_repair_patterns():
@@ -765,12 +897,12 @@ re_identify_bf_before_vol = \
 
 ## Patterns used for creating institutional preprint report-number
 ## recognition patterns (used by function "institute_num_pattern_to_regex"):
-   ## Recognise any character that isn't a->z, A->Z, 0->9, /, [, ], ' ', '"':
+## Recognise any character that isn't a->z, A->Z, 0->9, /, [, ], ' ', '"':
 re_report_num_chars_to_escape = \
                 re.compile(r'([^\]A-Za-z0-9\/\[ "])', re.UNICODE)
-   ## Replace "hello" with hello:
+## Replace "hello" with hello:
 re_extract_quoted_text = (re.compile(r'\"([^"]+)\"', re.UNICODE), r'\g<1>',)
-   ## Replace / [abcd ]/ with /( [abcd])?/ :
+## Replace / [abcd ]/ with /( [abcd])?/ :
 re_extract_char_class = (re.compile(r' \[([^\]]+) \]', re.UNICODE), \
                           r'( [\g<1>])?')
 ###
@@ -1307,17 +1439,17 @@ def make_extra_author_regex_str():
                """author patterns - failed """ \
                """to read from KB %(kb)s.\n""" \
                % { 'kb' : fpath }
-        sys.stderr.write(emsg)
-        sys.stderr.flush()
-        sys.exit(1)
+        write_message(emsg, sys.stderr, verbose=0)
+        halt(err=IOError, msg="Error: Unable to open author kb '%s'" % fpath, exit_code=1)
 
     for line_num, rawline in enumerate(fh):
         try:
             rawline = rawline.decode("utf-8")
         except UnicodeError:
-            sys.stderr.write("*** Unicode problems in %s for line %s\n" \
-                             % (fpath, str(line_num)))
-            sys.exit(1)
+            write_message("*** Unicode problems in %s for line %s\n" \
+                             % (fpath, str(line_num)), sys.stderr, verbose=0)
+            halt(err=UnicodeError, \
+                 msg="Error: Unable to parse author kb (line: %s)" % str(line_num), exit_code=1)
         if (len(rawline) > 0) and (rawline[0] != '#'):
             add_to_auth_list(rawline)
             ## Shorten collaboration to 'coll'
@@ -1335,7 +1467,7 @@ def make_extra_author_regex_str():
 
 ## Create the regular expression used to find user-specified 'extra' authors
 ## (letter case is not concidered when matching)
-re_extra_auth = re.compile(make_extra_author_regex_str(),re.IGNORECASE)
+re_extra_auth = re.compile(make_extra_author_regex_str(), re.IGNORECASE)
 
 ## The different forms of arXiv notation
 re_arxiv_notation = re.compile("""
@@ -1367,7 +1499,8 @@ def get_recids_and_filepaths(args):
         ## (e.g. arXiv names)
         items = x.split(":", 1)
         if len(items) != 2:
-            sys.stderr.write(u"W: Recid:filepath argument invalid. Skipping.\n")
+            write_message(u"W: Recid:filepath argument invalid. Skipping.\n", \
+                          sys.stderr, verbose=0)
             continue
         jobs.append((items[0], items[1]))
     return jobs
@@ -1687,9 +1820,11 @@ def build_reportnum_knowledge_base(fpath):
             try:
                 rawline = rawline.decode("utf-8")
             except UnicodeError:
-                sys.stderr.write("*** Unicode problems in %s for line %s\n" \
-                                 % (fpath, str(kb_line_num)))
-                sys.exit(1)
+                write_message("*** Unicode problems in %s for line %s\n" \
+                                 % (fpath, str(kb_line_num)), sys.stderr, verbose=0)
+                halt(err=UnicodeError, \
+                         msg="Error: Unable to parse report number kb (line: %s)" % str(kb_line_num), \
+                         exit_code=1)
 
             m_institute_name = re_institute_name.search(rawline)
             if m_institute_name is not None:
@@ -1746,9 +1881,8 @@ def build_reportnum_knowledge_base(fpath):
                """institute preprint referencing patterns - failed """ \
                """to read from KB %(kb)s.\n""" \
                % { 'kb' : fpath }
-        sys.stderr.write(emsg)
-        sys.stderr.flush()
-        sys.exit(1)
+        write_message(emsg, sys.stderr, verbose=0)
+        halt(err=IOError, msg="Error: Unable to open report number kb '%s'" % fpath, exit_code=1)
 
     ## return the preprint reference patterns and the replacement strings
     ## for non-standard categ-strings:
@@ -1818,7 +1952,6 @@ def build_titles_knowledge_base(fpath):
         fh = open(fpath, "r")
         count = 0
         for rawline in fh:
-
             if rawline.find('\\') != -1:
                 continue
             count += 1
@@ -1827,9 +1960,10 @@ def build_titles_knowledge_base(fpath):
             try:
                 rawline = rawline.decode("utf-8").rstrip("\n")
             except UnicodeError:
-                sys.stderr.write("*** Unicode problems in %s for line %s\n" \
-                                 % (fpath, str(count)))
-                sys.exit(1)
+                write_message("*** Unicode problems in %s for line %s\n" \
+                                 % (fpath, str(count)), sys.stderr, verbose=0)
+                halt(err=UnicodeError, msg="Error: Unable to parse journal kb (line: %s)" % str(count), \
+                     exit_code=1)
 
             ## Extract the seek->replace terms from this KB line:
             m_kb_line = p_kb_line.search(rawline)
@@ -1860,8 +1994,8 @@ def build_titles_knowledge_base(fpath):
                        """- KB %(kb)s has errors.\n""" \
                        """- Mapping: %(mapping)s\n""" \
                        % { 'kb' : fpath , 'mapping' : rawline}
-                sys.stderr.write(emsg)
-                sys.exit(1)
+                write_message(emsg, sys.stderr, verbose=0)
+                halt(msg="Error: Unformatted journal kb exp '%s'" % rawline, exit_code=1)
         fh.close()
 
         ## Now, for every 'replacement term' found in the KB, if it is
@@ -1891,9 +2025,8 @@ def build_titles_knowledge_base(fpath):
         emsg = """Error: Could not build list of journal titles - failed """ \
                """to read from KB %(kb)s.\n""" \
                % { 'kb' : fpath }
-        sys.stderr.write(emsg)
-        sys.stderr.flush()
-        sys.exit(1)
+        write_message(emsg, sys.stderr, verbose=0)
+        halt(err=IOError, msg="Error: Unable to open journal kb '%s'" % fpath, exit_code=1)
 
     ## return the raw knowledge base:
     return (kb, standardised_titles, seek_phrases)
@@ -2024,13 +2157,15 @@ def limit_m_tags(xml_file, length_limit):
     try:
         ofilehdl = open(xml_file, 'r')
     except IOError:
-        sys.stdout.write("***%s\n\n" % xml_file)
-        raise IOError("Cannot open %s to read!" % xml_file)
+        write_message("***%s\n\n" % xml_file, verbose=0)
+        halt(err=IOError, msg="Error: Unable to read from '%s'" % xml_file, \
+             exit_code=1)
     try:
         nfilehdl = open(temp_xml_file, 'w')
     except IOError:
-        sys.stdout.write("***%s\n\n" % temp_xml_file)
-        raise IOError("Cannot open %s to write!" % temp_xml_file)
+        write_message("***%s\n\n" % temp_xml_file, verbose=0)
+        halt(err=IOError, msg="Error: Unable to write to '%s'" % temp_xml_file, \
+             exit_code=1)
 
     for line in ofilehdl:
         line_dec = line.decode("utf-8")
@@ -2165,7 +2300,8 @@ def identify_and_tag_URLs(line):
               """list of identified URLs!\nLine pre-URL checking: %s\n""" \
               """Line post-URL checking: %s\n""" \
               % (line_pre_url_check, line)
-        raise IndexError(msg)
+        write_message(msg, sys.stderr, verbose=0)
+        halt(err=IndexError, exit_code=1)
 
     ## return the line containing the tagged URLs:
     return (line, identified_urls)
@@ -2854,8 +2990,8 @@ def start_datafield_element(line_marker):
         @param line_marker: (string) The line marker which will be the sole
         content of the newly created marker subfield. This will always be the
         first subfield to be created for a new datafield element.
-        @return new_datafield: (string) The string holding the relevant
-        datafield and subfield tags.
+        @return: (string) The string holding the relevant datafield and
+        subfield tags.
     """
     new_datafield = """   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">
       <subfield code="%(sf-code-ref-marker)s">%(marker-val)s</subfield>""" \
@@ -2867,7 +3003,7 @@ def start_datafield_element(line_marker):
     }
     return new_datafield
 
-def split_on_semi_colon(misc_txt,line_elements,elements_processed,total_elements):
+def split_on_semi_colon(misc_txt, line_elements, elements_processed, total_elements):
     """ Given some misc text, see if there are any semi-colons which may indiciate that
         a reference line is in fact two separate citations.
         @param misc_txt: (string) The misc_txt to look for semi-colons within.
@@ -2875,7 +3011,7 @@ def split_on_semi_colon(misc_txt,line_elements,elements_processed,total_elements
             represent an element of a reference which has been processed.
         @param elements_processed: (integer) The number of elements which have been
             *looked at* for this entire reference line, regardless of splits
-        @param citation_elements: (integer) The total number of elements which
+        @param total_elements: (integer) The total number of elements which
             have been identified in the *entire* reference line
         @return: (string) Dipicting where the semi-colon was found in relation to the
             rest of the misc_txt. False if a semi-colon was not found, or one was found
@@ -3411,6 +3547,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
 
 
         elif tag_type == "REPORTNUMBER":
+
             ## This tag is an identified institutional report number:
 
             ## extract the institutional report-number from the line:
@@ -3737,7 +3874,7 @@ def add_tagged_title(reading_line,
         was performed, and before REPORT-NUMBERs and TITLEs were stripped out.
        @param len_title: (integer) the length of the matched TITLE.
        @param matched_title: (string) the matched TITLE text.
-       @previous_match: (string) the previous periodical TITLE citation to
+       @param previous_match: (string) the previous periodical TITLE citation to
         have been matched in the current reference line. It is used when
         replacing an IBID instance in the line.
        @param startpos: (integer) the pointer to the next position in the
@@ -5445,9 +5582,8 @@ def extract_references_from_fulltext(fulltext):
         ## No References
         refs = []
         status = 4
-        if cli_opts['verbosity'] >= 1:
-            sys.stdout.write("-----extract_references_from_fulltext: " \
-                             "ref_sect_start is None\n")
+        write_message("-----extract_references_from_fulltext: " \
+                         "ref_sect_start is None\n", verbose=2)
     else:
         ## If a reference section was found, however weak
         ref_sect_end = \
@@ -5459,9 +5595,8 @@ def extract_references_from_fulltext(fulltext):
             ## No End to refs? Not safe to extract
             refs = []
             status = 5
-            if cli_opts['verbosity'] >= 1:
-                sys.stdout.write("-----extract_references_from_fulltext: " \
-                                 "no end to refs!\n")
+            write_message("-----extract_references_from_fulltext: " \
+                             "no end to refs!\n", verbose=2)
         else:
             ## If the end of the reference section was found.. start extraction
             refs = get_reference_lines(fulltext, \
@@ -5519,8 +5654,7 @@ def convert_PDF_to_plaintext(fpath):
                     % { 'pdftotext' : CFG_PATH_PDFTOTEXT,
                         'filepath'  : fpath.replace("'", "\\'")
                       }
-    if cli_opts['verbosity'] >= 1:
-        sys.stdout.write("%s\n" % cmd_pdftotext)
+    write_message("%s\n" % cmd_pdftotext, verbose=2)
     ## open pipe to pdftotext:
     pipe_pdftotext = os.popen("%s" % cmd_pdftotext, 'r')
     ## read back results:
@@ -5542,9 +5676,8 @@ def convert_PDF_to_plaintext(fpath):
             count += 2
     ## close pipe to pdftotext:
     pipe_pdftotext.close()
-    if cli_opts['verbosity'] >= 1:
-        sys.stdout.write("-----convert_PDF_to_plaintext found: " \
-                         "%s lines of text\n" % str(count))
+    write_message("-----convert_PDF_to_plaintext found: " \
+                     "%s lines of text\n" % str(count), verbose=2)
 
     ## finally, check conversion result not bad:
     if _pdftotext_conversion_is_bad(doclines):
@@ -5558,7 +5691,7 @@ def get_plaintext_document_body(fpath):
        In the case of a plain-text document, this simply means reading the
        contents in from the file. In the case of a PDF/PostScript however,
        this means converting the document to plaintext.
-       @param: fpath: (string) - the path to the fulltext file
+       @param fpath: (string) - the path to the fulltext file
        @return: (list) of strings - each string being a line in the document.
     """
     textbody = []
@@ -5571,15 +5704,15 @@ def get_plaintext_document_body(fpath):
                         % (CFG_PATH_GFILE, fpath.replace("'", "\\'")), "r")
         res_gfile = pipe_gfile.readline()
         pipe_gfile.close()
-
-        if (res_gfile.lower().find("text") != -1 or
-           res_gfile.lower().find("txt") != -1) and \
-           res_gfile.lower().find("pdf") == -1:
+        ## Remove trailing numeration from filename, to check extension
+        if (res_gfile.lower().find("text") != -1) and \
+            (res_gfile.lower().find("pdf") == -1):
             ## plain-text file: don't convert - just read in:
             textbody = []
             for line in open("%s" % fpath, "r").readlines():
                 textbody.append(line.decode("utf-8"))
-        elif res_gfile.lower().find("pdf") != -1:
+        elif (res_gfile.lower().find("pdf") != -1) or \
+            (res_gfile.lower().find("pdfa") != -1):
             ## convert from PDF
             (textbody, status) = convert_PDF_to_plaintext(fpath)
     else:
@@ -5588,7 +5721,7 @@ def get_plaintext_document_body(fpath):
     return (textbody, status)
 
 def write_raw_references_to_stream(recid, raw_refs, strm=None):
-    """Write a lost of raw reference lines to the a given stream.
+    """Write a list of raw reference lines to the a given stream.
        Each reference line is preceeded by the record-id. Thus, if for example,
        the following 2 reference lines were passed to this function:
         [1] See http://invenio-software.org/ for more details.
@@ -5621,55 +5754,25 @@ def write_raw_references_to_stream(recid, raw_refs, strm=None):
 def usage(wmsg="", err_code=0):
     """Display a usage message for refextract on the standard error stream and
        then exit.
-       @param wmsg: (string) - some kind of warning message for the user.
-       @param err_code: (integer) - an error code to be passed to sys.exit,
+       @param wmsg: (string) some kind of brief warning message for the user.
+       @param err_code: (integer) an error code to be passed to halt,
         which is called after the usage message has been printed.
        @return: None.
     """
     if wmsg != "":
         wmsg = wmsg.strip() + "\n"
-    msg = """  Usage: refextract [options] recid:file1 [recid:file2 ...]
+    stnd_help_message = """Usage: refextract [options] -f recid:file1 [-f recid:file2 ...]""" \
+    + help_message + """
+  Examples:
+     refextract -x /home/chayward/refs.xml -f 499:/home/chayward/thesis.pdf
 
-  refextract tries to extract the reference section from a full-text document.
-  Extracted reference lines are processed and any recognised citations are
-  marked up using MARC XML. Results are output to the standard output stream.
-
-  Options:
-   -h, --help     print this help
-   -V, --version  print version information
-   -v, --verbose  verbosity level (0=mute, 1=default info msg,
-                  2=display reference section extraction analysis,
-                  3=display reference line citation processing analysis,
-                  9=max information)
-   -r, --output-raw-refs
-                  output raw references, as extracted from the document.
-                  No MARC XML mark-up - just each extracted line, prefixed
-                  by the recid of the document that it came from.
-   -x, --xmlfile
-                  write the extracted references, in xml form, to a file rather
-                  than standard output.
-   -d, --dictfile
-                  write statistics about all matched title abbreviations
-                  (i.e. LHS terms in the titles knowledge base) to a file.
-   -z, --raw-references
-                  treat the input file as pure references. i.e. skip the stage
-                  of trying to locate the reference section within a document
-                  and instead move to the stage of recognition and
-                  standardisation of citations within lines.
-   -s, --inspire
-                  output journal title numeration in the inspire recognised
-                  format: [series]volume,page,year.
-   -j, --kb-journal
-                  manually specify the location of a journal title knowledge-
-                  base file.
-   -n, --kb-report-number
-                  manually specify the location of a report number knowledge-
-                  base file.
-
-  Example: refextract -x /home/chayward/refs.xml 499:/home/chayward/thesis.pdf
 """
-    sys.stderr.write(wmsg + msg)
-    sys.exit(err_code)
+    ## Display the help information and the warning in the stderr stream
+    ## 'help_message' is global
+    write_message(stnd_help_message, stream=sys.stderr, verbose=0)
+    ## Output error message, either to the stderr stream also or
+    ## on the interface. Stop the extraction procedure
+    halt(msg=wmsg, exit_code=err_code)
 
 def get_cli_options():
     """Get the various arguments and options from the command line and populate
@@ -5681,6 +5784,7 @@ def get_cli_options():
     global cli_opts
     ## dictionary of important flags and values relating to cli call of program:
     cli_opts = { 'treat_as_reference_section' : 0,
+                 'fulltext'                   : [],
                  'output_raw'                 : 0,
                  'verbosity'                  : 0,
                  'xmlfile'                    : 0,
@@ -5691,27 +5795,33 @@ def get_cli_options():
                }
 
     try:
-        myoptions, myargs = getopt.getopt(sys.argv[1:], "hVv:zrx:d:sj:n:", \
+        myoptions, myargs = getopt.getopt(sys.argv[1:], "hVv:f:zrx:d:pj:n:", \
                                           ["help",
                                            "version",
                                            "verbose=",
+                                           "fulltext=",
                                            "raw-references",
                                            "output-raw-refs",
                                            "xmlfile=",
                                            "dictfile=",
                                            "inspire",
                                            "kb-journal=",
-                                           "kb-report-number="])
+                                           "kb-report-number=",])
     except getopt.GetoptError, err:
-        ## Invalid option provided - usage message
-        usage(wmsg="Error: %(msg)s." % { 'msg' : str(err) })
+        if err.opt in ("c", "collection", "i", "recid", "e", "extraction-job"):
+            ## These are arguments designed to be used for the daemon mode only
+            ## They should not be present here.
+            halt(msg="Error: '%s' is a daemon-specific flag and should not be " % err.opt \
+                     + "used with specific fulltext input. \n Use '--help' for flag options.")
+        else:
+            ## Invalid option provided - usage message
+            usage(wmsg="Error: %(msg)s." % { 'msg' : str(err) })
 
     for o in myoptions:
         if o[0] in ("-V","--version"):
             ## version message and exit
-            sys.stdout.write("%s\n" % __revision__)
-            sys.stdout.flush()
-            sys.exit(0)
+            write_message("%s\n" % __revision__, verbose=0)
+            halt(exit_code=0)
         elif o[0] in ("-h","--help"):
             ## help message and exit
             usage()
@@ -5724,6 +5834,9 @@ def get_cli_options():
                 cli_opts['verbosity'] = 0
             else:
                 cli_opts['verbosity'] = int(o[1])
+        elif o[0] in ("-f", "--fulltext"):
+            ## add a pdf/text file from where to extract references
+            cli_opts['fulltext'].append(o[1])
         elif o[0] in ("-z", "--raw-references"):
             ## treat input as pure reference lines:
             cli_opts['treat_as_reference_section'] = 1
@@ -5734,29 +5847,30 @@ def get_cli_options():
             ## Write out the statistics of all titles matched during the
             ## extraction job to the specified file
             cli_opts['dictfile'] = o[1]
-        elif o[0] in ("-s", "--inspire"):
+        elif o[0] in ("-p", "--inspire"):
             ## Output recognised journal titles in the Inspire compatible
             ## format
             cli_opts['inspire'] = 1
-        elif o[0] in ("-j","--kb-journal"):
+        elif o[0] in ("-j", "--kb-journal"):
             ## The location of the journal title kb requested to override
             ## a 'configuration file'-specified kb, holding
             ## 'seek---replace' terms, used when matching titles in references
             cli_opts['kb-journal'] = o[1]
-        elif o[0] in ("-n","--kb-report-number"):
+        elif o[0] in ("-n", "--kb-report-number"):
             ## The location of the report number kb requested to override
             ## a 'configuration file'-specified kb
             cli_opts['kb-report-number'] = o[1]
 
-    # What journal title format are we using?
-    if cli_opts['verbosity'] > 0 and cli_opts['inspire']:
-        sys.stdout.write("--- Using inspire journal title form\n")
-    elif cli_opts['verbosity'] > 0:
-        sys.stdout.write("--- Using invenio journal title form\n")
+    if len(myargs) >= 1:
+        ## some standalone arguments are present, abort
+        usage(wmsg="Error: Unrecognised argument '%s'\n Use '-f' or \
+'--fulltext' to specify each document for extraction." % myargs[0])
 
-    if len(myargs) == 0:
-        ## no arguments: error message
-        usage(wmsg="Error: no full-text.")
+    # What journal title format are we using?
+    if cli_opts['inspire']:
+        write_message("--- Using inspire journal title form\n", verbose=2)
+    else:
+        write_message("--- Using invenio journal title form\n", verbose=2)
 
     return (cli_opts, myargs)
 
@@ -5861,75 +5975,116 @@ def sum_2_dictionaries(dicta, dictb):
             dict_out[key] = dictb[key]
     return dict_out
 
-def main():
-    """Main function.
+def begin_extraction(daemon_cli_options=None):
+    """Starts the core extraction procedure. [Entry point from main]
+       Only refextract_daemon calls this directly, from _task_run_core()
+       @param daemon_cli_options: contains the pre-assembled list of cli flags
+       and values processed by the Refextract Daemon. This is full only when
+       called as a scheduled bibtask inside bibsched.
     """
-    global cli_opts
-    (cli_opts, cli_args) =  get_cli_options()
 
+    global cli_opts, running_independently
+    ## Global 'running mode' dependent functions
+    global write_message, task_update_progress, task_sleep_now_if_required
+
+    ## If running inside as a bibtask, set the functions relating to the
+    ## interface between bibsched and refextract
+    if daemon_cli_options:
+        running_independently = False
+        ## Try to assign the write_message function from bibtask
+        ## which will format log messages properly
+        try:
+            write_message = bibtask_write_message
+            task_update_progress = bibtask_task_update_progress
+            task_sleep_now_if_required = bibtask_task_sleep_now_if_required
+        except NameError:
+            raise StandardError("Error: Unable to import essential bibtask functions.")
+        ## Set the cli options to be those assembled by refextract_daemon
+        cli_opts = daemon_cli_options
+    else:
+        running_independently = True
+        (cli_opts, cli_args) = get_cli_options()
     ## A dictionary to contain the counts of all 'bad titles' found during
     ## this reference extraction job:
     all_found_titles_count = {}
 
-    extract_jobs = get_recids_and_filepaths(cli_args)
+    ## Gather fulltext document locations from input arguments
+    if len(cli_opts['fulltext']) == 0:
+        ## no arguments: error message
+        usage(wmsg="Error: No input file specified.")
+    else:
+        extract_jobs = get_recids_and_filepaths(cli_opts['fulltext'])
+
     if len(extract_jobs) == 0:
         ## no files provided for reference extraction - error message
-        usage()
+        usage(wmsg="Error: No valid input file specified (-f id:file [-f id:file ...])")
 
     ## Read the journal titles knowledge base, creating the search
     ## patterns and replace terms. Check for user-specified journal kb.
     if cli_opts['kb-journal'] != 0:
-        (title_search_kb, \
-         title_search_standardised_titles, \
-         title_search_keys) = \
-                   build_titles_knowledge_base(cli_opts['kb-journal'])
+        titles_kb_file = cli_opts['kb-journal']
     else:
-        (title_search_kb, \
-         title_search_standardised_titles, \
-         title_search_keys) = \
-                   build_titles_knowledge_base(CFG_REFEXTRACT_KB_JOURNAL_TITLES)
+        titles_kb_file = CFG_REFEXTRACT_KB_JOURNAL_TITLES
+
+    ## Do a quick test to see if the specified kb file exists.
+    ## If it does not, assume name and append onto etc directory.
+    if not os.path.exists(titles_kb_file):
+        titles_kb_file = os.path.join(CFG_ETCDIR, 'bibedit', os.path.basename(titles_kb_file))
+
+    (title_search_kb, \
+     title_search_standardised_titles, \
+     title_search_keys) = \
+               build_titles_knowledge_base(titles_kb_file)
 
     ## Read the report numbers knowledge base, creating the search
     ## patterns and replace terms. Check for user-specified rep-no kb.
     if cli_opts['kb-report-number'] != 0:
-        (preprint_reportnum_sre, \
-         standardised_preprint_reportnum_categs) = \
-                   build_reportnum_knowledge_base(cli_opts['kb-report-number'])
+        repno_kb_file = cli_opts['kb-report-number']
     else:
-        (preprint_reportnum_sre, \
-         standardised_preprint_reportnum_categs) = \
-                   build_reportnum_knowledge_base(CFG_REFEXTRACT_KB_REPORT_NUMBERS)
+        repno_kb_file = CFG_REFEXTRACT_KB_REPORT_NUMBERS
+
+    ## Do a quick test to see if the specified kb file exists.
+    ## If it does not, assume name and append onto etc directory.
+    if not os.path.exists(repno_kb_file):
+        repno_kb_file = os.path.join(CFG_ETCDIR, 'bibedit', os.path.basename(repno_kb_file))
+
+    (preprint_reportnum_sre, \
+     standardised_preprint_reportnum_categs) = \
+               build_reportnum_knowledge_base(repno_kb_file)
 
     done_coltags = 0 ## flag to signal that the starting XML collection
                      ## tags have been output to either an xml file or stdout
 
-    for curitem in extract_jobs:
+    for num, curitem in enumerate(extract_jobs):
+        ## Safe to sleep/stop the extraction here
+        task_sleep_now_if_required(can_stop_too=True)
+        ## Update the document extraction number
+        task_update_progress("Extracting from %d of %d" % (num+1, len(extract_jobs)))
+
         how_found_start = -1  ## flag to indicate how the reference start section was found (or not)
         extract_error = 0  ## extraction was OK unless determined otherwise
         ## reset the stats counters:
         count_misc = count_title = count_reportnum = count_url = count_doi = count_auth_group = 0
         recid = curitem[0]
-        if cli_opts['verbosity'] >= 1:
-            sys.stdout.write("--- processing RecID: %s pdffile: %s; %s\n" \
-                             % (str(curitem[0]), curitem[1], ctime()))
+        write_message("--- processing RecID: %s pdffile: %s; %s\n" \
+                         % (str(curitem[0]), curitem[1], ctime()), verbose=2)
 
         ## 1. Get this document body as plaintext:
         (docbody, extract_error) = get_plaintext_document_body(curitem[1])
         if extract_error == 1:
             ## Non-existent or unreadable pdf/text directory.
-            sys.stderr.write("Error: could not open %s for extraction.\n" \
-                             % curitem[1])
-            sys.exit(1)
+            write_message("***%s\n\n" % curitem[1], sys.stderr, verbose=0)
+            halt(msg="Error: Unable to open '%s' for extraction.\n" \
+                 % curitem[1], exit_code=1)
         if extract_error == 0 and len(docbody) == 0:
             extract_error = 3
-        if cli_opts['verbosity'] >= 1:
-            sys.stdout.write("-----get_plaintext_document_body gave: " \
+        write_message("-----get_plaintext_document_body gave: " \
                              "%s lines, overall error: %s\n" \
-                             % (str(len(docbody)), str(extract_error)))
+                             % (str(len(docbody)), str(extract_error)), verbose=2)
 
         if not done_coltags:
             ## Output opening XML collection tags:
-            ## Initialise ouput xml file if the relevant cli flag/arg exists
+            ## Initialise output xml file if the relevant cli flag/arg exists
             if cli_opts['xmlfile']:
                 try:
                     ofilehdl = open(cli_opts['xmlfile'], 'w')
@@ -5938,10 +6093,12 @@ def main():
                     ofilehdl.write("%s\n" \
                           % CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8"))
                     ofilehdl.flush()
-                except:
-                    sys.stdout.write("***%s\n\n" % cli_opts['xmlfile'])
-                    raise IOError("Cannot open %s to write!" \
-                                  % cli_opts['xmlfile'])
+                except Exception, err:
+                    write_message("***%s\n%s\n" % (cli_opts['xmlfile'], err), \
+                                      sys.stderr, verbose=0)
+                    halt(err=IOError, msg="Error: Unable to write to '%s'" \
+                             % cli_opts['xmlfile'], exit_code=1)
+
             ## else, write the xml lines to the stdout
             else:
                 sys.stdout.write("%s\n" \
@@ -5963,11 +6120,10 @@ def main():
                            extract_references_from_fulltext(docbody)
                 if len(reflines) == 0 and extract_error == 0:
                     extract_error = 6
-                if cli_opts['verbosity'] >= 1:
-                    sys.stdout.write("-----extract_references_from_fulltext " \
+                write_message("-----extract_references_from_fulltext " \
                                      "gave len(reflines): %s overall error: " \
                                      "%s\n" \
-                                     % (str(len(reflines)), str(extract_error)))
+                                     % (str(len(reflines)), str(extract_error)), verbose=2)
 
             ## 3. Standardise the reference lines:
             #reflines = test_get_reference_lines()
@@ -6008,20 +6164,20 @@ def main():
                 write_raw_references_to_stream(recid, reflines, rawfilehdl)
                 rawfilehdl.close()
             except:
-                raise IOError("Cannot open raw ref file: %s to write" \
-                              % raw_file)
+                write_message("***%s\n\n" % raw_file, \
+                                  sys.stderr, verbose=0)
+                halt(err=IOError, msg="Error: Unable to write to '%s'" \
+                              % raw_file, exit_code=1)
         ## If found ref section by a weaker method and only found misc/urls then junk it
         ## studies show that such cases are ~ 100% rubbish. Also allowing only
         ## urls found greatly increases the level of rubbish accepted..
         if count_reportnum + count_title == 0 and how_found_start > 2:
             count_misc = count_url = count_doi = count_auth_group = 0
             processed_references = []
-            if cli_opts['verbosity'] >= 1:
-                sys.stdout.write("-----Found ONLY miscellaneous/Urls so removed it how_found_start=  %d\n" % (how_found_start))
-        elif  count_reportnum + count_title  > 0 and how_found_start > 2:
-            if cli_opts['verbosity'] >= 1:
-                sys.stdout.write("-----Found journals/reports with how_found_start=  %d\n" % (how_found_start))
-
+            write_message("-----Found ONLY miscellaneous/Urls so removed it how_found_start=  %d\n" \
+                          % (how_found_start), verbose=2)
+        elif count_reportnum + count_title  > 0 and how_found_start > 2:
+            write_message("-----Found journals/reports with how_found_start=  %d\n" % (how_found_start), verbose=2)
         ## Display the processed reference lines:
         out = display_xml_record(extract_error, \
                                  count_reportnum, \
@@ -6042,18 +6198,16 @@ def main():
         ## Compress multiple 'h' subfields in a datafield
         out = compress_subfields(out,CFG_REFEXTRACT_SUBFIELD_AUTH)
 
-        if cli_opts['verbosity'] >= 1:
-            lines = out.split('\n')
-            sys.stdout.write("-----display_xml_record gave: %s significant " \
-                             "lines of xml, overall error: %s\n" \
-                             % (str(len(lines) - 7), extract_error))
+        lines = out.split('\n')
+        write_message("-----display_xml_record gave: %s significant " \
+                         "lines of xml, overall error: %s\n" \
+                         % (str(len(lines) - 7), extract_error), verbose=2)
         if cli_opts['xmlfile']:
             ofilehdl.write("%s" % (out.encode("utf-8"),))
             ofilehdl.flush()
         else:
             ## Write the record to the standard output stream:
             sys.stdout.write("%s" % out.encode("utf-8"))
-            sys.stdout.flush()
 
     ## If an XML collection was opened, display closing tag
     if done_coltags:
@@ -6083,12 +6237,19 @@ def main():
             dfilehdl.close()
         except IOError, (errno, err_string):
             ## There was a problem writing out the statistics
-            sys.stderr.write("""Error: Unable to write "matched titles" """ \
+            write_message("""Error: Unable to write "matched titles" """ \
                              """statistics to output file %s. """ \
                              """Error Number %d (%s).\n""" \
-                             % (cli_opts['dictfile'], errno, err_string))
-            sys.exit(1)
+                             % (cli_opts['dictfile'], errno, err_string), \
+                             sys.stderr, verbose=0)
+            halt(err=IOError, msg="Error: Unable to write to '%s'" % cli_opts['dictfile'], exit_code=1)
 
+def main():
+    """Main wrapper function for begin_extraction, and is
+    always accessed in a standalone/independent way. (i.e. calling main
+    will cause refextract to run in an independent mode)"""
+    begin_extraction()
+    write_message("--- Extraction complete\n", verbose=2)
 
 def test_get_reference_lines():
     """Returns some test reference lines.

@@ -3996,4 +3996,14 @@ CREATE TABLE IF NOT EXISTS `aidCACHE` (
   INDEX `key-b` (`object_key`),
   INDEX `last_updated-b` (`last_updated`)
 ) ENGINE=MyISAM;
+
+-- refextract tables:
+
+CREATE TABLE `xtrJOB` (
+  `id` tinyint(4) NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) NOT NULL,
+  `last_updated` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
+
 -- end of file
