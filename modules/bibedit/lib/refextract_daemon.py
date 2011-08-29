@@ -406,24 +406,25 @@ def _task_run_core():
             write_message("Error: Unable to extract references.\n%s\n" % \
                 (err.args[0]), stream=sys.stdout, verbose=0)
             raise StandardError
+
+        try:
+            ## Always move contents of file holding xml into a file
+            ## with a timestamp
+            perm_file_fd, perm_file_name = \
+                mkstemp(suffix='.xml', prefix="refextract_%s_" % \
+                            time.strftime("%Y-%m-%d_%H:%M:%S"), \
+                            dir=os.path.join(CFG_TMPDIR, "refextract"))
+            copyfile(daemon_cli_opts['xmlfile'], perm_file_name)
+            os.close(perm_file_fd)
+        except IOError, err:
+            write_message("Error: Unable to copy content to timestamped XML file, %s" \
+                              % err)
+            return 0
+
         ## Now, given the references have been output to option 'xmlfile'
         ## enrich the meta-data of the affected records, via bibupload
         ## Only if a named file was given as input
         if task_has_option('extraction-job'):
-            try:
-                ## Move contents of file holding xml into a file
-                ## with a timestamp
-                perm_file_fd, perm_file_name = \
-                    mkstemp(suffix='.xml', prefix="refextract_%s" % \
-                                time.strftime("%Y-%m-%d_%H:%M:%S"), \
-                                dir=os.path.join(CFG_TMPDIR, "refextract"))
-                copyfile(daemon_cli_opts['xmlfile'], perm_file_name)
-                os.close(perm_file_fd)
-            except IOError, err:
-                write_message("Error: Unable to copy content to timestamped XML file, %s" \
-                                  % err)
-                return 0
-
             cmd = "%s/bibupload -n -c '%s' " % (CFG_BINDIR, perm_file_name)
             errcode = 0
             try:
@@ -453,7 +454,7 @@ def _task_run_core():
         ## directory of the outputted references.
         else:
             write_message("Reference extraction complete. Saved references XML file to %s" \
-                              % (daemon_cli_opts['xmlfile']))
+                              % (perm_file_name))
 
     return True
 
