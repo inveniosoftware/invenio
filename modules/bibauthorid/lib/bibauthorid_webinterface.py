@@ -2286,7 +2286,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                     continue
 
                 authors.append([results[0], results[1],
-                                authorpapers[0:max_num_show_papers]])
+                                authorpapers[0:max_num_show_papers], len(authorpapers)])
 
             search_results = authors
 

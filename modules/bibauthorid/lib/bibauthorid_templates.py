@@ -889,15 +889,19 @@ class Template:
             r = verbiage_dict['data_ns']
             h('<noscript><h5>%s</h5></noscript>' % r)
             canonical_name = get_canonical_id_from_person_id(person_id)
-            h('<div> <strong> Canonical name setup </strong>')
+            if '.' in canonical_name:
+                canonical_name = canonical_name[0:canonical_name.rindex('.')]
+            h('<div><div> <strong> Canonical name setup </strong>')
             h('<div style="margin-top: 15px;"> Current canonical name: %s  <form method="GET" action="%s/person/action">' % (canonical_name, CFG_SITE_URL))
             h('<input type="hidden" name="set_canonical_name" value="True" />')
             h('<input name="canonical_name" id="canonical_name" type="text" style="border:1px solid #333; width:500px;" value="%s" /> ' % canonical_name)
             h('<input type="hidden" name="pid" value="%s" />' % person_id)
             h('<input type="submit" value="set canonical name" class="aid_btn_blue" />')
+            h('<br>NOTE: please note the a number is appended automatically to the name displayed above. This cannot be manually triggered so to ensure unicity of IDs.')
+            h('To change the number if greater then one, please change all the other names first, then updating this one will do the trick. </div>')
             h('</form> </div></div>')
 
-            h('  <b><b>' + self._('... This tab is currently under construction ... ') + '</p>')
+            h('  <br><br>' + self._('... This tab is currently under construction ... ') + '</p>')
             h("  </div>")
 
         h("</div>")
@@ -1411,6 +1415,17 @@ class Template:
             pid = result[0]
             names = result[1]
             papers = result[2]
+            try:
+                total_papers = result[3]
+                if total_papers > 1:
+                    papers_string = '(%s Papers)' % str(total_papers)
+                elif total_papers == 1:
+                    papers_string = '(%s Paper)' % str(total_papers)
+                else:
+                    papers_string = '(No papers)'
+            except IndexError:
+                total_papers = None
+                papers_string = ''
 
             h('<div id="aid_result%s">' % (index % 2))
             h('<div style="padding-bottom:5px;">')
@@ -1447,15 +1462,15 @@ class Template:
                             '<em><a href="%s" id="confirmlink">'
                             '<strong>' + self._('YES!') + '</strong>'
                             + self._(' Attribute Papers To ') +
-                            '%s </a></em></span>')
-                            % (link, get_person_redirect_link(pid)))
+                            '%s %s </a></em></span>')
+                            % (link, get_person_redirect_link(pid), papers_string))
             else:
                 h(('<span style="margin-left: 40px;">'
                             '<em><a href="%s/%s/%s" id="aid_moreinfolink">'
-                            + self._('Publication List ') + '(%s)</a></em></span>')
+                            + self._('Publication List ') + '(%s) %s </a></em></span>')
                             % (CFG_SITE_URL, linktarget,
                                get_person_redirect_link(pid),
-                               get_person_redirect_link(pid)))
+                               get_person_redirect_link(pid), papers_string))
             h('<div class="more-mpid%s" id="aid_moreinfo">' % (pid))
 
             if papers and index < bconfig.PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT:
