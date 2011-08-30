@@ -239,8 +239,10 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
     def display(self, req, form):
 
-        argd = wash_urlargd(form, {'idq': (int, None),
-                                   })
+        argd = wash_urlargd(form, {'idq':   (int, 0),
+                                   'page':  (int, 1),
+                                   'step':  (int, 20),
+                                   'ln':    (str, '')})
 
         uid = getUid(req)
 
@@ -277,6 +279,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         return page(title=_("Your Alerts"),
                     body=perform_request_youralerts_display(uid,
                                                             idq=argd['idq'],
+                                                            page=argd['page'],
+                                                            step=argd['step'],
                                                             ln=argd['ln']),
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % \
                               {'sitesecureurl' : CFG_SITE_SECURE_URL,
