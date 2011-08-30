@@ -64,12 +64,17 @@ CFG_REFEXTRACT_SUBFIELD_URL              = "u"   ## ref url subfield
 CFG_REFEXTRACT_SUBFIELD_URL_DESCR        = "z"   ## ref url-text subfield
 CFG_REFEXTRACT_SUBFIELD_AUTH             = "h"   ## ref author subfield
 
-## refextract statisticts fields:
+## refextract statistics fields:
 CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS   = "999" ## ref-stats tag
 CFG_REFEXTRACT_IND1_EXTRACTION_STATS     = "C"   ## ref-stats ind1
 CFG_REFEXTRACT_IND2_EXTRACTION_STATS     = "6"   ## ref-stats ind2
 CFG_REFEXTRACT_SUBFIELD_EXTRACTION_STATS = "a"   ## ref-stats subfield
 
+## refextract author-extraction fields:
+CFG_REFEXTRACT_AE_TAG_ID_HEAD_AUTHOR     = "100" ## first author-aff details
+CFG_REFEXTRACT_AE_TAG_ID_TAIL_AUTHOR     = "700" ## remaining author-affs
+CFG_REFEXTRACT_AE_SUBFIELD_AUTHOR        = "a"   ## authors subfield
+CFG_REFEXTRACT_AE_SUBFIELD_AFFILIATION   = "u"   ## affiliations subfield
 
 ## Internal tags are used by refextract to mark-up recognised citation
 ## information. These are the "closing tags:
@@ -85,6 +90,8 @@ CFG_REFEXTRACT_MARKER_CLOSING_PAGE       = r"</cds.PG>"
 CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND= r"</cds.AUTHstnd>"
 CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL= r"</cds.AUTHetal>"
 CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL= r"</cds.AUTHincl>"
+
+CFG_REFEXTRACT_MARKER_CLOSING_AFFILIATION= r"</cds.AFF>"
 
 ## XML Record and collection opening/closing tags:
 CFG_REFEXTRACT_XML_VERSION          = u"""<?xml version="1.0" encoding="UTF-8"?>"""

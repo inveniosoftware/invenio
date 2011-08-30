@@ -63,11 +63,16 @@ try:
                   CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND, \
                   CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL, \
                   CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL, \
+                  CFG_REFEXTRACT_MARKER_CLOSING_AFFILIATION, \
                   CFG_REFEXTRACT_XML_VERSION, \
                   CFG_REFEXTRACT_XML_COLLECTION_OPEN, \
                   CFG_REFEXTRACT_XML_COLLECTION_CLOSE, \
                   CFG_REFEXTRACT_XML_RECORD_OPEN, \
-                  CFG_REFEXTRACT_XML_RECORD_CLOSE
+                  CFG_REFEXTRACT_XML_RECORD_CLOSE, \
+                  CFG_REFEXTRACT_AE_SUBFIELD_AUTHOR, \
+                  CFG_REFEXTRACT_AE_SUBFIELD_AFFILIATION, \
+                  CFG_REFEXTRACT_AE_TAG_ID_HEAD_AUTHOR, \
+                  CFG_REFEXTRACT_AE_TAG_ID_TAIL_AUTHOR
 except ImportError:
     CFG_REFEXTRACT_VERSION = "Invenio/%s refextract/%s" % ('standalone', 'standalone')
     CFG_REFEXTRACT_KB_JOURNAL_TITLES = "%s/etc/refextract-journal-titles.kb" % '..'
@@ -102,6 +107,7 @@ except ImportError:
     CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND= r"</cds.AUTHstnd>"
     CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL= r"</cds.AUTHetal>"
     CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL= r"</cds.AUTHincl>"
+    CFG_REFEXTRACT_MARKER_CLOSING_AFFILIATION= r"</cds.AFF>"
     CFG_REFEXTRACT_XML_VERSION          = u"""<?xml version="1.0" encoding="UTF-8"?>"""
     CFG_REFEXTRACT_XML_COLLECTION_OPEN  = u"""<collection xmlns="http://www.loc.gov/MARC21/slim">"""
     CFG_REFEXTRACT_XML_COLLECTION_CLOSE = u"""</collection>\n"""
@@ -980,7 +986,16 @@ re_tagged_citation = re.compile(r"""
           (\s\/)?                ## optional /
           \>                     ## closing of tag (>)
           """, \
-                                  re.UNICODE|re.VERBOSE)
+                                    re.UNICODE|re.VERBOSE)
+
+re_tagged_author_aff_line = re.compile(r"""
+          \<cds\.                ## open tag: <cds.
+          ((AUTHstnd)             ## an Author tag
+          |(AFF))                  ## or an Affiliation tag
+          (\s\/)?                ## optional /
+          \>                     ## closing of tag (>)
+          """, \
+                                           re.UNICODE|re.VERBOSE)
 
 
 ## is there pre-recognised numeration-tagging within a
@@ -3010,10 +3025,10 @@ def create_marc_xml_reference_line(line_marker,
      count_url, \
      count_doi, \
      count_auth_group) = \
-         convert_processed_line_to_marc_xml(line_marker, \
-                                                      tagged_line.replace('\n',''), \
-                                                      identified_dois, \
-                                                      identified_urls)
+         convert_processed_reference_line_to_marc_xml(line_marker, \
+                                                          tagged_line.replace('\n',''), \
+                                                          identified_dois, \
+                                                          identified_urls)
     return (xml_line, count_misc, count_title, \
                count_reportnum, count_url, count_doi, count_auth_group)
 
@@ -3112,7 +3127,7 @@ def check_author_for_ibid(line_elements,author):
     ## If an author does not need to be replicated for an ibid, append nothing to the xml line
     return "", author
 
-def append_datafield_element(line_marker,citation_structure,line_elements,author,xml_line):
+def append_datafield_element(line_marker, citation_structure, line_elements, author, xml_line):
     """ Finish the current datafield element and start a new one, with a new
         marker subfield.
         @param line_marker: (string) The line marker which will be the sole
@@ -3145,6 +3160,30 @@ def append_datafield_element(line_marker,citation_structure,line_elements,author
 
     return xml_line, author
 
+def start_auth_aff_datafield_element(first_author):
+    """ Construct the first line of the XML datafield element,
+        with the relevant datafield tag (depending on if it's
+        the first author-aff pair or not).
+        @param first_author: (boolean) Use the HEAD author tag
+        or the TAIL author tag.
+        @return: (string) The starting datafield line with the
+        appropriate tag.
+    """
+    ## First author/affiliation? (use $100)
+    if first_author:
+        auth_tag = CFG_REFEXTRACT_AE_TAG_ID_HEAD_AUTHOR
+
+    ## use $700
+    else:
+        auth_tag = CFG_REFEXTRACT_AE_TAG_ID_TAIL_AUTHOR
+
+    new_datafield = """   <datafield tag="%(df-tag-auth)s" ind1=" " ind2=" ">""" \
+    % { 'df-tag-auth'            : auth_tag,
+    }
+
+    return new_datafield
+
+
 def start_datafield_element(line_marker):
     """ Start a brand new datafield element with a marker subfield.
         @param line_marker: (string) The line marker which will be the sole
@@ -3153,13 +3192,18 @@ def start_datafield_element(line_marker):
         @return: (string) The string holding the relevant datafield and
         subfield tags.
     """
-    new_datafield = """   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">
+
+    marker_subfield = """
       <subfield code="%(sf-code-ref-marker)s">%(marker-val)s</subfield>""" \
+            % {      'sf-code-ref-marker' : CFG_REFEXTRACT_SUBFIELD_MARKER,
+                     'marker-val'         : encode_for_xml(line_marker)
+            }
+
+    new_datafield = """   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">%(marker-subfield)s""" \
     % {      'df-tag-ref'         : CFG_REFEXTRACT_TAG_ID_REFERENCE,
              'df-ind1-ref'        : CFG_REFEXTRACT_IND1_REFERENCE,
              'df-ind2-ref'        : CFG_REFEXTRACT_IND2_REFERENCE,
-             'sf-code-ref-marker' : CFG_REFEXTRACT_SUBFIELD_MARKER,
-             'marker-val'         : encode_for_xml(line_marker)
+             'marker-subfield'    : marker_subfield
     }
     return new_datafield
 
@@ -3239,8 +3283,53 @@ def dump_or_split_author(misc_txt,line_elements):
 
     return ""
 
+def build_formatted_xml_author_affiliation_line(author_elements, first_author):
+    """ Given a single line, of either:
+    1. auth
+    2. auth, aff
+    3. aff
+    Mark up into an xml form. No splitting heuristics are required, since all
+    authors and associated affiliations will form single lines.
+    @param author_elements: (list) The type of the item (affiliation or author)
+    and the items content (the author or affiliation string)
+    @param first_author: (boolean) Whether or not this is the first author-aff
+    pair to mark up, for this document. This will influence the datafield tag used
+    (100 or 700)
+    @return: (string) The XML version of the passed in author-aff elements.
+    """
+    ## Begin the datafield element (no line marker)
+    xml_line = start_auth_aff_datafield_element(first_author)
 
-def build_formatted_xml_citation(citation_elements,line_marker):
+    line_elements = []
+    citation_structure = []
+    elements_processed = 0
+
+    for element in author_elements:
+
+        if element['type'] == "AUTH":
+            ## Add the author subfield with the author text
+            xml_line += """
+      <subfield code="%(sf-code-ref-auth)s">%(content)s</subfield>""" \
+                % {     'content'               : encode_for_xml(element['content']).strip('()'),
+                        'sf-code-ref-auth'      : CFG_REFEXTRACT_AE_SUBFIELD_AUTHOR,
+                 }
+        elif element['type'] == "AFF":
+            ## Add the affiliation subfield with the affiliation text
+            xml_line += """
+      <subfield code="%(sf-code-ref-auth)s">%(content)s</subfield>""" \
+                % {     'content'               : encode_for_xml(element['content']).strip('()'),
+                        'sf-code-ref-auth'      : CFG_REFEXTRACT_AE_SUBFIELD_AFFILIATION,
+                 }
+        line_elements.append(element)
+
+    ## Close the ending datafield element
+    xml_line += """
+   </datafield>\n"""
+
+    return xml_line
+
+
+def build_formatted_xml_citation(citation_elements, line_marker):
     """ Create the MARC-XML string of the found reference information which was taken
         from a tagged reference line.
         @param citation_elements: (list) an ordered list of dictionary elements,
@@ -3338,7 +3427,6 @@ def build_formatted_xml_citation(citation_elements,line_marker):
         ## Now handle the type dependent actions
         ##TITLE
         if element['type'] == "TITLE":
-
 
             ## If a report number has been marked up, and there's misc text before this title and the last tag
             if is_in_line_elements("REPORTNUMBER",line_elements) and \
@@ -3481,7 +3569,7 @@ def build_formatted_xml_citation(citation_elements,line_marker):
         elif element['type'] == "AUTH":
 
             if element['auth_type'] != 'incl':
-                auth_choice = dump_or_split_author(element['misc_txt'],line_elements)
+                auth_choice = dump_or_split_author(element['misc_txt'], line_elements)
                 if auth_choice == "dump":
                     ## This author is no good, place it into misc text
                     xml_line += """
@@ -3533,9 +3621,102 @@ def build_formatted_xml_citation(citation_elements,line_marker):
 
     return xml_line
 
+def convert_processed_auth_aff_line_to_marc_xml(line, first_author):
+    """ Given a line holding either tagged authors, affiliations or both, convert it to its
+        MARC-XML representation.
+
+        @param line: (string) The tagged author-affiliation line. The line may hold a
+        single author, an author and an affiliation, or an affiliation.
+        @return xml_line: (string) the MARC-XML representation of the tagged author/aff line
+        @return count_*: (integer) the number of * (pieces of info) found in the author/aff line.
+    """
+
+    count_auth = count_aff = 0
+    xml_line = ""
+    processed_line = line
+    cur_misc_txt = u""
+
+    tag_match = re_tagged_author_aff_line.search(processed_line)
+
+    # contains a list of dictionary entries of previously cited items
+    author_elements = []
+    # the last tag element found when working from left-to-right across the line
+    identified_author_element = None
+
+    while tag_match is not None:
+
+        ## While there are tags inside this reference line...
+        tag_match_start = tag_match.start()
+        tag_match_end   = tag_match.end()
+        tag_type        = tag_match.group(1)
+        cur_misc_txt += processed_line[0:tag_match_start]
+
+        if tag_type.find("AUTH") != -1:
+            ## This tag is an identified Author:
+            ## extract the author from the line:
+            idx_closing_tag_nearest = processed_line.find(\
+                CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND, tag_match_end)
+
+            if idx_closing_tag_nearest == -1:
+                ## no closing </cds.AUTH****> tag found - strip the opening tag
+                ## and move past it
+                processed_line = processed_line[tag_match_end:]
+                identified_citation_element = None
+            else:
+                auth_txt = processed_line[tag_match_end:idx_closing_tag_nearest]
+                ## Now move past the ending tag in the line:
+                processed_line = processed_line[idx_closing_tag_nearest + \
+                                                    len("</cds.AUTHxxxx>"):]
+                #SAVE the current misc text
+                identified_author_element = { 'type'       : "AUTH",
+                                              'content'    : "%s" % auth_txt,
+                                            }
+                ## Increment the stats counters:
+                count_auth += 1
+                cur_misc_txt = u""
+
+        elif tag_type.find("AFF") != -1:
+            ## This tag is an identified affiliation:
+            ## extract the affiliation from the line:
+            idx_closing_tag_nearest = processed_line.find(\
+                CFG_REFEXTRACT_MARKER_CLOSING_AFFILIATION, tag_match_end)
+
+            if idx_closing_tag_nearest == -1:
+                ## no closing </cds.AFF> tag found - strip the opening tag
+                ## and move past it
+                processed_line = processed_line[tag_match_end:]
+                identified_citation_element = None
+            else:
+                aff_txt = processed_line[tag_match_end:idx_closing_tag_nearest]
+                ## Now move past the ending tag in the line:
+                processed_line = processed_line[idx_closing_tag_nearest + \
+                                                    len(CFG_REFEXTRACT_MARKER_CLOSING_AFFILIATION):]
+                #SAVE the current misc text
+                identified_author_element =   {   'type'       : "AFF",
+                                                  'content'    : "%s" % aff_txt,
+                                                }
+                ## Increment the stats counters:
+                count_aff += 1
+                cur_misc_txt = u""
+
+        if identified_author_element != None:
+            ## Append the found tagged data and current misc text
+            author_elements.append(identified_author_element)
+            identified_author_element = None
+
+        ## Look for the next tag in the processed line:
+        tag_match = re_tagged_author_aff_line.search(processed_line)
+
+    ## Now, run the method which will take as input:
+    ## 1. A list of dictionaries, where each dictionary is a author or an
+    ## affiliation.
+    xml_line = build_formatted_xml_author_affiliation_line(author_elements, first_author)
+
+    ## return the reference-line as MARC XML:
+    return (xml_line, count_auth, count_aff)
 
 
-def convert_processed_line_to_marc_xml(line_marker,
+def convert_processed_reference_line_to_marc_xml(line_marker,
                                                  line,
                                                  identified_dois,
                                                  identified_urls):
@@ -4864,48 +5045,48 @@ def get_post_author_section_keyword_patterns():
 re_aff_num = re.compile(r"(^[\d]+[A-Z])")
 re_aff_name = re.compile(r"(univ|institut|laborator)", re.I)
 re_aff_univ = re.compile(r"univ[a-z]+\s+(of)?\s+([a-z\s\-]+)|([a-z\s\-]+)\s+(?!univ[a-z]+\sof)univ[a-z]+", re.I)
-
 re_splitting_comma = re.compile(",[^\d]", re.UNICODE)
 
 def arrange_possible_authors(line, delimiter=None):
+    """Break a line according to a delimiter. Replace 'and' phrases
+       with the delimiter before splitting.
+       @param line: (string) The line containing possible authors.
+       @param delimiter: (char) A delimiter found when rearranging
+       numeration around characters. This rearranging took place
+       prior to this, and was used to partially repair pdftotext issues.
+       @return: (list) Broken up line.
+    """
     if not delimiter:
         delimiter = ","
     ## Replace and's with delimiter (comma as standard)
     delimited_line = re.sub(r"(^\s*|\s)([Aa][Nn][Dd]|&)\s", delimiter, line)
-    ## Split by commas
-#    possible_authors = re_splitting_comma.split(comma_split_line.strip())
+    ## Split by delimiter
     possible_authors = delimited_line.split(delimiter)
     ## Remove empty stuff
     possible_authors = filter(lambda x: x.strip(), possible_authors)
     return possible_authors
 
 def gather_affiliated_authors_by_numeration(lines, aff_positions, number_to_find):
-    """Use the found affiliation to try and help with author extraction"""
+    """ Use the found affiliation to try and help with author extraction.
+        Using affiliation positions, and the number to find, look for authors above
+        the affiliations, by comparing the numeration found adjacent to authors.
+        An extraction procedure tends to spend the majority of its time inside this
+        function, if the number of numerated, affiliated authors is high.
+        @param lines: (list) The search space.
+        @param aff_positions: (list) Positions of already found affiliations.
+        @param number_to_find: (int) The number to find against authors.
+        @return: (tuple) of two lists, one holding numerated author matches,
+        and the other holding authors which resided on a line holding a numerated
+        author, and were split using some common, found delimiter.
+    """
     def has_number(possible_auth, number_to_find):
         """Does this possible author have the numeration I want?"""
         (auth_nums, auth_num_match) = obtain_author_affiliation_numeration_list(possible_auth)
         return number_to_find in auth_nums
 
     def remove_excess_numeration(author_match):
+        """See function signature."""
         return re.sub("^\d+|\d+$", "", author_match)
-
-#    def make_numerated_author_pattern(list_of_numerated_authors):
-#        patterns = []
-#        for num_auth in list_of_numerated_authors:
-#            num_auth = re.sub("[a-z]", "[a-z]", num_auth)
-#            num_auth = re.sub("(?<=%s)+?%s" % (re.escape("[a-z][a-z]"), re.escape("[a-z]")), "+", num_auth)
-#
-#            num_auth = re.sub("[A-Z]", "[A-Z]", num_auth)
-#            num_auth = re.sub("(?<=%s)+?%s" % (re.escape("[A-Z][A-Z]"), re.escape("[A-Z]")), "+", num_auth)
-#
-#            num_auth = re.sub("[0-9]", "[0-9]", num_auth)
-#            num_auth = re.sub("(?<=%s)+?%s" % (re.escape("[0-9][0-9]"), re.escape("[0-9]")), "+", num_auth)
-#
-#            num_auth = re.sub("[\-]", "", num_auth)
-#            num_auth = re.sub("\s", "\\s", num_auth)
-#            num_auth = re.escape(num_auth)
-#            patterns.append(num_auth)
-#        return patterns
 
     ## Holds numerated authors.
     numerated_authors = []
@@ -4928,7 +5109,6 @@ def gather_affiliated_authors_by_numeration(lines, aff_positions, number_to_find
         ## make sure to save the rest of the split authors in this line.
         if numerated_authors:
             all_split_authors.extend(possible_authors)
-#            numerated_author_patterns.extend(make_numerated_author_pattern(numerated_authors))
 
     return (map(remove_excess_numeration, numerated_authors), \
             map(remove_excess_numeration, all_split_authors))
@@ -5029,13 +5209,6 @@ def initiate_affiliated_author_search(affiliations, top_lines, aff_positions):
 
                 if cli_opts['verbosity'] >= 7:
                     sys.stdout.write("----Found %d weak affiliated authors.\n" % len(collected_line_above_authors))
-
-#    ## Check all numerated authors which were found
-#    all_numerated_authors = []
-#    all_numerated_authors.extend([a for a in cur_aff['author_data'] if a not in all_numerated_authors])
-#    if all_numerated_authors:
-#        ## Extend the standard set of authors, in the event numerated authors are found
-#        topline_standard_authors = collect_standard_authors(top_lines, 0)
 
     return (affiliations, loose_authors)
 
@@ -5143,7 +5316,6 @@ def extract_numerated_affiliations(num_data, num_find, missing):
         if num_find in aff_nums:
             ## Attempt to get numeration for this affiliation
             try:
-#                print "num with aff: %d" % num_find
                 num_find = num_find + 1
             except ValueError:
                 sys.stderr.write("Error: Unable to obtain integer affiliation numeration.")
@@ -5153,7 +5325,6 @@ def extract_numerated_affiliations(num_data, num_find, missing):
                          'line'                 : reduce_affiliation_names(line),
                          'aff_nums'             : aff_nums,
                          'author_data'          : None})
-#            print "--Found aff: %s" % line
 
         elif num_find in missing:
             ## Get the next non missing number and use that
@@ -5252,7 +5423,7 @@ def realign_numeration(toplines):
                                 if line_ahead:
                                     toplines_alternate[lookahead] = \
                                         num_match.group(0).strip() + line_ahead
-#                                    print "new line: %s" % toplines_alternate[lookahead]
+
                                     ## Increment the next number to look for
                                     num += 1
                                     numeration_swaps += 1
@@ -5418,35 +5589,6 @@ def find_affiliations(lines, start, end=None, use_to_find_authors=False):
             reduce_affiliation_names(tmp_aff['line']).strip(".,:;- []()*\\"))
 
     return (affiliations, loose_authors)
-
-def collect_standard_authors(top_lines, position=0, first=None):
-    """Obtain standard authors [recursive]
-    @param top_lines: (list) top lines of document
-    @param position: (int) position in top lines
-    @return: list holding the list of collected authors,
-    and the position of the last author line
-    """
-    author_matches = []
-    if position < len(top_lines):
-        line = top_lines[position]
-        ## Get all standard author matches for this line
-        author_matches = re_single_author_pattern_with_numeration.search(line)
-        author_matches_alt = \
-            re_single_author_pattern_with_numeration.finditer(realign_shifted_line_numeration_around_commas(line))
-        if author_matches or author_matches_alt:
-            if first is None:
-                first = position
-
-            ## Recurse on the next position
-            (more_author_matches, first, position) = collect_standard_authors(top_lines, position+1, first)
-
-            if len(author_matches) > len(author_matches_alt):
-                ## Save the matching strings in a list
-                author_matches.extend(more_author_matches)
-            else:
-                author_matches_alt.extent(more_author_matches)
-    ## Authors for this line
-    return (author_matches, first, position-1)
 
 def collect_tagged_authors(top_section, position, first_line=None, \
                                orig_blank_lines=None, cur_blank_lines=None):
@@ -5860,6 +6002,44 @@ def extract_top_document_information_from_fulltext(docbody, first_author=None):
 
     return (document_information, status, chosen_type)
 
+def mark_up_affiliation(affiliation):
+    """ Tags a string, with the affiliation tags.
+    """
+    def process_aff(a):
+        """Remove unacceptable end characters."""
+        a = replace_undesirable_characters(a).strip(".,:;- []()*\\")
+        return a
+
+    processed_aff = process_aff(affiliation)
+
+    tagged_aff = ""
+    if processed_aff:
+        tagged_aff = "%s%s%s" % ("<cds.AFF>", \
+                                     processed_aff, \
+                                     CFG_REFEXTRACT_MARKER_CLOSING_AFFILIATION)
+    return tagged_aff
+
+def mark_up_affiliations(affiliations):
+    """ Tag a set of lines as affiliations. Note the first
+        affiliation too.
+        @param affiliations: (list) Strings which should be marked up
+        as affiliations.
+        @return: (list) of tuples. Holding a boolean, as to whether or not
+        this affiliation or author is the first one in the list.
+    """
+
+    tagged_affiliations = []
+
+    is_first_aff = True
+    for a in affiliations:
+        marked_up_aff = mark_up_affiliation(a)
+        if marked_up_aff:
+            tagged_affiliations.append((is_first_aff, marked_up_aff))
+            if is_first_aff:
+                is_first_aff = False
+
+    return tagged_affiliations
+
 def mark_up_authors_with_affiliations(final_authors):
     """ Prepare authors and any possible associated affiliations
     into marked-up (tagged) lines according to identified authors.
@@ -5878,22 +6058,25 @@ def mark_up_authors_with_affiliations(final_authors):
         a = replace_undesirable_characters(a).strip(".,:;- []()*\\")
         return a
 
-    def process_aff(a):
-        a = replace_undesirable_characters(a).strip(".,:;- []()*\\")
-        return a
+    is_first_author = True
 
     for aff_auth_dict in final_authors:
         for authors in aff_auth_dict['authors']:
             ## Otherwise the closing element tag dissappears (!?)
             if authors:
                 if not aff_auth_dict['affiliation']:
-                    aff_for_authors = ''
+                    aff_for_authors = ""
                 else:
-                    aff_for_authors = aff_auth_dict['affiliation']
-                tagged_authors.append("%s%s%s%s" % ("<cds.AUTHstnd>", \
-                                                        process_authors(authors), \
-                                                        CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND, \
-                                                        process_aff(aff_for_authors)))
+                    ## Use the affiliation tags to tag this affiliation
+                    aff_for_authors = mark_up_affiliation(aff_auth_dict['affiliation'])
+                ## Tag authors, and any of their associated affiliations
+                tagged_authors.append((is_first_author, "%s%s%s%s" % ("<cds.AUTHstnd>", \
+                                                            process_authors(authors), \
+                                                            CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND, \
+                                                            aff_for_authors)))
+                if is_first_author:
+                    is_first_author = False
+
     return tagged_authors
 
 def choose_author_method(tagged_info, std_info, aff_info, \
@@ -5911,8 +6094,9 @@ def choose_author_method(tagged_info, std_info, aff_info, \
     @param tagged_authors: (list) List of purely tagged authors.
     @param std_authors: (list) List of purely standard-matched authors.
     @param aff_authors: (list) List of purely affiliated authors.
-    @return: (dict) Affiliation and author information which is deemed to be
-    the most accurate for the document.
+    @return: (tuple) Affiliation and author information which is deemed to be
+    the most accurate for the document, and the type used --
+    (standard [2] or affiliated [3]).
     """
 
     ## Immediately discard non-sets of authors (hold duplicate entries)
@@ -5994,7 +6178,6 @@ def choose_author_method(tagged_info, std_info, aff_info, \
             return (std_info, 2)
         else:
             return (aff_info, 3)
-#        return ((std_info or aff_info), 2)
     else:
         if cli_opts['verbosity'] >= 4:
             sys.stdout.write("---Choosing affiliated over standard authors.\n")
@@ -6002,7 +6185,6 @@ def choose_author_method(tagged_info, std_info, aff_info, \
             return (aff_info, 3)
         else:
             return (std_info, 2)
-#        return ((aff_info or std_info), 3)
 
 def find_reference_section(docbody):
     """Search in document body for its reference section. More precisely, find
@@ -7288,9 +7470,6 @@ def get_cli_options():
             cli_opts['affiliations'] = 1
         elif o[0] in ("--first_author"):
             cli_opts['first_author'] = 1
-        if len(myargs) == 0:
-            ## no arguments: error message
-            usage(wmsg="Error: no full-text.")
 
     # What journal title format are we using?
     if cli_opts['verbosity'] > 0 and cli_opts['inspire']:
@@ -7311,8 +7490,38 @@ def get_cli_options():
 
     return (cli_opts, myargs)
 
-def display_xml_record(status_code, count_reportnum, count_title, count_url,
-                       count_doi, count_misc, count_auth_group, recid, xml_lines):
+def display_auth_aff_xml_record(recid, xml_lines):
+    """ Wraps XML lines holding extracted authors and affiliations
+        with the necessary record and controlfield elements.
+        @param recid: (int) record id of the document being extracted.
+        @param xml_lines: (list) of xml holding annotated authors
+        and affiliation information.
+        @return: (xml_lines) xml lines with the surrounding elements.
+    """
+    ## Start with the opening record tag:
+    out = u"%(record-open)s\n" \
+              % { 'record-open' : CFG_REFEXTRACT_XML_RECORD_OPEN, }
+
+    ## Display the record-id controlfield:
+    out += \
+     u"""   <controlfield tag="%(cf-tag-recid)s">%(recid)s</controlfield>\n""" \
+     % { 'cf-tag-recid' : CFG_REFEXTRACT_CTRL_FIELD_RECID,
+         'recid'        : encode_for_xml(recid),
+       }
+
+    ## Loop through all xml lines and add them to the output string:
+    for line in xml_lines:
+        out += line
+
+    ## Now add the closing tag to the record:
+    out += u"%(record-close)s\n" \
+           % { 'record-close' : CFG_REFEXTRACT_XML_RECORD_CLOSE, }
+
+    return out
+
+
+def display_references_xml_record(status_code, count_reportnum, count_title, count_url,
+                                  count_doi, count_misc, count_auth_group, recid, xml_lines):
     """Given a series of MARC XML-ized reference lines and a record-id, write a
        MARC XML record to the stdout stream. Include in the record some stats
        for the extraction job.
@@ -7456,9 +7665,11 @@ def begin_extraction(daemon_cli_options=None):
         ## no files provided for reference extraction - error message
         usage(wmsg="Error: No valid input file specified (-f id:file [-f id:file ...])")
 
-    ## Don't parse the knowledge bases if authors/affiliations are being extracted
-    if not cli_opts['authors'] and not cli_opts['affiliations']:
+    ## What top section data do I want?
+    extract_top_section_metadata = cli_opts['authors'] or cli_opts['affiliations']
 
+    ## Don't parse the knowledge bases if authors/affiliations are being extracted
+    if not extract_top_section_metadata:
         ## Read the journal titles knowledge base, creating the search
         ## patterns and replace terms. Check for user-specified journal kb.
         if cli_opts['kb-journal'] != 0:
@@ -7511,8 +7722,6 @@ def begin_extraction(daemon_cli_options=None):
         recid = curitem[0]
         write_message("--- processing RecID: %s pdffile: %s; %s\n" \
                          % (str(curitem[0]), curitem[1], ctime()), verbose=2)
-
-        extract_top_section_metadata = cli_opts['authors'] or cli_opts['affiliations']
 
         ## 1. Get this document body as plaintext:
         (docbody, extract_error) = \
@@ -7574,7 +7783,7 @@ def begin_extraction(daemon_cli_options=None):
             if not extract_top_section_metadata:
                 if len(extract_lines) == 0 and extract_error == 0:
                     extract_error = 6
-                write_message("-----extract_references_from_fulltext " \
+                    write_message("-----extract_references_from_fulltext " \
                                      "gave len(reflines): %s overall error: " \
                                      "%s\n" \
                                      % (str(len(extract_lines)), str(extract_error)))
@@ -7609,12 +7818,12 @@ def begin_extraction(daemon_cli_options=None):
                 ## affiliations are being extracted
                 if cli_opts['authors']:
                     extract_lines = document_info['authors']
-                    ## Assoiciate authors with their affiliations if possible
+                    ## Associate authors with their affiliations if possible
                     out_lines = mark_up_authors_with_affiliations(extract_lines)
                 else:
                     extract_lines = document_info['affiliations']
                     ## Just the list of affiliations
-                    out_lines = set([aff['line'] for aff in extract_lines])
+                    out_lines = mark_up_affiliations(set([aff['line'] for aff in extract_lines]))
 
                 if not document_info and extract_error == 0:
                     extract_error = 6
@@ -7628,19 +7837,14 @@ def begin_extraction(daemon_cli_options=None):
                                          % (str(len(extract_lines)), str(extract_error)))
 
                 processed_lines = []
-                for l in out_lines:
+                for first_auth_aff, l in out_lines:
                     (xml_line, \
-                     count_misc, \
-                     count_title, \
-                     count_reportnum, \
-                     count_url, \
-                     count_doi, \
-                     count_auth_group) = \
-                     convert_processed_line_to_marc_xml("", \
-                                                            l.replace('\n',''), \
-                                                            None, \
-                                                            None)
+                     count_auth, \
+                     count_aff) = \
+                     convert_processed_auth_aff_line_to_marc_xml(l.replace('\n',''), \
+                                                                     first_auth_aff)
                     processed_lines.append(xml_line)
+
         else:
             ## document body is empty, therefore the reference section is empty:
             extract_lines = []
@@ -7664,31 +7868,37 @@ def begin_extraction(daemon_cli_options=None):
         ## urls found greatly increases the level of rubbish accepted..
         if count_reportnum + count_title == 0 and how_found_start > 2:
             count_misc = count_url = count_doi = count_auth_group = 0
-            processed_references = []
-            write_message("-----Found ONLY miscellaneous/Urls so removed it how_found_start=  %d\n" \
-                          % (how_found_start), verbose=2)
-        elif count_reportnum + count_title  > 0 and how_found_start > 2:
-            write_message("-----Found journals/reports with how_found_start=  %d\n" % (how_found_start), verbose=2)
-        ## Display the processed reference lines:
-        out = display_xml_record(extract_error, \
-                                 count_reportnum, \
-                                 count_title, \
-                                 count_url, \
-                                 count_doi, \
-                                 count_misc, \
-                                 count_auth_group, \
-                                 recid, \
-                                 processed_lines)
+            processed_lines = []
+            if cli_opts['verbosity'] >= 1:
+                sys.stdout.write("-----Found ONLY miscellaneous/Urls so removed it how_found_start=  %d\n" % (how_found_start))
+        elif  count_reportnum + count_title  > 0 and how_found_start > 2:
+            if cli_opts['verbosity'] >= 1:
+                sys.stdout.write("-----Found journals/reports with how_found_start=  %d\n" % (how_found_start))
 
-        ## Filter the processed reference lines to remove junk
-        out = filter_processed_lines(out)  ## Be sure to call this BEFORE compress_subfields
-                                           ## since filter_processed_lines expects the
-                                           ## original xml format.
+        if extract_top_section_metadata:
+            out = display_auth_aff_xml_record(recid, \
+                                                  processed_lines)
+        else:
+            ## Display the processed reference lines:
+            out = display_references_xml_record(extract_error, \
+                                                    count_reportnum, \
+                                                    count_title, \
+                                                    count_url, \
+                                                    count_doi, \
+                                                    count_misc, \
+                                                    count_auth_group, \
+                                                    recid, \
+                                                    processed_lines)
 
-        ## Compress mulitple 'm' subfields in a datafield
-        out = compress_subfields(out, CFG_REFEXTRACT_SUBFIELD_MISC)
-        ## Compress multiple 'h' subfields in a datafield
-        out = compress_subfields(out, CFG_REFEXTRACT_SUBFIELD_AUTH)
+            ## Compress mulitple 'm' subfields in a datafield
+            out = compress_subfields(out, CFG_REFEXTRACT_SUBFIELD_MISC)
+            ## Compress multiple 'h' subfields in a datafield
+            out = compress_subfields(out, CFG_REFEXTRACT_SUBFIELD_AUTH)
+
+            ## Filter the processed reference lines to remove junk
+            out = filter_processed_lines(out)  ## Be sure to call this BEFORE compress_subfields
+                                               ## since filter_processed_lines expects the
+                                               ## original xml format.
 
         lines = out.split('\n')
         write_message("-----display_xml_record gave: %s significant " \
