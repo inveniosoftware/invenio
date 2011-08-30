@@ -1481,17 +1481,17 @@ class Template:
                 'ln' : ln,
                 'messages' : _('Your messages')
                 }
-        if submitter:
-            out += '<li><a href="%(CFG_SITE_SECURE_URL)s/yoursubmissions.py?ln=%(ln)s">%(submissions)s</a></li>'  % {
-                'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
-                'ln' : ln,
-                'submissions' : _('Your submissions')
-                }
         if usealerts or guest:
             out += '<li><a href="%(CFG_SITE_SECURE_URL)s/yoursearches/display?ln=%(ln)s">%(searches)s</a></li>'  % {
                 'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
                 'ln' : ln,
                 'searches' : _('Your searches')
+                }
+        if submitter:
+            out += '<li><a href="%(CFG_SITE_SECURE_URL)s/yoursubmissions.py?ln=%(ln)s">%(submissions)s</a></li>'  % {
+                'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
+                'ln' : ln,
+                'submissions' : _('Your submissions')
                 }
         out += '</ul></div>'
         return out

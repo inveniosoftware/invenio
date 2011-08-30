@@ -434,7 +434,7 @@ class Template:
                 'alert_details_creation_last_run_dates': alert_details_creation_last_run_dates}
 
         out += """
-<table class="youralerts_display_table" cellspacing="2px">
+<table class="youralerts_display_table" cellspacing="0px">
   <thead class="youralerts_display_table_header">
     <tr>
       <td colspan="2"></td>
