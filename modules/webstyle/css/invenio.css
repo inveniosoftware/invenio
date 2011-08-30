@@ -2582,22 +2582,19 @@ a:hover.bibMergeImgClickable img {
 }
 
 .youralerts_display_table {
-   border: 1px solid #bbbbbb;
+   border: 1px solid #ffcc00;
 }
 .youralerts_display_table_header td {
-   background-color: #7a9bdd;
+   background-color: #ffffcc;
    padding: 2px;
-   border-bottom: 1px solid #3366cc;
-   border-right: 1px solid #3366cc;
+   border-bottom: 1px solid #ffcc00;
 }
 .youralerts_display_table_footer td {
-   background-color: #7a9bdd;
-   color: white;
+   background-color: #ffffcc;
+   color: black;
    padding: 2px;
    font-size: 80%;
    text-align: center;
-   border-bottom: 1px solid #3366cc;
-   border-right: 1px solid #3366cc;
    white-space: nowrap;
 }
 .youralerts_display_table_footer img {
@@ -2618,16 +2615,18 @@ a:hover.bibMergeImgClickable img {
    vertical-align: bottom;
 }
 .youralerts_display_table_content {
-   background-color: #f2f2fa;
+   background-color: white;
    padding: 5px;
    text-align: left;
    vertical-align: top;
+   border-bottom: 1px solid #ffcc00;
 }
 .youralerts_display_table_content_mouseover {
-   background-color: #ebebfa;
+   background-color: #ffffe3;
    padding: 5px;
    text-align: left;
    vertical-align: top;
+   border-bottom: 1px solid #ffcc00;
 }
 .youralerts_display_table_content_container_left {
    float: left;
@@ -2641,12 +2640,13 @@ a:hover.bibMergeImgClickable img {
    clear: both;
 }
 .youralerts_display_table_counter {
-   background-color: #f2f2fa;
+   background-color: white;
    padding: 5px 2px;
    text-align: right;
    vertical-align: top;
    font-size: 80%;
    color: gray;
+   border-bottom: 1px solid #ffcc00;
 }
 .youralerts_display_table_content_name {
    margin-bottom: 5px;
@@ -2698,28 +2698,25 @@ a:hover.bibMergeImgClickable img {
 
 /* WebSearch module - YourSearches */
 .websearch_yoursearches_table {
-   border: 1px solid #bbbbbb;
+   border: 1px solid #ffcc00;
 }
 .websearch_yoursearches_table_header td {
-   background-color: #7a9bdd;
-   color: white;
+   background-color: #ffffcc;
+   color: black;
    padding: 2px;
    font-weight: bold;
    font-size: 75%;
    text-transform: uppercase;
-   border-bottom: 1px solid #3366cc;
-   border-right: 1px solid #3366cc;
+   border-bottom: 1px solid #ffcc00;
    white-space: nowrap;
    vertical-align: top;
 }
 .websearch_yoursearches_table_footer td {
-   background-color: #7a9bdd;
-   color: white;
+   background-color: #ffffcc;
+   color: black;
    padding: 5px;
    font-size: 80%;
    text-align: center;
-   border-bottom: 1px solid #3366cc;
-   border-right: 1px solid #3366cc;
    white-space: nowrap;
 }
 .websearch_yoursearches_table_footer img {
@@ -2740,24 +2737,27 @@ a:hover.bibMergeImgClickable img {
    vertical-align: bottom;
 }
 .websearch_yoursearches_table_content {
-   background-color: #f2f2fa;
+   background-color: white;
    padding: 5px;
    text-align: left;
    vertical-align: top;
+   border-bottom: 1px solid #ffcc00;
 }
 .websearch_yoursearches_table_content_mouseover {
-   background-color: #ebebfa;
+   background-color: #ffffe3;
    padding: 5px;
    text-align: left;
    vertical-align: top;
+   border-bottom: 1px solid #ffcc00;
 }
 .websearch_yoursearches_table_counter {
-   background-color: #f2f2fa;
+   background-color: white;
    padding: 5px 2px;
    text-align: right;
    vertical-align: top;
    font-size: 80%;
    color: grey;
+   border-bottom: 1px solid #ffcc00;
 }
 .websearch_yoursearches_table_content_options {
    margin: 5px;

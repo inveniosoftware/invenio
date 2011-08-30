@@ -5242,7 +5242,7 @@ class Template:
                       (CFG_SITE_SECURE_URL, paging_navigation[3], step, cgi.escape(p), ln, '/img/yoursearches_last_page.png')
 
         out += """
-<table class="websearch_yoursearches_table" cellspacing="2px">
+<table class="websearch_yoursearches_table" cellspacing="0px">
   <thead class="websearch_yoursearches_table_header">
     <tr>
       <td colspan="2"></td>
