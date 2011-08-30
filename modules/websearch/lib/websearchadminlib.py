@@ -99,6 +99,8 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
     output = ''
     subtitle = ''
     sitelangs = get_languages()
+    if type(trans) is str:
+        trans = [trans]
     if confirm in ["2", 2] and colID:
         finresult = modify_translations(colID, sitelangs, sel_type, trans, "collection")
     col_dict = dict(get_def_name('', "collection"))
@@ -107,8 +109,6 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
         colID = int(colID)
         subtitle = """<a name="3">3. Modify translations for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a href="%s/help/admin/websearch-admin-guide#3.3">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
 
-        if type(trans) is str:
-            trans = [trans]
         if sel_type == '':
             sel_type = get_col_nametypes()[0][0]
 
