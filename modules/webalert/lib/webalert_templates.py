@@ -264,7 +264,11 @@ class Template:
     def tmpl_youralerts_display(self,
                                 ln,
                                 alerts,
+                                nb_alerts,
                                 idq,
+                                page,
+                                step,
+                                paging_navigation,
                                 guest,
                                 guesttxt):
         """
@@ -325,14 +329,14 @@ class Template:
         # Diplay a message about the number of alerts.
         if idq:
             msg = _('You have defined %(number_of_alerts)s alerts based on that search query.') % \
-                  {'number_of_alerts': '<strong>' + str(len(alerts)) + '</strong>'}
+                  {'number_of_alerts': '<strong>' + str(nb_alerts) + '</strong>'}
             msg += '<br />'
             msg += _('You may want to %(new_alert)s or display all %(youralerts)s.') % \
                    {'new_alert': '<a href="%s/youralerts/input?ln=%s&amp;idq=%i">%s</a>' % (CFG_SITE_SECURE_URL, ln, idq, _('define a new one')),
                     'youralerts': '<a href="%s/youralerts/display?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('your alerts'))}
         else:
             msg = _('You have defined a total of %(number_of_alerts)s alerts.') % \
-                  {'number_of_alerts': '<strong>' + str(len(alerts)) + '</strong>'}
+                  {'number_of_alerts': '<strong>' + str(nb_alerts) + '</strong>'}
             msg += '<br />'
             msg += _('You may define new alert based on %(yoursearches)s, the %(popular_alerts)s or just by %(search_interface)s.') % \
                    {'yoursearches': '<a href="%s/yoursearches/display?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('your searches')),
@@ -340,7 +344,7 @@ class Template:
                     'search_interface': '<a href="%s/?ln=%s">%s</a>' %(CFG_SITE_URL, ln, _('searching for something new'))}
         out = '<p>' + msg + '</p>'
 
-        counter = 0
+        counter = (page - 1) * step
         youralerts_display_html = ""
         for alert in alerts:
             counter += 1
@@ -433,6 +437,26 @@ class Template:
                 'alert_details_options': alert_details_options,
                 'alert_details_creation_last_run_dates': alert_details_creation_last_run_dates}
 
+        footer = ''
+        if paging_navigation[0]:
+            footer += """<a href="%s/youralerts/display?page=%i&amp;step=%i&amp;idq=%i&amp;ln=%s"><img src="%s" /></a>""" % \
+                      (CFG_SITE_SECURE_URL, 1, step, idq, ln, '/img/sb.gif')
+        if paging_navigation[1]:
+            footer += """<a href="%s/youralerts/display?page=%i&amp;step=%i&amp;idq=%i&amp;ln=%s"><img src="%s" /></a>""" % \
+                      (CFG_SITE_SECURE_URL, page - 1, step, idq, ln, '/img/sp.gif')
+        footer += "&nbsp;"
+        displayed_alerts_from = ((page - 1) * step) + 1
+        displayed_alerts_to = paging_navigation[2] and (page * step) or nb_alerts
+        footer += _('Displaying alerts <strong>%i to %i</strong> from <strong>%i</strong> total alerts') % \
+               (displayed_alerts_from, displayed_alerts_to, nb_alerts)
+        footer += "&nbsp;"
+        if paging_navigation[2]:
+            footer += """<a href="%s/youralerts/display?page=%i&amp;step=%i&amp;idq=%i&amp;ln=%s"><img src="%s" /></a>""" % \
+                      (CFG_SITE_SECURE_URL, page + 1, step, idq, ln, '/img/sn.gif')
+        if paging_navigation[3]:
+            footer += """<a href="%s/youralerts/display?page=%i&amp;step=%i&amp;idq=%i&amp;ln=%s"><img src="%s" /></a>""" % \
+                      (CFG_SITE_SECURE_URL, paging_navigation[3], step, idq, ln, '/img/se.gif')
+
         out += """
 <table class="youralerts_display_table" cellspacing="0px">
   <thead class="youralerts_display_table_header">
@@ -442,13 +466,14 @@ class Template:
   </thead>
   <tfoot class="youralerts_display_table_footer">
     <tr>
-      <td colspan="2"></td>
+      <td colspan="2">%(footer)s</td>
     </tr>
   </tfoot>
   <tbody>
     %(youralerts_display_html)s
   </tbody>
-</table>""" % {'youralerts_display_html': youralerts_display_html}
+</table>""" % {'footer': footer,
+               'youralerts_display_html': youralerts_display_html}
 
         return out
 

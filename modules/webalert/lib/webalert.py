@@ -35,6 +35,8 @@ from invenio.dateutils import convert_datestruct_to_datetext, convert_datetext_t
 import invenio.template
 webalert_templates = invenio.template.load('webalert')
 
+CFG_WEBALERT_YOURALERTS_MAX_NUMBER_OF_DISPLAYED_ALERTS = 20
+
 ### IMPLEMENTATION
 
 class AlertError(Exception):
@@ -173,11 +175,13 @@ def perform_add_alert(alert_name, frequency, notification,
     run_sql(query, params)
     out = _("The alert %s has been added to your profile.")
     out %= '<b>' + cgi.escape(alert_name) + '</b>'
-    out += perform_request_youralerts_display(uid, idq=None, ln=ln)
+    out += perform_request_youralerts_display(uid, idq=0, ln=ln)
     return out
 
 def perform_request_youralerts_display(uid,
-                                       idq=None,
+                                       idq=0,
+                                       page=1,
+                                       step=CFG_WEBALERT_YOURALERTS_MAX_NUMBER_OF_DISPLAYED_ALERTS,
                                        ln=CFG_SITE_LANG):
     """
     Display a list of the user defined alerts. If a specific query id is defined
@@ -188,6 +192,12 @@ def perform_request_youralerts_display(uid,
 
     @param idq: The specified query id for which to display the user alerts
     @type idq: int
+
+    @param page: 
+    @type page: integer
+
+    @param step: 
+    @type step: integer
 
     @param ln: The interface language
     @type ln: string
@@ -202,6 +212,42 @@ def perform_request_youralerts_display(uid,
         idq_clause = "AND uqb.id_query=%i" % (idq,)
     else:
         idq_clause = ""
+
+    query_nb_alerts = """   SELECT      COUNT(*)
+                            FROM        user_query_basket AS uqb
+                            WHERE       uqb.id_user=%%s
+                                %s""" % (idq_clause,)
+    params_nb_alerts = (uid,)
+    result_nb_alerts = run_sql(query_nb_alerts, params_nb_alerts)
+    nb_alerts = result_nb_alerts[0][0]
+
+    # The real page starts counting from 0, i.e. minus 1 from the human page
+    real_page = page - 1
+    # The step needs to be a positive integer
+    if (step <= 0):
+        step = CFG_WEBALERT_YOURALERTS_MAX_NUMBER_OF_DISPLAYED_ALERTS
+    # The maximum real page is the integer division of the total number of
+    # searches and the searches displayed per page
+    max_real_page = (nb_alerts / step) - (not (nb_alerts % step) and 1 or 0)
+    # Check if the selected real page exceeds the maximum real page and reset
+    # if needed
+    if (real_page >= max_real_page):
+        #if ((nb_queries_distinct % step) != 0):
+        #    real_page = max_real_page
+        #else:
+        #    real_page = max_real_page - 1
+        real_page = max_real_page
+        page = real_page + 1
+    elif (real_page < 0):
+        real_page = 0
+        page = 1
+    # Calculate the start value for the SQL LIMIT constraint
+    limit_start = real_page * step
+    # Calculate the display of the paging navigation arrows for the template
+    paging_navigation = (real_page >= 2,
+                         real_page >= 1,
+                         real_page <= (max_real_page - 1),
+                         (real_page <= (max_real_page - 2)) and (max_real_page + 1))
 
     # query the database
     query = """ SELECT      q.id,
@@ -220,10 +266,11 @@ def perform_request_youralerts_display(uid,
                     ON      uqb.id_basket=bsk.id
                 WHERE       uqb.id_user=%%s
                     %s
-                ORDER BY    uqb.alert_name ASC""" % ('%%Y-%%m-%%d %%H:%%i:%%s',
-                                                     '%%Y-%%m-%%d %%H:%%i:%%s',
-                                                     idq_clause,)
-    params = (uid,)
+                ORDER BY    uqb.alert_name ASC
+                LIMIT       %%s,%%s""" % ('%%Y-%%m-%%d %%H:%%i:%%s',
+                                          '%%Y-%%m-%%d %%H:%%i:%%s',
+                                          idq_clause,)
+    params = (uid, limit_start, step)
     result = run_sql(query, params)
 
     alerts = []
@@ -261,8 +308,12 @@ Here are all the alerts defined by this user: %s""" % (uid, repr(result)))
     # link to the "add new alert" form
     out = webalert_templates.tmpl_youralerts_display(ln=ln,
                                                      alerts=alerts,
-                                                     guest=isGuestUser(uid),
+                                                     nb_alerts=nb_alerts,
                                                      idq=idq,
+                                                     page=page,
+                                                     step=step,
+                                                     paging_navigation=paging_navigation,
+                                                     guest=isGuestUser(uid),
                                                      guesttxt=warning_guest_user(type="alerts", ln=ln))
     return out
 
@@ -291,7 +342,7 @@ def perform_remove_alert(alert_name, id_query, id_basket, uid, ln=CFG_SITE_LANG)
         out += "The alert <b>%s</b> has been removed from your profile.<br /><br />\n" % cgi.escape(alert_name)
     else:
         out += "Unable to remove alert <b>%s</b>.<br /><br />\n" % cgi.escape(alert_name)
-    out += perform_request_youralerts_display(uid, idq=None, ln=ln)
+    out += perform_request_youralerts_display(uid, idq=0, ln=ln)
     return out
 
 
@@ -351,7 +402,7 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, id_quer
     run_sql(query, params)
 
     out += _("The alert %s has been successfully updated.") % ("<b>" + cgi.escape(alert_name) + "</b>",)
-    out += "<br /><br />\n" + perform_request_youralerts_display(uid, idq=None, ln=ln)
+    out += "<br /><br />\n" + perform_request_youralerts_display(uid, idq=0, ln=ln)
     return out
 
 def is_selected(var, fld):
