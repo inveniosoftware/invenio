@@ -1419,6 +1419,10 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             try:
                 if CFG_WEBSEARCH_USE_ALEPH_SYSNOS:
                     # let us try to recognize /<CFG_SITE_RECORD>/<SYSNO> style of URLs:
+                    # check for SYSNOs with an embedded slash; needed for [ARXIVINV-15]
+                    if len(path) > 1 and get_mysql_recid_from_aleph_sysno(path[0] + "/" + path[1]):
+                        path[0] = path[0] + "/" + path[1]
+                        del path[1]
                     x = get_mysql_recid_from_aleph_sysno(path[0])
                     if x:
                         recid = x
