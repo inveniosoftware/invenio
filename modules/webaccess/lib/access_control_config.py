@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -247,7 +247,8 @@ DEF_ACTIONS = (
                ('claimpaper_claim_others_papers', 'Claim papers for others', '', 'no'),
                ('claimpaper_change_own_data', 'Change data associated to his own person ID', '', 'no'),
                ('claimpaper_change_others_data', 'Change data of any person ID', '', 'no'),
-               ('runbibtasklet', 'run BibTaskLet', '', 'no')
+               ('runbibtasklet', 'run BibTaskLet', '', 'no'),
+               ('cfgbibsched', 'configure BibSched', '', 'no')
               )
 
 # Default authorizations
@@ -356,4 +357,3 @@ CFG_WEBACCESS_WARNING_MSGS = {
                                19: """The site is having troubles in sending you an email for confirming your email address. The error has been logged and will be taken care of as soon as possible.""",
                                20: """No roles are authorized to perform action %s with the given parameters."""
         }
-

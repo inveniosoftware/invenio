@@ -24,7 +24,13 @@ pylib_DATA = \
 	bibtask.py \
 	bibtaskex.py \
 	bibtask_config.py \
-	bibtasklet.py
+	bibtasklet.py \
+	bibsched_webapi.py \
+	bibsched_webinterface.py
+
+jsdir=$(localstatedir)/www/js
+
+js_DATA = bibsched.js
 
 EXTRA_DIST = $(pylib_DATA)
 

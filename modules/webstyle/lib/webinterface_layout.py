@@ -222,6 +222,13 @@ except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceBibCirculationAdminPages = WebInterfaceDumbPages
 
+try:
+    from invenio.bibsched_webinterface import \
+         WebInterfaceBibSchedPages
+except:
+    register_exception(alert_admin=True, subject='EMERGENCY')
+    WebInterfaceBibSchedPages = WebInterfaceDumbPages
+
 if CFG_OPENAIRE_SITE:
     try:
         from invenio.openaire_deposit_webinterface import \
@@ -245,10 +252,11 @@ else:
 
 class WebInterfaceAdminPages(WebInterfaceDirectory):
     """This class implements /admin2 admin pages."""
-    _exports = ['index', 'bibcirculation']
+    _exports = ['index', 'bibcirculation', 'bibsched']
     def index(self, req, form):
         return "FIXME: return /help/admin content"
     bibcirculation = WebInterfaceBibCirculationAdminPages()
+    bibsched = WebInterfaceBibSchedPages()
 
 class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     """ The global URL layout is composed of the search API plus all
