@@ -501,22 +501,19 @@ def get_words_from_phrase(phrase, stemming_language=None):
         block = re_block_punctuation_begin.sub("", block)
         block = re_block_punctuation_end.sub("", block)
         if block:
-            if stemming_language:
-                block = apply_stemming_and_stopwords_and_length_check(block, stemming_language)
-            if block:
-                words[block] = 1
+            stemmed_block = apply_stemming_and_stopwords_and_length_check(block, stemming_language)
+            if stemmed_block:
+                words[stemmed_block] = 1
             # 3rd break each block into subblocks according to punctuation and add subblocks:
             for subblock in re_punctuation.split(block):
-                if stemming_language:
-                    subblock = apply_stemming_and_stopwords_and_length_check(subblock, stemming_language)
-                if subblock:
-                    words[subblock] = 1
-                    # 4th break each subblock into alphanumeric groups and add groups:
-                    for alphanumeric_group in re_separators.split(subblock):
-                        if stemming_language:
-                            alphanumeric_group = apply_stemming_and_stopwords_and_length_check(alphanumeric_group, stemming_language)
-                        if alphanumeric_group:
-                            words[alphanumeric_group] = 1
+                stemmed_subblock = apply_stemming_and_stopwords_and_length_check(subblock, stemming_language)
+                if stemmed_subblock:
+                    words[stemmed_subblock] = 1
+                # 4th break each subblock into alphanumeric groups and add groups:
+                for alphanumeric_group in re_separators.split(subblock):
+                    stemmed_alphanumeric_group = apply_stemming_and_stopwords_and_length_check(alphanumeric_group, stemming_language)
+                    if stemmed_alphanumeric_group:
+                        words[stemmed_alphanumeric_group] = 1
     for block in formulas:
         words[block] = 1
     return words.keys()
