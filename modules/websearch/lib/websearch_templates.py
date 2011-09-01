@@ -5171,7 +5171,7 @@ class Template:
           <input name="p" value="%(p)s" type="text" />
           <input class="formbutton" type="submit" value="%(submit_label)s" />
         </form>
-        """ % {'search_text': _('Search inside your searches for'),
+        """ % {'search_text': _('Search inside all your searches for'),
                'action': '%s/yoursearches/display?ln=%s' % (CFG_SITE_SECURE_URL, ln),
                'p': cgi.escape(p),
                'submit_label': _('Search')}
