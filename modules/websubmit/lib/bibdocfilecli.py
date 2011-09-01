@@ -483,7 +483,7 @@ Examples:
     revising_options.add_option("--undelete", action='store_const', const='undelete', dest='action', help='undelete previosuly soft-deleted documents')
     revising_options.add_option("--purge", action='store_const', const='purge', dest='action', help='purge (i.e. hard-delete any format of any version prior to the latest version of) the matched documents')
     revising_options.add_option("--expunge", action='store_const', const='expunge', dest='action', help='expunge (i.e. hard-delete any version and formats of) the matched documents')
-    revising_options.add_option("--with-versions", dest="version", help="specifies the version(s) to be used with hard-delete, hide, revert, e.g.: 1-2,3 or all")
+    revising_options.add_option("--with-version", dest="version", help="specifies the version(s) to be used with hide, unhide, e.g.: 1-2,3 or ALL. Specifies the version to be used with hard-delete and revert, e.g. 2")
     revising_options.add_option("--with-format", dest="format", help='to specify a format when appending/revising/deleting/reverting a document, e.g. "pdf"', metavar='FORMAT')
     revising_options.add_option("--with-hide-previous", dest='hide_previous', action='store_true', help='when revising, hides previous versions', default=False)
     parser.add_option_group(revising_options)
@@ -805,6 +805,12 @@ def cli_delete_file(options):
     format = cli2format(options)
     docname = BibDoc(docid).get_docname()
     version = getattr(options, 'version', None)
+    try:
+        version_int = int(version)
+        if 0 >= version_int:
+            raise ValueError
+    except:
+        raise OptionValueError, 'when hard-deleting, version should be valid positive integer, not %s' % version
     ffts = {recid : [{'docname' : docname, 'version' : version, 'format' : format, 'doctype' : 'DELETE-FILE'}]}
     return bibupload_ffts(ffts)
 
@@ -815,10 +821,10 @@ def cli_revert(options):
     docname = BibDoc(docid).get_docname()
     version = getattr(options, 'version', None)
     try:
-        version = int(version)
-        if 0 >= version:
+        version_int = int(version)
+        if 0 >= version_int:
             raise ValueError
-    except ValueError:
+    except:
         raise OptionValueError, 'when reverting, version should be valid positive integer, not %s' % version
     ffts = {recid : [{'docname' : docname, 'version' : version, 'doctype' : 'REVERT'}]}
     return bibupload_ffts(ffts)
