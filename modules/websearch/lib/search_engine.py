@@ -4044,7 +4044,7 @@ def get_tags_from_sort_fields(sort_fields):
     if not sort_fields:
         return [], ''
     for sort_field in sort_fields:
-        if sort_field and str(sort_field[0:2]).isdigit():
+        if sort_field and (len(sort_field) > 1 and str(sort_field[0:2]).isdigit()):
             # sort_field starts by two digits, so this is probably a MARC tag already
             tags.append(sort_field)
         else:
