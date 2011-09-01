@@ -254,7 +254,7 @@ def perform_request_youralerts_display(uid,
             step = CFG_WEBALERT_YOURALERTS_MAX_NUMBER_OF_DISPLAYED_ALERTS
         # The maximum real page is the integer division of the total number of
         # searches and the searches displayed per page
-        max_real_page = nb_alerts and ((nb_alerts / step) - (not (nb_alerts % step) and 1 or 0)) or 0
+        max_real_page = nb_alerts and ((nb_alerts / step) - (not (nb_alerts % step) and 1 or 0))
         # Check if the selected real page exceeds the maximum real page and reset
         # if needed
         if (real_page >= max_real_page):
