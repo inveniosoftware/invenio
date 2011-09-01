@@ -242,6 +242,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'idq':   (int, 0),
                                    'page':  (int, 1),
                                    'step':  (int, 20),
+                                   'p':     (str, ''),
                                    'ln':    (str, '')})
 
         uid = getUid(req)
@@ -281,6 +282,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                                             idq=argd['idq'],
                                                             page=argd['page'],
                                                             step=argd['step'],
+                                                            p=argd['p'],
                                                             ln=argd['ln']),
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % \
                               {'sitesecureurl' : CFG_SITE_SECURE_URL,

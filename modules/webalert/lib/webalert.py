@@ -21,6 +21,7 @@ __revision__ = "$Id$"
 
 import cgi
 import time
+from urllib import quote
 
 from invenio.config import CFG_SITE_LANG
 from invenio.dbquery import run_sql
@@ -182,6 +183,7 @@ def perform_request_youralerts_display(uid,
                                        idq=0,
                                        page=1,
                                        step=CFG_WEBALERT_YOURALERTS_MAX_NUMBER_OF_DISPLAYED_ALERTS,
+                                       p='',
                                        ln=CFG_SITE_LANG):
     """
     Display a list of the user defined alerts. If a specific query id is defined
@@ -209,110 +211,139 @@ def perform_request_youralerts_display(uid,
     out = ""
 
     if idq:
-        idq_clause = "AND uqb.id_query=%i" % (idq,)
+        idq_clause = "q.id=%i" % (idq,)
     else:
         idq_clause = ""
 
-    query_nb_alerts = """   SELECT      COUNT(*)
+    search_clause = ""
+    search_clause_urlargs = []
+    search_clause_alert_name = []
+    if p:
+        p_stripped = p.strip()
+        p_stripped_args = p.split()
+        sql_p_stripped_args = ['\'%%' + quote(p_stripped_arg).replace('%','%%') + '%%\'' for p_stripped_arg in p_stripped_args]
+        for sql_p_stripped_arg in sql_p_stripped_args:
+            search_clause_urlargs.append("q.urlargs LIKE %s" % (sql_p_stripped_arg,))
+            search_clause_alert_name.append("uqb.alert_name LIKE %s" % (sql_p_stripped_arg,))
+        search_clause = "((%s) OR (%s))" % (" AND ".join(search_clause_urlargs),
+                                                " AND ".join(search_clause_alert_name))
+
+    idq_and_search_clause_list = [clause for clause in (idq_clause, search_clause) if clause]
+    idq_and_search_clause = ' AND '.join(idq_and_search_clause_list)
+
+    query_nb_alerts = """   SELECT      COUNT(IF((uqb.id_user=%%s
+                                                  %s),uqb.id_query,NULL)),
+                                        COUNT(q.id)
                             FROM        user_query_basket AS uqb
-                            WHERE       uqb.id_user=%%s
-                                %s""" % (idq_clause,)
+                            RIGHT JOIN  query AS q
+                                ON      uqb.id_query=q.id
+                                %s""" % ((search_clause and ' AND ' + search_clause),
+                                         (idq_clause and ' WHERE ' + idq_clause))
     params_nb_alerts = (uid,)
     result_nb_alerts = run_sql(query_nb_alerts, params_nb_alerts)
     nb_alerts = result_nb_alerts[0][0]
+    nb_queries = result_nb_alerts[0][1]
 
-    # The real page starts counting from 0, i.e. minus 1 from the human page
-    real_page = page - 1
-    # The step needs to be a positive integer
-    if (step <= 0):
-        step = CFG_WEBALERT_YOURALERTS_MAX_NUMBER_OF_DISPLAYED_ALERTS
-    # The maximum real page is the integer division of the total number of
-    # searches and the searches displayed per page
-    max_real_page = (nb_alerts / step) - (not (nb_alerts % step) and 1 or 0)
-    # Check if the selected real page exceeds the maximum real page and reset
-    # if needed
-    if (real_page >= max_real_page):
-        #if ((nb_queries_distinct % step) != 0):
-        #    real_page = max_real_page
-        #else:
-        #    real_page = max_real_page - 1
-        real_page = max_real_page
-        page = real_page + 1
-    elif (real_page < 0):
-        real_page = 0
-        page = 1
-    # Calculate the start value for the SQL LIMIT constraint
-    limit_start = real_page * step
-    # Calculate the display of the paging navigation arrows for the template
-    paging_navigation = (real_page >= 2,
-                         real_page >= 1,
-                         real_page <= (max_real_page - 1),
-                         (real_page <= (max_real_page - 2)) and (max_real_page + 1))
+    # In case we do have some alerts, proceed with the needed calculations and
+    # fetching them from the database
+    if nb_alerts:
+        # The real page starts counting from 0, i.e. minus 1 from the human page
+        real_page = page - 1
+        # The step needs to be a positive integer
+        if (step <= 0):
+            step = CFG_WEBALERT_YOURALERTS_MAX_NUMBER_OF_DISPLAYED_ALERTS
+        # The maximum real page is the integer division of the total number of
+        # searches and the searches displayed per page
+        max_real_page = nb_alerts and ((nb_alerts / step) - (not (nb_alerts % step) and 1 or 0)) or 0
+        # Check if the selected real page exceeds the maximum real page and reset
+        # if needed
+        if (real_page >= max_real_page):
+            #if ((nb_queries_distinct % step) != 0):
+            #    real_page = max_real_page
+            #else:
+            #    real_page = max_real_page - 1
+            real_page = max_real_page
+            page = real_page + 1
+        elif (real_page < 0):
+            real_page = 0
+            page = 1
+        # Calculate the start value for the SQL LIMIT constraint
+        limit_start = real_page * step
+        # Calculate the display of the paging navigation arrows for the template
+        paging_navigation = (real_page >= 2,
+                             real_page >= 1,
+                             real_page <= (max_real_page - 1),
+                             (real_page <= (max_real_page - 2)) and (max_real_page + 1))
 
-    # query the database
-    query = """ SELECT      q.id,
-                            q.urlargs,
-                            uqb.id_basket,
-                            bsk.name,
-                            uqb.alert_name,
-                            uqb.frequency,
-                            uqb.notification,
-                            DATE_FORMAT(uqb.date_creation,'%s'),
-                            DATE_FORMAT(uqb.date_lastrun,'%s')
-                FROM        user_query_basket uqb
-                LEFT JOIN   query q
-                    ON      uqb.id_query=q.id
-                LEFT JOIN   bskBASKET bsk
-                    ON      uqb.id_basket=bsk.id
-                WHERE       uqb.id_user=%%s
-                    %s
-                ORDER BY    uqb.alert_name ASC
-                LIMIT       %%s,%%s""" % ('%%Y-%%m-%%d %%H:%%i:%%s',
-                                          '%%Y-%%m-%%d %%H:%%i:%%s',
-                                          idq_clause,)
-    params = (uid, limit_start, step)
-    result = run_sql(query, params)
+        query = """ SELECT      q.id,
+                                q.urlargs,
+                                uqb.id_basket,
+                                bsk.name,
+                                uqb.alert_name,
+                                uqb.frequency,
+                                uqb.notification,
+                                DATE_FORMAT(uqb.date_creation,'%s'),
+                                DATE_FORMAT(uqb.date_lastrun,'%s')
+                    FROM        user_query_basket uqb
+                    LEFT JOIN   query q
+                        ON      uqb.id_query=q.id
+                    LEFT JOIN   bskBASKET bsk
+                        ON      uqb.id_basket=bsk.id
+                    WHERE       uqb.id_user=%%s
+                        %s
+                        %s
+                    ORDER BY    uqb.alert_name ASC
+                    LIMIT       %%s,%%s""" % ('%%Y-%%m-%%d %%H:%%i:%%s',
+                                              '%%Y-%%m-%%d %%H:%%i:%%s',
+                                              (idq_clause and ' AND ' + idq_clause),
+                                              (search_clause and ' AND ' + search_clause))
+        params = (uid, limit_start, step)
+        result = run_sql(query, params)
 
-    alerts = []
-    for (query_id,
-         query_args,
-         bsk_id,
-         bsk_name,
-         alert_name,
-         alert_frequency,
-         alert_notification,
-         alert_creation,
-         alert_last_run) in result:
-        try:
-            if not query_id:
-                raise StandardError("""\
+        alerts = []
+        for (query_id,
+             query_args,
+             bsk_id,
+             bsk_name,
+             alert_name,
+             alert_frequency,
+             alert_notification,
+             alert_creation,
+             alert_last_run) in result:
+            try:
+                if not query_id:
+                    raise StandardError("""\
 Warning: I have detected a bad alert for user id %d.
 It seems one of his/her alert queries was deleted from the 'query' table.
 Please check this and delete it if needed.
 Otherwise no problem, I'm continuing with the other alerts now.
 Here are all the alerts defined by this user: %s""" % (uid, repr(result)))
-            alerts.append({'queryid' : query_id,
-                           'queryargs' : query_args,
-                           'textargs' : get_textual_query_info_from_urlargs(query_args, ln=ln),
-                           'userid' : uid,
-                           'basketid' : bsk_id,
-                           'basketname' : bsk_name,
-                           'alertname' : alert_name,
-                           'frequency' : alert_frequency,
-                           'notification' : alert_notification,
-                           'created' : alert_creation,
-                           'lastrun' : alert_last_run})
-        except StandardError:
-            register_exception(alert_admin=True)
+                alerts.append({'queryid' : query_id,
+                               'queryargs' : query_args,
+                               'textargs' : get_textual_query_info_from_urlargs(query_args, ln=ln),
+                               'userid' : uid,
+                               'basketid' : bsk_id,
+                               'basketname' : bsk_name,
+                               'alertname' : alert_name,
+                               'frequency' : alert_frequency,
+                               'notification' : alert_notification,
+                               'created' : alert_creation,
+                               'lastrun' : alert_last_run})
+            except StandardError:
+                register_exception(alert_admin=True)
+    else:
+        alerts = []
+        paging_navigation = ()
 
-    # link to the "add new alert" form
     out = webalert_templates.tmpl_youralerts_display(ln=ln,
                                                      alerts=alerts,
                                                      nb_alerts=nb_alerts,
+                                                     nb_queries=nb_queries,
                                                      idq=idq,
                                                      page=page,
                                                      step=step,
                                                      paging_navigation=paging_navigation,
+                                                     p=p,
                                                      guest=isGuestUser(uid),
                                                      guesttxt=warning_guest_user(type="alerts", ln=ln))
     return out
