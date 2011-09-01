@@ -380,12 +380,12 @@ def _task_run_core():
 
     if fast_update_personid:
         bibtask.task_update_progress('Updating personid...')
-        _run_personid_fast_assign_papers(record_ids_nested)
+        _run_personid_fast_assign_papers(record_ids_nested, all_records)
         bibtask.task_update_progress('PersonID update finished!')
 
     if personid_gc:
         bibtask.task_update_progress('Updating personid (GC)...')
-        _run_personid_gc(record_ids_nested)
+        _run_personid_gc(record_ids_nested, all_records)
         bibtask.task_update_progress('PersonID update finished (GC)!')
         #TODO: remember to pass the papers list!
     return 1
@@ -1067,23 +1067,77 @@ def _run_authornames_tables_gc():
                     comment='bibauthorid_daemon, authornames_tables_gc')
     authornames_tables_gc()
 
-def _run_personid_fast_assign_papers(paperslist):
-    insert_user_log('daemon', '-1', 'PFAP', 'bibsched', 'status',
-                    comment='bibauthorid_daemon, personid_fast_assign_papers on ' + str(paperslist))
-    if not paperslist:
+def _run_personid_fast_assign_papers(paperslist, all_records=False):
+#    insert_user_log('daemon', '-1', 'PFAP', 'bibsched', 'status',
+#                    comment='bibauthorid_daemon, personid_fast_assign_papers on ' + str(paperslist))
+    if not paperslist and all_records:
+        insert_user_log('daemon', '-1', 'PFAP', 'bibsched', 'status',
+                    comment='bibauthorid_daemon, personid_fast_assign_papers on all papers')
+        #update_authornames_tables_from_paper()
+        personid_fast_assign_papers()
+    elif not paperslist:
+        last_log = get_user_log(userinfo='daemon', action='PFAP', only_most_recent=True)
+        if len(last_log) >= 1:
+            #select only the most recent papers
+            recently_modified, min_date = get_papers_recently_modified(date=last_log[0][2])
+            insert_user_log('daemon', '-1', 'PFAP', 'bibsched', 'status',
+                            comment='bibauthorid_daemon, run_personid_fast_assign_papers on '
+                            + str([paperslist, all_records, recently_modified]),
+                            timestamp=min_date[0][0])
+
+            if not recently_modified:
+                bibtask.write_message("update_personID_table_from_paper: "
+                                      "All person entities up to date.",
+                                      stream=sys.stdout, verbose=0)
+            else:
+                bibtask.write_message("update_personID_table_from_paper: Running on: " +
+                                      str(recently_modified), stream=sys.stdout, verbose=0)
+                personid_fast_assign_papers(recently_modified)
+        else:
+            insert_user_log('daemon', '-1', 'PFAP', 'bibsched', 'status',
+                    comment='bibauthorid_daemon, personid_fast_assign_papers on all papers')
         #update_authornames_tables_from_paper()
         personid_fast_assign_papers()
     else:
+        insert_user_log('daemon', '-1', 'PFAP', 'bibsched', 'status',
+                    comment='bibauthorid_daemon, personid_fast_assign_papers on ' + str(paperslist))
         #update_authornames_tables_from_paper(paperslist)
         personid_fast_assign_papers(paperslist)
 
-def _run_personid_gc(paperslist):
-    insert_user_log('daemon', '-1', 'PGC', 'bibsched', 'status',
-                    comment='bibauthorid_daemon, personid_gc (update_personid_from_papers) on '
-                    + str(paperslist))
-    if not paperslist:
+def _run_personid_gc(paperslist, all_records=False):
+#    insert_user_log('daemon', '-1', 'PGC', 'bibsched', 'status',
+#                    comment='bibauthorid_daemon, personid_gc (update_personid_from_papers) on '
+#                    + str(paperslist))
+    if not paperslist and  all_records:
         #update_authornames_tables_from_paper()
+        insert_user_log('daemon', '-1', 'PGC', 'bibsched', 'status',
+            comment='bibauthorid_daemon, personid_gc (update_personid_from_papers) on all papers')
         update_personID_table_from_paper()
+    elif not paperslist:
+        last_log = get_user_log(userinfo='daemon', action='PGC', only_most_recent=True)
+        if len(last_log) >= 1:
+            #select only the most recent papers
+            recently_modified, min_date = get_papers_recently_modified(date=last_log[0][2])
+            insert_user_log('daemon', '-1', 'PGC', 'bibsched', 'status',
+                            comment='bibauthorid_daemon, update_personid_from_papers on '
+                            + str([paperslist, all_records, recently_modified]),
+                            timestamp=min_date[0][0])
+
+            if not recently_modified:
+                bibtask.write_message("update_personID_table_from_paper: "
+                                      "All person entities up to date.",
+                                      stream=sys.stdout, verbose=0)
+            else:
+                bibtask.write_message("update_personID_table_from_paper: Running on: " +
+                                      str(recently_modified), stream=sys.stdout, verbose=0)
+                personid_fast_assign_papers(recently_modified)
+        else:
+            insert_user_log('daemon', '-1', 'PGC', 'bibsched', 'status',
+            comment='bibauthorid_daemon, personid_gc (update_personid_from_papers) on all papers')
+            update_personID_table_from_paper()
     else:
+        insert_user_log('daemon', '-1', 'PGC', 'bibsched', 'status',
+                comment='bibauthorid_daemon, personid_gc (update_personid_from_papers) on '
+                + str(paperslist))
         #update_authornames_tables_from_paper(paperslist)
         update_personID_table_from_paper(paperslist)
