@@ -265,10 +265,12 @@ class Template:
                                 ln,
                                 alerts,
                                 nb_alerts,
+                                nb_queries,
                                 idq,
                                 page,
                                 step,
                                 paging_navigation,
+                                p,
                                 guest,
                                 guesttxt):
         """
@@ -309,13 +311,44 @@ class Template:
 
         # In case the user has not yet defined any alerts display only the
         # following message
-        if not alerts:
-            if idq:
-                msg = _('You have not defined any alerts yet based on that search query.')
+        if not nb_alerts:
+            if idq and not p:
+                if nb_queries:
+                    msg = _('You have not defined any alerts yet based on that search query.')
+                    msg += "<br />"
+                    msg += _('You may want to %(new_alert)s or display all %(youralerts)s.') % \
+                           {'new_alert': '<a href="%s/youralerts/input?ln=%s&amp;idq=%i">%s</a>' % (CFG_SITE_SECURE_URL, ln, idq, _('define one now')),
+                            'youralerts': '<a href="%s/youralerts/display?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('your alerts'))}
+                else:
+                    msg = _('The selected search query seems to be invalid.')
+                    msg += "<br />"
+                    msg += _('You may define new alert based on %(yoursearches)s, the %(popular_alerts)s or just by %(search_interface)s.') % \
+                           {'yoursearches': '<a href="%s/yoursearches/display?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('your searches')),
+                            'popular_alerts': '<a href="%s/youralerts/popular?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('popular alerts')),
+                            'search_interface': '<a href="%s/?ln=%s">%s</a>' %(CFG_SITE_URL, ln, _('searching for something new'))}
+            elif p and not idq:
+                msg = _('You have not defined any alerts yet including the terms %s.') % \
+                      ('<strong>' + cgi.escape(p) + '</strong>',)
                 msg += "<br />"
-                msg += _('You may want to %(new_alert)s or display all %(youralerts)s.') % \
-                       {'new_alert': '<a href="%s/youralerts/input?ln=%s&amp;idq=%i">%s</a>' % (CFG_SITE_SECURE_URL, ln, idq, _('define one now')),
-                        'youralerts': '<a href="%s/youralerts/display?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('your alerts'))}
+                msg += _('You may define new alert based on %(yoursearches)s, the %(popular_alerts)s or just by %(search_interface)s.') % \
+                       {'yoursearches': '<a href="%s/yoursearches/display?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('your searches')),
+                        'popular_alerts': '<a href="%s/youralerts/popular?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('popular alerts')),
+                        'search_interface': '<a href="%s/?ln=%s">%s</a>' %(CFG_SITE_URL, ln, _('searching for something new'))}
+            elif p and idq:
+                if nb_queries:
+                    msg = _('You have not defined any alerts yet based on that search query including the terms %s.') % \
+                          ('<strong>' + cgi.escape(p) + '</strong>',)
+                    msg += "<br />"
+                    msg += _('You may want to %(new_alert)s or display all %(youralerts)s.') % \
+                           {'new_alert': '<a href="%s/youralerts/input?ln=%s&amp;idq=%i">%s</a>' % (CFG_SITE_SECURE_URL, ln, idq, _('define one now')),
+                            'youralerts': '<a href="%s/youralerts/display?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('your alerts'))}
+                else:
+                    msg = _('The selected search query seems to be invalid.')
+                    msg += "<br />"
+                    msg += _('You may define new alert based on %(yoursearches)s, the %(popular_alerts)s or just by %(search_interface)s.') % \
+                           {'yoursearches': '<a href="%s/yoursearches/display?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('your searches')),
+                            'popular_alerts': '<a href="%s/youralerts/popular?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('popular alerts')),
+                            'search_interface': '<a href="%s/?ln=%s">%s</a>' %(CFG_SITE_URL, ln, _('searching for something new'))}
             else:
                 msg = _('You have not defined any alerts yet.')
                 msg += '<br />'
@@ -327,9 +360,26 @@ class Template:
             return out
 
         # Diplay a message about the number of alerts.
-        if idq:
+        if idq and not p:
             msg = _('You have defined %(number_of_alerts)s alerts based on that search query.') % \
                   {'number_of_alerts': '<strong>' + str(nb_alerts) + '</strong>'}
+            msg += '<br />'
+            msg += _('You may want to %(new_alert)s or display all %(youralerts)s.') % \
+                   {'new_alert': '<a href="%s/youralerts/input?ln=%s&amp;idq=%i">%s</a>' % (CFG_SITE_SECURE_URL, ln, idq, _('define a new one')),
+                    'youralerts': '<a href="%s/youralerts/display?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('your alerts'))}
+        elif p and not idq:
+            msg = _('You have defined %(number_of_alerts)s alerts including the terms %(p)s.') % \
+                  {'p': '<strong>' + cgi.escape(p) + '</strong>',
+                   'number_of_alerts': '<strong>' + str(nb_alerts) + '</strong>'}
+            msg += '<br />'
+            msg += _('You may define new alert based on %(yoursearches)s, the %(popular_alerts)s or just by %(search_interface)s.') % \
+                   {'yoursearches': '<a href="%s/yoursearches/display?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('your searches')),
+                    'popular_alerts': '<a href="%s/youralerts/popular?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('popular alerts')),
+                    'search_interface': '<a href="%s/?ln=%s">%s</a>' %(CFG_SITE_URL, ln, _('searching for something new'))}
+        elif idq and p:
+            msg = _('You have defined %(number_of_alerts)s alerts based on that search query including the terms %(p)s.') % \
+                  {'p': '<strong>' + cgi.escape(p) + '</strong>',
+                   'number_of_alerts': '<strong>' + str(nb_alerts) + '</strong>'}
             msg += '<br />'
             msg += _('You may want to %(new_alert)s or display all %(youralerts)s.') % \
                    {'new_alert': '<a href="%s/youralerts/input?ln=%s&amp;idq=%i">%s</a>' % (CFG_SITE_SECURE_URL, ln, idq, _('define a new one')),
@@ -343,6 +393,19 @@ class Template:
                     'popular_alerts': '<a href="%s/youralerts/popular?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('popular alerts')),
                     'search_interface': '<a href="%s/?ln=%s">%s</a>' %(CFG_SITE_URL, ln, _('searching for something new'))}
         out = '<p>' + msg + '</p>'
+
+        # Search form
+        search_form = """
+        <form name="youralerts_search" action="%(action)s" method="get">
+          <small><strong>%(search_text)s</strong></small>
+          <input name="p" value="%(p)s" type="text" />
+          <input class="formbutton" type="submit" value="%(submit_label)s" />
+        </form>
+        """ % {'search_text': _('Search all your alerts for'),
+               'action': '%s/youralerts/display?ln=%s' % (CFG_SITE_SECURE_URL, ln),
+               'p': cgi.escape(p),
+               'submit_label': _('Search')}
+        out += '<p>' + search_form + '</p>'
 
         counter = (page - 1) * step
         youralerts_display_html = ""
@@ -406,7 +469,9 @@ class Template:
                                                              'idq'    :   alert_query_id,
                                                              'name'   :   alert_name,
                                                              'idb'    :   alert_basket_id},
-                                                            _('Delete'))
+                                                            _('Delete'),
+                                                            {'onclick': 'return confirm(\'%s\')' % \
+                                                             (_('Are you sure you want to permanently delete this alert?'),)})
             alert_details_options = '<img src="%s/img/youralerts_alert_edit.png" />' % (CFG_SITE_URL,) + \
                                     alert_details_options_edit + \
                                     '&nbsp;&nbsp;&nbsp;' + \
