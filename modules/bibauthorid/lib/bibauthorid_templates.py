@@ -889,7 +889,7 @@ class Template:
             r = verbiage_dict['data_ns']
             h('<noscript><h5>%s</h5></noscript>' % r)
             canonical_name = get_canonical_id_from_person_id(person_id)
-            if '.' in canonical_name:
+            if '.' in str(canonical_name) and not isinstance(canonical_name, int):
                 canonical_name = canonical_name[0:canonical_name.rindex('.')]
             h('<div><div> <strong> Canonical name setup </strong>')
             h('<div style="margin-top: 15px;"> Current canonical name: %s  <form method="GET" action="%s/person/action">' % (canonical_name, CFG_SITE_URL))
@@ -970,7 +970,7 @@ class Template:
                         fv = self._('Error retrieving record title')
 
                     h('<div id="aid_moreinfo">')
-                    h(('%s' + self._('with name: '))
+                    h(('%s' + self._(' --  With name: '))
                       % (fv))
                     #, bibrefs_auto_assigned[person]["bibrecs"][recid][0][1]))
                     # asbibref = "%s||%s" % (person, bibrefs_auto_assigned[person]["bibrecs"][recid][0][0])

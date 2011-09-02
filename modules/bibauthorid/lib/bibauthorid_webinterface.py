@@ -567,9 +567,9 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         if len(donet) > 0:
             teaser = 'Success!'
             if len(donet) == 1:
-                message = str(len(donet)) + ' transaction succesfully executed.'
+                message = str(len(donet)) + ' transaction successfully executed.'
             else:
-                message = str(len(donet)) + ' transactions succesfully executed.'
+                message = str(len(donet)) + ' transactions successfully executed.'
 
             box = box + TEMPLATE.tmpl_notification_box(message, teaser)
         return box
@@ -2332,12 +2332,12 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         try:
             pinfo = session["personinfo"]
             if pinfo['ulevel'] == 'admin':
-                return redirect_to_url(req, '%s/person/%s' % (CFG_SITE_URL, person))
+                return redirect_to_url(req, '%s/person/%s?open_claim=True' % (CFG_SITE_URL, person))
         except KeyError:
             pass
 
         if bconfig.BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE:
-            return redirect_to_url(req, '%s/person/%s' % (CFG_SITE_URL, person))
+            return redirect_to_url(req, '%s/person/%s?open_claim=True' % (CFG_SITE_URL, person))
 
         body = TEMPLATE.tmpl_claim_stub(person)
 
