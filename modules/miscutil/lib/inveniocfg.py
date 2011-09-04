@@ -848,7 +848,18 @@ def cli_cmd_create_apache_conf(conf):
         ssl_key_path = '/etc/pki/tls/private/localhost.key'
         vhost_ip_address_needed = True
         wsgi_socket_directive_needed = True
-    ## okay, let's create Apache vhost files:
+    # maybe we are using non-standard ports?
+    vhost_site_url = conf.get('Invenio', 'CFG_SITE_URL').replace("http://", "")
+    vhost_site_url_port = '80'
+    vhost_site_secure_url = conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("https://", "")
+    vhost_site_secure_url_port = '443'
+    if ':' in vhost_site_url:
+        vhost_site_url, vhost_site_url_port = vhost_site_url.split(':', 1)
+    if ':' in vhost_site_secure_url:
+        vhost_site_secure_url, vhost_site_secure_url_port = vhost_site_secure_url.split(':', 1)
+    if vhost_site_url_port != '80' or vhost_site_secure_url_port != '443':
+        listen_directive_needed = True
+    ## OK, let's create Apache vhost files:
     if not os.path.exists(apache_conf_dir):
         os.mkdir(apache_conf_dir)
     apache_vhost_file = apache_conf_dir + os.sep + \
@@ -859,7 +870,7 @@ def cli_cmd_create_apache_conf(conf):
 AddDefaultCharset UTF-8
 ServerSignature Off
 ServerTokens Prod
-NameVirtualHost %(vhost_ip_address)s:80
+NameVirtualHost %(vhost_ip_address)s:%(vhost_site_url_port)s
 %(listen_directive)s
 %(wsgi_socket_directive)s
 WSGIRestrictStdout Off
@@ -869,7 +880,7 @@ WSGIRestrictStdout Off
 <Files *~>
    deny from all
 </Files>
-<VirtualHost %(vhost_ip_address)s:80>
+<VirtualHost %(vhost_ip_address)s:%(vhost_site_url_port)s>
         ServerName %(servername)s
         ServerAlias %(serveralias)s
         ServerAdmin %(serveradmin)s
@@ -911,15 +922,17 @@ WSGIRestrictStdout Off
         </Directory>
         %(deflate_directive)s
 </VirtualHost>
-""" % {'servername': conf.get('Invenio', 'CFG_SITE_URL').replace("http://", ""),
-       'serveralias': conf.get('Invenio', 'CFG_SITE_URL').replace("http://", "").split('.')[0],
+""" % {'vhost_site_url_port': vhost_site_url_port,
+       'servername': vhost_site_url,
+       'serveralias': vhost_site_url.split('.')[0],
        'serveradmin': conf.get('Invenio', 'CFG_SITE_ADMIN_EMAIL'),
        'webdir': conf.get('Invenio', 'CFG_WEBDIR'),
        'logdir': conf.get('Invenio', 'CFG_LOGDIR'),
        'libdir' : conf.get('Invenio', 'CFG_PYLIBDIR'),
        'wsgidir': os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'www-wsgi'),
        'vhost_ip_address': vhost_ip_address_needed and _detect_ip_address() or '*',
-       'listen_directive': listen_directive_needed and 'Listen 80' or '#Listen 80',
+       'listen_directive': listen_directive_needed and 'Listen ' + vhost_site_url_port or \
+                           '#Listen ' + vhost_site_url_port,
        'wsgi_socket_directive': (wsgi_socket_directive_needed and \
                                 'WSGISocketPrefix ' or '#WSGISocketPrefix ') + \
               conf.get('Invenio', 'CFG_PREFIX') + os.sep + 'var' + os.sep + 'run',
@@ -930,7 +943,7 @@ WSGIRestrictStdout Off
 ServerSignature Off
 ServerTokens Prod
 %(listen_directive)s
-NameVirtualHost %(vhost_ip_address)s:443
+NameVirtualHost %(vhost_ip_address)s:%(vhost_site_secure_url_port)s
 %(ssl_pem_directive)s
 %(ssl_crt_directive)s
 %(ssl_key_directive)s
@@ -941,7 +954,7 @@ WSGIRestrictStdout Off
 <Files *~>
    deny from all
 </Files>
-<VirtualHost %(vhost_ip_address)s:443>
+<VirtualHost %(vhost_ip_address)s:%(vhost_site_secure_url_port)s>
         ServerName %(servername)s
         ServerAlias %(serveralias)s
         ServerAdmin %(serveradmin)s
@@ -982,15 +995,17 @@ WSGIRestrictStdout Off
         </Directory>
         %(deflate_directive)s
 </VirtualHost>
-""" % {'servername': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("https://", ""),
-       'serveralias': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("https://", "").split('.')[0],
+""" % {'vhost_site_secure_url_port': vhost_site_secure_url_port,
+       'servername': vhost_site_secure_url,
+       'serveralias': vhost_site_secure_url.split('.')[0],
        'serveradmin': conf.get('Invenio', 'CFG_SITE_ADMIN_EMAIL'),
        'webdir': conf.get('Invenio', 'CFG_WEBDIR'),
        'logdir': conf.get('Invenio', 'CFG_LOGDIR'),
        'libdir' : conf.get('Invenio', 'CFG_PYLIBDIR'),
        'wsgidir' : os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'www-wsgi'),
        'vhost_ip_address': vhost_ip_address_needed and _detect_ip_address() or '*',
-       'listen_directive' : listen_directive_needed and 'Listen 443' or '#Listen 443',
+       'listen_directive' : listen_directive_needed and 'Listen ' + vhost_site_secure_url_port or \
+                            '#Listen ' + vhost_site_secure_url_port,
        'ssl_pem_directive': ssl_pem_directive_needed and \
                             'SSLCertificateFile %s' % ssl_pem_path or \
                             '#SSLCertificateFile %s' % ssl_pem_path,
