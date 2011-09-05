@@ -958,7 +958,8 @@ def update_personID_table_from_paper(papers_list=None, personid=None):
             while self.q.empty() == False:
                 self.paper = self.q.get()
                 self.check_paper()
-                self.q.task_done()
+#                There is no Queue.task_done() in python 2.4
+#                self.q.task_done()
 
         def check_paper(self):
             if bconfig.TABLES_UTILS_DEBUG:
@@ -1062,13 +1063,17 @@ def update_personID_table_from_paper(papers_list=None, personid=None):
         jobslist = Queue()
         for p in jobs.items():
             jobslist.put(p)
+        del(jobs)
 
+        workers = []
         for i in range(bconfig.CFG_BIBAUTHORID_MAX_PROCESSES):
-            t = Worker(jobslist)
-            t.daemon = True
-            t.start()
+            w = Worker(jobslist)
+            w.daemon = True
+            w.start()
+            workers.append(w)
 
-        jobslist.join()
+        for w in workers:
+            w.join()
 
 
 def personid_perform_cleanup():
