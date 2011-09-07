@@ -36,7 +36,8 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     get_record_revision_ids, revision_format_valid_p, split_revid, \
     get_marcxml_of_revision_id
 from invenio.htmlutils import remove_html_markup
-from invenio.bibrecord import create_record, record_xml_output, record_add_field
+from invenio.bibrecord import create_record, record_xml_output, record_add_field, \
+                              record_order_subfields
 from invenio.bibedit_config import CFG_BIBEDIT_TO_MERGE_SUFFIX
 
 import invenio.template
@@ -382,6 +383,7 @@ def _get_record_slave(recid, result, mode=None, uid=None):
             result['resultCode'], result['resultText'] = 1, 'Record %s locked by queue' % recid
         else:
             record = create_record( print_record(recid, 'xm') )[0]
+            record_order_subfields(record)
 
     elif mode == 'tmpfile':
         file_path = '%s_%s.xml' % (_get_file_path(recid, uid),
