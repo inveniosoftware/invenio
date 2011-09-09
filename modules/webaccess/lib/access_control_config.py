@@ -106,14 +106,14 @@ elif CFG_OPENAIRE_SITE:
     "ZOpenAIRE": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
     }
 elif CFG_INSPIRE_SITE:
-    # FIXME: remove after HTTPS certificates are in place for INSPIRE
+    # INSPIRE specific robot configuration
     CFG_EXTERNAL_AUTH_DEFAULT = 'Local'
     CFG_EXTERNAL_AUTH_USING_SSO = False
     CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
     CFG_EXTERNAL_AUTHENTICATION = {
     "Local": None,
-    "Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False, check_user_ip=False),
-    "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True, check_user_ip=False)
+    "Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False, check_user_ip=True),
+    "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True, check_user_ip=True)
     }
 else:
     CFG_EXTERNAL_AUTH_DEFAULT = 'Local'
