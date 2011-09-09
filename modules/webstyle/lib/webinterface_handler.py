@@ -215,11 +215,14 @@ class WebInterfaceDirectory(object):
             final_parts[-3:] = original_parts[-3:]
 
             target = urlparse.urlunparse(final_parts)
-            ## FIXME: this condition should disappear once Inspire have a valid
-            ## https certificate
-            from invenio.config import CFG_INSPIRE_SITE
-            if not CFG_INSPIRE_SITE or plain_path.startswith('/youraccount/login'):
-                redirect_to_url(req, target)
+            ## The following condition used to allow certain URLs to
+            ## by-pass the forced SSL redirect. Since SSL certificates
+            ## are deployed on INSPIRE, this is no longer needed
+            ## Will be left here for reference.
+            #from invenio.config import CFG_INSPIRE_SITE
+            #if not CFG_INSPIRE_SITE or plain_path.startswith('/youraccount/login'):
+            redirect_to_url(req, target)
+
         if CFG_EXTERNAL_AUTH_USING_SSO and req.is_https() and guest_p:
             (iden, p_un, dummy, dummy) = loginUser(req, '', '',
                                          CFG_EXTERNAL_AUTH_USING_SSO)
