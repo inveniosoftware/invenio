@@ -42,7 +42,8 @@ try:
         CFG_BIBAUTHORID_ATTACH_VA_TO_MULTIPLE_RAS , \
         CFG_BIBAUTHORID_ENABLED, \
         CFG_BIBAUTHORID_ON_AUTHORPAGES, \
-        CFG_BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE
+        CFG_BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE, \
+        CFG_INSPIRE_SITE
 except ImportError:
     GLOBAL_CONFIG = False
 
@@ -237,12 +238,17 @@ LOGGER = logging.getLogger("Dummy")
 LOGGER.addHandler(DEFAULT_HANDLER)
 LOGGER.setLevel(LOG_LEVEL)
 
-## force skip ui arxiv stub page (specific fore inspire)
-if GLOBAL_CONFIG:
+## force skip ui arxiv stub page (specific for inspire)
+BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = True
+
+if GLOBAL_CONFIG and CFG_INSPIRE_SITE:
     BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = CFG_BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE
-else:
-    BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = True
-BIBAUTHORID_CFG_INSPIRE_LOGIN = 'http://arxiv.org/inspire_login'
+
+## URL for the remote INSPIRE login that shall be shown on (arXiv stub page.)
+BIBAUTHORID_CFG_INSPIRE_LOGIN = ""
+
+if CFG_INSPIRE_SITE:
+    BIBAUTHORID_CFG_INSPIRE_LOGIN = 'https://arxiv.org/inspire_login'
 
 if not LOGGERS:
     LOGGERS.append(logging.getLogger("Dummy"))
