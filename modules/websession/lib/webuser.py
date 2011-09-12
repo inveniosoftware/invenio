@@ -225,6 +225,8 @@ def setUid(req, uid, remember_me=False):
     if hasattr(req, '_user_info'):
         del req._user_info
     session = get_session(req)
+    session.invalidate()
+    session = get_session(req)
     session['uid'] = uid
     if remember_me:
         session.set_timeout(86400)

@@ -48,7 +48,7 @@ from invenio.dbquery import run_sql
 from invenio.webmessage import account_new_mail
 from invenio.access_control_engine import acc_authorize_action
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.webinterface_handler_config import HTTP_BAD_REQUEST
+from invenio.webinterface_handler_config import SERVER_RETURN, HTTP_NOT_FOUND
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
 from invenio import webgroup
 from invenio import webgroup_dblayer
@@ -61,7 +61,7 @@ from invenio.access_control_mailcookie import mail_cookie_retrieve_kind, \
     InvenioWebAccessMailCookieDeletedError, mail_cookie_check_authorize_action
 from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS, \
     CFG_EXTERNAL_AUTH_USING_SSO, CFG_EXTERNAL_AUTH_LOGOUT_SSO, \
-    CFG_EXTERNAL_AUTHENTICATION
+    CFG_EXTERNAL_AUTHENTICATION, CFG_EXTERNAL_AUTH_SSO_REFRESH
 
 import invenio.template
 websession_templates = invenio.template.load('websession')
@@ -72,7 +72,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
     _exports = ['', 'edit', 'change', 'lost', 'display',
                 'send_email', 'youradminactivities', 'access',
                 'delete', 'logout', 'login', 'register', 'resetpassword',
-                'robotlogin', 'robotlogout']
+                'robotlogin', 'robotlogout', 'keepalivesso']
 
     _force_https = True
 
@@ -692,7 +692,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             from invenio.config import CFG_OPENAIRE_PORTAL_URL
             redirect_to_url(req, CFG_OPENAIRE_PORTAL_URL)
         else:
-            redirect_to_url(req, "%s/img/pix.png" % CFG_SITE_URL)
+            redirect_to_url(req, "%s/img/pix.png" % CFG_SITE_SECURE_URL)
 
     def robotlogin(self, req, form):
         """
@@ -756,7 +756,24 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         lastupdated=__lastupdated__,
                         navmenuid='youraccount')
 
-
+    def keepalivesso(self, req, form):
+        """
+        This handler is a hack to keep a Shibboleth SSO session alive.
+        Basically this page should be included into a hidden i-frame,
+        so that the client browser will keep visit this URL regularly
+        and provide up-to-date information about the user.
+        """
+        if CFG_EXTERNAL_AUTH_USING_SSO:
+            argd = wash_urlargd(form, {'format': (str, '')})
+            webuser.collect_user_info(req, refresh=True)
+            req.headers_out['Refresh'] = "%s; url=%s" % (CFG_EXTERNAL_AUTH_SSO_REFRESH, "%s/youraccount/keepssoalive" % CFG_SITE_SECURE_URL)
+            if argd['format'] == 'image':
+                from invenio.bibdocfile import stream_file
+                from invenio.config import CFG_WEBDIR
+                return stream_file(req, os.path.join(CFG_WEBDIR, 'img', 'keep_sso_connection_alive.gif'))
+            return """<html><head><meta http-equiv="Refresh" content="%s; url=%s" /></head><body></body></html>""" % (CFG_EXTERNAL_AUTH_SSO_REFRESH, "%s/youraccount/keepssoalive" % CFG_SITE_SECURE_URL)
+        else:
+            raise SERVER_RETURN(HTTP_NOT_FOUND)
 
     def login(self, req, form):
         args = wash_urlargd(form, {
@@ -828,7 +845,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
             # login successful!
             if args['referer']:
-                redirect_to_url(req, args['referer'])
+                redirect_to_url(req, args['referer'].replace(CFG_SITE_URL, CFG_SITE_SECURE_URL))
             else:
                 return self.display(req, form)
         else:
@@ -1058,7 +1075,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use groups."))
 
         if argd['cancel']:
-            url = CFG_SITE_URL + '/yourgroups/display?ln=%s'
+            url = CFG_SITE_SECURE_URL + '/yourgroups/display?ln=%s'
             url %= argd['ln']
             redirect_to_url(req, url)
 
@@ -1117,7 +1134,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use groups."))
 
         if argd['cancel']:
-            url = CFG_SITE_URL + '/yourgroups/display?ln=%s'
+            url = CFG_SITE_SECURE_URL + '/yourgroups/display?ln=%s'
             url %= argd['ln']
             redirect_to_url(req, url)
 
@@ -1179,7 +1196,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use groups."))
 
         if argd['cancel']:
-            url = CFG_SITE_URL + '/yourgroups/display?ln=%s'
+            url = CFG_SITE_SECURE_URL + '/yourgroups/display?ln=%s'
             url %= argd['ln']
             redirect_to_url(req, url)
 
@@ -1236,7 +1253,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use groups."))
 
         if argd['cancel']:
-            url = CFG_SITE_URL + '/yourgroups/display?ln=%s'
+            url = CFG_SITE_SECURE_URL + '/yourgroups/display?ln=%s'
             url %= argd['ln']
             redirect_to_url(req, url)
 
@@ -1307,7 +1324,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use groups."))
 
         if argd['cancel']:
-            url = CFG_SITE_URL + '/yourgroups/display?ln=%s'
+            url = CFG_SITE_SECURE_URL + '/yourgroups/display?ln=%s'
             url %= argd['ln']
             redirect_to_url(req, url)
 

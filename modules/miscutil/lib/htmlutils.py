@@ -291,15 +291,21 @@ def tidy_html(html_buffer, cleaning_lib='utidylib'):
 
     return output
 
-def get_mathjax_header():
+def get_mathjax_header(https=False):
     """
     Return the snippet of HTML code to put in HTML HEAD tag, in order to
     enable MathJax support.
+    @param https: when using the CDN, whether to use the HTTPS URL rather
+        than the HTTP one.
+    @type https: bool
     @note: with new releases of MathJax, update this function toghether with
            $MJV variable in the root Makefile.am
     """
     if CFG_MATHJAX_HOSTING.lower() == 'cdn':
-        mathjax_path = "http://cdn.mathjax.org/mathjax/1.1-latest"
+        if https:
+            mathjax_path = "https://d3eoax9i5htok0.cloudfront.net/mathjax/1.1-latest"
+        else:
+            mathjax_path = "http://cdn.mathjax.org/mathjax/1.1-latest"
     else:
         mathjax_path = "/MathJax"
     return """<script type="text/x-mathjax-config">

@@ -768,6 +768,7 @@ def cli_cmd_create_apache_conf(conf):
     """
     print ">>> Going to create Apache conf files..."
     from invenio.textutils import wrap_text_in_a_box
+    from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
     apache_conf_dir = conf.get("Invenio", 'CFG_ETCDIR') + \
                       os.sep + 'apache'
 
@@ -827,6 +828,20 @@ def cli_cmd_create_apache_conf(conf):
     else:
         deflate_directive = ""
 
+    if CFG_EXTERNAL_AUTH_USING_SSO:
+        shibboleth_directive = r"""
+        <Location ~ "/youraccount/(login|keepssoalive)|Shibboleth.sso/">
+            SSLRequireSSL   # The modules only work using HTTPS
+            AuthType shibboleth
+            ShibRequireSession On
+            ShibRequireAll On
+            ShibExportAssertion Off
+            require valid-user
+        </Location>
+        """
+    else:
+        shibboleth_directive = ""
+
     ## Apache vhost conf file is distro specific, so analyze needs:
     # Gentoo (and generic defaults):
     listen_directive_needed = True
@@ -849,6 +864,9 @@ def cli_cmd_create_apache_conf(conf):
         wsgi_socket_directive_needed = True
     # maybe we are using non-standard ports?
     vhost_site_url = conf.get('Invenio', 'CFG_SITE_URL').replace("http://", "")
+    if vhost_site_url.startswith("https://"):
+        ## The installation is configured to require HTTPS for any connection
+        vhost_site_url = vhost_site_url.replace("https://", "")
     vhost_site_url_port = '80'
     vhost_site_secure_url = conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("https://", "")
     vhost_site_secure_url_port = '443'
@@ -981,6 +999,7 @@ WSGIRestrictStdout Off
         AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1
         Alias /robots.txt %(webdir)s/robots.txt
         Alias /favicon.ico %(webdir)s/favicon.ico
+        RedirectMatch /sslredirect/(.*) http://$1
         WSGIScriptAlias / %(wsgidir)s/invenio.wsgi
         WSGIPassAuthorization On
         %(xsendfile_directive)s
@@ -993,6 +1012,7 @@ WSGIRestrictStdout Off
            Allow from all
         </Directory>
         %(deflate_directive)s
+        %(shibboleth_directive)s
 </VirtualHost>
 """ % {'vhost_site_secure_url_port': vhost_site_secure_url_port,
        'servername': vhost_site_secure_url,
@@ -1016,6 +1036,7 @@ WSGIRestrictStdout Off
                             'SSLCertificateKeyFile %s' % ssl_key_path,
        'xsendfile_directive' : xsendfile_directive,
        'deflate_directive': deflate_directive,
+       'shibboleth_directive': shibboleth_directive,
        }
     # write HTTP vhost snippet:
     if os.path.exists(apache_vhost_file):
@@ -1028,8 +1049,7 @@ WSGIRestrictStdout Off
     print "Created file", apache_vhost_file
     # write HTTPS vhost snippet:
     vhost_ssl_created = False
-    if conf.get('Invenio', 'CFG_SITE_SECURE_URL') != \
-       conf.get('Invenio', 'CFG_SITE_URL'):
+    if conf.get('Invenio', 'CFG_SITE_SECURE_URL').startswith("https://"):
         if os.path.exists(apache_vhost_ssl_file):
             shutil.copy(apache_vhost_ssl_file,
                         apache_vhost_ssl_file + '.OLD')

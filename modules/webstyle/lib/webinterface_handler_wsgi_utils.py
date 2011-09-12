@@ -237,22 +237,16 @@ def _parse_cookie(str, Class, names=None):
 
     return result
 
-def add_cookie(req, cookie, value="", **kw):
+def add_cookies(req, cookies):
     """
-    Sets a cookie in outgoing headers and adds a cache
+    Sets one or more cookie in outgoing headers and adds a cache
     directive so that caches don't cache the cookie.
     """
-
-    # is this a cookie?
-    if not isinstance(cookie, Cookie):
-
-        # make a cookie
-        cookie = Cookie(cookie, value, **kw)
-
     if not req.headers_out.has_key("Set-Cookie"):
         req.headers_out.add("Cache-Control", 'no-cache="set-cookie"')
 
-    req.headers_out.add("Set-Cookie", str(cookie))
+    for cookie in cookies:
+        req.headers_out.add("Set-Cookie", str(cookie))
 
 def get_cookies(req, Class=Cookie, **kw):
     """

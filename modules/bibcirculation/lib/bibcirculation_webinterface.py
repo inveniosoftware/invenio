@@ -26,7 +26,6 @@ __lastupdated__ = """$Date$"""
 
 # others invenio imports
 from invenio.config import CFG_SITE_LANG, \
-                           CFG_SITE_URL, \
                            CFG_SITE_SECURE_URL, \
                            CFG_ACCESS_CONTROL_LEVEL_SITE, \
                            CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
@@ -71,7 +70,7 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
     def index(self, req, form):
         """ The function called by default
         """
-        redirect_to_url(req, "%s/yourloans/display?%s" % (CFG_SITE_URL,
+        redirect_to_url(req, "%s/yourloans/display?%s" % (CFG_SITE_SECURE_URL,
                                                           req.args))
 
     def display(self, req, form):
@@ -89,14 +88,14 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
         uid = getUid(req)
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/yourloans/display" % \
-                                       (CFG_SITE_URL,),
+                                       (CFG_SITE_SECURE_URL,),
                                        navmenuid="yourloans")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourloans/display%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})), norobot=True)
 
@@ -133,14 +132,14 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
         uid = getUid(req)
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/yourloans/loanshistoricaloverview" % \
-                                       (CFG_SITE_URL,),
+                                       (CFG_SITE_SECURE_URL,),
                                        navmenuid="yourloans")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourloans/loanshistoricaloverview%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})), norobot=True)
 
@@ -173,7 +172,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
     def index(self, req, form):
         """ The function called by default
         """
-        redirect_to_url(req, "%s/ill/display?%s" % (CFG_SITE_URL,
+        redirect_to_url(req, "%s/ill/display?%s" % (CFG_SITE_SECURE_URL,
                                                           req.args))
 
     def display(self, req, form):
@@ -189,14 +188,14 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         uid = getUid(req)
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/ill/display" % \
-                                       (CFG_SITE_URL,),
+                                       (CFG_SITE_SECURE_URL,),
                                        navmenuid="ill")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/ill/display%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})), norobot=True)
 
@@ -245,14 +244,14 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         uid = getUid(req)
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/ill/register_request" % \
-                                       (CFG_SITE_URL,),
+                                       (CFG_SITE_SECURE_URL,),
                                        navmenuid="ill")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/ill/register_request%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})), norobot=True)
 
@@ -349,7 +348,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri']}, {})
+                CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -365,7 +364,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         if argd['ln'] != CFG_SITE_LANG:
             link_ln = '?ln=%s' % argd['ln']
         tabs = [(unordered_tabs[tab_id]['label'], \
-                 '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
+                 '%s/%s/%s/%s%s' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
                  tab_id in ['holdings'],
                  unordered_tabs[tab_id]['enabled']) \
                 for (tab_id, _order) in ordered_tabs_id
@@ -379,7 +378,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
 
         title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
-        navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
+        navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
         navtrail += title
         navtrail += '</a>'
 
@@ -388,7 +387,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                               uid=uid,
                               verbose=1,
                               req=req,
-                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
+                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                               language=argd['ln'],
                               navmenuid='search',
                               navtrail_append_title_p=0) + \
@@ -425,7 +424,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/%s/%s/holdings/request%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         CFG_SITE_RECORD,
                         self.recid,
                         make_canonical_urlargd(argd, {})),
@@ -438,7 +437,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                      make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri']}, {})
+                CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -455,7 +454,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         if argd['ln'] != CFG_SITE_LANG:
             link_ln = '?ln=%s' % argd['ln']
         tabs = [(unordered_tabs[tab_id]['label'], \
-                 '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
+                 '%s/%s/%s/%s%s' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
                  tab_id in ['holdings'],
                  unordered_tabs[tab_id]['enabled']) \
                 for (tab_id, _order) in ordered_tabs_id
@@ -469,7 +468,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
 
         title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
-        navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
+        navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
         navtrail += title
         navtrail += '</a>'
 
@@ -478,7 +477,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                               uid=uid,
                               verbose=1,
                               req=req,
-                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
+                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                               language=argd['ln'],
                               navmenuid='search',
                               navtrail_append_title_p=0) + \
@@ -515,7 +514,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                      make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri']}, {})
+                CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -532,7 +531,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         if argd['ln'] != CFG_SITE_LANG:
             link_ln = '?ln=%s' % ln
         tabs = [(unordered_tabs[tab_id]['label'], \
-                 '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
+                 '%s/%s/%s/%s%s' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
                  tab_id in ['holdings'],
                  unordered_tabs[tab_id]['enabled']) \
                 for (tab_id, _order) in ordered_tabs_id
@@ -546,7 +545,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
 
         title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
-        navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
+        navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
         navtrail += title
         navtrail += '</a>'
 
@@ -591,7 +590,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/%s/%s/holdings/ill_request_with_recid%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         CFG_SITE_RECORD,
                         self.recid,
                         make_canonical_urlargd(argd, {})),
@@ -604,7 +603,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                      make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri']}, {})
+                CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -621,7 +620,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         if argd['ln'] != CFG_SITE_LANG:
             link_ln = '?ln=%s' % argd['ln']
         tabs = [(unordered_tabs[tab_id]['label'], \
-                 '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
+                 '%s/%s/%s/%s%s' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
                  tab_id in ['holdings'],
                  unordered_tabs[tab_id]['enabled']) \
                 for (tab_id, _order) in ordered_tabs_id
@@ -635,7 +634,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
 
         title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
-        navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
+        navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
         navtrail += title
         navtrail += '</a>'
 
@@ -644,7 +643,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                               uid=uid,
                               verbose=1,
                               req=req,
-                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
+                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                               language=argd['ln'],
                               navmenuid='search',
                               navtrail_append_title_p=0) + \
@@ -690,7 +689,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/%s/%s/holdings/ill_request_with_recid%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         CFG_SITE_RECORD,
                         self.recid,
                         make_canonical_urlargd(argd, {})),
@@ -703,7 +702,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                      make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri']}, {})
+                CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -720,7 +719,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         if argd['ln'] != CFG_SITE_LANG:
             link_ln = '?ln=%s' % argd['ln']
         tabs = [(unordered_tabs[tab_id]['label'], \
-                 '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
+                 '%s/%s/%s/%s%s' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
                  tab_id in ['holdings'],
                  unordered_tabs[tab_id]['enabled']) \
                 for (tab_id, _order) in ordered_tabs_id
@@ -734,7 +733,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
 
         title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
-        navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
+        navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
         navtrail += title
         navtrail += '</a>'
 

@@ -1187,7 +1187,7 @@ def _get_formated_record(record):
     xml_record = bibrecord.record_xml_output(record)
 
     result =  "<html><head><title>Record preview</title></head>"
-    result += get_mathjax_header()
+    result += get_mathjax_header(True)
     result += "<body><h2> Brief format preview </h2>"
     result += bibformat.format_record(recID=None,
                                      of="hb",

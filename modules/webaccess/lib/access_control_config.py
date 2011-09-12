@@ -125,6 +125,9 @@ else:
     "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
     }
 
+## If using SSO, this is the number of seconds after which the keep-alive
+## SSO handler is pinged again to provide fresh SSO information.
+CFG_EXTERNAL_AUTH_SSO_REFRESH = 600
 
 # default data for the add_default_settings function
 # Note: by default the definition is set to deny any. This won't be a problem

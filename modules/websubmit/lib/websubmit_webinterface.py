@@ -76,7 +76,7 @@ from invenio.websubmit_managedocfiles import \
      get_upload_file_interface_javascript, \
      get_upload_file_interface_css, \
      move_uploaded_files_to_storage
-     
+
 
 class WebInterfaceFilesPages(WebInterfaceDirectory):
 
@@ -119,7 +119,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
                 target = '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : ln, 'referer' : \
-                    CFG_SITE_URL + user_info['uri']}, {})
+                    CFG_SITE_SECURE_URL + user_info['uri']}, {})
                 return redirect_to_url(req, target, norobot=True)
             elif auth_code:
                 return page_not_authorized(req, "../", \
@@ -170,7 +170,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
 
             if not version:
                 version = args['version']
-                
+
             ## Download as attachment
             is_download = False
             if args['download']:
@@ -199,7 +199,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                                     cookie = mail_cookie_create_authorize_action('viewrestrdoc', {'status' : docfile.get_status()})
                                     target = '/youraccount/login' + \
                                     make_canonical_urlargd({'action': cookie, 'ln' : ln, 'referer' : \
-                                        CFG_SITE_URL + user_info['uri']}, {})
+                                        CFG_SITE_SECURE_URL + user_info['uri']}, {})
                                     redirect_to_url(req, target)
                                 else:
                                     req.status = apache.HTTP_UNAUTHORIZED
@@ -359,7 +359,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             # Ask to login
             target = '/youraccount/login' + \
                      make_canonical_urlargd({'ln' : argd['ln'],
-                                             'referer' : CFG_SITE_URL + user_info['uri']}, {})
+                                             'referer' : CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)
         elif auth_code:
             return page_not_authorized(req, referer="/submit/managedocfiles",
@@ -724,20 +724,20 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         Does not copy the uploaded file to the websubmit directory.
         Instead, the path to the file is stored inside the submission directory.
         """
-        
+
         def gcd(a,b):
             """ the euclidean algorithm """
             while a:
                 a, b = b%a, a
             return b
-        
+
         from invenio.bibencode_extract import extract_frames
         from invenio.bibencode_config import CFG_BIBENCODE_WEBSUBMIT_ASPECT_SAMPLE_DIR, CFG_BIBENCODE_WEBSUBMIT_ASPECT_SAMPLE_FNAME
         from invenio.bibencode_encode import determine_aspect
         from invenio.bibencode_utils import probe
         from invenio.bibencode_metadata import ffprobe_metadata
         from invenio.websubmit_config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
-        
+
         if sys.hexversion < 0x2060000:
             try:
                 import simplejson as json
@@ -837,29 +837,29 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                             basedir, name, extension = decompose_file(filename)
                             new_name = propose_next_docname(name)
                             filename = new_name + extension
-                        
+
                         #-------------#
                         # VIDEO STUFF #
                         #-------------#
-                        
+
                         ## Remove all previous uploads
                         filelist = os.listdir(os.path.split(formfields.file.name)[0])
                         for afile in filelist:
                             if argd['access'] in afile:
                                 os.remove(os.path.join(os.path.split(formfields.file.name)[0], afile))
-                        
+
                         ## Check if the file is a readable video
                         ## We must exclude all image and audio formats that are readable by ffprobe
                         if (os.path.splitext(filename)[1] in ['jpg', 'jpeg', 'gif', 'tiff', 'bmp', 'png', 'tga',
                                                               'jp2', 'j2k', 'jpf', 'jpm', 'mj2', 'biff', 'cgm',
-                                                              'exif', 'img', 'mng', 'pic', 'pict', 'raw', 'wmf', 'jpe', 'jif', 
+                                                              'exif', 'img', 'mng', 'pic', 'pict', 'raw', 'wmf', 'jpe', 'jif',
                                                               'jfif', 'jfi', 'tif', 'webp', 'svg', 'ai', 'ps', 'psd',
-                                                              'wav', 'mp3', 'pcm', 'aiff', 'au', 'flac', 'wma', 'm4a', 'wv', 'oga', 
+                                                              'wav', 'mp3', 'pcm', 'aiff', 'au', 'flac', 'wma', 'm4a', 'wv', 'oga',
                                                               'm4a', 'm4b', 'm4p', 'm4r', 'aac', 'mp4', 'vox', 'amr', 'snd']
                                                               or not probe(formfields.file.name)):
                             formfields.file.close()
                             raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
-                        
+
                         ## We have no "delete" attribute in Python 2.4
                         if sys.hexversion < 0x2050000:
                             ## We need to rename first and create a dummy file
@@ -876,16 +876,16 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                             ## Rename the temporary file for the garbage collector
                             new_tmp_fullpath = os.path.split(formfields.file.name)[0] + "/" + CFG_WEBSUBMIT_TMP_VIDEO_PREFIX + argd['access'] + "_" + os.path.split(formfields.file.name)[1]
                             os.rename(formfields.file.name, new_tmp_fullpath)
-                        
+
                         # Write the path to the temp file to a file in STORAGEDIR
                         fp = open(os.path.join(dir_to_open, "filepath"), "w")
                         fp.write(new_tmp_fullpath)
                         fp.close()
-                        
+
                         fp = open(os.path.join(dir_to_open, "filename"), "w")
                         fp.write(filename)
                         fp.close()
-                        
+
                         ## We are going to extract some thumbnails for websubmit ##
                         sample_dir = os.path.join(curdir, 'files', str(user_info['uid']), CFG_BIBENCODE_WEBSUBMIT_ASPECT_SAMPLE_DIR)
                         try:
@@ -898,9 +898,9 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                         except OSError:
                             register_exception(req=req, alert_admin=False)
                         try:
-                            extract_frames(input_file=new_tmp_fullpath, 
-                                        output_file=os.path.join(sample_dir, CFG_BIBENCODE_WEBSUBMIT_ASPECT_SAMPLE_FNAME), 
-                                        size="600x600", 
+                            extract_frames(input_file=new_tmp_fullpath,
+                                        output_file=os.path.join(sample_dir, CFG_BIBENCODE_WEBSUBMIT_ASPECT_SAMPLE_FNAME),
+                                        size="600x600",
                                         numberof=5)
                             json_response['frames'] = []
                             for extracted_frame in os.listdir(sample_dir):
@@ -910,7 +910,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                             os.remove(new_tmp_fullpath)
                             register_exception(req=req, alert_admin=False)
                             raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
-                                
+
                         ## Try to detect the aspect. if this fails, the video is not readable
                         ## or a wrong file might have been uploaded
                         try:
@@ -928,7 +928,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                             os.remove(new_tmp_fullpath)
                             register_exception(req=req, alert_admin=False)
                             raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
-                        
+
                         ## Try to extract some metadata from the video container
                         metadata = ffprobe_metadata(new_tmp_fullpath)
                         json_response['meta_title'] = metadata['format'].get('TAG:title')
@@ -943,9 +943,9 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
             # Send our response
             if simplejson_available:
-                
+
                 dumped_response = json.dumps(json_response)
-                
+
                 # store the response in the websubmit directory
                 # this is needed if the submission is not finished and continued later
                 response_dir = os.path.join(curdir, 'files', str(user_info['uid']), "response")
@@ -957,7 +957,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                 fp = open(os.path.join(response_dir, "response"), "w")
                 fp.write(dumped_response)
                 fp.close()
-                
+
                 return dumped_response
 
     def getuploadedfile(self, req, form):
@@ -1213,7 +1213,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         params['ln'] = ln
         params['indir'] = dir
 
-        url = "%s/submit?%s" % (CFG_SITE_URL, urlencode(params))
+        url = "%s/submit?%s" % (CFG_SITE_SECURE_URL, urlencode(params))
         redirect_to_url(req, url)
 
     def sub(self, req, form):
@@ -1247,7 +1247,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                 params.update(cgi.parse_qs(args))
             else:
                 return warningMsg(_("Sorry, invalid URL..."), req, ln=ln)
-        url = "%s/submit/direct?%s" % (CFG_SITE_URL, urlencode(params, doseq=True))
+        url = "%s/submit/direct?%s" % (CFG_SITE_SECURE_URL, urlencode(params, doseq=True))
         redirect_to_url(req, url)
 
 
@@ -1332,7 +1332,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                 return redirect_to_url(req, "%s/youraccount/login%s" % (
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
-                    'referer' : CFG_SITE_URL + req.unparsed_uri, 'ln' : args['ln']}, {})), norobot=True)
+                    'referer' : CFG_SITE_SECURE_URL + req.unparsed_uri, 'ln' : args['ln']}, {})), norobot=True)
 
             if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
                 return page_not_authorized(req, "../submit",

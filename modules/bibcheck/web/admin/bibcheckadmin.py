@@ -25,7 +25,7 @@ from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import wash_language, gettext_set_language
 #from invenio.urlutils import wash_url_argument, redirect_to_url
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
+from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL, \
                            CFG_SITE_NAME, CFG_ETCDIR, CFG_BINDIR
 
 __lastupdated__ = """$Date$"""
@@ -54,7 +54,7 @@ def index(req, search="", ln=CFG_SITE_LANG):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     navtrail = """<a class="navtrail" href="%s/help/admin">%s</a>""" % \
-               (CFG_SITE_URL, _("Admin Area"))
+               (CFG_SITE_SECURE_URL, _("Admin Area"))
     (admin_ok, uid) = is_admin(req)
     if admin_ok:
         return page(title=_("BibCheck Admin"),
@@ -111,7 +111,7 @@ def _perform_request_index(ln, search=""):
           <input type="hidden" name="ln" value="%(ln)s" />
           <input type="submit" class="adminbutton" value="Search">
           </form>
-          </td></tr></table> """ % { 'siteurl': CFG_SITE_URL,
+          </td></tr></table> """ % { 'siteurl': CFG_SITE_SECURE_URL,
                                      'search': search,
                                      'ln': ln,
                                       'searchforastr': _("Limit to knowledge bases containing string:") }
@@ -129,20 +129,20 @@ def _perform_request_index(ln, search=""):
             lines += "<tr "+mystyle+">"
             line = '<td>' + cgi.escape(myfile) + '</td>'
             line += '<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>'
-            line += '<td><a href="%s/admin/bibcheck/bibcheckadmin.py/edit?fname=' % CFG_SITE_URL + \
+            line += '<td><a href="%s/admin/bibcheck/bibcheckadmin.py/edit?fname=' % CFG_SITE_SECURE_URL + \
                     myfile+'&ln='+ln+'">Edit</a></td>'
             line += '<td>&nbsp;&nbsp;&nbsp;</td>'
             reallydelq = _("Really delete")+" "+myfile+"?"
-            line += '<td><a href="%s/admin/bibcheck/bibcheckadmin.py/delete?fname=' % CFG_SITE_URL + \
+            line += '<td><a href="%s/admin/bibcheck/bibcheckadmin.py/delete?fname=' % CFG_SITE_SECURE_URL + \
                     myfile+'&ln='+ln+'" onclick="return confirm(\''+reallydelq+'\');">'+_("Delete")+'</a></td>'
             #verify syntax..
             line += '<td>&nbsp;&nbsp;&nbsp;</td>'
-            line += '<td><a href="%s/admin/bibcheck/bibcheckadmin.py/verify?fname=' % CFG_SITE_URL + \
+            line += '<td><a href="%s/admin/bibcheck/bibcheckadmin.py/verify?fname=' % CFG_SITE_SECURE_URL + \
                     myfile+'&ln='+ln+'">'+_("Verify syntax")+'</a></td>'
             lines += line+"</tr>\n"
         lines += "</table>\n"
     myout = lines
-    myout += "<br/><br/><a href=\"%s/admin/bibcheck/bibcheckadmin.py/edit\">" % CFG_SITE_URL + \
+    myout += "<br/><br/><a href=\"%s/admin/bibcheck/bibcheckadmin.py/edit\">" % CFG_SITE_SECURE_URL + \
              _("Create new")+"</a>"
     return myout
 
@@ -156,8 +156,8 @@ def verify(req, fname, ln=CFG_SITE_LANG):
     fname = os.path.basename(fname)
 
     navtrail = """<a class="navtrail" href="%s/help/admin">%s</a>""" % \
-               (CFG_SITE_URL, _("Admin Area"))
-    navtrail += """&gt; <a class="navtrail" href="%s/admin/bibcheck/bibcheckadmin.py/">BibCheck Admin</a> """ % CFG_SITE_URL
+               (CFG_SITE_SECURE_URL, _("Admin Area"))
+    navtrail += """&gt; <a class="navtrail" href="%s/admin/bibcheck/bibcheckadmin.py/">BibCheck Admin</a> """ % CFG_SITE_SECURE_URL
     errors = ""
     outstr = ""
     errstr = ""
@@ -200,8 +200,8 @@ def edit(req, ln=CFG_SITE_LANG, fname=""):
     #check auth
     (admin_ok, uid) = is_admin(req)
     navtrail = """<a class="navtrail" href="%s/help/admin">%s</a>""" % \
-               (CFG_SITE_URL, _("Admin Area"))
-    navtrail += """&gt; <a class="navtrail" href="%s/admin/bibcheck/bibcheckadmin.py/">BibCheck Admin</a> """ % CFG_SITE_URL
+               (CFG_SITE_SECURE_URL, _("Admin Area"))
+    navtrail += """&gt; <a class="navtrail" href="%s/admin/bibcheck/bibcheckadmin.py/">BibCheck Admin</a> """ % CFG_SITE_SECURE_URL
     myout = _("File")+" " + cgi.escape(fname) + "<br/>"
     if admin_ok:
         #add a javascript checker so that the user cannot save a form with empty
@@ -260,8 +260,8 @@ def save(req, ln, fname, code, wasnew=0):
     #check auth
     (admin_ok, uid) = is_admin(req)
     navtrail = '''<a class="navtrail" href="%s/help/admin">%s</a>''' % \
-               (CFG_SITE_URL, _("Admin Area"))
-    navtrail += """&gt; <a class="navtrail" href="%s/admin/bibcheck/bibcheckadmin.py/">BibCheck Admin</a> """ % CFG_SITE_URL
+               (CFG_SITE_SECURE_URL, _("Admin Area"))
+    navtrail += """&gt; <a class="navtrail" href="%s/admin/bibcheck/bibcheckadmin.py/">BibCheck Admin</a> """ % CFG_SITE_SECURE_URL
     if admin_ok:
         myfile = CFG_ETCDIR+"/bibcheck/"+fname
         #check if the file exists if this was new
@@ -299,8 +299,8 @@ def delete(req, ln, fname):
     #check auth
     (admin_ok, uid) = is_admin(req)
     navtrail = """<a class="navtrail" href="%s/help/admin">%s</a>""" % \
-               (CFG_SITE_URL, _("Admin Area"))
-    navtrail += """&gt; <a class="navtrail" href="%s/admin/bibcheck/bibcheckadmin.py/">BibCheck Admin</a> """ % CFG_SITE_URL
+               (CFG_SITE_SECURE_URL, _("Admin Area"))
+    navtrail += """&gt; <a class="navtrail" href="%s/admin/bibcheck/bibcheckadmin.py/">BibCheck Admin</a> """ % CFG_SITE_SECURE_URL
     if admin_ok:
         msg = ""
         myfile = CFG_ETCDIR+"/bibcheck/"+fname

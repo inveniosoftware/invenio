@@ -865,7 +865,7 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
         ## add MathJax if displaying single records (FIXME: find
         ## eventual better place to this code)
         if of.lower() in CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS:
-            metaheaderadd = get_mathjax_header()
+            metaheaderadd = get_mathjax_header(req.is_https())
         else:
             metaheaderadd = ''
 

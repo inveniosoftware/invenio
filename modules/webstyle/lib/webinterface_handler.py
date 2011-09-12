@@ -43,17 +43,21 @@ import gc
 from invenio import webinterface_handler_config as apache
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_TMPDIR, \
     CFG_SITE_RECORD
-from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
 from invenio.messages import wash_language
 from invenio.urlutils import redirect_to_url
 from invenio.errorlib import register_exception
 from invenio.webuser import get_preferred_user_language, isGuestUser, \
-    getUid, loginUser, update_Uid, isUserSuperAdmin, collect_user_info
+    getUid, isUserSuperAdmin, collect_user_info
 from invenio.webinterface_handler_wsgi_utils import StringField
+from invenio.session import get_session
 
 ## The following variable is True if the installation make any difference
 ## between HTTP Vs. HTTPS connections.
-CFG_HAS_HTTPS_SUPPORT = CFG_SITE_URL != CFG_SITE_SECURE_URL
+CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
+
+## The following variable is True if HTTPS is used for *any* URL.
+CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
+
 
 ## Set this to True in order to log some more information.
 DEBUG = False
@@ -197,7 +201,7 @@ class WebInterfaceDirectory(object):
         # We have found the next segment. If we know that from this
         # point our subpages are over HTTPS, do the switch.
 
-        if CFG_HAS_HTTPS_SUPPORT and self._force_https and not req.is_https():
+        if (CFG_FULL_HTTPS or CFG_HAS_HTTPS_SUPPORT and (self._force_https or get_session(req).need_https)) and not req.is_https():
             # We need to isolate the part of the URI that is after
             # CFG_SITE_URL, and append that to our CFG_SITE_SECURE_URL.
             original_parts = urlparse.urlparse(req.unparsed_uri)
@@ -222,13 +226,6 @@ class WebInterfaceDirectory(object):
             #from invenio.config import CFG_INSPIRE_SITE
             #if not CFG_INSPIRE_SITE or plain_path.startswith('/youraccount/login'):
             redirect_to_url(req, target)
-
-        if CFG_EXTERNAL_AUTH_USING_SSO and req.is_https() and guest_p:
-            (iden, p_un, dummy, dummy) = loginUser(req, '', '',
-                                         CFG_EXTERNAL_AUTH_USING_SSO)
-            if len(iden)>0:
-                update_Uid(req, p_un)
-                guest_p = False
 
         # Continue the traversal. If there is a path, continue
         # resolving, otherwise call the method as it is our final

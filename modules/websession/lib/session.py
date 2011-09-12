@@ -24,7 +24,7 @@ Just use L{get_session} to obtain a session object (with a dictionary
 interface, which will let you store permanent information).
 """
 
-from invenio.webinterface_handler_wsgi_utils import add_cookie, Cookie, get_cookie
+from invenio.webinterface_handler_wsgi_utils import add_cookies, Cookie, get_cookie
 
 import cPickle
 import time
@@ -39,10 +39,12 @@ else:
 
 from invenio.dbquery import run_sql, blob_to_string
 from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
-    CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT
+    CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT, CFG_SITE_URL, CFG_SITE_SECURE_URL
 from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
     CFG_WEBSESSION_ONE_DAY, CFG_WEBSESSION_CLEANUP_CHANCE, \
     CFG_WEBSESSION_ENABLE_LOCKING
+
+CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
 
 def get_session(req, sid=None):
     """
@@ -99,6 +101,7 @@ class InvenioSession(dict):
         self._invalid = 0
         self._http_ip = None
         self._https_ip = None
+        self.__need_https = False
 
         dict.__init__(self)
 
@@ -107,6 +110,9 @@ class InvenioSession(dict):
             cookie = get_cookie(req, CFG_WEBSESSION_COOKIE_NAME)
             if cookie:
                 self._sid = cookie.value
+            else:
+                stub_cookie = get_cookie(req, CFG_WEBSESSION_COOKIE_NAME + 'stub')
+                self.__need_https = stub_cookie and stub_cookie.value == 'HTTPS'
 
         if self._sid:
             if not _check_sid(self._sid):
@@ -138,7 +144,6 @@ class InvenioSession(dict):
                 self._https_ip = remote_ip
             else:
                 self._http_ip = remote_ip
-            add_cookie(self._req, self.make_cookie())
             self._created = time.time()
             self._timeout = CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT * \
                 CFG_WEBSESSION_ONE_DAY
@@ -164,7 +169,7 @@ class InvenioSession(dict):
         else:
             self.set_timeout(CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT *
                 CFG_WEBSESSION_ONE_DAY)
-        add_cookie(self._req, self.make_cookie())
+        add_cookies(self._req, self.make_cookies())
 
     def load(self):
         """
@@ -243,6 +248,7 @@ class InvenioSession(dict):
                     uid=%s
             """, (session_key, session_expiry, session_object, uid,
                 session_expiry, session_object, uid))
+            add_cookies(self._req, self.make_cookies())
 
     def delete(self):
         """
@@ -255,29 +261,42 @@ class InvenioSession(dict):
         """
         Declare the session as invalid.
         """
-        cookie = self.make_cookie()
-        cookie.expires = 0
-        add_cookie(self._req, cookie)
+        cookies = self.make_cookies()
+        for cookie in cookies:
+            cookie.expires = 0
+        add_cookies(self._req, cookies)
         self.delete()
         self._invalid = 1
         if hasattr(self._req, '_session'):
             delattr(self._req, '_session')
 
-    def make_cookie(self):
+    def make_cookies(self):
         """
-        Reimplementation of L{BaseSession.make_cookie} method, that also
-        consider the L{_remember_me} flag
+        Create the necessary cookies to implement secure session handling
+        (possibly over HTTPS).
 
-        @return: a session cookie.
-        @rtpye: {mod_python.Cookie.Cookie}
+        @return: a list of cookies.
         """
-        cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME, self._sid)
-        cookie.path = '/'
+        cookies = []
+        uid = self.get('uid', -1)
+        if uid > 0 and CFG_SITE_SECURE_URL.startswith("https://"):
+            stub_cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME + 'stub', 'HTTPS')
+        else:
+            stub_cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME + 'stub', 'NO')
+        cookies.append(stub_cookie)
+        if self._req.is_https() or not CFG_SITE_SECURE_URL.startswith("https://") or uid <= 0:
+            cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME, self._sid)
+            if CFG_SITE_SECURE_URL.startswith("https://") and uid > 0:
+                cookie.secure = True
+                cookie.httponly = True
+            cookies.append(cookie)
+        for cookie in cookies:
+            cookie.path = '/'
+            if self._remember_me:
+                cookie.expires = time.time() + self._timeout
 
-        if self._remember_me:
-            cookie.expires = time.time() + self._timeout
+        return cookies
 
-        return cookie
 
     def initial_http_ip(self):
         """
@@ -377,6 +396,20 @@ class InvenioSession(dict):
 
     def __del__(self):
         self.unlock()
+
+    def get_need_https(self):
+        return self.__need_https
+
+    ## This property will be True if the connection need to be set to HTTPS
+    ## in order for the session to be successfully read. This can actually
+    ## be checked by not having a cookie, but just having the stub_cookie.
+    ## The default cookie is only sent via HTTPS, while the stub_cookie
+    ## is also sent via HTTP and contains the uid, of the user. So if there
+    ## is actually a stub cookie and its value is different than -1 this
+    ## property will be True, meaning the server should redirect the client
+    ## to an HTTPS connection if she really wants to access authenticated
+    ## resources.
+    need_https = property(get_need_https)
 
 def _unlock_session_cleanup(session):
     """

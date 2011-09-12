@@ -37,6 +37,7 @@ from invenio.config import \
      CFG_VERSION, \
      CFG_WEBSTYLE_INSPECT_TEMPLATES, \
      CFG_WEBSTYLE_TEMPLATE_SKIN
+from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
 from invenio.messages import gettext_set_language, language_list_long, is_language_rtl
 from invenio.urlutils import make_canonical_urlargd, create_html_link
 from invenio.dateutils import convert_datecvs_to_datestruct, \
@@ -439,6 +440,19 @@ template function generated it.
         }
         return out
 
+    def tmpl_keep_alive_sso(self, req):
+        """When using Shibboleth-based SSO build a hidden IFRAME to keep
+        th shibboleth session alive.
+        """
+        if CFG_EXTERNAL_AUTH_USING_SSO:
+            from invenio.webuser import collect_user_info
+            if collect_user_info(req)['guest'] == '0':
+                return """\
+<div style="display: none;"><iframe style="width:0px; height:0px; border: 0px" src="%s">
+<img src="%s" alt=" " width="0" height="0" />
+</iframe></div>""" % ("%s/youraccount/keepalivesso" % CFG_SITE_SECURE_URL, "%s/youraccount/keepalivesso?format=image" % CFG_SITE_SECURE_URL)
+        return ""
+
     def tmpl_pagefooter(self, req=None, ln=CFG_SITE_LANG, lastupdated=None,
                         pagefooteradd=""):
         """Creates a page footer
@@ -469,6 +483,8 @@ template function generated it.
         else:
             msg_lastupdated = ""
 
+        keepalivesso = self.tmpl_keep_alive_sso(req)
+
         out = """
 <div class="pagefooter">
 %(pagefooteradd)s
@@ -487,31 +503,32 @@ template function generated it.
  </div>
 <!-- replaced page footer -->
 </div>
+%(keepalivesso)s
 </body>
 </html>
         """ % {
-          'siteurl' : CFG_SITE_URL,
-          'sitesecureurl' : CFG_SITE_SECURE_URL,
-          'ln' : ln,
+          'siteurl': CFG_SITE_URL,
+          'sitesecureurl': CFG_SITE_SECURE_URL,
+          'ln': ln,
           'langlink': '?ln=' + ln,
 
-          'sitename' : CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
-          'sitesupportemail' : CFG_SITE_SUPPORT_EMAIL,
+          'sitename': CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
+          'sitesupportemail': CFG_SITE_SUPPORT_EMAIL,
 
-          'msg_search' : _("Search"),
-          'msg_submit' : _("Submit"),
-          'msg_personalize' : _("Personalize"),
-          'msg_help' : _("Help"),
+          'msg_search': _("Search"),
+          'msg_submit': _("Submit"),
+          'msg_personalize': _("Personalize"),
+          'msg_help': _("Help"),
 
-          'msg_poweredby' : _("Powered by"),
-          'msg_maintainedby' : _("Maintained by"),
+          'msg_poweredby': _("Powered by"),
+          'msg_maintainedby': _("Maintained by"),
 
-          'msg_lastupdated' : msg_lastupdated,
-          'languagebox' : self.tmpl_language_selection_box(req, ln),
-          'version' : CFG_VERSION,
+          'msg_lastupdated': msg_lastupdated,
+          'languagebox': self.tmpl_language_selection_box(req, ln),
+          'version': CFG_VERSION,
 
-          'pagefooteradd' : pagefooteradd,
-
+          'pagefooteradd': pagefooteradd,
+          'keepalivesso': keepalivesso,
         }
         return out
 

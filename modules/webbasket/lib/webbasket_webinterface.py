@@ -24,7 +24,7 @@ from invenio import webinterface_handler_config as apache
 
 import os
 import cgi
-from invenio.config import CFG_SITE_URL, \
+from invenio.config import CFG_SITE_SECURE_URL, \
                            CFG_ACCESS_CONTROL_LEVEL_SITE, \
                            CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
                            CFG_SITE_SECURE_URL, CFG_PREFIX, CFG_SITE_LANG
@@ -136,7 +136,7 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
         user (who is the author of the comment), and is of a certain
         type (file, image, etc). Therefore these 5 values are part of
         the URL. Eg:
-        CFG_SITE_URL/yourbaskets/attachments/get/31/91/5/file/myfile.pdf
+        CFG_SITE_SECURE_URL/yourbaskets/attachments/get/31/91/5/file/myfile.pdf
                                              bskid/recid/uid
         """
         argd = wash_urlargd(form, {'file': (str, None),
@@ -161,7 +161,7 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
             # Ask to login
             target = '/youraccount/login' + \
                      make_canonical_urlargd({'ln' : argd['ln'], 'referer' : \
-                                             CFG_SITE_URL + user_info['uri']}, {})
+                                             CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)
 
         elif not(check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['READITM'])):
@@ -191,7 +191,7 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
         Process requests received from CKEditor to upload files, etc.
 
         URL eg:
-        CFG_SITE_URL/yourbaskets/attachments/put/31/91/
+        CFG_SITE_SECURE_URL/yourbaskets/attachments/put/31/91/
                                              bskid/recid/
         """
         if not is_html_text_editor_installed():
@@ -203,11 +203,11 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
         uid = getUid(req)
 
         # URL where the file can be fetched after upload
-        user_files_path = '%(CFG_SITE_URL)s/yourbaskets/attachments/get/%(bskid)s/%(recid)i/%(uid)s' % \
+        user_files_path = '%(CFG_SITE_SECURE_URL)s/yourbaskets/attachments/get/%(bskid)s/%(recid)i/%(uid)s' % \
                           {'uid': uid,
                            'recid': argd['recid'],
                            'bskid': argd['bskid'],
-                           'CFG_SITE_URL': CFG_SITE_URL}
+                           'CFG_SITE_SECURE_URL': CFG_SITE_SECURE_URL}
         # Path to directory where uploaded files are saved
         user_files_absolute_path = '%(CFG_PREFIX)s/var/data/baskets/comments/%(bskid)s/%(recid)s/%(uid)s' % \
                                    {'uid': uid,
@@ -275,11 +275,11 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
     def index(self, req, dummy):
         """Index page."""
-        redirect_to_url(req, '%s/yourbaskets/display?%s' % (CFG_SITE_URL, req.args))
+        redirect_to_url(req, '%s/yourbaskets/display?%s' % (CFG_SITE_SECURE_URL, req.args))
 
     def display_item(self, req, dummy):
         """Legacy URL redirection."""
-        redirect_to_url(req, '%s/yourbaskets/display?%s' % (CFG_SITE_URL, req.args))
+        redirect_to_url(req, '%s/yourbaskets/display?%s' % (CFG_SITE_SECURE_URL, req.args))
 
     def display(self, req, form):
         """Display basket interface."""
@@ -309,7 +309,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/yourbaskets/display%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -340,7 +340,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         except:
             register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
-        rssurl = CFG_SITE_URL + "/rss"
+        rssurl = CFG_SITE_SECURE_URL + "/rss"
 
         if argd['of'] != 'hb':
             page_start(req, of=argd['of'])
@@ -352,7 +352,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         elif argd['bskid']:
             rssurl = "%s/yourbaskets/display?category=%s&topic=%s&group=%i&bskid=%i&of=xr" % \
-                     (CFG_SITE_URL,
+                     (CFG_SITE_SECURE_URL,
                       cgi.escape(argd['category']),
                       cgi.escape(argd['topic']),
                       argd['group'],
@@ -396,7 +396,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/yourbaskets/search%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -461,7 +461,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/yourbaskets/write_note%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -528,7 +528,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/yourbaskets/save_note%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -605,7 +605,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/yourbaskets/display%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -692,7 +692,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/yourbaskets/add%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -770,7 +770,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/yourbaskets/delete%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -792,12 +792,12 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             elif argd['category'] == CFG_WEBBASKET_CATEGORIES['GROUP']:
                 argd['group'] = wash_group(uid, argd['group'])[0]
             url = """%s/yourbaskets/display?category=%s&topic=%s&group=%i&ln=%s""" % \
-                  (CFG_SITE_URL, argd['category'], argd['topic'], argd['group'], argd['ln'])
+                  (CFG_SITE_SECURE_URL, argd['category'], argd['topic'], argd['group'], argd['ln'])
             redirect_to_url(req, url)
         else:
             navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
                        '%s</a>'
-            navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
+            navtrail %= (CFG_SITE_SECURE_URL, argd['ln'], _("Your Account"))
             navtrail_end = create_basket_navtrail(uid=uid,
                                                   category=argd['category'],
                                                   topic=argd['topic'],
@@ -854,7 +854,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/yourbaskets/modify%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -863,7 +863,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use baskets."))
 
-        url = CFG_SITE_URL
+        url = CFG_SITE_SECURE_URL
         url += '/yourbaskets/display?category=%s&amp;topic=%s&amp;group=%i&amp;bskid=%i&amp;ln=%s' % \
                (argd['category'], argd['topic'], argd['group'], argd['bskid'], argd['ln'])
         if argd['action'] == CFG_WEBBASKET_ACTIONS['DELETE']:
@@ -891,7 +891,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 #            warnings = [('WRN_WEBBASKET_UNDEFINED_ACTION',)]
         navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
                    '%s</a>'
-        navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
+        navtrail %= (CFG_SITE_SECURE_URL, argd['ln'], _("Your Account"))
         navtrail_end = create_basket_navtrail(uid=uid,
                                               category=argd['category'],
                                               topic=argd['topic'],
@@ -950,7 +950,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/yourbaskets/edit%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -961,12 +961,12 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use baskets."))
 
         if argd['cancel']:
-            url = CFG_SITE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s'
+            url = CFG_SITE_SECURE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s'
             url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'], argd['topic'],
                     argd['ln'])
             redirect_to_url(req, url)
         elif argd['delete']:
-            url = CFG_SITE_URL
+            url = CFG_SITE_SECURE_URL
             url += '/yourbaskets/delete?bskid=%i&category=%s&topic=%s&ln=%s' % \
                    (argd['bskid'], CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                    argd['topic'], argd['ln'])
@@ -1000,7 +1000,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                         ln=argd['ln'])
             if argd['new_topic'] != "-1":
                 argd['topic'] = argd['new_topic']
-            url = CFG_SITE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s' % \
+            url = CFG_SITE_SECURE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s' % \
                   (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                    argd['topic'], argd['ln'])
             redirect_to_url(req, url)
@@ -1012,7 +1012,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
                    '%s</a>'
-        navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
+        navtrail %= (CFG_SITE_SECURE_URL, argd['ln'], _("Your Account"))
         navtrail_end = create_basket_navtrail(
                             uid=uid,
                             category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
@@ -1066,7 +1066,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/yourbaskets/edit_topic%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -1077,14 +1077,14 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use baskets."))
 
         if argd['cancel']:
-            url = CFG_SITE_URL + '/yourbaskets/display?category=%s&ln=%s'
+            url = CFG_SITE_SECURE_URL + '/yourbaskets/display?category=%s&ln=%s'
             url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'], argd['ln'])
-            #url = CFG_SITE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s'
+            #url = CFG_SITE_SECURE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s'
             #url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'], argd['topic'],
             #        argd['ln'])
             redirect_to_url(req, url)
         elif argd['delete']:
-            url = CFG_SITE_URL
+            url = CFG_SITE_SECURE_URL
             url += '/yourbaskets/delete?bskid=%i&category=%s&topic=%s&ln=%s' % \
                    (argd['bskid'], CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                    argd['topic'], argd['ln'])
@@ -1094,10 +1094,10 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                               topic=argd['topic'],
                                               new_name=argd['new_name'],
                                               ln=argd['ln'])
-            #url = CFG_SITE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s' % \
+            #url = CFG_SITE_SECURE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s' % \
             #      (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
             #       argd['topic'], argd['ln'])
-            url = CFG_SITE_URL + '/yourbaskets/display?category=%s&ln=%s' % \
+            url = CFG_SITE_SECURE_URL + '/yourbaskets/display?category=%s&ln=%s' % \
                   (CFG_WEBBASKET_CATEGORIES['PRIVATE'], argd['ln'])
             redirect_to_url(req, url)
         else:
@@ -1107,7 +1107,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
                    '%s</a>'
-        navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
+        navtrail %= (CFG_SITE_SECURE_URL, argd['ln'], _("Your Account"))
         navtrail_end = ""
         #navtrail_end = create_basket_navtrail(
         #                    uid=uid,
@@ -1166,7 +1166,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/yourbaskets/create_basket%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -1203,14 +1203,14 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                 register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
             if ( argd['recid'] and argd['colid'] >= 0 ):
-                url = CFG_SITE_URL + '/yourbaskets/add?category=%s&bskid=%i&colid=%i&recid=%s&wait=1&ln=%s'
+                url = CFG_SITE_SECURE_URL + '/yourbaskets/add?category=%s&bskid=%i&colid=%i&recid=%s&wait=1&ln=%s'
                 url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                         bskid,
                         argd['colid'],
                         '&recid='.join(str(recid) for recid in argd['recid']),
                         argd['ln'])
             elif ( argd['es_title'] and argd['es_desc'] and argd['es_url'] and argd['colid'] == -1 ):
-                url = CFG_SITE_URL + '/yourbaskets/add?category=%s&bskid=%i&colid=%i&es_title=%s&es_desc=%s&es_url=%s&wait=1&ln=%s'
+                url = CFG_SITE_SECURE_URL + '/yourbaskets/add?category=%s&bskid=%i&colid=%i&es_title=%s&es_desc=%s&es_url=%s&wait=1&ln=%s'
                 url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                         bskid,
                         argd['colid'],
@@ -1219,7 +1219,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         quote(argd['es_url']),
                         argd['ln'])
             else:
-                url = CFG_SITE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s'
+                url = CFG_SITE_SECURE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s'
                 url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'], topic, argd['ln'])
             redirect_to_url(req, url)
         else:
@@ -1237,7 +1237,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                  ln=argd['ln'])
             navtrail = '<a class="navtrail" href="%s/youraccount/'\
                        'display?ln=%s">%s</a>'
-            navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
+            navtrail %= (CFG_SITE_SECURE_URL, argd['ln'], _("Your Account"))
             if isGuestUser(uid):
                 body = create_guest_warning_box(argd['ln']) + body
             return page(title = _("Create basket"),
@@ -1301,7 +1301,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             except:
                 register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
-        rssurl = CFG_SITE_URL + "/rss"
+        rssurl = CFG_SITE_SECURE_URL + "/rss"
 
         if argd['of'] != 'hb':
             page_start(req, of=argd['of'])
@@ -1312,7 +1312,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                 return
         elif argd['bskid']:
             rssurl = "%s/yourbaskets/display_public?&bskid=%i&of=xr" % \
-                     (CFG_SITE_URL,
+                     (CFG_SITE_SECURE_URL,
                       argd['bskid'])
 
         return page(title       = title,
@@ -1387,7 +1387,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/yourbaskets/subscribe%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -1447,7 +1447,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/yourbaskets/unsubscribe%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -1509,7 +1509,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/yourbaskets/write_public_note%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -1571,7 +1571,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
                     'referer' : "%s/yourbaskets/save_public_note%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 

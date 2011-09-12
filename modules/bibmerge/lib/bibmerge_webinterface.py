@@ -34,7 +34,7 @@ else:
     import json
 
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_RECORD
+from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL, CFG_SITE_RECORD
 from invenio.search_engine import guess_primary_collection_of_a_record
 from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized, collect_user_info
@@ -46,7 +46,7 @@ from invenio.bibmerge_engine import perform_request_init, \
                                     perform_request_ajax
 
 navtrail = (' <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> '
-            ) % CFG_SITE_URL
+            ) % CFG_SITE_SECURE_URL
 
 
 class WebInterfaceMergePages(WebInterfaceDirectory):
@@ -101,7 +101,7 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
         elif self.recid:
             # Handle RESTful call by storing recid and redirecting to
             # generic URL.
-            redirect_to_url(req, '%s/%s/merge/' % (CFG_SITE_URL, CFG_SITE_RECORD) )
+            redirect_to_url(req, '%s/%s/merge/' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD) )
 
         if recid1 is not None:
             # Authorize access to record 1.
@@ -124,7 +124,7 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
             # Show BibEdit start page.
             body, errors, warnings = perform_request_init()
             metaheaderadd = """<script type="text/javascript" src="%(site)s/js/json2.js"></script>
-  <script type="text/javascript" src="%(site)s/js/bibmerge_engine.js"></script>""" % {'site': CFG_SITE_URL}
+  <script type="text/javascript" src="%(site)s/js/bibmerge_engine.js"></script>""" % {'site': CFG_SITE_SECURE_URL}
             title = 'Record Merger'
             return page(title         = title,
                         metaheaderadd = metaheaderadd,
@@ -143,5 +143,5 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
 
     def __call__(self, req, form):
         """Redirect calls without final slash."""
-        redirect_to_url(req, '%s/%s/merge/' % (CFG_SITE_URL, CFG_SITE_RECORD))
+        redirect_to_url(req, '%s/%s/merge/' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD))
 

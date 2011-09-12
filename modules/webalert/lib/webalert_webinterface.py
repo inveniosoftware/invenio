@@ -21,7 +21,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_NAME, \
+from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_NAME, \
   CFG_ACCESS_CONTROL_LEVEL_SITE, CFG_SITE_NAME_INTL
 from invenio.webpage import page
 from invenio import webalert
@@ -44,7 +44,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
     def index(self, req, dummy):
         """Index page."""
-        redirect_to_url(req, '%s/youralerts/list' % CFG_SITE_URL)
+        redirect_to_url(req, '%s/youralerts/list' % CFG_SITE_SECURE_URL)
 
     def display(self, req, form):
         """Display search history page.  A misnomer."""
@@ -59,14 +59,14 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/youralerts/display" % \
-                                             (CFG_SITE_URL,),
+                                             (CFG_SITE_SECURE_URL,),
                                        navmenuid="youralerts")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/youralerts/display%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -120,14 +120,14 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/youralerts/input" % \
-                                             (CFG_SITE_URL,),
+                                             (CFG_SITE_SECURE_URL,),
                                        navmenuid="youralerts")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/youralerts/input%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -205,14 +205,14 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/youralerts/modify" % \
-                                             (CFG_SITE_URL,),
+                                             (CFG_SITE_SECURE_URL,),
                                        navmenuid="youralerts")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/youralerts/modify%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -283,14 +283,14 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/youralerts/list" % \
-                                             (CFG_SITE_URL,),
+                                             (CFG_SITE_SECURE_URL,),
                                        navmenuid="youralerts")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/youralerts/list%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -339,14 +339,14 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/youralerts/add" % \
-                                             (CFG_SITE_URL,),
+                                             (CFG_SITE_SECURE_URL,),
                                        navmenuid="youralerts")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/youralerts/add%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -416,14 +416,14 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/youralerts/update" % \
-                                             (CFG_SITE_URL,),
+                                             (CFG_SITE_SECURE_URL,),
                                        navmenuid="youralerts")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/youralerts/update%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -490,14 +490,14 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/youralerts/remove" % \
-                                             (CFG_SITE_URL,),
+                                             (CFG_SITE_SECURE_URL,),
                                        navmenuid="youralerts")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/youralerts/remove%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 

@@ -42,7 +42,6 @@ from invenio.config import \
     CFG_SITE_NAME, \
     CFG_SITE_SUPPORT_EMAIL, \
     CFG_SITE_ADMIN_EMAIL, \
-    CFG_SITE_URL, \
     CFG_SITE_SECURE_URL
 import invenio.access_control_engine as acce
 import invenio.access_control_admin as acca
@@ -67,10 +66,6 @@ from invenio.access_control_config import DEF_DEMO_USER_ROLES, \
 from invenio.bibtask import authenticate
 from cgi import escape
 
-## The following variable is True if the installation make any difference
-## between HTTP Vs. HTTPS connections.
-CFG_HAS_HTTPS_SUPPORT = CFG_SITE_URL != CFG_SITE_SECURE_URL
-
 def index(req, title='', body='', subtitle='', adminarea=2, authorized=0, ln=CFG_SITE_LANG):
     """main function to show pages for webaccessadmin.
 
@@ -81,9 +76,6 @@ def index(req, title='', body='', subtitle='', adminarea=2, authorized=0, ln=CFG
     3. show admin page with title, body, subtitle and navtrail.
 
     authorized - if 1, don't check if the user is allowed to be webadmin """
-    if CFG_HAS_HTTPS_SUPPORT and not req.is_https():
-        redirect_to_url(req, "%s/admin/webaccess/webaccessadmin.py" % CFG_SITE_SECURE_URL)
-
     navtrail_previous_links = '<a class="navtrail" href="%s/help/admin">Admin Area' \
         '</a>' % (CFG_SITE_SECURE_URL,)
 

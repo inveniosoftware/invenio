@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_SECURE_URL
 from invenio.urlutils import redirect_to_url
 from invenio.messages import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
@@ -50,7 +50,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
     def index(self, req, form):
         """ The function called by default
         """
-        redirect_to_url(req, "%s/batchuploader/metadata" % (CFG_SITE_URL))
+        redirect_to_url(req, "%s/batchuploader/metadata" % (CFG_SITE_SECURE_URL))
 
     def metadata(self, req, form):
         """ Display Metadata file upload form """
@@ -124,11 +124,11 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
         if correct_time != 0:
             redirect_to_url(req,
             "%s/batchuploader/documents?error=1&mode=%s&docfolder=%s&matching=%s&submit_date=%s"
-            % (CFG_SITE_URL, argd['mode'], argd['docfolder'], argd['matching'], argd['submit_date']))
+            % (CFG_SITE_SECURE_URL, argd['mode'], argd['docfolder'], argd['matching'], argd['submit_date']))
         if correct_date != 0:
             redirect_to_url(req,
             "%s/batchuploader/documents?error=%s&mode=%s&docfolder=%s&matching=%s&submit_time=%s"
-            % (CFG_SITE_URL, correct_date, argd['mode'], argd['docfolder'], argd['matching'], argd['submit_time']))
+            % (CFG_SITE_SECURE_URL, correct_date, argd['mode'], argd['docfolder'], argd['matching'], argd['submit_time']))
 
         date = argd['submit_date'] not in ['yyyy-mm-dd', ''] \
                                 and argd['submit_date'] or ''
@@ -137,10 +137,10 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
 
         if date != '' and time == '':
             redirect_to_url(req, "%s/batchuploader/documents?error=1&mode=%s&docfolder=%s&matching=%s&submit_date=%s"
-                            % (CFG_SITE_URL, argd['mode'], argd['docfolder'], argd['matching'], argd['submit_date']))
+                            % (CFG_SITE_SECURE_URL, argd['mode'], argd['docfolder'], argd['matching'], argd['submit_date']))
         elif date == '' and time != '':
             redirect_to_url(req, "%s/batchuploader/documents?error=4&mode=%s&docfolder=%s&matching=%s&submit_time=%s"
-                            % (CFG_SITE_URL, argd['mode'], argd['docfolder'], argd['matching'], argd['submit_time']))
+                            % (CFG_SITE_SECURE_URL, argd['mode'], argd['docfolder'], argd['matching'], argd['submit_time']))
 
         errors, info = document_upload(req, argd['docfolder'], argd['matching'],
                                        argd['mode'], date, time, argd['ln'], argd['priority'])
@@ -148,7 +148,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
         body = batchuploader_templates.tmpl_display_menu(argd['ln'])
         uid = getUid(req)
         navtrail = '''<a class="navtrail" href="%s/batchuploader/documents">%s</a>''' % \
-                    (CFG_SITE_URL, _("Document batch upload"))
+                    (CFG_SITE_SECURE_URL, _("Document batch upload"))
 
         body += batchuploader_templates.tmpl_display_web_docupload_result(argd['ln'], errors, info)
         title = _("Document batch upload result")
@@ -197,16 +197,16 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
         if correct_time != 0:
             redirect_to_url(req,
             "%s/batchuploader/metadata?error=1&filetype=%s&mode=%s&submit_date=%s"
-            % (CFG_SITE_URL, argd['filetype'], argd['mode'], argd['submit_date']))
+            % (CFG_SITE_SECURE_URL, argd['filetype'], argd['mode'], argd['submit_date']))
         if not form.get('metafile', None) or not form.get('metafile', None).value: # Empty file
             redirect_to_url(req,
             "%s/batchuploader/metadata?error=2&filetype=%s&mode=%s&submit_date=%s&submit_time=%s"
-            % (CFG_SITE_URL, argd['filetype'], argd['mode'], argd['submit_date'],
+            % (CFG_SITE_SECURE_URL, argd['filetype'], argd['mode'], argd['submit_date'],
             argd['submit_time']))
         if correct_date != 0:
             redirect_to_url(req,
             "%s/batchuploader/metadata?error=%s&filetype=%s&mode=%s&submit_time=%s"
-            % (CFG_SITE_URL, correct_date, argd['filetype'], argd['mode'], argd['submit_time']))
+            % (CFG_SITE_SECURE_URL, correct_date, argd['filetype'], argd['mode'], argd['submit_time']))
 
         date = argd['submit_date'] not in ['yyyy-mm-dd', ''] \
                 and argd['submit_date'] or ''
@@ -215,10 +215,10 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
 
         if date != '' and time == '':
             redirect_to_url(req, "%s/batchuploader/metadata?error=1&filetype=%s&mode=%s&submit_date=%s"
-            % (CFG_SITE_URL, argd['filetype'], argd['mode'], argd['submit_date']))
+            % (CFG_SITE_SECURE_URL, argd['filetype'], argd['mode'], argd['submit_date']))
         elif date == '' and time != '':
             redirect_to_url(req, "%s/batchuploader/metadata?error=4&filetype=%s&mode=%s&submit_time=%s"
-            % (CFG_SITE_URL, argd['filetype'], argd['mode'], argd['submit_time']))
+            % (CFG_SITE_SECURE_URL, argd['filetype'], argd['mode'], argd['submit_time']))
 
         #Function where bibupload queues the file
         auth_code, auth_message = metadata_upload(req,
@@ -240,7 +240,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
                 body += batchuploader_templates.tmpl_upload_successful(argd['ln'])
                 title = _("Upload successful")
             navtrail = '''<a class="navtrail" href="%s/batchuploader/metadata">%s</a>''' % \
-                            (CFG_SITE_URL, _("Metadata batch upload"))
+                            (CFG_SITE_SECURE_URL, _("Metadata batch upload"))
             return page(title = title,
                         body = body,
                         uid = uid,
@@ -300,4 +300,4 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
 
     def __call__(self, req, form):
         """Redirect calls without final slash."""
-        redirect_to_url(req, '%s/batchuploader/metadata' % CFG_SITE_URL)
+        redirect_to_url(req, '%s/batchuploader/metadata' % CFG_SITE_SECURE_URL)
