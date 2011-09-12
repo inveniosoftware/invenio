@@ -32,6 +32,9 @@ CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
                            "dbdump", "batchuploader", "bibauthorid", 'bibencode',
                            "bibtasklet", "refextract")
 
+# Tasks that should be run as standalone task
+CFG_BIBTASK_MONOTASKS = ("bibupload", "dbdump", "inveniogc")
+
 # Task that should not be reinstatiated
 CFG_BIBTASK_NON_REPETITIVE_TASK = ('bibupload')
 

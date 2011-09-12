@@ -31,7 +31,10 @@ import getopt
 from socket import gethostname
 import signal
 
-from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS
+from invenio.bibtask_config import \
+    CFG_BIBTASK_VALID_TASKS, \
+    CFG_BIBTASK_MONOTASKS
+
 from invenio.config import \
      CFG_PREFIX, \
      CFG_BIBSCHED_REFRESHTIME, \
@@ -1039,7 +1042,7 @@ class BibSched:
                     program = os.path.join(CFG_BINDIR, procname)
                     ## Trick to log in bibsched.log the task exiting
                     exit_str = '&& echo "`date "+%%Y-%%m-%%d %%H:%%M:%%S"` --> Task #%d (%s) exited" >> %s' % (task_id, proc, os.path.join(CFG_LOGDIR, 'bibsched.log'))
-                    if proc == 'bibupload' or proc == 'dbdump':
+                    if proc in CFG_BIBTASK_MONOTASKS:
                         ## okay, we have a synchronous monotask to run:
                         ## (won't be interrupted by any other task that may pop in)
                         COMMAND = "(%s %s > /dev/null 2> /dev/null %s)" % (program, str(task_id), exit_str) ### !!! THIS MEANS BIBUPLOADS BLOCK EVERYTHING
