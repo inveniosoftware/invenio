@@ -35,8 +35,11 @@ CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
 # Tasks that should be run as standalone task
 CFG_BIBTASK_MONOTASKS = ("bibupload", "dbdump", "inveniogc")
 
+# Tasks that should be run during fixed times
+CFG_BIBTASK_FIXEDTIMETASKS = ("oaiharvest", )
+
 # Task that should not be reinstatiated
-CFG_BIBTASK_NON_REPETITIVE_TASK = ('bibupload')
+CFG_BIBTASK_NON_REPETITIVE_TASK = ('bibupload', )
 
 ## Default options for each bibtasks
 # for each bibtask name are specified those settings that the bibtask expects

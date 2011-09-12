@@ -33,7 +33,8 @@ import signal
 
 from invenio.bibtask_config import \
     CFG_BIBTASK_VALID_TASKS, \
-    CFG_BIBTASK_MONOTASKS
+    CFG_BIBTASK_MONOTASKS, \
+    CFG_BIBTASK_FIXEDTIMETASKS
 
 from invenio.config import \
      CFG_PREFIX, \
@@ -1016,7 +1017,7 @@ class BibSched:
                     return False
 
             ## No higher priority task have issue with the given task.
-            if len(higher) >= CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS:
+            if proc not in CFG_BIBTASK_FIXEDTIMETASKS and len(higher) >= CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS:
                 ### !!! THIS HAS TO BE ADAPTED FOR MULTINODE
                 ### !!! Basically, the number of concurrent tasks should count per node
                 ## Not enough resources.
