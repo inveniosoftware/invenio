@@ -308,36 +308,36 @@ def schedule_extraction(recid, taxonomy):
 
 def _doc_already_submitted(recid):
     # check extraction was already registered
-    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc = %s AND user = %s\
+    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc='bibclassify' AND user=%s\
         AND (status='WAITING' OR status='RUNNING')"
-    if dbquery.run_sql(sql, ('bibclassify','extract:%s' % recid))[0][0] > 0:
+    if dbquery.run_sql(sql, ("extract:" + str(recid),))[0][0] > 0:
         return (True, "The automated keyword extraction \
                     for this document has been already scheduled. Please return back in a while.")
 
     # check the upload is inside the scheduled tasks
-    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc = %s AND user = %s\
+    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc='bibupload' AND user=%s\
         AND (status='WAITING' OR status='RUNNING')"
-    if dbquery.run_sql(sql, ('bibupload','extract:%s' % recid))[0][0] > 0:
+    if dbquery.run_sql(sql, ("extract:" + str(recid),))[0][0] > 0:
         return (True, 'The document was already processed, '
                         'it will take a while for it to be ingested.')
 
     # or the task was run and is already archived
-    sql = "SELECT COUNT(proc) FROM hstTASK WHERE proc = %s AND user = %s"
-    if dbquery.run_sql(sql, ('bibupload','extract:%s' % recid))[0][0] > 0:
+    sql = "SELECT COUNT(proc) FROM hstTASK WHERE proc='bibupload' AND user=%s"
+    if dbquery.run_sql(sql, ("extract:" + str(recid),))[0][0] > 0:
         return (True, 'The document was already processed, '
                         'at this moment, the automated extraction is not available.')
 
     # or the task was already ran
-    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc = %s AND user = %s\
+    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc='bibclassify' AND user=%s\
         AND (status='DONE')"
-    if dbquery.run_sql(sql, ('bibclassify','extract:%s' % recid))[0][0] > 0:
+    if dbquery.run_sql(sql, ("extract:" + str(recid),))[0][0] > 0:
         return (True, 'The document was already processed, '
                         'but automated extraction identified no suitable keywords.')
 
     # or the extraction is in error stat
-    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc = %s AND user = %s\
+    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc='bibclassify' AND user=%s\
         AND (status='ERROR')"
-    if dbquery.run_sql(sql, ('bibclassify','extract:%s' % recid))[0][0] > 0:
+    if dbquery.run_sql(sql, ("extract:" + str(recid),))[0][0] > 0:
         return (True, 'The document was already scheduled, '
                         'but an error happened. This requires an'
                         'administrator\'s intervention. Unfortunately, '
