@@ -357,9 +357,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         <input class="formbutton" type="submit" value="%s">
                         </form></p>""" % (p_email, _("Send Password"))
                 else:
-                    query = """SELECT email FROM user
-                            WHERE id = %i"""
-                    res = run_sql(query % uid)
+                    res = run_sql("SELECT email FROM user WHERE id=%s", (uid,))
                     if res:
                         email = res[0][0]
                     else:

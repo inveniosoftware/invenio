@@ -128,7 +128,7 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
         if not uid:
             uid = getUid(req)
         try:
-            res = run_sql("SELECT email FROM user WHERE id=%s AND note=1" % uid)
+            res = run_sql("SELECT email FROM user WHERE id=%s AND note=1", (uid,))
 
             if res and res[0][0]:
                 if text:

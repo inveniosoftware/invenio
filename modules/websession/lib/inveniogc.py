@@ -28,7 +28,7 @@ import datetime
 import time
 import os
 try:
-    from invenio.dbquery import run_sql
+    from invenio.dbquery import run_sql, wash_table_column_name
     from invenio.config import CFG_LOGDIR, CFG_TMPDIR, CFG_CACHEDIR, \
          CFG_TMPSHAREDDIR, CFG_WEBSEARCH_RSS_TTL, \
          CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS
@@ -234,7 +234,7 @@ def clean_documents():
     bibdocs involved."""
     write_message("""CLEANING OF OBSOLETED DELETED DOCUMENTS STARTED""")
     write_message("select id from bibdoc where status='DELETED' and NOW()>ADDTIME(modification_date, '%s 0:0:0')" % CFG_DELETED_BIBDOC_MAXLIFE, verbose=9)
-    records = run_sql("select id from bibdoc where status='DELETED' and NOW()>ADDTIME(modification_date, '%s 0:0:0')" % CFG_DELETED_BIBDOC_MAXLIFE)
+    records = run_sql("select id from bibdoc where status='DELETED' and NOW()>ADDTIME(modification_date, '%s 0:0:0')", (CFG_DELETED_BIBDOC_MAXLIFE,))
     for record in records:
         bibdoc = BibDoc(record[0])
         bibdoc.expunge()
@@ -255,7 +255,7 @@ def check_tables():
     for row in res:
         table_name = row[0]
         write_message("checking table %s" % table_name)
-        run_sql("CHECK TABLE %s" % table_name)
+        run_sql("CHECK TABLE %s" % wash_table_column_name(table_name)) # kwalitee: disable=sql
 
 def optimise_tables():
     """
@@ -269,7 +269,7 @@ def optimise_tables():
     for row in res:
         table_name = row[0]
         write_message("optimising table %s" % table_name)
-        run_sql("OPTIMIZE TABLE %s" % table_name)
+        run_sql("OPTIMIZE TABLE %s" % wash_table_column_name(table_name)) # kwalitee: disable=sql
 
 def guest_user_garbage_collector():
     """Session Garbage Collector
@@ -443,7 +443,7 @@ def guest_user_garbage_collector():
 
     ## 5b - delete expired not confirmed email address
     write_message("""DELETE FROM user WHERE note='2' AND NOW()>ADDTIME(last_login, '%s 0:0:0')""" % CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS, verbose=9)
-    delcount['email_addresses'] = run_sql("""DELETE FROM user WHERE note='2' AND NOW()>ADDTIME(last_login, '%s 0:0:0')""" % CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS)
+    delcount['email_addresses'] = run_sql("""DELETE FROM user WHERE note='2' AND NOW()>ADDTIME(last_login, '%s 0:0:0')""", (CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS,))
 
     # 6 - delete expired roles memberships
     write_message("""DELETE FROM user_accROLE WHERE expiration<NOW()""", verbose=9)
