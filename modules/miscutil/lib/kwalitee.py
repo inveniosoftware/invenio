@@ -39,6 +39,7 @@ Check options::
    --check-docstrings       check Python doctrings compliance
    --check-pep8             check PEP8 compliance
    --check-sql              check SQL queries
+   --check-eval             check Python eval calls
    --check-html-options     check <option> missing 'value' attribute
 
 Examples::
@@ -642,6 +643,8 @@ def cmd_check_all(filenames):
         errors_found_p = True
     if cmd_check_pep8(filenames):
         errors_found_p = True
+    if cmd_check_eval(filenames): # kwalitee: disable=eval
+        errors_found_p = True
     if cmd_check_sql(filenames):
         errors_found_p = True
     if cmd_check_html_options(filenames):
@@ -657,6 +660,8 @@ def cmd_check_some(filenames):
     if cmd_check_variables(filenames):
         errors_found_p = True
     if cmd_check_indentation(filenames):
+        errors_found_p = True
+    if cmd_check_eval(filenames): # kwalitee: disable=eval
         errors_found_p = True
     if cmd_check_sql(filenames):
         errors_found_p = True
@@ -876,6 +881,30 @@ def cmd_check_sql(filenames):
     return errors_found_p
 
 
+def cmd_check_eval(filenames): # kwalitee: disable=eval
+    """Run `eval' and `execfile' check on filenames."""
+    errors_found_p = False
+    print_heading('Checking Python eval calls...')
+    for filename in filenames:
+        out = ''
+        for grepargs in ('eval\(',
+                         'execfile\('):
+            process = subprocess.Popen(['grep', '-HEni', grepargs, filename],
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE)
+            process_output, process_error = process.communicate()
+            if process_error:
+                errors_found_p = True
+                print "[ERROR]", process_error
+            for line in process_output.split('\n'): # pylint: disable=E1103
+                if line and not line.endswith('# kwalitee: disable=eval'):
+                    out += line + '\n'
+        if out:
+            errors_found_p = True
+            print out.strip()
+    return errors_found_p
+
+
 def cmd_stats(filenames):
     """Run overall kwalite stats on file/dir."""
     if len(filenames) == 1 and os.path.isdir(filenames[0]):
@@ -912,7 +941,8 @@ def main():
                        '--check-errors', '--check-variables',
                        '--check-indentation', '--check-whitespace',
                        '--check-docstrings', '--check-pep8',
-                       '--check-html-options', '--check-sql'):
+                       '--check-html-options', '--check-sql',
+                       '--check-eval'):
                 cmd_option = opt[2:].replace('-', '_')
             elif opt in ('-q', '--quiet'):
                 QUIET_MODE = True
@@ -927,7 +957,7 @@ def main():
             sys.exit(1)
         # run it:
         if cmd_option == 'stats':
-            eval('cmd_' + cmd_option)(cmd_pathnames)
+            eval('cmd_' + cmd_option)(cmd_pathnames) # kwalitee: disable=eval
         else:
             # detect Python files to process:
             cmd_filenames = get_python_filenames_from_pathnames(cmd_pathnames)
@@ -939,7 +969,8 @@ def main():
                 # respective tests, and after cleaning advertize it in
                 # the --help page.
                 cmd_filenames = cmd_pathnames
-            errors_found_p = eval('cmd_' + cmd_option)(cmd_filenames)
+            errors_found_p = \
+              eval('cmd_' + cmd_option)(cmd_filenames) # kwalitee: disable=eval
             if errors_found_p:
                 print_heading('Kwalitee problems found.  Please fix.',
                               stream='ERROR')
