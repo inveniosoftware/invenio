@@ -60,20 +60,7 @@ kwalitee-check-indentation:
 	@$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py --check-indentation $(top_srcdir)
 
 kwalitee-check-sql-queries:
-	@echo "* Listing potentially dangerous SQL queries:"
-	@echo "** SQL SELECT queries without explicit column list:"
-	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'SELECT \* FROM' {} \; 2> /dev/null
-	@echo "** SQL INSERT queries without explicit column list:"
-	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'INSERT INTO ([[:alnum:]]|_)+[[:space:]]*VALUES' {} \; 2> /dev/null
-	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'INSERT INTO ([[:alnum:]]|_)+[[:space:]]*$$' {} \; 2> /dev/null
-	@echo "** SQL queries using charset-ignorant escape_string():"
-	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'escape_string' {} \; 2> /dev/null
-	@echo "** SQL queries using literal '%s':"
-	@find $(top_srcdir) -name '*.py' -exec grep -HEin "run_sql.*'%[dfis]'" {} \; 2> /dev/null
-	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'run_sql.*"%[dfis]"' {} \; 2> /dev/null
-	@echo "** SQL queries with potentially unescaped arguments:"
-	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'run_sql.* % ' {} \; 2> /dev/null
-	@echo "* Done."
+	@$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py --check-sql $(top_srcdir)
 
 etags:
 	\rm -f $(top_srcdir)/TAGS

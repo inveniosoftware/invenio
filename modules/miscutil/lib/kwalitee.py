@@ -38,6 +38,7 @@ Check options::
    --check-whitespace       check trailing whitespace
    --check-docstrings       check Python doctrings compliance
    --check-pep8             check PEP8 compliance
+   --check-sql              check SQL queries
    --check-html-options     check <option> missing 'value' attribute
 
 Examples::
@@ -147,6 +148,7 @@ def get_list_of_web_test_files(modulesdir, modulename):
 def get_nb_lines_in_file(filename):
     """Return number of lines in FILENAME."""
     return len(open(filename).readlines())
+
 
 def get_nb_test_cases_in_file(filename):
     """Return number of test cases in FILENAME."""
@@ -640,6 +642,8 @@ def cmd_check_all(filenames):
         errors_found_p = True
     if cmd_check_pep8(filenames):
         errors_found_p = True
+    if cmd_check_sql(filenames):
+        errors_found_p = True
     if cmd_check_html_options(filenames):
         errors_found_p = True
     return errors_found_p
@@ -653,6 +657,8 @@ def cmd_check_some(filenames):
     if cmd_check_variables(filenames):
         errors_found_p = True
     if cmd_check_indentation(filenames):
+        errors_found_p = True
+    if cmd_check_sql(filenames):
         errors_found_p = True
     if cmd_check_html_options(filenames):
         errors_found_p = True
@@ -754,6 +760,7 @@ def cmd_check_whitespace(filenames):
             print out
     return errors_found_p
 
+
 def cmd_check_html_options(filenames):
     """
     Check cases where an C{<option>} element has been used without its
@@ -788,6 +795,7 @@ def cmd_check_html_options(filenames):
             errors_found_p = True
             print out
     return errors_found_p
+
 
 def cmd_check_docstrings(filenames):
     """Run epydoc doctrings check on filenames."""
@@ -840,6 +848,35 @@ def cmd_check_pep8(filenames):
     return errors_found_p
 
 
+def cmd_check_sql(filenames):
+    """Run SQL query compliance check on filenames."""
+    errors_found_p = False
+    print_heading('Checking SQL queries...')
+    for filename in filenames:
+        out = ''
+        for grepargs in ('SELECT \* FROM',
+                         'INSERT INTO ([[:alnum:]]|_)+[[:space:]]*VALUES',
+                         'INSERT INTO ([[:alnum:]]|_)+[[:space:]]*$$',
+                         'escape_string', # kwalitee: disable=sql
+                         "run_sql.*'%[dfis]'",
+                         'run_sql.*"%[dfis]"',
+                         'run_sql.* % '): # kwalitee: disable=sql
+            process = subprocess.Popen(['grep', '-HEni', grepargs, filename],
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE)
+            process_output, process_error = process.communicate()
+            if process_error:
+                errors_found_p = True
+                print "[ERROR]", process_error
+            for line in process_output.split('\n'): # pylint: disable=E1103
+                if line and not line.endswith('# kwalitee: disable=sql'):
+                    out += line + '\n'
+        if out:
+            errors_found_p = True
+            print out.strip()
+    return errors_found_p
+
+
 def cmd_stats(filenames):
     """Run overall kwalite stats on file/dir."""
     if len(filenames) == 1 and os.path.isdir(filenames[0]):
@@ -876,7 +913,7 @@ def main():
                        '--check-errors', '--check-variables',
                        '--check-indentation', '--check-whitespace',
                        '--check-docstrings', '--check-pep8',
-                       '--check-html-options'):
+                       '--check-html-options', '--check-sql'):
                 cmd_option = opt[2:].replace('-', '_')
             elif opt in ('-q', '--quiet'):
                 QUIET_MODE = True
