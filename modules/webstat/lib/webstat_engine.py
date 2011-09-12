@@ -1456,8 +1456,8 @@ def get_customevent_dump(args):
         # Get all the event arguments and creation times
         tbl_name = get_customevent_table(event_id)
         col_names = get_customevent_args(event_id)
-        sql_query = ["SELECT * FROM %s WHERE creation_time > '%s'" % (tbl_name,
-                                 lower)] # Note: SELECT * technique is okay here
+
+        sql_query = ["SELECT * FROM %s WHERE creation_time > '%%s'" % wash_table_column_name(tbl_name), (lower,)] # kwalitee: disable=sql
         sql_query.append("AND creation_time < '%s'" % upper)
         sql_param = []
         for col_bool, col_title, col_content in args['cols' + i]:
@@ -2411,10 +2411,10 @@ def _get_tag_name(tag):
     """
     For a specific MARC tag, it returns the human-readable name
     """
-    res = run_sql("SELECT name FROM tag WHERE value LIKE '%%%s%%'" % (tag))
+    res = run_sql("SELECT name FROM tag WHERE value LIKE %s", ('%' + tag + '%',))
     if res:
         return res[0][0]
-    res = run_sql("SELECT name FROM tag WHERE value LIKE '%%%s%%'" % (tag[:-1]))
+    res = run_sql("SELECT name FROM tag WHERE value LIKE %s", ('%' + tag[:-1] + '%',))
     if res:
         return res[0][0]
     return ''

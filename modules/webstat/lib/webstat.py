@@ -580,7 +580,7 @@ def destroy_customevent(event_id=None):
         return "Event id [%s] doesn't exist! Aborted." % event_id
     else:
         tbl_name = get_customevent_table(event_id)
-        run_sql("DROP TABLE %s" % (tbl_name))
+        run_sql("DROP TABLE %s" % wash_table_column_name(tbl_name)) # kwalitee: disable=sql
         run_sql("DELETE FROM staEVENT WHERE id = %s", (event_id, ))
         return ("Event with id [%s] was successfully destroyed.\n" +
                 "Table [%s], with content, was destroyed.") \
@@ -632,7 +632,7 @@ def register_customevent(event_id, *arguments):
         sql_str = ''.join(sql_query)
         run_sql(sql_str, tuple(sql_param))
     else:
-        run_sql("INSERT INTO %s () VALUES ()" % (tbl_name))
+        run_sql("INSERT INTO %s () VALUES ()" % wash_table_column_name(tbl_name)) # kwalitee: disable=sql
 
 
 def cache_keyevent_trend(ids=[]):
@@ -739,16 +739,12 @@ def basket_display():
         # custom event baskets not defined, so return empty output:
         return []
     try:
-        res = run_sql("SELECT creation_time FROM %s ORDER BY creation_time"
-                      % tbl_name)
+        res = run_sql("SELECT creation_time FROM %s ORDER BY creation_time" % wash_table_column_name(tbl_name)) # kwalitee: disable=sql
         days = (res[-1][0] - res[0][0]).days + 1
-        public = run_sql("SELECT COUNT(*) FROM %s " % tbl_name + \
-                             "WHERE action = 'display_public'")[0][0]
-        users = run_sql("SELECT COUNT(DISTINCT user) FROM %s" % tbl_name)[0][0]
-        adds = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'add'"
-                       % tbl_name)[0][0]
-        displays = run_sql("SELECT COUNT(*) FROM %s " % tbl_name + \
-                 "WHERE action = 'display' OR action = 'display_public'")[0][0]
+        public = run_sql("SELECT COUNT(*) FROM %s " % wash_table_column_name(tbl_name) + " WHERE action = 'display_public'")[0][0] # kwalitee: disable=sql
+        users = run_sql("SELECT COUNT(DISTINCT user) FROM %s" % wash_table_column_name(tbl_name))[0][0] # kwalitee: disable=sql
+        adds = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'add'" % wash_table_column_name(tbl_name))[0][0] # kwalitee: disable=sql
+        displays = run_sql("SELECT COUNT(*) FROM %s " % wash_table_column_name(tbl_name) + " WHERE action = 'display' OR action = 'display_public'")[0][0] # kwalitee: disable=sql
         hits = adds + displays
         average = hits / days
 
@@ -775,7 +771,7 @@ def alert_display():
         res = run_sql("SELECT creation_time FROM %s ORDER BY creation_time"
                       % tbl_name)
         days = (res[-1][0] - res[0][0]).days + 1
-        res = run_sql("SELECT COUNT(DISTINCT user),COUNT(*) FROM %s" % (tbl_name))
+        res = run_sql("SELECT COUNT(DISTINCT user),COUNT(*) FROM %s" % wash_table_column_name(tbl_name)) # kwalitee: disable=sql
         users = res[0][0]
         hits = res[0][1]
         displays = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'list'"
