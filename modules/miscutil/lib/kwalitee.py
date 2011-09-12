@@ -857,7 +857,6 @@ def cmd_check_sql(filenames):
         for grepargs in ('SELECT \* FROM',
                          'INSERT INTO ([[:alnum:]]|_)+[[:space:]]*VALUES',
                          'INSERT INTO ([[:alnum:]]|_)+[[:space:]]*$$',
-                         'escape_string', # kwalitee: disable=sql
                          "run_sql.*'%[dfis]'",
                          'run_sql.*"%[dfis]"',
                          'run_sql.* % '): # kwalitee: disable=sql
