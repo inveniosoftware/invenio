@@ -121,7 +121,7 @@ if CFG_DEVEL_SITE:
                 run_sql("DELETE FROM user_usergroup WHERE id_user=%s", (uid[0][0], ))
             for method_name in self.robot_login_methods:
                 for group in self.some_groups:
-                    run_sql("DELETE FROM usergroup WHERE name=%s", ("%s [%s]" % (group, method_name), ))
+                    run_sql("DELETE FROM usergroup WHERE name=%s", (group + " [" + method_name + "]",))
 
         def setUp(self):
             from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION

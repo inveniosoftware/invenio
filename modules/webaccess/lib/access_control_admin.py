@@ -285,7 +285,7 @@ def acc_delete_role(id_role=0, name_role=0):
         return 0
 
     # try to delete
-    if run_sql("""DELETE FROM accROLE WHERE id = %s  """ % (id_role, )):
+    if run_sql("""DELETE FROM accROLE WHERE id = %s  """, (id_role, )):
         # delete everything related
         # authorization entries
         count += 1 + run_sql("""DELETE FROM

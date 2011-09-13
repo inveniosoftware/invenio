@@ -53,7 +53,7 @@ from invenio.bibrankadminlib import addadminbox, tupletotable, \
 from invenio.access_control_firerole import compile_role_definition, \
     repair_role_definitions, serialize
 from invenio.messages import gettext_set_language
-from invenio.dbquery import run_sql, OperationalError
+from invenio.dbquery import run_sql, OperationalError, wash_table_column_name
 from invenio.webpage import page
 from invenio.webuser import getUid, isGuestUser, page_not_authorized, collect_user_info
 from invenio.webuser import email_valid_p, get_user_preferences, \
@@ -3391,7 +3391,7 @@ def headeritalic(**ids):
             output += ' %s <i>%s</i>' % (key, ids[key])
             continue
 
-        res = run_sql("""SELECT %%s FROM %s WHERE id = %%s""" % table, (value, ids[key]))
+        res = run_sql("""SELECT %%s FROM %s WHERE id = %%s""" % wash_table_column_name(table), (value, ids[key])) # kwalitee: disable=sql
 
         if res:
             if output:
@@ -3427,7 +3427,7 @@ def headerstrong(query=1, **ids):
             continue
 
         if query:
-            res = run_sql("""SELECT %%s FROM %s WHERE id = %%s""" % table, (value, ids[key]))
+            res = run_sql("""SELECT %%s FROM %s WHERE id = %%s""" % wash_table_column_name(table), (value, ids[key])) # kwalitee: disable=sql
             if res:
                 if output:
                     output += ' and '
