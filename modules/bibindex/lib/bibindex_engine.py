@@ -57,7 +57,7 @@ from invenio.search_engine import perform_request_search, strip_accents, \
      wash_index_term, lower_index_term, get_index_stemming_language, \
      get_synonym_terms
 from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, \
-     deserialize_via_marshal
+     deserialize_via_marshal, wash_table_column_name
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibtask import task_init, write_message, get_datetime, \
@@ -364,13 +364,12 @@ def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
         "%sidxPHRASE%02dF TO idxPHRASE%02dF;" % (reindex_prefix, index_id, index_id)
     )
     write_message("Dropping old index tables for id %s" % index_id)
-    run_sql("DROP TABLE old_idxWORD%02dR, old_idxWORD%02dF, old_idxPAIR%02dR, old_idxPAIR%02dF, old_idxPHRASE%02dR, old_idxPHRASE%02dF" % (index_id, index_id, index_id, index_id, index_id, index_id)
-    )
+    run_sql("DROP TABLE old_idxWORD%02dR, old_idxWORD%02dF, old_idxPAIR%02dR, old_idxPAIR%02dF, old_idxPHRASE%02dR, old_idxPHRASE%02dF" % (index_id, index_id, index_id, index_id, index_id, index_id)) # kwalitee: disable=sql
 
 def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
     """Create reindexing temporary tables."""
     write_message("Creating new tmp index tables for id %s" % index_id)
-    run_sql("""DROP TABLE IF EXISTS %sidxWORD%02dF""" % (reindex_prefix, index_id))
+    run_sql("""DROP TABLE IF EXISTS %sidxWORD%02dF""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
     run_sql("""CREATE TABLE %sidxWORD%02dF (
                         id mediumint(9) unsigned NOT NULL auto_increment,
                         term varchar(50) default NULL,
@@ -379,7 +378,7 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         UNIQUE KEY term (term)
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
 
-    run_sql("""DROP TABLE IF EXISTS %sidxWORD%02dR""" % (reindex_prefix, index_id))
+    run_sql("""DROP TABLE IF EXISTS %sidxWORD%02dR""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
     run_sql("""CREATE TABLE %sidxWORD%02dR (
                         id_bibrec mediumint(9) unsigned NOT NULL,
                         termlist longblob,
@@ -387,7 +386,7 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         PRIMARY KEY (id_bibrec,type)
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
 
-    run_sql("""DROP TABLE IF EXISTS %sidxPAIR%02dF""" % (reindex_prefix, index_id))
+    run_sql("""DROP TABLE IF EXISTS %sidxPAIR%02dF""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
     run_sql("""CREATE TABLE %sidxPAIR%02dF (
                         id mediumint(9) unsigned NOT NULL auto_increment,
                         term varchar(100) default NULL,
@@ -396,7 +395,7 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         UNIQUE KEY term (term)
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
 
-    run_sql("""DROP TABLE IF EXISTS %sidxPAIR%02dR""" % (reindex_prefix, index_id))
+    run_sql("""DROP TABLE IF EXISTS %sidxPAIR%02dR""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
     run_sql("""CREATE TABLE %sidxPAIR%02dR (
                         id_bibrec mediumint(9) unsigned NOT NULL,
                         termlist longblob,
@@ -404,7 +403,7 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         PRIMARY KEY (id_bibrec,type)
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
 
-    run_sql("""DROP TABLE IF EXISTS %sidxPHRASE%02dF""" % (reindex_prefix, index_id))
+    run_sql("""DROP TABLE IF EXISTS %sidxPHRASE%02dF""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
     run_sql("""CREATE TABLE %sidxPHRASE%02dF (
                         id mediumint(9) unsigned NOT NULL auto_increment,
                         term text default NULL,
@@ -413,7 +412,7 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         KEY term (term(50))
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
 
-    run_sql("""DROP TABLE IF EXISTS %sidxPHRASE%02dR""" % (reindex_prefix, index_id))
+    run_sql("""DROP TABLE IF EXISTS %sidxPHRASE%02dR""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
     run_sql("""CREATE TABLE %sidxPHRASE%02dR (
                         id_bibrec mediumint(9) unsigned NOT NULL default '0',
                         termlist longblob,
@@ -727,10 +726,10 @@ def truncate_index_table(index_name):
     if index_id:
         write_message('Truncating %s index table in order to reindex.' % index_name, verbose=2)
         run_sql("UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00' WHERE id=%s", (index_id,))
-        run_sql("TRUNCATE idxWORD%02dF" % index_id)
-        run_sql("TRUNCATE idxWORD%02dR" % index_id)
-        run_sql("TRUNCATE idxPHRASE%02dF" % index_id)
-        run_sql("TRUNCATE idxPHRASE%02dR" % index_id)
+        run_sql("TRUNCATE idxWORD%02dF" % index_id) # kwalitee: disable=sql
+        run_sql("TRUNCATE idxWORD%02dR" % index_id) # kwalitee: disable=sql
+        run_sql("TRUNCATE idxPHRASE%02dF" % index_id) # kwalitee: disable=sql
+        run_sql("TRUNCATE idxPHRASE%02dR" % index_id) # kwalitee: disable=sql
 
 def update_index_last_updated(index_id, starting_time=None):
     """Update last_updated column of the index table in the database.
@@ -896,23 +895,20 @@ class WordTable:
             else:
                 # yes there were some new words:
                 write_message("......... updating hitlist for ``%s''" % word, verbose=9)
-                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % self.tablename,
-                    (set.fastdump(), word))
+                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % wash_table_column_name(self.tablename), (set.fastdump(), word)) # kwalitee: disable=sql
 
         else: # the word is new, will create new set:
             write_message("......... inserting hitlist for ``%s''" % word, verbose=9)
             set = intbitset(self.value[word].keys())
             try:
-                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % self.tablename,
-                        (word, set.fastdump()))
+                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % wash_table_column_name(self.tablename), (word, set.fastdump())) # kwalitee: disable=sql
             except Exception, e:
                 ## We send this exception to the admin only when is not
                 ## already reparing the problem.
                 register_exception(prefix="Error when putting the term '%s' into db (hitlist=%s): %s\n" % (repr(word), set, e), alert_admin=(task_get_option('cmd') != 'repair'))
 
         if not set: # never store empty words
-            run_sql("DELETE from %s WHERE term=%%s" % self.tablename,
-                    (word,))
+            run_sql("DELETE FROM %s WHERE term=%%s" % wash_table_column_name(self.tablename), (word,)) # kwalitee: disable=sql
 
         del self.value[word]
 
@@ -1128,12 +1124,10 @@ class WordTable:
 
         # put words into reverse index table with FUTURE status:
         for recID in recIDs:
-            run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % self.tablename[:-1],
-                    (recID, serialize_via_marshal(wlist[recID])))
+            run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % wash_table_column_name(self.tablename[:-1]), (recID, serialize_via_marshal(wlist[recID]))) # kwalitee: disable=sql
             # ... and, for new records, enter the CURRENT status as empty:
             try:
-                run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % self.tablename[:-1],
-                        (recID, serialize_via_marshal([])))
+                run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(self.tablename[:-1]), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
             except DatabaseError:
                 # okay, it's an already existing record, no problem
                 pass
