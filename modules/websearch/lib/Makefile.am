@@ -22,6 +22,7 @@ pylib_DATA = \
 	websearch_templates.py \
 	websearch_webinterface.py \
 	websearch_regression_tests.py \
+	websearch_web_tests.py \
 	search_engine.py \
 	search_engine_config.py \
 	search_engine_tests.py \
