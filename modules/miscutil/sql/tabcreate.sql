@@ -3517,6 +3517,7 @@ CREATE TABLE IF NOT EXISTS schTASK (
   status varchar(50),
   progress varchar(255),
   priority tinyint(4) NOT NULL default 0,
+  sequenceid int(8) NULL default NULL,
   PRIMARY KEY  (id),
   KEY status (status),
   KEY runtime (runtime),

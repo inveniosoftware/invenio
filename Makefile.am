@@ -535,6 +535,7 @@ update-v1.0.0-rc0-tables: # from v1.0.0-rc0 to next release
 	echo "UPDATE sbmALLFUNCDESCR SET function='Move_CKEditor_Files_to_Storage', description='Transfer files attached to the record with the CKEditor' WHERE function='Move_FCKeditor_Files_to_Storage';" | ${prefix}/bin/dbexec
 	echo "UPDATE sbmFUNCTIONS SET function='Move_CKEditor_Files_to_Storage' WHERE function='Move_FCKeditor_Files_to_Storage';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK CHANGE proc proc varchar(255) NOT NULL;" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE schTASK ADD sequenceid int(8) NULL default NULL;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE session CHANGE session_object session_object longblob;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE session CHANGE session_expiry session_expiry datetime NOT NULL default '0000-00-00 00:00:00';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE oaiREPOSITORY CHANGE setSpec setSpec varchar(255) NOT NULL default 'GLOBAL_SET';" | ${prefix}/bin/dbexec

@@ -409,7 +409,7 @@ class Manager:
         msg += ' sleeptime: %s\n\n' % self.currentrow[4]
         msg += '    status: %s\n\n' % self.currentrow[5]
         msg += '  progress: %s\n\n' % self.currentrow[6]
-        arguments = marshal.loads(self.currentrow[7])
+        arguments = marshal.loads(self.currentrow[8])
         if type(arguments) is dict:
             # FIXME: REMOVE AFTER MAJOR RELEASE 1.0
             msg += '   options : %s\n\n' % arguments
@@ -867,7 +867,7 @@ class Manager:
                     table = "hstTASK"
                     order = "runtime DESC"
                     where = ''
-                self.rows = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress,arguments,priority,host FROM %s WHERE status NOT LIKE '%%_DELETED' %s ORDER BY %s""" % (table, where, order))
+                self.rows = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress,arguments,priority,host,sequenceid FROM %s WHERE status NOT LIKE '%%_DELETED' %s ORDER BY %s""" % (table, where, order))
                 ring = 0
                 self.repaint()
             ring += 1
@@ -928,14 +928,14 @@ class BibSched:
         n_active = []
         if "bibupload" not in self.allowed_task_types:
             self.node_relevant_bibupload_tasks = ()
-        for id,proc,runtime,status,priority,host in self.node_relevant_waiting_tasks:
+        for id, proc, runtime, status, priority, host, sequenceid in self.node_relevant_waiting_tasks:
             procname = proc.split(':')[0]
             if procname in self.allowed_task_types:
-                n_waiting.append((id, proc, runtime, status, priority, host))
-        for id,proc,runtime,status,priority,host in self.node_relevant_active_tasks:
+                n_waiting.append((id, proc, runtime, status, priority, host, sequenceid))
+        for id, proc, runtime, status, priority, host, sequenceid in self.node_relevant_active_tasks:
             procname = proc.split(':')[0]
             if procname in self.allowed_task_types:
-                n_active.append((id, proc, runtime, status, priority, host))
+                n_active.append((id, proc, runtime, status, priority, host, sequenceid))
         self.node_relevant_active_tasks = tuple(n_active)
         self.node_relevant_waiting_tasks = tuple(n_waiting)
 
@@ -980,23 +980,24 @@ class BibSched:
         higher = []
         lower = []
         ### !!! We allready have this in node_relevant_active_tasks
-        for other_task_id, task_proc, runtime, status, task_priority, task_host in self.node_relevant_active_tasks:
+        for other_task_id, task_proc, runtime, status, task_priority, task_host, sequenceid in self.node_relevant_active_tasks:
+#        for other_task_id, task_proc, runtime, status, task_priority, task_host in self.node_relevant_active_tasks:
 #        for other_task_id, task_proc, task_priority, status in self.get_running_tasks():
             if task_id == other_task_id:
                 continue
             if task_priority < priority and task_host == self.hostname:
-                lower.append((other_task_id, task_proc, task_priority, status))
+                lower.append((other_task_id, task_proc, task_priority, status, sequenceid))
             elif task_host == self.hostname:
-                higher.append((other_task_id, task_proc, task_priority, status))
+                higher.append((other_task_id, task_proc, task_priority, status, sequenceid))
         return lower, higher
 
-    def handle_task(self, task_id, proc, runtime, status, priority, host):
+    def handle_task(self, task_id, proc, runtime, status, priority, host, sequenceid):
         """Perform needed action of the row representing a task.
         Return True when task_status need to be refreshed"""
         #Log('%s id: %s, proc: %s, runtime: %s, status: %s, priority: %s' % (task_status, task_id, proc, runtime, status, priority))
         #Log("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s" % (task_id, proc, runtime, status, priority))
 
-        if (task_id, proc, runtime, status, priority, host) in self.node_relevant_waiting_tasks:
+        if (task_id, proc, runtime, status, priority, host, sequenceid) in self.node_relevant_waiting_tasks:
 #        elif task_id in self.task_status['WAITING'] or task_id in self.task_status['SLEEPING']:
             #Log("Trying to run %s" % task_id)
 
@@ -1006,7 +1007,7 @@ class BibSched:
             lower, higher = self.split_active_tasks_by_priority(task_id, priority)
             #Log('lower: %s' % lower)
             #Log('higher: %s' % higher)
-            for other_task_id, other_proc, other_runtime, other_status, other_priority, other_host  in self.active_tasks_all_nodes:
+            for other_task_id, other_proc, other_runtime, other_status, other_priority, other_host, other_sequenceid in self.active_tasks_all_nodes:
                 if not self.is_task_safe_to_execute(proc, other_proc):
                     ### !!! WE NEED TO CHECK FOR TASKS THAT CAN ONLY BE EXECUTED ON ONE MACHINE AT ONE TIME
                     ### !!! FOR EXAMPLE BIBUPLOADS WHICH NEED TO BE EXECUTED SEQUENTIALLY AND NEVER CONCURRENTLY
@@ -1014,6 +1015,12 @@ class BibSched:
                     ## cannot run at the same time of the given task.
                     ## We give up
                     #Log("Cannot run because task_id: %s, proc: %s is the queue and incompatible" % (other_task_id, other_proc))
+                    return False
+
+            for other_task_id, other_proc, other_dummy, other_status, other_sequenceid in higher + lower:
+                if sequenceid == other_sequenceid and task_id > other_task_id:
+                    Log('Same sequence id processes.')
+                    ## If there is a task with same sequence number then do not run the current task
                     return False
 
             ## No higher priority task have issue with the given task.
@@ -1100,10 +1107,10 @@ class BibSched:
             if max_bibupload_priority:
                 run_sql("UPDATE schTASK SET priority=%s WHERE status='WAITING' AND proc='bibupload' AND runtime<=NOW()", ( max_bibupload_priority[0][0], ))
             ## The bibupload tasks are sorted by id, which means by the order they were scheduled
-            self.node_relevant_bibupload_tasks = run_sql("SELECT id,proc,runtime,status,priority,host FROM schTASK WHERE status='WAITING' AND proc='bibupload' AND runtime<=NOW() ORDER BY id ASC LIMIT 1", n=1)
+            self.node_relevant_bibupload_tasks = run_sql("SELECT id,proc,runtime,status,priority,host,sequenceid FROM schTASK WHERE status='WAITING' AND proc='bibupload' AND runtime<=NOW() ORDER BY id ASC LIMIT 1", n=1)
             ## The other tasks are sorted by priority
-            self.node_relevant_waiting_tasks = run_sql("SELECT id,proc,runtime,status,priority,host FROM schTASK WHERE (status='WAITING' AND runtime<=NOW()) OR status='SLEEPING' ORDER BY priority DESC, runtime ASC, id ASC")
-            self.node_relevant_active_tasks = run_sql("SELECT id,proc,runtime,status,priority,host FROM schTASK WHERE status IN ('RUNNING','CONTINUING','SCHEDULED','ABOUT TO STOP','ABOUT TO SLEEP')")
+            self.node_relevant_waiting_tasks = run_sql("SELECT id,proc,runtime,status,priority,host,sequenceid FROM schTASK WHERE (status='WAITING' AND runtime<=NOW()) OR status='SLEEPING' ORDER BY priority DESC, runtime ASC, id ASC")
+            self.node_relevant_active_tasks = run_sql("SELECT id,proc,runtime,status,priority,host,sequenceid FROM schTASK WHERE status IN ('RUNNING','CONTINUING','SCHEDULED','ABOUT TO STOP','ABOUT TO SLEEP')")
             self.active_tasks_all_nodes = tuple(self.node_relevant_active_tasks)
             ## Remove tasks that can not be executed on this host
             self.filter_for_allowed_tasks()
