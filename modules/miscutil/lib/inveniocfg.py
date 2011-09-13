@@ -741,8 +741,7 @@ def cli_cmd_run_regression_tests(conf):
     build_and_run_regression_test_suite()
 
 def cli_cmd_run_web_tests(conf):
-    """Run web tests in a browser. Requires Firefox with
-    Selenium IDE extension."""
+    """Run web tests in a browser. Requires Firefox with Selenium."""
     from invenio.testutils import build_and_run_web_test_suite
     build_and_run_web_test_suite()
 
