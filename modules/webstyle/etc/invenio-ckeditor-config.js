@@ -27,6 +27,11 @@ config.toolbar_WebComment = [
 config.skin = 'v2';
 config.resize_enabled = false;
 
+
+/* Enable browser built-in spellchecker */
+config.disableNativeSpellChecker = false;
+config.browserContextMenuOnCtrl = true;
+
 /* Remove "status" bar at the bottom of the editor displaying the DOM path*/
 config.removePlugins = 'elementspath';
 
