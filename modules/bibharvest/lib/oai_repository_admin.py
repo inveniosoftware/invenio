@@ -463,7 +463,7 @@ def delete_oai_set(oai_set_id):
     """"""
 
     try:
-        res = run_sql("DELETE FROM oaiREPOSITORY WHERE id=%s" % oai_set_id)
+        res = run_sql("DELETE FROM oaiREPOSITORY WHERE id=%s", (oai_set_id,))
         return (1, "")
     except StandardError, e:
         return (0, e)

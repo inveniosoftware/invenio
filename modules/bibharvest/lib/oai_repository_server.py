@@ -45,7 +45,7 @@ from invenio.config import \
      CFG_WEBSTYLE_HTTP_USE_COMPRESSION
 
 from invenio.intbitset import intbitset
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, wash_table_column_name
 from invenio.search_engine import record_exists, perform_request_search, \
     get_all_restricted_recids
 from invenio.bibformat_dblayer import get_preformatted_record
@@ -155,7 +155,7 @@ def get_field(sysno, field):
 
     bibbx = "bib%sx" % digit
     bibx  = "bibrec_bib%sx" % digit
-    query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec=%%s AND bx.id=bibx.id_bibxxx AND bx.tag=%%s" % (bibbx, bibx)
+    query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec=%%s AND bx.id=bibx.id_bibxxx AND bx.tag=%%s" % (wash_table_column_name(bibbx), wash_table_column_name(bibx))
 
     res = run_sql(query, (sysno, field))
 
@@ -371,8 +371,8 @@ def print_record(sysno, format='marcxml', record_exists_result=None):
                         bibx = "bibrec_bib%d%dx" % (digit1, digit2)
                         query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
                                 "WHERE bb.id_bibrec=%%s AND b.id=bb.id_bibxxx AND b.tag LIKE %%s "\
-                                "ORDER BY bb.field_number, b.tag ASC" % (bibbx, bibx)
-                        res = run_sql(query, (sysno, '%d%d%%' % (digit1, digit2)))
+                                "ORDER BY bb.field_number, b.tag ASC" % (wash_table_column_name(bibbx), wash_table_column_name(bibx))
+                        res = run_sql(query, (sysno, str(digit1) + str(digit2) + "%"))
                         field_number_old = -999
                         field_old = ""
                         for row in res:
