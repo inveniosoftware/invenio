@@ -572,6 +572,7 @@ class Manager:
         #if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
             #self.display_in_footer("a process is already running!")
         if status in ("SCHEDULED", "WAITING"):
+            run_sql("UPDATE schTASK SET status='SCHEDULED', host=%s WHERE id=%s", (self.hostname, task_id))
             if process in self.helper_modules:
                 program = os.path.join(CFG_BINDIR, process)
                 COMMAND = "%s %s > /dev/null 2> /dev/null &" % (program, str(task_id))
@@ -910,8 +911,11 @@ class BibSched:
 
     def tie_task_to_host(self, task_id):
         """Sets the hostname of a task to the machine executing this script
+        @return: True if the scheduling was successful, False otherwise,
+            e.g. if the task was scheduled concurrently on a different host.
         """
-        return run_sql("UPDATE schTASK SET host=%s WHERE id=%s", (self.hostname, task_id))
+        run_sql("UPDATE schTASK SET host=%s, status='SCHEDULED' WHERE id=%s AND host='' AND status='WAITING'", (self.hostname, task_id))
+        return bool(run_sql("SELECT id FROM schTASK WHERE id=%s AND host=%s", (task_id, self.hostname, )))
 
     def filter_for_allowed_tasks(self):
         """ Removes all tasks that are not allowed in this Invenio instance
@@ -1031,13 +1035,17 @@ class BibSched:
             procname = proc.split(':')[0]
             if not tasks_to_stop and not tasks_to_sleep:
                 if status in ("SLEEPING", "ABOUT TO SLEEP"):
-                    bibsched_set_status(task_id, "CONTINUING", status)
-                    if not bibsched_send_signal(proc, task_id, signal.SIGCONT):
-                        bibsched_set_status(task_id, "ERROR", "CONTINUING")
-                        Log("Task #%d (%s) woken up but didn't existed anymore" % (task_id, proc))
+                    if host == self.hostname:
+                        ## We can only wake up tasks that are running on our own host
+                        bibsched_set_status(task_id, "CONTINUING", status)
+                        if not bibsched_send_signal(proc, task_id, signal.SIGCONT):
+                            bibsched_set_status(task_id, "ERROR", "CONTINUING")
+                            Log("Task #%d (%s) woken up but didn't existed anymore" % (task_id, proc))
+                            return True
+                        Log("Task #%d (%s) woken up" % (task_id, proc))
                         return True
-                    Log("Task #%d (%s) woken up" % (task_id, proc))
-                    return True
+                    else:
+                        return False
                 elif procname in self.helper_modules:
                     program = os.path.join(CFG_BINDIR, procname)
                     ## Trick to log in bibsched.log the task exiting
@@ -1049,20 +1057,18 @@ class BibSched:
                     else:
                         COMMAND = "(%s %s > /dev/null 2> /dev/null %s) &" % (program, str(task_id), exit_str)
                     ### Set the task to scheduled and tie it to this host
-                    bibsched_set_status(task_id, "SCHEDULED")
-                    self.tie_task_to_host(task_id)
-                    Log("Task #%d (%s) started" % (task_id, proc))
-                    ### Relief the lock for the BibTask, it is save now to do so
-                    run_sql("UNLOCK TABLES")
-                    os.system(COMMAND)
-                    count = 10
-                    while run_sql("SELECT status FROM schTASK WHERE id=%s AND status='SCHEDULED'", (task_id, )):
-                        ## Polling to wait for the task to really start,
-                        ## in order to avoid race conditions.
-                        if count <= 0:
-                            raise StandardError, "Process %s (task_id: %s) was launched but seems not to be able to reach RUNNING status." % (proc, task_id)
-                        time.sleep(CFG_BIBSCHED_REFRESHTIME)
-                        count -= 1
+                    if self.tie_task_to_host(task_id):
+                        Log("Task #%d (%s) started" % (task_id, proc))
+                        ### Relief the lock for the BibTask, it is save now to do so
+                        os.system(COMMAND)
+                        count = 10
+                        while run_sql("SELECT status FROM schTASK WHERE id=%s AND status='SCHEDULED'", (task_id, )):
+                            ## Polling to wait for the task to really start,
+                            ## in order to avoid race conditions.
+                            if count <= 0:
+                                raise StandardError, "Process %s (task_id: %s) was launched but seems not to be able to reach RUNNING status." % (proc, task_id)
+                            time.sleep(CFG_BIBSCHED_REFRESHTIME)
+                            count -= 1
                     return True
                 else:
                     raise StandardError, "%s is not in the allowed modules" % procname
@@ -1104,13 +1110,11 @@ class BibSched:
 
         try:
             while True:
-                run_sql("LOCK TABLES schTASK WRITE")
                 #Log("New bibsched cycle")
                 calculate_rows()
                 ## Let's first handle running node_relevant_active_tasks.
                 for task in self.node_relevant_active_tasks:
                     if self.handle_task(*task):
-                        run_sql("UNLOCK TABLES")
                         break
                 else:
                     # If nothing has changed we can go on to run tasks.
@@ -1120,17 +1124,13 @@ class BibSched:
                             ## which means we execute the first next bibupload.
                             if self.handle_task(*self.node_relevant_bibupload_tasks[0]):
                                 ## Something has changed
-                                run_sql("UNLOCK TABLES")
                                 break
                         elif self.handle_task(*task):
                             ## Something has changed
-                            run_sql("UNLOCK TABLES")
                             break
                     else:
-                        run_sql("UNLOCK TABLES")
                         time.sleep(CFG_BIBSCHED_REFRESHTIME)
         except Exception, err:
-            run_sql("UNLOCK TABLES")
             register_exception(alert_admin=True)
             try:
                 register_emergency('Emergency from %s: BibSched halted: %s' % (CFG_SITE_URL, err))
