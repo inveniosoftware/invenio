@@ -347,7 +347,9 @@ class InvenioConnector(object):
             params = urllib.urlencode({'file': marcxml,
                                         'mode': mode})
             ## We don't use self.browser as batchuploader is protected by IP
-            return urllib2.urlopen(self.server_url + "/batchuploader/robotupload", params)
+            opener = urllib2.build_opener()
+            opener.addheaders = [('User-agent', 'invenio_webupload')]
+            return opener.open(self.server_url + "/batchuploader/robotupload", params,)
 
     def _parse_results(self, results, cached_records):
         """
