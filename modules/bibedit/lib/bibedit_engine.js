@@ -66,6 +66,7 @@
  *   - onMergeClick
  *   - bindNewRecordHandlers
  *   - cleanUp
+ *   - addHandler_autocompleteAffiliations
  *
  * 7. Editor UI
  *   - colorFields
@@ -161,6 +162,9 @@ var gBibCircUrl = null;
 
 var gDisplayBibCircPanel = false;
 
+//Tags to be autocompleted
+var gTagsToAutocomplete = ['100_u', '700_u', '701_u','502_c'];
+
 /*
  * **************************** 2. Initialization ******************************
  */
@@ -187,6 +191,7 @@ $(function(){
    * Initialize all components.
    */
   initMenu();
+  initJeditable();
   initAjax();
   initMisc();
   createTopToolbar();
@@ -243,6 +248,37 @@ function initMisc(){
   $("#bibEditBibCirculationBtn").bind("click", onBibCirculationBtnClicked);
 }
 
+function initJeditable(){
+  /*
+   * Overwrite Jeditable plugin function to add the autocomplete handler
+   * to textboxes corresponding to field 100__u
+   */
+  $.editable.types['textarea'].element = function(settings, original) {
+    var textarea = $('<textarea />');
+    if (settings.rows) {
+        textarea.attr('rows', settings.rows);
+    } else if (settings.height != "none") {
+        textarea.height(settings.height);
+    }
+    if (settings.cols) {
+        textarea.attr('cols', settings.cols);
+    } else if (settings.width != "none") {
+        textarea.width(settings.width);
+    }
+    $(this).append(textarea);
+
+    /* original variable is the cell that contains the textbox */
+    var cell_id_split = $(original).attr('id').split('_');
+    /* create subfield id corresponding to original cell */
+    cell_id_split[0] = 'subfieldTag';
+    var subfield_id = cell_id_split.join('_');
+    /* Add autocomplete handler to field 100__u only */
+    if ($.inArray(cell_id_split[1] + '_' + $(original).siblings('#' + subfield_id).text(), gTagsToAutocomplete) != -1) {
+        addHandler_autocompleteAffiliations(textarea);
+    }
+    return(textarea);
+  }
+}
 
 /*
  * **************************** 3. Ajax ****************************************
@@ -1394,6 +1430,25 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
   gPhysCopiesNum = 0;
 }
 
+function addHandler_autocompleteAffiliations(tg) {
+    /*
+     * Add autocomplete handler to a given cell
+     */
+    $(tg).autocomplete({
+    source: function( request, response ) {
+                $.getJSON("/kb/export",
+                { kbname: 'InstitutionsCollection', format: 'jquery', term: request.term},
+                response);
+    },
+    search: function() {
+                var term = this.value;
+                if (term.length < 3) {
+                    return false;
+                }
+    }
+    });
+}
+
 /*
  * **************************** 7. Editor UI ***********************************
  */
@@ -1893,6 +1948,13 @@ function onAddFieldChange(event){
           $('#txtAddFieldSubfieldCode_' + fieldTmpNo + '_0')[0].focus();
 	    break;
 	  case 'SubfieldCode':
+            /* Generate ID of the field tag input */
+            var fieldTagID = ('#' + $(this).attr('id').replace('SubfieldCode', 'Tag')).split('_');
+            fieldTagID.pop();
+            fieldTagID = fieldTagID.join('_');
+            if ($.inArray($(this).parent().prev().prev().children(fieldTagID)[0].value + '_' + this.value, gTagsToAutocomplete) != -1) {
+                addHandler_autocompleteAffiliations($(this).parent().next().children('input'));
+            }
 	    $(this).parent().next().children('input').focus();
 	    break;
 	  default:
@@ -2115,18 +2177,25 @@ function onAddSubfieldsChange(event){
    */
   if (this.value.length == 1){
     var valid = validMARC('SubfieldCode', this.value);
-    if (!valid && !$(this).hasClass('bibEditInputError'))
+    if (!valid && !$(this).hasClass('bibEditInputError')){
       $(this).addClass('bibEditInputError');
+    }
     else if (valid){
-      if ($(this).hasClass('bibEditInputError'))
-  $(this).removeClass('bibEditInputError');
+      if ($(this).hasClass('bibEditInputError')) {
+        $(this).removeClass('bibEditInputError');
+      }
       if (event.keyCode != 9 && event.keyCode != 16){
-  $(this).parent().next().children('input').focus();
+        /* If we are creating a new 100__u field add autocomplete handler */
+        if ($.inArray($(this).attr('id').split('_')[1] + '_' + this.value, gTagsToAutocomplete) != -1) {
+          addHandler_autocompleteAffiliations($(this).parent().next().children('input'));
+        }
+        $(this).parent().next().children('input').focus();
       }
     }
   }
-  else if ($(this).hasClass('bibEditInputError'))
+  else if ($(this).hasClass('bibEditInputError')){
     $(this).removeClass('bibEditInputError');
+  }
 }
 
 function onAddSubfieldsSave(event, tag, fieldPosition){

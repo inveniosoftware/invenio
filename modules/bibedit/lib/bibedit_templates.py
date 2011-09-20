@@ -479,6 +479,64 @@ def page_style():
                     padding-top: 37px;
                 }
 
+                /* jQuery-UI Theming used for:
+                 * - Autocomplete menu
+                 */
+
+                .ui-autocomplete-loading {
+                    background: white url('/img/ui-anim_basic_16x16.gif') right center no-repeat;
+                }
+
+                .ui-corner-all {
+                    -moz-border-radius: 4px 4px 4px 4px;
+                }
+
+                .ui-widget-content {
+                    width: 300px;
+                }
+                .ui-widget-content a {
+                    background-color: white;
+                    color: black;
+                }
+
+                .ui-widget-overlay {
+                    -moz-background-clip: border;
+                    -moz-background-origin: padding;
+                    -moz-background-size: auto auto;
+                    background-attachment: scroll;
+                    background-position: 50% 50%;
+                    background-repeat: repeat;
+                    background-color: #666666;
+                    opacity: 0.5;
+                    left: 0;
+                    position: absolute;
+                    top: 0;
+                }
+
+                .ui-widget {
+                    /* font-family: Trebuchet MS,Tahoma,Verdana,Arial,sans-serif; */
+                    font-size: .8em;
+                }
+
+                .ui-menu .ui-menu-item a {
+                    display: block;
+                    line-height: .8;
+                    padding: 0.2em 0.4em;
+                    text-decoration: none;
+                    background-color: white;
+                    color: black;
+                }
+
+                .ui-menu {
+                    list-style: none outside none;
+                    margin-left: 1em;
+                    padding-left: 1em;
+                }
+
+                .ui-autocomplete {
+                    cursor: default;
+                }
+
             """
     style += "</style>"
     return style

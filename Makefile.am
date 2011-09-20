@@ -148,6 +148,7 @@ install-jquery-plugins: install-jquery-plugins
 	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.draggable.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.position.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.resizable.min.js && \
+	wget http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js && \
 	wget http://www.appelsiini.net/download/jquery.jeditable.mini.js && \
 	wget http://github.com/malsup/form/raw/master/jquery.form.js --no-check-certificate && \
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
@@ -226,8 +227,9 @@ uninstall-jquery-plugins:
 	rm -f jquery.ajaxPager.js && \
 	rm -f jquery.form.js && \
 	rm -f jquery.dataTables.min.js && \
-	rm -f ui.core.js
-	rm -f jquery.bookmark.min.js) && \
+	rm -f ui.core.js && \
+	rm -f jquery.bookmark.min.js && \
+        rm -f jquery-ui.min.js)
 	(cd ${prefix}/var/www/img && \
 	rm -f cancel.png uploadify.css uploadify.swf uploadify.allglyphs.swf uploadify.fla && \
 	rm -f datatables_jquery-ui.css \
