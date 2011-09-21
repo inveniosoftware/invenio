@@ -41,7 +41,6 @@ from invenio.config import CFG_BINDIR, CFG_TMPSHAREDDIR, CFG_LOGDIR, \
                             CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS, \
                             CFG_BATCHUPLOADER_WEB_ROBOT_AGENT, \
                             CFG_PREFIX, CFG_SITE_LANG
-from invenio.webinterface_handler_wsgi_utils import Field
 from invenio.textutils import encode_for_xml
 from invenio.bibtask import task_low_level_submission
 from invenio.messages import gettext_set_language
@@ -104,8 +103,12 @@ def cli_upload(req, file_content=None, mode=None):
         msg = "[ERROR] Invalid upload mode."
         _log(msg)
         return _write(req, msg)
-    if isinstance(arg_file, Field):
+    if hasattr(arg_file, "filename"):
         arg_file = arg_file.value
+    else:
+        msg = "[ERROR] 'file' parameter must be a (single) file"
+        _log(msg)
+        return _write(req, msg)
 
     # write temporary file:
     tempfile.tempdir = CFG_TMPSHAREDDIR
