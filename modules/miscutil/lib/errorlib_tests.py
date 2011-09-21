@@ -28,8 +28,10 @@ import unittest
 import datetime
 
 class TestGetEmergencyRecipients(unittest.TestCase):
+
     def test_get_emergency_recipients(self):
         """errorlib - test return of proper set of recipients"""
+
         now = datetime.datetime.today()
         tomorrow = now + datetime.timedelta(days=1)
         diff_day = now + datetime.timedelta(days=4)
@@ -52,8 +54,8 @@ class TestGetEmergencyRecipients(unittest.TestCase):
         minute = (now.minute - 3) % 60
         # hour and earlier can change when minute is modified
         if minute > now.minute:
-             hour = (now.hour - 1) % 24
-             earlier = now.replace(hour=(now.hour - 2) % 24)
+            hour = (now.hour - 1) % 24
+            earlier = now.replace(hour=(now.hour - 2) % 24)
         else:
             hour = now.hour
         constraint_near_miss = "%s-%s" % (

@@ -31,8 +31,8 @@ from cStringIO import StringIO
 
 from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, \
     CFG_WEBALERT_ALERT_ENGINE_EMAIL, CFG_SITE_ADMIN_EMAIL, \
-    CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, CFG_SITE_URL, CFG_VERSION, \
-    CFG_CERN_SITE, CFG_SITE_EMERGENCY_EMAIL_ADDRESSES, \
+    CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, CFG_SITE_URL, \
+    CFG_SITE_EMERGENCY_EMAIL_ADDRESSES, \
     CFG_SITE_ADMIN_EMAIL_EXCEPTIONS, \
     CFG_ERRORLIB_RESET_EXCEPTION_NOTIFICATION_COUNTER_AFTER
 from invenio.urlutils import wash_url_argument
@@ -137,15 +137,18 @@ def get_emergency_recipients(recipient_cfg=CFG_SITE_EMERGENCY_EMAIL_ADDRESSES):
         '18:00-06:00': 'team-in-usa@foo.com',
         '*': 'john.doe.phone@foo.com'}
     """
+
     from invenio.dateutils import parse_runtime_limit
 
     recipients = set()
     for time_condition, address_str in recipient_cfg.items():
         if time_condition and time_condition is not '*':
             (current_range, future_range) = parse_runtime_limit(time_condition)
-            time_now = time.time()
+            time_now = time.mktime(datetime.datetime.today().timetuple())
+
             if not current_range[0] <= time_now <= current_range[1]:
                 continue
+
         recipients.update([address_str])
     return list(recipients)
 
@@ -428,7 +431,7 @@ def register_exception(stream='error',
                 subject = '%s at %s' % (subject, CFG_SITE_URL)
                 email_text = "\n%s\n%s" % (pretty_notification_info, email_text)
                 if not written_to_log:
-                        email_text += """\
+                    email_text += """\
 Note that this email was sent to you because it has been impossible to log
 this exception into %s""" % os.path.join(CFG_LOGDIR, 'invenio.' + stream)
                 send_email(

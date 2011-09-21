@@ -310,6 +310,7 @@ def parse_runtime_limit(value):
     [Wee[kday]] [hh[:mm][-hh[:mm]]].
     The function will return two valid time ranges. The first could be in the past, containing the present or in the future. The second is always in the future.
     """
+
     def extract_time(value):
         value = _RE_RUNTIMELIMIT_HOUR.search(value).groupdict()
         hour = int(value['hour']) % 24
@@ -337,6 +338,7 @@ def parse_runtime_limit(value):
             raise ValueError
         pieces = g.groupdict()
         today_weekday = today.isoweekday() - 1
+
         if pieces['weekday'] is None:
             ## No weekday specified. So either today or tomorrow
             first_occasion_day = 0
@@ -346,25 +348,31 @@ def parse_runtime_limit(value):
             weekday = extract_weekday(pieces['weekday'])
             first_occasion_day = -((today_weekday - weekday) % 7) * 24 * 3600
             next_occasion_day = first_occasion_day + 7 * 24 * 3600
+
         if pieces['begin'] is None:
             pieces['begin'] = '00:00'
         if pieces['end'] is None:
             pieces['end'] = '00:00'
+
         beginning_time = extract_time(pieces['begin'])
         ending_time = extract_time(pieces['end'])
-        if beginning_time >= ending_time:
-            ## end < begin we add a 24-hours watch tour.
+
+        if not ending_time:
             ending_time += 24 * 3600
+        elif beginning_time and ending_time:
+            if beginning_time > ending_time:
+                beginning_time -= 24 * 3600
+
         reference_time = time.mktime(datetime.datetime(today.year, today.month, today.day).timetuple())
-        first_range = (
+        current_range = (
             reference_time + first_occasion_day + beginning_time,
             reference_time + first_occasion_day + ending_time
         )
-        second_range = (
+        future_range = (
             reference_time + next_occasion_day + beginning_time,
             reference_time + next_occasion_day + ending_time
         )
-        return first_range, second_range
+        return current_range, future_range
     except ValueError:
         raise
     except:
