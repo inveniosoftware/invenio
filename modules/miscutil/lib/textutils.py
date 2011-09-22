@@ -26,6 +26,7 @@ __revision__ = "$Id$"
 import sys
 import re
 import textwrap
+import htmlentitydefs
 import invenio.template
 from invenio.config import CFG_ETCDIR
 try:
@@ -542,3 +543,38 @@ def translate_to_ascii(values):
         ascii_text = unidecode(unicode_text).encode('ascii')
         values[index] = ascii_text
     return values
+
+def xml_entities_to_utf8(text, skip=('lt', 'gt', 'amp')):
+    """
+    Removes HTML or XML character references and entities from a text string
+    and replaces them with their UTF-8 representation, if possible.
+
+    @param text: The HTML (or XML) source text.
+    @type text: string
+
+    @param skip: list of entity names to skip when transforming.
+    @type skip: iterable
+
+    @return: The plain text, as a Unicode string, if necessary.
+    @author: Based on http://effbot.org/zone/re-sub.htm#unescape-html
+    """
+    def fixup(m):
+        text = m.group(0)
+        if text[:2] == "&#":
+            # character reference
+            try:
+                if text[:3] == "&#x":
+                    return unichr(int(text[3:-1], 16)).encode("utf-8")
+                else:
+                    return unichr(int(text[2:-1])).encode("utf-8")
+            except ValueError:
+                pass
+        else:
+            # named entity
+            if text[1:-1] not in skip:
+                try:
+                    text = unichr(htmlentitydefs.name2codepoint[text[1:-1]]).encode("utf-8")
+                except KeyError:
+                    pass
+        return text # leave as is
+    return re.sub("&#?\w+;", fixup, text)
