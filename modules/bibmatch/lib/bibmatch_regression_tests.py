@@ -68,54 +68,84 @@ class BibMatchTest(unittest.TestCase):
 000000019 909CS $$sn$$w198238n
 000000019 980__ $$aREPORT
         """
+
         #ambig match:  Changed Atlantis (Timaeus) ->Atlantis
-        self.recxml1 = """
-<?xml version="1.0" encoding="UTF-8"?>
+        self.recxml1 = """<?xml version="1.0" encoding="UTF-8"?>
 <collection xmlns="http://www.loc.gov/MARC21/slim">
 <record>
-  <controlfield tag="001">101</controlfield>
-  <datafield tag="037" ind1=" " ind2=" ">
-    <subfield code="a">BUL-NEWS-2009-003</subfield>
+  <controlfield tag="001">95</controlfield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">0289446CERCER</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="9">SLAC</subfield>
+    <subfield code="a">3838510</subfield>
   </datafield>
   <datafield tag="041" ind1=" " ind2=" ">
     <subfield code="a">eng</subfield>
   </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
-    <subfield code="a">Plato</subfield>
+    <subfield code="a">Polyakov, A M</subfield>
+    <subfield code="u">Princeton University</subfield>
   </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
-    <subfield code="a">Atlantis (Timaeus)</subfield>
+    <subfield code="a">The wall of the cave</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="c">1994</subfield>
   </datafield>
   <datafield tag="520" ind1=" " ind2=" ">
-    <subfield code="b">&lt;!--HTML-->&lt;p class="articleHeader">This great island lay over against the Pillars of Heracles, in extent greater than Libya and Asia put together, and was the passage to other islands and to a great ocean of which the Mediterranean sea was only the harbour; and within the Pillars the empire of Atlantis reached in Europe to Tyrrhenia and in Libya to Egypt.&lt;/p>&lt;p>This mighty power was arrayed against Egypt and Hellas and all the countries&lt;/p>&lt;div class="phrwithcaption">&lt;div class="imageScale">&lt;img src="http://invenio-software.org/download/invenio-demo-site-files/icon-journal_Athanasius_Kircher_Atlantis_image.gif" alt="" />&lt;/div>&lt;p>Representation of Atlantis by Athanasius Kircher (1669)&lt;/p>&lt;/div>bordering on the Mediterranean. Then your city did bravely, and won renown over the whole earth. For at the peril of her own existence, and when the other Hellenes had deserted her, she repelled the invader, and of her own accord gave liberty to all the nations within the Pillars. A little while afterwards there were great earthquakes and floods, and your warrior race all sank into the earth; and the great island of Atlantis also disappeared in the sea. This is the explanation of the shallows which are found in that part of the Atlantic ocean. &lt;p>&lt;/p>(Excerpt from TIMAEUS, By Plato, translated By Jowett, Benjamin)&lt;br /></subfield>
+    <subfield code="a">In this article old and new relations between gauge fields and strings are discussed. We add new arguments that the Yang Mills theories must be described by the non-critical strings in the five dimensional curved space. The physical meaning of the fifth dimension is that of the renormalization scale represented by the Liouville field. We analyze the meaning of the zigzag symmetry and show that it is likely to be present if there is a minimal supersymmetry on the world sheet. We also present the new string backgrounds which may be relevant for the description of the ordinary bosonic Yang-Mills theories. The article is written on the occasion of the 40-th anniversary of the IHES.</subfield>
   </datafield>
-  <datafield tag="590" ind1=" " ind2=" ">
-    <subfield code="b">&lt;!--HTML-->&lt;br /></subfield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">SIS LANLPUBL2001</subfield>
   </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
-    <subfield code="c">1</subfield>
-    <subfield code="n">02/2009</subfield>
-    <subfield code="t">Atlantis Times</subfield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">LANL EDS</subfield>
   </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
-    <subfield code="c">1</subfield>
-    <subfield code="n">03/2009</subfield>
-    <subfield code="t">Atlantis Times</subfield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">SIS:2001 PR/LKR added</subfield>
   </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
-    <subfield code="c">1</subfield>
-    <subfield code="n">04/2009</subfield>
-    <subfield code="t">Atlantis Times</subfield>
+  <datafield tag="650" ind1="1" ind2="7">
+    <subfield code="2">SzGeCERN</subfield>
+    <subfield code="a">Particle Physics - Theory</subfield>
   </datafield>
-  <datafield tag="856" ind1="4" ind2=" ">
-    <subfield code="u">http://localhost/record/101/files/journal_Athanasius_Kircher_Atlantis_image.gif</subfield>
+  <datafield tag="690" ind1="C" ind2=" ">
+    <subfield code="a">ARTICLE</subfield>
   </datafield>
-  <datafield tag="856" ind1="4" ind2=" ">
-    <subfield code="u">http://localhost/record/101/files/journal_Athanasius_Kircher_Atlantis_image.gif?subformat=icon</subfield>
-    <subfield code="x">icon</subfield>
+  <datafield tag="909" ind1="C" ind2="4">
+    <subfield code="c">645-658</subfield>
+    <subfield code="p">Int. J. Mod. Phys. A</subfield>
+    <subfield code="v">14</subfield>
+    <subfield code="y">1999</subfield>
+  </datafield>
+  <datafield tag="859" ind1=" " ind2=" ">
+    <subfield code="f">polyakov@puhep1.princeton.edu</subfield>
+  </datafield>
+  <datafield tag="916" ind1=" " ind2=" ">
+    <subfield code="s">n</subfield>
+    <subfield code="w">199837</subfield>
+  </datafield>
+  <datafield tag="960" ind1=" " ind2=" ">
+    <subfield code="a">13</subfield>
+  </datafield>
+  <datafield tag="961" ind1=" " ind2=" ">
+    <subfield code="c">20060916</subfield>
+    <subfield code="h">0007</subfield>
+    <subfield code="l">CER01</subfield>
+    <subfield code="x">19980910</subfield>
+  </datafield>
+  <datafield tag="963" ind1=" " ind2=" ">
+    <subfield code="a">PUBLIC</subfield>
+  </datafield>
+  <datafield tag="970" ind1=" " ind2=" ">
+    <subfield code="a">000289446CER</subfield>
   </datafield>
   <datafield tag="980" ind1=" " ind2=" ">
-    <subfield code="a">ATLANTISTIMESNEWS</subfield>
+    <subfield code="a">ARTICLE</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="u">http://invenio-demo.cern.ch/record/95/files/9809057.pdf</subfield>
   </datafield>
 </record>
 </collection>
@@ -145,29 +175,6 @@ class BibMatchTest(unittest.TestCase):
   <datafield tag="690" ind1="C" ind2=" ">
     <subfield code="a">Conference Paper</subfield>
     <subfield code="2">INSPIRE</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="s">Phys.Rev.,D61,022001</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="r">hep-th/9601083</subfield>
-    <subfield code="s">Phys.Rev.,D53,4129</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="r">hep-th/0201029</subfield>
-    <subfield code="s">Phys.Rev.,D65,126009</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="r">hep-th/0105097</subfield>
-    <subfield code="s">Phys.Rev.,D66,106006</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="r">hep-th/9906070</subfield>
-    <subfield code="s">Nucl.Phys.,B584,69</subfield>
-  </datafield>
-  <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="r">hep-th/0211182</subfield>
-    <subfield code="s">JHEP,0303,061</subfield>
   </datafield>
   <datafield tag="520" ind1=" " ind2=" ">
     <subfield code="a">A brief overview of hep-th/0201028 prepared for NATO Advanced Study Institute and EC Summer School on Progress in String, Field and Particle Theory, Cargese, Corsica, France, 25 June - 11 July 2002.</subfield>
@@ -255,7 +262,7 @@ class BibMatchTest(unittest.TestCase):
 </record>
 </collection>
 """
-        #exact match: using all titles to disambiguate
+        #ambig
         self.recxml3 = """
 <?xml version="1.0" encoding="UTF-8"?>
 <collection xmlns="http://www.loc.gov/MARC21/slim">
@@ -274,10 +281,6 @@ class BibMatchTest(unittest.TestCase):
   </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">Analyse informatique</subfield>
-  </datafield>
-  <datafield tag="245" ind1=" " ind2=" ">
-    <subfield code="n">t.2</subfield>
-    <subfield code="p">L'accomplissement</subfield>
   </datafield>
   <datafield tag="260" ind1=" " ind2=" ">
     <subfield code="a">Paris</subfield>
@@ -310,12 +313,11 @@ class BibMatchTest(unittest.TestCase):
 
 </collection>
 """
-        #fuzzy matched: quasi-normal -> quasinormal and missing words in title
+        #matched: quasi-normal -> quasi normal + missing word in title
         self.recxml4 = """
 <?xml version="1.0" encoding="UTF-8"?>
 <collection xmlns="http://www.loc.gov/MARC21/slim">
 <record>
-  <controlfield tag="001">92</controlfield>
   <controlfield tag="003">SzGeCERN</controlfield>
   <controlfield tag="005">20060616163757.0</controlfield>
   <datafield tag="037" ind1=" " ind2=" ">
@@ -410,7 +412,6 @@ class BibMatchTest(unittest.TestCase):
     <subfield code="a">ARTICLE</subfield>
   </datafield>
 </record>
-
 </collection>
 """ % CFG_SITE_RECORD
         # Restricted record in thesis collection
@@ -478,39 +479,120 @@ class BibMatchTest(unittest.TestCase):
     </record>
     </collection>
     """
+        self.recxml6 = """
+<?xml version="1.0" encoding="UTF-8"?>
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">14</controlfield>
+  <datafield tag="041" ind1=" " ind2=" ">
+    <subfield code="a">eng</subfield>
+  </datafield>
+  <datafield tag="088" ind1=" " ind2=" ">
+    <subfield code="a">CERN-PRE-82-006</subfield>
+  </datafield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Ellis, J</subfield>
+    <subfield code="u">CERN</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">From the standard model to grand unification</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Geneva</subfield>
+    <subfield code="b">CERN</subfield>
+    <subfield code="c">1982</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">mult. p</subfield>
+  </datafield>
+  <datafield tag="650" ind1="1" ind2="7">
+    <subfield code="2">SzGeCERN</subfield>
+    <subfield code="a">General Theoretical Physics</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="0">
+    <subfield code="y">1982</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="0">
+    <subfield code="b">11</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="0">
+    <subfield code="p">TH</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="1">
+    <subfield code="c">1990-01-28</subfield>
+    <subfield code="l">50</subfield>
+    <subfield code="m">2001-09-15</subfield>
+    <subfield code="o">BATCH</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="2">
+    <subfield code="f">820332</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="O">
+    <subfield code="o">oai:cds.cern.ch:CERN-PRE-82-006</subfield>
+    <subfield code="p">cern:theory</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="S">
+    <subfield code="s">h</subfield>
+    <subfield code="w">1982n</subfield>
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">PREPRINT</subfield>
+  </datafield>
+</record>
+</collection>
+        """
         return
-
 
     def test_check_existing(self):
         """bibmatch - check existing record"""
-        records = create_records(self.recxml3)
-        [dummy1, matchedrecs, dummy2, dummy3] = match_records(records)
+        # Non-fuzzy searching will not find it
+        records = create_records(self.recxml4)
+        [nonmatchedrecs, dummy1, dummy2, dummy3] = match_records(records, \
+                                                                 verbose=0, \
+                                                                 fuzzy=False)
+        self.assertEqual(1, len(nonmatchedrecs))
+
+        # Fuzzy searching should find it
+        records = create_records(self.recxml4)
+        [dummy1, matchedrecs, dummy2, dummy3] = match_records(records, \
+                                                              verbose=0, \
+                                                              fuzzy=True)
+        self.assertEqual(1, len(matchedrecs))
+
+        # Check that searches returning more results are properly validated
+        # This search should return 4 hits, but only real 1 match.
+        records = create_records(self.recxml6)
+        [dummy1, matchedrecs, dummy2, dummy3] = match_records(records, \
+                                                              verbose=0)
         self.assertEqual(1, len(matchedrecs))
 
     def test_check_new(self):
         """bibmatch - check a new record"""
         records = create_records(self.recxml2)
-        [newrecs, dummy1, dummy2, dummy3] = match_records(records)
+        [newrecs, dummy1, dummy2, dummy3] = match_records(records, \
+                                                          verbose=0)
         self.assertEqual(1, len(newrecs))
 
     def test_check_ambiguous(self):
         """bibmatch - check an ambiguous record"""
-        records = create_records(self.recxml1)
+        records = create_records(self.recxml3)
         [dummy1, dummy2, ambigrecs, dummy3] = match_records(records, \
-                                                            qrystrs=[("", "[100__a]")])
+                                                            verbose=0)
         self.assertEqual(1, len(ambigrecs))
 
     def test_check_fuzzy(self):
         """bibmatch - check fuzzily matched record"""
-        records = create_records(self.recxml4)
-        [dummy1, dummy2, dummy3, fuzzyrecs] = match_records(records)
+        records = create_records(self.recxml1)
+        [dummy1, dummy2, dummy3, fuzzyrecs] = match_records(records, \
+                                                            verbose=0)
         self.assertEqual(1, len(fuzzyrecs))
 
     def test_check_remote(self):
         """bibmatch - check remote match (Invenio demo site)"""
-        records = create_records(self.recxml3)
+        records = create_records(self.recxml6)
         [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, \
-                                                              server_url="http://invenio-demo.cern.ch")
+                                                              server_url="http://invenio-demo.cern.ch", \
+                                                              verbose=0)
         self.assertEqual(1, len(matchedrecs))
 
     def test_check_textmarc(self):
@@ -518,14 +600,16 @@ class BibMatchTest(unittest.TestCase):
         marcxml = transform_input_to_marcxml("", self.textmarc)
         records = create_records(marcxml)
         [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, \
-                                                              server_url="http://invenio-demo.cern.ch")
+                                                              verbose=0)
         self.assertEqual(2, len(matchedrecs))
 
     def test_check_altered(self):
         """bibmatch - check altered match"""
-        records = create_records(self.recxml3)
+        records = create_records(self.recxml4)
         self.assertTrue(not record_has_field(records[0][0], '001'))
-        [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, modify=1)
+        [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, \
+                                                              modify=1, \
+                                                              verbose=0)
         self.assertTrue(record_has_field(matchedrecs[0][0], '001'))
 
     def test_check_qrystr(self):
@@ -539,39 +623,34 @@ class BibMatchTest(unittest.TestCase):
         new_query = querystring.create_query(records[0], qrystr_new)
         self.assertEqual(old_query, new_query)
 
-    def test_check_completeness(self):
-        """bibmatch - check query completeness"""
-        records = create_records(self.recxml4)
-        [dummy1, dummy2, ambigrecs, dummy3] = match_records(records, \
-                                                            qrystrs=[("", "[088__a] [035__a]")])
-        self.assertEqual(1, len(ambigrecs))
-
     def test_check_collection(self):
         """bibmatch - check collection"""
-        records = create_records(self.recxml3)
+        records = create_records(self.recxml4)
         [nomatchrecs, dummy1, dummy2, dummy3] = match_records(records, \
-                                                              collections=["Articles"])
+                                                              collections=["Books"], \
+                                                              verbose=0)
         self.assertEqual(1, len(nomatchrecs))
         [dummy1, matchedrecs, dummy2, dummy3] = match_records(records, \
-                                                              collections=["Books"])
+                                                              collections=["Articles"], \
+                                                              verbose=0)
         self.assertEqual(1, len(matchedrecs))
 
     def test_restricted_collections_local(self):
         """bibmatch - check restricted collections local search"""
         records = create_records(self.recxml5)
+        # Should not have access
+        [nomatchrecs, dummy1, dummy2, dummy3] = match_records(records, \
+                                                              qrystrs=[("", "[088__a]")], \
+                                                              collections=["Theses"], \
+                                                              verbose=0)
+        self.assertEqual(1, len(nomatchrecs))
+
         # Jekyll should have access
         [dummy1, matchedrecs, dummy2, dummy3] = match_records(records, \
                                                               qrystrs=[("", "[088__a]")], \
                                                               collections=["Theses"], \
                                                               user="jekyll",
-                                                              password="j123ekyll")
-        self.assertEqual(1, len(matchedrecs))
-        # Hyde should not have access
-        [nomatchrecs, dummy1, dummy2, dummy3] = match_records(records, \
-                                                              qrystrs=[("", "[088__a]")], \
-                                                              collections=["Theses"], \
-                                                              user="hyde", \
-                                                              password="h123yde",
+                                                              password="j123ekyll", \
                                                               verbose=0)
         self.assertEqual(1, len(matchedrecs))
 
@@ -583,8 +662,9 @@ class BibMatchTest(unittest.TestCase):
                                                               qrystrs=[("", "[088__a]")], \
                                                               collections=["Theses"], \
                                                               server_url="https://invenio-demo.cern.ch", \
-                                                              user="jekyll", \
-                                                              password="j123ekyll")
+                                                              user  ="jekyll", \
+                                                              password="j123ekyll",
+                                                              verbose=0)
         self.assertEqual(1, len(matchedrecs))
         # Hyde should not have access
         [nomatchrecs, dummy1, dummy2, dummy3] = match_records(records, \
