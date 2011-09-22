@@ -24,6 +24,8 @@ pylib_DATA = __init__.py \
              errorlib_regression_tests.py \
              data_cacher.py \
              dbdump.py \
+             web_api_key.py \
+             web_api_key_tests.py \
              dbquery.py \
              dbquery_tests.py \
              dbquery_regression_tests.py \
@@ -65,9 +67,9 @@ pylib_DATA = __init__.py \
              remote_debugger_config.py \
              remote_debugger_wsgi_reload.py \
              jsonutils.py \
-	         sequtils_cnum.py \
-	         sequtils.py \
-	         sequtils_regression_tests.py
+             sequtils_cnum.py \
+             sequtils.py \
+             sequtils_regression_tests.py
 
 noinst_DATA = testimport.py \
               kwalitee.py \

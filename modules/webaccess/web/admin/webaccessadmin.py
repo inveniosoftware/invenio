@@ -88,6 +88,11 @@ def modifypreferences(req, userID, login_method='', callback='yes', confirm=0, l
 
     return wal.perform_modifypreferences(req=req, userID=userID, login_method=login_method, callback=callback, confirm=confirm)
 
+def modifyapikeydata(req, userID, keyID, status, callback='yes', confirm=0, ln=CFG_SITE_LANG):
+    """modify the status of a REST API key"""
+
+    return wal.perform_modifyapikeydata(req=req, userID=userID, keyID=keyID, status=status, callback=callback, confirm=confirm)
+
 def modifylogindata(req, userID, nickname='', email='', password='', callback='yes', confirm=0, ln=CFG_SITE_LANG):
     """modify the email/password of an account"""
 

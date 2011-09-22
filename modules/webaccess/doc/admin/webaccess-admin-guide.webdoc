@@ -858,6 +858,14 @@ II. Example - connecting role and user</a>
     account can also be selected. To modify baskets or alerts, you need to login as the user, and
     modify the desired data as a normal user. Remember to log out as the user when you are finished
     editing.
+    Here you can also edit the user's REST API keys changing its status to the desired one. This status
+    is specified by CFG_REST_API_KEY_STATUS (only the first three are mandatory):
+      0 = OK
+      1 = REMOVED
+      2 = REVOKED
+      3 = WARNING1
+      4 = WARNING2
+      5 = WARNING3
 
 </pre>
 

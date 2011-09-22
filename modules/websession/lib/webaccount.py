@@ -45,6 +45,8 @@ from invenio.external_authentication import InvenioWebAccessExternalAuthError
 import invenio.template
 websession_templates = invenio.template.load('websession')
 
+from invenio import web_api_key
+
 def perform_info(req, ln):
     """Display the main features of CDS personalize"""
     uid = getUid(req)
@@ -334,6 +336,13 @@ def perform_set(email, ln, can_config_bibcatalog = False, verbose = 0):
                 ln = ln,
                 preferred_lang = preferred_lang
                 )
+
+    keys_info = web_api_key.show_web_api_keys(uid=uid)
+    out+=websession_templates.tmpl_user_api_key(
+                ln = ln,
+                keys_info = keys_info
+                )
+
     #show this dialog only if the system has been configured to use a ticket system
     from invenio.config import CFG_BIBCATALOG_SYSTEM
     if CFG_BIBCATALOG_SYSTEM and can_config_bibcatalog:

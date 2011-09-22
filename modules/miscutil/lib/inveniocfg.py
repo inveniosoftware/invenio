@@ -135,7 +135,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE',
                        'CFG_OAI_METADATA_FORMATS',
                        'CFG_WEBSUBMIT_DESIRED_CONVERSIONS',
-                       'CFG_BIBDOCFILE_BEST_FORMATS_TO_EXTRACT_TEXT_FROM',]:
+                       'CFG_BIBDOCFILE_BEST_FORMATS_TO_EXTRACT_TEXT_FROM',
+                       'CFG_WEB_API_KEY_ALLOWED_URL']:
         option_value = option_value[1:-1]
 
     ## 3cbis) very special cases: dicts with backward compatible string

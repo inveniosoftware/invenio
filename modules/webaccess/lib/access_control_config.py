@@ -357,3 +357,11 @@ CFG_WEBACCESS_WARNING_MSGS = {
                                20: """No roles are authorized to perform action %s with the given parameters."""
         }
 
+#There are three status key that must be here: OK, REMOVED and REVOKED
+#the value doesn't matter at all
+CFG_WEB_API_KEY_STATUS = {
+                      'OK':'OK',
+                      'REMOVED':'REMOVED',
+                      'REVOKED':'REVOKED',
+                      'WARNING':'WARNING'
+                      }

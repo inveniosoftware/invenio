@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+##
 ## This file is part of Invenio.
 ## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
@@ -47,9 +47,11 @@ from invenio.messages import wash_language
 from invenio.urlutils import redirect_to_url
 from invenio.errorlib import register_exception
 from invenio.webuser import get_preferred_user_language, isGuestUser, \
-    getUid, isUserSuperAdmin, collect_user_info
+    getUid, isUserSuperAdmin, collect_user_info, setUid
 from invenio.webinterface_handler_wsgi_utils import StringField
 from invenio.session import get_session
+from invenio import web_api_key
+
 
 ## The following variable is True if the installation make any difference
 ## between HTTP Vs. HTTPS connections.
@@ -374,6 +376,16 @@ def create_handler(root):
 
             # Set user agent for fckeditor.py, which needs it here
             os.environ["HTTP_USER_AGENT"] = req.headers_in.get('User-Agent', '')
+
+            # Check if REST authentication can be performed
+            if req.args:
+                args = cgi.parse_qs(req.args)
+                if 'apikey' in args and req.is_https():
+                    uid = web_api_key.acc_get_uid_from_request(req.uri, req.args)
+                    if uid < 0:
+                        raise apache.SERVER_RETURN, apache.HTTP_UNAUTHORIZED
+                    else:
+                        setUid(req=req, uid=uid)
 
             guest_p = isGuestUser(getUid(req), run_on_slave=False)
 

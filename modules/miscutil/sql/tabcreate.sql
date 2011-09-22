@@ -4091,4 +4091,17 @@ CREATE TABLE IF NOT EXISTS seqSTORE (
   UNIQUE KEY seq_name_value (seq_name, seq_value)
 ) ENGINE=MyISAM;
 
+-- table for API key
+
+CREATE TABLE IF NOT EXISTS webapikey (
+  id varchar(150) NOT NULL,
+  secret varchar(150) NOT NULL,
+  id_user int(15) NOT NULL,
+  status varchar(25) NOT NULL default 'OK',
+  description varchar(255) default NULL,
+  PRIMARY KEY (id),
+  KEY (id_user),
+  KEY (status)
+) ENGINE=MyISAM;
+
 -- end of file
