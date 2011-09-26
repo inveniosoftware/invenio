@@ -508,27 +508,42 @@ def _get_formated_record(record_id, output_format, update_commands, language, ou
     @param update_commands: list of commands used to update record contents
     @param language: the language to use to format the record
     """
-    updated_record = _get_updated_record(record_id, update_commands)
-    xml_record = bibrecord.record_xml_output(updated_record)
+    if update_commands:
+        updated_record = _get_updated_record(record_id, update_commands)
 
     old_record = search_engine.get_record(recid=record_id)
+    xml_record = bibrecord.record_xml_output(old_record)
     if "hm" == output_format:
         result = "<pre>\n"
-        if "All tags" not in outputTags or not outputTags:
-            diff_result = _get_record_diff(record_id, old_record, updated_record)
-            for line in diff_result.split('\n')[:-1]:
-                for tag in outputTags:
-                    if tag in line.split()[1]:
+        if ("All tags" not in outputTags) and outputTags:
+            if update_commands:
+                marc_record = _get_record_diff(record_id, old_record, updated_record)
+                tag_position = 1
+            else:
+                marc_record = _create_marc(xml_record)
+                tag_position = 0
+            for line in marc_record.split('\n')[:-1]:
+                if line.split()[tag_position][:3] in outputTags:
+                    if update_commands:
                         result += line.strip() + '\n'
-                    elif '<strong' in line:
-                        if tag in line.split()[3]:
-                            result += line.strip() + '\n'
+                    else:
+                        result += "%09d " % record_id + line.strip() + '\n'
+                elif '<strong' in line:
+                    if line.split()[3][5:8] in outputTags:
+                        result += line.strip() + '\n'
         else:
-            result += _get_record_diff(record_id, old_record, updated_record)
+            if update_commands:
+                result += _get_record_diff(record_id, old_record, updated_record)
+            else:
+                marc_record = _create_marc(xml_record)
+                for line in marc_record.split('\n')[:-1]:
+                    result += "%09d " % record_id + line.strip() + '\n'
 
         result += "</pre>"
         return result
 
+    if update_commands:
+        xml_record = bibrecord.record_xml_output(updated_record)
     result = bibformat.format_record(recID=None,
                                      of=output_format,
                                      xml_record=xml_record,
