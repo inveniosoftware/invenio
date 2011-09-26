@@ -94,6 +94,7 @@ from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
     collect_user_info, logoutUser, isUserSuperAdmin
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
+from invenio.weblinkback_webinterface import WebInterfaceRecordLinkbacksPages
 from invenio.bibcirculation_webinterface import WebInterfaceHoldingsPages
 from invenio.webpage import page, pageheaderonly, create_error_box
 from invenio.messages import gettext_set_language
@@ -988,7 +989,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage',
                 'references', 'export', 'citations', 'holdings', 'edit',
-                'keywords', 'multiedit', 'merge', 'plots']
+                'keywords', 'multiedit', 'merge', 'plots', 'linkbacks']
 
     #_exports.extend(output_formats)
 
@@ -1009,6 +1010,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         self.export = WebInterfaceRecordExport(self.recid, self.format)
         self.edit = WebInterfaceEditPages(self.recid)
         self.merge = WebInterfaceMergePages(self.recid)
+        self.linkbacks = WebInterfaceRecordLinkbacksPages(self.recid)
 
         return
 
@@ -1084,7 +1086,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage',
                 'references', 'export', 'citations', 'holdings', 'edit',
-                'keywords', 'multiedit', 'merge', 'plots']
+                'keywords', 'multiedit', 'merge', 'plots', 'linkbacks']
 
     #_exports.extend(output_formats)
 
@@ -1105,6 +1107,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         self.export = WebInterfaceRecordExport(self.recid, self.format)
         self.edit = WebInterfaceEditPages(self.recid)
         self.merge = WebInterfaceMergePages(self.recid)
+        self.linkbacks = WebInterfaceRecordLinkbacksPages(self.recid)
 
         return
 
@@ -1476,7 +1479,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             try:
                 if path[1] in ['', 'files', 'reviews', 'comments', 'usage',
                                'references', 'citations', 'holdings', 'edit',
-                               'keywords', 'multiedit', 'merge', 'plots']:
+                               'keywords', 'multiedit', 'merge', 'plots', 'linkbacks']:
                     tab = path[1]
                 elif path[1] == 'export':
                     tab = ''

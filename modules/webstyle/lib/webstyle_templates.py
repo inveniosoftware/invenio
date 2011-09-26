@@ -28,6 +28,7 @@ import sys
 import string
 
 from invenio.config import \
+     CFG_SITE_RECORD, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
@@ -262,6 +263,17 @@ class Template:
                         secure_page_p=0, navmenuid="admin", metaheaderadd="",
                         rssurl=CFG_SITE_URL+"/rss", body_css_classes=None):
 
+        from invenio.weblinkback_templates import get_trackback_auto_discovery_tag
+        # Embed a link in the header to subscribe trackbacks
+        # TODO: This hack must be replaced with the introduction of the new web framework
+        uri = req.unparsed_uri
+        recordIndexInURI = uri.find('/' + CFG_SITE_RECORD + '/')
+        headerLinkbackTrackbackLink = ''
+        # substring found --> offer trackback link in header
+        if recordIndexInURI != -1:
+            recid = uri[recordIndexInURI:len(uri)].split('/')[2].split("?")[0] #recid might end with ? for journal records
+            headerLinkbackTrackbackLink = get_trackback_auto_discovery_tag(recid)
+
         """Creates a page header
 
            Parameters:
@@ -352,6 +364,7 @@ template function generated it.
  <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
  <link rel="search" type="application/opensearchdescription+xml" href="%(siteurl)s/opensearchdescription" title="%(sitename)s" />
  <link rel="unapi-server" type="application/xml" title="unAPI" href="%(unAPIurl)s" />
+ %(linkbackTrackbackLink)s
  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
  <meta http-equiv="Content-Language" content="%(ln)s" />
  <meta name="description" content="%(description)s" />
@@ -461,6 +474,7 @@ template function generated it.
           'msg_help' : _("Help"),
           'languagebox' : self.tmpl_language_selection_box(req, ln),
           'unAPIurl' : cgi.escape('%s/unapi' % CFG_SITE_URL),
+          'linkbackTrackbackLink': headerLinkbackTrackbackLink,
           'inspect_templates_message' : inspect_templates_message
         }
         return out

@@ -3399,6 +3399,7 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
             'files'     : {'label': _('Files'),            'visible': False, 'enabled': True, 'order': 7},
             'plots'     : {'label': _('Plots'),            'visible': False, 'enabled': True, 'order': 8},
             'holdings'  : {'label': _('Holdings'),         'visible': False, 'enabled': True, 'order': 9},
+            'linkbacks' : {'label': _('Linkbacks'),        'visible': False, 'enabled': True, 'order': 10},
             }
 
     res = run_sql("SELECT tabs FROM collectiondetailedrecordpagetabs " + \

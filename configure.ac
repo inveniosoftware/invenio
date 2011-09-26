@@ -811,6 +811,10 @@ AC_CONFIG_FILES([config.nice  \
      modules/webjournal/lib/widgets/Makefile \
      modules/webjournal/web/Makefile \
      modules/webjournal/web/admin/Makefile \
+     modules/weblinkback/Makefile \
+     modules/weblinkback/lib/Makefile \
+     modules/weblinkback/web/Makefile \
+     modules/weblinkback/web/admin/Makefile \
      modules/webmessage/Makefile \
      modules/webmessage/bin/Makefile \
      modules/webmessage/bin/webmessageadmin \

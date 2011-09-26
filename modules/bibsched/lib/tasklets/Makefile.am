@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,7 +18,7 @@
 pylibdir=$(libdir)/python/invenio/bibsched_tasklets
 
 pylib_DATA = __init__.py bst_fibonacci.py bst_send_email.py bst_twitter_fetcher.py bst_run_bibtask.py \
-	bst_notify_url.py
+	bst_notify_url.py bst_weblinkback_updater.py
 
 EXTRA_DIST = $(pylib_DATA)
 

@@ -101,6 +101,42 @@ $ batchuploader --metadata -s20m
 </blockquote>
 </p>
 
+<p>If you are using the WebLinkback module, you should run the following tasklets:
+<blockquote>
+<pre>
+sudo -u www-data /opt/invenio/bin/bibtasklet \
+     -N weblinkbackupdaterdeleteurlsonblacklist \
+     -T bst_weblinkback_updater \
+     -a "mode=1" \
+     -u admin -s1d -L '22:00-05:00'
+
+sudo -u www-data /opt/invenio/bin/bibtasklet \
+     -N weblinkbackupdaternewpages \
+     -T bst_weblinkback_updater \
+     -a "mode=2" \
+     -u admin -s1d -L '22:00-05:00'
+
+sudo -u www-data /opt/invenio/bin/bibtasklet \
+     -N weblinkbackupdateroldpages \
+     -T bst_weblinkback_updater \
+     -a "mode=3" \
+     -u admin -s7d -L '22:00-05:00'
+
+sudo -u www-data /opt/invenio/bin/bibtasklet \
+     -N weblinkbackupdatermanuallysettitles \
+     -T bst_weblinkback_updater \
+     -a "mode=4" \
+     -u admin -s7d -L '22:00-05:00'
+
+sudo -u www-data /opt/invenio/bin/bibtasklet \
+     -N weblinkbackupdaterdetectbrokenlinkbacks \
+     -T bst_weblinkback_updater \
+     -a "mode=5" \
+     -u admin -s7d -L 'Sunday 01:00-05:00'
+</pre>
+</blockquote>
+</p>
+
 <h2>Monitoring periodical daemon tasks</h2>
 
 <p>Note that the BibSched automated daemon stops as soon as some of

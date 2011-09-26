@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,15 +15,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/invenio/bibformat_elements
-pylib_DATA = bfe_webjournal_main_navigation.py \
-	     bfe_webjournal_articles_overview.py bfe_webjournal_imprint.py \
-	     bfe_webjournal_sub_navigation.py bfe_webjournal_info.py \
-	     bfe_webjournal_article_admin_links.py bfe_webjournal_article_title.py \
-	     bfe_webjournal_article_body.py bfe_webjournal_article_author.py \
-	     bfe_webjournal_rss.py bfe_webjournal_archive.py \
-	     bfe_webjournal_articles.py bfe_webjournal_trackback_auto_discovery.py
+SUBDIRS = lib web
 
-EXTRA_DIST = $(pylib_DATA)
-
-CLEANFILES = *~ *.tmp *.pyc
+CLEANFILES = *~

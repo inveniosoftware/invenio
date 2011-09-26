@@ -4097,4 +4097,67 @@ CREATE TABLE IF NOT EXISTS seqSTORE (
   UNIQUE KEY seq_name_value (seq_name, seq_value)
 ) ENGINE=MyISAM;
 
+-- tables for linkbacks:
+
+CREATE TABLE IF NOT EXISTS lnkENTRY (
+  id int(15) NOT NULL auto_increment,
+  origin_url varchar(100) NOT NULL, -- url of the originating resource
+  id_bibrec mediumint(8) unsigned NOT NULL, -- bibrecord
+  additional_properties longblob,
+  type varchar(30) NOT NULL,
+  status varchar(30) NOT NULL default 'PENDING',
+  insert_time datetime default '0000-00-00 00:00:00',
+  PRIMARY KEY (id),
+  INDEX (id_bibrec),
+  INDEX (type),
+  INDEX (status),
+  INDEX (insert_time)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS lnkENTRYURLTITLE (
+  id int(15) unsigned NOT NULL auto_increment,
+  url varchar(100) NOT NULL,
+  title varchar(100) NOT NULL,
+  manual_set boolean NOT NULL default 0,
+  broken_count int(5) default 0,
+  broken boolean NOT NULL default 0,
+  PRIMARY KEY (id),
+  UNIQUE (url),
+  INDEX (title)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS lnkENTRYLOG (
+  id_lnkENTRY int(15) unsigned NOT NULL,
+  id_lnkLOG int(15) unsigned NOT NULL,
+  FOREIGN KEY (id_lnkENTRY) REFERENCES lnkENTRY(id),
+  FOREIGN KEY (id_lnkLOG) REFERENCES lnkLOG(id)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS lnkLOG (
+  id int(15) unsigned NOT NULL auto_increment,
+  id_user int(15) unsigned,
+  action varchar(30) NOT NULL,
+  log_time datetime default '0000-00-00 00:00:00',
+  PRIMARY KEY (id),
+  INDEX (id_user),
+  INDEX (action),
+  INDEX (log_time)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS lnkADMINURL (
+  id int(15) unsigned NOT NULL auto_increment,
+  url varchar(100) NOT NULL,
+  list varchar(30) NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE (url),
+  INDEX (list)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS lnkADMINURLLOG (
+  id_lnkADMINURL int(15) unsigned NOT NULL,
+  id_lnkLOG int(15) unsigned NOT NULL,
+  FOREIGN KEY (id_lnkADMINURL) REFERENCES lnkADMINURL(id),
+  FOREIGN KEY (id_lnkLOG) REFERENCES lnkLOG(id)
+) ENGINE=MyISAM;
+
 -- end of file

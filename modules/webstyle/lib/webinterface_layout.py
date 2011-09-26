@@ -136,6 +136,12 @@ except:
     WebInterfaceCommentsPages = WebInterfaceDumbPages
 
 try:
+    from invenio.weblinkback_webinterface import WebInterfaceRecentLinkbacksPages
+except:
+    register_exception(alert_admin=True, subject='EMERGENCY')
+    WebInterfaceRecentLinkbacksPages = WebInterfaceDumbPages
+
+try:
     from invenio.webmessage_webinterface import WebInterfaceYourMessagesPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
@@ -288,6 +294,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'bibsword',
         'person',
         'admin2',
+        'linkbacks'
         ] + test_exports + openaire_exports
 
     def __init__(self):
@@ -321,6 +328,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     batchuploader = WebInterfaceBatchUploaderPages()
     bibsword = WebInterfaceSword()
     person = WebInterfaceBibAuthorIDPages()
+    linkbacks = WebInterfaceRecentLinkbacksPages()
 
 # This creates the 'handler' function, which will be invoked directly
 # by mod_python.

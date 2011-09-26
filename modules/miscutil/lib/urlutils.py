@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -31,10 +31,17 @@ import re
 import sys
 import os
 import inspect
+import urllib
 from urllib import urlencode, quote_plus, quote
 from urlparse import urlparse
 from cgi import parse_qs, escape
 from md5 import md5
+
+try:
+    import BeautifulSoup
+    BEAUTIFUL_SOUP_IMPORTED = True
+except ImportError:
+    BEAUTIFUL_SOUP_IMPORTED = False
 
 try:
     from hashlib import sha256, sha1
@@ -438,6 +445,22 @@ def urlargs_replace_text_in_arg(urlargs, regexp_argname, text_old, text_new):
     if out.startswith("&amp;"):
         out = out[5:]
     return out
+
+def get_title_of_page(url):
+    """
+    @param url: page to get the title from
+    @return: the page title in utf-8 or None in case
+    that any kind of exception occured e.g. connection error,
+    URL not known
+    """
+    if BEAUTIFUL_SOUP_IMPORTED:
+        try:
+            soup = BeautifulSoup.BeautifulSoup(urllib.urlopen(url))
+            return soup.title.string.encode("utf-8")
+        except:
+            return None
+    else:
+        return "Title not available"
 
 def create_AWS_request_url(base_url, argd, _amazon_secret_access_key,
                            _timestamp=None):
