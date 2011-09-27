@@ -85,6 +85,7 @@ class SimulatedModPythonRequest(object):
         self.__write_error = False
         self.__errors = environ['wsgi.errors']
         self.__headers_in = table([])
+        self.__tainted = False
         for key, value in environ.iteritems():
             if key.startswith('HTTP_'):
                 self.__headers_in[key[len('HTTP_'):].replace('_', '-')] = value
@@ -92,12 +93,12 @@ class SimulatedModPythonRequest(object):
             self.__headers_in['content-length'] = environ['CONTENT_LENGTH']
         if environ.get('CONTENT_TYPE'):
             self.__headers_in['content-type'] = environ['CONTENT_TYPE']
-        self.get_post_form()
 
     def get_wsgi_environ(self):
         return self.__environ
 
     def get_post_form(self):
+        self.__tainted = True
         post_form = self.__environ.get('wsgi.post_form')
         input = self.__environ['wsgi.input']
         if (post_form is not None
@@ -165,6 +166,7 @@ class SimulatedModPythonRequest(object):
 
     def send_http_header(self):
         if not self.__response_sent_p:
+            self.__tainted = True
             if self.__allowed_methods and self.__status.startswith('405 ') or self.__status.startswith('501 '):
                 self.__headers['Allow'] = ', '.join(self.__allowed_methods)
 
@@ -328,6 +330,18 @@ class SimulatedModPythonRequest(object):
             except:
                 pass
         return out
+
+    def get_original_wsgi_environment(self):
+        """
+        Return the original WSGI environment used to initialize this request
+        object.
+        @return: environ, start_response
+        @raise AssertionError: in case the environment has been altered, i.e.
+            either the input has been consumed or something has already been
+            written to the output.
+        """
+        assert not self.__tainted, "The original WSGI environment is tainted since at least req.write or req.form has been used."
+        return self.__environ, self.__start_response
 
     content_type = property(get_content_type, set_content_type)
     unparsed_uri = property(get_unparsed_uri)
