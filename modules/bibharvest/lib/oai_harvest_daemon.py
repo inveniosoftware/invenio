@@ -545,6 +545,11 @@ def task_run_core():
                         error_happened_p = True
                         continue
             write_message("upload step ended")
+
+            if CFG_INSPIRE_SITE:
+                # Launch BibIndex,Webcoll update task to show uploaded content quickly
+                task_low_level_submission("bibindex", "oai", *tuple(['-w', 'reportnumber,collection', '-P', '6']))
+                task_low_level_submission("webcoll", "oai", *tuple(['-c', 'HEP', '-P', '6']))
         write_message("post-harvest processes ended")
     if error_happened_p:
         return False
@@ -1198,7 +1203,7 @@ def call_bibupload(marcxmlfile, mode=None, oai_src_id= -1):
             args = mode
             # Add custom name 'oai' with priority 6 and file to upload to arguments
             #FIXME: allow per-harvest arguments
-            args.extend(["-N", "oai","-P","6",marcxmlfile])
+            args.extend(["-N", "oai", "-P", "6", marcxmlfile])
             task_id = task_low_level_submission("bibupload", "oaiharvest", *tuple(args))
             create_oaiharvest_log(task_id, oai_src_id, marcxmlfile)
         except Exception, msg:
@@ -1315,7 +1320,7 @@ def compare_timestamps_with_tolerance(timestamp1,
         "%Y-%m-%d %H:%M:%S"))
     # now compare them:
     if timestamp1_seconds < timestamp2_seconds - tolerance:
-        return - 1
+        return -1
     elif timestamp1_seconds > timestamp2_seconds + tolerance:
         return 1
     else:
