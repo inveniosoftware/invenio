@@ -16,7 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
 WebSubmit function - Replaces the links that have been created by the
-FCKeditor
+CKEditor
 """
 __revision__ = "$Id$"
 
@@ -28,12 +28,12 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_PREFIX, CFG_SITE_RECORD
 
-re_fckeditor_link = re.compile('"' + CFG_SITE_URL + \
+re_ckeditor_link = re.compile('"' + CFG_SITE_URL + \
                                r'/submit/getattachedfile/(?P<uid>\d+)/(?P<type>(image|file|media|flash))/(?P<filename>.*?)"')
 
-def Move_FCKeditor_Files_to_Storage(parameters, curdir, form, user_info=None):
+def Move_CKEditor_Files_to_Storage(parameters, curdir, form, user_info=None):
     """
-    Moves the files uploaded via the FCKeditor that are linked to
+    Moves the files uploaded via the CKEditor that are linked to
     the given field. Replace these links with URLs 'local' to the
     record (recid/files/).
 
@@ -67,7 +67,7 @@ def Move_FCKeditor_Files_to_Storage(parameters, curdir, form, user_info=None):
         input_file.close()
 
         def translate_link(match_obj):
-            """Replace FCKeditor link by 'local' record link. Also
+            """Replace CKEditor link by 'local' record link. Also
             create the FFT for that link"""
             file_type = match_obj.group('type')
             file_name = match_obj.group('filename')
@@ -99,16 +99,17 @@ def Move_FCKeditor_Files_to_Storage(parameters, curdir, form, user_info=None):
             if original_location not in processed_paths:
                 # Must create an FFT only if we have not yet processed
                 # the file. This can happen if same image exists on
-                # the same page (either in two different FCKeditor
+                # the same page (either in two different CKEditor
                 # instances, or twice in the HTML)
                 processed_paths.append(original_location)
-                write_fft(original_location,
+                write_fft(curdir,
+                          original_location,
                           docname,
                           icon_location,
                           doctype=file_type)
             return '"' + new_url + '"'
 
-        output_string = re_fckeditor_link.sub(translate_link, input_string)
+        output_string = re_ckeditor_link.sub(translate_link, input_string)
         output_file = file(curdir + os.sep + input_filename, 'w')
         output_file.write(output_string)
         output_file.close()
@@ -119,7 +120,7 @@ def build_url(sysno, name, file_type, extension, is_icon=False):
 
     @param sysno: record ID
     @name name: base name of the file
-    @param file_type: as chosen by FCKeditor: 'File', 'Image', 'Flash', 'Media'
+    @param file_type: as chosen by CKEditor: 'File', 'Image', 'Flash', 'Media'
     @param extension: file extension, including '.'
     """
     return CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + str(sysno) + \
@@ -131,21 +132,21 @@ def build_docname(name, file_type, extension):
     Build the docname of the file.
 
     In order to ensure uniqueness of the docname, we have to prefix
-    the filename with the filetype: FCKeditor takes care of filenames
+    the filename with the filetype: CKEditor takes care of filenames
     uniqueness for each diffrent filetype, but not that files in
     different filetypes will not have the same name
     """
     return name + '_' + file_type + extension
 
-def write_fft(file_location, docname, icon_location=None, doctype="image"):
+def write_fft(curdir, file_location, docname, icon_location=None, doctype="image"):
     """
     Append a new FFT for the record. Write the result to the FFT file on disk.
 
-    May only be used for files attached with FCKeditor (i.e. URLs
-    matching re_fckeditor_link)
+    May only be used for files attached with CKEditor (i.e. URLs
+    matching re_ckeditor_link)
     """
     if file_location.startswith(CFG_SITE_URL):
-        # FCKeditor does not url-encode filenames, and FFT does not
+        # CKEditor does not url-encode filenames, and FFT does not
         # like URLs that are not quoted. So do it now (but only for
         # file name, in URL context!)
         url_parts = file_location.split("/")

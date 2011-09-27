@@ -67,6 +67,7 @@ from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
 from invenio.htmlutils import remove_html_markup, get_links_in_html_page
 from invenio.textutils import wash_for_utf8
+from invenio.search_engine_utils import get_fieldvalues
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -124,17 +125,6 @@ def kill_sleepy_mysql_threads(max_threads=CFG_MAX_MYSQL_THREADS, thread_timeout=
                 run_sql("KILL %s", (r_id,))
                 write_message("WARNING: too many DB threads, killing thread %s" % r_id, verbose=1)
     return
-
-## MARC-21 tag/field access functions
-def get_fieldvalues(recID, tag):
-    """Returns list of values of the MARC-21 'tag' fields for the record
-       'recID'."""
-    bibXXx = "bib" + tag[0] + tag[1] + "x"
-    bibrec_bibXXx = "bibrec_" + bibXXx
-    query = "SELECT value FROM %s AS b, %s AS bb WHERE bb.id_bibrec=%%s AND bb.id_bibxxx=b.id AND tag LIKE %%s" \
-            % (bibXXx, bibrec_bibXXx)
-    res = run_sql(query, (recID, tag))
-    return [row[0] for row in res]
 
 def get_associated_subfield_value(recID, tag, value, associated_subfield_code):
     """Return list of ASSOCIATED_SUBFIELD_CODE, if exists, for record
@@ -304,9 +294,7 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
             write_message("... will extract words from %s" % ', '.join(urls_to_index), verbose=2)
             words = {}
             for url in urls_to_index:
-                format = guess_format_from_url(url)
-                write_message("... %s format was guessed for %s" % (format, url), verbose=3)
-                tmpdoc = download_url(url, format)
+                tmpdoc = download_url(url)
                 file_converter_logger = get_file_converter_logger()
                 old_logging_level = file_converter_logger.getEffectiveLevel()
                 if task_get_task_param("verbose") > 3:
@@ -457,10 +445,9 @@ def get_words_from_phrase(phrase, stemming_language=None):
         block = re_block_punctuation_begin.sub("", block)
         block = re_block_punctuation_end.sub("", block)
         if block:
-            if stemming_language:
-                block = apply_stemming_and_stopwords_and_length_check(block, stemming_language)
-            if block:
-                words[block] = 1
+            stemmed_block = apply_stemming_and_stopwords_and_length_check(block, stemming_language)
+            if stemmed_block:
+                words[stemmed_block] = 1
             if re_arxiv.match(block):
                 # special case for blocks like `arXiv:1007.5048' where
                 # we would like to index the part after the colon
@@ -468,16 +455,14 @@ def get_words_from_phrase(phrase, stemming_language=None):
                 words[block.split(':', 1)[1]] = 1
             # 3rd break each block into subblocks according to punctuation and add subblocks:
             for subblock in re_punctuation.split(block):
-                if stemming_language:
-                    subblock = apply_stemming_and_stopwords_and_length_check(subblock, stemming_language)
-                if subblock:
-                    words[subblock] = 1
-                    # 4th break each subblock into alphanumeric groups and add groups:
-                    for alphanumeric_group in re_separators.split(subblock):
-                        if stemming_language:
-                            alphanumeric_group = apply_stemming_and_stopwords_and_length_check(alphanumeric_group, stemming_language)
-                        if alphanumeric_group:
-                            words[alphanumeric_group] = 1
+                stemmed_subblock = apply_stemming_and_stopwords_and_length_check(subblock, stemming_language)
+                if stemmed_subblock:
+                    words[stemmed_subblock] = 1
+                # 4th break each subblock into alphanumeric groups and add groups:
+                for alphanumeric_group in re_separators.split(subblock):
+                    stemmed_alphanumeric_group = apply_stemming_and_stopwords_and_length_check(alphanumeric_group, stemming_language)
+                    if stemmed_alphanumeric_group:
+                        words[stemmed_alphanumeric_group] = 1
     for block in formulas:
         words[block] = 1
     return words.keys()
@@ -1061,6 +1046,17 @@ class WordTable:
             write_message( "No new records added. %s is up to date" % self.tablename)
         else:
             self.add_recIDs(alist, opt_flush)
+        # special case of author indexes where we need to re-index
+        # those records that were affected by changed BibAuthorID
+        # attributions:
+        if self.index_name in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor'):
+            from invenio.bibauthorid_personid_tables_utils import get_recids_affected_since
+            # dates[1] is ignored, since BibAuthorID API does not offer upper limit search
+            alist = create_range_list(get_recids_affected_since(dates[0]))
+            if not alist:
+                write_message( "No new records added by author canonical IDs. %s is up to date" % self.tablename)
+            else:
+                self.add_recIDs(alist, opt_flush)
 
     def add_recID_range(self, recID1, recID2):
         """Add records from RECID1 to RECID2."""

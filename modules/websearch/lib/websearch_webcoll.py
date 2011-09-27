@@ -873,7 +873,11 @@ def get_database_last_updated_timestamp():
     database_tables_timestamps = []
     database_tables_timestamps.append(get_table_update_time('bibrec'))
     database_tables_timestamps.append(get_table_update_time('bibfmt'))
-    database_tables_timestamps.append(get_table_update_time('idxWORD%'))
+    try:
+        database_tables_timestamps.append(get_table_update_time('idxWORD%'))
+    except ValueError:
+        # There are no indexes in the database. That's OK.
+        pass
     database_tables_timestamps.append(get_table_update_time('collection%'))
     database_tables_timestamps.append(get_table_update_time('portalbox'))
     database_tables_timestamps.append(get_table_update_time('field%'))

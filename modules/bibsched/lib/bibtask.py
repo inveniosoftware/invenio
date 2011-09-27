@@ -69,6 +69,7 @@ from invenio.webuser import get_user_preferences, get_email
 from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
     CFG_BIBTASK_DEFAULT_TASK_SETTINGS
 from invenio.dateutils import parse_runtime_limit
+from invenio.shellutils import escape_shell_arg
 
 # Global _TASK_PARAMS dictionary.
 _TASK_PARAMS = {
@@ -177,6 +178,12 @@ def task_low_level_submission(name, user, *argv):
         if not name in CFG_BIBTASK_VALID_TASKS:
             raise StandardError('%s is not a valid task name' % name)
 
+        new_argv = []
+        for arg in argv:
+            if isinstance(arg, unicode):
+                arg = arg.encode('utf8')
+            new_argv.append(arg)
+        argv = new_argv
         priority = get_priority(argv)
         special_name = get_special_name(argv)
         argv = tuple([os.path.join(CFG_BINDIR, name)] + list(argv))
@@ -184,11 +191,13 @@ def task_low_level_submission(name, user, *argv):
         if special_name:
             name = '%s:%s' % (name, special_name)
 
+        verbose_argv = 'Will execute: %s' % ' '.join([escape_shell_arg(str(arg)) for arg in argv])
+
         ## submit task:
         task_id = run_sql("""INSERT INTO schTASK (proc,user,
             runtime,sleeptime,status,progress,arguments,priority)
-            VALUES (%s,%s,NOW(),'','WAITING','',%s,%s)""",
-            (name, user, marshal.dumps(argv), priority))
+            VALUES (%s,%s,NOW(),'','WAITING',%s,%s,%s)""",
+            (name, user, verbose_argv, marshal.dumps(argv), priority))
 
     except Exception:
         register_exception(alert_admin=True)
@@ -281,6 +290,10 @@ def task_init(
         argv = sys.argv
 
     setup_loggers(_TASK_PARAMS.get('task_id'))
+
+    task_name = os.path.basename(sys.argv[0])
+    if task_name not in CFG_BIBTASK_VALID_TASKS or os.path.realpath(os.path.join(CFG_BINDIR, task_name)) != os.path.realpath(sys.argv[0]):
+        raise OSError("%s is not in the allowed modules" % sys.argv[0])
 
     if type(argv) is dict:
         # FIXME: REMOVE AFTER MAJOR RELEASE 1.0
@@ -437,7 +450,7 @@ def _task_build_params(
                 _TASK_PARAMS["runtime_limit"] = parse_runtime_limit(opt[1])
             elif opt[0] in ("--profile", ):
                 _TASK_PARAMS["profile"] += opt[1].split(',')
-            elif opt[0] in ("--post-process"):
+            elif opt[0] in ("--post-process", ):
                 _TASK_PARAMS["post-process"] += [opt[1]];
             elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
                 not task_submit_elaborate_specific_parameter_fnc(opt[0],
@@ -665,11 +678,12 @@ def _task_submit(argv, authorization_action, authorization_msg):
     else:
         task_name = _TASK_PARAMS['task_name']
     write_message("storing task options %s\n" % argv, verbose=9)
+    verbose_argv = 'Will execute: %s' % ' '.join([escape_shell_arg(str(arg)) for arg in argv])
     _TASK_PARAMS['task_id'] = run_sql("""INSERT INTO schTASK (proc,user,
                                            runtime,sleeptime,status,progress,arguments,priority)
-                                         VALUES (%s,%s,%s,%s,'WAITING','',%s, %s)""",
+                                         VALUES (%s,%s,%s,%s,'WAITING',%s,%s, %s)""",
         (task_name, _TASK_PARAMS['user'], _TASK_PARAMS["runtime"],
-         _TASK_PARAMS["sleeptime"], marshal.dumps(argv), _TASK_PARAMS['priority']))
+         _TASK_PARAMS["sleeptime"], verbose_argv, marshal.dumps(argv), _TASK_PARAMS['priority']))
 
     ## update task number:
     write_message("Task #%d submitted." % _TASK_PARAMS['task_id'])
@@ -771,14 +785,17 @@ def _task_run(task_run_fnc):
     finally:
         task_status = task_read_status()
         if sleeptime:
+            argv = _task_get_options(_TASK_PARAMS['task_id'], _TASK_PARAMS['task_name'])
+            verbose_argv = 'Will execute: %s' % ' '.join([escape_shell_arg(str(arg)) for arg in argv])
+
             new_runtime = get_datetime(sleeptime)
             ## The task is a daemon. We resubmit it
             if task_status == 'DONE':
                 ## It has finished in a good way. We recycle the database row
-                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress='' WHERE id=%s", (new_runtime, _TASK_PARAMS['task_id']))
+                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s, host=''  WHERE id=%s", (new_runtime, verbose_argv, _TASK_PARAMS['task_id']))
                 write_message("Task #%d finished and resubmitted." % _TASK_PARAMS['task_id'])
             elif task_status == 'STOPPED':
-                run_sql("UPDATE schTASK SET status='WAITING', progress='' WHERE id=%s", (_TASK_PARAMS['task_id'], ))
+                run_sql("UPDATE schTASK SET status='WAITING', progress=%s, host=''  WHERE id=%s", (verbose_argv, _TASK_PARAMS['task_id'], ))
                 write_message("Task #%d stopped and resubmitted." % _TASK_PARAMS['task_id'])
             else:
                 ## We keep the bad result and we resubmit with another id.
@@ -800,10 +817,10 @@ def _task_run(task_run_fnc):
     if task_get_task_param("post-process"):
 
         split = re.compile(r"(bst_.*)\[(.*)\]")
-        for tasklet in task_get_task_param("post-process") :
-            re.search(r"\[.*\]", tasklet)
-            if not(split.match(tasklet)): # wrong syntax
-                _usage(1, "Bib_takslet bad syntax")
+        for tasklet in task_get_task_param("post-process"):
+            if not split.match(tasklet): # wrong syntax
+                _usage(1, "There is an error in the post processing option "
+                        "for this task.")
 
             aux_tasklet = split.match(tasklet)
             _TASKLETS[aux_tasklet.group(1)](**eval("dict(%s)" % (aux_tasklet.group(2))))
@@ -817,7 +834,7 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
     if help_specific_usage:
         sys.stderr.write("Command options:\n")
         sys.stderr.write(help_specific_usage)
-    sys.stderr.write("Scheduling options:\n")
+    sys.stderr.write("  Scheduling options:\n")
     sys.stderr.write("  -u, --user=USER\tUser name under which to submit this"
         " task.\n")
     sys.stderr.write("  -t, --runtime=TIME\tTime to execute the task. [default=now]\n"
@@ -830,15 +847,15 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
         "\t\t\tExamples: 22:00-03:00, Sunday 01:00-05:00.\n"
         "\t\t\tSyntax: [Wee[kday]] [hh[:mm][-hh[:mm]]].\n")
     sys.stderr.write("  -P, --priority=PRI\tTask priority (0=default, 1=higher, etc).\n")
-    sys.stderr.write("  -N, --name=NAME\tTask specific name (advanced option).\n")
-    sys.stderr.write("General options:\n")
+    sys.stderr.write("  -N, --name=NAME\tTask specific name (advanced option).\n\n")
+    sys.stderr.write("  General options:\n")
     sys.stderr.write("  -h, --help\t\tPrint this help.\n")
     sys.stderr.write("  -V, --version\t\tPrint version information.\n")
     sys.stderr.write("  -v, --verbose=LEVEL\tVerbose level (0=min,"
         " 1=default, 9=max).\n")
     sys.stderr.write("      --profile=STATS\tPrint profile information. STATS is a comma-separated\n\t\t\tlist of desired output stats (calls, cumulative,\n\t\t\tfile, line, module, name, nfl, pcalls, stdname, time).\n")
-    sys.stderr.write("  --post-process=BIB_TASKLET_NAME[parameters]\tPostprocesses the specified bibtasklet with the given parameters BETWEEN SQUARE BRACKETS.\n")
-    sys.stderr.write("\t\t\tExample:--post-process \"bst_send_email[fromaddr='foo@xxx.com', toaddr='bar@xxx.com', subject='hello', content='hellp']\" -v9\n")
+    sys.stderr.write("  --post-process=BIB_TASKLET_NAME[parameters]\tPostprocesses the specified\n\t\t\tbibtasklet with the given parameters between square\n\t\t\tbrackets.\n")
+    sys.stderr.write("\t\t\tExample:--post-process \"bst_send_email[fromaddr=\n\t\t\t'foo@xxx.com', toaddr='bar@xxx.com', subject='hello',\n\t\t\tcontent='help']\"\n")
     if description:
         sys.stderr.write(description)
     sys.exit(exitcode)

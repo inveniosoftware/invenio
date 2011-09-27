@@ -23,8 +23,7 @@ __revision__ = "$Id$"
 from invenio.urlutils import create_html_link
 from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
-from invenio.access_control_engine import acc_authorize_action
-from invenio.search_engine import guess_primary_collection_of_a_record
+from invenio.bibedit_utils import user_can_edit_record_collection
 
 def format_element(bfo, style):
     """
@@ -37,11 +36,7 @@ def format_element(bfo, style):
     out = ""
 
     user_info = bfo.user_info
-    collection = guess_primary_collection_of_a_record(bfo.recID)
-    (auth_code, auth_message) = acc_authorize_action(user_info,
-                                                     'runbibedit',
-                                                     collection=collection)
-    if auth_code == 0:
+    if user_can_edit_record_collection(user_info, bfo.recID):
         linkattrd = {}
         if style != '':
             linkattrd['style'] = style

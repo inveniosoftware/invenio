@@ -2908,7 +2908,7 @@ def delete_a_field_from_submissionpage(doctype, action, pagenum, fieldposn):
             return 0
         else:
             ## still unable to delete all fields - return fail code
-            return 'WRN_WEBSUBMITADMIN_UNABLE_TO_DELETE_FIELD_FROM_SUBMISSION_PAGE'
+            return 1
 
 def update_details_of_a_field_on_a_submissionpage(doctype, action, pagenum, fieldposn,
                                                   fieldtext, fieldlevel, fieldshortdesc, fieldcheck):
@@ -2992,13 +2992,15 @@ def move_field_on_submissionpage_from_positionx_to_positiony(doctype, action, pa
         movefieldfrom = int(movefieldfrom)
         movefieldto = int(movefieldto)
     except ValueError:
-        return 'WRN_WEBSUBMITADMIN_INVALID_FIELD_NUMBERS_SUPPLIED_WHEN_TRYING_TO_MOVE_FIELD_ON_SUBMISSION_PAGE'
+        return 1
+        #return 'WRN_WEBSUBMITADMIN_INVALID_FIELD_NUMBERS_SUPPLIED_WHEN_TRYING_TO_MOVE_FIELD_ON_SUBMISSION_PAGE'
     numfields_page = get_numberfields_submissionpage_doctype_action(doctype=doctype, action=action, pagenum=pagenum)
 
     if movefieldfrom > numfields_page or movefieldto > numfields_page or movefieldfrom < 1 or \
            movefieldto < 1 or movefieldfrom == movefieldto:
         ## invalid move-field coordinates:
-        return 'WRN_WEBSUBMITADMIN_INVALID_FIELD_NUMBERS_SUPPLIED_WHEN_TRYING_TO_MOVE_FIELD_ON_SUBMISSION_PAGE'
+        return 1
+        #return 'WRN_WEBSUBMITADMIN_INVALID_FIELD_NUMBERS_SUPPLIED_WHEN_TRYING_TO_MOVE_FIELD_ON_SUBMISSION_PAGE'
 
     q = """UPDATE sbmFIELD SET fieldnb=%s WHERE subname=%s AND pagenb=%s AND fieldnb=%s"""
     ## process movement:
@@ -3014,7 +3016,8 @@ def move_field_on_submissionpage_from_positionx_to_positiony(doctype, action, pa
         if num_fields_posn_movefieldfrom != 0:
             ## problem moving the field from its position to the temporary position
             ## try to move it back, and return with an error
-            return 'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_TEMP_POSITION'
+            return 2
+            #return 'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_TEMP_POSITION'
 
         ## move field from position 'movefieldto' to position 'movefieldfrom':
         run_sql(q, (movefieldfrom, "%s%s" % (action, doctype), pagenum, movefieldto))
@@ -3026,7 +3029,8 @@ def move_field_on_submissionpage_from_positionx_to_positiony(doctype, action, pa
 
             ## move field at temporary posn back to 'movefieldfrom' position:
             run_sql(q, (movefieldfrom, "%s%s" % (action, doctype), pagenum, tmp_fieldnb))
-            return 'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD2_TO_FIELD1_POSITION'
+            return 3
+            #return 'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD2_TO_FIELD1_POSITION'
 
         ## move field from temporary position 'tmp_fieldnb' to position 'movefieldto':
         run_sql(q, (movefieldto, "%s%s" % (action, doctype), pagenum, tmp_fieldnb))
@@ -3035,7 +3039,8 @@ def move_field_on_submissionpage_from_positionx_to_positiony(doctype, action, pa
         if num_fields_posn_tmp_fieldnb != 0:
             ## problem moving the field from the temporary position to position 'movefieldto'
             ## stop - admin should examine and fix this problem
-            return 'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_POSITION_FIELD2_FROM_TEMPORARY_POSITION'
+            return 4
+            #return 'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_POSITION_FIELD2_FROM_TEMPORARY_POSITION'
         ## successfully swapped fields - update modification date of the swapped fields and of the submission
         update_modificationdate_of_field_on_submissionpage(doctype=doctype, action=action, subpage=pagenum, fieldnb=movefieldfrom)
         update_modificationdate_of_field_on_submissionpage(doctype=doctype, action=action, subpage=pagenum, fieldnb=movefieldto)
@@ -3053,7 +3058,8 @@ def move_field_on_submissionpage_from_positionx_to_positiony(doctype, action, pa
         if num_fields_posn_movefieldfrom != 0:
             ## problem moving the field from its position to the temporary position
             ## try to move it back, and return with an error
-            return 'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_TEMP_POSITION'
+            return 2
+            #return 'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_TEMP_POSITION'
 
         ## fill the gap created by the moved field by decrementing by one the position of all fields below it:
         qres = decrement_position_of_all_fields_atposition_greaterthan_positionx_on_submissionpage(doctype=doctype, action=action,
@@ -3068,7 +3074,8 @@ def move_field_on_submissionpage_from_positionx_to_positiony(doctype, action, pa
                 ## try to move the field back from 'tmp_fieldnb'
                 run_sql(q, (movefieldfrom, "%s%s" % (action, doctype), pagenum, tmp_fieldnb))
                 ## return an ERROR message
-                return 'WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_DECREMENT_POSITION_OF_FIELDS_BELOW_FIELD1'
+                return 5
+                #return 'WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_DECREMENT_POSITION_OF_FIELDS_BELOW_FIELD1'
 
         ## now increment (by one) the position of the fields at and below the field at position 'movefieldto':
         qres = increment_position_of_all_fields_atposition_greaterthan_positionx_on_submissionpage(doctype=doctype, action=action,
@@ -3079,7 +3086,8 @@ def move_field_on_submissionpage_from_positionx_to_positiony(doctype, action, pa
           get_number_of_fields_on_submissionpage_at_positionx(doctype=doctype, action=action, pagenum=pagenum, positionx=movefieldto)
         if num_fields_posn_movefieldto != 0:
             ## there isn't! the increment of position has failed - return warning:
-            return 'WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_INCREMENT_POSITION_OF_FIELDS_AT_AND_BELOW_FIELD2'
+            return 6
+            #return 'WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_INCREMENT_POSITION_OF_FIELDS_AT_AND_BELOW_FIELD2'
 
         ## Move field from temporary position to position 'movefieldto':
         run_sql(q, (movefieldto, "%s%s" % (action, doctype), pagenum, tmp_fieldnb))
@@ -3087,7 +3095,8 @@ def move_field_on_submissionpage_from_positionx_to_positiony(doctype, action, pa
           get_number_of_fields_on_submissionpage_at_positionx(doctype=doctype, action=action, pagenum=pagenum, positionx=movefieldto)
         if num_fields_posn_movefieldto == 0:
             ## failed to move field1 from temp posn to final posn
-            return 'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_POSITION_FIELD2_FROM_TEMPORARY_POSITION'
+            return 4
+            #return 'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_POSITION_FIELD2_FROM_TEMPORARY_POSITION'
 
         ## successfully moved field - update modification date of the moved field and of the submission
         update_modificationdate_of_field_on_submissionpage(doctype=doctype, action=action, subpage=pagenum, fieldnb=movefieldfrom)

@@ -31,6 +31,11 @@ cfg_min_mysqldb_version = "1.2.1_p2"
 import string
 import sys
 import getpass
+import subprocess
+import re
+
+error_messages = []
+warning_messages = []
 
 def wait_for_user(msg):
     """Print MSG and prompt user for confirmation."""
@@ -45,7 +50,8 @@ def wait_for_user(msg):
 
 ## 1) check Python version:
 if sys.version < cfg_min_python_version:
-    print """
+    error_messages.append(
+    """
     *******************************************************
     ** ERROR: TOO OLD PYTHON DETECTED: %s
     *******************************************************
@@ -60,9 +66,11 @@ if sys.version < cfg_min_python_version:
     ** Please upgrade your Python before continuing.     **
     *******************************************************
     """ % (string.replace(sys.version, "\n", ""), cfg_min_python_version)
-    sys.exit(1)
+    )
+
 if sys.version > cfg_max_python_version:
-    print """
+    error_messages.append(
+    """
     *******************************************************
     ** ERROR: TOO NEW PYTHON DETECTED: %s
     *******************************************************
@@ -78,7 +86,7 @@ if sys.version > cfg_max_python_version:
     ** Installation aborted.                             **
     *******************************************************
     """ % (string.replace(sys.version, "\n", ""), cfg_max_python_version)
-    sys.exit(1)
+    )
 
 ## 2) check for required modules:
 try:
@@ -106,7 +114,7 @@ try:
     import zlib
     import wsgiref
 except ImportError, msg:
-    print """
+    error_messages.append("""
     *************************************************
     ** IMPORT ERROR %s
     *************************************************
@@ -116,7 +124,7 @@ except ImportError, msg:
     ** fix the problem before continuing!          **
     *************************************************
     """ % msg
-    sys.exit(1)
+    )
 
 ## 3) check for recommended modules:
 try:
@@ -127,7 +135,7 @@ try:
         # no need to advise on Psyco on 64-bit systems
         pass
 except ImportError, msg:
-    print """
+    warning_messages.append("""
     *****************************************************
     ** IMPORT WARNING %s
     *****************************************************
@@ -141,13 +149,13 @@ except ImportError, msg:
     ** into production.)                               **
     *****************************************************
     """ % msg
-
-    wait_for_user("Press ENTER to continue the installation...")
+    )
 
 try:
     import rdflib
 except ImportError, msg:
-    print """
+    warning_messages.append(
+    """
     *****************************************************
     ** IMPORT WARNING %s
     *****************************************************
@@ -161,12 +169,12 @@ except ImportError, msg:
     ** into production.)                               **
     *****************************************************
     """ % msg
-    wait_for_user("Press ENTER to continue the installation...")
+    )
 
 try:
     import pyRXP
 except ImportError, msg:
-    print """
+    warning_messages.append("""
     *****************************************************
     ** IMPORT WARNING %s
     *****************************************************
@@ -179,12 +187,12 @@ except ImportError, msg:
     ** into production.)                               **
     *****************************************************
     """ % msg
-    wait_for_user("Press ENTER to continue the installation...")
+    )
 
 try:
     import dateutil
 except ImportError, msg:
-    print """
+    warning_messages.append("""
     *****************************************************
     ** IMPORT WARNING %s
     *****************************************************
@@ -198,12 +206,12 @@ except ImportError, msg:
     ** into production.)                               **
     *****************************************************
     """ % msg
-    wait_for_user("Press ENTER to continue the installation...")
+    )
 
 try:
     import libxml2
 except ImportError, msg:
-    print """
+    warning_messages.append("""
     *****************************************************
     ** IMPORT WARNING %s
     *****************************************************
@@ -217,12 +225,13 @@ except ImportError, msg:
     ** into production.)                               **
     *****************************************************
     """ % msg
-    wait_for_user("Press ENTER to continue the installation...")
+    )
 
 try:
     import libxslt
 except ImportError, msg:
-    print """
+    warning_messages.append(
+    """
     *****************************************************
     ** IMPORT WARNING %s
     *****************************************************
@@ -235,12 +244,13 @@ except ImportError, msg:
     ** into production.)                               **
     *****************************************************
     """ % msg
-    wait_for_user("Press ENTER to continue the installation...")
+    )
 
 try:
     import Gnuplot
 except ImportError, msg:
-    print """
+    warning_messages.append(
+    """
     *****************************************************
     ** IMPORT WARNING %s
     *****************************************************
@@ -255,14 +265,15 @@ except ImportError, msg:
     ** into production.)                               **
     *****************************************************
     """ % msg
-    wait_for_user("Press ENTER to continue the installation...")
+    )
 
 try:
     import magic
     if not hasattr(magic, "open"):
         raise StandardError
 except ImportError, msg:
-    print """
+    warning_messages.append(
+    """
     *****************************************************
     ** IMPORT WARNING %s
     *****************************************************
@@ -276,8 +287,10 @@ except ImportError, msg:
     ** into production.)                               **
     *****************************************************
     """ % msg
+    )
 except StandardError:
-    print """
+    warning_messages.append(
+    """
     *****************************************************
     ** IMPORT WARNING python-magic
     *****************************************************
@@ -291,11 +304,13 @@ except StandardError:
     ** into production.)                               **
     *****************************************************
     """
+    )
 
 try:
     import reportlab
 except ImportError, msg:
-    print """
+    warning_messages.append(
+    """
     *****************************************************
     ** IMPORT WARNING %s
     *****************************************************
@@ -309,12 +324,13 @@ except ImportError, msg:
     ** into production.)                               **
     *****************************************************
     """ % msg
-    wait_for_user("Press ENTER to continue the installation...")
+    )
 
 try:
     import pyPdf
 except ImportError, msg:
-    print """
+    warning_messages.append(
+    """
     *****************************************************
     ** IMPORT WARNING %s
     *****************************************************
@@ -328,12 +344,13 @@ except ImportError, msg:
     ** into production.)                               **
     *****************************************************
     """ % msg
-    wait_for_user("Press ENTER to continue the installation...")
+    )
 
 
 ## 4) check for versions of some important modules:
 if MySQLdb.__version__ < cfg_min_mysqldb_version:
-    print """
+    error_messages.append(
+    """
     *****************************************************
     ** ERROR: PYTHON MODULE MYSQLDB %s DETECTED
     *****************************************************
@@ -343,14 +360,15 @@ if MySQLdb.__version__ < cfg_min_mysqldb_version:
     ** for more details.                               **
     *****************************************************
     """ % (MySQLdb.__version__, cfg_min_mysqldb_version)
-    sys.exit(1)
+    )
 
 try:
     import Stemmer
     try:
         from Stemmer import algorithms
     except ImportError, msg:
-        print """
+        error_messages.append(
+        """
         *****************************************************
         ** ERROR: STEMMER MODULE PROBLEM %s
         *****************************************************
@@ -362,7 +380,7 @@ try:
         ** for more details.                               **
         *****************************************************
         """ % (msg)
-        sys.exit(1)
+        )
 except ImportError:
     pass # no prob, Stemmer is optional
 
@@ -373,7 +391,8 @@ try:
     if not os.path.exists(path_to_python_h):
         raise StandardError, "Cannot find %s" % path_to_python_h
 except StandardError, msg:
-    print """
+    error_messages.append(
+    """
     *****************************************************
     ** ERROR: PYTHON HEADER FILE ERROR %s
     *****************************************************
@@ -385,4 +404,93 @@ except StandardError, msg:
     ** continuing the installation process.            **
     *****************************************************
     """ % (msg)
+    )
+
+## Check if ffmpeg is installed and if so, with the minimum configuration for bibencode
+try:
+    try:
+        process = subprocess.Popen('ffprobe', stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    except OSError:
+        raise StandardError, "FFMPEG/FFPROBE does not seem to be installed!"
+    returncode = process.wait()
+    output = process.communicate()[1]
+    RE_CONFIGURATION = re.compile("(--enable-[a-z0-9\-]*)")
+    CONFIGURATION_REQUIRED = (
+                '--enable-gpl',
+                '--enable-version3',
+                '--enable-nonfree',
+                '--enable-libtheora',
+                '--enable-libvorbis',
+                '--enable-libvpx',
+                '--enable-libopenjpeg'
+                )
+    options = RE_CONFIGURATION.findall(output)
+    if sys.version_info < (2, 6):
+        import sets
+        s = sets.Set(CONFIGURATION_REQUIRED)
+        if not s.issubset(options):
+            raise StandardError, options.difference(s)
+    else:
+        if not set(CONFIGURATION_REQUIRED).issubset(options):
+            raise StandardError, set(CONFIGURATION_REQUIRED).difference(options)
+except StandardError, msg:
+    warning_messages.append(
+    """
+    *****************************************************
+    ** WARNING: FFMPEG CONFIGURATION MISSING %s
+    *****************************************************
+    ** You do not seem to have FFmpeg configured with  **
+    ** the minimum video codecs to run the demo site.  **
+    ** Please install the necessary libraries and      **
+    ** re-install FFmpeg according to the Invenio      **
+    ** installation manual (INSTALL).                  **
+    *****************************************************
+    """ % (msg)
+    )
+
+if warning_messages:
+    print """
+    ******************************************************
+    ** WARNING MESSAGES                                 **
+    ******************************************************
+    """
+    for warning in warning_messages:
+        print warning
+
+if error_messages:
+    print """
+    ******************************************************
+    ** ERROR MESSAGES                                   **
+    ******************************************************
+    """
+    for error in error_messages:
+        print error
+
+if warning_messages and error_messages:
+    print """
+    There were %(n_err)s error(s) found that you need to solve.
+    Please see above, solve them, and re-run configure.
+    Note that there are also %(n_wrn)s warnings you may want
+    to look into.  Aborting the installation.
+    """ % {'n_wrn': len(warning_messages),
+           'n_err': len(error_messages)}
+
     sys.exit(1)
+elif error_messages:
+    print """
+    There were %(n_err)s error(s) found that you need to solve.
+    Please see above, solve them, and re-run configure.
+    Aborting the installation.
+    """ % {'n_err': len(error_messages)}
+
+    sys.exit(1)
+elif warning_messages:
+    print """
+    There were %(n_wrn)s warnings found that you may want to
+    look into, solve, and re-run configure before you
+    continue the installation.  However, you can also continue
+    the installation now and solve these issues later, if you wish.
+    """ % {'n_wrn': len(warning_messages)}
+    wait_for_user("Press ENTER to continue the installation...")
+
+

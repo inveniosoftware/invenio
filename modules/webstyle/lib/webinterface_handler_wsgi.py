@@ -105,7 +105,14 @@ class SimulatedModPythonRequest(object):
             return post_form[2]
         # This must be done to avoid a bug in cgi.FieldStorage
         self.__environ.setdefault('QUERY_STRING', '')
-        fs = FieldStorage(self, keep_blank_values=1)
+
+        ## Video handler hack:
+        uri = self.__environ['PATH_INFO']
+        if uri.endswith("upload_video"):
+            tmp_shared = True
+        else:
+            tmp_shared = False
+        fs = FieldStorage(self, keep_blank_values=1, to_tmp_shared=tmp_shared)
         if fs.wsgi_input_consumed:
             new_input = InputProcessed()
             post_form = (new_input, input, fs)

@@ -152,6 +152,9 @@ Daemon mode options:
                             (deleted documents).
       --repair-personid     Deletes untouched person entities to then
                             re-create and updated these entities.
+      --fast-update-personid    Updates personid adding not yet assigned papers to the system,
+                            in a fast, best effort basis. -r to specify records.
+      --personid-gc        Runs the gc on personid. -r to specify records.
 
  Options:
   -r, --record-ids=NUM      Specifies a list of record ids. To use as on option
@@ -226,7 +229,9 @@ def _read_options(options_string):
         "clean_cache": False,
         "record_ids" : None,
         "all_records": False,
-        "repair_pid": False
+        "repair_pid": False,
+        "fast_update_personid": False,
+        "personid_gc": False
     }
 
     try:
@@ -235,7 +240,8 @@ def _read_options(options_string):
             "process-all", "help", "version", "prepare-grid", "prefix=",
             "data-dir=", "standalone", "job-dir=", "max-records=",
             "load-grid-results", "update-universe", "update-cache",
-            "clean-cache", "record-ids=", "all-records", "repair-personid"]
+            "clean-cache", "record-ids=", "all-records", "repair-personid",
+            "fast-update-personid", "personid-gc"]
         opts, args = getopt.gnu_getopt(options_string, short_flags, long_flags)
     except getopt.GetoptError, err1:
         print >> sys.stderr, "Parameter problem: %s" % err1
@@ -272,7 +278,9 @@ def _read_options(options_string):
         "--update-cache": "update_cache",
         "--clean-cache": "clean_cache",
         "--all-records": "all_records",
-        "--repair-personid": "repair_pid"
+        "--repair-personid": "repair_pid",
+        "--fast-update-personid":"fast_update_personid",
+        "--personid-gc":"personid_gc"
     }
 
     for option, argument in opts:

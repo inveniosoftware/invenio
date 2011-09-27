@@ -431,14 +431,14 @@ class BFXParser:
         <if name="var" neq="value"/>      : True if var!=value, eval as string
         <if name="var" like="regexp"/>    : Match against a regular expression
 
-        Example:
-        <if name="author" eq="Pauli">
-          <then>Pauli</then>
-          <elif name="" eq="Einstein">
-            <then>Pauli</then>
-            <else>other</else>
-          </elif>
-        </if>
+        Example::
+            <if name="author" eq="Pauli">
+              <then>Pauli</then>
+              <elif name="" eq="Einstein">
+                <then>Pauli</then>
+                <else>other</else>
+              </elif>
+            </if>
         '''
         #test mode
         if not self.flags['exec']:
@@ -581,10 +581,10 @@ class BFXParser:
 class MARCTranslator:
     '''
     memory[name]
-        [name]['addresses'] - the set of rules for each of the defined names
-        [name]['parent'] - the name of the parent; '' if none;
-        [name]['children'] - a list with the name of the children of every variable
-        [name]['object'] - stored state of object for performance efficiency
+    [name]['addresses'] - the set of rules for each of the defined names
+    [name]['parent'] - the name of the parent; '' if none;
+    [name]['children'] - a list with the name of the children of every variable
+    [name]['object'] - stored state of object for performance efficiency
     '''
     def __init__(self, labels=None):
         '''
@@ -940,7 +940,7 @@ def record_add_field_instance(record, tag, field_instance):
 def record_num_parts(record, level):
     '''
     Count the number of instances or the number of subfields in the whole record.
-    @param record
+    @param record: record to consider for counting
     @param level: either 1 or 2
            level=1 - view record on instance level
            level=2 - view record on subfield level
@@ -953,11 +953,11 @@ def record_num_parts(record, level):
 def record_parts(record, level):
     '''
     An iterator over the instances or subfields of a record.
-    @param record
+    @param record: record to consider for iterating
     @param level: either 1 or 2
-           level=1 - iterate over instances
-           level=2 - iterate over subfields
-    @yield a record structure representing the part (instance or subfield)
+            - level=1: iterate over instances
+            - level=2: iterate over subfields
+    @return: a record structure representing the part (instance or subfield)
     '''
     if level == 1:
         names = record.keys()
@@ -1001,7 +1001,7 @@ def copy(old_record, address=''):
     '''
     Copy a record by filtering all parts of the old record specified by address
     (A better name for the function is filter.)
-    @param record: the initial record
+    @param old_record: the initial record
     @param address: an address; for examples see bibformat_bfx_engine_config.
            If no address is specified, return the initial record.
     @return: the filtered record
@@ -1058,7 +1058,9 @@ def merge(record1, record2):
     '''
     Merge two records.
     Controlfields with the same tag in record2 as in record1 are ignored.
-    @param record1, record2
+
+    @param record1: first record to merge
+    @param record2: second record to merge
     @return: the merged record
     '''
     new_record = {}

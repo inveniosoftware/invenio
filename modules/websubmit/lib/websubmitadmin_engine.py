@@ -28,6 +28,9 @@ from invenio.websubmitadmin_config import *
 from invenio.access_control_admin import acc_get_all_roles, acc_get_role_users, acc_delete_user_role
 from invenio.config import CFG_SITE_LANG, CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR
 from invenio.access_control_engine import acc_authorize_action
+from invenio.errorlib import register_exception
+from invenio.websubmitadmin_config import InvenioWebSubmitWarning
+from invenio.messages import gettext_set_language
 
 import invenio.template
 
@@ -337,7 +340,7 @@ def build_submission_collection_tree(collection_id, has_brother_above=0, has_bro
     ## return the built collection tree:
     return collection_node
 
-def _organise_submission_page_display_submission_tree(errors, warnings, user_msg=""):
+def _organise_submission_page_display_submission_tree(user_msg=""):
     title = "Organise WebSubmit Main Page"
     body = ""
     if user_msg == "" or type(user_msg) not in (list, tuple, str, unicode):
@@ -412,8 +415,6 @@ def perform_request_organise_submission_page(doctype="",
                                              movedoctypeupinsbmcollection="",
                                              movedoctypedowninsbmcollection=""):
     user_msg = []
-    errors = []
-    warnings = []
     body = ""
     if "" not in (deletedoctypefromsbmcollection, sbmcolid, catscore, doctype):
         ## delete a document type from it's position in the tree
@@ -425,7 +426,7 @@ def perform_request_organise_submission_page(doctype="",
         else:
             user_msg.append("Unable to delete document type from submission-collection")
         ## display submission-collections:
-        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
+        (title, body) = _organise_submission_page_display_submission_tree(user_msg=user_msg)
     elif "" not in (deletesbmcollection, sbmcolid):
         ## try to delete the submission-collection from the tree:
         try:
@@ -434,7 +435,7 @@ def perform_request_organise_submission_page(doctype="",
         except InvenioWebSubmitAdminWarningDeleteFailed, excptn:
             user_msg.append(str(excptn))
         ## re-display submission-collections:
-        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
+        (title, body) = _organise_submission_page_display_submission_tree(user_msg=user_msg)
     elif "" not in (movedoctypedowninsbmcollection, sbmcolid, doctype, catscore):
         ## move a doctype down in order for a submission-collection:
         ## normalize scores of all doctype-children of the submission-collection:
@@ -455,7 +456,7 @@ def perform_request_organise_submission_page(doctype="",
                                                                                              score_doctype_to_move,
                                                                                              score_brother_below)
             user_msg.append("Document type moved down")
-        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
+        (title, body) = _organise_submission_page_display_submission_tree(user_msg=user_msg)
     elif "" not in (movedoctypeupinsbmcollection, sbmcolid, doctype, catscore):
         ## move a doctype up in order for a submission-collection:
         ## normalize scores of all doctype-children of the submission-collection:
@@ -476,7 +477,7 @@ def perform_request_organise_submission_page(doctype="",
                                                                                              score_doctype_to_move,
                                                                                              score_brother_above)
             user_msg.append("Document type moved up")
-        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
+        (title, body) = _organise_submission_page_display_submission_tree(user_msg=user_msg)
     elif "" not in (movesbmcollectiondown, sbmcolid):
         ## move a submission-collection down in order:
 
@@ -517,7 +518,7 @@ def perform_request_organise_submission_page(doctype="",
         else:
             ## cannot move the master (0) collection
             user_msg.append("Unable to move submission-collection downwards")
-        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
+        (title, body) = _organise_submission_page_display_submission_tree(user_msg=user_msg)
     elif "" not in (movesbmcollectionup, sbmcolid):
         ## move a submission-collection up in order:
 
@@ -557,7 +558,7 @@ def perform_request_organise_submission_page(doctype="",
         else:
             ## cannot move the master (0) collection
             user_msg.append("Unable to move submission-collection upwards")
-        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
+        (title, body) = _organise_submission_page_display_submission_tree(user_msg=user_msg)
     elif "" not in (addsbmcollection, addtosbmcollection):
         ## Add a submission-collection, attached to a submission-collection:
         ## check that the collection to attach to exists:
@@ -581,7 +582,7 @@ def perform_request_organise_submission_page(doctype="",
         else:
             ## Parent submission-collection does not exist:
             user_msg.append("Unable to add submission-collection - parent unknown")
-        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
+        (title, body) = _organise_submission_page_display_submission_tree(user_msg=user_msg)
     elif "" not in (adddoctypes, addtosbmcollection):
         ## Add document type(s) to a submission-collection:
         if type(adddoctypes) == str:
@@ -612,11 +613,11 @@ def perform_request_organise_submission_page(doctype="",
             user_msg.append("The selected submission-collection doesn't seem to exist")
         ## Check that submission-collection exists:
         ## insert
-        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
+        (title, body) = _organise_submission_page_display_submission_tree(user_msg=user_msg)
     else:
         ## default action - display submission-collections:
-        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
-    return (title, body, errors, warnings)
+        (title, body) = _organise_submission_page_display_submission_tree(user_msg=user_msg)
+    return (title, body)
 
 
 
@@ -634,8 +635,6 @@ def _add_new_action(actid,actname,working_dir,status_text):
 
 def perform_request_add_function(funcname=None, funcdescr=None, funcaddcommit=""):
     user_msg = []
-    errors = []
-    warnings = []
     body = ""
     title = "Create New WebSubmit Function"
     commit_error=0
@@ -670,7 +669,7 @@ def perform_request_add_function(funcname=None, funcdescr=None, funcaddcommit=""
         if commit_error != 0:
             ## don't commit - just re-display page with message to user
             body = websubmitadmin_templates.tmpl_display_addfunctionform(funcdescr=funcdescr, user_msg=user_msg)
-            return (title, body, errors, warnings)
+            return (title, body)
 
         ## Add a new function definition - IF it is not already present
         err_code = insert_function_details(funcname, funcdescr)
@@ -694,7 +693,7 @@ def perform_request_add_function(funcname=None, funcdescr=None, funcaddcommit=""
         ## Display Web form for new function addition:
         body = websubmitadmin_templates.tmpl_display_addfunctionform()
 
-    return (title, body, errors, warnings)
+    return (title, body)
 
 def perform_request_add_action(actid=None, actname=None, working_dir=None, status_text=None, actcommit=""):
     """An interface for the addition of a new WebSubmit action.
@@ -704,12 +703,9 @@ def perform_request_add_action(actid=None, actname=None, working_dir=None, statu
        @param actname:     name of new action
        @param working_dir: action working directory for WebSubmit core
        @param status_text: status text displayed at end of action
-       @return: tuple containing "title" (title of page), body (page body), errors (list of errors),
-                warnings (list of warnings).
+       @return: tuple containing "title" (title of page), body (page body).
     """
     user_msg = []
-    errors = []
-    warnings = []
     body = ""
     title = "Create New WebSubmit Action"
     commit_error=0
@@ -761,7 +757,7 @@ def perform_request_add_action(actid=None, actname=None, working_dir=None, statu
             ## don't commit - just re-display page with message to user
             body = websubmitadmin_templates.tmpl_display_addactionform(actid=actid, actname=actname, working_dir=working_dir,\
                                                                        status_text=status_text, user_msg=user_msg)
-            return (title, body, errors, warnings)
+            return (title, body)
 
         ## Commit new action to WebSubmit DB:
         err_code = _add_new_action(actid,actname,working_dir,status_text)
@@ -783,7 +779,7 @@ def perform_request_add_action(actid=None, actname=None, working_dir=None, statu
     else:
         ## Display Web form for new action details:
         body = websubmitadmin_templates.tmpl_display_addactionform()
-    return (title, body, errors, warnings)
+    return (title, body)
 
 def perform_request_add_jscheck(chname=None, chdesc=None, chcommit=""):
     """An interface for the addition of a new WebSubmit JavaScript Check, as used on form elements.
@@ -791,12 +787,9 @@ def perform_request_add_jscheck(chname=None, chdesc=None, chcommit=""):
        Web form prompting for Check details.
        @param chname:       unique id/name for new Check
        @param chdesc:     description (JavaScript code body) of new Check
-       @return: tuple containing "title" (title of page), body (page body), errors (list of errors),
-                warnings (list of warnings).
+       @return: tuple containing "title" (title of page), body (page body).
     """
     user_msg = []
-    errors = []
-    warnings = []
     body = ""
     title = "Create New WebSubmit Checking Function"
     commit_error=0
@@ -831,7 +824,7 @@ def perform_request_add_jscheck(chname=None, chdesc=None, chcommit=""):
         if commit_error != 0:
             ## don't commit - just re-display page with message to user
             body = websubmitadmin_templates.tmpl_display_addjscheckform(chname=chname, chdesc=chdesc, user_msg=user_msg)
-            return (title, body, errors, warnings)
+            return (title, body)
 
         ## Commit new check to WebSubmit DB:
         err_code = insert_jscheck_details(chname, chdesc)
@@ -852,7 +845,7 @@ def perform_request_add_jscheck(chname=None, chdesc=None, chcommit=""):
     else:
         ## Display Web form for new check details:
         body = websubmitadmin_templates.tmpl_display_addjscheckform()
-    return (title, body, errors, warnings)
+    return (title, body)
 
 def perform_request_add_element(elname=None, elmarccode=None, eltype=None, elsize=None, elrows=None, \
                                 elcols=None, elmaxlength=None, elval=None, elfidesc=None, \
@@ -869,12 +862,9 @@ def perform_request_add_element(elname=None, elmarccode=None, eltype=None, elsiz
        @param elfidesc: (string) description of element
        @param elmodifytext: (string) modification text of element
        @param elcommit: (string) If this value is not empty, attempt to commit element details to WebSubmit DB
-       @return: tuple containing "title" (title of page), body (page body), errors (list of errors),
-                warnings (list of warnings).
+       @return: tuple containing "title" (title of page), body (page body).
     """
     user_msg = []
-    errors = []
-    warnings = []
     body = ""
     title = "Create New WebSubmit Element"
     commit_error=0
@@ -979,7 +969,7 @@ def perform_request_add_element(elname=None, elmarccode=None, eltype=None, elsiz
                                                                         elmodifytext=elmodifytext,
                                                                         user_msg=user_msg,
                                                                        )
-            return (title, body, errors, warnings)
+            return (title, body)
 
         ## Commit new element description to WebSubmit DB:
         err_code = insert_element_details(elname=elname, elmarccode=elmarccode, eltype=eltype, \
@@ -1011,7 +1001,7 @@ def perform_request_add_element(elname=None, elmarccode=None, eltype=None, elsiz
     else:
         ## Display Web form for new element details:
         body = websubmitadmin_templates.tmpl_display_addelementform()
-    return (title, body, errors, warnings)
+    return (title, body)
 
 def perform_request_edit_element(elname, elmarccode=None, eltype=None, elsize=None, \
                                  elrows=None, elcols=None, elmaxlength=None, elval=None, \
@@ -1028,12 +1018,9 @@ def perform_request_edit_element(elname, elmarccode=None, eltype=None, elsize=No
        @param elfidesc: description of element
        @param elmodifytext: modification text of element
        @param elcommit: If this value is not empty, attempt to commit element details to WebSubmit DB
-       @return: tuple containing "title" (title of page), body (page body), errors (list of errors),
-                warnings (list of warnings).
+       @return: tuple containing "title" (title of page), body (page body).
     """
     user_msg = []
-    errors = []
-    warnings = []
     body = ""
     title = "Edit WebSubmit Element"
     commit_error=0
@@ -1129,9 +1116,7 @@ def perform_request_edit_element(elname, elmarccode=None, eltype=None, elsize=No
             user_msg.append("""Could Not Update Element""")
             title = "Available WebSubmit Elements"
             body = websubmitadmin_templates.tmpl_display_allelements(all_elements, user_msg=user_msg)
-            return (title, body, errors, warnings)
-
-
+            return (title, body)
 
         ## Commit updated element description to WebSubmit DB:
         err_code = update_element_details(elname=elname, elmarccode=elmarccode, eltype=eltype, \
@@ -1220,9 +1205,9 @@ def perform_request_edit_element(elname, elmarccode=None, eltype=None, elsize=No
                 user_msg.append("""Could Not Find Any Rows for Element with Name '%s'""" % (elname,))
                 ## LOG MESSAGE
             body = websubmitadmin_templates.tmpl_display_allelements(all_elements, user_msg=user_msg)
-    return (title, body, errors, warnings)
+    return (title, body)
 
-def _display_edit_check_form(errors, warnings, chname, user_msg=""):
+def _display_edit_check_form(chname, user_msg=""):
     title = "Edit WebSubmit Checking Function"
     if user_msg == "":
         user_msg = []
@@ -1259,12 +1244,9 @@ def perform_request_edit_jscheck(chname, chdesc=None, chcommit=""):
        If "chdesc" not empty, will assume that this is a call to commit update to Check details.
        @param chname: unique id for Check
        @param chdesc: modified value for WebSubmit Check description (code body) - (presence invokes update)
-       @return: tuple containing "title" (title of page), body (page body), errors (list of errors),
-                warnings (list of warnings).
+       @return: tuple containing "title" (title of page), body (page body).
     """
     user_msg = []
-    errors = []
-    warnings = []
     body = ""
     title = "Edit WebSubmit Checking Function"
     commit_error=0
@@ -1302,7 +1284,7 @@ def perform_request_edit_jscheck(chname, chdesc=None, chcommit=""):
             user_msg.append("""Could Not Update Checking Function""")
             body = websubmitadmin_templates.tmpl_display_alljschecks(all_jschecks, user_msg=user_msg)
             title = "Available WebSubmit Checking Functions"
-            return (title, body, errors, warnings)
+            return (title, body)
 
         ## Commit updated Check details to WebSubmit DB:
         err_code = update_jscheck_details(chname, chdesc)
@@ -1326,10 +1308,10 @@ def perform_request_edit_jscheck(chname, chdesc=None, chcommit=""):
             title = "Available WebSubmit Checking Functions"
     else:
         ## Display Web form containing existing details of Check:
-        (title, body) = _display_edit_check_form(errors, warnings, chname=chname)
-    return (title, body, errors, warnings)
+        (title, body) = _display_edit_check_form(chname=chname)
+    return (title, body)
 
-def _display_edit_action_form(errors, warnings, actid, user_msg=""):
+def _display_edit_action_form(actid, user_msg=""):
     title = "Edit WebSubmit Action"
     if user_msg == "":
         user_msg = []
@@ -1369,12 +1351,9 @@ def perform_request_edit_action(actid, actname=None, working_dir=None, status_te
        @param actname: modified value for WebSubmit action name/description (presence invokes update)
        @param working_dir: modified value for WebSubmit action working_dir
        @param status_text: modified value for WebSubmit action status text
-       @return: tuple containing "title" (title of page), body (page body), errors (list of errors),
-                warnings (list of warnings).
+       @return: tuple containing "title" (title of page), body (page body).
     """
     user_msg = []
-    errors = []
-    warnings = []
     body = ""
     title = "Edit WebSubmit Action"
     commit_error = 0
@@ -1421,8 +1400,8 @@ def perform_request_edit_action(actid, actname=None, working_dir=None, status_te
 
         if commit_error != 0:
             ## don't commit - just re-display page with message to user
-            (title, body) = _display_edit_action_form(errors=errors, warnings=warnings, actid=actid, user_msg=user_msg)
-            return (title, body, errors, warnings)
+            (title, body) = _display_edit_action_form(actid=actid, user_msg=user_msg)
+            return (title, body)
 
         ## Commit updated action details to WebSubmit DB:
         err_code = update_action_details(actid, actname, working_dir, status_text)
@@ -1448,13 +1427,11 @@ def perform_request_edit_action(actid, actname=None, working_dir=None, status_te
             title = "Available WebSubmit Actions"
     else:
         ## Display Web form containing existing details of action:
-        (title, body) = _display_edit_action_form(errors=errors, warnings=warnings, actid=actid)
-    return (title, body, errors, warnings)
+        (title, body) = _display_edit_action_form(actid=actid)
+    return (title, body)
 
-def _functionedit_display_function_details(errors, warnings, funcname, user_msg=""):
+def _functionedit_display_function_details(funcname, user_msg=""):
     """Display the details of a function, along with any message to the user that may have been provided.
-       @param errors: LIST of errors (passed by reference from caller) - errors will be appended to it
-       @param warnings: LIST of warnings (passed by reference from caller) - warnings will be appended to it
        @param funcname: unique name of function to be updated
        @param user_msg: Any message to the user that is to be displayed on the page.
        @return: tuple containing (page title, HTML page body).
@@ -1552,10 +1529,8 @@ def _format_function_docstring(docstring):
 
     return '\n'.join([line[min_nb_leading_whitespace:] for line in new_docstring_list]).rstrip()
 
-def _functionedit_update_description(errors, warnings, funcname, funcdescr):
+def _functionedit_update_description(funcname, funcdescr):
     """Perform an update of the description for a given function.
-       @param errors: LIST of errors (passed by reference from caller) - errors will be appended to it
-       @param warnings: LIST of warnings (passed by reference from caller) - warnings will be appended to it
        @param funcname: unique name of function to be updated
        @param funcdescr: description to be updated for funcname
        @return: a tuple containing (page title, HTML body content)
@@ -1570,17 +1545,15 @@ def _functionedit_update_description(errors, warnings, funcname, funcdescr):
 ## TODO : ERROR LIBS
         user_msg.append("""Could Not Update Description for Function '%s'""" % (funcname,))
     ## Display function details
-    (title, body) = _functionedit_display_function_details(errors=errors, warnings=warnings, funcname=funcname, user_msg=user_msg)
+    (title, body) = _functionedit_display_function_details(funcname=funcname, user_msg=user_msg)
     return (title, body)
 
-def _functionedit_delete_parameter(errors, warnings, funcname, deleteparam):
+def _functionedit_delete_parameter(funcname, deleteparam):
     """Delete a parameter from a given function.
        Important: if any document types have been using the function from which this parameter will be deleted,
         and therefore have values for this parameter, these values will not be deleted from the WebSubmit DB.
         The deleted parameter therefore may continue to exist in the WebSubmit DB, but will be disassociated
         from this function.
-       @param errors: LIST of errors (passed by reference from caller) - errors will be appended to it
-       @param warnings: LIST of warnings (passed by reference from caller) - warnings will be appended to it
        @param funcname: unique name of the function from which the parameter is to be deleted.
        @param deleteparam: the name of the parameter to be deleted from the function.
        @return: tuple containing (title, HTML body content)
@@ -1596,13 +1569,11 @@ def _functionedit_delete_parameter(errors, warnings, funcname, deleteparam):
         user_msg.append("""'%s' Parameter Does not Seem to Exist for Function '%s' - Could not Delete""" \
                    % (deleteparam, funcname))
     ## Display function details
-    (title, body) = _functionedit_display_function_details(errors=errors, warnings=warnings, funcname=funcname, user_msg=user_msg)
+    (title, body) = _functionedit_display_function_details(funcname=funcname, user_msg=user_msg)
     return (title, body)
 
-def _functionedit_add_parameter(errors, warnings, funcname, funceditaddparam="", funceditaddparamfree=""):
+def _functionedit_add_parameter(funcname, funceditaddparam="", funceditaddparamfree=""):
     """Add (connect) a parameter to a given WebSubmit function.
-       @param errors: LIST of errors (passed by reference from caller) - errors will be appended to it
-       @param warnings: LIST of warnings (passed by reference from caller) - warnings will be appended to it
        @param funcname: unique name of the function to which the parameter is to be added.
        @param funceditaddparam: the value of a HTML select list: if present, will contain the name of the
         parameter to be added to the function.  May also be empty - the user may have used the free-text field
@@ -1642,7 +1613,7 @@ def _functionedit_add_parameter(errors, warnings, funcname, funceditaddparam="",
             user_msg.append("""Could not Add '%s' Parameter to Function '%s' - It Already Exists for this Function""" \
                        % (add_parameter, funcname))
     ## Display function details
-    (title, body) = _functionedit_display_function_details(errors=errors, warnings=warnings, funcname=funcname, user_msg=user_msg)
+    (title, body) = _functionedit_display_function_details(funcname=funcname, user_msg=user_msg)
     return (title, body)
 
 def perform_request_edit_function(funcname, funcdescr=None, funceditaddparam=None, funceditaddparamfree=None,
@@ -1658,10 +1629,8 @@ def perform_request_edit_function(funcname, funcdescr=None, funceditaddparam=Non
         @param funcdescreditcommit: a flag to indicate that this request is to update the description of a function
         @param funcparamdelcommit: a flag to indicate that this request is to delete a parameter from a function
         @param funcparamaddcommit: a flag to indicate that this request is to add a new parameter to a function
-        @return: tuple containing (page title, HTML page body, list of errors encountered, list of warnings)
+        @return: tuple containing (page title, HTML page body)
     """
-    errors = []
-    warnings = []
     body = ""
     title = "Edit WebSubmit Function"
     commit_error = 0
@@ -1710,100 +1679,81 @@ def perform_request_edit_function(funcname, funcdescr=None, funceditaddparam=Non
         funceditdelparam = ""
 
     if funcname == "":
-        (title, body) = _functionedit_display_function_details(errors=errors, warnings=warnings, funcname=funcname)
-        return (title, body, errors, warnings)
+        (title, body) = _functionedit_display_function_details(funcname=funcname)
+        return (title, body)
 
     if funcdescreditcommit != "" and funcdescreditcommit is not None:
         ## Update the definition of a function:
-        (title, body) = _functionedit_update_description(errors=errors, warnings=warnings, funcname=funcname, funcdescr=funcdescr)
+        (title, body) = _functionedit_update_description(funcname=funcname, funcdescr=funcdescr)
     elif funcparamaddcommit != "" and funcparamaddcommit is not None:
         ## Request to add a new parameter to a function
-        (title, body) = _functionedit_add_parameter(errors=errors, warnings=warnings, funcname=funcname,
+        (title, body) = _functionedit_add_parameter(funcname=funcname,
                                                     funceditaddparam=funceditaddparam, funceditaddparamfree=funceditaddparamfree)
     elif funcparamdelcommit != "" and funcparamdelcommit is not None:
         ## Request to delete a parameter from a function
-        (title, body) = _functionedit_delete_parameter(errors=errors, warnings=warnings, funcname=funcname, deleteparam=funceditdelparam)
+        (title, body) = _functionedit_delete_parameter(funcname=funcname, deleteparam=funceditdelparam)
     else:
         ## Display Web form for new function addition:
-        (title, body) = _functionedit_display_function_details(errors=errors, warnings=warnings, funcname=funcname)
-    return (title, body, errors, warnings)
+        (title, body) = _functionedit_display_function_details(funcname=funcname)
+    return (title, body)
 
 def perform_request_function_usage(funcname):
     """Display a page containing the usage details of a given function.
        @param funcname: the function name
        @return: page body
     """
-    errors = []
-    warnings = []
     func_usage = get_function_usage_details(function=funcname)
     func_usage = stringify_listvars(func_usage)
     body = websubmitadmin_templates.tmpl_display_function_usage(funcname, func_usage)
-    return (body, errors, warnings)
+    return body
 
 def perform_request_list_actions():
     """Display a list of all WebSubmit actions.
-       @return: tuple: (body,errors,warnings), where errors and warnings are lists of errors/warnings
-         encountered along the way, and body is a string of HTML, which is a page body.
+       @return: body where body is a string of HTML, which is a page body.
     """
-    errors = []
-    warnings = []
     body = ""
     all_actions = get_actid_actname_allactions()
     body = websubmitadmin_templates.tmpl_display_allactions(all_actions)
-    return (body, errors, warnings)
+    return body
 
 def perform_request_list_doctypes():
     """Display a list of all WebSubmit document types.
-       @return: tuple:(body,errors,warnings), where errors and warnings are lists of errors/warnings
-         encountered along the way, and body is a string of HTML, which is a page body.
+       @return: body where body is a string of HTML, which is a page body.
     """
-    errors = []
-    warnings = []
     body = ""
     all_doctypes = get_docid_docname_alldoctypes()
     body = websubmitadmin_templates.tmpl_display_alldoctypes(all_doctypes)
-    return (body, errors, warnings)
+    return body
 
 def perform_request_list_jschecks():
     """Display a list of all WebSubmit JavaScript element checking functions.
-       @return: tuple:(body,errors,warnings), where errors and warnings are lists of errors/warnings
-         encountered along the way, and body is a string of HTML, which is a page body.
+       @return: body, where body is a string of HTML, which is a page body.
     """
-    errors = []
-    warnings = []
     body = ""
     all_jschecks = get_chname_alljschecks()
     body = websubmitadmin_templates.tmpl_display_alljschecks(all_jschecks)
-    return (body, errors, warnings)
+    return body
 
 def perform_request_list_functions():
     """Display a list of all WebSubmit FUNCTIONS.
-       @return: tuple:(body,errors,warnings), where errors and warnings are lists of errors/warnings
-         encountered along the way, and body is a string of HTML, which is a page body.
+       @return: body where  body is a string of HTML, which is a page body.
     """
-    errors = []
-    warnings = []
     body = ""
     all_functions = get_funcname_funcdesc_allfunctions()
     body = websubmitadmin_templates.tmpl_display_allfunctions(all_functions)
-    return (body, errors, warnings)
+    return body
 
 def perform_request_list_elements():
     """Display a list of all WebSubmit ELEMENTS.
-       @return: tuple:(body,errors,warnings), where errors and warnings are lists of errors/warnings
-         encountered along the way, and body is a string of HTML, which is a page body.
+       @return: body where body is a string of HTML, which is a page body.
     """
-    errors = []
-    warnings = []
     body = ""
     all_elements = get_elename_allelements()
     body = websubmitadmin_templates.tmpl_display_allelements(all_elements)
-    return (body, errors, warnings)
+    return body
 
-def _remove_doctype(errors, warnings, doctype):
+def _remove_doctype(doctype):
     """Process removal of a document type.
-       @param errors: LIST of errors (passed by reference from caller) - errors will be appended to it
-       @param warnings: LIST of warnings (passed by reference from caller) - warnings will be appended to it
        @param doctype: the document type to be removed.
        @return: a tuple containing page title, and HTML page body)
     """
@@ -1883,15 +1833,13 @@ def perform_request_remove_doctype(doctype="", doctypedelete="", doctypedeleteco
        @doctypedelete: flag to signal that a confirmation for deletion should be displayed
        @doctypedeleteconfirm: flag to signal that confirmation for deletion has been received and
         the doctype should be removed
-       @return: a tuple (title, body, errors, warnings)
+       @return: a tuple (title, body)
     """
-    errors = []
-    warnings = []
     body = ""
     title = "Remove WebSubmit Document Type"
     if doctypedeleteconfirm not in ("", None):
         ## Delete the document type:
-        (title, body) = _remove_doctype(errors=errors, warnings=warnings, doctype=doctype)
+        (title, body) = _remove_doctype(doctype=doctype)
     else:
         ## Display "doctype delete form"
         if doctypedelete not in ("", None) and doctype not in ("", None):
@@ -1902,7 +1850,7 @@ def perform_request_remove_doctype(doctype="", doctypedelete="", doctypedeleteco
             ## alldoctypes = get_docid_docname_alldoctypes()
             alldoctypes = get_docid_docname_and_docid_alldoctypes()
         body = websubmitadmin_templates.tmpl_display_delete_doctype_form(doctype=doctype, alldoctypes=alldoctypes)
-    return (title, body, errors, warnings)
+    return (title, body)
 
 def _create_add_doctype_form(doctype="", doctypename="", doctypedescr="", clonefrom="", user_msg=""):
     """Perform the steps necessary to create the "add a new doctype" form.
@@ -1923,10 +1871,8 @@ def _create_add_doctype_form(doctype="", doctypename="", doctypedescr="", clonef
                                                                 )
     return (title, body)
 
-def _clone_categories_doctype(errors, warnings, user_msg, fromdoctype, todoctype):
+def _clone_categories_doctype(user_msg, fromdoctype, todoctype):
     """Clone the categories of one document type, to another document type.
-       @param errors: a list of errors encountered while cloning categories
-       @param warnings: a list of warnings encountered while cloning categories
        @param user_msg: any message to be displayed to the user (this is a list)
        @param fromdoctype: the doctype from which categories are to be cloned
        @param todoctype: the doctype into which categories are to be cloned
@@ -1949,10 +1895,8 @@ def _clone_categories_doctype(errors, warnings, user_msg, fromdoctype, todoctype
     else:
         return 0  ## cloning successful
 
-def _clone_functions_foraction_doctype(errors, warnings, user_msg, fromdoctype, todoctype, action):
+def _clone_functions_foraction_doctype(user_msg, fromdoctype, todoctype, action):
     """Clone the functions of a given action of one document type, to the same action on another document type.
-       @param errors: a list of errors encountered while cloning functions
-       @param warnings: a list of warnings encountered while cloning functions
        @param user_msg: any message to be displayed to the user (this is a list)
        @param fromdoctype: the doctype from which functions are to be cloned
        @param todoctype: the doctype into which functions are to be cloned
@@ -1979,10 +1923,8 @@ def _clone_functions_foraction_doctype(errors, warnings, user_msg, fromdoctype, 
     else:
         return 0  ## total success
 
-def _clone_functionparameters_foraction_fromdoctype_todoctype(errors, warnings, user_msg, fromdoctype, todoctype, action):
+def _clone_functionparameters_foraction_fromdoctype_todoctype(user_msg, fromdoctype, todoctype, action):
     """Clone the parameters/values of a given action of one document type, to the same action on another document type.
-       @param errors: a list of errors encountered while cloning parameters
-       @param warnings: a list of warnings encountered while cloning parameters
        @param user_msg: any message to be displayed to the user (this is a list)
        @param fromdoctype: the doctype from which parameters are to be cloned
        @param todoctype: the doctype into which parameters are to be cloned
@@ -2002,7 +1944,7 @@ def _clone_functionparameters_foraction_fromdoctype_todoctype(errors, warnings, 
     else:
         return 0  ## all parameters were cloned
 
-def _add_doctype(errors, warnings, doctype, doctypename, doctypedescr, clonefrom):
+def _add_doctype(doctype, doctypename, doctypedescr, clonefrom):
     title = ""
     body = ""
     user_msg = []
@@ -2033,9 +1975,7 @@ def _add_doctype(errors, warnings, doctype, doctypename, doctypedescr, clonefrom
             if clonefrom not in ("", "None", None):
                 ## document type should be cloned from "clonefrom"
                 ## first, clone the categories from another doctype:
-                error_code = _clone_categories_doctype(errors=errors,
-                                                       warnings=warnings,
-                                                       user_msg=user_msg,
+                error_code = _clone_categories_doctype(user_msg=user_msg,
                                                        fromdoctype=clonefrom,
                                                        todoctype=doctype)
                 ## get details of clonefrom's submissions
@@ -2045,7 +1985,7 @@ def _add_doctype(errors, warnings, doctype, doctypename, doctypedescr, clonefrom
                     for doc_submission_actname in all_actnames_submissions_clonefrom:
                         ## clone submission details:
                         action_name = doc_submission_actname[0]
-                        _clone_submission_fromdoctype_todoctype(errors=errors, warnings=errors, user_msg=user_msg,
+                        _clone_submission_fromdoctype_todoctype(user_msg=user_msg,
                                                                 todoctype=doctype, action=action_name, clonefrom=clonefrom)
 
             user_msg.append("""The "%s" document type has been added.""" % (doctype,))
@@ -2061,8 +2001,6 @@ def _add_doctype(errors, warnings, doctype, doctypename, doctypedescr, clonefrom
     return (title, body)
 
 def perform_request_add_doctype(doctype=None, doctypename=None, doctypedescr=None, clonefrom=None, doctypedetailscommit=""):
-    errors = []
-    warnings = []
     body = ""
 
     ## wash args:
@@ -2098,13 +2036,13 @@ def perform_request_add_doctype(doctype=None, doctypename=None, doctypedescr=Non
         clonefrom = "None"
 
     if doctypedetailscommit not in ("", None):
-        (title, body) = _add_doctype(errors=errors, warnings=warnings, doctype=doctype,
+        (title, body) = _add_doctype(doctype=doctype,
                                      doctypename=doctypename, doctypedescr=doctypedescr, clonefrom=clonefrom)
     else:
         (title, body) = _create_add_doctype_form()
-    return (title, body, errors, warnings)
+    return (title, body)
 
-def _delete_referee_doctype(errors, warnings, doctype, categid, refereeid):
+def _delete_referee_doctype(doctype, categid, refereeid):
     """Delete a referee from a given category of a document type.
        @param doctype: the document type from whose category the referee is to be removed
        @param categid: the name/ID of the category from which the referee is to be removed
@@ -2151,7 +2089,7 @@ def _create_list_referees_doctype(doctype):
             pass
     return referees_details
 
-def _create_edit_doctype_details_form(errors, warnings, doctype, doctypename="", doctypedescr="", doctypedetailscommit="", user_msg=""):
+def _create_edit_doctype_details_form(doctype, doctypename="", doctypedescr="", doctypedetailscommit="", user_msg=""):
     if user_msg == "" or type(user_msg) not in (list, tuple, str, unicode):
         user_msg = []
     elif type(user_msg) in (str, unicode):
@@ -2182,7 +2120,7 @@ def _create_edit_doctype_details_form(errors, warnings, doctype, doctypename="",
         title = "Available WebSubmit Document Types"
     return (title, body)
 
-def _create_add_submission_choose_clonefrom_form(errors, warnings, doctype, action, user_msg=""):
+def _create_add_submission_choose_clonefrom_form(doctype, action, user_msg=""):
     if user_msg == "" or type(user_msg) not in (list, tuple, str, unicode):
         user_msg = []
     elif type(user_msg) in (str, unicode):
@@ -2215,7 +2153,7 @@ def _create_add_submission_choose_clonefrom_form(errors, warnings, doctype, acti
         (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
 
-def _create_add_submission_form(errors, warnings, doctype, action, displayed="", buttonorder="", statustext="",
+def _create_add_submission_form(doctype, action, displayed="", buttonorder="", statustext="",
                                 level="", score="", stpage="", endtxt="", user_msg=""):
     if user_msg == "" or type(user_msg) not in (list, tuple, str, unicode):
         user_msg = []
@@ -2242,7 +2180,7 @@ def _create_add_submission_form(errors, warnings, doctype, action, displayed="",
                                                                        )
     return (title, body)
 
-def _create_delete_submission_form(errors, warnings, doctype, action):
+def _create_delete_submission_form(doctype, action):
     user_msg = []
     title = """Delete Submission "%s" from Document Type "%s" """ % (action, doctype)
     numrows_doctypesubmission = get_number_submissions_doctype_action(doctype=doctype, action=action)
@@ -2256,7 +2194,7 @@ def _create_delete_submission_form(errors, warnings, doctype, action):
         (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
 
-def _create_edit_submission_form(errors, warnings, doctype, action, user_msg=""):
+def _create_edit_submission_form(doctype, action, user_msg=""):
     if user_msg == "" or type(user_msg) not in (list, tuple, str, unicode):
         user_msg = []
     elif type(user_msg) in (str, unicode):
@@ -2302,7 +2240,7 @@ def _create_edit_submission_form(errors, warnings, doctype, action, user_msg="")
         (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
 
-def _create_edit_category_form(errors, warnings, doctype, categid):
+def _create_edit_category_form(doctype, categid):
     title = "Edit Category Description"
     categ_details = get_all_categories_sname_lname_for_doctype_categsname(doctype=doctype, categsname=categid)
     if len(categ_details) == 1:
@@ -2349,7 +2287,7 @@ def _create_configure_doctype_form(doctype, jumpcategout="", user_msg=""):
                                                                     user_msg=user_msg)
     return (title, body)
 
-def _clone_submission_fromdoctype_todoctype(errors, warnings, user_msg, todoctype, action, clonefrom):
+def _clone_submission_fromdoctype_todoctype(user_msg, todoctype, action, clonefrom):
     ## first, delete the submission from todoctype (if it exists):
     error_code = delete_submissiondetails_doctype(doctype=todoctype, action=action)
     if error_code == 0:
@@ -2358,13 +2296,11 @@ def _clone_submission_fromdoctype_todoctype(errors, warnings, user_msg, todoctyp
         if error_code == 0:
             ## submission inserted
             ## now clone functions:
-            error_code = _clone_functions_foraction_doctype(errors=errors, warnings=warnings, user_msg=user_msg, \
+            error_code = _clone_functions_foraction_doctype(user_msg=user_msg, \
                                     fromdoctype=clonefrom, todoctype=todoctype, action=action)
             if error_code in (0, 2):
                 ## no serious error - clone parameters:
-                error_code = _clone_functionparameters_foraction_fromdoctype_todoctype(errors=errors,
-                                                                                       warnings=warnings,
-                                                                                       user_msg=user_msg,
+                error_code = _clone_functionparameters_foraction_fromdoctype_todoctype(user_msg=user_msg,
                                                                                        fromdoctype=clonefrom,
                                                                                        todoctype=todoctype,
                                                                                        action=action)
@@ -2392,14 +2328,13 @@ def _clone_submission_fromdoctype_todoctype(errors, warnings, user_msg, todoctyp
                         % (action, todoctype, clonefrom))
         ## TODO : LOG ERROR
 
-def _add_submission_to_doctype_clone(errors, warnings, doctype, action, clonefrom):
+def _add_submission_to_doctype_clone(doctype, action, clonefrom):
     user_msg = []
 
     if action in ("", None) or clonefrom in ("", None):
         user_msg.append("Unknown action or document type to clone from - cannot add submission")
         (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
         return (title, body)
-
 
     ## does action exist?
     numrows_action = get_number_actions_with_actid(actid=action)
@@ -2413,7 +2348,7 @@ def _add_submission_to_doctype_clone(errors, warnings, doctype, action, clonefro
             ## TODO : LOG ERROR
         else:
             ## clone the submission
-            _clone_submission_fromdoctype_todoctype(errors=errors, warnings=errors, user_msg=user_msg,
+            _clone_submission_fromdoctype_todoctype(user_msg=user_msg,
                                                     todoctype=doctype, action=action, clonefrom=clonefrom)
             user_msg.append("""Cloning of Submission "%s" from Document Type "%s" has been carried out. You should not""" \
                            """ ignore any warnings that you may have seen.""" % (action, clonefrom))
@@ -2426,7 +2361,7 @@ def _add_submission_to_doctype_clone(errors, warnings, doctype, action, clonefro
     (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
 
-def _add_submission_to_doctype(errors, warnings, doctype, action, displayed, buttonorder,
+def _add_submission_to_doctype(doctype, action, displayed, buttonorder,
                                statustext, level, score, stpage, endtxt):
     user_msg = []
 
@@ -2453,10 +2388,8 @@ def _add_submission_to_doctype(errors, warnings, doctype, action, displayed, but
     (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
 
-def _delete_submission_from_doctype(errors, warnings, doctype, action):
+def _delete_submission_from_doctype(doctype, action):
     """Delete a submission (action) from the document type identified by "doctype".
-       @param errors:  a list of errors encountered while deleting the submission
-       @param warnings: a list of warnings encountered while deleting the submission
        @param doctype: the unique ID of the document type from which the submission is to be deleted
        @param categid: the action ID of the submission to be deleted from doctype
        @return: a tuple containing 2 strings: (page title, page body)
@@ -2501,11 +2434,9 @@ def _delete_submission_from_doctype(errors, warnings, doctype, action):
     (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
 
-def _edit_submission_for_doctype(errors, warnings, doctype, action, displayed, buttonorder,
+def _edit_submission_for_doctype(doctype, action, displayed, buttonorder,
                                  statustext, level, score, stpage, endtxt):
     """Update the details of a given submission belonging to the document type identified by "doctype".
-       @param errors:  a list of errors encountered while updating the submission's details
-       @param warnings: a list of warnings encountered while updating the submission's details
        @param doctype: the unique ID of the document type for which the submission is to be updated
        @param action: action name of the submission to be updated
        @param displayed: displayed on main submission page? (Y/N)
@@ -2537,10 +2468,8 @@ def _edit_submission_for_doctype(errors, warnings, doctype, action, displayed, b
     (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
 
-def _edit_doctype_details(errors, warnings, doctype, doctypename, doctypedescr):
+def _edit_doctype_details(doctype, doctypename, doctypedescr):
     """Update the details (name and/or description) of a document type (identified by doctype.)
-       @param errors:  a list of errors encountered while updating the doctype's details
-       @param warnings: a list of warnings encountered while updating the doctype's details
        @param doctype: the unique ID of the document type to be updated
        @param doctypename: the new/updated name for the doctype
        @param doctypedescr: the new/updated description for the doctype
@@ -2558,11 +2487,9 @@ def _edit_doctype_details(errors, warnings, doctype, doctypename, doctypedescr):
     (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
 
-def _edit_category_for_doctype(errors, warnings, doctype, categid, categdescr):
+def _edit_category_for_doctype(doctype, categid, categdescr):
     """Edit the description of a given category (identified by categid), belonging to
        the document type identified by doctype.
-       @param errors:  a list of errors encountered while modifying the category
-       @param warnings: a list of warnings encountered while modifying the category
        @param doctype: the unique ID of the document type for which the category is to be modified
        @param categid: the unique category ID of the category to be modified
        @param categdescr: the new description for the category
@@ -2587,11 +2514,9 @@ def _edit_category_for_doctype(errors, warnings, doctype, categid, categdescr):
     (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
 
-def _add_category_to_doctype(errors, warnings, doctype, categid, categdescr):
+def _add_category_to_doctype(doctype, categid, categdescr):
     """Add a new category to the document type identified by "doctype".
        Category ID, and category description are both mandatory.
-       @param errors:  a list of errors encountered while adding the category
-       @param warnings: a list of warnings encountered while adding the category
        @param doctype: the unique ID of the document type to which the category is to be added
        @param categid: the unique category ID of the category to be added to doctype
        @param categdescr: the description of the category to be added
@@ -2616,10 +2541,8 @@ def _add_category_to_doctype(errors, warnings, doctype, categid, categdescr):
     (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
 
-def _delete_category_from_doctype(errors, warnings, doctype, categid):
+def _delete_category_from_doctype(doctype, categid):
     """Delete a category (categid) from the document type identified by "doctype".
-       @param errors:  a list of errors encountered while deleting the category
-       @param warnings: a list of warnings encountered while deleting the category
        @param doctype: the unique ID of the document type from which the category is to be deleted
        @param categid: the unique category ID of the category to be deleted from doctype
        @return: a tuple containing 2 strings: (page title, page body)
@@ -2643,7 +2566,7 @@ def _delete_category_from_doctype(errors, warnings, doctype, categid):
     (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
 
-def _jump_category_to_new_score(errors, warnings, doctype, jumpcategout, jumpcategin):
+def _jump_category_to_new_score(doctype, jumpcategout, jumpcategin):
     user_msg = []
     if jumpcategout in ("", None) or jumpcategin in ("", None):
         ## need both jumpcategout and jumpcategin to move a category:
@@ -2663,7 +2586,7 @@ def _jump_category_to_new_score(errors, warnings, doctype, jumpcategout, jumpcat
     (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
 
-def _move_category(errors, warnings, doctype, categid, movecategup=""):
+def _move_category(doctype, categid, movecategup=""):
     user_msg = []
     if categid in ("", None):
         ## cannot move unknown category!
@@ -2725,8 +2648,6 @@ def perform_request_configure_doctype(doctype,
                                       endtxt=None
                                      ):
     user_msg = []
-    errors = []
-    warnings = []
     body = ""
 
     if doctype is not None:
@@ -2844,7 +2765,7 @@ def perform_request_configure_doctype(doctype,
         all_doctypes = get_docid_docname_alldoctypes()
         body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
         title = "Available WebSubmit Document Types"
-        return (title, body, errors, warnings)
+        return (title, body)
     elif numrows_doctype == 0:
         ## this doctype does not seem to exist:
         user_msg.append("""The document type identified by "%s" doesn't exist - cannot configure at this time.""" \
@@ -2853,78 +2774,71 @@ def perform_request_configure_doctype(doctype,
         all_doctypes = get_docid_docname_alldoctypes()
         body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
         title = "Available WebSubmit Document Types"
-        return (title, body, errors, warnings)
+        return (title, body)
 
     ## since doctype ID is OK, process doctype configuration request:
     if doctypedetailsedit not in ("", None):
-        (title, body) = _create_edit_doctype_details_form(errors=errors, warnings=warnings, doctype=doctype)
+        (title, body) = _create_edit_doctype_details_form(doctype=doctype)
     elif doctypedetailscommit not in ("", None):
         ## commit updated document type details
-        (title, body) = _edit_doctype_details(errors=errors, warnings=warnings, doctype=doctype,
+        (title, body) = _edit_doctype_details(doctype=doctype,
                                               doctypename=doctypename, doctypedescr=doctypedescr)
     elif doctypecategoryadd not in ("", None):
         ## add new category:
-        (title, body) = _add_category_to_doctype(errors=errors, warnings=warnings,
-                                                 doctype=doctype, categid=categid, categdescr=categdescr)
+        (title, body) = _add_category_to_doctype(doctype=doctype, categid=categid, categdescr=categdescr)
     elif doctypecategoryedit not in ("", None):
         ## create form to update category description:
-        (title, body) = _create_edit_category_form(errors=errors, warnings=warnings, doctype=doctype,
+        (title, body) = _create_edit_category_form(doctype=doctype,
                                                    categid=categid)
     elif doctypecategoryeditcommit not in ("", None):
         ## commit updated category description:
-        (title, body) = _edit_category_for_doctype(errors=errors, warnings=warnings,
-                                                   doctype=doctype, categid=categid, categdescr=categdescr)
+        (title, body) = _edit_category_for_doctype(doctype=doctype, categid=categid, categdescr=categdescr)
     elif doctypecategorydelete not in ("", None):
         ## delete a category
-        (title, body) = _delete_category_from_doctype(errors=errors, warnings=warnings,
-                                                      doctype=doctype, categid=categid)
+        (title, body) = _delete_category_from_doctype(doctype=doctype, categid=categid)
     elif movecategup not in ("", None) or movecategdown not in ("", None):
         ## move a category up or down in score:
-        (title, body) = _move_category(errors=errors, warnings=warnings,
-                                       doctype=doctype, categid=categid,
+        (title, body) = _move_category(doctype=doctype, categid=categid,
                                        movecategup=movecategup)
     elif jumpcategout not in ("", None) and jumpcategin not in ("", None):
         ## jump a category from one score to another:
-        (title, body) = _jump_category_to_new_score(errors=errors, warnings=warnings,
-                                                    doctype=doctype, jumpcategout=jumpcategout,
+        (title, body) = _jump_category_to_new_score(doctype=doctype, jumpcategout=jumpcategout,
                                                     jumpcategin=jumpcategin)
     elif doctypesubmissionadd not in ("", None):
         ## form displaying option of adding doctype:
-        (title, body) = _create_add_submission_choose_clonefrom_form(errors=errors, warnings=warnings, doctype=doctype, action=action)
+        (title, body) = _create_add_submission_choose_clonefrom_form(doctype=doctype, action=action)
     elif doctypesubmissionaddclonechosen not in ("", None):
         ## add a submission. if there is a document type to be cloned from, then process clone;
         ## otherwise, present form with details of doctype
         if doctype_cloneactionfrom in ("", None, "None"):
             ## no clone - present form into which details of new submission should be entered
-            (title, body) = _create_add_submission_form(errors=errors, warnings=warnings, doctype=doctype, action=action)
+            (title, body) = _create_add_submission_form(doctype=doctype, action=action)
         else:
             ## new submission should be cloned from doctype_cloneactionfrom
-            (title, body) = _add_submission_to_doctype_clone(errors=errors, warnings=warnings,
-                                                             doctype=doctype, action=action, clonefrom=doctype_cloneactionfrom)
+            (title, body) = _add_submission_to_doctype_clone(doctype=doctype, action=action, clonefrom=doctype_cloneactionfrom)
     elif doctypesubmissiondelete not in ("", None):
         ## create form to prompt for confirmation of deletion of a submission:
-        (title, body) = _create_delete_submission_form(errors=errors, warnings=warnings, doctype=doctype, action=action)
+        (title, body) = _create_delete_submission_form(doctype=doctype, action=action)
     elif doctypesubmissiondeleteconfirm not in ("", None):
         ## process the deletion of a submission from the doctype concerned:
-        (title, body) = _delete_submission_from_doctype(errors=errors, warnings=warnings,
-                                                        doctype=doctype, action=action)
+        (title, body) = _delete_submission_from_doctype(doctype=doctype, action=action)
     elif doctypesubmissionedit not in ("", None):
         ## create form to update details of a submission
-        (title, body) = _create_edit_submission_form(errors=errors, warnings=warnings, doctype=doctype, action=action)
+        (title, body) = _create_edit_submission_form(doctype=doctype, action=action)
     elif doctypesubmissioneditdetailscommit not in ("", None):
         ## commit updated submission details:
-        (title, body) = _edit_submission_for_doctype(errors=errors, warnings=warnings, doctype=doctype, action=action,
+        (title, body) = _edit_submission_for_doctype(doctype=doctype, action=action,
                                                      displayed=displayed, buttonorder=buttonorder, statustext=statustext,
                                                      level=level, score=score, stpage=stpage, endtxt=endtxt)
     elif doctypesubmissionadddetailscommit not in ("", None):
         ## commit new submission to doctype (not by cloning)
-        (title, body) = _add_submission_to_doctype(errors=errors, warnings=warnings, doctype=doctype, action=action,
+        (title, body) = _add_submission_to_doctype(doctype=doctype, action=action,
                                                    displayed=displayed, buttonorder=buttonorder, statustext=statustext,
                                                    level=level, score=score, stpage=stpage, endtxt=endtxt)
     else:
         ## default - display root of edit doctype
         (title, body) = _create_configure_doctype_form(doctype=doctype, jumpcategout=jumpcategout)
-    return (title, body, errors, warnings)
+    return (title, body)
 
 def _create_configure_doctype_submission_functions_form(doctype,
                                                         action,
@@ -3156,8 +3070,7 @@ def perform_request_configure_doctype_submissionfunctions_parameters(doctype,
                                                                      editfunctionparameterfilecommit="",
                                                                      paramfilename="",
                                                                      paramfilecontent=""):
-    errors = []
-    warnings = []
+
     body = ""
     user_msg = []
     ## ensure that there is only one doctype for this doctype ID - simply display all doctypes with warning if not
@@ -3167,7 +3080,7 @@ def perform_request_configure_doctype_submissionfunctions_parameters(doctype,
         all_doctypes = get_docid_docname_alldoctypes()
         body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
         title = "Available WebSubmit Document Types"
-        return (title, body, errors, warnings)
+        return (title, body)
 
     numrows_doctype = get_number_doctypes_docid(docid=doctype)
     if numrows_doctype > 1:
@@ -3178,7 +3091,7 @@ def perform_request_configure_doctype_submissionfunctions_parameters(doctype,
         all_doctypes = get_docid_docname_alldoctypes()
         body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
         title = "Available WebSubmit Document Types"
-        return (title, body, errors, warnings)
+        return (title, body)
     elif numrows_doctype == 0:
         ## this doctype does not seem to exist:
         user_msg.append("""The document type identified by "%s" doesn't exist - cannot configure at this time.""" \
@@ -3187,7 +3100,7 @@ def perform_request_configure_doctype_submissionfunctions_parameters(doctype,
         all_doctypes = get_docid_docname_alldoctypes()
         body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
         title = "Available WebSubmit Document Types"
-        return (title, body, errors, warnings)
+        return (title, body)
 
     ## ensure that this submission exists for this doctype:
     numrows_submission = get_number_submissions_doctype_action(doctype=doctype, action=action)
@@ -3197,14 +3110,14 @@ def perform_request_configure_doctype_submissionfunctions_parameters(doctype,
         user_msg.append("""The Submission "%s" seems to exist multiple times for the Document Type "%s" - cannot configure at this time.""" \
                    % (action, doctype))
         (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
-        return (title, body, errors, warnings)
+        return (title, body)
     elif numrows_submission == 0:
         ## this submission does not seem to exist for this doctype:
         user_msg.append("""The Submission "%s" doesn't exist for the "%s" Document Type - cannot configure at this time.""" \
                    % (action, doctype))
         ## TODO : LOG ERROR
         (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
-        return (title, body, errors, warnings)
+        return (title, body)
 
     if editfunctionparametervaluecommit not in ("", None):
         ## commit an update to a function parameter:
@@ -3231,7 +3144,7 @@ def perform_request_configure_doctype_submissionfunctions_parameters(doctype,
         (title, body) = _create_configure_doctype_submission_functions_list_parameters_form(doctype=doctype,
                                                                                             action=action,
                                                                                             functionname=functionname)
-    return (title, body, errors, warnings)
+    return (title, body)
 
 def perform_request_configure_doctype_submissionfunctions(doctype,
                                                           action,
@@ -3256,8 +3169,6 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
                                                           addfunctionstep="",
                                                           addfunctionscore=""):
 
-    errors = []
-    warnings = []
     body = ""
     user_msg = []
 
@@ -3320,7 +3231,7 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
         all_doctypes = get_docid_docname_alldoctypes()
         body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
         title = "Available WebSubmit Document Types"
-        return (title, body, errors, warnings)
+        return (title, body)
 
     numrows_doctype = get_number_doctypes_docid(docid=doctype)
     if numrows_doctype > 1:
@@ -3331,7 +3242,7 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
         all_doctypes = get_docid_docname_alldoctypes()
         body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
         title = "Available WebSubmit Document Types"
-        return (title, body, errors, warnings)
+        return (title, body)
     elif numrows_doctype == 0:
         ## this doctype does not seem to exist:
         user_msg.append("""The document type identified by "%s" doesn't exist - cannot configure at this time.""" \
@@ -3340,7 +3251,7 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
         all_doctypes = get_docid_docname_alldoctypes()
         body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
         title = "Available WebSubmit Document Types"
-        return (title, body, errors, warnings)
+        return (title, body)
 
     ## ensure that this submission exists for this doctype:
     numrows_submission = get_number_submissions_doctype_action(doctype=doctype, action=action)
@@ -3350,14 +3261,14 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
         user_msg.append("""The Submission "%s" seems to exist multiple times for the Document Type "%s" - cannot configure at this time.""" \
                    % (action, doctype))
         (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
-        return (title, body, errors, warnings)
+        return (title, body)
     elif numrows_submission == 0:
         ## this submission does not seem to exist for this doctype:
         user_msg.append("""The Submission "%s" doesn't exist for the "%s" Document Type - cannot configure at this time.""" \
                    % (action, doctype))
         ## TODO : LOG ERROR
         (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
-        return (title, body, errors, warnings)
+        return (title, body)
 
 
     ## submission valid
@@ -3435,7 +3346,7 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
                                                                             movefromfunctionstep=movefromfunctionstep,
                                                                             movefromfunctionscore=movefromfunctionscore
                                                                            )
-    return (title, body, errors, warnings)
+    return (title, body)
 
 def _add_function_to_submission(doctype, action, addfunctionname, addfunctionstep, addfunctionscore):
     """Process the addition of a function to a submission.
@@ -3559,10 +3470,8 @@ def perform_request_configure_doctype_submissionpage_preview(doctype, action, pa
        @param doctype: (string) the unique ID of a document type
        @param action: (string) the unique ID of an action
        @param pagenum: (integer) the number of the submission page to be previewed
-       @return: a tuple of four elements. (page-title, page-body, errors, warnings)
+       @return: a tuple of four elements. (page-title, page-body)
     """
-    errors = []
-    warnings = []
     body = ""
     user_msg = []
 
@@ -3582,12 +3491,12 @@ def perform_request_configure_doctype_submissionpage_preview(doctype, action, pa
         if not (int(pagenum) > 0 and int(pagenum) <= num_pages_submission):
             user_msg.append("Invalid page number - out of range")
             (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype, action=action, user_msg=user_msg)
-            return (title, body, errors, warnings)
+            return (title, body)
     except ValueError:
         ## invalid page number
         user_msg.append("Invalid page number - must be an integer value!")
         (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype, action=action, user_msg=user_msg)
-        return (title, body, errors, warnings)
+        return (title, body)
 
     ## get details of all fields on submission page:
     fields = get_details_and_description_of_all_fields_on_submissionpage(doctype=doctype, action=action, pagenum=pagenum)
@@ -3600,15 +3509,14 @@ def perform_request_configure_doctype_submissionpage_preview(doctype, action, pa
                                                                                          action=action,
                                                                                          pagenum=pagenum,
                                                                                          fields=string_fields)
-    return (title, body, errors, warnings)
+    return (title, body)
 
 def perform_request_configure_doctype_submissionpage_elements(doctype, action, pagenum, movefieldfromposn="",
                                                               movefieldtoposn="", deletefieldposn="", editfieldposn="",
                                                               editfieldposncommit="", fieldname="", fieldtext="", fieldlevel="",
                                                               fieldshortdesc="", fieldcheck="", addfield="", addfieldcommit=""):
     """Process requests relating to the elements of a particular submission page"""
-    errors = []
-    warnings = []
+
     body = ""
     user_msg = []
     try:
@@ -3683,7 +3591,7 @@ def perform_request_configure_doctype_submissionpage_elements(doctype, action, p
         all_doctypes = get_docid_docname_alldoctypes()
         body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
         title = "Available WebSubmit Document Types"
-        return (title, body, errors, warnings)
+        return (title, body)
 
     numrows_doctype = get_number_doctypes_docid(docid=doctype)
     if numrows_doctype > 1:
@@ -3694,7 +3602,7 @@ def perform_request_configure_doctype_submissionpage_elements(doctype, action, p
         all_doctypes = get_docid_docname_alldoctypes()
         body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
         title = "Available WebSubmit Document Types"
-        return (title, body, errors, warnings)
+        return (title, body)
     elif numrows_doctype == 0:
         ## this doctype does not seem to exist:
         user_msg.append("""The document type identified by "%s" doesn't exist - cannot configure at this time.""" \
@@ -3703,7 +3611,7 @@ def perform_request_configure_doctype_submissionpage_elements(doctype, action, p
         all_doctypes = get_docid_docname_alldoctypes()
         body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
         title = "Available WebSubmit Document Types"
-        return (title, body, errors, warnings)
+        return (title, body)
 
     ## ensure that this submission exists for this doctype:
     numrows_submission = get_number_submissions_doctype_action(doctype=doctype, action=action)
@@ -3713,14 +3621,14 @@ def perform_request_configure_doctype_submissionpage_elements(doctype, action, p
         user_msg.append("""The Submission "%s" seems to exist multiple times for the Document Type "%s" - cannot configure at this time.""" \
                    % (action, doctype))
         (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
-        return (title, body, errors, warnings)
+        return (title, body)
     elif numrows_submission == 0:
         ## this submission does not seem to exist for this doctype:
         user_msg.append("""The Submission "%s" doesn't exist for the "%s" Document Type - cannot configure at this time.""" \
                    % (action, doctype))
         ## TODO : LOG ERROR
         (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
-        return (title, body, errors, warnings)
+        return (title, body)
 
     ## ensure that the page number for this submission is valid:
     num_pages_submission = get_numbersubmissionpages_doctype_action(doctype=doctype, action=action)
@@ -3728,28 +3636,27 @@ def perform_request_configure_doctype_submissionpage_elements(doctype, action, p
         if not (int(pagenum) > 0 and int(pagenum) <= num_pages_submission):
             user_msg.append("Invalid page number - out of range")
             (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype, action=action, user_msg=user_msg)
-            return (title, body, errors, warnings)
+            return (title, body)
     except ValueError:
         ## invalid page number
         user_msg.append("Invalid page number - must be an integer value!")
         (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype, action=action, user_msg=user_msg)
-        return (title, body, errors, warnings)
+        return (title, body)
 
 
     ## submission valid
     if editfieldposn != "" and editfieldposncommit == "":
         ## display form for editing field
-        (title, body) = _configure_doctype_edit_field_on_submissionpage_display_field_details(errors=errors, warnings=warnings,
-                                                                                              doctype=doctype, action=action,
+        (title, body) = _configure_doctype_edit_field_on_submissionpage_display_field_details(doctype=doctype, action=action,
                                                                                               pagenum=pagenum, fieldposn=editfieldposn)
     elif editfieldposn != "" and editfieldposncommit != "":
         ## commit changes to element
-        (title, body) = _configure_doctype_edit_field_on_submissionpage(errors=errors, warnings=warnings, doctype=doctype, action=action,
+        (title, body) = _configure_doctype_edit_field_on_submissionpage(doctype=doctype, action=action,
                                                                         pagenum=pagenum, fieldposn=editfieldposn, fieldtext=fieldtext,
                                                                         fieldlevel=fieldlevel, fieldshortdesc=fieldshortdesc, fieldcheck=fieldcheck)
     elif movefieldfromposn != "" and movefieldtoposn != "":
         ## move a field
-        (title, body) = _configure_doctype_move_field_on_submissionpage(errors=errors, warnings=warnings, doctype=doctype,
+        (title, body) = _configure_doctype_move_field_on_submissionpage(doctype=doctype,
                                                                         action=action, pagenum=pagenum, movefieldfromposn=movefieldfromposn,
                                                                         movefieldtoposn=movefieldtoposn)
     elif addfield != "":
@@ -3757,18 +3664,18 @@ def perform_request_configure_doctype_submissionpage_elements(doctype, action, p
         (title, body) = _configure_doctype_add_field_to_submissionpage_display_form(doctype=doctype, action=action, pagenum=pagenum)
     elif addfieldcommit != "":
         ## commit a new field to the page
-        (title, body) = _configure_doctype_add_field_to_submissionpage(errors=errors, warnings=warnings, doctype=doctype, action=action,
+        (title, body) = _configure_doctype_add_field_to_submissionpage(doctype=doctype, action=action,
                                                                        pagenum=pagenum, fieldname=fieldname, fieldtext=fieldtext,
                                                                        fieldlevel=fieldlevel, fieldshortdesc=fieldshortdesc, fieldcheck=fieldcheck)
     elif deletefieldposn != "":
         ## user wishes to delete a field from the page:
-        (title, body) = _configure_doctype_delete_field_from_submissionpage(errors=errors, warnings=warnings, doctype=doctype,
+        (title, body) = _configure_doctype_delete_field_from_submissionpage(doctype=doctype,
                                                                             action=action, pagenum=pagenum, fieldnum=deletefieldposn)
     else:
         ## default visit to page - list its elements:
         (title, body) = _create_configure_doctype_submission_page_elements_form(doctype=doctype, action=action,
                                                                                 pagenum=pagenum, movefieldfromposn=movefieldfromposn)
-    return (title, body, errors, warnings)
+    return (title, body)
 
 def stringify_list_elements(elementslist):
     o = []
@@ -3776,7 +3683,7 @@ def stringify_list_elements(elementslist):
         o.append(str(el))
     return o
 
-def _configure_doctype_edit_field_on_submissionpage(errors, warnings, doctype, action, pagenum, fieldposn,
+def _configure_doctype_edit_field_on_submissionpage(doctype, action, pagenum, fieldposn,
                                                     fieldtext, fieldlevel, fieldshortdesc, fieldcheck):
     """Perform an update to the details of a field on a submission page.
        @param doctype: (string) the unique ID of a document type
@@ -3795,8 +3702,7 @@ def _configure_doctype_edit_field_on_submissionpage(errors, warnings, doctype, a
         checkres = get_number_jschecks_with_chname(chname=fieldcheck)
         if checkres < 1:
             user_msg.append("The Check '%s' does not exist in WebSubmit - changes to field not saved" % (fieldcheck,))
-            (title, body) = _configure_doctype_edit_field_on_submissionpage_display_field_details(errors=errors, warnings=warnings,
-                                                                                                  doctype=doctype, action=action,
+            (title, body) = _configure_doctype_edit_field_on_submissionpage_display_field_details(doctype=doctype, action=action,
                                                                                                   pagenum=pagenum, fieldposn=fieldposn,
                                                                                                   fieldtext=fieldtext, fieldlevel=fieldlevel,
                                                                                                   fieldshortdesc=fieldshortdesc, user_msg=user_msg)
@@ -3822,7 +3728,7 @@ def _configure_doctype_edit_field_on_submissionpage(errors, warnings, doctype, a
     (title, body) = _create_configure_doctype_submission_page_elements_form(doctype=doctype, action=action, pagenum=pagenum, user_msg=user_msg)
     return (title, body)
 
-def _configure_doctype_edit_field_on_submissionpage_display_field_details(errors, warnings, doctype, action, pagenum, fieldposn,
+def _configure_doctype_edit_field_on_submissionpage_display_field_details(doctype, action, pagenum, fieldposn,
                                                                           fieldtext=None, fieldlevel=None, fieldshortdesc=None,
                                                                           fieldcheck=None, user_msg=""):
     """Display a form used to edit a field on a submission page.
@@ -3888,7 +3794,7 @@ def _configure_doctype_edit_field_on_submissionpage_display_field_details(errors
                                                                                user_msg=user_msg)
     return (title, body)
 
-def _configure_doctype_add_field_to_submissionpage(errors, warnings, doctype, action, pagenum, fieldname="",
+def _configure_doctype_add_field_to_submissionpage(doctype, action, pagenum, fieldname="",
                                                    fieldtext="", fieldlevel="", fieldshortdesc="", fieldcheck=""):
     """Add a field to a submission page.
        @param doctype: (string) the unique ID of a document type
@@ -3984,75 +3890,117 @@ def _configure_doctype_add_field_to_submissionpage_display_form(doctype, action,
                                                                               user_msg=user_msg)
     return (title, body)
 
-def _configure_doctype_move_field_on_submissionpage(errors, warnings, doctype, action, pagenum, movefieldfromposn, movefieldtoposn):
+def _configure_doctype_move_field_on_submissionpage(doctype, action, pagenum, movefieldfromposn, movefieldtoposn):
     user_msg = []
+    _ = gettext_set_language(CFG_SITE_LANG)
     movefield_res = move_field_on_submissionpage_from_positionx_to_positiony(doctype=doctype, action=action, pagenum=pagenum,
                                                                              movefieldfrom=movefieldfromposn, movefieldto=movefieldtoposn)
-    if movefield_res == \
-       'WRN_WEBSUBMITADMIN_INVALID_FIELD_NUMBERS_SUPPLIED_WHEN_TRYING_TO_MOVE_FIELD_ON_SUBMISSION_PAGE':
+
+    if movefield_res == 1:
         ## invalid field numbers
-        warnings.append(('WRN_WEBSUBMITADMIN_INVALID_FIELD_NUMBERS_SUPPLIED_WHEN_TRYING_TO_MOVE_FIELD_ON_SUBMISSION_PAGE', \
-                         movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype)))
-        user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s - field position numbers invalid""" \
+        try:
+            raise InvenioWebSubmitWarning(_('Unable to move field at position %s to position %s on page %s of submission \'%s%s\' - Invalid Field Position Numbers')  % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
+        except InvenioWebSubmitWarning, exc:
+            register_exception(stream='warning')
+            #warnings.append(exc.message)
+        #warnings.append(('WRN_WEBSUBMITADMIN_INVALID_FIELD_NUMBERS_SUPPLIED_WHEN_TRYING_TO_MOVE_FIELD_ON_SUBMISSION_PAGE', \
+                         #movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype)))
+            user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s - field position numbers invalid""" \
                         % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
-    elif movefield_res == \
-         'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_TEMP_POSITION':
+    elif movefield_res == 2:
         ## failed to swap 2 fields - couldn't move field1 to temp position
-        warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_TEMP_POSITION', \
-                         movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype)))
-        user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s""" \
+        try:
+            raise InvenioWebSubmitWarning(_('Unable to swap field at position %s with field at position %s on page %s of submission %s - could not move field at position %s to temporary field location')  % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
+        except InvenioWebSubmitWarning, exc:
+            register_exception(stream='warning')
+            #warnings.append(exc.message)
+        #warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_TEMP_POSITION', \
+                         #movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype)))
+            user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s""" \
                         % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
-    elif movefield_res == \
-         'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD2_TO_FIELD1_POSITION':
+    elif movefield_res == 3:
         ## failed to swap 2 fields on submission page - couldn't move field2 to field1 position
-        warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD2_TO_FIELD1_POSITION', \
-                          movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype), movefieldtoposn, movefieldfromposn))
-        user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s - See Admin if field order is broken""" \
+        try:
+            raise InvenioWebSubmitWarning(_('Unable to swap field at position %s with field at position %s on page %s of submission %s - could not move field at position %s to position %s. Please ask Admin to check that a field was not stranded in a temporary position')  % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
+        except InvenioWebSubmitWarning, exc:
+            register_exception(stream='warning')
+            #warnings.append(exc.message)
+        #warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD2_TO_FIELD1_POSITION', \
+                          #movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype), movefieldtoposn, movefieldfromposn))
+            user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s - See Admin if field order is broken""" \
                         % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
-    elif movefield_res == \
-         'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_POSITION_FIELD2_FROM_TEMPORARY_POSITION':
+    elif movefield_res == 4:
         ## failed to swap 2 fields in submission page - couldnt swap field at temp position to field2 position
-        warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_POSITION_FIELD2_FROM_TEMPORARY_POSITION', \
-                         movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype), movefieldfromposn, movefieldtoposn))
-        user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s - Field-order is now broken and must be corrected by Admin""" \
+        try:
+            raise InvenioWebSubmitWarning(_('Unable to swap field at position %s with field at position %s on page %s of submission %s - could not move field that was located at position %s to position %s from temporary position. Field is now stranded in temporary position and must be corrected manually by an Admin')  % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype, movefieldfromposn, movefieldtoposn))
+        except InvenioWebSubmitWarning, exc:
+            register_exception(stream='warning')
+            #warnings.append(exc.message)
+        #warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_POSITION_FIELD2_FROM_TEMPORARY_POSITION', \
+                         #movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype), movefieldfromposn, movefieldtoposn))
+            user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s - Field-order is now broken and must be corrected by Admin""" \
                         % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
-    elif movefield_res == \
-         'WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_DECREMENT_POSITION_OF_FIELDS_BELOW_FIELD1':
+    elif movefield_res == 5:
         ## failed to decrement the position of all fields below the field that was moved to a temp position
-        warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_DECREMENT_POSITION_OF_FIELDS_BELOW_FIELD1', \
-                         movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype), movefieldfromposn))
-        user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s - See Admin if field-order is broken""" \
+        try:
+            raise InvenioWebSubmitWarning(_('Unable to move field at position %s to position %s on page %s of submission %s - could not decrement the position of the fields below position %s. Tried to recover - please check that field ordering is not broken')  % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype, movefieldfromposn))
+        except InvenioWebSubmitWarning, exc:
+            register_exception(stream='warning')
+            #warnings.append(exc.message)
+        #warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_DECREMENT_POSITION_OF_FIELDS_BELOW_FIELD1', \
+                         #movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype), movefieldfromposn))
+            user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s - See Admin if field-order is broken""" \
                         % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
-    elif movefield_res == \
-         'WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_INCREMENT_POSITION_OF_FIELDS_AT_AND_BELOW_FIELD2':
+    elif movefield_res == 6:
         ## failed to increment position of fields in and below position into which 'movefromfieldposn' is to be inserted
-        warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_INCREMENT_POSITION_OF_FIELDS_AT_AND_BELOW_FIELD2', \
-                         movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype), movefieldtoposn, movefieldfromposn))
-        user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s - Field-order is now broken and must be corrected by Admin""" \
+        try:
+            raise InvenioWebSubmitWarning(_('Unable to move field at position %s to position %s on page %s of submission %s%s - could not increment the position of the fields at and below position %s. The field that was at position %s is now stranded in a temporary position.')  % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype, movefieldtoposn, movefieldfromposn))
+        except InvenioWebSubmitWarning, exc:
+            register_exception(stream='warning')
+            #warnings.append(exc.message)
+        #warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_INCREMENT_POSITION_OF_FIELDS_AT_AND_BELOW_FIELD2', \
+                         #movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype), movefieldtoposn, movefieldfromposn))
+            user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s - Field-order is now broken and must be corrected by Admin""" \
                         % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
     else:
         ## successful update:
-        warnings.append(('WRN_WEBSUBMITADMIN_MOVED_FIELD_ON_SUBMISSION_PAGE', movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype)))
-        user_msg.append("""Successfully moved field from position %s to position %s on page %s of submission %s%s""" \
+        try:
+            raise InvenioWebSubmitWarning(_('Moved field from position %s to position %s on page %s of submission \'%s%s\'.')  % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
+        except InvenioWebSubmitWarning, exc:
+            register_exception(stream='warning')
+            #warnings.append(exc.message)
+        #warnings.append(('WRN_WEBSUBMITADMIN_MOVED_FIELD_ON_SUBMISSION_PAGE', movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype)))
+            user_msg.append("""Successfully moved field from position %s to position %s on page %s of submission %s%s""" \
                         % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
 
     (title, body) = _create_configure_doctype_submission_page_elements_form(doctype=doctype, action=action, pagenum=pagenum, user_msg=user_msg)
     return (title, body)
 
-def _configure_doctype_delete_field_from_submissionpage(errors, warnings, doctype, action, pagenum, fieldnum):
+def _configure_doctype_delete_field_from_submissionpage(doctype, action, pagenum, fieldnum):
     """Delete a field from a submission page"""
+    _ = gettext_set_language(CFG_SITE_LANG)
     user_msg = []
     del_res = delete_a_field_from_submissionpage_then_reorder_fields_below_to_fill_vacant_position(doctype=doctype,
                                                                                                    action=action,
                                                                                                    pagenum=pagenum,
                                                                                                    fieldposn=fieldnum)
-    if del_res == 'WRN_WEBSUBMITADMIN_UNABLE_TO_DELETE_FIELD_FROM_SUBMISSION_PAGE':
-        warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_DELETE_FIELD_FROM_SUBMISSION_PAGE', fieldnum, pagenum, "%s%s" % (action, doctype)))
-        user_msg.append("Unable to delete field at position %s from page number %s of submission %s%s" % (fieldnum, pagenum, action, doctype))
+    if del_res == 1:
+        try:
+            raise InvenioWebSubmitWarning(_('Unable to delete field at position %s from page %s of submission \'%s\'') % (fieldnum, pagenum, action, doctype))
+        except InvenioWebSubmitWarning, exc:
+            register_exception(stream='warning')
+            #warnings.append(exc.message)
+        #warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_DELETE_FIELD_FROM_SUBMISSION_PAGE', fieldnum, pagenum, "%s%s" % (action, doctype)))
+            user_msg.append("Unable to delete field at position %s from page number %s of submission %s%s" % (fieldnum, pagenum, action, doctype))
     else:
         ## deletion was OK
         user_msg.append("Field deleted")
-        warnings.append(('WRN_WEBSUBMITADMIN_DELETED_FIELD_FROM_SUBMISSION_PAGE', fieldnum, pagenum, "%s%s" % (action, doctype)))
+        try:
+            raise InvenioWebSubmitWarning(_('Unable to delete field at position %s from page %s of submission \'%s%s\'') % (fieldnum, pagenum, action, doctype))
+        except InvenioWebSubmitWarning, exc:
+            register_exception(stream='warning')
+            #warnings.append(exc.message)
+        #warnings.append(('WRN_WEBSUBMITADMIN_DELETED_FIELD_FROM_SUBMISSION_PAGE', fieldnum, pagenum, "%s%s" % (action, doctype)))
     (title, body) = _create_configure_doctype_submission_page_elements_form(doctype=doctype, action=action, pagenum=pagenum, user_msg=user_msg)
     return (title, body)
 
@@ -4083,8 +4031,6 @@ def perform_request_configure_doctype_submissionpages(doctype,
                                                       deletepageconfirm="",
                                                       addpage=""):
     """Process requests relating to the submission pages of a doctype/submission"""
-    errors = []
-    warnings = []
     body = ""
     user_msg = []
     try:
@@ -4099,7 +4045,7 @@ def perform_request_configure_doctype_submissionpages(doctype,
         all_doctypes = get_docid_docname_alldoctypes()
         body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
         title = "Available WebSubmit Document Types"
-        return (title, body, errors, warnings)
+        return (title, body)
 
     numrows_doctype = get_number_doctypes_docid(docid=doctype)
     if numrows_doctype > 1:
@@ -4110,7 +4056,7 @@ def perform_request_configure_doctype_submissionpages(doctype,
         all_doctypes = get_docid_docname_alldoctypes()
         body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
         title = "Available WebSubmit Document Types"
-        return (title, body, errors, warnings)
+        return (title, body)
     elif numrows_doctype == 0:
         ## this doctype does not seem to exist:
         user_msg.append("""The document type identified by "%s" doesn't exist - cannot configure at this time.""" \
@@ -4119,7 +4065,7 @@ def perform_request_configure_doctype_submissionpages(doctype,
         all_doctypes = get_docid_docname_alldoctypes()
         body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
         title = "Available WebSubmit Document Types"
-        return (title, body, errors, warnings)
+        return (title, body)
 
     ## ensure that this submission exists for this doctype:
     numrows_submission = get_number_submissions_doctype_action(doctype=doctype, action=action)
@@ -4129,14 +4075,14 @@ def perform_request_configure_doctype_submissionpages(doctype,
         user_msg.append("""The Submission "%s" seems to exist multiple times for the Document Type "%s" - cannot configure at this time.""" \
                    % (action, doctype))
         (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
-        return (title, body, errors, warnings)
+        return (title, body)
     elif numrows_submission == 0:
         ## this submission does not seem to exist for this doctype:
         user_msg.append("""The Submission "%s" doesn't exist for the "%s" Document Type - cannot configure at this time.""" \
                    % (action, doctype))
         ## TODO : LOG ERROR
         (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
-        return (title, body, errors, warnings)
+        return (title, body)
 
     ## submission valid
     if addpage != "":
@@ -4153,13 +4099,13 @@ def perform_request_configure_doctype_submissionpages(doctype,
                                                                         user_msg=user_msg)
     elif movepage != "":
         ## user wants to move a page upwards in the order
-        (title, body) = _configure_doctype_move_submission_page(errors=errors, warnings=warnings, doctype=doctype,
+        (title, body) = _configure_doctype_move_submission_page(doctype=doctype,
                                                                 action=action, pagenum=pagenum, direction=movepagedirection)
     elif deletepage != "":
         ## user wants to delete a page:
         if deletepageconfirm != "":
             ## confirmation of deletion has been provided - proceed
-            (title, body) = _configure_doctype_delete_submission_page(errors=errors, warnings=warnings, doctype=doctype,
+            (title, body) = _configure_doctype_delete_submission_page(doctype=doctype,
                                                                       action=action, pagenum=pagenum)
         else:
             ## user has not yet confirmed the deletion of a page - prompt for confirmation
@@ -4169,9 +4115,9 @@ def perform_request_configure_doctype_submissionpages(doctype,
     else:
         ## default - display details of submission pages for this submission:
         (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype, action=action)
-    return (title, body, errors, warnings)
+    return (title, body)
 
-def _configure_doctype_move_submission_page(errors, warnings, doctype, action, pagenum, direction):
+def _configure_doctype_move_submission_page(doctype, action, pagenum, direction):
     user_msg = []
     ## Sanity checking:
     if direction.lower() not in ("up", "down"):
@@ -4216,7 +4162,7 @@ def _configure_doctype_move_submission_page(errors, warnings, doctype, action, p
     (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype, action=action, user_msg=user_msg)
     return (title, body)
 
-def _configure_doctype_delete_submission_page(errors, warnings, doctype, action, pagenum):
+def _configure_doctype_delete_submission_page(doctype, action, pagenum):
     user_msg = []
     num_pages = get_numbersubmissionpages_doctype_action(doctype=doctype, action=action)
     if num_pages > 0:

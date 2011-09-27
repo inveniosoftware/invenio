@@ -28,8 +28,8 @@ from invenio.config import CFG_TMPDIR, CFG_SITE_URL, CFG_SITE_NAME, CFG_BINDIR
 from invenio.urlutils import redirect_to_url
 from invenio.search_engine import perform_request_search, \
     get_collection_reclist, \
-    get_fieldvalues, \
     get_most_popular_field_values
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.dbquery import run_sql, \
     wash_table_column_name
 from invenio.websubmitadmin_dblayer import get_docid_docname_alldoctypes
@@ -1803,7 +1803,6 @@ def create_graph_trend_flot(trend, path, settings):
     """Creates the graph trend using the flot library"""
     out = """<!--[if IE]><script language="javascript" type="text/javascript"
                     src="%(site)s/js/excanvas.min.js"></script><![endif]-->
-              <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.min.js"></script>
               <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.flot.min.js"></script>
               <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.flot.selection.min.js"></script>
               <script id="source" language="javascript" type="text/javascript">

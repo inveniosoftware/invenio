@@ -1651,9 +1651,8 @@ def get_all_items_in_all_public_baskets(format='hb'):
     return (res_local, res_external)
 
 def get_all_items_in_all_public_baskets_by_matching_notes(p=""):
-    """For the specified user, return all the items in the public baskets they
-    are subscribed to, matching their notes' titles and bodies,
-    grouped by basket"""
+    """Return all the items in all the public baskets matching
+    their notes' titles and bodies, grouped by basket"""
 
     p = p and '%' + p + '%' or '%'
 
@@ -1666,7 +1665,7 @@ def get_all_items_in_all_public_baskets_by_matching_notes(p=""):
                 JOIN        usergroup_bskBASKET AS ugbsk
                     ON      ugbsk.id_bskBASKET=notes.id_bskBASKET
                     AND     ugbsk.id_usergroup=0
-                    AND     ugbsk.share_lelel IS NOT NULL
+                    AND     ugbsk.share_level IS NOT NULL
                     AND     ugbsk.share_level!='NO'
                     AND     ugbsk.share_level!='RI'
                 WHERE       notes.title like %s

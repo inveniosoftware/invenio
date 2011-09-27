@@ -123,8 +123,7 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
         if not ajax_request:
             # Show BibEdit start page.
             body, errors, warnings = perform_request_init()
-            metaheaderadd = """<script type="text/javascript" src="%(site)s/js/jquery/jquery.min.js"></script>
-  <script type="text/javascript" src="%(site)s/js/jquery/json2.js"></script>
+            metaheaderadd = """<script type="text/javascript" src="%(site)s/js/jquery/json2.js"></script>
   <script type="text/javascript" src="%(site)s/js/bibmerge_engine.js"></script>""" % {'site': CFG_SITE_URL}
             title = 'Record Merger'
             return page(title         = title,

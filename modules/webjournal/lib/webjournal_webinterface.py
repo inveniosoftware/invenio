@@ -93,12 +93,15 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         journal_name = None
         journal_issue_year = None
         journal_issue_number = None
+        specific_category = None
         category = None
         article_id = None
         if len(path) > 1:
             journal_name = path[1]
         if len(path) > 2 and path[2].isdigit():
             journal_issue_year = path[2]
+        elif len(path) > 2 and not path[2].isdigit():
+            specific_category = urllib.unquote(path[2])
         if len(path) > 3 and path[3].isdigit():
             journal_issue_number = path[3]
         if len(path) > 4:
@@ -166,12 +169,13 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         if not journal_issue_year or \
            not journal_issue_number or \
            not category or \
-           redirect_p:
+           redirect_p or \
+           specific_category:
             if not journal_issue_year or not journal_issue_number:
                 journal_issue = get_current_issue(argd['ln'], washed_journal_name)
                 journal_issue_year = journal_issue.split('/')[1]
                 journal_issue_number = journal_issue.split('/')[0]
-            if not category:
+            if not category or specific_category:
                 categories = get_journal_categories(washed_journal_name,
                                                     journal_issue_number + \
                                                     '/' + journal_issue_year)
@@ -189,7 +193,10 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                         except InvenioWebJournalIssueNotFoundDBError, e:
                             register_exception(req=req)
                             return e.user_box(req)
-                category = categories[0].replace(' ', '%20')
+                if not category:
+                    category = categories[0].replace(' ', '%20')
+                if specific_category:
+                    category = specific_category.replace(' ', '%20')
             redirect_to_url(req, CFG_SITE_URL + '/journal/%(name)s/%(issue_year)s/%(issue_number)s/%(category)s/?ln=%(ln)s' % \
                             {'name': washed_journal_name,
                              'issue_year': journal_issue_year,

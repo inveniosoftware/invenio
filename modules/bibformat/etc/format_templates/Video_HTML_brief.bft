@@ -1,0 +1,21 @@
+<name>Video HTML brief</name>
+<description></description>
+
+<table width="600px">
+	<tr>
+		<td>
+			<div class="video_brief_container">
+				<div class="video_brief_thumb">
+					<a href="<BFE_RECORD_URL/>"><BFE_VIDEO_BIGTHUMB/></a>
+				</div>
+				<div class="video_brief_info">
+					<strong>
+						<BFE_TITLE prefix="" suffix="" default="" escape="" highlight="no" separator=" "/>
+					</strong>
+					<br/> by <BFE_AUTHORS prefix="" suffix="" default="" escape="" affiliation_suffix=")" extension="[...]" link_author_pages="no" limit="" print_links="yes" separator=" ; " print_affiliations="no" highlight="no" interactive="no" affiliation_prefix=" ("/>
+					<br/> <span class="video_brief_abstract"><BFE_ABSTRACT limit="2"/></span>
+				</div>
+			</div>
+		</td>
+	</tr>
+</table>

@@ -485,6 +485,35 @@ if test -z "$GNUPLOT"; then
    Gnuplot is available from <http://www.gnuplot.info/>.])
 fi
 
+## Check for ffmpeg:
+AC_PATH_PROG(FFMPEG, ffmpeg)
+AC_PATH_PROG(FFPROBE, ffprobe)
+if test -z "$FFMPEG"; then
+   AC_MSG_WARN([
+   FFmpeg was not found in your PATH. It is used by the BibEncode
+   module to for video encoding. 
+   You can continue without but you will not be able to use BibEncode
+   and no video submission workflows are thereby possible.
+   We recommend you to install it first if you would like to support video
+   submissions and to rerun the configure script.
+   FFmpeg is available from <http://www.ffmpeg.org/>.])
+fi
+
+## Check for mediainfo:
+AC_PATH_PROG(MEDIAINFO, mediainfo)
+if test -z "$MEDIAINFO"; then
+   AC_MSG_WARN([
+   Mediainfo was not found in your PATH. It is used by the BibEncode
+   module to for video encoding and media metadata handling. 
+   You can continue without but you will not be able to use BibEncode
+   and no video submission workflows are thereby possible.
+   We recommend you to install it first if you would like to support video
+   submissions and to rerun the configure script.
+   Mediainfo is available from <http://mediainfo.sourceforge.net/>.])
+fi
+
+## Check for ffmpeg
+
 ## Substitute variables:
 AC_SUBST(VERSION)
 AC_SUBST(OPENOFFICE_PYTHON)
@@ -516,6 +545,9 @@ AC_SUBST(CLISP)
 AC_SUBST(CMUCL)
 AC_SUBST(SBCL)
 AC_SUBST(CACHEDIR)
+AC_SUBST(FFMPEG)
+AC_SUBST(MEDIAINFO)
+AC_SUBST(FFPROBE)
 AC_SUBST(localstatedir, `eval echo "${localstatedir}"`)
 
 ## Define output files:
@@ -533,6 +565,8 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibauthorid/doc/hacking/Makefile \
      modules/bibauthorid/lib/Makefile \
      modules/bibauthorid/lib/bibauthorid_comparison_functions/Makefile \
+     modules/bibauthorid/etc/Makefile \
+     modules/bibauthorid/etc/name_authority_files/Makefile \
      modules/bibauthorid/web/Makefile \
      modules/bibcatalog/Makefile \
      modules/bibcatalog/doc/Makefile \
@@ -561,6 +595,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibclassify/doc/Makefile \
      modules/bibclassify/doc/admin/Makefile \
      modules/bibclassify/doc/hacking/Makefile \
+     modules/bibclassify/etc/Makefile \
      modules/bibclassify/lib/Makefile \
      modules/bibconvert/Makefile \
      modules/bibconvert/bin/Makefile \
@@ -583,6 +618,12 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibedit/etc/Makefile \
      modules/bibedit/lib/Makefile \
      modules/bibedit/web/Makefile \
+     modules/bibencode/Makefile \
+     modules/bibencode/bin/Makefile \
+     modules/bibencode/bin/bibencode \
+     modules/bibencode/lib/Makefile \
+     modules/bibencode/etc/Makefile \
+     modules/bibencode/www/Makefile \
      modules/bibexport/Makefile \
      modules/bibexport/bin/Makefile \
      modules/bibexport/bin/bibexport \
@@ -707,6 +748,9 @@ AC_CONFIG_FILES([config.nice  \
      modules/miscutil/etc/Makefile \
      modules/miscutil/etc/bash_completion.d/Makefile \
      modules/miscutil/etc/bash_completion.d/inveniocfg \
+     modules/miscutil/etc/ckeditor_scientificchar/Makefile \
+     modules/miscutil/etc/ckeditor_scientificchar/dialogs/Makefile \
+     modules/miscutil/etc/ckeditor_scientificchar/lang/Makefile \
      modules/miscutil/lib/Makefile \
      modules/miscutil/sql/Makefile \
      modules/miscutil/web/Makefile \

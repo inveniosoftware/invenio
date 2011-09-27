@@ -72,6 +72,7 @@ DEPENDENCIES:
 import cPickle
 import os
 import time
+import cgi
 
 from urllib import urlencode
 
@@ -795,8 +796,8 @@ def create_file_upload_interface(recid,
     restrictions_list = ""
     if len(restrictions_and_desc) > 1:
         restrictions_list = '<select id="fileRestriction" name="fileRestriction">' + \
-                        '\n'.join(['<option value="' + restriction + '">' + \
-                                   description + '</option>' \
+                        '\n'.join(['<option value="' + cgi.escape(restriction, True) + '">' + \
+                                   cgi.escape(description) + '</option>' \
                                    for (restriction, description) \
                                    in restrictions_and_desc]) + \
                         '</select>'
@@ -806,7 +807,10 @@ def create_file_upload_interface(recid,
                              'restriction_help': _('Choose how you want to restrict access to this file.').replace("'", "\\'")}
 
     elif len(restrictions_and_desc) == 1:
-        restrictions_list = '<select style="display:none" id="fileRestriction" name="fileRestriction"><option value="%(restriction)s">%(restriction)s</option></select>' % {'restriction': restrictions_and_desc[0][0]}
+        restrictions_list = '<select style="display:none" id="fileRestriction" name="fileRestriction"><option value="%(restriction_attr)s">%(restriction)s</option></select>' % {
+            'restriction': cgi.escape(restrictions_and_desc[0][0]),
+            'restriction_attr': cgi.escape(restrictions_and_desc[0][0], True)
+        }
     else:
         restrictions_list = '<select style="display:none" id="fileRestriction" name="fileRestriction"></select>'
 
@@ -2242,8 +2246,7 @@ def get_upload_file_interface_javascript(form_url_params):
     interface.
     """
     javascript = '''
-<script type="text/javascript" src="/js/jquery/jquery.min.js"></script>
-<script type="text/javascript" src="/js/jquery/jquery.form.js"></script>
+<script type="text/javascript" src="/js/jquery.form.js"></script>
 <script type="text/javascript">
 <!--
 '''

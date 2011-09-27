@@ -23,8 +23,9 @@ __revision__ = "$Id$"
 ## OAI harvest post-processing
 CFG_OAI_POSSIBLE_POSTMODES = [\
          ["c", "convert (c)"], \
-         ["r", "extract references (r)"], \
          ["p", "extract plots (p)"], \
+         ["r", "extract references (r)"], \
+         ["a", "extract authors (a)"], \
          ["t", "attach full-text (t)"], \
          ["f", "filter (f)"], \
          ["u", "upload (u)"]]

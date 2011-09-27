@@ -178,7 +178,6 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
         graphe_name = "tmp_%s_%s_stats.html" % (kind_of_graphe, recid)
         out = """
               <!--[if IE]><script language="javascript" type="text/javascript" src="%(site)s/js/excanvas.min.js"></script><![endif]-->
-              <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.min.js"></script>
               <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.flot.min.js"></script>
               <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.flot.selection.min.js"></script>
               <script id="source" language="javascript" type="text/javascript">

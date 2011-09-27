@@ -237,6 +237,10 @@ class WashForUTF8Test(unittest.TestCase):
         """textutils - assuring an exception on incorrect input"""
         self.assertRaises(UnicodeDecodeError, wash_for_utf8, "\202\203\204\205", correct=False)
 
+    def test_already_utf8_input(self):
+        """textutils - washing a Unicode string into UTF-8 binary string"""
+        self.assertEqual('Göppert', wash_for_utf8(u'G\xf6ppert', True))
+
 class WrapTextInABoxTest(unittest.TestCase):
     """Test functions related to wrap_text_in_a_box function."""
 

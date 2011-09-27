@@ -3462,7 +3462,7 @@ CREATE TABLE IF NOT EXISTS sbmCOOKIES (
 
 CREATE TABLE IF NOT EXISTS schTASK (
   id int(15) unsigned NOT NULL auto_increment,
-  proc varchar(20) NOT NULL,
+  proc varchar(255) NOT NULL,
   host varchar(255) NOT NULL default '',
   user varchar(50) NOT NULL,
   runtime datetime NOT NULL,
@@ -4002,4 +4002,14 @@ CREATE TABLE IF NOT EXISTS `aidCACHE` (
   INDEX `key-b` (`object_key`),
   INDEX `last_updated-b` (`last_updated`)
 ) ENGINE=MyISAM;
+
+-- refextract tables:
+
+CREATE TABLE IF NOT EXISTS `xtrJOB` (
+  `id` tinyint(4) NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) NOT NULL,
+  `last_updated` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
+
 -- end of file

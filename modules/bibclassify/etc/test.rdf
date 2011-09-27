@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Test HEP taxonomy -->
+
+<rdf:RDF xmlns="http://www.w3.org/2004/02/skos/core#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+
+<rdf:Property rdf:about="http://cern.ch/thesauri/HEPontology.rdf#compositeOf">
+  <rdfs:comment>Expresses a composite keyword relationship to broader concepts.</rdfs:comment>
+  <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#broader"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="http://cern.ch/thesauri/HEPontology.rdf#composite">
+  <rdfs:comment>Expresses the relationship to a composite keyword</rdfs:comment>
+  <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#narrower"/>
+</rdf:Property>
+
+<ConceptScheme rdf:about="http://cern.ch/thesauri/HEPontology.rdf">
+        <dc:creator rdf:resource="http://ceres.ca.gov/"/>
+        <dc:description>This is a first draft of a subject ontology/thesaurus for High Energy Physics using RDF/SKOS syntax
+                        Developed jointly by CERN and DESY labs.</dc:description>
+        <dc:title>HEP ontology</dc:title>
+</ConceptScheme>
+
+<Concept rdf:about="http://cern.ch/thesauri/HEPontology.rdf#0">
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.spin0"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.dimension0"/>
+  <prefLabel xml:lang="en">0</prefLabel>
+  <altLabel xml:lang="en">zero</altLabel>
+  <note xml:lang="en">nostandalone</note>
+</Concept>
+
+
+<Concept rdf:about="http://cern.ch/thesauri/HEPontology.rdf#A2">
+  <prefLabel xml:lang="en">A2</prefLabel>
+  <altLabel xml:lang="en">MAINZ-A1</altLabel>
+  <broader rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#MainzLinac"/>
+</Concept>
+
+<Concept rdf:about="http://cern.ch/thesauri/HEPontology.rdf#a2(1320)">
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.a2(1320)hadronicdecay"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.a2(1320)branchingratio"/>
+  <prefLabel xml:lang="en">a2(1320)</prefLabel>
+  <note xml:lang="en">core</note>
+  <historyNote xml:lang="en">A2(1320)</historyNote>
+  <broader rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#meson"/>
+</Concept>
+
+<Concept rdf:about="http://cern.ch/thesauri/HEPontology.rdf#a3(2050)">
+  <prefLabel xml:lang="en">a3(2050)</prefLabel>
+  <note xml:lang="en">core</note>
+  <historyNote xml:lang="en">A(2050)</historyNote>
+  <broader rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#meson"/>
+</Concept>
+
+<Concept rdf:about="http://cern.ch/thesauri/HEPontology.rdf#a4(2040)">
+  <prefLabel xml:lang="en">a4(2040)</prefLabel>
+  <note xml:lang="en">core</note>
+  <historyNote xml:lang="en">delta(2040)</historyNote>
+  <broader rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#meson"/>
+</Concept>
+
+<Concept rdf:about="http://cern.ch/thesauri/HEPontology.rdf#a6(2450)">
+  <prefLabel xml:lang="en">a6(2450)</prefLabel>
+  <note xml:lang="en">core</note>
+  <historyNote xml:lang="en">delta(2450)</historyNote>
+  <broader rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#meson"/>
+</Concept>
+
+<Concept rdf:about="http://cern.ch/thesauri/HEPontology.rdf#abelian">
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.vortexabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.symmetryabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.stringtensionabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.orbifoldabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.monopoleabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.magneticmonopoleabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.instantonabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.horizontalsymmetryabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.holonomyabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugeabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugefieldtheoryabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.forceabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.fluxtubeabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.fieldtheoryabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.externalfieldabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.dualityabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.differentialformsabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.colorabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.chargeabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.anyonabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.algebraabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.Higgsmodelabelian"/>
+  <prefLabel xml:lang="en">abelian</prefLabel>
+</Concept>
+
+<Concept rdf:about="http://cern.ch/thesauri/HEPontology.rdf#aberration">
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.beamopticsaberration"/>
+  <prefLabel xml:lang="en">aberration</prefLabel>
+</Concept>
+
+<Concept rdf:about="http://cern.ch/thesauri/HEPontology.rdf#absorption">
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.whitedwarfabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.synchrotronradiationabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.showersabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.scalarparticleabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.resonanceabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.radiationabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.quasarabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.quarkoniumabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.psimesonsabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.piabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.pi-absorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.photonabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.photoelectronabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.particleabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.pabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.opticsabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.neutrinoabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.neutrinonucleusabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.nabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.muonabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.modelabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.microwavesabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.massabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.jetabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.hydrogenabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.heliumabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.hadronabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gravitonabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gravitationabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gluonabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.experimentalmethodsabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.energyabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.energyspectrumabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.energylevelsabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.electronabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.darkmatterabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.crosssectionabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.cosmicradiationabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.charmoniumabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.calorimeterabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.beamabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.axionabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.angularmomentumabsorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.absorptionspectrum"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.absorptionsemiclassical"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.absorptionoptical"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.absorptionlength"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.absorptioneffect"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.absorptioncorrection"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.absorptionacoustic"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.absorptionHawking"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.K-absorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.K+absorption"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.J/psi(3100)absorption"/>
+  <prefLabel xml:lang="en">absorption</prefLabel>
+</Concept>
+
+<Concept rdf:about="http://cern.ch/thesauri/HEPontology.rdf#bottom">
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.upsilonmesonsbottom"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.structurefunctionbottom"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.squarkbottom"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.sparticlebottom"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.quarkbottom"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.pentaquarkbottom"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.jetbottom"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.chimesonsbottom"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.bottomtransversemomentum"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.bottomsemileptonicdecay"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.bottomparticleidentification"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.bottommomentumspectrum"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.bottommass"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.bottomfragmentationfunction"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.bottomfragmentation"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.bottomenergyspectrum"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.bottomdecay"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.bottomassociatedproduction"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.bottomangulardistribution"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.antiquarkbottom"/>
+  <prefLabel xml:lang="en">bottom</prefLabel>
+  <altLabel xml:lang="en">b-quark</altLabel>
+  <spiresLabel xml:lang="en">beauty</spiresLabel>
+  <note xml:lang="en">nostandalone</note>
+  <note xml:lang="en">core</note>
+  <broader rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#flavor"/>
+  <narrower rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#bottommeson"/>
+  <narrower rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#bottombaryon"/>
+  <narrower rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#bottomparticle"/>
+</Concept>
+
+<Concept rdf:about="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonnewparticle">
+<prefLabel xml:lang="en">gauge boson: new particle</prefLabel>
+  <compositeOf rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#gaugeboson"/>
+  <compositeOf rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#newparticle"/>
+</Concept>
+
+<Concept rdf:about="http://cern.ch/thesauri/HEPontology.rdf#gaugeboson">
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.rho(770)gaugeboson"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonwidth"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonvertexfunction"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosontransverse"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonscatteringamplitude"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonscattering"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonright-handed"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonrepresentation"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonpropagator"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonproduction"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonpostulatedparticle"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonphotoproduction"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonpairproduction"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonon-shell"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonnewparticle"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonneutralparticle"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonmultiplet"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonmultipleproduction"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonmodel"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonmixingangle"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonmixing"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonmassless"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonmassive"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonmassspectrum"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonmassgeneration"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonmass"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonlongitudinal"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonleptonicdecay"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonheavy"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonhadroproduction"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonfusion"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonexcitedstate"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonexchange"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonemission"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonelectroproduction"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonelasticscattering"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosondilepton"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosondecaymodes"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosondecay"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosoncurrent"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosoncouplingconstant"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosoncoupling"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosoncondensation"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonbranchingratio"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonbilepton"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonassociatedproduction"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonabelian"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonKaluza-Klein"/>
+  <prefLabel xml:lang="en">gauge boson</prefLabel>
+  <note xml:lang="en">core</note>
+  <broader rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#boson"/>
+  <narrower rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#axigluon"/>
+  <narrower rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Z0"/>
+  <narrower rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#W"/>
+  <narrower rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#W'"/>
+  <narrower rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Z'"/>
+  <narrower rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#gluon"/>
+  <narrower rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#graviton"/>
+  <narrower rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#photon"/>
+  <related rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#intermediateboson"/>
+</Concept>
+
+<Concept rdf:about="http://cern.ch/thesauri/HEPontology.rdf#newparticle">
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.newparticlequantumnumber"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.newparticlemass"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.newparticlehadroproduction"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.newparticledecay"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.newparticlecoupling"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.neutralparticlenewparticle"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.leptonnewparticle"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.intermediatebosonnewparticle"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.gaugebosonnewparticle"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.fermionnewparticle"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.correctionnewparticle"/>
+  <composite rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#Composite.charmedmesonnewparticle"/>
+  <prefLabel xml:lang="en">new particle</prefLabel>
+  <note xml:lang="en">core</note>
+  <broader rdf:resource="http://cern.ch/thesauri/HEPontology.rdf#particle"/>
+</Concept>
+
+</rdf:RDF>

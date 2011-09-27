@@ -26,7 +26,8 @@ from invenio.bibmerge_merger import merge_field_group, replace_field, \
                                     add_subfield, replace_subfield, \
                                     delete_subfield, copy_R2_to_R1, merge_record
 from invenio.search_engine import print_record, perform_request_search, \
-                                  get_fieldvalues
+        record_exists
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibedit_utils import cache_exists, cache_expired, \
     create_cache_file, delete_cache_file, get_cache_file_contents, \
     get_cache_mtime, latest_record_revision, record_locked_by_other_user, \
@@ -35,8 +36,8 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     get_record_revision_ids, revision_format_valid_p, split_revid, \
     get_marcxml_of_revision_id
 from invenio.htmlutils import remove_html_markup
-from invenio.search_engine import record_exists
-from invenio.bibrecord import create_record, record_xml_output, record_add_field
+from invenio.bibrecord import create_record, record_xml_output, record_add_field, \
+                              record_order_subfields
 from invenio.bibedit_config import CFG_BIBEDIT_TO_MERGE_SUFFIX
 
 import invenio.template
@@ -146,9 +147,16 @@ def perform_request_record(requestType, uid, data):
             record_add_field(record2, '980', ' ', ' ', '', [('c', 'DELETED')])
             # mark record2 as duplicate of record1
             record_add_field(record2, '970', ' ', ' ', '', [('d', str(recid1))])
+
+            #submit record1
+            xml_record1 = record_xml_output(record1)
+            save_xml_record(recid1, uid, xml_record1)
             #submit record2
-            xml_record = record_xml_output(record2)
-            save_xml_record(recid2, uid, xml_record)
+            xml_record2 = record_xml_output(record2)
+            save_xml_record(recid2, uid, xml_record2)
+
+            result['resultText'] = 'Records submitted'
+            return result
 
         #submit record1
         save_xml_record(recid1, uid)
@@ -375,6 +383,7 @@ def _get_record_slave(recid, result, mode=None, uid=None):
             result['resultCode'], result['resultText'] = 1, 'Record %s locked by queue' % recid
         else:
             record = create_record( print_record(recid, 'xm') )[0]
+            record_order_subfields(record)
 
     elif mode == 'tmpfile':
         file_path = '%s_%s.xml' % (_get_file_path(recid, uid),

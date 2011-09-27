@@ -73,6 +73,16 @@ class TestGetWordsFromPhrase(unittest.TestCase):
         l_words_obtained.sort()
         self.assertEqual(l_words_obtained, l_words_expected)
 
+    def test_stemming_phrase(self):
+        """bibindex engine - getting stemmed words from l'anthropologie"""
+        test_phrase = "l'anthropologie"
+        l_words_not_expected = ['anthropolog', 'l', "l'anthropolog", "l'anthropologi"]
+        l_words_expected = ['anthropologi', 'l', "l'anthropologi"]
+        l_words_obtained = bibindex_engine.get_words_from_phrase(test_phrase, 'en')
+        l_words_obtained.sort()
+        self.assertNotEqual(l_words_obtained, l_words_not_expected)
+        self.assertEqual(l_words_obtained, l_words_expected)
+
     def test_dashed_phrase(self):
         """bibindex engine - getting words from `word1-word2' phrase"""
         test_phrase = 'word1-word2'

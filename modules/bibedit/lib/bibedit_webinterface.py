@@ -37,11 +37,11 @@ else:
 
 from invenio.access_control_engine import acc_authorize_action
 from invenio.bibedit_engine import perform_request_ajax, perform_request_init, \
-    perform_request_newticket, perform_request_compare
-from invenio.bibedit_utils import json_unicode_to_utf8
+    perform_request_newticket, perform_request_compare, \
+    perform_request_init_template_interface, perform_request_ajax_template_interface
+from invenio.bibedit_utils import json_unicode_to_utf8, user_can_edit_record_collection
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_RECORD
 from invenio.messages import gettext_set_language
-from invenio.search_engine import guess_primary_collection_of_a_record
 from invenio.urlutils import redirect_to_url
 from invenio.webinterface_handler import WebInterfaceDirectory, wash_urlargd
 from invenio.webpage import page
@@ -49,12 +49,14 @@ from invenio.webuser import collect_user_info, getUid, page_not_authorized
 
 navtrail = (' <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> '
             ) % CFG_SITE_URL
-
+navtrail_bibedit = (' <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> ' + \
+                    ' &gt; <a class="navtrail" href=\"%s/%s/edit\">Record Editor</a>'
+            ) % (CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_RECORD)
 
 class WebInterfaceEditPages(WebInterfaceDirectory):
     """Defines the set of /edit pages."""
 
-    _exports = ['', 'new_ticket', 'compare_revisions']
+    _exports = ['', 'new_ticket', 'compare_revisions', 'templates']
 
     def __init__(self, recid=None):
         """Initialize."""
@@ -106,8 +108,8 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
             if not ajax_request:
                 # Do not display the introductory recID selection box to guest
                 # users (as it used to be with v0.99.0):
-                auth_code, auth_message = acc_authorize_action(req,
-                                                               'runbibedit')
+                dummy_auth_code, auth_message = acc_authorize_action(req,
+                                                                     'runbibedit')
                 referer = '/edit/'
                 if self.recid:
                     referer = '/%s/%s/edit/' % (CFG_SITE_RECORD, self.recid)
@@ -127,9 +129,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         elif recid is not None:
             json_response.update({'recID': recid})
             # Authorize access to record.
-            auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
-                collection=guess_primary_collection_of_a_record(recid))
-            if auth_code != 0:
+            if not user_can_edit_record_collection(req, recid):
                 json_response.update({'resultCode': 101})
                 return json.dumps(json_response)
 
@@ -214,8 +214,74 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
                 #redirect..
                 redirect_to_url(req, url)
 
+    def templates(self, req, form):
+        """handle a edit/templates request"""
+        uid = getUid(req)
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
+        # Abort if the simplejson module isn't available
+        if not simplejson_available:
+            title = 'Record Editor Template Manager'
+            body = '''Sorry, the record editor cannot operate when the
+                `simplejson' module is not installed.  Please see the INSTALL
+                file.'''
+            return page(title       = title,
+                        body        = body,
+                        errors      = [],
+                        warnings    = [],
+                        uid         = uid,
+                        language    = argd['ln'],
+                        navtrail    = navtrail_bibedit,
+                        lastupdated = __lastupdated__,
+                        req         = req)
+
+        # If it is an Ajax request, extract any JSON data.
+        ajax_request = False
+        if form.has_key('jsondata'):
+            json_data = json.loads(str(form['jsondata']))
+            # Deunicode all strings (Invenio doesn't have unicode
+            # support).
+            json_data = json_unicode_to_utf8(json_data)
+            ajax_request = True
+            json_response = {'resultCode': 0}
+
+        # Authorization.
+        user_info = collect_user_info(req)
+        if user_info['email'] == 'guest':
+            # User is not logged in.
+            if not ajax_request:
+                # Do not display the introductory recID selection box to guest
+                # users (as it used to be with v0.99.0):
+                dummy_auth_code, auth_message = acc_authorize_action(req,
+                                                                     'runbibedit')
+                referer = '/edit'
+                return page_not_authorized(req=req, referer=referer,
+                                           text=auth_message, navtrail=navtrail)
+            else:
+                # Session has most likely timed out.
+                json_response.update({'resultCode': 100})
+                return json.dumps(json_response)
+        # Handle request.
+        if not ajax_request:
+            # Show BibEdit template management start page.
+            body, errors, warnings = perform_request_init_template_interface()
+            title = 'Record Editor Template Manager'
+            return page(title       = title,
+                        body        = body,
+                        errors      = errors,
+                        warnings    = warnings,
+                        uid         = uid,
+                        language    = argd['ln'],
+                        navtrail    = navtrail_bibedit,
+                        lastupdated = __lastupdated__,
+                        req         = req)
+        else:
+            # Handle AJAX request.
+            json_response.update(perform_request_ajax_template_interface(json_data))
+            return json.dumps(json_response)
+
     def __call__(self, req, form):
         """Redirect calls without final slash."""
+
         if self.recid:
             redirect_to_url(req, '%s/%s/%s/edit/' % (CFG_SITE_URL,
                                                          CFG_SITE_RECORD,

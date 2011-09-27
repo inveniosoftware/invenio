@@ -48,4 +48,9 @@ CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA = ['superadmin']
 # Exceptions: errors
 class InvenioWebMessageError(Exception):
     """A generic error for WebMessage."""
-    pass
+    def __init__(self, message):
+        """Initialisation."""
+        self.message = message
+    def __str__(self):
+        """String representation."""
+        return repr(self.message)

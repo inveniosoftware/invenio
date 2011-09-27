@@ -62,7 +62,8 @@ from invenio.config import \
      CFG_WEBSEARCH_WILDCARD_LIMIT, \
      CFG_WEBSEARCH_SHOW_COMMENT_COUNT, \
      CFG_WEBSEARCH_SHOW_REVIEW_COUNT, \
-     CFG_SITE_RECORD
+     CFG_SITE_RECORD, \
+     CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT
 
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
@@ -70,41 +71,24 @@ from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, creat
 from invenio.htmlutils import nmtoken_from_string
 from invenio.webinterface_handler import wash_urlargd
 from invenio.bibrank_citation_searcher import get_cited_by_count
+from invenio.webuser import session_param_get, session_param_set
 
 from invenio.intbitset import intbitset
 
 from invenio.websearch_external_collections import external_collection_get_state, get_external_collection_engine
 from invenio.websearch_external_collections_utils import get_collection_id
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
+from invenio.search_engine_utils import get_fieldvalues
 
 _RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
 _RE_SPACES = re.compile(r"\s+")
-
-def get_fieldvalues(recID, tag):
-    """Return list of field values for field TAG inside record RECID.
-       FIXME: should be imported commonly for search_engine too."""
-    out = []
-    if tag == "001___":
-        # we have asked for recID that is not stored in bibXXx tables
-        out.append(str(recID))
-    else:
-        # we are going to look inside bibXXx tables
-        digit = tag[0:2]
-        bx = "bib%sx" % digit
-        bibx = "bibrec_bib%sx" % digit
-        query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND bx.tag LIKE '%s'" \
-                "ORDER BY bibx.field_number, bx.tag ASC" % (bx, bibx, recID, tag)
-        res = run_sql(query)
-        for row in res:
-            out.append(row[0])
-    return out
-
 
 class Template:
 
     # This dictionary maps Invenio language code to locale codes (ISO 639)
     tmpl_localemap = {
         'bg': 'bg_BG',
+        'ar': 'ar_AR',
         'ca': 'ca_ES',
         'de': 'de_DE',
         'el': 'el_GR',
@@ -3688,7 +3672,115 @@ class Template:
         ## unAPI identifier
         out = '<abbr class="unapi-id" title="%s"></abbr>\n' % recID
         out += content
+        return out
 
+    def tmpl_display_back_to_search(self, req, recID, ln):
+        """ Displays the next-hit/previous-hit/back-to-search links
+            on the detailed record pages in order to be able to quickly
+            flip between detailed record pages
+
+          @param req: request as received from apache
+          @param recID: ID of the detailed record
+          @param ln: language of the page
+          @return: html output """
+
+        _ = gettext_set_language(ln)
+        try:
+            wlq = session_param_get(req, 'websearch-last-query')
+        # displayed concrete record having not done any search before
+        except KeyError:
+            wlq = ''
+            return ''
+        try:
+            wlqh = session_param_get(req, 'websearch-last-query-hits')
+        # displayed concrete record having not done any search before
+        except KeyError:
+            wlqh = []
+            return ''
+
+        # displayed concrete record or excedeed
+        # limit CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT,
+        # then display record without previous/next/back links
+        if wlqh == []:
+            return ''
+        else:
+            record_found = 0
+            for coll in range(len(wlqh)):
+                if recID in wlqh[coll]:
+                    record_found = 1
+                    coll_recID = coll
+                    break
+
+            # record recID belongs to one collection stored
+            if record_found:
+                if len(wlqh[coll_recID]) > 1:
+                    wlqh[coll_recID].reverse()
+                recIDs = wlqh[coll_recID]
+                totalrec = len(recIDs)
+            # display concrete record or excedeed
+            # limit CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT,
+            # then display record without previous/next/back links
+            else:
+                return ''
+
+        out = '''<br/><br/><div align="right">'''
+        # if there is only one hit,
+        # show only the "back" option
+        if totalrec == 1:
+            # go back to the last search results page
+            out += '''<div style="padding-bottom:2px;"><span class="moreinfo" style="margin-right:10px;">
+                        %(back)s </span></div></div><br/>''' % {
+                    'back': create_html_link(wlq, {}, _("Back to search"), {'class': "moreinfo"})}
+        elif totalrec > 1:
+            pos = recIDs.index(recID)
+            numrec = pos + 1
+            if pos == 0:
+                recIDnext = recIDs[pos + 1]
+                recIDlast = recIDs[totalrec - 1]
+                # show only next and last options
+                out += '''<div><span class="moreinfo" style="margin-right:10px;">
+                                    %(numrec)s %(totalrec)s %(next)s %(last)s </span></div> ''' % {
+                                'numrec': _("%s of") % ('<strong>' + self.tmpl_nice_number(numrec, ln) + '</strong>'),
+                                'totalrec': ("%s") % ('<strong>' + self.tmpl_nice_number(totalrec, ln) + '</strong>'),
+                                'next': create_html_link(self.build_search_url(recid=recIDnext, ln=ln),
+                                        {}, ('<font size="4">&rsaquo;</font>'), {'class': "moreinfo"}),
+                                'last': create_html_link(self.build_search_url(recid=recIDlast, ln=ln),
+                                        {}, ('<font size="4">&raquo;</font>'), {'class': "moreinfo"})}
+            elif pos == totalrec - 1:
+                recIDfirst = recIDs[0]
+                recIDprev = recIDs[pos - 1]
+                # show only first and previous potions
+                out += '''<div><span class="moreinfo" style="margin-right:10px;">
+                                    %(first)s %(previous)s %(numrec)s %(totalrec)s</span></div>''' % {
+                                'first': create_html_link(self.build_search_url(recid=recIDfirst, ln=ln),
+                                            {}, ('<font size="4">&laquo;</font>'), {'class': "moreinfo"}),
+                                'previous': create_html_link(self.build_search_url(recid=recIDprev, ln=ln),
+                                            {}, ('<font size="4">&lsaquo;</font>'), {'class': "moreinfo"}),
+                                'numrec': _("%s of") % ('<strong>' + self.tmpl_nice_number(numrec, ln) + '</strong>'),
+                                'totalrec': ("%s") % ('<strong>' + self.tmpl_nice_number(totalrec, ln) + '</strong>')}
+            else:
+                recIDfirst = recIDs[0]
+                recIDprev = recIDs[pos - 1]
+                recIDnext = recIDs[pos + 1]
+                recIDlast = recIDs[len(recIDs) - 1]
+                out += '''<div><span class="moreinfo" style="margin-right:10px;">
+                                    %(first)s %(previous)s
+                                    %(numrec)s %(totalrec)s %(next)s %(last)s </span></div>''' % {
+                                'first': create_html_link(self.build_search_url(recid=recIDfirst, ln=ln),
+                                            {}, ('<font size="4">&laquo;</font>'),
+                                            {'class': "moreinfo"}),
+                                'previous': create_html_link(self.build_search_url(recid=recIDprev, ln=ln),
+                                            {}, ('<font size="4">&lsaquo;</font>'), {'class': "moreinfo"}),
+                                'numrec': _("%s of") % ('<strong>' + self.tmpl_nice_number(numrec, ln) + '</strong>'),
+                                'totalrec': ("%s") % ('<strong>' + self.tmpl_nice_number(totalrec, ln) + '</strong>'),
+                                'next': create_html_link(self.build_search_url(recid=recIDnext, ln=ln),
+                                            {}, ('<font size="4">&rsaquo;</font>'), {'class': "moreinfo"}),
+                                'last': create_html_link(self.build_search_url(recid=recIDlast, ln=ln),
+                                            {}, ('<font size="4">&raquo;</font>'), {'class': "moreinfo"})}
+            # go back to the last search results page
+            out += '''<div style="padding-bottom:2px;"><span class="moreinfo" style="margin-right:10px;">
+                        %(back)s </span></div></div>''' % {
+                    'back': create_html_link(wlq, {}, _("Back to search"), {'class': "moreinfo"})}
         return out
 
     def tmpl_record_plots(self, recID, ln):
@@ -4181,7 +4273,7 @@ class Template:
             #req.write("<h1>%s</h1>" % (authorname))
 
         if person_link:
-            cmp_link = ('<div><a href="%s/person/%s?open_claim=True">%s</a></div>'
+            cmp_link = ('<div><a href="%s/person/claimstub?person=%s">%s</a></div>'
                       % (CFG_SITE_URL, person_link,
                          _("This is me.  Verify my publication list.")))
             if return_html:

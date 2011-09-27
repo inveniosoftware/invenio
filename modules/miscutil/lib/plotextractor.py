@@ -27,11 +27,11 @@ from invenio.shellutils import run_shell_command, Timeout, run_process_with_time
 from invenio.invenio_connector import InvenioConnector
 from invenio.textutils import wrap_text_in_a_box, \
                               wait_for_user
-from invenio.config import CFG_TMPDIR, CFG_SITE_URL
-from invenio.plotextractor_config import CFG_PLOTEXTRACTOR_DISALLOWED_TEX, \
-                                         CFG_PLOTEXTRACTOR_CONTEXT_WORD_LIMIT, \
-                                         CFG_PLOTEXTRACTOR_CONTEXT_SENTENCE_LIMIT, \
-                                         CFG_PLOTEXTRACTOR_CONTEXT_EXTRACT_LIMIT
+from invenio.config import CFG_TMPDIR, CFG_SITE_URL, \
+                           CFG_PLOTEXTRACTOR_DISALLOWED_TEX, \
+                           CFG_PLOTEXTRACTOR_CONTEXT_WORD_LIMIT, \
+                           CFG_PLOTEXTRACTOR_CONTEXT_SENTENCE_LIMIT, \
+                           CFG_PLOTEXTRACTOR_CONTEXT_EXTRACT_LIMIT
 from invenio.bibtask import task_low_level_submission
 from invenio.plotextractor_getter import get_list_of_all_matching_files, \
                                          parse_and_download, \

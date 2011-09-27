@@ -33,7 +33,7 @@ from invenio.config import CFG_SITE_NAME
 from invenio.config import CFG_INSPIRE_SITE
 #from invenio.config import CFG_SITE_SECURE_URL
 from invenio.webpage import page, pageheaderonly, pagefooteronly
-from invenio.messages import gettext_set_language, wash_language
+from invenio.messages import gettext_set_language #, wash_language
 from invenio.template import load
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.session import get_session
@@ -43,7 +43,8 @@ from invenio.webuser import email_valid_p, emailUnique
 from invenio.webuser import get_email_from_username, get_uid_from_email, isUserSuperAdmin
 from invenio.access_control_admin import acc_find_user_role_actions
 from invenio.access_control_admin import acc_get_user_roles, acc_get_role_id
-from invenio.search_engine import perform_request_search, get_fieldvalues, sort_records
+from invenio.search_engine import perform_request_search, sort_records
+from invenio.search_engine_utils import get_fieldvalues
 
 import invenio.bibauthorid_webapi as webapi
 import invenio.bibauthorid_config as bconfig
@@ -81,8 +82,9 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         /person/search
         /person/you -> /person/<string>
         /person/export
+        /person/claimstub
     """
-    _exports = ['', 'action', 'welcome', 'search', 'you', 'export', 'tickets_admin']
+    _exports = ['', 'action', 'welcome', 'search', 'you', 'export', 'tickets_admin', 'claimstub']
 
 
     def __init__(self, person_id=None):
@@ -175,13 +177,19 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                                    'verbose': (int, 0),
                                    'ticketid': (int, -1),
                                    'open_claim': (str, None)})
-        ln = wash_language(argd['ln'])
+
+        ln = argd['ln']
+        # ln = wash_language(argd['ln'])
 
         rt_ticket_id = argd['ticketid']
         req.argd = argd #needed for perform_req_search
         session = get_session(req)
         ulevel = self.__get_user_role(req)
         uid = getUid(req)
+
+        if self.person_id < 0:
+            return redirect_to_url(req, "%s/person/search" % (CFG_SITE_URL))
+
         if isUserSuperAdmin({'uid': uid}):
             ulevel = 'admin'
 
@@ -554,14 +562,14 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         if len(pendingt) == 0:
             box = ""
         else:
-            box = TEMPLATE.tmpl_ticket_box(teaser, message, "")
+            box = TEMPLATE.tmpl_ticket_box(teaser, message)
 
         if len(donet) > 0:
             teaser = 'Success!'
             if len(donet) == 1:
-                message = str(len(donet)) + ' transaction succesfully executed.'
+                message = str(len(donet)) + ' transaction successfully executed.'
             else:
-                message = str(len(donet)) + ' transactions succesfully executed.'
+                message = str(len(donet)) + ' transactions successfully executed.'
 
             box = box + TEMPLATE.tmpl_notification_box(message, teaser)
         return box
@@ -735,13 +743,13 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                                                                   'b_to_others': _('It\'s not mine, but I know whose it is!'),
                                                                   'b_forget': _('Forget decision')},
                                                  'record_undecided': {'alt_confirm': _('Mine!'),
-                                                                     'confirm_text': _('This is my record!'),
+                                                                     'confirm_text': _('This is my paper!'),
                                                                      'alt_repeal': _('Not mine!'),
                                                                      'repeal_text': _('This is not my paper!'),
                                                                      'to_other_text': _('Assign to another person'),
                                                                      'alt_to_other': _('To other person!')},
                                                  'record_confirmed': {'alt_confirm': _('Not Mine.'),
-                                                                       'confirm_text': _('Marked as my record!'),
+                                                                       'confirm_text': _('Marked as my paper!'),
                                                                        'alt_forget': _('Forget decision!'),
                                                                        'forget_text': _('Forget assignment decision'),
                                                                        'alt_repeal': _('Not Mine!'),
@@ -749,11 +757,11 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                                                                        'to_other_text': _('Assign to another person'),
                                                                        'alt_to_other': _('To other person!')},
                                                  'record_repealed': {'alt_confirm': _('Mine!'),
-                                                                    'confirm_text': _('But this is my record!'),
+                                                                    'confirm_text': _('But this is my paper!'),
                                                                     'alt_forget': _('Forget decision!'),
                                                                     'forget_text': _('Forget decision!'),
                                                                     'alt_repeal': _('Not Mine!'),
-                                                                    'repeal_text': _('Marked as not your record.'),
+                                                                    'repeal_text': _('Marked as not your paper.'),
                                                                      'to_other_text': _('Assign to another person'),
                                                                      'alt_to_other': _('To other person!')}}
         else:
@@ -767,7 +775,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                                  'data_ns': _('Additional Data for this Person')}
             buttons_verbiage_dict = {'mass_buttons': {'no_doc_string': _('Sorry, there are currently no documents to be found in this category.'),
                                                   'b_confirm': _('Yes, those papers are by this person.'),
-                                                  'b_repeal': _('No, those papers are not< by this person'),
+                                                  'b_repeal': _('No, those papers are not by this person'),
                                                   'b_to_others': _('Assign to other person'),
                                                   'b_forget': _('Forget decision')},
                                  'record_undecided': {'alt_confirm': _('Confirm!'),
@@ -1017,23 +1025,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         Takes care of the ticket  when in administrator mode
 
         '''
-        session = get_session(req)
-        uid = getUid(req)
-        pinfo = session["personinfo"]
-#        ulevel = pinfo["ulevel"]
-        ticket = pinfo["ticket"]
-        bibref_check_required = self._ticket_review_bibref_check(req)
-
-        if bibref_check_required:
-            return bibref_check_required
-
-        for t in ticket:
-            t['status'] = webapi.check_transaction_permissions(uid,
-                                                               t['bibref'],
-                                                               t['pid'],
-                                                               t['action'])
-        session.save()
-        return self._ticket_final_review(req)
+        return self._ticket_dispatch_user(req)
 
 
     def _ticket_review_bibref_check(self, req):
@@ -1044,7 +1036,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         session = get_session(req)
         pinfo = session["personinfo"]
         ticket = pinfo["ticket"]
-        needs_review = []
 
         if 'ln' in pinfo:
             ln = pinfo["ln"]
@@ -1056,20 +1047,19 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         if ("bibref_check_required" in pinfo and pinfo["bibref_check_required"]
             and "bibref_check_reviewed_bibrefs" in pinfo):
 
-            if pinfo["bibref_check_reviewed_bibrefs"]:
-                for rbibreft in pinfo["bibref_check_reviewed_bibrefs"]:
-                    if not rbibreft.count("||") or not rbibreft.count(","):
-                        continue
+            for rbibreft in pinfo["bibref_check_reviewed_bibrefs"]:
+                if not rbibreft.count("||") or not rbibreft.count(","):
+                    continue
 
-                    rpid, rbibref = rbibreft.split("||")
-                    rrecid = rbibref.split(",")[1]
-                    rpid = webapi.wash_integer_id(rpid)
+                rpid, rbibref = rbibreft.split("||")
+                rrecid = rbibref.split(",")[1]
+                rpid = webapi.wash_integer_id(rpid)
 
-                    for ticket_update in [row for row in ticket
-                                          if (row['bibref'] == str(rrecid) and
-                                              row['pid'] == rpid)]:
-                        ticket_update["bibref"] = rbibref
-                        del(ticket_update["incomplete"])
+                for ticket_update in [row for row in ticket
+                                      if (row['bibref'] == str(rrecid) and
+                                          row['pid'] == rpid)]:
+                    ticket_update["bibref"] = rbibref
+                    del(ticket_update["incomplete"])
 
             for ticket_remove in [row for row in ticket
                                   if ('incomplete' in row)]:
@@ -1090,6 +1080,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         else:
             bibrefs_auto_assigned = {}
             bibrefs_to_confirm = {}
+            needs_review = []
 
 #            if ("bibrefs_auto_assigned" in pinfo
 #                 and pinfo["bibrefs_auto_assigned"]):
@@ -1175,6 +1166,12 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                 pinfo["bibref_check_required"] = False
 
             session.save()
+
+            if 'external_first_entry' in pinfo and pinfo['external_first_entry']:
+                del(pinfo["external_first_entry"])
+                pinfo['external_first_entry_skip_review'] = True
+                session.save()
+                return "" # don't bother the user the first time
 
             body = TEMPLATE.tmpl_bibref_check(bibrefs_auto_assigned,
                                           bibrefs_to_confirm)
@@ -1265,6 +1262,11 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             if row["status"] in ["denied", "warning_granted",
                                  "warning_denied"]]:
             skip_checkout_page = False
+
+        if 'external_first_entry_skip_review' in pinfo and pinfo['external_first_entry_skip_review']:
+            del(pinfo["external_first_entry_skip_review"])
+            skip_checkout_page = True
+            session.save()
 
         if (not ticket or skip_checkout_page
             or ("checkout_confirmed" in pinfo
@@ -1387,8 +1389,12 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                                                     userinfo['uid-ip'], str(userinfo))
                 ok_tickets.append(t)
                 ticket.remove(t)
-            else:
-                webapi.create_request_ticket(userinfo, ticket)
+
+        if ticket:
+            webapi.create_request_ticket(userinfo, ticket)
+
+        if CFG_INSPIRE_SITE and ok_tickets:
+            webapi.send_user_commit_notification_email(userinfo, ok_tickets)
 
         for t in ticket:
             t['execution_result'] = True
@@ -1493,7 +1499,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         elif user_role_id in user_roles:
             role = 'user'
 
-        if webapi.is_external_user(uid):
+        if role == 'guest' and webapi.is_external_user(uid):
             role = 'user'
 
         return role
@@ -1648,7 +1654,8 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
              'set_canonical_name': (str, None),
              'canonical_name': (str, None)})
 
-        ln = wash_language(argd['ln'])
+        ln = argd['ln']
+        # ln = wash_language(argd['ln'])
         pid = None
         action = None
         bibrefs = None
@@ -1927,7 +1934,9 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                 return self._error_page(req, ln,
                         "Fatal: cannot set a custom canonical name without a suggestion")
 
-            webapi.update_person_canonical_name(pid, cname)
+            uid = getUid(req)
+            userinfo = "%s||%s" % (uid, req.remote_ip)
+            webapi.update_person_canonical_name(pid, cname, userinfo)
 
             return redirect_to_url(req, "/person/%s" % webapi.get_person_redirect_link(pid))
 
@@ -2217,7 +2226,8 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
              'verbose': (int, 0),
              'q': (str, None)})
 
-        ln = wash_language(argd['ln'])
+        ln = argd['ln']
+        # ln = wash_language(argd['ln'])
         query = None
         recid = None
         nquery = None
@@ -2237,19 +2247,21 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             if query.count(":"):
                 try:
                     left, right = query.split(":")
-                except ValueError:
-                    pass
-
-                try:
-                    recid = int(left)
-                    nquery = str(right)
-                except (ValueError, TypeError):
                     try:
-                        recid = int(right)
-                        nquery = str(left)
+                        recid = int(left)
+                        nquery = str(right)
                     except (ValueError, TypeError):
-                        recid = None
-                        nquery = query
+                        try:
+                            recid = int(right)
+                            nquery = str(left)
+                        except (ValueError, TypeError):
+                            recid = None
+                            nquery = query
+                except ValueError:
+                    recid = None
+                    nquery = query
+
+
 
             else:
                 nquery = query
@@ -2274,7 +2286,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                     continue
 
                 authors.append([results[0], results[1],
-                                authorpapers[0:max_num_show_papers]])
+                                authorpapers[0:max_num_show_papers], len(authorpapers)])
 
             search_results = authors
 
@@ -2294,6 +2306,52 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                     language=ln)
 
 
+    def claimstub(self, req, form):
+        '''
+        Generate stub page before claiming process
+
+        @param req: Apache request object
+        @type req: Apache request object
+        @param form: GET/POST request params
+        @type form: dict
+        '''
+        argd = wash_urlargd(
+            form,
+            {'ln': (str, CFG_SITE_LANG),
+             'person': (str, '')})
+
+        ln = argd['ln']
+        # ln = wash_language(argd['ln'])
+        _ = gettext_set_language(ln)
+
+        person = '-1'
+        if 'person' in argd and argd['person']:
+            person = argd['person']
+
+        session = get_session(req)
+        try:
+            pinfo = session["personinfo"]
+            if pinfo['ulevel'] == 'admin':
+                return redirect_to_url(req, '%s/person/%s?open_claim=True' % (CFG_SITE_URL, person))
+        except KeyError:
+            pass
+
+        if bconfig.BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE:
+            return redirect_to_url(req, '%s/person/%s?open_claim=True' % (CFG_SITE_URL, person))
+
+        body = TEMPLATE.tmpl_claim_stub(person)
+
+        pstr = 'Person ID missing or invalid'
+        if person != '-1':
+            pstr = person
+        title = _('You are going to claim papers for: %s' % pstr)
+
+        return page(title=title,
+                    metaheaderadd=self._scripts(kill_browser_cache=True),
+                    body=body,
+                    req=req,
+                    language=ln)
+
     def welcome(self, req, form):
         '''
         Generate SSO landing/welcome page
@@ -2309,7 +2367,8 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             form,
             {'ln': (str, CFG_SITE_LANG)})
 
-        ln = wash_language(argd['ln'])
+        ln = argd['ln']
+        # ln = wash_language(argd['ln'])
         _ = gettext_set_language(ln)
 
         if uid == 0:
@@ -2347,7 +2406,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         req.write(TEMPLATE.tmpl_welcome_end())
         req.write(pagefooteronly(req=req))
 
-
     def tickets_admin(self, req, form):
         '''
         Generate SSO landing/welcome page
@@ -2380,7 +2438,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                     body=body,
                     req=req)
 
-
     def export(self, req, form):
         '''
         Generate JSONized export of Person data
@@ -2399,8 +2456,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         if not JSON_OK:
             return "500_json_not_found__install_package"
 
-#        session = get_session(req)
-#        ln = wash_language(argd['ln'])
+        # session = get_session(req)
         request = None
         userid = None
 

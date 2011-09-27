@@ -30,6 +30,7 @@ from bibauthorid_virtualauthor_utils import get_virtualauthor_records
 from bibauthorid_authorname_utils import get_name_and_db_name_strings
 from math import exp
 import bibauthorid_config as bconfig
+import bibauthorid_structs as dat
 
 # NAME: Defines the name of the module for display purposes. [A-Za-z0-9 \-_]
 MODULE_NAME = "Coauthor Comparison"
@@ -86,6 +87,11 @@ def get_information_from_dataset(va_id, ra_id= -1):
         collaboration
     @rtype: True if ra_id > -1 or list of strings or string
     '''
+    src = "MEM"
+
+    if bconfig.STANDALONE or dat.RUNTIME_CONFIG["populate_aid_from_personid"]:
+        src = "API"
+
     va_data = get_virtualauthor_records(va_id)
     bibrec_id = ""
     authorname_id = -1
@@ -103,7 +109,8 @@ def get_information_from_dataset(va_id, ra_id= -1):
 
     coauthors = get_field_values_on_condition(
                                         bibrec_id, ['100', '700'], 'a', 'a',
-                                        authorname_strings["db_name"], "!=")
+                                        authorname_strings["db_name"], "!=",
+                                        source=src)
 
     collaboration = get_field_values_on_condition(bibrec_id, "710", "g")
 

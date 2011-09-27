@@ -44,7 +44,8 @@ from invenio.config import CFG_SITE_NAME, \
 
 from invenio.mailutils import send_email
 from invenio.access_control_admin import acc_get_role_id, acc_get_role_users
-from invenio.search_engine import search_pattern, get_fieldvalues
+from invenio.search_engine import search_pattern
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.dbquery import run_sql
 
 #Copied from publiline

@@ -830,7 +830,7 @@ class Template:
 
         if msg is "":
             out = "<p>%(please_login)s</p>" % {
-                    'please_login' : _("If you already have an account, please login using the form below.")
+                    'please_login' : cgi.escape(_("If you already have an account, please login using the form below."))
                 }
 
             if CFG_CERN_SITE:
@@ -845,7 +845,7 @@ class Template:
                     # how to get one, or be silent about register
                     # facility if account level is more than 4:
                     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 5:
-                        out += "<p>" + _("If you don't own an account yet, please contact %s.") % ('<a href="mailto:%s">%s</a>' % (CFG_SITE_SUPPORT_EMAIL, CFG_SITE_SUPPORT_EMAIL)) + "</p>"
+                        out += "<p>" + _("If you don't own an account yet, please contact %s.") % ('<a href="mailto:%s">%s</a>' % (cgi.escape(CFG_SITE_SUPPORT_EMAIL, True), cgi.escape(CFG_SITE_SUPPORT_EMAIL))) + "</p>"
 
         else:
             out = "<p>%s</p>" % msg
@@ -859,7 +859,7 @@ class Template:
             login_select = """<select name="login_method" id="login_method">"""
             for method in methods:
                 login_select += """<option value="%(method)s" %(selected)s>%(method)s</option>""" % {
-                                  'method' : method,
+                                  'method' : cgi.escape(method, True),
                                   'selected' : (method == selected_method and 'selected="selected"' or "")
                                 }
             login_select += "</select>"
@@ -868,12 +868,12 @@ class Template:
                       <td align="right"><strong><label for="login_method">%(login_title)s</label></strong></td>
                       <td>%(login_select)s</td>
                    </tr>""" % {
-                     'login_title' : _("Login method:"),
-                     'login_select' : login_select,
+                     'login_title' : cgi.escape(_("Login method:")),
+                     'login_select' : cgi.escape(login_select),
                    }
         else:
             # only one login method available
-            out += """<input type="hidden" name="login_method" value="%s" />""" % (methods[0])
+            out += """<input type="hidden" name="login_method" value="%s" />""" % cgi.escape(methods[0], True)
 
         out += """<tr>
                    <td align="right">
@@ -893,25 +893,25 @@ class Template:
                   <tr>
                    <td></td>
                    <td align="center" colspan="3"><code class="blocknote"><input class="formbutton" type="submit" name="action" value="%(login)s" /></code>""" % {
-                       'ln': ln,
-                       'referer' : cgi.escape(referer),
-                       'username' : _("Username"),
-                       'password' : _("Password"),
-                       'remember_me' : _("Remember login on this computer."),
-                       'login' : _("login"),
+                       'ln': cgi.escape(ln, True),
+                       'referer' : cgi.escape(referer, True),
+                       'username' : cgi.escape(_("Username")),
+                       'password' : cgi.escape(_("Password")),
+                       'remember_me' : cgi.escape(_("Remember login on this computer.")),
+                       'login' : cgi.escape(_("login")),
                        }
         if internal:
             out += """&nbsp;&nbsp;&nbsp;(<a href="./lost?ln=%(ln)s">%(lost_pass)s</a>)""" % {
-                     'ln' : ln,
-                     'lost_pass' : _("Lost your password?")
+                     'ln' : cgi.escape(ln, True),
+                     'lost_pass' : cgi.escape(_("Lost your password?"))
                    }
         out += """</td>
                     </tr>
                   </table></form>"""
 
         out += """<p><strong>%(note)s:</strong> %(note_text)s</p>""" % {
-               'note' : _("Note"),
-               'note_text': _("You can use your nickname or your email address to login.")}
+               'note' : cgi.escape(_("Note")),
+               'note_text': cgi.escape(_("You can use your nickname or your email address to login."))}
 
         return out
 
@@ -1370,32 +1370,6 @@ class Template:
 
     def tmpl_warning(self, warnings, ln=CFG_SITE_LANG):
         """
-        Prepare the warnings list
-        @param warnings: list of warning tuples (warning_msg, arg1, arg2, etc)
-        @return: html string of warnings
-        """
-        from invenio.errorlib import get_msgs_for_code_list
-        span_class = 'important'
-        out = ""
-        if type(warnings) is not list:
-            warnings = [warnings]
-        if len(warnings) > 0:
-            warnings_parsed = get_msgs_for_code_list(warnings, 'warning', ln)
-            for (warning_code, warning_text) in warnings_parsed:
-                if not warning_code.startswith('WRN'):
-                    #display only warnings that begin with WRN to user
-                    continue
-                span_class = 'important'
-                out += '''
-                    <span class="%(span_class)s">%(warning)s</span><br />''' % \
-                    {   'span_class'    :   span_class,
-                        'warning'       :   warning_text         }
-            return out
-        else:
-            return ""
-
-    def tmpl_warnings(self, warnings, ln=CFG_SITE_LANG):
-        """
         Display len(warnings) warning fields
         @param infos: list of strings
         @param ln=language
@@ -1414,6 +1388,22 @@ class Template:
                 warningbox += lines[-1] + "  </p>"
             warningbox += "</div><br />\n"
         return warningbox
+
+    def tmpl_error(self, error, ln=CFG_SITE_LANG):
+        """
+        Display error
+        @param error: string
+        @param ln=language
+        @return: html output
+        """
+        _ = gettext_set_language(ln)
+        errorbox = ""
+        if error != "":
+            errorbox = "<div class=\"errorbox\">\n  <b>Error:</b>\n"
+            errorbox += "  <p>"
+            errorbox += error + "  </p>"
+            errorbox += "</div><br />\n"
+        return errorbox
 
     def tmpl_display_all_groups(self,
                                 infos,

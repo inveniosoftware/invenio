@@ -108,7 +108,7 @@ well-structured, subject thesauri expressed in the RDF/SKOS language.</p>
 
 <p>A detailed account of the phrase matching mechanisms used by BibClassify is
 included in the
-<a href="<CFG_SITE_URL>/help/hacking/bibclassify-internals">hacking guide</a>.</p>
+<a href="<CFG_SITE_URL>/help/hacking/bibclassify/">hacking guide</a>.</p>
 
 <a name="2"></a><h2>2. Running BibClassify</h2>
 

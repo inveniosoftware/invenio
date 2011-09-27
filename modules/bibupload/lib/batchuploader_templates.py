@@ -102,8 +102,7 @@ class Template:
                 }
             }
         </script>
-        <script type="text/javascript" src="%(site_url)s/js/jquery/jquery.min.js"></script>
-        <script type="text/javascript" src="%(site_url)s/js/jquery/jquery.ui.datepicker.min.js"></script>
+        <script type="text/javascript" src="%(site_url)s/js/ui.datepicker.min.js"></script>
         """ % {'site_url':CFG_SITE_URL}
 
         return styles
@@ -165,6 +164,7 @@ class Template:
             <option %(mode_sel3)s>--correct</option>
             <option %(mode_sel4)s>--append</option>
             <option %(mode_sel5)s>-ir insert-or-replace</option>
+            <option %(mode_sel6)s>--delete</option>
         </select>
     <a href="%(site_url)s/help/admin/bibupload-admin-guide#3.3" target="_blank"><img class="img_link" src="/img/help.png" title="Upload mode help"></a>
     </div>
@@ -199,6 +199,7 @@ class Template:
         'mode_sel3': mode == '--correct' and "selected" or "",
         'mode_sel4': mode == '--append' and "selected" or "",
         'mode_sel5': mode == '-ir insert-or-replace' and "selected" or "",
+        'mode_sel6': mode == '--delete' and "selected" or "",
         'site_url': CFG_SITE_URL,
         'submit_date': cgi.escape(submit_date),
         'submit_time': cgi.escape(submit_time)}
@@ -362,8 +363,8 @@ class Template:
         <span class="italics">%(txt2)s: /afs/cern.ch/user/j/user/public/foo/</span></div>
         <div><span class="mandatory_field""> * </span> %(txt3)s:
         <select name="matching">
-            <option>reportnumber</option>
-            <option>recid</option>
+            <option value="reportnumber">reportnumber</option>
+            <option value="recid">recid</option>
         </select>
         </div>
         <div><span class="mandatory_field""> * </span> %(txt4)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="mode" value="append" "checked" id="appendcheckbox"/><label for="appendcheckbox">append</label>

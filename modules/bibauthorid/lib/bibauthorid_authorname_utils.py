@@ -31,6 +31,43 @@ from bibauthorid_utils import split_name_parts
 import bibauthorid_structs as dat
 import bibauthorid_config as bconfig
 
+from invenio.config import CFG_ETCDIR
+import re
+
+try:
+    from editdist import distance
+except ImportError:
+    try:
+        from Levenshtein import distance
+    except ImportError:
+        bconfig.LOGGER.exception("Levenshtein Module not available!")
+        if bconfig.AUTHORNAMES_UTILS_DEBUG:
+            print "Levenshtein Module not available!"
+        def distance(s1, s2):
+            d = {}
+            lenstr1 = len(s1)
+            lenstr2 = len(s2)
+            for i in xrange(-1, lenstr1 + 1):
+                d[(i, -1)] = i + 1
+            for j in xrange(-1, lenstr2 + 1):
+                d[(-1, j)] = j + 1
+
+            for i in xrange(0, lenstr1):
+                for j in xrange(0, lenstr2):
+                    if s1[i] == s2[j]:
+                        cost = 0
+                    else:
+                        cost = 1
+                    d[(i, j)] = min(
+                                   d[(i - 1, j)] + 1, # deletion
+                                   d[(i, j - 1)] + 1, # insertion
+                                   d[(i - 1, j - 1)] + cost, # substitution
+                                  )
+                    if i > 1 and j > 1 and s1[i] == s2[j - 1] and s1[i - 1] == s2[j]:
+                        d[(i, j)] = min (d[(i, j)], d[i - 2, j - 2] + cost) # transposition
+            return d[lenstr1 - 1, lenstr2 - 1]
+
+
 
 def get_bibrefs_by_authornames_id(authornames_id):
     '''
@@ -355,8 +392,11 @@ def soft_compare_names(origin_name, target_name):
     return score
 
 
-def compare_names(origin_name, target_name):
+def compare_names_old(origin_name, target_name):
     """
+    DEPRECATED: this was used by earlier versions of the algorithm. Left in the code for
+    testing purposes.
+    
     Compute an index of confidence that would like to indicate whether two
     names might represent the same person.The computation is based on
     similarities of name structure, in particular:
@@ -813,13 +853,13 @@ def jaro_winkler_str_similarity(str1, str2):
     return _winkler_modifier(str1, str2, jaro_weight)
 
 
-def names_are_equal_composites(name1, name2):
+def full_names_are_equal_composites(name1, name2):
     '''
     Checks if names are equal composites; e.g. "guangsheng" vs. "guang sheng"
 
-    @param name1: Name string of the first name (w/ last name)
+    @param name1: Full Name string of the first name (w/ last name)
     @type name1: string
-    @param name2: Name string of the second name (w/ last name)
+    @param name2: Full Name string of the second name (w/ last name)
     @type name2: string
 
     @return: Are the names equal composites?
@@ -849,11 +889,25 @@ def names_are_equal_composites(name1, name2):
 
 def names_are_equal_gender(name1, name2, gendernames):
     '''
-    Checks on gender equality of two names baes on a word list
+    Checks if names have the same gender
+    @param gendernames: dictionary male/female names
+    '''
+    g1 = [name1 in gendernames['boys'], name1 in gendernames['girls']]
+    g2 = [name2 in gendernames['boys'], name2 in gendernames['girls']]
 
-    @param name1: Name string of the first name (w/ last name)
+    if (g1[0] == g2[0] == True) and (g1[1] == False or g2[1] == False):
+        return True
+    if (g1[1] == g2[1] == True) and (g1[0] == False or g2[0] == False):
+        return True
+    return False
+
+def full_names_are_equal_gender(name1, name2, gendernames):
+    '''
+    Checks on gender equality of two first names baes on a word list
+
+    @param name1: Full Name string of the first name (w/ last name)
     @type name1: string
-    @param name2: Name string of the second name (w/ last name)
+    @param name2: Full Name string of the second name (w/ last name)
     @type name2: string
     @param gendernames: dictionary of male/female names
     @type gendernames: dict
@@ -867,33 +921,47 @@ def names_are_equal_gender(name1, name2, gendernames):
     if not isinstance(name2, list):
         name2 = split_name_parts(name2)
 
-    print_debug = False
     names_are_equal_gender_b = True
     ogender = None
     tgender = None
-    oname = name1[2][0].lower()
-    tname = name2[2][0].lower()
-    oname = clean_name_string(oname, "", False, True)
-    tname = clean_name_string(tname, "", False, True)
+#    oname = name1[2][0].lower()
+#    tname = name2[2][0].lower()
+#    oname = clean_name_string(oname, "", False, True)
+#    tname = clean_name_string(tname, "", False, True)
 
-    if oname in gendernames['boys']:
-        ogender = 'Male'
-    elif oname in gendernames['girls']:
-        ogender = 'Female'
+    onames = [clean_name_string(n.lower(), "", False, True) for n in name1[2]]
+    tnames = [clean_name_string(n.lower(), "", False, True) for n in name2[2]]
 
-    if tname in gendernames['boys']:
-        tgender = 'Male'
-    elif tname in gendernames['girls']:
-        tgender = 'Female'
+    for oname in onames:
+        if oname in gendernames['boys']:
+            if ogender != 'Conflict':
+                if ogender != 'Female':
+                    ogender = 'Male'
+                else:
+                    ogender = 'Conflict'
+        elif oname in gendernames['girls']:
+            if ogender != 'Conflict':
+                if ogender != 'Male':
+                    ogender = 'Female'
+                else:
+                    ogender = 'Conflict'
 
-    if print_debug:
-        print '     Gender check: ', oname, ' is a ', ogender
-        print '     Gender check: ', tname, ' is a ', tgender
+    for tname in tnames:
+        if tname in gendernames['boys']:
+            if tgender != 'Conflict':
+                if tgender != 'Female':
+                    tgender = 'Male'
+                else:
+                    tgender = 'Conflict'
+        elif tname in gendernames['girls']:
+            if tgender != 'Conflict':
+                if tgender != 'Male':
+                    tgender = 'Female'
+                else:
+                    tgender = 'Conflict'
 
     if ogender and tgender:
-        if ogender != tgender:
-            if print_debug:
-                print '    Gender differs, force split!'
+        if ogender != tgender or ogender == 'Conflict' or tgender == 'Conflict':
 
             names_are_equal_gender_b = False
 
@@ -902,11 +970,23 @@ def names_are_equal_gender(name1, name2, gendernames):
 
 def names_are_synonymous(name1, name2, name_variations):
     '''
+    Checks if names are synonims 
+    @param name_variations: name variations list
+    @type name_variations: list of lists
+    '''
+
+    a = [name1 in nvar and name2 in nvar for nvar in name_variations]
+    if True in a:
+        return True
+    return False
+
+def full_names_are_synonymous(name1, name2, name_variations):
+    '''
     Checks if two names are synonymous; e.g. "Robert" vs. "Bob"
 
-    @param name1: Name string of the first name (w/ last name)
+    @param name1: Full Name string of the first name (w/ last name)
     @type name1: string
-    @param name2: Name string of the second name (w/ last name)
+    @param name2: Full Name string of the second name (w/ last name)
     @type name2: string
     @param name_variations: name variations list
     @type name_variations: list of lists
@@ -937,7 +1017,7 @@ def names_are_synonymous(name1, name2, name_variations):
 
             if oname in nvar and tname in nvar:
                 if print_debug:
-                    print '      ', oname, ' and ', tname, ' are synonyms! Not splitting!'
+                    print '      ', oname, ' and ', tname, ' are synonyms!'
 
                 matches[i] = True
 
@@ -950,12 +1030,19 @@ def names_are_synonymous(name1, name2, name_variations):
 
 def names_are_substrings(name1, name2):
     '''
+    Checks if the names are subtrings of each other, left to right
+    @return: bool
+    '''
+    return name1.startswith(name2) or name2.startswith(name1)
+
+def full_names_are_substrings(name1, name2):
+    '''
     Checks if two names are substrings of each other; e.g. "Christoph" vs. "Ch"
     Only checks for the beginning of the names. 
 
-    @param name1: Name string of the first name (w/ last name)
+    @param name1: Full Name string of the first name (w/ last name)
     @type name1: string
-    @param name2: Name string of the second name (w/ last name)
+    @param name2: Full Name string of the second name (w/ last name)
     @type name2: string
 
     @return: are names synonymous
@@ -971,18 +1058,27 @@ def names_are_substrings(name1, name2):
     tnames = name2[2]
 #    oname = "".join(onames).lower()
 #    tname = "".join(tnames).lower()
-    oname = clean_name_string("".join(onames).lower(), "", False, True)
-    tname = clean_name_string("".join(tnames).lower(), "", False, True)
-    names_are_substrings_b = False
 
-    if (oname.startswith(tname)
-        or tname.startswith(oname)):
-        names_are_substrings_b = True
+    names_are_substrings_b = False
+    for o in onames:
+        oname = clean_name_string(o.lower(), "", False, True)
+        for t in tnames:
+            tname = clean_name_string(t.lower(), "", False, True)
+            if (oname.startswith(tname)
+                or tname.startswith(oname)):
+                names_are_substrings_b = True
 
     return names_are_substrings_b
 
 
-def names_minimum_levenshtein_distance(name1, name2):
+def names_levenshtein_distance(name1, name2):
+    '''
+    Returns the levenshtein distance between two strings
+    TODO:  improve to give more sensed results in case of synonim names?
+    '''
+    return distance(name1, name2)
+
+def full_names_minimum_levenshtein_distance(name1, name2):
     '''
     Determines the minimum distance D between two names.
     Comparison is base on the minimum number of first names.
@@ -994,19 +1090,14 @@ def names_minimum_levenshtein_distance(name1, name2):
     D("guang ming", "guang fin") = 2
 
     @precondition: Names have been checked for composition equality.
-    @param name1: Name string of the first name (w/ last name)
+    @param name1: Name string of the first name (w/ last name), force split
     @type name1: string
     @param name2: Name string of the second name (w/ last name)
     @type name2: string
-
+weather
     @return: the minimum Levenshtein distance between two names
     @rtype: int
     '''
-    try:
-        from Levenshtein import distance
-    except ImportError:
-        bconfig.LOGGER.exception("Levenshtein Module not available!")
-        return - 1
 
     if not isinstance(name1, list):
         name1 = split_name_parts(name1)
@@ -1027,3 +1118,237 @@ def names_minimum_levenshtein_distance(name1, name2):
     tname = clean_name_string("".join(tnames).lower(), "", False, True)
 
     return distance(oname, tname)
+
+def _load_gender_firstnames_dict(files=''):
+    if not files:
+        files = {'boy': CFG_ETCDIR + '/bibauthorid/name_authority_files/male_firstnames.txt',
+                                        'girl': CFG_ETCDIR + '/bibauthorid/name_authority_files/female_firstnames.txt'}
+
+    boyf = open(files['boy'], 'r')
+    boyn = [x.strip().lower() for x in boyf.readlines()]
+    boyf.close()
+    girlf = open(files['girl'], 'r')
+    girln = [x.strip().lower() for x in girlf.readlines()]
+    girlf.close()
+    return {'boys':boyn, 'girls':girln}
+
+
+def _load_firstname_variations(filename=''):
+    #will load an array of arrays: [['rick','richard','dick'],['john','jhonny']]
+    if not filename:
+        filename = CFG_ETCDIR + '/bibauthorid/name_authority_files/name_variants.txt'
+    retval = []
+    r = re.compile("\n")
+    fp = open(filename)
+
+    for l in fp.readlines():
+        lr = r.sub("", l)
+        retval.append([clean_name_string(name.lower(), "", False, True)
+                       for name in lr.split(";") if name])
+
+    fp.close()
+
+    return retval
+
+def compare_names(origin_name, target_name):
+    '''
+    Compare two names.
+    mode can be:
+        -float: returns a value in range [0,1] to guess name equality
+        -full: returns [surname_distance, names_distance, names_are_substring, names_are_synonim, 
+                        same_gender, names_equal_upon_composition, exactly_same_initials,
+                        initials_have_intersection] 
+    '''
+    AUTHORNAMES_UTILS_DEBUG = bconfig.AUTHORNAMES_UTILS_DEBUG
+    MAX_ALLOWED_SURNAME_DISTANCE = 2
+    if AUTHORNAMES_UTILS_DEBUG:
+        print "\nComparing: " , origin_name, ' ', target_name
+    gendernames = GLOBAL_gendernames
+    name_variations = GLOBAL_name_variations
+    no = split_name_parts(origin_name)
+    nt = split_name_parts(target_name)
+
+    if AUTHORNAMES_UTILS_DEBUG:
+        print "|- splitted no: ", no
+        print "|- splitted nt: ", nt
+
+    score = 0.0
+
+    surname_dist = distance(no[0], nt[0])
+    if AUTHORNAMES_UTILS_DEBUG:
+        print "|- surname distance: ", surname_dist
+    if surname_dist > 0:
+        score = max(0.0, 0.5 - (float(surname_dist) / float(MAX_ALLOWED_SURNAME_DISTANCE)))
+    else:
+        score = 1
+    if AUTHORNAMES_UTILS_DEBUG:
+        print '||- surname score: ', score
+
+    initials_only = ((min(len(no[2]), len(nt[2]))) == 0)
+    if AUTHORNAMES_UTILS_DEBUG:
+        print '|- initials only: ', initials_only
+
+    names_are_equal_composites = False
+    if not initials_only:
+        names_are_equal_composites = full_names_are_equal_composites(origin_name, target_name)
+    if AUTHORNAMES_UTILS_DEBUG:
+        print "|- equal composites: ", names_are_equal_composites
+
+    max_n_initials = max_n_initials = max(len(no[1]), len(nt[1]))
+    initials_intersection = set(no[1]).intersection(set(nt[1]))
+    n_initials_intersection = len(initials_intersection)
+    initials_union = set(no[1]).union(set(nt[1]))
+    n_initials_union = len(initials_union)
+
+
+    initials_distance = distance("".join(no[1]), "".join(nt[1]))
+    if n_initials_union > 0:
+        initials_c = float(n_initials_intersection) / float(n_initials_union)
+    else:
+        initials_c = 1
+
+    if len(no[1]) > len(nt[1]):
+        alo = no[1]
+        alt = nt[1]
+    else:
+        alo = nt[1]
+        alt = no[1]
+    lo = len(alo)
+    lt = len(alt)
+    if max_n_initials > 0:
+        initials_screwup = sum([i + 1 for i, k in enumerate(reversed(alo))
+                            if lo - 1 - i < lt and k != alt[lo - 1 - i] ]) / \
+                            float(float(max_n_initials * (max_n_initials + 1)) / 2)
+        initials_distance = initials_distance / max_n_initials
+    else:
+        initials_screwup = 0
+        initials_distance = 0
+
+    score = score - (0.75 * initials_screwup + 0.10 * (1 - initials_c)\
+            + 0.15 * initials_distance) * (score)
+    if AUTHORNAMES_UTILS_DEBUG:
+        print "|- initials sets: ", no[1], " ", nt[1]
+        print "|- initials distance: ", initials_distance
+        print "|- initials c: ", initials_c
+        print "|- initials screwup: ", initials_screwup
+        print "||- initials score: ", score
+
+    composits_eq = full_names_are_equal_composites(no, nt)
+    if len(no[2]) > 0 and len(nt[2]) > 0:
+        gender_eq = full_names_are_equal_gender(no, nt, gendernames)
+    else:
+        gender_eq = True
+    vars_eq = full_names_are_synonymous(no, nt, name_variations)
+    substr_eq = full_names_are_substrings(no, nt)
+
+    if not initials_only:
+        if len(no[2]) > len(nt[2]):
+            nalo = no[2]
+            nalt = nt[2]
+        else:
+            nalo = nt[2]
+            nalt = no[2]
+        nlo = len(nalo)
+        nlt = len(nalt)
+        names_screwup_list = [(distance(k, nalt[nlo - 1 - i]), max(len(k), len(nalt[nlo - 1 - i])))
+                             for i, k in enumerate(reversed(nalo)) \
+                             if nlo - 1 - i < nlt]
+        max_names_screwup = max([float(i[0]) / i[1] for i in names_screwup_list])
+        avg_names_screwup = sum([float(i[0]) / i[1] for i in names_screwup_list])\
+                            / len(names_screwup_list)
+
+    else:
+        max_names_screwup = 0
+        avg_names_screwup = 0
+
+    score = score - score * 0.75 * max_names_screwup - score * 0.25 * avg_names_screwup
+    if AUTHORNAMES_UTILS_DEBUG:
+        print "|- max names screwup: ", max_names_screwup
+        print "|- avg screwup: ", avg_names_screwup
+        print "||- names score: ", score
+        print "|- names composites: ", composits_eq
+        print "|- same gender: ", gender_eq
+        print "|- synonims: ", vars_eq
+        print "|- substrings: ", substr_eq
+
+    if vars_eq:
+        synmap = [[i, j, names_are_synonymous(i, j, name_variations)] for i in no[2] for j in nt[2]]
+        synmap = [i for i in synmap if i[2] == True]
+        if AUTHORNAMES_UTILS_DEBUG:
+            print "|-- synmap: ", synmap
+        for i in synmap:
+            if no[2].index(i[0]) == nt[2].index(i[1]):
+                score = score + (1 - score) * 0.5
+            else:
+                score = score + (1 - score) * 0.15
+    else:
+        if AUTHORNAMES_UTILS_DEBUG:
+            print "|-- synmap: empty"
+    if AUTHORNAMES_UTILS_DEBUG:
+        print "|-- synmap score: ", score
+
+    if substr_eq and not initials_only:
+        ssmap = [[i, j, names_are_substrings(i, j)] for i in no[2] for j in nt[2]]
+        ssmap = [i for i in ssmap if i[2] == True]
+        if AUTHORNAMES_UTILS_DEBUG:
+            print "|-- substr map: ", ssmap
+        for i in ssmap:
+            if no[2].index(i[0]) == nt[2].index(i[1]):
+                score = score + (1 - score) * 0.2
+            else:
+                score = score + (1 - score) * 0.05
+    else:
+        if AUTHORNAMES_UTILS_DEBUG:
+            print "|-- substr map: empty"
+
+    if AUTHORNAMES_UTILS_DEBUG:
+        print "|-- substring score: ", score
+
+    if composits_eq and not initials_only:
+        if AUTHORNAMES_UTILS_DEBUG:
+            print "|-- composite names"
+        score = score + (1 - score) * 0.2
+    else:
+        if AUTHORNAMES_UTILS_DEBUG:
+            print "|-- not composite names"
+    if AUTHORNAMES_UTILS_DEBUG:
+        print "|-- composite score: ", score
+
+    if not gender_eq:
+        score = score / 3.
+        if AUTHORNAMES_UTILS_DEBUG:
+            print "|-- apply gender penalty"
+    else:
+        if AUTHORNAMES_UTILS_DEBUG:
+            print "|--   no  gender penalty"
+
+    if AUTHORNAMES_UTILS_DEBUG:
+        print "|-- gender score: ", score
+
+    if surname_dist > MAX_ALLOWED_SURNAME_DISTANCE:
+        score = 0.0
+        if AUTHORNAMES_UTILS_DEBUG:
+            print "|- surname trim: ", score
+    else:
+        if AUTHORNAMES_UTILS_DEBUG:
+            print "|- no surname trim: ", score
+    if AUTHORNAMES_UTILS_DEBUG:
+        print "||- final score:  ", score
+
+
+    return score
+
+GLOBAL_gendernames = _load_gender_firstnames_dict()
+GLOBAL_name_variations = _load_firstname_variations()
+
+
+
+
+
+
+
+
+
+
+
+

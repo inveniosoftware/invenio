@@ -43,7 +43,8 @@ from invenio.bibedit_dblayer import get_record_last_modification_date, \
     delete_hp_change
 from invenio.bibrecord import create_record, create_records, \
     record_get_field_value, record_has_field, record_xml_output, \
-    record_strip_empty_fields, record_strip_empty_volatile_subfields
+    record_strip_empty_fields, record_strip_empty_volatile_subfields, \
+    record_order_subfields, record_get_field_instances
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
@@ -52,13 +53,14 @@ from invenio.dateutils import convert_datetext_to_dategui
 from invenio.bibedit_dblayer import get_bibupload_task_opts, \
     get_marcxml_of_record_revision, get_record_revisions, \
     get_info_of_record_revision
-from invenio.search_engine import get_fieldvalues, print_record, \
-     record_exists, get_colID, guess_primary_collection_of_a_record, \
-     get_record
+from invenio.search_engine import print_record, record_exists, get_colID, \
+     guess_primary_collection_of_a_record, get_record, \
+     get_all_collections_of_a_record
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.webuser import get_user_info
 from invenio.dbquery import run_sql
 from invenio.websearchadminlib import get_detailed_page_tabs
-
+from invenio.access_control_engine import acc_authorize_action
 
 # Precompile regexp:
 re_file_option = re.compile(r'^%s' % CFG_TMPSHAREDDIR)
@@ -71,6 +73,28 @@ re_tmpl_description = re.compile('<!-- BibEdit-Template-Description: (.*) -->')
 re_ftmpl_name = re.compile('<!-- BibEdit-Field-Template-Name: (.*) -->')
 re_ftmpl_description = re.compile('<!-- BibEdit-Field-Template-Description: (.*) -->')
 
+
+# Authorization
+
+def user_can_edit_record_collection(req, recid):
+    """ Check if user has authorization to modify a collection
+    the recid belongs to
+    """
+    record_collections = get_all_collections_of_a_record(recid)
+    if not record_collections:
+        # Check if user has access to all collections
+        auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
+                                                       collection='')
+        if auth_code == 0:
+            return True
+    else:
+        for collection in record_collections:
+            auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
+                                                           collection=collection)
+            if auth_code == 0:
+                return True
+    return False
+
 # Helper functions
 
 def assert_undo_redo_lists_correctness(undo_list, redo_list):
@@ -80,6 +104,56 @@ def assert_undo_redo_lists_correctness(undo_list, redo_list):
     for redoItem in redo_list:
         assert redoItem != None;
         assert redoItem != 0
+
+def record_find_matching_fields(key, rec, tag="", ind1=" ", ind2=" ", \
+                                exact_match=False):
+    """
+    This utility function will look for any fieldvalues containing or equal
+    to, if exact match is wanted, given keyword string. The found fields will be
+    returned as a list of field instances per tag. The fields to search can be
+    narrowed down to tag/indicator level.
+
+    @param key: keyword to search for
+    @type key: string
+
+    @param rec: a record structure as returned by bibrecord.create_record()
+    @type rec: dict
+
+    @param tag: a 3 characters long string
+    @type tag: string
+
+    @param ind1: a 1 character long string
+    @type ind1: string
+
+    @param ind2: a 1 character long string
+    @type ind2: string
+
+    @return: a list of found fields in a tuple per tag: (tag, field_instances) where
+        field_instances is a list of (Subfields, ind1, ind2, value, field_position_global)
+        and subfields is list of (code, value)
+    @rtype: list
+    """
+    if not tag:
+        all_field_instances = rec.items()
+    else:
+        all_field_instances = [(tag, record_get_field_instances(rec, tag, ind1, ind2))]
+    matching_field_instances = []
+    for current_tag, field_instances in all_field_instances:
+        found_fields = []
+        for field_instance in field_instances:
+            # Get values to match: controlfield_value + subfield values
+            values_to_match = [field_instance[3]] + \
+                              [val for code, val in field_instance[0]]
+            if exact_match and key in values_to_match:
+                found_fields.append(field_instance)
+            else:
+                for value in values_to_match:
+                    if value.find(key) > -1:
+                        found_fields.append(field_instance)
+                        break
+        if len(found_fields) > 0:
+            matching_field_instances.append((current_tag, found_fields))
+    return matching_field_instances
 
 # Operations on the BibEdit cache file
 def cache_exists(recid, uid):
@@ -112,6 +186,8 @@ def create_cache_file(recid, uid, record='', cache_dirty=False, pending_changes=
     """
     if not record:
         record = get_bibrecord(recid)
+        # Order subfields alphabetically after loading the record
+        record_order_subfields(record)
         if not record:
             return
 
@@ -197,6 +273,10 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
     # clean the record from unfilled volatile fields
     record_strip_empty_volatile_subfields(record)
     record_strip_empty_fields(record)
+
+    # order subfields alphabetically before saving the record
+    record_order_subfields(record)
+
     xml_to_write = record_xml_output(record)
 
     # Write XML file.
@@ -409,13 +489,14 @@ def get_templates(templatesDir, tmpl_name, tmpl_description, extractContent = Fa
 
     templates = []
     for fname in template_fnames:
-        template_file = open('%s%s%s' % (
-                templatesDir, os.sep, fname),'r')
+        filepath = '%s%s%s' % (templatesDir, os.sep, fname)
+        template_file = open(filepath,'r')
         template = template_file.read()
         template_file.close()
         fname_stripped = os.path.splitext(fname)[0]
         mo_name = tmpl_name.search(template)
         mo_description = tmpl_description.search(template)
+        date_modified = time.ctime(os.path.getmtime(filepath))
         if mo_name:
             name = mo_name.group(1)
         else:
@@ -432,7 +513,7 @@ def get_templates(templatesDir, tmpl_name, tmpl_description, extractContent = Fa
             else:
                 raise "Problem when parsing the template %s" % (fname, )
         else:
-            templates.append([fname_stripped, name, description])
+            templates.append([fname_stripped, name, description, date_modified])
 
     return templates
 

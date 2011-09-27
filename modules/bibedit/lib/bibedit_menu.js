@@ -41,6 +41,7 @@ function initMenu(){
   $('#cellStatus').text('Ready');
   // Bind button event handlers.
   $('#imgNewRecord').bind('click', onNewRecordClick);
+  $('#imgTemplateRecord').bind('click', onTemplateRecordClick);
   $('#btnSearch').bind('click', onSearchClick);
   $('#btnSubmit').bind('click', onSubmitClick);
   $('#btnCancel').bind('click', onCancelClick);

@@ -172,26 +172,26 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
      Parameter 'include_subformat_icons' decides if subformat
      considered as icons should be returned
 
-    'parsed_urls' is a dictionary in the form:
-    {'main_urls' : {'Main'      : [('http://CFG_SITE_URL/CFG_SITE_RECORD/1/files/aFile.pdf', 'aFile', 'PDF'),
-                                   ('http://CFG_SITE_URL/CFG_SITE_RECORD/1/files/aFile.gif', 'aFile', 'GIF')],
-                    'Additional': [('http://CFG_SITE_URL/CFG_SITE_RECORD/1/files/bFile.pdf', 'bFile', 'PDF')]},
+    'parsed_urls' is a dictionary in the form::
+        {'main_urls' : {'Main'      : [('http://CFG_SITE_URL/CFG_SITE_RECORD/1/files/aFile.pdf', 'aFile', 'PDF'),
+                                       ('http://CFG_SITE_URL/CFG_SITE_RECORD/1/files/aFile.gif', 'aFile', 'GIF')],
+                        'Additional': [('http://CFG_SITE_URL/CFG_SITE_RECORD/1/files/bFile.pdf', 'bFile', 'PDF')]},
 
-     'other_urls': [('http://externalurl.com/aFile.pdf', 'Fulltext'),      # url(8564_u), description(8564_z/y)
-                    ('http://externalurl.com/bFile.pdf', 'Fulltext')],
+         'other_urls': [('http://externalurl.com/aFile.pdf', 'Fulltext'),      # url(8564_u), description(8564_z/y)
+                        ('http://externalurl.com/bFile.pdf', 'Fulltext')],
 
-     'cern_urls' : [('http://cern.ch/aFile.pdf', 'Fulltext'),              # url(8564_u), description(8564_z/y)
-                    ('http://cern.ch/bFile.pdf', 'Fulltext')],
-    }
+         'cern_urls' : [('http://cern.ch/aFile.pdf', 'Fulltext'),              # url(8564_u), description(8564_z/y)
+                        ('http://cern.ch/bFile.pdf', 'Fulltext')],
+        }
 
     Some notes about returned structure:
-    - key 'cern_urls' is only available on CERN site
-    - keys in main_url dictionaries are defined by the BibDoc.
-    - older versions are not part of the parsed urls
-    - returns only main files when possible, that is when doctypes
-      make a distinction between 'Main' files and other
-      files. Otherwise returns all the files as main. This is only
-      enabled if distinguish_main_and_additional_files is set to True
+        - key 'cern_urls' is only available on CERN site
+        - keys in main_url dictionaries are defined by the BibDoc.
+        - older versions are not part of the parsed urls
+        - returns only main files when possible, that is when doctypes
+          make a distinction between 'Main' files and other
+          files. Otherwise returns all the files as main. This is only
+          enabled if distinguish_main_and_additional_files is set to True
     """
     _ = gettext_set_language(bfo.lang)
 

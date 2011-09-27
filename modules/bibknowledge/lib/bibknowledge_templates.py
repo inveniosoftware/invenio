@@ -257,7 +257,7 @@ class Template:
                          user gives its postal code (270__a): \
                          Set field to 100__a, expression to 270__a:*%*.")+"<br/><br/>"
         #create a pretty select box
-        selectbox = "<select name=\"collection\"><option>"+_("Any collection")+"</option>"
+        selectbox = "<select name=\"collection\"><option value=\""+ _("Any collection") +"\">"+_("Any collection")+"</option>"
         for mycoll in collections:
             selectbox += "<option value=\""+mycoll+"\""
             if mycoll == collection:

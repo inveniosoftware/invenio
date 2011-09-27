@@ -41,7 +41,9 @@ try:
         CFG_BIBAUTHORID_EXTERNAL_CLAIMED_RECORDS_KEY, \
         CFG_BIBAUTHORID_ATTACH_VA_TO_MULTIPLE_RAS , \
         CFG_BIBAUTHORID_ENABLED, \
-        CFG_BIBAUTHORID_ON_AUTHORPAGES
+        CFG_BIBAUTHORID_ON_AUTHORPAGES, \
+        CFG_BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE, \
+        CFG_INSPIRE_SITE
 except ImportError:
     GLOBAL_CONFIG = False
 
@@ -95,7 +97,7 @@ else:
 LIMIT_TO_COLLECTIONS = []
 
 # Exclude documents that are visible in a collection mentioned here:
-EXCLUDE_COLLECTIONS = ["HEPNAMES", "INST"]
+EXCLUDE_COLLECTIONS = ["HEPNAMES", "INST", "Deleted", "DELETED", "deleted"]
 
 # User info keys for externally claimed records
 # e.g. for arXiv SSO: ["external_arxivids"]
@@ -112,13 +114,13 @@ VALID_EXPORT_FILTERS = ["arxiv"]
 if GLOBAL_CONFIG and CFG_BIBAUTHORID_PERSONID_SQL_MAX_THREADS:
     PERSONID_SQL_MAX_THREADS = CFG_BIBAUTHORID_PERSONID_SQL_MAX_THREADS
 else:
-    PERSONID_SQL_MAX_THREADS = 4
+    PERSONID_SQL_MAX_THREADS = 12
 
 # Max number of processes spawned by the disambiguation algorithm
 if GLOBAL_CONFIG and CFG_BIBAUTHORID_MAX_PROCESSES:
     BIBAUTHORID_MAX_PROCESSES = CFG_BIBAUTHORID_MAX_PROCESSES
 else:
-    BIBAUTHORID_MAX_PROCESSES = 4
+    BIBAUTHORID_MAX_PROCESSES = 12
 
 # Threshold for connecting a paper to a person: BCTKD are the papers from the
 # backtracked RAs found searching back for the papers already connected to the
@@ -154,8 +156,16 @@ PERSONID_CNP_FLAG_MINUS1 = 0.5
 PERSONID_UPFA_PPLMF = -1
 
 
+# Update/disambiguation process surname list creation method
+# Can be either 'mysql' or 'regexp'.
+# 'mysql' is inerently slow but accurate, 'regexp' is really really fast, but with potentially
+#different results. 'mysql' left in for compatibility.
+BIBAUTHORID_LIST_CREATION_METHOD = 'regexp'
+
+
 #Tables Utils debug output
 TABLES_UTILS_DEBUG = False
+AUTHORNAMES_UTILS_DEBUG = False
 
 # Is the authorid algorithm allowed to attach a virtual author to multiple
 # real authors in the last run of the orphan processing?
@@ -228,6 +238,17 @@ LOGGER = logging.getLogger("Dummy")
 LOGGER.addHandler(DEFAULT_HANDLER)
 LOGGER.setLevel(LOG_LEVEL)
 
+## force skip ui arxiv stub page (specific for inspire)
+BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = True
+
+if GLOBAL_CONFIG and CFG_INSPIRE_SITE:
+    BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = CFG_BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE
+
+## URL for the remote INSPIRE login that shall be shown on (arXiv stub page.)
+BIBAUTHORID_CFG_INSPIRE_LOGIN = ""
+
+if CFG_INSPIRE_SITE:
+    BIBAUTHORID_CFG_INSPIRE_LOGIN = 'https://arxiv.org/inspire_login'
 
 if not LOGGERS:
     LOGGERS.append(logging.getLogger("Dummy"))

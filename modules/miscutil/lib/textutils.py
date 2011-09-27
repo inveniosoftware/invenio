@@ -343,24 +343,28 @@ def wash_for_xml(text, xml_version='1.0'):
         return RE_ALLOWED_XML_1_1_CHARS.sub('', unicode(text, 'utf-8')).encode('utf-8')
 
 def wash_for_utf8(text, correct=True):
+    """Return UTF-8 encoded binary string with incorrect characters washed away.
+
+    @param text: input string to wash (can be either a binary string or a Unicode string)
+    @param correct: whether to correct bad characters or throw exception
     """
-    Removes all characters incorrect from the unicode point of view
-    @param text: input string to wash
-    """
-    cont = True
-    while cont:
+    if isinstance(text, unicode):
+        return text.encode('utf-8')
+
+    ret = []
+    while True:
         try:
             text.decode("utf-8")
         except UnicodeDecodeError, e:
             if correct:
-                text = text[:e.start] + text[e.end:]
+                ret.append(text[:e.start])
+                text = text[e.end:]
             else:
                 raise e
-        except Exception, e:
-            raise e
         else:
-            cont = False
-    return text
+            break
+    ret.append(text)
+    return ''.join(ret)
 
 def nice_size(size):
     """

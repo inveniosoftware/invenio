@@ -46,7 +46,9 @@ from invenio.config import \
      CFG_WEBCOMMENT_ALLOW_COMMENTS,\
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
      CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS, \
-     CFG_SITE_RECORD
+     CFG_SITE_RECORD, \
+     CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE, \
+     CFG_WEBCOMMENT_MAX_ATTACHED_FILES
 from invenio.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.search_engine import create_navtrail_links, \
@@ -58,7 +60,7 @@ from invenio.htmlutils import get_mathjax_header
 from invenio.errorlib import register_exception
 from invenio.messages import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.websearchadminlib import get_detailed_page_tabs
+from invenio.websearchadminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import \
      mail_cookie_create_authorize_action, \
@@ -67,16 +69,11 @@ from invenio.access_control_mailcookie import \
      InvenioWebAccessMailCookieDeletedError, \
      InvenioWebAccessMailCookieError
 from invenio.webcomment_config import \
-     CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE, \
-     CFG_WEBCOMMENT_MAX_ATTACHED_FILES
+     InvenioWebCommentError, \
+     InvenioWebCommentWarning
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
-try:
-    from invenio.fckeditor_invenio_connector import FCKeditorConnectorInvenio
-    fckeditor_available = True
-except ImportError, e:
-    fckeditor_available = False
 import os
 from invenio import webinterface_handler_config as apache
 from invenio.bibdocfile import \
@@ -127,7 +124,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         @param subscribed: int, 1 if user just subscribed to discussion, -1 if unsubscribed
         @return the full html page.
         """
-
         argd = wash_urlargd(form, {'do': (str, "od"),
                                    'ds': (str, "all"),
                                    'nb': (int, 100),
@@ -174,6 +170,37 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             user_is_subscribed_to_discussion = False
             user_can_unsubscribe_from_discussion = False
 
+        unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
+                                                    self.recid,
+                                                    ln=argd['ln'])
+        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
+        ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
+        link_ln = ''
+        if argd['ln'] != CFG_SITE_LANG:
+            link_ln = '?ln=%s' % argd['ln']
+
+        tabs = [(unordered_tabs[tab_id]['label'], \
+                 '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
+                 tab_id in ['comments', 'reviews'],
+                 unordered_tabs[tab_id]['enabled']) \
+                for (tab_id, order) in ordered_tabs_id
+                if unordered_tabs[tab_id]['visible'] == True]
+
+        tabs_counts = get_detailed_page_tabs_counts(self.recid)
+        citedbynum = tabs_counts['Citations']
+        references = tabs_counts['References']
+        discussions = tabs_counts['Discussions']
+
+        top = webstyle_templates.detailed_record_container_top(self.recid,
+                                                               tabs,
+                                                               argd['ln'],
+                                                               citationnum=citedbynum,
+                                                               referencenum=references,
+                                                               discussionnum=discussions)
+        bottom = webstyle_templates.detailed_record_container_bottom(self.recid,
+                                                                     tabs,
+                                                                     argd['ln'])
+
         #display_comment_rounds = [cmtgrp for cmtgrp in argd['cmtgrp'] if cmtgrp.isdigit() or cmtgrp == "all" or cmtgrp == "-1"]
         display_comment_rounds = argd['cmtgrp']
 
@@ -181,7 +208,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
         (ok, problem) = check_recID_is_in_range(self.recid, check_warnings, argd['ln'])
         if ok:
-            (body, errors, warnings) = perform_request_display_comments_or_remarks(req=req, recID=self.recid,
+            body = perform_request_display_comments_or_remarks(req=req, recID=self.recid,
                 display_order=argd['do'],
                 display_since=argd['ds'],
                 nb_per_page=argd['nb'],
@@ -199,27 +226,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 display_comment_rounds=display_comment_rounds
                 )
 
-            unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
-                                                    self.recid,
-                                                    ln=argd['ln'])
-            ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
-            ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
-            link_ln = ''
-            if argd['ln'] != CFG_SITE_LANG:
-                link_ln = '?ln=%s' % argd['ln']
-            tabs = [(unordered_tabs[tab_id]['label'], \
-                     '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
-                     tab_id in ['comments', 'reviews'],
-                     unordered_tabs[tab_id]['enabled']) \
-                    for (tab_id, order) in ordered_tabs_id
-                    if unordered_tabs[tab_id]['visible'] == True]
-            top = webstyle_templates.detailed_record_container_top(self.recid,
-                                                                    tabs,
-                                                                    argd['ln'])
-            bottom = webstyle_templates.detailed_record_container_bottom(self.recid,
-                                                                         tabs,
-                                                                         argd['ln'])
-
             title, description, keywords = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])
             navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
             if navtrail:
@@ -233,7 +239,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             if CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS:
                 mathjaxheader = get_mathjax_header()
             jqueryheader = '''
-            <script src="%(CFG_SITE_URL)s/js/jquery.min.js" type="text/javascript" language="javascript"></script>
             <script src="%(CFG_SITE_URL)s/js/jquery.MultiFile.pack.js" type="text/javascript" language="javascript"></script>
             ''' % {'CFG_SITE_URL': CFG_SITE_URL}
 
@@ -258,7 +263,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         verbose=1,
                         req=req,
                         language=argd['ln'],
-                        warnings=check_warnings, errors=[],
                         navmenuid='search')
 
     # Return the same page wether we ask for /CFG_SITE_RECORD/123 or /CFG_SITE_RECORD/123/
@@ -278,7 +282,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         @param note: title of the review
         @param comid: comment id, needed for replying
         @param editor_type: the type of editor used for submitting the
-                            comment: 'textarea', 'fckeditor'.
+                            comment: 'textarea', 'ckeditor'.
         @param subscribe: if set, subscribe user to receive email
                           notifications when new comment are added to
                           this discussion
@@ -332,7 +336,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         if not auth_code and (user_info['email'] != 'guest'):
             can_attach_files = True
 
-        warning_msgs = []
+        warning_msgs = [] # list of warning tuples (warning_text, warning_color)
         added_files = {}
         if can_attach_files:
             # User is allowed to attach files. Process the files
@@ -385,7 +389,12 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                             # dismiss all uploaded files and re-ask to
                             # upload again
                             file_too_big = True
-                            warning_msgs.append(('WRN_WEBCOMMENT_MAX_FILE_SIZE_REACHED', cgi.escape(filename), str(file_size/1024) + 'KB', str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/1024) + 'KB'))
+                            try:
+                                raise InvenioWebCommentWarning(_('The size of file \\"%s\\" (%s) is larger than maximum allowed file size (%s). Select files again.') % (cgi.escape(filename), str(file_size/1024) + 'KB', str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/1024) + 'KB'))
+                            except InvenioWebCommentWarning, exc:
+                                register_exception(stream='warning')
+                                warning_msgs.append((exc.message, ''))
+                            #warning_msgs.append(('WRN_WEBCOMMENT_MAX_FILE_SIZE_REACHED', cgi.escape(filename), str(file_size/1024) + 'KB', str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/1024) + 'KB'))
                         else:
                             added_files[filename] = os.path.join(dir_to_open, filename)
 
@@ -443,22 +452,22 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 # User is not already subscribed, and asked to subscribe
                 subscribe = True
 
-            (body, errors, warnings) = perform_request_add_comment_or_remark(recID=self.recid,
-                                                                             ln=argd['ln'],
-                                                                             uid=uid,
-                                                                             action=argd['action'],
-                                                                             msg=argd['msg'],
-                                                                             note=argd['note'],
-                                                                             score=argd['score'],
-                                                                             reviews=self.discussion,
-                                                                             comID=argd['comid'],
-                                                                             client_ip_address=client_ip_address,
-                                                                             editor_type=argd['editor_type'],
-                                                                             can_attach_files=can_attach_files,
-                                                                             subscribe=subscribe,
-                                                                             req=req,
-                                                                             attached_files=added_files,
-                                                                             warnings=warning_msgs)
+            body = perform_request_add_comment_or_remark(recID=self.recid,
+                                                         ln=argd['ln'],
+                                                         uid=uid,
+                                                         action=argd['action'],
+                                                         msg=argd['msg'],
+                                                         note=argd['note'],
+                                                         score=argd['score'],
+                                                         reviews=self.discussion,
+                                                         comID=argd['comid'],
+                                                         client_ip_address=client_ip_address,
+                                                         editor_type=argd['editor_type'],
+                                                         can_attach_files=can_attach_files,
+                                                         subscribe=subscribe,
+                                                         req=req,
+                                                         attached_files=added_files,
+                                                         warnings=warning_msgs)
 
             if self.discussion:
                 title = _("Add Review")
@@ -466,7 +475,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 title = _("Add Comment")
 
             jqueryheader = '''
-            <script src="%(CFG_SITE_URL)s/js/jquery.min.js" type="text/javascript" language="javascript"></script>
             <script src="%(CFG_SITE_URL)s/js/jquery.MultiFile.pack.js" type="text/javascript" language="javascript"></script>
             ''' % {'CFG_SITE_URL': CFG_SITE_URL}
 
@@ -476,8 +484,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         uid=uid,
                         language=CFG_SITE_LANG,
                         verbose=1,
-                        errors=errors,
-                        warnings=warnings,
                         req=req,
                         navmenuid='search',
                         metaheaderadd=jqueryheader)
@@ -488,7 +494,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         uid=uid,
                         verbose=1,
                         req=req,
-                        warnings=check_warnings, errors=[],
                         navmenuid='search')
 
     def vote(self, req, form):
@@ -662,7 +667,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 class WebInterfaceCommentsFiles(WebInterfaceDirectory):
     """Handle <strike>upload and </strike> access to files for comments.
 
-       <strike>The upload is currently only available through the FCKeditor.</strike>
+       <strike>The upload is currently only available through the Ckeditor.</strike>
     """
 
     #_exports = ['put'] # 'get' is handled by _lookup(..)
@@ -763,53 +768,3 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
                     body=_('The requested file could not be found'),
                     req=req,
                     language=argd['ln'])
-
-##     def put(self, req, form):
-##         """
-##         Process requests received from FCKeditor to upload files, etc.
-##         """
-##         if not fckeditor_available:
-##             return
-
-##         uid = getUid(req)
-
-##         # URL where the file can be fetched after upload
-##         user_files_path = '%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/%(recid)i/comments/attachments/get/%(uid)s' % \
-##                           {'uid': uid,
-##                            'recid': self.recid,
-##                            'CFG_SITE_URL': CFG_SITE_URL}
-##         # Path to directory where uploaded files are saved
-##         user_files_absolute_path = '%(CFG_PREFIX)s/var/data/comments/%(recid)s/%(uid)s' % \
-##                                    {'uid': uid,
-##                                     'recid': self.recid,
-##                                     'CFG_PREFIX': CFG_PREFIX}
-##         # Create a Connector instance to handle the request
-##         conn = FCKeditorConnectorInvenio(form, recid=self.recid, uid=uid,
-##                                          allowed_commands=['QuickUpload'],
-##                                          allowed_types = ['File', 'Image', 'Flash', 'Media'],
-##                                          user_files_path = user_files_path,
-##                                          user_files_absolute_path = user_files_absolute_path)
-
-##         # Check that user can upload attachments for comments.
-##         user_info = collect_user_info(req)
-##         (auth_code, auth_msg) = check_user_can_attach_file_to_comments(user_info, self.recid)
-##         if user_info['email'] == 'guest':
-##             # User is guest: must login prior to upload
-##             data = conn.sendUploadResults(1, '', '', 'Please login before uploading file.')
-##         elif auth_code:
-##             # User cannot submit
-##             data = conn.sendUploadResults(1, '', '', 'Sorry, you are not allowed to submit files.')
-##         else:
-##             # Process the upload and get the response
-##             data = conn.doResponse()
-
-##         # Transform the headers into something ok for mod_python
-##         for header in conn.headers:
-##             if not header is None:
-##                 if header[0] == 'Content-Type':
-##                     req.content_type = header[1]
-##                 else:
-##                     req.headers_out[header[0]] = header[1]
-##         # Send our response
-##         req.send_http_header()
-##         req.write(data)

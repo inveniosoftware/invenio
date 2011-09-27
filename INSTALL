@@ -45,7 +45,8 @@ Contents
 
           $ sudo aptitude install rxp python-psyco sbcl cmucl \
               pylint pychecker pyflakes python-profiler python-epydoc \
-              libapache2-mod-xsendfile openoffice.org
+              libapache2-mod-xsendfile openoffice.org python-utidylib \
+              python-beautifulsoup
 
         Moreover, you should install some Message Transfer Agent (MTA)
         such as Postfix so that Invenio can email notification
@@ -128,18 +129,21 @@ Contents
           - (optional) hashlib, needed only for Python-2.4 and only
              if you would like to use AWS connectivity:
              <http://pypi.python.org/pypi/hashlib>
+          - (optional) utidylib, for HTML washing:
+	     <http://utidylib.berlios.de/>
+          - (optional) Beautiful Soup, for HTML washing:
+	     <http://www.crummy.com/software/BeautifulSoup/>
+          - (optional) Python Twitter (and its dependencies) if you want
+             to use the Twitter Fetcher bibtasklet:
+             <http://code.google.com/p/python-twitter/>
 
         Note: MySQLdb version 1.2.1_p2 or higher is recommended.  If
               you are using an older version of MySQLdb, you may get
               into problems with character encoding.
 
-     e) mod_wsgi Apache module.
+     e) mod_wsgi Apache module.  Versions 3.x and above are
+        recommended.
           <http://code.google.com/p/modwsgi/>
-
-        Note: for the time being, the WSGI daemon must be run with
-              threads=1, because Invenio is not fully thread safe yet.
-              This will come later.  The Apache configuration example
-              snippets (created below) will use threads=1.
 
         Note: if you are using Python 2.4 or earlier, then you should
               also install the wsgiref Python module, available from:
@@ -214,7 +218,7 @@ Contents
 	platform, with Python 2.3 to 2.6
 	   <http://pypi.python.org/pypi/xlwt>
 
-     l) (recommended) matplotlib 1.0.0 is a python 2D plotting library
+     m) (recommended) matplotlib 1.0.0 is a python 2D plotting library
      	which produces publication quality figures in a variety of
 	hardcopy formats and interactive environments across
 	platforms. matplotlib can be used in python scripts, the
@@ -223,6 +227,40 @@ Contents
 	toolkits. It is used to generate pie graphs in the custom
 	summary query (WebStat)
 	   <http://matplotlib.sourceforge.net>
+
+     n) (optional) FFmpeg, an open-source tools an libraries collection
+        to convert video and audio files. It makes use of both internal
+        as well as external libraries to generate videos for the web, such
+        as Theora, WebM and H.264 out of almost any thinkable video input.
+        FFmpeg is needed to run video related modules and submission workflows
+        in Invenio. The minimal configuration of ffmpeg for the Invenio demo site
+        requires a number of external libraries. It is highly recommended
+        to remove all installed versions and packages that are comming with
+        various Linux distributions and install the latest versions from
+        sources. Additionally, you will need the Mediainfo Library for multimedia
+        metadata handling.
+        Minimum libraries for the demo site:
+        - the ffmpeg multimedia encoder tools
+          <http://ffmpeg.org/>
+        - a library for jpeg images needed for thumbnail extraction
+          <http://www.openjpeg.org/>
+        - a library for the ogg container format, needed for Vorbis and Theora
+          <http://www.xiph.org/ogg/>
+        - the OGG Vorbis audi codec library
+          <http://www.vorbis.com/>
+        - the OGG Theora video codec library
+          <http://www.theora.org/>
+        - the WebM video codec library
+          <http://www.webmproject.org/>
+        - the mediainfo library for multimedia metadata
+          <http://mediainfo.sourceforge.net/>
+        Recommended for H.264 video (!be aware of licensing issues!):
+        - a library for H.264 video encoding
+          <http://www.videolan.org/developers/x264.html>
+        - a library for Advanced Audi Coding
+          <http://www.audiocoding.com/faac.html>
+        - a library for MP3 encoding
+          <http://lame.sourceforge.net/>
 
    Note that the configure script checks whether you have all the
    prerequisite software installed and that it won't let you continue
@@ -249,8 +287,9 @@ Contents
       $ make install
       $ make install-mathjax-plugin     ## optional
       $ make install-jquery-plugins    ## optional
-      $ make install-fckeditor-plugin  ## optional
+      $ make install-ckeditor-plugin  ## optional
       $ make install-pdfa-helper-files ## optional
+      $ make install-mediaelement ## optional
 
 1b. Configuration
 -----------------
@@ -454,20 +493,25 @@ Contents
 
           Note that `unzip' is needed when installing jquery plugins.
 
-      $ make install-fckeditor-plugin  ## optional
+      $ make install-ckeditor-plugin  ## optional
 
           This will automatically download and install in the proper
-          place FCKeditor, a WYSIWYG Javascript-based editor (e.g. for
+          place CKeditor, a WYSIWYG Javascript-based editor (e.g. for
           the WebComment module).
 
           Note that in order to enable the editor you have to set the
-          CFG_WEBCOMMENT_USE_FCKEDITOR to True.
+          CFG_WEBCOMMENT_USE_RICH_EDITOR to True.
 
       $ make install-pdfa-helper-files ## optional
 
           This will automatically download and install in the proper
           place the helper files needed to create PDF/A files out of
           existing PDF files.
+
+      $ make install-mediaelement ## optional
+
+          This will automatically download and install the MediaElementJS
+          HTML5 video player that is needed for videos on the DEMO site.
 
 2b. Configuration
 -----------------
@@ -535,6 +579,35 @@ Contents
           file and it will override any default options with the ones
           you have specifield in your local file.  This cascading of
           configuration parameters will ease your future upgrades.
+
+          If you want to have multiple Invenio instances for distributed
+          video encoding, you need to share the same configuration amongs
+          them and make some of the folders of the Invenio installation
+          available for all nodes.
+
+            Configure the allowed tasks for every node:
+
+              CFG_BIBSCHED_NODE_TASKS = {
+                  "hostname_machine1" : ["bibindex", "bibupload",
+                      "bibreformat","webcoll", "bibtaskex", "bibrank",
+                      "oaiharvest", "oairepositoryupdater", "inveniogc",
+                      "webstatadmin", "bibclassify", "bibexport",
+                      "dbdump", "batchuploader", "bibauthorid", "bibtasklet"],
+                  "hostname_machine2" : ['bibencode',]
+              }
+
+            Share the following directories among Invenio instances:
+
+              /var/tmp-shared
+                 hosts video uploads in a temporary form
+              /var/tmp-shared/bibencode/jobs
+                 hosts new job files for the video encoding daemon
+              /var/tmp-shared/bibencode/jobs/done
+                 hosts job files that have been processed by the daemon
+              /var/data/files
+                 hosts fulltext and media files associated to records
+              /var/data/submit
+                 hosts files created during submissions
 
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
 
@@ -615,12 +688,24 @@ Contents
 
           Note that you may need to adapt generated vhost file
           snippets to match your concrete operating system specifics.
+          For example, the generated configuration snippet will
+          preload Invenio WSGI daemon application upon Apache start up
+          for faster site response.  The generated configuration
+          assumes that you are using mod_wsgi version 3 or later.  If
+          you are using the old legacy mod_wsgi version 2, then you
+          would need to comment out the WSGIImportScript directive
+          from the generated snippet, or else move the WSGI daemon
+          setup to the top level, outside of the VirtualHost section.
 
-          Note also that you may want to tweak the generated example
-          configurations, especially with respect to the
-          WSGIDaemonProcess parameters.  E.g. increase the `processes'
-          parameter if you have lots of RAM and many concurrent users
-          accessing your site in parallel.
+          Note also that you may want to tweak the generated Apache
+          vhost snippet for performance reasons, especially with
+          respect to WSGIDaemonProcess parameters.  For example, you
+          can increase the number of processes from the default value
+          `processes=5' if you have lots of RAM and if many concurrent
+          users may access your site in parallel.  However, note that
+          you must use `threads=1' there, because Invenio WSGI daemon
+          processes are not fully thread safe yet.  This may change in
+          the future.
 
       $ sudo /etc/init.d/apache2 restart
 

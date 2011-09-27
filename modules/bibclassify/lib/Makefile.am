@@ -27,7 +27,9 @@ pylib_DATA = bibclassify_acronym_analyzer.py \
              bibclassify_ontology_reader.py \
              bibclassify_text_extractor.py \
              bibclassify_text_normalizer.py \
-             bibclassify_utils.py \
+             bibclassify_microtests.py \
+             bibclassify_templates.py \
+             bibclassify_tests.py \
              bibclassify_webinterface.py
 
 EXTRA_DIST = $(pylib_DATA)

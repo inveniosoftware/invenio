@@ -93,6 +93,12 @@ def get_creation_date_libxslt(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
 
     if recID is string, value is converted to int
     if recID is Node, first child node (text node) is taken as value
+
+    @param ctx: context as passed by libxslt
+    @param recID: record ID
+    @param fmt: format of the returned date
+    @return: creation date of X{recID}
+    @rtype: string
     """
     try:
         if isinstance(recID, str):
@@ -127,6 +133,12 @@ def get_creation_date_4suite(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
 
     if value is int, value is converted to string
     if value is Node, first child node (text node) is taken as value
+
+    @param ctx: context as passed by 4suite
+    @param recID: record ID
+    @param fmt: format of the returned date
+    @return: creation date of X{recID}
+    @rtype: string
     """
     try:
         if len(recID) > 0 and isinstance(recID[0], Node):
@@ -163,6 +175,12 @@ def get_modification_date_libxslt(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
 
     if recID is string, value is converted to int
     if recID is Node, first child node (text node) is taken as value
+
+    @param ctx: context as passed by libxslt
+    @param recID: record ID
+    @param fmt: format of the returned date
+    @return: modification date of X{recID}
+    @rtype: string
     """
     try:
         if isinstance(recID, str):
@@ -197,6 +215,12 @@ def get_modification_date_4suite(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
 
     if value is int, value is converted to string
     if value is Node, first child node (text node) is taken as value
+
+    @param ctx: context as passed by 4suite
+    @param recID: record ID
+    @param fmt: format of the returned date
+    @return: modification date of X{recID}
+    @rtype: string
     """
     try:
         if len(recID) > 0 and isinstance(recID[0], Node):
@@ -235,7 +259,13 @@ def eval_bibformat_libxslt(ctx, recID, template_code):
     if recID is Node, first child node (text node) is taken as value
     template_code is evaluated as a format template piece of code. '<'
     and '"' need to be escaped with '&lt;' and '&quot;'
-    """
+
+    @param ctx: context as passed by libxslt
+    @param recID: record ID
+    @param template_code: the code calling a BFE_ as it would be use in format template
+    @return: the evalued call to a format template (usually a call to a format element)
+    @rtype: string
+    """ #'
     from invenio.bibformat_engine import \
     format_with_format_template, \
     BibFormatObject
@@ -273,7 +303,13 @@ def eval_bibformat_4suite(ctx, recID, template_code):
     if recID is Node, first child node (text node) is taken as value
     template_code is evaluated as a format template piece of code. '<'
     and '"' need to be escaped with '&lt;' and '&quot;'
-    """
+
+    @param ctx: context as passed by 4suite
+    @param recID: record ID
+    @param template_code: the code calling a BFE_ as it would be use in format template
+    @return: the evalued call to a format template (usually a call to a format element)
+    @rtype: string
+    """ #'
     from invenio.bibformat_engine import \
     format_with_format_template, \
     BibFormatObject

@@ -136,6 +136,8 @@ def build_seealso_links(basic_search_units, seealso_engines, req, lang, query):
     links = []
     for engine in seealso_engines:
         url = engine.build_search_url(basic_search_units, req.args, lang)
+        user_url = engine.build_user_search_url(basic_search_units, req.args, lang)
+        url = user_url or url
         if url:
             links.append('<a class="google" href="%(url)s">%(query)s %(text_in)s %(name)s</a>' % \
                 {'url': cgi.escape(url),
@@ -186,8 +188,9 @@ def do_external_search(req, lang, vprint, basic_search_units, search_engines):
 
     for engine in search_engines:
         url = engine.build_search_url(basic_search_units, req.args, lang)
+        user_url = engine.build_user_search_url(basic_search_units, req.args, lang)
         if url:
-            engines_list.append([url, engine])
+            engines_list.append([url, engine, user_url])
 
     pagegetters_list = [HTTPAsyncPageGetter(engine[0]) for engine in engines_list]
 
@@ -429,8 +432,9 @@ def do_calculate_hosted_collections_results(req, lang, vprint, verbosity_level, 
     if type(hosted_search_engines) is set:
         for engine in hosted_search_engines:
             url = engine.build_search_url(basic_search_units, req.args, lang)
+            user_url = engine.build_user_search_url(basic_search_units, req.args, lang)
             if url:
-                engines_list.append([url, engine])
+                engines_list.append([url, engine, user_url])
     # in case we are iterating a pre calculated url+engine list
     elif type(hosted_search_engines) is list:
         for engine in hosted_search_engines:

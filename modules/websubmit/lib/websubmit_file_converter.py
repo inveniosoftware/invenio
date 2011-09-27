@@ -131,7 +131,7 @@ def get_conversion_map():
         '.xml': {},
         '.hocr': {},
         '.pdf;pdfa': {},
-
+        '.asc': {},
     }
     if CFG_PATH_GZIP:
         ret['.ps']['.ps.gz'] = (gzip, {})
@@ -171,6 +171,7 @@ def get_conversion_map():
     if CFG_PATH_PDFTOTEXT:
         ret['.pdf']['.txt'] = (pdf2text, {})
         ret['.pdf;pdfa']['.txt'] = (pdf2text, {})
+    ret['.asc']['.txt'] = (txt2text, {})
     ret['.txt']['.txt'] = (txt2text, {})
     ret['.csv']['.txt'] = (txt2text, {})
     ret['.html']['.txt'] = (html2text, {})
@@ -186,7 +187,7 @@ def get_conversion_map():
         ret['.sxw']['.odt'] = (unoconv, {'output_format': 'odt'})
         ret['.odt']['.doc'] = (unoconv, {'output_format': 'doc'})
         ret['.odt']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
-        ret['.odt']['.txt'] = (unoconv, {'output_format': 'text'})
+        ret['.odt']['.txt'] = (unoconv, {'output_format': 'txt'})
         ret['.ppt']['.odp'] = (unoconv, {'output_format': 'odp'})
         ret['.pptx']['.odp'] = (unoconv, {'output_format': 'odp'})
         ret['.sxi']['.odp'] = (unoconv, {'output_format': 'odp'})

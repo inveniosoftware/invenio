@@ -69,12 +69,13 @@ from invenio.config import \
      CFG_BIBFORMAT_HIDDEN_TAGS, \
      CFG_SITE_URL, \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
-     CFG_BIBRANK_SHOW_CITATION_LINKS, \
      CFG_SOLR_URL, \
-     CFG_SITE_RECORD
+     CFG_SITE_RECORD, \
+     CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT
 
 from invenio.search_engine_config import InvenioWebSearchUnknownCollectionError, InvenioWebSearchWildcardLimitError
-from invenio.bibrecord import create_record, record_get_field_instances
+from invenio.search_engine_utils import get_fieldvalues
+from invenio.bibrecord import create_record
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records, is_method_valid
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibindex_engine_stemmer import stem
@@ -88,7 +89,7 @@ from invenio.websearch_external_collections import print_external_results_overvi
 from invenio.access_control_admin import acc_get_action_id
 from invenio.access_control_config import VIEWRESTRCOLL, \
     CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
-from invenio.websearchadminlib import get_detailed_page_tabs
+from invenio.websearchadminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
 from invenio.intbitset import intbitset as HitSet
 from invenio.dbquery import DatabaseError, deserialize_via_marshal, InvenioDbQueryWildcardLimitError
 from invenio.access_control_engine import acc_authorize_action
@@ -101,14 +102,15 @@ import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 webcomment_templates = invenio.template.load('webcomment')
 
-from invenio.bibrank_citation_searcher import get_cited_by_count, calculate_cited_by_list, \
+from invenio.bibrank_citation_searcher import calculate_cited_by_list, \
     calculate_co_cited_with_list, get_records_with_num_cites, get_self_cited_by, \
     get_refersto_hitset, get_citedby_hitset
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
+
 from invenio.dbquery import run_sql, run_sql_with_limit, \
                             get_table_update_time, Error
-from invenio.webuser import getUid, collect_user_info
+from invenio.webuser import getUid, collect_user_info, session_param_set
 from invenio.webpage import pageheaderonly, pagefooteronly, create_error_box
 from invenio.messages import gettext_set_language
 from invenio.search_engine_query_parser import SearchQueryParenthesisedParser, \
@@ -427,6 +429,31 @@ def get_collection_reclist(coll, recreate_cache_if_needed=True):
     # finally, return reclist:
     return collection_reclist_cache.cache[coll]
 
+def get_available_output_formats(visible_only=False):
+    """
+    Return the list of available output formats.  When visible_only is
+    True, returns only those output formats that have visibility flag
+    set to 1.
+    """
+
+    formats = []
+    query = "SELECT code,name FROM format"
+    if visible_only:
+        query += " WHERE visibility='1'"
+    query += " ORDER BY name ASC"
+    res = run_sql(query)
+    if res:
+        # propose found formats:
+        for code, name in res:
+            formats.append({ 'value' : code,
+                             'text' : name
+                           })
+    else:
+        formats.append({'value' : 'hb',
+                        'text' : "HTML brief"
+                       })
+    return formats
+
 class SearchResultsCache(DataCacher):
     """
     Provides temporary lazy cache for Search Results.
@@ -603,7 +630,7 @@ def get_index_id_from_field(field):
     Example: field='author', output=4.
     """
     out = 0
-    if field == '':
+    if not field:
         field = 'global' # empty string field means 'global' index (field 'anyfield')
 
     # first look in the index table:
@@ -1026,19 +1053,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, aas,
                        'text' : name,
                      })
 
-    formats = []
-    query = """SELECT code,name FROM format WHERE visibility='1' ORDER BY name ASC"""
-    res = run_sql(query)
-    if res:
-        # propose found formats:
-        for code, name in res:
-            formats.append({ 'value' : code,
-                             'text' : name
-                           })
-    else:
-        formats.append({'value' : 'hb',
-                        'text' : _("HTML brief")
-                       })
+    formats = get_available_output_formats(visible_only=True)
 
     # show collections in the search box? (not if there is only one
     # collection defined, and not if we are in light search)
@@ -1927,7 +1942,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
 
     for idx_unit in xrange(len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
-        if len(bsu_f) < 2 and not bsu_f == '':
+        if bsu_f and len(bsu_f) < 2:
             if of.startswith("h"):
                 print_warning(req, _("There is no index %s.  Searching for %s in all fields." % (bsu_f, bsu_p)))
             bsu_f = ''
@@ -2420,19 +2435,19 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
                 # wildcard query, or only the beginning of field 't'
                 # is defined, so add wildcard character:
                 query += " AND bx.tag LIKE %s"
-                query_params = query_params + (t + '%',)
+                query_params_and_tag = query_params + (t + '%',)
             else:
                 # exact query for 't':
                 query += " AND bx.tag=%s"
-                query_params = query_params + (t,)
+                query_params_and_tag = query_params + (t,)
             if use_query_limit:
                 try:
-                    res = run_sql_with_limit(query, query_params, wildcard_limit=wl)
+                    res = run_sql_with_limit(query, query_params_and_tag, wildcard_limit=wl)
                 except InvenioDbQueryWildcardLimitError, excp:
                     res = excp.res
                     limit_reached = 1 # set the limit reached flag to true
             else:
-                res = run_sql(query, query_params)
+                res = run_sql(query, query_params_and_tag)
         # fill the result set:
         for id_bibrec in res:
             if id_bibrec[0]:
@@ -3133,55 +3148,6 @@ def get_field_tags(field):
         out.append(val[0])
     return out
 
-
-def get_fieldvalues(recIDs, tag, repetitive_values=True):
-    """
-    Return list of field values for field TAG for the given record ID
-    or list of record IDs.  (RECIDS can be both an integer or a list
-    of integers.)
-
-    If REPETITIVE_VALUES is set to True, then return all values even
-    if they are doubled.  If set to False, then return unique values
-    only.
-    """
-    out = []
-    if isinstance(recIDs, (int, long)):
-        recIDs =[recIDs,]
-    if not isinstance(recIDs, (list, tuple)):
-        return []
-    if len(recIDs) == 0:
-        return []
-    if tag == "001___":
-        # we have asked for tag 001 (=recID) that is not stored in bibXXx tables
-        out = [str(recID) for recID in recIDs]
-    else:
-        # we are going to look inside bibXXx tables
-        digits = tag[0:2]
-        try:
-            intdigits = int(digits)
-            if intdigits < 0 or intdigits > 99:
-                raise ValueError
-        except ValueError:
-            # invalid tag value asked for
-            return []
-        bx = "bib%sx" % digits
-        bibx = "bibrec_bib%sx" % digits
-        queryparam = []
-        for recID in recIDs:
-            queryparam.append(recID)
-        if not repetitive_values:
-            queryselect = "DISTINCT(bx.value)"
-        else:
-            queryselect = "bx.value"
-        query = "SELECT %s FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec IN (%s) " \
-                " AND bx.id=bibx.id_bibxxx AND bx.tag LIKE %%s " \
-                " ORDER BY bibx.field_number, bx.tag ASC" % \
-                (queryselect, bx, bibx, ("%s,"*len(queryparam))[:-1])
-        res = run_sql(query, tuple(queryparam) + (tag,))
-        for row in res:
-            out.append(row[0])
-    return out
-
 def get_fieldvalues_alephseq_like(recID, tags_in, can_see_hidden=False):
     """Return buffer of ALEPH sequential-like textual format with fields found
        in the list TAGS_IN for record RECID.
@@ -3751,19 +3717,6 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                             # internal recid.
                             pass
 
-                    citedbynum = 0 #num of citations, to be shown in the cit tab
-                    references = -1 #num of references
-                    if CFG_BIBRANK_SHOW_CITATION_LINKS:
-                        citedbynum = get_cited_by_count(recid)
-                    if not CFG_CERN_SITE:#FIXME:should be replaced by something like CFG_SHOW_REFERENCES
-                        reftag = ""
-                        reftags = get_field_tags("reference")
-                        if reftags:
-                            reftag = reftags[0]
-                        tmprec = get_record(recid)
-                        if reftag and len(reftag) > 4:
-                            references = len(record_get_field_instances(tmprec, reftag[0:3], reftag[3], reftag[4]))
-
                     tabs = [(unordered_tabs[tab_id]['label'], \
                              '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, recid_to_display, tab_id, link_ln), \
                              tab_id == tab,
@@ -3771,13 +3724,19 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                             for (tab_id, order) in ordered_tabs_id
                             if unordered_tabs[tab_id]['visible'] == True]
 
+                    tabs_counts = get_detailed_page_tabs_counts(recid)
+                    citedbynum = tabs_counts['Citations']
+                    references = tabs_counts['References']
+                    discussions = tabs_counts['Discussions']
+
                     # load content
                     if tab == 'usage':
                         req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
                                                      tabs,
                                                      ln,
                                                      citationnum=citedbynum,
-                                                     referencenum=references))
+                                                     referencenum=references,
+                                                     discussionnum=discussions))
                         r = calculate_reading_similarity_list(recIDs[irec], "downloads")
                         downloadsimilarity = None
                         downloadhistory = None
@@ -3804,7 +3763,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                                                      tabs,
                                                      ln,
                                                      citationnum=citedbynum,
-                                                     referencenum=references))
+                                                     referencenum=references,
+                                                     discussionnum=discussions))
                         req.write(websearch_templates.tmpl_detailed_record_citations_prologue(recid, ln))
 
                         # Citing
@@ -3847,64 +3807,36 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                                                      tabs,
                                                      ln,
                                                      citationnum=citedbynum,
-                                                     referencenum=references))
+                                                     referencenum=references,
+                                                     discussionnum=discussions))
 
                         req.write(format_record(recIDs[irec], 'HDREF', ln=ln, user_info=user_info, verbose=verbose))
                         req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
                                                                                       tabs,
                                                                                       ln))
                     elif tab == 'keywords':
-                        from invenio.bibclassify_webinterface import \
-                            record_get_keywords, get_sorting_options, \
-                            generate_keywords, get_keywords_body
-                        from invenio.webinterface_handler import wash_urlargd
-                        form = req.form
-                        argd = wash_urlargd(form, {
-                            'generate': (str, 'no'),
-                            'sort': (str, 'occurrences'),
-                            'type': (str, 'tagcloud'),
-                            'numbering': (str, 'off'),
-                            })
+                        import bibclassify_webinterface
                         recid = recIDs[irec]
-
-                        req.write(webstyle_templates.detailed_record_container_top(recid,
-                            tabs, ln, citationnum=citedbynum, referencenum=references))
-
-                        if argd['generate'] == 'yes':
-                            # The user asked to generate the keywords.
-                            keywords = generate_keywords(req, recid)
-                        else:
-                            # Get the keywords contained in the MARC.
-                            keywords = record_get_keywords(recid, argd)
-
-                        if keywords:
-                            req.write(get_sorting_options(argd, keywords))
-                        elif argd['sort'] == 'related' and not keywords:
-                            req.write('You may want to run BibIndex.')
-
-                        # Output the keywords or the generate button.
-                        get_keywords_body(keywords, req, recid, argd)
-
-                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
-                            tabs, ln))
+                        bibclassify_webinterface.main_page(req, recid, tabs, ln, webstyle_templates)
                     elif tab == 'plots':
                         req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
                                                                                    tabs,
                                                                                    ln))
-                        content = websearch_templates.tmpl_record_plots(
-                                                        recID=recIDs[irec],
-                                                        ln=ln)
+                        content = websearch_templates.tmpl_record_plots(recID=recIDs[irec],
+                                                                         ln=ln)
                         req.write(content)
                         req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
                                                                                       tabs,
                                                                                       ln))
+
                     else:
                         # Metadata tab
                         req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
                                                      tabs,
                                                      ln,
                                                      show_short_rec_p=False,
-                                                     citationnum=citedbynum, referencenum=references))
+                                                     citationnum=citedbynum, referencenum=references,
+                                                     discussionnum=discussions))
 
                         creationdate = None
                         modificationdate = None
@@ -3923,8 +3855,12 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                             creationdate = creationdate,
                             modificationdate = modificationdate,
                             content = content)
+                        # display of the next-hit/previous-hit/back-to-search links
+                        # on the detailed record pages
+                        content += websearch_templates.tmpl_display_back_to_search(req,
+                                                                                   recIDs[irec],
+                                                                                   ln)
                         req.write(content)
-
                         req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
                                                                                       tabs,
                                                                                       ln,
@@ -4717,6 +4653,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
 
         if req is not None and not req.header_only:
             page_start(req, of, cc, aas, ln, uid, title, description, keywords, recid, tab)
+
         # Default format is hb but we are in detailed -> change 'of'
         if of == "hb":
             of = "hd"
@@ -5199,6 +5136,8 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                 if len(colls_to_search)>1:
                     cpu_time = -1 # we do not want to have search time printed on each collection
                 print_records_prologue(req, of, cc=cc)
+                results_final_colls = []
+                wlqh_results_overlimit = 0
                 for coll in colls_to_search:
                     if results_final.has_key(coll) and len(results_final[coll]):
                         if of.startswith("h"):
@@ -5225,6 +5164,12 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                                 # rank_records failed and returned some error message to display:
                                 print_warning(req, results_final_relevances_prologue)
                                 print_warning(req, results_final_relevances_epilogue)
+
+                        if len(results_final_recIDs) < CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT:
+                            results_final_colls.append(results_final_recIDs)
+                        else:
+                            wlqh_results_overlimit = 1
+
                         print_records(req, results_final_recIDs, jrec, rg, of, ot, ln,
                                       results_final_relevances,
                                       results_final_relevances_prologue,
@@ -5237,11 +5182,24 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                                       so=so,
                                       sp=sp,
                                       rm=rm)
+
                         if of.startswith("h"):
                             req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
                                                         jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                         sc, pl_in_url,
                                                         d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1))
+
+                # store the last search results page
+                if req and not isinstance(req, cStringIO.OutputType):
+                    session_param_set(req, 'websearch-last-query', req.unparsed_uri)
+                    if not wlqh_results_overlimit:
+                        # store list of results if user wants to display hits
+                        # in a single list, or store list of collections of records
+                        # if user displays hits split by collections:
+                        session_param_set(req, 'websearch-last-query-hits', results_final_colls)
+                    else:
+                        results_final_colls = []
+                        session_param_set(req, 'websearch-last-query-hits', results_final_colls)
 
                 #if hosted_colls and (of.startswith("h") or of.startswith("x")):
                 if hosted_colls_actual_or_potential_results_p:

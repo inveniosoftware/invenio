@@ -1,0 +1,107 @@
+// -*- coding: utf-8 -*-
+//
+// This file is part of Invenio.
+// Copyright (C) 2011 CERN.
+//
+// Invenio is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as
+// published by the Free Software Foundation; either version 2 of the
+// License, or (at your option) any later version.
+//
+// Invenio is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Invenio; if not, write to the Free Software Foundation, Inc.,
+// 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+
+// Recommended rates for good video quality
+// 270p  >  500kbps
+// 360p  > 2000kbps
+// 480p  > 2600kbps
+// 720p  > 4000kbps
+// 1080p > 7000kbps
+
+{
+	"MP4_480P": {
+		"videocodec": "libx264",
+		"audiocodec": "libfaac",
+		"videobitrate": "1000k",
+		"audiobitrate": "128k",
+		"width": 854,
+		"height": 480,
+		"passes": 1,
+		"extension": "mp4",
+		"special": "-vpre baseline -ac 2"
+	},
+	"MP4_480P_2PASS": {
+		"videocodec": "libx264",
+		"audiocodec": "libfaac",
+		"videobitrate": "1000k",
+		"audiobitrate": "128k",
+		"width": 854,
+		"height": 480,
+		"passes": 2,
+		"extension": "mp4",
+		"special_firstpass": "-vpre baseline -ac 2",
+		"special_secondpass": "-vpre fast_firstpass -ac 2"
+	},
+	"MP4_720P": {
+		"videocodec": "libx264",
+		"audiocodec": "libfaac",
+		"videobitrate": "2500k",
+		"audiobitrate": "128k",
+		"width": 1280,
+		"height": 720,
+		"passes": 1,
+		"extension": "mp4",
+		"special": "-vpre baseline -ac 2"
+	},
+	"WEBM_480P": {
+		"videocodec": "libvpx",
+		"audiocodec": "libvorbis",
+		"videobitrate": "1000k",
+		"audiobitrate": "128k",
+		"width": 854,
+		"height": 480,
+		"passes": 1,
+		"extension": "webm",
+		"special": "-ac 2 -g 320 -qmax 63"
+	},
+	"WEBM_720P": {
+		"videocodec": "libvpx",
+		"audiocodec": "libvorbis",
+		"videobitrate": "2500k",
+		"audiobitrate": "128k",
+		"width": 1280,
+		"height": 720,
+		"passes": 1,
+		"extension": "webm",
+		"special": "-ac 2 -g 320 -qmax 63"
+	},
+	"THEORA_480P": {
+		"videocodec": "libtheora",
+		"audiocodec": "libvorbis",
+		"videobitrate": "1000k",
+		"audiobitrate": "128k",
+		"width": 854,
+		"height": 480,
+		"passes": 1,
+		"extension": "ogv",
+		"special": "-ac 2"
+	},
+	"THEORA_720P": {
+		"videocodec": "libtheora",
+		"audiocodec": "libvorbis",
+		"videobitrate": "2500k",
+		"audiobitrate": "128k",
+		"width": 1280,
+		"height": 720,
+		"passes": 1,
+		"extension": "ogv",
+		"special": "-ac 2"
+	}
+}

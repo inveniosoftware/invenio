@@ -34,14 +34,13 @@ import calendar
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.webuser import collect_user_info, page_not_authorized
-from invenio.config import CFG_BINDIR, CFG_TMPDIR, CFG_LOGDIR, \
+from invenio.config import CFG_BINDIR, CFG_TMPSHAREDDIR, CFG_LOGDIR, \
                             CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
                             CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
                             CFG_OAI_ID_FIELD, CFG_BATCHUPLOADER_DAEMON_DIR, \
                             CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS, \
                             CFG_BATCHUPLOADER_WEB_ROBOT_AGENT, \
                             CFG_PREFIX, CFG_SITE_LANG
-from invenio.webinterface_handler_wsgi_utils import Field
 from invenio.textutils import encode_for_xml
 from invenio.bibtask import task_low_level_submission
 from invenio.messages import gettext_set_language
@@ -104,11 +103,15 @@ def cli_upload(req, file_content=None, mode=None):
         msg = "[ERROR] Invalid upload mode."
         _log(msg)
         return _write(req, msg)
-    if isinstance(arg_file, Field):
+    if hasattr(arg_file, "filename"):
         arg_file = arg_file.value
+    else:
+        msg = "[ERROR] 'file' parameter must be a (single) file"
+        _log(msg)
+        return _write(req, msg)
 
     # write temporary file:
-    tempfile.tempdir = CFG_TMPDIR
+    tempfile.tempdir = CFG_TMPSHAREDDIR
 
     filename = tempfile.mktemp(prefix="batchupload_" + \
                time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_")
@@ -163,7 +166,7 @@ def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None
         metafile = _transform_input_to_marcxml(file_input=metafile.value)
 
     user_info = collect_user_info(req)
-    tempfile.tempdir = CFG_TMPDIR
+    tempfile.tempdir = CFG_TMPSHAREDDIR
     filename = tempfile.mktemp(prefix="batchupload_" + \
         user_info['nickname'] + "_" + time.strftime("%Y%m%d%H%M%S",
         time.localtime()) + "_")
@@ -172,9 +175,10 @@ def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None
     filedesc.close()
 
     # check if this client can run this file:
-    allow = _check_client_can_submit_file(req=req, metafile=metafile, webupload=1, ln=ln)
-    if allow[0] != 0:
-        return (error_codes['not_authorized'], allow[1])
+    if req is not None:
+        allow = _check_client_can_submit_file(req=req, metafile=metafile, webupload=1, ln=ln)
+        if allow[0] != 0:
+            return (error_codes['not_authorized'], allow[1])
 
     # check MARCXML validity
     if filetype == 'marcxml':
@@ -276,13 +280,14 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
                 if len(errors) > num_errors:
                     continue
             # Check if user has rights to upload file
-            file_collection = guess_collection_of_a_record(int(rec_id))
-            auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader', collection=file_collection)
-            if auth_code != 0:
-                error_msg = err_desc[5] % file_collection
-                errors.append((docfile, error_msg))
-                continue
-            tempfile.tempdir = CFG_TMPDIR
+            if req is not None:
+                file_collection = guess_collection_of_a_record(int(rec_id))
+                auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader', collection=file_collection)
+                if auth_code != 0:
+                    error_msg = err_desc[5] % file_collection
+                    errors.append((docfile, error_msg))
+                    continue
+            tempfile.tempdir = CFG_TMPSHAREDDIR
             # Move document to be uploaded to temporary folder
             tmp_file = tempfile.mktemp(prefix=identifier + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_", suffix=extension)
             shutil.copy(os.path.join(folder, docfile), tmp_file)
@@ -302,8 +307,10 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
             filedesc.write(marc_content)
             filedesc.close()
             info[1].append(docfile)
-            user_info = collect_user_info(req)
-            user = user_info['nickname']
+            user = ""
+            if req is not None:
+                user_info = collect_user_info(req)
+                user = user_info['nickname']
             if not user:
                 user = "batchupload"
             # Execute bibupload with the appropiate mode
@@ -594,7 +601,7 @@ def _transform_input_to_marcxml(file_input=""):
     to MARCXML.
     """
     # Create temporary file to read from
-    tmp_fd, filename = tempfile.mkstemp(dir=CFG_TMPDIR)
+    tmp_fd, filename = tempfile.mkstemp(dir=CFG_TMPSHAREDDIR)
     os.write(tmp_fd, file_input)
     os.close(tmp_fd)
     try:

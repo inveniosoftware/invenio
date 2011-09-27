@@ -33,8 +33,8 @@
     <form action="<CFG_SITE_URL>/search" method="get">
     <input size="20" type="text" name="p" value="" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -64,8 +64,8 @@
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     <p>
@@ -102,8 +102,8 @@
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="NA60" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     <p>
@@ -150,8 +150,8 @@ della ricerca.</it>
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="higgs boson" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -174,7 +174,7 @@ della ricerca.</it>
     <input size="20" type="text" name="p" value="'higgs boson'" />
     <select name="f"><option value="">_(any field)_</option>
                      <option selected="selected">_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -198,7 +198,7 @@ della ricerca.</it>
     <input size="20" type="text" name="p" value="&quot;higgs boson&quot;" />
     <select name="f"><option value="">_(any field)_</option>
                      <option selected="selected">_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -242,8 +242,8 @@ della ricerca.</it>
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon*" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -282,8 +282,8 @@ della ricerca.</it>
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon kaon" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -293,8 +293,8 @@ della ricerca.</it>
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon AND kaon" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -313,8 +313,8 @@ della ricerca.</it>
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon OR kaon" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -333,8 +333,8 @@ della ricerca.</it>
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon NOT kaon" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -367,8 +367,8 @@ della ricerca.</it>
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="(gravity OR supergravity) AND (ellis OR perelstein)" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -401,8 +401,8 @@ della ricerca.</it>
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="2003" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
                      <option selected="selected" value="year">_(year)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
@@ -422,8 +422,8 @@ della ricerca.</it>
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="year:2003" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -442,8 +442,8 @@ della ricerca.</it>
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="year:2003->2004" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -476,8 +476,8 @@ della ricerca.</it>
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="cited:3->30" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -494,8 +494,8 @@ della ricerca.</it>
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="refersto:author:ellis" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -513,8 +513,8 @@ della ricerca.</it>
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="citedby:author:ellis" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -546,8 +546,8 @@ della ricerca.</it>
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="Ellis" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -571,7 +571,7 @@ della ricerca.</it>
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="Ellis, J R" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
+                     <option value="title">_(title)_</option>
                      <option selected="selected" value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
@@ -595,7 +595,7 @@ della ricerca.</it>
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="Ellis, John Rolfe" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
+                     <option value="title">_(title)_</option>
                      <option selected="selected" value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
@@ -616,8 +616,8 @@ della ricerca.</it>
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="author:&quot;Ellis, J*&quot; year:1990->1993" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>

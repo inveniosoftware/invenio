@@ -20,6 +20,8 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = bibrecord_config.py \
              bibrecord.py \
              bibrecord_tests.py \
+             refextract_cli.py \
+             refextract_daemon.py \
              refextract_config.py \
              refextract.py \
              refextract_tests.py \
@@ -46,8 +48,16 @@ js_DATA = bibedit_display.js \
           bibedit_menu.js \
           bibeditmulti.js \
           bibedit_holdingpen.js \
-	  marcxml.js \
-	  bibedit_clipboard.js
+          marcxml.js \
+          bibedit_clipboard.js \
+          bibedit_template_interface.js
+
+install-data-hook:
+	## Let's initialize an empty jquery.min.js, so that if the admin does not
+	## run make install-jquery-plugins, at least when jquery.min.js is
+	## downloaded by the client browser, no 404 error is raised.
+	@mkdir -p $(jsdir)/jquery
+	@touch $(jsdir)/jquery/jquery.min.js
 
 EXTRA_DIST = $(pylib_DATA) \
              $(js_DATA)

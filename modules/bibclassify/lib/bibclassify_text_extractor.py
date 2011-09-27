@@ -29,6 +29,8 @@ and text_lines_from_url.
 
 This module also provides the utility 'is_pdf' that uses GNU file in order to
 determine if a local file is a PDF file.
+
+This module is STANDALONE safe
 """
 
 import os
@@ -36,34 +38,41 @@ import re
 import sys
 import tempfile
 import urllib2
+import bibclassify_config as bconfig
 
-from bibclassify_utils import write_message
+log = bconfig.get_logger("bibclassify.text_extractor")
+
 
 _ONE_WORD = re.compile("[A-Za-z]{2,}")
 
 def text_lines_from_local_file(document, remote=False):
-    """Returns the fulltext of the local file."""
+    """Returns the fulltext of the local file.
+    @var document: fullpath to the file that should be read
+    @var remote: boolean, if True does not count lines (gosh!)
+    @return: list of lines if st was read or an empty list"""
+
+    # FIXME - this does not care if we open anything, including binary files
+
     try:
         if is_pdf(document):
             if not executable_exists("pdftotext"):
-                write_message("ERROR: pdftotext is not available on the "
-                    "system.", stream=sys.stderr, verbose=1)
+                log.error("pdftotext is not available on the system.")
             cmd = "pdftotext -q -enc UTF-8 %s -" % re.escape(document)
             filestream = os.popen(cmd)
         else:
             filestream = open(document, "r")
     except IOError, ex1:
-        write_message("ERROR: Unable to read from file %s. (%s)" % (document,
-            ex1.strerror), stream=sys.stderr, verbose=1)
-        return None
+        log.error("Unable to read from file %s. (%s)" % (document, ex1.strerror))
+        return []
 
-    lines = [line.decode("utf-8") for line in filestream]
+    # FIXME - we assume it is utf-8 encoded / that is not good
+    lines = [line.decode("utf-8", 'replace') for line in filestream]
     filestream.close()
 
     if not _is_english_text('\n'.join(lines)):
-        write_message("WARNING: It seems the file '%s' is unvalid and doesn't "
+        log.warning("It seems the file '%s' is unvalid and doesn't "
             "contain text. Please communicate this file to the Invenio "
-            "team." % document, stream=sys.stderr, verbose=0)
+            "team." % document)
 
     line_nb = len(lines)
     word_nb = 0
@@ -74,8 +83,7 @@ def text_lines_from_local_file(document, remote=False):
     lines = [line for line in lines if _ONE_WORD.search(line) is not None]
 
     if not remote:
-        write_message("INFO: Local file has %d lines and %d words." % (line_nb,
-            word_nb), stream=sys.stderr, verbose=3)
+        log.info("Local file has %d lines and %d words." % (line_nb, word_nb))
 
     return lines
 
@@ -111,14 +119,12 @@ def text_lines_from_url(url, user_agent=""):
     try:
         distant_stream = urllib2.urlopen(request)
         # Write the URL content to a temporary file.
-        tmpfd, local_file = tempfile.mkstemp(prefix="bibclassify.")
-        os.close(tmpfd)
+        local_file = tempfile.mkstemp(prefix="bibclassify.")[1]
         local_stream = open(local_file, "w")
         local_stream.write(distant_stream.read())
         local_stream.close()
     except:
-        write_message("ERROR: Unable to read from URL %s." % url,
-            stream=sys.stderr, verbose=1)
+        log.error("Unable to read from URL %s." % url)
         return None
     else:
         # Read lines from the temporary file.
@@ -130,8 +136,7 @@ def text_lines_from_url(url, user_agent=""):
         for line in lines:
             word_nb += len(re.findall("\S+", line))
 
-        write_message("INFO: Remote file has %d lines and %d words." %
-            (line_nb, word_nb), stream=sys.stderr, verbose=3)
+        log.info("Remote file has %d lines and %d words." % (line_nb, word_nb))
 
         return lines
 
@@ -144,10 +149,9 @@ def executable_exists(executable):
 
 def is_pdf(document):
     """Checks if a document is a PDF file. Returns True if is is."""
-    if not executable_exists:
-        write_message("WARNING: GNU file was not found on the system. "
-            "Switching to a weak file extension test.", stream=sys.stderr,
-            verbose=2)
+    if not executable_exists('pdftotext'):
+        log.warning("GNU file was not found on the system. "
+            "Switching to a weak file extension test.")
         if document.lower().endswith(".pdf"):
             return True
         return False
@@ -158,14 +162,12 @@ def is_pdf(document):
     try:
         filetype = file_output.split(":")[1]
     except IndexError:
-        write_message("WARNING: Your version of the 'file' utility seems to "
-            "be unsupported. Please report this to info@invenio-software.org.",
-            stream=sys.stderr, verbose=2)
-        sys.exit(1)
+        log.error("Your version of the 'file' utility seems to "
+            "be unsupported. Please report this to cds.support@cern.ch.")
+        raise Exception('Incompatible pdftotext')
 
     pdf = filetype.find("PDF") > -1
     # This is how it should be done however this is incompatible with
     # file version 4.10.
     #os.popen('file -bi ' + document).read().find("application/pdf")
     return pdf
-

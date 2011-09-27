@@ -86,6 +86,7 @@ INSERT INTO collectionname VALUES (2,'ro','ln','Preprinturi');
 INSERT INTO collectionname VALUES (2,'rw','ln','Preprints');
 INSERT INTO collectionname VALUES (2,'ka','ln','პრეპრინტები');
 INSERT INTO collectionname VALUES (2,'lt','ln','Rankraščiai');
+INSERT INTO collectionname VALUES (2,'ar','ln','مسودات');
 
 INSERT INTO collectionname VALUES (3,'en','ln','Books');
 INSERT INTO collectionname VALUES (3,'fr','ln','Livres');
@@ -114,6 +115,7 @@ INSERT INTO collectionname VALUES (3,'ro','ln','Cărţi');
 INSERT INTO collectionname VALUES (3,'rw','ln','Ibitabo');
 INSERT INTO collectionname VALUES (3,'ka','ln','წიგნები');
 INSERT INTO collectionname VALUES (3,'lt','ln','Knygos');
+INSERT INTO collectionname VALUES (3,'ar','ln','كتب');
 
 INSERT INTO collectionname VALUES (4,'en','ln','Theses');
 INSERT INTO collectionname VALUES (4,'fr','ln','Thèses');
@@ -142,6 +144,7 @@ INSERT INTO collectionname VALUES (4,'ro','ln','Teze');
 INSERT INTO collectionname VALUES (4,'rw','ln','Igitabo ky\'ubushakashatsi'); -- '
 INSERT INTO collectionname VALUES (4,'ka','ln','თეზისები');
 INSERT INTO collectionname VALUES (4,'lt','ln','Disertacijos');
+INSERT INTO collectionname VALUES (4,'ar','ln','أطروحات');
 
 INSERT INTO collectionname VALUES (5,'en','ln','Reports');
 INSERT INTO collectionname VALUES (5,'fr','ln','Rapports');
@@ -170,6 +173,7 @@ INSERT INTO collectionname VALUES (5,'ro','ln','Rapoarte');
 INSERT INTO collectionname VALUES (5,'rw','ln','Raporo');
 INSERT INTO collectionname VALUES (5,'ka','ln','რეპორტები');
 INSERT INTO collectionname VALUES (5,'lt','ln','Pranešimai');
+INSERT INTO collectionname VALUES (5,'ar','ln','تقارير');
 
 INSERT INTO collectionname VALUES (6,'en','ln','Articles');
 INSERT INTO collectionname VALUES (6,'fr','ln','Articles');
@@ -198,6 +202,7 @@ INSERT INTO collectionname VALUES (6,'ro','ln','Articole');
 INSERT INTO collectionname VALUES (6,'rw','ln','Ikinyamakuru ky\'ubushakashatsi'); -- '
 INSERT INTO collectionname VALUES (6,'ka','ln','სტატიები');
 INSERT INTO collectionname VALUES (6,'lt','ln','Straipsniai');
+INSERT INTO collectionname VALUES (6,'ar','ln','مقالات');
 
 INSERT INTO collectionname VALUES (8,'en','ln','Pictures');
 INSERT INTO collectionname VALUES (8,'fr','ln','Photos');
@@ -226,6 +231,7 @@ INSERT INTO collectionname VALUES (8,'ro','ln','Poze');
 INSERT INTO collectionname VALUES (8,'rw','ln','Ifoto');
 INSERT INTO collectionname VALUES (8,'ka','ln','სურათები');
 INSERT INTO collectionname VALUES (8,'lt','ln','Paveikslėliai');
+INSERT INTO collectionname VALUES (8,'ar','ln','صور');
 
 INSERT INTO collectionname VALUES (9,'en','ln','CERN Divisions');
 INSERT INTO collectionname VALUES (9,'fr','ln','Divisions du CERN');
@@ -254,6 +260,7 @@ INSERT INTO collectionname VALUES (9,'ro','ln','Divizii CERN');
 INSERT INTO collectionname VALUES (9,'rw','ln','Ishami ya CERN');
 INSERT INTO collectionname VALUES (9,'ka','ln','ცერნის განყოფილებები');
 INSERT INTO collectionname VALUES (9,'lt','ln','CERN Padaliniai');
+INSERT INTO collectionname VALUES (9,'ar','ln','أقسام المنظمة الأوربية للبحوث النووية');
 
 INSERT INTO collectionname VALUES (10,'en','ln','CERN Experiments');
 INSERT INTO collectionname VALUES (10,'fr','ln','Expériences du CERN');
@@ -282,6 +289,7 @@ INSERT INTO collectionname VALUES (10,'ro','ln','Experimente CERN');
 INSERT INTO collectionname VALUES (10,'rw','ln','Ubushakashatsi bwa CERN');
 INSERT INTO collectionname VALUES (10,'ka','ln','ცერნის ექსპერემენტები');
 INSERT INTO collectionname VALUES (10,'lt','ln','CERN Eksperimentai');
+INSERT INTO collectionname VALUES (10,'ar','ln','تجارب المنظمة الأوربية للبحوث النووية');
 
 INSERT INTO collectionname VALUES (11,'en','ln','Theoretical Physics (TH)');
 INSERT INTO collectionname VALUES (11,'fr','ln','Physique Théorique (TH)');
@@ -310,6 +318,7 @@ INSERT INTO collectionname VALUES (11,'ro','ln','Fizică Teoretică (TH)');
 INSERT INTO collectionname VALUES (11,'rw','ln','Theoretical Physics (TH)');
 INSERT INTO collectionname VALUES (11,'ka','ln','თეორიული ფიზიკა (თფ)');
 INSERT INTO collectionname VALUES (11,'lt','ln','Teorinė fizika (TH)');
+INSERT INTO collectionname VALUES (11,'ar','ln','الفيزياء النظرية');
 
 INSERT INTO collectionname VALUES (12,'en','ln','Experimental Physics (EP)');
 INSERT INTO collectionname VALUES (12,'fr','ln','Physique Expérimentale (EP)');
@@ -338,6 +347,7 @@ INSERT INTO collectionname VALUES (12,'ro','ln','Fizică Experimentală (EP)');
 INSERT INTO collectionname VALUES (12,'rw','ln','Experimental Physics (EP)');
 INSERT INTO collectionname VALUES (12,'ka','ln','ექსპერიმენტული ფიზიკა (ეფ)');
 INSERT INTO collectionname VALUES (12,'lt','ln','Eksperimentinė fizika (EP)');
+INSERT INTO collectionname VALUES (12,'ar','ln','الفيزياء التجريبية');
 
 INSERT INTO collectionname VALUES (13,'en','ln','ISOLDE');
 INSERT INTO collectionname VALUES (13,'fr','ln','ISOLDE');
@@ -366,6 +376,7 @@ INSERT INTO collectionname VALUES (13,'ro','ln','ISOLDE');
 INSERT INTO collectionname VALUES (13,'rw','ln','ISOLDE');
 INSERT INTO collectionname VALUES (13,'ka','ln','ISOLDE');
 INSERT INTO collectionname VALUES (13,'lt','ln','ISOLDE');
+INSERT INTO collectionname VALUES (13,'ar','ln','ISOLDE');
 
 INSERT INTO collectionname VALUES (14,'en','ln','ALEPH');
 INSERT INTO collectionname VALUES (14,'fr','ln','ALEPH');
@@ -394,6 +405,7 @@ INSERT INTO collectionname VALUES (14,'ro','ln','ALEPH');
 INSERT INTO collectionname VALUES (14,'rw','ln','ALEPH');
 INSERT INTO collectionname VALUES (14,'ka','ln','ALEPH');
 INSERT INTO collectionname VALUES (14,'lt','ln','ALEPH');
+INSERT INTO collectionname VALUES (14,'ar','ln','ALEPH');
 
 INSERT INTO collectionname VALUES (15,'en','ln','Articles & Preprints');
 INSERT INTO collectionname VALUES (15,'fr','ln','Articles et Prétirages');
@@ -422,6 +434,7 @@ INSERT INTO collectionname VALUES (15,'ro','ln','Articole şi Preprinturi');
 INSERT INTO collectionname VALUES (15,'rw','ln','Ibinyamakuru');
 INSERT INTO collectionname VALUES (15,'ka','ln','სტატიები და პრეპრინტები');
 INSERT INTO collectionname VALUES (15,'lt','ln','Straipsniai ir Rankraščiai');
+INSERT INTO collectionname VALUES (15,'ar','ln','مقالات & مسودات');
 
 INSERT INTO collectionname VALUES (16,'en','ln','Books & Reports');
 INSERT INTO collectionname VALUES (16,'fr','ln','Livres et Rapports');
@@ -450,6 +463,7 @@ INSERT INTO collectionname VALUES (16,'ro','ln','Cărţi şi Rapoarte');
 INSERT INTO collectionname VALUES (16,'rw','ln','Ibitabo & Raporo');
 INSERT INTO collectionname VALUES (16,'ka','ln','წიგნები და მოხსენებები');
 INSERT INTO collectionname VALUES (16,'lt','ln','Knygos ir Pranešimai');
+INSERT INTO collectionname VALUES (16,'ar','ln','كتب & تقارير');
 
 INSERT INTO collectionname VALUES (17,'en','ln','Multimedia & Arts');
 INSERT INTO collectionname VALUES (17,'fr','ln','Multimédia et Arts');
@@ -478,6 +492,7 @@ INSERT INTO collectionname VALUES (17,'ro','ln','Multimedia şi Arte');
 INSERT INTO collectionname VALUES (17,'rw','ln','Multimedia & Arts');
 INSERT INTO collectionname VALUES (17,'ka','ln','მულტიმედია და ხელოვნება');
 INSERT INTO collectionname VALUES (17,'lt','ln','Multimedija ir Menas');
+INSERT INTO collectionname VALUES (17,'ar','ln','وسائط متعددة & فنون');
 
 INSERT INTO collectionname VALUES (18,'en','ln','Poetry');
 INSERT INTO collectionname VALUES (18,'fr','ln','Poésie');
@@ -506,6 +521,7 @@ INSERT INTO collectionname VALUES (18,'ro','ln','Poezie');
 INSERT INTO collectionname VALUES (18,'rw','ln','Umuvugo');
 INSERT INTO collectionname VALUES (18,'ka','ln','პოეზია');
 INSERT INTO collectionname VALUES (18,'lt','ln','Poezija');
+INSERT INTO collectionname VALUES (18,'ar','ln','شعر');
 
 INSERT INTO collectionname VALUES (19,'en','ln','Atlantis Times News');
 INSERT INTO collectionname VALUES (19,'fr','ln','Atlantis Times Actualités');
@@ -855,6 +871,8 @@ INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) 
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,84,'ka','rt',90);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,85,'lt','rt',100);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,86,'lt','rt',90);
+INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,87,'ar','rt',100);
+INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,88,'ar','rt',90);
 
 INSERT INTO example VALUES (1,'author search','author:"Ellis, J"');
 INSERT INTO example VALUES (2,'word search','quantum');
@@ -994,6 +1012,8 @@ INSERT INTO portalbox VALUES (83,'საიტის შესახებ', '�
 INSERT INTO portalbox VALUES (84,'ასევე იხილეთ','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>'); -- '
 INSERT INTO portalbox VALUES (85,'APIE PUSLAPĮ', 'Sveiki atvykę į Invenio bandomąjį tinklapį. Invenio yra nemokama programinė įranga dokumentų serveriams, sukurta CERN. Kviečiame išbandyti visas tinklapio galimybes ir funkcijas.');
 INSERT INTO portalbox VALUES (86,'TAIP PAT ŽIŪRĖKITE','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>'); -- '
+INSERT INTO portalbox VALUES (87,'حول هذا الموقع','مرحبا بكم في الموقع التجريبي لإنفينيو، المحطة الخادمة (الحرة) المبرمجة من طرف المنظمة الأوربية للبحوث النووية. الرجاء عدم التردد للإطلاع على جميع صفحات هذا الموقع التجريبي');
+INSERT INTO portalbox VALUES (88,'زوروا أيضا','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 
 INSERT INTO sbmCOLLECTION VALUES (36,'Document Types');
 
@@ -1021,7 +1041,7 @@ INSERT INTO sbmDOCTYPE VALUES ('Demo Thesis Submission','DEMOTHE','2008-03-02','
 INSERT INTO sbmDOCTYPE VALUES ('Demo Article Submission','DEMOART','2008-03-06','2008-03-06','<br /><br />The Demo Article submission demonstrates a more complex submission type.<br /><br />\r\nThe submission gives a document a category. This category is used in the document\'s reference number and also serves as a means to classify it into a specific ATLANTIS collection. Documents submitted into the \"Article\" category are inserted into the ATLANTIS \"Articles\" collection, documents categorized as \"Preprint\" are inserted into the ATLANTIS \"Preprints\" collection, and a document categorized as a \"Report\" is inserted into the ATLANTIS \"Reports\" collection.<br /><br />\r\n');
 INSERT INTO sbmDOCTYPE VALUES ('Demo Book Submission (Refereed)','DEMOBOO','2008-03-06','2008-03-06','<br /><br />The Demo Book submission demonstrates a refereed submission.<br /><br />\r\nWhen the details of a book are submitted by a user, they must be approved by a referee before the record is integrated into the ATLANTIS repository.<br />\r\nApproved books are integrated into the ATLANTIS \"Books\" collection.<br />\r\n');
 INSERT INTO sbmDOCTYPE VALUES ('Demo Poetry Submission','DEMOPOE','2008-03-12','2008-03-12','<br /><br />\r\nThe Demo Poetry submission demonstrates a simple submission type with a submission form split over two pages.<br />\r\nIt does not use categories. Records created with this submission are inserted into the ATLANTIS \"Poetry\" collection.\r\n<br /><br />');
-INSERT INTO sbmDOCTYPE VALUES ('Demo Journal Submission','DEMOJRN','2008-09-18','2008-09-18','The Demo Journal submission submits records that will be integrated into the demo "Atlantis Times" journal.<br />\r\n Makes use of FCKeditor to provide WYSIWYG HTML edition of the articles. Install it with <code>make install-fckeditor-plugin</code>.');
+INSERT INTO sbmDOCTYPE VALUES ('Demo Journal Submission','DEMOJRN','2008-09-18','2008-09-18','The Demo Journal submission submits records that will be integrated into the demo "Atlantis Times" journal.<br />\r\n Makes use of CKEditor to provide WYSIWYG HTML edition of the articles. Install it with <code>make install-ckeditor-plugin</code>.');
 
 INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,1,'DEMOPIC_TITLE','<table width=\"100%\" bgcolor=\"#D3E3E2\" align=\"center\" cellspacing=\"2\" cellpadding=\"2\" border=\"1\"><tr><td align=\"left\"><br /><b>Submit an ATLANTIS picture:</b><br /><br /><span style=\"color: red;\">*</span>Picture Title:<br />','M','Picture Title','','2007-09-13','2007-10-04',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,2,'DEMOPIC_PHOTOG','<br /><br />Picture Author(s) or Photographers(s): <i>(one per line)</i><br />','O','Photographer(s)','','2007-09-13','2007-09-13',NULL,NULL);
@@ -1133,7 +1153,7 @@ INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_AU',NULL,'100__a','T',NULL,6,60,NULL,N
 INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_SUPERV',NULL,'','T',NULL,6,60,NULL,NULL,NULL,'2008-03-02','2008-03-02','<br />Thesis Supervisor(s)<br />(one per line):<br />',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_ABS',NULL,'520__a','T',NULL,12,80,NULL,NULL,NULL,'2008-03-02','2008-03-02','<br />Abstract:<br />',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_NUMP',NULL,'300__a','I',5,NULL,NULL,NULL,NULL,NULL,'2008-03-02','2008-03-06','<br />Number of Pages:&nbsp;',NULL,0);
-INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_LANG',NULL,'041__a','S',NULL,NULL,NULL,NULL,NULL,'<SELECT name=\"DEMOTHE_LANG\">\r\n        <OPTION>Select:</option>\r\n        <option value=\"eng\">English</option>\r\n        <option value=\"fre\">French</option>\r\n        <option value=\"ger\">German</option>\r\n        <option value=\"dut\">Dutch</option>\r\n        <option value=\"ita\">Italian</option>\r\n        <option value=\"spa\">Spanish</option>\r\n        <option value=\"por\">Portuguese</option>\r\n        <option value=\"gre\">Greek</option>\r\n        <option value=\"slo\">Slovak</option>\r\n        <option value=\"cze\">Czech</option>\r\n        <option value=\"hun\">Hungarian</option>\r\n        <option value=\"pol\">Polish</option>\r\n        <option value=\"nor\">Norwegian</option>\r\n        <option value=\"swe\">Swedish</option>\r\n        <option value=\"fin\">Finnish</option>\r\n        <option value=\"rus\">Russian</option>\r\n</SELECT>','2008-03-02','2008-03-02','<br /><br />Select the Language:&nbsp;',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_LANG',NULL,'041__a','S',NULL,NULL,NULL,NULL,NULL,'<SELECT name=\"DEMOTHE_LANG\">\r\n        <option value=\"Select:\">Select:</option>\r\n        <option value=\"eng\">English</option>\r\n        <option value=\"fre\">French</option>\r\n        <option value=\"ger\">German</option>\r\n        <option value=\"dut\">Dutch</option>\r\n        <option value=\"ita\">Italian</option>\r\n        <option value=\"spa\">Spanish</option>\r\n        <option value=\"por\">Portuguese</option>\r\n        <option value=\"gre\">Greek</option>\r\n        <option value=\"slo\">Slovak</option>\r\n        <option value=\"cze\">Czech</option>\r\n        <option value=\"hun\">Hungarian</option>\r\n        <option value=\"pol\">Polish</option>\r\n        <option value=\"nor\">Norwegian</option>\r\n        <option value=\"swe\">Swedish</option>\r\n        <option value=\"fin\">Finnish</option>\r\n        <option value=\"rus\">Russian</option>\r\n</SELECT>','2008-03-02','2008-03-02','<br /><br />Select the Language:&nbsp;',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_PUBL',NULL,'','I',35,NULL,NULL,NULL,NULL,NULL,'2008-03-02','2008-03-02','<br />Thesis Publisher (or University):&nbsp;',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_PLDEF',NULL,'','I',20,NULL,NULL,NULL,NULL,NULL,'2008-03-02','2008-03-02','<br /><br />Place of Thesis Defence:<br />',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_DIPL',NULL,'','S',NULL,NULL,NULL,NULL,NULL,'<select name=\"DEMOTHE_DIPL\">\r\n <option value=\"\">Select:</option>\r\n <option value=\"Diploma\">Diploma</option>\r\n <option value=\"MSc\">MSc</option>\r\n <option value=\"PhD\">PhD</option>\r\n</select>','2008-03-02','2008-03-02','<br /><br />Diploma Awarded:<br />',NULL,0);
@@ -1153,7 +1173,7 @@ INSERT INTO sbmFIELDDESC VALUES ('DEMOART_DATE',NULL,'269__c','I',10,NULL,NULL,N
 INSERT INTO sbmFIELDDESC VALUES ('DEMOART_END',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<INPUT TYPE=\"button\" class=\"adminbutton\" name=\"endS\" width=\"400\" height=\"50\" value=\"Finish Submission\" onclick=\"finish();\">\r\n</div>','2008-03-07','2008-03-07',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOART_FILE',NULL,'','F',60,NULL,NULL,NULL,NULL,NULL,'2008-03-07','2008-03-07',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOART_KW',NULL,'6531_a','T',NULL,4,50,NULL,NULL,NULL,'2008-03-07','2008-03-07','<br /><br />Keywords:<br /><i>(one keyword/key-phrase per line)</i><br />',NULL,0);
-INSERT INTO sbmFIELDDESC VALUES ('DEMOART_LANG',NULL,'041__a','S',NULL,NULL,NULL,NULL,NULL,'<SELECT name=\"DEMOART_LANG\">\r\n        <OPTION>Select:</option>\r\n        <option value=\"eng\">English</option>\r\n        <option value=\"fre\">French</option>\r\n        <option value=\"ger\">German</option>\r\n        <option value=\"dut\">Dutch</option>\r\n        <option value=\"ita\">Italian</option>\r\n        <option value=\"spa\">Spanish</option>\r\n        <option value=\"por\">Portuguese</option>\r\n        <option value=\"gre\">Greek</option>\r\n        <option value=\"slo\">Slovak</option>\r\n        <option value=\"cze\">Czech</option>\r\n        <option value=\"hun\">Hungarian</option>\r\n        <option value=\"pol\">Polish</option>\r\n        <option value=\"nor\">Norwegian</option>\r\n        <option value=\"swe\">Swedish</option>\r\n        <option value=\"fin\">Finnish</option>\r\n        <option value=\"rus\">Russian</option>\r\n</SELECT>','2008-03-07','2008-03-07','<br /><br />Select the Language:&nbsp;',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOART_LANG',NULL,'041__a','S',NULL,NULL,NULL,NULL,NULL,'<SELECT name=\"DEMOART_LANG\">\r\n        <option value=\"Select:\">Select:</option>\r\n        <option value=\"eng\">English</option>\r\n        <option value=\"fre\">French</option>\r\n        <option value=\"ger\">German</option>\r\n        <option value=\"dut\">Dutch</option>\r\n        <option value=\"ita\">Italian</option>\r\n        <option value=\"spa\">Spanish</option>\r\n        <option value=\"por\">Portuguese</option>\r\n        <option value=\"gre\">Greek</option>\r\n        <option value=\"slo\">Slovak</option>\r\n        <option value=\"cze\">Czech</option>\r\n        <option value=\"hun\">Hungarian</option>\r\n        <option value=\"pol\">Polish</option>\r\n        <option value=\"nor\">Norwegian</option>\r\n        <option value=\"swe\">Swedish</option>\r\n        <option value=\"fin\">Finnish</option>\r\n        <option value=\"rus\">Russian</option>\r\n</SELECT>','2008-03-07','2008-03-07','<br /><br />Select the Language:&nbsp;',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOART_NOTE',NULL,'500__a','T',NULL,6,60,NULL,NULL,NULL,'2008-03-07','2008-03-07','<br /><br />Additional Comments or Notes:<br />',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOART_NUMP',NULL,'300__a','I',5,NULL,NULL,NULL,NULL,NULL,'2008-03-07','2008-03-07','<br />Number of Pages:&nbsp;',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOART_REP',NULL,'088__a','T',NULL,4,30,NULL,NULL,NULL,'2008-03-07','2008-03-07','<br />Other Report Numbers <i>(one per line)</i>:',NULL,0);
@@ -1167,14 +1187,14 @@ INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_DATE',NULL,'269__c','I',10,NULL,NULL,N
 INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_END',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<INPUT TYPE=\"button\" class=\"adminbutton\" name=\"endS\" width=\"400\" height=\"50\" value=\"Finish Submission\" onclick=\"finish();\">\r\n</div>','2008-03-07','2008-03-07',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_FILE',NULL,'','F',60,NULL,NULL,NULL,NULL,NULL,'2008-03-07','2008-03-07',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_KW',NULL,'6531_a','T',NULL,4,50,NULL,NULL,NULL,'2008-03-07','2008-03-07','<br /><br />Keywords:<br /><i>(one keyword/key-phrase per line)</i><br />',NULL,0);
-INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_LANG',NULL,'041__a','S',NULL,NULL,NULL,NULL,NULL,'<SELECT name=\"DEMOBOO_LANG\">\r\n        <OPTION>Select:</option>\r\n        <option value=\"eng\">English</option>\r\n        <option value=\"fre\">French</option>\r\n        <option value=\"ger\">German</option>\r\n        <option value=\"dut\">Dutch</option>\r\n        <option value=\"ita\">Italian</option>\r\n        <option value=\"spa\">Spanish</option>\r\n        <option value=\"por\">Portuguese</option>\r\n        <option value=\"gre\">Greek</option>\r\n        <option value=\"slo\">Slovak</option>\r\n        <option value=\"cze\">Czech</option>\r\n        <option value=\"hun\">Hungarian</option>\r\n        <option value=\"pol\">Polish</option>\r\n        <option value=\"nor\">Norwegian</option>\r\n        <option value=\"swe\">Swedish</option>\r\n        <option value=\"fin\">Finnish</option>\r\n        <option value=\"rus\">Russian</option>\r\n</SELECT>','2008-03-07','2008-03-07','<br /><br />Select the Language:&nbsp;',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_LANG',NULL,'041__a','S',NULL,NULL,NULL,NULL,NULL,'<SELECT name=\"DEMOBOO_LANG\">\r\n        <option value=\"Select:\">Select:</option>\r\n        <option value=\"eng\">English</option>\r\n        <option value=\"fre\">French</option>\r\n        <option value=\"ger\">German</option>\r\n        <option value=\"dut\">Dutch</option>\r\n        <option value=\"ita\">Italian</option>\r\n        <option value=\"spa\">Spanish</option>\r\n        <option value=\"por\">Portuguese</option>\r\n        <option value=\"gre\">Greek</option>\r\n        <option value=\"slo\">Slovak</option>\r\n        <option value=\"cze\">Czech</option>\r\n        <option value=\"hun\">Hungarian</option>\r\n        <option value=\"pol\">Polish</option>\r\n        <option value=\"nor\">Norwegian</option>\r\n        <option value=\"swe\">Swedish</option>\r\n        <option value=\"fin\">Finnish</option>\r\n        <option value=\"rus\">Russian</option>\r\n</SELECT>','2008-03-07','2008-03-07','<br /><br />Select the Language:&nbsp;',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_NOTE',NULL,'500__a','T',NULL,6,60,NULL,NULL,NULL,'2008-03-07','2008-03-07','<br /><br />Additional Comments or Notes:<br />',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_NUMP',NULL,'300__a','I',5,NULL,NULL,NULL,NULL,NULL,'2008-03-07','2008-03-07','<br />Number of Pages:&nbsp;',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_REP',NULL,'088__a','T',NULL,4,30,NULL,NULL,NULL,'2008-03-07','2008-03-07','<br />Other Report Numbers <i>(one per line)</i>:',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_RN',NULL,'037__a','I',35,NULL,NULL,NULL,'DEMO-BOOK-<YYYY>-???',NULL,'2008-03-07','2008-03-07',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_TITLE',NULL,'245__a','T',NULL,5,60,NULL,NULL,NULL,'2008-03-07','2008-03-07','<br />Title:<br />',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_COMNT',NULL,'','T',NULL,6,60,NULL,NULL,NULL,'2008-03-07','2008-03-07',NULL,NULL,0);
-INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_DECSN',NULL,'','S',NULL,NULL,NULL,NULL,NULL,'<select name=\"DEMOBOO_DECSN\">\r\n<option>Select:</option>\r\n<option value=\"approve\">Approve</option>\r\n<option value=\"reject\">Reject</option>\r\n</select>\r\n','2008-03-07','2008-03-07',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_DECSN',NULL,'','S',NULL,NULL,NULL,NULL,NULL,'<select name=\"DEMOBOO_DECSN\">\r\n<option value=\"Select:\">Select:</option>\r\n<option value=\"approve\">Approve</option>\r\n<option value=\"reject\">Reject</option>\r\n</select>\r\n','2008-03-07','2008-03-07',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_REGB',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<INPUT TYPE=\"button\" class=\"adminbutton\" name=\"endS\" width=\"400\" height=\"50\" value=\"Register Decision\" onclick=\"finish();\">\r\n</div>','2008-03-07','2008-03-07',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_ABS',NULL,'520__a','T',NULL,20,80,NULL,NULL,NULL,'2008-03-12','2008-03-12','<br />Abstract:<br />',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_AU',NULL,'100__a','T',NULL,6,60,NULL,NULL,NULL,'2008-03-12','2008-03-12','<br />Authors: <i>(one per line)</i><br />',NULL,0);
@@ -1182,7 +1202,7 @@ INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_CHANGE',NULL,'','S',NULL,NULL,NULL,NUL
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_CONT',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<input type=\"button\" class=\"adminbutton\" width=\"400\" height=\"50\" name=\"endS\" value=\"Continue\" onclick=\"finish();\" />\r\n</div>','2008-03-12','2008-03-12',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_DUMMY',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'</td></tr></table><br /><br /></td></tr></table>','2008-03-12','2008-03-12',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_END',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<INPUT TYPE=\"button\" class=\"adminbutton\" name=\"endS\" width=\"400\" height=\"50\" value=\"Finish Submission\" onclick=\"finish();\">\r\n</div>','2008-03-12','2008-03-12',NULL,NULL,0);
-INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_LANG',NULL,'041__a','S',NULL,NULL,NULL,NULL,NULL,'<SELECT name=\"DEMOPOE_LANG\">\r\n        <OPTION>Select:</option>\r\n        <option value=\"eng\">English</option>\r\n        <option value=\"fre\">French</option>\r\n        <option value=\"ger\">German</option>\r\n        <option value=\"dut\">Dutch</option>\r\n        <option value=\"ita\">Italian</option>\r\n        <option value=\"spa\">Spanish</option>\r\n        <option value=\"por\">Portuguese</option>\r\n        <option value=\"gre\">Greek</option>\r\n        <option value=\"slo\">Slovak</option>\r\n        <option value=\"cze\">Czech</option>\r\n        <option value=\"hun\">Hungarian</option>\r\n        <option value=\"pol\">Polish</option>\r\n        <option value=\"nor\">Norwegian</option>\r\n        <option value=\"swe\">Swedish</option>\r\n        <option value=\"fin\">Finnish</option>\r\n        <option value=\"rus\">Russian</option>\r\n</SELECT>','2008-03-12','2008-03-12','<br /><br />Select the Language:&nbsp;',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_LANG',NULL,'041__a','S',NULL,NULL,NULL,NULL,NULL,'<SELECT name=\"DEMOPOE_LANG\">\r\n        <option value=\"Select:\">Select:</option>\r\n        <option value=\"eng\">English</option>\r\n        <option value=\"fre\">French</option>\r\n        <option value=\"ger\">German</option>\r\n        <option value=\"dut\">Dutch</option>\r\n        <option value=\"ita\">Italian</option>\r\n        <option value=\"spa\">Spanish</option>\r\n        <option value=\"por\">Portuguese</option>\r\n        <option value=\"gre\">Greek</option>\r\n        <option value=\"slo\">Slovak</option>\r\n        <option value=\"cze\">Czech</option>\r\n        <option value=\"hun\">Hungarian</option>\r\n        <option value=\"pol\">Polish</option>\r\n        <option value=\"nor\">Norwegian</option>\r\n        <option value=\"swe\">Swedish</option>\r\n        <option value=\"fin\">Finnish</option>\r\n        <option value=\"rus\">Russian</option>\r\n</SELECT>','2008-03-12','2008-03-12','<br /><br />Select the Language:&nbsp;',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_RN',NULL,'037__a','I',35,NULL,NULL,NULL,'DEMO-POETRY-<YYYY>-???',NULL,'2008-03-12','2008-03-12',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_TITLE',NULL,'245__a','T',NULL,5,60,NULL,NULL,NULL,'2008-03-12','2008-03-12','<br />Title:<br />',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_YEAR',NULL,'909C0y','I',4,NULL,NULL,4,NULL,NULL,'2008-03-12','2008-03-12','<br /><br />Year:&nbsp;',NULL,0);
@@ -1192,15 +1212,15 @@ INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_AU',NULL,'100__a','T',NULL,4,60,NULL,N
 INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_EMAIL',NULL,'859__a','T',NULL,4,60,NULL,NULL,NULL,'2008-09-23','2009-02-20','</TD><TD><br /><br />E-mail(s) of the author(s): <i>(one per line)</i><br />',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_TITLEE',NULL,'245__a','T',NULL,5,60,NULL,NULL,NULL,'2008-09-23','2009-02-20','</TD></TR><TR><TD><br /><br />English title:<br />',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_TITLEF',NULL,'246_1a','T',NULL,5,60,NULL,NULL,NULL,'2008-09-23','2009-02-20','</TD><TD><br /><br />French title:<br />',NULL,0);
-INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_ABSF',NULL,'590__b','R',NULL,100,90,NULL,NULL,'from invenio.htmlutils import get_html_text_editor\r\nfrom invenio.config import CFG_SITE_URL\r\nfrom invenio.search_engine import get_fieldvalues\r\nimport os\r\n\r\nif (\'modify\' in curdir) and not os.path.exists(\"%s/DEMOJRN_ABSF\" % curdir):\r\n    try:\r\n        content = get_fieldvalues(int(sysno), \'590__b\')[0]\r\n    except:\r\n        content = \'\'\r\nelif os.path.exists(\"%s/DEMOJRN_ABSE\" % curdir):\r\n    content = file(\"%s/DEMOJRN_ABSE\" % curdir).read()\r\nelse:\r\n    content = \'\'\r\n\r\ntext = get_html_text_editor(\"DEMOJRN_ABSF\", id=\"BulletinFCKEditor1\", content=content, toolbar_set=\"WebJournal\", width=\'522px\', height=\'700px\', file_upload_url=CFG_SITE_URL + \'/submit/attachfile\', custom_configurations_path=\'/fckeditor/journal-editor-config.js\')','2008-09-23','2009-02-23','</td><td><br />French Article:<br />',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_ABSF',NULL,'590__b','R',NULL,100,90,NULL,NULL,'from invenio.htmlutils import get_html_text_editor\r\nfrom invenio.config import CFG_SITE_URL\r\nfrom invenio.search_engine_utils import get_fieldvalues\r\nimport os\r\n\r\nif (\'modify\' in curdir) and not os.path.exists(\"%s/DEMOJRN_ABSF\" % curdir):\r\n    try:\r\n        content = get_fieldvalues(int(sysno), \'590__b\')[0]\r\n    except:\r\n        content = \'\'\r\nelif os.path.exists(\"%s/DEMOJRN_ABSE\" % curdir):\r\n    content = file(\"%s/DEMOJRN_ABSE\" % curdir).read()\r\nelse:\r\n    content = \'\'\r\n\r\ntext = get_html_text_editor(\"DEMOJRN_ABSF\", id=\"BulletinCKEditor1\", content=content, toolbar_set=\"WebJournal\", width=\'522px\', height=\'700px\', file_upload_url=CFG_SITE_URL + \'/submit/attachfile\', custom_configurations_path=\'/ckeditor/journal-editor-config.js\')','2008-09-23','2009-02-23','</td><td><br />French Article:<br />',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_CONT',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<input type=\"button\" class=\"adminbutton\" width=\"400\" height=\"50\" name=\"endS\" value=\"Continue\" onclick=\"finish();\" />\r\n</div>','2008-10-06','2008-10-06',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_END',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<INPUT TYPE=\"button\" class=\"adminbutton\" name=\"endS\" width=\"400\" height=\"50\" value=\"Finish Submission\" onclick=\"finish();\">\r\n</div>','2008-09-23','2009-02-20','</td></tr><tr><td colspan=\"2\">',NULL,0);
-INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_ISSUES',NULL,'','R',NULL,NULL,NULL,NULL,NULL,'from invenio.search_engine import get_fieldvalues\r\nfrom invenio.webjournal_utils import get_next_journal_issues, get_current_issue, get_journal_issue_grouping\r\nimport os\r\n\r\norders_and_issues = [(\'\',\'\')]*4\r\n\r\nif (\'modify\' in curdir) and not os.path.exists(\"%s/DEMOJRN_ISSUE1\" % curdir):\r\n    try:\r\n        orders = get_fieldvalues(int(sysno), \'773__c\')\r\n        issues = get_fieldvalues(int(sysno), \'773__n\')\r\n        orders_and_issues = zip(orders, issues) + orders_and_issues\r\n    except:\r\n        pass\r\nelif (\'running\' in curdir) and not os.path.exists(\"%s/DEMOJRN_ISSUE1\" % curdir):\r\n    try:\r\n        journal_name = \'AtlantisTimes\'\r\n        current_issue = get_current_issue(\'en\', journal_name)\r\n        nb_issues = get_journal_issue_grouping(journal_name)\r\n        next_issue_numbers = get_next_journal_issues(current_issue, journal_name, nb_issues)\r\n        orders_and_issues = zip([\'\']*4, next_issue_numbers) + orders_and_issues\r\n    except:\r\n        pass\r\nissues_fields = []\r\nsingle_issue_and_order_tmpl = \'\'\'\r\n<input type=\"text\" name=\"DEMOJRN_ORDER%i\" size=\"2\" value=\"%s\"  />\r\n<input type=\"text\" name=\"DEMOJRN_ISSUE%i\" size=\"7\" value=\"%s\"  />\'\'\'\r\ni = 1\r\nfor order_and_issue in orders_and_issues[:4]:\r\n    order = order_and_issue[0]\r\n    issue = order_and_issue[1]\r\n    issues_fields.append(single_issue_and_order_tmpl % (i, order, i, issue))\r\n    i += 1\r\n\r\ntext = \'<br/>\'.join(issues_fields)\r\n','2009-02-20','2009-02-23','</TD><TD align=\"center\"><span style=\"color: red;\">*</span>Order(s) <small><i>(digit)</i></small> and issue(s) <small><i>(xx/YYYY)</i></small> of the article:<br />',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_ISSUES',NULL,'','R',NULL,NULL,NULL,NULL,NULL,'from invenio.search_engine_utils import get_fieldvalues\r\nfrom invenio.webjournal_utils import get_next_journal_issues, get_current_issue, get_journal_issue_grouping\r\nimport os\r\n\r\norders_and_issues = [(\'\',\'\')]*4\r\n\r\nif (\'modify\' in curdir) and not os.path.exists(\"%s/DEMOJRN_ISSUE1\" % curdir):\r\n    try:\r\n        orders = get_fieldvalues(int(sysno), \'773__c\')\r\n        issues = get_fieldvalues(int(sysno), \'773__n\')\r\n        orders_and_issues = zip(orders, issues) + orders_and_issues\r\n    except:\r\n        pass\r\nelif (\'running\' in curdir) and not os.path.exists(\"%s/DEMOJRN_ISSUE1\" % curdir):\r\n    try:\r\n        journal_name = \'AtlantisTimes\'\r\n        current_issue = get_current_issue(\'en\', journal_name)\r\n        nb_issues = get_journal_issue_grouping(journal_name)\r\n        next_issue_numbers = get_next_journal_issues(current_issue, journal_name, nb_issues)\r\n        orders_and_issues = zip([\'\']*4, next_issue_numbers) + orders_and_issues\r\n    except:\r\n        pass\r\nissues_fields = []\r\nsingle_issue_and_order_tmpl = \'\'\'\r\n<input type=\"text\" name=\"DEMOJRN_ORDER%i\" size=\"2\" value=\"%s\"  />\r\n<input type=\"text\" name=\"DEMOJRN_ISSUE%i\" size=\"7\" value=\"%s\"  />\'\'\'\r\ni = 1\r\nfor order_and_issue in orders_and_issues[:4]:\r\n    order = order_and_issue[0]\r\n    issue = order_and_issue[1]\r\n    issues_fields.append(single_issue_and_order_tmpl % (i, order, i, issue))\r\n    i += 1\r\n\r\ntext = \'<br/>\'.join(issues_fields)\r\n','2009-02-20','2009-02-23','</TD><TD align=\"center\"><span style=\"color: red;\">*</span>Order(s) <small><i>(digit)</i></small> and issue(s) <small><i>(xx/YYYY)</i></small> of the article:<br />',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_RN',NULL,'037__a','I',35,NULL,NULL,NULL,'BUL-<COMBO>-<YYYY>-???',NULL,'2008-10-06','2009-02-20',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_IN',NULL,'595__a','H',NULL,NULL,NULL,NULL,'Atlantis Times',NULL,'2008-09-23','2009-02-20',' ',NULL,0);
-INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_ABSE',NULL,'520__b','R',NULL,100,90,NULL,NULL,'from invenio.htmlutils import get_html_text_editor\r\nfrom invenio.config import CFG_SITE_URL\r\nfrom invenio.search_engine import get_fieldvalues\r\nimport os\r\n\r\n\r\nif (\'modify\' in curdir) and not os.path.exists(\"%s/DEMOJRN_ABSE\" % curdir):\r\n    try:\r\n        content = get_fieldvalues(int(sysno), \'520__b\')[0]\r\n    except:\r\n        content = \'\'\r\nelif os.path.exists(\"%s/DEMOJRN_ABSE\" % curdir):\r\n    content = file(\"%s/DEMOJRN_ABSE\" % curdir).read()\r\nelse:\r\n    content = \'\'\r\n\r\ntext = get_html_text_editor(\"DEMOJRN_ABSE\",id=\"BulletinFCKEditor2\", content=content, toolbar_set=\"WebJournal\", width=\'522px\', height=\'700px\', file_upload_url=CFG_SITE_URL + \'/submit/attachfile\', custom_configurations_path=\'/fckeditor/journal-editor-config.js\')\r\n\r\n','2008-09-22','2009-02-23','</td></tr><tr><td><br />English Article:<br />',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_ABSE',NULL,'520__b','R',NULL,100,90,NULL,NULL,'from invenio.htmlutils import get_html_text_editor\r\nfrom invenio.config import CFG_SITE_URL\r\nfrom invenio.search_engine_utils import get_fieldvalues\r\nimport os\r\n\r\n\r\nif (\'modify\' in curdir) and not os.path.exists(\"%s/DEMOJRN_ABSE\" % curdir):\r\n    try:\r\n        content = get_fieldvalues(int(sysno), \'520__b\')[0]\r\n    except:\r\n        content = \'\'\r\nelif os.path.exists(\"%s/DEMOJRN_ABSE\" % curdir):\r\n    content = file(\"%s/DEMOJRN_ABSE\" % curdir).read()\r\nelse:\r\n    content = \'\'\r\n\r\ntext = get_html_text_editor(\"DEMOJRN_ABSE\",id=\"BulletinCKEditor2\", content=content, toolbar_set=\"WebJournal\", width=\'522px\', height=\'700px\', file_upload_url=CFG_SITE_URL + \'/submit/attachfile\', custom_configurations_path=\'/ckeditor/journal-editor-config.js\')\r\n\r\n','2008-09-22','2009-02-23','</td></tr><tr><td><br />English Article:<br />',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_ENDING',NULL,'','H',NULL,NULL,NULL,NULL,NULL,NULL,'2009-02-06','2009-02-20','</td></tr></table>',NULL,0);
-INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_CATEG',NULL,'','R',NULL,NULL,NULL,NULL,NULL,'# Solve usual problem with submit/direct?.. links that bypass \r\n# the comboXXX (category selection) of the submission. Retrieve \r\n# the value, and set it (only in the case of MBI)\r\n\r\nfrom invenio.search_engine import get_fieldvalues\r\n\r\nif \"modify\" in curdir:\r\n    try:\r\n        comboDEMOJRNfile = file(\"%s/%s\" % (curdir,\'comboDEMOJRN\'), \'w\')\r\n        report_number = get_fieldvalues(int(sysno), \'037__a\')[0]\r\n        category = report_number.split(\'-\')[1]\r\n        comboDEMOJRNfile.write(category)\r\n        comboDEMOJRNfile.close()\r\n    except:\r\n        text = \'\'','2009-10-15','2009-10-15',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_CATEG',NULL,'','R',NULL,NULL,NULL,NULL,NULL,'# Solve usual problem with submit/direct?.. links that bypass \r\n# the comboXXX (category selection) of the submission. Retrieve \r\n# the value, and set it (only in the case of MBI)\r\n\r\nfrom invenio.search_engine_utils import get_fieldvalues\r\n\r\nif \"modify\" in curdir:\r\n    try:\r\n        comboDEMOJRNfile = file(\"%s/%s\" % (curdir,\'comboDEMOJRN\'), \'w\')\r\n        report_number = get_fieldvalues(int(sysno), \'037__a\')[0]\r\n        category = report_number.split(\'-\')[1]\r\n        comboDEMOJRNfile.write(category)\r\n        comboDEMOJRNfile.close()\r\n    except:\r\n        text = \'\'','2009-10-15','2009-10-15',NULL,NULL,0);
 
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Mail_Submitter',70,1);
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Print_Success',60,1);
@@ -1339,7 +1359,7 @@ INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOJRN','Mail_Submitter',70,1);
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOJRN','Print_Success',60,1);
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOJRN','Insert_Record',50,1);
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOJRN','Make_Record',40,1);
-INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOJRN','Move_FCKeditor_Files_to_Storage',30,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOJRN','Move_CKEditor_Files_to_Storage',30,1);
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOJRN','Report_Number_Generation',20,1);
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOJRN','Create_Recid',10,1);
 INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOJRN','Get_Report_Number',10,1);
@@ -1351,7 +1371,7 @@ INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOJRN','Print_Success_MBI',70,2);
 INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOJRN','Move_Files_to_Storage',60,2);
 INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOJRN','Insert_Modify_Record',50,2);
 INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOJRN','Make_Modify_Record',40,2);
-INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOJRN','Move_FCKeditor_Files_to_Storage',30,2);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOJRN','Move_CKEditor_Files_to_Storage',30,2);
 INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOJRN','Get_Recid',20,2);
 INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOJRN','Get_Report_Number',10,2);
 

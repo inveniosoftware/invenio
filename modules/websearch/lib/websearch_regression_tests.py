@@ -46,8 +46,9 @@ from invenio.urlutils import same_urls_p
 from invenio.search_engine import perform_request_search, \
     guess_primary_collection_of_a_record, guess_collection_of_a_record, \
     collection_restricted_p, get_permitted_restricted_collections, \
-    get_fieldvalues, search_pattern, search_unit, search_unit_in_bibrec, \
+    search_pattern, search_unit, search_unit_in_bibrec, \
     wash_colls
+from invenio.search_engine_utils import get_fieldvalues
 
 def parse_url(url):
     parts = urlparse.urlparse(url)
@@ -288,6 +289,14 @@ class WebSearchTestRecord(unittest.TestCase):
                          test_web_page_content(make_url('/%s/1/export/h?ot=245' % CFG_SITE_RECORD),
                                                expected_text='001__'))
         return
+
+    def test_plots_tab(self):
+        """ websearch - test to ensure the plots tab is working """
+        browser = Browser()
+        self.assertEqual([],
+                         test_web_page_content(make_url('/%s/8/plots' % CFG_SITE_RECORD),
+                                               expected_text='div id="clip"',
+                                               unexpected_text='Abstract'))
 
 class WebSearchTestCollections(unittest.TestCase):
 

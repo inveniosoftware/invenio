@@ -1,4 +1,4 @@
-/*Define here the config of the FCKEditor used in Invenio for
+/*Define here the config of the CKEditor used in Invenio for
   journal articles submission.
 
   Users/admin:
@@ -10,31 +10,37 @@
   Developers:
   Here is the best/only place to define custom toolbar sets.
  */
-
-FCKConfig.ToolbarSets["WebJournal"] = [
+CKEDITOR.editorConfig = function( config )
+{
+config.toolbar_WebJournal = [
 ['Source', 'Preview'],
-['Templates', '-','PasteText','PasteWord'],
+['Templates', '-','PasteText','PasteFromWord'],
 ['Undo','Redo','-','Find','Replace','-','RemoveFormat'],
 ['Link','Unlink'],
-['Image','Table','Rule','SpecialChar'],
+['Image','Table','HorizontalRule','SpecialChar'],
 '/',
-['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript', '-','TextColor'],
-['OrderedList','UnorderedList','-','Outdent','Indent','Blockquote','CreateDiv'],
-['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
+['Bold','Italic','Underline','Strike','-','Subscript','Superscript', '-','TextColor'],
+['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'],
+['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 '/',
-['Style','FontFormat'],
-['FontSize'],
-['FitWindow','ShowBlocks']
+['Styles','Format', 'FontSize'],
+['Maximize','ShowBlocks']
 ];
 
-FCKConfig.EditorAreaCSS = '/img/AtlantisTimes.css' ;
-FCKConfig.CustomStyles = {};
-FCKConfig.EditorAreaStyles = 'body { background-color: White !important}';
-FCKConfig.StylesXmlPath = '/fckeditor/journal-editor-styles.xml' ;
-FCKConfig.TemplatesXmlPath = '/fckeditor/journal-editor-templates.xml' ;
-FCKConfig.EnterMode = 'p';
+config.skin = 'v2';
+config.resize_enabled = false;
+
+/* Remove "status" bar at the bottom of the editor displaying the DOM path*/
+config.removePlugins = 'elementspath';
+
+config.contentsCss = '/img/AtlantisTimes.css' ;
+config.bodyClass = 'ckeditor_body';
+config.stylesSet = 'journal-editor-style:/ckeditor/journal-editor-styles.js';
+config.templates_files = [ '/ckeditor/journal-editor-templates.js' ];
+config.enterMode = CKEDITOR.ENTER_P;
 /* Tags that are removed when clicking on "Remove format" button:
    we need to add 'p' here
 */
-FCKConfig.RemoveFormatTags = 'b,big,code,del,dfn,em,font,i,ins,kbd,q,samp,small,span,strike,strong,sub,sup,tt,u,var,p' ;
-FCKConfig.TemplateReplaceAll = false ;
+config.removeFormatTags = 'b,big,code,del,dfn,em,font,i,ins,kbd,q,samp,small,span,strike,strong,sub,sup,tt,u,var,p' ;
+config.templates_replaceContent = false;
+}

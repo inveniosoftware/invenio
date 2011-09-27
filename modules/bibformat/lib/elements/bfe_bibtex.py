@@ -330,8 +330,9 @@ def format_bibtex_field(name, value, name_width=20, value_width=40):
 
     Then " = " is printed (notice spaces).
 
-    So the total width will be name_width + value_width + len(" = ")
-                                                               (3)
+    So the total width will be::
+        name_width + value_width + len(" = ")
+                                        (3)
 
     if value is empty string, then return empty string.
 

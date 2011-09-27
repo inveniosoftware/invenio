@@ -131,6 +131,7 @@ def print_results(req, lang, pagegetter, infos, current_time):
     _ = gettext_set_language(lang)
     url = infos[0]
     engine = infos[1]
+    user_url = infos[2]
     internal_name = get_link_name(engine.name)
     name = _(engine.name)
     base_url = engine.base_url
@@ -146,7 +147,7 @@ def print_results(req, lang, pagegetter, infos, current_time):
             html_sec = ''
         else:
             html_num = '<strong>' + \
-                       make_url(_('%s results found') % num, url) + \
+                       make_url(_('%s results found') % num, user_url or url) + \
                        '</strong>'
             html_sec = '(' + _('%s seconds') % ('%2.2f' % current_time) + ')'
     else:

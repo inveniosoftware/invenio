@@ -21,16 +21,26 @@
 __revision__ = "$Id$"
 
 from HTMLParser import HTMLParser
-from invenio.config import CFG_SITE_URL, CFG_MATHJAX_HOSTING
+from invenio.config import CFG_SITE_URL, \
+     CFG_MATHJAX_HOSTING, \
+     CFG_SITE_LANG, \
+     CFG_WEBDIR
 from invenio.textutils import indent_text
 import re
 import cgi
+import os
 
 try:
-    from invenio.fckeditor import fckeditor
-    fckeditor_available = True
-except ImportError, e:
-    fckeditor_available = False
+    from BeautifulSoup import BeautifulSoup
+    CFG_BEAUTIFULSOUP_INSTALLED = True
+except ImportError:
+      CFG_BEAUTIFULSOUP_INSTALLED = False
+try:
+    import tidy
+    CFG_TIDY_INSTALLED = True
+except ImportError:
+    CFG_TIDY_INSTALLED = False
+
 # List of allowed tags (tags that won't create any XSS risk)
 cfg_html_buffer_allowed_tag_whitelist = ('a',
                                          'p', 'br', 'blockquote',
@@ -112,6 +122,10 @@ class HTMLWasher(HTMLParser):
         """ Constructor; initializes washer """
         HTMLParser.__init__(self)
         self.result = ''
+        self.nb = 0
+        self.previous_nbs = []
+        self.previous_type_lists = []
+        self.url = ''
         self.render_unallowed_tags = False
         self.allowed_tag_whitelist = \
                 cfg_html_buffer_allowed_tag_whitelist
@@ -155,6 +169,10 @@ class HTMLWasher(HTMLParser):
         """
         self.reset()
         self.result = ''
+        self.nb = 0
+        self.previous_nbs = []
+        self.previous_type_lists = []
+        self.url = ''
         self.render_unallowed_tags = render_unallowed_tags
         self.allowed_tag_whitelist = allowed_tag_whitelist
         self.allowed_attribute_whitelist = allowed_attribute_whitelist
@@ -186,7 +204,15 @@ class HTMLWasher(HTMLParser):
     def handle_data(self, data):
         """Function called for text nodes"""
         if not self.silent:
-            self.result += cgi.escape(data, True)
+            # let's to check if data contains a link
+            import string
+            if string.find(str(data),'http://') == -1:
+                self.result += cgi.escape(data, True)
+            else:
+                if self.url:
+                    if self.url <> data:
+                        self.url = ''
+                        self.result += '(' + cgi.escape(data, True) + ')'
 
     def handle_endtag(self, tag):
         """Function called for ending of tags"""
@@ -232,6 +258,37 @@ class HTMLWasher(HTMLParser):
         Return it as it is."""
         self.result += '&' + name + ';'
 
+def tidy_html(html_buffer, cleaning_lib='utidylib'):
+    """
+    Tidy up the input HTML using one of the installed cleaning
+    libraries.
+
+    @param html_buffer: the input HTML to clean up
+    @type html_buffer: string
+    @param cleaning_lib: chose the preferred library to clean the HTML. One of:
+                         - utidylib
+                         - beautifulsoup
+    @return: a cleaned version of the input HTML
+    @note: requires uTidylib or BeautifulSoup to be installed. If the chosen library is missing, the input X{html_buffer} is returned I{as is}.
+    """
+
+    if CFG_TIDY_INSTALLED and cleaning_lib == 'utidylib':
+        options = dict(output_xhtml=1,
+                       show_body_only=1)
+        try:
+            output = str(tidy.parseString(html_buffer, **options))
+        except:
+            output = html_buffer
+    elif CFG_BEAUTIFULSOUP_INSTALLED and cleaning_lib == 'beautifulsoup':
+        try:
+            output = str(BeautifulSoup(html_buffer).prettify())
+        except:
+            output = html_buffer
+    else:
+        output = html_buffer
+
+    return output
+
 def get_mathjax_header():
     """
     Return the snippet of HTML code to put in HTML HEAD tag, in order to
@@ -255,12 +312,20 @@ MathJax.Hub.Config({
     'mathjax_path': mathjax_path
 }
 
+def is_html_text_editor_installed():
+    """
+    Returns True if the wysiwyg editor (CKeditor) is installed
+    """
+    return os.path.exists(os.path.join(CFG_WEBDIR, 'ckeditor', 'ckeditor.js'))
+
+ckeditor_available = is_html_text_editor_installed()
 
 def get_html_text_editor(name, id=None, content='', textual_content=None, width='300px', height='200px',
                          enabled=True, file_upload_url=None, toolbar_set="Basic",
-                         custom_configurations_path='/fckeditor/invenio-fckeditor-config.js'):
+                         custom_configurations_path='/ckeditor/invenio-ckeditor-config.js',
+                         ln=CFG_SITE_LANG):
     """
-    Returns a wysiwyg editor (FCKeditor) to embed in html pages.
+    Returns a wysiwyg editor (CKEditor) to embed in html pages.
 
     Fall back to a simple textarea when the library is not installed,
     or when the user's browser is not compatible with the editor, or
@@ -268,11 +333,11 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
 
     NOTE that the output also contains a hidden field named
     'editor_type' that contains the kind of editor used, 'textarea' or
-    'fckeditor'.
+    'ckeditor'.
 
     Based on 'editor_type' you might want to take different actions,
     like replace CRLF with <br/> when editor_type equals to
-    'textarea', but not when editor_type equals to 'fckeditor'.
+    'textarea', but not when editor_type equals to 'ckeditor'.
 
     @param name: *str* the name attribute of the returned editor
 
@@ -303,12 +368,12 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
         When value is not given, the file upload is disabled.
 
     @param toolbar_set: *str* the name of the toolbar layout to
-        use. FCKeditor comes by default with 'Basic' and
+        use. CKeditor comes by default with 'Basic' and
         'Default'. To define other sets, customize the
         config file in
-        /opt/invenio/var/www/fckeditor/invenio-fckconfig.js
+        /opt/cds-invenio/var/www/ckeditor/invenio-ckconfig.js
 
-    @param custom_configurations_path: *str* value for the FCKeditor config
+    @param custom_configurations_path: *str* value for the CKeditor config
         variable 'CustomConfigurationsPath',
         which allows to specify the path of a
         file that contains a custom configuration
@@ -322,54 +387,63 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
 
     editor = ''
 
-    if enabled and fckeditor_available:
+    if enabled and ckeditor_available:
         # Prepare upload path settings
+        file_upload_script = ''
         if file_upload_url is not None:
-            file_upload_script = '''
-            oFCKeditor.Config["LinkUploadURL"] = '%(file_upload_url)s';
-            oFCKeditor.Config["ImageUploadURL"] = '%(file_upload_url)s?type=Image';
-            oFCKeditor.Config["FlashUploadURL"] = '%(file_upload_url)s?type=Flash';
-            oFCKeditor.Config["MediaUploadURL"] = '%(file_upload_url)s?type=Media';
-            oFCKeditor.Config["LinkUpload"] = true;
-            oFCKeditor.Config["ImageUpload"] = true;
-            oFCKeditor.Config["FlashUpload"] = true;
+            file_upload_script = ''',
+            filebrowserLinkUploadUrl: '%(file_upload_url)s',
+            filebrowserImageUploadUrl: '%(file_upload_url)s?type=Image',
+            filebrowserFlashUploadUrl: '%(file_upload_url)s?type=Flash'
             ''' % {'file_upload_url': file_upload_url}
-        else:
-            file_upload_script = '''
-            oFCKeditor.Config["LinkUpload"] = false;
-            oFCKeditor.Config["ImageUpload"] = false;
-            oFCKeditor.Config["FlashUpload"] = false;
-            '''
 
         # Prepare code to instantiate an editor
         editor += '''
-        <script type="text/javascript" src="%(CFG_SITE_URL)s/fckeditor/fckeditor.js"></script>
-        <input type="hidden" name="editor_type" id="%(name)seditortype" value="textarea" />
+        <script language="javascript">
+        /* Load the script only once, or else multiple instance of the editor on the same page will not work */
+        var INVENIO_CKEDITOR_ALREADY_LOADED
+            if (INVENIO_CKEDITOR_ALREADY_LOADED != 1) {
+	        document.write("<script src='%(CFG_SITE_URL)s/ckeditor/ckeditor.js'><\/script>");
+                INVENIO_CKEDITOR_ALREADY_LOADED = 1;
+            }
+	</script>
+        <input type="hidden" name="editor_type" id="%(id)seditortype" value="textarea" />
         <textarea id="%(id)s" name="%(name)s" style="width:%(width)s;height:%(height)s">%(textual_content)s</textarea>
-        <textarea id="%(id)shtmlvalue" name="%(name)shtmlvalue" style="display:None;width:%(width)s;height:%(height)s">%(html_content)s</textarea>
+        <textarea id="%(id)shtmlvalue" name="%(name)shtmlvalue" style="display:none;width:%(width)s;height:%(height)s">%(html_content)s</textarea>
         <script type="text/javascript">
-          var oFCKeditor = new FCKeditor('%(name)s', '%(width)s', '%(height)s', '%(toolbar)s') ;
-          oFCKeditor.BasePath = "/fckeditor/" ;
-          oFCKeditor.Config["CustomConfigurationsPath"] = '%(custom_configurations_path)s';
-          /* Set paths to upload files */
-          %(file_upload_script)s
-          /* Disable browsing on the server, which would not work anyway */
-          oFCKeditor.Config["LinkBrowser"] = false;
-          oFCKeditor.Config["ImageBrowser"] = false;
-          oFCKeditor.Config["FlashBrowser"] = false;
+          var CKEDITOR_BASEPATH = '/ckeditor/';
 
-          oFCKeditor.ReplaceTextarea() ;
+          CKEDITOR.replace( '%(name)s',
+                            {customConfig: '%(custom_configurations_path)s',
+                            toolbar: '%(toolbar)s',
+                            width: '%(width)s',
+                            height:'%(height)s',
+                            language: '%(ln)s'
+                            %(file_upload_script)s
+                            });
 
-          function FCKeditor_OnComplete( editorInstance )
+        CKEDITOR.on('instanceReady',
+          function( evt )
           {
-            /* If FCKeditor was correctly loaded, display the nice HTML representation */
-            var oEditor = FCKeditorAPI.GetInstance('%(name)s');
-            var html_editor = document.getElementById('%(id)shtmlvalue');
-            oEditor.SetHTML(html_editor.value);
-            var editor_type_field = document.getElementById('%(name)seditortype');
-            editor_type_field.value = 'fckeditor';
-            oEditor.ResetIsDirty();
-          }
+            /* If CKeditor was correctly loaded, display the nice HTML representation */
+            var oEditor = evt.editor;
+            editor_id = oEditor.id
+            editor_name = oEditor.name
+            var html_editor = document.getElementById(editor_name + 'htmlvalue');
+            oEditor.setData(html_editor.value);
+            var editor_type_field = document.getElementById(editor_name + 'editortype');
+            editor_type_field.value = 'ckeditor';
+            var writer = oEditor.dataProcessor.writer;
+            writer.indentationChars = ''; /*Do not indent source code with tabs*/
+            oEditor.resetDirty();
+            /* Workaround: http://dev.ckeditor.com/ticket/3674 */
+             evt.editor.on( 'contentDom', function( ev )
+             {
+             ev.removeListener();
+             evt.editor.resetDirty();
+             } );
+            /* End workaround */
+          })
 
         </script>
         ''' % \
@@ -382,10 +456,11 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
            'custom_configurations_path': custom_configurations_path,
            'toolbar': toolbar_set,
            'file_upload_script': file_upload_script,
-           'CFG_SITE_URL': CFG_SITE_URL}
+           'CFG_SITE_URL': CFG_SITE_URL,
+           'ln': ln}
 
     else:
-        # FCKedior is not installed
+        # CKedior is not installed
         textarea = '<textarea %(id)s name="%(name)s" style="width:%(width)s;height:%(height)s">%(content)s</textarea>' \
                      % {'content': cgi.escape(textual_content),
                         'width': width,
@@ -470,10 +545,10 @@ def create_html_select(options, selected=None, attrs=None, **other_attrs):
 
         >>> print create_html_select(["foo", "bar"], selected="bar", name="baz")
         <select name="baz">
-          <option selected="selected">
+          <option selected="selected" value="bar">
             bar
           </option>
-          <option>
+          <option value="foo">
             foo
           </option>
         </select>
@@ -490,7 +565,7 @@ def create_html_select(options, selected=None, attrs=None, **other_attrs):
     @param options: this can either be a sequence of strings or a map of
         C{key->value}. In the former case, the C{select} tag will contain
         a list of C{option} tags (in alphabetical order), where the
-        C{value} attribute is not specified. In the latter case, the
+        C{value} attribute is set to C{value}. In the latter case, the
         C{value} attribute will be set to the C{key}, while the body
         of the C{option} will be set to C{value}.
     @type options: sequence or map
@@ -506,6 +581,10 @@ def create_html_select(options, selected=None, attrs=None, **other_attrs):
     @rtype: string
 
     @note: the values and keys will be escaped for HTML.
+
+    @note: it is important that parameter C{value} is always
+        specified, in case some browser plugin play with the
+        markup, for eg. when translating the page.
     """
     body = []
     try:
@@ -518,7 +597,7 @@ def create_html_select(options, selected=None, attrs=None, **other_attrs):
         options.sort()
         for value in options:
             option_attrs = value == selected and {"selected": "selected"} or {}
-            body.append(create_html_tag("option", body=value, escape_body=True, attrs=option_attrs))
+            body.append(create_html_tag("option", body=value, escape_body=True, value=value, attrs=option_attrs))
     return create_html_tag("select", body='\n'.join(body), attrs=attrs, **other_attrs)
 
 class _LinkGetter(HTMLParser):

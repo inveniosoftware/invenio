@@ -94,19 +94,17 @@ def delete(req, ln=CFG_SITE_LANG, comid="", recid="", uid="", reviews=""):
 
     (auth_code, auth_msg) = check_user(req,'cfgwebcomment')
     if (auth_code != 'false'):
-        (body, errors, warnings) = perform_request_delete(ln=ln,
-                                                          comID=comid,
-                                                          recID=recid,
-                                                          uid=uid,
-                                                          reviews=reviews)
+        body = perform_request_delete(ln=ln,
+                                      comID=comid,
+                                      recID=recid,
+                                      uid=uid,
+                                      reviews=reviews)
         return page(title=(reviews=='1' and _("Delete/Undelete Reviews") or _("Delete/Undelete Comments")) + _(" or Suppress abuse reports"),
                 body=body,
                 uid=uid,
                 language=ln,
                 navtrail = navtrail_previous_links,
                 req = req,
-                errors = errors,
-                warnings = warnings,
                 lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)

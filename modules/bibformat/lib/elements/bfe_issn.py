@@ -26,9 +26,8 @@ import urllib
 import sys
 import re
 import getopt
-from invenio.search_engine import \
-     get_fieldvalues, \
-     perform_request_search
+from invenio.search_engine import perform_request_search
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.config import CFG_CERN_SITE
 
 if CFG_CERN_SITE:

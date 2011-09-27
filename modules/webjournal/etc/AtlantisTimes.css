@@ -330,3 +330,7 @@ a.rssLink img{
         text-align:center;
         background-color: #fff;
 }
+.ckeditor_body {
+/* When editing in CKEditor, you want a white background */
+background-color: #fff;
+}

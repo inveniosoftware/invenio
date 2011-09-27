@@ -31,12 +31,23 @@ import re
 from invenio.config import CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_MAXRESULTS
 CFG_EXTERNAL_COLLECTION_MAXRESULTS = CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_MAXRESULTS
 
+try:
+    from BeautifulSoup import BeautifulSoup
+    CFG_BEAUTIFULSOUP_INSTALLED = True
+except ImportError:
+    CFG_BEAUTIFULSOUP_INSTALLED = False
+
 from invenio.bibformat import format_record
 from invenio.websearch_external_collections_getter import fetch_url_content
 import cgi
 
 re_href = re.compile(r'<a[^>]*href="?([^">]*)"?[^>]*>', re.IGNORECASE)
 re_img = re.compile(r'<img[^>]*src="?([^">]*)"?[^>]*>', re.IGNORECASE)
+
+try:
+    import libxml2
+except ImportError:
+    pass
 
 def correct_url(htmlcode, host, path):
     """This function is used to correct urls in html code.
@@ -167,8 +178,7 @@ class ExternalCollectionResultsParser(object):
 class CDSIndicoCollectionResutsParser(ExternalCollectionResultsParser):
     """Parser for Indico"""
 
-    num_results_regex = re.compile(r'<strong>([0-9]+?)</strong> records found')
-    result_regex = re.compile(r'<tr><td valign="top" align="right" style="white-space: nowrap;">\s*<input name="recid" type="checkbox" value="[0-9]+" \/>\s*([0-9]+\.)\s*</td><td valign="top">(.*?)<div class="moreinfo">.*?</div></td></tr>', re.MULTILINE + re.DOTALL)
+    num_results_regex = re.compile(r'<h3 style="float:right">Hits: ([0-9]+?)</h3>')
 
     def __init__(self, host="", path=""):
         super(CDSIndicoCollectionResutsParser, self).__init__(host, path)
@@ -176,12 +186,61 @@ class CDSIndicoCollectionResutsParser(ExternalCollectionResultsParser):
     def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
 
-        results = self.result_regex.finditer(self.buffer)
-        for result in results:
-            num = result.group(1)
-            html = result.group(2)
+        if CFG_BEAUTIFULSOUP_INSTALLED:
+            soup = BeautifulSoup(self.buffer)
 
-            self.add_html_result(num + ' ' + html  + '<br />', limit)
+            # Remove "more" links that include Indico Javascript
+            more_links = soup.findAll('a', { "class" : "searchResultLink", "href": "#"})
+            [more_link.extract() for more_link in more_links]
+
+            # Events
+            event_results = soup.findAll('li', {"class" : "searchResultEvent"})
+            event_index = 1
+            for result in event_results:
+                self.add_html_result((event_index == 1 and '<b>Events:</b><br/>' or '') + \
+                                     str(result)  + '<br />', limit)
+                event_index += 1
+            # Contributions
+            contribution_results = soup.findAll('li', {"class" : "searchResultContribution"})
+            contribution_index = 1
+            for result in contribution_results:
+                self.add_html_result((contribution_index == 1 and '<b>Contributions:</b><br/>' or '') + \
+                                     str(result)  + '<br />', limit)
+                contribution_index += 1
+        else:
+            # Markup is complex. Do whatever we can...
+            # Events
+            split_around_events = self.buffer.split('<li class="searchResultEvent">')
+            if len(split_around_events) > 1:
+                event_index = 1
+                for html_chunk in split_around_events[1:]:
+                    output = '<li class="searchResultEvent">'
+                    if event_index == len(split_around_events) -1:
+                        split_around_link = html_chunk.split('searchResultLink')
+                        split_around_ul = 'searchResultLink'.join(split_around_link[1:]).split('</ul>')
+                        output += split_around_link[0] + 'searchResultLink' + \
+                                  split_around_ul[0] + '</ul>' + split_around_ul[1]
+                    else:
+                        output += html_chunk
+                    self.add_html_result((event_index == 1 and '<b>Events:</b><br/>' or '') + \
+                                     output  + '<br />', limit)
+                    event_index += 1
+            # Contributions
+            split_around_contributions = self.buffer.split('<li class="searchResultContribution">')
+            if len(split_around_contributions) > 1:
+                contribution_index = 1
+                for html_chunk in split_around_contributions[1:]:
+                    output = '<li class="searchResultContribution">'
+                    if contribution_index == len(split_around_contributions) -1:
+                        split_around_link = html_chunk.split('searchResultLink')
+                        split_around_ul = 'searchResultLink'.join(split_around_link[1:]).split('</ul>')
+                        output += split_around_link[0] + 'searchResultLink' + \
+                                  split_around_ul[0] + '</ul>' + split_around_ul[1]
+                    else:
+                        output += html_chunk
+                    self.add_html_result((contribution_index == 1 and '<b>Contributions:</b><br/>' or '') + \
+                                     output  + '<br />', limit)
+                    contribution_index += 1
 
 class KISSExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """Parser for Kiss."""
@@ -428,14 +487,13 @@ class InvenioXMLExternalCollectionResultsParser(ExternalCollectionResultsParser)
         """Parse buffer to extract records. Format the records using the selected output format."""
 
         (recids, records) = self.parse_and_extract_records(of)
-
         if req and cgi.parse_qs(req.args).has_key('jrec'):
             counter = int(cgi.parse_qs(req.args)['jrec'][0]) - 1
         else:
             counter = 0
         for recid in recids:
             counter += 1
-            if of == 'hb':
+            if of in ['hb', None]:
                 html = """
                         <tr><td valign="top" align="right" style="white-space: nowrap;">
                         <input name="recid" type="checkbox" value="%(recid)s" />
@@ -487,3 +545,70 @@ class InvenioXMLExternalCollectionResultsParser(ExternalCollectionResultsParser)
         except AttributeError:
             # in case there were no results found an Attribute error is raised
             return ([], {})
+
+class ScienceCinemaXMLExternalCollectionResultsParser(ExternalCollectionResultsParser):
+    """XML parser for ScienceCinema"""
+
+    def parse_num_results(self):
+        """Returns the number of results"""
+        return self.buffer.split('</audio>')[0].count('<record>')
+
+    def parse(self, of='hb', req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
+        """Parse buffer to extract records. Format the records using the selected output format."""
+
+        def process_audio_record(record_node):
+            """Return HTML formatted version of an audio record_node"""
+            ostiId = ''
+            title = ''
+            description = ''
+            link = ''
+            image = ''
+            snippets = ''
+            subnode = record_node.children
+            while subnode is not None:
+                if subnode.name == 'ostiId':
+                    ostiId = str(subnode.content)
+                elif subnode.name == 'title':
+                    title = str(subnode.content)
+                elif subnode.name == 'description':
+                    description = str(subnode.content)
+                elif subnode.name == 'link':
+                    link = str(subnode.content)
+                elif subnode.name == 'image':
+                    image = str(subnode.content)
+                elif subnode.name == 'snippets':
+                    snippets = str(subnode.content)
+                subnode = subnode.next
+            return """<table><tr><td><img style="max-width:180px" src="%(image)s"/></td><td valign="top"><b>%(title)s</b><br/>
+%(description)s<br/>
+<a href="%(link)s">%(link)s</a></td></tr></table>
+            """ % \
+        {'title': title,
+         'ostiId': ostiId,
+         'description': description,
+         'link': link,
+         'image': image,
+         'snippets': snippets}
+
+        def process_metadata_record(record_node):
+            """Return HTML formatted version of a metadata record_node"""
+            return process_audio_record(record_node)
+
+        try:
+            document = libxml2.parseDoc(self.buffer)
+            node = document.getRootElement().children
+            while node is not None:
+                current_nodename = node.name
+                if current_nodename in ['audio']: # Currently ignore 'metadata' nodes
+                    result = node.children
+                    while result is not None:
+                        if result.name == 'record':
+                            if current_nodename == 'audio':
+                                self.add_html_result(process_audio_record(result))
+                            elif current_nodename == 'metadata':
+                                self.add_html_result(process_metadata_record(result))
+                        result = result.next
+                node = node.next
+            document.freeDoc()
+        except Exception, e:
+            return

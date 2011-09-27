@@ -54,6 +54,7 @@ class Template:
             '          %(imgCompressMenuSection)sRecord\n' \
             '          %(imgNewRecord)s\n' \
             '          %(imgCloneRecord)s\n' \
+            '          &nbsp;&nbsp;%(imgTemplateRecord)s\n' \
             '        </div>\n' \
             '        <table>\n' \
             '          <col width="28px">\n' \
@@ -99,6 +100,9 @@ class Template:
             'imgCloneRecord': img('/img/table_multiple.png',
                 'bibEditImgCtrlDisabled', id='imgCloneRecord',
                 title='Clone record'), \
+            'imgTemplateRecord': img('/img/page_edit.png',
+                'bibEditImgCtrlEnabled', id='imgTemplateRecord',
+                title='Manage templates'), \
             'txtSearchPattern': inp('text', id='txtSearchPattern'), \
             'sctSearchType': '<select id="sctSearchType">\n' \
             '                <option value="recID">Rec ID</option>\n' \
@@ -453,6 +457,19 @@ def page_style():
                     overflow:hidden;
                     word-wrap: break-word;
                 }
+
+                #bibEditTable td {
+                    max-width: 500px;
+                    overflow:hidden;
+                    word-wrap: break-word;
+                 }
+                 #bibEditTable td textarea{
+                    max-width: 675px;
+                    min-height: 65px;
+                    max-height: 600px;
+
+                }
+
 
                 #bibEditMenu .bibEditMenuSection table {
                     width: 100%;

@@ -1,0 +1,98 @@
+// -*- coding: utf-8 -*-
+//
+// This file is part of Invenio.
+// Copyright (C) 2011 CERN.
+//
+// Invenio is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as
+// published by the Free Software Foundation; either version 2 of the
+// License, or (at your option) any later version.
+//
+// Invenio is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Invenio; if not, write to the Free Software Foundation, Inc.,
+// 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+{
+	// INSTANTIATION
+    // According to the PBcore standard, this strict order MUST be followed
+    "instantiation_mapping": [
+        {"tag": "<instantiationIdentifier>%s</instantiationIdentifier>",
+         "mapping": "local->instantiationIdentifier"},
+        {"tag": "<instantiationDate dateType=\"created\">%s</instantiationDate>",
+         "mapping": "ffprobe->format->TAG:creation_time"},
+        {"tag": "<instantiationDimensions unitsofmeasure=\"pixels\">%s</instantiationDimensions>",
+         "mapping": "ffprobe->video->width;;x;;ffprobe->video->height"},
+        {"tag": "<instantiationPhysical>%s</instantiationPhysical>",
+         "mapping": "local->instantiationPhysical"},
+        {"tag": "<instantiationDigital source=\"IANA MIME Media types\" ref=\"http://www.iana.org/assignments/media-types/video/\">%s</instantiationDigital>",
+         "mapping": "mediainfo->general->internet_media_type"},
+        // {"tag": "<instantiationStandard>%s</instantiationStandard>", "mapping": "" },
+        {"tag": "<instantiationLocation>%s</instantiationLocation>",
+         "mapping": "local->instantiationLocation"},
+        {"tag": "<instantiationMediaType source=\"PBCore instantiationMediaType\" ref=\"http://metadataregistry.org/concept/show/id/1491.html\">%s</instantiationMediaType>",
+         "mapping": "Moving Image"},
+        {"tag": "<instantiationGenerations>%s</instantiationGenerations>",
+         "mapping": "local->instantiationGenerations"},
+        {"tag": "<instantiationFileSize unitsofMeasure=\"B\">%s</instantiationFileSize>",
+         "mapping": "ffprobe->format->size"},
+        {"tag": "<instantiationTimeStart>%s</instantiationTimeStart>",
+         "mapping": "ffprobe->format->time_start",
+         "call": "seconds_to_timecode"},
+        {"tag": "<instantiationDuration>%s</instantiationDuration>",
+         "mapping": "ffprobe->format->duration",
+         "call": "seconds_to_timecode"},
+        {"tag": "<instantiationDataRate unitsofMeasure=\"bps\">%s</instantiationDataRate>",
+         "mapping": "ffprobe->format->bit_rate" },
+        // {"tag": "<instantiationColors>%s</instantiationColors>", "mapping": "" },
+        {"tag": "<instantiationTracks>%s</instantiationTracks>",
+         "mapping": "ffprobe->format->nb_streams"},
+        // {"tag": "<instantiationChannelConfiguration>%s</instantiationChannelConfiguration>", "mapping": "" },
+        {"tag": "<instantiationLanguage source=\"ISO 639.2\" ref=\"http://www.loc.gov/standards/iso639-2/php/code_list.php\">%s</instantiationLanguage>",
+         "mapping": "mediainfo->general->language"},
+        // {"tag": "<instantiationAlternativeModes>%s</instantiationAlternativeModes>", "mapping": "" },
+        {"tag": "%s",
+         "mapping": "local->joinedtracks" }
+        // {"tag": "<instantiationRelation>%s</instantiationRelation>", "mapping": "" },
+        // {"tag": "<instantiationRights>%s</instantiationRights>", "mapping": "" },
+        // {"tag": "<instantiationAnnotation>%s</instantiationAnnotation>", "mapping": "" },
+        // {"tag": "<instantiationPart>%s</instantiationPart>", "mapping": "" },
+        // {"tag": "<instantiationExtension>%s</instantiationExtension>", "mapping": "" },
+    ],
+    // ESSENCE TRACK
+    // According to the PBcore standard, this strict order MUST be followed
+    "essencetrack_mapping": [
+        {"tag": "<essenceTrackType>%s</essenceTrackType>",
+         "mapping": "ffprobe->stream->codec_type"},
+        {"tag": "<essenceTrackIdentifier>%s</essenceTrackIdentifier>",
+         "mapping": "ffprobe->stream->index"},
+        // {"tag": "<essenceTrackStandard>%s</essenceTrackStandard>", "mapping": " "},
+        {"tag": "<essenceTrackEncoding>%s</essenceTrackEncoding>",
+         "mapping": "ffprobe->stream->codec_name"},
+        {"tag": "<essenceTrackDataRate unitsOfMeasure=\"bps\">%s</essenceTrackDataRate>",
+         "mapping": "mediainfo->track->bit_rate"},
+        {"tag": "<essenceTrackFrameRate unitsOfMeasure=\"fps\" >%s</essenceTrackFrameRate>",
+         "mapping": "mediainfo->track->frame_rate"},
+        // {"tag": "<essenceTrackPlaybackSpeed>%s</essenceTrackPlaybackSpeed>", "mapping": " "},
+        {"tag": "<essenceTrackSamplingRate unitsOfMeasure=\"Hz\" >%s</essenceTrackSamplingRate>",
+         "mapping": "ffprobe->stream->sample_rate"},
+        {"tag": "<essenceTrackBitDepth>%s</essenceTrackBitDepth>",
+         "mapping": "mediainfo->track->resolution"},
+        {"tag": "<essenceTrackFrameSize>%s</essenceTrackFrameSize>",
+         "mapping": "ffprobe->stream->width;;x;;ffprobe->stream->height"},
+        {"tag": "<essenceTrackAspectRatio>%s</essenceTrackAspectRatio>",
+         "mapping": "mediainfo->track->display_aspect_ratio"},
+        {"tag": "<essenceTrackTimeStart>%s</essenceTrackTimeStart>",
+         "mapping": "ffprobe->stream->start_time"},
+        {"tag": "<essenceTrackDuration>%s</essenceTrackDuration>",
+         "mapping": "ffprobe->stream->duration"},
+        {"tag": "<essenceTrackLanguage source=\"ISO 639.2\" ref=\"http://www.loc.gov/standards/iso639-2/php/code_list.php\">%s</essenceTrackLanguage>",
+         "mapping": "ffprobe->stream->TAG:language"}
+        // {"tag": "<essenceTrackAnnotation>%s</essenceTrackAnnotation>", "mapping": " "},
+        // {"tag": "<essenceTrackExtension>%s</essenceTrackExtension>", "mapping": " "},
+    ]
+}

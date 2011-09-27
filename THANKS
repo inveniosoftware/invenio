@@ -163,4 +163,8 @@ The LaTeX-to-Unicode translation table was compiled from:
 FX, <http://stackoverflow.com/questions/4578912/replace-all-accented-characters-by-their-latex-equivalent>
 Lea Wiemann <LeWiemann@gmail.com>, <http://docutils.sourceforge.net/docutils/writers/newlatex2e/unicode_map.py>
 
+The scientificchar plugin for the CKEditor was adapted from the
+specialchar plugin from Frederico Knabben.
+<http://ckeditor.com/>
+
 - end of file -

@@ -23,7 +23,7 @@ Bibclassify acronym analyser.
 
 import re
 
-ACRONYM_BRACKETS_REGEX = re.compile("[([] ?(([A-Z]\.?){2,})s? ?[)\]]")
+ACRONYM_BRACKETS_REGEX = re.compile("[([] ?(([a-zA-Z]\.?){2,})s? ?[)\]]")
 DOTS_REGEX = re.compile("\.")
 MAXIMUM_LEVEL = 2
 STOPLIST = ("and", "of", "for", "the", "to", "do", "de", "theory",
@@ -261,3 +261,6 @@ def _equivalent_expansions(expansion1, expansion2):
         simplified_versions.append("".join(store))
 
     return simplified_versions[0] == simplified_versions[1]
+
+if __name__ == "__main__":
+    print get_acronyms("asymptomatically de Sitter(dS). and what one large relative symmetric (LRS) which always has general relativity (GR)")

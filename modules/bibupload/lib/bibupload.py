@@ -20,43 +20,6 @@
 """
 BibUpload: Receive MARC XML file and update the appropriate database
 tables according to options.
-
-Usage: bibupload [options]
-Command options:
-  -a, --append          new fields are appended to the existing record
-  -c, --correct         fields are replaced by the new ones in the existing record
-  -f, --format          takes only the FMT fields into account. Does not update
-  -i, --insert          insert the new record in the database
-  -r, --replace         the existing record is entirely replaced by the new one
-  -z, --reference       update references (update only 999 fields)
-  -d, --delete          specified fields are deleted in existing record
-  -S, --stage=STAGE     stage to start from in the algorithm (0: always done; 1: FMT tags;
-                        2: FFT tags; 3: BibFmt; 4: Metadata update; 5: time update)
-  -n, --notimechange    do not change record last modification date when updating
-  -o, --holdingpen      Insert record into holding pen instead of the normal database
-  --pretend             do not really insert/append/correct/replace the input file
-Scheduling options:
-  -u, --user=USER       User name under which to submit this task.
-  -t, --runtime=TIME    Time to execute the task. [default=now]
-                        Examples: +15s, 5m, 3h, 2002-10-27 13:57:26.
-  -s, --sleeptime=SLEEP Sleeping frequency after which to repeat the task.
-                        Examples: 30m, 2h, 1d. [default=no]
-  -L  --limit=LIMIT     Time limit when it is allowed to execute the task.
-                        Examples: 22:00-03:00, Sunday 01:00-05:00.
-                        Syntax: [Wee[kday]] [hh[:mm][-hh[:mm]]].
-  -P, --priority=PRI    Task priority (0=default, 1=higher, etc).
-  -N, --name=NAME       Task specific name (advanced option).
-General options:
-  -h, --help            Print this help.
-  -V, --version         Print version information.
-  -v, --verbose=LEVEL   Verbose level (0=min, 1=default, 9=max).
-      --profile=STATS   Print profile information. STATS is a comma-separated
-                        list of desired output stats (calls, cumulative,
-                        file, line, module, name, nfl, pcalls, stdname, time).
-Receive MARC XML file and update appropriate database
-tables according to options.
-Examples:
-    $ bibupload -i input.xml
 """
 
 __revision__ = "$Id$"
@@ -177,7 +140,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         return (1, -1)
 
     # Extraction of the Record Id from 001, SYSNO or OAIID tags:
-    rec_id = retrieve_rec_id(record, opt_mode)
+    rec_id = retrieve_rec_id(record, opt_mode, pretend=pretend)
     if rec_id == -1:
         return (1, -1)
     elif rec_id > 0:
@@ -189,8 +152,8 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             error = record_add_field(record, '001', controlfield_value=rec_id)
             if error is None:
                 write_message("   Failed: " \
-                                            "Error during adding the 001 controlfield "  \
-                                            "to the record", verbose=1, stream=sys.stderr)
+                    "Error during adding the 001 controlfield "  \
+                    "to the record", verbose=1, stream=sys.stderr)
                 return (1, int(rec_id))
             else:
                 error = None
@@ -210,7 +173,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
 
     record_deleted_p = False
     if opt_mode == 'insert' or \
-    (opt_mode == 'replace_or_insert' and rec_id is None):
+    (opt_mode == 'replace_or_insert') and rec_id is None:
         insert_mode_p = True
         # Insert the record into the bibrec databases to have a recordId
         rec_id = create_new_record(pretend=pretend)
@@ -274,6 +237,9 @@ def bibupload(record, opt_tag=None, opt_mode=None,
     write_message("   -Stage COMPLETED", verbose=2)
 
     try:
+        if not record_is_valid(record):
+            return (1, -1)
+
         # Have a look if we have FMT tags
         write_message("Stage 1: Start (Insert of FMT tags if exist).", verbose=2)
         if opt_stage_to_start_from <= 1 and \
@@ -408,6 +374,22 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             update_database_with_metadata(original_record, rec_id, oai_rec_id, pretend=pretend)
             write_message("   Restored original record", verbose=1, stream=sys.stderr)
 
+def record_is_valid(record):
+    """
+    Check if the record is valid. Currently this simply checks if the record
+    has exactly one rec_id.
+
+    @param record: the record
+    @type record: recstruct
+    @return: True if the record is valid
+    @rtype: bool
+    """
+    rec_ids = record_get_field_values(record, tag="001")
+    if len(rec_ids) != 1:
+        write_message("    The record is not valid: it has not a single rec_id: %s" % (rec_ids), stream=sys.stderr)
+        return False
+    return True
+
 def find_record_ids_by_oai_id(oaiId):
     """
     A method finding the records identifier provided the oai identifier
@@ -445,7 +427,7 @@ def insert_record_into_holding_pen(record, oai_id, pretend=False):
     else:
         # id not found by using the oai_id, let's use a wider search based
         # on any information we might have.
-        bibrec_id = retrieve_rec_id(record, 'holdingpen')
+        bibrec_id = retrieve_rec_id(record, 'holdingpen', pretend=pretend)
         if bibrec_id is None:
             bibrec_id = 0
 
@@ -632,7 +614,7 @@ def extract_tag_from_record(record, tag_number):
         return record.get(tag_number, None)
     return None
 
-def retrieve_rec_id(record, opt_mode):
+def retrieve_rec_id(record, opt_mode, pretend=False):
     """Retrieve the record Id from a record by using tag 001 or SYSNO or OAI ID
     tag. opt_mod is the desired mode."""
 
@@ -645,7 +627,7 @@ def retrieve_rec_id(record, opt_mode):
         rec_id = tag_001[0][3]
         # if we are in insert mode => error
         if opt_mode == 'insert':
-            write_message("   Failed : Error tag 001 found in the xml" \
+            write_message("   Failed: tag 001 found in the xml" \
                           " submitted, you should use the option replace," \
                           " correct or append to replace an existing" \
                           " record. (-h for help)",
@@ -657,6 +639,28 @@ def retrieve_rec_id(record, opt_mode):
             if find_record_from_recid(rec_id) is not None:
                 # okay, 001 corresponds to some known record
                 return int(rec_id)
+            elif opt_mode in ('replace', 'replace_or_insert'):
+                if task_get_option('force'):
+                    # we found the rec_id but it's not in the system and we are
+                    # requested to replace records. Therefore we create on the fly
+                    # a empty record allocating the recid.
+                    write_message("   Warning: tag 001 found in the xml with"
+                                " value %(rec_id)s, but rec_id %(rec_id)s does"
+                                " not exist. Since the mode replace was"
+                                " requested the rec_id %(rec_id)s is allocated"
+                                " on-the-fly." % {"rec_id" : rec_id},
+                                stream=sys.stderr)
+                    return create_new_record(rec_id=rec_id, pretend=pretend)
+                else:
+                    # Since --force was not used we are going to raise an error
+                    write_message("   Failed: tag 001 found in the xml"
+                                  " submitted with value %(rec_id)s. The"
+                                  " corresponding record however does not"
+                                  " exists. If you want to really create"
+                                  " such record, please use the --force"
+                                  " parameter when calling bibupload." % {
+                                    "rec_id": rec_id}, stream=sys.stderr)
+                    return -1
             else:
                 # The record doesn't exist yet. We shall have try to check
                 # the SYSNO or OAI id later.
@@ -781,21 +785,40 @@ def retrieve_rec_id(record, opt_mode):
 
 ### Insert functions
 
-def create_new_record(pretend=False):
-    """Create new record in the database"""
+def create_new_record(rec_id=None, pretend=False):
+    """
+    Create new record in the database
+
+    @param rec_id: if specified the new record will have this rec_id.
+    @type rec_id: int
+    @return: the allocated rec_id
+    @rtype: int
+
+    @note: in case of errors will be returned None
+    """
+    if rec_id is not None:
+        try:
+            rec_id = int(rec_id)
+        except (ValueError, TypeError), error:
+            write_message("   Error during the creation_new_record function : %s "
+        % error, verbose=1, stream=sys.stderr)
+            return None
+        if run_sql("SELECT id FROM bibrec WHERE id=%s", (rec_id, )):
+            write_message("   Error during the creation_new_record function : the requested rec_id %s already exists." % rec_id)
+            return None
     if pretend:
-        return run_sql("SELECT max(id)+1 FROM bibrec")[0][0]
-    now = convert_datestruct_to_datetext(time.localtime())
-    query = """INSERT INTO bibrec (creation_date, modification_date)
-                VALUES (%s, %s)"""
-    params = (now, now)
+        if rec_id:
+            return rec_id
+        else:
+            return run_sql("SELECT max(id)+1 FROM bibrec")[0][0]
     try:
-        rec_id = run_sql(query, params)
-        return rec_id
+        if rec_id is not None:
+            return run_sql("INSERT INTO bibrec (id, creation_date, modification_date) VALUES (%s, NOW(), NOW())", (rec_id, ))
+        else:
+            return run_sql("INSERT INTO bibrec (creation_date, modification_date) VALUES (NOW(), NOW())")
     except Error, error:
-        write_message("   Error during the creation_new_record function : %s "
-            % error, verbose=1, stream=sys.stderr)
-    return None
+        write_message("   Error during the creation_new_record function : %s " % error, verbose=1, stream=sys.stderr)
+        return None
 
 def insert_bibfmt(id_bibrec, marc, format, modification_date='1970-01-01 00:00:00', pretend=False):
     """Insert the format in the table bibfmt"""
@@ -1047,18 +1070,14 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
         try:
             if not url: # Not requesting a new url. Just updating comment & description
                 return _update_description_and_comment(bibdoc, docname, format, description, comment, flags, pretend=pretend)
-            tmpurl = download_url(url, format)
             try:
-                try:
-                    if not pretend:
-                        bibdoc.add_file_new_format(tmpurl, description=description, comment=comment, flags=flags)
-                except StandardError, e:
-                    write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because format already exists (%s)." % (url, format, docname, doctype, newname, description, comment, flags, e), stream=sys.stderr)
-                    raise
-            finally:
-                os.remove(tmpurl)
+                if not pretend:
+                    bibdoc.add_file_new_format(url, description=description, comment=comment, flags=flags)
+            except StandardError, e:
+                write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because format already exists (%s)." % (url, format, docname, doctype, newname, description, comment, flags, e), stream=sys.stderr)
+                raise
         except Exception, e:
-            write_message("Error in downloading '%s' because of: %s" % (url, e), stream=sys.stderr)
+            write_message("Error in adding '%s' as a new format because of: %s" % (url, e), stream=sys.stderr)
             raise
         return True
 
@@ -1068,18 +1087,14 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
         try:
             if not url:
                 return _update_description_and_comment(bibdoc, docname, format, description, comment, flags, pretend=pretend)
-            tmpurl = download_url(url, format)
             try:
-                try:
-                    if not pretend:
-                        bibdoc.add_file_new_version(tmpurl, description=description, comment=comment, flags=flags)
-                except StandardError, e:
-                    write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because '%s'." % (url, format, docname, doctype, newname, description, comment, flags, e), stream=sys.stderr)
-                    raise
-            finally:
-                os.remove(tmpurl)
+                if not pretend:
+                    bibdoc.add_file_new_version(url, description=description, comment=comment, flags=flags)
+            except StandardError, e:
+                write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because '%s'." % (url, format, docname, doctype, newname, description, comment, flags, e), stream=sys.stderr)
+                raise
         except Exception, e:
-            write_message("Error in downloading '%s' because of: %s" % (url, e), stream=sys.stderr)
+            write_message("Error in adding '%s' as a new version because of: %s" % (url, e), stream=sys.stderr)
             raise
         return True
 
@@ -1165,14 +1180,12 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
             # Let's discover the desired format
             format = field_get_subfield_values(fft, 'f')
             if format:
-                format = format[0]
+                format = normalize_format(format[0])
             else:
                 if url:
                     format = guess_format_from_url(url)
                 else:
                     format = ""
-
-            format = normalize_format(format)
 
             # Let's discover the icon
             icon = field_get_subfield_values(fft, 'x')
@@ -1253,6 +1266,60 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
 
         # Preprocessed data elaboration
         bibrecdocs = BibRecDocs(rec_id)
+
+        ## Let's pre-download all the URLs to see if, in case of mode 'correct' or 'append'
+        ## we can avoid creating a new revision.
+        for docname, (doctype, newname, restriction, version, urls) in docs.items():
+            downloaded_urls = []
+            try:
+                bibdoc = bibrecdocs.get_bibdoc(docname)
+            except InvenioWebSubmitFileError:
+                ## A bibdoc with the given docname does not exists.
+                ## So there is no chance we are going to revise an existing
+                ## format with an identical file :-)
+                bibdoc = None
+
+            new_revision_needed = False
+            for url, format, description, comment, flags in urls:
+                if url:
+                    try:
+                        downloaded_url = download_url(url, format)
+                        write_message("%s saved into %s" % (url, downloaded_url), verbose=9)
+                    except Exception, err:
+                        write_message("Error in downloading '%s' because of: %s" % (url, err), stream=sys.stderr)
+                        raise
+                    if mode == 'correct' and bibdoc is not None and not new_revision_needed:
+                        downloaded_urls.append((downloaded_url, format, description, comment, flags))
+                        if not bibdoc.check_file_exists(downloaded_url):
+                            new_revision_needed = True
+                        else:
+                            write_message("WARNING: %s is already attached to bibdoc %s for recid %s" % (url, docname, rec_id), stream=sys.stderr)
+                    elif mode == 'append' and bibdoc is not None:
+                        if not bibdoc.check_file_exists(downloaded_url):
+                            downloaded_urls.append((downloaded_url, format, description, comment, flags))
+                        else:
+                            write_message("WARNING: %s is already attached to bibdoc %s for recid %s" % (url, docname, rec_id), stream=sys.stderr)
+                    else:
+                        downloaded_urls.append((downloaded_url, format, description, comment, flags))
+                else:
+                    downloaded_urls.append(('', format, description, comment, flags))
+            if mode == 'correct' and bibdoc is not None and not new_revision_needed:
+                ## Since we don't need a new revision (because all the files
+                ## that are being uploaded are different)
+                ## we can simply remove the urls but keep the other information
+                write_message("No need to add a new revision for docname %s for recid %s" % (docname, rec_id), verbose=2)
+                docs[docname] = (doctype, newname, restriction, version, [('', format, description, comment, flags) for (dummy, format, description, comment, flags) in downloaded_urls])
+                for downloaded_url, dummy, dummy, dummy, dummy in downloaded_urls:
+                    ## Let's free up some space :-)
+                    if downloaded_url and os.path.exists(downloaded_url):
+                        os.remove(downloaded_url)
+            else:
+                if downloaded_urls or mode != 'append':
+                    docs[docname] = (doctype, newname, restriction, version, downloaded_urls)
+                else:
+                    ## In case we are in append mode and there are no urls to append
+                    ## we discard the whole FFT
+                    del docs[docname]
 
         if mode == 'replace': # First we erase previous bibdocs
             if not pretend:
@@ -1814,6 +1881,8 @@ Examples:
   -n, --notimechange\tdo not change record last modification date when updating
   -o, --holdingpen\tInsert record into holding pen instead of the normal database
   --pretend\t\tdo not really insert/append/correct/replace the input file
+  --force\t\twhen --replace, use provided 001 tag values, even if the matching
+\t\t\trecord does not exist (thus allocating it on-the-fly)
 """,
             version=__revision__,
             specific_params=("ircazdS:fno",
@@ -1828,7 +1897,8 @@ Examples:
                    "format",
                    "notimechange",
                    "holdingpen",
-                   "pretend"
+                   "pretend",
+                   "force"
                  ]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_run_fnc=task_run_core)
@@ -1905,6 +1975,11 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
 
     elif key in ("--pretend",):
         task_set_option('pretend', True)
+        fix_argv_paths([args[0]])
+        task_set_option('file_path', os.path.abspath(args[0]))
+
+    elif key in ("--force",):
+        task_set_option('force', True)
         fix_argv_paths([args[0]])
         task_set_option('file_path', os.path.abspath(args[0]))
 

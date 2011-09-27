@@ -23,23 +23,24 @@ BibClassify daemon.
 FIXME: the code below requires collection table to be updated to add column:
    clsMETHOD_fk mediumint(9) unsigned NOT NULL,
 This is not clean and should be fixed.
+
+This module IS NOT standalone safe - it should never be run so.
 """
 
 import sys
 import time
 import os
 
-from invenio.dbquery import run_sql
-from invenio.bibtask import task_init, write_message, task_update_progress, \
-    task_set_option, task_get_option, task_sleep_now_if_required, \
-    task_get_task_param
-from invenio.bibclassify_engine import output_keywords_for_local_file
-from invenio.config import CFG_BINDIR, CFG_TMPDIR
-from invenio.intbitset import intbitset
-from invenio.search_engine import get_collection_reclist
-from invenio.bibdocfile import BibRecDocs
-from invenio.bibclassify_text_extractor import is_pdf
-from invenio.config import CFG_VERSION
+import bibclassify_config as bconfig
+import bibclassify_text_extractor
+import bibclassify_engine
+import bibclassify_webinterface
+
+import bibtask
+from dbquery import run_sql
+from intbitset import intbitset
+from search_engine import get_collection_reclist
+from bibdocfile import BibRecDocs
 
 # Global variables allowing to retain the progress of the task.
 _INDEX = 0
@@ -50,7 +51,7 @@ _RECIDS_NUMBER = 0
 
 def bibclassify_daemon():
     """Constructs the BibClassify bibtask."""
-    task_init(authorization_action='runbibclassify',
+    bibtask.task_init(authorization_action='runbibclassify',
         authorization_msg="BibClassify Task Submission",
         description="Extract keywords and create a BibUpload "
             "task.\nExamples:\n"
@@ -61,7 +62,7 @@ def bibclassify_daemon():
         "this record\n"
         "  -c, --collection\t\tkeywords are extracted from this collection\n"
         "  -k, --taxonomy\t\tkeywords are based on that reference",
-        version="Invenio v%s" % CFG_VERSION,
+        version="Invenio BibClassify v%s" % bconfig.VERSION,
         specific_params=("i:c:k:f",
             [
              "recid=",
@@ -135,11 +136,11 @@ def _get_recids_foreach_ontology(recids=None, collections=None, taxonomy=None):
         records = get_collection_reclist(collection)
         if records:
             if not date_last_run:
-                write_message("INFO: Collection %s has not been previously "
+                bibtask.write_message("INFO: Collection %s has not been previously "
                     "analyzed." % collection, stream=sys.stderr, verbose=3)
                 modified_records = intbitset(run_sql("SELECT id FROM bibrec"))
-            elif task_get_option('force'):
-                write_message("INFO: Analysis is forced for collection %s." %
+            elif bibtask.task_get_option('force'):
+                bibtask.write_message("INFO: Analysis is forced for collection %s." %
                     collection, stream=sys.stderr, verbose=3)
                 modified_records = intbitset(run_sql("SELECT id FROM bibrec"))
             else:
@@ -154,14 +155,14 @@ def _get_recids_foreach_ontology(recids=None, collections=None, taxonomy=None):
                     'recIDs': records
                 })
             else:
-                write_message("WARNING: All records from collection '%s' have "
+                bibtask.write_message("WARNING: All records from collection '%s' have "
                     "already been analyzed for keywords with ontology '%s' "
                     "on %s." % (collection, ontology, date_last_run),
                     stream=sys.stderr, verbose=2)
         else:
-            write_message("ERROR: Collection '%s' doesn't contain any record. "
-                "Cannot analyse keywords." % collection, stream=sys.stderr,
-                verbose=0)
+            bibtask.write_message("ERROR: Collection '%s' doesn't contain any record. "
+                "Cannot analyse keywords." % (collection,),
+                stream=sys.stderr, verbose=0)
 
     return rec_onts
 
@@ -176,7 +177,7 @@ def _task_submit_elaborate_specific_parameter(key, value, opts, args):
     know that key.
     eg:
     if key in ('-n', '--number'):
-        task_get_option(\1) = value
+        bibtask.task_get_option(\1) = value
         return True
     return False
     """
@@ -185,51 +186,52 @@ def _task_submit_elaborate_specific_parameter(key, value, opts, args):
         try:
             value = int(value)
         except ValueError:
-            write_message("The value specified for --recid must be a "
+            bibtask.write_message("The value specified for --recid must be a "
                 "valid integer, not '%s'." % value, stream=sys.stderr,
                 verbose=0)
         if not _recid_exists(value):
-            write_message("ERROR: '%s' is not a valid record ID." % value,
+            bibtask.write_message("ERROR: '%s' is not a valid record ID." % value,
                 stream=sys.stderr, verbose=0)
             return False
-        recids = task_get_option('recids')
+        recids = bibtask.task_get_option('recids')
         if recids is None:
             recids = []
         recids.append(value)
-        task_set_option('recids', recids)
+        bibtask.task_set_option('recids', recids)
 
     # Collection option
     elif key in ("-c", "--collection"):
         if not _collection_exists(value):
-            write_message("ERROR: '%s' is not a valid collection." % value,
+            bibtask.write_message("ERROR: '%s' is not a valid collection." % value,
                 stream=sys.stderr, verbose=0)
             return False
-        collections = task_get_option("collections")
+        collections = bibtask.task_get_option("collections")
         collections = collections or []
         collections.append(value)
-        task_set_option("collections", collections)
+        bibtask.task_set_option("collections", collections)
 
     # Taxonomy option
     elif key in ("-k", "--taxonomy"):
         if not _ontology_exists(value):
-            write_message("ERROR: '%s' is not a valid taxonomy name." % value,
+            bibtask.write_message("ERROR: '%s' is not a valid taxonomy name." % value,
                 stream=sys.stderr, verbose=0)
             return False
-        task_set_option("taxonomy", value)
+        bibtask.task_set_option("taxonomy", value)
     elif key in ("-f", "--force"):
-        task_set_option("force", True)
+        bibtask.task_set_option("force", True)
     else:
         return False
 
     return True
 
 def _task_run_core():
-    """Runs anayse_documents for each ontology, collection, record ids
+    """Runs analyse_documents for each ontology, collection, record ids
     set."""
+
     automated_daemon_mode_p = True
-    recids = task_get_option('recids')
-    collections = task_get_option('collections')
-    taxonomy = task_get_option('taxonomy')
+    recids = bibtask.task_get_option('recids')
+    collections = bibtask.task_get_option('collections')
+    taxonomy = bibtask.task_get_option('taxonomy')
 
     if recids or collections:
         # We want to run some records/collection only, so we are not
@@ -249,119 +251,147 @@ def _task_run_core():
     if not onto_recids:
         # Nothing to do.
         if automated_daemon_mode_p:
-            _update_date_of_last_run(task_get_task_param('task_starting_time'))
+            _update_date_of_last_run(bibtask.task_get_task_param('task_starting_time'))
         return 1
 
-    changes = []
-    changes.append('<?xml version="1.0" encoding="UTF-8"?>')
-    changes.append('<collection xmlns="http://www.loc.gov/MARC21/slim">')
+    # We will write to a temporary file as we go, because we might be processing
+    # big collections with many docs
+    _rid = time.strftime("%Y%m%d%H%M%S", time.localtime())
+    abs_path = bibclassify_engine.get_tmp_file(_rid)
+    fo = open(abs_path, 'w')
+
+
+    fo.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+    fo.write('<collection xmlns="http://www.loc.gov/MARC21/slim">\n')
 
     # Count the total number of records in order to update the progression.
     global _RECIDS_NUMBER
     for onto_rec in onto_recids:
         _RECIDS_NUMBER += len(onto_rec['recIDs'])
 
+    rec_added = False
+
     for onto_rec in onto_recids:
-        task_sleep_now_if_required(can_stop_too=False)
+        bibtask.task_sleep_now_if_required(can_stop_too=False)
 
         if onto_rec['collection'] is not None:
-            write_message('INFO: Applying taxonomy %s to collection %s (%s '
+            bibtask.write_message('INFO: Applying taxonomy %s to collection %s (%s '
                 'records)' % (onto_rec['ontology'], onto_rec['collection'],
                 len(onto_rec['recIDs'])), stream=sys.stderr, verbose=3)
         else:
-            write_message('INFO: Applying taxonomy %s to recIDs %s. ' %
+            bibtask.write_message('INFO: Applying taxonomy %s to recIDs %s. ' %
                 (onto_rec['ontology'],
                 ', '.join([str(recid) for recid in onto_rec['recIDs']])),
                 stream=sys.stderr, verbose=3)
-
         if onto_rec['recIDs']:
-            changes.append(_analyze_documents(onto_rec['recIDs'],
-                onto_rec['ontology'], onto_rec['collection']))
+            xml = _analyze_documents(onto_rec['recIDs'],
+                onto_rec['ontology'], onto_rec['collection'])
+            if len(xml) > 5:
+                fo.write(xml)
+                rec_added = True
 
-    changes.append('</collection>')
-
-    # Write the changes to a temporary file.
-    tmp_directory = "%s/bibclassify" % CFG_TMPDIR
-    filename = "bibclassifyd_%s.xml" % time.strftime("%Y%m%d%H%M%S",
-        time.localtime())
-    abs_path = os.path.join(tmp_directory, filename)
-
-    if not os.path.isdir(tmp_directory):
-        os.mkdir(tmp_directory)
-
-    file_desc = open(abs_path, "w")
-    file_desc.write('\n'.join(changes))
-    file_desc.close()
+    fo.write('</collection>\n')
+    fo.close()
 
     # Apply the changes.
-    if changes:
-        cmd = "%s/bibupload -n -c '%s' " % (CFG_BINDIR, abs_path)
-        errcode = 0
-        try:
-            errcode = os.system(cmd)
-        except OSError, exc:
-            write_message('ERROR: Command %s failed [%s].' % (cmd, exc),
-                stream=sys.stderr, verbose=0)
-        if errcode != 0:
-            write_message("ERROR: %s failed, error code is %d." %
-                (cmd, errcode), stream=sys.stderr, verbose=0)
-            return 0
+    if rec_added:
+        if bconfig.CFG_DB_SAVE_KW:
+            bibclassify_webinterface.upload_keywords(abs_path)
+        else:
+            bibtask.write_message("INFO: CFG_DB_SAVE_KW is false, we don't save results",
+                                  stream=sys.stderr, verbose=0)
+    else:
+        bibtask.write_message("WARNING: No keywords found, recids: %s" % onto_recids,
+                                  stream=sys.stderr, verbose=0)
+        os.remove(abs_path)
 
     # Update the date of last run in the clsMETHOD table, but only if
     # we were running in an automated mode.
     if automated_daemon_mode_p:
-        _update_date_of_last_run(task_get_task_param('task_starting_time'))
+        _update_date_of_last_run(bibtask.task_get_task_param('task_starting_time'))
     return 1
 
-def _analyze_documents(records, ontology, collection):
+def _analyze_documents(records, taxonomy_name, collection,
+                       output_limit=bconfig.CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER):
     """For each collection, parse the documents attached to the records
-    in collection with the corresponding ontology."""
+    in collection with the corresponding taxonomy_name.
+    @var records: list of recids to process
+    @var taxonomy_name: str, name of the taxonomy, e.g. HEP
+    @var collection: str, collection name
+    @keyword output_limit: int, max number of keywords to extract [3]
+    @return: str, marcxml output format of results
+    """
     global _INDEX
 
     if not records:
         # No records could be found.
-        write_message("WARNING: No record were found in collection %s." %
+        bibtask.write_message("WARNING: No records were found in collection %s." %
             collection, stream=sys.stderr, verbose=2)
         return False
 
     # Process records:
     output = []
     for record in records:
-        bibdocfiles = BibRecDocs(record).list_latest_files()
-        output.append('<record>')
-        output.append('<controlfield tag="001">%s</controlfield>' % record)
-        for doc in bibdocfiles:
-            # Get the keywords for each PDF document contained in the record.
-            if is_pdf(doc.get_full_path()):
-                write_message('INFO: Generating keywords for record %d.' %
-                    record, stream=sys.stderr, verbose=3)
-                fulltext = doc.get_full_path()
+        bibdocfiles = BibRecDocs(record).list_latest_files() # TODO: why this doesn't call list_all_files() ?
+        keywords = {}
+        akws = {}
+        acro = {}
+        single_keywords = composite_keywords = author_keywords = acronyms = None
 
-                output.append(output_keywords_for_local_file(fulltext,
-                    taxonomy=ontology, output_mode="marcxml", output_limit=3,
-                    match_mode="partial", with_author_keywords=True,
-                    verbose=task_get_option('verbose')))
+
+        for doc in bibdocfiles:
+            # Get the keywords for all PDF documents contained in the record.
+            if bibclassify_text_extractor.is_pdf(doc.get_full_path()):
+                bibtask.write_message('INFO: Generating keywords for record %d.' %
+                    record, stream=sys.stderr, verbose=3)
+                fulltext = doc.get_path()
+
+                single_keywords, composite_keywords, author_keywords, acronyms = \
+                    bibclassify_engine.get_keywords_from_local_file(fulltext,
+                    taxonomy_name, with_author_keywords=True, output_mode="raw",
+                    output_limit=output_limit, match_mode='partial')
+            else:
+                bibtask.write_message('WARNING: BibClassify does not know how to process \
+                    doc: %s (type: %s) -- ignoring it.' %
+                    (doc.fullpath, doc.doctype), stream=sys.stderr, verbose=3)
+
+            if single_keywords or composite_keywords:
+                cleaned_single = bibclassify_engine.clean_before_output(single_keywords)
+                cleaned_composite = bibclassify_engine.clean_before_output(composite_keywords)
+                # merge the groups into one
+                keywords.update(cleaned_single)
+                keywords.update(cleaned_composite)
+            acro.update(acronyms)
+            akws.update(author_keywords)
+
+        if len(keywords):
+            output.append('<record>')
+            output.append('<controlfield tag="001">%s</controlfield>' % record)
+            output.append(bibclassify_engine._output_marc(keywords.items(), (), akws, acro,
+                                                      spires=bconfig.CFG_SPIRES_FORMAT))
+            output.append('</record>')
+        else:
+            bibtask.write_message('WARNING: No keywords found for record %d.' %
+                    record, stream=sys.stderr, verbose=0)
 
         _INDEX += 1
 
-        output.append('</record>')
-
-        task_update_progress('Done %d out of %d.' % (_INDEX, _RECIDS_NUMBER))
-        task_sleep_now_if_required(can_stop_too=False)
+        bibtask.task_update_progress('Done %d out of %d.' % (_INDEX, _RECIDS_NUMBER))
+        bibtask.task_sleep_now_if_required(can_stop_too=False)
 
     return '\n'.join(output)
 
 def _task_submit_check_options():
     """Required by bibtask. Checks the options."""
-    recids = task_get_option('recids')
-    collections = task_get_option('collections')
-    taxonomy = task_get_option('taxonomy')
+    recids = bibtask.task_get_option('recids')
+    collections = bibtask.task_get_option('collections')
+    taxonomy = bibtask.task_get_option('taxonomy')
 
     # If a recid or a collection is specified, check that the taxonomy
     # is also specified.
     if (recids is not None or collections is not None) and \
         taxonomy is None:
-        write_message("ERROR: When specifying a record ID or a collection, "
+        bibtask.write_message("ERROR: When specifying a record ID or a collection, "
             "you have to precise which\ntaxonomy to use.", stream=sys.stderr,
             verbose=0)
         return False

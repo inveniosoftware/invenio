@@ -36,11 +36,11 @@ from tempfile import mkstemp
 
 from invenio.errorlib import register_exception
 from invenio.config import CFG_TMPDIR, CFG_SITE_URL, CFG_WEBSUBMIT_FILEDIR, \
-    CFG_SITE_RECORD
+    CFG_SITE_RECORD, CFG_TMPSHAREDDIR
 from invenio.bibdocfile import BibRecDocs, BibDoc, InvenioWebSubmitFileError, \
     nice_size, check_valid_url, clean_url, get_docname_from_url, \
     guess_format_from_url, KEEP_OLD_VALUE, decompose_bibdocfile_fullpath, \
-    bibdocfile_url_to_bibdoc, decompose_bibdocfile_url
+    bibdocfile_url_to_bibdoc, decompose_bibdocfile_url, CFG_BIBDOCFILE_AVAILABLE_FLAGS
 
 from invenio.intbitset import intbitset
 from invenio.search_engine import perform_request_search
@@ -194,7 +194,12 @@ def cli_quick_match_all_docids(options, recids=None):
     cd_doc = getattr(options, 'cd_doc', None)
     if docids is None:
         debug('Initially considering all the docids')
-        docids = intbitset(run_sql('SELECT id_bibdoc FROM bibrec_bibdoc'))
+        if recids is None:
+            recids = cli_quick_match_all_recids(options)
+        docids = intbitset()
+        for id_bibrec, id_bibdoc in run_sql('SELECT id_bibrec, id_bibdoc FROM bibrec_bibdoc'):
+            if id_bibrec in recids:
+                docids.add(id_bibdoc)
     else:
         debug('Initially considering this docids: %s' % docids)
     tmp_query = []
@@ -301,6 +306,19 @@ def cli2docid(options, recids=None, docids=None):
     else:
         raise StandardError, "No docids matched"
 
+def cli2flags(options):
+    """
+    Transform a comma separated list of flags into a list of valid flags.
+    """
+    flags = getattr(options, 'flags', None)
+    if flags:
+        flags = [flag.strip().upper() for flag in flags.split(',')]
+        for flag in flags:
+            if flag not in CFG_BIBDOCFILE_AVAILABLE_FLAGS:
+                raise StandardError("%s is not among the valid flags: %s" % (flag, ', '.join(CFG_BIBDOCFILE_AVAILABLE_FLAGS)))
+        return flags
+    return []
+
 def cli2description(options):
     """Return a good value for the description."""
     description = getattr(options, 'set_description', None)
@@ -372,7 +390,7 @@ def cli_docids_iterator(options, recids=None, docids=None):
     if recids is None:
         recids = cli_quick_match_all_recids(options)
     if docids is None:
-        docids = cli_quick_match_all_docids(options)
+        docids = cli_quick_match_all_docids(options, recids)
     for docid in docids:
         if cli_slow_match_single_docid(options, docid, recids, docids):
             yield docid
@@ -433,6 +451,8 @@ Examples:
         # (note the ^M or \\n before 'allow any')
         # See also $r subfield in <%(site)s/help/admin/bibupload-admin-guide#3.6>
         # and Firerole in <%(site)s/help/admin/webaccess-admin-guide#6>
+    $ bibdocfile --append x.pdf --recid=1 --with-flags='PDF/A,OCRED' # append
+        # to record 1 the file x.pdf specifying the PDF/A and OCRED flags
     """ % {'site': CFG_SITE_URL}
     query_options = OptionGroup(parser, 'Query options')
 
@@ -484,9 +504,10 @@ Examples:
     revising_options.add_option("--undelete", action='store_const', const='undelete', dest='action', help='undelete previosuly soft-deleted documents')
     revising_options.add_option("--purge", action='store_const', const='purge', dest='action', help='purge (i.e. hard-delete any format of any version prior to the latest version of) the matched documents')
     revising_options.add_option("--expunge", action='store_const', const='expunge', dest='action', help='expunge (i.e. hard-delete any version and formats of) the matched documents')
-    revising_options.add_option("--with-versions", dest="version", help="specifies the version(s) to be used with hard-delete, hide, revert, e.g.: 1-2,3 or all")
+    revising_options.add_option("--with-version", dest="version", help="specifies the version(s) to be used with hide, unhide, e.g.: 1-2,3 or ALL. Specifies the version to be used with hard-delete and revert, e.g. 2")
     revising_options.add_option("--with-format", dest="format", help='to specify a format when appending/revising/deleting/reverting a document, e.g. "pdf"', metavar='FORMAT')
     revising_options.add_option("--with-hide-previous", dest='hide_previous', action='store_true', help='when revising, hides previous versions', default=False)
+    revising_options.add_option("--with-flags", dest='flags', help='comma-separated optional list of flags used when appending/revising a document. Valid flags are: %s' % ', '.join(CFG_BIBDOCFILE_AVAILABLE_FLAGS), default=None)
     parser.add_option_group(revising_options)
 
     housekeeping_options = OptionGroup(parser, 'Actions for housekeeping')
@@ -520,7 +541,7 @@ def bibupload_ffts(ffts, append=False, debug=False, interactive=True):
     if xml:
         if interactive:
             print xml
-        tmp_file_fd, tmp_file_name = mkstemp(suffix='.xml', prefix="bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"), dir=CFG_TMPDIR)
+        tmp_file_fd, tmp_file_name = mkstemp(suffix='.xml', prefix="bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"), dir=CFG_TMPSHAREDDIR)
         os.write(tmp_file_fd, xml)
         os.close(tmp_file_fd)
         os.chmod(tmp_file_name, 0644)
@@ -570,6 +591,7 @@ def cli_append(options, append_path):
     restriction = cli2restriction(options)
     doctype = cli2doctype(options)
     docname = cli2docname(options, url=append_path)
+    flags = cli2flags(options)
     if not docname:
         raise OptionValueError, 'Not enough information to retrieve a valid docname'
     format = cli2format(options, append_path)
@@ -587,7 +609,8 @@ def cli_append(options, append_path):
         'restriction' : restriction,
         'doctype' : doctype,
         'format' : format,
-        'url' : url
+        'url' : url,
+        'options': flags
     }]}
     return bibupload_ffts(ffts, append=True)
 
@@ -599,6 +622,9 @@ def cli_revise(options, revise_path):
     restriction = cli2restriction(options)
     docname = cli2docname(options, url=revise_path)
     hide_previous = getattr(options, 'hide_previous', None)
+    flags = cli2flags(options)
+    if hide_previous and 'PERFORM_HIDE_PREVIOUS' not in flags:
+        flags.append('PERFORM_HIDE_PREVIOUS')
     if not docname:
         raise OptionValueError, 'Not enough information to retrieve a valid docname'
     format = cli2format(options, revise_path)
@@ -615,7 +641,7 @@ def cli_revise(options, revise_path):
         'doctype' : doctype,
         'format' : format,
         'url' : url,
-        'options' : hide_previous and ['PERFORM_HIDE_PREVIOUS'] or None
+        'options' : flags
     }]}
     return bibupload_ffts(ffts)
 
@@ -811,6 +837,12 @@ def cli_delete_file(options):
     format = cli2format(options)
     docname = BibDoc(docid).get_docname()
     version = getattr(options, 'version', None)
+    try:
+        version_int = int(version)
+        if 0 >= version_int:
+            raise ValueError
+    except:
+        raise OptionValueError, 'when hard-deleting, version should be valid positive integer, not %s' % version
     ffts = {recid : [{'docname' : docname, 'version' : version, 'format' : format, 'doctype' : 'DELETE-FILE'}]}
     return bibupload_ffts(ffts)
 
@@ -821,10 +853,10 @@ def cli_revert(options):
     docname = BibDoc(docid).get_docname()
     version = getattr(options, 'version', None)
     try:
-        version = int(version)
-        if 0 >= version:
+        version_int = int(version)
+        if 0 >= version_int:
             raise ValueError
-    except ValueError:
+    except:
         raise OptionValueError, 'when reverting, version should be valid positive integer, not %s' % version
     ffts = {recid : [{'docname' : docname, 'version' : version, 'doctype' : 'REVERT'}]}
     return bibupload_ffts(ffts)

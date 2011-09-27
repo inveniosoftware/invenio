@@ -34,6 +34,9 @@ import bibauthorid_structs as dat
 
 from bibauthorid_general_functions import cmp_virtual_to_real_author
 from bibauthorid_virtualauthor_utils import init_va_process_queue
+from bibauthorid_virtualauthor_utils import get_virtualauthor_records
+
+import bibauthorid_personid_tables_utils as pidu
 
 
 def create_new_realauthor(va_id):
@@ -211,7 +214,7 @@ def update_ralist_cache(va_list, va_list_hash):
     return ralist
 
 
-def add_virtualauthor(va_id, multi_va_to_ra=False):
+def add_virtualauthor(va_id, multi_va_to_ra=False, get_raid_from_personid_table=False):
     '''
     Adds a new virtual author to the real authors system:
     the idea is to search for possibly compatible real authors, then compare
@@ -242,15 +245,32 @@ def add_virtualauthor(va_id, multi_va_to_ra=False):
 
         va_hash = hash(str(va_cluster))
 
-        if va_hash in dat.RA_VA_CACHE:
-            ralist_raw = dat.RA_VA_CACHE[va_hash]
-            bconfig.LOGGER.debug("|-> Cache Hit for va cluster")
-        else:
-            bconfig.LOGGER.debug("|-> Cache Fail--Generating new hash")
-            ralist_raw = update_ralist_cache(va_cluster, va_hash)
+        if not get_raid_from_personid_table:
+            if va_hash in dat.RA_VA_CACHE:
+                ralist_raw = dat.RA_VA_CACHE[va_hash]
+                bconfig.LOGGER.debug("|-> Cache Hit for va cluster")
+            else:
+                bconfig.LOGGER.debug("|-> Cache Fail--Generating new hash")
+                ralist_raw = update_ralist_cache(va_cluster, va_hash)
 
-        ralist = [ids['ra_id'] for ids in ralist_raw if ids['va_id'] != va_id]
-        ralist = list(set(ralist))
+            ralist = [ids['ra_id'] for ids in ralist_raw if ids['va_id'] != va_id]
+            ralist = list(set(ralist))
+        else:
+            ralist = pidu.get_personid_from_paper(get_virtualauthor_records(va_id, tag="bibrefrecpair")[0]['value'])
+            if ralist < 0:
+                update_ralist_cache(va_cluster, va_hash)
+                return
+            add_realauthor_va(ralist, va_id, 1)
+            update_ralist_cache(va_cluster, va_hash)
+            bconfig.LOGGER.log(25, "|-> Adding to real author #%s"
+                               " with a compatability."
+                               % (ralist))
+            (bibauthorid_virtualauthor_utils.
+             update_virtualauthor_record(va_id, 'connected', 'True'))
+            (bibauthorid_virtualauthor_utils.
+             delete_virtualauthor_record(va_id, 'updated'))
+            return
+
 
         if len(ralist) > 0:
             min_compatibilities = []
@@ -407,6 +427,7 @@ def find_and_process_updates(process_initials):
         va_name = (bibauthorid_virtualauthor_utils.
                    get_virtualauthor_records(va_id,
                                          tag='orig_name_string')[0]['value'])
+        paidfp = dat.RUNTIME_CONFIG['populate_aid_from_personid']
 
         if not process_initials:
             if bibauthorid_utils.split_name_parts(va_name)[2]:
@@ -414,13 +435,13 @@ def find_and_process_updates(process_initials):
                  delete_virtualauthor_record(va_id, 'updated'))
                 bconfig.LOGGER.log(25, "|> Inserting VA:"
                       + " %s Orig. name: %s" % (va_id, va_name))
-                add_virtualauthor(va_id)
+                add_virtualauthor(va_id, get_raid_from_personid_table=paidfp)
         else:
             (bibauthorid_virtualauthor_utils.
              delete_virtualauthor_record(va_id, 'updated'))
             bconfig.LOGGER.log(25, "|> Inserting VA: %s Orig. name: %s"
                           % (va_id, va_name))
-            add_virtualauthor(va_id)
+            add_virtualauthor(va_id, get_raid_from_personid_table=paidfp)
 
 
 def process_updated_virtualauthors():
@@ -464,7 +485,7 @@ def update_realauthor_data_by_vid(ra_id, va_id):
                if row['virtualauthorid'] == va_id]
 
     for i in va_data:
-        if (not (i['tag'] == "updated") 
+        if (not (i['tag'] == "updated")
             and not (i['tag'] == "connected")
             and not (i['tag'] == "authorindex")
             and not (i['tag'] == 'bibrefrecpair')):
@@ -617,7 +638,7 @@ def del_ra_data_by_vaid(ra_id, va_id):
     bconfig.LOGGER.info("Processing RA data. %s " % (va_data))
 
     for i in va_data:
-        if (not (i['tag'] == "updated") 
+        if (not (i['tag'] == "updated")
             and not (i['tag'] == "connected")
             and not (i['tag'] == "authorindex")
             and not (i['tag'] == "bibrec_id")

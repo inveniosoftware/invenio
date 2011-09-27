@@ -88,7 +88,8 @@ from invenio.bibrank_tag_based_indexer import \
      citation, \
      download_weight_filtering_user, \
      download_weight_total, \
-    file_similarity_by_times_downloaded
+     file_similarity_by_times_downloaded, \
+     index_term_count
 from invenio.bibrank_word_indexer import word_similarity
 from invenio.bibrank_citerank_indexer import citerank
 # pylint: enable=W0611

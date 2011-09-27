@@ -388,7 +388,7 @@ div .boxleft_2 {
         <td />
         <td>
         <select class="fieldActionType" onchange="onFieldActionTypeChange(this);">
-        <option>%(text_select_action)s</option>
+        <option value="%(text_select_action)s">%(text_select_action)s</option>
         <option value="0">%(text_add_field)s</option>
         <option value="1">%(text_delete_field)s</option>
         <option value="2">%(text_update_field)s</option>
@@ -749,8 +749,7 @@ div .boxleft_2 {
     def scripts(self):
         """Returns the scripts that should be imported."""
 
-        scripts_jquery = ["jquery.min.js",
-                   "json2.js"]
+        scripts_jquery = ["json2.js"]
 
         scripts = ["bibeditmulti.js"]
 

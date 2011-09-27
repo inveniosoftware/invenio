@@ -37,7 +37,8 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_SITE_URL, \
      CFG_CERN_SITE, \
-     CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
+     CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
+     CFG_OPENAIRE_SITE
 from invenio import webuser
 from invenio.webpage import page
 from invenio import webaccount
@@ -689,7 +690,11 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         Implement logout method for external service providers.
         """
         webuser.logoutUser(req)
-        redirect_to_url(req, "%s/img/pix.png" % CFG_SITE_URL)
+        if CFG_OPENAIRE_SITE:
+            from invenio.config import CFG_OPENAIRE_PORTAL_URL
+            redirect_to_url(req, CFG_OPENAIRE_PORTAL_URL)
+        else:
+            redirect_to_url(req, "%s/img/pix.png" % CFG_SITE_URL)
 
     def robotlogin(self, req, form):
         """
@@ -729,6 +734,9 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
             # login successful!
             if args['referer']:
+                if CFG_OPENAIRE_SITE and args['referer'].startswith('https://openaire.cern.ch/deposit'):
+                    ## HACK for OpenAIRE
+                    args['referer'] = args['referer'].replace('https://openaire.cern.ch/deposit', 'http://openaire.cern.ch/deposit')
                 redirect_to_url(req, args['referer'])
             else:
                 return self.display(req, form)
@@ -760,6 +768,15 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'action': (str, ''),
             'remember_me' : (str, ''),
             'referer': (str, '')})
+
+        if CFG_OPENAIRE_SITE:
+            from invenio.config import CFG_OPENAIRE_PORTAL_URL
+            if CFG_OPENAIRE_PORTAL_URL:
+                from invenio.urlutils import create_url
+                from base64 import encodestring
+                invenio_loginurl = args['referer'] or '%s/youraccount/display?ln=%s' % (CFG_SITE_SECURE_URL, args['ln'])
+                loginurl = create_url(CFG_OPENAIRE_PORTAL_URL, {"option": "com_openaire", "view": "login", "return": encodestring(invenio_loginurl)})
+                redirect_to_url(req, loginurl)
 
         # sanity checks:
         args['login_method'] = wash_login_method(args['login_method'])
@@ -1001,8 +1018,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
             return webuser.page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use groups."))
 
-        (body, errors, warnings) = webgroup.perform_request_groups_display(uid=uid,
-                                                                          ln=argd['ln'])
+        body = webgroup.perform_request_groups_display(uid=uid,
+                                                       ln=argd['ln'])
 
         return page(title         = _("Your Groups"),
                     body          = body,
@@ -1011,12 +1028,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     req           = req,
                     language      = argd['ln'],
                     lastupdated   = __lastupdated__,
-                    errors        = errors,
-                    warnings      = warnings,
                     navmenuid     = 'yourgroups',
                     secure_page_p = 1)
-
-
 
     def create(self, req, form):
         """create(): interface for creating a new group
@@ -1052,18 +1065,18 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
             redirect_to_url(req, url)
 
         if argd['create_button'] :
-            (body, errors, warnings)= webgroup.perform_request_create_group(uid=uid,
-                                                                            group_name=argd['group_name'],
-                                                                            group_description=argd['group_description'],
-                                                                            join_policy=argd['join_policy'],
-                                                                            ln = argd['ln'])
+            body= webgroup.perform_request_create_group(uid=uid,
+                                                        group_name=argd['group_name'],
+                                                        group_description=argd['group_description'],
+                                                        join_policy=argd['join_policy'],
+                                                        ln = argd['ln'])
 
 
         else:
-            (body, errors, warnings) = webgroup.perform_request_input_create_group(group_name=argd['group_name'],
-                                                                                   group_description=argd['group_description'],
-                                                                                   join_policy=argd['join_policy'],
-                                                                                   ln=argd['ln'])
+            body = webgroup.perform_request_input_create_group(group_name=argd['group_name'],
+                                                               group_description=argd['group_description'],
+                                                               join_policy=argd['join_policy'],
+                                                               ln=argd['ln'])
         title = _("Create new group")
 
 
@@ -1074,8 +1087,6 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     req           = req,
                     language      = argd['ln'],
                     lastupdated   = __lastupdated__,
-                    errors        = errors,
-                    warnings      = warnings,
                     navmenuid     = 'yourgroups',
                     secure_page_p = 1)
 
@@ -1116,19 +1127,19 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
             search = 0
             if argd['group_name']:
                 search = 1
-            (body, errors, warnings) = webgroup.perform_request_join_group(uid,
-                                                                           argd['grpID'],
-                                                                           argd['group_name'],
-                                                                           search,
-                                                                           argd['ln'])
+            body = webgroup.perform_request_join_group(uid,
+                                                       argd['grpID'],
+                                                       argd['group_name'],
+                                                       search,
+                                                       argd['ln'])
         else:
             search = 0
             if argd['find_button']:
                 search = 1
-            (body, errors, warnings) = webgroup.perform_request_input_join_group(uid,
-                                                                                 argd['group_name'],
-                                                                                 search,
-                                                                                 ln=argd['ln'])
+            body = webgroup.perform_request_input_join_group(uid,
+                                                             argd['group_name'],
+                                                             search,
+                                                             ln=argd['ln'])
 
         title = _("Join New Group")
         return page(title         = title,
@@ -1138,8 +1149,6 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     req           = req,
                     language      = argd['ln'],
                     lastupdated   = __lastupdated__,
-                    errors        = errors,
-                    warnings      = warnings,
                     navmenuid     = 'yourgroups',
                     secure_page_p = 1)
 
@@ -1177,13 +1186,13 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
             redirect_to_url(req, url)
 
         if argd['leave_button']:
-            (body, errors, warnings) = webgroup.perform_request_leave_group(uid,
-                                                                            argd['grpID'],
-                                                                            argd['confirmed'],
-                                                                            argd['ln'])
+            body = webgroup.perform_request_leave_group(uid,
+                                                        argd['grpID'],
+                                                        argd['confirmed'],
+                                                        argd['ln'])
         else:
-            (body, errors, warnings) = webgroup.perform_request_input_leave_group(uid=uid,
-                                                                                  ln=argd['ln'])
+            body = webgroup.perform_request_input_leave_group(uid=uid,
+                                                              ln=argd['ln'])
         title = _("Leave Group")
         return page(title         = title,
                     body          = body,
@@ -1192,8 +1201,6 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     req           = req,
                     language      = argd['ln'],
                     lastupdated   = __lastupdated__,
-                    errors        = errors,
-                    warnings      = warnings,
                     navmenuid     = 'yourgroups',
                     secure_page_p = 1)
 
@@ -1236,13 +1243,13 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
             redirect_to_url(req, url)
 
         elif argd['delete']:
-            (body, errors, warnings) = webgroup.perform_request_delete_group(uid=uid,
-                                                                             grpID=argd['grpID'],
-                                                                             confirmed=argd['confirmed'])
+            body = webgroup.perform_request_delete_group(uid=uid,
+                                                         grpID=argd['grpID'],
+                                                         confirmed=argd['confirmed'])
 
         elif argd['update']:
 
-            (body, errors, warnings) = webgroup.perform_request_update_group(uid= uid,
+            body = webgroup.perform_request_update_group(uid= uid,
                                                                              grpID=argd['grpID'],
                                                                              group_name=argd['group_name'],
                                                                              group_description=argd['group_description'],
@@ -1250,9 +1257,9 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                                                                              ln=argd['ln'])
 
         else :
-            (body, errors, warnings)= webgroup.perform_request_edit_group(uid=uid,
-                                                                          grpID=argd['grpID'],
-                                                                          ln=argd['ln'])
+            body= webgroup.perform_request_edit_group(uid=uid,
+                                                      grpID=argd['grpID'],
+                                                      ln=argd['ln'])
 
 
 
@@ -1264,8 +1271,6 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     req           = req,
                     language      = argd['ln'],
                     lastupdated   = __lastupdated__,
-                    errors        = errors,
-                    warnings      = warnings,
                     navmenuid     = 'yourgroups',
                     secure_page_p = 1)
 
@@ -1309,27 +1314,27 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
             redirect_to_url(req, url)
 
         if argd['remove_member']:
-            (body, errors, warnings) = webgroup.perform_request_remove_member(uid=uid,
-                                                                              grpID=argd['grpID'],
-                                                                              member_id=argd['member_id'],
-                                                                              ln=argd['ln'])
+            body = webgroup.perform_request_remove_member(uid=uid,
+                                                          grpID=argd['grpID'],
+                                                          member_id=argd['member_id'],
+                                                          ln=argd['ln'])
 
         elif argd['reject_member']:
-            (body, errors, warnings) = webgroup.perform_request_reject_member(uid=uid,
-                                                                              grpID=argd['grpID'],
-                                                                              user_id=argd['pending_member_id'],
-                                                                              ln=argd['ln'])
+            body = webgroup.perform_request_reject_member(uid=uid,
+                                                          grpID=argd['grpID'],
+                                                          user_id=argd['pending_member_id'],
+                                                          ln=argd['ln'])
 
         elif argd['add_member']:
-            (body, errors, warnings) = webgroup.perform_request_add_member(uid=uid,
-                                                                           grpID=argd['grpID'],
-                                                                           user_id=argd['pending_member_id'],
-                                                                           ln=argd['ln'])
+            body = webgroup.perform_request_add_member(uid=uid,
+                                                       grpID=argd['grpID'],
+                                                       user_id=argd['pending_member_id'],
+                                                       ln=argd['ln'])
 
         else:
-            (body, errors, warnings)= webgroup.perform_request_manage_member(uid=uid,
-                                                                             grpID=argd['grpID'],
-                                                                             ln=argd['ln'])
+            body= webgroup.perform_request_manage_member(uid=uid,
+                                                         grpID=argd['grpID'],
+                                                         ln=argd['ln'])
         title = _("Edit group members")
         return page(title         = title,
                     body          = body,
@@ -1338,8 +1343,6 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     req           = req,
                     language      = argd['ln'],
                     lastupdated   = __lastupdated__,
-                    errors        = errors,
-                    warnings      = warnings,
                     navmenuid     = 'yourgroups',
                     secure_page_p = 1)
 

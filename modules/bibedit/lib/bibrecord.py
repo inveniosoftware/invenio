@@ -1075,6 +1075,29 @@ def record_strip_empty_fields(rec, tag=None):
             else:
                 del rec[tag]
 
+def record_order_subfields(rec, tag=None):
+    """ Orders subfields from a record alphabetically based on subfield code.
+    If 'tag' is not None, only a specific tag of the record will be reordered,
+    otherwise the whole record.
+    @param rec: bibrecord
+    @type rec: bibrec
+
+    @param tag: tag where the subfields will be ordered
+    @type tag: string
+    """
+    if rec is None:
+        return rec
+    if tag is None:
+        tags = rec.keys()
+        for tag in tags:
+            record_order_subfields(rec, tag)
+    elif tag in rec:
+        for i in xrange(len(rec[tag])):
+            field = rec[tag][i]
+            # Order subfields alphabetically by subfield code
+            ordered_subfields = sorted(field[0], key=lambda subfield: subfield[0])
+            rec[tag][i] = (ordered_subfields, field[1], field[2], field[3], field[4])
+
 ### IMPLEMENTATION / INVISIBLE FUNCTIONS
 
 def _compare_fields(field1, field2, strict=True):

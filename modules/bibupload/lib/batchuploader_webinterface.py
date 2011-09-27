@@ -23,7 +23,6 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from invenio.webinterface_handler_wsgi_utils import Field
 from invenio.config import CFG_SITE_URL
 from invenio.urlutils import redirect_to_url
 from invenio.messages import gettext_set_language
@@ -168,9 +167,8 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
         """Interface for robots used like this:
             $ curl -F 'file=@localfile.xml' -F 'mode=-i' http://cdsweb.cern.ch/batchuploader/robotupload -A invenio_webupload
         """
-        argd = wash_urlargd(form, {'file': (Field, None),
-                                   'mode': (str,None)})
-        cli_upload(req, argd['file'], argd['mode'])
+        argd = wash_urlargd(form, {'mode': (str,None)})
+        cli_upload(req, form.get('file', None), argd['mode'])
 
     def allocaterecord(self, req, form):
         """
@@ -182,8 +180,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
         """ Function called after submitting the metadata upload form.
             Checks if input fields are correct before uploading.
         """
-        argd = wash_urlargd(form, {'metafile': (Field, None),
-                                   'filetype': (str, None),
+        argd = wash_urlargd(form, {'filetype': (str, None),
                                    'mode': (str, None),
                                    'submit_date': (str, None),
                                    'submit_time': (str, None),
@@ -201,7 +198,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
             redirect_to_url(req,
             "%s/batchuploader/metadata?error=1&filetype=%s&mode=%s&submit_date=%s"
             % (CFG_SITE_URL, argd['filetype'], argd['mode'], argd['submit_date']))
-        if not argd['metafile'].value: # Empty file
+        if not form.get('metafile', None) or not form.get('metafile', None).value: # Empty file
             redirect_to_url(req,
             "%s/batchuploader/metadata?error=2&filetype=%s&mode=%s&submit_date=%s&submit_time=%s"
             % (CFG_SITE_URL, argd['filetype'], argd['mode'], argd['submit_date'],
@@ -225,7 +222,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
 
         #Function where bibupload queues the file
         auth_code, auth_message = metadata_upload(req,
-                                  argd['metafile'], argd['filetype'], argd['mode'].split()[0],
+                                  form.get('metafile', None), argd['filetype'], argd['mode'].split()[0],
                                   date, time, argd['filename'], argd['ln'],
                                   argd['priority'])
 

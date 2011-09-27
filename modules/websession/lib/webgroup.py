@@ -25,9 +25,12 @@ from invenio.config import CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
       CFG_WEBSESSION_USERGROUP_STATUS, \
-      CFG_WEBSESSION_GROUP_JOIN_POLICY
+      CFG_WEBSESSION_GROUP_JOIN_POLICY, \
+      InvenioWebSessionError, \
+      InvenioWebSessionWarning
 from invenio.webuser import nickname_valid_p, get_user_info
 from invenio.webmessage import perform_request_send
+from invenio.errorlib import register_exception
 import invenio.webgroup_dblayer as db
 from invenio.dbquery import IntegrityError
 try:
@@ -41,26 +44,20 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-def perform_request_groups_display(uid, infos=[], errors = [], warnings = [], \
+def perform_request_groups_display(uid, infos=[], warnings = [], \
         ln=CFG_SITE_LANG):
     """Display all the groups the user belongs to.
     @param uid:   user id
     @param info: info about last user action
     @param ln: language
-    @return: a (body, errors[], warnings[]) formed tuple
+    @return: body with warnings
     """
     _ = gettext_set_language(ln)
     body = ""
-    (body_admin, errors_admin) = display_admin_groups(uid, ln)
-    (body_member, errors_member) = display_member_groups(uid, ln)
-    (body_external, errors_external) = display_external_groups(uid, ln)
 
-    if errors_admin:
-        errors.extend(errors_admin)
-    if errors_member:
-        errors.extend(errors_member)
-    if errors_external:
-        errors.extend(errors_external)
+    body_admin = display_admin_groups(uid, ln)
+    body_member = display_member_groups(uid, ln)
+    body_external = display_external_groups(uid, ln)
 
     body = websession_templates.tmpl_display_all_groups(infos=infos,
         admin_group_html=body_admin,
@@ -68,60 +65,51 @@ def perform_request_groups_display(uid, infos=[], errors = [], warnings = [], \
         external_group_html=body_external,
         warnings=warnings,
         ln=ln)
-    return (body, errors, warnings)
-
+    return body
 
 def display_admin_groups(uid, ln=CFG_SITE_LANG):
     """Display groups the user is admin of.
     @param uid: user id
     @param ln: language
-    @return: a (body, errors[]) formed tuple
+    @return: body
     return html groups representation the user is admin of
     """
     body = ""
-    errors = []
     record = db.get_groups_by_user_status(uid=uid,
         user_status=CFG_WEBSESSION_USERGROUP_STATUS["ADMIN"])
     body = websession_templates.tmpl_display_admin_groups(groups=record,
-        ln=ln)
-    return (body, errors)
-
+                                                          ln=ln)
+    return body
 
 def display_member_groups(uid, ln=CFG_SITE_LANG):
     """Display groups the user is member of.
     @param uid: user id
     @param ln: language
-    @return: a (body, errors[]) formed tuple
+    @return: body
     body : html groups representation the user is member of
     """
     body = ""
-    errors = []
     records = db.get_groups_by_user_status(uid,
         user_status=CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"] )
-
     body = websession_templates.tmpl_display_member_groups(groups=records,
-        ln=ln)
-    return (body, errors)
-
+                                                           ln=ln)
+    return body
 
 def display_external_groups(uid, ln=CFG_SITE_LANG):
     """Display groups the user is admin of.
     @param uid: user id
     @param ln: language
-    @return: a (body, errors[]) formed tuple
+    @return: body
     return html groups representation the user is admin of
     """
     body = ""
-    errors = []
     record = db.get_external_groups(uid)
     if record:
         body = websession_templates.tmpl_display_external_groups(groups=record,
-            ln=ln)
+                                                                 ln=ln)
     else:
         body = None
-
-    return (body, errors)
-
+    return body
 
 def perform_request_input_create_group(group_name,
                                        group_description,
@@ -134,30 +122,29 @@ def perform_request_input_create_group(group_name,
     @param join_policy: join  policy chosen if the page has been reloaded
     @param warnings: warnings
     @param ln: language
-    @return: a (body, errors[], warnings[]) formed tuple
+    @return: body with warnings
     body: html for group creation page
     """
     body = ""
-    errors = []
     body = websession_templates.tmpl_display_input_group_info(group_name,
-        group_description,
-        join_policy,
-        act_type="create",
-        warnings=warnings,
-        ln=ln)
-    return (body, errors, warnings)
+                                                              group_description,
+                                                              join_policy,
+                                                              act_type="create",
+                                                              warnings=warnings,
+                                                              ln=ln)
+    return body
 
 def perform_request_create_group(uid,
-        group_name,
-        group_description,
-        join_policy,
-        ln=CFG_SITE_LANG):
+                                 group_name,
+                                 group_description,
+                                 join_policy,
+                                 ln=CFG_SITE_LANG):
     """Create new group.
     @param group_name: name of the group entered
     @param group_description: description of the group entered
     @param join_policy: join  policy of the group entered
     @param ln: language
-    @return: a (body, errors, warnings) formed tuple
+    @return: body with warnings
     warning != [] if group_name or join_policy are not valid
     or if the name already exists in the database
     body="1" if succeed in order to display info on the main page
@@ -165,51 +152,58 @@ def perform_request_create_group(uid,
     _ = gettext_set_language(ln)
     body = ""
     warnings = []
-    errors = []
     infos = []
     if group_name == "":
-        warnings.append(('WRN_WEBSESSION_NO_GROUP_NAME',))
-        (body, errors, warnings) = perform_request_input_create_group(
-            group_name,
-            group_description,
-            join_policy,
-            warnings=warnings)
+        try:
+            raise InvenioWebSessionWarning(_('Please enter a group name.'))
+        except InvenioWebSessionWarning, exc:
+            register_exception(stream='warning')
+            warnings.append(exc.message)
+        body = perform_request_input_create_group(group_name,
+                                                  group_description,
+                                                  join_policy,
+                                                  warnings=warnings)
     elif not group_name_valid_p(group_name):
-        warnings.append('WRN_WEBSESSION_NOT_VALID_GROUP_NAME')
-        (body, errors, warnings) = perform_request_input_create_group(
-            group_name,
-            group_description,
-            join_policy,
-            warnings=warnings)
-
+        try:
+            raise InvenioWebSessionWarning(_('Please enter a valid group name.'))
+        except InvenioWebSessionWarning, exc:
+            register_exception(stream='warning')
+            warnings.append(exc.message)
+        body = perform_request_input_create_group(group_name,
+                                                  group_description,
+                                                  join_policy,
+                                                  warnings=warnings)
     elif join_policy=="-1":
-        warnings.append('WRN_WEBSESSION_NO_JOIN_POLICY')
-        (body, errors, warnings) = perform_request_input_create_group(
-            group_name,
-            group_description,
-            join_policy,
-            warnings=warnings)
+        try:
+            raise InvenioWebSessionWarning(_('Please choose a group join policy.'))
+        except InvenioWebSessionWarning, exc:
+            register_exception(stream='warning')
+            warnings.append(exc.message)
+        body = perform_request_input_create_group(group_name,
+                                                  group_description,
+                                                  join_policy,
+                                                  warnings=warnings)
     elif db.group_name_exist(group_name):
-        warnings.append('WRN_WEBSESSION_GROUP_NAME_EXISTS')
-        (body, errors, warnings) = perform_request_input_create_group(
-            group_name,
-            group_description,
-            join_policy,
-            warnings=warnings)
-
+        try:
+            raise InvenioWebSessionWarning(_('Group name already exists. Please choose another group name.'))
+        except InvenioWebSessionWarning, exc:
+            register_exception(stream='warning')
+            warnings.append(exc.message)
+        body = perform_request_input_create_group(group_name,
+                                                  group_description,
+                                                  join_policy,
+                                                  warnings=warnings)
     else:
         db.insert_new_group(uid,
-            group_name,
-            group_description,
-            join_policy)
+                            group_name,
+                            group_description,
+                            join_policy)
         infos.append(CFG_WEBSESSION_INFO_MESSAGES["GROUP_CREATED"])
-        (body, errors, warnings) = perform_request_groups_display(uid,
-            infos=infos,
-            errors=errors,
-            warnings=warnings,
-            ln=ln)
-    return (body, errors, warnings)
-
+        body = perform_request_groups_display(uid,
+                                              infos=infos,
+                                              warnings=warnings,
+                                              ln=ln)
+    return body
 
 def perform_request_input_join_group(uid,
                                      group_name,
@@ -221,9 +215,8 @@ def perform_request_input_join_group(uid,
     @param search=1 if search performed else 0
     @param warnings: warnings coming from perform_request_join_group
     @param ln: language
-    @return: a (body, errors[], warnings[]) formed tuple
+    @return: body with warnings
     """
-    errors = []
     group_from_search = {}
     records = db.get_visible_group_list(uid=uid)
     if search:
@@ -234,8 +227,7 @@ def perform_request_input_join_group(uid,
         search,
         warnings=warnings,
         ln=ln)
-
-    return (body, errors, warnings)
+    return body
 
 def perform_request_join_group(uid,
                                grpID,
@@ -249,13 +241,12 @@ def perform_request_join_group(uid,
     @param group_name: name of the group entered if search on name performed
     @param search=1 if search performed else 0
     @param ln: language
-    @return: a (body, errors[], warnings[]) formed tuple
+    @return: body with warnings
     warnings != [] if 0 or more than one group is selected
     """
     _ = gettext_set_language(ln)
     body = ""
     warnings = []
-    errors = []
     infos = []
 
     if "-1" in grpID:
@@ -265,13 +256,15 @@ def perform_request_join_group(uid,
         # test if user is already member or pending
         status = db.get_user_status(uid, grpID)
         if status:
-            warnings.append('WRN_WEBSESSION_ALREADY_MEMBER')
-
-            (body, errors, warnings) = perform_request_groups_display(uid,
-                infos=infos,
-                errors=errors,
-                warnings=warnings,
-                ln=ln)
+            try:
+                raise InvenioWebSessionWarning(_('You are already member of the group.'))
+            except InvenioWebSessionWarning, exc:
+                register_exception(stream='warning')
+                warnings.append(exc.message)
+            body = perform_request_groups_display(uid,
+                                                  infos=infos,
+                                                  warnings=warnings,
+                                                  ln=ln)
             # insert new user of group
         else:
             group_infos = db.get_group_infos(grpID)
@@ -289,33 +282,33 @@ def perform_request_join_group(uid,
                     ln=ln)
                 (body, dummy, dummy) = \
                     perform_request_send(uid,
-                        msg_to_user=admin,
-                        msg_to_group="",
-                        msg_subject=msg_subjet,
-                        msg_body=msg_body,
-                        ln=ln)
+                                         msg_to_user=admin,
+                                         msg_to_group="",
+                                         msg_subject=msg_subjet,
+                                         msg_body=msg_body,
+                                         ln=ln)
                 infos.append(CFG_WEBSESSION_INFO_MESSAGES["JOIN_REQUEST"])
-
-
             elif group_type == CFG_WEBSESSION_GROUP_JOIN_POLICY["VISIBLEOPEN"]:
                 db.insert_new_member(uid,
                     grpID,
                     CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
-
                 infos.append(CFG_WEBSESSION_INFO_MESSAGES["JOIN_GROUP"])
-            (body, errors, warnings) = perform_request_groups_display(uid,
+            body = perform_request_groups_display(uid,
                 infos=infos,
-                errors=errors,
                 warnings=warnings,
                 ln=ln)
     else:
-        warnings.append('WRN_WEBSESSION_MULTIPLE_GROUPS')
-        (body, errors, warnings) = perform_request_input_join_group(uid,
-            group_name,
-            search,
-            warnings,
-            ln)
-    return (body, errors, warnings)
+        try:
+            raise InvenioWebSessionWarning(_('Please select only one group.'))
+        except InvenioWebSessionWarning, exc:
+            register_exception(stream='warning')
+            warnings.append(exc.message)
+        body = perform_request_input_join_group(uid,
+                                                group_name,
+                                                search,
+                                                warnings,
+                                                ln)
+    return body
 
 def perform_request_input_leave_group(uid,
                                       warnings=[],
@@ -325,10 +318,9 @@ def perform_request_input_leave_group(uid,
     @param warnings: warnings != [] if 0 group is selected or if not admin
         of the
     @param ln: language
-    @return: a (body, errors[], warnings[]) formed tuple
+    @return: body with warnings
     """
     body = ""
-    errors = []
     groups = []
     records = db.get_groups_by_user_status(uid=uid,
         user_status=CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
@@ -336,8 +328,7 @@ def perform_request_input_leave_group(uid,
     body = websession_templates.tmpl_display_input_leave_group(groups,
         warnings=warnings,
         ln=ln)
-
-    return (body, errors, warnings)
+    return body
 
 def perform_request_leave_group(uid, grpID, confirmed=0, ln=CFG_SITE_LANG):
 
@@ -347,29 +338,32 @@ def perform_request_leave_group(uid, grpID, confirmed=0, ln=CFG_SITE_LANG):
     @param warnings: warnings != [] if 0 group is selected
     @param confirmed: a confirmed page is first displayed
     @param ln: language
-    @return: a (body, errors[], warnings[]) formed tuple
+    @return: body with warnings
     """
     _ = gettext_set_language(ln)
     body = ""
     warnings = []
-    errors = []
     infos = []
     if not grpID == -1:
         if confirmed:
             db.leave_group(grpID, uid)
             infos.append(CFG_WEBSESSION_INFO_MESSAGES["LEAVE_GROUP"])
-            (body, errors, warnings) = perform_request_groups_display(uid,
-                infos=infos, errors=errors, warnings=warnings, ln=ln)
-
+            body = perform_request_groups_display(uid,
+                                                  infos=infos,
+                                                  warnings=warnings,
+                                                  ln=ln)
         else:
             body = websession_templates.tmpl_confirm_leave(uid, grpID, ln)
     else:
-        warnings.append('WRN_WEBSESSION_NO_GROUP_SELECTED')
-        (body, errors, warnings) = perform_request_input_leave_group(uid,
-            warnings= warnings,
-            ln=ln)
-    return (body, errors, warnings)
-
+        try:
+            raise InvenioWebSessionWarning(_('Please select one group.'))
+        except InvenioWebSessionWarning, exc:
+            register_exception(stream='warning')
+            warnings.append(exc.message)
+        body = perform_request_input_leave_group(uid,
+                                                 warnings= warnings,
+                                                 ln=ln)
+    return body
 
 def perform_request_edit_group(uid,
         grpID,
@@ -380,24 +374,33 @@ def perform_request_edit_group(uid,
     @param grpID: ID of the group
     @param warnings: warnings
     @param ln: language
-    @return: a (body, errors[], warnings[]) formed tuple
+    @return: body with warnings
     """
-
-    body = ''
-    errors = []
+    body = ""
+    _ = gettext_set_language(ln)
     user_status = db.get_user_status(uid, grpID)
     if not len(user_status):
-        errors.append('ERR_WEBSESSION_DB_ERROR')
-        return (body, errors, warnings)
+        try:
+            raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
+        except InvenioWebSessionError, exc:
+            register_exception()
+            body = websession_templates.tmpl_error(exc.message, ln)
+            return body
     elif user_status[0][0] != CFG_WEBSESSION_USERGROUP_STATUS['ADMIN']:
-        errors.append(('ERR_WEBSESSION_GROUP_NO_RIGHTS',))
-        return (body, errors, warnings)
-
+        try:
+            raise InvenioWebSessionError(_('Sorry, you do not have sufficient rights on this group.'))
+        except InvenioWebSessionError, exc:
+            register_exception()
+            body = websession_templates.tmpl_error(exc.message, ln)
+            return body
     group_infos = db.get_group_infos(grpID)[0]
     if not len(group_infos):
-        errors.append('ERR_WEBSESSION_DB_ERROR')
-        return (body, errors, warnings)
-
+        try:
+            raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
+        except InvenioWebSessionError, exc:
+            register_exception()
+            body = websession_templates.tmpl_error(exc.message, ln)
+            return body
     body = websession_templates.tmpl_display_input_group_info(
         group_name=group_infos[1],
         group_description=group_infos[2],
@@ -406,8 +409,7 @@ def perform_request_edit_group(uid,
         grpID=grpID,
         warnings=warnings,
         ln=ln)
-
-    return (body, errors, warnings)
+    return body
 
 def perform_request_update_group(uid, grpID, group_name, group_description,
         join_policy, ln=CFG_SITE_LANG):
@@ -418,53 +420,64 @@ def perform_request_update_group(uid, grpID, group_name, group_description,
     @param group_description: description of the group
     @param join_policy: join policy of the group
     @param ln: language
-    @return: a (body, errors[], warnings[]) formed tuple
+    @return: body with warnings
     """
     body = ''
-    errors = []
     warnings = []
     infos = []
     _ = gettext_set_language(ln)
     group_name_available = db.group_name_exist(group_name)
     if group_name == "":
-        warnings.append('WRN_WEBSESSION_NO_GROUP_NAME')
-        (body, errors, warnings) = perform_request_edit_group(uid,
-            grpID,
-            warnings=warnings,
-            ln=ln)
+        try:
+            raise InvenioWebSessionWarning(_('Please enter a group name.'))
+        except InvenioWebSessionWarning, exc:
+            register_exception(stream='warning')
+            warnings.append(exc.message)
+        body = perform_request_edit_group(uid,
+                                          grpID,
+                                          warnings=warnings,
+                                          ln=ln)
     elif not group_name_valid_p(group_name):
-        warnings.append('WRN_WEBSESSION_NOT_VALID_GROUP_NAME')
-        (body, errors, warnings) = perform_request_edit_group(uid,
-            grpID,
-            warnings=warnings,
-            ln=ln)
+        try:
+            raise InvenioWebSessionWarning(_('Please enter a valid group name.'))
+        except InvenioWebSessionWarning, exc:
+            register_exception(stream='warning')
+            warnings.append(exc.message)
+        body = perform_request_edit_group(uid,
+                                          grpID,
+                                          warnings=warnings,
+                                          ln=ln)
     elif join_policy == "-1":
-        warnings.append('WRN_WEBSESSION_NO_JOIN_POLICY')
-        (body, errors, warnings) = perform_request_edit_group(uid,
-            grpID,
-            warnings=warnings,
-            ln=ln)
+        try:
+            raise InvenioWebSessionWarning(_('Please choose a group join policy.'))
+        except InvenioWebSessionWarning, exc:
+            register_exception(stream='warning')
+            warnings.append(exc.message)
+        body = perform_request_edit_group(uid,
+                                          grpID,
+                                          warnings=warnings,
+                                          ln=ln)
     elif (group_name_available and group_name_available[0][0]!= grpID):
-        warnings.append('WRN_WEBSESSION_GROUP_NAME_EXISTS')
-        (body, errors, warnings) = perform_request_edit_group(uid,
-            grpID,
-            warnings=warnings,
-            ln=ln)
-
+        try:
+            raise InvenioWebSessionWarning(_('Group name already exists. Please choose another group name.'))
+        except InvenioWebSessionWarning, exc:
+            register_exception(stream='warning')
+            warnings.append(exc.message)
+        body = perform_request_edit_group(uid,
+                                          grpID,
+                                          warnings=warnings,
+                                          ln=ln)
     else:
         grpID = db.update_group_infos(grpID,
             group_name,
             group_description,
             join_policy)
         infos.append(CFG_WEBSESSION_INFO_MESSAGES["GROUP_UPDATED"])
-        (body, errors, warnings) = perform_request_groups_display(uid,
+        body = perform_request_groups_display(uid,
             infos=infos,
-            errors=errors,
             warnings=warnings,
             ln=CFG_SITE_LANG)
-
-    return (body, errors, warnings)
-
+    return body
 
 def  perform_request_delete_group(uid, grpID, confirmed=0, ln=CFG_SITE_LANG):
     """First display confirm message(confirmed=0).
@@ -473,25 +486,32 @@ def  perform_request_delete_group(uid, grpID, confirmed=0, ln=CFG_SITE_LANG):
     @param grpID: ID of the group
     @param confirmed: =1 if confirmed message has been previously displayed
     @param ln: language
-    @return: a (body, errors[], warnings[]) formed tuple
+    @return: body with warnings
     """
     body = ""
     warnings = []
-    errors = []
     infos = []
     _ = gettext_set_language(ln)
     group_infos = db.get_group_infos(grpID)
     user_status = db.get_user_status(uid, grpID)
     if not group_infos:
-        warnings.append('WRN_WEBSESSION_GROUP_ALREADY_DELETED')
-        (body, errors, warnings) = perform_request_groups_display(uid,
-            infos=infos,
-            errors=errors,
-            warnings=warnings,
-            ln=CFG_SITE_LANG)
+        try:
+            raise InvenioWebSessionWarning(_('The group has already been deleted.'))
+        except InvenioWebSessionWarning, exc:
+            register_exception(stream='warning')
+            warnings.append(exc.message)
+        body = perform_request_groups_display(uid,
+                                              infos=infos,
+                                              warnings=warnings,
+                                              ln=CFG_SITE_LANG)
     else:
         if not len(user_status):
-            errors.append('ERR_WEBSESSION_DB_ERROR')
+            try:
+                raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
+            except InvenioWebSessionError, exc:
+                register_exception()
+                body = websession_templates.tmpl_error(exc.message, ln)
+                return body
         elif confirmed:
             group_infos = db.get_group_infos(grpID)
             group_name = group_infos[0][1]
@@ -506,16 +526,13 @@ def  perform_request_delete_group(uid, grpID, confirmed=0, ln=CFG_SITE_LANG):
                 ln=ln)
             db.delete_group_and_members(grpID)
             infos.append(CFG_WEBSESSION_INFO_MESSAGES["GROUP_DELETED"])
-            (body, errors, warnings) = perform_request_groups_display(uid,
-                infos=infos,
-                errors=errors,
-                warnings=warnings,
-                ln=CFG_SITE_LANG)
+            body = perform_request_groups_display(uid,
+                                                  infos=infos,
+                                                  warnings=warnings,
+                                                  ln=CFG_SITE_LANG)
         else:
             body = websession_templates.tmpl_confirm_delete(grpID, ln)
-
-    return (body, errors, warnings)
-
+    return body
 
 def perform_request_manage_member(uid,
         grpID,
@@ -528,22 +545,33 @@ def perform_request_manage_member(uid,
     @param info: info about last user action
     @param warnings: warnings
     @param ln: language
-    @return: a (body, errors[], warnings[]) formed tuple
+    @return: body with warnings
     """
     body = ''
-    errors = []
     _ = gettext_set_language(ln)
     user_status = db.get_user_status(uid, grpID)
     if not len(user_status):
-        errors.append('ERR_WEBSESSION_DB_ERROR')
-        return (body, errors, warnings)
+        try:
+            raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
+        except InvenioWebSessionError, exc:
+            register_exception()
+            body = websession_templates.tmpl_error(exc.message, ln)
+            return body
     elif user_status[0][0] != CFG_WEBSESSION_USERGROUP_STATUS['ADMIN']:
-        errors.append(('ERR_WEBSESSION_GROUP_NO_RIGHTS',))
-        return (body, errors, warnings)
+        try:
+            raise InvenioWebSessionError(_('Sorry, you do not have sufficient rights on this group.'))
+        except InvenioWebSessionError, exc:
+            register_exception()
+            body = websession_templates.tmpl_error(exc.message, ln)
+            return body
     group_infos = db.get_group_infos(grpID)
     if not len(group_infos):
-        errors.append('ERR_WEBSESSION_DB_ERROR')
-        return (body, errors, warnings)
+        try:
+            raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
+        except InvenioWebSessionError, exc:
+            register_exception()
+            body = websession_templates.tmpl_error(exc.message, ln)
+            return body
     members = db.get_users_by_status(grpID,
         CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
     pending_members = db.get_users_by_status(grpID,
@@ -556,7 +584,7 @@ def perform_request_manage_member(uid,
         warnings=warnings,
         infos=infos,
         ln=ln)
-    return (body, errors, warnings)
+    return body
 
 def perform_request_remove_member(uid, grpID, member_id, ln=CFG_SITE_LANG):
     """Remove member from a group.
@@ -564,34 +592,39 @@ def perform_request_remove_member(uid, grpID, member_id, ln=CFG_SITE_LANG):
     @param grpID: ID of the group
     @param member_id: selected member ID
     @param ln: language
-    @return: a (body, errors[], warnings[]) formed tuple
+    @return: body with warnings
     """
     body = ''
-    errors = []
     warnings = []
     infos = []
     _ = gettext_set_language(ln)
     user_status = db.get_user_status(uid, grpID)
     if not len(user_status):
-        errors.append('ERR_WEBSESSION_DB_ERROR')
-        return (body, errors, warnings)
-
+        try:
+            raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
+        except InvenioWebSessionError, exc:
+            register_exception()
+            body = websession_templates.tmpl_error(exc.message, ln)
+            return body
     if member_id == -1:
-        warnings.append('WRN_WEBSESSION_NO_MEMBER_SELECTED')
-        (body, errors, warnings) = perform_request_manage_member(uid,
-            grpID,
-            warnings=warnings,
-            ln=ln)
-
+        try:
+            raise InvenioWebSessionWarning(_('Please choose a member if you want to remove him from the group.'))
+        except InvenioWebSessionWarning, exc:
+            register_exception(stream='warning')
+            warnings.append(exc.message)
+        body = perform_request_manage_member(uid,
+                                             grpID,
+                                             warnings=warnings,
+                                             ln=ln)
     else:
         db.delete_member(grpID, member_id)
         infos.append(CFG_WEBSESSION_INFO_MESSAGES["MEMBER_DELETED"])
-        (body, errors, warnings) = perform_request_manage_member(uid,
-            grpID,
-            infos=infos,
-            warnings=warnings,
-            ln=ln)
-    return (body, errors, warnings)
+        body = perform_request_manage_member(uid,
+                                             grpID,
+                                             infos=infos,
+                                             warnings=warnings,
+                                             ln=ln)
+    return body
 
 def perform_request_add_member(uid, grpID, user_id, ln=CFG_SITE_LANG):
     """Add waiting member to a group.
@@ -599,40 +632,48 @@ def perform_request_add_member(uid, grpID, user_id, ln=CFG_SITE_LANG):
     @param grpID: ID of the group
     @param user_id: selected member ID
     @param ln: language
-    @return: a (body, errors[], warnings[]) formed tuple
+    @return: body with warnings
     """
     body = ''
-    errors = []
     warnings = []
     infos = []
     _ = gettext_set_language(ln)
     user_status = db.get_user_status(uid, grpID)
     if not len(user_status):
-        errors.append('ERR_WEBSESSION_DB_ERROR')
-        return (body, errors, warnings)
+        try:
+            raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
+        except InvenioWebSessionError, exc:
+            register_exception()
+            body = websession_templates.tmpl_error(exc.message, ln)
+            return body
     if user_id == -1:
-        warnings.append('WRN_WEBSESSION_NO_USER_SELECTED_ADD')
-        (body, errors, warnings) = perform_request_manage_member(uid,
-            grpID,
-            warnings=warnings,
-            ln=ln)
+        try:
+            raise InvenioWebSessionWarning(_('Please choose a user from the list if you want him to be added to the group.'))
+        except InvenioWebSessionWarning, exc:
+            register_exception(stream='warning')
+            warnings.append(exc.message)
+        body = perform_request_manage_member(uid,
+                                             grpID,
+                                             warnings=warnings,
+                                             ln=ln)
     else :
         # test if user is already member or pending
         status = db.get_user_status(user_id, grpID)
         if status and status[0][0] == 'M':
-            warnings.append('WRN_WEBSESSION_ALREADY_MEMBER_ADD')
-            (body, errors, warnings) = perform_request_manage_member(uid,
-                grpID,
-                infos=infos,
-                warnings=warnings,
-                ln=ln)
-
-
+            try:
+                raise InvenioWebSessionWarning(_('The user is already member of the group.'))
+            except InvenioWebSessionWarning, exc:
+                register_exception(stream='warning')
+                warnings.append(exc.message)
+            body = perform_request_manage_member(uid,
+                                                 grpID,
+                                                 infos=infos,
+                                                 warnings=warnings,
+                                                 ln=ln)
         else:
             db.add_pending_member(grpID,
                 user_id,
                 CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
-
             infos.append(CFG_WEBSESSION_INFO_MESSAGES["MEMBER_ADDED"])
             group_infos = db.get_group_infos(grpID)
             group_name = group_infos[0][1]
@@ -642,14 +683,12 @@ def perform_request_add_member(uid, grpID, user_id, ln=CFG_SITE_LANG):
             (body, dummy, dummy) = perform_request_send(
                 uid, msg_to_user=user, msg_to_group="", msg_subject=msg_subjet,
                 msg_body=msg_body, ln=ln)
-            (body, errors, warnings) = perform_request_manage_member(uid,
-                grpID,
-                infos=infos,
-                warnings=warnings,
-                ln=ln)
-
-
-    return (body, errors, warnings)
+            body = perform_request_manage_member(uid,
+                                                 grpID,
+                                                 infos=infos,
+                                                 warnings=warnings,
+                                                 ln=ln)
+    return body
 
 def perform_request_reject_member(uid,
         grpID,
@@ -660,33 +699,44 @@ def perform_request_reject_member(uid,
     @param grpID: ID of the group
     @param member_id: selected member ID
     @param ln: language
-    @return: a (body, errors[], warnings[]) formed tuple
+    @return: body with warnings
     """
     body = ''
-    errors = []
     warnings = []
     infos = []
     _ = gettext_set_language(ln)
     user_status = db.get_user_status(uid, grpID)
     if not len(user_status):
-        errors.append('ERR_WEBSESSION_DB_ERROR')
-        return (body, errors, warnings)
+        try:
+            raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
+        except InvenioWebSessionError, exc:
+            register_exception()
+            body = websession_templates.tmpl_error(exc.message, ln)
+            return body
     if user_id == -1:
-        warnings.append('WRN_WEBSESSION_NO_USER_SELECTED_DEL')
-        (body, errors, warnings) = perform_request_manage_member(uid,
-            grpID,
-            warnings=warnings,
-            ln=ln)
+        try:
+            raise InvenioWebSessionWarning(_('Please choose a user from the list if you want him to be removed from waiting list.'))
+        except InvenioWebSessionWarning, exc:
+            register_exception(stream='warning')
+            warnings.append(exc.message)
+        body = perform_request_manage_member(uid,
+                                             grpID,
+                                             warnings=warnings,
+                                             ln=ln)
     else :
         # test if user is already member or pending
         status = db.get_user_status(user_id, grpID)
         if not status:
-            warnings.append('WRN_WEBSESSION_ALREADY_MEMBER_REJECT')
-            (body, errors, warnings) = perform_request_manage_member(uid,
-                grpID,
-                infos=infos,
-                warnings=warnings,
-                ln=ln)
+            try:
+                raise InvenioWebSessionWarning(_('The user request for joining group has already been rejected.'))
+            except InvenioWebSessionWarning, exc:
+                register_exception(stream='warning')
+                warnings.append(exc.message)
+            body = perform_request_manage_member(uid,
+                                                 grpID,
+                                                 infos=infos,
+                                                 warnings=warnings,
+                                                 ln=ln)
         else:
             db.delete_member(grpID, user_id)
             group_infos = db.get_group_infos(grpID)
@@ -704,14 +754,12 @@ def perform_request_reject_member(uid,
                 msg_body=msg_body,
                 ln=ln)
             infos.append(CFG_WEBSESSION_INFO_MESSAGES["MEMBER_REJECTED"])
-            (body, errors, warnings) = perform_request_manage_member(uid,
-                grpID,
-                infos=infos,
-                warnings=warnings,
-                ln=ln)
-
-
-    return (body, errors, warnings)
+            body = perform_request_manage_member(uid,
+                                                 grpID,
+                                                 infos=infos,
+                                                 warnings=warnings,
+                                                 ln=ln)
+    return body
 
 def account_group(uid, ln=CFG_SITE_LANG):
     """Display group info for myaccount.py page.
@@ -728,6 +776,7 @@ def account_group(uid, ln=CFG_SITE_LANG):
         nb_member_groups,
         nb_total_groups,
         ln=ln)
+
 def get_navtrail(ln=CFG_SITE_LANG, title=""):
     """Gets the navtrail for title.
     @param title: title of the page

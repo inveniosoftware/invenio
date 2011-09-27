@@ -527,7 +527,7 @@ class Template:
             returning the HTML headers necessary in order to open the view
             holdingpen page
         """
-        jquery_scripts = ["jquery.min.js", "jquery.ui.core.js", "jquery.ui.widget.js",
+        jquery_scripts = ["jquery.ui.core.js", "jquery.ui.widget.js",
                           "jquery-treeview/jquery.treeview.js",
                           "jquery-treeview/jquery.treeview.async.js",
                           "jquery.ajaxPager.js"]

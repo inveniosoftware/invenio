@@ -30,9 +30,9 @@ class BibCatalogSystem:
 
     TICKET_ATTRIBUTES = ['ticketid', 'priority', 'recordid', 'subject', 'text', 'creator', 'owner', 'date', 'status', 'queue', 'url_display', 'url_modify', 'url_close']
 
-    def check_system(self, uid):
+    def check_system(self, uid=None):
         """Check connectivity. Return a string describing the error or an empty str
-           @param uid: invenio user id
+           @param uid: invenio user id. optional
            @type uid: number
            @return: empty string on success. Otherwise a string describing error.
            @rtype: string
@@ -40,7 +40,7 @@ class BibCatalogSystem:
         return "this class cannot be instantiated"
 
     def ticket_search(self, uid, recordid=-1, subject="", text="", creator="", owner="", \
-                      date_from="", date_until="", status="", priority=""):
+                      date_from="", date_until="", status="", priority="", queue=""):
         """Search for tickets based on various criteria. Return an array of ticket numbers
            @param uid: invenio user id.
            @type uid: number
@@ -61,13 +61,15 @@ class BibCatalogSystem:
            @param status: search criteria - ticket has this status. Example: 'resolved'.
            @type status: string
            @param priority: search criteria - ticket priority number.
-           @type priority: number.
+           @type priority: number
+           @param queue: search criteria - specific queue to search within
+           @type queue: string
         """
         pass
 
-    def ticket_submit(self, uid, subject, recordid, text="", queue="", priority="", owner=""):
+    def ticket_submit(self, uid=None, subject="", recordid=-1, text="", queue="", priority="", owner="",requestor=""):
         """submit a ticket. Return ticket number on success, otherwise None
-           @param uid: invenio user id
+           @param uid: invenio user id. optional
            @type uid: number
            @param subject: set this as the ticket's subject.
            @type subject: string
@@ -81,6 +83,8 @@ class BibCatalogSystem:
            @type priority: number
            @param owner: set ticket owner to this uid.
            @type owner: number
+           @param requestor: set ticket requestor to this email.
+           @type requestor: string
            @return: new ticket id or None
         """
         pass
@@ -138,6 +142,20 @@ class BibCatalogSystem:
            @rtype: dictionary
         """
         pass
+
+    def ticket_comment(self, uid, ticketid, comment):
+        """Submit a comment to specified ticket. Accepts multi-line text.
+           @param uid: user id
+           @type uid: number
+           @param ticketid: ticket id
+           @type ticketid: number
+           @param comment: the comment to send.
+           @type comment: string
+           @return: 1 on success, otherwise 0
+           @rtype: int
+        """
+        pass
+
 
 def get_bibcat_from_prefs(uid):
     """gets username and pw from user prefs as a tuple.

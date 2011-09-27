@@ -115,8 +115,8 @@ translated. Eg:</p>
 &lt;form action="&lt;CFG_SITE_URL>/search" method="get">
     &lt;input size="20" type="text" name="p" value="" />
     &lt;select name="f">&lt;option value="">&#95;(any field)&#95;&lt;/option>
-                     &lt;option>&#95;(title)&#95;&lt;/option>
-                     &lt;option>&#95;(author)&#95;&lt;/option>
+                     &lt;option value="&#95;(title)&#95;">&#95;(title)&#95;&lt;/option>
+                     &lt;option value="&#95;(author)&#95;">&#95;(author)&#95;&lt;/option>
     &lt;/select>
     &lt;input class="formbutton" type="submit" name="action" value="&#95;(Search)&#95;" />
 &lt;/form>
@@ -127,8 +127,8 @@ translated. Eg:</p>
     <nobr>
     <input size="20" type="text" name="p" value="" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="_(title)_">_(title)_</option>
+                     <option value="_(author)_">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </nobr>

@@ -29,20 +29,61 @@ contains the changes to apply.
 """
 
 import re
+import logging
+import sys
+import os
+# make sure invenio lib is importable
+if os.path.dirname(__file__) not in sys.path:
+    sys.path.insert(0, os.path.dirname(__file__))
+import config
 
+VERSION = '0.4.9'
+
+logging_level = logging.ERROR
+
+
+# ------------- main config -----------
+
+# Save generated kw into the database?
+# daemon does that
+CFG_DB_SAVE_KW = True
+
+# Number of keywords that are printed by default (this limits single keywords,
+# composite keywords, and acronyms - not author keywords)
+CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER = 20
+
+# The main marc xml field where to find/save the keywords, including the
+# indicators
+CFG_MAIN_FIELD = '6531_'
+
+# Other fields to take from the marc xml when generating tagcloud/list of
+# keywords.
+CFG_OTHER_FIELDS = ['6950_']
+
+# Where to save author supplied keywords
+CFG_AUTH_FIELD = ''
+
+# Where to save extracted acronyms
+CFG_ACRON_FIELD = ''
+
+# ------------ bibclass config -------
 # USER AGENT
-
 CFG_BIBCLASSIFY_USER_AGENT = ""
 
-# BIBCLASSIFY VARIABLES
-
-# Number of keywords that are output per default.
-CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER = 20
 
 # PARTIAL_TEXT
 # Marks the part of the fulltext to keep when running a partial match.
 # Each tuple contains the start and end percentages of a section.
 CFG_BIBCLASSIFY_PARTIAL_TEXT = ((0, 20), (40, 60))
+
+
+# Format and output marcxml records in spires format
+CFG_SPIRES_FORMAT = False
+
+
+# The taxonomy used when no taxonomy is specified
+CFG_EXTRACTION_TAXONOMY = 'HEP'
+
 
 # WORD TRANSFORMATIONS
 
@@ -135,8 +176,8 @@ CFG_BIBCLASSIFY_GENERAL_REGULAR_EXPRESSIONS = (
 # re.escape(separator)
 
 CFG_BIBCLASSIFY_SEPARATORS = {
-    " ": r"[\s-]",
-    "-": r"[\s-]?",
+    " ": r"[\s\n-]",
+    "-": r"[\s\n-]?",
     "/": r"[/\s]?",
     "(": r"\s?\(",
     "*": r"[*\s]?",
@@ -158,7 +199,7 @@ CFG_BIBCLASSIFY_WORD_WRAP = "[^\w-]%s[^\w-]"
 
 CFG_BIBCLASSIFY_VALID_SEPARATORS = (
     "of", "of a", "of an", "of the", "of this", "of one", "of two", "of three",
-    "of new", "of other",  "of many", "of both", "of these", "of each", "is"
+    "of new", "of other",  "of many", "of both", "of these", "of each", "is", "the"
     )
 
 # AUTHOR KEYWORDS
@@ -179,3 +220,93 @@ CFG_BIBCLASSIFY_AUTHOR_KW_END = (
 
 CFG_BIBCLASSIFY_AUTHOR_KW_SEPARATION = re.compile(" ?; ?| ?, ?| ?- ")
 
+
+# Modules to call to get output from them
+#CFG_EXTERNAL_MODULES = {'webtag' : 'call_from_outside'}
+CFG_EXTERNAL_MODULES = {}
+
+
+
+
+
+log = None
+_loggers = []
+def get_logger(name):
+    """Creates a logger for you - with the parent newseman logger and
+    common configuration"""
+    if log:
+        logger = log.manager.getLogger(name)
+    else:
+        logger = logging.getLogger(name)
+        hdlr = logging.StreamHandler(sys.stderr)
+        formatter = logging.Formatter('%(levelname)s %(name)s:%(lineno)d    %(message)s')
+        hdlr.setFormatter(formatter)
+        logger.addHandler(hdlr)
+        logger.setLevel(logging_level)
+        logger.propagate = 0
+    if logger not in _loggers:
+        _loggers.append(logger)
+    return logger
+def set_global_level(level):
+    global logging_level
+    logging_level = int(level)
+    for l in _loggers:
+        l.setLevel(logging_level)
+
+log = get_logger('bibclassify')
+
+STANDALONE = False
+try:
+    import search_engine
+except:
+    STANDALONE = True
+    log.warning('Bibclassify is running in a standalone mode, access to database is not supported')
+
+
+
+if STANDALONE:
+    import tempfile
+    # try to find etcdir (first in this directory), and set etc to be one
+    # level higher
+    etcdir = ' '
+    bibetc = os.path.join(os.path.dirname(__file__), 'bibclassify')
+    if os.path.isdir(bibetc) and os.access(bibetc, os.W_OK):
+        etcdir = os.path.dirname(__file__)
+
+    if not os.path.isdir(etcdir) or not os.access(etcdir, os.W_OK):
+        etcdir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../etc"))
+        if not os.path.isdir(etcdir) or not os.access(etcdir, os.W_OK):
+            etcdir = tempfile.gettempdir()
+
+    log.warning("Setting CFG_CACHEDIR, CFG_WEBDIR, CFG_ETCDIR to: %s" % etcdir)
+
+    # override a few special paths
+    config.CFG_CACHEDIR = etcdir
+    config.CFG_WEBDIR = etcdir
+    config.CFG_ETCDIR = etcdir
+
+
+# shadow the config variables that bibclassify modules use
+CFG_PREFIX = config.CFG_PREFIX
+CFG_CACHEDIR = config.CFG_CACHEDIR
+CFG_WEBDIR = config.CFG_WEBDIR
+CFG_ETCDIR = config.CFG_ETCDIR
+CFG_TMPDIR = config.CFG_TMPDIR
+
+
+# Redefine variable definitions if local config exists
+try:
+    import bibclassify_config_local as localconf
+    for confid in dir(localconf):
+        if 'CFG' in confid:
+            if hasattr(config, confid):
+                log.info('Overriding global config %s with %s' % (confid, getattr(localconf, confid)))
+                setattr(config, confid, getattr(localconf, confid))
+            if confid in globals():
+                globals()[confid] = getattr(localconf, confid)
+                log.info('Overriding bibclassify config %s with %s' % (confid, getattr(localconf, confid)))
+except ImportError:
+    # No local configuration was found.
+    pass
+
+log.info('Initialized bibclassify config')

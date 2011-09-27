@@ -22,12 +22,13 @@ __revision__ = "$Id$"
 
 from invenio.webcomment import get_first_comments_or_remarks
 
-def format_element(bfo, nbReviews='all', nbComments='all'):
+def format_element(bfo, nbReviews='all', nbComments='all', show_reviews='true'):
     """
     Prints comments posted for the record.
 
     @param nbReviews: The max number of reviews to print
     @param nbComments: The max number of comments to print
+    @param show_reviews: Shows or hides the complete review block
     """
 
     nb_reviews = nbReviews
@@ -36,6 +37,10 @@ def format_element(bfo, nbReviews='all', nbComments='all'):
     nb_comments = nbComments
     if nb_comments.isdigit():
         nb_comments = int(nb_comments)
+    if show_reviews in ('true', 'True'):
+        show_reviews = True
+    else:
+        show_reviews = False
 
     (comments, reviews) = get_first_comments_or_remarks(recID=bfo.recID,
                                                         ln=bfo.lang,
@@ -43,7 +48,8 @@ def format_element(bfo, nbReviews='all', nbComments='all'):
                                                         nb_reviews=nb_reviews,
                                                         voted=-1,
                                                         reported=-1,
-                                                        user_info=bfo.user_info)
+                                                        user_info=bfo.user_info,
+                                                        show_reviews=show_reviews)
 
 
     return comments + reviews

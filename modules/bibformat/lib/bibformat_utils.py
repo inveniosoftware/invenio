@@ -41,11 +41,19 @@ from invenio.dbquery import run_sql
 from invenio.urlutils import string_to_numeric_char_reference
 from invenio.textutils import encode_for_xml
 from invenio.shellutils import run_shell_command
+from invenio.search_engine_utils import get_fieldvalues
 
 def highlight_matches(text, compiled_pattern, \
                       prefix_tag='<strong>', suffix_tag="</strong>"):
     """
     Highlight words in 'text' matching the 'compiled_pattern'
+
+    @param text: the text in which we want to "highlight" parts
+    @param compiled_pattern: the parts to highlight
+    @type compiled_pattern: a compiled regular expression
+    @param prefix_tag: prefix to use before each matching parts
+    @param suffix_tag: suffix to use after each matching parts
+    @return: a version of input X{text} with words matching X{compiled_pattern} surrounded by X{prefix_tag} and X{suffix_tag}
     """
 
     #Add 'prefix_tag' and 'suffix_tag' before and after 'match'
@@ -68,6 +76,8 @@ def highlight(text, keywords=None, \
 
     @param text: the text to modify
     @param keywords: a list of string
+    @param prefix_tag: prefix to use before each matching parts
+    @param suffix_tag: suffix to use after each matching parts
     @return: highlighted text
     """
 
@@ -167,28 +177,12 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
     controlfield, OAI ID fields and 980__c=DELETED)
 
     @param recID: the id of the record to retrieve
+    @param format: the format to use
     @param on_the_fly: if False, try to fetch precreated one in database
+    @param decompress: the library to use to decompress cache from DB
     @return: the xml string of the record
     """
     from invenio.search_engine import record_exists
-
-    def get_fieldvalues(recID, tag):
-        """Return list of field values for field TAG inside record RECID."""
-        out = []
-        if tag == "001___":
-            # we have asked for recID that is not stored in bibXXx tables
-            out.append(str(recID))
-        else:
-            # we are going to look inside bibXXx tables
-            digit = tag[0:2]
-            bx = "bib%sx" % digit
-            bibx = "bibrec_bib%sx" % digit
-            query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND bx.tag LIKE '%s'" \
-                    "ORDER BY bibx.field_number, bx.tag ASC" % (bx, bibx, recID, tag)
-            res = run_sql(query)
-            for row in res:
-                out.append(row[0])
-        return out
 
     def get_creation_date(recID, fmt="%Y-%m-%d"):
         "Returns the creation date of the record 'recID'."
@@ -398,6 +392,9 @@ def parse_tag(tag):
     >> parse_tag('245.%') = ['245', '', '', '']
     >> parse_tag('245$$%') = ['245', '', '', '']
     >> parse_tag('2%5$$a') = ['2%5', '', '', 'a']
+
+    @param tag: tag to parse
+    @return: a canonical form of the input X{tag}
     """
 
     p_tag =  ['', '', '', ''] # tag, ind1, ind2, code
@@ -439,11 +436,15 @@ def get_all_fieldvalues(recID, tags_in):
 
     Note that when a partial 'tags_in' is specified (eg. '100__'), the
     subfields of all corresponding datafields are returned all 'mixed'
-    together. Eg. with:
+    together. Eg. with::
       123 100__ $a Ellis, J $u CERN
       123 100__ $a Smith, K
-    >> get_all_fieldvalues(123, '100__')
-       ['Ellis, J', 'CERN', 'Smith, K']
+    >>> get_all_fieldvalues(123, '100__')
+    ['Ellis, J', 'CERN', 'Smith, K']
+
+    @param recID: record ID to consider
+    @param tags_in: list of tags got retrieve
+    @return: a list of values corresponding to X{tags_in} found in X{recID}
     """
     out = []
     if type(tags_in) is not list:
@@ -503,6 +504,9 @@ def latex_to_html(text):
     """
     Do some basic interpretation of LaTeX input. Gives some nice
     results when used in combination with MathJax.
+
+    @param text: input "LaTeX" markup to interpret
+    @return: a representation of input LaTeX more suitable for HTML
     """
     # Process verbatim environment first
     def make_verbatim(match_obj):
@@ -577,6 +581,12 @@ def get_pdf_snippets(recID, patterns,
     The snippets are meant to look like in the results of the popular search
     engine: using " ... " between snippets.
     For empty patterns it returns ""
+
+    @param recID: record ID to consider
+    @param patterns: list of patterns to retrieve
+    @param nb_words_around: max number of words around the matched pattern
+    @param max_snippets: max number of snippets to include
+    @return: snippet
     """
     from invenio.bibdocfile import BibRecDocs
 
@@ -621,9 +631,15 @@ def get_text_snippets(textfile_path, patterns, nb_words_around, max_snippets, \
     For empty patterns it returns ""
     The idea is to first produce big snippets with grep and then narrow them
     using the cut_out_snippet function.
-    @param right_boundary: match the right word boundary
     TODO: - distinguish the beginning of sentences and try to make the snippets
-          start there
+    start there
+
+    @param textfile_path: path to a text file to extract snippet from
+    @param patterns: list of patterns to retrieve
+    @param nb_words_around: max number of words around the matched pattern
+    @param max_snippets: max number of snippets to include
+    @param right_boundary: match the right word boundary or not
+    @return: snippet
     """
 
     if len(patterns) == 0:
@@ -693,6 +709,9 @@ def get_text_snippets(textfile_path, patterns, nb_words_around, max_snippets, \
 def get_tokens(text):
     """
     Tokenize the words in the text
+
+    @param text: text to extract token from
+    @return: a list of tokens
     """
 
     b_pattern = '\\W+'
@@ -708,9 +727,18 @@ def get_tokens(text):
 
 
 def cut_out_snippet(text, patterns, nb_words_around, max_words, right_boundary = True):
-    # Cut out one ore more snippets, limits to max_words param.
-    # The snippet can include many occurances of the patterns if they are not
-    # further appart than 2 * nb_words_around.
+    """
+    Cut out one ore more snippets, limits to max_words param.
+    The snippet can include many occurances of the patterns if they are not
+    further appart than 2 * nb_words_around.
+
+    @param text: the text to process
+    @param patterns: the patterns to match
+    @param nb_words_around: max number of words around the matched pattern
+    @param max_words: maximum number of words in the snippet
+    @param right_boundary: match the right word boundary or not
+    @return: a tuple (list of snippets, max_words (?))
+    """
 
     #index in 'matches'
     next_pattern = 0

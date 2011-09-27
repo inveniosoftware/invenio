@@ -24,8 +24,9 @@ __revision__ = "$Id$"
 import os
 import unittest
 
-from invenio.invenio_connector import InvenioConnector
-from invenio.config import CFG_SITE_URL
+from invenio.invenio_connector import InvenioConnector, \
+                                      InvenioConnectorAuthError
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
 from invenio.testutils import make_test_suite, run_test_suite
 
 class InvenioConnectorTest(unittest.TestCase):
@@ -51,6 +52,28 @@ class InvenioConnectorTest(unittest.TestCase):
         result = server.search(p='', c=['Books'], of='id')
         self.assertTrue(len(result) > 0, \
                         'did not get collection search results.')
+
+    def test_search_local_restricted_collections(self):
+        """InvenioConnector - local restricted collection search"""
+        server = InvenioConnector(CFG_SITE_URL)
+        search_params = dict(p='LBL-28106', c=['Theses'], of='id')
+        self.assertRaises(InvenioConnectorAuthError, server.search, **search_params)
+
+        server = InvenioConnector(CFG_SITE_SECURE_URL, user='admin', password='')
+        result = server.search(p='LBL-28106', c=['Theses'], of='id')
+        self.assertTrue(len(result) > 0, \
+                        'did not get restricted collection search results.')
+
+    def test_search_remote_restricted_collections(self):
+        """InvenioConnector - remote restricted collection search"""
+        server = InvenioConnector("http://invenio-demo.cern.ch")
+        search_params = dict(p='LBL-28106', c=['Theses'], of='id')
+        self.assertRaises(InvenioConnectorAuthError, server.search, **search_params)
+
+        server = InvenioConnector("https://invenio-demo.cern.ch", user='jekyll', password='j123ekyll')
+        result = server.search(p='LBL-28106', c=['Theses'], of='id')
+        self.assertTrue(len(result) > 0, \
+                        'did not get restricted collection search results.')
 
 TEST_SUITE = make_test_suite(InvenioConnectorTest)
 

@@ -1982,8 +1982,8 @@ You can also use parentheses in your queries to group boolean expressions togeth
     <blockquote>
     <input size="40" type="text" name="p" value="(gravity OR supergravity) AND (ellis OR perelstein)" />
     <select name="f"><option value="">_(any field)_</option>
-                     <option>_(title)_</option>
-                     <option>_(author)_</option>
+                     <option value="title">_(title)_</option>
+                     <option value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </blockquote>

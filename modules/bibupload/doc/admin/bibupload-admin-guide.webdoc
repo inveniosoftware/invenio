@@ -193,6 +193,16 @@ input file should contain record ID in the 001 tag and the title in
 </pre>
 </p>
 
+<p>Note that if you are using the <code>--replace</code> mode, and you specify
+in the incoming MARCXML a 001 tag with a value representing a record ID that
+does not exist, bibupload will not create the record on-the-fly unless the
+<code>--force</code> parameter was also passed on the command line. This is done
+in order to avoid creating, by mistake, holes in the database list of record
+identifiers. When you ask, in fact, to <code>--replace</code> a non-existing record
+imposing a record ID with a value of, say, <code>1 000 000</code> and, subsequently, you
+<code>--insert</code> a new record, this will automatically receive an ID with
+the value <code>1 000 001</code>.</p>
+
 <p>If you combine the <code>--pretend</code> parameter with the above updating modes you can actually test what would be executed without modifying the database or altering the system status.</p>
 
 <a name="3.4"></a><h3>3.4 Inserting and updating at the same time</h3>

@@ -176,7 +176,15 @@ To match records in specific collection(s):
 
 <blockquote>
 <pre>
- $ bibmatch -x 'Books,Articles' < input.xml
+ $ bibmatch --collection 'Books,Articles' < input.xml
+</pre>
+</blockquote>
+
+To match records in restricted collection(s):
+
+<blockquote>
+<pre>
+ $ bibmatch --collection 'Theses' --user admin < input.xml
 </pre>
 </blockquote>
 
@@ -217,12 +225,6 @@ Command line options:
 
  Advanced options:
 
- -c --config=filename      load querystrings from a config file. Each line starting with QRYSTR will
-                           be added as a query. i.e. QRYSTR --- [title] [author]
-
- -x --collection           only perform queries in certain collection(s).
-                           Note: matching against restricted collections does not work.
-
  -m --mode=(a|e|o|p|r)     perform an advanced search using special search mode.
                              Where mode is:
                                "a" all of the words,
@@ -235,5 +237,14 @@ Command line options:
                              Where operator is:
                                "a" boolean AND (default)
                                "o" boolean OR
+
+ -c --config=filename      load querystrings from a config file. Each line starting with QRYSTR will
+                           be added as a query. i.e. QRYSTR --- [title] [author]
+
+ -x --collection           only perform queries in certain collection(s).
+                           Note: matching against restricted collections requires authentication.
+
+ --user=USERNAME           username to use when connecting to Invenio instance. Useful when searching
+                           restricted collections. You will be prompted for password.
 </pre>
 </blockquote>

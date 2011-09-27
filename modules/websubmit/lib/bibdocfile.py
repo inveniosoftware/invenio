@@ -113,7 +113,9 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_WEBSUBMIT_STORAGEDIR, \
     CFG_BIBDOCFILE_USE_XSENDFILE, \
     CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY, \
-    CFG_SITE_RECORD
+    CFG_SITE_RECORD, \
+    CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS
+
 from invenio.websubmit_config import CFG_WEBSUBMIT_ICON_SUBFORMAT_RE, \
     CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT
 import invenio.template
@@ -145,6 +147,9 @@ CFG_BIBDOCFILE_AVAILABLE_FLAGS = (
 
 #: constant used if FFT correct with the obvious meaning.
 KEEP_OLD_VALUE = 'KEEP-OLD-VALUE'
+
+_CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS = [(re.compile(_regex), _headers)
+        for _regex, _headers in CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS]
 
 _mimes = MimeTypes(strict=False)
 _mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
@@ -199,6 +204,12 @@ _extensions = _generate_extensions()
 class InvenioWebSubmitFileError(Exception):
     """
     Exception raised in case of errors related to fulltext files.
+    """
+    pass
+
+class InvenioBibdocfileUnauthorizedURL(Exception):
+    """
+    Exception raised when one tries to download an unauthorized external URL.
     """
     pass
 
@@ -287,15 +298,6 @@ def guess_format_from_url(url):
         recognize it.
     @rtype: string
     """
-    def parse_content_disposition(text):
-        for item in text.split(';'):
-            item = item.strip()
-            if item.strip().startswith('filename='):
-                return item[len('filename="'):-len('"')]
-
-    def parse_content_type(text):
-        return text.split(';')[0].strip()
-
     ## Let's try to guess the extension by considering the URL as a filename
     ext = decompose_file(url, skip_version=True, only_known_extensions=True)[2]
     if ext.startswith('.'):
@@ -315,18 +317,14 @@ def guess_format_from_url(url):
     else:
         ## Since the URL is remote, let's try to perform a HEAD request
         ## and see the corresponding headers
-        info = urllib2.urlopen(url).info()
-        content_disposition = info.getheader('Content-Disposition')
-        if content_disposition:
-            filename = parse_content_disposition(content_disposition)
-            if filename:
-                return decompose_file(filename)[2]
-        content_type = info.getheader('Content-Type')
-        if content_type:
-            content_type = parse_content_type(content_type)
-            ext = _mimes.guess_extension(content_type)
-            if ext:
-                return normalize_format(ext)
+        try:
+            response = open_url(url, head_request=True)
+        except (InvenioBibdocfileUnauthorizedURL, urllib2.URLError):
+            return ""
+        format = get_format_from_http_response(response)
+        if format:
+            return format
+
         if CFG_HAS_MAGIC:
             ## Last solution: let's download the remote resource
             ## and use the Python magic library to guess the extension
@@ -394,6 +392,19 @@ def compose_file(dirname, docname, extension, subformat=None, version=None):
     if extension and not extension.startswith("."):
         extension = ".%s" % extension
     return os.path.join(dirname, docname + extension + subformat + version)
+
+def compose_format(extension, subformat=None):
+    """
+    Construct the format string
+    """
+    if not extension.startswith("."):
+        extension = ".%s" % extension
+    if subformat:
+        if not subformat.startswith(";"):
+            subformat = ";%s" % subformat
+    else:
+        subformat = ""
+    return extension + subformat
 
 def decompose_file(afile, skip_version=False, only_known_extensions=False,
         allow_subformat=True):
@@ -697,42 +708,6 @@ class BibRecDocs:
         """
         return [bibdoc.docname for bibdoc in self.list_bibdocs(doctype)]
 
-    def check_file_exists(self, path):
-        """
-        Check if a file with the same content of the file pointed in C{path}
-        is already attached to this record.
-
-        @param path: the file to be checked against.
-        @type path: string
-        @return: True if a file with the requested content is already attached
-        to the record.
-        @rtype: bool
-        """
-        size = os.path.getsize(path)
-
-        # Let's consider all the latest files
-        files = self.list_latest_files()
-
-        # Let's consider all the latest files with same size
-        potential = [afile for afile in files if afile.get_size() == size]
-
-        if potential:
-            checksum = calculate_md5(path)
-
-            # Let's consider all the latest files with the same size and the
-            # same checksum
-            potential = [afile for afile in potential if afile.get_checksum() == checksum]
-
-            if potential:
-                potential = [afile for afile in potential if filecmp.cmp(afile.get_full_path(), path)]
-
-                if potential:
-                    return True
-                else:
-                    # Gosh! How unlucky, same size, same checksum but not same
-                    # content!
-                    pass
-        return False
 
     def propose_unique_docname(self, docname):
         """
@@ -1369,6 +1344,24 @@ class BibRecDocs:
                 self.merge_bibdocs(docname, new_docname)
             docnames.add(docname)
 
+    def check_file_exists(self, path):
+        """
+        Check if a file with the same content of the file pointed in C{path}
+        is already attached to this record.
+
+        @param path: the file to be checked against.
+        @type path: string
+        @return: True if a file with the requested content is already attached
+        to the record.
+        @rtype: bool
+        """
+        # Let's consider all the latest files
+        for bibdoc in self.list_bibdocs():
+            if bibdoc.check_file_exists(path):
+                return True
+        return False
+
+
 class BibDoc:
     """
     This class represents one document (i.e. a set of files with different
@@ -1458,7 +1451,7 @@ class BibDoc:
                 if recid:
                     res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s LIMIT 1", (recid, docname), 1)
                     if res:
-                        raise InvenioWebSubmitFileError, "A bibdoc called %s already exists for recid %s" % (docname, recid)
+                        raise InvenioWebSubmitFileError("A bibdoc called %s already exists for recid %s" % (docname, recid))
                 self.id = run_sql("INSERT INTO bibdoc (status,docname,creation_date,modification_date) "
                     "values(%s,%s,NOW(),NOW())", (self.status, docname))
                 if self.id:
@@ -2559,6 +2552,23 @@ class BibDoc:
         version = int(version)
         return [docfile for docfile in self.docfiles if docfile.get_version() == version and (list_hidden or not docfile.hidden_p())]
 
+    def check_file_exists(self, path):
+        """
+        Check if a file with the same content of the file pointed in C{path}
+        is already attached to this record.
+
+        @param path: the file to be checked against.
+        @type path: string
+        @return: True if a file with the requested content is already attached
+        to the record.
+        @rtype: bool
+        """
+        # Let's consider all the latest files
+        for afile in self.list_latest_files():
+            if afile.is_identical_to(path):
+                return True
+        return False
+
     def get_latest_version(self):
         """ Returns the latest existing version number for the given bibdoc.
         If no file is associated to this bibdoc, returns '0'.
@@ -2708,6 +2718,17 @@ class BibDocFile:
                  description = self.description or ''
                )
 
+    def is_identical_to(self, path):
+        """
+        @path: the path of another file on disk.
+        @return: True if L{path} is contains bitwise the same content.
+        """
+        if os.path.getsize(path) != self.size:
+            return False
+        if calculate_md5(path) != self.checksum:
+            return False
+        return filecmp.cmp(self.get_full_path(), path)
+
     def is_restricted(self, user_info):
         """Returns restriction state. (see acc_authorize_action return values)"""
         if self.status not in ('', 'DELETED'):
@@ -2809,14 +2830,14 @@ class BibDocFile:
         """Return True if the checksum corresponds to the file."""
         return calculate_md5(self.fullpath) == self.checksum
 
-    def stream(self, req):
+    def stream(self, req, download=False):
         """Stream the file.  Note that no restriction check is being
         done here, since restrictions have been checked previously
         inside websubmit_webinterface.py."""
         if os.path.exists(self.fullpath):
             if random.random() < CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY and calculate_md5(self.fullpath) != self.checksum:
                 raise InvenioWebSubmitFileError, "File %s, version %i, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
-            stream_file(req, self.fullpath, "%s%s" % (self.name, self.superformat), self.mime, self.encoding, self.etag, self.checksum, self.fullurl)
+            stream_file(req, self.fullpath, "%s%s" % (self.name, self.superformat), self.mime, self.encoding, self.etag, self.checksum, self.fullurl, download=download)
             raise apache.SERVER_RETURN, apache.DONE
         else:
             req.status = apache.HTTP_NOT_FOUND
@@ -2887,7 +2908,7 @@ def check_bibdoc_authorization(user_info, status):
     return (0, CFG_WEBACCESS_WARNING_MSGS[0])
 
 
-def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=None, md5=None, location=None):
+def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=None, md5=None, location=None, download=False):
     """This is a generic function to stream a file to the user.
     If fullname, mime, encoding, and location are not provided they will be
     guessed based on req and fullpath.
@@ -3050,7 +3071,10 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         if os.path.exists(fullpath):
             if fullname is None:
                 fullname = os.path.basename(fullpath)
-            req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
+            if download:
+                req.headers_out["Content-Disposition"] = 'attachment; filename="%s"' % fullname.replace('"', '\\"')
+            else:
+                req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
             req.headers_out["X-Sendfile"] = fullpath
             if mime is None:
                 format = decompose_file(fullpath)[2]
@@ -3090,7 +3114,10 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
             req.headers_out["ETag"] = etag
         if md5 is not None:
             req.headers_out["Content-MD5"] = base64.encodestring(binascii.unhexlify(md5.upper()))[:-1]
-        req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
+        if download:
+            req.headers_out["Content-Disposition"] = 'attachment; filename="%s"' % fullname.replace('"', '\\"')
+        else:
+            req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
         size = os.path.getsize(fullpath)
         if not size:
             try:
@@ -3405,8 +3432,7 @@ def get_format_from_url(url):
 
 def clean_url(url):
     """Given a local url e.g. a local path it render it a realpath."""
-    protocol = urllib2.urlparse.urlsplit(url)[0]
-    if protocol in ('', 'file'):
+    if is_url_a_local_file(url):
         path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
         return os.path.abspath(path)
     else:
@@ -3418,7 +3444,13 @@ def is_url_a_local_file(url):
     return protocol in ('', 'file')
 
 def check_valid_url(url):
-    """Check for validity of a url or a file."""
+    """
+    Check for validity of a url or a file.
+
+    @param url: the URL to check
+    @type url: string
+    @raise StandardError: if the URL is not a valid URL.
+    """
     try:
         if is_url_a_local_file(url):
             path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
@@ -3431,7 +3463,10 @@ def check_valid_url(url):
                     return
             raise StandardError, "%s is not in one of the allowed paths." % path
         else:
-            urllib2.urlopen(url)
+            try:
+                open_url(url)
+            except InvenioBibdocfileUnauthorizedURL, e:
+                raise StandardError, str(e)
     except Exception, e:
         raise StandardError, "%s is not a correct url: %s" % (url, e)
 
@@ -3439,60 +3474,186 @@ def safe_mkstemp(suffix):
     """Create a temporary filename that don't have any '.' inside a part
     from the suffix."""
     tmpfd, tmppath = tempfile.mkstemp(suffix=suffix, dir=CFG_TMPDIR)
+    # Close the file and leave the responsability to the client code to
+    # correctly open/close it.
+    os.close(tmpfd)
+
     if '.' not in suffix:
         # Just in case format is empty
-        return tmpfd, tmppath
+        return tmppath
     while '.' in os.path.basename(tmppath)[:-len(suffix)]:
-        os.close(tmpfd)
         os.remove(tmppath)
         tmpfd, tmppath = tempfile.mkstemp(suffix=suffix, dir=CFG_TMPDIR)
-    return (tmpfd, tmppath)
+        os.close(tmpfd)
+    return tmppath
 
-def download_url(url, format=None, sleep=2):
-    """Download a url (if it corresponds to a remote file) and return a local url
-    to it."""
+def download_local_file(filename, format=None):
+    """
+    Copies a local file to Invenio's temporary directory.
+
+    @param filename: the name of the file to copy
+    @type filename: string
+    @param format: the format of the file to copy (will be found if not
+            specified)
+    @type format: string
+    @return: the path of the temporary file created
+    @rtype: string
+    @raise StandardError: if something went wrong
+    """
+    # Make sure the format is OK.
     if format is None:
-        format = decompose_file(url)[2]
+        format = guess_format_from_url(filename)
     else:
         format = normalize_format(format)
-    protocol = urllib2.urlparse.urlsplit(url)[0]
-    tmpfd, tmppath = safe_mkstemp(format)
+
+    tmppath = ''
+
+    # Now try to copy.
     try:
+        path = urllib2.urlparse.urlsplit(urllib.unquote(filename))[2]
+        if os.path.abspath(path) != path:
+            raise StandardError, "%s is not a normalized path (would be %s)." \
+                    % (path, os.path.normpath(path))
+        for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR,
+                CFG_WEBSUBMIT_STORAGEDIR]:
+            if path.startswith(allowed_path):
+                tmppath = safe_mkstemp(format)
+                shutil.copy(path, tmppath)
+                if os.path.getsize(tmppath) == 0:
+                    os.remove(tmppath)
+                    raise StandardError, "%s seems to be empty" % filename
+                break
+        else:
+            raise StandardError, "%s is not in one of the allowed paths." % path
+    except Exception, e:
+        raise StandardError, "Impossible to copy the local file '%s': %s" % \
+                (filename, str(e))
+
+    return tmppath
+
+def download_external_url(url, format=None):
+    """
+    Download a url (if it corresponds to a remote file) and return a
+    local url to it.
+
+    @param url: the URL to download
+    @type url: string
+    @param format: the format of the file (will be found if not specified)
+    @type format: string
+    @return: the path to the download local file
+    @rtype: string
+    @raise StandardError: if the download failed
+    """
+    tmppath = None
+
+    # Make sure the format is OK.
+    if format is None:
+        # First try to find a known extension to the URL
+        format = decompose_file(url, skip_version=True,
+                only_known_extensions=True)[2]
+        if not format:
+            # No correct format could be found. Will try to get it from the
+            # HTTP message headers.
+            format = ''
+    else:
+        format = normalize_format(format)
+
+    from_file, to_file, tmppath = None, None, ''
+
+    try:
+        from_file = open_url(url)
+    except InvenioBibdocfileUnauthorizedURL, e:
+        raise StandardError, str(e)
+    except urllib2.URLError, e:
+        raise StandardError, 'URL could not be opened: %s' % str(e)
+
+    if not format:
+        # We could not determine the format from the URL, so let's try
+        # to read it from the HTTP headers.
+        format = get_format_from_http_response(from_file)
+
+    try:
+        tmppath = safe_mkstemp(format)
+
+        to_file = open(tmppath, 'w')
+        while True:
+            block = from_file.read(CFG_BIBDOCFILE_BLOCK_SIZE)
+            if not block:
+                break
+            to_file.write(block)
+        to_file.close()
+        from_file.close()
+
+        if os.path.getsize(tmppath) == 0:
+            raise StandardError, "%s seems to be empty" % url
+    except Exception, e:
+        # Try to close and remove the temporary file.
         try:
-            if protocol in ('', 'file'):
-                path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
-                if os.path.abspath(path) != path:
-                    raise StandardError, "%s is not a normalized path (would be %s)." % (path, os.path.normpath(path))
-                for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR, CFG_TMPSHAREDDIR, CFG_WEBSUBMIT_STORAGEDIR]:
-                    if path.startswith(allowed_path):
-                        shutil.copy(path, tmppath)
-                        if os.path.getsize(tmppath) > 0:
-                            return tmppath
-                        else:
-                            raise StandardError, "%s seems to be empty" % url
-                raise StandardError, "%s is not in one of the allowed paths." % path
-            else:
-                try:
-                    from_file = urllib2.urlopen(url)
-                    to_file = open(tmppath, 'w')
-                    while True:
-                        block = from_file.read(CFG_BIBDOCFILE_BLOCK_SIZE)
-                        if not block:
-                            break
-                        to_file.write(block)
-                    to_file.close()
-                    from_file.close()
-                except Exception, e:
-                    raise StandardError, "Error when downloading %s into %s: %s" % (url, tmppath, e)
-                if os.path.getsize(tmppath) > 0:
-                    return tmppath
-                else:
-                    raise StandardError, "%s seems to be empty" % url
-        except:
+            to_file.close()
+        except Exception:
+            pass
+        try:
             os.remove(tmppath)
-            raise
-    finally:
-        os.close(tmpfd)
+        except Exception:
+            pass
+        raise StandardError, "Error when downloading %s into %s: %s" % \
+                (url, tmppath, e)
+
+    return tmppath
+
+def get_format_from_http_response(response):
+    """
+    Tries to retrieve the format of the file from the message headers of the
+    HTTP response.
+
+    @param response: the HTTP response
+    @type response: file-like object (as returned by urllib.urlopen)
+    @return: the format of the remote resource
+    @rtype: string
+    """
+    def parse_content_type(text):
+        return text.split(';')[0].strip()
+
+    def parse_content_disposition(text):
+        for item in text.split(';'):
+            item = item.strip()
+            if item.strip().startswith('filename='):
+                return item[len('filename="'):-len('"')]
+
+    info = response.info()
+
+    format = ''
+
+    content_disposition = info.getheader('Content-Disposition')
+    if content_disposition:
+        filename = parse_content_disposition(content_disposition)
+        if filename:
+            format = decompose_file(filename)[2]
+    content_type = info.getheader('Content-Type')
+    if content_type:
+        content_type = parse_content_type(content_type)
+        ext = _mimes.guess_extension(content_type)
+        if ext:
+            format = normalize_format(ext)
+
+    return format
+
+def download_url(url, format=None):
+    """
+    Download a url (if it corresponds to a remote file) and return a
+    local url to it.
+    """
+    tmppath = None
+
+    try:
+        if is_url_a_local_file(url):
+            tmppath = download_local_file(url, format=format)
+        else:
+            tmppath = download_external_url(url, format=format)
+    except StandardError:
+        raise
+
+    return tmppath
 
 class BibDocMoreInfo:
     """
@@ -3795,3 +3956,48 @@ def readfile(filename):
         return open(filename).read()
     except Exception:
         return ''
+
+class HeadRequest(urllib2.Request):
+    """
+    A request object to perform a HEAD request.
+    """
+    def get_method(self):
+        return 'HEAD'
+
+def open_url(url, headers=None, head_request=False):
+    """
+    Opens a URL. If headers are passed as argument, no check is performed and
+    the URL will be opened. Otherwise checks if the URL is present in
+    CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS and uses the headers specified in
+    the config variable.
+
+    @param url: the URL to open
+    @type url: string
+    @param headers: the headers to use
+    @type headers: dictionary
+    @param head_request: if True, perform a HEAD request, otherwise a POST
+            request
+    @type head_request: boolean
+    @return: a file-like object as returned by urllib2.urlopen.
+    """
+    headers_to_use = None
+
+    if headers is None:
+        for regex, headers in _CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS:
+            if regex.match(url) is not None:
+                headers_to_use = headers
+                break
+
+        if headers_to_use is None:
+            # URL is not allowed.
+            raise InvenioBibdocfileUnauthorizedURL, "%s is not an authorized " \
+                    "external URL." % url
+    else:
+        headers_to_use = headers
+
+    request_obj = head_request and HeadRequest or urllib2.Request
+    request = request_obj(url)
+    for key, value in headers_to_use.items():
+        request.add_header(key, value)
+
+    return urllib2.urlopen(request)

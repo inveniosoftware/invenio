@@ -27,18 +27,28 @@ import datetime
 import bibauthorid_config as bconfig
 import re
 import os
+try:
+    import multiprocessing
+    from multiprocessing import Queue # FIXME: Queue import below override this!
+except ImportError:
+    # FIXME: multiprocessing is not required dependency, so should be
+    # optional
+    pass
+from Queue import Empty
+from Queue import Queue
 
 from invenio.config import CFG_ETCDIR
 from bibauthorid_utils import split_name_parts, create_normalized_name, create_canonical_name
 from bibauthorid_utils import clean_name_string, get_field_values_on_condition
 from bibauthorid_authorname_utils import soft_compare_names, compare_names
 #from bibauthorid_authorname_utils import create_name_tuples
-from bibauthorid_authorname_utils import names_are_equal_composites
-from bibauthorid_authorname_utils import names_are_equal_gender
-from bibauthorid_authorname_utils import names_are_substrings
-from bibauthorid_authorname_utils import names_are_synonymous
-from bibauthorid_authorname_utils import names_minimum_levenshtein_distance
-from bibauthorid_tables_utils import get_bibrefs_from_name_string
+from bibauthorid_authorname_utils import full_names_are_equal_composites
+from bibauthorid_authorname_utils import full_names_are_equal_gender
+from bibauthorid_authorname_utils import full_names_are_substrings
+from bibauthorid_authorname_utils import full_names_are_synonymous
+from bibauthorid_authorname_utils import full_names_minimum_levenshtein_distance
+from bibauthorid_tables_utils import get_bibrefs_from_name_string, update_authornames_tables_from_paper
+from invenio.search_engine import perform_request_search
 
 from threading import Thread
 from operator import itemgetter
@@ -52,7 +62,7 @@ try:
 except ImportError:
     from invenio.data_cacher import DataCacher
     from invenio.dbquery import run_sql, close_connection
-    from invenio.dbquery import deserialize_via_marshal
+    #from invenio.dbquery import deserialize_via_marshal
     from invenio.dbquery import OperationalError, ProgrammingError
     from invenio.access_control_engine import acc_authorize_action
 #    from invenio.webuser import collect_user_info
@@ -96,6 +106,35 @@ class PersonIDStatusDataCacher(DataCacher):
 
         DataCacher.__init__(self, cache_filler, timestamp_verifier)
 
+def get_recids_affected_since(last_timestamp):
+    '''
+    Returns a list of recids which have been manually changed since timestamp
+    @TODO: extend the system to track and signal even automatic updates (unless a full reindex is
+        acceptable in case of magic automatic update)
+    @param: last_timestamp: last update, datetime.datetime
+    '''
+    vset = set()
+    values = run_sql("select value from aidUSERINPUTLOG where timestamp > %s", (last_timestamp,))
+    for v in values:
+        if ',' in v[0] and ':' in v[0]:
+            vset.add(v[0].split(',')[1])
+
+    pids = run_sql("select distinct personid from aidUSERINPUTLOG where  timestamp > %s", (last_timestamp,))
+    pidlist = [p[0] for p in pids if p[0] >= 0]
+    values = []
+    if len(pidlist) > 1:
+        values = run_sql("select data from aidPERSONID where tag='paper' and personid in %s", (pidlist,))
+    elif len(pidlist) == 1:
+        values = run_sql("select data from aidPERSONID where tag='paper' and personid = %s", (pidlist[0],))
+    for v in values:
+        if ',' in v[0] and ':' in v[0]:
+            vset.add(v[0].split(',')[1])
+    # transform output to list of integers, since we are returning recIDs:
+    return [int(recid) for recid in list(vset)]
+
+def get_persons_affected_since(last_timestamp, return_alt_names=False, return_all_person_papers=False):
+    recids = get_recids_affected_since(last_timestamp)
+    return get_persons_from_recids(recids, return_alt_names, return_all_person_papers)
 
 def remove_empty_personids():
     pids = run_sql("select distinct personid from aidPERSONID order by personid")
@@ -264,7 +303,7 @@ def _load_firstname_variations(filename=''):
     return retval
 
 
-def personid_split_person_with_mixed_firstname_new(pids=None, SPLIT_TRSH=1):
+def personid_split_person_with_mixed_firstname_new(pids=None):
     gendernames = _load_gender_firstnames_dict()
     name_variations = _load_firstname_variations()
 
@@ -280,11 +319,10 @@ def personid_split_person_with_mixed_firstname_new(pids=None, SPLIT_TRSH=1):
         else:
             print "The PID list is invalid."
 
-        _perform_split_person_on_pid(pid, gendernames, name_variations, SPLIT_TRSH)
+        _perform_split_person_on_pid(pid, gendernames, name_variations)
 
 
-def _perform_split_person_on_pid(pid, gendernames, name_variations,
-                                 levenshtein_split_threshold):
+def _perform_split_person_on_pid(pid, gendernames, name_variations):
     print_plot_stats = False
     print_debug = True
     print_ignored = False
@@ -371,11 +409,11 @@ def _perform_split_person_on_pid(pid, gendernames, name_variations,
             split = False
             name1 = split_name_parts(ref_name)
             name2 = split_name_parts(comp[0])
-            composits_eq = names_are_equal_composites(name1, name2)
-            gender_eq = names_are_equal_gender(name1, name2, gendernames)
-            ldist = names_minimum_levenshtein_distance(name1, name2)
-            vars_eq = names_are_synonymous(name1, name2, name_variations)
-            substr_eq = names_are_substrings(name1, name2)
+            composits_eq = full_names_are_equal_composites(name1, name2)
+            gender_eq = full_names_are_equal_gender(name1, name2, gendernames)
+            ldist = full_names_minimum_levenshtein_distance(name1, name2)
+            vars_eq = full_names_are_synonymous(name1, name2, name_variations)
+            substr_eq = full_names_are_substrings(name1, name2)
             onames = name1[2]
             tnames = name2[2]
             oname = "".join(onames).lower()
@@ -429,7 +467,7 @@ def _perform_split_person_on_pid(pid, gendernames, name_variations,
 #                    minlen = min(len(oname), len(tname))
 #                    maxlen = max(len(oname), len(tname))
 #                    print("[%s,%s,%s] ... %s and %s on pid %s"
-#                          % (ldist, (ldist/float(minlen)), 
+#                          % (ldist, (ldist/float(minlen)),
 #                             (ldist/float(maxlen)), oname, tname, pid))
 #                    print("for %s and %s on pid %s" % (oname, tname, pid))
 
@@ -858,136 +896,184 @@ def update_personID_table_from_paper(papers_list=None, personid=None):
     '''
     Updates the personID table removing the bibrec / bibrefs couples no longer existing (after a paper has been
     updated (name changed))
-    @param: list of papers to consider for the update (bibrecs) (('1'),)
-    @param: limit to given personid (('1',),)
+    @param papers_list: list of papers to consider for the update (bibrecs) (('1'),)
+    @param type papers_list: tuple/list of tuples/lists of integers/strings which represent integers
+    @param personid: limit to given personid (('1',),)
+    @param type personid: tuple/list of tuples/lists of integers/strings which represent integers
+    @return: None
     '''
 
-    personid_q = ''
-    if personid:
-        personid_q = '( '
-        for p in personid:
-            personid_q += " '" + str(p[0]) + "',"
-        personid_q = personid_q[0:len(personid_q) - 1] + ' )'
-
-    if not papers_list and personid_q:
-        papers_list = []
+    def extract_bibrec(paper):
+        '''
+        Extracts bibrec from a record like 100:312,53. In the given example the function will return 53.
+        '''
         try:
-            bibrefrec_list = run_sql("select data from aidPERSONID use index (`ptf-b`) where tag='paper' and personid in %s" % (personid_q))
-        except (ProgrammingError, OperationalError):
-            bibrefrec_list = run_sql("select data from aidPERSONID where tag='paper' and personid in %s" % (personid_q))
-
-        for b in bibrefrec_list:
-            papers_list.append(b)
-
-    elif not papers_list:
-        papers_list = []
-        try:
-            bibrefrec_list = run_sql("select data from aidPERSONID use index (`tdf-b`) where tag='paper'")
-        except (ProgrammingError, OperationalError):
-            bibrefrec_list = run_sql("select data from aidPERSONID where tag='paper'")
-
-        for b in bibrefrec_list:
-            papers_list.append(b)
-
-    if bconfig.TABLES_UTILS_DEBUG:
-        print "update_personID_table_from_paper: bibrefrec selected:  " + str(len(papers_list))
-
-    bibreclist = []
-    for p in papers_list:
-        try:
-            br = [p[0].split(',')[1]]
-            if br not in bibreclist:
-                bibreclist.append(br)
-            if bconfig.TABLES_UTILS_DEBUG:
-                print 'update_personID_table_from_paper: Selected ' + str(p[0].split(',')[1]) + ' from ' + str(p)
+            return paper.split(',')[1]
         except IndexError:
-            br = [p[0]]
-            if br not in bibreclist:
-                bibreclist.append(br)
+            return paper
+
+
+    def list_2_SQL_str(items, f):
+        """
+        Concatenates all items in items to a sql string using f.
+        @param items: a set of items
+        @param type items: X
+        @param f: a function which transforms each item from items to string
+        @param type f: X:->str
+        @return: "(x1, x2, x3, ... xn)" for xi in items
+        @return type: string
+        """
+        strs = tuple("%s, " % (f(x)) for x in items)
+        concat = "".join(strs)
+        return "(%s)" % concat[0:len(concat) - 2]
+
+    def collect_person_id_data(select, index, where, person, limit=""):
+        """
+        Runs a sql query whit the arguments above.
+        If the index is not found the function ignores it.
+        """
+
+        if person:
+            try:
+                query = "%s %s %s and personid in %s %s" % (select, index, where, person, limit)
+                return run_sql(query)
+            except (ProgrammingError, OperationalError):
+                query = "%s %s and personid in %s %s" % (select, where, person, limit)
+                return run_sql(query)
+        else:
+            try:
+                query = "%s %s %s %s" % (select, index, where, limit)
+                return run_sql(query)
+            except (ProgrammingError, OperationalError):
+                query = "%s %s %s" % (select, where, limit)
+                return run_sql(query)
+
+
+    class Worker(Thread):
+        def __init__(self, q):
+            Thread.__init__(self)
+            self.q = q
+
+        def run(self):
+            while self.q.empty() == False:
+                self.paper = self.q.get()
+                self.check_paper()
+#                There is no Queue.task_done() in python 2.4
+#                self.q.task_done()
+
+        def check_paper(self):
             if bconfig.TABLES_UTILS_DEBUG:
-                print 'update_personID_table_from_paper: Selected ' + str(p[0]) + ' from ' + str(p)
+                print " -> processing paper = %s" % (self.paper[0],)
 
-#    full_papers_list = papers_list
-    papers_list = bibreclist
-    if bconfig.TABLES_UTILS_DEBUG:
-        print "update_personID_table_from_paper: After duplicate removing remaining bibrecs:  " + str(len(papers_list))
-
-    for paper in papers_list:
-        fullbibrefs100 = run_sql("select id_bibxxx from bibrec_bib10x where id_bibrec=%s", (paper[0],))
-        fullbibrefs700 = run_sql("select id_bibxxx from bibrec_bib70x where id_bibrec=%s", (paper[0],))
-
-        fullbibrefs100str = '( '
-        for i in fullbibrefs100:
-            fullbibrefs100str += " '" + str(i[0]) + "',"
-        fullbibrefs100str = fullbibrefs100str[0:len(fullbibrefs100str) - 1] + ' )'
-
-        fullbibrefs700str = '( '
-        for i in fullbibrefs700:
-            fullbibrefs700str += " '" + str(i[0]) + "',"
-        fullbibrefs700str = fullbibrefs700str[0:len(fullbibrefs700str) - 1] + ' )'
-        #NOTE: values are taken only from bibrec_bibXXX tables which are considered safe.
-        if len(fullbibrefs100) >= 1:
-            sqlquery = "select id from bib10x where tag='100__a' and id in %s" % fullbibrefs100str
-            bibrefs100 = run_sql(sqlquery)
-        else:
-            bibrefs100 = []
-        if len(fullbibrefs700) >= 1:
-            sqlquery = "select id from bib70x where tag='700__a' and id in %s" % fullbibrefs700str
-            bibrefs700 = run_sql(sqlquery)
-        else:
-            bibrefs700 = []
-
-        bibrecreflist = []
-        for i in bibrefs100:
-            bibrecreflist.append('100:' + str(i[0]) + ',' + str(paper[0]))
-        for i in bibrefs700:
-            bibrecreflist.append('700:' + str(i[0]) + ',' + str(paper[0]))
-
-        if bconfig.TABLES_UTILS_DEBUG:
-            print "update_personID_table_from_paper: searching for pids owning " + str(paper[0])
-
-        pid_rows = []
-
-        if personid_q:
-            try:
-                query = "select id,personid,tag,data,flag,lcul from aidPERSONID use index (`tdf-b`,`ptf-b`) where tag='paper'  and personid in %s" % personid_q + " and data like %s"
-                pid_rows = run_sql(query, ('%,' + str(paper[0]),))
-            except (ProgrammingError, OperationalError):
-                query = "select id,personid,tag,data,flag,lcul from aidPERSONID where tag='paper'  and personid in %s" % personid_q + " and data like %s"
-                pid_rows = run_sql(query, ('%,' + str(paper[0]),))
-        else:
-            try:
-                pid_rows = run_sql("select id,personid,tag,data,flag,lcul from aidPERSONID use index (`tdf-b`,`ptf-b`) where tag='paper' and data like %s", ('%,' + str(paper[0]),))
-            except (ProgrammingError, OperationalError):
-                pid_rows = run_sql("select id,personid,tag,data,flag,lcul from aidPERSONID where tag='paper' and data like %s", ('%,' + str(paper[0]),))
-
-        #finally, if a bibrec/ref pair is in the authornames table but not in this list that name of that paper
-        #is no longer existing and must be removed from the table. The new one will be addedd by the
-        #update procedure in future; this entry will be risky becouse the garbage collector may
-        #decide to kill the bibref in the bibX0x table
-        for row in pid_rows:
-            if row[3] not in bibrecreflist:
-                other_bibrefs = [b[3] for b in pid_rows if b[1] == row[1] and b[3] != row[3]]
-                if len(other_bibrefs) == 1:
-                    if bconfig.TABLES_UTILS_DEBUG:
-                        print "update_personID_table_from_paper: deleting " + str(row) + ' and  updating ' + str(other_bibrefs[0])
-                    #we have one and only one sobstitute, we can switch them!
-                    run_sql("delete from aidPERSONID where id = %s", (str(row[0]),))
-                    run_sql("update aidPERSONID set flag=%s,lcul=%s where id=%s", (str(row[4]), str(row[5]), str(other_bibrefs[0][0])))
-                else:
-                    if bconfig.TABLES_UTILS_DEBUG:
-                        print "update_personID_table_from_paper: deleting " + str(row)
-                    run_sql("delete from aidPERSONID where id = %s", (str(row[0]),))
+            fullbibrefs100 = run_sql("select id_bibxxx from bibrec_bib10x where id_bibrec=%s", (self.paper[0],))
+            if len(fullbibrefs100) > 0:
+                fullbibrefs100str = list_2_SQL_str(fullbibrefs100, lambda x: str(x[0]))
+                bibrefs100 = run_sql("select id from bib10x where tag='100__a' and id in %s" % (fullbibrefs100str,))
             else:
-                if bconfig.TABLES_UTILS_DEBUG:
-                    print "update_personID_table_from_paper: not touching " + str(row)
-        persons_to_update = []
-        for p in pid_rows:
-            if p[1] not in persons_to_update:
-                persons_to_update.append([p[1]])
+                bibrefs100 = ()
+
+            fullbibrefs700 = run_sql("select id_bibxxx from bibrec_bib70x where id_bibrec=%s", (self.paper[0],))
+            if len(fullbibrefs700) > 0:
+                fullbibrefs700str = list_2_SQL_str(fullbibrefs700, lambda x: str(x[0]))
+                bibrefs700 = run_sql("select id from bib70x where tag='700__a' and id in %s" % (fullbibrefs700str,))
+            else:
+                bibrefs700 = ()
+
+            bibrecreflist = frozenset(["100:%s,%s" % (str(i[0]), self.paper[0]) for i in bibrefs100] + ["700:%s,%s" % (str(i[0]), self.paper[0]) for i in bibrefs700])
+            pid_rows_lazy = None
+
+            #finally, if a bibrec/ref pair is in the authornames table but not in this list that name of that paper
+            #is no longer existing and must be removed from the table. The new one will be addedd by the
+            #update procedure in future; this entry will be risky becouse the garbage collector may
+            #decide to kill the bibref in the bibX0x table
+            for row in self.paper[1]:
+                if row[3] not in bibrecreflist:
+                    if not pid_rows_lazy:
+                        pid_rows_lazy = collect_person_id_data(select="select id, personid, tag, data, flag, lcul from aidPERSONID",
+                                                               index="use index (`tdf-b`,`ptf-b`)",
+                                                               where="where tag='paper' and data like '%%,%s'" % (self.paper[0],),
+                                                               person=personid_q)
+
+                    other_bibrefs = [b[0] for b in pid_rows_lazy if b[1] == row[1] and b[3] != row[3]]
+                    run_sql("delete from aidPERSONID where id = %s", (row[0],))
+                    if bconfig.TABLES_UTILS_DEBUG:
+                        print "*   deleting record with missing bibref: id = %s, personid = %s, tag = %s, data = %s, flag = %s, lcul = %s" % row
+                        print "found %d other records with the same personid and bibrec" % len(other_bibrefs)
+                    if len(other_bibrefs) == 1:
+                        #we have one and only one sobstitute, we can switch them!
+                        run_sql("update aidPERSONID set flag=%s,lcul=%s where id=%s", (str(row[4]), str(row[5]), str(other_bibrefs[0])))
+                        if bconfig.TABLES_UTILS_DEBUG:
+                            print "updating id=%d with flag=%d,lcul=%d" % (other_bibrefs[0], row[4], row[5])
+
+            persons_to_update = set([(p[1],) for p in self.paper[1]])
+            update_personID_canonical_names(persons_to_update)
+
+    if papers_list:
+        papers_list = frozenset([int(x[0]) for x in papers_list])
+
+    deleted_recs = run_sql("select o.id_bibrec from bibrec_bib98x o, \
+                            (select i.id as iid from bib98x i \
+                            where value = 'DELETED' \
+                            and tag like '980__a') as dummy \
+                            where o.id_bibxxx = dummy.iid")
+    deleted_recs = frozenset(x[0] for x in deleted_recs)
+    if bconfig.TABLES_UTILS_DEBUG:
+        print "%d total deleted papers" % (len(deleted_recs),)
+
+    if personid:
+        personid_q = list_2_SQL_str(personid, lambda x: str(x[0]))
+    else:
+        personid_q = None
+
+    counter = 0
+    rows_limit = 10000000
+    end_loop = False
+    while not end_loop:
+        papers_data = collect_person_id_data(select="select id, personid, tag, data, flag, lcul from aidPERSONID",
+                                             index="use index (`ptf-b`)",
+                                             where="where tag='paper'",
+                                             person=personid_q,
+                                             limit="limit %d, %d" % (counter, rows_limit,))
+
         if bconfig.TABLES_UTILS_DEBUG:
-            print "update_personID_table_from_paper: updating canonical names of" + str(persons_to_update)
-        update_personID_canonical_names(persons_to_update)
+            print "query with limit %d %d" % (counter, rows_limit)
+
+        if len(papers_data) == rows_limit:
+            counter += rows_limit
+        else:
+            end_loop = True
+
+        papers_data = tuple((extract_bibrec(p[3]), p) for p in papers_data)
+        to_remove = set()
+        jobs = dict()
+        for p in papers_data:
+            if int(p[0]) in deleted_recs:
+                to_remove.add(p[1][0])
+            elif not papers_list or int(p[0]) in papers_list:
+                jobs[p[0]] = jobs.get(p[0], []) + [p[1]]
+        del(papers_data)
+
+        if len(to_remove) > 0:
+            delstr = list_2_SQL_str(to_remove, lambda x: str(x))
+            delta = run_sql("delete from aidPERSONID where tag='paper' and id in %s" % (delstr,))
+            counter -= delta
+            if bconfig.TABLES_UTILS_DEBUG:
+                print "*   deleting %d papers, from %d, marked as deleted: %s" % (delta, len(to_remove), delstr)
+
+        jobslist = Queue()
+        for p in jobs.items():
+            jobslist.put(p)
+        del(jobs)
+
+        workers = []
+        for i in range(bconfig.CFG_BIBAUTHORID_MAX_PROCESSES):
+            w = Worker(jobslist)
+            w.daemon = True
+            w.start()
+            workers.append(w)
+
+        for w in workers:
+            w.join()
 
 
 def personid_perform_cleanup():
@@ -2558,7 +2644,7 @@ def person_bibref_is_touched(pid, bibref):
 
     if not flag:
         return False
-    elif - 2 < flag < 2:
+    elif -2 < flag < 2:
         return False
     else:
         return True
@@ -2596,10 +2682,7 @@ def get_bibref_modification_status(bibref):
     except (IndexError):
         return [False, 0]
 
-    if flag == 2 or flag == -2:
-        return [True, lcul]
-    else:
-        return [False, lcul]
+    return [flag, lcul]
 
 
 def assign_person_to_uid(uid, pid):
@@ -2669,7 +2752,7 @@ def assign_uid_to_person(uid, pid, create_new_pid=False, force=False):
         set_person_data(pid, 'uid', str(uid))
         return pid
     elif force and pid < 0:
-        return - 1
+        return -1
 
     current = get_personid_from_uid(((uid,),))
 
@@ -2685,7 +2768,7 @@ def assign_uid_to_person(uid, pid, create_new_pid=False, force=False):
                     if create_new_pid:
                         create_new_person_from_uid(uid)
                     else:
-                        return - 1
+                        return -1
             else:
                 set_person_data(pid, 'uid', str(uid))
                 return pid
@@ -2693,7 +2776,7 @@ def assign_uid_to_person(uid, pid, create_new_pid=False, force=False):
             if create_new_pid:
                 create_new_person_from_uid(uid)
             else:
-                return - 1
+                return -1
 
 
 def get_personid_from_uid(uid):
@@ -2710,12 +2793,25 @@ def get_personid_from_uid(uid):
     @param uid: userID
     @type uid: ((int,),)
     '''
-    pid = run_sql("select id,personid,tag,data,flag,lcul from aidPERSONID where tag=%s and data=%s", ('uid', str(uid[0][0])))
+    pid = run_sql("select personid from aidPERSONID where tag=%s and data=%s", ('uid', str(uid[0][0])))
     if len(pid) == 1:
-        return ([pid[0][1]], True)
+        return (pid[0], True)
     else:
         return  ([-1], False)
 
+
+def get_personid_from_paper(bibrecref):
+    '''
+    Returns the personID associated with the provided bibrec/bibref pair
+    @param bibrecref: x00:xxxx,xxxx
+    @type uid: str
+    @return: pid
+    '''
+    pid = run_sql("select id,personid,tag,data,flag,lcul from aidPERSONID where tag=%s and data=%s", ('paper', bibrecref))
+    if len(pid) == 1:
+        return pid[0][1]
+    else:
+        return -1
 
 def get_possible_bibrecref(names, bibrec, always_match=False):
     '''
@@ -2956,3 +3052,122 @@ def get_personid_status_cacher():
         DATA_CACHERS.append(PersonIDStatusDataCacher())
 
     return DATA_CACHERS[0]
+
+
+
+def _pfap_printmsg(identity, msg):
+    if bconfig.TABLES_UTILS_DEBUG:
+        print (time.strftime('%H:%M:%S')
+           + ' personid_fast_assign_papers '
+           + str(identity) + ': '
+           + msg)
+
+def _pfap_assign_bibrefrec(i, tab, bibref, bibrec, namestring):
+    name_parts = split_name_parts(namestring)
+    pid_names_rows = run_sql("select personid,data from aidPERSONID where tag='gathered_name' and data like %s ", (name_parts[0] + ',%',))
+    pid_names_dict = {}
+    for pid in pid_names_rows:
+        pid_names_dict[pid[1]] = pid[0]
+    del pid_names_rows
+
+    names_comparison_list = []
+    for name in pid_names_dict.keys():
+        names_comparison_list.append([name, compare_names(name, namestring)])
+    names_comparison_list = sorted(names_comparison_list, key=lambda x: x[1], reverse=True)
+
+    _pfap_printmsg('BibrefAss:  ' + str(i), ' Top name comparison list against %s: %s' % (namestring, str(names_comparison_list[0:3])))
+
+    if len(names_comparison_list) > 0 and names_comparison_list[0][1] > 0:
+        _pfap_printmsg('BibrefAss:  ' + str(i), ' Assigning to the best fit: %s' % str(pid_names_dict[names_comparison_list[0][0]]))
+        run_sql("insert into aidPERSONID (personid,tag,data,flag,lcul) values (%s,'paper',%s,'0','0')",
+                (str(pid_names_dict[names_comparison_list[0][0]]), tab + ':' + str(bibref) + ',' + str(bibrec)))
+        update_personID_names_string_set([[pid_names_dict[names_comparison_list[0][0]]]])
+        update_personID_canonical_names([[pid_names_dict[names_comparison_list[0][0]]]])
+    else:
+        _pfap_printmsg('BibrefAss:  ' + str(i), 'Creating a new person...')
+        personid = run_sql("select max(personid)+1 from aidPERSONID")[0][0]
+        run_sql("insert into aidPERSONID (personid,tag,data,flag,lcul) values (%s,'paper',%s,'0','0')",
+                (personid, tab + ':' + str(bibref) + ',' + str(bibrec)))
+        update_personID_names_string_set([[personid]])
+        update_personID_canonical_names([[personid]])
+
+def _pfap_assign_paper(i, p_q, atul):
+    '''
+    bibrec = 123
+    '''
+    while True:
+
+        try:
+            bibrec = p_q.get_nowait()
+        except Empty:
+            return
+
+        _pfap_printmsg('Assigner:  ' + str(i), 'Starting on paper: %s' % bibrec)
+        b100 = run_sql("select b.id,b.value from bib10x as b, bibrec_bib10x as a where b.id=a.id_bibxxx and b.tag=%s and a.id_bibrec=%s", ('100__a', bibrec))
+        b700 = run_sql("select b.id,b.value from bib70x as b, bibrec_bib70x as a where b.id=a.id_bibxxx and b.tag=%s and a.id_bibrec=%s", ('700__a', bibrec))
+
+        _pfap_printmsg('Assigner:  ' + str(i), 'Found: %s 100: and %s 700:' % (len(b100), len(b700)))
+
+        for bibref in b100:
+            present = run_sql("select count(data)>0  from aidPERSONID where tag='paper' and data =%s", ('100:' + str(bibref[0]) + ',' + str(bibrec),))[0][0]
+            if not present:
+                _pfap_printmsg('Assigner:  ' + str(i), 'Found: 100:%s,%s not assigned, assigning...' % (str(bibref[0]), str(bibrec)))
+                _pfap_assign_bibrefrec(i, '100', bibref[0], bibrec, bibref[1])
+        for bibref in b700:
+            present = run_sql("select count(data)>0  from aidPERSONID where tag='paper' and data =%s", ('700:' + str(bibref[0]) + ',' + str(bibrec),))[0][0]
+            if not present:
+                _pfap_printmsg('Assigner:  ' + str(i), 'Found: 700:%s,%s not assigned, assigning...' % (str(bibref[0]), str(bibrec)))
+                _pfap_assign_bibrefrec(i, '700', bibref[0], bibrec, bibref[1])
+
+        atul.acquire()
+        update_authornames_tables_from_paper([[bibrec]])
+        atul.release()
+        _pfap_printmsg('Assigner:  ' + str(i), 'Done with: %s' % bibrec)
+
+def personid_fast_assign_papers(paperslist=None):
+    '''
+    Assign papers to the most compatible person.
+    Compares only the name to find the right person to assign to. If nobody seems compatible,
+    create a new person.
+    '''
+
+
+    _pfap_printmsg('starter', 'Started')
+    if not paperslist:
+        #paperslist = run_sql('select id from bibrec where 1')
+        paperslist = [[x] for x in perform_request_search(p="")]
+
+    paperslist = [k[0] for k in paperslist]
+
+    _pfap_printmsg('starter', 'Starting on %s papers ' % len(paperslist))
+
+    authornames_table_update_lock = multiprocessing.Lock()
+    papers_q = multiprocessing.Queue()
+
+    for p in paperslist:
+        papers_q.put(p)
+
+    process_list = []
+    for c in range(4 * bconfig.BIBAUTHORID_MAX_PROCESSES):
+        p = multiprocessing.Process(target=_pfap_assign_paper, args=(c, papers_q, authornames_table_update_lock))
+        process_list.append(p)
+        p.start()
+
+    for p in process_list:
+        p.join()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

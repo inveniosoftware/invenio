@@ -51,7 +51,8 @@ from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, get_email, page_not_authorized, collect_user_info
 from invenio.messages import gettext_set_language, wash_language
 #from invenio.websubmit_config import *
-from invenio.search_engine import search_pattern, get_fieldvalues,check_user_can_view_record
+from invenio.search_engine import search_pattern, check_user_can_view_record
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.websubmit_functions.Retrieve_Data import Get_Field
 from invenio.mailutils import send_email
 from invenio.urlutils import wash_url_argument
@@ -1125,7 +1126,7 @@ def __doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern,
 
         validation = """
     <select name="validate">
-      <option> %(select)s</option>
+      <option value="%(select)s"> %(select)s</option>
       <option value="approve">%(approve)s</option>
       <option value="reject">%(reject)s</option>
     </select>

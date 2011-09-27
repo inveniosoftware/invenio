@@ -203,6 +203,30 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
         oai_src_sets = oai_src[0][7].split()
         oai_src_bibfilter = oai_src[0][8]
 
+    if confirm in [1, "1"] and not oai_src_name:
+        output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a name for the source.")
+    elif confirm in [1, "1"] and not oai_src_prefix:
+        output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a metadata prefix.")
+    elif confirm in [1, "1"] and not oai_src_baseurl:
+        output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a base url.")
+    elif confirm in [1, "1"] and not oai_src_frequency:
+        output += bibharvest_templates.tmpl_print_warning(ln, "Please choose a frequency of harvesting")
+    elif confirm in [1, "1"] and "c" in oai_src_post and (not oai_src_config or validatefile(oai_src_config) != 0):
+        output += bibharvest_templates.tmpl_print_warning(ln, "You selected a postprocess mode which involves conversion.")
+        output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a valid name of or a full path to a BibConvert config file or change postprocess mode.")
+    elif confirm in [1, "1"] and "f" in oai_src_post and (not oai_src_bibfilter or validatefile(oai_src_bibfilter) != 0):
+        output += bibharvest_templates.tmpl_print_warning(ln, "You selected a postprocess mode which involves filtering.")
+        output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a valid name of or a full path to a BibFilter script or change postprocess mode.")
+    elif oai_src_id > -1 and confirm in [1, "1"]:
+        if not oai_src_frequency:
+            oai_src_frequency = 0
+        if not oai_src_config:
+            oai_src_config = "NULL"
+        if not oai_src_post:
+            oai_src_post = []
+        res = modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_config, oai_src_post, oai_src_sets, oai_src_bibfilter)
+        output += write_outcome(res)
+
     text = bibharvest_templates.tmpl_print_brs(ln, 1)
     text += bibharvest_templates.tmpl_admin_w200_text(ln=ln, title="Source name", name="oai_src_name", value=oai_src_name)
     text += bibharvest_templates.tmpl_admin_w200_text(ln=ln, title="Base URL", name="oai_src_baseurl", value=oai_src_baseurl)
@@ -259,31 +283,6 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
                                 ln=ln,
                                 confirm=1)
 
-    if confirm in [1, "1"] and not oai_src_name:
-        output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a name for the source.")
-    elif confirm in [1, "1"] and not oai_src_prefix:
-        output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a metadata prefix.")
-    elif confirm in [1, "1"] and not oai_src_baseurl:
-        output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a base url.")
-    elif confirm in [1, "1"] and not oai_src_frequency:
-        output += bibharvest_templates.tmpl_print_warning(ln, "Please choose a frequency of harvesting")
-    elif confirm in [1, "1"] and "c" in oai_src_post and (not oai_src_config or validatefile(oai_src_config) != 0):
-        output += bibharvest_templates.tmpl_print_warning(ln, "You selected a postprocess mode which involves conversion.")
-        output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a valid name of or a full path to a BibConvert config file or change postprocess mode.")
-    elif confirm in [1, "1"] and "f" in oai_src_post and (not oai_src_bibfilter or validatefile(oai_src_bibfilter) != 0):
-        output += bibharvest_templates.tmpl_print_warning(ln, "You selected a postprocess mode which involves filtering.")
-        output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a valid name of or a full path to a BibFilter script or change postprocess mode.")
-    elif oai_src_id > -1 and confirm in [1, "1"]:
-        if not oai_src_frequency:
-            oai_src_frequency = 0
-        if not oai_src_config:
-            oai_src_config = "NULL"
-        if not oai_src_post:
-            oai_src_post = []
-        res = modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_config, oai_src_post, oai_src_sets, oai_src_bibfilter)
-        output += write_outcome(res)
-
-
     output += bibharvest_templates.tmpl_print_brs(ln, 2)
     output += create_html_link(urlbase=oai_harvest_admin_url + \
                                "/index",
@@ -328,6 +327,39 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
 
     if (confirm not in ["-1", -1] and validate(oai_src_baseurl)[0] == 0) or \
            confirm in ["1", 1]:
+
+        if confirm in [1, "1"] and not oai_src_name:
+            output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a name for the source.")
+        elif confirm in [1, "1"] and not oai_src_prefix:
+            output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a metadata prefix.")
+        elif confirm in [1, "1"] and not oai_src_frequency:
+            output += bibharvest_templates.tmpl_print_warning(ln, "Please choose a frequency of harvesting")
+        elif confirm in [1, "1"] and not oai_src_lastrun:
+            output += bibharvest_templates.tmpl_print_warning(ln, "Please choose the harvesting starting date")
+        elif confirm in [1, "1"] and "c" in oai_src_post and (not oai_src_config or validatefile(oai_src_config) != 0):
+            output += bibharvest_templates.tmpl_print_warning(ln, "You selected a postprocess mode which involves conversion.")
+            output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a valid name of or a full path to a BibConvert config file or change postprocess mode.")
+        elif confirm in [1, "1"] and "f" in oai_src_post and (not oai_src_bibfilter or validatefile(oai_src_bibfilter) != 0):
+            output += bibharvest_templates.tmpl_print_warning(ln, "You selected a postprocess mode which involves filtering.")
+            output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a valid name of or a full path to a BibFilter script or change postprocess mode.")
+        elif oai_src_name and confirm in [1, "1"]:
+            if not oai_src_frequency:
+                oai_src_frequency = 0
+            if not oai_src_lastrun:
+                oai_src_lastrun = 1
+            if not oai_src_config:
+                oai_src_config = "NULL"
+            if not oai_src_post:
+                oai_src_post = []
+
+            res = add_oai_src(oai_src_name, oai_src_baseurl,
+                              oai_src_prefix, oai_src_frequency,
+                              oai_src_lastrun, oai_src_config,
+                              oai_src_post, oai_src_sets,
+                              oai_src_bibfilter)
+            output += write_outcome(res)
+
+
         output += bibharvest_templates.tmpl_output_validate_info(ln, 0, str(oai_src_baseurl))
         output += bibharvest_templates.tmpl_print_brs(ln, 2)
         text = bibharvest_templates.tmpl_admin_w200_text(ln=ln,
@@ -459,43 +491,13 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
                                    urlargd={'ln': ln},
                                    link_label=_("Go back to the OAI sources overview"))
 
-    if confirm in [1, "1"] and not oai_src_name:
-        output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a name for the source.")
-    elif confirm in [1, "1"] and not oai_src_prefix:
-        output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a metadata prefix.")
-    elif confirm in [1, "1"] and not oai_src_frequency:
-        output += bibharvest_templates.tmpl_print_warning(ln, "Please choose a frequency of harvesting")
-    elif confirm in [1, "1"] and not oai_src_lastrun:
-        output += bibharvest_templates.tmpl_print_warning(ln, "Please choose the harvesting starting date")
-    elif confirm in [1, "1"] and "c" in oai_src_post and (not oai_src_config or validatefile(oai_src_config) != 0):
-        output += bibharvest_templates.tmpl_print_warning(ln, "You selected a postprocess mode which involves conversion.")
-        output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a valid name of or a full path to a BibConvert config file or change postprocess mode.")
-    elif confirm in [1, "1"] and "f" in oai_src_post and (not oai_src_bibfilter or validatefile(oai_src_bibfilter) != 0):
-        output += bibharvest_templates.tmpl_print_warning(ln, "You selected a postprocess mode which involves filtering.")
-        output += bibharvest_templates.tmpl_print_warning(ln, "Please enter a valid name of or a full path to a BibFilter script or change postprocess mode.")
-    elif oai_src_name and confirm in [1, "1"]:
-        if not oai_src_frequency:
-            oai_src_frequency = 0
-        if not oai_src_lastrun:
-            oai_src_lastrun = 1
-        if not oai_src_config:
-            oai_src_config = "NULL"
-        if not oai_src_post:
-            oai_src_post = []
 
-        res = add_oai_src(oai_src_name, oai_src_baseurl,
-                          oai_src_prefix, oai_src_frequency,
-                          oai_src_lastrun, oai_src_config,
-                          oai_src_post, oai_src_sets,
-                          oai_src_bibfilter)
-        output += write_outcome(res)
-
-        lnargs = [["ln", ln]]
-        output += bibharvest_templates.tmpl_print_brs(ln, 2)
-        output += create_html_link(urlbase=oai_harvest_admin_url + \
-                                   "/index",
-                                   urlargd={'ln': ln},
-                                   link_label=_("Go back to the OAI sources overview"))
+    lnargs = [["ln", ln]]
+    output += bibharvest_templates.tmpl_print_brs(ln, 2)
+    output += create_html_link(urlbase=oai_harvest_admin_url + \
+                               "/index",
+                               urlargd={'ln': ln},
+                               link_label=_("Go back to the OAI sources overview"))
 
     body = [output]
 

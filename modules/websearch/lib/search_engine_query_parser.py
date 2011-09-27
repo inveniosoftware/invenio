@@ -529,6 +529,8 @@ class SpiresToInvenioSyntaxConverter:
         'ps' : '650__a:',
         'scl' : '650__a:',
         'status' : '650__a:',
+        # recid
+        'recid' : 'recid:',
         # report number
         'r' : 'reportnumber:',
         'rn' : 'reportnumber:',
@@ -555,11 +557,6 @@ class SpiresToInvenioSyntaxConverter:
 
         # captions
         'caption' : 'caption:',
-
-        # replace all the keywords without match with empty string
-        # this will remove the noise from the unknown keywrds in the search
-        # and will in all fields for the words following the keywords
-
         # category
         'arx' : '037__c:',
         'category' : '037__c:',
@@ -569,20 +566,26 @@ class SpiresToInvenioSyntaxConverter:
         # texkey
         'texkey' : '035__z:',
         # type code
-        'tc' : '690C_a:',
-        'ty' : '690C_a:',
-        'type' : '690C_a:',
-        'type-code' : '690C_a',
+        'tc' : 'collection:',
+        'ty' : 'collection:',
+        'type' : 'collection:',
+        'type-code' : 'collection:',
         # field code
-        'f' : '65017a:',
-        'fc' : '65017a:',
-        'field' : '65017a:',
-        'field-code' : '65017a:',
+        'f' : 'subject:',
+        'fc' : 'subject:',
+        'field' : 'subject:',
+        'field-code' : 'subject:',
+        'subject' : 'subject:',
         # coden
-        'bc' : '',
-        'browse-only-indx' : '',
-        'coden' : '',
-        'journal-coden' : '',
+        'bc' : 'journal:',
+        'browse-only-indx' : 'journal:',
+        'coden' : 'journal:',
+        'journal-coden' : 'journal:',
+
+        # replace all the keywords without match with empty string
+        # this will remove the noise from the unknown keywrds in the search
+        # and will in all fields for the words following the keywords
+
         # energy
         'e' : '',
         'energy' : '',
@@ -620,8 +623,8 @@ class SpiresToInvenioSyntaxConverter:
         '773__c:', # journal-page
         '773__w:', # cnum
         '044__a:', # country code
-        '65017a:', # field code
-        '690C_a:', # type code
+        'subject:', # field code
+        'collection:', # type code
         '035__z:', # texkey
         # also exact expno, corp-auth, url, abstract, doi, mycite, citing
         # but we have no invenio equivalents for these ATM
@@ -664,7 +667,7 @@ class SpiresToInvenioSyntaxConverter:
             \b((?P<secondorderop>[^\s]+:)?)     # do we have a second-order-op on top?
             ((?P<first>first)?)author:(?P<name>
                         [^\'\"]     # first character not a quotemark
-                        [^()]+?     # some stuff that isn't parentheses (that is dealt with in pp)
+                        [^()]*?     # some stuff that isn't parentheses (that is dealt with in pp)
                         [^\'\"])    # last character not a quotemark
             (?=\ and\ not\ |\ and\ |\ or\ |\ not\ |$)''')
 
@@ -1022,12 +1025,15 @@ class SpiresToInvenioSyntaxConverter:
         author_name = ''
         author_middle_name = ''
         author_surname = ''
+        full_search = ''
         if len(fuzzy_name['nonlastnames']) > 0:
             author_name = fuzzy_name['nonlastnames'][0]
         if len(fuzzy_name['nonlastnames']) == 2:
             author_middle_name = fuzzy_name['nonlastnames'][1]
         if len(fuzzy_name['nonlastnames']) > 2:
             author_middle_name = ' '.join(fuzzy_name['nonlastnames'][1:])
+        if fuzzy_name['raw']:
+            full_search = fuzzy_name['raw']
         author_surname = ' '.join(fuzzy_name['lastnames'])
 
         NAME_IS_INITIAL = (len(author_name) == 1)
@@ -1065,6 +1071,8 @@ class SpiresToInvenioSyntaxConverter:
         if NAME_IS_NOT_INITIAL:
             for i in range(1,len(author_name)):
                 search_pattern += ' or ' + self._EA_TAG + "\"%s, %s\"" % (author_surname, author_name[0:i])
+
+        search_pattern += ' or %s"%s, *"' % (self._A_TAG, full_search)
 
         return search_pattern
 

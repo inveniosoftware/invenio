@@ -12,7 +12,7 @@
 ## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -31,7 +31,7 @@
    up so that they can be linked to the full articles on the Web by
    means of hyper-links.
 
-   "bibrefextract" has 4 phases of processing (passes):
+   "refextract" has 4 phases of processing (passes):
     1. Convert PDF file to plaintext (UTF-8).
     2. Extract References from plaintext.
     3. Recognise and standardise citations in the extracted
@@ -41,15 +41,13 @@
     4. Markup standardised citations in MARC XML and output
        them.
 
-   Options:
-      --help, -h                Display help/usage message and exit.
-      --version, -V             Print version number and exit.
-      --output-raw-refs, -r     output raw references, as extracted
-                                from the document.
+    Can be called in either a daemin mode by specifying a collection,
+    record id, or extraction job file as input and also in a
+    standalone mode by providing a physical fulltext file using
+    [-f, --fulltext].
 """
-
 try:
-    from invenio.refextract import main
+    from invenio.refextract_cli import main
 except ImportError, err:
     import sys
     sys.stderr.write("Error: %s" % err)

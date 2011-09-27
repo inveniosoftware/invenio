@@ -47,7 +47,13 @@ import invenio.template
 bibformat_templates = invenio.template.load('bibformat')
 
 def getnavtrail(previous = '', ln=CFG_SITE_LANG):
-    """Get the navtrail"""
+    """
+    Get the navtrail
+
+    @param previous: suffix of the navtrail
+    @param ln: language
+    @return: HTML markup of the navigation trail
+    """
     previous = wash_url_argument(previous, 'str')
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -135,9 +141,10 @@ def perform_request_format_template_show(bft, ln=CFG_SITE_LANG, code=None,
 
     @param ln: language
     @param bft: the template to edit
-    @param code, the code being edited
+    @param code: the code being edited
     @param ln_for_preview: the language for the preview (for bfo)
     @param pattern_for_preview: the search pattern to be used for the preview (for bfo)
+    @param content_type_for_preview: content-type to use to serve preview
     @return: the main page for formats management
     """
     format_template = bibformat_engine.get_format_template(filename=bft, with_attributes=True)
@@ -178,6 +185,7 @@ def perform_request_format_template_show_dependencies(bft, ln=CFG_SITE_LANG):
 
     @param ln: language
     @param bft: the filename of the template to show
+    @return: HTML markup
     """
     format_template = bibformat_engine.get_format_template(filename=bft, with_attributes=True)
     name = format_template['attrs']['name']
@@ -313,6 +321,7 @@ def perform_request_format_element_show_dependencies(bfe, ln=CFG_SITE_LANG):
 
     @param ln: language
     @param bfe: the filename of the format element to show
+    @return: HTML markup of elements dependencies page
     """
     format_templates = get_templates_that_use_element(bfe)
     tags = get_tags_used_by_element(bfe)
@@ -332,8 +341,9 @@ def perform_request_format_element_test(bfe, ln=CFG_SITE_LANG, param_values=None
 
     @param ln: language
     @param bfe: the name of the format element to show
-    @param params: the list of parameters to pass to element format function
+    @param param_values: the list of parameters to pass to element format function
     @param user_info: the user_info of this request
+    @return: HTML markup of elements test page
     """
     _ = gettext_set_language(ln)
     format_element = bibformat_engine.get_format_element(bfe, with_built_in_params=True)
@@ -522,6 +532,8 @@ def perform_request_output_format_show(bfo, ln=CFG_SITE_LANG, r_fld=[], r_val=[]
     @param r_tpl: the list of 'template' attribute for each rule
     @param default: the default format template used by this output format
     @param r_upd: the rule that we want to increase/decrease in order of evaluation
+    @param args: additional parameters to move rules. See above
+    @return: HTML markuo for editing tools of a given output format.
     """
 
     output_format = bibformat_engine.get_output_format(bfo, with_attributes=True)
@@ -603,6 +615,7 @@ def perform_request_output_format_show_dependencies(bfo, ln=CFG_SITE_LANG):
 
     @param ln: language
     @param bfo: the filename of the output format to show
+    @return: HTML markup of the output format dependencies pages
     """
     output_format = bibformat_engine.get_output_format(code=bfo, with_attributes=True)
     name = output_format['attrs']['names']['generic']
@@ -670,6 +683,7 @@ def delete_format_template(filename):
     If format template is not writable, do not remove
 
     @param filename: the format template filename
+    @return: None
     """
     if not can_write_format_template(filename):
         return
@@ -681,6 +695,10 @@ def delete_format_template(filename):
 def update_format_template_code(filename, code=""):
     """
     Saves code inside template given by filename
+
+    @param filename: filename of the template to edit
+    @param code: content of the template
+    @return: None
     """
     format_template = bibformat_engine.get_format_template_attrs(filename)
     name = format_template['name']
@@ -713,6 +731,9 @@ def update_format_template_attributes(filename, name="", description="", duplica
     the code of the template whoose filename is given in 'duplicate' for the code
     of our template.
 
+    @param filename: filename of the template to update
+    @param name: name to use for the template
+    @param description: description to use for the template
     @param duplicate: the filename of a template that we want to copy
     @return: the filename of the modified format
     """
@@ -799,6 +820,7 @@ def delete_output_format(code):
     if file is not writable, don't remove
 
     @param code: the 6 letters code of the output format to remove
+    @return: None
     """
     if not can_write_output_format(code):
         return
@@ -817,6 +839,11 @@ def delete_output_format(code):
 def update_output_format_rules(code, rules=[], default=""):
     """
     Saves rules inside output format given by code
+
+    @param code: the code of the output format to update
+    @param rules: the rules to apply for the output format
+    @param default: the default template when no rule match
+    @return: None
     """
 
     # Generate output format syntax
@@ -851,7 +878,7 @@ def update_output_format_attributes(code, name="", description="", new_code="",
 
     @param description: the new description
     @param name: the new name
-    @param code: the new short code (== new bfo) of the output format
+    @param new_code: the new short code (== new bfo) of the output format
     @param code: the code of the output format to update
     @param names_trans: the translations in the same order as the languages from get_languages()
     @param content_type: the new content_type of the output format
@@ -887,6 +914,9 @@ def can_read_format_template(filename):
     """
     Returns 0 if we have read permission on given format template, else
     returns other integer
+
+    @param filename: name of a format template
+    @return: True if template X{bft} can be read or not
     """
     path = "%s%s%s" % (CFG_BIBFORMAT_TEMPLATES_PATH, os.sep, filename)
     return os.access(path, os.R_OK)
@@ -895,6 +925,9 @@ def can_read_output_format(bfo):
     """
     Returns 0 if we have read permission on given output format, else
     returns other integer
+
+    @param bfo: name of an output format
+    @return: True if output format X{bfo} can be read or not
     """
     filename = bibformat_engine.resolve_output_format_filename(bfo)
     path = "%s%s%s" % (CFG_BIBFORMAT_OUTPUTS_PATH, os.sep, filename)
@@ -904,6 +937,9 @@ def can_read_format_element(name):
     """
     Returns 0 if we have read permission on given format element, else
     returns other integer
+
+    @param name: name of a format element
+    @return: True if element X{name} can be read or not
     """
 
     filename = bibformat_engine.resolve_format_element_filename(name)
@@ -914,6 +950,9 @@ def can_write_format_template(bft):
     """
     Returns 0 if we have write permission on given format template, else
     returns other integer
+
+    @param bft: name of a format template
+    @return: True if template X{bft} can be edited or not
     """
     if not can_read_format_template(bft):
         return False
@@ -925,6 +964,9 @@ def can_write_output_format(bfo):
     """
     Returns 0 if we have write permission on given output format, else
     returns other integer
+
+    @param bfo: name of an output format
+    @return: True if output format X{bfo} can be edited or not
     """
     if not can_read_output_format(bfo):
         return False
@@ -936,6 +978,8 @@ def can_write_output_format(bfo):
 def can_write_etc_bibformat_dir():
     """
     Returns true if we can write in etc/bibformat dir.
+
+    @return: True if can write, or False
     """
     path = "%s%sbibformat" % (CFG_ETCDIR, os.sep)
     return os.access(path, os.W_OK)
@@ -946,18 +990,17 @@ def get_outputs_that_use_template(filename):
     The returned output formats also give their dependencies on tags.
 
     We don't return the complete output formats but some reference to
-    them (filename + names)
+    them (filename + names)::
 
-    [ {'filename':"filename_1.bfo"
-       'names': {'en':"a name", 'fr': "un nom", 'generic':"a name"}
-       'tags': ['710__a', '920__']
-      },
-      ...
-    ]
-
-    Returns output formats references sorted by (generic) name
+        [ {'filename':"filename_1.bfo"
+           'names': {'en':"a name", 'fr': "un nom", 'generic':"a name"}
+           'tags': ['710__a', '920__']
+          },
+          ...
+        ]
 
     @param filename: a format template filename
+    @return: output formats references sorted by (generic) name
     """
     output_formats_list = {}
     tags = []
@@ -1000,18 +1043,17 @@ def get_elements_used_by_template(filename):
     We must handle usage of bfe_field in a special way if we want to retrieve
     used tag: used tag is given in "tag" parameter, not inside element code.
 
-    The list is returned sorted by name
+    The list is returned sorted by name::
 
-    [ {'filename':"filename_1.py"
-       'name':"filename_1"
-       'tags': ['710__a', '920__']
-      },
-      ...
-    ]
-
-    Returns elements sorted by name
+        [ {'filename':"filename_1.py"
+           'name':"filename_1"
+           'tags': ['710__a', '920__']
+          },
+          ...
+        ]
 
     @param filename: a format template filename
+    @return: elements sorted by name
     """
     format_elements = {}
     format_template = bibformat_engine.get_format_template(filename=filename, with_attributes=True)
@@ -1064,9 +1106,8 @@ def get_tags_used_by_element(filename):
     @TODO: There is room for improvements. For example catch
     call to BibRecord functions.
 
-    Returns tags sorted by value
-
     @param filename: a format element filename
+    @return: tags sorted by value
     """
     tags = {}
 
@@ -1101,18 +1142,17 @@ def get_tags_used_by_element(filename):
 def get_templates_that_use_element(name):
     """
     Returns a list of format templates that call the given format element.
-    The returned format templates also give their dependencies on tags.
+    The returned format templates also give their dependencies on tags::
 
-    [ {'filename':"filename_1.bft"
-       'name': "a name"
-       'tags': ['710__a', '920__']
-      },
-      ...
-    ]
-
-    Returns templates sorted by name
+        [ {'filename':"filename_1.bft"
+           'name': "a name"
+           'tags': ['710__a', '920__']
+          },
+          ...
+        ]
 
     @param name: a format element name
+    @return: templates sorted by name
     """
     format_templates = {}
     tags = []
@@ -1141,18 +1181,18 @@ def get_templates_that_use_element(name):
 def get_templates_used_by_output(code):
     """
     Returns a list of templates used inside an output format give by its code
-    The returned format templates also give their dependencies on elements and tags
+    The returned format templates also give their dependencies on elements and tags::
 
-    [ {'filename':"filename_1.bft"
-       'name': "a name"
-       'elements': [{'filename':"filename_1.py", 'name':"filename_1", 'tags': ['710__a', '920__']
-      }, ...]
-      },
-      ...
-    ]
+        [ {'filename':"filename_1.bft"
+           'name': "a name"
+           'elements': [{'filename':"filename_1.py", 'name':"filename_1", 'tags': ['710__a', '920__']
+          }, ...]
+          },
+          ...
+        ]
 
-    Returns templates sorted by name
-
+    @param code: outpout format code
+    @return: templates sorted by name
     """
     format_templates = {}
     output_format = bibformat_engine.get_output_format(code, with_attributes=True)
@@ -1192,6 +1232,7 @@ def perform_request_format_validate(ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=No
     @param bfo: an output format 6 chars code
     @param bft: a format element filename
     @param bfe: a format element name
+    @return: HTML markup
     """
 
     if bfo is not None:
@@ -1423,6 +1464,9 @@ def check_format_element(name):
 def check_tag(tag):
     """
     Checks the validity of a tag
+
+    @param tag: tag to check
+    @return: list of errors for the tag
     """
     errors = []
     return errors
@@ -1430,7 +1474,9 @@ def check_tag(tag):
 
 def perform_request_dreamweaver_floater():
     """
-    Returns a floater for Dreamweaver with all Format Elements avalaible.
+    Returns a floater for Dreamweaver with all Format Elements available.
+
+    @return: HTML markup (according to Dreamweaver specs)
     """
     # Get format elements lists of attributes
     elements = bibformat_engine.get_format_elements(with_built_in_params=True)

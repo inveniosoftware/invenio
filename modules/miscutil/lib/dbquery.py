@@ -37,6 +37,7 @@ import string
 import time
 import marshal
 import re
+import atexit
 from zlib import compress, decompress
 from thread import get_ident
 from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, \
@@ -71,6 +72,15 @@ CFG_DATABASE_PASS = 'my123p$ss'
 
 _DB_CONN = {}
 
+def unlock_all():
+    for db in _DB_CONN.values():
+        try:
+            cur = db.cur()
+            cur.execute("UNLOCK TABLES")
+        except:
+            pass
+
+atexit.register(unlock_all)
 
 class InvenioDbQueryWildcardLimitError(Exception):
     """Exception raised when query limit reached."""

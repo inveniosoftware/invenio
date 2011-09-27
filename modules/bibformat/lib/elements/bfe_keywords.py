@@ -28,8 +28,8 @@ def format_element(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='y
     """
     Display keywords of the record.
 
-    @param keyword_prefix a prefix before each keyword
-    @param keyword_suffix a suffix after each keyword
+    @param keyword_prefix: a prefix before each keyword
+    @param keyword_suffix: a suffix after each keyword
     @param separator: a separator between keywords
     @param link: links the keywords if 'yes' (HTML links)
     """

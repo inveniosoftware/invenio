@@ -126,7 +126,12 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBMATCH_FUZZY_WORDLIMITS',
                        'CFG_BIBMATCH_QUERY_TEMPLATES',
                        'CFG_WEBSEARCH_SYNONYM_KBRS',
-                       'CFG_BIBINDEX_SYNONYM_KBRS']:
+                       'CFG_BIBINDEX_SYNONYM_KBRS',
+                       'CFG_WEBCOMMENT_EMAIL_REPLIES_TO',
+                       'CFG_WEBCOMMENT_RESTRICTION_DATAFIELD',
+                       'CFG_WEBCOMMENT_ROUND_DATAFIELD',
+                       'CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS',
+                       'CFG_BIBSCHED_NODE_TASKS']:
         option_value = option_value[1:-1]
 
     ## 3cbis) very special cases: dicts with backward compatible string
@@ -152,7 +157,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY',
                        'CFG_BATCHUPLOADER_WEB_ROBOT_AGENT',
                        'CFG_BIBAUTHORID_EXTERNAL_CLAIMED_RECORDS_KEY',
-                       'CFG_BIBCIRCULATION_ITEM_STATUS_OPTIONAL']:
+                       'CFG_BIBCIRCULATION_ITEM_STATUS_OPTIONAL',
+                       'CFG_PLOTEXTRACTOR_DISALLOWED_TEX']:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:
@@ -182,7 +188,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_BCTKD_RA',
                        'CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_NEW_RA',
                        'CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH',
-                       'CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N']:
+                       'CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N',
+                       'CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT']:
         option_value = float(option_value[1:-1])
 
     ## 4) finally, return output line:
@@ -500,14 +507,15 @@ def cli_cmd_reset_fieldnames(conf):
                                  "citerank_pagerank_c": _("all-time-best cite rank"),
                                  "citerank_pagerank_t": _("time-decay cite rank"),}
         for (rankmethod_id, rankmethod_name) in rankmethod_id_name_list:
-            try:
-                run_sql("""INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES
-                            (%s,%s,%s,%s)""", (rankmethod_id, lang, 'ln',
-                                               rankmethod_name_names[rankmethod_name]))
-            except IntegrityError:
-                run_sql("""UPDATE rnkMETHODNAME SET value=%s
-                            WHERE id_rnkMETHOD=%s AND ln=%s AND type=%s""",
-                        (rankmethod_name_names[rankmethod_name], rankmethod_id, lang, 'ln',))
+            if rankmethod_name_names.has_key(rankmethod_name):
+                try:
+                    run_sql("""INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES
+                                (%s,%s,%s,%s)""", (rankmethod_id, lang, 'ln',
+                                                   rankmethod_name_names[rankmethod_name]))
+                except IntegrityError:
+                    run_sql("""UPDATE rnkMETHODNAME SET value=%s
+                                WHERE id_rnkMETHOD=%s AND ln=%s AND type=%s""",
+                            (rankmethod_name_names[rankmethod_name], rankmethod_id, lang, 'ln',))
 
     print ">>> I18N field names reset successfully."
 
@@ -734,8 +742,7 @@ def cli_cmd_run_regression_tests(conf):
     build_and_run_regression_test_suite()
 
 def cli_cmd_run_web_tests(conf):
-    """Run web tests in a browser. Requires Firefox with
-    Selenium IDE extension."""
+    """Run web tests in a browser. Requires Firefox with Selenium."""
     from invenio.testutils import build_and_run_web_test_suite
     build_and_run_web_test_suite()
 
@@ -784,6 +791,43 @@ def cli_cmd_create_apache_conf(conf):
         else:
             xsendfile_directive += '        #XSendFilePath %s\n' % path
     xsendfile_directive = xsendfile_directive.strip()
+
+    ## Preparation of deflate directive
+    deflate_directive_needed = int(conf.get("Invenio", 'CFG_WEBSTYLE_HTTP_USE_COMPRESSION')) != 0
+    if deflate_directive_needed:
+        deflate_directive = r"""
+        ## Configuration snippet taken from:
+        ## <http://httpd.apache.org/docs/2.2/mod/mod_deflate.html>
+        <IfModule mod_deflate.c>
+            SetOutputFilter DEFLATE
+
+            # Netscape 4.x has some problems...
+            BrowserMatch ^Mozilla/4 gzip-only-text/html
+
+            # Netscape 4.06-4.08 have some more problems
+            BrowserMatch ^Mozilla/4\.0[678] no-gzip
+
+            # MSIE masquerades as Netscape, but it is fine
+            # BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+
+            # NOTE: Due to a bug in mod_setenvif up to Apache 2.0.48
+            # the above regex won't work. You can use the following
+            # workaround to get the desired effect:
+            BrowserMatch \bMSI[E] !no-gzip !gzip-only-text/html
+
+            # Don't compress images
+            SetEnvIfNoCase Request_URI \
+                \.(?:gif|jpe?g|png)$ no-gzip dont-vary
+
+            # Make sure proxies don't deliver the wrong content
+            <IfModule mod_header.c>
+                Header append Vary User-Agent env=!dont-vary
+            </IfModule>
+        </IfModule>
+        """
+    else:
+        deflate_directive = ""
+
     ## Apache vhost conf file is distro specific, so analyze needs:
     # Gentoo (and generic defaults):
     listen_directive_needed = True
@@ -804,7 +848,18 @@ def cli_cmd_create_apache_conf(conf):
         ssl_key_path = '/etc/pki/tls/private/localhost.key'
         vhost_ip_address_needed = True
         wsgi_socket_directive_needed = True
-    ## okay, let's create Apache vhost files:
+    # maybe we are using non-standard ports?
+    vhost_site_url = conf.get('Invenio', 'CFG_SITE_URL').replace("http://", "")
+    vhost_site_url_port = '80'
+    vhost_site_secure_url = conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("https://", "")
+    vhost_site_secure_url_port = '443'
+    if ':' in vhost_site_url:
+        vhost_site_url, vhost_site_url_port = vhost_site_url.split(':', 1)
+    if ':' in vhost_site_secure_url:
+        vhost_site_secure_url, vhost_site_secure_url_port = vhost_site_secure_url.split(':', 1)
+    if vhost_site_url_port != '80' or vhost_site_secure_url_port != '443':
+        listen_directive_needed = True
+    ## OK, let's create Apache vhost files:
     if not os.path.exists(apache_conf_dir):
         os.mkdir(apache_conf_dir)
     apache_vhost_file = apache_conf_dir + os.sep + \
@@ -815,18 +870,17 @@ def cli_cmd_create_apache_conf(conf):
 AddDefaultCharset UTF-8
 ServerSignature Off
 ServerTokens Prod
-NameVirtualHost %(vhost_ip_address)s:80
+NameVirtualHost %(vhost_ip_address)s:%(vhost_site_url_port)s
 %(listen_directive)s
 %(wsgi_socket_directive)s
 WSGIRestrictStdout Off
-#WSGIImportScript %(wsgidir)s/invenio.wsgi process-group=invenio application-group=%%{GLOBAL}
 <Files *.pyc>
    deny from all
 </Files>
 <Files *~>
    deny from all
 </Files>
-<VirtualHost %(vhost_ip_address)s:80>
+<VirtualHost %(vhost_ip_address)s:%(vhost_site_url_port)s>
         ServerName %(servername)s
         ServerAlias %(serveralias)s
         ServerAdmin %(serveradmin)s
@@ -844,14 +898,18 @@ WSGIRestrictStdout Off
         Alias /img/ %(webdir)s/img/
         Alias /css/ %(webdir)s/css/
         Alias /js/ %(webdir)s/js/
+        Alias /flash/ %(webdir)s/flash/
+        Alias /css/ %(webdir)s/css/
         Alias /export/ %(webdir)s/export/
         Alias /MathJax/ %(webdir)s/MathJax/
         Alias /jsCalendar/ %(webdir)s/jsCalendar/
-        Alias /fckeditor/ %(webdir)s/fckeditor/
+        Alias /ckeditor/ %(webdir)s/ckeditor/
+        Alias /mediaelement/ %(webdir)s/mediaelement/
         AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1
         Alias /robots.txt %(webdir)s/robots.txt
         Alias /favicon.ico %(webdir)s/favicon.ico
         WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP} inactivity-timeout=3600 maximum-requests=10000
+        WSGIImportScript %(wsgidir)s/invenio.wsgi process-group=invenio application-group=%%{GLOBAL}
         WSGIScriptAlias / %(wsgidir)s/invenio.wsgi
         WSGIPassAuthorization On
         %(xsendfile_directive)s
@@ -863,26 +921,30 @@ WSGIRestrictStdout Off
            Order allow,deny
            Allow from all
         </Directory>
+        %(deflate_directive)s
 </VirtualHost>
-""" % {'servername': conf.get('Invenio', 'CFG_SITE_URL').replace("http://", ""),
-       'serveralias': conf.get('Invenio', 'CFG_SITE_URL').replace("http://", "").split('.')[0],
+""" % {'vhost_site_url_port': vhost_site_url_port,
+       'servername': vhost_site_url,
+       'serveralias': vhost_site_url.split('.')[0],
        'serveradmin': conf.get('Invenio', 'CFG_SITE_ADMIN_EMAIL'),
        'webdir': conf.get('Invenio', 'CFG_WEBDIR'),
        'logdir': conf.get('Invenio', 'CFG_LOGDIR'),
        'libdir' : conf.get('Invenio', 'CFG_PYLIBDIR'),
        'wsgidir': os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'www-wsgi'),
        'vhost_ip_address': vhost_ip_address_needed and _detect_ip_address() or '*',
-       'listen_directive': listen_directive_needed and 'Listen 80' or '#Listen 80',
+       'listen_directive': listen_directive_needed and 'Listen ' + vhost_site_url_port or \
+                           '#Listen ' + vhost_site_url_port,
        'wsgi_socket_directive': (wsgi_socket_directive_needed and \
                                 'WSGISocketPrefix ' or '#WSGISocketPrefix ') + \
               conf.get('Invenio', 'CFG_PREFIX') + os.sep + 'var' + os.sep + 'run',
        'xsendfile_directive' : xsendfile_directive,
+       'deflate_directive': deflate_directive,
        }
     apache_vhost_ssl_body = """\
 ServerSignature Off
 ServerTokens Prod
 %(listen_directive)s
-NameVirtualHost %(vhost_ip_address)s:443
+NameVirtualHost %(vhost_ip_address)s:%(vhost_site_secure_url_port)s
 %(ssl_pem_directive)s
 %(ssl_crt_directive)s
 %(ssl_key_directive)s
@@ -893,7 +955,7 @@ WSGIRestrictStdout Off
 <Files *~>
    deny from all
 </Files>
-<VirtualHost %(vhost_ip_address)s:443>
+<VirtualHost %(vhost_ip_address)s:%(vhost_site_secure_url_port)s>
         ServerName %(servername)s
         ServerAlias %(serveralias)s
         ServerAdmin %(serveradmin)s
@@ -912,10 +974,13 @@ WSGIRestrictStdout Off
         Alias /img/ %(webdir)s/img/
         Alias /css/ %(webdir)s/css/
         Alias /js/ %(webdir)s/js/
+        Alias /flash/ %(webdir)s/flash/
+        Alias /css/ %(webdir)s/css/
         Alias /export/ %(webdir)s/export/
         Alias /MathJax/ %(webdir)s/MathJax/
         Alias /jsCalendar/ %(webdir)s/jsCalendar/
-        Alias /fckeditor/ %(webdir)s/fckeditor/
+        Alias /ckeditor/ %(webdir)s/ckeditor/
+        Alias /mediaelement/ %(webdir)s/mediaelement/
         AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1
         Alias /robots.txt %(webdir)s/robots.txt
         Alias /favicon.ico %(webdir)s/favicon.ico
@@ -930,16 +995,19 @@ WSGIRestrictStdout Off
            Order allow,deny
            Allow from all
         </Directory>
+        %(deflate_directive)s
 </VirtualHost>
-""" % {'servername': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("https://", ""),
-       'serveralias': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("https://", "").split('.')[0],
+""" % {'vhost_site_secure_url_port': vhost_site_secure_url_port,
+       'servername': vhost_site_secure_url,
+       'serveralias': vhost_site_secure_url.split('.')[0],
        'serveradmin': conf.get('Invenio', 'CFG_SITE_ADMIN_EMAIL'),
        'webdir': conf.get('Invenio', 'CFG_WEBDIR'),
        'logdir': conf.get('Invenio', 'CFG_LOGDIR'),
        'libdir' : conf.get('Invenio', 'CFG_PYLIBDIR'),
        'wsgidir' : os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'www-wsgi'),
        'vhost_ip_address': vhost_ip_address_needed and _detect_ip_address() or '*',
-       'listen_directive' : listen_directive_needed and 'Listen 443' or '#Listen 443',
+       'listen_directive' : listen_directive_needed and 'Listen ' + vhost_site_secure_url_port or \
+                            '#Listen ' + vhost_site_secure_url_port,
        'ssl_pem_directive': ssl_pem_directive_needed and \
                             'SSLCertificateFile %s' % ssl_pem_path or \
                             '#SSLCertificateFile %s' % ssl_pem_path,
@@ -950,6 +1018,7 @@ WSGIRestrictStdout Off
                             '#SSLCertificateKeyFile %s' % ssl_key_path or \
                             'SSLCertificateKeyFile %s' % ssl_key_path,
        'xsendfile_directive' : xsendfile_directive,
+       'deflate_directive': deflate_directive,
        }
     # write HTTP vhost snippet:
     if os.path.exists(apache_vhost_file):

@@ -328,7 +328,8 @@ def build_and_run_unit_test_suite():
         base, ext = os.path.splitext(candidate)
 
         if ext != '.py' or not (base.endswith('_tests') and not \
-                                base.endswith('_regression_tests')):
+                                base.endswith('_regression_tests') and not \
+                                base.endswith('_web_tests')):
             continue
 
         module = __import__('invenio.' + base, globals(), locals(), ['TEST_SUITE'])
@@ -362,27 +363,23 @@ def build_and_run_regression_test_suite():
 
 def build_and_run_web_test_suite():
     """
-    Detect all Selenium web test cases, build a complete test suite of
-    them, and run it in a browser. (Requires Firefox with Selenium IDE
-    extension.)  Called by 'inveniocfg --run-web-tests'.
+    Detect all Invenio modules with names ending by
+    '*_web_tests.py', build a complete test suite of them, and
+    run it.  Called by 'inveniocfg --run-web-tests'.
     """
-    # warn user first:
-    warn_user_about_tests('web')
-    # build test suite with all web tests:
-    print ">>> Building complete web test suite..."
-    webtestdir = CFG_PREFIX +  '/lib/webtest/invenio'
-    fdesc = open(webtestdir + os.sep + "test_all.html", "w")
-    fdesc.write('<table>\n')
-    fdesc.write('<tr><td>Web test suite for the whole Invenio.</td></tr>\n')
-    for candidate in sorted(os.listdir(webtestdir)):
+
+    test_modules = []
+
+    for candidate in os.listdir(os.path.dirname(invenio.__file__)):
         base, ext = os.path.splitext(candidate)
-        if ext != '.html' or base == 'test_all':
+
+        if ext != '.py' or not base.endswith('_web_tests'):
             continue
-        fdesc.write('<tr><td><a target="testFrame" href="%s">%s</a></td></tr>\n' % (candidate, base))
-    fdesc.write('</table>\n')
-    fdesc.close()
-    # run this test suite:
-    cmd = "firefox -chrome 'chrome://selenium-ide/content/selenium/TestRunner.html?baseURL=%s&test=file://%s/test_all.html&auto=true' -height 800 -width 1200 &" % \
-          (CFG_SITE_URL, webtestdir)
-    print ">>> Launching Firefox with Selenium IDE, please check the web test results there."
-    os.system(cmd)
+
+        module = __import__('invenio.' + base, globals(), locals(), ['TEST_SUITE'])
+        test_modules.append(module.TEST_SUITE)
+
+    warn_user_about_tests()
+
+    complete_suite = unittest.TestSuite(test_modules)
+    unittest.TextTestRunner(verbosity=2).run(complete_suite)

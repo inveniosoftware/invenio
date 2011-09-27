@@ -32,7 +32,7 @@ from invenio.config import CFG_SITE_URL
 from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 from invenio.bibformat import format_record
 from invenio.session import get_session
-from invenio.search_engine import get_fieldvalues
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibauthorid_webapi import get_bibref_name_string, get_person_redirect_link, get_canonical_id_from_person_id
 from invenio.messages import gettext_set_language, wash_language
 #from invenio.textutils import encode_for_xml
@@ -126,7 +126,7 @@ class Template:
         return "\n".join(html)
 
 
-    def tmpl_ticket_box(self, teaser, message, ticket, show_close_btn=True):
+    def tmpl_ticket_box(self, teaser, message, show_close_btn=True):
         '''
         Creates a semi-permanent box informing about ticket
         status notifications
@@ -889,15 +889,19 @@ class Template:
             r = verbiage_dict['data_ns']
             h('<noscript><h5>%s</h5></noscript>' % r)
             canonical_name = get_canonical_id_from_person_id(person_id)
-            h('<div> <strong> Canonical name setup </strong>')
+            if '.' in str(canonical_name) and not isinstance(canonical_name, int):
+                canonical_name = canonical_name[0:canonical_name.rindex('.')]
+            h('<div><div> <strong> Canonical name setup </strong>')
             h('<div style="margin-top: 15px;"> Current canonical name: %s  <form method="GET" action="%s/person/action">' % (canonical_name, CFG_SITE_URL))
             h('<input type="hidden" name="set_canonical_name" value="True" />')
             h('<input name="canonical_name" id="canonical_name" type="text" style="border:1px solid #333; width:500px;" value="%s" /> ' % canonical_name)
             h('<input type="hidden" name="pid" value="%s" />' % person_id)
             h('<input type="submit" value="set canonical name" class="aid_btn_blue" />')
+            h('<br>NOTE: please note the a number is appended automatically to the name displayed above. This cannot be manually triggered so to ensure unicity of IDs.')
+            h('To change the number if greater then one, please change all the other names first, then updating this one will do the trick. </div>')
             h('</form> </div></div>')
 
-            h('  <b><b>' + self._('... This tab is currently under construction ... ') + '</p>')
+            h('  <br><br>' + self._('... This tab is currently under construction ... ') + '</p>')
             h("  </div>")
 
         h("</div>")
@@ -966,7 +970,7 @@ class Template:
                         fv = self._('Error retrieving record title')
 
                     h('<div id="aid_moreinfo">')
-                    h(('%s' + self._('with name: '))
+                    h(('%s' + self._(' --  With name: '))
                       % (fv))
                     #, bibrefs_auto_assigned[person]["bibrecs"][recid][0][1]))
                     # asbibref = "%s||%s" % (person, bibrefs_auto_assigned[person]["bibrecs"][recid][0][0])
@@ -1358,7 +1362,8 @@ class Template:
         h = html.append
 
         h('<form id="searchform" action="/person/search" method="GET">')
-        h('<input type="text" name="q" style="border:1px solid #333; width:500px;" '
+        h('Find author clusters by name. e.g: <i>Ellis, J</i>: <br>')
+        h('<input placeholder="Search for a name, e.g: Ellis, J" type="text" name="q" style="border:1px solid #333; width:500px;" '
                     'maxlength="250" value="%s" class="focus" />' % query)
         h('<input type="submit" value="Search" />')
         h('</form>')
@@ -1410,6 +1415,17 @@ class Template:
             pid = result[0]
             names = result[1]
             papers = result[2]
+            try:
+                total_papers = result[3]
+                if total_papers > 1:
+                    papers_string = '(%s Papers)' % str(total_papers)
+                elif total_papers == 1:
+                    papers_string = '(%s Paper)' % str(total_papers)
+                else:
+                    papers_string = '(No papers)'
+            except IndexError:
+                total_papers = None
+                papers_string = ''
 
             h('<div id="aid_result%s">' % (index % 2))
             h('<div style="padding-bottom:5px;">')
@@ -1446,15 +1462,15 @@ class Template:
                             '<em><a href="%s" id="confirmlink">'
                             '<strong>' + self._('YES!') + '</strong>'
                             + self._(' Attribute Papers To ') +
-                            '%s (PersonID: %d )</a></em></span>')
-                            % (link, get_person_redirect_link(pid), pid))
+                            '%s %s </a></em></span>')
+                            % (link, get_person_redirect_link(pid), papers_string))
             else:
                 h(('<span style="margin-left: 40px;">'
                             '<em><a href="%s/%s/%s" id="aid_moreinfolink">'
-                            + self._('Publication List ') + '(%s)</a></em></span>')
+                            + self._('Publication List ') + '(%s) %s </a></em></span>')
                             % (CFG_SITE_URL, linktarget,
                                get_person_redirect_link(pid),
-                               get_person_redirect_link(pid)))
+                               get_person_redirect_link(pid), papers_string))
             h('<div class="more-mpid%s" id="aid_moreinfo">' % (pid))
 
             if papers and index < bconfig.PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT:
@@ -1509,25 +1525,22 @@ class Template:
         '''
         html = []
         h = html.append
-        h('<p><b>Congratulations! you have now successfully registered in INSPIRE via arXiv!</b></p>')
+        h('<p><b>Congratulations! you have now successfully connected to INSPIRE via arXiv.org!</b></p>')
 
-        h('<p>In the coming months, your INSPIRE account will give you the ability '
-          'to use personalized features of INSPIRE and other powerful tools.</p>')
+        h('<p>Right now, you can verify your'
+        ' publication records, which will help us to produce better publication lists and'
+        ' citation statistics.'
+        '</p>')
 
-        h('<p>Right now, you can use your INSPIRE account to correct your '
-          'publication record and help us to produce better publication lists '
-          'and citation statistics.</p>')
+        h('<p>We are currently importing your publication list from arXiv.org .'
+        'When we\'re done, you\'ll see a link to verify your'
+        ' publications below; please claim the papers that are yours '
+        ' and remove the ones that are not. This information will be automatically processed'
+        ' or be sent to our operator for approval if needed, usually within 24'
+        ' hours.'
+        '</p>')
 
-        h('<p>We are importing your publication list from arXiv right now, and '
-          'use this information to find other papers you\'ve written.'
-          '  This may take a few seconds, or even a few minutes if you\'ve'
-          ' been very busy.  You might like to grab a cup of coffee and come'
-          ' back, or you can always login later, and your account will be '
-          'prepopulated. When we\'re done, you\'ll see a link to correct your '
-          'publications below.</p>')
-
-        h('<p>When the link appears we invite you to confirm the papers that are '
-          'yours and to reject the ones that you are not author of. If you have '
+        h('If you have '
           'any questions or encounter any problems please contact us here: '
           '<a href="mailto:%s">%s</a></p>'
           % (CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL,
@@ -1556,6 +1569,24 @@ class Template:
 
         return "\n".join(html)
 
+    def tmpl_claim_stub(self, person='-1'):
+        '''
+        claim stub page
+        '''
+        html = []
+        h = html.append
+
+        h(' <ul><li><a href=%s> Login through arXiv.org </a> <small>' % bconfig.BIBAUTHORID_CFG_INSPIRE_LOGIN)
+        h ('(This is faster for you, as it allows your changes to be publicly shown immediately.)</small> <br><br>')
+        h(' <li><a href=%s/person/%s?open_clam=True> Continue as a guest </a>'
+          '<small>(It will take some time before your changes are publicly shown.'
+          'Use only if you don\'t have an arXiv.org account.)</small><br><br></ul>' % (CFG_SITE_URL, person))
+        h('If you login through arXiv.org we can verify that you are the author of these papers and accept your claims rapidly, '
+          'as well as adding additional claims from arXiv. <br>If you choose not to login via arXiv your changes will '
+          'be publicly visible only after our editors check and confirm them, usually a few days.<br>  '
+          'Either way, claims made on the part of another author will go through our staff and may take longer to display. '
+          'This applies as well to papers which have been previously claimed, by yourself or someone else.')
+        return "\n".join(html)
 
     def tmpl_welcome_link(self):
         '''

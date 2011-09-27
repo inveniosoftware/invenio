@@ -37,7 +37,7 @@ from invenio.config import \
      CFG_VERSION, \
      CFG_WEBSTYLE_INSPECT_TEMPLATES, \
      CFG_WEBSTYLE_TEMPLATE_SKIN
-from invenio.messages import gettext_set_language, language_list_long
+from invenio.messages import gettext_set_language, language_list_long, is_language_rtl
 from invenio.urlutils import make_canonical_urlargd, create_html_link
 from invenio.dateutils import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
@@ -330,9 +330,10 @@ template function generated it.
  <meta http-equiv="Content-Language" content="%(ln)s" />
  <meta name="description" content="%(description)s" />
  <meta name="keywords" content="%(keywords)s" />
+ <script type="text/javascript" src="%(cssurl)s/js/jquery/jquery.min.js"></script>
  %(metaheaderadd)s
 </head>
-<body%(body_css_classes)s lang="%(ln_iso_639_a)s">
+<body%(body_css_classes)s lang="%(ln_iso_639_a)s"%(rtl_direction)s>
 <div class="pageheader">
 %(inspect_templates_message)s
 <!-- replaced page header -->
@@ -394,6 +395,7 @@ template function generated it.
 %(pageheaderadd)s
 </div>
         """ % {
+          'rtl_direction': is_language_rtl(ln) and ' dir="rtl"' or '',
           'siteurl' : CFG_SITE_URL,
           'sitesecureurl' : CFG_SITE_SECURE_URL,
           'cssurl' : secure_page_p and CFG_SITE_SECURE_URL or CFG_SITE_URL,
@@ -696,7 +698,7 @@ URI: http://%(host)s%(page)s
                                       show_similar_rec_p=True,
                                       creationdate=None,
                                       modificationdate=None, show_short_rec_p=True,
-                                      citationnum=-1, referencenum=-1):
+                                      citationnum=-1, referencenum=-1, discussionnum=-1):
         """Prints the box displayed in detailed records pages, with tabs at the top.
 
         Returns content as it is if the number of tabs for this record
@@ -713,6 +715,7 @@ URI: http://%(host)s%(page)s
         @param show_short_rec_p: *boolean* - prints a very short version of the record as reminder.
         @param citationnum: show (this) number of citations in the citations tab
         @param referencenum: show (this) number of references in the references tab
+        @param discussionnum: show (this) number of comments/reviews in the discussion tab
         """
         # If no tabs, returns nothing
         if len(tabs) <= 1:
@@ -731,6 +734,9 @@ URI: http://%(host)s%(page)s
                     addnum = "(" + str(citationnum) + ")"
                 if (referencenum > -1) and url.count("/references") == 1:
                     addnum = "(" + str(referencenum) + ")"
+                if (discussionnum > -1) and url.count("/comments") == 1:
+                    addnum = "(" + str(discussionnum) + ")"
+
                 css_class = []
                 if selected:
                     css_class.append('on')
@@ -814,11 +820,11 @@ URI: http://%(host)s%(page)s
         _ = gettext_set_language(ln)
 
         out = """
-                <p class="nobottomgap" >&nbsp;</p>
-            </div>
             <div class="bottom-left-folded">%(dates)s</div>
-            <div class="bottom-right-folded" style="text-align:right"><span class="moreinfo" style="margin-right:25px">%(similar)s</span></div>
-        </div>
+            <div class="bottom-right-folded" style="text-align:right" style="padding-bottom:2px;">
+                <span class="moreinfo" style="margin-right:10px;">%(similar)s</span></div>
+          </div>
+      </div>
     </div>
     <br/>
     """ % {'similar':create_html_link(

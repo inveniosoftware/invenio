@@ -28,9 +28,13 @@ EXTRA_DIST = UNINSTALL THANKS RELEASE-NOTES configure-tests.py config.nice.in \
 MJV = 1.1
 MATHJAX = https://github.com/mathjax/MathJax/zipball/v$(MJV)
 
-# current FCKeditor version
-FCKV = 2.6.6
-FCKEDITOR = FCKeditor_$(FCKV).zip
+# current CKeditor version
+CKV = 3.6.1
+CKEDITOR = ckeditor_$(CKV).zip
+
+# current MediaElement.js version
+MEV = master
+MEDIAELEMENT = http://github.com/johndyer/mediaelement/zipball/$(MEV)
 
 # git-version-get stuff:
 BUILT_SOURCES = $(top_srcdir)/.version
@@ -77,20 +81,7 @@ kwalitee-check-indentation:
 	@$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py --check-indentation $(top_srcdir)
 
 kwalitee-check-sql-queries:
-	@echo "* Listing potentially dangerous SQL queries:"
-	@echo "** SQL SELECT queries without explicit column list:"
-	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'SELECT \* FROM' {} \; 2> /dev/null
-	@echo "** SQL INSERT queries without explicit column list:"
-	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'INSERT INTO ([[:alnum:]]|_)+[[:space:]]*VALUES' {} \; 2> /dev/null
-	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'INSERT INTO ([[:alnum:]]|_)+[[:space:]]*$$' {} \; 2> /dev/null
-	@echo "** SQL queries using charset-ignorant escape_string():"
-	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'escape_string' {} \; 2> /dev/null
-	@echo "** SQL queries using literal '%s':"
-	@find $(top_srcdir) -name '*.py' -exec grep -HEin "run_sql.*'%[dfis]'" {} \; 2> /dev/null
-	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'run_sql.*"%[dfis]"' {} \; 2> /dev/null
-	@echo "** SQL queries with potentially unescaped arguments:"
-	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'run_sql.* % ' {} \; 2> /dev/null
-	@echo "* Done."
+	@$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py --check-sql $(top_srcdir)
 
 etags:
 	\rm -f $(top_srcdir)/TAGS
@@ -222,40 +213,32 @@ uninstall-jquery-plugins:
 	@echo "** The jquery plugins were successfully uninstalled.     **"
 	@echo "***********************************************************"
 
-install-fckeditor-plugin:
+install-ckeditor-plugin:
 	@echo "***********************************************************"
-	@echo "** Installing FCKeditor plugin, please wait...           **"
+	@echo "** Installing CKeditor plugin, please wait...           **"
 	@echo "***********************************************************"
-	rm -rf ${prefix}/lib/python/invenio/fckeditor/
-	rm -rf /tmp/invenio-fckeditor-plugin
-	mkdir /tmp/invenio-fckeditor-plugin
-	(cd /tmp/invenio-fckeditor-plugin && \
-	wget 'http://downloads.sourceforge.net/fckeditor/$(FCKEDITOR)' && \
-	unzip -u -d ${prefix}/var/www $(FCKEDITOR)) && \
-	mkdir -p ${prefix}/lib/python/invenio/fckeditor/editor/filemanager/connectors/py && \
-	mv -f ${prefix}/var/www/fckeditor/fckeditor.py ${prefix}/lib/python/invenio/fckeditor/ && \
-	mv -f ${prefix}/var/www/fckeditor/editor/filemanager/connectors/py/*.py ${prefix}/lib/python/invenio/fckeditor/editor/filemanager/connectors/py/ && \
-	rm -f ${prefix}/var/www/fckeditor/editor/filemanager/connectors/py/upload.py && \
-	rm -f ${prefix}/var/www/fckeditor/editor/filemanager/connectors/py/zope.py && \
-	find ${prefix}/lib/python/invenio/fckeditor -type d -exec touch {}/__init__.py \; && \
-	find ${prefix}/var/www/fckeditor/ -depth -name '_*' -exec rm -rf {} \; && \
-	rm -r ${prefix}/var/www/fckeditor/editor/filemanager/connectors && \
-	find ${prefix}/var/www/fckeditor/fckeditor* -maxdepth 0 ! -name "fckeditor.js" -exec rm -r {} \; && \
-	rm -fr /tmp/invenio-fckeditor-plugin
-	sed -i "s/if (FCKBrowserInfo\.IsSafari){FCKTools\.AddEventListener(FCK\.EditorDocument,'paste'/if (FCKBrowserInfo.IsSafari \&\& false){FCKTools.AddEventListener(FCK.EditorDocument,'paste'/" ${prefix}/var/www/fckeditor/editor/js/fckeditorcode_gecko.js # Fix issue described at <http://dev.ckeditor.com/ticket/4960>, affecting v2.6.5, 2.6.6
-	@echo "* Installing Invenio-specific FCKeditor config..."
+	rm -rf ${prefix}/lib/python/invenio/ckeditor/
+	rm -rf /tmp/invenio-ckeditor-plugin
+	mkdir /tmp/invenio-ckeditor-plugin
+	(cd /tmp/invenio-ckeditor-plugin && \
+	wget 'http://download.cksource.com/CKEditor/CKEditor/CKEditor%20$(CKV)/$(CKEDITOR)' && \
+	unzip -u -d ${prefix}/var/www $(CKEDITOR)) && \
+	find ${prefix}/var/www/ckeditor/ -depth -name '_*' -exec rm -rf {} \; && \
+	find ${prefix}/var/www/ckeditor/ckeditor* -maxdepth 0 ! -name "ckeditor.js" -exec rm -r {} \; && \
+	rm -fr /tmp/invenio-ckeditor-plugin
+	@echo "* Installing Invenio-specific CKeditor config..."
 	(cd $(top_srcdir)/modules/webstyle/etc && make install)
 	@echo "***********************************************************"
-	@echo "** The FCKeditor plugin was successfully installed.      **"
+	@echo "** The CKeditor plugin was successfully installed.      **"
 	@echo "** Please do not forget to properly set the option       **"
 	@echo "** CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR in invenio.conf.  **"
 	@echo "***********************************************************"
 
-uninstall-fckeditor-plugin:
-	@rm -rvf ${prefix}/var/www/fckeditor
-	@rm -rvf ${prefix}/lib/python/invenio/fckeditor
+uninstall-ckeditor-plugin:
+	@rm -rvf ${prefix}/var/www/ckeditor
+	@rm -rvf ${prefix}/lib/python/invenio/ckeditor
 	@echo "***********************************************************"
-	@echo "** The FCKeditor plugin was successfully uninstalled.    **"
+	@echo "** The CKeditor plugin was successfully uninstalled.    **"
 	@echo "***********************************************************"
 
 install-pdfa-helper-files:
@@ -265,6 +248,22 @@ install-pdfa-helper-files:
 	wget 'http://invenio-software.org/download/invenio-demo-site-files/ISOCoatedsb.icc' -O ${prefix}/etc/websubmit/file_converter_templates/ISOCoatedsb.icc
 	@echo "***********************************************************"
 	@echo "** The PDF/A helper files were successfully installed.   **"
+	@echo "***********************************************************"
+
+install-mediaelement:
+	@echo "***********************************************************"
+	@echo "** MediaElement.js, please wait...                       **"
+	@echo "***********************************************************"
+	rm -rf /tmp/mediaelement
+	mkdir /tmp/mediaelement
+	wget 'http://github.com/johndyer/mediaelement/zipball/master' -O '/tmp/mediaelement/mediaelement.zip' --no-check-certificate
+	unzip -u -d '/tmp/mediaelement' '/tmp/mediaelement/mediaelement.zip'
+	rm -rf ${prefix}/var/www/mediaelement
+	mkdir ${prefix}/var/www/mediaelement
+	mv /tmp/mediaelement/johndyer-mediaelement-*/build/* ${prefix}/var/www/mediaelement
+	rm -rf /tmp/mediaelement
+	@echo "***********************************************************"
+	@echo "** MediaElement.js was successfully installed.           **"
 	@echo "***********************************************************"
 
 uninstall-pdfa-helper-files:
@@ -527,5 +526,9 @@ update-v1.0.0-rc0-tables: # from v1.0.0-rc0 to next release
 	echo "INSERT INTO format (name, code, description, content_type, visibility) VALUES ('Podcast', 'xp', 'Sample format suitable for multimedia feeds, such as podcasts', 'application/rss+xml', 0);" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE accMAILCOOKIE ADD INDEX expiration (expiration);" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE crcILLREQUEST ADD budget_code varchar(60) NOT NULL default '';" | ${prefix}/bin/dbexec
+	echo "UPDATE sbmFUNDESC SET function='Move_CKEditor_Files_to_Storage' WHERE function='Move_FCKeditor_Files_to_Storage';" | ${prefix}/bin/dbexec
+	echo "UPDATE sbmALLFUNCDESCR SET function='Move_CKEditor_Files_to_Storage', description='Transfer files attached to the record with the CKEditor' WHERE function='Move_FCKeditor_Files_to_Storage';" | ${prefix}/bin/dbexec
+	echo "UPDATE sbmFUNCTIONS SET function='Move_CKEditor_Files_to_Storage' WHERE function='Move_FCKeditor_Files_to_Storage';" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE schTASK CHANGE proc proc varchar(255) NOT NULL;" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~ *.pyc *.tmp

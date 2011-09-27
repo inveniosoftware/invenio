@@ -40,7 +40,8 @@ class Template:
         'docname': (str, ""), # the docname (optional)
         'format' : (str, ""), # the format
         'verbose' : (int, 0), # the verbosity
-        'subformat' : (str, ""), # the subformat
+        'subformat': (str, ""), # the subformat
+        'download': (int, 0), # download as attachment
         }
 
 
@@ -3051,7 +3052,7 @@ class Template:
         <tr class="mailboxfooter">
          <td>
              <select name="validate">
-                 <option> %(select)s</option>
+                 <option value="%(select)s"> %(select)s</option>
                  <option value="approve">%(approve)s</option>
                  <option value="reject">%(reject)s</option>
              </select>

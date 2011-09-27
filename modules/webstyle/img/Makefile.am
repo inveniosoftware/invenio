@@ -96,6 +96,7 @@ img_DATA = add-small.png \
            icon-journal_hms_beagle.gif \
            iconcross.gif \
            iconcross2.gif \
+           page_edit.png \
            pix.png \
            plus_orange.png \
            iconeye.gif \
@@ -162,6 +163,7 @@ img_DATA = add-small.png \
            sbm_guide_submit_button.png \
            sbm_guide_subnumber.png \
            sbm_guide_summary.png \
+           sciencewise.png \
            sclose.gif \
            se.gif \
            search.png \

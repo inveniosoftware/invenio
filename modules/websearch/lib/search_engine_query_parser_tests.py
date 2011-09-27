@@ -76,7 +76,7 @@ class TestParserUtilityFunctions(unittest.TestCase):
         """Test whole convert/parse stack: SQPP.parse_query(STISC.convert_query('find a richter, burton and t quark'))"""
         self.assertEqual(self.parser.parse_query(self.converter.convert_query('find a richter, burton and t quark')),
                          ['+',
-                          'author:"richter, burton*" | exactauthor:"richter, b *" | exactauthor:"richter, b" | exactauthor:"richter, bu" | exactauthor:"richter, bur" | exactauthor:"richter, burt" | exactauthor:"richter, burto"',
+                          'author:"richter, burton*" | exactauthor:"richter, b *" | exactauthor:"richter, b" | exactauthor:"richter, bu" | exactauthor:"richter, bur" | exactauthor:"richter, burt" | exactauthor:"richter, burto" | author:"richter, burton, *"',
                           '+', 'title:quark'])
 
     def test_stisc_not_vs_and_not1(self):
@@ -444,7 +444,7 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
 
     def test_author_full_first(self):
         """SPIRES search syntax - find a ellis, john"""
-        invenio_search = 'author:"ellis, john*" or exactauthor:"ellis, j *" or exactauthor:"ellis, j" or exactauthor:"ellis, jo" or exactauthor:"ellis, joh"'
+        invenio_search = 'author:"ellis, john*" or exactauthor:"ellis, j *" or exactauthor:"ellis, j" or exactauthor:"ellis, jo" or exactauthor:"ellis, joh" or author:"ellis, john, *"'
         spires_search = 'find a ellis, john'
         self._compare_searches(invenio_search, spires_search)
 
@@ -498,7 +498,7 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
 
     def test_refersto_author_multi_name_no_quotes(self):
         """SPIRES search syntax - find a ellis and refersto author parke, sj"""
-        inv_search = 'author:ellis refersto:(author:"parke, sj*"  or exactauthor:"parke, s *"  or exactauthor:"parke, s")'
+        inv_search = 'author:ellis refersto:(author:"parke, sj*"  or exactauthor:"parke, s *"  or exactauthor:"parke, s" or author:"parke, sj, *")'
         spi_search = "find a ellis and refersto author parke, sj"
         self._compare_searches(inv_search, spi_search)
 
@@ -556,6 +556,24 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = "find a beacom and date = 2000"
         self._compare_searches(inv_search, spi_search)
 
+    def test_type_code(self):
+        """SPIRES search syntax - find tc review"""
+        inv_search = "collection:review"
+        spi_search = "find tc review"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_field_code(self):
+        """SPIRES search syntax - f f p"""
+        inv_search = "subject:p"
+        spi_search = "f f p"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_coden(self):
+        """SPIRES search syntax - find coden aphys"""
+        inv_search = "journal:aphys"
+        spi_search = "find coden aphys"
+        self._compare_searches(inv_search, spi_search)
+
     def test_fin_to_find_trans(self):
         """SPIRES search syntax - fin a ellis, j == find a ellis, j"""
         fin_search = "fin a ellis, j"
@@ -597,6 +615,12 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         """SPIRES search syntax - find kw something ->keyword:something"""
         spi_search = "find kw meson"
         inv_search = "keyword:meson"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_recid(self):
+        """SPIRES search syntax - find recid 11111"""
+        spi_search = 'find recid 111111'
+        inv_search = 'recid:111111'
         self._compare_searches(inv_search, spi_search)
 
     def test_desy_keyword_translation(self):
@@ -899,6 +923,12 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         """SPIRES search syntax - test find cn d0 and (a abachi or abbott or abazov)"""
         spi_search = "find cn d0 and (a abachi or abbott or abazov)"
         inv_search = "collaboration:d0 and (author:abachi or author:abbott or author:abazov)"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_super_short_author_name(self):
+        """SPIRES search syntax - test fin a er and cn cms"""
+        spi_search = "fin a er and cn cms"
+        inv_search = "author:er collaboration:cms"
         self._compare_searches(inv_search, spi_search)
 
     def test_simple_syntax_mixing(self):

@@ -187,7 +187,6 @@ $(function(){
    * Initialize all components.
    */
   initMenu();
-  initJeditable();
   initAjax();
   initMisc();
   createTopToolbar();
@@ -1071,6 +1070,12 @@ function onNewRecordClick(event){
   updateStatus('ready');
   updateToolbar(false);
   event.preventDefault();
+}
+
+function onTemplateRecordClick(event){
+    /* Handle 'Template management' button */
+    var template_window = window.open('/record/edit/templates', '', 'resizeable,scrollbars');
+    template_window.document.close(); // needed for chrome and safari
 }
 
 function getRecord(recID, recRev, onSuccess){
@@ -2319,7 +2324,6 @@ function convertFieldIntoEditable(cell, shouldSelect){
         return tmpResult;
       },
       placeholder: '',
-      width: '100%',
       onblur: 'submit',
       select: shouldSelect
     });
