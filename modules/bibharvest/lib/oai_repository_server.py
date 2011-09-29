@@ -903,6 +903,13 @@ def check_argd(arguments):
         out = out + oai_error("badArgument",
                               "The request includes illegal arguments")
 
+## resumptionToken not empty when defined
+#
+#
+    if arguments.get('resumptionToken', None) == '':
+        out = out + oai_error("badResumptionToken",
+                              "ResumptionToken invalid")
+
 ## datestamp formats
 #
 #
