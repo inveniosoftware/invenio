@@ -72,6 +72,8 @@ class TestErrorCodes(unittest.TestCase):
                                                                                       'until':"some_random_date"})))
         self.assertNotEqual(None, re.search("badArgument", oai_repository_server.check_argd({'verb':"ListRecords"})))
 
+        self.assertNotEqual(None, re.search("badResumptionToken", oai_repository_server.check_argd({'verb': 'ListRecords', 'resumptionToken': ''})))
+
 class TestEncodings(unittest.TestCase):
     """Test for OAI response encodings."""
 

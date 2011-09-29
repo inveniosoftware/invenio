@@ -127,7 +127,10 @@ class TestSelectiveHarvesting(unittest.TestCase):
         self.assertEqual(len(oai_repository_server.oaigetsysnolist()), \
                          len(oai_repository_server.oaigetsysnolist(fromdate=earliest_datestamp, \
                                                             untildate=latest_datestamp)))
-
+    def test_resumption_token(self):
+        """oairepository - testing harvesting with bad resumption token"""
+        # Non existing resumptionToken
+        self.assert_('badResumptionToken' in oai_repository_server.oailistrecords('resumptionToken=foobar&verb=ListRecords'))
 
 class TestPerformance(unittest.TestCase):
     """Test performance of the repository """
