@@ -341,6 +341,14 @@ def format(xmltext, template_filename=None, template_source=None):
         sys.stderr.write(template_filename +' was not given.')
         return None
 
+    # Some massaging of the input to avoid the default namespace issue
+    # in XPath. More elegant solution might be found though.
+    xmltext = xmltext.replace('xmlns="http://www.loc.gov/MARC21/slim"', '')
+
+    # For older MARCXML records stored in bibfmt with empty indicators
+    xmltext = xmltext.replace('ind1=""', 'ind1=" "')
+    xmltext = xmltext.replace('ind2=""', 'ind2=" "')
+
     result = ""
     if processor_type == 0:
         # libxml2 & libxslt
