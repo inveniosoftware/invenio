@@ -92,6 +92,9 @@ function updateView() {
 	$("#displayTemplates").hide();
         $('#buttonSubmitChanges').attr('disabled', 'true').addClass('buttonDisabled');
 }
+function showLoading() {
+    $('#preview_area').html('<img src=/img/ui-anim_basic_16x16.gif> Loading...');
+}
 
 function createCommandsList(){
 	/*
@@ -163,6 +166,7 @@ function onButtonTestSearchClick() {
 	gActionToPerform = gActionTypes.testSearch;
 	gOutputFormat = gOutputFormatPreview;
 	gPageToDiplay = 1;
+        showLoading();
 	performAJAXRequest();
         $('#buttonSubmitChanges').attr('disabled', 'true').addClass('buttonDisabled');
 }
@@ -176,6 +180,7 @@ function onButtonPreviewResultsClick() {
 	gOutputFormat = gOutputFormatPreview;
 	gPageToDiplay = 1;
         gComputeModifications = 1;
+        showLoading();
 	performAJAXRequest();
         $('#buttonSubmitChanges').removeAttr('disabled').removeClass('buttonDisabled');
 }
@@ -297,7 +302,6 @@ function performAJAXRequest() {
 	/*
 	 * Perform an AJAX request
 	 */
-
 	$.ajax( {
 		cache : false,
 		type : "POST",

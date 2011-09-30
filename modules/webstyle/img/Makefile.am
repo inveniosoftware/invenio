@@ -250,7 +250,8 @@ img_DATA = add-small.png \
            white_field.gif \
            wsignout.gif \
 	   compare.png \
-           document-preview.png
+           document-preview.png \
+           ui-anim_basic_16x16.gif
 
 tmpdir=$(localstatedir)/tmp
 
