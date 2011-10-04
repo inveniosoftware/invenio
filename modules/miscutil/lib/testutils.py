@@ -443,6 +443,22 @@ class InvenioWebTestCase(unittest.TestCase):
         except:
             raise InvenioWebTestCaseException(element=element_link_text)
 
+    def find_element_by_partial_link_text_with_timeout(self, element_partial_link_text, timeout=30):
+        """ Find an element by partial link text. This waits up to 'timeout' seconds
+        before throwing an InvenioWebTestCaseException or if it finds the element
+        will return it in 0 - timeout seconds.
+        @param element_partial_link_text: partial link text of the element to find
+        @type element_partial_link_text: string
+        @param timeout: time in seconds before throwing an exception
+        if the element is not found
+        @type timeout: int
+        """
+
+        try:
+            WebDriverWait(self.browser, timeout).until(lambda driver: driver.find_element_by_partial_link_text(element_partial_link_text))
+        except:
+            raise InvenioWebTestCaseException(element=element_partial_link_text)
+
     def find_element_by_id_with_timeout(self, element_id, timeout=30):
         """ Find an element by id. This waits up to 'timeout' seconds
         before throwing an InvenioWebTestCaseException or if it finds the element
