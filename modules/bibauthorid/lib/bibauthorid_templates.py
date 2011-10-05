@@ -1578,7 +1578,7 @@ class Template:
 
         h(' <ul><li><a href=%s> Login through arXiv.org </a> <small>' % bconfig.BIBAUTHORID_CFG_INSPIRE_LOGIN)
         h ('(This is faster for you, as it allows your changes to be publicly shown immediately.)</small> <br><br>')
-        h(' <li><a href=%s/person/%s?open_clam=True> Continue as a guest </a>'
+        h(' <li><a href=%s/person/%s?open_claim=True> Continue as a guest </a>'
           '<small>(It will take some time before your changes are publicly shown.'
           'Use only if you don\'t have an arXiv.org account.)</small><br><br></ul>' % (CFG_SITE_URL, person))
         h('If you login through arXiv.org we can verify that you are the author of these papers and accept your claims rapidly, '
