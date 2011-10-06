@@ -1146,11 +1146,6 @@ function onGetRecordSuccess(json){
   var revDt = formatDateTime(getRevisionDate(gRecRev));
   var recordRevInfo = "record revision: " + revDt;
   var revAuthorString = gRecRevAuthor;
-
-  /*$('.headline').html(
-    'Record Editor: Record #<span id="spnRecID">' + gRecID + '</span>' +
-    '<div style="margin-left: 5px; font-size: 0.5em; color: #36c;">' +
-    recordRevInfo + ' ' + revAuthorString + '</div>').css('white-space', 'nowrap');*/
   $('.revisionLine').html(recordRevInfo + ' ' + revAuthorString)
   gRecord = json['record'];
   gTagFormat = json['tagFormat'];
