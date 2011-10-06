@@ -40,6 +40,14 @@ class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
 
     index = __call__
 
+    def _lookup(self, component, path):
+        if component == 'hello':
+            name = '/'.join(path)
+            def hello(req, form):
+                return "Hello %s!" % name
+            return hello, []
+        return None, []
+
     def sso(self, req, form):
         """ For testing single sign-on """
         req.add_common_vars()
