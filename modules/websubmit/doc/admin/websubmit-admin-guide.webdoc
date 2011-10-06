@@ -1275,7 +1275,7 @@ function documentation</a>.</p>
 
 <p>File revisions and deletions comes for free with the
 functions. Simply allow deletion or revision of files when
-configuring <code>Create_Upload_Files_Interface<code>.</p>
+configuring <code>Create_Upload_Files_Interface</code>.</p>
 
 
 <a name="5.4"></a><h3>5.4 Upload_File element instance + Move_Uploaded_Files_To_Storage function</h3>
@@ -1317,7 +1317,7 @@ the <a href="#2.3">option 3</a>, step 5.</p>
 
 <p>File revisions and deletions comes for free with the
 this technique. Simply allow deletion or revision of files when
-configuring <code>Upload_Files<code> element of the MBI or SRV steps.</p>
+configuring <code>Upload_Files</code> element of the MBI or SRV steps.</p>
 
 <a name="5.5"></a><h3>5.5 FCKeditor element instance + Move_FCKeditor_Files_To_Storage function</h3>
 
