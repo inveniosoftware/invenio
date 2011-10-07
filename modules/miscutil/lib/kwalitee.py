@@ -31,7 +31,7 @@ General options::
 Check options::
    --stats                  generate kwalitee summary stats
    --check-all              perform all checks listed below
-   --check-some             perform some (important) checks only
+   --check-some             perform some (important) checks only [default]
    --check-errors           check Python errors
    --check-variables        check Python variables
    --check-indentation      check Python code indentation
@@ -847,8 +847,8 @@ def main():
                 cmd_pathnames = sys.argv[opt_idx:]
                 break
         if not cmd_option:
-            print "ERROR: Cannot detect option; see '--help'."
-            sys.exit(1)
+            # by default, we are checking only `most important' stuff
+            cmd_option = 'check_some'
         if not cmd_pathnames:
             print "ERROR: Please specify directory/file; see '--help'."
             sys.exit(1)
