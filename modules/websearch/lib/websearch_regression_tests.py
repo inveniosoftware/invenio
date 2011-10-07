@@ -287,8 +287,6 @@ class WebSearchTestRecord(unittest.TestCase):
     def test_exported_formats(self):
         """ websearch - check formats exported through /CFG_SITE_RECORD/1/export/ URLs"""
 
-        browser = Browser()
-
         self.assertEqual([],
                          test_web_page_content(make_url('/%s/1/export/hm' % CFG_SITE_RECORD),
                                                expected_text='245__ $$aALEPH experiment'))
@@ -324,7 +322,6 @@ class WebSearchTestRecord(unittest.TestCase):
 
     def test_plots_tab(self):
         """ websearch - test to ensure the plots tab is working """
-        browser = Browser()
         self.assertEqual([],
                          test_web_page_content(make_url('/%s/8/plots' % CFG_SITE_RECORD),
                                                expected_text='div id="clip"',
@@ -931,7 +928,7 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
     def test_search_engine_python_api_for_nonexisting_record(self):
         """websearch - search engine Python API for non-existing record"""
         self.assertEqual([],
-                         perform_request_search(recid=1234567809))
+                         perform_request_search(recid=16777215))
 
     def test_search_engine_python_api_for_nonexisting_collection(self):
         """websearch - search engine Python API for non-existing collection"""
@@ -1840,11 +1837,11 @@ class WebSearchDateQueryTest(unittest.TestCase):
 
     def test_search_unit_hits_for_datecreated_previous_millenia(self):
         """websearch - search_unit with datecreated returns >0 hits for docs in the last 1000 years"""
-        self.assertNotEqual(self.empty, search_unit('1000-01-01->9999', 'datecreated'))
+        self.assertNotEqual(self.empty, search_unit('1000-01-01->9999-12-31', 'datecreated'))
 
     def test_search_unit_hits_for_datemodified_previous_millenia(self):
         """websearch - search_unit with datemodified returns >0 hits for docs in the last 1000 years"""
-        self.assertNotEqual(self.empty, search_unit('1000-01-01->9999', 'datemodified'))
+        self.assertNotEqual(self.empty, search_unit('1000-01-01->9999-12-31', 'datemodified'))
 
     def test_search_unit_in_bibrec_for_datecreated_previous_millenia(self):
         """websearch - search_unit_in_bibrec with creationdate gets >0 hits for past 1000 years"""
