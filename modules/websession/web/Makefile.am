@@ -15,13 +15,4 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-testdir = $(libdir)/webtest/invenio
-
-test_DATA = test_group_create.html \
-	    test_group_msg.html \
-	    test_group_open.html \
-	    test_group_set.html
-
-EXTRA_DIST = $(test_DATA)
-
 CLEANFILES = *~ *.tmp
