@@ -37,7 +37,7 @@ if sys.hexversion < 0x2040000:
 from mechanize import Browser, LinkNotFoundError
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_NAME, CFG_SITE_LANG, \
-    CFG_SITE_RECORD
+    CFG_SITE_RECORD, CFG_SITE_LANGS
 from invenio.testutils import make_test_suite, \
                               run_test_suite, \
                               make_url, make_surl, test_web_page_content, \
@@ -49,6 +49,13 @@ from invenio.search_engine import perform_request_search, \
     search_pattern, search_unit, search_unit_in_bibrec, \
     wash_colls
 from invenio.search_engine_utils import get_fieldvalues
+
+
+if 'fr' in CFG_SITE_LANGS:
+    lang_french_configured = True
+else:
+    lang_french_configured = False
+
 
 def parse_url(url):
     parts = urlparse.urlparse(url)
@@ -120,27 +127,39 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help',
                                                expected_text="Help Central"))
-        self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/help/?ln=fr',
-                                               expected_text="Centre d'aide"))
+
+    if lang_french_configured:
+        def test_help_page_availability_fr(self):
+            """websearch - availability of Help Central page in french"""
+            self.assertEqual([],
+                             test_web_page_content(CFG_SITE_URL + '/help/?ln=fr',
+                                                   expected_text="Centre d'aide"))
 
     def test_search_tips_page_availability(self):
         """websearch - availability of Search Tips"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/search-tips',
                                                expected_text="Search Tips"))
-        self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/help/search-tips?ln=fr',
-                                               expected_text="Conseils de recherche"))
+
+    if lang_french_configured:
+        def test_search_tips_page_availability_fr(self):
+            """websearch - availability of Search Tips in french"""
+            self.assertEqual([],
+                             test_web_page_content(CFG_SITE_URL + '/help/search-tips?ln=fr',
+                                                   expected_text="Conseils de recherche"))
 
     def test_search_guide_page_availability(self):
         """websearch - availability of Search Guide"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/search-guide',
                                                expected_text="Search Guide"))
-        self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/help/search-guide?ln=fr',
-                                               expected_text="Guide de recherche"))
+
+    if lang_french_configured:
+        def test_search_guide_page_availability_fr(self):
+            """websearch - availability of Search Guide in french"""
+            self.assertEqual([],
+                             test_web_page_content(CFG_SITE_URL + '/help/search-guide?ln=fr',
+                                                   expected_text="Guide de recherche"))
 
 class WebSearchTestLegacyURLs(unittest.TestCase):
 
@@ -198,9 +217,21 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
         check(make_url('/search.py', p='nuclear', ln='en') + 'as=1',
               make_url('/search', p='nuclear', ln='en') + 'as=1')
 
-        # direct recid searches are redirected to /CFG_SITE_RECORD
-        check(make_url('/search.py', recid=1, ln='es'),
-              make_url('/%s/1' % CFG_SITE_RECORD, ln='es'))
+    if lang_french_configured:
+        def test_legacy_search_fr(self):
+            """ websearch - search queries handle legacy urls """
+
+            browser = Browser()
+
+            def check(legacy, new, browser=browser):
+                browser.open(legacy)
+                got = browser.geturl()
+
+                self.failUnless(same_urls_p(got, new), got)
+
+            # direct recid searches are redirected to /CFG_SITE_RECORD
+            check(make_url('/search.py', recid=1, ln='fr'),
+                  make_url('/%s/1' % CFG_SITE_RECORD, ln='fr'))
 
     def test_legacy_search_help_link(self):
         """websearch - legacy Search Help page link"""
@@ -208,11 +239,12 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/help/search/index.en.html',
                                                expected_text="Help Central"))
 
-    def test_legacy_search_tips_link(self):
-        """websearch - legacy Search Tips page link"""
-        self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/help/search/tips.fr.html',
-                                               expected_text="Conseils de recherche"))
+    if lang_french_configured:
+        def test_legacy_search_tips_link(self):
+            """websearch - legacy Search Tips page link"""
+            self.assertEqual([],
+                             test_web_page_content(CFG_SITE_URL + '/help/search/tips.fr.html',
+                                                   expected_text="Conseils de recherche"))
 
     def test_legacy_search_guide_link(self):
         """websearch - legacy Search Guide page link"""
