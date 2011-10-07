@@ -984,16 +984,6 @@ def concat(alist):
         newl.extend(l)
     return newl
 
-def print_errors(alist):
-    """
-    Creates a unique string with the strings in list, using '\n' as
-    a separator.
-    """
-    text = ""
-    for l in alist:
-        text = '%s\n%s'% (text, l)
-    return text
-
 def record_find_field(rec, tag, field, strict=False):
     """
     Returns the global and local positions of the first occurrence
