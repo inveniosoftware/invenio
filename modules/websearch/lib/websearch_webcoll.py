@@ -414,7 +414,7 @@ class Collection:
         if self.nbrecs and self.reclist:
             # firstly, get last 'rg' records:
             recIDs = list(self.reclist)
-
+            of = 'hb'
             # CERN hack begins: tweak latest additions for selected collections:
             if CFG_CERN_SITE:
                 # alter recIDs list for some CERN collections:
@@ -439,6 +439,7 @@ class Collection:
                     # select only videos with movies:
                     recIDs = list(intbitset(recIDs) & \
                                   search_pattern_parenthesised(p='collection:"PUBLVIDEOMOVIE"'))
+                    of = 'hvp'
                 # sort some CERN collections specially:
                 if self.name in ['Videos',
                                  'Video Clips',
@@ -460,7 +461,7 @@ class Collection:
             for idx in range(total-1, total-to_display-1, -1):
                 recid = recIDs[idx]
                 self.latest_additions_info.append({'id': recid,
-                                                   'format': format_record(recid, "hb", ln=ln),
+                                                   'format': format_record(recid, of, ln=ln),
                                                    'date': get_creation_date(recid, fmt="%Y-%m-%d<br />%H:%i")})
         return
 
@@ -492,19 +493,29 @@ class Collection:
         if latest_additions_info_p:
             passIDs = []
             for idx in range(0, min(len(self.latest_additions_info), rg)):
-                passIDs.append({'id': self.latest_additions_info[idx]['id'],
-                                'body': self.latest_additions_info[idx]['format'] + \
-                                        websearch_templates.tmpl_record_links(recid=self.latest_additions_info[idx]['id'],
+                # CERN hack: display the records in a grid layout, so do not show the related links
+                if CFG_CERN_SITE and self.name in ['Videos']:
+                    passIDs.append({'id': self.latest_additions_info[idx]['id'],
+                                    'body': self.latest_additions_info[idx]['format'],
+                                    'date': self.latest_additions_info[idx]['date']})
+                else:
+                    passIDs.append({'id': self.latest_additions_info[idx]['id'],
+                                    'body': self.latest_additions_info[idx]['format'] + \
+                                     websearch_templates.tmpl_record_links(recid=self.latest_additions_info[idx]['id'],
                                                                               rm='citation',
                                                                               ln=ln),
-                                'date': self.latest_additions_info[idx]['date']})
+                                    'date': self.latest_additions_info[idx]['date']})
 
             if self.nbrecs > rg:
                 url = websearch_templates.build_search_url(
                     cc=self.name, jrec=rg+1, ln=ln, aas=aas)
             else:
                 url = ""
-
+            # CERN hack: display the records in a grid layout
+            if CFG_CERN_SITE and self.name in ['Videos']:
+                return websearch_templates.tmpl_instant_browse(
+                    aas=aas, ln=ln, recids=passIDs, more_link=url, grid_layout=True)
+      
             return websearch_templates.tmpl_instant_browse(
                 aas=aas, ln=ln, recids=passIDs, more_link=url)
 

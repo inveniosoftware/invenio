@@ -1456,7 +1456,7 @@ class Template:
         return _("This collection does not contain any document yet.")
 
 
-    def tmpl_instant_browse(self, aas, ln, recids, more_link=None):
+    def tmpl_instant_browse(self, aas, ln, recids, more_link=None, grid_layout=False):
         """
           Formats a list of records (given in the recids list) from the database.
 
@@ -1476,19 +1476,32 @@ class Template:
         _ = gettext_set_language(ln)
 
         body = '''<table class="latestadditionsbox">'''
+        if grid_layout:
+            body += '<div>'
         for recid in recids:
-            body += '''
-            <tr>
-              <td class="latestadditionsboxtimebody">%(date)s</td>
-              <td class="latestadditionsboxrecordbody">
+            if grid_layout:
+                body += '''
                 <abbr class="unapi-id" title="%(recid)s"></abbr>
                 %(body)s
-              </td>
-            </tr>''' % {
+            ''' % {
+                'recid': recid['id'],
+                'body': recid['body']}
+            else:
+                body += '''
+                <tr>
+                  <td class="latestadditionsboxtimebody">%(date)s</td>
+                  <td class="latestadditionsboxrecordbody">
+                    <abbr class="unapi-id" title="%(recid)s"></abbr>
+                    %(body)s
+                  </td>
+                </tr>''' % {
                         'recid': recid['id'],
                         'date': recid['date'],
                         'body': recid['body']
                       }
+        if grid_layout:
+            body += '''<div style="clear:both"></div>'''
+            body += '''</div>'''
         body += "</table>"
         if more_link:
             body += '<div align="right"><small>' + \
