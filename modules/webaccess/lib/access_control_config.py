@@ -112,8 +112,8 @@ elif CFG_INSPIRE_SITE:
     CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
     CFG_EXTERNAL_AUTHENTICATION = {
     "Local": None,
-    "Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False, check_user_ip=True),
-    "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True, check_user_ip=True)
+    "Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False, check_user_ip=2),
+    "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True, check_user_ip=2)
     }
 else:
     CFG_EXTERNAL_AUTH_DEFAULT = 'Local'
