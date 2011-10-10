@@ -17,10 +17,4 @@
 
 SUBDIRS = admin
 
-testdir = $(libdir)/webtest/invenio
-
-test_DATA = test_insert_oai_source.html
-
-EXTRA_DIST = $(test_DATA)
-
 CLEANFILES = *~ *.tmp
