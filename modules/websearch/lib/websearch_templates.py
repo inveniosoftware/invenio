@@ -4435,9 +4435,28 @@ class Template:
         for coll, colldef in l_colls:
             out += '<td align="right">%.1f</td>' % d_avg_cites[coll]
         out += '</tr>'
-        out += """<tr><td><strong>%(msg_breakdown)s</strong></td></tr>""" % \
-               {'msg_breakdown': _("Breakdown of papers by citations:"), }
         return out
+
+    def tmpl_citesummary_minus_self_cites(self, d_total_cites, d_avg_cites, l_colls, ln=CFG_SITE_LANG):
+        """HTML citesummary format, overview. A part of HCS format suite."""
+        _ = gettext_set_language(ln)
+        out = """<tr><td><strong>%(msg_cites)s</strong></td>""" % \
+              {'msg_cites': _("Total number of citations excluding self-citations:"), }
+        for coll, colldef in l_colls:
+            out += '<td align="right">%s</td>' % self.tmpl_nice_number(d_total_cites[coll], ln)
+        out += '</tr>'
+        out += """<tr><td><strong>%(msg_avgcit)s</strong></td>""" % \
+               {'msg_avgcit': _("Average citations per paper excluding self-citations:"), }
+        for coll, colldef in l_colls:
+            out += '<td align="right">%.1f</td>' % d_avg_cites[coll]
+        out += '</tr>'
+        return out
+
+    def tmpl_citesummary_breakdown_header(self, ln=CFG_SITE_LANG):
+        _ = gettext_set_language(ln)
+        return """<tr><td><strong>%(msg_breakdown)s</strong></td></tr>""" % \
+               {'msg_breakdown': _("Breakdown of papers by citations:"), }
+
 
     def tmpl_citesummary_breakdown_by_fame(self, d_cites, low, high, fame, l_colls, searchpattern, searchfield, ln=CFG_SITE_LANG):
         """HTML citesummary format, breakdown by fame. A part of HCS format suite."""

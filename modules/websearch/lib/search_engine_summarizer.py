@@ -26,11 +26,34 @@ __lastupdated__ = """$Date$"""
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_INSPIRE_SITE
+import ConfigParser
+import sys
+
+if sys.hexversion < 0x2040000:
+    # pylint: disable=W0622
+    from sets import Set as set
+    # pylint: enable=W0622
+
+from invenio.config import CFG_INSPIRE_SITE, CFG_ETCDIR
 from invenio.bibrank_citation_searcher import get_cited_by_list
+from invenio.bibrank_citation_indexer import tagify
+from invenio.errorlib import register_exception
+from invenio.bibformat_utils import parse_tag
+from invenio.search_engine_utils import get_fieldvalues
 import search_engine
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
+
+def load_config_file(key):
+    filename = CFG_ETCDIR + "/bibrank/" + key + ".cfg"
+    config = ConfigParser.ConfigParser()
+    try:
+        config.readfp(open(filename))
+    except StandardError:
+        raise Exception('Unable to load config file %s' % filename)
+    return config
+
+CITATION_CONFIG = load_config_file('citation')
 
 ## CFG_CITESUMMARY_COLLECTIONS -- how do we break down cite summary
 ## results according to collections?
@@ -53,6 +76,65 @@ CFG_CITESUMMARY_FAME_THRESHOLDS = [
                                    (0, 0, 'Unknown papers (0)')
                                    ]
 
+## CFG_SELFCITATIONS_THRESHOLD -- only calculate self-citations stats if
+## we are dealing with less than n records
+CFG_CITESUMMARY_SELFCITES_THRESHOLD = 1000
+
+
+def get_authors_tags(config=CITATION_CONFIG):
+    """
+    Get the tags for main author, coauthors, alternative authors from config
+    """
+    function = config.get("rank_method", "function")
+
+    tags_names = [
+        'first_author',
+        'additional_author',
+        'alternative_author_name'
+    ]
+
+    tags = {}
+    for t in tags_names:
+        r_tag = config.get(function, t)
+        tags[t] = tagify(parse_tag(r_tag))
+
+    return tags
+
+
+def get_authors_from_record(recID, tags):
+    """
+    Get all authors for a record
+    We need this function because there's 3 different types of authors
+    and to fetch each one of them we need look through MARC tags
+    """
+    mainauth_list = get_fieldvalues(recID, tags['first_author'])
+    coauth_list   = get_fieldvalues(recID, tags['additional_author'])
+    extauth_list  = get_fieldvalues(recID, tags['alternative_author_name'])
+
+    authors = set(mainauth_list)
+    authors.update(coauth_list)
+    authors.update(extauth_list)
+
+    return authors
+
+
+def get_coauthors(author, tags, cache):
+    """
+    Given author A, returns all the authors having published
+    a record with author A
+    """
+    if author in cache:
+        return cache[author]
+
+    friends = set()
+
+    for recid in search_engine.search_pattern(p=author, f='author'):
+        friends.update(get_authors_from_record(recid, tags))
+
+    cache[author] = friends
+    return friends
+
+
 def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None):
     """Write summary report for records RECIDS in the format OF in language LN.
        SEARCHPATTERN and SEARCHFIELD are search query that led to RECIDS,
@@ -62,6 +144,8 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
     if of == 'hcs':
         # this is HTML cite summary
         html = []
+        compute_self_citations = True
+
         # 1) hcs prologue:
         d_recids = {}
         d_total_recs = {}
@@ -71,6 +155,8 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
             else:
                 d_recids[coll] = recids & search_engine.search_pattern(p=colldef)
             d_total_recs[coll] = len(d_recids[coll])
+            if d_total_recs[coll] > CFG_CITESUMMARY_SELFCITES_THRESHOLD:
+                compute_self_citations = False
 
         prologue = websearch_templates.tmpl_citesummary_prologue(d_total_recs, CFG_CITESUMMARY_COLLECTIONS, searchpattern, searchfield, ln)
 
@@ -95,14 +181,63 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
                     d_recid_citecount_l[coll].append((recid, len(lciters)))
             if d_total_cites[coll] != 0:
                 d_avg_cites[coll] = d_total_cites[coll] * 1.0 / d_total_recs[coll]
-        overview = websearch_templates.tmpl_citesummary_overview(d_total_cites, d_avg_cites, CFG_CITESUMMARY_COLLECTIONS, ln)
+        overview = websearch_templates.tmpl_citesummary_overview(d_total_cites,
+            d_avg_cites, CFG_CITESUMMARY_COLLECTIONS, ln)
 
         if not req:
             html.append(overview)
         elif hasattr(req, "write"):
             req.write(overview)
 
-        # 3) hcs break down by fame:
+        # 3) compute self-citations
+        if compute_self_citations:
+            try:
+                tags = get_authors_tags()
+            except IndexError, msg:
+                register_exception(prefix="attribute " + \
+                    str(msg) + " missing in config", alert_admin=True)
+                compute_self_citations = False
+
+        if compute_self_citations:
+            d_recid_citers = {}
+            d_total_cites = {}
+            d_avg_cites = {}
+            for coll, colldef in CFG_CITESUMMARY_COLLECTIONS:
+                d_total_cites[coll] = 0
+                d_avg_cites[coll] = 0
+
+                d_recid_citers[coll] =  get_cited_by_list(d_recids[coll])
+                authors_cache = {}
+                for recid, lciters in d_recid_citers[coll]:
+                    if lciters:
+                        authors = get_authors_from_record(recid, tags)
+                        for cit in lciters:
+                            cit_authors = get_authors_from_record(cit, tags)
+                            #extend with circle of friends
+                            for author in list(cit_authors)[:20]:
+                                author_friends = get_coauthors(author, tags, authors_cache)
+                                cit_authors.update(author_friends)
+
+                            if len(authors.intersection(cit_authors)) == 0:
+                                d_total_cites[coll] += 1
+
+                if d_total_cites[coll] != 0:
+                    d_avg_cites[coll] = d_total_cites[coll] * 1.0 / d_total_recs[coll]
+            overview = websearch_templates.tmpl_citesummary_minus_self_cites(d_total_cites, d_avg_cites, CFG_CITESUMMARY_COLLECTIONS, ln)
+
+            if not req:
+                html.append(overview)
+            elif hasattr(req, "write"):
+                req.write(overview)
+
+        header = websearch_templates.tmpl_citesummary_breakdown_header(ln)
+        if not req:
+            html.append(header)
+        elif hasattr(req, "write"):
+            req.write(header)
+
+
+        # 4) hcs break down by fame:
         for low, high, fame in CFG_CITESUMMARY_FAME_THRESHOLDS:
             d_cites = {}
             for coll, colldef in CFG_CITESUMMARY_COLLECTIONS:
@@ -120,7 +255,7 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
             elif hasattr(req, "write"):
                 req.write(fame_info)
 
-        # 4) hcs calculate h index
+        # 5) hcs calculate h index
         d_h_factors = {}
         def comparator(x, y):
             if x[1] > y[1]:
@@ -144,7 +279,7 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
         elif hasattr(req, "write"):
             req.write(h_idx)
 
-        # 5) hcs epilogue:
+        # 6) hcs epilogue:
         eplilogue = websearch_templates.tmpl_citesummary_epilogue(ln)
 
         if not req:
@@ -219,5 +354,3 @@ def calculate_citations(citedbylist):
     alldict['avgcites'] = avgcites
     alldict['reciddict'] = reciddict
     return alldict
-
-
