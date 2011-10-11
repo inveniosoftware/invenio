@@ -2379,8 +2379,13 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         # start continuous writing to the browser...
         req.content_type = "text/html"
         req.send_http_header()
+        ssl_param = 0
+
+        if req.is_https():
+            ssl_param = 1
+
         req.write(pageheaderonly(req=req, title=title_message,
-                                 language=ln))
+                                 language=ln, secure_page_p=ssl_param))
 
         req.write(TEMPLATE.tmpl_welcome_start())
 
