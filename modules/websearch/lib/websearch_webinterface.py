@@ -396,7 +396,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         # Start the page in clean manner:
         req.content_type = "text/html"
         req.send_http_header()
-        req.write(pageheaderonly(req=req, title=title_message,
+        req.write(pageheaderonly(req=req, title=title_message, uid=getUid(req),
                                  metaheaderadd=metaheaderadd, language=ln))
         req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
         req.write(page_content)
