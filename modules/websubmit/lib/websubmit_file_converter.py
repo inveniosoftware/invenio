@@ -90,8 +90,10 @@ CFG_TWO2THREE_LANG_CODES = {
 
 CFG_OPENOFFICE_TMPDIR = os.path.join(CFG_TMPDIR, 'ooffice-tmp-files')
 CFG_GS_MINIMAL_VERSION_FOR_PDFA = "8.65"
+CFG_GS_MINIMAL_VERSION_FOR_PDFX = "8.52"
 CFG_ICC_PATH = os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'ISOCoatedsb.icc')
 CFG_PDFA_DEF_PATH = os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'PDFA_def.ps')
+CFG_PDFX_DEF_PATH = os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'PDFX_def.ps')
 
 _RE_CLEAN_SPACES = re.compile(r'\s+')
 
@@ -162,6 +164,11 @@ def get_conversion_map():
             ret['.ps']['.pdf;pdfa'] = (ps2pdf, {})
             if CFG_PATH_GUNZIP:
                 ret['.ps.gz']['.pdf'] = (ps2pdf, {})
+    if can_pdfx():
+        ret['.ps']['.pdf;pdfx'] = (ps2pdfx, {})
+        ret['.pdf']['.pdf;pdfx'] = (pdf2pdfx, {})
+        if CFG_PATH_GUNZIP:
+            ret['.ps.gz']['.pdf;pdfx'] = (ps2pdfx, {})
     if CFG_PATH_PDFTOPS:
         ret['.pdf']['.ps'] = (pdf2ps, {'compress': False})
         ret['.pdf;pdfa']['.ps'] = (pdf2ps, {'compress': False})
@@ -284,6 +291,38 @@ def can_pdfopt(verbose=False):
     elif verbose:
         print >> sys.stderr, "PDF linearization is not supported because the pdfopt executable is not available"
     return False
+
+
+def can_pdfx(verbose=False):
+    """Return True if it's possible to generate PDF/Xs."""
+    if not CFG_PATH_PDFTOPS:
+        if verbose:
+            print >> sys.stderr, "Conversion of PS or PDF to PDF/X is not possible because the pdftops executable is not available"
+        return False
+    if not CFG_PATH_GS:
+        if verbose:
+            print >> sys.stderr, "Conversion of PS or PDF to PDF/X is not possible because the gs executable is not available"
+        return False
+    else:
+        try:
+            output = run_shell_command("%s --version" % CFG_PATH_GS)[1].strip()
+            if not output:
+                raise ValueError("No version information returned")
+            if [int(number) for number in output.split('.')] < [int(number) for number in CFG_GS_MINIMAL_VERSION_FOR_PDFX.split('.')]:
+                print >> sys.stderr, "Conversion of PS or PDF to PDF/X is not possible because the minimal gs version for the executable %s is not met: it should be %s but %s has been found" % (CFG_PATH_GS, CFG_GS_MINIMAL_VERSION_FOR_PDFX, output)
+                return False
+        except Exception, err:
+            print >> sys.stderr, "Conversion of PS or PDF to PDF/X is not possible because it's not possible to retrieve the gs version using the executable %s: %s" % (CFG_PATH_GS, err)
+            return False
+    if not CFG_PATH_PDFINFO:
+        if verbose:
+            print >> sys.stderr, "Conversion of PS or PDF to PDF/X is not possible because the pdfinfo executable is not available"
+        return False
+    if not os.path.exists(CFG_ICC_PATH):
+        if verbose:
+            print >> sys.stderr, "Conversion of PS or PDF to PDF/X is not possible because %s does not exists. Have you run make install-pdfa-helper-files?" % CFG_ICC_PATH
+        return False
+    return True
 
 
 def can_pdfa(verbose=False):
@@ -641,6 +680,64 @@ def any2djvu(input_file, output_file=None, resolution=400, ocr=True, input_forma
 
 _RE_FIND_TITLE = re.compile(r'^Title:\s*(.*?)\s*$')
 
+def pdf2pdfx(input_file, output_file=None, title=None, pdfopt=False, profile="pdf/x-3:2002", **dummy):
+    """
+    Transform any PDF into a PDF/X (see: <http://en.wikipedia.org/wiki/PDF/X>)
+    @param input_file [string] the input file name
+    @param output_file [string] the output_file file name, None for temporary generated
+    @param title [string] the title of the document. None for autodiscovery.
+    @param pdfopt [bool] whether to linearize the pdf, too.
+    @param profile: [string] the PDFX profile to use. Supports: 'pdf/x-1a:2001', 'pdf/x-1a:2003', 'pdf/x-3:2002'
+    @return [string] output_file input_file
+    raise InvenioWebSubmitFileConverterError in case of errors.
+    """
+
+    input_file, output_file, working_dir = prepare_io(input_file, output_file, '.pdf')
+
+    if title is None:
+        stdout = execute_command(CFG_PATH_PDFINFO, input_file)
+        for line in stdout.split('\n'):
+            g = _RE_FIND_TITLE.match(line)
+            if g:
+                title = g.group(1)
+                break
+    if not title:
+        title = 'No title'
+
+    get_file_converter_logger().debug("Extracted title is %s" % title)
+
+    if os.path.exists(CFG_ICC_PATH):
+        shutil.copy(CFG_ICC_PATH, working_dir)
+    else:
+        raise InvenioWebSubmitFileConverterError('ERROR: ISOCoatedsb.icc file missing. Have you run "make install-pdfa-helper-files" as part of your Invenio deployment?')
+    pdfx_header = open(CFG_PDFX_DEF_PATH).read()
+    pdfx_header = pdfx_header.replace('<<<<TITLEMARKER>>>>', title)
+    icc_iso_profile_def = ''
+    if profile == 'pdf/x-1a:2001':
+        pdfx_version = 'PDF/X-1a:2001'
+        pdfx_conformance = 'PDF/X-1a:2001'
+    elif profile == 'pdf/x-1a:2003':
+        pdfx_version = 'PDF/X-1a:2003'
+        pdfx_conformance = 'PDF/X-1a:2003'
+    elif profile == 'pdf/x-3:2002':
+        icc_iso_profile_def = '/ICCProfile (ISOCoatedsb.icc)'
+        pdfx_version = 'PDF/X-3:2002'
+        pdfx_conformance = 'PDF/X-3:2002'
+    pdfx_header = pdfx_header.replace('<<<<ICCPROFILEDEF>>>>', icc_iso_profile_def)
+    pdfx_header = pdfx_header.replace('<<<<GTS_PDFXVersion>>>>', pdfx_version)
+    pdfx_header = pdfx_header.replace('<<<<GTS_PDFXConformance>>>>', pdfx_conformance)
+    outputpdf = os.path.join(working_dir, 'output_file.pdf')
+    open(os.path.join(working_dir, 'PDFX_def.ps'), 'w').write(pdfx_header)
+    if profile in ['pdf/x-3:2002']:
+        execute_command(CFG_PATH_GS, '-sProcessColorModel=DeviceCMYK', '-dPDFX', '-dBATCH', '-dNOPAUSE', '-dNOOUTERSAVE', '-dUseCIEColor', '-sDEVICE=pdfwrite', '-dAutoRotatePages=/None', '-sOutputFile=output_file.pdf', os.path.join(working_dir, 'PDFX_def.ps'), input_file, cwd=working_dir)
+    elif profile in ['pdf/x-1a:2001', 'pdf/x-1a:2003']:
+        execute_command(CFG_PATH_GS, '-sProcessColorModel=DeviceCMYK', '-dPDFX', '-dBATCH', '-dNOPAUSE', '-dNOOUTERSAVE', '-sColorConversionStrategy=CMYK', '-sDEVICE=pdfwrite', '-dAutoRotatePages=/None', '-sOutputFile=output_file.pdf', os.path.join(working_dir, 'PDFX_def.ps'), input_file, cwd=working_dir)
+    if pdfopt:
+        execute_command(CFG_PATH_PDFOPT, outputpdf, output_file)
+    else:
+        shutil.move(outputpdf, output_file)
+    clean_working_dir(working_dir)
+    return output_file
 
 def pdf2pdfa(input_file, output_file=None, title=None, pdfopt=True, **dummy):
     """
@@ -714,6 +811,57 @@ def pdf2ps(input_file, output_file=None, level=2, compress=True, **dummy):
         execute_command(CFG_PATH_GZIP, '-c', os.path.join(working_dir, 'output.ps'), filename_out=output_file)
     else:
         shutil.move(os.path.join(working_dir, 'output.ps'), output_file)
+    clean_working_dir(working_dir)
+    return output_file
+
+
+def ps2pdfx(input_file, output_file=None, title=None, pdfopt=False, profile="pdf/x-3:2002", **dummy):
+    """
+    Transform any PS into a PDF/X (see: <http://en.wikipedia.org/wiki/PDF/X>)
+    @param input_file [string] the input file name
+    @param output_file [string] the output_file file name, None for temporary generated
+    @param title [string] the title of the document. None for autodiscovery.
+    @param pdfopt [bool] whether to linearize the pdf, too.
+    @param profile: [string] the PDFX profile to use. Supports: 'pdf/x-1a:2001', 'pdf/x-1a:2003', 'pdf/x-3:2002'
+    @return [string] output_file input_file
+    raise InvenioWebSubmitFileConverterError in case of errors.
+    """
+
+    input_file, output_file, working_dir = prepare_io(input_file, output_file, '.pdf')
+    if input_file.endswith('.gz'):
+        new_input_file = os.path.join(working_dir, 'input.ps')
+        execute_command(CFG_PATH_GUNZIP, '-c', input_file, filename_out=new_input_file)
+        input_file = new_input_file
+    if not title:
+        title = 'No title'
+
+    shutil.copy(CFG_ICC_PATH, working_dir)
+    pdfx_header = open(CFG_PDFX_DEF_PATH).read()
+    pdfx_header = pdfx_header.replace('<<<<TITLEMARKER>>>>', title)
+    icc_iso_profile_def = ''
+    if profile == 'pdf/x-1a:2001':
+        pdfx_version = 'PDF/X-1a:2001'
+        pdfx_conformance = 'PDF/X-1a:2001'
+    elif profile == 'pdf/x-1a:2003':
+        pdfx_version = 'PDF/X-1a:2003'
+        pdfx_conformance = 'PDF/X-1a:2003'
+    elif profile == 'pdf/x-3:2002':
+        icc_iso_profile_def = '/ICCProfile (ISOCoatedsb.icc)'
+        pdfx_version = 'PDF/X-3:2002'
+        pdfx_conformance = 'PDF/X-3:2002'
+    pdfx_header = pdfx_header.replace('<<<<ICCPROFILEDEF>>>>', icc_iso_profile_def)
+    pdfx_header = pdfx_header.replace('<<<<GTS_PDFXVersion>>>>', pdfx_version)
+    pdfx_header = pdfx_header.replace('<<<<TITLEMARKER>>>>', title)
+    outputpdf = os.path.join(working_dir, 'output_file.pdf')
+    open(os.path.join(working_dir, 'PDFX_def.ps'), 'w').write(pdfx_header)
+    if profile in ['pdf/x-3:2002']:
+        execute_command(CFG_PATH_GS, '-sProcessColorModel=DeviceCMYK', '-dPDFX', '-dBATCH', '-dNOPAUSE', '-dNOOUTERSAVE', '-dUseCIEColor', '-sDEVICE=pdfwrite', '-dAutoRotatePages=/None', '-sOutputFile=output_file.pdf', os.path.join(working_dir, 'PDFX_def.ps'), 'input.ps', cwd=working_dir)
+    elif profile in ['pdf/x-1a:2001', 'pdf/x-1a:2003']:
+        execute_command(CFG_PATH_GS, '-sProcessColorModel=DeviceCMYK', '-dPDFX', '-dBATCH', '-dNOPAUSE', '-dNOOUTERSAVE', '-sColorConversionStrategy=CMYK', '-dAutoRotatePages=/None', '-sDEVICE=pdfwrite', '-sOutputFile=output_file.pdf', os.path.join(working_dir, 'PDFX_def.ps'), 'input.ps', cwd=working_dir)
+    if pdfopt:
+        execute_command(CFG_PATH_PDFOPT, outputpdf, output_file)
+    else:
+        shutil.move(outputpdf, output_file)
     clean_working_dir(working_dir)
     return output_file
 
