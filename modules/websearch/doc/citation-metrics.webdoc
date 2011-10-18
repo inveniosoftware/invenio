@@ -54,6 +54,7 @@
        </en>
       </lang>
      </dd>
+    </dl>
 
     <dl>
      <dt>
@@ -70,6 +71,7 @@
        </en>
       </lang>
      </dd>
+    </dl>
 
     <dl>
      <dt>
@@ -86,6 +88,30 @@
        </en>
       </lang>
      </dd>
+    </dl>
+
+    <dl>
+     <dt>
+      <a name="citesummary_self-cites">
+       <lang>
+        <en>
+         Total number of citations minus self-citations
+        </en>
+       </lang>
+      </a>
+     </dt>
+     <dd>
+      <lang>
+       <en>
+        This is the sum over all papers of the number of citations minus the number of citations to a paper by at least one of the coauthors of any paper. Things to note here:
+        <ul>
+          <li>If you are doing a citesummary for author A, the self-cites for her paper 1 are all papers citing paper 1 written by author A or her co-authors for any paper author A has written.</li>
+          <li>If there are more than 20 authors on a paper, the collaboration name is used to exclude cites from papers with the same collaboration name. Collaboration is not used for papers under 20 authors. If the paper has more than 20 authors and no collaboration name, only the first 20 authors are used. This will exclude most self citations from that same group, but will miss a few from individual authors later in the list. This is a rare case.</li>
+        </ul>
+       </en>
+      </lang>
+     </dd>
+    </dl>
 
     <dl>
      <dt>
@@ -106,4 +132,5 @@
        </en>
       </lang>
      </dd>
+    </dl>
 

@@ -43,11 +43,13 @@ from invenio.testutils import make_test_suite, \
                               make_url, make_surl, test_web_page_content, \
                               merge_error_messages
 from invenio.urlutils import same_urls_p
+from invenio.dbquery import run_sql
 from invenio.search_engine import perform_request_search, \
     guess_primary_collection_of_a_record, guess_collection_of_a_record, \
     collection_restricted_p, get_permitted_restricted_collections, \
     search_pattern, search_unit, search_unit_in_bibrec, \
     wash_colls, record_public_p
+from invenio import search_engine_summarizer
 from invenio.search_engine_utils import get_fieldvalues
 
 
@@ -1664,6 +1666,22 @@ class WebSearchSummarizerTest(unittest.TestCase):
                                                expected_text="Less known papers (1-9)",
                                                expected_link_target=CFG_SITE_URL+'/search?p=author%3Aellis%20and%20not%20quark%20AND%20cited%3A1-%3E9&rm=citation',
                                                expected_link_label='1'))
+
+    def test_compute_self_citations(self):
+        """websearch - computing self-citations"""
+        tags = search_engine_summarizer.get_authors_tags()
+        recids = [row[0] for row in run_sql('select id from bibrec limit 300')]
+        citers = search_engine_summarizer.get_cited_by_list(recids)
+        authors_cache = {}
+        total_citations = sum(len(lciters) for recid,lciters in citers)
+        total_citations_minus_self_citations = 0
+        for recid, lciters in citers:
+            total_citations_minus_self_citations += \
+                search_engine_summarizer.compute_self_citations(recid,
+                                                                lciters,
+                                                                authors_cache,
+                                                                tags)
+        self.assert_(total_citations_minus_self_citations < total_citations)
 
 
 class WebSearchRecordCollectionGuessTest(unittest.TestCase):
