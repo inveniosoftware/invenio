@@ -774,7 +774,7 @@ def pdf2pdfa(input_file, output_file=None, title=None, pdfopt=True, **dummy):
     outputpdf = os.path.join(working_dir, 'output_file.pdf')
     open(os.path.join(working_dir, 'PDFA_def.ps'), 'w').write(pdfa_header)
     execute_command(CFG_PATH_PDFTOPS, '-level3', input_file, inputps)
-    execute_command(CFG_PATH_GS, '-sProcessColorModel=DeviceCMYK', '-dPDFA', '-dBATCH', '-dNOPAUSE', '-dNOOUTERSAVE', '-dUseCIEColor', '-sDEVICE=pdfwrite', '-sOutputFile=output_file.pdf', os.path.join(working_dir, 'PDFA_def.ps'), 'input.ps', cwd=working_dir)
+    execute_command(CFG_PATH_GS, '-sProcessColorModel=DeviceCMYK', '-dPDFA', '-dBATCH', '-dNOPAUSE', '-dNOOUTERSAVE', '-dUseCIEColor', '-sDEVICE=pdfwrite', '-dAutoRotatePages=/None', '-sOutputFile=output_file.pdf', os.path.join(working_dir, 'PDFA_def.ps'), 'input.ps', cwd=working_dir)
     if pdfopt:
         execute_command(CFG_PATH_PDFOPT, outputpdf, output_file)
     else:
@@ -890,7 +890,7 @@ def ps2pdfa(input_file, output_file=None, title=None, pdfopt=True, **dummy):
     pdfa_header = pdfa_header.replace('<<<<TITLEMARKER>>>>', title)
     outputpdf = os.path.join(working_dir, 'output_file.pdf')
     open(os.path.join(working_dir, 'PDFA_def.ps'), 'w').write(pdfa_header)
-    execute_command(CFG_PATH_GS, '-sProcessColorModel=DeviceCMYK', '-dPDFA', '-dBATCH', '-dNOPAUSE', '-dNOOUTERSAVE', '-dUseCIEColor', '-sDEVICE=pdfwrite', '-sOutputFile=output_file.pdf', os.path.join(working_dir, 'PDFA_def.ps'), input_file, cwd=working_dir)
+    execute_command(CFG_PATH_GS, '-sProcessColorModel=DeviceCMYK', '-dPDFA', '-dBATCH', '-dNOPAUSE', '-dNOOUTERSAVE', '-dUseCIEColor', '-sDEVICE=pdfwrite', '-dAutoRotatePages=/None', '-sOutputFile=output_file.pdf', os.path.join(working_dir, 'PDFA_def.ps'), input_file, cwd=working_dir)
     if pdfopt:
         execute_command(CFG_PATH_PDFOPT, outputpdf, output_file)
     else:
