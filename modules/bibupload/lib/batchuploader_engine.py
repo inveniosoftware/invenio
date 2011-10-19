@@ -138,9 +138,12 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None):
         _log(msg)
         return _write(req, msg)
     # run upload command
-    bibupload_path = CFG_BINDIR + '/bibupload -u batchupload'
-    run_shell_command('%s %s %s' % (bibupload_path, arg_mode, filename))
-    msg = "[INFO] %s %s %s" % (bibupload_path, arg_mode, filename)
+    if callback_url:
+        task_low_level_submission('bibupload', "batchupload", arg_mode, filename, "--callback-url", callback_url)
+        msg = "[INFO] %s %s %s %s %s" % ('bibupload', arg_mode, filename, "--callback-url", callback_url)
+    else:
+        task_low_level_submission('bibupload', "batchupload", arg_mode, filename)
+        msg = "[INFO] %s %s %s" % ('bibupload', arg_mode, filename)
     _log(msg)
     return _write(req, msg)
 

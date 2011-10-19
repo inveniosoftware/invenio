@@ -165,10 +165,10 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
 
     def robotupload(self, req, form):
         """Interface for robots used like this:
-            $ curl -F 'file=@localfile.xml' -F 'mode=-i' http://cdsweb.cern.ch/batchuploader/robotupload -A invenio_webupload
+            $ curl -F 'file=@localfile.xml' -F 'mode=-i' [-F 'callback_url=http://...' http://cdsweb.cern.ch/batchuploader/robotupload] -A invenio_webupload
         """
-        argd = wash_urlargd(form, {'mode': (str,None)})
-        cli_upload(req, form.get('file', None), argd['mode'])
+        argd = wash_urlargd(form, {'mode': (str, None), 'callback_url': (str, None)})
+        cli_upload(req, form.get('file', None), argd['mode'], argd['callback_url'])
 
     def allocaterecord(self, req, form):
         """

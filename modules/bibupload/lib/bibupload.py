@@ -33,6 +33,8 @@ import socket
 import marshal
 import copy
 import tempfile
+import urlparse
+import urllib2
 
 from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_REFERENCE_TAG, \
@@ -41,8 +43,10 @@ from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG, \
      CFG_BIBUPLOAD_STRONG_TAGS, \
      CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS, \
-     CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE
+     CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE, \
+     CFG_SITE_URL, CFG_SITE_RECORD
 
+from invenio.jsonutils import json, CFG_JSON_AVAILABLE
 from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
     CFG_BIBUPLOAD_SPECIAL_TAGS
 from invenio.dbquery import run_sql, \
@@ -135,14 +139,18 @@ def bibupload(record, opt_tag=None, opt_mode=None,
     error = None
     # If there are special tags to proceed check if it exists in the record
     if opt_tag is not None and not(record.has_key(opt_tag)):
-        write_message("    Failed: Tag not found, enter a valid tag to update.",
-                    verbose=1, stream=sys.stderr)
-        return (1, -1)
+        msg = "    Failed: Tag not found, enter a valid tag to update."
+        write_message(msg, verbose=1, stream=sys.stderr)
+        return (1, -1, msg)
 
     # Extraction of the Record Id from 001, SYSNO or OAIID tags:
     rec_id = retrieve_rec_id(record, opt_mode, pretend=pretend)
     if rec_id == -1:
-        return (1, -1)
+        msg = "    Failed: either the record already exists and insert was " \
+            "requested or the record does not exists and " \
+            "replace/correct/append has been used"
+        write_message(msg, verbose=1, stream=sys.stderr)
+        return (1, -1, msg)
     elif rec_id > 0:
         write_message("   -Retrieve record ID (found %s): DONE." % rec_id, verbose=2)
         if not record.has_key('001'):
@@ -151,10 +159,10 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             # should add it now:
             error = record_add_field(record, '001', controlfield_value=rec_id)
             if error is None:
-                write_message("   Failed: " \
-                    "Error during adding the 001 controlfield "  \
-                    "to the record", verbose=1, stream=sys.stderr)
-                return (1, int(rec_id))
+                msg = "   Failed: Error during adding the 001 controlfield "  \
+                    "to the record"
+                write_message(msg, verbose=1, stream=sys.stderr)
+                return (1, int(rec_id), msg)
             else:
                 error = None
             write_message("   -Added tag 001: DONE.", verbose=2)
@@ -164,9 +172,9 @@ def bibupload(record, opt_tag=None, opt_mode=None,
     if opt_mode == 'reference':
         error = extract_tag_from_record(record, CFG_BIBUPLOAD_REFERENCE_TAG)
         if error is None:
-            write_message("   Failed: No reference tags has been found...",
-                        verbose=1, stream=sys.stderr)
-            return (1, -1)
+            msg = "   Failed: No reference tags has been found..."
+            write_message(msg, verbose=1, stream=sys.stderr)
+            return (1, -1, msg)
         else:
             error = None
             write_message("   -Check if reference tags exist: DONE", verbose=2)
@@ -182,10 +190,10 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         # we add the record Id control field to the record
         error = record_add_field(record, '001', controlfield_value=rec_id)
         if error is None:
-            write_message("   Failed: " \
-                                        "Error during adding the 001 controlfield "  \
-                                        "to the record", verbose=1, stream=sys.stderr)
-            return (1, int(rec_id))
+            msg = "   Failed: Error during adding the 001 controlfield "  \
+                  "to the record"
+            write_message(msg, verbose=1, stream=sys.stderr)
+            return (1, int(rec_id), msg)
         else:
             error = None
 
@@ -198,9 +206,9 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         # Also save a copy to restore previous situation in case of errors
         original_record = get_record(rec_id)
         if rec_old is None:
-            write_message("   Failed during the creation of the old record!",
-                        verbose=1, stream=sys.stderr)
-            return (1, int(rec_id))
+            msg = "   Failed during the creation of the old record!"
+            write_message(msg, verbose=1, stream=sys.stderr)
+            return (1, int(rec_id), msg)
         else:
             write_message("   -Retrieve the old record to update: DONE", verbose=2)
 
@@ -238,7 +246,9 @@ def bibupload(record, opt_tag=None, opt_mode=None,
 
     try:
         if not record_is_valid(record):
-            return (1, -1)
+            msg = "ERROR: record is not valid"
+            write_message(msg, verbose=1, stream=sys.stderr)
+            return (1, -1, msg)
 
         # Have a look if we have FMT tags
         write_message("Stage 1: Start (Insert of FMT tags if exist).", verbose=2)
@@ -246,13 +256,13 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             extract_tag_from_record(record, 'FMT') is not None:
             record = insert_fmt_tags(record, rec_id, opt_mode, pretend=pretend)
             if record is None:
-                write_message("   Stage 1 failed: Error while inserting FMT tags",
-                            verbose=1, stream=sys.stderr)
-                return (1, int(rec_id))
+                msg = "   Stage 1 failed: Error while inserting FMT tags"
+                write_message(msg, verbose=1, stream=sys.stderr)
+                return (1, int(rec_id), msg)
             elif record == 0:
                 # Mode format finished
                 stat['nb_records_updated'] += 1
-                return (0, int(rec_id))
+                return (0, int(rec_id), "")
             write_message("   -Stage COMPLETED", verbose=2)
         else:
             write_message("   -Stage NOT NEEDED", verbose=2)
@@ -272,13 +282,13 @@ def bibupload(record, opt_tag=None, opt_mode=None,
                 record = elaborate_fft_tags(record, rec_id, opt_mode, pretend=pretend)
             except Exception, e:
                 register_exception()
-                write_message("   Stage 2 failed: Error while elaborating FFT tags: %s" % e,
-                    verbose=1, stream=sys.stderr)
-                return (1, int(rec_id))
+                msg = "   Stage 2 failed: Error while elaborating FFT tags: %s" % e
+                write_message(msg, verbose=1, stream=sys.stderr)
+                return (1, int(rec_id), msg)
             if record is None:
-                write_message("   Stage 2 failed: Error while elaborating FFT tags",
-                            verbose=1, stream=sys.stderr)
-                return (1, int(rec_id))
+                msg = "   Stage 2 failed: Error while elaborating FFT tags"
+                write_message(msg, verbose=1, stream=sys.stderr)
+                return (1, int(rec_id), msg)
             write_message("   -Stage COMPLETED", verbose=2)
         else:
             write_message("   -Stage NOT NEEDED", verbose=2)
@@ -291,13 +301,13 @@ def bibupload(record, opt_tag=None, opt_mode=None,
                 record = synchronize_8564(rec_id, record, record_had_FFT, pretend=pretend)
             except Exception, e:
                 register_exception(alert_admin=True)
-                write_message("   Stage 2B failed: Error while synchronizing 8564 tags: %s" % e,
-                    verbose=1, stream=sys.stderr)
-                return (1, int(rec_id))
+                msg = "   Stage 2B failed: Error while synchronizing 8564 tags: %s" % e
+                write_message(msg, verbose=1, stream=sys.stderr)
+                return (1, int(rec_id), msg)
             if record is None:
-                write_message("   Stage 2B failed: Error while synchronizing 8564 tags",
-                            verbose=1, stream=sys.stderr)
-                return (1, int(rec_id))
+                msg = "   Stage 2B failed: Error while synchronizing 8564 tags"
+                write_message(msg, verbose=1, stream=sys.stderr)
+                return (1, int(rec_id), msg)
             write_message("   -Stage COMPLETED", verbose=2)
         else:
             write_message("   -Stage NOT NEEDED", verbose=2)
@@ -311,21 +321,21 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             if opt_mode != 'format':
                 error = update_bibfmt_format(rec_id, rec_xml_new, 'xm', pretend=pretend)
                 if error == 1:
-                    write_message("   Failed: error during update_bibfmt_format 'xm'",
-                                verbose=1, stream=sys.stderr)
-                    return (1, int(rec_id))
+                    msg = "   Failed: error during update_bibfmt_format 'xm'"
+                    write_message(msg, verbose=1, stream=sys.stderr)
+                    return (1, int(rec_id), msg)
                 if CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE:
                     error = update_bibfmt_format(rec_id, marshal.dumps(record), 'recstruct', pretend=pretend)
                     if error == 1:
-                        write_message("   Failed: error during update_bibfmt_format 'recstruct'",
-                                    verbose=1, stream=sys.stderr)
-                        return (1, int(rec_id))
+                        msg = "   Failed: error during update_bibfmt_format 'recstruct'"
+                        write_message(msg, verbose=1, stream=sys.stderr)
+                        return (1, int(rec_id), msg)
                 # archive MARCXML format of this record for version history purposes:
                 error = archive_marcxml_for_history(rec_id, pretend=pretend)
                 if error == 1:
-                    write_message("   Failed to archive MARCXML for history",
-                                verbose=1, stream=sys.stderr)
-                    return (1, int(rec_id))
+                    msg = "   Failed to archive MARCXML for history"
+                    write_message(msg, verbose=1, stream=sys.stderr)
+                    return (1, int(rec_id), msg)
                 else:
                     write_message("   -Archived MARCXML for history : DONE", verbose=2)
             write_message("   -Stage COMPLETED", verbose=2)
@@ -366,7 +376,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
 
         # Upload of this record finish
         write_message("Record "+str(rec_id)+" DONE", verbose=1)
-        return (0, int(rec_id))
+        return (0, int(rec_id), "")
     finally:
         if record_deleted_p:
             ## BibUpload has failed living the record deleted. We should
@@ -1883,6 +1893,8 @@ Examples:
   --pretend\t\tdo not really insert/append/correct/replace the input file
   --force\t\twhen --replace, use provided 001 tag values, even if the matching
 \t\t\trecord does not exist (thus allocating it on-the-fly)
+  --callback-url\tSend via a POST request a JSON-serialized answer (see admin guide), in
+\t\t\torder to provide a feedback to an external service about the outcome of the operation.
 """,
             version=__revision__,
             specific_params=("ircazdS:fno",
@@ -1898,7 +1910,8 @@ Examples:
                    "notimechange",
                    "holdingpen",
                    "pretend",
-                   "force"
+                   "force",
+                   "callback-url="
                  ]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_run_fnc=task_run_core)
@@ -1994,6 +2007,9 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
             print >> sys.stderr, """The value specified for --stage must be comprised between 0 and 5"""
             return False
         task_set_option('stage_to_start_from', value)
+
+    elif key in ("--callback-url", ):
+        task_set_option('callback_url', value)
     else:
         return False
     return True
@@ -2034,6 +2050,26 @@ def writing_rights_p():
         return False
     return True
 
+def post_results_to_callback_url(results, callback_url):
+    if not CFG_JSON_AVAILABLE:
+        from warnings import warn
+        warn("--callback-url used but simplejson/json not available")
+        return
+    json_results = json.dumps(results)
+    ## <scheme>://<netloc>/<path>?<query>#<fragment>
+    scheme, netloc, path, query, fragment = urlparse.urlsplit(callback_url)
+    ## See: http://stackoverflow.com/questions/111945/is-there-any-way-to-do-http-put-in-python
+    if scheme == 'http':
+        opener = urllib2.build_opener(urllib2.HTTPHandler)
+    elif scheme == 'https':
+        opener = urllib2.build_opener(urllib2.HTTPSHandler)
+    else:
+        raise ValueError("Scheme not handled %s for callback_url %s" % (scheme, callback_url))
+    request = urllib2.Request(callback_url, data=json_results)
+    request.add_header('Content-Type', 'application/json')
+    request.get_method = lambda: 'POST'
+    return opener.open(request)
+
 def task_run_core():
     """ Reimplement to add the body of the task."""
     error = 0
@@ -2049,6 +2085,8 @@ def task_run_core():
         write_message("   -Open XML marc: DONE", verbose=2)
         task_sleep_now_if_required(can_stop_too=True)
         write_message("Entering records loop", verbose=3)
+        callback_url = task_get_option('callback_url')
+        results_for_callback = {'results': []}
         if recs is not None:
             # We proceed each record by record
             for record in recs:
@@ -2076,6 +2114,8 @@ def task_run_core():
                             write_message("Record could not have been parsed",
                                           stream=sys.stderr)
                         stat['nb_errors'] += 1
+                        if callback_url:
+                            results_for_callback['results'].append({'recid': error[1], 'success': False, 'error_message': error[2]})
                     elif error[0] == 2:
                         if record:
                             write_message(record_xml_output(record),
@@ -2083,6 +2123,15 @@ def task_run_core():
                         else:
                             write_message("Record could not have been parsed",
                                           stream=sys.stderr)
+                        if callback_url:
+                            results_for_callback['results'].append({'recid': error[1], 'success': False, 'error_message': error[2]})
+                    elif error[0] == 0:
+                        if callback_url:
+                            from invenio.search_engine import print_record
+                            results_for_callback['results'].append({'recid': error[1], 'success': True, "marcxml": print_record(error[1], 'xm'), 'url': "%s/%s/%s" % (CFG_SITE_URL, CFG_SITE_RECORD, error[1])})
+                    else:
+                        if callback_url:
+                            results_for_callback['results'].append({'recid': error[1], 'success': False, 'error_message': error[2]})
 
                 task_update_progress("Done %d out of %d." % \
                     (stat['nb_records_inserted'] + \
@@ -2091,6 +2140,9 @@ def task_run_core():
         else:
             write_message("   Error bibupload failed: No record found",
                         verbose=1, stream=sys.stderr)
+        callback_url = task_get_option("callback_url")
+        if callback_url:
+            post_results_to_callback_url(results_for_callback, callback_url)
 
     if task_get_task_param('verbose') >= 1:
         # Print out the statistics
