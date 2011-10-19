@@ -21,19 +21,7 @@ __revision__ = "$Id"
 
 __lastupdated__ = """$Date: 2008/08/12 09:26:46 $"""
 
-import sys
-if sys.hexversion < 0x2060000:
-    try:
-        import simplejson as json
-    except ImportError:
-        # Okay, no Ajax app will be possible, but continue anyway,
-        # since this package is only recommended, not mandatory.
-        pass
-else:
-    import json
-
-from invenio.bibedit_utils import json_unicode_to_utf8
-
+from invenio.jsonutils import json, json_unicode_to_utf8
 from invenio.webinterface_handler import WebInterfaceDirectory, \
                                          wash_urlargd
 from invenio.webpage import page

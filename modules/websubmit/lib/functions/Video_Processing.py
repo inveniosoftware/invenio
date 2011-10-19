@@ -21,27 +21,19 @@
 
 __revision__ = "$Id$"
 
-from invenio.mailutils import send_email
+import os
+
+from invenio.jsonutils import json_decode_file
 from invenio.errorlib import register_exception
 from invenio.bibencode_config import CFG_BIBENCODE_TEMPLATE_BATCH_SUBMISSION
-from invenio.bibencode_utils import json_decode_file, generate_timestamp
+from invenio.bibencode_utils import generate_timestamp
 from invenio.bibencode_batch_engine import create_job_from_dictionary
 from invenio.config import CFG_SITE_ADMIN_EMAIL
-## Simplejspn fallback, stuff will crash if V < 2.5 and no simplejson
-try:
-    import json
-except:
-    try:
-        import simplejson as json
-    except:
-        pass
-import os
-import uuid
 
 def Video_Processing(parameters, curdir, form, user_info=None):
     """
     """
-    
+
     ## Read the batch template for submissions
     if parameters.get('batch_template'):
         try:
@@ -51,7 +43,7 @@ def Video_Processing(parameters, curdir, form, user_info=None):
             raise
     else:
         batch_template = json_decode_file(CFG_BIBENCODE_TEMPLATE_BATCH_SUBMISSION)
-    
+
     ## Handle the filepath
     file_storing_path = os.path.join(curdir, "files", str(user_info['uid']), "NewFile", 'filepath')
     try:
@@ -62,7 +54,7 @@ def Video_Processing(parameters, curdir, form, user_info=None):
     except:
         register_exception(prefix="The file containing the path to the video was not readable")
         raise
-    
+
     ## Handle the filename
     file_storing_name = os.path.join(curdir, "files", str(user_info['uid']), "NewFile", 'filename')
     try:
@@ -75,7 +67,7 @@ def Video_Processing(parameters, curdir, form, user_info=None):
     except:
         register_exception(prefix="The file containing the original filename of the video was not readable")
         raise
-    
+
     ## Handle the aspect ratio
     if parameters.get('aspect'):
         try:
@@ -89,7 +81,7 @@ def Video_Processing(parameters, curdir, form, user_info=None):
             raise
     else:
         batch_template['aspect'] = None
-    
+
     ## Handle the title
     if parameters.get('title'):
         try:
@@ -102,12 +94,12 @@ def Video_Processing(parameters, curdir, form, user_info=None):
             raise
     else:
         batch_template['submission_title'] = None
-    
+
     ## Set the rest
     batch_template['notify_admin'] = CFG_SITE_ADMIN_EMAIL
     batch_template['notify_user'] = user_info['email']
     batch_template['recid'] = sysno
-    
+
     timestamp = generate_timestamp()
     job_filename = "submission_%d_%s.job" % (sysno, timestamp)
     create_job_from_dictionary(batch_template, job_filename)

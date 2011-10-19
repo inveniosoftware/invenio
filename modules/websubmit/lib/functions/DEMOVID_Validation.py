@@ -19,7 +19,7 @@
 
 """
 
-from invenio.bibencode_utils import json_decode_file, probe
+from invenio.bibencode_utils import probe
 from invenio.websubmit_config import InvenioWebSubmitFunctionStop
 import os
 
@@ -30,7 +30,7 @@ def DEMOVID_Validation(parameters, curdir, form, user_info=None):
     """
     messages = []
     malformed = False
-    
+
     file_storing_path = os.path.join(curdir, "files", str(user_info['uid']), "NewFile", 'filepath')
     file_storing_name = os.path.join(curdir, "files", str(user_info['uid']), "NewFile", 'filename')
     file_storing_aspect = os.path.join(curdir, "DEMOVID_ASPECT")
@@ -38,7 +38,7 @@ def DEMOVID_Validation(parameters, curdir, form, user_info=None):
     file_storing_description = os.path.join(curdir, "DEMOVID_DESCR")
     file_storing_author = os.path.join(curdir, "DEMOVID_AU")
     file_storing_year = os.path.join(curdir, "DEMOVID_YEAR")
-    
+
     ## Validate the uploaded video
     try:
         fp = open(file_storing_path)
@@ -53,7 +53,7 @@ def DEMOVID_Validation(parameters, curdir, form, user_info=None):
     except:
         malformed = True
         messages.append("Please upload a video.")
-    
+
     ## Validate the title
     try:
         fp = open(file_storing_title)
@@ -65,8 +65,8 @@ def DEMOVID_Validation(parameters, curdir, form, user_info=None):
     except:
         malformed = True
         messages.append("Please enter a title.")
-    
-    
+
+
     ## Validate the description
     try:
         fp = open(file_storing_description)
@@ -78,7 +78,7 @@ def DEMOVID_Validation(parameters, curdir, form, user_info=None):
     except:
         malformed = True
         messages.append("Please enter a description.")
-    
+
     ## Validate author
     try:
         fp = open(file_storing_author)
@@ -87,7 +87,7 @@ def DEMOVID_Validation(parameters, curdir, form, user_info=None):
     except:
         malformed = True
         messages.append("Please enter at least one author.")
-    
+
     ## Validate year
     try:
         fp = open(file_storing_year)
@@ -119,7 +119,7 @@ def DEMOVID_Validation(parameters, curdir, form, user_info=None):
     except:
         malformed = True
         messages.append("Please enter an aspect ratio.")
-    
+
     if malformed:
         raise InvenioWebSubmitFunctionStop("""
         <SCRIPT>
@@ -131,6 +131,6 @@ def DEMOVID_Validation(parameters, curdir, form, user_info=None):
            document.forms[0].submit();
         </SCRIPT>""" % "\\n".join(messages)
         )
-        
+
     else:
         return

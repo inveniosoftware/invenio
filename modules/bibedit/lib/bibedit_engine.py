@@ -20,9 +20,16 @@
 
 __revision__ = "$Id"
 
+from datetime import datetime
+
+import re
+import difflib
+import zlib
+
 from invenio import bibrecord
 from invenio import bibformat
 
+from invenio.jsonutils import json, CFG_JSON_AVAILABLE
 from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL, CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL, \
     CFG_BIBEDIT_JS_CLONED_RECORD_COLOR, \
@@ -75,25 +82,6 @@ from invenio.bibknowledge import get_kbd_values_for_bibedit, get_kbr_values, \
 
 from invenio.bibcirculation_dblayer import get_number_copies, has_copies
 from invenio.bibcirculation_utils import create_item_details_url
-from datetime import datetime
-
-import re
-import difflib
-import zlib
-import sys
-if sys.hexversion < 0x2060000:
-    try:
-        import simplejson as json
-        simplejson_available = True
-    except ImportError:
-        # Okay, no Ajax app will be possible, but continue anyway,
-        # since this package is only recommended, not mandatory.
-        simplejson_available = False
-else:
-    import json
-    simplejson_available = True
-
-
 
 import invenio.template
 bibedit_templates = invenio.template.load('bibedit')
@@ -173,7 +161,7 @@ def perform_request_init(uid, ln, req, lastupdated):
     history_url = '"' + CFG_SITE_URL + '/admin/bibedit/bibeditadmin.py/history"'
     cern_site = 'false'
 
-    if not simplejson_available:
+    if not CFG_JSON_AVAILABLE:
         title = 'Record Editor'
         body = '''Sorry, the record editor cannot operate when the
                 `simplejson' module is not installed.  Please see the INSTALL

@@ -30,24 +30,15 @@ import hmac
 import time
 import base64
 
-if sys.hexversion < 0x2060000:
-    try:
-        import simplejson as json
-    except ImportError:
-        # Okay, no Ajax app will be possible, but continue anyway,
-        # since this package is only recommended, not mandatory.
-        pass
-else:
-    import json
-
 if sys.hexversion < 0x2050000:
     import sha as sha1
 else:
     from hashlib import sha1
 
-from cPickle import loads, dumps
+from cPickle import dumps
 from zlib import decompress, compress
 
+from invenio.jsonutils import json, json_unicode_to_utf8
 from invenio.shellutils import mymkdir
 from invenio.external_authentication import ExternalAuth, InvenioWebAccessExternalAuthError
 from invenio.config import CFG_ETCDIR, CFG_SITE_URL, CFG_SITE_SECURE_URL
@@ -201,7 +192,6 @@ class ExternalAuthRobot(ExternalAuth):
         to properly login the user, and verify that the data are actually
         both well formed and signed correctly.
         """
-        from invenio.bibedit_utils import json_unicode_to_utf8
         from invenio.webinterface_handler import wash_urlargd
         args = wash_urlargd(req.form, {
             'assertion': (str, ''),

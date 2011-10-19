@@ -24,29 +24,20 @@ Functions that are used throughout the BibEncode module
 """
 import os
 import subprocess
+import unicodedata
+import re
+import sys
+import time
+import uuid
+
 from invenio.bibencode_config import (
                     CFG_BIBENCODE_FFMPEG_PROBE_LOG,
                     CFG_BIBENCODE_FFMPEG_PROBE_COMMAND,
                     CFD_BIBENCODE_FFMPEG_OUT_RE_CONFIGURATION,
                     CFG_BIBENCODE_FFMPEG_CONFIGURATION_REQUIRED,
-                    CFG_BIBENCODE_WEBSUBMIT_ASPECT_SAMPLE_DIR,
                     CFG_BIBENCODE_MEDIAINFO_COMMAND
                     )
-from invenio.bibedit_utils import json_unicode_to_utf8
-from invenio.config import CFG_SITE_URL, CFG_PATH_FFPROBE
-import unicodedata
-import re
-import sys
-import time
-## Simplejspn fallback, stuff will crash if V < 2.5 and no simplejson
-try:
-    import json
-except:
-    try:
-        import simplejson as json
-    except:
-        pass
-import uuid
+from invenio.config import CFG_PATH_FFPROBE
 
 ## The timestamp for the process. Used to identify Logfiles.
 def generate_timestamp():
@@ -284,45 +275,6 @@ def check_mediainfo_configuration():
     except OSError:
         return ["MEDIAINFO does not seem to be installed!"]
     return False
-
-def json_remove_comments(text):
-    """ Removes C style comments from the given string. Will keep newline
-        characters intact. This way parsing errors from json will point to the
-        right line.
-
-        This is primarily used to make comments in JSON files possible.
-        The JSON standard has no comments syntax, but we want to use
-        JSON for our profiles and configuration files. The comments need to be
-        removed first, before the text can be feed to the JSON parser of python.
-
-    @param text: JSON string that should be cleaned
-    @type text: string
-    @return: Cleaned JSON
-    @rtype: string
-    """
-    def replacer(match):
-        s = match.group(0)
-        if s.startswith('/'):
-            return ""
-        else:
-            return s
-    pattern = re.compile(
-        r'//.*?$|/\*.*?\*/|\'(?:\\.|[^\\\'])*\'|"(?:\\.|[^\\"])*"',
-        re.DOTALL | re.MULTILINE
-    )
-    return re.sub(pattern, replacer, text)
-
-def json_decode_file(file):
-    """ Parses a textfile using json to build a python object representation
-    """
-    file = open(file)
-    seq = file.read()
-    ## The JSON standard has no comments syntax. We have to remove them
-    ## before feeding python's JSON parser
-    seq = json_remove_comments(seq)
-    ## Parse all the unicode stuff to utf-8
-    seq = json_unicode_to_utf8(json.loads(seq))
-    return seq
 
 def getval(dictionary, key, fallback=None):
     """ Returns a value from a dict. If the key doesn't exist, returns fallback

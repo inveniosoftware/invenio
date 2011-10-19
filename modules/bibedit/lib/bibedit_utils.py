@@ -350,23 +350,6 @@ def record_locked_by_queue(recid):
             else:
                 return lock
 
-
-# JSON
-def json_unicode_to_utf8(data):
-    """Change all strings in a JSON structure to UTF-8."""
-    if type(data) == unicode:
-        return data.encode('utf-8')
-    elif type(data) == dict:
-        newdict = {}
-        for key in data:
-            newdict[json_unicode_to_utf8(key)] = json_unicode_to_utf8(data[key])
-        return newdict
-    elif type(data) == list:
-        return [json_unicode_to_utf8(elem) for elem in data]
-    else:
-        return data
-
-
 # History/revisions
 
 def revision_to_timestamp(td):

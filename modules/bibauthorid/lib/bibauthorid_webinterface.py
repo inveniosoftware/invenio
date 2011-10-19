@@ -20,10 +20,12 @@
 # pylint: disable=W0105
 # pylint: disable=C0301
 # pylint: disable=W0613
+
 from cgi import escape
 from copy import deepcopy
-import sys
+from pprint import pformat
 
+from invenio.jsonutils import json, CFG_JSON_AVAILABLE
 from invenio.bibauthorid_config import CLAIMPAPER_ADMIN_ROLE
 from invenio.bibauthorid_config import CLAIMPAPER_USER_ROLE
 #from invenio.bibauthorid_config import EXTERNAL_CLAIMED_RECORDS_KEY
@@ -48,25 +50,6 @@ from invenio.search_engine_utils import get_fieldvalues
 
 import invenio.bibauthorid_webapi as webapi
 import invenio.bibauthorid_config as bconfig
-
-from pprint import pformat
-
-JSON_OK = False
-
-if sys.hexversion < 0x2060000:
-    try:
-        import simplejson as json
-        JSON_OK = True
-    except ImportError:
-        # Okay, no Ajax app will be possible, but continue anyway,
-        # since this package is only recommended, not mandatory.
-        JSON_OK = False
-else:
-    try:
-        import json
-        JSON_OK = True
-    except ImportError:
-        JSON_OK = False
 
 TEMPLATE = load('bibauthorid')
 
@@ -2458,7 +2441,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
              'request': (str, None),
              'userid': (str, None)})
 
-        if not JSON_OK:
+        if not CFG_JSON_AVAILABLE:
             return "500_json_not_found__install_package"
 
         # session = get_session(req)

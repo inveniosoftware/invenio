@@ -22,11 +22,8 @@
 import os
 import re
 import shutil
-from invenio.bibencode_utils import (
-                                     json_decode_file,
-                                     generate_timestamp,
-                                     getval
-                                     )
+from invenio.jsonutils import json_decode_file
+from invenio.bibencode_utils import generate_timestamp, getval
 from invenio.bibtask import (
                              task_low_level_submission,
                              task_get_task_param,

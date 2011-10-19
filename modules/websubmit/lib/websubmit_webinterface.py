@@ -67,6 +67,7 @@ import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.session import get_session
+from invenio.jsonutils import json, CFG_JSON_AVAILABLE
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
@@ -572,18 +573,6 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         parsing of additional parameters to rename files, add
         comments, restrictions, etc.
         """
-        if sys.hexversion < 0x2060000:
-            try:
-                import simplejson as json
-                simplejson_available = True
-            except ImportError:
-                # Okay, no Ajax app will be possible, but continue anyway,
-                # since this package is only recommended, not mandatory.
-                simplejson_available = False
-        else:
-            import json
-            simplejson_available = True
-
         argd = wash_urlargd(form, {
             'doctype': (str, ''),
             'access': (str, ''),
@@ -714,7 +703,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                         raise apache.SERVER_RETURN(apache.HTTP_BAD_REQUEST)
 
             # Send our response
-            if simplejson_available:
+            if CFG_JSON_AVAILABLE:
                 return json.dumps(added_files)
 
 
@@ -737,18 +726,6 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         from invenio.bibencode_utils import probe
         from invenio.bibencode_metadata import ffprobe_metadata
         from invenio.websubmit_config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
-
-        if sys.hexversion < 0x2060000:
-            try:
-                import simplejson as json
-                simplejson_available = True
-            except ImportError:
-                # Okay, no Ajax app will be possible, but continue anyway,
-                # since this package is only recommended, not mandatory.
-                simplejson_available = False
-        else:
-            import json
-            simplejson_available = True
 
         argd = wash_urlargd(form, {
             'doctype': (str, ''),
@@ -942,7 +919,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                     break;
 
             # Send our response
-            if simplejson_available:
+            if CFG_JSON_AVAILABLE:
 
                 dumped_response = json.dumps(json_response)
 
