@@ -775,12 +775,11 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
     """
 
     response = {}
-
     if not cache_exists(recid, uid):
         response['resultCode'] = 106
     elif not get_cache_mtime(recid, uid) == cacheMTime and isBulk == False:
         # In case of a bulk request, the changes are deliberately performed
-        # imemdiately one after another
+        # immediately one after another
         response['resultCode'] = 107
     else:
         try:

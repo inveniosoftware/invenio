@@ -251,7 +251,7 @@ function initMisc(){
 function initJeditable(){
   /*
    * Overwrite Jeditable plugin function to add the autocomplete handler
-   * to textboxes corresponding to field 100__u
+   * to textboxes corresponding to fields in gTagsToAutocomplete
    */
   $.editable.types['textarea'].element = function(settings, original) {
     var textarea = $('<textarea />');
@@ -272,7 +272,7 @@ function initJeditable(){
     /* create subfield id corresponding to original cell */
     cell_id_split[0] = 'subfieldTag';
     var subfield_id = cell_id_split.join('_');
-    /* Add autocomplete handler to field 100__u only */
+    /* Add autocomplete handler to fields in gTagsToAutocomplete */
     if ($.inArray(cell_id_split[1] + '_' + $(original).siblings('#' + subfield_id).text(), gTagsToAutocomplete) != -1) {
         addHandler_autocompleteAffiliations(textarea);
     }
@@ -1232,7 +1232,7 @@ function onSubmitClick(){
       displayMessage(resCode);
       updateToolbar(false);
       resetBibeditState()
-    });
+    }, false);
     onSubmitClick.force = false;
     resetBibeditState();
   }
@@ -1274,7 +1274,7 @@ function onCancelClick(){
         });
         cleanUp(!gNavigatingRecordSet, '', null, true, true);
         updateStatus('report', gRESULT_CODES[json['resultCode']]);
-      });
+      }, false);
       holdingPenPanelRemoveEntries();
       gUndoList = [];
       gRedoList = [];
@@ -1315,7 +1315,7 @@ function onCloneRecordClick(){
       $('#txtSearchPattern').val(newRecID);
       getRecord.clonedRecord = true;
       getRecord(newRecID);
-  });
+  }, false);
 }
 
 function onDeleteRecordClick(){
@@ -1338,7 +1338,7 @@ function onDeleteRecordClick(){
       updateStatus('report', gRESULT_CODES[resCode]);
       displayMessage(resCode);
       updateToolbar(false);
-    });
+    }, false);
   }
 }
 
@@ -1368,7 +1368,7 @@ function bindNewRecordHandlers(){
     updateStatus('updating');
     createReq({requestType: 'newRecord', newType: 'empty'}, function(json){
       getRecord(json['newRecID']);
-    });
+    }, false);
     event.preventDefault();
   });
   for (var i=0, n=gRECORD_TEMPLATES.length; i<n; i++)
@@ -1378,7 +1378,7 @@ function bindNewRecordHandlers(){
       createReq({requestType: 'newRecord', newType: 'template',
 	templateFilename: gRECORD_TEMPLATES[templateNo][0]}, function(json){
 	  getRecord(json['newRecID'], 0, onGetTemplateSuccess); // recRev = 0 -> current revision
-      });
+      }, false);
       event.preventDefault();
     });
 }
@@ -2095,7 +2095,7 @@ function addFieldSave(fieldTmpNo)
   };
   createReq(data, function(json){
     updateStatus('report', gRESULT_CODES[json['resultCode']]);
-  });
+  }, false);
 
   // Continue local updating.
   var fields = gRecord[tag];
@@ -2180,7 +2180,7 @@ function onAddSubfieldsChange(event){
         $(this).removeClass('bibEditInputError');
       }
       if (event.keyCode != 9 && event.keyCode != 16){
-        /* If we are creating a new 100__u field add autocomplete handler */
+        /* If we are creating a new field present in gTagsToAutocomplete, add autocomplete handler */
         if ($.inArray($(this).attr('id').split('_')[1] + '_' + this.value, gTagsToAutocomplete) != -1) {
           addHandler_autocompleteAffiliations($(this).parent().next().children('input'));
         }
@@ -2199,8 +2199,6 @@ function onAddSubfieldsSave(event, tag, fieldPosition){
    */
   updateStatus('updating');
 
-//  var tmpArray = this.id.split('_');
-//  var tag = tmpArray[1], fieldPosition = tmpArray[2];
   var fieldID = tag + '_' + fieldPosition;
   var subfields = [];
   var protectedSubfield = false, invalidOrEmptySubfields = false;
@@ -2251,7 +2249,7 @@ function onAddSubfieldsSave(event, tag, fieldPosition){
     };
     createReq(data, function(json){
       updateStatus('report', gRESULT_CODES[json['resultCode']]);
-    });
+    }, false);
 
     // Continue local updating
     var field = gRecord[tag][fieldPosition];
@@ -2420,7 +2418,7 @@ function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode,
 
   createReq(data, function(json){
     updateStatus('report', gRESULT_CODES[json['resultCode']]);
-  });
+  }, false);
 }
 
 function updateFieldTag(oldTag, newTag, oldInd1, oldInd2, ind1, ind2, fieldPosition,
@@ -2442,7 +2440,7 @@ function updateFieldTag(oldTag, newTag, oldInd1, oldInd2, ind1, ind2, fieldPosit
 
   createReq(data, function(json){
     updateStatus('report', gRESULT_CODES[json['resultCode']]);
-  });
+  }, false);
 }
 
 function getUpdateFieldTagRequestData(oldTag, oldInd1, oldInd2, newTag, ind1, ind2,
@@ -2806,7 +2804,7 @@ function onDeleteClick(event){
 
   createReq(ajaxData, function(json){
     updateStatus('report', gRESULT_CODES[json['resultCode']]);
-  });
+  }, false);
 }
 
 function onMoveFieldUp(tag, fieldPosition) {
@@ -3783,10 +3781,6 @@ function urPerformAddField(controlfield, fieldPosition, tag, ind1, ind2, subfiel
     undoRedo: (isUndo? "undo": "redo")
   };
 
-//  createReq(data, function(json){
-//    updateStatus('report', gRESULT_CODES[json['resultCode']]);
-//  });
-
   // updating the local situation
   if (gRecord[tag] == undefined){
     gRecord[tag] = [];
@@ -3816,9 +3810,6 @@ function urPerformRemoveSubfields(tag, fieldPosition, subfields, isUndo){
     undoRedo: (isUndo ? "undo": "redo")
   };
 
-//  createReq(data, function(json){
-//    updateStatus('report', gRESULT_CODES[json['resultCode']]);
-//  });
   // modifying the client-side interface
   gRecord[tag][fieldPosition][0].splice( gRecord[tag][fieldPosition][0].length - subfields.length, subfields.length);
   redrawFields(tag);
