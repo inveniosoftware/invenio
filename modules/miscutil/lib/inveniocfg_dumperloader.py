@@ -162,7 +162,7 @@ def dict2db(table_name, dict_data, mode):
 
 def query2list(query, table_name):
     """Given a SQL query return a list of dictionaries with the results"""
-    results = run_sql(query, with_desc=1)
+    results = run_sql(query, with_desc=True)
     lst_results = []
     dict_results = {}
     for section_id, result in enumerate(results[0]):

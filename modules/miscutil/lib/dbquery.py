@@ -148,32 +148,34 @@ def close_connection():
     except KeyError:
         pass
 
-def run_sql(sql, param=None, n=0, with_desc=0):
+def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False):
     """Run SQL on the server with PARAM and return result.
-
     @param param: tuple of string params to insert in the query (see
-        notes below)
-
+    notes below)
     @param n: number of tuples in result (0 for unbounded)
-
     @param with_desc: if True, will return a DB API 7-tuple describing
-        columns in query.
-
-    @return: If SELECT, SHOW, DESCRIBE statements, return tuples of
-        data, followed by description if parameter with_desc is
-        provided.  If INSERT, return last row id.  Otherwise return
-        SQL result as provided by database.
+    columns in query.
+    @param with_dict: if True, will return a list of dictionaries
+    composed of column-value pairs
+    @return: If SELECT, SHOW, DESCRIBE statements, return tuples of data,
+    followed by description if parameter with_desc is
+    provided.
+    If SELECT and with_dict=True, return a list of dictionaries
+    composed of column-value pairs, followed by description
+    if parameter with_desc is provided.
+    If INSERT, return last row id.
+    Otherwise return SQL result as provided by database.
 
     @note: When the site is closed for maintenance (as governed by the
-        config variable CFG_ACCESS_CONTROL_LEVEL_SITE), do not attempt
-        to run any SQL queries but return empty list immediately.
-        Useful to be able to have the website up while MySQL database
-        is down for maintenance, hot copies, table repairs, etc.
-
+    config variable CFG_ACCESS_CONTROL_LEVEL_SITE), do not attempt
+    to run any SQL queries but return empty list immediately.
+    Useful to be able to have the website up while MySQL database
+    is down for maintenance, hot copies, table repairs, etc.
     @note: In case of problems, exceptions are returned according to
-        the Python DB API 2.0.  The client code can import them from
-        this file and catch them.
+    the Python DB API 2.0.  The client code can import them from
+    this file and catch them.
     """
+
     if CFG_ACCESS_CONTROL_LEVEL_SITE == 3:
         # do not connect to the database as the site is closed for maintenance:
         return []
@@ -201,10 +203,22 @@ def run_sql(sql, param=None, n=0, with_desc=0):
             recset = cur.fetchmany(n)
         else:
             recset = cur.fetchall()
-        if with_desc:
-            return recset, cur.description
+
+        if with_dict: # return list of dictionaries
+            # let's extract column names
+            keys = [row[0] for row in cur.description]
+            # let's construct a list of dictionaries
+            list_dict_results = [dict(zip(*[keys, values])) for values in recset]
+
+            if with_desc:
+                return list_dict_results, cur.description
+            else:
+                return list_dict_results
         else:
-            return recset
+            if with_desc:
+                return recset, cur.description
+            else:
+                return recset
     else:
         if string.upper(string.split(sql)[0]) == "INSERT":
             rc = cur.lastrowid
@@ -247,7 +261,7 @@ def run_sql_many(query, params, limit=CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT):
         i += limit
     return r
 
-def run_sql_with_limit(query, param=None, n=0, with_desc=0, wildcard_limit=0):
+def run_sql_with_limit(query, param=None, n=0, with_desc=False, wildcard_limit=0):
     """This function should be used in some cases, instead of run_sql function, in order
         to protect the db from queries that might take a log time to respond
         Ex: search queries like [a-z]+ ; cern*; a->z;

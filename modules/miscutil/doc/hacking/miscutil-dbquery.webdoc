@@ -33,17 +33,22 @@ code to use (see below).
 
 <blockquote>
 <pre>
-def run_sql(sql, param=None, n=0, with_desc=0):
+def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False):
     """Run SQL on the server with PARAM and return result.
 
         @param param: tuple of string params to insert in the query
                       (see notes below)
         @param n: number of tuples in result (0 for unbounded)
-        @param with_desc: if true, will return a
+        @param with_desc: if True, will return a
                           DB API 7-tuple describing columns in query
+        @param with_dict: if True, will return a list of dictionaries
+                          composed of column-value pairs
         @return: if SELECT, SHOW, DESCRIBE statements: tuples of data, followed
                                                        by description if parameter
                                                        provided
+                 If SELECT and with_dict=True, return a list of dictionaries
+                 composed of column-value pairs, followed by description
+                 if parameter with_desc is provided.
                  if INSERT: last row id.
                  else: SQL result as provided by database
 

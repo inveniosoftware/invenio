@@ -26,6 +26,7 @@ pylib_DATA = __init__.py \
              dbdump.py \
              dbquery.py \
              dbquery_tests.py \
+             dbquery_regression_tests.py \
              logicutils.py \
              logicutils_tests.py \
              mailutils.py \
