@@ -274,7 +274,9 @@ def tidy_html(html_buffer, cleaning_lib='utidylib'):
 
     if CFG_TIDY_INSTALLED and cleaning_lib == 'utidylib':
         options = dict(output_xhtml=1,
-                       show_body_only=1)
+                       show_body_only=1,
+                       merge_divs=0,
+                       wrap=0)
         try:
             output = str(tidy.parseString(html_buffer, **options))
         except:
