@@ -914,6 +914,9 @@ class BibSched:
         @return: True if the scheduling was successful, False otherwise,
             e.g. if the task was scheduled concurrently on a different host.
         """
+        if not run_sql("SELECT id FROM schTASK WHERE id=%s AND host='' AND status='WAITING'", (task_id, )):
+            ## The task was already tied?
+            return False
         run_sql("UPDATE schTASK SET host=%s, status='SCHEDULED' WHERE id=%s AND host='' AND status='WAITING'", (self.hostname, task_id))
         return bool(run_sql("SELECT id FROM schTASK WHERE id=%s AND host=%s", (task_id, self.hostname, )))
 
