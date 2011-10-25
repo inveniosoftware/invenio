@@ -90,7 +90,8 @@ def get_authors_tags(config=CITATION_CONFIG):
     tags_names = [
         'first_author',
         'additional_author',
-        'alternative_author_name'
+        'alternative_author_name',
+        'collaboration_name',
     ]
 
     tags = {}
@@ -102,8 +103,8 @@ def get_authors_tags(config=CITATION_CONFIG):
 
 
 def get_authors_from_record(recID, tags):
-    """
-    Get all authors for a record
+    """Get all authors for a record
+
     We need this function because there's 3 different types of authors
     and to fetch each one of them we need look through MARC tags
     """
@@ -118,8 +119,17 @@ def get_authors_from_record(recID, tags):
     return authors
 
 
-def get_coauthors(author, tags, cache):
+def get_collaborations_from_record(recID, tags):
+    """ Get all collaborations for a record,
+
+    Similar to get_authors_from_record
     """
+    return set(get_fieldvalues(recID, tags['collaboration_name']))
+
+
+def get_coauthors(author, tags, cache):
+    """ Get all coauthors for an author
+
     Given author A, returns all the authors having published
     a record with author A
     """
@@ -193,7 +203,7 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
         if compute_self_citations:
             try:
                 tags = get_authors_tags()
-            except IndexError, msg:
+            except (IndexError, ConfigParser.NoOptionError), msg:
                 register_exception(prefix="attribute " + \
                     str(msg) + " missing in config", alert_admin=True)
                 compute_self_citations = False
@@ -211,15 +221,25 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
                 for recid, lciters in d_recid_citers[coll]:
                     if lciters:
                         authors = get_authors_from_record(recid, tags)
-                        for cit in lciters:
-                            cit_authors = get_authors_from_record(cit, tags)
-                            #extend with circle of friends
-                            for author in list(cit_authors)[:20]:
-                                author_friends = get_coauthors(author, tags, authors_cache)
-                                cit_authors.update(author_friends)
+                        if len(authors) > 20:
+                            # Use collaboration names
+                            collaborations = get_collaborations_from_record(recid, tags)
+                            for cit in lciters:
+                                cit_collaborations = get_collaborations_from_record(cit, tags)
+                                if len(collaborations.intersection(cit_collaborations)) == 0:
+                                    d_total_cites[coll] += 1
 
-                            if len(authors.intersection(cit_authors)) == 0:
-                                d_total_cites[coll] += 1
+                        else:
+                            # Use author names
+                            for cit in lciters:
+                                cit_authors = get_authors_from_record(cit, tags)
+                                #extend with circle of friends
+                                for author in list(cit_authors)[:20]:
+                                    author_friends = get_coauthors(author, tags, authors_cache)
+                                    cit_authors.update(author_friends)
+
+                                if len(authors.intersection(cit_authors)) == 0:
+                                    d_total_cites[coll] += 1
 
                 if d_total_cites[coll] != 0:
                     d_avg_cites[coll] = d_total_cites[coll] * 1.0 / d_total_recs[coll]
