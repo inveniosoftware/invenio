@@ -16,6 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from invenio.webstat import register_customevent
 
 """Invenio ACCOUNT HANDLING"""
 
@@ -825,6 +826,10 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                                                     navmenuid='youraccount')
 
             # login successful!
+            try:
+                register_customevent("login", [req.remote_host or req.remote_ip, uid, args['p_un']])
+            except:
+                register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
             if args['referer']:
                 redirect_to_url(req, args['referer'].replace(CFG_SITE_URL, CFG_SITE_SECURE_URL))
             else:
