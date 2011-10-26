@@ -264,7 +264,7 @@ class SimulatedModPythonRequest(object):
         return self.__environ['REQUEST_METHOD']
 
     def get_hostname(self):
-        return self.__environ('HTTP_HOST', '')
+        return self.__environ.get('HTTP_HOST', '')
 
     def set_filename(self, filename):
         self.__filename = filename
