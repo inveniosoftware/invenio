@@ -712,6 +712,14 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibsched/lib/Makefile \
      modules/bibsched/lib/tasklets/Makefile \
      modules/bibupload/Makefile \
+     modules/bibsort/Makefile \
+     modules/bibsort/bin/Makefile \
+     modules/bibsort/bin/bibsort \
+     modules/bibsort/lib/Makefile \
+     modules/bibsort/etc/Makefile \
+     modules/bibsort/doc/Makefile \
+     modules/bibsort/doc/admin/Makefile \
+     modules/bibsort/doc/hacking/Makefile \
      modules/bibsword/Makefile \
      modules/bibsword/bin/Makefile \
      modules/bibsword/bin/bibsword \

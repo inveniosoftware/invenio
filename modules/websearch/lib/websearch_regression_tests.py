@@ -695,7 +695,7 @@ class WebSearchTestWildcardLimit(unittest.TestCase):
     def test_wildcard_limit_correctly_passed_when_set(self):
         """websearch - wildcard limit is correctly passed when set"""
         self.assertEqual([],
-            test_web_page_content(CFG_SITE_URL + '/search?p=e*&f=author&of=id&wl=5',
+            test_web_page_content(CFG_SITE_URL + '/search?p=e*&f=author&of=id&wl=5&rg=100',
                                   expected_text="[9, 10, 11, 17, 46, 48, 50, 51, 52, 53, 54, 67, 72, 74, 81, 88, 92, 96]"))
 
     def test_wildcard_limit_correctly_not_active(self):
@@ -942,7 +942,7 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
     def test_search_engine_python_api_for_successful_query(self):
         """websearch - search engine Python API for successful query"""
         self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47],
-                         perform_request_search(p='ellis'))
+                         perform_request_search(p='ellis', rg=None))
 
     def test_search_engine_python_api_for_existing_record(self):
         """websearch - search engine Python API for existing record"""
@@ -998,7 +998,7 @@ class WebSearchSearchEngineWebAPITest(unittest.TestCase):
     def test_search_engine_web_api_for_successful_query(self):
         """websearch - search engine Web API for successful query"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id&rg=100',
                                                expected_text="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47]"))
 
     def test_search_engine_web_api_for_existing_record(self):
@@ -1514,13 +1514,13 @@ class WebSearchMARCQueryTest(unittest.TestCase):
     def test_many_marc_tags_partial_phrase_query(self):
         """websearch - many MARC tags, partial phrase query (245)"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%27and%27',
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%27and%27&rg=100',
                                                expected_text="[1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 91, 96]"))
 
     def test_single_marc_tag_regexp_query(self):
         """websearch - single MARC tag, regexp query"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%2Fand%2F',
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%2Fand%2F&rg=100',
                                                expected_text="[1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 91, 96]"))
 
 class WebSearchExtSysnoQueryTest(unittest.TestCase):

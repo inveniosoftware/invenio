@@ -4060,4 +4060,40 @@ CREATE TABLE IF NOT EXISTS `xtrJOB` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM;
 
+-- tables for bibsort module
+
+CREATE TABLE IF NOT EXISTS bsrMETHOD (
+  id mediumint(8) unsigned NOT NULL auto_increment,
+  name varchar(20) NOT NULL,
+  definition varchar(255),
+  washer varchar(255) NOT NULL,
+  PRIMARY KEY (id)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS bsrMETHODNAME (
+  id_bsrMETHOD mediumint(8) unsigned NOT NULL,
+  ln char(5) NOT NULL default '',
+  type char(3) NOT NULL default 'sn',
+  value varchar(255) NOT NULL,
+  PRIMARY KEY (id_bsrMETHOD, ln, type)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS bsrMETHODDATA (
+  id_bsrMETHOD mediumint(8) unsigned NOT NULL,
+  data_dict longblob,
+  data_dict_ordered longblob,
+  data_list_sorted longblob,
+  last_updated datetime,
+  PRIMARY KEY (id_bsrMETHOD)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS bsrMETHODDATABUCKET (
+  id_bsrMETHOD mediumint(8) unsigned NOT NULL,
+  bucket_no tinyint(2) NOT NULL,
+  bucket_data longblob,
+  bucket_last_value varchar(255),
+  last_updated datetime,
+  PRIMARY KEY (id_bsrMETHOD, bucket_no)
+) ENGINE=MyISAM;
+
 -- end of file

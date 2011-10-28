@@ -72,7 +72,8 @@ from invenio.config import \
      CFG_SOLR_URL, \
      CFG_SITE_RECORD, \
      CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
-     CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY
+     CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY, \
+     CFG_BIBSORT_BUCKETS
 
 from invenio.search_engine_config import InvenioWebSearchUnknownCollectionError, InvenioWebSearchWildcardLimitError
 from invenio.search_engine_utils import get_fieldvalues
@@ -3510,46 +3511,264 @@ def print_hosted_results(url_and_engine, ln=CFG_SITE_LANG, of=None, req=None, no
         limit=limit
         )
 
-def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG):
-    """Sort records in 'recIDs' list according sort field 'sort_field' in order 'sort_order'.
-       If more than one instance of 'sort_field' is found for a given record, try to choose that that is given by
-       'sort pattern', for example "sort by report number that starts by CERN-PS".
-       Note that 'sort_field' can be field code like 'author' or MARC tag like '100__a' directly."""
+class BibSortDataCacher(DataCacher):
+    """
+    Cache holding all structures created by bibsort
+    (   _data, data_dict).
+    """
+    def __init__(self, method_name):
+        self.method_name = method_name
+        self.method_id = 0
+        try:
+            res = run_sql("""SELECT id from bsrMETHOD where name = %s""", (self.method_name,))
+        except:
+            self.method_id = 0
+        if res and res[0]:
+            self.method_id = res[0][0]
+        else:
+            self.method_id = 0
 
-    _ = gettext_set_language(ln)
+        def cache_filler():
+            method_id = self.method_id
+            alldicts = {}
+            if self.method_id == 0:
+                return {}
+            try:
+                res_data = run_sql("""SELECT data_dict_ordered from bsrMETHODDATA \
+                                   where id_bsrMETHOD = %s""", (method_id,))
+                res_buckets = run_sql("""SELECT bucket_no, bucket_data from bsrMETHODDATABUCKET\
+                                      where id_bsrMETHOD = %s""", (method_id,))
+            except Exception:
+                # database problems, return empty cache
+                return {}
+            try:
+                data_dict_ordered = deserialize_via_marshal(res_data[0][0])
+            except:
+                data_dict_ordered= {}
+            alldicts['data_dict_ordered'] = data_dict_ordered # recid: weight
 
-    ## check arguments:
-    if not sort_field:
-        return recIDs
-    if len(recIDs) > CFG_WEBSEARCH_NB_RECORDS_TO_SORT:
-        if of.startswith('h'):
-            print_warning(req, _("Sorry, sorting is allowed on sets of up to %d records only. Using default sort order.") % CFG_WEBSEARCH_NB_RECORDS_TO_SORT, "Warning")
-        return recIDs
+            if not res_buckets:
+                alldicts['bucket_data'] = {}
+                return alldicts
 
-    sort_fields = string.split(sort_field, ",")
-    recIDs_dict = {}
-    recIDs_out = []
+            for row in res_buckets:
+                bucket_no = row[0]
+                try:
+                    bucket_data = HitSet((row[1]))
+                except:
+                    bucket_data = HitSet([])
+                alldicts.setdefault('bucket_data', {})[bucket_no] = bucket_data
 
-    ## first deduce sorting MARC tag out of the 'sort_field' argument:
+            return alldicts
+
+        def timestamp_verifier():
+            method_id = self.method_id
+            res = run_sql("""SELECT last_updated from bsrMETHODDATA where id_bsrMETHOD = %s""", (method_id,))
+            try:
+                update_time_methoddata = str(res[0][0])
+            except IndexError:
+                update_time_methoddata = '1970-01-01 00:00:00'
+            res = run_sql("""SELECT max(last_updated) from bsrMETHODDATABUCKET where id_bsrMETHOD = %s""", (method_id,))
+            try:
+                update_time_buckets = str(res[0][0])
+            except IndexError:
+                update_time_buckets = '1970-01-01 00:00:00'
+            return max(update_time_methoddata, update_time_buckets)
+
+        DataCacher.__init__(self, cache_filler, timestamp_verifier)
+
+def get_sorting_methods():
+    if not CFG_BIBSORT_BUCKETS: # we do not want to use buckets
+        return {}
+    try: # make sure the method has some data
+        res = run_sql("""SELECT m.name, m.definition FROM bsrMETHOD m, bsrMETHODDATA md WHERE m.id = md.id_bsrMETHOD""")
+    except:
+        return {}
+    return dict(res)
+
+sorting_methods = get_sorting_methods()
+cache_sorted_data = {}
+for sorting_method in sorting_methods:
+    try:
+        cache_sorted_data[sorting_method].is_ok_p
+    except Exception:
+        cache_sorted_data[sorting_method] = BibSortDataCacher(sorting_method)
+
+
+def get_tags_form_sort_fields(sort_fields):
+    """Given a list of sort_fields, return the tags associated with it and
+    also the name of the field that has no tags associated, to be able to
+    display a message to the user."""
     tags = []
+    if not sort_fields:
+        return [], ''
     for sort_field in sort_fields:
         if sort_field and str(sort_field[0:2]).isdigit():
             # sort_field starts by two digits, so this is probably a MARC tag already
             tags.append(sort_field)
         else:
             # let us check the 'field' table
-            query = """SELECT DISTINCT(t.value) FROM tag AS t, field_tag AS ft, field AS f
-                        WHERE f.code=%s AND ft.id_field=f.id AND t.id=ft.id_tag
-                        ORDER BY ft.score DESC"""
-            res = run_sql(query, (sort_field, ))
-            if res:
-                for row in res:
-                    tags.append(row[0])
+            field_tags = get_field_tags(sort_field)
+            if field_tags:
+                tags.extend(field_tags)
             else:
-                if of.startswith('h'):
-                    print_warning(req, _("Sorry, %s does not seem to be a valid sort option. Choosing title sort instead.") % cgi.escape(sort_field), "Error")
-                tags.append("245__a")
-    if verbose >= 3:
+                return [], sort_field
+    return tags, ''
+
+
+def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None):
+    """Initial entry point for sorting records, acts like a dispatcher.
+       (i) sort_field is in the bsrMETHOD, and thus, the BibSort has sorted the data for this field, so we can use the cache;
+       (ii)sort_field is not in bsrMETHOD, and thus, the cache does not contain any information regarding this sorting method"""
+
+    _ = gettext_set_language(ln)
+
+    #we should return sorted records up to irec_max(exclusive)
+    dummy, irec_max = get_interval_for_records_to_sort(len(recIDs), jrec, rg)
+    #calculate the min index on the reverted list
+    index_min = max(len(recIDs) - irec_max, 0) #just to be sure that the min index is not negative
+
+    use_sorting_buckets = True
+
+    if not CFG_BIBSORT_BUCKETS or not sorting_methods: #ignore the use of buckets, use old fashion sorting
+        use_sorting_buckets = False
+
+    if not sort_field:
+        if use_sorting_buckets:
+            return sort_records_bibsort(req, recIDs, 'latest first', sort_field, sort_order, verbose, of, ln, rg, jrec)
+        else:
+            return recIDs[index_min:]
+
+    sort_fields = string.split(sort_field, ",")
+    if len(sort_fields) == 1:
+        # we have only one sorting_field, check if it is treated by BibSort
+        for sort_method in sorting_methods:
+            definition = sorting_methods[sort_method]
+            if use_sorting_buckets and \
+               ((definition.startswith('FIELD') and \
+                definition.replace('FIELD:','').strip().lower() == string.lower(sort_fields[0])) or \
+                sort_method == sort_fields[0]):
+                #use BibSort
+                return sort_records_bibsort(req, recIDs, sort_method, sort_field, sort_order, verbose, of, ln, rg, jrec)
+    #deduce sorting MARC tag out of the 'sort_field' argument:
+    tags, error_field = get_tags_form_sort_fields(sort_fields)
+    if error_field:
+        if use_sorting_buckets:
+            return sort_records_bibsort(req, recIDs, 'latest first', sort_field, sort_order, verbose, of, ln, rg, jrec)
+        else:
+            if of.startswith('h'):
+                print_warning(req, _("Sorry, %s does not seem to be a valid sort option. The records will not be sorted.") % cgi.escape(error_field), "Error")
+            return recIDs[index_min:]
+    if tags:
+        for sort_method in sorting_methods:
+            definition = sorting_methods[sort_method]
+            if definition.startswith('MARC') \
+                    and definition.replace('MARC:','').strip().split(',') == tags \
+                    and use_sorting_buckets:
+                #this list of tags have a designated method in BibSort, so use it
+                return sort_records_bibsort(req, recIDs, sort_method, sort_field, sort_order, verbose, of, ln, rg, jrec)
+        #we do not have this sort_field in BibSort tables -> do the old fashion sorting
+        return sort_records_bibxxx(req, recIDs, tags, sort_field, sort_order, sort_pattern, verbose, of, ln, rg)
+
+    return recIDs[index_min:]
+
+
+def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None):
+    """This function orders the recIDs list, based on a sorting method(sort_field) using the BibSortDataCacher for speed"""
+
+    _ = gettext_set_language(ln)
+
+    #sanity check
+    if sort_method not in sorting_methods:
+        return sort_records_bibxxx(req, recIDs, None, sort_field, sort_order, '', verbose, of, ln, rg, jrec)
+
+    if verbose >= 3 and of.startswith('h'):
+        print_warning(req, "Sorting (using BibSort cache) by method %s (definition %s)." \
+                      % (cgi.escape(repr(sort_method)), cgi.escape(repr(sorting_methods[sort_method]))))
+
+    #we should return sorted records up to irec_max(exclusive)
+    dummy, irec_max = get_interval_for_records_to_sort(len(recIDs), jrec, rg)
+    solution = HitSet([])
+    input_recids = HitSet(recIDs)
+    cache_sorted_data[sort_method].recreate_cache_if_needed()
+    sort_cache = cache_sorted_data[sort_method].cache
+    bucket_numbers = sort_cache['bucket_data'].keys()
+    #check if all buckets have been constructed
+    if len(bucket_numbers) != CFG_BIBSORT_BUCKETS:
+        if verbose > 3 and of.startswith('h'):
+            print_warning(req, "Not all buckets have been constructed.. switching to old fashion sorting.")
+        return sort_records_bibxxx(req, recIDs, None, sort_field, sort_order, '', verbose, of, ln, rg, jrec)
+    if sort_order == 'd':
+        bucket_numbers.reverse()
+    for bucket_no in bucket_numbers:
+        solution.union_update(input_recids & sort_cache['bucket_data'][bucket_no])
+        if len(solution) >= irec_max:
+            break
+    dict_solution = {}
+    missing_records = []
+    for recid in solution:
+        try:
+            dict_solution[recid] = sort_cache['data_dict_ordered'][recid]
+        except KeyError:
+            #recid is in buckets, but not in the bsrMETHODDATA,
+            #maybe because the value has been deleted, but the change has not yet been propagated to the buckets
+            missing_records.append(recid)
+    #check if there are recids that are not in any bucket -> to be added at the end/top, ordered by insertion date
+    if len(solution) < irec_max:
+        #some records have not been yet inserted in the bibsort structures
+        #or, some records have no value for the sort_method
+        missing_records = sorted(missing_records + list(input_recids.difference(solution)))
+    #the records need to be sorted in reverse order for the print record function
+    #the return statement should be equivalent with the following statements
+    #(these are clearer, but less efficient, since they revert the same list twice)
+    #sorted_solution = (missing_records + sorted(dict_solution, key=dict_solution.__getitem__, reverse=sort_order=='d'))[:irec_max]
+    #sorted_solution.reverse()
+    #return sorted_solution
+    if sort_method.strip().lower().startswith('latest') and sort_order == 'd':
+        # if we want to sort the records on their insertion date, add the mission records at the top
+        solution = sorted(dict_solution, key=dict_solution.__getitem__, reverse=sort_order=='a') + missing_records
+    else:
+        solution = missing_records + sorted(dict_solution, key=dict_solution.__getitem__, reverse=sort_order=='a')
+    #calculate the min index on the reverted list
+    index_min = max(len(solution) - irec_max, 0) #just to be sure that the min index is not negative
+    #return all the records up to irec_max, but on the reverted list
+    return solution[index_min:]
+
+
+def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None):
+    """OLD FASHION SORTING WITH NO CACHE, for sort fields that are not run in BibSort
+       Sort records in 'recIDs' list according sort field 'sort_field' in order 'sort_order'.
+       If more than one instance of 'sort_field' is found for a given record, try to choose that that is given by
+       'sort pattern', for example "sort by report number that starts by CERN-PS".
+       Note that 'sort_field' can be field code like 'author' or MARC tag like '100__a' directly."""
+
+    _ = gettext_set_language(ln)
+
+    #we should return sorted records up to irec_max(exclusive)
+    dummy, irec_max = get_interval_for_records_to_sort(len(recIDs), jrec, rg)
+    #calculate the min index on the reverted list
+    index_min = max(len(recIDs) - irec_max, 0) #just to be sure that the min index is not negative
+
+    ## check arguments:
+    if not sort_field:
+        return recIDs[index_min:]
+    if len(recIDs) > CFG_WEBSEARCH_NB_RECORDS_TO_SORT:
+        if of.startswith('h'):
+            print_warning(req, _("Sorry, sorting is allowed on sets of up to %d records only. Using default sort order.") % CFG_WEBSEARCH_NB_RECORDS_TO_SORT, "Warning")
+        return recIDs[index_min:]
+
+    recIDs_dict = {}
+    recIDs_out = []
+
+    if not tags:
+        # tags have not been camputed yet
+        sort_fields = string.split(sort_field, ",")
+        tags, error_field = get_tags_form_sort_fields(sort_fields)
+        if error_field:
+            if of.startswith('h'):
+                print_warning(req, _("Sorry, %s does not seem to be a valid sort option. The records will not be sorted.") % cgi.escape(error_field), "Error")
+            return recIDs[index_min:]
+    if verbose >= 3 and of.startswith('h'):
         print_warning(req, "Sorting by tags %s." % cgi.escape(repr(tags)))
         if sort_pattern:
             print_warning(req, "Sorting preferentially by %s." % cgi.escape(sort_pattern))
@@ -3596,13 +3815,47 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         if sort_order == 'a':
             recIDs_out.reverse()
         # okay, we are done
-        return recIDs_out
+        # return only up to the maximum that we need to sort
+        if len(recIDs_out) != len(recIDs):
+            dummy, irec_max = get_interval_for_records_to_sort(len(recIDs_out), jrec, rg)
+            index_min = max(len(recIDs_out) - irec_max, 0) #just to be sure that the min index is not negative
+        return recIDs_out[index_min:]
     else:
         # good, no sort needed
-        return recIDs
+        return recIDs[index_min:]
+
+
+def get_interval_for_records_to_sort(nb_found, jrec=None, rg=None):
+    """calculates in which interval should the sorted records be
+    a value of 'rg=-9999' means to print all records: to be used with care."""
+
+    if not jrec:
+        jrec = 1
+
+    if not rg:
+        #return all
+        return jrec-1, nb_found
+
+    if rg == -9999: # print all records
+        rg = nb_found
+    else:
+        rg = abs(rg)
+    if jrec < 1: # sanity checks
+        jrec = 1
+    if jrec > nb_found:
+        jrec = max(nb_found-rg+1, 1)
+
+    # will sort records from irec_min to irec_max excluded
+    irec_min = jrec - 1
+    irec_max = irec_min + rg
+    if irec_min < 0:
+        irec_min = 0
+    if irec_max > nb_found:
+        irec_max = nb_found
+
+    return irec_min, irec_max
 
 def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LANG, relevances=[], relevances_prologue="(", relevances_epilogue="%%)", decompress=zlib.decompress, search_pattern='', print_records_prologue_p=True, print_records_epilogue_p=True, verbose=0, tab='', sf='', so='d', sp='', rm=''):
-
     """
     Prints list of records 'recIDs' formatted according to 'format' in
     groups of 'rg' starting from 'jrec'.
@@ -5145,14 +5398,14 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
             if of == "id":
                 # we have been asked to return list of recIDs
                 recIDs = list(results_final_for_all_selected_colls)
-                if sf: # do we have to sort?
-                    recIDs = sort_records(req, recIDs, sf, so, sp, verbose, of)
-                elif rm: # do we have to rank?
+                if rm: # do we have to rank?
                     results_final_for_all_colls_rank_records_output = rank_records(rm, 0, results_final_for_all_selected_colls,
                                                                                    string.split(p) + string.split(p1) +
                                                                                    string.split(p2) + string.split(p3), verbose)
                     if results_final_for_all_colls_rank_records_output[0]:
                         recIDs = results_final_for_all_colls_rank_records_output[0]
+                elif sf or CFG_BIBSORT_BUCKETS: # do we have to sort?
+                    recIDs = sort_records(req, recIDs, sf, so, sp, verbose, of, ln, rg, jrec)
                 return recIDs
             elif of.startswith("h"):
                 if of not in ['hcs']:
@@ -5201,9 +5454,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                         results_final_relevances = []
                         results_final_relevances_prologue = ""
                         results_final_relevances_epilogue = ""
-                        if sf: # do we have to sort?
-                            results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose, of)
-                        elif rm: # do we have to rank?
+                        if rm: # do we have to rank?
                             results_final_recIDs_ranked, results_final_relevances, results_final_relevances_prologue, results_final_relevances_epilogue, results_final_comments = \
                                                          rank_records(rm, 0, results_final[coll],
                                                                       string.split(p) + string.split(p1) +
@@ -5216,6 +5467,8 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                                 # rank_records failed and returned some error message to display:
                                 print_warning(req, results_final_relevances_prologue)
                                 print_warning(req, results_final_relevances_epilogue)
+                        elif sf or CFG_BIBSORT_BUCKETS: # do we have to sort?
+                            results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose, of, ln, rg, jrec)
 
                         if len(results_final_recIDs) < CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT:
                             results_final_colls.append(results_final_recIDs)
