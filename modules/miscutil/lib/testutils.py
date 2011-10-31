@@ -32,8 +32,13 @@ import unittest
 
 from urllib import urlencode
 from itertools import chain, repeat
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
+
+try:
+    from selenium import webdriver
+    from selenium.webdriver.support.ui import WebDriverWait
+except ImportError:
+    # web tests will not be available, but unit and regression tests will:
+    pass
 
 import invenio
 from invenio.config import CFG_SITE_URL, \
