@@ -753,7 +753,7 @@ def _task_run(task_run_fnc):
                 postponed_times = int(g.group(1))
             else:
                 postponed_times = 0
-            run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s WHERE id=%s", (new_runtime, 'Postponed %d time(s)' % (postponed_times + 1), _TASK_PARAMS['task_id']))
+            run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s, host='' WHERE id=%s", (new_runtime, 'Postponed %d time(s)' % (postponed_times + 1), _TASK_PARAMS['task_id']))
             write_message("Task #%d postponed because outside of runtime limit" % _TASK_PARAMS['task_id'])
             return True
 
@@ -792,10 +792,10 @@ def _task_run(task_run_fnc):
             ## The task is a daemon. We resubmit it
             if task_status == 'DONE':
                 ## It has finished in a good way. We recycle the database row
-                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s, host=''  WHERE id=%s", (new_runtime, verbose_argv, _TASK_PARAMS['task_id']))
+                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s, host='' WHERE id=%s", (new_runtime, verbose_argv, _TASK_PARAMS['task_id']))
                 write_message("Task #%d finished and resubmitted." % _TASK_PARAMS['task_id'])
             elif task_status == 'STOPPED':
-                run_sql("UPDATE schTASK SET status='WAITING', progress=%s, host=''  WHERE id=%s", (verbose_argv, _TASK_PARAMS['task_id'], ))
+                run_sql("UPDATE schTASK SET status='WAITING', progress=%s, host='' WHERE id=%s", (verbose_argv, _TASK_PARAMS['task_id'], ))
                 write_message("Task #%d stopped and resubmitted." % _TASK_PARAMS['task_id'])
             else:
                 ## We keep the bad result and we resubmit with another id.
