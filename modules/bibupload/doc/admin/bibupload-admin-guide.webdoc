@@ -502,7 +502,7 @@ the whole bibupload task will fail.</p>
 <p>If it is needed to use the batch upload function from within command line, this can be achieved with a curl call, like:
 <blockquote>
 <pre>
-$ curl -F 'file=@localfile.xml' -F 'mode=-i' http://cdsweb.cern.ch/batchuploader/robotupload [-F 'callback_url=http://...' http://cdsweb.cern.ch/batchuploader/robotupload] -A invenio_webupload
+$ curl -F 'file=@localfile.xml' -F 'mode=-i' http://cdsweb.cern.ch/batchuploader/robotupload [-F 'callback_url=http://...'] -A invenio_webupload
 <pre>
 </blockquote></p>
 
