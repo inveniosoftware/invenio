@@ -720,6 +720,8 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibsort/doc/Makefile \
      modules/bibsort/doc/admin/Makefile \
      modules/bibsort/doc/hacking/Makefile \
+     modules/bibsort/web/Makefile \
+     modules/bibsort/web/admin/Makefile \
      modules/bibsword/Makefile \
      modules/bibsword/bin/Makefile \
      modules/bibsword/bin/bibsword \

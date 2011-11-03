@@ -4065,9 +4065,10 @@ CREATE TABLE IF NOT EXISTS `xtrJOB` (
 CREATE TABLE IF NOT EXISTS bsrMETHOD (
   id mediumint(8) unsigned NOT NULL auto_increment,
   name varchar(20) NOT NULL,
-  definition varchar(255),
+  definition varchar(255) NOT NULL,
   washer varchar(255) NOT NULL,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id), 
+  UNIQUE KEY (name)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bsrMETHODNAME (
@@ -4094,6 +4095,13 @@ CREATE TABLE IF NOT EXISTS bsrMETHODDATABUCKET (
   bucket_last_value varchar(255),
   last_updated datetime,
   PRIMARY KEY (id_bsrMETHOD, bucket_no)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS collection_bsrMETHOD (
+  id_collection mediumint(9) unsigned NOT NULL,
+  id_bsrMETHOD mediumint(9) unsigned NOT NULL,
+  score tinyint(4) unsigned NOT NULL default '0',
+  PRIMARY KEY (id_collection, id_bsrMETHOD)
 ) ENGINE=MyISAM;
 
 -- end of file

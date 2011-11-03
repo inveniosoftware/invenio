@@ -108,3 +108,11 @@ class BibSortWasher(object):
             return float(val)
         except ValueError:
             return 0
+
+
+def get_all_available_washers():
+    """
+    Returns all the available washer functions without the leading '_'
+    """
+    method_list = dir(BibSortWasher)
+    return [method[1:] for method in method_list if method.startswith('_') and method.find('__') < 0]

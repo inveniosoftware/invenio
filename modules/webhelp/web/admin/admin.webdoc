@@ -284,7 +284,7 @@ engine.
   data, you can remove all the sorting data associated with a method.
 </td>
 <td>
-  <small class="note">command-line configuration</small>
+  <a href="<CFG_SITE_URL>/admin/bibsort/bibsortadmin.py">BibSort Admin Interface</a>
 </td>
 <td>
   <a href="bibsort-admin-guide">BibSort Admin Guide</a>

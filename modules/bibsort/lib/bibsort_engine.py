@@ -496,6 +496,34 @@ def delete_bibsort_data_for_method(method_id):
         return False
     return True
 
+def delete_all_data_for_method(method_id):
+    """This method will delete all data asociated with a method
+    from bibsort tables.
+    Returns False in case some error occured, True otherwise"""
+    method_name = 'method name'
+    try:
+        run_sql("DELETE FROM bsrMETHODDATA WHERE id_bsrMETHOD = %s", (method_id, ))
+        run_sql("DELETE FROM bsrMETHODDATABUCKET WHERE id_bsrMETHOD = %s", (method_id, ))
+        run_sql("DELETE FROM bsrMETHODNAME WHERE id_bsrMETHOD = %s", (method_id, ))
+        run_sql("DELETE FROM bsrMETHOD WHERE id = %s", (method_id, ))
+        method_name = run_sql("SELECT name from bsrMETHOD WHERE id = %s", (method_id, ))[0][0]
+    except Error:
+        return False
+    except IndexError:
+        return True
+    if method_name:# the method has not been deleted
+        return False
+    return True
+
+def add_sorting_method(method_name, method_definition, method_treatment):
+    """This method will add a new sorting method in the database
+    and update the config file"""
+    try:
+        run_sql("INSERT INTO bsrMETHOD(name, definition, washer) \
+            VALUES (%s, %s, %s)", (method_name, method_definition, method_treatment))
+    except Error:
+        return False
+    return True
 
 def update_bibsort_tables(recids, method, update_timestamp = True):
     """Updates the data structures for sorting method: method
