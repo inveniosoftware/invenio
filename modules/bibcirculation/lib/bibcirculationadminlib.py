@@ -47,7 +47,8 @@ from invenio.bibcirculation_utils import book_title_from_MARC, \
       update_request_data, \
       validate_date_format, \
       create_ill_record, \
-      generate_email_body
+      generate_email_body, \
+      looks_like_dictionary
       #get_list_of_ILL_requests, \
       #create_item_details_url
 from invenio.webstat import register_customevent
@@ -58,6 +59,7 @@ from invenio.bibcirculation_config import \
      CFG_BIBCIRCULATION_TEMPLATES, CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY, \
      CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
 import invenio.bibcirculation_dblayer as db
+from invenio.bibcirculation_utils import looks_like_dictionary
 import invenio.template
 bibcirculation_templates = invenio.template.load('bibcirculation')
 
@@ -1897,16 +1899,20 @@ def get_borrower_notes(req, borrower_id, delete_key, library_notes, ln=CFG_SITE_
     @param borrower_id:   identify the borrower. It is also the primary key of
                           the table crcBORROWER.
 
-   """
+    """
 
     if delete_key and borrower_id:
-        borrower_notes = eval(db.get_borrower_notes(borrower_id))
-        del borrower_notes[delete_key]
-        db.update_borrower_notes(borrower_id, borrower_notes)
+        if looks_like_dictionary(db.get_borrower_notes(borrower_id)):
+            borrower_notes = eval(db.get_borrower_notes(borrower_id))
+            del borrower_notes[delete_key]
+            db.update_borrower_notes(borrower_id, borrower_notes)
 
     elif library_notes:
         if db.get_borrower_notes(borrower_id):
-            borrower_notes = eval(db.get_borrower_notes(borrower_id))
+            if looks_like_dictionary(db.get_borrower_notes(borrower_id)):
+                borrower_notes = eval(db.get_borrower_notes(borrower_id))
+            else:
+                borrower_notes = {}
         else:
             borrower_notes = {}
 
@@ -1949,13 +1955,17 @@ def get_loans_notes(req, loan_id, delete_key,
     """
 
     if delete_key and loan_id:
-        loans_notes = eval(db.get_loan_notes(loan_id))
-        del loans_notes[delete_key]
-        db.update_loan_notes(loan_id, loans_notes)
+        if looks_like_dictionary(db.get_loan_notes(loan_id)):
+            loans_notes = eval(db.get_loan_notes(loan_id))
+            del loans_notes[delete_key]
+            db.update_loan_notes(loan_id, loans_notes)
 
     elif library_notes:
         if db.get_loan_notes(loan_id):
-            loans_notes = eval(db.get_loan_notes(loan_id))
+            if looks_like_dictionary(db.get_loan_notes(loan_id)):
+                loans_notes = eval(db.get_loan_notes(loan_id))
+            else:
+                loans_notes = {}
         else:
             loans_notes = {}
 
@@ -3127,13 +3137,17 @@ def get_library_notes(req, library_id, delete_key,
     """
 
     if delete_key and library_id:
-        lib_notes = eval(db.get_library_notes(library_id))
-        del lib_notes[delete_key]
-        db.update_library_notes(library_id, lib_notes)
+        if looks_like_dictionary(db.get_library_notes(library_id)):
+            lib_notes = eval(db.get_library_notes(library_id))
+            del lib_notes[delete_key]
+            db.update_library_notes(library_id, lib_notes)
 
     elif library_notes:
         if db.get_library_notes(library_id):
-            lib_notes = eval(db.get_library_notes(library_id))
+            if looks_like_dictionary(db.get_library_notes(library_id)):
+                lib_notes = eval(db.get_library_notes(library_id))
+            else:
+                lib_notes = {}
         else:
             lib_notes = {}
 
@@ -4295,13 +4309,17 @@ def get_purchase_notes(req, purchase_id, delete_key, library_notes, ln=CFG_SITE_
     """
 
     if delete_key and purchase_id:
-        purchase_notes = eval(db.get_purchase_notes(purchase_id))
-        del purchase_notes[delete_key]
-        db.update_purchase_notes(purchase_id, purchase_notes)
+        if looks_like_dictionary(db.get_purchase_notes(purchase_id)):
+            purchase_notes = eval(db.get_purchase_notes(purchase_id))
+            del purchase_notes[delete_key]
+            db.update_purchase_notes(purchase_id, purchase_notes)
 
     elif library_notes:
         if db.get_purchase_notes(purchase_id):
-            purchase_notes = eval(db.get_purchase_notes(purchase_id))
+            if looks_like_dictionary(db.get_purchase_notes(purchase_id)):
+                purchase_notes = eval(db.get_purchase_notes(purchase_id))
+            else:
+                purchase_notes = {}
         else:
             purchase_notes = {}
 
@@ -4658,9 +4676,10 @@ def ill_request_details_step1(req, delete_key, ill_request_id, new_status, ln=CF
     """
 
     if delete_key and ill_request_id:
-        library_notes = eval(db.get_ill_request_notes(ill_request_id))
-        del library_notes[delete_key]
-        db.update_ill_request_notes(ill_request_id, library_notes)
+        if looks_like_dictionary(db.get_ill_request_notes(ill_request_id)):
+            library_notes = eval(db.get_ill_request_notes(ill_request_id))
+            del library_notes[delete_key]
+            db.update_ill_request_notes(ill_request_id, library_notes)
 
     if new_status:
         db.update_ill_request_status(ill_request_id,new_status)
@@ -4706,9 +4725,10 @@ def ill_request_details_step2(req, delete_key, ill_request_id, new_status, libra
         return mustloginpage(req, auth_message)
 
     if delete_key and ill_request_id:
-        library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
-        del library_previous_notes[delete_key]
-        db.update_ill_request_notes(ill_request_id, library_previous_notes)
+        if looks_like_dictionary(db.get_ill_request_notes(ill_request_id)):
+            library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
+            del library_previous_notes[delete_key]
+            db.update_ill_request_notes(ill_request_id, library_previous_notes)
 
     #navtrail_previous_links = '<a class="navtrail" ' \
     #                          'href="%s/help/admin">Admin Area' \
@@ -4719,7 +4739,10 @@ def ill_request_details_step2(req, delete_key, ill_request_id, new_status, libra
         cost_format = cost + ' ' + currency
 
     if db.get_ill_request_notes(ill_request_id):
-        library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
+        if looks_like_dictionary(db.get_ill_request_notes(ill_request_id)):
+            library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
+        else:
+            library_previous_notes = {}
     else:
         library_previous_notes = {}
 
@@ -4756,9 +4779,10 @@ def ordered_books_details_step1(req, purchase_id, delete_key, ln=CFG_SITE_LANG):
     """
 
     if delete_key and purchase_id:
-        purchase_notes = eval(db.get_purchase_notes(purchase_id))
-        del purchase_notes[delete_key]
-        db.update_purchase_notes(purchase_id, purchase_notes)
+        if looks_like_dictionary(db.get_purchase_notes(purchase_id)):
+            purchase_notes = eval(db.get_purchase_notes(purchase_id))
+            del purchase_notes[delete_key]
+            db.update_purchase_notes(purchase_id, purchase_notes)
 
     list_of_vendors = db.get_list_of_vendors()
     order_details = db.get_order_details(purchase_id)
@@ -4824,7 +4848,10 @@ def ordered_books_details_step3(req, purchase_id, recid, vendor_id,
     """
     """
 
-    purchase_notes = eval(purchase_notes)
+    if looks_like_dictionary(purchase_notes):
+        purchase_notes = eval(purchase_notes)
+    else:
+        purchase_notes = {}
     library_notes = library_notes.strip(' \n\t')
     if (len(library_notes)) is not 0:
         purchase_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
@@ -5513,13 +5540,17 @@ def get_ill_library_notes(req, ill_id, delete_key, library_notes, ln=CFG_SITE_LA
     """
 
     if delete_key and ill_id:
-        ill_notes = eval(db.get_ill_notes(ill_id))
-        del ill_notes[delete_key]
-        db.update_ill_notes(ill_id, ill_notes)
+        if looks_like_dictionary(db.get_ill_notes(ill_id)):
+            ill_notes = eval(db.get_ill_notes(ill_id))
+            del ill_notes[delete_key]
+            db.update_ill_notes(ill_id, ill_notes)
 
     elif library_notes:
         if db.get_ill_notes(ill_id):
-            ill_notes = eval(db.get_ill_notes(ill_id))
+            if looks_like_dictionary(db.get_ill_notes(ill_id)):
+                ill_notes = eval(db.get_ill_notes(ill_id))
+            else:
+                ill_notes = {}
         else:
             ill_notes = {}
 

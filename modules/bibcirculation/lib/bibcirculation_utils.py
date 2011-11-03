@@ -31,7 +31,9 @@ from invenio.bibcirculation_config import CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY, 
      CFG_BIBCIRCULATION_HOLIDAYS
 from invenio.messages import gettext_set_language
 
-import datetime, time
+import datetime, time, re
+
+DICC_REGEXP = re.compile("^\{('[^']*': ?('[^']*'|[0-9]*|None)(, ?'[^']*': ?('[^']*'|[0-9]*|None))*)?\}$")
 
 def hold_request_mail(recid, borrower_id):
     """
@@ -588,7 +590,10 @@ def wash_recid_from_ILL_request(ill_request_id):
     """
 
     book_info = db.get_ill_book_info(ill_request_id)
-    book_info = eval(book_info)
+    if looks_like_dictionary(book_info):
+        book_info = eval(book_info)
+    else:
+        book_info = None
 
     try:
         recid = int(book_info['recid'])
@@ -689,3 +694,9 @@ def create_item_details_url(recid, ln):
     """
     url = '/admin/bibcirculation/bibcirculationadmin.py/get_item_details?ln=%s&recid=%s' % (ln, str(recid))
     return CFG_SITE_URL + url
+
+def looks_like_dictionary(candidate_string):
+    if re.match(DICC_REGEXP, candidate_string):
+        return True
+    else:
+        return False
