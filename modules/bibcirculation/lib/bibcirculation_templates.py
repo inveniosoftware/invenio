@@ -38,7 +38,8 @@ from invenio.bibcirculation_utils import get_book_cover, \
       renew_loan_for_X_days, \
       get_item_info_for_search_result, \
       all_copies_are_missing, \
-      has_copies
+      has_copies, \
+      looks_like_dictionary
 
 
 _MENU_ = """
@@ -4904,7 +4905,10 @@ class Template:
         if not borrower_notes:
             borrower_notes = {}
         else:
-            borrower_notes = eval(borrower_notes)
+            if looks_like_dictionary(borrower_notes):
+                borrower_notes = eval(borrower_notes)
+            else:
+                borrower_notes = {}
 
         out = """ """
 
@@ -4999,7 +5003,10 @@ class Template:
         if not loans_notes:
             loans_notes = {}
         else:
-            loans_notes = eval(loans_notes)
+            if looks_like_dictionary(loans_notes):
+                loans_notes = eval(loans_notes)
+            else:
+                loans_notes = {}
 
         out = """ """
 
@@ -7761,7 +7768,10 @@ class Template:
         if not library_notes:
             library_notes = {}
         else:
-            library_notes = eval(library_notes)
+            if looks_like_dictionary(library_notes):
+                library_notes = eval(library_notes)
+            else:
+                library_notes = {}
 
         out = """ """
 
@@ -9964,7 +9974,10 @@ class Template:
         if not purchase_notes:
             purchase_notes = {}
         else:
-            purchase_notes = eval(purchase_notes)
+            if looks_like_dictionary(purchase_notes):
+                purchase_notes = eval(purchase_notes)
+            else:
+                purchase_notes = {}
 
         out = """ """
 
@@ -11078,7 +11091,10 @@ class Template:
             else:
                 library_name = '-'
 
-            item_info = eval(item_info)
+            if looks_like_dictionary(item_info):
+                item_info = eval(item_info)
+            else:
+                item_info = {}
 
             try:
                 title_link = create_html_link(CFG_SITE_URL +
@@ -11162,12 +11178,18 @@ class Template:
         if library_notes == '' or library_notes == None:
             previous_library_notes = {}
         else:
-            previous_library_notes = eval(library_notes)
+            if looks_like_dictionary(library_notes):
+                previous_library_notes = eval(library_notes)
+            else:
+                previous_library_notes = {}
 
         key_array = previous_library_notes.keys()
         key_array.sort()
 
-        item_info = eval(item_info)
+        if looks_like_dictionary(item_info):
+            item_info = eval(item_info)
+        else:
+            item_info = {}
 
         today = datetime.date.today()
         within_a_week  = (datetime.date.today() + datetime.timedelta(days=7)).strftime('%Y-%m-%d')
@@ -12159,7 +12181,10 @@ class Template:
         (_borrower_id, borrower_name, borrower_email, borrower_mailbox,
          period_from, period_to, book_info, borrower_comments, only_this_edition) = ill_request_borrower_details
 
-        book_info = eval(book_info)
+        if looks_like_dictionary(book_info):
+            book_info = eval(book_info)
+        else:
+            book_info = {}
 
         try:
             (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(book_info['recid']))
@@ -12366,7 +12391,10 @@ class Template:
             if not ill_req_details:
                 previous_library_notes = {}
             else:
-                previous_library_notes = eval(ill_req_details[8])
+                if looks_like_dictionary(ill_req_details[8]):
+                    previous_library_notes = eval(ill_req_details[8])
+                else:
+                    previous_library_notes = {}
 
             (ill_request_id, library_notes) = request_info
 
@@ -12427,7 +12455,10 @@ class Template:
             if not ill_req_details:
                 previous_library_notes = {}
             else:
-                previous_library_notes = eval(ill_req_details[8])
+                if looks_like_dictionary(ill_req_details[8]):
+                    previous_library_notes = eval(ill_req_details[8])
+                else:
+                    previous_library_notes = {}
 
             (ill_request_id, library_id, request_date, expected_date,
              cost, currency, barcode, library_notes) =  request_info
@@ -12519,7 +12550,10 @@ class Template:
             if not previous_library_notes:
                 previous_library_notes = {}
             else:
-                previous_library_notes = eval(previous_library_notes)
+                if looks_like_dictionary(previous_library_notes):
+                    previous_library_notes = eval(previous_library_notes)
+                else:
+                    previous_library_notes = {}
 
             (ill_request_id, cost, currency, barcode, library_notes) =  request_info
 
@@ -12611,7 +12645,10 @@ class Template:
             if not previous_library_notes:
                 previous_library_notes = {}
             else:
-                previous_library_notes = eval(previous_library_notes)
+                if looks_like_dictionary(previous_library_notes):
+                    previous_library_notes = eval(previous_library_notes)
+                else:
+                    previous_library_notes = {}
 
             (ill_request_id, arrival_date, due_date, cost, currency, barcode, library_notes) =  request_info
 
@@ -12710,7 +12747,10 @@ class Template:
 
             (library_id, request_date, expected_date, arrival_date, due_date, barcode, previous_library_notes) = ill_req_details
 
-            previous_library_notes = eval(previous_library_notes)
+            if looks_like_dictionary(previous_library_notes):
+                previous_library_notes = eval(previous_library_notes)
+            else:
+                previous_library_notes = {}
 
             (ill_request_id, return_date, cost, currency, library_notes) =  request_info
 
@@ -12811,7 +12851,10 @@ class Template:
 
             (library_id, request_date, expected_date, arrival_date, due_date, return_date, cost, barcode, previous_library_notes) = ill_req_details
 
-            previous_library_notes = eval(previous_library_notes)
+            if looks_like_dictionary(previous_library_notes):
+                previous_library_notes = eval(previous_library_notes)
+            else:
+                previous_library_notes = {}
 
             (value, currency) = cost.split()
 
@@ -12991,7 +13034,10 @@ class Template:
 
         (purchase_id, recid, vendor, order_date, expected_date, price, status, notes) = order_details
 
-        purchase_notes = eval(notes)
+        if looks_like_dictionary(notes):
+            purchase_notes = eval(notes)
+        else:
+            purchase_notes = {}
 
         (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
 
@@ -13373,7 +13419,10 @@ class Template:
                            _("Expected date"), expected_date,
                            _("Previous notes"))
 
-        purchase_notes = eval(purchase_notes)
+        if looks_like_dictionary(purchase_notes):
+            purchase_notes = eval(purchase_notes)
+        else:
+            purchase_notes = {}
 
         key_array = purchase_notes.keys()
         key_array.sort()
@@ -15069,7 +15118,11 @@ class Template:
                 library_link = '-'
 
             #get book title
-            book_info = eval(book_info)
+            if looks_like_dictionary(book_info):
+                book_info = eval(book_info)
+            else:
+                book_info = {}
+
             try:
                 title_link = create_html_link(CFG_SITE_URL +
                                           '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
@@ -15147,7 +15200,8 @@ class Template:
         if not ill_notes:
             ill_notes = {}
         else:
-            ill_notes = eval(ill_notes)
+            if looks_like_dictionary(ill_notes):
+                ill_notes = eval(ill_notes)
 
         out = """ """
 
