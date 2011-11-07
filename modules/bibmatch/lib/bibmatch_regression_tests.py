@@ -310,7 +310,7 @@ class BibMatchTest(unittest.TestCase):
 
 </collection>
 """
-        #fuzzy matched: quasi-normal -> quasi normal + missing word in title
+        #fuzzy matched: quasi-normal -> quasinormal and missing words in title
         self.recxml4 = """
 <?xml version="1.0" encoding="UTF-8"?>
 <collection xmlns="http://www.loc.gov/MARC21/slim">
@@ -332,7 +332,7 @@ class BibMatchTest(unittest.TestCase):
     <subfield code="u">National Technical University of Athens</subfield>
   </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
-    <subfield code="a">Quasi normal Modes of Electromagnetic Perturbations of Four-Dimensional Topological Black Holes</subfield>
+    <subfield code="a">Quasinormal Modes of Perturbations of Four-Dimensional Topological Black Holes</subfield>
   </datafield>
   <datafield tag="260" ind1=" " ind2=" ">
     <subfield code="c">2006</subfield>
