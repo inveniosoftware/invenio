@@ -305,7 +305,6 @@ def personid_fast_assign_papers(paperslist=None):
 
         task_sleep_now_if_required(True)
 
-
 def get_recids_affected_since(last_timestamp):
     '''
     Returns a list of recids which have been manually changed since timestamp

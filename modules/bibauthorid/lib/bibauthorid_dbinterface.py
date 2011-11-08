@@ -1771,6 +1771,9 @@ def pfap_assign_paper_iteration(i, bibrec, atul, personid_new_id_lock):
     bibrec = 123
     '''
     _pfap_printmsg('Assigner:  ' + str(i), 'Starting on paper: %s' % bibrec)
+    atul.acquire()
+    update_authornames_tables_from_paper([[bibrec]])
+    atul.release()
     b100 = run_sql("select b.id,b.value from bib10x as b, "
                    "bibrec_bib10x as a where b.id=a.id_bibxxx and "
                    "b.tag=%s and a.id_bibrec=%s", ('100__a', bibrec))
@@ -1798,9 +1801,6 @@ def pfap_assign_paper_iteration(i, bibrec, atul, personid_new_id_lock):
                            'assigning...' % (str(bibref[0]), str(bibrec)))
             _pfap_assign_bibrefrec(i, '700', bibref[0], bibrec, bibref[1], personid_new_id_lock)
 
-    atul.acquire()
-    update_authornames_tables_from_paper([[bibrec]])
-    atul.release()
     _pfap_printmsg('Assigner:  ' + str(i), 'Done with: %s' % bibrec)
 
 
@@ -1886,7 +1886,8 @@ def update_personID_canonical_names(persons_list=None, overwrite=False, suggeste
                          (pid[0], 'canonical_name', canonical_name))
 
 
-def update_personID_names_string_set(PIDlist=None, really_update_all=False, wait_finished=False):
+def update_personID_names_string_set(PIDlist=None, really_update_all=False, wait_finished=False,
+                                     single_threaded=False):
     '''
     Updates the personID table with the names gathered from documents
     @param: list of pids to consider, if omitted performs an update on the entire db
@@ -1981,7 +1982,6 @@ def update_personID_names_string_set(PIDlist=None, really_update_all=False, wait
                 values = values[0:len(values) - 1]
                 sqlquery = sqlquery + values
                 run_sql(sqlquery)
-
             close_connection()
 #                else:
 #                    sys.stdout.write(str(self.pid) + ' not updating!')sudo -u apache /opt/invenio/bin/bibauthorid -u admin --process-all 
@@ -1990,8 +1990,9 @@ def update_personID_names_string_set(PIDlist=None, really_update_all=False, wait
 #                sys.stdout.flush()
 
     class starter(threading.Thread):
-        def __init__ (self):
+        def __init__ (self,single_threaded=False):
             threading.Thread.__init__(self)
+            self.ST = single_threaded
 
         def run(self):
             tgath = []
@@ -1999,15 +2000,20 @@ def update_personID_names_string_set(PIDlist=None, really_update_all=False, wait
                 current = names_gatherer(pid)
                 tgath.append(current)
                 current.start()
-                if bconfig.TABLES_UTILS_DEBUG:
-                    sys.stdout.write(str(pid) + '.\n')
-                    sys.stdout.flush()
-                while threading.activeCount() > bconfig.PERSONID_SQL_MAX_THREADS:
-                    time.sleep(0.02)
-            for t in tgath:
-                t.join()
+                if self.ST:
+                    current.join()
+                    continue
+                else:
+                    if bconfig.TABLES_UTILS_DEBUG:
+                        sys.stdout.write(str(pid) + '.\n')
+                        sys.stdout.flush()
+                    while threading.activeCount() > bconfig.PERSONID_SQL_MAX_THREADS:
+                        time.sleep(0.02)
+            if not self.ST:
+                for t in tgath:
+                    t.join()
 
-    thread = starter()
+    thread = starter(single_threaded)
     thread.start()
     if wait_finished:
         thread.join()
