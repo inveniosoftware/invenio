@@ -5237,17 +5237,15 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                                                         sc, pl_in_url,
                                                         d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1))
 
-                # store the last search results page
                 if req and not isinstance(req, cStringIO.OutputType):
+                    # store the last search results page
                     session_param_set(req, 'websearch-last-query', req.unparsed_uri)
-                    if not wlqh_results_overlimit:
-                        # store list of results if user wants to display hits
-                        # in a single list, or store list of collections of records
-                        # if user displays hits split by collections:
-                        session_param_set(req, 'websearch-last-query-hits', results_final_colls)
-                    else:
-                        results_final_colls = []
-                        session_param_set(req, 'websearch-last-query-hits', results_final_colls)
+                    if wlqh_results_overlimit:
+                        results_final_colls = None
+                    # store list of results if user wants to display hits
+                    # in a single list, or store list of collections of records
+                    # if user displays hits split by collections:
+                    session_param_set(req, 'websearch-last-query-hits', results_final_colls)
 
                 #if hosted_colls and (of.startswith("h") or of.startswith("x")):
                 if hosted_colls_actual_or_potential_results_p:
