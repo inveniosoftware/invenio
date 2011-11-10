@@ -169,6 +169,16 @@ class InvenioWebMessageWebTest(InvenioWebTestCase):
         self.find_element_by_name_with_timeout("delete")
         self.browser.find_element_by_name("delete").click()
         self.logout()
+        # login as juliet
+        self.login(username="juliet", password="j123uliet")
+        # let's go to "Your Messages"
+        self.find_element_by_link_text_with_timeout("Your Messages")
+        self.browser.find_element_by_link_text("Your Messages").click()
+        self.find_element_by_link_text_with_timeout("dear Juliet")
+        self.browser.find_element_by_link_text("dear Juliet").click()
+        self.find_element_by_name_with_timeout("delete")
+        self.browser.find_element_by_name("delete").click()
+        self.logout()
 
     def test_send_message_later(self):
         """webmessage - web test send a message later"""
