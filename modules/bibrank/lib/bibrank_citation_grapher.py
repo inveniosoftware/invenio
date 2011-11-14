@@ -30,6 +30,7 @@ from invenio.bibrank_citation_searcher import calculate_cited_by_list
 
 cfg_bibrank_print_citation_history = 1
 color_line_list = ['9', '19', '10', '15', '21', '18']
+cfg_bibrank_citation_history_min_x_points = 3 # do not generate graphs that have less than three points
 
 def get_field_values(recID, tag):
     """Return list of field values for field tag inside record RECID."""
@@ -69,6 +70,9 @@ def calculate_citation_history_coordinates(recid):
     for key, value in initial_result.items():
         result.append((key, value))
     result.sort()
+    if len(result) < cfg_bibrank_citation_history_min_x_points:
+        # do not generate graphs that have less than X points
+        return []
     return result
 
 def calculate_citation_graphe_x_coordinates(recid):
@@ -135,4 +139,3 @@ def create_citation_history_graph_and_box(recid, ln=CFG_SITE_LANG):
                     html_graphe_code = """<p>%s"""% html_command(graphe_image)
                 html_result = html_head + html_graphe_code
     return html_result
-
