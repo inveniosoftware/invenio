@@ -216,6 +216,6 @@ def get_processed_external_recids(pid):
 
 def get_all_personids_recs(pid):
     records = dbinter.get_all_paper_records(pid)
-    return [int(rec.split(',')[1]) for rec in records]
+    return [int(rec[0].split(',')[1]) for rec in records]
 
 

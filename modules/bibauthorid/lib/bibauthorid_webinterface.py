@@ -30,7 +30,7 @@ try:
 except:
     CFG_JSON_AVAILABLE = False
     json = None
-    
+
 from invenio.bibauthorid_config import CLAIMPAPER_ADMIN_ROLE
 from invenio.bibauthorid_config import CLAIMPAPER_USER_ROLE
 #from invenio.bibauthorid_config import EXTERNAL_CLAIMED_RECORDS_KEY
@@ -2410,6 +2410,26 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
 
         link = TEMPLATE.tmpl_welcome_link()
         req.write(link)
+        req.write("<br><br>")
+        uinfo = collect_user_info(req)
+
+        arxivp = []
+        if 'external_arxivids' in uinfo and uinfo['external_arxivids']:
+            try:
+                for i in uinfo['external_arxivids'].split(';'):
+                    arxivp.append(i)
+            except (IndexError, KeyError):
+                pass
+
+        req.write(TEMPLATE.tmpl_welcome_arXiv_papers(arxivp))
+        if CFG_INSPIRE_SITE:
+            # FIXME: this is needed for debugging arXiv login on
+            # INSPIRE for a day or so; it should be removed as soon as
+            # possible due to security concerns
+            debg = "<!--"
+            debg = debg + str(uinfo)
+            debg = debg + "-->"
+            req.write(debg)
         req.write(TEMPLATE.tmpl_welcome_end())
         req.write(pagefooteronly(req=req))
 

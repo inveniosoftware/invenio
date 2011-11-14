@@ -1648,6 +1648,18 @@ class Template:
             self._('Correct my publication lists!') + \
             '</b></a>'
 
+    def tmpl_welcome_arXiv_papers(self, paps):
+        '''
+        Creates the list of arXiv papers
+        '''
+        plist = "<br><br>"
+        if paps:
+            plist = plist + "We have got and automatically claimed for You the following papers from arXiv.org: <br>"
+            for p in paps:
+                plist = plist + "  "+str(p)+"<br>"
+        else:
+            plist = "We have got no papers from arXiv.org which we could claim automatically for You. <br>"
+        return plist
 
     def tmpl_welcome_end(self):
         '''
