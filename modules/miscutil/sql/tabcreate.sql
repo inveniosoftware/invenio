@@ -2893,7 +2893,7 @@ CREATE TABLE IF NOT EXISTS publreq (
 CREATE TABLE IF NOT EXISTS session (
   session_key varchar(32) NOT NULL default '',
   session_expiry int(11) unsigned NOT NULL default '0',
-  session_object blob,
+  session_object longblob,
   uid int(15) unsigned NOT NULL,
   UNIQUE KEY session_key (session_key),
   KEY uid (uid)
