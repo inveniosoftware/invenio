@@ -71,7 +71,8 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_SOLR_URL, \
      CFG_SITE_RECORD, \
-     CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT
+     CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
+     CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY
 
 from invenio.search_engine_config import InvenioWebSearchUnknownCollectionError, InvenioWebSearchWildcardLimitError
 from invenio.search_engine_utils import get_fieldvalues
@@ -311,6 +312,7 @@ def check_user_can_view_record(user_info, recid):
     authorization is not granted
     @rtype: (int, string)
     """
+    policy = CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY.strip().upper()
     if isinstance(recid, str):
         recid = int(recid)
     if record_public_p(recid):
@@ -323,14 +325,18 @@ def check_user_can_view_record(user_info, recid):
         return (0, '')
     restricted_collections = get_restricted_collections_for_recid(recid, recreate_cache_if_needed=False)
     if restricted_collections:
-        ## If there are restricted collections the user must be authorized to all of them
+        ## If there are restricted collections the user must be authorized to all/any of them (depending on the policy)
+        auth_code, auth_msg = 0, ''
         for collection in get_restricted_collections_for_recid(recid, recreate_cache_if_needed=False):
             (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=collection)
-            if auth_code:
+            if auth_code and policy != 'ANY':
                 ## Ouch! the user is not authorized to this collection
                 return (auth_code, auth_msg)
-        ## OK! The user is authorized.
-        return (0, '')
+            elif auth_code == 0 and policy == 'ANY':
+                ## Good! At least one collection is authorized
+                return (0, '')
+        ## Depending on the policy, the user will be either authorized or not
+        return auth_code, auth_msg
     if is_record_in_any_collection(recid, recreate_cache_if_needed=False):
         ## the record is not in any restricted collection
         return (0, '')
