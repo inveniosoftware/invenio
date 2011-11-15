@@ -75,7 +75,7 @@ AC_MSG_CHECKING(for OpenOffice.org Python binary)
 AC_ARG_WITH(openoffice-python, AC_HELP_STRING([--with-openoffice-python], [path to a specific OpenOffice.org Python binary (optional)]), OPENOFFICE_PYTHON=`which ${withval}`)
 
 if test -z "$OPENOFFICE_PYTHON"; then
-   OPENOFFICE_PYTHON=`locate -n 1 -r "o.*office/program/python$"`
+   OPENOFFICE_PYTHON=`locate -l 1 -r "o.*office/program/python$"`
    OPENOFFICE_PYTHON="$PYTHON $OPENOFFICE_PYTHON"
    if test -n "$OPENOFFICE_PYTHON" && ($OPENOFFICE_PYTHON -c "import uno" 2> /dev/null); then
       AC_MSG_RESULT($OPENOFFICE_PYTHON)
@@ -491,7 +491,7 @@ AC_PATH_PROG(FFPROBE, ffprobe)
 if test -z "$FFMPEG"; then
    AC_MSG_WARN([
    FFmpeg was not found in your PATH. It is used by the BibEncode
-   module to for video encoding. 
+   module to for video encoding.
    You can continue without but you will not be able to use BibEncode
    and no video submission workflows are thereby possible.
    We recommend you to install it first if you would like to support video
@@ -504,7 +504,7 @@ AC_PATH_PROG(MEDIAINFO, mediainfo)
 if test -z "$MEDIAINFO"; then
    AC_MSG_WARN([
    Mediainfo was not found in your PATH. It is used by the BibEncode
-   module to for video encoding and media metadata handling. 
+   module to for video encoding and media metadata handling.
    You can continue without but you will not be able to use BibEncode
    and no video submission workflows are thereby possible.
    We recommend you to install it first if you would like to support video
