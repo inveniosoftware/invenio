@@ -6188,7 +6188,7 @@ def register_ill_request_from_borrower_page_step2(req, borrower_id, title,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def register_purchase_request_step1(req, type, title, authors,
+def register_purchase_request_step1(req, recid, req_type, title, authors,
                         place, publisher, year, edition, this_edition_only,
                         isbn, standard_number,
                         budget_code, cash, period_of_interest_from,
@@ -6211,8 +6211,12 @@ def register_purchase_request_step1(req, type, title, authors,
                     'Circulation Management' \
                     '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
+    if recid != '':
+        (title, year, authors,
+         isbn, publisher) = book_information_from_MARC(int(recid))
+
     body = bc_templates.tmpl_register_purchase_request_step1(infos=infos,
-                                fields=(type, title, authors, place, publisher,
+                                fields=(req_type, title, authors, place, publisher,
                                         year, edition, this_edition_only,
                                         isbn, standard_number,
                                         budget_code, cash,

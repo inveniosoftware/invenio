@@ -1884,7 +1884,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
     def register_purchase_request_step1(self, req, form):
         """    """
-        argd = wash_urlargd(form, {'type': (str, 'acq-book'),
+        argd = wash_urlargd(form, {'recid': (str, ''), 'type': (str, 'acq-book'),
                 'title': (str, ''), 'authors': (str, ''), 'place': (str, ''),
                 'publisher': (str, ''), 'year': (str, ''), 'edition': (str, ''),
                 'this_edition_only': (str, 'No'),
@@ -1894,7 +1894,8 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
                 'period_of_interest_to': (str, ''),
                 'additional_comments': (str, ''), 'ln': (str, "en")})
 
-        type = argd['type'].strip()
+        recid = argd['recid'].strip()
+        req_type = argd['type'].strip()
         title = argd['title'].strip()
         authors = argd['authors'].strip()
         place = argd['place'].strip()
@@ -1911,11 +1912,11 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         additional_comments = argd['additional_comments'].strip()
         ln = argd['ln']
 
-        return bal.register_purchase_request_step1(req, type, title, authors,
-                        place, publisher, year, edition, this_edition_only,
-                        isbn, standard_number,
-                        budget_code, cash, period_of_interest_from,
-                        period_of_interest_to, additional_comments, ln)
+        return bal.register_purchase_request_step1(req, recid, req_type, title,
+                                authors, place, publisher, year, edition,
+                                this_edition_only, isbn, standard_number,
+                                budget_code, cash, period_of_interest_from,
+                                period_of_interest_to, additional_comments, ln)
 
 
     def register_purchase_request_step2(self, req, form):

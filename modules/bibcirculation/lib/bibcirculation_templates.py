@@ -3356,14 +3356,14 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
                     <input
                     type=button
-                onClick="location.href='%s/admin2/bibcirculation/order_new_copy_step1?ln=%s&recid=%s'"
+                onClick="location.href='%s/admin2/bibcirculation/register_purchase_request_step1?ln=%s&recid=%s'"
                     value='%s' class="formbutton">
 
                 <!--<input
                 type=button
         onClick="location.href='%s/admin2/bibcirculation/register_ill_request_step0?ln=%s&recid=%s'"
-                     value='%s'class="formbutton">
-                     </td>  -->
+                     value='%s'class="formbutton"> -->
+                     </td>
                 </tr>
             </table>
             <br />
