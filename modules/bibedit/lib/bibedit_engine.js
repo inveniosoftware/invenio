@@ -2637,44 +2637,49 @@ function check_subjects_KB(value) {
 
 function onContentChange(value, th){
   /*
-   * Handle 'Save' button in editable content fields.
+   * Purpose: jEditable callback when the user hits enter in the editable field.
+   * Input(s): string:value - the new content value
+   *           object:th - this (table cell)
+   *
+   * Returns: string - string to be introduced in the cell th
    */
-  if (failInReadOnly()){
-    return;
-  }
+
+  /* Extract information about the field to edit from cell id */
   var tmpArray = th.id.split('_');
   var tag = tmpArray[1], fieldPosition = tmpArray[2], subfieldIndex = tmpArray[3];
+  var cellType = tmpArray[0];
+
+  /* Get field instance to be updated from global variable gRecord */
   var field = gRecord[tag][fieldPosition];
-  var tag_ind = tag + field[1] + field[2];
-  var oldValue = "";
+  var tag_ind = tag + field[1] + field[2]; // tag + indicators. e.g 999C5
+
+  /* Sanitize cell input value */
   value = value.replace(/\n/g, ' '); // Replace newlines with spaces.
   value = value.replace(/^\s+|\s+$/g,""); // Remove whitespace from the ends of strings
+
+  var oldValue = ""; //variable that will contain old value from gRecord
   if (subfieldIndex == undefined){
-    // Controlfield or modifying a field tag
-    if (tmpArray[0] == 'fieldTag') {
+    /* Edit field tag */
+    if (cellType == 'fieldTag') {
         if (tag_ind == value.replace(/_/g, " "))
             return escapeHTML(value);
         else {
             oldValue = tag_ind;
         }
     }
-    else if (field[3] == value)
-      return escapeHTML(value);
     else{
-        oldValue = field[3];
-        field[3] = value;
-        subfieldIndex = null;
-        var subfieldCode = null;
+        /* subfield index should not be undefined. Return the same value. */
+        return escapeHTML(value);
     }
   }
-  else{
-    if (tmpArray[0] == 'subfieldTag') {
+  else {
+    if (cellType == 'subfieldTag') {
+        /* Edit subfield code */
         if (field[0][subfieldIndex][0] == value)
             return escapeHTML(value);
         else {
-            // Regular subfield
-            oldValue = field[0][subfieldIndex][0];
-            field[0][subfieldIndex][0] = value;
+            oldValue = field[0][subfieldIndex][0]; // get old subfield code from gRecord
+            field[0][subfieldIndex][0] = value; // update gRecord
         }
     }
     else {
@@ -2682,88 +2687,91 @@ function onContentChange(value, th){
         if (tag_ind == '65017' && field[0][subfieldIndex][0] == 'a') {
             value = check_subjects_KB(value);
         }
+         /* Edit subfield value */
         if (field[0][subfieldIndex][1] == value)
             return escapeHTML(value);
-        // Regular field
         else {
-            oldValue = field[0][subfieldIndex][1];
-            field[0][subfieldIndex][1] = value;
+            oldValue = field[0][subfieldIndex][1]; // get old subfield value from gRecord
+            field[0][subfieldIndex][1] = value; // update gRecord
         }
     }
-    var subfieldCode = field[0][subfieldIndex][0];
   }
 
   var newValue = escapeHTML(value);
-  // setting the undo/redo handlers
-  var code;
+  if (subfieldIndex != undefined) {
+      var oldSubfieldCode = gRecord[tag][fieldPosition][0][subfieldIndex][0];
+  }
   var urHandler;
   var operation_type;
-  if (tmpArray[0] == 'subfieldTag') {
-      code = gRecord[tag][fieldPosition][0][subfieldIndex][0];
-      value = field[0][subfieldIndex][1];
-      operation_type = "change_subfield_code";
-      urHandler = prepareUndoHandlerChangeSubfield(tag,
-                                               fieldPosition,
-                                               subfieldIndex,
-                                               value,
-                                               value,
-                                               oldValue, code,
-                                               operation_type);
-  }
-  else if (tmpArray[0] == 'fieldTag') {
-      var oldTag = oldValue.substring(0,3);
-      var oldInd1 = oldValue.substring(3,4);
-      var oldInd2 = oldValue.substring(4,5);
-      var newTag = value.substring(0,3);
-      var newInd1 = value.substring(3,4);
-      var newInd2 = value.substring(4,5);
-      operation_type = "change_field_code";
-      urHandler = prepareUndoHandlerChangeFieldCode(oldTag,
-                                                    oldInd1,
-                                                    oldInd2,
-                                                    newTag,
-                                                    newInd1,
-                                                    newInd2,
-                                                    fieldPosition,
-                                                    operation_type);
-  }
-  else {
-      code = gRecord[tag][fieldPosition][0][subfieldIndex][0];
-      operation_type = "change_content";
-      urHandler = prepareUndoHandlerChangeSubfield(tag,
-                                               fieldPosition,
-                                               subfieldIndex,
-                                               oldValue,
-                                               newValue,
-                                               code, code,
-                                               operation_type);
+  switch (cellType) {
+      case 'subfieldTag':
+          value = field[0][subfieldIndex][1];
+          operation_type = "change_subfield_code";
+          urHandler = prepareUndoHandlerChangeSubfield(tag,
+                                                       fieldPosition,
+                                                       subfieldIndex,
+                                                       value,
+                                                       value,
+                                                       oldValue,
+                                                       oldSubfieldCode,
+                                                       operation_type);
+          break;
+      case 'fieldTag':
+          var oldTag = oldValue.substring(0,3);
+          var oldInd1 = oldValue.substring(3,4);
+          var oldInd2 = oldValue.substring(4,5);
+          var newTag = value.substring(0,3);
+          var newInd1 = value.substring(3,4);
+          var newInd2 = value.substring(4,5);
+          operation_type = "change_field_code";
+          urHandler = prepareUndoHandlerChangeFieldCode(oldTag,
+                                                        oldInd1,
+                                                        oldInd2,
+                                                        newTag,
+                                                        newInd1,
+                                                        newInd2,
+                                                        fieldPosition,
+                                                        operation_type);
+          break;
+      default:
+          operation_type = "change_content";
+          urHandler = prepareUndoHandlerChangeSubfield(tag,
+                                                       fieldPosition,
+                                                       subfieldIndex,
+                                                       oldValue,
+                                                       newValue,
+                                                       oldSubfieldCode,
+                                                       oldSubfieldCode,
+                                                       operation_type);
   }
   addUndoOperation(urHandler);
 
-  // generating the Ajax request
-  if (tmpArray[0] == 'subfieldTag') {
-      value = field[0][subfieldIndex][1];
-      updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, value,
-                          null, urHandler, modifySubfieldCode=true);
-  }
-  else if (tmpArray[0] == 'fieldTag'){
-      updateFieldTag(oldTag, newTag, oldInd1, oldInd2, newInd1, newInd2, fieldPosition, null, urHandler);
-  }
-  else{
-      updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, value, null, urHandler);
+  // Generate AJAX request
+  switch (cellType) {
+      case 'subfieldTag':
+          value = field[0][subfieldIndex][1];
+          updateSubfieldValue(tag, fieldPosition, subfieldIndex, oldSubfieldCode, value,
+                              null, urHandler, modifySubfieldCode=true);
+          break;
+      case 'fieldTag':
+          updateFieldTag(oldTag, newTag, oldInd1, oldInd2, newInd1, newInd2, fieldPosition, null, urHandler);
+          break;
+      default:
+          updateSubfieldValue(tag, fieldPosition, subfieldIndex, oldSubfieldCode, value, null, urHandler);
   }
 
   var idPrefix;
-  if (tmpArray[0] == 'subfieldTag') {
+  if (cellType == 'subfieldTag') {
       idPrefix = '"#subfieldTag_';
   }
   else{
       idPrefix = '"#content_';
   }
+  /* Create fading effect to show the cell modified */
   setTimeout('$(' + idPrefix + tag + '_' + fieldPosition + '_' + subfieldIndex +
       '").effect("highlight", {color: gNEW_CONTENT_COLOR}, ' +
       'gNEW_CONTENT_COLOR_FADE_DURATION)', gNEW_CONTENT_HIGHLIGHT_DELAY);
-  // Return escaped value to display.
+
   return newValue;
 }
 
