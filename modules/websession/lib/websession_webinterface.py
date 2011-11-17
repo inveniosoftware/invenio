@@ -766,12 +766,12 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         if CFG_EXTERNAL_AUTH_USING_SSO:
             argd = wash_urlargd(form, {'format': (str, '')})
             webuser.collect_user_info(req, refresh=True)
-            req.headers_out['Refresh'] = "%s; url=%s" % (CFG_EXTERNAL_AUTH_SSO_REFRESH, "%s/youraccount/keepssoalive" % CFG_SITE_SECURE_URL)
+            req.headers_out['Refresh'] = "%s; url=%s" % (CFG_EXTERNAL_AUTH_SSO_REFRESH, "%s/youraccount/keepalivesso" % CFG_SITE_SECURE_URL)
             if argd['format'] == 'image':
                 from invenio.bibdocfile import stream_file
                 from invenio.config import CFG_WEBDIR
                 return stream_file(req, os.path.join(CFG_WEBDIR, 'img', 'keep_sso_connection_alive.gif'))
-            return """<html><head><meta http-equiv="Refresh" content="%s; url=%s" /></head><body></body></html>""" % (CFG_EXTERNAL_AUTH_SSO_REFRESH, "%s/youraccount/keepssoalive" % CFG_SITE_SECURE_URL)
+            return """<html><head><meta http-equiv="Refresh" content="%s; url=%s" /></head><body></body></html>""" % (CFG_EXTERNAL_AUTH_SSO_REFRESH, "%s/youraccount/keepalivesso" % CFG_SITE_SECURE_URL)
         else:
             raise SERVER_RETURN(HTTP_NOT_FOUND)
 
