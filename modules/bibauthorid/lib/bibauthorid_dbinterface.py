@@ -734,7 +734,7 @@ def get_person_bibrecs(pid):
     '''
     Returns bibrecs associated with a personid
     @param pid: integer personid
-    @return [bibrec1,...,bibrecN] 
+    @return [bibrec1,...,bibrecN]
     '''
     papers = run_sql("select data from aidPERSONID where personid=%s and tag='paper'", (str(pid),))
     bibrecs = [p[0].split(',')[1] for p in papers]
@@ -887,9 +887,11 @@ def get_possible_personids_from_paperlist(bibrecreflist):
         pids = []
 
         try:
-            pids = run_sql("select personid from aidPERSONID use index (`tdf-b`) where tag=%s and data=%s", ('paper', str(b[0])))
+            pids = run_sql("select personid from aidPERSONID "
+                    "use index (`tdf-b`) where tag=%s and data=%s", ('paper', str(b[0])))
         except (OperationalError, ProgrammingError):
-            pids = run_sql("select personid from aidPERSONID where tag=%s and data=%s", ('paper', str(b[0])))
+            pids = run_sql("select personid from aidPERSONID "
+                    "where tag=%s and data=%s", ('paper', str(b[0])))
 
         for pid in pids:
             if pid[0] in pid_bibrecref_dict:
@@ -1804,7 +1806,7 @@ def pfap_assign_paper_iteration(i, bibrec, atul, personid_new_id_lock):
     _pfap_printmsg('Assigner:  ' + str(i), 'Done with: %s' % bibrec)
 
 
-#bibauthorid_maintenance personid update private methods 
+#bibauthorid_maintenance personid update private methods
 def update_personID_canonical_names(persons_list=None, overwrite=False, suggested='',
                                      really_update_all=False):
     '''
@@ -1984,7 +1986,7 @@ def update_personID_names_string_set(PIDlist=None, really_update_all=False, wait
                 run_sql(sqlquery)
             close_connection()
 #                else:
-#                    sys.stdout.write(str(self.pid) + ' not updating!')sudo -u apache /opt/invenio/bin/bibauthorid -u admin --process-all 
+#                    sys.stdout.write(str(self.pid) + ' not updating!')sudo -u apache /opt/invenio/bin/bibauthorid -u admin --process-all
 #                    sys.stdout.flush()
 #                sys.stdout.write(self.pstr + '\n')
 #                sys.stdout.flush()

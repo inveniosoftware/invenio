@@ -2423,13 +2423,12 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
 
         req.write(TEMPLATE.tmpl_welcome_arXiv_papers(arxivp))
         if CFG_INSPIRE_SITE:
-            # FIXME: this is needed for debugging arXiv login on
-            # INSPIRE for a day or so; it should be removed as soon as
-            # possible due to security concerns
-            debg = "<!--"
-            debg = debg + str(uinfo)
-            debg = debg + "-->"
-            req.write(debg)
+            #logs arXive logins, for debug purposes.
+            dbg = ('uinfo= ' + str(uinfo) + '\npinfo= ' + str(pinfo) + '\nreq= ' + str(req)
+                    + '\nsession= '+str(session))
+            userinfo = "%s||%s" % (uid, req.remote_ip)
+            webapi.insert_log(userinfo, pid, 'arXiv_login', 'dbg', '', comment=dbg)
+
         req.write(TEMPLATE.tmpl_welcome_end())
         req.write(pagefooteronly(req=req))
 

@@ -57,7 +57,7 @@ def update_person_canonical_name(person_id, canonical_name, userinfo=''):
     '''
     Updates a person's canonical name
     @param person_id: person id
-    @param canonical_name: string 
+    @param canonical_name: string
     '''
     dbapi.update_personID_canonical_names(persons_list=[[person_id]], overwrite=True, suggested=canonical_name)
     dbapi.insert_user_log(userinfo, person_id, 'data_update', 'CMPUI_changecanonicalname', '', 'Canonical name manually updated.')
@@ -689,7 +689,7 @@ def search_person_ids_by_name(namequery):
     return dbapi.find_personIDs_by_name_string(escaped_query)
 
 
-def deprecated_log(userinfo, personid, action, tag, value, comment='', transactionid=0):
+def insert_log(userinfo, personid, action, tag, value, comment='', transactionid=0):
     '''
     Log an action performed by a user
 
@@ -950,22 +950,25 @@ def arxiv_login(req):
         t = search_engine.perform_request_search(p='037:' + str(arx), of='id')
         for i in t:
             found_bibrecs.append(i)
-    #found_bibrecs = [78]
+    #found_bibrecs = [567700, 567744]
 
     uid = getUid(req)
     pid = dbapi.get_personid_from_uid([[uid]])
     if pid[1]:
         pid_bibrecs = dbapi.get_all_personids_recs(pid[0][0])
         pid_bibrecs = set(pid_bibrecs)
+        missing_bibrecs = [bib for bib in found_bibrecs if int(bib) not in pid_bibrecs]
         found_bibrecs = [bib for bib in found_bibrecs if int(bib) in pid_bibrecs]
+    else:
+        missing_bibrecs = []
 
     bibrec_names = []
-    for b in found_bibrecs:
+    for b in found_bibrecs+missing_bibrecs:
         bibrec_names.append([b, get_field_values_on_condition(b, source='API', get_table=['100', '700'], get_tag='a')])
 
     for n in list(bibrec_names):
         for i in list(n[1]):
-            if nameapi.soft_compare_names(surname, i.encode('utf-8')) < 0.4:
+            if nameapi.soft_compare_names(surname, i.encode('utf-8')) < 0.45:
                 n[1].remove(i)
     #bibrec_names = [[78, set([u'M\xfcck, W'])]]
 
@@ -979,7 +982,7 @@ def arxiv_login(req):
                 continue
             for bibref in bibrefs[0][0].split(','):
                 bibrefrecs.append(str(bibref) + ',' + str(bibrec[0]))
-    #bibrefrec = ['100:116,78', '700:505,78']
+    #bibrefrecs = ['100:116,78', '700:505,78']
 
     person_papers = []
     if not pid[1]:
@@ -989,10 +992,12 @@ def arxiv_login(req):
         possible_persons = sorted(possible_persons, key=lambda k: len(k[1]))
 
         if len(possible_persons) > 1:
-            if len(possible_persons[0][1]) > len(possible_persons[1][1]):
-                pid = dbapi.assign_person_to_uid(uid, possible_persons[0][0])
-                person_papers = possible_persons[0][1]
-            else:
+            for pp in possible_persons:
+                pid = dbapi.assign_person_to_uid(uid, pp[0])
+                person_papers = pp[1]
+                if pid != -1:
+                    break
+            if pid == -1:
                 pid = dbapi.assign_person_to_uid(uid, -1)
         elif len(possible_persons) == 1:
             pid = dbapi.assign_person_to_uid(uid, possible_persons[0][0])
@@ -1004,11 +1009,13 @@ def arxiv_login(req):
 
     tempticket = []
     #now we have to open the tickets...
+    #person_papers contains the papers which are already assigned to the person and came from arxive,
+    #they can be claimed regardless
     for bibref in person_papers:
         tempticket.append({'pid':pid, 'bibref':bibref, 'action':'confirm'})
 
     done_bibrecs = set(b.split(',')[1] for b in person_papers)
-    for b in found_bibrecs:
+    for b in found_bibrecs+missing_bibrecs:
         if str(b) not in done_bibrecs:
             tempticket.append({'pid':pid, 'bibref':str(b), 'action':'confirm'})
 
@@ -1393,7 +1400,7 @@ def execute_action(action, pid, bibref, uid, gather_list, userinfo='', comment='
     else:
         return False
 
-    #This is the only point which modifies a person, so this can trigger the 
+    #This is the only point which modifies a person, so this can trigger the
     #deletion of a cached page
     dbapi.delete_cached_author_page(pid)
 
