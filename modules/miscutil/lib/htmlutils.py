@@ -29,6 +29,7 @@ from invenio.textutils import indent_text, encode_for_xml
 import re
 import cgi
 import os
+import string
 
 try:
     from BeautifulSoup import BeautifulSoup
@@ -53,6 +54,14 @@ CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST = ('href', 'name', 'class')
 ## precompile some often-used regexp for speed reasons:
 RE_HTML = re.compile("(?s)<[^>]*>|&#?\w+;")
 RE_HTML_WITHOUT_ESCAPED_CHARS = re.compile("(?s)<[^>]*>")
+
+# url validation regex
+regex_url = re.compile(r'^(?:http|ftp)s?://' # http:// or https://
+                       r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
+                       r'localhost|' #localhost...
+                       r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+                       r'(?::\d+)?' # optional port
+                       r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
 def nmtoken_from_string(text):
     """
@@ -158,6 +167,8 @@ class HTMLWasher(HTMLParser):
     def wash(self, html_buffer,
              render_unallowed_tags=False,
              allowed_tag_whitelist=CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST,
+             automatic_link_transformation=False,
+             allowed_tag_whitelist=cfg_html_buffer_allowed_tag_whitelist,
              allowed_attribute_whitelist=\
                     CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST):
         """
@@ -175,6 +186,7 @@ class HTMLWasher(HTMLParser):
         self.previous_type_lists = []
         self.url = ''
         self.render_unallowed_tags = render_unallowed_tags
+        self.automatic_link_transformation = automatic_link_transformation
         self.allowed_tag_whitelist = allowed_tag_whitelist
         self.allowed_attribute_whitelist = allowed_attribute_whitelist
         self.feed(html_buffer)
@@ -205,15 +217,18 @@ class HTMLWasher(HTMLParser):
     def handle_data(self, data):
         """Function called for text nodes"""
         if not self.silent:
-            # let's to check if data contains a link
-            import string
-            if string.find(str(data),'http://') == -1:
-                self.result += cgi.escape(data, True)
+            possible_urls = re.findall(r'(https?://[\w\d:#%/;$()~_?\-=\\\.&]*)', data)
+            # validate possible urls
+            # we'll transform them just in case
+            # they are valid.
+            if possible_urls and self.automatic_link_transformation:
+                for url in possible_urls:
+                    if regex_url.search(url):
+                        transformed_url = '<a href="%s">%s</a>' % (url, url)
+                        data = string.replace(data, url, transformed_url)
+                self.result += data
             else:
-                if self.url:
-                    if self.url <> data:
-                        self.url = ''
-                        self.result += '(' + cgi.escape(data, True) + ')'
+                self.result += cgi.escape(data, True)
 
     def handle_endtag(self, tag):
         """Function called for ending of tags"""

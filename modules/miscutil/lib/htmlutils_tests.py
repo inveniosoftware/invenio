@@ -213,6 +213,45 @@ class HTMLMarkupRemovalTest(unittest.TestCase):
         self.assertEqual(remove_html_markup(test_input, 'X'),
                          test_expected)
 
+class HTMLAutomaticLinksTransformation(unittest.TestCase):
+    """Test functions related to transforming links into HTML context"""
+
+    def __init__(self, methodName='test'):
+        self.washer = HTMLWasher()
+        unittest.TestCase.__init__(self, methodName)
+
+    def test_transform_link(self):
+        """htmlutils - transforming a link"""
+        body_input = 'https://cdsweb.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es'
+        body_expected = '<a href="https://cdsweb.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es">https://cdsweb.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es</a>'
+        self.assertEqual(self.washer.wash(html_buffer=body_input,
+                                          automatic_link_transformation=True),
+                         body_expected)
+
+    def test_transform_several_links(self):
+        """htmlutils - transforming several links"""
+        body_input = 'some text https://cdsweb.cern.ch/collection/Videos?ln=es more text https://cdsweb.cern.ch/search?p=%27CERN+News'
+        body_expected = 'some text <a href="https://cdsweb.cern.ch/collection/Videos?ln=es">https://cdsweb.cern.ch/collection/Videos?ln=es</a> more text <a href="https://cdsweb.cern.ch/search?p=%27CERN">https://cdsweb.cern.ch/search?p=%27CERN</a>+News'
+        self.assertEqual(self.washer.wash(html_buffer=body_input,
+                                          automatic_link_transformation=True),
+                         body_expected)
+
+    def test_transform_just_valid_links(self):
+        """htmlutils - transforming just valid links"""
+        body_input = body_input = 'some text https://cdsweb.cern.ch/collection/Videos?ln=es more text https://cdsweb..cern/search?p=%27CERN+News'
+        body_expected = 'some text <a href="https://cdsweb.cern.ch/collection/Videos?ln=es">https://cdsweb.cern.ch/collection/Videos?ln=es</a> more text https://cdsweb..cern/search?p=%27CERN+News'
+        self.assertEqual(self.washer.wash(html_buffer=body_input,
+                                          automatic_link_transformation=True),
+                         body_expected)
+
+    def test_not_transform_link(self):
+        """htmlutils - not transforming a link"""
+        body_input = '<a href="https://cdsweb.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es">Multimedia</a>'
+        body_expected = '<a href="https://cdsweb.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es">Multimedia</a>'
+        self.assertEqual(self.washer.wash(html_buffer=body_input,
+                                          automatic_link_transformation=True),
+                         body_expected)
+
 class HTMLCreation(unittest.TestCase):
     """Test functions related to creation of HTML markup."""
 
@@ -227,6 +266,7 @@ TEST_SUITE = make_test_suite(XSSEscapingTest,
                              HTMLWashingTest,
                              HTMLMarkupRemovalTest,
                              HTMLTidyingTest,
+                             HTMLAutomaticLinksTransformation,
                              HTMLCreation)
 
 if __name__ == "__main__":

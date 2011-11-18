@@ -1,5 +1,6 @@
 from invenio.htmlutils import HTMLWasher
 import htmlentitydefs
+import cgi
 
 class EmailWasher(HTMLWasher):
     """
@@ -30,6 +31,17 @@ class EmailWasher(HTMLWasher):
                     if attr.lower() == 'href':
                         self.url = value
                         self.result += '<' + value + '>'
+
+    def handle_data(self, data):
+        """Function called for text nodes"""
+        if not self.silent:
+            if self.url:
+                if self.url == data:
+                    data = ''
+                else:
+                    data = '(' + data + ')'
+            self.url = ''
+            self.result += cgi.escape(data, True)
 
     def handle_endtag(self, tag):
         """Function called for ending of tags"""
