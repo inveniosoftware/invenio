@@ -243,12 +243,12 @@ def get_papers_by_person_id(person_id= -1, rec_status= -2, ext_out=False):
             try:
                 date = list(gfoc(recid, "269", "c"))[0]
             except (IndexError):
-                date = "Not Available"
+                date = "Not available"
 
             try:
                 exp = list(gfoc(recid, "693", "e"))[0]
             except (IndexError):
-                exp = "Not Available"
+                exp = "None"
             #date = ""
             records.append([recid, bibref, flag, authorname,
                             authoraff, date, rt_status, exp])

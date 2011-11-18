@@ -557,7 +557,7 @@ class Template:
             if paper['authoraffiliation']:
                 aff = paper['authoraffiliation'].encode("utf-8")
             else:
-                aff = "unknown"
+                aff = "Not assigned"
 
             h("    <td>%s</td>" % (aff))
 

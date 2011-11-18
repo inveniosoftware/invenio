@@ -64,7 +64,7 @@ except ImportError:
                     if i > 1 and j > 1 and s1[i] == s2[j - 1] and s1[i - 1] == s2[j]:
                         d[(i, j)] = min (d[(i, j)], d[i - 2, j - 2] + cost) # transposition
             return d[lenstr1 - 1, lenstr2 - 1]
-            
+
 
 #Gender names and names variation files are loaded updon module import to increase performances
 
@@ -777,7 +777,7 @@ def full_names_are_equal_gender(name1, name2, gendernames):
 
 def names_are_synonymous(name1, name2, name_variations):
     '''
-    Checks if names are synonims 
+    Checks if names are synonims
     @param name_variations: name variations list
     @type name_variations: list of lists
     '''
@@ -822,7 +822,7 @@ def full_names_are_synonymous(name1, name2, name_variations):
             oname = clean_name_string(oname, "", False, True)
             tname = clean_name_string(tname, "", False, True)
 
-            if oname in nvar and tname in nvar:
+            if (oname in nvar and tname in nvar) or oname==tname:
                 if print_debug:
                     print '      ', oname, ' and ', tname, ' are synonyms!'
 
@@ -845,7 +845,7 @@ def names_are_substrings(name1, name2):
 def full_names_are_substrings(name1, name2):
     '''
     Checks if two names are substrings of each other; e.g. "Christoph" vs. "Ch"
-    Only checks for the beginning of the names. 
+    Only checks for the beginning of the names.
 
     @param name1: Full Name string of the first name (w/ last name)
     @type name1: string
@@ -965,11 +965,6 @@ def _load_firstname_variations(filename=''):
 def compare_names(origin_name, target_name):
     '''
     Compare two names.
-    mode can be:
-        -float: returns a value in range [0,1] to guess name equality
-        -full: returns [surname_distance, names_distance, names_are_substring, names_are_synonim, 
-                        same_gender, names_equal_upon_composition, exactly_same_initials,
-                        initials_have_intersection] 
     '''
     AUTHORNAMES_UTILS_DEBUG = bconfig.AUTHORNAMES_UTILS_DEBUG
     MAX_ALLOWED_SURNAME_DISTANCE = 2
@@ -1005,8 +1000,13 @@ def compare_names(origin_name, target_name):
         print '||- surname score: ', score
 
     initials_only = ((min(len(no[2]), len(nt[2]))) == 0)
+    only_initials_available = False
+    if len(no[2]) == len(nt[2]) and initials_only:
+        only_initials_available = True
+
     if AUTHORNAMES_UTILS_DEBUG:
         print '|- initials only: ', initials_only
+        print '|- only initials available: ', only_initials_available
 
     names_are_equal_composites = False
     if not initials_only:
@@ -1152,6 +1152,13 @@ def compare_names(origin_name, target_name):
     else:
         if AUTHORNAMES_UTILS_DEBUG:
             print "|- no surname trim: ", score
+
+    if initials_only and not only_initials_available:
+        score = score * .9
+        print "|- initials only penalty: ", score
+    else:
+        print "|- no initials only penalty"
+
     if AUTHORNAMES_UTILS_DEBUG:
         print "||- final score:  ", score
 
