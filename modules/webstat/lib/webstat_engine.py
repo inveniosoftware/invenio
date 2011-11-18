@@ -1574,19 +1574,22 @@ def get_custom_summary_data(query, tag):
 
     if len(pub) == 0:
         return []
-    others = 0
-    total = 0
-    first_other = -1
-    for elem in pub:
-        total += elem[1]
-        if elem[1] < 2:
-            if first_other == -1:
-                first_other = pub.index(elem)
-            others += elem[1]
-    del pub[first_other:]
+    if CFG_CERN_SITE:
+        total = sum([x[1] for x in pub])
+    else:
+        others = 0
+        total = 0
+        first_other = -1
+        for elem in pub:
+            total += elem[1]
+            if elem[1] < 2:
+                if first_other == -1:
+                    first_other = pub.index(elem)
+                others += elem[1]
+        del pub[first_other:]
 
-    if others != 0:
-        pub.append(('Others', others))
+        if others != 0:
+            pub.append(('Others', others))
     pub.append(('TOTAL', total))
 
     return pub

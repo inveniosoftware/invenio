@@ -553,7 +553,7 @@ def create_customevent(event_id=None, name=None, cols=[]):
     tbl_name = get_customevent_table(event_id)
 
     # Create a table for the new event
-    sql_query = ["CREATE TABLE %s (" % tbl_name]
+    sql_query = ["CREATE TABLE %s (" % wash_table_column_name(tbl_name)]
     sql_query.append("id MEDIUMINT unsigned NOT NULL auto_increment,")
     sql_query.append("creation_time TIMESTAMP DEFAULT NOW(),")
     for argument in cols:
@@ -602,6 +602,12 @@ def modify_customevent(event_id=None, name=None, cols=[]):
 
     res = run_sql("SELECT CONCAT('staEVENT', number), cols " + \
                       "FROM staEVENT WHERE id = %s", (event_id, ))
+    if not res:
+        return "Invalid event id: %s! Aborted" % event_id
+    if not run_sql("SHOW TABLES LIKE %s", res[0][0]):
+        run_sql("DELETE FROM staEVENT WHERE id=%s", (event_id, ))
+        create_customevent(event_id, event_id, cols)
+        return
     cols_orig = cPickle.loads(res[0][1])
 
     # add new cols
@@ -618,7 +624,7 @@ def modify_customevent(event_id=None, name=None, cols=[]):
 
     #modify event table
     if cols_del or cols_add:
-        sql_query = ["ALTER TABLE %s " % res[0][0]]
+        sql_query = ["ALTER TABLE %s " % wash_table_column_name(res[0][0])]
         # check if a column was renamed
         for col_del in cols_del:
             result = -1
@@ -683,15 +689,26 @@ def destroy_customevent(event_id=None):
     # Check if the specified id exists
     if len(run_sql("SELECT NULL FROM staEVENT WHERE id = %s",
                    (event_id, ))) == 0:
-        return "Event id [%s] doesn't exist! Aborted." % event_id
+        return "Custom event ID '%s' doesn't exist! Aborted." % event_id
     else:
         tbl_name = get_customevent_table(event_id)
         run_sql("DROP TABLE %s" % wash_table_column_name(tbl_name)) # kwalitee: disable=sql
         run_sql("DELETE FROM staEVENT WHERE id = %s", (event_id, ))
-        return ("Event with id [%s] was successfully destroyed.\n" +
-                "Table [%s], with content, was destroyed.") \
+        return ("Custom event ID '%s' table '%s' was successfully destroyed.\n") \
                 % (event_id, tbl_name)
 
+def destroy_customevents():
+    """
+    Removes all existing custom events by destroying the MySQL tables and
+    the events data that might be around. Use with caution!
+
+    @return: A status message
+    @type: str
+    """
+    msg = ''
+    for event in run_sql("SELECT id FROM staEVENT"):
+        msg += destroy_customevent(event[0])
+    return msg
 
 def register_customevent(event_id, *arguments):
     """
@@ -723,7 +740,7 @@ def register_customevent(event_id, *arguments):
     # Make sql query
     if len(arguments[0]) != 0:
         sql_param = []
-        sql_query = ["INSERT INTO %s (" % tbl_name]
+        sql_query = ["INSERT INTO %s (" % wash_table_column_name(tbl_name)]
         for title in col_titles:
             sql_query.append("`%s`" % title)
             sql_query.append(",")
@@ -879,15 +896,15 @@ def alert_display():
         return []
     try:
         res = run_sql("SELECT creation_time FROM %s ORDER BY creation_time"
-                      % tbl_name)
+                      % wash_table_column_name(tbl_name))
         days = (res[-1][0] - res[0][0]).days + 1
         res = run_sql("SELECT COUNT(DISTINCT user),COUNT(*) FROM %s" % wash_table_column_name(tbl_name)) # kwalitee: disable=sql
         users = res[0][0]
         hits = res[0][1]
         displays = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'list'"
-                           % tbl_name)[0][0]
+                           % wash_table_column_name(tbl_name))[0][0]
         search = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'display'"
-                         % tbl_name)[0][0]
+                         % wash_table_column_name(tbl_name))[0][0]
         average = hits / days
 
         res = [("Alerts page hits", hits)]
