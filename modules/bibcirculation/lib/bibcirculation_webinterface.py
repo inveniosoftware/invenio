@@ -864,7 +864,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
 
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
-        if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+        if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL,
                                 {'collection': guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
