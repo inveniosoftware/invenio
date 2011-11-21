@@ -52,7 +52,6 @@ from invenio.config import \
 
 from invenio.messages import wash_language, gettext_set_language
 from invenio.textutils import guess_minimum_encoding
-from invenio.bibtask import task_low_level_submission
 from invenio.errorlib import get_msgs_for_code_list, register_errors, register_exception
 
 def scheduled_send_email(fromaddr,
@@ -86,6 +85,7 @@ def scheduled_send_email(fromaddr,
         of arguments to the call of task_low_level_submission
     @return: the scheduled bibtasklet
     """
+    from invenio.bibtask import task_low_level_submission
     if not isinstance(toaddr, (unicode, str)):
         toaddr = ','.join(toaddr)
     if user is None:
