@@ -29,7 +29,7 @@ from invenio.config import CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_URL, 
     CFG_SITE_RECORD
 from invenio.webuser import email_valid_p
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
-from invenio.mailutils import send_email
+from invenio.mailutils import scheduled_send_email
 
 CFG_EMAIL_FROM_ADDRESS = '%s Submission Engine <%s>' % (CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL)
 
@@ -291,18 +291,18 @@ Thank you for submitting your item into %(sitename)s.
             ## Managers should also be copied into the mail:
             owners_email += ",%s" % managers_email
         ## Post the mail:
-        send_email(CFG_EMAIL_FROM_ADDRESS, owners_email, \
+        scheduled_send_email(CFG_EMAIL_FROM_ADDRESS, owners_email, \
                    "[%s] Submitted" % reference_numbers, \
                    email_txt, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
     elif managers_email != "":
         ## Although it's not desirable to mail the submitters, if "managers"
         ## have been given, it is reasonable to mail them:
-        send_email(CFG_EMAIL_FROM_ADDRESS, managers_email, \
+        scheduled_send_email(CFG_EMAIL_FROM_ADDRESS, managers_email, \
                    "[%s] Submitted" % reference_numbers, \
                    email_txt, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
     elif CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN:
         ## We don't want to mail the "owners". Let's mail the admin instead:
-        send_email(CFG_EMAIL_FROM_ADDRESS, CFG_SITE_ADMIN_EMAIL, \
+        scheduled_send_email(CFG_EMAIL_FROM_ADDRESS, CFG_SITE_ADMIN_EMAIL, \
                    "[%s] Submitted" % reference_numbers, email_txt)
 
     ## Return an empty string
