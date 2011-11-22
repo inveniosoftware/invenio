@@ -262,6 +262,7 @@ def Send_APP_Mail (parameters, curdir, form, user_info=None):
     mailbody += "\n\nTitle: %s\n\nAuthor(s): %s\n\n" % (titlevalue,authorvalue)
     if comment != "":
         mailbody += "Comments from the referee:\n%s\n" % comment
-    # Send mail to referee
-    send_email(FROMADDR,addresses,mailtitle,mailbody, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
+    # Send mail to referee if any recipients or copy to admin
+    if addresses or CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN:
+        send_email(FROMADDR,addresses,mailtitle,mailbody, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
     return ""

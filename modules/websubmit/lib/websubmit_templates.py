@@ -220,7 +220,7 @@ class Template:
 
         return """<li>%s</li>""" % create_html_link('%s/submit' % CFG_SITE_URL, {'doctype' : doc['id'], 'ln' : ln}, doc['name'])
 
-    def tmpl_action_page(self, ln, uid, guest, pid, now, doctype,
+    def tmpl_action_page(self, ln, uid, pid, now, doctype,
                          description, docfulldesc, snameCateg,
                          lnameCateg, actionShortDesc, indir,
                          statustext):
@@ -230,8 +230,6 @@ class Template:
         Parameters:
 
           - 'ln' *string* - The language to display the interface in
-
-          - 'guest' *boolean* - If the user is logged in or not
 
           - 'pid' *string* - The current process id
 
@@ -264,10 +262,6 @@ class Template:
               var checked = 0;
               function tester() {
               """
-        if (guest):
-            out += "alert(\"%(please_login_js)s\");return false;\n" % {
-                     'please_login_js' : _("Please log in first.") + '\\n' + _("Use the top-right menu to log in.")
-                   }
 
         out += """
                     if (checked == 0) {
@@ -319,17 +313,23 @@ class Template:
                       'ln' : ln,
                     }
 
-        if len(snameCateg) :
+        if len(snameCateg):
             out += """<td align="right">"""
+            selected = ""
+            if len(snameCateg) == 1:
+                # If there is only one category, we check it automatically
+                selected = "checked"
             for i in range(0, len(snameCateg)):
-                out += """<label for="combo%(shortname)s">%(longname)s</label><input type="radio" name="combo%(doctype)s" id="combo%(shortname)s" value="%(shortname)s" onclick="clicked();" />&nbsp;<br />""" % {
+                out += """<label for="combo%(shortname)s">%(longname)s</label><input type="radio" name="combo%(doctype)s" id="combo%(shortname)s" %(selected)s value="%(shortname)s" onclick="clicked();" />&nbsp;<br />""" % {
                          'longname' : lnameCateg[i],
                          'doctype' : doctype,
+                         'selected' : selected,
                          'shortname' : snameCateg[i],
                        }
-            out += "</td><td>"
-        else:
-            out += '<td><script type="text/javascript">checked=1;</script>'
+            out += "</td>"
+        out += "<td>"
+        if len(snameCateg) < 2:
+            out += '<script type="text/javascript">checked=1;</script>'
         out += """&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                   <td>
                     <table><tr><td>
@@ -2375,7 +2375,7 @@ class Template:
                    }
             if auth_code == 0:
                 out += "<br />" + _("As a referee for this document, you may click this button to approve or reject it") + ":<br />" +\
-                       """<input class="adminbutton" type="submit" name="approval" value="%(approve)s" onclick="window.location='approve.py?%(access)s&amp;ln=%(ln)s';return false;" />""" % {
+                       """<input class="adminbutton" type="submit" name="approval" value="%(approve)s" onclick="window.location='approve.py?access=%(access)s&amp;ln=%(ln)s';return false;" />""" % {
                          'approve' : _("Approve/Reject"),
                          'access' : access,
                          'ln' : ln

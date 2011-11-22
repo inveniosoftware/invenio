@@ -1626,7 +1626,7 @@ def SendEnglish(doctype,categ,RN,title,authors,access,sysno):
     <%s/%s/%s/files/>
 
     To approve/reject the document, you should go to this URL:
-    <%s/approve.py?%s>
+    <%s/approve.py?access=%s>
 
     ---------------------------------------------
     Best regards.

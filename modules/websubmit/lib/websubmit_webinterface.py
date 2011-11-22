@@ -48,7 +48,8 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role
 from invenio.webpage import page, create_error_box, pageheaderonly, \
     pagefooteronly
-from invenio.webuser import getUid, page_not_authorized, collect_user_info, isGuestUser, isUserSuperAdmin
+from invenio.webuser import getUid, page_not_authorized, collect_user_info, isUserSuperAdmin, \
+                            isGuestUser
 from invenio.websubmit_config import *
 from invenio import webjournal_utils
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
@@ -541,6 +542,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             # Is user authorized to perform this action?
             (auth_code, auth_msg) = acc_authorize_action(user_info,
                                                          "submit",
+                                                         authorized_if_no_roles=not isGuestUser(getUid(req)),
                                                          doctype=argd['doctype'],
                                                          act=action)
             if not acc_is_role("submit", doctype=argd['doctype'], act=action):
@@ -625,13 +627,14 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                     action = act_fd.read()
                     act_fd.close()
                 except:
-                    act = ""
+                    action = ""
 
         # Is user authorized to perform this action?
         (auth_code, auth_message) = acc_authorize_action(uid, "submit",
-                                                     verbose=0,
-                                                     doctype=argd['doctype'],
-                                                     act=action)
+                                                         authorized_if_no_roles=not isGuestUser(uid),
+                                                         verbose=0,
+                                                         doctype=argd['doctype'],
+                                                         act=action)
         if acc_is_role("submit", doctype=argd['doctype'], act=action) and auth_code != 0:
             # User cannot submit
             raise apache.SERVER_RETURN(apache.HTTP_UNAUTHORIZED)
@@ -795,9 +798,10 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
         # Is user authorized to perform this action?
         (auth_code, auth_message) = acc_authorize_action(uid, "submit",
-                                                     verbose=0,
-                                                     doctype=argd['doctype'],
-                                                     act=action)
+                                                         authorized_if_no_roles=not isGuestUser(uid),
+                                                         verbose=0,
+                                                         doctype=argd['doctype'],
+                                                         act=action)
         if acc_is_role("submit", doctype=argd['doctype'], act=action) and auth_code != 0:
             # User cannot submit
             raise apache.SERVER_RETURN(apache.HTTP_UNAUTHORIZED)
@@ -1329,17 +1333,26 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         def _index(req, c, ln, doctype, act, startPg, access,
                    mainmenu, fromdir, nextPg, nbPg, curpage, step,
                    mode):
-
+            auth_args = {}
+            if doctype:
+                auth_args['doctype'] = doctype
+            if act:
+                auth_args['act'] = act
             uid = getUid(req)
-            if isGuestUser(uid):
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
-                    CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : CFG_SITE_SECURE_URL + req.unparsed_uri, 'ln' : args['ln']}, {})), norobot=True)
+            (auth_code, auth_msg) = acc_authorize_action(uid, 'submit', authorized_if_no_roles=not isGuestUser(uid), **auth_args)
+            if auth_code > 0 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+                if isGuestUser(uid):
+                    return redirect_to_url(req, "%s/youraccount/login%s" % (
+                        CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({'referer' : CFG_SITE_SECURE_URL + req.unparsed_uri, 'ln' : args['ln']}, {}))
+                                           , norobot=True)
+                else:
+                    return page_not_authorized(req, "../submit",
+                                               uid=uid,
+                                               text=auth_msg,
+                                               navmenuid='submit')
 
-            if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-                return page_not_authorized(req, "../submit",
-                                           navmenuid='submit')
+
             if CFG_CERN_SITE:
                 ## HACK BEGIN: this is a hack for CMS and ATLAS draft
                 from invenio.webuser import collect_user_info

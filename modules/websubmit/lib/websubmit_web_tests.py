@@ -122,11 +122,7 @@ class InvenioWebSubmitWebTest(InvenioWebTestCase):
         # login as jekyll
         self.login(username="jekyll", password="j123ekyll")
         self.browser.get(CFG_SITE_SECURE_URL + "/submit?doctype=DEMOJRN")
-        self.find_element_by_id_with_timeout("comboARTS")
-        self.browser.find_element_by_id("comboARTS").click()
-        self.find_element_by_xpath_with_timeout("//input[@value='Submit New Record']")
-        self.browser.find_element_by_xpath("//input[@value='Submit New Record']").click()
-        self.page_source_test(expected_text='You are not authorized to perform this action')
+        self.page_source_test(unexpected_text='Arts')
         self.browser.get(CFG_SITE_SECURE_URL)
         self.find_element_by_link_text_with_timeout("Submit")
         self.browser.find_element_by_link_text("Submit").click()
@@ -150,6 +146,8 @@ class InvenioWebSubmitWebTest(InvenioWebTestCase):
         self.fill_textbox(textbox_name="DEMOJRN_TITLEF", text="Ceci est un titre test")
         self.find_element_by_name_with_timeout("endS")
         self.browser.find_element_by_name("endS").click()
+        self.page_source_test(expected_text=['Submission Complete!', \
+                                             'Your document has the following reference(s): <b>BUL-ARTS-'])
         self.logout()
 
     def test_submit_poetry(self):
@@ -206,6 +204,30 @@ class InvenioWebSubmitWebTest(InvenioWebTestCase):
         self.page_source_test(expected_text=['Submission Complete!', \
                                              'Your document has the following reference(s): <b>DEMO-ARTICLE-'])
         self.logout()
+
+    def test_submit_article_guest(self):
+        """websubmit - web test submit an article as a guest"""
+        self.browser.get(CFG_SITE_SECURE_URL)
+        self.find_element_by_link_text_with_timeout("Submit")
+        self.browser.find_element_by_link_text("Submit").click()
+        self.find_element_by_link_text_with_timeout("Demo Article Submission")
+        self.browser.find_element_by_link_text("Demo Article Submission").click()
+        self.find_element_by_xpath_with_timeout("//input[@value='Submit New Record']")
+        self.browser.find_element_by_xpath("//input[@value='Submit New Record']").click()
+        self.fill_textbox(textbox_name="DEMOART_REP", text="Test-Ref-001\nTest-Ref-002")
+        self.fill_textbox(textbox_name="DEMOART_TITLE", text="Test article document title")
+        self.fill_textbox(textbox_name="DEMOART_AU", text="Author1, Firstname1\nAuthor2, Firstname2")
+        self.fill_textbox(textbox_name="DEMOART_ABS", text="This is a test abstract.\nIt has some more lines.\n\n...and some empty lines.\n\nAnd it finishes here.")
+        self.fill_textbox(textbox_name="DEMOART_NUMP", text="1234")
+        self.choose_selectbox_option_by_label(selectbox_name="DEMOART_LANG", label="French")
+        self.fill_textbox(textbox_name="DEMOART_DATE", text="11/01/2001")
+        self.fill_textbox(textbox_name="DEMOART_KW", text="test keyword1\ntest keyword2\ntest keyword3")
+        self.fill_textbox(textbox_name="DEMOART_NOTE", text="I don't think I have any additional comments.\nBut maybe I'll input some quotes here: \" ' ` and the rest.")
+        self.fill_textbox(textbox_name="DEMOART_FILE", text="/opt/invenio/lib/webtest/invenio/test.pdf")
+        self.find_element_by_name_with_timeout("endS")
+        self.browser.find_element_by_name("endS").click()
+        self.page_source_test(expected_text=['Submission Complete!', \
+                                             'Your document has the following reference(s): <b>DEMO-ARTICLE-'])
 
 TEST_SUITE = make_test_suite(InvenioWebSubmitWebTest, )
 

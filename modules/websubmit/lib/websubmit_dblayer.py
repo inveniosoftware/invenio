@@ -748,3 +748,30 @@ def get_approval_request_category(reportnumber):
     except IndexError:
         ## No row for this approval request?
         return None
+
+def get_approval_url_parameters(access):
+    """Given an access ID the function will return the appropriate URL parameters,
+       as a dictionary, needed to generate an URL to the applicable approval form.
+
+       Note: does not add the 'ln' parameter, which may be needed.
+       @param access: (string) - the access id of the document
+        for which the approval request has been made.
+       @return: (dict or None) - dictionary if there was a row for this approval
+        request; None if not.
+    """
+    res = run_sql("select doctype,rn from sbmAPPROVAL where access=%s",(access,))
+    if len(res) == 0:
+        return None
+    doctype = res[0][0]
+    rn = res[0][1]
+
+    res = run_sql("select value from sbmPARAMETERS where name='edsrn' and doctype=%s",(doctype,))
+    if len(res) == 0:
+        return None
+    edsrn = res[0][0]
+    params = {
+             edsrn: rn,
+             'access' : access,
+             'sub' : 'APP%s' % doctype,
+             }
+    return params
