@@ -422,15 +422,16 @@ function onAjaxSuccess(json, onSuccess){
     $('#btnSubmit').css('background-color', 'lightgreen');
   }
       }
-      if (onSuccess)
-  // No critical errors; call onSuccess function.
-  onSuccess(json);
+      if (onSuccess) {
+          // No critical errors; call onSuccess function.
+          onSuccess(json);
+      }
     }
   }
 }
 
 function resetBibeditState(){
-  /** A function clearing the state of the bibEdit (all the panels content)
+  /* A function clearing the state of the bibEdit (all the panels content)
   */
   gHoldingPenLoadedChanges = {};
   gHoldingPenChanges = [];
@@ -1606,11 +1607,16 @@ function onSubfieldBoxClick(box){
 }
 
 function addFieldGatherInformations(fieldTmpNo){
-  /** Gathering the information about a current form
-      returns [template_num, data]
-      This funcion saves the state of a form -> saving the template name and values only would
-      not be enough. we want to know what has been modified in last-chosen template !
-      data is in the same format as teh templates data.
+  /**
+   * Purpose: Gather the information about a current form
+   * Called when adding x similar fields
+   *
+   * Input(s): int:fieldTmpNo - temporary number to identify the field being
+   * added
+   *
+   * Returns: [template_num, data]
+   * where data is in the same format as the templates data.
+   *
   */
   var templateNum = $('#selectAddFieldTemplate_' + fieldTmpNo).attr("value");
   var tag = $("#txtAddFieldTag_" + fieldTmpNo).attr("value");
