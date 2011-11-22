@@ -153,14 +153,13 @@ install-jquery-plugins: install-jquery-plugins
 	wget http://github.com/malsup/form/raw/master/jquery.form.js --no-check-certificate && \
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
 	wget http://autobahn.tablesorter.com/jquery.tablesorter.zip && \
-	wget http://plugins.jquery.com/files/Uploadify-v2.1.3.zip -O uploadify.zip && \
+	wget http://www.uploadify.com/wp-content/uploads/uploadify-v2.1.4.zip -O uploadify.zip && \
 	wget http://www.datatables.net/download/build/jquery.dataTables.min.js && \
 	wget http://keith-wood.name/zip/jquery.bookmark.package-1.4.0.zip && \
 	unzip jquery.tablesorter.zip && \
 	rm jquery.tablesorter.zip && \
-	unzip -u uploadify.zip && \
 	rm -rf uploadify && \
-	mv jquery.uploadify-v2.1.3 uploadify && \
+	unzip -u uploadify.zip -d uploadify && \
 	wget http://flot.googlecode.com/files/flot-0.6.zip && \
 	wget http://trentrichardson.com/examples/timepicker/js/jquery-ui-timepicker-addon.js && \
 	unzip -u flot-0.6.zip && \
@@ -168,7 +167,7 @@ install-jquery-plugins: install-jquery-plugins
 	rm flot-0.6.zip && rm -r flot && \
 	mv uploadify/swfobject.js ./ && \
 	mv uploadify/cancel.png uploadify/uploadify.css uploadify/uploadify.allglyphs.swf uploadify/uploadify.fla uploadify/uploadify.swf ../img/ && \
-	mv uploadify/jquery.uploadify.v2.1.3.min.js ./jquery.uploadify.min.js && \
+	mv uploadify/jquery.uploadify.v2.1.4.min.js ./jquery.uploadify.min.js && \
 	rm uploadify.zip && rm -r uploadify && \
 	wget --no-check-certificate https://github.com/douglascrockford/JSON-js/raw/master/json2.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.datepicker.min.js && \
