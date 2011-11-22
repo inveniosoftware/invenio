@@ -175,8 +175,7 @@ install-jquery-plugins: install-jquery-plugins
 	wget http://jquery.bassistance.de/treeview/jquery.treeview.zip && \
 	unzip jquery.treeview.zip -d jquery-treeview && \
 	rm jquery.treeview.zip && \
-	wget http://plugins.jquery.com/files/jquery.ajaxPager.js_5.txt && \
-	mv jquery.ajaxPager.js_5.txt jquery.ajaxPager.js && \
+	wget http://invenio-software.org/download/jquery/v1.5/js/jquery.ajaxPager.js && \
 	wget http://jqueryui.com/download/jquery-ui-1.7.3.custom.zip && \
 	unzip jquery-ui-1.7.3.custom.zip development-bundle/ui/ui.core.js js/jquery-ui-1.7.3.custom.min.js && \
 	mv development-bundle/ui/ui.core.js ui.core.js && \
