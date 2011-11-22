@@ -2907,7 +2907,7 @@ def check_bibdoc_authorization(user_info, status):
         raise ValueError, 'Unexpected authorization type %s for %s' % (repr(auth_type), repr(auth_value))
     return (0, CFG_WEBACCESS_WARNING_MSGS[0])
 
-
+_RE_BAD_MSIE = re.compile("MSIE\s+(\d+\.\d+)")
 def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=None, md5=None, location=None, download=False):
     """This is a generic function to stream a file to the user.
     If fullname, mime, encoding, and location are not provided they will be
@@ -3066,14 +3066,22 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                 ret[key] = value
         return ret
 
+    headers = get_normalized_headers(req.headers_in)
+    g = _RE_BAD_MSIE.search(headers.get('User-Agent', "MSIE 6.0"))
+    bad_msie = g and float(g.group(1)) < 9.0
+
     if CFG_BIBDOCFILE_USE_XSENDFILE:
         ## If XSendFile is supported by the server, let's use it.
         if os.path.exists(fullpath):
             if fullname is None:
                 fullname = os.path.basename(fullpath)
-            if download:
+            if bad_msie:
+                ## IE is confused by quotes
+                req.headers_out["Content-Disposition"] = 'attachment; filename=%s' % fullname.replace('"', '\\"')
+            elif download:
                 req.headers_out["Content-Disposition"] = 'attachment; filename="%s"' % fullname.replace('"', '\\"')
             else:
+                ## IE is confused by inline
                 req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
             req.headers_out["X-Sendfile"] = fullpath
             if mime is None:
@@ -3081,12 +3089,13 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                 (mime, encoding) = _mimes.guess_type(fullpath)
                 if mime is None:
                     mime = "application/octet-stream"
-            req.content_type = mime
+            if not bad_msie:
+                ## IE is confused by not supported mimetypes
+                req.content_type = mime
             return ""
         else:
             raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
 
-    headers = get_normalized_headers(req.headers_in)
     if headers['if-match']:
         if etag is not None and etag not in headers['if-match']:
             raise apache.SERVER_RETURN, apache.HTTP_PRECONDITION_FAILED
@@ -3101,7 +3110,9 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                 mime = "application/octet-stream"
         if location is None:
             location = req.uri
-        req.content_type = mime
+        if not bad_msie:
+            ## IE is confused by not supported mimetypes
+            req.content_type = mime
         req.encoding = encoding
         req.filename = fullname
         req.headers_out["Last-Modified"] = time.strftime('%a, %d %b %Y %X GMT', time.gmtime(mtime))
@@ -3114,9 +3125,13 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
             req.headers_out["ETag"] = etag
         if md5 is not None:
             req.headers_out["Content-MD5"] = base64.encodestring(binascii.unhexlify(md5.upper()))[:-1]
-        if download:
+        if bad_msie:
+            ## IE is confused by quotes
+            req.headers_out["Content-Disposition"] = 'attachment; filename=%s' % fullname.replace('"', '\\"')
+        elif download:
             req.headers_out["Content-Disposition"] = 'attachment; filename="%s"' % fullname.replace('"', '\\"')
         else:
+            ## IE is confused by inline
             req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
         size = os.path.getsize(fullpath)
         if not size:
