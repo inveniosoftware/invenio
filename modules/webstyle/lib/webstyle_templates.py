@@ -440,19 +440,6 @@ template function generated it.
         }
         return out
 
-    def tmpl_keep_alive_sso(self, req):
-        """When using Shibboleth-based SSO build a hidden IFRAME to keep
-        th shibboleth session alive.
-        """
-        if CFG_EXTERNAL_AUTH_USING_SSO:
-            from invenio.webuser import collect_user_info
-            if collect_user_info(req)['guest'] == '0':
-                return """\
-<div style="display: none;"><iframe style="width:0px; height:0px; border: 0px" src="%s">
-<img src="%s" alt=" " width="0" height="0" />
-</iframe></div>""" % ("%s/youraccount/keepalivesso" % CFG_SITE_SECURE_URL, "%s/youraccount/keepalivesso?format=image" % CFG_SITE_SECURE_URL)
-        return ""
-
     def tmpl_pagefooter(self, req=None, ln=CFG_SITE_LANG, lastupdated=None,
                         pagefooteradd=""):
         """Creates a page footer
@@ -483,8 +470,6 @@ template function generated it.
         else:
             msg_lastupdated = ""
 
-        keepalivesso = self.tmpl_keep_alive_sso(req)
-
         out = """
 <div class="pagefooter">
 %(pagefooteradd)s
@@ -503,7 +488,6 @@ template function generated it.
  </div>
 <!-- replaced page footer -->
 </div>
-%(keepalivesso)s
 </body>
 </html>
         """ % {
@@ -528,7 +512,6 @@ template function generated it.
           'version': CFG_VERSION,
 
           'pagefooteradd': pagefooteradd,
-          'keepalivesso': keepalivesso,
         }
         return out
 

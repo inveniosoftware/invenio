@@ -830,7 +830,7 @@ def cli_cmd_create_apache_conf(conf):
 
     if CFG_EXTERNAL_AUTH_USING_SSO:
         shibboleth_directive = r"""
-        <Location ~ "/youraccount/(login|keepalivesso)|Shibboleth.sso/">
+        <Location ~ "/youraccount/login|Shibboleth.sso/">
             SSLRequireSSL   # The modules only work using HTTPS
             AuthType shibboleth
             ShibRequireSession On
