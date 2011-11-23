@@ -1178,10 +1178,10 @@ def collect_user_info(req, login_time=False, refresh=False):
                 ## The user uses an external authentication method and it's a bit since
                 ## she has not performed a login
                 if not CFG_EXTERNAL_AUTH_USING_SSO or (
-                    is_req and req.is_https()):
-                    ## If we're using SSO we must be sure to be in HTTPS
+                    is_req and login_object.in_shibboleth()):
+                    ## If we're using SSO we must be sure to be in HTTPS and Shibboleth handler
                     ## otherwise we can't really read anything, hence
-                    ## it's better skeep the synchronization
+                    ## it's better skip the synchronization
                     try:
                         groups = login_object.fetch_user_groups_membership(user_info['email'], req=req)
                         # groups is a dictionary {group_name : group_description,}
