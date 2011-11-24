@@ -125,7 +125,7 @@ class Template:
         out = '''
         The issue number %(issue)s for the %(journal_name)s journal has been successfully
         regenerated. <br/>
-        Look at your changes: >> <a href="%(CFG_SITE_URL)s/journal/%(journal_name)s/%(issue_year)s/%(issue_number)s"> %(journal_name)s </a> <br/> or go back to this journal <a href="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/administrate?journal_name=%(journal_name)s">administration interface</a>.
+        Look at your changes: &raquo; <a href="%(CFG_SITE_URL)s/journal/%(journal_name)s/%(issue_year)s/%(issue_number)s"> %(journal_name)s </a> <br/> or go back to this journal <a href="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/administrate?journal_name=%(journal_name)s">administration interface</a>.
         ''' % {'issue': issue,
                'journal_name': journal_name,
                'CFG_SITE_URL': CFG_SITE_URL,
@@ -372,7 +372,7 @@ Cher Abonné,
         """
         _ = gettext_set_language(ln)
         out = '''<p style="color:#0f0">Alert sent successfully!</p>
-        Return to your journal here: >> \
+        Return to your journal here: &raquo; \
                  <a href="%(CFG_SITE_URL)s/journal/%(journal_name)s">%(journal_name)s</a> <br/>
                  or go back to the <a href="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/administrate?journal_name=%(journal_name)s">administration interface</a>''' % {'CFG_SITE_URL': CFG_SITE_URL,
                                       'journal_name': journal_name}
@@ -430,13 +430,13 @@ Cher Abonné,
         issue_string = "".join([" - %s" % issue for issue in active_issues])
         title = '<h2>Issue(s) %s created successfully!</h2>' % issue_string
         body = '''<p>Now you can:</p>
-                 <p>Return to your journal here: >>
+                 <p>Return to your journal here: &raquo;
                  <a href="%s/journal/%s"> %s </a>
                  </p>
-                 <p>Make additional publications here: >>
+                 <p>Make additional publications here: &raquo;
                  <a href="%s/admin/webjournal/webjournaladmin.py/administrate?journal_name=%s">Publishing Interface</a>
                 </p>
-                <p>Send an alert email here: >>
+                <p>Send an alert email here: &raquo;
                 <a href="%s/admin/webjournal/webjournaladmin.py/alert?journal_name=%s"> Send an alert</a>
                 </p>''' % (CFG_SITE_URL, journal_name,
                          journal_name, CFG_SITE_URL,
@@ -489,13 +489,13 @@ Cher Abonné,
         _ = gettext_set_language(ln)
         title = '<h2>Journal update %s published successfully!</h2>' % update_issue
         body = '''<p>Now you can:</p>
-                 <p>Return to your journal here: >>
+                 <p>Return to your journal here: &raquo;
                  <a href="%s/journal/%s"> %s </a>
                  </p>
-                 <p>Go back to the publishing interface: >>
+                 <p>Go back to the publishing interface: &raquo;
                  <a href="%s/admin/webjournal/webjournaladmin.py/administrate?journal_name=%s">Issue Interface</a>
                  </p>
-                 <p>Send an alert email here: >>
+                 <p>Send an alert email here: &raquo;
                  <a href="%s/journal/alert?name=%s"> Send an alert</a>
                  </p>''' % (CFG_SITE_URL, journal_name, journal_name,
                           CFG_SITE_URL, journal_name, CFG_SITE_URL, journal_name)
