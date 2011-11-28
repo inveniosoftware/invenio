@@ -165,6 +165,11 @@ var gDisplayBibCircPanel = false;
 //Tags to be autocompleted
 var gTagsToAutocomplete = ['100_u', '700_u', '701_u','502_c'];
 
+//KB related variables
+var gKBSubject = null;
+var gKBInstitution = null;
+
+
 /*
  * **************************** 2. Initialization ******************************
  */
@@ -1144,6 +1149,10 @@ function onGetRecordSuccess(json){
   gBibCircUrl = json['bibCirculationUrl'];
   gDisplayBibCircPanel = json['canRecordHavePhysicalCopies'];
 
+  // Get KB information
+  gKBSubject = json['KBSubject'];
+  gKBInstitution = json['KBInstitution'];
+
   var revDt = formatDateTime(getRevisionDate(gRecRev));
   var recordRevInfo = "record revision: " + revDt;
   var revAuthorString = gRecRevAuthor;
@@ -1430,10 +1439,13 @@ function addHandler_autocompleteAffiliations(tg) {
     /*
      * Add autocomplete handler to a given cell
      */
+    /* If gKBInstitution is not defined in the system, do nothing */
+    if ($.inArray(gKBInstitution,gAVAILABLE_KBS) == -1)
+        return
     $(tg).autocomplete({
     source: function( request, response ) {
                 $.getJSON("/kb/export",
-                { kbname: 'InstitutionsCollection', format: 'jquery', term: request.term},
+                { kbname: gKBInstitution, format: 'jquery', term: request.term},
                 response);
     },
     search: function() {
@@ -2746,10 +2758,13 @@ function check_subjects_KB(value) {
     /*
      * Query Subjects KB to look for a match
      */
+    /* If KB is not defined in the system, just return value*/
+    if ($.inArray(gKBSubject,gAVAILABLE_KBS) == -1)
+        return value
     var response='';
     $.ajaxSetup({async:false});
     $.getJSON("/kb/export",
-             { kbname: 'Subjects', format: 'json', searchkey: value},
+             { kbname: gKBSubject, format: 'json', searchkey: value},
              function(data) {if (data[0]) {response = data[0].label;}}
              );
     $.ajaxSetup({async:true});
