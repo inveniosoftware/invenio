@@ -25,7 +25,7 @@ try:
     import multiprocessing
 except ImportError:
     pass
-from threading import Thread
+from threading import Thread, Lock
 from Queue import Queue, Empty
 from search_engine import perform_request_search
 from bibtask import task_sleep_now_if_required
@@ -33,6 +33,7 @@ from bibtask import task_read_status
 
 from bibauthorid_backinterface import get_all_names_from_personid
 from bibauthorid_name_utils import split_name_parts
+from dbquery import close_connection
 
 #TODO: Remove imports from bibauthorid_dbinterface.
 # It is better to write emit statements in bibauthorid_backinterface
@@ -57,7 +58,7 @@ class status_checker:
     '''
     def __init__(self):
         self.trigger = False
-        self.locky = multiprocessing.Lock()
+        self.locky = Lock()
 
     def should_stop(self):
         '''
@@ -156,6 +157,8 @@ def update_personID_table_from_paper(papers_list=None, personid=None):
 
             persons_to_update = set([(p[1],) for p in self.paper[1]])
             dbinter.update_personID_canonical_names(persons_to_update)
+            dbinter.update_personID_names_string_set(persons_to_update, single_threaded=True, wait_finished=True)
+            close_connection()
 
     if papers_list:
         papers_list = frozenset([int(x[0]) for x in papers_list])
@@ -208,7 +211,7 @@ def update_personID_table_from_paper(papers_list=None, personid=None):
             jobslist.put(p)
         del(jobs)
 
-        max_processes = bconfig.CFG_BIBAUTHORID_MAX_PROCESSES
+        max_processes = bconfig.CFG_BIBAUTHORID_PERSONID_SQL_MAX_THREADS
         while not jobslist.empty():
             workers = []
             checker = status_checker()
@@ -249,12 +252,32 @@ def personid_remove_automatically_assigned_papers(pids=None):
             continue
 
 
-def personid_fast_assign_papers(paperslist=None):
+def personid_fast_assign_papers(paperslist=None, use_threading_not_multiprocessing=True):
     '''
     Assign papers to the most compatible person.
     Compares only the name to find the right person to assign to. If nobody seems compatible,
     create a new person.
     '''
+
+    class Worker(Thread):
+        def __init__(self, i, p_q, atul, personid_new_id_lock, checker):
+            Thread.__init__(self)
+            self.i = i
+            self.checker = checker
+            self.p_q = p_q
+            self.atul = atul
+            self.personid_new_id_lock = personid_new_id_lock
+
+        def run(self):
+            while True:
+                if checker.should_stop():
+                    break
+                try:
+                    bibrec = self.p_q.get_nowait()
+                except Empty:
+                    break
+
+                pfap_assign_paper_iteration(self.i, bibrec, self.atul, self.personid_new_id_lock)
 
     def _pfap_assign_paper(i, p_q, atul, personid_new_id_lock, checker):
         while True:
@@ -279,31 +302,52 @@ def personid_fast_assign_papers(paperslist=None):
 
     _pfap_printmsg('starter', 'Starting on %s papers ' % len(paperslist))
 
-    authornames_table_update_lock = multiprocessing.Lock()
-    personid_new_id_lock = multiprocessing.Lock()
-    papers_q = multiprocessing.Queue()
+    if use_threading_not_multiprocessing:
+        authornames_table_update_lock = Lock()
+        personid_new_id_lock = Lock()
+        papers_q = Queue()
+    else:
+        authornames_table_update_lock = multiprocessing.Lock()
+        personid_new_id_lock = multiprocessing.Lock()
+        papers_q = multiprocessing.Queue()
 
     for p in paperslist:
         papers_q.put(p)
 
     process_list = []
     c = 0
-    while not papers_q.empty():
-        checker = status_checker()
-        while len(process_list) <= bconfig.CFG_BIBAUTHORID_MAX_PROCESSES:
-            p = multiprocessing.Process(target=_pfap_assign_paper, args=(c, papers_q,
-                                                                authornames_table_update_lock,
-                                                                personid_new_id_lock, checker))
-            c += 1
-            process_list.append(p)
-            p.start()
+    if not use_threading_not_multiprocessing:
+        while not papers_q.empty():
+            checker = status_checker()
+            while len(process_list) <= bconfig.CFG_BIBAUTHORID_MAX_PROCESSES:
+                p = multiprocessing.Process(target=_pfap_assign_paper, args=(c, papers_q,
+                                                                    authornames_table_update_lock,
+                                                                    personid_new_id_lock, checker))
+                c += 1
+                process_list.append(p)
+                p.start()
 
-        for i, p in enumerate(tuple(process_list)):
-            if not p.is_alive():
-                p.join()
-                process_list.remove(p)
+            for i, p in enumerate(tuple(process_list)):
+                if not p.is_alive():
+                    p.join()
+                    process_list.remove(p)
 
-        task_sleep_now_if_required(True)
+            task_sleep_now_if_required(True)
+    else:
+        max_processes = bconfig.CFG_BIBAUTHORID_PERSONID_SQL_MAX_THREADS
+        while not papers_q.empty():
+            workers = []
+            checker = status_checker()
+            for i in range(max_processes):
+                w = Worker(i, papers_q, authornames_table_update_lock,
+                           personid_new_id_lock, checker)
+                w.start()
+                workers.append(w)
+
+            for w in workers:
+                w.join()
+
+            task_sleep_now_if_required(True)
 
 def get_recids_affected_since(last_timestamp):
     '''

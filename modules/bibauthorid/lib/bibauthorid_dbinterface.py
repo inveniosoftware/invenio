@@ -1744,7 +1744,7 @@ def _pfap_assign_bibrefrec(i, tab, bibref, bibrec, namestring, pnidl):
                 "(%s,'paper',%s,'0','0')",
                 (str(pid_names_dict[names_comparison_list[0][0]]), tab +
                                 ':' + str(bibref) + ',' + str(bibrec)))
-        _pfap_printmsg('BibrefAss:  ' + str(i),' update names string set of %s'
+        _pfap_printmsg('BibrefAss:  ' + str(i), ' update names string set of %s'
             % str([[pid_names_dict[names_comparison_list[0][0]]]]))
         update_personID_names_string_set([[pid_names_dict[names_comparison_list[0][0]]]],
                                          wait_finished=True)
@@ -1763,7 +1763,7 @@ def _pfap_assign_bibrefrec(i, tab, bibref, bibrec, namestring, pnidl):
                 "(%s,'paper',%s,'0','0')",
                 (personid, tab + ':' + str(bibref) + ',' + str(bibrec)))
         pnidl.release()
-        _pfap_printmsg('BibrefAss:  ' + str(i),' update names string set of %s' % str([[personid]]))
+        _pfap_printmsg('BibrefAss:  ' + str(i), ' update names string set of %s' % str([[personid]]))
         update_personID_names_string_set([[personid]], wait_finished=True)
         update_personID_canonical_names([[personid]])
 
@@ -1837,8 +1837,10 @@ def update_personID_canonical_names(persons_list=None, overwrite=False, suggeste
 
         if (not overwrite) and len(current_canonical) > 0:
             if bconfig.TABLES_UTILS_DEBUG:
-                print "NOT updating canonical names an not overwrite and current_canonical"
+                print "U_PID_CANONICALNAMES: NOT updating canonical names an not overwrite and current_canonical for ", pid
         else:
+            if bconfig.TABLES_UTILS_DEBUG:
+                print "U_PID_CANONICALNAMES: updating canonical name for ", pid
             names = []
 
             if use_index:
@@ -1886,6 +1888,7 @@ def update_personID_canonical_names(persons_list=None, overwrite=False, suggeste
                 canonical_name = canonical_name + '.' + str(max_idx + 1)
                 run_sql("insert into aidPERSONID (personid,tag,data) values (%s,%s,%s) ",
                          (pid[0], 'canonical_name', canonical_name))
+    close_connection()
 
 
 def update_personID_names_string_set(PIDlist=None, really_update_all=False, wait_finished=False,
@@ -1992,7 +1995,7 @@ def update_personID_names_string_set(PIDlist=None, really_update_all=False, wait
 #                sys.stdout.flush()
 
     class starter(threading.Thread):
-        def __init__ (self,single_threaded=False):
+        def __init__ (self, single_threaded=False):
             threading.Thread.__init__(self)
             self.ST = single_threaded
 
