@@ -1721,6 +1721,8 @@ def _pfap_printmsg(identity, msg):
 
 # bibathorid_maintenance personid_fast_assign_papers private methods:
 def _pfap_assign_bibrefrec(i, tab, bibref, bibrec, namestring, pnidl):
+    _pfap_printmsg('BibrefAss:  ' + str(i), 'Assigning ' + str(bibref) + ' ' + str(bibrec)
+                   + ' ' + str(namestring))
     name_parts = split_name_parts(namestring)
     pid_names_rows = run_sql("select personid,data from aidPERSONID where tag='gathered_name'"
                              " and data like %s ", (name_parts[0] + ',%',))
@@ -1750,8 +1752,8 @@ def _pfap_assign_bibrefrec(i, tab, bibref, bibrec, namestring, pnidl):
                                          wait_finished=True)
         update_personID_canonical_names([[pid_names_dict[names_comparison_list[0][0]]]])
     else:
-        pnidl.acquire()
         _pfap_printmsg('BibrefAss:  ' + str(i), 'Creating a new person...')
+        pnidl.acquire()
         personid_count = run_sql("SELECT COUNT( DISTINCT personid ) FROM  `aidPERSONID` WHERE 1")[0][0]
 
         if personid_count > 0:
@@ -1763,6 +1765,7 @@ def _pfap_assign_bibrefrec(i, tab, bibref, bibrec, namestring, pnidl):
                 "(%s,'paper',%s,'0','0')",
                 (personid, tab + ':' + str(bibref) + ',' + str(bibrec)))
         pnidl.release()
+        _pfap_printmsg('BibrefAss:  ' + str(i), 'Released new pid lock')
         _pfap_printmsg('BibrefAss:  ' + str(i), ' update names string set of %s' % str([[personid]]))
         update_personID_names_string_set([[personid]], wait_finished=True)
         update_personID_canonical_names([[personid]])
@@ -1773,9 +1776,12 @@ def pfap_assign_paper_iteration(i, bibrec, atul, personid_new_id_lock):
     bibrec = 123
     '''
     _pfap_printmsg('Assigner:  ' + str(i), 'Starting on paper: %s' % bibrec)
+    _pfap_printmsg('Assigner:  ' + str(i), 'Updating authornames table')
     atul.acquire()
     update_authornames_tables_from_paper([[bibrec]])
     atul.release()
+    _pfap_printmsg('Assigner:  ' + str(i), 'Released authornames table')
+
     b100 = run_sql("select b.id,b.value from bib10x as b, "
                    "bibrec_bib10x as a where b.id=a.id_bibxxx and "
                    "b.tag=%s and a.id_bibrec=%s", ('100__a', bibrec))
@@ -1904,6 +1910,8 @@ def update_personID_names_string_set(PIDlist=None, really_update_all=False, wait
     The gathering of names is an expensive operation for the database (many joins), so the operation
     is threaded so to have as many parallell queries as possible.
     '''
+    local_dbg = False
+
     if (not PIDlist or len(PIDlist) == 0):
         if really_update_all:
             PIDlist = run_sql('SELECT DISTINCT `personid` FROM `aidPERSONID`')
@@ -1966,14 +1974,14 @@ def update_personID_names_string_set(PIDlist=None, really_update_all=False, wait
                 for i in self.namesdict.iteritems():
                     if i[1] != self.current_namesdict[i[0]]:
                         self.needs_update = True
-                        if bconfig.TABLES_UTILS_DEBUG:
+                        if bconfig.TABLES_UTILS_DEBUG and local_dbg:
                             pass
 #                            sys.stdout.write(str(self.pid) + str(i[1]) +
 #                                ' differs  from ' + str(self.current_namesdict[i[0]]))
 #                            sys.stdout.flush()
 
             if self.needs_update:
-                if bconfig.TABLES_UTILS_DEBUG:
+                if bconfig.TABLES_UTILS_DEBUG and local_dbg:
                     pass
 #                    sys.stdout.write(str(self.pid) + ' updating!')
 #                    sys.stdout.flush()
@@ -1987,12 +1995,10 @@ def update_personID_names_string_set(PIDlist=None, really_update_all=False, wait
                 values = values[0:len(values) - 1]
                 sqlquery = sqlquery + values
                 run_sql(sqlquery)
+                if bconfig.TABLES_UTILS_DEBUG and local_dbg:
+                    print('Update_personid_names_string_set: thread finished,'
+                          ' going to close connection on ' + str(self.pid))
             close_connection()
-#                else:
-#                    sys.stdout.write(str(self.pid) + ' not updating!')sudo -u apache /opt/invenio/bin/bibauthorid -u admin --process-all
-#                    sys.stdout.flush()
-#                sys.stdout.write(self.pstr + '\n')
-#                sys.stdout.flush()
 
     class starter(threading.Thread):
         def __init__ (self, single_threaded=False):
@@ -2000,28 +2006,43 @@ def update_personID_names_string_set(PIDlist=None, really_update_all=False, wait
             self.ST = single_threaded
 
         def run(self):
-            tgath = []
-            for pid in PIDlist:
-                current = names_gatherer(pid)
-                tgath.append(current)
-                current.start()
-                if self.ST:
+            if bconfig.TABLES_UTILS_DEBUG and local_dbg:
+                print('Update_personid_names_string_set: spawning threads for ' + str(PIDlist))
+            if self.ST:
+                for pid in PIDlist:
+                    if bconfig.TABLES_UTILS_DEBUG and local_dbg:
+                        print('Update_personid_names_string_set: spawning ST thread on ' + str(pid))
+                    current = names_gatherer(pid)
+                    current.start()
                     current.join()
-                    continue
-                else:
-                    if bconfig.TABLES_UTILS_DEBUG:
-                        sys.stdout.write(str(pid) + '.\n')
-                        sys.stdout.flush()
-                    while threading.activeCount() > bconfig.PERSONID_SQL_MAX_THREADS:
-                        time.sleep(0.02)
-            if not self.ST:
-                for t in tgath:
+            else:
+                wks = []
+                for pid in PIDlist:
+                    current = names_gatherer(pid)
+                    if bconfig.TABLES_UTILS_DEBUG and local_dbg:
+                        print('Update_personid_names_string_set: spawning MT thread on ' + str(pid))
+                    current.start()
+                    wks.append(current)
+                    if len(wks) > bconfig.PERSONID_SQL_MAX_THREADS:
+                        for t in list(wks):
+                            t.join()
+                            wks.remove(t)
+                for t in list(wks):
                     t.join()
+                    wks.remove(t)
+                if bconfig.TABLES_UTILS_DEBUG and local_dbg:
+                    print('Update_personid_names_string_set: recollected all MT threads ')
 
     thread = starter(single_threaded)
+    if bconfig.TABLES_UTILS_DEBUG and local_dbg:
+        print('Update_personid_names_string_set on ' + str(PIDlist) + '\n')
     thread.start()
+    if bconfig.TABLES_UTILS_DEBUG and local_dbg:
+        print('Update_personid_names_string_set main thread returned on ' + str(PIDlist) + '\n')
     if wait_finished:
         thread.join()
+    if bconfig.TABLES_UTILS_DEBUG and local_dbg:
+        print('Update_personid_names_string_set FINISHED on ' + str(PIDlist) + '\n')
 
 
 def update_authornames_tables_from_paper(papers_list=None):
@@ -2358,5 +2379,3 @@ def get_all_authors(bibrec):
         authors_7 = []
 
     return [a[0] for a in authors_1] + [a[0] for a in authors_7]
-
-

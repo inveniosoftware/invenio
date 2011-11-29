@@ -822,7 +822,7 @@ def full_names_are_synonymous(name1, name2, name_variations):
             oname = clean_name_string(oname, "", False, True)
             tname = clean_name_string(tname, "", False, True)
 
-            if (oname in nvar and tname in nvar) or oname==tname:
+            if (oname in nvar and tname in nvar) or oname == tname:
                 if print_debug:
                     print '      ', oname, ' and ', tname, ' are synonyms!'
 
@@ -1155,9 +1155,11 @@ def compare_names(origin_name, target_name):
 
     if initials_only and not only_initials_available:
         score = score * .9
-        print "|- initials only penalty: ", score
+        if AUTHORNAMES_UTILS_DEBUG:
+            print "|- initials only penalty: ", score, initials_only, only_initials_available
     else:
-        print "|- no initials only penalty"
+        if AUTHORNAMES_UTILS_DEBUG:
+            print "|- no initials only penalty", initials_only, only_initials_available
 
     if AUTHORNAMES_UTILS_DEBUG:
         print "||- final score:  ", score

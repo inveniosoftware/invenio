@@ -276,6 +276,7 @@ def personid_fast_assign_papers(paperslist=None, use_threading_not_multiprocessi
                     bibrec = self.p_q.get_nowait()
                 except Empty:
                     break
+                close_connection()
 
                 pfap_assign_paper_iteration(self.i, bibrec, self.atul, self.personid_new_id_lock)
 
@@ -335,17 +336,20 @@ def personid_fast_assign_papers(paperslist=None, use_threading_not_multiprocessi
             task_sleep_now_if_required(True)
     else:
         max_processes = bconfig.CFG_BIBAUTHORID_PERSONID_SQL_MAX_THREADS
+        checker = status_checker()
+        workers = []
         while not papers_q.empty():
-            workers = []
-            checker = status_checker()
-            for i in range(max_processes):
+            i = 0
+            while len(workers) < max_processes:
                 w = Worker(i, papers_q, authornames_table_update_lock,
                            personid_new_id_lock, checker)
+                i += 1
                 w.start()
                 workers.append(w)
-
-            for w in workers:
-                w.join()
+            for c, p in enumerate(tuple(workers)):
+                if not p.is_alive():
+                    p.join()
+                    workers.remove(p)
 
             task_sleep_now_if_required(True)
 
