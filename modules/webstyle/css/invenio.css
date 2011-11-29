@@ -1113,7 +1113,7 @@ form input[disabled], form input[disabled="true"]{
    /* <http://reference.sitepoint.com/css/attributeselector#compatibilitysection> */
    color: #666;
 }
-form input[type=checkbox] {
+form input[type=checkbox], form input[type=radio] {
     border: none;
 }
 .wsactionbutton {
