@@ -161,7 +161,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBAUTHORID_EXTERNAL_CLAIMED_RECORDS_KEY',
                        'CFG_PLOTEXTRACTOR_DISALLOWED_TEX',
                        'CFG_OAI_FRIENDS',
-                       'CFG_WEBSTYLE_REVERSE_PROXY_IPS']:
+                       'CFG_WEBSTYLE_REVERSE_PROXY_IPS',
+                       'CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS']:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:

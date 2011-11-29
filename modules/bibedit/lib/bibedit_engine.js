@@ -162,9 +162,6 @@ var gBibCircUrl = null;
 
 var gDisplayBibCircPanel = false;
 
-//Tags to be autocompleted
-var gTagsToAutocomplete = ['100_u', '700_u', '701_u','502_c'];
-
 //KB related variables
 var gKBSubject = null;
 var gKBInstitution = null;
@@ -278,7 +275,8 @@ function initJeditable(){
     cell_id_split[0] = 'subfieldTag';
     var subfield_id = cell_id_split.join('_');
     /* Add autocomplete handler to fields in gTagsToAutocomplete */
-    if ($.inArray(cell_id_split[1] + '_' + $(original).siblings('#' + subfield_id).text(), gTagsToAutocomplete) != -1) {
+    var fieldInfo = $(original).parents("tr").siblings().eq(0).children().eq(1).html()
+    if ($.inArray(fieldInfo + $(original).siblings('#' + subfield_id).text(), gTagsToAutocomplete) != -1) {
         addHandler_autocompleteAffiliations(textarea);
     }
     return(textarea);
@@ -1965,7 +1963,16 @@ function onAddFieldChange(event){
             var fieldTagID = ('#' + $(this).attr('id').replace('SubfieldCode', 'Tag')).split('_');
             fieldTagID.pop();
             fieldTagID = fieldTagID.join('_');
-            if ($.inArray($(this).parent().prev().prev().children(fieldTagID)[0].value + '_' + this.value, gTagsToAutocomplete) != -1) {
+            var fieldTag = $(this).parent().prev().prev().children().eq(0).val(),
+                fieldInd1 = $(this).parent().prev().prev().children().eq(1).val(),
+                fieldInd2 = $(this).parent().prev().prev().children().eq(2).val();
+            if (fieldInd1 == '') {
+                fieldInd1 = '_';
+            }
+            if (fieldInd2 == '') {
+                fieldInd2 = '_';
+            }
+            if ($.inArray(fieldTag +  fieldInd1 + fieldInd2 + this.value, gTagsToAutocomplete) != -1) {
                 addHandler_autocompleteAffiliations($(this).parent().next().children('input'));
             }
 	    $(this).parent().next().children('input').focus();
@@ -2219,7 +2226,8 @@ function onAddSubfieldsChange(event){
       }
       if (event.keyCode != 9 && event.keyCode != 16){
         /* If we are creating a new field present in gTagsToAutocomplete, add autocomplete handler */
-        if ($.inArray($(this).attr('id').split('_')[1] + '_' + this.value, gTagsToAutocomplete) != -1) {
+        var fieldInfo = $(this).parents("tr").siblings().eq(0).children().eq(1).html();
+        if ($.inArray(fieldInfo + this.value, gTagsToAutocomplete) != -1) {
           addHandler_autocompleteAffiliations($(this).parent().next().children('input'));
         }
         $(this).parent().next().children('input').focus();

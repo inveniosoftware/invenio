@@ -73,7 +73,7 @@ from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_get_subfields
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL, CFG_SITE_RECORD, CFG_BIBEDIT_KB_SUBJECTS, \
-    CFG_BIBEDIT_KB_INSTITUTIONS
+    CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS
 from invenio.search_engine import record_exists, search_pattern
 from invenio.webuser import session_param_get, session_param_set
 from invenio.bibcatalog import bibcatalog_system
@@ -210,7 +210,8 @@ def perform_request_init(uid, ln, req, lastupdated):
             'gAUTOSUGGEST_TAGS' : CFG_BIBEDIT_AUTOSUGGEST_TAGS,
             'gAUTOCOMPLETE_TAGS' : CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS.keys(),
             'gKEYWORD_TAG' : '"' + CFG_BIBEDIT_KEYWORD_TAG  + '"',
-            'gAVAILABLE_KBS': get_available_kbs()
+            'gAVAILABLE_KBS': get_available_kbs(),
+            'gTagsToAutocomplete': CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS
             }
     body += '<script type="text/javascript">\n'
     for key in data:
