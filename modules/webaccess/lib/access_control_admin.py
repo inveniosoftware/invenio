@@ -994,7 +994,7 @@ def acc_get_action_id(name_action):
     try:
         return run_sql("""SELECT id FROM accACTION WHERE name = %s""",
         (name_action, ))[0][0]
-    except IndexError:
+    except (ProgrammingError, IndexError):
         return 0
 
 
@@ -1821,4 +1821,3 @@ def acc_cleanup_arguments():
 
     # return count and ids of deleted arguments
     return (count, ids2)
-

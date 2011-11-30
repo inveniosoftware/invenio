@@ -37,7 +37,7 @@ from invenio.config import \
 from invenio.webstat_config import CFG_WEBSTAT_CONFIG_PATH
 from invenio.search_engine import get_coll_i18nname, \
     wash_index_term
-from invenio.dbquery import run_sql, wash_table_column_name
+from invenio.dbquery import run_sql, wash_table_column_name, ProgrammingError
 from invenio.bibsched import is_task_scheduled, \
     get_task_ids_by_descending_date, \
     get_task_options
@@ -706,7 +706,11 @@ def destroy_customevents():
     @type: str
     """
     msg = ''
-    for event in run_sql("SELECT id FROM staEVENT"):
+    try:
+        res = run_sql("SELECT id FROM staEVENT")
+    except ProgrammingError:
+        return msg
+    for event in res:
         msg += destroy_customevent(event[0])
     return msg
 

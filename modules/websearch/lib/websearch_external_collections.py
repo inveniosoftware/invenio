@@ -32,7 +32,7 @@ if sys.hexversion < 0x2040000:
     # pylint: enable=W0622
 
 from invenio.config import CFG_SITE_LANG
-from invenio.dbquery import run_sql, OperationalError
+from invenio.dbquery import run_sql, OperationalError, ProgrammingError
 from invenio.messages import gettext_set_language
 
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
@@ -218,7 +218,7 @@ def external_collection_load_states():
     query = "SELECT collection_externalcollection.id_collection, collection_externalcollection.type, externalcollection.name FROM collection_externalcollection, externalcollection WHERE collection_externalcollection.id_externalcollection = externalcollection.id;"
     try:
         results = run_sql(query)
-    except OperationalError:
+    except (OperationalError, ProgrammingError):
         results = None
     if results:
         for result in results:

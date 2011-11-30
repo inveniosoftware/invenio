@@ -653,7 +653,9 @@ def cli_cmd_drop_tables(conf):
     from invenio.webstat import destroy_customevents
     wait_for_user(wrap_text_in_a_box("""WARNING: You are going to destroy
 your database tables!"""))
-    print destroy_customevents()
+    msg = destroy_customevents()
+    if msg:
+        print msg
     cmd = "%s/bin/dbexec < %s/lib/sql/invenio/tabdrop.sql" % (CFG_PREFIX, CFG_PREFIX)
     if os.system(cmd):
         print "ERROR: failed execution of", cmd
