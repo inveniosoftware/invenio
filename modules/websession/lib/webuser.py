@@ -1178,7 +1178,7 @@ def collect_user_info(req, login_time=False, refresh=False):
                 ## The user uses an external authentication method and it's a bit since
                 ## she has not performed a login
                 if not CFG_EXTERNAL_AUTH_USING_SSO or (
-                    is_req and login_object.in_shibboleth()):
+                    is_req and login_object.in_shibboleth(req)):
                     ## If we're using SSO we must be sure to be in HTTPS and Shibboleth handler
                     ## otherwise we can't really read anything, hence
                     ## it's better skip the synchronization
