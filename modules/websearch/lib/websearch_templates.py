@@ -174,7 +174,8 @@ class Template:
                            'op2': (str, ""),
                            'p3' : (str, ""),
                            'f3' : (str, ""),
-                           'm3' : (str, "")}
+                           'm3' : (str, ""),
+                           'wl' : (int, CFG_WEBSEARCH_WILDCARD_LIMIT)}
 
     tmpl_openurl_accepted_args = {
             'id' : (list, []),
