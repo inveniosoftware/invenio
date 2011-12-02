@@ -56,7 +56,7 @@ def format_element(bfo):
 
     if journal != '' and volume is not None:
 
-        out += '<a href="http://weblib.cern.ch/cgi-bin/ejournals?publication='
+        out += '<a href="https://cdsweb.cern.ch/ejournals.py?publication='
         out += quote(journal_source)
         out += '&amp;volume=' + volume
         out += '&amp;year=' + year
