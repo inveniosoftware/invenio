@@ -479,10 +479,12 @@ class Template:
         out += "</dd>"
         if CFG_CERN_SITE:
             out += """</dd>
-            <dt><a href="http://weblib.cern.ch/cgi-bin/checkloan?uid=&amp;version=2">%(your_loans)s</a></dt>
+            <dt><a href="%(CFG_SITE_SECURE_URL)s/yourloans/display?ln=%(ln)s">%(your_loans)s</a></dt>
             <dd>%(explain_loans)s</dd>""" % {
               'your_loans' : _("Your Loans"),
               'explain_loans' : _("Check out book you have on loan, submit borrowing requests, etc. Requires CERN ID."),
+            'ln': ln,
+            'CFG_SITE_SECURE_URL': CFG_SITE_SECURE_URL
             }
 
         out += """
