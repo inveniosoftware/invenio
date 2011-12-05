@@ -3067,7 +3067,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         return ret
 
     headers = get_normalized_headers(req.headers_in)
-    g = _RE_BAD_MSIE.search(headers.get('User-Agent', "MSIE 6.0"))
+    g = _RE_BAD_MSIE.search(headers.get('user-agent', "MSIE 6.0"))
     bad_msie = g and float(g.group(1)) < 9.0
 
     if CFG_BIBDOCFILE_USE_XSENDFILE:
