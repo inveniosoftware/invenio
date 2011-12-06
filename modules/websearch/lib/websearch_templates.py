@@ -2285,13 +2285,13 @@ class Template:
                  </thead>
                  <tbody>
                   <tr valign="bottom">
-                   <td valign="top" class="searchboxbody">
+                   <td class="searchboxbody">
                      %(select_sf)s %(select_so)s %(select_rm)s
                    </td>
-                   <td valign="top" class="searchboxbody">
+                   <td class="searchboxbody">
                      %(select_rg)s %(select_sc)s
                    </td>
-                   <td valign="top" class="searchboxbody">%(select_of)s</td>
+                   <td class="searchboxbody">%(select_of)s</td>
                   </tr>
                  </tbody>
                 </table>""" % {
