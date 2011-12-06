@@ -47,7 +47,7 @@ from invenio.search_engine import perform_request_search, \
     guess_primary_collection_of_a_record, guess_collection_of_a_record, \
     collection_restricted_p, get_permitted_restricted_collections, \
     search_pattern, search_unit, search_unit_in_bibrec, \
-    wash_colls
+    wash_colls, record_public_p
 from invenio.search_engine_utils import get_fieldvalues
 
 
@@ -1135,6 +1135,66 @@ class WebSearchRestrictedPicturesTest(unittest.TestCase):
         if error_messages:
             self.failUnless("HTTP Error 401: Unauthorized" in merge_error_messages(error_messages))
 
+class WebSearchRestrictedWebJournalFilesTest(unittest.TestCase):
+    """
+    Check whether files attached to a WebJournal article are well
+    accessible when the article is published
+    """
+    def test_restricted_files_guest(self):
+        """websearch - files of unreleased articles are not available to guest"""
+
+        # Record is not public...
+        self.assertEqual(record_public_p(106), False)
+
+        # ... and guest cannot access attached files
+        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/106/files/journal_galapagos_archipelago.jpg' % CFG_SITE_RECORD,
+                                               expected_text=['This file is restricted.  If you think you have right to access it, please authenticate yourself.'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_restricted_files_editor(self):
+        """websearch - files of unreleased articles are available to editor"""
+
+        # Record is not public...
+        self.assertEqual(record_public_p(106), False)
+
+        # ... but editor can access attached files
+        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/106/files/journal_galapagos_archipelago.jpg' % CFG_SITE_RECORD,
+                                               username='balthasar',
+                                               password='b123althasar',
+                                               expected_text=[],
+                                               unexpected_text=['This file is restricted',
+                                                                'You are not authorized'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_public_files_guest(self):
+        """websearch - files of released articles are available to guest"""
+
+        # Record is not public...
+        self.assertEqual(record_public_p(105), False)
+
+        # ... but user can access attached files, as article is released
+        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/105/files/journal_scissor_beak.jpg' % CFG_SITE_RECORD,
+                                               expected_text=[],
+                                                unexpected_text=['This file is restricted',
+                                                                 'You are not authorized'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_really_restricted_files_guest(self):
+        """websearch - restricted files of released articles are not available to guest"""
+
+        # Record is not public...
+        self.assertEqual(record_public_p(105), False)
+
+        # ... and user cannot access restricted attachements, even if
+        # article is released
+        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/105/files/restricted-journal_scissor_beak.jpg' % CFG_SITE_RECORD,
+                                               expected_text=['This file is restricted.  If you think you have right to access it, please authenticate yourself.'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
 class WebSearchRSSFeedServiceTest(unittest.TestCase):
     """Test of the RSS feed service."""
 
@@ -1929,6 +1989,7 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchSearchEngineWebAPITest,
                              WebSearchRestrictedCollectionTest,
                              WebSearchRestrictedPicturesTest,
+                             WebSearchRestrictedWebJournalFilesTest,
                              WebSearchRSSFeedServiceTest,
                              WebSearchXSSVulnerabilityTest,
                              WebSearchResultsOverview,

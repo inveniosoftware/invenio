@@ -1695,3 +1695,52 @@ def get_recid_from_legacy_number(issue_number, category, number):
             recid_to_return = positive_index_records[number]
 
     return recid_to_return
+
+def is_recid_in_released_issue(recid):
+    """
+    Returns True if recid is part of the latest issue of the given
+    journal.
+
+    WARNING: the function does not check that the article does not
+    belong to the draft collection of the record. This is wanted, in
+    order to workaround the time needed for a record to go from the
+    draft collection to the final collection
+    """
+    bfo = BibFormatObject(recid)
+    journal_name = ''
+    journal_names = [journal_name for journal_name in bfo.fields('773__t') if journal_name]
+    if journal_names:
+        journal_name = journal_names[0]
+    else:
+        return False
+
+    existing_journal_names = [o['journal_name'] for o in get_journals_ids_and_names()]
+    if not journal_name in existing_journal_names:
+        # Try to remove whitespace
+        journal_name = journal_name.replace(' ', '')
+        if not journal_name in existing_journal_names:
+            # Journal name unknown from WebJournal
+            return False
+
+    config_strings = get_xml_from_config(["draft_image_access_policy"], journal_name)
+    if config_strings['draft_image_access_policy'] and \
+       config_strings['draft_image_access_policy'][0] != 'allow':
+        # The journal does not want to optimize access to images
+        return False
+
+    article_issues = bfo.fields('773__n')
+    current_issue = get_current_issue(CFG_SITE_LANG, journal_name)
+    for article_issue in article_issues:
+        # Check each issue until a released one is found
+        if get_release_datetime(article_issue, journal_name):
+            # Release date exists, issue has been released
+            return True
+        else:
+            # Unreleased issue. Do we still allow based on journal config?
+            unreleased_issues_mode = get_unreleased_issue_hiding_mode(journal_name)
+            if (unreleased_issues_mode == 'none' or \
+                (unreleased_issues_mode == 'future' and \
+                 not issue_is_later_than(article_issue, current_issue))):
+                return True
+
+    return False

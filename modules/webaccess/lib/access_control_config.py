@@ -289,7 +289,8 @@ DEF_DEMO_AUTHS = (
              ('submit_DEMOJRN_*', 'cfgwebjournal', {'name': 'AtlantisTimes', 'with_editor_rights': 'no'}),
              ('atlantiseditor', 'cfgwebjournal', {'name': 'AtlantisTimes', 'with_editor_rights': 'yes'}),
              ('referee_DEMOBOO_*', 'runbatchuploader', {'collection': 'Books'}),
-             ('poetrycommentreader', 'viewcomment', {'collection': 'Poetry'})
+             ('poetrycommentreader', 'viewcomment', {'collection': 'Poetry'}),
+             ('atlantiseditor', VIEWRESTRCOLL, {'collection': 'Atlantis Times Drafts'})
             )
 
 _ = gettext_set_language(CFG_SITE_LANG)

@@ -149,6 +149,7 @@ nodes:</p>
       </li>
       <li><strong>draft_keyword</strong>: keyword that will be removed from some fields of the records of the issue to be released: that is used to automatically "publish" records tagged as draft.</li>
       <li><strong>first_issue</strong>: The first issue number to be ever published for this journal: this is only needed at the beginning, in order for WebJournal to know what should be the first issue number (Eg. if it starts in the middle of the year with a different number than <code>01</code>)</li>
+      <li><strong>draft_image_access_policy</strong>: '<code>allow</code>' or '<code>deny</code>' (default): if we should allow or not (default) access to images and files attached to an article even if this article is still part of a restricted collection: this allows to workaround the time required for an article to appear in a public collection after an issue has been released. Access is still forbidden if the article does not belong to a released issue, but at least default authorizations of the record do not apply.</li>
     </ul>
   </li>
 </ul>

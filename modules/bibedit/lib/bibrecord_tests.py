@@ -58,7 +58,7 @@ class BibRecordSuccessTest(unittest.TestCase):
 
     def test_records_created(self):
         """ bibrecord - demo file how many records are created """
-        self.assertEqual(104, len(self.recs))
+        self.assertEqual(106, len(self.recs))
 
     def test_tags_created(self):
         """ bibrecord - demo file which tags are created """
@@ -67,9 +67,9 @@ class BibRecordSuccessTest(unittest.TestCase):
         tags = ['003', '005', '020', '024', '035', '037', '041', '080', '088',
                 '100', '242', '245', '246', '250', '260', '269', '270', '300',
                 '340', '490', '500', '502', '506', '520', '590', '595', '650',
-                '653', '690', '694', '695', '700', '710', '720', '773', '856',
-                '859', '901', '909', '916', '960', '961', '962', '963', '964',
-                '970', '980', '999', 'FFT']
+                '653', '690', '691', '694', '695', '700', '710', '720', '773',
+                '856', '859', '901', '909', '916', '960', '961', '962', '963',
+                '964', '970', '980', '999', 'FFT']
 
         t = []
         for rec in self.recs:
@@ -93,7 +93,7 @@ class BibRecordSuccessTest(unittest.TestCase):
                   15, 14, 16, 15, 15, 15, 16, 15, 16, 15, 15, 16, 15, 14, 14,
                   15, 12, 13, 11, 15, 8, 11, 14, 13, 12, 13, 6, 6, 25, 24, 27,
                   26, 26, 24, 26, 27, 25, 28, 24, 23, 27, 25, 25, 26, 26, 24,
-                  19, 27, 25, 22, 9, 8, 9, 9, 8, 7]
+                  19, 27, 25, 22, 9, 8, 9, 9, 8, 7, 9, 8]
 
         cr = []
         ret = []

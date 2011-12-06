@@ -49,6 +49,7 @@ from invenio.webpage import page, create_error_box, pageheaderonly, \
     pagefooteronly
 from invenio.webuser import getUid, page_not_authorized, collect_user_info, isGuestUser, isUserSuperAdmin
 from invenio.websubmit_config import *
+from invenio import webjournal_utils
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import make_canonical_urlargd, redirect_to_url
 from invenio.messages import gettext_set_language
@@ -117,14 +118,22 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
 
             (auth_code, auth_message) = check_user_can_view_record(user_info, self.recid)
             if auth_code and user_info['email'] == 'guest':
-                cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-                target = '/youraccount/login' + \
-                    make_canonical_urlargd({'action': cookie, 'ln' : ln, 'referer' : \
-                    CFG_SITE_SECURE_URL + user_info['uri']}, {})
-                return redirect_to_url(req, target, norobot=True)
+                if webjournal_utils.is_recid_in_released_issue(self.recid):
+                    # We can serve the file
+                    pass
+                else:
+                    cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
+                    target = '/youraccount/login' + \
+                             make_canonical_urlargd({'action': cookie, 'ln' : ln, 'referer' : \
+                                                     CFG_SITE_SECURE_URL + user_info['uri']}, {})
+                    return redirect_to_url(req, target, norobot=True)
             elif auth_code:
-                return page_not_authorized(req, "../", \
-                    text = auth_message)
+                if webjournal_utils.is_recid_in_released_issue(self.recid):
+                    # We can serve the file
+                    pass
+                else:
+                    return page_not_authorized(req, "../", \
+                                               text = auth_message)
 
 
             readonly = CFG_ACCESS_CONTROL_LEVEL_SITE == 1
