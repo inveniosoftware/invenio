@@ -717,12 +717,19 @@ URI: http://%(host)s%(page)s
         @param referencenum: show (this) number of references in the references tab
         @param discussionnum: show (this) number of comments/reviews in the discussion tab
         """
-        # If no tabs, returns nothing
-        if len(tabs) <= 1:
-            return ''
+        from invenio.search_engine import record_public_p
 
         # load the right message language
         _ = gettext_set_language(ln)
+
+        # Prepare restriction flag
+        restriction_flag = ''
+        if not record_public_p(recid):
+            restriction_flag = '<div class="restrictedflag"><span>%s</span></div>' % _("Restricted")
+
+        # If no tabs, returns nothing (excepted if restricted)
+        if len(tabs) <= 1:
+            return restriction_flag
 
         # Build the tabs at the top of the page
         out_tabs = ''
@@ -791,6 +798,9 @@ URI: http://%(host)s%(page)s
                 %(record_brief)s
                 """ % {'tabs':out_tabs,
                        'record_brief':record_brief}
+
+        out = restriction_flag + out
+
         return out
 
     def detailed_record_container_bottom(self, recid, tabs, ln=CFG_SITE_LANG,
