@@ -150,7 +150,7 @@ install-jquery-plugins: install-jquery-plugins
 	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.resizable.min.js && \
 	wget http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js && \
 	wget http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js && \
-	wget http://github.com/malsup/form/raw/master/jquery.form.js --no-check-certificate && \
+	wget https://raw.github.com/malsup/form/master/jquery.form.js --no-check-certificate && \
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
 	wget http://autobahn.tablesorter.com/jquery.tablesorter.zip && \
 	wget http://www.uploadify.com/wp-content/uploads/uploadify-v2.1.4.zip -O uploadify.zip && \
