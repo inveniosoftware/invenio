@@ -80,7 +80,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
-     CFG_TMPDIR, \
+     CFG_TMPSHAREDDIR, \
      CFG_SITE_SUPPORT_EMAIL
 from invenio.messages import gettext_set_language
 from invenio.bibdocfilecli import cli_fix_marc
@@ -440,8 +440,8 @@ def create_file_upload_interface(recid,
                                            'doctype': sbm_doctype})
     elif uid and sbm_access:
         # WebSubmit File Management (admin) interface mode.
-        # Working directory is in CFG_TMPDIR
-        working_dir = os.path.join(CFG_TMPDIR,
+        # Working directory is in CFG_TMPSHAREDDIR
+        working_dir = os.path.join(CFG_TMPSHAREDDIR,
                               'websubmit_upload_interface_config_' + str(uid),
                               sbm_access)
         try:

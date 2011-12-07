@@ -31,7 +31,7 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     CFG_TMPDIR, \
+     CFG_TMPSHAREDDIR, \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \
@@ -385,7 +385,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         body = ''
         if argd['do'] != 0 and not argd['cancel']:
             # Apply modifications
-            working_dir = os.path.join(CFG_TMPDIR,
+            working_dir = os.path.join(CFG_TMPSHAREDDIR,
                                        'websubmit_upload_interface_config_' + str(uid),
                                        argd['access'])
             move_uploaded_files_to_storage(working_dir=working_dir,
@@ -401,7 +401,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                     (_('Your modifications to record #%i have been submitted') % argd['recid'])
         elif argd['cancel']:
             # Clean temporary directory
-            working_dir = os.path.join(CFG_TMPDIR,
+            working_dir = os.path.join(CFG_TMPSHAREDDIR,
                                        'websubmit_upload_interface_config_' + str(uid),
                                        argd['access'])
             shutil.rmtree(working_dir)
