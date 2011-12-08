@@ -126,7 +126,7 @@ def build_url(sysno, name, file_type, extension, is_icon=False):
     @param extension: file extension, including '.'
     """
     return CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + str(sysno) + \
-           '/files/' + build_docname(name, file_type, extension) + \
+           '/files/' + urllib.quote(build_docname(name, file_type, extension)) + \
            (is_icon and '?subformat=icon' or '')
 
 def build_docname(name, file_type, extension):
