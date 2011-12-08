@@ -2809,6 +2809,17 @@ div.restrictedflag {
    float:left;
    text-align:center;
 }
+.restrictedfilerowheader{
+   background-color: #f11;
+   color: #fff;
+   font-weight: bold;
+   text-transform: uppercase;
+   text-align:center;
+   cursor: default;
+   font-size: small;
+   letter-spacing: 1px;
+}
+
 /* Actions in mini-panel of detailed record view*/
 ul.detailedrecordactions{
    list-style-image: url(arrow_link-icon-15x11-right.gif) ;

@@ -1100,6 +1100,25 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('jekyll@cds.cern.ch'))), ['Theses'])
         self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('hyde@cds.cern.ch'))), [])
 
+    def test_restricted_record_has_restriction_flag(self):
+        """websearch - restricted record displays a restriction flag"""
+        browser = Browser()
+        browser.open(CFG_SITE_URL + '/%s/42/files/' % CFG_SITE_RECORD)
+        browser.select_form(nr=0)
+        browser['p_un'] = 'jekyll'
+        browser['p_pw'] = 'j123ekyll'
+        browser.submit()
+        if browser.response().read().find("Restricted") > -1:
+            pass
+        else:
+            self.fail("Oops, a 'Restricted' flag should appear on restricted records.")
+
+        browser.open(CFG_SITE_URL + '/%s/42/files/comments' % CFG_SITE_RECORD)
+        if browser.response().read().find("Restricted") > -1:
+            pass
+        else:
+            self.fail("Oops, a 'Restricted' flag should appear on restricted records.")
+
 class WebSearchRestrictedPicturesTest(unittest.TestCase):
     """
     Check whether restricted pictures on the demo site can be accessed
@@ -1192,6 +1211,13 @@ class WebSearchRestrictedWebJournalFilesTest(unittest.TestCase):
         # article is released
         error_messages = test_web_page_content(CFG_SITE_URL + '/%s/105/files/restricted-journal_scissor_beak.jpg' % CFG_SITE_RECORD,
                                                expected_text=['This file is restricted.  If you think you have right to access it, please authenticate yourself.'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_restricted_picture_has_restriction_flag(self):
+        """websearch - restricted files displays a restriction flag"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/1/files/' % CFG_SITE_RECORD,
+                                                  expected_text="Restricted")
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 

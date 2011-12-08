@@ -2012,7 +2012,8 @@ class BibDoc:
                 versions = versions,
                 imageurl = imageurl,
                 docname = self.docname,
-                recid = self.recid
+                recid = self.recid,
+                status = self.status
                 )
         else:
             return ""
