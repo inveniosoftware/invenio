@@ -216,7 +216,7 @@ def create_new_person(uid, uid_is_owner=False):
     pids = run_sql("select count(personid) from aidPERSONID")[0][0]
     if int(pids) > 0:
         pid = run_sql("select max(personid) from aidPERSONID")[0][0]
-        pid = int(pid)
+        pid = int(pid) + 1
     else:
         pid = 0
 

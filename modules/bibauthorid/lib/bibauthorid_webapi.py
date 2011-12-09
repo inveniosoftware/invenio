@@ -963,7 +963,7 @@ def arxiv_login(req):
         missing_bibrecs = []
 
     bibrec_names = []
-    for b in found_bibrecs+missing_bibrecs:
+    for b in found_bibrecs + missing_bibrecs:
         bibrec_names.append([b, get_field_values_on_condition(b, source='API', get_table=['100', '700'], get_tag='a')])
 
     for n in list(bibrec_names):
@@ -1015,7 +1015,7 @@ def arxiv_login(req):
         tempticket.append({'pid':pid, 'bibref':bibref, 'action':'confirm'})
 
     done_bibrecs = set(b.split(',')[1] for b in person_papers)
-    for b in found_bibrecs+missing_bibrecs:
+    for b in found_bibrecs + missing_bibrecs:
         if str(b) not in done_bibrecs:
             tempticket.append({'pid':pid, 'bibref':str(b), 'action':'confirm'})
 

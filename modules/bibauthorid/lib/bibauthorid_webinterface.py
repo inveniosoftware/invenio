@@ -1872,10 +1872,10 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                 ticket.append(t)
             if 'search_ticket' in pinfo:
                 del(pinfo['search_ticket'])
-            session.save()
 
             #start ticket processing chain
             pinfo["claimpaper_admin_last_viewed_pid"] = pid
+            session.save()
             return self.adf['ticket_dispatch'][ulevel](req)
 #            return self.perform(req, form)
 
@@ -2425,7 +2425,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         if CFG_INSPIRE_SITE:
             #logs arXive logins, for debug purposes.
             dbg = ('uinfo= ' + str(uinfo) + '\npinfo= ' + str(pinfo) + '\nreq= ' + str(req)
-                    + '\nsession= '+str(session))
+                    + '\nsession= ' + str(session))
             userinfo = "%s||%s" % (uid, req.remote_ip)
             webapi.insert_log(userinfo, pid, 'arXiv_login', 'dbg', '', comment=dbg)
 
