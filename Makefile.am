@@ -30,7 +30,7 @@ MJV = 1.1
 MATHJAX = https://github.com/mathjax/MathJax/zipball/v$(MJV)
 
 # current CKeditor version
-CKV = 3.6.1
+CKV = 3.6.2
 CKEDITOR = ckeditor_$(CKV).zip
 
 # current MediaElement.js version
