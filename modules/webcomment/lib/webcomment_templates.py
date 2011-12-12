@@ -428,6 +428,7 @@ class Template:
         <div class="webcomment_comment_title">
             %(title)s
             <div class="webcomment_comment_date">%(date)s</div>
+            <a class="webcomment_permalink" title="Permalink to this comment" href="#%(comid)i">¶</a>
         </div>
             <blockquote>
         %(body)s
@@ -445,6 +446,7 @@ class Template:
                  'attached_files_html': attached_files_html,
                  'date': date_creation,
                  'site_url': CFG_SITE_URL,
+                 'comid': com_id,
                  }
         return out
 

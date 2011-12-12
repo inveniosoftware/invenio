@@ -3286,6 +3286,22 @@ div.subtitle {
 
 /* WebComment Refactor */
 
+.webcomment_permalink, .webcomment_permalink:link,
+.webcomment_permalink:visited{
+    visibility: hidden;
+    color: #C60F0F;
+    font-size: medium;
+    padding: 0 4px;
+    text-decoration: none;
+}
+ .webcomment_permalink:hover {
+    color: white;
+    background-color: #C60F0F;
+}
+.webcomment_comment_title:hover .webcomment_permalink{
+    visibility: visible;
+}
+
 .webcomment_review_title_table {
 	border: 0px;
 	border-collapse: separate;
