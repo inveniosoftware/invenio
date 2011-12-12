@@ -407,18 +407,18 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
 
         # Prepare code to instantiate an editor
         editor += '''
-        <script language="javascript">
+        <script type="text/javascript" language="javascript">//<![CDATA[
         /* Load the script only once, or else multiple instance of the editor on the same page will not work */
         var INVENIO_CKEDITOR_ALREADY_LOADED
             if (INVENIO_CKEDITOR_ALREADY_LOADED != 1) {
-                document.write("<script src='%(CFG_SITE_URL)s/ckeditor/ckeditor.js'><\/script>");
+                document.write('<script type="text/javascript" src="%(CFG_SITE_URL)s/ckeditor/ckeditor.js"><\/script>');
                 INVENIO_CKEDITOR_ALREADY_LOADED = 1;
             }
-        </script>
+        //]]></script>
         <input type="hidden" name="editor_type" id="%(id)seditortype" value="textarea" />
-        <textarea id="%(id)s" name="%(name)s" style="width:%(width)s;height:%(height)s">%(textual_content)s</textarea>
-        <textarea id="%(id)shtmlvalue" name="%(name)shtmlvalue" style="display:none;width:%(width)s;height:%(height)s">%(html_content)s</textarea>
-        <script type="text/javascript">
+        <textarea rows="100" cols="80" id="%(id)s" name="%(name)s" style="width:%(width)s;height:%(height)s">%(textual_content)s</textarea>
+        <textarea rows="100" cols="80" id="%(id)shtmlvalue" name="%(name)shtmlvalue" style="display:none;width:%(width)s;height:%(height)s">%(html_content)s</textarea>
+        <script type="text/javascript">//<![CDATA[
           var CKEDITOR_BASEPATH = '/ckeditor/';
 
           CKEDITOR.replace( '%(name)s',
@@ -453,7 +453,7 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
             /* End workaround */
           })
 
-        </script>
+        //]]></script>
         ''' % \
           {'textual_content': cgi.escape(textual_content),
            'html_content': content,
@@ -469,7 +469,7 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
 
     else:
         # CKedior is not installed
-        textarea = '<textarea %(id)s name="%(name)s" style="width:%(width)s;height:%(height)s">%(content)s</textarea>' \
+        textarea = '<textarea rows="100" cols="80" %(id)s name="%(name)s" style="width:%(width)s;height:%(height)s">%(content)s</textarea>' \
                      % {'content': cgi.escape(textual_content),
                         'width': width,
                         'height': height,
