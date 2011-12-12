@@ -366,7 +366,7 @@ class Template:
         out = ''
         final_body = email_quoted_txt2html(body)
         title = _('%(x_name)s') % {'x_name': nickname,}
-        title += '<a name=%s></a>' % com_id
+        title += '<a name="%s"></a>' % com_id
         links = ''
         moderator_links = ''
         if reply_link:
@@ -938,23 +938,21 @@ class Template:
 
         if reviews == 0:
             if not user_is_subscribed_to_discussion:
-                body += '<small>'
                 body += '<div class="comment-subscribe">' + '<img src="%s/img/mail-icon-12x8.gif" border="0" alt="" />' % CFG_SITE_URL + \
                         '&nbsp;' + '<b>' + create_html_link(urlbase=CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + \
                                                             str(recID) + '/comments/subscribe',
                                                             urlargd={},
                                                             link_label=_('Subscribe')) + \
                         '</b>' + ' to this discussion. You will then receive all new comments by email.' + '</div>'
-                body += '</small><br />'
+                body += '<br />'
             elif user_can_unsubscribe_from_discussion:
-                body += '<small>'
                 body += '<div class="comment-subscribe">' + '<img src="%s/img/mail-icon-12x8.gif" border="0" alt="" />' % CFG_SITE_URL + \
                         '&nbsp;' + '<b>' + create_html_link(urlbase=CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + \
                                                             str(recID) + '/comments/unsubscribe',
                                                             urlargd={},
                                                             link_label=_('Unsubscribe')) + \
                         '</b>' + ' from this discussion. You will no longer receive emails about new comments.' + '</div>'
-                body += '</small><br />'
+                body += '<br />'
 
         if can_send_comments:
             body += add_comment_or_review
@@ -1032,7 +1030,7 @@ class Template:
         """
         enctype_attr = ''
         if enctype:
-            enctype_attr = 'enctype=' + enctype
+            enctype_attr = 'enctype="%s"' % enctype
 
         output  = """
 <form action="%s" method="%s" %s%s%s>""" % \
@@ -1197,6 +1195,7 @@ class Template:
                       <input class="adminbutton" type="submit" value="Add comment" onclick="user_must_confirm_before_leaving_page = false;return true;"/>
                       %(reply_to)s
                   </div>
+</div>
                 """ % {'note': note,
                        'record_label': _("Article") + ":",
                        'comment_label': _("Comment") + ":",
@@ -1209,7 +1208,6 @@ class Template:
         form = self.create_write_comment_hiddenform(action=form_link, method="post", text=form, button='Add comment',
                                                     enctype='multipart/form-data', form_id='cmtForm',
                                                     form_name='cmtForm')
-        form += '</div>'
 
         return warnings + form + self.tmpl_page_do_not_leave_comment_page_js(ln=ln)
 
@@ -2195,7 +2193,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = '''
-        <script language="JavaScript">
+        <script type="text/javascript" language="JavaScript">//<![CDATA[
             var initial_comment_value = document.forms.cmtForm.msg.value;
             var user_must_confirm_before_leaving_page = true;
 
@@ -2215,7 +2213,7 @@ class Template:
                     }
                }
             }
-        </script>
+        //]]></script>
         ''' % {'message': _('Your comment will be lost.').replace('"', '\\"'),
                'name': 'msg'}
 
