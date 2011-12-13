@@ -44,7 +44,7 @@ from invenio.webinterface_handler_config import \
     HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR
 from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
     CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE, CFG_SITE_URL, \
-    CFG_SITE_SECURE_URL
+    CFG_SITE_SECURE_URL, CFG_WEBSTYLE_REVERSE_PROXY_IPS
 from invenio.errorlib import register_exception, get_pretty_traceback
 
 ## Static files are usually handled directly by the webserver (e.g. Apache)
@@ -230,6 +230,7 @@ class SimulatedModPythonRequest(object):
 
     def get_remote_ip(self):
         if 'X-FORWARDED-FOR' in self.__headers_in and \
+                self.__environ.get('REMOTE_ADDR') in CFG_WEBSTYLE_REVERSE_PROXY_IPS and \
                 self.__headers_in.get('X-FORWARDED-SERVER', '') == \
                 self.__headers_in.get('X-FORWARDED-HOST', '') == \
                 urlparse(CFG_SITE_URL)[1]:
