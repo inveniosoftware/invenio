@@ -1460,7 +1460,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             session.save()
             return redirect_to_url(req, referer)
 
-        return redirect_to_url(req, "%s/person/%s" % (CFG_SITE_URL,
+        return redirect_to_url(req, "%s/person/%s?open_claim=True" % (CFG_SITE_URL,
                                  webapi.get_person_redirect_link(
                                    pinfo["claimpaper_admin_last_viewed_pid"])))
 
