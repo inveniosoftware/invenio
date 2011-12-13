@@ -1265,27 +1265,27 @@ function onSubmitPreviewSuccess(dialogPreview, html_preview){
         close: function() { updateStatus('ready'); },
         buttons: {
             "Submit changes": function() {
-                                    createReq({recID: gRecID, requestType: 'submit',
-                                        force: onSubmitClick.force}, function(json){
-                                            // Submission was successful.
-                                            changeAndSerializeHash({state: 'submit', recid: gRecID});
-                                            var resCode = json['resultCode'];
-                                            cleanUp(!gNavigatingRecordSet, '', null, true);
-                                            updateStatus('report', gRESULT_CODES[resCode]);
-                                            updateToolbar(false);
-                                            resetBibeditState();
-                                            displayMessage(resCode);
-                                            updateStatus('ready');
-                                    });
-                                    $( this ).remove();
-                                },
+                createReq({recID: gRecID, requestType: 'submit',
+                  force: onSubmitClick.force}, function(json){
+                      // Submission was successful.
+                      changeAndSerializeHash({state: 'submit', recid: gRecID});
+                      var resCode = json['resultCode'];
+                      cleanUp(!gNavigatingRecordSet, '', null, true);
+                      updateStatus('report', gRESULT_CODES[resCode]);
+                      updateToolbar(false);
+                      resetBibeditState();
+                      displayMessage(resCode);
+                      updateStatus('ready');
+              });
+              $( this ).remove();
+            },
             Cancel: function() {
                         updateStatus('ready');
                         $( this ).remove();
                     }
     }});
+  // Focus on the submit button
   $(dialogPreview.dialogDiv).parent().find('button:nth-child(1)').focus();
-
 }
 
 function onSubmitClick(){
@@ -1293,7 +1293,7 @@ function onSubmitClick(){
    * Handle 'Submit' button (submit record).
    */
   updateStatus('updating');
-  var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700);
+  var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700, true);
 
   // Get preview of the record and let the user confirm submit
   getPreview(dialogPreview, onSubmitPreviewSuccess);
@@ -1306,7 +1306,7 @@ function onPreviewClick(){
   /*
    * Handle 'Preview' button (preview record).
    */
-   var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700);
+   var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700, true);
    createReq({'new_window': true, recID: gRecID, requestType: 'preview'
        }, function(json){
        // Preview was successful.
@@ -1361,6 +1361,141 @@ function getPreview(dialog, onSuccess) {
         html_preview = json['html_preview'];
         onSuccess(dialog, html_preview);
        });
+}
+
+/************* Reference extraction in BibEdit ***************/
+
+function onRefExtractClick() {
+   /*
+    * Handle reference extraction button
+    *
+    * 1) Create dialog box while loading
+    * 2) Send request to the server to extract references
+    * 3) Update dialog box with references extracted
+    * 4) If user approves, redraw interface with new content and update
+    *    cache in server
+    * 
+    */
+
+   /* Create the modal dialog that will contain the references */
+   var dialogReferences = createDialog("Loading...", "Extracting references...", 750, 700, true);
+
+    /* Create a request to extract references */
+    var bibrecord, textmarc, xmlrecord;
+    createReq({recID: gRecID, requestType: 'refextract'},
+        function(json){
+            bibrecord = json['ref_bibrecord'];
+            textmarc = json['ref_textmarc'];
+            xmlrecord = json['ref_xmlrecord'];
+            if (!xmlrecord) {
+                dialogReferences.contentParagraph.css('margin-top', '50px');
+                dialogReferences.contentSpan.html("The record does not have a PDF file ");
+                dialogReferences.dialogDiv.dialog({
+                    title: "PDF not found",
+                    height: '200',
+                    width: '350',
+                    buttons: {
+                        "Accept" : function() {
+                                    $( this ).remove();
+                                   }
+                    }
+                });
+            }
+            /* References were extracted */
+            else {
+                addContentToDialog(dialogReferences, textmarc, "Do you want to apply the following references?");
+                dialogReferences.dialogDiv.dialog({
+                    title: "Apply references",
+                    buttons: {
+                        "Apply references": function() {
+                            /* Update global record with the updated version */
+                            gRecord = bibrecord;
+                            /* Update cache in the server to have the updated record */
+                            createReq({recID: gRecID, recXML: xmlrecord, requestType: 'updateCacheRef'});
+                            /* Redraw whole content table and enable submit button */
+                            $('#bibEditTable').remove();
+                            displayRecord();
+                            redrawFields();
+                            reColorFields();
+                            $('#btnSubmit').removeAttr('disabled');
+                            $('#btnSubmit').css('background-color', 'lightgreen');
+                            $( this ).remove();
+                        },
+                        Cancel: function() {
+                            $( this ).remove();
+                        }
+                }});
+            }
+        });
+}
+
+function onRefExtractFreeTextClick() {
+  /*
+   * Handler for free text refextract button. Allows to paste references
+   * and process them using refextract on the server side.
+   */
+  /* Create the modal dialog that will contain the references */
+  content = "Paste your references:<br/><textarea id='reffreetext' rows=38 cols=80></textarea>"
+  var dialogReferences = createDialog("Paste references", content, 750, 700);
+  dialogReferences.dialogDiv.dialog({
+      buttons: {
+        "Extract references": function() {
+          /* Read content from textarea before replacing it
+          with the loading gif */
+          var textReferences = $('#reffreetext').val();
+          dialogReferences.contentParagraph.addClass('dialog-box-centered');
+          dialogReferences.contentSpan.html("Loading...<br /><br /> <img src='/img/ajax-loader.gif'>");
+          createReq({ recID: gRecID,
+                      requestType: 'refextract',
+                      txt: textReferences },
+                    function(json) {
+                      var bibrecord, textmarc, xmlrecord, dialogTxt;
+                      bibrecord = json['ref_bibrecord'];
+                      textmarc = json['ref_textmarc'];
+                      xmlrecord = json['ref_xmlrecord'];
+                      var button_dict = {};
+                      if ($(textmarc).html() !== "") {
+                        dialogTxt =  "Do you want to apply the following references?";
+                        button_dict["Apply references"] = function() {
+                              /* Update global record with the updated version */
+                              gRecord = bibrecord;
+                              /* Update cache in the server to have the updated record */
+                              createReq({recID: gRecID, recXML: xmlrecord, requestType: 'updateCacheRef'});
+                              /* Redraw whole content table and enable submit button */
+                              $('#bibEditTable').remove();
+                              displayRecord();
+                              redrawFields();
+                              reColorFields();
+                              $('#btnSubmit').removeAttr('disabled');
+                              $('#btnSubmit').css('background-color', 'lightgreen');
+                              $( this ).remove();
+                        }
+                      }
+                      else {
+                        dialogTxt =  "No references extracted. The automatic " +
+                          "extraction did not recognize any reference in the " +
+                          "pasted text.<br />If you want to edit the references " +
+                          "manually, an easily recognizable format is:<br/><br/>" +
+                          "&nbsp;&nbsp;&nbsp;&nbsp;[1] Phys. Rev A71 (2005) 42<br />" +
+                          "&nbsp;&nbsp;&nbsp;&nbsp;[2] ATLAS-CMS-2007-333";
+                      }
+                      button_dict.Cancel = function() {
+                              $( this ).remove();
+                            }
+                      addContentToDialog(dialogReferences,
+                              textmarc,
+                              dialogTxt);
+                      dialogReferences.dialogDiv.dialog({
+                        title: "Apply references",
+                        buttons: button_dict
+                      });
+                  }
+        );
+      },
+        Cancel: function() {
+          $( this ).remove();
+        }
+      }});
 }
 
 function onCancelClick(){
@@ -1547,6 +1682,7 @@ function addHandler_autocompleteAffiliations(tg) {
                 if (term.length < 3) {
                     return false;
                 }
+                return true;
     }
     });
 }
@@ -2624,7 +2760,10 @@ function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, va
   }, false);
 }
 
-function getBulkUpdateSubfieldContentRequestData(tag, fieldPosition, subfieldIndex, subfieldCode, value, consumedChange, undoDescriptor, subfieldsToAdd, subfield_offset) {
+function getBulkUpdateSubfieldContentRequestData(tag, fieldPosition,
+                                                 subfieldIndex, subfieldCode,
+                                                 value, consumedChange,
+                                                 undoDescriptor, subfieldsToAdd, subfield_offset) {
     /*
      *Purpose: prepare data to be included in the request for a bulk update
      *         of the subfield content
@@ -2660,7 +2799,8 @@ function getBulkUpdateSubfieldContentRequestData(tag, fieldPosition, subfieldInd
     return changesAdd
 }
 
-function bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, subfieldCode, value, consumedChange, undoDescriptor, subfieldsToAdd, subfields_offset) {
+function bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, subfieldCode,
+                            value, consumedChange, undoDescriptor, subfieldsToAdd, subfields_offset) {
     /*
      *Purpose: perform request for a bulk update as the user introduced in the content
      *         field multiple subfields to be added in the form $$aTest$$bAnother
@@ -2990,9 +3130,9 @@ function onContentChange(value, th) {
   value = value.replace(/\n/g, ' '); // Replace newlines with spaces.
   value = value.replace(/^\s+|\s+$/g,""); // Remove whitespace from the ends of strings
 
-  var oldValue = ""; // variable that will contain old value from gRecord
+  var oldValue = ""; //variable that will contain old value from gRecord
   var newValue = escapeHTML(value);
-  if (subfieldIndex == undefined) {
+  if (subfieldIndex == undefined){
     /* Edit field tag */
     if (cellType == 'fieldTag') {
         if (tag_ind == value.replace(/_/g, " "))
@@ -3040,6 +3180,7 @@ function onContentChange(value, th) {
             field_instance[0].splice(subfieldIndex, 1); // update gRecord, remove old content
             field_instance[0].push.apply(field_instance[0], subfieldsToAdd); // update gRecord, add new subfields
             subfield_offset = 1;
+            newValue = subfieldsToAdd[0][1];
         }
         /* If editing reference field, add $$9 subfield */
         else if (tag_ind == '999C5' && !is_reference_manually_curated(field_instance)) {
@@ -3062,8 +3203,6 @@ function onContentChange(value, th) {
         }
     }
   }
-
-  var newValue = escapeHTML(value);
 
   var urHandler;
   var operation_type;
@@ -3129,26 +3268,26 @@ function onContentChange(value, th) {
                                                        oldSubfieldCode,
                                                        operation_type);
       }
-
   }
   addUndoOperation(urHandler);
 
   // Generate AJAX request
   switch (cellType) {
-  case 'subfieldTag':
-      updateSubfieldValue(tag, fieldPosition, subfieldIndex, newSubfieldCode, value,
-                          null, urHandler, modifySubfieldCode=true);
-      break;
-  case 'fieldTag':
-      updateFieldTag(oldTag, newTag, oldInd1, oldInd2, newInd1, newInd2, fieldPosition, null, urHandler);
-      break;
-  default:
-      if (bulkOperation) {
-          bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, oldSubfieldCode, newValue, null, urHandler, subfieldsToAdd, subfield_offset);
-      }
-      else {
-          updateSubfieldValue(tag, fieldPosition, subfieldIndex, oldSubfieldCode, value, null, urHandler);
-      }
+      case 'subfieldTag':
+          value = subfield_instance[1];
+          updateSubfieldValue(tag, fieldPosition, subfieldIndex, oldSubfieldCode, value,
+                              null, urHandler, modifySubfieldCode=true);
+          break;
+      case 'fieldTag':
+          updateFieldTag(oldTag, newTag, oldInd1, oldInd2, newInd1, newInd2, fieldPosition, null, urHandler);
+          break;
+      default:
+          if (bulkOperation) {
+              bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, oldSubfieldCode, newValue, null, urHandler, subfieldsToAdd, subfield_offset);
+          }
+          else {
+              updateSubfieldValue(tag, fieldPosition, subfieldIndex, oldSubfieldCode, value, null, urHandler);
+          }
   }
 
   var idPrefix;

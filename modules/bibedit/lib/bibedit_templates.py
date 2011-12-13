@@ -531,7 +531,6 @@ def page_style():
                 }
 
                 .ui-widget {
-                    /* font-family: Trebuchet MS,Tahoma,Verdana,Arial,sans-serif; */
                     font-size: .8em;
                 }
 

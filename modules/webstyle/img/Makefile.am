@@ -47,7 +47,7 @@ img_DATA = add-small.png \
            aid_to_other.png \
            aid_to_other_gray.png \
            ajax-loader.gif \
-           application_pdf.png \
+	         application_pdf.png \
            balloon_arrow_left_shadow.png \
            balloon_bottom_left_shadow.png \
            balloon_bottom_shadow.png \
@@ -79,6 +79,7 @@ img_DATA = add-small.png \
            drop_down_menu_arrow_down_lb.gif \
            drop_down_menu_arrow_down_w.gif \
            edit1.gif \
+           edit-paste.png \
            external-icon-light-8x8.gif \
            eye.png \
            feed-icon-12x12.gif \
@@ -145,6 +146,7 @@ img_DATA = add-small.png \
            rcorners-gray-1280x18.gif \
            rcorners-gray-1280x60-folded.gif \
            red_gradient.gif \
+           ref_extract.png \
            refresh.png \
            replace.png \
            restricted.gif \

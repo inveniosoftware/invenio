@@ -36,6 +36,7 @@ import urllib2
 from urllib import urlencode, quote_plus, quote, FancyURLopener
 from urlparse import urlparse
 from cgi import parse_qs, escape
+from md5 import md5
 
 try:
     import BeautifulSoup

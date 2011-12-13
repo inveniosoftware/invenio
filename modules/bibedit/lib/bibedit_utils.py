@@ -53,7 +53,7 @@ from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
     CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG, CFG_TMPSHAREDDIR, \
     CFG_BIBEDIT_QUEUE_CHECK_METHOD, \
-    CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE
+    CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE, CFG_INSPIRE_SITE
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.textutils import wash_for_xml
 from invenio.bibedit_dblayer import get_bibupload_task_opts, \
@@ -67,6 +67,8 @@ from invenio.webuser import get_user_info, getUid
 from invenio.dbquery import run_sql
 from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.access_control_engine import acc_authorize_action
+from invenio.refextract_api import extract_references_from_record_xml, \
+                                   extract_references_from_string_xml
 
 # Precompile regexp:
 re_file_option = re.compile(r'^%s' % CFG_TMPSHAREDDIR)
@@ -719,3 +721,40 @@ def merge_record_with_template(rec, template_name):
                                                field_get_subfield_values(template_field_instance,
                                                code)[0])
     return rec
+
+#################### Reference extraction ####################
+
+def replace_references(recid, txt=None, inspire=CFG_INSPIRE_SITE, uid=None):
+    """Replace references for a record
+
+    The record itself is not updated, the marc xml of the document with updated
+    references is returned
+
+    Parameters:
+    * recid: the id of the record
+    * txt: references in text mode
+    * inspire: format of ther references
+    """
+    # Parse references
+    if not txt:
+        references_xml = extract_references_from_record_xml(recid, inspire=inspire)
+    else:
+        references_xml = extract_references_from_string_xml(txt, inspire=inspire)
+    references = create_record(references_xml.encode('utf-8'))
+
+    dummy1, dummy2, record, dummy3, dummy4, dummy5, dummy6 = get_cache_file_contents(recid, uid)
+
+    if references[0]:
+        fields_to_add = record_get_field_instances(references[0],
+                                                   tag='999',
+                                                   ind1='%',
+                                                   ind2='%')
+        # Replace 999 fields
+        record_delete_fields(record, '999')
+        record_add_fields(record, '999', fields_to_add)
+        # Update record references
+        out_xml = record_xml_output(record)
+    else:
+        out_xml = None
+
+    return out_xml
