@@ -823,7 +823,13 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
 
 def page_start(req, of, cc, aas, ln, uid, title_message=None,
                description='', keywords='', recID=-1, tab='', p=''):
-    "Start page according to given output format."
+    """
+    Start page according to given output format.
+
+    @param title_message: title of the page, not escaped for HTML
+    @param description: description of the page, not escaped for HTML
+    @param keywords: keywords of the page, not escaped for HTML
+    """
     _ = gettext_set_language(ln)
 
     if not req or isinstance(req, cStringIO.OutputType):
@@ -886,7 +892,7 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
             # to the way perform_request_search() works, hb
             # (lowercase) is equal to hd)
             navtrail += ' <a class="navtrail" href="%s/%s/%s">%s</a>' % \
-                            (CFG_SITE_URL, CFG_SITE_RECORD, recID, title_message)
+                            (CFG_SITE_URL, CFG_SITE_RECORD, recID, cgi.escape(title_message))
             if (of != '' or of.lower() != 'hd') and of != 'hb':
                 # Export
                 format_name = of
@@ -900,12 +906,12 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
                 tab_label = get_detailed_page_tabs(cc, ln=ln)[tab]['label']
                 navtrail += ' &gt; ' + _(tab_label)
         else:
-            navtrail += title_message
+            navtrail += cgi.escape(title_message)
 
         if p:
             # we are serving search/browse results pages, so insert pattern:
             navtrail += ": " + cgi.escape(p)
-            title_message = cgi.escape(p) + " - " + title_message
+            title_message = p + " - " + title_message
 
         body_css_classes = []
         if cc:

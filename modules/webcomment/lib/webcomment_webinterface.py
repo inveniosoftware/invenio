@@ -232,7 +232,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             if navtrail:
                 navtrail += ' &gt; '
             navtrail += '<a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
-            navtrail += title
+            navtrail += cgi.escape(title)
             navtrail += '</a>'
             navtrail += ' &gt; <a class="navtrail">%s</a>' % (self.discussion==1 and _("Reviews") or _("Comments"))
 
@@ -419,7 +419,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             if navtrail:
                 navtrail += ' &gt; '
             navtrail += '<a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
-            navtrail += title
+            navtrail += cgi.escape(title)
             navtrail += '</a>'
             navtrail += '&gt; <a class="navtrail" href="%s/%s/%s/%s/?ln=%s">%s</a>' % (CFG_SITE_URL,
                                                                                            CFG_SITE_RECORD,

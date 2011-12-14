@@ -546,14 +546,18 @@ class Template:
         return CFG_SITE_URL + '/rss' + args
 
     def tmpl_record_page_header_content(self, req, recid, ln):
-        """ Provide extra information in the header of /CFG_SITE_RECORD pages """
+        """
+        Provide extra information in the header of /CFG_SITE_RECORD pages
+
+        Return (title, description, keywords), not escaped for HTML
+        """
 
         _ = gettext_set_language(ln)
 
         title = get_fieldvalues(recid, "245__a")
 
         if title:
-            title = cgi.escape(title[0])
+            title = title[0]
         else:
             title = _("Record") + ' #%d' % recid
 
@@ -562,7 +566,7 @@ class Template:
         description += "\n"
         description += '; '.join(get_fieldvalues(recid, "100__a") + get_fieldvalues(recid, "700__a"))
 
-        return [cgi.escape(x, True) for x in (title, description, keywords)]
+        return (title, description, keywords)
 
     def tmpl_navtrail_links(self, aas, ln, dads):
         """

@@ -117,9 +117,11 @@ class Template:
 
           - 'ln' *string* - The language to display
 
-          - 'description' *string* - description goes to the metadata in the header of the HTML page
+          - 'description' *string* - description goes to the metadata in the header of the HTML page,
+                                     not yet escaped for HTML
 
-          - 'keywords' *string* - keywords goes to the metadata in the header of the HTML page
+          - 'keywords' *string* - keywords goes to the metadata in the header of the HTML page,
+                                  not yet escaped for HTML
 
           - 'userinfobox' *string* - the HTML code for the user information box
 
@@ -147,7 +149,7 @@ class Template:
 
           - 'boxrightbottomadd' *string* - additional right-bottom box HTML code
 
-          - 'title' *string* - the title of the page
+          - 'title' *string* - the title of the page, not yet escaped for HTML
 
           - 'titleprologue' *string* - what to print before page title
 
@@ -255,11 +257,13 @@ class Template:
 
           - 'ln' *string* - The language to display
 
-          - 'headertitle' *string* - the second part of the page HTML title
+          - 'headertitle' *string* - the title of the HTML page, not yet escaped for HTML
 
-          - 'description' *string* - description goes to the metadata in the header of the HTML page
+          - 'description' *string* - description goes to the metadata in the header of the HTML page,
+                                     not yet escaped for HTML
 
-          - 'keywords' *string* - keywords goes to the metadata in the header of the HTML page
+          - 'keywords' *string* - keywords goes to the metadata in the header of the HTML page,
+                                  not yet escaped for HTML
 
           - 'userinfobox' *string* - the HTML code for the user information box
 
@@ -411,8 +415,8 @@ template function generated it.
 
           'sitesupportemail' : CFG_SITE_SUPPORT_EMAIL,
 
-          'description' : cgi.escape(description),
-          'keywords' : cgi.escape(keywords),
+          'description' : cgi.escape(description, True),
+          'keywords' : cgi.escape(keywords, True),
           'metaheaderadd' : metaheaderadd,
 
           'userinfobox' : userinfobox,
