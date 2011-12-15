@@ -745,7 +745,7 @@ class Template:
                 # do NOT delete the HTML comment below. It is used for parsing... (I plead unguilty!)
                 comments_rows += """
     <!-- start comment row -->
-    <div class="webcomment_comment_depth_%s">""" % (depth)
+    <div style="margin-left:%spx">""" % (depth*20)
                 delete_links = {}
                 if not reviews:
                     report_link = '%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/comments/report?ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/comments/display' % useful_dict % {'comid':comment[c_id]}
