@@ -37,7 +37,7 @@ function initMenu(){
     }
   });
   // Set the status.
-  $('#cellIndicator').html(img('/img/circle_green'));
+  $('#cellIndicator').html(img('/img/circle_green.png'));
   $('#cellStatus').text('Ready');
   // Bind button event handlers.
   $('#imgNewRecord').bind('click', onNewRecordClick);
