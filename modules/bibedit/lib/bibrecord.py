@@ -206,6 +206,8 @@ def record_get_field_instances(rec, tag="", ind1=" ", ind2=" "):
     @param code: a 1 character long string
     @return: a list of field tuples (Subfields, ind1, ind2, value,
         field_position_global) where subfields is list of (code, value)"""
+    if not rec:
+        return []
     if not tag:
         return rec.items()
     else:
