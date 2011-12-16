@@ -627,7 +627,7 @@ def create_Indico_request_url(base_url, indico_what, indico_loc, indico_id, indi
             my_digest_algo = sha1
         signature = hmac.new(indico_sig, url_to_sign, my_digest_algo).hexdigest()
         items.append(('signature', signature))
-    else:
+    elif not HASHLIB_IMPORTED:
         try:
             raise Exception("Module hashlib not installed. Please install it.")
         except:
