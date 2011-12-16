@@ -46,18 +46,19 @@ from invenio.messages import gettext_set_language
 re_image_pattern = re.compile(r'<img\s*(class=["\']imageScale["\'])*?\s*src="(?P<image>\S*)"\s*/>',
                               re.DOTALL | re.IGNORECASE | re.VERBOSE)
 
-yahoo_weather_rss_base_url = 'http://weather.yahooapis.com/forecastrss?p=%(location)s&u=%(degree_unit)s'
+yahoo_weather_rss_base_url = 'http://weather.yahooapis.com/forecastrss?w=%(location)s&u=%(degree_unit)s'
 
-def format_element(bfo, location='SZXX0008', degree_unit='c' ,
+def format_element(bfo, location='782041', degree_unit='c' ,
            display_weather_icon='false', weather_icon_only='false'):
     """
     Display the latest weather forecast from Yahoo Weather
+
+    (See http://developer.yahoo.com/weather/)
 
     @param location: Yahoo location code for the forecast
     @param degree_unit: Degree unit ('f'=Fahrenheit or 'c'=Celsius)
     @param display_weather_icon: if 'true', display weather icon inside the forecasts
     @param weather_icon_only: it 'true' display only the wheater icon (without text)
-
     """
     if not feedparser_available:
         return ""
