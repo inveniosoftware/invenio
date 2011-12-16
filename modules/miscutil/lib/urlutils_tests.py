@@ -35,7 +35,8 @@ from invenio.urlutils import \
      same_urls_p, \
      HASHLIB_IMPORTED, \
      wash_url_argument, \
-     create_url
+     create_url, \
+     create_Indico_request_url
 
 class TestWashUrlArgument(unittest.TestCase):
     def test_wash_url_argument(self):
@@ -137,6 +138,35 @@ class TestUrls(unittest.TestCase):
         # Check signature exists and is correct
         self.assertEqual(parse_qs(signed_aws_request_url_2)["Signature"],
                          ['TuM6E5L9u/uNqOX09ET03BXVmHLVFfJIna5cxXuHxiU='])
+
+        def test_signed_Indico_request_creation(self):
+            """urlutils - test creation of signed Indico requests"""
+
+            signed_Indico_request_url = create_Indico_request_url("https://indico.cern.ch",
+                                 "categ",
+                                 "",
+                                 [1, 7],
+                                 "xml",
+                                 {'onlypublic': 'yes',
+                                  'order': 'title',
+                                  'from': 'today',
+                                  'to': 'tomorrow'},
+                                 '00000000-0000-0000-0000-000000000000',
+                                 '00000000-0000-0000-0000-000000000000',
+                                  _timestamp=1234)
+
+            # Are we at least acccessing correct base url?
+            self.assert_(signed_Indico_request_url.startswith("https://indico.cern.ch/export/categ/1-7.xml?"))
+
+            # Check parameters
+            self.assertEqual(parse_qs(signed_Indico_request_url)["order"],
+                             ['title'])
+            self.assertEqual(parse_qs(signed_Indico_request_url)["timestamp"],
+                             ['1234'])
+
+            # Check signature exists and is correct
+            self.assertEqual(parse_qs(signed_Indico_request_url)["signature"],
+                             ['e984e0c683e36ce3544372f23a397fd2400f4954'])
 
     def test_same_urls_p(self):
         """urlutils - test checking URLs equality"""
