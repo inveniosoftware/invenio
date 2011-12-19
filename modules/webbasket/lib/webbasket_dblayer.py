@@ -1439,11 +1439,7 @@ def get_external_basket_info(bskid):
                 JOIN        usergroup_bskBASKET AS ugbsk
                 ON          bsk.id=ugbsk.id_bskBASKET
                 AND         ugbsk.id_usergroup=0
-                JOIN        user_bskBASKET AS ubsk
-                ON          bsk.id_owner!=ubsk.id_user
-                AND         bsk.id=ubsk.id_bskBASKET
-                WHERE       id=%s
-                GROUP BY    bsk.id"""
+                WHERE       id=%s"""
     params = (bskid,)
     res = run_sql(query, params)
 
