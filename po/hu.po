@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.99.3\n"
+"Project-Id-Version: CDS-Invenio 0.99.4\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2010-10-20 20:36+0200\n"
+"POT-Creation-Date: 2011-12-19 20:55+0100\n"
 "PO-Revision-Date: 2008-07-03 22:58+0200\n"
 "Last-Translator: Eva Papp <Eva.Papp@cern.ch>\n"
 "Language-Team: HU <cds.support@cern.ch>\n"
@@ -1015,8 +1015,9 @@ msgid "collection"
 msgstr ""
 
 #: modules/websearch/doc/admin/websearch-admin-guide.webdoc:21
+#, fuzzy
 msgid "WebSearch Admin Guide"
-msgstr ""
+msgstr "Keresési Útmutató"
 
 #: modules/websearch/doc/search-guide.webdoc:331
 #: modules/websearch/doc/search-guide.webdoc:367
@@ -1312,8 +1313,9 @@ msgid "Add to personal basket"
 msgstr ""
 
 #: modules/websubmit/doc/admin/websubmit-admin-guide.webdoc:21
+#, fuzzy
 msgid "WebSubmit Admin Guide"
-msgstr ""
+msgstr "Feltöltési Útmutató"
 
 #: modules/bibformat/etc/format_templates/Default_HTML_files.bft:4
 msgid "No fulltext"

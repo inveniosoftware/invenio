@@ -28,6 +28,9 @@ The CERN development group currently consists of:
      extension for the indexer.  Improvents to the task scheduler and
      session hander, etc.
 
+ - Ludmila Marian <ludmila.marian@gmail.com>
+     Fixes to several modules.
+
  - Chris Montarbaud <christiane.montarbaud@cern.ch>
      Multimedia and photo management.
 

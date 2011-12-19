@@ -1,43 +1,29 @@
 --------------------------------------------------------------------
-CDS Invenio v0.99.3 is released
-December 13, 2010
+CDS Invenio v0.99.4 is released
+December 19, 2011
 http://invenio-software.org/
 --------------------------------------------------------------------
 
-CDS Invenio v0.99.3 was released on December 13, 2010.
+CDS Invenio v0.99.4 was released on December 19, 2011.
 
 This is a minor bugfix release only.  It is recommended to all CDS
-Invenio sites using v0.99.2 or previous releases.
+Invenio sites using v0.99.3 or previous releases.
 
 What's new:
 -----------
 
- *) fixed issues in the harvesting daemon when harvesting from more
-    than one OAI repository (BibHarvest)
+ *) fixed double stemming during indexing (BibRank)
 
- *) fixed failure in formatting engine when dealing with
-    not-yet-existing records (BibFormat)
+ *) fixed collection translation in admin UI (WebSearch)
 
- *) fixed traversal of final URL parts in the URL dispatcher
-    (WebStyle)
-
- *) improved bibdocfile URL recognition upon upload of MARC files
-    (BibUpload)
-
- *) fixed bug in admin interface for adding authorizations (WebAccess)
-
- *) keyword extractor is now compatible with rdflib releases older
-    than 2.3.2 (BibClassify)
-
- *) output of `bibsched status' now shows the queue mode status as
-    AUTOMATIC or MANUAL to help queue monitoring (BibSched)
+ *) fixed UP and DOWN functions for UTF-8 strings (BibConvert)
 
 Download:
 ---------
 
-  <http://invenio-software.org/download/cds-invenio-0.99.3.tar.gz>
-  <http://invenio-software.org/download/cds-invenio-0.99.3.tar.gz.md5>
-  <http://invenio-software.org/download/cds-invenio-0.99.3.tar.gz.sig>
+  <http://invenio-software.org/download/cds-invenio-0.99.4.tar.gz>
+  <http://invenio-software.org/download/cds-invenio-0.99.4.tar.gz.md5>
+  <http://invenio-software.org/download/cds-invenio-0.99.4.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -47,18 +33,23 @@ Please follow the INSTALL file bundled in the distribution tarball.
 Upgrade notes:
 --------------
 
-If you are upgrading from CDS Invenio v0.99.2, then:
+If you are upgrading from CDS Invenio v0.99.3, then:
 
  - please stop your bibsched queue and your Apache server
 
  - install the update:
 
-     $ cd cds-invenio-0.99.3
+     $ cd cds-invenio-0.99.4
      $ cp -a /opt/cds-invenio/etc /opt/cds-invenio/etc.OLD
      $ sh /opt/cds-invenio/etc/build/config.nice
      $ make install
      $ /opt/cds-invenio/bin/inveniocfg --update-all
      $ cp -a /opt/cds-invenio/etc.OLD /opt/cds-invenio/etc
+
+ - in order to apply the double-stemming fix for the indexer,
+   reindexing of those indexes that use stemming is recommended:
+
+     $ bibindex -u admin --reindex
 
  - restart your Apache server and your bibsched queue
 

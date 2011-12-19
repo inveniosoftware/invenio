@@ -1,3 +1,34 @@
+CDS Invenio v0.99.4 (released 2011-12-19)
+=========================================
+
+2011-09-12  Samuele Kaplun  <samuele.kaplun@cern.ch>
+
+	BibIndex: fix double-stemming upon indexing
+	* In get_words_from_phrase(), certain phrases could have
+	  resulted in returning double-stemmed terms, thus causing
+	  these terms not to be correctly indexed.
+
+	* In order to fully apply the fix one have also to run
+
+	     $ bibindex --reindex
+
+	  on any index that is configured to use stemming.
+
+	Co-authored-by: Ludmila Marian <ludmila.marian@gmail.com>
+
+2011-08-30  Ludmila Marian  <ludmila.marian@gmail.com>
+
+	WebSearch: fix collection translation in admin UI
+	* Fixes collection translation in the admin interface
+	  when only one language is enabled for the site.
+
+2011-06-24  Ludmila Marian  <ludmila.marian@gmail.com>
+
+	BibConvert: fix UP and DOWN for UTF-8 strings
+	* Since Python lower and upper function are not correctly
+	  converting UTF-8 characters, a workaround is put in place
+	  by converting via Unicode.
+
 CDS Invenio v0.99.3 (released 2010-12-13)
 =========================================
 

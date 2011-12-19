@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.99.3\n"
+"Project-Id-Version: CDS-Invenio 0.99.4\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2010-10-20 20:36+0200\n"
+"POT-Creation-Date: 2011-12-19 20:55+0100\n"
 "PO-Revision-Date: 2008-02-29 14:34+0100\n"
 "Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
 "Language-Team: CS <cds.support@cern.ch>\n"
@@ -1017,8 +1017,9 @@ msgid "collection"
 msgstr "kolekce"
 
 #: modules/websearch/doc/admin/websearch-admin-guide.webdoc:21
+#, fuzzy
 msgid "WebSearch Admin Guide"
-msgstr ""
+msgstr "Administrace Přidávání"
 
 #: modules/websearch/doc/search-guide.webdoc:331
 #: modules/websearch/doc/search-guide.webdoc:367
