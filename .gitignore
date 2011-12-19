@@ -32,6 +32,7 @@ po/*.sed
 *.lib
 *.x86f
 modules/bibauthorid/bin/bibauthorid
+modules/bibcirculation/bin/bibcircd
 modules/bibclassify/bin/bibclassify
 modules/bibconvert/bin/bibconvert
 modules/bibedit/bin/bibedit

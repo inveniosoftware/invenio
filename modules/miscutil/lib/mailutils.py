@@ -90,8 +90,10 @@ def scheduled_send_email(fromaddr,
         toaddr = ','.join(toaddr)
     if user is None:
         user = fromaddr
+    if other_bibtasklet_arguments is None:
+        other_bibtasklet_arguments = ()
     return task_low_level_submission(
-        "bibtasklet", user, "-T", "bst_send_email"
+        "bibtasklet", user, "-T", "bst_send_email",
         "-a", "fromaddr=%s" % fromaddr,
         "-a", "toaddr=%s" % toaddr,
         "-a", "subject=%s" % subject,
@@ -398,4 +400,3 @@ def log(*error):
     _ = gettext_set_language(CFG_SITE_LANG)
     errors = get_msgs_for_code_list([error], 'error', CFG_SITE_LANG)
     register_errors(errors, 'error')
-
