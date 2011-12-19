@@ -22,32 +22,19 @@ Metadata insertion, extraction and processing for video files.
 """
 
 __revision__ = "$Id$"
-from invenio.bibtask import (
-                    write_message,
-                    task_update_progress,
-                    )
+
+import subprocess
+import re
+from xml.dom import minidom
+
+from invenio.jsonutils import json, json_decode_file
+from invenio.bibtask import write_message
 from invenio.bibencode_config import (
                         CFG_BIBENCODE_FFMPEG_METADATA_ARGUMENT,
                         CFG_BIBENCODE_FFMPEG_METADATA_SET_COMMAND,
                         CFG_BIBENCODE_PBCORE_MAPPINGS
                         )
-from invenio.bibencode_utils import (
-                        probe, getval, mediainfo, check_mediainfo_configuration,
-                        seconds_to_timecode, json_decode_file
-                        )
-## Simplejson fallback, will crash if v < 2.5 and no simplejson
-try:
-    import json
-except:
-    try:
-        import simplejson as json
-    except:
-        pass
-import subprocess
-import re
-from xml.dom import minidom
-from xml.dom.minidom import Document
-from invenio.bibconvert_xslt_engine import convert
+from invenio.bibencode_utils import probe, getval, mediainfo
 
 ## Stores metadata for the process. Many different functions in BibEncode
 ## need access to video metadata regularly. Because we dont pass objects arount

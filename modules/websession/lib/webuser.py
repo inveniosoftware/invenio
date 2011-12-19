@@ -128,7 +128,7 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
         if not uid:
             uid = getUid(req)
         try:
-            res = run_sql("SELECT email FROM user WHERE id=%s AND note=1" % uid)
+            res = run_sql("SELECT email FROM user WHERE id=%s AND note=1", (uid,))
 
             if res and res[0][0]:
                 if text:
@@ -224,6 +224,8 @@ def setUid(req, uid, remember_me=False):
     """
     if hasattr(req, '_user_info'):
         del req._user_info
+    session = get_session(req)
+    session.invalidate()
     session = get_session(req)
     session['uid'] = uid
     if remember_me:
@@ -1176,10 +1178,10 @@ def collect_user_info(req, login_time=False, refresh=False):
                 ## The user uses an external authentication method and it's a bit since
                 ## she has not performed a login
                 if not CFG_EXTERNAL_AUTH_USING_SSO or (
-                    is_req and req.is_https()):
-                    ## If we're using SSO we must be sure to be in HTTPS
+                    is_req and login_object.in_shibboleth(req)):
+                    ## If we're using SSO we must be sure to be in HTTPS and Shibboleth handler
                     ## otherwise we can't really read anything, hence
-                    ## it's better skeep the synchronization
+                    ## it's better skip the synchronization
                     try:
                         groups = login_object.fetch_user_groups_membership(user_info['email'], req=req)
                         # groups is a dictionary {group_name : group_description,}

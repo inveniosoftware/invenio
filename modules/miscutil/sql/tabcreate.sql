@@ -2667,7 +2667,7 @@ CREATE TABLE IF NOT EXISTS collection_collection (
 CREATE TABLE IF NOT EXISTS oaiREPOSITORY (
   id mediumint(9) unsigned NOT NULL auto_increment,
   setName varchar(255) NOT NULL default '',
-  setSpec varchar(255) NOT NULL default '',
+  setSpec varchar(255) NOT NULL default 'GLOBAL_SET',
   setCollection varchar(255) NOT NULL default '',
   setDescription text NOT NULL default '',
   setDefinition text NOT NULL default '',
@@ -2893,7 +2893,7 @@ CREATE TABLE IF NOT EXISTS publreq (
 CREATE TABLE IF NOT EXISTS session (
   session_key varchar(32) NOT NULL default '',
   session_expiry int(11) unsigned NOT NULL default '0',
-  session_object blob,
+  session_object longblob,
   uid int(15) unsigned NOT NULL,
   UNIQUE KEY session_key (session_key),
   KEY uid (uid)

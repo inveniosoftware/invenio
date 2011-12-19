@@ -29,7 +29,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_ETCDIR, \
      CFG_PREFIX
-from invenio.search_engine import perform_request_search, HitSet
+from invenio.search_engine import perform_request_search
 from invenio.bibrank_citation_indexer import get_citation_weight, print_missing, get_cit_dict, insert_into_cit_db
 from invenio.bibrank_downloads_indexer import *
 from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal, \
@@ -184,10 +184,10 @@ def single_tag_rank(config):
         task_sleep_now_if_required(can_stop_too=True)
         write_message("......Processing records #%s-%s" % (recids, recide))
         recs = run_sql("SELECT id_bibrec, value FROM bib%sx, bibrec_bib%sx WHERE tag=%%s AND id_bibxxx=id and id_bibrec >=%%s and id_bibrec<=%%s" % (tag[0:2], tag[0:2]), (tag, recids, recide))
-        valid = HitSet(trailing_bits=1)
+        valid = intbitset(trailing_bits=1)
         valid.discard(0)
         for key in tags:
-            newset = HitSet()
+            newset = intbitset()
             newset += [recid[0] for recid in (run_sql("SELECT id_bibrec FROM bib%sx, bibrec_bib%sx WHERE id_bibxxx=id AND tag=%%s AND id_bibxxx=id and id_bibrec >=%%s and id_bibrec<=%%s" % (tag[0:2], tag[0:2]), (key, recids, recide)))]
             valid.intersection_update(newset)
         if tags:
@@ -426,7 +426,7 @@ def get_valid_range(rank_method_code):
         recIDs = perform_request_search(c=l_of_colls)
     else:
         recIDs = []
-    valid = HitSet()
+    valid = intbitset()
     valid += recIDs
     return valid
 

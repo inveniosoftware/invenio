@@ -20,10 +20,11 @@
 
 import sys
 import os
+import re
 import cgi
 import inspect
 from fnmatch import fnmatch
-from urlparse import urlparse
+from urlparse import urlparse, urlunparse
 
 from wsgiref.validate import validator
 from wsgiref.util import FileWrapper, guess_scheme
@@ -34,13 +35,16 @@ if __name__ != "__main__":
     ## dependecies do this! (e.g. 4Suite)
     sys.stdout = sys.stderr
 
+from invenio.session import get_session
+from invenio.webinterface_handler import CFG_HAS_HTTPS_SUPPORT, CFG_FULL_HTTPS
 from invenio.webinterface_layout import invenio_handler
 from invenio.webinterface_handler_wsgi_utils import table, FieldStorage
 from invenio.webinterface_handler_config import \
     HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
     HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR
 from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
-    CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE, CFG_SITE_URL
+    CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE, CFG_SITE_URL, \
+    CFG_SITE_SECURE_URL
 from invenio.errorlib import register_exception, get_pretty_traceback
 
 ## Static files are usually handled directly by the webserver (e.g. Apache)
@@ -48,6 +52,21 @@ from invenio.errorlib import register_exception, get_pretty_traceback
 ## as when running wsgiref simple server), then this flag can be
 ## turned on (it is done automatically by wsgi_handler_test).
 CFG_WSGI_SERVE_STATIC_FILES = False
+
+
+## Magic regexp to search for usage of CFG_SITE_URL within src/href or
+## any src usage of an external website
+_RE_HTTPS_REPLACES = re.compile(r"\b((?:src\s*=|url\s*\()\s*[\"']?)http\://", re.I)
+
+def _http_replace_func(match):
+    ## src external_site -> CFG_SITE_SECURE_URL/sslredirect/external_site
+    return match.group(1) + CFG_SITE_SECURE_URL + '/sslredirect/'
+
+_ESCAPED_CFG_SITE_URL = cgi.escape(CFG_SITE_URL, True)
+_ESCAPED_CFG_SITE_SECURE_URL = cgi.escape(CFG_SITE_SECURE_URL, True)
+def https_replace(html):
+    html = html.replace(_ESCAPED_CFG_SITE_URL, _ESCAPED_CFG_SITE_SECURE_URL)
+    return _RE_HTTPS_REPLACES.sub(_http_replace_func, html)
 
 class InputProcessed(object):
     """
@@ -85,6 +104,11 @@ class SimulatedModPythonRequest(object):
         self.__write_error = False
         self.__errors = environ['wsgi.errors']
         self.__headers_in = table([])
+        self.__tainted = False
+        self.__is_https = int(guess_scheme(self.__environ) == 'https')
+        self.__replace_https = False
+        self.track_writings = False
+        self.__what_was_written = ""
         for key, value in environ.iteritems():
             if key.startswith('HTTP_'):
                 self.__headers_in[key[len('HTTP_'):].replace('_', '-')] = value
@@ -92,12 +116,12 @@ class SimulatedModPythonRequest(object):
             self.__headers_in['content-length'] = environ['CONTENT_LENGTH']
         if environ.get('CONTENT_TYPE'):
             self.__headers_in['content-type'] = environ['CONTENT_TYPE']
-        self.get_post_form()
 
     def get_wsgi_environ(self):
         return self.__environ
 
     def get_post_form(self):
+        self.__tainted = True
         post_form = self.__environ.get('wsgi.post_form')
         input = self.__environ['wsgi.input']
         if (post_form is not None
@@ -146,7 +170,15 @@ class SimulatedModPythonRequest(object):
             self.__bytes_sent += len(self.__buffer)
             try:
                 if not self.__write_error:
-                    self.__write(self.__buffer)
+                    if self.__replace_https:
+                        self.__write(https_replace(self.__buffer))
+                    else:
+                        self.__write(self.__buffer)
+                    if self.track_writings:
+                        if self.__replace_https:
+                            self.__what_was_written += https_replace(self.__buffer)
+                        else:
+                            self.__what_was_written += self.__buffer
             except IOError, err:
                 if "failed to write data" in str(err) or "client connection closed" in str(err):
                     ## Let's just log this exception without alerting the admin:
@@ -159,12 +191,16 @@ class SimulatedModPythonRequest(object):
 
     def set_content_type(self, content_type):
         self.__headers['content-type'] = content_type
+        if self.__is_https:
+            if content_type.startswith("text/html") or content_type.startswith("application/rss+xml"):
+                self.__replace_https = True
 
     def get_content_type(self):
         return self.__headers['content-type']
 
     def send_http_header(self):
         if not self.__response_sent_p:
+            self.__tainted = True
             if self.__allowed_methods and self.__status.startswith('405 ') or self.__status.startswith('501 '):
                 self.__headers['Allow'] = ', '.join(self.__allowed_methods)
 
@@ -256,13 +292,13 @@ class SimulatedModPythonRequest(object):
             del self.__headers['content-length']
 
     def is_https(self):
-        return int(guess_scheme(self.__environ) == 'https')
+        return self.__is_https
 
     def get_method(self):
         return self.__environ['REQUEST_METHOD']
 
     def get_hostname(self):
-        return self.__environ('HTTP_HOST', '')
+        return self.__environ.get('HTTP_HOST', '')
 
     def set_filename(self, filename):
         self.__filename = filename
@@ -318,6 +354,9 @@ class SimulatedModPythonRequest(object):
     def get_referer(self):
         return self.headers_in.get('referer')
 
+    def get_what_was_written(self):
+        return self.__what_was_written
+
     def __str__(self):
         from pprint import pformat
         out = ""
@@ -328,6 +367,18 @@ class SimulatedModPythonRequest(object):
             except:
                 pass
         return out
+
+    def get_original_wsgi_environment(self):
+        """
+        Return the original WSGI environment used to initialize this request
+        object.
+        @return: environ, start_response
+        @raise AssertionError: in case the environment has been altered, i.e.
+            either the input has been consumed or something has already been
+            written to the output.
+        """
+        assert not self.__tainted, "The original WSGI environment is tainted since at least req.write or req.form has been used."
+        return self.__environ, self.__start_response
 
     content_type = property(get_content_type, set_content_type)
     unparsed_uri = property(get_unparsed_uri)
@@ -349,6 +400,7 @@ class SimulatedModPythonRequest(object):
     remote_ip = property(get_remote_ip)
     remote_host = property(get_remote_host)
     referer = property(get_referer)
+    what_was_written = property(get_what_was_written)
 
 def alert_admin_for_server_status_p(status, referer):
     """
@@ -502,6 +554,27 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
                 ## have a file (Field) instance instead of a string.
                 form[key] = value
 
+        if (CFG_FULL_HTTPS or CFG_HAS_HTTPS_SUPPORT and get_session(req).need_https) and not req.is_https():
+            from invenio.urlutils import redirect_to_url
+            # We need to isolate the part of the URI that is after
+            # CFG_SITE_URL, and append that to our CFG_SITE_SECURE_URL.
+            original_parts = urlparse(req.unparsed_uri)
+            plain_prefix_parts = urlparse(CFG_SITE_URL)
+            secure_prefix_parts = urlparse(CFG_SITE_SECURE_URL)
+
+            # Compute the new path
+            plain_path = original_parts[2]
+            plain_path = secure_prefix_parts[2] + \
+                         plain_path[len(plain_prefix_parts[2]):]
+
+            # ...and recompose the complete URL
+            final_parts = list(secure_prefix_parts)
+            final_parts[2] = plain_path
+            final_parts[-3:] = original_parts[-3:]
+
+            target = urlunparse(final_parts)
+            redirect_to_url(req, target)
+
         try:
             return _check_result(req, module_globals[possible_handler](req, **form))
         except TypeError, err:
@@ -531,7 +604,6 @@ def check_wsgiref_testing_feasability():
     In order to use wsgiref for running Invenio, CFG_SITE_URL and
     CFG_SITE_SECURE_URL must not use HTTPS because SSL is not supported.
     """
-    from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
     if CFG_SITE_URL.lower().startswith('https'):
         print >> sys.stderr, """
 ERROR: SSL is not supported by the wsgiref simple server implementation.

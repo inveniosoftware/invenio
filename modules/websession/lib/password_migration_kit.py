@@ -138,7 +138,7 @@ def __check_admin(admin_pwd):
         return False
 
 def __creating_backup():
-    query = "CREATE TABLE user_backup (PRIMARY KEY id (id)) SELECT * FROM user"
+    query = "CREATE TABLE user_backup (PRIMARY KEY id (id)) SELECT id, email, password, note, settings, nickname, last_login FROM user"
     try:
         run_sql(query)
     except Exception, msg:

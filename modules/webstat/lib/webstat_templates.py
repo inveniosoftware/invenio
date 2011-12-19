@@ -22,9 +22,9 @@ import datetime, cgi, urllib, os
 from invenio.config import \
      CFG_WEBDIR, \
      CFG_SITE_URL, \
-     CFG_SITE_LANG
-
-from invenio.webstat_engine import xlwt_imported
+     CFG_SITE_LANG, \
+     CFG_SITE_NAME
+from invenio.search_engine import get_coll_sons
 from invenio.webstat_engine import get_invenio_error_details
 
 
@@ -39,14 +39,17 @@ class Template:
                      raw data can be exported for offline processing. Further on, a general
                      overview is presented below under the label Current System Health.</p>"""
 
-    def tmpl_system_health(self, health_statistics, ln=CFG_SITE_LANG):
+    def tmpl_system_health_list(self, ln=CFG_SITE_LANG):
         """
         Generates a box with current information from the system providing the administrator
         an easy way of overlooking the 'health', i.e. the current performance/efficency, of
         the system.
         """
-        out = """<h3>Current system health</h3>"""
+        return """<h3>Current system health</h3>
+            See <a href="%s/stats/system_health%s">current system health</a>""" % \
+            (CFG_SITE_URL, (CFG_SITE_LANG != ln and '?ln=' + ln) or '')
 
+    def tmpl_system_health(self, health_statistics, ln=CFG_SITE_LANG):
         temp_out = ""
         for statistic in health_statistics:
             if statistic is None:
@@ -58,9 +61,7 @@ class Template:
                             '.' * (85 - len(str(statistic[0])) - len(str(statistic[1]))) + \
                             str(statistic[1]) + '\n'
 
-        out += "<pre>" + temp_out + "</pre>"
-
-        return out
+        return "<pre>" + temp_out + "</pre>"
 
     def tmpl_keyevent_list(self, ln=CFG_SITE_LANG):
         """
@@ -70,26 +71,27 @@ class Template:
                   <p>Please choose a statistic from below to review it in detail.</p>
                   <ul>
                     <li><a href="%(CFG_SITE_URL)s/stats/collection_population%(ln_link)s">Collection population</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/new_records%(ln_link)s">New records</a></li>
                     <li><a href="%(CFG_SITE_URL)s/stats/search_frequency%(ln_link)s">Search frequency</a></li>
                     <li><a href="%(CFG_SITE_URL)s/stats/search_type_distribution%(ln_link)s">Search type distribution</a></li>
                     <li><a href="%(CFG_SITE_URL)s/stats/download_frequency%(ln_link)s">Download frequency</a></li>
                     <li><a href="%(CFG_SITE_URL)s/stats/comments_frequency%(ln_link)s">Comments frequency</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/number_of_loans%(ln_link)s">Number of loans</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/number_of_loans%(ln_link)s">Number of circulation loans</a></li>
                     <li><a href="%(CFG_SITE_URL)s/stats/web_submissions%(ln_link)s">Web submissions</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/loans_stats%(ln_link)s">Loan statistics</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/loans_lists%(ln_link)s">Loan lists</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/renewals_lists%(ln_link)s">Renewals lists</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/returns_table%(ln_link)s">Number of overdue returns</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/returns_graph%(ln_link)s">Percentage of overdue returns</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/ill_requests_stats%(ln_link)s">ILL Requests statistics</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/ill_requests_lists%(ln_link)s">ILL Requests list</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/ill_requests_graph%(ln_link)s">Percentage of satisfied ILL requests</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/items_stats%(ln_link)s">Items statistics</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/items_list%(ln_link)s">Items list</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/loans_requests%(ln_link)s">Hold requests statistics</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/loans_request_lists%(ln_link)s">Hold requests lists</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/user_stats%(ln_link)s">User statistics</a></li>
-                    <li><a href="%(CFG_SITE_URL)s/stats/user_lists%(ln_link)s">User lists</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/loans_stats%(ln_link)s">Circulation loan statistics</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/loans_lists%(ln_link)s">Circulation loan lists</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/renewals_lists%(ln_link)s">Circulation renewals lists</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/returns_table%(ln_link)s">Number of circulation overdue returns</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/returns_graph%(ln_link)s">Percentage of circulation overdue returns</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/ill_requests_stats%(ln_link)s">Circulation ILL Requests statistics</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/ill_requests_lists%(ln_link)s">Circulation ILL Requests list</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/ill_requests_graph%(ln_link)s">Percentage of satisfied circulation ILL requests</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/items_stats%(ln_link)s">Circulation items statistics</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/items_list%(ln_link)s">Circulation items list</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/loans_requests%(ln_link)s">Circulation hold requests statistics</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/loans_request_lists%(ln_link)s">Circulation hold requests lists</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/user_stats%(ln_link)s">Circulation user statistics</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/user_lists%(ln_link)s">Circulation user lists</a></li>
                   </ul>""" % {'CFG_SITE_URL': CFG_SITE_URL,
                               'ln_link': (CFG_SITE_LANG != ln and '?ln=' + ln) or ''}
 
@@ -172,21 +174,29 @@ class Template:
                  <ul><li><a href="%s/stats/custom_summary">Custom query summary</a></li></ul>
                  """ % CFG_SITE_URL
 
-    def tmpl_collection_stats_list(self, collections, ln=CFG_SITE_LANG):
+    def tmpl_collection_stats_main_list(self, ln=CFG_SITE_LANG):
         """
         Generates a list of available collections statistics.
         """
-        out = """<h3>Collections stats</h3>"""
+        out = """<h3>Collections stats</h3>
+                 <ul>"""
+        for coll in get_coll_sons(CFG_SITE_NAME):
+            out += """<li><a href="%s/stats/collections?%s">%s</a></li>""" \
+                        % (CFG_SITE_URL, urllib.urlencode({'collection': coll}) +
+                           ((CFG_SITE_LANG != ln and '&ln=' + ln) or ''), coll)
+        out += """<li><a href="%s/stats/collection_stats%s">Other collections</a></li>""" \
+                % (CFG_SITE_URL, (CFG_SITE_LANG != ln and '?ln=' + ln) or '')
+        return out + "</ul>"
 
-        temp_out = ""
+    def tmpl_collection_stats_complete_list(self, collections, ln=CFG_SITE_LANG):
+        if len(collections) == 0:
+            return self.tmpl_error("There are currently no collections available.", ln=ln)
+        temp_out = """<h4>Collections stats</h4>
+                 <ul>"""
         for coll in collections:
             temp_out += """<li><a href="%s/stats/collections?%s">%s</a></li>""" \
-                        % (CFG_SITE_URL, urllib.urlencode({'coll': coll[0]}), coll[1])
-        if len(collections) == 0:
-            out += self.tmpl_error("There are currently no collections available.", ln=ln)
-        else:
-            out += "<ul>" + temp_out + "</ul>"
-        return out
+                        % (CFG_SITE_URL, urllib.urlencode({'collection': coll[0]}), coll[1])
+        return temp_out + "</ul>"
 
     def tmpl_customevent_help(self, ln=CFG_SITE_LANG):
         """
@@ -234,7 +244,7 @@ class Template:
         """
         return """<div class="important">%s</div>""" % msg
 
-    def tmpl_keyevent_box(self, options, order, choosed, ln=CFG_SITE_LANG, excel=False):
+    def tmpl_keyevent_box(self, options, order, choosed, ln=CFG_SITE_LANG, list=False):
         """
         Generates a FORM box with dropdowns for keyevents.
 
@@ -249,7 +259,7 @@ class Template:
         """
         # Create the FORM's header
         formheader = """<form method="get">
-        <input type="hidden" name="ln"value="%s" />""" % ln
+        <input type="hidden" name="ln" value="%s" />""" % ln
 
         # Create the headers using the options permutation
         headers = [[options[param][1] for param in order]]
@@ -281,10 +291,10 @@ class Template:
         sels[0].append("""<input class="formbutton" type="submit"
         name="action_gen" value="Generate"/>""")
 
-        # Export to excel option
-        if excel and xlwt_imported:
+        # Export option
+        if list:
             sels[0].append("""<input class="formbutton" type="submit"
-            name="format" value="Excel"/>""")
+            name="format" value="Full list"/>""")
         # Create form footer
         formfooter = """</form>"""
 
@@ -579,6 +589,22 @@ class Template:
         except IOError:
             return "No data found"
 
+    def tmpl_display_numeric_stats(self, titles, avgs, maxs, mins):
+        """Display average, max and min values"""
+        if titles:
+            out = ""
+            for i in range(len(titles)):
+                out += """<em>%s</em><br />
+                          <b>Average:</b> %d<br />
+                          <b>Max:</b> %d<br />
+                          <b>Min:</b> %d<br />""" % (cgi.escape(titles[i]),
+                                                    avgs[i], maxs[i], mins[i])
+            return out
+        else:
+            return """<b>Average:</b> %d<br />
+                      <b>Max:</b> %d<br />
+                      <b>Min:</b> %d<br />""" % (avgs, maxs, mins)
+
     def tmpl_display_custom_summary(self, tag_name, data, title, query, tag,
                                     path, ln=CFG_SITE_LANG):
         """Display the custom summary (annual report)"""
@@ -620,12 +646,21 @@ Distribution across %s
 </tr>
 
 """ % (cgi.escape(tag_name), cgi.escape(tag_name[0].capitalize() + tag_name[1:]))
+        if len(query) > 0:
+            query += " and "
         for title, number in data:
-            out += """<tr>
+            if title in ('Others', 'TOTAL'):
+                out += """<tr>
 <td align="right">%d</td>
 <td>%s</td>
 </tr>
 """ % (number, cgi.escape(title))
+            else:
+                out += """<tr>
+<td align="right"><a href="%s/search?p=%s&ln=%s">%d</a></td>
+<td>%s</td>
+</tr>
+""" % (CFG_SITE_URL, cgi.escape(urllib.quote(query + " " + tag + ':"' + title + '"')), ln, number, cgi.escape(title))
         out += """</table></div>
 <div><img src="%s" /></div>""" % cgi.escape(path.replace(CFG_WEBDIR, CFG_SITE_URL))
         return out
@@ -780,15 +815,15 @@ Distribution across %s
                       <script language="javascript" type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui-1.7.3.custom.min.js"></script>
                       <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui-timepicker-addon.js"></script>
 
-                      <div id="selectDateTxt" onload style="position:relative;display:none">
+                      <div id="selectDateTxt" style="position:relative;display:none">
                       <table align="center">
                           <tr align="center">
                               <td align="right" class="searchboxheader">From: </td>
-                              <td align="left"><input type=text name="s_date" id="s_date" value="%(s_date)s" size="14"></td>
+                              <td align="left"><input type="text" name="s_date" id="s_date" value="%(s_date)s" size="14" /></td>
                           </tr>
                           <tr align="center">
                               <td align="right" class="searchboxheader">To: </td>
-                              <td align="left"><input type=text name="f_date" id="f_date" value="%(f_date)s" size="14"></td>
+                              <td align="left"><input type="text" name="f_date" id="f_date" value="%(f_date)s" size="14" /></td>
                           </tr>
                       </table>
                       </div>
@@ -832,6 +867,6 @@ Distribution across %s
 </script>
 
 
-<input type=text name="%s" onchange="checkNumber(this)" value="%s">""" % (name, preselected)
+<input type="text" name="%s" onchange="checkNumber(this)" value="%s" />""" % (name, preselected)
         else:
-            return """<input type=text name="%s" value="%s">""" % (name, preselected)
+            return """<input type="text" name="%s" value="%s" />""" % (name, preselected)

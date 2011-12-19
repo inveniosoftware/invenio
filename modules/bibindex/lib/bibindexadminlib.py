@@ -29,7 +29,7 @@ from invenio.bibrankadminlib import write_outcome, modify_translations, \
         get_def_name, get_name, get_languages, addadminbox, tupletotable, \
         createhiddenform
 from invenio.access_control_engine import acc_authorize_action
-from invenio.dbquery import run_sql, get_table_status_info
+from invenio.dbquery import run_sql, get_table_status_info, wash_table_column_name
 from invenio.bibindex_engine_stemmer import get_stemming_language_map
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -562,7 +562,7 @@ def perform_showdetailsfieldtag(fldID, tagID, ln=CFG_SITE_LANG, callback="yes", 
     tag = run_sql("SELECT value from tag where id=%s", (id_tag, ))
     tag = tag[0][0]
     for i in range(0, len(tag) - 1):
-        res = run_sql("SELECT id_field,id_tag FROM field_tag,tag WHERE tag.id=field_tag.id_tag AND tag.value=%s", ('%s%%' % tag[0:i], ))
+        res = run_sql("SELECT id_field,id_tag FROM field_tag,tag WHERE tag.id=field_tag.id_tag AND tag.value=%s", ('%' + tag[0:i] + '%',))
         for (id_field, id_tag) in res:
             output += "%s, " % fld_dict[int(id_field)]
             exist[id_field] = 1
@@ -1490,12 +1490,12 @@ def delete_idx(idxID):
         res = run_sql("DELETE FROM idxINDEX WHERE id=%s", (idxID, ))
         res = run_sql("DELETE FROM idxINDEXNAME WHERE id_idxINDEX=%s", (idxID, ))
         res = run_sql("DELETE FROM idxINDEX_field WHERE id_idxINDEX=%s", (idxID, ))
-        res = run_sql("DROP TABLE idxWORD%02dF" % idxID)
-        res = run_sql("DROP TABLE idxWORD%02dR" % idxID)
-        res = run_sql("DROP TABLE idxPAIR%02dF" % idxID)
-        res = run_sql("DROP TABLE idxPAIR%02dR" % idxID)
-        res = run_sql("DROP TABLE idxPHRASE%02dF" % idxID)
-        res = run_sql("DROP TABLE idxPHRASE%02dR" % idxID)
+        res = run_sql("DROP TABLE idxWORD%02dF" % idxID) # kwalitee: disable=sql
+        res = run_sql("DROP TABLE idxWORD%02dR" % idxID) # kwalitee: disable=sql
+        res = run_sql("DROP TABLE idxPAIR%02dF" % idxID) # kwalitee: disable=sql
+        res = run_sql("DROP TABLE idxPAIR%02dR" % idxID) # kwalitee: disable=sql
+        res = run_sql("DROP TABLE idxPHRASE%02dF" % idxID) # kwalitee: disable=sql
+        res = run_sql("DROP TABLE idxPHRASE%02dR" % idxID) # kwalitee: disable=sql
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -1716,7 +1716,7 @@ def switch_score(fldID, id_1, id_2):
         return (0, e)
 
 def get_lang_list(table, field, id):
-    langs = run_sql("select ln from %s where %s=%%s" % (table, field), (id, ))
+    langs = run_sql("SELECT ln FROM %s WHERE %s=%%s" % (wash_table_column_name(table), wash_table_column_name(field)), (id, )) # kwalitee: disable=sql
     exists = {}
     lang = ''
     for lng in langs:

@@ -115,7 +115,7 @@ def redirect_to_url(req, url, redirection_type=None, norobot=False):
           apache.HTTP_NOT_MODIFIED                 = 304
           apache.HTTP_USE_PROXY                    = 305
           apache.HTTP_TEMPORARY_REDIRECT           = 307
-    The default is apache.HTTP_TEMPORARY_REDIRECT
+    The default is apache.HTTP_MOVED_TEMPORARILY
     @param norobot: wether to instruct crawlers and robots such as GoogleBot
         not to index past this point.
     @see: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3

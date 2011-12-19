@@ -25,6 +25,8 @@ __revision__ = "$Id$"
 import unittest
 import re
 
+from cStringIO import StringIO
+
 from invenio import oai_repository_server
 from invenio.testutils import make_test_suite, run_test_suite
 
@@ -33,12 +35,16 @@ class TestVerbs(unittest.TestCase):
 
     def test_verbs(self):
         """oairepository - testing verbs"""
-        self.assertNotEqual(None, re.search("Identify", oai_repository_server.oaiidentify("", None)))
-        self.assertNotEqual(None, re.search("ListIdentifiers", oai_repository_server.oailistidentifiers("")))
-        self.assertNotEqual(None, re.search("ListRecords", oai_repository_server.oailistrecords("")))
-        self.assertNotEqual(None, re.search("ListMetadataFormats", oai_repository_server.oailistmetadataformats("")))
-        self.assertNotEqual(None, re.search("ListSets", oai_repository_server.oailistsets("")))
-        self.assertNotEqual(None, re.search("GetRecord", oai_repository_server.oaigetrecord("")))
+        self.assertNotEqual(None, re.search("Identify", oai_repository_server.oai_identify({'verb': 'Identify'})))
+        ret = StringIO()
+        oai_repository_server.oai_list_records_or_identifiers(ret, {'verb': 'ListIdentifiers', 'metadataPrefix': 'marcxml'})
+        self.assertNotEqual(None, re.search("ListIdentifiers", ret.getvalue()))
+        ret = StringIO()
+        oai_repository_server.oai_list_records_or_identifiers(ret, {'verb': 'ListRecords', 'metadataPrefix': 'marcxml'})
+        self.assertNotEqual(None, re.search("ListRecords", ret.getvalue()))
+        self.assertNotEqual(None, re.search("ListMetadataFormats", oai_repository_server.oai_list_metadata_formats({'verb': 'ListMetadataFormats'})))
+        self.assertNotEqual(None, re.search("ListSets", oai_repository_server.oai_list_sets({'verb': 'ListSets'})))
+        self.assertNotEqual(None, re.search("GetRecord", oai_repository_server.oai_get_record({'identifier': 'oai:atlantis.cern.ch:1', 'verb': 'GetRecord'})))
 
 
 class TestErrorCodes(unittest.TestCase):
@@ -47,46 +53,35 @@ class TestErrorCodes(unittest.TestCase):
     def test_issue_error_identify(self):
         """oairepository - testing error codes"""
 
-        self.assertNotEqual(None, re.search("badVerb", oai_repository_server.check_argd({'verb':"IllegalVerb"})))
-        self.assertNotEqual(None, re.search("badArgument", oai_repository_server.check_argd({'verb':"Identify",
-                                                                                      'test':"test"})))
-        self.assertNotEqual(None, re.search("badArgument", oai_repository_server.check_argd({'verb':"ListIdentifiers",
+        self.assertNotEqual([], [code for (code, dummy_text) in oai_repository_server.check_argd({'verb':"IllegalVerb"}) if code == 'badVerb'])
+        self.assertNotEqual([], [code for (code, dummy_text) in oai_repository_server.check_argd({'verb':"Identify",
+                                                                                      'test':"test"}) if code == 'badArgument'])
+        self.assertNotEqual([], [code for (code, dummy_text) in oai_repository_server.check_argd({'verb':"ListIdentifiers",
                                                                                       'metadataPrefix':"oai_dc",
                                                                                       'from':"some_random_date",
-                                                                                      'until':"some_random_date"})))
-        self.assertNotEqual(None, re.search("badArgument", oai_repository_server.check_argd({'verb':"ListIdentifiers",
+                                                                                      'until':"some_random_date"}) if code == 'badArgument'])
+        self.assertNotEqual([], [code for (code, dummy_text) in oai_repository_server.check_argd({'verb':"ListIdentifiers",
                                                                                       'metadataPrefix':"oai_dc",
                                                                                       'from':"2001-01-01",
-                                                                                      'until':"2002-01-01T00:00:00Z"})))
-        self.assertNotEqual(None, re.search("badArgument", oai_repository_server.check_argd({'verb':"ListIdentifiers"})))
-        self.assertNotEqual(None, re.search("cannotDisseminateFormat", oai_repository_server.check_argd({'verb':"ListIdentifiers",
-                                                                                                  'metadataPrefix':"illegal_mdp"})))
+                                                                                      'until':"2002-01-01T00:00:00Z"}) if code == 'badArgument'])
+        self.assertNotEqual([], [code for (code, dummy_text) in oai_repository_server.check_argd({'verb':"ListIdentifiers"}) if code == 'badArgument'])
+        self.assertNotEqual([], [code for (code, dummy_text) in oai_repository_server.check_argd({'verb':"ListIdentifiers",
+                                                                                                  'metadataPrefix':"illegal_mdp"}) if code == 'cannotDisseminateFormat'])
 
-        self.assertNotEqual(None, re.search("badArgument", oai_repository_server.check_argd({'verb':"ListIdentifiers",
+        self.assertNotEqual([], [code for (code, dummy_text) in oai_repository_server.check_argd({'verb':"ListIdentifiers",
                                                                                       'metadataPrefix':"oai_dc",
-                                                                                      'metadataPrefix':"oai_dc"})))
-        self.assertNotEqual(None, re.search("badArgument", oai_repository_server.check_argd({'verb':"ListRecords",
+                                                                                      'metadataPrefix':"oai_dc"}) if code == 'badArgument'])
+        self.assertNotEqual([], [code for (code, dummy_text) in oai_repository_server.check_argd({'verb':"ListRecords",
                                                                                       'metadataPrefix':"oai_dc",
                                                                                       'set':"really_wrong_set",
                                                                                       'from':"some_random_date",
-                                                                                      'until':"some_random_date"})))
-        self.assertNotEqual(None, re.search("badArgument", oai_repository_server.check_argd({'verb':"ListRecords"})))
+                                                                                      'until':"some_random_date"}) if code == 'badArgument'])
+        self.assertNotEqual([], [code for (code, dummy_text) in oai_repository_server.check_argd({'verb':"ListRecords"}) if code == 'badArgument'])
 
-class TestEncodings(unittest.TestCase):
-    """Test for OAI response encodings."""
-
-    def test_encoding(self):
-        """oairepository - testing encodings"""
-
-        self.assertEqual("&lt;&amp;>", oai_repository_server.encode_for_xml("<&>"))
-        self.assertEqual("%20", oai_repository_server.escape_space(" "))
-        self.assertEqual("%25%20%3F%23%3D%26%2F%3A%3B%2B", oai_repository_server.encode_for_url("% ?#=&/:;+"))
-
-
+        self.assertNotEqual([], [code for (code, dummy_text) in oai_repository_server.check_argd({'verb': 'ListRecords', 'resumptionToken': ''}) if code == 'badResumptionToken'])
 
 TEST_SUITE = make_test_suite(TestVerbs,
-                             TestErrorCodes,
-                             TestEncodings,)
+                             TestErrorCodes)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

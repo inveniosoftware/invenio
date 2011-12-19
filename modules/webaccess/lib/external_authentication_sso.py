@@ -84,6 +84,13 @@ class ExternalAuthSSO(ExternalAuth):
         self.egroup_cache = None
 
 
+    def in_shibboleth(self, req):
+        """
+        Return True if the current request handler is actually under
+        Shibboleth control.
+        """
+        return req.subprocess_env.has_key(CFG_EXTERNAL_AUTH_SSO_EMAIL_VARIABLE)
+
     def auth_user(self, username, password, req=None):
         """
         Check USERNAME and PASSWORD against the SSO system.

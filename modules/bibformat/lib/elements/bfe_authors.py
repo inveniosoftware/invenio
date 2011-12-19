@@ -20,6 +20,11 @@
 """
 __revision__ = "$Id$"
 
+from urllib import quote
+from cgi import escape
+from invenio.config import CFG_SITE_URL
+from invenio.messages import gettext_set_language
+
 def format_element(bfo, limit, separator=' ; ',
            extension='[...]',
            print_links="yes",
@@ -42,11 +47,6 @@ def format_element(bfo, limit, separator=' ; ',
     @param interactive: if yes, enable user to show/hide authors when there are too many (html + javascript)
     @param highlight: highlights authors corresponding to search query if set to 'yes'
     """
-    from urllib import quote
-    from cgi import escape
-    from invenio.config import CFG_SITE_URL
-    from invenio.messages import gettext_set_language
-
     _ = gettext_set_language(bfo.lang)    # load the right message language
 
     authors = []
@@ -76,7 +76,7 @@ def format_element(bfo, limit, separator=' ; ',
                                   '&amp;ln=' + bfo.lang + \
                                   '">' + escape(author['a']) + '</a>'
                 else:
-                    author['a'] = '<a href="' + CFG_SITE_URL + \
+                    author['a'] = '<a rel="author" href="' + CFG_SITE_URL + \
                                   '/author/' + quote(author['a']) + \
                                   '?recid=' +  bibrec_id + \
                                   '&ln=' + bfo.lang + \

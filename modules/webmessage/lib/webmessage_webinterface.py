@@ -50,7 +50,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
     def index(self, req, form):
         """ The function called by default
         """
-        redirect_to_url(req, "%s/yourmessages/display?%s" % (CFG_SITE_URL, req.args))
+        redirect_to_url(req, "%s/yourmessages/display?%s" % (CFG_SITE_SECURE_URL, req.args))
 
     def display(self, req, form):
         """
@@ -71,7 +71,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/display%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -124,7 +124,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/write%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -218,7 +218,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/send%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -293,7 +293,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/delete%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -339,7 +339,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/delete_all%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -385,7 +385,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/display_msg%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 

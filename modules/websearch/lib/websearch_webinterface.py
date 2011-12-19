@@ -265,16 +265,17 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         self.personid = -1
         self.authorname = " "
         self.person_data_available = False
+        self.must_fallback_on_person_search = False
         self.person_search_results = None
-        self.cache_supported = False
-        self.pt = None
+        self.search_query = None
         try:
-            import bibauthorid_personid_tables_utils as pt
+            import invenio.bibauthorid_searchinterface as pt
             self.cache_supported = True
             self.pt = pt
         except ImportError:
             self.cache_supported = False
-        self.pt = pt
+            self.pt = None
+            raise AssertionError
 
     def _lookup(self, component, path):
         """This handler parses dynamic URLs (/author/John+Doe)."""
@@ -354,13 +355,13 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             from invenio.bibauthorid_webapi import get_person_redirect_link
             from invenio.bibauthorid_webapi import is_valid_canonical_id
             from invenio.bibauthorid_webapi import get_personid_status_cacher
-            from invenio.bibauthorid_utils import create_normalized_name
-            from invenio.bibauthorid_utils import split_name_parts
+            from invenio.bibauthorid_name_utils import create_normalized_name
+            from invenio.bibauthorid_name_utils import split_name_parts
 #            from invenio.bibauthorid_config import CLAIMPAPER_CLAIM_OTHERS_PAPERS
             from invenio.bibauthorid_config import AID_ENABLED
             from invenio.bibauthorid_config import AID_ON_AUTHORPAGES
             bibauthorid_template = invenio.template.load('bibauthorid')
-            import bibauthorid_personid_tables_utils as pt
+            import bibauthorid_searchinterface as pt
             is_bibauthorid = True
         except ImportError:
             return self.create_authorpage(req, form)
@@ -396,7 +397,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         # Start the page in clean manner:
         req.content_type = "text/html"
         req.send_http_header()
-        req.write(pageheaderonly(req=req, title=title_message,
+        req.write(pageheaderonly(req=req, title=title_message, uid=getUid(req),
                                  metaheaderadd=metaheaderadd, language=ln))
         req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
         req.write(page_content)
@@ -441,7 +442,6 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
         if self.personid > -1:
             return
-
         #check if it is a canonical ID (e.g. Ellis_J_1):
         if is_bibauthorid and is_valid_canonical_id(self.pageparam):
             try:
@@ -497,7 +497,8 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                 self.personid = test_results[0][0]
             else:
                 self.person_search_results = sorted_results
-
+                self.search_query = nquery
+                self.must_fallback_on_person_search = True
 
     def create_authorpage(self, req, form, return_html=False):
         '''
@@ -526,8 +527,8 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             from invenio.bibauthorid_webapi import get_person_redirect_link
             from invenio.bibauthorid_webapi import is_valid_canonical_id
             from invenio.bibauthorid_webapi import get_personid_status_cacher
-            from invenio.bibauthorid_utils import create_normalized_name
-            from invenio.bibauthorid_utils import split_name_parts
+            from invenio.bibauthorid_name_utils import create_normalized_name
+            from invenio.bibauthorid_name_utils import split_name_parts
 #            from invenio.bibauthorid_config import CLAIMPAPER_CLAIM_OTHERS_PAPERS
             from invenio.bibauthorid_config import AID_ENABLED
             from invenio.bibauthorid_config import AID_ON_AUTHORPAGES
@@ -542,6 +543,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             is_bibauthorid = False
 
         from operator import itemgetter
+        import time
 
         argd = wash_urlargd(form,
                             {'ln': (str, CFG_SITE_LANG),
@@ -590,8 +592,8 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         if is_bibauthorid:
             self.resolve_personid(param_recid)
 
-            if self.person_search_results:
-                if bibauthorid_template and nquery:
+            if self.must_fallback_on_person_search:
+                if bibauthorid_template and self.search_query:
                     authors = []
 
                     for results in self.person_search_results:
@@ -603,7 +605,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                                         authorpapers[0:4]])
 
                     srch = bibauthorid_template.tmpl_author_search
-                    body = srch(nquery, authors, author_pages_mode=True)
+                    body = srch(self.search_query, authors, author_pages_mode=True)
 
                     if return_html:
                         html.append(body)
@@ -611,6 +613,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                     else:
                         req.write(body)
                         return
+        import time
         # start page
 #        req.content_type = "text/html"
 #        req.send_http_header()
@@ -1044,7 +1047,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
-                    make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
+                    make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_SECURE_URL + req.unparsed_uri}, {})
             return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -1214,7 +1217,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                         if coll_recids & recids:
                             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : collname})
                             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
-                                    make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
+                                    make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_SECURE_URL + req.unparsed_uri}, {})
                             return redirect_to_url(req, target, norobot=True)
                     elif auth_code:
                         return page_not_authorized(req, "../", \
@@ -1231,7 +1234,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                 if auth_code and user_info['email'] == 'guest':
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
-                            make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
+                            make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_SECURE_URL + req.unparsed_uri}, {})
                     return redirect_to_url(req, target, norobot=True)
                 elif auth_code:
                     return page_not_authorized(req, "../", \
@@ -1278,7 +1281,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                 if auth_code and user_info['email'] == 'guest':
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
-                            make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
+                            make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_SECURE_URL + req.unparsed_uri}, {})
                     return redirect_to_url(req, target, norobot=True)
                 elif auth_code:
                     return page_not_authorized(req, "../", \
@@ -1419,6 +1422,10 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             try:
                 if CFG_WEBSEARCH_USE_ALEPH_SYSNOS:
                     # let us try to recognize /<CFG_SITE_RECORD>/<SYSNO> style of URLs:
+                    # check for SYSNOs with an embedded slash; needed for [ARXIVINV-15]
+                    if len(path) > 1 and get_mysql_recid_from_aleph_sysno(path[0] + "/" + path[1]):
+                        path[0] = path[0] + "/" + path[1]
+                        del path[1]
                     x = get_mysql_recid_from_aleph_sysno(path[0])
                     if x:
                         recid = x
@@ -1470,6 +1477,13 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 #return WebInterfaceRecordRestrictedPages(recid, tab, format), path[1:]
             #else:
             return WebInterfaceRecordPages(recid, tab, format), path[1:]
+        elif component == 'sslredirect':
+            ## Fallback solution for sslredirect special path that should
+            ## be rather implemented as an Apache level redirection
+            def redirecter(req, form):
+                real_url = "http://" + '/'.join(path)
+                redirect_to_url(req, real_url)
+            return redirecter, []
 
         return None, []
 
@@ -1669,7 +1683,7 @@ def display_collection(req, c, aas, verbose, ln):
         rssurl += '?' + '&amp;'.join(rssurl_params)
 
     if 'hb' in CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS:
-        metaheaderadd = get_mathjax_header()
+        metaheaderadd = get_mathjax_header(req.is_https())
     else:
         metaheaderadd = ''
 
@@ -1715,7 +1729,7 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
                 if auth_code and user_info['email'] == 'guest':
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
-                            make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
+                            make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_SECURE_URL + req.unparsed_uri}, {})
                     return redirect_to_url(req, target, norobot=True)
                 elif auth_code:
                     return page_not_authorized(req, "../", \
@@ -1864,7 +1878,7 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
         if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
-                    make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
+                    make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_SECURE_URL + req.unparsed_uri}, {})
             return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \

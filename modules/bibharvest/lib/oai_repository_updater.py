@@ -23,8 +23,6 @@
 
 """
 
-__revision__ = "$Id$"
-
 import os
 import sys
 import time
@@ -35,17 +33,19 @@ if sys.hexversion < 0x2040000:
     # pylint: enable=W0622
 
 from tempfile import mkstemp
+from pprint import pformat
 
 from invenio.config import \
      CFG_OAI_ID_FIELD, \
      CFG_OAI_ID_PREFIX, \
      CFG_OAI_SET_FIELD, \
-     CFG_BINDIR, \
+     CFG_OAI_PREVIOUS_SET_FIELD, \
      CFG_SITE_NAME, \
      CFG_TMPDIR
-from invenio.search_engine import perform_request_search, get_record
-from invenio.search_engine_utils import get_fieldvalues
-from invenio.intbitset import intbitset as HitSet
+from invenio.oai_repository_config import CFG_OAI_REPOSITORY_MARCXML_SIZE, \
+     CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
+from invenio.search_engine import perform_request_search, get_record, search_unit_in_bibxxx
+from invenio.intbitset import intbitset
 from invenio.dbquery import run_sql
 from invenio.bibtask import \
      task_get_option, \
@@ -53,21 +53,13 @@ from invenio.bibtask import \
      write_message, \
      task_update_progress, \
      task_init, \
-     task_sleep_now_if_required
+     task_sleep_now_if_required, \
+     task_low_level_submission
 from invenio.bibrecord import \
-     record_delete_subfield, \
-     field_xml_output
-
-DATAFIELD_SET_HEAD = \
-                   "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">" % \
-                   (CFG_OAI_SET_FIELD[0:3],
-                    CFG_OAI_SET_FIELD[3:4].replace('_', ' '),
-                    CFG_OAI_SET_FIELD[4:5].replace('_', ' '))
-DATAFIELD_ID_HEAD  = \
-                  "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">" % \
-                  (CFG_OAI_ID_FIELD[0:3],
-                   CFG_OAI_ID_FIELD[3:4].replace('_', ' '),
-                   CFG_OAI_ID_FIELD[4:5].replace('_', ' '))
+     record_get_field_value, \
+     record_get_field_values, \
+     record_add_field, \
+     record_xml_output
 
 def get_set_definitions(set_spec):
     """
@@ -85,6 +77,7 @@ def get_set_definitions(set_spec):
         params = parse_set_definition(set_definition)
         params['setSpec'] = set_spec
         params['setName'] = set_name
+
         set_definitions.append(params)
     return set_definitions
 
@@ -126,14 +119,14 @@ def all_set_specs():
 
 def get_recids_for_set_spec(set_spec):
     """
-    Returns the list (as HitSet) of recids belonging to 'set'
+    Returns the list (as intbitset) of recids belonging to 'set'
 
     Parameters:
 
       set_spec - *str* the set_spec for which we would like to get the
                  recids
     """
-    recids = HitSet()
+    recids = intbitset()
 
     for set_def in get_set_definitions(set_spec):
         new_recids = perform_request_search(c=[coll.strip() \
@@ -151,7 +144,7 @@ def get_recids_for_set_spec(set_spec):
                                             m3=set_def['m3'],
                                             ap=0)
 
-        recids = recids.union(HitSet(new_recids))
+        recids |= intbitset(new_recids)
 
     return recids
 
@@ -175,7 +168,7 @@ def get_set_name_for_set_spec(set_spec):
     else:
         return ""
 
-def print_repository_status(write_message=write_message,
+def print_repository_status(local_write_message=write_message,
                             verbose=0):
     """
     Prints the repository status to the standard output.
@@ -196,17 +189,17 @@ def print_repository_status(write_message=write_message,
                          definitions. Precise, but ~slow...
     """
     repository_size_s = "%d" % repository_size()
-    repository_recids_after_update = HitSet()
+    repository_recids_after_update = intbitset()
 
-    write_message(CFG_SITE_NAME)
-    write_message(" OAI Repository Status")
+    local_write_message(CFG_SITE_NAME)
+    local_write_message(" OAI Repository Status")
 
     set_spec_max_length = 19 # How many max char do we display for
     set_name_max_length = 20 # setName and setSpec?
 
     if verbose == 0:
         # Just print repository size
-        write_message("  Total(**)" + " " * 29 +
+        local_write_message("  Total(**)" + " " * 29 +
                       " " * (9 - len(repository_size_s)) + repository_size_s)
         return
     elif verbose == 1:
@@ -214,17 +207,17 @@ def print_repository_status(write_message=write_message,
         set_spec_max_length = 30
         set_name_max_length = 30
 
-    write_message("=" * 80)
+    local_write_message("=" * 80)
     header = "  setSpec" + " " * (set_spec_max_length - 7) + \
              "  setName" + " " * (set_name_max_length - 5) + " Volume"
     if verbose > 1:
         header += " " * 5 + "After update(*):"
-    write_message(header)
+    local_write_message(header)
 
     if verbose > 1:
-        write_message(" " * 57 + "Additions  Deletions")
+        local_write_message(" " * 57 + "Additions  Deletions")
 
-    write_message("-" * 80)
+    local_write_message("-" * 80)
 
     for set_spec in all_set_specs():
 
@@ -236,32 +229,22 @@ def print_repository_status(write_message=write_message,
             # repository has some records coming from external
             # sources, or if it has never been synchronized with this
             # tool.
-            current_recids = perform_request_search(c=CFG_SITE_NAME,
-                                                    p1=set_spec,
-                                                    f1=CFG_OAI_SET_FIELD,
-                                                    m1="e", ap=0)
+            current_recids = get_recids_for_set_spec(set_spec)
             nb_current_recids = len(current_recids)
         else:
             # Get the records that are *currently* exported for this
             # setSpec
-            current_recids = perform_request_search(c=CFG_SITE_NAME,
-                                                    p1=set_spec,
-                                                    f1=CFG_OAI_SET_FIELD,
-                                                    m1="e", ap=0, op1="a",
-                                                    p2="oai:*",
-                                                    f2=CFG_OAI_ID_FIELD,
-                                                    m2="e")
+            current_recids = search_unit_in_bibxxx(p=set_spec, f=CFG_OAI_SET_FIELD, type='e')
             nb_current_recids = len(current_recids)
             # Get the records that *should* be in this set according to
             # the admin defined settings, and compute how many should be
             # added or removed
             should_recids = get_recids_for_set_spec(set_spec)
-            repository_recids_after_update = repository_recids_after_update.union(should_recids)
+            repository_recids_after_update |= should_recids
 
-            nb_add_recids = len(HitSet(should_recids).difference(HitSet(current_recids)))
-            nb_remove_recids = len(HitSet(current_recids).difference(HitSet(should_recids)))
+            nb_add_recids = len(should_recids -  current_recids)
+            nb_remove_recids = len(current_recids - should_recids)
             nb_should_recids = len(should_recids)
-            nb_recids_after_update = len(repository_recids_after_update)
 
 
         # Adapt setName and setSpec strings lengths
@@ -281,30 +264,26 @@ def print_repository_status(write_message=write_message,
                 " " * max(9 - len(str(nb_add_recids)), 0) + '+' + str(nb_add_recids) + \
                 " " * max(7 - len(str(nb_remove_recids)), 0) + '-' + str(nb_remove_recids) + " = " +\
                 " " * max(7 - len(str(nb_should_recids)), 0) + str(nb_should_recids)
-        write_message(row)
+        local_write_message(row)
 
-    write_message("=" * 80)
+    local_write_message("=" * 80)
     footer = "  Total(**)" + " " * (set_spec_max_length + set_name_max_length - 7) + \
              " " * (9 - len(repository_size_s)) + repository_size_s
     if verbose > 1:
-        footer += ' ' * (28 - len(str(nb_recids_after_update))) + str(nb_recids_after_update)
-    write_message(footer)
+        footer += ' ' * (28 - len(str(len(repository_recids_after_update)))) + str(len(repository_recids_after_update))
+    local_write_message(footer)
 
     if verbose > 1:
-        write_message('  *The "after update" columns show the repository after you run this tool.')
+        local_write_message('  *The "after update" columns show the repository after you run this tool.')
     else:
-        write_message(' *"Volume" is indicative if repository is out of sync. Use --detailed-report.')
-    write_message('**The "total" is not the sum of the above numbers, but the union of the records.')
+        local_write_message(' *"Volume" is indicative if repository is out of sync. Use --detailed-report.')
+    local_write_message('**The "total" is not the sum of the above numbers, but the union of the records.')
 
 def repository_size():
-    "Read repository size"
-    return len(perform_request_search(p1="oai:*",
-                                      f1=CFG_OAI_ID_FIELD,
-                                      m1="e",
-                                      ap=0))
+    """Read repository size"""
+    return len(search_unit_in_bibxxx(p="*", f=CFG_OAI_SET_FIELD, type="e"))
 
 ### MAIN ###
-
 def oairepositoryupdater_task():
     """Main business logic code of oai_archive"""
     no_upload = task_get_option("no_upload")
@@ -314,26 +293,51 @@ def oairepositoryupdater_task():
         print_repository_status(verbose=report)
         return True
 
+    initial_snapshot = {}
+    for set_spec in all_set_specs():
+        initial_snapshot[set_spec] = get_set_definitions(set_spec)
+    write_message("Initial set snapshot: %s" % pformat(initial_snapshot), verbose=2)
+
     task_update_progress("Fetching records to process")
 
-    # Build the list of records to be processed, that is, search for
-    # the records that match one of the search queries defined in OAI
-    # Repository admin interface.
-    recids_for_set = {} # Remember exactly which record belongs to which set
-    recids = HitSet() # "Flat" set of the recids_for_set values
-    for set_spec in all_set_specs():
-        task_sleep_now_if_required(can_stop_too=True)
-        _recids = get_recids_for_set_spec(set_spec)
-        recids_for_set[set_spec] = _recids
-        recids = recids.union(_recids)
+    recids_with_oaiid = search_unit_in_bibxxx(p='*', f=CFG_OAI_ID_FIELD, type='e')
+    write_message("%s recids have an OAI ID" % len(recids_with_oaiid), verbose=2)
 
-    # Also get the list of records that are currently exported through
-    # OAI and that might need to be refreshed
-    oai_recids = perform_request_search(c=CFG_SITE_NAME,
-                                        p1='oai:%s:*' % CFG_OAI_ID_PREFIX,
-                                        f1=CFG_OAI_ID_FIELD,
-                                        m1="e", ap=0)
-    recids = recids.union(HitSet(oai_recids))
+    all_current_recids = search_unit_in_bibxxx(p='*', f=CFG_OAI_SET_FIELD, type='e')
+    no_more_exported_recids = intbitset(all_current_recids)
+    write_message("%s recids are currently exported" % (len(all_current_recids)), verbose=2)
+
+    all_affected_recids = intbitset()
+    all_should_recids = intbitset()
+    recids_for_set = {}
+    for set_spec in all_set_specs():
+        if not set_spec:
+            set_spec = CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
+        should_recids = get_recids_for_set_spec(set_spec)
+        recids_for_set[set_spec] = should_recids
+        no_more_exported_recids -= should_recids
+        all_should_recids |= should_recids
+        current_recids = search_unit_in_bibxxx(p=set_spec, f=CFG_OAI_SET_FIELD, type='e')
+        write_message("%s recids should be in %s. Currently %s are in %s" % (len(should_recids), set_spec, len(current_recids), set_spec), verbose=2)
+        to_add = should_recids - current_recids
+        write_message("%s recids should be added to %s" % (len(to_add), set_spec), verbose=2)
+        to_remove = current_recids - should_recids
+        write_message("%s recids should be removed from %s" % (len(to_remove), set_spec), verbose=2)
+        affected_recids = to_add | to_remove
+        write_message("%s recids should be hence updated for %s" % (len(affected_recids), set_spec), verbose=2)
+        all_affected_recids |= affected_recids
+
+    missing_oaiid = all_should_recids - recids_with_oaiid
+    write_message("%s recids are missing an oaiid" % len(missing_oaiid))
+    write_message("%s recids should no longer be exported" % len(no_more_exported_recids))
+
+    ## Let's add records with missing OAI ID
+    all_affected_recids |= missing_oaiid | no_more_exported_recids
+    write_message("%s recids should updated" % (len(all_affected_recids)), verbose=2)
+
+    if not all_affected_recids:
+        write_message("Nothing to do!")
+        return True
 
     # Prepare to save results in a tmp file
     (fd, filename) = mkstemp(dir=CFG_TMPDIR,
@@ -341,143 +345,97 @@ def oairepositoryupdater_task():
                                   time.strftime("%Y%m%d_%H%M%S_",
                                                 time.localtime()))
     oai_out = os.fdopen(fd, "w")
-    oai_out.write('<collection>')
-    has_updated_records = False
+    oai_out.write("<collection>")
+
+    tot = 0
     # Iterate over the recids
-    i = 0
-    for recid in recids:
-        i += 1
+    for i, recid in enumerate(all_affected_recids):
         task_sleep_now_if_required(can_stop_too=True)
         task_update_progress("Done %s out of %s records." % \
-                             (i, len(recids)))
+                             (i, len(all_affected_recids)))
+
+        write_message("Elaborating recid %s" % recid, verbose=3)
+        record = get_record(recid)
+        if not record:
+            write_message("Record %s seems empty. Let's skip it." % recid, verbose=3)
+            continue
+        new_record = {}
 
         # Check if an OAI identifier is already in the record or
         # not.
-        oai_id_entry = "<subfield code=\"%s\">oai:%s:%s</subfield>\n" % \
-                       (CFG_OAI_ID_FIELD[5:6], CFG_OAI_ID_PREFIX, recid)
-        already_has_oai_id = True
-        oai_ids = [_oai_id for _oai_id in \
-                   get_fieldvalues(recid, CFG_OAI_ID_FIELD) \
-                   if _oai_id.strip() != '']
-        if len(oai_ids) == 0:
-            already_has_oai_id = False
+        assign_oai_id_entry = False
+        oai_id_entry = record_get_field_value(record, tag=CFG_OAI_ID_FIELD[:3], ind1=CFG_OAI_ID_FIELD[3], ind2=CFG_OAI_ID_FIELD[4], code=CFG_OAI_ID_FIELD[5])
+        if not oai_id_entry:
+            assign_oai_id_entry = True
+            oai_id_entry = "oai:%s:%s" % (CFG_OAI_ID_PREFIX, recid)
+            write_message("Setting new oai_id %s for record %s" % (oai_id_entry, recid), verbose=3)
+        else:
+            write_message("Already existing oai_id %s for record %s" % (oai_id_entry, recid), verbose=3)
 
         # Get the sets to which this record already belongs according
         # to the metadata
-        current_oai_sets = set(\
-            [_oai_set for _oai_set in \
-             get_fieldvalues(recid, CFG_OAI_SET_FIELD) \
-             if _oai_set.strip() != ''])
+        current_oai_sets = set(record_get_field_values(record, tag=CFG_OAI_SET_FIELD[:3], ind1=CFG_OAI_SET_FIELD[3], ind2=CFG_OAI_SET_FIELD[4], code=CFG_OAI_SET_FIELD[5]))
+        write_message("Record %s currently belongs to these oai_sets: %s" % (recid, ", ".join(current_oai_sets)), verbose=3)
+
+        current_previous_oai_sets = set(record_get_field_values(record, tag=CFG_OAI_PREVIOUS_SET_FIELD[:3], ind1=CFG_OAI_PREVIOUS_SET_FIELD[3], ind2=CFG_OAI_PREVIOUS_SET_FIELD[4], code=CFG_OAI_PREVIOUS_SET_FIELD[5]))
+        write_message("Record %s currently doesn't belong anymore to these oai_sets: %s" % (recid, ", ".join(current_previous_oai_sets)), verbose=3)
 
         # Get the sets that should be in this record according to
         # settings
-        updated_oai_sets = set(\
-            [_set for _set, _recids in recids_for_set.iteritems()
-             if recid in _recids if _set])
+        updated_oai_sets = set(_set for _set, _recids in recids_for_set.iteritems()
+             if recid in _recids)
+        write_message("Record %s now belongs to these oai_sets: %s" % (recid, ", ".join(updated_oai_sets)), verbose=3)
+
+        updated_previous_oai_sets = set(_set for _set in (current_previous_oai_sets - updated_oai_sets) |
+             (current_oai_sets - updated_oai_sets))
+        write_message("Record %s now doesn't belong anymore to these oai_sets: %s" % (recid, ", ".join(updated_previous_oai_sets)), verbose=3)
 
         # Ok, we have the old sets and the new sets. If they are equal
         # and oai ID does not need to be added, then great, nothing to
         # change . Otherwise apply the new sets.
-        if current_oai_sets == updated_oai_sets and already_has_oai_id:
+        if current_oai_sets == updated_oai_sets and not assign_oai_id_entry:
+            write_message("Nothing has changed for record %s, let's move on!" % recid, verbose=3)
             continue # Jump to next recid
 
-        has_updated_records = True
+        write_message("Something has changed for record %s, let's update it!" % recid, verbose=3)
+        subfields = [(CFG_OAI_ID_FIELD[5], oai_id_entry)]
+        for oai_set in updated_oai_sets:
+            subfields.append((CFG_OAI_SET_FIELD[5], oai_set))
+        for oai_set in updated_previous_oai_sets:
+            subfields.append((CFG_OAI_PREVIOUS_SET_FIELD[5], oai_set))
 
-        # Generate the xml sets entry
-        oai_set_entry = '\n'.join(["<subfield code=\"%s\">%s</subfield>" % \
-                                   (CFG_OAI_SET_FIELD[5:6], _oai_set) \
-                                   for _oai_set in updated_oai_sets if \
-                                   _oai_set]) + \
-                                   "\n"
+        record_add_field(new_record, tag="001", controlfield_value=str(recid))
+        record_add_field(new_record, tag=CFG_OAI_ID_FIELD[:3], ind1=CFG_OAI_ID_FIELD[3], ind2=CFG_OAI_ID_FIELD[4], subfields=subfields)
+        oai_out.write(record_xml_output(new_record))
+        tot += 1
+        if tot == CFG_OAI_REPOSITORY_MARCXML_SIZE:
+            oai_out.write("</collection>")
+            oai_out.close()
+            write_message("Wrote to file %s" % filename)
+            if not no_upload:
+                task_low_level_submission('bibupload', 'oairepository', '-c', filename, '-n')
+            # Prepare to save results in a tmp file
+            (fd, filename) = mkstemp(dir=CFG_TMPDIR,
+                                        prefix='oairepository_' + \
+                                        time.strftime("%Y%m%d_%H%M%S_",
+                                                        time.localtime()))
+            oai_out = os.fdopen(fd, "w")
+            oai_out.write("<collection>")
+            tot = 0
+            task_sleep_now_if_required(can_stop_too=True)
 
-        # Also get all the datafields with tag and indicator matching
-        # CFG_OAI_SET_FIELD[:5] and CFG_OAI_ID_FIELD[:5] but with
-        # subcode != CFG_OAI_SET_FIELD[5:6] and subcode !=
-        # CFG_OAI_SET_FIELD[5:6], so that we can preserve these values
-        other_data = marcxml_filter_out_tags(recid, [CFG_OAI_SET_FIELD,
-                                                     CFG_OAI_ID_FIELD])
-
-        if CFG_OAI_ID_FIELD[0:5] == CFG_OAI_SET_FIELD[0:5]:
-            # Put set and OAI ID in the same datafield
-            oai_out.write("<record>\n")
-            oai_out.write("<controlfield tag=\"001\">%s"
-                "</controlfield>\n" % recid)
-            oai_out.write(DATAFIELD_ID_HEAD)
-            oai_out.write("\n")
-            #if oai_id_entry:
-            oai_out.write(oai_id_entry)
-            #if oai_set_entry:
-            oai_out.write(oai_set_entry)
-            oai_out.write("</datafield>\n")
-            oai_out.write(other_data)
-            oai_out.write("</record>\n")
-        else:
-            oai_out.write("<record>\n")
-            oai_out.write("<controlfield tag=\"001\">%s"
-                "</controlfield>\n" % recid)
-            oai_out.write(DATAFIELD_ID_HEAD)
-            oai_out.write("\n")
-            oai_out.write(oai_id_entry)
-            oai_out.write("</datafield>\n")
-            oai_out.write(DATAFIELD_SET_HEAD)
-            oai_out.write("\n")
-            oai_out.write(oai_set_entry)
-            oai_out.write("</datafield>\n")
-            oai_out.write(other_data)
-            oai_out.write("</record>\n")
-
-    oai_out.write('</collection>')
+    oai_out.write("</collection>")
     oai_out.close()
     write_message("Wrote to file %s" % filename)
 
     if not no_upload:
         task_sleep_now_if_required(can_stop_too=True)
-        if has_updated_records:
-            command = "%s/bibupload -c %s -u oairepository" % (CFG_BINDIR, filename)
-            os.system(command)
+        if tot > 0:
+            task_low_level_submission('bibupload', 'oairepository', '-c', filename, '-n')
         else:
             os.remove(filename)
 
     return True
-
-def marcxml_filter_out_tags(recid, fields):
-    """
-    Returns the fields of record 'recid' that share the same tag and
-    indicators as those specified in 'fields', but for which the
-    subfield is different. This is nice to emulate a bibupload -c that
-    corrects only specific subfields.
-
-    Parameters:
-           recid - *int* the id of the record to process
-
-          fields - *list(str)* the list of fields that we want to filter
-                   out. Eg ['909COp', '909COo']
-    """
-    out = ''
-
-    record = get_record(recid)
-
-    # Delete subfields that we want to replace
-    for field in fields:
-        record_delete_subfield(record,
-                               tag=field[0:3],
-                               ind1=field[3:4],
-                               ind2=field[4:5],
-                               subfield_code=field[5:6])
-
-    # Select only datafields that share tag + indicators
-    processed_tags_and_ind = []
-    for field in fields:
-        if not field[0:5] in processed_tags_and_ind:
-            # Ensure that we do not process twice the same datafields
-            processed_tags_and_ind.append(field[0:5])
-            for datafield in record.get(field[0:3], []):
-                if datafield[1] == field[3:4].replace('_', ' ') and \
-                       datafield[2] == field[4:5].replace('_', ' ') and \
-                       datafield[0]:
-                    out += field_xml_output(datafield, field[0:3]) + '\n'
-
-    return out
 
 #########################
 
@@ -487,6 +445,19 @@ def main():
     # if there is any -r or --report option (or other similar options)
     # in the arguments, just print the status and exit (do not run
     # through BibSched...)
+    if (CFG_OAI_ID_FIELD[:5] != CFG_OAI_SET_FIELD[:5]) or \
+            (CFG_OAI_ID_FIELD[:5] != CFG_OAI_PREVIOUS_SET_FIELD[:5]):
+        print >> sys.stderr, """\
+ERROR: since Invenio 1.0 the OAI ID and the OAI Set must be stored in the same
+field. Please revise your configuration for the variables
+    CFG_OAI_ID_FIELD (currently set to %s)
+    CFG_OAI_SET_FIELD (currently set to %s)
+    CFG_OAI_PREVIOUS_SET_FIELD (currently set to %s)""" % (
+            CFG_OAI_ID_FIELD,
+            CFG_OAI_SET_FIELD,
+            CFG_OAI_PREVIOUS_SET_FIELD
+        )
+        sys.exit(1)
     mode = -1
     if '-d' in sys.argv[1:] or '--detailed-report' in sys.argv[1:]:
         mode = 2
@@ -494,12 +465,11 @@ def main():
         mode = 1
 
     if mode != -1:
-        def write_message(*args):
+        def local_write_message(*args):
             """Overload BibTask function so that it does not need to
             run in BibSched environment"""
             sys.stdout.write(args[0] + '\n')
-        print_repository_status(write_message=write_message,
-                                verbose=mode)
+        print_repository_status(local_write_message=local_write_message, verbose=mode)
         return
 
     task_init(authorization_action='runoairepository',
@@ -517,7 +487,6 @@ def main():
                 " -r --report\t\tOAI repository status\n"
                 " -d --detailed-report\t\tOAI repository detailed status\n"
                 " -n --no-process\tDo no upload the modifications\n",
-            version=__revision__,
             specific_params=("rdn", [
                 "report",
                 "detailed-report",
@@ -526,7 +495,7 @@ def main():
                 task_submit_elaborate_specific_parameter,
             task_run_fnc=oairepositoryupdater_task)
 
-def task_submit_elaborate_specific_parameter(key, value, opts, args):
+def task_submit_elaborate_specific_parameter(key, _value, _opts, _args):
     """Elaborate specific CLI parameters of oairepositoryupdater"""
     if key in ("-r", "--report"):
         task_set_option("report", 1)

@@ -33,7 +33,7 @@ from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument, redirect_to_url
 from invenio.search_engine import search_pattern, \
                            create_basic_search_units
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_NAME
+from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL, CFG_SITE_NAME
 
 def index(req, ln=CFG_SITE_LANG):
     """
@@ -67,7 +67,7 @@ def index(req, ln=CFG_SITE_LANG):
         is_admin = False
 
     navtrail = '''<a class="navtrail" href="%s/help/admin">%s</a>''' % \
-               (CFG_SITE_URL, _("Admin Area"))
+               (CFG_SITE_SECURE_URL, _("Admin Area"))
 
     return page(title=_("BibFormat Admin"),
                 body=bibformatadminlib.perform_request_index(ln=ln,
@@ -164,7 +164,7 @@ def output_format_show(req, bfo, ln=CFG_SITE_LANG,
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a>''' % (CFG_SITE_URL, ln, _("Manage Output Formats")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln, _("Manage Output Formats")))
     code = wash_url_argument(bfo, 'str')
 
     try:
@@ -237,7 +237,7 @@ def output_format_show_attributes(req, bfo, ln=CFG_SITE_LANG):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a>''' % (CFG_SITE_URL, ln , _("Manage Output Formats")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln , _("Manage Output Formats")))
 
     try:
         uid = getUid(req)
@@ -284,7 +284,7 @@ def output_format_show_dependencies(req, bfo, ln=CFG_SITE_LANG):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s </a>''' % (CFG_SITE_URL, ln, _("Manage Output Formats")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s </a>''' % (CFG_SITE_SECURE_URL, ln, _("Manage Output Formats")))
 
     try:
         uid = getUid(req)
@@ -381,7 +381,7 @@ def output_format_delete(req, bfo, ln=CFG_SITE_LANG, chosen_option=""):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a> &gt; %s''' % (CFG_SITE_URL, ln, _("Manage Output Formats"), _("Delete Output Format")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a> &gt; %s''' % (CFG_SITE_SECURE_URL, ln, _("Manage Output Formats"), _("Delete Output Format")))
 
     try:
         uid = getUid(req)
@@ -497,7 +497,7 @@ def format_template_show(req, bft, code=None, ln=CFG_SITE_LANG,
     _ = gettext_set_language(ln)
 
     navtrail_previous_links = bibformatadminlib.getnavtrail('''
-    &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (CFG_SITE_URL, ln ,  _("Manage Format Templates")))
+    &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln ,  _("Manage Format Templates")))
 
     try:
         uid = getUid(req)
@@ -570,7 +570,7 @@ def format_template_show_attributes(req, bft, ln=CFG_SITE_LANG, new=0):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (CFG_SITE_URL, ln, _("Manage Format Templates")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln, _("Manage Format Templates")))
 
     try:
         uid = getUid(req)
@@ -617,7 +617,7 @@ def format_template_show_dependencies(req, bft, ln=CFG_SITE_LANG):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (CFG_SITE_URL, ln, _("Manage Format Templates")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln, _("Manage Format Templates")))
 
     try:
         uid = getUid(req)
@@ -691,7 +691,7 @@ def format_template_delete(req, bft, ln=CFG_SITE_LANG, chosen_option=""):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     navtrail_previous_links = bibformatadminlib.getnavtrail('''
-    &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a> &gt; %s''' % (CFG_SITE_URL, ln ,_("Manage Format Templates"),_("Delete Format Template")))
+    &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a> &gt; %s''' % (CFG_SITE_SECURE_URL, ln ,_("Manage Format Templates"),_("Delete Format Template")))
 
     try:
         uid = getUid(req)
@@ -908,7 +908,7 @@ def format_element_show_dependencies(req, bfe, ln=CFG_SITE_LANG):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s">%s</a>''' % (CFG_SITE_URL, ln , _("Format Elements Documentation")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln , _("Format Elements Documentation")))
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
@@ -943,7 +943,7 @@ def format_element_test(req, bfe, ln=CFG_SITE_LANG, param_values=None):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s">%s</a>''' %( CFG_SITE_URL, ln , _("Format Elements Documentation")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s">%s</a>''' %( CFG_SITE_SECURE_URL, ln , _("Format Elements Documentation")))
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -996,7 +996,7 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
     if not auth_code:
         if bfo is not None: #Output format validation
             bfo = wash_url_argument(bfo, 'str')
-            navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a>'''%(CFG_SITE_URL, ln, _("Manage Output Formats")))
+            navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a>'''%(CFG_SITE_SECURE_URL, ln, _("Manage Output Formats")))
 
             if not bibformatadminlib.can_read_output_format(bfo): #No read permission
                 return page(title=_("Restricted Output Format"),
@@ -1017,7 +1017,7 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
 
         elif bft is not None: #Format template validation
             bft = wash_url_argument(bft, 'str')
-            navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (CFG_SITE_URL, ln, _("Manage Format Templates")))
+            navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln, _("Manage Format Templates")))
 
             if not bibformatadminlib.can_read_format_template(bft): #No read permission
                 return page(title=_("Restricted Format Template"),
@@ -1035,7 +1035,7 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
 
         elif bfe is not None: #Format element validation
             bfe = wash_url_argument(bfe, 'str')
-            navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s#%s">%s</a>''' % (CFG_SITE_URL, ln , bfe.upper() , _("Format Elements Documentation")))
+            navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s#%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln , bfe.upper() , _("Format Elements Documentation")))
 
             if not bibformatadminlib.can_read_format_element(bfe) and \
                    not bibformat_dblayer.tag_exists_for_name(bfe): #No read permission
@@ -1071,7 +1071,7 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
                     req=req)
 
     else:
-        navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/?ln=%s'''%(CFG_SITE_URL, ln))
+        navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/?ln=%s'''%(CFG_SITE_SECURE_URL, ln))
 
         return page_not_authorized(req=req,
                                    text=auth_msg,

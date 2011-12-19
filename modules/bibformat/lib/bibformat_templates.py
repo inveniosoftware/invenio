@@ -1746,8 +1746,8 @@ class Template:
             <td class="admintdright"><input type="text" name="param_values" value="%(value)s"/></td>
             <td class="admintdleft">%(description)s&nbsp;</td>
             </tr>
-            ''' % {'name':param_names[i],
-                   'value':param_values[i],
+            ''' % {'name':cgi.escape(param_names[i]),
+                   'value':cgi.escape(param_values[i], quote=True),
                    'description':param_descriptions[i]}
 
         out += '''

@@ -21,22 +21,13 @@
 Provide API-callable functions for knowledge base management (using kb's).
 """
 
-from invenio import bibknowledge_dblayer
-from invenio.bibformat_config  import CFG_BIBFORMAT_ELEMENTS_PATH
-from invenio.config import CFG_WEBDIR
 import os
-import sys
 import re
 
-if sys.hexversion < 0x2060000:
-    try:
-        import simplejson as json
-    except ImportError:
-        # Okay, no Ajax app will be possible, but continue anyway,
-        # since this package is only recommended, not mandatory.
-        pass
-else:
-    import json
+from invenio import bibknowledge_dblayer
+from invenio.jsonutils import json
+from invenio.bibformat_config  import CFG_BIBFORMAT_ELEMENTS_PATH
+from invenio.config import CFG_WEBDIR
 
 
 def get_kb_mappings(kb_name="", key="", value="", match_type="s"):

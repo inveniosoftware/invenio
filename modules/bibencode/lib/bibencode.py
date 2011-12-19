@@ -25,6 +25,9 @@ metadata handling and more as BibTasks.
 
 __revision__ = "$Id$"
 
+from pprint import pprint
+import os
+
 from invenio.bibtask import (
                     task_init,
                     write_message,
@@ -47,20 +50,9 @@ from invenio.bibencode_profiles import (
                     get_encoding_profiles,
                     get_extract_profiles
                     )
-from invenio.bibencode_utils import (
-                    check_ffmpeg_configuration,
-                    json_decode_file
-                    )
-from pprint import pprint
-import os
-## Simplejspn fallback, stuff will crash if V < 2.5 and no simplejson
-try:
-    import json
-except:
-    try:
-        import simplejson as json
-    except:
-        pass
+from invenio.bibencode_utils import check_ffmpeg_configuration
+
+from invenio.jsonutils import json, json_decode_file
 import invenio.textutils
 import invenio.bibencode_encode
 import invenio.bibencode_extract
@@ -254,7 +246,7 @@ def task_run_core():
         elif _topt('meta_input') is not None:
             if type(_topt('meta_input')) is not type(dict()):
                 metadata = invenio.bibencode_metadata.json_decode_file(
-                                        file=_topt('meta_input'))
+                                        filename=_topt('meta_input'))
                 task_set_option('meta_input', metadata)
             return invenio.bibencode_metadata.write_metadata(
                                        input_file=_topt('input'),

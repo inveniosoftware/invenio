@@ -25,8 +25,7 @@ config.toolbar_WebComment = [
 			     ];
 
 config.skin = 'v2';
-config.resize_enabled = false;
-
+config.resize_dir = 'vertical';
 
 /* Enable browser built-in spellchecker */
 config.disableNativeSpellChecker = false;

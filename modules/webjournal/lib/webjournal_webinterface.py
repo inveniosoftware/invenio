@@ -28,6 +28,7 @@ from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import \
      CFG_SITE_URL, \
+     CFG_SITE_SECURE_URL, \
      CFG_SITE_LANG, \
      CFG_CERN_SITE
 from invenio.webuser import getUid
@@ -483,7 +484,7 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
             return e.user_box(req)
         except InvenioWebJournalNoNameError, e:
             return e.user_box(req)
-        redirect_to_url(req, CFG_SITE_URL + \
+        redirect_to_url(req, CFG_SITE_SECURE_URL + \
                         '/admin/webjournal/webjournaladmin.py/administrate?journal_name=' + \
                         journal_name + '&ln=' + ln)
 
@@ -496,7 +497,7 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
                                    'url': (str, "init"),
                                    'ln': (str, "")})
 
-        redirect_to_url(req, CFG_SITE_URL + \
+        redirect_to_url(req, CFG_SITE_SECURE_URL + \
                         '/admin/webjournal/webjournaladmin.py/feature_record?journal_name=' + \
                         argd['name'] + '&ln=' + argd['ln'] + '&recid='+ argd['recid'] + '&url='+ argd['url'])
 
@@ -508,7 +509,7 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
                                    'issue': (str, ""),
                                    'ln': (str, "")})
 
-        redirect_to_url(req, CFG_SITE_URL + \
+        redirect_to_url(req, CFG_SITE_SECURE_URL + \
                         '/admin/webjournal/webjournaladmin.py/regenerate?journal_name=' + \
                         argd['name'] + '&ln=' + argd['ln'] + '&issue=' + argd['issue'])
 
@@ -528,7 +529,7 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
                                    'issue': (str, ""),
                                    'force': (str, "False")})
 
-        redirect_to_url(req, CFG_SITE_URL + \
+        redirect_to_url(req, CFG_SITE_SECURE_URL + \
                         '/admin/webjournal/webjournaladmin.py/alert?journal_name=' + \
                         argd['name'] + '&ln=' + argd['ln'] + '&issue=' + argd['issue'] + \
                         '&sent=' + argd['sent'] + '&plainText=' + argd['plainText'] + \
@@ -545,7 +546,7 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
                                    'action_publish': (str, "cfg"),
                                    'issue_number': (list, []),
                                    'ln': (str, "")})
-        redirect_to_url(req, CFG_SITE_URL + \
+        redirect_to_url(req, CFG_SITE_SECURE_URL + \
                         '/admin/webjournal/webjournaladmin.py/issue_control?journal_name=' + \
                         argd['name'] + '&ln=' + argd['ln'] + '&issue=' + argd['issue_number'] + \
                         '&action=' + argd['action_publish'])

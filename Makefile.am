@@ -29,7 +29,7 @@ MJV = 1.1
 MATHJAX = https://github.com/mathjax/MathJax/zipball/v$(MJV)
 
 # current CKeditor version
-CKV = 3.6.1
+CKV = 3.6.2
 CKEDITOR = ckeditor_$(CKV).zip
 
 # current MediaElement.js version
@@ -530,5 +530,8 @@ update-v1.0.0-rc0-tables: # from v1.0.0-rc0 to next release
 	echo "UPDATE sbmALLFUNCDESCR SET function='Move_CKEditor_Files_to_Storage', description='Transfer files attached to the record with the CKEditor' WHERE function='Move_FCKeditor_Files_to_Storage';" | ${prefix}/bin/dbexec
 	echo "UPDATE sbmFUNCTIONS SET function='Move_CKEditor_Files_to_Storage' WHERE function='Move_FCKeditor_Files_to_Storage';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK CHANGE proc proc varchar(255) NOT NULL;" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE session CHANGE session_object session_object longblob;" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE oaiREPOSITORY CHANGE setSpec setSpec varchar(255) NOT NULL default 'GLOBAL_SET';" | ${prefix}/bin/dbexec
+	echo "UPDATE oaiREPOSITORY SET setSpec='GLOBAL_SET' WHERE setSpec='';" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~ *.pyc *.tmp

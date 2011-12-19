@@ -21,24 +21,11 @@
 Solr utilities.
 """
 
-import sys
-import time
 import urllib2
 import urllib
-from invenio import intbitset
 import mimetools
-
-if sys.hexversion < 0x2060000:
-    try:
-        import simplejson as json
-        simplejson_available = True
-    except ImportError:
-        # Okay, no Ajax app will be possible, but continue anyway,
-        # since this package is only recommended, not mandatory.
-        simplejson_available = False
-else:
-    import json
-    simplejson_available = True
+from invenio import intbitset
+from invenio.jsonutils import json
 
 def solr_get_facets(bitset, solr_url):
     facet_query_url = "%s/invenio_facets" % solr_url

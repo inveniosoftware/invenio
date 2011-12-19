@@ -32,7 +32,7 @@ import datetime, time, cgi, types
 # Others Invenio imports
 from invenio.config import \
     CFG_SITE_LANG, \
-    CFG_SITE_URL, \
+    CFG_SITE_SECURE_URL, \
     CFG_CERN_SITE
 import invenio.access_control_engine as acce
 from invenio.webpage import page
@@ -98,7 +98,7 @@ def mustloginpage(req, message):
     navtrail_previous_links = '<a class="navtrail" href="%s/admin/">' \
         'Admin Area</a> &gt; ' \
         '<a class="navtrail" href="%s/admin/bibcirculation/">' \
-        'BibCirculation Admin</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+        'BibCirculation Admin</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL)
 
     return page_not_authorized(req=req, text=message,
         navtrail=navtrail_previous_links)
@@ -108,7 +108,7 @@ def index(req, ln=CFG_SITE_LANG):
     """
     navtrail_previous_links = '<a class="navtrail"' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -157,7 +157,7 @@ def borrower_search(req, empty_barcode, redirect_to_new_request=False,
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">' \
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     body = bc_templates.tmpl_borrower_search(infos=infos,
                                 redirect_to_new_request=redirect_to_new_request,
@@ -206,11 +206,15 @@ def borrower_search_result(req, column, string, redirect_to_new_request=False,
         result = search_user(column, string)
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                'href="%s/help/admin">Admin Area' \
-                '</a> &gt; <a class="navtrail" ' \
-                'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">' \
-                'Circulation Management' \
-                '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                              'href="%s/help/admin">Admin Area' \
+                              '</a> &gt; <a class="navtrail" ' \
+                              'href="%s/admin2/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
 
     if len(result) == 1:
         if redirect_to_new_request:
@@ -243,7 +247,7 @@ def item_search(req, infos=[], ln=CFG_SITE_LANG):
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">' \
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     _ = gettext_set_language(ln)
 
@@ -319,7 +323,7 @@ def item_search_result(req, p, f, ln=CFG_SITE_LANG):
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">' \
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     return page(title=_("Item search result"),
                 uid=id_user,
@@ -418,11 +422,15 @@ def borrower_notification(req, borrower_id, borrower_email, template, message,
                                                        ln=ln)
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                    'href="%s/help/admin">Admin Area' \
-                    '</a> &gt; <a class="navtrail" ' \
-                    'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">' \
-                    'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                              'href="%s/help/admin">Admin Area' \
+                              '</a> &gt; <a class="navtrail" ' \
+                              'href="%s/admin2/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
 
     return page(title="Borrower Notification",
                  uid=id_user,
@@ -474,11 +482,10 @@ def get_next_waiting_loan_request(req, recid, barcode, check_id,
     result = db.get_next_waiting_loan_request(recid)
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                    'href="%s/help/admin">Admin Area' \
-                    '</a> &gt; <a class="navtrail" ' \
-                    'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">' \
-                    'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                              'href="%s/help/admin">Admin Area' \
+                              '</a> &gt; <a class="navtrail" ' \
+                              'href="%s/admin2/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL)
 
 
     body = bc_templates.tmpl_get_next_waiting_loan_request(result=result,
@@ -524,7 +531,7 @@ def make_new_loan_from_request(req, check_id, barcode, ln=CFG_SITE_LANG):
     if db.is_item_on_loan(barcode):
         infos.append('The item with the barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s is on loan.' % {'x_barcode': barcode, 'x_strong_tag_open': '<strong>', 'x_strong_tag_close': '</strong>'})
         return redirect_to_url(req,
-            '%s/admin2/bibcirculation/all_loans?ln=%s&msg=ok' % (CFG_SITE_URL, ln))
+            '%s/admin2/bibcirculation/all_loans?ln=%s&msg=ok' % (CFG_SITE_SECURE_URL, ln))
     else:
         db.new_loan(borrower_id, recid, barcode, due_date,
                     CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN, 'normal', '')
@@ -543,7 +550,7 @@ def make_new_loan_from_request(req, check_id, barcode, ln=CFG_SITE_LANG):
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">' \
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     body = bc_templates.tmpl_register_new_loan(borrower_info=borrower_info,
                                                infos=infos,
@@ -569,11 +576,10 @@ def loan_return(req, ln=CFG_SITE_LANG):
     infos = []
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                    'href="%s/help/admin">Admin Area' \
-                    '</a> &gt; <a class="navtrail" ' \
-                    'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">' \
-                    'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                              'href="%s/help/admin">Admin Area' \
+                              '</a> &gt; <a class="navtrail" ' \
+                              'href="%s/admin2/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -652,7 +658,7 @@ def loan_return_confirm(req, barcode, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     return page(title=_("Loan return"),
                 uid=id_user,
@@ -693,7 +699,7 @@ def loan_on_desk_step1(req, key, string, ln=CFG_SITE_LANG):
 
         navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
         return page(title=_("Loan on desk"),
                     uid=id_user,
@@ -709,7 +715,7 @@ def loan_on_desk_step1(req, key, string, ln=CFG_SITE_LANG):
         if CFG_CERN_SITE:
             infos.append(_("0 borrowers found.") + ' ' +_("Search by CCID."))
         else:
-            new_borrower_link = create_html_link(CFG_SITE_URL +
+            new_borrower_link = create_html_link(CFG_SITE_SECURE_URL +
                                 '/admin2/bibcirculation/add_new_borrower_step1',
                                 {'ln': ln}, _("Register new borrower."))
             message = _("0 borrowers found.") + ' ' + new_borrower_link
@@ -730,7 +736,7 @@ def loan_on_desk_step1(req, key, string, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     return page(title=_("Circulation management"),
                 uid=id_user,
@@ -753,7 +759,7 @@ def loan_on_desk_step2(req, user_id, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -790,7 +796,7 @@ def loan_on_desk_step3(req, user_id, list_of_barcodes, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -878,7 +884,7 @@ def loan_on_desk_step3(req, user_id, list_of_barcodes, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 body=body,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -908,7 +914,7 @@ def loan_on_desk_step4(req, list_of_barcodes, user_id,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -988,7 +994,7 @@ def loan_on_desk_step4(req, list_of_barcodes, user_id,
         update_requests_statuses(barcode)
 
     return redirect_to_url(req,
-            '%s/admin2/bibcirculation/all_loans?ln=%s&msg=ok' % (CFG_SITE_URL, ln))
+            '%s/admin2/bibcirculation/all_loans?ln=%s&msg=ok' % (CFG_SITE_SECURE_URL, ln))
 
 
 def loan_on_desk_confirm(req, barcode=None, borrower_id=None, ln=CFG_SITE_LANG):
@@ -1007,7 +1013,7 @@ def loan_on_desk_confirm(req, barcode=None, borrower_id=None, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -1147,7 +1153,7 @@ def register_new_loan(req, barcode, borrower_id,
 
         navtrail_previous_links = '<a class="navtrail" ' \
                                   'href="%s/help/admin">Admin Area' \
-                                  '</a>' % (CFG_SITE_URL,)
+                                  '</a>' % (CFG_SITE_SECURE_URL,)
 
         return page(title=title,
                     uid=id_user,
@@ -1193,7 +1199,7 @@ def get_borrower_details(req, borrower_id, update, ln=CFG_SITE_LANG):
 
         navtrail_previous_links = '<a class="navtrail" ' \
                                   'href="%s/help/admin">Admin Area' \
-                                  '</a>' % (CFG_SITE_URL,)
+                                  '</a>' % (CFG_SITE_SECURE_URL,)
 
         body = bc_templates.tmpl_borrower_details(borrower=borrower,
                                                   requests=requests,
@@ -1251,13 +1257,13 @@ def get_borrower_loans_details(req, recid, barcode, borrower_id,
 
     infos = []
 
-    force_renew_link = create_html_link(CFG_SITE_URL +
+    force_renew_link = create_html_link(CFG_SITE_SECURE_URL +
                         '/admin2/bibcirculation/get_borrower_loans_details',
                         {'barcode': barcode, 'borrower_id': borrower_id,
                          'loan_id': loan_id, 'force': 'true', 'ln': ln},
                         (_("Yes")))
 
-    no_renew_link = create_html_link(CFG_SITE_URL +
+    no_renew_link = create_html_link(CFG_SITE_SECURE_URL +
                         '/admin2/bibcirculation/get_borrower_loans_details',
                         {'borrower_id': borrower_id, 'ln': ln},
                         (_("No")))
@@ -1293,7 +1299,7 @@ def get_borrower_loans_details(req, recid, barcode, borrower_id,
             queue = db.get_queue_request(recid)
             new_due_date = renew_loan_for_X_days(barcode)
 
-            force_renewall_link = create_html_link(CFG_SITE_URL +
+            force_renewall_link = create_html_link(CFG_SITE_SECURE_URL +
                             '/admin2/bibcirculation/get_borrower_loans_details',
                             {'barcode': barcode, 'borrower_id': borrower_id,
                             'loan_id': loan_id, 'force': 'true', 'ln': ln},
@@ -1319,7 +1325,7 @@ def get_borrower_loans_details(req, recid, barcode, borrower_id,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_borrower_loans_details(
                                                 borrower_loans=borrower_loans,
@@ -1379,12 +1385,12 @@ def get_item_loans_details(req, recid, barcode, loan_id, force,
         new_due_date = renew_loan_for_X_days(barcode)
 
 
-        force_renew_link = create_html_link(CFG_SITE_URL +
+        force_renew_link = create_html_link(CFG_SITE_SECURE_URL +
                         '/admin2/bibcirculation/get_item_loans_details',
                        {'barcode': barcode, 'loan_id': loan_id, 'force': 'true',
                        'recid': recid, 'ln': ln}, (_("Yes")))
 
-        no_renew_link = create_html_link(CFG_SITE_URL +
+        no_renew_link = create_html_link(CFG_SITE_SECURE_URL +
                         '/admin2/bibcirculation/get_item_loans_details',
                         {'recid': recid, 'ln': ln},
                         (_("No")))
@@ -1407,7 +1413,7 @@ def get_item_loans_details(req, recid, barcode, loan_id, force,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_get_item_loans_details(result=result,
                                                                 recid=recid,
@@ -1455,7 +1461,7 @@ def get_item_details(req, recid, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_get_item_details(recid=recid,
                                         copies=copies,
@@ -1494,7 +1500,7 @@ def get_item_req_historical_overview(req, recid, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_get_item_req_historical_overview(
                                             req_hist_overview=req_hist_overview,
@@ -1528,7 +1534,7 @@ def get_item_loans_historical_overview(req, recid, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_get_item_loans_historical_overview(
                                         loans_hist_overview=loans_hist_overview,
@@ -1562,7 +1568,7 @@ def bor_loans_historical_overview(req, borrower_id, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_bor_loans_historical_overview(
         loans_hist_overview = loans_hist_overview,
@@ -1598,7 +1604,7 @@ def bor_requests_historical_overview(req, borrower_id, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_bor_requests_historical_overview(
         req_hist_overview = req_hist_overview,
@@ -1631,7 +1637,7 @@ def get_library_details(req, library_id, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     library_details = db.get_library_details(library_id)
 
@@ -1674,7 +1680,7 @@ def merge_libraries_step1(req, library_id, f=None, p=None, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     library_details = db.get_library_details(library_id)
     library_items = db.get_library_items(library_id)
@@ -1723,7 +1729,7 @@ def merge_libraries_step2(req, library_from, library_to, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     library_from_details = db.get_library_details(library_from)
     library_from_items   = db.get_library_items(library_from)
@@ -1793,7 +1799,7 @@ def get_borrower_requests_details(req, borrower_id, request_id,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     name = db.get_borrower_name(borrower_id)
 
@@ -1846,7 +1852,7 @@ def get_pending_requests(req, request_id, print_data, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_get_pending_requests(result=result, ln=ln)
 
@@ -1896,7 +1902,7 @@ def get_waiting_requests(req, request_id, print_data, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_get_waiting_requests(result=result, ln=ln)
 
@@ -1932,7 +1938,7 @@ def all_requests(req, request_id, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_all_requests(result=result, ln=ln)
 
@@ -1975,7 +1981,7 @@ def all_loans(req, msg=None, ln=CFG_SITE_LANG):
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">' \
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     body = bc_templates.tmpl_all_loans(result=result, infos=infos, ln=ln)
 
@@ -2011,7 +2017,7 @@ def all_expired_loans(req, ln=CFG_SITE_LANG):
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">' \
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     body = bc_templates.tmpl_all_expired_loans(result=result,
                                                infos=infos,
@@ -2054,7 +2060,7 @@ def get_item_requests_details(req, recid, request_id, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_get_item_requests_details(recid=recid,
                                                        result=result,
@@ -2097,7 +2103,7 @@ def associate_barcode(req, request_id, recid, borrower_id, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_associate_barcode(request_id=request_id,
                                                            recid=recid,
@@ -2153,7 +2159,7 @@ def get_borrower_notes(req, borrower_id, delete_key, library_notes,
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">' \
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     body = bc_templates.tmpl_borrower_notes(borrower_notes=borrower_notes,
                                             borrower_id=borrower_id,
@@ -2207,7 +2213,7 @@ def get_loans_notes(req, loan_id, delete_key,
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">' \
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     referer = req.headers_in.get('referer')
 
@@ -2229,7 +2235,7 @@ def add_new_borrower_step1(req, ln=CFG_SITE_LANG):
     """
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -2284,7 +2290,7 @@ def add_new_borrower_step2(req, name, email, phone, address, mailbox,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     if len(infos) > 0:
         body = bc_templates.tmpl_add_new_borrower_step1(tup_infos=tup_infos,
@@ -2303,7 +2309,7 @@ def add_new_borrower_step2(req, name, email, phone, address, mailbox,
 
         return redirect_to_url(req,
             '%s/admin2/bibcirculation/get_borrower_details?ln=%s&borrower_id=%s' \
-                                            % (CFG_SITE_URL, ln, borrower_id))
+                                            % (CFG_SITE_SECURE_URL, ln, borrower_id))
 
 
         #body = bc_templates.tmpl_add_new_borrower_step2(tup_infos=tup_infos,
@@ -2344,7 +2350,7 @@ def add_new_borrower_step3(req, tup_infos, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_add_new_borrower_step3(ln=ln)
 
@@ -2362,7 +2368,7 @@ def add_new_borrower_step3(req, tup_infos, ln=CFG_SITE_LANG):
 #
 #    navtrail_previous_links = '<a class="navtrail"' \
 #                              ' href="%s/help/admin">Admin Area' \
-#                              '</a>' % (CFG_SITE_URL,)
+#                              '</a>' % (CFG_SITE_SECURE_URL,)
 #
 #    id_user = getUid(req)
 #    (auth_code, auth_message) = is_adminuser(req)
@@ -2402,7 +2408,7 @@ def add_new_borrower_step3(req, tup_infos, ln=CFG_SITE_LANG):
 #
 #    navtrail_previous_links = '<a class="navtrail" ' \
 #                              'href="%s/help/admin">Admin Area' \
-#                              '</a>' % (CFG_SITE_URL,)
+#                              '</a>' % (CFG_SITE_SECURE_URL,)
 #
 #    body = bc_templates.tmpl_update_borrower_info_step2(result=result, ln=ln)
 #
@@ -2423,7 +2429,7 @@ def update_borrower_info_step1(req, borrower_id, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail"' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -2478,7 +2484,7 @@ def update_borrower_info_step2(req, borrower_id, name, email, phone, address,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     if len(infos) > 0:
         body = bc_templates.tmpl_update_borrower_info_step1(tup_infos=tup_infos,
@@ -2489,7 +2495,7 @@ def update_borrower_info_step2(req, borrower_id, name, email, phone, address,
 
         return redirect_to_url(req,
             '%s/admin2/bibcirculation/get_borrower_details?ln=%s&borrower_id=%s' \
-                                            % (CFG_SITE_URL, ln, borrower_id))
+                                            % (CFG_SITE_SECURE_URL, ln, borrower_id))
 
     return page(title=_("Update borrower information"),
                 uid=id_user,
@@ -2534,7 +2540,7 @@ def get_item_loans_notes(req, loan_id, add_notes, new_note, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_get_loans_notes(loans_notes=loans_notes,
                                              loan_id=loan_id,
@@ -2564,7 +2570,7 @@ def new_item(req, isbn, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     if isbn:
         from xml.dom import minidom
@@ -2666,7 +2672,7 @@ def new_item(req, isbn, ln=CFG_SITE_LANG):
             cover_link = get_cover_link.item(0).firstChild.firstChild.data
             book_info.append(str(cover_link))
         except AttributeError:
-            cover_link = CFG_SITE_URL + "/img/book_cover_placeholder.gif"
+            cover_link = CFG_SITE_SECURE_URL + "/img/book_cover_placeholder.gif"
             book_info.append(str(cover_link))
 
         if len(errors)!=0:
@@ -2692,7 +2698,7 @@ def add_new_library_step1(req, ln=CFG_SITE_LANG):
     """
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -2721,7 +2727,7 @@ def add_new_library_step2(req, name, email, phone, address,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     _ = gettext_set_language(ln)
 
@@ -2747,7 +2753,7 @@ def add_new_library_step3(req, name, email, phone, address,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -2775,7 +2781,7 @@ def update_library_info_step1(req, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail"' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -2821,7 +2827,7 @@ def update_library_info_step2(req, column, string, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     return page(title=_("Update library information"),
                 uid=id_user,
@@ -2848,7 +2854,7 @@ def update_library_info_step3(req, library_id, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail"' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     library_info = db.get_library_details(library_id)
 
@@ -2871,7 +2877,7 @@ def update_library_info_step4(req, name, email, phone, address, lib_type,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -2900,7 +2906,7 @@ def update_library_info_step5(req, name, email, phone, address, lib_type,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -2928,7 +2934,7 @@ def new_book_step1(req, ln):
     """
     navtrail_previous_links = '<a class="navtrail"' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -2952,7 +2958,7 @@ def new_book_step2(req, ln):
     """
     navtrail_previous_links = '<a class="navtrail"' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -2977,7 +2983,7 @@ def add_new_copy_step1(req, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail"' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -3010,7 +3016,7 @@ def add_new_copy_step2(req, p, f, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_add_new_copy_step2(result=result, ln=ln)
 
@@ -3041,7 +3047,7 @@ def add_new_copy_step3(req, recid, barcode, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail"' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     if barcode is not None:
         if not db.barcode_in_use(barcode):
@@ -3080,7 +3086,7 @@ def add_new_copy_step4(req, barcode, library, location, collection, description,
 
     navtrail_previous_links = '<a class="navtrail"' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     infos = []
 
@@ -3136,7 +3142,7 @@ def add_new_copy_step4(req, barcode, library, location, collection, description,
                 req=req,
                 body=body,
                 metaheaderadd='<link rel="stylesheet" href="%s/img/jquery-ui.css" '\
-                                'type="text/css" />' % CFG_SITE_URL,
+                                'type="text/css" />' % CFG_SITE_SECURE_URL,
                 language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
@@ -3164,7 +3170,7 @@ def add_new_copy_step5(req, barcode, library, location, collection, description,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_add_new_copy_step5(infos=infos, recid=recid, ln=ln)
 
@@ -3182,7 +3188,7 @@ def update_item_info_step1(req, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail"' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -3207,7 +3213,7 @@ def update_item_info_step2(req, p, f, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -3234,7 +3240,7 @@ def update_item_info_step3(req, recid, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail"' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -3274,7 +3280,7 @@ def update_item_info_step4(req, barcode, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     if recid == None:
         _ = gettext_set_language(ln)
@@ -3318,7 +3324,7 @@ def update_item_info_step5(req, barcode, old_barcode, library, location,
 
     navtrail_previous_links = '<a class="navtrail"' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_update_item_info_step5(tup_infos=tup_infos, ln=ln)
 
@@ -3362,7 +3368,7 @@ def update_item_info_step6(req, tup_infos, ln=CFG_SITE_LANG):
     update_requests_statuses(old_barcode)
     navtrail_previous_links = '<a class="navtrail"' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     if barcode != old_barcode:
         if db.barcode_in_use(barcode):
@@ -3405,7 +3411,7 @@ def search_library_step1(req, infos=[], ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail"' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -3462,7 +3468,7 @@ def search_library_step2(req, column, string, ln=CFG_SITE_LANG):
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     return page(title=_("Search library"),
                 uid=id_user,
@@ -3507,7 +3513,7 @@ def get_library_notes(req, library_id, delete_key,
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     body = bc_templates.tmpl_library_notes(library_notes=lib_notes,
                                             library_id=library_id,
@@ -3541,7 +3547,7 @@ def change_due_date_step1(req, barcode, borrower_id, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_change_due_date_step1(loan_details=loan_details,
                                                    loan_id=loan_id,
@@ -3553,9 +3559,9 @@ def change_due_date_step1(req, barcode, borrower_id, ln=CFG_SITE_LANG):
                 body=body, language=ln,
                 #metaheaderadd = '<link rel="stylesheet" '\
                 #                'href="%s/img/jquery-ui/themes/redmond/ui.theme.css" '\
-                #                'type="text/css" />' % CFG_SITE_URL,
+                #                'type="text/css" />' % CFG_SITE_SECURE_URL,
                 metaheaderadd = '<link rel="stylesheet" href="%s/img/jquery-ui.css" '\
-                                'type="text/css" />' % CFG_SITE_URL,
+                                'type="text/css" />' % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3585,7 +3591,7 @@ def change_due_date_step2(req, new_due_date, loan_id, borrower_id,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_change_due_date_step2(new_due_date=new_due_date,
                                                    borrower_id=borrower_id,
@@ -3625,7 +3631,7 @@ def claim_book_return(req, borrower_id, recid, loan_id,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_borrower_notification(email=email,
                                                    subject=subject,
@@ -3662,7 +3668,7 @@ def create_new_loan_step1(req, borrower_id, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_create_new_loan_step1(borrower=borrower,
                                                    infos=infos,
@@ -3739,7 +3745,7 @@ def create_new_loan_step2(req, borrower_id, barcode, notes, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     return page(title=title,
                 uid=id_user,
@@ -3795,7 +3801,7 @@ def create_new_request_step1(req, borrower_id, p="", f="", search=None,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     if type(result) is types.IntType or type(result) is types.LongType:
         recid = result
@@ -3842,7 +3848,7 @@ def create_new_request_step2(req, recid, borrower_id, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     user_info = db.get_borrower_details(borrower_id)
 
@@ -3876,7 +3882,7 @@ def create_new_request_step3(req, borrower_id, barcode, recid,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -3900,7 +3906,7 @@ def create_new_request_step3(req, borrower_id, barcode, recid,
                 uid=id_user,
                 req=req,
                 body=body,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3937,7 +3943,7 @@ def create_new_request_step4(req, period_from, period_to, barcode,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_create_new_request_step4(ln=ln)
 
@@ -3984,7 +3990,7 @@ def place_new_request_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
 
         navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
         return page(title=_("New request"),
                     uid=id_user,
@@ -4001,7 +4007,7 @@ def place_new_request_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
         if CFG_CERN_SITE:
             infos.append(_("0 borrowers found.") + ' ' +_("Search by CCID."))
         else:
-            new_borrower_link = create_html_link(CFG_SITE_URL +
+            new_borrower_link = create_html_link(CFG_SITE_SECURE_URL +
                                 '/admin2/bibcirculation/add_new_borrower_step1',
                                 {'ln': ln}, _("Register new borrower."))
             message = _("0 borrowers found.") + ' ' + new_borrower_link
@@ -4025,7 +4031,7 @@ def place_new_request_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     return page(title=_("New request"),
                 uid=id_user,
@@ -4070,13 +4076,13 @@ def place_new_request_step2(req, barcode, recid, user_info, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     return page(title=_("New request"),
                 uid=id_user,
                 req=req,
                 body=body,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4098,7 +4104,7 @@ def place_new_request_step3(req, barcode, recid, user_info,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -4164,10 +4170,10 @@ def place_new_request_step3(req, barcode, recid, user_info,
             library  = ''
             request_date = ''
 
-        link_to_holdings_details = create_html_link(CFG_SITE_URL +
+        link_to_holdings_details = create_html_link(CFG_SITE_SECURE_URL +
                                     '/record/%s/holdings'%str(recid),
                                     {'ln': ln},
-                                    (CFG_SITE_URL +
+                                    (CFG_SITE_SECURE_URL +
                                     '/record/%s/holdings'%str(recid)))
 
         subject = _('New request')
@@ -4248,7 +4254,7 @@ def place_new_loan_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
 
         navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
         id_user = getUid(req)
         (auth_code, auth_message) = is_adminuser(req)
@@ -4269,7 +4275,7 @@ def place_new_loan_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
         if CFG_CERN_SITE:
             infos.append(_("0 borrowers found.") + ' ' +_("Search by CCID."))
         else:
-            new_borrower_link = create_html_link(CFG_SITE_URL +
+            new_borrower_link = create_html_link(CFG_SITE_SECURE_URL +
                                 '/admin2/bibcirculation/add_new_borrower_step1',
                                 {'ln': ln}, _("Register new borrower."))
             message = _("0 borrowers found.") + ' ' + new_borrower_link
@@ -4290,7 +4296,7 @@ def place_new_loan_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     return page(title=_("New loan"),
                 uid=id_user,
@@ -4329,7 +4335,7 @@ def place_new_loan_step2(req, barcode, recid, user_info, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     return page(title=_("New loan"),
                 uid=id_user,
@@ -4433,7 +4439,7 @@ def place_new_loan_step3(req, barcode, recid, ccid, name, email, phone,
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     return page(title=title,
                 uid=id_user,
@@ -4450,7 +4456,7 @@ def order_new_copy_step1(req, recid, ln):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -4470,7 +4476,7 @@ def order_new_copy_step1(req, recid, ln):
                 uid=id_user,
                 req=req,
                 metaheaderadd = """<link rel="stylesheet" href="%s/img/jquery-ui.css"
-                                         type="text/css" >""" % CFG_SITE_URL,
+                                         type="text/css" >""" % CFG_SITE_SECURE_URL,
                 body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
@@ -4496,7 +4502,7 @@ def order_new_copy_step2 (req, recid, barcode, vendor_id, cost, currency,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     return page(title=_("Order new copy"),
                 uid=id_user,
@@ -4546,7 +4552,7 @@ def list_ordered_books(req, ln):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     return page(title=_("List of ordered books"),
                 uid=id_user,
@@ -4593,7 +4599,7 @@ def get_purchase_notes(req, purchase_id, delete_key, library_notes,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_purchase_notes(purchase_notes=purchase_notes,
                                             purchase_id=purchase_id,
@@ -4648,7 +4654,7 @@ def register_ill_request_step0(req, recid, key, string, ln=CFG_SITE_LANG):
 
         navtrail_previous_links = '<a class="navtrail" ' \
                                   'href="%s/help/admin">Admin Area' \
-                                  '</a>' % (CFG_SITE_URL,)
+                                  '</a>' % (CFG_SITE_SECURE_URL,)
 
 
         return page(title=_("Register ILL request"),
@@ -4729,7 +4735,7 @@ def register_ill_request_step0(req, recid, key, string, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     return page(title=_("Register ILL request"),
                 uid=id_user,
@@ -4746,7 +4752,7 @@ def register_ill_request_step1(req, recid, user_info, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -4773,7 +4779,7 @@ def register_ill_request_step2(req, recid, user_info, period_of_interest_from,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -4828,7 +4834,7 @@ def register_ill_request_step3(req, borrower_id, request_info,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_register_ill_request_step3(ln=ln)
 
@@ -4845,7 +4851,7 @@ def list_ill_request(req, status, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -4871,7 +4877,7 @@ def list_acquisition(req, status, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -4929,7 +4935,7 @@ def ill_request_details_step1(req, delete_key, ill_request_id, new_status,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     if infos == []:
         body = bc_templates.tmpl_ill_request_details_step1(
@@ -4947,7 +4953,7 @@ def ill_request_details_step1(req, delete_key, ill_request_id, new_status,
                 req=req,
                 metaheaderadd='<link rel="stylesheet" ' \
                                     'href="%s/img/jquery-ui.css" ' \
-                                    'type="text/css" />' % CFG_SITE_URL,
+                                    'type="text/css" />' % CFG_SITE_SECURE_URL,
                 body=body,
                 language=ln,
                 navtrail=navtrail_previous_links,
@@ -4988,7 +4994,7 @@ def acq_details_step1(req, delete_key, ill_request_id, new_status,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     if infos == []:
         body = bc_templates.tmpl_acq_details_step1(
@@ -5004,7 +5010,7 @@ def acq_details_step1(req, delete_key, ill_request_id, new_status,
     return page(title=title,
                 uid=id_user,
                 req=req,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                 body=body,
                 language=ln,
                 navtrail=navtrail_previous_links,
@@ -5031,7 +5037,7 @@ def ill_request_details_step2(req, delete_key, ill_request_id, new_status,
 
     #navtrail_previous_links = '<a class="navtrail" ' \
     #                          'href="%s/help/admin">Admin Area' \
-    #                          '</a>' % (CFG_SITE_URL,)
+    #                          '</a>' % (CFG_SITE_SECURE_URL,)
 
     if db.get_ill_request_notes(ill_request_id):
         library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
@@ -5102,7 +5108,7 @@ def acq_details_step2(req, delete_key, ill_request_id, new_status,
 
     return redirect_to_url(req,
             '%s/admin2/bibcirculation/list_acquisition?ln=%s&status=%s' % \
-                                                (CFG_SITE_URL, ln, new_status))
+                                                (CFG_SITE_SECURE_URL, ln, new_status))
 
 def ordered_books_details_step1(req, purchase_id, delete_key, ln=CFG_SITE_LANG):
 
@@ -5123,7 +5129,7 @@ def ordered_books_details_step1(req, purchase_id, delete_key, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_ordered_book_details_step1(
                                                 order_details=order_details,
@@ -5135,7 +5141,7 @@ def ordered_books_details_step1(req, purchase_id, delete_key, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 metaheaderadd='<link rel="stylesheet" href="%s/img/jquery-ui.css" '\
-                              'type="text/css" />' % CFG_SITE_URL,
+                              'type="text/css" />' % CFG_SITE_SECURE_URL,
                 body=body,
                 language=ln,
                 navtrail=navtrail_previous_links,
@@ -5161,7 +5167,7 @@ def ordered_books_details_step2(req, purchase_id, recid, vendor_id,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_ordered_book_details_step2(
                                                     order_details=order_details,
@@ -5199,7 +5205,7 @@ def ordered_books_details_step3(req, purchase_id, recid, vendor_id,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     #body = bc_templates.tmpl_ordered_book_details_step3(ln=ln)
     body = list_ordered_books(req, ln)
@@ -5218,7 +5224,7 @@ def add_new_vendor_step1(req, ln=CFG_SITE_LANG):
     """
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -5253,7 +5259,7 @@ def add_new_vendor_step2(req, name, email, phone, address,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_add_new_vendor_step2(tup_infos=tup_infos, ln=ln)
 
@@ -5280,7 +5286,7 @@ def add_new_vendor_step3(req, name, email, phone, address,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_add_new_vendor_step3(ln=ln)
 
@@ -5300,7 +5306,7 @@ def update_vendor_info_step1(req, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail"' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     _ = gettext_set_language(ln)
 
@@ -5347,7 +5353,7 @@ def update_vendor_info_step2(req, column, string, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_update_vendor_info_step2(result=result, ln=ln)
 
@@ -5377,7 +5383,7 @@ def update_vendor_info_step3(req, vendor_id, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail"' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_update_vendor_info_step3(vendor_info=vendor_info,
                                                                   ln=ln)
@@ -5405,7 +5411,7 @@ def update_vendor_info_step4(req, name, email, phone, address,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_update_vendor_info_step4(tup_infos=tup_infos,
                                                                   ln=ln)
@@ -5433,7 +5439,7 @@ def update_vendor_info_step5(req, name, email, phone, address,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_update_vendor_info_step5(ln=ln)
 
@@ -5459,7 +5465,7 @@ def search_vendor_step1(req, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail"' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_search_vendor_step1(infos=infos,
                                                              ln=ln)
@@ -5506,7 +5512,7 @@ def search_vendor_step2(req, column, string, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     return page(title=_("Search vendor"),
                 uid=id_user,
@@ -5536,7 +5542,7 @@ def get_vendor_details(req, vendor_id, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_vendor_details(vendor_details=vendor_details,
                                                         ln=ln)
@@ -5576,7 +5582,7 @@ def get_vendor_notes(req, vendor_id, add_notes, new_note, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_vendor_notes(vendor_notes=vendor_notes,
                                                       vendor_id=vendor_id,
@@ -5603,7 +5609,7 @@ def register_ill_request_with_no_recid_step1(req, borrower_id,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_register_ill_request_with_no_recid_step1(
                                                         infos=infos,
@@ -5613,7 +5619,7 @@ def register_ill_request_with_no_recid_step1(req, borrower_id,
     return page(title=_("Register ILL request"),
                 uid=id_user,
                 req=req,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                 body=body,
                 language=ln,
                 navtrail=navtrail_previous_links,
@@ -5699,7 +5705,7 @@ def register_ill_request_with_no_recid_step2(req, title, authors, place,
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
 
 
@@ -5724,7 +5730,7 @@ def register_ill_request_with_no_recid_step3(req, title, authors, place,
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -5773,7 +5779,7 @@ def register_ill_request_with_no_recid_step4(req, book_info, borrower_id,
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     _ = gettext_set_language(ln)
 
@@ -5844,7 +5850,7 @@ def get_borrower_ill_details(req, borrower_id, ln=CFG_SITE_LANG):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     name = db.get_borrower_name(borrower_id)
 
@@ -5873,7 +5879,7 @@ def bor_ill_historical_overview(req, borrower_id, ln):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     name = db.get_borrower_name(borrower_id)
 
@@ -5917,7 +5923,7 @@ def get_ill_library_notes(req, ill_id, delete_key, library_notes,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     body = bc_templates.tmpl_ill_notes(ill_notes=ill_notes,
                                                    ill_id=ill_id,
@@ -5952,7 +5958,7 @@ def get_expired_loans_with_requests(req, request_id, ln=CFG_SITE_LANG):
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     body = bc_templates.tmpl_get_expired_loans_with_requests(result=result,
                                                              ln=ln)
@@ -5978,7 +5984,7 @@ def register_ill_book_request(req, borrower_id, ln=CFG_SITE_LANG):
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     _ = gettext_set_language(ln)
 
@@ -6054,7 +6060,7 @@ def register_ill_book_request_result(req, borrower_id, p, f,  ln=CFG_SITE_LANG):
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     return page(title=_("Register ILL Book request"),
                 uid=id_user,
@@ -6078,7 +6084,7 @@ def register_ill_book_request_from_borrower_page(req, borrower_id,
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     _ = gettext_set_language(ln)
 
@@ -6108,7 +6114,7 @@ def register_ill_request_from_borrower_page_step1(req, borrower_id,
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     _ = gettext_set_language(ln)
 
@@ -6173,7 +6179,7 @@ def register_ill_request_from_borrower_page_step2(req, borrower_id, title,
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     return page(title=_("Register ILL request"),
                 uid=id_user,
@@ -6203,7 +6209,7 @@ def register_purchase_request_step1(req, type, title, authors,
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     body = bc_templates.tmpl_register_purchase_request_step1(infos=infos,
                                 fields=(type, title, authors, place, publisher,
@@ -6222,7 +6228,7 @@ def register_purchase_request_step1(req, type, title, authors,
                 language=ln,
                 metaheaderadd='<link rel="stylesheet" ' \
                                     'href="%s/img/jquery-ui.css" ' \
-                                    'type="text/css" />' % CFG_SITE_URL,
+                                    'type="text/css" />' % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -6245,7 +6251,7 @@ def register_purchase_request_step2(req, type, title, authors,
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     infos = []
 
@@ -6278,7 +6284,7 @@ def register_purchase_request_step2(req, type, title, authors,
                         '</a> &gt; <a class="navtrail" ' \
                         'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                         'Circulation Management' \
-                        '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                        '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
             return page(title=_("Register ILL request"),
                         uid=id_user,
@@ -6294,7 +6300,7 @@ def register_purchase_request_step2(req, type, title, authors,
             if CFG_CERN_SITE:
                 infos.append(_("0 borrowers found.") + ' ' +_("Search by CCID."))
             else:
-                new_borrower_link = create_html_link(CFG_SITE_URL +
+                new_borrower_link = create_html_link(CFG_SITE_SECURE_URL +
                                 '/admin2/bibcirculation/add_new_borrower_step1',
                                 {'ln': ln}, _("Register new borrower."))
                 message = _("0 borrowers found.") + ' ' + new_borrower_link
@@ -6318,7 +6324,7 @@ def register_purchase_request_step2(req, type, title, authors,
                 language=ln,
                 metaheaderadd='<link rel="stylesheet" ' \
                                     'href="%s/img/jquery-ui.css" ' \
-                                    'type="text/css" />' % CFG_SITE_URL,
+                                    'type="text/css" />' % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -6341,7 +6347,7 @@ def register_purchase_request_step3(req, type, title, authors,
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     infos = []
 
@@ -6381,7 +6387,7 @@ def register_purchase_request_step3(req, type, title, authors,
 
         return redirect_to_url(req,
                 '%s/admin2/bibcirculation/list_acquisition?ln=%s&status=%s' % \
-                                            (CFG_SITE_URL, ln,
+                                            (CFG_SITE_SECURE_URL, ln,
                                              CFG_BIBCIRCULATION_ACQ_STATUS_NEW))
 
     return page(title=_("Register purchase request"),
@@ -6391,7 +6397,7 @@ def register_purchase_request_step3(req, type, title, authors,
                 language=ln,
                 metaheaderadd='<link rel="stylesheet" ' \
                                     'href="%s/img/jquery-ui.css" ' \
-                                    'type="text/css" />' % CFG_SITE_URL,
+                                    'type="text/css" />' % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -6412,7 +6418,7 @@ def register_ill_article_request_step1(req, ln=CFG_SITE_LANG):
                    '</a> &gt; <a class="navtrail" ' \
                    'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">' \
                    'Circulation Management' \
-                   '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                   '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     body = bc_templates.tmpl_register_ill_article_request_step1(infos=infos,
                                                                 ln=ln)
@@ -6421,7 +6427,7 @@ def register_ill_article_request_step1(req, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 body=body,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />"%(CFG_SITE_URL),
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />"%(CFG_SITE_SECURE_URL),
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -6462,7 +6468,7 @@ def register_ill_article_request_step2(req, periodical_title, article_title,
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
         return page(title=_("Register ILL request"),
                     uid=id_user,
@@ -6478,7 +6484,7 @@ def register_ill_article_request_step2(req, periodical_title, article_title,
         if CFG_CERN_SITE:
             infos.append(_("0 borrowers found.") + ' ' +_("Search by CCID."))
         else:
-            new_borrower_link = create_html_link(CFG_SITE_URL +
+            new_borrower_link = create_html_link(CFG_SITE_SECURE_URL +
                                 '/admin2/bibcirculation/add_new_borrower_step1',
                                 {'ln': ln}, _("Register new borrower."))
             message = _("0 borrowers found.") + ' ' + new_borrower_link
@@ -6522,7 +6528,7 @@ def register_ill_article_request_step2(req, periodical_title, article_title,
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     return invenio.webpage.page(title=_("Register ILL request"),
                 uid=id_user,
@@ -6589,7 +6595,7 @@ def ill_search(req, ln=CFG_SITE_LANG):
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -6606,7 +6612,7 @@ def ill_search(req, ln=CFG_SITE_LANG):
                 body=body,
                 language=ln,
             metaheaderadd='<link rel="stylesheet" href="%s/img/jquery-ui.css" '\
-                                'type="text/css" />' % CFG_SITE_URL,
+                                'type="text/css" />' % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -6631,7 +6637,7 @@ def ill_search_result(req, p, f, date_from, date_to, ln):
                     '</a> &gt; <a class="navtrail" ' \
                     'href="%s/admin2/bibcirculation/loan_on_desk_step1?ln=%s">'\
                     'Circulation Management' \
-                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL, ln)
+                    '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     #id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -6684,7 +6690,7 @@ def delete_copy_step1(req, barcode, ln):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                                  'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
 
     barcode = barcode.strip('\'" \t')
     recid = db.get_recid(barcode)
@@ -6760,7 +6766,7 @@ def delete_copy_step2(req, barcode, ln):
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+                              '</a>' % (CFG_SITE_SECURE_URL,)
     return page(title=title,
                 req=req,
                 body=body, language=ln,

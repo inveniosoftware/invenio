@@ -29,7 +29,7 @@ from invenio.refextract import CFG_REFEXTRACT_KB_JOURNAL_TITLES, \
                                create_marc_xml_reference_section, \
                                build_titles_knowledge_base, \
                                build_reportnum_knowledge_base, \
-                               display_xml_record, \
+                               display_references_xml_record, \
                                compress_subfields, \
                                restrict_m_subfields, \
                                cli_opts
@@ -72,15 +72,15 @@ class RefextractTest(unittest.TestCase):
                                             title_search_keys)
 
         # Generate the xml string to be outputted
-        tmp_out = display_xml_record(0, \
-                                 count_reportnum, \
-                                 count_title, \
-                                 count_url, \
-                                 count_doi, \
-                                 count_misc, \
-                                 count_auth_group, \
-                                 self.rec_id, \
-                                 processed_references)
+        tmp_out = display_references_xml_record(0, \
+                                                    count_reportnum, \
+                                                    count_title, \
+                                                    count_url, \
+                                                    count_doi, \
+                                                    count_misc, \
+                                                    count_auth_group, \
+                                                    self.rec_id, \
+                                                    processed_references)
 
         # Remove redundant misc subfields
         (m_restricted, ref_lines) = restrict_m_subfields(tmp_out.split('\n'))

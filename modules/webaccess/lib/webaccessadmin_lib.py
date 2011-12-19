@@ -42,7 +42,6 @@ from invenio.config import \
     CFG_SITE_NAME, \
     CFG_SITE_SUPPORT_EMAIL, \
     CFG_SITE_ADMIN_EMAIL, \
-    CFG_SITE_URL, \
     CFG_SITE_SECURE_URL
 import invenio.access_control_engine as acce
 import invenio.access_control_admin as acca
@@ -53,7 +52,7 @@ from invenio.bibrankadminlib import addadminbox, tupletotable, \
 from invenio.access_control_firerole import compile_role_definition, \
     repair_role_definitions, serialize
 from invenio.messages import gettext_set_language
-from invenio.dbquery import run_sql, OperationalError
+from invenio.dbquery import run_sql, OperationalError, wash_table_column_name
 from invenio.webpage import page
 from invenio.webuser import getUid, isGuestUser, page_not_authorized, collect_user_info
 from invenio.webuser import email_valid_p, get_user_preferences, \
@@ -67,10 +66,6 @@ from invenio.access_control_config import DEF_DEMO_USER_ROLES, \
 from invenio.bibtask import authenticate
 from cgi import escape
 
-## The following variable is True if the installation make any difference
-## between HTTP Vs. HTTPS connections.
-CFG_HAS_HTTPS_SUPPORT = CFG_SITE_URL != CFG_SITE_SECURE_URL
-
 def index(req, title='', body='', subtitle='', adminarea=2, authorized=0, ln=CFG_SITE_LANG):
     """main function to show pages for webaccessadmin.
 
@@ -81,9 +76,6 @@ def index(req, title='', body='', subtitle='', adminarea=2, authorized=0, ln=CFG
     3. show admin page with title, body, subtitle and navtrail.
 
     authorized - if 1, don't check if the user is allowed to be webadmin """
-    if CFG_HAS_HTTPS_SUPPORT and not req.is_https():
-        redirect_to_url(req, "%s/admin/webaccess/webaccessadmin.py" % CFG_SITE_SECURE_URL)
-
     navtrail_previous_links = '<a class="navtrail" href="%s/help/admin">Admin Area' \
         '</a>' % (CFG_SITE_SECURE_URL,)
 
@@ -3391,7 +3383,7 @@ def headeritalic(**ids):
             output += ' %s <i>%s</i>' % (key, ids[key])
             continue
 
-        res = run_sql("""SELECT %%s FROM %s WHERE id = %%s""" % table, (value, ids[key]))
+        res = run_sql("""SELECT %%s FROM %s WHERE id = %%s""" % wash_table_column_name(table), (value, ids[key])) # kwalitee: disable=sql
 
         if res:
             if output:
@@ -3427,7 +3419,7 @@ def headerstrong(query=1, **ids):
             continue
 
         if query:
-            res = run_sql("""SELECT %%s FROM %s WHERE id = %%s""" % table, (value, ids[key]))
+            res = run_sql("""SELECT %%s FROM %s WHERE id = %%s""" % wash_table_column_name(table), (value, ids[key])) # kwalitee: disable=sql
             if res:
                 if output:
                     output += ' and '

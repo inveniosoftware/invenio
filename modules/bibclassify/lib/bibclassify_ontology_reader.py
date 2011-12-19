@@ -55,8 +55,10 @@ import time
 
 try:
     import rdflib
+    rdflib_exceptions_Error = rdflib.exceptions.Error
 except ImportError:
     rdflib = None
+    rdflib_exceptions_Error = None
 
 import bibclassify_config as bconfig
 log = bconfig.get_logger("bibclassify.ontology_reader")
@@ -549,7 +551,7 @@ def _build_cache(source_file, skip_cache=False):
             else:
                 store.parse("file:///" + source_file)
 
-    except rdflib.exceptions.Error, e:
+    except rdflib_exceptions_Error, e:
         log.error("Serious error reading RDF file")
         log.error(e)
         log.error(traceback.format_exc())

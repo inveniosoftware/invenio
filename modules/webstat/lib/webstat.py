@@ -29,22 +29,22 @@ from urllib import quote
 
 from invenio import template
 from invenio.config import \
-     CFG_SITE_NAME, \
      CFG_WEBDIR, \
      CFG_TMPDIR, \
      CFG_SITE_URL, \
-     CFG_SITE_LANG
+     CFG_SITE_LANG, \
+     CFG_WEBSTAT_BIBCIRCULATION_START_YEAR
 from invenio.webstat_config import CFG_WEBSTAT_CONFIG_PATH
-from invenio.search_engine import get_alphabetically_ordered_collection_list, \
-    is_hosted_collection
-from invenio.dbquery import run_sql, wash_table_column_name
+from invenio.search_engine import get_coll_i18nname, \
+    wash_index_term
+from invenio.dbquery import run_sql, wash_table_column_name, ProgrammingError
 from invenio.bibsched import is_task_scheduled, \
     get_task_ids_by_descending_date, \
     get_task_options
-from invenio.bibcirculation_utils import book_title_from_MARC
 
 # Imports handling key events and error log
 from invenio.webstat_engine import get_keyevent_trend_collection_population, \
+    get_keyevent_trend_new_records, \
     get_keyevent_trend_search_frequency, \
     get_keyevent_trend_search_type_distribution, \
     get_keyevent_trend_download_frequency, \
@@ -94,12 +94,13 @@ from invenio.webstat_engine import get_custom_summary_data, \
 # Imports for handling outputting
 from invenio.webstat_engine import create_graph_trend, \
     create_graph_dump, \
-    create_graph_table
+    create_graph_table, \
+    get_numeric_stats
 
 # Imports for handling exports
 from invenio.webstat_engine import export_to_python, \
     export_to_csv, \
-    export_to_excel
+    export_to_file
 
 TEMPLATES = template.load('webstat')
 
@@ -120,14 +121,17 @@ TYPE_REPOSITORY = [('gnuplot', 'Image - Gnuplot'),
 
 def get_collection_list_plus_all():
     """ Return all the collection names plus the name All"""
-    coll = get_alphabetically_ordered_collection_list()
-    hosted_colls = []
-    for collection in coll:
-        if is_hosted_collection(collection[0]):
-            hosted_colls.append(collection)
-    for hosted_coll in hosted_colls:
-        coll.remove(hosted_coll)
-    coll.append(['All', 'All'])
+    coll = [('All', 'All')]
+    res = run_sql("SELECT name FROM collection WHERE (dbquery IS NULL OR dbquery \
+NOT LIKE 'hostedcollection:%') ORDER BY name ASC")
+    for c_name in res:
+        # make a nice printable name (e.g. truncate c_printable for
+        # long collection names in given language):
+        c_printable_fullname = get_coll_i18nname(c_name[0], CFG_SITE_LANG, False)
+        c_printable = wash_index_term(c_printable_fullname, 30, False)
+        if c_printable != c_printable_fullname:
+            c_printable = c_printable + "..."
+        coll.append([c_name[0], c_printable])
     return coll
 
 # Key event repository, add an entry here to support new key measures.
@@ -135,8 +139,27 @@ KEYEVENT_REPOSITORY = {'collection population':
                           {'fullname': 'Collection population',
                             'specificname':
                                    'Population in collection "%(collection)s"',
+                            'description':
+                                   ('The collection population is the number of \
+documents existing in the selected collection.', ),
                             'gatherer':
                                    get_keyevent_trend_collection_population,
+                            'extraparams': {'collection': ('combobox', 'Collection',
+                                   get_collection_list_plus_all)},
+                            'cachefilename':
+                                   'webstat_%(event_id)s_%(collection)s_%(timespan)s',
+                            'ylabel': 'Number of records',
+                            'multiple': None,
+                            'output': 'Graph'},
+                        'new records':
+                          {'fullname': 'New records',
+                            'specificname':
+                                   'New records in collection "%(collection)s"',
+                            'description':
+                                   ('The graph shows the new documents created in \
+the selected collection and time span.', ),
+                            'gatherer':
+                                   get_keyevent_trend_new_records,
                             'extraparams': {'collection': ('combobox', 'Collection',
                                    get_collection_list_plus_all)},
                             'cachefilename':
@@ -147,6 +170,9 @@ KEYEVENT_REPOSITORY = {'collection population':
                         'search frequency':
                           {'fullname': 'Search frequency',
                             'specificname': 'Search frequency',
+                            'description':
+                                   ('The search frequency is the number of searches \
+performed in a specific time span.', ),
                             'gatherer': get_keyevent_trend_search_frequency,
                             'extraparams': {},
                             'cachefilename':
@@ -157,6 +183,9 @@ KEYEVENT_REPOSITORY = {'collection population':
                         'search type distribution':
                           {'fullname': 'Search type distribution',
                             'specificname': 'Search type distribution',
+                            'description':
+                                   ('The search type distribution shows both the \
+number of simple searches and the number of advanced searches in the same graph.', ),
                             'gatherer':
                                    get_keyevent_trend_search_type_distribution,
                             'extraparams': {},
@@ -169,6 +198,9 @@ KEYEVENT_REPOSITORY = {'collection population':
                         'download frequency':
                           {'fullname': 'Download frequency',
                             'specificname': 'Download frequency in collection "%(collection)s"',
+                            'description':
+                                   ('The download frequency is the number of fulltext \
+downloads of the documents.', ),
                             'gatherer': get_keyevent_trend_download_frequency,
                             'extraparams': {'collection': ('combobox', 'Collection',
                                                     get_collection_list_plus_all)},
@@ -179,6 +211,9 @@ KEYEVENT_REPOSITORY = {'collection population':
                          'comments frequency':
                           {'fullname': 'Comments frequency',
                             'specificname': 'Comments frequency in collection "%(collection)s"',
+                            'description':
+                                   ('The comments frequency is the amount of comments written \
+for all the documents.', ),
                             'gatherer': get_keyevent_trend_comments_frequency,
                             'extraparams': {'collection': ('combobox', 'Collection',
                                                     get_collection_list_plus_all)},
@@ -187,19 +222,26 @@ KEYEVENT_REPOSITORY = {'collection population':
                             'multiple': None,
                             'output': 'Graph'},
                         'number of loans':
-                          {'fullname': 'Number of loans',
-                            'specificname': 'Number of loans',
+                          {'fullname': 'Number of circulation loans',
+                            'specificname': 'Number of circulation loans',
+                            'description':
+                                   ('The number of loans shows the total number of records loaned \
+ over a time span', ),
                             'gatherer': get_keyevent_trend_number_of_loans,
                             'extraparams': {},
                             'cachefilename':
                                    'webstat_%(event_id)s_%(timespan)s',
                             'ylabel': 'Number of loans',
                             'multiple': None,
-                            'output': 'Graph'},
+                            'output': 'Graph',
+                            'type': 'bibcirculation'},
                         'web submissions':
                           {'fullname': 'Number of web submissions',
                             'specificname':
                                    'Number of web submissions of "%(doctype)s"',
+                            'description':
+                                   ("The web submissions are the number of submitted \
+documents using the web form.", ),
                             'gatherer': get_keyevent_trend_web_submissions,
                             'extraparams': {
                                 'doctype': ('combobox', 'Type of document', _get_doctypes)},
@@ -209,30 +251,37 @@ KEYEVENT_REPOSITORY = {'collection population':
                             'multiple': None,
                             'output': 'Graph'},
                         'loans statistics':
-                          {'fullname': 'Loans statistics',
-                            'specificname': 'Loans statistics',
+                          {'fullname': 'Circulation loans statistics',
+                            'specificname': 'Circulation loans statistics',
+                            'description':
+                                   ('The loan statistics consist on different numbers \
+related to the records loaned. It is important to see the difference between document \
+and item. The item is the physical representation of a document (like every copy of a \
+book). There may be more items than documents, but never the opposite.', ),
                             'gatherer':
                                    get_keyevent_loan_statistics,
                             'extraparams': {
-                                'user_address': ('textbox', 'User address'),
                                 'udc': ('textbox', 'UDC'),
                                 'item_status': ('combobox', 'Item status', _get_item_statuses),
                                 'publication_date': ('textbox', 'Publication date'),
                                 'creation_date': ('textbox', 'Creation date')},
                             'cachefilename':
-                                   'webstat_%(event_id)s_%(user_address)s_' + \
-                                '%(udc)s_%(item_status)s_%(publication_date)s' + \
+                                   'webstat_%(event_id)s_%(udc)s_%(item_status)s_%(publication_date)s' + \
                                 '_%(creation_date)s_%(timespan)s',
                             'rows': ['Number of documents loaned',
-                                         'Number of items loaned on the total number of items',
+                                         'Number of items loaned on the total number of items (%)',
                                          'Number of items never loaned on the \
-                                         total number of items',
-                                         'Average time between the date of ' + \
-                                         'the record creation and the date of the first loan'],
-                            'output': 'Table'},
+                                         total number of items (%)',
+                                         'Average time between the date of \
+the record creation and the date of the first loan (in days)'],
+                            'output': 'Table',
+                            'type': 'bibcirculation'},
                          'loans lists':
-                           {'fullname': 'Loans lists',
-                            'specificname': 'Loans lists',
+                           {'fullname': 'Circulation loans lists',
+                            'specificname': 'Circulation loans lists',
+                            'description':
+                                   ('The loan lists show the most loaned and the never loaned \
+records in a time span. The most loaned record are calculated as the number of loans by copy.', ),
                             'gatherer':
                                    get_keyevent_loan_lists,
                             'extraparams': {
@@ -241,39 +290,49 @@ KEYEVENT_REPOSITORY = {'collection population':
                                 'max_loans': ('textbox', 'Maximum number of loans'),
                                 'min_loans': ('textbox', 'Minimum number of loans'),
                                 'publication_date': ('textbox', 'Publication date'),
-                                'creation_date': ('textbox', 'Creation date'),
-                                'user_address': ('textbox', 'User address')},
+                                'creation_date': ('textbox', 'Creation date')},
                             'cachefilename':
                                    'webstat_%(event_id)s_%(udc)s_%(loan_period)s' + \
                                  '_%(min_loans)s_%(max_loans)s_%(publication_date)s_' + \
-                                 '%(creation_date)s_%(user_address)s_%(timespan)s',
+                                 '%(creation_date)s_%(timespan)s',
                             'rows': [],
-                            'output': 'List'},
+                            'output': 'List',
+                            'type': 'bibcirculation'},
                           'renewals':
-                           {'fullname': 'Renewals',
-                            'specificname': 'Renewals',
+                           {'fullname': 'Circulation renewals',
+                            'specificname': 'Circulation renewals',
+                            'description':
+                                   ('Here the list of most renewed items stored is shown \
+by decreasing order', ),
                             'gatherer':
                                    get_keyevent_renewals_lists,
                             'extraparams': {
-                                'udc': ('textbox', 'UDC'),
-                                'user_address': ('textbox', 'User address')},
+                                'udc': ('textbox', 'UDC')},
                             'cachefilename':
-                                   'webstat_%(event_id)s_%(udc)s_%(user_address)s_%(timespan)s',
+                                   'webstat_%(event_id)s_%(udc)s_%(timespan)s',
                             'rows': [],
-                            'output': 'List'},
+                            'output': 'List',
+                            'type': 'bibcirculation'},
                           'number returns':
-                           {'fullname': 'Number of overdue returns',
-                            'specificname': 'Number of overdue returns',
+                           {'fullname': 'Number of circulation overdue returns',
+                            'specificname': 'Number of circulation overdue returns',
+                            'description':
+                                   ('The number of overdue returns is the number of loans \
+that has not been returned by the due date (they may have been returned after or never).', ),
                             'gatherer':
                                    get_keyevent_returns_table,
                             'extraparams': {},
                             'cachefilename':
                                    'webstat_%(event_id)s_%(timespan)s',
                             'rows': ['Number of overdue returns'],
-                            'output': 'Table'},
+                            'output': 'Table',
+                            'type': 'bibcirculation'},
                           'percentage returns':
-                           {'fullname': 'Percentage of overdue returns',
+                           {'fullname': 'Percentage of circulation overdue returns',
                             'specificname': 'Percentage of overdue returns',
+                            'description':
+                                   ('This graphs shows both the overdue returns and the total \
+of returns.', ),
                             'gatherer':
                                    get_keyevent_trend_returns_percentage,
                             'extraparams': {},
@@ -282,33 +341,39 @@ KEYEVENT_REPOSITORY = {'collection population':
                             'ylabel': 'Percentage of overdue returns',
                             'multiple': ['Overdue returns',
                                          'Total returns'],
-                            'output': 'Graph'},
+                            'output': 'Graph',
+                            'type': 'bibcirculation'},
                         'ill requests statistics':
-                          {'fullname': 'ILL Requests statistics',
-                            'specificname': 'ILL Requests statistics',
+                          {'fullname': 'Circulation ILL Requests statistics',
+                            'specificname': 'Circulation ILL Requests statistics',
+                            'description':
+                                   ('The ILL requests statistics are different numbers \
+related to the requests to other libraries.', ),
                             'gatherer':
                                    get_keyevent_ill_requests_statistics,
                             'extraparams': {
-                                'user_address': ('textbox', 'User address'),
                                 'doctype': ('combobox', 'Type of document', _get_item_doctype),
                                 'status': ('combobox', 'Status of request', _get_request_statuses),
                                 'supplier': ('combobox', 'Supplier', _get_libraries)},
                             'cachefilename':
-                                   'webstat_%(event_id)s_%(user_address)s_\
-                                   %(doctype)s_%(status)s_%(supplier)s_%(timespan)s',
+                                   'webstat_%(event_id)s_%(doctype)s_%(status)s_%(supplier)s_%(timespan)s',
                             'rows': ['Number of ILL requests',
-                                     'Number of satisfied ILL requests 3 months \
+                                     'Number of satisfied ILL requests 2 weeks \
                                      after the date of request creation',
-                                     'Average time between the date and the hour \
-                                     of the ill request date and the date and the \
-                                     hour of the delivery item to the user',
-                                     'Average time between the date and the hour \
+                                     'Average time between the day \
+                                     of the ILL request date and day \
+                                     of the delivery item to the user (in days)',
+                                     'Average time between the day \
                                      the ILL request was sent to the supplier and \
-                                     the date and hour of the delivery item'],
-                            'output': 'Table'},
+                                     the day of the delivery item (in days)'],
+                            'output': 'Table',
+                            'type': 'bibcirculation'},
                           'ill requests list':
-                           {'fullname': 'ILL Requests list',
-                            'specificname': 'ILL Requests list',
+                           {'fullname': 'Circulation ILL Requests list',
+                            'specificname': 'Circulation ILL Requests list',
+                            'description':
+                                   ('The ILL requests list shows 50 requests to other \
+libraries on the selected time span.', ),
                             'gatherer':
                                    get_keyevent_ill_requests_lists,
                             'extraparams': {
@@ -317,27 +382,33 @@ KEYEVENT_REPOSITORY = {'collection population':
                             'cachefilename':
                                    'webstat_%(event_id)s_%(doctype)s_%(supplier)s_%(timespan)s',
                             'rows': [],
-                            'output': 'List'},
+                            'output': 'List',
+                            'type': 'bibcirculation'},
                           'percentage satisfied ill requests':
-                           {'fullname': 'Percentage of satisfied ILL requests',
-                            'specificname': 'Percentage of satisfied ILL requests',
+                           {'fullname': 'Percentage of circulation satisfied ILL requests',
+                            'specificname': 'Percentage of circulation satisfied ILL requests',
+                            'description':
+                                   ('This graph shows both the satisfied ILL requests and \
+the total number of requests in the selected time span.', ),
                             'gatherer':
                                    get_keyevent_trend_satisfied_ill_requests_percentage,
                             'extraparams': {
-                                'user_address': ('textbox', 'User address'),
                                 'doctype': ('combobox', 'Type of document', _get_item_doctype),
                                 'status': ('combobox', 'Status of request', _get_request_statuses),
                                 'supplier': ('combobox', 'Supplier', _get_libraries)},
                             'cachefilename':
-                                   'webstat_%(event_id)s_%(user_address)s_\
-                                   %(doctype)s_%(status)s_%(supplier)s_%(timespan)s',
+                                   'webstat_%(event_id)s_%(doctype)s_%(status)s_%(supplier)s_%(timespan)s',
                             'ylabel': 'Percentage of satisfied ILL requests',
                             'multiple': ['Satisfied ILL requests',
                                          'Total requests'],
-                            'output': 'Graph'},
+                            'output': 'Graph',
+                            'type': 'bibcirculation'},
                           'items stats':
-                           {'fullname': 'Items statistics',
-                            'specificname': 'Items statistics',
+                           {'fullname': 'Circulation items statistics',
+                            'specificname': 'Circulation items statistics',
+                            'description':
+                                   ('The items statistics show the total number of items at \
+the moment and the number of new items in the selected time span.', ),
                             'gatherer':
                                    get_keyevent_items_statistics,
                             'extraparams': {
@@ -346,10 +417,13 @@ KEYEVENT_REPOSITORY = {'collection population':
                             'cachefilename':
                                    'webstat_%(event_id)s_%(udc)s_%(timespan)s',
                             'rows': ['The total number of items', 'Total number of new items'],
-                            'output': 'Table'},
+                            'output': 'Table',
+                            'type': 'bibcirculation'},
                           'items list':
-                           {'fullname': 'Items list',
-                            'specificname': 'Items list',
+                           {'fullname': 'Circulation items list',
+                            'specificname': 'Circulation items list',
+                            'description':
+                                   ('The item list shows data about the existing items.', ),
                             'gatherer':
                                    get_keyevent_items_lists,
                             'extraparams': {
@@ -358,10 +432,15 @@ KEYEVENT_REPOSITORY = {'collection population':
                             'cachefilename':
                                    'webstat_%(event_id)s_%(library)s_%(status)s',
                             'rows': [],
-                            'output': 'List'},
+                            'output': 'List',
+                            'type': 'bibcirculation'},
                         'loan request statistics':
-                          {'fullname': 'Hold requests statistics',
-                            'specificname': 'Hold requests statistics',
+                          {'fullname': 'Circulation hold requests statistics',
+                            'specificname': 'Circulation hold requests statistics',
+                            'description':
+                                   ('The hold requests statistics show numbers about the \
+requests for documents. For the numbers to be correct, there must be data in the loanrequest \
+custom event.', ),
                             'gatherer':
                                    get_keyevent_loan_request_statistics,
                             'extraparams': {
@@ -373,39 +452,50 @@ KEYEVENT_REPOSITORY = {'collection population':
                                          'Number of successful hold requests transactions',
                                          'Average time between the hold request date and \
                                          the date of delivery document  in a year'],
-                            'output': 'Table'},
-                         'loans request lists':
-                           {'fullname': 'Hold requests lists',
-                            'specificname': 'Hold requests lists',
+                            'output': 'Table',
+                            'type': 'bibcirculation'},
+                         'loan request lists':
+                           {'fullname': 'Circulation hold requests lists',
+                            'specificname': 'Circulation hold requests lists',
+                            'description':
+                                   ('The hold requests list shows the most requested items.', ),
                             'gatherer':
                                    get_keyevent_loan_request_lists,
                             'extraparams': {
-                                'udc': ('textbox', 'UDC'),
-                                'user_address': ('textbox', 'User address')},
+                                'udc': ('textbox', 'UDC')},
                             'cachefilename':
-                                   'webstat_%(event_id)s_%(udc)s_%(user_address)s_%(timespan)s',
+                                   'webstat_%(event_id)s_%(udc)s_%(timespan)s',
                             'rows': [],
-                            'output': 'List'},
+                            'output': 'List',
+                            'type': 'bibcirculation'},
                          'user statistics':
-                           {'fullname': 'Users statistics',
-                            'specificname': 'Users statistics',
+                           {'fullname': 'Circulation users statistics',
+                            'specificname': 'Circulation users statistics',
+                            'description':
+                                   ('The user statistics show the number of active users \
+(at least one transaction) in the selected timespan.', ),
                             'gatherer':
                                    get_keyevent_user_statistics,
-                            'extraparams': {'user_address': ('textbox', 'User address')},
+                            'extraparams': {},
                             'cachefilename':
-                                   'webstat_%(event_id)s_%(user_address)s_%(timespan)s',
+                                   'webstat_%(event_id)s_%(timespan)s',
                             'rows': ['Number of active users'],
-                            'output': 'Table'},
+                            'output': 'Table',
+                            'type': 'bibcirculation'},
                          'user lists':
-                           {'fullname': 'Users lists',
-                            'specificname': 'Users lists',
+                           {'fullname': 'Circulation users lists',
+                            'specificname': 'Circulation users lists',
+                            'description':
+                                   ('The user list shows the most intensive users \
+(ILL requests + Loans)', ),
                             'gatherer':
                                    get_keyevent_user_lists,
-                            'extraparams': {'user_address': ('textbox', 'User address')},
+                            'extraparams': {},
                             'cachefilename':
-                                   'webstat_%(event_id)s_%(user_address)s_%(timespan)s',
+                                   'webstat_%(event_id)s_%(timespan)s',
                             'rows': [],
-                            'output': 'List'}
+                            'output': 'List',
+                            'type': 'bibcirculation'}
 
                        }
 
@@ -463,7 +553,7 @@ def create_customevent(event_id=None, name=None, cols=[]):
     tbl_name = get_customevent_table(event_id)
 
     # Create a table for the new event
-    sql_query = ["CREATE TABLE %s (" % tbl_name]
+    sql_query = ["CREATE TABLE %s (" % wash_table_column_name(tbl_name)]
     sql_query.append("id MEDIUMINT unsigned NOT NULL auto_increment,")
     sql_query.append("creation_time TIMESTAMP DEFAULT NOW(),")
     for argument in cols:
@@ -512,6 +602,12 @@ def modify_customevent(event_id=None, name=None, cols=[]):
 
     res = run_sql("SELECT CONCAT('staEVENT', number), cols " + \
                       "FROM staEVENT WHERE id = %s", (event_id, ))
+    if not res:
+        return "Invalid event id: %s! Aborted" % event_id
+    if not run_sql("SHOW TABLES LIKE %s", res[0][0]):
+        run_sql("DELETE FROM staEVENT WHERE id=%s", (event_id, ))
+        create_customevent(event_id, event_id, cols)
+        return
     cols_orig = cPickle.loads(res[0][1])
 
     # add new cols
@@ -528,13 +624,29 @@ def modify_customevent(event_id=None, name=None, cols=[]):
 
     #modify event table
     if cols_del or cols_add:
-        sql_query = ["ALTER TABLE %s " % res[0][0]]
-        for col in cols_del:
-            sql_query.append("DROP COLUMN `%s`" % col)
-            sql_query.append(", ")
-        for col in cols_add:
-            sql_query.append("ADD COLUMN `%s` MEDIUMTEXT NULL, " % col)
-            sql_query.append("ADD INDEX `%s` (`%s`(50))" % (col, col))
+        sql_query = ["ALTER TABLE %s " % wash_table_column_name(res[0][0])]
+        # check if a column was renamed
+        for col_del in cols_del:
+            result = -1
+            while result < 1 or result > len(cols_add) + 1:
+                print """What do you want to do with the column %s in event %s?:
+1.- Delete it""" % (col_del, event_id)
+                for i in range(len(cols_add)):
+                    print "%d.- Rename it to %s" % (i + 2, cols_add[i])
+                result = int(raw_input("\n"))
+            if result == 1:
+                sql_query.append("DROP COLUMN `%s`" % col_del)
+                sql_query.append(", ")
+            else:
+                col_add = cols_add[result-2]
+                sql_query.append("CHANGE `%s` `%s` MEDIUMTEXT NULL"%(col_del, col_add))
+                sql_query.append(", ")
+                cols_add.remove(col_add)
+
+        # add the rest of the columns
+        for col_add in cols_add:
+            sql_query.append("ADD COLUMN `%s` MEDIUMTEXT NULL, " % col_add)
+            sql_query.append("ADD INDEX `%s` (`%s`(50))" % (col_add, col_add))
             sql_query.append(", ")
         sql_query[-1] = ";"
         run_sql("".join(sql_query))
@@ -577,15 +689,30 @@ def destroy_customevent(event_id=None):
     # Check if the specified id exists
     if len(run_sql("SELECT NULL FROM staEVENT WHERE id = %s",
                    (event_id, ))) == 0:
-        return "Event id [%s] doesn't exist! Aborted." % event_id
+        return "Custom event ID '%s' doesn't exist! Aborted." % event_id
     else:
         tbl_name = get_customevent_table(event_id)
-        run_sql("DROP TABLE %s" % (tbl_name))
+        run_sql("DROP TABLE %s" % wash_table_column_name(tbl_name)) # kwalitee: disable=sql
         run_sql("DELETE FROM staEVENT WHERE id = %s", (event_id, ))
-        return ("Event with id [%s] was successfully destroyed.\n" +
-                "Table [%s], with content, was destroyed.") \
+        return ("Custom event ID '%s' table '%s' was successfully destroyed.\n") \
                 % (event_id, tbl_name)
 
+def destroy_customevents():
+    """
+    Removes all existing custom events by destroying the MySQL tables and
+    the events data that might be around. Use with caution!
+
+    @return: A status message
+    @type: str
+    """
+    msg = ''
+    try:
+        res = run_sql("SELECT id FROM staEVENT")
+    except ProgrammingError:
+        return msg
+    for event in res:
+        msg += destroy_customevent(event[0])
+    return msg
 
 def register_customevent(event_id, *arguments):
     """
@@ -617,7 +744,7 @@ def register_customevent(event_id, *arguments):
     # Make sql query
     if len(arguments[0]) != 0:
         sql_param = []
-        sql_query = ["INSERT INTO %s (" % tbl_name]
+        sql_query = ["INSERT INTO %s (" % wash_table_column_name(tbl_name)]
         for title in col_titles:
             sql_query.append("`%s`" % title)
             sql_query.append(",")
@@ -632,7 +759,7 @@ def register_customevent(event_id, *arguments):
         sql_str = ''.join(sql_query)
         run_sql(sql_str, tuple(sql_param))
     else:
-        run_sql("INSERT INTO %s () VALUES ()" % (tbl_name))
+        run_sql("INSERT INTO %s () VALUES ()" % wash_table_column_name(tbl_name)) # kwalitee: disable=sql
 
 
 def cache_keyevent_trend(ids=[]):
@@ -646,10 +773,14 @@ def cache_keyevent_trend(ids=[]):
     @type ids: []
     """
     args = {}
-    timespans = _get_timespans()
 
     for event_id in ids:
         args['event_id'] = event_id
+        if 'type' in KEYEVENT_REPOSITORY[event_id] and \
+             KEYEVENT_REPOSITORY[event_id]['type'] == 'bibcirculation':
+            timespans = _get_timespans(bibcirculation_stat=True)[:-1]
+        else:
+            timespans = _get_timespans()[:-1]
         extraparams = KEYEVENT_REPOSITORY[event_id]['extraparams']
 
         # Construct all combinations of extraparams and store as
@@ -739,16 +870,12 @@ def basket_display():
         # custom event baskets not defined, so return empty output:
         return []
     try:
-        res = run_sql("SELECT creation_time FROM %s ORDER BY creation_time"
-                      % tbl_name)
+        res = run_sql("SELECT creation_time FROM %s ORDER BY creation_time" % wash_table_column_name(tbl_name)) # kwalitee: disable=sql
         days = (res[-1][0] - res[0][0]).days + 1
-        public = run_sql("SELECT COUNT(*) FROM %s " % tbl_name + \
-                             "WHERE action = 'display_public'")[0][0]
-        users = run_sql("SELECT COUNT(DISTINCT user) FROM %s" % tbl_name)[0][0]
-        adds = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'add'"
-                       % tbl_name)[0][0]
-        displays = run_sql("SELECT COUNT(*) FROM %s " % tbl_name + \
-                 "WHERE action = 'display' OR action = 'display_public'")[0][0]
+        public = run_sql("SELECT COUNT(*) FROM %s " % wash_table_column_name(tbl_name) + " WHERE action = 'display_public'")[0][0] # kwalitee: disable=sql
+        users = run_sql("SELECT COUNT(DISTINCT user) FROM %s" % wash_table_column_name(tbl_name))[0][0] # kwalitee: disable=sql
+        adds = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'add'" % wash_table_column_name(tbl_name))[0][0] # kwalitee: disable=sql
+        displays = run_sql("SELECT COUNT(*) FROM %s " % wash_table_column_name(tbl_name) + " WHERE action = 'display' OR action = 'display_public'")[0][0] # kwalitee: disable=sql
         hits = adds + displays
         average = hits / days
 
@@ -773,15 +900,15 @@ def alert_display():
         return []
     try:
         res = run_sql("SELECT creation_time FROM %s ORDER BY creation_time"
-                      % tbl_name)
+                      % wash_table_column_name(tbl_name))
         days = (res[-1][0] - res[0][0]).days + 1
-        res = run_sql("SELECT COUNT(DISTINCT user),COUNT(*) FROM %s" % (tbl_name))
+        res = run_sql("SELECT COUNT(DISTINCT user),COUNT(*) FROM %s" % wash_table_column_name(tbl_name)) # kwalitee: disable=sql
         users = res[0][0]
         hits = res[0][1]
         displays = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'list'"
-                           % tbl_name)[0][0]
+                           % wash_table_column_name(tbl_name))[0][0]
         search = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'display'"
-                         % tbl_name)[0][0]
+                         % wash_table_column_name(tbl_name))[0][0]
         average = hits / days
 
         res = [("Alerts page hits", hits)]
@@ -800,27 +927,9 @@ def loan_display():
     Display loan statistics.
     """
     try:
-        total = run_sql("SELECT COUNT(*) FROM crcLOAN")[0][0]
-        toppop = run_sql("SELECT id_bibrec, COUNT(DISTINCT id_crcBORROWER) \
-                      FROM crcLOAN GROUP BY id_bibrec \
-                      HAVING COUNT(DISTINCT id_crcBORROWER) = (SELECT MAX(n) from (\
-                      SELECT COUNT(DISTINCT id_crcBORROWER) n \
-                      FROM crcLOAN GROUP BY id_bibrec) aux)")
-        topreq = run_sql("SELECT id_bibrec, COUNT(DISTINCT id_crcBORROWER) " +
-                         "FROM crcLOANREQUEST GROUP BY id_bibrec " +
-                         "HAVING COUNT(DISTINCT id_crcBORROWER) = (SELECT MAX(n) from (" +
-                         "SELECT COUNT(DISTINCT id_crcBORROWER) n " +
-                         "FROM crcLOANREQUEST GROUP BY id_bibrec) aux)")
-        res = [("Loans", total)]
-        for record in toppop:
-            res.append(("   Most popular records",
-                        book_title_from_MARC(record[0]) + '(%d)' % record[1]))
-        for record in topreq:
-            res.append(("   Most requested records",
-                        book_title_from_MARC(record[0]) + '(%d)' % record[1]))
         loans, renewals, returns, illrequests, holdrequests = \
                 get_keyevent_bibcirculation_report()
-        res.append(("Yearly report", ''))
+        res = [("Yearly report", '')]
         res.append(("   Loans", loans))
         res.append(("   Renewals", renewals))
         res.append(("   Returns", returns))
@@ -836,6 +945,9 @@ def get_url_customevent(url_dest, event_id, *arguments):
     Get an url for registers a custom event. Every time is load the
     url will register a customevent as register_customevent().
 
+    @param url_dest: url to redirect after register the event
+    @type url_dest: str
+
     @param event_id: Human-readable id of the event to be registered
     @type event_id: str
 
@@ -843,9 +955,6 @@ def get_url_customevent(url_dest, event_id, *arguments):
                        the param "WEBSTAT_IP" will tell webstat that here
                        should be the IP who request the url
     @type *arguments: [params]
-
-    @param url_dest: url to redirect after register the event
-    @type url_dest: str
 
     @return: url for register event
     @type: str
@@ -860,10 +969,33 @@ def perform_request_index(ln=CFG_SITE_LANG):
     Displays some informative text, the health box, and a the list of
     key/custom events.
     """
+    out = TEMPLATES.tmpl_welcome(ln=ln)
+
+    # Display the health box
+    out += TEMPLATES.tmpl_system_health_list(ln=ln)
+
+    # Produce a list of the key statistics
+    out += TEMPLATES.tmpl_keyevent_list(ln=ln)
+
+    # Display the custom statistics
+    out += TEMPLATES.tmpl_customevent_list(_get_customevents(), ln=ln)
+
+    # Display error log analyzer
+    out += TEMPLATES.tmpl_error_log_statistics_list(ln=ln)
+
+    # Display annual report
+    out += TEMPLATES.tmpl_custom_summary(ln=ln)
+
+    # Display test for collections
+    out += TEMPLATES.tmpl_collection_stats_main_list(ln=ln)
+
+    return out
+
+
+def perform_display_current_system_health(ln=CFG_SITE_LANG):
     from ConfigParser import ConfigParser
     conf = ConfigParser()
     conf.read(CFG_WEBSTAT_CONFIG_PATH)
-    out = TEMPLATES.tmpl_welcome(ln=ln)
 
     # Prepare the health base data
     health_indicators = []
@@ -892,14 +1024,14 @@ def perform_request_index(ln=CFG_SITE_LANG):
 
     # Append new records information to the health box
     if conf.get("general", "record_box") == "True":
-        args = {'collection': CFG_SITE_NAME, 't_start': today,
+        args = {'collection': "All", 't_start': today,
                  't_end': tomorrow, 'granularity': "day",
                  't_format': "%Y-%m-%d"}
         try:
             tot_records = get_keyevent_trend_collection_population(args)[0][1]
         except IndexError:
             tot_records = 0
-        args = {'collection': CFG_SITE_NAME, 't_start': yesterday,
+        args = {'collection': "All", 't_start': yesterday,
                  't_end': today, 'granularity': "day", 't_format': "%Y-%m-%d"}
         try:
             new_records = tot_records - \
@@ -946,24 +1078,7 @@ def perform_request_index(ln=CFG_SITE_LANG):
                                   get_keyevent_snapshot_uptime_cmd()))
 
     # Display the health box
-    out += TEMPLATES.tmpl_system_health(health_indicators, ln=ln)
-
-    # Produce a list of the key statistics
-    out += TEMPLATES.tmpl_keyevent_list(ln=ln)
-
-    # Display the custom statistics
-    out += TEMPLATES.tmpl_customevent_list(_get_customevents(), ln=ln)
-
-    # Display error log analyzer
-    out += TEMPLATES.tmpl_error_log_statistics_list(ln=ln)
-
-    # Display annual report
-    out += TEMPLATES.tmpl_custom_summary(ln=ln)
-
-    # Display test for collections
-    out += TEMPLATES.tmpl_collection_stats_list(get_collection_list_plus_all(), ln=ln)
-
-    return out
+    return TEMPLATES.tmpl_system_health(health_indicators, ln=ln)
 
 
 def perform_display_keyevent(event_id=None, args={},
@@ -971,8 +1086,8 @@ def perform_display_keyevent(event_id=None, args={},
     """
     Display key events using a certain output type over the given time span.
 
-    @param ids: The ids for the custom events that are to be displayed.
-    @type ids: [str]
+    @param event_id: The ids for the custom events that are to be displayed.
+    @type event_id: [str]
 
     @param args: { param name: argument value }
     @type args: { str: str }
@@ -1005,15 +1120,20 @@ def perform_display_keyevent(event_id=None, args={},
         choosed['format'] = args['format']
         order += ['format']
     if event_id != 'items list':
-        options['timespan'] = ('combobox', 'Time span', _get_timespans())
+        if 'type' in KEYEVENT_REPOSITORY[event_id] and \
+            KEYEVENT_REPOSITORY[event_id]['type'] == 'bibcirculation':
+            options['timespan'] = ('combobox', 'Time span', _get_timespans(bibcirculation_stat=True))
+        else:
+            options['timespan'] = ('combobox', 'Time span', _get_timespans())
         choosed['timespan'] = args['timespan']
         order += ['timespan']
         choosed['s_date'] = args['s_date']
         choosed['f_date'] = args['f_date']
 
     # Send to template to prepare event customization FORM box
-    excel = KEYEVENT_REPOSITORY[event_id]['output'] == 'List'
-    out = TEMPLATES.tmpl_keyevent_box(options, order, choosed, ln=ln, excel=excel)
+    list = KEYEVENT_REPOSITORY[event_id]['output'] == 'List'
+    out = "\n".join(["<p>%s</p>" % parr for parr in KEYEVENT_REPOSITORY[event_id]['description']]) \
+            + TEMPLATES.tmpl_keyevent_box(options, order, choosed, ln=ln, list=list)
 
     # Arguments OK?
 
@@ -1051,8 +1171,13 @@ def perform_display_keyevent(event_id=None, args={},
     for param in KEYEVENT_REPOSITORY[event_id]['extraparams']:
         t_args[param] = choosed[param]
 
+    if 'format' in args and args['format'] == 'Full list':
+        gatherer = lambda: KEYEVENT_REPOSITORY[event_id]['gatherer'](t_args, limit=-1)
+        export_to_file(gatherer(), req)
+        return out
+
     # Create closure of frequency function in case cache needs to be refreshed
-    gatherer = lambda: KEYEVENT_REPOSITORY[event_id]['gatherer'](t_args)
+    gatherer = lambda return_sql: KEYEVENT_REPOSITORY[event_id]['gatherer'](t_args, return_sql=return_sql)
 
     # Determine if this particular file is due for scheduling cacheing,
     # in that case we must not allow refreshing of the rawdata.
@@ -1078,14 +1203,15 @@ def perform_display_keyevent(event_id=None, args={},
                   "format": choosed['format'],
                   "multiple": KEYEVENT_REPOSITORY[event_id]['multiple']}
     else:
-        if 'format' in args and args['format'] == 'Excel':
-            export_to_excel(data, req)
-            return out
         settings = {"title": KEYEVENT_REPOSITORY[event_id]['specificname']\
                      % choosed, "format": 'Table',
                      "rows": KEYEVENT_REPOSITORY[event_id]['rows']}
+    if args['sql']:
+        sql = gatherer(True)
+    else:
+        sql = ''
     return out + _perform_display_event(data,
-                                 os.path.basename(filename), settings, ln=ln)
+                        os.path.basename(filename), settings, ln=ln) + sql
 
 
 def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
@@ -1215,7 +1341,7 @@ def perform_display_customevent_data(ids, args_req, choosed):
         args_req['event_id'] = event_id
 
         # Prepare raw data gatherer, if cache needs refreshing.
-        gatherer = lambda: get_customevent_trend(args_req)
+        gatherer = lambda x: get_customevent_trend(args_req)
 
         # Determine if this particular file is due for scheduling cacheing,
         # in that case we must not allow refreshing of the rawdata.
@@ -1246,40 +1372,62 @@ def perform_display_customevent_data_ascii_dump(ids, args, args_req, choosed):
     return eval(_get_file_using_cache(filename, gatherer, force).read())
 
 
-def perform_display_stats_per_coll(collection='All', req=None, ln=CFG_SITE_LANG):
+def perform_display_coll_list(req=None, ln=CFG_SITE_LANG):
     """
-    Display general statistics for a given collection
+    Display list of collections
 
     @param req: The Apache request object, necessary for export redirect.
     @type req:
     """
-    timespan = 'this month'
-    events_id = ('download frequency', 'collection population', 'comments frequency')
-    gformat = 'gnuplot'
+    return TEMPLATES.tmpl_collection_stats_complete_list(get_collection_list_plus_all())
+
+
+def perform_display_stats_per_coll(args={}, req=None, ln=CFG_SITE_LANG):
+    """
+    Display general statistics for a given collection
+
+    @param args: { param name: argument value }
+    @type args: { str: str }
+
+    @param req: The Apache request object, necessary for export redirect.
+    @type req:
+    """
+    events_id = ('collection population', 'download frequency', 'comments frequency')
+    # Get all the option lists:
     # Make sure extraparams are valid, if any
-    if not collection in [x[0] for x in get_collection_list_plus_all()]:
+    if not args['collection'] in [x[0] for x in get_collection_list_plus_all()]:
         return TEMPLATES.tmpl_error('Please specify a valid value for parameter "Collection".')
+
+    # { parameter name: [(argument internal name, argument full name)]}
+    options = {'collection': ('combobox', 'Collection', get_collection_list_plus_all()),
+               'timespan': ('combobox', 'Time span', _get_timespans()),
+               'format': ('combobox', 'Output format', _get_formats())}
+    order = options.keys()
 
     # Arguments OK beyond this point!
 
     # Get unique name for caching purposes (make sure that the params
     # used in the filename are safe!)
-    choosed = {'timespan': timespan, 'collection': collection}
-    out = "<table>"
+    out = TEMPLATES.tmpl_keyevent_box(options, order, args, ln=ln)
+    out += "<table>"
     pair = False
     for event_id in events_id:
+        # Get unique name for caching purposes (make sure that the params used
+        # in the filename are safe!)
         filename = KEYEVENT_REPOSITORY[event_id]['cachefilename'] \
-               % dict([(param, re.subn("[^\w]", "_", choosed[param])[0])
-                       for param in choosed] +
+               % dict([(param, re.subn("[^\w]", "_", args[param])[0])
+                       for param in args] +
                       [('event_id', re.subn("[^\w]", "_", event_id)[0])])
 
         # Get time parameters from repository
-        _, t_fullname, t_start, t_end, granularity, t_format, xtic_format = \
-            _get_timespans()[3]
-        args = {'t_start': t_start, 't_end': t_end, 'granularity': granularity,
-                't_format': t_format, 'xtic_format': xtic_format, 'collection': collection}
+        if args['timespan'] == "select date":
+            t_args = _get_time_parameters_select_date(args["s_date"], args["f_date"])
+        else:
+            t_args = _get_time_parameters(options, args['timespan'])
+        for param in KEYEVENT_REPOSITORY[event_id]['extraparams']:
+            t_args[param] = args[param]
         # Create closure of frequency function in case cache needs to be refreshed
-        gatherer = lambda: KEYEVENT_REPOSITORY[event_id]['gatherer'](args)
+        gatherer = lambda return_sql: KEYEVENT_REPOSITORY[event_id]['gatherer'](t_args, return_sql=return_sql)
 
         # Determine if this particular file is due for scheduling cacheing,
         # in that case we must not allow refreshing of the rawdata.
@@ -1289,11 +1437,12 @@ def perform_display_stats_per_coll(collection='All', req=None, ln=CFG_SITE_LANG)
         data = eval(_get_file_using_cache(filename, gatherer, allow_refresh=allow_refresh).read())
 
         # Prepare the graph settings that are being passed on to grapher
-        settings = {"title": KEYEVENT_REPOSITORY[event_id]['specificname'] % args,
-                  "xlabel": t_fullname + ' (' + granularity + ')',
+        settings = {"title": KEYEVENT_REPOSITORY[event_id]['specificname'] % t_args,
+                  "xlabel":  t_args['t_fullname'] + ' (' + \
+                     t_args['granularity'] + ')',
                   "ylabel": KEYEVENT_REPOSITORY[event_id]['ylabel'],
-                  "xtic_format": xtic_format,
-                  "format": gformat,
+                  "xtic_format": t_args['xtic_format'],
+                  "format": args['format'],
                   "multiple": KEYEVENT_REPOSITORY[event_id]['multiple'],
                   "size": '360,270'}
         if not pair:
@@ -1326,7 +1475,7 @@ def perform_display_custom_summary(args, ln=CFG_SITE_LANG):
     @type args: { str: str }
     """
     if args['tag'] == '':
-        args['tag'] = "909C4p"
+        args['tag'] = "773__p"
     data = get_custom_summary_data(args['query'], args['tag'])
     tag_name = _get_tag_name(args['tag'])
     if tag_name == '':
@@ -1361,7 +1510,7 @@ def _perform_display_event(data, name, settings, ln=CFG_SITE_LANG):
     if settings["format"] == "asciidump":
         path += "_asciidump"
         create_graph_dump(data, path)
-        return TEMPLATES.tmpl_display_event_trend_ascii(settings["title"],
+        out = TEMPLATES.tmpl_display_event_trend_ascii(settings["title"],
                                                         path, ln=ln)
 
     if settings["format"] == "Table":
@@ -1370,24 +1519,28 @@ def _perform_display_event(data, name, settings, ln=CFG_SITE_LANG):
 
     create_graph_trend(data, path, settings)
     if settings["format"] == "asciiart":
-        return TEMPLATES.tmpl_display_event_trend_ascii(
+        out = TEMPLATES.tmpl_display_event_trend_ascii(
             settings["title"], path, ln=ln)
     else:
         if settings["format"] == "gnuplot":
             try:
                 import Gnuplot
             except ImportError:
-                return 'Gnuplot is not installed. Returning ASCII art.' + \
+                out = 'Gnuplot is not installed. Returning ASCII art.' + \
                        TEMPLATES.tmpl_display_event_trend_ascii(
                     settings["title"], path, ln=ln)
 
-            return TEMPLATES.tmpl_display_event_trend_image(
+            out = TEMPLATES.tmpl_display_event_trend_image(
                 settings["title"], path, ln=ln)
         elif settings["format"] == "flot":
-            return TEMPLATES.tmpl_display_event_trend_text(
+            out = TEMPLATES.tmpl_display_event_trend_text(
                 settings["title"], path, ln=ln)
-        return TEMPLATES.tmpl_display_event_trend_ascii(
-            settings["title"], path, ln=ln)
+        else:
+            out = TEMPLATES.tmpl_display_event_trend_ascii(
+                    settings["title"], path, ln=ln)
+    avgs, maxs, mins = get_numeric_stats(data, settings["multiple"] is not None)
+    return out + TEMPLATES.tmpl_display_numeric_stats(settings["multiple"],
+                    avgs, maxs, mins)
 
 
 def _get_customevents():
@@ -1400,7 +1553,7 @@ def _get_customevents():
     return [(x[0], x[1]) for x in run_sql("SELECT id, name FROM staEVENT")]
 
 
-def _get_timespans(dttime=None):
+def _get_timespans(dttime=None, bibcirculation_stat=False):
     """
     Helper function that generates possible time spans to be put in the
     drop-down in the generation box. Computes possible years, and also some
@@ -1457,11 +1610,15 @@ def _get_timespans(dttime=None):
               to_str((dttime + datetime.timedelta(days=31)).replace(day=1)),
               "month", dtformat, "%b")]
 
-    # Get first year as indicated by the content's in bibrec
+    # Get first year as indicated by the content's in bibrec or
+    # CFG_WEBSTAT_BIBCIRCULATION_START_YEAR
     try:
-        year1 = run_sql("SELECT creation_date FROM bibrec ORDER BY \
-                creation_date LIMIT 1")[0][0].year
-    except IndexError:
+        if bibcirculation_stat and CFG_WEBSTAT_BIBCIRCULATION_START_YEAR:
+            year1 = int(CFG_WEBSTAT_BIBCIRCULATION_START_YEAR)
+        else:
+            year1 = run_sql("SELECT creation_date FROM bibrec ORDER BY \
+                    creation_date LIMIT 1")[0][0].year
+    except:
         year1 = dttime.year
 
     year2 = time.localtime()[0]
@@ -1530,12 +1687,12 @@ def _get_time_parameters_select_date(s_date, f_date):
     """
 
     t_fullname = "%s-%s" % (s_date, f_date)
-    dt_start = datetime.datetime.strptime(s_date, "%m/%d/%Y %H:%M")
-    dt_end = datetime.datetime.strptime(f_date, "%m/%d/%Y %H:%M")
+    dt_start = datetime.datetime(*(time.strptime(s_date, "%m/%d/%Y %H:%M")[0:6]))
+    dt_end = datetime.datetime(*(time.strptime(f_date, "%m/%d/%Y %H:%M")[0:6]))
     if dt_end - dt_start <= timedelta(hours=1):
         xtic_format = "%m:%s"
         granularity = 'second'
-    elif dt_end - dt_start <= timedelta(days=3):
+    elif dt_end - dt_start <= timedelta(days=1):
         xtic_format = "%H:%m"
         granularity = 'minute'
     elif dt_end - dt_start <= timedelta(days=7):
@@ -1621,7 +1778,7 @@ def _get_export_closure(typename):
     closure.
 
     @param typename: Internal type name
-    @type type: str
+    @type typename: str
 
     @return: Closure that exports data to the type's format
     @type: function
@@ -1668,7 +1825,7 @@ def _get_file_using_cache(filename, closure, force=False, allow_refresh=True):
         if force or (time.time() - mtime > WEBSTAT_CACHE_INTERVAL):
 
             # No! Use closure to compute new content
-            content = closure()
+            content = closure(False)
 
             # Cache the data
             open(filename, 'w').write(str(content))

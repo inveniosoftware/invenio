@@ -126,6 +126,8 @@ Contents
              <http://rdflib.net/>
           - (optional) mechanize, to run regression web test suite:
              <http://wwwsearch.sourceforge.net/mechanize/>
+          - (optional) python-mock, mocking library for the test suite:
+             <http://www.voidspace.org.uk/python/mock/>
           - (optional) hashlib, needed only for Python-2.4 and only
              if you would like to use AWS connectivity:
              <http://pypi.python.org/pypi/hashlib>

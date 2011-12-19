@@ -19,6 +19,13 @@
 
 """Bibencode batch processing submodule"""
 
+from string import Template
+from pprint import pprint
+import os
+import shutil
+import uuid
+from pprint import pformat
+
 from invenio.bibtask import (
                              task_update_progress,
                              write_message,
@@ -38,7 +45,7 @@ from invenio.bibencode_profiles import (
                                         get_extract_profile
                                         )
 from invenio.bibdocfilecli import cli_fix_marc
-from invenio.bibencode_utils import json_decode_file, chose2
+from invenio.bibencode_utils import chose2
 from invenio.bibencode_metadata import (
                                         pbcore_metadata
                                         )
@@ -52,21 +59,8 @@ from invenio.mailutils import send_email
 from invenio.messages import gettext_set_language
 from invenio.webuser import emailUnique, get_user_preferences
 from invenio.bibformat_xslt_engine import format
+from invenio.jsonutils import json, json_decode_file
 import invenio.config
-from string import Template
-from pprint import pprint
-import os
-import shutil
-import uuid
-## Simplejspn fallback, stuff will crash if V < 2.5 and no simplejson
-try:
-    import json
-except:
-    try:
-        import simplejson as json
-    except:
-        pass
-from pprint import pformat
 
 ## Stored messages for email notifications
 global _BATCH_STEP, _BATCH_STEPS

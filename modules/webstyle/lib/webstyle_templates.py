@@ -1,4 +1,4 @@
-## This file is part of Invenio.
+    ## This file is part of Invenio.
 ## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
@@ -37,6 +37,7 @@ from invenio.config import \
      CFG_VERSION, \
      CFG_WEBSTYLE_INSPECT_TEMPLATES, \
      CFG_WEBSTYLE_TEMPLATE_SKIN
+from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
 from invenio.messages import gettext_set_language, language_list_long, is_language_rtl
 from invenio.urlutils import make_canonical_urlargd, create_html_link
 from invenio.dateutils import convert_datecvs_to_datestruct, \
@@ -490,28 +491,27 @@ template function generated it.
 </body>
 </html>
         """ % {
-          'siteurl' : CFG_SITE_URL,
-          'sitesecureurl' : CFG_SITE_SECURE_URL,
-          'ln' : ln,
+          'siteurl': CFG_SITE_URL,
+          'sitesecureurl': CFG_SITE_SECURE_URL,
+          'ln': ln,
           'langlink': '?ln=' + ln,
 
-          'sitename' : CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
-          'sitesupportemail' : CFG_SITE_SUPPORT_EMAIL,
+          'sitename': CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
+          'sitesupportemail': CFG_SITE_SUPPORT_EMAIL,
 
-          'msg_search' : _("Search"),
-          'msg_submit' : _("Submit"),
-          'msg_personalize' : _("Personalize"),
-          'msg_help' : _("Help"),
+          'msg_search': _("Search"),
+          'msg_submit': _("Submit"),
+          'msg_personalize': _("Personalize"),
+          'msg_help': _("Help"),
 
-          'msg_poweredby' : _("Powered by"),
-          'msg_maintainedby' : _("Maintained by"),
+          'msg_poweredby': _("Powered by"),
+          'msg_maintainedby': _("Maintained by"),
 
-          'msg_lastupdated' : msg_lastupdated,
-          'languagebox' : self.tmpl_language_selection_box(req, ln),
-          'version' : CFG_VERSION,
+          'msg_lastupdated': msg_lastupdated,
+          'languagebox': self.tmpl_language_selection_box(req, ln),
+          'version': CFG_VERSION,
 
-          'pagefooteradd' : pagefooteradd,
-
+          'pagefooteradd': pagefooteradd,
         }
         return out
 
@@ -717,12 +717,19 @@ URI: http://%(host)s%(page)s
         @param referencenum: show (this) number of references in the references tab
         @param discussionnum: show (this) number of comments/reviews in the discussion tab
         """
-        # If no tabs, returns nothing
-        if len(tabs) <= 1:
-            return ''
+        from invenio.search_engine import record_public_p
 
         # load the right message language
         _ = gettext_set_language(ln)
+
+        # Prepare restriction flag
+        restriction_flag = ''
+        if not record_public_p(recid):
+            restriction_flag = '<div class="restrictedflag"><span>%s</span></div>' % _("Restricted")
+
+        # If no tabs, returns nothing (excepted if restricted)
+        if len(tabs) <= 1:
+            return restriction_flag
 
         # Build the tabs at the top of the page
         out_tabs = ''
@@ -791,6 +798,9 @@ URI: http://%(host)s%(page)s
                 %(record_brief)s
                 """ % {'tabs':out_tabs,
                        'record_brief':record_brief}
+
+        out = restriction_flag + out
+
         return out
 
     def detailed_record_container_bottom(self, recid, tabs, ln=CFG_SITE_LANG,

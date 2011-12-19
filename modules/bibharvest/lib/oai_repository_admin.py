@@ -31,6 +31,8 @@ from invenio.urlutils import create_html_link
 from invenio.dbquery import run_sql
 from invenio.oai_repository_updater import parse_set_definition
 from invenio.messages import gettext_set_language
+from invenio.errorlib import register_exception
+from invenio.oai_repository_config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
 
 import invenio.template
 bibharvest_templates = invenio.template.load('bibharvest')
@@ -368,6 +370,7 @@ def get_oai_set(id=''):
             sets.append(set)
         return sets
     except StandardError, e:
+        register_exception(alert_admin=True)
         return str(e)
 
 def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec,
@@ -378,6 +381,8 @@ def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec,
     """Modifies a row's parameters"""
 
     try:
+        if not oai_set_spec:
+            oai_set_spec = CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
         set_definition = 'c=' + oai_set_collection + ';' + \
                          'p1=' + oai_set_p1  + ';' + \
                          'f1=' + oai_set_f1  + ';' + \
@@ -404,7 +409,7 @@ def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec,
                             m2=%s,
                             p3=%s,
                             f3=%s,
-                            m3=%s
+                            m3=%s,
                          WHERE id=%s""",
                       (oai_set_name,
                        oai_set_spec,
@@ -424,6 +429,7 @@ def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec,
 
         return (1, "")
     except StandardError, e:
+        register_exception(alert_admin=True)
         return (0, str(e))
 
 def add_oai_set(oai_set_name, oai_set_spec, oai_set_collection,
@@ -433,6 +439,8 @@ def add_oai_set(oai_set_name, oai_set_spec, oai_set_collection,
                 oai_set_f3, oai_set_m3, oai_set_op1, oai_set_op2):
     """Add a definition into the OAI Repository"""
     try:
+        if not oai_set_spec:
+            oai_set_spec = CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
         set_definition = 'c=' + oai_set_collection + ';' + \
                          'p1=' + oai_set_p1  + ';' + \
                          'f1=' + oai_set_f1  + ';' + \
@@ -457,15 +465,17 @@ def add_oai_set(oai_set_name, oai_set_spec, oai_set_collection,
                        oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3))
         return (1, "")
     except StandardError, e:
+        register_exception(alert_admin=True)
         return (0, e)
 
 def delete_oai_set(oai_set_id):
     """"""
 
     try:
-        res = run_sql("DELETE FROM oaiREPOSITORY WHERE id=%s" % oai_set_id)
+        res = run_sql("DELETE FROM oaiREPOSITORY WHERE id=%s", (oai_set_id,))
         return (1, "")
     except StandardError, e:
+        register_exception(alert_admin=True)
         return (0, e)
 
 def drop_down_menu(boxname, content):
@@ -594,7 +604,7 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection,
     text += "<table><tr><td>"
     text += input_text(ln = ln, title = "OAI Set spec:",
                        name = "oai_set_spec", value = oai_set_spec)
-    text += '</td><td colspan="3"><small><small><em>Optional: leave blank if not needed</em> [<a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#Set" target="_blank">?</a>]</small></small>'
+    text += '</td><td colspan="3"><small><small><em>Optional: if you leave it blank it will be automatically set to "%s", with the implicit convention that any record belonging to it can be harvested by not specifying any set.</em> [<a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#set" target="_blank">?</a>]</small></small>' % CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
     text += "</td></tr><tr><td>"
     text += input_text(ln = ln,
                        title = "OAI Set name:",

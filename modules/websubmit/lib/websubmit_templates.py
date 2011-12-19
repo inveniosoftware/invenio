@@ -1191,7 +1191,7 @@ class Template:
                 out += "<pre>%s</pre>" % verbose_files
         return out
 
-    def tmpl_bibdoc_filelist(self, ln, versions=[], imageurl='', recid='', docname=''):
+    def tmpl_bibdoc_filelist(self, ln, versions=[], imageurl='', recid='', docname='', status=''):
         """
         Displays the file list for a record.
 
@@ -1212,19 +1212,23 @@ class Template:
          - 'recid' *int* - The record id
 
          - 'docname' *string* - The name of the document
+
+         - 'status' *string* - The status of a document
         """
 
         # load the right message language
         _ = gettext_set_language(ln)
 
         out = """<table border="0" cellspacing="1" class="searchbox">
+                   %(restriction_label)s
                    <tr>
                      <td align="left" colspan="2" class="portalboxheader">
                        <img src='%(imageurl)s' border="0" />&nbsp;&nbsp;%(docname)s
                      </td>
                    </tr>""" % {
                      'imageurl' : imageurl,
-                     'docname' : docname
+                     'docname' : docname,
+                     'restriction_label': status and ('<tr><td colspan="2" class="restrictedfilerowheader">%s</td></tr>' % _('Restricted')) or ''
                    }
         for version in versions:
             if version['previous']:

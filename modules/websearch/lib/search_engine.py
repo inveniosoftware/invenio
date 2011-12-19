@@ -71,7 +71,8 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_SOLR_URL, \
      CFG_SITE_RECORD, \
-     CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT
+     CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
+     CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY
 
 from invenio.search_engine_config import InvenioWebSearchUnknownCollectionError, InvenioWebSearchWildcardLimitError
 from invenio.search_engine_utils import get_fieldvalues
@@ -90,7 +91,7 @@ from invenio.access_control_admin import acc_get_action_id
 from invenio.access_control_config import VIEWRESTRCOLL, \
     CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
 from invenio.websearchadminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
-from invenio.intbitset import intbitset as HitSet
+from invenio.intbitset import intbitset
 from invenio.dbquery import DatabaseError, deserialize_via_marshal, InvenioDbQueryWildcardLimitError
 from invenio.access_control_engine import acc_authorize_action
 from invenio.errorlib import register_exception
@@ -259,7 +260,7 @@ def get_all_restricted_recids():
     Return the set of all the restricted recids, i.e. the ids of those records
     which belong to at least one restricted collection.
     """
-    ret = HitSet()
+    ret = intbitset()
     for collection in restricted_collection_cache.cache:
         ret |= get_collection_reclist(collection)
     return ret
@@ -311,6 +312,7 @@ def check_user_can_view_record(user_info, recid):
     authorization is not granted
     @rtype: (int, string)
     """
+    policy = CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY.strip().upper()
     if isinstance(recid, str):
         recid = int(recid)
     if record_public_p(recid):
@@ -323,14 +325,18 @@ def check_user_can_view_record(user_info, recid):
         return (0, '')
     restricted_collections = get_restricted_collections_for_recid(recid, recreate_cache_if_needed=False)
     if restricted_collections:
-        ## If there are restricted collections the user must be authorized to all of them
+        ## If there are restricted collections the user must be authorized to all/any of them (depending on the policy)
+        auth_code, auth_msg = 0, ''
         for collection in get_restricted_collections_for_recid(recid, recreate_cache_if_needed=False):
             (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=collection)
-            if auth_code:
+            if auth_code and policy != 'ANY':
                 ## Ouch! the user is not authorized to this collection
                 return (auth_code, auth_msg)
-        ## OK! The user is authorized.
-        return (0, '')
+            elif auth_code == 0 and policy == 'ANY':
+                ## Good! At least one collection is authorized
+                return (0, '')
+        ## Depending on the policy, the user will be either authorized or not
+        return auth_code, auth_msg
     if is_record_in_any_collection(recid, recreate_cache_if_needed=False):
         ## the record is not in any restricted collection
         return (0, '')
@@ -417,12 +423,12 @@ def get_collection_reclist(coll, recreate_cache_if_needed=True):
         collection_reclist_cache.recreate_cache_if_needed()
     if not collection_reclist_cache.cache[coll]:
         # not yet it the cache, so calculate it and fill the cache:
-        set = HitSet()
+        set = intbitset()
         query = "SELECT nbrecs,reclist FROM collection WHERE name=%s"
         res = run_sql(query, (coll, ), 1)
         if res:
             try:
-                set = HitSet(res[0][1])
+                set = intbitset(res[0][1])
             except:
                 pass
         collection_reclist_cache.cache[coll] = set
@@ -865,7 +871,7 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
         ## add MathJax if displaying single records (FIXME: find
         ## eventual better place to this code)
         if of.lower() in CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS:
-            metaheaderadd = get_mathjax_header()
+            metaheaderadd = get_mathjax_header(req.is_https())
         else:
             metaheaderadd = ''
 
@@ -1805,7 +1811,7 @@ def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
 
     index_id = get_index_id_from_field(f)
     if index_id != 0:
-        coll = HitSet()
+        coll = intbitset()
         for coll_name in colls:
             coll |= get_collection_reclist(coll_name)
         browsed_phrases_in_colls = get_nearest_terms_in_idxphrase_with_collection(p, index_id, rg/2, rg/2, coll)
@@ -1825,7 +1831,7 @@ def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
         browsed_phrases_in_colls = []
         if 0:
             for phrase in browsed_phrases:
-                phrase_hitset = HitSet()
+                phrase_hitset = intbitset()
                 phrase_hitsets = search_pattern("", phrase, f, 'e')
                 for coll in colls:
                     phrase_hitset.union_update(phrase_hitsets[coll])
@@ -1904,10 +1910,10 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
 
     _ = gettext_set_language(ln)
 
-    hitset_empty = HitSet()
+    hitset_empty = intbitset()
     # sanity check:
     if not p:
-        hitset_full = HitSet(trailing_bits=1)
+        hitset_full = intbitset(trailing_bits=1)
         hitset_full.discard(0)
         # no pattern, so return all universe
         return hitset_full
@@ -1966,7 +1972,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 samelenfield = bsu_f[0:ltag]
                 if samelenfield == htag: #user searches by a hidden tag
                     #we won't show you anything..
-                    basic_search_unit_hitset = HitSet()
+                    basic_search_unit_hitset = intbitset()
                     if verbose >= 9 and of.startswith("h"):
                         print_warning(req, "Pattern %s hitlist omitted since \
                                             it queries in a hidden tag %s" %
@@ -2030,7 +2036,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     if verbose and of.startswith("h"):
         t1 = os.times()[4]
     # let the initial set be the complete universe:
-    hitset_in_any_collection = HitSet(trailing_bits=1)
+    hitset_in_any_collection = intbitset(trailing_bits=1)
     hitset_in_any_collection.discard(0)
     for idx_unit in xrange(len(basic_search_units)):
         this_unit_operation = basic_search_units[idx_unit][0]
@@ -2097,7 +2103,7 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
         parser = SearchQueryParenthesisedParser()
 
         # get a hitset with all recids
-        result_hitset = HitSet(trailing_bits=1)
+        result_hitset = intbitset(trailing_bits=1)
 
         # parse the query. The result is list of [op1, expr1, op2, expr2, ..., opN, exprN]
         parsing_result = parser.parse_query(p)
@@ -2172,12 +2178,12 @@ def search_unit(p, f=None, m=None, wl=0):
     """
 
     ## create empty output results set:
-    hitset = HitSet()
+    hitset = intbitset()
     if not p: # sanity checking
         return hitset
 
     ## eventually look up runtime synonyms:
-    hitset_synonyms = HitSet()
+    hitset_synonyms = intbitset()
     if CFG_WEBSEARCH_SYNONYM_KBRS.has_key(f):
         for p_synonym in get_synonym_terms(p,
                              CFG_WEBSEARCH_SYNONYM_KBRS[f][0],
@@ -2222,7 +2228,7 @@ def search_unit(p, f=None, m=None, wl=0):
 
 def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
     """Searches for 'word' inside bibwordsX table for field 'f' and returns hitset of recIDs."""
-    set = HitSet() # will hold output result set
+    set = intbitset() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
     limit_reached = 0 # flag for knowing if the query limit has been reached
     # deduce into which bibwordsX table we will search:
@@ -2234,7 +2240,7 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
             bibwordsX = "idxWORD%02dF" % index_id
             stemming_language = get_index_stemming_language(index_id)
         else:
-            return HitSet() # word index f does not exist
+            return intbitset() # word index f does not exist
 
     # wash 'word' argument and run query:
     word = string.replace(word, '*', '%') # we now use '*' as the truncation character
@@ -2278,7 +2284,7 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
                           (wash_index_term(word),))
     # fill the result set:
     for word, hitlist in res:
-        hitset_bibwrd = HitSet(hitlist)
+        hitset_bibwrd = intbitset(hitlist)
         # add the results:
         if set_used:
             set.union_update(hitset_bibwrd)
@@ -2295,7 +2301,7 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
 def search_unit_in_idxphrases(p, f, type, wl=0):
     """Searches for phrase 'p' inside idxPHRASE*F table for field 'f' and returns hitset of recIDs found.
     The search type is defined by 'type' (e.g. equals to 'r' for a regexp search)."""
-    set = HitSet() # will hold output result set
+    set = intbitset() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
     limit_reached = 0 # flag for knowing if the query limit has been reached
     use_query_limit = False # flag for knowing if to limit the query results or not
@@ -2306,7 +2312,7 @@ def search_unit_in_idxphrases(p, f, type, wl=0):
         if index_id:
             idxphraseX = "idxPHRASE%02dF" % index_id
         else:
-            return HitSet() # phrase index f does not exist
+            return intbitset() # phrase index f does not exist
     # detect query type (exact phrase, partial phrase, regexp):
     if type == 'r':
         query_addons = "REGEXP %s"
@@ -2346,7 +2352,7 @@ def search_unit_in_idxphrases(p, f, type, wl=0):
         res = run_sql("SELECT term,hitlist FROM %s WHERE term %s" % (idxphraseX, query_addons), query_params)
     # fill the result set:
     for word, hitlist in res:
-        hitset_bibphrase = HitSet(hitlist)
+        hitset_bibphrase = intbitset(hitlist)
         # add the results:
         if set_used:
             set.union_update(hitset_bibphrase)
@@ -2417,7 +2423,7 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
                 try:
                     query_params = tuple(int(param) for param in query_params)
                 except ValueError:
-                    return HitSet()
+                    return intbitset()
             if use_query_limit:
                 try:
                     res = run_sql_with_limit("SELECT id FROM bibrec WHERE id %s" % query_addons,
@@ -2455,7 +2461,7 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
     # check no of hits found:
     nb_hits = len(l)
     # okay, return result set:
-    set = HitSet(l)
+    set = intbitset(l)
     #check to see if the query limit was reached
     if limit_reached:
         #raise an exception, so we can print a nice message to the user
@@ -2480,7 +2486,7 @@ def search_unit_in_bibrec(datetext1, datetext2, type='c'):
     Does not pay attention to pattern, collection, anything.  Useful
     to intersect later on with the 'real' query.
     """
-    set = HitSet()
+    set = intbitset()
     if type.startswith("m"):
         type = "modification_date"
     else:
@@ -2514,7 +2520,7 @@ def search_unit_by_times_cited(p):
     allrecs = []
     if p == 0 or p == "0" or \
        p.startswith("0->") or p.endswith("->0"):
-        allrecs = HitSet(run_sql("SELECT id FROM bibrec"))
+        allrecs = intbitset(run_sql("SELECT id FROM bibrec"))
     return get_records_with_num_cites(numstr, allrecs)
 
 def search_unit_refersto(query):
@@ -2527,9 +2533,9 @@ def search_unit_refersto(query):
         if ahitset:
             return get_refersto_hitset(ahitset)
         else:
-            return HitSet([])
+            return intbitset([])
     else:
-        return HitSet([])
+        return intbitset([])
 
 def search_unit_citedby(query):
     """
@@ -2541,9 +2547,9 @@ def search_unit_citedby(query):
         if ahitset:
             return get_citedby_hitset(ahitset)
         else:
-            return HitSet([])
+            return intbitset([])
     else:
-        return HitSet([])
+        return intbitset([])
 
 def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", verbose=0, ln=CFG_SITE_LANG, display_nearest_terms_box=True):
     """Return dict of hitsets given by intersection of hitset with the collection universes."""
@@ -2814,15 +2820,15 @@ def get_nearest_terms_in_idxphrase(p, index_id, n_below, n_above):
 def get_nearest_terms_in_idxphrase_with_collection(p, index_id, n_below, n_above, collection):
     """Browse (-n_above, +n_below) closest bibliographic phrases
        for the given pattern p in the given field idxPHRASE table,
-       considering the collection (HitSet).
+       considering the collection (intbitset).
        Return list of [(phrase1, hitset), (phrase2, hitset), ... , (phrase_n, hitset)]."""
     idxphraseX = "idxPHRASE%02dF" % index_id
     res_above = run_sql("SELECT term,hitlist FROM %s WHERE term<%%s ORDER BY term DESC LIMIT %%s" % idxphraseX, (p, n_above * 3))
-    res_above = [(term, HitSet(hitlist) & collection) for term, hitlist in res_above]
+    res_above = [(term, intbitset(hitlist) & collection) for term, hitlist in res_above]
     res_above = [(term, len(hitlist)) for term, hitlist in res_above if hitlist]
 
     res_below = run_sql("SELECT term,hitlist FROM %s WHERE term>=%%s ORDER BY term ASC LIMIT %%s" % idxphraseX, (p, n_below * 3))
-    res_below = [(term, HitSet(hitlist) & collection) for term, hitlist in res_below]
+    res_below = [(term, intbitset(hitlist) & collection) for term, hitlist in res_below]
     res_below = [(term, len(hitlist)) for term, hitlist in res_below if hitlist]
 
     res_above.reverse()
@@ -2960,7 +2966,7 @@ def get_nbhits_in_bibwords(word, f):
         res = run_sql("SELECT hitlist FROM %s WHERE term=%%s" % bibwordsX,
                       (word,))
         for hitlist in res:
-            out += len(HitSet(hitlist[0]))
+            out += len(intbitset(hitlist[0]))
     return out
 
 def get_nbhits_in_idxphrases(word, f):
@@ -2978,7 +2984,7 @@ def get_nbhits_in_idxphrases(word, f):
         res = run_sql("SELECT hitlist FROM %s WHERE term=%%s" % idxphraseX,
                       (word,))
         for hitlist in res:
-            out += len(HitSet(hitlist[0]))
+            out += len(intbitset(hitlist[0]))
     return out
 
 def get_nbhits_in_bibxxx(p, f):
@@ -4861,7 +4867,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, aas, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
         t1 = os.times()[4]
-        results_in_any_collection = HitSet()
+        results_in_any_collection = intbitset()
         if aas == 1 or (p1 or p2 or p3):
             ## 3A - advanced search
             try:
@@ -5056,7 +5062,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
             results_final_nb_total = results_final_nb.values()[0]
         else:
             # okay, some work ahead to union hits across collections:
-            results_final_for_all_selected_colls = HitSet()
+            results_final_for_all_selected_colls = intbitset()
             for coll in results_final.keys():
                 results_final_for_all_selected_colls.union_update(results_final[coll])
             results_final_nb_total = len(results_final_for_all_selected_colls)
@@ -5396,6 +5402,16 @@ def perform_request_log(req, date=""):
     req.write("</html>")
     return "\n"
 
+def get_all_field_values(tag):
+    """
+    Return all existing values stored for a given tag.
+    @param tag: the full tag, e.g. 909C0b
+    @type tag: string
+    @return: the list of values
+    @rtype: list of strings
+    """
+    table = 'bib%2dx' % int(tag[:2])
+    return [row[0] for row in run_sql("SELECT DISTINCT(value) FROM %s WHERE tag=%%s" % table, (tag, ))]
 
 def get_most_popular_field_values(recids, tags, exclude_values=None, count_repetitive_values=True):
     """

@@ -20,9 +20,16 @@
 # pylint: disable=W0105
 # pylint: disable=C0301
 # pylint: disable=W0613
+
 from cgi import escape
 from copy import deepcopy
-import sys
+from pprint import pformat
+
+try:
+    from invenio.jsonutils import json, CFG_JSON_AVAILABLE
+except:
+    CFG_JSON_AVAILABLE = False
+    json = None
 
 from invenio.bibauthorid_config import CLAIMPAPER_ADMIN_ROLE
 from invenio.bibauthorid_config import CLAIMPAPER_USER_ROLE
@@ -49,24 +56,11 @@ from invenio.search_engine_utils import get_fieldvalues
 import invenio.bibauthorid_webapi as webapi
 import invenio.bibauthorid_config as bconfig
 
+from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
+from invenio.bibauthorid_frontinterface import update_personID_names_string_set
+
 from pprint import pformat
 
-JSON_OK = False
-
-if sys.hexversion < 0x2060000:
-    try:
-        import simplejson as json
-        JSON_OK = True
-    except ImportError:
-        # Okay, no Ajax app will be possible, but continue anyway,
-        # since this package is only recommended, not mandatory.
-        JSON_OK = False
-else:
-    try:
-        import json
-        JSON_OK = True
-    except ImportError:
-        JSON_OK = False
 
 TEMPLATE = load('bibauthorid')
 
@@ -703,6 +697,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                                                     'alt_to_other': _('To other person!')}}
 
         return self._generate_tabs_admin(req, form, ln, show_tabs=tabs, ticket_links=links,
+                                         show_reset_button=False,
                                          open_tickets=[], verbiage_dict=verbiage_dict,
                                          buttons_verbiage_dict=buttons_verbiage_dict)
 
@@ -819,7 +814,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
     def _generate_tabs_admin(self, req, form, ln,
                              show_tabs=['records', 'repealed', 'review', 'comments', 'tickets', 'data'],
                              open_tickets=None, ticket_links=['delete', 'commit', 'del_entry', 'commit_entry'],
-                             verbiage_dict=None, buttons_verbiage_dict=None):
+                             verbiage_dict=None, buttons_verbiage_dict=None, show_reset_button=True):
         '''
         Generate the tabs content for an admin user
         @param req: Apache Request Object
@@ -867,7 +862,8 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                             'authorname': paper[3],
                             'authoraffiliation': paper[4],
                             'paperdate': paper[5],
-                            'rt_status': paper[6]})
+                            'rt_status': paper[6],
+                            'paperexperiment': paper[7]})
 
         rejected_papers = [row for row in records if row['flag'] < -1]
         rest_of_papers = [row for row in records if row['flag'] >= -1]
@@ -899,7 +895,8 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                                             show_tabs=show_tabs,
                                             ticket_links=ticket_links,
                                             verbiage_dict=verbiage_dict,
-                                            buttons_verbiage_dict=buttons_verbiage_dict)
+                                            buttons_verbiage_dict=buttons_verbiage_dict,
+                                            show_reset_button=show_reset_button)
 
         return tabs
 
@@ -1295,7 +1292,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                 del(ticket[tt])
                 continue
 
-            tt['authorname_rec'] = webapi.get_bibref_name_string(tt['bibref'])
+            tt['authorname_rec'] = get_bibrefrec_name_string(tt['bibref'])
             tt['person_name'] = webapi.get_most_frequent_name_from_pid(tt['pid'])
 
         mark_yours = []
@@ -1354,9 +1351,12 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         if "user_email" in pinfo:
             userinfo['email'] = pinfo["user_email"]
 
+        pids_to_update = set()
         for t in ticket:
             t['execution_result'] = webapi.execute_action(t['action'], t['pid'], t['bibref'], uid,
+                                                          pids_to_update,
                                                           userinfo['uid-ip'], str(userinfo))
+        update_personID_names_string_set(pids_to_update)
         session.save()
 
 
@@ -1382,13 +1382,17 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         if "user_email" in pinfo:
             userinfo['email'] = pinfo["user_email"]
 
+        pids_to_update = set()
         for t in list(ticket):
             if t['status'] in ['granted', 'warning_granted']:
                 t['execution_result'] = webapi.execute_action(t['action'],
                                                     t['pid'], t['bibref'], uid,
+                                                    pids_to_update,
                                                     userinfo['uid-ip'], str(userinfo))
                 ok_tickets.append(t)
                 ticket.remove(t)
+
+        update_personID_names_string_set(pids_to_update)
 
         if ticket:
             webapi.create_request_ticket(userinfo, ticket)
@@ -1456,7 +1460,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             session.save()
             return redirect_to_url(req, referer)
 
-        return redirect_to_url(req, "%s/person/%s" % (CFG_SITE_URL,
+        return redirect_to_url(req, "%s/person/%s?open_claim=True" % (CFG_SITE_URL,
                                  webapi.get_person_redirect_link(
                                    pinfo["claimpaper_admin_last_viewed_pid"])))
 
@@ -1868,10 +1872,10 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                 ticket.append(t)
             if 'search_ticket' in pinfo:
                 del(pinfo['search_ticket'])
-            session.save()
 
             #start ticket processing chain
             pinfo["claimpaper_admin_last_viewed_pid"] = pid
+            session.save()
             return self.adf['ticket_dispatch'][ulevel](req)
 #            return self.perform(req, form)
 
@@ -2261,8 +2265,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                     recid = None
                     nquery = query
 
-
-
             else:
                 nquery = query
 
@@ -2379,8 +2381,13 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         # start continuous writing to the browser...
         req.content_type = "text/html"
         req.send_http_header()
+        ssl_param = 0
+
+        if req.is_https():
+            ssl_param = 1
+
         req.write(pageheaderonly(req=req, title=title_message,
-                                 language=ln))
+                                 language=ln, secure_page_p=ssl_param))
 
         req.write(TEMPLATE.tmpl_welcome_start())
 
@@ -2403,6 +2410,25 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
 
         link = TEMPLATE.tmpl_welcome_link()
         req.write(link)
+        req.write("<br><br>")
+        uinfo = collect_user_info(req)
+
+        arxivp = []
+        if 'external_arxivids' in uinfo and uinfo['external_arxivids']:
+            try:
+                for i in uinfo['external_arxivids'].split(';'):
+                    arxivp.append(i)
+            except (IndexError, KeyError):
+                pass
+
+        req.write(TEMPLATE.tmpl_welcome_arXiv_papers(arxivp))
+        if CFG_INSPIRE_SITE:
+            #logs arXive logins, for debug purposes.
+            dbg = ('uinfo= ' + str(uinfo) + '\npinfo= ' + str(pinfo) + '\nreq= ' + str(req)
+                    + '\nsession= ' + str(session))
+            userinfo = "%s||%s" % (uid, req.remote_ip)
+            webapi.insert_log(userinfo, pid, 'arXiv_login', 'dbg', '', comment=dbg)
+
         req.write(TEMPLATE.tmpl_welcome_end())
         req.write(pagefooteronly(req=req))
 
@@ -2453,7 +2479,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
              'request': (str, None),
              'userid': (str, None)})
 
-        if not JSON_OK:
+        if not CFG_JSON_AVAILABLE:
             return "500_json_not_found__install_package"
 
         # session = get_session(req)

@@ -26,6 +26,7 @@ pylib_DATA = __init__.py \
              dbdump.py \
              dbquery.py \
              dbquery_tests.py \
+             dbquery_regression_tests.py \
              logicutils.py \
              logicutils_tests.py \
              mailutils.py \
@@ -61,7 +62,8 @@ pylib_DATA = __init__.py \
              solrutils.py \
              remote_debugger.py \
              remote_debugger_config.py \
-             remote_debugger_wsgi_reload.py
+             remote_debugger_wsgi_reload.py \
+             jsonutils.py
 
 noinst_DATA = testimport.py \
               kwalitee.py \

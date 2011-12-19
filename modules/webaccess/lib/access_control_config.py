@@ -112,8 +112,8 @@ elif CFG_INSPIRE_SITE:
     CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
     CFG_EXTERNAL_AUTHENTICATION = {
     "Local": None,
-    "Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False, check_user_ip=True),
-    "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True, check_user_ip=True)
+    "Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False, check_user_ip=2),
+    "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True, check_user_ip=2)
     }
 else:
     CFG_EXTERNAL_AUTH_DEFAULT = 'Local'
@@ -125,6 +125,9 @@ else:
     "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
     }
 
+## If using SSO, this is the number of seconds after which the keep-alive
+## SSO handler is pinged again to provide fresh SSO information.
+CFG_EXTERNAL_AUTH_SSO_REFRESH = 600
 
 # default data for the add_default_settings function
 # Note: by default the definition is set to deny any. This won't be a problem
@@ -286,7 +289,8 @@ DEF_DEMO_AUTHS = (
              ('submit_DEMOJRN_*', 'cfgwebjournal', {'name': 'AtlantisTimes', 'with_editor_rights': 'no'}),
              ('atlantiseditor', 'cfgwebjournal', {'name': 'AtlantisTimes', 'with_editor_rights': 'yes'}),
              ('referee_DEMOBOO_*', 'runbatchuploader', {'collection': 'Books'}),
-             ('poetrycommentreader', 'viewcomment', {'collection': 'Poetry'})
+             ('poetrycommentreader', 'viewcomment', {'collection': 'Poetry'}),
+             ('atlantiseditor', VIEWRESTRCOLL, {'collection': 'Atlantis Times Drafts'})
             )
 
 _ = gettext_set_language(CFG_SITE_LANG)

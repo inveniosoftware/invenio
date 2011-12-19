@@ -80,7 +80,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
-     CFG_TMPDIR, \
+     CFG_TMPSHAREDDIR, \
      CFG_SITE_SUPPORT_EMAIL
 from invenio.messages import gettext_set_language
 from invenio.bibdocfilecli import cli_fix_marc
@@ -265,20 +265,24 @@ def create_file_upload_interface(recid,
     @type can_name_new_files: boolean
 
     @param doctypes_to_default_filename: Rename uploaded files to admin-chosen
-                                 values. List here the the files in
-                                 current submission directory that
-                                 contain the names to use for each doctype.
+                                 values. To rename to a value found in a file in curdir,
+                                 use 'file:' prefix to specify the file to read from.
                                  Eg:
-                                 {'main': RN', 'additional': 'additional_filename'}
+                                 {'main': 'file:RN', 'additional': 'foo'}
 
                                  If the same doctype is submitted
                                  several times, a"-%i" suffix is added
                                  to the name defined in the file.
 
+                                 When using 'file:' prefix, the name
+                                 is only resolved at the end of the
+                                 submission, when attaching the file.
+
                                  The default filenames are overriden
                                  by user-chosen names if you allow
                                  'can_name_new_files' or
-                                 'can_rename_doctypes'.
+                                 'can_rename_doctypes', excepted if the
+                                 name is prefixed with 'file:'.
     @type doctypes_to_default_filename: dict
 
     @param max_files_for_doctype: the maximum number of files that users can
@@ -436,8 +440,8 @@ def create_file_upload_interface(recid,
                                            'doctype': sbm_doctype})
     elif uid and sbm_access:
         # WebSubmit File Management (admin) interface mode.
-        # Working directory is in CFG_TMPDIR
-        working_dir = os.path.join(CFG_TMPDIR,
+        # Working directory is in CFG_TMPSHAREDDIR
+        working_dir = os.path.join(CFG_TMPSHAREDDIR,
                               'websubmit_upload_interface_config_' + str(uid),
                               sbm_access)
         try:
@@ -1683,16 +1687,24 @@ def wash_form_parameters(form, abstract_bibdocs, can_keep_doctypes,
         file_rename = str(form['rename']) # contains new bibdocname if applicable
     elif file_action == "add" and \
              doctypes_to_default_filename.has_key(file_doctype):
-        # Admin-chosen name. Ensure it is unique by appending a suffix
+        # Admin-chosen name.
         file_rename = doctypes_to_default_filename[file_doctype]
-        file_counter = 2
-        while get_bibdoc_for_docname(file_rename, abstract_bibdocs):
-            if file_counter == 2:
-                file_rename += '-2'
-            else:
-                file_rename = file_rename[:-len(str(file_counter))] + \
-                              str(file_counter)
-            file_counter += 1
+        if file_rename.lower().startswith('file:'):
+            # We will define name at a later stage, i.e. when
+            # submitting the file with bibdocfile. The name will be
+            # chosen by reading content of a file in curdir
+            file_rename = ''
+        else:
+            # Ensure name is unique, by appending a suffix
+            file_rename = doctypes_to_default_filename[file_doctype]
+            file_counter = 2
+            while get_bibdoc_for_docname(file_rename, abstract_bibdocs):
+                if file_counter == 2:
+                    file_rename += '-2'
+                else:
+                    file_rename = file_rename[:-len(str(file_counter))] + \
+                                  str(file_counter)
+                file_counter += 1
     else:
         file_rename = ''
 
@@ -1788,6 +1800,7 @@ def move_uploaded_files_to_storage(working_dir, recid, icon_sizes,
     # with a file that exists (that means that the bibdoc has not been
     # deleted nor renamed by a later action)
     pending_bibdocs = {}
+    newly_added_bibdocs = [] # Does not consider new formats/revisions
 
     performed_actions = read_actions_log(working_dir)
     for action, bibdoc_name, file_path, rename, description, \
@@ -1800,9 +1813,12 @@ def move_uploaded_files_to_storage(working_dir, recid, icon_sizes,
         bibrecdocs = BibRecDocs(recid)
 
         if action == 'add':
-            add(file_path, bibdoc_name, rename, doctype, description,
-                comment, file_restriction, recid, working_dir, icon_sizes,
-                create_icon_doctypes, pending_bibdocs, bibrecdocs)
+            new_bibdoc = \
+                       add(file_path, bibdoc_name, rename, doctype, description,
+                           comment, file_restriction, recid, working_dir, icon_sizes,
+                           create_icon_doctypes, pending_bibdocs, bibrecdocs)
+            if new_bibdoc:
+                newly_added_bibdocs.append(new_bibdoc)
 
         elif action == 'addFormat':
             add_format(file_path, bibdoc_name, recid, doctype, working_dir,
@@ -1810,15 +1826,49 @@ def move_uploaded_files_to_storage(working_dir, recid, icon_sizes,
                        pending_bibdocs, bibrecdocs)
 
         elif action == 'revise':
-            revise(file_path, bibdoc_name, rename, doctype,
-                   description, comment, file_restriction, icon_sizes,
-                   create_icon_doctypes, keep_previous_versions,
-                   recid, working_dir, pending_bibdocs,
-                   bibrecdocs, force_file_revision)
+            new_bibdoc = \
+                       revise(file_path, bibdoc_name, rename, doctype,
+                              description, comment, file_restriction, icon_sizes,
+                              create_icon_doctypes, keep_previous_versions,
+                              recid, working_dir, pending_bibdocs,
+                              bibrecdocs, force_file_revision)
+            if new_bibdoc:
+                newly_added_bibdocs.append(new_bibdoc)
 
         elif action == 'delete':
             delete(bibdoc_name, recid, working_dir, pending_bibdocs,
                    bibrecdocs)
+
+    # Finally rename bibdocs that should be named according to a file in
+    # curdir (eg. naming according to report number). Only consider
+    # file that have just been added.
+    parameters = _read_file_revision_interface_configuration_from_disk(working_dir)
+    new_names = []
+    doctypes_to_default_filename = parameters[22]
+    for bibdoc_to_rename in newly_added_bibdocs:
+        bibdoc_to_rename_doctype = bibdoc_to_rename.doctype
+        rename_to = doctypes_to_default_filename.get(bibdoc_to_rename_doctype, '')
+        if rename_to.startswith('file:'):
+            # This BibDoc must be renamed. Look for name in working dir
+            name_at_filepath = os.path.join(working_dir, rename_to[5:])
+            if os.path.exists(name_at_filepath) and \
+                   os.path.abspath(name_at_filepath).startswith(working_dir):
+                try:
+                    rename = file(name_at_filepath).read()
+                except:
+                    register_exception(prefix='Move_Uploaded_Files_to_Storage ' \
+                                       'could not read file %s in curdir to rename bibdoc' % \
+                                       (name_at_filepath,),
+                                       alert_admin=True)
+                if rename:
+                    file_counter = 2
+                    new_filename = rename
+                    while bibrecdocs.has_docname_p(new_filename) or (new_filename in new_names):
+                        new_filename = rename + '_%i' % file_counter
+                        file_counter += 1
+                    bibdoc_to_rename.change_name(new_filename)
+                    new_names.append(new_filename) # keep track of name, or we have to reload bibrecdoc...
+                    _do_log(working_dir, 'Renamed ' + bibdoc_to_rename.get_docname())
 
     # Delete the HB BibFormat cache in the DB, so that the fulltext
     # links do not point to possible dead files
@@ -1833,6 +1883,8 @@ def add(file_path, bibdoc_name, rename, doctype, description, comment,
         pending_bibdocs, bibrecdocs):
     """
     Adds the file using bibdocfile CLI
+
+    Return the bibdoc that has been newly added.
     """
     try:
         if os.path.exists(file_path):
@@ -1889,6 +1941,7 @@ def add(file_path, bibdoc_name, rename, doctype, description, comment,
                     bibdoc.get_docname() + ': ' + \
                     file_restriction or '(no restriction)')
 
+            return bibdoc
         else:
             # File has been later renamed or deleted.
             # Remember to add it later if file is found (ie
@@ -1971,8 +2024,13 @@ def revise(file_path, bibdoc_name, rename, doctype, description,
            keep_previous_versions, recid, working_dir, pending_bibdocs,
            bibrecdocs, force_file_revision):
     """
-    Revises the given bibdoc with a new file
+    Revises the given bibdoc with a new file.
+
+    Return the bibdoc that has been newly added. (later: if needed,
+    return as tuple the bibdoc that has been revised, or deleted,
+    etc.)
     """
+    added_bibdoc = None
     try:
         if os.path.exists(file_path) or not file_path:
 
@@ -1998,6 +2056,7 @@ def revise(file_path, bibdoc_name, rename, doctype, description,
                                                      never_fail=True)
                     _do_log(working_dir, 'Added ' + bibdoc.get_docname() + ': ' + \
                             file_path)
+                    added_bibdoc = bibdoc
 
                     # Set restriction
                     bibdoc.set_status(file_restriction)
@@ -2152,6 +2211,8 @@ def revise(file_path, bibdoc_name, rename, doctype, description,
                            'named %s in record %i.' % \
                            (file_path, bibdoc_name, recid),
                            alert_admin=True)
+
+    return added_bibdoc
 
 def delete(bibdoc_name, recid, working_dir, pending_bibdocs,
            bibrecdocs):

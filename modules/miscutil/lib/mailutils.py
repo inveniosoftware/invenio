@@ -54,6 +54,53 @@ from invenio.messages import wash_language, gettext_set_language
 from invenio.textutils import guess_minimum_encoding
 from invenio.errorlib import get_msgs_for_code_list, register_errors, register_exception
 
+def scheduled_send_email(fromaddr,
+               toaddr,
+               subject="",
+               content="",
+               header=None,
+               footer=None,
+               copy_to_admin=0,
+               attempt_times=1,
+               attempt_sleeptime=10,
+               user=None,
+               other_bibtasklet_arguments=None):
+    """
+    Like send_email, but send an email via the bibsched
+    infrastructure.
+    @param fromaddr: sender
+    @type fromaddr: string
+    @param toaddr: list of receivers
+    @type toaddr: string (comma separated) or list of strings
+    @param subject: the subject
+    @param content: the body of the message
+    @param header: optional header, otherwise default is used
+    @param footer: optional footer, otherwise default is used
+    @param copy_to_admin: set to 1 in order to send email the admins
+    @param attempt_times: try at least n times before giving up sending
+    @param attempt_sleeptime: number of seconds to sleep between two attempts
+    @param user: the user name to user when scheduling the bibtasklet. If
+        None, the sender will be used
+    @param other_bibtasklet_arguments: other arguments to append to the list
+        of arguments to the call of task_low_level_submission
+    @return: the scheduled bibtasklet
+    """
+    from invenio.bibtask import task_low_level_submission
+    if not isinstance(toaddr, (unicode, str)):
+        toaddr = ','.join(toaddr)
+    if user is None:
+        user = fromaddr
+    return task_low_level_submission(
+        "bibtasklet", user, "-T", "bst_send_email"
+        "-a", "fromaddr=%s" % fromaddr,
+        "-a", "toaddr=%s" % toaddr,
+        "-a", "subject=%s" % subject,
+        "-a", "content=%s" % content,
+        "-a", "copy_to_admin=%s" % copy_to_admin,
+        "-a", "attempt_times=%s" % attempt_times,
+        "-a", "attempt_sleeptime=%s" % attempt_sleeptime,
+        *other_bibtasklet_arguments)
+
 def send_email(fromaddr,
                toaddr,
                subject="",

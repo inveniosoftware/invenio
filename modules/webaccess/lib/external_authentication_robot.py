@@ -30,24 +30,15 @@ import hmac
 import time
 import base64
 
-if sys.hexversion < 0x2060000:
-    try:
-        import simplejson as json
-    except ImportError:
-        # Okay, no Ajax app will be possible, but continue anyway,
-        # since this package is only recommended, not mandatory.
-        pass
-else:
-    import json
-
 if sys.hexversion < 0x2050000:
     import sha as sha1
 else:
     from hashlib import sha1
 
-from cPickle import loads, dumps
+from cPickle import dumps
 from zlib import decompress, compress
 
+from invenio.jsonutils import json, json_unicode_to_utf8
 from invenio.shellutils import mymkdir
 from invenio.external_authentication import ExternalAuth, InvenioWebAccessExternalAuthError
 from invenio.config import CFG_ETCDIR, CFG_SITE_URL, CFG_SITE_SECURE_URL
@@ -62,12 +53,22 @@ CFG_ROBOT_URL_TIMEOUT = 3600
 
 CFG_ROBOT_KEYS_PATH = os.path.join(CFG_ETCDIR, 'webaccess', 'robot_keys.dat')
 
-def normalize_ip(ip):
+def normalize_ip(ip, up_to_bytes=4):
     """
+    @param up_to_bytes: set this to the number of bytes that should
+    be considered in the normalization. E.g. is this is set two 2, only the
+    first two bytes will be considered, while the remaining two will be set
+    to 0.
     @return: a normalized IP, e.g. 123.02.12.12 -> 123.2.12.12
     """
     try:
-        return '.'.join(str(int(number)) for number in ip.split('.'))
+        ret = []
+        for i, number in enumerate(ip.split(".")):
+            if i < up_to_bytes:
+                ret.append(str(int(number)))
+            else:
+                ret.append("0")
+        return '.'.join(ret)
     except ValueError:
         ## e.g. if it's IPV6 ::1
         return ip
@@ -155,8 +156,11 @@ class ExternalAuthRobot(ExternalAuth):
     @type userip_attribute_name: string
     @param check_user_ip: whether to check for the IP address of the user
         using the given URL, against the IP address stored in the assertion
-        to be identical.
-    @type check_user_ip: boolean
+        to be identical. If 0, no IP check will be performed, if 1, only the
+        1st byte will be compared, if 2, only the first two bytes will be
+        compared, if 3, only the first three bytes, and if 4, the whole IP
+        address will be checked.
+    @type check_user_ip: int
     @param use_zlib: whether to use base64-url-flavour encoding of the zlib
         compression of the json serialization of the assertion or simply
         the json serialization of the assertion.
@@ -169,7 +173,7 @@ class ExternalAuthRobot(ExternalAuth):
             groups_separator=CFG_ROBOT_GROUPS_SEPARATOR,
             timeout_attribute_name=CFG_ROBOT_TIMEOUT_ATTRIBUTE_NAME,
             userip_attribute_name=CFG_ROBOT_USERIP_ATTRIBUTE_NAME,
-            check_user_ip=True,
+            check_user_ip=4,
             use_zlib=True,
             ):
         ExternalAuth.__init__(self, enforce_external_nicknames=enforce_external_nicknames)
@@ -188,7 +192,6 @@ class ExternalAuthRobot(ExternalAuth):
         to properly login the user, and verify that the data are actually
         both well formed and signed correctly.
         """
-        from invenio.bibedit_utils import json_unicode_to_utf8
         from invenio.webinterface_handler import wash_urlargd
         args = wash_urlargd(req.form, {
             'assertion': (str, ''),
@@ -220,7 +223,7 @@ class ExternalAuthRobot(ExternalAuth):
         if timeout < time.time():
             raise InvenioWebAccessExternalAuthError("The provided assertion is expired")
         userip = data.get(self.userip_attribute_name)
-        if not self.check_user_ip or (normalize_ip(userip) == normalize_ip(req.remote_ip)):
+        if not self.check_user_ip or (normalize_ip(userip, self.check_user_ip) == normalize_ip(req.remote_ip, self.check_user_ip)):
             return data
         else:
             raise InvenioWebAccessExternalAuthError("The provided assertion has been issued for a different IP address (%s instead of %s)" % (userip, req.remote_ip))

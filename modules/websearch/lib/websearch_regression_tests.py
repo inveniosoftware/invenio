@@ -37,7 +37,7 @@ if sys.hexversion < 0x2040000:
 from mechanize import Browser, LinkNotFoundError
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_NAME, CFG_SITE_LANG, \
-    CFG_SITE_RECORD
+    CFG_SITE_RECORD, CFG_SITE_LANGS
 from invenio.testutils import make_test_suite, \
                               run_test_suite, \
                               make_url, make_surl, test_web_page_content, \
@@ -47,8 +47,15 @@ from invenio.search_engine import perform_request_search, \
     guess_primary_collection_of_a_record, guess_collection_of_a_record, \
     collection_restricted_p, get_permitted_restricted_collections, \
     search_pattern, search_unit, search_unit_in_bibrec, \
-    wash_colls
+    wash_colls, record_public_p
 from invenio.search_engine_utils import get_fieldvalues
+
+
+if 'fr' in CFG_SITE_LANGS:
+    lang_french_configured = True
+else:
+    lang_french_configured = False
+
 
 def parse_url(url):
     parts = urlparse.urlparse(url)
@@ -120,27 +127,39 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help',
                                                expected_text="Help Central"))
-        self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/help/?ln=fr',
-                                               expected_text="Centre d'aide"))
+
+    if lang_french_configured:
+        def test_help_page_availability_fr(self):
+            """websearch - availability of Help Central page in french"""
+            self.assertEqual([],
+                             test_web_page_content(CFG_SITE_URL + '/help/?ln=fr',
+                                                   expected_text="Centre d'aide"))
 
     def test_search_tips_page_availability(self):
         """websearch - availability of Search Tips"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/search-tips',
                                                expected_text="Search Tips"))
-        self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/help/search-tips?ln=fr',
-                                               expected_text="Conseils de recherche"))
+
+    if lang_french_configured:
+        def test_search_tips_page_availability_fr(self):
+            """websearch - availability of Search Tips in french"""
+            self.assertEqual([],
+                             test_web_page_content(CFG_SITE_URL + '/help/search-tips?ln=fr',
+                                                   expected_text="Conseils de recherche"))
 
     def test_search_guide_page_availability(self):
         """websearch - availability of Search Guide"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/search-guide',
                                                expected_text="Search Guide"))
-        self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/help/search-guide?ln=fr',
-                                               expected_text="Guide de recherche"))
+
+    if lang_french_configured:
+        def test_search_guide_page_availability_fr(self):
+            """websearch - availability of Search Guide in french"""
+            self.assertEqual([],
+                             test_web_page_content(CFG_SITE_URL + '/help/search-guide?ln=fr',
+                                                   expected_text="Guide de recherche"))
 
 class WebSearchTestLegacyURLs(unittest.TestCase):
 
@@ -198,9 +217,21 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
         check(make_url('/search.py', p='nuclear', ln='en') + 'as=1',
               make_url('/search', p='nuclear', ln='en') + 'as=1')
 
-        # direct recid searches are redirected to /CFG_SITE_RECORD
-        check(make_url('/search.py', recid=1, ln='es'),
-              make_url('/%s/1' % CFG_SITE_RECORD, ln='es'))
+    if lang_french_configured:
+        def test_legacy_search_fr(self):
+            """ websearch - search queries handle legacy urls """
+
+            browser = Browser()
+
+            def check(legacy, new, browser=browser):
+                browser.open(legacy)
+                got = browser.geturl()
+
+                self.failUnless(same_urls_p(got, new), got)
+
+            # direct recid searches are redirected to /CFG_SITE_RECORD
+            check(make_url('/search.py', recid=1, ln='fr'),
+                  make_url('/%s/1' % CFG_SITE_RECORD, ln='fr'))
 
     def test_legacy_search_help_link(self):
         """websearch - legacy Search Help page link"""
@@ -208,11 +239,12 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/help/search/index.en.html',
                                                expected_text="Help Central"))
 
-    def test_legacy_search_tips_link(self):
-        """websearch - legacy Search Tips page link"""
-        self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/help/search/tips.fr.html',
-                                               expected_text="Conseils de recherche"))
+    if lang_french_configured:
+        def test_legacy_search_tips_link(self):
+            """websearch - legacy Search Tips page link"""
+            self.assertEqual([],
+                             test_web_page_content(CFG_SITE_URL + '/help/search/tips.fr.html',
+                                                   expected_text="Conseils de recherche"))
 
     def test_legacy_search_guide_link(self):
         """websearch - legacy Search Guide page link"""
@@ -255,8 +287,6 @@ class WebSearchTestRecord(unittest.TestCase):
     def test_exported_formats(self):
         """ websearch - check formats exported through /CFG_SITE_RECORD/1/export/ URLs"""
 
-        browser = Browser()
-
         self.assertEqual([],
                          test_web_page_content(make_url('/%s/1/export/hm' % CFG_SITE_RECORD),
                                                expected_text='245__ $$aALEPH experiment'))
@@ -292,7 +322,6 @@ class WebSearchTestRecord(unittest.TestCase):
 
     def test_plots_tab(self):
         """ websearch - test to ensure the plots tab is working """
-        browser = Browser()
         self.assertEqual([],
                          test_web_page_content(make_url('/%s/8/plots' % CFG_SITE_RECORD),
                                                expected_text='div id="clip"',
@@ -899,7 +928,7 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
     def test_search_engine_python_api_for_nonexisting_record(self):
         """websearch - search engine Python API for non-existing record"""
         self.assertEqual([],
-                         perform_request_search(recid=1234567809))
+                         perform_request_search(recid=16777215))
 
     def test_search_engine_python_api_for_nonexisting_collection(self):
         """websearch - search engine Python API for non-existing collection"""
@@ -1071,6 +1100,25 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('jekyll@cds.cern.ch'))), ['Theses'])
         self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('hyde@cds.cern.ch'))), [])
 
+    def test_restricted_record_has_restriction_flag(self):
+        """websearch - restricted record displays a restriction flag"""
+        browser = Browser()
+        browser.open(CFG_SITE_URL + '/%s/42/files/' % CFG_SITE_RECORD)
+        browser.select_form(nr=0)
+        browser['p_un'] = 'jekyll'
+        browser['p_pw'] = 'j123ekyll'
+        browser.submit()
+        if browser.response().read().find("Restricted") > -1:
+            pass
+        else:
+            self.fail("Oops, a 'Restricted' flag should appear on restricted records.")
+
+        browser.open(CFG_SITE_URL + '/%s/42/files/comments' % CFG_SITE_RECORD)
+        if browser.response().read().find("Restricted") > -1:
+            pass
+        else:
+            self.fail("Oops, a 'Restricted' flag should appear on restricted records.")
+
 class WebSearchRestrictedPicturesTest(unittest.TestCase):
     """
     Check whether restricted pictures on the demo site can be accessed
@@ -1105,6 +1153,73 @@ class WebSearchRestrictedPicturesTest(unittest.TestCase):
                                                               'You are not authorized'])
         if error_messages:
             self.failUnless("HTTP Error 401: Unauthorized" in merge_error_messages(error_messages))
+
+class WebSearchRestrictedWebJournalFilesTest(unittest.TestCase):
+    """
+    Check whether files attached to a WebJournal article are well
+    accessible when the article is published
+    """
+    def test_restricted_files_guest(self):
+        """websearch - files of unreleased articles are not available to guest"""
+
+        # Record is not public...
+        self.assertEqual(record_public_p(106), False)
+
+        # ... and guest cannot access attached files
+        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/106/files/journal_galapagos_archipelago.jpg' % CFG_SITE_RECORD,
+                                               expected_text=['This file is restricted.  If you think you have right to access it, please authenticate yourself.'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_restricted_files_editor(self):
+        """websearch - files of unreleased articles are available to editor"""
+
+        # Record is not public...
+        self.assertEqual(record_public_p(106), False)
+
+        # ... but editor can access attached files
+        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/106/files/journal_galapagos_archipelago.jpg' % CFG_SITE_RECORD,
+                                               username='balthasar',
+                                               password='b123althasar',
+                                               expected_text=[],
+                                               unexpected_text=['This file is restricted',
+                                                                'You are not authorized'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_public_files_guest(self):
+        """websearch - files of released articles are available to guest"""
+
+        # Record is not public...
+        self.assertEqual(record_public_p(105), False)
+
+        # ... but user can access attached files, as article is released
+        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/105/files/journal_scissor_beak.jpg' % CFG_SITE_RECORD,
+                                               expected_text=[],
+                                                unexpected_text=['This file is restricted',
+                                                                 'You are not authorized'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_really_restricted_files_guest(self):
+        """websearch - restricted files of released articles are not available to guest"""
+
+        # Record is not public...
+        self.assertEqual(record_public_p(105), False)
+
+        # ... and user cannot access restricted attachements, even if
+        # article is released
+        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/105/files/restricted-journal_scissor_beak.jpg' % CFG_SITE_RECORD,
+                                               expected_text=['This file is restricted.  If you think you have right to access it, please authenticate yourself.'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_restricted_picture_has_restriction_flag(self):
+        """websearch - restricted files displays a restriction flag"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/1/files/' % CFG_SITE_RECORD,
+                                                  expected_text="Restricted")
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
 
 class WebSearchRSSFeedServiceTest(unittest.TestCase):
     """Test of the RSS feed service."""
@@ -1803,16 +1918,16 @@ class WebSearchDateQueryTest(unittest.TestCase):
 
     def setUp(self):
         """Establish variables we plan to re-use"""
-        from invenio.intbitset import intbitset as HitSet
-        self.empty = HitSet()
+        from invenio.intbitset import intbitset
+        self.empty = intbitset()
 
     def test_search_unit_hits_for_datecreated_previous_millenia(self):
         """websearch - search_unit with datecreated returns >0 hits for docs in the last 1000 years"""
-        self.assertNotEqual(self.empty, search_unit('1000-01-01->9999', 'datecreated'))
+        self.assertNotEqual(self.empty, search_unit('1000-01-01->9999-12-31', 'datecreated'))
 
     def test_search_unit_hits_for_datemodified_previous_millenia(self):
         """websearch - search_unit with datemodified returns >0 hits for docs in the last 1000 years"""
-        self.assertNotEqual(self.empty, search_unit('1000-01-01->9999', 'datemodified'))
+        self.assertNotEqual(self.empty, search_unit('1000-01-01->9999-12-31', 'datemodified'))
 
     def test_search_unit_in_bibrec_for_datecreated_previous_millenia(self):
         """websearch - search_unit_in_bibrec with creationdate gets >0 hits for past 1000 years"""
@@ -1900,6 +2015,7 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchSearchEngineWebAPITest,
                              WebSearchRestrictedCollectionTest,
                              WebSearchRestrictedPicturesTest,
+                             WebSearchRestrictedWebJournalFilesTest,
                              WebSearchRSSFeedServiceTest,
                              WebSearchXSSVulnerabilityTest,
                              WebSearchResultsOverview,

@@ -24,12 +24,14 @@ __revision__ = "$Id$"
 import datetime
 import unittest
 import urllib
+from invenio.search_engine import record_public_p
 from invenio import webjournal_utils as wju
 from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_LANG, \
                            CFG_SITE_SUPPORT_EMAIL, \
 			   CFG_PREFIX
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, \
+     test_web_page_content, merge_error_messages
 
 class ArticlesRelated(unittest.TestCase):
     """Functions about articles"""
@@ -76,6 +78,8 @@ class JournalConfigVars(unittest.TestCase):
         value = wju.get_xml_from_config(["submission/identifier_element"], 'AtlantisTimes')
         self.assertEqual(value.values()[0], ['DEMOJRN_RN'])
         self.assertEqual(value.keys(), ['submission/identifier_element'])
+        value = wju.get_xml_from_config(["draft_image_access_policy"], 'AtlantisTimes')
+        self.assertEqual(value.values()[0], ['allow'])
 
     def test_get_journal_issue_field(self):
         """webjournal - returns the MARC field  """
@@ -221,10 +225,62 @@ class TimeIssueFunctions(unittest.TestCase):
         articles in each category"""
         value = wju.get_number_of_articles_for_issue('03/2009', 'AtlantisTimes', ln=CFG_SITE_LANG)
         self.assertEqual(value.values()[0], 3)
-        self.assertEqual(value.values()[1], 1)
+        self.assertEqual(value.values()[1], 2)
         self.assertEqual(value.keys()[0], 'News')
         self.assertEqual(value.keys()[1], 'Science')
 
+    def test_is_recid_in_released_issue(self):
+        """webjournal - check identification of records as part of a released issue"""
+        for recid in xrange(1, 99):
+            # Not articles
+            self.assertEqual(wju.is_recid_in_released_issue(recid), False)
+        for recid in xrange(99, 104):
+            # Article published and well categorized/indexed
+            self.assertEqual(wju.is_recid_in_released_issue(recid), True)
+
+        # Even though article is not in public collection (yet?), it
+        # is part of a released issue
+        self.assertEqual(wju.is_recid_in_released_issue(105), True)
+
+        # Article is not part of public collection, and is not part of
+        # a released issue
+        self.assertEqual(wju.is_recid_in_released_issue(106), False)
+
+    def test_article_in_unreleased_issue(self):
+        """webjournal - check access to unreleased article"""
+
+        # Record is not public
+        self.assertEqual(record_public_p(106), False)
+
+        # Unreleased article is not visible to guest
+        error_messages = test_web_page_content(CFG_SITE_URL + '/journal/AtlantisTimes/2009/06/News/106' ,
+                                               expected_text=["A naturalist's voyage around the world"],
+                                               unexpected_text=['Galapagos Archipelago'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+        # Unreleased article is visible to editor
+        error_messages = test_web_page_content(CFG_SITE_URL + '/journal/AtlantisTimes/2009/06/News/106',
+                                               username='balthasar',
+                                               password='b123althasar',
+                                               expected_text=['Galapagos Archipelago'],
+                                               unexpected_text=['This file is restricted',
+                                                                'You are not authorized'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_restricted_article_in_released_issue(self):
+        """webjournal - check access to restricted article in released issue"""
+
+        # Record is not public
+        self.assertEqual(record_public_p(106), False)
+
+        # Released article (even if restricted) is visible to guest
+        error_messages = test_web_page_content(CFG_SITE_URL + '/journal/AtlantisTimes/2009/03/Science/105' ,
+                                               expected_text=["Scissor-beak"],
+                                               unexpected_text=["A naturalist's voyage around the world"])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
 
 class JournalRelated(unittest.TestCase):
     """Functions about journal"""

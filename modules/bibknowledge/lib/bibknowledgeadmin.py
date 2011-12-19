@@ -28,7 +28,7 @@ from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument, redirect_to_url
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
+from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL, \
                            CFG_SITE_NAME, CFG_WEBDIR
 
 __lastupdated__ = """$Date$"""
@@ -67,7 +67,7 @@ def kb_manage(req, ln=CFG_SITE_LANG, search="", descriptiontoo=""):
         is_admin = False
 
     navtrail = '''<a class="navtrail" href="%s/help/admin">%s</a>''' % \
-               (CFG_SITE_URL, _("Admin Area"))
+               (CFG_SITE_SECURE_URL, _("Admin Area"))
     if is_admin:
         return page(title=_("BibKnowledge Admin"),
                 body=bibknowledgeadminlib.perform_request_knowledge_bases_management(ln=ln, search=search, descriptiontoo=descriptiontoo),
@@ -89,7 +89,7 @@ def kb_upload(req, kb, ln=CFG_SITE_LANG):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     navtrail = '''<a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % \
-               (CFG_SITE_URL, ln, _("Knowledge Bases"))
+               (CFG_SITE_SECURE_URL, ln, _("Knowledge Bases"))
 
     try:
         dummy = getUid(req)
@@ -139,7 +139,7 @@ def kb_upload(req, kb, ln=CFG_SITE_LANG):
         fn = str(kb_id)+".rdf"
         open(uploaddir+"/"+fn, 'w').write(fileitem.file.read())
         body = (_("File %s uploaded.") % ('kbfiles/' + cgi.escape(fn)))
-        body += " <a href='"+CFG_SITE_URL+"/kb'>%s</a>" % _("Back")
+        body += " <a href='"+CFG_SITE_SECURE_URL+"/kb'>%s</a>" % _("Back")
         return(page(title=_("File uploaded"),
                     body = body,
                     language=ln,
@@ -168,7 +168,7 @@ def kb_show(req, kb, sortby="to", ln=CFG_SITE_LANG, startat=0, search=""):
     _ = gettext_set_language(ln)
     navtrail_previous_links = '''
          &gt; <a class="navtrail"
-         href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_URL,
+         href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL,
                                          ln, _("Manage Knowledge Bases"))
 
     try:
@@ -213,7 +213,7 @@ def kb_show_attributes(req, kb, ln=CFG_SITE_LANG, sortby="to"):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_URL, ln, _("Manage Knowledge Bases"))
+    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln, _("Manage Knowledge Bases"))
 
     try:
         uid = getUid(req)
@@ -263,7 +263,7 @@ def kb_dynamic_update(req, kb_id, field, expression, collection,
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_URL, ln, _("Manage Knowledge Bases"))
+    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln, _("Manage Knowledge Bases"))
 
     try:
         dummy = getUid(req)
@@ -300,7 +300,7 @@ def kb_show_dependencies(req, kb, ln=CFG_SITE_LANG, sortby="to"):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_URL, ln, _("Manage Knowledge Bases"))
+    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln, _("Manage Knowledge Bases"))
 
     try:
         uid = getUid(req)
@@ -353,7 +353,7 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=CFG_SITE_LANG,
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
 
-    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_URL, ln, _("Manage Knowledge Bases"))
+    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln, _("Manage Knowledge Bases"))
 
     try:
         dummy = getUid(req)
@@ -462,7 +462,7 @@ def kb_edit_mapping(req, kb, key, mapFrom, mapTo,
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_URL, ln, _("Manage Knowledge Bases"))
+    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln, _("Manage Knowledge Bases"))
 
     try:
         dummy = getUid(req)
@@ -521,7 +521,7 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
 
-    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_URL, ln, _("Manage Knowledge Bases"))
+    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln, _("Manage Knowledge Bases"))
 
     try:
         dummy = getUid(req)
@@ -587,7 +587,7 @@ def kb_export(req, kbname="", format="kbr", searchkey="", searchvalue="", search
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_URL, ln, _("Manage Knowledge Bases"))
+    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln, _("Manage Knowledge Bases"))
     if not kbname:
         return page(title=_("Knowledge base name missing"),
                     body = """Required parameter kbname
@@ -683,7 +683,7 @@ def kb_add(req, ln=CFG_SITE_LANG, sortby="to", kbtype=""):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
 
-    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_URL, ln, _("Manage Knowledge Bases"))
+    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln, _("Manage Knowledge Bases"))
 
     try:
         dummy = getUid(req)
@@ -700,7 +700,7 @@ def kb_add(req, ln=CFG_SITE_LANG, sortby="to", kbtype=""):
         kb_id = bibknowledge.add_kb(kb_name=name, kb_type=kbtype)
         redirect_to_url(req, "kb?ln=%(ln)s&amp;action=attributes&amp;kb=%(kb)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby})
     else:
-        navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_URL, ln, _("Manage Knowledge Bases"))
+        navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln, _("Manage Knowledge Bases"))
 
         return page_not_authorized(req=req,
                                    text=auth_msg,
@@ -715,7 +715,7 @@ def kb_delete(req, kb, ln=CFG_SITE_LANG, chosen_option=""):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a> &gt; %s''' % (CFG_SITE_URL, ln, _("Manage Knowledge Bases"), _("Delete Knowledge Base"))
+    navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a> &gt; %s''' % (CFG_SITE_SECURE_URL, ln, _("Manage Knowledge Bases"), _("Delete Knowledge Base"))
 
     try:
         dummy = getUid(req)
@@ -751,7 +751,7 @@ def kb_delete(req, kb, ln=CFG_SITE_LANG, chosen_option=""):
 
         redirect_to_url(req, "kb?ln=%(ln)s" % {'ln':ln})
     else:
-        navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb">%s</a>''' % (CFG_SITE_URL, _("Manage Knowledge Bases"))
+        navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb">%s</a>''' % (CFG_SITE_SECURE_URL, _("Manage Knowledge Bases"))
 
         return page_not_authorized(req=req, text=auth_msg,
                                    navtrail=navtrail_previous_links)

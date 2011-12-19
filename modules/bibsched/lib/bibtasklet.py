@@ -139,7 +139,7 @@ def main():
         authorization_msg="BibTaskLet Task Submission",
         help_specific_usage="""\
   -T, --tasklet         Execute the specific tasklet
-  -a, --arguments       Specify an argument to be passed to tasklet in the form
+  -a, --argument        Specify an argument to be passed to tasklet in the form
                             param=value, e.g. --argument foo=bar
   -l, --list-tasklets   List the existing tasklets
 """,

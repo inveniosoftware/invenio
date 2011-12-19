@@ -402,29 +402,31 @@ def page_style():
                 }
 
                 .pagebodystripemiddle {
-                    position:absolute;
-                    margin: 0px;
-                    padding: 0px;
-                    height: 100%;
+                    position:relative;
+                    width: 996px;
+                    height: 860px;
                 }
 
                 .headline_div {
                     position: absolute;
+                    top:0;
+                    left:0;
                     background: #ffffff;
-                    padding-left : 175px;
-                    width : 820px;
+                    margin-left : 175px;
+                    width : 750px;
                     height: 45px;
                     text-indent: -15px;
                 }
 
                 #bibEditContent {
                     position: absolute;
-                    margin-top: 45px;
+                    top:0;
+                    left:0;
+                    margin-top: 55px;
                     margin-left: 175px;
                     overflow: auto;
-                    width: 820px;
-                    height: 80%;
-                    z-index: -1;
+                    width: 750px;
+                    height: 805px;
                 }
 
                 #bibEditMenu {
@@ -434,6 +436,7 @@ def page_style():
                     padding-left: 10px;
                     font-size: 0.8em;
                     left: 0px;
+                    z-index:1;
                 }
 
                 #bibEditMenu .bibEditMenuSection {
@@ -453,7 +456,6 @@ def page_style():
                 }
 
                 #bibEditTable td {
-                    max-width: 500px;
                     overflow:hidden;
                     word-wrap: break-word;
                 }
@@ -464,12 +466,11 @@ def page_style():
                     word-wrap: break-word;
                  }
                  #bibEditTable td textarea{
-                    max-width: 675px;
+                    max-width: 615px;
                     min-height: 65px;
                     max-height: 600px;
 
                 }
-
 
                 #bibEditMenu .bibEditMenuSection table {
                     width: 100%;
@@ -510,8 +511,12 @@ def page_style():
                 }
 
                 .revisionLine {
-                    text-align: right;
-                    padding-left: 125px;
+                    position: absolute;
+                    top:0;
+                    left:0;
+                    margin-left: 175px;
+                    font-size:12px;
+                    color: rgb(90, 134, 196);
                 }
 
                 .navtrailboxbody {
@@ -524,12 +529,72 @@ def page_style():
 
                 #topToolbarRight {
                     position: absolute;
-                    padding-left: 790px;
+                    top:0;
+                    right:0;
                     height: 48px;
+                    padding-top: 12px;
                 }
 
                 #top_toolbar_hr {
-                    padding-top: 37px;
+                    padding-top: 46px;
+                }
+
+                /* jQuery-UI Theming used for:
+                 * - Autocomplete menu
+                 */
+
+                .ui-autocomplete-loading {
+                    background: white url('/img/ui-anim_basic_16x16.gif') right center no-repeat;
+                }
+
+                .ui-corner-all {
+                    -moz-border-radius: 4px 4px 4px 4px;
+                }
+
+                .ui-widget-content {
+                    width: 300px;
+                }
+                .ui-widget-content a {
+                    background-color: white;
+                    color: black;
+                }
+
+                .ui-widget-overlay {
+                    -moz-background-clip: border;
+                    -moz-background-origin: padding;
+                    -moz-background-size: auto auto;
+                    background-attachment: scroll;
+                    background-position: 50% 50%;
+                    background-repeat: repeat;
+                    background-color: #666666;
+                    opacity: 0.5;
+                    left: 0;
+                    position: absolute;
+                    top: 0;
+                }
+
+                .ui-widget {
+                    /* font-family: Trebuchet MS,Tahoma,Verdana,Arial,sans-serif; */
+                    font-size: .8em;
+                }
+
+                .ui-menu .ui-menu-item a {
+                    display: block;
+                    line-height: .8;
+                    padding: 0.2em 0.4em;
+                    text-decoration: none;
+                    background-color: white;
+                    color: black;
+                }
+
+                .ui-menu {
+                    list-style: none outside none;
+                    margin-left: 1em;
+                    padding-left: 1em;
+                }
+
+                .ui-autocomplete {
+                    cursor: default;
                 }
 
 

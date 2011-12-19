@@ -19,28 +19,17 @@
 
 """ BibEncode profile submodule """
 
-## Simplejspn fallback, stuff will crash if V < 2.5 and no simplejson
-try:
-    import json
-except:
-    try:
-        import simplejson as json
-    except:
-        pass
-import re
 import os
 import shutil
+
+from invenio.jsonutils import json_decode_file
 from invenio.bibencode_config import (
                                       CFG_BIBENCODE_PROFILES_ENCODING,
                                       CFG_BIBENCODE_PROFILES_EXTRACT,
                                       CFG_BIBENCODE_PROFILES_ENCODING_LOCAL,
                                       CFG_BIBENCODE_PROFILES_EXTRACT_LOCAL
                                       )
-from invenio.bibencode_utils import (
-                                     json_remove_comments,
-                                     json_decode_file,
-                                     getval
-                                     )
+from invenio.bibencode_utils import getval
 from invenio.errorlib import register_exception
 
 #-------------------#

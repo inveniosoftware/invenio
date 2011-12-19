@@ -27,9 +27,9 @@ __lastupdated__ = """$Date$"""
 
 import cgi
 
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_URL, CFG_TMPDIR
 from invenio.webpage import page
-from invenio.webinterface_handler import WebInterfaceDirectory
+from invenio.webinterface_handler import WebInterfaceDirectory, wash_urlargd
 from invenio.urlutils import redirect_to_url
 
 class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
@@ -39,6 +39,14 @@ class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
         redirect_to_url(req, CFG_SITE_URL + '/httptest/post1')
 
     index = __call__
+
+    def _lookup(self, component, path):
+        if component == 'hello':
+            name = '/'.join(path)
+            def hello(req, form):
+                return "Hello %s!" % name
+            return hello, []
+        return None, []
 
     def sso(self, req, form):
         """ For testing single sign-on """
@@ -84,10 +92,13 @@ class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
         """
         from invenio.webinterface_handler_wsgi_utils import handle_file_post
         from invenio.bibdocfile import stream_file
+        argd = wash_urlargd(form, {"save": (str, "")})
         if req.method != 'POST':
             body = """<p>Please send a file via POST.</p>"""
             return page("test2", body=body, req=req)
         path, mimetype = handle_file_post(req)
+        if argd['save'] and argd['save'].startswith(CFG_TMPDIR):
+            open(argd['save'], "w").write(open(path).read())
         return stream_file(req, path, mime=mimetype)
 
     def complexpost(self, req, form):

@@ -22845,4 +22845,81 @@ Only the mountain and I.
       <subfield code="a">POETRY</subfield>
     </datafield>
   </record>
+  <record>
+    <datafield tag="037" ind1=" " ind2=" ">
+      <subfield code="a">BUL-SCIENCE-2009-002</subfield>
+    </datafield>
+    <datafield tag="041" ind1=" " ind2=" ">
+      <subfield code="a">eng</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="a">Charles Darwin</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">Scissor-beak</subfield>
+    </datafield>
+    <datafield tag="520" ind1=" " ind2=" ">
+      <subfield code="b">&lt;!--HTML-->&lt;p class="articleHeader"> &lt;i>October 15th.&lt;/i>&amp;mdash;We got under way and passed Punta Gorda, where there is a colony of tame Indians from the province of Missiones. We sailed rapidly down the current, but before sunset, from a silly fear of bad weather, we brought-to in a narrow arm of the river. I took the boat and rowed some distance up this creek. It was very narrow, winding, and deep; on each side a wall thirty or forty feet high, formed by trees intwined with creepers, gave to the canal a singularly gloomy appearance. I here saw a very extraordinary bird, called the Scissor-beak (Rhynchops nigra). It has short legs, web feet, extremely long-pointed wings, and is of about the size of a tern.&lt;/p> &lt;div class="phrwithcaption"> &lt;div class="imageScale"> &lt;img src="http://invenio-software.org/download/invenio-demo-site-files/icon-journal_scissor_beak.jpg" />&lt;/div> &lt;/div> &lt;p> The beak is flattened laterally, that is, in a plane at right angles to that of a spoonbill or duck. It is as flat and elastic as an ivory paper-cutter, and the lower mandible, differently from every other bird, is an inch and a half longer than the upper. In a lake near Maldonado, from which the water had been nearly drained, and which, in consequence, swarmed with small fry, I saw several of these birds, generally in small flocks, flying rapidly backwards and forwards close to the surface of the lake. They kept their bills wide open, and the lower mandible half buried in the water. Thus skimming the surface, they ploughed it in their course: the water was quite smooth, and it formed a most curious spectacle to behold a flock, each bird leaving its narrow wake on the mirror-like surface. In their flight they frequently twist about with extreme quickness, and dexterously manage with their projecting lower mandible to plough up small fish, which are secured by the upper and shorter half of their scissor-like bills. This fact I repeatedly saw, as, like swallows, they continued to fly backwards and forwards close before me. Occasionally when leaving the surface of the water their flight was wild, irregular, and rapid; they then uttered loud harsh cries. When these birds are fishing, the advantage of the long primary feathers of their wings, in keeping them dry, is very evident. When thus employed, their forms resemble the symbol by which many artists represent marine birds. Their tails are much used in steering their irregular course.&lt;/p> &lt;p> These birds are common far inland along the course of the Rio Parana; it is said that they remain here during the whole year, and breed in the marshes. During the day they rest in flocks on the grassy plains, at some distance from the water. Being at anchor, as I have said, in one of the deep creeks between the islands of the Parana, as the evening drew to a close, one of these scissor-beaks suddenly appeared. The water was quite still, and many little fish were rising. The bird continued for a long time to skim the surface, flying in its wild and irregular manner up and down the narrow canal, now dark with the growing night and the shadows of the overhanging trees. At Monte Video, I observed that some large flocks during the day remained on the mud-banks at the head of the harbour, in the same manner as on the grassy plains near the Parana; and every evening they took flight seaward. From these facts I suspect that the Rhynchops generally fishes by night, at which time many of the lower animals come most abundantly to the surface. M. Lesson states that he has seen these birds opening the shells of the mactr&amp;aelig; buried in the sand-banks on the coast of Chile: from their weak bills, with the lower mandible so much projecting, their short legs and long wings, it is very improbable that this can be a general habit.&lt;/p></subfield>
+    </datafield>
+    <datafield tag="691" ind1=" " ind2=" ">
+      <subfield code="a">DRAFT</subfield>
+    </datafield>
+    <datafield tag="773" ind1="" ind2=" ">
+      <subfield code="c">2</subfield>
+      <subfield code="n">03/2009</subfield>
+      <subfield code="t">Atlantis Times</subfield>
+    </datafield>
+    <datafield tag="773" ind1="" ind2=" ">
+      <subfield code="c">2</subfield>
+      <subfield code="n">04/2009</subfield>
+      <subfield code="t">Atlantis Times</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">ATLANTISTIMESSCIENCEDRAFT</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/journal_scissor_beak.jpg</subfield>
+      <subfield code="x">http://invenio-software.org/download/invenio-demo-site-files/icon-journal_scissor_beak.jpg</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/journal_scissor_beak.jpg</subfield>
+      <subfield code="x">http://invenio-software.org/download/invenio-demo-site-files/icon-journal_scissor_beak.jpg</subfield>
+      <subfield code="n">restricted-journal_scissor_beak.jpg</subfield>
+      <subfield code="r">restricted</subfield>
+    </datafield>
+  </record>
+  <record>
+    <datafield tag="037" ind1=" " ind2=" ">
+      <subfield code="a">BUL-NEWS-2009-005</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="a">Charles Darwin</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">Galapagos Archipelago</subfield>
+    </datafield>
+    <datafield tag="520" ind1=" " ind2=" ">
+      <subfield code="b">&lt;!--HTML-->&lt;p class="articleHeader">&lt;i>September 15th.&lt;/i>&amp;mdash;This archipelago consists of ten principal islands, of which five exceed the others in size. They are situated under the Equator, and between five and six hundred miles westward of the coast of America. They are all formed of volcanic rocks; a few fragments of granite curiously glazed and altered by the heat can hardly be considered as an exception.&lt;/p> &lt;p> Some of the craters surmounting the larger islands are of immense size, and they rise to a height of between three and four thousand feet. Their flanks are studded by innumerable smaller orifices. I scarcely hesitate to affirm that there must be in the whole archipelago at least two thousand craters. These consist either of lava and scori&amp;aelig;, or of finely-stratified, sandstone-like tuff. Most of the latter are beautifully symmetrical; they owe their origin to eruptions of volcanic mud without any lava: it is a remarkable circumstance that every one of the twenty-eight tuff-craters which were examined had their southern sides either much lower than the other sides, or quite broken down and removed. As all these craters apparently have been formed when standing in the sea, and as the waves from the trade wind and the swell from the open Pacific here unite their forces on the southern coasts of all the islands, this singular uniformity in the broken state of the craters, composed of the soft and yielding tuff, is easily explained.&lt;/p> &lt;p style="text-align: center;"> &lt;img alt="" class="ph" src="http://invenio-software.org/download/invenio-demo-site-files/icon-journal_galapagos_archipelago.jpg" style="width: 300px; height: 294px;" />&lt;/p> &lt;p> Considering that these islands are placed directly under the equator, the climate is far from being excessively hot; this seems chiefly caused by the singularly low temperature of the surrounding water, brought here by the great southern Polar current. Excepting during one short season very little rain falls, and even then it is irregular; but the clouds generally hang low. Hence, whilst the lower parts of the islands are very sterile, the upper parts, at a height of a thousand feet and upwards, possess a damp climate and a tolerably luxuriant vegetation. This is especially the case on the windward sides of the islands, which first receive and condense the moisture from the atmosphere.&lt;/p></subfield>
+    </datafield>
+    <datafield tag="691" ind1=" " ind2=" ">
+      <subfield code="a">DRAFT</subfield>
+    </datafield>
+    <datafield tag="773" ind1="" ind2=" ">
+      <subfield code="c">1</subfield>
+      <subfield code="n">06/2009</subfield>
+      <subfield code="t">Atlantis Times</subfield>
+    </datafield>
+    <datafield tag="773" ind1="" ind2=" ">
+      <subfield code="c">1</subfield>
+      <subfield code="n">07/2009</subfield>
+      <subfield code="t">Atlantis Times</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">ATLANTISTIMESNEWSDRAFT</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/journal_galapagos_archipelago.jpg</subfield>
+      <subfield code="x">http://invenio-software.org/download/invenio-demo-site-files/icon-journal_galapagos_archipelago.jpg</subfield>
+    </datafield>
+  </record>
 </collection>

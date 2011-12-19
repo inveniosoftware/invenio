@@ -593,7 +593,7 @@ function createGeneralControlsPanel(){
 function createTopToolbar(){
   /* Generate BibEdit top toolbar */
 
-  $('.navtrailboxbody').after('<td class="revisionLine"></td>');
+  $('.headline_div').after('<div class="revisionLine"></div>');
   // When Special modes are available there will be a loop through all of
   // them and the appropriate icons will be added
   
@@ -612,10 +612,12 @@ function updateToolbar(enable) {
     if (enable === true) {
         $('#img_preview').bind('click', onPreviewClick).removeClass(
         'bibEditImgCtrlDisabled').addClass('bibEditImgCtrlEnabled');
+        $('.revisionLine').show();
     }
     else {
         $('#img_preview').unbind('click', onPreviewClick).removeClass(
         'bibEditImgCtrlEnabled').addClass('bibEditImgCtrlDisabled');
+        $('.revisionLine').hide();
     }
 }
 

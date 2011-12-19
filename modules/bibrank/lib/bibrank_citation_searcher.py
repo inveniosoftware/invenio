@@ -63,17 +63,27 @@ class CitationDictsDataCacher(DataCacher):
 
         DataCacher.__init__(self, cache_filler, timestamp_verifier)
 
-try:
-    cache_citation_dicts.is_ok_p
-except Exception:
-    cache_citation_dicts = CitationDictsDataCacher()
+CACHE_CITATION_DICTS = None
 
 def get_citation_dict(dictname):
-    """Return cached value of a citation dictionary. DICTNAME can be
-       citationdict, reversedict, selfcitdict, selfcitedbydict.
     """
-    cache_citation_dicts.recreate_cache_if_needed()
-    return cache_citation_dicts.cache.get(dictname, {})
+    Returns a cached value of a citation dictionary. Performs lazy
+    loading, i.e. loads the dictionary the first time it is actually
+    used.
+
+    @param dictname: the name of the citation dictionary to return. Can
+            be citationdict, reversedict, selfcitdict, selfcitedbydict.
+    @type dictname: string
+    @return: a citation dictionary. The structure of the dictionary is
+            { recid -> [list of recids] }.
+    @rtype: dictionary
+    """
+    global CACHE_CITATION_DICTS
+    if CACHE_CITATION_DICTS is None:
+        CACHE_CITATION_DICTS = CitationDictsDataCacher()
+    else:
+        CACHE_CITATION_DICTS.recreate_cache_if_needed()
+    return CACHE_CITATION_DICTS.cache.get(dictname, {})
 
 def get_cited_by(recordid):
     """Return a list of records that cite recordid"""

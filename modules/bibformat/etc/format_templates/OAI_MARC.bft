@@ -1,0 +1,3 @@
+<name>OAI MARC</name>
+<description>Standard MARC XML output suitable for embed in OAI-PMH responses</description>
+<BFE_OAI_MARCXML/>

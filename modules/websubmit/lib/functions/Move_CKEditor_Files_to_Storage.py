@@ -26,9 +26,11 @@ import urllib
 from invenio.bibdocfile import decompose_file
 from invenio.config import \
      CFG_SITE_URL, \
-     CFG_PREFIX, CFG_SITE_RECORD
+     CFG_SITE_SECURE_URL, \
+     CFG_PREFIX, \
+     CFG_SITE_RECORD
 
-re_ckeditor_link = re.compile('"' + CFG_SITE_URL + \
+re_ckeditor_link = re.compile('"(' + CFG_SITE_URL + '|' + CFG_SITE_SECURE_URL + ')' + \
                                r'/submit/getattachedfile/(?P<uid>\d+)/(?P<type>(image|file|media|flash))/(?P<filename>.*?)"')
 
 def Move_CKEditor_Files_to_Storage(parameters, curdir, form, user_info=None):
@@ -124,7 +126,7 @@ def build_url(sysno, name, file_type, extension, is_icon=False):
     @param extension: file extension, including '.'
     """
     return CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + str(sysno) + \
-           '/files/' + build_docname(name, file_type, extension) + \
+           '/files/' + urllib.quote(build_docname(name, file_type, extension)) + \
            (is_icon and '?subformat=icon' or '')
 
 def build_docname(name, file_type, extension):
@@ -145,7 +147,8 @@ def write_fft(curdir, file_location, docname, icon_location=None, doctype="image
     May only be used for files attached with CKEditor (i.e. URLs
     matching re_ckeditor_link)
     """
-    if file_location.startswith(CFG_SITE_URL):
+    if file_location.startswith(CFG_SITE_URL) or \
+           file_location.startswith(CFG_SITE_SECURE_URL):
         # CKEditor does not url-encode filenames, and FFT does not
         # like URLs that are not quoted. So do it now (but only for
         # file name, in URL context!)
@@ -156,7 +159,8 @@ def write_fft(curdir, file_location, docname, icon_location=None, doctype="image
         except:
             pass
 
-    if icon_location.startswith(CFG_SITE_URL):
+    if icon_location.startswith(CFG_SITE_URL) or \
+       icon_location.startswith(CFG_SITE_SECURE_URL):
         # Ditto quote file name
         url_parts = icon_location.split("/")
         try:

@@ -42,6 +42,7 @@ from invenio.config import \
      CFG_TMPDIR, \
      CFG_SITE_LANG, \
      CFG_SITE_URL, \
+     CFG_SITE_SECURE_URL, \
      CFG_PREFIX, \
      CFG_WEBCOMMENT_ALLOW_COMMENTS,\
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
@@ -143,7 +144,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri']}, {})
+                CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -237,7 +238,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
             mathjaxheader = ''
             if CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS:
-                mathjaxheader = get_mathjax_header()
+                mathjaxheader = get_mathjax_header(req.is_https())
             jqueryheader = '''
             <script src="%(CFG_SITE_URL)s/js/jquery.MultiFile.pack.js" type="text/javascript" language="javascript"></script>
             ''' % {'CFG_SITE_URL': CFG_SITE_URL}
@@ -324,7 +325,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                     onetime=True)
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri'] + '&cookie=' + msg_cookie}, {})
+                CFG_SITE_SECURE_URL + user_info['uri'] + '&cookie=' + msg_cookie}, {})
             return redirect_to_url(req, target, norobot=True)
         elif (auth_code_1 or auth_code_2):
             return page_not_authorized(req, "../", \
@@ -439,7 +440,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
                     argd.update(cookie_argd)
                 except InvenioWebAccessMailCookieDeletedError, e:
-                    return redirect_to_url(req, CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + \
+                    return redirect_to_url(req, CFG_SITE_SECURE_URL + '/'+ CFG_SITE_RECORD +'/' + \
                                            str(self.recid) + (self.discussion==1 and \
                                                               '/reviews' or '/comments'))
                 except InvenioWebAccessMailCookieError, e:
@@ -541,7 +542,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri']}, {})
+                CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -555,7 +556,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         else:
             #Note: sent to comments display
             referer = "%s/%s/%s/%s?&amp;ln=%s&amp;voted=1"
-            referer %= (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, self.discussion == 1 and 'reviews' or 'comments', argd['ln'])
+            referer %= (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, self.discussion == 1 and 'reviews' or 'comments', argd['ln'])
             redirect_to_url(req, referer)
 
     def report(self, req, form):
@@ -600,7 +601,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri']}, {})
+                CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -614,7 +615,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         else:
             #Note: sent to comments display
             referer = "%s/%s/%s/%s/display?ln=%s&amp;voted=1"
-            referer %= (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, self.discussion==1 and 'reviews' or 'comments', argd['ln'])
+            referer %= (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, self.discussion==1 and 'reviews' or 'comments', argd['ln'])
             redirect_to_url(req, referer)
 
     def subscribe(self, req, form):
@@ -632,7 +633,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri']}, {})
+                CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -640,7 +641,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
         success = subscribe_user_to_discussion(self.recid, uid)
         display_url = "%s/%s/%s/comments/display?subscribed=%s&ln=%s" % \
-                      (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, str(success), argd['ln'])
+                      (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, str(success), argd['ln'])
         redirect_to_url(req, display_url)
 
     def unsubscribe(self, req, form):
@@ -656,12 +657,12 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri']}, {})
+                CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target, norobot=True)
 
         success = unsubscribe_user_from_discussion(self.recid, uid)
         display_url = "%s/%s/%s/comments/display?subscribed=%s&ln=%s" % \
-                      (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, str(-success), argd['ln'])
+                      (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, str(-success), argd['ln'])
         redirect_to_url(req, display_url)
 
 class WebInterfaceCommentsFiles(WebInterfaceDirectory):
@@ -721,7 +722,7 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri']}, {})
+                CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -741,7 +742,7 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri']}, {})
+                CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)
         elif auth_code:
             return page_not_authorized(req, "../", \

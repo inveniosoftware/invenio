@@ -33,7 +33,8 @@ from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 from invenio.bibformat import format_record
 from invenio.session import get_session
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.bibauthorid_webapi import get_bibref_name_string, get_person_redirect_link, get_canonical_id_from_person_id
+from invenio.bibauthorid_webapi import get_person_redirect_link, get_canonical_id_from_person_id
+from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
 from invenio.messages import gettext_set_language, wash_language
 #from invenio.textutils import encode_for_xml
 
@@ -269,7 +270,8 @@ class Template:
                                                                        'repeal_text':'Repeal record assignment',
                                                                        'to_other_text':'Assign to another person',
                                                                        'alt_to_other':'To other person!'
-                                                                       }):
+                                                                       },
+                              show_reset_button=True):
         '''
         Generate play per-paper links for the table for the
         status "confirmed"
@@ -281,18 +283,23 @@ class Template:
         @param verbiage_dict: language for the link descriptions
         @type verbiage_dict: dict
         '''
-        return ('<!--2!--><span id="aid_status_details"> '
+
+        stri = ('<!--2!--><span id="aid_status_details"> '
                 '<img src="%(url)s/img/aid_check.png" alt="%(alt_confirm)s" />'
-                '%(confirm_text)s <br>'
+                '%(confirm_text)s <br>')
+        if show_reset_button:
+            stri = stri + (
                 '<a id="aid_reset_gr" class="aid_grey" href="%(url)s/person/action?reset=True&selection=%(ref)s&pid=%(pid)s">'
                 '<img src="%(url)s/img/aid_reset_gray.png" alt="%(alt_forget)s" style="margin-left:22px;" />'
-                '%(forget_text)s</a><br>'
+                '%(forget_text)s</a><br>')
+        stri = stri + (
                 '<a id="aid_repeal" class="aid_grey" href="%(url)s/person/action?repeal=True&selection=%(ref)s&pid=%(pid)s">'
                 '<img src="%(url)s/img/aid_reject_gray.png" alt="%(alt_repeal)s" style="margin-left:22px;"/>'
                 '%(repeal_text)s</a><br>'
                 '<a id="aid_to_other" class="aid_grey" href="%(url)s/person/action?to_other_person=True&selection=%(ref)s">'
                 '<img src="%(url)s/img/aid_to_other_gray.png" alt="%(alt_to_other)s" style="margin-left:22px;"/>'
-                '%(to_other_text)s</a> </span>'
+                '%(to_other_text)s</a> </span>')
+        return (stri
                 % ({'url': CFG_SITE_URL, 'ref': bibref, 'pid': pid,
                     'alt_confirm':verbiage_dict['alt_confirm'],
                     'confirm_text':verbiage_dict['confirm_text'],
@@ -312,7 +319,8 @@ class Template:
                                                                        'repeal_text':'Repeal this record assignment.',
                                                                        'to_other_text':'Assign to another person',
                                                                        'alt_to_other':'To other person!'
-                                                                       }):
+                                                                       },
+                             show_reset_button=True):
         '''
         Generate play per-paper links for the table for the
         status "repealed"
@@ -324,18 +332,23 @@ class Template:
         @param verbiage_dict: language for the link descriptions
         @type verbiage_dict: dict
         '''
-        return ('<!---2!--><span id="aid_status_details"> '
+        stri = ('<!---2!--><span id="aid_status_details"> '
                 '<img src="%(url)s/img/aid_reject.png" alt="%(alt_repeal)s" />'
-                '%(repeal_text)s <br>'
+                '%(repeal_text)s <br>')
+        if show_reset_button:
+            stri = stri + (
                 '<a id="aid_reset" class="aid_grey" href="%(url)s/person/action?reset=True&selection=%(ref)s&pid=%(pid)s">'
                 '<img src="%(url)s/img/aid_reset_gray.png" alt="%(alt_forget)s" style="margin-left: 22px;" />'
-                '%(forget_text)s</a><br>'
+                '%(forget_text)s</a><br>')
+        stri = stri + (
                 '<a id="aid_confirm" class="aid_grey" href="%(url)s/person/action?confirm=True&selection=%(ref)s&pid=%(pid)s">'
                 '<img src="%(url)s/img/aid_check_gray.png" alt="%(alt_confirm)s" style="margin-left: 22px;" />'
                 '%(confirm_text)s</a><br>'
                 '<a id="aid_to_other" class="aid_grey" href="%(url)s/person/action?to_other_person=True&selection=%(ref)s">'
                 '<img src="%(url)s/img/aid_to_other_gray.png" alt="%(alt_to_other)s" style="margin-left:22px;"/>'
-                '%(to_other_text)s</a> </span>'
+                '%(to_other_text)s</a> </span>')
+
+        return (stri
                 % ({'url': CFG_SITE_URL, 'ref': bibref, 'pid': pid,
                     'alt_confirm':verbiage_dict['alt_confirm'],
                     'confirm_text':verbiage_dict['confirm_text'],
@@ -353,7 +366,8 @@ class Template:
                                                                        'repeal_text':'This record has been repealed.',
                                                                        'to_other_text':'Assign to another person',
                                                                        'alt_to_other':'To other person!'
-                                                                       }):
+                                                                       },
+                              show_reset_button=True):
         '''
         Generate play per-paper links for the table for the
         status "no decision taken yet"
@@ -366,7 +380,7 @@ class Template:
         @type verbiage_dict: dict
         '''
         #batchprocess?mconfirm=True&bibrefs=['100:17,16']&pid=1
-        return ('<!--0!--><span id="aid_status_details"> '
+        str = ('<!--0!--><span id="aid_status_details"> '
                 '<a id="aid_confirm" href="%(url)s/person/action?confirm=True&selection=%(ref)s&pid=%(pid)s">'
                 '<img src="%(url)s/img/aid_check.png" alt="%(alt_confirm)s" />'
                 '%(confirm_text)s</a><br />'
@@ -375,7 +389,8 @@ class Template:
                 '%(repeal_text)s</a> <br />'
                 '<a id="aid_to_other" href="%(url)s/person/action?to_other_person=True&selection=%(ref)s">'
                 '<img src="%(url)s/img/aid_to_other.png" alt="%(alt_to_other)s" />'
-                '%(to_other_text)s</a> </span>'
+                '%(to_other_text)s</a> </span>')
+        return (str
                 % ({'url': CFG_SITE_URL, 'ref': bibref, 'pid': pid,
                     'alt_confirm':verbiage_dict['alt_confirm'],
                     'confirm_text':verbiage_dict['confirm_text'],
@@ -464,7 +479,8 @@ class Template:
                                                                                                         'alt_forget':'Forget decision!',
                                                                                                         'forget_text':'Forget assignment decision',
                                                                                                         'alt_repeal':'Rejected!',
-                                                                                                        'repeal_text':'Repeal this record assignment.'}}):
+                                                                                                        'repeal_text':'Repeal this record assignment.'}},
+                                                                            show_reset_button=True):
         '''
         Generate the big tables for the person overview page
 
@@ -507,7 +523,8 @@ class Template:
         h('<input type="submit" name="confirm" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_confirm'])
         h('<input type="submit" name="repeal" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_repeal'])
         h('<input type="submit" name="to_other_person" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_to_others'])
-        h('<input type="submit" name="reset" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_forget'])
+        if show_reset_button:
+            h('<input type="submit" name="reset" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_forget'])
         h("  </div>")
 
 
@@ -518,7 +535,8 @@ class Template:
         h('    <th>Paper Short Info</th>')
         h("    <th>Author Name</th>")
         h("    <th>Affiliation</th>")
-#        h("    <th>Date</th>")
+        h("    <th>Date</th>")
+        h("    <th>Experiment</th>")
         h("    <th>Actions</th>")
         h("  </tr>")
         h("</thead>")
@@ -539,18 +557,36 @@ class Template:
             if paper['authoraffiliation']:
                 aff = paper['authoraffiliation'].encode("utf-8")
             else:
-                aff = "unknown"
+                aff = "Not assigned"
 
             h("    <td>%s</td>" % (aff))
-#            h("    <td>%s</td>" % (paper['paperdate']))
+
+            if paper['paperdate']:
+                pdate = paper['paperdate'].encode("utf-8")
+            else:
+                pdate = 'N.A.'
+            h("    <td>%s</td>" % pdate)
+
+            if paper['paperexperiment']:
+                pdate = paper['paperexperiment'].encode("utf-8")
+            else:
+                pdate = 'N.A.'
+            h("    <td>%s</td>" % pdate)
+
             paper_status = self._("No status information found.")
 
             if paper['flag'] == 2:
-                paper_status = self.tmpl_author_confirmed(paper['bibref'], person_id, verbiage_dict=buttons_verbiage_dict['record_confirmed'])
+                paper_status = self.tmpl_author_confirmed(paper['bibref'], person_id,
+                                            verbiage_dict=buttons_verbiage_dict['record_confirmed'],
+                                            show_reset_button=show_reset_button)
             elif paper['flag'] == -2:
-                paper_status = self.tmpl_author_repealed(paper['bibref'], person_id, verbiage_dict=buttons_verbiage_dict['record_repealed'])
+                paper_status = self.tmpl_author_repealed(paper['bibref'], person_id,
+                                            verbiage_dict=buttons_verbiage_dict['record_repealed'],
+                                            show_reset_button=show_reset_button)
             else:
-                paper_status = self.tmpl_author_undecided(paper['bibref'], person_id, verbiage_dict=buttons_verbiage_dict['record_undecided'])
+                paper_status = self.tmpl_author_undecided(paper['bibref'], person_id,
+                                            verbiage_dict=buttons_verbiage_dict['record_undecided'],
+                                            show_reset_button=show_reset_button)
 
             h('    <td><div id="bibref%s" style="float:left"><!--%s!-->%s &nbsp;</div>'
                            % (paper['bibref'], paper['flag'], paper_status))
@@ -582,7 +618,8 @@ class Template:
         h('<input type="submit" name="confirm" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_confirm'])
         h('<input type="submit" name="repeal" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_repeal'])
         h('<input type="submit" name="to_other_person" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_to_others'])
-        h('<input type="submit" name="reset" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_forget'])
+        if show_reset_button:
+            h('<input type="submit" name="reset" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_forget'])
         h("  </div>")
         h("</form>")
         return "\n".join(pp_html)
@@ -698,6 +735,7 @@ class Template:
                         rt_tickets=[],
                         open_rt_tickets=[],
                         show_tabs=['records', 'repealed', 'review', 'comments', 'tickets', 'data'],
+                        show_reset_button=True,
                         ticket_links=['delete', 'commit', 'del_entry', 'commit_entry'],
                         verbiage_dict={'confirmed':'Records', 'repealed':'Not this person\'s records',
                                          'review':'Records in need of review',
@@ -761,16 +799,20 @@ class Template:
         h('  <ul>')
         if 'records' in show_tabs:
             r = verbiage_dict['confirmed']
-            h('    <li><a href="#tabRecords"><span>%(r)s (%(l)s)</span></a></li>' % ({'r':r, 'l':len(rest_of_papers)}))
+            h('    <li><a href="#tabRecords"><span>%(r)s (%(l)s)</span></a></li>' %
+              ({'r':r, 'l':len(rest_of_papers)}))
         if 'repealed' in show_tabs:
             r = verbiage_dict['repealed']
-            h('    <li><a href="#tabNotRecords"><span>%(r)s (%(l)s)</span></a></li>' % ({'r':r, 'l':len(rejected_papers)}))
+            h('    <li><a href="#tabNotRecords"><span>%(r)s (%(l)s)</span></a></li>' %
+              ({'r':r, 'l':len(rejected_papers)}))
         if 'review' in show_tabs:
             r = verbiage_dict['review']
-            h('    <li><a href="#tabReviewNeeded"><span>%(r)s (%(l)s)</span></a></li>' % ({'r':r, 'l':len(review_needed)}))
+            h('    <li><a href="#tabReviewNeeded"><span>%(r)s (%(l)s)</span></a></li>' %
+              ({'r':r, 'l':len(review_needed)}))
         if 'tickets' in show_tabs:
             r = verbiage_dict['tickets']
-            h('    <li><a href="#tabTickets"><span>%(r)s (%(l)s)</span></a></li>' % ({'r':r, 'l':len(open_rt_tickets)}))
+            h('    <li><a href="#tabTickets"><span>%(r)s (%(l)s)</span></a></li>' %
+              ({'r':r, 'l':len(open_rt_tickets)}))
         if 'data' in show_tabs:
             r = verbiage_dict['data']
             h('    <li><a href="#tabData"><span>%s</span></a></li>' % r)
@@ -781,7 +823,10 @@ class Template:
             r = verbiage_dict['confirmed_ns']
             h('<noscript><h5>%s</h5></noscript>' % r)
             h(self.__tmpl_admin_records_table("massfunctions",
-                                             person_id, rest_of_papers, verbiage_dict=buttons_verbiage_dict['mass_buttons'], buttons_verbiage_dict=buttons_verbiage_dict))
+                                             person_id, rest_of_papers,
+                                             verbiage_dict=buttons_verbiage_dict['mass_buttons'],
+                                             buttons_verbiage_dict=buttons_verbiage_dict,
+                                             show_reset_button=show_reset_button))
             h("  </div>")
 
         if 'repealed' in show_tabs:
@@ -792,7 +837,10 @@ class Template:
             h('<br />' + self._('They will be regarded in the next run of the author ')
               + self._('disambiguation algorithm and might disappear from this listing.'))
             h(self.__tmpl_admin_records_table("rmassfunctions",
-                                             person_id, rejected_papers, verbiage_dict=buttons_verbiage_dict['mass_buttons'], buttons_verbiage_dict=buttons_verbiage_dict))
+                                             person_id, rejected_papers,
+                                             verbiage_dict=buttons_verbiage_dict['mass_buttons'],
+                                              buttons_verbiage_dict=buttons_verbiage_dict,
+                                              show_reset_button=show_reset_button))
             h("  </div>")
 
         if 'review' in show_tabs:
@@ -856,7 +904,7 @@ class Template:
 
                 for a in actions:
                     bibref, bibrec = a[1].split(',')
-                    pname = get_bibref_name_string(bibref)
+                    pname = get_bibrefrec_name_string(bibref)
                     title = ""
 
                     try:
@@ -1420,11 +1468,15 @@ class Template:
                 if total_papers > 1:
                     papers_string = '(%s Papers)' % str(total_papers)
                 elif total_papers == 1:
-                    papers_string = '(%s Paper)' % str(total_papers)
+                    if (len(papers) == 1 and
+                        len(papers[0]) == 1 and
+                        papers[0][0] == 'Not retrieved to increase performances.'):
+                        papers_string = ''
+                    else:
+                        papers_string = '(1 Paper)'
                 else:
                     papers_string = '(No papers)'
             except IndexError:
-                total_papers = None
                 papers_string = ''
 
             h('<div id="aid_result%s">' % (index % 2))
@@ -1578,13 +1630,13 @@ class Template:
 
         h(' <ul><li><a href=%s> Login through arXiv.org </a> <small>' % bconfig.BIBAUTHORID_CFG_INSPIRE_LOGIN)
         h ('(This is faster for you, as it allows your changes to be publicly shown immediately.)</small> <br><br>')
-        h(' <li><a href=%s/person/%s?open_clam=True> Continue as a guest </a>'
+        h(' <li><a href=%s/person/%s?open_claim=True> Continue as a guest </a>'
           '<small>(It will take some time before your changes are publicly shown.'
           'Use only if you don\'t have an arXiv.org account.)</small><br><br></ul>' % (CFG_SITE_URL, person))
         h('If you login through arXiv.org we can verify that you are the author of these papers and accept your claims rapidly, '
           'as well as adding additional claims from arXiv. <br>If you choose not to login via arXiv your changes will '
           'be publicly visible only after our editors check and confirm them, usually a few days.<br>  '
-          'Either way, claims made on the part of another author will go through our staff and may take longer to display. '
+          'Either way, claims made on behalf of another author will go through our staff and may take longer to display. '
           'This applies as well to papers which have been previously claimed, by yourself or someone else.')
         return "\n".join(html)
 
@@ -1596,6 +1648,18 @@ class Template:
             self._('Correct my publication lists!') + \
             '</b></a>'
 
+    def tmpl_welcome_arXiv_papers(self, paps):
+        '''
+        Creates the list of arXiv papers
+        '''
+        plist = "<br><br>"
+        if paps:
+            plist = plist + "We have got and automatically claimed for You the following papers from arXiv.org: <br>"
+            for p in paps:
+                plist = plist + "  "+str(p)+"<br>"
+        else:
+            plist = "We have got no papers from arXiv.org which we could claim automatically for You. <br>"
+        return plist
 
     def tmpl_welcome_end(self):
         '''

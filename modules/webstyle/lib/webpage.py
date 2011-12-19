@@ -25,16 +25,13 @@ from invenio.config import \
      CFG_WEBSTYLE_CDSPAGEBOXRIGHTBOTTOM, \
      CFG_WEBSTYLE_CDSPAGEBOXRIGHTTOP, \
      CFG_SITE_LANG, \
-     CFG_SITE_URL, \
-     CFG_SITE_SECURE_URL
-from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
+     CFG_SITE_URL
 from invenio.messages import gettext_set_language
 from invenio.webuser import \
      create_userinfobox_body, \
      create_useractivities_menu, \
      create_adminactivities_menu, \
-     getUid, \
-     isGuestUser
+     getUid
 from invenio.errorlib import get_msgs_for_code_list, register_errors
 
 import invenio.template
@@ -102,16 +99,11 @@ def page(title, body, navtrail="", description="", keywords="",
     """
 
     _ = gettext_set_language(language)
-    if req and uid is None:
-        uid = getUid(req)
-        if CFG_EXTERNAL_AUTH_USING_SSO and not isGuestUser(uid):
-            ## If the user is logged in and we are using SSO
-            ## this trick will keep the SSO session alive
-            ## (SSO session need an https connection)
-            body += """<img src="%s/img/keep_sso_connection_alive.gif"
-                    alt=" " width="0" height="0"
-                    style="visibility : hidden;" />""" % CFG_SITE_SECURE_URL
-    elif uid is None:
+    if req is not None:
+        if uid is None:
+            uid = getUid(req)
+        secure_page_p = req.is_https() and 1 or 0
+    if uid is None:
         ## 0 means generic guest user.
         uid = 0
     if of == 'xx':
@@ -202,7 +194,10 @@ def pageheaderonly(title, navtrail="", description="", keywords="", uid=0,
                    rssurl=CFG_SITE_URL+"/rss", body_css_classes=None):
     """Return just the beginning of page(), with full headers.
        Suitable for the search results page and any long-taking scripts."""
-
+    if req is not None:
+        if uid is None:
+            uid = getUid(uid)
+        secure_page_p = req.is_https() and 1 or 0
     return webstyle_templates.tmpl_pageheader(req,
                       ln = language,
                       headertitle = title,
@@ -227,7 +222,6 @@ def pagefooteronly(cdspagefooteradd="", lastupdated="",
                    language=CFG_SITE_LANG, req=None, verbose=1):
     """Return just the ending of page(), with full footer.
        Suitable for the search results page and any long-taking scripts."""
-
     return webstyle_templates.tmpl_pagefooter(req,
                                               ln=language,
                                               lastupdated = lastupdated,

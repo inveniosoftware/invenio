@@ -22,25 +22,13 @@ __revision__ = "$Id"
 
 __lastupdated__ = """$Date: 2008/08/12 09:26:46 $"""
 
-import sys
-if sys.hexversion < 0x2060000:
-    try:
-        import simplejson as json
-        simplejson_available = True
-    except ImportError:
-        # Okay, no Ajax app will be possible, but continue anyway,
-        # since this package is only recommended, not mandatory.
-        simplejson_available = False
-else:
-    import json
-    simplejson_available = True
-
+from invenio.jsonutils import json, json_unicode_to_utf8, CFG_JSON_AVAILABLE
 from invenio.access_control_engine import acc_authorize_action
 from invenio.bibedit_engine import perform_request_ajax, perform_request_init, \
     perform_request_newticket, perform_request_compare, \
     perform_request_init_template_interface, perform_request_ajax_template_interface
-from invenio.bibedit_utils import json_unicode_to_utf8, user_can_edit_record_collection
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_RECORD
+from invenio.bibedit_utils import user_can_edit_record_collection
+from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL, CFG_SITE_RECORD
 from invenio.messages import gettext_set_language
 from invenio.urlutils import redirect_to_url
 from invenio.webinterface_handler import WebInterfaceDirectory, wash_urlargd
@@ -48,10 +36,10 @@ from invenio.webpage import page
 from invenio.webuser import collect_user_info, getUid, page_not_authorized
 
 navtrail = (' <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> '
-            ) % CFG_SITE_URL
+            ) % CFG_SITE_SECURE_URL
 navtrail_bibedit = (' <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> ' + \
                     ' &gt; <a class="navtrail" href=\"%s/%s/edit\">Record Editor</a>'
-            ) % (CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_RECORD)
+            ) % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, CFG_SITE_RECORD)
 
 class WebInterfaceEditPages(WebInterfaceDirectory):
     """Defines the set of /edit pages."""
@@ -74,7 +62,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         uid = getUid(req)
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
         # Abort if the simplejson module isn't available
-        if not simplejson_available:
+        if not CFG_JSON_AVAILABLE:
             title = 'Record Editor'
             body = '''Sorry, the record editor cannot operate when the
                 `simplejson' module is not installed.  Please see the INSTALL
@@ -124,7 +112,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
             # Handle RESTful calls from logged in users by redirecting to
             # generic URL.
             redirect_to_url(req, '%s/%s/edit/#state=edit&recid=%s&recrev=%s' % (
-                    CFG_SITE_URL, CFG_SITE_RECORD, self.recid, ""))
+                    CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, ""))
 
         elif recid is not None:
             json_response.update({'recID': recid})
@@ -219,7 +207,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         uid = getUid(req)
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
         # Abort if the simplejson module isn't available
-        if not simplejson_available:
+        if not CFG_JSON_AVAILABLE:
             title = 'Record Editor Template Manager'
             body = '''Sorry, the record editor cannot operate when the
                 `simplejson' module is not installed.  Please see the INSTALL
@@ -283,8 +271,8 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         """Redirect calls without final slash."""
 
         if self.recid:
-            redirect_to_url(req, '%s/%s/%s/edit/' % (CFG_SITE_URL,
+            redirect_to_url(req, '%s/%s/%s/edit/' % (CFG_SITE_SECURE_URL,
                                                          CFG_SITE_RECORD,
                                                          self.recid))
         else:
-            redirect_to_url(req, '%s/%s/edit/' % (CFG_SITE_URL, CFG_SITE_RECORD))
+            redirect_to_url(req, '%s/%s/edit/' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD))

@@ -28,7 +28,7 @@ stamper_templatesdir = $(sysconfdir)/websubmit/file_stamper_templates
 stamper_templates_DATA = demo-stamp-left.tex demo-stamp-left-logo.png
 
 converter_templatesdir = $(sysconfdir)/websubmit/file_converter_templates
-converter_templates_DATA = PDFA_def.ps deskew.lua
+converter_templates_DATA = PDFA_def.ps deskew.lua PDFX_def.ps
 
 EXTRA_DIST = $(submission_templates_DATA) $(stamper_templates_DATA) $(converter_templates_DATA)
 

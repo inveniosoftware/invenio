@@ -35,6 +35,7 @@ def format_element(bfo):
     editor of the journal
     """
     out = ''
+    stats_admin_link = ''
     if bfo.user_info['uri'].startswith('/journal'):
         # Print editing links
         args = parse_url_string(bfo.user_info['uri'])
@@ -54,17 +55,28 @@ def format_element(bfo):
             else:
                 identifier = bfo.field(identifier_field)
 
+            (auth_code, auth_msg) = acc_authorize_action(bfo.user_info, 'runwebstatadmin')
+            if not auth_code:
+                # User will be allowed to see stats
+                stats_admin_link = '''
+                <p>
+                    <a href="%(CFG_SITE_URL)s/stats/customevent?ids=journals&amp;cols0=articleid&col_value0=%(recid)s&amp;timespan=last+month"> &raquo; statistics</a>
+                </p>
+                ''' % {'CFG_SITE_URL': CFG_SITE_URL,
+                       'recid': recid}
+
             out += '''
 <div style="float:right;margin-left:5px;font-weight:700;">
   <p>
-    <a href="%(CFG_SITE_URL)s/submit/direct?%(identifier_element)s=%(identifier)s&amp;sub=MBI%(doctype)s" target="_blank"> >> edit article</a>
+    <a href="%(CFG_SITE_URL)s/submit/direct?%(identifier_element)s=%(identifier)s&amp;sub=MBI%(doctype)s" target="_blank"> &raquo; edit article</a>
   </p>
   <p>
-    <a href="%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/%(recid)s" target="_blank"> >> record in %(CFG_SITE_NAME_INTL)s</a>
+    <a href="%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/%(recid)s" target="_blank"> &raquo; record in %(CFG_SITE_NAME_INTL)s</a>
   </p>
   <p>
-    <a href="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/regenerate?journal_name=%(journal_name)s&amp;issue=%(issue_number)s"> >> publish changes</a>
+    <a href="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/regenerate?journal_name=%(journal_name)s&amp;issue=%(issue_number)s"> &raquo; publish changes</a>
   </p>
+  %(stats_admin_link)s
 </div>''' % {'CFG_SITE_URL': CFG_SITE_URL,
              'CFG_SITE_RECORD': CFG_SITE_RECORD,
              'identifier': identifier,
@@ -74,7 +86,8 @@ def format_element(bfo):
              'doctype': doctype,
              'identifier_element': identifier_element,
              'CFG_SITE_NAME_INTL': CFG_SITE_NAME_INTL.get(bfo.lang,
-                                                          CFG_SITE_NAME)}
+                                                          CFG_SITE_NAME),
+             'stats_admin_link': stats_admin_link}
 
     return out
 

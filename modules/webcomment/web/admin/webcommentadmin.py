@@ -26,7 +26,7 @@ __lastupdated__ = """$Date$"""
 from invenio.webcommentadminlib import *
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box
-from invenio.config import CFG_SITE_URL,CFG_SITE_LANG,CFG_SITE_NAME
+from invenio.config import CFG_SITE_SECURE_URL,CFG_SITE_LANG,CFG_SITE_NAME
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized, collect_user_info
 from invenio.urlutils import wash_url_argument, redirect_to_url
@@ -294,7 +294,7 @@ def del_com(req, ln=CFG_SITE_LANG, action="delete", **hidden):
             body = perform_request_undel_com(ln=ln, comIDs=comIDs)
             title = _("Undelete comments")
         else:
-            redirect_to_url(req, CFG_SITE_URL + '/admin/webcomment/webcommentadmin.py')
+            redirect_to_url(req, CFG_SITE_SECURE_URL + '/admin/webcomment/webcommentadmin.py')
         return page(title=title,
                     body=body,
                     uid=uid,

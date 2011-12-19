@@ -285,7 +285,7 @@ def acc_delete_role(id_role=0, name_role=0):
         return 0
 
     # try to delete
-    if run_sql("""DELETE FROM accROLE WHERE id = %s  """ % (id_role, )):
+    if run_sql("""DELETE FROM accROLE WHERE id = %s  """, (id_role, )):
         # delete everything related
         # authorization entries
         count += 1 + run_sql("""DELETE FROM
@@ -994,7 +994,7 @@ def acc_get_action_id(name_action):
     try:
         return run_sql("""SELECT id FROM accACTION WHERE name = %s""",
         (name_action, ))[0][0]
-    except IndexError:
+    except (ProgrammingError, IndexError):
         return 0
 
 
@@ -1821,4 +1821,3 @@ def acc_cleanup_arguments():
 
     # return count and ids of deleted arguments
     return (count, ids2)
-

@@ -20,9 +20,16 @@
 
 __revision__ = "$Id"
 
+from datetime import datetime
+
+import re
+import difflib
+import zlib
+
 from invenio import bibrecord
 from invenio import bibformat
 
+from invenio.jsonutils import json, CFG_JSON_AVAILABLE
 from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL, CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL, \
     CFG_BIBEDIT_JS_CLONED_RECORD_COLOR, \
@@ -54,7 +61,8 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     update_cache_file_contents, get_field_templates, get_marcxml_of_revision, \
     revision_to_timestamp, timestamp_to_revision, \
     get_record_revision_timestamps, record_revision_exists, \
-    can_record_have_physical_copies, bibedit_log
+    can_record_have_physical_copies, bibedit_log, extend_record_with_template, \
+    merge_record_with_template
 
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
@@ -75,25 +83,6 @@ from invenio.bibknowledge import get_kbd_values_for_bibedit, get_kbr_values, \
 
 from invenio.bibcirculation_dblayer import get_number_copies, has_copies
 from invenio.bibcirculation_utils import create_item_details_url
-from datetime import datetime
-
-import re
-import difflib
-import zlib
-import sys
-if sys.hexversion < 0x2060000:
-    try:
-        import simplejson as json
-        simplejson_available = True
-    except ImportError:
-        # Okay, no Ajax app will be possible, but continue anyway,
-        # since this package is only recommended, not mandatory.
-        simplejson_available = False
-else:
-    import json
-    simplejson_available = True
-
-
 
 import invenio.template
 bibedit_templates = invenio.template.load('bibedit')
@@ -173,7 +162,7 @@ def perform_request_init(uid, ln, req, lastupdated):
     history_url = '"' + CFG_SITE_URL + '/admin/bibedit/bibeditadmin.py/history"'
     cern_site = 'false'
 
-    if not simplejson_available:
+    if not CFG_JSON_AVAILABLE:
         title = 'Record Editor'
         body = '''Sorry, the record editor cannot operate when the
                 `simplejson' module is not installed.  Please see the INSTALL
@@ -231,7 +220,7 @@ def perform_request_init(uid, ln, req, lastupdated):
 
     scripts = ['bibedit_display.js', 'bibedit_engine.js', 'bibedit_keys.js',
                'bibedit_menu.js', 'bibedit_holdingpen.js', 'marcxml.js',
-               'bibedit_clipboard.js']
+               'bibedit_clipboard.js','jquery-ui.min.js']
 
     stylesheets = ['bibedit.css']
 
@@ -535,7 +524,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                 pending_changes = []
                 disabled_hp_changes = {}
             if read_only_mode:
-                if data.has_key('recordRevision') and data['record_revision'] != 'sampleValue':
+                if data.has_key('recordRevision') and data['recordRevision'] != 'sampleValue':
                     record_revision_ts = data['recordRevision']
                     record_xml = get_marcxml_of_revision(recid, \
                                                          record_revision_ts)
@@ -603,6 +592,12 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             number_of_physical_copies = get_number_copies(recid)
             bibcirc_details_URL = create_item_details_url(recid, ln)
             can_have_copies = can_record_have_physical_copies(recid)
+
+            # For some collections, merge template with record
+            template_to_merge = extend_record_with_template(recid)
+            if template_to_merge:
+                record = merge_record_with_template(record, template_to_merge)
+                create_cache_file(recid, uid, record, True)
 
             response['cacheDirty'], response['record'], \
                 response['cacheMTime'], response['recordRevision'], \
@@ -780,12 +775,11 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
     """
 
     response = {}
-
     if not cache_exists(recid, uid):
         response['resultCode'] = 106
     elif not get_cache_mtime(recid, uid) == cacheMTime and isBulk == False:
         # In case of a bulk request, the changes are deliberately performed
-        # imemdiately one after another
+        # immediately one after another
         response['resultCode'] = 107
     else:
         try:
@@ -1182,7 +1176,7 @@ def _get_formated_record(record):
     xml_record = bibrecord.record_xml_output(record)
 
     result =  "<html><head><title>Record preview</title></head>"
-    result += get_mathjax_header()
+    result += get_mathjax_header(True)
     result += "<body><h2> Brief format preview </h2>"
     result += bibformat.format_record(recID=None,
                                      of="hb",

@@ -836,18 +836,21 @@ def check_arguments_compatibility(the_callable, argd):
         argd = {}
     args, dummy, varkw, defaults = inspect.getargspec(the_callable)
     tmp_args = list(args)
+    optional_args = []
     args_dict = {}
     if defaults:
         defaults = list(defaults)
     else:
         defaults = []
     while defaults:
-        args_dict[tmp_args.pop()] = defaults.pop()
+        arg = tmp_args.pop()
+        optional_args.append(arg)
+        args_dict[arg] = defaults.pop()
 
     while tmp_args:
         args_dict[tmp_args.pop()] = None
 
-    for arg, value in argd.iteritems():
+    for arg, dummy_value in argd.iteritems():
         if arg in args_dict:
             del args_dict[arg]
         elif not varkw:
@@ -855,8 +858,8 @@ def check_arguments_compatibility(the_callable, argd):
                 '"%s" with arguments %s' % (
                     arg, get_callable_signature_as_string(the_callable), argd))
 
-    for arg, value in args_dict.items():
-        if value:
+    for arg in args_dict.keys():
+        if arg in optional_args:
             del args_dict[arg]
 
     if args_dict:

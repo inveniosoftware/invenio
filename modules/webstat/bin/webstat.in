@@ -30,9 +30,9 @@ TMPDIR=@prefix@/var/tmp
 INVENIOLOGFILE=${LOGDIR}/invenio.err
 APACHELOGFILE=${LOGDIR}/apache.err
 #Search string with format: '^>> 2010-07-02'
-searchstringmonth="^\(>> \)\{0,1\}"`date +%Y-%m-`
+searchstringmonth="^\(>> \)*"`date +%Y-%m-`
 searchstringday="$searchstringmonth"`date +%d`
-numberoferrors=500
+numberoferrors=100
 
 ## usage helper function:
 usage () {

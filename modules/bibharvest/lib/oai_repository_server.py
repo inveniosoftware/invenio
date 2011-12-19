@@ -22,14 +22,14 @@ __revision__ = "$Id$"
 import cPickle
 import os
 import re
-import cgi
-import urllib
 import time
+import datetime
+import tempfile
 import sys
-if sys.hexversion < 0x2060000:
-    from md5 import md5
+if sys.hexversion < 0x2050000:
+    from glob import glob as iglob
 else:
-    from hashlib import md5
+    from glob import iglob
 
 from invenio.config import \
      CFG_OAI_DELETED_POLICY, \
@@ -38,21 +38,35 @@ from invenio.config import \
      CFG_OAI_ID_FIELD, \
      CFG_OAI_LOAD, \
      CFG_OAI_SET_FIELD, \
+     CFG_OAI_PREVIOUS_SET_FIELD, \
+     CFG_OAI_METADATA_FORMATS, \
      CFG_CACHEDIR, \
      CFG_SITE_NAME, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_URL, \
-     CFG_WEBSTYLE_HTTP_USE_COMPRESSION
+     CFG_WEBSTYLE_HTTP_USE_COMPRESSION, \
+     CFG_CERN_SITE, \
+     CFG_OAI_SAMPLE_IDENTIFIER, \
+     CFG_OAI_ID_PREFIX, \
+     CFG_OAI_FRIENDS, \
+     CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
+     CFG_OAI_PROVENANCE_BASEURL_SUBFIELD, \
+     CFG_OAI_PROVENANCE_DATESTAMP_SUBFIELD, \
+     CFG_OAI_PROVENANCE_METADATANAMESPACE_SUBFIELD, \
+     CFG_OAI_PROVENANCE_ORIGINDESCRIPTION_SUBFIELD, \
+     CFG_OAI_PROVENANCE_HARVESTDATE_SUBFIELD, \
+     CFG_OAI_PROVENANCE_ALTERED_SUBFIELD
 
 from invenio.intbitset import intbitset
-from invenio.dbquery import run_sql
-from invenio.search_engine import record_exists, perform_request_search, \
-    get_all_restricted_recids
-from invenio.bibformat_dblayer import get_preformatted_record
+from invenio.htmlutils import X, EscapedXMLString
+from invenio.dbquery import run_sql, wash_table_column_name
+from invenio.search_engine import record_exists, get_all_restricted_recids, get_all_field_values, search_unit_in_bibxxx, get_record
 from invenio.bibformat import format_record
-from invenio.textutils import encode_for_xml
+from invenio.bibrecord import record_get_field_instances
+from invenio.errorlib import register_exception
+from invenio.oai_repository_config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
 
-verbs = {
+CFG_VERBS = {
     'GetRecord'          : ['identifier', 'metadataPrefix'],
     'Identify'           : [],
     'ListIdentifiers'    : ['from', 'until',
@@ -66,104 +80,88 @@ verbs = {
                             'resumptionToken'],
     'ListSets'           : ['resumptionToken']
     }
-params = {
-    "verb" : ["Identify","ListIdentifiers","ListSets","ListMetadataFormats","ListRecords","GetRecord"],
-    "metadataPrefix" : ["oai_dc","marcxml"],
-    "from" :[""],
-    "until":[""],
-    "set" :[""],
-    "identifier": [""]
+
+CFG_ERRORS = {
+    "badArgument": "The request includes illegal arguments, is missing required arguments, includes a repeated argument, or values for arguments have an illegal syntax:",
+    "badResumptionToken": "The value of the resumptionToken argument is invalid or expired:",
+    "badVerb": "Value of the verb argument is not a legal OAI-PMH verb, the verb argument is missing, or the verb argument is repeated:",
+    "cannotDisseminateFormat": "The metadata format identified by the value given for the metadataPrefix argument is not supported by the item or by the repository:",
+    "idDoesNotExist": "The value of the identifier argument is unknown or illegal in this repository:",
+    "noRecordsMatch": "The combination of the values of the from, until, set and metadataPrefix arguments results in an empty list:",
+    "noMetadataFormats": "There are no metadata formats available for the specified item:",
+    "noSetHierarchy": "The repository does not support sets:"
 }
 
-def escape_space(strxml):
-    "Encode special chars in string for URL-compliancy."
+def oai_error(argd, errors):
+    """
+    Return a well-formatted OAI-PMH error
+    """
+    out = """<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+         http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">"""
+    out += X.responseDate()(get_utc_now())
+    for error_code, error_msg in errors:
+        assert(error_code in CFG_ERRORS)
+        if error_code in ("badArgument", "badVerb"):
+            out += X.request()(oai_get_request_url())
+            break
+    else:
+        ## There are no badArgument or badVerb errors so we can
+        ## return the whole request information
+        out += X.request(**argd)(oai_get_request_url())
+    for error_code, error_msg in errors:
+        if error_msg is None:
+            error_msg = CFG_ERRORS[error_code]
+        else:
+            error_msg = "%s %s" % (CFG_ERRORS[error_code], error_msg)
+        out += X.error(code=error_code)(error_msg)
+    out += "</OAI-PMH>"
+    return out
 
-    strxml = strxml.replace(' ', '%20')
-    return strxml
+def oai_header(argd, verb):
+    """
+    Return OAI header
+    """
 
-def encode_for_url(strxml):
-    "Encode special chars in string for URL-compliancy."
+    out = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n"
+    out += "<?xml-stylesheet type=\"text/xsl\" href=\"%s/css/oai2.xsl.v1.0\" ?>\n" % CFG_SITE_URL
+    out += "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">\n"
 
-    strxml = strxml.replace('%', '%25')
-    strxml = strxml.replace(' ', '%20')
-    strxml = strxml.replace('?', '%3F')
-    strxml = strxml.replace('#', '%23')
-    strxml = strxml.replace('=', '%3D')
-    strxml = strxml.replace('&', '%26')
-    strxml = strxml.replace('/', '%2F')
-    strxml = strxml.replace(':', '%3A')
-    strxml = strxml.replace(';', '%3B')
-    strxml = strxml.replace('+', '%2B')
-
-    return strxml
-
-def oai_header(args, verb):
-    "Print OAI header"
-
-    out = ""
-
-    out = out + "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n"
-    out = out + "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">\n"
-
-    out = out + " <responseDate>" + oaigetresponsedate() + "</responseDate>\n"
+    #out += "<responseDate>%s</responseDate>" % get_utc_now()
+    out += X.responseDate()(get_utc_now())
 
     if verb:
-        out = out + " <request verb=\"%s\">%s</request>\n" % (verb, oaigetrequesturl(args))
-        out = out + " <%s>\n" % verb
+        out += X.request(**argd)(oai_get_request_url())
+        out += "<%s>\n" % verb
     else:
-        out = out + " <request>%s</request>\n" % (oaigetrequesturl(args))
+        out += X.request()(oai_get_request_url())
 
     return out
 
 def oai_footer(verb):
-    "Print OAI footer"
-
+    """
+    @return: the OAI footer.
+    """
     out = ""
-
     if verb:
-        out = "%s </%s>\n" % (out, verb)
-    out = out + "</OAI-PMH>\n"
-
+        out += "</%s>\n" % (verb)
+    out += "</OAI-PMH>\n"
     return out
 
-def oai_error_header(args, verb):
-    "Print OAI header"
+def get_field(recid, field):
+    """
+    Gets list of field 'field' for the record with 'recid' system number.
+    """
 
-    out = ""
-
-###    out = "Content-Type: text/xml\n\n"
-    out = out + "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n"
-    out = out + "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">\n"
-
-    out = out + " <responseDate>" + oaigetresponsedate() + "</responseDate>\n"
-    out = out + " <request verb=\"%s\">%s</request>\n" % (verb, oaigetrequesturl(args))
-
-    return out
-
-def oai_error_footer(verb):
-    "Print OAI footer"
-
-    out  = verb
-    out  = "</OAI-PMH>\n"
-    return out
-
-def get_field(sysno, field):
-    "Gets list of field 'field' for the record with 'sysno' system number."
-
-    out   = []
     digit = field[0:2]
 
     bibbx = "bib%sx" % digit
     bibx  = "bibrec_bib%sx" % digit
-    query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec=%%s AND bx.id=bibx.id_bibxxx AND bx.tag=%%s" % (bibbx, bibx)
+    query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec=%%s AND bx.id=bibx.id_bibxxx AND bx.tag=%%s" % (wash_table_column_name(bibbx), wash_table_column_name(bibx))
 
-    res = run_sql(query, (sysno, field))
-
-    for row in res:
-
-        out.append(row[0])
-
-    return out
+    return [row[0] for row in run_sql(query, (recid, field))]
 
 def utc_to_localtime(date):
     """
@@ -207,7 +205,7 @@ def utc_to_localtime(date):
     return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(local_time))
 
 def localtime_to_utc(date):
-    "Convert localtime to UTC"
+    """Convert localtime to UTC"""
 
     ldate = date.split(" ")[0]
     ltime = date.split(" ")[1]
@@ -238,27 +236,27 @@ def localtime_to_utc(date):
 
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", utc_time)
 
-def get_modification_date(sysno):
-    "Returns the date of last modification for the record 'sysno'."
+def get_modification_date(recid):
+    """Returns the date of last modification for the record 'recid'."""
     out = ""
-    res = run_sql("SELECT DATE_FORMAT(modification_date,'%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec WHERE id=%s", (sysno,), 1)
+    res = run_sql("SELECT DATE_FORMAT(modification_date,'%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec WHERE id=%s", (recid,), 1)
     if res and res[0][0]:
         out = localtime_to_utc(res[0][0])
     return out
 
 def get_earliest_datestamp():
-    "Get earliest datestamp in the database"
+    """Get earliest datestamp in the database"""
     out = ""
-    res = run_sql("SELECT MIN(DATE_FORMAT(creation_date,'%%Y-%%m-%%d %%H:%%i:%%s')) FROM bibrec", (), 1)
-    if res[0][0]:
+    res = run_sql("SELECT DATE_FORMAT(MIN(creation_date),'%Y-%m-%d %H:%i:%s') FROM bibrec", n=1)
+    if res:
         out = localtime_to_utc(res[0][0])
     return out
 
 def get_latest_datestamp():
-    "Get latest datestamp in the database"
+    """Get latest datestamp in the database"""
     out = ""
-    res = run_sql("SELECT MAX(DATE_FORMAT(modification_date,'%%Y-%%m-%%d %%H:%%i:%%s')) FROM bibrec", (), 1)
-    if res[0][0]:
+    res = run_sql("SELECT DATE_FORMAT(MAX(modification_date),'%Y-%m-%d %H:%i:%s') FROM bibrec", n=1)
+    if res:
         out = localtime_to_utc(res[0][0])
     return out
 
@@ -287,8 +285,78 @@ def normalize_date(date, dtime="T00:00:00Z"):
 
     return date
 
-def print_record(sysno, format='marcxml', record_exists_result=None):
-    """Prints record 'sysno' formatted according to 'format'.
+def get_record_provenance(recid):
+    """
+    Return the provenance XML representation of a record, suitable to be put
+    in the about tag.
+    """
+    record = get_record(recid)
+    provenances = record_get_field_instances(record, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4])
+    out = ""
+    for provenance in provenances:
+        base_url = identifier = datestamp = metadata_namespace = origin_description = harvest_date = altered = ""
+        for (code, value) in provenance[0]:
+            if code == CFG_OAI_PROVENANCE_BASEURL_SUBFIELD:
+                base_url = value
+            elif code == CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5]:
+                identifier = value
+            elif code == CFG_OAI_PROVENANCE_DATESTAMP_SUBFIELD:
+                datestamp = value
+            elif code == CFG_OAI_PROVENANCE_METADATANAMESPACE_SUBFIELD:
+                metadata_namespace = value
+            elif code == CFG_OAI_PROVENANCE_ORIGINDESCRIPTION_SUBFIELD:
+                origin_description = value
+            elif code == CFG_OAI_PROVENANCE_HARVESTDATE_SUBFIELD:
+                harvest_date = value
+            elif code == CFG_OAI_PROVENANCE_ALTERED_SUBFIELD:
+                altered = value
+        if base_url:
+            out += """<provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">"""
+            out += X.originDescription(harvestDate=harvest_date, altered=altered)(
+                X.baseURL()(base_url),
+                X.identifier()(identifier),
+                X.datestamp()(datestamp),
+                X.metadataNamespace()(metadata_namespace),
+                origin_description and X.originDescription(origin_description) or '' ## This is already XML
+            )
+            out += """</provenance>"""
+    return out
+
+def get_record_rights(dummy):
+    """
+    Return the record rights parts, suitable to be put in the about tag.
+    """
+    return ""
+    ## FIXME: This need to be thought in a good way. What shall we really
+    ## put in the rights parts?
+    #record = get_record(recid)
+    #rights = record_get_field_instances(record, CFG_OAI_RIGHTS_FIELD[:3], CFG_OAI_RIGHTS_FIELD[3], CFG_OAI_RIGHTS_FIELD[4])
+    #license = record_get_field_instances(record, CFG_OAI_LICENSE_FIELD[:3], CFG_OAI_LICENSE_FIELD[3], CFG_OAI_LICENSE_FIELD[4])
+
+    #holder = date = rights_uri = contact = statement = terms = publisher = license_uri = ''
+    #if rights:
+        #for code, value in rights[0][0]:
+            #if code == CFG_OAI_RIGHTS_HOLDER_SUBFIELD:
+                #holder = value
+            #elif code == CFG_OAI_RIGHTS_DATE_SUBFIELD:
+                #date = value
+            #elif code == CFG_OAI_RIGHTS_URI_SUBFIELD:
+                #rights_uri = value
+            #elif code == CFG_OAI_RIGHTS_CONTACT_SUBFIELD:
+                #contact = value
+            #elif CFG_OAI_RIGHTS_STATEMENT_SUBFIELD:
+                #statement = value
+    #if license:
+        #for code, value in license[0][0]:
+            #if code == CFG_OAI_LICENSE_TERMS_SUBFIELD:
+                #terms = value
+            #elif code == CFG_OAI_LICENSE_PUBLISHER_SUBFIELD:
+                #publisher = value
+            #elif code == CFG_OAI_LICENSE_URI_SUBFIELD:
+                #license_uri = value
+
+def print_record(recid, prefix='marcxml', verb='ListRecords', set_spec=None):
+    """Prints record 'recid' formatted according to 'prefix'.
 
     - if record does not exist, return nothing.
 
@@ -300,263 +368,165 @@ def print_record(sysno, format='marcxml', record_exists_result=None):
       then return nothing.
 
     Optional parameter 'record_exists_result' has the value of the result
-    of the record_exists(sysno) function (in order not to call that function
+    of the record_exists(recid) function (in order not to call that function
     again if already done.)
+    """
+
+    record_exists_result = record_exists(recid) == 1
+    if record_exists_result:
+        sets = get_field(recid, CFG_OAI_SET_FIELD)
+        if set_spec is not None and not set_spec in sets and not [set_ for set_ in sets if set_.startswith("%s:" % set_spec)]:
+            ## the record is not in the requested set, and is not
+            ## in any subset
+            record_exists_result = False
+
+    if record_exists_result:
+        status = None
+    else:
+        status = 'deleted'
+
+    if not record_exists_result and CFG_OAI_DELETED_POLICY not in ('persistent', 'transient'):
+        return
+
+    idents = get_field(recid, CFG_OAI_ID_FIELD)
+    try:
+        assert idents, "No OAI ID for record %s, please do your checks!" % recid
+    except AssertionError, err:
+        register_exception(alert_admin=True)
+        return
+    try:
+        assert len(idents) == 1, "More than OAI ID found for recid %s. Considering only the first one, but please do your checks: %s" % (recid, idents)
+    except AssertionError, err:
+        register_exception(alert_admin=True)
+    ident = idents[0]
+
+    header_body = EscapedXMLString('')
+    header_body += X.identifier()(ident)
+    header_body += X.datestamp()(get_modification_date(recid))
+    for set_spec in get_field(recid, CFG_OAI_SET_FIELD):
+        if set_spec and set_spec != CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC:
+            # Print only if field not empty
+            header_body += X.setSpec()(set_spec)
+
+    header = X.header(status=status)(header_body)
+
+    if verb == 'ListIdentifiers':
+        return header
+    else:
+        if record_exists_result:
+            metadata_body = format_record(recid, CFG_OAI_METADATA_FORMATS[prefix][0])
+            metadata = X.metadata(body=metadata_body)
+            provenance_body = get_record_provenance(recid)
+            if provenance_body:
+                provenance = X.about(body=provenance_body)
+            else:
+                provenance = ''
+            rights_body = get_record_rights(recid)
+            if rights_body:
+                rights = X.about(body=rights_body)
+            else:
+                rights = ''
+        else:
+            metadata = ''
+            provenance = ''
+            rights = ''
+        return X.record()(header, metadata, provenance, rights)
+
+def oai_list_metadata_formats(argd):
+    """Generates response to oai_list_metadata_formats verb."""
+
+    if argd.get('identifier'):
+        recid = oai_get_recid(argd['identifier'])
+        _record_exists = record_exists(recid)
+        if _record_exists != 1 and (_record_exists != -1 or CFG_OAI_DELETED_POLICY == "no"):
+            return oai_error(argd, [("idDoesNotExist", "invalid record Identifier: %s" % argd['identifier'])])
+
+    out = ""
+    for prefix, (dummy, schema, namespace) in CFG_OAI_METADATA_FORMATS.items():
+        out += X.metadataFormat()(
+            X.metadataPrefix(prefix),
+            X.schema(schema),
+            X.metadataNamespace(namespace)
+        )
+
+    return oai_header(argd, "ListMetadataFormats") + out + oai_footer("ListMetadataFormats")
+
+def oai_list_records_or_identifiers(req, argd):
+    """Generates response to oai_list_records verb."""
+
+    verb = argd['verb']
+    resumption_token_was_specified = False
+
+    # check if the resumption_token did not expire
+    if argd.get('resumptionToken'):
+        resumption_token_was_specified = True
+        try:
+            cache = oai_cache_load(argd['resumptionToken'])
+            last_recid = cache['last_recid']
+            argd = cache['argd']
+            complete_list = cache['complete_list']
+            complete_list = filter_out_based_on_date_range(complete_list, argd.get('from', ''), argd.get('until', ''))
+        except Exception:
+            register_exception(alert_admin=True)
+            req.write(oai_error(argd, [("badResumptionToken", "ResumptionToken expired or invalid: %s" % argd['resumptionToken'])]))
+            return
+    else:
+        last_recid = 0
+        complete_list = oai_get_recid_list(argd.get('set', ""), argd.get('from', ""), argd.get('until', ""))
+
+        if not complete_list: # noRecordsMatch error
+            req.write(oai_error(argd, [("noRecordsMatch", "no records correspond to the request")]))
+            return
+
+    cursor = 0
+    for cursor, recid in enumerate(complete_list):
+        ## Let's fast-forward the cursor to point after the last recid that was
+        ## disseminated successfully
+        if recid > last_recid:
+            break
+
+    req.write(oai_header(argd, verb))
+    for recid in list(complete_list)[cursor:cursor+CFG_OAI_LOAD]:
+        req.write(print_record(recid, argd['metadataPrefix'], verb=verb, set_spec=argd.get('set')))
+
+    if list(complete_list)[cursor+CFG_OAI_LOAD:]:
+        resumption_token = oai_generate_resumption_token(argd.get('set', ''))
+        cache = {
+            'argd': argd,
+            'last_recid': recid,
+            'complete_list': complete_list.fastdump(),
+        }
+        oai_cache_dump(resumption_token, cache)
+        expdate = oai_get_response_date(CFG_OAI_EXPIRE)
+        req.write(X.resumptionToken(expirationDate=expdate, cursor=cursor, completeListSize=len(complete_list))(resumption_token))
+    elif resumption_token_was_specified:
+        ## Since a resumptionToken was used we shall put a last empty resumptionToken
+        req.write(X.resumptionToken(cursor=cursor, completeListSize=len(complete_list))(""))
+    req.write(oai_footer(verb))
+    oai_cache_gc()
+
+def oai_list_sets(argd):
+    """
+    Lists available sets for OAI metadata harvesting.
     """
 
     out = ""
 
-    # sanity check:
-    if record_exists_result is not None:
-        _record_exists = record_exists_result
-    else:
-        _record_exists = record_exists(sysno)
-
-    if not _record_exists:
-        return
-
-    if (format == "dc") or (format == "oai_dc"):
-        format = "xd"
-
-    # print record opening tags:
-
-    out = out + "  <record>\n"
-
-    if _record_exists == -1: # Deleted?
-        if CFG_OAI_DELETED_POLICY == "persistent" or \
-               CFG_OAI_DELETED_POLICY == "transient":
-            out = out + "    <header status=\"deleted\">\n"
-        else:
-            return
-    else:
-        out = out + "   <header>\n"
-
-    for ident in get_field(sysno, CFG_OAI_ID_FIELD):
-        out = "%s    <identifier>%s</identifier>\n" % (out, escape_space(ident))
-    out = "%s    <datestamp>%s</datestamp>\n" % (out, get_modification_date(sysno))
-    for set in get_field(sysno, CFG_OAI_SET_FIELD):
-        if set:
-            # Print only if field not empty
-            out = "%s    <setSpec>%s</setSpec>\n" % (out, set)
-    out = out + "   </header>\n"
-
-    if _record_exists == -1: # Deleted?
-        pass
-    else:
-        out = out + "   <metadata>\n"
-
-        if format == "marcxml":
-            formatted_record = get_preformatted_record(sysno, 'xm')
-            if formatted_record is not None:
-                ## MARCXML is already preformatted. Adapt it if needed
-                formatted_record = formatted_record.replace("<record>", "<marc:record xmlns:marc=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\" type=\"Bibliographic\">\n     <marc:leader>00000coc  2200000uu 4500</marc:leader>")
-                formatted_record = formatted_record.replace("<record xmlns=\"http://www.loc.gov/MARC21/slim\">", "<marc:record xmlns:marc=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\" type=\"Bibliographic\">\n     <marc:leader>00000coc  2200000uu 4500</marc:leader>")
-                formatted_record = formatted_record.replace("</record", "</marc:record")
-                formatted_record = formatted_record.replace("<controlfield", "<marc:controlfield")
-                formatted_record = formatted_record.replace("</controlfield", "</marc:controlfield")
-                formatted_record = formatted_record.replace("<datafield", "<marc:datafield")
-                formatted_record = formatted_record.replace("</datafield", "</marc:datafield")
-                formatted_record = formatted_record.replace("<subfield", "<marc:subfield")
-                formatted_record = formatted_record.replace("</subfield", "</marc:subfield")
-                out += formatted_record
-            else:
-                ## MARCXML is not formatted in the database, so produce it.
-                out = out + "    <marc:record xmlns:marc=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\" type=\"Bibliographic\">"
-                out = out + "     <marc:leader>00000coc  2200000uu 4500</marc:leader>"
-                out = "%s     <marc:controlfield tag=\"001\">%d</marc:controlfield>\n" % (out, int(sysno))
-
-                for digit1 in range(0, 10):
-                    for digit2 in range(0, 10):
-                        bibbx = "bib%d%dx" % (digit1, digit2)
-                        bibx = "bibrec_bib%d%dx" % (digit1, digit2)
-                        query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
-                                "WHERE bb.id_bibrec=%%s AND b.id=bb.id_bibxxx AND b.tag LIKE %%s "\
-                                "ORDER BY bb.field_number, b.tag ASC" % (bibbx, bibx)
-                        res = run_sql(query, (sysno, '%d%d%%' % (digit1, digit2)))
-                        field_number_old = -999
-                        field_old = ""
-                        for row in res:
-                            field, value, field_number = row[0], row[1], row[2]
-                            ind1, ind2 = field[3], field[4]
-                            if ind1 == "_":
-                                ind1 = " "
-                            if ind2 == "_":
-                                ind2 = " "
-                            # print field tag
-                            if field_number != field_number_old or field[:-1] != field_old[:-1]:
-                                if format == "marcxml":
-
-                                    if field_number_old != -999:
-                                        if field_old[0:2] == "00":
-                                            out = out + "     </marc:controlfield>\n"
-                                        else:
-                                            out = out + "     </marc:datafield>\n"
-
-                                    if field[0:2] == "00":
-                                        out = "%s     <marc:controlfield tag=\"%s\">\n" % (out, encode_for_xml(field[0:3]))
-                                    else:
-                                        out = "%s     <marc:datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">\n" % (out, encode_for_xml(field[0:3]), encode_for_xml(ind1).lower(), encode_for_xml(ind2).lower())
-
-
-                                field_number_old = field_number
-                                field_old = field
-                            # print subfield value
-                            if format == "marcxml":
-                                value = encode_for_xml(value)
-
-                                if(field[0:2] == "00"):
-                                    out = "%s      %s\n" % (out, value)
-                                else:
-                                    out = "%s      <marc:subfield code=\"%s\">%s</marc:subfield>\n" % (out, encode_for_xml(field[-1:]), value)
-
-
-                            # fetch next subfield
-                        # all fields/subfields printed in this run, so close the tag:
-                        if (format == "marcxml") and field_number_old != -999:
-                            if field_old[0:2] == "00":
-                                out = out + "     </marc:controlfield>\n"
-                            else:
-                                out = out + "     </marc:datafield>\n"
-
-                out = out + "    </marc:record>\n"
-
-        elif format == "xd":
-            out += format_record(sysno, 'xoaidc')
-
-    # print record closing tags:
-
-        out = out + "   </metadata>\n"
-
-    out = out + "  </record>\n"
-
-    return out
-
-def oailistmetadataformats(args):
-    "Generates response to oailistmetadataformats verb."
-
-    arg = parse_args(args)
-
-    out = ""
-
-    flag = 1 # list or not depending on identifier
-
-    if arg['identifier'] != "":
-
-        flag = 0
-
-        sysno = oaigetsysno(arg['identifier'])
-        _record_exists = record_exists(sysno)
-        if _record_exists == 1 or \
-               (_record_exists == -1 and CFG_OAI_DELETED_POLICY != "no"):
-
-            flag = 1
-
-        else:
-
-            out = out + oai_error("idDoesNotExist","invalid record Identifier")
-            out = oai_error_header(args, "ListMetadataFormats") + out + oai_error_footer("ListMetadataFormats")
-            return out
-
-    if flag:
-        out = out + "   <metadataFormat>\n"
-        out = out + "    <metadataPrefix>oai_dc</metadataPrefix>\n"
-        out = out + "    <schema>http://www.openarchives.org/OAI/1.1/dc.xsd</schema>\n"
-        out = out + "    <metadataNamespace>http://purl.org/dc/elements/1.1/</metadataNamespace>\n"
-        out = out + "   </metadataFormat>\n"
-        out = out + "   <metadataFormat>\n"
-        out = out + "    <metadataPrefix>marcxml</metadataPrefix>\n"
-        out = out + "    <schema>http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd</schema>\n"
-        out = out + "    <metadataNamespace>http://www.loc.gov/MARC21/slim</metadataNamespace>\n"
-        out = out + "   </metadataFormat>\n"
-
-    out = oai_header(args, "ListMetadataFormats") + out + oai_footer("ListMetadataFormats")
-    return out
-
-
-def oailistrecords(args):
-    "Generates response to oailistrecords verb."
-
-    arg = parse_args(args)
-
-    out = ""
-    resumptionToken_printed = False
-
-    sysnos = []
-    sysno  = []
-    # check if the resumptionToken did not expire
-    if arg['resumptionToken']:
-        filename = os.path.join(CFG_CACHEDIR, 'RTdata', arg['resumptionToken'])
-        if os.path.exists(filename) == 0:
-            out = oai_error("badResumptionToken", "ResumptionToken expired")
-            out = oai_error_header(args, "ListRecords") + out + oai_error_footer("ListRecords")
-            return out
-
-    if arg['resumptionToken'] != "":
-        sysnos = oaicacheout(arg['resumptionToken'])
-        arg['metadataPrefix'] = sysnos.pop()
-    else:
-        sysnos = oaigetsysnolist(arg['set'], arg['from'], arg['until'])
-
-    if len(sysnos) == 0: # noRecordsMatch error
-
-        out = out + oai_error("noRecordsMatch", "no records correspond to the request")
-        out = oai_error_header(args, "ListRecords") + out + oai_error_footer("ListRecords")
-        return out
-
-    i = 0
-    for sysno_ in sysnos:
-        if sysno_:
-            if i >= CFG_OAI_LOAD:          # cache or write?
-                if not resumptionToken_printed: # resumptionToken?
-                    arg['resumptionToken'] = oaigenresumptionToken()
-                    extdate = oaigetresponsedate(CFG_OAI_EXPIRE)
-                    if extdate:
-                        out = "%s <resumptionToken expirationDate=\"%s\">%s</resumptionToken>\n" % (out, extdate, arg['resumptionToken'])
-                    else:
-                        out = "%s <resumptionToken>%s</resumptionToken>\n" % (out, arg['resumptionToken'])
-                    resumptionToken_printed = True
-                sysno.append(sysno_)
-            else:
-                _record_exists = record_exists(sysno_)
-                if not (_record_exists == -1 and CFG_OAI_DELETED_POLICY == "no"):
-                    #Produce output only if record exists and had to be printed
-                    i = i + 1 # Increment limit only if record is returned
-                    res = print_record(sysno_, arg['metadataPrefix'], _record_exists)
-                    if res:
-                        out += res
-
-    if resumptionToken_printed:
-        oaicacheclean()
-        sysno.append(arg['metadataPrefix'])
-        oaicachein(arg['resumptionToken'], sysno)
-
-    out = oai_header(args, "ListRecords") + out + oai_footer("ListRecords")
-    return out
-
-def oailistsets(args):
-    "Lists available sets for OAI metadata harvesting."
-
-    out = ""
-
     # note: no flow control in ListSets
-
-    sets = get_sets()
-
+    sets = get_all_sets().values()
+    if not sets:
+        return oai_error(argd, [("noSetHierarchy", "No sets have been configured for this repository")])
     for set_ in sets:
-
-        out = out + "  <set>\n"
-        out = "%s    <setSpec>%s</setSpec>\n" % (out, set_[0])
-        out = "%s    <setName>%s</setName>\n" % (out, set_[1])
+        out += "  <set>\n"
+        out += X.setSpec()(set_[0]) + X.setName()(set_[1])
         if set_[2]:
-            out = "%s    <setDescription>%s</setDescription>\n" % (out, set_[2])
+            out += X.setDescription()(set_[2])
         out = out + "   </set>\n"
 
-    out = oai_header(args, "ListSets") + out + oai_footer("ListSets")
-
-    return out
+    return oai_header(argd, "ListSets") + out + oai_footer("ListSets")
 
 
-def oaigetrecord(args):
+def oai_get_record(argd):
     """Returns record 'identifier' according to 'metadataPrefix' format for OAI metadata harvesting.
 
     - if record does not exist, return oai_error 'idDoesNotExist'.
@@ -569,97 +539,20 @@ def oaigetrecord(args):
       then return oai_error 'idDoesNotExist'.
     """
 
-    arg = parse_args(args)
-    out = ""
-    sysno = oaigetsysno(arg['identifier'])
-    _record_exists = record_exists(sysno)
+    recid = oai_get_recid(argd['identifier'])
+    _record_exists = record_exists(recid)
     if _record_exists == 1 or \
            (_record_exists == -1 and CFG_OAI_DELETED_POLICY != 'no'):
-        out = print_record(sysno, arg['metadataPrefix'], _record_exists)
-        out = oai_header(args, "GetRecord") + out + oai_footer("GetRecord")
+        out = print_record(recid, argd['metadataPrefix'], _record_exists)
+        out = oai_header(argd, "GetRecord") + out + oai_footer("GetRecord")
     else:
-        out = oai_error("idDoesNotExist", "invalid record Identifier")
-        out = oai_error_header(args, "GetRecord") + out + oai_error_footer("GetRecord")
-    return out
-
-def oailistidentifiers(args):
-    "Prints OAI response to the ListIdentifiers verb."
-
-    arg = parse_args(args)
-
-    out = ""
-    resumptionToken_printed = False
-
-    sysno  = []
-    sysnos = []
-
-    if arg['resumptionToken']:
-        filename = os.path.join(CFG_CACHEDIR, 'RTdata', arg['resumptionToken'])
-        if os.path.exists(filename) == 0:
-            out = out + oai_error("badResumptionToken", "ResumptionToken expired")
-            out = oai_error_header(args, "ListIdentifiers") + out + oai_error_footer("ListIdentifiers")
-            return out
-
-    if arg['resumptionToken']:
-        sysnos = oaicacheout(arg['resumptionToken'])
-    else:
-        sysnos = oaigetsysnolist(arg['set'], arg['from'], arg['until'])
-
-    if len(sysnos) == 0: # noRecordsMatch error
-        out = out + oai_error("noRecordsMatch", "no records correspond to the request")
-        out = oai_error_header(args, "ListIdentifiers") + out + oai_error_footer("ListIdentifiers")
-        return out
-
-    i = 0
-    for sysno_ in sysnos:
-        if sysno_:
-            if i >= CFG_OAI_LOAD:           # cache or write?
-                if not resumptionToken_printed: # resumptionToken?
-                    arg['resumptionToken'] = oaigenresumptionToken()
-                    extdate = oaigetresponsedate(CFG_OAI_EXPIRE)
-                    if extdate:
-                        out = "%s  <resumptionToken expirationDate=\"%s\">%s</resumptionToken>\n" % (out, extdate, arg['resumptionToken'])
-                    else:
-                        out = "%s  <resumptionToken>%s</resumptionToken>\n" % (out, arg['resumptionToken'])
-                    resumptionToken_printed = True
-                sysno.append(sysno_)
-            else:
-                _record_exists = record_exists(sysno_)
-                if (not _record_exists == -1 and CFG_OAI_DELETED_POLICY == "no"):
-                    i = i + 1 # Increment limit only if record is returned
-                for ident in get_field(sysno_, CFG_OAI_ID_FIELD):
-                    if ident != '':
-                        if _record_exists == -1: #Deleted?
-                            if CFG_OAI_DELETED_POLICY == "persistent" \
-                                   or CFG_OAI_DELETED_POLICY == "transient":
-                                out = out + "    <header status=\"deleted\">\n"
-                            else:
-                                # In that case, print nothing (do not go further)
-                                break
-                        else:
-                            out = out + "    <header>\n"
-                        out = "%s      <identifier>%s</identifier>\n" % (out, escape_space(ident))
-                        out = "%s      <datestamp>%s</datestamp>\n" % (out, get_modification_date(oaigetsysno(ident)))
-                        for set in get_field(sysno_, CFG_OAI_SET_FIELD):
-                            if set:
-                                # Print only if field not empty
-                                out = "%s      <setSpec>%s</setSpec>\n" % (out, set)
-                        out = out + "    </header>\n"
-
-    if resumptionToken_printed:
-        oaicacheclean() # clean cache from expired resumptionTokens
-        oaicachein(arg['resumptionToken'], sysno)
-
-    out = oai_header(args, "ListIdentifiers") + out + oai_footer("ListIdentifiers")
-
+        return oai_error(argd, [("idDoesNotExist", "invalid record Identifier: %s" % argd['identifier'])])
     return out
 
 
-def oaiidentify(args, script_url):
-    """Generates a response to oaiidentify verb.
 
-    Parameters:
-           args - *dict* query parameters
+def oai_identify(argd):
+    """Generates a response to oai_identify verb.
 
      script_url - *str* URL of the script used to access the
                   service. This is made necessary since the gateway
@@ -669,130 +562,158 @@ def oaiidentify(args, script_url):
                   response
     """
 
-    out = """  <repositoryName>%(CFG_SITE_NAME)s</repositoryName>
-    <baseURL>%(CFG_SITE_URL)s%(script_url)s</baseURL>
-    <protocolVersion>2.0</protocolVersion>
-    <adminEmail>%(CFG_SITE_SUPPORT_EMAIL)s</adminEmail>
-    <earliestDatestamp>%(earliest_datestamp)s</earliestDatestamp>
-    <deletedRecord>%(CFG_OAI_DELETED_POLICY)s</deletedRecord>
-    <granularity>%(granularity)s</granularity>
-    %(compression)s
-    %(CFG_OAI_IDENTIFY_DESCRIPTION)s\n""" % \
-        {"CFG_SITE_NAME": cgi.escape(CFG_SITE_NAME),
-         "CFG_SITE_URL": cgi.escape(CFG_SITE_URL),
-         "earliest_datestamp": cgi.escape(get_earliest_datestamp()),
-         "granularity": "YYYY-MM-DDThh:mm:ssZ",
-         "CFG_OAI_DELETED_POLICY": cgi.escape(CFG_OAI_DELETED_POLICY),
-         "CFG_SITE_SUPPORT_EMAIL": cgi.escape(CFG_SITE_SUPPORT_EMAIL),
-         "CFG_OAI_IDENTIFY_DESCRIPTION": CFG_OAI_IDENTIFY_DESCRIPTION,
-         "compression": CFG_WEBSTYLE_HTTP_USE_COMPRESSION and "<compression>deflate</compression>" or "",
-         "script_url": script_url}
+    out = X.repositoryName()(CFG_SITE_NAME)
+    out += X.baseURL()(CFG_SITE_URL + '/oai2d')
+    out += X.protocolVersion()("2.0")
+    out += X.adminEmail()(CFG_SITE_SUPPORT_EMAIL)
+    out += X.earliestDatestamp()(get_earliest_datestamp())
+    out += X.deletedRecord()(CFG_OAI_DELETED_POLICY)
+    out += X.granularity()("YYYY-MM-DDThh:mm:ssZ")
+    if CFG_WEBSTYLE_HTTP_USE_COMPRESSION:
+        out += X.compression()('deflate')
+    out += X.description("""<oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier
+                                       http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">""" +
+                X.scheme()("oai") +
+                X.repositoryIdentifier()(CFG_OAI_ID_PREFIX) +
+                X.delimiter()(":") +
+                X.sampleIdentifier()(CFG_OAI_SAMPLE_IDENTIFIER) +
+                """</oai-identifier>""")
+    out += CFG_OAI_IDENTIFY_DESCRIPTION
+    if CFG_OAI_FRIENDS:
+        friends = """<friends xmlns="http://www.openarchives.org/OAI/2.0/friends/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/friends/
+      http://www.openarchives.org/OAI/2.0/friends.xsd">"""
+        for baseurl in CFG_OAI_FRIENDS:
+            friends += X.baseURL()(baseurl)
+        friends += """</friends>"""
+        out += X.description(friends)
 
-    out = oai_header(args, "Identify") + out + oai_footer("Identify")
+    out = oai_header(argd, "Identify") + out + oai_footer("Identify")
 
     return out
 
-def oaigetrequesturl(args):
-    "Generates requesturl tag for OAI."
+def get_utc_now():
+    """
+    Return current UTC time in the OAI-PMH format.
+    """
+    return datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
 
-    # re_amp = re.compile('&')
+def oai_build_request_element(argd=None):
+    """
+    Build the request tag.
+    """
+    if argd is None:
+        argd = {}
+    return X.responseDate()(get_utc_now()) + X.request(**argd)("%s/oai2d" % CFG_SITE_URL)
 
-    requesturl = CFG_SITE_URL + "/" + "oai2d/"# + "?" + re_amp.sub("&amp;", args)
-
+def oai_get_request_url():
+    """Generates requesturl tag for OAI."""
+    requesturl = CFG_SITE_URL + "/oai2d"
     return requesturl
 
-def oaigetresponsedate(delay=0):
-    "Generates responseDate tag for OAI."
-
+def oai_get_response_date(delay=0):
+    """Generates responseDate tag for OAI."""
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() + delay))
 
-
-def oai_error(code, msg):
-    "OAI error occured"
-
-    return "<error code=\"%s\">%s</error>\n" % (code, msg)
-
-
-def oaigetsysno(identifier):
-    "Returns the first database BIB ID for the OAI identifier 'identifier', if it exists."
-    sysno = None
+def oai_get_recid(identifier):
+    """Returns the first database BIB ID for the OAI identifier 'identifier', if it exists."""
+    recid = None
     if identifier:
         query = "SELECT DISTINCT(bb.id_bibrec) FROM bib%sx AS bx, bibrec_bib%sx AS bb WHERE bx.tag=%%s AND bb.id_bibxxx=bx.id AND bx.value=%%s" % (CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD[0:2])
         res = run_sql(query, (CFG_OAI_ID_FIELD, identifier))
         for row in res:
-            sysno = row[0]
-    return sysno
+            recid = row[0]
+    return recid
 
-
-def oaigetsysnolist(set="", fromdate="", untildate=""):
-    "Returns list of system numbers for the OAI set 'set', modified from 'fromdate' until 'untildate'."
-    from invenio.oai_repository_updater import get_set_definitions
-
+def filter_out_based_on_date_range(recids, fromdate="", untildate=""):
+    """ Filter out recids based on date range."""
     if fromdate != "":
         fromdate = normalize_date(fromdate, "T00:00:00Z")
     else:
         fromdate = get_earliest_datestamp()
+    fromdate = utc_to_localtime(fromdate)
 
     if untildate != "":
         untildate = normalize_date(untildate, "T23:59:59Z")
     else:
         untildate = get_latest_datestamp()
 
-    collections = []
-    for set_definition in get_set_definitions(set):
-        collections.extend(coll.strip() for coll in set_definition['c'].split(','))
-    recids = perform_request_search(f1=CFG_OAI_ID_FIELD, p1="oai:*", m1="e", op1='a',
-                                    f2=((set and CFG_OAI_SET_FIELD) or ""), p2=set, m2="e",
-                                    d1=utc_to_localtime(fromdate),
-                                    d2=utc_to_localtime(untildate),
-                                    c=collections,
-                                    dt='m',
-                                    ap=0)
-    ## Let's discard non public records
-    return list(intbitset(recids) - get_all_restricted_recids())
+    untildate = utc_to_localtime(untildate)
 
-def oaigenresumptionToken():
-    "Generates unique ID for resumption token management."
+    recids = intbitset(recids) ## Let's clone :-)
 
-    return md5(str(time.time())).hexdigest()
+    if fromdate and untildate:
+        recids &= intbitset(run_sql("SELECT id FROM bibrec WHERE modification_date BETWEEN %s AND %s", (fromdate, untildate)))
+    elif fromdate:
+        recids &= intbitset(run_sql("SELECT id FROM bibrec WHERE modification_date >= %s", (fromdate, )))
+    elif untildate:
+        recids &= intbitset(run_sql("SELECT id FROM bibrec WHERE modification_date <= %s", (untildate, )))
+    return recids - get_all_restricted_recids()
 
-
-def oaicachein(resumptionToken, sysnos):
-    "Stores or adds sysnos in cache.  Input is a string of sysnos separated by commas."
-
-    filename = os.path.join(CFG_CACHEDIR, 'RTdata', resumptionToken)
-
-    fil = open(filename, "w")
-    cPickle.dump(sysnos, fil)
-    fil.close()
-    return 1
-
-
-def oaicacheout(resumptionToken):
-    "Restores string of comma-separated system numbers from cache."
-
-    sysnos = []
-
-    filename = os.path.join(CFG_CACHEDIR, 'RTdata', resumptionToken)
-
-    if oaicachestatus(resumptionToken):
-        fil = open(filename, "r")
-        sysnos = cPickle.load(fil)
-        fil.close()
+def oai_get_recid_list(set_spec="", fromdate="", untildate=""):
+    """
+    Returns list of recids for the OAI set 'set', modified from 'fromdate' until 'untildate'.
+    """
+    ret = intbitset()
+    if not set_spec:
+        ret |= search_unit_in_bibxxx(p='*', f=CFG_OAI_SET_FIELD, type='e')
+        if CFG_OAI_DELETED_POLICY != 'no':
+            ret |= search_unit_in_bibxxx(p='*', f=CFG_OAI_PREVIOUS_SET_FIELD, type='e')
     else:
-        return 0
-    return sysnos
+        ret |= search_unit_in_bibxxx(p=set_spec, f=CFG_OAI_SET_FIELD, type='e')
+        ret |= search_unit_in_bibxxx(p='%s:*' % set_spec, f=CFG_OAI_SET_FIELD, type='e')
+        if CFG_OAI_DELETED_POLICY != 'no':
+            ret |= search_unit_in_bibxxx(p=set_spec, f=CFG_OAI_PREVIOUS_SET_FIELD, type='e')
+            ret |= search_unit_in_bibxxx(p='%s:*' % set_spec, f=CFG_OAI_PREVIOUS_SET_FIELD, type='e')
+    if CFG_OAI_DELETED_POLICY == 'no':
+        ret -= search_unit_in_bibxxx(p='DELETED', f='980__%', type='e')
+        if CFG_CERN_SITE:
+            ret -= search_unit_in_bibxxx(p='DUMMY', f='980__%', type='e')
+    return filter_out_based_on_date_range(ret, fromdate, untildate)
 
+def oai_generate_resumption_token(set_spec):
+    """Generates unique ID for resumption token management."""
+    fd, name = tempfile.mkstemp(dir=os.path.join(CFG_CACHEDIR, 'RTdata'), prefix='%s___' % set_spec)
+    os.close(fd)
+    return os.path.basename(name)
 
-def oaicacheclean():
-    "Removes cached resumptionTokens older than specified"
+def oai_delete_resumption_tokens_for_set(set_spec):
+    """
+    In case a set is modified by the admin interface, this will delete
+    any resumption token that is now invalid.
+    """
+    aset = set_spec
+    while aset:
+        for name in iglob(os.path.join(CFG_CACHEDIR, 'RTdata', '%s___*' % set_spec)):
+            os.remove(name)
+        aset = aset.rsplit(":", 1)[0]
+    for name in iglob(os.path.join(CFG_CACHEDIR, 'RTdata', '___*')):
+        os.remove(name)
 
-    directory = os.path.join(CFG_CACHEDIR, 'RTdata')
+def oai_cache_dump(resumption_token, cache):
+    """
+    Given a resumption_token and the cache, stores the cache.
+    """
+    cPickle.dump(cache, open(os.path.join(CFG_CACHEDIR, 'RTdata', resumption_token), 'w'), -1)
 
-    files = os.listdir(directory)
+def oai_cache_load(resumption_token):
+    """
+    Restores the cache from the resumption_token.
+    """
+    fullpath = os.path.join(CFG_CACHEDIR, 'RTdata', resumption_token)
+    if os.path.dirname(os.path.abspath(fullpath)) != os.path.abspath(os.path.join(CFG_CACHEDIR, 'RTdata')):
+        raise ValueError("Invalid path")
+    return cPickle.load(open(fullpath))
 
-    for file_ in files:
-        filename = os.path.join(directory, file_)
+def oai_cache_gc():
+    """
+    OAI Cache Garbage Collector.
+    """
+    for file_ in os.listdir(os.path.join(CFG_CACHEDIR, 'RTdata')):
+        filename = os.path.join(os.path.join(CFG_CACHEDIR, 'RTdata', file_))
         # cache entry expires when not modified during a specified period of time
         if ((time.time() - os.path.getmtime(filename)) > CFG_OAI_EXPIRE):
             try:
@@ -800,199 +721,144 @@ def oaicacheclean():
             except OSError, e:
                 # Most probably the cache was already deleted
                 pass
-    return 1
 
-
-def oaicachestatus(resumptionToken):
-    "Checks cache status.  Returns 0 for empty, 1 for full."
-
-    filename = os.path.join(CFG_CACHEDIR, 'RTdata', resumptionToken)
-
-    if os.path.exists(filename):
-        if os.path.getsize(filename) > 0:
-            return 1
-        else:
-            return 0
-    else:
-        return 0
-
-
-def get_sets():
-    "Returns list of sets."
-    # TODO: Try to remove dependency on oaiREPOSITORY table, by
-    # determining available sets from data.
-
-    out = {}
-    row = ['', '']
-
-    query = "SELECT setSpec,setName,setDescription FROM oaiREPOSITORY"
-    res = run_sql(query)
+def get_all_sets():
+    """
+    Return all the sets.
+    """
+    res = run_sql("SELECT setSpec, setName, setDescription FROM oaiREPOSITORY")
+    ret = {}
     for row in res:
-        row_bis = [row[0], row[1], row[2]]
-        out[row[0]] = row_bis
+        ret[row[0]] = row
 
-    return out.values()
+    ## Let's expand with all the set that exist in the DB
+    for a_set in get_all_field_values(CFG_OAI_SET_FIELD):
+        if a_set not in ret:
+            ret[a_set] = (a_set, a_set, '')
 
+    ## Let's expand with all the supersets
+    for a_set in ret.keys():
+        while ':' in a_set:
+            try:
+                a_set = a_set.rsplit(":", 1)[0]
+            except AttributeError:
+                a_set = ':'.join(a_set.split(":")[:-1])
+            if a_set not in ret:
+                ret[a_set] = (a_set, a_set, '')
 
-def parse_args(args=""):
-    "Parse input args"
+    if CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC in ret:
+        ## Let's remove the special global set
+        del ret[CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC]
 
-    out_args = {
-       "verb"             : "",
-       "metadataPrefix"   : "",
-       "from"             : "",
-       "until"            : "",
-       "set"              : "",
-       "identifier"       : "",
-       "resumptionToken"  : ""
-    }
+    if '' in ret:
+        ## '' is not a valid setSpec but might be in the MARC
+        del ret['']
 
-    if args == "" or args is None:
-        pass
-    else:
+    return ret
 
-        list_of_arguments = args.split('&')
-
-        for item in list_of_arguments:
-            keyvalue = item.split('=')
-            if len(keyvalue) == 2:
-                if (out_args.has_key(keyvalue[0])):
-                    if(out_args[keyvalue[0]] != ""):
-                        out_args[keyvalue[0]] = "Error"
-                    else:
-                        out_args[keyvalue[0]] = urllib.unquote(keyvalue[1])
-                else:
-                    out_args[keyvalue[0]] = urllib.unquote(keyvalue[1])
-            else:
-                out_args['verb'] = ""
-
-    return out_args
-
-def check_argd(arguments):
+def check_argd(argd):
     """
     Check OAI arguments
     Also transform them from lists to strings.
     """
+    errors = []
 
-    out = ""
-
-## no several times the same argument
-#
-#
-    for param, value in arguments.iteritems():
-        if len(value) > 1 and not 'The request includes illegal arguments' in out:
-            out = out + oai_error("badArgument", "The request includes illegal arguments")
-            bad_arguments_error = True
+    ## no several times the same argument
+    bad_arguments_error = False
+    for param, value in argd.iteritems():
+        if len(value) > 1 and not bad_arguments_error:
+            errors.append(("badArgument", "More than one value specified for the %s argument: %s" % (param, value)))
+            bad_arguments_error = True ## This is needed only once
         if len(value) > 0:
-            arguments[param] = value[0]
+            argd[param] = value[0]
         else:
-            arguments[param] = ''
+            argd[param] = ''
 
-## principal argument required
-#
-#
-    if verbs.has_key(arguments['verb']):
-        pass
-    else:
-        out = out + oai_error("badVerb", "Illegal OAI verb")
+    ## principal argument required
+    if argd['verb'] not in CFG_VERBS:
+        errors.append(("badVerb", "Illegal OAI verb: %s" % argd['verb']))
 
-## defined args
-#
-#
-    for param in arguments.keys():
-        if not param in verbs.get(arguments['verb'], []) and param != 'verb' \
-               and not 'The request includes illegal arguments' in out:
-            out = out + oai_error("badArgument", "The request includes illegal arguments")
+    ## defined argd
+    for param in argd.keys():
+        if not param in CFG_VERBS.get(argd['verb'], []) and param != 'verb' \
+               and not bad_arguments_error:
+            errors.append(("badArgument", "The request includes illegal arguments for the given verb: %s" % param))
+            bad_arguments_error = True
             break # Indicate only once
 
-## resumptionToken exclusive
-#
-#
-    if arguments.get('resumptionToken', '') != "" and \
-           len(arguments.keys()) != 2 and \
-           not 'The request includes illegal arguments' in out:
-        out = out + oai_error("badArgument",
-                              "The request includes illegal arguments")
+    ## resumptionToken exclusive
+    if argd.get('resumptionToken', '') != "" and \
+           len(argd.keys()) != 2 and not bad_arguments_error:
+        errors.append(("badArgument", "The resumptionToken was specified together with other arguments"))
+        bad_arguments_error = True
 
-## datestamp formats
-#
-#
-    if arguments.has_key('from') and \
-           'from' in verbs.get(arguments['verb'], []):
-        from_length = len(arguments['from'])
-        if check_date(arguments['from']) == "":
-            out = out + oai_error("badArgument",
-                                  "Bad datestamp format in from")
+    if argd.get('resumptionToken', None) == '':
+        errors.append(("badResumptionToken", "ResumptionToken invalid: %s" % argd.get('resumptionToken', None)))
+
+    ## datestamp formats
+    if argd.has_key('from') and \
+           'from' in CFG_VERBS.get(argd['verb'], []):
+        from_length = len(argd['from'])
+        if check_date(argd['from']) == "":
+            errors.append(("badArgument", "Bad datestamp format in from: %s" % argd['from']))
     else:
         from_length = 0
 
-    if arguments.has_key('until') and \
-           'until' in verbs.get(arguments['verb'], []):
-        until_length = len(arguments['until'])
-        if check_date(arguments['until']) == "":
-            out = out + oai_error("badArgument",
-                                  "Bad datestamp format in until")
+    if argd.has_key('until') and \
+           'until' in CFG_VERBS.get(argd['verb'], []):
+        until_length = len(argd['until'])
+        if check_date(argd['until']) == "":
+            errors.append(("badArgument", "Bad datestamp format in until: %s" % argd['until']))
     else:
         until_length = 0
 
     if from_length != 0:
         if until_length != 0:
             if from_length != until_length:
-                out = out + oai_error("badArgument",
-                                      "Bad datestamp format")
+                errors.append(("badArgument", "From and until have two different formats: %s Vs. %s" % (from_length, until_length)))
 
-    if arguments.has_key('from') and arguments.has_key('until') \
-           and arguments['from'] > arguments['until'] and \
-           'from' in verbs.get(arguments['verb'], []) and \
-           'until' in verbs.get(arguments['verb'], []):
-        out = out + oai_error("badArgument", "Wrong date")
+    if argd.has_key('from') and argd.has_key('until') \
+           and argd['from'] > argd['until'] and \
+           'from' in CFG_VERBS.get(argd['verb'], []) and \
+           'until' in CFG_VERBS.get(argd['verb'], []):
+        errors.append(("badArgument", "from argument comes after until argument: %s > %s" % (argd['from'], argd['until'])))
 
-## Identify exclusive
-#
-#
-    if arguments['verb'] == "Identify" and \
-           len(arguments.keys()) != 1:
-        if not 'The request includes illegal arguments' in out: # Do not repeat this error
-            out = out + oai_error("badArgument",
-                                  "The request includes illegal arguments")
+    ## Identify exclusive
+    if argd['verb'] == "Identify" and \
+           len(argd.keys()) != 1:
+        if not bad_arguments_error: # Do not repeat this error
+            errors.append(("badArgument", "The request includes illegal arguments"))
+            bad_arguments_error = True
 
-## parameters for GetRecord
-#
-#
-    if arguments['verb'] == "GetRecord" and \
-           not arguments.has_key('identifier'):
-        out = out + oai_error("badArgument",
-                              "Record identifier missing")
+    ## parameters for GetRecord
+    if argd['verb'] == "GetRecord" and \
+           not argd.has_key('identifier'):
+        errors.append(("badArgument", "Record identifier missing"))
 
-    if arguments['verb'] == "GetRecord" and \
-           not arguments.has_key('metadataPrefix'):
-        out = out + oai_error("badArgument",
-                              "Missing metadataPrefix")
+    if argd['verb'] == "GetRecord" and \
+           not argd.has_key('metadataPrefix'):
+        errors.append(("badArgument", "Missing metadataPrefix"))
 
-## parameters for ListRecords and ListIdentifiers
-#
-#
-    if (arguments['verb'] == "ListRecords" or arguments['verb'] == "ListIdentifiers") and \
-           (not arguments.has_key('resumptionToken') and not arguments.has_key('metadataPrefix')):
-        out = out + oai_error("badArgument", "Missing metadataPrefix")
+    ## parameters for ListRecords and ListIdentifiers
+    if (argd['verb'] == "ListRecords" or argd['verb'] == "ListIdentifiers") and \
+           (not argd.has_key('resumptionToken') and not argd.has_key('metadataPrefix')):
+        errors.append(("badArgument", "Missing metadataPrefix"))
 
-## Metadata prefix defined and valid
-#
-#
-    if arguments.has_key('metadataPrefix') and \
-           not arguments['metadataPrefix'] in params['metadataPrefix']:
-        out = out + oai_error("cannotDisseminateFormat", "Chosen format is not supported")
+    ## Metadata prefix defined and valid
+    if argd.has_key('metadataPrefix') and \
+           not argd['metadataPrefix'] in CFG_OAI_METADATA_FORMATS:
+        errors.append(("cannotDisseminateFormat", "Chosen format is not supported. Valid formats are: %s" % ', '.join(CFG_OAI_METADATA_FORMATS.keys())))
 
-    return out
+    return errors
 
 def oai_profile():
     """
     Runs a benchmark
     """
-    oailistrecords('set=&from=&metadataPrefix=oai_dc&verb=ListRecords&resumptionToken=&identifier=&until=')
-    #oailistrecords('set=&from=&metadataPrefix=marcxml&verb=ListRecords&resumptionToken=&identifier=&until=')
-    #oailistidentifiers('set=&from=&metadataPrefix=oai_dc&verb=ListIdentifiers&resumptionToken=&identifier=&until=')
-
+    from cStringIO import StringIO
+    oai_list_records_or_identifiers(StringIO(), argd={"metadataPrefix": "oai_dc", "verb": "ListRecords"})
+    oai_list_records_or_identifiers(StringIO(), argd={"metadataPrefix": "marcxml", "verb" :"ListRecords"})
+    oai_list_records_or_identifiers(StringIO(), argd={"metadataPrefix": "oai_dc", "verb": "ListIdentifiers"})
     return
 
 if __name__ == "__main__":

@@ -909,6 +909,11 @@ def field_get_subfield_values(field_instance, code):
             for subfield_code, subfield_value in field_instance[0]
             if subfield_code == code]
 
+def field_get_subfield_codes(field_instance):
+    """Return subfield codes of the field instance FIELD."""
+    return [subfield_code
+            for subfield_code, subfield_value in field_instance[0]]
+
 def field_add_subfield(field, code, value):
     """Adds a subfield to field 'field'"""
     field[0].append((code, value))
@@ -983,16 +988,6 @@ def concat(alist):
     for l in alist:
         newl.extend(l)
     return newl
-
-def print_errors(alist):
-    """
-    Creates a unique string with the strings in list, using '\n' as
-    a separator.
-    """
-    text = ""
-    for l in alist:
-        text = '%s\n%s'% (text, l)
-    return text
 
 def record_find_field(rec, tag, field, strict=False):
     """

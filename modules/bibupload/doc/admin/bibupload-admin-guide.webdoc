@@ -31,6 +31,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4. <a href="#3.4">Inserting and updating at the same time</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5. <a href="#3.5">Updating preformatted output formats</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.6. <a href="#3.6">Uploading fulltext files</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.7. <a href="#3.7">Obtaining feedbacks</a><br />
 <strong>4. <a href="#4">Batch Uploader</a></strong><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1. <a href="#4.1">Web interface - Cataloguers</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1. <a href="#4.2">Web interface - Robots</a><br />
@@ -428,6 +429,69 @@ full-text files connected to the record.  Thus, if you whish to update
 some 8564 tag pointing to a locally managed file, the only way to
 perform this is through the FFT tag, not by editing 8564 directly.<p>
 
+<a name="3.7"></a><h3>3.7 Obtaining feedbacks</h3>
+<p>Sometimes, to implement a particular workflow or policy in a digital
+repository, it might be nice to receive an automatic machine friendly
+feedback that aknowledges the outcome of a bibupload execution. To this aim
+the <tt>--callback-url</tt> command line parameter can be used. This parameter
+expects a <em>URL</em> to be specified to which a
+<strong><a href="http://json.org/" alt="JSON" target="_blank">JSON</a>-serialized</strong>
+response will <strong>POSTed</strong>.<p>
+
+<p>Say, you have an external service reachable via the URL
+<tt>http://www.example.org/accept_feedback</tt>. If the argument:
+<pre>
+--callback-url http://www.example.org/accept_feedback
+</pre>
+is added to the usual bibupload call, at the end of the execution of the
+corresponding bibupload task, an HTTP POST request will be performed,
+if possible to the given URL, reporting the outcome of the bibupload execution
+as a JSON-serialized response with the following structure:
+<ul>
+<li>a JSON <strong>object</strong> with the following <em>string</em> -- <em>value</em> mapping:
+<ul>
+<li>string: <strong>results</strong> -- value: a JSON <strong>array</strong> whose values
+are all JSON <strong>objects</strong> with the following <em>string</em> -- <em>value</em> mapping:
+<ul>
+<li><strong>recid</strong>: an integer number, representing the described record
+identifier (<tt>-1</tt> if no record identifier can be retrieved)</li>
+<li><strong>success</strong>: either <tt>true</tt> or <tt>false</tt> depending
+on the success of the elaboration of the corresponding MARCXML</li>
+<li><strong>error_message</strong>: a <strong>string</strong> containing a human-friendly
+description of the error that caused the MARCXML elaboration to fail (in case <tt>success</tt>
+was having <tt>false</tt> value)</li>
+<li><strong>marcxml</strong>: in case of success, this contains the final MARCXML
+representation of the record</li>
+<li><strong>url</strong>: in case of success, this contains the final URL where
+the detailde representation of the record can be fetched (i.e. its canonical URL)
+</li></ul>
+</li></ul>
+</li></ul>
+</p>
+
+<p>For example, a possible JSON response posted to a specified URL can look like:
+<pre>
+{
+    "results": [
+        {
+            "recid": -1,
+            "error_message": "ERROR: can not retrieve the record identifier",
+            "success": false
+        },
+        {
+            "recid": 1000,
+            "error_message": "",
+            "success": true,
+            "marcxml": "<record><controlfield tag=\"001\">1000</controlfield>...</record>",
+            "url": "http://www.example.org/record/1000"
+        },
+        ...
+    ]
+}
+</pre>
+<p>Note that, currently, in case the specified URL can not be reached at the time of the POST request,
+the whole bibupload task will fail.</p>
+
 <a name="4"></a><h2>4. Batch Uploader</h2>
 <a name="4.1"></a><h3>4.1 Web interface - Cataloguers</h3>
 <p>The batchuploader web interface can be used either to upload metadata files or documents. Opposed to daemon mode, actions will be executed only once.</p>
@@ -438,13 +502,17 @@ perform this is through the FFT tag, not by editing 8564 directly.<p>
 <p>If it is needed to use the batch upload function from within command line, this can be achieved with a curl call, like:
 <blockquote>
 <pre>
-$ curl -F 'file=@localfile.xml' -F 'mode=-i' http://cdsweb.cern.ch/batchuploader/robotupload -A invenio_webupload
+$ curl -F 'file=@localfile.xml' -F 'mode=-i' http://cdsweb.cern.ch/batchuploader/robotupload [-F 'callback_url=http://...'] -A invenio_webupload
 <pre>
 </blockquote></p>
 
 <p>This service provides (client, file) checking to assure the records are put into a collection the client has rights to.<br />
 To configure this permissions, check <tt>CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS</tt> variable in the configuration file.<br />
 The allowed user agents can also be defined using the <tt>CFG_BATCHUPLOADER_WEB_ROBOT_AGENT</tt> variable.</p>
+<p>Note that you can receive machine-friendly feedbacks from the corresponding
+bibupload task that is launched by a given batchuploader request, by adding
+the optional POST field <tt>callback_url</tt> with the same semantic of the <tt>--callback-url</tt>
+command line parameter of bibupload (see the previous paragraph <a href="#3.7">Obtaining feedbacks</a>).</p>
 
 <a name="4.3"></a><h3>4.2 Daemon mode</h3>
 

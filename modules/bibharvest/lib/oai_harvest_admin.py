@@ -1263,7 +1263,7 @@ def add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency
 def delete_oai_src(oai_src_id):
     """Deletes a row from the database according to its id"""
     try:
-        res = run_sql("DELETE FROM oaiHARVEST WHERE id=%s" % oai_src_id)
+        res = run_sql("DELETE FROM oaiHARVEST WHERE id=%s", (oai_src_id,))
         return (1, "")
     except StandardError, e:
         return (0, e)

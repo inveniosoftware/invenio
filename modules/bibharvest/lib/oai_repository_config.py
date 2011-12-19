@@ -1,4 +1,3 @@
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011 CERN.
 ##
@@ -16,16 +15,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir=$(libdir)/python/invenio/bibauthorid_comparison_functions
+"""OAI Repository Configuration."""
 
-pylib_DATA = aid_cmp_affiliations.py \
-             aid_cmp_coauthorship.py \
-             aid_cmp_inspireids.py \
-             aid_cmp_names.py \
-             aid_cmp_paperequality.py \
-             aid_cmp_topcites.py \
-             __init__.py
+## Maximum number of records to put in a single bibupload
+CFG_OAI_REPOSITORY_MARCXML_SIZE = 100
 
-EXTRA_DIST = $(pylib_DATA)
-
-CLEANFILES = *~ *.tmp *.pyc
+## A magic value used to specify the global set (e.g. when the admin
+## specify a set configuration without putting any setSpec)
+## NOTE: if you change this value, please update accordingly the root
+## Makefile.am and tabcreate.sql defaults for setSpec column in
+## oaiREPOSITORY MySQL table.
+CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC = "GLOBAL_SET"
