@@ -21,6 +21,11 @@
 
 __revision__ = "$Id$"
 
+import datetime
+import random
+import re
+import time
+
 from invenio.search_engine_utils import get_fieldvalues
 import invenio.bibcirculation_dblayer as db
 from invenio.search_engine import get_field_tags
@@ -42,9 +47,9 @@ from invenio.bibcirculation_config import \
                                 CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED, \
                                 CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED
 
+DICC_REGEXP = re.compile("^\{('[^']*': ?('[^']*'|[0-9]*|None)(, ?'[^']*': ?('[^']*'|[0-9]*|None))*)?\}$")
 
 from invenio.messages import gettext_set_language
-import datetime, time, random
 
 def search_user(column, string):
     if string is not None:
@@ -722,7 +727,10 @@ def wash_recid_from_ILL_request(ill_request_id):
     """
 
     book_info = db.get_ill_book_info(ill_request_id)
-    book_info = eval(book_info)
+    if looks_like_dictionary(book_info):
+        book_info = eval(book_info)
+    else:
+        book_info = None
 
     try:
         recid = int(book_info['recid'])
@@ -932,3 +940,9 @@ def check_database():
                  """, (CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED, ))
 
     return (len(r1), len(r2), len(r3), len(r4))
+
+def looks_like_dictionary(candidate_string):
+    if re.match(DICC_REGEXP, candidate_string):
+        return True
+    else:
+        return False

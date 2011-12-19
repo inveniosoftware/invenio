@@ -41,7 +41,7 @@ from invenio.bibcirculation_utils import get_book_cover, \
       renew_loan_for_X_days, \
       get_item_info_for_search_result, \
       all_copies_are_missing, \
-      is_periodical
+      is_periodical, looks_like_dictionary
 
 from invenio.bibcirculation_config import \
     CFG_BIBCIRCULATION_ITEM_LOAN_PERIOD, \
@@ -5682,7 +5682,10 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
         if not borrower_notes:
             borrower_notes = {}
         else:
-            borrower_notes = eval(borrower_notes)
+            if looks_like_dictionary(borrower_notes):
+                borrower_notes = eval(borrower_notes)
+            else:
+                borrower_notes = {}
 
         out = """ """
 
@@ -5781,7 +5784,10 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
         if not loans_notes:
             loans_notes = {}
         else:
-            loans_notes = eval(loans_notes)
+            if looks_like_dictionary(loans_notes):
+                loans_notes = eval(loans_notes)
+            else:
+                loans_notes = {}
 
         out = """ """
 
@@ -8688,7 +8694,10 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
         if not library_notes:
             library_notes = {}
         else:
-            library_notes = eval(library_notes)
+            if looks_like_dictionary(library_notes):
+                library_notes = eval(library_notes)
+            else:
+                library_notes = {}
 
         out = """ """
 
@@ -10977,7 +10986,10 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
         if not purchase_notes:
             purchase_notes = {}
         else:
-            purchase_notes = eval(purchase_notes)
+            if looks_like_dictionary(purchase_notes):
+                purchase_notes = eval(purchase_notes)
+            else:
+                purchase_notes = {}
 
         out = """ """
 
@@ -11525,7 +11537,10 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
             else:
                 library_name = '-'
 
-            item_info = eval(item_info)
+            if looks_like_dictionary(item_info):
+                item_info = eval(item_info)
+            else:
+                item_info = {}
 
             try:
                 title_link = create_html_link(CFG_SITE_URL +
@@ -11639,7 +11654,10 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
             else:
                 vendor_name = '-'
 
-            item_info = eval(item_info)
+            if looks_like_dictionary(item_info):
+                item_info = eval(item_info)
+            else:
+                item_info = {}
 
             try:
                 title_link = create_html_link(CFG_SITE_URL +
@@ -11736,12 +11754,18 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
         if library_notes == '' or library_notes == None:
             previous_library_notes = {}
         else:
-            previous_library_notes = eval(library_notes)
+            if looks_like_dictionary(library_notes):
+                previous_library_notes = eval(library_notes)
+            else:
+                previous_library_notes = {}
 
         key_array = previous_library_notes.keys()
         key_array.sort()
 
-        item_info = eval(item_info)
+        if looks_like_dictionary(item_info):
+            item_info = eval(item_info)
+        else:
+            item_info = {}
 
         today = datetime.date.today()
         within_a_week = (datetime.date.today()
@@ -12709,12 +12733,18 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
         if library_notes == '' or library_notes == None:
             previous_library_notes = {}
         else:
-            previous_library_notes = eval(library_notes)
+            if looks_like_dictionary(library_notes):
+                previous_library_notes = eval(library_notes)
+            else:
+                previous_library_notes = {}
 
         key_array = previous_library_notes.keys()
         key_array.sort()
 
-        item_info = eval(item_info)
+        if looks_like_dictionary(item_info):
+            item_info = eval(item_info)
+        else:
+            item_info = {}
 
         today = datetime.date.today()
         within_a_week = (datetime.date.today()
@@ -13509,7 +13539,10 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
         (purchase_id, recid, vendor, order_date, expected_date,
                                         price, status, notes) = order_details
 
-        purchase_notes = eval(notes)
+        if looks_like_dictionary(notes):
+            purchase_notes = eval(notes)
+        else:
+            purchase_notes = {}
 
         (book_title, book_year, book_author,
                     book_isbn, book_editor) = book_information_from_MARC(recid)
@@ -13878,7 +13911,10 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                            _("Expected date"), expected_date,
                            _("Previous notes"))
 
-        purchase_notes = eval(purchase_notes)
+        if looks_like_dictionary(purchase_notes):
+            purchase_notes = eval(purchase_notes)
+        else:
+            purchase_notes = {}
 
         key_array = purchase_notes.keys()
         key_array.sort()
@@ -15575,7 +15611,11 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                 library_link = '-'
 
             #get book title
-            book_info = eval(book_info)
+            if looks_like_dictionary(book_info):
+                book_info = eval(book_info)
+            else:
+                book_info = {}
+
             try:
                 title_link = create_html_link(CFG_SITE_URL +
                                 '/admin2/bibcirculation/get_item_details',
@@ -15660,7 +15700,8 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
         if not ill_notes:
             ill_notes = {}
         else:
-            ill_notes = eval(ill_notes)
+            if looks_like_dictionary(ill_notes):
+                ill_notes = eval(ill_notes)
 
         out = """ """
 
