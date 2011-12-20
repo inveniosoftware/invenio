@@ -44,7 +44,7 @@ from invenio.webinterface_handler_config import \
     HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR
 from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
     CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE, CFG_SITE_URL, \
-    CFG_SITE_SECURE_URL
+    CFG_SITE_SECURE_URL, CFG_WEBSTYLE_REVERSE_PROXY_IPS
 from invenio.errorlib import register_exception, get_pretty_traceback
 
 ## Static files are usually handled directly by the webserver (e.g. Apache)
@@ -57,6 +57,11 @@ CFG_WSGI_SERVE_STATIC_FILES = False
 ## Magic regexp to search for usage of CFG_SITE_URL within src/href or
 ## any src usage of an external website
 _RE_HTTPS_REPLACES = re.compile(r"\b((?:src\s*=|url\s*\()\s*[\"']?)http\://", re.I)
+
+## Regexp to verify that the IP starts with a number (filter cases where 'unknown')
+## It is faster to verify only the start (585 ns) compared with verifying
+## the whole ip address - re.compile('^\d+\.\d+\.\d+\.\d+$') (1.01 µs)
+_RE_IPADDRESS_START = re.compile("^\d+\.")
 
 def _http_replace_func(match):
     ## src external_site -> CFG_SITE_SECURE_URL/sslredirect/external_site
@@ -230,12 +235,16 @@ class SimulatedModPythonRequest(object):
 
     def get_remote_ip(self):
         if 'X-FORWARDED-FOR' in self.__headers_in and \
+                self.__environ.get('REMOTE_ADDR') in CFG_WEBSTYLE_REVERSE_PROXY_IPS and \
                 self.__headers_in.get('X-FORWARDED-SERVER', '') == \
                 self.__headers_in.get('X-FORWARDED-HOST', '') == \
                 urlparse(CFG_SITE_URL)[1]:
-            ip = self.__headers_in['X-FORWARDED-FOR'].split(',')[0]
-            if ip:
-                return ip
+            ip_list = self.__headers_in['X-FORWARDED-FOR'].split(',')
+            for ip in ip_list:
+                if _RE_IPADDRESS_START.match(ip):
+                    return ip
+            # no IP has the correct format, return a default IP
+            return '10.0.0.10'
         return self.__environ.get('REMOTE_ADDR')
 
     def get_remote_host(self):
