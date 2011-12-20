@@ -58,6 +58,11 @@ CFG_WSGI_SERVE_STATIC_FILES = False
 ## any src usage of an external website
 _RE_HTTPS_REPLACES = re.compile(r"\b((?:src\s*=|url\s*\()\s*[\"']?)http\://", re.I)
 
+## Regexp to verify that the IP starts with a number (filter cases where 'unknown')
+## It is faster to verify only the start (585 ns) compared with verifying
+## the whole ip address - re.compile('^\d+\.\d+\.\d+\.\d+$') (1.01 µs)
+_RE_IPADDRESS_START = re.compile("^\d+\.")
+
 def _http_replace_func(match):
     ## src external_site -> CFG_SITE_SECURE_URL/sslredirect/external_site
     return match.group(1) + CFG_SITE_SECURE_URL + '/sslredirect/'
@@ -234,9 +239,12 @@ class SimulatedModPythonRequest(object):
                 self.__headers_in.get('X-FORWARDED-SERVER', '') == \
                 self.__headers_in.get('X-FORWARDED-HOST', '') == \
                 urlparse(CFG_SITE_URL)[1]:
-            ip = self.__headers_in['X-FORWARDED-FOR'].split(',')[0]
-            if ip:
-                return ip
+            ip_list = self.__headers_in['X-FORWARDED-FOR'].split(',')
+            for ip in ip_list:
+                if _RE_IPADDRESS_START.match(ip):
+                    return ip
+            # no IP has the correct format, return a default IP
+            return '10.0.0.10'
         return self.__environ.get('REMOTE_ADDR')
 
     def get_remote_host(self):
