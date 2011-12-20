@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -235,16 +235,26 @@ class SimulatedModPythonRequest(object):
 
     def get_remote_ip(self):
         if 'X-FORWARDED-FOR' in self.__headers_in and \
-                self.__environ.get('REMOTE_ADDR') in CFG_WEBSTYLE_REVERSE_PROXY_IPS and \
-                self.__headers_in.get('X-FORWARDED-SERVER', '') == \
-                self.__headers_in.get('X-FORWARDED-HOST', '') == \
-                urlparse(CFG_SITE_URL)[1]:
-            ip_list = self.__headers_in['X-FORWARDED-FOR'].split(',')
-            for ip in ip_list:
-                if _RE_IPADDRESS_START.match(ip):
-                    return ip
-            # no IP has the correct format, return a default IP
-            return '10.0.0.10'
+               self.__headers_in.get('X-FORWARDED-SERVER', '') == \
+               self.__headers_in.get('X-FORWARDED-HOST', '') == \
+               urlparse(CFG_SITE_URL)[1]:
+            # we are using proxy setup
+            if self.__environ.get('REMOTE_ADDR') in CFG_WEBSTYLE_REVERSE_PROXY_IPS:
+                # we trust this proxy
+                ip_list = self.__headers_in['X-FORWARDED-FOR'].split(',')
+                for ip in ip_list:
+                    if _RE_IPADDRESS_START.match(ip):
+                        return ip
+                # no IP has the correct format, return a default IP
+                return '10.0.0.10'
+            else:
+                # we don't trust this proxy
+                register_exception(prefix="You are running in a proxy configuration, but the " + \
+                                   "CFG_WEBSTYLE_REVERSE_PROXY_IPS variable does not contain " + \
+                                   "the IP of your proxy, thus the remote IP addresses of your " + \
+                                   "clients are not trusted.  Please configure this variable.",
+                                   alert_admin=True)
+                return '10.0.0.11'
         return self.__environ.get('REMOTE_ADDR')
 
     def get_remote_host(self):
