@@ -33,7 +33,7 @@ from invenio.messages import gettext_set_language
 
 import datetime, time, re
 
-DICC_REGEXP = re.compile("^\{('[^']*': ?('[^']*'|[0-9]*|None)(, ?'[^']*': ?('[^']*'|[0-9]*|None))*)?\}$")
+DICC_REGEXP = re.compile("^\{('[^']*': ?('[^']*'|\"[^\"]+\"|[0-9]*|None)(, ?'[^']*': ?('[^']*'|\"[^\"]+\"|[0-9]*|None))*)?\}$")
 
 def hold_request_mail(recid, borrower_id):
     """
