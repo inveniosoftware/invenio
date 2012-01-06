@@ -47,7 +47,7 @@ from invenio.bibcirculation_config import \
                                 CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED, \
                                 CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED
 
-DICC_REGEXP = re.compile("^\{('[^']*': ?('[^']*'|[0-9]*|None)(, ?'[^']*': ?('[^']*'|[0-9]*|None))*)?\}$")
+DICC_REGEXP = re.compile("^\{('[^']*': ?('[^']*'|\"[^\"]+\"|[0-9]*|None)(, ?'[^']*': ?('[^']*'|\"[^\"]+\"|[0-9]*|None))*)?\}$")
 
 from invenio.messages import gettext_set_language
 
