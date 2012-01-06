@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ bfx_DATA = oaidc2marcxml.bfx
 
 xsldir = $(sysconfdir)/bibconvert/config
 xsl_DATA = oaidc2marcxml.xsl oaimarc2marcxml.xsl oaiarxiv2marcxml.xsl \
-           oaidmf2marcxml.xsl authorlist2marcxml.xsl
+           oaidmf2marcxml.xsl authorlist2marcxml.xsl bibtex2marcxml.cfg
 
 EXTRA_DIST = $(kb_DATA) $(bfx_DATA) $(xsl_DATA)
 

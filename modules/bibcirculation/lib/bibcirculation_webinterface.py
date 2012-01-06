@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,6 +23,8 @@
 __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
+
+import cgi
 
 # others invenio imports
 from invenio.config import CFG_SITE_LANG, \
@@ -893,7 +895,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
         navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
-        navtrail += title
+        navtrail += cgi.escape(title)
         navtrail += '</a>'
 
         return pageheaderonly(title=title,
@@ -980,7 +982,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
         navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
-        navtrail += title
+        navtrail += cgi.escape(title)
         navtrail += '</a>'
 
         return pageheaderonly(title=title,
@@ -1058,7 +1060,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
         navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
-        navtrail += title
+        navtrail += cgi.escape(title)
         navtrail += '</a>'
 
         return pageheaderonly(title=title,
@@ -1144,7 +1146,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
         navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
-        navtrail += title
+        navtrail += cgi.escape(title)
         navtrail += '</a>'
 
         return pageheaderonly(title=title,
@@ -1243,7 +1245,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
         navtrail += ' &gt; <a class="navtrail" href="%s/%s/%s?ln=%s">'% (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, argd['ln'])
-        navtrail += title
+        navtrail += cgi.escape(title)
         navtrail += '</a>'
 
         return pageheaderonly(title=title,
