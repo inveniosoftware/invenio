@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 import cgi
 
 # Invenio imports
-from invenio.urlutils import create_html_link
+from invenio.urlutils import create_html_link, create_url
 from invenio.webuser import get_user_info, collect_user_info, isGuestUser, get_email
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.webmessage_mailutils import email_quoted_txt2html
@@ -148,7 +148,7 @@ class Template:
              'nb_comments': len(comments)
             }
         if not comments:
-                out = """
+            out = """
 <!--  comments title table -->
 <table class="webcomment_header_comments">
   <tr>
@@ -334,7 +334,7 @@ class Template:
                            write_button_form)
         return out
 
-    def tmpl_get_comment_without_ranking(self, req, ln, nickname, comment_uid, date_creation, body, status, nb_reports, reply_link=None, report_link=None, undelete_link=None, delete_links=None, unreport_link=None, recID=-1, com_id='', attached_files=None):
+    def tmpl_get_comment_without_ranking(self, req, ln, nickname, comment_uid, date_creation, body, status, nb_reports, reply_link=None, report_link=None, undelete_link=None, delete_links=None, unreport_link=None, recID=-1, com_id='', attached_files=None, collapsed_p=False):
         """
         private function
         @param req: request object to fetch user info
@@ -355,11 +355,13 @@ class Template:
         @param recID: recID where the comment is posted
         @param com_id: ID of the comment displayed
         @param attached_files: list of attached files
+        @param collapsed_p: if the comment should be collapsed or not
         @return: html table of comment
         """
         from invenio.search_engine import guess_primary_collection_of_a_record
         # load the right message language
         _ = gettext_set_language(ln)
+        user_info = collect_user_info(req)
         date_creation = convert_datetext_to_dategui(date_creation, ln=ln)
         if attached_files is None:
             attached_files = []
@@ -368,6 +370,13 @@ class Template:
         title = _('%(x_name)s') % {'x_name': nickname,}
         title += '<a name="C%s" id="C%s"></a>' % (com_id, com_id)
         links = ''
+        if not isGuestUser(user_info['uid']):
+            # Add link to toggle comment visibility
+            links += create_html_link(CFG_SITE_URL + '/' + CFG_SITE_RECORD + '/' + str(recID) + '/comments/toggle',
+                                  {'comid': com_id, 'ln': ln, 'collapse': collapsed_p and '0' or '1', 'referer': user_info['uri']},
+                                  _("Close"),
+                                  {'onclick': "return toggle_visibility(this, %s, 'fast');" % com_id},
+                                  escape_linkattrd=False)
         moderator_links = ''
         if reply_link:
             links += '<a class="webcomment_comment_reply" href="' + reply_link +'">' + _("Reply") +'</a>'
@@ -375,7 +384,6 @@ class Template:
             links += '<a class="webcomment_comment_report" href="' + report_link +'">' + _("Report abuse") + '</a>'
         # Check if user is a comment moderator
         record_primary_collection = guess_primary_collection_of_a_record(recID)
-        user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'moderatecomments', collection=record_primary_collection)
         if status in ['dm', 'da'] and req:
             if not auth_code:
@@ -421,8 +429,17 @@ class Template:
                                                         link_label=cgi.escape(filename)) + '<br />'
             attached_files_html += '</div>'
 
+        toggle_visibility_block = ''
+        if not isGuestUser(user_info['uid']):
+            toggle_visibility_block = """<div class="webcomment_toggle_visibility"><a id="collapsible_ctr_%(comid)s" class="%(collapse_ctr_class)s" href="%(toggle_url)s" onclick="return toggle_visibility(this, %(comid)i);" title="%(collapse_label)s"><span style="display:none">%(collapse_label)s</span></a></div>""" % \
+                                    {'comid': com_id,
+                                     'toggle_url': create_url(CFG_SITE_URL + '/' + CFG_SITE_RECORD + '/' + str(recID) + '/comments/toggle', {'comid': com_id, 'ln': ln, 'collapse': collapsed_p and '0' or '1', 'referer': user_info['uri']}),
+                                     'collapse_ctr_class': collapsed_p and 'webcomment_collapse_ctr_right' or 'webcomment_collapse_ctr_down',
+                                     'collapse_label': collapsed_p and _("Open") or _("Close")}
+
         out += """
 <div class="webcomment_comment_box">
+    %(toggle_visibility_block)s
     <div class="webcomment_comment_avatar"><img class="webcomment_comment_avatar_default" src="%(site_url)s/img/user-icon-1-24x24.gif" alt="avatar" /></div>
     <div class="webcomment_comment_content">
         <div class="webcomment_comment_title">
@@ -430,12 +447,14 @@ class Template:
             <div class="webcomment_comment_date">%(date)s</div>
             <a class="webcomment_permalink" title="Permalink to this comment" href="#C%(comid)i">¶</a>
         </div>
+        <div class="collapsible_content" id="collapsible_content_%(comid)i" style="%(collapsible_content_style)s">
             <blockquote>
         %(body)s
             </blockquote>
         %(attached_files_html)s
 
         <div class="webcomment_comment_options">%(links)s</div>
+        </div>
         <div class="clearer"></div>
     </div>
     <div class="clearer"></div>
@@ -447,6 +466,8 @@ class Template:
                  'date': date_creation,
                  'site_url': CFG_SITE_URL,
                  'comid': com_id,
+                 'collapsible_content_style': collapsed_p and 'display:none' or '',
+                 'toggle_visibility_block': toggle_visibility_block,
                  }
         return out
 
@@ -629,6 +650,7 @@ class Template:
             c_round_name = 11
             c_restriction = 12
             reply_to = 13
+            c_visibility = 14
             discussion = 'reviews'
             comments_link = '<a href="%s/%s/%s/comments/">%s</a> (%i)' % (CFG_SITE_URL, CFG_SITE_RECORD, recID, _('Comments'), total_nb_comments)
             reviews_link = '<b>%s (%i)</b>' % (_('Reviews'), total_nb_reviews)
@@ -644,6 +666,7 @@ class Template:
             c_round_name = 7
             c_restriction = 8
             reply_to = 9
+            c_visibility = 10
             discussion = 'comments'
             comments_link = '<b>%s (%i)</b>' % (_('Comments'), total_nb_comments)
             reviews_link = '<a href="%s/%s/%s/reviews/">%s</a> (%i)' % (CFG_SITE_URL, CFG_SITE_RECORD, recID, _('Reviews'), total_nb_reviews)
@@ -716,7 +739,47 @@ class Template:
                 comments_rows += _('%(x_nb)i comments for round "%(x_name)s"') % {'x_nb': len(comments_list), 'x_name': comment_round_name}+ "</a><br/>"
             comments_rows += '<div id="cmtSubRound%s" class="cmtsubround" style="%s">' % (comment_round_name,
                                                                                           comment_round_style)
+            comments_rows += '''
+            <script type='text/javascript'>//<![CDATA[
+            function toggle_visibility(this_link, comid, duration) {
+                if (duration == null) duration = 0;
+                var isVisible = $('#collapsible_content_' + comid).is(':visible');
+                $('#collapsible_content_' + comid).toggle(duration);
+                $('#collapsible_ctr_' + comid).toggleClass('webcomment_collapse_ctr_down');
+                $('#collapsible_ctr_' + comid).toggleClass('webcomment_collapse_ctr_right');
+                if (isVisible){
+                    $('#collapsible_ctr_' + comid).attr('title', '%(open_label)s');
+                    $('#collapsible_ctr_' + comid + ' > span').html('%(open_label)s');
+                } else {
+                    $('#collapsible_ctr_' + comid).attr('title', '%(close_label)s');
+                    $('#collapsible_ctr_' + comid + ' > span').html('%(close_label)s');
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/comments/toggle',
+                    data: {'comid': comid, 'ln': '%(ln)s', 'collapse': isVisible && 1 || 0}
+                    });
+                /* Replace our link with a jump to the adequate, in case needed
+                   (default link is for non-Javascript user) */
+                this_link.href = "#C" + comid
+                /* Find out if after closing comment we shall scroll a bit to the top,
+                   i.e. go back to main anchor of the comment that we have just set */
+                var top = $(window).scrollTop();
+                if ($(window).scrollTop() >= $("#C" + comid).offset().top) {
+                    // Our comment is now above the window: scroll to it
+                    return true;
+                }
+                return false;
+            }
+            //]]></script>
+            ''' % {'siteurl': CFG_SITE_URL,
+                   'recID': recID,
+                   'ln': ln,
+                   'CFG_SITE_RECORD': CFG_SITE_RECORD,
+                   'open_label': _("Open"),
+                   'close_label': _("Close")}
             thread_history = [0]
+            previous_depth = 0
             for comment in comments_list:
                 if comment[reply_to] not in thread_history:
                     # Going one level down in the thread
@@ -726,6 +789,13 @@ class Template:
                     depth = thread_history.index(comment[reply_to])
                     thread_history = thread_history[:depth + 1]
 
+                if previous_depth > depth:
+                    comments_rows += ("""</div>""" * (previous_depth-depth))
+
+                if previous_depth < depth:
+                    comments_rows += ("""<div class="webcomment_thread_block">""" * (depth-previous_depth))
+
+                previous_depth = depth
 
                 # CERN hack begins: display full ATLAS user name.
                 comment_user_fullname = ""
@@ -744,7 +814,7 @@ class Template:
                 # do NOT delete the HTML comment below. It is used for parsing... (I plead unguilty!)
                 comments_rows += """
     <!-- start comment row -->
-    <div style="margin-left:%spx">""" % (depth*20)
+    <div>"""
                 delete_links = {}
                 if not reviews:
                     report_link = '%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/comments/report?ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/comments/display' % useful_dict % {'comid':comment[c_id]}
@@ -753,7 +823,7 @@ class Template:
                     delete_links['auth'] = "%s/admin/webcomment/webcommentadmin.py/del_single_com_auth?ln=%s&amp;id=%s" % (CFG_SITE_URL, ln, comment[c_id])
                     undelete_link = "%s/admin/webcomment/webcommentadmin.py/undel_com?ln=%s&amp;id=%s" % (CFG_SITE_URL, ln, comment[c_id])
                     unreport_link = "%s/admin/webcomment/webcommentadmin.py/unreport_com?ln=%s&amp;id=%s" % (CFG_SITE_URL, ln, comment[c_id])
-                    comments_rows += self.tmpl_get_comment_without_ranking(req, ln, messaging_link, comment[c_user_id], comment[c_date_creation], comment[c_body], comment[c_status], comment[c_nb_reports], reply_link, report_link, undelete_link, delete_links, unreport_link, recID, comment[c_id], files)
+                    comments_rows += self.tmpl_get_comment_without_ranking(req, ln, messaging_link, comment[c_user_id], comment[c_date_creation], comment[c_body], comment[c_status], comment[c_nb_reports], reply_link, report_link, undelete_link, delete_links, unreport_link, recID, comment[c_id], files, comment[c_visibility])
                 else:
                     report_link = '%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/reviews/report?ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/reviews/display' % useful_dict % {'comid': comment[c_id]}
                     delete_links['mod'] = "%s/admin/webcomment/webcommentadmin.py/del_single_com_mod?ln=%s&amp;id=%s" % (CFG_SITE_URL, ln, comment[c_id])
@@ -1847,7 +1917,11 @@ class Template:
                                                                       None,        #reply_link
                                                                       None,        #report_link
                                                                       None,        #undelete_link
-                                                                      None))       #delete_links
+                                                                      None,        #delete_links
+                                                                      None,        #unreport_link
+                                                                      -1,          # recid
+                                                                      cmt_tuple[4] # com_id
+                                                                      ))
             users.append(self.tmpl_admin_user_info(ln,
                                                    meta_data[0], #nickname
                                                    meta_data[1], #uid

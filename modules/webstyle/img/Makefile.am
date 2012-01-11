@@ -217,6 +217,7 @@ img_DATA = add-small.png \
            webbasket_extern.png \
            webbasket_intern.png \
            webbasket_move.png \
+           webbasket_right.png \
            webbasket_ugs.png \
            webbasket_up.png \
            webbasket_us.png \

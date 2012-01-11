@@ -3286,6 +3286,22 @@ div.subtitle {
 
 /* WebComment Refactor */
 
+.webcomment_collapse_ctr_down {
+  outline: 0;
+  width:16px;
+  height:16px;
+  margin:10px 5px;
+  background: transparent url(webbasket_down.png) no-repeat center center !important;
+  display:block;
+}
+.webcomment_collapse_ctr_right {
+  outline: 0;
+  width:16px;
+  height:16px;
+  margin:10px 5px;
+  background: transparent url(webbasket_right.png) no-repeat center center !important;
+  display:block;
+}
 .webcomment_permalink, .webcomment_permalink:link,
 .webcomment_permalink:visited{
     visibility: hidden;
@@ -3328,7 +3344,7 @@ div.subtitle {
 }
 
 .webcomment_comment_box {
-	margin-bottom:20px;
+	margin-top:20px;
 	background:#F9F9F9;
 	border:1px solid #DDD;
 }
@@ -3429,8 +3445,18 @@ div.subtitle {
 	float: left;
 	margin: 2px 10px 2px 5px;
 }
-
-
+.webcomment_toggle_visibility {
+	float: left;
+}
+.webcomment_thread_block{
+        border-left: 1px dashed transparent;
+        padding-top:1px;
+        padding-left: 20px;
+}
+.webcomment_thread_block:hover{
+        border-left: 1px dashed #aaa;
+        background-color: #F9F9F9;
+}
 .webcomment_comment_content {
 }
 

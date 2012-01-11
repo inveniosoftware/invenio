@@ -37,7 +37,8 @@ from invenio.webcomment import check_recID_is_in_range, \
                                check_user_can_view_comments, \
                                check_user_can_send_comments, \
                                check_user_can_view_comment, \
-                               query_get_comment
+                               query_get_comment, \
+                               toggle_comment_visibility
 from invenio.config import \
      CFG_TMPDIR, \
      CFG_SITE_LANG, \
@@ -86,7 +87,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
     """Defines the set of /comments pages."""
 
     _exports = ['', 'display', 'add', 'vote', 'report', 'index', 'attachments',
-                'subscribe', 'unsubscribe']
+                'subscribe', 'unsubscribe', 'toggle']
 
     def __init__(self, recid=-1, reviews=0):
         self.recid = recid
@@ -664,6 +665,26 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         display_url = "%s/%s/%s/comments/display?subscribed=%s&ln=%s" % \
                       (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, str(-success), argd['ln'])
         redirect_to_url(req, display_url)
+
+    def toggle(self, req, form):
+        """
+        Store the visibility of a comment for current user
+        """
+        argd = wash_urlargd(form, {'comid': (int, -1),
+                                   'referer': (str, None),
+                                   'collapse': (int, 1)})
+
+        uid = getUid(req)
+
+        if isGuestUser(uid):
+            # We do not store information for guests
+            return ''
+
+        toggle_comment_visibility(uid, argd['comid'], argd['collapse'], self.recid)
+        if argd['referer']:
+            return redirect_to_url(req, CFG_SITE_SECURE_URL + \
+                                   (not argd['referer'].startswith('/') and '/' or '') + \
+                                   argd['referer'] + '#' + str(argd['comid']))
 
 class WebInterfaceCommentsFiles(WebInterfaceDirectory):
     """Handle <strike>upload and </strike> access to files for comments.

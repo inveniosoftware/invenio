@@ -3225,6 +3225,13 @@ CREATE TABLE IF NOT EXISTS cmtSUBSCRIPTION (
   KEY id_user (id_bibrec, id_user)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS cmtCOLLAPSED (
+  id_bibrec int(15) unsigned NOT NULL default '0',
+  id_cmtRECORDCOMMENT int(15) unsigned NULL,
+  id_user int(15) unsigned NOT NULL,
+  PRIMARY KEY (id_user, id_bibrec, id_cmtRECORDCOMMENT)
+) ENGINE=MyISAM;
+
 -- tables for BibKnowledge:
 
 CREATE TABLE IF NOT EXISTS knwKB (
