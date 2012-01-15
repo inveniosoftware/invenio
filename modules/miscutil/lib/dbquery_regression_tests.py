@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -37,9 +37,11 @@ class RunSqlReturnListOfDictionaries(unittest.TestCase):
 
     def test_select_date_format_column_query(self):
         """dbquery - select date format column query"""
+        import time
+        year = time.localtime().tm_year
         res = dbquery.run_sql("SELECT DATE_FORMAT(creation_date, '%Y') FROM bibrec WHERE id<3", with_dict=True)
-        self.assertEqual(res, ([{"DATE_FORMAT(creation_date, '%Y')": '2011'},
-                                {"DATE_FORMAT(creation_date, '%Y')": '2011'}]))
+        self.assertEqual(res, ([{"DATE_FORMAT(creation_date, '%Y')": str(year)},
+                                {"DATE_FORMAT(creation_date, '%Y')": str(year)}]))
 
     def test_select_sum_columns_query(self):
         """dbquery - select sum columns query"""
