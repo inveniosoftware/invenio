@@ -818,7 +818,7 @@ def perform_request_display(uid,
                                              topic=selected_topic,
                                              grpid=selected_group_id,
                                              p="",
-                                             n=0,
+                                             n=1,
                                              ln=ln)
 
     if not of.startswith('x'):
@@ -1159,11 +1159,13 @@ def perform_request_search(uid,
         # the external records be fetched from the database to be searched then.
         format = 'xm'
 
+        ### Calculate the search results for the user's personal baskets ###
         if b.startswith("P") or not b:
             personal_search_results = {}
             personal_items = db.get_all_items_in_user_personal_baskets(uid, selected_topic, format)
             personal_local_items = personal_items[0]
             personal_external_items = personal_items[1]
+            personal_external_items_xml_records = {}
 
             for local_info_per_basket in personal_local_items:
                 bskid       = local_info_per_basket[0]
@@ -1182,7 +1184,9 @@ def perform_request_search(uid,
                 topic       = external_info_per_basket[2]
                 recid       = external_info_per_basket[3]
                 value       = external_info_per_basket[4]
-                text = remove_html_markup(decompress(value))
+                xml_record  = decompress(value)
+                personal_external_items_xml_records[recid] = xml_record
+                text = remove_html_markup(xml_record)
                 #text = text.replace('\n', '')
                 result = pattern.search(text)
                 if result:
@@ -1210,22 +1214,46 @@ def perform_request_search(uid,
                         personal_search_results[bskid] = [basket_name, topic, len(recids_per_basket_by_matching_notes), list(recids_per_basket_by_matching_notes)]
                         total_no_personal_search_results += len(recids_per_basket_by_matching_notes)
 
+            # For every found record: calculate the number of notes
+            # and the HTML representation of the record.
+            for bskid in personal_search_results.keys():
+                recids = personal_search_results[bskid][3]
+                number_of_notes_per_record = db.get_number_of_notes_per_record_in_basket(bskid, recids)
+                records = []
+                for recid_and_notes in number_of_notes_per_record:
+                    recid = recid_and_notes[0]
+                    number_of_notes = recid_and_notes[1]
+                    if recid < 0:
+                        xml_record = personal_external_items_xml_records[recid]
+                        record_html = format_record(None, of='hwbsr', xml_record=xml_record)
+                        records.append((recid, number_of_notes, record_html))
+                    else:
+                        record_html = format_record(recid, of='hwbsr', on_the_fly=True)
+                        records.append((recid, number_of_notes, record_html))
+                personal_search_results[bskid][3] = records
+
+        ### Calculate the search results for the user's group baskets ###
         if b.startswith("G") or not b:
             group_search_results = {}
             group_items = db.get_all_items_in_user_group_baskets(uid, selected_group_id, format)
             group_local_items = group_items[0]
             group_external_items = group_items[1]
+            group_external_items_xml_records = {}
 
             for local_info_per_basket in group_local_items:
                 bskid       = local_info_per_basket[0]
                 basket_name = local_info_per_basket[1]
                 grpid       = local_info_per_basket[2]
                 group_name  = local_info_per_basket[3]
-                recid_list  = local_info_per_basket[4]
+                share_rights = local_info_per_basket[4]
+                recid_list  = local_info_per_basket[5]
                 local_recids_per_basket = intbitset(map(int, recid_list.strip(',').split(',')))
                 intsec = local_search_results.intersection(local_recids_per_basket)
                 if intsec:
-                    group_search_results[bskid] = [basket_name, grpid, group_name, len(intsec), list(intsec)]
+                    share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
+                    share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                    share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
+                    group_search_results[bskid] = [basket_name, grpid, group_name, share_rights_notes, len(intsec), list(intsec)]
                     total_no_group_search_results += len(intsec)
 
             for external_info_per_basket in group_external_items:
@@ -1233,17 +1261,23 @@ def perform_request_search(uid,
                 basket_name = external_info_per_basket[1]
                 grpid       = external_info_per_basket[2]
                 group_name  = external_info_per_basket[3]
-                recid       = external_info_per_basket[4]
-                value       = external_info_per_basket[5]
-                text = remove_html_markup(decompress(value))
+                share_rights = external_info_per_basket[4]
+                recid       = external_info_per_basket[5]
+                value       = external_info_per_basket[6]
+                xml_record  = decompress(value)
+                group_external_items_xml_records[recid] = xml_record
+                text = remove_html_markup(xml_record)
                 #text = text.replace('\n', '')
                 result = pattern.search(text)
                 if result:
                     if group_search_results.has_key(bskid):
-                        group_search_results[bskid][3] += 1
-                        group_search_results[bskid][4].append(recid)
+                        group_search_results[bskid][4] += 1
+                        group_search_results[bskid][5].append(recid)
                     else:
-                        group_search_results[bskid] = [basket_name, grpid, group_name, 1, [recid]]
+                        share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
+                        share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                        share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
+                        group_search_results[bskid] = [basket_name, grpid, group_name, share_rights_notes, 1, [recid]]
                     total_no_group_search_results += 1
 
             if n:
@@ -1253,47 +1287,81 @@ def perform_request_search(uid,
                     basket_name = info_per_basket_by_matching_notes[1]
                     grpid       = info_per_basket_by_matching_notes[2]
                     group_name  = info_per_basket_by_matching_notes[3]
-                    recid_list  = info_per_basket_by_matching_notes[4]
+                    share_rights = info_per_basket_by_matching_notes[4]
+                    recid_list  = info_per_basket_by_matching_notes[5]
                     recids_per_basket_by_matching_notes = set(map(int, recid_list.strip(',').split(',')))
                     if group_search_results.has_key(bskid):
-                        no_group_search_results_per_basket_so_far = group_search_results[bskid][3]
-                        group_search_results[bskid][4] = list(set(group_search_results[bskid][4]).union(recids_per_basket_by_matching_notes))
-                        group_search_results[bskid][3] = len(group_search_results[bskid][4])
-                        total_no_group_search_results += ( group_search_results[bskid][3] - no_group_search_results_per_basket_so_far )
+                        no_group_search_results_per_basket_so_far = group_search_results[bskid][4]
+                        group_search_results[bskid][5] = list(set(group_search_results[bskid][5]).union(recids_per_basket_by_matching_notes))
+                        group_search_results[bskid][4] = len(group_search_results[bskid][5])
+                        total_no_group_search_results += ( group_search_results[bskid][4] - no_group_search_results_per_basket_so_far )
                     else:
-                        group_search_results[bskid] = [basket_name, grpid, group_name, len(recids_per_basket_by_matching_notes), list(recids_per_basket_by_matching_notes)]
+                        share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
+                        share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                        share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
+                        group_search_results[bskid] = [basket_name, grpid, group_name, share_rights_notes, len(recids_per_basket_by_matching_notes), list(recids_per_basket_by_matching_notes)]
                         total_no_group_search_results += len(recids_per_basket_by_matching_notes)
 
+            # For every found record: calculate the number of notes
+            # and the HTML representation of the record.
+            for bskid in group_search_results.keys():
+                recids = group_search_results[bskid][5]
+                number_of_notes_per_record = db.get_number_of_notes_per_record_in_basket(bskid, recids)
+                records = []
+                for recid_and_notes in number_of_notes_per_record:
+                    recid = recid_and_notes[0]
+                    number_of_notes = recid_and_notes[1]
+                    if recid < 0:
+                        xml_record = group_external_items_xml_records[recid]
+                        record_html = format_record(None, of='hwbsr', xml_record=xml_record)
+                        records.append((recid, number_of_notes, record_html))
+                    else:
+                        record_html = format_record(recid, of='hwbsr', on_the_fly=True)
+                        records.append((recid, number_of_notes, record_html))
+                group_search_results[bskid][5] = records
+
+        ### Calculate the search results for the user's public baskets ###
         if b.startswith("E") or not b:
             public_search_results = {}
             public_items = db.get_all_items_in_user_public_baskets(uid, format)
             public_local_items = public_items[0]
             public_external_items = public_items[1]
+            public_external_items_xml_records = {}
 
             for local_info_per_basket in public_local_items:
                 bskid       = local_info_per_basket[0]
                 basket_name = local_info_per_basket[1]
-                recid_list  = local_info_per_basket[2]
+                share_rights = local_info_per_basket[2]
+                recid_list  = local_info_per_basket[3]
                 local_recids_per_basket = intbitset(map(int, recid_list.strip(',').split(',')))
                 intsec = local_search_results.intersection(local_recids_per_basket)
                 if intsec:
-                    public_search_results[bskid] = [basket_name, len(intsec), list(intsec)]
+                    share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
+                    share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                    share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
+                    public_search_results[bskid] = [basket_name, share_rights_notes, len(intsec), list(intsec)]
                     total_no_public_search_results += len(intsec)
 
             for external_info_per_basket in public_external_items:
                 bskid       = external_info_per_basket[0]
                 basket_name = external_info_per_basket[1]
-                recid       = external_info_per_basket[2]
-                value       = external_info_per_basket[3]
-                text = remove_html_markup(decompress(value))
+                share_rights = external_info_per_basket[2]
+                recid       = external_info_per_basket[3]
+                value       = external_info_per_basket[4]
+                xml_record  = decompress(value)
+                public_external_items_xml_records[recid] = xml_record
+                text = remove_html_markup(xml_record)
                 #text = text.replace('\n', '')
                 result = pattern.search(text)
                 if result:
                     if public_search_results.has_key(bskid):
-                        public_search_results[bskid][1] += 1
-                        public_search_results[bskid][2].append(recid)
+                        public_search_results[bskid][2] += 1
+                        public_search_results[bskid][3].append(recid)
                     else:
-                        public_search_results[bskid] = [external_info_per_basket[1], 1, [recid]]
+                        share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
+                        share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                        share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
+                        public_search_results[bskid] = [basket_name, share_rights_notes, 1, [recid]]
                     total_no_public_search_results += 1
 
             if n:
@@ -1301,47 +1369,81 @@ def perform_request_search(uid,
                 for info_per_basket_by_matching_notes in public_items_by_matching_notes:
                     bskid       = info_per_basket_by_matching_notes[0]
                     basket_name = info_per_basket_by_matching_notes[1]
-                    recid_list  = info_per_basket_by_matching_notes[2]
+                    share_rights = info_per_basket_by_matching_notes[2]
+                    recid_list  = info_per_basket_by_matching_notes[3]
                     recids_per_basket_by_matching_notes = set(map(int, recid_list.strip(',').split(',')))
                     if public_search_results.has_key(bskid):
-                        no_public_search_results_per_basket_so_far = public_search_results[bskid][1]
-                        public_search_results[bskid][2] = list(set(public_search_results[bskid][2]).union(recids_per_basket_by_matching_notes))
-                        public_search_results[bskid][1] = len(public_search_results[bskid][2])
-                        total_no_public_search_results += ( public_search_results[bskid][1] - no_public_search_results_per_basket_so_far )
+                        no_public_search_results_per_basket_so_far = public_search_results[bskid][2]
+                        public_search_results[bskid][3] = list(set(public_search_results[bskid][3]).union(recids_per_basket_by_matching_notes))
+                        public_search_results[bskid][2] = len(public_search_results[bskid][3])
+                        total_no_public_search_results += ( public_search_results[bskid][2] - no_public_search_results_per_basket_so_far )
                     else:
-                        public_search_results[bskid] = [basket_name, len(recids_per_basket_by_matching_notes), list(recids_per_basket_by_matching_notes)]
+                        share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
+                        share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                        share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
+                        public_search_results[bskid] = [basket_name, share_rights_notes, len(recids_per_basket_by_matching_notes), list(recids_per_basket_by_matching_notes)]
                         total_no_public_search_results += len(recids_per_basket_by_matching_notes)
 
+            # For every found record: calculate the number of notes
+            # and the HTML representation of the record.
+            for bskid in public_search_results.keys():
+                recids = public_search_results[bskid][3]
+                number_of_notes_per_record = db.get_number_of_notes_per_record_in_basket(bskid, recids)
+                records = []
+                for recid_and_notes in number_of_notes_per_record:
+                    recid = recid_and_notes[0]
+                    number_of_notes = recid_and_notes[1]
+                    if recid < 0:
+                        xml_record = public_external_items_xml_records[recid]
+                        record_html = format_record(None, of='hwbsr', xml_record=xml_record)
+                        records.append((recid, number_of_notes, record_html))
+                    else:
+                        record_html = format_record(recid, of='hwbsr', on_the_fly=True)
+                        records.append((recid, number_of_notes, record_html))
+                public_search_results[bskid][3] = records
+
+        ### Calculate the search results for all the public baskets ###
         if b.startswith("A"):
             all_public_search_results = {}
             all_public_items = db.get_all_items_in_all_public_baskets(format)
             all_public_local_items = all_public_items[0]
             all_public_external_items = all_public_items[1]
+            all_public_external_items_xml_records = {}
 
             for local_info_per_basket in all_public_local_items:
                 bskid       = local_info_per_basket[0]
                 basket_name = local_info_per_basket[1]
-                recid_list  = local_info_per_basket[2]
+                share_rights = local_info_per_basket[2]
+                recid_list  = local_info_per_basket[3]
                 local_recids_per_basket = intbitset(map(int, recid_list.strip(',').split(',')))
                 intsec = local_search_results.intersection(local_recids_per_basket)
                 if intsec:
-                    all_public_search_results[bskid] = [basket_name, len(intsec), list(intsec)]
+                    share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
+                    share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                    share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
+                    all_public_search_results[bskid] = [basket_name, share_rights_notes, len(intsec), list(intsec)]
                     total_no_all_public_search_results += len(intsec)
 
             for external_info_per_basket in all_public_external_items:
                 bskid       = external_info_per_basket[0]
                 basket_name = external_info_per_basket[1]
-                recid       = external_info_per_basket[2]
-                value       = external_info_per_basket[3]
-                text = remove_html_markup(decompress(value))
+                share_rights = external_info_per_basket[2]
+                recid       = external_info_per_basket[3]
+                value       = external_info_per_basket[4]
+                xml_record  = decompress(value)
+                all_public_external_items_xml_records[recid] = xml_record
+                text = remove_html_markup(xml_record)
                 #text = text.replace('\n', '')
                 result = pattern.search(text)
                 if result:
                     if all_public_search_results.has_key(bskid):
-                        all_public_search_results[bskid][1] += 1
-                        all_public_search_results[bskid][2].append(recid)
+                        all_public_search_results[bskid][2] += 1
+                        all_public_search_results[bskid][3].append(recid)
                     else:
-                        all_public_search_results[bskid] = [external_info_per_basket[1], 1, [recid]]
+                        share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
+                        share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                        share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
+                        all_public_search_results[bskid] = [basket_name, share_rights_notes, 1, [recid]]
                     total_no_all_public_search_results += 1
 
             if n:
@@ -1349,16 +1451,38 @@ def perform_request_search(uid,
                 for info_per_basket_by_matching_notes in all_public_items_by_matching_notes:
                     bskid       = info_per_basket_by_matching_notes[0]
                     basket_name = info_per_basket_by_matching_notes[1]
-                    recid_list  = info_per_basket_by_matching_notes[2]
+                    share_rights = info_per_basket_by_matching_notes[2]
+                    recid_list  = info_per_basket_by_matching_notes[3]
                     recids_per_basket_by_matching_notes = set(map(int, recid_list.strip(',').split(',')))
                     if all_public_search_results.has_key(bskid):
-                        no_all_public_search_results_per_basket_so_far = all_public_search_results[bskid][1]
-                        all_public_search_results[bskid][2] = list(set(all_public_search_results[bskid][2]).union(recids_per_basket_by_matching_notes))
-                        all_public_search_results[bskid][1] = len(all_public_search_results[bskid][2])
-                        total_no_all_public_search_results += ( all_public_search_results[bskid][1] - no_all_public_search_results_per_basket_so_far )
+                        no_all_public_search_results_per_basket_so_far = all_public_search_results[bskid][2]
+                        all_public_search_results[bskid][3] = list(set(all_public_search_results[bskid][3]).union(recids_per_basket_by_matching_notes))
+                        all_public_search_results[bskid][2] = len(all_public_search_results[bskid][3])
+                        total_no_all_public_search_results += ( all_public_search_results[bskid][2] - no_all_public_search_results_per_basket_so_far )
                     else:
-                        all_public_search_results[bskid] = [basket_name, len(recids_per_basket_by_matching_notes), list(recids_per_basket_by_matching_notes)]
+                        share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
+                        share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                        share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
+                        all_public_search_results[bskid] = [basket_name, share_rights_notes, len(recids_per_basket_by_matching_notes), list(recids_per_basket_by_matching_notes)]
                         total_no_all_public_search_results += len(recids_per_basket_by_matching_notes)
+
+            # For every found record: calculate the number of notes
+            # and the HTML representation of the record.
+            for bskid in all_public_search_results.keys():
+                recids = all_public_search_results[bskid][3]
+                number_of_notes_per_record = db.get_number_of_notes_per_record_in_basket(bskid, recids)
+                records = []
+                for recid_and_notes in number_of_notes_per_record:
+                    recid = recid_and_notes[0]
+                    number_of_notes = recid_and_notes[1]
+                    if recid < 0:
+                        xml_record = all_public_external_items_xml_records[recid]
+                        record_html = format_record(None, of='hwbsr', xml_record=xml_record)
+                        records.append((recid, number_of_notes, record_html))
+                    else:
+                        record_html = format_record(recid, of='hwbsr', on_the_fly=True)
+                        records.append((recid, number_of_notes, record_html))
+                all_public_search_results[bskid][3] = records
 
         search_results_html = webbasket_templates.tmpl_search_results(personal_search_results,
                                                                       total_no_personal_search_results,

@@ -1367,8 +1367,34 @@ ul.bsk_export_as_list{
 }
 
 /*START The search box container*/
-#bskcontainersearch{
+#webbasket_container_search_box{
    width: 100%;
+}
+/*END The search box container*/
+
+/*START The search results container*/
+#webbasket_container_search_results{
+   width: 100%;
+}
+
+.webbasket_search_results_results_overview_cell{
+   border-top: 1px #fc0 solid;
+   border-bottom: 1px #fc0 dotted;
+   background-color: #ffc;
+}
+
+.webbasket_search_results_number_of_items{
+   color: gray;
+}
+
+.webbasket_search_results_basket{
+   font-size: 80%;
+   padding: 0;
+}
+
+.webbasket_search_results_basket ol{
+   padding-top: 0;
+   margin-top: 0;
 }
 /*END The search box container*/
 

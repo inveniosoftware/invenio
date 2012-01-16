@@ -40,6 +40,7 @@ from invenio.config import \
 from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.webbasket_dblayer import get_basket_item_title_and_URL
+from invenio.bibformat import format_record
 
 class Template:
     """Templating class for webbasket module"""
@@ -580,59 +581,64 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = """
-    <table cellspacing="0px" cellpadding="5px" class="bsk_search_box">"""
+    <table cellspacing="0px" cellpadding="5px">"""
 
         total_no_search_results = total_no_personal_search_results + \
                                total_no_group_search_results + \
                                total_no_public_search_results + \
                                total_no_all_public_search_results
         if total_no_search_results:
-            # INFO: Results overview is disabled for now.
-            # Remove "if False:" when needed again.
-            if False:
+            if total_no_search_results != max(total_no_personal_search_results, \
+                                              total_no_group_search_results, \
+                                              total_no_public_search_results, \
+                                              total_no_all_public_search_results):
                 out += """
       <tr>
-        <td style="border-top: 1px #fc0 solid; border-bottom: 1px #fc0 dotted; background-color: #ffc">
+        <td class="webbasket_search_results_results_overview_cell">
         <strong>%(results_overview_label)s:</strong> %(items_found_label)s
         </td>
       </tr>""" % {'results_overview_label': _('Results overview'),
-                  'items_found_label': _('%i items found') % total_no_search_results}
+                  'items_found_label': _('%i matching items') % total_no_search_results}
                 if total_no_personal_search_results:
                     out += """
       <tr>
         <td>
-        <a href="#%(personal_baskets_name)s">%(personal_baskets_label)s</a>: %(items_found_label)s
+        <a href="#%(personal_baskets_name)s">%(personal_baskets_label)s</a>
+        <span class="webbasket_search_results_number_of_items">(%(items_found)i)</span>
         </td>
       </tr>""" % {'personal_baskets_label': _('Personal baskets'),
                   'personal_baskets_name': "P",
-                  'items_found_label': _('%i items found') % total_no_personal_search_results}
+                  'items_found': total_no_personal_search_results}
                 if total_no_group_search_results:
                     out += """
       <tr>
         <td>
-        <a href="#%(group_baskets_name)s">%(group_baskets_label)s<a/>: %(items_found_label)s
+        <a href="#%(group_baskets_name)s">%(group_baskets_label)s<a/>
+        <span class="webbasket_search_results_number_of_items">(%(items_found)s)</span>
         </td>
       </tr>""" % {'group_baskets_label': _('Group baskets'),
                   'group_baskets_name': "G",
-                  'items_found_label': _('%i items found') % total_no_group_search_results}
+                  'items_found': total_no_group_search_results}
                 if total_no_public_search_results:
                     out += """
       <tr>
         <td>
-        <a href="#%(public_baskets_name)s">%(public_baskets_label)s</a>: %(items_found_label)s
+        <a href="#%(public_baskets_name)s">%(public_baskets_label)s</a>
+        <span class="webbasket_search_results_number_of_items">(%(items_found)s)</span>
         </td>
       </tr>""" % {'public_baskets_label': _('Public baskets'),
                   'public_baskets_name': "E",
-                  'items_found_label': _('%i items found') % total_no_public_search_results}
+                  'items_found': total_no_public_search_results}
                 if total_no_all_public_search_results:
                     out += """
       <tr>
         <td>
-        <a href="#%(all_public_baskets_name)s">%(all_public_baskets_label)s</a>: %(items_found_label)s
+        <a href="#%(all_public_baskets_name)s">%(all_public_baskets_label)s</a>
+        <span class="webbasket_search_results_number_of_items">(%(items_found)s)</span>
         </td>
       </tr>""" % {'all_public_baskets_label': _('All public baskets'),
                   'all_public_baskets_name': "A",
-                  'items_found_label': _('%i items found') % total_no_all_public_search_results}
+                  'items_found': total_no_all_public_search_results}
                 out += """
       <tr>
         <td>
@@ -649,44 +655,104 @@ class Template:
       </tr>""" % {'no_items_found_label': _('No items found.')}
 
 
+        ### Search results from the user's personal baskets ###
         if total_no_personal_search_results:
+            # Print out the header for the personal baskets
             out += """
       <tr>
-        <td style="border-top: 1px #fc0 solid; border-bottom: 1px #fc0 dotted; background-color: #ffc">
+        <td class="webbasket_search_results_results_overview_cell">
         <a name="%(personal_baskets_name)s"></a><strong>%(personal_baskets_label)s:</strong> %(items_found_label)s
         </td>
       </tr>""" % {'personal_baskets_label': _('Personal baskets'),
                   'personal_baskets_name': "P",
-                  'items_found_label': _('%i items found') % total_no_personal_search_results}
+                  'items_found_label': _('%i matching items') % total_no_personal_search_results}
 
-            for personal_search_result in personal_search_results.iteritems():
-                basket_link = """<a href="%(url)s/yourbaskets/display?category=%(category)s&amp;topic=%(topic)s&amp;bskid=%(bskid)i&amp;ln=%(ln)s" title="%(title_name)s">%(basket_name)s</a>""" % \
+            # For every basket print a link to the basket and the number of items
+            # found in that basket
+            for bskid in personal_search_results.keys():
+                basket_link = """<a href="%(url)s/yourbaskets/display?category=%(category)s&amp;topic=%(topic)s&amp;bskid=%(bskid)i&amp;ln=%(ln)s">%(basket_name)s</a>""" % \
                               {'url': CFG_SITE_URL,
                                'category': CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-                               'topic': cgi.escape(personal_search_result[1][1], True),
-                               'bskid': personal_search_result[0],
+                               'topic': cgi.escape(personal_search_results[bskid][1], True),
+                               'bskid': bskid,
                                'ln': ln,
-                               'title_name': cgi.escape(personal_search_result[1][0], True),
-                               'basket_name': cgi.escape(personal_search_result[1][0], True)}
+                               'basket_name': cgi.escape(personal_search_results[bskid][0], True)}
                 out += """
       <tr>
         <td>
-        %(in_basket_label)s: %(items_found)s
+        %(in_basket_label)s <span class="webbasket_search_results_number_of_items">(%(items_found)i)</span>
         </td>
       </tr>""" % {'in_basket_label': _('In %(x_linked_basket_name)s') % \
                                      {'x_linked_basket_name': basket_link},
-                  'items_found': _('%i items found') % personal_search_result[1][2]}
+                                      'items_found': personal_search_results[bskid][2]}
 
-                # TESTING: list found records and items.
-                out += "<tr><td style=\"font-size: 80%; color: gray;\">"
-                personal_search_result_record_ids = personal_search_result[1][3]
-                for personal_search_result_record_id in personal_search_result_record_ids:
-                    personal_search_result_record_details = get_basket_item_title_and_URL(personal_search_result_record_id)
-                    personal_search_result_record_title = personal_search_result_record_details[0]
-                    personal_search_result_record_url = personal_search_result_record_details[1]
-                    out += '<a href="%s">%s</a><br />' % (personal_search_result_record_url,
-                                                          cgi.escape(personal_search_result_record_title))
-                out += "</td></tr>"
+                # Print the list of records found in that basket
+                out += """
+      <tr>
+        <td class="webbasket_search_results_basket">
+          <ol>"""
+                personal_search_result_records = personal_search_results[bskid][3]
+                for personal_search_result_record in personal_search_result_records:
+                    recid = personal_search_result_record[0]
+                    number_of_notes = personal_search_result_record[1]
+                    record_html = personal_search_result_record[2]
+                    # If this a local record print the detailed record link and
+                    # the view/add notes link
+                    if recid > 0:
+                        detailed_record_html = """<a class="moreinfo" href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(recid)i">%(detailed_record_label)s</a>""" % \
+                                               {'siteurl': CFG_SITE_URL,
+                                                'CFG_SITE_RECORD': CFG_SITE_RECORD,
+                                                'recid': recid,
+                                                'detailed_record_label': _('Detailed record')}
+                        notes_html = """<a class="moreinfo" href="%(siteurl)s/yourbaskets/%(notes_action)s?"""\
+                                     """category=P&amp;topic=%(topic)s&amp;bskid=%(bskid)s&amp;recid=%(recid)i"""\
+                                     """&amp;ln=%(ln)s%(notes_inline_anchor)s">%(notes_label)s</a>""" % \
+                                     {'siteurl': CFG_SITE_URL,
+                                      'topic': personal_search_results[bskid][1],
+                                      'bskid' : bskid,
+                                      'recid' : recid,
+                                      'ln' : ln,
+                                      'notes_action': number_of_notes and 'display' or 'write_note',
+                                      'notes_inline_anchor': not number_of_notes and '#note' or '',
+                                      'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
+                        
+                        out += """
+                        <li>
+                        %(record_html)s
+                        <br />
+                        %(more_info)s
+                        </li>""" % \
+                        {'record_html': record_html,
+                         'more_info': """<span class="moreinfo">%(detailed_record_html)s - %(notes_html)s</span>""" % \
+                                                       {'detailed_record_html': detailed_record_html,
+                                                        'notes_html': notes_html}}
+                    # If this an external record print only the view/add notes link
+                    else:
+                        notes_html = """<a class="moreinfo" href="%(siteurl)s/yourbaskets/%(notes_action)s?"""\
+                                     """category=P&amp;topic=%(topic)s&amp;bskid=%(bskid)s&amp;recid=%(recid)i"""\
+                                     """&amp;ln=%(ln)s%(notes_inline_anchor)s">%(notes_label)s</a>""" % \
+                                     {'siteurl': CFG_SITE_URL,
+                                      'topic': personal_search_results[bskid][1],
+                                      'bskid' : bskid,
+                                      'recid' : recid,
+                                      'ln' : ln,
+                                      'notes_action': number_of_notes and 'display' or 'write_note',
+                                      'notes_inline_anchor': not number_of_notes and '#note' or '',
+                                      'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
+                        
+                        out += """
+                        <li>
+                        %(record_html)s
+                        <br />
+                        %(more_info)s
+                        </li>""" % \
+                        {'record_html': record_html,
+                         'more_info':  notes_html}
+                        
+                out += """
+          </ol>
+        </td>
+      </tr>"""
 
             out += """
       <tr>
@@ -695,33 +761,109 @@ class Template:
         </td>
       </tr>"""
 
+        ### Search results from the user's group baskets ###
         if total_no_group_search_results:
+            # Print out the header for the group baskets
             out += """
       <tr>
-        <td style="border-top: 1px #fc0 solid; border-bottom: 1px #fc0 dotted; background-color: #ffc">
+        <td class="webbasket_search_results_results_overview_cell">
         <a name="%(group_baskets_name)s"></a><strong>%(group_baskets_label)s:</strong> %(items_found_label)s
         </td>
       </tr>""" % {'group_baskets_label': _('Group baskets'),
                   'group_baskets_name': "G",
-                  'items_found_label': _('%i items found') % total_no_group_search_results}
+                  'items_found_label': _('%i matching items') % total_no_group_search_results}
 
-            for group_search_result in group_search_results.iteritems():
-                basket_link = """<a href="%(url)s/yourbaskets/display?category=%(category)s&amp;group=%(group)i&amp;bskid=%(bskid)i&amp;ln=%(ln)s" title="%(title_name)s">%(basket_name)s</a>""" % \
+            # For every basket print a link to the basket and the number of items
+            # found in that basket
+            for bskid in group_search_results.keys():
+                basket_link = """<a href="%(url)s/yourbaskets/display?category=%(category)s&amp;group=%(grpid)i&amp;bskid=%(bskid)i&amp;ln=%(ln)s">%(basket_name)s</a>""" % \
                               {'url': CFG_SITE_URL,
                                'category': CFG_WEBBASKET_CATEGORIES['GROUP'],
-                               'group': group_search_result[1][1],
-                               'bskid': group_search_result[0],
+                               'grpid': group_search_results[bskid][1],
+                               'bskid': bskid,
                                'ln': ln,
-                               'title_name': cgi.escape(group_search_result[1][0], True),
-                               'basket_name': cgi.escape(group_search_result[1][0], True)}
+                               'basket_name': cgi.escape(group_search_results[bskid][0], True)}
                 out += """
       <tr>
         <td>
-        %(in_basket_label)s: %(items_found)s
+        %(in_basket_label)s <span class="webbasket_search_results_number_of_items">(%(items_found)i)</span>
         </td>
       </tr>""" % {'in_basket_label': _('In %(x_linked_basket_name)s') % \
                                      {'x_linked_basket_name': basket_link},
-                  'items_found': _('%i items found') % group_search_result[1][3]}
+                                      'items_found': group_search_results[bskid][4]}
+
+                # Print the list of records found in that basket
+                out += """
+      <tr>
+        <td class="webbasket_search_results_basket">
+          <ol>"""
+                group_search_result_records = group_search_results[bskid][5]
+                (share_rights_view_notes, share_rights_add_notes) = group_search_results[bskid][3]
+                for group_search_result_record in group_search_result_records:
+                    recid = group_search_result_record[0]
+                    number_of_notes = group_search_result_record[1]
+                    record_html = group_search_result_record[2]
+                    share_rights_notes = bool(share_rights_view_notes and (number_of_notes or share_rights_add_notes))
+                    # If this a local record print the detailed record link and
+                    # the view/add notes link
+                    if recid > 0:
+                        detailed_record_html = """<a class="moreinfo" href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(recid)i">%(detailed_record_label)s</a>""" % \
+                                               {'siteurl': CFG_SITE_URL,
+                                                'CFG_SITE_RECORD': CFG_SITE_RECORD,
+                                                'recid': recid,
+                                                'detailed_record_label': _('Detailed record')}
+                        if share_rights_notes:
+                            notes_html = """<a class="moreinfo" href="%(siteurl)s/yourbaskets/%(notes_action)s?"""\
+                                         """category=G&amp;group=%(grpid)i&amp;bskid=%(bskid)s&amp;recid=%(recid)i"""\
+                                         """&amp;ln=%(ln)s%(notes_inline_anchor)s">%(notes_label)s</a>""" % \
+                                         {'siteurl': CFG_SITE_URL,
+                                          'grpid': group_search_results[bskid][1],
+                                          'bskid' : bskid,
+                                          'recid' : recid,
+                                          'ln' : ln,
+                                          'notes_action': number_of_notes and 'display' or 'write_note',
+                                          'notes_inline_anchor': not number_of_notes and '#note' or '',
+                                          'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
+                        
+                        out += """
+                        <li>
+                        %(record_html)s
+                        <br />
+                        %(more_info)s
+                        </li>""" % \
+                        {'record_html': record_html,
+                         'more_info': """<span class="moreinfo">%(detailed_record_html)s%(separator)s%(notes_html)s</span>""" % \
+                                                       {'detailed_record_html': detailed_record_html,
+                                                        'separator': share_rights_notes and ' - ' or '',
+                                                        'notes_html': share_rights_notes and notes_html or ''}}
+                    # If this an external record print only the view/add notes link
+                    else:
+                        if share_rights_notes:
+                            notes_html = """<a class="moreinfo" href="%(siteurl)s/yourbaskets/%(notes_action)s?"""\
+                                         """category=G&amp;group=%(grpid)i&amp;bskid=%(bskid)s&amp;recid=%(recid)i"""\
+                                         """&amp;ln=%(ln)s%(notes_inline_anchor)s">%(notes_label)s</a>""" % \
+                                         {'siteurl': CFG_SITE_URL,
+                                          'grpid': group_search_results[bskid][1],
+                                          'bskid' : bskid,
+                                          'recid' : recid,
+                                          'ln' : ln,
+                                          'notes_action': number_of_notes and 'display' or 'write_note',
+                                          'notes_inline_anchor': not number_of_notes and '#note' or '',
+                                          'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
+                        
+                        out += """
+                        <li>
+                        %(record_html)s
+                        %(more_info)s
+                        </li>""" % \
+                        {'record_html': record_html,
+                         'more_info': share_rights_notes and '<br />' + notes_html or ''}
+                        
+                out += """
+          </ol>
+        </td>
+      </tr>"""
+
             out += """
       <tr>
         <td>
@@ -729,32 +871,103 @@ class Template:
         </td>
       </tr>"""
 
+        ### Search results from the user's public baskets ###
         if total_no_public_search_results:
             out += """
       <tr>
-        <td style="border-top: 1px #fc0 solid; border-bottom: 1px #fc0 dotted; background-color: #ffc">
+        <td class="webbasket_search_results_results_overview_cell">
         <a name="%(public_baskets_name)s"></a><strong>%(public_baskets_label)s:</strong> %(items_found_label)s
         </td>
       </tr>""" % {'public_baskets_label': _('Public baskets'),
                   'public_baskets_name': "E",
-                  'items_found_label': _('%i items found') % total_no_public_search_results}
+                  'items_found_label': _('%i matching items') % total_no_public_search_results}
 
-            for public_search_result in public_search_results.iteritems():
-                basket_link = """<a href="%(url)s/yourbaskets/display?category=%(category)s&amp;bskid=%(bskid)i&amp;ln=%(ln)s" title="%(title_name)s">%(basket_name)s</a>""" % \
+            for bskid in public_search_results.keys():
+                basket_link = """<a href="%(url)s/yourbaskets/display?category=%(category)s&amp;bskid=%(bskid)i&amp;ln=%(ln)s">%(basket_name)s</a>""" % \
                               {'url': CFG_SITE_URL,
                                'category': CFG_WEBBASKET_CATEGORIES['EXTERNAL'],
-                               'bskid': public_search_result[0],
+                               'bskid': bskid,
                                'ln': ln,
-                               'title_name': cgi.escape(public_search_result[1][0], True),
-                               'basket_name': cgi.escape(public_search_result[1][0], True)}
+                               'basket_name': cgi.escape(public_search_results[bskid][0], True)}
                 out += """
       <tr>
         <td>
-        %(in_basket_label)s: %(items_found)s
+        %(in_basket_label)s <span class="webbasket_search_results_number_of_items">(%(items_found)i)</span>
         </td>
       </tr>""" % {'in_basket_label': _('In %(x_linked_basket_name)s') % \
                                      {'x_linked_basket_name': basket_link},
-                  'items_found': _('%i items found') % public_search_result[1][1]}
+                  'items_found': public_search_results[bskid][2]}
+
+                # Print the list of records found in that basket
+                out += """
+      <tr>
+        <td class="webbasket_search_results_basket">
+          <ol>"""
+                public_search_result_records = public_search_results[bskid][3]
+                (share_rights_view_notes, share_rights_add_notes) = public_search_results[bskid][1]
+                for public_search_result_record in public_search_result_records:
+                    recid = public_search_result_record[0]
+                    number_of_notes = public_search_result_record[1]
+                    record_html = public_search_result_record[2]
+                    share_rights_notes = bool(share_rights_view_notes and (number_of_notes or share_rights_add_notes))
+                    # If this a local record print the detailed record link and
+                    # the view/add notes link
+                    if recid > 0:
+                        detailed_record_html = """<a class="moreinfo" href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(recid)i">%(detailed_record_label)s</a>""" % \
+                                               {'siteurl': CFG_SITE_URL,
+                                                'CFG_SITE_RECORD': CFG_SITE_RECORD,
+                                                'recid': recid,
+                                                'detailed_record_label': _('Detailed record')}
+                        if share_rights_notes:
+                            notes_html = """<a class="moreinfo" href="%(siteurl)s/yourbaskets/%(notes_action)s?"""\
+                                         """bskid=%(bskid)s&amp;recid=%(recid)i"""\
+                                         """&amp;ln=%(ln)s%(notes_inline_anchor)s">%(notes_label)s</a>""" % \
+                                         {'siteurl': CFG_SITE_URL,
+                                          'bskid' : bskid,
+                                          'recid' : recid,
+                                          'ln' : ln,
+                                          'notes_action': number_of_notes and 'display_public' or 'write_public_note',
+                                          'notes_inline_anchor': not number_of_notes and '#note' or '',
+                                          'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
+                        
+                        out += """
+                        <li>
+                        %(record_html)s
+                        <br />
+                        %(more_info)s
+                        </li>""" % \
+                        {'record_html': record_html,
+                         'more_info': """<span class="moreinfo">%(detailed_record_html)s%(separator)s%(notes_html)s</span>""" % \
+                                                       {'detailed_record_html': detailed_record_html,
+                                                        'separator': share_rights_notes and ' - ' or '',
+                                                        'notes_html': share_rights_notes and notes_html or ''}}
+                    # If this an external record print only the view/add notes link
+                    else:
+                        if share_rights_notes:
+                            notes_html = """<a class="moreinfo" href="%(siteurl)s/yourbaskets/%(notes_action)s?"""\
+                                         """bskid=%(bskid)s&amp;recid=%(recid)i"""\
+                                         """&amp;ln=%(ln)s%(notes_inline_anchor)s">%(notes_label)s</a>""" % \
+                                         {'siteurl': CFG_SITE_URL,
+                                          'bskid' : bskid,
+                                          'recid' : recid,
+                                          'ln' : ln,
+                                          'notes_action': number_of_notes and 'display_public' or 'write_public_note',
+                                          'notes_inline_anchor': not number_of_notes and '#note' or '',
+                                          'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
+                        
+                        out += """
+                        <li>
+                        %(record_html)s
+                        %(more_info)s
+                        </li>""" % \
+                        {'record_html': record_html,
+                         'more_info': share_rights_notes and '<br />' + notes_html or ''}
+                        
+                out += """
+          </ol>
+        </td>
+      </tr>"""
+
             out += """
       <tr>
         <td>
@@ -762,31 +975,102 @@ class Template:
         </td>
       </tr>"""
 
+        ### Search results from all the public baskets ###
         if total_no_all_public_search_results:
             out += """
       <tr>
-        <td style="border-top: 1px #fc0 solid; border-bottom: 1px #fc0 dotted; background-color: #ffc">
+        <td class="webbasket_search_results_results_overview_cell">
         <a name="%(all_public_baskets_name)s"></a><strong>%(all_public_baskets_label)s:</strong> %(items_found_label)s
         </td>
       </tr>""" % {'all_public_baskets_label': _('All public baskets'),
                   'all_public_baskets_name': "A",
-                  'items_found_label': _('%i items found') % total_no_all_public_search_results}
+                  'items_found_label': _('%i matching items') % total_no_all_public_search_results}
 
-            for all_public_search_result in all_public_search_results.iteritems():
-                basket_link = """<a href="%(url)s/yourbaskets/display_public?bskid=%(bskid)i&amp;ln=%(ln)s" title="%(title_name)s">%(basket_name)s</a>""" % \
+            for bskid in all_public_search_results.keys():
+                basket_link = """<a href="%(url)s/yourbaskets/display_public?bskid=%(bskid)i&amp;ln=%(ln)s">%(basket_name)s</a>""" % \
                               {'url': CFG_SITE_URL,
-                               'bskid': all_public_search_result[0],
+                               'bskid': bskid,
                                'ln': ln,
-                               'title_name': cgi.escape(all_public_search_result[1][0], True),
-                               'basket_name': cgi.escape(all_public_search_result[1][0], True)}
+                               'basket_name': cgi.escape(all_public_search_results[bskid][0], True)}
                 out += """
       <tr>
         <td>
-        %(in_basket_label)s: %(items_found)s
+        %(in_basket_label)s <span class="webbasket_search_results_number_of_items">(%(items_found)i)</span>
         </td>
       </tr>""" % {'in_basket_label': _('In %(x_linked_basket_name)s') % \
                                      {'x_linked_basket_name': basket_link},
-                  'items_found': _('%i items found') % all_public_search_result[1][1]}
+                  'items_found': all_public_search_results[bskid][2]}
+
+                # Print the list of records found in that basket
+                out += """
+      <tr>
+        <td class="webbasket_search_results_basket">
+          <ol>"""
+                all_public_search_result_records = all_public_search_results[bskid][3]
+                (share_rights_view_notes, share_rights_add_notes) = all_public_search_results[bskid][1]
+                for all_public_search_result_record in all_public_search_result_records:
+                    recid = all_public_search_result_record[0]
+                    number_of_notes = all_public_search_result_record[1]
+                    record_html = all_public_search_result_record[2]
+                    share_rights_notes = bool(share_rights_view_notes and (number_of_notes or share_rights_add_notes))
+                    # If this a local record print the detailed record link and
+                    # the view/add notes link
+                    if recid > 0:
+                        detailed_record_html = """<a class="moreinfo" href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(recid)i">%(detailed_record_label)s</a>""" % \
+                                               {'siteurl': CFG_SITE_URL,
+                                                'CFG_SITE_RECORD': CFG_SITE_RECORD,
+                                                'recid': recid,
+                                                'detailed_record_label': _('Detailed record')}
+                        if share_rights_notes:
+                            notes_html = """<a class="moreinfo" href="%(siteurl)s/yourbaskets/%(notes_action)s?"""\
+                                         """bskid=%(bskid)s&amp;recid=%(recid)i"""\
+                                         """&amp;ln=%(ln)s%(notes_inline_anchor)s">%(notes_label)s</a>""" % \
+                                         {'siteurl': CFG_SITE_URL,
+                                          'bskid' : bskid,
+                                          'recid' : recid,
+                                          'ln' : ln,
+                                          'notes_action': number_of_notes and 'display_public' or 'write_public_note',
+                                          'notes_inline_anchor': not number_of_notes and '#note' or '',
+                                          'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
+                        
+                        out += """
+                        <li>
+                        %(record_html)s
+                        <br />
+                        %(more_info)s
+                        </li>""" % \
+                        {'record_html': record_html,
+                         'more_info': """<span class="moreinfo">%(detailed_record_html)s%(separator)s%(notes_html)s</span>""" % \
+                                                       {'detailed_record_html': detailed_record_html,
+                                                        'separator': share_rights_notes and ' - ' or '',
+                                                        'notes_html': share_rights_notes and notes_html or ''}}
+                    # If this an external record print only the view/add notes link
+                    else:
+                        if share_rights_notes:
+                            notes_html = """<a class="moreinfo" href="%(siteurl)s/yourbaskets/%(notes_action)s?"""\
+                                         """bskid=%(bskid)s&amp;recid=%(recid)i"""\
+                                         """&amp;ln=%(ln)s%(notes_inline_anchor)s">%(notes_label)s</a>""" % \
+                                         {'siteurl': CFG_SITE_URL,
+                                          'bskid' : bskid,
+                                          'recid' : recid,
+                                          'ln' : ln,
+                                          'notes_action': number_of_notes and 'display_public' or 'write_public_note',
+                                          'notes_inline_anchor': not number_of_notes and '#note' or '',
+                                          'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
+                        
+                        out += """
+                        <li>
+                        %(record_html)s
+                        %(more_info)s
+                        </li>""" % \
+                        {'record_html': record_html,
+                         'more_info': share_rights_notes and '<br />' + notes_html or ''}
+                        
+                out += """
+          </ol>
+        </td>
+      </tr>"""
+
             out += """
       <tr>
         <td>
@@ -828,14 +1112,14 @@ class Template:
 
         if search_box:
             container_search_box = """
-  <div id="bskcontainersearch">%s
+  <div id="webbasket_container_search_box">%s
   </div>
 """ % (search_box,)
             display_items.append(container_search_box)
 
         if search_results:
             container_search_results = """
-  <div id="bskcontainersearch">%s
+  <div id="webbasket_container_search_results">%s
   </div>
 """ % (search_results,)
             display_items.append(container_search_results)
@@ -3896,39 +4180,54 @@ def create_search_box_select_options(category,
     else:
         b = ""
 
-    options = []
-
     if topic_list or group_list:
-        options.append((_("All your baskets"), "", True, False))
+        out += """<option value=""%(selected)s>%(label)s</option>""" % \
+               {'selected': not b and ' selected="selected"' or '',
+                'label': _("All your baskets")}
     if topic_list:
-        options.append((_("Your personal baskets"), CFG_WEBBASKET_CATEGORIES['PRIVATE'], False, True))
-    for topic_name in topic_list:
-        topic_label = cgi.escape(topic_name[0], True)
-        topic_value = "P_%s" % (cgi.escape(topic_name[0], True),)
-        options.append((topic_label, topic_value, False, False))
+        out += """<optgroup label="%(label)s">""" % \
+               {'label': _("Your personal baskets")}
+        if len(topic_list) > 1:
+            out += """<option value="%(value)s"%(selected)s>%(label)s</option>""" % \
+                   {'value': CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                    'selected': b == CFG_WEBBASKET_CATEGORIES['PRIVATE'] and ' selected="selected"' or '',
+                    'label': _("All your topics")}
+        for topic_name in topic_list:
+            topic_label = cgi.escape(topic_name[0], True)
+            topic_value = "P_%s" % (topic_label,)
+            out += """<option value="%(value)s"%(selected)s>%(label)s</option>""" % \
+                   {'value': topic_value,
+                    'selected': b == topic_value and ' selected="selected"' or '',
+                    'label': topic_label}
+        out += "</optgroup>"
     if group_list:
-        options.append((_("Your group baskets"), CFG_WEBBASKET_CATEGORIES['GROUP'], False, True))
-    for group_id_and_name in group_list:
-        group_label = cgi.escape(group_id_and_name[1], True)
-        group_value = "G_%i" % (group_id_and_name[0],)
-        options.append((group_label, group_value, False, False))
+        out += """<optgroup label="%(label)s">""" % \
+               {'label': _("Your group baskets")}
+        if len(group_list) > 1:
+            out += """<option value="%(value)s"%(selected)s>%(label)s</option>""" % \
+                   {'value': CFG_WEBBASKET_CATEGORIES['GROUP'],
+                    'selected': b == CFG_WEBBASKET_CATEGORIES['GROUP'] and ' selected="selected"' or '',
+                    'label': _("All your groups")}
+        for group_id_and_name in group_list:
+            group_label = cgi.escape(group_id_and_name[1], True)
+            group_value = "G_%i" % (group_id_and_name[0],)
+            out += """<option value="%(value)s"%(selected)s>%(label)s</option>""" % \
+                   {'value': group_value,
+                    'selected': b == group_value and ' selected="selected"' or '',
+                    'label': group_label}
+        out += "</optgroup>"
     if number_of_public_baskets:
-        options.append((_("Your public baskets"), CFG_WEBBASKET_CATEGORIES['EXTERNAL'], False, True))
-    options.append((_("All the public baskets"), CFG_WEBBASKET_CATEGORIES['ALLPUBLIC'], True, False))
-
-    for option in options:
-        out += """
-            <option style="%(style)s" value="%(value)s"%(selected)s>%(label)s</option>""" % \
-                          {'value': option[1],
-                           'label': option[0],
-                           'selected': option[1] == b and ' selected="selected"' or '',
-                           #'style': option[2] and \
-                           #( ( not option[1] or option[1] ==  CFG_WEBBASKET_CATEGORIES['ALLPUBLIC'] ) and "font-weight: bold;" or \
-                           #( option[1] and option[1] !=  CFG_WEBBASKET_CATEGORIES['ALLPUBLIC'] ) and "font-weight: bold; margin-left: 5px;" ) or \
-                           #"font-weight: normal; margin-left: 10px;"}
-                           'style': option[2] and "font-weight: bold;" or \
-                           option[3] and "font-weight: bold; margin-left: 5px;" or \
-                           "font-weight: normal; margin-left: 10px;"}
+        out += """<optgroup label="%(label)s">""" % \
+               {'label': _("Your public baskets")}
+        out += """<option value="%(value)s"%(selected)s>%(label)s</option>""" % \
+               {'value': CFG_WEBBASKET_CATEGORIES['EXTERNAL'],
+                'selected': b == CFG_WEBBASKET_CATEGORIES['EXTERNAL'] and ' selected="selected"' or '',
+                'label': _("All your public baskets")}
+        out += "</optgroup>"
+    out += """<option value="%(value)s"%(selected)s>%(label)s</option>""" % \
+           {'value': CFG_WEBBASKET_CATEGORIES['ALLPUBLIC'],
+            'selected': b == CFG_WEBBASKET_CATEGORIES['ALLPUBLIC'] and ' selected="selected"' or '',
+            'label': _("All the public baskets")}
 
     return out
 
