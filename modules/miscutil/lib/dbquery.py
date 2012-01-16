@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -32,6 +32,7 @@ from MySQLdb import Warning, Error, InterfaceError, DataError, \
                     DatabaseError, OperationalError, IntegrityError, \
                     InternalError, NotSupportedError, \
                     ProgrammingError
+import gc
 import os
 import string
 import time
@@ -188,13 +189,17 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False):
     try:
         db = _db_login()
         cur = db.cursor()
+        gc.disable()
         rc = cur.execute(sql, param)
+        gc.enable()
     except OperationalError: # unexpected disconnect, bad malloc error, etc
         # FIXME: now reconnect is always forced, we may perhaps want to ping() first?
         try:
             db = _db_login(relogin=1)
             cur = db.cursor()
+            gc.disable()
             rc = cur.execute(sql, param)
+            gc.enable()
         except OperationalError: # again an unexpected disconnect, bad malloc error, etc
             raise
 
@@ -245,12 +250,16 @@ def run_sql_many(query, params, limit=CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT):
         try:
             db = _db_login()
             cur = db.cursor()
+            gc.disable()
             rc = cur.executemany(query, params[i:i + limit])
+            gc.enable()
         except OperationalError:
             try:
                 db = _db_login(relogin=1)
                 cur = db.cursor()
+                gc.disable()
                 rc = cur.executemany(query, params[i:i + limit])
+                gc.enable()
             except OperationalError:
                 raise
         ## collect its result:
