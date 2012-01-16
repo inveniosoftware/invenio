@@ -2317,7 +2317,7 @@ class Template:
   <thead>
     <tr>
       <td class="bskbasketheader"%(optional_colspan)s>
-        <table>
+        <table width="100%%">
           <tr>
             <td class="bskbasketheadertitle">
               <strong>
@@ -2400,7 +2400,7 @@ class Template:
   <tfoot>
     <tr>
       <td class="bskbasketfooter"%(optional_colspan)s>
-        <table>
+        <table width="100%%">
           <tr>
             <td class="bskbasketfootertitle">
               <small>
@@ -2456,7 +2456,7 @@ class Template:
       <td style="text-align:center; height:100px">
       %s
       </td>
-    </tr>""" % _("Basket is empty")
+    </tr>""" % _("This basket does not contain any records yet.")
                 else:
                     count = 0
                     for item in items:
@@ -2597,7 +2597,7 @@ class Template:
 
         out = """
     <tr>
-      <td style="border-bottom: 1px solid #fc0;">
+      <td class="webbasket_basket_content_item_cell">
         <table>
           <tr>
             <td class="bskcontentcount">
@@ -2906,7 +2906,7 @@ class Template:
   <tfoot>
     <tr>
       <td class="bskbasketfooter">
-        <table>
+        <table width="100%%">
           <tr>
             <td class="bskbasketfootertitle">
               &nbsp;
@@ -3334,7 +3334,7 @@ class Template:
   <thead>
     <tr>
       <td class="bskbasketheader"%(optional_colspan)s>
-        <table>
+        <table width="100%%">
           <tr>
             <td class="bskbasketheadertitle">
               <strong>
@@ -3391,7 +3391,7 @@ class Template:
   <tfoot>
     <tr>
       <td class="bskbasketfooter"%(optional_colspan)s>
-        <table>
+        <table width="100%%">
           <tr>
             <td class="bskbasketfootertitle">
               <small>
@@ -3737,7 +3737,7 @@ class Template:
   <tfoot>
     <tr>
       <td class="bskbasketfooter">
-        <table>
+        <table width="100%%">
           <tr>
             <td class="bskbasketfootertitle">
               &nbsp;

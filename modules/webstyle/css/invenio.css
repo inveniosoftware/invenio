@@ -1656,7 +1656,7 @@ ul.bsk_export_as_list{
 .bskbasketheader{
    background-color: #ffc;
    padding: 5px;
-   border-bottom: 1px solid #fc0;
+   border: 1px solid #fc0;
    border-collapse: collapse;
    vertical-align: top;
 }
@@ -1687,7 +1687,7 @@ ul.bsk_export_as_list{
 .bskbasketfooter{
    background-color: #ffc;
    padding: 5px;
-   border-top: 1px solid #fc0;
+   border: 1px solid #fc0;
    border-collapse: collapse;
    vertical-align: bottom;
 }
@@ -1868,6 +1868,9 @@ ul.bsk_export_as_list{
 .bskcontentoptions img{
    border: none;
    padding-right: 5px;
+}
+.webbasket_basket_content_item_cell {
+   border: 1px solid #fc0;
 }
 .bskactions{
    text-align: center;
