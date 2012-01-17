@@ -2402,9 +2402,6 @@
       <subfield code="m">Whittman D.M., Tyson J.A., Kirkman D., Dell’Antonio, I., Bertstein G.,</subfield>
       <subfield code="s">Nature 405 (2000) 143</subfield>
    </datafield>
-   <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">CDS Invenio/0.99.1.20090427 refextract/0.99.1.20090427-1231299834-0-2-25-0-0</subfield>
-   </datafield>
     <datafield tag="980" ind1=" " ind2=" ">
       <subfield code="a">PREPRINT</subfield>
     </datafield>
@@ -17213,9 +17210,6 @@
       <subfield code="m">For a review with a comprehensive set of references, see E. d‘Hoker and D.Z. Freedman, "Supersymmetric Gauge Theories and the AdS/CFT Correspondence,"</subfield>
       <subfield code="r">hep-th/0201253</subfield>
     </datafield>
-    <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181365824-0-23-17-1-0</subfield>
-    </datafield>
   </record>
   <record>
     <datafield tag="035" ind1=" " ind2=" ">
@@ -17363,9 +17357,6 @@
       <subfield code="m">M. Bianchi, D. Z. Freedman and K. Skenderis,</subfield>
       <subfield code="s">J. High Energy Phys. 08 (2001) 041</subfield>
       <subfield code="r">hep-th/0105276</subfield>
-    </datafield>
-    <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181358050-0-7-7-0-0</subfield>
     </datafield>
   </record>
   <record>
@@ -17657,9 +17648,6 @@
       <subfield code="o">[32]</subfield>
       <subfield code="m">C. W. Misner, K. S. Thorne and J. A. Wheeler, Gravitation, Freeman, San Francisco (1973).</subfield>
     </datafield>
-    <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181361227-0-29-24-0-2</subfield>
-    </datafield>
   </record>
   <record>
     <controlfield tag="003">SzGeCERN</controlfield>
@@ -17940,9 +17928,6 @@
       <subfield code="m">I. Klebanov, A. Tseytlin, "Entropy of Near-Extremal Black p-branes,"</subfield>
       <subfield code="s">Nucl. Phys. B 475 (1996) 164</subfield>
       <subfield code="r">hep-th/9604089</subfield>
-    </datafield>
-    <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181363461-0-26-22-0-4</subfield>
     </datafield>
   </record>
   <record>
@@ -18245,9 +18230,6 @@
     <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">[37]</subfield>
       <subfield code="m">A. Adams, O. Aharony, J. McGreevy, E. Silverstein,..., work in progress</subfield>
-    </datafield>
-    <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181365384-0-25-23-0-5</subfield>
     </datafield>
   </record>
   <record>
@@ -18623,9 +18605,6 @@
       <subfield code="s">Phys. Rev. D 64 (2001) 064011</subfield>
       <subfield code="r">hep-th/0011217</subfield>
     </datafield>
-    <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181365450-0-40-37-0-4</subfield>
-    </datafield>
   </record>
   <record>
     <controlfield tag="003">SzGeCERN</controlfield>
@@ -18968,9 +18947,6 @@
       <subfield code="m">E. Witten,</subfield>
       <subfield code="s">Nucl. Phys. B 195 (1982) 481</subfield>
     </datafield>
-    <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181365734-0-27-39-0-1</subfield>
-    </datafield>
   </record>
   <record>
     <controlfield tag="003">SzGeCERN</controlfield>
@@ -19076,9 +19052,6 @@
     </datafield>
     <datafield tag="980" ind1=" " ind2=" ">
       <subfield code="a">ARTICLE</subfield>
-    </datafield>
-    <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181367639-4-0-0-0-0</subfield>
     </datafield>
   </record>
   <record>
@@ -19323,9 +19296,6 @@
       <subfield code="o">[15]</subfield>
       <subfield code="m">D. Anselmi,</subfield>
       <subfield code="r">hep-th/0210123</subfield>
-    </datafield>
-    <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181367768-0-22-19-0-0</subfield>
     </datafield>
   </record>
   <record>
@@ -20187,9 +20157,6 @@
       <subfield code="m">D. Berenstein and H. Nastase, "On lightcone string field theory from super Yang-Mills and holography,"</subfield>
       <subfield code="r">hep-th/0205048</subfield>
     </datafield>
-    <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181368247-0-102-108-0-5</subfield>
-    </datafield>
   </record>
   <record>
     <controlfield tag="003">SzGeCERN</controlfield>
@@ -20456,9 +20423,6 @@
       <subfield code="m">V.K.Onemli and R.P.Woodard,</subfield>
       <subfield code="s">Class. Quantum Gravity 19 (2002) 4607</subfield>
       <subfield code="r">gr-qc/0204065</subfield>
-    </datafield>
-    <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181372109-0-18-28-0-0</subfield>
     </datafield>
   </record>
   <record>
@@ -20787,9 +20751,6 @@
       <subfield code="s">Nucl.Phys. B656 (2003) 23</subfield>
       <subfield code="r">hep-th/0212138</subfield>
     </datafield>
-    <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181375069-0-21-38-0-1</subfield>
-    </datafield>
   </record>
   <record>
     <controlfield tag="003">SzGeCERN</controlfield>
@@ -21065,9 +21026,6 @@
       <subfield code="m">M.Porrati and G. W. Rombouts,</subfield>
       <subfield code="r">hep-th/0401211</subfield>
       <subfield code="s">Phys.Rev. D69 (2004) 122003</subfield>
-    </datafield>
-    <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181382391-0-26-23-0-2</subfield>
     </datafield>
   </record>
   <record>
@@ -21489,9 +21447,6 @@
       <subfield code="m">T. Damour, M. Henneaux and H. Nicolai, "Cosmological billiards,"</subfield>
       <subfield code="s">Class. Quantum Gravity 20 (2003) R145</subfield>
       <subfield code="r">hep-th/0212256</subfield>
-    </datafield>
-    <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181394655-0-44-48-0-2</subfield>
     </datafield>
   </record>
   <record>
@@ -21918,9 +21873,6 @@
       <subfield code="m">S. de Haro, I. Papadimitriou and A. C. Petkou, "Conformally coupled scalars, instantons and Vacuum instability in AdS(4)," [arXiv</subfield>
       <subfield code="r">hep-th/0611315</subfield>
     </datafield>
-    <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181414470-0-53-49-0-2</subfield>
-    </datafield>
   </record>
   <record>
     <controlfield tag="003">SzGeCERN</controlfield>
@@ -22296,9 +22248,6 @@
       <subfield code="o">[40]</subfield>
       <subfield code="m">G. Koutsoumbas, S. Musiri, E. Papantonopoulos and G. Siopsis, in preparation.</subfield>
     </datafield>
-    <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181414732-0-36-41-0-2</subfield>
-    </datafield>
   </record>
   <record>
     <controlfield tag="003">SzGeCERN</controlfield>
@@ -22483,9 +22432,6 @@
       <subfield code="o">[18]</subfield>
       <subfield code="m">S. Alexander, L. S. Finn, and N. Yunes, in progress (2007).</subfield>
     </datafield>
-    <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181427282-0-8-12-1-4</subfield>
-    </datafield>
   </record>
   <record>
     <controlfield tag="003">SzGeCERN</controlfield>
@@ -22577,6 +22523,124 @@
     <datafield tag="980" ind1=" " ind2=" ">
       <subfield code="a">ARTICLE</subfield>
     </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">1.</subfield>
+      <subfield code="h">T. Banks, W. Fischler, S. Shenker and L. Susskind</subfield>
+      <subfield code="r">hep-th/9610043</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">2.</subfield>
+      <subfield code="h">E. Witten</subfield>
+      <subfield code="s">Nucl. Phys B 460 (1995) 335</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">3.</subfield>
+      <subfield code="h">B. de Wit, J. Hoppe and H. Nicolai</subfield>
+      <subfield code="s">Nucl. Phys B 305 (1988) 545</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">4.</subfield>
+      <subfield code="h">M. Berkooz and M. Douglas</subfield>
+      <subfield code="r">hep-th/9610236</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">5.</subfield>
+      <subfield code="h">H. Nishino and E. Sezgin</subfield>
+      <subfield code="r">hep-th/9607185</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">6.</subfield>
+      <subfield code="h">M. Blencowe and M. Duff</subfield>
+      <subfield code="s">Nucl. Phys B 310 (1988) 387</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">7.</subfield>
+      <subfield code="h">C. Vafa</subfield>
+      <subfield code="s">Nucl. Phys B 469 (1996) 403</subfield>
+      <subfield code="m">9</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">7.</subfield>
+      <subfield code="h">C. Hull</subfield>
+      <subfield code="r">hep-th/9512181</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">8.</subfield>
+      <subfield code="h">D. Kutasov and E. Martinec</subfield>
+      <subfield code="r">hep-th/9602049</subfield>
+      <subfield code="m">10</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">8.</subfield>
+      <subfield code="h">I. Bars</subfield>
+      <subfield code="r">hep-th/9607112</subfield>
+      <subfield code="m">11. For some background on the choice of 10+2, see e.g</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">8.</subfield>
+      <subfield code="h">L. Castellani, P. Fré, F. Giani, K. Pilch and P. van Nieuwenhuizen</subfield>
+      <subfield code="s">Phys. Rev D 26 (1982) 1481</subfield>
+      <subfield code="m">12</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">8.</subfield>
+      <subfield code="h">A. Connes</subfield>
+      <subfield code="m">Non-commutative Geometry, Academic Press (San Diego, 1994) 5</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">3.</subfield>
+      <subfield code="h">B. de Wit, J. Hoppe and H. Nicolai</subfield>
+      <subfield code="s">Nucl. Phys B 305 (1988) 545</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">4.</subfield>
+      <subfield code="h">M. Berkooz and M. Douglas</subfield>
+      <subfield code="r">hep-th/9610236</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">5.</subfield>
+      <subfield code="h">H. Nishino and E. Sezgin</subfield>
+      <subfield code="r">hep-th/9607185</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">6.</subfield>
+      <subfield code="h">M. Blencowe and M. Duff</subfield>
+      <subfield code="s">Nucl. Phys B 310 (1988) 387</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">7.</subfield>
+      <subfield code="h">C. Vafa</subfield>
+      <subfield code="s">Nucl. Phys B 469 (1996) 403</subfield>
+      <subfield code="m">9</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">7.</subfield>
+      <subfield code="h">C. Hull</subfield>
+      <subfield code="r">hep-th/9512181</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">8.</subfield>
+      <subfield code="h">D. Kutasov and E. Martinec</subfield>
+      <subfield code="r">hep-th/9602049</subfield>
+      <subfield code="m">10</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">8.</subfield>
+      <subfield code="h">I. Bars</subfield>
+      <subfield code="r">hep-th/9607112</subfield>
+      <subfield code="m">11. For some background on the choice of 10+2, see e.g</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">8.</subfield>
+      <subfield code="h">L. Castellani, P. Fré, F. Giani, K. Pilch and P. van Nieuwenhuizen</subfield>
+      <subfield code="s">Phys. Rev D 26 (1982) 1481</subfield>
+      <subfield code="m">12</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">8.</subfield>
+      <subfield code="h">A. Connes</subfield>
+      <subfield code="m">Non-commutative Geometry, Academic Press (San Diego, 1994) 5</subfield>
+   </datafield>
   </record>
   <record>
     <datafield tag="035" ind1="" ind2="">
@@ -22814,10 +22878,6 @@
   <!--It's probably a good article, anyway-->
   <record>
     <controlfield tag="003">SzGeCERN</controlfield>
-    <datafield tag="024" ind1="7" ind2=" ">
-        <subfield code="a">10.1142/S0217732300001444</subfield>
-        <subfield code="2">DOI</subfield>
-    </datafield>
     <datafield tag="035" ind1=" " ind2=" ">
       <subfield code="a">2174811CERCER</subfield>
     </datafield>
@@ -22892,6 +22952,7 @@
       <subfield code="a">Walker, Joel W.</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="4">
+      <subfield code="a">10.1142/S0217732300001444</subfield>
       <subfield code="c">1191-1202</subfield>
       <subfield code="p">Mod. Phys. Lett. A</subfield>
       <subfield code="v">15</subfield>
@@ -23168,7 +23229,7 @@
     <datafield tag="700" ind1="" ind2="">
       <subfield code="a">Feldhaus, J</subfield>
     </datafield>
-    <datafield tag="773" ind1="" ind2="">
+    <datafield tag="909" ind1="C" ind2="4">
       <subfield code="c">456-462</subfield>
       <subfield code="n">1-3</subfield>
       <subfield code="p">Nucl. Instrum. Methods Phys. Res., A</subfield>
@@ -23209,13 +23270,6 @@
   <record>
     <controlfield tag="003">SzGeCERN</controlfield>
     <controlfield tag="005">20070110102840.0</controlfield>
-    <datafield tag="024" ind1="8" ind2=" ">
-      <subfield code="a">oai:cds.cern.ch:SCAN-9709037</subfield>
-      <subfield code="p">cerncds:SCAN</subfield>
-    </datafield>
-    <datafield tag="024" ind1="8" ind2=" ">
-      <subfield code="p">cerncds:FULLTEXT</subfield>
-    </datafield>
     <datafield tag="035" ind1=" " ind2=" ">
       <subfield code="a">0008580CERCER</subfield>
     </datafield>
@@ -23254,6 +23308,11 @@
     </datafield>
     <datafield tag="690" ind1="C" ind2=" ">
       <subfield code="a">PREPRINT</subfield>
+    </datafield>
+    <datafield tag="909" ind1="C" ind2="O">
+      <subfield code="a">oai:cds.cern.ch:SCAN-9709037</subfield>
+      <subfield code="p">cerncds:SCAN</subfield>
+      <subfield code="p">cerncds:FULLTEXT</subfield>
     </datafield>
     <datafield tag="916" ind1=" " ind2=" ">
       <subfield code="s">h</subfield>
