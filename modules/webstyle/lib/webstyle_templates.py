@@ -37,7 +37,7 @@ from invenio.config import \
      CFG_VERSION, \
      CFG_WEBSTYLE_INSPECT_TEMPLATES, \
      CFG_WEBSTYLE_TEMPLATE_SKIN, \
-     CFG_SITE_INSPIRE
+     CFG_INSPIRE_SITE
 
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
 from invenio.messages import gettext_set_language, language_list_long, is_language_rtl
@@ -837,7 +837,7 @@ URI: http://%(host)s%(page)s
 
         similar = ""
 
-        if show_similar_rec_p and not CFG_SITE_INSPIRE:
+        if show_similar_rec_p and not CFG_INSPIRE_SITE:
             similar = create_html_link(
                 websearch_templates.build_search_url(p='recid:%d' % \
                                                      recid,
