@@ -2267,6 +2267,144 @@
       <subfield code="s">n</subfield>
       <subfield code="w">200104</subfield>
     </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Allen S.W.,</subfield>
+      <subfield code="s">Mon. Not. R. Astron. Soc. 296 (1998) 392</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Bacon D., Refregier A., Ellis R.S.,</subfield>
+      <subfield code="s">Mon. Not. R. Astron. Soc. 318 (2000) 625</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Beckett M., Mackay C., McMahon R., Parry I., Ellis R.S., Chan S.J., Hoenig M.,</subfield>
+      <subfield code="s">Proc. SPIE 3354 (1998) 431</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Bertin E., Arnouts S., 1996, A&amp;Ann. Sci., 117, 393 Bonnet H., Mellier Y., Fort B.,</subfield>
+      <subfield code="s">Astrophys. J. 427 (1994) 83</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Bower R.G., Lucey J.R., Ellis R.S.,</subfield>
+      <subfield code="s">Mon. Not. R. Astron. Soc. 254 (1992) 589</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Bower R.G., Lucey J.R., Ellis R.S.,</subfield>
+      <subfield code="s">Mon. Not. R. Astron. Soc. 254 (1992) 601</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Clowe D., Luppino G.A., Kaiser N., Henry J.P., Gioia I.M., 1998, Astrophys. J., 497L Couch W.J., Ellis R.S., Malin D.F., MacLaren I.,</subfield>
+      <subfield code="s">Mon. Not. R. Astron. Soc. 249 (1991) 606</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">da Costa L., et al.,</subfield>
+      <subfield code="s">Astron. Astrophys. 343 (1999) 29</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Erben T., van Waerbeke L., Mellier Y., Schneider P., Cuillandre J.-C., Castander F.J., Dantel-Fort M.,</subfield>
+      <subfield code="s">Astron. Astrophys. 355 (2000) 23</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Fahlman G., Kaiser N., Squires G., Woods D.,</subfield>
+      <subfield code="s">Astrophys. J. 437 (1994) 56</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Firth, A., 2000, Clustering at High Redshift, Astropart. Phys. Conference Series, Vol. 200, p. 404 Fischer P.,</subfield>
+      <subfield code="s">Astron. J. 117 (1999) 2024</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Gladders M.D., Yee H.K.C.,</subfield>
+      <subfield code="s">Astron. J. 120 (2000) 2148</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Gray M.E., Ellis R.S., Refregier A., Bézecourt J., McMahon R.G., Hoenig M.D : 318 (2000) 573 Hradecky V., Jones C., Donnelly R.H., Djorgovski S.G., Gal R.R., Odeqahn S.C.,</subfield>
+      <subfield code="s">Astrophys. J. 543 (2000) 521</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Kaiser N., Wilson G., Luppino G.A., 2000,</subfield>
+      <subfield code="r">astro-ph/0003338</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Kaiser N., Squires G.,</subfield>
+      <subfield code="s">Astrophys. J. 404 (1993) 441</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Kneib J.P., Ellis R.S., Smail I., Couch W.J., Sharples R.M.,</subfield>
+      <subfield code="s">Astrophys. J. 471 (1996) 643</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Marzke R., McCarthy P.J., Persson E., et al., 1999, Photometric Redshifts and the Detection of High Redshift Galaxies, Astropart. Phys. Conference Series, Vol. 191, p. 148 Menanteau F., Ellis R.S., Abraham R.G., Barger Astron. J., Cowie L.L.,</subfield>
+      <subfield code="s">Mon. Not. R. Astron. Soc. 309 (1999) 208</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Metzler C.A., White M., Loken C., 2000, Astrophys. J., submitted</subfield>
+      <subfield code="r">astro-ph/0005442</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Miralda-Escude J., Babul A.,</subfield>
+      <subfield code="s">Astrophys. J. 449 (1995) 18</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Persson S.E., Murphy D.C., Krzeminsky W., Rother M., Rieke M.J., 1998, Astron. J., 116 Refregier A., Heavens A., Heymans C.,</subfield>
+      <subfield code="s">Mon. Not. R. Astron. Soc. 319 (2000) 649</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Schneider P.,</subfield>
+      <subfield code="s">Mon. Not. R. Astron. Soc. 283 (1996) 837</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Smail I., Ellis R.S., Fitchett M.J., Edge A.C.,</subfield>
+      <subfield code="s">Mon. Not. R. Astron. Soc. 273 (1995) 277</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Smail I., Dressler A., Kneib J.-P., Ellis R.S., Couch W.J., Sharples R.M., Oemler Astron. J.,</subfield>
+      <subfield code="s">Astrophys. J. 469 (1996) 508</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Squires G., Neumann D.M., Kaiser N., Arnaud M., Babul A., Boehringer H., Fahlman G., Woods D.,</subfield>
+      <subfield code="s">Astrophys. J. 482 (1997) 648</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">van Kampen E., Katgert P.,</subfield>
+      <subfield code="s">Mon. Not. R. Astron. Soc. 289 (1997) 327</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">van Waerbeke L, et al.,</subfield>
+      <subfield code="s">Astron. Astrophys. 538 (2000) 30</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o"> </subfield>
+      <subfield code="m">Whittman D.M., Tyson J.A., Kirkman D., Dell’Antonio, I., Bertstein G.,</subfield>
+      <subfield code="s">Nature 405 (2000) 143</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="6">
+      <subfield code="a">CDS Invenio/0.99.1.20090427 refextract/0.99.1.20090427-1231299834-0-2-25-0-0</subfield>
+   </datafield>
     <datafield tag="980" ind1=" " ind2=" ">
       <subfield code="a">PREPRINT</subfield>
     </datafield>
@@ -7835,6 +7973,107 @@
       <subfield code="s">n</subfield>
       <subfield code="w">200216</subfield>
     </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[1]</subfield>
+      <subfield code="m">R. Maartens, D. Wands, B.A. Bassett, I.P.C. Heard,</subfield>
+      <subfield code="s">Phys. Rev. D 62 (2000) 041301</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[2]</subfield>
+      <subfield code="m">M.C. Bento, O. Bertolami,</subfield>
+      <subfield code="s">Phys. Rev. D 65 (2002) 063513</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[3]</subfield>
+      <subfield code="m">O. Bertolami, G.G. Ross,</subfield>
+      <subfield code="s">Phys. Lett. B 183 (1987) 163</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[4]</subfield>
+      <subfield code="m">J. McDonald, "F-term Hybrid Inflation, η-Problem and Extra Dimensions",</subfield>
+      <subfield code="r">hep-ph/0201016</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[5]</subfield>
+      <subfield code="m">G. Dvali, Q. Shafi, R. Schaefer,</subfield>
+      <subfield code="s">Phys. Rev. Lett. 73 (1994) 1886</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[6]</subfield>
+      <subfield code="m">A.D. Linde,</subfield>
+      <subfield code="s">Phys. Lett. B 259 (1991) 38</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[6]</subfield>
+      <subfield code="m">M.C. Bento, O. Bertolami, P.M. Sá,</subfield>
+      <subfield code="s">Phys. Lett. B 262 (1991) 11</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[6]</subfield>
+      <subfield code="s">Mod. Phys. Lett. A 7 (1992) 911</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[6]</subfield>
+      <subfield code="m">A.D. Linde,</subfield>
+      <subfield code="s">Phys. Rev. D 49 (1994) 748</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[7]</subfield>
+      <subfield code="m">E.J. Copeland, A.R. Liddle, D.H. Lyth, E.D. Stewart, D. Wands,</subfield>
+      <subfield code="s">Phys. Rev. D 49 (1994) 6410</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[8]</subfield>
+      <subfield code="m">L.E. Mendes, A.R. Liddle,</subfield>
+      <subfield code="s">Phys. Rev. D 62 (2000) 103511</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[9]</subfield>
+      <subfield code="m">J.A. Adams, G.G. Ross, S. Sarkar,</subfield>
+      <subfield code="s">Phys. Lett. B 391 (1997) 271</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[10]</subfield>
+      <subfield code="m">T. Shiromizu, K. Maeda, M. Sasaki,</subfield>
+      <subfield code="s">Phys. Rev. D 62 (2000) 024012</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[11]</subfield>
+      <subfield code="m">P. Binétruy, C. Deffayet, U. Ellwanger, D. Langlois,</subfield>
+      <subfield code="s">Phys. Lett. B 477 (2000) 285</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[11]</subfield>
+      <subfield code="m">E.E. Flanagan, S.H. Tye, I. Wasserman,</subfield>
+      <subfield code="s">Phys. Rev. D 62 (2000) 044039</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[12]</subfield>
+      <subfield code="m">D. Langlois, R. Maartens, D. Wands,</subfield>
+      <subfield code="s">Phys. Lett. B 489 (2000) 259</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[13]</subfield>
+      <subfield code="m">C.B. Netterfield Pryke, et al., "A Measurement by BOOMERANG of multiple peaks in the angular power spectrum of the cosmic microwave background", Ann. Sci.tro/ph0104460.</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[14]</subfield>
+      <subfield code="m">A.T. Lee, et al., "A High Spatial Resolution Analy-sis of the MAXIMA-1 Cosmic Microwave Background Anisotropy Data", Astronomy/ph0104459.</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[15]</subfield>
+      <subfield code="m">C. Pryke, et al., "Cosmological Parameter Extraction from the First Season of Observations with DASI", Ann. Sci.tro/ph0104490.</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[16]</subfield>
+      <subfield code="m">M.C. Bento, O. Bertolami,</subfield>
+      <subfield code="s">Phys. Lett. B 384 (1996) 98</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[17]</subfield>
+      <subfield code="m">G.G. Ross, S. Sarkar,</subfield>
+      <subfield code="s">Nucl. Phys. B 461 (1995) 597</subfield>
+   </datafield>
     <datafield tag="980" ind1=" " ind2=" ">
       <subfield code="a">PREPRINT</subfield>
     </datafield>
@@ -7891,6 +8130,93 @@
       <subfield code="s">n</subfield>
       <subfield code="w">200216</subfield>
     </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[1]</subfield>
+      <subfield code="m">A. D. Alhaidari,</subfield>
+      <subfield code="s">Phys. Rev. Lett. 87 (2001) 210405</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[2]</subfield>
+      <subfield code="m">A. N. Vaidya and R. de L. Rodrigues,</subfield>
+      <subfield code="r">hep-th/0203067</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[3]</subfield>
+      <subfield code="m">A. D. Alhaidari,</subfield>
+      <subfield code="s">J. Phys. A 34 (2001) 9827</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[3]</subfield>
+      <subfield code="s">J. Phys. A 35 (2002) 3143</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[4]</subfield>
+      <subfield code="m">See for example G. A. Natanzon,</subfield>
+      <subfield code="s">Teor. Mat. Fiz. 38 (1979) 146</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[4]</subfield>
+      <subfield code="m">L. E. Gendenshtein,</subfield>
+      <subfield code="s">JETP Lett. 38 (1983) 356</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[4]</subfield>
+      <subfield code="m">F. Cooper, J. N. Ginocchi, and A. Khare,</subfield>
+      <subfield code="s">Phys. Rev. D 36 (1987) 2438</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[4]</subfield>
+      <subfield code="m">R. Dutt, A. Khare, and U. P. Sukhatme,</subfield>
+      <subfield code="s">Am. J. Phys. 56 (1988) 163</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[4]</subfield>
+      <subfield code="s">Am. J. Phys. 59 (1991) 723</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[4]</subfield>
+      <subfield code="m">G. Lévai,</subfield>
+      <subfield code="s">J. Phys. A 22 (1989) 689</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[4]</subfield>
+      <subfield code="s">J. Phys. A 27 (1994) 3809</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[4]</subfield>
+      <subfield code="m">R. De, R. Dutt, and U. Sukhatme,</subfield>
+      <subfield code="s">J. Phys. A 25 (1992) L843</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[5]</subfield>
+      <subfield code="m">See for example M. F. Manning,</subfield>
+      <subfield code="s">Phys. Rev. 48 (1935) 161</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[5]</subfield>
+      <subfield code="m">A. Bhattacharjie and E. C. G. Sudarshan,</subfield>
+      <subfield code="s">Nuovo Cimento 25 (1962) 864</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[5]</subfield>
+      <subfield code="m">N. K. Pak and I. Sökmen,</subfield>
+      <subfield code="s">Phys. Lett. A 103 (1984) 298</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[5]</subfield>
+      <subfield code="m">H. G. Goldstein, Classical Mechanics (Addison-Wesley, Reading-MA 1986); R. Montemayer,</subfield>
+      <subfield code="s">Phys. Rev. A 36 (1987) 1562</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[5]</subfield>
+      <subfield code="m">G. Junker,</subfield>
+      <subfield code="s">J. Phys. A 23 (1990) L881</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[6]</subfield>
+      <subfield code="m">A. D. Alhaidari,</subfield>
+      <subfield code="s">Phys. Rev. A 65 (2002) 042109</subfield>
+   </datafield>
     <datafield tag="980" ind1=" " ind2=" ">
       <subfield code="a">PREPRINT</subfield>
     </datafield>
@@ -14229,6 +14555,186 @@
       <subfield code="s">n</subfield>
       <subfield code="w">200216</subfield>
     </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">1.</subfield>
+      <subfield code="m">T. Barnes, contribution at the COSY Workshop on Baryon Excitations (May 2000, Jülich, Germany),</subfield>
+      <subfield code="r">nucl-th/0009011</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">2.</subfield>
+      <subfield code="m">E.I. Ivanov et al.,</subfield>
+      <subfield code="s">Phys. Rev. Lett. 86 (2001) 3977</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">3.</subfield>
+      <subfield code="m">T.T. Takahashi, H. Matsufuru, Y. Nemoto and H. Suganuma,</subfield>
+      <subfield code="s">Phys. Rev. Lett. 86 (2001) 18</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">3.</subfield>
+      <subfield code="m">; ibid., Proc. of "Int. Symp. on Hadron and Nuclei" (February 2001, Seoul, Korea), published by Institute of Physics and Applied Phyics (2001), ed. Dr. T.K. Choi, p. 341; ibid., T. Umeda, Nucl. Phys. Proc. S. : 94 (2001) 554.</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">4.</subfield>
+      <subfield code="m">Yu. A. Simonov, these proceedings; D.S. Kuzmenko and Yu. A. Simonov,</subfield>
+      <subfield code="r">hep-ph/0202277</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">5.</subfield>
+      <subfield code="m">S. Capstick and N. Isgur,</subfield>
+      <subfield code="s">Phys. Rev. D 34 (1986) 2809</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">6.</subfield>
+      <subfield code="m">C. Alexandrou, Ph. de Forcrand and A. Tsapalis,</subfield>
+      <subfield code="s">Phys. Rev. D 65 (2002) 054503</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">7.</subfield>
+      <subfield code="m">C.E. Carlson and N.C. Mukhopadhyay,</subfield>
+      <subfield code="s">Phys. Rev. Lett. 67 (1991) 3745</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">8.</subfield>
+      <subfield code="m">C.-K. Chow, D. Pirjol and T.-M. Yan,</subfield>
+      <subfield code="s">Phys. Rev. D 59 (1999) 056002</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">9.</subfield>
+      <subfield code="m">T. Barnes, Ph. D. thesis, California Institute of Technology, 1977; T. Barnes and F.E. Close,</subfield>
+      <subfield code="s">Phys. Lett. B 123 (1983) 89</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">10.</subfield>
+      <subfield code="m">E. Golowich, E. Haqq and G. Karl,</subfield>
+      <subfield code="s">Phys. Rev. D 28 (1983) 160</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">11.</subfield>
+      <subfield code="m">C.E. Carlson, Proc. of the 7th Int. Conf. on the Structure of Baryons (October 1995, Santa Fe, NM), p. 461, eds. B. F. Gibson et al. (World Scientific, Singapore, 1996).</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">12.</subfield>
+      <subfield code="m">C.E. Carlson and T.H. Hansson,</subfield>
+      <subfield code="s">Phys. Lett. B 128 (1983) 95</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">13.</subfield>
+      <subfield code="m">I. Duck and E. Umland,</subfield>
+      <subfield code="s">Phys. Lett. B 128 (1983) 221</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">14.</subfield>
+      <subfield code="m">P.R. Page, Proc. of "The Physics of Excited Nucleons" (NSTAR2000) (February 2000, Newport News, VA).</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">15.</subfield>
+      <subfield code="m">J. Merlin and J. Paton,</subfield>
+      <subfield code="s">J. Phys. G 11 (1985) 439</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">16.</subfield>
+      <subfield code="m">K.J. Juge, J. Kuti and C.J. Morningstar, Nucl. Phys. Proc. S. : 63 (1998) 543.</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">17.</subfield>
+      <subfield code="m">E.S. Swanson and A.P. Szczepaniak,</subfield>
+      <subfield code="s">Phys. Rev. D 59 (1999) 014035</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">18.</subfield>
+      <subfield code="m">T.J. Allen, M.G. Olsson and S. Veseli,</subfield>
+      <subfield code="s">Phys. Lett. B 434 (1998) 110</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">19.</subfield>
+      <subfield code="m">S. Capstick and P.R. Page,</subfield>
+      <subfield code="s">Phys. Rev. D 60 (1999) 111501</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">20.</subfield>
+      <subfield code="m">L.S. Kisslinger et al.,</subfield>
+      <subfield code="s">Phys. Rev. D 51 (1995) 5986</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">20.</subfield>
+      <subfield code="s">Nucl. Phys. A 629 (1998) 30c</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">20.</subfield>
+      <subfield code="m">A.P. Martynenko,</subfield>
+      <subfield code="s">Sov. J. Nucl. Phys. 54 (1991) 488</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">21.</subfield>
+      <subfield code="m">S.M. Gerasyuta and V.I. Kochkin,</subfield>
+      <subfield code="r">hep-ph/0203104</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">22.</subfield>
+      <subfield code="m">T.D. Cohen and L.Ya. Glozman,</subfield>
+      <subfield code="s">Phys. Rev. D 65 (2002) 016006</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">23.</subfield>
+      <subfield code="m">E. Klempt, these proceedings.</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">24.</subfield>
+      <subfield code="m">A.M. Zaitsev (VES Collab.), Proc. of ICHEP’96 (Warsaw, 1996).</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">25.</subfield>
+      <subfield code="m">D.E. Groom et al. (Particle Data Group),</subfield>
+      <subfield code="s">Eur. Phys. J. C 15 (2000) 1</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">26.</subfield>
+      <subfield code="m">H. Li (BES Collab.),</subfield>
+      <subfield code="s">Nucl. Phys. A 675 (2000) 189c</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">26.</subfield>
+      <subfield code="m">B.-S. Zou et al.,</subfield>
+      <subfield code="r">hep-ph/9909204</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">27.</subfield>
+      <subfield code="m">L.S. Kisslinger and Z.-P. Li,</subfield>
+      <subfield code="s">Phys. Lett. B 445 (1999) 271</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">28.</subfield>
+      <subfield code="m">N. Isgur,</subfield>
+      <subfield code="s">Phys. Rev. D 60 (1999) 114016</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">29.</subfield>
+      <subfield code="m">Z.-P. Li et al.,</subfield>
+      <subfield code="s">Phys. Rev. D 44 (1991) 2841</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">29.</subfield>
+      <subfield code="s">Phys. Rev. D 46 (1992) 70</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">30.</subfield>
+      <subfield code="m">T. Barnes and F.E. Close,</subfield>
+      <subfield code="s">Phys. Lett. B 128 (1983) 277</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">31.</subfield>
+      <subfield code="m">O. Kittel and G.F. Farrar,</subfield>
+      <subfield code="r">hep-ph/0010186</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">32.</subfield>
+      <subfield code="m">P.R. Page, Proc. of "3rd Int. Conf. on Quark Confinement and Hadron Spectrum" (Confinement III), (June 1998, Newport News, VA).</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">33.</subfield>
+      <subfield code="m">K.J. Juge, J. Kuti and C.J. Morningstar, Nucl. Phys. Proc. S. : 63 (1998) 326.</subfield>
+   </datafield>
     <datafield tag="980" ind1=" " ind2=" ">
       <subfield code="a">PREPRINT</subfield>
     </datafield>
@@ -22149,6 +22655,159 @@
     <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/9809057.pdf</subfield>
     </datafield>
+    <!--added using refextract-->
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[1]</subfield>
+      <subfield code="m">K. Wilson</subfield>
+      <subfield code="s">Phys. Rev. D 10 (1974) 2445</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[2]</subfield>
+      <subfield code="m">A. Polyakov</subfield>
+      <subfield code="s">Phys. Lett. B 59 (1975) 82</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[3]</subfield>
+      <subfield code="m">A.Polyakov</subfield>
+      <subfield code="s">Nucl. Phys. B 120 (1977) 429</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[4]</subfield>
+      <subfield code="m">S. Mandelstam</subfield>
+      <subfield code="s">Phys. Rep., C 23 (1976) 245</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[5]</subfield>
+      <subfield code="m">G. t’Hooft in High Energy Phys., Zichichi editor, Bolognia (1976)</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[6]</subfield>
+      <subfield code="m">A. Polyakov</subfield>
+      <subfield code="r">hep-th/9711002</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[7]</subfield>
+      <subfield code="m">I. Klebanov</subfield>
+      <subfield code="s">Nucl. Phys. B 496 (1997) 231</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[8]</subfield>
+      <subfield code="m">J. Maldacena</subfield>
+      <subfield code="r">hep-th/9711200</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[9]</subfield>
+      <subfield code="m">S. Gubser I. Klebanov A. Polyakov</subfield>
+      <subfield code="r">hep-th/9802109</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[10]</subfield>
+      <subfield code="m">E. Witten</subfield>
+      <subfield code="r">hep-th/9802150</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[11]</subfield>
+      <subfield code="m">L. Brink P. di Vecchia P. Howe</subfield>
+      <subfield code="s">Phys. Lett. B 63 (1976) 471</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[12]</subfield>
+      <subfield code="m">S. Deser B. Zumino</subfield>
+      <subfield code="s">Phys. Lett. B 65 (1976) 369</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[13]</subfield>
+      <subfield code="m">A. Polyakov</subfield>
+      <subfield code="s">Phys. Lett. B 103 (1981) 207</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[14]</subfield>
+      <subfield code="m">T. Curtright C. Thorn</subfield>
+      <subfield code="s">Phys. Rev. Lett. 48 (1982) 1309</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[15]</subfield>
+      <subfield code="m">J. Gervais A. Neveu</subfield>
+      <subfield code="s">Nucl. Phys. B 199 (1982) 59</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[16]</subfield>
+      <subfield code="m">J. Polchinski</subfield>
+      <subfield code="s">Nucl. Phys. B 346 (1990) 253</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[17]</subfield>
+      <subfield code="m">C. Callan E. Martinec M. Perry D. Friedan</subfield>
+      <subfield code="s">Nucl. Phys. B 262 (1985) 593</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[18]</subfield>
+      <subfield code="m">A. Polyakov Proceedings of Les Houches (1992)</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[19]</subfield>
+      <subfield code="m">A. Polyakov</subfield>
+      <subfield code="s">Nucl. Phys. B 164 (1980) 171</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[20]</subfield>
+      <subfield code="m">Y. Makeenko A. Migdal</subfield>
+      <subfield code="s">Nucl. Phys. B 188 (1981) 269</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[21]</subfield>
+      <subfield code="m">H. Verlinde</subfield>
+      <subfield code="r">hep-th/9705029</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[22]</subfield>
+      <subfield code="m">A. Migdal</subfield>
+      <subfield code="s">Nucl. Phys. B, Proc. Suppl. 41 (1995) 51</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[23]</subfield>
+      <subfield code="m">J. Maldacena</subfield>
+      <subfield code="r">hep-th/9803002</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[24]</subfield>
+      <subfield code="m">G. Horowitz A. Strominger</subfield>
+      <subfield code="s">Nucl. Phys. B 360 (1991) 197</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[25]</subfield>
+      <subfield code="m">A. Lukas B. Ovrut D. Waldram</subfield>
+      <subfield code="r">hep-th/9802041</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[26]</subfield>
+      <subfield code="m">K. Wilson</subfield>
+      <subfield code="s">Phys. Rev. 179 (1969) 1499</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[27]</subfield>
+      <subfield code="m">A. Polyakov</subfield>
+      <subfield code="s">Zh. Eksp. Teor. Fiz. 59 (1970) 542</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[27]</subfield>
+      <subfield code="s">Pis'ma Zh. Eksp. Teor. Fiz. 12 (1970) 538</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[28]</subfield>
+      <subfield code="m">A. Peet J. Polchinski</subfield>
+      <subfield code="r">hep-th/9809022</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[29]</subfield>
+      <subfield code="m">E. Fradkin A. Tseytlin</subfield>
+      <subfield code="s">Phys. Lett. B 178 (1986) 34</subfield>
+   </datafield>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">[30]</subfield>
+      <subfield code="m">S. Gubser I. Klebanov</subfield>
+      <subfield code="r">hep-th/9708005</subfield>
+   </datafield>
   </record>
   <!--added the following record to get an example of finding a reference-->
   <!--by 999C5s to 909C4-->

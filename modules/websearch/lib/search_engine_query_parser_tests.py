@@ -574,6 +574,24 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = "find coden aphys"
         self._compare_searches(inv_search, spi_search)
 
+    def test_job_title(self):
+        """SPIRES search syntax - find job engineer not position programmer"""
+        inv_search = 'title:engineer not title:programmer'
+        spi_search = 'find job engineer not position programmer'
+        self._compare_searches(inv_search, spi_search)
+
+    def test_job_rank(self):
+        """SPIRES search syntax - find rank Postdoc"""
+        inv_search = 'rank:Postdoc'
+        spi_search = 'find rank Postdoc'
+        self._compare_searches(inv_search, spi_search)
+
+    def test_job_region(self):
+        """SPIRES search syntax - find region EU not continent Europe"""
+        inv_search = 'region:EU not region:Europe'
+        spi_search = 'find region EU not continent Europe'
+        self._compare_searches(inv_search, spi_search)
+
     def test_fin_to_find_trans(self):
         """SPIRES search syntax - fin a ellis, j == find a ellis, j"""
         fin_search = "fin a ellis, j"

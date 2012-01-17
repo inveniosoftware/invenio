@@ -36,7 +36,9 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_VERSION, \
      CFG_WEBSTYLE_INSPECT_TEMPLATES, \
-     CFG_WEBSTYLE_TEMPLATE_SKIN
+     CFG_WEBSTYLE_TEMPLATE_SKIN, \
+     CFG_INSPIRE_SITE
+
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
 from invenio.messages import gettext_set_language, language_list_long, is_language_rtl
 from invenio.urlutils import make_canonical_urlargd, create_html_link
@@ -833,6 +835,16 @@ URI: http://%(host)s%(page)s
         # load the right message language
         _ = gettext_set_language(ln)
 
+        similar = ""
+
+        if show_similar_rec_p and not CFG_INSPIRE_SITE:
+            similar = create_html_link(
+                websearch_templates.build_search_url(p='recid:%d' % \
+                                                     recid,
+                                                     rm='wrd',
+                                                     ln=ln),
+                {}, _("Similar records"),{'class': "moreinfo"})
+
         out = """
             <div class="bottom-left-folded">%(dates)s</div>
             <div class="bottom-right-folded" style="text-align:right" style="padding-bottom:2px;">
@@ -841,14 +853,8 @@ URI: http://%(host)s%(page)s
       </div>
     </div>
     <br/>
-    """ % {'similar':create_html_link(
-                websearch_templates.build_search_url(p='recid:%d' % \
-                                                     recid,
-                                                     rm='wrd',
-                                                     ln=ln),
-                {}, _("Similar records"),
-                {'class': "moreinfo"}),
-           'dates':creationdate and '<div class="recordlastmodifiedbox" style="float:left;position:relative;margin-left:1px">&nbsp;%(dates)s</div>' % {
+    """ % {'similar' : similar,
+           'dates' : creationdate and '<div class="recordlastmodifiedbox" style="position:relative;margin-left:1px">&nbsp;%(dates)s</div>' % {
                 'dates': _("Record created %(x_date_creation)s, last modified %(x_date_modification)s") % \
                 {'x_date_creation': creationdate,
                  'x_date_modification': modificationdate},

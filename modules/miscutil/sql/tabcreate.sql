@@ -1,5 +1,5 @@
 -- This file is part of Invenio.
--- Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+-- Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 --
 -- Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -3019,6 +3019,7 @@ CREATE TABLE IF NOT EXISTS user_query_basket (
   date_creation date default NULL,
   date_lastrun date default '0000-00-00',
   alert_name varchar(30) NOT NULL default '',
+  alert_desc text default NULL,
   notification char(1) NOT NULL default 'y',
   PRIMARY KEY  (id_user,id_query,frequency,id_basket),
   KEY alert_name (alert_name)

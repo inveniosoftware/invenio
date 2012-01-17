@@ -39,32 +39,21 @@ bibcatalog.py consist of ticket operations, as follows.
     * ticket_get_attribute(uid, ticketid, attrname) returns the value of an attribute.
     * ticket_get_info(uid, ticketid, attrlist) return ticket information as a dictionary.
 
-2. Using the API
+2. Configuring your access to RT
 
-from invenio.bibcatalog import *
-import sys
-uid = 1 #or whatever..
-x = bibcatalog_system.check_system(uid)
-if len(x) > 0:
-    print "errors: "+str(x)
-    sys.exit()
-else:
-    print "ok"
-
-3. Configuring your access to RT
+To use the BibCatalog module you first need to set up the ticket system you want to use (currently only RT).
 
 Edit these lines in invenio.conf:
 
 CFG_BIBCATALOG_SYSTEM = RT
 CFG_BIBCATALOG_SYSTEM_RT_CLI = /usr/bin/rt
 CFG_BIBCATALOG_SYSTEM_RT_URL = http://xxx.server.org/rt3
-CFG_BIBCATALOG_QUEUES = General
 
 Your RT installation does not need to be in the same computer where
 your Invenio installation is. However, you will need the CLI (/usr/bin/rt)
 Perl program.
 
-4. Configuring RT
+3. Configuring RT
 
 RT version 3 has been tested with this installation.
 
@@ -81,5 +70,20 @@ CommentOnTicket
 CreateTicket
 ModifyTicket
 ReplyToTicket
+
+4. Using the API
+
+
+from invenio.bibcatalog import bibcatalog_system
+
+if bibcatalog_system is not None:
+	uid = 1 #or whatever..
+	x = bibcatalog_system.check_system(uid)
+	if len(x) > 0:
+	    print "errors: "+str(x)
+	    sys.exit()
+	else:
+	    print "ok"
+
 
 </pre>

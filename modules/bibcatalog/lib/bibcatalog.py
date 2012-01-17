@@ -20,15 +20,14 @@
 """
 Provide a "ticket" interface with a request tracker.
 See: https://twiki.cern.ch/twiki/bin/view/Inspire/SystemDesignBibCatalogue
-This creates an instance of the class that has been configured for this installation.
+This creates an instance of the class that has been configured for this installation,
+or returns None if no ticket system is configured.
 """
-
-from invenio.bibcatalog_system import BibCatalogSystem
-from invenio.bibcatalog_system_rt import BibCatalogSystemRT
-
-bibcatalog_system = BibCatalogSystem()
 from invenio.config import CFG_BIBCATALOG_SYSTEM
+
+bibcatalog_system = None
 if CFG_BIBCATALOG_SYSTEM == 'RT':
+    from invenio.bibcatalog_system_rt import BibCatalogSystemRT
     bibcatalog_system = BibCatalogSystemRT()
 
 

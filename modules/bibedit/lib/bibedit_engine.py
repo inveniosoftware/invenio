@@ -72,14 +72,15 @@ from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_modify_controlfield, record_get_field_values, \
     record_get_subfields
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
-    CFG_SITE_URL, CFG_SITE_RECORD
+    CFG_SITE_URL, CFG_SITE_RECORD, CFG_BIBEDIT_KB_SUBJECTS, \
+    CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS
 from invenio.search_engine import record_exists, search_pattern
 from invenio.webuser import session_param_get, session_param_set
 from invenio.bibcatalog import bibcatalog_system
 from invenio.webpage import page
 from invenio.htmlutils import get_mathjax_header
 from invenio.bibknowledge import get_kbd_values_for_bibedit, get_kbr_values, \
-     get_kbt_items_for_bibedit #autosuggest
+     get_kbt_items_for_bibedit, kb_exists
 
 from invenio.bibcirculation_dblayer import get_number_copies, has_copies
 from invenio.bibcirculation_utils import create_item_details_url
@@ -208,7 +209,9 @@ def perform_request_init(uid, ln, req, lastupdated):
             'gRESULT_CODES': CFG_BIBEDIT_AJAX_RESULT_CODES,
             'gAUTOSUGGEST_TAGS' : CFG_BIBEDIT_AUTOSUGGEST_TAGS,
             'gAUTOCOMPLETE_TAGS' : CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS.keys(),
-            'gKEYWORD_TAG' : '"' + CFG_BIBEDIT_KEYWORD_TAG  + '"'
+            'gKEYWORD_TAG' : '"' + CFG_BIBEDIT_KEYWORD_TAG  + '"',
+            'gAVAILABLE_KBS': get_available_kbs(),
+            'gTagsToAutocomplete': CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS
             }
 
     fieldTemplates = get_available_fields_templates()
@@ -231,6 +234,15 @@ def perform_request_init(uid, ln, req, lastupdated):
     body += '    <div id="bibEditContent"></div>\n'
 
     return body, errors, warnings
+
+def get_available_kbs():
+    """
+    Return list of KBs that are available in the system to be used with
+    BibEdit
+    """
+    kb_list = [CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_KB_SUBJECTS]
+    available_kbs = [kb for kb in kb_list if kb_exists(kb)]
+    return available_kbs
 
 def get_xml_comparison(header1, header2, xml1, xml2):
     """
@@ -283,14 +295,17 @@ def perform_request_newticket(recid, uid):
     @return: (error_msg, url)
 
     """
-    t_id = bibcatalog_system.ticket_submit(uid, "", recid, "")
     t_url = ""
     errmsg = ""
-    if t_id:
-        #get the ticket's URL
-        t_url = bibcatalog_system.ticket_get_attribute(uid, t_id, 'url_modify')
+    if bibcatalog_system is not None:
+        t_id = bibcatalog_system.ticket_submit(uid, "", recid, "")
+        if t_id:
+            #get the ticket's URL
+            t_url = bibcatalog_system.ticket_get_attribute(uid, t_id, 'url_modify')
+        else:
+            errmsg = "ticket_submit failed"
     else:
-        errmsg = "ticket_submit failed"
+        errmsg = "No ticket system configured"
     return (errmsg, t_url)
 
 
@@ -619,6 +634,9 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             except KeyError:
                 tagformat = CFG_BIBEDIT_TAG_FORMAT
             response['tagFormat'] = tagformat
+            # KB information
+            response['KBSubject'] = CFG_BIBEDIT_KB_SUBJECTS
+            response['KBInstitution'] = CFG_BIBEDIT_KB_INSTITUTIONS
 
     elif request_type == 'submit':
         # Submit the record. Possible error situations:
@@ -1121,14 +1139,15 @@ def perform_request_bibcatalog(request_type, recid, uid):
 
     if request_type == 'getTickets':
         # Insert the ticket data in the response, if possible
-        if uid:
+        if bibcatalog_system is None:
+            response['tickets'] = "<!--No ticket system configured-->"
+        elif bibcatalog_system and uid:
             bibcat_resp = bibcatalog_system.check_system(uid)
             if bibcat_resp == "":
                 tickets_found = bibcatalog_system.ticket_search(uid, \
                     status=['new', 'open'], recordid=recid)
                 t_url_str = '' #put ticket urls here, formatted for HTML display
                 for t_id in tickets_found:
-
                     #t_url = bibcatalog_system.ticket_get_attribute(uid, \
                     #    t_id, 'url_display')
                     ticket_info = bibcatalog_system.ticket_get_info( \
@@ -1149,7 +1168,6 @@ def perform_request_bibcatalog(request_type, recid, uid):
                 #put something in the tickets container, for debug
                 response['tickets'] = "<!--"+bibcat_resp+"-->"
         response['resultCode'] = 31
-
     return response
 
 def perform_request_preview_record(request_type, recid, uid):

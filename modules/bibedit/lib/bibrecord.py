@@ -1318,7 +1318,7 @@ def _create_record_rxp(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
         subfields = []
         for subfield in _get_children_by_tag_name_rxp(datafield, 'subfield'):
             if subfield[CHILDREN]:
-                value = ''.join([n for n in subfield[CHILDREN]])
+                value = _get_children_as_string_rxp(subfield[CHILDREN])
                 subfields.append((subfield[ATTRS].get('code', '!'), value))
             elif keep_singletons:
                 subfields.append((subfield[ATTRS].get('code', '!'), ''))
@@ -1374,8 +1374,7 @@ def _create_record_from_document(document,
         subfields = []
 
         for subfield in _get_children_by_tag_name(datafield, "subfield"):
-            text_nodes = subfield.childNodes
-            value = ''.join([n.data for n in text_nodes]).encode("utf-8")
+            value = _get_children_as_string(subfield.childNodes).encode("utf-8")
             if value or keep_singletons:
                 code = subfield.getAttributeNS(None, 'code').encode("utf-8")
                 subfields.append((code or '!', value))
@@ -1443,6 +1442,36 @@ def _get_children_by_tag_name_rxp(node, name):
         return [child for child in node[CHILDREN] if child[TAG] == name]
     except TypeError:
         return []
+
+def _get_children_as_string(node):
+    """
+    Iterates through all the children of a node and returns one string
+    containing the values from all the text-nodes recursively.
+    """
+    out = []
+    if node:
+        for child in node:
+            if child.nodeType == child.TEXT_NODE:
+                out.append(child.data)
+            else:
+                out.append(_get_children_as_string(child.childNodes))
+    return ''.join(out)
+
+def _get_children_as_string_rxp(node):
+    """
+    RXP version of _get_children_as_string():
+
+    Iterates through all the children of a node and returns one string
+    containing the values from all the text-nodes recursively.
+    """
+    out = []
+    if node:
+        for child in node:
+            if type(child) is str:
+                out.append(child)
+            else:
+                out.append(_get_children_as_string_rxp(child[CHILDREN]))
+    return ''.join(out)
 
 def _wash_indicators(*indicators):
     """

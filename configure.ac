@@ -677,6 +677,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibmatch/bin/bibmatch \
      modules/bibmatch/doc/Makefile \
      modules/bibmatch/doc/admin/Makefile \
+     modules/bibmatch/doc/hacking/Makefile \
      modules/bibmatch/etc/Makefile \
      modules/bibmatch/lib/Makefile \
      modules/bibmerge/Makefile \

@@ -162,7 +162,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBCIRCULATION_ITEM_STATUS_OPTIONAL',
                        'CFG_PLOTEXTRACTOR_DISALLOWED_TEX',
                        'CFG_OAI_FRIENDS',
-                       'CFG_WEBSTYLE_REVERSE_PROXY_IPS']:
+                       'CFG_WEBSTYLE_REVERSE_PROXY_IPS',
+                       'CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS']:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:
@@ -193,8 +194,13 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_NEW_RA',
                        'CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH',
                        'CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N',
-                       'CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT']:
+                       'CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT',
+                       'CFG_BIBMATCH_FUZZY_MATCH_VALIDATION_LIMIT']:
         option_value = float(option_value[1:-1])
+
+    ## 3h) special cases: bibmatch validation list
+    if option_name in ['CFG_BIBMATCH_MATCH_VALIDATION_RULESETS']:
+        option_value = option_value[1:-1]
 
     ## 4) finally, return output line:
     return '%s = %s' % (option_name, option_value)

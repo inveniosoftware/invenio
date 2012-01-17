@@ -26,6 +26,7 @@ __revision__ = "$Id$"
 import sys
 import re
 import textwrap
+import htmlentitydefs
 import invenio.template
 from invenio.config import CFG_ETCDIR
 try:
@@ -33,6 +34,12 @@ try:
     CHARDET_AVAILABLE = True
 except ImportError:
     CHARDET_AVAILABLE = False
+
+try:
+    from unidecode import unidecode
+    UNIDECODE_AVAILABLE = True
+except ImportError:
+    UNIDECODE_AVAILABLE = False
 
 CFG_LATEX_UNICODE_TRANSLATION_CONST = {}
 
@@ -399,8 +406,8 @@ def decode_to_unicode(text, failover_encoding='utf-8'):
     the type of encoding used in the given text. This is useful when input encoding
     is unknown.
 
-    For optimal results, it is recommended that the chardet module is installed.
-    NOTE: Beware that this might be slow for large strings.
+    For optimal result, it is recommended that the 'chardet' module is installed.
+    NOTE: Beware that this might be slow for *very* large strings.
 
     If chardet detection fails, it will try to decode the string using the basic
     detection function guess_minimum_encoding(). Should that fail, it will decode
@@ -420,6 +427,8 @@ def decode_to_unicode(text, failover_encoding='utf-8'):
     @return: input text as Unicode
     @rtype: string
     """
+    if not text:
+        return ""
     detected_encoding = None
     if CHARDET_AVAILABLE:
         # We can use chardet to perform detection
@@ -427,7 +436,7 @@ def decode_to_unicode(text, failover_encoding='utf-8'):
         if res['confidence'] >= 0.8:
             detected_encoding = res['encoding']
     if detected_encoding == None:
-        # chardet unsuccessful, then try to make a basic guess
+        # No chardet detection, try to make a basic guess
         dummy, detected_encoding = guess_minimum_encoding(text)
     try:
         return text.decode(detected_encoding)
@@ -505,3 +514,67 @@ def _load_latex2unicode_constants(kb_file="%s/bibconvert/KB/latex-to-unicode.kb"
     data.close()
     CFG_LATEX_UNICODE_TRANSLATION_CONST['regexp_obj'] = re.compile("|".join(latex_symbols))
     CFG_LATEX_UNICODE_TRANSLATION_CONST['table'] = translation_table
+
+def translate_to_ascii(values):
+    """
+    Transliterate the string contents of the given sequence into ascii representation.
+    Returns a sequence with the modified values if the module 'unidecode' is
+    available. Otherwise it will return the same sequence untouched.
+
+    For example: H\xc3\xb6hne becomes Hohne.
+
+    Note: Passed strings are returned as a list.
+
+    @param values: sequence of strings to transform
+    @type values: sequence
+
+    @return: sequence with values transformed to ascii
+    @rtype: sequence
+    """
+    if not UNIDECODE_AVAILABLE or not values:
+        return values
+    if type(values) == str:
+        values = [values]
+    for index, value in enumerate(values):
+        if not value:
+            continue
+        encoded_text, encoding = guess_minimum_encoding(value)
+        unicode_text = unicode(encoded_text.decode(encoding))
+        ascii_text = unidecode(unicode_text).encode('ascii')
+        values[index] = ascii_text
+    return values
+
+def xml_entities_to_utf8(text, skip=('lt', 'gt', 'amp')):
+    """
+    Removes HTML or XML character references and entities from a text string
+    and replaces them with their UTF-8 representation, if possible.
+
+    @param text: The HTML (or XML) source text.
+    @type text: string
+
+    @param skip: list of entity names to skip when transforming.
+    @type skip: iterable
+
+    @return: The plain text, as a Unicode string, if necessary.
+    @author: Based on http://effbot.org/zone/re-sub.htm#unescape-html
+    """
+    def fixup(m):
+        text = m.group(0)
+        if text[:2] == "&#":
+            # character reference
+            try:
+                if text[:3] == "&#x":
+                    return unichr(int(text[3:-1], 16)).encode("utf-8")
+                else:
+                    return unichr(int(text[2:-1])).encode("utf-8")
+            except ValueError:
+                pass
+        else:
+            # named entity
+            if text[1:-1] not in skip:
+                try:
+                    text = unichr(htmlentitydefs.name2codepoint[text[1:-1]]).encode("utf-8")
+                except KeyError:
+                    pass
+        return text # leave as is
+    return re.sub("&#?\w+;", fixup, text)

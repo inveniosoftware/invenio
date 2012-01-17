@@ -582,6 +582,14 @@ class SpiresToInvenioSyntaxConverter:
         'coden' : 'journal:',
         'journal-coden' : 'journal:',
 
+        # jobs specific codes
+        'job' : 'title:',
+        'position' : 'title:',
+        'region' : 'region:',
+        'continent' : 'region:',
+        'deadline' : '046__a:',
+        'rank' : 'rank:',
+
         # replace all the keywords without match with empty string
         # this will remove the noise from the unknown keywrds in the search
         # and will in all fields for the words following the keywords

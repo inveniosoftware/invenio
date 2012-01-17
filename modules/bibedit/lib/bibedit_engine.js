@@ -162,8 +162,10 @@ var gBibCircUrl = null;
 
 var gDisplayBibCircPanel = false;
 
-//Tags to be autocompleted
-var gTagsToAutocomplete = ['100_u', '700_u', '701_u','502_c'];
+//KB related variables
+var gKBSubject = null;
+var gKBInstitution = null;
+
 
 /*
  * **************************** 2. Initialization ******************************
@@ -297,7 +299,8 @@ function initJeditable(){
     cell_id_split[0] = 'subfieldTag';
     var subfield_id = cell_id_split.join('_');
     /* Add autocomplete handler to fields in gTagsToAutocomplete */
-    if ($.inArray(cell_id_split[1] + '_' + $(original).siblings('#' + subfield_id).text(), gTagsToAutocomplete) != -1) {
+    var fieldInfo = $(original).parents("tr").siblings().eq(0).children().eq(1).html()
+    if ($.inArray(fieldInfo + $(original).siblings('#' + subfield_id).text(), gTagsToAutocomplete) != -1) {
         addHandler_autocompleteAffiliations(textarea);
     }
     return(textarea);
@@ -447,15 +450,16 @@ function onAjaxSuccess(json, onSuccess){
     $('#btnSubmit').css('background-color', 'lightgreen');
   }
       }
-      if (onSuccess)
-  // No critical errors; call onSuccess function.
-  onSuccess(json);
+      if (onSuccess) {
+          // No critical errors; call onSuccess function.
+          onSuccess(json);
+      }
     }
   }
 }
 
 function resetBibeditState(){
-  /** A function clearing the state of the bibEdit (all the panels content)
+  /* A function clearing the state of the bibEdit (all the panels content)
   */
   gHoldingPenLoadedChanges = {};
   gHoldingPenChanges = [];
@@ -1178,6 +1182,10 @@ function onGetRecordSuccess(json){
   gBibCircUrl = json['bibCirculationUrl'];
   gDisplayBibCircPanel = json['canRecordHavePhysicalCopies'];
 
+  // Get KB information
+  gKBSubject = json['KBSubject'];
+  gKBInstitution = json['KBInstitution'];
+
   var revDt = formatDateTime(getRevisionDate(gRecRev));
   var recordRevInfo = "record revision: " + revDt;
   var revAuthorString = gRecRevAuthor;
@@ -1463,10 +1471,13 @@ function addHandler_autocompleteAffiliations(tg) {
     /*
      * Add autocomplete handler to a given cell
      */
+    /* If gKBInstitution is not defined in the system, do nothing */
+    if ($.inArray(gKBInstitution,gAVAILABLE_KBS) == -1)
+        return
     $(tg).autocomplete({
     source: function( request, response ) {
                 $.getJSON("/kb/export",
-                { kbname: 'InstitutionsCollection', format: 'jquery', term: request.term},
+                { kbname: gKBInstitution, format: 'jquery', term: request.term},
                 response);
     },
     search: function() {
@@ -1640,11 +1651,16 @@ function onSubfieldBoxClick(box){
 }
 
 function addFieldGatherInformations(fieldTmpNo){
-  /** Gathering the information about a current form
-      returns [template_num, data]
-      This funcion saves the state of a form -> saving the template name and values only would
-      not be enough. we want to know what has been modified in last-chosen template !
-      data is in the same format as teh templates data.
+  /**
+   * Purpose: Gather the information about a current form
+   * Called when adding x similar fields
+   *
+   * Input(s): int:fieldTmpNo - temporary number to identify the field being
+   * added
+   *
+   * Returns: [template_num, data]
+   * where data is in the same format as the templates data.
+   *
   */
   var templateNum = $('#selectAddFieldTemplate_' + fieldTmpNo).attr("value");
   var tag = $("#txtAddFieldTag_" + fieldTmpNo).attr("value");
@@ -1983,7 +1999,16 @@ function onAddFieldChange(event){
             var fieldTagID = ('#' + $(this).attr('id').replace('SubfieldCode', 'Tag')).split('_');
             fieldTagID.pop();
             fieldTagID = fieldTagID.join('_');
-            if ($.inArray($(this).parent().prev().prev().children(fieldTagID)[0].value + '_' + this.value, gTagsToAutocomplete) != -1) {
+            var fieldTag = $(this).parent().prev().prev().children().eq(0).val(),
+                fieldInd1 = $(this).parent().prev().prev().children().eq(1).val(),
+                fieldInd2 = $(this).parent().prev().prev().children().eq(2).val();
+            if (fieldInd1 == '') {
+                fieldInd1 = '_';
+            }
+            if (fieldInd2 == '') {
+                fieldInd2 = '_';
+            }
+            if ($.inArray(fieldTag +  fieldInd1 + fieldInd2 + this.value, gTagsToAutocomplete) != -1) {
                 addHandler_autocompleteAffiliations($(this).parent().next().children('input'));
             }
 	    $(this).parent().next().children('input').focus();
@@ -2107,6 +2132,26 @@ function addFieldSave(fieldTmpNo)
     }
   }
 
+  /* Loop through all subfields to look for new subfields in the format
+   * $$aContent$$bMore content and split them accordingly */
+  var subfieldsExtended = [];
+  for (var i=0; i<subfields.length;i++) {
+      if (valueContainsSubfields(subfields[i][1])) {
+          var subfieldsToAdd = new Array(), subfieldCode = subfields[i][0];
+          splitContentSubfields(subfields[i][1], subfieldCode, subfieldsToAdd);
+          subfieldsExtended.push.apply(subfieldsExtended,subfieldsToAdd);
+      }
+      else{
+          subfieldsExtended.push(subfields[i]);
+      }
+  }
+  if (typeof subfieldsExtended[0] != 'undefined') {
+      /* We have split some subfields */
+      for (var i=0;i<subfieldsExtended.length;i++) {
+          subfields[i] = subfieldsExtended[i];
+      }
+  }
+
   // adding an undo handler
   var undoHandler = prepareUndoHandlerAddField(tag,
                                                ind1,
@@ -2218,7 +2263,8 @@ function onAddSubfieldsChange(event){
       }
       if (event.keyCode != 9 && event.keyCode != 16){
         /* If we are creating a new field present in gTagsToAutocomplete, add autocomplete handler */
-        if ($.inArray($(this).attr('id').split('_')[1] + '_' + this.value, gTagsToAutocomplete) != -1) {
+        var fieldInfo = $(this).parents("tr").siblings().eq(0).children().eq(1).html();
+        if ($.inArray(fieldInfo + this.value, gTagsToAutocomplete) != -1) {
           addHandler_autocompleteAffiliations($(this).parent().next().children('input'));
         }
         $(this).parent().next().children('input').focus();
@@ -2270,8 +2316,27 @@ function onAddSubfieldsSave(event, tag, fieldPosition){
     return;
   }
 
-  if (!(subfields.length === 0)){
-     // creating the undo/redo handler
+  if (!subfields.length == 0){
+    /* Loop through all subfields to look for new subfields in the format
+     * $$aContent$$bMore content and split them accordingly */
+    var subfieldsExtended = [];
+    for (var i=0; i<subfields.length;i++) {
+       if (valueContainsSubfields(subfields[i][1])) {
+           var subfieldsToAdd = new Array(), subfieldCode = subfields[i][0];
+           splitContentSubfields(subfields[i][1], subfieldCode, subfieldsToAdd);
+           subfieldsExtended.push.apply(subfieldsExtended,subfieldsToAdd);
+       }
+       else{
+           subfieldsExtended.push(subfields[i]);
+       }
+    } 
+    if (typeof subfieldsExtended[0] != 'undefined') {
+        /* We have split some subfields */
+        for (var i=0;i<subfieldsExtended.length;i++) {
+            subfields[i] = subfieldsExtended[i];
+        }
+    }
+    // creating the undo/redo handler
     var urHandler = prepareUndoHandlerAddSubfields(tag, fieldPosition, subfields);
     addUndoOperation(urHandler);
     // Create Ajax request
@@ -2455,6 +2520,85 @@ function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode,
   createReq(data, function(json){
     updateStatus('report', gRESULT_CODES[json['resultCode']]);
   }, false);
+}
+
+function getBulkUpdateSubfieldContentRequestData(tag, fieldPosition,
+                                                 subfieldIndex, subfieldCode,
+                                                 value, consumedChange,
+                                                 undoDescriptor, subfieldsToAdd) {
+    /*
+     *Purpose: prepare data to be included in the request for a bulk update
+     *         of the subfield content
+     *
+     *Return: object: Array of changes to be applied
+     *
+     */
+    var changesAdd = [];
+
+    var data = getUpdateSubfieldValueRequestData(tag,
+                                                 fieldPosition,
+                                                 subfieldIndex,
+                                                 subfieldCode,
+                                                 value,
+                                                 consumedChange,
+                                                 null,
+                                                 false);
+    changesAdd.push(data);
+
+    data = {
+      recID: gRecID,
+      requestType: 'addSubfields',
+      tag: tag,
+      fieldPosition: fieldPosition,
+      subfields: subfieldsToAdd.slice(1)
+    };
+    changesAdd.push(data);
+
+    return changesAdd
+}
+
+function bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, subfieldCode,
+                            value, consumedChange, undoDescriptor, subfieldsToAdd) {
+    /*
+     *Purpose: perform request for a bulk update as the user introduced in the content
+     *         field multiple subfields to be added in the form $$aTest$$bAnother
+     *
+     *Input(s): string:tag - Field tag to be updated
+     *          int:fieldPosition - position of the field with regard to the rest
+     *                              of fields with the same tag
+     *          int:subfieldIndex - position of the subfield with regard to the
+     *                              other subfields in that field instance
+     *          string:subfieldCode - Code of the subfield that is being modified
+     *          string:value - old value present in the subfield
+     *          consumedChange - undefined behaviour
+     *          object:undoDescriptor - undo operations relative to the update
+     *                                  action
+     *          object:subfieldsToAdd - array containing subfields to add)
+     *
+     */
+    updateStatus('updating');
+    if (consumedChange == undefined || consumedChange == null){
+        consumedChange = -1;
+    }
+
+    var data = getBulkUpdateSubfieldContentRequestData(tag,
+                                               fieldPosition,
+                                               subfieldIndex,
+                                               subfieldCode,
+                                               value,
+                                               consumedChange,
+                                               undoDescriptor,
+                                               subfieldsToAdd);
+    var optArgs = {
+      undoRedo: undoDescriptor
+    };
+    createBulkReq(data, function(json){
+      updateStatus('report', gRESULT_CODES[json['resultCode']])}, optArgs);
+
+    redrawFields(tag);
+    reColorFields();
+
+
 }
 
 function updateFieldTag(oldTag, newTag, oldInd1, oldInd2, ind1, ind2, fieldPosition,
@@ -2678,10 +2822,13 @@ function check_subjects_KB(value) {
     /*
      * Query Subjects KB to look for a match
      */
+    /* If KB is not defined in the system, just return value*/
+    if ($.inArray(gKBSubject,gAVAILABLE_KBS) == -1)
+        return value
     var response='';
     $.ajaxSetup({async:false});
     $.getJSON("/kb/export",
-             { kbname: 'Subjects', format: 'json', searchkey: value},
+             { kbname: gKBSubject, format: 'json', searchkey: value},
              function(data) {if (data[0]) {response = data[0].label;}}
              );
     $.ajaxSetup({async:true});
@@ -2691,139 +2838,212 @@ function check_subjects_KB(value) {
     return value;
 }
 
+/* ---- Helper functions for adding subfields into the subfield content ---- */
+
+function valueContainsSubfields(value) {
+    /*
+     * Purpose: Check if value has subfields inside. E.g. test$$xAnother test
+     *
+     * Input(s): string:value - value introduced into the subfield
+     *
+     * Returns: boolean - true (subfields inside), false (no subfields)
+     */
+    var regExp = new RegExp(".*\\$\\$[0-9a-zA-Z].*");
+    return regExp.test(value);
+}
+
+function splitContentSubfields(value, subfieldCode, subfieldsToAdd) {
+    /*
+     * Purpose: split content into pairs subfield index - subfield value
+     *
+     * Input(s): string:value - value introduced into the subfield
+     *           Array:subfieldsToAdd - will contain all subfields extracted
+     *
+     */
+    var splitValue = value.split('$$');
+    subfieldsToAdd[0] = new Array(subfieldCode, splitValue[0]);
+    for (var i=1; i<splitValue.length; i++) {
+        subfieldsToAdd[i] = new Array(splitValue[i][0], splitValue[i].substring(1));
+    }
+}
+
 function onContentChange(value, th){
   /*
-   * Handle 'Save' button in editable content fields.
+   * Purpose: jEditable callback when the user hits enter in the editable field.
+   * Input(s): string:value - the new content value
+   *           object:th - this (table cell)
+   *
+   * Returns: string - string to be introduced in the cell th
    */
-  if (failInReadOnly()){
-    return null;
-  }
 
+  /* Extract information about the field to edit from cell id */
   var tmpArray = th.id.split('_');
-  var tag = tmpArray[1];
-  fieldPosition = tmpArray[2];
-  subfieldIndex = tmpArray[3];
+  var tag = tmpArray[1], fieldPosition = tmpArray[2], subfieldIndex = tmpArray[3];
+  var cellType = tmpArray[0];
 
+  /* Get field instance to be updated from global variable gRecord */
   var field = gRecord[tag][fieldPosition];
-  var tag_ind = tag + field[1] + field[2];
-  var oldValue = "";
+  var tag_ind = tag + field[1] + field[2]; // tag + indicators. e.g 999C5
+
+  /* Sanitize cell input value */
   value = value.replace(/\n/g, ' '); // Replace newlines with spaces.
   value = value.replace(/^\s+|\s+$/g,""); // Remove whitespace from the ends of strings
+
+  var oldValue = ""; //variable that will contain old value from gRecord
   if (subfieldIndex == undefined){
-    // Controlfield or modifying a field tag
-    if (tmpArray[0] == 'fieldTag') {
+    /* Edit field tag */
+    if (cellType == 'fieldTag') {
         if (tag_ind == value.replace(/_/g, " "))
             return escapeHTML(value);
         else {
             oldValue = tag_ind;
         }
     }
-    else if (field[3] == value)
-      return escapeHTML(value);
     else{
-        oldValue = field[3];
-        field[3] = value;
-        subfieldIndex = null;
-        var subfieldCode = null;
+        /* subfield index should not be undefined. Return the same value. */
+        return escapeHTML(value);
     }
   }
-  else{
-    if (tmpArray[0] == 'subfieldTag') {
+  else {
+    if (cellType == 'subfieldTag') {
+        /* Edit subfield code */
         if (field[0][subfieldIndex][0] == value)
             return escapeHTML(value);
         else {
-            // Regular subfield
-            oldValue = field[0][subfieldIndex][0];
-            field[0][subfieldIndex][0] = value;
+            oldValue = field[0][subfieldIndex][0]; // get old subfield code from gRecord
+            field[0][subfieldIndex][0] = value; // update gRecord
         }
     }
     else {
-        // If editing subject field, check KB
+        /* Edit subfield value */
+        /* If editing subject field, check KB */
         if (tag_ind == '65017' && field[0][subfieldIndex][0] == 'a') {
             value = check_subjects_KB(value);
         }
-        if (field[0][subfieldIndex][1] == value)
-            return escapeHTML(value);
-        // Regular field
-        else {
+        /* Check if there are subfields inside of the content value
+         * e.g 999C5 $$mThis a test$$hThis is a second subfield */
+        if (valueContainsSubfields(value)) {
+            var bulkOperation = true;
+            var subfieldsToAdd = new Array(), subfieldCode = field[0][subfieldIndex][0];
+            splitContentSubfields(value, subfieldCode, subfieldsToAdd);
+            field[0].splice(subfieldIndex, 1); // update gRecord, remove old content
+            field[0].push.apply(field[0], subfieldsToAdd); // update gRecord, add new subfields
             oldValue = field[0][subfieldIndex][1];
-            field[0][subfieldIndex][1] = value;
+        }
+        else if (field[0][subfieldIndex][1] == value)
+            return escapeHTML(value);
+        else {
+            oldValue = field[0][subfieldIndex][1]; // get old subfield value from gRecord
+            field[0][subfieldIndex][1] = value; // update gRecord
         }
     }
-    var subfieldCode = field[0][subfieldIndex][0];
   }
 
   var newValue = escapeHTML(value);
-  // setting the undo/redo handlers
-  var code;
+  if (subfieldIndex != undefined) {
+      var oldSubfieldCode = gRecord[tag][fieldPosition][0][subfieldIndex][0];
+  }
   var urHandler;
   var operation_type;
-  if (tmpArray[0] == 'subfieldTag') {
-      code = gRecord[tag][fieldPosition][0][subfieldIndex][0];
-      value = field[0][subfieldIndex][1];
-      operation_type = "change_subfield_code";
-      urHandler = prepareUndoHandlerChangeSubfield(tag,
-                                               fieldPosition,
-                                               subfieldIndex,
-                                               value,
-                                               value,
-                                               oldValue, code,
-                                               operation_type);
-  }
-  else if (tmpArray[0] == 'fieldTag') {
-      var oldTag = oldValue.substring(0,3);
-      var oldInd1 = oldValue.substring(3,4);
-      var oldInd2 = oldValue.substring(4,5);
-      var newTag = value.substring(0,3);
-      var newInd1 = value.substring(3,4);
-      var newInd2 = value.substring(4,5);
-      operation_type = "change_field_code";
-      urHandler = prepareUndoHandlerChangeFieldCode(oldTag,
-                                                    oldInd1,
-                                                    oldInd2,
-                                                    newTag,
-                                                    newInd1,
-                                                    newInd2,
-                                                    fieldPosition,
-                                                    operation_type);
-  }
-  else {
-      code = gRecord[tag][fieldPosition][0][subfieldIndex][0];
-      operation_type = "change_content";
-      urHandler = prepareUndoHandlerChangeSubfield(tag,
-                                               fieldPosition,
-                                               subfieldIndex,
-                                               oldValue,
-                                               newValue,
-                                               code, code,
-                                               operation_type);
+  switch (cellType) {
+      case 'subfieldTag':
+          value = field[0][subfieldIndex][1];
+          operation_type = "change_subfield_code";
+          urHandler = prepareUndoHandlerChangeSubfield(tag,
+                                                       fieldPosition,
+                                                       subfieldIndex,
+                                                       value,
+                                                       value,
+                                                       oldValue,
+                                                       oldSubfieldCode,
+                                                       operation_type);
+          break;
+      case 'fieldTag':
+          var oldTag = oldValue.substring(0,3);
+          var oldInd1 = oldValue.substring(3,4);
+          var oldInd2 = oldValue.substring(4,5);
+          var newTag = value.substring(0,3);
+          var newInd1 = value.substring(3,4);
+          var newInd2 = value.substring(4,5);
+          operation_type = "change_field_code";
+          urHandler = prepareUndoHandlerChangeFieldCode(oldTag,
+                                                        oldInd1,
+                                                        oldInd2,
+                                                        newTag,
+                                                        newInd1,
+                                                        newInd2,
+                                                        fieldPosition,
+                                                        operation_type);
+          break;
+      default:
+          if (bulkOperation) {
+              var undoHandlers = [];
+              /* Prepare  undo handlers to modify subfield content and to
+               * add new subfields */
+
+              /* 1) Modify main subfield content */
+              newValue = subfieldsToAdd[0][1];
+              undoHandlers.push(prepareUndoHandlerChangeSubfield(tag,
+                                                       fieldPosition,
+                                                       subfieldIndex,
+                                                       oldValue,
+                                                       newValue,
+                                                       oldSubfieldCode,
+                                                       oldSubfieldCode,
+                                                       "change_content"));
+
+              /* 2) Add new subfields */
+              undoHandlers.push(prepareUndoHandlerAddSubfields(tag,
+                                                               fieldPosition,
+                                                               subfieldsToAdd.slice(1)));
+              urHandler = prepareUndoHandlerBulkOperation(undoHandlers, "addSufields");
+          }
+          else {
+              operation_type = "change_content";
+              urHandler = prepareUndoHandlerChangeSubfield(tag,
+                                                           fieldPosition,
+                                                           subfieldIndex,
+                                                           oldValue,
+                                                           newValue,
+                                                           oldSubfieldCode,
+                                                           oldSubfieldCode,
+                                                           operation_type);
+          }
+
   }
   addUndoOperation(urHandler);
 
-  // generating the Ajax request
-  if (tmpArray[0] == 'subfieldTag') {
-      value = field[0][subfieldIndex][1];
-      updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, value,
-                          null, urHandler, modifySubfieldCode=true);
-  }
-  else if (tmpArray[0] == 'fieldTag'){
-      updateFieldTag(oldTag, newTag, oldInd1, oldInd2, newInd1, newInd2, fieldPosition, null, urHandler);
-  }
-  else{
-      updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, value, null, urHandler);
+  // Generate AJAX request
+  switch (cellType) {
+      case 'subfieldTag':
+          value = field[0][subfieldIndex][1];
+          updateSubfieldValue(tag, fieldPosition, subfieldIndex, oldSubfieldCode, value,
+                              null, urHandler, modifySubfieldCode=true);
+          break;
+      case 'fieldTag':
+          updateFieldTag(oldTag, newTag, oldInd1, oldInd2, newInd1, newInd2, fieldPosition, null, urHandler);
+          break;
+      default:
+          if (bulkOperation) {
+              bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, oldSubfieldCode, newValue, null, urHandler, subfieldsToAdd);
+          }
+          else {
+              updateSubfieldValue(tag, fieldPosition, subfieldIndex, oldSubfieldCode, value, null, urHandler);
+          }
   }
 
   var idPrefix;
-  if (tmpArray[0] == 'subfieldTag') {
+  if (cellType == 'subfieldTag') {
       idPrefix = '"#subfieldTag_';
   }
   else{
       idPrefix = '"#content_';
   }
+  /* Create fading effect to show the cell modified */
   setTimeout('$(' + idPrefix + tag + '_' + fieldPosition + '_' + subfieldIndex +
       '").effect("highlight", {color: gNEW_CONTENT_COLOR}, ' +
       'gNEW_CONTENT_COLOR_FADE_DURATION)', gNEW_CONTENT_HIGHLIGHT_DELAY);
-  // Return escaped value to display.
+
   return newValue;
 }
 
@@ -3399,7 +3619,7 @@ function prepareUndoHandlerRemoveAllHPChanges(hpChanges){
 
 function prepareUndoHandlerBulkOperation(undoHandlers, handlerTitle){
   /*
-    Preapring an und/redo handler allowing to treat the bulk operations
+    Preparing an und/redo handler allowing to treat the bulk operations
     ( like for example in case of pasting fields )
     arguments:
       undoHandlers : handlers of separate operations from the bulk
