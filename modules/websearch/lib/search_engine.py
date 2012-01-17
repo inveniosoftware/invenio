@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -2249,6 +2249,9 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
             return intbitset() # word index f does not exist
 
     # wash 'word' argument and run query:
+    if f == 'authorcount' and word.endswith('+'):
+        # field count query of the form N+ so transform N+ to N->99999:
+        word = word[:-1] + '->99999'
     word = string.replace(word, '*', '%') # we now use '*' as the truncation character
     words = string.split(word, "->", 1) # check for span query
     if len(words) == 2:
@@ -2259,9 +2262,19 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
             word1 = lower_index_term(word1)
             word0 = stem(word0, stemming_language)
             word1 = stem(word1, stemming_language)
+        word0_washed = wash_index_term(word0)
+        word1_washed = wash_index_term(word1)
+        if f == 'authorcount':
+            # field count query; convert to integers in order
+            # to have numerical behaviour for 'BETWEEN n1 AND n2' query
+            try:
+                word0_washed = int(word0_washed)
+                word1_washed = int(word1_washed)
+            except ValueError:
+                pass
         try:
             res = run_sql_with_limit("SELECT term,hitlist FROM %s WHERE term BETWEEN %%s AND %%s" % bibwordsX,
-                          (wash_index_term(word0), wash_index_term(word1)), wildcard_limit = wl)
+                          (word0_washed, word1_washed), wildcard_limit = wl)
         except InvenioDbQueryWildcardLimitError, excp:
             res = excp.res
             limit_reached = 1 # set the limit reached flag to true
@@ -2307,6 +2320,9 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
 def search_unit_in_idxphrases(p, f, type, wl=0):
     """Searches for phrase 'p' inside idxPHRASE*F table for field 'f' and returns hitset of recIDs found.
     The search type is defined by 'type' (e.g. equals to 'r' for a regexp search)."""
+    # call word search method in some cases:
+    if f == 'authorcount':
+        return search_unit_in_bibwords(p, f, wl=wl)
     set = intbitset() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
     limit_reached = 0 # flag for knowing if the query limit has been reached
@@ -2376,8 +2392,8 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
     """Searches for pattern 'p' inside bibxxx tables for field 'f' and returns hitset of recIDs found.
     The search type is defined by 'type' (e.g. equals to 'r' for a regexp search)."""
 
-    # FIXME: quick hack for the journal index
-    if f == 'journal':
+    # call word search method in some cases:
+    if f == 'journal' or f == 'authorcount':
         return search_unit_in_bibwords(p, f, wl=wl)
     p_orig = p # saving for eventual future 'no match' reporting
     limit_reached = 0 # flag for knowing if the query limit has been reached

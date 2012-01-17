@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -2001,6 +2001,34 @@ class WebSearchWashCollectionsTest(unittest.TestCase):
             sorted(wash_colls(cc='', c=['Books & Reports', 'Theses'])[2]),
             ['Books & Reports', 'Theses'])
 
+
+class WebSearchAuthorCountQueryTest(unittest.TestCase):
+    """Test of queries using authorcount fields."""
+
+    def test_journal_authorcount_word(self):
+        """websearch - author count, word query"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=4&f=authorcount&of=id',
+                                               expected_text="[51, 54, 59, 66, 92, 96]"))
+
+    def test_journal_authorcount_phrase(self):
+        """websearch - author count, phrase query"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=%224%22&f=authorcount&of=id',
+                                               expected_text="[51, 54, 59, 66, 92, 96]"))
+
+    def test_journal_authorcount_span(self):
+        """websearch - author count, span query"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=authorcount%3A9-%3E16&of=id',
+                                               expected_text="[69, 71]"))
+
+    def test_journal_authorcount_plus(self):
+        """websearch - author count, plus query"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=50%2B&f=authorcount&of=id',
+                                               expected_text="[10, 17]"))
+
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -2039,7 +2067,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchDateQueryTest,
                              WebSearchTestWildcardLimit,
                              WebSearchSynonymQueryTest,
-                             WebSearchWashCollectionsTest)
+                             WebSearchWashCollectionsTest,
+                             WebSearchAuthorCountQueryTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

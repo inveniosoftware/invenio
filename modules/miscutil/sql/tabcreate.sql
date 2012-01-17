@@ -2024,6 +2024,21 @@ CREATE TABLE IF NOT EXISTS idxWORD17R (
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS idxWORD18F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(50) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxWORD18R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS idxPAIR01F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term varchar(100) default NULL,
@@ -2279,6 +2294,21 @@ CREATE TABLE IF NOT EXISTS idxPAIR17R (
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS idxPAIR18F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR18R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS idxPHRASE01F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term text default NULL,
@@ -2528,6 +2558,21 @@ CREATE TABLE IF NOT EXISTS idxPHRASE17F (
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE17R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPHRASE18F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term text default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  KEY term (term(50))
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPHRASE18R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',

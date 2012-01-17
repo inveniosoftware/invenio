@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -208,6 +208,25 @@ def get_words_from_journal_tag(recID, tag):
             lwords.append(pubinfo)
     # return list of words and pubinfos:
     return lwords
+
+def get_field_count(recID, tags):
+    """
+    Return number of field instances having TAGS in record RECID.
+
+    @param recID: record ID
+    @type recID: int
+    @param tags: list of tags to count, e.g. ['100__a', '700__a']
+    @type tags: list
+    @return: number of tags present in record
+    @rtype: int
+    @note: Works internally via getting field values, which may not be
+        very efficient.  Could use counts only, or else retrieve stored
+        recstruct format of the record and walk through it.
+    """
+    out = 0
+    for tag in tags:
+        out += len(get_fieldvalues(recID, tag))
+    return out
 
 def get_author_canonical_ids_for_recid(recID):
     """
@@ -1073,6 +1092,14 @@ class WordTable:
             # subfield into indexed term
             for recID in range(recID1, recID2 + 1):
                 new_words = get_words_from_journal_tag(recID, self.fields_to_index[0])
+                if not wlist.has_key(recID):
+                    wlist[recID] = []
+                wlist[recID] = list_union(new_words, wlist[recID])
+        elif self.index_name in ('authorcount',):
+            # FIXME: quick hack for the authorcount index; we have to
+            # count the number of author fields only
+            for recID in range(recID1, recID2 + 1):
+                new_words = [str(get_field_count(recID, self.fields_to_index)),]
                 if not wlist.has_key(recID):
                     wlist[recID] = []
                 wlist[recID] = list_union(new_words, wlist[recID])
