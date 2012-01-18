@@ -22,6 +22,7 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = __init__.py \
              errorlib.py \
              errorlib_unit_tests.py \
+             errorlib_model.py \
              errorlib_webinterface.py \
              errorlib_regression_tests.py \
              data_cacher.py \
@@ -35,6 +36,7 @@ pylib_DATA = __init__.py \
              logicutils_unit_tests.py \
              mailutils.py \
              miscutil_config.py \
+             miscutil_model.py \
              messages.py \
              messages_unit_tests.py \
              textutils.py \
@@ -58,6 +60,8 @@ pylib_DATA = __init__.py \
              inveniocfg_unit_tests.py \
              shellutils.py \
              shellutils_unit_tests.py \
+             sqlalchemyutils.py \
+             sqlalchemyutils_mysql.py \
              pluginutils.py \
              pluginutils_unit_tests.py \
              plotextractor.py \

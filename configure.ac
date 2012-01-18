@@ -20,9 +20,7 @@
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT([invenio],
-        m4_esyscmd([./git-version-gen .tarball-version]),
-        [info@invenio-software.org])
+AC_INIT([invenio],[m4_esyscmd(./git-version-gen .tarball-version)],[info@invenio-software.org])
 AM_INIT_AUTOMAKE([tar-ustar])
 
 ## By default we shall install into /opt/invenio.  (Do not use
@@ -42,7 +40,7 @@ AM_GNU_GETTEXT_VERSION(0.14.4)
 
 ## Check for MySQL client:
 AC_MSG_CHECKING(for mysql)
-AC_ARG_WITH(mysql, AC_HELP_STRING([--with-mysql], [path to a specific MySQL binary (optional)]), MYSQL=${withval})
+AC_ARG_WITH(mysql, AS_HELP_STRING([--with-mysql],[path to a specific MySQL binary (optional)]), MYSQL=${withval})
 if test -n "$MYSQL"; then
    AC_MSG_RESULT($MYSQL)
 else
@@ -57,7 +55,7 @@ fi
 
 ## Check for Python:
 AC_MSG_CHECKING(for python)
-AC_ARG_WITH(python, AC_HELP_STRING([--with-python], [path to a specific Python binary (optional)]), PYTHON=${withval})
+AC_ARG_WITH(python, AS_HELP_STRING([--with-python],[path to a specific Python binary (optional)]), PYTHON=${withval})
 if test -n "$PYTHON"; then
    AC_MSG_RESULT($PYTHON)
 else
@@ -72,7 +70,7 @@ fi
 
 ## Check for OpenOffice.org Python binary:
 AC_MSG_CHECKING(for OpenOffice.org Python binary)
-AC_ARG_WITH(openoffice-python, AC_HELP_STRING([--with-openoffice-python], [path to a specific OpenOffice.org Python binary (optional)]), OPENOFFICE_PYTHON=`which ${withval}`)
+AC_ARG_WITH(openoffice-python, AS_HELP_STRING([--with-openoffice-python],[path to a specific OpenOffice.org Python binary (optional)]), OPENOFFICE_PYTHON=`which ${withval}`)
 
 if test -z "$OPENOFFICE_PYTHON"; then
    OPENOFFICE_PYTHON=`locate -l 1 -r "o.*office/program/python$"`
@@ -415,7 +413,7 @@ fi
 
 ## Check for CLISP:
 AC_MSG_CHECKING(for clisp)
-AC_ARG_WITH(clisp, AC_HELP_STRING([--with-clisp], [path to a specific CLISP binary (optional)]), CLISP=${withval})
+AC_ARG_WITH(clisp, AS_HELP_STRING([--with-clisp],[path to a specific CLISP binary (optional)]), CLISP=${withval})
 if test -n "$CLISP"; then
    AC_MSG_RESULT($CLISP)
 else
@@ -434,7 +432,7 @@ fi
 
 ## Check for CMUCL:
 AC_MSG_CHECKING(for cmucl)
-AC_ARG_WITH(cmucl, AC_HELP_STRING([--with-cmucl], [path to a specific CMUCL binary (optional)]), CMUCL=${withval})
+AC_ARG_WITH(cmucl, AS_HELP_STRING([--with-cmucl],[path to a specific CMUCL binary (optional)]), CMUCL=${withval})
 if test -n "$CMUCL"; then
    AC_MSG_RESULT($CMUCL)
 else
@@ -457,7 +455,7 @@ fi
 
 ## Check for SBCL:
 AC_MSG_CHECKING(for sbcl)
-AC_ARG_WITH(sbcl, AC_HELP_STRING([--with-sbcl], [path to a specific SBCL binary (optional)]), SBCL=${withval})
+AC_ARG_WITH(sbcl, AS_HELP_STRING([--with-sbcl],[path to a specific SBCL binary (optional)]), SBCL=${withval})
 if test -n "$SBCL"; then
    AC_MSG_RESULT($SBCL)
 else

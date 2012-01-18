@@ -18,6 +18,7 @@
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = bibedit_config.py \
+             bibedit_model.py \
              bibedit_dblayer.py \
              bibedit_engine.py \
              bibedit_regression_tests.py \

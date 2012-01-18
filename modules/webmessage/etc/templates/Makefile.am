@@ -16,7 +16,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 templatesdir = $(sysconfdir)/templates
-templates_DATA = webmessage_display.html webmessage_write.html
+templates_DATA = webmessage_display_msg.html \
+		 webmessage_display.html \
+		 webmessage_confirm_delete.html \
+		 webmessage_write.html
 
 EXTRA_DIST = $(templates_DATA)
 

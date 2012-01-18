@@ -19,6 +19,7 @@ pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = \
 	websearchadminlib.py \
+	websearch_model.py \
 	websearch_templates.py \
 	websearch_webinterface.py \
 	websearch_regression_tests.py \

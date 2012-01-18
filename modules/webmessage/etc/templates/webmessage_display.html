@@ -50,18 +50,21 @@
         </td>
         </tr>
     {% else %}
-        {% for (msgid, id_user_from, user_from_nick, subject, sent_date, status) in messages %}
-            {% if not subject %}
-                {% set subject = _("No subject") %}
-            {% endif %}
-            {% if status == config.CFG_WEBMESSAGE_STATUS_CODE['NEW'] %}
+        {% for m in messages %}
+            {% if m.status == config.CFG_WEBMESSAGE_STATUS_CODE['NEW'] %}
                 {% set status_style = ' style="font-weight:bold"' %}
             {% endif %}
             <tr class="mailboxrecord">
-                <td {{ status_style }}><a href="{{ url_for('.display_msg', msgid=msgid) }}">{{ subject }}</a></td>
-                <td>{{ user_from_nick|default(get_user_info(id_user_from)[2]) }}</td>
-                <td>{{ sent_date|invenio_format_date }}</td>
-                <td><a href="{{url_for('.delete', msgid=msgid) }}">{{ _("Delete") }}</a></td>
+                <td {{ status_style }}><a href="{{ url_for('.display_msg', msgid=m.id) }}">
+                {% if m.subject %}
+                    {{ m.subject }}
+                {% else %}
+                    {{ _("No subject") }}
+                {% endif %}
+                </a></td>
+                <td>{{ m.user_from.nickname }}</td>
+                <td>{{ m.sent_date|invenio_format_date }}</td>
+                <td><a href="{{url_for('.delete', msgid=m.id) }}">{{ _("Delete") }}</a></td>
             </tr>
         {% endfor %}
     {% endif %}

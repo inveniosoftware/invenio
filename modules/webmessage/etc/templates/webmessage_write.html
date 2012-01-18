@@ -25,33 +25,56 @@
 {% block javascript %}
     <script type="text/javascript">
     $(document).ready(function(){
+        function split( val ) {
+            return val.split(/,\s*/);
+        } 
+        function extractLast( term ) {
+          return split(term).pop();
+        }
+        var selectLast = function( event, ui ) {
+            var terms = split(this.value);
+            terms.pop();
+            terms.push(ui.item.value);
+            terms.push("");
+            this.value = terms.join(", ");
+            return false;
+        }
+
         $("#msg_to_user").autocomplete({
+            minLength: 3,
             source: function(request, response) {
                 $.ajax({
                     url: "{{ url_for('.ajax')|safe }}",
                     data: {
-                        query: "users",
-                        term: request.term
+                        q: "users",
+                        p: extractLast(request.term)
+                    },
+                    focus: function() {
+                        return false;
                     },
                     success: function(data, textStatus, jqXHR){
                         response(data["nicknames"]);
                     }
-                });
-            }
-        });
+                })},
+            select: selectLast });
         $("#msg_to_group").autocomplete({
+            minLength: 3,
             source: function(request, response) {
                 $.ajax({
                     url: "{{ url_for('.ajax')|safe }}",
                     data: {
-                        query: "groups",
-                        term: request.term
+                        q: "groups",
+                        p: extractLast(request.term)
+                    },
+                    focus: function() {
+                        return false;
                     },
                     success: function(data, textStatus, jqXHR){
                         response(data["groups"]);
                     }
                 });
-            }
+            },
+            select: selectLast
         });
     });
     </script>
@@ -67,14 +90,14 @@
                 <td class="mailboxlabel">{{ _("To:") }}</td>
                 <td class="mailboxlabel">{{ _("Users") }}</td>
                 <td style="width:100%;">
-                    <input class="mailboxinput" type="text" name="msg_to_user" value="{{ msg_to_users }}" id="msg_to_user" />
+                    <input class="mailboxinput" type="text" name="msg_to_user" value="{{ msg_to }}" id="msg_to_user" />
                 </td>
                 </tr>
                 <tr>
                 <td class="mailboxlabel">&nbsp;</td>
                 <td class="mailboxlabel">{{ _("Groups") }}</td>
                 <td style="width:100%;">
-                    <input class="mailboxinput" type="text" name="msg_to_group" value="{{ msg_to_groups }}" id="msg_to_group" />
+                    <input class="mailboxinput" type="text" name="msg_to_group" value="{{ msg_to_group }}" id="msg_to_group" />
                 </td>
                 </tr>
                 <tr>

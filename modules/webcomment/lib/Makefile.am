@@ -20,6 +20,7 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = webcomment_config.py \
              webcomment.py \
              webcomment_unit_tests.py \
+             webcomment_model.py \
              webcomment_templates.py \
              webcomment_webinterface.py \
              webcommentadminlib.py \

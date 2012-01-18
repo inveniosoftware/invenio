@@ -1,5 +1,9 @@
+# -*- coding: utf-8 -*-
+#
+## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
+##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -13,18 +17,25 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## 59 Temple Place, Suite 330, Boston, MA 02D111-1307, USA.
 
-pylibdir = $(libdir)/python/invenio
+"""
+RefExtract database models.
+"""
 
-pylib_DATA = refextract_cli.py \
-             refextract_daemon.py \
-             refextract_config.py \
-             refextract_model.py \
-             refextract.py \
-             refextract_unit_tests.py \
-             refextract_authextract_unit_tests.py
+# General imports.
+from invenio.sqlalchemyutils import db
 
-EXTRA_DIST = $(pylib_DATA)
+# Create your models here.
 
-CLEANFILES = *~ *.tmp *.pyc
+class XtrJOB(db.Model):
+    """Represents a XtrJOB record."""
+    def __init__(self):
+        pass
+
+    __tablename__ = 'xtrJOB'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    name = db.Column(db.String, nullable=False)
+    last_updated = db.Column(db.DateTime, nullable=False)
+

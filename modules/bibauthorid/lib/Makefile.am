@@ -42,6 +42,7 @@ pylib_DATA = \
 	bibauthorid_general_utils.py \
 	bibauthorid_name_utils.py \
 	bibauthorid_recipes.py \
+        bibauthorid_model.py \
 	bibauthorid_templates.py \
 	bibauthorid_wedge.py \
 	bibauthorid_webauthorprofileinterface.py

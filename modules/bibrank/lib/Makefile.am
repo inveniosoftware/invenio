@@ -26,6 +26,7 @@ pylib_DATA = bibrankadminlib.py \
              bibrank_grapher.py bibrank_downloads_grapher.py bibrank_citation_grapher.py \
              bibrank_citation_indexer.py bibrank_citation_indexer_unit_tests.py \
              bibrank_citation_searcher.py bibrank_citation_searcher_unit_tests.py \
+             bibrank_model.py \
              bibrank_regression_tests.py bibrank.py \
              bibrankadmin_regression_tests.py \
              bibrankgkb.py \

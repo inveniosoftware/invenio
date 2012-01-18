@@ -1,3 +1,4 @@
+{#
 ## This file is part of Invenio.
 ## Copyright (C) 2012 CERN.
 ##
@@ -14,17 +15,28 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-pylibdir = $(libdir)/python/invenio
-
-pylib_DATA = refextract_cli.py \
-             refextract_daemon.py \
-             refextract_config.py \
-             refextract_model.py \
-             refextract.py \
-             refextract_unit_tests.py \
-             refextract_authextract_unit_tests.py
-
-EXTRA_DIST = $(pylib_DATA)
-
-CLEANFILES = *~ *.tmp *.pyc
+#}
+{% extends "page.html" %}
+{% set title = _("Delete all messages") %}
+{% block body %}
+<table class="confirmoperation">
+  <tr>
+    <td colspan="2" class="confirmmessage">
+      {{ _("Are you sure you want to empty your whole mailbox?") }}
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <form name="validate" action="{{ url_for('.delete_all') }}" method="post">
+        <input type="hidden" name="confirmed" value="1" />
+        <input type="submit" value="{{ _("Yes") }}" class="formbutton" />
+      </form>
+    </td>
+    <td>
+      <form name="cancel" action="display" method="post">
+        <input type="submit" value="{{ _("No") }}" class="formbutton" />
+      </form>
+    </td>
+  </tr>
+</table>
+{% endblock %}
