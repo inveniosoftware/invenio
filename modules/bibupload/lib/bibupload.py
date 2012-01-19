@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -44,6 +44,7 @@ from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_STRONG_TAGS, \
      CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS, \
      CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE, \
+     CFG_BIBUPLOAD_DELETE_FORMATS, \
      CFG_SITE_URL, CFG_SITE_RECORD, \
      CFG_OAI_PROVENANCE_ALTERED_SUBFIELD
 
@@ -341,6 +342,13 @@ def bibupload(record, opt_tag=None, opt_mode=None,
                         msg = "   Failed: error during update_bibfmt_format 'recstruct'"
                         write_message(msg, verbose=1, stream=sys.stderr)
                         return (1, int(rec_id), msg)
+                # delete some formats like HB upon record change:
+                for format_to_delete in CFG_BIBUPLOAD_DELETE_FORMATS:
+                    try:
+                        delete_bibfmt_format(rec_id, format_to_delete, pretend=pretend)
+                    except:
+                        # OK, some formats like HB could not have been deleted, no big deal
+                        pass
                 # archive MARCXML format of this record for version history purposes:
                 error = archive_marcxml_for_history(rec_id, pretend=pretend)
                 if error == 1:
@@ -1613,6 +1621,14 @@ def update_bibfmt_format(id_bibrec, format_value, format_name, modification_date
         else:
             write_message("   -Insert the format %s in bibfmt : DONE" % format_name , verbose=2)
             return 0
+
+def delete_bibfmt_format(id_bibrec, format_name, pretend=False):
+    """
+    Delete format FORMAT_NAME from bibfmt table for record ID_BIBREC.
+    """
+    if not pretend:
+        run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s and format=%s", (id_bibrec, format_name))
+    return 0
 
 def archive_marcxml_for_history(recID, pretend=False):
     """

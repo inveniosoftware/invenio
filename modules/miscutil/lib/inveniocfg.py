@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -153,6 +153,7 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE',
                        'CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS',
                        'CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS',
+                       'CFG_BIBUPLOAD_DELETE_FORMATS',
                        'CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES',
                        'CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST',
                        'CFG_WEBSEARCH_RSS_I18N_COLLECTIONS',
