@@ -133,22 +133,21 @@ install-jquery-plugins: install-jquery-plugins
 	mkdir -p ${prefix}/var/www/js
 	mkdir -p $(prefix)/var/www/css
 	(cd ${prefix}/var/www/js && \
-	wget http://jqueryjs.googlecode.com/files/jquery-1.3.1.min.js && \
-	mv jquery-1.3.1.min.js jquery.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/jquery-1.4.4.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.effects.core.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.effects.highlight.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.widget.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.tabs.min.js && \
+	wget http://code.jquery.com/jquery-1.5.2.min.js && \
+	mv jquery-1.5.2.min.js jquery.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.effects.core.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.effects.highlight.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.ui.widget.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.ui.tabs.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.slider.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.sortable.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.button.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.dialog.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.mouse.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.draggable.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.position.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.10/ui/minified/jquery.ui.resizable.min.js && \
-	wget http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.ui.button.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.ui.dialog.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.ui.mouse.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.ui.draggable.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.ui.position.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.ui.resizable.min.js && \
+	wget http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js && \
 	wget http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js && \
 	wget https://raw.github.com/malsup/form/master/jquery.form.js --no-check-certificate && \
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
@@ -171,7 +170,7 @@ install-jquery-plugins: install-jquery-plugins
 	rm uploadify.zip && rm -r uploadify && \
 	wget --no-check-certificate https://github.com/douglascrockford/JSON-js/raw/master/json2.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.datepicker.min.js && \
-	wget -O jquery.hotkeys.min.js http://js-hotkeys.googlecode.com/files/jquery.hotkeys-0.7.8-packed.js && \
+	wget https://raw.github.com/jeresig/jquery.hotkeys/master/jquery.hotkeys.js && \
 	wget http://jquery.bassistance.de/treeview/jquery.treeview.zip && \
 	unzip jquery.treeview.zip -d jquery-treeview && \
 	rm jquery.treeview.zip && \
@@ -227,6 +226,19 @@ uninstall-jquery-plugins:
 	rm -f jquery.dataTables.min.js && \
 	rm -f ui.core.js && \
 	rm -f jquery.bookmark.min.js && \
+        rm -f jquery.hotkeys.js && \
+        rm -f jquery.tablesorter.min.js && \
+        rm -f jquery.ui.button.min.js && \
+        rm -f jquery.ui.dialog.min.js && \
+        rm -f jquery.ui.draggable.min.js && \
+        rm -f jquery.ui.mouse.min.js && \
+        rm -f jquery.ui.position.min.js && \
+        rm -f jquery.ui.resizable.min.js && \
+        rm -f jquery.ui.widget.min.js && \
+        rm -f jquery-ui-timepicker-addon.js && \
+        rm -f jquery-ui-1.7.3.custom.min.js && \
+        rm -f jquery.metadata.js && \
+        rm -f jquery-latest.js && \
         rm -f jquery-ui.min.js)
 	(cd ${prefix}/var/www/img && \
 	rm -f cancel.png uploadify.css uploadify.swf uploadify.allglyphs.swf uploadify.fla && \

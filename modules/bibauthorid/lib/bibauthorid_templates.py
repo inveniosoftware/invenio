@@ -231,8 +231,7 @@ class Template:
                 '<META HTTP-EQUIV="Cache-Directive" CONTENT="no-cache">',
                 '<META HTTP-EQUIV="Expires" CONTENT="0">']
 
-        scripts = ["jquery-1.4.4.js",
-                   "ui.core.js",
+        scripts = ["ui.core.js",
                    "jquery.ui.widget.min.js",
                    "jquery.ui.tabs.min.js",
                    "jquery.form.js",

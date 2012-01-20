@@ -226,7 +226,7 @@ def perform_request_init(uid, ln, req, lastupdated):
     # Add scripts (the ordering is NOT irrelevant).
     scripts = ['jquery.effects.core.min.js',
                'jquery.effects.highlight.min.js',
-               'jquery.jeditable.mini.js', 'jquery.hotkeys.min.js', 'json2.js',
+               'jquery.jeditable.mini.js', 'jquery.hotkeys.js', 'json2.js',
                'bibedit_display.js', 'bibedit_engine.js', 'bibedit_keys.js',
                'bibedit_menu.js', 'bibedit_holdingpen.js', 'marcxml.js',
                'bibedit_clipboard.js','jquery-ui.min.js']
