@@ -254,7 +254,7 @@ div .boxleft_2 {
             <b>%(text_search_criteria)s:</b>
         </div>
         <div class="boxleft_2">
-            <input type="text" id="textBoxSearchCriteria"  size="40"> <br />
+            <input type="text" placeholder='Use default search engine syntax' id="textBoxSearchCriteria"  size="60"> <br />
         </div>
     </div>
     <div class="boxContainer">
