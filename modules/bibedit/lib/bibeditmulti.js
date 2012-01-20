@@ -335,7 +335,7 @@ function setOutputFormat(outputFormat){
 }
 
 function initTextBoxes(){
-    $('#textBoxValue, #textBoxNewValue, #textBoxOutputTags, #textBoxCondition').focus(function() {
+    $('#textBoxOutputTags, #textBoxCondition').focus(function() {
         if (this.value == this.defaultValue){
             this.value = '';
         }
@@ -344,7 +344,7 @@ function initTextBoxes(){
         }
     });
 
-    $('#textBoxValue, #textBoxNewValue, #textBoxOutputTags, #textBoxCondition').blur(function() {
+    $('#textBoxOutputTags, #textBoxCondition').blur(function() {
         if ($.trim(this.value) == ''){
             this.value = (this.defaultValue ? this.defaultValue : '');
         }
