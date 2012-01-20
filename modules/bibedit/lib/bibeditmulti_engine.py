@@ -523,13 +523,13 @@ def _get_formated_record(record_id, output_format, update_commands, language, ou
                 marc_record = _create_marc(xml_record)
                 tag_position = 0
             for line in marc_record.split('\n')[:-1]:
-                if line.split()[tag_position][:3] in outputTags:
+                if line.split()[tag_position][:5].replace('_', '') in outputTags:
                     if update_commands:
                         result += line.strip() + '\n'
                     else:
                         result += "%09d " % record_id + line.strip() + '\n'
                 elif '<strong' in line:
-                    if line.split()[3][5:8] in outputTags:
+                    if line.split()[3][5:10].replace('_', '') in outputTags:
                         result += line.strip() + '\n'
         else:
             if update_commands:
