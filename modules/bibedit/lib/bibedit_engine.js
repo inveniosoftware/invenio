@@ -281,6 +281,7 @@ function initJeditable(){
         addHandler_autocompleteAffiliations(textarea);
     }
     textarea.bind('keydown', 'return', function(event){ form.submit(); return false;});
+    initInputHotkeys(textarea);
     return(textarea);
   }
 }
