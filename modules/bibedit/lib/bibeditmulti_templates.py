@@ -228,6 +228,15 @@ div .boxleft_2 {
     background:grey;
 }
 
+.multiedit_field_deleted {
+    color:red;
+    text-decoration:line-through;
+}
+
+.multiedit_field_modified {
+    color:green;
+}
+
 </style>
         """
         return styles
