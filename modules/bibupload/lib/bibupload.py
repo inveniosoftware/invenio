@@ -263,9 +263,9 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             return (1, -1, msg)
 
         # Have a look if we have FMT tags
+        we_have_fmt_tags_p = extract_tag_from_record(record, 'FMT') is not None
         write_message("Stage 1: Start (Insert of FMT tags if exist).", verbose=2)
-        if opt_stage_to_start_from <= 1 and \
-            extract_tag_from_record(record, 'FMT') is not None:
+        if opt_stage_to_start_from <= 1 and we_have_fmt_tags_p:
             record = insert_fmt_tags(record, rec_id, opt_mode, pretend=pretend)
             if record is None:
                 msg = "   Stage 1 failed: Error while inserting FMT tags"
@@ -342,13 +342,14 @@ def bibupload(record, opt_tag=None, opt_mode=None,
                         msg = "   Failed: error during update_bibfmt_format 'recstruct'"
                         write_message(msg, verbose=1, stream=sys.stderr)
                         return (1, int(rec_id), msg)
-                # delete some formats like HB upon record change:
-                for format_to_delete in CFG_BIBUPLOAD_DELETE_FORMATS:
-                    try:
-                        delete_bibfmt_format(rec_id, format_to_delete, pretend=pretend)
-                    except:
-                        # OK, some formats like HB could not have been deleted, no big deal
-                        pass
+                if not we_have_fmt_tags_p:
+                    # delete some formats like HB upon record change:
+                    for format_to_delete in CFG_BIBUPLOAD_DELETE_FORMATS:
+                        try:
+                            delete_bibfmt_format(rec_id, format_to_delete, pretend=pretend)
+                        except:
+                            # OK, some formats like HB could not have been deleted, no big deal
+                            pass
                 # archive MARCXML format of this record for version history purposes:
                 error = archive_marcxml_for_history(rec_id, pretend=pretend)
                 if error == 1:
