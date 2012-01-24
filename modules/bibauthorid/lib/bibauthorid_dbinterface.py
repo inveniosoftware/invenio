@@ -23,124 +23,57 @@
     all other files in the module.
 '''
 import bibauthorid_config as bconfig
-import re
-import time
-import threading
-import sys
 
-from dbquery import serialize_via_marshal
-from dbquery import deserialize_via_marshal
+try:
+    import numpy
+    import cPickle
+    import zlib
+except ImportError:
+    pass
+
+from itertools import groupby, count, ifilter, chain
+from operator import itemgetter
 from invenio.access_control_engine import acc_authorize_action
 from invenio.search_engine import perform_request_search
 
 from bibauthorid_name_utils import split_name_parts
-from bibauthorid_name_utils import clean_name_string
-from bibauthorid_name_utils import soft_compare_names, compare_names
 from bibauthorid_name_utils import create_canonical_name
-from bibauthorid_general_utils import get_field_values_on_condition
-from invenio.data_cacher import DataCacher
-import datetime
+from bibauthorid_name_utils import create_normalized_name
+from bibauthorid_general_utils import update_status
 from dbquery import run_sql \
                     , OperationalError \
-                    , ProgrammingError \
-                    , close_connection
-from bibauthorid_name_utils import create_normalized_name
+                    , ProgrammingError
 
-try:
-    import unidecode
-    UNIDECODE_ENABLED = True
-except ImportError:
-    bconfig.LOGGER.error("Authorid will run without unidecode support! "
-                         "This is not recommended! Please install unidecode!")
-    UNIDECODE_ENABLED = False
 
-DATA_CACHERS = []
-"""
-DATA_CACHERS is a list of Data Cacher objects to be persistent in memory
-"""
-
-def get_bibref_name_string(bibref):
+def set_personid_row(person_id, tag, value, opt1=0, opt2=0, opt3=""):
     '''
-    Returns the name string associated with the given bibref
-    @param: bibref ((100:123,),)
+    Inserts data and the additional options of a person by a given personid and tag.
     '''
-    name = run_sql("select db_name from aidAUTHORNAMES where id=(select Name_id from aidAUTHORNAMESBIBREFS where bibref=%s)", (str(bibref[0][0]),))
-    if len(name) > 0:
-        return name[0][0]
-    else:
-        return ''
+    run_sql("INSERT INTO aidPERSONIDDATA "
+            "(`personid`, `tag`, `data`, `opt1`, `opt2`, `opt3`) "
+            "VALUES (%s, %s, %s, %s, %s, %s)",
+            (person_id, tag, value, opt1, opt2, opt3))
 
 
-def get_bibrefs_from_name_string(string):
+def get_personid_row(person_id, tag):
     '''
-    Returns bibrefs associated to a name string
-    @param: string: name
-    '''
-    return run_sql("select bibrefs from aidAUTHORNAMES where db_name=%s ", (str(string),))
-
-
-def set_person_data(person_id, tag, value, user_level=0):
-    '''
-    Change the value associated to the given tag for a certain person.
-    @param person_id: ID of the person
-    @type person_id: int
-    @param tag: tag to be updated
-    @type tag: string
-    @param value: value to be written for the tag
-    @type value: string
-    '''
-    current_tag_value = []
-
-    try:
-        current_tag_value = run_sql("SELECT data FROM aidPERSONID use index (`ptf-b`) "
-                                    "WHERE personid = %s AND tag = %s AND "
-                                    "data = %s", (person_id, tag, value))
-    except (OperationalError, ProgrammingError):
-        current_tag_value = run_sql("SELECT data FROM aidPERSONID "
-                                    "WHERE personid = %s AND tag = %s AND "
-                                    "data = %s", (person_id, tag, value))
-
-    if len(current_tag_value) > 0:
-        run_sql("UPDATE aidPERSONID SET tag = %s, data = %s WHERE "
-                "personid = %s AND tag = %s AND lcul = %s", (tag, value, person_id, tag, user_level))
-    else:
-        run_sql("INSERT INTO aidPERSONID (`personid`, `tag`, `data`, `flag`, `lcul`) "
-                "VALUES (%s, %s, %s, %s, %s);", (person_id, tag, value, '0', user_level))
-    update_personID_canonical_names([[person_id]])
-
-
-def get_person_data(person_id, tag=None, select_flag=False):
-    '''
-    Returns all the records associated to a person.
-    If tag != None only rows for the selected tag will be returned.
+    Returns all the records associated to a person and a tag.
 
     @param person_id: id of the person to read the attribute from
     @type person_id: int
-    @param tag: the tag to read. Optional. Default: None
+    @param tag: the tag to read.
     @type tag: string
 
     @return: the data associated with a virtual author
     @rtype: tuple of tuples
     '''
-    rows = []
-    if not select_flag:
-        if tag:
-            rows = run_sql("SELECT tag, data FROM aidPERSONID "
-                           "WHERE personid = %s AND tag = %s", (person_id, tag))
-        else:
-            rows = run_sql("SELECT tag, data FROM aidPERSONID "
-                           "WHERE personid = %s", (person_id,))
-    else:
-        if tag:
-            rows = run_sql("SELECT tag, data, flag FROM aidPERSONID "
-                           "WHERE personid = %s AND tag = %s", (person_id, tag))
-        else:
-            rows = run_sql("SELECT tag, data, flag FROM aidPERSONID "
-                           "WHERE personid = %s", (person_id,))
-    return rows
+    return run_sql("SELECT data, opt1, opt2, opt3 "
+                   "data FROM aidPERSONIDDATA "
+                   "WHERE personid = %s AND tag = %s",
+                   (person_id, tag))
 
 
-def del_person_data(tag, person_id=None, value=None):
+def del_personid_row(tag, person_id=None, value=None):
     '''
     Change the value associated to the given tag for a certain person.
     @param person_id: ID of the person
@@ -150,16 +83,16 @@ def del_person_data(tag, person_id=None, value=None):
     @param value: value to be written for the tag
     @type value: string
     '''
-    if person_id != None:
-        if not value:
-            run_sql("delete from aidPERSONID where personid=%s and tag=%s", (person_id, tag,))
+    if person_id:
+        if value:
+            run_sql("delete from aidPERSONIDDATA where personid=%s and tag=%s and data=%s", (person_id, tag, value,))
         else:
-            run_sql("delete from aidPERSONID where personid=%s and tag=%s and data=%s", (person_id, tag, value,))
+            run_sql("delete from aidPERSONIDDATA where personid=%s and tag=%s", (person_id, tag,))
     else:
-        if not value:
-            run_sql("delete from aidPERSONID where tag=%s", (tag,))
+        if value:
+            run_sql("delete from aidPERSONIDDATA where tag=%s and data=%s", (tag, value,))
         else:
-            run_sql("delete from aidPERSONID where tag=%s and data=%s", (tag, value,))
+            run_sql("delete from aidPERSONIDDATA where tag=%s", (tag,))
 
 
 def get_all_papers_of_pids(personid_list):
@@ -170,63 +103,109 @@ def get_all_papers_of_pids(personid_list):
     @type personid_list: iteratable of integers.
     '''
     if personid_list:
-        return []
-
-    plist = list_2_SQL_str(personid_list, lambda x: str(x))
-
-    return run_sql("select personid, data, flag \
-                   from aidPERSONID \
-                   where tag like 'paper' \
-                   and personid in %s \
-                   order by data" \
-                   % plist)
+        plist = list_2_SQL_str(personid_list, lambda x: str(x))
+        return run_sql("select personid, bibref_table, bibref_value, bibrec, flag \
+                        from aidPERSONIDPAPERS \
+                        where personid in %s" \
+                       % plist)
+    return ()
 
 
 def del_person_not_manually_claimed_papers(pid):
     '''
     Deletes papers from a person which have not been manually claimed.
     '''
-    run_sql("delete from aidPERSONID where tag='paper'"
-            " and (flag <> '-2' and flag <> '2') and personid=%s", (pid,))
+    run_sql("delete from aidPERSONIDPAPERS "
+            "where and (flag <> '-2' and flag <> '2') and personid=%s", (pid,))
 
 def get_personid_from_uid(uid):
     '''
     Returns the personID associated with the provided ui.
     If the personID is already associated with the person the secon parameter is True, false otherwise.
-    If there is more then one compatible results the persons are listed in order of name compatibility.
-    If no persons are found returns ([-1],False)
-    !!!
-    The guessing mechanism got outdated thus disabled and replaced by arxiv_login in webapi, the code is left
-    there for future updates
-    !!!
-    If there is none, associates on a best effort basis the best matching personid to the uid.
     @param uid: userID
     @type uid: ((int,),)
     '''
-    pid = run_sql("select personid from aidPERSONID where tag=%s and data=%s", ('uid', str(uid[0][0])))
+    pid = run_sql("select personid from aidPERSONIDDATA where tag=%s and data=%s", ('uid', str(uid[0][0])))
     if len(pid) == 1:
         return (pid[0], True)
     else:
         return  ([-1], False)
 
+def get_uid_from_personid(pid):
+    uid = run_sql("select data from aidPERSONIDDATA where tag='uid' and personid = %s", (pid,))
+    if uid:
+        return uid[0][0]
+    else:
+        return None
 
-def create_new_person(uid, uid_is_owner=False):
+
+def get_new_pesonid():
+    pids = (run_sql("select max(personid) from aidPERSONIDDATA")[0][0],
+            run_sql("select max(personid) from aidPERSONIDPAPERS")[0][0])
+
+    pids = tuple(int(p) for p in pids if p != None)
+
+    if len(pids) == 2:
+        return max(*pids) + 1
+    elif len(pids) == 1:
+        return pids[0] + 1
+    else:
+        return 0
+
+
+def get_existing_personids():
+    try:
+        pids_data = set(zip(*run_sql("select distinct personid from aidPERSONIDDATA"))[0])
+    except IndexError:
+        pids_data = set()
+
+    try:
+        pids_pap = set(zip(*run_sql("select distinct personid from aidPERSONIDPAPERS"))[0])
+    except IndexError:
+        pids_pap = set()
+
+    return pids_data | pids_pap
+
+
+def get_existing_result_clusters():
+    return run_sql("select distinct personid from aidRESULTS")
+
+
+def create_new_person(uid= -1, uid_is_owner=False):
     '''
     Create a new person. Set the uid as owner if requested.
     '''
-    if len(run_sql("SELECT personid FROM aidPERSONID LIMIT 1")):
-        pid = run_sql("select max(personid) from aidPERSONID")[0][0]
-        pid = int(pid) + 1
-    else:
-        pid = 0
-
+    pid = get_new_pesonid()
     if uid_is_owner:
-        set_person_data(pid, 'uid', str(uid))
-        set_person_data(pid, 'user-created', str(uid))
+        set_personid_row(pid, 'uid', str(uid))
     else:
-        set_person_data(pid, 'user-created', str(uid))
-
+        set_personid_row(pid, 'user-created', str(uid))
     return pid
+
+def create_new_person_from_uid(uid):
+    return create_new_person(uid, uid_is_owner=True)
+
+def new_person_from_signature(sig, name=None):
+    '''
+    Creates a new person from a signature.
+    '''
+    pid = get_new_pesonid()
+    add_signature(sig, name, pid)
+    return pid
+
+
+def add_signature(sig, name, pid):
+    '''
+    Inserts a signature in personid.
+    '''
+    if not name:
+        name = get_name_by_bibrecref(sig)
+        name = create_normalized_name(split_name_parts(name))
+
+    run_sql("INSERT INTO aidPERSONIDPAPERS "
+            "(personid, bibref_table, bibref_value, bibrec, name) "
+            "VALUES (%s, %s, %s, %s, %s)"
+            , (pid, str(sig[0]), sig[1], sig[2], name))
 
 
 def update_request_ticket(person_id, tag_data_tuple, ticket_id=None):
@@ -241,21 +220,19 @@ def update_request_ticket(person_id, tag_data_tuple, ticket_id=None):
     #      rt_paper_cornfirm, rt_paper_reject, rt_paper_forget, rt_name, rt_email, rt_whatever
     #flag: rt_number
     if not ticket_id:
-        last_id = []
-
-        try:
-            last_id = run_sql("select max(flag) from aidPERSONID use index (`ptf-b`) where personid=%s and tag like %s", (str(person_id), 'rt_%'))[0][0]
-        except (OperationalError, ProgrammingError):
-            last_id = run_sql("select max(flag) from aidPERSONID where personid=%s and tag like %s", (str(person_id), 'rt_%'))[0][0]
+        last_id = run_sql("select max(opt1) from aidPERSONIDDATA where personid=%s and tag like %s", (str(person_id), 'rt_%'))[0][0]
 
         if last_id:
             ticket_id = last_id + 1
         else:
             ticket_id = 1
-    delete_request_ticket(person_id, ticket_id)
+    else:
+        delete_request_ticket(person_id, ticket_id)
 
     for d in tag_data_tuple:
-        run_sql("insert into aidPERSONID (personid,tag,data,flag) values (%s,%s,%s,%s)", (str(person_id), 'rt_' + str(d[0]), str(d[1]), str(ticket_id)))
+        run_sql("insert into aidPERSONIDDATA (personid, tag, data, opt1) "
+                "values (%s,%s,%s,%s)",
+                 (str(person_id), 'rt_' + str(d[0]), str(d[1]), str(ticket_id)))
 
     return ticket_id
 
@@ -266,108 +243,25 @@ def delete_request_ticket(person_id, ticket_id=None):
     If ticket_id is not provider removes all the tickets pending on a person.
     '''
     if ticket_id:
-        run_sql("delete from aidPERSONID where personid=%s and tag like %s and flag =%s", (str(person_id), 'rt_%', str(ticket_id)))
+        run_sql("delete from aidPERSONIDDATA where personid=%s and tag like %s and opt1 =%s", (str(person_id), 'rt_%', str(ticket_id)))
     else:
-        run_sql("delete from aidPERSONID where personid=%s and tag like %s", (str(person_id), 'rt_%'))
+        run_sql("delete from aidPERSONIDDATA where personid=%s and tag like %s", (str(person_id), 'rt_%'))
 
 
-def find_personIDs_by_name_string(namestring, strict=False):
-    '''
-    Search engine to find persons matching the given string
-    The matching is done on the surname first, and names if present.
-    An ordered list (per compatibility) of pids and found names is returned.
+def get_all_personids_by_name(regexpr):
+    return run_sql("select personid, name "
+                   "from aidPERSONIDPAPERS "
+                   "where name like %s",
+                   (regexpr,))
 
-    @param namestring: string name, 'surname, names I.'
-    @type: string
-    @param strict: Define if this shall perform an exact or a fuzzy match
-    @type strict: boolean
-    @return: pid list of lists
-    [pid,[[name string, occur count, compatibility]]]
-    '''
-    canonical = []
-    use_index = True
-
-    try:
-        canonical = run_sql("select personid,data from aidPERSONID use index (`tdf-b`) where data like %s and tag=%s", (namestring + '%', 'canonical_name'))
-    except (ProgrammingError, OperationalError):
-        canonical = run_sql("select personid,data from aidPERSONID where data like %s and tag=%s", (namestring + '%', 'canonical_name'))
-        use_index = False
-
-    namestring_parts = split_name_parts(namestring)
-
-#   The following lines create the regexp used in the query.
-    surname = clean_name_string(namestring_parts[0],
-#                                replacement=".{0,3}",
-                                replacement="%",
-                                keep_whitespace=False,
-                                trim_whitespaces=True)
-    surname = surname + ',%'
-    matching_pids_names_tuple = []
-
-    if use_index:
-        matching_pids_names_tuple = run_sql("select o.personid, o.data, o.flag from aidPERSONID o use index (`ptf-b`), "
-                                            "(select distinct i.personid as ipid from aidPERSONID i use index (`tdf-b`) where i.tag='gathered_name' and i.data like %s)"
-                                            " as dummy where  o.tag='gathered_name' and o.personid = dummy.ipid", (surname,))
-#        matching_pids_names_tuple = run_sql("select personid, data, flag from aidPERSONID use index (`ptf-b`) "
-#                                            "where  tag=\'gathered_name\' and personid in "
-#                                            "(select distinct personid from aidPERSONID use index (`tdf-b`) "
-#                                            "where tag=\'gathered_name\' and data like %s)", (surname,))
+def get_personids_by_canonical_name(target):
+    pid = run_sql("select personid from aidPERSONIDDATA where "
+                  "tag='canonical_name' and data like %s", (target,))
+    if pid:
+        return run_sql("select personid, name from aidPERSONIDPAPERS "
+                       "where personid=%s", (pid[0][0],))
     else:
-        matching_pids_names_tuple = run_sql("select o.personid, o.data, o.flag from aidPERSONID o, "
-                                            "(select distinct i.personid as ipid from aidPERSONID i where i.tag='gathered_name' and i.data like %s)"
-                                            " as dummy where  o.tag='gathered_name' and o.personid = dummy.ipid", (surname,))
-#    print matching_pids_names_tuple
-    if len(matching_pids_names_tuple) == 0 and len(surname) >= 2:
-        surname = surname[0:len(surname) - 2] + '%,%'
-
-        if use_index:
-            matching_pids_names_tuple = run_sql("select o.personid, o.data, o.flag from aidPERSONID o use index (`ptf-b`), "
-                                            "(select distinct i.personid as ipid from aidPERSONID i use index (`tdf-b`) where i.tag='gathered_name' and i.data like %s)"
-                                            " as dummy where  o.tag='gathered_name' and o.personid = dummy.ipid", (surname,))
-        else:
-            matching_pids_names_tuple = run_sql("select o.personid, o.data, o.flag from aidPERSONID o, "
-                                            "(select distinct i.personid as ipid from aidPERSONID i where i.tag='gathered_name' and i.data like %s)"
-                                            " as dummy where  o.tag='gathered_name' and o.personid = dummy.ipid", (surname,))
-
-    if len(matching_pids_names_tuple) == 0 and len(surname) >= 2:
-        surname = '%' + surname[0:len(surname) - 2] + '%,%'
-
-        if use_index:
-            matching_pids_names_tuple = run_sql("select o.personid, o.data, o.flag from aidPERSONID o use index (`ptf-b`), "
-                                            "(select distinct i.personid as ipid from aidPERSONID i use index (`tdf-b`) where i.tag='gathered_name' and i.data like %s)"
-                                            " as dummy where  o.tag='gathered_name' and o.personid = dummy.ipid", (surname,))
-        else:
-            matching_pids_names_tuple = run_sql("select o.personid, o.data, o.flag from aidPERSONID o, "
-                                            "(select distinct i.personid as ipid from aidPERSONID i where i.tag='gathered_name' and i.data like %s)"
-                                            " as dummy where  o.tag='gathered_name' and o.personid = dummy.ipid", (surname,))
-
-    matching_pids = []
-#    print matching_pids_names_tuple
-    for name in matching_pids_names_tuple:
-        comparison = soft_compare_names(namestring, name[1])
-        matching_pids.append([name[0], name[1], name[2], comparison])
-#   matching_pids = sorted(matching_pids, key=lambda k: k[3], reverse=True)
-#    print matching_pids
-    persons = {}
-    if len(canonical) > 0:
-        for n in canonical:
-            matching_pids.append([n[0], n[1], 1, 1])
-    for n in matching_pids:
-        if n[3] >= 0.4:
-            if n[0] not in persons:
-                persons[n[0]] = sorted([[p[1], p[2], p[3]] for p in  matching_pids if p[0] == n[0]],
-                                key=lambda k: k[2], reverse=True)
-#    print persons
-    porderedlist = []
-    for i in persons.iteritems():
-        porderedlist.append([i[0], i[1]])
-    porderedlist = sorted(porderedlist, key=lambda k: k[1][0][1], reverse=False)
-    porderedlist = sorted(porderedlist, key=lambda k: k[1][0][0], reverse=False)
-    porderedlist = sorted(porderedlist, key=lambda k: k[1][0][2], reverse=True)
-    if strict and len(porderedlist) >= 1:
-        return [porderedlist[0]]
-    return porderedlist
-
+        return []
 
 def get_bibref_modification_status(bibref):
     '''
@@ -384,24 +278,15 @@ def get_bibref_modification_status(bibref):
     if not bibref:
         raise ValueError("A bibref is expected!")
 
-    flags = []
-
-    try:
-        flags = run_sql("SELECT flag,lcul FROM aidPERSONID use index (`tdf-b`) WHERE "
-                       "tag = 'paper' AND data = %s"
-                       , (bibref,))
-    except (OperationalError, ProgrammingError):
-        flags = run_sql("SELECT flag,lcul FROM aidPERSONID WHERE "
-                       "tag = 'paper' AND data = %s"
-                       , (bibref,))
-
-    try:
-        flag = flags[0][0]
-        lcul = flags[0][1]
-    except (IndexError):
-        return [False, 0]
-
-    return [flag, lcul]
+    head, rec = bibref.split(',')
+    table, ref = head.split(':')
+    flags = run_sql("SELECT flag, lcul FROM aidPERSONIDPAPERS WHERE "
+                    "bibref_table = %s and bibref_value = %s and bibrec = %s"
+                    , (table, ref, rec))
+    if flags:
+        return flags[0]
+    else:
+        return (False, 0)
 
 
 def get_canonical_id_from_personid(pid):
@@ -414,200 +299,78 @@ def get_canonical_id_from_personid(pid):
     @return: sql result of the request
     @rtype: tuple of tuple
     '''
-    return run_sql("SELECT data FROM aidPERSONID WHERE "
-                   "tag='canonical_name' AND personid = %s", (str(pid),))
+    return run_sql("SELECT data FROM aidPERSONIDDATA WHERE "
+                   "tag = %s AND personid = %s", ('canonical_name', str(pid)))
 
 
-def get_papers_status(papers):
+def get_papers_status(paper):
     '''
     Gets the personID and flag assiciated to papers
     @param papers: list of papers
-    @type papers: (('100:7531,9024',),)
+    @type papers: '100:7531,9024'
     @return: (('data','personID','flag',),)
     @rtype: tuple of tuples
     '''
-    #lst of papers (('100:7531,9024',),)
-    #for each paper gives: personid, assignment status
-    papersstr = '( '
-    for p in papers:
-        papersstr += '\'' + str(p[0]) + '\','
-    papersstr = papersstr[0:len(papersstr) - 1] + ' )'
-    if len(papers) >= 1:
-        ret_val = []
+    head, bibrec = paper.split(',')
+    _table, bibref = head.split(':')
 
-        try:
-            ret_val = run_sql("select data,PersonID,flag from aidPERSONID use index (`tdf-b`) where tag=%s and data in " + papersstr,
-                    ('paper',))
-        except (ProgrammingError, OperationalError):
-            ret_val = run_sql("select data,PersonID,flag from aidPERSONID where tag=%s and data in " + papersstr,
-                    ('paper',))
-
-        return ret_val
-    else:
-        return []
-
-
-class PersonIDStatusDataCacher(DataCacher):
-    '''
-    Data Cacher to monitor the existence of personid data
-    '''
-    def __init__(self):
-        '''
-        Initializes the Data Cacher
-        '''
-        def cache_filler():
-            '''
-            Sets the Data Cacher content to True if the table is not empty
-            '''
-            try:
-                if len(run_sql("SELECT personid FROM aidPERSONID "
-                               "WHERE tag='paper' LIMIT 1")):
-                    return True
-                else:
-                    return False
-            except Exception:
-                # database problems, return empty cache
-                return False
-
-        def timestamp_verifier():
-            '''
-            Verifies that the table is still empty every 2 hours
-            '''
-            dt = datetime.datetime.now()
-            td = dt - datetime.timedelta(hours=2)
-            return td.strftime("%Y-%m-%d %H:%M:%S")
-
-        DataCacher.__init__(self, cache_filler, timestamp_verifier)
+    rets = run_sql("select PersonID, flag "
+                             "from aidPERSONIDPAPERS "
+                             "where bibref_table = %s "
+                             "and bibref_value = %s "
+                             "and bibrec = %s"
+                             % (head, bibrec, bibref))
+    return [[paper] + list(x) for x in rets]
 
 
 def get_persons_from_recids(recids, return_alt_names=False,
-                                    return_all_person_papers=False):
-    '''
-    Function to find person informations as occuring on records
+                            return_all_person_papers=False):
+    rec_2_pid = dict()
+    pid_2_data = dict()
+    all_pids = set()
 
-    @param recids: List of rec IDs
-    @type recids: list of int
-    @param return_alt_names: Return all name variations?
-    @type return_alt_names: boolean
-    @param return_all_person_papers: Return also a person's record IDs?
-    @type return_all_person_papers: boolean
+    for rec in recids:
+        pids = run_sql("SELECT personid "
+                       "FROM aidPERSONIDPAPERS "
+                       "WHERE bibrec = %s",
+                       (rec,))
 
-    return: tuple of two dicts:
-        structure: ({recid: [personids]}, {personid: {personinfo}})
-        example:
-        ({1: [4]},
-        {4: {'canonical_id' : str,
-             'alternatative_names': list of str,
-             'person_records': list of int
-            }
-        })
-    rtype: tuple of two dicts
-    '''
-    rec_pid = {}
-    pinfo = {}
+        # for some reason python's set is faster than a mysql distinct
+        pids = set(p[0] for p in pids)
+        all_pids |= pids
+        rec_2_pid[rec] = list(pids)
 
-    if not isinstance(recids, list) or isinstance(recids, tuple):
-        if isinstance(recids, int):
-            recids = [recids]
-        else:
-            return (rec_pid, pinfo)
+    for pid in all_pids:
+        canonical = run_sql("SELECT data "
+                            "FROM aidPERSONIDDATA "
+                            "WHERE tag = %s "
+                            "AND personid = %s",
+                            ('canonical_name', pid))
+        assert len(canonical) == 1
 
-    if not DATA_CACHERS:
-        DATA_CACHERS.append(PersonIDStatusDataCacher())
+        pid_data = {'canonical_id' : canonical[0][0]}
 
-    pid_table_cacher = DATA_CACHERS[0]
-    pid_table_cacher.recreate_cache_if_needed()
+        if return_alt_names:
+            names = run_sql("SELECT name "
+                            "FROM aidPERSONIDPAPERS "
+                            "WHERE personid = %s",
+                            (pid,))
+            names = set(n[0] for n in names)
 
-    if not pid_table_cacher.cache:
-        return (rec_pid, pinfo)
+            pid_data['alternatative_names'] = list(names)
 
-    for recid in recids:
-        rec_names = get_field_values_on_condition(recid,
-                                                  source='API',
-                                                  get_table=['100', '700'],
-                                                  get_tag='a')
-        for rname in rec_names:
-            rname = rname.encode('utf-8')
-            rec_bibrefs = run_sql("select bibrefs from aidAUTHORNAMES where "
-                                  "db_name=%s", (rname,))
+        if return_all_person_papers:
+            recs = run_sql("SELECT bibrec "
+                           "FROM aidPERSONIDPAPERS "
+                           "WHERE personid = %s",
+                           (pid,))
+            recs = set(r[0] for r in recs)
 
-            if not rec_bibrefs:
-                continue
+            pid_data['person_records'] = list(recs)
 
-            rec_bibrefs = rec_bibrefs[0][0].split(',')
-            bibrefrec = ""
+        pid_2_data[pid] = pid_data
 
-            if len(rec_bibrefs) > 1:
-                for ref in rec_bibrefs:
-                    table, refid = ref.split(":")
-                    tmp = None
-
-                    if table == "100":
-                        tmp = run_sql("select id_bibrec from bibrec_bib10x "
-                                      "where id_bibxxx=%s and id_bibrec=%s",
-                                      (refid, recid))
-                    elif table == "700":
-                        tmp = run_sql("select id_bibrec from bibrec_bib70x "
-                                      "where id_bibxxx=%s and id_bibrec=%s",
-                                      (refid, recid))
-                    else:
-                        continue
-
-                    if tmp:
-                        bibrefrec = "%s,%s" % (ref, recid)
-                        break
-            else:
-                try:
-                    bibrefrec = "%s,%s" % (rec_bibrefs[0], recid)
-                except IndexError:
-                    pass
-
-            if bibrefrec:
-                pids = []
-
-                try:
-                    pids = run_sql("select personid from aidPERSONID "
-                                   "use index (`tdf-b`) where "
-                                   "tag=%s and data=%s and flag > -1",
-                                   ('paper', bibrefrec))
-                except (ProgrammingError, OperationalError):
-                    pids = run_sql("select personid from aidPERSONID "
-                                   "where "
-                                   "tag=%s and data=%s and flag > -1",
-                                   ('paper', bibrefrec))
-
-                pids = [i[0] for i in pids]
-
-                for pid in pids:
-                    if recid in rec_pid:
-                        rec_pid[recid].append(pid)
-                    else:
-                        rec_pid[recid] = [pid]
-                    if pid in pinfo:
-                        continue
-
-                    pinfo[pid] = {}
-                    cid = ""
-
-                    try:
-                        cid = get_person_data(pid, "canonical_name")[0][1]
-                    except IndexError:
-                        pass
-
-                    pinfo[pid]["canonical_id"] = cid
-
-                    if return_alt_names:
-                        anames = get_person_db_names_count((pid,))
-                        pinfo[pid]["alternative_names"] = [anm[0]
-                                                           for anm in anames]
-
-                    if return_all_person_papers:
-                        pinfo[pid]["person_records"] = get_person_papers(
-                                                        (pid,), -1,
-                                                        show_author_name=True,
-                                                        show_title=False)
-
-    return (rec_pid, pinfo)
+    return (rec_2_pid, pid_2_data)
 
 
 def get_person_db_names_count(pid, sort_by_count=True):
@@ -617,32 +380,42 @@ def get_person_db_names_count(pid, sort_by_count=True):
     @param pid: ID of the person
     @type pid: ('2',)
     '''
-    docs = []
 
-    try:
-        docs = run_sql("SELECT `data` FROM `aidPERSONID` use index (`ptf-b`) where PersonID=%s and tag=%s and flag>=%s",
-                        (str(pid[0]), 'paper', '-1',))
-    except (ProgrammingError, OperationalError):
-        docs = run_sql("SELECT `data` FROM `aidPERSONID` where PersonID=%s and tag=%s and flag>=%s",
-                        (str(pid[0]), 'paper', '-1',))
+    id_2_count = run_sql("select bibref_table, bibref_value "
+                         "from aidPERSONIDPAPERS "
+                         "where personid = %s", (pid,))
 
-    authornames = {}
-    for doc in docs:
-        dsplit = doc[0].split(',')
-        tnum = "70"
-        if str(dsplit[0].split(':')[0]) == "100":
-            tnum = "10"
-        sqlstr = "SELECT value FROM bib%sx WHERE  id = " % tnum + "%s"
-        authorname = run_sql(sqlstr, (dsplit[0].split(':')[1],))
-        if len(authorname) > 0:
-            if authorname[0][0] not in authornames:
-                authornames[authorname[0][0]] = 1
-            else:
-                authornames[authorname[0][0]] += 1
-    authornames = list(authornames.iteritems())
+    ref100 = [refid[1] for refid in id_2_count if refid[0] == '100']
+    ref700 = [refid[1] for refid in id_2_count if refid[0] == '700']
+
+    ref100_count = dict((key, len(list(data))) for key, data in groupby(sorted(ref100)))
+    ref700_count = dict((key, len(list(data))) for key, data in groupby(sorted(ref700)))
+
+    if ref100:
+        ref100_s = list_2_SQL_str(ref100, str)
+        id100_2_str = run_sql("select id, value "
+                              "from bib10x "
+                              "where id in %s"
+                              % ref100_s)
+    else:
+        id100_2_str = tuple()
+
+    if ref700:
+        ref700_s = list_2_SQL_str(ref700, str)
+        id700_2_str = run_sql("select id, value "
+                              "from bib70x "
+                              "where id in %s"
+                              % ref700_s)
+    else:
+        id700_2_str = tuple()
+
+    ret100 = [(name, ref100_count[refid]) for refid, name in id100_2_str]
+    ret700 = [(name, ref700_count[refid]) for refid, name in id700_2_str]
+
+    ret = ret100 + ret700
     if sort_by_count:
-        authornames = sorted(authornames, key=lambda k: k[0], reverse=False)
-    return authornames
+        ret = sorted(ret, key=itemgetter(1), reverse=True)
+    return ret
 
 
 def get_person_id_from_canonical_id(canonical_id):
@@ -655,7 +428,7 @@ def get_person_id_from_canonical_id(canonical_id):
     @return: sql result of the request
     @rtype: tuple of tuple
     '''
-    return run_sql("SELECT personid FROM aidPERSONID WHERE "
+    return run_sql("SELECT personid FROM aidPERSONIDDATA WHERE "
                    "tag='canonical_name' AND data = %s", (canonical_id,))
 
 
@@ -667,67 +440,59 @@ def get_person_names_count(pid):
     @param value: value to be written for the tag
     @type value: string
     '''
-    ret_val = []
-
-    try:
-        ret_val = run_sql("select data,flag from aidPERSONID use index (`ptf-b`) where PersonID=%s and tag=%s",
-                    (str(pid[0]), 'gathered_name',))
-    except (OperationalError, ProgrammingError):
-        ret_val = run_sql("select data,flag from aidPERSONID where PersonID=%s and tag=%s",
-                    (str(pid[0]), 'gathered_name',))
-
-    return ret_val
+    return run_sql("select name, count(name) from aidPERSONIDPAPERS where "
+                   "personid=%s group by name", (pid,))
 
 
-def get_person_names_set(pid):
+def get_person_db_names_set(pid):
     '''
-    Returns the set of name strings associated to a person id
+    Returns the set of db_name strings associated to a person id
     @param pid: ID of the person
-    @type pid: ('2',)
-    @param value: value to be written for the tag
-    @type value: string
+    @type pid: 2
     '''
-    docs = []
 
-    try:
-        docs = run_sql("SELECT `data` FROM `aidPERSONID` use index (`ptf-b`) where PersonID=%s and tag=%s and flag>=%s",
-                        (str(pid[0]), 'paper', '-1',))
-    except (ProgrammingError, OperationalError):
-        docs = run_sql("SELECT `data` FROM `aidPERSONID` where PersonID=%s and tag=%s and flag>=%s",
-                    (str(pid[0]), 'paper', '-1',))
-
-    authornames = set()
-    for doc in docs:
-        dsplit = doc[0].split(',')
-        tnum = "70"
-        if str(dsplit[0].split(':')[0]) == "100":
-            tnum = "10"
-        sqlstr = "SELECT value FROM bib%sx WHERE  id = " % tnum + "%s"
-        authorname = run_sql(sqlstr, (dsplit[0].split(':')[1],))
-        if len(authorname) > 0:
-            authornames.add(authorname[0])
-    return list(authornames)
+    names = get_person_db_names_count(pid)
+    if names:
+        return zip(set(zip(*names)[0]))
+    else:
+        return []
 
 def get_personids_from_bibrec(bibrec):
     '''
     Returns all the personids associated to a bibrec.
     '''
-    authors = get_authors_from_paper(bibrec)
-    coauthors = get_coauthors_from_paper(bibrec)
 
-    alist = ''.join(["'100:%s,%s'," % (p[0], str(bibrec)) for p in authors])
-    clist = ''.join(["'700:%s,%s'," % (p[0], str(bibrec)) for p in coauthors])
-    if len(clist) > 0:
-        clist = clist[0:len(clist) - 1]
-    elif len(alist) > 0:
-        alist = alist[0:len(alist) - 1]
+    pids = run_sql("select distinct personid from aidPERSONIDPAPERS where bibrec=%s", (bibrec,))
+
+    if pids:
+        return zip(*pids)[0]
     else:
         return []
-    query = ("select distinct personid from aidPERSONID where tag='paper' and flag > '-1'"
-            " and data in (%s)" % (alist + clist))
-    pids = run_sql(query)
-    return [a[0] for a in pids]
 
+def get_personids_and_papers_from_bibrecs(bibrecs, limit_by_name=None):
+    '''
+    '''
+    if not bibrecs:
+        return []
+    else:
+        bibrecs = list_2_SQL_str(bibrecs)
+    if limit_by_name:
+        try:
+            surname = split_name_parts(limit_by_name)[0]
+        except IndexError:
+            surname = None
+    else:
+        surname = None
+    if not surname:
+        data = run_sql("select personid,bibrec from aidPERSONIDPAPERS where bibrec in %s" % (bibrecs,))
+    else:
+        surname = split_name_parts(limit_by_name)[0]
+        data = run_sql(("select personid,bibrec from aidPERSONIDPAPERS where bibrec in %s "
+                       "and name like " % bibrecs) + ' %s ', (surname + '%',))
+    pidlist = [(k, set([s[1] for s in d]))
+               for k, d in groupby(sorted(data, key=lambda x:x[0]), key=lambda x:x[0])]
+    pidlist = sorted(pidlist, key=lambda x:len(x[1]), reverse=True)
+    return pidlist
 
 def get_person_bibrecs(pid):
     '''
@@ -735,114 +500,107 @@ def get_person_bibrecs(pid):
     @param pid: integer personid
     @return [bibrec1,...,bibrecN]
     '''
-    papers = run_sql("select data from aidPERSONID where personid=%s and tag='paper'", (str(pid),))
-    bibrecs = [p[0].split(',')[1] for p in papers]
-    return bibrecs
+    papers = run_sql("select bibrec from aidPERSONIDPAPERS where personid=%s", (str(pid),))
 
-def get_person_papers(pid, flag, show_author_name=False,
-                      show_title=False, show_rt_status=False):
-    '''
-    Returns all the paper associated to a person with a flag greater or equal
-    than the given one. Eventually returns even author name and title
-    associated to the papers.
-
-    @param pid: person id
-    @type pid: ('2',)
-    @param flag: numerical flag, the convention is documented with the
-                 database table creation script
-    @type papers: integer
-    @param show_author_name: Also return authorname in dict?
-    @type show_author_name: Boolean
-    @param show_title: Also return title in dict?
-    @type show_title: Boolean
-    @param show_rt_status: Also return if this paper is currently mentioned
-        in a ticket to be reviewed by an operator.
-
-    @return: [{'data': String,
-               'flag': Int,
-               'author_name': String,
-               'title': String,
-               'rt_status': Boolean}]
-             author_name and title will be returned depending on the params
-    @rtype: list of dicts
-    '''
-    #expects a pid ('2',)
-    #and a flag 0
-    try:
-        from invenio.search_engine import get_record
-    except ImportError:
+    if papers:
+        return list(set(zip(*papers)[0]))
+    else:
         return []
 
-    paperslist = []
-    docs = []
+def get_person_papers(pid, flag,
+                      show_author_name=False,
+                      show_title=False,
+                      show_rt_status=False,
+                      show_affiliations=False,
+                      show_date=False,
+                      show_experiment=False):
+    query = "bibref_table, bibref_value, bibrec, flag"
+    if show_author_name:
+        query += ", name"
 
-    try:
-        flag = int(flag)
-    except ValueError:
-        return paperslist
+    all_papers = run_sql("SELECT " + query + " "
+                         "FROM aidPERSONIDPAPERS "
+                         "WHERE personid = %s "
+                         "AND flag >= %s",
+                         (pid, flag))
 
-    try:
-        docs = run_sql("SELECT data,flag FROM aidPERSONID use index (`ptf-b`) "
-                       "where personid = %s "
-                       "and tag = %s and flag >= %s",
-                       (pid[0], 'paper', flag))
-    except (ProgrammingError, OperationalError):
-        docs = run_sql("SELECT data,flag FROM aidPERSONID where personid = %s"
-                        " and tag = %s and flag >= %s",
-                        (pid[0], 'paper', flag))
+    def format_paper(paper):
+        bibrefrec = "%s:%d,%d" % paper[:3]
+        ret = {'data' : bibrefrec,
+               'flag' : paper[3]
+              }
 
-    for doc in docs:
-        listdict = {}
+        if show_author_name:
+            ret['authorname'] = paper[4]
 
         if show_title:
-            title = "No title on paper..."
+            ret['title'] = ""
+            title_id = run_sql("SELECT id_bibxxx "
+                               "FROM bibrec_bib24x "
+                               "WHERE id_bibrec = %s",
+                               (paper[2],))
+            if title_id:
+                title_id = zip(title_id)[0]
+                title_id_s = list_2_SQL_str(title_id)
+                title = run_sql("SELECT value "
+                                "FROM bib24x "
+                                "WHERE id in %s "
+                                "AND tag = '245__a'"
+                                % title_id_s)
 
-            try:
-                rec_id = int(doc[0].split(',')[1])
-                title = get_record(rec_id)['245'][0][0][0][1]
-            except (IndexError, KeyError, ValueError):
-                title = "Problem encountered while retrieving document title"
-
-            listdict["title"] = title
-
-        dsplit = doc[0].split(',')
-        tnum = "70"
-
-        if str(dsplit[0].split(':')[0]) == "100":
-            tnum = "10"
-
-        sqlstr = ("SELECT value FROM bib%sx WHERE  id = " % (tnum)) + '%s'
-        authorname = run_sql(sqlstr, (dsplit[0].split(':')[1],))
-
-        try:
-            authorname = authorname[0][0]
-
-            if show_author_name:
-                listdict["authorname"] = authorname.decode("utf-8")
-        except IndexError:
-            #The paper has been modified and this bibref is no longer there
-            #@TODO: this must call bibsched to update_personid_table_from_paper
-            continue
-
-        listdict["data"] = doc[0]
-        listdict["flag"] = doc[1]
+                if title:
+                    ret['title'] = title[0]
 
         if show_rt_status:
-            rt_count = run_sql("SELECT count(*) FROM aidPERSONID WHERE "
-                               "tag like 'rt_%%' and data = %s", (doc[0],))
-            try:
-                rt_count = int(rt_count[0][0])
-            except (IndexError, ValueError, TypeError):
-                rt_count = 0
+            rt_count = run_sql("SELECT count(personid) "
+                               "FROM aidPERSONIDDATA WHERE "
+                               "tag like 'rt_%%' and data = %s"
+                               , (bibrefrec,))
 
-            if rt_count > 0:
-                listdict["rt_status"] = True
-            else:
-                listdict["rt_status"] = False
+            ret['rt_status'] = (rt_count[0][0] > 0)
 
-        paperslist.append(listdict)
+        if show_affiliations:
+            tag = '%s__u' % paper[0]
+            ret['affiliation'] = get_grouped_records(paper[:3], tag)[tag]
 
-    return paperslist
+        if show_date:
+            ret['date'] = []
+            date_id = run_sql("SELECT id_bibxxx "
+                              "FROM bibrec_bib26x "
+                              "WHERE id_bibrec = %s "
+                              , (paper[2],))
+
+            if date_id:
+                date_id_s = list_2_SQL_str(date_id)
+                date = run_sql("SELECT value "
+                               "FROM bib26x "
+                               "WHERE id in %s "
+                               "AND tag = %s"
+                               % (date_id_s, "'269__c'"))
+                if date:
+                    ret['date'] = zip(*date)[0]
+
+
+        if show_experiment:
+            ret['experiment'] = []
+            experiment_id = run_sql("SELECT id_bibxxx "
+                                    "FROM bibrec_bib69x "
+                                    "WHERE id_bibrec = %s "
+                                    , (paper[2],))
+
+            if experiment_id:
+                experiment_id_s = list_2_SQL_str(experiment_id)
+                experiment = run_sql("SELECT value "
+                                     "FROM bib69x "
+                                     "WHERE id in %s "
+                                     "AND tag = %s"
+                                     % (experiment_id_s, "'693__e'"))
+                if experiment:
+                    ret['experiment'] = zip(*experiment)[0]
+
+        return ret
+
+    return [format_paper(paper) for paper in all_papers]
 
 
 def get_persons_with_open_tickets_list():
@@ -850,60 +608,10 @@ def get_persons_with_open_tickets_list():
     Finds all the persons with open tickets and returns pids and count of tickets
     @return: [[pid, ticket_count]]
     '''
-    try:
-        return run_sql("select o.personid, count(distinct o.flag) from "
-                    "aidPERSONID o use index (`ptf-b`), "
-                    "(select distinct i.personid as iid from aidPERSONID i "
-                    "use index (`ptf-b`) where tag like 'rt_%') as dummy "
-                    "WHERE tag like 'rt_%' AND o.personid = dummy.iid "
-                    "group by o.personid")
-    except (OperationalError, ProgrammingError):
-        return run_sql("select o.personid, count(distinct o.flag) from "
-                    "aidPERSONID o, "
-                    "(select distinct i.personid as iid from aidPERSONID i "
-                    "where tag like 'rt_%') as dummy "
-                    "WHERE tag like 'rt_%' AND o.personid = dummy.iid "
-                    "group by o.personid")
-#    try:
-#        return run_sql('select personid,count(distinct(flag)) from aidPERSONID use index (`ptf-b`)'
-#                   'where personid in (select distinct personid from aidPERSONID use index (`ptf-b`) '
-#                   'where tag like "rt_%") and tag like "rt_%" group by personid ')
-#    except (OperationalError, ProgrammingError):
-#        return run_sql('select personid,count(distinct(flag)) from aidPERSONID '
-#                   'where personid in (select distinct personid from aidPERSONID '
-#                   'where tag like "rt_%") and tag like "rt_%" group by personid ')
+    return run_sql("select personid, count(distinct opt1) from "
+                    "aidPERSONIDDATA where tag like 'rt_%' group by personid")
 
-
-def get_possible_personids_from_paperlist(bibrecreflist):
-    '''
-    @param bibrecreflist: list of bibrecref couples, (('100:123,123',),) or bibrecs (('123',),)
-    returns a list of pids and connected bibrefs in order of number of bibrefs per pid
-    [ [['1'],['123:123.123','123:123.123']] , [['2'],['123:123.123']] ]
-    '''
-
-    pid_bibrecref_dict = {}
-    for b in bibrecreflist:
-        pids = []
-
-        try:
-            pids = run_sql("select personid from aidPERSONID "
-                    "use index (`tdf-b`) where tag=%s and data=%s", ('paper', str(b[0])))
-        except (OperationalError, ProgrammingError):
-            pids = run_sql("select personid from aidPERSONID "
-                    "where tag=%s and data=%s", ('paper', str(b[0])))
-
-        for pid in pids:
-            if pid[0] in pid_bibrecref_dict:
-                pid_bibrecref_dict[pid[0]].append(str(b[0]))
-            else:
-                pid_bibrecref_dict[pid[0]] = [str(b[0])]
-
-    pid_list = [[i, pid_bibrecref_dict[i]] for i in pid_bibrecref_dict]
-
-    return sorted(pid_list, key=lambda k: len(k[1]), reverse=True)
-
-
-def get_request_ticket(person_id, matching=None, ticket_id=None):
+def get_request_ticket(person_id, ticket_id=None):
     '''
     Retrieves one or many requests tickets from a person
     @param: person_id: person id integer
@@ -912,50 +620,13 @@ def get_request_ticket(person_id, matching=None, ticket_id=None):
     @returns: [[[('tag', 'value')], ticket_id]]
         [[[('a', 'va'), ('b', 'vb')], 1L], [[('b', 'daOEIaoe'), ('a', 'caaoOUIe')], 2L]]
     '''
-    use_index = True
-    tickets = []
-
     if ticket_id:
-        rows = []
-
-        try:
-            rows = [run_sql("select tag,data,flag from aidPERSONID use index (`ptf-b`) where tag like %s and personid=%s and flag=%s", ('rt_%', str(person_id), str(ticket_id)))]
-        except (ProgrammingError, OperationalError):
-            rows = [run_sql("select tag,data,flag from aidPERSONID where tag like %s and personid=%s and flag=%s", ('rt_%', str(person_id), str(ticket_id)))]
-            use_index = False
-
-        if len(rows) < 1:
-            return []
+        tstr = " and opt1='%s' " % ticket_id
     else:
-        rows = []
-        ids = []
-
-        if use_index:
-            if not matching:
-                ids = run_sql("select distinct flag from aidPERSONID use index (`ptf-b`) where personid=%s and tag like %s", (str(person_id), 'rt_%'))
-            else:
-                ids = run_sql("select distinct flag from aidPERSONID use index (`tdf-b`) where tag=%s and data=%s and personid=%s", ('rt_' + str(matching[0]), str(matching[1]), str(person_id)))
-        else:
-            if not matching:
-                ids = run_sql("select distinct flag from aidPERSONID where personid=%s and tag like %s", (str(person_id), 'rt_%'))
-            else:
-                ids = run_sql("select distinct flag from aidPERSONID where tag=%s and data=%s and personid=%s", ('rt_' + str(matching[0]), str(matching[1]), str(person_id)))
-
-        for tid in ids:
-            if use_index:
-                rows.append(run_sql("select tag,data,flag from aidPERSONID use index (`ptf-b`) where tag like %s and personid=%s and flag = %s", ('rt_%', str(person_id), str(tid[0]))))
-            else:
-                rows.append(run_sql("select tag,data,flag from aidPERSONID where tag like %s and personid=%s and flag = %s", ('rt_%', str(person_id), str(tid[0]))))
-
-    for row in rows:
-        ticket = []
-        for line in row:
-            ticket.append((line[0][3:], line[1]))
-        try:
-            tickets.append([ticket, row[0][2]])
-        except IndexError:
-            pass
-    return tickets
+        tstr = " "
+    tickets = run_sql("select tag,data,opt1 from aidPERSONIDDATA where personid=%s and "
+                      " tag like 'rt_%%' " + tstr , (person_id,))
+    return [[[(s[0][3:], s[1]) for s in d], k] for k, d in groupby(sorted(tickets, key=lambda k: k[2]), key=lambda k: k[2])]
 
 
 def insert_user_log(userinfo, personid, action, tag, value, comment='', transactionid=0, timestamp=''):
@@ -1007,7 +678,7 @@ def insert_user_log(userinfo, personid, action, tag, value, comment='', transact
     return transactionid
 
 
-def person_bibref_is_touched(pid, bibref):
+def person_bibref_is_touched_old(pid, bibref):
     '''
     Determines if a record attached to a person has been touched by a human
     by checking the flag.
@@ -1017,25 +688,16 @@ def person_bibref_is_touched(pid, bibref):
     @param bibref: The paper identifier to be checked (e.g. "100:12,144")
     @type bibref: string
     '''
-    if not isinstance(pid, int):
-        try:
-            pid = int(pid)
-        except (ValueError, TypeError):
-            raise ValueError("Person ID has to be a number!")
+    bibref, rec = bibref.split(",")
+    table, ref = bibref.split(":")
 
-    if not bibref:
-        raise ValueError("A bibref is expected!")
-
-    flag = []
-
-    try:
-        flag = run_sql("SELECT flag FROM aidPERSONID use index (`ptf-b`) WHERE "
-                       "personid = %s AND tag = 'paper' AND data = %s"
-                       , (pid, bibref))
-    except (OperationalError, ProgrammingError):
-        flag = run_sql("SELECT flag FROM aidPERSONID WHERE "
-                       "personid = %s AND tag = 'paper' AND data = %s"
-                       , (pid, bibref))
+    flag = run_sql("SELECT flag "
+                   "FROM aidPERSONIDPAPERS "
+                   "WHERE personid = %s "
+                   "AND bibref_table = %s "
+                   "AND bibref_value = %s "
+                   "AND bibrec = %s"
+                   , (pid, table, ref, rec))
 
     try:
         flag = flag[0][0]
@@ -1050,9 +712,9 @@ def person_bibref_is_touched(pid, bibref):
         return True
 
 
-def reject_papers_from_person(pid, papers, gather_list, user_level=0):
+def confirm_papers_to_person(pid, papers, user_level=0):
     '''
-    Confirms the negative relationship between pid and paper, as from user input.
+    Confirms the relationship between pid and paper, as from user input.
     @param pid: id of the person
     @type pid: ('2',)
     @param papers: list of papers to confirm
@@ -1061,21 +723,47 @@ def reject_papers_from_person(pid, papers, gather_list, user_level=0):
     calling update_personID_names_string_set
     @typer gather_list: set([('2',), ('3',)])
     '''
-    #expects a pid ('2',)
-    #and a lst of papers (('100:7531,9024',),)
-    #check if already assigned by user and skip those ones
     for p in papers:
-        run_sql("update aidPERSONID set flag=%s,lcul=%s where PersonID=%s and data=%s",
-                ('-2', user_level, str(pid[0]), str(p[0])))
+        bibref, rec = p[0].split(",")
+        table, ref = bibref.split(":")
 
-    if gather_list != None:
-        gather_list.add(pid)
-    else:
-        update_personID_names_string_set((pid,))
-    update_personID_canonical_names([pid])
+        present = run_sql("select * from aidPERSONIDPAPERS where "
+                          " bibref_table = %s and"
+                          " bibref_value = %s and"
+                          " bibrec = %s", (table, ref, rec))
+
+        if not present:
+            add_signature([table, ref, rec], None, pid[0])
+
+        run_sql("update aidPERSONIDPAPERS "
+                "set personid = %s "
+                ", flag = %s "
+                ", lcul = %s "
+                "where bibref_table = %s "
+                "and bibref_value = %s "
+                "and bibrec = %s"
+                , (str(pid[0]), '2', user_level,
+                   table, ref, rec))
+
+    update_personID_canonical_names(pid)
+
+def reject_papers_from_person(pid, papers, user_level=0):
+    '''
+    Confirms the negative relationship between pid and paper, as from user input.
+    @param pid: id of the person
+    @type pid: ('2',)
+    @param papers: list of papers to confirm
+    @type papers: (('100:7531,9024',),)
+    '''
+    for p in papers:
+        rec = p[0].split(",")[1]
+        run_sql("update aidPERSONIDPAPERS "
+                "set flag = %s, lcul = %s "
+                "where personid=%s and bibrec=%s",
+                ('-2', user_level, str(pid[0]), rec))
 
 
-def reset_papers_flag(pid, papers, gather_list):
+def reset_papers_flag(pid, papers):
     '''
     Resets the flag associated to the papers to '0'
     @param papers: list of papers to confirm
@@ -1085,14 +773,15 @@ def reset_papers_flag(pid, papers, gather_list):
     @typer gather_list: set([('2',), ('3',)])
     '''
     for p in papers:
-        run_sql("update aidPERSONID set flag='0',lcul='0' where tag=%s and data=%s",
-                ('paper', str(p[0])))
-
-    if gather_list != None:
-        gather_list.add(pid)
-    else:
-        update_personID_names_string_set((pid,))
-    update_personID_canonical_names((pid,))
+        bibref, rec = p[0].split(",")
+        table, ref = bibref.split(":")
+        run_sql("update aidPERSONIDPAPERS "
+                "set flag = %s, lcul = %s "
+                "where bibref_table = %s "
+                "and bibref_value = %s "
+                "and bibrec = %s",
+                ('0', '0',
+                table, ref, rec))
 
 
 def user_can_modify_data(uid, pid):
@@ -1106,28 +795,16 @@ def user_can_modify_data(uid, pid):
     @return: can user mofidfy data?
     @rtype: boolean
     '''
-    pid_uid = []
 
-    try:
-        pid_uid = run_sql("select data from aidPERSONID use index (`ptf-b`) "
-                          "where tag = %s and personid = %s", ('uid', str(pid)))
-    except (OperationalError, ProgrammingError):
-        pid_uid = run_sql("select data from aidPERSONID where tag = %s"
+    pid_uid = run_sql("select data from aidPERSONIDDATA where tag = %s"
                           " and personid = %s", ('uid', str(pid)))
 
-    if len(pid_uid) >= 1:
-        if str(uid) == str(pid_uid[0][0]):
-            if acc_authorize_action(uid, bconfig.CLAIMPAPER_CHANGE_OWN_DATA)[0] == 0:
-                return True
-        if acc_authorize_action(uid, bconfig.CLAIMPAPER_CHANGE_OTHERS_DATA)[0] == 0:
-            return True
-
-        return False
+    if len(pid_uid) >= 1 and str(uid) == str(pid_uid[0][0]):
+        rights = bconfig.CLAIMPAPER_CHANGE_OWN_DATA
     else:
-        if acc_authorize_action(uid, bconfig.CLAIMPAPER_CHANGE_OTHERS_DATA)[0] == 0:
-            return True
+        rights = bconfig.CLAIMPAPER_CHANGE_OTHERS_DATA
 
-        return False
+    return acc_authorize_action(uid, rights)[0] == 0
 
 
 def get_possible_bibrecref(names, bibrec, always_match=False):
@@ -1137,9 +814,7 @@ def get_possible_bibrecref(names, bibrec, always_match=False):
     @param bibrec: bibrec number
     @param always_match: match with all the names (full bibrefs list)
     '''
-    splitted_names = []
-    for n in names:
-        splitted_names.append(split_name_parts(n))
+    splitted_names = [split_name_parts(n) for n in names]
 
     bibrec_names_100 = run_sql("select o.id, o.value from bib10x o, "
                                "(select i.id_bibxxx as iid from bibrec_bib10x i "
@@ -1189,24 +864,20 @@ def user_can_modify_paper(uid, paper):
     @return: can user mofidfy paper attribution?
     @rtype: boolean
     '''
-    prow = []
-
-    try:
-        prow = run_sql("select id,personid,tag,data,flag,lcul from aidPERSONID use index (`tdf-b`) where tag=%s and data =%s"
-                       "order by lcul desc limit 0,1", ('paper', str(paper)))
-    except (OperationalError, ProgrammingError):
-        prow = run_sql("select id,personid,tag,data,flag,lcul from aidPERSONID where tag=%s and data =%s"
-                       "order by lcul desc limit 0,1", ('paper', str(paper)))
+    bibref, rec = paper.split(",")
+    table, ref = bibref.split(":")
+    prow = run_sql("select personid, lcul from aidPERSONIDPAPERS "
+                   "where bibref_table = %s and bibref_value = %s and bibrec = %s "
+                   "order by lcul desc limit 0,1",
+                   (table, ref, rec))
 
     if len(prow) == 0:
-        if ((acc_authorize_action(uid, bconfig.CLAIMPAPER_CLAIM_OWN_PAPERS)[0] == 0) or (acc_authorize_action(uid, bconfig.CLAIMPAPER_CLAIM_OTHERS_PAPERS)[0] == 0)):
-            return True
+        return ((acc_authorize_action(uid, bconfig.CLAIMPAPER_CLAIM_OWN_PAPERS)[0] == 0) or
+                (acc_authorize_action(uid, bconfig.CLAIMPAPER_CLAIM_OTHERS_PAPERS)[0] == 0))
 
-        return False
-
-    min_req_acc_n = int(prow[0][5])
+    min_req_acc_n = int(prow[0][1])
     req_acc = resolve_paper_access_right(bconfig.CLAIMPAPER_CLAIM_OWN_PAPERS)
-    pid_uid = run_sql("select data from aidPERSONID where tag = %s and personid = %s", ('uid', str(prow[0][1])))
+    pid_uid = run_sql("select data from aidPERSONIDDATA where tag = %s and personid = %s", ('uid', str(prow[0][0])))
     if len(pid_uid) > 0:
         if (str(pid_uid[0][0]) != str(uid)) and min_req_acc_n > 0:
             req_acc = resolve_paper_access_right(bconfig.CLAIMPAPER_CLAIM_OTHERS_PAPERS)
@@ -1216,10 +887,7 @@ def user_can_modify_paper(uid, paper):
 
     min_req_acc = resolve_paper_access_right(min_req_acc_n)
 
-    if (acc_authorize_action(uid, min_req_acc)[0] == 0) and (resolve_paper_access_right(min_req_acc) >= min_req_acc_n):
-        return True
-    else:
-        return False
+    return (acc_authorize_action(uid, min_req_acc)[0] == 0) and (resolve_paper_access_right(min_req_acc) >= min_req_acc_n)
 
 
 def resolve_paper_access_right(acc):
@@ -1253,275 +921,15 @@ def get_recently_modified_record_ids(date='00-00-00 00:00:00'):
     papers = run_sql("select id from bibrec where modification_date > %s",
                      (str(date),))
     if papers:
-        bibrecs = [int(i[0]) for i in papers]
+        bibrecs = map(int, *zip(*papers))
         all_bibrecs = perform_request_search(p="")
-        bibrecs = list(set(bibrecs).intersection(set(all_bibrecs)))
+        bibrecs = list(set(bibrecs) & set(all_bibrecs))
         min_date = run_sql("select max(modification_date) from bibrec")
     else:
         bibrecs = []
         min_date = run_sql("select now()")
-    return [(i,) for i in bibrecs], min_date
+    return bibrecs, min_date
 
-def authornames_tables_gc(bunch_size=500):
-    '''
-    Performs garbage collecting on the authornames tables.
-    Potentially really slow.
-    '''
-    bunch_start = run_sql("select min(id) from aidAUTHORNAMESBIBREFS")
-    if len(bunch_start) >= 1:
-        bunch_start = int(bunch_start[0][0])
-    else:
-        return
-
-    abfs_ids_bunch = run_sql("select id,Name_id,bibref from aidAUTHORNAMESBIBREFS limit "
-                            + str(bunch_start - 1) + "," + str(bunch_size))
-    bunch_start += bunch_size
-
-    while len(abfs_ids_bunch) >= 1:
-        bib100list = []
-        bib700list = []
-        for i in abfs_ids_bunch:
-            if i[2].split(':')[0] == '100':
-                bib100list.append(i[2].split(':')[1])
-            elif i[2].split(':')[0] == '700':
-                bib700list.append(i[2].split(':')[1])
-
-        bib100liststr = '( '
-        for i in bib100list:
-            bib100liststr += "'" + str(i) + "',"
-        bib100liststr = bib100liststr[0:len(bib100liststr) - 1] + " )"
-
-        bib700liststr = '( '
-        for i in bib700list:
-            bib700liststr += "'" + str(i) + "',"
-        bib700liststr = bib700liststr[0:len(bib700liststr) - 1] + " )"
-
-        if len(bib100list) >= 1:
-            bib10xids = run_sql("select id from bib10x where id in %s"
-                                % bib100liststr)
-        else:
-            bib10xids = []
-
-        if len(bib700list) >= 1:
-            bib70xids = run_sql("select id from bib70x where id in %s"
-                                % bib700liststr)
-        else:
-            bib70xids = []
-
-        bib10xlist = []
-        bib70xlist = []
-
-        for i in bib10xids:
-            bib10xlist.append(str(i[0]))
-        for i in bib70xids:
-            bib70xlist.append(str(i[0]))
-
-        bib100junk = set(bib100list).difference(set(bib10xlist))
-        bib700junk = set(bib700list).difference(set(bib70xlist))
-
-        idsdict = {}
-        for i in abfs_ids_bunch:
-            idsdict[i[2]] = [i[0], i[1]]
-
-        junklist = []
-        for i in bib100junk:
-            junklist.append('100:' + i)
-        for i in bib700junk:
-            junklist.append('700:' + i)
-
-        for junkref in junklist:
-            try:
-                id_to_remove = idsdict[junkref]
-
-                run_sql("delete from aidAUTHORNAMESBIBREFS where id=%s",
-                        (str(id_to_remove[0]),))
-                if bconfig.TABLES_UTILS_DEBUG:
-                    print ("authornames_tables_gc: idAUTHORNAMESBIBREFS deleting row "
-                           + str(id_to_remove))
-
-                authrow = run_sql("select id,Name,bibrefs,db_name from aidAUTHORNAMES where id=%s",
-                                  (str(id_to_remove[1]),))
-
-                if len(authrow[0][2].split(',')) == 1:
-                    run_sql("delete from aidAUTHORNAMES where id=%s", (str(id_to_remove[1]),))
-                    if bconfig.TABLES_UTILS_DEBUG:
-                        print "authornames_tables_gc: aidAUTHORNAMES deleting " + str(authrow)
-                else:
-                    bibreflist = ''
-                    for ref in authrow[0][2].split(','):
-                        if ref != junkref:
-                            bibreflist += ref + ','
-                    bibreflist = bibreflist[0:len(bibreflist) - 1]
-                    run_sql("update aidAUTHORNAMES set bibrefs=%s where id=%s",
-                            (bibreflist, id_to_remove[1]))
-                    if bconfig.TABLES_UTILS_DEBUG:
-                        print ("authornames_tables_gc: aidAUTHORNAMES updating "
-                               + str(authrow) + ' with ' + str(bibreflist))
-
-            except (OperationalError, ProgrammingError, KeyError, IndexError,
-                    ValueError, TypeError):
-                pass
-
-        abfs_ids_bunch = run_sql("select id,Name_id,bibref from aidAUTHORNAMESBIBREFS limit " +
-                            str(bunch_start - 1) + ',' + str(bunch_size))
-        bunch_start += bunch_size
-
-def populate_authornames():
-    """
-    Author names table population from bib10x and bib70x
-    Average Runtime: 376.61 sec (6.27 min) for 327k entries
-    Should be called only with empty table, then use
-    update_authornames_tables_from_paper with the new papers which
-    are coming in or modified.
-    """
-    max_rows_per_run = bconfig.TABLE_POPULATION_BUNCH_SIZE
-
-    if max_rows_per_run == -1:
-        max_rows_per_run = 5000
-
-    max100 = run_sql("SELECT COUNT(id) FROM bib10x WHERE tag = '100__a'")
-    max700 = run_sql("SELECT COUNT(id) FROM bib70x WHERE tag = '700__a'")
-
-    tables = "bib10x", "bib70x"
-    authornames_is_empty_checked = 0
-    authornames_is_empty = 1
-
-#    Bring author names from bib10x and bib70x to authornames table
-
-    for table in tables:
-
-        if table == "bib10x":
-            table_number = "100"
-        else:
-            table_number = "700"
-
-        querylimiter_start = 0
-        querylimiter_max = eval('max' + str(table_number) + '[0][0]')
-        if bconfig.TABLES_UTILS_DEBUG:
-            print "\nProcessing %s (%s entries):" % (table, querylimiter_max)
-            sys.stdout.write("0% ")
-            sys.stdout.flush()
-
-        while querylimiter_start <= querylimiter_max:
-            if bconfig.TABLES_UTILS_DEBUG:
-                sys.stdout.write(".")
-                sys.stdout.flush()
-                percentage = int(((querylimiter_start + max_rows_per_run) * 100)
-                                   / querylimiter_max)
-                sys.stdout.write(".%s%%." % (percentage))
-                sys.stdout.flush()
-
-#            Query the Database for a list of authors from the correspondent
-#            tables--several thousands at a time
-            bib = run_sql("SELECT id, value FROM %s WHERE tag = '%s__a' "
-                          "LIMIT %s, %s" % (table, table_number,
-                                       querylimiter_start, max_rows_per_run))
-
-            authorexists = None
-
-            querylimiter_start += max_rows_per_run
-
-            for i in bib:
-
-                # For mental sanity, exclude things that are not names...
-                # Yes, I know that there are strange names out there!
-                # Yes, I read the 40 misconceptions about names.
-                # Yes, I know!
-                # However, these statistical outlaws are harmful.
-                artifact_removal = re.compile("[^a-zA-Z0-9]")
-                authorname = ""
-
-                if not i[1]:
-                    continue
-
-                test_name = i[1].decode('utf-8')
-
-                if UNIDECODE_ENABLED:
-                    test_name = unidecode.unidecode(i[1].decode('utf-8'))
-
-                raw_name = artifact_removal.sub("", test_name)
-
-                if len(raw_name) > 1:
-                    authorname = i[1].decode('utf-8')
-
-                if not authorname:
-                    continue
-
-                if not authornames_is_empty_checked:
-                    authornames_is_empty = run_sql("SELECT COUNT(id) "
-                                                   "FROM aidAUTHORNAMES")
-                    if authornames_is_empty[0][0] == 0:
-                        authornames_is_empty_checked = 1
-                        authornames_is_empty = 1
-
-                if not authornames_is_empty:
-#                    Find duplicates in the database and append id if
-#                    duplicate is found
-                    authorexists = run_sql("SELECT id, name, bibrefs, db_name "
-                                           "FROM aidAUTHORNAMES "
-                                           "WHERE db_name = %s",
-                                           (authorname.encode("utf-8"),))
-
-
-                bibrefs = "%s:%s" % (table_number, i[0])
-
-                if not authorexists:
-                    insert_name = ""
-
-                    if len(authorname) > 240:
-                        bconfig.LOGGER.warn("\nName too long, truncated to 254"
-                                            " chars: %s" % (authorname))
-                        insert_name = authorname[0:254]
-                    else:
-                        insert_name = authorname
-
-                    cnn = create_normalized_name
-                    snp = split_name_parts
-
-                    aid_name = authorname
-
-                    if UNIDECODE_ENABLED:
-                        aid_name = cnn(snp(unidecode.unidecode(insert_name)))
-                        aid_name = aid_name.replace("\"", "")
-                    else:
-                        aid_name = cnn(snp(insert_name))
-                        aid_name = aid_name.replace(u"\u201c", "")
-                        aid_name = aid_name.replace(u"\u201d", "")
-
-                    run_sql("INSERT INTO aidAUTHORNAMES VALUES"
-                            " (NULL, %s, %s, %s)",
-                            (aid_name.encode('utf-8'), bibrefs,
-                             insert_name.encode('utf-8')))
-
-                    if authornames_is_empty:
-                        authornames_is_empty = 0
-                else:
-                    if authorexists[0][2].count(bibrefs) >= 0:
-                        upd_bibrefs = "%s,%s" % (authorexists[0][2], bibrefs)
-                        run_sql("UPDATE aidAUTHORNAMES SET bibrefs = "
-                                "%s WHERE id = %s",
-                                (upd_bibrefs, authorexists[0][0]))
-        if bconfig.TABLES_UTILS_DEBUG:
-            sys.stdout.write(" Done.")
-            sys.stdout.flush()
-
-def populate_authornames_bibrefs_from_authornames():
-    '''
-    Populates aidAUTHORNAMESBIBREFS.
-
-    For each entry in aidAUTHORNAMES creates a corresponding entry in aidA.B.
-    so it's possible to search
-    by bibrec/bibref at a reasonable speed as well and not only by name.
-    '''
-    nids = run_sql("select id,bibrefs from aidAUTHORNAMES")
-    for nid in nids:
-        for bibref in nid[1].split(','):
-            if bconfig.TABLES_UTILS_DEBUG:
-                print ('populate_authornames_bibrefs_from_authornames: Adding: '
-                       ' %s %s' % (str(nid[0]), str(bibref)))
-
-            run_sql("insert into aidAUTHORNAMESBIBREFS (Name_id, bibref) "
-                    "values (%s,%s)", (str(nid[0]), str(bibref)))
 
 def get_cached_author_page(pageparam):
     '''
@@ -1596,35 +1004,7 @@ def get_user_log(transactionid='', userinfo='', personID='', action='', tag='', 
     return run_sql(sql_query)
 
 
-def collect_personid_papers(person, paper="", limit=""):
-    """
-    Runs a sql query whit the arguments above.
-    If the index is not found the function ignores it.
-    """
-    if paper:
-        index = "use index (`tdf-b`,`ptf-b`)"
-        where = "where tag='paper' and data like '%%,%s'" % paper
-    else:
-        index = "use index (`ptf-b`)"
-        where = "where tag='paper'"
-
-    if person:
-        person = "and personid in %s" % person
-    else:
-        person = ""
-
-    if limit:
-        limit = "limit %d, %d" % limit
-
-    try:
-        query = "select id, personid, tag, data, flag, lcul from aidPERSONID %s %s %s %s" % (index, where, person, limit)
-        return run_sql(query)
-    except (ProgrammingError, OperationalError):
-        query = "select id, personid, tag, data, flag, lcul from aidPERSONID %s %s %s" % (where, person, limit)
-        return run_sql(query)
-
-
-def list_2_SQL_str(items, f):
+def list_2_SQL_str(items, f=lambda x: x):
     """
     Concatenates all items in items to a sql string using f.
     @param items: a set of items
@@ -1659,207 +1039,42 @@ def get_coauthors_from_paper(paper):
         return run_sql("select id from bib70x where tag='700__a' and id in %s" % (fullbibrefs700str,))
     return tuple()
 
-def delete_personid_by_id(ids):
-    '''
-    Deletes rows in aidPERSONID by id
-    '''
-    if isinstance(ids, int) or isinstance(ids, long) or isinstance(ids, str):
-        return run_sql("delete from aidPERSONID where tag='paper' and id = %s", (str(ids),))
-    else:
-        delstr = list_2_SQL_str(ids, lambda x: str(x))
-        return run_sql("delete from aidPERSONID where tag='paper' and id in %s" % (delstr,))
+def get_bibrefrec_subset(table, papers, refs):
+    table = "bibrec_bib%sx" % str(table)[:-1]
+    contents = run_sql("select id_bibrec, id_bibxxx from %s" % table)
+    papers = set(papers)
+    refs = set(refs)
 
-def get_all_person_ids():
-    '''
-    Get all the distinct person ids
-    '''
-    return run_sql("select distinct personid from aidPERSONID")
-
-def get_person_rt_tickets(pid):
-    '''
-    Returns all the tickets associated to a personID
-    @param pid: int
-    '''
-    return run_sql("select id from aidPERSONID where tag like 'rt%%' and personid=%s", (pid,))
-
-def get_person_claimed_papers(pid):
-    '''
-    Returns all the papers manually claimed to a person
-    @param pid: int
-    '''
-    return run_sql("select id from aidPERSONID where tag='paper'"
-                   " and (flag='2') and personid=%s", (pid,))
-
-def get_person_rejected_papers(pid):
-    '''
-    Returns all the papers manually rejected to a person
-    @param pid: int
-    '''
-    return run_sql("select id from aidPERSONID where tag='paper'"
-                   " and (flag='-2') and personid=%s", (pid,))
+    return ifilter(lambda x: x[0] in papers and x[1] in refs, contents)
 
 def get_deleted_papers():
-    return run_sql("select o.id_bibrec from bibrec_bib98x o, \
-                    (select i.id as iid from bib98x i \
-                    where value = 'DELETED' \
-                    and tag like '980__a') as dummy \
-                    where o.id_bibxxx = dummy.iid")
-
-def update_flags_in_personid(ident, flag, lcul):
-    run_sql("update aidPERSONID set flag=%s,lcul=%s where id=%s", (str(flag), str(lcul), str(ident)))
-
-#PRIVATE SERVICE METHODS
-#The following are private methods used by the interfaces to fulfill their needs. The methods
-#are hosted here to have a single file which is holding SQL queries.
-
-def _pfap_printmsg(identity, msg):
-    if bconfig.TABLES_UTILS_DEBUG:
-        print (time.strftime('%H:%M:%S')
-           + ' personid_fast_assign_papers '
-           + str(identity) + ': '
-           + msg)
-
-# bibathorid_maintenance personid_fast_assign_papers private methods:
-def _pfap_assign_bibrefrec(i, tab, bibref, bibrec, namestring, pnidl):
-    _pfap_printmsg('BibrefAss:  ' + str(i), 'Assigning ' + str(bibref) + ' ' + str(bibrec)
-                   + ' ' + str(namestring))
-    name_parts = split_name_parts(namestring)
-    pid_names_rows = run_sql("select personid,data from aidPERSONID where tag='gathered_name'"
-                             " and data like %s ", (name_parts[0] + ',%',))
-    pid_names_dict = {}
-    for pid in pid_names_rows:
-        pid_names_dict[pid[1]] = pid[0]
-    del pid_names_rows
-
-    names_comparison_list = []
-    for name in pid_names_dict.keys():
-        names_comparison_list.append([name, compare_names(name, namestring)])
-    names_comparison_list = sorted(names_comparison_list, key=lambda x: x[1], reverse=True)
-
-    _pfap_printmsg('BibrefAss:  ' + str(i),
-        ' Top name comparison list against %s: %s' % (namestring, str(names_comparison_list[0:3])))
-
-    if len(names_comparison_list) > 0 and names_comparison_list[0][1] > bconfig.PERSONID_FAST_ASSIGN_PAPERS_MIN_NAME_TRSH:
-        _pfap_printmsg('BibrefAss:  ' + str(i),
-                ' Assigning to the best fit: %s' % str(pid_names_dict[names_comparison_list[0][0]]))
-        run_sql("insert into aidPERSONID (personid,tag,data,flag,lcul) values "
-                "(%s,'paper',%s,'0','0')",
-                (str(pid_names_dict[names_comparison_list[0][0]]), tab +
-                                ':' + str(bibref) + ',' + str(bibrec)))
-        _pfap_printmsg('BibrefAss:  ' + str(i), ' update names string set of %s'
-            % str([[pid_names_dict[names_comparison_list[0][0]]]]))
-        update_personID_names_string_set([[pid_names_dict[names_comparison_list[0][0]]]],
-                                         wait_finished=True)
-        update_personID_canonical_names([[pid_names_dict[names_comparison_list[0][0]]]])
-    else:
-        _pfap_printmsg('BibrefAss:  ' + str(i), 'Creating a new person...')
-        pnidl.acquire()
-        personid_count = run_sql("SELECT COUNT( DISTINCT personid ) FROM  `aidPERSONID` WHERE 1")[0][0]
-
-        if personid_count > 0:
-            personid = run_sql("select max(personid)+1 from aidPERSONID")[0][0]
-        else:
-            personid = 1
-
-        run_sql("insert into aidPERSONID (personid,tag,data,flag,lcul) values "
-                "(%s,'paper',%s,'0','0')",
-                (personid, tab + ':' + str(bibref) + ',' + str(bibrec)))
-        pnidl.release()
-        _pfap_printmsg('BibrefAss:  ' + str(i), 'Released new pid lock')
-        _pfap_printmsg('BibrefAss:  ' + str(i), ' update names string set of %s' % str([[personid]]))
-        update_personID_names_string_set([[personid]], wait_finished=True)
-        update_personID_canonical_names([[personid]])
-
-
-def pfap_assign_paper_iteration(i, bibrec, atul, personid_new_id_lock):
-    '''
-    bibrec = 123
-    '''
-    _pfap_printmsg('Assigner:  ' + str(i), 'Starting on paper: %s' % bibrec)
-    _pfap_printmsg('Assigner:  ' + str(i), 'Updating authornames table')
-    atul.acquire()
-    update_authornames_tables_from_paper([[bibrec]])
-    atul.release()
-    _pfap_printmsg('Assigner:  ' + str(i), 'Released authornames table')
-
-    b100 = run_sql("select b.id,b.value from bib10x as b, "
-                   "bibrec_bib10x as a where b.id=a.id_bibxxx and "
-                   "b.tag=%s and a.id_bibrec=%s", ('100__a', bibrec))
-    b700 = run_sql("select b.id,b.value from bib70x as b, "
-                   "bibrec_bib70x as a where b.id=a.id_bibxxx and "
-                   "b.tag=%s and a.id_bibrec=%s", ('700__a', bibrec))
-
-    _pfap_printmsg('Assigner:  ' + str(i),
-                   'Found: %s 100: and %s 700:' % (len(b100), len(b700)))
-
-    for bibref in b100:
-        present = run_sql("select count(data)>0  from aidPERSONID where "
-                          "tag='paper' and data =%s and flag <> '-2'",
-                          ('100:' + str(bibref[0]) + ',' + str(bibrec),))[0][0]
-        if not present:
-            _pfap_printmsg('Assigner:  ' + str(i), 'Found: 100:%s,%s not assigned,'
-                           ' assigning...' % (str(bibref[0]), str(bibrec)))
-            _pfap_assign_bibrefrec(i, '100', bibref[0], bibrec, bibref[1], personid_new_id_lock)
-    for bibref in b700:
-        present = run_sql("select count(data)>0  from aidPERSONID where "
-                          "tag='paper' and data =%s",
-                          ('700:' + str(bibref[0]) + ',' + str(bibrec),))[0][0]
-        if not present:
-            _pfap_printmsg('Assigner:  ' + str(i), 'Found: 700:%s,%s not assigned, '
-                           'assigning...' % (str(bibref[0]), str(bibrec)))
-            _pfap_assign_bibrefrec(i, '700', bibref[0], bibrec, bibref[1], personid_new_id_lock)
-
-    _pfap_printmsg('Assigner:  ' + str(i), 'Done with: %s' % bibrec)
-
+    return run_sql("select o.id_bibrec from bibrec_bib98x o, "
+                   "(select i.id as iid from bib98x i "
+                   "where value = 'DELETED' "
+                   "and tag like '980__a') as dummy "
+                   "where o.id_bibxxx = dummy.iid")
 
 #bibauthorid_maintenance personid update private methods
-def update_personID_canonical_names(persons_list=None, overwrite=False, suggested='',
-                                     really_update_all=False):
+def update_personID_canonical_names(persons_list=[], overwrite=False, suggested=''):
     '''
     Updates the personID table creating or updating canonical names for persons
     @param: persons_list: persons to consider for the update  (('1'),)
     @param: overwrite: if to touch already existing canonical names
     @param: suggested: string to suggest a canonical name for the person
     '''
-    use_index = True
+    if not persons_list:
+        persons_list = [x[0] for x in run_sql('select distinct personid from aidPERSONIDPAPERS')]
 
-    if not persons_list and really_update_all:
-        persons_list = run_sql('select distinct personid from aidPERSONID')
-    elif not persons_list:
-        if bconfig.TABLES_UTILS_DEBUG:
-            print "No person in persons list. Skipping"
-        return
+    for idx, pid in enumerate(persons_list):
+        update_status(float(idx) / float(len(persons_list)))
+        current_canonical = run_sql("select data from aidPERSONIDDATA where "
+                                    "personid=%s and tag=%s", (pid, 'canonical_name'))
 
-    for pid in persons_list:
-        current_canonical = ""
-
-        try:
-            current_canonical = run_sql("select data from aidPERSONID use index (`ptf-b`) where "
-                                        "personid=%s and tag=%s", (pid[0], 'canonical_name'))
-        except (ProgrammingError, OperationalError):
-            current_canonical = run_sql("select data from aidPERSONID where personid=%s and tag=%s",
-                                                                        (pid[0], 'canonical_name'))
-            use_index = False
-
-        if (not overwrite) and len(current_canonical) > 0:
-            if bconfig.TABLES_UTILS_DEBUG:
-                print "U_PID_CANONICALNAMES: NOT updating canonical names an not overwrite and current_canonical for ", pid
-        else:
-            if bconfig.TABLES_UTILS_DEBUG:
-                print "U_PID_CANONICALNAMES: updating canonical name for ", pid
-            names = []
-
-            if use_index:
-                names = run_sql("select data,flag from aidPERSONID use index (`ptf-b`) where "
-                                "personid=%s and tag=%s", (pid[0], 'gathered_name'))
-            else:
-                names = run_sql("select data,flag from aidPERSONID where personid=%s and tag=%s",
-                                                                        (pid[0], 'gathered_name'))
+        if overwrite or len(current_canonical) == 0:
+            names = get_person_names_count(pid)
 
             names = sorted(names, key=lambda k: k[1], reverse=True)
             if len(names) < 1 and not suggested:
-                if bconfig.TABLES_UTILS_DEBUG:
-                    print "No gathered names and no suggested. skipping."
                 continue
             else:
                 if suggested:
@@ -1867,318 +1082,26 @@ def update_personID_canonical_names(persons_list=None, overwrite=False, suggeste
                 else:
                     canonical_name = create_canonical_name(names[0][0])
 
-                run_sql("delete from aidPERSONID where personid=%s and tag=%s", (pid[0],
-                                                                                  'canonical_name'))
-                existing_cnames = []
+                run_sql("delete from aidPERSONIDDATA where personid=%s and tag=%s",
+                        (pid, 'canonical_name'))
 
-                if use_index:
-                    existing_cnames = run_sql("select data from aidPERSONID "
-                                              "use index (`tdf-b`) where tag=%s and"
-                                              " data like %s", ('canonical_name',
-                                                                str(canonical_name) + '%'))
-                else:
-                    existing_cnames = run_sql("select data from aidPERSONID where "
-                                              "tag=%s and data like %s", ('canonical_name',
-                                                                        str(canonical_name) + '%'))
+                existing_cnames = run_sql("select data from aidPERSONIDDATA "
+                                          "where tag=%s and data like %s",
+                                          ('canonical_name', str(canonical_name) + '%'))
 
-                max_idx = 0
+                existing_cnames = set(name[0] for name in existing_cnames)
+                for i in count(1):
+                    cur_try = canonical_name + '.' + str(i)
+                    if cur_try not in existing_cnames:
+                        canonical_name = cur_try
+                        break
 
-                for i in existing_cnames:
-                    this_cid = 0
+                run_sql("insert into aidPERSONIDDATA (personid, tag, data) values (%s,%s,%s) ",
+                         (pid, 'canonical_name', canonical_name))
 
-                    if i[0].count("."):
-                        this_cid = i[0].split(".")[-1]
+    update_status(1.)
+    print
 
-                    max_idx = max(max_idx, int(this_cid))
-
-                canonical_name = canonical_name + '.' + str(max_idx + 1)
-                run_sql("insert into aidPERSONID (personid,tag,data) values (%s,%s,%s) ",
-                         (pid[0], 'canonical_name', canonical_name))
-    close_connection()
-
-
-def update_personID_names_string_set(PIDlist=None, really_update_all=False, wait_finished=False,
-                                     single_threaded=False):
-    '''
-    Updates the personID table with the names gathered from documents
-    @param: list of pids to consider, if omitted performs an update on the entire db
-    @type: tuple of tuples
-
-    Gets all the names associated to the bibref/bibrec couples of the person and builds a set of
-    names, counting the occurrencies. The values are store in the gathered_name/flag fields of each
-    person.
-    The gathering of names is an expensive operation for the database (many joins), so the operation
-    is threaded so to have as many parallell queries as possible.
-    '''
-    local_dbg = False
-
-    if (not PIDlist or len(PIDlist) == 0):
-        if really_update_all:
-            PIDlist = run_sql('SELECT DISTINCT `personid` FROM `aidPERSONID`')
-            close_connection()
-        else:
-            return
-
-    class names_gatherer(threading.Thread):
-        def __init__ (self, pid):
-            threading.Thread.__init__(self)
-            self.pid = pid
-            self.pstr = ''
-            self.person_papers = None
-            self.namesdict = None
-            self.needs_update = None
-            self.current_namesdict = None
-            self.pname = None
-
-
-        def run(self):
-            self.namesdict = dict()
-            use_index = True
-
-            try:
-                self.person_papers = run_sql("select data from `aidPERSONID` use index (`ptf-b`)"
-                                             " where tag=\'paper\' and "
-                                             " flag >= \'-1\' and PersonID=%s",
-                                                (str(self.pid[0]),))
-            except (OperationalError, ProgrammingError):
-                self.person_papers = run_sql("select data from `aidPERSONID` where"
-                                             " tag=\'paper\' and "
-                                             " flag >= \'-1\' and PersonID=%s",
-                                                (str(self.pid[0]),))
-                use_index = False
-
-            for p in self.person_papers:
-                self.pname = run_sql("select Name from aidAUTHORNAMES where id = "
-                 "(select Name_id from aidAUTHORNAMESBIBREFS where bibref = %s)",
-                                    (str(p[0].split(',')[0]),))
-                if len(self.pname) > 0:
-                    if self.pname[0][0] not in self.namesdict:
-                        self.namesdict[self.pname[0][0]] = 1
-                    else:
-                        self.namesdict[self.pname[0][0]] += 1
-
-            if use_index:
-                self.current_namesdict = dict(run_sql("select data,flag from aidPERSONID "
-                                                      "use index (`ptf-b`) where personID=%s "
-                                        "and tag=\'gathered_name\'", (str(self.pid[0]),)))
-            else:
-                self.current_namesdict = dict(run_sql("select data,flag from aidPERSONID "
-                                                      "where personID=%s "
-                                        "and tag=\'gathered_name\'", (str(self.pid[0]),)))
-
-
-            self.needs_update = False
-            if self.current_namesdict != self.namesdict:
-                self.needs_update = True
-            else:
-                for i in self.namesdict.iteritems():
-                    if i[1] != self.current_namesdict[i[0]]:
-                        self.needs_update = True
-                        if bconfig.TABLES_UTILS_DEBUG and local_dbg:
-                            pass
-#                            sys.stdout.write(str(self.pid) + str(i[1]) +
-#                                ' differs  from ' + str(self.current_namesdict[i[0]]))
-#                            sys.stdout.flush()
-
-            if self.needs_update:
-                if bconfig.TABLES_UTILS_DEBUG and local_dbg:
-                    pass
-#                    sys.stdout.write(str(self.pid) + ' updating!')
-#                    sys.stdout.flush()
-                run_sql("delete from `aidPERSONID` where PersonID=%s and tag=%s",
-                         (str(self.pid[0]), 'gathered_name'))
-
-                sqlquery = 'insert into aidPERSONID (PersonID, tag, data, flag) values '
-                values = ''.join(['("%s","%s","%s","%s"),' % (str(self.pid[0]),
-                                'gathered_name', str(name),
-                                str(self.namesdict[name])) for name in self.namesdict])
-                values = values[0:len(values) - 1]
-                sqlquery = sqlquery + values
-                run_sql(sqlquery)
-                if bconfig.TABLES_UTILS_DEBUG and local_dbg:
-                    print('Update_personid_names_string_set: thread finished,'
-                          ' going to close connection on ' + str(self.pid))
-            close_connection()
-
-    class starter(threading.Thread):
-        def __init__ (self, single_threaded=False):
-            threading.Thread.__init__(self)
-            self.ST = single_threaded
-
-        def run(self):
-            if bconfig.TABLES_UTILS_DEBUG and local_dbg:
-                print('Update_personid_names_string_set: spawning threads for ' + str(PIDlist))
-            if self.ST:
-                for pid in PIDlist:
-                    if bconfig.TABLES_UTILS_DEBUG and local_dbg:
-                        print('Update_personid_names_string_set: spawning ST thread on ' + str(pid))
-                    current = names_gatherer(pid)
-                    current.start()
-                    current.join()
-            else:
-                wks = []
-                for pid in PIDlist:
-                    current = names_gatherer(pid)
-                    if bconfig.TABLES_UTILS_DEBUG and local_dbg:
-                        print('Update_personid_names_string_set: spawning MT thread on ' + str(pid))
-                    current.start()
-                    wks.append(current)
-                    if len(wks) > bconfig.PERSONID_SQL_MAX_THREADS:
-                        for t in list(wks):
-                            t.join()
-                            wks.remove(t)
-                for t in list(wks):
-                    t.join()
-                    wks.remove(t)
-                if bconfig.TABLES_UTILS_DEBUG and local_dbg:
-                    print('Update_personid_names_string_set: recollected all MT threads ')
-
-    thread = starter(single_threaded)
-    if bconfig.TABLES_UTILS_DEBUG and local_dbg:
-        print('Update_personid_names_string_set on ' + str(PIDlist) + '\n')
-    thread.start()
-    if bconfig.TABLES_UTILS_DEBUG and local_dbg:
-        print('Update_personid_names_string_set main thread returned on ' + str(PIDlist) + '\n')
-    if wait_finished:
-        thread.join()
-    if bconfig.TABLES_UTILS_DEBUG and local_dbg:
-        print('Update_personid_names_string_set FINISHED on ' + str(PIDlist) + '\n')
-
-
-def update_authornames_tables_from_paper(papers_list=None):
-    """
-    Updates the authornames tables with the names on the given papers list
-    @param papers_list: list of the papers which have been updated (bibrecs) ((1,),)
-
-    For each paper of the list gathers all names, bibrefs and bibrecs to be added to aidAUTHORNAMES
-    table, taking care of updating aidA.B. as well
-
-    NOTE: update_authornames_tables_from_paper: just to remember: get record would be faster but
-        we don't have the bibref there,
-        maybe there is a way to rethink everything not to use bibrefs? How to address
-        authors then?
-    """
-
-
-    def update_authornames_tables(name, bibref):
-        '''
-        Update the tables for one bibref,name touple
-        '''
-        authornames_row = run_sql("select id,Name,bibrefs,db_name from aidAUTHORNAMES where db_name like %s",
-                            (str(name),))
-        authornames_bibrefs_row = run_sql("select id,Name_id,bibref from aidAUTHORNAMESBIBREFS "
-                                        "where bibref like %s", (str(bibref),))
-
-#: update_authornames_tables: if i'm not wrong there should always be only one result; will be checked further on
-        if ((len(authornames_row) > 1) or (len(authornames_bibrefs_row) > 1) or
-            (len(authornames_row) < len(authornames_bibrefs_row))):
-            if bconfig.TABLES_UTILS_DEBUG:
-                print "update_authornames_tables: More then one result or missing authornames?? Something is wrong, not updating" + str(authornames_row) + str(authornames_bibrefs_row)
-                return
-
-        if len(authornames_row) == 1:
-#            we have an hit for the name string; check if there is the 'new' bibref associated,
-#            if yes there is nothing to do, otherwise shold add it here and in the ANbibrefs table
-            if authornames_row[0][2].count(bibref) < 1:
-                if bconfig.TABLES_UTILS_DEBUG:
-                    print 'update_authornames_tables: Adding new bibref to ' + str(authornames_row) + ' ' + str(name) + ' ' + str(bibref)
-                run_sql("update aidAUTHORNAMES set bibrefs=%s where id=%s",
-                            (authornames_row[0][2] + ',' + str(bibref), authornames_row[0][0]))
-                if len(authornames_bibrefs_row) < 1:
-#                we have to add the bibref to the name, would be strange if it would be already there
-                    run_sql("insert into aidAUTHORNAMESBIBREFS  (Name_id,bibref) values (%s,%s)",
-                        (authornames_row[0][0], str(bibref)))
-            else:
-                if bconfig.TABLES_UTILS_DEBUG:
-                    print 'update_authornames_tables: Nothing to add to ' + str(authornames_row) + ' ' + str(name) + ' ' + str(bibref)
-
-
-        else:
-#@NOTE: update_authornames_tables: we don't have the name string in the db: the name associated to the bibref is changed
-#            or this is a new name? Experimenting with bibulpload looks like if a name on a paper changes a new bibref is created;
-#
-            if len(authornames_bibrefs_row) == 1:
-#               If len(authornames_row) is zero but we have a row in authornames_bibrefs_row means that
-#               the name string is changed, somehow!
-                if bconfig.TABLES_UTILS_DEBUG:
-                    print 'update_authornames_tables: The name associated to the bibref is changed?? ' + str(name) + ' ' + str(bibref)
-
-            else:
-                artifact_removal = re.compile("[^a-zA-Z0-9]")
-                authorname = ""
-
-                test_name = name.decode('utf-8')
-
-                if UNIDECODE_ENABLED:
-                    test_name = unidecode.unidecode(name.decode('utf-8'))
-
-                raw_name = artifact_removal.sub("", test_name)
-
-                if len(raw_name) > 1:
-                    authorname = name.decode('utf-8')
-
-                if len(raw_name) > 1:
-                    dbname = authorname
-                else:
-                    dbname = 'Error in name parsing!'
-
-                clean_name = create_normalized_name(split_name_parts(name))
-                authornamesid = run_sql("insert into aidAUTHORNAMES (Name,bibrefs,db_name) values (%s,%s,%s)",
-                                (clean_name, str(bibref), dbname))
-                run_sql("insert into aidAUTHORNAMESBIBREFS  (Name_id,bibref) values (%s,%s)",
-                        (authornamesid, str(bibref)))
-                if bconfig.TABLES_UTILS_DEBUG:
-                    print 'update_authornames_tables: Created new name ' + str(authornamesid) + ' ' + str(name) + ' ' + str(bibref)
-
-    tables = [['bibrec_bib10x', 'bib10x', '100__a', '100'],
-              ['bibrec_bib70x', 'bib70x', '700__a', '700']]
-
-    if not papers_list:
-        papers_list = run_sql("select id from bibrec")
-    for paper in papers_list:
-        for table in tables:
-            sqlstr = "select id_bibxxx from %s where id_bibrec=" % table[0]
-            bibrefs = run_sql(sqlstr + "%s", (str(paper[0]),))
-            for ref in bibrefs:
-                sqlstr = "select value from %s where tag='%s' and id=" % (table[1], table[2])
-                name = run_sql(sqlstr + "%s", (str(ref[0]),))
-                if len(name) >= 1:
-                    update_authornames_tables(name[0][0], table[3] + ':' + str(ref[0]))
-
-def check_table(table=""):
-    '''
-    This function will check if a table is present in the database.
-    If no table is specified, the function will return all tables.
-   '''
-    if table:
-        return [name[0] for name in run_sql("show tables like %s", (table,))]
-    else:
-        return [name[0] for name in run_sql("show tables")]
-
-def create_probability_table():
-    run_sql("create table aidPROBCACHE( "
-            "    cluster VARCHAR(256), "
-            "    bibmap MEDIUMBLOB, "
-            "    matrix LONGBLOB "
-            ")")
-
-def load_bibmap_and_matrix_from_db(last_name):
-    row = run_sql("select bibmap, matrix from aidPROBCACHE where cluster like %s", (last_name,))
-    if len(row) == 0:
-        return (None, None)
-    elif len(row) == 1:
-        return (deserialize_via_marshal(row[0][0]), deserialize_via_marshal(row[0][1]))
-    else:
-        raise AssertionError("aidPROBCACHE is corrupted")
-
-def save_bibmap_and_matrix_to_db(last_name, bibmap, matrix):
-    run_sql("delete from aidPROBCACHE where cluster like %s", (last_name,))
-    run_sql("insert low_priority "
-            "into aidPROBCACHE "
-            "set cluster = %s, "
-            "bibmap = %s, "
-            "matrix = %s",
-            (last_name, serialize_via_marshal(bibmap), serialize_via_marshal(matrix)))
 
 def personid_get_recids_affected_since(last_timestamp):
     '''
@@ -2187,98 +1110,43 @@ def personid_get_recids_affected_since(last_timestamp):
         acceptable in case of magic automatic update)
     @param: last_timestamp: last update, datetime.datetime
     '''
-    vset = set()
-    values = run_sql("select value from aidUSERINPUTLOG where timestamp > %s", (last_timestamp,))
-    for v in values:
-        if ',' in v[0] and ':' in v[0]:
-            vset.add(v[0].split(',')[1])
+    vset = set(int(v[0].split(',')[1]) for v in run_sql(
+               "select distinct value from aidUSERINPUTLOG "
+               "where timestamp > %s", (last_timestamp,))
+               if ',' in v[0] and ':' in v[0])
 
-    pids = run_sql("select distinct personid from aidUSERINPUTLOG where  timestamp > %s", (last_timestamp,))
-    pidlist = [p[0] for p in pids if p[0] >= 0]
-    values = []
-    if len(pidlist) > 1:
-        values = run_sql("select data from aidPERSONID where tag='paper' and personid in %s", (pidlist,))
-    elif len(pidlist) == 1:
-        values = run_sql("select data from aidPERSONID where tag='paper' and personid = %s", (pidlist[0],))
-    for v in values:
-        if ',' in v[0] and ':' in v[0]:
-            vset.add(v[0].split(',')[1])
-    # transform output to list of integers, since we are returning recIDs:
-    return [int(recid) for recid in list(vset)]
+    pids = set(int(p[0]) for p in run_sql(
+               "select distinct personid from aidUSERINPUTLOG "
+               "where timestamp > %s", (last_timestamp,))
+               if p[0] > 0)
 
+    if pids:
+        pids_s = list_2_SQL_str(pids)
+        vset |= set(int(b[0]) for b in run_sql(
+                    "select bibrec from aidPERSONIDPAPERS "
+                    "where personid in %s" % pids_s))
 
-def get_all_paper_records(pid):
-    return run_sql("SELECT data FROM `aidPERSONID` WHERE tag = 'paper' AND personid = %s", (str(pid),))
+    return list(vset) # I'm not sure about this cast. It might work without it.
 
 
-def create_new_person_from_uid(uid):
-    #creates a new person
-    pid = run_sql("select max(personid) from aidPERSONID")[0][0]
-
-    if pid:
-        try:
-            pid = int(pid)
-        except (ValueError, TypeError):
-            pid = -1
-        pid += 1
-
-    set_person_data(pid, 'uid', str(uid))
-    return pid
-
-
-def confirm_papers_to_person(pid, papers, gather_list, user_level=0):
-    '''
-    Confirms the relationship between pid and paper, as from user input.
-    @param pid: id of the person
-    @type pid: ('2',)
-    @param papers: list of papers to confirm
-    @type papers: (('100:7531,9024',),)
-    @param gather_list: list to store the pids to be updated rather than
-    calling update_personID_names_string_set
-    @typer gather_list: set([('2',), ('3',)])
-    '''
-    #expects a pid ('2',)
-    #and a lst of papers (('100:7531,9024',),)
-
-#    class names_gatherer(Thread):
-#        def __init__(self, pid):
-#            Thread.__init__(self)
-#            self.pid = pid
-#
-#        def run(self):
-#            update_personID_names_string_set(self.pid)
-#            close_connection()
-
-    updated_pids = set([pid])
-    for p in papers:
-        old_owners = []
-
-        try:
-            old_owners = run_sql("select personid from aidPERSONID use index (`tdf-b`) where"
-                                 " tag=%s and data=%s", ('paper', str(p[0]),))
-        except (OperationalError, ProgrammingError):
-            old_owners = run_sql("select personid from aidPERSONID where tag=%s and data=%s",
-                                 ('paper', str(p[0]),))
-
-        updated_pids |= set((str(owner[0]),) for owner in old_owners)
-
-        run_sql("delete from aidPERSONID where tag=%s and data=%s", ('paper', str(p[0]),))
-        run_sql("insert into aidPERSONID (PersonID, tag, data, flag, lcul)"
-                " values (%s,'paper',%s,'2', %s)",
-                (str(pid[0]), str(p[0]), user_level))
-
-    if gather_list != None:
-        gather_list |= updated_pids
+def get_all_paper_records(pid, claimed_only=False):
+    if not claimed_only:
+        return run_sql("SELECT distinct bibrec FROM aidPERSONIDPAPERS WHERE personid = %s", (str(pid),))
     else:
-        update_personID_names_string_set(tuple(updated_pids))
-    update_personID_canonical_names([pid])
+        return run_sql("SELECT distinct bibrec FROM aidPERSONIDPAPERS WHERE "
+                       "personid = %s and flag=2 or flag=-2", (str(pid),))
+
 
 
 def get_all_names_from_personid():
-    return run_sql("SELECT personid, data "
-                   "FROM aidPERSONID "
-                   "WHERE tag LIKE %s",
-                    ("gathered_name",))
+    pids = run_sql("SELECT DISTINCT personid "
+                   "FROM aidPERSONIDPAPERS")
+
+    return ((p[0], [n[0] for n in run_sql(
+                    "SELECT DISTINCT name "
+                    "FROM aidPERSONIDPAPERS "
+                    "WHERE personid = %s", p)]
+                    ) for p in pids)
 
 
 def get_grouped_records(bibrefrec, *args):
@@ -2319,9 +1187,8 @@ def get_grouped_records(bibrefrec, *args):
                       "WHERE id_bibrec = %d "
                       "AND field_number = %d" %
                       (mapping_table, rec, int(field_number)))
-    grouped = list_2_SQL_str([gr[0] for gr in grouped], lambda x: str(x))
-    if len(grouped) == 0:
-        raise AssertionError("At least the given bibrefrec should be in the group")
+    assert len(grouped) > 0
+    grouped_s = list_2_SQL_str(grouped, lambda x: str(x[0]))
 
     ret = {}
     for arg in args:
@@ -2329,38 +1196,47 @@ def get_grouped_records(bibrefrec, *args):
                       "FROM %s "
                       "WHERE tag LIKE '%s' "
                       "AND id IN %s" %
-                      (target_table, arg, grouped))
+                      (target_table, arg, grouped_s))
         ret[arg] = [q[0] for q in qry]
 
     return ret
 
-
 def get_name_by_bibrecref(bib):
     '''
-    @param bib: bibrefref
-    @type bib: (mark, bibref, bibrec)
+    @param bib: bibrefrec or bibref
+    @type bib: (mark, bibref, bibrec) OR (mark, bibref)
     '''
     table = "bib%sx" % (str(bib[0])[:-1])
     refid = bib[1]
-    ret = run_sql("select value from %s where id = %s" % (table, refid))
-    if len(ret) != 1:
-        raise AssertionError("Invalid input.")
+    tag = "%s__a" % bib[0]
+    ret = run_sql("select value from %s where id = '%s' and tag = '%s'" % (table, refid, tag))
+
+    # if zero - check if the garbage collector has run
+    assert len(ret) == 1
     return ret[0][0]
 
 
 def get_collaboration(bibrec):
-    bibxxx = run_sql("select id_bibxxx from bibrec_bib71x where 'bibrec' = %s", (str(bibrec),))
+    bibxxx = run_sql("select id_bibxxx from bibrec_bib71x where id_bibrec = %s", (str(bibrec),))
 
     if len(bibxxx) == 0:
         return ()
 
     bibxxx = list_2_SQL_str(bibxxx, lambda x: str(x[0]))
 
-    ret = run_sql("select value from bib71x where id in %s and tag like '%s'", (bibxxx, "710__g"))
-    if len(ret) != 1:
-        raise AssertionError("Invalid input.")
-    return ret[0][0]
+    ret = run_sql("select value from bib71x where id in %s and tag like '%s'" % (bibxxx, "710__g"))
+    return [r[0] for r in ret]
 
+def get_key_words(bibrec):
+    bibxxx = run_sql("select id_bibxxx from bibrec_bib69x where id_bibrec = %s", (str(bibrec),))
+
+    if len(bibxxx) == 0:
+        return ()
+
+    bibxxx = list_2_SQL_str(bibxxx, lambda x: str(x[0]))
+
+    ret = run_sql("select value from bib69x where id in %s and tag like '%s'" % (bibxxx, "695__a"))
+    return [r[0] for r in ret]
 
 def get_all_authors(bibrec):
     bibxxx_1 = run_sql("select id_bibxxx from bibrec_bib10x where id_bibrec = %s", (str(bibrec),))
@@ -2379,3 +1255,470 @@ def get_all_authors(bibrec):
         authors_7 = []
 
     return [a[0] for a in authors_1] + [a[0] for a in authors_7]
+
+
+def get_bib10x():
+    return run_sql("select id, value from bib10x where tag like %s", ("100__a",))
+
+def get_bib70x():
+    return run_sql("select id, value from bib70x where tag like %s", ("700__a",))
+
+def filter_newer_bibs(bibs, last_run):
+    """
+    Returns all bibrefrecs which have been modified since
+    'last_run' and are in bibs
+    @param bibs: a list of bibrefrecs
+    @type bibs: list of strings
+    @param last_run: date, YYYY-MM-DD HH:MM:SS
+    @type last_run: string
+    @return: a list with all modified bibrefrecs
+    @type return: a tuple of strings
+    """
+    def filty(bib):
+        return len(run_sql("select last_updated "
+                "from aidPERSONIDPAPERS "
+                "where bibref_table = %s "
+                "and bibref_value = %s "
+                "and bibrec = %s "
+                "and last_updated < %s"
+                , (str(bib[0]), bib[1], bib[2],
+                   last_run))) > 0
+    return ifilter(filty, bibs)
+
+
+class bib_matrix:
+    '''
+    This small class contains the sparse matrix
+    and encapsulates it.
+    '''
+    # please increment this value every time you
+    # change the output of the comparison functions
+    current_comparison_version = 7
+
+    special_items = ((None, -3., 'N'), ('+', -2., '+'), ('-', -1., '-'))
+    special_symbols = dict((x[0], (x[1], x[2])) for x in special_items)
+    special_numbers = dict((x[1], (x[0], x[2])) for x in special_items)
+    special_strings = dict((x[2], (x[0], x[1])) for x in special_items)
+
+    def __init__(self, cluster_set=None):
+        if cluster_set:
+            bibs = chain(*(cl.bibs for cl in cluster_set.clusters))
+            self._bibmap = dict((b[1], b[0]) for b in enumerate(bibs))
+            width = len(self._bibmap)
+            size = ((width - 1) * width) / 2
+            self._matrix = bib_matrix.create_empty_matrix(size)
+
+    @staticmethod
+    def create_empty_matrix(lenght):
+        ret = numpy.ndarray(shape=(lenght, 2), dtype=float, order='C')
+        ret.fill(bib_matrix.special_symbols[None][0])
+        return ret
+
+    def _resolve_entry(self, bibs):
+        entry = sorted([self._bibmap[bib] for bib in bibs])
+        assert entry[0] < entry[1]
+        return entry[0] + ((entry[1] - 1) * entry[1]) / 2
+
+    def __setitem__(self, bibs, val):
+        entry = self._resolve_entry(bibs)
+
+        if val in self.special_symbols:
+            num = self.special_symbols[val][0]
+            val = (num, num)
+
+        self._matrix[entry] = val
+
+    def __getitem__(self, bibs):
+        entry = self._resolve_entry(bibs)
+        ret = self._matrix[entry]
+        if ret[0] in self.special_numbers:
+            return self.special_numbers[ret[0]][0]
+        return ret[0], ret[1]
+
+    @staticmethod
+    def __pickle_tuple(tupy):
+        '''
+        tupy can be a very special iterable. It may contain:
+            * (float, float)
+            * None
+            * '+', '-' or '?'
+        '''
+        def to_str(elem):
+            if elem[0] in bib_matrix.special_numbers:
+                return "%s|" % bib_matrix.special_numbers[elem[0]][1]
+            return "%f:%f|" % (elem[0], elem[1])
+
+        strs = map(to_str, tupy)
+        if strs:
+            strs[-1] = strs[-1][:-1]
+        return "".join(strs)
+
+    @staticmethod
+    def __unpickle_tuple(tupy):
+        '''
+        tupy must be an object created by pickle_tuple.
+        '''
+        def from_str(elem, index, total):
+            if index % 100000 == 0:
+                update_status(float(index) / float(total))
+            if elem in bib_matrix.special_strings:
+                nummy = bib_matrix.special_strings[elem][1]
+                return (nummy, nummy)
+            fls = elem.split(":")
+            assert len(fls) == 2
+            return (float(fls[0]), float(fls[1]))
+
+        print "Loading the cache..."
+        strs = tupy.split("|")
+        if strs == ['']:
+            strs = []
+        ret = bib_matrix.create_empty_matrix(len(strs))
+        for i, stri in enumerate(strs):
+            ret[i][0], ret[i][1] = from_str(stri, i, len(strs))
+        update_status(1)
+        print ""
+        return ret
+
+    def load(self, name):
+        '''
+        This method will load the matrix from the
+        database.
+        '''
+        row = run_sql("select bibmap, matrix "
+                      "from aidPROBCACHE "
+                      "where cluster like %s",
+                      (name,))
+        if len(row) == 0:
+            self._bibmap, self._matrix = None, None
+            return False
+        elif len(row) == 1:
+            bibmap_vs = zlib.decompress(row[0][0])
+            bibmap_v = cPickle.loads(bibmap_vs)
+            rec_v, self._bibmap = bibmap_v
+            if (rec_v != bib_matrix.current_comparison_version or
+                bib_matrix.current_comparison_version < 0): # you can use negative
+                                                            # version to recalculate
+                self._bibmap, self._matrix = None, None
+                return False
+
+            matrix_s = zlib.decompress(row[0][1])
+            self._matrix = bib_matrix.__unpickle_tuple(matrix_s)
+            return self._bibmap != None and self._matrix != None
+        else:
+            assert not "aidPROBCACHE is corrupted"
+            return False
+
+    def store(self, name):
+        bibmap_v = (bib_matrix.current_comparison_version, self._bibmap)
+        bibmap_vs = cPickle.dumps(bibmap_v)
+        bibmap_vsc = zlib.compress(bibmap_vs)
+
+        matrix_s = bib_matrix.__pickle_tuple(self._matrix)
+        matrix_sc = zlib.compress(matrix_s)
+
+        run_sql("delete from aidPROBCACHE where cluster like %s", (name,))
+        run_sql("insert low_priority "
+                "into aidPROBCACHE "
+                "set cluster = %s, "
+                "bibmap = %s, "
+                "matrix = %s",
+                (name, bibmap_vsc, matrix_sc))
+
+
+def delete_paper_from_personid(rec):
+    '''
+    Deletes all information in PERSONID about a given paper
+    '''
+    run_sql("delete from aidPERSONIDPAPERS where bibrec = %s", (rec,))
+
+
+def get_signatures_from_rec(bibrec):
+    '''
+    Retrieves all information in PERSONID
+    about a given bibrec.
+    '''
+    return run_sql("select personid, bibref_table, bibref_value, bibrec, name "
+                   "from aidPERSONIDPAPERS where bibrec = %s"
+                   , (bibrec,))
+
+
+def modify_signature(bibrecref, bibref):
+    '''
+    Modifies a signature in aidPERSONIDpapers.
+    '''
+    return run_sql("UPDATE aidPERSONIDPAPERS "
+                   "SET bibref_table = %s, bibref_value = %s "
+                   "WHERE bibref_table = %s AND bibref_value = %s AND bibrec = %s"
+                   , (str(bibref[0]), bibref[1],
+                      str(bibrecref[0]), bibrecref[1], bibrecref[2]))
+
+
+def find_pids_by_name(name):
+    '''
+    Finds names and personids by a prefix name.
+    '''
+    return set(run_sql("SELECT personid, name "
+                       "FROM aidPERSONIDPAPERS "
+                       "WHERE name like %s"
+                       , (name + ',%',)))
+
+
+def remove_sigs(signatures):
+    '''
+    Removes records from aidPERSONIDPAPERS
+    '''
+    for sig in signatures:
+        run_sql("DELETE FROM aidPERSONIDPAPERS "
+                "WHERE bibref_table like %s AND bibref_value = %s AND bibrec = %s"
+                , (str(sig[0]), sig[1], sig[2]))
+
+
+def remove_personid_papers(pids):
+    '''
+    Removes all signatures from aidPERSONIDPAPERS with pid in pids
+    '''
+    if pids:
+        run_sql("delete from aidPERSONIDPAPERS where personid in %s"
+                % list_2_SQL_str(pids))
+
+
+def get_full_personid_papers(table_name="`aidPERSONIDPAPERS`"):
+    '''
+    Get all columns and rows from aidPERSONIDPAPERS
+    or any other table with the same structure.
+    '''
+    return run_sql("select personid, bibref_table, "
+                   "bibref_value, bibrec, name, flag, "
+                   "lcul from %s" % table_name)
+
+
+def get_full_results():
+    '''
+    Depricated. Should be removed soon.
+    '''
+    return run_sql("select personid, bibref_table, bibref_value, bibrec "
+                   "from aidRESULTS")
+
+
+def get_lastname_results(last_name):
+    '''
+    Returns rows from aidRESULTS which share a common last name.
+    '''
+    return run_sql("select personid, bibref_table, bibref_value, bibrec "
+                   "from aidRESULTS "
+                   "where personid like '" + last_name + ".%'")
+
+
+
+def get_full_personid_data(table_name="`aidPERSONIDDATA`"):
+    '''
+    Get all columns and rows from aidPERSONIDDATA
+    or any other table with the same structure.
+    '''
+    return run_sql("select personid, tag, data, "
+                   "opt1, opt2, opt3 from %s" % table_name)
+
+
+def check_personid_papers():
+    '''
+    Checks all invariants of personid
+    '''
+    ret = True
+
+    pids = run_sql("select distinct personid from aidPERSONIDPAPERS")
+    for pid in pids:
+        pid = pid[0]
+        recs = run_sql("select bibrec from aidPERSONIDPAPERS where personid = %s", (pid,))
+        recs = [rec[0] for rec in recs]
+        for rec in set(recs):
+            recs.remove(rec)
+
+        if recs:
+            ret = False
+            print "Person %d has duplicated papers: %s" % (pid, str(tuple(set(recs))))
+
+    recs = run_sql("select distinct bibrec from aidPERSONIDPAPERS")
+    for rec in recs:
+        rec = rec[0]
+        refs = list(run_sql("select bibref_table, bibref_value from aidPERSONIDPAPERS where bibrec = %s and flag > %s", (rec, "-2")))
+
+        for ref in set(refs):
+            refs.remove(ref)
+
+        if refs:
+            ret = False
+            refs = sorted(refs)
+            refs = groupby(refs)
+            refs = ["Found %s:%s %d times." % (key[0], key[1], len(list(data)) + 1) for key, data in refs]
+            print "Paper %d has duplicated signatures:" % rec
+            for ref in refs:
+                print "\t%s" % ref
+
+    return ret
+
+
+def repair_personid():
+    '''
+    This should make check_personid_papers() to return true.
+    '''
+    def drun_sql(q, a):
+        print q % a
+        run_sql(q, a)
+
+    for pid in (p[0] for p in run_sql("select distinct personid from aidPERSONIDPAPERS")):
+        rows = run_sql("select bibrec, bibref_table, bibref_value, flag "
+                       "from aidPERSONIDPAPERS where personid = %s", (pid,))
+
+        rows = ((k, list(d))
+                for k, d in groupby(sorted(rows, key=itemgetter(0)), itemgetter(0)))
+
+        for rec, sigs in rows:
+            if len(sigs) > 1:
+                claimed = [sig for sig in sigs if sig[3] > 1]
+                rejected = [sig for sig in sigs if sig[3] < -1]
+
+                if len(claimed) == 1:
+                    sigs.remove(claimed[0])
+                elif len(claimed) == 0 and len(rejected) == 1:
+                    sigs.remove(rejected[0])
+
+                for sig in set(sigs):
+                    run_sql("delete from aidPERSONIDPAPERS "
+                            "where personid = %s "
+                            "and bibrec = %s "
+                            "and bibref_table = %s "
+                            "and bibref_value = %s "
+                            "and flag = %s"
+                            , (pid, sig[0], sig[1], sig[2], sig[3]))
+
+    for rec in (r[0] for r in run_sql("select distinct bibrec from aidPERSONIDPAPERS")):
+        rows = run_sql("select bibref_table, bibref_value, flag from aidPERSONIDPAPERS "
+                       "where bibrec = %s", (rec,))
+        kfuc = itemgetter(slice(0, 2))
+        rows = ((k, map(itemgetter(2), d)) for k, d in groupby(sorted(rows), kfuc))
+
+        for bibref, flags in rows:
+            if len(flags) > 1:
+                claimed = sum(1 for f in flags if f > 1)
+                rejected = sum(1 for f in flags if f < -1)
+
+                if claimed == 1:
+                    run_sql("delete from aidPERSONIDPAPERS "
+                            "where bibrec = %s "
+                            "and bibref_table = %s "
+                            "and bibref_value = %s "
+                            "and flag <> %s"
+                            , (rec, bibref[0], bibref[1], 2))
+                elif claimed == 0 and rejected == 1:
+                    run_sql("delete from aidPERSONIDPAPERS "
+                            "where bibrec = %s "
+                            "and bibref_table = %s "
+                            "and bibref_value = %s "
+                            "and flag <> %s"
+                            , (rec, bibref[0], bibref[1], -2))
+                else:
+                    run_sql("delete from aidPERSONIDPAPERS "
+                            "where bibrec = %s "
+                            "and bibref_table = %s "
+                            "and bibref_value = %s"
+                            , (rec, bibref[0], bibref[1]))
+
+
+def get_all_bibrecs():
+    return [x[0] for x in run_sql("select distinct bibrec from aidPERSONIDPAPERS")]
+
+
+def remove_all_bibrecs(bibrecs):
+    bibrecs_s = list_2_SQL_str(bibrecs)
+    run_sql("delete from aidPERSONIDPAPERS where bibrec in %s" % bibrecs_s)
+
+
+def empty_results_table():
+    run_sql("TRUNCATE aidRESULTS")
+
+
+def save_cluster(named_cluster):
+    name, cluster = named_cluster
+    for bib in cluster.bibs:
+        run_sql("INSERT INTO aidRESULTS "
+                "(personid, bibref_table, bibref_value, bibrec) "
+                "VALUES (%s, %s, %s, %s) "
+                , (name, str(bib[0]), bib[1], bib[2]))
+
+
+def personid_name_from_signature(sig):
+    return run_sql("select personid, name "
+                   "from aidPERSONIDPAPERS "
+                   "where bibref_table = %s and bibref_value = %s and bibrec = %s"
+                   , sig)
+
+
+def copy_personids():
+    run_sql("DROP TABLE IF EXISTS  `aidPERSONIDDATA_copy`")
+    run_sql("CREATE TABLE `aidPERSONIDDATA_copy` ( "
+            "`personid` BIGINT( 16 ) UNSIGNED NOT NULL , "
+            "`tag` VARCHAR( 64 ) NOT NULL , "
+            "`data` VARCHAR( 256 ) NOT NULL , "
+            "`opt1` MEDIUMINT( 8 ) DEFAULT NULL , "
+            "`opt2` MEDIUMINT( 8 ) DEFAULT NULL , "
+            "`opt3` VARCHAR( 256 ) DEFAULT NULL , "
+            "KEY  `personid-b` (  `personid` ) , "
+            "KEY  `tag-b` (  `tag` ) , "
+            "KEY  `data-b` (  `data` ) , "
+            "KEY  `opt1` (  `opt1` ) "
+            ") ENGINE = MYISAM DEFAULT CHARSET = utf8")
+    run_sql("INSERT INTO `aidPERSONIDDATA_copy` "
+            "SELECT * "
+            "FROM `aidPERSONIDDATA`")
+
+    run_sql("DROP TABLE IF EXISTS `aidPERSONIDPAPERS_copy`")
+    run_sql("CREATE TABLE `aidPERSONIDPAPERS_copy` ( "
+            "`personid` bigint( 16 ) unsigned NOT NULL , "
+            "`bibref_table` enum( '100', '700' ) NOT NULL , "
+            "`bibref_value` mediumint( 8 ) unsigned NOT NULL , "
+            "`bibrec` mediumint( 8 ) unsigned NOT NULL , "
+            "`name` varchar( 256 ) NOT NULL , "
+            "`flag` smallint( 2 ) NOT NULL DEFAULT '0', "
+            "`lcul` smallint( 2 ) NOT NULL DEFAULT '0', "
+            "`last_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP , "
+            "KEY `personid-b` ( `personid` ) , "
+            "KEY `reftable-b` ( `bibref_table` ) , "
+            "KEY `refvalue-b` ( `bibref_value` ) , "
+            "KEY `rec-b` ( `bibrec` ) , "
+            "KEY `name-b` ( `name` ) , "
+            "KEY `timestamp-b` ( `last_updated` ) , "
+            "KEY `ptvrf-b` ( `personid` , `bibref_table` , `bibref_value` , `bibrec` , `flag` ) "
+            ") ENGINE = MyISAM DEFAULT CHARSET = utf8")
+    run_sql("INSERT INTO `aidPERSONIDPAPERS_copy` "
+            "SELECT * "
+            "FROM `aidPERSONIDPAPERS")
+
+
+def get_possible_personids_from_paperlist_old(bibrecreflist):
+    '''
+    @param bibrecreflist: list of bibrecref couples, (('100:123,123',),) or bibrecs (('123',),)
+    returns a list of pids and connected bibrefs in order of number of bibrefs per pid
+    [ [['1'],['123:123.123','123:123.123']] , [['2'],['123:123.123']] ]
+    '''
+
+    pid_bibrecref_dict = {}
+    for b in bibrecreflist:
+        pids = []
+
+        try:
+            pids = run_sql("select personid from aidPERSONID "
+                    "use index (`tdf-b`) where tag=%s and data=%s", ('paper', str(b[0])))
+        except (OperationalError, ProgrammingError):
+            pids = run_sql("select personid from aidPERSONID "
+                    "where tag=%s and data=%s", ('paper', str(b[0])))
+
+        for pid in pids:
+            if pid[0] in pid_bibrecref_dict:
+                pid_bibrecref_dict[pid[0]].append(str(b[0]))
+            else:
+                pid_bibrecref_dict[pid[0]] = [str(b[0])]
+
+    pid_list = [[i, pid_bibrecref_dict[i]] for i in pid_bibrecref_dict]
+
+    return sorted(pid_list, key=lambda k: len(k[2]), reverse=True)
+

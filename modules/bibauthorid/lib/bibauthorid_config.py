@@ -54,7 +54,7 @@ except ImportError:
 
 
 # Current version of the framework
-VERSION = '1.1.0'
+VERSION = '1.1.1'
 
 # make sure current directory is importable
 FILE_PATH = osp.dirname(osp.abspath(__file__))
@@ -320,13 +320,5 @@ def stop_and_close_logger():
 ## Logging 'device' used by the classes to write log messages
 LOGGER = LOGGERS[0]
 
-## STANDALONE defines if the algorithm is run within the environment of
-## Invenio/Inspire or if it is used individually (e.g. Grid usage)
-STANDALONE = False
 
-try:
-    import dbquery
-except ImportError, err:
-    STANDALONE = True
-    LOGGER.warning('Bibauthorid is running in standalone mode.\n'
-                   '-> Access to the database is not supported.')
+

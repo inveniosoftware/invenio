@@ -22,12 +22,12 @@ Point of access to the documents clustering facility.
 Provides utilities to safely interact with stored data.
 '''
 
-from invenio.bibauthorid_general_utils import get_field_values_on_condition
 import invenio.bibauthorid_config as bconfig
 import invenio.bibauthorid_frontinterface as dbapi
 import invenio.bibauthorid_name_utils as nameapi
 
 import invenio.search_engine as search_engine
+from search_engine import perform_request_search
 from cgi import escape
 from time import gmtime, strftime, ctime
 from invenio.dbquery import OperationalError
@@ -59,7 +59,7 @@ def update_person_canonical_name(person_id, canonical_name, userinfo=''):
     @param person_id: person id
     @param canonical_name: string
     '''
-    dbapi.update_personID_canonical_names(persons_list=[[person_id]], overwrite=True, suggested=canonical_name)
+    dbapi.update_personID_canonical_names((person_id,), overwrite=True, suggested=canonical_name)
     dbapi.insert_user_log(userinfo, person_id, 'data_update', 'CMPUI_changecanonicalname', '', 'Canonical name manually updated.')
 
 def get_canonical_id_from_person_id(person_id):
@@ -117,22 +117,22 @@ def get_bibrefs_from_bibrecs(bibreclist):
     @return: a list of record->bibrefs
     @return: list of lists
     '''
-    lists = []
-    for bibrec in bibreclist:
-        lists.append([bibrec, dbapi.get_possible_bibrecref([''], bibrec,
-                                                        always_match=True)])
-    return lists
+    return [[bibrec, dbapi.get_possible_bibrecref([''], bibrec, always_match=True)]
+            for bibrec in bibreclist]
 
-
-def get_possible_bibrefs_from_pid_bibrec(pid, bibreclist, always_match=False):
+def get_possible_bibrefs_from_pid_bibrec(pid, bibreclist, always_match=False, additional_names=None):
     '''
     Returns for each bibrec a list of bibrefs for which the surname matches.
     @param pid: person id to gather the names strings from
     @param bibreclist: list of bibrecs on which to search
+    @param always_match: match all bibrefs no matter the name
+    @param additional_names: [n1,...,nn] names to match other then the one from personid
     '''
     pid = wash_integer_id(pid)
 
-    pid_names = dbapi.get_person_names_set([pid])
+    pid_names = dbapi.get_person_db_names_set(pid)
+    if additional_names:
+        pid_names += zip(additional_names)
     lists = []
     for bibrec in bibreclist:
         lists.append([bibrec, dbapi.get_possible_bibrecref([n[0] for n in pid_names], bibrec,
@@ -183,7 +183,7 @@ def get_person_id_from_paper(bibref=None):
         return -1
 
     person_id = -1
-    db_data = dbapi.get_papers_status([(bibref,)])
+    db_data = dbapi.get_papers_status(bibref)
 
     try:
         person_id = db_data[0][1]
@@ -220,11 +220,14 @@ def get_papers_by_person_id(person_id= -1, rec_status= -2, ext_out=False):
         return []
 
     records = []
-    db_data = dbapi.get_person_papers((person_id,),
-                                   rec_status,
-                                   show_author_name=True,
-                                   show_title=False,
-                                   show_rt_status=True)
+    db_data = dbapi.get_person_papers(person_id,
+                                      rec_status,
+                                      show_author_name=True,
+                                      show_title=False,
+                                      show_rt_status=True,
+                                      show_affiliations=ext_out,
+                                      show_date=ext_out,
+                                      show_experiment=ext_out)
     if not ext_out:
         records = [[row["data"].split(",")[1], row["data"], row["flag"],
                     row["authorname"]] for row in db_data]
@@ -235,20 +238,14 @@ def get_papers_by_person_id(person_id= -1, rec_status= -2, ext_out=False):
             flag = row["flag"]
             authorname = row["authorname"]
             rt_status = row['rt_status']
-            gfoc = get_field_values_on_condition
-            authoraff = ", ".join(gfoc(recid, ["100", "700"], "u", "a",
-                                       authorname, source="API"))
+            authoraff = ", ".join(row['affiliation'])
 
-            #Date retrival disabled to increase UI speed.
             try:
-                date = list(gfoc(recid, "269", "c"))[0]
-            except (IndexError):
+                date = sorted(row['date'], key=len)[0]
+            except IndexError:
                 date = "Not available"
 
-            try:
-                exp = list(gfoc(recid, "693", "e"))[0]
-            except (IndexError):
-                exp = "None"
+            exp = ", ".join(row['experiment'])
             #date = ""
             records.append([recid, bibref, flag, authorname,
                             authoraff, date, rt_status, exp])
@@ -309,7 +306,7 @@ def get_person_names_from_id(person_id= -1):
     if (not person_id > -1) or (not isinstance(person_id, int)):
         return []
 
-    return dbapi.get_person_names_count((person_id,))
+    return dbapi.get_person_names_count(person_id)
 
 
 def get_person_db_names_from_id(person_id= -1):
@@ -328,7 +325,7 @@ def get_person_db_names_from_id(person_id= -1):
     if (not person_id > -1) or (not isinstance(person_id, int)):
         return []
 
-    return dbapi.get_person_db_names_count((person_id,))
+    return dbapi.get_person_db_names_count(person_id)
 
 
 def get_longest_name_from_pid(person_id= -1):
@@ -346,7 +343,7 @@ def get_longest_name_from_pid(person_id= -1):
 
     longest_name = ""
 
-    for name in dbapi.get_person_names_count((person_id,)):
+    for name in dbapi.get_person_names_count(person_id):
         if name and len(name[0]) > len(longest_name):
             longest_name = name[0]
 
@@ -356,7 +353,7 @@ def get_longest_name_from_pid(person_id= -1):
         return "This person does not seem to have a name!"
 
 
-def get_most_frequent_name_from_pid(person_id= -1):
+def get_most_frequent_name_from_pid(person_id= -1, allow_none=False):
     '''
     Finds the most frequent name of a person to be
     representative for this person.
@@ -370,13 +367,16 @@ def get_most_frequent_name_from_pid(person_id= -1):
     pid = wash_integer_id(person_id)
 
     if (not pid > -1) or (not isinstance(pid, int)):
-        return "'%s' doesn't look like a person ID!" % person_id
+        if allow_none:
+            return None
+        else:
+            return "'%s' doesn't look like a person ID!" % person_id
     person_id = pid
 
     mf_name = ""
 
     try:
-        nn = dbapi.get_person_names_count((person_id,))
+        nn = dbapi.get_person_names_count(person_id)
         mf_name = sorted(nn, key=lambda k:k[1], reverse=True)[0][0]
     except IndexError:
         pass
@@ -384,7 +384,10 @@ def get_most_frequent_name_from_pid(person_id= -1):
     if mf_name:
         return mf_name
     else:
-        return "This person does not seem to have a name!"
+        if allow_none:
+            return None
+        else:
+            return "This person does not seem to have a name!"
 
 
 def get_paper_status(bibref):
@@ -394,7 +397,7 @@ def get_paper_status(bibref):
     @param bibref: the bibref-bibrec pair that unambiguously identifies a paper
     @type bibref: string
     '''
-    db_data = dbapi.get_papers_status([[bibref]])
+    db_data = dbapi.get_papers_status(bibref)
     #data,PersonID,flag
     status = None
 
@@ -793,7 +796,7 @@ def user_can_modify_paper(uid, paper):
     return dbapi.user_can_modify_paper(uid, paper)
 
 
-def person_bibref_is_touched(pid, bibref):
+def person_bibref_is_touched_old(pid, bibref):
     '''
     Determines if an assignment has been touched by a user (i.e. check for
     the flag of an assignment being 2 or -2)
@@ -814,21 +817,7 @@ def person_bibref_is_touched(pid, bibref):
     if not bibref:
         raise ValueError("A bibref is expected!")
 
-    return dbapi.person_bibref_is_touched(pid, bibref)
-
-
-def assign_uid_to_person(uid, pid, create_new_pid=False):
-    '''
-    Assign uid to person
-    @param uid: uid
-    @param pid: pid
-    @param create_new_pid: forces creation of new person
-    '''
-    pid = wash_integer_id(pid)
-    uid = wash_integer_id(uid)
-
-    dbapi.assign_uid_to_person(uid, pid, create_new_pid)
-
+    return dbapi.person_bibref_is_touched_old(pid, bibref)
 
 def get_review_needing_records(pid):
     '''
@@ -924,100 +913,65 @@ def arxiv_login(req):
 
     session_bareinit(req)
     session = get_session(req)
+
     pinfo = session['personinfo']
     ticket = session['personinfo']['ticket']
 
     uinfo = collect_user_info(req)
-    pinfo['external_first_entry'] = True
+    pinfo['external_first_entry'] = False
+
+    try:
+        name = uinfo['external_firstname']
+    except KeyError:
+        name = None
+    try:
+        surname = uinfo['external_familyname']
+    except KeyError:
+        surname = None
+
+    session['personinfo']['arxiv_name'] = nameapi.create_normalized_name(
+                                          nameapi.split_name_parts(surname + ', ' + name))
     session.save()
 
-    arxiv_p_ids = []
-    name = ''
-    surname = ''
     try:
-        for i in uinfo['external_arxivids'].split(';'):
-            arxiv_p_ids.append(i)
-        name = uinfo['external_firstname']
-        surname = uinfo['external_familyname']
+        arxiv_p_ids = uinfo['external_arxivids'].split(';')
+    except KeyError:
+        arxiv_p_ids = []
+
     #'external_arxivids': 'hep-th/0112017;hep-th/0112020',
     #'external_familyname': 'Weiler',
     #'external_firstname': 'Henning',
-    except KeyError:
-        pass
 
-    found_bibrecs = []
-    for arx in arxiv_p_ids:
-        t = search_engine.perform_request_search(p='037:' + str(arx), of='id')
-        for i in t:
-            found_bibrecs.append(i)
+    try:
+        found_bibrecs = set(zip(*[perform_request_search(p='037:' + str(arx), of='id')
+                              for arx in arxiv_p_ids])[0])
+    except IndexError:
+        found_bibrecs = set()
+
     #found_bibrecs = [567700, 567744]
 
     uid = getUid(req)
-    pid = dbapi.get_personid_from_uid([[uid]])
-    if pid[1]:
-        pid_bibrecs = dbapi.get_all_personids_recs(pid[0][0])
-        pid_bibrecs = set(pid_bibrecs)
-        missing_bibrecs = [bib for bib in found_bibrecs if int(bib) not in pid_bibrecs]
-        found_bibrecs = [bib for bib in found_bibrecs if int(bib) in pid_bibrecs]
+    pid, pid_found = dbapi.get_personid_from_uid([[uid]])
+
+    if not pid_found:
+        pid = dbapi.reclaim_personid_for_new_arXiv_user(found_bibrecs,
+                    nameapi.create_normalized_name(nameapi.split_name_parts(surname + ', ' + name)), uid)
     else:
-        missing_bibrecs = []
+        pid = pid[0]
 
-    bibrec_names = []
-    for b in found_bibrecs + missing_bibrecs:
-        bibrec_names.append([b, get_field_values_on_condition(b, source='API', get_table=['100', '700'], get_tag='a')])
+    pid_bibrecs = set([i[0] for i in dbapi.get_all_personids_recs(pid, claimed_only=True)])
+    missing_bibrecs = found_bibrecs - pid_bibrecs
+    #present_bibrecs = found_bibrecs.intersection(pid_bibrecs)
 
-    for n in list(bibrec_names):
-        for i in list(n[1]):
-            if nameapi.soft_compare_names(surname, i.encode('utf-8')) < 0.45:
-                n[1].remove(i)
-    #bibrec_names = [[78, set([u'M\xfcck, W'])]]
-
-    #what is left are only suitable names for each record.
-    bibrefrecs = []
-
-    for bibrec in bibrec_names:
-        for name in bibrec[1]:
-            bibrefs = dbapi.get_bibrefs_from_name_string(name.encode('utf-8'))
-            if len(bibrefs) < 1:
-                continue
-            for bibref in bibrefs[0][0].split(','):
-                bibrefrecs.append(str(bibref) + ',' + str(bibrec[0]))
-    #bibrefrecs = ['100:116,78', '700:505,78']
-
-    person_papers = []
-    if not pid[1]:
-        brr = [[i] for i in bibrefrecs]
-        possible_persons = dbapi.get_possible_personids_from_paperlist(brr)
-        #[[0L, ['700:316,10']]]
-        possible_persons = sorted(possible_persons, key=lambda k: len(k[1]))
-
-        if len(possible_persons) > 1:
-            for pp in possible_persons:
-                pid = dbapi.assign_person_to_uid(uid, pp[0])
-                person_papers = pp[1]
-                if pid != -1:
-                    break
-            if pid == -1:
-                pid = dbapi.assign_person_to_uid(uid, -1)
-        elif len(possible_persons) == 1:
-            pid = dbapi.assign_person_to_uid(uid, possible_persons[0][0])
-            person_papers = possible_persons[0][1]
-        else:
-            pid = dbapi.assign_person_to_uid(uid, -1)
-    else:
-        pid = long(pid[0][0])
+    #assert len(found_bibrecs) == len(missing_bibrecs) + len(present_bibrecs)
 
     tempticket = []
     #now we have to open the tickets...
     #person_papers contains the papers which are already assigned to the person and came from arxive,
     #they can be claimed regardless
-    for bibref in person_papers:
-        tempticket.append({'pid':pid, 'bibref':bibref, 'action':'confirm'})
 
-    done_bibrecs = set(b.split(',')[1] for b in person_papers)
-    for b in found_bibrecs + missing_bibrecs:
-        if str(b) not in done_bibrecs:
-            tempticket.append({'pid':pid, 'bibref':str(b), 'action':'confirm'})
+    for bibrec in missing_bibrecs:
+        tempticket.append({'pid':pid, 'bibref':str(bibrec), 'action':'confirm'})
 
     #check if ticket targets (bibref for pid) are already in ticket
     for t in list(tempticket):
@@ -1027,7 +981,6 @@ def arxiv_login(req):
         ticket.append(t)
     session.save()
     return pid
-
 
 def external_user_can_perform_action(uid):
     '''
@@ -1359,7 +1312,7 @@ def create_new_person(uid, uid_is_owner=False):
     return pid
 
 
-def execute_action(action, pid, bibref, uid, gather_list, userinfo='', comment=''):
+def execute_action(action, pid, bibref, uid, userinfo='', comment=''):
     '''
     Executes the action, setting the last user right according to uid
 
@@ -1390,13 +1343,13 @@ def execute_action(action, pid, bibref, uid, gather_list, userinfo='', comment='
 
     if action in ['confirm', 'assign']:
         dbapi.insert_user_log(userinfo, pid, 'assign', 'CMPUI_ticketcommit', bibref, comment)
-        dbapi.confirm_papers_to_person((str(pid),), [[bibref]], gather_list, user_level)
+        dbapi.confirm_papers_to_person((str(pid),), [[bibref]], user_level)
     elif action in ['repeal']:
         dbapi.insert_user_log(userinfo, pid, 'repeal', 'CMPUI_ticketcommit', bibref, comment)
-        dbapi.reject_papers_from_person((str(pid),), [[bibref]], gather_list, user_level)
+        dbapi.reject_papers_from_person((str(pid),), [[bibref]], user_level)
     elif action in ['reset']:
         dbapi.insert_user_log(userinfo, pid, 'reset', 'CMPUI_ticketcommit', bibref, comment)
-        dbapi.reset_papers_flag((str(pid),), [[bibref]], gather_list)
+        dbapi.reset_papers_flag((str(pid),), [[bibref]])
     else:
         return False
 
@@ -1434,13 +1387,3 @@ def sign_assertion(robotname, assertion):
         secr = ""
 
     return robot.sign(secr, assertion)
-
-
-def get_personid_status_cacher():
-    '''
-    Returns a DataCacher object describing the status of the pid table content
-
-    @return: DataCacher Object
-    @rtype: DataCacher
-    '''
-    return dbapi.get_personid_status_cacher()

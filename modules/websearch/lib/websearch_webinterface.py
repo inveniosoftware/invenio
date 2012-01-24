@@ -264,7 +264,6 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         self.pageparam = cgi.escape(pageparam.replace("+", " "))
         self.personid = -1
         self.authorname = " "
-        self.person_data_available = False
         self.must_fallback_on_person_search = False
         self.person_search_results = None
         self.search_query = None
@@ -354,7 +353,6 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             from invenio.bibauthorid_webapi import get_person_db_names_from_id
             from invenio.bibauthorid_webapi import get_person_redirect_link
             from invenio.bibauthorid_webapi import is_valid_canonical_id
-            from invenio.bibauthorid_webapi import get_personid_status_cacher
             from invenio.bibauthorid_name_utils import create_normalized_name
             from invenio.bibauthorid_name_utils import split_name_parts
 #            from invenio.bibauthorid_config import CLAIMPAPER_CLAIM_OTHERS_PAPERS
@@ -517,7 +515,6 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         '''
         is_bibauthorid = False
         bibauthorid_template = None
-        personid_status_cacher = None
         userinfo = collect_user_info(req)
         metaheaderadd = ""
         html = []
@@ -529,7 +526,6 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             from invenio.bibauthorid_webapi import get_person_db_names_from_id
             from invenio.bibauthorid_webapi import get_person_redirect_link
             from invenio.bibauthorid_webapi import is_valid_canonical_id
-            from invenio.bibauthorid_webapi import get_personid_status_cacher
             from invenio.bibauthorid_name_utils import create_normalized_name
             from invenio.bibauthorid_name_utils import split_name_parts
 #            from invenio.bibauthorid_config import CLAIMPAPER_CLAIM_OTHERS_PAPERS
@@ -583,14 +579,6 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                                      metaheaderadd=metaheaderadd,
                                      language=ln))
             req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
-
-        if is_bibauthorid:
-            personid_status_cacher = get_personid_status_cacher()
-            personid_status_cacher.recreate_cache_if_needed()
-            self.person_data_available = personid_status_cacher.cache
-
-        if not self.person_data_available:
-            is_bibauthorid = False
 
         if is_bibauthorid:
             self.resolve_personid(param_recid)

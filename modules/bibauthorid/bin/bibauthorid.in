@@ -1,4 +1,4 @@
-#!@PYTHON@
+#!/usr/bin/python
 ## -*- mode: python; coding: utf-8; -*-
 ##
 ## This file is part of Invenio.
@@ -18,95 +18,18 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-
-"""Usage: bibauthorid [OPTIONS]
-
-Runs the author disambiguation and identity matching algorithm.
-
-General options:
-  -h, --help                Display this help and exit
-  -V, --version             Output version information and exit
-  -v, --verbose=LEVEL       Number between 1 and 50. The higher the number,
-                            the higher the level of importance. Everything
-                            below the number will be ignored. Equal and above
-                            will be shovn. Debugging=10, Info=20, Bibauthorid
-                            default log=25, Warnings=30, Errors=40]
-  -S, --standalone          Switches on stand alone mode. This is required
-                            for jobs that should run on a set of files rather
-                            than on the database (e.g. this is needed on the
-                            grid). Without this switch no standalone job will
-                            start or perform.
-
-Daemon mode options:
-  NOTE: Options -n, -a, -U, -G and -R are mutually exclusive (XOR)!
-  -n, --lastname=STRING     Process only authors with this last name.
-  -a, --process-all         The option for cleaning all authors.
-  -U, --update-universe     Update bibauthorid universe. Find modified and
-                            newly entered records and process all the authors
-                            on these records.
-  -G, --prepare-grid        Prepares a set of files that supply the
-                            pre-clustered data needed for stand alone job to
-                            run (e.g. needed on the grid). The behavior of
-                            this export can be controlled with the
-                            options -d (required), -p and -m (both optional).
-  -R, --load-grid-results   Loads the results from the grid jobs
-                            and writes them to the database. The behavior of
-                            this import can be controlled with the
-                            options -d (required).
-  -d, --data-dir=DIRNAME    Specifies the data directory, in which the data for
-                            the grid preparation will be stored to or loaded
-                            from. It requires the -G or -R switch.
-  -p, --prefix=STRING       Specifies the prefix of the directories created
-                            under the --data-dir directory. Optional.
-                            Defaults to 'job'. It requires the -G switch.
-  -m, --max-records         Specifies the number of records that
-                            shall be stored per job package. Optional.
-                            Defaults to 4000 and requires -G switch.
-      --update-cache        Updates caches to the newly introduced changes
-                            (new and modified documents).
-                            This should be called daily or better more then
-                            once per day, to ensure the correct operation of
-                            the frontend (and the backend).
-      --clean-cache         Clean the cache from out of date contents
-                            (deleted documents).
-
-Standalone mode options:
-  -j, --job-dir=DIRECTORY   Run the job on the files found under the path
-                            specified here. Supplying a directory is mandatory.
-                            The results of the process will be stored in a
-                            sub directory of --job-dir named 'results'. These
-                            results can be loaded into the db with the -R
-                            option of this command line tool.
-
-Examples (daemon mode):
-  - Process all records that hold an author with last name 'Ellis':
-      $ bibauthorid -u admin --lastname "Ellis"
-  - Process all records and regard all authors:
-      $ bibauthorid -u admin --process-all
-  - To update all information from newly entered and modified records:
-      $ bibauthorid -u admin -U
-  - Prepare job packages in folder 'gridfiles' with the sub directories
-    prefixed with 'task' and a maximum number of 2000 records per package:
-      $ bibauthorid -u admin --prepare-grid -d gridfiles -p task -m 2000
-
-Examples (standalone mode):
-  - Process the job package stored in folder 'grid_data/job0'
-      $ bibauthorid -S --job-dir=grid_data/job0
 """
+    Runs the author disambiguation and identity matching algorithm.
+    Use -h for help.
+"""
+
 import sys
 
-try:
-    from invenio.config import CFG_PYLIBDIR
-    sys.path.append("%s/invenio" % (CFG_PYLIBDIR))
-except ImportError, e:
-    print "Error: %s" % e
-    sys.exit(1)
+from invenio.config import CFG_PYLIBDIR
 
-try:
-    from bibauthorid_cli import main
-except ImportError, e:
-    print "Error: %s" % e
-    sys.exit(1)
+sys.path.append("%s/invenio" % (CFG_PYLIBDIR))
+
+from bibauthorid_cli import main
 
 main()
 

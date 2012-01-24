@@ -116,13 +116,15 @@ def split_name_parts(name_string, delete_name_additions=True,
         if name_string.count(sep) >= 1:
             found_sep = sep
             surname, rest_of_name = string_partition(name_string, sep)[0::2]
+            surname = surname.strip().capitalize()
             break
 
     if not found_sep:
         if name_string.count(" ") > 0:
             rest_of_name, surname = string_partition(name_string, ' ', direc='r')[0::2]
+            surname = surname.strip().capitalize()
         else:
-            return [name_string, [], []]
+            return [name_string.strip().capitalize(), [], [], []]
 
     if rest_of_name.count(","):
         rest_of_name = string_partition(rest_of_name, ",")[0]
@@ -138,7 +140,7 @@ def split_name_parts(name_string, delete_name_additions=True,
             initials.append(i.capitalize())
             pos_counter += 1
         else:
-            names.append(i.capitalize())
+            names.append(i.strip().capitalize())
             initials.append(i[0].capitalize())
             positions.append(pos_counter)
             pos_counter += 1
@@ -877,54 +879,6 @@ def full_names_are_substrings(name1, name2):
 
     return names_are_substrings_b
 
-
-#def names_levenshtein_distance(name1, name2):
-#    '''
-#    Returns the levenshtein distance between two strings
-#    TODO:  improve to give more sensed results in case of synonim names?
-#    '''
-#    return distance(name1, name2)
-#
-#def full_names_minimum_levenshtein_distance(name1, name2):
-#    '''
-#    Determines the minimum distance D between two names.
-#    Comparison is base on the minimum number of first names.
-#    Examples:
-#    D("guang", "guang sheng") = 0
-#    D("guang", "guangsheng") = 5
-#    D("guang sheng", "guangsheng") = 5
-#    D("guang sheng", "guang shing") = 1
-#    D("guang ming", "guang fin") = 2
-#
-#    @precondition: Names have been checked for composition equality.
-#    @param name1: Name string of the first name (w/ last name), force split
-#    @type name1: string
-#    @param name2: Name string of the second name (w/ last name)
-#    @type name2: string
-#    @return: the minimum Levenshtein distance between two names
-#    @rtype: int
-#    '''
-#
-#    if not isinstance(name1, list):
-#        name1 = split_name_parts(name1)
-#
-#    if not isinstance(name2, list):
-#        name2 = split_name_parts(name2)
-#
-#    onames = name1[2]
-#    tnames = name2[2]
-##    min_names_count = min(len(onames), len(tnames))
-##
-##    if min_names_count <= 0:
-##        return -1
-##
-##    oname = "".join(onames[:min_names_count]).lower()
-##    tname = "".join(tnames[:min_names_count]).lower()
-#    oname = clean_name_string("".join(onames).lower(), "", False, True)
-#    tname = clean_name_string("".join(tnames).lower(), "", False, True)
-#
-#    return distance(oname, tname)
-
 def _load_gender_firstnames_dict(files=''):
     if not NO_CFG_ETCDIR and not files:
         files = {'boy':  CFG_ETCDIR + '/bibauthorid/name_authority_files/male_firstnames.txt',
@@ -934,12 +888,12 @@ def _load_gender_firstnames_dict(files=''):
                  'girl': '../etc/name_authority_files/female_firstnames.txt'}
 
     boyf = open(files['boy'], 'r')
-    boyn = [x.strip().lower() for x in boyf.readlines()]
+    boyn = set([x.strip().lower() for x in boyf.readlines()])
     boyf.close()
     girlf = open(files['girl'], 'r')
-    girln = [x.strip().lower() for x in girlf.readlines()]
+    girln = set([x.strip().lower() for x in girlf.readlines()])
     girlf.close()
-    return {'boys':boyn, 'girls':girln}
+    return {'boys':list(boyn - girln), 'girls':list(girln - boyn)}
 
 
 def _load_firstname_variations(filename=''):
@@ -962,7 +916,7 @@ def _load_firstname_variations(filename=''):
 
     return retval
 
-def compare_names(origin_name, target_name):
+def compare_names(origin_name, target_name, initials_penalty=False):
     '''
     Compare two names.
     '''
@@ -1014,7 +968,7 @@ def compare_names(origin_name, target_name):
     if AUTHORNAMES_UTILS_DEBUG:
         print "|- equal composites: ", names_are_equal_composites
 
-    max_n_initials = max_n_initials = max(len(no[1]), len(nt[1]))
+    max_n_initials = max(len(no[1]), len(nt[1]))
     initials_intersection = set(no[1]).intersection(set(nt[1]))
     n_initials_intersection = len(initials_intersection)
     initials_union = set(no[1]).union(set(nt[1]))
@@ -1153,7 +1107,7 @@ def compare_names(origin_name, target_name):
         if AUTHORNAMES_UTILS_DEBUG:
             print "|- no surname trim: ", score
 
-    if initials_only and not only_initials_available:
+    if initials_only and (not only_initials_available or initials_penalty):
         score = score * .9
         if AUTHORNAMES_UTILS_DEBUG:
             print "|- initials only penalty: ", score, initials_only, only_initials_available
@@ -1166,6 +1120,17 @@ def compare_names(origin_name, target_name):
 
 
     return score
+
+
+def generate_last_name_cluster_str(name):
+    '''
+    Use this function to find the last name cluster
+    this name should be associated with.
+    '''
+    family = split_name_parts(name.decode('utf-8'))[0]
+    artifact_removal = re.compile("[^a-zA-Z0-9]")
+    return artifact_removal.sub("", family).lower()
+
 
 GLOBAL_gendernames = _load_gender_firstnames_dict()
 GLOBAL_name_variations = _load_firstname_variations()

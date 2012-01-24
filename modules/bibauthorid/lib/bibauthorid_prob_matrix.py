@@ -1,10 +1,24 @@
-from scipy.sparse import lil_matrix
+import time
 
-from bibauthorid_backinterface import probability_table_exists
-from bibauthorid_backinterface import create_probability_table
-from bibauthorid_backinterface import save_bibmap_and_matrix_to_db
-from bibauthorid_backinterface import load_bibmap_and_matrix_from_db
+import bibauthorid_config as bconfig
 from bibauthorid_comparison import compare_bibrefrecs
+from bibauthorid_comparison import clear_all_caches as clear_comparison_caches
+from bibauthorid_backinterface import bib_matrix
+from bibauthorid_general_utils import update_status
+
+if bconfig.TABLES_UTILS_DEBUG:
+    def _debug_is_eq(v1, v2):
+        eps = 1e-6
+        return v1 + eps > v2 and v2 + eps > v1
+
+    def _debug_is_eq_v(vl1, vl2):
+        if isinstance(vl1, str) and isinstance(vl2, str):
+            return vl1 == vl2
+
+        if isinstance(vl1, tuple) and isinstance(vl2, tuple):
+            return _debug_is_eq(vl1[0], vl2[0]) and _debug_is_eq(vl1[1], vl2[1])
+
+        return False
 
 class probability_matrix:
     '''
@@ -12,57 +26,9 @@ class probability_matrix:
     between all virtual authors. It is able to write
     and read from the database and update the results.
     '''
-    class bib_matrix:
-        '''
-        This small class contains the sparse matrix
-        and encapsulates it.
-        '''
-        def __init__(self, cluster_set = None):
-            if cluster_set:
-                bibs = [bib for cl in cluster_set.clusters
-                        for bib in cl.bibs]
-                self._bibmap = dict((b[1], b[0]) for b in enumerate(bibs))
-                width = len(bibs)
-                size = ((width - 1) * width) / 2
-                # create a linearized matrix
-                self._matrix = [None for x in xrange(size)]
 
-        def _resolve_entry(self, bibs):
-            entry = sorted([self._bibmap[bib] for bib in bibs])
-            if entry[0] >= entry[1]:
-                raise AssertionError
-            return entry[0] + ((entry[1] - 1) * entry[1]) / 2
-
-        def __setitem__(self, bibs, val):
-            entry = self._resolve_entry(bibs)
-            self._matrix[entry] = val
-
-        def __getitem__(self, bibs):
-            entry = self._resolve_entry(bibs)
-            return self._matrix[entry]
-
-        def store(self, name):
-            '''
-            This method will store the matrix to the
-            database.
-            '''
-            if not probability_table_exists():
-                raise AssertionError
-
-            save_bibmap_and_matrix_to_db(name, self._bibmap, self._matrix)
-
-        def load(self, name):
-            '''
-            This method will load the matrix from the
-            database.
-            '''
-            if not probability_table_exists():
-                raise AssertionError
-
-            self._bibmap, self._matrix = load_bibmap_and_matrix_from_db(name)
-
-    def __init__(self, cluster_set, last_name="", cached = [],
-                 use_cache = False, save_cache = False):
+    def __init__(self, cluster_set, last_name="", cached=[],
+                 use_cache=False, save_cache=False):
         '''
         Constructs probability matrix. If use_cache is true, it will
         try to load old computations from the database. If save cache
@@ -74,32 +40,77 @@ class probability_matrix:
         @param cached: A list with the bibs, which are not touched
         since last save.
         '''
-        self._bib_matrix = self.bib_matrix(cluster_set)
+        self._bib_matrix = bib_matrix(cluster_set)
 
-        old_matrix = self.bib_matrix()
-        if use_cache and probability_table_exists():
-            old_matrix.load(last_name)
-        elif cached:
-            raise AssertionError("You cannot have cached"
-                                  "results and empty table!")
+        old_matrix = bib_matrix()
+        successful_load = False
+        if use_cache:
+            successful_load = old_matrix.load(last_name)
+        else:
+            assert not cached
 
+        ncl = sum([len(cl.bibs) for cl in cluster_set.clusters])
+        expected = ((ncl * (ncl - 1)) / 2)
+        print "maximum number of comparisons: %d" % expected
+        if expected == 0:
+            expected = 1
+
+        save_interval = 10000000
+        self.cur_calc = 0
+        self.save_calc = save_interval
+        self.opti = 0
+        self.last_save = None
+
+        def taka_a_break():
+            clear_comparison_caches()
+
+            if save_cache:
+                update_status(self.percent, "saving...")
+                t = time.time()
+                self._bib_matrix.store(last_name)
+                self.last_save = int(time.time() - t)
+
+        def calculate_value(bib1, bib2):
+            if self.cur_calc == self.save_calc:
+                taka_a_break()
+                self.save_calc += save_interval
+            self.cur_calc += 1
+
+            return compare_bibrefrecs(bib1, bib2)
+
+        def update_current_status():
+            if self.last_save != None:
+                save_str = "last save: %d sec" % self.last_save
+            else:
+                save_str = ""
+            update_status(self.percent, save_str)
+
+        print "Building the probability matrix..."
         for cl1 in cluster_set.clusters:
+            self.percent = (float(self.opti) + float(self.cur_calc)) / expected
+            update_current_status()
             for cl2 in cluster_set.clusters:
-                if id(cl1) != id(cl2) and cl1.hates(cl2) == False:
+                if id(cl1) != id(cl2) and not cl1.hates(cl2):
                     for bib1 in cl1.bibs:
                         for bib2 in cl2.bibs:
-                            if bib1 in cached and bib2 in cached:
-                                val = old_matrix[bib1, bib2]
-                                if val == None:
-                                    val = compare_bibrefrecs(bib1, bib2)
-                            else:
-                                val = compare_bibrefrecs(bib1, bib2)
-                            self._bib_matrix[bib1, bib2] = val
+                            if bib1 < bib2:
+                                if bib1 in cached and bib2 in cached and successful_load:
+                                    val = old_matrix[bib1, bib2]
+                                    if not val:
+                                        val = calculate_value(bib1, bib2)
+                                    else:
+                                        self.opti += 1
+                                        if bconfig.TABLES_UTILS_DEBUG:
+                                            assert _debug_is_eq_v(val, compare_bibrefrecs(bib1, bib2))
+                                else:
+                                    val = calculate_value(bib1, bib2)
 
-        if save_cache:
-            if not probability_table_exists():
-                create_probability_table()
-            self._bib_matrix.store(last_name)
+                                self._bib_matrix[bib1, bib2] = val
+
+        self.percent = 1
+        taka_a_break()
+        update_current_status()
+        print "\nDone. %d calculations, %d optimized." % (self.cur_calc, self.opti)
 
     def __getitem__(self, bibs):
         return self._bib_matrix[bibs[0], bibs[1]]

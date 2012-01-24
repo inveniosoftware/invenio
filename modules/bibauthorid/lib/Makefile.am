@@ -27,6 +27,7 @@ pylib_DATA = bibauthorid_backinterface.py \
              bibauthorid_dbinterface.py \
              bibauthorid_frontinterface.py \
              bibauthorid_general_utils.py \
+             bibauthorid_matrix_optimization.py \
              bibauthorid_name_utils.py \
              bibauthorid_personid_maintenance.py \
              bibauthorid_prob_matrix.py \
@@ -36,8 +37,10 @@ pylib_DATA = bibauthorid_backinterface.py \
              bibauthorid_webapi.py \
              bibauthorid_webinterface.py \
              bibauthorid_wedge.py \
+             bibauthorid_merge.py \
+             bibauthorid_rabbit.py \
+             bibauthorid_tortoise.py \
              __init__.py
-
 
 jsdir=$(localstatedir)/www/js
 

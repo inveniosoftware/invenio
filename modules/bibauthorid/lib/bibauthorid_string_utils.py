@@ -47,36 +47,15 @@ def string_partition(s, sep, direc='l'):
         return (s[0:i], s[i:i + 1], s[i + 1:])
 
 
-def str_to_unicode(obj, encoding="utf-8"):
-    '''
-    Transforms any string object into a unicode object.
-
-    @param obj: the object to be transformed
-    @type obj: string or unicode
-    @param encoding: the preferred encoding. Defaults to UTF-8
-    @type encoding: string
-
-    @return: returns the unicode representation of the object.
-    @rtype: basetype::unicode
-
-    '''
-    if isinstance(obj, basestring):
-        if not isinstance(obj, unicode):
-            obj = unicode(obj, encoding)
-    return obj
-
-
-def str_to_int(string_value):
-    '''
-    Transforms a string into an int value
-
-    @param string_value: The string representation of an integer
-    @type string_value: string
-
-    @return: The int value of the string
-    @rtype: int
-
-    '''
-    return int(''.join([c for c in string_value if c.isdigit()]))
+def unpackbib(bibrecref):
+    """
+    Creates a tuple (700, 123, 456) from a bibrecref string("100:123,456").
+    @param bibrecref and return: bibrecref
+    @type bibrecref: string
+    @type return: (int, int int)
+    """
+    table, tail = bibrecref.split(":")
+    bibref, bibrec = tail.split(",")
+    return (int(table), int(bibref), int(bibrec))
 
 
