@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -391,8 +391,11 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             page_content = pagecontent
 
         metaheaderadd = ""
-        if is_bibauthorid:
-            metaheaderadd = bibauthorid_template.tmpl_meta_includes()
+
+        ### next two lines are commented out in order to avoid
+        ### including all JS files in /author pages:
+        #if is_bibauthorid:
+        #    metaheaderadd = bibauthorid_template.tmpl_meta_includes()
 
         # Start the page in clean manner:
         req.content_type = "text/html"
