@@ -25,13 +25,11 @@ Requirements:
   - jquery.min.js
 
  JQuery UI:
-  - ui.core.js
-  - ui.sortable.js
-  - ui.slider.js
+  - jquery-ui.min.js
   - UI "base" theme:
-      - ui.slider.css
-      - ui.core.css
-      - ui.theme.css
+      - jquery.ui.slider.css
+      - jquery.ui.core.css
+      - jquery.ui.theme.css
       - images
 
  Uploadify 2.0.1 (JQuery plugin):
@@ -363,9 +361,9 @@ def create_photos_manager_interface(sysno, session_id, uid,
                    'description': description})
 
     out += '''
-    <link rel="stylesheet" href="%(CFG_SITE_URL)s/img/jquery-ui/themes/base/ui.slider.css" type="text/css" charset="utf-8"/>
-    <link rel="stylesheet" href="%(CFG_SITE_URL)s/img/jquery-ui/themes/base/ui.core.css" type="text/css" charset="utf-8"/>
-    <link rel="stylesheet" href="%(CFG_SITE_URL)s/img/jquery-ui/themes/base/ui.theme.css" type="text/css" charset="utf-8"/>
+    <link rel="stylesheet" href="%(CFG_SITE_URL)s/img/jquery-ui/themes/base/jquery.ui.slider.css" type="text/css" charset="utf-8"/>
+    <link rel="stylesheet" href="%(CFG_SITE_URL)s/img/jquery-ui/themes/base/jquery.ui.core.css" type="text/css" charset="utf-8"/>
+    <link rel="stylesheet" href="%(CFG_SITE_URL)s/img/jquery-ui/themes/base/jquery.ui.theme.css" type="text/css" charset="utf-8"/>
     <style type="text/css">
             #sortable { list-style-type: none; margin: 0; padding: 0; }
             #sortable li { margin: auto 3px; padding: 1px; float: left; width: 180px; font-size:small; text-align: center; position: relative;}
@@ -386,9 +384,7 @@ def create_photos_manager_interface(sysno, session_id, uid,
 
     <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery.uploadify.min.js"></script>
     <script type="text/javascript" src="%(CFG_SITE_URL)s/js/swfobject.js"></script>
-    <script type="text/javascript" src="%(CFG_SITE_URL)s/js/ui.core.js"></script>
-    <script type="text/javascript" src="%(CFG_SITE_URL)s/js/ui.sortable.min.js"></script>
-    <script type="text/javascript" src="%(CFG_SITE_URL)s/js/ui.slider.min.js"></script>
+    <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="%(CFG_SITE_URL)s/img/uploadify.css" type="text/css" />
 
     <script type="text/javascript">

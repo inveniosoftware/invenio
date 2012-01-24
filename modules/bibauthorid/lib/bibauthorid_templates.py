@@ -231,17 +231,9 @@ class Template:
                 '<META HTTP-EQUIV="Cache-Directive" CONTENT="no-cache">',
                 '<META HTTP-EQUIV="Expires" CONTENT="0">']
 
-        scripts = ["ui.core.js",
-                   "jquery.ui.widget.min.js",
-                   "jquery.ui.tabs.min.js",
+        scripts = ["jquery-ui.min.js",
                    "jquery.form.js",
                    "jquery.dataTables.min.js",
-                   "jquery.ui.mouse.min.js",
-                   "jquery.ui.draggable.min.js",
-                   "jquery.ui.position.min.js",
-                   "jquery.ui.resizable.min.js",
-                   "jquery.ui.button.min.js",
-                   "jquery.ui.dialog.min.js",
                    "bibauthorid.js"]
 
         result.append('<link rel="stylesheet" type="text/css" href='

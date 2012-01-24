@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -126,29 +126,17 @@ uninstall-jscalendar-plugin:
 	@echo "** The jsCalendar plugin was successfully uninstalled.   **"
 	@echo "***********************************************************"
 
-install-jquery-plugins: install-jquery-plugins
+install-jquery-plugins:
 	@echo "***********************************************************"
 	@echo "** Installing various jQuery plugins, please wait...     **"
 	@echo "***********************************************************"
 	mkdir -p ${prefix}/var/www/js
 	mkdir -p $(prefix)/var/www/css
 	(cd ${prefix}/var/www/js && \
-	wget http://code.jquery.com/jquery-1.5.2.min.js && \
-	mv jquery-1.5.2.min.js jquery.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.effects.core.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.effects.highlight.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.ui.widget.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.ui.tabs.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.slider.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.sortable.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.ui.button.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.ui.dialog.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.ui.mouse.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.ui.draggable.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.ui.position.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.16/ui/minified/jquery.ui.resizable.min.js && \
-	wget http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js && \
-	wget http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js && \
+	wget http://code.jquery.com/jquery-1.7.1.min.js && \
+	mv jquery-1.7.1.min.js jquery.min.js && \
+	wget http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js && \
+        wget http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js && \
 	wget https://raw.github.com/malsup/form/master/jquery.form.js --no-check-certificate && \
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
 	wget http://autobahn.tablesorter.com/jquery.tablesorter.zip && \
@@ -160,7 +148,7 @@ install-jquery-plugins: install-jquery-plugins
 	rm -rf uploadify && \
 	unzip -u uploadify.zip -d uploadify && \
 	wget http://flot.googlecode.com/files/flot-0.6.zip && \
-	wget http://trentrichardson.com/examples/timepicker/js/jquery-ui-timepicker-addon.js && \
+        wget http://trentrichardson.com/examples/timepicker/js/jquery-ui-timepicker-addon.js && \
 	unzip -u flot-0.6.zip && \
 	mv flot/jquery.flot.selection.min.js flot/jquery.flot.min.js flot/excanvas.min.js ./ && \
 	rm flot-0.6.zip && rm -r flot && \
@@ -169,18 +157,11 @@ install-jquery-plugins: install-jquery-plugins
 	mv uploadify/jquery.uploadify.v2.1.4.min.js ./jquery.uploadify.min.js && \
 	rm uploadify.zip && rm -r uploadify && \
 	wget --no-check-certificate https://github.com/douglascrockford/JSON-js/raw/master/json2.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.datepicker.min.js && \
 	wget https://raw.github.com/jeresig/jquery.hotkeys/master/jquery.hotkeys.js && \
 	wget http://jquery.bassistance.de/treeview/jquery.treeview.zip && \
 	unzip jquery.treeview.zip -d jquery-treeview && \
 	rm jquery.treeview.zip && \
 	wget http://invenio-software.org/download/jquery/v1.5/js/jquery.ajaxPager.js && \
-	wget http://jqueryui.com/download/jquery-ui-1.7.3.custom.zip && \
-	unzip jquery-ui-1.7.3.custom.zip development-bundle/ui/ui.core.js js/jquery-ui-1.7.3.custom.min.js && \
-	mv development-bundle/ui/ui.core.js ui.core.js && \
-	mv js/jquery-ui-1.7.3.custom.min.js jquery-ui-1.7.3.custom.min.js && \
-	rm -rf development-bundle && \
-	rm jquery-ui-1.7.3.custom.zip && \
 	unzip jquery.bookmark.package-1.4.0.zip && \
 	rm -f jquery.bookmark.ext.* bookmarks-big.png bookmarkBasic.html jquery.bookmark.js jquery.bookmark.pack.js && \
 	mv bookmarks.png ../img/ && \
@@ -188,13 +169,13 @@ install-jquery-plugins: install-jquery-plugins
 	rm -f jquery.bookmark.package-1.4.0.zip && \
 	mkdir -p ${prefix}/var/www/img && \
 	cd ${prefix}/var/www/img && \
-	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.7.3/themes/base/ && \
-	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.7.3/themes/smoothness/ && \
-	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.7.3/themes/redmond/ && \
+	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/base/ && \
+	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/smoothness/ && \
+	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/ && \
 	wget --no-check-certificate -O datatables_jquery-ui.css https://github.com/DataTables/DataTables/raw/master/media/css/demo_table_jui.css && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/themes/redmond/jquery-ui.css && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/demos/images/calendar.gif && \
-	wget -r -np -nH --cut-dirs=5 -A "png" http://jquery-ui.googlecode.com/svn/tags/1.7.3/themes/redmond/images/)
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/jquery-ui.css && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.8.17/demos/images/calendar.gif && \
+	wget -r -np -nH --cut-dirs=5 -A "png" http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/images/)
 	@echo "***********************************************************"
 	@echo "** The jQuery plugins were successfully installed.       **"
 	@echo "***********************************************************"
@@ -202,8 +183,6 @@ install-jquery-plugins: install-jquery-plugins
 uninstall-jquery-plugins:
 	(cd ${prefix}/var/www/js && \
 	rm -f jquery.min.js && \
-	rm -f jquery.effects.core.min.js && \
-	rm -f jquery.effects.highlight.min.js && \
 	rm -f jquery.MultiFile.pack.js && \
 	rm -f jquery.jeditable.mini.js && \
 	rm -f jquery.flot.selection.min.js && \
@@ -212,14 +191,9 @@ uninstall-jquery-plugins:
 	rm -f jquery-ui-timepicker-addon.min.js && \
 	rm -f jquery.tablesorter.js && \
 	rm -f jquery.tablesorter.pager.js && \
-	rm -f ui.datepicker.min.js && \
 	rm -f json2.js && \
 	rm -f jquery.uploadify.min.js && \
-	rm -f ui.slider.min.js && \
-	rm -f ui.sortable.min.js && \
-	rm -f jquery.ui.tabs.min.js && \
 	rm -rf tablesorter && \
-	rm -f jquery.hotkeys.min.js && \
 	rm -rf jquery-treeview && \
 	rm -f jquery.ajaxPager.js && \
 	rm -f jquery.form.js && \
@@ -228,14 +202,6 @@ uninstall-jquery-plugins:
 	rm -f jquery.bookmark.min.js && \
         rm -f jquery.hotkeys.js && \
         rm -f jquery.tablesorter.min.js && \
-        rm -f jquery.ui.button.min.js && \
-        rm -f jquery.ui.dialog.min.js && \
-        rm -f jquery.ui.draggable.min.js && \
-        rm -f jquery.ui.mouse.min.js && \
-        rm -f jquery.ui.position.min.js && \
-        rm -f jquery.ui.resizable.min.js && \
-        rm -f jquery.ui.widget.min.js && \
-        rm -f jquery-ui-timepicker-addon.js && \
         rm -f jquery-ui-1.7.3.custom.min.js && \
         rm -f jquery.metadata.js && \
         rm -f jquery-latest.js && \

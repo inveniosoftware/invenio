@@ -224,9 +224,7 @@ def perform_request_init(uid, ln, req, lastupdated):
             "   var fieldTemplates = %s\n" % (json.dumps(fieldTemplates), ) + \
             "</script>\n"
     # Add scripts (the ordering is NOT irrelevant).
-    scripts = ['jquery.effects.core.min.js',
-               'jquery.effects.highlight.min.js',
-               'jquery.jeditable.mini.js', 'jquery.hotkeys.js', 'json2.js',
+    scripts = ['jquery.jeditable.mini.js', 'jquery.hotkeys.js', 'json2.js',
                'bibedit_display.js', 'bibedit_engine.js', 'bibedit_keys.js',
                'bibedit_menu.js', 'bibedit_holdingpen.js', 'marcxml.js',
                'bibedit_clipboard.js','jquery-ui.min.js']
@@ -1239,8 +1237,7 @@ def perform_request_init_template_interface():
     body += '    </script>\n'
 
     # Add scripts (the ordering is NOT irrelevant).
-    scripts = ['jquery.effects.core.min.js',
-               'jquery.effects.highlight.min.js',
+    scripts = ['jquery-ui.min.js',
                'json2.js', 'bibedit_display.js', 'bibedit_template_interface.js']
 
     for script in scripts:

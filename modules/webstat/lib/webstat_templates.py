@@ -812,7 +812,7 @@ Distribution across %s
                 f_date = datetime.datetime.now().strftime("%m/%d/%Y %H:%M")
             sel += """<link rel="stylesheet" href="%(CFG_SITE_URL)s/img/jquery-ui.css"
                         type="text/css" />
-                      <script language="javascript" type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui-1.7.3.custom.min.js"></script>
+                      <script language="javascript" type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui.min.js"></script>
                       <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui-timepicker-addon.js"></script>
 
                       <div id="selectDateTxt" style="position:relative;display:none">

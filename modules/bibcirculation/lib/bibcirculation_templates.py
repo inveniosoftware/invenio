@@ -865,7 +865,7 @@ class Template:
         out = """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />
-        <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+        <script type="text/javascript" language='JavaScript' src="%s/js/jquery-ui.min.js"></script>
 
         <form name="request_form" action="%s/%s/%s/holdings/send" method="get" >
         <br />
@@ -2246,7 +2246,7 @@ class Template:
                           </tr>
                 </table>
 
-                <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+                <script type="text/javascript" language='JavaScript' src="%s/js/jquery-ui.min.js"></script>
 
                 <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                 <thead>
@@ -7923,7 +7923,7 @@ class Template:
 
         out += """
 
-            <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+            <script type="text/javascript" language='JavaScript' src="%s/js/jquery-ui.min.js"></script>
 
             <table class="bibcirctable">
               <tr align="left">
@@ -8419,7 +8419,7 @@ class Template:
 
         out += """
 
-        <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+        <script type="text/javascript" language='JavaScript' src="%s/js/jquery-ui.min.js"></script>
 
         <form name="request_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/create_new_request_step4" method="get" >
         <div class="bibcircbottom">
@@ -8905,7 +8905,7 @@ class Template:
 
         out += """
 
-                <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+                <script type="text/javascript" language='JavaScript' src="%s/js/jquery-ui.min.js"></script>
 
 
                 <table class="bibcirctable">
@@ -9362,7 +9362,7 @@ class Template:
 
         out += """
 
-                <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+                <script type="text/javascript" language='JavaScript' src="%s/js/jquery-ui.min.js"></script>
 
                 <table class="bibcirctable">
                   <tr class="bibcirctableheader">
@@ -9526,7 +9526,7 @@ class Template:
 
         out += """
 
-        <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+        <script type="text/javascript" language='JavaScript' src="%s/js/jquery-ui.min.js"></script>
 
              <table class="bibcirctable">
                 <tr>
@@ -10735,7 +10735,7 @@ class Template:
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+            <script type="text/javascript" language='JavaScript' src="%s/js/jquery-ui.min.js"></script>
             """% CFG_SITE_URL
 
         out += """
@@ -11147,7 +11147,7 @@ class Template:
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+            <script type="text/javascript" language='JavaScript' src="%s/js/jquery-ui.min.js"></script>
             """% (CFG_SITE_URL)
 
         (_borrower_id, borrower_name, borrower_email, borrower_mailbox,
@@ -13095,7 +13095,7 @@ class Template:
 
         out += """
 
-        <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+        <script type="text/javascript" language='JavaScript' src="%s/js/jquery-ui.min.js"></script>
 
              <table class="bibcirctable">
                 <tr>
@@ -14375,7 +14375,7 @@ class Template:
         conditions_link = """<a href="http://library.web.cern.ch/library/Library/ill_faq.html" target="_blank">conditions</a>"""
 
         out += """
-        <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+        <script type="text/javascript" language='JavaScript' src="%s/js/jquery-ui.min.js"></script>
 
              <table class="bibcirctable">
                 <tr align="center">
@@ -16212,7 +16212,7 @@ class Template:
         #conditions_link = """<a href="http://library.web.cern.ch/library/Library/ill_faq.html" target="_blank">conditions</a>"""
 
         out += """
-            <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+            <script type="text/javascript" language='JavaScript' src="%s/js/jquery-ui.min.js"></script>
 
              <table class="bibcirctable">
                 <tr align="center">
@@ -16550,7 +16550,7 @@ class Template:
         out += """
         <div class="bibcircbottom">
         <link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />
-        <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+        <script type="text/javascript" language='JavaScript' src="%s/js/jquery-ui.min.js"></script>
         <form name="search_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ill_search_result" method="get" >
         <br />
         <br />
