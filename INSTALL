@@ -43,8 +43,8 @@ Contents
         You may also want to install some of the following packages,
         if you have them available on your concrete architecture:
 
-          $ sudo aptitude install rxp python-psyco sbcl cmucl \
-              pylint pychecker pyflakes python-profiler python-epydoc \
+          $ sudo aptitude install python-psyco sbcl cmucl pylint \
+              pychecker pyflakes python-profiler python-epydoc \
               libapache2-mod-xsendfile openoffice.org
 
         Moreover, you should install some Message Transfer Agent (MTA)
