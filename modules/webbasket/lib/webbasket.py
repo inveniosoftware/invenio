@@ -30,6 +30,7 @@ if sys.hexversion < 0x2040000:
 from invenio.intbitset import intbitset
 
 import cgi
+import urllib
 from httplib import urlsplit, HTTPConnection
 #from socket import getdefaulttimeout, setdefaulttimeout
 from zlib import decompress
@@ -120,7 +121,7 @@ def perform_request_display_public(uid,
     else:
         (bskid, basket_name, id_owner, last_update, dummy, nb_items, recids, share_rights) = basket[0]
         if selected_recid:
-            valid_recids = eval(recids + ',')
+            valid_recids = tuple(map(int, recids.split(',')))
             if selected_recid in valid_recids:
                 (content, warnings_item) = __display_public_basket_single_item(bskid,
                                                                           basket_name,
@@ -564,19 +565,25 @@ def perform_request_display(uid,
         # TODO: Send the correct title of the page as well.
         return perform_request_list_public_baskets(uid)
 
-    personal_info = db.get_all_personal_basket_ids_and_names_by_topic(uid)
+    personal_info = db.get_all_user_personal_basket_ids_by_topic(uid)
     personal_baskets_info = ()
+
     if personal_info and selected_category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
+        # Create a dictionary that has the valid topics for keys and the basket
+        # ids in each topic (string, ids separated by commas) as values.
+        personal_info_dict = {}
+        for personal_info_topic_and_bskids in personal_info:
+            personal_info_dict[personal_info_topic_and_bskids[0]] = map(int, personal_info_topic_and_bskids[1].split(','))
         valid_category_choice = True
         if selected_topic:
-            # (A) tuples parsing check
-            valid_topic_names = [personal_info_topic[0] for personal_info_topic in personal_info]
-            if selected_topic in valid_topic_names:
-            # (B) DB check
-            #if db.is_topic_valid(uid, selected_topic):
+            valid_selected_topic_p = False
+            # Validate the topic. Check if the selected topic is one of the keys
+            # in the dictionary. If it is valid then get some more info for that
+            # topic from the DB.
+            if selected_topic in personal_info_dict.keys():
                 personal_baskets_info = db.get_personal_baskets_info_for_topic(uid, selected_topic)
                 valid_selected_topic_p = True
-            else:
+            if not valid_selected_topic_p:
                 try:
                     raise InvenioWebBasketWarning(_('The selected topic does not exist or you do not have access to it.'))
                 except InvenioWebBasketWarning, exc:
@@ -588,31 +595,21 @@ def perform_request_display(uid,
                 selected_topic = ""
         else:
             valid_selected_topic_p = True
+
         if valid_selected_topic_p and selected_bskid:
-            # (A) tuples parsing check
             if selected_topic:
-                valid_baskets = [eval(personal_info_topic[2] + ',') for personal_info_topic in personal_info
-                                 if personal_info_topic[0] == selected_topic]
+                valid_bskids = personal_info_dict[selected_topic]
             else:
-                valid_baskets = [eval(personal_info_topic[2] + ',') for personal_info_topic in personal_info]
-            valid_bskids = []
-            for valid_basket in valid_baskets:
-                valid_bskids.extend([valid_bskid[0] for valid_bskid in valid_basket])
+                valid_bskids = []
+                for valid_bskids_per_topic in personal_info_dict.values():
+                    valid_bskids.extend(valid_bskids_per_topic)
             if selected_bskid in valid_bskids:
-            # (B) DB check
-            #if db.is_personal_basket_valid(uid, selected_bskid):
                 if not selected_topic:
-                    # (A) tuples parsing check
-                    valid_baskets_dict = {}
-                    for personal_info_topic in personal_info:
-                        valid_baskets_dict[personal_info_topic[0]] = eval(personal_info_topic[2] + ',')
-                    for valid_basket in valid_baskets_dict.iteritems():
-                        if selected_bskid in [valid_bskid[0] for valid_bskid in valid_basket[1]]:
-                            selected_topic = valid_basket[0]
+                    for valid_topic in personal_info_dict.iterkeys():
+                        if selected_bskid in personal_info_dict[valid_topic]:
+                            selected_topic = valid_topic
                             break
-                    # (B) DB check
-                    #selected_topic = db.get_basket_topic(uid, selected_bskid)
-                    personal_baskets_info = db.get_personal_baskets_info_for_topic(uid, selected_topic)
+                personal_baskets_info = db.get_personal_baskets_info_for_topic(uid, selected_topic)
                 for personal_basket_info in personal_baskets_info:
                     if personal_basket_info[0] == selected_bskid:
                         selected_basket_info = list(personal_basket_info)
@@ -630,29 +627,28 @@ def perform_request_display(uid,
         else:
             selected_bskid = 0
 
-    group_info = db.get_all_group_basket_ids_and_names_by_group(uid)
+    group_info = db.get_all_user_group_basket_ids_by_group(uid)
     group_baskets_info = ()
     selected_group_name = ""
+
     if group_info and selected_category == CFG_WEBBASKET_CATEGORIES['GROUP']:
+        # Create a dictionary that has the valid group as keys and the basket
+        # ids in each group (string, ids separated by commas) as values.
+        group_info_dict = {}
+        for group_info_group_and_bskids in group_info:
+            group_info_dict[group_info_group_and_bskids[0]] = (group_info_group_and_bskids[1], \
+                                                               map(int, group_info_group_and_bskids[2].split(',')))
         valid_category_choice = True
         if selected_group_id:
-            # (A) tuples parsing check
-            valid_group_ids = [group_info_group[0] for group_info_group in group_info]
-            if selected_group_id in valid_group_ids:
-            # (B) DB check
-            #if db.is_group_valid(uid, selected_group_id):
+            valid_selected_group_p = False
+            # Validate the group. Check if the selected group is one of the keys
+            # in the dictionary. If it is valid then get some more info for that
+            # group from the DB.
+            if selected_group_id in group_info_dict.keys():
+                selected_group_name = group_info_dict[selected_group_id][0]
                 group_baskets_info = db.get_group_baskets_info_for_group(selected_group_id)
-                # (A) tuples parsing
-                for group_info_group in group_info:
-                    if group_info_group[0] == selected_group_id:
-                        selected_group_name = group_info_group[1]
-                        break
-                # (B) DB
-                #selected_group_name = db.get_group_name(selected_group_id)
-                #if selected_group_name:
-                #    selected_group_name = selected_group_name[0][0]
                 valid_selected_group_p = True
-            else:
+            if not valid_selected_group_p:
                 try:
                     raise InvenioWebBasketWarning(_('The selected topic does not exist or you do not have access to it.'))
                 except InvenioWebBasketWarning, exc:
@@ -664,40 +660,23 @@ def perform_request_display(uid,
                 valid_selected_group_p = False
         else:
             valid_selected_group_p = True
+
         if valid_selected_group_p and selected_bskid:
-            # (A) tuples parsing check
             if selected_group_id:
-                valid_baskets = [eval(group_info_group[3] + ',') for group_info_group in group_info
-                                 if group_info_group[0] == selected_group_id]
+                valid_bskids = group_info_dict[selected_group_id][1]
             else:
-                valid_baskets = [eval(group_info_group[3] + ',') for group_info_group in group_info]
-            valid_bskids = []
-            for valid_basket in valid_baskets:
-                valid_bskids.extend([valid_bskid[0] for valid_bskid in valid_basket])
+                valid_bskids = []
+                for group_and_valid_bskids_per_group in group_info_dict.values():
+                    valid_bskids_per_group = group_and_valid_bskids_per_group[1]
+                    valid_bskids.extend(valid_bskids_per_group)
             if selected_bskid in valid_bskids:
-            # (B) DB check
-            #if db.is_group_basket_valid(uid, selected_bskid):
                 if not selected_group_id:
-                    # (A) tuples parsing check
-                    valid_baskets_dict = {}
-                    for group_info_group in group_info:
-                        valid_baskets_dict[group_info_group[0]] = eval(group_info_group[3] + ',')
-                    for valid_basket in valid_baskets_dict.iteritems():
-                        if selected_bskid in [valid_bskid[0] for valid_bskid in valid_basket[1]]:
-                            selected_group_id = valid_basket[0]
+                    for valid_group_id in group_info_dict.iterkeys():
+                        if selected_bskid in group_info_dict[valid_group_id][1]:
+                            selected_group_id = valid_group_id
                             break
-                    # (B) DB check
-                    #selected_group_id = db.get_basket_group(uid, selected_bskid)
-                    # (A) tuples parsing
-                    for group_info_group in group_info:
-                        if group_info_group[0] == selected_group_id:
-                            selected_group_name = group_info_group[1]
-                            break
-                    # (B) DB
-                    #selected_group_name = db.get_group_name(selected_group_id)
-                    #if selected_group_name:
-                    #    selected_group_name = selected_group_name[0][0]
-                    group_baskets_info = db.get_group_baskets_info_for_group(selected_group_id)
+                selected_group_name = group_info_dict[selected_group_id][0]
+                group_baskets_info = db.get_group_baskets_info_for_group(selected_group_id)
                 for group_basket_info in group_baskets_info:
                     if group_basket_info[0] == selected_bskid:
                         selected_basket_info = list(group_basket_info)
@@ -1940,10 +1919,10 @@ def perform_request_add(uid,
                     #warnings.append('WRN_WEBBASKET_INVALID_ADD_TO_PARAMETERS')
                     warnings_html += webbasket_templates.tmpl_warnings(exc.message, ln)
 
-    personal_basket_list = db.get_all_personal_basket_ids_and_names_by_topic_for_add_to_list(uid)
-    group_basket_list = db.get_all_group_basket_ids_and_names_by_group_for_add_to_list(uid)
+    personal_basket_list = db.get_all_user_personal_basket_ids_by_topic(uid)
+    group_basket_list = db.get_all_user_group_basket_ids_by_group_with_add_rights(uid)
     if not personal_basket_list and not group_basket_list:
-        bskid = db.create_basket(uid=uid, basket_name="Untitled basket", topic="Untitled topic")
+        bskid = db.create_basket(uid=uid, basket_name=_('Untitled basket'), topic=_('Untitled topic'))
         try:
             raise InvenioWebBasketWarning(_('A default topic and basket have been automatically created. Edit them to rename them as you see fit.'))
         except InvenioWebBasketWarning, exc:
@@ -1962,7 +1941,7 @@ def perform_request_add(uid,
             body = warnings_html + body
             return (body, navtrail)
         else:
-            personal_basket_list = db.get_all_personal_basket_ids_and_names_by_topic_for_add_to_list(uid)
+            personal_basket_list = db.get_all_user_personal_basket_ids_by_topic(uid)
 
     body = webbasket_templates.tmpl_add(recids=recids,
                                         category=category,
@@ -2383,71 +2362,75 @@ def create_basket_navtrail(uid,
     _ = gettext_set_language(ln)
     out = ''
     if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
-        out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">'\
-               '%s</a>'
-        out %= (CFG_SITE_URL,
-                'category=' + category + '&amp;ln=' + ln,
-                _("Personal baskets"))
+        category_html = """ &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>""" % \
+                        (CFG_SITE_URL,
+                         'category=' + category + '&amp;ln=' + ln,
+                         _("Personal baskets"))
+        out += category_html
+
         topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
         if topic in topics:
-            out += ' &gt; '
-            out += '<a class="navtrail" href="%s/yourbaskets/display?%s">'\
-                   '%s</a>'
-            out %= (CFG_SITE_URL,
-                    'category=' + category + '&amp;topic=' + \
-                                  topic + '&amp;ln=' + ln,
-                    cgi.escape(topic))
+            topic_html = """ &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>""" % \
+                         (CFG_SITE_URL,
+                          'category=' + category + '&amp;topic=' + \
+                                    urllib.quote(topic) + '&amp;ln=' + ln,
+                          cgi.escape(topic))
+            out += topic_html
+
             if bskid:
                 basket = db.get_public_basket_infos(bskid)
                 if basket:
-                    out += ' &gt; '
-                    out += '<a class="navtrail" href="%s/yourbaskets/display'\
-                           '?%s">%s</a>'
-                    out %= (CFG_SITE_URL,
-                            'category=' + category + '&amp;topic=' + \
-                            topic + '&amp;ln=' + ln + '#bsk' + str(bskid),
-                            cgi.escape(basket[1]))
+                    basket_html = """ &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>""" % \
+                                  (CFG_SITE_URL,
+                                   'category=' + category + '&amp;topic=' + \
+                                             urllib.quote(topic) + '&amp;ln=' + ln + '#bsk' + str(bskid),
+                                   cgi.escape(basket[1]))
+                    out += basket_html
 
     elif category == CFG_WEBBASKET_CATEGORIES['GROUP']:
-        out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">'\
-               '%s</a>'
-        out %= (CFG_SITE_URL, 'category=' + category + '&amp;ln=' + ln, _("Group baskets"))
+        category_html = """ &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>""" % \
+                        (CFG_SITE_URL,
+                         'category=' + category + '&amp;ln=' + ln,
+                         _("Group baskets"))
+        out += category_html
+
         groups = db.get_group_infos(uid)
         if group:
             groups = filter(lambda x: x[0] == group, groups)
         if len(groups):
-            out += ' &gt; '
-            out += '<a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
-            out %= (CFG_SITE_URL,
-                    'category=' + category + '&amp;group=' + \
-                              str(group) + '&amp;ln=' + ln,
-                    cgi.escape(groups[0][1]))
+            group_html = """ &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>""" % \
+                         (CFG_SITE_URL,
+                          'category=' + category + '&amp;group=' + \
+                                    str(group) + '&amp;ln=' + ln,
+                          cgi.escape(groups[0][1]))
+            out += group_html
+
             if bskid:
                 basket = db.get_public_basket_infos(bskid)
                 if basket:
-                    out += ' &gt; '
-                    out += '<a class="navtrail" href="%s/yourbaskets/display?'\
-                           '%s">%s</a>'
-                    out %= (CFG_SITE_URL,
-                            'category=' + category + '&amp;group=' + \
-                            str(group) + '&amp;ln=' + ln + '#bsk' + str(bskid),
-                            cgi.escape(basket[1]))
+                    basket_html = """ &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>""" % \
+                                  (CFG_SITE_URL,
+                                   'category=' + category + '&amp;group=' + \
+                                             str(group) + '&amp;ln=' + ln + '#bsk' + str(bskid),
+                                   cgi.escape(basket[1]))
+                    out += basket_html
+
     elif category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
-        out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">'\
-               '%s</a>'
-        out %= (CFG_SITE_URL,
-                'category=' + category + '&amp;ln=' + ln,
-                _("Others' baskets"))
+        category_html = """ &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>""" % \
+                        (CFG_SITE_URL,
+                         'category=' + category + '&amp;ln=' + ln,
+                         _("Others' baskets"))
+        out += category_html
         if bskid:
             basket = db.get_public_basket_infos(bskid)
             if basket:
-                out += ' &gt; '
-                out += '<a class="navtrail" href="%s/yourbaskets/display?%s">'\
-                       '%s</a>'
-                out %= (CFG_SITE_URL,
-                        'category=' + category + '&amp;ln=' + ln + \
-                        '#bsk' + str(bskid),
-                        cgi.escape(basket[1]))
+                basket_html = """ &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">""" % \
+                              (CFG_SITE_URL,
+                               'category=' + category + '&amp;ln=' + ln + \
+                                         '#bsk' + str(bskid),
+                               cgi.escape(basket[1]))
+                out += basket_html
+
     return out
 
 def create_webbasket_navtrail(uid,
@@ -2484,7 +2467,7 @@ def create_webbasket_navtrail(uid,
             if basket:
                 out += " &gt; "
                 out += """<a class="navtrail" href="%s/yourbaskets/display_public?bskid=%i&amp;ln=%s">%s</a>""" % \
-                       (CFG_SITE_URL, bskid, ln, cgi.escape(basket))
+                       (CFG_SITE_URL, bskid, ln, cgi.escape(basket, True))
 
     elif search_baskets:
         out += " &gt; "
@@ -2506,13 +2489,13 @@ def create_webbasket_navtrail(uid,
                 if topic in topic_names:
                     out += " &gt; "
                     out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;topic=%s&amp;ln=%s">%s</a>""" % \
-                           (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['PRIVATE'], cgi.escape(topic), ln, cgi.escape(topic))
+                           (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['PRIVATE'], urllib.quote(topic), ln, cgi.escape(topic, True))
                     if bskid:
                         basket = db.get_basket_name(bskid)
                         if basket:
                             out += " &gt; "
                             out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;topic=%s&amp;bskid=%i&amp;ln=%s">%s</a>""" % \
-                                   (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['PRIVATE'], cgi.escape(topic), bskid, ln, cgi.escape(basket))
+                                   (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['PRIVATE'], urllib.quote(topic), bskid, ln, cgi.escape(basket, True))
 
         elif category == CFG_WEBBASKET_CATEGORIES['GROUP']:
             out += " &gt; "
@@ -2523,13 +2506,13 @@ def create_webbasket_navtrail(uid,
                 if group_names and group_names[0]:
                     out += " &gt; "
                     out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;group=%i&amp;ln=%s">%s</a>""" % \
-                           (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['GROUP'], group, ln, cgi.escape(group_names[0]))
+                           (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['GROUP'], group, ln, cgi.escape(group_names[0], True))
                     if bskid:
                         basket = db.get_basket_name(bskid)
                         if basket:
                             out += " &gt; "
                             out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;topic=%s&amp;bskid=%i&amp;ln=%s">%s</a>""" % \
-                                   (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['GROUP'], group, bskid, ln, cgi.escape(basket))
+                                   (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['GROUP'], group, bskid, ln, cgi.escape(basket, True))
 
         elif category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
             out += " &gt; "
@@ -2540,7 +2523,7 @@ def create_webbasket_navtrail(uid,
                 if basket:
                     out += " &gt; "
                     out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;topic=%s&amp;bskid=%i&amp;ln=%s">%s</a>""" % \
-                           (CFG_SITE_URL, category, group, bskid, ln, cgi.escape(basket))
+                           (CFG_SITE_URL, category, group, bskid, ln, cgi.escape(basket, True))
 
     return out
 

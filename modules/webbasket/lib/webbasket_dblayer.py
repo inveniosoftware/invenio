@@ -230,37 +230,11 @@ def get_personal_baskets_info_for_topic(uid, topic):
 
     return res
 
-def get_all_personal_basket_ids_and_names_by_topic(uid):
-    """For a given user return all their personal baskets
-    (in tuples: (id, name)) grouped by topic. Note that the
-    basket tuples have to evaluated to be converted to actual
-    tuples."""
+def get_all_user_personal_basket_ids_by_topic(uid):
+    """For a given user return all their personal basket ids grouped by topic."""
 
     query = """ SELECT      ubsk.topic,
-                            count(bsk.id),
-                            GROUP_CONCAT('(', bsk.id, ', \"', bsk.name, '\")'
-                                        ORDER BY bsk.name)
-                FROM        user_bskBASKET AS ubsk
-                JOIN        bskBASKET AS bsk
-                ON          ubsk.id_bskBASKET=bsk.id
-                AND         ubsk.id_user=bsk.id_owner
-                WHERE       bsk.id_owner=%s
-                GROUP BY    ubsk.topic
-                ORDER BY    ubsk.topic"""
-    params = (uid,)
-    res = run_sql(query, params)
-
-    return res
-
-def get_all_personal_basket_ids_and_names_by_topic_for_add_to_list(uid):
-    """For a given user return all their personal baskets
-    (in tuples: (id, name)) grouped by topic. Note that the
-    basket tuples have to evaluated to be converted to actual
-    tuples."""
-
-    query = """ SELECT      ubsk.topic,
-                            GROUP_CONCAT('(', bsk.id, ', \"', bsk.name, '\")'
-                                        ORDER BY bsk.name)
+                            GROUP_CONCAT(bsk.id)
                 FROM        user_bskBASKET AS ubsk
                 JOIN        bskBASKET AS bsk
                 ON          ubsk.id_bskBASKET=bsk.id
@@ -351,6 +325,29 @@ def get_personal_topics_infos(uid):
                ORDER BY topic"""
     uid = int(uid)
     res = run_sql(query, (uid,))
+    return res
+
+def get_basket_ids_and_names(bskids, limit=0):
+    """For the given basket ids, return their ids and names,
+    ordered by basket name.
+    If 'limit' is greater than 0, limit the number of results returned."""
+
+    if not((type(bskids) is list) or (type(bskids) is tuple)):
+        bskids = [bskids]
+
+    query = """ SELECT      bsk.id,
+                            bsk.name
+                FROM        bskBASKET AS bsk
+                WHERE       %s
+                ORDER BY    bsk.name
+                %s"""
+    sep = ' OR '
+    query %= (sep.join(['id=%s'] * len(bskids)), limit and 'LIMIT %i' % limit or '')
+
+    params = tuple(bskids)
+
+    res = run_sql(query, params)
+
     return res
 
 def rename_basket(bskid, new_name):
@@ -951,9 +948,6 @@ def add_to_many_baskets(uid, recids=[], colid=0, bskids=[], es_title="", es_desc
             # sets approach
             #existing_recids = [ids[1] for ids in res2A]
             #new_recids = list(set(recids)-set(existing_recids))
-            f = open("/tmp/bsk_db", "w")
-            f.write(str(recids) + "\n" + str(existing_recids) + "\n" + str(existing_ids) + "\n" + str(new_recids) + "\n")
-            f.close()
             if new_recids:
                 query2B = """INSERT
                              INTO   bskEXTREC
@@ -1164,17 +1158,12 @@ def get_group_name(gid):
 
     return res
 
-def get_all_group_basket_ids_and_names_by_group(uid):
-    """For a given user return all their group baskets
-    (in tuples: (id, name)) grouped by group. Note that the
-    basket tuples have to evaluated to be converted to actual
-    tuples."""
+def get_all_user_group_basket_ids_by_group(uid):
+    """For a given user return all their group basket ids grouped by group."""
 
     query = """ SELECT      ug.id,
                             ug.name,
-                            count(bsk.id),
-                            GROUP_CONCAT('(', ugbsk.id_bskBASKET, ', \"', bsk.name, '\")'
-                                        ORDER BY bsk.name)
+                            GROUP_CONCAT(ugbsk.id_bskBASKET)
                 FROM        usergroup AS ug
                 JOIN        usergroup_bskBASKET AS ugbsk
                     ON      ugbsk.id_usergroup=ug.id
@@ -1190,15 +1179,12 @@ def get_all_group_basket_ids_and_names_by_group(uid):
 
     return res
 
-def get_all_group_basket_ids_and_names_by_group_for_add_to_list(uid):
-    """For a given user return all their group baskets
-    (in tuples: (id, name)) grouped by group. Note that the
-    basket tuples have to evaluated to be converted to actual
-    tuples."""
+def get_all_user_group_basket_ids_by_group_with_add_rights(uid):
+    """For a given user return all their group basket ids grouped by group.
+    Return only the basket ids to which it is allowed to add records."""
 
     query = """ SELECT      ug.name,
-                            GROUP_CONCAT('(', ugbsk.id_bskBASKET, ', \"', bsk.name, '\")'
-                                        ORDER BY bsk.name)
+                            GROUP_CONCAT(ugbsk.id_bskBASKET)
                 FROM        usergroup AS ug
                 JOIN        usergroup_bskBASKET AS ugbsk
                     ON      ugbsk.id_usergroup=ug.id

@@ -37,6 +37,9 @@ CFG_WEBBASKET_SHARE_LEVELS_ORDERED = [CFG_WEBBASKET_SHARE_LEVELS['READITM'],
                                       CFG_WEBBASKET_SHARE_LEVELS['DELITM'],
                                       CFG_WEBBASKET_SHARE_LEVELS['MANAGE']]
 
+# Keep in mind that the underscore ('_') is a special character. In case you
+# want to define new categories, don't use the underscore ('_') anywhere in the
+# value! You may use it in the key if you wish.
 CFG_WEBBASKET_CATEGORIES = {'PRIVATE':      'P',
                             'GROUP':        'G',
                             'EXTERNAL':     'E',
