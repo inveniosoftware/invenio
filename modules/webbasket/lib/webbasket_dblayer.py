@@ -2274,7 +2274,7 @@ def create_pseudo_record(es_title, es_desc, es_url, of="hb"):
   <datafield tag="856" ind1="4" ind2=" ">
     <subfield code="u">%s</subfield>
   </datafield>
-</record>""" % (encode_for_xml(es_title), encode_for_xml(es_desc), es_url)
+</record>""" % (encode_for_xml(es_title), encode_for_xml(es_desc), encode_for_xml(es_url))
     return record
 
 def prettify_url(url, char_limit=50, nb_dots=3):
