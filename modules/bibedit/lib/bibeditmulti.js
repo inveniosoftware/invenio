@@ -93,7 +93,7 @@ function updateView() {
         $('#buttonSubmitChanges').attr('disabled', 'true').addClass('buttonDisabled');
 }
 function showLoading() {
-    $('#preview_area').html('<img src=/img/ui-anim_basic_16x16.gif> Loading...');
+    $('#preview_area').html('<span class="multiedit_loading">Loading...</span><br /><img src=/img/ajax-loader.gif>').css("text-align", "center");
 }
 
 function createCommandsList(){
@@ -242,10 +242,12 @@ function onAjaxSuccess(json) {
             gComputeModifications = 0;
 
         }
+        $("#preview_area").css("text-align", "")
         $("#preview_area").html(search_html);
 }
 
 function displayError(msg) {
+    $("#preview_area").css("text-align", "")
     $("#preview_area").html(msg);
 }
 

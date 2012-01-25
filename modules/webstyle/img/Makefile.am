@@ -46,6 +46,7 @@ img_DATA = add-small.png \
            aid_reset.png \
            aid_to_other.png \
            aid_to_other_gray.png \
+           ajax-loader.gif \
            balloon_arrow_left_shadow.png \
            balloon_bottom_left_shadow.png \
            balloon_bottom_shadow.png \

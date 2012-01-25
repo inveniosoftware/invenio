@@ -237,6 +237,10 @@ div .boxleft_2 {
     color:green;
 }
 
+.multiedit_loading {
+    font-size:12px;
+}
+
 </style>
         """
         return styles
