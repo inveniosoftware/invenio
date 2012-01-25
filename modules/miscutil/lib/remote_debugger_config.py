@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,8 +23,8 @@ CFG_REMOTE_DEBUGGER_ENABLED = 0 # by default, we don't want to enable debugger
 
 # if CFG_DEVEL_SITE is defined, then we do want to enable debugger:
 try:
-    from invenio.config import CFG_DEBUG_SITE
-    if CFG_DEBUG_SITE:
+    from invenio.config import CFG_DEVEL_SITE
+    if CFG_DEVEL_SITE:
         CFG_REMOTE_DEBUGGER_ENABLED = 1
 except ImportError:
     pass
