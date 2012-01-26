@@ -1204,10 +1204,10 @@ def perform_request_search(uid,
                     number_of_notes = recid_and_notes[1]
                     if recid < 0:
                         xml_record = personal_external_items_xml_records[recid]
-                        record_html = format_record(None, of='hwbsr', xml_record=xml_record)
+                        record_html = format_record(None, of='bsr', xml_record=xml_record)
                         records.append((recid, number_of_notes, record_html))
                     else:
-                        record_html = format_record(recid, of='hwbsr', on_the_fly=True)
+                        record_html = format_record(recid, of='bsr', on_the_fly=True)
                         records.append((recid, number_of_notes, record_html))
                 personal_search_results[bskid][3] = records
 
@@ -1292,10 +1292,10 @@ def perform_request_search(uid,
                     number_of_notes = recid_and_notes[1]
                     if recid < 0:
                         xml_record = group_external_items_xml_records[recid]
-                        record_html = format_record(None, of='hwbsr', xml_record=xml_record)
+                        record_html = format_record(None, of='bsr', xml_record=xml_record)
                         records.append((recid, number_of_notes, record_html))
                     else:
-                        record_html = format_record(recid, of='hwbsr', on_the_fly=True)
+                        record_html = format_record(recid, of='bsr', on_the_fly=True)
                         records.append((recid, number_of_notes, record_html))
                 group_search_results[bskid][5] = records
 
@@ -1374,10 +1374,10 @@ def perform_request_search(uid,
                     number_of_notes = recid_and_notes[1]
                     if recid < 0:
                         xml_record = public_external_items_xml_records[recid]
-                        record_html = format_record(None, of='hwbsr', xml_record=xml_record)
+                        record_html = format_record(None, of='bsr', xml_record=xml_record)
                         records.append((recid, number_of_notes, record_html))
                     else:
-                        record_html = format_record(recid, of='hwbsr', on_the_fly=True)
+                        record_html = format_record(recid, of='bsr', on_the_fly=True)
                         records.append((recid, number_of_notes, record_html))
                 public_search_results[bskid][3] = records
 
@@ -1456,10 +1456,10 @@ def perform_request_search(uid,
                     number_of_notes = recid_and_notes[1]
                     if recid < 0:
                         xml_record = all_public_external_items_xml_records[recid]
-                        record_html = format_record(None, of='hwbsr', xml_record=xml_record)
+                        record_html = format_record(None, of='bsr', xml_record=xml_record)
                         records.append((recid, number_of_notes, record_html))
                     else:
-                        record_html = format_record(recid, of='hwbsr', on_the_fly=True)
+                        record_html = format_record(recid, of='bsr', on_the_fly=True)
                         records.append((recid, number_of_notes, record_html))
                 all_public_search_results[bskid][3] = records
 
