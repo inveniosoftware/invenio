@@ -111,7 +111,7 @@ exclude-result-prefixes="marc fn">
 	<xsl:if test="starts-with(., 'http://mediaarchive.cern.ch/MediaArchive/')">
 	  <jwplayer:file><xsl:value-of select="substring(., 42)"/></jwplayer:file>
 	  <jwplayer:provider>rtmp</jwplayer:provider>
-	  <jwplayer:streamer>rtmp://flashmsuds.cern.ch/vod</jwplayer:streamer>
+	  <jwplayer:streamer>rtmp://wowza.cern.ch:1935/vod</jwplayer:streamer>
         </xsl:if>
 
         <media:content>
