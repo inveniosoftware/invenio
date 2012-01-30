@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -296,10 +296,12 @@ class BibFormatMARCXMLTest(unittest.TestCase):
     def setUp(self):
         """Prepare some ideal outputs"""
 
-        self.record_9_xm = '''<?xml version="1.0" encoding="UTF-8"?>
+        self.record_9_xm_beg = '''<?xml version="1.0" encoding="UTF-8"?>
 <collection xmlns="http://www.loc.gov/MARC21/slim">
 <record>
   <controlfield tag="001">9</controlfield>
+  <controlfield tag="005">'''
+        self.record_9_xm_end = '''\
   <datafield tag="041" ind1=" " ind2=" ">
     <subfield code="a">eng</subfield>
   </datafield>
@@ -367,7 +369,8 @@ class BibFormatMARCXMLTest(unittest.TestCase):
         """bibformat - MARCXML output"""
         pageurl = CFG_SITE_URL + '/%s/9?of=xm' % CFG_SITE_RECORD
         result = test_web_page_content(pageurl,
-                                       expected_text=self.record_9_xm)
+                                       expected_text=[self.record_9_xm_beg,
+                                                      self.record_9_xm_end])
         self.assertEqual([], result)
 
 class BibFormatMARCTest(unittest.TestCase):
@@ -376,8 +379,9 @@ class BibFormatMARCTest(unittest.TestCase):
 
     def setUp(self):
         """Prepare some ideal outputs"""
-
-        self.record_29_hm = '''000000029 001__ 29
+        self.record_29_hm_beg = '''000000029 001__ 29
+000000029 005__ '''
+        self.record_29_hm_end = '''\
 000000029 020__ $$a0720421039
 000000029 041__ $$aeng
 000000029 080__ $$a517.11
@@ -397,7 +401,8 @@ class BibFormatMARCTest(unittest.TestCase):
 
         pageurl = CFG_SITE_URL + '/%s/29?of=hm' % CFG_SITE_RECORD
         result = test_web_page_content(pageurl,
-                                       expected_text=self.record_29_hm)
+                                       expected_text=[self.record_29_hm_beg,
+                                                      self.record_29_hm_end])
         self.assertEqual([], result)
 
 class BibFormatTitleFormattingTest(unittest.TestCase):
