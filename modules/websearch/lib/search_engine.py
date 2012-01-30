@@ -983,10 +983,11 @@ def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_
     # month
     box += """<select name="%sm">""" % name
     box += """<option value="">%s""" % _("any month")
+    # trailing space in May distinguishes short/long form of the month name
     for mm, month in [(1, _("January")), (2, _("February")), (3, _("March")), (4, _("April")), \
-                      (5, _("May")), (6, _("June")), (7, _("July")), (8, _("August")), \
+                      (5, _("May ")), (6, _("June")), (7, _("July")), (8, _("August")), \
                       (9, _("September")), (10, _("October")), (11, _("November")), (12, _("December"))]:
-        box += """<option value="%02d"%s>%s""" % (mm, is_selected(mm, selected_month), month)
+        box += """<option value="%02d"%s>%s""" % (mm, is_selected(mm, selected_month), month.strip())
     box += """</select>"""
     # year
     box += """<select name="%sy">""" % name

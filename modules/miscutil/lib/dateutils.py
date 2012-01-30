@@ -3,7 +3,7 @@
 ## Some functions about dates
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -216,7 +216,7 @@ def get_i18n_month_name(month_nb, display='short', ln=CFG_SITE_LANG):
                    2: _("February"),
                    3: _("March"),
                    4: _("April"),
-                   5: _("May"),
+                   5: _("May "), # trailing space distinguishes short/long form
                    6: _("June"),
                    7: _("July"),
                    8: _("August"),
@@ -224,7 +224,7 @@ def get_i18n_month_name(month_nb, display='short', ln=CFG_SITE_LANG):
                    10: _("October"),
                    11: _("November"),
                    12: _("December")}
-    return months[month_nb]
+    return months[month_nb].strip()
 
 def create_day_selectbox(name, selected_day=0, ln=CFG_SITE_LANG):
     """

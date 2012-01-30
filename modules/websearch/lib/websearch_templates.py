@@ -1190,10 +1190,11 @@ class Template:
                  'any' : _("any month"),
                  'sel' : self.tmpl_is_selected(sm, 0)
                }
+        # trailing space in May distinguishes short/long form of the month name
         for mm, month in [(1, _("January")), (2, _("February")), (3, _("March")), (4, _("April")), \
-                          (5, _("May")), (6, _("June")), (7, _("July")), (8, _("August")), \
+                          (5, _("May ")), (6, _("June")), (7, _("July")), (8, _("August")), \
                           (9, _("September")), (10, _("October")), (11, _("November")), (12, _("December"))]:
-            box += """<option value="%02d"%s>%s</option>""" % (mm, self.tmpl_is_selected(sm, mm), month)
+            box += """<option value="%02d"%s>%s</option>""" % (mm, self.tmpl_is_selected(sm, mm), month.strip())
         box += """</select>"""
         # year
         box += """
