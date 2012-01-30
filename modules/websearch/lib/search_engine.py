@@ -3067,13 +3067,15 @@ def guess_primary_collection_of_a_record(recID):
        In that case, return 'CFG_SITE_NAME'."""
     out = CFG_SITE_NAME
     dbcollids = get_fieldvalues(recID, "980__a")
-    if dbcollids:
-        for dbcollid in dbcollids:
-            dbquery = "collection:" + dbcollid
-            res = run_sql("SELECT name FROM collection WHERE dbquery=%s", (dbquery,))
-            if res:
-                out = res[0][0]
-                break
+    for dbcollid in dbcollids:
+        variants = ("collection:" + dbcollid,
+                    'collection:"' + dbcollid + '"',
+                    "980__a:" + dbcollid,
+                    '980__a:"' + dbcollid + '"')
+        res = run_sql("SELECT name FROM collection WHERE dbquery IN (%s,%s,%s,%s)", variants)
+        if res:
+            out = res[0][0]
+            break
     if CFG_CERN_SITE:
         # dirty hack for ATLAS collections at CERN:
         if out in ('ATLAS Communications', 'ATLAS Internal Notes'):
