@@ -28,6 +28,7 @@ import os
 import re
 import sys
 import time
+from datetime import datetime
 from zlib import compress
 import socket
 import marshal
@@ -58,6 +59,7 @@ from invenio.bibrecord import create_records, \
                               record_delete_field, \
                               record_xml_output, \
                               record_get_field_instances, \
+                              record_get_field_value, \
                               record_get_field_values, \
                               field_get_subfield_values, \
                               field_get_subfield_instances, \
@@ -138,7 +140,9 @@ def bibupload(record, opt_tag=None, opt_mode=None,
     """
     assert(opt_mode in ('insert', 'replace', 'replace_or_insert', 'reference',
         'correct', 'append', 'format', 'holdingpen', 'delete'))
+
     error = None
+    now = datetime.now() # will hold record creation/modification date
     # If there are special tags to proceed check if it exists in the record
     if opt_tag is not None and not(record.has_key(opt_tag)):
         msg = "    Failed: Tag not found, enter a valid tag to update."
@@ -168,7 +172,8 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             else:
                 error = None
             write_message("   -Added tag 001: DONE.", verbose=2)
-    write_message("   -Check if the xml marc file is already in the database: DONE" , verbose=2)
+
+            write_message("   -Check if the xml marc file is already in the database: DONE" , verbose=2)
 
     # Reference mode check if there are reference tag
     if opt_mode == 'reference':
@@ -199,6 +204,13 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         else:
             error = None
 
+        error = record_add_field(record, '005', controlfield_value=now.strftime("%Y%m%d%H%M%S.0"))
+        if error is None:
+            write_message("   Failed: Error during adding to 005 controlfield to record",verbose=1,stream=sys.stderr)
+            return (1, int(rec_id))
+        else:
+            error=None
+
     elif opt_mode != 'insert' and opt_mode != 'format' and \
             opt_stage_to_start_from != 5:
         insert_mode_p = False
@@ -208,12 +220,19 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         record_had_altered_bit = record_get_field_values(rec_old, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4], CFG_OAI_PROVENANCE_ALTERED_SUBFIELD)
         # Also save a copy to restore previous situation in case of errors
         original_record = get_record(rec_id)
+
+        if original_record.has_key('005'):
+            record_delete_field(original_record,'005')
+
         if rec_old is None:
             msg = "   Failed during the creation of the old record!"
             write_message(msg, verbose=1, stream=sys.stderr)
             return (1, int(rec_id), msg)
         else:
             write_message("   -Retrieve the old record to update: DONE", verbose=2)
+
+        if rec_old.has_key('005'):
+            record_delete_field(rec_old,'005')
 
         # In Replace mode, take over old strong tags if applicable:
         if opt_mode == 'replace' or \
@@ -238,6 +257,19 @@ def bibupload(record, opt_tag=None, opt_mode=None,
                 opt_tag, opt_mode)
             write_message("   -Append new tags to the old record: DONE", verbose=2)
 
+        # 005 tag should be added everytime the record is modified
+        # If an exiting record is modified, its 005 tag should be overwritten with a new revision value
+        if record.has_key('005'):
+            record_delete_field(record, '005')
+            write_message("  Deleted the existing 005 tag.", verbose=2)
+        error = record_add_field(record, '005', controlfield_value=now.strftime("%Y%m%d%H%M%S.0"))
+        if error is None:
+            write_message("   Failed: Error during adding to 005 controlfield to record",verbose=1,stream=sys.stderr)
+            return (1, int(rec_id))
+        else:
+            error=None
+            write_message("   -Added tag 005: DONE. "+ str(record_get_field_value(record,'005','','')), verbose=2)
+
         # if record_had_altered_bit, this must be set to true, since the
         # record has been altered.
         if record_had_altered_bit:
@@ -255,6 +287,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         record_deleted_p = True
         write_message("   -Clean bibrec_bibxxx: DONE", verbose=2)
     write_message("   -Stage COMPLETED", verbose=2)
+
 
     try:
         if not record_is_valid(record):
@@ -323,7 +356,6 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             write_message("   -Stage COMPLETED", verbose=2)
         else:
             write_message("   -Stage NOT NEEDED", verbose=2)
-
         # Update of the BibFmt
         write_message("Stage 3: Start (Update bibfmt).", verbose=2)
         if opt_stage_to_start_from <= 3:
@@ -331,13 +363,14 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             rec_xml_new = record_xml_output(record)
             # Update bibfmt with the format xm of this record
             if opt_mode != 'format':
-                error = update_bibfmt_format(rec_id, rec_xml_new, 'xm', pretend=pretend)
+                modification_date = datetime.strptime(record_get_field_value(record,'005'),'%Y%m%d%H%M%S.%f').strftime('%Y-%m-%d %H:%M:%S')
+                error = update_bibfmt_format(rec_id, rec_xml_new, 'xm', modification_date, pretend=pretend)
                 if error == 1:
                     msg = "   Failed: error during update_bibfmt_format 'xm'"
                     write_message(msg, verbose=1, stream=sys.stderr)
                     return (1, int(rec_id), msg)
                 if CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE:
-                    error = update_bibfmt_format(rec_id, marshal.dumps(record), 'recstruct', pretend=pretend)
+                    error = update_bibfmt_format(rec_id, marshal.dumps(record), 'recstruct', modification_date, pretend=pretend)
                     if error == 1:
                         msg = "   Failed: error during update_bibfmt_format 'recstruct'"
                         write_message(msg, verbose=1, stream=sys.stderr)
@@ -381,9 +414,8 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         if opt_stage_to_start_from <= 5 and \
         opt_notimechange == 0 and \
         not insert_mode_p:
-            now = convert_datestruct_to_datetext(time.localtime())
             write_message("   -Retrieved current localtime: DONE", verbose=2)
-            update_bibrec_modif_date(now, rec_id, pretend=pretend)
+            update_bibrec_modif_date(now.strftime("%Y-%m-%d %H:%M:%S"), rec_id, pretend=pretend)
             write_message("   -Stage COMPLETED", verbose=2)
         else:
             write_message("   -Stage NOT NEEDED", verbose=2)
