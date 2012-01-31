@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -73,3 +71,7 @@ class KnwKBRVAL(db.Model):
                 server_default='0')
     kb = db.relationship(KnwKB, backref='kbrvals')
 
+
+__all__ = ['KnwKB',
+           'KnwKBDDEF',
+           'KnwKBRVAL']

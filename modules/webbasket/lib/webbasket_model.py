@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -31,7 +29,7 @@ from invenio.sqlalchemyutils import db
 from websession_model import User, Usergroup
 from websearch_model import Collection
 
-class BskBASKET(db.Model): 
+class BskBASKET(db.Model):
     """Represents a BskBASKET record."""
     def __init__(self):
         pass
@@ -42,13 +40,13 @@ class BskBASKET(db.Model):
                 nullable=False, server_default='0')
     name = db.Column(db.String(50), nullable=False,
                 server_default='')
-    date_modification = db.Column(db.DateTime, nullable=False, 
-        server_default='0000-00-00 00:00:00')
+    date_modification = db.Column(db.DateTime, nullable=False,
+        server_default='0001-01-01 00:00:00')
     nb_views = db.Column(db.Integer(15), nullable=False,
                 server_default='0')
     owner = db.relationship(User, backref='baskets')
 
-class BskEXTREC(db.Model): 
+class BskEXTREC(db.Model):
     """Represents a BskEXTREC record."""
     def __init__(self):
         pass
@@ -61,12 +59,12 @@ class BskEXTREC(db.Model):
                 db.ForeignKey(Collection.id), nullable=False, server_default='0')
     original_url = db.Column(db.Text, nullable=True)
     creation_date = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
-    modification_date = db.Column(db.DateTime, nullable=False, 
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
+    modification_date = db.Column(db.DateTime, nullable=False,
+        server_default='0001-01-01 00:00:00')
     collection = db.relationship(Collection, backref='EXTRECs')
 
-class BskEXTFMT(db.Model): 
+class BskEXTFMT(db.Model):
     """Represents a BskEXTFMT record."""
     def __init__(self):
         pass
@@ -78,11 +76,11 @@ class BskEXTFMT(db.Model):
     format = db.Column(db.String(10), nullable=False,
                 server_default='')
     last_updated = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     value = db.Column(db.iLargeBinary, nullable=True)
     EXTREC = db.relationship(BskEXTREC, backref='EXTFMTs')
 
-class BskREC(db.Model): 
+class BskREC(db.Model):
     """Represents a BskREC record."""
     def __init__(self):
         pass
@@ -92,18 +90,18 @@ class BskREC(db.Model):
             primary_key=True)
     id_bskBASKET = db.Column(db.Integer(15, unsigned=True),
                 db.ForeignKey(BskBASKET.id), nullable=False, server_default='0',
-            primary_key=True)
+                primary_key=True)
     id_user_who_added_item = db.Column(db.Integer(15),
                 db.ForeignKey(User.id),
-            nullable=False, server_default='0')
+                nullable=False, server_default='0')
     score = db.Column(db.Integer(15), nullable=False,
                 server_default='0')
     date_added = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     basket = db.relationship(BskBASKET, backref='RECs')
     user_who_added_item = db.relationship(User)
 
-class BskRECORDCOMMENT(db.Model): 
+class BskRECORDCOMMENT(db.Model):
     """Represents a BskRECORDCOMMENT record."""
     def __init__(self):
         pass
@@ -121,7 +119,7 @@ class BskRECORDCOMMENT(db.Model):
                 server_default='')
     body = db.Column(db.Text, nullable=False)
     date_creation = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     priority = db.Column(db.Integer(15), nullable=False,
                 server_default='0')
     in_reply_to_id_bskRECORDCOMMENT = db.Column(db.Integer(15, unsigned=True),
@@ -139,10 +137,10 @@ class UserBskBASKET(db.Model):
         pass
     __tablename__ = 'user_bskBASKET'
     id_user = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(User.id),
-                nullable=False, 
+                nullable=False,
             server_default='0', primary_key=True)
     id_bskBASKET = db.Column(db.Integer(15, unsigned=True),
-                db.ForeignKey(BskBASKET.id), nullable=False, 
+                db.ForeignKey(BskBASKET.id), nullable=False,
             server_default='0', primary_key=True)
     topic = db.Column(db.String(50), nullable=False,
                 server_default='')
@@ -158,12 +156,12 @@ class UsergroupBskBASKET(db.Model):
                 db.ForeignKey(Usergroup.id), nullable=False, server_default='0',
             primary_key=True)
     id_bskBASKET = db.Column(db.Integer(15, unsigned=True),
-                db.ForeignKey(BskBASKET.id), nullable=False, server_default='0', 
+                db.ForeignKey(BskBASKET.id), nullable=False, server_default='0',
             primary_key=True)
     topic = db.Column(db.String(50), nullable=False,
                 server_default='')
     date_shared = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     share_level = db.Column(db.Char(2), nullable=False,
                 server_default='')
     usergroup = db.relationship(Usergroup, backref='usergroup_baskets')
@@ -171,3 +169,11 @@ class UsergroupBskBASKET(db.Model):
                 backref='usergroups')
 
 
+
+__all__ = ['BskBASKET',
+           'BskEXTREC',
+           'BskEXTFMT',
+           'BskREC',
+           'BskRECORDCOMMENT',
+           'UserBskBASKET',
+           'UsergroupBskBASKET']

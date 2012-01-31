@@ -1,0 +1,148 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{%- if not request.is_xhr -%}
+  {% extends "record.html" %}
+{%- endif -%}
+
+{% block record_content %}
+  <div class="page-header">
+    {{ format_record(recid, 'hs', ln=g.ln)|safe }}
+  </div>
+
+
+  <div class="page-header">
+    <h4>
+      {{ _("Comments") }}
+      <small> /
+      <a href="{{ url_for('webcomment.reviews', recid=recid) }}">
+        {{ _('Reviews') }}
+      </a>
+      <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add', recid=recid) }}">
+        <i class="icon-pencil"></i> {{ _('write comment') }}
+      </a>
+      </small>
+    </h4>
+  </div>
+
+  {%- if comments -%}
+
+  <ul class="unstyled">
+  {%- for c in comments recursive -%}
+  <li name="{{ c.id }}">
+    <div >
+    <p>
+      <a class="pull-right" title="{{ _('Permalink to this comment') }}" href="#{{ c.id }}">¶</a>
+    </p>
+    <blockquote>
+      <p style="font-size:90%;">
+      {{ c.body|quoted_txt2html(
+        indent_html=(
+          '<span style="border-left: 3px solid #CCC; padding-left:5px;">',
+          '</span>'))|safe }}
+      </p>
+      <small>
+        <i class="icon-user"></i>
+        {%- if c.user -%}
+        <a href="{{ url_for('yourmessages.add', sent_to_user_nicks=c.user.nickname) }}">
+          {{ c.user.nickname }}
+        </a>
+        {%- else -%}
+          {{ _('Guest') }}
+        {%- endif -%}
+        - <i class="icon-pencil"></i>
+        <a data-toggle="modal" href="{{ url_for('webcomment.add', recid=recid, in_reply=c.id) }}">
+          {{ _('reply') }}
+        </a>
+        - <i class="icon-heart"></i>
+        <a href="{{ url_for('webcomment.vote', recid=recid, id=c.id, value=1) }}">
+          {{_('like')}}
+        </a>
+        <span class="badge badge-success">{{ c.nb_votes_yes }}</span>
+        /
+        <a href="{{ url_for('webcomment.vote', recid=recid, id=c.id, value=-1) }}">
+          {{_('dislike')}}
+        </a>
+        <span class="badge badge-important">{{ c.nb_votes_total-c.nb_votes_yes }}</span>
+        - <i class="icon-time"></i> {{ c.date_creation }}
+        -
+          <a href="{{ url_for('webcomment.report', recid=recid, id=c.id) }}">
+            <i class="icon-exclamation-sign"></i>
+            {{ _('report abuse') }}
+          </a>
+      </small>
+    </blockquote>
+    {%- if c.replies -%}
+    <ul class="unstyled" style="padding-left: 20px;">
+      {{ loop(c.replies) }}
+    </ul>
+    {%- endif -%}
+    </div>
+  </li>
+  {%- endfor -%}
+  </ul>
+  {%- endif -%}
+
+  <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add', recid=recid) }}">
+    <i class="icon-pencil"></i> {{ _('write comment') }}
+  </a>
+
+  <div style="clear:both"/></div>
+  <hr/>
+
+<script>
+$(document).ready(function() {
+// Support for AJAX loaded modal window.
+// Focuses on first input textbox after it loads the window.
+$('[data-toggle="modal"]').click(function(e) {
+  e.preventDefault();
+  var href = $(this).attr('href');
+  if (href.indexOf('#') == 0) {
+    $(href).modal('open');
+  } else {
+    $.get(href, function(data) {
+      $('<div class="modal" >' + data + '</div>').modal();
+    }).success(function() { $('input:text:visible:first').focus(); });
+  }
+});
+
+});
+</script>
+
+
+  {%- if record.user_comment_subscritions|length -%}
+
+  <div class="alert">
+  {%- set info_subs = _('%(open_tag)s Unsubscribe %(close_tag)s from this discussion. You will not receive any new comments by email.') % {
+    'open_tag': '<strong><a href="'+url_for('webcomment.unsubscribe', recid=recid)+'"><i class="icon-trash"></i>',
+    'close_tag':'</a></strong>'} -%}
+    {{ info_subs|safe }}
+  </div>
+
+  {%- else -%}
+
+  <div class="alert alert-info">
+  {%- set info_subs = _('%(open_tag)s Subscribe %(close_tag)s to this discussion. You will then receive all new comments by email.') % {
+    'open_tag': '<strong><a href="'+url_for('webcomment.subscribe', recid=recid)+'"><i class="icon-envelope"></i>',
+    'close_tag':'</a></strong>'} -%}
+    {{ info_subs|safe }}
+  </div>
+
+  {%- endif -%}
+
+{% endblock %}

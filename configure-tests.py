@@ -23,9 +23,9 @@ running from configure.ac.
 """
 
 ## minimally recommended/required versions:
-cfg_min_python_version = "2.4"
-cfg_max_python_version = "2.9.9999"
-cfg_min_mysqldb_version = "1.2.1_p2"
+CFG_MIN_PYTHON_VERSION = (2, 4)
+CFG_MAX_PYTHON_VERSION = (2, 9, 9999)
+CFG_MIN_MYSQLDB_VERSION = "1.2.1_p2"
 
 ## 0) import modules needed for this testing:
 import string
@@ -49,7 +49,7 @@ def wait_for_user(msg):
         return
 
 ## 1) check Python version:
-if sys.version < cfg_min_python_version:
+if sys.version_info < CFG_MIN_PYTHON_VERSION:
     error_messages.append(
     """
     *******************************************************
@@ -65,10 +65,11 @@ if sys.version < cfg_min_python_version:
     **                                                   **
     ** Please upgrade your Python before continuing.     **
     *******************************************************
-    """ % (string.replace(sys.version, "\n", ""), cfg_min_python_version)
+    """ % (string.replace(sys.version, "\n", ""),
+           '.'.join(CFG_MIN_PYTHON_VERSION))
     )
 
-if sys.version > cfg_max_python_version:
+if sys.version_info > CFG_MAX_PYTHON_VERSION:
     error_messages.append(
     """
     *******************************************************
@@ -85,7 +86,8 @@ if sys.version > cfg_max_python_version:
     **                                                   **
     ** Installation aborted.                             **
     *******************************************************
-    """ % (string.replace(sys.version, "\n", ""), cfg_max_python_version)
+    """ % (string.replace(sys.version, "\n", ""),
+           '.'.join(CFG_MAX_PYTHON_VERSION))
     )
 
 ## 2) check for required modules:
@@ -113,6 +115,17 @@ try:
     import urllib
     import zlib
     import wsgiref
+    import sqlalchemy
+    import werkzeug
+    import jinja2
+    import flask
+    import fixture
+    import flask.ext.assets
+    import flaskext.cache
+    import flask.ext.sqlalchemy
+    import flask.ext.testing
+    import wtforms
+    import flask.ext.wtf
 except ImportError, msg:
     error_messages.append("""
     *************************************************
@@ -324,7 +337,7 @@ except ImportError, msg:
 
 
 ## 4) check for versions of some important modules:
-if MySQLdb.__version__ < cfg_min_mysqldb_version:
+if MySQLdb.__version__ < CFG_MIN_MYSQLDB_VERSION:
     error_messages.append(
     """
     *****************************************************
@@ -335,7 +348,7 @@ if MySQLdb.__version__ < cfg_min_mysqldb_version:
     ** before continuing.  Please see the INSTALL file **
     ** for more details.                               **
     *****************************************************
-    """ % (MySQLdb.__version__, cfg_min_mysqldb_version)
+    """ % (MySQLdb.__version__, CFG_MIN_MYSQLDB_VERSION)
     )
 
 try:

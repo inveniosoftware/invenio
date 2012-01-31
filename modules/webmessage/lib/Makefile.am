@@ -22,6 +22,8 @@ pylib_DATA = webmessage.py \
              webmessage_config.py \
              webmessage_dblayer.py \
              webmessage_mailutils.py \
+             webmessage_flask_tests.py \
+             webmessage_forms.py \
              webmessage_model.py \
              webmessage_query.py \
              webmessage_webinterface.py \

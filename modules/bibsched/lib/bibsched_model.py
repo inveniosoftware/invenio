@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -68,3 +66,6 @@ class SchTASK(db.Model):
     priority = db.Column(db.TinyInteger(4), nullable=False,
                 server_default='0')
 
+
+__all__ = ['HstTASK',
+           'SchTASK']

@@ -1,0 +1,119 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{%- if not request.is_xhr -%}
+  {% extends "record.html" %}
+{%- endif -%}
+
+{% block record_content %}
+  <div class="page-header">
+    {{ format_record(recid, 'hs', ln=g.ln)|safe }}
+  </div>
+
+  <div class="page-header">
+    <h4>
+      {{ _("Reviews") }}
+      <small> /
+      <a href="{{ url_for('webcomment.comments', recid=recid) }}">
+        {{ _('Comments') }}
+      </a>
+      </small>
+      <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add', recid=recid) }}">
+        <i class="icon-pencil"></i> {{ _('write review') }}
+      </a>
+    </h4>
+  </div>
+
+  {%- if comments -%}
+
+  <ul class="unstyled">
+  {%- for c in comments -%}
+  <li name="{{ c.id }}">
+    <div>
+    <h4>
+    {{ c.title }}
+    <small>
+       /
+      {{ ('<i class="icon-star"></i>'|safe) * (c.star_score%5) }}{{ ('<i class="icon-star-empty"></i>'|safe) * ((5-c.star_score)%5) }}
+      <a class="pull-right" title="{{ _('Permalink to this comment') }}" href="#{{ c.id }}">¶</a>
+    </small>
+    <h4>
+    <blockquote>
+      <p>
+      {{ c.body }}
+      </p>
+      <small>
+        <i class="icon-user"></i>
+        {%- if c.user -%}
+        <a href="{{ url_for('yourmessages.add', sent_to_user_nicks=c.user.nickname) }}">
+          {{ c.user.nickname }}
+        </a>
+        {%- else -%}
+          {{ _('Guest') }}
+        {%- endif -%}
+        - <i class="icon-time"></i> {{ c.date_creation }}
+        - <i class="icon-question-sign"></i> Was it helpfull?
+          <a href="{{ url_for('webcomment.vote', recid=recid, id=c.id, value=1,
+            referer=request.url
+          ) }}">
+          <i class="icon-thumbs-up"></i>
+          {{ _('yes') }}
+          </a> /
+          <a href="{{ url_for('webcomment.vote', recid=recid, id=c.id, value=-1,
+            referer=request.url
+          ) }}">
+          <i class="icon-thumbs-down"></i>
+          {{ _('no') }}
+          </a>
+          -
+          <a href="{{ url_for('webcomment.report', recid=recid, id=c.id,
+            referer=request.url
+          ) }}">
+            <i class="icon-exclamation-sign"></i>
+            {{ _('report abuse') }}
+          </a>
+      </small>
+    </blockquote>
+    </div>
+  </li>
+  {%- endfor -%}
+  </ul>
+  {%- endif -%}
+
+<script>
+$(document).ready(function() {
+// Support for AJAX loaded modal window.
+// Focuses on first input textbox after it loads the window.
+$('[data-toggle="modal"]').click(function(e) {
+  e.preventDefault();
+  var href = $(this).attr('href');
+  if (href.indexOf('#') == 0) {
+    $(href).modal('open');
+  } else {
+    $.get(href, function(data) {
+      $('<div class="modal" >' + data + '</div>').modal();
+    }).success(function() { $('input:text:visible:first').focus(); });
+  }
+});
+
+});
+</script>
+
+
+
+{% endblock %}

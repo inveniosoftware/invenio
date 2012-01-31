@@ -40,6 +40,9 @@ from invenio.dbquery import run_sql, ProgrammingError
 from invenio.access_control_firerole import compile_role_definition, \
     acc_firerole_check_user, serialize, deserialize, load_role_definition
 from invenio.intbitset import intbitset
+from invenio.sqlalchemyutils import db
+from invenio.webaccess_model import AccAuthorization, AccACTION, \
+                                    AccARGUMENT, UserAccROLE
 
 CFG_SUPERADMINROLE_ID = 0
 try:
@@ -68,8 +71,8 @@ def acc_add_action(name_action='', description='', optional='no',
 
     keystr = ''
     # action with this name all ready exists, return 0
-    if run_sql("""SELECT name FROM accACTION WHERE name = %s""",
-            (name_action, )):
+    if db.session.query(db.exists()).filter(
+        AccACTION.name==name_action).scalar():
         return 0
 
     # create keyword string
@@ -83,15 +86,13 @@ def acc_add_action(name_action='', description='', optional='no',
 
     # insert the new entry
     try:
-        res = run_sql("""INSERT INTO accACTION (name, description,
-        allowedkeywords, optional) VALUES (%s, %s, %s, %s)""",
-        (name_action, description, keystr, optional))
+        a = AccACTION(name=name_action, decription=description,
+                      allowedkeywords=keystr, optional=optional)
+        db.session.add(a)
+        db.session.commit()
+        return True, name_action, description, keystr, optional
     except ProgrammingError:
         return 0
-
-    if res:
-        return res, name_action, description, keystr, optional
-    return 0
 
 
 def acc_delete_action(id_action=0, name_action=0):
@@ -1173,6 +1174,12 @@ def acc_get_role_users(id_role):
         ORDER BY u.email""", (id_role, ))
 
 
+def acc_get_roles_emails(id_roles):
+    return set(map(lambda u: u.email.lower().strip(),
+        db.session.query(User.email).join(User.roles).filter(db.and_(
+            UserAccROLE.expiration >= db.func.now(),
+            UserAccROLE.id_accROLE.in_(id_roles))).all()))
+
 # ARGUMENT RELATED
 
 def acc_get_argument_id(keyword, value):
@@ -1219,6 +1226,21 @@ def acc_is_user_in_role(user_info, id_role):
         return True
 
     return acc_firerole_check_user(user_info, load_role_definition(id_role))
+
+
+def acc_is_user_in_any_role(user_info, id_roles):
+    if db.session.query(db.func.count(UserAccROLE.id_accROLE)).filter(db.and_(
+        UserAccROLE.id_user == user_info['uid'],
+        UserAccROLE.expiration >= db.func.now(),
+        UserAccROLE.id_accROLE.in_(id_roles))).scalar() > 0:
+        return True
+
+    for id_role in id_roles:
+        if acc_firerole_check_user(user_info, load_role_definition(id_role)):
+            return True
+
+    return False
+
 
 def acc_get_user_roles_from_user_info(user_info):
     """get all roles a user is connected to."""
@@ -1380,28 +1402,33 @@ def acc_find_possible_actions_argument_listid(id_role, id_action, arglistid):
     # return this list
     return res2
 
+
 def acc_find_possible_roles(name_action, always_add_superadmin=True, **arguments):
     """Find all the possible roles that are enabled to action_name with
     given arguments. roles is a list of role_id
     """
-    id_action = acc_get_action_id(name_action)
-    roles = intbitset(run_sql("SELECT id_accROLE FROM accROLE_accACTION_accARGUMENT WHERE id_accACTION=%s AND argumentlistid <= 0", (id_action, ), run_on_slave=True))
+    query_roles_without_args = \
+        db.select([AccAuthorization.id_accROLE], db.and_(
+            AccAuthorization.argumentlistid <= 0,
+            AccAuthorization.id_accACTION == db.bindparam('id_action')))
+
+    query_roles_with_args = \
+        AccAuthorization.query.filter(db.and_(
+            AccAuthorization.argumentlistid > 0,
+            AccAuthorization.id_accACTION == db.bindparam('id_action'))).\
+            join(AccAuthorization.argument)
+
+    id_action = db.session.query(AccACTION.id).filter(AccACTION.name==name_action).scalar()
+    roles = intbitset(
+        db.engine.execute(query_roles_without_args.params(id_action=id_action)).\
+            fetchall())
+
     if always_add_superadmin:
         roles.add(CFG_SUPERADMINROLE_ID)
-    other_roles_to_check = run_sql("SELECT id_accROLE, keyword, value, argumentlistid FROM  accROLE_accACTION_accARGUMENT JOIN accARGUMENT ON id_accARGUMENT=id WHERE id_accACTION=%s AND argumentlistid > 0", (id_action, ), run_on_slave=True)
-    other_roles_to_check_dict = {}
-    for id_accROLE, keyword, value, argumentlistid in other_roles_to_check:
-        if id_accROLE not in roles:
-            try:
-                other_roles_to_check_dict[(id_accROLE, argumentlistid)][keyword] = value
-            except KeyError:
-                other_roles_to_check_dict[(id_accROLE, argumentlistid)] = {keyword : value}
-    for ((id_accROLE, argumentlistid), stored_arguments) in other_roles_to_check_dict.iteritems():
-        for key, value in stored_arguments.iteritems():
-            if (value != arguments.get(key, '*') != '*') and value != '*':
-                break
-        else:
-            roles.add(id_accROLE)
+    for auth in query_roles_with_args.params(id_action=id_action).all():
+        if auth.id_accROLE not in roles:
+            if not ((auth.argument.value != arguments.get(auth.argument.keyword, '*') != '*') and auth.argument.value != '*'):
+                roles.add(auth.id_accROLE)
     return roles
 
 def acc_find_possible_actions_user_from_user_info(user_info, id_action):

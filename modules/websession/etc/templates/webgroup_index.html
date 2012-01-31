@@ -1,0 +1,84 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% extends "page.html" %}
+{% set title = _("Your Groups") %}
+{% set personalize_selected = True %}
+{% block header %}
+  {{ super() }}
+  {% js "js/jquery/jquery.tokeninput.js" %}
+  {% css "css/token-input.css" %}
+{% endblock %}
+{% block javascript %}
+<script type="text/javascript">
+    $(document).ready(function() {
+      $("#add-group").tokenInput("{{ url_for(".tokenize") }}", {
+        onAdd: function (item) {
+          var request = $.ajax({
+            url: "{{ url_for(".join") }}",
+            type: "POST",
+            data: {id : item.id},
+            dataType: "html"
+          });
+
+          request.done(function() {
+              alert("{{ _("Joined group") }} " + item.name);
+          });
+
+          request.fail(function(jqXHR, textStatus) {
+              alert("{{ _("Request failed:") }} " + textStatus );
+          });
+        },
+        onDelete: function (item) {
+           var request = $.ajax({
+            url: "{{ url_for(".leave") }}",
+            type: "POST",
+            data: {id : item.id},
+            dataType: "html"
+          });
+
+          request.done(function() {
+            alert("{{ _("Left group") }} " + item.name);
+          });
+
+          request.fail(function(jqXHR, textStatus) {
+              alert("{{ _("Request failed:") }} " + textStatus );
+          });
+        },
+        prePopulate: {{ member_groups|tojson|safe }},
+        jsonContainer: "data",
+        preventDuplicates: true,
+        tokenFormatter: function(item) {
+          return '<li>' + item.name + ' <small style="color: #333;">' + item.description + '</small></li>'
+        },
+        onReady: function() {
+          $("ul li input").change(function() {
+            $("#create-group").val($(this).val());
+          });
+        }
+      });
+    });
+</script>
+{% endblock javascript %}
+{% block body %}
+<h3>{{ _("You are a member of the following groups:") }}</h3>
+<input id="create-group" name="name" /><button onclick="alert($('#create-group').val());">Add</button>
+<div>
+  <input id="add-group" name="id_usergroup" type="text" placeholder="{{ _("Join group") }}" value="" />
+</div>
+{% endblock %}

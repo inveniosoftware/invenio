@@ -20,7 +20,7 @@
 """Query definitions for module webmessage"""
 
 from time import localtime, mktime
-
+from datetime import datetime
 
 from invenio.config import \
      CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
@@ -42,8 +42,9 @@ def filter_messages_from_user_with_status(uid, status):
     @param uid: user id
     @return: sqlalchemy.sql.expression.ClauseElement
     """
-    return (db.AsBINARY(UserMsgMESSAGE.status.__eq__(status))) & \
-        (UserMsgMESSAGE.id_user_to == uid)
+    # AsBINARY removed!!!
+    return (UserMsgMESSAGE.status.__eq__(status)) & \
+           (UserMsgMESSAGE.id_user_to == uid)
 
 def filter_all_messages_from_user(uid):
     """
@@ -52,26 +53,33 @@ def filter_all_messages_from_user(uid):
     @return: sqlalchemy.sql.expression.ClauseElement
     """
     reminder = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
-    return db.not_(db.AsBINARY(UserMsgMESSAGE.status.__eq__(reminder))) & \
-        (UserMsgMESSAGE.id_user_to == uid)
+    return db.not_(UserMsgMESSAGE.status.__eq__(reminder)) & \
+           (UserMsgMESSAGE.id_user_to == uid)
+    #return db.not_(db.AsBINARY(UserMsgMESSAGE.status.__eq__(reminder))) & \
+    #    (UserMsgMESSAGE.id_user_to == uid)
 
 
 def filter_user_message(uid, msgid):
     """
-    Filter message from user with defined id.
+    Filter message from user with defined id(s).
     @param uid: user id
-    @param msgid: message id
+    @param msgid: message id(s)
     @return: sqlalchemy.sql.expression.ClauseElement
     """
-    return (UserMsgMESSAGE.id_user_to==uid) & \
-           (UserMsgMESSAGE.id_msgMESSAGE==msgid)
+    try:
+        iter(msgid)
+        return (UserMsgMESSAGE.id_user_to==uid) & \
+               (UserMsgMESSAGE.id_msgMESSAGE.in_(msgid))
+    except:
+        return (UserMsgMESSAGE.id_user_to==uid) & \
+               (UserMsgMESSAGE.id_msgMESSAGE==msgid)
 
 def check_user_owns_message(uid, msgid):
     """
     Checks whether a user owns a message
     @param uid:   user id
     @param msgid: message id
-    @return: positive number if the user owns the message, else 0
+    @return: number of messages own by user
     """
     return db.session.query(db.func.count('*')).\
            select_from(UserMsgMESSAGE).\
@@ -170,7 +178,7 @@ def delete_message_from_user_inbox(uid, msg_id):
     """
     res = UserMsgMESSAGE.query.filter(filter_user_message(uid, msg_id)).\
                    delete(synchronize_session=False)
-    check_if_need_to_delete_message_permanently([msg_id])
+    check_if_need_to_delete_message_permanently(msg_id)
     return res
 
 def check_if_need_to_delete_message_permanently(msg_ids):
@@ -436,6 +444,7 @@ def check_quota(nb_messages):
             res[uid] = n
     return res
 
+
 def update_user_inbox_for_reminders(uid):
     """
     Updates user's inbox with any reminders that should have arrived
@@ -445,29 +454,21 @@ def update_user_inbox_for_reminders(uid):
     now =  convert_datestruct_to_datetext(localtime())
     reminder_status = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
     new_status = CFG_WEBMESSAGE_STATUS_CODE['NEW']
-    query1 = """SELECT m.id
-                FROM   msgMESSAGE m,
-                       user_msgMESSAGE um
-                WHERE  um.id_user_to=%s AND
-                       um.id_msgMESSAGE=m.id AND
-                       m.received_date<=%s AND
-                       um.status like binary %s
-                """
-    params1 = (uid, now, reminder_status)
-    res_ids = run_sql(query1, params1)
-    out = len(res_ids)
-    if (out>0):
-        query2 = """UPDATE user_msgMESSAGE
-                    SET    status=%s
-                    WHERE  id_user_to=%s AND ("""
-        query_params = [new_status, uid]
-        for msg_id in res_ids[0:-1]:
-            query2 += "id_msgMESSAGE=%s OR "
-            query_params.append(msg_id[0])
-        query2 += "id_msgMESSAGE=%s)"
-        query_params.append(res_ids[-1][0])
-        run_sql(query2, tuple(query_params))
-    return out
+    expired_reminders = db.session.query(UserMsgMESSAGE.id_msgMESSAGE).\
+        join(UserMsgMESSAGE.message).\
+        filter(db.and_(
+        UserMsgMESSAGE.id_user_to==uid,
+        UserMsgMESSAGE.status.like(reminder_status),
+        MsgMESSAGE.received_date<=datetime.now()
+        #MsgMESSAGE.received_date<=db.func.current_timestamp()
+        )).all()
+    print expired_reminders
+    res = UserMsgMESSAGE.query.filter(db.and_(
+        UserMsgMESSAGE.id_user_to==uid,
+        UserMsgMESSAGE.id_msgMESSAGE.in_([i for i, in expired_reminders]))).\
+        update({UserMsgMESSAGE.status: new_status}, synchronize_session='fetch')
+    return res
+
 
 def get_nicknames_like(pattern):
     """get nicknames like pattern"""

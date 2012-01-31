@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -43,3 +41,5 @@ class StaEVENT(db.Model):
     creation_time = db.Column(db.TIMESTAMP, nullable=False,
             server_default=db.func.current_timestamp())
     cols = db.Column(db.String(255), nullable=True)
+
+__all__ = ['StaEVENT']

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -24,42 +22,112 @@ websearch database models.
 """
 
 # General imports.
+from flask import g
+from sqlalchemy.ext.mutable import Mutable
+from invenio.intbitset import intbitset
+from invenio.search_engine_config import CFG_WEBSEARCH_SEARCH_WITHIN
 from invenio.sqlalchemyutils import db
-
+from sqlalchemy.orm.collections import InstrumentedList
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm.collections import mapped_collection, \
+                                       attribute_mapped_collection
+from sqlalchemy.orm.collections import collection
 # Create your models here.
 
 from invenio.websession_model import User
 
-#class NodeMap(db.MappedCollection):
-#    """Holds 'Node' objects, keyed by the 'name' attribute with insert
-#    order maintained."""
-#    def __init__(self, *args, **kw):
-#        db.MappedCollection.__init__(self, keyfunc=lambda name: name.type_ln)
-#
-#    #@collection.internally_instrumented
-#    def __setitem__(self, key, value, _sa_initiator=None):
-#        print "Key Mapped Collection"
-#        print key
-#        print value.__dict__
-#        new_key = self.keyfunc(value)
-#        if new_key != key:
-#            try:
-#                super(NodeMap, self).__delitem__(self.keyfunc(value))
-#            except:
-#                pass
-#            value.type_ln = key
-#        super(NodeMap, self).__setitem__(key,
-#                value)
-#
-#    #@collection.internally_instrumented
-#    def __delitem__(self, key, _sa_initiator=None):
-#        super(NodeMap, self).__delitem__(key)
 
+class IntbitsetPickle(object):
+    def dumps(self, obj, protocol=None):
+        if obj is not None:
+            return obj.fastdump()
+        return obj
+
+    def loads(self, obj):
+        try:
+            return intbitset(obj)
+        except:
+            return intbitset()
+
+
+class OrderedList(InstrumentedList):
+    def append(self, item):
+        if self:
+            item.score= self[-1].score+1
+        else:
+            item.score= 1
+        InstrumentedList.append(self, item)
+
+    def set(self, item, index=0):
+        if self:
+            item.score = index
+            for i,it in enumerate(sorted(self, key=lambda obj: obj.score)[index:]):
+                it.score = index + i + 1
+        else:
+            item.score=index
+        InstrumentedList.append(self, item)
+
+
+def attribute_multi_dict_collection(creator, key_attr, val_attr):
+    class MultiMappedCollection(dict):
+
+        def __init__(self, data=None):
+            self._data = data or {}
+
+        @collection.appender
+        def _append(self, obj):
+            l = self._data.setdefault(key_attr(obj), [])
+            l.append(obj)
+
+        def __setitem__(self, key, value):
+            self._append(creator(key, value))
+
+        def __getitem__(self, key):
+            return tuple(val_attr(obj) for obj in self._data[key])
+
+        @collection.remover
+        def _remove(self, obj):
+            self._data[key_attr(obj)].remove(obj)
+
+        @collection.iterator
+        def _iterator(self):
+            for objs in self._data.itervalues():
+                for obj in objs:
+                    yield obj
+
+        #@collection.converter
+        #def convert(self, other):
+        #    print '===== CONVERT ===='
+        #    print other
+        #    for k, vals in other.iteritems():
+        #        for v in list(vals):
+        #            print 'converting: ', k,': ',v
+        #            yield creator(k, v)
+
+        #@collection.internally_instrumented
+        #def extend(self, items):
+        #    for k, item in items:
+        #        for v in list(item):
+        #            print 'setting: ', k,': ',v
+        #            self.__setitem__(k,v)
+
+        def __repr__(self):
+            return '%s(%r)' % (type(self).__name__, self._data)
+
+    return MultiMappedCollection
+
+external_collection_mapper = attribute_multi_dict_collection(
+    creator=lambda k,v: CollectionExternalcollection(
+                            type=k, externalcollection=v),
+    key_attr=lambda obj: obj.type,
+    val_attr=lambda obj: obj.externalcollection)
+
+
+db.Model.__table_args__ = {'extend_existing':True}
 
 class Collection(db.Model):
     """Represents a Collection record."""
-    def __init__(self):
-        pass
+
     __tablename__ = 'collection'
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True)
@@ -69,13 +137,142 @@ class Collection(db.Model):
                 index=True)
     nbrecs = db.Column(db.Integer(10, unsigned=True),
                 server_default='0')
-    reclist = db.Column(db.iLargeBinary)
-    names = db.relationship("Collectionname",
+    #FIXME mutable has not very good performance
+    reclist = db.Column(db.PickleType(pickler=IntbitsetPickle(),
+                                     mutable=True))
+    _names = db.relationship(lambda: Collectionname,
                          backref='collection',
-                         #collection_class=NodeMap
-                         #mapped_collection(keyfunc=lambda name: name.type_ln)
-                         #ln + ":" + name.type)
-                         )
+                         collection_class=attribute_mapped_collection('ln_type'),
+                         cascade="all, delete, delete-orphan")
+
+    names = association_proxy('_names', 'value',
+        creator=lambda k,v:Collectionname(ln_type=k, value=v))
+
+    _formatoptions = association_proxy('formats', 'format')
+    @property
+    def formatoptions(self):
+        if len(self._formatoptions):
+            return self._formatoptions
+        else:
+            return [{'code': 'hb', 'name': "HTML %s" % g._("brief")}]
+
+    @property
+    def name_ln(self):
+        try:
+            return db.object_session(self).query(Collectionname).\
+                with_parent(self).filter(db.and_(Collectionname.ln==g.ln,
+                    Collectionname.type=='ln')).first().value
+        except:
+            return self.name
+
+    @property
+    def portalboxes_ln(self):
+        return db.object_session(self).query(CollectionPortalbox).\
+            with_parent(self).filter(CollectionPortalbox.ln==g.ln).\
+            order_by(db.desc(CollectionPortalbox.score)).all()
+
+    @property
+    def most_specific_dad(self):
+        return db.object_session(self).query(Collection).\
+            join(Collection.sons).\
+            filter(CollectionCollection.id_son==self.id).\
+            order_by(db.asc(Collection.nbrecs)).\
+            first()
+
+    _collection_children = db.relationship(lambda: CollectionCollection,
+                                collection_class=OrderedList,
+                                primaryjoin=lambda: Collection.id==CollectionCollection.id_dad,
+                                foreign_keys=lambda: CollectionCollection.id_dad,
+                                order_by=lambda: db.asc(CollectionCollection.score))
+    _collection_children_r = db.relationship(lambda: CollectionCollection,
+                                collection_class=OrderedList,
+                                primaryjoin=lambda: db.and_(
+                                    Collection.id==CollectionCollection.id_dad,
+                                    CollectionCollection.type=='r'),
+                                foreign_keys=lambda: CollectionCollection.id_dad,
+                                order_by=lambda: db.asc(CollectionCollection.score))
+    _collection_children_v = db.relationship(lambda: CollectionCollection,
+                                collection_class=OrderedList,
+                                primaryjoin=lambda: db.and_(
+                                    Collection.id==CollectionCollection.id_dad,
+                                    CollectionCollection.type=='v'),
+                                foreign_keys=lambda: CollectionCollection.id_dad,
+                                order_by=lambda: db.asc(CollectionCollection.score))
+    collection_parents = db.relationship(lambda: CollectionCollection,
+                                collection_class=OrderedList,
+                                primaryjoin=lambda: Collection.id==CollectionCollection.id_son,
+                                foreign_keys=lambda: CollectionCollection.id_son,
+                                order_by=lambda: db.asc(CollectionCollection.score))
+    collection_children = association_proxy('_collection_children', 'son')
+    collection_children_r = association_proxy('_collection_children_r', 'son',
+        creator=lambda son: CollectionCollection(id_son=son.id, type='r'))
+    collection_children_v = association_proxy('_collection_children_v', 'son',
+        creator=lambda son: CollectionCollection(id_son=son.id, type='v'))
+
+#
+    _externalcollections = db.relationship(lambda: CollectionExternalcollection,
+#            backref='collection',
+            cascade="all, delete, delete-orphan")
+#
+#    externalcollections = association_proxy(
+#        '_externalcollections',
+#        'externalcollection')
+
+    def _externalcollections_type(type):
+        return association_proxy(
+            '_externalcollections_'+str(type),
+            'externalcollection',
+            creator=lambda ext: CollectionExternalcollection(externalcollection=ext, type=type))
+
+    externalcollections_0 = _externalcollections_type(0)
+    externalcollections_1 = _externalcollections_type(1)
+    externalcollections_2 = _externalcollections_type(2)
+
+
+    externalcollections = db.relationship(lambda: CollectionExternalcollection,
+            #backref='collection',
+            collection_class=external_collection_mapper,
+            cascade="all, delete, delete-orphan")
+
+
+    # Search options
+    _make_field_fieldvalue = lambda type: db.relationship(
+                        lambda: CollectionFieldFieldvalue,
+                        primaryjoin=lambda: db.and_(
+                            Collection.id==CollectionFieldFieldvalue.id_collection,
+                            CollectionFieldFieldvalue.type==type),
+                        order_by=lambda: CollectionFieldFieldvalue.score)
+
+    _search_within = _make_field_fieldvalue('sew')
+    search_options = _make_field_fieldvalue('seo')
+
+    @property
+    def search_within(self):
+        """
+        Collect search within options.
+        """
+        default = {'':g._('any field')}
+        found = dict((o.field.code, o.field.name_ln) for o in self._search_within)
+        default.update(found or zip(map(lambda x:x.replace(' ',''),
+                CFG_WEBSEARCH_SEARCH_WITHIN),
+                [f.name_ln for f in Field.query.filter(
+                    Field.name.in_(CFG_WEBSEARCH_SEARCH_WITHIN)).all()]))
+        return default
+
+
+    #@db.hybrid_property
+    #def externalcollections(self):
+    #    return self._externalcollections
+
+    #@externalcollections.setter
+    #def externalcollections(self, data):
+    #    if isinstance(data, dict):
+    #        for k, vals in data.iteritems():
+    #            for v in list(vals):
+    #                self._externalcollections[k] = v
+    #    else:
+    #        self._externalcollections = data
+
 
 class Collectionname(db.Model):
     """Represents a Collectionname record."""
@@ -85,31 +282,18 @@ class Collectionname(db.Model):
             nullable=False, primary_key=True)
     ln = db.Column(db.Char(5), nullable=False, primary_key=True,
                 server_default='')
-    type = db.Column(db.Char(3), nullable=False, primary_key=True,
+    type = db.Column(db.Char(5), nullable=False, primary_key=True,
                 server_default='sn')
     value = db.Column(db.String(255), nullable=False)
-    #collection = db.relationship(Collection, backref='names')
 
-#    @hybrid_property
-#    def type_ln(self):
-#        #return self.type + ":" + self.ln
-#        return (self.type, self.ln)
+    @db.hybrid_property
+    def ln_type(self):
+        return (self.ln, self.type)
 
-#    @type_ln.setter
-#    def type_ln(self, value):
-#        #print self.__dict__
-#        #assoc_collection = self.collection
-#        #try:
-#        #    assoc_collection.names.remove(self)
-#        #except:
-#        #    pass
-#        #(self.type, self.ln) = value.split(":")
-#        (self.type, self.ln) = value
-#        #print self.__dict__
-#        #try:
-#        #    assoc_collection.names.set(self)
-#        #except:
-#        #    pass
+    @ln_type.setter
+    def ln_type(self, value):
+        (self.ln, self.type) = value
+
 
 #from sqlalchemy import event
 
@@ -135,8 +319,6 @@ class Collectiondetailedrecordpagetabs(db.Model):
 
 class CollectionCollection(db.Model):
     """Represents a CollectionCollection record."""
-    def __init__(self):
-        pass
     __tablename__ = 'collection_collection'
     id_dad = db.Column(db.MediumInteger(9, unsigned=True),
                 db.ForeignKey(Collection.id), primary_key=True)
@@ -211,36 +393,50 @@ class CollectionPortalbox(db.Model):
     portalbox = db.relationship(Portalbox, backref='collections',
                 order_by=score)
 
+
+from invenio.websearch_external_collections_searcher import external_collections_dictionary
+
 class Externalcollection(db.Model):
     """Represents a Externalcollection record."""
-    def __init__(self):
-        pass
     __tablename__ = 'externalcollection'
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True)
     name = db.Column(db.String(255), unique=True, nullable=False,
                 server_default='')
 
+    @property
+    def engine(self):
+        if external_collections_dictionary.has_key(self.name):
+            return external_collections_dictionary[self.name]
+
 class CollectionExternalcollection(db.Model):
     """Represents a CollectionExternalcollection record."""
-    def __init__(self):
-        pass
     __tablename__ = 'collection_externalcollection'
     id_collection = db.Column(db.MediumInteger(9,
                 unsigned=True),
-            db.ForeignKey(Collection.id), primary_key=True,
+                db.ForeignKey(Collection.id), primary_key=True,
                 server_default='0')
     id_externalcollection = db.Column(db.MediumInteger(9,
                 unsigned=True),
-            db.ForeignKey(Externalcollection.id),
+                db.ForeignKey(Externalcollection.id),
                 primary_key=True,
-            server_default='0')
+                server_default='0')
     type = db.Column(db.TinyInteger(4, unsigned=True),
                 server_default='0',
-            nullable=False)
-    collection = db.relationship(Collection, backref='externalcollections')
-    externalcollection = db.relationship(Externalcollection) #,
-                                    # backref='collections')
+                 nullable=False)
+
+    def _collection_type(type):
+        return db.relationship(Collection,
+            primaryjoin=lambda:db.and_(
+                CollectionExternalcollection.id_collection==Collection.id,
+                CollectionExternalcollection.type==type),
+            backref='_externalcollections_'+str(type))
+    collection_0 = _collection_type(0)
+    collection_1 = _collection_type(1)
+    collection_2 = _collection_type(2)
+
+    externalcollection = db.relationship(Externalcollection)
+
 
 class Format(db.Model):
     """Represents a Format record."""
@@ -265,15 +461,15 @@ class CollectionFormat(db.Model):
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
                 db.ForeignKey(Collection.id), primary_key=True)
     id_format = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(Externalcollection.id), primary_key=True)
+                db.ForeignKey(Format.id), primary_key=True)
     score = db.Column(db.TinyInteger(4, unsigned=True),
                 nullable=False,
-            server_default='0')
+                server_default='0')
     collection = db.relationship(Collection, backref='formats',
-                order_by=score)
-    format = db.relationship(Externalcollection,
+                order_by=db.desc(score))
+    format = db.relationship(Format,
                 backref='collections',
-            order_by=score)
+                order_by=db.desc(score))
 
 class Formatname(db.Model):
     """Represents a Formatname record."""
@@ -305,6 +501,16 @@ class Field(db.Model):
     #    )
     #tag_names = association_proxy("tags", "as_tag")
 
+    @property
+    def name_ln(self):
+        try:
+            return db.object_session(self).query(Fieldname).\
+                with_parent(self).filter(db.and_(Fieldname.ln==g.ln,
+                    Fieldname.type=='ln')).first().value
+        except:
+            return self.name
+
+
 class Fieldvalue(db.Model):
     """Represents a Fieldvalue record."""
     def __init__(self):
@@ -315,7 +521,7 @@ class Fieldvalue(db.Model):
                 autoincrement=True)
     name = db.Column(db.String(255), nullable=False)
     value = db.Column(db.Text, nullable=False)
- 
+
 class Fieldname(db.Model):
     """Represents a Fieldname record."""
     def __init__(self):
@@ -328,6 +534,7 @@ class Fieldname(db.Model):
     type = db.Column(db.Char(3), primary_key=True,
                 server_default='sn')
     value = db.Column(db.String(255), nullable=False)
+
     field = db.relationship(Field, backref='names')
 
 class Tag(db.Model):
@@ -415,14 +622,19 @@ class CollectionFieldFieldvalue(db.Model):
                 db.ForeignKey(Fieldvalue.id), primary_key=True,
             nullable=True)
     type = db.Column(db.Char(3), nullable=False,
-                server_default='src') 
+                server_default='src')
     score = db.Column(db.TinyInteger(4, unsigned=True), nullable=False,
                 server_default='0')
     score_fieldvalue = db.Column(db.TinyInteger(4, unsigned=True), nullable=False,
                 server_default='0')
-    collection = db.relationship(Collection, backref='field_fieldvalues')
-    field = db.relationship(Field, backref='collection_fieldvalues')
+
+    collection = db.relationship(Collection,
+                                 backref='field_fieldvalues',
+                                 order_by=score)
+    field = db.relationship(Field, backref='collection_fieldvalues',
+                            lazy='joined')
     fieldvalue = db.relationship(Fieldvalue, backref='collection_fields')
+
 
 from bibclassify_model import ClsMETHOD
 
@@ -460,3 +672,27 @@ class CollectionRnkMETHOD(db.Model):
     rnkMETHOD = db.relationship(RnkMETHOD, backref='collections')
 
 
+
+__all__ = ['Collection',
+           'Collectionname',
+           'Collectiondetailedrecordpagetabs',
+           'CollectionCollection',
+           'Example',
+           'CollectionExample',
+           'Portalbox',
+           'CollectionPortalbox',
+           'Externalcollection',
+           'CollectionExternalcollection',
+           'Format',
+           'CollectionFormat',
+           'Formatname',
+           'Field',
+           'Fieldvalue',
+           'Fieldname',
+           'Tag',
+           'FieldTag',
+           'WebQuery',
+           'UserQuery',
+           'CollectionFieldFieldvalue',
+           'CollectionClsMETHOD',
+           'CollectionRnkMETHOD']

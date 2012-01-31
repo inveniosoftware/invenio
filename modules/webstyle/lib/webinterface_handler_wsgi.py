@@ -89,9 +89,10 @@ class SimulatedModPythonRequest(object):
     easy.
     @see: <http://www.modpython.org/live/current/doc-html/pyapi-mprequest.html>
     """
-    def __init__(self, environ, start_response):
+    def __init__(self, environ, start_response, flask_app=None):
         self.__environ = environ
         self.__start_response = start_response
+        self.__flask_app = flask_app
         self.__response_sent_p = False
         self.__buffer = ''
         self.__low_level_headers = []
@@ -121,6 +122,13 @@ class SimulatedModPythonRequest(object):
             self.__headers_in['content-length'] = environ['CONTENT_LENGTH']
         if environ.get('CONTENT_TYPE'):
             self.__headers_in['content-type'] = environ['CONTENT_TYPE']
+
+    def get_flask_request_context(self):
+        ctx = self.__flask_app.request_context(self.__environ)
+        with ctx:
+            if self.__flask_app.preprocess_request() is not None:
+                return None
+        return ctx
 
     def get_wsgi_environ(self):
         return self.__environ
@@ -439,12 +447,12 @@ def alert_admin_for_server_status_p(status, referer):
             return True
     return False
 
-def application(environ, start_response):
+def application(environ, start_response, flask_app=None):
     """
     Entry point for wsgi.
     """
     ## Needed for mod_wsgi, see: <http://code.google.com/p/modwsgi/wiki/ApplicationIssues>
-    req = SimulatedModPythonRequest(environ, start_response)
+    req = SimulatedModPythonRequest(environ, start_response, flask_app)
     #print 'Starting mod_python simulation'
     try:
         try:

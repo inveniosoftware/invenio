@@ -60,3 +60,63 @@ class InvenioWebSearchWildcardLimitError(Exception):
     def __init__(self, res):
         """Initialization."""
         self.res = res
+
+## CERN Site hack
+#CFG_WEBSEARCH_SEARCH_WITHIN = ['title',
+#                               'author',
+#                               'abstract',
+#                               'report number,
+#                               'year']
+
+CFG_WEBSEARCH_SEARCH_WITHIN = ['title',
+                               'author',
+                               'abstract',
+                               'keyword',
+                               'report number',
+                               'journal',
+                               'year',
+                               'fulltext',
+                               'reference']
+
+
+CFG_WEBSEACH_MATCHING_TYPES = {
+    'a': {
+        'title': "All of the words:",
+        'tokenize': """
+            return '('+$.map(val.split(' '), function(e) {
+              return f+e;
+            }).join(' AND ')+')';
+        """
+        },
+    'o': {
+        'title': "Any of the words:",
+        'tokenize': """
+            return '('+$.map(val.split(' '), function(e) {
+              return f+e;
+            }).join(' OR ')+')';
+        """
+        },
+
+    'e': {
+        'title': "Exact phrase:",
+        'tokenize': """
+            return f+'"'+val+'"';
+        """
+        },
+
+    'p': {
+        'title': "Partial phrase:",
+        'tokenize': """
+            return f+"'"+val+"'";
+        """
+        },
+
+    'r': {
+        'title': "Regular expression:",
+        'tokenize': """
+            return f+'/'+val+'/';
+        """
+        }
+    }
+
+

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -25,14 +23,29 @@ WebSession database models.
 
 # General imports.
 from invenio.sqlalchemyutils import db
-
+from sqlalchemy.ext.hybrid import hybrid_property
+from invenio.dbquery import serialize_via_marshal, deserialize_via_marshal
 # Create your models here.
+
+#TODO Consider using standard cPickle or pickle
+#     (then just remove pickler=MarshalPickle()).
+class MarshalPickle(object):
+    def dumps(self, obj, protocol=None):
+        if obj is not None:
+            obj = serialize_via_marshal(obj)
+        return obj
+
+    def loads(self, obj):
+        try:
+            obj = deserialize_via_marshal(obj)
+        except:
+            obj = {}
+        return obj
+
 
 class User(db.Model):
     """Represents a User record."""
-    def __init__(self):
-        pass
-    def __repr__(self):
+    def __str__(self):
         return "%s <%s>" % (self.nickname, self.email)
     __tablename__ = 'user'
     id = db.Column(db.Integer(15, unsigned=True),
@@ -40,19 +53,54 @@ class User(db.Model):
                 autoincrement=True)
     email = db.Column(db.String(255), nullable=False,
                 server_default='')
-    password = db.Column(db.iBinary, nullable=False)
+    _password = db.Column(db.LargeBinary, name="password", nullable=False)
     note = db.Column(db.String(255), nullable=True)
-    settings = db.Column(db.iBinary, nullable=True)
+    settings = db.Column(db.PickleType(pickler=MarshalPickle()),
+                         nullable=True)
     nickname = db.Column(db.String(255), nullable=False,
                 server_default='')
     last_login = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
+
+    #TODO re_invalid_nickname = re.compile(""".*[,'@]+.*""")
+
+    _password_comparator = db.PasswordComparator(_password)
+
+    @hybrid_property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, password):
+        self._password = self._password_comparator.hash(password)
+
+    @password.comparator
+    def password(self):
+        return self._password_comparator
+
+    @property
+    def guest(self):
+        return False if self.email else True
+
+    #
+    # Basic functions for user authentification.
+    #
+    def get_id(self):
+        return self.id
+
+    def is_guest(self):
+        return self.guest
+
+    def is_authenticated(self):
+        return True if self.email else False
+
+    def is_active(self):
+        return True
+
 
 class Usergroup(db.Model):
     """Represents a Usergroup record."""
-    def __init__(self):
-        pass
-    def __repr__(self):
+    def __str__(self):
         return "%s <%s>" % (self.name, self.description)
     __tablename__ = 'usergroup'
     id = db.Column(db.Integer(15, unsigned=True),
@@ -61,16 +109,16 @@ class Usergroup(db.Model):
     name = db.Column(db.String(255), nullable=False,
                 server_default='')
     description = db.Column(db.Text, nullable=True)
-    join_policy = db.Column(db.Char(2), nullable=False,
+    join_policy = db.Column(db.CHAR(2), nullable=False,
                 server_default='')
     login_method = db.Column(db.String(255), nullable=False,
                 server_default='INTERNAL')
+    #all_users = db.relationship(User, secondary=lambda: UserUsergroup.__table__,
+    #                       collection_class=set)
 
 class UserUsergroup(db.Model):
     """Represents a UserUsergroup record."""
-    def __init__(self):
-        pass
-    def __repr__(self):
+    def __str__(self):
         return "%s:%s" % (self.user.nickname, self.usergroup.name)
     __tablename__ = 'user_usergroup'
     id_user = db.Column(db.Integer(15, unsigned=True),
@@ -81,10 +129,10 @@ class UserUsergroup(db.Model):
                 db.ForeignKey(Usergroup.id),
                 nullable=False, server_default='0',
                 primary_key=True)
-    user_status = db.Column(db.Char(1), nullable=False,
+    user_status = db.Column(db.CHAR(1), nullable=False,
                 server_default='')
     user_status_date = db.Column(db.DateTime, nullable=False,
-                server_default='0000-00-00 00:00:00')
+                server_default='0001-01-01 00:00:00')
     user = db.relationship(User, backref='usergroups')
     usergroup = db.relationship(Usergroup, backref='users')
 
@@ -95,9 +143,15 @@ class Session(db.Model):
     __tablename__ = 'session'
     session_key = db.Column(db.String(32), nullable=False,
                 server_default='', primary_key=True)
-    session_expiry = db.Column(db.Integer(11, unsigned=True), nullable=False,
-                server_default='0')
-    session_object = db.Column(db.iBinary, nullable=True)
+    session_expiry = db.Column(db.DateTime, nullable=False,
+                server_default='0001-01-01 00:00:00')
+    # Use standard binary column.
+    session_object = db.Column(db.LargeBinary, nullable=True)
     uid = db.Column(db.Integer(15, unsigned=True),
                 nullable=False)
 
+
+__all__ = ['User',
+           'Usergroup',
+           'UserUsergroup',
+           'Session']

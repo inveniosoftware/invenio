@@ -39,6 +39,14 @@ Contents
               python-dateutil python-rdflib \
               python-gnuplot python-magic pdftk html2text giflib-tools \
               pstotext netpbm python-pypdf python-chardet python-lxml
+	      python-sqlalchemy python-sqlalchemy-ext \
+	      python-flask
+
+        You also need to install following packages from PyPi
+	by running:
+
+          $ sudo pip install fixture Flask-Assets Flask-Cache \
+	      Flask-SQLAlchemy Flask-Testing wtforms Flask-WTF
 
         You may also want to install some of the following packages,
         if you have them available on your concrete architecture:

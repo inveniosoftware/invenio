@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -28,12 +26,10 @@ from invenio.sqlalchemyutils import db
 
 # Create your models here.
 
-from websession_model import User
+from invenio.websession_model import User
 
 class AccACTION(db.Model):
     """Represents a AccACTION record."""
-    def __init__(self):
-        pass
     __tablename__ = 'accACTION'
     id = db.Column(db.Integer(15, unsigned=True),
                 primary_key=True,
@@ -47,8 +43,6 @@ class AccACTION(db.Model):
 
 class AccARGUMENT(db.Model):
     """Represents a AccARGUMENT record."""
-    def __init__(self):
-        pass
     __tablename__ = 'accARGUMENT'
     id = db.Column(db.Integer(15, unsigned=True),
                 primary_key=True,
@@ -59,14 +53,12 @@ class AccARGUMENT(db.Model):
 
 class AccMAILCOOKIE(db.Model):
     """Represents a AccMAILCOOKIE record."""
-    def __init__(self):
-        pass
     __tablename__ = 'accMAILCOOKIE'
     id = db.Column(db.Integer(15, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
     data = db.Column(db.iBinary, nullable=False)
-    expiration = db.Column(db.DateTime, nullable=False, 
+    expiration = db.Column(db.DateTime, nullable=False,
             server_default='9999-12-31 23:59:59',
                 index=True)
     kind = db.Column(db.String(32), nullable=False)
@@ -77,8 +69,6 @@ class AccMAILCOOKIE(db.Model):
 
 class AccROLE(db.Model):
     """Represents a AccROLE record."""
-    def __init__(self):
-        pass
     __tablename__ = 'accROLE'
     id = db.Column(db.Integer(15, unsigned=True),
                 primary_key=True,
@@ -89,38 +79,41 @@ class AccROLE(db.Model):
     firerole_def_ser = db.Column(db.iBinary, nullable=True)
     firerole_def_src = db.Column(db.Text, nullable=True)
 
-class AccAssociation(db.Model):
+class AccAuthorization(db.Model):
     """Represents a AccAssociation record."""
-    def __init__(self):
-        pass
     __tablename__ = 'accROLE_accACTION_accARGUMENT'
     id_accROLE = db.Column(db.Integer(15), db.ForeignKey(AccROLE.id),
                 nullable=True,
-            primary_key=True, index=True)
+                primary_key=True, index=True)
     id_accACTION = db.Column(db.Integer(15), db.ForeignKey(AccACTION.id),
                 nullable=True,
-            primary_key=True, index=True)
+                primary_key=True, index=True)
     id_accARGUMENT = db.Column(db.Integer(15), db.ForeignKey(AccARGUMENT.id),
-            nullable=True, primary_key=True,
+                nullable=True, primary_key=True,
                 index=True)
     argumentlistid = db.Column(db.MediumInteger(8), nullable=True,
                 primary_key=True)
-    role = db.relationship(AccROLE, backref='associations')
-    action = db.relationship(AccACTION, backref='associations')
-    argument = db.relationship(AccARGUMENT, backref='associations')
+    role = db.relationship(AccROLE, backref='authorizations')
+    action = db.relationship(AccACTION, backref='authorizations')
+    argument = db.relationship(AccARGUMENT, backref='authorizations')
 
 class UserAccROLE(db.Model):
     """Represents a UserAccROLE record."""
-    def __init__(self):
-        pass
     __tablename__ = 'user_accROLE'
     id_user = db.Column(db.Integer(15, unsigned=True),
                 db.ForeignKey(User.id),
-            nullable=False, primary_key=True)
+                nullable=False, primary_key=True)
     id_accROLE = db.Column(db.Integer(15, unsigned=True),
                 db.ForeignKey(AccROLE.id),
-            nullable=False, primary_key=True)
+                nullable=False, primary_key=True)
     expiration = db.Column(db.DateTime, nullable=False,
-                server_default='9999-12-31 23:59:59') 
+                server_default='9999-12-31 23:59:59')
     user = db.relationship(User, backref='roles')
     role = db.relationship(AccROLE, backref='users')
+
+__all__ = ['AccACTION',
+           'AccARGUMENT',
+           'AccMAILCOOKIE',
+           'AccROLE',
+           'AccAuthorization',
+           'UserAccROLE']

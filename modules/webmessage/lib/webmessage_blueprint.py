@@ -21,145 +21,254 @@
 
 import pprint
 from string import rfind, strip
+from datetime import datetime
 
 from flask import Blueprint, session, make_response, g, render_template, \
-                  request, flash, jsonify, redirect, url_for
+                  request, flash, jsonify, redirect, url_for, current_app, \
+                  url_for
 from invenio import webmessage_dblayer as dbplayer
 from invenio.sqlalchemyutils import db
 from invenio.webmessage import is_no_quota_user
 from invenio.webmessage_config import CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA, \
-    CFG_WEBMESSAGE_STATUS_CODE, CFG_WEBMESSAGE_SEPARATOR
+                                      CFG_WEBMESSAGE_STATUS_CODE, \
+                                      CFG_WEBMESSAGE_SEPARATOR, \
+                                      CFG_WEBMESSAGE_EMAIL_ALERT
+from invenio.config import CFG_SITE_LANG, \
+                           CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
+                           CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE
 from invenio.webmessage_mailutils import email_quote_txt
-from invenio.websession_model import User, Usergroup
 from invenio.webmessage_model import MsgMESSAGE, UserMsgMESSAGE
+from invenio.webmessage_forms import AddMsgMESSAGEForm, FilterMsgMESSAGEForm
 from invenio import webmessage_query as dbquery
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.webinterface_handler import wash_urlargd
-from invenio.dbquery import run_sql
+from invenio.webuser_flask import current_user
 
-blueprint = InvenioBlueprint('yourmessages', __name__, url_prefix="/yourmessages", config='invenio.webmessage_config', breadcrumbs=[(_("Your Account"), 'youraccount.display'), ('Your Messages', 'yourmessages.display')])
+from sqlalchemy.sql import operators
 
-@blueprint.route('/')
+class MessagesMenu(object):
+    def __str__(self):
+        uid = session.uid #current_user.get_id()
+        #dbquery.update_user_inbox_for_reminders(uid)
+        unread = db.session.query(db.func.count(UserMsgMESSAGE.id_msgMESSAGE)).\
+            filter(db.and_(
+                UserMsgMESSAGE.id_user_to == uid,
+                UserMsgMESSAGE.status == CFG_WEBMESSAGE_STATUS_CODE['NEW']
+            )).scalar()
+
+        out = _('Messages')
+        if unread:
+            out += ' <span class="badge badge-important">%d</span>' % unread
+        out += """
+    <script id="menu_msg">
+      $(function() {
+        var menu_a = $('#menu_msg').parent();
+        var message_update = function(obj) {
+          $(menu_a).parent().addClass('dropdown');
+          $(menu_a).unbind('hover');
+          $.ajax({
+            url: '%(url)s'
+          }).done(function ( data ) {
+            $(menu_a).parent().append(data);
+          });
+        }
+        $(menu_a).on('hover', message_update);
+      });
+    </script>
+        """ % {'url': url_for('yourmessages.menu')}
+        return out
+
+not_guest = lambda: not current_user.is_guest()
+
+blueprint = InvenioBlueprint('yourmessages', __name__, url_prefix="/yourmessages",
+            config='invenio.webmessage_config',
+            menubuilder=[('main.personalize.messages', _('Your messages'),
+                          'yourmessages.index', 10),
+                         ('main.messages', MessagesMenu(),
+                          'yourmessages.index', 20, [], not_guest)],
+            breadcrumbs=[(_("Your Account"), 'youraccount.display'),
+                         ('Your Messages', 'yourmessages.display')])
+
+
+@blueprint.route('/menu', methods=['GET'])
+#FIXME if request is_xhr then do not return 401
+#@blueprint.invenio_authenticated
+#@blueprint.invenio_authorized('usemessages')
+#@blueprint.invenio_templated('webmessage_menu.html')
+def menu():
+    uid = current_user.get_id()
+
+    dbquery.update_user_inbox_for_reminders(uid)
+    # join: msgMESSAGE -> user_msgMESSAGE, msgMESSAGE -> users
+    # filter: all messages from user AND filter form
+    # order: sorted by one of the table column
+    messages=db.session.query(MsgMESSAGE, UserMsgMESSAGE).\
+        join(MsgMESSAGE.user_from, MsgMESSAGE.sent_to_users).\
+        filter(db.and_(dbquery.filter_all_messages_from_user(uid))).\
+        order_by(db.desc(MsgMESSAGE.received_date)).limit(5)
+
+    #return dict(messages=messages.all())
+    return render_template('webmessage_menu.html', messages=messages.all())
+
+
+@blueprint.route('/', methods=['GET', 'POST'])
+@blueprint.route('/index', methods=['GET', 'POST'])
 @blueprint.route('/display', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-def display():
-    uid = g.user_info['uid']
-    return render_template('webmessage_display.html',
-                messages=dbquery.get_all_messages_for_user(uid),
+@blueprint.invenio_authorized('usemessages')
+@blueprint.invenio_sorted(MsgMESSAGE)
+@blueprint.invenio_filtered(MsgMESSAGE, columns={
+                    'subject':operators.startswith_op,
+                    'user_from.nickname':operators.contains_op},
+                    form=FilterMsgMESSAGEForm)
+@blueprint.invenio_templated('webmessage_index.html')
+def index(sort=False, filter=None):
+    uid = current_user.get_id()
+
+    dbquery.update_user_inbox_for_reminders(uid)
+    # join: msgMESSAGE -> user_msgMESSAGE, msgMESSAGE -> users
+    # filter: all messages from user AND filter form
+    # order: sorted by one of the table column
+    messages=db.session.query(MsgMESSAGE, UserMsgMESSAGE).\
+        join(MsgMESSAGE.user_from, MsgMESSAGE.sent_to_users).\
+        filter(db.and_(dbquery.filter_all_messages_from_user(uid), (filter))).\
+        order_by(sort)
+
+    return dict(messages=messages.all(),
                 nb_messages=dbquery.count_nb_messages(uid),
                 no_quota=is_no_quota_user(uid))
 
-@blueprint.route("/test")
-def test():
-    resp = make_response("I am in the blueprint. Session -> %s" % pprint.pformat(dict(session)))
-    resp.content_type = 'text/plain'
-    return resp
-
-@blueprint.route("/ajax")
-def ajax():
-    argd = wash_urlargd(request.values, {"q": (str, ""), "p": (str, "")})
-    q = argd['q']
-    p = argd['p']
-    if q == 'users' and len(p) >= 3:
-        res = db.session.query(User.nickname).filter(
-            User.nickname.like("%s%%" % p)).limit(10).all()
-        return jsonify(nicknames=[elem for elem, in res])
-    elif q == 'groups' and len(p) >= 3:
-        res = db.session.query(Usergroup.name).filter(
-            Usergroup.name.like("%s%%" % p)).limit(10).all()
-        return jsonify(groups=[elem for elem, in res])
-    return jsonify()
-
+@blueprint.route("/add", methods=['GET', 'POST'])
 @blueprint.route("/write", methods=['GET', 'POST'])
 @blueprint.invenio_set_breadcrumb(_("Write a message"))
 @blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'msg_reply_id': (int, 0),
-                                   'msg_to': (unicode, u""),
-                                   'msg_to_group': (unicode, u""),
-                                   'msg_to_user': (unicode, u""),
-                                   'msg_subject' : (unicode, u""),
-                                   'msg_body' : (unicode, u"")})
-def write(msg_reply_id, msg_to, msg_to_user, msg_to_group, msg_body, msg_subject):
-    uid = g.user_info['uid']
-    msg_id = 0
+@blueprint.invenio_authorized('usemessages')
+@blueprint.invenio_wash_urlargd({'msg_reply_id': (int, 0) })
+def add(msg_reply_id):
+    uid = current_user.get_id()
     if msg_reply_id:
         if (dbplayer.check_user_owns_message(uid, msg_reply_id) == 0):
             flash(_('Sorry, this message in not in your mailbox.'), "error")
-            msg_reply_id = 0
+            return redirect(url_for('.index'))
         else:
-            msg_subject = ""
-            msg_body = ""
             try:
                 m = dbquery.get_message(uid, msg_reply_id)
-                msg_to = m.message.user_from.nickname or str(m.message.id_user_from)
-                msg_subject = _("Re:") + " " + m.message.subject
-                msg_body = email_quote_txt(m.message.body)
+                message = MsgMESSAGE()
+                message.sent_to_user_nicks = m.message.user_from.nickname \
+                                            or str(m.message.id_user_from)
+                message.subject = _("Re:") + " " + m.message.subject
+                message.body = email_quote_txt(m.message.body)
+                form = AddMsgMESSAGEForm(request.form, obj=message)
+                return dict(form=form)
             except db.sqlalchemy.orm.exc.NoResultFound:
                 # The message exists in table user_msgMESSAGE
                 # but not in table msgMESSAGE => table inconsistency
                 flash(_('This message does not exist.'), "error")
-                msg_reply_id = 0
             except:
-                flash(_('This message does not exist.'), "error")
-                msg_reply_id = 0
+                flash(_('Problem with loading message.'), "error")
 
-    return render_template('webmessage_write.html', msg_to=msg_to,
-                                           msg_to_group=msg_to_group,
-                                           msg_id=msg_id,
-                                           msg_subject=msg_subject,
-                                           msg_body=msg_body)
+            return redirect(url_for('.index'))
+
+    form = AddMsgMESSAGEForm(request.values)
+    if form.validate_on_submit():
+        m = MsgMESSAGE()
+        form.populate_obj(m)
+        m.id_user_from = uid
+        m.sent_date = datetime.now()
+        quotas = dbplayer.check_quota(CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES - 1)
+        users = filter(lambda x: quotas.has_key(x.id), m.recipients)
+        #m.recipients = m.recipients.difference(users))
+        for u in users:
+            m.recipients.remove(u)
+        if len(users) > 0:
+            flash(_('Following users reached their quota %d messages: %s') % \
+                  (CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, ', '.join(
+                  [u.nickname for u in users]),), "error")
+        flash(_('Message has %d valid recipients.') %
+              (len(m.recipients),), "info")
+        if len(m.recipients) == 0:
+            flash(_('Message was not sent'), "info")
+        else:
+            if m.received_date is not None \
+                and m.received_date > datetime.now():
+
+                for um in m.sent_to_users:
+                    um.status = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
+            else:
+                m.received_date = datetime.now()
+            try:
+                db.session.add(m)
+                db.session.commit()
+                flash(_('Message was sent'), "info")
+                return redirect(url_for('.index'))
+            except:
+                db.session.rollback()
+
+    return render_template('webmessage_add.html', form=form)
 
 
+@blueprint.route("/view")
 @blueprint.route("/display_msg")
 @blueprint.invenio_set_breadcrumb(_("Read a message"))
 @blueprint.invenio_authenticated
+@blueprint.invenio_authorized('usemessages')
 @blueprint.invenio_wash_urlargd({'msgid': (int, 0)})
-def display_msg(msgid):
+@blueprint.invenio_templated('webmessage_view.html')
+def view(msgid):
     data = ()
-    uid = g.user_info['uid']
+    uid = current_user.get_id()
     if (dbquery.check_user_owns_message(uid, msgid) == 0):
         flash(_('Sorry, this message (#%d) is not in your mailbox.') % (msgid, ), "error")
     else:
         try:
             m = dbquery.get_message(uid, msgid)
-            return render_template('webmessage_display_msg.html', m=m)
+            m.status = CFG_WEBMESSAGE_STATUS_CODE['READ']
+            ## It's not necessary since "m" is SQLAlchemy object bind with same
+            ## session.
+            ##db.session.add(m)
+            ## I wonder if the autocommit works ...
+            # Commit changes before rendering for correct menu update.
+            db.session.commit()
+            return dict(m=m)
         except db.sqlalchemy.orm.exc.NoResultFound:
             flash(_('This message does not exist.'), "error")
         except:
             flash(_('Problem with loading message.'), "error")
 
-    return redirect(url_for('.display'))
+    return redirect(url_for('.index'))
 
-@blueprint.route("/delete")
-@blueprint.invenio_set_breadcrumb(_("Delete a messages"))
+@blueprint.route("/delete", methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'msgid': (int, 0)})
-def delete(msgid):
+@blueprint.invenio_authorized('usemessages')
+def delete():
     """
-    Delete every message for a logged user
-    @param confirmed: 0 will produce a confirmation message.
+    Delete message specified by 'msgid' that belongs to logged user.
     """
-    uid = g.user_info['uid']
-    if dbquery.check_user_owns_message(uid, msgid) == 0:
-        flash(_('Sorry, this message (#%d) is not in your mailbox.') % (msgid, ), "error")
+    uid = current_user.get_id()
+    msgids = request.values.getlist('msgid', type=int)
+    if len(msgids) <= 0:
+        flash(_('Sorry, no valid message specified.'), "error")
+    elif dbquery.check_user_owns_message(uid, msgids) < len(msgids):
+        flash(_('Sorry, this message (#%s) is not in your mailbox.') % (str(msgids), ), "error")
     else:
-        if dbquery.delete_message_from_user_inbox(uid, msgid) == 0:
+        if dbquery.delete_message_from_user_inbox(uid, msgids) == 0:
             flash(_("The message could not be deleted."), "error")
         else:
             flash(_("The message was successfully deleted."), "info")
 
-    return redirect(url_for('.display'))
+    return redirect(url_for('.index'))
 
 @blueprint.route("/delete_all", methods=['GET', 'POST'])
 @blueprint.invenio_set_breadcrumb(_("Delete all messages"))
 @blueprint.invenio_authenticated
+@blueprint.invenio_authorized('usemessages')
 @blueprint.invenio_wash_urlargd({'confirmed': (int, 0)})
 def delete_all(confirmed=0):
     """
-    Delete every message for a logged user
+    Delete every message belonging a logged user.
     @param confirmed: 0 will produce a confirmation message.
     """
-    uid = g.user_info['uid']
+    uid = current_user.get_id()
     if confirmed != 1:
         return render_template('webmessage_confirm_delete.html')
 
@@ -167,5 +276,5 @@ def delete_all(confirmed=0):
         flash(_("Your mailbox has been emptied."), "info")
     else:
         flash(_("Could not empty your mailbox."), "warning")
-    return redirect(url_for('.display'))
+    return redirect(url_for('.index'))
 

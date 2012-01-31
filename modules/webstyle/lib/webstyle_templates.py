@@ -27,6 +27,7 @@ import urllib
 import sys
 import string
 
+from flask import render_template, g, current_app
 from invenio.config import \
      CFG_SITE_RECORD, \
      CFG_SITE_LANG, \
@@ -363,6 +364,8 @@ template function generated it.
  <!--[if gt IE 8]>
     <style type="text/css">div.restrictedflag {filter:none;}</style>
  <![endif]-->
+ <link rel="stylesheet" href="%(siteurl)s/css/bootstrap.min.css" type="text/css" />
+ <link rel="stylesheet" href="%(siteurl)s/css/bootstrap-responsive.min.css" type="text/css" />
  <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
  <link rel="search" type="application/opensearchdescription+xml" href="%(siteurl)s/opensearchdescription" title="%(sitename)s" />
  <link rel="unapi-server" type="application/xml" title="unAPI" href="%(unAPIurl)s" />
@@ -372,59 +375,13 @@ template function generated it.
  <meta name="description" content="%(description)s" />
  <meta name="keywords" content="%(keywords)s" />
  <script type="text/javascript" src="%(cssurl)s/js/jquery.min.js"></script>
+ <script type="text/javascript" src="%(cssurl)s/js/jquery/bootstrap.min.js"></script>
  %(metaheaderadd)s
 </head>
 <body%(body_css_classes)s lang="%(ln_iso_639_a)s"%(rtl_direction)s>
 <div class="pageheader">
 %(inspect_templates_message)s
 <!-- replaced page header -->
-<div class="headerlogo">
-<table class="headerbox" cellspacing="0">
- <tr>
-  <td align="right" valign="top" colspan="12">
-  <div class="userinfoboxbody">
-    %(userinfobox)s
-  </div>
-  <div class="headerboxbodylogo">
-   <a href="%(siteurl)s?ln=%(ln)s">%(sitename)s</a>
-  </div>
-  </td>
- </tr>
- <tr class="menu">
-       <td class="headermoduleboxbodyblank">
-             &nbsp;
-       </td>
-       <td class="headermoduleboxbodyblank">
-             &nbsp;
-       </td>
-       <td class="headermoduleboxbody%(search_selected)s">
-             <a class="header%(search_selected)s" href="%(siteurl)s/?ln=%(ln)s">%(msg_search)s</a>
-       </td>
-       <td class="headermoduleboxbodyblank">
-             &nbsp;
-       </td>
-       <td class="headermoduleboxbody%(submit_selected)s">
-             <a class="header%(submit_selected)s" href="%(siteurl)s/submit?ln=%(ln)s">%(msg_submit)s</a>
-       </td>
-       <td class="headermoduleboxbodyblank">
-             &nbsp;
-       </td>
-       <td class="headermoduleboxbody%(personalize_selected)s">
-             %(useractivities)s
-       </td>
-       <td class="headermoduleboxbodyblank">
-             &nbsp;
-       </td>
-       <td class="headermoduleboxbody%(help_selected)s">
-             <a class="header%(help_selected)s" href="%(siteurl)s/help/%(langlink)s">%(msg_help)s</a>
-       </td>
-       %(adminactivities)s
-       <td class="headermoduleboxbodyblanklast">
-             &nbsp;
-       </td>
- </tr>
-</table>
-</div>
 <table class="navtrailbox">
  <tr>
   <td class="navtrailboxbody">
@@ -479,6 +436,8 @@ template function generated it.
           'linkbackTrackbackLink': headerLinkbackTrackbackLink,
           'inspect_templates_message' : inspect_templates_message
         }
+
+        out += render_template('header.html').encode('utf-8')
         return out
 
     def tmpl_pagefooter(self, req=None, ln=CFG_SITE_LANG, lastupdated=None,
@@ -504,9 +463,10 @@ template function generated it.
         if lastupdated and lastupdated != '$Date$':
             if lastupdated.startswith("$Date: ") or \
             lastupdated.startswith("$Id: "):
-                lastupdated = convert_datestruct_to_dategui(\
-                                 convert_datecvs_to_datestruct(lastupdated),
-                                 ln=ln)
+                lastupdated = convert_datecvs_to_datestruct(lastupdated)
+                              #convert_datestruct_to_dategui(\
+                              #   convert_datecvs_to_datestruct(lastupdated),
+                              #   ln=ln)
             msg_lastupdated = _("Last updated") + ": " + lastupdated
         else:
             msg_lastupdated = ""
@@ -514,46 +474,21 @@ template function generated it.
         out = """
 <div class="pagefooter">
 %(pagefooteradd)s
-<!-- replaced page footer -->
- <div class="pagefooterstripeleft">
-  %(sitename)s&nbsp;::&nbsp;<a class="footer" href="%(siteurl)s/?ln=%(ln)s">%(msg_search)s</a>&nbsp;::&nbsp;<a class="footer" href="%(siteurl)s/submit?ln=%(ln)s">%(msg_submit)s</a>&nbsp;::&nbsp;<a class="footer" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>&nbsp;::&nbsp;<a class="footer" href="%(siteurl)s/help/%(langlink)s">%(msg_help)s</a>
-  <br />
-  %(msg_poweredby)s <a class="footer" href="http://invenio-software.org/">Invenio</a> v%(version)s
-  <br />
-  %(msg_maintainedby)s <a class="footer" href="mailto:%(sitesupportemail)s">%(sitesupportemail)s</a>
-  <br />
-  %(msg_lastupdated)s
- </div>
- <div class="pagefooterstriperight">
-  %(languagebox)s
- </div>
-<!-- replaced page footer -->
-</div>
+</div>""" % {
+          'pagefooteradd': pagefooteradd
+        }
+
+        from datetime import datetime
+        try:
+            lastupdated = datetime(*lastupdated[:7])
+        except:
+            lastupdated = None
+
+        out += render_template('footer.html', lastupdated=lastupdated).encode('utf-8')
+        out += """
 </body>
 </html>
-        """ % {
-          'siteurl': CFG_SITE_URL,
-          'sitesecureurl': CFG_SITE_SECURE_URL,
-          'ln': ln,
-          'langlink': '?ln=' + ln,
-
-          'sitename': CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
-          'sitesupportemail': CFG_SITE_SUPPORT_EMAIL,
-
-          'msg_search': _("Search"),
-          'msg_submit': _("Submit"),
-          'msg_personalize': _("Personalize"),
-          'msg_help': _("Help"),
-
-          'msg_poweredby': _("Powered by"),
-          'msg_maintainedby': _("Maintained by"),
-
-          'msg_lastupdated': msg_lastupdated,
-          'languagebox': self.tmpl_language_selection_box(req, ln),
-          'version': CFG_VERSION,
-
-          'pagefooteradd': pagefooteradd,
-        }
+        """
         return out
 
     def tmpl_language_selection_box(self, req, language=CFG_SITE_LANG):

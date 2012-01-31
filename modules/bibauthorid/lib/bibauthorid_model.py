@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -32,8 +30,6 @@ from invenio.sqlalchemyutils import db
 
 class AidAUTHORNAMES(db.Model):
     """Represents a AidAUTHORNAMES record."""
-    def __init__(self):
-        pass
     __tablename__ = 'aidAUTHORNAMES'
     __table_args__ = {'useexisting':True}#, 'extend_existing': True}
     id = db.Column(db.BigInteger(15), nullable=False,
@@ -48,8 +44,6 @@ class AidAUTHORNAMES(db.Model):
 
 class AidAUTHORNAMESBIBREFS(db.Model):
     """Represents a AidAUTHORNAMESBIBREFS record."""
-    def __init__(self):
-        pass
     __tablename__ = 'aidAUTHORNAMESBIBREFS'
     id = db.Column(db.BigInteger(15), nullable=False,
                 primary_key=True,
@@ -61,8 +55,6 @@ class AidAUTHORNAMESBIBREFS(db.Model):
 
 class AidCACHE(db.Model):
     """Represents a AidCACHE record."""
-    def __init__(self):
-        pass
     __tablename__ = 'aidCACHE'
     id = db.Column(db.Integer(15), nullable=False,
                 primary_key=True,
@@ -78,8 +70,6 @@ class AidCACHE(db.Model):
 
 class AidDOCLIST(db.Model):
     """Represents a AidDOCLIST record."""
-    def __init__(self):
-        pass
     __tablename__ = 'aidDOCLIST'
     id = db.Column(db.BigInteger(15), nullable=False,
                 primary_key=True,
@@ -91,8 +81,6 @@ class AidDOCLIST(db.Model):
 
 class AidPERSONID(db.Model):
     """Represents a AidPERSONID record."""
-    def __init__(self):
-        pass
     __tablename__ = 'aidPERSONID'
     id = db.Column(db.BigInteger(15), nullable=False,
                 primary_key=True,
@@ -113,8 +101,6 @@ class AidPERSONID(db.Model):
 
 class AidREALAUTHORDATA(db.Model):
     """Represents a AidREALAUTHORDATA record."""
-    def __init__(self):
-        pass
     __tablename__ = 'aidREALAUTHORDATA'
     id = db.Column(db.BigInteger(15), nullable=False,
                 primary_key=True,
@@ -135,8 +121,6 @@ class AidREALAUTHORDATA(db.Model):
 
 class AidUSERINPUTLOG(db.Model):
     """Represents a AidUSERINPUTLOG record."""
-    def __init__(self):
-        pass
     __tablename__ = 'aidUSERINPUTLOG'
     id = db.Column(db.BigInteger(15), nullable=False,
                 primary_key=True,
@@ -161,8 +145,6 @@ class AidUSERINPUTLOG(db.Model):
 
 class AidVIRTUALAUTHORS(db.Model):
     """Represents a AidVIRTUALAUTHORS record."""
-    def __init__(self):
-        pass
     __tablename__ = 'aidVIRTUALAUTHORS'
     id = db.Column(db.BigInteger(15), nullable=False,
                 primary_key=True,
@@ -175,12 +157,10 @@ class AidVIRTUALAUTHORS(db.Model):
     p = db.Column(db.Float, nullable=False)
     clusterID = db.Column(db.BigInteger(15), nullable=False,
                 server_default='0',
-            index=True)
+                index=True)
 
 class AidVIRTUALAUTHORSCLUSTERS(db.Model):
     """Represents a AidVIRTUALAUTHORSCLUSTERS record."""
-    def __init__(self):
-        pass
     __tablename__ = 'aidVIRTUALAUTHORSCLUSTERS'
     id = db.Column(db.Integer(15), nullable=False,
                 primary_key=True,
@@ -189,8 +169,6 @@ class AidVIRTUALAUTHORSCLUSTERS(db.Model):
 
 class AidVIRTUALAUTHORSDATA(db.Model):
     """Represents a AidVIRTUALAUTHORSDATA record."""
-    def __init__(self):
-        pass
     __tablename__ = 'aidVIRTUALAUTHORSDATA'
     id = db.Column(db.BigInteger(15), nullable=False,
                 primary_key=True,
@@ -205,8 +183,6 @@ class AidVIRTUALAUTHORSDATA(db.Model):
 
 class AidREALAUTHORS(db.Model):
     """Represents a AidREALAUTHORS record."""
-    def __init__(self):
-        pass
     __tablename__ = 'aidREALAUTHORS'
     id = db.Column(db.BigInteger(15), nullable=False,
                 primary_key=True,
@@ -218,4 +194,69 @@ class AidREALAUTHORS(db.Model):
             nullable=False, index=True)
     p = db.Column(db.Float, nullable=False)
 
+
+class AidPERSONIDDATA(db.Model):
+    """Represents a AidPERSONIDDATA record."""
+
+    __tablename__ = 'aidPERSONIDDATA'
+
+    personid = db.Column(db.BigInteger, primary_key=True, nullable=False)
+    tag = db.Column(db.String, primary_key=True, nullable=False)
+    data = db.Column(db.String, nullable=False)
+    opt1 = db.Column(db.Integer)
+    opt2 = db.Column(db.Integer)
+    opt3 = db.Column(db.String)
+
+
+class AidPERSONIDPAPERS(db.Model):
+    """Represents a AidPERSONIDPAPERS record."""
+
+    __tablename__ = 'aidPERSONIDPAPERS'
+
+    personid = db.Column(db.BigInteger, primary_key=True, nullable=False)
+    bibref_table = db.Column(db.Enum('100', '700'), primary_key=True, nullable=False)
+    bibref_value = db.Column(db.Integer, primary_key=True, nullable=False)
+    bibrec = db.Column(db.Integer, primary_key=True, nullable=False)
+    name = db.Column(db.String, nullable=False)
+    flag = db.Column(db.SmallInteger, nullable=False)
+    lcul = db.Column(db.SmallInteger, nullable=False)
+    last_updated = db.Column(db.DateTime, nullable=False)
+
+
+class AidPROBCACHE(db.Model):
+    """Represents a AidPROBCACHE record."""
+
+    __tablename__ = 'aidPROBCACHE'
+
+    cluster = db.Column(db.String, primary_key=True, nullable=False)
+    bibmap = db.Column(db.Binary, nullable=False)
+    matrix = db.Column(db.Binary, nullable=False)
+
+
+class AidRESULTS(db.Model):
+    """Represents a AidRESULTS record."""
+
+    __tablename__ = 'aidRESULTS'
+
+    personid = db.Column(db.String, primary_key=True, nullable=False)
+    bibref_table = db.Column(db.Enum('100', '700'), primary_key=True, nullable=False)
+    bibref_value = db.Column(db.Integer, primary_key=True, nullable=False)
+    bibrec = db.Column(db.Integer, primary_key=True, nullable=False)
+
+
+__all__ = ['AidAUTHORNAMES',
+           'AidAUTHORNAMESBIBREFS',
+           'AidCACHE',
+           'AidDOCLIST',
+           'AidPERSONID',
+           'AidPERSONIDDATA',
+           'AidPERSONIDPAPERS',
+           'AidPROBCACHE',
+           'AidREALAUTHORDATA',
+           'AidRESULTS',
+           'AidUSERINPUTLOG',
+           'AidVIRTUALAUTHORS',
+           'AidVIRTUALAUTHORSCLUSTERS',
+           'AidVIRTUALAUTHORSDATA',
+           'AidREALAUTHORS']
 

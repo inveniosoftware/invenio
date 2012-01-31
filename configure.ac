@@ -800,6 +800,8 @@ AC_CONFIG_FILES([config.nice  \
      modules/webaccess/bin/Makefile \
      modules/webaccess/bin/authaction \
      modules/webaccess/bin/webaccessadmin \
+     modules/webaccess/etc/Makefile \
+     modules/webaccess/etc/templates/Makefile \
      modules/webaccess/doc/Makefile \
      modules/webaccess/doc/admin/Makefile \
      modules/webaccess/doc/hacking/Makefile \
@@ -824,6 +826,8 @@ AC_CONFIG_FILES([config.nice  \
      modules/webcomment/doc/Makefile \
      modules/webcomment/doc/admin/Makefile \
      modules/webcomment/doc/hacking/Makefile \
+     modules/webcomment/etc/Makefile \
+     modules/webcomment/etc/templates/Makefile \
      modules/webcomment/lib/Makefile \
      modules/webcomment/web/Makefile \
      modules/webcomment/web/admin/Makefile \
@@ -862,12 +866,16 @@ AC_CONFIG_FILES([config.nice  \
      modules/websearch/doc/Makefile \
      modules/websearch/doc/admin/Makefile \
      modules/websearch/doc/hacking/Makefile \
+     modules/websearch/etc/Makefile \
+     modules/websearch/etc/templates/Makefile \
      modules/websearch/lib/Makefile \
      modules/websearch/web/Makefile \
      modules/websearch/web/admin/Makefile \
      modules/websession/Makefile \
      modules/websession/bin/Makefile \
      modules/websession/bin/inveniogc \
+     modules/websession/etc/Makefile \
+     modules/websession/etc/templates/Makefile \
      modules/websession/doc/Makefile \
      modules/websession/doc/admin/Makefile \
      modules/websession/doc/hacking/Makefile \

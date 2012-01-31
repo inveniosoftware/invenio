@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -43,6 +41,8 @@ class ClsMETHOD(db.Model):
     description = db.Column(db.String(255), nullable=False,
                 server_default='')
     last_updated = db.Column(db.DateTime, nullable=False, 
-            server_default='0000-00-00 00:00:00')
+            server_default='0001-01-01 00:00:00')
 
 
+
+__all__ = ['ClsMETHOD']

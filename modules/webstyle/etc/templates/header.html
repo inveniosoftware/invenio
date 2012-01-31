@@ -1,0 +1,97 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{#
+## This file contains header part of main page template.
+##
+## Usage:
+## {% include 'header.html' %}
+#}
+
+  <style>
+  ul.nav li.dropdown:hover ul.dropdown-menu{
+    display: block;
+    margin-top: 0px;
+  }
+  </style>
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </a>
+        <a class="brand" href="{{ url_for('search.index') }}">
+          {{ config.CFG_SITE_NAME_INTL[g.ln] }}
+        </a>
+        <ul class="nav pull-right">
+          <li>
+          {% if current_user.is_guest() %}
+            <a href="{{ url_for('youraccount.login') }}">
+              <i class="icon icon-white icon-user"></i> {{ _("guest") }}
+            </a>
+          {% else %}
+            <a href="{{ url_for('youraccount.display') }}">
+              <i class="icon icon-white icon-user"></i> {{ current_user.nickname|default(current_user.email) }}
+            </a>
+          {% endif %}
+          </li>
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span>&nbsp;</a>
+          <ul class="dropdown-menu">
+            <li><a href="{{ url_for('youraccount.display') }}">{{ _("Personalize") }}</a></li>
+            <li class="divider"></li>
+            {% if current_user.is_guest() %}
+            <li><a href="{{ url_for('youraccount.login') }}">
+              <i class="icon icon-lock"></i> {{ _("Login") }}
+            </a></li>
+            {% else %}
+            <li><a href="{{ url_for('youraccount.logout') }}">
+              <i class="icon icon-off"></i> {{ _("Logout") }}
+            </a></li>
+            {% endif %}
+          </ul>
+          </li>
+        </ul>
+        <div class="nav-collapse collapse">
+        <ul class="nav">
+        {%- for item in menu|sort(attribute='order') recursive %}
+          {%- if item.children -%}
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="{{ url_for(item.url) }}">
+              {{ item.title|safe }}
+              <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+              {{ loop(item.children.itervalues()) }}
+            </ul>
+          </li>
+          {%- else -%}
+          <li><a href="{{ url_for(item.url) }}">{{ item.title|safe }}</a></li>
+          {%- endif %}
+        {%- endfor %}
+        </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="clear:both; height: 60px;"></div>
+

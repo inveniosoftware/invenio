@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com>
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -98,17 +96,21 @@ class OaiHARVESTLOG(db.Model):
                 db.ForeignKey(Bibrec.id), nullable=False, server_default='0')
     bibupload_task_id = db.Column(db.Integer(11), db.ForeignKey(SchTASK.id),
                 nullable=False, server_default='0',
-            primary_key=True)
+                primary_key=True)
     oai_id = db.Column(db.String(40), nullable=False, server_default='',
                 primary_key=True)
     date_harvested = db.Column(db.DateTime, nullable=False,
-            server_default='0000-00-00 00:00:00',
+                server_default='0001-01-01 00:00:00',
                 primary_key=True)
     date_inserted = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     inserted_to_db = db.Column(db.Char(1), nullable=False,
                 server_default='P')
     bibrec = db.relationship(Bibrec, backref='harvestlogs')
     schtask = db.relationship(SchTASK)
 
 
+
+__all__ = ['OaiHARVEST',
+           'OaiREPOSITORY',
+           'OaiHARVESTLOG']

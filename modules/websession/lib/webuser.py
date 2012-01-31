@@ -181,8 +181,8 @@ def getUid(req):
 
        getUid(req) -> userId
     """
-    if hasattr(req, '_user_info'):
-        return req._user_info['uid']
+    #if hasattr(req, '_user_info'):
+    #    return req._user_info['_uid']
     if CFG_ACCESS_CONTROL_LEVEL_SITE == 1: return 0
     if CFG_ACCESS_CONTROL_LEVEL_SITE == 2: return -1
 
@@ -1231,7 +1231,7 @@ def collect_user_info(req, login_time=False, refresh=False):
             except gaierror:
                 #FIXME: we should support IPV6 too. (hint for FireRole)
                 pass
-            user_info['session'] = get_session(req).sid()
+            user_info['session'] = get_session(req).sid
             user_info['remote_host'] = req.remote_host or ''
             user_info['referer'] = req.headers_in.get('Referer', '')
             user_info['uri'] = req.unparsed_uri or ''

@@ -110,6 +110,74 @@ def make_test_suite(*test_cases):
     return unittest.TestSuite([unittest.makeSuite(case, 'test')
                                for case in test_cases])
 
+from invenio.config import *
+from invenio.webinterface_handler_flask import create_invenio_flask_app
+from invenio.sqlalchemyutils import db
+from flaskext.testing import TestCase, Twill
+from sqlalchemy.engine.url import URL
+
+class FlaskSQLAlchemyTest(TestCase):
+    #FIXME: add CFG_DATABASE_TYPE
+    #engine = CFG_DATABASE_TYPE
+    username = CFG_DATABASE_USER
+    password = CFG_DATABASE_PASS
+    host = CFG_DATABASE_HOST
+    database = CFG_DATABASE_NAME
+
+    @property
+    def SQLALCHEMY_DATABASE_URI(self):
+        return URL(
+            self.engine,
+            username = self.username,
+            password = self.password,
+            host = self.host,
+            database = self.database
+            )
+
+    def create_app(self):
+        db.init_invenio(engine=self.engine)
+        app = create_invenio_flask_app()
+        app.debug = False
+        app.config['SQLALCHEMY_ECHO'] = False
+        app.config['SQLALCHEMY_DATABASE_URI'] = self.SQLALCHEMY_DATABASE_URI
+        db.init_app(app)
+        return app
+
+    def setUp(self):
+        db.create_all()
+
+    def tearDown(self):
+        #db.session.remove()
+        db.session.expunge_all()
+        db.session.rollback()
+        db.drop_all()
+
+    def login(self, username, password):
+        return self.client.post('/youraccount/login',
+                #base_url=request.base_url.replace('http:','https:'),
+                data=dict(
+                nickname=username,
+                password=password
+                ), follow_redirects=True)
+
+    def logout(self):
+        return self.client.get('/youraccount/logout', follow_redirects=True)
+
+def make_flask_test_suite(*test_cases):
+    """ Build up a Flask test suite given separate test cases"""
+    from operator import add
+    #FIXME read test configuration
+    db_settings = {
+        'PostgreSQL': {'engine': 'postgresql'},
+        'SQLite': {'engine': 'sqlite+pysqlite', 'username': None,
+                   'password': None, 'host': None, 'database': None}
+        }
+    create_type = lambda c: [type(k+c.__name__, (c,), d)
+                             for k,d in db_settings.iteritems()]
+
+    return unittest.TestSuite([unittest.makeSuite(case, 'test')
+                for case in reduce(add, map(create_type, test_cases))])
+
 def run_test_suite(testsuite, warn_user=False):
     """
     Convenience function to embed in test suites.  Run given testsuite
@@ -801,3 +869,28 @@ class InvenioWebTestCaseException(Exception):
     def __str__(self):
         """String representation."""
         return repr(self.message)
+
+def build_and_run_flask_test_suite():
+    """
+    Detect all Invenio modules with names ending by
+    '*_flask_tests.py', build a complete test suite of them, and
+    run it.  Called by 'inveniocfg --run-flask-tests'.
+    """
+
+    test_modules = []
+
+    for candidate in os.listdir(os.path.dirname(invenio.__file__)):
+        base, ext = os.path.splitext(candidate)
+
+        if ext != '.py' or not base.endswith('_flask_tests'):
+            continue
+
+        module = __import__('invenio.' + base, globals(), locals(), ['TEST_SUITE'])
+        test_modules.append(module.TEST_SUITE)
+
+    #FIXME create warning about tested databases
+    warn_user_about_tests()
+
+    complete_suite = unittest.TestSuite(test_modules)
+    run_test_suite(complete_suite)
+

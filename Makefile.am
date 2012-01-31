@@ -52,8 +52,14 @@ $(top_srcdir)/.version:
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
 
+# Bootstrap version
+BOOTSTRAPV = 2.0.4
+
 check-upgrade:
 	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/inveniocfg_upgrader.py $(top_srcdir) --upgrade-check
+
+check-custom-templates:
+	$(PYTHON) $(top_srcdir)/modules/webstyle/lib/template.py --check-custom-templates $(top_srcdir)
 
 kwalitee-check:
 	@$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py --stats $(top_srcdir)
@@ -273,6 +279,68 @@ install-mediaelement:
 	rm -rf /tmp/mediaelement
 	@echo "***********************************************************"
 	@echo "** MediaElement.js was successfully installed.           **"
+	@echo "***********************************************************"
+
+install-bootstrap:
+	@echo "***********************************************************"
+	@echo "** Installing Twitter Bootstrap, please wait...          **"
+	@echo "***********************************************************"
+	rm -rf /tmp/invenio-bootstrap
+	mkdir /tmp/invenio-bootstrap
+	(cd /tmp/invenio-bootstrap && \
+	wget -O bootstrap.zip 'http://invenio-software.org/download/bootstrap/bootstrap-${BOOTSTRAPV}.zip' && \
+	unzip -u bootstrap.zip && \
+	cp bootstrap/css/bootstrap-responsive.css ${prefix}/var/www/css/bootstrap-responsive.css && \
+	cp bootstrap/css/bootstrap-responsive.min.css ${prefix}/var/www/css/bootstrap-responsive.min.css && \
+	cp bootstrap/css/bootstrap.css ${prefix}/var/www/css/bootstrap.css && \
+	cp bootstrap/css/bootstrap.min.css ${prefix}/var/www/css/bootstrap.min.css && \
+	cp bootstrap/img/glyphicons-halflings-white.png ${prefix}/var/www/img/glyphicons-halflings-white.png && \
+	cp bootstrap/img/glyphicons-halflings.png ${prefix}/var/www/img/glyphicons-halflings.png && \
+	cp bootstrap/js/bootstrap.js ${prefix}/var/www/js/jquery/bootstrap.js && \
+	cp bootstrap/js/bootstrap.min.js ${prefix}/var/www/js/jquery/bootstrap.min.js && \
+	rm -fr /tmp/invenio-bootstrap )
+	@echo "***********************************************************"
+	@echo "** The Twitter Bootstrap was successfully installed.     **"
+	@echo "***********************************************************"
+
+uninstall-bootstrap:
+	rm ${prefix}/var/www/css/bootstrap-responsive.css && \
+	rm ${prefix}/var/www/css/bootstrap-responsive.min.css && \
+	rm ${prefix}/var/www/css/bootstrap.css && \
+	rm ${prefix}/var/www/css/bootstrap.min.css && \
+	rm ${prefix}/var/www/img/glyphicons-halflings-white.png && \
+	rm ${prefix}/var/www/img/glyphicons-halflings.png && \
+	rm ${prefix}/var/www/js/jquery/bootstrap.js && \
+	rm ${prefix}/var/www/js/jquery/bootstrap.min.js
+	@echo "***********************************************************"
+	@echo "** The Twitter Bootstrap was successfully uninstalled.   **"
+	@echo "***********************************************************"
+
+install-jquery-tokeninput:
+	@echo "***********************************************************"
+	@echo "** Installing JQuery Tokeninput, please wait...          **"
+	@echo "***********************************************************"
+	rm -rf /tmp/jquery-tokeninput
+	mkdir /tmp/jquery-tokeninput
+	(cd /tmp/jquery-tokeninput && \
+	wget -O jquery-tokeninput.zip 'https://github.com/loopj/jquery-tokeninput/zipball/jquery-tokeninput-1.6.0' && \
+	unzip -u jquery-tokeninput.zip && \
+	cp loopj-jquery-tokeninput-201d2d1/styles/token-input-facebook.css ${prefix}/var/www/css/token-input-facebook.css && \
+	cp loopj-jquery-tokeninput-201d2d1/styles/token-input-mac.css ${prefix}/var/www/css/token-input-mac.css && \
+	cp loopj-jquery-tokeninput-201d2d1/styles/token-input.css ${prefix}/var/www/css/token-input.css && \
+	cp loopj-jquery-tokeninput-201d2d1/src/jquery.tokeninput.js ${prefix}/var/www/js/jquery/jquery.tokeninput.js && \
+	rm -fr /tmp/jquery-tokeninput )
+	@echo "***********************************************************"
+	@echo "** The JQuery Tokeninput was successfully installed.     **"
+	@echo "***********************************************************"
+
+uninstall-jquery-tokeninput:
+	rm ${prefix}/var/www/css/token-input-facebook.css && \
+	rm ${prefix}/var/www/css/token-input-mac.css && \
+	rm ${prefix}/var/www/css/token-input.css && \
+	rm ${prefix}/var/www/js/jquery/jquery.tokeninput.js
+	@echo "***********************************************************"
+	@echo "** The JQuery Tokeninput was successfully uninstalled.   **"
 	@echo "***********************************************************"
 
 uninstall-pdfa-helper-files:

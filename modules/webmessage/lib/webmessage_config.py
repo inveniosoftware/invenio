@@ -45,6 +45,9 @@ CFG_WEBMESSAGE_SEPARATOR = ','
 # list of roles (find them in accROLE table) without quota
 CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA = ['superadmin']
 
+# alert user also by email
+CFG_WEBMESSAGE_EMAIL_ALERT = True
+
 # Exceptions: errors
 class InvenioWebMessageError(Exception):
     """A generic error for WebMessage."""

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -36,8 +34,8 @@ from sqlalchemy.dialects.mysql import TINYINT as TinyInteger
 from sqlalchemy.dialects.mysql import VARCHAR as String
 from sqlalchemy.dialects.mysql import CHAR as Char
 from sqlalchemy.dialects.mysql import TIMESTAMP as TIMESTAMP
-from sqlalchemy.dialects.mysql import BLOB as Binary
-from sqlalchemy.dialects.mysql import BLOB as LargeBinary
+#from sqlalchemy.dialects.mysql import BLOB as Binary
+#from sqlalchemy.dialects.mysql import BLOB as LargeBinary
 from sqlalchemy.orm import relationship, backref, class_mapper
 
 import sqlalchemy.types as types
@@ -65,8 +63,8 @@ def visit_create_index(element, compiler, **kw):
     if index.unique:
         text += "UNIQUE "
     text += "INDEX `%s` ON `%s` (%s)" \
-        % (index.name, #(preparer.quote(compiler._index_identifier(index.name), index.quote), 
-        index.table, #preparer.format_table(index.table), 
+        % (index.name, #(preparer.quote(compiler._index_identifier(index.name), index.quote),
+        index.table, #preparer.format_table(index.table),
         ', '.join('`' + c.name + '`' + #preparer.quote(c.name, c.quote) +
             ((str(c.type).startswith('TEXT') and (c.type.length != None))
                 and '(%d)' % c.type.length or '')
@@ -95,6 +93,20 @@ def visit_primary_key_constraint(*element):
             for c in constraint)
     text += compiler.define_constraint_deferrability(constraint)
     return text
+
+@compiles(types.Text, 'sqlite')
+@compiles(sqlalchemy.dialects.mysql.TEXT, 'sqlite')
+def compile_text(element, compiler, **kw):
+    return 'TEXT'
+
+@compiles(types.Binary, 'sqlite')
+def compile_binary(element, compiler, **kw):
+    return 'BLOB'
+
+@compiles(types.LargeBinary, 'sqlite')
+def compile_largebinary(element, compiler, **kw):
+    return 'LONGBLOB'
+
 
 @compiles(types.Text, 'mysql')
 @compiles(sqlalchemy.dialects.mysql.TEXT, 'mysql')

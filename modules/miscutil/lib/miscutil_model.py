@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -46,3 +44,5 @@ class Publreq(db.Model):
                 server_default='')
     address = db.Column(db.Text, nullable=False)
     publication = db.Column(db.Text, nullable=False)
+
+__all__ = ['Publreq']

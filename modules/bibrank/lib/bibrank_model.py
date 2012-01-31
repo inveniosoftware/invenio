@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com>
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -41,7 +39,7 @@ class RnkMETHOD(db.Model):
     name = db.Column(db.String(20), unique=True, nullable=False,
                 server_default='')
     last_updated = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+                server_default='0001-01-01 00:00:00')
 
 class RnkMETHODDATA(db.Model):
     """Represents a RnkMETHODDATA record."""
@@ -77,8 +75,7 @@ class RnkCITATIONDATA(db.Model):
                 nullable=False)
     object_value = db.Column(db.iLargeBinary, nullable=True)
     last_updated = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
-
+                server_default='0001-01-01 00:00:00')
 
 class RnkCITATIONDATAEXT(db.Model):
     """Represents a RnkCITATIONDATAEXT record."""
@@ -112,7 +109,7 @@ class RnkDOWNLOADS(db.Model):
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
                 db.ForeignKey(Bibrec.id), nullable=True)
     download_time = db.Column(db.DateTime, nullable=True,
-            server_default='0000-00-00 00:00:00')
+                server_default='0001-01-01 00:00:00')
     client_host = db.Column(db.Integer(10, unsigned=True),
                 nullable=True)
     id_user = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(User.id),
@@ -143,7 +140,7 @@ class RnkPAGEVIEWS(db.Model):
     client_host = db.Column(db.Integer(10, unsigned=True),
                 nullable=True)
     view_time = db.Column(db.DateTime, primary_key=True,
-            server_default='0000-00-00 00:00:00')
+            server_default='0001-01-01 00:00:00')
     bibrec = db.relationship(Bibrec, backref='pageviews')
     user = db.relationship(User, backref='pageviews')
 
@@ -172,3 +169,14 @@ class RnkWORD01R(db.Model):
     bibrec = db.relationship(Bibrec, backref='word01rs')
 
 
+
+__all__ = ['RnkMETHOD',
+           'RnkMETHODDATA',
+           'RnkMETHODNAME',
+           'RnkCITATIONDATA',
+           'RnkCITATIONDATAEXT',
+           'RnkAUTHORDATA',
+           'RnkDOWNLOADS',
+           'RnkPAGEVIEWS',
+           'RnkWORD01F',
+           'RnkWORD01R']

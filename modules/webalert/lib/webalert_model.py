@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -61,3 +59,5 @@ class UserQueryBasket(db.Model):
     user = db.relationship(User, backref='query_baskets')
     query = db.relationship(WebQuery, backref='user_baskets')
     basket = db.relationship(BskBASKET, backref='user_queries')
+
+__all__ = ['UserQueryBasket']

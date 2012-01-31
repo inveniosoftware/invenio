@@ -49,6 +49,7 @@ from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
 from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
     CFG_WEBSESSION_ONE_DAY, CFG_WEBSESSION_CLEANUP_CHANCE, \
     CFG_WEBSESSION_ENABLE_LOCKING
+from invenio.session_flask import InvenioSession as FlaskInvenioSession
 
 CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
 
@@ -74,10 +75,10 @@ def get_session(req, sid=None):
         valid session.
     """
     if sid is not None:
-        req._session = InvenioSession(req, sid)
+        req._session = FlaskInvenioSession(sid=sid)
         return req._session
     if not hasattr(req, '_session'):
-        req._session = InvenioSession(req, sid)
+        req._session = FlaskInvenioSession(sid = sid)
     return req._session
 
 class InvenioSession(dict):

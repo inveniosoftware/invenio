@@ -16,184 +16,137 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{% set guest = session['user_info']['guest'] == '1' %}
-{% set usealerts = session['user_info']['precached_usealerts'] %}
-{% set usemessages = session['user_info']['precached_usemessages'] %}
-{% set usebaskets = session['user_info']['precached_usebaskets'] %}
-{% set useloans = session['user_info']['precached_useloans'] %}
-{% set usegroups = session['user_info']['precached_usegroups'] %}
-{% set viewsubmissions = session['user_info']['precached_viewsubmissions'] %}
-{% set useapprove = session['user_info']['precached_useapprove'] %}
-{% set useadmin = session['user_info']['precached_useadmin'] %}
-{% set usestats = session['user_info']['precached_usestats'] %}
-{% set viewclaimlink = session['user_info']['precached_viewclaimlink'] %}
-{% set usepaperclaim = session['user_info']['precached_usepaperclaim'] %}
-{% set usepaperattribution = session['user_info']['precached_usepaperattribution'] %}
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="{{ ln|safe }}" xml:lang="{{ ln|safe }}" {% if is_language_rtl %}dir="rtl"{% endif %}>
+{% set guest = current_user.is_guest() %}
+{% set usealerts = current_user['precached_usealerts'] %}
+{% set usemessages = current_user['precached_usemessages'] %}
+{% set usebaskets = current_user['precached_usebaskets'] %}
+{% set useloans = current_user['precached_useloans'] %}
+{% set usegroups = current_user['precached_usegroups'] %}
+{% set viewsubmissions = current_user['precached_viewsubmissions'] %}
+{% set useapprove = current_user['precached_useapprove'] %}
+{% set useadmin = current_user['precached_useadmin'] %}
+{% set usestats = current_user['precached_usestats'] %}
+{% set viewclaimlink = current_user['precached_viewclaimlink'] %}
+{% set usepaperclaim = current_user['precached_usepaperclaim'] %}
+{% set usepaperattribution = current_user['precached_usepaperattribution'] %}
+<!DOCTYPE html>
+<html lang="{{ ln|safe }}" {% if is_language_rtl %}dir="rtl"{% endif %}>
 <head>
-<title>{{ title }} - {{ config.CFG_SITE_NAME_INTL[g.ln] }}</title>
-<link rev="made" href="mailto:{{ config.CFG_SITE_SUPPORT_EMAIL }}" />
-<link rel="stylesheet" href="{{ url_for('static', filename='css/invenio.css') }}" type="text/css" />
-<link rel="alternate" type="application/rss+xml" title="{{ config.CFG_SITE_NAME }} RSS" href="{{ url_for('rss') }}" />
-<link rel="search" type="application/opensearchdescription+xml" href="{{ url_for('opensearchdescription') }}" title="{{ config.CFG_SITE_NAME }}" />
-<link rel="unapi-server" type="application/xml" title="unAPI" href="{{ url_for('unapi') }}" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta http-equiv="Content-Language" content="{{ g.ln|safe }}" />
-<meta name="description" content="{{ description }}" />
-<meta name="keywords" content="{{ keywords }}" />
-<script type="text/javascript" src="{{ url_for('static', filename='js/jquery/jquery.min.js') }}"></script>
-{% block header %}{{ metaheaderadd|safe }}{% endblock header %}
-{% block javascript %}{% endblock javascript %}
-{% block css %}{% endblock css %}
+  <meta charset="utf-8">
+  <title>{{ title+' - ' if title }}{{ config.CFG_SITE_NAME_INTL[g.ln] }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Language" content="{{ g.ln|safe }}" />
+  <meta name="description" content="{{ description }}" />
+  <meta name="keywords" content="{{ keywords }}" />
+  <meta name="author" content="">
+  <link rev="made" href="mailto:{{ config.CFG_SITE_SUPPORT_EMAIL }}" />
+  <link rel="alternate" type="application/rss+xml" title="{{ config.CFG_SITE_NAME }} RSS" href="{{ url_for('rss') }}" />
+  <link rel="search" type="application/opensearchdescription+xml" href="{{ url_for('opensearchdescription') }}" title="{{ config.CFG_SITE_NAME }}" />
+  <link rel="unapi-server" type="application/xml" title="unAPI" href="{{ url_for('unapi') }}" />
+  <!-- Le styles -->
+  {% css 'css/bootstrap.css' %}
+  {% css 'css/bootstrap-responsive.min.css' %}
+  {% css 'css/token-input.css' %}
+  {% css 'css/token-input-facebook.css' %}
+  {% js 'js/jquery/jquery.min.js' %}
+  {% js 'js/jquery/bootstrap.js' %}
+  {% js 'js/jquery/jquery.tokeninput.js' %}
+  <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <!-- Le fav and touch icons -->
+{#
+  <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+#}
+{#
+  {% js 'js/jquery/jquery.min.js' %}
+  {% css 'css/invenio.css' %}
+#}
+  {% block header %}
+    {{ metaheaderadd|safe }}
+  {% endblock header %}
+  {% assets get_css_bundle() %}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"></link>
+  {% endassets %}
+  {% assets get_js_bundle() %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+  {% block javascript %}{% endblock javascript %}
+  {% block css %}{% endblock css %}
+  <style>
+    footer a, footer a:hover {
+      color: #666;
+    }
+    footer, footer p {
+      font-size: 11px;
+      color: #333;
+    }
+  </style>
 </head>
-<body {{ body_css_classes|safe }} lang="{{ ln|safe }}">
-<div class="pageheader">
-<!-- replaced page header -->
-{% block headerbox %}
-    <table class="headerbox" cellspacing="0">
-        <tr>
-        <td align="right" valign="top" colspan="12">
-            <div class="userinfoboxbody">
-            <img src="{{ url_for('static', filename='img/user-icon-1-20x20.gif') }}" border="0" alt="{{ _("user icon") }}" />
-            {% if guest %}
-                {{ _("guest") }} ::
-                <a class="userinfo" href="{{ url_for('youraccount.login', referer=request.url) }}">{{ _("login") }}s</a>
-            {% else %}
-                <a class="userinfo" href="{{ url_for('youraccount.display') }}">{{ session["user_info"]["nickname"]|default(session["user_info"]["email"])}}</a> ::
-                <a class="userinfo" href="{{ url_for('youraccount.logout') }}">{{ _("logout") }}</a>
-            {% endif %}
-            </div>
-            <div class="headerboxbodylogo">
-            <a href="{{ url_for('/') }}">{{ config.CFG_SITE_NAME_INTL[g.ln] }}</a>
-            </div>
-        </td>
-        </tr>
-        <tr class="menu">
-        <td class="headermoduleboxbodyblank">&nbsp;</td>
-        <td class="headermoduleboxbodyblank">&nbsp;</td>
-        <td class="headermoduleboxbody{{ search_selected }}">
-            <a class="header{{ search_selected }}" href="{{ url_for('/') }}">{{ _("Search") }}</a>
-        </td>
-        <td class="headermoduleboxbodyblank">&nbsp;</td>
-        <td class="headermoduleboxbody{{ submit_selected }}">
-            <a class="header{{ submit_selected }}" href="{{ url_for('submit') }}">{{ _("Submit") }}</a>
-        </td>
-        <td class="headermoduleboxbodyblank">&nbsp;</td>
-        <td class="headermoduleboxbody{{ personalize_selected and "selected" or "" }}">
-            <div class="hassubmenu{{ personalize_selected and " on" or "" }}">
-            <a class="header{{ personalize_selected and "selected" or "" }}" href="{{ url_for('youraccount.display') }}">{{ _("Personalize") }}</a>
-            <ul class="subsubmenu" style="width: 13em;">
-                {% if not guest %}
-                <li><a href="{{ url_for('youraccount.display') }}">{{ _("Your account") }}</a></li>
-                {% endif %}
-                {% if usealerts or guest %}
-                <li><a href="{{ url_for('youralerts.list') }}">{{ _("Your alerts") }}</a></li>
-                {% endif %}
-                {% if useapprove %}
-                <li><a href="{{ url_for('yourapprovals.display') }}">{{ _("Your approvals") }}</a></li>
-                {% endif %}
-                {% if usebaskets or guest %}
-                <li><a href="{{ url_for('yourbaskets.display') }}">{{ _("Your baskets") }}</a></li>
-                {% endif %}
-                {% if usegroups %}
-                <li><a href="{{ url_for('yourgroups.display') }}">{{ _("Your groups") }}</a></li>
-                {% endif %}
-                {% if useloans %}
-                <li><a href="{{ url_for('yourloans.display') }}">{{ _("Your loans") }}</a></li>
-                {% endif %}
-                {% if usemessages %}
-                <li><a href="{{ url_for('yourmessages.display') }}">{{ _("Your messages") }}</a></li>
-                {% endif %}
-                {% if viewsubmissions %}
-                <li><a href="{{ url_for('yoursubmissions.display') }}">{{ _("Your submissions") }}</a></li>
-                {% endif %}
-                {% if usealerts or guest %}
-                <li><a href="{{ url_for('youralerts.display') }}">{{ _("Your searches") }}</a></li>
-                {% endif %}
-            </ul>
-            </div>
-        </td>
-        <td class="headermoduleboxbodyblank">&nbsp;</td>
-        <td class="headermoduleboxbody {{ help_selected }}">
-            <a class="header{{ help_selected }}" href="{{ url_for('help') }}">{{ _("Help") }}</a>
-        </td>
-        <td class="headermoduleboxbodyblank">&nbsp;</td>
-        <td class="headermoduleboxbody {{ admin_selected }}">
-            <div class="hassubmenu{{ admin_selected and " on" or "" }}">
-            <a hreflang="en" class="header{{ admin_selected and "selected" or ""}}" href="{{ url_for('youraccount.youradminactivities') }}">{{ _("Administration") }}</a>
-            <ul class="subsubmenu" style="width: 19em;">
-            </ul>
-            </div>
-        </td>
-        <td class="headermoduleboxbodyblanklast">&nbsp;</td>
-        </tr>
-    </table>
-    </div>
-    <table class="navtrailbox">
-    <tr><td class="navtrailboxbody">
+<body {{ body_css_classes|safe }} lang="{{ g.ln|safe }}">
+<header>
+  <!-- replaced page header -->
+  {% block headerbox %}
+    {% include 'header.html' %}
+  {% endblock headerbox %}
+  <!-- end replaced page header -->
+  {% block breadcrumb %}
+  {% if breadcrumbs|length > 1 %}
+  <div class="container">
+    <ul class="breadcrumb">
         {% for breadcrumb in breadcrumbs %}
         {% if loop.last %}
-            {{ _(breadcrumb[0]) }}
+        <li class="active">
+            {{ breadcrumb[0] }}
+        </li>
         {% else %}
-            <a href="{{ url_for(breadcrumb[1]) }}" class="navtrail">{{ _(breadcrumb[0]) }}</a> >
+         <li>
+            {% set url_args = breadcrumb[2] or {} %}
+            <a href="{{ url_for(breadcrumb[1], **url_args) }}" class="navtrail">{{ breadcrumb[0] }}</a> <span class="divider">/</span>
+        </li>
         {% endif %}
         {% endfor %}
-    </td></tr>
-    </table>
-    <!-- end replaced page header -->
-    {% block pageheaderadd %}{{ pageheaderadd|safe }}{% endblock pageheaderadd %}
-{% endblock headerbox %}
-</div>
-<div class="pagebody">
-<div class="pagebodystripeleft">
-    <div class="pageboxlefttop">{% block boxlefttop %}{{ boxlefttop }}{% endblock boxlefttop %}</div>
-    <div class="pageboxlefttopadd">{% block boxlefttopadd %}{{ boxlefttopadd }}{% endblock boxlefttopadd %}</div>
-    <div class="pageboxleftbottomadd">{% block boxleftbottomadd %}{{ boxleftbottomadd }}{% endblock boxleftbottomadd %}</div>
-    <div class="pageboxleftbottom">{% block boxleftbottom %}{{ boxleftbottom }}{% endblock boxleftbottom %}</div>
-</div>
-<div class="pagebodystriperight">
-    <div class="pageboxrighttop">{% block boxrighttop %}{{ boxrighttop }}{% endblock boxrighttop %}</div>
-    <div class="pageboxrighttopadd">{% block boxrighttopadd %}{{ boxrighttopadd }}{% endblock boxrighttopadd %}</div>
-    <div class="pageboxrightbottomadd">{% block boxrightbottomadd %}{{ boxrightbottomadd }}{% endblock boxrightbottomadd %}</div>
-    <div class="pageboxrightbottom">{% block boxrightbottom %}{{ boxrightbottom }}{% endblock boxrightbottom %}</div>
-</div>
-<div class="pagebodystripemiddle">
-    {% block title %}<h1>{{ title }}</h1>{% endblock title %}
-    {% block messages %}
+    </ul>
+  </div>
+  {% endif %}
+  {% endblock breadcrumb %}
+  {% block pageheaderadd %}{{ pageheaderadd|safe }}{% endblock pageheaderadd %}
+</header>
+<div class="container">
+  {% block title %}
+  {% if title %}
+    <div class="page-header">
+      <h1>{{ title }}</h1>
+    </div>
+  {% endif %}
+  {% endblock title %}
+  {% block messages %}
     {% for category, msg in get_flashed_messages(with_categories=true) %}
-        <p class="flash-{{ category }}">{{ _(msg) }}</p>
+      <div class="alert alert-{{ category }}">
+        <a class="close" data-dismiss="alert" href="#">×</a>
+        {{ msg }}
+      </div>
     {% endfor %}
     {% endblock messages %}
     {% block body %}
     {{ body }}
     {% endblock body %}
+  <hr/>
 </div>
-<div class="clear"></div>
-</div>
-<div class="pagefooter">
-{% block pagefooteradd %}{{ pagefooteradd|safe }}{% endblock pagefooteradd %}
-<!-- replaced page footer -->
-<div class="pagefooterstripeleft">
-{{ config["CFG_SITE_NAME_INTL"][g.ln] }} &nbsp;::&nbsp;<a class="footer" href="{{ url_for('') }}">{{ _("Search") }}</a>&nbsp;::&nbsp;<a class="footer" href="{{ url_for('submit') }}">{{ _("Submit") }}</a>&nbsp;::&nbsp;<a class="footer" href="{{ url_for('youraccount.display') }}">{{ _("Personalize") }}</a>&nbsp;::&nbsp;<a class="footer" href="{{ url_for('help') }}">{{ _("Help") }}</a>
-<br />
-{{ _("Powered by") }} <a class="footer" href="http://invenio-software.org/">Invenio</a> v{{ config.CFG_VERSION }}
-<br />
-{{ _("Maintained by") }} <a class="footer" href="mailto:{{ config.CFG_SITE_SUPPORT_EMAIL }}">{{ config.CFG_SITE_SUPPORT_EMAIL }}</a>
-<br />
-{% if lastupdated %}
-    {{ _("Last updated") }}: {{ lastupdated|invenio_format_date }}
-{% endif %}
-</div>
-<div class="pagefooterstriperight">
-    {% if config.CFG_LANGUAGE_LIST_LONG %}
-        {{ _("This site is also available in the following languages:") }} <br />
-        {% for (lang, lang_namelong) in config.CFG_LANGUAGE_LIST_LONG %}
-            &nbsp; <a href="?ln={{ lang }}" class="langinfo">{{ lang_namelong|safe }}</a>
-        {% endfor %}
-    {% endif %}
-</div>
-<!-- replaced page footer -->
-</div>
+<footer>
+  <div class="container">
+    {% block pagefooteradd %}{{ pagefooteradd|safe }}{% endblock pagefooteradd %}
+  </div>
+  <!-- replaced page footer -->
+  {% include 'footer.html' %}
+</footer>
 </body>
 </html>

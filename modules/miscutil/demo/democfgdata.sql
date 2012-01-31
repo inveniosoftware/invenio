@@ -1801,27 +1801,6 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (6,19,0);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (6,20,0);
 
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,1,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,2,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,3,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,4,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,5,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,6,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,7,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,8,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,9,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,10,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,11,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,12,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,13,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,14,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,15,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,16,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,17,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,18,1);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,19,0);
-INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,20,0);
-
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (8,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (8,2,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (8,3,1);

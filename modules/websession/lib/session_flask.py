@@ -32,15 +32,25 @@ from uuid import uuid4
 from werkzeug.datastructures import CallbackDict
 from werkzeug.exceptions import BadRequest
 from flask.sessions import SessionInterface, SessionMixin
-from flask import current_app, request
+from flask import g, current_app, request
 from warnings import warn
 
-from invenio.dbquery import run_sql
-from invenio.config import CFG_SITE_SECURE_URL
+from invenio.sqlalchemyutils import db
+from invenio.webuser_flask import current_user
+from invenio.config import \
+    CFG_SITE_SECURE_URL, \
+    CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL
 
 __all__ = ["InvenioSession", "InvenioSessionInterface"]
 
 CFG_SUPPORT_HTTPS = CFG_SITE_SECURE_URL.startswith("https://")
+
+# Store session information in memory cache (Redis, Memcache, ...).
+CFG_SESSION_USE_CACHE = True
+# Session key prefix for storing in db.
+CFG_SESSION_KEY_PREFIX = 'session::'
+
+from invenio.cache import cache
 
 class InvenioSession(dict, SessionMixin):
     """
@@ -62,6 +72,12 @@ class InvenioSession(dict, SessionMixin):
         """
         remote_ip = request.remote_addr
         current_app.logger.info("checking session IP against %s" % remote_ip)
+
+        if '_https_ip' not in self:
+            self['_https_ip'] = remote_ip
+        if '_http_ip' not in self:
+            self['_http_ip'] = remote_ip
+
         if request.scheme == 'https':
             if self.get('_https_ip', remote_ip) != remote_ip:
                 return False
@@ -85,16 +101,16 @@ class InvenioSession(dict, SessionMixin):
         if self.get('_uid') != uid:
             current_app.logger.info("detected logging in...")
             self.logging_in = True
-            from invenio.webuser import collect_user_info
-            self['user_info'] = collect_user_info(request._get_current_object(), login_time=True)
-            current_app.logger.info("storing user_info")
         self['_uid'] = uid
 
     def _get_user_info(self):
-        if 'user_info' in self:
+        if 'user_info' in self and not self.logging_in:
+            current_app.logger.info("accessing user_info")
             return self['user_info']
-        from invenio.webuser import collect_user_info
-        self['user_info'] = collect_user_info(request._get_current_object(), login_time=True)
+
+        current_app.logger.info("reloading user_info")
+        current_user.reload()
+        self.logging_in = False
         return self['user_info']
 
     uid = property(_get_uid, _set_uid)
@@ -131,28 +147,40 @@ class InvenioSessionInterface(SessionInterface):
         if not sid:
             sid = self.generate_sid()
             return self.session_class(sid=sid)
-        current_app.logger.info("loading session data")
-        res = run_sql("SELECT session_object FROM session WHERE session_key=%s "
-                      "AND session_expiry >= UTC_TIMESTAMP()", (sid, ))
-        if res:
-            try:
-                data = self.serializer.loads(res[0][0])
-                session = self.session_class(data, sid=sid)
-                current_app.logger.info("initilized session")
-                if session.check_ip(request):
-                    return session
-            except Exception, err:
-                current_app.logger.warning("Detected error: %s" % err)
-                pass
+        current_app.logger.info("loading session data sid: %s" % sid)
+        try:
+            if CFG_SESSION_USE_CACHE:
+                data = self.serializer.loads(cache.get(CFG_SESSION_KEY_PREFIX+sid))
+            else:
+                from invenio.websession_model import Session
+                from datetime import datetime
+                s = Session.query.filter(db.and_(
+                    Session.session_key == sid,
+                    Session.session_expiry >= db.func.current_timestamp())).one()
+                data = self.serializer.loads(s.session_object)
+
+            session = self.session_class(data, sid=sid)
+            session['_uid'] = session.uid
+            session['uid'] = session.uid
+            session['user_info'] = session.user_info
+            current_app.logger.info("initilized session")
+            if session.check_ip(request):
+                return session
+        except Exception, err:
+            current_app.logger.warning("Detected error: %s" % err)
+            pass
+        except:
+            current_app.logger.warning("Error: loading session object")
         current_app.logger.info("returning empty session")
         return self.session_class(sid=sid)
 
     def save_session(self, app, session, response):
         current_app.logger.info("saving session %s" % session.sid)
         domain = self.get_cookie_domain(app)
+        from invenio.websession_model import Session
         if not session:
             current_app.logger.info("empty session detected. Deleting it")
-            run_sql("DELETE FROM session WHERE session_key=%s", (session.sid, ))
+            Session.query.filter(Session.session_key==session.sid).delete()
             response.delete_cookie(app.session_cookie_name,
                                     domain=domain)
             response.delete_cookie(app.session_cookie_name + 'stub',
@@ -172,23 +200,30 @@ class InvenioSessionInterface(SessionInterface):
             sid = self.generate_sid()
             ## And remove the cookie that has been set
             current_app.logger.info("... and delete previous one")
-            run_sql("DELETE FROM session WHERE session_key=%s", (session.sid, ))
+            if CFG_SESSION_USE_CACHE:
+                cache.delete(CFG_SESSION_KEY_PREFIX+sid)
+            else:
+                Session.query.filter(Session.session_key==session.sid).delete()
             response.delete_cookie(app.session_cookie_name, domain=domain)
             response.delete_cookie(app.session_cookie_name + 'stub',
                                    domain=domain)
             session.sid = sid
-        val = self.serializer.dumps(dict(session))
-        run_sql("""INSERT INTO session(
-                        session_key,
-                        session_expiry,
-                        session_object,
-                        uid
-                   ) VALUES(%s, %s, %s, %s)
-                        ON DUPLICATE KEY UPDATE
-                        session_expiry=%s,
-                        session_object=%s,
-                        uid=%s""",
-                (sid, session_expiry, val, uid, session_expiry, val, uid))
+        #FIXME REPLACE OR UPDATE
+        current_app.logger.info(str(dict(session)))
+        session['_uid'] = uid
+        session['user_info'] = session.user_info
+        if CFG_SESSION_USE_CACHE:
+            cache.set(CFG_SESSION_KEY_PREFIX+sid, self.serializer.dumps(dict(session)),
+                      timeout = 3600) #self.get_session_expiration_time(app, session))
+        else:
+            s = Session()
+            s.session_key = sid
+            s.session_expiry = session_expiry
+            s.session_object = self.serializer.dumps(dict(session))
+            s.uid = uid or -1
+            db.session.merge(s)
+            db.session.commit()
+
         if not CFG_SUPPORT_HTTPS:
             response.set_cookie(app.session_cookie_name, sid,
                                 expires=cookie_expiry, httponly=True,

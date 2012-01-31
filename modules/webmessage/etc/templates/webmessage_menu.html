@@ -1,0 +1,59 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+<ul class="dropdown-menu">
+  <li class="nav-header">{{ _('Messages') }}
+    <a class="pull-right" href="{{ url_for('yourmessages.add') }}">
+      {{ _('Write message') }}
+    </a>
+  </li>
+  <li class="divider"></li>
+  {% for m, um in messages %}
+  <li class="row">
+    {% set a_class = "span5 alert-info" if um.status == 'N' else "span5" %}
+    <a style="margin-bottom: 1px;" class="{{ a_class }}" href="{{ url_for('yourmessages.view', msgid=m.id) }}">
+      <div style="width: 100%; float: left;">
+        <div style="float:left; width: 30px; padding: 4px;">
+          <img src="http://placehold.it/30x30" alt="avatar"/>
+        </div>
+        <div style="margin-left: 38px;">
+          <strong>{{ m.user_from.nickname }}</strong>
+          <i class="pull-right">{{ m.received_date }}</i>
+          <br/>
+          <p>
+            {{ m.subject }} <small>{{ m.body[:50] }}</small>
+          </p>
+        </div>
+      </div>
+    </a>
+  </li>
+  {% else %}
+  <li class="row">
+    <strong class="span5" style="padding: 0 15px;">{{ _('Empty inbox') }}</strong>
+  </li>
+  {% endfor %}
+  <li class="divider"></li>
+  <li style="text-align: center;">
+    <a href="{{ url_for('yourmessages.index') }}">{{ _('See All Messages') }}</a>
+  </li>
+</ul>
+
+
+
+

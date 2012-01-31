@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -47,3 +45,5 @@ class HstBATCHUPLOAD(db.Model):
     batch_mode = db.Column(db.String(15), nullable=False)
     task = db.relationship(SchTASK, backref='batchuploads')
 
+
+__all__ = ['HstBATCHUPLOAD']

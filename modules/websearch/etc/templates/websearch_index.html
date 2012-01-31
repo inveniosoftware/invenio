@@ -1,0 +1,131 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% from "_formhelpers.html" import render_filter_form with context %}
+{% from "websearch_helpers.html" import collection_tree, portalbox_sidebar, search_also, search_form  with context %}
+{% extends "page.html" %}
+{% set title = collection.name_ln if collection.id > 1 else None %}
+
+{%- set portalboxes = dict() -%}
+{%- for k,l in collection.portalboxes_ln|groupby('position') -%}
+  {%- do portalboxes.update({k:l}) -%}
+{%- endfor -%}
+
+{% block title %}
+  {{ portalboxes.tp }}
+  {{ super() }}
+  {{ portalboxes.te }}
+{% endblock %}
+
+{% block body %}
+
+<style>
+.websearch .nav > li > a {
+  white-space: nowrap;
+}
+.websearch .nav > li > a:hover {
+  background-color: inherit;
+}
+.websearch ul.nav > li > ul {
+  clear: both;
+}
+.websearch ul.nav > li > ul > li {
+  display: inline;
+}
+.websearch ul.nav > li > ul > li > a {
+  display: inline;
+}
+.websearch .badge {
+  font-size: 80%;
+}
+
+.collection ul.nav-list {
+  padding-left: 0px;
+}
+
+.collection ul.nav-list ul.nav-list {
+  font-size: 90%;
+}
+
+.collection ul ul li a {
+  color: #333;
+  opacity: 0.8;
+}
+
+.collection .badge {
+  opacity:0.6;
+  font-size:80%;
+}
+</style>
+
+{{ search_form(collection) }}
+
+<div class="row websearch"><!-- row 2 -->
+  {{ portalbox_sidebar(portalboxes.lt, class="span2") }}
+
+  {% if collection.collection_children_r %}
+    <div class="span4 collection">
+      <h4>{{ _("Narrow by collections") }}</h4>
+      {{ collection_tree(collection.collection_children_r, limit=2, class="nav nav-list") }}
+    </div>
+  {% else %}
+      <div class="span{{ '8' if collection.collection_children_v else '10' }}">
+        {% for recid in collection.reclist %}
+          <div class="row-fluid">
+            <div class="span1">
+              <small style="font-size:70%;">
+                {{ get_creation_date(recid, fmt="%Y-%m-%d<br />%H:%i")|safe }}
+              </small>
+            </div>
+            <div class="span11">
+              {{ format_record(recid, 'hb', ln=g.ln)|safe }}
+                <p>
+                  <a href="{{ url_for('.search', recid=recid, ln=g.ln) }}">
+                    {{ _("Detailed record") }}
+                  </a>
+                   -
+                  <a href="{{ url_for('.search', p="recid:%d" % recid, rm='wrd', ln=ln) }}">
+                    {{ _("Similar records") }}
+                  </a>
+                </p>
+             </div>
+          </div>
+        {% endfor %}
+      </div>
+  {% endif %}
+
+  {% if collection.collection_children_v %}
+    <div class="span6 collection">
+      <h4>{{ _("Focus on") }}</h4>
+      {{ collection_tree(collection.collection_children_v, limit=2, class="nav nav-list") }}
+
+      {{ search_also(collection.externalcollections_2) }}
+    </div>
+  {% else %}
+      <div class="span2">
+        {{ search_also(collection.externalcollections_2) }}
+      </div>
+  {% endif %}
+
+  {{ portalbox_sidebar(portalboxes.rt, class="span2 pull-right") }}
+
+</div>
+
+<div style="clear: both;"></div>
+
+{% endblock %}

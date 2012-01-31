@@ -29,13 +29,20 @@ if sys.hexversion < 0x2040000:
     # pylint: enable=W0622
 
 from invenio.config import CFG_SITE_SECURE_URL
-from invenio.dbquery import run_sql
-from invenio.access_control_admin import acc_find_possible_roles, acc_is_user_in_role, CFG_SUPERADMINROLE_ID, acc_get_role_users
+from invenio.access_control_admin import \
+    acc_find_possible_roles,\
+    acc_is_user_in_role, \
+    acc_is_user_in_any_role, \
+    CFG_SUPERADMINROLE_ID, acc_get_role_users, \
+    acc_get_roles_emails
 from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS, CFG_WEBACCESS_MSGS
 from invenio.webuser import collect_user_info
 from invenio.access_control_firerole import deserialize, load_role_definition, acc_firerole_extract_emails
 from invenio.urlutils import make_canonical_urlargd
+from invenio.cache import cache
+from invenio.webuser_flask import current_user
 
+#@cache.memoize(3600)
 def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **arguments):
     """
     Given the request object (or the user_info dictionary, or the uid), checks
@@ -45,16 +52,20 @@ def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **argum
     authorization will be granted.
     Returns (0, msg) when the authorization is granted, (1, msg) when it's not.
     """
-    user_info = collect_user_info(req)
+    if type(req) is not int:
+        req = current_user.get_id()
+    user_info = collect_user_info(req) #FIXME
     roles = acc_find_possible_roles(name_action, always_add_superadmin=False, **arguments)
-    for id_role in roles:
-        if acc_is_user_in_role(user_info, id_role):
-            ## User belong to at least one authorized role.
-            return (0, CFG_WEBACCESS_WARNING_MSGS[0])
-    if acc_is_user_in_role(user_info, CFG_SUPERADMINROLE_ID):
-        ## User is SUPERADMIN
+    from flask import current_app
+    current_app.logger.info(user_info)
+    current_app.logger.info(roles)
+    roles.add(CFG_SUPERADMINROLE_ID)
+    if acc_is_user_in_any_role(user_info, roles):
+        ## User belong to at least one authorized role
+        ## or User is SUPERADMIN
         return (0, CFG_WEBACCESS_WARNING_MSGS[0])
-    if not roles:
+
+    if len(roles)<=1:
         ## No role is authorized for the given action/arguments
         if authorized_if_no_roles:
             ## User is authorized because no authorization exists for the given
@@ -63,6 +74,7 @@ def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **argum
         else:
             ## User is not authorized.
             return (20, CFG_WEBACCESS_WARNING_MSGS[20] % cgi.escape(name_action))
+
     ## User is not authorized
     in_a_web_request_p = bool(user_info['uri'])
     return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (in_a_web_request_p and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or "")))
@@ -80,11 +92,9 @@ def acc_get_authorized_emails(name_action, **arguments):
     @return: the list of authorized emails.
     @rtype: set of string
     """
-    authorized_emails = set()
     roles = acc_find_possible_roles(name_action, always_add_superadmin=False, **arguments)
+    authorized_emails = acc_get_roles_emails(roles)
     for id_role in roles:
-        for dummy1, email, dummy2 in acc_get_role_users(id_role):
-            authorized_emails.add(email.lower().strip())
         firerole = load_role_definition(id_role)
         authorized_emails = authorized_emails.union(acc_firerole_extract_emails(firerole))
     return authorized_emails

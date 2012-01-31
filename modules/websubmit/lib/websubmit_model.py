@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -66,11 +64,11 @@ class SbmAPPROVAL(db.Model):
     status = db.Column(db.String(10), nullable=False,
                 server_default='')
     dFirstReq = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     dLastReq = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     dAction = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     access = db.Column(db.String(20), nullable=False,
                 server_default='0')
     note = db.Column(db.Text, nullable=False)
@@ -183,22 +181,22 @@ class SbmCPLXAPPROVAL(db.Model):
     id_EdBoardGroup = db.Column(db.Integer(15, unsigned=True), nullable=False,
                 server_default='0')
     dFirstReq = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     dLastReq = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     dEdBoardSel = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     dRefereeSel = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     dRefereeRecom = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     dEdBoardRecom = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     dPubComRecom = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     dProjectLeaderAction = db.Column(db.DateTime,
                 nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
 
 
 class SbmFIELD(db.Model):
@@ -357,11 +355,11 @@ class SbmPUBLICATION(db.Model):
     status = db.Column(db.String(10), nullable=False,
                 server_default='')
     dFirstReq = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     dLastReq = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     dAction = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     accessref = db.Column(db.String(20), nullable=False,
                 server_default='')
     accessedi = db.Column(db.String(20), nullable=False,
@@ -373,11 +371,11 @@ class SbmPUBLICATION(db.Model):
     authoremail = db.Column(db.String(50), nullable=False,
                 server_default='')
     dRefSelection = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     dRefRec = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     dEdiRec = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     accessspo = db.Column(db.String(20), nullable=False,
                 server_default='')
     journal = db.Column(db.String(100), nullable=True)
@@ -456,10 +454,35 @@ class SbmSUBMISSIONS(db.Model):
     reference = db.Column(db.String(40), nullable=False,
                 server_default='')
     cd = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     md = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     log_id = db.Column(db.Integer(11), nullable=False,
                 primary_key=True,
                 autoincrement=True)
 
+
+__all__ = ['SbmACTION',
+           'SbmALLFUNCDESCR',
+           'SbmAPPROVAL',
+           'SbmCATEGORIES',
+           'SbmCHECKS',
+           'SbmCOLLECTION',
+           'SbmCOLLECTIONSbmCOLLECTION',
+           'SbmDOCTYPE',
+           'SbmCOLLECTIONSbmDOCTYPE',
+           'SbmCOOKIES',
+           'SbmCPLXAPPROVAL',
+           'SbmFIELD',
+           'SbmFIELDDESC',
+           'SbmFORMATEXTENSION',
+           'SbmFUNCTIONS',
+           'SbmFUNDESC',
+           'SbmGFILERESULT',
+           'SbmIMPLEMENT',
+           'SbmPARAMETERS',
+           'SbmPUBLICATION',
+           'SbmPUBLICATIONCOMM',
+           'SbmPUBLICATIONDATA',
+           'SbmREFEREES',
+           'SbmSUBMISSIONS']

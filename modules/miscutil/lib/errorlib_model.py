@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -40,12 +38,14 @@ class HstEXCEPTION(db.Model):
     filename = db.Column(db.String(255), nullable=True)
     line = db.Column(db.Integer(9), nullable=True)
     last_seen = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     last_notified = db.Column(db.DateTime, nullable=False, 
-            server_default='0000-00-00 00:00:00')
+            server_default='0001-01-01 00:00:00')
     counter = db.Column(db.Integer(15), nullable=False,
                 server_default='0')
     total = db.Column(db.Integer(15), nullable=False,
                 server_default='0')
 
 
+
+__all__ = ['HstEXCEPTION']

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com>
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -28,8 +26,8 @@ from invenio.sqlalchemyutils import db
 
 # Create your models here.
 
-from websession_model import User
-from bibedit_model import Bibrec
+from invenio.websession_model import User
+from invenio.bibedit_model import Bibrec
 
 class SwrREMOTESERVER(db.Model):
     """Represents a SwrREMOTESERVER record."""
@@ -76,11 +74,11 @@ class SwrCLIENTDATA(db.Model):
     xml_metadata_submit = db.Column(db.iLargeBinary,
                 nullable=False)
     submission_date = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     publication_date = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     removal_date = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     link_medias = db.Column(db.String(150), nullable=False)
     link_metadata = db.Column(db.String(150), nullable=False)
     link_status = db.Column(db.String(150), nullable=False)
@@ -91,3 +89,6 @@ class SwrCLIENTDATA(db.Model):
                 backref='clientdata')
     user = db.relationship(User, backref='clientdata')
     bibrec = db.relationship(Bibrec)
+
+__all__ = ['SwrREMOTESERVER',
+           'SwrCLIENTDATA']

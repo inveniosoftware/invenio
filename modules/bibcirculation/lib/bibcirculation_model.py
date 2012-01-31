@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com>
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -46,9 +44,9 @@ class CrcBORROWER(db.Model):
     address = db.Column(db.String(60), nullable=True)
     mailbox = db.Column(db.String(30), nullable=True)
     borrower_since = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     borrower_until = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     notes = db.Column(db.Text, nullable=True)
 
 class CrcLIBRARY(db.Model):
@@ -92,9 +90,9 @@ class CrcITEM(db.Model):
     status = db.Column(db.String(20), nullable=False,
                 server_default='')
     creation_date = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     modification_date = db.Column(db.DateTime, nullable=False,
-            server_default='0000-00-00 00:00:00')
+            server_default='0001-01-01 00:00:00')
     number_of_requests = db.Column(db.Integer(3, unsigned=True),
                 nullable=False,
                                 server_default='0')
@@ -116,23 +114,23 @@ class CrcILLREQUEST(db.Model):
                      server_default='')
     period_of_interest_from = db.Column(db.DateTime,
                 nullable=False,
-            server_default='0000-00-00 00:00:00')
+            server_default='0001-01-01 00:00:00')
     period_of_interest_to = db.Column(db.DateTime,
                 nullable=False,
-            server_default='0000-00-00 00:00:00')
+            server_default='0001-01-01 00:00:00')
     id_crcLIBRARY = db.Column(db.Integer(15, unsigned=True),
             db.ForeignKey(CrcLIBRARY.id), nullable=False,
                 server_default='0')
     request_date = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     expected_date = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     arrival_date = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     due_date = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     return_date = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     status = db.Column(db.String(20), nullable=False,
                 server_default='')
     cost = db.Column(db.String(30), nullable=False,
@@ -163,18 +161,18 @@ class CrcLOAN(db.Model):
     barcode = db.Column(db.String(30), db.ForeignKey(CrcITEM.barcode), nullable=False,
                 server_default='')
     loaned_on = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     returned_on = db.Column(db.Date, nullable=False,
                 server_default='0000-00-00')
     due_date = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+                server_default='0001-01-01 00:00:00')
     number_of_renewals = db.Column(db.Integer(3, unsigned=True), nullable=False,
                 server_default='0')
     overdue_letter_number = db.Column(db.Integer(3, unsigned=True), nullable=False,
                 server_default='0')
     overdue_letter_date = db.Column(db.DateTime,
                 nullable=False,
-        server_default='0000-00-00 00:00:00')
+                server_default='0001-01-01 00:00:00')
     status = db.Column(db.String(20), nullable=False,
                 server_default='')
     type = db.Column(db.String(20), nullable=False,
@@ -200,15 +198,15 @@ class CrcLOANREQUEST(db.Model):
                 server_default='')
     period_of_interest_from = db.Column(db.DateTime,
                 nullable=False,
-            server_default='0000-00-00 00:00:00')
+                server_default='0001-01-01 00:00:00')
     period_of_interest_to = db.Column(db.DateTime,
                 nullable=False,
-            server_default='0000-00-00 00:00:00')
+                server_default='0001-01-01 00:00:00')
     status = db.Column(db.String(20), nullable=False,
                 server_default='')
     notes = db.Column(db.Text, nullable=True)
     request_date = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+                server_default='0001-01-01 00:00:00')
     borrower = db.relationship(CrcBORROWER, backref='loanrequests')
     bibrec = db.relationship(Bibrec, backref='loanrequests')
     item = db.relationship(CrcITEM, backref='loanrequests')
@@ -244,9 +242,9 @@ class CrcPURCHASE(db.Model):
     id_crcVENDOR = db.Column(db.Integer(15, unsigned=True),
                 db.ForeignKey(CrcVENDOR.id), nullable=False, server_default='0')
     ordered_date = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+                server_default='0001-01-01 00:00:00')
     expected_date = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+                server_default='0001-01-01 00:00:00')
     price = db.Column(db.String(20), nullable=False,
                 server_default='0')
     status = db.Column(db.String(20), nullable=False,
@@ -256,5 +254,11 @@ class CrcPURCHASE(db.Model):
     vendor = db.relationship(CrcVENDOR, backref='purchases')
 
 
-
-
+__all__ = ['CrcBORROWER',
+           'CrcLIBRARY',
+           'CrcITEM',
+           'CrcILLREQUEST',
+           'CrcLOAN',
+           'CrcLOANREQUEST',
+           'CrcVENDOR',
+           'CrcPURCHASE']

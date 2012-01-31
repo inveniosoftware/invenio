@@ -20,6 +20,7 @@ SUBDIRS = upgrades
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = __init__.py \
+             cache.py \
              errorlib.py \
              errorlib_unit_tests.py \
              errorlib_model.py \
@@ -51,6 +52,7 @@ pylib_DATA = __init__.py \
              inveniocfg_upgrader_unit_tests.py \
              invenio_connector.py \
              invenio_connector_regression_tests.py \
+             jinja2utils.py \
              urlutils.py \
              urlutils_unit_tests.py \
              w3c_validator.py \
@@ -88,7 +90,8 @@ pylib_DATA = __init__.py \
              jsonutils_unit_tests.py \
              sequtils_cnum.py \
              sequtils.py \
-             sequtils_regression_tests.py
+             sequtils_regression_tests.py \
+	     wtforms_utils.py
 
 noinst_DATA = testimport.py \
               kwalitee.py \

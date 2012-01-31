@@ -41,6 +41,7 @@ Options to set up and test a demo site:
    --run-unit-tests         run unit test suite (needs demo site)
    --run-regression-tests   run regression test suite (needs demo site)
    --run-web-tests          run web tests in a browser (needs demo site, Firefox, Selenium IDE)
+   --run-flask-tests        run Flask test suite
 
 Options to update config files in situ:
    --update-all             perform all the update options
@@ -726,20 +727,38 @@ def cli_cmd_load_webstat_conf(conf):
         sys.exit(1)
     print ">>> WebStat config load successfully."
 
+
 def cli_cmd_drop_tables(conf):
     """Drop Invenio DB tables.  Useful for the uninstallation process."""
-    print ">>> Going to drop tables..."
+    print ">>> Going to drop tables and related data on filesystem ..."
     from invenio.config import CFG_PREFIX
     from invenio.textutils import wrap_text_in_a_box, wait_for_user
     from invenio.webstat import destroy_customevents
     wait_for_user(wrap_text_in_a_box("""WARNING: You are going to destroy
-your database tables!"""))
+your database tables and related data on filesystem!"""))
     msg = destroy_customevents()
     if msg:
         print msg
-    cmd = "%s/bin/dbexec < %s/lib/sql/invenio/tabdrop.sql" % (CFG_PREFIX, CFG_PREFIX)
-    if os.system(cmd):
-        print "ERROR: failed execution of", cmd
+
+    import shutil
+    from invenio.bibdocfile import _make_base_dir
+    from invenio.sqlalchemyutils import db, load_all_model_files
+    from sqlalchemy import event
+    db.init_invenio()
+    db.console()
+
+    def bibdoc_before_drop(target, connection, **kw):
+        for (docid,) in db.session.query(target.c.id).all():
+            shutil.rmtree(_make_base_dir(docid))
+
+    try:
+        from invenio.bibrecord_model import Bibdoc
+        event.listen(Bibdoc.__table__, "before_drop", bibdoc_before_drop)
+
+        modules = load_all_model_files()
+        db.drop_all()
+    except:
+        print "ERROR: failed execution of DROP ALL"
         sys.exit(1)
     print ">>> Tables dropped successfully."
 
@@ -842,6 +861,11 @@ def cli_cmd_run_web_tests(conf):
     from invenio.testutils import build_and_run_web_test_suite
     if not build_and_run_web_test_suite():
         sys.exit(1)
+
+def cli_cmd_run_flask_tests(conf):
+    """Run flask tests."""
+    from invenio.testutils import build_and_run_flask_test_suite
+    build_and_run_flask_test_suite()
 
 def _detect_ip_address():
     """Detect IP address of this computer.  Useful for creating Apache
@@ -1528,6 +1552,8 @@ def main(*cmd_args):
                 cli_cmd_run_regression_tests(conf)
             elif action == 'run-web-tests':
                 cli_cmd_run_web_tests(conf)
+            elif action == 'run-flask-tests':
+                cli_cmd_run_flask_tests(conf)
             elif action == 'update-all':
                 cli_cmd_update_config_py(conf)
                 cli_cmd_update_dbquery_py(conf)

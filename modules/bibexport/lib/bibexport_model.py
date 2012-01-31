@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -48,7 +46,7 @@ class ExpJOB(db.Model):
     deleted = db.Column(db.MediumInteger(12), nullable=False,
                 server_default='0')
     lastrun = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     output_directory = db.Column(db.Text, nullable=True)
     #users = db.relationship(User, secondary=UserExpJOB.__table__,
     #            backref='jobs')
@@ -76,7 +74,7 @@ class ExpJOBRESULT(db.Model):
     id_expJOB = db.Column(db.Integer(15), db.ForeignKey(ExpJOB.id),
                 nullable=False)
     execution_time = db.Column(db.DateTime, nullable=False,
-        server_default='0000-00-00 00:00:00')
+        server_default='0001-01-01 00:00:00')
     status = db.Column(db.MediumInteger(12), nullable=False,
                 server_default='0')
     status_message = db.Column(db.Text, nullable=False)
@@ -155,3 +153,9 @@ EXPJOBRESULT_EXPQUERYRESULT = db.Table('expJOBRESULT_expQUERYRESULT', db.metadat
 )
 
 
+
+__all__ = ['ExpJOB',
+           'UserExpJOB',
+           'ExpJOBRESULT',
+           'ExpQUERY',
+           'ExpQUERYRESULT']

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-## Author: Jiri Kuncar <jiri.kuncar@gmail.com> 
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012 CERN.
 ##
@@ -35,7 +33,9 @@ class XtrJOB(db.Model):
 
     __tablename__ = 'xtrJOB'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    name = db.Column(db.String, nullable=False)
+    id = db.Column(db.Integer(4), primary_key=True, nullable=False)
+    name = db.Column(db.String(30), nullable=False)
     last_updated = db.Column(db.DateTime, nullable=False)
 
+
+__all__ = ['XtrJOB']
