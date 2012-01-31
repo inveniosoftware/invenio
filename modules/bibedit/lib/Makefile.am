@@ -35,6 +35,7 @@ pylib_DATA = bibrecord_config.py \
              bibeditcli.py \
              bibedit_utils.py \
              bibedit_webinterface.py \
+             bibedit_web_tests.py \
              bibeditmulti_templates.py \
              bibeditmulti_webinterface.py \
              bibeditmulti_engine.py
