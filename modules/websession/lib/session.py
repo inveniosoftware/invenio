@@ -37,6 +37,7 @@ if sys.hexversion < 0x2060000:
 else:
     from hashlib import md5
 
+from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.dbquery import run_sql, blob_to_string
 from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
     CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT, CFG_SITE_URL, CFG_SITE_SECURE_URL
@@ -229,8 +230,9 @@ class InvenioSession(dict):
             }
             session_key = self._sid
             session_object = cPickle.dumps(session_dict, -1)
-            session_expiry = time.time() + self._timeout + \
-                CFG_WEBSESSION_ONE_DAY
+            session_expiry = time.time() + self._timeout + CFG_WEBSESSION_ONE_DAY
+            session_expiry = convert_datestruct_to_datetext(time.gmtime(session_expiry))
+
             uid = self.get('uid', -1)
             run_sql("""
                 INSERT session(
@@ -389,7 +391,7 @@ class InvenioSession(dict):
             """
             run_sql("""
                 DELETE FROM session
-                WHERE session_expiry<=UNIX_TIMESTAMP()
+                WHERE session_expiry<=UTC_TIMESTAMP()
             """)
         self._req.register_cleanup(session_cleanup)
         self._req.log_error("InvenioSession: registered database cleanup.")
