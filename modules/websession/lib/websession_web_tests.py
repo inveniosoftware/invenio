@@ -28,6 +28,19 @@ from invenio.testutils import make_test_suite, \
 class InvenioWebSessionWebTest(InvenioWebTestCase):
     """WebSession web tests."""
 
+    def _delete_messages(self):
+        """Delete all messages from users inbox"""
+
+        self.find_element_by_link_text_with_timeout("Personalize")
+        self.browser.find_element_by_link_text("Personalize").click()
+        self.find_element_by_link_text_with_timeout("Your Messages")
+        self.browser.find_element_by_link_text("Your Messages").click()
+        self.find_element_by_xpath_with_timeout("//input[@name='del_all' and @value='Delete All']")
+        self.browser.find_element_by_xpath("//input[@name='del_all' and @value='Delete All']").click()
+        self.handle_popup_dialog()
+        self.find_element_by_xpath_with_timeout("//input[@value='Yes']")
+        self.browser.find_element_by_xpath("//input[@value='Yes']").click()
+
     def test_create_group(self):
         """websession - web test create a group"""
 
@@ -54,13 +67,14 @@ class InvenioWebSessionWebTest(InvenioWebTestCase):
         self.find_element_by_name_with_timeout("delete")
         self.browser.find_element_by_name("delete").click()
         self.page_source_test(expected_text='You have successfully deleted a group.')
+        self._delete_messages()
         self.logout()
 
     def test_message_group(self):
         """websession - web test send a message to any group"""
 
         self.browser.get(CFG_SITE_SECURE_URL)
-        # login as romeo
+        # login as juliet
         self.login(username="juliet", password="j123uliet")
         self.find_element_by_link_text_with_timeout("Personalize")
         self.browser.find_element_by_link_text("Personalize").click()
@@ -79,7 +93,9 @@ class InvenioWebSessionWebTest(InvenioWebTestCase):
         self.fill_textbox("msg_body", "hello")
         self.find_element_by_name_with_timeout("send_button")
         self.browser.find_element_by_name("send_button").click()
+        self._delete_messages()
         self.logout()
+        # login as romeo
         self.login(username="romeo", password="r123omeo")
         self.find_element_by_link_text_with_timeout("Your Messages")
         self.browser.find_element_by_link_text("Your Messages").click()
@@ -94,7 +110,7 @@ class InvenioWebSessionWebTest(InvenioWebTestCase):
         """websession - web test create an open group and join it"""
 
         self.browser.get(CFG_SITE_SECURE_URL)
-        # login as romeo
+        # login as juliet
         self.login(username="juliet", password="j123uliet")
         self.find_element_by_link_text_with_timeout("Personalize")
         self.browser.find_element_by_link_text("Personalize").click()
@@ -109,6 +125,7 @@ class InvenioWebSessionWebTest(InvenioWebTestCase):
         self.browser.find_element_by_name("create_button").click()
         self.handle_popup_dialog()
         self.logout()
+        # login as romeo
         self.login(username="romeo", password="r123omeo")
         self.find_element_by_link_text_with_timeout("Your Groups")
         self.browser.find_element_by_link_text("Your Groups").click()
@@ -119,6 +136,7 @@ class InvenioWebSessionWebTest(InvenioWebTestCase):
         self.browser.find_element_by_name("join_button").click()
         self.handle_popup_dialog()
         self.logout()
+        # login as hyde
         self.login(username="hyde", password="h123yde")
         self.find_element_by_link_text_with_timeout("Your Groups")
         self.browser.find_element_by_link_text("Your Groups").click()
@@ -129,6 +147,7 @@ class InvenioWebSessionWebTest(InvenioWebTestCase):
         self.browser.find_element_by_name("join_button").click()
         self.handle_popup_dialog()
         self.logout()
+        # login as romeo
         self.login(username="romeo", password="r123omeo")
         self.find_element_by_link_text_with_timeout("Your Groups")
         self.browser.find_element_by_link_text("Your Groups").click()
@@ -141,6 +160,7 @@ class InvenioWebSessionWebTest(InvenioWebTestCase):
         self.find_element_by_name_with_timeout("leave_button")
         self.browser.find_element_by_name("leave_button").click()
         self.logout()
+        # login as juliet
         self.login(username="juliet", password="j123uliet")
         self.find_element_by_link_text_with_timeout("Your Groups")
         self.browser.find_element_by_link_text("Your Groups").click()
@@ -150,13 +170,18 @@ class InvenioWebSessionWebTest(InvenioWebTestCase):
         self.browser.find_element_by_name("delete").click()
         self.find_element_by_name_with_timeout("delete")
         self.browser.find_element_by_name("delete").click()
+        self._delete_messages()
+        self.logout()
+        # login as hyde
+        self.login(username="hyde", password="h123yde")
+        self._delete_messages()
         self.logout()
 
     def test_set_group(self):
         """websession - web test set group"""
 
         self.browser.get(CFG_SITE_SECURE_URL)
-        # login as romeo
+        # login as juliet
         self.login(username="juliet", password="j123uliet")
         self.find_element_by_link_text_with_timeout("Personalize")
         self.browser.find_element_by_link_text("Personalize").click()
@@ -171,6 +196,7 @@ class InvenioWebSessionWebTest(InvenioWebTestCase):
         self.browser.find_element_by_name("create_button").click()
         self.handle_popup_dialog()
         self.logout()
+        # login as romeo
         self.login(username="romeo", password="r123omeo")
         self.find_element_by_link_text_with_timeout("Your Groups")
         self.browser.find_element_by_link_text("Your Groups").click()
@@ -184,6 +210,7 @@ class InvenioWebSessionWebTest(InvenioWebTestCase):
         self.find_element_by_name_with_timeout("join_button")
         self.browser.find_element_by_name("join_button").click()
         self.logout()
+        # login as juliet
         self.login(username="juliet", password="j123uliet")
         self.find_element_by_link_text_with_timeout("Your Messages")
         self.browser.find_element_by_link_text("Your Messages").click()
@@ -202,15 +229,11 @@ class InvenioWebSessionWebTest(InvenioWebTestCase):
         self.browser.find_element_by_name("delete").click()
         self.find_element_by_name_with_timeout("delete")
         self.browser.find_element_by_name("delete").click()
+        self._delete_messages()
         self.logout()
+        # login as romeo
         self.login(username="romeo", password="r123omeo")
-        self.find_element_by_link_text_with_timeout("Your Messages")
-        self.browser.find_element_by_link_text("Your Messages").click()
-        self.find_element_by_xpath_with_timeout("//input[@name='del_all' and @value='Delete All']")
-        self.browser.find_element_by_xpath("//input[@name='del_all' and @value='Delete All']").click()
-        self.handle_popup_dialog()
-        self.find_element_by_xpath_with_timeout("//input[@value='Yes']")
-        self.browser.find_element_by_xpath("//input[@value='Yes']").click()
+        self._delete_messages()
         self.logout()
 
 TEST_SUITE = make_test_suite(InvenioWebSessionWebTest, )
