@@ -90,13 +90,15 @@ class InvenioWebSubmitWebTest(InvenioWebTestCase):
     def test_submit_book_approval(self):
         """websubmit - web test submit a book approval"""
 
+        import time
+        year = time.localtime().tm_year
         self.browser.get(CFG_SITE_SECURE_URL)
         # login as hyde
         self.login(username="hyde", password="h123yde")
         self.browser.get(CFG_SITE_SECURE_URL + "/yourapprovals.py")
         self.page_source_test(expected_text='You are not authorized to use approval system.')
         self.browser.get(CFG_SITE_SECURE_URL + "/publiline.py?doctype=DEMOBOO")
-        self.browser.find_element_by_link_text("DEMO-BOOK-2011-001").click()
+        self.browser.find_element_by_link_text("DEMO-BOOK-%s-001" % str(year)).click()
         self.page_source_test(unexpected_text='As a referee for this document, you may click this button to approve or reject it')
         self.logout()
         # login as dorian
@@ -107,7 +109,7 @@ class InvenioWebSubmitWebTest(InvenioWebTestCase):
         self.find_element_by_link_text_with_timeout("You are a general referee")
         self.browser.find_element_by_link_text("You are a general referee").click()
         self.page_source_test(expected_text='DEMO-BOOK-')
-        self.browser.find_element_by_link_text("DEMO-BOOK-2011-001").click()
+        self.browser.find_element_by_link_text("DEMO-BOOK-%s-001" % str(year)).click()
         self.page_source_test(expected_text=['Approval and Refereeing Workflow', \
                                              'The record you are trying to access', \
                                              'It is currently restricted for security reasons'])
