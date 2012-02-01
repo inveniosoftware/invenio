@@ -28,13 +28,12 @@ from invenio.testutils import make_test_suite, \
 class InvenioBibHarvestWebTest(InvenioWebTestCase):
     """BibHarvest web tests."""
 
-    def test_insert_oai_sourse(self):
+    def test_insert_oai_source(self):
         """bibharvest - web test insert oai source"""
 
         self.browser.get(CFG_SITE_SECURE_URL)
         # login as admin
         self.login(username="admin", password="")   
-        
         self.find_element_by_link_text_with_timeout("Administration")
         self.browser.find_element_by_link_text("Administration").click()
         self.find_element_by_link_text_with_timeout("Configure OAI Harvest")
@@ -61,6 +60,11 @@ class InvenioBibHarvestWebTest(InvenioWebTestCase):
         self.find_element_by_link_text_with_timeout("Go back to the OAI sources overview")
         self.browser.find_element_by_link_text("Go back to the OAI sources overview").click()
         self.page_source_test(expected_text='AtlantisOAI')
+        self.find_element_by_link_text_with_timeout("delete")
+        self.browser.find_element_by_link_text("delete").click()
+        self.browser.find_element_by_class_name("adminbutton").click()
+        self.find_element_by_link_text_with_timeout("Go back to the OAI sources overview")
+        self.browser.find_element_by_link_text("Go back to the OAI sources overview").click()
         self.logout()
 
 TEST_SUITE = make_test_suite(InvenioBibHarvestWebTest, )
