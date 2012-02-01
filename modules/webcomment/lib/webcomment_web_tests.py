@@ -60,6 +60,22 @@ class InvenioWebCommentWebTest(InvenioWebTestCase):
         self.browser.find_element_by_link_text("Back to record").click()
         self.page_source_test(expected_text=['juliet', 'This is a test reply.'])
         self.logout()
+        # login as romeo
+        self.login(username="romeo", password="r123omeo")
+        self.browser.get(CFG_SITE_SECURE_URL + "/record/1")
+        self.find_element_by_partial_link_text_with_timeout("Discussion")
+        self.browser.find_element_by_partial_link_text("Discussion").click()
+        self.find_element_by_link_text_with_timeout("Delete comment")
+        self.browser.find_element_by_link_text("Delete comment").click()
+        self.logout()
+        # login as juliet
+        self.login(username="juliet", password="j123uliet")
+        self.browser.get(CFG_SITE_SECURE_URL+"/record/1")
+        self.find_element_by_partial_link_text_with_timeout("Discussion")
+        self.browser.find_element_by_partial_link_text("Discussion").click()
+        self.find_element_by_link_text_with_timeout("Delete comment")
+        self.browser.find_element_by_link_text("Delete comment").click()
+        self.logout()
 
     def test_add_review(self):
         """webcomment - web test add a new review"""
@@ -131,6 +147,14 @@ class InvenioWebCommentWebTest(InvenioWebTestCase):
         self.find_element_by_link_text_with_timeout("Report abuse")
         self.browser.find_element_by_link_text("Report abuse").click()
         self.page_source_test(expected_text='please login')
+        # login as romeo
+        self.login(username="romeo", password="r123omeo")
+        self.browser.get(CFG_SITE_SECURE_URL + "/record/2")
+        self.find_element_by_partial_link_text_with_timeout("Discussion")
+        self.browser.find_element_by_partial_link_text("Discussion").click()
+        self.find_element_by_link_text_with_timeout("Delete comment")
+        self.browser.find_element_by_link_text("Delete comment").click()
+        self.logout()
 
 TEST_SUITE = make_test_suite(InvenioWebCommentWebTest, )
 
