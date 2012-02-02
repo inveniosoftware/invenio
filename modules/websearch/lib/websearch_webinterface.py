@@ -113,6 +113,7 @@ from invenio.bibdocfile_webinterface import WebInterfaceManageDocFilesPages, Web
 from invenio.bibfield import get_record
 from invenio.shellutils import mymkdir
 from invenio.websearch_yoursearches import perform_request_yoursearches_display
+from invenio.webstat import register_customevent
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -1210,8 +1211,9 @@ class WebInterfaceYourSearchesPages(WebInterfaceDirectory):
 
     _exports = ['', 'display']
 
-    def index(self, req, form):
+    def index(self, req, dummy):
         """
+        Redirects the user to the display page.
         """
         redirect_to_url(req, '%s/yoursearches/display' % CFG_SITE_SECURE_URL)
 

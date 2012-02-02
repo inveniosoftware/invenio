@@ -5092,8 +5092,6 @@ class Template:
                                   step,
                                   paging_navigation,
                                   p,
-                                  guest,
-                                  guesttxt,
                                   ln=CFG_SITE_LANG):
         """
         Template for the display the user's search history.
@@ -5256,8 +5254,7 @@ class Template:
   <tbody>
     %(yoursearches)s
   </tbody>
-</table>""" % {'header': _('Search details'),
-               'footer': footer,
+</table>""" % {'footer': footer,
                'yoursearches': yoursearches}
 
         return out
@@ -5283,51 +5280,51 @@ def get_html_user_friendly_search_query_args(args,
     _ = gettext_set_language(ln)
 
     # Arguments dictionary
-    dict = parse_qs(args)
+    args_dict = parse_qs(args)
 
-    if not dict.has_key('p') and not dict.has_key('p1') and not dict.has_key('p2') and not dict.has_key('p3'):
+    if not args_dict.has_key('p') and not args_dict.has_key('p1') and not args_dict.has_key('p2') and not args_dict.has_key('p3'):
         search_patterns_html = _('Search for everything')
     else:
         search_patterns_html = _('Search for') + ' '
-        if dict.has_key('p'):
-            search_patterns_html += '<strong>' + cgi.escape(dict['p'][0]) + '</strong>'
-            if dict.has_key('f'):
-                search_patterns_html += ' ' + _('as') + ' ' + '<strong>' + cgi.escape(dict['f'][0]) + '</strong>'
-        if dict.has_key('p1'):
-            if dict.has_key('p'):
+        if args_dict.has_key('p'):
+            search_patterns_html += '<strong>' + cgi.escape(args_dict['p'][0]) + '</strong>'
+            if args_dict.has_key('f'):
+                search_patterns_html += ' ' + _('as') + ' ' + '<strong>' + cgi.escape(args_dict['f'][0]) + '</strong>'
+        if args_dict.has_key('p1'):
+            if args_dict.has_key('p'):
                 search_patterns_html += ' ' + _('and') + ' '
-            search_patterns_html += '<strong>' + cgi.escape(dict['p1'][0]) + '</strong>'
-            if dict.has_key('f1'):
-                search_patterns_html += ' ' + _('as') + ' ' + '<strong>' + cgi.escape(dict['f1'][0]) + '</strong>'
-        if dict.has_key('p2'):
-            if dict.has_key('p') or dict.has_key('p1'):
-                if dict.has_key('op1'):
-                    search_patterns_html += ' %s ' % (dict['op1'][0] == 'a' and _('and') or \
-                                                      dict['op1'][0] == 'o' and _('or') or \
-                                                      dict['op1'][0] == 'n' and _('and not') or
+            search_patterns_html += '<strong>' + cgi.escape(args_dict['p1'][0]) + '</strong>'
+            if args_dict.has_key('f1'):
+                search_patterns_html += ' ' + _('as') + ' ' + '<strong>' + cgi.escape(args_dict['f1'][0]) + '</strong>'
+        if args_dict.has_key('p2'):
+            if args_dict.has_key('p') or args_dict.has_key('p1'):
+                if args_dict.has_key('op1'):
+                    search_patterns_html += ' %s ' % (args_dict['op1'][0] == 'a' and _('and') or \
+                                                      args_dict['op1'][0] == 'o' and _('or') or \
+                                                      args_dict['op1'][0] == 'n' and _('and not') or
                                                       ', ',)
-            search_patterns_html += '<strong>' + cgi.escape(dict['p2'][0]) + '</strong>'
-            if dict.has_key('f2'):
-                search_patterns_html += ' ' + _('as') + ' ' + '<strong>' + cgi.escape(dict['f2'][0]) + '</strong>'
-        if dict.has_key('p3'):
-            if dict.has_key('p') or dict.has_key('p1') or dict.has_key('p2'):
-                if dict.has_key('op2'):
-                    search_patterns_html += ' %s ' % (dict['op2'][0] == 'a' and _('and') or \
-                                                      dict['op2'][0] == 'o' and _('or') or \
-                                                      dict['op2'][0] == 'n' and _('and not') or
+            search_patterns_html += '<strong>' + cgi.escape(args_dict['p2'][0]) + '</strong>'
+            if args_dict.has_key('f2'):
+                search_patterns_html += ' ' + _('as') + ' ' + '<strong>' + cgi.escape(args_dict['f2'][0]) + '</strong>'
+        if args_dict.has_key('p3'):
+            if args_dict.has_key('p') or args_dict.has_key('p1') or args_dict.has_key('p2'):
+                if args_dict.has_key('op2'):
+                    search_patterns_html += ' %s ' % (args_dict['op2'][0] == 'a' and _('and') or \
+                                                      args_dict['op2'][0] == 'o' and _('or') or \
+                                                      args_dict['op2'][0] == 'n' and _('and not') or
                                                       ', ',)
-            search_patterns_html += '<strong>' + cgi.escape(dict['p3'][0]) + '</strong>'
-            if dict.has_key('f3'):
-                search_patterns_html += ' ' + _('as') + ' ' + '<strong>' + cgi.escape(dict['f3'][0]) + '</strong>'
+            search_patterns_html += '<strong>' + cgi.escape(args_dict['p3'][0]) + '</strong>'
+            if args_dict.has_key('f3'):
+                search_patterns_html += ' ' + _('as') + ' ' + '<strong>' + cgi.escape(args_dict['f3'][0]) + '</strong>'
 
-    if not dict.has_key('c') and not dict.has_key('cc'):
+    if not args_dict.has_key('c') and not args_dict.has_key('cc'):
         collections_html = _('in all the collections')
     else:
         collections_html = _('in the following collection(s)') + ': '
-        if dict.has_key('c'):
-            collections_html += ', '.join('<strong>' + cgi.escape(collection) + '</strong>' for collection in dict['c'])
-        elif dict.has_key('cc'):
-            collections_html += '<strong>' + cgi.escape(dict['cc'][0]) + '</strong>'
+        if args_dict.has_key('c'):
+            collections_html += ', '.join('<strong>' + cgi.escape(collection) + '</strong>' for collection in args_dict['c'])
+        elif args_dict.has_key('cc'):
+            collections_html += '<strong>' + cgi.escape(args_dict['cc'][0]) + '</strong>'
 
     search_query_args_html = search_patterns_html + '<br />' + collections_html
 
@@ -5373,9 +5370,9 @@ def get_html_user_friendly_date_from_datetext(given_date,
     if given_date_datestruct[0] != 0 and \
        given_date_datestruct[1] != 0 and \
        given_date_datestruct[2] != 0:
-        days_old = (today - datetime_date(given_date_datestruct.tm_year,
-                                          given_date_datestruct.tm_mon,
-                                          given_date_datestruct.tm_mday)).days
+        days_old = (today - datetime_date(given_date_datestruct[0],
+                                          given_date_datestruct[1],
+                                          given_date_datestruct[2])).days
         if days_old == 0:
             out = _('Today')
         elif days_old < 7:
