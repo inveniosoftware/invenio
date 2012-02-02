@@ -40,6 +40,7 @@ pylib_DATA = __init__.py \
              Insert_Record.py \
              Is_Original_Submitter.py \
              Is_Referee.py \
+             Link_Records.py \
              Mail_Approval_Request_to_Committee_Chair.py \
              Mail_Approval_Request_to_Referee.py \
              Mail_Approval_Withdrawn_to_Referee.py \

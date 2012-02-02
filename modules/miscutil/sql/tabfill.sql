@@ -363,6 +363,7 @@ INSERT INTO tag VALUES (140,'comment','500__a');
 INSERT INTO tag VALUES (141,'title','245__a');
 INSERT INTO tag VALUES (142,'main abstract','245__a');
 INSERT INTO tag VALUES (143,'internal notes','595__a');
+INSERT INTO tag VALUES (144,'other relationship entry', '787%');
 
 INSERT INTO idxINDEX VALUES (1,'global','This index contains words/phrases from global fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (2,'collection','This index contains words/phrases from collection identifiers fields.','0000-00-00 00:00:00', '');
@@ -457,6 +458,7 @@ INSERT INTO sbmALLFUNCDESCR VALUES ('Move_CKEditor_Files_to_Storage','Transfer f
 INSERT INTO sbmALLFUNCDESCR VALUES ('Create_Upload_Files_Interface','Display generic interface to add/revise/delete files. To be used before function "Move_Uploaded_Files_to_Storage"');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Move_Uploaded_Files_to_Storage','Attach files uploaded with "Create_Upload_Files_Interface"');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Move_Photos_to_Storage','Attach/edit the pictures uploaded with the "create_photos_manager_interface()" function');
+INSERT INTO sbmALLFUNCDESCR VALUES ('Link_Records','Link two records toghether via MARC')
 
 INSERT INTO sbmFIELDDESC VALUES ('Upload_Photos',NULL,'','R',NULL,NULL,NULL,NULL,NULL,'\"\"\"\r\nThis is an example of element that creates a photos upload interface.\r\nClone it, customize it and integrate it into your submission. Then add function \r\n\'Move_Photos_to_Storage\' to your submission functions list, in order for files \r\nuploaded with this interface to be attached to the record. More information in \r\nthe WebSubmit admin guide.\r\n\"\"\"\r\n\r\nfrom invenio.websubmit_functions.Shared_Functions import ParamFromFile\r\nfrom invenio.websubmit_functions.Move_Photos_to_Storage import \\\r\n    read_param_file, \\\r\n    create_photos_manager_interface, \\\r\n    get_session_id\r\n\r\n# Retrieve session id\r\ntry:\r\n    # User info is defined only in MBI/MPI actions...\r\n    session_id = get_session_id(None, uid, user_info) \r\nexcept:\r\n    session_id = get_session_id(req, uid, {})\r\n\r\n# Retrieve context\r\nindir = curdir.split(\'/\')[-3]\r\ndoctype = curdir.split(\'/\')[-2]\r\naccess = curdir.split(\'/\')[-1]\r\n\r\n# Get the record ID, if any\r\nsysno = ParamFromFile(\"%s/%s\" % (curdir,\'SN\')).strip()\r\n\r\n\"\"\"\r\nModify below the configuration of the photos manager interface.\r\nNote: `can_reorder_photos\' parameter is not yet fully taken into consideration\r\n\r\nDocumentation of the function is available at <http://localhost/admin/websubmit/websubmitadmin.py/functionedit?funcname=Move_Photos_to_Storage>\r\n\"\"\"\r\ntext += create_photos_manager_interface(sysno, session_id, uid,\r\n                                        doctype, indir, curdir, access,\r\n                                        can_delete_photos=True,\r\n                                        can_reorder_photos=True,\r\n                                        can_upload_photos=True,\r\n                                        editor_width=700,\r\n                                        editor_height=400,\r\n                                        initial_slider_value=100,\r\n                                        max_slider_value=200,\r\n                                        min_slider_value=80)','0000-00-00','0000-00-00',NULL,NULL,0);
 
@@ -612,6 +614,10 @@ INSERT INTO sbmFUNDESC VALUES ('Move_Photos_to_Storage','iconsize');
 INSERT INTO sbmFUNDESC VALUES ('Move_Photos_to_Storage','iconformat');
 INSERT INTO sbmFUNDESC VALUES ('User_is_Record_Owner_or_Curator','curator_role');
 INSERT INTO sbmFUNDESC VALUES ('User_is_Record_Owner_or_Curator','curator_flag');
+INSERT INTO sbmFUNDESC VALUES ('Link_Records','edsrn');
+INSERT INTO sbmFUNDESC VALUES ('Link_Records','edsrn2');
+INSERT INTO sbmFUNDESC VALUES ('Link_Records','directRelationship');
+INSERT INTO sbmFUNDESC VALUES ('Link_Records','reverseRelationship');
 
 INSERT INTO sbmGFILERESULT VALUES ('HTML','HTML document');
 INSERT INTO sbmGFILERESULT VALUES ('WORD','data');
