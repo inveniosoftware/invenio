@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1232,8 +1232,7 @@ def perform_request_init_template_interface():
     body += '    </script>\n'
 
     # Add scripts (the ordering is NOT irrelevant).
-    scripts = ['jquery.effects.core.min.js',
-               'jquery.effects.highlight.min.js',
+    scripts = ['jquery-ui.min.js',
                'json2.js', 'bibedit_display.js', 'bibedit_template_interface.js']
 
     for script in scripts:

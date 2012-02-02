@@ -31,6 +31,7 @@ import sys
 from dbquery import serialize_via_marshal
 from dbquery import deserialize_via_marshal
 from invenio.access_control_engine import acc_authorize_action
+from invenio.search_engine import perform_request_search
 
 from bibauthorid_name_utils import split_name_parts
 from bibauthorid_name_utils import clean_name_string
@@ -1254,13 +1255,14 @@ def get_recently_modified_record_ids(date='00-00-00 00:00:00'):
     papers = run_sql("select id from bibrec where modification_date > %s",
                      (str(date),))
     if papers:
-        bibrecs = [i[0] for i in papers]
-        bibrecs.append(-1)
-        min_date = run_sql("select max(modification_date) from bibrec where "
-                           "id in " + str(tuple(bibrecs)))
+        bibrecs = [int(i[0]) for i in papers]
+        all_bibrecs = perform_request_search(p="")
+        bibrecs = list(set(bibrecs).intersection(set(all_bibrecs)))
+        min_date = run_sql("select max(modification_date) from bibrec")
     else:
+        bibrecs = []
         min_date = run_sql("select now()")
-    return papers, min_date
+    return [(i,) for i in bibrecs], min_date
 
 def authornames_tables_gc(bunch_size=500):
     '''

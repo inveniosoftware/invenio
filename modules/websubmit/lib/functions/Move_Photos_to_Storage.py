@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,9 +29,9 @@ Requirements:
   - jquery.ui.sortable.min.js
   - jquery.ui.slider.min.js
   - UI "base" theme:
-      - ui.slider.css
-      - ui.core.css
-      - ui.theme.css
+      - jquery.ui.slider.css
+      - jquery.ui.core.css
+      - jquery.ui.theme.css
       - images
 
  Uploadify 2.0.1 (JQuery plugin):

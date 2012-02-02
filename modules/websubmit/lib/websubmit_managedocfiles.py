@@ -81,7 +81,8 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_TMPSHAREDDIR, \
-     CFG_SITE_SUPPORT_EMAIL
+     CFG_SITE_SUPPORT_EMAIL, \
+     CFG_CERN_SITE
 from invenio.messages import gettext_set_language
 from invenio.bibdocfilecli import cli_fix_marc
 from invenio.bibdocfile import BibRecDocs, \
@@ -1103,6 +1104,8 @@ def build_updated_files_list(bibdocs, actions, recid, display_hidden_files=False
     i = 0
     for bibdoc in bibdocs:
         hidden_p = True in [bibdocfile.hidden_p() for bibdocfile in bibdoc.list_latest_files()]
+        if CFG_CERN_SITE:
+            hidden_p = False # Temporary workaround. See Ticket #846
         if not display_hidden_files and hidden_p:
             # Do not consider hidden files
             continue

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -13615,7 +13615,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
 
         out += """
 
-        <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+        <script type="text/javascript" language='JavaScript' src="%s/js/jquery-ui.min.js"></script>
 
              <table class="bibcirctable">
                 <tr>

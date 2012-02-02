@@ -532,6 +532,12 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = "find topcite 50+"
         self._compare_searches(inv_search, spi_search)
 
+    def test_topcit(self):
+        """SPIRES search syntax - find topcit 50+"""
+        inv_search = "cited:50->999999999"
+        spi_search = "find topcit 50+"
+        self._compare_searches(inv_search, spi_search)
+
     def test_caption(self):
         """SPIRES search syntax - find caption muon"""
         inv_search = "caption:muon"
@@ -557,9 +563,15 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         self._compare_searches(inv_search, spi_search)
 
     def test_type_code(self):
-        """SPIRES search syntax - find tc review"""
+        """SPIRES search syntax - find tc/ps/scl review"""
         inv_search = "collection:review"
         spi_search = "find tc review"
+        self._compare_searches(inv_search, spi_search)
+        inv_search = "collection:review"
+        spi_search = "find ps review"
+        self._compare_searches(inv_search, spi_search)
+        inv_search = "collection:review"
+        spi_search = "find scl review"
         self._compare_searches(inv_search, spi_search)
 
     def test_field_code(self):

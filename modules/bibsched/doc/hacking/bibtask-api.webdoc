@@ -52,6 +52,8 @@
 
 <p>It should implement a main function to be passed to <tt>task_init</tt> via the <tt>task_run_fnc</tt> parameter as the core of the bibtask.</p>
 
+<p>It can be scheduled directly via a Python script by using the <tt>task_low_level_submission</tt> API.
+
 <h3>Detailed API</h3>
 <h4>bibtask.task_init</h4>
 <pre>
@@ -116,7 +118,7 @@ def task_update_progress(msg):
 """Updates progress information in the BibSched task table."""
 </pre>
 
-<h4>bibrask.write_message</h4>
+<h4>bibtask.write_message</h4>
 <pre>
     def write_message(msg, stream=sys.stdout, verbose=1):
     """Write message and flush output stream (may be sys.stdout or sys.stderr).
@@ -131,3 +133,25 @@ def task_update_progress(msg):
     """
 </pre>
 
+<h4>bibtask.task_low_level_submission</h4>
+<pre>
+def task_low_level_submission(name, user, *argv):
+    """Let special lowlevel enqueuing of a task on the bibsche queue.
+    @param name: is the name of the bibtask. It must be a valid executable under
+        C{CFG_BINDIR}.
+    @type name: string
+    @param user: is a string that will appear as the "user" submitting the task.
+        Since task are submitted via API it make sense to set the
+        user to the name of the module/function that called
+        task_low_level_submission.
+    @type user: string
+    @param argv: are all the additional CLI parameters that would have been
+        passed on the CLI (one parameter per variable).
+        e.g.:
+        >>> task_low_level_submission('bibupload', 'admin', '-a', '/tmp/z.xml')
+    @type: strings
+    @return: the task identifier when the task is correctly enqueued.
+    @rtype: int
+    @note: use absolute paths in argv
+    """
+</pre>

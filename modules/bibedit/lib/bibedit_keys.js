@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2009, 2010, 2011 CERN.
+ * Copyright (C) 2009, 2010, 2011, 2012 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -26,7 +26,6 @@
  * Global variables
  */
 
-var gSelectionModeOn = false;
 var gReady = true;
 
 
@@ -41,7 +40,15 @@ function disableInInput(fn){
 }
 function initHotkeys(){
   /*
-   * Initialize all hotkeys.
+   * Initialize non-input hotkeys.
+   * Using https://github.com/jeresig/jquery.hotkeys
+   *
+   * Plugin notes:
+   * If you want to use more than one modifiers (e.g. alt+ctrl+z) you should
+   * define them by an alphabetical order e.g. alt+ctrl+shift
+   *
+   * Hotkeys aren't tracked if you're inside of an input element (use function
+   * initInputHotkeys)
    */
   // New record.
   $(document).bind('keydown', 'Shift+n',
@@ -256,34 +263,6 @@ function onKeyTab(event){
     else
       $(contentCells).eq($(contentCells).index(cell)-1).trigger('click');
     event.preventDefault();
-  }
-}
-
-function onKeySpace(event){
-  /*
-   * Handle key space/shift+space (edit subfield/field).
-   */
-  if (event.target.nodeName == 'TD'){
-    var targetID = event.target.id;
-    var type = targetID.slice(0, targetID.indexOf('_'));
-    if (type == 'content'){
-      var id = targetID.slice(targetID.indexOf('_')+1);
-      var tmpArray = id.split('_');
-      if (event.shiftKey){
-	// Shift is pressed. Select the full field.
-	id = (tmpArray.length == 3) ? tmpArray.slice(0, -1).join('_') :
-	  tmpArray.join('_');
-	$('#boxField_' + id).trigger('click');
-      }
-      else{
-	// Just select the subfield itself.
-	if (tmpArray.length == 3)
-	  $('#boxSubfield_' + id).trigger('click');
-	else
-	  $('#boxField_' + id).trigger('click');
-      }
-      event.preventDefault();
-    }
   }
 }
 

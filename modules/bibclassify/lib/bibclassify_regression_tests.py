@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -94,7 +94,7 @@ class BibClassifyRegressionTest(BibClassifyTestCase):
 
         results, errors = self.unredirect()
 
-        res, msg = check_pdf1(results)
+        res, msg = check_pdf2(results)
         if not res:
             self.fail(msg)
 

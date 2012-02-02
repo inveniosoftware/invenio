@@ -40,6 +40,8 @@ from invenio.bibrank_citation_indexer import tagify
 from invenio.errorlib import register_exception
 from invenio.bibformat_utils import parse_tag
 from invenio.search_engine_utils import get_fieldvalues
+from invenio.bibauthorid_searchinterface import get_personids_from_bibrec
+from invenio.bibauthorid_searchinterface import get_person_bibrecs
 import search_engine
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -108,27 +110,27 @@ def get_authors_from_record(recID, tags):
     We need this function because there's 3 different types of authors
     and to fetch each one of them we need look through MARC tags
     """
-    mainauth_list = get_fieldvalues(recID, tags['first_author'])
-    coauth_list   = get_fieldvalues(recID, tags['additional_author'])
-    extauth_list  = get_fieldvalues(recID, tags['alternative_author_name'])
+    authors = get_personids_from_bibrec(recID)
 
-    authors = set(mainauth_list)
-    authors.update(coauth_list)
-    authors.update(extauth_list)
+    if not authors:
+        mainauth_list = get_fieldvalues(recID, tags['first_author'])
+        coauth_list   = get_fieldvalues(recID, tags['additional_author'])
+        extauth_list  = get_fieldvalues(recID, tags['alternative_author_name'])
+
+        authors = set(mainauth_list)
+        authors.update(coauth_list)
+        authors.update(extauth_list)
 
     return authors
 
 
 def get_collaborations_from_record(recID, tags):
-    """ Get all collaborations for a record,
-
-    Similar to get_authors_from_record
-    """
-    return set(get_fieldvalues(recID, tags['collaboration_name']))
+    """Get all collaborations for a record"""
+    return get_fieldvalues(recID, tags['collaboration_name'])
 
 
 def get_coauthors(author, tags, cache):
-    """ Get all coauthors for an author
+    """Get all coauthors for an author
 
     Given author A, returns all the authors having published
     a record with author A
@@ -138,11 +140,87 @@ def get_coauthors(author, tags, cache):
 
     friends = set()
 
-    for recid in search_engine.search_pattern(p=author, f='author'):
+    try:
+        authorid = int(author)
+        records = get_person_bibrecs(authorid)
+    except ValueError:
+        records = search_engine.search_pattern(p=author, f='author')
+    for recid in records:
         friends.update(get_authors_from_record(recid, tags))
 
     cache[author] = friends
     return friends
+
+
+def compute_self_citations(recid, lciters, authors_cache, tags):
+    if not lciters:
+        return 0
+
+    total_citations = 0
+
+    authors = frozenset(get_authors_from_record(recid, tags))
+
+    collaborations = None
+    if len(authors) > 20:
+        collaborations = frozenset(
+            get_collaborations_from_record(recid, tags))
+
+    if collaborations:
+        # Use collaborations names
+        for cit in lciters:
+            cit_collaborations = frozenset(
+                get_collaborations_from_record(cit, tags))
+            if not collaborations.intersection(cit_collaborations):
+                total_citations += 1
+    else:
+        # Use authors names
+        for cit in lciters:
+            cit_authors = get_authors_from_record(cit, tags)
+            if len(cit_authors) > 20 and \
+                get_collaborations_from_record(cit, tags):
+                # Record from a collaboration that cites
+                # a record from an author, it's fine
+                total_citations += 1
+            else:
+                cit_authors_set = set(cit_authors)
+                # Extend with circle of friends
+                for author in list(cit_authors)[:20]:
+                    author_friends = get_coauthors(author, tags, authors_cache)
+                    cit_authors_set.update(author_friends)
+
+                if not authors.intersection(cit_authors_set):
+                    total_citations += 1
+
+
+    return total_citations
+
+
+def render_self_citations(d_recids, d_total_recs, ln):
+    try:
+        tags = get_authors_tags()
+    except IndexError, e:
+        register_exception(prefix="attribute " + \
+            str(e) + " missing in config", alert_admin=True)
+        return ""
+
+    d_recid_citers = {}
+    d_total_cites = {}
+    d_avg_cites = {}
+    for coll, dummy_colldef in CFG_CITESUMMARY_COLLECTIONS:
+        d_total_cites[coll] = 0
+        d_avg_cites[coll] = 0
+
+        d_recid_citers[coll] = get_cited_by_list(d_recids[coll])
+        authors_cache = {}
+        for recid, lciters in d_recid_citers[coll]:
+            d_total_cites[coll] += \
+                compute_self_citations(recid, lciters, authors_cache, tags)
+
+        if d_total_recs[coll] != 0:
+            d_avg_cites[coll] = d_total_cites[coll] * 1.0 / d_total_recs[coll]
+
+    return websearch_templates.tmpl_citesummary_minus_self_cites(
+        d_total_cites, d_avg_cites, CFG_CITESUMMARY_COLLECTIONS, ln)
 
 
 def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None):
@@ -154,7 +232,7 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
     if of == 'hcs':
         # this is HTML cite summary
         html = []
-        compute_self_citations = True
+        compute_self_citations_p = True
 
         # 1) hcs prologue:
         d_recids = {}
@@ -166,7 +244,7 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
                 d_recids[coll] = recids & search_engine.search_pattern(p=colldef)
             d_total_recs[coll] = len(d_recids[coll])
             if d_total_recs[coll] > CFG_CITESUMMARY_SELFCITES_THRESHOLD:
-                compute_self_citations = False
+                compute_self_citations_p = False
 
         prologue = websearch_templates.tmpl_citesummary_prologue(d_total_recs, CFG_CITESUMMARY_COLLECTIONS, searchpattern, searchfield, ln)
 
@@ -180,7 +258,7 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
         d_total_cites = {}
         d_avg_cites = {}
         d_recid_citecount_l = {}
-        for coll, colldef in CFG_CITESUMMARY_COLLECTIONS:
+        for coll, dummy_colldef in CFG_CITESUMMARY_COLLECTIONS:
             d_total_cites[coll] = 0
             d_avg_cites[coll] = 0
             d_recid_citecount_l[coll] = []
@@ -189,7 +267,7 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
                 if lciters:
                     d_total_cites[coll] += len(lciters)
                     d_recid_citecount_l[coll].append((recid, len(lciters)))
-            if d_total_cites[coll] != 0:
+            if d_total_recs[coll] != 0:
                 d_avg_cites[coll] = d_total_cites[coll] * 1.0 / d_total_recs[coll]
         overview = websearch_templates.tmpl_citesummary_overview(d_total_cites,
             d_avg_cites, CFG_CITESUMMARY_COLLECTIONS, ln)
@@ -200,50 +278,8 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
             req.write(overview)
 
         # 3) compute self-citations
-        if compute_self_citations:
-            try:
-                tags = get_authors_tags()
-            except (IndexError, ConfigParser.NoOptionError), msg:
-                register_exception(prefix="attribute " + \
-                    str(msg) + " missing in config", alert_admin=True)
-                compute_self_citations = False
-
-        if compute_self_citations:
-            d_recid_citers = {}
-            d_total_cites = {}
-            d_avg_cites = {}
-            for coll, colldef in CFG_CITESUMMARY_COLLECTIONS:
-                d_total_cites[coll] = 0
-                d_avg_cites[coll] = 0
-
-                d_recid_citers[coll] =  get_cited_by_list(d_recids[coll])
-                authors_cache = {}
-                for recid, lciters in d_recid_citers[coll]:
-                    if lciters:
-                        authors = get_authors_from_record(recid, tags)
-                        if len(authors) > 20:
-                            # Use collaboration names
-                            collaborations = get_collaborations_from_record(recid, tags)
-                            for cit in lciters:
-                                cit_collaborations = get_collaborations_from_record(cit, tags)
-                                if len(collaborations.intersection(cit_collaborations)) == 0:
-                                    d_total_cites[coll] += 1
-
-                        else:
-                            # Use author names
-                            for cit in lciters:
-                                cit_authors = get_authors_from_record(cit, tags)
-                                #extend with circle of friends
-                                for author in list(cit_authors)[:20]:
-                                    author_friends = get_coauthors(author, tags, authors_cache)
-                                    cit_authors.update(author_friends)
-
-                                if len(authors.intersection(cit_authors)) == 0:
-                                    d_total_cites[coll] += 1
-
-                if d_total_cites[coll] != 0:
-                    d_avg_cites[coll] = d_total_cites[coll] * 1.0 / d_total_recs[coll]
-            overview = websearch_templates.tmpl_citesummary_minus_self_cites(d_total_cites, d_avg_cites, CFG_CITESUMMARY_COLLECTIONS, ln)
+        if compute_self_citations_p:
+            overview = render_self_citations(d_recids, d_total_recs, ln)
 
             if not req:
                 html.append(overview)

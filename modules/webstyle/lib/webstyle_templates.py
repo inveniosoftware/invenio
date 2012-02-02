@@ -856,7 +856,7 @@ URI: http://%(host)s%(page)s
 
         out = """
             <div class="bottom-left-folded">%(dates)s</div>
-            <div class="bottom-right-folded" style="text-align:right" style="padding-bottom:2px;">
+            <div class="bottom-right-folded" style="text-align:right;padding-bottom:2px;">
                 <span class="moreinfo" style="margin-right:10px;">%(similar)s</span></div>
           </div>
       </div>

@@ -93,7 +93,7 @@ function updateView() {
         $('#buttonSubmitChanges').attr('disabled', 'true').addClass('buttonDisabled');
 }
 function showLoading() {
-    $('#preview_area').html('<img src=/img/ui-anim_basic_16x16.gif> Loading...');
+    $('#preview_area').html('<span class="multiedit_loading">Loading...</span><br /><img src=/img/ajax-loader.gif>').css("text-align", "center");
 }
 
 function createCommandsList(){
@@ -242,10 +242,12 @@ function onAjaxSuccess(json) {
             gComputeModifications = 0;
 
         }
+        $("#preview_area").css("text-align", "")
         $("#preview_area").html(search_html);
 }
 
 function displayError(msg) {
+    $("#preview_area").css("text-align", "")
     $("#preview_area").html(msg);
 }
 
@@ -335,7 +337,7 @@ function setOutputFormat(outputFormat){
 }
 
 function initTextBoxes(){
-    $('#textBoxValue, #textBoxNewValue, #textBoxOutputTags, #textBoxCondition').focus(function() {
+    $('#textBoxOutputTags, #textBoxCondition').focus(function() {
         if (this.value == this.defaultValue){
             this.value = '';
         }
@@ -344,7 +346,7 @@ function initTextBoxes(){
         }
     });
 
-    $('#textBoxValue, #textBoxNewValue, #textBoxOutputTags, #textBoxCondition').blur(function() {
+    $('#textBoxOutputTags, #textBoxCondition').blur(function() {
         if ($.trim(this.value) == ''){
             this.value = (this.defaultValue ? this.defaultValue : '');
         }

@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -396,8 +396,11 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             page_content = pagecontent
 
         metaheaderadd = ""
-        if is_bibauthorid:
-            metaheaderadd = bibauthorid_template.tmpl_meta_includes()
+
+        ### next two lines are commented out in order to avoid
+        ### including all JS files in /author pages:
+        #if is_bibauthorid:
+        #    metaheaderadd = bibauthorid_template.tmpl_meta_includes()
 
         # Start the page in clean manner:
         req.content_type = "text/html"
@@ -1049,6 +1052,12 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req, 'runbibedit')[0] != 0:
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
+        #check if the user has rights to set a high wildcard limit
+        #if not, reduce the limit set by user, with the default one
+        if CFG_WEBSEARCH_WILDCARD_LIMIT > 0 and (argd['wl'] > CFG_WEBSEARCH_WILDCARD_LIMIT or argd['wl'] == 0):
+            if acc_authorize_action(req, 'runbibedit')[0] != 0:
+                argd['wl'] = CFG_WEBSEARCH_WILDCARD_LIMIT
+
         if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
@@ -1123,6 +1132,12 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
 
         if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req, 'runbibedit')[0] != 0:
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
+
+        #check if the user has rights to set a high wildcard limit
+        #if not, reduce the limit set by user, with the default one
+        if CFG_WEBSEARCH_WILDCARD_LIMIT > 0 and (argd['wl'] > CFG_WEBSEARCH_WILDCARD_LIMIT or argd['wl'] == 0):
+            if acc_authorize_action(req, 'runbibedit')[0] != 0:
+                argd['wl'] = CFG_WEBSEARCH_WILDCARD_LIMIT
 
         record_primary_collection = guess_primary_collection_of_a_record(self.recid)
 
@@ -1723,6 +1738,12 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
                 previous_url = websearch_templates.build_rss_url(argd,
                                                                  jrec=prev_jrec)
 
+            #check if the user has rights to set a high wildcard limit
+            #if not, reduce the limit set by user, with the default one
+            if CFG_WEBSEARCH_WILDCARD_LIMIT > 0 and (argd['wl'] > CFG_WEBSEARCH_WILDCARD_LIMIT or argd['wl'] == 0):
+                if acc_authorize_action(req, 'runbibedit')[0] != 0:
+                    argd['wl'] = CFG_WEBSEARCH_WILDCARD_LIMIT
+
             recIDs = perform_request_search(req, of="id",
                                                           c=argd['c'], cc=argd['cc'],
                                                           p=argd['p'], f=argd['f'],
@@ -1731,7 +1752,7 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
                                                           p2=argd['p2'], f2=argd['f2'],
                                                           m2=argd['m2'], op2=argd['op2'],
                                                           p3=argd['p3'], f3=argd['f3'],
-                                                          m3=argd['m3'])
+                                                          m3=argd['m3'], wl=argd['wl'])
             nb_found = len(recIDs)
             next_url = None
             if len(recIDs) >= argd['jrec'] + argd['rg']:
@@ -1831,6 +1852,12 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
 
         if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req, 'runbibedit')[0] != 0:
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
+
+        #check if the user has rights to set a high wildcard limit
+        #if not, reduce the limit set by user, with the default one
+        if CFG_WEBSEARCH_WILDCARD_LIMIT > 0 and (argd['wl'] > CFG_WEBSEARCH_WILDCARD_LIMIT or argd['wl'] == 0):
+            if acc_authorize_action(req, 'runbibedit')[0] != 0:
+                argd['wl'] = CFG_WEBSEARCH_WILDCARD_LIMIT
 
         if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})

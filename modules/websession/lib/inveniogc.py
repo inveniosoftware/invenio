@@ -38,6 +38,7 @@ try:
     from invenio.bibdocfile import BibDoc
     from invenio.bibsched import gc_tasks
     from invenio.websubmit_config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
+    from invenio.dateutils import convert_datestruct_to_datetext
 except ImportError, e:
     print "Error: %s" % (e,)
     sys.exit(1)
@@ -309,11 +310,11 @@ def guest_user_garbage_collector():
 
     # 1 - DELETE EXPIRED SESSIONS
     write_message("- deleting expired sessions")
-    timelimit = time.time()
+    timelimit = convert_datestruct_to_datetext(time.gmtime())
     write_message("  DELETE FROM session WHERE"
-        " session_expiry < %d \n" % (timelimit,), verbose=9)
+        " session_expiry < %s \n" % (timelimit,), verbose=9)
     delcount['session'] += run_sql("DELETE FROM session WHERE"
-        " session_expiry < %s """ % (timelimit,))
+        " session_expiry < %s """, (timelimit,))
 
 
     # 1b - DELETE GUEST USERS WITHOUT SESSION

@@ -17,10 +17,4 @@
 
 SUBDIRS = admin
 
-testdir = $(libdir)/webtest/invenio
-
-test_DATA = test_format_many_authors.html
-
-EXTRA_DIST = $(test_DATA)
-
 CLEANFILES = *~ *.tmp

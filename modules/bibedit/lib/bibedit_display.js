@@ -157,10 +157,10 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
       cellContentClass = 'bibEditCellContent';
       cellContentTitle = 'title="Click to edit" ';
       if (autosuggest || autokeyword) {
-          cellContentTitle = 'title="Click to edit (suggest values: ctrl-shift-a or ctrl-9) " ';
+          cellContentTitle = 'title="Click to edit (suggest values: ctrl-shift-a) " ';
       }
       if (autocomplete) {
-          cellContentTitle = 'title="Click to edit (complete values: ctrl-shift-a or ctrl-9) " ';
+          cellContentTitle = 'title="Click to edit (complete values: ctrl-shift-a) " ';
       }
       cellContentOnClick = 'onclick="onContentClick(this)" ';
     }

@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 import unittest
 from invenio.testutils import make_test_suite, run_test_suite
-from invenio.bibdocfile import BibRecDocs, check_bibdoc_authorization
+from invenio.bibdocfile import BibRecDocs, check_bibdoc_authorization, bibdocfile_url_p
 from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
 from invenio.config import \
         CFG_SITE_URL, \
@@ -242,7 +242,7 @@ class BibDocFilesTest(unittest.TestCase):
         my_new_bibdoc.delete()
         self.assertEqual(my_new_bibdoc.deleted_p(), True)
 
-class CheckBibDocAuthorization(unittest.TestCase):
+class CheckBibDocAuthorizationTest(unittest.TestCase):
     """Regression tests for check_bibdoc_authorization function."""
     def test_check_bibdoc_authorization(self):
         """bibdocfile - check_bibdoc_authorization function"""
@@ -261,11 +261,16 @@ class CheckBibDocAuthorization(unittest.TestCase):
         self.assertNotEqual(check_bibdoc_authorization(juliet, 'restricted_video')[0], 0)
         self.assertNotEqual(check_bibdoc_authorization(juliet, 'status: restricted_video')[0], 0)
 
+class BibDocFileURLTest(unittest.TestCase):
+    """Regression tests for bibdocfile_url_p function."""
+    def test_bibdocfile_url_p(self):
+        self.failUnless(bibdocfile_url_p(CFG_SITE_URL + '/%s/98/files/9709037.pdf' % CFG_SITE_RECORD))
+        self.failUnless(bibdocfile_url_p(CFG_SITE_URL + '/%s/098/files/9709037.pdf' % CFG_SITE_RECORD))
 
-
-TEST_SUITE = make_test_suite(BibRecDocsTest, \
-                             BibDocsTest, \
-                             BibDocFilesTest, \
-                             CheckBibDocAuthorization)
+TEST_SUITE = make_test_suite(BibRecDocsTest,
+                             BibDocsTest,
+                             BibDocFilesTest,
+                             CheckBibDocAuthorizationTest,
+                             BibDocFileURLTest)
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

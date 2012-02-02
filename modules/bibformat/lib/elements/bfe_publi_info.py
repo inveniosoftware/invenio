@@ -42,6 +42,7 @@ def format_element(bfo):
     year = publication_info.get('y')
     number = publication_info.get('n')
     pages = publication_info.get('c')
+    doi = publication_info.get('a')
 
     if journal is not None:
         journal = cgi.escape(journal)
@@ -53,6 +54,8 @@ def format_element(bfo):
         number = cgi.escape(number)
     if pages is not None:
         pages = cgi.escape(pages)
+    if doi is not None:
+        doi = cgi.escape(doi)
 
     if journal != '' and volume is not None:
 

@@ -528,8 +528,6 @@ class SpiresToInvenioSyntaxConverter:
         'cc' : 'postalcode:',
         # ppf subject
         'ppf-subject' : '650__a:',
-        'ps' : '650__a:',
-        'scl' : '650__a:',
         'status' : '650__a:',
         # recid
         'recid' : 'recid:',
@@ -555,6 +553,7 @@ class SpiresToInvenioSyntaxConverter:
         'dk' : '695__a:',
 
         # topcite
+        'topcit' : 'cited:',
         'topcite' : 'cited:',
 
         # captions
@@ -572,6 +571,8 @@ class SpiresToInvenioSyntaxConverter:
         'ty' : 'collection:',
         'type' : 'collection:',
         'type-code' : 'collection:',
+        'scl': 'collection:',
+        'ps':  'collection:',
         # field code
         'f' : 'subject:',
         'fc' : 'subject:',

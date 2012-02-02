@@ -33,13 +33,7 @@ test_DATA = test.pdf \
             test.doc \
             test.docx \
             icon-test.gif \
-            test.tar.gz \
-            test_submit_article.html \
-            test_submit_poetry.html \
-            test_submit_book.html \
-            test_submit_tar_gz.html \
-            test_submit_book_approval.html \
-            test_submit_journal.html
+            test.tar.gz
 
 EXTRA_DIST = $(doc_DATA) $(test_DATA)
 

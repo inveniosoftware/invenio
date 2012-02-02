@@ -20,6 +20,7 @@ __lastupdated__ = """$Date$"""
 __revision__ = "$Id$"
 
 import os
+import errno
 import time
 import cgi
 import sys
@@ -654,9 +655,13 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                     if not os.path.exists(dir_to_open):
                         try:
                             os.makedirs(dir_to_open)
-                        except:
-                            register_exception(req=req, alert_admin=True)
-                            raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
+                        except OSError, e:
+                            if e.errno != errno.EEXIST:
+                                # If the issue is only that directory
+                                # already exists, then continue, else
+                                # report
+                                register_exception(req=req, alert_admin=True)
+                                raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
 
                     filename = formfields.filename
                     ## Before saving the file to disc, wash the filename (in particular
@@ -699,7 +704,15 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                                                                   key))
                             if not os.path.exists(icons_dir):
                                 # Create uid/icons dir if needed
-                                os.makedirs(icons_dir)
+                                try:
+                                    os.makedirs(icons_dir)
+                                except OSError, e:
+                                    if e.errno != errno.EEXIST:
+                                        # If the issue is only that
+                                        # directory already exists,
+                                        # then continue, else report
+                                        register_exception(req=req, alert_admin=True)
+                                        raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
                             os.rename(os.path.join(icon_path, icon_name),
                                       os.path.join(icons_dir, icon_name))
                             added_files[key] = {'name': filename,
@@ -807,9 +820,13 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                     if not os.path.exists(dir_to_open):
                         try:
                             os.makedirs(dir_to_open)
-                        except:
-                            register_exception(req=req, alert_admin=True)
-                            raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
+                        except OSError, e:
+                            if e.errno != errno.EEXIST:
+                                # If the issue is only that directory
+                                # already exists, then continue, else
+                                # report
+                                register_exception(req=req, alert_admin=True)
+                                raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
 
                     filename = formfields.filename
                     ## Before saving the file to disc, wash the filename (in particular

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -176,7 +176,8 @@ class Template:
                            'op2': (str, ""),
                            'p3' : (str, ""),
                            'f3' : (str, ""),
-                           'm3' : (str, "")}
+                           'm3' : (str, ""),
+                           'wl' : (int, CFG_WEBSEARCH_WILDCARD_LIMIT)}
 
     tmpl_openurl_accepted_args = {
             'id' : (list, []),
@@ -1195,10 +1196,11 @@ class Template:
                  'any' : _("any month"),
                  'sel' : self.tmpl_is_selected(sm, 0)
                }
+        # trailing space in May distinguishes short/long form of the month name
         for mm, month in [(1, _("January")), (2, _("February")), (3, _("March")), (4, _("April")), \
-                          (5, _("May")), (6, _("June")), (7, _("July")), (8, _("August")), \
+                          (5, _("May ")), (6, _("June")), (7, _("July")), (8, _("August")), \
                           (9, _("September")), (10, _("October")), (11, _("November")), (12, _("December"))]:
-            box += """<option value="%02d"%s>%s</option>""" % (mm, self.tmpl_is_selected(sm, mm), month)
+            box += """<option value="%02d"%s>%s</option>""" % (mm, self.tmpl_is_selected(sm, mm), month.strip())
         box += """</select>"""
         # year
         box += """
@@ -4200,7 +4202,6 @@ class Template:
                          'Lectures',
                          'Preprint',
                          'Published',
-                         'Report',
                          'Review',
                          'Thesis']
         else:
@@ -4453,13 +4454,24 @@ class Template:
     def tmpl_citesummary_minus_self_cites(self, d_total_cites, d_avg_cites, l_colls, ln=CFG_SITE_LANG):
         """HTML citesummary format, overview. A part of HCS format suite."""
         _ = gettext_set_language(ln)
-        out = """<tr><td><strong>%(msg_cites)s</strong></td>""" % \
-              {'msg_cites': _("Total number of citations excluding self-citations:"), }
+        out = """<tr><td><strong>%(msg_cites)s</strong>""" % \
+              {'msg_cites': _("Total number of citations excluding self-citations"), }
+
+        out += ' <small><small>[<a href="'
+        # use ? help linking in the style of oai_repository_admin.py
+        out += '%s">' % (CFG_SITE_URL + '/help/citation-metrics#citesummary_self-cites')
+        out += '?</a>]</small></small></td>'
+
         for coll, colldef in l_colls:
             out += '<td align="right">%s</td>' % self.tmpl_nice_number(d_total_cites[coll], ln)
         out += '</tr>'
-        out += """<tr><td><strong>%(msg_avgcit)s</strong></td>""" % \
-               {'msg_avgcit': _("Average citations per paper excluding self-citations:"), }
+        out += """<tr><td><strong>%(msg_avgcit)s</strong>""" % \
+               {'msg_avgcit': _("Average citations per paper excluding self-citations"), }
+        out += ' <small><small>[<a href="'
+        # use ? help linking in the style of oai_repository_admin.py
+        out += '%s">' % (CFG_SITE_URL + '/help/citation-metrics#citesummary_self-cites')
+        out += '?</a>]</small></small></td>'
+
         for coll, colldef in l_colls:
             out += '<td align="right">%.1f</td>' % d_avg_cites[coll]
         out += '</tr>'

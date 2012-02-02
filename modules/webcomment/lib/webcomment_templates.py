@@ -366,7 +366,7 @@ class Template:
         out = ''
         final_body = email_quoted_txt2html(body)
         title = _('%(x_name)s') % {'x_name': nickname,}
-        title += '<a name=%s></a>' % com_id
+        title += '<a name="%s"></a>' % com_id
         links = ''
         moderator_links = ''
         if reply_link:
@@ -428,6 +428,7 @@ class Template:
         <div class="webcomment_comment_title">
             %(title)s
             <div class="webcomment_comment_date">%(date)s</div>
+            <a class="webcomment_permalink" title="Permalink to this comment" href="#%(comid)i">¶</a>
         </div>
             <blockquote>
         %(body)s
@@ -445,6 +446,7 @@ class Template:
                  'attached_files_html': attached_files_html,
                  'date': date_creation,
                  'site_url': CFG_SITE_URL,
+                 'comid': com_id,
                  }
         return out
 
@@ -743,7 +745,7 @@ class Template:
                 # do NOT delete the HTML comment below. It is used for parsing... (I plead unguilty!)
                 comments_rows += """
     <!-- start comment row -->
-    <div class="webcomment_comment_depth_%s">""" % (depth)
+    <div style="margin-left:%spx">""" % (depth*20)
                 delete_links = {}
                 if not reviews:
                     report_link = '%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/comments/report?ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/comments/display' % useful_dict % {'comid':comment[c_id]}
@@ -938,23 +940,21 @@ class Template:
 
         if reviews == 0:
             if not user_is_subscribed_to_discussion:
-                body += '<small>'
                 body += '<div class="comment-subscribe">' + '<img src="%s/img/mail-icon-12x8.gif" border="0" alt="" />' % CFG_SITE_URL + \
                         '&nbsp;' + '<b>' + create_html_link(urlbase=CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + \
                                                             str(recID) + '/comments/subscribe',
                                                             urlargd={},
                                                             link_label=_('Subscribe')) + \
                         '</b>' + ' to this discussion. You will then receive all new comments by email.' + '</div>'
-                body += '</small><br />'
+                body += '<br />'
             elif user_can_unsubscribe_from_discussion:
-                body += '<small>'
                 body += '<div class="comment-subscribe">' + '<img src="%s/img/mail-icon-12x8.gif" border="0" alt="" />' % CFG_SITE_URL + \
                         '&nbsp;' + '<b>' + create_html_link(urlbase=CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + \
                                                             str(recID) + '/comments/unsubscribe',
                                                             urlargd={},
                                                             link_label=_('Unsubscribe')) + \
                         '</b>' + ' from this discussion. You will no longer receive emails about new comments.' + '</div>'
-                body += '</small><br />'
+                body += '<br />'
 
         if can_send_comments:
             body += add_comment_or_review
@@ -1032,7 +1032,7 @@ class Template:
         """
         enctype_attr = ''
         if enctype:
-            enctype_attr = 'enctype=' + enctype
+            enctype_attr = 'enctype="%s"' % enctype
 
         output  = """
 <form action="%s" method="%s" %s%s%s>""" % \
@@ -1197,6 +1197,7 @@ class Template:
                       <input class="adminbutton" type="submit" value="Add comment" onclick="user_must_confirm_before_leaving_page = false;return true;"/>
                       %(reply_to)s
                   </div>
+</div>
                 """ % {'note': note,
                        'record_label': _("Article") + ":",
                        'comment_label': _("Comment") + ":",
@@ -1209,7 +1210,6 @@ class Template:
         form = self.create_write_comment_hiddenform(action=form_link, method="post", text=form, button='Add comment',
                                                     enctype='multipart/form-data', form_id='cmtForm',
                                                     form_name='cmtForm')
-        form += '</div>'
 
         return warnings + form + self.tmpl_page_do_not_leave_comment_page_js(ln=ln)
 
@@ -2195,7 +2195,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = '''
-        <script language="JavaScript">
+        <script type="text/javascript" language="JavaScript">//<![CDATA[
             var initial_comment_value = document.forms.cmtForm.msg.value;
             var user_must_confirm_before_leaving_page = true;
 
@@ -2215,7 +2215,7 @@ class Template:
                     }
                }
             }
-        </script>
+        //]]></script>
         ''' % {'message': _('Your comment will be lost.').replace('"', '\\"'),
                'name': 'msg'}
 

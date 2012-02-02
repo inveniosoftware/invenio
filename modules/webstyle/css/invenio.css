@@ -1224,7 +1224,7 @@ form input[disabled], form input[disabled="true"]{
 /* Subscribe to comment*/
 .comment-subscribe {
     /*color:#f00;*/
-    /*font-size:0.94em;*/
+    font-size:small;
     overflow:hidden;
     padding:7px 0 5px 5px;
     position:relative;
@@ -2935,6 +2935,22 @@ div.bibcircbottom {
 .bibHarvestPagerPage{
 
 /* WebComment Refactor */
+
+.webcomment_permalink, .webcomment_permalink:link,
+.webcomment_permalink:visited{
+    visibility: hidden;
+    color: #C60F0F;
+    font-size: medium;
+    padding: 0 4px;
+    text-decoration: none;
+}
+ .webcomment_permalink:hover {
+    color: white;
+    background-color: #C60F0F;
+}
+.webcomment_comment_title:hover .webcomment_permalink{
+    visibility: visible;
+}
 
 .webcomment_review_title_table {
 	border: 0px;

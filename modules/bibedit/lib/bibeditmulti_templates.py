@@ -228,6 +228,19 @@ div .boxleft_2 {
     background:grey;
 }
 
+.multiedit_field_deleted {
+    color:red;
+    text-decoration:line-through;
+}
+
+.multiedit_field_modified {
+    color:green;
+}
+
+.multiedit_loading {
+    font-size:12px;
+}
+
 </style>
         """
         return styles
@@ -254,7 +267,7 @@ div .boxleft_2 {
             <b>%(text_search_criteria)s:</b>
         </div>
         <div class="boxleft_2">
-            <input type="text" id="textBoxSearchCriteria"  size="40"> <br />
+            <input type="text" placeholder='Use default search engine syntax' id="textBoxSearchCriteria"  size="60"> <br />
         </div>
     </div>
     <div class="boxContainer">
@@ -501,13 +514,13 @@ div .boxleft_2 {
     <tr class="valueParameters">
         <td /><td /><td /><td />
         <td colspan="3">
-            <input id="textBoxValue" class="txtValue textBoxValue" type="text" value="%(text_value)s"/>
+            <input id="textBoxValue" class="txtValue textBoxValue" type="text" placeholder="%(text_value)s"/>
         </td>
     </tr>
     <tr class="newValueParameters">
         <td /><td /><td /><td />
         <td colspan="3">
-            <input id="textBoxNewValue" class="txtValue textBoxNewValue" type="text" value="%(text_new_value)s"/>
+            <input id="textBoxNewValue" class="txtValue textBoxNewValue" type="text" placeholder="%(text_new_value)s"/>
         </td>
     </tr>
     <tr class="conditionParameters">

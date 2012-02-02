@@ -36,7 +36,7 @@ base class.
 
 __revision__ = "$Id"
 
-import cgi
+import subprocess
 from invenio import search_engine
 from invenio import bibrecord
 from invenio import bibformat
@@ -50,6 +50,8 @@ from invenio.bibtask import task_low_level_submission
 from invenio.webuser import collect_user_info, isUserSuperAdmin
 
 from invenio.dbquery import run_sql
+
+from invenio import xmlmarc2textmarc as xmlmarc2textmarc
 
 from invenio import template
 multiedit_templates = template.load('bibeditmulti')
@@ -462,43 +464,44 @@ def perform_request_submit_changes(search_criteria, update_commands, language, u
     response['search_html'] = multiedit_templates.changes_applied(status, file_path)
     return response
 
-def _get_record_diff(record_id, record, updated_record):
-    """ Returns the new record with formating to display
-    changes in the search results
-    @param record: Record without modifications
-    @type record: Record object
-    @param updated_record: Record with modifications
-    @type updated_record: Record object
-    @return: formated record with changes highlighted
+def _get_record_diff(record_textmarc, updated_record_textmarc, outputTags, record_id):
+    """
+    Use difflib library to compare the old record with the modified version and
+    return the output for Multiedit interface
+
+    @param record_textmarc: original record textmarc representation
+    @type record_textmarc: string
+    @param updated_record_textmarc: updated record textmarc representation
+    @type updated_record_textmarc: string
+    @param outputTags: tags to be filtered while printing output
+    @type outputTags: list
+    @return: content to be displayed on Multiedit interface for this record
     @rtype: string
     """
-    import itertools
+    import difflib
 
-    record_xml = bibrecord.record_xml_output(record)
-    record_marc = cgi.escape(_create_marc(record_xml))
-    record_split = record_marc.split('\n')[:-1]
+    differ = difflib.Differ()
 
-    updated_record_xml = bibrecord.record_xml_output(updated_record)
-    updated_record_marc = cgi.escape(_create_marc(updated_record_xml))
-    updated_record_split = updated_record_marc.split('\n')[:-1]
-    
-    result = ''
-    if (len(updated_record_split) == len(record_split)) and (record.keys() == updated_record.keys()):
-        for line_updated, line in itertools.izip(updated_record_split, record_split):
-            line_updated_split = line_updated.split("$$")
-            line_split = line.split("$$")
-            for i in xrange(len(line_updated_split)):
-                if line_updated_split[i] not in line_split:
-                    line_updated_split[i] = "<strong style=\"color: red\">" + line_updated_split[i] + "</strong>"
-            new_line = "$$".join(line_updated_split)
-            result += "%09d " % record_id + new_line.strip() + '\n'
-    else:
-        for i in xrange(len(updated_record_split)):
-            if updated_record_split[i] not in record_split:
-                updated_record_split[i] =  "<strong style=\"color: red\">" + updated_record_split[i].strip() + "</strong>"
-            result += "%09d " % record_id + updated_record_split[i].strip() + '\n'
-    return result
+    filter_tags = "All tags" not in outputTags and outputTags
 
+    result = ["<pre>"]
+    for line in differ.compare(record_textmarc.splitlines(), updated_record_textmarc.splitlines()):
+        if line[0] == ' ':
+            if not filter_tags or line.split()[0].replace('_', '') in outputTags:
+                result.append("%09d " % record_id + line.strip())
+        elif line[0] == '-':
+            # Mark as deleted
+            if not filter_tags or line.split()[1].replace('_', '') in outputTags:
+                result.append('<strong class="multiedit_field_deleted">' + "%09d " % record_id + line[2:].strip() + "</strong>")
+        elif line[0] == '+':
+            # Mark as added/modified
+            if not filter_tags or line.split()[1].replace('_', '') in outputTags:
+                result.append('<strong class="multiedit_field_modified">' + "%09d " % record_id + line[2:].strip() + "</strong>")
+        else:
+            continue
+
+    result.append("</pre>")
+    return '\n'.join(result)
 
 def _get_formated_record(record_id, output_format, update_commands, language, outputTags=""):
     """Returns a record in a given format
@@ -509,51 +512,41 @@ def _get_formated_record(record_id, output_format, update_commands, language, ou
     @param language: the language to use to format the record
     """
     if update_commands:
+        # Modify te bibrecord object with the appropriate actions
         updated_record = _get_updated_record(record_id, update_commands)
 
+    textmarc_options = {"aleph-marc":0, "correct-mode":1, "append-mode":0,
+                        "delete-mode":0, "insert-mode":0, "replace-mode":0,
+                        "text-marc":1}
+
     old_record = search_engine.get_record(recid=record_id)
-    xml_record = bibrecord.record_xml_output(old_record)
+    old_record_textmarc = xmlmarc2textmarc.create_marc_record(old_record, sysno="", options=textmarc_options)
     if "hm" == output_format:
-        result = "<pre>\n"
-        if ("All tags" not in outputTags) and outputTags:
-            if update_commands:
-                marc_record = _get_record_diff(record_id, old_record, updated_record)
-                tag_position = 1
-            else:
-                marc_record = _create_marc(xml_record)
-                tag_position = 0
-            for line in marc_record.split('\n')[:-1]:
-                if line.split()[tag_position][:3] in outputTags:
-                    if update_commands:
-                        result += line.strip() + '\n'
-                    else:
-                        result += "%09d " % record_id + line.strip() + '\n'
-                elif '<strong' in line:
-                    if line.split()[3][5:8] in outputTags:
-                        result += line.strip() + '\n'
+        if update_commands:
+            updated_record_textmarc = xmlmarc2textmarc.create_marc_record(updated_record, sysno="", options=textmarc_options)
+            result = _get_record_diff(old_record_textmarc, updated_record_textmarc, outputTags, record_id)
         else:
-            if update_commands:
-                result += _get_record_diff(record_id, old_record, updated_record)
-            else:
-                marc_record = _create_marc(xml_record)
-                for line in marc_record.split('\n')[:-1]:
-                    result += "%09d " % record_id + line.strip() + '\n'
-
-        result += "</pre>"
-        return result
-
-    if update_commands:
-        xml_record = bibrecord.record_xml_output(updated_record)
-    result = bibformat.format_record(recID=None,
-                                     of=output_format,
-                                     xml_record=xml_record,
-                                     ln=language)
+            filter_tags = "All tags" not in outputTags and outputTags
+            result = ['<pre>']
+            for line in old_record_textmarc.splitlines()[:-1]:
+                if not filter_tags or line.split()[0].replace('_', '') in outputTags:
+                    result.append("%09d " % record_id + line.strip())
+            result.append('</pre>')
+            result = '\n'.join(result)
+    else:
+        if update_commands:
+            # No coloring of modifications in this case
+            xml_record = bibrecord.record_xml_output(updated_record)
+        else:
+            xml_record = bibrecord.record_xml_output(old_record)
+        result = bibformat.format_record(recID=None,
+                                        of=output_format,
+                                        xml_record=xml_record,
+                                        ln=language)
     return result
 
 # FIXME: Remove this method as soon as the formatting for MARC is
 # implemented in bibformat
-
-from invenio import xmlmarc2textmarc as xmlmarc2textmarc
 def _create_marc(records_xml):
     """Creates MARC from MARCXML.
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,6 +28,7 @@ import os
 import re
 import sys
 import time
+from datetime import datetime
 from zlib import compress
 import socket
 import marshal
@@ -44,6 +45,7 @@ from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_STRONG_TAGS, \
      CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS, \
      CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE, \
+     CFG_BIBUPLOAD_DELETE_FORMATS, \
      CFG_SITE_URL, CFG_SITE_RECORD, \
      CFG_OAI_PROVENANCE_ALTERED_SUBFIELD
 
@@ -57,6 +59,7 @@ from invenio.bibrecord import create_records, \
                               record_delete_field, \
                               record_xml_output, \
                               record_get_field_instances, \
+                              record_get_field_value, \
                               record_get_field_values, \
                               field_get_subfield_values, \
                               field_get_subfield_instances, \
@@ -137,7 +140,9 @@ def bibupload(record, opt_tag=None, opt_mode=None,
     """
     assert(opt_mode in ('insert', 'replace', 'replace_or_insert', 'reference',
         'correct', 'append', 'format', 'holdingpen', 'delete'))
+
     error = None
+    now = datetime.now() # will hold record creation/modification date
     # If there are special tags to proceed check if it exists in the record
     if opt_tag is not None and not(record.has_key(opt_tag)):
         msg = "    Failed: Tag not found, enter a valid tag to update."
@@ -167,7 +172,8 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             else:
                 error = None
             write_message("   -Added tag 001: DONE.", verbose=2)
-    write_message("   -Check if the xml marc file is already in the database: DONE" , verbose=2)
+
+            write_message("   -Check if the xml marc file is already in the database: DONE" , verbose=2)
 
     # Reference mode check if there are reference tag
     if opt_mode == 'reference':
@@ -198,6 +204,13 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         else:
             error = None
 
+        error = record_add_field(record, '005', controlfield_value=now.strftime("%Y%m%d%H%M%S.0"))
+        if error is None:
+            write_message("   Failed: Error during adding to 005 controlfield to record",verbose=1,stream=sys.stderr)
+            return (1, int(rec_id))
+        else:
+            error=None
+
     elif opt_mode != 'insert' and opt_mode != 'format' and \
             opt_stage_to_start_from != 5:
         insert_mode_p = False
@@ -207,12 +220,19 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         record_had_altered_bit = record_get_field_values(rec_old, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4], CFG_OAI_PROVENANCE_ALTERED_SUBFIELD)
         # Also save a copy to restore previous situation in case of errors
         original_record = get_record(rec_id)
+
+        if original_record.has_key('005'):
+            record_delete_field(original_record,'005')
+
         if rec_old is None:
             msg = "   Failed during the creation of the old record!"
             write_message(msg, verbose=1, stream=sys.stderr)
             return (1, int(rec_id), msg)
         else:
             write_message("   -Retrieve the old record to update: DONE", verbose=2)
+
+        if rec_old.has_key('005'):
+            record_delete_field(rec_old,'005')
 
         # In Replace mode, take over old strong tags if applicable:
         if opt_mode == 'replace' or \
@@ -237,6 +257,19 @@ def bibupload(record, opt_tag=None, opt_mode=None,
                 opt_tag, opt_mode)
             write_message("   -Append new tags to the old record: DONE", verbose=2)
 
+        # 005 tag should be added everytime the record is modified
+        # If an exiting record is modified, its 005 tag should be overwritten with a new revision value
+        if record.has_key('005'):
+            record_delete_field(record, '005')
+            write_message("  Deleted the existing 005 tag.", verbose=2)
+        error = record_add_field(record, '005', controlfield_value=now.strftime("%Y%m%d%H%M%S.0"))
+        if error is None:
+            write_message("   Failed: Error during adding to 005 controlfield to record",verbose=1,stream=sys.stderr)
+            return (1, int(rec_id))
+        else:
+            error=None
+            write_message("   -Added tag 005: DONE. "+ str(record_get_field_value(record,'005','','')), verbose=2)
+
         # if record_had_altered_bit, this must be set to true, since the
         # record has been altered.
         if record_had_altered_bit:
@@ -255,6 +288,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         write_message("   -Clean bibrec_bibxxx: DONE", verbose=2)
     write_message("   -Stage COMPLETED", verbose=2)
 
+
     try:
         if not record_is_valid(record):
             msg = "ERROR: record is not valid"
@@ -262,9 +296,9 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             return (1, -1, msg)
 
         # Have a look if we have FMT tags
+        we_have_fmt_tags_p = extract_tag_from_record(record, 'FMT') is not None
         write_message("Stage 1: Start (Insert of FMT tags if exist).", verbose=2)
-        if opt_stage_to_start_from <= 1 and \
-            extract_tag_from_record(record, 'FMT') is not None:
+        if opt_stage_to_start_from <= 1 and we_have_fmt_tags_p:
             record = insert_fmt_tags(record, rec_id, opt_mode, pretend=pretend)
             if record is None:
                 msg = "   Stage 1 failed: Error while inserting FMT tags"
@@ -322,7 +356,6 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             write_message("   -Stage COMPLETED", verbose=2)
         else:
             write_message("   -Stage NOT NEEDED", verbose=2)
-
         # Update of the BibFmt
         write_message("Stage 3: Start (Update bibfmt).", verbose=2)
         if opt_stage_to_start_from <= 3:
@@ -330,17 +363,26 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             rec_xml_new = record_xml_output(record)
             # Update bibfmt with the format xm of this record
             if opt_mode != 'format':
-                error = update_bibfmt_format(rec_id, rec_xml_new, 'xm', pretend=pretend)
+                modification_date = datetime.strptime(record_get_field_value(record,'005'),'%Y%m%d%H%M%S.%f').strftime('%Y-%m-%d %H:%M:%S')
+                error = update_bibfmt_format(rec_id, rec_xml_new, 'xm', modification_date, pretend=pretend)
                 if error == 1:
                     msg = "   Failed: error during update_bibfmt_format 'xm'"
                     write_message(msg, verbose=1, stream=sys.stderr)
                     return (1, int(rec_id), msg)
                 if CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE:
-                    error = update_bibfmt_format(rec_id, marshal.dumps(record), 'recstruct', pretend=pretend)
+                    error = update_bibfmt_format(rec_id, marshal.dumps(record), 'recstruct', modification_date, pretend=pretend)
                     if error == 1:
                         msg = "   Failed: error during update_bibfmt_format 'recstruct'"
                         write_message(msg, verbose=1, stream=sys.stderr)
                         return (1, int(rec_id), msg)
+                if not we_have_fmt_tags_p:
+                    # delete some formats like HB upon record change:
+                    for format_to_delete in CFG_BIBUPLOAD_DELETE_FORMATS:
+                        try:
+                            delete_bibfmt_format(rec_id, format_to_delete, pretend=pretend)
+                        except:
+                            # OK, some formats like HB could not have been deleted, no big deal
+                            pass
                 # archive MARCXML format of this record for version history purposes:
                 error = archive_marcxml_for_history(rec_id, pretend=pretend)
                 if error == 1:
@@ -372,9 +414,8 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         if opt_stage_to_start_from <= 5 and \
         opt_notimechange == 0 and \
         not insert_mode_p:
-            now = convert_datestruct_to_datetext(time.localtime())
             write_message("   -Retrieved current localtime: DONE", verbose=2)
-            update_bibrec_modif_date(now, rec_id, pretend=pretend)
+            update_bibrec_modif_date(now.strftime("%Y-%m-%d %H:%M:%S"), rec_id, pretend=pretend)
             write_message("   -Stage COMPLETED", verbose=2)
         else:
             write_message("   -Stage NOT NEEDED", verbose=2)
@@ -1613,6 +1654,14 @@ def update_bibfmt_format(id_bibrec, format_value, format_name, modification_date
         else:
             write_message("   -Insert the format %s in bibfmt : DONE" % format_name , verbose=2)
             return 0
+
+def delete_bibfmt_format(id_bibrec, format_name, pretend=False):
+    """
+    Delete format FORMAT_NAME from bibfmt table for record ID_BIBREC.
+    """
+    if not pretend:
+        run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s and format=%s", (id_bibrec, format_name))
+    return 0
 
 def archive_marcxml_for_history(recID, pretend=False):
     """

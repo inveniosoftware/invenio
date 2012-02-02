@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -47,13 +47,14 @@ from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, CFG_SITE_URL, CFG_TMPDI
      CFG_DEVEL_SITE
 from invenio.access_control_config import CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
 from invenio import bibupload
-from invenio.search_engine import print_record
+from invenio.search_engine import print_record, get_record
 from invenio.jsonutils import json
 from invenio.dbquery import run_sql, get_table_status_info
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.testutils import make_test_suite, run_test_suite, test_web_page_content
 from invenio.bibdocfile import BibRecDocs
 from invenio.bibtask import task_set_task_param, setup_loggers, task_set_option, task_low_level_submission
+from invenio.bibrecord import record_has_field,record_get_field_value
 
 # helper functions:
 
@@ -65,8 +66,8 @@ def remove_tag_001_from_xmbuffer(xmbuffer):
     return re.sub(r'<controlfield tag="001">.*</controlfield>', '', xmbuffer)
 
 def compare_xmbuffers(xmbuffer1, xmbuffer2):
-    """Compare two XM (XML MARC) buffers by removing whitespaces
-       before testing.
+    """Compare two XM (XML MARC) buffers by removing whitespaces and version
+       numbers in tags 005 before testing.
     """
 
     def remove_blanks_from_xmbuffer(xmbuffer):
@@ -74,6 +75,10 @@ def compare_xmbuffers(xmbuffer1, xmbuffer2):
         out = xmbuffer.replace("\n", "")
         out = out.replace(" ", "")
         return out
+
+    # remove 005 revision numbers:
+    xmbuffer1 = re.sub(r'<controlfield tag="005">.*?</controlfield>', '', xmbuffer1)
+    xmbuffer2 = re.sub(r'<controlfield tag="005">.*?</controlfield>', '', xmbuffer2)
 
     # remove whitespace:
     xmbuffer1 = remove_blanks_from_xmbuffer(xmbuffer1)
@@ -104,6 +109,12 @@ def compare_hmbuffers(hmbuffer1, hmbuffer2):
     hmbuffer2 = re.sub(r'^<pre>', '', hmbuffer2)
     hmbuffer1 = re.sub(r'</pre>$', '', hmbuffer1)
     hmbuffer2 = re.sub(r'</pre>$', '', hmbuffer2)
+
+    # remove 005 revision numbers:
+    hmbuffer1 = re.sub(r'(^|\n)[0-9]{9}\s005.*($|\n)', '\n', hmbuffer1)
+    hmbuffer2 = re.sub(r'(^|\n)[0-9]{9}\s005.*($|\n)', '\n', hmbuffer2)
+    hmbuffer1 = hmbuffer1.strip()
+    hmbuffer2 = hmbuffer2.strip()
 
     # remove leading recid, leaving only field values:
     hmbuffer1 = re.sub(r'(^|\n)[0-9]{9}\s', '', hmbuffer1)
@@ -367,6 +378,19 @@ class BibUploadInsertModeTest(GenericBibUploadTest):
         self.assertEqual(compare_hmbuffers(remove_tag_001_from_hmbuffer(inserted_hm),
                                           self.test_hm), '')
 
+    def test_retrieve_005_tag(self):
+        """bibupload - insert mode, verifying insertion of 005 control field for record """
+        # Convert marc xml into record structure
+        recs = bibupload.xml_marc_to_records(self.test)
+        err, recid, msg = bibupload.bibupload(recs[0], opt_mode='insert')
+        # Retrive the inserted record based on the record id
+        rec = get_record(recid)
+        # We retrieve the creationdate date from the database
+        query = """SELECT DATE_FORMAT(creation_date,'%%Y%%m%%d%%H%%i%%s') FROM bibrec where id = %s"""
+        res = run_sql(query % recid)
+        self.assertEqual(record_has_field(rec,'005'),True)
+        self.assertEqual(str(res[0][0])+'.0',record_get_field_value(rec,'005','',''))
+
 class BibUploadAppendModeTest(GenericBibUploadTest):
     """Testing append mode."""
 
@@ -473,6 +497,15 @@ class BibUploadAppendModeTest(GenericBibUploadTest):
         self.assertEqual(compare_xmbuffers(after_append_xm, self.test_expected_xm), '')
         self.assertEqual(compare_hmbuffers(after_append_hm, self.test_expected_hm), '')
         # clean up after ourselves:
+
+    def test_retrieve_updated_005_tag(self):
+        """bibupload - append mode, updating 005 control tag after modifiction """
+        recs = bibupload.xml_marc_to_records(self.test_to_append)
+        err, recid, msg = bibupload.bibupload(recs[0], opt_mode='append')
+        rec = get_record(recid)
+        query = """SELECT DATE_FORMAT(modification_date,'%%Y%%m%%d%%H%%i%%s') FROM bibrec where id = %s"""
+        res =  run_sql(query % recid)
+        self.assertEqual(str(res[0][0])+'.0',record_get_field_value(rec,'005','',''))
 
 class BibUploadCorrectModeTest(GenericBibUploadTest):
     """
@@ -703,6 +736,7 @@ class BibUploadDeleteModeTest(GenericBibUploadTest):
         # Checking dumb text is no more in bibxxx
         self.failIf(run_sql("SELECT id_bibrec from bibrec_bib88x WHERE id_bibrec=%s", (recid, )))
         # clean up after ourselves:
+
 
 class BibUploadReplaceModeTest(GenericBibUploadTest):
     """Testing replace mode."""
@@ -1128,8 +1162,8 @@ class BibUploadFMTModeTest(GenericBibUploadTest):
         xm_after = print_record(76, 'xm')
         hm_after = print_record(76, 'hm')
         hb_after = print_record(76, 'hb')
-        self.assertEqual(xm_after, xm_before)
-        self.assertEqual(hm_after, hm_before)
+        self.assertEqual(compare_xmbuffers(xm_after, xm_before), '')
+        self.assertEqual(compare_hmbuffers(hm_after, hm_before), '')
         self.failUnless(hb_after.startswith("Test. Let us see if this gets inserted well."))
         # now insert another format value and recheck:
         recs = bibupload.xml_marc_to_records(self.recid76_xm_with_fmt_only_second)
@@ -1138,8 +1172,8 @@ class BibUploadFMTModeTest(GenericBibUploadTest):
         hm_after = print_record(76, 'hm')
         hb_after = print_record(76, 'hb')
         hd_after = print_record(76, 'hd')
-        self.assertEqual(xm_after, xm_before)
-        self.assertEqual(hm_after, hm_before)
+        self.assertEqual(compare_xmbuffers(xm_after, xm_before), '')
+        self.assertEqual(compare_hmbuffers(hm_after, hm_before), '')
         self.failUnless(hb_after.startswith("Test. Yet another test, to be run after the first one."))
         self.failUnless(hd_after.startswith("Test. Let's see what will be stored in the detailed format field."))
 
@@ -1151,6 +1185,7 @@ class BibUploadFMTModeTest(GenericBibUploadTest):
         xm_after = print_record(76, 'xm')
         hm_after = print_record(76, 'hm')
         hb_after = print_record(76, 'hb')
+
         self.assertEqual(compare_xmbuffers(xm_after,
                                           '<record><controlfield tag="001">76</controlfield></record>'), '')
         self.assertEqual(compare_hmbuffers(hm_after,
@@ -1191,11 +1226,11 @@ class BibUploadFMTModeTest(GenericBibUploadTest):
                                            </record>
                                            """), '')
         self.assertEqual(compare_hmbuffers(hm_after, """
-                                           001__ 76
-                                           003__ SzGeCERN
-                                           100__ $$aDoe, John$$uCERN
-                                           245__ $$aOn the foos and bars
-                                           """), '')
+                                          001__ 76
+                                          003__ SzGeCERN
+                                          100__ $$aDoe, John$$uCERN
+                                          245__ $$aOn the foos and bars
+                                          """), '')
         self.failUnless(hb_after.startswith("Test. Here is some format value."))
         self.failUnless(hd_after.startswith("Test. Let's see what will be stored in the detailed format field."))
 
@@ -4301,6 +4336,7 @@ TEST_SUITE = make_test_suite(BibUploadHoldingPenTest,
                              BibUploadPretendTest,
                              BibUploadCallbackURLTest
                              )
+
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

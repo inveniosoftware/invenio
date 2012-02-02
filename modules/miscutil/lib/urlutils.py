@@ -35,7 +35,7 @@ from urlparse import urlparse
 from cgi import parse_qs, escape
 
 try:
-    from hashlib import sha256
+    from hashlib import sha256, sha1
     HASHLIB_IMPORTED = True
 except ImportError:
     HASHLIB_IMPORTED = False
@@ -44,7 +44,6 @@ from invenio import webinterface_handler_config as apache
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE
-
 
 def wash_url_argument(var, new_type):
     """
@@ -564,24 +563,99 @@ def create_AWS_request_url(base_url, argd, _amazon_secret_access_key,
     return base_url + "?" + urlencode(argd)
 
 
-class _MySHA256(object):
+def create_Indico_request_url(base_url, indico_what, indico_loc, indico_id, indico_type, indico_params, indico_key, indico_sig, _timestamp=None):
+    """
+    Create a signed Indico request URL to access Indico HTTP Export APIs.
+
+    See U{http://indico.cern.ch/ihelp/html/ExportAPI/index.html} for more
+    information.
+
+    Example:
+    >> create_Indico_request_url("https://indico.cern.ch",
+                                 "categ",
+                                 "",
+                                 [1, 7],
+                                 "xml",
+                                 {'onlypublic': 'yes',
+                                  'order': 'title',
+                                  'from': 'today',
+                                  'to': 'tomorrow'},
+                                 '00000000-0000-0000-0000-000000000000',
+                                 '00000000-0000-0000-0000-000000000000')
+
+    @param base_url: Service base URL of the Indico instance to query
+    @param indico_what: element to export
+    @type indico_what: one of the strings: C{categ}, C{event}, C{room}, C{reservation}
+    @param indico_loc: location of the element(s) specified by ID (only used for some elements)
+    @param indico_id: ID of the element to be exported
+    @type indico_id: a string or a list/tuple of strings
+    @param indico_type: output format
+    @type indico_type: one of the strings: C{json}, C{jsonp}, C{xml}, C{html}, C{ics}, C{atom}
+    @param indico_params: parameters of the query. See U{http://indico.cern.ch/ihelp/html/ExportAPI/common.html}
+    @param indico_key: API key provided for the given Indico instance
+    @param indico_sig: API secret key (signature) provided for the given Indico instance
+    @param _timestamp: for testing purpose only (default: current timestamp)
+
+    @return signed URL of the request (string)
+    """
+
+    url = '/export/' + indico_what + '/'
+    if indico_loc:
+        url += indico_loc + '/'
+    if type(indico_id) in (list, tuple):
+        # dash separated list of values
+        indico_id = '-'.join([str(x) for x in indico_id])
+    url += indico_id + '.' + str(indico_type)
+
+    if hasattr(indico_params, 'items'):
+        items = indico_params.items()
+    else:
+        items = list(indico_params)
+    if indico_key:
+        items.append(('apikey', indico_key))
+    if indico_sig and HASHLIB_IMPORTED:
+        if _timestamp:
+            items.append(('timestamp', str(_timestamp)))
+        else:
+            items.append(('timestamp', str(int(time.time()))))
+        items = sorted(items, key=lambda x: x[0].lower())
+        url_to_sign = '%s?%s' % (url, urlencode(items))
+        if sys.version_info < (2, 5):
+            # compatibility mode for Python < 2.5 and hashlib
+            my_digest_algo = _MySHA1(sha1())
+        else:
+            my_digest_algo = sha1
+        signature = hmac.new(indico_sig, url_to_sign, my_digest_algo).hexdigest()
+        items.append(('signature', signature))
+    elif not HASHLIB_IMPORTED:
+        try:
+            raise Exception("Module hashlib not installed. Please install it.")
+        except:
+            from invenio.errorlib import register_exception
+            register_exception(stream='warning', alert_admin=True, subject='Cannot create AWS signature')
+    if not items:
+        return url
+
+    url = '%s%s?%s' % (base_url.strip('/'), url, urlencode(items))
+    return url
+
+class _MyHashlibAlgo(object):
     '''
-    Define a subclass of the sha256 class, with an additional "new()"
+    Define a subclass of any hashlib algorithm class, with an additional "new()"
     function, to work with the Python < 2.5 version of the hmac module.
 
     (This class is more complex than it should, but it is not
-    possible to subclass sha256)
+    possible to subclass haslib algorithm)
     '''
-    new = lambda d = '': sha256()
 
     def __init__(self, obj):
         """Set the wrapped object."""
-        super(_MySHA256, self).__setattr__('_obj', obj)
+        super(_MyHashlibAlgo, self).__setattr__('_obj', obj)
 
         methods = []
         for name_value in inspect.getmembers(obj, inspect.ismethod):
             methods.append(name_value[0])
-        super(_MySHA256, self).__setattr__('__methods__', methods)
+        super(_MyHashlibAlgo, self).__setattr__('__methods__', methods)
 
         def isnotmethod(object_):
             "Opposite of ismethod(..)"
@@ -589,7 +663,7 @@ class _MySHA256(object):
         members = []
         for name_value in inspect.getmembers(obj, isnotmethod):
             members.append(name_value[0])
-        super(_MySHA256, self).__setattr__('__members__', members)
+        super(_MyHashlibAlgo, self).__setattr__('__members__', members)
 
     def __getattr__(self, name):
         """Redirect unhandled get attribute to self._obj."""
@@ -603,12 +677,21 @@ class _MySHA256(object):
         """Redirect set attribute to self._obj if necessary."""
         self_has_attr = True
         try:
-            super(_MySHA256, self).__getattribute__(name)
+            super(_MyHashlibAlgo, self).__getattribute__(name)
         except AttributeError:
             self_has_attr = False
 
         if (name == "_obj" or not hasattr(self, "_obj") or
             not hasattr(self._obj, name) or self_has_attr):
-            return super(_MySHA256, self).__setattr__(name, value)
+            return super(_MyHashlibAlgo, self).__setattr__(name, value)
         else:
             return setattr(self._obj, name, value)
+
+class _MySHA256(_MyHashlibAlgo):
+    "A _MyHashlibAlgo subsclass for sha256"
+    new = lambda d = '': sha256()
+
+
+class _MySHA1(_MyHashlibAlgo):
+    "A _MyHashlibAlgo subsclass for sha1"
+    new = lambda d = '': sha1()

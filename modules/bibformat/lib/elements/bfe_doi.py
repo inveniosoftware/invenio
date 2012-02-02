@@ -21,17 +21,17 @@
 
 from cgi import escape
 
-def format_element(bfo, tag="0247_", label=""):
+def format_element(bfo, tag="909C4", label=""):
     """
     Return an HTML link to the DOI.
 
-    @param tag: field (tag + indicators) where the DOI can be found.
+    @param tag: field
     @param label: label to use for the DOI link. If not specified, use the DOI number as label for the link.
     """
     fields = bfo.fields(tag)
     doi = ''
     for field in fields:
-        if field.get('2', 'DOI') == 'DOI' and 'a' in field:
+        if 'a' in field:
             doi = field['a']
     if doi:
         return """<a href="http://dx.doi.org/%s" title="DOI" target="_blank">%s</a>""" % (escape(doi, True), label and escape(label) or escape(doi))
