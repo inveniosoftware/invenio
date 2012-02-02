@@ -32,7 +32,7 @@ class InvenioBibFormatWebTest(InvenioWebTestCase):
         """bibformat - web test format many authors"""
 
         self.browser.get(CFG_SITE_SECURE_URL)
-        self.fill_textbox("p", "recid:10")
+        self.fill_textbox(textbox_name="p", text="recid:10")
         self.find_element_by_name_with_timeout("action_search")
         self.browser.find_element_by_name("action_search").click()
         self.handle_popup_dialog()

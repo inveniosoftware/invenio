@@ -40,13 +40,13 @@ class InvenioWebMessageWebTest(InvenioWebTestCase):
         @type body: string
         """
         if users:
-            self.fill_textbox("msg_to_user", users)
+            self.fill_textbox(textbox_name="msg_to_user", text=users)
         if groups:
-            self.fill_textbox("msg_to_group", groups)
+            self.fill_textbox(textbox_name="msg_to_group", text=groups)
         if subject:
-            self.fill_textbox("msg_subject", subject)
+            self.fill_textbox(textbox_name="msg_subject", text=subject)
         if body:
-            self.fill_textbox("msg_body", body)
+            self.fill_textbox(textbox_name="msg_body", text=body)
 
     def test_send_message(self):
         """webmessage - web test send a message"""
@@ -63,10 +63,10 @@ class InvenioWebMessageWebTest(InvenioWebTestCase):
         self.find_element_by_name_with_timeout("del_all")
         self.browser.find_element_by_name("del_all").click()
         self.handle_popup_dialog()
-        self.fill_textbox("search_pattern", "juliet")
+        self.fill_textbox(textbox_name="search_pattern", text="juliet")
         self.find_element_by_name_with_timeout("search_user")
         self.browser.find_element_by_name("search_user").click()
-        self.choose_selectbox_option_by_label("names_selected", "juliet")
+        self.choose_selectbox_option_by_label(selectbox_name="names_selected", label="juliet")
         self.find_element_by_name_with_timeout("add_user")
         self.browser.find_element_by_name("add_user").click()
         self.element_value_test("msg_to_user", \
@@ -136,10 +136,10 @@ class InvenioWebMessageWebTest(InvenioWebTestCase):
         self.find_element_by_name_with_timeout("del_all")
         self.browser.find_element_by_name("del_all").click()
         self.handle_popup_dialog()
-        self.fill_textbox("search_pattern", "juliet")
+        self.fill_textbox(textbox_name="search_pattern", text="juliet")
         self.find_element_by_name_with_timeout("search_user")
         self.browser.find_element_by_name("search_user").click()
-        self.choose_selectbox_option_by_label("names_selected", "juliet")
+        self.choose_selectbox_option_by_label(selectbox_name="names_selected", label="juliet")
         self.find_element_by_name_with_timeout("add_user")
         self.browser.find_element_by_name("add_user").click()
         self.element_value_test("msg_to_user", \
@@ -195,12 +195,12 @@ class InvenioWebMessageWebTest(InvenioWebTestCase):
         self.browser.find_element_by_name("del_all").click()
         self.handle_popup_dialog()
         self._compose_message(users="juliet", subject="dear juliet", body= "i love you")
-        self.choose_selectbox_option_by_label("msg_send_day", "4")
-        self.choose_selectbox_option_by_label("msg_send_month", "July")
+        self.choose_selectbox_option_by_label(selectbox_name="msg_send_day",label= "4")
+        self.choose_selectbox_option_by_label(selectbox_name="msg_send_month", label="July")
         self.find_element_by_name_with_timeout("send_button")
         self.browser.find_element_by_name("send_button").click()
         self.page_source_test(expected_text='The chosen date (0/7/4) is invalid')
-        self.choose_selectbox_option_by_label("msg_send_year", "2019")
+        self.choose_selectbox_option_by_label(selectbox_name="msg_send_year", label="2019")
         self.find_element_by_name_with_timeout("send_button")
         self.browser.find_element_by_name("send_button").click()
         self.page_source_test(expected_text='Your message has been sent')
