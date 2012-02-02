@@ -31,7 +31,7 @@ from invenio.webaccount import warning_guest_user
 from invenio.webbasket import create_personal_baskets_selection_box
 from invenio.webbasket_dblayer import check_user_owns_baskets
 from invenio.messages import gettext_set_language
-from invenio.dateutils import convert_datestruct_to_datetext, convert_datetext_to_dategui
+from invenio.dateutils import convert_datestruct_to_datetext
 
 import invenio.template
 webalert_templates = invenio.template.load('webalert')
@@ -219,7 +219,6 @@ def perform_request_youralerts_display(uid,
     search_clause_urlargs = []
     search_clause_alert_name = []
     if p:
-        p_stripped = p.strip()
         p_stripped_args = p.split()
         sql_p_stripped_args = ['\'%%' + quote(p_stripped_arg).replace('%','%%') + '%%\'' for p_stripped_arg in p_stripped_args]
         for sql_p_stripped_arg in sql_p_stripped_args:
@@ -227,9 +226,6 @@ def perform_request_youralerts_display(uid,
             search_clause_alert_name.append("uqb.alert_name LIKE %s" % (sql_p_stripped_arg,))
         search_clause = "((%s) OR (%s))" % (" AND ".join(search_clause_urlargs),
                                                 " AND ".join(search_clause_alert_name))
-
-    idq_and_search_clause_list = [clause for clause in (idq_clause, search_clause) if clause]
-    idq_and_search_clause = ' AND '.join(idq_and_search_clause_list)
 
     query_nb_alerts = """   SELECT      COUNT(IF((uqb.id_user=%%s
                                                   %s),uqb.id_query,NULL)),
@@ -343,9 +339,7 @@ Here are all the alerts defined by this user: %s""" % (uid, repr(result)))
                                                      page=page,
                                                      step=step,
                                                      paging_navigation=paging_navigation,
-                                                     p=p,
-                                                     guest=isGuestUser(uid),
-                                                     guesttxt=warning_guest_user(type="alerts", ln=ln))
+                                                     p=p)
     return out
 
 def perform_remove_alert(alert_name, id_query, id_basket, uid, ln=CFG_SITE_LANG):

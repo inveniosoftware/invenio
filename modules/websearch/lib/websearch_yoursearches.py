@@ -24,7 +24,7 @@ from invenio.dbquery import run_sql
 from invenio.webaccount import warning_guest_user
 from invenio.messages import gettext_set_language
 from invenio.webuser import isGuestUser
-from urllib import quote, quote_plus, unquote_plus
+from urllib import quote
 from invenio.webalert import count_user_alerts_for_given_query
 
 import invenio.template
@@ -63,7 +63,6 @@ def perform_request_yoursearches_display(uid,
 
     search_clause = ""
     if p:
-        p_stripped = p.strip()
         p_stripped_args = p.split()
         sql_p_stripped_args = ['\'%%' + quote(p_stripped_arg).replace('%','%%') + '%%\'' for p_stripped_arg in p_stripped_args]
         for sql_p_stripped_arg in sql_p_stripped_args:
@@ -150,8 +149,6 @@ def perform_request_yoursearches_display(uid,
         step=step,
         paging_navigation=paging_navigation,
         p=p,
-        guest = isGuestUser(uid),
-        guesttxt = warning_guest_user(type="searches", ln=ln),
         ln = ln)
 
 def account_list_searches(uid,

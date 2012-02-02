@@ -60,7 +60,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         redirect_to_url(req, '%s/youralerts/display' % CFG_SITE_SECURE_URL)
 
-    def list(self, req, form):
+    def list(self, req, dummy):
         """
         Legacy youralerts list page.
         Now redirects to the youralerts display page.
