@@ -23,10 +23,17 @@ from invenio.config import CFG_SITE_SECURE_URL
 from invenio.testutils import make_test_suite, \
                               run_test_suite, \
                               InvenioWebTestCase
+from invenio.dbquery import run_sql
 
 
 class InvenioWebCommentWebTest(InvenioWebTestCase):
     """WebComment web tests."""
+
+    def _delete_comments_and_reviews(self, recID, text="%This is a test%"):
+        run_sql("delete from cmtRECORDCOMMENT where id_bibrec=%s and body like %s", (recID, text))
+
+    def _delete_comments_and_reviews_history(self, recID):
+        run_sql("delete from cmtACTIONHISTORY where id_bibrec=%s", (recID,))
 
     def test_add_comment(self):
         """webcomment - web test add a new comment"""
@@ -60,22 +67,7 @@ class InvenioWebCommentWebTest(InvenioWebTestCase):
         self.browser.find_element_by_link_text("Back to record").click()
         self.page_source_test(expected_text=['juliet', 'This is a test reply.'])
         self.logout()
-        # login as romeo
-        self.login(username="romeo", password="r123omeo")
-        self.browser.get(CFG_SITE_SECURE_URL + "/record/1")
-        self.find_element_by_partial_link_text_with_timeout("Discussion")
-        self.browser.find_element_by_partial_link_text("Discussion").click()
-        self.find_element_by_link_text_with_timeout("Delete comment")
-        self.browser.find_element_by_link_text("Delete comment").click()
-        self.logout()
-        # login as juliet
-        self.login(username="juliet", password="j123uliet")
-        self.browser.get(CFG_SITE_SECURE_URL+"/record/1")
-        self.find_element_by_partial_link_text_with_timeout("Discussion")
-        self.browser.find_element_by_partial_link_text("Discussion").click()
-        self.find_element_by_link_text_with_timeout("Delete comment")
-        self.browser.find_element_by_link_text("Delete comment").click()
-        self.logout()
+        self._delete_comments_and_reviews(recID=1)
 
     def test_add_review(self):
         """webcomment - web test add a new review"""
@@ -85,6 +77,7 @@ class InvenioWebCommentWebTest(InvenioWebTestCase):
         self.browser.find_element_by_partial_link_text("Discussion").click()
         self.find_element_by_link_text_with_timeout("Reviews")
         self.browser.find_element_by_link_text("Reviews").click()
+        self._delete_comments_and_reviews_history(recID=1)
         self.choose_selectbox_option_by_value(selectbox_name="score", value="4")
         self.fill_textbox(textbox_name="note", text="This is a test review title")
         self.fill_textbox(textbox_name="msg", text="This is a test review body.")
@@ -102,6 +95,7 @@ class InvenioWebCommentWebTest(InvenioWebTestCase):
                                              'Reviewed by', 'jekyll', \
                                              'This is a test review body.'])
         self.logout()
+        self._delete_comments_and_reviews(recID=1)
 
     def test_delete_report(self):
         """webcomment - web test delete a report"""
@@ -126,7 +120,7 @@ class InvenioWebCommentWebTest(InvenioWebTestCase):
         self.browser.get(CFG_SITE_SECURE_URL + "/record/2")
         self.find_element_by_partial_link_text_with_timeout("Discussion")
         self.browser.find_element_by_partial_link_text("Discussion").click()
-        self.fill_textbox(textbox_name="msg", text="Another comment.")
+        self.fill_textbox(textbox_name="msg", text="'This is a test for another comment.")
         self.find_element_by_xpath_with_timeout("//input[@value='Add comment']")
         self.browser.find_element_by_xpath("//input[@value='Add comment']").click()
         self.find_element_by_link_text_with_timeout("Back to record")
@@ -147,14 +141,7 @@ class InvenioWebCommentWebTest(InvenioWebTestCase):
         self.find_element_by_link_text_with_timeout("Report abuse")
         self.browser.find_element_by_link_text("Report abuse").click()
         self.page_source_test(expected_text='please login')
-        # login as romeo
-        self.login(username="romeo", password="r123omeo")
-        self.browser.get(CFG_SITE_SECURE_URL + "/record/2")
-        self.find_element_by_partial_link_text_with_timeout("Discussion")
-        self.browser.find_element_by_partial_link_text("Discussion").click()
-        self.find_element_by_link_text_with_timeout("Delete comment")
-        self.browser.find_element_by_link_text("Delete comment").click()
-        self.logout()
+        self._delete_comments_and_reviews(recID=2)
 
 TEST_SUITE = make_test_suite(InvenioWebCommentWebTest, )
 
