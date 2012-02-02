@@ -67,7 +67,7 @@ from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTIO
 from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
 from invenio.errorlib import register_exception
 from invenio.search_engine import search_unit
-from invenio.htmlutils import remove_html_markup
+from invenio.htmlutils import remove_html_markup, unescape
 
 ########################################
 ### Display public baskets and notes ###
@@ -1165,7 +1165,8 @@ def perform_request_search(uid,
                 value       = external_info_per_basket[4]
                 xml_record  = decompress(value)
                 personal_external_items_xml_records[recid] = xml_record
-                text = remove_html_markup(xml_record)
+                text = remove_html_markup(xml_record, remove_escaped_chars_p=False)
+                text = unescape(text)
                 #text = text.replace('\n', '')
                 result = pattern.search(text)
                 if result:
@@ -1245,7 +1246,8 @@ def perform_request_search(uid,
                 value       = external_info_per_basket[6]
                 xml_record  = decompress(value)
                 group_external_items_xml_records[recid] = xml_record
-                text = remove_html_markup(xml_record)
+                text = remove_html_markup(xml_record, remove_escaped_chars_p=False)
+                text = unescape(text)
                 #text = text.replace('\n', '')
                 result = pattern.search(text)
                 if result:
@@ -1329,7 +1331,8 @@ def perform_request_search(uid,
                 value       = external_info_per_basket[4]
                 xml_record  = decompress(value)
                 public_external_items_xml_records[recid] = xml_record
-                text = remove_html_markup(xml_record)
+                text = remove_html_markup(xml_record, remove_escaped_chars_p=False)
+                text = unescape(text)
                 #text = text.replace('\n', '')
                 result = pattern.search(text)
                 if result:
@@ -1411,7 +1414,8 @@ def perform_request_search(uid,
                 value       = external_info_per_basket[4]
                 xml_record  = decompress(value)
                 all_public_external_items_xml_records[recid] = xml_record
-                text = remove_html_markup(xml_record)
+                text = remove_html_markup(xml_record, remove_escaped_chars_p=False)
+                text = unescape(text)
                 #text = text.replace('\n', '')
                 result = pattern.search(text)
                 if result:
