@@ -32,7 +32,6 @@ from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
                                       CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA
 from invenio.dateutils import datetext_default, \
                               convert_datestruct_to_datetext
-from invenio.webuser import list_users_in_roles
 from invenio.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
 
 def check_user_owns_message(uid, msgid):
@@ -473,30 +472,18 @@ def check_quota(nb_messages):
     @param nb_messages: max number of messages a user can have
     @return: a dictionary of users over-quota
     """
-    where = ''
-    no_quota_users = list_users_in_roles(CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA)
-    query_params = []
-    if len(no_quota_users) > 0:
-        where = """WHERE """
-        for uid in no_quota_users[:-1]:
-            where += "id_user_to!=%s AND "
-            query_params.append(uid)
-        where += "id_user_to!=%s"
-        query_params.append(no_quota_users[-1])
-    query = """SELECT id_user_to,
-                      count(id_user_to)
-               FROM user_msgMESSAGE
-               %s
-               GROUP BY id_user_to
-               HAVING count(id_user_to)>%%s"""
-    query_params.append(nb_messages)
-    res = run_sql(query % where, tuple(query_params))
-    user_over_quota = {}
-    def enter_dict(couple):
-        """ enter a tuple in user_over_quota dict """
-        user_over_quota[int(couple[0])] = int(couple[1])
-    map(enter_dict, res)
-    return user_over_quota
+    from invenio.webuser import collect_user_info
+    from invenio.access_control_admin import acc_is_user_in_role, acc_get_role_id
+    no_quota_role_ids = [acc_get_role_id(role) for role in CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA]
+    res = {}
+    for uid, n in run_sql("SELECT id_user_to, COUNT(id_user_to) FROM user_msgMESSAGE GROUP BY id_user_to HAVING COUNT(id_user_to) > %s", (nb_messages, )):
+        user_info = collect_user_info(uid)
+        for role_id in no_quota_role_ids:
+            if acc_is_user_in_role(user_info, role_id):
+                break
+        else:
+            res[uid] = n
+    return res
 
 def update_user_inbox_for_reminders(uid):
     """

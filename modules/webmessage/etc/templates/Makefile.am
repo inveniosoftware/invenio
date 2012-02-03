@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,20 +15,9 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/invenio
+templatesdir = $(sysconfdir)/templates
+templates_DATA = webmessage_display.html webmessage_write.html
 
-pylib_DATA = webmessage.py \
-             webmessage_templates.py \
-             webmessage_config.py \
-             webmessage_dblayer.py \
-             webmessage_mailutils.py \
-             webmessage_webinterface.py \
-             webmessage_regression_tests.py \
-             webmessage_unit_tests.py \
-             webmessage_tests.py \
-             webmessage_web_tests.py \
-             webmessage_blueprint.py
+EXTRA_DIST = $(templates_DATA)
 
-EXTRA_DIST = $(pylib_DATA)
-
-CLEANFILES = *~ *.tmp *.pyc
+CLEANFILES = *~ *.tmp

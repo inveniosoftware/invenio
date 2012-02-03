@@ -854,6 +854,8 @@ AC_CONFIG_FILES([config.nice  \
      modules/webmessage/doc/Makefile \
      modules/webmessage/doc/admin/Makefile \
      modules/webmessage/doc/hacking/Makefile \
+     modules/webmessage/etc/Makefile \
+     modules/webmessage/etc/templates/Makefile \
      modules/webmessage/lib/Makefile \
      modules/webmessage/web/Makefile \
      modules/websearch/Makefile \

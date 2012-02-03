@@ -32,7 +32,8 @@ from invenio.config import CFG_SITE_LANG, \
 from invenio.messages import gettext_set_language
 from invenio.dateutils import datetext_default, get_datetext
 from invenio.htmlutils import escape_html
-from invenio.webuser import list_users_in_roles
+from invenio.webuser import collect_user_info
+from invenio.access_control_admin import acc_get_role_id, acc_is_user_in_role
 try:
     import invenio.template
     webmessage_templates = invenio.template.load('webmessage')
@@ -92,29 +93,6 @@ def perform_request_display_msg(uid, msgid, ln=CFG_SITE_LANG):
                                                 msg_sent_date,
                                                 msg_received_date,
                                                 ln)
-    return body
-
-def perform_request_display(uid, warnings=[], infos=[], ln=CFG_SITE_LANG):
-    """
-    Displays the user's Inbox
-    @param uid:   user id
-
-    @return: body with warnings
-    """
-    body = ""
-    rows = []
-    rows = db.get_all_messages_for_user(uid)
-    nb_messages = db.count_nb_messages(uid)
-    no_quota_users = list_users_in_roles(CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA)
-    no_quota = False
-    if uid in no_quota_users:
-        no_quota = True
-    body = webmessage_templates.tmpl_display_inbox(messages=rows,
-                                                   infos=infos,
-                                                   warnings=warnings,
-                                                   nb_messages=nb_messages,
-                                                   no_quota=no_quota,
-                                                   ln=ln)
     return body
 
 def perform_request_delete_msg(uid, msgid, ln=CFG_SITE_LANG):
@@ -479,3 +457,15 @@ def get_navtrail(ln=CFG_SITE_LANG, title=""):
     """
     navtrail = webmessage_templates.tmpl_navtrail(ln, title)
     return navtrail
+
+def is_no_quota_user(uid):
+    """
+    Return True if the user belongs to any of the no_quota roles.
+    """
+    no_quota_role_ids = [acc_get_role_id(role) for role in CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA]
+    res = {}
+    user_info = collect_user_info(uid)
+    for role_id in no_quota_role_ids:
+        if acc_is_user_in_role(user_info, role_id):
+            return True
+    return False

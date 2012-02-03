@@ -25,8 +25,7 @@ __lastupdated__ = """$Date$"""
 
 from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_URL, CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.webuser import getUid, isGuestUser, page_not_authorized, collect_user_info
-from invenio.webmessage import perform_request_display, \
-                               perform_request_display_msg, \
+from invenio.webmessage import perform_request_display_msg, \
                                perform_request_write, \
                                perform_request_send, \
                                perform_request_write_with_search, \
@@ -44,55 +43,13 @@ from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
     """Defines the set of /yourmessages pages."""
 
-    _exports = ['', 'display', 'write', 'send', 'delete', 'delete_all',
+    _exports = ['', 'write', 'send', 'delete', 'delete_all',
                 'display_msg']
 
     def index(self, req, form):
         """ The function called by default
         """
         redirect_to_url(req, "%s/yourmessages/display?%s" % (CFG_SITE_SECURE_URL, req.args))
-
-    def display(self, req, form):
-        """
-        Displays the Inbox of a given user
-        @param ln:  language
-        @return: the page for inbox
-        """
-        argd = wash_urlargd(form, {})
-
-        # Check if user is logged
-        uid = getUid(req)
-        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "%s/yourmessages/display" % \
-                                             (CFG_SITE_URL,),
-                                       navmenuid="yourmessages")
-        elif uid == -1 or isGuestUser(uid):
-            return redirect_to_url(req, "%s/youraccount/login%s" % (
-                CFG_SITE_SECURE_URL,
-                make_canonical_urlargd({
-                    'referer' : "%s/yourmessages/display%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
-
-        _ = gettext_set_language(argd['ln'])
-        user_info = collect_user_info(req)
-        if not user_info['precached_usemessages']:
-            return page_not_authorized(req, "../", \
-                                       text = _("You are not authorized to use messages."))
-
-        body = perform_request_display(uid=uid,
-                                       ln=argd['ln'])
-
-        return page(title       = _("Your Messages"),
-                    body        = body,
-                    navtrail    = get_navtrail(argd['ln']),
-                    uid         = uid,
-                    lastupdated = __lastupdated__,
-                    req         = req,
-                    language    = argd['ln'],
-                    navmenuid   = "yourmessages",
-                    secure_page_p=1)
 
     def write(self, req, form):
         """ write(): interface for message composing
