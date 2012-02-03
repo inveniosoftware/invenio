@@ -47,13 +47,17 @@ for _alang in CFG_SITE_LANGS:
                                              languages = [_alang],
                                              fallback = True)
 
-def gettext_set_language(ln):
+def gettext_set_language(ln, use_unicode=False):
     """
       Set the _ gettext function in every caller function
 
       Usage::
         _ = gettext_set_language(ln)
     """
+    if use_unicode:
+        def unicode_gettext_wrapper(*args, **kwargs):
+            return _LANG_GT_D[ln].gettext(*args, **kwargs).decode('utf-8')
+        return unicode_gettext_wrapper
     return _LANG_GT_D[ln].gettext
 
 def wash_language(ln):

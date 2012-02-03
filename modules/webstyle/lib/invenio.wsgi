@@ -47,4 +47,4 @@ try:
 except:
     pass
 
-from invenio.webinterface_handler_wsgi import application
+from invenio.webinterface_handler_flask import application

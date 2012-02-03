@@ -24,6 +24,7 @@ __revision__ = "$Id$"
 ## import interesting modules:
 
 import sys
+import urlparse
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -31,7 +32,7 @@ if sys.hexversion < 0x2040000:
     # pylint: enable=W0622
 
 from invenio.messages import gettext_set_language
-from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG
+from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_RECORD
 from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
     CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, DELEGATEADDUSERROLE, SUPERADMINROLE, \
     DEF_USERS, DEF_ROLES, DEF_AUTHS, DEF_ACTIONS, CFG_ACC_ACTIVITIES_URLS
@@ -1269,6 +1270,22 @@ def acc_find_possible_activities(user_info, ln=CFG_SITE_LANG):
     ret = {}
     for action, (name, url) in your_admin_activities.iteritems():
         ret[_(name)] =  url % ln
+
+    # For BibEdit and BibDocFile menu items, take into consideration
+    # current record whenever possible
+    if ret.has_key(_("Run Record Editor")) or \
+           ret.has_key(_("Run Document File Manager")) and \
+           user_info['uri'].startswith('/' + CFG_SITE_RECORD + '/'):
+        try:
+            # Get record ID and try to cast it to an int
+            current_record_id = int(urlparse.urlparse(user_info['uri'])[2].split('/')[2])
+        except:
+            pass
+        else:
+            if ret.has_key(_("Run Record Editor")):
+                ret[_("Run Record Editor")] = ret[_("Run Record Editor")] + '&amp;#state=edit&amp;recid=' + str(current_record_id)
+            if ret.has_key(_("Run Document File Manager")):
+                ret[_("Run Document File Manager")] = ret[_("Run Document File Manager")] + '&amp;recid=' + str(current_record_id)
 
     return ret
 

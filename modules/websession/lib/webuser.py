@@ -41,6 +41,7 @@ import random
 import datetime
 
 from socket import gaierror
+from flask import Request
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
@@ -235,7 +236,7 @@ def setUid(req, uid, remember_me=False):
     session = get_session(req)
     session.invalidate()
     session = get_session(req)
-    session['uid'] = uid
+    session['_uid'] = uid
     if remember_me:
         session.set_timeout(86400)
     session.set_remember_me(remember_me)
@@ -1184,6 +1185,8 @@ def collect_user_info(req, login_time=False, refresh=False):
 
     try:
         is_req = False
+        is_flask = False
+        session = None
         if not req:
             uid = -1
         elif type(req) in (type(1), type(1L)):
@@ -1200,8 +1203,23 @@ def collect_user_info(req, login_time=False, refresh=False):
                 register_exception(alert_admin=True)
             user_info.update(req)
             return user_info
+        elif isinstance(req, Request):
+            is_flask = True
+            from flask import session
+            uid = session.uid
+            if 'user_info' in session:
+                user_info = session['user_info']
+            if not login_time and not refresh:
+                return user_info
+            user_info['remote_ip'] = req.remote_addr
+            user_info['session'] = session.sid
+            user_info['remote_host'] = req.environ.get('REMOTE_HOST', '')
+            user_info['referer'] = req.referrer
+            user_info['uri'] = req.url or ''
+            user_info['agent'] = req.user_agent or 'N/A'
         else:
             is_req = True
+            session = get_session(req)
             uid = getUid(req)
             if hasattr(req, '_user_info') and not login_time:
                 user_info = req._user_info
@@ -1216,7 +1234,7 @@ def collect_user_info(req, login_time=False, refresh=False):
             user_info['session'] = get_session(req).sid()
             user_info['remote_host'] = req.remote_host or ''
             user_info['referer'] = req.headers_in.get('Referer', '')
-            user_info['uri'] = req.unparsed_uri or ()
+            user_info['uri'] = req.unparsed_uri or ''
             user_info['agent'] = req.headers_in.get('User-Agent', 'N/A')
         user_info['uid'] = uid
         user_info['nickname'] = get_nickname(uid) or ''
@@ -1236,15 +1254,12 @@ def collect_user_info(req, login_time=False, refresh=False):
 #                and usepaperattribution
 #                and acc_is_user_in_role(user_info, acc_get_role_id("paperattributionlinkviewers"))):
 #                viewclaimlink = True
-            if is_req:
-                session = get_session(req)
-                viewlink = False
+            viewlink = False
+            if is_req or is_flask:
                 try:
                     viewlink = session['personinfo']['claim_in_process']
                 except (KeyError, TypeError):
-                    viewlink = False
-            else:
-                viewlink = False
+                    pass
 
             if (CFG_BIBAUTHORID_ENABLED
                 and usepaperattribution
@@ -1322,15 +1337,12 @@ def collect_user_info(req, login_time=False, refresh=False):
                     and acc_is_user_in_role(user_info, acc_get_role_id("paperattributionviewers"))):
                     usepaperattribution = True
 
-                if is_req:
-                    session = get_session(req)
-                    viewlink = False
+                viewlink = False
+                if is_req or is_flask:
                     try:
                         viewlink = session['personinfo']['claim_in_process']
                     except (KeyError, TypeError):
-                        viewlink = False
-                else:
-                    viewlink = False
+                        pass
 
                 if (CFG_BIBAUTHORID_ENABLED
                     and usepaperattribution

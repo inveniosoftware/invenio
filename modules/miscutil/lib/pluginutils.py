@@ -27,6 +27,7 @@ import glob
 import inspect
 import imp
 
+from invenio.errorlib import register_exception
 from invenio.config import CFG_PYLIBDIR
 from invenio.textutils import wrap_text_in_a_box
 
@@ -341,6 +342,7 @@ class PluginContainer(object):
                 'api_version': api_version,
             }
         except Exception:
+            register_exception()
             self._plugin_map[plugin_name] = {
                 'plugin': None,
                 'error': sys.exc_info(),

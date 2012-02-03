@@ -26,12 +26,15 @@ interface, which will let you store permanent information).
 
 from invenio.webinterface_handler_wsgi_utils import add_cookies, Cookie, get_cookie
 
-import cPickle
-import time
 import random
+import zlib
+import cPickle
 import re
 import sys
 import os
+import time
+from datetime import datetime, timedelta
+from uuid import uuid4
 if sys.hexversion < 0x2060000:
     from md5 import md5
 else:
@@ -102,9 +105,6 @@ class InvenioSession(dict):
         self._req, self._sid, self._secret = req, sid, None
         self._lock = CFG_WEBSESSION_ENABLE_LOCKING
         self._new = 1
-        self._created = 0
-        self._accessed = 0
-        self._timeout = 0
         self._locked = 0
         self._invalid = 0
         self._dirty = False
@@ -153,11 +153,6 @@ class InvenioSession(dict):
                 self._https_ip = remote_ip
             else:
                 self._http_ip = remote_ip
-            self._created = time.time()
-            self._timeout = CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT * \
-                CFG_WEBSESSION_ONE_DAY
-
-        self._accessed = time.time()
 
         # need cleanup?
         if random.randint(1, CFG_WEBSESSION_CLEANUP_CHANCE) == 1:
@@ -197,12 +192,7 @@ class InvenioSession(dict):
         @type remember_me: bool
         """
         self._remember_me = remember_me
-        if remember_me:
-            self.set_timeout(CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER *
-                CFG_WEBSESSION_ONE_DAY)
-        else:
-            self.set_timeout(CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT *
-                CFG_WEBSESSION_ONE_DAY)
+        self['_permanent'] = remember_me
         add_cookies(self._req, self.make_cookies())
 
     def load(self):
@@ -214,9 +204,9 @@ class InvenioSession(dict):
         session_dict = None
         invalid = False
         res = run_sql("SELECT session_object FROM session "
-                        "WHERE session_key=%s", (self._sid, ))
+                        "WHERE session_key=%s AND session_expiry>=UTC_TIMESTAMP()", (self._sid, ))
         if res:
-            session_dict = cPickle.loads(blob_to_string(res[0][0]))
+            session_dict = cPickle.loads(zlib.decompress(blob_to_string(res[0][0])))
             remote_ip = self._req.remote_ip
             if self._req.is_https():
                 if session_dict['_https_ip'] is not None:
@@ -253,15 +243,8 @@ class InvenioSession(dict):
         if invalid:
             return 0
 
-        if (time.time() - session_dict["_accessed"]) > \
-                session_dict["_timeout"]:
-            return 0
-
-        self._created  = session_dict["_created"]
-        self._accessed = session_dict["_accessed"]
-        self._timeout  = session_dict["_timeout"]
-        self._remember_me = session_dict["_remember_me"]
-        self.update(session_dict["_data"])
+        self.update(session_dict)
+        self._remember_me = session_dict.get("_permanent", False)
         return 1
 
     def is_useful(self):
@@ -287,8 +270,8 @@ class InvenioSession(dict):
                     "_timeout" : self._timeout,
                     "_http_ip" : self._http_ip,
                     "_https_ip" : self._https_ip,
-                    "_remember_me" : self._remember_me
-            }
+                    "_permanent" : self._remember_me
+                    }
             session_key = self._sid
             session_object = cPickle.dumps(session_dict, -1)
             session_expiry = time.time() + self._timeout + CFG_WEBSESSION_ONE_DAY
@@ -342,7 +325,7 @@ class InvenioSession(dict):
         @return: a list of cookies.
         """
         cookies = []
-        uid = self.get('uid', -1)
+        uid = self.get('_uid', -1)
         if uid > 0 and CFG_SITE_SECURE_URL.startswith("https://"):
             stub_cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME + 'stub', 'HTTPS')
         else:
@@ -357,8 +340,8 @@ class InvenioSession(dict):
         for cookie in cookies:
             cookie.path = '/'
             if self._remember_me:
-                cookie.expires = time.time() + self._timeout
-
+                cookie.expires = time.time() + CFG_WEBSESSION_ONE_DAY * CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER
+                cookie.max_age = CFG_WEBSESSION_ONE_DAY * CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER
         return cookies
 
 
@@ -410,38 +393,6 @@ class InvenioSession(dict):
         """
         return self._sid
 
-    def created(self):
-        """
-        @return: the UNIX timestamp for when the session has been created.
-        @rtype: double
-        """
-        return self._created
-
-    def last_accessed(self):
-        """
-        @return: the UNIX timestamp for when the session has been last
-            accessed.
-        @rtype: double
-        """
-        return self._accessed
-
-    def timeout(self):
-        """
-        @return: the number of seconds from the last accessed timestamp,
-            after which the session is invalid.
-        @rtype: double
-        """
-        return self._timeout
-
-    def set_timeout(self, secs):
-        """
-        Set the number of seconds from the last accessed timestamp,
-            after which the session is invalid.
-        @param secs: the number of seconds.
-        @type secs: double
-        """
-        self._timeout = secs
-
     def cleanup(self):
         """
         Perform the database session cleanup.
@@ -482,48 +433,6 @@ def _unlock_session_cleanup(session):
     """
     session.unlock()
 
-def _init_rnd():
-    """
-    Initialize random number generators.
-    This is key in multithreaded env, see Python docs for random.
-    @return: the generators.
-    @rtype: list of generators
-    """
-
-    # query max number of threads
-    gennum = 10
-
-    # make generators
-    # this bit is from Python lib reference
-    random_generator = random.Random(time.time())
-    result = [random_generator]
-    for dummy in range(gennum - 1):
-        laststate = random_generator.getstate()
-        random_generator = random.Random()
-        random_generator.setstate(laststate)
-        random_generator.jumpahead(1000000)
-        result.append(random_generator)
-
-    return result
-
-_RANDOM_GENERATORS = _init_rnd()
-_RANDOM_ITERATOR = iter(_RANDOM_GENERATORS)
-
-def _get_generator():
-    """
-    get rnd_iter.next(), or start over
-    if we reached the end of it
-    @return: the next random number.
-    @rtype: double
-    """
-    global _RANDOM_ITERATOR
-    try:
-        return _RANDOM_ITERATOR.next()
-    except StopIteration:
-        # the small potential for two threads doing this
-        # seems does not warrant use of a lock
-        _RANDOM_ITERATOR = iter(_RANDOM_GENERATORS)
-        return _RANDOM_ITERATOR.next()
 
 _RE_VALIDATE_SID = re.compile('[0-9a-f]{32}$')
 def _check_sid(sid):
@@ -567,6 +476,7 @@ def _new_sid(req):
         change the validation scheme, as well as the test_Session_illegal_sid()
         unit test in test/test.py.
     """
+    return uuid4().hex
 
     the_time = long(time.time()*10000)
     pid = os.getpid()
