@@ -260,6 +260,9 @@ def apply_washer(data_dict, washer):
 def run_sorting_method(recids, method_name, method_id, definition, washer):
     """Does the actual sorting for the method_name
     for all the records in the database"""
+    run_sorting_for_rnk = False
+    if definition.startswith('RNK'):
+        run_sorting_for_rnk = True
     field_data_dictionary = get_field_data(recids, method_name, definition)
     if not field_data_dictionary:
         write_message("POSSIBLE ERROR: The sorting method --%s-- has no data!" \
@@ -267,7 +270,7 @@ def run_sorting_method(recids, method_name, method_id, definition, washer):
         return True
     apply_washer(field_data_dictionary, washer)
     sorted_data_list, sorted_data_dict = \
-                sort_dict(field_data_dictionary, CFG_BIBSORT_WEIGHT_DISTANCE)
+                sort_dict(field_data_dictionary, CFG_BIBSORT_WEIGHT_DISTANCE, run_sorting_for_rnk)
     executed = write_to_methoddata_table(method_id, field_data_dictionary, \
                                          sorted_data_dict, sorted_data_list)
     if not executed:
@@ -375,7 +378,7 @@ def split_into_buckets(sorted_data_list, data_size):
     return bucket_dict, bucket_last_rec_dict
 
 
-def sort_dict(dictionary, spacing=1):
+def sort_dict(dictionary, spacing=1, run_sorting_for_rnk=False):
     """Sorting a dictionary. Returns a list of sorted recids
     and also a dictionary containing the recid: weight
     weight = index * spacing"""
@@ -385,9 +388,13 @@ def sort_dict(dictionary, spacing=1):
     sorted_records_dict_with_id = {}
     sorted_records_list = sorted(dictionary, key=dictionary.__getitem__, reverse=False)
     index = 1
-    for recid in sorted_records_list:
-        sorted_records_dict_with_id[recid] = index * spacing
-        index += 1
+    if run_sorting_for_rnk:
+        #for ranking, we can keep the actual values associated with the recids
+        return sorted_records_list, dictionary
+    else:
+        for recid in sorted_records_list:
+            sorted_records_dict_with_id[recid] = index * spacing
+            index += 1
     write_message("Dictionary sorted.", verbose=5)
     return sorted_records_list, sorted_records_dict_with_id
 

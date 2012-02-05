@@ -686,7 +686,9 @@ def cli_cmd_create_demo_site(conf):
     cli_cmd_reset_fieldnames(conf) # needed for I18N demo ranking method names
     for cmd in ["%s/bin/webaccessadmin -u admin -c -r -D" % CFG_PREFIX,
                 "%s/bin/webcoll -u admin" % CFG_PREFIX,
-                "%s/bin/webcoll 1" % CFG_PREFIX,]:
+                "%s/bin/webcoll 1" % CFG_PREFIX,
+                "%s/bin/bibsort -u admin --load-config" % CFG_PREFIX,
+                "%s/bin/bibsort 2" % CFG_PREFIX, ]:
         if os.system(cmd):
             print "ERROR: failed execution of", cmd
             sys.exit(1)
@@ -710,9 +712,11 @@ def cli_cmd_load_demo_records(conf):
                 "%s/bin/webcoll 4" % CFG_PREFIX,
                 "%s/bin/bibrank -u admin" % CFG_PREFIX,
                 "%s/bin/bibrank 5" % CFG_PREFIX,
+                "%s/bin/bibsort -u admin -B" % CFG_PREFIX,
+                "%s/bin/bibsort 6" % CFG_PREFIX,
                 "%s/bin/oairepositoryupdater -u admin" % CFG_PREFIX,
-                "%s/bin/oairepositoryupdater 6" % CFG_PREFIX,
-                "%s/bin/bibupload 7" % CFG_PREFIX,]:
+                "%s/bin/oairepositoryupdater 7" % CFG_PREFIX,
+                "%s/bin/bibupload 8" % CFG_PREFIX,]:
         if os.system(cmd):
             print "ERROR: failed execution of", cmd
             sys.exit(1)

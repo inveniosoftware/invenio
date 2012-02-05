@@ -318,14 +318,6 @@ def task_submit_elaborate_specific_parameter(key, value, opts, dummy_args):
     else:
         return False
 
-    #test that the command is well received
-    cmd = task_get_option('cmd')
-    if not cmd:
-        raise StandardError("Please specify a command!")
-    if not cmd in ('load', 'dump', 'print', 'sort', 'rebalance'):
-        raise StandardError("This action is not possible. \
-        See the --help for available actions.")
-
     return True
 
 
@@ -339,7 +331,12 @@ def task_run_core():
     write_message("Task parameters: command=%s ; methods=%s ; recids=%s" \
                   % (cmd, methods, recids), verbose=2)
 
-    executed_correctly = True
+    executed_correctly = False
+
+        #test that the command is well received
+    if not cmd:
+        write_message("Please specify a command!")
+        return False
 
     if cmd == 'load':
         write_message('Starting loading the configuration \
@@ -366,7 +363,8 @@ def task_run_core():
         if executed_correctly:
             write_message('Rebalancing completed.', verbose=5)
     else:
-        write_message('This action has not been implemented!', sys.stderr)
+        write_message("This action is not possible. \
+        See the --help for available actions.", sys.stderr)
 
     write_message('bibsort exiting..')
     return executed_correctly

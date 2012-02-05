@@ -1349,8 +1349,8 @@ class WebSearchSortResultsTest(unittest.TestCase):
     def test_sort_results_ascending(self):
         """websearch - search results sorting, ascending field"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=of&f=title&rg=1&sf=reportnumber&so=a',
-                                               expected_text="ISOLTRAP"))
+                         test_web_page_content(CFG_SITE_URL + '/search?p=of&f=title&rg=2&sf=reportnumber&so=a',
+                                               expected_text="[astro-ph/0104076]"))
 
     def test_sort_results_descending(self):
         """websearch - search results sorting, descending field"""
