@@ -459,21 +459,41 @@ class InvenioWebTestCase(unittest.TestCase):
         except:
             raise InvenioWebTestCaseException(element=element_partial_link_text)
 
-    def find_element_by_id_with_timeout(self, element_id, timeout=30):
+    def find_element_by_id_with_timeout(self, element_id, timeout=30, text=""):
         """ Find an element by id. This waits up to 'timeout' seconds
         before throwing an InvenioWebTestCaseException or if it finds the element
         will return it in 0 - timeout seconds.
+        If the parameter text is provided, the function waits
+        until the element is found and its content is equal to the given text.
+        If the element's text is not equal to the given text an exception will be raised
+        and the result of this comparison will be stored in the errors list
+        #NOTE: Currently this is used to wait for an element's text to be
+        refreshed using JavaScript
         @param element_id: id of the element to find
         @type element_id: string
         @param timeout: time in seconds before throwing an exception
         if the element is not found
         @type timeout: int
+        @param text: expected text inside the given element.
+        @type text: string
         """
 
         try:
             WebDriverWait(self.browser, timeout).until(lambda driver: driver.find_element_by_id(element_id))
         except:
             raise InvenioWebTestCaseException(element=element_id)
+
+        if text:
+            q = self.browser.find_element_by_id(element_id)
+            try:
+                # if the element's text is not equal to the given text, an exception will be raised
+                WebDriverWait(self.browser, timeout).until(lambda driver: driver.find_element_by_id(element_id) and q.text==text)
+            except:
+                # let's store the result of the comparison in the errors list
+                try:
+                    self.assertEqual(q.text, text)
+                except AssertionError, e:
+                    self.errors.append(str(e))
 
     def find_element_by_xpath_with_timeout(self, element_xpath, timeout=30):
         """ Find an element by xpath. This waits up to 'timeout' seconds

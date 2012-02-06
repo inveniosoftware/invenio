@@ -24,7 +24,6 @@ from invenio.testutils import make_test_suite, \
                               run_test_suite, \
                               InvenioWebTestCase
 
-
 class InvenioBibEditWebTest(InvenioWebTestCase):
     """BibEdit web tests."""
 
@@ -38,47 +37,24 @@ class InvenioBibEditWebTest(InvenioWebTestCase):
         self.fill_textbox(textbox_id="txtSearchPattern", text="36")
         self.find_element_by_id_with_timeout("btnSearch")
         self.browser.find_element_by_id("btnSearch").click()
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Record loaded", in_form=False)
-#            except: pass
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Ready", in_form=False)
-#            except: pass
-#        self.element_value_test(element_id="content_001_0", expected_element_value="36")
+        self.find_element_by_id_with_timeout("cellStatus", text="Record loaded")
+        self.find_element_by_id_with_timeout("cellStatus", text="Ready")
+        self.find_element_by_id_with_timeout("content_001_0", text="36")
         self.find_element_by_id_with_timeout("btnCancel")
         self.browser.find_element_by_id("btnCancel").click()
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Cancelled", in_form=False)
-#            except: pass
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Ready", in_form=False)
-#            except: pass
+        self.find_element_by_id_with_timeout("cellStatus", text="Cancelled")
+        self.find_element_by_id_with_timeout("cellStatus", text="Ready")
         self.fill_textbox(textbox_id="txtSearchPattern", text="12")
         self.find_element_by_id_with_timeout("btnSearch")
         self.browser.find_element_by_id("btnSearch").click()
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Record loaded", in_form=False)
-#            except: pass
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Ready", in_form=False)
-#            except: pass
-#        self.element_value_test(element_id="content_001_0", expected_element_value="12")
+        self.find_element_by_id_with_timeout("cellStatus")
+        self.find_element_by_id_with_timeout("cellStatus", text="Record loaded")
+        self.find_element_by_id_with_timeout("cellStatus", text="Ready")
+        self.find_element_by_id_with_timeout("content_001_0", text="12")
         self.find_element_by_id_with_timeout("btnCancel")
         self.browser.find_element_by_id("btnCancel").click()
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Cancelled", in_form=False)
-#            except: pass
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Ready", in_form=False)
-#            except: pass
+        self.find_element_by_id_with_timeout("cellStatus", text="Cancelled")
+        self.find_element_by_id_with_timeout("cellStatus", text="Ready")
         self.logout()
 
     def test_bibedit_access_curator_coll(self):
@@ -91,36 +67,18 @@ class InvenioBibEditWebTest(InvenioWebTestCase):
         self.fill_textbox(textbox_id="txtSearchPattern", text="36")
         self.find_element_by_id_with_timeout("btnSearch")
         self.browser.find_element_by_id("btnSearch").click()
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Record loaded", in_form=False)
-#            except: pass
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Ready", in_form=False)
-#            except: pass
-#        self.element_value_test(element_id="content_001_0", expected_element_value="36")
+        self.find_element_by_id_with_timeout("cellStatus", text="Record loaded")
+        self.find_element_by_id_with_timeout("cellStatus", text="Ready")
+        self.find_element_by_id_with_timeout("content_001_0", text="36")
         self.find_element_by_id_with_timeout("btnCancel")
         self.browser.find_element_by_id("btnCancel").click()
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Cancelled", in_form=False)
-#            except: pass
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Ready", in_form=False)
-#            except: pass
+        self.find_element_by_id_with_timeout("cellStatus", text="Cancelled")
+        self.find_element_by_id_with_timeout("cellStatus", text="Ready")
         self.fill_textbox(textbox_id="txtSearchPattern", text="70")
         self.find_element_by_id_with_timeout("btnSearch")
         self.browser.find_element_by_id("btnSearch").click()
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Error: Permission denied", in_form=False)
-#            except: pass
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Ready", in_form=False)
-#            except: pass
+        self.find_element_by_id_with_timeout("cellStatus", text="Error: Permission denied")
+        self.find_element_by_id_with_timeout("cellStatus", text="Ready")
         self.element_value_test(element_id="bibEditMessage", expected_element_value="Could not access record. Permission denied.", in_form=False)
         self.logout()
 
@@ -134,15 +92,15 @@ class InvenioBibEditWebTest(InvenioWebTestCase):
         self.fill_textbox(textbox_id="txtSearchPattern", text="1")
         self.find_element_by_id_with_timeout("btnSearch")
         self.browser.find_element_by_id("btnSearch").click()
-#        self.element_value_test(element_id="cellStatus", expected_element_value="Error: Permission denied", in_form=False)
-#        self.element_value_test(element_id="cellStatus", expected_element_value="Ready", in_form=False)
+        self.find_element_by_id_with_timeout("cellStatus", text="Error: Permission denied")
+        self.find_element_by_id_with_timeout("cellStatus", text="Ready")
         self.element_value_test(element_id="bibEditMessage", expected_element_value="Could not access record. Permission denied.", in_form=False)
         self.browser.find_element_by_id("txtSearchPattern").clear()
         self.fill_textbox(textbox_id="txtSearchPattern", text="70")
         self.find_element_by_id_with_timeout("btnSearch")
         self.browser.find_element_by_id("btnSearch").click()
-#        self.element_value_test(element_id="cellStatus", expected_element_value="Error: Permission denied", in_form=False)
-#        self.element_value_test(element_id="cellStatus", expected_element_value="Ready", in_form=False)
+        self.find_element_by_id_with_timeout("cellStatus", text="Error: Permission denied")
+        self.find_element_by_id_with_timeout("cellStatus", text="Ready")
         self.element_value_test(element_id="bibEditMessage", expected_element_value="Could not access record. Permission denied.", in_form=False)
         self.logout()
 
@@ -156,15 +114,9 @@ class InvenioBibEditWebTest(InvenioWebTestCase):
         self.fill_textbox(textbox_id="txtSearchPattern", text="40")
         self.find_element_by_id_with_timeout("btnSearch")
         self.browser.find_element_by_id("btnSearch").click()
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Record loaded", in_form=False)
-#            except: pass
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Ready", in_form=False)
-#            except: pass
-#        self.element_value_test(element_id="content_001_0", expected_element_value="40")
+        self.find_element_by_id_with_timeout("cellStatus", text="Record loaded")
+        self.find_element_by_id_with_timeout("cellStatus", text="Ready")
+        self.find_element_by_id_with_timeout("content_001_0", text="40")
         self.logout()
         # login as romeo
         self.login(username="romeo", password="r123omeo")
@@ -172,10 +124,7 @@ class InvenioBibEditWebTest(InvenioWebTestCase):
         self.fill_textbox(textbox_id="txtSearchPattern", text="40")
         self.find_element_by_id_with_timeout("btnSearch")
         self.browser.find_element_by_id("btnSearch").click()
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Error: Record locked by user", in_form=False)
-#            except: pass
+        self.find_element_by_id_with_timeout("cellStatus", text="Error: Record locked by user")
         self.element_value_test(element_id="bibEditMessage", expected_element_value="This record is currently being edited by another user. Please try again later.", in_form=False)
         self.logout()
         # login as balthasar
@@ -184,25 +133,13 @@ class InvenioBibEditWebTest(InvenioWebTestCase):
         self.fill_textbox(textbox_id="txtSearchPattern", text="40")
         self.find_element_by_id_with_timeout("btnSearch")
         self.browser.find_element_by_id("btnSearch").click()
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Record loaded", in_form=False)
-#            except: pass
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Ready", in_form=False)
-#            except: pass
-#        self.element_value_test(element_id="content_001_0", expected_element_value="40")
+        self.find_element_by_id_with_timeout("cellStatus", text="Record loaded")
+        self.find_element_by_id_with_timeout("cellStatus", text="Ready")
+        self.find_element_by_id_with_timeout("content_001_0", text="40")
         self.find_element_by_id_with_timeout("btnCancel")
         self.browser.find_element_by_id("btnCancel").click()
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Cancelled", in_form=False)
-#            except: pass
-#        for i in range(60):
-#            try:
-#                self.element_value_test(element_id="cellStatus", expected_element_value="Ready", in_form=False)
-#            except: pass
+        self.find_element_by_id_with_timeout("cellStatus", text="Cancelled")
+        self.find_element_by_id_with_timeout("cellStatus", text="Ready")
         self.logout()
 
 TEST_SUITE = make_test_suite(InvenioBibEditWebTest, )
