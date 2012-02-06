@@ -1,7 +1,7 @@
 ## -*- mode: html; coding: utf-7; -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -57,8 +57,13 @@ Each section of the file corresponds to a method.
     <li>The <u>washer</u> property holds the name of the function that will process
         the values of the records, for this method, before they get sorted (in this case,
         it will remove the leading articles). This functions are implemented in
-        <i>bibsort_washer.py</i>. One can also set the washer to '-'
-        which will mean that no washer should be applied to the data before the sorting.
+        <i>bibsort_washer.py</i>. <br/>One can also set the washer to 'NOOP'
+        which will mean that no washer should be applied to the data before the sorting.<br/>
+        Bibsort supports <b>string collation</b>. There is the possibility of selecting a specific
+        language for this, by adding at the end of the washer ':ln', where 'ln' is the language
+        according to which the string comparison should be done.<br/>
+        Ex: "washer = sort_alphanumerically_remove_leading_articles:fr" means that the string comparison
+        would be done using the French rules.
     <li>The <u>definition</u> property holds the name of the place from where the data should be
         taken for this sorting method. There are several options for defining this property:</li>
         <ul>

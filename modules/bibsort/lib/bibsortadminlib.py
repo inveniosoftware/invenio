@@ -20,7 +20,7 @@
 from invenio.access_control_engine import acc_authorize_action
 from invenio.dbquery import run_sql
 from invenio.config import CFG_SITE_URL, CFG_BIBSORT_BUCKETS, CFG_ETCDIR, CFG_SITE_LANG
-from invenio.messages import gettext_set_language
+from invenio.messages import gettext_set_language, language_list_long
 from invenio.bibsort_engine import delete_all_data_for_method, add_sorting_method
 from invenio.bibsort_washer import get_all_available_washers
 from invenio.bibrankadminlib import write_outcome, modify_translations, \
@@ -28,7 +28,7 @@ from invenio.bibrankadminlib import write_outcome, modify_translations, \
     tupletotable, createhiddenform
 
 
-def perform_index(ln, action, bsrcode, sm_name, sm_def_type, sm_def_value, sm_washer):
+def perform_index(ln, action, bsrcode, sm_name, sm_def_type, sm_def_value, sm_washer, sm_locale):
     """
     Create the BibSort main page that displays all the sorting methods.
     """
@@ -54,7 +54,10 @@ def perform_index(ln, action, bsrcode, sm_name, sm_def_type, sm_def_value, sm_wa
                                    %(bsrcode, CFG_ETCDIR, get_admin_guide_link(ln)))
 
     elif action == 'add':
-        sm_method =  '%s: %s' % (sm_def_type.upper(), sm_def_value) 
+        sm_method = '%s: %s' % (sm_def_type.upper(), sm_def_value)
+        if sm_locale != 'en':
+            #it's not the default one, let's store it in the db with the washer
+            sm_washer += ':%s' % sm_locale
         result = add_sorting_method(sm_name, sm_method, sm_washer)
         if not result:
             return create_important_box('<p> There was an error adding method %s. <br/>\
@@ -179,6 +182,19 @@ def create_action_add_link():
             </select>
             </div>'''
 
+    #get possibilities for language
+    def get_locale_value():
+        """Returns all the available languages"""
+        sm_locale_code = '''<select name="sm_locale">'''
+        sm_locale_code += '''<option value='en'>English (default)</option>'''
+        langs = language_list_long(True)
+        for lang in langs:
+            if lang[0] != 'en': # we already added English as default
+                sm_locale_code += '''<option value='%(lang_short)s'>%(lang_long)s</option>''' \
+                                  % {'lang_short': lang[0], 'lang_long': lang[1]}
+        sm_locale_code += '''</select>'''
+        return sm_locale_code
+
     #get the possible definition types
     sm_types = ['field', 'marc', 'rnk', 'bibrec']
     sm_def_code = '''<table cellspan='5' cellpadding='5'>'''
@@ -246,6 +262,10 @@ def create_action_add_link():
            <td>%(sm_washer_code)s</td>
          </tr>
          <tr>
+           <td><b><small>Use this language when sorting:</small></b></td>
+           <td>%(sm_locale_code)s</td>
+         </tr>
+         <tr>
            <td colspan=2 align='right'><input type='submit' value='Add' style="%(button_style)s"/></td>
          </tr>
        </table> 
@@ -253,6 +273,7 @@ def create_action_add_link():
     </div>
     '''% {'button_style': button_style,
           'sm_washer_code': get_washer_value(),
+          'sm_locale_code': get_locale_value(),
           'sm_def_code': sm_def_code}
 
     button_link = '''<div style="padding-top:20px; padding-left:10px;">\

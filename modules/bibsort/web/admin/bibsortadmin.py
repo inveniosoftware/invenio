@@ -29,7 +29,7 @@ from invenio.urlutils import wash_url_argument
 from invenio import bibsortadminlib as bsc
 
 
-def index(req, ln=CFG_SITE_LANG, action='', bsrID='', sm_name='', sm_def_type='', sm_def_value='', sm_washer=''):
+def index(req, ln=CFG_SITE_LANG, action='', bsrID='', sm_name='', sm_def_type='', sm_def_value='', sm_washer='', sm_locale=''):
     """
     Display the initial(main) page
     """
@@ -48,8 +48,9 @@ def index(req, ln=CFG_SITE_LANG, action='', bsrID='', sm_name='', sm_def_type=''
         sm_def_type = wash_url_argument(sm_def_type, 'str')
         sm_def_value = wash_url_argument(sm_def_value, 'str')
         sm_washer = wash_url_argument(sm_washer, 'str')
+        sm_locale = wash_url_argument(sm_locale, 'str')
         return page(title="BibSort Admin Interface",
-                body=bsc.perform_index(ln, action, bsrID, sm_name, sm_def_type, sm_def_value, sm_washer),
+                body=bsc.perform_index(ln, action, bsrID, sm_name, sm_def_type, sm_def_value, sm_washer, sm_locale),
                 uid=uid,
                 language=ln,
                 navtrail = navtrail_previous_links,

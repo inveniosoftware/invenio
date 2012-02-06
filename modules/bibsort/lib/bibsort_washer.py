@@ -1,7 +1,7 @@
 ## -*- mode: python; coding: utf-8; -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -50,7 +50,7 @@ class BibSortWasher(object):
         """Returns the value"""
         return self.washer_fnc(val)
 
-    def _sort_alphanumerically_remove_leading_articles(self, val):
+    def _sort_alphanumerically_remove_leading_articles_strip_accents(self, val):
         """
         Convert:
         'The title' => 'title'
@@ -63,6 +63,20 @@ class BibSortWasher(object):
         if delim != "" and leading_word.lower() in LEADING_ARTICLES:
             return strip_accents(without_leading_word.strip().lower())
         return strip_accents(val.lower())
+
+    def _sort_alphanumerically_remove_leading_articles(self, val):
+        """
+        Convert:
+        'The title' => 'title'
+        'A title' => 'title'
+        'Title' => 'title'
+        """
+        if not val:
+            return ''
+        leading_word, delim, without_leading_word = str(val).partition(" ")
+        if delim != "" and leading_word.lower() in LEADING_ARTICLES:
+            return without_leading_word.strip().lower()
+        return val.lower()
 
     def _sort_case_insensitive_strip_accents(self, val):
         """Remove accents and convert to lower case"""

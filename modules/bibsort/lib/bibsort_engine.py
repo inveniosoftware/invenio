@@ -1,7 +1,7 @@
 ## -*- mode: python; coding: utf-8; -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -30,6 +30,9 @@ task_sleep_now_if_required
 from invenio.config import CFG_BIBSORT_BUCKETS, CFG_CERN_SITE
 from bibsort_washer import BibSortWasher, \
 InvenioBibSortWasherNotImplementedError
+
+import invenio.template
+websearch_templates = invenio.template.load('websearch')
 
 #The space distance between elements, to make inserts faster
 CFG_BIBSORT_WEIGHT_DISTANCE = 8
@@ -246,6 +249,7 @@ def apply_washer(data_dict, washer):
         return
     if washer.strip() == 'NOOP':
         return
+    washer = washer.partition(':')[0]#in case we have a locale defined
     try:
         method = BibSortWasher(washer)
         write_message('Washer method found: %s' %method, verbose=5)
@@ -256,6 +260,12 @@ def apply_washer(data_dict, washer):
         write_message("Washer %s is not implemented [%s]." \
                       %(washer, err), stream=sys.stderr)
 
+def locale_for_sorting(washer):
+    """Identifies if any specific locale should be used, and it returns it"""
+    if washer.find(":") > -1:
+        lang = washer[washer.index(':')+1:]
+        return websearch_templates.tmpl_localemap.get(lang, websearch_templates.tmpl_default_locale)
+    return None
 
 def run_sorting_method(recids, method_name, method_id, definition, washer):
     """Does the actual sorting for the method_name
@@ -269,8 +279,10 @@ def run_sorting_method(recids, method_name, method_id, definition, washer):
                       %method_name)
         return True
     apply_washer(field_data_dictionary, washer)
+    #do we have any locale constraint?
+    sorting_locale = locale_for_sorting(washer)
     sorted_data_list, sorted_data_dict = \
-                sort_dict(field_data_dictionary, CFG_BIBSORT_WEIGHT_DISTANCE, run_sorting_for_rnk)
+                sort_dict(field_data_dictionary, CFG_BIBSORT_WEIGHT_DISTANCE, run_sorting_for_rnk, sorting_locale)
     executed = write_to_methoddata_table(method_id, field_data_dictionary, \
                                          sorted_data_dict, sorted_data_list)
     if not executed:
@@ -378,7 +390,7 @@ def split_into_buckets(sorted_data_list, data_size):
     return bucket_dict, bucket_last_rec_dict
 
 
-def sort_dict(dictionary, spacing=1, run_sorting_for_rnk=False):
+def sort_dict(dictionary, spacing=1, run_sorting_for_rnk=False, sorting_locale=None):
     """Sorting a dictionary. Returns a list of sorted recids
     and also a dictionary containing the recid: weight
     weight = index * spacing"""
@@ -386,12 +398,27 @@ def sort_dict(dictionary, spacing=1, run_sorting_for_rnk=False):
     write_message("Starting sorting the dictionary " \
                   "containing all the data..", verbose=5)
     sorted_records_dict_with_id = {}
-    sorted_records_list = sorted(dictionary, key=dictionary.__getitem__, reverse=False)
-    index = 1
+
+    if sorting_locale:
+        import locale
+        orig_locale = locale.getlocale(locale.LC_ALL)
+        try:
+            locale.setlocale(locale.LC_ALL, sorting_locale)
+        except locale.Error:
+            try:
+                locale.setlocale(locale.LC_ALL, sorting_locale + '.UTF8')
+            except locale.Error:
+                write_message("Setting locale to %s is not working.. ignoring locale")
+        sorted_records_list = sorted(dictionary, key=dictionary.__getitem__, cmp=locale.strcoll, reverse=False)
+        locale.setlocale(locale.LC_ALL, orig_locale)
+    else:
+        sorted_records_list = sorted(dictionary, key=dictionary.__getitem__, reverse=False)
+
     if run_sorting_for_rnk:
         #for ranking, we can keep the actual values associated with the recids
         return sorted_records_list, dictionary
     else:
+        index = 1
         for recid in sorted_records_list:
             sorted_records_dict_with_id[recid] = index * spacing
             index += 1
