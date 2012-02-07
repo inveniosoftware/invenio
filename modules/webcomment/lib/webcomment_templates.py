@@ -366,7 +366,7 @@ class Template:
         out = ''
         final_body = email_quoted_txt2html(body)
         title = _('%(x_name)s') % {'x_name': nickname,}
-        title += '<a name="%s"></a>' % com_id
+        title += '<a name="C%s" id="C%s"></a>' % (com_id, com_id)
         links = ''
         moderator_links = ''
         if reply_link:
@@ -428,7 +428,7 @@ class Template:
         <div class="webcomment_comment_title">
             %(title)s
             <div class="webcomment_comment_date">%(date)s</div>
-            <a class="webcomment_permalink" title="Permalink to this comment" href="#%(comid)i">¶</a>
+            <a class="webcomment_permalink" title="Permalink to this comment" href="#C%(comid)i">¶</a>
         </div>
             <blockquote>
         %(body)s
@@ -716,7 +716,6 @@ class Template:
                 comments_rows += _('%(x_nb)i comments for round "%(x_name)s"') % {'x_nb': len(comments_list), 'x_name': comment_round_name}+ "</a><br/>"
             comments_rows += '<div id="cmtSubRound%s" class="cmtsubround" style="%s">' % (comment_round_name,
                                                                                           comment_round_style)
-
             thread_history = [0]
             for comment in comments_list:
                 if comment[reply_to] not in thread_history:
@@ -1365,7 +1364,7 @@ class Template:
                 out = _("Your review was successfully added.") + '<br /><br />'
             else:
                 out = _("Your comment was successfully added.") + '<br /><br />'
-                link += "#%s" % success
+                link += "#C%s" % success
         out += '<a href="%s">' % link
         out += _('Back to record') + '</a>'
         return out

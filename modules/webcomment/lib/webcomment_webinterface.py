@@ -550,12 +550,12 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
         success = perform_request_vote(argd['comid'], client_ip_address, argd['com_value'], uid)
         if argd['referer']:
-            argd['referer'] += "?ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;voted=%s&amp;" % (
+            argd['referer'] += "?ln=%s&do=%s&ds=%s&nb=%s&p=%s&voted=%s&" % (
                 argd['ln'], argd['do'], argd['ds'], argd['nb'], argd['p'], success)
             redirect_to_url(req, argd['referer'])
         else:
             #Note: sent to comments display
-            referer = "%s/%s/%s/%s?&amp;ln=%s&amp;voted=1"
+            referer = "%s/%s/%s/%s?&ln=%s&voted=1"
             referer %= (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, self.discussion == 1 and 'reviews' or 'comments', argd['ln'])
             redirect_to_url(req, referer)
 
@@ -609,12 +609,12 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
         success = perform_request_report(argd['comid'], client_ip_address, uid)
         if argd['referer']:
-            argd['referer'] += "?ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;reported=%s&amp;" % (argd['ln'], argd['do'], argd['ds'], argd['nb'], argd['p'], str(success))
+            argd['referer'] += "?ln=%s&do=%s&ds=%s&nb=%s&p=%s&reported=%s&" % (argd['ln'], argd['do'], argd['ds'], argd['nb'], argd['p'], str(success))
 
             redirect_to_url(req, argd['referer'])
         else:
             #Note: sent to comments display
-            referer = "%s/%s/%s/%s/display?ln=%s&amp;voted=1"
+            referer = "%s/%s/%s/%s/display?ln=%s&voted=1"
             referer %= (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, self.discussion==1 and 'reviews' or 'comments', argd['ln'])
             redirect_to_url(req, referer)
 
