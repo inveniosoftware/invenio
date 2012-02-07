@@ -2465,6 +2465,7 @@ class Template:
                   }
         else:
             out += """
+                  <div style="clear:both"></div>
                   <form action="%(siteurl)s/search" method="get"><div align="center">
                   """ % { 'siteurl' : CFG_SITE_URL }
 
