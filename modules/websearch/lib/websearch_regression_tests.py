@@ -871,6 +871,28 @@ class WebSearchNearestTermsTest(unittest.TestCase):
                                                expected_link_target=CFG_SITE_URL+"/search?ln=en&p=title%3Aenergi+author%3Aenqvist&f=keyword",
                                                expected_link_label='enqvist'))
 
+    def test_nearest_terms_box_in_unsuccessful_uppercase_query(self):
+        """ websearch - nearest terms box for unsuccessful uppercase query """
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=fOo%3Atest',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=food",
+                                               expected_link_label='food'))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=arXiv%3A1007.5048',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=artist",
+                                               expected_link_label='artist'))
+
+    def test_nearest_terms_box_in_unsuccessful_spires_query(self):
+        """ websearch - nearest terms box for unsuccessful spires query """
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=find+a+foobar',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=find+a+finch",
+                                               expected_link_label='finch'))
+
+
 class WebSearchBooleanQueryTest(unittest.TestCase):
     """Check various boolean queries."""
 

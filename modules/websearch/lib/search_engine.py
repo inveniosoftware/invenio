@@ -2765,23 +2765,15 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
                 if t == 'w':
                     # p was stripped of accents, to do the same:
                     argd_px = strip_accents(argd_px)
-                if f == argd[fx] or f == "anyfield" or f == "":
-                    if string.find(argd_px, p) > -1:
-                        argd[px] = string.replace(argd_px, p, term)
-                        break
-                else:
-                    if string.find(argd_px, f+':'+p) > -1:
-                        if string.find(term.strip(), ' ') > -1:
-                            term = '"' + term + '"'
-                        argd[px] = string.replace(argd_px, f+':'+p, f+':'+term)
-                        break
-                    elif string.find(argd_px, f+':"'+p+'"') > -1:
-                        argd[px] = string.replace(argd_px, f+':"'+p+'"', f+':"'+term+'"')
-                        break
-                    elif string.find(argd_px, f+':\''+p+'\'') > -1:
-                        argd[px] = string.replace(argd_px, f+':\''+p+'\'', f+':\''+term+'\'')
-                        break
-
+                #argd[px] = string.replace(argd_px, p, term, 1)
+                #we need something similar, but case insensitive
+                pattern_index = string.find(argd_px.lower(), p.lower())
+                if pattern_index > -1:
+                    argd[px] = argd_px[:pattern_index] + term + argd_px[pattern_index+len(p):]
+                    break
+                #this is doing exactly the same as:
+                #argd[px] = re.sub('(?i)' + re.escape(p), term, argd_px, 1)
+                #but is ~4x faster (2us vs. 8.25us)
         terminfo.append((term, hits, argd))
 
     intro = ""
