@@ -363,7 +363,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             rec_xml_new = record_xml_output(record)
             # Update bibfmt with the format xm of this record
             if opt_mode != 'format':
-                modification_date = datetime.strptime(record_get_field_value(record,'005'),'%Y%m%d%H%M%S.%f').strftime('%Y-%m-%d %H:%M:%S')
+                modification_date = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(record_get_field_value(record,'005'),'%Y%m%d%H%M%S.0'))
                 error = update_bibfmt_format(rec_id, rec_xml_new, 'xm', modification_date, pretend=pretend)
                 if error == 1:
                     msg = "   Failed: error during update_bibfmt_format 'xm'"
