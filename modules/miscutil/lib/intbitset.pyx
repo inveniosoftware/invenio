@@ -43,6 +43,7 @@ import zlib
 import sys
 from array import array
 from invenio.config import CFG_INTBITSET_ENABLE_SANITY_CHECKS
+from invenio.intbitset_helper import _
 
 __all__ = ['intbitset']
 
@@ -773,11 +774,3 @@ cdef class intbitset_iterator:
         return self
 
     cdef object __weakref__
-
-def _(dump):
-    ## As part of the pickle protocol, a callable that will instantiate
-    ## the class is needed.
-    ## It's called _ just to make it short and hidden :-)
-    return intbitset(dump)
-
-_.__module__ = 'invenio.intbitset'
