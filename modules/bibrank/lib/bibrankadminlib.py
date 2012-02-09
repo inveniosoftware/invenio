@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -229,7 +229,7 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
                     trans.append('')
 
         for nr in range(0,len(langs)):
-            actions.append(["%s %s" % (langs[nr][1], (langs[nr][0]==CFG_SITE_LANG and '<small>(def)</small>' or ''))])
+            actions.append(["%s" % (langs[nr][1],)])
             actions[-1].append('<input type="text" name="trans" size="30" value="%s"/>' % trans[nr])
 
         text = tupletotable(header=header, tuple=actions)
@@ -1033,5 +1033,3 @@ def write_outcome(res):
         return """<b><span class="info">Operation successfully completed.</span></b>"""
     elif res:
         return """<b><span class="info">Operation failed. Reason:</span></b><br />%s""" % res[1]
-
-
