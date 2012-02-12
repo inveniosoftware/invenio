@@ -59,9 +59,9 @@ class BibSortWasher(object):
         """
         if not val:
             return ''
-        leading_word, delim, without_leading_word = str(val).partition(" ")
-        if delim != "" and leading_word.lower() in LEADING_ARTICLES:
-            return strip_accents(without_leading_word.strip().lower())
+        val_tokens = str(val).split(" ", 1) #split in leading_word, phrase_without_leading_word
+        if len(val_tokens) == 2 and val_tokens[0].lower() in LEADING_ARTICLES:
+            return strip_accents(val_tokens[1].strip().lower())
         return strip_accents(val.lower())
 
     def _sort_alphanumerically_remove_leading_articles(self, val):
@@ -73,9 +73,9 @@ class BibSortWasher(object):
         """
         if not val:
             return ''
-        leading_word, delim, without_leading_word = str(val).partition(" ")
-        if delim != "" and leading_word.lower() in LEADING_ARTICLES:
-            return without_leading_word.strip().lower()
+        val_tokens = str(val).split(" ", 1) #split in leading_word, phrase_without_leading_word
+        if len(val_tokens) == 2 and val_tokens[0].lower() in LEADING_ARTICLES:
+            return val_tokens[1].strip().lower()
         return val.lower()
 
     def _sort_case_insensitive_strip_accents(self, val):

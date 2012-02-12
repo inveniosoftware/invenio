@@ -249,7 +249,7 @@ def apply_washer(data_dict, washer):
         return
     if washer.strip() == 'NOOP':
         return
-    washer = washer.partition(':')[0]#in case we have a locale defined
+    washer = washer.split(':')[0]#in case we have a locale defined
     try:
         method = BibSortWasher(washer)
         write_message('Washer method found: %s' %method, verbose=5)
@@ -907,14 +907,17 @@ def run_bibsort_rebalance(method_list = None):
         write_message('Rebalancing will run only for RNK methods', verbose=5)
     for name in bibsort_methods:
         task_update_progress('Rebalancing %s method.' %name)
-        write_message('Starting sorting the data for ____%s____ method.' \
+        write_message('Starting sorting the data for %s method ... ' \
                           %name.upper())
         executed_ok = run_sorting_method(recids, name,
                                 bibsort_methods[name]['id'],
                                 bibsort_methods[name]['definition'],
                                 bibsort_methods[name]['washer'])
         if not executed_ok:
+            write_message('Method %s could not be executed correctly.' \
+                          %name, sys.stderr)
             return False
+        write_message('Done.')
         task_sleep_now_if_required(can_stop_too=True)
     task_update_progress('Rebalancing done.')
     return True
