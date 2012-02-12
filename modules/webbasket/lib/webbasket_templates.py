@@ -548,14 +548,14 @@ class Template:
           <input name="p" value="%(p)s" type="text" />
           </td>
           <td>
-          <small><strong>in</strong><small>
+          <small><strong>%(in_label)s</strong><small>
           </td>
           <td>
           <select name="b">%(select_options)s
           </select>
           </td>
           <td>
-          <input class="formbutton" type="submit" value="Search" />
+          <input class="formbutton" type="submit" value="%(search_label)s" />
           </td>
         </tr>
         <tr>
@@ -573,7 +573,12 @@ class Template:
                    'notes_checked': n and ' checked="checked"' or '',
                    'p': p,
                    'select_options': select_options,
-                   'ln': ln}
+                   'ln': ln,
+                   'search_label': _('Search'),
+                   'in_label': _('%(x_search_for_term)s in %(x_collection_list)s') % \
+                                        {'x_search_for_term': '',
+                                        'x_collection_list': ''}
+                    }
         return out
 
     def tmpl_search_results(self,
