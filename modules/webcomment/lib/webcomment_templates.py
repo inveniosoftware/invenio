@@ -91,9 +91,11 @@ class Template:
         for comment_round_name, comments_list in comments:
             comment_rows += '<div id="cmtRound%s" class="cmtRound">' % (comment_round_name)
             if comment_round_name:
-                comment_rows += _('<div class="webcomment_comment_round_header">%(x_nb)i Comments for round "%(x_name)s"') % {'x_nb': len(comments_list), 'x_name': comment_round_name}  + "</div>"
+                comment_rows += '<div class="webcomment_comment_round_header">' + \
+                                _('%(x_nb)i Comments for round "%(x_name)s"') % {'x_nb': len(comments_list), 'x_name': comment_round_name}  + "</div>"
             else:
-                comment_rows += _('<div class="webcomment_comment_round_header">%(x_nb)i Comments') % {'x_nb': len(comments_list),}  + "</div>"
+                comment_rows += '<div class="webcomment_comment_round_header">' + \
+                                _('%(x_nb)i Comments') % {'x_nb': len(comments_list),}  + "</div>"
             for comment in comments_list:
                 if comment[c_nickname]:
                     nickname = comment[c_nickname]
@@ -324,13 +326,13 @@ class Template:
                  <!--  review title table -->
                 <table class="webcomment_header_ratings">
                   <tr>
-                    <td class="blocknote">%s:</td>
+                    <td class="blocknote"><div class="webcomment_review_first_introduction">%s:</td>
                   </tr>
                 </table>
                 %s<br />
                 %s
                 <br />''' % (_("Rate this document"),
-                           _('<div class="webcomment_review_first_introduction">Be the first to review this document.</div>'),
+                           _('Be the first to review this document.</div>'),
                            write_button_form)
         return out
 
@@ -367,7 +369,7 @@ class Template:
             attached_files = []
         out = ''
         final_body = email_quoted_txt2html(body)
-        title = _('%(x_name)s') % {'x_name': nickname,}
+        title = nickname
         title += '<a name="C%s" id="C%s"></a>' % (com_id, com_id)
         links = ''
         if not isGuestUser(user_info['uid']):
