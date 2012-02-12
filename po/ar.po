@@ -38,7 +38,7 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:1200
 #: modules/websearch/lib/websearch_templates.py:1152
 msgid "AND NOT"
-msgstr ""
+msgstr "ليس"
 
 #: modules/webhelp/web/admin/admin.webdoc:18
 #: modules/websearch/doc/admin/websearch-admin-guide.webdoc:21
@@ -72,7 +72,7 @@ msgstr ""
 #: modules/bibcheck/web/admin/bibcheckadmin.py:302
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:70
 msgid "Admin Area"
-msgstr ""
+msgstr "فضاءالادارة للمشرف"
 
 #: modules/websearch/doc/search-guide.webdoc:427
 #: modules/websearch/doc/search-guide.webdoc:559
@@ -90,7 +90,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:2232
 #: modules/websearch/lib/websearch_templates.py:2263
 msgid "Browse"
-msgstr ""
+msgstr "تصفح"
 
 #: modules/webhelp/web/help-central.webdoc:50
 #: modules/websearch/doc/search-tips.webdoc:20
@@ -101,7 +101,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:2117
 #: modules/websearch/lib/websearch_templates.py:2174
 msgid "Search Tips"
-msgstr "مساعد للبحث"
+msgstr "نصائح للبحث"
 
 #: modules/websearch/doc/search-guide.webdoc:343
 #: modules/websearch/doc/search-guide.webdoc:378
@@ -117,7 +117,7 @@ msgstr "مساعد للبحث"
 #: modules/websearch/doc/search-guide.webdoc:820
 #: modules/miscutil/lib/inveniocfg.py:481
 msgid "abstract"
-msgstr ""
+msgstr "الملخص"
 
 #: modules/websearch/doc/search-guide.webdoc:348
 #: modules/websearch/doc/search-guide.webdoc:383
@@ -133,7 +133,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:825
 #: modules/miscutil/lib/inveniocfg.py:486
 msgid "fulltext"
-msgstr ""
+msgstr "النص الكامل"
 
 #: modules/websearch/doc/search-guide.webdoc:337
 #: modules/websearch/doc/search-guide.webdoc:373
@@ -150,7 +150,7 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:1222
 #: modules/websearch/lib/websearch_templates.py:1108
 msgid "Regular expression:"
-msgstr ""
+msgstr "عبارة قياسية :"
 
 #: modules/websearch/doc/search-guide.webdoc:333
 #: modules/websearch/doc/search-guide.webdoc:369
@@ -167,7 +167,7 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:1218
 #: modules/websearch/lib/websearch_templates.py:1100
 msgid "All of the words:"
-msgstr ""
+msgstr "كل الكلمات :"
 
 #: modules/websearch/doc/search-guide.webdoc:351
 #: modules/websearch/doc/search-guide.webdoc:386
@@ -183,7 +183,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:828
 #: modules/miscutil/lib/inveniocfg.py:483
 msgid "report number"
-msgstr ""
+msgstr "رقم التقرير"
 
 #: modules/websearch/doc/search-tips.webdoc:406
 #: modules/websearch/doc/search-tips.webdoc:413
@@ -206,7 +206,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:831
 #: modules/miscutil/lib/inveniocfg.py:489
 msgid "year"
-msgstr ""
+msgstr "السنة"
 
 #: modules/websearch/doc/search-guide.webdoc:352
 #: modules/websearch/doc/search-guide.webdoc:387
@@ -222,7 +222,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:829
 #: modules/miscutil/lib/inveniocfg.py:484
 msgid "subject"
-msgstr ""
+msgstr "الموضوع"
 
 #: modules/websearch/doc/search-guide.webdoc:336
 #: modules/websearch/doc/search-guide.webdoc:372
@@ -239,7 +239,7 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:1221
 #: modules/websearch/lib/websearch_templates.py:1106
 msgid "Partial phrase:"
-msgstr ""
+msgstr "جملة جزئية :"
 
 #: modules/websearch/doc/search-guide.webdoc:350
 #: modules/websearch/doc/search-guide.webdoc:385
@@ -255,7 +255,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:827
 #: modules/miscutil/lib/inveniocfg.py:485
 msgid "reference"
-msgstr ""
+msgstr "مرجع"
 
 #: modules/websearch/doc/search-tips.webdoc:37
 #: modules/websearch/doc/search-tips.webdoc:68
@@ -484,12 +484,12 @@ msgstr ""
 #: modules/webstyle/doc/hacking/webstyle-webdoc-syntax.webdoc:131
 #: modules/miscutil/lib/inveniocfg.py:480
 msgid "author"
-msgstr ""
+msgstr "مؤلف"
 
 #: modules/webhelp/web/help-central.webdoc:98
 #: modules/websearch/doc/search-guide.webdoc:20
 msgid "Search Guide"
-msgstr ""
+msgstr "دليل البحث"
 
 #: modules/websearch/doc/search-guide.webdoc:347
 #: modules/websearch/doc/search-guide.webdoc:382
@@ -505,7 +505,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:824
 #: modules/miscutil/lib/inveniocfg.py:491
 msgid "experiment"
-msgstr ""
+msgstr "تجربة"
 
 #: modules/websearch/doc/search-guide.webdoc:334
 #: modules/websearch/doc/search-guide.webdoc:370
@@ -522,7 +522,7 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:1219
 #: modules/websearch/lib/websearch_templates.py:1102
 msgid "Any of the words:"
-msgstr ""
+msgstr "أي من الكلمات :"
 
 #: modules/websearch/doc/search-guide.webdoc:346
 #: modules/websearch/doc/search-guide.webdoc:381
@@ -538,7 +538,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:823
 #: modules/miscutil/lib/inveniocfg.py:488
 msgid "division"
-msgstr ""
+msgstr "قسم"
 
 #: modules/websearch/doc/search-tips.webdoc:39
 #: modules/websearch/doc/search-tips.webdoc:70
@@ -776,11 +776,11 @@ msgstr ""
 #: modules/bibknowledge/lib/bibknowledge_templates.py:82
 #: modules/bibknowledge/lib/bibknowledge_templates.py:423
 msgid "Search"
-msgstr ""
+msgstr "بحث"
 
 #: modules/webhelp/web/help-central.webdoc:133
 msgid "Citation Metrics"
-msgstr ""
+msgstr "مقاييس الاستشهادات"
 
 #: modules/websearch/doc/search-tips.webdoc:35
 #: modules/websearch/doc/search-tips.webdoc:66
@@ -1009,7 +1009,7 @@ msgstr ""
 #: modules/webstyle/doc/hacking/webstyle-webdoc-syntax.webdoc:129
 #: modules/miscutil/lib/inveniocfg.py:478
 msgid "any field"
-msgstr ""
+msgstr "في كل الحقول"
 
 #: modules/webhelp/web/help-central.webdoc:20
 #: modules/webhelp/web/help-central.webdoc:25
@@ -1039,11 +1039,11 @@ msgstr ""
 #: modules/webstyle/lib/webdoc_tests.py:105
 #: modules/webstyle/lib/webdoc_webinterface.py:155
 msgid "Help Central"
-msgstr ""
+msgstr "مركز التعليمات"
 
 #: modules/bibformat/etc/format_templates/Default_HTML_actions.bft:6
 msgid "Export as"
-msgstr ""
+msgstr "تصدير بصيغة"
 
 #: modules/websearch/doc/search-guide.webdoc:345
 #: modules/websearch/doc/search-guide.webdoc:380
@@ -1059,11 +1059,11 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:822
 #: modules/miscutil/lib/inveniocfg.py:487
 msgid "collection"
-msgstr ""
+msgstr "مجموعة"
 
 #: modules/websearch/doc/admin/websearch-admin-guide.webdoc:20
 msgid "WebSearch Admin Guide"
-msgstr ""
+msgstr "WebSearch دليل ادارة"
 
 #: modules/websearch/doc/search-guide.webdoc:335
 #: modules/websearch/doc/search-guide.webdoc:371
@@ -1080,12 +1080,12 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:1220
 #: modules/websearch/lib/websearch_templates.py:1104
 msgid "Exact phrase:"
-msgstr ""
+msgstr "العبارة بالضبط :"
 
 #: modules/webhelp/web/help-central.webdoc:108
 #: modules/websubmit/doc/submit-guide.webdoc:20
 msgid "Submit Guide"
-msgstr ""
+msgstr "دليل الإيداع"
 
 #: modules/websearch/doc/search-guide.webdoc:360
 #: modules/websearch/doc/search-guide.webdoc:395
@@ -1100,7 +1100,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:1151
 #: modules/websearch/lib/websearch_webcoll.py:592
 msgid "OR"
-msgstr ""
+msgstr "أو"
 
 #: modules/websearch/doc/search-guide.webdoc:359
 #: modules/websearch/doc/search-guide.webdoc:394
@@ -1113,7 +1113,7 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:1198
 #: modules/websearch/lib/websearch_templates.py:1150
 msgid "AND"
-msgstr ""
+msgstr "و"
 
 #: modules/websearch/doc/search-guide.webdoc:349
 #: modules/websearch/doc/search-guide.webdoc:384
@@ -1129,7 +1129,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:826
 #: modules/miscutil/lib/inveniocfg.py:482
 msgid "keyword"
-msgstr ""
+msgstr "مفاتيح"
 
 #: modules/websearch/doc/search-tips.webdoc:36
 #: modules/websearch/doc/search-tips.webdoc:67
@@ -1361,15 +1361,15 @@ msgstr "عنوان"
 #: modules/websearch/doc/search-tips.webdoc:110
 #: modules/websearch/lib/websearch_templates.py:1264
 msgid "Narrow by collection:"
-msgstr ":تحديد المجموعة"
+msgstr "تحديد المجموعة :"
 
 #: modules/bibformat/etc/format_templates/Default_HTML_actions.bft:5
 msgid "Add to personal basket"
-msgstr ""
+msgstr "أضف إلى السلة"
 
 #: modules/websubmit/doc/admin/websubmit-admin-guide.webdoc:20
 msgid "WebSubmit Admin Guide"
-msgstr ""
+msgstr "WebSubmit دليل ادارة"
 
 #: modules/websearch/doc/search-tips.webdoc:290
 #: modules/websubmit/lib/websubmit_templates.py:1119
@@ -1378,15 +1378,15 @@ msgstr ""
 #: modules/bibharvest/lib/oai_harvest_admin.py:472
 #: modules/bibharvest/lib/oai_harvest_admin.py:487
 msgid "or"
-msgstr ""
+msgstr "أو"
 
 #: modules/bibedit/lib/bibedit_templates.py:280
 msgid "Comparison of:"
-msgstr ""
+msgstr ": المقارنة"
 
 #: modules/bibedit/lib/bibedit_templates.py:281
 msgid "Revision"
-msgstr ""
+msgstr "تنقيح"
 
 #: modules/bibformat/lib/bibformat_templates.py:315
 #: modules/bibformat/lib/bibformat_templates.py:429
@@ -1406,7 +1406,7 @@ msgstr ""
 #: modules/bibknowledge/lib/bibknowledge_templates.py:587
 #: modules/bibknowledge/lib/bibknowledge_templates.py:656
 msgid "Menu"
-msgstr ""
+msgstr "القائمة"
 
 #: modules/bibformat/lib/bibformat_templates.py:317
 #: modules/bibformat/lib/bibformat_templates.py:430
@@ -1417,7 +1417,7 @@ msgstr ""
 #: modules/bibknowledge/lib/bibknowledge_templates.py:586
 #: modules/bibknowledge/lib/bibknowledge_templates.py:655
 msgid "Close Editor"
-msgstr ""
+msgstr "إغلاق المحرر"
 
 #: modules/bibformat/lib/bibformat_templates.py:318
 #: modules/bibformat/lib/bibformat_templates.py:431
@@ -1425,7 +1425,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:599
 #: modules/bibformat/lib/bibformat_templates.py:630
 msgid "Modify Template Attributes"
-msgstr ""
+msgstr "تعديل خصائص النموذج"
 
 #: modules/bibformat/lib/bibformat_templates.py:319
 #: modules/bibformat/lib/bibformat_templates.py:432
@@ -1433,7 +1433,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:600
 #: modules/bibformat/lib/bibformat_templates.py:631
 msgid "Template Editor"
-msgstr ""
+msgstr "محرر النماذج"
 
 #: modules/bibformat/lib/bibformat_templates.py:320
 #: modules/bibformat/lib/bibformat_templates.py:433
@@ -1444,7 +1444,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:1384
 #: modules/bibformat/lib/bibformat_templates.py:1490
 msgid "Check Dependencies"
-msgstr ""
+msgstr "فحص علاقات"
 
 #: modules/bibformat/lib/bibformat_templates.py:370
 #: modules/bibformat/lib/bibformat_templates.py:935
@@ -1517,7 +1517,7 @@ msgstr ""
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:447
 #: modules/bibknowledge/lib/bibknowledge_templates.py:79
 msgid "Name"
-msgstr ""
+msgstr "اسم"
 
 #: modules/bibformat/lib/bibformat_templates.py:389
 #: modules/bibformat/lib/bibformat_templates.py:936
@@ -1540,7 +1540,7 @@ msgstr ""
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:451
 #: modules/bibknowledge/lib/bibknowledge_templates.py:80
 msgid "Description"
-msgstr ""
+msgstr "وصف"
 
 #: modules/bibformat/lib/bibformat_templates.py:390
 msgid "Update Format Attributes"
@@ -1550,19 +1550,19 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:596
 #: modules/bibformat/lib/bibformat_templates.py:627
 msgid "Show Documentation"
-msgstr ""
+msgstr "عرض الوثائق"
 
 #: modules/bibformat/lib/bibformat_templates.py:581
 #: modules/bibformat/lib/bibformat_templates.py:597
 #: modules/bibformat/lib/bibformat_templates.py:628
 #: modules/bibformat/lib/bibformat_templates.py:679
 msgid "Hide Documentation"
-msgstr ""
+msgstr "إخفاء الوثائق"
 
 #: modules/bibformat/lib/bibformat_templates.py:588
 #: modules/websubmit/lib/websubmit_templates.py:868
 msgid "Your modifications will not be saved."
-msgstr ""
+msgstr ".لن يتم حفظ التعديلات"
 
 #: modules/bibformat/lib/bibformat_templates.py:938
 #: modules/bibformat/lib/bibformat_templates.py:1062
@@ -1605,12 +1605,12 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13402
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15087
 msgid "Status"
-msgstr ""
+msgstr "الحالة"
 
 #: modules/bibformat/lib/bibformat_templates.py:939
 #: modules/bibformat/lib/bibformat_templates.py:1063
 msgid "Last Modification Date"
-msgstr ""
+msgstr "تاريخ آخر تعديل"
 
 #: modules/bibformat/lib/bibformat_templates.py:940
 #: modules/bibformat/lib/bibformat_templates.py:1064
@@ -1620,7 +1620,7 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:1490
 #: modules/bibknowledge/lib/bibknowledge_templates.py:81
 msgid "Action"
-msgstr ""
+msgstr "نشاط"
 
 #: modules/bibformat/lib/bibformat_templates.py:942
 #: modules/bibformat/lib/bibformat_templates.py:1066
@@ -1632,7 +1632,7 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:384
 #: modules/bibformat/web/admin/bibformatadmin.py:999
 msgid "Manage Output Formats"
-msgstr ""
+msgstr "إدارة صيغ العرض"
 
 #: modules/bibformat/lib/bibformat_templates.py:943
 #: modules/bibformat/lib/bibformat_templates.py:1067
@@ -1676,7 +1676,7 @@ msgstr ""
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:747
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:749
 msgid "Delete"
-msgstr ""
+msgstr "حذف"
 
 #: modules/bibformat/lib/bibformat_templates.py:1019
 msgid "Add New Format Template"
@@ -1688,7 +1688,7 @@ msgstr ""
 
 #: modules/bibformat/lib/bibformat_templates.py:1059
 msgid "Code"
-msgstr ""
+msgstr "رمز"
 
 #: modules/bibformat/lib/bibformat_templates.py:1142
 msgid "Add New Output Format"
@@ -1696,7 +1696,7 @@ msgstr ""
 
 #: modules/bibformat/lib/bibformat_templates.py:1180
 msgid "menu"
-msgstr ""
+msgstr "القائمة"
 
 #: modules/bibformat/lib/bibformat_templates.py:1181
 #: modules/bibformat/lib/bibformat_templates.py:1381
@@ -1949,15 +1949,15 @@ msgstr ""
 #: modules/bibharvest/lib/bibharvest_templates.py:53
 #: modules/bibharvest/lib/bibharvest_templates.py:70
 msgid "See Guide"
-msgstr ""
+msgstr "مراجعة الدليل"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:81
 msgid "OAI sources currently present in the database"
-msgstr ""
+msgstr "المصادر OAI الموجود حاليا في قاعدة البيانات"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:82
 msgid "No OAI sources currently present in the database"
-msgstr ""
+msgstr "لا يوجد حاليا مصادر OAI بقاعدة البيانات"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:92
 msgid "Next oaiharvest task"
@@ -1965,11 +1965,11 @@ msgstr ""
 
 #: modules/bibharvest/lib/bibharvest_templates.py:93
 msgid "scheduled time:"
-msgstr ""
+msgstr ": الوقت المبرمج"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:94
 msgid "current status:"
-msgstr ""
+msgstr ": الوضع الحالي"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:95
 msgid "No oaiharvest task currently scheduled."
@@ -2039,51 +2039,51 @@ msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:138
 msgid "Warning: Please, select a valid time"
-msgstr ""
+msgstr "تحذير : الرجاء تحديد وقت صحيح"
 
 #: modules/bibupload/lib/batchuploader_templates.py:142
 msgid "Warning: Please, select a valid file"
-msgstr ""
+msgstr "تحذير : الرجاء تحديد ملف صحيح"
 
 #: modules/bibupload/lib/batchuploader_templates.py:146
 msgid "Warning: The date format is not correct"
-msgstr ""
+msgstr "تحذير : صياغة التاريخ غير صحيحة"
 
 #: modules/bibupload/lib/batchuploader_templates.py:150
 msgid "Warning: Please, select a valid date"
-msgstr ""
+msgstr "تحذير : الرجاء تحديد تاريخ صحيح"
 
 #: modules/bibupload/lib/batchuploader_templates.py:185
 msgid "Select file to upload"
-msgstr ""
+msgstr "اختر الملف المراد تحميله"
 
 #: modules/bibupload/lib/batchuploader_templates.py:186
 msgid "File type"
-msgstr ""
+msgstr "نوع الملف"
 
 #: modules/bibupload/lib/batchuploader_templates.py:187
 #: modules/bibupload/lib/batchuploader_templates.py:395
 msgid "Upload mode"
-msgstr ""
+msgstr "طريقة التحميل"
 
 #: modules/bibupload/lib/batchuploader_templates.py:188
 #: modules/bibupload/lib/batchuploader_templates.py:396
 msgid "Upload later? then select:"
-msgstr ""
+msgstr "للتحميل لاحقا، اختر :"
 
 #: modules/bibupload/lib/batchuploader_templates.py:189
 #: modules/bibupload/lib/batchuploader_templates.py:397
 #: modules/webmessage/lib/webmessage_templates.py:88
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:535
 msgid "Date"
-msgstr ""
+msgstr "التاريخ"
 
 #: modules/bibupload/lib/batchuploader_templates.py:190
 #: modules/bibupload/lib/batchuploader_templates.py:398
 #: modules/bibupload/lib/batchuploader_templates.py:464
 #: modules/webstyle/lib/webstyle_templates.py:670
 msgid "Time"
-msgstr ""
+msgstr "الوقت"
 
 #: modules/bibupload/lib/batchuploader_templates.py:191
 #: modules/bibupload/lib/batchuploader_templates.py:393
@@ -2092,7 +2092,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:164
 #: modules/websession/lib/websession_templates.py:1038
 msgid "Example"
-msgstr ""
+msgstr "مثال"
 
 #: modules/bibupload/lib/batchuploader_templates.py:192
 #: modules/bibupload/lib/batchuploader_templates.py:400
@@ -2122,55 +2122,55 @@ msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:237
 msgid "No metadata files have been uploaded yet."
-msgstr ""
+msgstr "إلى حد الان، لم يقع إستيراد أية ملف بيانات وصفية ."
 
 #: modules/bibupload/lib/batchuploader_templates.py:250
 #: modules/bibupload/lib/batchuploader_templates.py:292
 msgid "Submit time"
-msgstr ""
+msgstr "قدمت في"
 
 #: modules/bibupload/lib/batchuploader_templates.py:251
 #: modules/bibupload/lib/batchuploader_templates.py:293
 msgid "File name"
-msgstr ""
+msgstr "اسم الملف"
 
 #: modules/bibupload/lib/batchuploader_templates.py:252
 #: modules/bibupload/lib/batchuploader_templates.py:294
 msgid "Execution time"
-msgstr ""
+msgstr "وقت التنفيذ"
 
 #: modules/bibupload/lib/batchuploader_templates.py:279
 msgid "No document files have been uploaded yet."
-msgstr ""
+msgstr "إلى حد الان، لم يقع إستيراد أية وثائق ."
 
 #: modules/bibupload/lib/batchuploader_templates.py:334
 #: modules/bibupload/lib/batchuploader_webinterface.py:73
 #: modules/bibupload/lib/batchuploader_webinterface.py:243
 msgid "Metadata batch upload"
-msgstr ""
+msgstr "استيراد البيانات الوصفية بالدفعة"
 
 #: modules/bibupload/lib/batchuploader_templates.py:337
 #: modules/bibupload/lib/batchuploader_webinterface.py:96
 #: modules/bibupload/lib/batchuploader_webinterface.py:151
 msgid "Document batch upload"
-msgstr ""
+msgstr "استيراد الوثائق بالدفعة"
 
 #: modules/bibupload/lib/batchuploader_templates.py:340
 #: modules/bibupload/lib/batchuploader_webinterface.py:267
 msgid "Upload history"
-msgstr ""
+msgstr "سجل الاستيراد"
 
 #: modules/bibupload/lib/batchuploader_templates.py:343
 msgid "Daemon monitor"
-msgstr ""
+msgstr "مراقبة العمليات"
 
 #: modules/bibupload/lib/batchuploader_templates.py:392
 msgid "Input directory"
-msgstr ""
+msgstr "المجلد المصدر :"
 
 #: modules/bibupload/lib/batchuploader_templates.py:394
 msgid "Filename matching"
-msgstr ""
+msgstr "اسم الملف يتطابق مع"
 
 #: modules/bibupload/lib/batchuploader_templates.py:409
 #, python-format
@@ -2210,7 +2210,7 @@ msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:442
 msgid "Metadata folders"
-msgstr ""
+msgstr "مجلدات البيانات الوصفية"
 
 #: modules/bibupload/lib/batchuploader_templates.py:464
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2179
@@ -2225,19 +2225,19 @@ msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:464
 msgid "Progress"
-msgstr ""
+msgstr "سير التقدم"
 
 #: modules/bibupload/lib/batchuploader_templates.py:466
 msgid "Last BibSched tasks:"
-msgstr ""
+msgstr " مهمات BibSched الأخيرة:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:475
 msgid "Next scheduled BibSched run:"
-msgstr ""
+msgstr "التشغيل المقبل المبرمج في BibSched :"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:154
 msgid "Document batch upload result"
-msgstr ""
+msgstr "نتائج استيراد الوثائق"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:238
 msgid "Invalid MARCXML"
@@ -2249,7 +2249,7 @@ msgstr ""
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:291
 msgid "Batch Uploader: Daemon monitor"
-msgstr ""
+msgstr "الاستيراد بالدفعة : مراقبة العمليات"
 
 #: modules/miscutil/lib/dateutils.py:82 modules/miscutil/lib/dateutils.py:109
 #: modules/webbasket/lib/webbasket.py:208
@@ -2262,59 +2262,59 @@ msgstr ""
 
 #: modules/miscutil/lib/dateutils.py:172
 msgid "Sun"
-msgstr ""
+msgstr "الأحد"
 
 #: modules/miscutil/lib/dateutils.py:173
 msgid "Mon"
-msgstr ""
+msgstr "الاثنين"
 
 #: modules/miscutil/lib/dateutils.py:174
 msgid "Tue"
-msgstr ""
+msgstr "الثلاثاء"
 
 #: modules/miscutil/lib/dateutils.py:175
 msgid "Wed"
-msgstr ""
+msgstr "الأربعاء"
 
 #: modules/miscutil/lib/dateutils.py:176
 msgid "Thu"
-msgstr ""
+msgstr "الخميس"
 
 #: modules/miscutil/lib/dateutils.py:177
 msgid "Fri"
-msgstr ""
+msgstr "الجمعة"
 
 #: modules/miscutil/lib/dateutils.py:178
 msgid "Sat"
-msgstr ""
+msgstr "السبت"
 
 #: modules/miscutil/lib/dateutils.py:180
 msgid "Sunday"
-msgstr ""
+msgstr "الأحد"
 
 #: modules/miscutil/lib/dateutils.py:181
 msgid "Monday"
-msgstr ""
+msgstr "الاثنين"
 
 #: modules/miscutil/lib/dateutils.py:182
 msgid "Tuesday"
-msgstr ""
+msgstr "الثلاثاء"
 
 #: modules/miscutil/lib/dateutils.py:183
 msgid "Wednesday"
-msgstr ""
+msgstr "الأربعاء"
 
 #: modules/miscutil/lib/dateutils.py:184
 msgid "Thursday"
-msgstr ""
+msgstr "الخميس"
 
 #: modules/miscutil/lib/dateutils.py:185
 msgid "Friday"
-msgstr ""
+msgstr "الجمعة"
 
 #: modules/miscutil/lib/dateutils.py:186
 msgid "Saturday"
-msgstr ""
+msgstr "السبت"
 
 #: modules/miscutil/lib/dateutils.py:200 modules/miscutil/lib/dateutils.py:214
 #: modules/bibcirculation/lib/bibcirculation_templates.py:781
@@ -2496,43 +2496,43 @@ msgstr ""
 #: modules/miscutil/lib/errorlib_webinterface.py:80
 #, python-format
 msgid "Cannot send error request, %s parameter missing."
-msgstr ""
+msgstr "لا يمكن إرسال طلب خاطئ، بعض المعطيات(%s) مفقودة ."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:98
 msgid "The error report has been sent."
-msgstr ""
+msgstr "لقد تم ارسال تقرير حول الخطأ."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:99
 msgid "Many thanks for helping us to improve the service."
-msgstr ""
+msgstr "شكرا جزيلا لمساعدتنا على تحسين الخدمة."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:101
 msgid "Use the back button of your browser to return to the previous page."
-msgstr ""
+msgstr "استخدم زر الرجوع في متصفحك للعودة إلى الصفحة السابقة."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:103
 msgid "Thank you!"
-msgstr ""
+msgstr "شكرا لك!"
 
 #: modules/miscutil/lib/inveniocfg.py:490
 msgid "journal"
-msgstr ""
+msgstr "مجلة"
 
 #: modules/miscutil/lib/inveniocfg.py:492
 msgid "record ID"
-msgstr ""
+msgstr "معرف السجل"
 
 #: modules/miscutil/lib/inveniocfg.py:505
 msgid "word similarity"
-msgstr ""
+msgstr "تشابه الكلمات"
 
 #: modules/miscutil/lib/inveniocfg.py:506
 msgid "journal impact factor"
-msgstr ""
+msgstr "مؤشر التأثير للمجلة"
 
 #: modules/miscutil/lib/inveniocfg.py:507
 msgid "times cited"
-msgstr ""
+msgstr "عدد الإستشهادات"
 
 #: modules/miscutil/lib/inveniocfg.py:508
 msgid "time-decay cite count"
@@ -2564,93 +2564,93 @@ msgstr ""
 #: modules/websession/lib/webuser.py:896 modules/websession/lib/webuser.py:905
 #: modules/websession/lib/webuser.py:906
 msgid "Run Record Editor"
-msgstr ""
+msgstr "تشغيل محرر السجلات"
 
 #: modules/webaccess/lib/access_control_config.py:301
 #: modules/websession/lib/websession_templates.py:1092
 msgid "Run Multi-Record Editor"
-msgstr ""
+msgstr "تشغيل محرر السجلات المتعددة"
 
 #: modules/webaccess/lib/access_control_config.py:302
 #: modules/websession/lib/websession_templates.py:1123
 #: modules/websession/lib/webuser.py:897 modules/websession/lib/webuser.py:907
 #: modules/websession/lib/webuser.py:908
 msgid "Run Document File Manager"
-msgstr ""
+msgstr "تشغيل إدارة الملفات"
 
 #: modules/webaccess/lib/access_control_config.py:303
 #: modules/websession/lib/websession_templates.py:1096
 msgid "Run Record Merger"
-msgstr ""
+msgstr "تشغيل دامج السجلات"
 
 #: modules/webaccess/lib/access_control_config.py:304
 msgid "Run BibSword client"
-msgstr ""
+msgstr "تشغيل العميل BibSword"
 
 #: modules/webaccess/lib/access_control_config.py:305
 #: modules/websession/lib/websession_templates.py:1103
 msgid "Configure BibKnowledge"
-msgstr ""
+msgstr "تهيئة BibKnowledg"
 
 #: modules/webaccess/lib/access_control_config.py:306
 #: modules/websession/lib/websession_templates.py:1102
 msgid "Configure BibFormat"
-msgstr ""
+msgstr "تهيئة BibFormat"
 
 #: modules/webaccess/lib/access_control_config.py:307
 #: modules/websession/lib/websession_templates.py:1105
 msgid "Configure OAI Harvest"
-msgstr ""
+msgstr "تهيئة الحاصد OAI"
 
 #: modules/webaccess/lib/access_control_config.py:308
 #: modules/websession/lib/websession_templates.py:1107
 msgid "Configure OAI Repository"
-msgstr ""
+msgstr "تهيئة مستودع OAI"
 
 #: modules/webaccess/lib/access_control_config.py:309
 #: modules/websession/lib/websession_templates.py:1109
 msgid "Configure BibIndex"
-msgstr ""
+msgstr "تهيئة BibIndex"
 
 #: modules/webaccess/lib/access_control_config.py:310
 #: modules/websession/lib/websession_templates.py:1111
 msgid "Configure BibRank"
-msgstr ""
+msgstr "تهيئة BibRank"
 
 #: modules/webaccess/lib/access_control_config.py:311
 #: modules/websession/lib/websession_templates.py:1113
 msgid "Configure WebAccess"
-msgstr ""
+msgstr "تهيئة WebAccess"
 
 #: modules/webaccess/lib/access_control_config.py:312
 #: modules/websession/lib/websession_templates.py:1115
 msgid "Configure WebComment"
-msgstr ""
+msgstr "تهيئة WebComment"
 
 #: modules/webaccess/lib/access_control_config.py:313
 #: modules/websession/lib/websession_templates.py:1119
 msgid "Configure WebSearch"
-msgstr ""
+msgstr "تهيئة WebSearch"
 
 #: modules/webaccess/lib/access_control_config.py:314
 #: modules/websession/lib/websession_templates.py:1121
 msgid "Configure WebSubmit"
-msgstr ""
+msgstr "تهيئة WebSubmit"
 
 #: modules/webaccess/lib/access_control_config.py:315
 #: modules/websession/lib/websession_templates.py:1117
 msgid "Configure WebJournal"
-msgstr ""
+msgstr "تهيئة WebJournal"
 
 #: modules/webaccess/lib/access_control_config.py:316
 #: modules/websession/lib/websession_templates.py:1094
 msgid "Run BibCirculation"
-msgstr ""
+msgstr "تشغيل BibCirculation"
 
 #: modules/webaccess/lib/access_control_config.py:317
 #: modules/websession/lib/websession_templates.py:1100
 msgid "Run Batch Uploader"
-msgstr ""
+msgstr "تشغيل الاستيراد بالدفعة"
 
 #: modules/webaccess/lib/access_control_config.py:318
 msgid "Run Person/Author Manager"
@@ -2753,7 +2753,7 @@ msgstr ""
 
 #: modules/webalert/lib/webalert.py:221 modules/webalert/lib/webalert.py:345
 msgid "The alert name cannot be empty."
-msgstr ""
+msgstr "اسم التنبيه لا يمكن أن يكون فارغا."
 
 #: modules/webalert/lib/webalert.py:226
 msgid "You are not the owner of this basket."
@@ -2776,23 +2776,26 @@ msgid ""
 "is available with a possibility to (a) view search results and (b) subscribe "
 "to an automatic email alerting service for these queries."
 msgstr ""
+"قمت بإجراء %(x_nb)s عملية بحث.يوجد %(x_url_open)sقائمة مفصلة%(x_url_close)s  "
+"مع إمكانية (أ) عرض نتائج البحث و (ب) الاشتراك في خدمة التنبيه التلقائي عبر "
+"البريد الالكتروني ."
 
 #: modules/webalert/lib/webalert_templates.py:75
 msgid "Pattern"
-msgstr ""
+msgstr "كلمات البحث"
 
 #: modules/webalert/lib/webalert_templates.py:77
 #: modules/bibedit/lib/bibeditmulti_templates.py:556
 msgid "Field"
-msgstr ""
+msgstr "حقل"
 
 #: modules/webalert/lib/webalert_templates.py:79
 msgid "Pattern 1"
-msgstr ""
+msgstr "كلمات البحث 1"
 
 #: modules/webalert/lib/webalert_templates.py:81
 msgid "Field 1"
-msgstr ""
+msgstr "الحقل 1"
 
 #: modules/webalert/lib/webalert_templates.py:83
 msgid "Pattern 2"
@@ -2800,19 +2803,19 @@ msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:85
 msgid "Field 2"
-msgstr ""
+msgstr "الحقل 2"
 
 #: modules/webalert/lib/webalert_templates.py:87
 msgid "Pattern 3"
-msgstr ""
+msgstr "كلمات البحث 3"
 
 #: modules/webalert/lib/webalert_templates.py:89
 msgid "Field 3"
-msgstr ""
+msgstr "الحقل 3"
 
 #: modules/webalert/lib/webalert_templates.py:91
 msgid "Collections"
-msgstr ""
+msgstr "المجموعات"
 
 #: modules/webalert/lib/webalert_templates.py:93
 #: modules/bibcirculation/lib/bibcirculation_templates.py:288
@@ -2826,86 +2829,86 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7568
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8365
 msgid "Collection"
-msgstr ""
+msgstr "مجموعة"
 
 #: modules/webalert/lib/webalert_templates.py:114
 msgid "You own the following alerts:"
-msgstr ""
+msgstr "لديك التنبيهات التالية :"
 
 #: modules/webalert/lib/webalert_templates.py:115
 msgid "alert name"
-msgstr ""
+msgstr "اسم التنبيه"
 
 #: modules/webalert/lib/webalert_templates.py:124
 msgid "SHOW"
-msgstr ""
+msgstr "عرض"
 
 #: modules/webalert/lib/webalert_templates.py:173
 msgid ""
 "This alert will notify you each time/only if a new item satisfies the "
 "following query:"
-msgstr ""
+msgstr "هذا التنبيه يبلغك بالنتائج المستجدة للإستشارة التالية : "
 
 #: modules/webalert/lib/webalert_templates.py:174
 msgid "QUERY"
-msgstr ""
+msgstr "كلمات البحث"
 
 #: modules/webalert/lib/webalert_templates.py:212
 msgid "Alert identification name:"
-msgstr ""
+msgstr "اسم تعريف التنبيه :"
 
 #: modules/webalert/lib/webalert_templates.py:214
 msgid "Search-checking frequency:"
-msgstr ""
+msgstr "دورية البحث والتدقيق :"
 
 #: modules/webalert/lib/webalert_templates.py:218
 #: modules/webalert/lib/webalert_templates.py:338
 #: modules/bibharvest/lib/oai_harvest_admin.py:142
 msgid "monthly"
-msgstr ""
+msgstr "شهريا"
 
 #: modules/webalert/lib/webalert_templates.py:219
 #: modules/webalert/lib/webalert_templates.py:336
 #: modules/bibharvest/lib/oai_harvest_admin.py:141
 msgid "weekly"
-msgstr ""
+msgstr "أسبوعيا"
 
 #: modules/webalert/lib/webalert_templates.py:220
 #: modules/webalert/lib/webalert_templates.py:333
 #: modules/bibharvest/lib/oai_harvest_admin.py:140
 msgid "daily"
-msgstr ""
+msgstr "يوميا"
 
 #: modules/webalert/lib/webalert_templates.py:221
 msgid "Send notification email?"
-msgstr ""
+msgstr "إرسال بريد إلكتروني للإعلام؟ "
 
 #: modules/webalert/lib/webalert_templates.py:224
 #: modules/webalert/lib/webalert_templates.py:341
 msgid "yes"
-msgstr ""
+msgstr "نعم"
 
 #: modules/webalert/lib/webalert_templates.py:225
 #: modules/webalert/lib/webalert_templates.py:343
 msgid "no"
-msgstr ""
+msgstr "لا"
 
 #: modules/webalert/lib/webalert_templates.py:226
 #, python-format
 msgid "if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket"
-msgstr ""
+msgstr "إذا %(x_fmt_open)sلا%(x_fmt_close)s ، يجب عليك تحديد سلة"
 
 #: modules/webalert/lib/webalert_templates.py:228
 msgid "Store results in basket?"
-msgstr ""
+msgstr "حفظ النتائج في سلة ؟ "
 
 #: modules/webalert/lib/webalert_templates.py:249
 msgid "SET ALERT"
-msgstr ""
+msgstr "حفظ التنبيه"
 
 #: modules/webalert/lib/webalert_templates.py:250
 msgid "CLEAR DATA"
-msgstr ""
+msgstr "إلغاء "
 
 #: modules/webalert/lib/webalert_templates.py:301
 #, python-format
@@ -2913,6 +2916,8 @@ msgid ""
 "Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the "
 "%(x_url2_open)spopular searches%(x_url2_close)s, or the input form."
 msgstr ""
+"يمكنك إضافة تنبيهات جديدة من %(x_url1_open)sبحوثك%(x_url1_close)s السابقة ، "
+"أو من ضمن البحوث %(x_url2_open)sالأكثر رواجا%(x_url2_close)s."
 
 #: modules/webalert/lib/webalert_templates.py:319
 #: modules/webcomment/lib/webcomment_templates.py:233
@@ -2924,27 +2929,27 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:2215
 #: modules/websession/lib/websession_templates.py:2255
 msgid "No"
-msgstr ""
+msgstr "رقم"
 
 #: modules/webalert/lib/webalert_templates.py:321
 msgid "Search checking frequency"
-msgstr ""
+msgstr "دورية البحث والتدقيق"
 
 #: modules/webalert/lib/webalert_templates.py:322
 msgid "Notification by email"
-msgstr ""
+msgstr "الإعلام عبر البريد الإلكتروني"
 
 #: modules/webalert/lib/webalert_templates.py:323
 msgid "Result in basket"
-msgstr ""
+msgstr "نتائج متوفرة في سلة"
 
 #: modules/webalert/lib/webalert_templates.py:324
 msgid "Date last run"
-msgstr ""
+msgstr "تاريخ آخر تشغيل"
 
 #: modules/webalert/lib/webalert_templates.py:325
 msgid "Creation date"
-msgstr ""
+msgstr "تاريخ الإنشاء"
 
 #: modules/webalert/lib/webalert_templates.py:326
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:346
@@ -2952,32 +2957,32 @@ msgstr ""
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:459
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:632
 msgid "Query"
-msgstr ""
+msgstr "البحث"
 
 #: modules/webalert/lib/webalert_templates.py:369
 #: modules/webbasket/lib/webbasket_templates.py:1786
 msgid "no basket"
-msgstr ""
+msgstr "لا يوجد سلة"
 
 #: modules/webalert/lib/webalert_templates.py:386
 msgid "Modify"
-msgstr ""
+msgstr "تعديل"
 
 #: modules/webalert/lib/webalert_templates.py:392
 #: modules/webjournal/lib/webjournaladminlib.py:231
 #: modules/webjournal/lib/webjournaladminlib.py:237
 msgid "Remove"
-msgstr ""
+msgstr "حذف"
 
 #: modules/webalert/lib/webalert_templates.py:394
 #: modules/webalert/lib/webalert_templates.py:484
 msgid "Execute search"
-msgstr ""
+msgstr "تنفيذ البحث"
 
 #: modules/webalert/lib/webalert_templates.py:400
 #, python-format
 msgid "You have defined %s alerts."
-msgstr ""
+msgstr "عدد التنبيهات المنشأة : %s ."
 
 #: modules/webalert/lib/webalert_templates.py:438
 #, python-format
@@ -2985,6 +2990,8 @@ msgid ""
 "You have not executed any search yet. Please go to the %(x_url_open)ssearch "
 "interface%(x_url_close)s first."
 msgstr ""
+"لم تقم  بأي بحث حتى الآن. يرجى الانتقال  أولا إلى %(x_url_open)sواجهة البحث"
+"%(x_url_close)s."
 
 #: modules/webalert/lib/webalert_templates.py:447
 #, python-format
@@ -2992,23 +2999,24 @@ msgid ""
 "You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
 "the last 30 days or so."
 msgstr ""
+"قمت بـ%(x_nb1)s بحث (%(x_nb2)s أسئلة مختلفة) خلال الأيام ال 30 الماضية."
 
 #: modules/webalert/lib/webalert_templates.py:452
 #, python-format
 msgid "Here are the %s most popular searches."
-msgstr ""
+msgstr "هنا البحوث %s الأكثر رواجا."
 
 #: modules/webalert/lib/webalert_templates.py:463
 msgid "Question"
-msgstr ""
+msgstr "السؤال"
 
 #: modules/webalert/lib/webalert_templates.py:467
 msgid "Last Run"
-msgstr ""
+msgstr "آخر تشغيل"
 
 #: modules/webalert/lib/webalert_templates.py:485
 msgid "Set new alert"
-msgstr ""
+msgstr "إضافة تنبيه جديد"
 
 #: modules/webalert/lib/webalert_webinterface.py:76
 #: modules/webalert/lib/webalert_webinterface.py:139
@@ -3022,13 +3030,13 @@ msgstr ""
 
 #: modules/webalert/lib/webalert_webinterface.py:79
 msgid "Popular Searches"
-msgstr ""
+msgstr "البحوث الأكثر رواجا"
 
 #: modules/webalert/lib/webalert_webinterface.py:81
 #: modules/websession/lib/websession_templates.py:457
 #: modules/websession/lib/websession_templates.py:619
 msgid "Your Searches"
-msgstr ""
+msgstr "عمليات البحث"
 
 #: modules/webalert/lib/webalert_webinterface.py:98
 #: modules/webalert/lib/webalert_webinterface.py:150
@@ -3072,7 +3080,7 @@ msgstr ""
 #: modules/websubmit/web/yourapprovals.py:91
 #: modules/websubmit/web/yoursubmissions.py:163
 msgid "Your Account"
-msgstr ""
+msgstr "حسابك الخاص"
 
 #: modules/webalert/lib/webalert_webinterface.py:100
 #, python-format
@@ -3105,7 +3113,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:678
 #, python-format
 msgid "%s, personalize"
-msgstr ""
+msgstr "إضفاء الطابع الشخصي على %s"
 
 #: modules/webalert/lib/webalert_webinterface.py:145
 #: modules/webalert/lib/webalert_webinterface.py:230
@@ -3123,7 +3131,7 @@ msgstr ""
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:559
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:279
 msgid "Error"
-msgstr ""
+msgstr "خطأ"
 
 #: modules/webalert/lib/webalert_webinterface.py:152
 #: modules/webalert/lib/webalert_webinterface.py:185
@@ -3133,25 +3141,25 @@ msgstr ""
 #: modules/webalert/lib/webalert_webinterface.py:522
 #, python-format
 msgid "%s Personalize, Set a new alert"
-msgstr ""
+msgstr "إضفاء الطابع الشخصي على %s، إنشاء تنبيه جديد"
 
 #: modules/webalert/lib/webalert_webinterface.py:178
 msgid "Set a new alert"
-msgstr ""
+msgstr "إنشاء تنبيه جديد"
 
 #: modules/webalert/lib/webalert_webinterface.py:263
 msgid "Modify alert settings"
-msgstr ""
+msgstr "تعديل إعدادات التنبيه"
 
 #: modules/webalert/lib/webalert_webinterface.py:270
 #, python-format
 msgid "%s Personalize, Modify alert settings"
-msgstr ""
+msgstr "إضفاء الطابع الشخصي على %s، تعديل إعدادات التنبيه"
 
 #: modules/webalert/lib/webalert_webinterface.py:314
 #: modules/websession/lib/websession_templates.py:474
 msgid "Your Alerts"
-msgstr ""
+msgstr "تنبيهاتك"
 
 #: modules/webalert/lib/webalert_webinterface.py:321
 #: modules/webalert/lib/webalert_webinterface.py:397
@@ -3159,13 +3167,13 @@ msgstr ""
 #: modules/webalert/lib/webalert_webinterface.py:550
 #, python-format
 msgid "%s Personalize, Display alerts"
-msgstr ""
+msgstr "إضفاء الطابع الشخصي على %s، عرض التنبيهات"
 
 #: modules/webalert/lib/webalert_webinterface.py:390
 #: modules/webalert/lib/webalert_webinterface.py:467
 #: modules/webalert/lib/webalert_webinterface.py:543
 msgid "Display alerts"
-msgstr ""
+msgstr "عرض التنبيهات"
 
 #: modules/webbasket/lib/webbasket.py:104
 #: modules/webbasket/lib/webbasket.py:2151
@@ -3331,17 +3339,17 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:614
 #: modules/webbasket/lib/webbasket_templates.py:691
 msgid "Group baskets"
-msgstr ""
+msgstr "سلال الفريق"
 
 #: modules/webbasket/lib/webbasket.py:2316
 msgid "Others' baskets"
-msgstr ""
+msgstr "سلال الغير"
 
 #: modules/webbasket/lib/webbasket.py:2352
 #: modules/websession/lib/websession_templates.py:465
 #: modules/websession/lib/websession_templates.py:613
 msgid "Your Baskets"
-msgstr ""
+msgstr "سلالك"
 
 #: modules/webbasket/lib/webbasket.py:2357
 #: modules/webbasket/lib/webbasket_webinterface.py:1273
@@ -3349,19 +3357,19 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_webinterface.py:1401
 #: modules/webbasket/lib/webbasket_webinterface.py:1461
 msgid "List of public baskets"
-msgstr ""
+msgstr "قائمة السلال العمومية"
 
 #: modules/webbasket/lib/webbasket.py:2368
 #: modules/webbasket/lib/webbasket_webinterface.py:428
 msgid "Search baskets"
-msgstr ""
+msgstr "البحث في السلال"
 
 #: modules/webbasket/lib/webbasket.py:2373
 #: modules/webbasket/lib/webbasket_webinterface.py:738
 #: modules/websearch/lib/websearch_templates.py:2852
 #: modules/websearch/lib/websearch_templates.py:3038
 msgid "Add to basket"
-msgstr ""
+msgstr "أضف إلى السلة"
 
 #: modules/webbasket/lib/webbasket.py:2413
 #: modules/webbasket/lib/webbasket_templates.py:218
@@ -3369,7 +3377,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:623
 #: modules/webbasket/lib/webbasket_templates.py:725
 msgid "Public baskets"
-msgstr ""
+msgstr "السلال العمومية"
 
 #: modules/webbasket/lib/webbasket.py:2443
 #, python-format
@@ -3377,6 +3385,8 @@ msgid ""
 "You have %(x_nb_perso)s personal baskets and are subscribed to "
 "%(x_nb_group)s group baskets and %(x_nb_public)s other users public baskets."
 msgstr ""
+"لديك %(x_nb_perso)s سلال شخصية ، ومشترك في %(x_nb_group)s سلال لفرق و "
+"%(x_nb_public)s سلال عمومية لمستخدمين آخرين"
 
 #: modules/webbasket/lib/webbasket.py:2629
 #: modules/webbasket/lib/webbasket.py:2667
@@ -3408,29 +3418,29 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:112
 #: modules/webbasket/lib/webbasket_templates.py:178
 msgid "Back to Your Baskets"
-msgstr ""
+msgstr "العودة إلى سلال الخاصة بك"
 
 #: modules/webbasket/lib/webbasket_templates.py:118
 #: modules/webbasket/lib/webbasket_webinterface.py:1243
 msgid "Create basket"
-msgstr ""
+msgstr "إنشاء السلة"
 
 #: modules/webbasket/lib/webbasket_templates.py:124
 #: modules/webbasket/lib/webbasket_webinterface.py:1132
 msgid "Edit topic"
-msgstr ""
+msgstr "تعديل الموضوع"
 
 #: modules/webbasket/lib/webbasket_templates.py:559
 msgid "Search baskets for"
-msgstr ""
+msgstr "البحث عن السلال"
 
 #: modules/webbasket/lib/webbasket_templates.py:560
 msgid "Search also in notes (where allowed)"
-msgstr ""
+msgstr "أبحث أيضا في الملاحظات"
 
 #: modules/webbasket/lib/webbasket_templates.py:597
 msgid "Results overview"
-msgstr ""
+msgstr "نظرة عامة على النتائج"
 
 #: modules/webbasket/lib/webbasket_templates.py:598
 #: modules/webbasket/lib/webbasket_templates.py:607
@@ -3452,7 +3462,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:632
 #: modules/webbasket/lib/webbasket_templates.py:758
 msgid "All public baskets"
-msgstr ""
+msgstr "كافة السلال العمومية "
 
 #: modules/webbasket/lib/webbasket_templates.py:648
 msgid "No items found."
@@ -3570,7 +3580,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15559
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15721
 msgid "Title"
-msgstr ""
+msgstr "العنوان"
 
 #: modules/webbasket/lib/webbasket_templates.py:1275
 msgid "URL"
@@ -3622,12 +3632,12 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1474
 msgid "Are you sure you want to delete this basket?"
-msgstr ""
+msgstr "هل أنت متأكد أنك تريد حذف هذه السلة؟"
 
 #: modules/webbasket/lib/webbasket_templates.py:1476
 #, python-format
 msgid "%i users are subscribed to this basket."
-msgstr ""
+msgstr "%i فرق من المستخدمين مشتركة في هذه السلة."
 
 #: modules/webbasket/lib/webbasket_templates.py:1478
 #, python-format
@@ -3637,7 +3647,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1480
 #, python-format
 msgid "You have set %i alerts on this basket."
-msgstr ""
+msgstr "لقد قمت بإنشاء %i تنبيهات على هذه السلة."
 
 #: modules/webbasket/lib/webbasket_templates.py:1518
 #: modules/webcomment/lib/webcomment_templates.py:232
@@ -3649,62 +3659,62 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:2214
 #: modules/websession/lib/websession_templates.py:2254
 msgid "Yes"
-msgstr ""
+msgstr "نعم"
 
 #: modules/webbasket/lib/webbasket_templates.py:1555
 #: modules/webbasket/lib/webbasket_templates.py:1651
 msgid "General settings"
-msgstr ""
+msgstr "إعدادات عامة"
 
 #: modules/webbasket/lib/webbasket_templates.py:1570
 #: modules/webbasket/lib/webbasket_templates.py:1745
 #: modules/webbasket/lib/webbasket_templates.py:1772
 msgid "Add group"
-msgstr ""
+msgstr "إضافة فريق"
 
 #: modules/webbasket/lib/webbasket_templates.py:1575
 msgid "Manage group rights"
-msgstr ""
+msgstr "إدارة حقوق الفرق"
 
 #: modules/webbasket/lib/webbasket_templates.py:1587
 msgid "Manage global sharing rights"
-msgstr ""
+msgstr "إدارة حقوق العامة للتقاسم"
 
 #: modules/webbasket/lib/webbasket_templates.py:1592
 #: modules/webbasket/lib/webbasket_templates.py:1658
 #: modules/webbasket/lib/webbasket_templates.py:2006
 #: modules/webbasket/lib/webbasket_templates.py:2085
 msgid "Delete basket"
-msgstr ""
+msgstr "حذف السلة"
 
 #: modules/webbasket/lib/webbasket_templates.py:1616
 #, python-format
 msgid "Editing basket %(x_basket_name)s"
-msgstr ""
+msgstr "تعديل السلة %(x_basket_name)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:1625
 #: modules/webbasket/lib/webbasket_templates.py:1680
 msgid "Save changes"
-msgstr ""
+msgstr "حفظ التغييرات"
 
 #: modules/webbasket/lib/webbasket_templates.py:1646
 msgid "Topic name"
-msgstr ""
+msgstr "اسم الموضوع"
 
 #: modules/webbasket/lib/webbasket_templates.py:1675
 #, python-format
 msgid "Editing topic: %(x_topic_name)s"
-msgstr ""
+msgstr "تحرير موضوع : %(x_topic_name)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:1692
 #: modules/webbasket/lib/webbasket_templates.py:1707
 msgid "No rights"
-msgstr ""
+msgstr "لا حقوق"
 
 #: modules/webbasket/lib/webbasket_templates.py:1694
 #: modules/webbasket/lib/webbasket_templates.py:1709
 msgid "View records"
-msgstr ""
+msgstr "عرض السجلات"
 
 #: modules/webbasket/lib/webbasket_templates.py:1696
 #: modules/webbasket/lib/webbasket_templates.py:1698
@@ -3715,47 +3725,47 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1719
 #: modules/webbasket/lib/webbasket_templates.py:1721
 msgid "and"
-msgstr ""
+msgstr "و"
 
 #: modules/webbasket/lib/webbasket_templates.py:1696
 msgid "view comments"
-msgstr ""
+msgstr "عرض التعليقات"
 
 #: modules/webbasket/lib/webbasket_templates.py:1698
 msgid "add comments"
-msgstr ""
+msgstr "ضافة تعليقات"
 
 #: modules/webbasket/lib/webbasket_templates.py:1711
 msgid "view notes"
-msgstr ""
+msgstr "عرض الملاحظات"
 
 #: modules/webbasket/lib/webbasket_templates.py:1713
 msgid "add notes"
-msgstr ""
+msgstr "إضافة الملاحظات"
 
 #: modules/webbasket/lib/webbasket_templates.py:1715
 msgid "add records"
-msgstr ""
+msgstr "إضافة السجلات"
 
 #: modules/webbasket/lib/webbasket_templates.py:1717
 msgid "delete notes"
-msgstr ""
+msgstr "حذف الملاحظات"
 
 #: modules/webbasket/lib/webbasket_templates.py:1719
 msgid "remove records"
-msgstr ""
+msgstr "حذف السجلات"
 
 #: modules/webbasket/lib/webbasket_templates.py:1721
 msgid "manage sharing rights"
-msgstr ""
+msgstr "إدارة حقوق المشاركة"
 
 #: modules/webbasket/lib/webbasket_templates.py:1743
 msgid "You are not a member of a group."
-msgstr ""
+msgstr "أنت لست عضوا في الفريق."
 
 #: modules/webbasket/lib/webbasket_templates.py:1765
 msgid "Sharing basket to a new group"
-msgstr ""
+msgstr "تقاسم السلة مع فريق جديد"
 
 #: modules/webbasket/lib/webbasket_templates.py:1794
 #: modules/websession/lib/websession_templates.py:510
@@ -3763,6 +3773,7 @@ msgid ""
 "You are logged in as a guest user, so your baskets will disappear at the end "
 "of the current session."
 msgstr ""
+"تم تسجيل دخولك كزائر، لذا لا يمكن الاحتفاظ بسلالك الخاصة عند نهاية الزيارة"
 
 #: modules/webbasket/lib/webbasket_templates.py:1795
 #: modules/webbasket/lib/webbasket_templates.py:1810
@@ -3775,12 +3786,12 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1809
 #: modules/websession/lib/websession_webinterface.py:263
 msgid "This functionality is forbidden to guest users."
-msgstr ""
+msgstr "هذه الوظيفة غير متاحة للمستخدمين الزوار٠"
 
 #: modules/webbasket/lib/webbasket_templates.py:1862
 #: modules/webcomment/lib/webcomment_templates.py:864
 msgid "Back to search results"
-msgstr ""
+msgstr "عودة إلى نتائج البحث"
 
 #: modules/webbasket/lib/webbasket_templates.py:1990
 #: modules/webbasket/lib/webbasket_templates.py:3022
@@ -3797,7 +3808,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1991
 #: modules/webbasket/lib/webbasket_templates.py:3024
 msgid "no notes yet"
-msgstr ""
+msgstr "لا توجد ملاحظات إلى حد الآن"
 
 #: modules/webbasket/lib/webbasket_templates.py:1994
 #, python-format
@@ -3981,7 +3992,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:915
 #: modules/websession/lib/websession_templates.py:1039
 msgid "Note"
-msgstr ""
+msgstr "ملاحظة"
 
 #: modules/webbasket/lib/webbasket_templates.py:3031
 #: modules/webbasket/lib/webbasket_templates.py:3084
@@ -3990,37 +4001,37 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:3090
 msgid "This public basket belongs to the user "
-msgstr ""
+msgstr "هذه السلة العمومية تعود إلى المستخدم"
 
 #: modules/webbasket/lib/webbasket_templates.py:3114
 msgid "This public basket belongs to you."
-msgstr ""
+msgstr "هذه السلة العمومية تعود إليك."
 
 #: modules/webbasket/lib/webbasket_templates.py:3889
 msgid "All your baskets"
-msgstr ""
+msgstr "كافة سلالك"
 
 #: modules/webbasket/lib/webbasket_templates.py:3891
 #: modules/webbasket/lib/webbasket_templates.py:3966
 msgid "Your personal baskets"
-msgstr ""
+msgstr "سلالك الشخصية"
 
 #: modules/webbasket/lib/webbasket_templates.py:3897
 #: modules/webbasket/lib/webbasket_templates.py:3977
 msgid "Your group baskets"
-msgstr ""
+msgstr "سلال فريقك"
 
 #: modules/webbasket/lib/webbasket_templates.py:3903
 msgid "Your public baskets"
-msgstr ""
+msgstr "سلالك العمومية"
 
 #: modules/webbasket/lib/webbasket_templates.py:3904
 msgid "All the public baskets"
-msgstr ""
+msgstr "كافة سلالك العمومية"
 
 #: modules/webbasket/lib/webbasket_templates.py:3961
 msgid "*** basket name ***"
-msgstr ""
+msgstr "*** اسم السلة ***"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:158
 #: modules/webbasket/lib/webbasket_webinterface.py:319
@@ -4039,7 +4050,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_webinterface.py:1519
 #: modules/webbasket/lib/webbasket_webinterface.py:1581
 msgid "You are not authorized to use baskets."
-msgstr ""
+msgstr "غير مصرح لك باستخدام السلال."
 
 #: modules/webbasket/lib/webbasket_webinterface.py:169
 msgid "You are not authorized to view this attachment"
@@ -4047,7 +4058,7 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_webinterface.py:361
 msgid "Display baskets"
-msgstr ""
+msgstr "عرض السلال"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:564
 #: modules/webbasket/lib/webbasket_webinterface.py:639
@@ -4057,11 +4068,11 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_webinterface.py:821
 msgid "Delete a basket"
-msgstr ""
+msgstr "حذف سلة"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:879
 msgid "Copy record to basket"
-msgstr ""
+msgstr "سجل نسخة إلى السلة"
 
 #: modules/webcomment/lib/webcommentadminlib.py:122
 msgid "Invalid comment ID."
@@ -4642,7 +4653,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:158
 #: modules/websession/lib/websession_templates.py:1034
 msgid "Nickname"
-msgstr ""
+msgstr "اسم مستعار"
 
 #: modules/webcomment/lib/webcomment_templates.py:1594
 #: modules/webcomment/lib/webcomment_templates.py:1626
@@ -4928,7 +4939,7 @@ msgstr ""
 #: modules/webjournal/web/admin/webjournaladmin.py:390
 #: modules/bibcheck/web/admin/bibcheckadmin.py:331
 msgid "Internal Error"
-msgstr ""
+msgstr "خطأ داخلي"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:102
 msgid "Delete/Undelete Reviews"
@@ -5021,7 +5032,7 @@ msgstr ""
 
 #: modules/webmessage/lib/webmessage.py:453
 msgid "Your message has been sent."
-msgstr ""
+msgstr "تم ارسال الرسالة."
 
 #: modules/webmessage/lib/webmessage.py:458
 #: modules/webmessage/lib/webmessage_templates.py:472
@@ -5030,101 +5041,101 @@ msgstr ""
 #: modules/webmessage/lib/webmessage_webinterface.py:357
 #: modules/websession/lib/websession_templates.py:607
 msgid "Your Messages"
-msgstr ""
+msgstr "رسائلك"
 
 #: modules/webmessage/lib/webmessage_templates.py:86
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4458
 msgid "Subject"
-msgstr ""
+msgstr "الموضوع"
 
 #: modules/webmessage/lib/webmessage_templates.py:87
 msgid "Sender"
-msgstr ""
+msgstr "المرسل"
 
 #: modules/webmessage/lib/webmessage_templates.py:96
 msgid "No messages"
-msgstr ""
+msgstr "لا توجد رسائل"
 
 #: modules/webmessage/lib/webmessage_templates.py:100
 msgid "No subject"
-msgstr ""
+msgstr "بلا موضوع"
 
 #: modules/webmessage/lib/webmessage_templates.py:146
 msgid "Write new message"
-msgstr ""
+msgstr "كتابة رسالة جديدة"
 
 #: modules/webmessage/lib/webmessage_templates.py:147
 msgid "Delete All"
-msgstr ""
+msgstr "حذف الكل"
 
 #: modules/webmessage/lib/webmessage_templates.py:189
 msgid "Re:"
-msgstr ""
+msgstr "ج :"
 
 #: modules/webmessage/lib/webmessage_templates.py:281
 msgid "Send later?"
-msgstr ""
+msgstr "أرسل لاحقا؟"
 
 #: modules/webmessage/lib/webmessage_templates.py:282
 #: modules/websubmit/lib/websubmit_templates.py:3080
 msgid "To:"
-msgstr ""
+msgstr "إلى :"
 
 #: modules/webmessage/lib/webmessage_templates.py:283
 msgid "Users"
-msgstr ""
+msgstr "المستخدمين"
 
 #: modules/webmessage/lib/webmessage_templates.py:284
 msgid "Groups"
-msgstr ""
+msgstr "الفرق"
 
 #: modules/webmessage/lib/webmessage_templates.py:285
 #: modules/webmessage/lib/webmessage_templates.py:447
 #: modules/websubmit/lib/websubmit_templates.py:3081
 msgid "Subject:"
-msgstr ""
+msgstr "الموضوع :"
 
 #: modules/webmessage/lib/webmessage_templates.py:286
 #: modules/websubmit/lib/websubmit_templates.py:3082
 msgid "Message:"
-msgstr ""
+msgstr "الرسالة :"
 
 #: modules/webmessage/lib/webmessage_templates.py:287
 #: modules/websubmit/lib/websubmit_templates.py:3083
 msgid "SEND"
-msgstr ""
+msgstr "أرسل"
 
 #: modules/webmessage/lib/webmessage_templates.py:446
 msgid "From:"
-msgstr ""
+msgstr "من :"
 
 #: modules/webmessage/lib/webmessage_templates.py:448
 msgid "Sent on:"
-msgstr ""
+msgstr "أرسلت في :"
 
 #: modules/webmessage/lib/webmessage_templates.py:449
 msgid "Received on:"
-msgstr ""
+msgstr "وردت في "
 
 #: modules/webmessage/lib/webmessage_templates.py:450
 msgid "Sent to:"
-msgstr ""
+msgstr "أرسلت إلى :"
 
 #: modules/webmessage/lib/webmessage_templates.py:451
 msgid "Sent to groups:"
-msgstr ""
+msgstr "أرسلت إلى الفرق :"
 
 #: modules/webmessage/lib/webmessage_templates.py:452
 msgid "REPLY"
-msgstr ""
+msgstr "رد"
 
 #: modules/webmessage/lib/webmessage_templates.py:453
 msgid "DELETE"
-msgstr ""
+msgstr "حذف"
 
 #: modules/webmessage/lib/webmessage_templates.py:506
 msgid "Are you sure you want to empty your whole mailbox?"
-msgstr ""
+msgstr "هل أنت متأكد أنك تريد  إفراغ كل صندوق بريدك ؟"
 
 #: modules/webmessage/lib/webmessage_templates.py:582
 #, python-format
@@ -5133,11 +5144,11 @@ msgstr ""
 
 #: modules/webmessage/lib/webmessage_templates.py:600
 msgid "Please select one or more:"
-msgstr ""
+msgstr "الرجاء اختيار واحد أو أكثر"
 
 #: modules/webmessage/lib/webmessage_templates.py:631
 msgid "Add to users"
-msgstr ""
+msgstr "أضف إلى المستخدمين"
 
 #: modules/webmessage/lib/webmessage_templates.py:633
 msgid "Add to groups"
@@ -5150,7 +5161,7 @@ msgstr ""
 #: modules/webmessage/lib/webmessage_templates.py:638
 #: modules/websession/lib/websession_templates.py:1819
 msgid "No matching group"
-msgstr ""
+msgstr "لا يوجد فريق مطابق"
 
 #: modules/webmessage/lib/webmessage_templates.py:675
 msgid "Find users or groups:"
@@ -5167,7 +5178,7 @@ msgstr ""
 #: modules/webmessage/lib/webmessage_templates.py:692
 #, python-format
 msgid "You have %(x_nb_new)s new messages out of %(x_nb_total)s messages"
-msgstr ""
+msgstr "لديك %(x_nb_new)s رسائل جديدة من أصل %(x_nb_total)s رسالة"
 
 #: modules/webmessage/lib/webmessage_webinterface.py:82
 #: modules/webmessage/lib/webmessage_webinterface.py:134
@@ -5180,56 +5191,56 @@ msgstr ""
 
 #: modules/webmessage/lib/webmessage_webinterface.py:403
 msgid "Read a message"
-msgstr ""
+msgstr "اقرء رسالة"
 
 #: modules/websearch/lib/search_engine.py:833
 #: modules/websearch/lib/search_engine.py:860
 #: modules/websearch/lib/search_engine.py:4715
 #: modules/websearch/lib/search_engine.py:4768
 msgid "Search Results"
-msgstr ""
+msgstr "نتائج البحث"
 
 #: modules/websearch/lib/search_engine.py:973
 #: modules/websearch/lib/websearch_templates.py:1174
 msgid "any day"
-msgstr ""
+msgstr "أي يوم"
 
 #: modules/websearch/lib/search_engine.py:979
 #: modules/websearch/lib/websearch_templates.py:1186
 msgid "any month"
-msgstr ""
+msgstr "أي شهر"
 
 #: modules/websearch/lib/search_engine.py:987
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "any year"
-msgstr ""
+msgstr "أي سنة"
 
 #: modules/websearch/lib/search_engine.py:1028
 #: modules/websearch/lib/search_engine.py:1047
 msgid "any public collection"
-msgstr ""
+msgstr "أي مجموعة مفتوح للعموم"
 
 #: modules/websearch/lib/search_engine.py:1032
 msgid "remove this collection"
-msgstr ""
+msgstr "إزالة هذه المجموعة"
 
 #: modules/websearch/lib/search_engine.py:1043
 msgid "add another collection"
-msgstr ""
+msgstr "إضافة مجموعة أخرى"
 
 #: modules/websearch/lib/search_engine.py:1053
 #: modules/websearch/lib/websearch_webcoll.py:592
 msgid "rank by"
-msgstr ""
+msgstr "مرتبة حسب"
 
 #: modules/websearch/lib/search_engine.py:1177
 #: modules/websearch/lib/websearch_webcoll.py:562
 msgid "latest first"
-msgstr ""
+msgstr "الأخير أولا"
 
 #: modules/websearch/lib/search_engine.py:1827
 msgid "No values found."
-msgstr ""
+msgstr "لم يتم العثور على بيانات"
 
 #: modules/websearch/lib/search_engine.py:1945
 msgid ""
@@ -5304,22 +5315,22 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:2702
 #, python-format
 msgid "There are no records referring to %s."
-msgstr ""
+msgstr ". %s لا توجد سجلات تشير إلى"
 
 #: modules/websearch/lib/search_engine.py:2704
 #, python-format
 msgid "There are no records cited by %s."
-msgstr ""
+msgstr "%s لا توجد سجلات استشهد بها ."
 
 #: modules/websearch/lib/search_engine.py:2709
 #, python-format
 msgid "No word index is available for %s."
-msgstr ""
+msgstr "%s لا يوجد كشاف كلمات متاح ل."
 
 #: modules/websearch/lib/search_engine.py:2720
 #, python-format
 msgid "No phrase index is available for %s."
-msgstr ""
+msgstr "%s لا يوجد كشاف جمل متاح ل ."
 
 #: modules/websearch/lib/search_engine.py:2767
 #, python-format
@@ -5327,12 +5338,14 @@ msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
 "Nearest terms in any collection are:"
 msgstr ""
+"لم تطابق عبارة البحث  %(x_term)s في الكشاف %(x_index)s  أي سجل . أقرب "
+"المصطلحات الواردة هي :"
 
 #: modules/websearch/lib/search_engine.py:2771
 #, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
-msgstr ""
+msgstr "لم تطابق عبارة البحث  %s أي سجل.أقرب المصطلحات الواردة هي :"
 
 #: modules/websearch/lib/search_engine.py:3486
 #, python-format
@@ -5381,27 +5394,27 @@ msgstr ""
 
 #: modules/websearch/lib/websearchadminlib.py:3395
 msgid "Citations"
-msgstr ""
+msgstr "استشهادات"
 
 #: modules/websearch/lib/websearchadminlib.py:3396
 msgid "Keywords"
-msgstr ""
+msgstr "مفاتيح"
 
 #: modules/websearch/lib/websearchadminlib.py:3397
 msgid "Discussion"
-msgstr ""
+msgstr "مناقشة"
 
 #: modules/websearch/lib/websearchadminlib.py:3398
 msgid "Usage statistics"
-msgstr ""
+msgstr "إحصائيات الاستعمال"
 
 #: modules/websearch/lib/websearchadminlib.py:3399
 msgid "Files"
-msgstr ""
+msgstr "الملفات"
 
 #: modules/websearch/lib/websearchadminlib.py:3400
 msgid "Plots"
-msgstr ""
+msgstr "المخططات"
 
 #: modules/websearch/lib/websearchadminlib.py:3401
 msgid "Holdings"
@@ -5410,17 +5423,17 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:458
 #, python-format
 msgid "Search on %(x_CFG_SITE_NAME_INTL)s"
-msgstr ""
+msgstr "البحث في  %(x_CFG_SITE_NAME_INTL)s"
 
 #: modules/websearch/lib/websearch_templates.py:682
 #: modules/websearch/lib/websearch_templates.py:831
 #, python-format
 msgid "Search %s records for:"
-msgstr ": تسجيلة %s البحث في"
+msgstr "البحث في %s سجل :"
 
 #: modules/websearch/lib/websearch_templates.py:734
 msgid "less"
-msgstr ""
+msgstr "أقل"
 
 #: modules/websearch/lib/websearch_templates.py:735
 #: modules/websearch/lib/websearch_templates.py:1508
@@ -5428,77 +5441,77 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:3970
 #: modules/websearch/lib/websearch_templates.py:4030
 msgid "more"
-msgstr ""
+msgstr "المزيد"
 
 #: modules/websearch/lib/websearch_templates.py:740
 #, python-format
 msgid "Example: %(x_sample_search_query)s"
-msgstr ""
+msgstr "على سبيل المثال : %(x_sample_search_query)s"
 
 #: modules/websearch/lib/websearch_templates.py:752
 #: modules/websearch/lib/websearch_templates.py:2129
 #, python-format
 msgid "Search in %(x_collection_name)s"
-msgstr ""
+msgstr "البحث في %(x_collection_name)s"
 
 #: modules/websearch/lib/websearch_templates.py:756
 #: modules/websearch/lib/websearch_templates.py:2133
 msgid "Search everywhere"
-msgstr ""
+msgstr "البحث في كل مكان"
 
 #: modules/websearch/lib/websearch_templates.py:790
 #: modules/websearch/lib/websearch_templates.py:867
 #: modules/websearch/lib/websearch_templates.py:2101
 #: modules/websearch/lib/websearch_templates.py:2159
 msgid "Advanced Search"
-msgstr ""
+msgstr "بحث متقدم"
 
 #: modules/websearch/lib/websearch_templates.py:928
 #, python-format
 msgid "Search %s records for"
-msgstr ""
+msgstr "ابحث عن %s سجل"
 
 #: modules/websearch/lib/websearch_templates.py:979
 #: modules/websearch/lib/websearch_templates.py:2017
 msgid "Simple Search"
-msgstr ""
+msgstr "بحث بسيط"
 
 #: modules/websearch/lib/websearch_templates.py:1012
 msgid "Search options:"
-msgstr ""
+msgstr "خيارات البحث :"
 
 #: modules/websearch/lib/websearch_templates.py:1059
 #: modules/websearch/lib/websearch_templates.py:2255
 msgid "Added/modified since:"
-msgstr ""
+msgstr "أضيفت / معدلة منذ"
 
 #: modules/websearch/lib/websearch_templates.py:1060
 #: modules/websearch/lib/websearch_templates.py:2256
 msgid "until:"
-msgstr ""
+msgstr "حتى :"
 
 #: modules/websearch/lib/websearch_templates.py:1065
 #: modules/websearch/lib/websearch_templates.py:2298
 msgid "Sort by:"
-msgstr ""
+msgstr "مرتبة حسب :"
 
 #: modules/websearch/lib/websearch_templates.py:1066
 #: modules/websearch/lib/websearch_templates.py:2299
 msgid "Display results:"
-msgstr ""
+msgstr "عرض النتائج :"
 
 #: modules/websearch/lib/websearch_templates.py:1067
 #: modules/websearch/lib/websearch_templates.py:2300
 msgid "Output format:"
-msgstr ""
+msgstr "صيغ العرض :"
 
 #: modules/websearch/lib/websearch_templates.py:1227
 msgid "Added since:"
-msgstr ""
+msgstr "أضيفت منذ :"
 
 #: modules/websearch/lib/websearch_templates.py:1228
 msgid "Modified since:"
-msgstr ""
+msgstr "حيينت منذ :"
 
 #: modules/websearch/lib/websearch_templates.py:1265
 msgid "Focus on:"
@@ -5506,11 +5519,11 @@ msgstr ":التركيز على"
 
 #: modules/websearch/lib/websearch_templates.py:1328
 msgid "restricted"
-msgstr ""
+msgstr "مقيد"
 
 #: modules/websearch/lib/websearch_templates.py:1355
 msgid "Search also:"
-msgstr ""
+msgstr "أبحث أيضا :"
 
 #: modules/websearch/lib/websearch_templates.py:1426
 msgid ""
@@ -5530,13 +5543,13 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:1523
 msgid "Latest additions:"
-msgstr ""
+msgstr "آخر الإضافات :"
 
 #: modules/websearch/lib/websearch_templates.py:1626
 #: modules/websearch/lib/websearch_templates.py:3361
 #, python-format
 msgid "Cited by %i records"
-msgstr ""
+msgstr " سجل %i مستشهد به في"
 
 #: modules/websearch/lib/websearch_templates.py:1692
 #, python-format
@@ -5557,11 +5570,11 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:2708
 #: modules/bibedit/lib/bibeditmulti_templates.py:657
 msgid "next"
-msgstr ""
+msgstr "التالي"
 
 #: modules/websearch/lib/websearch_templates.py:2204
 msgid "collections"
-msgstr ""
+msgstr "المجموعات"
 
 #: modules/websearch/lib/websearch_templates.py:2226
 msgid "Limit to:"
@@ -5570,27 +5583,27 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:2268
 #: modules/websearch/lib/websearch_webcoll.py:610
 msgid "results"
-msgstr ""
+msgstr "النتائج"
 
 #: modules/websearch/lib/websearch_templates.py:2304
 #: modules/websearch/lib/websearch_webcoll.py:580
 msgid "asc."
-msgstr ""
+msgstr "تصاعدي"
 
 #: modules/websearch/lib/websearch_templates.py:2307
 #: modules/websearch/lib/websearch_webcoll.py:581
 msgid "desc."
-msgstr ""
+msgstr "تنازلي"
 
 #: modules/websearch/lib/websearch_templates.py:2313
 #: modules/websearch/lib/websearch_webcoll.py:624
 msgid "single list"
-msgstr ""
+msgstr "قائمة واحدة"
 
 #: modules/websearch/lib/websearch_templates.py:2316
 #: modules/websearch/lib/websearch_webcoll.py:623
 msgid "split by collection"
-msgstr ""
+msgstr "تقسيم بالمجموعات"
 
 #: modules/websearch/lib/websearch_templates.py:2354
 msgid "MARC tag"
@@ -5604,36 +5617,36 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:2994
 #, python-format
 msgid "%s records found"
-msgstr "%s العثور على سجلات"
+msgstr "العثور على %s سجل"
 
 #: modules/websearch/lib/websearch_templates.py:2501
 #: modules/websearch/lib/websearch_templates.py:2691
 #: modules/bibedit/lib/bibeditmulti_templates.py:655
 msgid "begin"
-msgstr ""
+msgstr "تبدأ"
 
 #: modules/websearch/lib/websearch_templates.py:2506
 #: modules/websearch/lib/websearch_templates.py:2696
 #: modules/websubmit/lib/websubmit_templates.py:1241
 #: modules/bibedit/lib/bibeditmulti_templates.py:656
 msgid "previous"
-msgstr ""
+msgstr "السابق"
 
 #: modules/websearch/lib/websearch_templates.py:2525
 #: modules/websearch/lib/websearch_templates.py:2715
 msgid "end"
-msgstr ""
+msgstr "النهاية"
 
 #: modules/websearch/lib/websearch_templates.py:2545
 #: modules/websearch/lib/websearch_templates.py:2735
 msgid "jump to record:"
-msgstr ""
+msgstr "الانتقال إلى السجل :"
 
 #: modules/websearch/lib/websearch_templates.py:2558
 #: modules/websearch/lib/websearch_templates.py:2748
 #, python-format
 msgid "Search took %s seconds."
-msgstr ""
+msgstr " استغرق البحث %s ثانية"
 
 #: modules/websearch/lib/websearch_templates.py:2952
 #, python-format
@@ -5641,11 +5654,13 @@ msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
 "records in %(x_nb_seconds)s seconds."
 msgstr ""
+"%(x_fmt_open)sنظرة عامة على النتائج :%(x_fmt_close)s العثور على "
+"%(x_nb_records)s سجل في %(x_nb_seconds)s ثانية."
 
 #: modules/websearch/lib/websearch_templates.py:2964
 #, python-format
 msgid "%(x_fmt_open)sResults overview%(x_fmt_close)s"
-msgstr ""
+msgstr "%(x_fmt_open)sنظرة عامة على النتائج%(x_fmt_close)s"
 
 #: modules/websearch/lib/websearch_templates.py:2972
 #, python-format
@@ -5653,10 +5668,12 @@ msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found at least "
 "%(x_nb_records)s records in %(x_nb_seconds)s seconds."
 msgstr ""
+"%(x_fmt_open)sنظرة عامة على النتائج :%(x_fmt_close)s العثور على ما لا يقل عن "
+"%(x_nb_records)s سجل في %(x_nb_seconds)s ثانية."
 
 #: modules/websearch/lib/websearch_templates.py:3049
 msgid "No results found..."
-msgstr ""
+msgstr "لا يوجد نتائج..."
 
 #: modules/websearch/lib/websearch_templates.py:3082
 msgid ""
@@ -5674,26 +5691,26 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:3377
 #, python-format
 msgid "%i comments"
-msgstr ""
+msgstr "%i تعليق"
 
 #: modules/websearch/lib/websearch_templates.py:3378
 msgid "1 comment"
-msgstr ""
+msgstr "تعليق وحيد"
 
 #: modules/websearch/lib/websearch_templates.py:3388
 #, python-format
 msgid "%i reviews"
-msgstr ""
+msgstr " %i استعراض"
 
 #: modules/websearch/lib/websearch_templates.py:3389
 msgid "1 review"
-msgstr ""
+msgstr "استعراض وحيد"
 
 #: modules/websearch/lib/websearch_templates.py:3602
 #: modules/websearch/lib/websearch_webinterface.py:1580
 #, python-format
 msgid "Collection %s Not Found"
-msgstr ""
+msgstr "المجموعة %s غير موجود"
 
 #: modules/websearch/lib/websearch_templates.py:3614
 #: modules/websearch/lib/websearch_webinterface.py:1576
@@ -5714,6 +5731,8 @@ msgid ""
 "                                  or subscribe to the %(x_url2_open)sRSS feed"
 "%(x_url2_close)s."
 msgstr ""
+"إنشاء%(x_url1_open)sتنبيه عبر بريدك الإلكتروني%(x_url1_close)s\n"
+"أو الاشتراك في خدمة%(x_url2_open)sRSS%(x_url2_close)s."
 
 #: modules/websearch/lib/websearch_templates.py:3650
 #, python-format
@@ -5722,7 +5741,7 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3659
 msgid "Interested in being notified about new results for this query?"
-msgstr ""
+msgstr "هل تريد أن يتم إعلامك عن النتائج الجديدة لهذا البحث؟"
 
 #: modules/websearch/lib/websearch_templates.py:3746
 #: modules/websearch/lib/websearch_templates.py:3796
@@ -5877,16 +5896,16 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_webinterface.py:1582
 msgid "Not found"
-msgstr ""
+msgstr "غير موجود"
 
 #: modules/websearch/lib/websearch_external_collections.py:145
 msgid "in"
-msgstr ""
+msgstr "في"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:51
 msgid ""
 "Haven't found what you were looking for? Try your search on other servers:"
-msgstr ""
+msgstr "لم تجد ما تبحث عنه؟ حاول البحث في مصادر معلومات اخرى :"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:79
 msgid "External collections results overview:"
@@ -5894,7 +5913,7 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:119
 msgid "Search timed out."
-msgstr ""
+msgstr "مهلة للبحث."
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:120
 msgid ""
@@ -5911,16 +5930,16 @@ msgstr ""
 #: modules/websearch/lib/websearch_external_collections_templates.py:150
 #, python-format
 msgid "%s results found"
-msgstr ""
+msgstr "%s نتيجة وجدت"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:152
 #, python-format
 msgid "%s seconds"
-msgstr ""
+msgstr "%s ثانية"
 
 #: modules/websearch/lib/websearch_webcoll.py:645
 msgid "brief"
-msgstr ""
+msgstr "مختصر"
 
 #: modules/websession/lib/webaccount.py:116
 #, python-format
@@ -5928,6 +5947,8 @@ msgid ""
 "You are logged in as guest. You may want to %(x_url_open)slogin"
 "%(x_url_close)s as a regular user."
 msgstr ""
+"تم تسجيل دخولك كزائر. قد ترغب في%(x_url_open)sالدخول%(x_url_close)s كمستخدم "
+"عادي."
 
 #: modules/websession/lib/webaccount.py:120
 #, python-format
@@ -5935,26 +5956,32 @@ msgid ""
 "The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister"
 "%(x_url_close)s first"
 msgstr ""
+"على المستخدم%(x_fmt_open)s الزائر %(x_fmt_close)s%(x_url_open)s التسجيل"
+"%(x_url_close)s أولا ٠"
 
 #: modules/websession/lib/webaccount.py:125
 msgid "No queries found"
-msgstr ""
+msgstr "لا وجود لاي استشارات"
 
 #: modules/websession/lib/webaccount.py:367
 msgid ""
 "This collection is restricted.  If you think you have right to access it, "
 "please authenticate yourself."
 msgstr ""
+"هذه المجموعة مقيد بحقوق إستغلال. الرجاء تسجيل الدخول بحساب يتمتع بالحقوق "
+"اللازمة ."
 
 #: modules/websession/lib/webaccount.py:368
 msgid ""
 "This file is restricted.  If you think you have right to access it, please "
 "authenticate yourself."
 msgstr ""
+"هذه الملف مقيد بحقوق إستغلال. الرجاء تسجيل الدخول بحساب يتمتع بالحقوق "
+"اللازمة ."
 
 #: modules/websession/lib/websession_templates.py:93
 msgid "External account settings"
-msgstr ""
+msgstr "إعدادات الحساب الخارجي"
 
 #: modules/websession/lib/websession_templates.py:95
 #, python-format
@@ -5962,6 +5989,8 @@ msgid ""
 "You can consult the list of your external groups directly in the "
 "%(x_url_open)sgroups page%(x_url_close)s."
 msgstr ""
+"يمكنك الاطلاع على قائمة فرقك الخارجية  مباشرة من %(x_url_open)sصفحة الفرق"
+"%(x_url_close)s ."
 
 #: modules/websession/lib/websession_templates.py:99
 msgid "External user groups"
@@ -5972,66 +6001,70 @@ msgid ""
 "If you want to change your email or set for the first time your nickname, "
 "please set new values in the form below."
 msgstr ""
+"إذا كنت تريد تغيير بريدك الالكتروني أو تعيين لأول مرة إسما مستعارا لك، يرجى "
+"إستعمال الاستمارة التالية"
 
 #: modules/websession/lib/websession_templates.py:157
 msgid "Edit login credentials"
-msgstr ""
+msgstr "ضبط بيانات الدخول"
 
 #: modules/websession/lib/websession_templates.py:162
 msgid "New email address"
-msgstr ""
+msgstr "عنوان البريد الإلكتروني الجديد"
 
 #: modules/websession/lib/websession_templates.py:163
 #: modules/websession/lib/websession_templates.py:210
 #: modules/websession/lib/websession_templates.py:1036
 msgid "mandatory"
-msgstr ""
+msgstr "إجباري"
 
 #: modules/websession/lib/websession_templates.py:166
 msgid "Set new values"
-msgstr ""
+msgstr "تسجيل المعطيات الجديدة"
 
 #: modules/websession/lib/websession_templates.py:170
 msgid ""
 "Since this is considered as a signature for comments and reviews, once set "
 "it can not be changed."
-msgstr ""
+msgstr "بإعتماده كتوقيع للتعليقات و الاستعراضات لا يمكن تغييره لاحقا."
 
 #: modules/websession/lib/websession_templates.py:209
 msgid ""
 "If you want to change your password, please enter the old one and set the "
 "new value in the form below."
 msgstr ""
+"إذا كنت تريد تغيير كلمة المرور ,يرجى إدخال الكلمة القديمة والكلمة الجديدة "
+"أدناه."
 
 #: modules/websession/lib/websession_templates.py:211
 msgid "Old password"
-msgstr ""
+msgstr "كلمة المرور القديمة"
 
 #: modules/websession/lib/websession_templates.py:212
 msgid "New password"
-msgstr ""
+msgstr "كلمة المرور الجديدة"
 
 #: modules/websession/lib/websession_templates.py:213
 #: modules/websession/lib/websession_templates.py:1037
 msgid "optional"
-msgstr ""
+msgstr "اختياري"
 
 #: modules/websession/lib/websession_templates.py:215
 #: modules/websession/lib/websession_templates.py:1040
 msgid "The password phrase may contain punctuation, spaces, etc."
-msgstr ""
+msgstr "يجب ان تحتوي كلمة المرور على علامات الترقيم ، المساحات، الخ."
 
 #: modules/websession/lib/websession_templates.py:216
 msgid "You must fill the old password in order to set a new one."
-msgstr ""
+msgstr "يجب أن تكتب كلمة المرور القديمة من أجل تحديد واحدة جديدة."
 
 #: modules/websession/lib/websession_templates.py:217
 msgid "Retype password"
-msgstr ""
+msgstr "أعد كتابة كلمة المرور"
 
 #: modules/websession/lib/websession_templates.py:218
 msgid "Set new password"
-msgstr ""
+msgstr "تغيير كلمة المرور"
 
 #: modules/websession/lib/websession_templates.py:223
 #, python-format
@@ -6049,48 +6082,48 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:253
 msgid "Edit cataloging interface settings"
-msgstr ""
+msgstr "تعديل إعدادات واجهة الفهرسة"
 
 #: modules/websession/lib/websession_templates.py:254
 #: modules/websession/lib/websession_templates.py:900
 msgid "Username"
-msgstr ""
+msgstr "اسم المستخدم"
 
 #: modules/websession/lib/websession_templates.py:255
 #: modules/websession/lib/websession_templates.py:901
 #: modules/websession/lib/websession_templates.py:1035
 msgid "Password"
-msgstr ""
+msgstr "كلمة المرور"
 
 #: modules/websession/lib/websession_templates.py:256
 #: modules/websession/lib/websession_templates.py:282
 #: modules/websession/lib/websession_templates.py:316
 msgid "Update settings"
-msgstr ""
+msgstr "تحديث الإعدادات"
 
 #: modules/websession/lib/websession_templates.py:270
 msgid "Edit language-related settings"
-msgstr ""
+msgstr "ضبط الإعدادات المتعلقة باللغة"
 
 #: modules/websession/lib/websession_templates.py:281
 msgid "Select desired language of the web interface."
-msgstr ""
+msgstr "اختيار لغة المرغوب باستخدامها للواجهة ."
 
 #: modules/websession/lib/websession_templates.py:299
 msgid "Edit search-related settings"
-msgstr ""
+msgstr "ضبط الإعدادات المتعلقة بالبحث"
 
 #: modules/websession/lib/websession_templates.py:300
 msgid "Show the latest additions box"
-msgstr ""
+msgstr "عرض أحدث  الإضافات."
 
 #: modules/websession/lib/websession_templates.py:302
 msgid "Show collection help boxes"
-msgstr ""
+msgstr "عرض مربعات المساعدة للمجموعات"
 
 #: modules/websession/lib/websession_templates.py:317
 msgid "Number of search results per page"
-msgstr ""
+msgstr "عدد نتائج البحث في كل صفحة"
 
 #: modules/websession/lib/websession_templates.py:347
 msgid "Edit login method"
@@ -6100,12 +6133,12 @@ msgstr ""
 msgid ""
 "Please select which login method you would like to use to authenticate "
 "yourself"
-msgstr ""
+msgstr "الرجاء اختيار طريقة تسجيل الدخول التي ترغب في استخدامها"
 
 #: modules/websession/lib/websession_templates.py:349
 #: modules/websession/lib/websession_templates.py:363
 msgid "Select method"
-msgstr ""
+msgstr "حدد الأسلوب"
 
 #: modules/websession/lib/websession_templates.py:381
 #, python-format
@@ -6118,11 +6151,11 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:403
 #: modules/websession/lib/websession_templates.py:1033
 msgid "Email address"
-msgstr ""
+msgstr "عنوان البريد الإلكتروني"
 
 #: modules/websession/lib/websession_templates.py:404
 msgid "Send password reset link"
-msgstr ""
+msgstr "إرسال رابط إعادة كلمة المرور"
 
 #: modules/websession/lib/websession_templates.py:408
 #, python-format
@@ -6156,7 +6189,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:449
 #: modules/websession/lib/websession_webinterface.py:276
 msgid "Your Settings"
-msgstr ""
+msgstr "إعدادات حسابك"
 
 #: modules/websession/lib/websession_templates.py:450
 msgid ""
@@ -6197,6 +6230,7 @@ msgid ""
 "You are logged in as a guest user, so your alerts will disappear at the end "
 "of the current session."
 msgstr ""
+"تم تسجيل دخولك كزائر، لذا لا يمكن الاحتفاظ بتنبيهاتك الخاصة عند نهاية الزيارة"
 
 #: modules/websession/lib/websession_templates.py:535
 #, python-format
@@ -6208,7 +6242,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:616
 msgid "Your Alert Searches"
-msgstr ""
+msgstr "تنبيهاتك"
 
 #: modules/websession/lib/websession_templates.py:622
 #, python-format
@@ -6216,12 +6250,14 @@ msgid ""
 "You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
 "administering or are a member of."
 msgstr ""
+"يمكنك الاطلاع على %(x_url_open)sقائمة المجموعات%(x_url_close)s التي تقوم "
+"بإدارتها أو  التي أنت عضو فيها."
 
 #: modules/websession/lib/websession_templates.py:625
 #: modules/websession/lib/websession_templates.py:2326
 #: modules/websession/lib/websession_webinterface.py:1020
 msgid "Your Groups"
-msgstr ""
+msgstr "الجماعات الخاصة بك"
 
 #: modules/websession/lib/websession_templates.py:628
 #, python-format
@@ -6229,11 +6265,13 @@ msgid ""
 "You can consult the list of %(x_url_open)syour submissions%(x_url_close)s "
 "and inquire about their status."
 msgstr ""
+"يمكنك الاطلاع على قائمة %(x_url_open)sالوثائق التي قمت بإيداعها"
+"%(x_url_close)s والاستفسار عن وضعيتها."
 
 #: modules/websession/lib/websession_templates.py:631
 #: modules/websubmit/web/yoursubmissions.py:160
 msgid "Your Submissions"
-msgstr ""
+msgstr "إيداعتك"
 
 #: modules/websession/lib/websession_templates.py:634
 #, python-format
@@ -6241,31 +6279,33 @@ msgid ""
 "You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
 "the documents you approved or refereed."
 msgstr ""
+"يمكنك الاطلاع على قائمة %(x_url_open)s الوثائق%(x_url_close)s التي قمت "
+"بالموافقة عليها ."
 
 #: modules/websession/lib/websession_templates.py:637
 #: modules/websubmit/web/yourapprovals.py:88
 msgid "Your Approvals"
-msgstr ""
+msgstr "موافقاتك"
 
 #: modules/websession/lib/websession_templates.py:641
 #, python-format
 msgid "You can consult the list of %(x_url_open)syour tickets%(x_url_close)s."
-msgstr ""
+msgstr "يمكنك الاطلاع على قائمة %(x_url_open)s تذاكرك%(x_url_close)s"
 
 #: modules/websession/lib/websession_templates.py:644
 msgid "Your Tickets"
-msgstr ""
+msgstr "تذاكرك"
 
 #: modules/websession/lib/websession_templates.py:646
 #: modules/websession/lib/websession_webinterface.py:625
 msgid "Your Administrative Activities"
-msgstr ""
+msgstr "نشاطاتك الإدارية"
 
 #: modules/websession/lib/websession_templates.py:673
 #: modules/bibharvest/lib/oai_harvest_admin.py:470
 #: modules/bibharvest/lib/oai_harvest_admin.py:485
 msgid "Try again"
-msgstr ""
+msgstr "أعد المحاولة"
 
 #: modules/websession/lib/websession_templates.py:695
 #, python-format
@@ -6314,7 +6354,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:795
 msgid "You are no longer recognized by our system."
-msgstr ""
+msgstr "لقد تم تسجيل خروجك بنجاح."
 
 #: modules/websession/lib/websession_templates.py:797
 #, python-format
@@ -6327,11 +6367,11 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:804
 #, python-format
 msgid "If you wish you can %(x_url_open)slogin here%(x_url_close)s."
-msgstr ""
+msgstr "يمكنك إذا رغبت إعادة تسجيل دخولك %(x_url_open)sمن هنا%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:835
 msgid "If you already have an account, please login using the form below."
-msgstr ""
+msgstr "إذا كان لديك حساب ، الرجاء تسجيل الدخول أدناه."
 
 #: modules/websession/lib/websession_templates.py:839
 #, python-format
@@ -6346,6 +6386,7 @@ msgid ""
 "If you don't own an account yet, please %(x_url_open)sregister"
 "%(x_url_close)s an internal account."
 msgstr ""
+"إذا لم يكن لديك حساب ،فيمكنك %(x_url_open)s إنشاء حساب الآن%(x_url_close)s. "
 
 #: modules/websession/lib/websession_templates.py:850
 #, python-format
@@ -6358,7 +6399,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:902
 msgid "Remember login on this computer."
-msgstr ""
+msgstr "الاحتفاظ بتسجيل الدخول على هذا الكمبيوتر."
 
 #: modules/websession/lib/websession_templates.py:903
 #: modules/websession/lib/websession_templates.py:1182
@@ -6372,11 +6413,11 @@ msgstr "تسجيل الدخول"
 #: modules/websession/lib/websession_templates.py:908
 #: modules/websession/lib/websession_webinterface.py:529
 msgid "Lost your password?"
-msgstr ""
+msgstr "فقدت كلمة المرور؟"
 
 #: modules/websession/lib/websession_templates.py:916
 msgid "You can use your nickname or your email address to login."
-msgstr ""
+msgstr "يمكنك استخدام اسمك المستعار أو عنوان بريدك الإلكتروني للدخول."
 
 #: modules/websession/lib/websession_templates.py:940
 msgid ""
@@ -6403,6 +6444,8 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:988
 msgid "Please enter your email address and desired nickname and password:"
 msgstr ""
+"الرجاء إدخال عنوان بريدك الالكتروني ،الاسم المستعار وكلمة السر المرغوب "
+"فيهما :"
 
 #: modules/websession/lib/websession_templates.py:990
 msgid ""
@@ -6412,12 +6455,12 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1041
 msgid "Retype Password"
-msgstr ""
+msgstr "أعد كتابة كلمة المرور"
 
 #: modules/websession/lib/websession_templates.py:1042
 #: modules/websession/lib/websession_webinterface.py:942
 msgid "register"
-msgstr ""
+msgstr "تسجيل"
 
 #: modules/websession/lib/websession_templates.py:1043
 #, python-format
@@ -6451,15 +6494,15 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1082
 #, python-format
 msgid "You are enabled to the following roles: %(x_role)s."
-msgstr ""
+msgstr "وقع تمكينك من الأدوار التالية : %(x_role)s."
 
 #: modules/websession/lib/websession_templates.py:1098
 msgid "Run BibSword Client"
-msgstr ""
+msgstr "تشغيل عميل BibSword"
 
 #: modules/websession/lib/websession_templates.py:1125
 msgid "Here are some interesting web admin links for you:"
-msgstr ""
+msgstr "هنا بعض روابط ويب هامة للمشرف :"
 
 #: modules/websession/lib/websession_templates.py:1127
 #, python-format
@@ -6467,10 +6510,12 @@ msgid ""
 "For more admin-level activities, see the complete %(x_url_open)sAdmin Area"
 "%(x_url_close)s."
 msgstr ""
+"لمزيد من الأنشطة على المستوى الإشراف، الرجاء الرجوع  %(x_url_open)sلفضاء "
+"الإدارة%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:1180
 msgid "guest"
-msgstr ""
+msgstr "زائر"
 
 #: modules/websession/lib/websession_templates.py:1194
 msgid "logout"
@@ -6480,7 +6525,7 @@ msgstr "الخروج"
 #: modules/webstyle/lib/webstyle_templates.py:435
 #: modules/webstyle/lib/webstyle_templates.py:504
 msgid "Personalize"
-msgstr ""
+msgstr "حسابك الخاص"
 
 #: modules/websession/lib/websession_templates.py:1250
 msgid "Your account"
@@ -6488,7 +6533,7 @@ msgstr "حسابك الخاص"
 
 #: modules/websession/lib/websession_templates.py:1256
 msgid "Your alerts"
-msgstr ""
+msgstr "تنبيهاتك"
 
 #: modules/websession/lib/websession_templates.py:1262
 msgid "Your approvals"
@@ -6496,27 +6541,27 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1268
 msgid "Your baskets"
-msgstr ""
+msgstr "سلالك"
 
 #: modules/websession/lib/websession_templates.py:1274
 msgid "Your groups"
-msgstr ""
+msgstr "الجماعات الخاصة بك"
 
 #: modules/websession/lib/websession_templates.py:1280
 msgid "Your loans"
-msgstr ""
+msgstr "استعارتك"
 
 #: modules/websession/lib/websession_templates.py:1286
 msgid "Your messages"
-msgstr ""
+msgstr "رسائلك"
 
 #: modules/websession/lib/websession_templates.py:1292
 msgid "Your submissions"
-msgstr ""
+msgstr "إيداعتك"
 
 #: modules/websession/lib/websession_templates.py:1298
 msgid "Your searches"
-msgstr ""
+msgstr "عمليات البحث"
 
 #: modules/websession/lib/websession_templates.py:1351
 msgid "Administration"
@@ -6524,11 +6569,11 @@ msgstr "الإدارة"
 
 #: modules/websession/lib/websession_templates.py:1367
 msgid "Statistics"
-msgstr ""
+msgstr "إحصائيات"
 
 #: modules/websession/lib/websession_templates.py:1484
 msgid "You are an administrator of the following groups:"
-msgstr ""
+msgstr "انت مسؤولا عن الفرق التالية :"
 
 #: modules/websession/lib/websession_templates.py:1504
 #: modules/websession/lib/websession_templates.py:1578
@@ -6536,15 +6581,15 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:3012
 #: modules/websubmit/lib/websubmit_templates.py:3018
 msgid "Group"
-msgstr ""
+msgstr "فريق"
 
 #: modules/websession/lib/websession_templates.py:1511
 msgid "You are not an administrator of any groups."
-msgstr ""
+msgstr "أنت لست مسؤولا في أي مجموعة."
 
 #: modules/websession/lib/websession_templates.py:1518
 msgid "Edit group"
-msgstr ""
+msgstr "تعديل فريق"
 
 #: modules/websession/lib/websession_templates.py:1525
 #, python-format
@@ -6935,7 +6980,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:281
 #, python-format
 msgid "%s Personalize, Your Settings"
-msgstr ""
+msgstr "إضفاء الطابع الشخصي، إلى إعدادات حسابك %s"
 
 #: modules/websession/lib/websession_webinterface.py:335
 #: modules/websession/lib/websession_webinterface.py:402
@@ -6943,7 +6988,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:477
 #: modules/websession/lib/websession_webinterface.py:490
 msgid "Settings edited"
-msgstr ""
+msgstr "ضبط الإعدادات"
 
 #: modules/websession/lib/websession_webinterface.py:337
 #: modules/websession/lib/websession_webinterface.py:401
@@ -7001,7 +7046,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:395
 msgid "Settings successfully edited."
-msgstr ""
+msgstr "ضبط الإعدادات بنجاح."
 
 #: modules/websession/lib/websession_webinterface.py:396
 #, python-format
@@ -7014,7 +7059,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:912
 #, python-format
 msgid "Desired nickname %s is invalid."
-msgstr ""
+msgstr "الاسم المستعار المطلوب %s غير صحيح."
 
 #: modules/websession/lib/websession_webinterface.py:405
 #: modules/websession/lib/websession_webinterface.py:411
@@ -7026,7 +7071,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:913
 #: modules/websession/lib/websession_webinterface.py:924
 msgid "Please try again."
-msgstr ""
+msgstr "الرجاء اعادة المحاولة."
 
 #: modules/websession/lib/websession_webinterface.py:407
 #: modules/websession/lib/websession_webinterface.py:413
@@ -7036,7 +7081,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:454
 #: modules/websession/lib/websession_webinterface.py:501
 msgid "Edit settings"
-msgstr ""
+msgstr "ضبط الإعدادات"
 
 #: modules/websession/lib/websession_webinterface.py:408
 #: modules/websession/lib/websession_webinterface.py:414
@@ -7044,29 +7089,29 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:427
 #: modules/websession/lib/websession_webinterface.py:503
 msgid "Editing settings failed"
-msgstr ""
+msgstr "فشل ضبط الإعدادات."
 
 #: modules/websession/lib/websession_webinterface.py:410
 #: modules/websession/lib/websession_webinterface.py:907
 #, python-format
 msgid "Supplied email address %s is invalid."
-msgstr ""
+msgstr "عنوان البريد الإلكتروني %s غير صحيح."
 
 #: modules/websession/lib/websession_webinterface.py:416
 #: modules/websession/lib/websession_webinterface.py:917
 #, python-format
 msgid "Supplied email address %s already exists in the database."
-msgstr ""
+msgstr "عنوان البريد الإلكتروني %s موجود في قاعدة البيانات."
 
 #: modules/websession/lib/websession_webinterface.py:418
 #: modules/websession/lib/websession_webinterface.py:919
 msgid "Or please try again."
-msgstr ""
+msgstr "أو الرجاء اعادة المحاولة."
 
 #: modules/websession/lib/websession_webinterface.py:423
 #, python-format
 msgid "Desired nickname %s is already in use."
-msgstr ""
+msgstr "الاسم المستعار %s هو في قيد الاستعمال."
 
 #: modules/websession/lib/websession_webinterface.py:432
 msgid "Users cannot edit passwords on this site."
@@ -7146,17 +7191,17 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:674
 msgid "Logout"
-msgstr ""
+msgstr "الخروج"
 
 #: modules/websession/lib/websession_webinterface.py:747
 #: modules/websession/lib/websession_webinterface.py:803
 #: modules/websession/lib/websession_webinterface.py:838
 msgid "Login"
-msgstr ""
+msgstr "تسجيل الدخول"
 
 #: modules/websession/lib/websession_webinterface.py:869
 msgid "Register"
-msgstr ""
+msgstr "تسجيل"
 
 #: modules/websession/lib/websession_webinterface.py:872
 #: modules/websession/lib/websession_webinterface.py:944
@@ -7338,7 +7383,7 @@ msgstr ""
 #: modules/webstyle/lib/webstyle_templates.py:86
 #: modules/webstyle/lib/webstyle_templates.py:95
 msgid "Home"
-msgstr ""
+msgstr "الإستقبــال"
 
 #: modules/webstyle/lib/webstyle_templates.py:434
 #: modules/webstyle/lib/webstyle_templates.py:503
@@ -7566,7 +7611,7 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_managedocfiles.py:878
 #: modules/bibknowledge/lib/bibknowledge_templates.py:207
 msgid "Upload"
-msgstr ""
+msgstr "حمل"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:890
 #: modules/websubmit/lib/websubmit_webinterface.py:481
@@ -7725,27 +7770,27 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_webinterface.py:1377
 #: modules/websubmit/web/approve.py:81
 msgid "Warning"
-msgstr ""
+msgstr "تحذير"
 
 #: modules/websubmit/lib/websubmit_templates.py:85
 msgid "Document types available for submission"
-msgstr ""
+msgstr "أنواع الوثائق التي يمكن إيداعها"
 
 #: modules/websubmit/lib/websubmit_templates.py:86
 msgid "Please select the type of document you want to submit"
-msgstr ""
+msgstr "الرجاء اختيار نوع الوثيقة التي تريد  إيداعها"
 
 #: modules/websubmit/lib/websubmit_templates.py:103
 msgid "No document types available."
-msgstr ""
+msgstr "لا يوجد أنواع وثائق متاحة."
 
 #: modules/websubmit/lib/websubmit_templates.py:269
 msgid "Please log in first."
-msgstr ""
+msgstr "الرجاء تسجيل الدخول أولا."
 
 #: modules/websubmit/lib/websubmit_templates.py:269
 msgid "Use the top-right menu to log in."
-msgstr ""
+msgstr "استخدم القائمة العلوية اليمنى لتسجيل الدخول."
 
 #: modules/websubmit/lib/websubmit_templates.py:313
 msgid "Please select a category"
@@ -7768,39 +7813,39 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:378
 msgid "GO"
-msgstr ""
+msgstr "انطلق"
 
 #: modules/websubmit/lib/websubmit_templates.py:499
 #: modules/websubmit/lib/websubmit_templates.py:968
 msgid "SUMMARY"
-msgstr ""
+msgstr "الموجز"
 
 #: modules/websubmit/lib/websubmit_templates.py:535
 #: modules/bibharvest/lib/oai_harvest_admin.py:858
 #: modules/bibharvest/lib/oai_harvest_admin.py:911
 msgid "Previous page"
-msgstr ""
+msgstr "الصفحة السابقة"
 
 #: modules/websubmit/lib/websubmit_templates.py:541
 msgid "Submission number"
-msgstr ""
+msgstr "رقم الإيداع"
 
 #: modules/websubmit/lib/websubmit_templates.py:555
 #: modules/bibharvest/lib/oai_harvest_admin.py:843
 #: modules/bibharvest/lib/oai_harvest_admin.py:899
 msgid "Next page"
-msgstr ""
+msgstr "الصفحة التالية"
 
 #: modules/websubmit/lib/websubmit_templates.py:570
 #: modules/websubmit/lib/websubmit_templates.py:1009
 msgid "Are you sure you want to quit this submission?"
-msgstr ""
+msgstr "هل تريد فعلا مغادرة عملية الإيداع؟"
 
 #: modules/websubmit/lib/websubmit_templates.py:572
 #: modules/websubmit/lib/websubmit_templates.py:1010
 #: modules/websubmit/lib/websubmit_templates.py:1019
 msgid "Back to main menu"
-msgstr ""
+msgstr "العودة الى القائمة الرئيسية"
 
 #: modules/websubmit/lib/websubmit_templates.py:575
 msgid ""
@@ -7815,7 +7860,7 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:722
 #, python-format
 msgid "The field %s is mandatory."
-msgstr ""
+msgstr "الحقل %s إجباري"
 
 #: modules/websubmit/lib/websubmit_templates.py:722
 msgid "Please make a choice in the select box"
@@ -7823,12 +7868,12 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:736
 msgid "Please press a button."
-msgstr ""
+msgstr "يرجى الضغط على زر."
 
 #: modules/websubmit/lib/websubmit_templates.py:744
 #, python-format
 msgid "The field %s is mandatory. Please fill it in."
-msgstr ""
+msgstr "الحقل %s إجباري.يرجى استيفاءه ."
 
 #: modules/websubmit/lib/websubmit_templates.py:821
 #, python-format
@@ -7837,11 +7882,11 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:822
 msgid "Going back to page"
-msgstr ""
+msgstr "الرجوع إلى الصفحة"
 
 #: modules/websubmit/lib/websubmit_templates.py:959
 msgid "finished!"
-msgstr ""
+msgstr "انتهى!"
 
 #: modules/websubmit/lib/websubmit_templates.py:967
 msgid "end of action"
@@ -7849,7 +7894,7 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:991
 msgid "Submission no"
-msgstr ""
+msgstr "الإيداع عدد"
 
 #: modules/websubmit/lib/websubmit_templates.py:1062
 #, python-format
@@ -8066,28 +8111,28 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:2766
 #: modules/websubmit/lib/websubmit_templates.py:2950
 msgid "Title:"
-msgstr ""
+msgstr "العنوان :"
 
 #: modules/websubmit/lib/websubmit_templates.py:2340
 #: modules/websubmit/lib/websubmit_templates.py:2462
 #: modules/websubmit/lib/websubmit_templates.py:2772
 #: modules/websubmit/lib/websubmit_templates.py:2956
 msgid "Author:"
-msgstr ""
+msgstr ":مؤلف"
 
 #: modules/websubmit/lib/websubmit_templates.py:2348
 #: modules/websubmit/lib/websubmit_templates.py:2471
 #: modules/websubmit/lib/websubmit_templates.py:2780
 #: modules/websubmit/lib/websubmit_templates.py:2964
 msgid "More information:"
-msgstr ""
+msgstr "مزيد من المعلومات :"
 
 #: modules/websubmit/lib/websubmit_templates.py:2349
 #: modules/websubmit/lib/websubmit_templates.py:2472
 #: modules/websubmit/lib/websubmit_templates.py:2781
 #: modules/websubmit/lib/websubmit_templates.py:2965
 msgid "Click here"
-msgstr ""
+msgstr "اضغط هنا"
 
 #: modules/websubmit/lib/websubmit_templates.py:2358
 msgid "Approval note:"
@@ -8848,7 +8893,7 @@ msgstr ""
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:62
 msgid "show"
-msgstr ""
+msgstr "عرض"
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:63
 msgid "close"
@@ -9269,7 +9314,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15560
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15722
 msgid "Author"
-msgstr ""
+msgstr "مؤلف"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:321
 msgid "Editor"
@@ -9308,7 +9353,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15853
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16077
 msgid "ISBN"
-msgstr ""
+msgstr "ردمك"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:339
 msgid "Id"
@@ -10272,7 +10317,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14130
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15122
 msgid "No notes"
-msgstr ""
+msgstr "لا توجد ملاحظات"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3462
 msgid "Notes about this library"
@@ -10875,7 +10920,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16209
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16394
 msgid "ISSN"
-msgstr ""
+msgstr "ردمد"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11474
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12366
@@ -12376,3 +12421,31 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1648
 msgid "Correct my publication lists!"
 msgstr ""
+
+#~ msgid "No fulltext"
+#~ msgstr "لا يوجد نص كامل"
+
+#~ msgid "Upload succesful"
+#~ msgstr "استيراد ناجح"
+
+#~ msgid ", no notes yet"
+#~ msgstr "لا توجد ملاحظات إلى حد الآن"
+
+#~ msgid "HTML brief"
+#~ msgstr "HTML موجز"
+
+#~ msgid ""
+#~ "Warning: full-text search is only available for a subset of papers mostly "
+#~ "from 2006-2010."
+#~ msgstr ""
+#~ "تحذير : البحث عن النص الكامل متوفر فقط لمجموعة فرعية من ورقات معظمهم من "
+#~ "السنوات 2006-2010"
+
+#~ msgid ""
+#~ "You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout"
+#~ "%(x_url1_close)s b) edit your %(x_url2_open)saccount settings"
+#~ "%(x_url2_close)s."
+#~ msgstr ""
+#~ "تم تسجيل دخولك بالاسم المستعار%(x_user)s .يمكنك  %(x_url1_open)sتسجيل "
+#~ "الخروج%(x_url1_close)s و تعديل %(x_url2_open)sإعدادات حسابك"
+#~ "%(x_url2_close)s."
