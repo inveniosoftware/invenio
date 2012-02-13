@@ -1249,7 +1249,7 @@ def wash_colls(cc, c, split_colls=0, verbose=0):
     l_cc_nonrestricted_sons_and_nonhosted_colls.sort()
 
     l_cc_nonrestricted_sons = []
-    l_c = colls
+    l_c = colls[:]
     for row in res:
         if not collection_restricted_p(row[0]):
             l_cc_nonrestricted_sons.append(row[0])
@@ -1268,7 +1268,10 @@ def wash_colls(cc, c, split_colls=0, verbose=0):
     # remove duplicates:
     #colls_out_for_display_nondups=filter(lambda x, colls_out_for_display=colls_out_for_display: colls_out_for_display[x-1] not in colls_out_for_display[x:], range(1, len(colls_out_for_display)+1))
     #colls_out_for_display = map(lambda x, colls_out_for_display=colls_out_for_display:colls_out_for_display[x-1], colls_out_for_display_nondups)
-    colls_out_for_display = list(set(colls_out_for_display))
+    #colls_out_for_display = list(set(colls_out_for_display))
+    #remove duplicates while preserving the order
+    set_out = set()
+    colls_out_for_display = [coll for coll in colls_out_for_display if coll not in set_out and not set_out.add(coll)]
 
     if verbose:
         debug += "<br />5) --- decide whether colls_out_for_diplay should be colls or is it sufficient for it to be cc; remove duplicates ---"
@@ -1330,7 +1333,11 @@ def wash_colls(cc, c, split_colls=0, verbose=0):
     # remove duplicates:
     #colls_out_nondups=filter(lambda x, colls_out=colls_out: colls_out[x-1] not in colls_out[x:], range(1, len(colls_out)+1))
     #colls_out = map(lambda x, colls_out=colls_out:colls_out[x-1], colls_out_nondups)
-    colls_out = list(set(colls_out))
+    #colls_out = list(set(colls_out))
+    #remove duplicates while preserving the order
+    set_out = set()
+    colls_out = [coll for coll in colls_out if coll not in set_out and not set_out.add(coll)]
+
 
     if verbose:
         debug += "<br />8) --- calculate the colls_out; remove duplicates ---"
