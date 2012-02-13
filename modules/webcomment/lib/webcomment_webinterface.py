@@ -30,7 +30,8 @@ from invenio.webcomment import check_recID_is_in_range, \
                                perform_request_display_comments_or_remarks,\
                                perform_request_add_comment_or_remark,\
                                perform_request_vote,\
-                               perform_request_report
+                               perform_request_report, \
+                               check_comment_belongs_to_record
 from invenio.config import CFG_SITE_LANG, \
                            CFG_SITE_URL, \
                            CFG_SITE_SECURE_URL, \
@@ -225,6 +226,13 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                 text = auth_msg)
 
+        if argd['comid']:
+            # If replying to a comment, are we on a record that
+            # matches the original comment user is replying to?
+            if not check_comment_belongs_to_record(argd['comid'], self.recid):
+                return page_not_authorized(req, "../", \
+                                           text = _("Specified comment does not belong to this record"))
+
         client_ip_address = get_client_ip_address(req)
         check_warnings = []
         (ok, problem) = check_recID_is_in_range(self.recid, check_warnings, argd['ln'])
@@ -343,6 +351,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                    'referer': (str, None)
                                    })
 
+        _ = gettext_set_language(argd['ln'])
         client_ip_address = get_client_ip_address(req)
         uid = getUid(req)
 
@@ -357,6 +366,12 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         elif auth_code:
             return page_not_authorized(req, "../", \
                 text = auth_msg)
+
+        # Check that comment belongs to this recid
+        if not check_comment_belongs_to_record(argd['comid'], self.recid):
+            return page_not_authorized(req, "../", \
+                                       text = _("Specified comment does not belong to this record"))
+
 
         success = perform_request_vote(argd['comid'], client_ip_address, argd['com_value'], uid)
         if argd['referer']:
@@ -402,6 +417,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                    'referer': (str, None)
                                    })
 
+        _ = gettext_set_language(argd['ln'])
         client_ip_address = get_client_ip_address(req)
         uid = getUid(req)
 
@@ -416,6 +432,11 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         elif auth_code:
             return page_not_authorized(req, "../", \
                 text = auth_msg)
+
+        # Check that comment belongs to this recid
+        if not check_comment_belongs_to_record(argd['comid'], self.recid):
+            return page_not_authorized(req, "../", \
+                                       text = _("Specified comment does not belong to this record"))
 
         success = perform_request_report(argd['comid'], client_ip_address, uid)
         if argd['referer']:

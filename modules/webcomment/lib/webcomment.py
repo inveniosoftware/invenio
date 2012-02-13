@@ -1048,3 +1048,19 @@ def get_mini_reviews(recid, ln=CFG_SITE_LANG):
     return webcomment_templates.tmpl_mini_review(recid, ln, action=action,
                                                  avg_score=calculate_avg_score(reviews),
                                                  nb_comments_total=len(reviews))
+
+def check_comment_belongs_to_record(comid, recid):
+    """
+    Return True if the comment is indeed part of given record (even if
+    comment or/and record have been"deleted"). Else return False.
+
+    @param comid: the id of the comment to check membership
+    @param recid: the recid of the record we want to check if comment belongs to
+    """
+    query = """SELECT id_bibrec from cmtRECORDCOMMENT WHERE id=%s"""
+    params = (comid,)
+    res = run_sql(query, params)
+    if res and res[0][0] == recid:
+        return True
+
+    return False
