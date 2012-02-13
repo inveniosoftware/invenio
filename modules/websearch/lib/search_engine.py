@@ -786,7 +786,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                 elif pi.startswith('/') and pi.endswith('/'):
                     # B3b - pi has slashes around => do regexp search
                     opfts.append([oi, pi[1:-1], fi, 'r'])
-                elif fi and str(fi[0]).isdigit() and str(fi[1]).isdigit():
+                elif fi and len(fi) > 1 and str(fi[0]).isdigit() and str(fi[1]).isdigit():
                     # B3c - fi exists and starts by two digits => do ACC search
                     opfts.append([oi, pi, fi, 'a'])
                 elif fi and not get_index_id_from_field(fi) and get_field_name(fi):
