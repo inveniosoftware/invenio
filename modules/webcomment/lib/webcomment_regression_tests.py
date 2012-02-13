@@ -33,6 +33,7 @@ from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 from invenio.dbquery import run_sql
 from invenio.webcomment import query_add_comment_or_remark
+from invenio.webcommentadminlib import query_delete_comment_auth
 
 
 def prepare_attachments():
@@ -171,6 +172,15 @@ class WebCommentRestrictionsTest(unittest.TestCase):
                                                        attached_files=self.attached_files)
         self.restr_comid_3 = None
 
+        # Insert a public, deleted comment in a public record (public collection)
+        self.msg7 = "A test comment 7"
+        prepare_attachments()
+        self.deleted_comid = query_add_comment_or_remark(reviews=0, recID=self.public_record,
+                                                        uid=self.romeo_uid, msg=self.msg7,
+                                                        editor_type='textarea',
+                                                        attached_files=self.attached_files)
+        query_delete_comment_auth(self.deleted_comid)
+
     def tearDown(self):
         """Remove inserted comments"""
         run_sql("""DELETE FROM cmtRECORDCOMMENT WHERE id=%s""", (self.public_comid,))
@@ -180,6 +190,7 @@ class WebCommentRestrictionsTest(unittest.TestCase):
             run_sql("""DELETE FROM cmtRECORDCOMMENT WHERE id=%s""", (self.restr_comid_3,))
         run_sql("""DELETE FROM cmtRECORDCOMMENT WHERE id=%s""", (self.restr_comid_4,))
         run_sql("""DELETE FROM cmtRECORDCOMMENT WHERE id=%s""", (self.restr_comid_5,))
+        run_sql("""DELETE FROM cmtRECORDCOMMENT WHERE id=%s""", (self.deleted_comid,))
         pass
 
     def test_access_public_record_public_discussion_public_comment(self):
@@ -354,6 +365,380 @@ class WebCommentRestrictionsTest(unittest.TestCase):
         # Restore original restriction
         run_sql("UPDATE cmtRECORDCOMMENT SET restriction=%s WHERE id=%s",
                 (original_restriction, self.restr_comid_2))
+
+    def test_comment_reply_with_wrong_record(self):
+        """webcomment - replying to comment using mismatching recid"""
+        # Juliet should not be able to reply to the comment, even through a public record
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'juliet'
+        br['p_pw'] = 'j123uliet'
+        br.submit()
+        br.open("%s/%s/%i/comments/add?action=REPLY&comid=%s&ln=en" % \
+                (CFG_SITE_URL, 'record', self.public_record, self.restr_comid_1))
+        response = br.response().read()
+        if not self.msg2 in response and \
+               "Authorization failure" in response:
+            pass
+        else:
+            self.fail("Oops, users should not be able to reply to comment using mismatching recid")
+
+        # Jekyll should also not be able to reply the comment using the wrong recid
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'jekyll'
+        br['p_pw'] = 'j123ekyll'
+        br.submit()
+        br.open("%s/%s/%i/comments/add?action=REPLY&comid=%s&ln=en" % \
+                (CFG_SITE_URL, 'record', self.public_record, self.restr_comid_1))
+        response = br.response().read()
+        if not self.msg2 in response and \
+               "Authorization failure" in response:
+            pass
+        else:
+            self.fail("Oops, users should not be able to reply to comment using mismatching recid")
+
+    def test_comment_access_attachment_with_wrong_record(self):
+        """webcomment - accessing attachments using mismatching recid"""
+        # Juliet should not be able to access these files, especially with wrong recid
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'juliet'
+        br['p_pw'] = 'j123uliet'
+        br.submit()
+        try:
+            br.open("%s/%s/%i/comments/attachments/get/%i/file2" % \
+                     (CFG_SITE_URL, 'record', self.public_record, self.restr_comid_1))
+            response = br.response().read()
+        except HTTPError:
+            pass
+        else:
+            self.fail("Oops, users should not be able to access comment attachment using mismatching recid")
+
+        # Jekyll should also not be able to access these files when using wrong recid
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'jekyll'
+        br['p_pw'] = 'j123ekyll'
+        br.submit()
+        try:
+            br.open("%s/%s/%i/comments/attachments/get/%i/file2" % \
+                     (CFG_SITE_URL, 'record', self.public_record, self.restr_comid_1))
+            response = br.response().read()
+            response = br.response().read()
+        except HTTPError:
+            pass
+        else:
+            self.fail("Oops, users should not be able to access comment attachment using mismatching recid")
+
+    def test_comment_reply_to_deleted_comment(self):
+        """webcomment - replying to a deleted comment"""
+        # Juliet should not be able to reply to the deleted comment
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'juliet'
+        br['p_pw'] = 'j123uliet'
+        br.submit()
+        br.open("%s/%s/%i/comments/add?action=REPLY&comid=%s&ln=en" % \
+                (CFG_SITE_URL, 'record', self.public_record, self.deleted_comid))
+        response = br.response().read()
+        if not self.msg7 in response:
+            # There should be no authorization failure, in case the
+            # comment was deleted in between. We'll simply go on but
+            # the orginal comment will not be included
+            pass
+        else:
+            self.fail("Oops, users should not be able to reply to a deleted comment")
+
+        # Jekyll should also not be able to reply the deleted comment
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'jekyll'
+        br['p_pw'] = 'j123ekyll'
+        br.submit()
+        br.open("%s/%s/%i/comments/add?action=REPLY&comid=%s&ln=en" % \
+                (CFG_SITE_URL, 'record', self.public_record, self.deleted_comid))
+        response = br.response().read()
+        if not self.msg7 in response:
+            # There should be no authorization failure, in case the
+            # comment was deleted in between. We'll simply go on but
+            # the orginal comment will not be included
+            pass
+        else:
+            self.fail("Oops, users should not be able to reply to a deleted comment")
+
+    def test_comment_access_files_deleted_comment(self):
+        """webcomment - access files of a deleted comment"""
+        # Juliet should not be able to access the files
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'juliet'
+        br['p_pw'] = 'j123uliet'
+        br.submit()
+        br.open("%s/%s/%i/comments/attachments/get/%i/file2" % \
+                     (CFG_SITE_URL, 'record', self.public_record, self.deleted_comid))
+        response = br.response().read()
+        if "You cannot access files of a deleted comment" in response:
+            pass
+        else:
+            self.fail("Oops, users should not have access to this deleted comment attachment")
+
+        # Jekyll should also not be able to access the files
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'jekyll'
+        br['p_pw'] = 'j123ekyll'
+        br.submit()
+        br.open("%s/%s/%i/comments/attachments/get/%i/file2" % \
+                     (CFG_SITE_URL, 'record', self.public_record, self.deleted_comid))
+        response = br.response().read()
+        if "Authorization failure" in response:
+            pass
+        else:
+            self.fail("Oops, users should not have access to this deleted comment attachment")
+
+    def test_comment_report_deleted_comment(self):
+        """webcomment - report a deleted comment"""
+        # Juliet should not be able to report a the deleted comment
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'juliet'
+        br['p_pw'] = 'j123uliet'
+        br.submit()
+        br.open("%s/%s/%i/comments/report?comid=%s&ln=en" % \
+                (CFG_SITE_URL, 'record', self.public_record, self.deleted_comid))
+        response = br.response().read()
+        if not "Authorization failure" in response:
+            self.fail("Oops, users should not be able to report a deleted comment")
+
+    def test_comment_vote_deleted_comment(self):
+        """webcomment - report a deleted comment"""
+        # Juliet should not be able to vote for a the deleted comment/review
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'juliet'
+        br['p_pw'] = 'j123uliet'
+        br.submit()
+        br.open("%s/%s/%i/comments/vote?comid=%s&com_value=1&ln=en" % \
+                (CFG_SITE_URL, 'record', self.public_record, self.deleted_comid))
+        response = br.response().read()
+        if not "Authorization failure" in response:
+            self.fail("Oops, users should not be able to vote for a deleted comment")
+
+    def test_comment_report_with_wrong_record(self):
+        """webcomment - report a comment using mismatching recid"""
+        # Juliet should not be able to report a comment she cannot access, even through public recid
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'juliet'
+        br['p_pw'] = 'j123uliet'
+        br.submit()
+        br.open("%s/%s/%i/comments/report?comid=%s&ln=en" % \
+                (CFG_SITE_URL, 'record', self.public_record, self.restr_comid_1))
+        response = br.response().read()
+        if not "Authorization failure" in response:
+            self.fail("Oops, users should not be able to report using mismatching recid")
+
+        # Jekyll should also not be able to report the comment using the wrong recid
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'jekyll'
+        br['p_pw'] = 'j123ekyll'
+        br.submit()
+        br.open("%s/%s/%i/comments/report?comid=%s&ln=en" % \
+                (CFG_SITE_URL, 'record', self.public_record, self.restr_comid_1))
+        response = br.response().read()
+        if not "Authorization failure" in response:
+            self.fail("Oops, users should not be able to report using mismatching recid")
+
+    def test_comment_vote_with_wrong_record(self):
+        """webcomment - vote for a comment using mismatching recid"""
+        # Juliet should not be able to vote for a comment she cannot access, especially through public recid
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'juliet'
+        br['p_pw'] = 'j123uliet'
+        br.submit()
+        br.open("%s/%s/%i/comments/vote?comid=%s&com_value=1&ln=en" % \
+                (CFG_SITE_URL, 'record', self.public_record, self.restr_comid_1))
+        response = br.response().read()
+        if not "Authorization failure" in response:
+            self.fail("Oops, this user should not be able to report a deleted comment")
+
+        # Jekyll should also not be able to vote for the comment using the wrong recid
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'jekyll'
+        br['p_pw'] = 'j123ekyll'
+        br.submit()
+        br.open("%s/%s/%i/comments/vote?comid=%s&com_value=1&ln=en" % \
+                (CFG_SITE_URL, 'record', self.public_record, self.restr_comid_1))
+        response = br.response().read()
+        if not "Authorization failure" in response:
+            self.fail("Oops, users should not be able to report using mismatching recid")
+
+    def test_report_restricted_record_public_discussion_public_comment(self):
+        """webcomment - report a comment restricted by 'viewrestrcoll'"""
+        # Juliet should not be able to report the comment
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'juliet'
+        br['p_pw'] = 'j123uliet'
+        br.submit()
+        br.open("%s/%s/%i/comments/report?comid=%s&ln=en" % \
+                (CFG_SITE_URL, 'record', self.restr_record, self.restr_comid_1))
+        response = br.response().read()
+        if not "Authorization failure" in response:
+            self.fail("Oops, this user should not be able to report this comment")
+
+    def test_report_public_record_restricted_discussion_public_comment(self):
+        """webcomment - report a comment restricted by 'viewcomment'"""
+        # Juliet should not be able to report the comment
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'juliet'
+        br['p_pw'] = 'j123uliet'
+        br.submit()
+        br.open("%s/%s/%i/comments/report?comid=%s&ln=en" % \
+                (CFG_SITE_URL, 'record', self.restricted_discussion, self.restr_comid_5))
+        response = br.response().read()
+        if not "Authorization failure" in response:
+            self.fail("Oops, this user should not be able to report this comment")
+
+    def test_report_public_record_public_discussion_restricted_comment(self):
+        """webcomment - report a comment restricted by 'viewrestrcomment'"""
+        # Juliet should not be able to report the comment
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'juliet'
+        br['p_pw'] = 'j123uliet'
+        br.submit()
+        br.open("%s/%s/%i/comments/report?comid=%s&ln=en" % \
+                (CFG_SITE_URL, 'record', self.public_record_restr_comment, self.restr_comid_2))
+        response = br.response().read()
+        if not "Authorization failure" in response:
+            self.fail("Oops, this user should not be able to report this comment")
+
+    def test_vote_restricted_record_public_discussion_public_comment(self):
+        """webcomment - vote for a comment restricted by 'viewrestrcoll'"""
+        # Juliet should not be able to vote for the comment
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'juliet'
+        br['p_pw'] = 'j123uliet'
+        br.submit()
+        br.open("%s/%s/%i/comments/vote?comid=%s&com_value=1&ln=en" % \
+                (CFG_SITE_URL, 'record', self.restr_record, self.restr_comid_1))
+        response = br.response().read()
+        if not "Authorization failure" in response:
+            self.fail("Oops, this user should not be able to report this comment")
+
+    def test_vote_public_record_restricted_discussion_public_comment(self):
+        """webcomment - vote for a comment restricted by 'viewcomment'"""
+        # Juliet should not be able to vote for the comment
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'juliet'
+        br['p_pw'] = 'j123uliet'
+        br.submit()
+        br.open("%s/%s/%i/comments/vote?comid=%s&com_value=1&ln=en" % \
+                (CFG_SITE_URL, 'record', self.restricted_discussion, self.restr_comid_5))
+        response = br.response().read()
+        if not "Authorization failure" in response:
+            self.fail("Oops, this user should not be able to report this comment")
+
+    def test_vote_public_record_public_discussion_restricted_comment(self):
+        """webcomment - vote for a comment restricted by 'viewrestrcomment'"""
+        # Juliet should not be able to vote for the comment
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'juliet'
+        br['p_pw'] = 'j123uliet'
+        br.submit()
+        br.open("%s/%s/%i/comments/vote?comid=%s&com_value=1&ln=en" % \
+                (CFG_SITE_URL, 'record', self.public_record_restr_comment, self.restr_comid_2))
+        response = br.response().read()
+        if not "Authorization failure" in response:
+            self.fail("Oops, this user should not be able to report this comment")
+
+    def test_comment_subscribe_restricted_record_public_discussion(self):
+        """webcomment - subscribe to a discussion restricted with 'viewrestrcoll'"""
+        # Juliet should not be able to subscribe to the discussion
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'juliet'
+        br['p_pw'] = 'j123uliet'
+        br.submit()
+        br.open("%s/%s/%i/comments/subscribe?ln=en" % \
+                (CFG_SITE_URL, 'record', self.restr_record))
+        response = br.response().read()
+        if not "Authorization failure" in response:
+            self.fail("Oops, this user should not be able to subscribe to this discussion")
+
+        # Jekyll should be able to subscribe
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'jekyll'
+        br['p_pw'] = 'j123ekyll'
+        br.submit()
+        br.open("%s/%s/%i/comments/subscribe?ln=en" % \
+                (CFG_SITE_URL, 'record', self.restr_record))
+        response = br.response().read()
+        if not "You have been subscribed" in response or \
+               "Authorization failure" in response:
+            self.fail("Oops, this user should be able to subscribe to this discussion")
+
+    def test_comment_subscribe_public_record_restricted_discussion(self):
+        """webcomment - subscribe to a discussion restricted with 'viewcomment'"""
+        # Juliet should not be able to subscribe to the discussion
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'juliet'
+        br['p_pw'] = 'j123uliet'
+        br.submit()
+        br.open("%s/%s/%i/comments/subscribe?ln=en" % \
+                (CFG_SITE_URL, 'record', self.restricted_discussion))
+        response = br.response().read()
+        if not "Authorization failure" in response:
+            self.fail("Oops, this user should not be able to subscribe to this discussion")
+
+        # Romeo should be able to subscribe
+        br = Browser()
+        br.open(CFG_SITE_URL + '/youraccount/login')
+        br.select_form(nr=0)
+        br['p_un'] = 'romeo'
+        br['p_pw'] = 'r123omeo'
+        br.submit()
+        br.open("%s/%s/%i/comments/subscribe?ln=en" % \
+                (CFG_SITE_URL, 'record', self.restricted_discussion))
+        response = br.response().read()
+        if not "You have been subscribed" in response or \
+               "Authorization failure" in response:
+            print response
+            self.fail("Oops, this user should be able to subscribe to this discussion")
 
 TEST_SUITE = make_test_suite(WebCommentWebPagesAvailabilityTest,
                              WebCommentRestrictionsTest)
