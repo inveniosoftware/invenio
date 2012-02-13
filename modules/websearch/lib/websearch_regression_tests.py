@@ -37,7 +37,7 @@ if sys.hexversion < 0x2040000:
 from mechanize import Browser, LinkNotFoundError
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_NAME, CFG_SITE_LANG, \
-    CFG_SITE_RECORD, CFG_SITE_LANGS
+    CFG_SITE_RECORD, CFG_SITE_LANGS, CFG_WEBSEARCH_SPIRES_SYNTAX
 from invenio.testutils import make_test_suite, \
                               run_test_suite, \
                               make_url, make_surl, test_web_page_content, \
@@ -1938,19 +1938,20 @@ class WebSearchReferstoCitedbyTest(unittest.TestCase):
 class WebSearchSPIRESSyntaxTest(unittest.TestCase):
     """Test of SPIRES syntax issues"""
 
-    def test_and_not_parens(self):
-        'websearch - find a ellis, j and not a enqvist'
-        self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL +'/search?p=find+a+ellis%2C+j+and+not+a+enqvist&of=id&ap=0',
-                                               expected_text='[9, 12, 14, 47]'))
+    if CFG_WEBSEARCH_SPIRES_SYNTAX > 0:
+        def test_and_not_parens(self):
+            'websearch - find a ellis, j and not a enqvist'
+            self.assertEqual([],
+                             test_web_page_content(CFG_SITE_URL +'/search?p=find+a+ellis%2C+j+and+not+a+enqvist&of=id&ap=0',
+                                                   expected_text='[9, 12, 14, 47]'))
 
-    def test_dadd_search(self):
-        'websearch - find da > today - 3650'
-        # XXX: assumes we've reinstalled our site in the last 10 years
-        # should return every document in the system
-        self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL +'/search?ln=en&p=find+da+%3E+today+-+3650&f=&of=id',
-                                               expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104]'))
+        def test_dadd_search(self):
+            'websearch - find da > today - 3650'
+            # XXX: assumes we've reinstalled our site in the last 10 years
+            # should return every document in the system
+            self.assertEqual([],
+                             test_web_page_content(CFG_SITE_URL +'/search?ln=en&p=find+da+%3E+today+-+3650&f=&of=id',
+                                                   expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104]'))
 
 
 class WebSearchDateQueryTest(unittest.TestCase):
