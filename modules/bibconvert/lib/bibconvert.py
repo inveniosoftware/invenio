@@ -1069,10 +1069,10 @@ def FormatField(value, fn):
             out = value.strip()
 
     elif (fn == "UP"):
-        out = value.upper()
+        out = unicode(value,'utf-8').upper().encode('utf-8')
 
     elif (fn == "DOWN"):
-        out = value.lower()
+        out = unicode(value,'utf-8').lower().encode('utf-8')
 
     elif (fn == "CAP"):
         tmp = value.split(" ")
@@ -1572,10 +1572,10 @@ def format_field(value, fn):
             out = value.strip()
 
     elif (fn == "UP"):
-        out = value.upper()
+        out = unicode(value,'utf-8').upper().encode('utf-8')
 
     elif (fn == "DOWN"):
-        out = value.lower()
+        out = unicode(value,'utf-8').lower().encode('utf-8')
 
     elif (fn == "CAP"):
         tmp = value.split(" ")
