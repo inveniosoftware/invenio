@@ -252,7 +252,7 @@ def apply_washer(data_dict, washer):
     washer = washer.split(':')[0]#in case we have a locale defined
     try:
         method = BibSortWasher(washer)
-        write_message('Washer method found: %s' %method, verbose=5)
+        write_message('Washer method found: %s' %washer, verbose=5)
         for recid in data_dict:
             new_val = method.get_transformed_value(data_dict[recid])
             data_dict[recid] = new_val
@@ -482,19 +482,20 @@ def get_modified_non_rnk_methods(non_rnk_method_list):
     return updated_ranking_methods, inserted_ranking_methods
 
 
-def get_modified_rnk_methods(rnk_method_list):
+def get_modified_rnk_methods(rnk_method_list, bibsort_methods):
     """Returns the list of RNK methods that have been recently modified,
     so they will need to have their bibsort data updated"""
     updated_ranking_methods = []
     deleted_ranking_methods = []
     for method in rnk_method_list:
+        method_name = bibsort_methods[method]['definition'].replace('RNK:', '').strip()
         try:
             last_updated_rnk = str(run_sql('SELECT last_updated \
                                            FROM rnkMETHOD \
-                                           WHERE name = %s', (method, ))[0][0])
+                                           WHERE name = %s', (method_name, ))[0][0])
         except IndexError:
             write_message("The method %s could not be found in rnkMETHOD" \
-                      %(method), stream=sys.stderr)
+                      %(method_name), stream=sys.stderr)
             #this method does not exist in rnkMETHOD,
             #it might have been a mistype or it might have been deleted
             deleted_ranking_methods.append(method)
@@ -816,6 +817,7 @@ def run_bibsort_update(recids=None, method_list=None):
     write_message('Initial data for run_bibsort_update method: ' \
                   'number of recids = %s; method_list=%s' \
                   %(str(len(recids)), method_list), verbose=5)
+    write_message('Updating sorting data.')
 
     bibsort_methods, errors = get_bibsort_methods_details(method_list)
     if errors:
@@ -832,7 +834,7 @@ def run_bibsort_update(recids=None, method_list=None):
     #(iv) non RNK methods that are new -> they should be rebalanced(sorted), not updated
     #check which of the methods are RNK methods (they do not need modified recids)
     rnk_methods = get_rnk_methods(bibsort_methods)
-    rnk_methods_updated, rnk_methods_deleted = get_modified_rnk_methods(rnk_methods)
+    rnk_methods_updated, rnk_methods_deleted = get_modified_rnk_methods(rnk_methods, bibsort_methods)
     #check which of the methods have no data, so they are actually new,
     #so they need balancing(sorting) instead of updating
     non_rnk_methods = [method for method in bibsort_methods.keys() if method not in rnk_methods]
@@ -904,7 +906,7 @@ def run_bibsort_rebalance(method_list = None):
         task_sleep_now_if_required(can_stop_too=True)
     else:
         recids = intbitset([])
-        write_message('Rebalancing will run only for RNK methods', verbose=5)
+        write_message('Rebalancing will run only for RNK methods')
     for name in bibsort_methods:
         task_update_progress('Rebalancing %s method.' %name)
         write_message('Starting sorting the data for %s method ... ' \

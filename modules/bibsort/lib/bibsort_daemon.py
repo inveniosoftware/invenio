@@ -29,12 +29,12 @@ Options:
   -d, --dump-config     Outputs a database dump in form of a config file
   -p, --print-sorting-methods
                         Prints the available sorting methods
-  -B, --rebalance       Runs the sorting methods given in '--metods'and
+  -R, --rebalance       Runs the sorting methods given in '--metods'and
                         rebalances all the buckets.
                         If no method is specified, the rebalance will be done
                         for all the methods in the config file.
   -S, --update-sorting  Runs the sorting methods given in '--methods' for the
-                        recids given in '--recids'.
+                        recids given in '--id'.
                         If no method is specified, the update will be done for
                         all the methods in the config file.
                         If no recids are specified, the update will be done
@@ -45,8 +45,8 @@ Options:
   -M, --methods=METHODS Specify the sorting methods for which the
                         update_sorting or rebalancing will run
                         (ex: --methods=method1,method2,method3).
-  -R, --recids=RECIDS   Specify the records for which the update_sorting will
-                        run (ex: --recids=1,2-56,72)
+  -i, --id=RECIDS       Specify the records for which the update_sorting will
+                        run (ex: --id=1,2-56,72)
 """
 
 __revision__ = "$Id$"
@@ -202,13 +202,13 @@ def main_op():
     option_parser.add_option('-R', '--rebalance', action = 'store_true', \
         help = "Runs the sorting methods given in '--metods'and rebalances all the buckets. If no method is specified, the rebalance will be done for all the methods in the config file.")
     option_parser.add_option('-S', '--update-sorting', action = 'store_true', \
-        help = "Runs the sorting methods given in '--methods' for the recids given in '--recids'. If no method is specified, the update will be done for all the methods in the config file. If no recids are specified, the update will be done for all the records that have been modified/inserted from the last run of the sorting. If you want to run the sorting for all records, you should use the '-R' option")
+        help = "Runs the sorting methods given in '--methods' for the recids given in '--id'. If no method is specified, the update will be done for all the methods in the config file. If no recids are specified, the update will be done for all the records that have been modified/inserted from the last run of the sorting. If you want to run the sorting for all records, you should use the '-R' option")
     option_parser.add_option('--methods', action = 'store', dest = 'methods', \
         metavar = 'METHODS', \
         help = "Specify the sorting methods for which the update_sorting or rebalancing will run (ex: --methods=method1,method2,method3).")
-    option_parser.add_option('--recids', action = 'store', dest = 'recids', \
+    option_parser.add_option('--id', action = 'store', dest = 'recids', \
         metavar = 'RECIDS', \
-        help = "Specify the records for which the update_sorting will run (ex: --recids=1,2-56,72) ")
+        help = "Specify the records for which the update_sorting will run (ex: --id=1,2-56,72) ")
     options, dummy = option_parser.parse_args()
 
     if options.load_config and options.dump_config:
@@ -245,12 +245,12 @@ def main():
   -d, --dump-config     Outputs a database dump in form of a config file
   -p, --print-sorting-methods
                         Prints the available sorting methods
-  -B, --rebalance       Runs the sorting methods given in '--metods'and
+  -R, --rebalance       Runs the sorting methods given in '--metods'and
                         rebalances all the buckets. If no method is
                         specified, the rebalance will be done for all
                         the methods in the config file.
   -S, --update-sorting  Runs the sorting methods given in '--methods' for the
-                        recids given in '--recids'. If no method is
+                        recids given in '--id'. If no method is
                         specified, the update will be done for all the
                         methods in the config file. If no recids are
                         specified, the update will be done for all the records
@@ -261,18 +261,18 @@ def main():
   -M, --methods=METHODS Specify the sorting methods for which the
                         update_sorting or rebalancing will run (ex:
                         --methods=method1,method2,method3).
-  -R, --recids=RECIDS   Specify the records for which the update_sorting will
-                        run (ex: --recids=1,2-56,72)
+  -i, --id=RECIDS       Specify the records for which the update_sorting will
+                        run (ex: --id=1,2-56,72)
 """,
               version=__revision__,
-              specific_params=("ldpBSM:R:",
+              specific_params=("ldpRSM:i:",
                                ["load-config",
                                 "dump-config",
                                 "print-sorting-methods",
                                 "rebalance",
                                 "update-sorting",
                                 "methods=",
-                                "recids="]),
+                                "id="]),
               task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
               task_run_fnc=task_run_core)
 
@@ -298,7 +298,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, dummy_args):
         task_set_option('cmd', 'print')
 
     #Rebalance
-    elif key in ('-B', '--rebalance'):
+    elif key in ('-R', '--rebalance'):
         task_set_option('cmd', 'rebalance')
         if ('-S', '') in opts or ('--update-sorting', '') in opts:
             raise StandardError(".. conflicting options, please add only one")
@@ -312,7 +312,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, dummy_args):
         task_set_option('methods', value)
 
     #Define records
-    elif key in ('-R', '--recids'):
+    elif key in ('-i', '--id'):
         task_set_option('recids', value)
 
     else:
@@ -333,10 +333,9 @@ def task_run_core():
 
     executed_correctly = False
 
-        #test that the command is well received
+    # if no command is defined, run sorting
     if not cmd:
-        write_message("Please specify a command!")
-        return False
+        cmd = 'sort'
 
     if cmd == 'load':
         write_message('Starting loading the configuration \

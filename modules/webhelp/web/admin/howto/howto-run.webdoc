@@ -56,7 +56,7 @@ daemon, do:
 </blockquote>
 </p>
 
-<p>To setup indexing, ranking, formatting, and collection cache updating
+<p>To setup indexing, ranking, sorting, formatting, and collection cache updating
 daemons to run periodically with a sleeping period of, say, 5 minutes:
 
 <blockquote>
@@ -65,11 +65,12 @@ $ bibindex -f50000 -s5m
 $ bibreformat -oHB -s5m
 $ webcoll -v0 -s5m
 $ bibrank -f50000 -s5m
+$ bibsort -s5m
 </pre>
 </blockquote>
 </p>
 
-<p>It is imperative to have the above four tasks permanently in your
+<p>It is imperative to have the above five tasks permanently in your
 BibSched queue so that newly submitted documents will be processed
 automatically.
 </p>
@@ -79,6 +80,7 @@ automatically.
 <blockquote>
 <pre>
 $ bibrank -f50000 -R -wwrd -s14d -LSunday
+$ bibsort -R -s7d -L 'Sunday 01:00-05:00'
 $ inveniogc -a -s7d -L 'Sunday 01:00-05:00'
 $ dbdump -s20h -L '22:00-06:00' -o/opt2/mysql-backups -n10
 </pre>
@@ -172,6 +174,24 @@ You may want to do this either (i) periodically, say once per month
 additions to the record database, say when the size grows by 2-3
 percent.
 </p>
+
+<h4>Housekeeping: recalculating sorting weights</h4>
+
+<p>It is advised to run from time to time the rebalancing of the
+sorting buckets. In order to speed up the process of insertion of
+new records, the sorting buckets are not being recalculated,
+but new records are being added at the end of the corresponding
+bucket. This might create differences in the size of each bucket
+which might have a small impact on the speed of sorting.
+<blockquote>
+<pre>
+$ bibsort -R -s 7d -L 'Sunday 01:00-05:00'
+</pre>
+</blockquote>
+
+The rebalancing might be run weekly or even daily.
+</p>
+
 
 <h4>Housekeeping: cleaning up the garbage</h4>
 

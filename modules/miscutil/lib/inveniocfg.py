@@ -712,7 +712,7 @@ def cli_cmd_load_demo_records(conf):
                 "%s/bin/webcoll 4" % CFG_PREFIX,
                 "%s/bin/bibrank -u admin" % CFG_PREFIX,
                 "%s/bin/bibrank 5" % CFG_PREFIX,
-                "%s/bin/bibsort -u admin -B" % CFG_PREFIX,
+                "%s/bin/bibsort -u admin -R" % CFG_PREFIX,
                 "%s/bin/bibsort 6" % CFG_PREFIX,
                 "%s/bin/oairepositoryupdater -u admin" % CFG_PREFIX,
                 "%s/bin/oairepositoryupdater 7" % CFG_PREFIX,
