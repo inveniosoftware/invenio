@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1692,6 +1692,7 @@ def perform_request_add_comment_or_remark(recID=0,
                                                           client_ip_address=client_ip_address,
                                                           editor_type=editor_type,
                                                           req=req,
+
                                                           reply_to=comID, attached_files=attached_files)
                     if success > 0 and subscribe:
                         subscribe_user_to_discussion(recID, uid)
@@ -1989,6 +1990,22 @@ def check_user_can_send_comments(user_info, recid):
     record_primary_collection = guess_primary_collection_of_a_record(recid)
     return acc_authorize_action(user_info, 'sendcomment', authorized_if_no_roles=True, collection=record_primary_collection)
 
+def check_comment_belongs_to_record(comid, recid):
+    """
+    Return True if the comment is indeed part of given record (even if comment or/and record have
+    been "deleted"). Else return False.
+
+    @param comid: the id of the comment to check membership
+    @param recid: the recid of the record we want to check if comment belongs to
+    """
+    query = """SELECT id_bibrec from cmtRECORDCOMMENT WHERE id=%s"""
+    params = (comid,)
+    res = run_sql(query, params)
+    if res and res[0][0] == recid:
+        return True
+
+    return False
+
 def check_user_can_attach_file_to_comments(user_info, recid):
     """Check if the user is authorized to attach a file to comments
     for given recid. This function does not check that user can view
@@ -2055,3 +2072,17 @@ def get_user_collapsed_comments_for_record(uid, recid):
     query = """SELECT id_cmtRECORDCOMMENT from cmtCOLLAPSED WHERE id_user=%s and id_bibrec=%s"""
     params = (uid, recid)
     return [res[0] for res in run_sql(query, params)]
+
+def is_comment_deleted(comid):
+    """
+    Return True of the comment is deleted. Else False
+
+    @param comid: ID of comment to check
+    """
+    query = "SELECT status from cmtRECORDCOMMENT WHERE id=%s"
+    params = (comid,)
+    res = run_sql(query, params)
+    if res and res[0][0] != 'ok':
+        return True
+
+    return False
