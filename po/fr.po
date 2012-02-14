@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: Invenio 1.0.0-rc0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2011-12-19 22:09+0100\n"
-"PO-Revision-Date: 2011-01-17 15:31+0100\n"
+"PO-Revision-Date: 2012-02-14 15:59+0100\n"
 "Last-Translator: Jérôme Caffaro <jerome.caffaro@cern.ch>\n"
 "Language-Team: FR <info@invenio-software.org>\n"
 "Language: \n"
@@ -2104,9 +2104,8 @@ msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:194
 #: modules/bibupload/lib/batchuploader_templates.py:391
-#, fuzzy
 msgid "Upload priority"
-msgstr "Historique des envois"
+msgstr "Priorité de chargement"
 
 #: modules/bibupload/lib/batchuploader_templates.py:214
 #, python-format
@@ -2124,7 +2123,7 @@ msgstr ""
 msgid ""
 "The MARCXML submitted is not valid. Please, review the file and "
 "%(x_url2_open)sresubmit it%(x_url2_close)s"
-msgstr ""
+msgstr "Le MARCXML soumis n'est pas valide. Veuillez vérifier le fichier et %(x_url2_open)sle renvoyer%(x_url2_close)s"
 
 #: modules/bibupload/lib/batchuploader_templates.py:237
 msgid "No metadata files have been uploaded yet."
@@ -2254,10 +2253,9 @@ msgstr "Résultat envoi de document par lot"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:238
 msgid "Invalid MARCXML"
-msgstr ""
+msgstr "MARCXML non valide"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:241
-#, fuzzy
 msgid "Upload successful"
 msgstr "Envoi réussi"
 
@@ -2552,17 +2550,16 @@ msgid "times cited"
 msgstr "nombre de fois cité"
 
 #: modules/miscutil/lib/inveniocfg.py:508
-#, fuzzy
 msgid "time-decay cite count"
-msgstr "Déclin temporel du nombre de citations"
+msgstr "nombre de citations \"récentes\""
 
 #: modules/miscutil/lib/inveniocfg.py:509
 msgid "all-time-best cite rank"
-msgstr ""
+msgstr "score de citations"
 
 #: modules/miscutil/lib/inveniocfg.py:510
 msgid "time-decay cite rank"
-msgstr ""
+msgstr "score de citation \"récent\""
 
 #: modules/miscutil/lib/mailutils.py:210 modules/miscutil/lib/mailutils.py:223
 #: modules/webcomment/lib/webcomment_templates.py:2107
@@ -2671,9 +2668,8 @@ msgid "Run Batch Uploader"
 msgstr "Lancer Batch Uploader"
 
 #: modules/webaccess/lib/access_control_config.py:318
-#, fuzzy
 msgid "Run Person/Author Manager"
-msgstr "Lancer gestionnaire de fichiers"
+msgstr "Lancer Gestionnaire de Personnes/Auteurs"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3703
 #, python-format
@@ -3205,48 +3201,46 @@ msgstr "Afficher les alertes"
 #: modules/webbasket/lib/webbasket.py:2181
 msgid ""
 "The selected public basket does not exist or you do not have access to it."
-msgstr ""
+msgstr "Le panier sélectionné n'existe pas ou vous n'y avez pas accès."
 
 #: modules/webbasket/lib/webbasket.py:112
 msgid "Please select a valid public basket from the list of public baskets."
-msgstr ""
+msgstr "Veuillez sélectionner un panier de la liste des paniers publics"
 
 #: modules/webbasket/lib/webbasket.py:135
 #: modules/webbasket/lib/webbasket.py:298
 #: modules/webbasket/lib/webbasket.py:1000
 msgid "The selected item does not exist or you do not have access to it."
-msgstr ""
+msgstr "L'élément sélectionné n'existe pas ou vous n'y avez pas accès."
 
 #: modules/webbasket/lib/webbasket.py:141
-#, fuzzy
 msgid "Returning to the public basket view."
-msgstr "Retour à la vue mensuelle"
+msgstr "Retour à l'affichage des paniers publics."
 
 #: modules/webbasket/lib/webbasket.py:416
 #: modules/webbasket/lib/webbasket.py:474
 #: modules/webbasket/lib/webbasket.py:1419
 #: modules/webbasket/lib/webbasket.py:1483
-#, fuzzy
 msgid "You do not have permission to write notes to this item."
-msgstr "Vous n'êtes pas autorisé à voir cette notice."
+msgstr "Vous n'avez pas l'autorisation d'écrire des notes pour cet élément."
 
 #: modules/webbasket/lib/webbasket.py:429
 #: modules/webbasket/lib/webbasket.py:1431
 msgid ""
 "The note you are quoting does not exist or you do not have access to it."
-msgstr ""
+msgstr "La note que vous citez n'existe pas ou vous n'y avez pas accès."
 
 #: modules/webbasket/lib/webbasket.py:484
 #: modules/webbasket/lib/webbasket.py:1495
 msgid "You must fill in both the subject and the body of the note."
-msgstr ""
+msgstr "Vous devez indiquer le sujet et la contenu de la note."
 
 #: modules/webbasket/lib/webbasket.py:581
 #: modules/webbasket/lib/webbasket.py:657
 #: modules/webbasket/lib/webbasket.py:713
 #: modules/webbasket/lib/webbasket.py:2680
 msgid "The selected topic does not exist or you do not have access to it."
-msgstr ""
+msgstr "Le thème sélectionné n'existe pas ou vous n'y avez pas accès."
 
 #: modules/webbasket/lib/webbasket.py:623
 #: modules/webbasket/lib/webbasket.py:743
@@ -3254,102 +3248,98 @@ msgstr ""
 #: modules/webbasket/lib/webbasket.py:2715
 #: modules/webbasket/lib/webbasket.py:2722
 msgid "The selected basket does not exist or you do not have access to it."
-msgstr ""
+msgstr "Le panier sélectionné n'existe pas ou vous n'y avez pas accès."
 
 #: modules/webbasket/lib/webbasket.py:734
 msgid "The selected basket is no longer public."
-msgstr ""
+msgstr "Le panier sélectionné n'est plus public."
 
 #: modules/webbasket/lib/webbasket.py:1548
-#, fuzzy
 msgid "You do not have permission to delete this note."
-msgstr "Vous n'êtes pas autorisé à voir cette notice."
+msgstr "Vous n'avez pas l'autorisation d'effacer cette note."
 
 #: modules/webbasket/lib/webbasket.py:1559
 msgid ""
 "The note you are deleting does not exist or you do not have access to it."
-msgstr ""
+msgstr "La note à effacer n'existe pas ou vous n'y avez pas accès."
 
 #: modules/webbasket/lib/webbasket.py:1656
-#, fuzzy, python-format
+#, python-format
 msgid "Sorry, you do not have sufficient rights to add record #%i."
-msgstr "Vous n'êtes pas autorisé à voir cette notice."
+msgstr "Désolé, vous n'avez pas suffisamment de droits pour ajouter la notice #%i."
 
 #: modules/webbasket/lib/webbasket.py:1662
 msgid "Some of the items were not added due to lack of sufficient rights."
-msgstr ""
+msgstr "Certains éléments n'ont pas été ajoutés par manque de privilèges nécessaires."
 
 #: modules/webbasket/lib/webbasket.py:1679
 msgid "Please provide a title for the external source."
-msgstr ""
+msgstr "Veuillez fournir un titre pour la source externe."
 
 #: modules/webbasket/lib/webbasket.py:1685
 msgid "Please provide a description for the external source."
-msgstr ""
+msgstr "Veuillez fournir une description pour la source externe."
 
 #: modules/webbasket/lib/webbasket.py:1691
 msgid "Please provide a url for the external source."
-msgstr ""
+msgstr "Veuillez fournir une URL pour la source externe."
 
 #: modules/webbasket/lib/webbasket.py:1700
-#, fuzzy
 msgid "The url you have provided is not valid."
-msgstr "La notice sélectionnée n'existe pas."
+msgstr "L'URL fournie n'est pas valide."
 
 #: modules/webbasket/lib/webbasket.py:1707
 msgid ""
 "The url you have provided is not valid: The request contains bad syntax or "
 "cannot be fulfilled."
-msgstr ""
+msgstr "L'URL fournie n'est pas valide: la syntaxe de la requête est mauvaise ou elle ne peut pas aboutir."
 
 #: modules/webbasket/lib/webbasket.py:1714
 msgid ""
 "The url you have provided is not valid: The server failed to fulfil an "
 "apparently valid request."
-msgstr ""
+msgstr "L'URL fournie n'est pas valide: le serveur n'a pas pu répondre à une requête en apparence correcte."
 
 #: modules/webbasket/lib/webbasket.py:1763
 #: modules/webbasket/lib/webbasket.py:1884
 #: modules/webbasket/lib/webbasket.py:1953
-#, fuzzy
 msgid "Sorry, you do not have sufficient rights on this basket."
-msgstr "Vous n'êtes pas autorisé à voir le contenu de ce panier."
+msgstr "Désolé, vous n'avez pas suffisamment de droits pour ce panier."
 
 #: modules/webbasket/lib/webbasket.py:1772
-#, fuzzy
 msgid "No records to add."
-msgstr "Copier la notice dans le panier"
+msgstr "Aucune notice à ajouter."
 
 #: modules/webbasket/lib/webbasket.py:1812
 #: modules/webbasket/lib/webbasket.py:2652
 msgid "Cannot add items to the selected basket. Invalid parameters."
-msgstr ""
+msgstr "Impossible d'ajouter des éléments au panier sélectionné. Paramètres non valides."
 
 #: modules/webbasket/lib/webbasket.py:1824
 msgid ""
 "A default topic and basket have been automatically created. Edit them to "
 "rename them as you see fit."
-msgstr ""
+msgstr "Un thème et un panier par défaut ont été automatiquement créés. Vous pouvez au besoin les renommer."
 
 #: modules/webbasket/lib/webbasket.py:2101
 msgid "Please provide a name for the new basket."
-msgstr ""
+msgstr "Veuillez fournir un nom pour le nouveau panier."
 
 #: modules/webbasket/lib/webbasket.py:2107
 msgid "Please select an existing topic or create a new one."
-msgstr ""
+msgstr "Veuillez sélectionner un thème existant ou en créer un nouveau."
 
 #: modules/webbasket/lib/webbasket.py:2143
 msgid ""
 "You cannot subscribe to this basket, you are the either owner or you have "
 "already subscribed."
-msgstr ""
+msgstr "Vous ne pouvez pas vous abonner à ce panier, vous en êtes soit le propriétaire, soit déjà abonné."
 
 #: modules/webbasket/lib/webbasket.py:2173
 msgid ""
 "You cannot unsubscribe from this basket, you are the either owner or you "
 "have already unsubscribed."
-msgstr ""
+msgstr "Vous ne pouvez pas vous désabonner de ce panier, vous en êtes soit le propriétaire, soit déjà désabonné. "
 
 #: modules/webbasket/lib/webbasket.py:2266
 #: modules/webbasket/lib/webbasket.py:2379
@@ -3420,19 +3410,18 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:2629
 #: modules/webbasket/lib/webbasket.py:2667
-#, fuzzy
 msgid ""
 "The category you have selected does not exist. Please select a valid "
 "category."
-msgstr "La notice sélectionnée n'existe pas."
+msgstr "La catégorie sélectionnée n'existe pas. Veuillez en sélectionner une valide."
 
 #: modules/webbasket/lib/webbasket.py:2693
 msgid "The selected group does not exist or you do not have access to it."
-msgstr ""
+msgstr "Le groupe sélectionné n'existe pas ou vous n'y avez pas accès."
 
 #: modules/webbasket/lib/webbasket.py:2738
 msgid "The selected output format is not available or is invalid."
-msgstr ""
+msgstr "Le format de sortie sélectionné n'est pas disponible ou n'est pas valide."
 
 #: modules/webbasket/lib/webbasket_templates.py:87
 msgid ""
@@ -3467,7 +3456,7 @@ msgstr "Éditer le thème"
 
 #: modules/webbasket/lib/webbasket_templates.py:559
 msgid "Search baskets for"
-msgstr "Rechercher dans les panier"
+msgstr "Rechercher dans les paniers"
 
 #: modules/webbasket/lib/webbasket_templates.py:560
 msgid "Search also in notes (where allowed)"
@@ -3924,9 +3913,8 @@ msgstr "Supprimer"
 #: modules/webbasket/lib/webbasket_templates.py:2718
 #: modules/webbasket/lib/webbasket_templates.py:3239
 #: modules/webbasket/lib/webbasket_templates.py:3539
-#, fuzzy
 msgid "This record does not seem to exist any more"
-msgstr "Désolé, cette notice n'existe pas."
+msgstr "Cette notice ne semble plus exister."
 
 #: modules/webbasket/lib/webbasket_templates.py:2366
 #: modules/webbasket/lib/webbasket_templates.py:2868
@@ -4120,77 +4108,70 @@ msgid "Copy record to basket"
 msgstr "Copier la notice dans le panier"
 
 #: modules/webcomment/lib/webcommentadminlib.py:122
-#, fuzzy
 msgid "Invalid comment ID."
-msgstr "Identifiant du commentaire"
+msgstr "Identifiant de commentaire non valide."
 
 #: modules/webcomment/lib/webcommentadminlib.py:142
-#, fuzzy, python-format
+#, python-format
 msgid "Comment ID %s does not exist."
-msgstr "L'utilisateur %s n'existe pas."
+msgstr "Le commentaire avec l'identifiant %s n'existe pas."
 
 #: modules/webcomment/lib/webcommentadminlib.py:156
-#, fuzzy, python-format
+#, python-format
 msgid "Record ID %s does not exist."
-msgstr "L'utilisateur %s n'existe pas."
+msgstr "La notice avec l'identifiant %s n'existe pas."
 
 #: modules/webcomment/lib/webcomment.py:166
 #: modules/webcomment/lib/webcomment.py:210
 msgid "Bad page number --> showing first page."
-msgstr ""
+msgstr "Mauvais numéro de page --> affichage de la première page."
 
 #: modules/webcomment/lib/webcomment.py:174
-#, fuzzy
 msgid "Bad number of results per page --> showing 10 results per page."
-msgstr "Nombre de résultats par page"
+msgstr "Mauvais nombre de résultats par page --> affichage de 10 résultats par page."
 
 #: modules/webcomment/lib/webcomment.py:183
 msgid "Bad display order --> showing most helpful first."
-msgstr ""
+msgstr "Mauvais ordre d'affichage --> affichage des plus recommandés en premier."
 
 #: modules/webcomment/lib/webcomment.py:192
 msgid "Bad display order --> showing oldest first."
-msgstr ""
+msgstr "Mauvais ordre d'affichage --> affichage des plus anciens en premier."
 
 #: modules/webcomment/lib/webcomment.py:229
 #: modules/webcomment/lib/webcomment.py:1579
 #: modules/webcomment/lib/webcomment.py:1632
-#, fuzzy
 msgid "Comments on records have been disallowed by the administrator."
-msgstr "Le groupe %s a été supprimé par son administrateur."
+msgstr "Les commentaires sur les notices ont été désactivés par l'administrateur."
 
 #: modules/webcomment/lib/webcomment.py:237
 #: modules/webcomment/lib/webcomment.py:260
 #: modules/webcomment/lib/webcomment.py:1419
 #: modules/webcomment/lib/webcomment.py:1440
 msgid "Your feedback has been recorded, many thanks."
-msgstr ""
+msgstr "Votre appréciation a été enregistrée, merci."
 
 #: modules/webcomment/lib/webcomment.py:244
-#, fuzzy
 msgid "You have already reported an abuse for this comment."
-msgstr ""
-"Vous avez déjà atteint le nombre de fichier maximum pour ce type de document"
+msgstr "Vous avez déjà signalé un abus pour ce commentaire."
 
 #: modules/webcomment/lib/webcomment.py:251
-#, fuzzy
 msgid "The comment you have reported no longer exists."
-msgstr "La notice sélectionnée n'existe pas."
+msgstr "Le commentaire que vous avez signalé n'existe plus."
 
 #: modules/webcomment/lib/webcomment.py:267
 msgid "Sorry, you have already voted. This vote has not been recorded."
-msgstr ""
+msgstr "Désolé, vous avez déjà voté. Ce vote n'a pas été enregistré."
 
 #: modules/webcomment/lib/webcomment.py:274
 msgid ""
 "You have been subscribed to this discussion. From now on, you will receive "
 "an email whenever a new comment is posted."
-msgstr ""
+msgstr "Vous êtes maintenant abonné à cette discussion. Dorénavant vous recevrez un email pour chaque nouveau commentaire."
 
 #: modules/webcomment/lib/webcomment.py:281
-#, fuzzy
 msgid "You have been unsubscribed from this discussion."
-msgstr "Se désabonner de ce panier"
+msgstr "Vous êtes désabonné de la discussion."
 
 #: modules/webcomment/lib/webcomment.py:1171
 #, python-format
@@ -4210,71 +4191,68 @@ msgstr "%(report_number)s\\\"%(title)s\\\" a été commenté"
 #: modules/webcomment/lib/webcomment.py:1407
 #, python-format
 msgid "%s is an invalid record ID"
-msgstr ""
+msgstr "%s est un identifiant de notice non valable"
 
 #: modules/webcomment/lib/webcomment.py:1426
 #: modules/webcomment/lib/webcomment.py:1447
 msgid "Your feedback could not be recorded, please try again."
-msgstr ""
+msgstr "Votre appréciation n'a pu être enregistrée, veuillez réessayer."
 
 #: modules/webcomment/lib/webcomment.py:1555
 #, python-format
 msgid "%s is an invalid user ID."
-msgstr ""
+msgstr "%s est un identifiant utilisateur non valable."
 
 #: modules/webcomment/lib/webcomment.py:1589
-#, fuzzy
 msgid "Cannot reply to a review."
-msgstr "Supprimer le rapport sur l'évaluation"
+msgstr "Impossible de répondre à une évaluation"
 
 #: modules/webcomment/lib/webcomment.py:1644
 msgid "You must enter a title."
-msgstr ""
+msgstr "Vous devez fournir un titre."
 
 #: modules/webcomment/lib/webcomment.py:1651
 msgid "You must choose a score."
-msgstr ""
+msgstr "Vous devez donner une note."
 
 #: modules/webcomment/lib/webcomment.py:1658
 msgid "You must enter a text."
-msgstr ""
+msgstr "Vous devez fournir un texte."
 
 #: modules/webcomment/lib/webcomment.py:1675
-#, fuzzy
 msgid "You already wrote a review for this record."
-msgstr "Vous n'avez pas l'autorisation de voir cette page."
+msgstr "Vous avez déjà soumis une évaluation pour cette notice."
 
 #: modules/webcomment/lib/webcomment.py:1693
 msgid "You already posted a comment short ago. Please retry later."
-msgstr ""
+msgstr "Vous avez déjà posté un commentaire très récemment. Veuillez réessayer plus tard."
 
 #: modules/webcomment/lib/webcomment.py:1705
 msgid "Failed to insert your comment to the database. Please try again."
-msgstr ""
+msgstr "Échec lors de l'insertion du commentaire dans la base de donnée. Veuillez réessayer."
 
 #: modules/webcomment/lib/webcomment.py:1719
 msgid "Unknown action --> showing you the default add comment form."
-msgstr ""
+msgstr "Action inconnue --> affichage du formulaire de soumission de commentaire."
 
 #: modules/webcomment/lib/webcomment.py:1841
-#, fuzzy, python-format
+#, python-format
 msgid "Record ID %s does not exist in the database."
-msgstr "L'adresse email fournie n'existe pas dans la base de données."
+msgstr "La notice avec l'identifiant %s n'existe pas dans la base de données."
 
 #: modules/webcomment/lib/webcomment.py:1849
-#, fuzzy
 msgid "No record ID was given."
-msgstr "Désolé, aucun identifiant de notice n'a été fourni."
+msgstr "Aucun identifiant de notice n'a été fourni."
 
 #: modules/webcomment/lib/webcomment.py:1857
-#, fuzzy, python-format
+#, python-format
 msgid "Record ID %s is an invalid ID."
-msgstr "Désolé, %s n'est pas un identifiant valide."
+msgstr "%s n'est pas un identifiant valide."
 
 #: modules/webcomment/lib/webcomment.py:1865
 #, python-format
 msgid "Record ID %s is not a number."
-msgstr ""
+msgstr "L'identifiant de notice %s n'est pas un nombre."
 
 #: modules/webcomment/lib/webcomment_templates.py:79
 #: modules/webcomment/lib/webcomment_templates.py:839
@@ -4283,16 +4261,16 @@ msgid "Write a comment"
 msgstr "Écrire un commentaire"
 
 #: modules/webcomment/lib/webcomment_templates.py:94
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "<div class=\"webcomment_comment_round_header\">%(x_nb)i Comments for round "
 "\"%(x_name)s\""
-msgstr "%(x_nb)i commentaires au tour \"%(x_name)s\""
+msgstr "<div class=\"webcomment_comment_round_header\">%(x_nb)i commentaires au tour \"%(x_name)s\""
 
 #: modules/webcomment/lib/webcomment_templates.py:96
 #, python-format
 msgid "<div class=\"webcomment_comment_round_header\">%(x_nb)i Comments"
-msgstr ""
+msgstr "<div class=\"webcomment_comment_round_header\">%(x_nb)i Commentaires"
 
 #: modules/webcomment/lib/webcomment_templates.py:124
 #, python-format
@@ -4374,12 +4352,12 @@ msgstr "Évaluer ce document"
 msgid ""
 "<div class=\"webcomment_review_first_introduction\">Be the first to review "
 "this document.</div>"
-msgstr ""
+msgstr "<div class=\"webcomment_review_first_introduction\">Soyez le premier à évaluer ce document.</div>"
 
 #: modules/webcomment/lib/webcomment_templates.py:368
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_name)s"
-msgstr "lien %(x_sitename)s"
+msgstr "%(x_name)s"
 
 #: modules/webcomment/lib/webcomment_templates.py:375
 #: modules/webcomment/lib/webcomment_templates.py:764
@@ -4413,11 +4391,9 @@ msgid "Reviewed by %(x_nickname)s on %(x_date)s"
 msgstr "Évalué par %(x_nickname)s le %(x_date)s"
 
 #: modules/webcomment/lib/webcomment_templates.py:488
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_nb_people)s out of %(x_nb_total)s people found this review useful"
-msgstr ""
-"%(x_nb_people)i sur %(x_nb_total)i utilisateurs ont trouvé cette évaluation "
-"utile"
+msgstr "%(x_nb_people)s sur %(x_nb_total)s utilisateurs ont trouvé cette évaluation utile"
 
 #: modules/webcomment/lib/webcomment_templates.py:510
 msgid "Undelete review"
@@ -4960,9 +4936,8 @@ msgstr ""
 "Pour d'autres questions, veuillez contacter <%(CFG_SITE_SUPPORT_EMAIL)s>"
 
 #: modules/webcomment/lib/webcomment_templates.py:2219
-#, fuzzy
 msgid "Your comment will be lost."
-msgstr "Votre commentaire a été ajouté"
+msgstr "Votre commentaire sera perdu."
 
 #: modules/webcomment/lib/webcomment_webinterface.py:261
 #: modules/webcomment/lib/webcomment_webinterface.py:493
@@ -4974,7 +4949,7 @@ msgstr "Notice introuvable"
 msgid ""
 "The size of file \\\"%s\\\" (%s) is larger than maximum allowed file size "
 "(%s). Select files again."
-msgstr ""
+msgstr "La taille du fichier \\\"%s\\\" (%s) dépasse le maximum autorisé (%s). Sélectionnez à nouveau un fichier."
 
 #: modules/webcomment/lib/webcomment_webinterface.py:476
 #: modules/websubmit/lib/websubmit_templates.py:2668
@@ -5053,13 +5028,12 @@ msgstr "Rétablir les commentaires"
 #: modules/webmessage/lib/webmessage.py:137
 #: modules/webmessage/lib/webmessage.py:203
 msgid "Sorry, this message in not in your mailbox."
-msgstr ""
+msgstr "Désolé, ce message n'est pas dans votre boîte."
 
 #: modules/webmessage/lib/webmessage.py:75
 #: modules/webmessage/lib/webmessage.py:219
-#, fuzzy
 msgid "This message does not exist."
-msgstr "La page demandée n'existe pas."
+msgstr "Ce message n'existe pas."
 
 #: modules/webmessage/lib/webmessage.py:144
 msgid "The message could not be deleted."
@@ -5331,36 +5305,30 @@ msgid "No values found."
 msgstr "Pas de résultat"
 
 #: modules/websearch/lib/search_engine.py:1945
-#, fuzzy
 msgid ""
 "Warning: full-text search is only available for a subset of papers mostly "
 "from 2006-2011."
-msgstr ""
-"Attention: la recherche dans les fichiers n'est disponible que pour un sous-"
-"ensemble des papiers, principalement pour 2006-2010."
+msgstr "Attention: la recherche dans les fichiers n'est disponible que pour un sous-ensemble des papiers, principalement pour 2006-2011."
 
 #: modules/websearch/lib/search_engine.py:1947
-#, fuzzy
 msgid ""
 "Warning: figure caption search is only available for a subset of papers "
 "mostly from 2008-2011."
-msgstr ""
-"Attention: la recherche dans les légendes des figures n'est disponible que "
-"pour un sous-ensemble des papiers, principalement pour 2008-2010."
+msgstr "Attention: la recherche dans les légendes des figures n'est disponible que pour un sous-ensemble des papiers, principalement pour 2008-2011."
 
 #: modules/websearch/lib/search_engine.py:1953
 #, python-format
 msgid "There is no index %s.  Searching for %s in all fields."
-msgstr ""
+msgstr "Il n'y a pas d'index %s. Recherche de %s dans tous les champs."
 
 #: modules/websearch/lib/search_engine.py:1957
 #, python-format
 msgid "Instead searching %s."
-msgstr ""
+msgstr "Recherche %s à la place."
 
 #: modules/websearch/lib/search_engine.py:1963
 msgid "Search term too generic, displaying only partial results..."
-msgstr ""
+msgstr "Recherche trop générique, affichage d'une partie des résultats seulement..."
 
 #: modules/websearch/lib/search_engine.py:1966
 msgid ""
@@ -5414,9 +5382,8 @@ msgstr ""
 "des documents non publics, veuillez d'abord choisir la collection restreinte."
 
 #: modules/websearch/lib/search_engine.py:2696
-#, fuzzy
 msgid "No match found, please enter different search terms."
-msgstr "Utiliser différents termes de recherche"
+msgstr "Aucun résultat trouvé, veuillez utiliser d'autres termes de recherche"
 
 #: modules/websearch/lib/search_engine.py:2702
 #, python-format
@@ -5486,7 +5453,7 @@ msgstr "La notice a été supprimée."
 
 #: modules/websearch/lib/search_engine.py:3901
 msgid "Use different search terms."
-msgstr "Utiliser différents termes de recherche"
+msgstr "Utiliser d'autres termes de recherche"
 
 #: modules/websearch/lib/search_engine.py:4997
 msgid "No match within your time limits, discarding this condition..."
@@ -5872,16 +5839,15 @@ msgstr "Vous désirez être averti des nouveaux résultats pour cette recherche?
 
 #: modules/websearch/lib/websearch_templates.py:3746
 #: modules/websearch/lib/websearch_templates.py:3796
-#, fuzzy
 msgid "Back to search"
-msgstr "Retour aux résultats de recherche"
+msgstr "Retour à la recherche"
 
 #: modules/websearch/lib/websearch_templates.py:3756
 #: modules/websearch/lib/websearch_templates.py:3772
 #: modules/websearch/lib/websearch_templates.py:3787
 #, python-format
 msgid "%s of"
-msgstr ""
+msgstr "%s sur"
 
 #: modules/websearch/lib/websearch_templates.py:3886
 msgid "People who downloaded this document also downloaded:"
@@ -5908,18 +5874,17 @@ msgstr "parmi lesquelles auto-citations: %s notices"
 
 #: modules/websearch/lib/websearch_templates.py:4157
 msgid "Name variants"
-msgstr ""
+msgstr "Variantes du nom"
 
 #: modules/websearch/lib/websearch_templates.py:4168
 msgid "No Name Variants"
-msgstr ""
+msgstr "Aucune Variante du Nom"
 
 #: modules/websearch/lib/websearch_templates.py:4176
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:763
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:920
-#, fuzzy
 msgid "Papers"
-msgstr "Articles:"
+msgstr "Articles"
 
 #: modules/websearch/lib/websearch_templates.py:4180
 msgid "downloaded"
@@ -5930,57 +5895,48 @@ msgid "times"
 msgstr "fois"
 
 #: modules/websearch/lib/websearch_templates.py:4210
-#, fuzzy
 msgid "No Papers"
-msgstr "Articles:"
+msgstr "Aucun Article"
 
 #: modules/websearch/lib/websearch_templates.py:4223
-#, fuzzy
 msgid "unknown affiliation"
-msgstr "Action inconnue"
+msgstr "affiliation inconnue"
 
 #: modules/websearch/lib/websearch_templates.py:4230
-#, fuzzy
 msgid "No Affiliations"
-msgstr "Affiliations:"
+msgstr "Aucune Affiliation"
 
 #: modules/websearch/lib/websearch_templates.py:4232
-#, fuzzy
 msgid "Affiliations"
-msgstr "Affiliations:"
+msgstr "Affiliations"
 
 #: modules/websearch/lib/websearch_templates.py:4248
-#, fuzzy
 msgid "No Keywords"
-msgstr "Mot clé"
+msgstr "Aucun Mot Clé"
 
 #: modules/websearch/lib/websearch_templates.py:4251
-#, fuzzy
 msgid "Frequent keywords"
-msgstr "Mots clés fréquents:"
+msgstr "Mots clés fréquents"
 
 #: modules/websearch/lib/websearch_templates.py:4256
-#, fuzzy
 msgid "Frequent co-authors"
-msgstr "Co-auteurs fréquents:"
+msgstr "Co-auteurs fréquents"
 
 #: modules/websearch/lib/websearch_templates.py:4267
-#, fuzzy
 msgid "No Frequent Co-authors"
-msgstr "Co-auteurs fréquents:"
+msgstr "Aucun co-auteur fréquent"
 
 #: modules/websearch/lib/websearch_templates.py:4291
 msgid "This is me.  Verify my publication list."
-msgstr ""
+msgstr "Je suis cette personne. Vérifier ma liste de publication."
 
 #: modules/websearch/lib/websearch_templates.py:4330
 msgid "Citations:"
 msgstr "Citations:"
 
 #: modules/websearch/lib/websearch_templates.py:4334
-#, fuzzy
 msgid "No Citation Information available"
-msgstr "Aucun information disponible"
+msgstr "Aucun information de citation disponible"
 
 #: modules/websearch/lib/websearch_templates.py:4401
 msgid "Citation summary results"
@@ -5999,14 +5955,12 @@ msgid "Average citations per paper:"
 msgstr "Moyenne des citations par rapport"
 
 #: modules/websearch/lib/websearch_templates.py:4444
-#, fuzzy
 msgid "Total number of citations excluding self-citations:"
-msgstr "Nombre de citations:"
+msgstr "Nombre de citations total, auto-citations exclues:"
 
 #: modules/websearch/lib/websearch_templates.py:4449
-#, fuzzy
 msgid "Average citations per paper excluding self-citations:"
-msgstr "Moyenne des citations par rapport"
+msgstr "Moyenne des citations par rapport, auto-citations exclues:"
 
 #: modules/websearch/lib/websearch_templates.py:4458
 msgid "Breakdown of papers by citations:"
@@ -6022,12 +5976,12 @@ msgstr "Métriques de Citations Additionnelles"
 msgid ""
 "We're sorry. The requested author \"%s\" seems not to be listed on the "
 "specified paper."
-msgstr ""
+msgstr "Désolé. L'auteur demandé \"%s\" ne semble pas apparaître sur l'article spécifié."
 
 #: modules/websearch/lib/websearch_webinterface.py:738
 #: modules/websearch/lib/websearch_webinterface.py:750
 msgid "Please try the following link to start a broader search on the author: "
-msgstr ""
+msgstr "Suivez le lien suivant pour lancer une recherche plus large sur l'auteur:"
 
 #: modules/websearch/lib/websearch_webinterface.py:1163
 msgid "You are not authorized to view this area."
@@ -6866,7 +6820,7 @@ msgstr "Description du groupe:"
 
 #: modules/websession/lib/websession_templates.py:1776
 msgid "Group join policy:"
-msgstr "Politique pour l'adhésion au groupe:"
+msgstr "Règle adhésion au groupe:"
 
 #: modules/websession/lib/websession_templates.py:1817
 #: modules/websession/lib/websession_templates.py:1890
@@ -7587,42 +7541,35 @@ msgstr "Éditer les membres du groupe"
 
 #: modules/websession/lib/webgroup.py:158
 #: modules/websession/lib/webgroup.py:432
-#, fuzzy
 msgid "Please enter a group name."
-msgstr "Veuillez entrer un nom d'utilisateur ou de groupe."
+msgstr "Veuillez entrer un nom de groupe."
 
 #: modules/websession/lib/webgroup.py:168
 #: modules/websession/lib/webgroup.py:442
-#, fuzzy
 msgid "Please enter a valid group name."
-msgstr "Veuillez entrer un nom d'utilisateur ou de groupe."
+msgstr "Veuillez entrer un nom de groupe valide."
 
 #: modules/websession/lib/webgroup.py:178
 #: modules/websession/lib/webgroup.py:452
-#, fuzzy
 msgid "Please choose a group join policy."
-msgstr "Veuillez choisir une catégorie"
+msgstr "Veuillez choisir une règle d'adhésion au groupe."
 
 #: modules/websession/lib/webgroup.py:188
 #: modules/websession/lib/webgroup.py:462
-#, fuzzy
 msgid "Group name already exists. Please choose another group name."
-msgstr "Un fichier nommé %s existe déjà. Choisissez un autre nom."
+msgstr "Le nom du groupe existe déjà. Veuillez en choisir un autre."
 
 #: modules/websession/lib/webgroup.py:260
-#, fuzzy
 msgid "You are already member of the group."
-msgstr "Vous n'êtes pas membre de groupe."
+msgstr "Vous êtes déjà membre de ce groupe."
 
 #: modules/websession/lib/webgroup.py:302
-#, fuzzy
 msgid "Please select only one group."
-msgstr "Veuillez choisir un ou plusieurs:"
+msgstr "Veuillez ne sélectionner qu'un seul groupe."
 
 #: modules/websession/lib/webgroup.py:359
-#, fuzzy
 msgid "Please select one group."
-msgstr "Veuillez choisir un ou plusieurs:"
+msgstr "Veuillez sélectionner un groupe."
 
 #: modules/websession/lib/webgroup.py:384
 #: modules/websession/lib/webgroup.py:399
@@ -7633,43 +7580,39 @@ msgstr "Veuillez choisir un ou plusieurs:"
 #: modules/websession/lib/webgroup.py:644
 #: modules/websession/lib/webgroup.py:711
 msgid "Sorry, there was an error with the database."
-msgstr ""
+msgstr "Désolé, une erreur avec la base de donnée s'est produite."
 
 #: modules/websession/lib/webgroup.py:391
 #: modules/websession/lib/webgroup.py:562
-#, fuzzy
 msgid "Sorry, you do not have sufficient rights on this group."
-msgstr "Vous n'êtes pas autorisé à voir cette notice."
+msgstr "Désolé, vous n'êtes pas suffisamment de droits pour ce groupe."
 
 #: modules/websession/lib/webgroup.py:499
-#, fuzzy
 msgid "The group has already been deleted."
-msgstr "La notice a été supprimée."
+msgstr "Le groupe a déjà été supprimé."
 
 #: modules/websession/lib/webgroup.py:611
 msgid "Please choose a member if you want to remove him from the group."
-msgstr ""
+msgstr "Veuillez sélectionner un membre si vous souhaitez l'en retirer du groupe."
 
 #: modules/websession/lib/webgroup.py:651
 msgid ""
 "Please choose a user from the list if you want him to be added to the group."
-msgstr ""
+msgstr "Veuillez sélectionner un utilisateur de la liste pour l'ajouter à ce groupe."
 
 #: modules/websession/lib/webgroup.py:664
-#, fuzzy
 msgid "The user is already member of the group."
-msgstr "Vous n'êtes pas membre de groupe."
+msgstr "L'utilisateur est déjà membre du groupe."
 
 #: modules/websession/lib/webgroup.py:718
 msgid ""
 "Please choose a user from the list if you want him to be removed from "
 "waiting list."
-msgstr ""
+msgstr "Veuillez sélectionner un utilisateur de la liste si vous souhaitez l'en retirer de la liste d'attente."
 
 #: modules/websession/lib/webgroup.py:731
-#, fuzzy
 msgid "The user request for joining group has already been rejected."
-msgstr "Votre demande d'adhésion au groupe %s a été rejetée."
+msgstr "La demande d'adhésion au groupe a déjà été rejetée."
 
 #: modules/webstyle/lib/webstyle_templates.py:86
 #: modules/webstyle/lib/webstyle_templates.py:95
@@ -7737,9 +7680,8 @@ msgstr "Veuillez contacter %s en mentionnant l'information suivante:"
 
 #: modules/webstyle/lib/webstyle_templates.py:728
 #: modules/websubmit/lib/websubmit_templates.py:1231
-#, fuzzy
 msgid "Restricted"
-msgstr "restreint"
+msgstr "Restreint"
 
 #: modules/webstyle/lib/webstyle_templates.py:848
 #, python-format
@@ -7830,7 +7772,7 @@ msgstr "Accès"
 msgid ""
 "The file you want to edit is protected against modifications. Your action "
 "has not been applied"
-msgstr ""
+msgstr "Le fichier que vous voulez éditer est protégé contre les modifications. Votre action n'a pas été prise en compte."
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:562
 #, python-format
@@ -8844,7 +8786,7 @@ msgstr "Désolé, URL non valide..."
 msgid ""
 "Unable to move field at position %s to position %s on page %s of submission "
 "'%s%s' - Invalid Field Position Numbers"
-msgstr ""
+msgstr "Impossible de déplacer le champ de la position %s à la position %s sur la page %s de la soumission %s%s - Numéro de position non valide"
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3913
 #, python-format
@@ -8852,7 +8794,7 @@ msgid ""
 "Unable to swap field at position %s with field at position %s on page %s of "
 "submission %s - could not move field at position %s to temporary field "
 "location"
-msgstr ""
+msgstr "Impossible d'échanger le champ à la position %s avec le champ à la position %s sur la page %s de la soumission %s - impossible de déplacer le champ %s à une position temporaire"
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3924
 #, python-format
@@ -8860,7 +8802,7 @@ msgid ""
 "Unable to swap field at position %s with field at position %s on page %s of "
 "submission %s - could not move field at position %s to position %s. Please "
 "ask Admin to check that a field was not stranded in a temporary position"
-msgstr ""
+msgstr "Impossible d'échanger le champ à la position %s avec le champ à la position %s sur la page %s de la soumission %s - impossible de déplacer le champ %s à la position %s. Demandez à un administrateur si le champ n'est pas resté dans sa position temporaire"
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3935
 #, python-format
@@ -8869,7 +8811,7 @@ msgid ""
 "submission %s - could not move field that was located at position %s to "
 "position %s from temporary position. Field is now stranded in temporary "
 "position and must be corrected manually by an Admin"
-msgstr ""
+msgstr "Impossible d'échanger le champ à la position %s avec le champ à la position %s sur la page %s de la soumission %s - impossible de déplacer le champ qui était à la position %s vers la position %s depuis sa position temporaire. Le champ est maintenant bloqué dans sa position temporaire et doit être corrigé manuellement par un administrateur"
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3946
 #, python-format
@@ -8877,7 +8819,7 @@ msgid ""
 "Unable to move field at position %s to position %s on page %s of submission "
 "%s - could not decrement the position of the fields below position %s. Tried "
 "to recover - please check that field ordering is not broken"
-msgstr ""
+msgstr "Impossible d'échanger le champ à la position %s avec le champ à la position %s sur la page %s de la soumission %s - impossible de décroître la position des champs sous la position %s. Tentative de reprise - vérifiez avec un administrateur que l'ordre des champs est correct"
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3957
 #, python-format
@@ -8886,23 +8828,23 @@ msgid ""
 "%s%s - could not increment the position of the fields at and below position "
 "%s. The field that was at position %s is now stranded in a temporary "
 "position."
-msgstr ""
+msgstr "Impossible de déplacer le champ à la position %s à la position %s sur la page %s de la soumission %s%s - impossible d'augmenter la position des champs à et sous la position %s. Le champ qui était à la position %s est maintenant bloqué dans sa position temporaire."
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3968
 #, python-format
 msgid ""
 "Moved field from position %s to position %s on page %s of submission '%s%s'."
-msgstr ""
+msgstr "Champ déplacé de la position %s à la position %s sur la page %s de la soumission '%s%s'."
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3989
-#, fuzzy, python-format
+#, python-format
 msgid "Unable to delete field at position %s from page %s of submission '%s'"
-msgstr "Impossible de déterminer le nombre de pages de la soumission."
+msgstr "Impossible de supprimer le champ à la position %s sur la page %s de la soumission '%s'"
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3999
-#, fuzzy, python-format
+#, python-format
 msgid "Unable to delete field at position %s from page %s of submission '%s%s'"
-msgstr "Impossible de déterminer le nombre de pages de la soumission."
+msgstr "Impossible de supprimer le champ à la position %s sur la page %s de la soumission '%s%s'"
 
 #: modules/websubmit/web/approve.py:55
 msgid "approve.py: cannot determine document reference"
@@ -9007,7 +8949,7 @@ msgstr "Revenir au document"
 
 #: modules/websubmit/web/publiline.py:1106
 msgid "Back to the document"
-msgstr "Retout au document"
+msgstr "Retour au document"
 
 #: modules/websubmit/web/publiline.py:1134
 #: modules/websubmit/web/publiline.py:1194
@@ -9264,9 +9206,9 @@ msgid "Edit Settings"
 msgstr "Modifier les réglages"
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:43
-#, fuzzy, python-format
+#, python-format
 msgid "You have %i tickets."
-msgstr "Vos tickets"
+msgstr "Vous avez %i tickets."
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:62
 msgid "show"
@@ -9359,20 +9301,19 @@ msgstr "Informations générales"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:94
 msgid "Announcements"
-msgstr ""
+msgstr "Annonces"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:95
-#, fuzzy
 msgid "Training"
-msgstr "Attention"
+msgstr "Formation"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:96
 msgid "Events"
-msgstr ""
+msgstr "Événements"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:97
 msgid "Staff Association"
-msgstr ""
+msgstr "Association du personnel"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:106
 msgid "Archive"
@@ -9408,7 +9349,7 @@ msgstr "Critère de recherche"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:315
 msgid "Output tags"
-msgstr "Champs en sortie:"
+msgstr "Champs en sortie"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:316
 msgid "Filter collection"
@@ -9446,11 +9387,11 @@ msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:554
 msgid "Define new field action"
-msgstr "Nouvelle action sur un champ"
+msgstr "Ajouter une action sur un champ"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:555
 msgid "Define new subfield action"
-msgstr "Nouvelle action sur un sous-champ"
+msgstr "Ajouter une action sur un sous-champ"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:557
 msgid "Select action"
@@ -9497,9 +9438,8 @@ msgid "with"
 msgstr "avec"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:568
-#, fuzzy
 msgid "when subfield $$"
-msgstr "dans le sous-champ"
+msgstr "quand le sous-champ $$"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:569
 msgid "new value"
@@ -9507,25 +9447,23 @@ msgstr "nouvelle valeur"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:570
 msgid "is equal to"
-msgstr ""
+msgstr "est égal à"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:571
 msgid "contains"
-msgstr ""
+msgstr "contient"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:572
 msgid "condition"
 msgstr "condition"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:573
-#, fuzzy
 msgid "when other subfield"
-msgstr "Ajouter un autre sous-champ"
+msgstr "quand l'autre sous-champ"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:574
-#, fuzzy
 msgid "when subfield"
-msgstr "dans le sous-champ"
+msgstr "quand le sous-champ"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:575
 msgid "Apply only to specific field instances"
@@ -9636,7 +9574,6 @@ msgid "None"
 msgstr "Aucun"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:672
-#, fuzzy
 msgid "Manually"
 msgstr "Manuellement"
 
@@ -11200,6 +11137,7 @@ msgstr "Détails PEB"
 msgid "Period of interest - From"
 msgstr "Période souhaitée - De"
 
+# This should not be translated for the moment. Check usage
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10433
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10434
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11010
@@ -11209,6 +11147,7 @@ msgstr "Période souhaitée - De"
 msgid "period_of_interest_from"
 msgstr ""
 
+# This should not be translated for the moment. Check usage
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10434
 msgid "jsCal3"
 msgstr ""
@@ -11226,6 +11165,7 @@ msgstr ""
 msgid "Period of interest - To"
 msgstr "Période souhaitée - À"
 
+# This should not be translated for the moment. Check usage
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10435
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10436
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11012
@@ -11234,6 +11174,7 @@ msgstr "Période souhaitée - À"
 msgid "period_of_interest_to"
 msgstr ""
 
+# This should not be translated for the moment. Check usage
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10436
 msgid "jsCal4"
 msgstr ""
@@ -11280,11 +11221,13 @@ msgstr ""
 msgid "I want this edition only."
 msgstr "Je veux uniquement cette édition spécifique."
 
+# This should not be translated for the moment. Check usage
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11011
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15938
 msgid "jsCal1"
 msgstr ""
 
+# This should not be translated for the moment. Check usage
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11012
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15940
 msgid "jsCal2"
@@ -11598,19 +11541,19 @@ msgid "Not authorized"
 msgstr "Non autorisé"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:80
-#, fuzzy, python-format
+#, python-format
 msgid "ERROR: %s does not exist"
-msgstr "L'utilisateur %s n'existe pas."
+msgstr "ERREUR: %s n'existe pas"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:82
-#, fuzzy, python-format
+#, python-format
 msgid "ERROR: %s is not a directory"
-msgstr "n'est pas un dossier"
+msgstr "ERREUR: %s n'est pas un dossier"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:84
-#, fuzzy, python-format
+#, python-format
 msgid "ERROR: %s is not writable"
-msgstr "est protégé en écriture"
+msgstr "ERREUR: %s est protégé en écriture"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:117
 msgid "Limit to knowledge bases containing string:"
@@ -11654,33 +11597,33 @@ msgid "Edit BibCheck config file"
 msgstr "Édition du fichier de config de BibCheck"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:269
-#, fuzzy, python-format
+#, python-format
 msgid "File %s already exists."
-msgstr "Fichier déjà existant"
+msgstr "Le fichier %s existe déjà."
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:272
-#, fuzzy, python-format
+#, python-format
 msgid "File %s: written OK."
-msgstr "écrit OK."
+msgstr "Fichier %s: enregistrement terminé."
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:278
-#, fuzzy, python-format
+#, python-format
 msgid "File %s: write failed."
-msgstr "enregistrement échoué."
+msgstr "Fichier %s: enregistrement échoué."
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:280
 msgid "Save BibCheck config file"
 msgstr "Enregistrement du fichier de config de BibCheck"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:313
-#, fuzzy, python-format
+#, python-format
 msgid "File %s deleted."
-msgstr "Le fichier %s n'existe pas."
+msgstr "Le fichier %s est effacé."
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:315
-#, fuzzy, python-format
+#, python-format
 msgid "File %s: delete failed."
-msgstr "la suppression a échoué"
+msgstr "Fichier %s: la suppression a échoué."
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:317
 msgid "Delete BibCheck config file"
@@ -11760,28 +11703,24 @@ msgid "Error when retrieving the record"
 msgstr "Erreur lors de l'accès à la notice"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1144
-#, fuzzy
 msgid ""
 "Error when formatting the Holding Pen entry. Probably its content is broken"
-msgstr ""
-"Erreur lors du formattage de l'entrée de la liste d'attente. L'entrée est "
-"probablement corrompue"
+msgstr "Erreur lors du formatage de l'entrée de la liste d'attente. L'entrée est probablement corrompue"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1149
 msgid "Accept Holding Pen version"
 msgstr "Accepter la version de la Liste d'Attente"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:51
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Limit display to knowledge bases matching %(keyword_field)s in their rules "
 "and descriptions"
-msgstr "Limiter l'affichage aux bases de connaissance avec "
+msgstr "Limiter l'affichage aux bases de connaissance avec %(keyword_field)s dans leurs règles et description"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:89
-#, fuzzy
 msgid "No Knowledge Base"
-msgstr "Bases de Connaissances"
+msgstr "Aucune Bases de Connaissances"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:148
 msgid "Add New Knowledge Base"
@@ -11804,14 +11743,14 @@ msgid "If you upload another file, the current version will be replaced."
 msgstr "Si vous chargez un nouveau fichier, la version courant sera remplacée."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:194
-#, fuzzy, python-format
+#, python-format
 msgid "The current taxonomy can be accessed with this URL: %s"
-msgstr "La taxonomie courant peut être accédée à cette URL"
+msgstr "La taxonomie courante peut être accédée à cette URL: %s"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:197
-#, fuzzy, python-format
+#, python-format
 msgid "Please upload the RDF file for taxonomy %s"
-msgstr "Veuillez charger le fichier RDF de taxonomie"
+msgstr "Veuillez charger le fichier RDF pour la taxonomie %s"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:234
 msgid "Please configure"
@@ -11864,7 +11803,6 @@ msgstr ""
 "doit être évaluée dans une collection spécifique."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:251
-#, fuzzy
 msgid ""
 "Example 1: Your records contain field 270__a for                          "
 "the name and address of the author's institute.                          If "
@@ -11873,8 +11811,8 @@ msgid ""
 "will be created."
 msgstr ""
 "Exemple: votre notice contient un champ 270__a pour le nom et l'adresse\n"
-"d'une institution. Si vous assignez au champ '270__a' l'expression \n"
-"\"270__a:*Paris*\", une listes des institutions à Paris sera créée."
+"de l'institution d'un auteur. Si vous assignez au champ '270__a' l'expression \n"
+"\"270__a:*Paris*\", une liste des institutions à Paris sera créée."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:256
 msgid ""
@@ -11882,12 +11820,11 @@ msgid ""
 "the                          user gives its postal code "
 "(270__a):                          Set field to 100__a, expression to 270__a:"
 "*%*."
-msgstr ""
+msgstr "Exemple 2: Pour retourner le nom de l'institution (100__a) quand l'utilisateur fournit le code postal (270__a): indiquez le champ 100__a, et l'expression 270__a:*%s*."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:260
-#, fuzzy
 msgid "Any collection"
-msgstr "collection"
+msgstr "Toutes les collections"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:282
 msgid "Exporting: "
@@ -11926,9 +11863,8 @@ msgid "Search for a mapping"
 msgstr "Rechercher une règle"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:480
-#, fuzzy
 msgid "Knowledge base is empty"
-msgstr "Base de connaissances %s"
+msgstr "La base de connaissances est vide"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:545
 msgid "You can get a these mappings in textual format by: "
@@ -11939,31 +11875,29 @@ msgid "And the KBA version by:"
 msgstr "Et la version KBA à:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:627
-#, fuzzy
 msgid "Update Base Attributes"
-msgstr "Mettre à jour les attributs de format"
+msgstr "Mettre à jour les attributs de la base"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:670
-#, fuzzy
 msgid "This knowledge base is not used in any format elements."
-msgstr "La base de connaissance a déjà un fichier de taxonomie."
+msgstr "Cette base de connaissance n'est utilisée dans aucun élément de formatage."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:700
-#, fuzzy, python-format
+#, python-format
 msgid "Your rule: %s"
-msgstr "Votre règle"
+msgstr "Votre règle: %s"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:702
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "The left side of the rule (%s) already appears in these knowledge bases:"
-msgstr "apparaît déjà dans ces bases de connaissance"
+msgstr "La partie gauche de la règle (%s) apparaît déjà dans ces bases de connaissances:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:705
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "The right side of the rule (%s) already appears in these knowledge bases:"
-msgstr "apparaît déjà dans ces bases de connaissance"
+msgstr "La partie droite de la règle (%s) apparaît déjà dans ces bases de connaissances:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:719
 msgid "Please select action"
@@ -12000,19 +11934,17 @@ msgstr "Bases de Connaissances"
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:106
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:117
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:129
-#, fuzzy
 msgid "Cannot upload file"
-msgstr "Impossible de créer le format de sortie"
+msgstr "Impossible de charger le fichier"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:107
-#, fuzzy
 msgid "You have not selected a file to upload"
-msgstr "Sélectionnez un fichier à envoyer"
+msgstr "Vous n'avez pas sélectionné de fichier à envoyer"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:141
-#, fuzzy, python-format
+#, python-format
 msgid "File %s uploaded."
-msgstr "Fichier chargé"
+msgstr "Fichier %s chargé."
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:143
 msgid "File uploaded"
@@ -12155,19 +12087,18 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:267
 msgid "Fatal: Author ID capabilities are disabled on this system."
-msgstr ""
+msgstr "Erreur fatale: les fonctionnalités liées aux identifiants des auteurs sont désactivées sur ce système."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:270
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:313
-#, fuzzy
 msgid "Fatal: You are not allowed to access this functionality."
-msgstr "Vous n'êtes pas autorisé à accéder aux fonctions administratives."
+msgstr "Vous n'êtes pas autorisé à accéder à cette fonctionnalité."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:662
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:763
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:920
 msgid "Papers removed from this profile"
-msgstr ""
+msgstr "Articles supprimés de ce profil"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:663
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:667
@@ -12178,76 +12109,73 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:921
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:925
 msgid "Papers in need of review"
-msgstr ""
+msgstr "Articles en attente de vérification"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:664
-#, fuzzy
 msgid "Open Tickets"
-msgstr "Vos Tickets"
+msgstr "Tickets Ouverts"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:664
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:729
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:765
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:922
 msgid "Data"
-msgstr ""
+msgstr "Données"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:665
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:766
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:923
 msgid "Papers of this Person"
-msgstr ""
+msgstr "Articles de cette Personne"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:666
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:767
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:924
 msgid "Papers _not_ of this Person"
-msgstr ""
+msgstr "Articles _pas_ de cette Personne"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:668
 msgid "Tickets for this Person"
-msgstr ""
+msgstr "Tickets pour cette Personne"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:669
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:734
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:770
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:927
-#, fuzzy
 msgid "Additional Data for this Person"
-msgstr "Métriques de Citations Additionnelles"
+msgstr "Données Additionnelles pour cette Personne"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:671
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:735
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:771
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:947
 msgid "Sorry, there are currently no documents to be found in this category."
-msgstr ""
+msgstr "Désolé, il n'y a actuellement pas de documents dans cette catégorie."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:672
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:772
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:948
 msgid "Yes, those papers are by this person."
-msgstr ""
+msgstr "Oui, ces articles sont de cette personne."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:673
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:773
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:949
 msgid "No, those papers are not by this person"
-msgstr ""
+msgstr "Non, ces articles ne sont pas de cette personne"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:674
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:774
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:950
 msgid "Assign to other person"
-msgstr ""
+msgstr "Attribuer à une autre personne"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:675
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:739
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:775
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:951
-#, fuzzy
 msgid "Forget decision"
-msgstr "Prendre une décision"
+msgstr "Annuler la décision"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:676
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:690
@@ -12255,28 +12183,26 @@ msgstr "Prendre une décision"
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:790
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:952
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:966
-#, fuzzy
 msgid "Confirm!"
-msgstr "Confirmer"
+msgstr "Confirmer!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:677
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:777
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:953
 msgid "Yes, this paper is by this person."
-msgstr ""
+msgstr "Oui, cet article est de cette personne."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:678
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:778
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:954
-#, fuzzy
 msgid "Rejected!"
-msgstr "Rejeté"
+msgstr "Rejeté!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:679
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:779
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:955
 msgid "No, this paper is <i>not</i> by this person"
-msgstr ""
+msgstr "Non, cet article n'est <i>pas</i> de cette personne"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:680
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:688
@@ -12291,7 +12217,7 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:964
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:972
 msgid "Assign to another person"
-msgstr ""
+msgstr "Attribuer à une autre personne"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:681
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:689
@@ -12306,20 +12232,19 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:965
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:973
 msgid "To other person!"
-msgstr ""
+msgstr "À une autre personne!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:682
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:782
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:958
-#, fuzzy
 msgid "Confirmed."
-msgstr "Confirmer"
+msgstr "Confirmé."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:683
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:783
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:959
 msgid "Marked as this person's paper"
-msgstr ""
+msgstr "Marqué comme article de cette personne"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:684
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:692
@@ -12330,9 +12255,8 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:792
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:960
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:968
-#, fuzzy
 msgid "Forget decision!"
-msgstr "Prendre une décision"
+msgstr "Annuler la décision!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:685
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:693
@@ -12340,578 +12264,525 @@ msgstr "Prendre une décision"
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:793
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:961
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:969
-#, fuzzy
 msgid "Forget decision."
-msgstr "Prendre une décision"
+msgstr "Annuler la décision."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:686
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:786
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:962
 msgid "Repeal!"
-msgstr ""
+msgstr "Rejeter!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:687
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:787
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:963
 msgid "But it's <i>not</i> this person's paper."
-msgstr ""
+msgstr "Mais ce n'est <i>pas</i> un article de cette personne."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:691
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:791
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:967
 msgid "But it <i>is</i> this person's paper."
-msgstr ""
+msgstr "Mais <i>c'est</i> un article de cette personne."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:694
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:794
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:970
 msgid "Repealed"
-msgstr ""
+msgstr "Rejeté"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:695
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:795
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:971
 msgid "Marked as not this person's paper"
-msgstr ""
+msgstr "Marqué comme n'étant pas un article de cette personne"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:727
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:730
-#, fuzzy
 msgid "Your papers"
-msgstr "Vos alertes"
+msgstr "Vos articles"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:727
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:731
-#, fuzzy
 msgid "Not your papers"
-msgstr "Vous avez perdu votre mot de passe?"
+msgstr "Pas vos articles"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:736
-#, fuzzy
 msgid "These are mine!"
-msgstr "Il y a %i paniers"
+msgstr "Ce sont les miens!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:737
-#, fuzzy
 msgid "These are not mine!"
-msgstr "Il n'y a pas de prêt."
+msgstr "Ce ne sont pas les miens!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:738
 msgid "It's not mine, but I know whose it is!"
-msgstr ""
+msgstr "Ce n'est pas le mien, mais je sais de qui il est!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:740
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:754
 msgid "Mine!"
-msgstr ""
+msgstr "Le mien!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:741
 msgid "This is my paper!"
-msgstr ""
+msgstr "C'est mon article!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:742
-#, fuzzy
 msgid "Not mine!"
-msgstr "Non Spécifié"
+msgstr "Pas les miens!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:743
 msgid "This is not my paper!"
-msgstr ""
+msgstr "Ce n'est pas mon article!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:746
-#, fuzzy
 msgid "Not Mine."
-msgstr "Non Spécifié"
+msgstr "Pas les miens."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:747
 msgid "Marked as my paper!"
-msgstr ""
+msgstr "Marqué comme mon article!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:749
 msgid "Forget assignment decision"
-msgstr ""
+msgstr "Annuler la décision d'attribution"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:750
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:758
-#, fuzzy
 msgid "Not Mine!"
-msgstr "Non Spécifié"
+msgstr "Pas les miens!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:751
 msgid "But this is mine!"
-msgstr ""
+msgstr "Mais c'est le mien!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:755
 msgid "But this is my paper!"
-msgstr ""
+msgstr "Mais c'est mon article!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:759
 msgid "Marked as not your paper."
-msgstr ""
+msgstr "Marqué comme n'étant pas votre article."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:769
 msgid "Tickes you created about this person"
-msgstr ""
+msgstr "Ticket créés sur cette personne"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:922
-#, fuzzy
 msgid "Tickets"
-msgstr "tickets"
+msgstr "Tickets"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:926
-#, fuzzy
 msgid "Request Tickets"
-msgstr "Réservations"
+msgstr "Tickets/Requêtes"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:1178
-#, fuzzy
 msgid "Submit Attribution Information"
-msgstr "Imprimer informations du prêt"
+msgstr "Soumettre les informations d'attribution"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:1323
-#, fuzzy
 msgid "Please review your actions"
-msgstr "Veuillez choisir une action"
+msgstr "Passez en revue vos actions"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2008
-#, fuzzy
 msgid "Claim this paper"
-msgstr "ajouter cet utilisateur"
+msgstr "Revendiquer cet article"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2109
 msgid ""
 "<p>We're sorry. An error occurred while handling your request. Please find "
 "more information below:</p>"
-msgstr ""
+msgstr "<p>Désolé. Une erreur s'est produite lors du traitement de cette requête. Plus d'informations ci-dessous:</p>"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2187
 msgid "Person search for assignment in progress!"
-msgstr ""
+msgstr "Recherche en cours d'une personne pour attribution!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2188
-#, fuzzy
 msgid "You are searching for a person to assign the following papers:"
-msgstr "Vous êtes membre des groupes suivants:"
+msgstr "Vous recherchez une personne à qui attribuer les documents suivants:"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2349
 #, python-format
 msgid "You are going to claim papers for: %s"
-msgstr ""
+msgstr "Vous allez revendiquer les articles de: %s"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2377
 msgid "This page in not accessible directly."
-msgstr ""
+msgstr "Cette page n'est pas accessible directement."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2379
 msgid "Welcome!"
-msgstr ""
+msgstr "Bienvenue!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:153
 msgid "Click here to review the transactions."
-msgstr ""
+msgstr "Cliquez ici pour vérifier les transactions."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:196
-#, fuzzy
 msgid "Quit searching."
-msgstr "Exécuter la recherche"
+msgstr "Arrêter la recherche"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:417
-#, fuzzy
 msgid "You are about to attribute the following paper"
-msgstr "Vous êtes membre des groupes suivants:"
+msgstr "Vous êtes sur le point d'attribuer l'article suivant"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:439
 msgid "Info"
-msgstr ""
+msgstr "Info"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:451
 msgid " Search for a person to attribute the paper to"
-msgstr ""
+msgstr " Rechercher une personne à qui attribuer cet article"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:512
 #: modules/bibauthorid/lib/bibauthorid_templates.py:607
 #: modules/bibauthorid/lib/bibauthorid_templates.py:679
-#, fuzzy
 msgid "Select All"
-msgstr "Effacer tout"
+msgstr "Tout Sélectionner"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:513
 #: modules/bibauthorid/lib/bibauthorid_templates.py:608
 #: modules/bibauthorid/lib/bibauthorid_templates.py:680
-#, fuzzy
 msgid "Select None"
-msgstr "Choisir une action"
+msgstr "Tout Désélectionner"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:514
 #: modules/bibauthorid/lib/bibauthorid_templates.py:609
 #: modules/bibauthorid/lib/bibauthorid_templates.py:681
-#, fuzzy
 msgid "Invert Selection"
-msgstr "Sélection des relecteurs"
+msgstr "Inverser Sélection"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:516
 #: modules/bibauthorid/lib/bibauthorid_templates.py:611
 msgid "Hide successful claims"
-msgstr ""
+msgstr "Masquer les revendications réussies"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:576
-#, fuzzy
 msgid "No status information found."
-msgstr "Informations sur le prêt"
+msgstr "Aucun statut."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:598
 msgid "Operator review of user actions pending"
-msgstr ""
+msgstr "Revue des actions d'utilisateurs par les opérateurs en cours"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:642
 msgid "Sorry, there are currently no records to be found in this category."
-msgstr ""
+msgstr "Désolé, il n'y a actuellement pas de notice dans cette catégorie."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:671
-#, fuzzy
 msgid "Review Transaction"
-msgstr "Révision"
+msgstr "Examiner la transaction"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:678
-#, fuzzy
 msgid " On all pages: "
-msgstr "Annuler tous les changements"
+msgstr " Sur toutes les pages: "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:714
 msgid "Names variants:"
-msgstr ""
+msgstr "Variantes de noms:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:836
 msgid "These records have been marked as not being from this person."
-msgstr ""
+msgstr "Ces notices ont été marquées comme n'étant pas de cette personne."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:837
 msgid "They will be regarded in the next run of the author "
-msgstr ""
+msgstr "Elles seront considérées lors de la prochaine exécution "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:838
 msgid "disambiguation algorithm and might disappear from this listing."
-msgstr ""
+msgstr "la l'algorithme de désambiguation, et pourrait disparaître de cette liste."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:864
 #: modules/bibauthorid/lib/bibauthorid_templates.py:865
 #: modules/bibauthorid/lib/bibauthorid_templates.py:868
-#, fuzzy
 msgid "Not provided"
-msgstr "Pas encore évalué"
+msgstr "Non indiqué"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:866
-#, fuzzy
 msgid "Not available"
-msgstr "Aucun journal disponible"
+msgstr "Non disponible"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:867
-#, fuzzy
 msgid "No comments"
-msgstr "commentaires"
+msgstr "Aucun commentaire"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:869
-#, fuzzy
 msgid "Not Available"
-msgstr "Aucun information disponible"
+msgstr "Non Disponible"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:889
-#, fuzzy
 msgid " Delete this ticket"
-msgstr "Supprimer le panier"
+msgstr " Supprimer ce ticket"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:893
 msgid " Commit this entire ticket"
-msgstr ""
+msgstr " Commettre intégralement ce ticket"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:952
 msgid "... This tab is currently under construction ... "
-msgstr ""
+msgstr "... Cet onglet est actuellement en construction ... "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:973
 msgid ""
 "We could not reliably determine the name of the author on the records below "
 "to automatically perform an assignment."
-msgstr ""
+msgstr "Nous n'avons pas pu déterminer avec fiabilité le nom de l'auteur des notices ci-dessous pour effectuer une attribution automatique."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:975
 msgid "Please select an author for the records in question."
-msgstr ""
+msgstr "Veuillez sélectionner un auteur pour les notices en question."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:976
 msgid "Boxes not selected will be ignored in the process."
-msgstr ""
+msgstr "Les options non sélectionnées seront ignorées dans le processus."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:983
-#, fuzzy
 msgid "Select name for"
-msgstr "Choisir une note"
+msgstr "Choisir un nom pour"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:992
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1018
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1162
-#, fuzzy
 msgid "Error retrieving record title"
-msgstr "Erreur lors de l'accès à la notice"
+msgstr "Erreur lors de la récupération du titre de la notice"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:994
-#, fuzzy
 msgid "Paper title: "
-msgstr "Titre du périodique"
+msgstr "Titre de l'article: "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1006
-#, fuzzy
 msgid "The following names have been automatically chosen:"
-msgstr ""
-"Les fichiers suivants ont été placés dans la file d'attente avec succès:"
+msgstr "Les noms suivants ont été choisis automatiquement:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1021
 msgid " --  With name: "
-msgstr ""
+msgstr " --  Avec nom: "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1027
 msgid "Ignore"
-msgstr ""
+msgstr "Ignorer"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1076
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1092
-#, fuzzy
 msgid "Navigation:"
-msgstr "Citations:"
+msgstr "Navigation:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1077
 msgid "Run paper attribution for another author"
-msgstr ""
+msgstr "Attribuer les articles d'un autre auteur"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1078
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1095
-#, fuzzy
 msgid "Person Interface FAQ"
-msgstr "Interface de publication"
+msgstr "FAQ Interface des Personnes"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1093
-#, fuzzy
 msgid "Person Search"
-msgstr "Recherche"
+msgstr "Recherche de Personnes"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1094
-#, fuzzy
 msgid "Open tickets"
-msgstr "tickets"
+msgstr "Tickets ouverts"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1123
 msgid "Symbols legend: "
-msgstr ""
+msgstr "Légende des symboles: "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1128
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1186
 msgid "Everything is shiny, captain!"
-msgstr ""
+msgstr "Tout roule, capitaine!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1129
 msgid "The result of this request will be visible immediately"
-msgstr ""
+msgstr "La résultat de cette requête sera immédiatement visible"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1134
 msgid "Confirmation needed to continue"
-msgstr ""
+msgstr "Confirmation demandée pour continuer"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1135
 msgid ""
 "The result of this request will be visible immediately but we need your "
 "confirmation to do so for this paper have been manually claimed before"
-msgstr ""
+msgstr "Le résultat de cette requête sera visible immédiatement, mais nous avons besoin de votre confirmation puisque cet articles a été revendiqué auparavant"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1140
 msgid "This will create a change request for the operators"
-msgstr ""
+msgstr "Cela générera une requête de modification pour les opérateurs"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1141
 msgid ""
 "The result of this request will be visible upon confirmation through an "
 "operator"
-msgstr ""
+msgstr "Le résultat de cette requête sera visible après confirmation par un opérateur"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1179
-#, fuzzy
 msgid "Selected name on paper"
-msgstr "Choisir une note"
+msgstr "Nom sélectionné sur l'article"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1190
 msgid "Verification needed to continue"
-msgstr ""
+msgstr "Vérification demandée pour continuer"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1194
 msgid "This will create a request for the operators"
-msgstr ""
+msgstr "Cela générera une requête pour les opérateurs"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1216
 msgid "Please Check your entries"
-msgstr ""
+msgstr "Veuillez vérifier les valeurs fournies"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1216
-#, fuzzy
 msgid "Sorry."
-msgstr "Désolé"
+msgstr "Désolé."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1221
-#, fuzzy
 msgid "Please provide at least one transaction."
-msgstr "Identifiez-vous pour effectuer cette action."
+msgstr "Veuillez indiquer au moins une transaction."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1221
-#, fuzzy
 msgid "Error:"
-msgstr "Erreur"
+msgstr "Erreur:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1232
-#, fuzzy
 msgid "Please provide your information"
-msgstr "Informations nouveau fournisseur"
+msgstr "Veuillez indiquer vos informations personnelles"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1239
-#, fuzzy
 msgid "Please provide your first name"
-msgstr "Veuillez d'abord vous identifier."
+msgstr "Veuillez indiquer votre prénom"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1243
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1245
 msgid "Your first name:"
-msgstr ""
+msgstr "Votre prénom:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1251
 msgid "Please provide your last name"
-msgstr ""
+msgstr "Veuillez indiquer votre nom de famille"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1256
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1258
-#, fuzzy
 msgid "Your last name:"
-msgstr "Vos emprunts"
+msgstr "Votre nom de famille:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1266
 msgid "Please provide your eMail address"
-msgstr ""
+msgstr "Veuillez indiquer votre adresse email"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1272
 msgid ""
 "This eMail address is reserved by a user. Please log in or provide an "
 "alternative eMail address"
-msgstr ""
+msgstr "Cette adresse email est déjà allouée à quelqu'un. Connectez-vous ou indiquer une autre adresse email"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1277
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1279
-#, fuzzy
 msgid "Your eMail:"
-msgstr "Vos alertes"
+msgstr "Votre email:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1283
 msgid "You may leave a comment (optional)"
-msgstr ""
+msgstr "Vous pouvez laisser un commentaire (optionnel)"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1296
-#, fuzzy
 msgid "Continue claiming*"
-msgstr "Continuer quand même"
+msgstr "Continuer à revendiquer des articles*"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1298
 msgid "Confirm these changes**"
-msgstr ""
+msgstr "Confirmer ces changements**"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1301
-#, fuzzy
 msgid "!Delete the entire request!"
-msgstr "Effacer les évaluations sélectionnées"
+msgstr "!Effacer complètement la demande!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1314
-#, fuzzy
 msgid "Mark as your documents"
-msgstr "tous les types de documents"
+msgstr "Marquer comme étant vos documents"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1329
 msgid "Mark as _not_ your documents"
-msgstr ""
+msgstr "Marquer comme n'étant _pas_ vos documents"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1340
 msgid "Nothing staged as not yours"
-msgstr ""
+msgstr "Aucun marqué comme n'étant pas le votre"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1344
-#, fuzzy
 msgid "Mark as their documents"
-msgstr "Retout au document"
+msgstr "Marquez comme étant leurs documents"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1355
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1370
 msgid "Nothing staged in this category"
-msgstr ""
+msgstr "Aucun marqué dans cette categorie"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1359
-#, fuzzy
 msgid "Mark as _not_ their documents"
-msgstr "Retout au document"
+msgstr "Marquer comme n'étant _pas_ leurs documents"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1376
 msgid "  * You can come back to this page later. Nothing will be lost. <br />"
-msgstr ""
+msgstr "  * Vous pouvez revenir sur cette page plus tard. Rien ne sera perdu <br />"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1377
 msgid ""
 "  ** Performs all requested changes. Changes subject to permission "
 "restrictions will be submitted to an operator for manual review."
-msgstr ""
+msgstr "  ** Applique tous les changements demandés. Les changements sujets à des autorisations seront transmis à un opérateur pour vérification."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1433
 #, python-format
 msgid "We do not have a publication list for '%s'."
-msgstr ""
+msgstr "Nous n'avons pas de liste de publications pour '%s'."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1448
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1560
-#, fuzzy
 msgid "Create a new Person for your search"
-msgstr "Pas de résultat pour votre recherche"
+msgstr "Créer une nouvelle Personne pour votre recherche"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1503
-#, fuzzy
 msgid "Recent Papers"
-msgstr "Articles:"
+msgstr "Articles Récents"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1515
 msgid "YES!"
-msgstr ""
+msgstr "OUI!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1516
 msgid " Attribute Papers To "
-msgstr ""
+msgstr " Attribuer les articles à "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1522
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1544
-#, fuzzy
 msgid "Publication List "
-msgstr "Date de publication"
+msgstr "Liste de Publications "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1529
 msgid "Showing the"
-msgstr ""
+msgstr "Affichage des"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1529
-#, fuzzy
 msgid "most recent documents:"
-msgstr "Liste des documents relus"
+msgstr "plus récents documents:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1538
 msgid "Sorry, there are no documents known for this person"
-msgstr ""
+msgstr "Désolé, il n'y a pas de documents connus pour cette personne"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1540
 msgid ""
 "Information not shown to increase performances. Please refine your search."
-msgstr ""
+msgstr "Information non affichées pour des raisons de performance. Veuillez affiner votre recherche."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1648
 msgid "Correct my publication lists!"
-msgstr ""
+msgstr "Corriger ma liste de publications!"
 
 #~ msgid "No fulltext"
 #~ msgstr "Aucun fichier"
