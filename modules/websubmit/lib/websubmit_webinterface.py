@@ -341,7 +341,7 @@ def websubmit_legacy_getfile(req, form):
 
 # --------------------------------------------------
 
-from invenio.websubmit_engine import home, action, interface, endaction
+from invenio.websubmit_engine import home, action, interface, endaction, makeCataloguesTable
 
 class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
@@ -1339,19 +1339,6 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             if act:
                 auth_args['act'] = act
             uid = getUid(req)
-            (auth_code, auth_msg) = acc_authorize_action(uid, 'submit', authorized_if_no_roles=not isGuestUser(uid), **auth_args)
-            if auth_code > 0 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-                if isGuestUser(uid):
-                    return redirect_to_url(req, "%s/youraccount/login%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({'referer' : CFG_SITE_SECURE_URL + req.unparsed_uri, 'ln' : args['ln']}, {}))
-                                           , norobot=True)
-                else:
-                    return page_not_authorized(req, "../submit",
-                                               uid=uid,
-                                               text=auth_msg,
-                                               navmenuid='submit')
-
 
             if CFG_CERN_SITE:
                 ## HACK BEGIN: this is a hack for CMS and ATLAS draft
@@ -1367,9 +1354,22 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                                         navmenuid='submit')
             ## HACK END
 
-            if doctype=="":
-                return home(req,c,ln)
-            elif act=="":
+            if doctype == "":
+                catalogues_text, at_least_one_submission_authorized, submission_exists= makeCataloguesTable(req, ln=CFG_SITE_LANG)
+                if not at_least_one_submission_authorized and submission_exists:
+
+                    if isGuestUser(uid):
+                        return redirect_to_url(req, "%s/youraccount/login%s" % (
+                            CFG_SITE_SECURE_URL,
+                            make_canonical_urlargd({'referer' : CFG_SITE_SECURE_URL + req.unparsed_uri, 'ln' : args['ln']}, {}))
+                                            , norobot=True)
+                    else:
+
+                        return page_not_authorized(req, "../submit",
+                                                   uid=uid,
+                                                   navmenuid='submit')
+                return home(req,catalogues_text, c,ln)
+            elif act == "":
                 return action(req,c,ln,doctype)
             elif int(step)==0:
                 return interface(req, c, ln, doctype, act, startPg, access, mainmenu, fromdir, nextPg, nbPg, curpage)

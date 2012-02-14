@@ -41,9 +41,9 @@ from invenio.config import \
      CFG_DEVEL_SITE
 from invenio.dbquery import Error
 from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import acc_is_role
 from invenio.webpage import page, create_error_box
-from invenio.webuser import getUid, get_email, collect_user_info, isGuestUser
+from invenio.webuser import getUid, get_email, collect_user_info, isGuestUser, \
+                            page_not_authorized
 from invenio.websubmit_config import *
 from invenio.messages import gettext_set_language, wash_language
 from invenio.webstat import register_customevent
@@ -1154,7 +1154,7 @@ def endaction(req,
                 req = req,
                 navmenuid='submit')
 
-def home(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
+def home(req, catalogues_text, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
     """This function generates the WebSubmit "home page".
        Basically, this page contains a list of submission-collections
        in WebSubmit, and gives links to the various document-type
@@ -1162,6 +1162,7 @@ def home(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
        Document-types only appear on this page when they have been
        connected to a submission-collection in WebSubmit.
        @param req: (apache request object)
+       @param catalogues_text (string): the computed catalogues tree
        @param c: (string) - defaults to CFG_SITE_NAME
        @param ln: (string) - The Invenio interface language of choice.
         Defaults to CFG_SITE_LANG (the default language of the installation).
@@ -1179,7 +1180,7 @@ def home(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
 
     finaltext = websubmit_templates.tmpl_submit_home_page(
                     ln = ln,
-                    catalogues = makeCataloguesTable(req, ln)
+                    catalogues = catalogues_text
                 )
 
     return page(title=_("Submit"),
@@ -1201,11 +1202,20 @@ def makeCataloguesTable(req, ln=CFG_SITE_LANG):
         in order to decide whether to display a submission.
        @param ln: (string) - the language of the interface.
         (defaults to 'CFG_SITE_LANG').
-       @return: (string) - the submission-collections tree.
+       @return: (string, bool, bool) - the submission-collections tree.
+            True if there is at least one submission authorized for the user
+            True if there is at least one submission
     """
+    def is_at_least_one_submission_authorized(cats):
+        for cat in cats:
+            if cat['docs']:
+                return True
+            for son in cat['sons']:
+                if is_at_least_one_submission_authorized(son):
+                    return True
+        return False
     text = ""
     catalogues = []
-
     ## Get the submission-collections attached at the top level
     ## of the submission-collection tree:
     top_level_collctns = get_collection_children_of_submission_collection(0)
@@ -1214,14 +1224,16 @@ def makeCataloguesTable(req, ln=CFG_SITE_LANG):
         ## retrieve their details for displaying:
         for child_collctn in top_level_collctns:
             catalogues.append(getCatalogueBranch(child_collctn[0], 1, req))
-
         text = websubmit_templates.tmpl_submit_home_catalogs(
                  ln=ln,
-                 catalogs=catalogues
-               )
+                 catalogs=catalogues)
+        submissions_exist = True
+        at_least_one_submission_authorized = is_at_least_one_submission_authorized(catalogues)
     else:
         text = websubmit_templates.tmpl_submit_home_catalog_no_content(ln=ln)
-    return text
+        submissions_exist = False
+        at_least_one_submission_authorized = False
+    return text, at_least_one_submission_authorized, submissions_exist
 
 def getCatalogueBranch(id_father, level, req):
     """Build up a given branch of the submission-collection
@@ -1387,7 +1399,6 @@ def action(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, doctype=""):
         nbCateg = nbCateg+1
         snameCateg.append(doctype_categ[0])
         lnameCateg.append(doctype_categ[1])
-
     ## Now get the details of the document type:
     doctype_details = get_doctype_details(doctype)
     if doctype_details is None:
@@ -1416,6 +1427,12 @@ def action(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, doctype=""):
             indir.append(action_details[1])
             actionbutton.append(action_details[4])
             statustext.append(action_details[5])
+
+    if not snameCateg and not actionShortDesc:
+        return page_not_authorized(req, "../submit",
+                                   uid=uid,
+                                   navmenuid='submit')
+
 
     ## Send the gathered information to the template so that the doctype's
     ## home-page can be displayed:
