@@ -169,6 +169,7 @@ img_DATA = add-small.png \
            refresh.png \
            replace.png \
            restricted.gif \
+           rightarrow.gif \
            right-part-topless-trans.gif \
            right-part-trans.gif \
            right-trans.gif \

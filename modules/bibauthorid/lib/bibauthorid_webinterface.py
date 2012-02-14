@@ -63,7 +63,6 @@ from invenio.bibedit_utils import get_bibrecord
 from invenio.bibrecord import record_get_field_value, record_get_field_values, \
                               record_get_field_instances, field_get_subfield_values
 
-
 TEMPLATE = load('bibauthorid')
 
 class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
@@ -2461,7 +2460,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             recids = perform_request_search(p="001:%s" % argd['IRN'], cc="HepNames")
         else:
             redirect_to_url(req, "%s/collection/HepNames" % (CFG_SITE_URL))
-
         if not recids:
             redirect_to_url(req, "%s/collection/HepNames" % (CFG_SITE_URL))
         else:
