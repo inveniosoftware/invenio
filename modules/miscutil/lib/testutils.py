@@ -29,7 +29,9 @@ import os
 import sys
 import time
 import unittest
+import cgi
 
+from urlparse import urlsplit, urlunsplit
 from urllib import urlencode
 from itertools import chain, repeat
 
@@ -42,7 +44,7 @@ except ImportError:
 
 import invenio
 from invenio.config import CFG_SITE_URL, \
-     CFG_SITE_SECURE_URL, CFG_LOGDIR
+     CFG_SITE_SECURE_URL, CFG_LOGDIR, CFG_SITE_NAME_INTL
 from invenio.w3c_validator import w3c_validate, w3c_errors_to_str, \
      CFG_TESTS_REQUIRE_HTML_VALIDATION
 
@@ -400,8 +402,14 @@ class InvenioWebTestCase(unittest.TestCase):
     def setUp(self):
         """Initialization before tests."""
 
+        ## Let's default to English locale
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference('intl.accept_languages', 'en-us, en')
+        profile.update_preferences()
+
         # the instance of Firefox WebDriver is created
-        self.browser = webdriver.Firefox()
+        self.browser = webdriver.Firefox(profile)
+
         # list of errors
         self.errors = []
 
@@ -542,14 +550,16 @@ class InvenioWebTestCase(unittest.TestCase):
         except:
             raise InvenioWebTestCaseException(element="page source")
 
-    def login(self, username="guest", password=""):
+    def login(self, username="guest", password="", force_ln='en'):
         """ Login function
         @param username: the username (nickname or email)
         @type username: string
         @param password: the corresponding password
         @type password: string
+        @param force_ln: if the arrival page doesn't use the corresponding
+            language, then the browser will redirect to it.
+        @type force_ln: string
         """
-
         if not "You can use your nickname or your email address to login." in self.browser.page_source:
             if "You are no longer recognized by our system" in self.browser.page_source:
                 self.find_element_by_link_text_with_timeout("login here")
@@ -566,6 +576,13 @@ class InvenioWebTestCase(unittest.TestCase):
         self.fill_textbox(textbox_name="p_pw",  text=password)
         self.find_element_by_name_with_timeout("action")
         self.browser.find_element_by_name("action").click()
+        if force_ln and CFG_SITE_NAME_INTL[force_ln] not in self.browser.page_source:
+            splitted_url = list(urlsplit(self.browser.current_url))
+            query = cgi.parse_qs(splitted_url[3])
+            query.update({u'ln': unicode(force_ln)})
+            splitted_url[3] = urlencode(query)
+            new_url = urlunsplit(splitted_url)
+            self.browser.get(new_url)
 
     def logout(self):
         """ Logout function
