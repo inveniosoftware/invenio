@@ -25,6 +25,7 @@ import unittest
 import sys
 import zlib
 import os
+import re
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -36,6 +37,19 @@ from invenio.testutils import make_test_suite, run_test_suite
 from invenio.config import CFG_TMPDIR
 
 CFG_INTBITSET_BIG_EXAMPLE = open(os.path.join(CFG_TMPDIR, "intbitset_example.int")).read()
+
+def _check_enough_ram():
+    """
+    Return if there is enough RAM, i.e. if free outputs more than 1G of ram.
+    """
+    from invenio.shellutils import run_shell_command
+    try:
+        return int(re.sub(r'\s+', ' ', run_shell_command("free")[1].splitlines()[1]).split(' ')[1]) > 1024 * 1024
+    except:
+        ## Are we on Linux?
+        return False
+
+CFG_ENOUGH_RAM = _check_enough_ram()
 
 class IntBitSetTest(unittest.TestCase):
     """Test functions related to intbitset data structure."""
@@ -355,10 +369,14 @@ class IntBitSetTest(unittest.TestCase):
 
     def test_set_repr(self):
         """intbitset - Pythonic representation"""
-        for set1 in self.sets + [[]] + self.big_examples:
+        if CFG_ENOUGH_RAM:
+            big_examples = self.big_examples
+        else:
+            big_examples = []
+        for set1 in self.sets + [[]] + big_examples:
             intbitset1 = intbitset(set1)
             self.assertEqual(intbitset1, eval(repr(intbitset1)))
-        for set1 in self.sets + [[]] + self.big_examples:
+        for set1 in self.sets + [[]] + big_examples:
             intbitset1 = intbitset(set1, trailing_bits=True)
             self.assertEqual(intbitset1, eval(repr(intbitset1)))
 
