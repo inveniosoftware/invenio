@@ -148,6 +148,7 @@ class InvenioSession(dict):
             self._created = time.time()
             self._timeout = CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT * \
                 CFG_WEBSESSION_ONE_DAY
+            add_cookies(self._req, self.make_cookies())
 
         self._accessed = time.time()
 
