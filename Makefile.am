@@ -542,9 +542,13 @@ update-v1.0.0-rc0-tables: # from v1.0.0-rc0 to next release
 	echo "UPDATE oaiREPOSITORY SET setSpec='GLOBAL_SET' WHERE setSpec='';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE user_query_basket ADD COLUMN alert_desc TEXT DEFAULT NULL AFTER alert_name;" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Link_Records','Link two records toghether via MARC');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Video_Processing',NULL);" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Link_Records','edsrn');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Link_Records','edsrn2');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Link_Records','directRelationship');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Link_Records','reverseRelationship');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','aspect');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','batch_template');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','title');" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~ *.pyc *.tmp
