@@ -766,7 +766,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                                  'confirmed_ns': _('Papers of this Person'),
                                  'repealed_ns': _('Papers _not_ of this Person'),
                                  'review_ns': _('Papers in need of review'),
-                                 'tickets_ns': _('Tickes you created about this person'),
+                                 'tickets_ns': _('Tickets you created about this person'),
                                  'data_ns': _('Additional Data for this Person')}
             buttons_verbiage_dict = {'mass_buttons': {'no_doc_string': _('Sorry, there are currently no documents to be found in this category.'),
                                                   'b_confirm': _('Yes, those papers are by this person.'),
