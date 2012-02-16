@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: Invenio 1.0.0-rc0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2011-12-19 22:09+0100\n"
-"PO-Revision-Date: 2012-02-16 11:33+0100\n"
+"PO-Revision-Date: 2012-02-16 17:24+0100\n"
 "Last-Translator: Cornelia Plott <c.plott@fz-juelich.de>\n"
 "Language-Team: DE <info@invenio-software.org>\n"
 "Language: \n"
@@ -2670,7 +2670,7 @@ msgid "Run Person/Author Manager"
 msgstr "Person/Author Manager ausführen"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3703
-#, python-format
+#, python-format, fuzzy
 msgid "Your account on '%s' has been activated"
 msgstr "Ihr Konto wurde erfolgreich aktiviert."
 
@@ -3425,9 +3425,7 @@ msgstr "Öffentliche Körbe"
 msgid ""
 "You have %(x_nb_perso)s personal baskets and are subscribed to "
 "%(x_nb_group)s group baskets and %(x_nb_public)s other users public baskets."
-msgstr ""
-"Sie haben %(x_nb_perso)s persönliche Körbe und sind eingetragen bei "
-"%(x_nb_perso)s Gruppenkörben und %(x_nb_public)s Körben anderer Nutzer."
+msgstr "Sie haben %(x_nb_perso)s persönliche Körbe und sind eingetragen bei %(x_nb_group)s Gruppenkörben und %(x_nb_public)s Körben anderer Nutzer."
 
 #: modules/webbasket/lib/webbasket.py:2629
 #: modules/webbasket/lib/webbasket.py:2667
@@ -3556,9 +3554,7 @@ msgstr "Es ist zur Zeit kein Korb öffentlich zugänglich"
 msgid ""
 "Displaying public baskets %(x_from)i - %(x_to)i out of "
 "%(x_total_public_basket)i public baskets in total."
-msgstr ""
-"Es werden %(x_nb_begin)i bis %(x_nb_end)i öffentliche Körbe angezeigt von "
-"insgesamt %(x_nb_total)i öffentlichen Körben."
+msgstr "Es werden %(x_from)i bis %(x_to)i öffentliche Körbe angezeigt von insgesamt %(x_total_public_basket)i öffentlichen Körben."
 
 #: modules/webbasket/lib/webbasket_templates.py:1044
 #: modules/webbasket/lib/webbasket_templates.py:1068
@@ -4437,8 +4433,7 @@ msgstr "Rezensiert von %(x_nickname)s am %(x_date)s"
 #: modules/webcomment/lib/webcomment_templates.py:488
 #, python-format
 msgid "%(x_nb_people)s out of %(x_nb_total)s people found this review useful"
-msgstr ""
-"%(x_nb_people)i von %(x_nb_total)i haben dieses Review nützlich gefunden"
+msgstr "%(x_nb_people)s von %(x_nb_total)s haben dieses Review nützlich gefunden"
 
 #: modules/webcomment/lib/webcomment_templates.py:510
 msgid "Undelete review"
@@ -5251,7 +5246,7 @@ msgstr "Sind Sie sicher dass Sie die gesamte Nachrichten-Box löschen wollen?"
 #: modules/webmessage/lib/webmessage_templates.py:582
 #, python-format
 msgid "Quota used: %(x_nb_used)i messages out of max. %(x_nb_total)i"
-msgstr "Platz genutzt: %i Nachrichten von maximal %i"
+msgstr "Platz genutzt: %(x_nb_used)i Nachrichten von maximal %(x_nb_total)i"
 
 #: modules/webmessage/lib/webmessage_templates.py:600
 msgid "Please select one or more:"
@@ -5468,9 +5463,7 @@ msgstr "Es steht kein Phrasen-Index zur Verfügung für %s."
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
 "Nearest terms in any collection are:"
-msgstr ""
-"Zu Suchbegriff %(x_term)s im Index %(x_index) wurden keine passenden "
-"Datensätze gefunden. Die ähnlichsten Begriffe in allen Sammlungen sind:"
+msgstr "Zu Suchbegriff %(x_term)s im Index %(x_index)s wurden keine passenden Datensätze gefunden. Die ähnlichsten Begriffe in allen Sammlungen sind:"
 
 #: modules/websearch/lib/search_engine.py:2771
 #, python-format
@@ -5694,7 +5687,7 @@ msgstr "Letzte Einträge:"
 #: modules/websearch/lib/websearch_templates.py:3361
 #, python-format
 msgid "Cited by %i records"
-msgstr "Zitiert von %s Datensätzen"
+msgstr "Zitiert von %i Datensätzen"
 
 #: modules/websearch/lib/websearch_templates.py:1692
 #, python-format
@@ -6324,10 +6317,7 @@ msgid ""
 "If you have lost the password for your %(sitename)s %(x_fmt_open)sinternal "
 "account%(x_fmt_close)s, then please enter your email address in the "
 "following form in order to have a password reset link emailed to you."
-msgstr ""
-"Wenn Sie Ihr Passwort für das %(sitename)s (x_fmt_open)sBenutzerkonto"
-"%(x_fmt_close)s vergessen haben, geben Sie bitte Ihre E-Mail-Adresse ein und "
-"ein Link zum Neusetzen des Passworts wird Ihnen zugeschickt."
+msgstr "Wenn Sie Ihr Passwort für das %(sitename)s %(x_fmt_open)sBenutzerkonto%(x_fmt_close)s vergessen haben, geben Sie bitte Ihre E-Mail-Adresse ein und ein Link zum Neusetzen des Passworts wird Ihnen zugeschickt."
 
 #: modules/websession/lib/websession_templates.py:403
 #: modules/websession/lib/websession_templates.py:1033
@@ -6731,7 +6721,7 @@ msgid "You are not authorized to access administrative functions."
 msgstr "Sie sind nicht berechtigt, Administrationsfunktionen zu benützen."
 
 #: modules/websession/lib/websession_templates.py:1082
-#, python-format
+#, python-format, fuzzy
 msgid "You are enabled to the following roles: %(x_role)s."
 msgstr "Sie haben für folgende Rollen keine Berechtigung:"
 
