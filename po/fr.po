@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: Invenio 1.0.0-rc0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2011-12-19 22:09+0100\n"
-"PO-Revision-Date: 2012-02-14 15:59+0100\n"
+"PO-Revision-Date: 2012-02-16 14:04+0100\n"
 "Last-Translator: Jérôme Caffaro <jerome.caffaro@cern.ch>\n"
 "Language-Team: FR <info@invenio-software.org>\n"
 "Language: \n"
@@ -5928,7 +5928,7 @@ msgstr "Aucun co-auteur fréquent"
 
 #: modules/websearch/lib/websearch_templates.py:4291
 msgid "This is me.  Verify my publication list."
-msgstr "Je suis cette personne. Vérifier ma liste de publication."
+msgstr "Je suis cette personne. Vérifier ma liste de publications."
 
 #: modules/websearch/lib/websearch_templates.py:4330
 msgid "Citations:"
@@ -12608,7 +12608,7 @@ msgstr "Confirmation demandée pour continuer"
 msgid ""
 "The result of this request will be visible immediately but we need your "
 "confirmation to do so for this paper have been manually claimed before"
-msgstr "Le résultat de cette requête sera visible immédiatement, mais nous avons besoin de votre confirmation puisque cet articles a été revendiqué auparavant"
+msgstr "Le résultat de cette requête sera visible immédiatement, mais nous avons besoin de votre confirmation puisque cet articles a été revendiqués auparavant"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1140
 msgid "This will create a change request for the operators"
