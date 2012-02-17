@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,23 +19,12 @@
 
 """WebSearch module web tests."""
 
-import unittest
-from selenium import webdriver
-
 from invenio.config import CFG_SITE_URL
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import InvenioWebTestCase, make_test_suite, run_test_suite
 
 
-class InvenioWebSearchWebTests(unittest.TestCase):
+class InvenioWebSearchWebTests(InvenioWebTestCase):
     """WebSearch web tests."""
-
-    def setUp(self):
-        """Set up for tests."""
-        self.browser = webdriver.Firefox()
-
-    def tearDown(self):
-        """Clean after tests."""
-        self.browser.quit()
 
     def test_search_ellis(self):
         """websearch - web test search for ellis"""
@@ -43,9 +32,9 @@ class InvenioWebSearchWebTests(unittest.TestCase):
         p = self.browser.find_element_by_name("p")
         p.send_keys("ellis")
         p.submit()
-        page_source = self.browser.page_source
-        self.assertTrue('Thermal conductivity of dense quark matter ' \
-                        'and cooling of stars' in page_source)
+        self.page_source_test(expected_text=[
+            'Thermal conductivity of dense quark matter ' + \
+            'and cooling of stars'])
 
 
 TEST_SUITE = make_test_suite(InvenioWebSearchWebTests, )
