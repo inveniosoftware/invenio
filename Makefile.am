@@ -148,29 +148,25 @@ install-jquery-plugins: install-jquery-plugins
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.slider.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.sortable.min.js && \
 	wget http://www.appelsiini.net/download/jquery.jeditable.mini.js && \
-	wget http://github.com/malsup/form/raw/master/jquery.form.js --no-check-certificate && \
+	wget https://raw.github.com/malsup/form/master/jquery.form.js --no-check-certificate && \
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
-	wget http://plugins.jquery.com/files/jquery.autogrow-1.2.2.zip && \
-	wget http://tablesorter.com/jquery.tablesorter.zip && \
-	wget http://www.uploadify.com/wp-content/uploads/Uploadify-v2.1.3.zip -O uploadify.zip && \
+	wget https://raw.github.com/akaihola/jquery-autogrow/master/jquery.autogrow.js --no-check-certificate && \
+	wget http://autobahn.tablesorter.com/jquery.tablesorter.zip && \
+	wget http://www.uploadify.com/wp-content/uploads/uploadify-v2.1.4.zip -O uploadify.zip && \
 	unzip jquery.tablesorter.zip && \
 	rm jquery.tablesorter.zip && \
-	unzip -u uploadify.zip && \
-	mv -T jquery.uploadify-v2.1.3 uploadify && \
+	unzip -u uploadify.zip -d uploadify && \
 	mv uploadify/swfobject.js ./ && \
 	mv uploadify/cancel.png uploadify/uploadify.css uploadify/uploadify.allglyphs.swf uploadify/uploadify.fla uploadify/uploadify.swf ../img/ && \
-	mv uploadify/jquery.uploadify.v2.1.3.min.js ./jquery.uploadify.min.js && \
+	mv uploadify/jquery.uploadify.v2.1.4.min.js ./jquery.uploadify.min.js && \
 	rm uploadify.zip && rm -r uploadify && \
-	unzip jquery.autogrow-1.2.2.zip jquery.autogrow.js && \
-	rm jquery.autogrow-1.2.2.zip && \
 	wget --no-check-certificate https://github.com/douglascrockford/JSON-js/raw/master/json2.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.datepicker.min.js && \
 	wget -O jquery.hotkeys.min.js http://js-hotkeys.googlecode.com/files/jquery.hotkeys-0.7.8-packed.js && \
-	wget http://plugins.jquery.com/files/jquery.treeview_3.zip && \
-	unzip jquery.treeview_3.zip && \
-	rm jquery.treeview_3.zip && \
-	wget http://plugins.jquery.com/files/jquery.ajaxPager.js_5.txt && \
-	mv jquery.ajaxPager.js_5.txt jquery.ajaxPager.js && \
+	wget http://jquery.bassistance.de/treeview/jquery.treeview.zip && \
+	unzip jquery.treeview.zip -d jquery-treeview && \
+	rm jquery.treeview.zip && \
+	wget http://invenio-software.org/download/jquery/v1.5/js/jquery.ajaxPager.js && \
 	wget http://jqueryui.com/download/jquery-ui-1.7.3.custom.zip && \
 	unzip jquery-ui-1.7.3.custom.zip development-bundle/ui/ui.core.js && \
 	mv development-bundle/ui/ui.core.js ui.core.js && \
