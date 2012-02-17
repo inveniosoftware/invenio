@@ -10430,10 +10430,10 @@ class Template:
                        _("Address"), address,
                        _("Mailbox"), mailbox,
                        _("ILL request details"),
-                       _("Period of interest - From"), _("period_of_interest_from"),
-                       _("jsCal3"), _("period_of_interest_from"), _("jsCal3"),
-                       _("Period of interest - To"), _("period_of_interest_to"),
-                       _("jsCal4"), _("period_of_interest_to"), _("jsCal4"),
+                       _("Period of interest - From"), "period_of_interest_from",
+                       "jsCal3", "period_of_interest_from", "jsCal3",
+                       _("Period of interest - To"), "period_of_interest_to",
+                       "jsCal4", "period_of_interest_to", "jsCal4",
                        _("Additional comments"),
                        _("Borrower wants only this edition?"))
 
@@ -11007,9 +11007,9 @@ class Template:
              <br />
              <br />
              </div>
-             """ % (_("ILL request details"), _("Period of interest - From"), _("period_of_interest_from"),
-                    _("jsCal1"), _("period_of_interest_from"), _("jsCal1"),
-                    _("Period of interest - To"), _("period_of_interest_to"), _("jsCal2"), _("period_of_interest_to"), _("jsCal2"),
+             """ % (_("ILL request details"), _("Period of interest - From"), "period_of_interest_from",
+                    "jsCal1", "period_of_interest_from", "jsCal1",
+                    _("Period of interest - To"), "period_of_interest_to", "jsCal2", "period_of_interest_to", "jsCal2",
                     _("Additional comments"),
                     _("I accept the %s of the service in particular the return of books in due time." % (conditions_link)),
                     _("I want this edition only."),
@@ -15934,10 +15934,10 @@ class Template:
              <br />
              </div>
              """ % (_("ILL request details"), _("Period of interest - From"),
-                    _("period_of_interest_from"),
-                    _("jsCal1"), _("period_of_interest_from"), _("jsCal1"),
-                    _("Period of interest - To"), _("period_of_interest_to"),
-                    _("jsCal2"), _("period_of_interest_to"), _("jsCal2"),
+                    "period_of_interest_from",
+                    "jsCal1", "period_of_interest_from", "jsCal1",
+                    _("Period of interest - To"), "period_of_interest_to",
+                    "jsCal2", "period_of_interest_to", "jsCal2",
                     _("Additional comments"),
                     _("Borrower accepts the %s of the service in particular the return of books in due time." % (conditions_link)),
                     _("Borrower wants this edition only."),
@@ -16604,7 +16604,7 @@ class Template:
             </tr>
         </table>
 
-        """ % (CFG_SITE_URL,_("the beginning"),CFG_SITE_URL,_("now"))
+        """ % (CFG_SITE_URL, "the beginning", CFG_SITE_URL, "now")
 
         out += """
         <br />
