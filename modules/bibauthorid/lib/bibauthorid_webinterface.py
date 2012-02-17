@@ -1136,13 +1136,13 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                             except IndexError:
                                 continue # No bibrefs on record--discard
 
-                            if not pid in bibrefs_to_confirm:
-                                bibrefs_to_confirm[pid] = {
-                                    'person_name': person_name,
-                                    'canonical_id': "TBA",
-                                    'bibrecs': {brr[0]: brr[1]}}
-                            else:
-                                bibrefs_to_confirm[pid]['bibrecs'][brr[0]] = brr[1]
+                        if not pid in bibrefs_to_confirm:
+                            bibrefs_to_confirm[pid] = {
+                                'person_name': person_name,
+                                'canonical_id': "TBA",
+                                'bibrecs': {brr[0]: brr[1]}}
+                        else:
+                            bibrefs_to_confirm[pid]['bibrecs'][brr[0]] = brr[1]
 
             if bibrefs_to_confirm or bibrefs_auto_assigned:
                 pinfo["bibref_check_required"] = True
