@@ -219,7 +219,7 @@ class InvenioSession(dict):
         """
         Save the session to the database.
         """
-        if not self._invalid:
+        if not self._invalid and self._sid:
             session_dict = {"_data" : self.copy(),
                     "_created" : self._created,
                     "_accessed": self._accessed,
@@ -397,6 +397,7 @@ class InvenioSession(dict):
         self._req.log_error("InvenioSession: registered database cleanup.")
 
     def __del__(self):
+        self.save()
         self.unlock()
 
     def get_need_https(self):

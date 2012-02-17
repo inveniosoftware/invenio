@@ -185,7 +185,11 @@ def getUid(req):
     if CFG_ACCESS_CONTROL_LEVEL_SITE == 2: return -1
 
     guest = 0
-    session = get_session(req)
+    try:
+        session = get_session(req)
+    except Exception:
+        ## Not possible to obtain a session
+        return 0
     uid = session.get('uid', -1)
     if uid == -1: # first time, so create a guest user
         if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
