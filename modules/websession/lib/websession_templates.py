@@ -1238,7 +1238,7 @@ class Template:
 
         out = '''<div class="hassubmenu%(on)s">
         <a hreflang="en" class="header%(selected)s" href="%(CFG_SITE_SECURE_URL)s/youraccount/display?ln=%(ln)s">%(personalize)s</a>
-        <ul class="subsubmenu" style="width: 13em;">''' % {
+        <ul class="subsubmenu">''' % {
                 'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
                 'ln' : ln,
                 'personalize': _("Personalize"),
@@ -1347,7 +1347,7 @@ class Template:
         if activities:
             out += '''<div class="hassubmenu%(on)s">
             <a hreflang="en" class="header%(selected)s" href="%(CFG_SITE_SECURE_URL)s/youraccount/youradminactivities?ln=%(ln)s">%(admin)s</a>
-            <ul class="subsubmenu" style="width: 19em;">''' % {
+            <ul class="subsubmenu">''' % {
             'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
             'ln' : ln,
             'admin': _("Administration"),

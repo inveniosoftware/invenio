@@ -1,0 +1,18 @@
+.hassubmenu {
+    z-index: 100000;
+}
+
+#bibcircmenu {
+    z-index: 1000;
+}
+
+#bibcircmenu li ul.subsubmenu li {
+    margin: -3px 0;
+    color: #000;
+    z-index: 1000;
+}
+
+ul.subsubmenu {
+    width: 30em;
+    z-index: 2000;
+}
