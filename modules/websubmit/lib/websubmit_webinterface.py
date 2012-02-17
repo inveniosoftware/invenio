@@ -347,7 +347,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
     _exports = ['summary', 'sub', 'direct', '', 'attachfile', 'uploadfile', \
                 'getuploadedfile', 'managedocfiles', 'managedocfilesasync', \
-                'upload_video']
+                'upload_video', ('continue', 'continue_')]
 
     def managedocfiles(self, req, form):
         """
@@ -1170,6 +1170,31 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
         # Send error 404 in all other cases
         return(apache.HTTP_NOT_FOUND)
+
+    def continue_(self, req, form):
+        """
+        Continue an interrupted submission.
+        """
+        args = wash_urlargd(form, {'access': (str, ''), 'doctype': (str, '')})
+        ln = args['ln']
+
+        _ = gettext_set_language(ln)
+
+        access = args['access']
+        doctype = args['doctype']
+        if not access or not doctype:
+            return warningMsg(_("Sorry, invalid arguments"), req=req, ln=ln)
+        user_info = collect_user_info(req)
+        email = user_info['email']
+        res = run_sql("SELECT action, status FROM sbmSUBMISSIONS WHERE id=%s AND email=%s and doctype=%s", (access, email, doctype))
+        if res:
+            action, status = res[0]
+            if status == 'finished':
+                return warningMsg(_("Note: the requested submission has already been completed"), req=req, ln=ln)
+            redirect_to_url(req, CFG_SITE_SECURE_URL + '/submit/direct?' + urlencode({
+                'sub': action + doctype,
+                'access': access}))
+        return warningMsg(_("Sorry, you don't seem to have initiated a submission with the provided access number"), req=req, ln=ln)
 
     def direct(self, req, form):
         """Directly redirected to an initialized submission."""

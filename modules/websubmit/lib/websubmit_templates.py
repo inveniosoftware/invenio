@@ -359,11 +359,11 @@ class Template:
                 </tr>
                 </table>
                 </form>
-                <form action="/submit"><hr />
+                <form action="/submit/continue"><hr />
                   <font color="black"><small>%(continue_explain)s</small></font>
                   <table border="0" bgcolor="#CCCCCC" width="100%%"><tr>
                     <td width="100%%">
-                    <small>Access Number: <input size="15" name="AN" />
+                    <small>Access Number: <input size="15" name="access" />
                       <input type="hidden" name="doctype" value="%(doctype)s" />
                       <input type="hidden" name="ln" value="%(ln)s" />
                       <input class="adminbutton" type="submit" value=" %(go)s " />
