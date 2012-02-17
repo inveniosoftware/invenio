@@ -209,6 +209,8 @@ uninstall-jquery-plugins:
 	@echo "** The jquery plugins were successfully uninstalled.     **"
 	@echo "***********************************************************"
 
+install-ckeditor-plugin: install-fckeditor-plugin
+
 install-fckeditor-plugin:
 	@echo "***********************************************************"
 	@echo "** Installing FCKeditor plugin, please wait...           **"
