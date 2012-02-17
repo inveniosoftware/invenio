@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -46,7 +46,7 @@ class GetDefaultsTest(unittest.TestCase):
         sdir = None
         sdir_should_be = os.path.join(CFG_TMPDIR, self.arXiv_id + '_plots')
 
-        sdir, refno = get_defaults(self.tarball, sdir, "http://inspirebeta.net")
+        sdir, refno = get_defaults(self.tarball, sdir, "http://inspirehep.net")
         if sdir != None:
             run_shell_command("rm -rf %s" % (sdir,))
         self.assertTrue(sdir == sdir_should_be, \
