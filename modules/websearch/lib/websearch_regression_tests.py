@@ -1344,7 +1344,7 @@ class WebSearchSortResultsTest(unittest.TestCase):
         """websearch - search results sorting, default method"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=of&f=title&rg=1',
-                                               expected_text="[TESLA-FEL-99-07]"))
+                                               expected_text="CMS animation of the high-energy collisions"))
 
     def test_sort_results_ascending(self):
         """websearch - search results sorting, ascending field"""

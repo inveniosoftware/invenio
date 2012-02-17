@@ -27,7 +27,7 @@
 						<BFE_TITLE prefix="" suffix="" default="" escape="" highlight="no" separator=" "/>
 					</div>
 					<div class="video_content_author">
-						by <BFE_AUTHORS prefix="" suffix="" default="" escape="" affiliation_suffix=")" extension="[...]" link_author_pages="no" limit="" print_links="yes" separator=" ; " print_affiliations="no" highlight="no" interactive="no" affiliation_prefix=" ("/>
+						by <BFE_AUTHORS prefix="" suffix="" default="" escape="" affiliation_suffix=")" extension="[...]" link_author_pages="no" limit="" print_links="yes" separator=" ; " print_affiliations="no" highlight="no" interactive="no" affiliation_prefix=" ("/> <BFE_COPYRIGHT />
 					</div>
 					<div class="video_content_description">
 						<BFE_ABSTRACT />

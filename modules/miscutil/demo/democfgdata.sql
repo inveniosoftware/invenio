@@ -29,12 +29,12 @@ INSERT INTO user_usergroup VALUES (5,2,'A',NOW());
 INSERT INTO user_usergroup VALUES (6,2,'M',NOW());
 INSERT INTO user_usergroup VALUES (7,2,'M',NOW());
 
-INSERT INTO collection VALUES (2,'Preprints','collection:PREPRINT',NULL,NULL);
-INSERT INTO collection VALUES (3,'Books','collection:BOOK',NULL,NULL);
-INSERT INTO collection VALUES (4,'Theses','collection:THESIS',NULL,NULL);
-INSERT INTO collection VALUES (5,'Reports','collection:REPORT',NULL,NULL);
-INSERT INTO collection VALUES (6,'Articles','collection:ARTICLE',NULL,NULL);
-INSERT INTO collection VALUES (8,'Pictures','collection:PICTURE',NULL,NULL);
+INSERT INTO collection VALUES (2,'Preprints','980:"PREPRINT"',NULL,NULL);
+INSERT INTO collection VALUES (3,'Books','980:"BOOK"',NULL,NULL);
+INSERT INTO collection VALUES (4,'Theses','980:"THESIS"',NULL,NULL);
+INSERT INTO collection VALUES (5,'Reports','980:"REPORT"',NULL,NULL);
+INSERT INTO collection VALUES (6,'Articles','980:"ARTICLE"',NULL,NULL);
+INSERT INTO collection VALUES (8,'Pictures','980:"PICTURE"',NULL,NULL);
 INSERT INTO collection VALUES (9,'CERN Divisions',NULL,NULL,NULL);
 INSERT INTO collection VALUES (10,'CERN Experiments',NULL,NULL,NULL);
 INSERT INTO collection VALUES (11,'Theoretical Physics (TH)','division:TH',NULL,NULL);
@@ -44,14 +44,15 @@ INSERT INTO collection VALUES (14,'ALEPH','experiment:ALEPH',NULL,NULL);
 INSERT INTO collection VALUES (15,'Articles & Preprints',NULL,NULL,NULL);
 INSERT INTO collection VALUES (16,'Books & Reports',NULL,NULL,NULL);
 INSERT INTO collection VALUES (17,'Multimedia & Arts',NULL,NULL,NULL);
-INSERT INTO collection VALUES (18,'Poetry','collection:POETRY',NULL,NULL);
-INSERT INTO collection VALUES (19,'Atlantis Times News','collection:ATLANTISTIMESNEWS',NULL,NULL);
-INSERT INTO collection VALUES (20,'Atlantis Times Arts','collection:ATLANTISTIMESARTS',NULL,NULL);
-INSERT INTO collection VALUES (21,'Atlantis Times Science','collection:ATLANTISTIMESSCIENCE',NULL,NULL);
+INSERT INTO collection VALUES (18,'Poetry','980:"POETRY"',NULL,NULL);
+INSERT INTO collection VALUES (19,'Atlantis Times News','980:"ATLANTISTIMESNEWS"',NULL,NULL);
+INSERT INTO collection VALUES (20,'Atlantis Times Arts','980:"ATLANTISTIMESARTS"',NULL,NULL);
+INSERT INTO collection VALUES (21,'Atlantis Times Science','980:"ATLANTISTIMESSCIENCE"',NULL,NULL);
 INSERT INTO collection VALUES (22,'Atlantis Times',NULL,NULL,NULL);
 INSERT INTO collection VALUES (23,'Atlantis Institute Books','hostedcollection:',NULL,NULL);
 INSERT INTO collection VALUES (24,'Atlantis Institute Articles','hostedcollection:',NULL,NULL);
-INSERT INTO collection VALUES (25,'Atlantis Times Drafts','collection:ATLANTISTIMESSCIENCEDRAFT or collection:ATLANTISTIMESARTSDRAFT or collection:ATLANTISTIMESNEWSDRAFT',NULL,NULL);
+INSERT INTO collection VALUES (25,'Atlantis Times Drafts','980:"ATLANTISTIMESSCIENCEDRAFT" or 980:"ATLANTISTIMESARTSDRAFT" or 980:"ATLANTISTIMESNEWSDRAFT"',NULL,NULL);
+INSERT INTO collection VALUES (26,'Videos','980:"VIDEO"',NULL,NULL);
 
 INSERT INTO clsMETHOD VALUES (1,'HEP','http://invenio-software.org/download/invenio-demo-site-files/HEP.rdf','High Energy Physics Taxonomy','0000-00-00 00:00:00');
 INSERT INTO clsMETHOD VALUES (2,'NASA-subjects','http://invenio-software.org/download/invenio-demo-site-files/NASA-subjects.rdf','NASA Subjects','0000-00-00 00:00:00');
@@ -544,6 +545,10 @@ INSERT INTO collectionname VALUES (24,'fr','ln','Atlantis Institute Articles');
 INSERT INTO collectionname VALUES (25,'en','ln','Atlantis Times Drafts');
 INSERT INTO collectionname VALUES (25,'fr','ln','Atlantis Times Ébauches');
 
+INSERT INTO collectionname VALUES (26,'en','ln','Videos');
+INSERT INTO collectionname VALUES (26,'fr','ln','Vidéos');
+INSERT INTO collectionname VALUES (26,'it','ln','Filmati');
+
 INSERT INTO collection_collection VALUES (1,15,'r',60);
 INSERT INTO collection_collection VALUES (1,16,'r',40);
 INSERT INTO collection_collection VALUES (1,17,'r',30);
@@ -554,9 +559,10 @@ INSERT INTO collection_collection VALUES (15,2,'r',10);
 INSERT INTO collection_collection VALUES (16,3,'r',30);
 INSERT INTO collection_collection VALUES (16,4,'r',20);
 INSERT INTO collection_collection VALUES (16,5,'r',10);
-INSERT INTO collection_collection VALUES (17,8,'r',30);
+INSERT INTO collection_collection VALUES (17,8,'r',40);
 INSERT INTO collection_collection VALUES (17,18,'r',20);
 INSERT INTO collection_collection VALUES (17,22,'r',10);
+INSERT INTO collection_collection VALUES (17,26,'r',30);
 INSERT INTO collection_collection VALUES (22,19,'r',30);
 INSERT INTO collection_collection VALUES (22,20,'r',20);
 INSERT INTO collection_collection VALUES (22,21,'r',10);
@@ -873,6 +879,8 @@ INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) 
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,86,'lt','rt',90);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,87,'ar','rt',100);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,88,'ar','rt',90);
+
+INSERT INTO collectiondetailedrecordpagetabs(id_collection,tabs) VALUES(26,'');
 
 INSERT INTO example VALUES (1,'author search','author:"Ellis, J"');
 INSERT INTO example VALUES (2,'word search','quantum');
@@ -1570,12 +1578,12 @@ INSERT INTO sbmPARAMETERS VALUES ('DEMOJRN','files','DEMOJRN_ABSE,DEMOJRN_ABSF')
 INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','aspect','DEMOVID_ASPECT');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','authorfile','DEMOVID_AU');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','autorngen','Y');
-INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','counterpath','lastid_DEMOVID_<PA>categ</PA>_<PA>yy</PA>');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','counterpath','lastid_DEMOVID_<PA>yy</PA>');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','createTemplate','DEMOVIDcreate.tpl');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','edsrn','DEMOVID_RN');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','emailFile','SuE');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','newrnin','NEWRN');
-INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','rnformat','DEMO-VIDEO-<PA>categ</PA>-<PA>yy</PA>');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','rnformat','DEMO-VIDEO-<PA>yy</PA>');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','rnin','comboDEMOVID');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','sourceTemplate','DEMOVID.tpl');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','status','ADDED');

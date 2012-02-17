@@ -3075,8 +3075,10 @@ def guess_primary_collection_of_a_record(recID):
         variants = ("collection:" + dbcollid,
                     'collection:"' + dbcollid + '"',
                     "980__a:" + dbcollid,
-                    '980__a:"' + dbcollid + '"')
-        res = run_sql("SELECT name FROM collection WHERE dbquery IN (%s,%s,%s,%s)", variants)
+                    '980__a:"' + dbcollid + '"',
+                    '980:' + dbcollid ,
+                    '980:"' + dbcollid + '"')
+        res = run_sql("SELECT name FROM collection WHERE dbquery IN (%s,%s,%s,%s,%s,%s)", variants)
         if res:
             out = res[0][0]
             break
