@@ -46,8 +46,12 @@ def _check_enough_ram():
     try:
         return int(re.sub(r'\s+', ' ', run_shell_command("free")[1].splitlines()[1]).split(' ')[1]) > 1024 * 1024
     except:
-        ## Are we on Linux?
-        return False
+        ## Are we really on Linux? Maybe on a BSD system?
+        try:
+            return int(run_shell_command("sysctl -n hw.memsize")[1]) > 1024 * 1024
+        except:
+            # Still no luck
+            return False
 
 CFG_ENOUGH_RAM = _check_enough_ram()
 
