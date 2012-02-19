@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -409,7 +409,7 @@ class Manager:
         msg += ' sleeptime: %s\n\n' % self.currentrow[4]
         msg += '    status: %s\n\n' % self.currentrow[5]
         msg += '  progress: %s\n\n' % self.currentrow[6]
-        arguments = marshal.loads(self.currentrow[8])
+        arguments = marshal.loads(self.currentrow[7])
         if type(arguments) is dict:
             # FIXME: REMOVE AFTER MAJOR RELEASE 1.0
             msg += '   options : %s\n\n' % arguments
