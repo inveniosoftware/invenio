@@ -164,39 +164,31 @@ class HTMLTidyingTest(unittest.TestCase):
 <LI><A HREF="three.html">Three</A>
 </UL>''' # Input test 427841 from Tidy
 
-    def test_tidy_html_with_utidylib(self):
-        """htmlutils - Tidying up HTML with µTidylib """
-        res1 = tidy_html(self.html_buffer_1, 'utidylib')
-        res2 = tidy_html(self.html_buffer_2, 'utidylib')
-        res3 = tidy_html(self.html_buffer_3, 'utidylib')
-        if CFG_TIDY_INSTALLED:
+    if CFG_TIDY_INSTALLED:
+        def test_tidy_html_with_utidylib(self):
+            """htmlutils - Tidying up HTML with µTidylib """
+            res1 = tidy_html(self.html_buffer_1, 'utidylib')
+            res2 = tidy_html(self.html_buffer_2, 'utidylib')
+            res3 = tidy_html(self.html_buffer_3, 'utidylib')
             self.assertEqual(res1.replace('\n', '').replace(' ', ''),
-                             'test')
+                            'test')
             self.assertEqual(res2.replace('\n', '').replace(' ', ''),
-                             '<blockquote>test<div>test2</div></blockquote>')
+                            '<blockquote>test<div>test2</div></blockquote>')
             self.assertEqual(res3.replace('\n', '').replace(' ', ''),
-                             '<ul><li><ul><li><ahref="rememberwhenb.html">Next</a></li><li><ahref="daysofourlives.html">Back</a></li><li><ahref="newstuff.html">NewStuff</a></li></ul></li></ul><ul><li>Mergeadjacentlists</li></ul><divstyle="margin-left:2em"><ul><li><ahref="one.html">One</a></li><li><ahref="two.html">Two</a></li><li><ahref="three.html">Three</a></li></ul></div>')
-        else:
-            self.assertEqual(res1, res1)
-            self.assertEqual(res2, res2)
-            self.assertEqual(res3, res3)
+                            '<ul><li><ul><li><ahref="rememberwhenb.html">Next</a></li><li><ahref="daysofourlives.html">Back</a></li><li><ahref="newstuff.html">NewStuff</a></li></ul></li></ul><ul><li>Mergeadjacentlists</li></ul><divstyle="margin-left:2em"><ul><li><ahref="one.html">One</a></li><li><ahref="two.html">Two</a></li><li><ahref="three.html">Three</a></li></ul></div>')
 
-    def test_tidy_html_with_beautifulsoup(self):
-        """htmlutils - Tidying up HTML with BeautifulSoup"""
-        res1 = tidy_html(self.html_buffer_1, 'beautifulsoup')
-        res2 = tidy_html(self.html_buffer_2, 'beautifulsoup')
-        res3 = tidy_html(self.html_buffer_3, 'beautifulsoup')
-        if CFG_TIDY_INSTALLED:
+    if CFG_BEAUTIFULSOUP_INSTALLED:
+        def test_tidy_html_with_beautifulsoup(self):
+            """htmlutils - Tidying up HTML with BeautifulSoup"""
+            res1 = tidy_html(self.html_buffer_1, 'beautifulsoup')
+            res2 = tidy_html(self.html_buffer_2, 'beautifulsoup')
+            res3 = tidy_html(self.html_buffer_3, 'beautifulsoup')
             self.assertEqual(res1.replace('\n', '').replace(' ', ''),
-                             'test')
+                            'test')
             self.assertEqual(res2.replace('\n', '').replace(' ', ''),
-                             '<blockquote>test<div>test2</div></blockquote>')
+                            '<blockquote>test<div>test2</div></blockquote>')
             self.assertEqual(res3.replace('\n', '').replace(' ', ''),
-                             '<ul><li><ul><li><ahref="rememberwhenb.html">Next</a></li><li><ahref="daysofourlives.html">Back</a></li><li><ahref="newstuff.html">NewStuff</a></li></ul></li></ul><ul><li>Mergeadjacentlists</li></ul><ul><ul><li><ahref="one.html">One</a></li><li><ahref="two.html">Two</a></li><li><ahref="three.html">Three</a></li></ul></ul>')
-        else:
-            self.assertEqual(res1, res1)
-            self.assertEqual(res2, res2)
-            self.assertEqual(res3, res3)
+                            '<ul><li><ul><li><ahref="rememberwhenb.html">Next</a></li><li><ahref="daysofourlives.html">Back</a></li><li><ahref="newstuff.html">NewStuff</a></li></ul></li></ul><ul><li>Mergeadjacentlists</li></ul><ul><ul><li><ahref="one.html">One</a></li><li><ahref="two.html">Two</a></li><li><ahref="three.html">Three</a></li></ul></ul>')
 
     def test_tidy_html_with_unknown_lib(self):
         """htmlutils - Tidying up HTML with non existing library"""
