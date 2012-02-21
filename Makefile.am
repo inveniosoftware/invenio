@@ -1,5 +1,5 @@
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2011 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2011, 2012 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -259,5 +259,8 @@ update-v0.99.2-tables:
 
 update-v0.99.3-tables:
 	@echo "Nothing to do; table structure did not change between v0.99.3 and v0.99.4."
+
+update-v0.99.4-tables:
+	@echo "Nothing to do; table structure did not change between v0.99.4 and v0.99.5."
 
 CLEANFILES = *~
