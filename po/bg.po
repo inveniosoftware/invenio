@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.99.4\n"
+"Project-Id-Version: CDS-Invenio 0.99.5\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2011-12-19 20:55+0100\n"
+"POT-Creation-Date: 2012-02-21 13:36+0100\n"
 "PO-Revision-Date: 2008-03-27 02:25+0200\n"
 "Last-Translator: Nikolay Dyankov <ndyankov@gmail.com>\n"
 "Language-Team: BG <cds.support@cern.ch>\n"
@@ -3074,8 +3074,8 @@ msgstr "Дата"
 #: modules/webbasket/lib/webbasket_templates.py:774
 #: modules/webcomment/lib/webcomment_templates.py:444
 #: modules/webcomment/lib/webcomment_templates.py:454
-#: modules/webcomment/lib/webcomment_webinterface.py:161
-#: modules/webcomment/lib/webcomment_webinterface.py:243
+#: modules/webcomment/lib/webcomment_webinterface.py:162
+#: modules/webcomment/lib/webcomment_webinterface.py:251
 #: modules/websubmit/lib/websubmit_templates.py:2576
 msgid "Comments"
 msgstr "Коментари"
@@ -3119,7 +3119,7 @@ msgstr "Изтриване на коментар"
 
 #: modules/webbasket/lib/webbasket_templates.py:930
 #: modules/webbasket/lib/webbasket_templates.py:935
-#: modules/webcomment/lib/webcomment_webinterface.py:289
+#: modules/webcomment/lib/webcomment_webinterface.py:297
 #: modules/websubmit/lib/websubmit_templates.py:2572
 #: modules/websubmit/lib/websubmit_templates.py:2573
 msgid "Add Comment"
@@ -3484,8 +3484,8 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:445
 #: modules/webcomment/lib/webcomment_templates.py:455
-#: modules/webcomment/lib/webcomment_webinterface.py:161
-#: modules/webcomment/lib/webcomment_webinterface.py:243
+#: modules/webcomment/lib/webcomment_webinterface.py:162
+#: modules/webcomment/lib/webcomment_webinterface.py:251
 msgid "Reviews"
 msgstr "Прегледи"
 
@@ -3583,7 +3583,7 @@ msgid "Add review"
 msgstr "Добавяне на преглед"
 
 #: modules/webcomment/lib/webcomment_templates.py:917
-#: modules/webcomment/lib/webcomment_webinterface.py:287
+#: modules/webcomment/lib/webcomment_webinterface.py:295
 msgid "Add Review"
 msgstr "Добавете преглед"
 
@@ -3787,12 +3787,18 @@ msgstr "успешно забранена обида"
 msgid "Not yet reviewed"
 msgstr "Все още не е прегледано"
 
-#: modules/webcomment/lib/webcomment_webinterface.py:176
-#: modules/webcomment/lib/webcomment_webinterface.py:302
+#: modules/webcomment/lib/webcomment_webinterface.py:177
+#: modules/webcomment/lib/webcomment_webinterface.py:310
 msgid "Record Not Found"
 msgstr "Записът не е намерен"
 
-#: modules/webcomment/lib/webcomment_webinterface.py:262
+#: modules/webcomment/lib/webcomment_webinterface.py:234
+#: modules/webcomment/lib/webcomment_webinterface.py:373
+#: modules/webcomment/lib/webcomment_webinterface.py:439
+msgid "Specified comment does not belong to this record"
+msgstr ""
+
+#: modules/webcomment/lib/webcomment_webinterface.py:270
 #, python-format
 msgid ""
 "Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s "
@@ -3801,7 +3807,7 @@ msgstr ""
 "Преди да добавите коментар, първо трябва да %(x_url_open)sвлезете"
 "%(x_url_close)s first"
 
-#: modules/webcomment/lib/webcomment_webinterface.py:266
+#: modules/webcomment/lib/webcomment_webinterface.py:274
 #: modules/websession/lib/websession_webinterface.py:679
 #: modules/websession/lib/websession_webinterface.py:714
 msgid "Login"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2011-12-19 20:55+0100\n"
+"POT-Creation-Date: 2012-02-21 13:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3027,8 +3027,8 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:774
 #: modules/webcomment/lib/webcomment_templates.py:444
 #: modules/webcomment/lib/webcomment_templates.py:454
-#: modules/webcomment/lib/webcomment_webinterface.py:161
-#: modules/webcomment/lib/webcomment_webinterface.py:243
+#: modules/webcomment/lib/webcomment_webinterface.py:162
+#: modules/webcomment/lib/webcomment_webinterface.py:251
 #: modules/websubmit/lib/websubmit_templates.py:2576
 msgid "Comments"
 msgstr ""
@@ -3072,7 +3072,7 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:930
 #: modules/webbasket/lib/webbasket_templates.py:935
-#: modules/webcomment/lib/webcomment_webinterface.py:289
+#: modules/webcomment/lib/webcomment_webinterface.py:297
 #: modules/websubmit/lib/websubmit_templates.py:2572
 #: modules/websubmit/lib/websubmit_templates.py:2573
 msgid "Add Comment"
@@ -3430,8 +3430,8 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:445
 #: modules/webcomment/lib/webcomment_templates.py:455
-#: modules/webcomment/lib/webcomment_webinterface.py:161
-#: modules/webcomment/lib/webcomment_webinterface.py:243
+#: modules/webcomment/lib/webcomment_webinterface.py:162
+#: modules/webcomment/lib/webcomment_webinterface.py:251
 msgid "Reviews"
 msgstr ""
 
@@ -3525,7 +3525,7 @@ msgid "Add review"
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:917
-#: modules/webcomment/lib/webcomment_webinterface.py:287
+#: modules/webcomment/lib/webcomment_webinterface.py:295
 msgid "Add Review"
 msgstr ""
 
@@ -3721,19 +3721,25 @@ msgstr ""
 msgid "Not yet reviewed"
 msgstr ""
 
-#: modules/webcomment/lib/webcomment_webinterface.py:176
-#: modules/webcomment/lib/webcomment_webinterface.py:302
+#: modules/webcomment/lib/webcomment_webinterface.py:177
+#: modules/webcomment/lib/webcomment_webinterface.py:310
 msgid "Record Not Found"
 msgstr ""
 
-#: modules/webcomment/lib/webcomment_webinterface.py:262
+#: modules/webcomment/lib/webcomment_webinterface.py:234
+#: modules/webcomment/lib/webcomment_webinterface.py:373
+#: modules/webcomment/lib/webcomment_webinterface.py:439
+msgid "Specified comment does not belong to this record"
+msgstr ""
+
+#: modules/webcomment/lib/webcomment_webinterface.py:270
 #, python-format
 msgid ""
 "Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s "
 "first."
 msgstr ""
 
-#: modules/webcomment/lib/webcomment_webinterface.py:266
+#: modules/webcomment/lib/webcomment_webinterface.py:274
 #: modules/websession/lib/websession_webinterface.py:679
 #: modules/websession/lib/websession_webinterface.py:714
 msgid "Login"

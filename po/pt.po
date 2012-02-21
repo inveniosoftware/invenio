@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.99.4\n"
+"Project-Id-Version: CDS-Invenio 0.99.5\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2011-12-19 20:55+0100\n"
+"POT-Creation-Date: 2012-02-21 13:36+0100\n"
 "PO-Revision-Date: 2008-03-26 15:56+0100\n"
 "Last-Translator: Joaquim Silvestre <joaquim.rodrigues.silvestre@cern.ch>\n"
 "Language-Team: PT <cds.support@cern.ch>\n"
@@ -3192,8 +3192,8 @@ msgstr "Data"
 #: modules/webbasket/lib/webbasket_templates.py:774
 #: modules/webcomment/lib/webcomment_templates.py:444
 #: modules/webcomment/lib/webcomment_templates.py:454
-#: modules/webcomment/lib/webcomment_webinterface.py:161
-#: modules/webcomment/lib/webcomment_webinterface.py:243
+#: modules/webcomment/lib/webcomment_webinterface.py:162
+#: modules/webcomment/lib/webcomment_webinterface.py:251
 #: modules/websubmit/lib/websubmit_templates.py:2576
 msgid "Comments"
 msgstr "Comentários"
@@ -3240,7 +3240,7 @@ msgstr "Apagar comentário"
 
 #: modules/webbasket/lib/webbasket_templates.py:930
 #: modules/webbasket/lib/webbasket_templates.py:935
-#: modules/webcomment/lib/webcomment_webinterface.py:289
+#: modules/webcomment/lib/webcomment_webinterface.py:297
 #: modules/websubmit/lib/websubmit_templates.py:2572
 #: modules/websubmit/lib/websubmit_templates.py:2573
 msgid "Add Comment"
@@ -3627,8 +3627,8 @@ msgstr "%(x_nb_people)i de %(x_nb_total)i pessoas acharam esta review útil"
 
 #: modules/webcomment/lib/webcomment_templates.py:445
 #: modules/webcomment/lib/webcomment_templates.py:455
-#: modules/webcomment/lib/webcomment_webinterface.py:161
-#: modules/webcomment/lib/webcomment_webinterface.py:243
+#: modules/webcomment/lib/webcomment_webinterface.py:162
+#: modules/webcomment/lib/webcomment_webinterface.py:251
 #, fuzzy
 msgid "Reviews"
 msgstr "análises criticas"
@@ -3734,7 +3734,7 @@ msgid "Add review"
 msgstr "Adicionar analise critica"
 
 #: modules/webcomment/lib/webcomment_templates.py:917
-#: modules/webcomment/lib/webcomment_webinterface.py:287
+#: modules/webcomment/lib/webcomment_webinterface.py:295
 msgid "Add Review"
 msgstr "Adicionar análise critica"
 
@@ -3946,13 +3946,19 @@ msgstr "relatório de abuso suprimido com sucesso"
 msgid "Not yet reviewed"
 msgstr "Not yet reviewed"
 
-#: modules/webcomment/lib/webcomment_webinterface.py:176
-#: modules/webcomment/lib/webcomment_webinterface.py:302
+#: modules/webcomment/lib/webcomment_webinterface.py:177
+#: modules/webcomment/lib/webcomment_webinterface.py:310
 #, fuzzy
 msgid "Record Not Found"
 msgstr "Registo não encontrado"
 
-#: modules/webcomment/lib/webcomment_webinterface.py:262
+#: modules/webcomment/lib/webcomment_webinterface.py:234
+#: modules/webcomment/lib/webcomment_webinterface.py:373
+#: modules/webcomment/lib/webcomment_webinterface.py:439
+msgid "Specified comment does not belong to this record"
+msgstr ""
+
+#: modules/webcomment/lib/webcomment_webinterface.py:270
 #, python-format
 msgid ""
 "Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s "
@@ -3961,7 +3967,7 @@ msgstr ""
 "Antes de adicionar um comentário, precisa de se %(x_url_open)sautenticar"
 "%(x_url_close)s primeiro."
 
-#: modules/webcomment/lib/webcomment_webinterface.py:266
+#: modules/webcomment/lib/webcomment_webinterface.py:274
 #: modules/websession/lib/websession_webinterface.py:679
 #: modules/websession/lib/websession_webinterface.py:714
 #, fuzzy

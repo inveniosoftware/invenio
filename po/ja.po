@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.99.4\n"
+"Project-Id-Version: CDS-Invenio 0.99.5\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2011-12-19 20:55+0100\n"
+"POT-Creation-Date: 2012-02-21 13:36+0100\n"
 "PO-Revision-Date: 2008-06-13 13:00+0100\n"
 "Last-Translator: Marko Niinimaki <man@cern.ch>\n"
 "Language-Team: JA <cds.support@cern.ch>\n"
@@ -3081,8 +3081,8 @@ msgstr "日付"
 #: modules/webbasket/lib/webbasket_templates.py:774
 #: modules/webcomment/lib/webcomment_templates.py:444
 #: modules/webcomment/lib/webcomment_templates.py:454
-#: modules/webcomment/lib/webcomment_webinterface.py:161
-#: modules/webcomment/lib/webcomment_webinterface.py:243
+#: modules/webcomment/lib/webcomment_webinterface.py:162
+#: modules/webcomment/lib/webcomment_webinterface.py:251
 #: modules/websubmit/lib/websubmit_templates.py:2576
 msgid "Comments"
 msgstr "コメント"
@@ -3128,7 +3128,7 @@ msgstr "コメントを削除"
 
 #: modules/webbasket/lib/webbasket_templates.py:930
 #: modules/webbasket/lib/webbasket_templates.py:935
-#: modules/webcomment/lib/webcomment_webinterface.py:289
+#: modules/webcomment/lib/webcomment_webinterface.py:297
 #: modules/websubmit/lib/websubmit_templates.py:2572
 #: modules/websubmit/lib/websubmit_templates.py:2573
 msgid "Add Comment"
@@ -3489,8 +3489,8 @@ msgstr "このレビューは　%(x_nb_total)i 人中 %(x_nb_people)i 人に役�
 
 #: modules/webcomment/lib/webcomment_templates.py:445
 #: modules/webcomment/lib/webcomment_templates.py:455
-#: modules/webcomment/lib/webcomment_webinterface.py:161
-#: modules/webcomment/lib/webcomment_webinterface.py:243
+#: modules/webcomment/lib/webcomment_webinterface.py:162
+#: modules/webcomment/lib/webcomment_webinterface.py:251
 msgid "Reviews"
 msgstr "レビュー"
 
@@ -3588,7 +3588,7 @@ msgid "Add review"
 msgstr "レビューを追加"
 
 #: modules/webcomment/lib/webcomment_templates.py:917
-#: modules/webcomment/lib/webcomment_webinterface.py:287
+#: modules/webcomment/lib/webcomment_webinterface.py:295
 msgid "Add Review"
 msgstr "レビューを追加"
 
@@ -3786,12 +3786,18 @@ msgstr "不正なレポートを抑制しました。"
 msgid "Not yet reviewed"
 msgstr "レビューを書いてください。"
 
-#: modules/webcomment/lib/webcomment_webinterface.py:176
-#: modules/webcomment/lib/webcomment_webinterface.py:302
+#: modules/webcomment/lib/webcomment_webinterface.py:177
+#: modules/webcomment/lib/webcomment_webinterface.py:310
 msgid "Record Not Found"
 msgstr "レコードがみつからない"
 
-#: modules/webcomment/lib/webcomment_webinterface.py:262
+#: modules/webcomment/lib/webcomment_webinterface.py:234
+#: modules/webcomment/lib/webcomment_webinterface.py:373
+#: modules/webcomment/lib/webcomment_webinterface.py:439
+msgid "Specified comment does not belong to this record"
+msgstr ""
+
+#: modules/webcomment/lib/webcomment_webinterface.py:270
 #, python-format
 msgid ""
 "Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s "
@@ -3799,7 +3805,7 @@ msgid ""
 msgstr ""
 "%(x_url_open)sログイン%(x_url_close)s してから、コメントを追加してください。"
 
-#: modules/webcomment/lib/webcomment_webinterface.py:266
+#: modules/webcomment/lib/webcomment_webinterface.py:274
 #: modules/websession/lib/websession_webinterface.py:679
 #: modules/websession/lib/websession_webinterface.py:714
 msgid "Login"
