@@ -412,7 +412,10 @@ update-v0.99.2-tables:
 update-v0.99.3-tables:
 	@echo "Nothing to do; table structure did not change between v0.99.3 and v0.99.4."
 
-update-v0.99.4-tables: # from v0.99.4 to v1.0.0-rc0
+update-v0.99.4-tables:
+	@echo "Nothing to do; table structure did not change between v0.99.4 and v0.99.5."
+
+update-v0.99.5-tables: # from v0.99.5 to v1.0.0-rc0
 	echo "RENAME TABLE oaiARCHIVE TO oaiREPOSITORY;" | ${prefix}/bin/dbexec
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "INSERT INTO knwKB (id,name,description,kbtype) SELECT id,name,description,'' FROM fmtKNOWLEDGEBASES;" | ${prefix}/bin/dbexec
