@@ -1494,6 +1494,8 @@ class Template:
                             + self._('Recent Papers') +
                             '</a></em>')
                             % (pid))
+            else:
+                h("</em>")
 
             if search_ticket:
                 link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, pid)
@@ -1647,7 +1649,7 @@ class Template:
         if paps:
             plist = plist + "We have got and automatically claimed for You the following papers from arXiv.org: <br>"
             for p in paps:
-                plist = plist + "  "+str(p)+"<br>"
+                plist = plist + "  " + str(p) + "<br>"
         else:
             plist = "We have got no papers from arXiv.org which we could claim automatically for You. <br>"
         return plist
