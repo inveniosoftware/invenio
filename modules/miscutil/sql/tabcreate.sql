@@ -3533,7 +3533,7 @@ CREATE TABLE IF NOT EXISTS schTASK (
 
 CREATE TABLE IF NOT EXISTS hstTASK (
   id int(15) unsigned NOT NULL,
-  proc varchar(20) NOT NULL,
+  proc varchar(255) NOT NULL,
   host varchar(255) NOT NULL default '',
   user varchar(50) NOT NULL,
   runtime datetime NOT NULL,
@@ -3542,6 +3542,7 @@ CREATE TABLE IF NOT EXISTS hstTASK (
   status varchar(50),
   progress varchar(255),
   priority tinyint(4) NOT NULL default 0,
+  sequenceid int(8) NULL default NULL,
   PRIMARY KEY  (id),
   KEY status (status),
   KEY runtime (runtime),
@@ -4067,7 +4068,7 @@ CREATE TABLE IF NOT EXISTS bsrMETHOD (
   name varchar(20) NOT NULL,
   definition varchar(255) NOT NULL,
   washer varchar(255) NOT NULL,
-  PRIMARY KEY (id), 
+  PRIMARY KEY (id),
   UNIQUE KEY (name)
 ) ENGINE=MyISAM;
 
