@@ -31,19 +31,6 @@ from invenio.config import CFG_ETCDIR, CFG_PYLIBDIR
 # new format cannot be found, old format will be used.
 CFG_BIBFORMAT_USE_OLD_BIBFORMAT = False
 
-# Enable internationalization of brief format (HB). When set to 'True',
-# BibFormat will try to display each record of the search results list
-# in the language chosen by the user. This currently means that the
-# formatting of each record will be done on-the-fly for each language
-# different from CFG_SITE_LANG, as bibreformat precreates formatted
-# output in this language only. If set to 'False', the cache created by
-# bibreformat will be used independently of the language chosen by the
-# user. You might want to set this setting to True if your users comes
-# from various language zones and if you provide language-dependant
-# content in the brief format. Also consider the impact on the
-# performance of your server to have on-the-fly formatting enabled.
-CFG_BIBFORMAT_ENABLE_I18N_BRIEF_FORMAT = True
-
 # Paths to main formats directories
 CFG_BIBFORMAT_TEMPLATES_PATH = "%s%sbibformat%sformat_templates" % (CFG_ETCDIR, os.sep, os.sep)
 CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = "invenio.bibformat_elements"

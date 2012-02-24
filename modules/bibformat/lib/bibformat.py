@@ -47,10 +47,10 @@ from invenio.config import \
      CFG_PATH_PHP, \
      CFG_SITE_URL, \
      CFG_BIBFORMAT_HIDDEN_TAGS, \
-     CFG_SITE_RECORD
+     CFG_SITE_RECORD, \
+     CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS
 from invenio.bibformat_config import \
-     CFG_BIBFORMAT_USE_OLD_BIBFORMAT, \
-     CFG_BIBFORMAT_ENABLE_I18N_BRIEF_FORMAT
+     CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.access_control_engine import acc_authorize_action
 import getopt
 import sys
@@ -118,16 +118,16 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
        (ln == CFG_SITE_LANG or \
         of.lower() == 'xm' or \
         CFG_BIBFORMAT_USE_OLD_BIBFORMAT or \
-        (CFG_BIBFORMAT_ENABLE_I18N_BRIEF_FORMAT == False and of.lower() == 'hb')) and \
+        (of.lower() in CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS)) and \
         record_exists(recID) != -1:
-        # Try to fetch preformatted record Only possible for records
+        # Try to fetch preformatted record. Only possible for records
         # formatted in CFG_SITE_LANG language (other are never
         # stored), or of='xm' which does not depend on language.
-        # Also, when formatting in HB, and when
-        # CFG_BIBFORMAT_ENABLE_I18N_BRIEF_FORMAT is set to False,
-        # ignore other languages and fetch the preformatted output.
-        # Also, do not fetch from DB when record has been deleted: we
-        # want to return an "empty" record in that case
+        # Exceptions are made for output formats defined in
+        # CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS, which are
+        # always served from the same cache for any language.  Also,
+        # do not fetch from DB when record has been deleted: we want
+        # to return an "empty" record in that case
         res = bibformat_dblayer.get_preformatted_record(recID, of)
         if res is not None:
             # record 'recID' is formatted in 'of', so return it

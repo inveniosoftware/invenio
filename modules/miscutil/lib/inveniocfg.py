@@ -163,7 +163,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_PLOTEXTRACTOR_DISALLOWED_TEX',
                        'CFG_OAI_FRIENDS',
                        'CFG_WEBSTYLE_REVERSE_PROXY_IPS',
-                       'CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS']:
+                       'CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS',
+                       'CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS']:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:
