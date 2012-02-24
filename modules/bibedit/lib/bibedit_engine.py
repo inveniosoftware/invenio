@@ -1229,20 +1229,35 @@ def _get_formated_record(record, new_window):
 
     @param record: BibRecord object
     """
+    from invenio.config import CFG_WEBSTYLE_TEMPLATE_SKIN
 
     xml_record = wash_for_xml(bibrecord.record_xml_output(record))
 
-    result =  "<html><head><title>Record preview</title></head>"
+    result =  "<html><head><title>Record preview</title>"
+    result += """<style type="text/css">
+                    #referenceinp_link { display: none; }
+                    #referenceinp_link_span { display: none; }
+                </style></head>
+                <link rel="stylesheet" href="%(cssurl)s/img/invenio%(cssskin)s.css" type="text/css">
+                """%{'cssurl': CFG_SITE_URL,
+                     'cssskin': CFG_WEBSTYLE_TEMPLATE_SKIN != 'default' and '_' + CFG_WEBSTYLE_TEMPLATE_SKIN or ''
+                     }
     result += get_mathjax_header(True)
-    result += "<body><h2> Brief format preview </h2>"
+    result += "<body><h2> Brief format preview </h2><br />"
     result += bibformat.format_record(recID=None,
                                      of="hb",
                                      xml_record=xml_record)
-    result += "<h2> Detailed format preview </h2>"
+    result += "<br /><h2> Detailed format preview </h2><br />"
 
     result += bibformat.format_record(recID=None,
                                      of="hd",
                                      xml_record=xml_record)
+    #Preview references
+    result += "<br /><h2> References </h2><br />"
+
+    result += bibformat.format_record(0,
+                                    'hdref',
+                                    xml_record=xml_record)
 
     result += "</body></html>"
 

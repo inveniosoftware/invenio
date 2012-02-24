@@ -1232,6 +1232,7 @@ function onSubmitClick(){
    */
   updateStatus('updating');
   if (displayAlert('confirmSubmit')){
+    var preview = getPreview();
     createReq({recID: gRecID, requestType: 'submit',
          force: onSubmitClick.force}, function(json){
        // Submission was successful.
@@ -1240,6 +1241,7 @@ function onSubmitClick(){
       cleanUp(!gNavigatingRecordSet, '', null, true);
       updateStatus('report', gRESULT_CODES[resCode]);
       displayMessage(resCode);
+      $('#bibEditMessage').after(preview);
       updateToolbar(false);
       resetBibeditState()
     }, false);
@@ -1257,7 +1259,7 @@ function onPreviewClick(){
   /*
    * Handle 'Preview' button (preview record).
    */
-    createReq({recID: gRecID, requestType: 'preview'
+    createReq({data: {'new_window': false}, recID: gRecID, requestType: 'preview'
        }, function(json){
        // Preview was successful.
         var html_preview = json['html_preview'];
@@ -1265,6 +1267,16 @@ function onPreviewClick(){
         preview_window.document.write(html_preview);
         preview_window.document.close(); // needed for chrome and safari
        });
+}
+
+function getPreview() {
+    var html_preview;
+    createReq({'new_window': false, recID: gRecID, requestType: 'preview'
+       }, function(json){
+       // Preview was successful.
+        html_preview = json['html_preview'];
+       }, false);
+    return html_preview;
 }
 
 function onCancelClick(){
@@ -2910,10 +2922,23 @@ function onContentChange(value, th){
         else if (valueContainsSubfields(value)) {
             bulkOperation = true;
             splitContentSubfields(value, oldSubfieldCode, subfieldsToAdd);
+            if (tag_ind == '999C5' && !is_reference_manually_curated(field)){
+                subfieldsToAdd.push(new Array('9', 'CURATOR'));
+            }
             field[0].splice(subfieldIndex, 1); // update gRecord, remove old content
             field[0].push.apply(field[0], subfieldsToAdd); // update gRecord, add new subfields
             oldValue = field[0][subfieldIndex][1];
             subfield_offset = 1;
+        }
+        /* If editing reference field, add $$9 subfield */
+        else if (tag_ind == '999C5' && !is_reference_manually_curated(field)){
+            bulkOperation = true;
+            subfieldsToAdd.push.apply(subfieldsToAdd, field[0]);
+            subfieldsToAdd.push(new Array("9", "CURATOR"));
+            var test = field[0].length;
+            field[0].splice(0, test);
+            field[0].push.apply(field[0], subfieldsToAdd); // update gRecord, add new
+            subfield_offset = subfieldsToAdd.length - 1;
         }
         else if (field[0][subfieldIndex][1] == value)
             return escapeHTML(value);
