@@ -2104,9 +2104,9 @@ function addFieldSave(fieldTmpNo)
     }
   }
 
+  var subfieldsExtended = [];
   /* Loop through all subfields to look for new subfields in the format
    * $$aContent$$bMore content and split them accordingly */
-  var subfieldsExtended = [];
   for (var i=0, n=subfields.length; i<n ;i++) {
       if (valueContainsSubfields(subfields[i][1])) {
           var subfieldsToAdd = new Array(), subfieldCode = subfields[i][0];
@@ -2122,6 +2122,11 @@ function addFieldSave(fieldTmpNo)
       for (var i=0, n=subfieldsExtended.length; i < n; i++) {
           subfields[i] = subfieldsExtended[i];
       }
+  }
+
+  /* If adding a reference, add $$9 CURATOR */
+  if (tag == '999') {
+      subfields[subfields.length] = new Array('9', 'CURATOR');
   }
 
   // adding an undo handler
@@ -2500,7 +2505,7 @@ function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode,
 function getBulkUpdateSubfieldContentRequestData(tag, fieldPosition,
                                                  subfieldIndex, subfieldCode,
                                                  value, consumedChange,
-                                                 undoDescriptor, subfieldsToAdd) {
+                                                 undoDescriptor, subfieldsToAdd, subfield_offset) {
     /*
      *Purpose: prepare data to be included in the request for a bulk update
      *         of the subfield content
@@ -2508,6 +2513,10 @@ function getBulkUpdateSubfieldContentRequestData(tag, fieldPosition,
      *Return: object: Array of changes to be applied
      *
      */
+    if (!subfield_offset){
+        var subfield_offset = 1;
+    }
+
     var changesAdd = [];
 
     var data = getUpdateSubfieldValueRequestData(tag,
@@ -2525,7 +2534,7 @@ function getBulkUpdateSubfieldContentRequestData(tag, fieldPosition,
       requestType: 'addSubfields',
       tag: tag,
       fieldPosition: fieldPosition,
-      subfields: subfieldsToAdd.slice(1)
+      subfields: subfieldsToAdd.slice(subfield_offset)
     };
     changesAdd.push(data);
 
@@ -2533,7 +2542,7 @@ function getBulkUpdateSubfieldContentRequestData(tag, fieldPosition,
 }
 
 function bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, subfieldCode,
-                            value, consumedChange, undoDescriptor, subfieldsToAdd) {
+                            value, consumedChange, undoDescriptor, subfieldsToAdd, subfields_offset) {
     /*
      *Purpose: perform request for a bulk update as the user introduced in the content
      *         field multiple subfields to be added in the form $$aTest$$bAnother
@@ -2563,7 +2572,8 @@ function bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, subfieldCo
                                                value,
                                                consumedChange,
                                                undoDescriptor,
-                                               subfieldsToAdd);
+                                               subfieldsToAdd,
+                                               subfields_offset);
     var optArgs = {
       undoRedo: undoDescriptor
     };
@@ -2884,14 +2894,19 @@ function onContentChange(value, th){
     else {
         var subfieldsToAdd = new Array(), bulkOperation = false, subfield_offset;
         /* Edit subfield value */
+        /* If editing subject field, check KB */
+        if (tag_ind == '65017' && field[0][subfieldIndex][0] == 'a') {
+            value = check_subjects_KB(value);
+        }
         /* Check if there are subfields inside of the content value
          * e.g 999C5 $$mThis a test$$hThis is a second subfield */
-        if (valueContainsSubfields(value)) {
+        else if (valueContainsSubfields(value)) {
             bulkOperation = true;
             splitContentSubfields(value, oldSubfieldCode, subfieldsToAdd);
             field[0].splice(subfieldIndex, 1); // update gRecord, remove old content
             field[0].push.apply(field[0], subfieldsToAdd); // update gRecord, add new subfields
             oldValue = field[0][subfieldIndex][1];
+            subfield_offset = 1;
         }
         else if (field[0][subfieldIndex][1] == value)
             return escapeHTML(value);
@@ -3002,7 +3017,7 @@ function onContentChange(value, th){
           break;
       default:
           if (bulkOperation) {
-              bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, oldSubfieldCode, newValue, null, urHandler, subfieldsToAdd);
+              bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, oldSubfieldCode, newValue, null, urHandler, subfieldsToAdd, subfield_offset);
           }
           else {
               updateSubfieldValue(tag, fieldPosition, subfieldIndex, oldSubfieldCode, value, null, urHandler);
