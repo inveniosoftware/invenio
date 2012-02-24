@@ -1043,8 +1043,8 @@ function validMARC(datatype, value){
 // MARC validation REs
 validMARC.reControlTag = /00[1-9A-Za-z]{1}/;
 validMARC.reTag = /(0([1-9A-Z][0-9A-Z])|0([1-9a-z][0-9a-z]))|(([1-9A-Z][0-9A-Z]{2})|([1-9a-z][0-9a-z]{2}))/;
-validMARC.reIndicator1 = /[\da-z]{1}/;
-validMARC.reIndicator2 = /[\da-z]{1}/;
+validMARC.reIndicator1 = /[\da-zA-Z]{1}/;
+validMARC.reIndicator2 = /[\da-zA-Z]{1}/;
 //validMARC.reSubfieldCode = /[\da-z!&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?{}_^`~\[\]\\]{1}/;
 validMARC.reSubfieldCode = /[\da-z!&quot;#$%&amp;'()*+,-.\/:;&lt;=&gt;?{}_^`~\[\]\\]{1}/;
 
