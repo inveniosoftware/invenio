@@ -56,6 +56,7 @@ import datetime
 import traceback
 import logging
 import logging.handlers
+import random
 
 from invenio.dbquery import run_sql, _db_login
 from invenio.access_control_engine import acc_authorize_action
@@ -206,6 +207,32 @@ def task_low_level_submission(name, user, *argv):
             run_sql("""DELETE FROM schTASK WHERE id=%s""", (task_id, ))
         raise
     return task_id
+
+
+def bibtask_allocate_sequenceid(curdir=None):
+    """
+    Returns an almost unique number to be used a task sequence ID.
+
+    In WebSubmit functions, set C{curdir} to the curdir (!) to read
+    the shared sequence ID for all functions of this submission (reading
+    "access number").
+
+    @param curdir: in WebSubmit functions (ONLY) the value retrieved
+                   from the curdir parameter of the function
+    @return: an integer for the sequence ID. 0 is returned if the
+             sequence ID could not be allocated
+    @rtype: int
+    """
+    if curdir:
+        try:
+            fd = file(os.path.join(curdir, 'access'), "r")
+            access = fd.readline().strip()
+            fd.close()
+            return access.replace("_", "")[-9:]
+        except:
+            return 0
+    else:
+        return random.randrange(1, 4294967296)
 
 
 def setup_loggers(task_id=None):

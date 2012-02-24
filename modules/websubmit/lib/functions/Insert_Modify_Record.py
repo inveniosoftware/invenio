@@ -24,7 +24,8 @@ import time
 from invenio.config import \
      CFG_TMPDIR
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
-from invenio.bibtask import task_low_level_submission
+from invenio.websubmit_functions.Shared_Functions import ParamFromFile
+from invenio.bibtask import task_low_level_submission, bibtask_allocate_sequenceid
 
 def Insert_Modify_Record(parameters, curdir, form, user_info=None):
     """
@@ -36,6 +37,7 @@ def Insert_Modify_Record(parameters, curdir, form, user_info=None):
     the MySQL bibliographical database.
     """
     global rn
+    sequence_id = bibtask_allocate_sequenceid(curdir)
     if os.path.exists(os.path.join(curdir, "recmysqlfmt")):
         recfile = "recmysqlfmt"
     elif os.path.exists(os.path.join(curdir, "recmysql")):
@@ -47,6 +49,6 @@ def Insert_Modify_Record(parameters, curdir, form, user_info=None):
                               (rn.replace('/', '_'),
                                time.strftime("%Y-%m-%d_%H:%M:%S")))
     shutil.copy(initial_file, final_file)
-    bibupload_id = task_low_level_submission('bibupload', 'websubmit.Insert_Modify_Record', '-c', final_file, '-P', '3')
+    bibupload_id = task_low_level_submission('bibupload', 'websubmit.Insert_Modify_Record', '-c', final_file, '-P', '3', '-I', str(sequence_id))
     open(os.path.join(curdir, 'bibupload_id'), 'w').write(str(bibupload_id))
     return ""
