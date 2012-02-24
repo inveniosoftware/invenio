@@ -1,0 +1,8 @@
+<!-- BibEdit-Field-Template-Name: reference-->
+<!-- BibEdit-Field-Template-Description: reference -->
+<record>
+<datafield tag="999" ind1="C" ind2="5">
+<subfield code="r">VOLATILE: reference to arxiv eprint or repno</subfield>
+<subfield code="s">VOLATILE: reference to journal</subfield>
+</datafield>
+</record>

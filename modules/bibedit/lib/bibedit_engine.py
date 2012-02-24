@@ -123,7 +123,8 @@ def get_available_fields_templates():
     record
     """
     templates = get_field_templates()
-    result = get_empty_fields_templates()
+    #result = get_empty_fields_templates()
+    result = []
     for template in templates:
         tplTag = template[3].keys()[0]
         field = template[3][tplTag][0]

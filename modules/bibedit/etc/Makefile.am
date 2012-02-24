@@ -23,7 +23,8 @@ rectmpldir = $(etcdir)/record_templates/
 rectmpl_DATA = poem.xml
 
 fldtmpldir = $(etcdir)/field_templates/
-fldtmpl_DATA = firstauthor.xml
+fldtmpl_DATA = firstauthor.xml \
+               reference.xml
 
 EXTRA_DIST = $(etc_DATA) \
              $(rectmpl_DATA) \
