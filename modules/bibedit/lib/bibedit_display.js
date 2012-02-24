@@ -617,7 +617,7 @@ function updateToolbar(enable) {
 
 /// end of the Holding Pen Connected functions
 
-function createAddFieldForm(fieldTmpNo, fieldTemplateNo){
+function createAddFieldForm(fieldTmpNo, fieldTemplateNo, def_field_tag, def_ind1, def_ind2){
   /*
    * Create an 'Add field' form.
    * fieldTmpNo - temporary field number
@@ -647,7 +647,7 @@ function createAddFieldForm(fieldTmpNo, fieldTemplateNo){
 	    title: 'Add subfield'}) +
 	'</td>' +
       '</tr>' +
-      createAddFieldRow(fieldTmpNo, 0) +
+      createAddFieldRow(fieldTmpNo, 0, "", "", def_field_tag, def_ind1, def_ind2) +
       // adding a row used to insert at the end without repositioning the tag and indicators
       '<tr>' +
       '<td></td>' +
@@ -661,7 +661,7 @@ function createAddFieldForm(fieldTmpNo, fieldTemplateNo){
     '</tbody>';
 }
 
-function createAddFieldRow(fieldTmpNo, subfieldTmpNo, defaultCode, defaultValue){
+function createAddFieldRow(fieldTmpNo, subfieldTmpNo, defaultCode, defaultValue, def_field_tag, def_ind1, def_ind2){
   /*
    * Create a row in the 'Add field' form.
    * optional parameters:
@@ -688,11 +688,11 @@ function createAddFieldRow(fieldTmpNo, subfieldTmpNo, defaultCode, defaultValue)
     btnAddFieldRemove = '';
   if (subfieldTmpNo == 0){
     txtAddFieldTag = input('text', 'txtAddFieldTag_' + fieldTmpNo,
-            'bibEditTxtTag', {maxlength: 3});
+            'bibEditTxtTag', {maxlength: 3}, def_field_tag);
     txtAddFieldInd1 = input('text', 'txtAddFieldInd1_' + fieldTmpNo,
-          'bibEditTxtInd', {maxlength: 1});
+          'bibEditTxtInd', {maxlength: 1}, def_ind1);
     txtAddFieldInd2 = input('text', 'txtAddFieldInd2_' + fieldTmpNo,
-          'bibEditTxtInd', {maxlength: 1});
+          'bibEditTxtInd', {maxlength: 1}, def_ind2);
   }
   else
     btnAddFieldRemove = img('/img/delete.png', 'btnAddFieldRemove_' +

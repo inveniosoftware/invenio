@@ -1771,13 +1771,15 @@ function createAddFieldInterface(initialContent, initialTemplateNo){
   if (selected_fields != undefined) {
       var count_fields = 0;
       var selected_local_field_pos;
-      var selected_tag;
+      var selected_tag, selected_ind1, selected_ind2;
       for (var tag in selected_fields.fields) {
           for (var localFieldPos in selected_fields.fields[tag]) {
               count_fields++;
               selected_local_field_pos = localFieldPos;
           }
           selected_tag = tag;
+          selected_ind1 = selected_fields.fields[tag][localFieldPos][1];
+          selected_ind2 = selected_fields.fields[tag][localFieldPos][2];
       }
       if (count_fields === 1)
           insert_below_selected = true;
@@ -1791,7 +1793,7 @@ function createAddFieldInterface(initialContent, initialTemplateNo){
   // If only one field selected, add below the selected field
   if (insert_below_selected === true) {
       $('#rowGroup' + '_' + selected_tag + '_' + selected_local_field_pos).after(
-      createAddFieldForm(fieldTmpNo, initialTemplateNo));
+      createAddFieldForm(fieldTmpNo, initialTemplateNo, selected_tag, selected_ind1, selected_ind2));
       $(jQRowGroupID).data('insertionPoint', parseInt(selected_local_field_pos) + 1);
       $(jQRowGroupID).data('selected_tag', selected_tag);
   }
@@ -1834,7 +1836,12 @@ function createAddFieldInterface(initialContent, initialTemplateNo){
     $(jQRowGroupID).data('isControlfield', false);
   }
   reColorFields();
-  $('#txtAddFieldTag_' + fieldTmpNo).focus();
+  if (insert_below_selected === true) {
+      $('#txtAddFieldSubfieldCode_' + fieldTmpNo + '_0').focus();
+  }
+  else {
+      $('#txtAddFieldTag_' + fieldTmpNo).focus();
+  }
   // Color the new form for a short period.
   $(jQRowGroupID).effect('highlight', {color: gNEW_ADD_FIELD_FORM_COLOR},
     gNEW_ADD_FIELD_FORM_COLOR_FADE_DURATION);
