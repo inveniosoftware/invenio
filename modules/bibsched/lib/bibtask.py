@@ -455,7 +455,7 @@ def _task_build_params(
                 _TASK_PARAMS["profile"] += opt[1].split(',')
             elif opt[0] in ("--post-process", ):
                 _TASK_PARAMS["post-process"] += [opt[1]];
-            elif opt[0] in ("-S","--sequence-id"):
+            elif opt[0] in ("-I","--sequence-id"):
                 _TASK_PARAMS["sequence-id"] = opt[1]
             elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
                 not task_submit_elaborate_specific_parameter_fnc(opt[0],
