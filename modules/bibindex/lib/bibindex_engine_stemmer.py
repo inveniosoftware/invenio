@@ -23,7 +23,7 @@ BibIndex stemmer facility based on the Porter Stemming Algorithm.
 __revision__ = "$Id$"
 
 from thread import get_ident
-from invenio.bibindex_engine_stemmer_greek import greek_stemmer
+from invenio.bibindex_engine_stemmer_greek import GreekStemmer
 
 _stemmers = {}
 
@@ -62,20 +62,14 @@ try:
     def stem(word, lang):
         """Return WORD stemmed according to language LANG (e.g. 'en')."""
         if lang and is_stemmer_available_for_language(lang):
-            if lang == 'el':
-                return _stemmers[get_ident()][lang].stem_word(word)
-            else:
-                return _stemmers[get_ident()][lang].stemWord(word)
+            return _stemmers[get_ident()][lang].stemWord(word)
         else:
             return word
 
     def stemWords(words, lang):
         """Return WORDS stemmed according to language LANG (e.g. 'en')."""
         if lang and is_stemmer_available_for_language(lang):
-            if lang == 'el':
-                return [_stemmers[get_ident()]['el'].stem_word(word) for word in words]
-            else:
-                return _stemmers[get_ident()][lang].stemWords(words)
+            return _stemmers[get_ident()][lang].stemWords(words)
         else:
             return words
 
@@ -98,7 +92,7 @@ try:
                     stemmers_initialized[dst_lang] = Stemmer.Stemmer(src_lang, 40000)
             except (TypeError, KeyError):
                 pass
-        stemmers_initialized['el'] = greek_stemmer()
+        stemmers_initialized['el'] = GreekStemmer()
         return stemmers_initialized
 
 
@@ -455,14 +449,12 @@ except ImportError:
             if not get_ident() in _stemmers:
                 _stemmers[get_ident()] = {
                     'en': PorterStemmer(),
-                    'el': greek_stemmer()}
+                    'el': GreekStemmer()}
             if lang == 'en':
                 #make sure _stemmers[get_ident()] is avail..
                 return _stemmers[get_ident()]['en'].stem(word, 0, len(word)-1)
             elif lang == 'el':
-                #TODO: first we have to capitalize the word
-                # and remove accents from the vowels
-                return _stemmers[get_ident()]['el'].stem_word(word)
+                return _stemmers[get_ident()]['el'].stemWord(word)
         else:
             return word
 
@@ -472,14 +464,12 @@ except ImportError:
             if not get_ident() in _stemmers:
                 _stemmers[get_ident()] = {
                     'en': PorterStemmer(),
-                    'el': greek_stemmer()}
+                    'el': GreekStemmer()}
             if lang == 'en':
                 #make sure _stemmers[get_ident()] is avail..
                 return [_stemmers[get_ident()]['en'].stem(word, 0, len(word)-1) for word in words]
             elif lang == 'el':
-                #TODO: first we have to capitalize the word
-                # and remove accents from the vowels
-                return [_stemmers[get_ident()]['el'].stem_word(word) for word in words]
+                return _stemmers[get_ident()]['el'].stemWords(words)
         else:
             return words
 
