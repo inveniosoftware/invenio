@@ -283,13 +283,21 @@ def OAI_Request(server, script, params, method="POST", secure=False,
             elif method == "POST":
                 conn.request("POST", script, params, headers)
         except socket.gaierror, (err, str_e):
-            raise InvenioOAIRequestError("An error occured when trying to request %s: %s\n" % (server, str_e))
+            # We'll retry in a few seconds
+            nb_seconds_retry = 30
+            sys.stderr.write("An error occured when trying to request %s: %s\nWill retry in %i seconds\n" % (server, e, nb_seconds_retry))
+            time.sleep(nb_seconds_retry)
+            continue
 
         # Request sent, get results
         try:
             response = conn.getresponse()
         except (httplib.HTTPException, socket.error), e:
-            raise InvenioOAIRequestError("An error occured when trying to read response from %s: %s\n" % (server, e))
+            # We'll retry in a few seconds
+            nb_seconds_retry = 30
+            sys.stderr.write("An error occured when trying to read response from %s: %s\nWill retry in %i seconds\n" % (server, e, nb_seconds_retry))
+            time.sleep(nb_seconds_retry)
+            continue
 
         status = "%d" % response.status
 

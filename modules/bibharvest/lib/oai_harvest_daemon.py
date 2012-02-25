@@ -45,7 +45,10 @@ from invenio.config import \
      CFG_INSPIRE_SITE, \
      CFG_CERN_SITE, \
      CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT, \
-     CFG_SITE_URL
+     CFG_SITE_URL, \
+     CFG_OAI_FAILED_HARVESTING_STOP_QUEUE, \
+     CFG_OAI_FAILED_HARVESTING_EMAILS_ADMIN
+from invenio.oai_harvest_config import InvenioOAIHarvestWarning
 from invenio.dbquery import run_sql
 from invenio.bibtask import \
      task_get_task_param, \
@@ -63,6 +66,7 @@ from invenio.bibrecord import record_extract_oai_id, create_records, \
                               record_modify_subfield, \
                               record_has_field, field_xml_output
 from invenio import oai_harvest_getter
+from invenio.errorlib import register_exception
 from invenio.plotextractor_getter import harvest_single, make_single_directory
 from invenio.plotextractor_converter import untar
 from invenio.plotextractor import process_single, get_defaults
@@ -124,7 +128,8 @@ def task_run_core():
         for element in task_get_option("dates"):
             datelist.append(element)
 
-    error_happened_p = False
+    error_happened_p = 0 # 0: no error, 1: "recoverable" error (don't stop queue), 2: error (admin intervention needed)
+
     j = 0
     for repos in reposlist:
         j += 1
@@ -169,7 +174,8 @@ def task_run_core():
             else:
                 write_message("an error occurred while harvesting from source %s for the dates chosen:\n%s\n" % \
                               (reponame, file_list))
-                error_happened_p = True
+                if error_happened_p < 1:
+                    error_happened_p = 1
                 continue
 
         elif dateflag != 1 and lastrun is None and frequency != 0:
@@ -189,7 +195,8 @@ def task_run_core():
             else :
                 write_message("an error occurred while harvesting from source %s:\n%s\n" % \
                               (reponame, file_list))
-                error_happened_p = True
+                if error_happened_p < 1:
+                    error_happened_p = 1
                 continue
 
         elif dateflag != 1 and frequency != 0:
@@ -220,7 +227,8 @@ def task_run_core():
                 else :
                     write_message("an error occurred while harvesting from source %s:\n%s\n" % \
                                   (reponame, file_list))
-                    error_happened_p = True
+                    if error_happened_p < 1:
+                        error_happened_p = 1
                     continue
             else:
                 write_message("source %s does not need updating" % (reponame,))
@@ -267,7 +275,7 @@ def task_run_core():
                 else:
                     write_message("an error occurred while converting %s:\n%s" % \
                                   (active_file, err_msg))
-                    error_happened_p = True
+                    error_happened_p = 2
                     continue
             # print stats:
             for updated_file in updated_files_list:
@@ -305,7 +313,7 @@ def task_run_core():
                 else:
                     write_message("an error occurred while extracting plots from %s:\n%s" % \
                                   (active_file, err_msg))
-                    error_happened_p = True
+                    error_happened_p = 2
                     continue
             # print stats:
             for updated_file in updated_files_list:
@@ -341,7 +349,7 @@ def task_run_core():
                 else:
                     write_message("an error occurred while extracting references from %s:\n%s" % \
                                   (active_file, err_msg))
-                    error_happened_p = True
+                    error_happened_p = 2
                     continue
             # print stats:
             for updated_file in updated_files_list:
@@ -384,7 +392,7 @@ def task_run_core():
                 else:
                     write_message("an error occurred while extracting authorlists from %s:\n%s" % \
                                   (active_file, err_msg))
-                    error_happened_p = True
+                    error_happened_p = 2
                     continue
             # print stats:
             for updated_file in updated_files_list:
@@ -417,7 +425,7 @@ def task_run_core():
                 else:
                     write_message("an error occurred while attaching fulltext to %s:\n%s" % \
                                   (active_file, err_msg))
-                    error_happened_p = True
+                    error_happened_p = 2
                     continue
             # print stats:
             for updated_file in updated_files_list:
@@ -447,7 +455,7 @@ def task_run_core():
                 else:
                     write_message("an error occurred while bibfiltering %s:\n%s" % \
                                   (active_file, err_msg))
-                    error_happened_p = True
+                    error_happened_p = 2
                     continue
             # print stats:
             for active_file in active_files_list:
@@ -516,7 +524,7 @@ def task_run_core():
                             write_message("nothing to upload")
                     else:
                         write_message("an error occurred while uploading harvest from %s" % (reponame,))
-                        error_happened_p = True
+                        error_happened_p = 2
                         continue
             else:
                 # upload files normally
@@ -541,7 +549,7 @@ def task_run_core():
                             write_message("nothing to upload")
                     else:
                         write_message("an error occurred while uploading harvest from %s" % (reponame,))
-                        error_happened_p = True
+                        error_happened_p = 2
                         continue
             write_message("upload step ended")
 
@@ -551,7 +559,24 @@ def task_run_core():
                 task_low_level_submission("webcoll", "oai", *tuple(['-c', 'HEP', '-P', '6']))
         write_message("post-harvest processes ended")
     if error_happened_p:
-        return False
+        if CFG_OAI_FAILED_HARVESTING_STOP_QUEUE == 0 or \
+           not task_get_task_param("sleeptime") or \
+           error_happened_p > 1:
+            # Admin want BibSched to stop, or the task is not set to
+            # run at a later date: we must stop the queue.
+            write_message("An error occurred. Task is configured to stop")
+            return False
+        else:
+            # An error happened, but it can be recovered at next run
+            # (task is re-scheduled) and admin set BibSched to
+            # continue even after failure.
+            write_message("An error occurred, but task is configured to continue")
+            if CFG_OAI_FAILED_HARVESTING_EMAILS_ADMIN:
+                try:
+                    raise InvenioOAIHarvestWarning("OAIHarvest (task #%s) failed at fully harvesting source(s) %s. BibSched has NOT been stopped, and OAIHarvest will try to recover at next run" % (task_get_task_param("task_id"), ", ".join([repo[0][6] for repo in reposlist]),))
+                except InvenioOAIHarvestWarning, e:
+                    register_exception(stream='warning', alert_admin=True)
+            return True
     else:
         return True
 
