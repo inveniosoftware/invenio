@@ -1,5 +1,5 @@
 # # This file is part of Invenio.
-# # Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+# # Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
 # #
 # # Invenio is free software; you can redistribute it and/or
 # # modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2010-12-21 09:26+0100\n"
 "PO-Revision-Date: 2008-02-29 15:25+0100\n"
-"Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
+"Last-Translator: Vasyl Ostrovskyi <vo@imath.kiev.ua>\n"
 "Language-Team: UK <info@invenio-software.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -11566,6 +11566,370 @@ msgid ""
 msgstr ""
 
 #, fuzzy
+#~ msgid "Upload priority"
+#~ msgstr "Downloads history:"
+
+#, fuzzy
+#~ msgid "Returning to the public basket view."
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "You do not have permission to write notes to this item."
+#~ msgstr "Цей розділ поки що не містить записів"
+
+#, fuzzy
+#~ msgid "You do not have permission to delete this note."
+#~ msgstr "Цей розділ поки що не містить записів"
+
+#, fuzzy
+#~ msgid "Sorry, you do not have sufficient rights to add record #%i."
+#~ msgstr "Цей розділ поки що не містить записів"
+
+#, fuzzy
+#~ msgid "The url you have provided is not valid."
+#~ msgstr "Запис видалено"
+
+#, fuzzy
+#~ msgid "Sorry, you do not have sufficient rights on this basket."
+#~ msgstr "Цей розділ поки що не містить записів"
+
+#, fuzzy
+#~ msgid "No records to add."
+#~ msgstr "Шукати серед %s записів:"
+
+#, fuzzy
+#~ msgid ""
+#~ "The category you have selected does not exist. Please select a valid "
+#~ "category."
+#~ msgstr "Запис видалено"
+
+#, fuzzy
+#~ msgid "This record does not seem to exist any more"
+#~ msgstr "Запис видалено"
+
+#, fuzzy
+#~ msgid "Invalid comment ID."
+#~ msgstr "обліковий запис"
+
+#, fuzzy
+#~ msgid "Comment ID %s does not exist."
+#~ msgstr "Запис видалено"
+
+#, fuzzy
+#~ msgid "Record ID %s does not exist."
+#~ msgstr "Запис видалено"
+
+#, fuzzy
+#~ msgid "Bad number of results per page --> showing 10 results per page."
+#~ msgstr "Результати пошуку"
+
+#, fuzzy
+#~ msgid "The comment you have reported no longer exists."
+#~ msgstr "Запис видалено"
+
+#, fuzzy
+#~ msgid "Cannot reply to a review."
+#~ msgstr "далі"
+
+#, fuzzy
+#~ msgid ""
+#~ "<div class=\"webcomment_comment_round_header\">%(x_nb)i Comments for "
+#~ "round \"%(x_name)s\""
+#~ msgstr "Cited by: %s records"
+
+#, fuzzy
+#~ msgid "Your comment will be lost."
+#~ msgstr "Запис видалено"
+
+#, fuzzy
+#~ msgid "This message does not exist."
+#~ msgstr "Запис видалено"
+
+#, fuzzy
+#~ msgid "Back to search"
+#~ msgstr "Результати пошуку"
+
+#, fuzzy
+#~ msgid "Papers"
+#~ msgstr "повідомлення"
+
+#, fuzzy
+#~ msgid "No Papers"
+#~ msgstr "повідомлення"
+
+#, fuzzy
+#~ msgid "unknown affiliation"
+#~ msgstr "Citation history:"
+
+#, fuzzy
+#~ msgid "No Affiliations"
+#~ msgstr "Citation history:"
+
+#, fuzzy
+#~ msgid "Affiliations"
+#~ msgstr "Citation history:"
+
+#, fuzzy
+#~ msgid "No Keywords"
+#~ msgstr "ключеве слово"
+
+#, fuzzy
+#~ msgid "No Citation Information available"
+#~ msgstr "Не знайдено лексичний вказівник для"
+
+#, fuzzy
+#~ msgid "Please select only one group."
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Please select one group."
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Sorry, you do not have sufficient rights on this group."
+#~ msgstr "Цей розділ поки що не містить записів"
+
+#, fuzzy
+#~ msgid "The group has already been deleted."
+#~ msgstr "Запис видалено"
+
+#, fuzzy
+#~ msgid "Restricted"
+#~ msgstr "обмежено"
+
+#, fuzzy
+#~ msgid "You have %i tickets."
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "when subfield $$"
+#~ msgstr "Детальний запис"
+
+#, fuzzy
+#~ msgid "when other subfield"
+#~ msgstr "Детальний запис"
+
+#, fuzzy
+#~ msgid "when subfield"
+#~ msgstr "Детальний запис"
+
+#, fuzzy
+#~ msgid "Manually"
+#~ msgstr "січень"
+
+#, fuzzy
+#~ msgid "ERROR: %s does not exist"
+#~ msgstr "Запис видалено"
+
+#, fuzzy
+#~ msgid "File %s already exists."
+#~ msgstr "Запис видалено"
+
+#, fuzzy
+#~ msgid "File %s: written OK."
+#~ msgstr "Cited by"
+
+#, fuzzy
+#~ msgid "File %s: write failed."
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "File %s deleted."
+#~ msgstr "Запис видалено"
+
+#, fuzzy
+#~ msgid "File %s: delete failed."
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "No Knowledge Base"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Any collection"
+#~ msgstr "розділ"
+
+#, fuzzy
+#~ msgid "Knowledge base is empty"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Update Base Attributes"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Your rule: %s"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Cannot upload file"
+#~ msgstr "Формат представлення:"
+
+#, fuzzy
+#~ msgid "You have not selected a file to upload"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Open Tickets"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Additional Data for this Person"
+#~ msgstr "обліковий запис"
+
+#, fuzzy
+#~ msgid "Forget decision"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Rejected!"
+#~ msgstr "обмежено"
+
+#, fuzzy
+#~ msgid "Your papers"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Not your papers"
+#~ msgstr "підтвердження"
+
+#, fuzzy
+#~ msgid "These are mine!"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "These are not mine!"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Tickets"
+#~ msgstr "назва"
+
+#, fuzzy
+#~ msgid "Request Tickets"
+#~ msgstr "гість"
+
+#, fuzzy
+#~ msgid "Please review your actions"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Select All"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Select None"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Invert Selection"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "No status information found."
+#~ msgstr "адміністрування"
+
+#, fuzzy
+#~ msgid "Review Transaction"
+#~ msgstr "підрозділ"
+
+#, fuzzy
+#~ msgid "Not provided"
+#~ msgstr "автор"
+
+#, fuzzy
+#~ msgid "Not available"
+#~ msgstr "Не знайдено лексичний вказівник для"
+
+#, fuzzy
+#~ msgid "No comments"
+#~ msgstr "обліковий запис"
+
+#, fuzzy
+#~ msgid "Not Available"
+#~ msgstr "Не знайдено лексичний вказівник для"
+
+#, fuzzy
+#~ msgid " Delete this ticket"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Select name for"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Paper title: "
+#~ msgstr "повідомлення"
+
+#, fuzzy
+#~ msgid "The following names have been automatically chosen:"
+#~ msgstr "Запис видалено"
+
+#, fuzzy
+#~ msgid "Navigation:"
+#~ msgstr "Citation history:"
+
+#, fuzzy
+#~ msgid "Person Interface FAQ"
+#~ msgstr "Внутрішня помилка"
+
+#, fuzzy
+#~ msgid "Person Search"
+#~ msgstr "Пошук"
+
+#, fuzzy
+#~ msgid "Open tickets"
+#~ msgstr "назва"
+
+#, fuzzy
+#~ msgid "Selected name on paper"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Sorry."
+#~ msgstr "Впорядкувати за:"
+
+#, fuzzy
+#~ msgid "Please provide at least one transaction."
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Your last name:"
+#~ msgstr "підтвердження"
+
+#, fuzzy
+#~ msgid "Your eMail:"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "!Delete the entire request!"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Mark as your documents"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Mark as their documents"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Mark as _not_ their documents"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Create a new Person for your search"
+#~ msgstr "Розділ %s не існує"
+
+#, fuzzy
+#~ msgid "Recent Papers"
+#~ msgstr "повідомлення"
+
+#, fuzzy
+#~ msgid "Publication List "
+#~ msgstr "кошики"
+
+#, fuzzy
 #~ msgid "Time:"
 #~ msgstr "назва"
 
@@ -11628,10 +11992,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "Submit and save record %s"
 #~ msgstr "Подібні записи"
-
-#, fuzzy
-#~ msgid "There are %i baskets"
-#~ msgstr "кошики"
 
 #, fuzzy
 #~ msgid "updated on"
@@ -11703,14 +12063,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "Done"
 #~ msgstr "травень"
-
-#, fuzzy
-#~ msgid "Add another subfield"
-#~ msgstr "Детальний запис"
-
-#, fuzzy
-#~ msgid "current version"
-#~ msgstr "кошики"
 
 #, fuzzy
 #~ msgid "Edit current version"
@@ -11867,10 +12219,6 @@ msgstr ""
 #~ msgstr "додане"
 
 #, fuzzy
-#~ msgid "your approvals"
-#~ msgstr "підтвердження"
-
-#, fuzzy
 #~ msgid "Create New Group"
 #~ msgstr "кошики"
 
@@ -11915,3 +12263,19 @@ msgstr ""
 #, fuzzy
 #~ msgid "%i others' baskets"
 #~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "There are %i baskets"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "Add another subfield"
+#~ msgstr "Детальний запис"
+
+#, fuzzy
+#~ msgid "current version"
+#~ msgstr "кошики"
+
+#, fuzzy
+#~ msgid "your approvals"
+#~ msgstr "підтвердження"
