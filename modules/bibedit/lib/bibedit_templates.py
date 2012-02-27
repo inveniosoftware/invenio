@@ -502,14 +502,6 @@ def page_style():
                     -moz-border-radius: 4px 4px 4px 4px;
                 }
 
-                .ui-widget-content {
-                    width: 300px;
-                }
-                .ui-widget-content a {
-                    background-color: white;
-                    color: black;
-                }
-
                 .ui-widget-overlay {
                     -moz-background-clip: border;
                     -moz-background-origin: padding;

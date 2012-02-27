@@ -773,7 +773,7 @@ function displayMessage(msgCode, keepContent, args){
       break;
     case 4:
       msg = 'Your modifications have now been submitted. ' +
-  'They will be processed as soon as the task queue is empty.';
+  'They will be processed as soon as the task queue is empty. <br />';
       break;
     case 10:
       msg = 'The record will be deleted as soon as the task queue is empty.';
@@ -1114,7 +1114,6 @@ function escapeHTML(value){
   return value;
 }
 
-
 /*
  * **************************** Functions related to Template interface ****************************************
  */
@@ -1141,4 +1140,65 @@ function createTemplateList(){
   }
   msg += '</table></li>';
   $('#bibEditTemplateList').html(msg);
+}
+
+jQuery.fn.extend({
+    scrollTo : function(scrollPos) {
+        return this.each(function() {
+            $('#bibEditContent').scrollTop(scrollPos);
+        });
+    }
+});
+
+/*
+ * **************************** Functions related to jquery UI dialog ****************************************
+ */
+
+function createDialog(title, LoadingText, height, width){
+  /* Creates a jQuery UI dialog
+   *
+   * title: string, title displayed on top of the dialog
+   * LoadingText: string, text displayed above the loading bar
+   * heigth: int, height of the dialog
+   * width: int, width of the dialog
+   *
+   */
+  var dialog = {
+        dialogDiv : $( '<div>' ),
+        contentParagraph : $('<p>'),
+        contentSpan : $('<span>'),
+        iconSpan : $('<span>')
+  };
+  var dialogDiv = dialog.dialogDiv;
+  var contentParagraph = dialog.contentParagraph;
+  var contentSpan = dialog.contentSpan;
+  var iconSpan = dialog.iconSpan;
+  contentParagraph.addClass('dialog-box-centered');
+  contentSpan.html(LoadingText + "<br /><br /> <img src='/img/ajax-loader.gif'>");
+  dialogDiv.append(contentParagraph.append(contentSpan));
+  dialogDiv.appendTo( $( 'body' ) );
+  dialogDiv.dialog({
+       title: title,
+       resizable: false,
+       modal: true,
+       height: height,
+       width: width
+  });
+
+  return dialog;
+}
+
+function addContentToDialog(dialog, html_content, alertText){
+  /* Modify internal content of a jQuery UI dialog
+   *
+   * dialog: object containing different parts of the dialog (see createDialog())
+   * html_content: string, main text of the dialog
+   * alertText: string, text besides the alert icon
+   *
+   */
+  dialog.iconSpan.addClass('ui-icon').addClass('ui-icon-alert').addClass('dialog-icon');
+  dialog.contentParagraph.before(dialog.iconSpan);
+  dialog.contentParagraph.removeClass('dialog-box-centered');
+  dialog.contentSpan.html("<strong>" + alertText + "</strong>\n\
+                    <br /><br />" + html_content);
 }

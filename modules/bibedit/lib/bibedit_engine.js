@@ -1226,30 +1226,51 @@ function onGetTemplateSuccess(json) {
   onGetRecordSuccess(json);
 }
 
+function onSubmitPreviewSuccess(dialogPreview, html_preview){
+  /*
+   * Confirm whether to submit the record
+   *
+   * dialog: object containing the different parts of the modal dialog
+   * html_preview: a formatted preview of the record content
+  */
+  addContentToDialog(dialogPreview, html_preview, "Do you want to submit the record?");
+  dialogPreview.dialogDiv.dialog({
+        title: "Confirm submit",
+        close: function() { updateStatus('ready'); },
+        buttons: {
+            "Submit changes": function() {
+                                    createReq({recID: gRecID, requestType: 'submit',
+                                        force: onSubmitClick.force}, function(json){
+                                            // Submission was successful.
+                                            changeAndSerializeHash({state: 'submit', recid: gRecID});
+                                            var resCode = json['resultCode'];
+                                            cleanUp(!gNavigatingRecordSet, '', null, true);
+                                            updateStatus('report', gRESULT_CODES[resCode]);
+                                            updateToolbar(false);
+                                            resetBibeditState();
+                                            displayMessage(resCode);
+                                            updateStatus('ready');
+                                    });
+                                    $( this ).remove();
+                                },
+            Cancel: function() {
+                        updateStatus('ready');
+                        $( this ).remove();
+                    }
+    }});
+  $(dialogPreview.dialogDiv).parent().find('button:nth-child(1)').focus();
+
+}
+
 function onSubmitClick(){
   /*
    * Handle 'Submit' button (submit record).
    */
   updateStatus('updating');
-  if (displayAlert('confirmSubmit')){
-    var preview = getPreview();
-    createReq({recID: gRecID, requestType: 'submit',
-         force: onSubmitClick.force}, function(json){
-       // Submission was successful.
-      changeAndSerializeHash({state: 'submit', recid: gRecID});
-      var resCode = json['resultCode'];
-      cleanUp(!gNavigatingRecordSet, '', null, true);
-      updateStatus('report', gRESULT_CODES[resCode]);
-      displayMessage(resCode);
-      $('#bibEditMessage').after(preview);
-      updateToolbar(false);
-      resetBibeditState()
-    }, false);
-    onSubmitClick.force = false;
-    resetBibeditState();
-  }
-  else
-    updateStatus('ready');
+  var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700);
+
+  // Get preview of the record and let the user confirm submit
+  getPreview(dialogPreview, onSubmitPreviewSuccess);
 }
 
 // Enable this flag to force the next submission even if cache is outdated.
@@ -1259,7 +1280,7 @@ function onPreviewClick(){
   /*
    * Handle 'Preview' button (preview record).
    */
-    createReq({data: {'new_window': false}, recID: gRecID, requestType: 'preview'
+    createReq({'new_window': true, recID: gRecID, requestType: 'preview'
        }, function(json){
        // Preview was successful.
         var html_preview = json['html_preview'];
@@ -1269,14 +1290,40 @@ function onPreviewClick(){
        });
 }
 
-function getPreview() {
+function onOpenPDFClick() {
+  /*
+   * Create request to retrieve PDF from record and open it in new window
+   */
+   createReq({recID: gRecID, requestType: 'get_pdf_url'
+       }, function(json){
+        // Preview was successful.
+        var pdf_url = json['pdf_url'];
+        var preview_window = window.open(pdf_url, '', 'resizeable,scrollbars');
+        preview_window.document.close(); // needed for chrome and safari
+       });
+
+}
+
+function record_has_pdf() {
+  /*
+   * Request server if the record has a pdf attached
+   */
+   var record_has_pdf;
+   createReq({recID: gRecID, requestType: 'record_has_pdf'
+       }, function(json){
+            record_has_pdf = json['record_has_pdf'];
+       }, false);
+   return record_has_pdf;
+}
+
+function getPreview(dialog, onSuccess) {
     var html_preview;
     createReq({'new_window': false, recID: gRecID, requestType: 'preview'
        }, function(json){
        // Preview was successful.
         html_preview = json['html_preview'];
-       }, false);
-    return html_preview;
+        onSuccess(dialog, html_preview);
+       });
 }
 
 function onCancelClick(){
@@ -2401,7 +2448,6 @@ function convertFieldIntoEditable(cell, shouldSelect){
           convertFieldIntoEditable(cell, false);
         }
       }
-
       return newVal;
     }, {
       type: 'textarea',
@@ -2601,8 +2647,6 @@ function bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, subfieldCo
 
     redrawFields(tag);
     reColorFields();
-
-
 }
 
 function updateFieldTag(oldTag, newTag, oldInd1, oldInd2, ind1, ind2, fieldPosition,
@@ -3037,6 +3081,9 @@ function onContentChange(value, th){
   }
   addUndoOperation(urHandler);
 
+  // Save the scroll current position before updating the interface
+  var scrollPos = $("#bibEditContent").scrollTop();
+
   // Generate AJAX request
   switch (cellType) {
       case 'subfieldTag':
@@ -3063,6 +3110,9 @@ function onContentChange(value, th){
   else{
       idPrefix = '"#content_';
   }
+
+  /* Scroll to previous position */
+  $(idPrefix.replace(/\"/g,"") + tag + '_' + fieldPosition + '_' + subfieldIndex).scrollTo(scrollPos);
   /* Create fading effect to show the cell modified */
   setTimeout('$(' + idPrefix + tag + '_' + fieldPosition + '_' + subfieldIndex +
       '").effect("highlight", {color: gNEW_CONTENT_COLOR}, ' +
