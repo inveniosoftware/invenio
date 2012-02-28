@@ -94,6 +94,17 @@ def get_citation_weight(rank_method_code, config):
         #make an empty start set
         if task_get_option("quick") == "no":
             result_intermediate = [{}, {}, {}]
+        else:
+            # check indexing times of `journal' and `reportnumber`
+            # indexes, since if they are not up to date yet, then we
+            # should wait and not run citation indexing as of yet:
+            last_timestamp_bibrec = run_sql("SELECT DATE_FORMAT(MAX(modification_date), '%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec", (), 1)[0][0]
+            last_timestamp_indexes = run_sql("SELECT DATE_FORMAT(MAX(last_updated), '%%Y-%%m-%%d %%H:%%i:%%s') FROM idxINDEX WHERE name IN (%s,%s)", ('journal', 'reportnumber'), 1)[0][0]
+            if not last_timestamp_indexes or \
+               not last_timestamp_bibrec or \
+               last_timestamp_bibrec > last_timestamp_indexes:
+                write_message("Not running citation indexer since journal/reportnumber indexes are not up to date yet.")
+                return {}
 
         citation_weight_dic_intermediate = result_intermediate[0]
         citation_list_intermediate = result_intermediate[1]
