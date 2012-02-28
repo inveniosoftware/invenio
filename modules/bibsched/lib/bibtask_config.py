@@ -70,6 +70,7 @@ CFG_BIBTASK_DEFAULT_TASK_SETTINGS = {
         'stage_to_start_from': 1,
         'pretend': False,
         'force': False,
+        'stop_queue_on_error': True,
     },
     'bibindex': {
         'cmd': 'add',

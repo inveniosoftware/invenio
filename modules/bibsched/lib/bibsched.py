@@ -54,7 +54,13 @@ from invenio.textutils import wrap_text_in_a_box
 from invenio.errorlib import register_exception, register_emergency
 from invenio.shellutils import run_shell_command
 
-CFG_VALID_STATUS = ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING', '% DELETED', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'STOPPED', 'SLEEPING', 'KILLED', 'NOW STOP')
+CFG_VALID_STATUS = ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING',
+                    '% DELETED', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'STOPPED',
+                    'SLEEPING', 'KILLED', 'NOW STOP', 'ERRORS REPORTED')
+
+
+class RecoverableError(StandardError):
+    pass
 
 
 def get_pager():
@@ -318,7 +324,7 @@ class Manager:
             elif chr in (ord("s"), ord("S")):
                 self.sleep()
             elif chr in (ord("k"), ord("K")):
-                if status in ('ERROR', 'DONE WITH ERRORS'):
+                if status in ('ERROR', 'DONE WITH ERRORS', 'ERRORS REPORTED'):
                     self.acknowledge()
                 elif status is not None:
                     self.kill()
@@ -602,7 +608,7 @@ class Manager:
     def acknowledge(self):
         task_id = self.currentrow[0]
         status = self.currentrow[5]
-        if status in ('ERROR', 'DONE WITH ERRORS'):
+        if status in ('ERROR', 'DONE WITH ERRORS', 'ERRORS REPORTED'):
             bibsched_set_status(task_id, 'ACK ' + status, status)
             self.display_in_footer("Acknowledged error")
 
@@ -834,7 +840,7 @@ class Manager:
         else:
             self.display_in_footer(self.footer_select_mode, print_time_p=1)
             footer2 = ""
-            if self.item_status.find("DONE") > -1 or self.item_status in ("ERROR", "STOPPED", "KILLED"):
+            if self.item_status.find("DONE") > -1 or self.item_status in ("ERROR", "STOPPED", "KILLED", "ERRORS REPORTED"):
                 footer2 += self.footer_stopped_item
             elif self.item_status in ("RUNNING", "CONTINUING", "ABOUT TO STOP", "ABOUT TO SLEEP"):
                 footer2 += self.footer_running_item
@@ -1122,12 +1128,30 @@ class BibSched:
                 return True
 
     def watch_loop(self):
+        def check_errors():
+            sql = "SELECT count(id) FROM schTASK WHERE status='ERROR'" \
+                  " OR status='DONE WITH ERRORS' OR STATUS='CERROR'"
+            if run_sql(sql)[0][0] > 0:
+                errors = run_sql("SELECT id,proc,status FROM schTASK" \
+                          " WHERE status='ERROR' " \
+                          "OR status='DONE WITH ERRORS'" \
+                          "OR status='CERROR'")
+                msg_errors = ["    #%s %s -> %s" % row for row in errors]
+                msg = 'BibTask with ERRORS:\n%s' % "\n".join(msg_errors)
+                err_types = set(e[2] for e in errors if e[2])
+                if 'ERROR' in err_types or 'DONE WITH ERRORS' in err_types:
+                    raise StandardError(msg)
+                else:
+                    raise RecoverableError(msg)
+
         def calculate_rows():
             """Return all the node_relevant_active_tasks to work on."""
-            if run_sql("SELECT count(id) FROM schTASK WHERE status='ERROR' OR status='DONE WITH ERRORS'")[0][0] > 0:
-                errors = run_sql("SELECT id,proc,status FROM schTASK WHERE status='ERROR' OR status='DONE WITH ERRORS'")
-                errors = ["    #%s %s -> %s" % row for row in errors]
-                raise StandardError('BibTask with ERRORS:\n%s' % "\n".join(errors))
+            try:
+                check_errors()
+            except RecoverableError, msg:
+                register_emergency('Light emergency from %s: BibTask failed: %s' % (CFG_SITE_URL, msg))
+                run_sql("UPDATE schTASK set status='ERRORS REPORTED' where status='CERROR'")
+
             max_bibupload_priority = run_sql("SELECT max(priority) FROM schTASK WHERE status='WAITING' AND proc='bibupload' AND runtime<=NOW()")
             if max_bibupload_priority:
                 run_sql("UPDATE schTASK SET priority=%s WHERE status='WAITING' AND proc='bibupload' AND runtime<=NOW()", ( max_bibupload_priority[0][0], ))

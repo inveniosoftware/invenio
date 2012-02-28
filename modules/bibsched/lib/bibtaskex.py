@@ -52,6 +52,9 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     if key in ('-n', '--number'):
         task_set_option('number', value)
         return True
+    elif key in ('-e', '--error'):
+        task_set_option('error', True)
+        return True
     return False
 
 def task_run_core():
@@ -67,6 +70,8 @@ def task_run_core():
             write_message("Error: water in the CPU.  Ignoring and continuing.", sys.stderr, verbose=3)
         elif i > 0 and i % 5 == 0:
             write_message("Error: floppy drive dropped on the floor.  Ignoring and continuing.", sys.stderr)
+            if task_get_option('error'):
+                1 / 0
         write_message("fib(%d)=%d" % (i, fib(i)))
         task_update_progress("Done %d out of %d." % (i, n))
         task_sleep_now_if_required(can_stop_too=True)
@@ -78,10 +83,13 @@ def main():
     """Main that construct all the bibtask."""
     task_init(authorization_action='runbibtaskex',
             authorization_msg="BibTaskEx Task Submission",
-            help_specific_usage="""  -n,  --number         Print Fibonacci numbers for up to NUM. [default=30]\n""",
+            help_specific_usage="""\
+-n,  --number         Print Fibonacci numbers for up to NUM. [default=30]
+-e,  --error          Raise an error from time to time
+""",
             version=__revision__,
-            specific_params=("n:",
-                ["number="]),
+            specific_params=("n:e",
+                ["number=", "error"]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_run_fnc=task_run_core)
 

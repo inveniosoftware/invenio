@@ -121,6 +121,8 @@ def register_emergency(msg, recipients=None):
     from invenio.mailutils import send_email
     if not recipients:
         recipients = get_emergency_recipients()
+    recipients = set(recipients)
+    recipients.add(CFG_SITE_ADMIN_EMAIL)
     for address_str in recipients:
         send_email(CFG_SITE_SUPPORT_EMAIL, address_str, "Emergency notification", msg)
 
