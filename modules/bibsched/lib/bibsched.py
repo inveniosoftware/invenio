@@ -572,13 +572,16 @@ class Manager:
         status = self.currentrow[5]
         #if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
             #self.display_in_footer("a process is already running!")
-        if status in ("SCHEDULED", "WAITING"):
-            run_sql("UPDATE schTASK SET status='SCHEDULED', host=%s WHERE id=%s", (self.hostname, task_id))
+        if status == "WAITING":
             if process in self.helper_modules:
-                program = os.path.join(CFG_BINDIR, process)
-                COMMAND = "%s %s > /dev/null 2> /dev/null &" % (program, str(task_id))
-                os.system(COMMAND)
-                Log("manually running task #%d (%s)" % (task_id, process))
+                if run_sql("UPDATE schTASK SET status='SCHEDULED', host=%s WHERE id=%s and status='WAITING'", (self.hostname, task_id)):
+                    program = os.path.join(CFG_BINDIR, process)
+                    COMMAND = "%s %s > /dev/null 2> /dev/null &" % (program, str(task_id))
+                    os.system(COMMAND)
+                    Log("manually running task #%d (%s)" % (task_id, process))
+                else:
+                    ## Process already running (typing too quickly on the keyboard?)
+                    pass
             else:
                 self.display_in_footer("Process %s is not in the list of allowed processes." % process)
         else:
