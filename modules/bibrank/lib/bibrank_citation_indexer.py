@@ -52,9 +52,11 @@ class memoise:
             object = self.memo[args] = self.function(*args)
             return object
 
+INTBITSET_OF_DELETED_RECORDS = search_unit(p='DELETED', f='980', m='a')
+
 def get_recids_matching_query(pvalue, fvalue):
     """Return list of recIDs matching query for PVALUE and FVALUE."""
-    rec_id = list(search_pattern(p=pvalue, f=fvalue, m='e'))
+    rec_id = list(search_pattern(p=pvalue, f=fvalue, m='e') - INTBITSET_OF_DELETED_RECORDS)
     return rec_id
 get_recids_matching_query = memoise(get_recids_matching_query)
 
@@ -335,6 +337,15 @@ def get_citation_informations(recid_list, config):
                 write_message(mesg)
                 task_update_progress(mesg)
             done = done+1
+
+            if recid in INTBITSET_OF_DELETED_RECORDS:
+                # do not treat this record since it was deleted; we
+                # skip it like this in case it was only soft-deleted
+                # e.g. via bibedit (i.e. when collection tag 980 is
+                # DELETED but other tags like report number or journal
+                # publication info remained the same, so the calls to
+                # get_fieldvalues() below would return old values)
+                continue
 
             pri_report_numbers = get_fieldvalues(recid, p_record_pri_number_tag)
             add_report_numbers = get_fieldvalues(recid, p_record_add_number_tag)
@@ -733,7 +744,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                     p = matches[0][0]
                 rec_id = None
                 try:
-                    rec_ids = list(search_unit(p, 'journal'))
+                    rec_ids = list(search_unit(p, 'journal') - INTBITSET_OF_DELETED_RECORDS)
                 except:
                     rec_ids = None
                 write_message("These match searching "+p+" in journal: "+str(rec_id), verbose=9)
@@ -819,7 +830,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         done = done+1
         p = recs.replace("\"","")
         #search the publication string like Phys. Lett., B 482 (2000) 417 in 999C5s
-        rec_ids = list(search_unit(f=pubreftag, p=p, m='a'))
+        rec_ids = list(search_unit(f=pubreftag, p=p, m='a') - INTBITSET_OF_DELETED_RECORDS)
         write_message("These records match "+p+" in "+pubreftag+" : "+str(rec_ids), verbose=9)
         if rec_ids:
             for rec_id in rec_ids:
