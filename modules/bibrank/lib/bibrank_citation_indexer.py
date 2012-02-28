@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -39,6 +39,7 @@ from invenio.bibtask import write_message, task_get_option, \
                      task_update_progress, task_sleep_now_if_required, \
                      task_get_task_param
 from invenio.errorlib import register_exception
+from invenio.intbitset import intbitset
 
 class memoise:
     def __init__(self, function):
@@ -51,9 +52,11 @@ class memoise:
             object = self.memo[args] = self.function(*args)
             return object
 
+INTBITSET_OF_DELETED_RECORDS = search_unit(p='DELETED', f='980', m='a')
+
 def get_recids_matching_query(pvalue, fvalue):
     """Return list of recIDs matching query for PVALUE and FVALUE."""
-    rec_id = list(search_pattern(p=pvalue, f=fvalue, m='e'))
+    rec_id = list(search_pattern(p=pvalue, f=fvalue, m='e') - INTBITSET_OF_DELETED_RECORDS)
     return rec_id
 get_recids_matching_query = memoise(get_recids_matching_query)
 
@@ -93,10 +96,34 @@ def get_citation_weight(rank_method_code, config):
         #make an empty start set
         if task_get_option("quick") == "no":
             result_intermediate = [{}, {}, {}]
+        else:
+            # check indexing times of `journal' and `reportnumber`
+            # indexes, since if they are not up to date yet, then we
+            # should wait and not run citation indexing as of yet:
+            last_timestamp_bibrec = run_sql("SELECT DATE_FORMAT(MAX(modification_date), '%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec", (), 1)[0][0]
+            last_timestamp_indexes = run_sql("SELECT DATE_FORMAT(MAX(last_updated), '%%Y-%%m-%%d %%H:%%i:%%s') FROM idxINDEX WHERE name IN (%s,%s)", ('journal', 'reportnumber'), 1)[0][0]
+            if not last_timestamp_indexes or \
+               not last_timestamp_bibrec or \
+               last_timestamp_bibrec > last_timestamp_indexes:
+                write_message("Not running citation indexer since journal/reportnumber indexes are not up to date yet.")
+                return {}
 
         citation_weight_dic_intermediate = result_intermediate[0]
         citation_list_intermediate = result_intermediate[1]
         reference_list_intermediate = result_intermediate[2]
+
+        # Enrich updated_recid_list so that it would contain also
+        # records citing or referring to updated records, so that
+        # their citation information would be updated too.  Not the
+        # most efficient way to treat this problem, but the one that
+        # requires least code changes until ref_analyzer() is more
+        # nicely re-factored.
+        updated_recid_list_set = intbitset(updated_recid_list)
+        for somerecid in updated_recid_list:
+            # add both citers and citees:
+            updated_recid_list_set |= intbitset(citation_list_intermediate.get(somerecid, []))
+            updated_recid_list_set |= intbitset(reference_list_intermediate.get(somerecid, []))
+        updated_recid_list = list(updated_recid_list_set)
 
         #call the procedure that does the hard work by reading fields of
         #citations and references in the updated_recid's (but nothing else)!
@@ -310,6 +337,15 @@ def get_citation_informations(recid_list, config):
                 write_message(mesg)
                 task_update_progress(mesg)
             done = done+1
+
+            if recid in INTBITSET_OF_DELETED_RECORDS:
+                # do not treat this record since it was deleted; we
+                # skip it like this in case it was only soft-deleted
+                # e.g. via bibedit (i.e. when collection tag 980 is
+                # DELETED but other tags like report number or journal
+                # publication info remained the same, so the calls to
+                # get_fieldvalues() below would return old values)
+                continue
 
             pri_report_numbers = get_fieldvalues(recid, p_record_pri_number_tag)
             add_report_numbers = get_fieldvalues(recid, p_record_add_number_tag)
@@ -608,6 +644,17 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     d_records_s = citation_informations[3] #recid -> its publication inf
     t1 = os.times()[4]
 
+    write_message("Phase 0: temporarily remove changed records from citation dictionaries; they will be filled later")
+    for somerecid in updated_rec_list:
+        try:
+            del citation_list[somerecid]
+        except KeyError:
+            pass
+        try:
+            del reference_list[somerecid]
+        except KeyError:
+            pass
+
     write_message("Phase 1: d_references_report_numbers")
     #d_references_report_numbers: e.g 8 -> ([astro-ph/9889],[hep-ph/768])
     #meaning: rec 8 contains these in bibliography
@@ -619,10 +666,6 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
             mesg =  "d_references_report_numbers done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)
-            #write to db!
-            insert_into_cit_db(reference_list, "reversedict")
-            insert_into_cit_db(citation_list, "citationdict")
-            #it's ok to sleep too, we got something done
             task_sleep_now_if_required()
         done = done+1
 
@@ -688,9 +731,6 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
             mesg = "d_references_s done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)
-            #write to db!
-            insert_into_cit_db(reference_list, "reversedict")
-            insert_into_cit_db(citation_list, "citationdict")
             task_sleep_now_if_required()
 
         done = done+1
@@ -704,7 +744,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                     p = matches[0][0]
                 rec_id = None
                 try:
-                    rec_ids = list(search_unit(p, 'journal'))
+                    rec_ids = list(search_unit(p, 'journal') - INTBITSET_OF_DELETED_RECORDS)
                 except:
                     rec_ids = None
                 write_message("These match searching "+p+" in journal: "+str(rec_id), verbose=9)
@@ -790,7 +830,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         done = done+1
         p = recs.replace("\"","")
         #search the publication string like Phys. Lett., B 482 (2000) 417 in 999C5s
-        rec_ids = list(search_unit(f=pubreftag, p=p, m='a'))
+        rec_ids = list(search_unit(f=pubreftag, p=p, m='a') - INTBITSET_OF_DELETED_RECORDS)
         write_message("These records match "+p+" in "+pubreftag+" : "+str(rec_ids), verbose=9)
         if rec_ids:
             for rec_id in rec_ids:
