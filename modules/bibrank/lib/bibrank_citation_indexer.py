@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -39,6 +39,7 @@ from invenio.bibtask import write_message, task_get_option, \
                      task_update_progress, task_sleep_now_if_required, \
                      task_get_task_param
 from invenio.errorlib import register_exception
+from invenio.intbitset import intbitset
 
 class memoise:
     def __init__(self, function):
@@ -97,6 +98,19 @@ def get_citation_weight(rank_method_code, config):
         citation_weight_dic_intermediate = result_intermediate[0]
         citation_list_intermediate = result_intermediate[1]
         reference_list_intermediate = result_intermediate[2]
+
+        # Enrich updated_recid_list so that it would contain also
+        # records citing or referring to updated records, so that
+        # their citation information would be updated too.  Not the
+        # most efficient way to treat this problem, but the one that
+        # requires least code changes until ref_analyzer() is more
+        # nicely re-factored.
+        updated_recid_list_set = intbitset(updated_recid_list)
+        for somerecid in updated_recid_list:
+            # add both citers and citees:
+            updated_recid_list_set |= intbitset(citation_list_intermediate.get(somerecid, []))
+            updated_recid_list_set |= intbitset(reference_list_intermediate.get(somerecid, []))
+        updated_recid_list = list(updated_recid_list_set)
 
         #call the procedure that does the hard work by reading fields of
         #citations and references in the updated_recid's (but nothing else)!
@@ -608,6 +622,17 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     d_records_s = citation_informations[3] #recid -> its publication inf
     t1 = os.times()[4]
 
+    write_message("Phase 0: temporarily remove changed records from citation dictionaries; they will be filled later")
+    for somerecid in updated_rec_list:
+        try:
+            del citation_list[somerecid]
+        except KeyError:
+            pass
+        try:
+            del reference_list[somerecid]
+        except KeyError:
+            pass
+
     write_message("Phase 1: d_references_report_numbers")
     #d_references_report_numbers: e.g 8 -> ([astro-ph/9889],[hep-ph/768])
     #meaning: rec 8 contains these in bibliography
@@ -619,10 +644,6 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
             mesg =  "d_references_report_numbers done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)
-            #write to db!
-            insert_into_cit_db(reference_list, "reversedict")
-            insert_into_cit_db(citation_list, "citationdict")
-            #it's ok to sleep too, we got something done
             task_sleep_now_if_required()
         done = done+1
 
@@ -688,9 +709,6 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
             mesg = "d_references_s done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)
-            #write to db!
-            insert_into_cit_db(reference_list, "reversedict")
-            insert_into_cit_db(citation_list, "citationdict")
             task_sleep_now_if_required()
 
         done = done+1
