@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,7 +22,11 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 
 import invenio.oai_harvest_admin as oha
-import simplejson as json
+try:
+    import simplejson as json
+except ImportError:
+    # json is only recommended
+    pass
 import datetime
 import math
 import urllib
@@ -603,4 +607,3 @@ def viewholdingpen(req, filter = "", ln=CFG_SITE_LANG):
                     lastupdated = __lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-
