@@ -1251,7 +1251,7 @@ def server_pid(ping_the_process=True, check_is_really_bibsched=True):
             return None
 
     if check_is_really_bibsched:
-        output = run_shell_command("ps p %s o args=", (str(pid),))[1]
+        output = run_shell_command("ps p %s -o args=", (str(pid),))[1]
         if not 'bibsched' in output:
             warning("pidfile %s found referring to pid %s which does not correspond to bibsched: cmdline is %s" % (pidfile, pid, output))
             return None
