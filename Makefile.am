@@ -511,4 +511,7 @@ update-v0.99.5-tables: # from v0.99.5 to v1.0.0-rc0
 	echo -e 'from invenio.access_control_firerole import repair_role_definitions;\
 	repair_role_definitions()' | $(PYTHON)
 
+update-v1.0.0-rc0-tables: # from v1.0.0-rc0 to v1.0.0
+	@echo "Nothing to do; table structure did not change between v1.0.0-rc0 and v1.0.0."
+
 CLEANFILES = *~ *.pyc *.tmp
