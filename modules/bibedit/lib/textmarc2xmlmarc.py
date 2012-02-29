@@ -28,8 +28,9 @@ import getopt
 import string
 import sys
 import re
-
 import os.path
+
+from codecs import BOM_UTF8
 
 class Field:
     "A class to hold information on bibliographic field and its value."
@@ -354,6 +355,11 @@ def transform_file(filename):
 
     ## go trough all the input file
     for line in fileinput.input(filename):
+        if line.startswith(BOM_UTF8):
+            ## When files are created with notepad, or in general on Windows,
+            ## let's skip the BOM character which would otherwise be included
+            ## as such in Python.
+            line = line[len(BOM_UTF8):]
         if re.sub("\s","",line) != "":
             # parse the input line with MARC sequential format
             sysno, field, value = line[0:9], line[10:15], line[16:]
@@ -366,7 +372,7 @@ def transform_file(filename):
                 if field[2] == " ":
                     field = string.replace(field," ","0",1)
                 sys.stderr.write(text)
-                raise
+                raise ValueError("Record %s: Error in field definition %s\n" % (sysno,field))
             sysno, field, value = string.strip(sysno), string.strip(field), string.strip(value)
             if sysno == record_current.sysno: # we are in the same bibliographic record
                 record_current.add(field_old, Field(value_old))
@@ -450,9 +456,15 @@ def main():
         print '<collection xmlns="http://www.loc.gov/MARC21/slim">'
         if files:
             for afile in files:
-                transform_file(afile)
+                try:
+                    transform_file(afile)
+                except ValueError:
+                    print >> sys.stderr, "WARNING: %s skipped" % afile
         else:
-            transform_file("-")
+            try:
+                transform_file("-")
+            except ValueError:
+                print >> sys.stderr, "WARNING: ignoring input"
         print '</collection>'
 
     sys.stderr.close()
