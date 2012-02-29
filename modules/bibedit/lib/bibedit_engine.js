@@ -1219,6 +1219,8 @@ function onGetRecordSuccess(json){
 
   createReq({recID: gRecID, requestType: 'getTickets'}, onGetTicketsSuccess);
 
+  // Refresh top toolbar
+  updateToolbar(false);
   updateToolbar(true);
 }
 

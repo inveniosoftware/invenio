@@ -87,6 +87,8 @@ from invenio.bibknowledge import get_kbd_values_for_bibedit, get_kbr_values, \
 from invenio.bibcirculation_dblayer import get_number_copies, has_copies
 from invenio.bibcirculation_utils import create_item_details_url
 
+from invenio.bibdocfile import BibRecDocs, InvenioWebSubmitFileError
+
 import invenio.template
 bibedit_templates = invenio.template.load('bibedit')
 
@@ -380,6 +382,10 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False, \
                                                   undo_redo, cacheMTime))
     elif request_type in ('preview', ):
         response.update(perform_request_preview_record(request_type, recid, uid, data))
+    elif request_type in ('get_pdf_url', ):
+        response.update(perform_request_get_pdf_url(recid))
+    elif request_type in ('record_has_pdf', ):
+        response.update(perform_request_record_has_pdf(recid, uid))
 
     return response
 
@@ -621,7 +627,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             if template_to_merge:
                 record = merge_record_with_template(record, template_to_merge)
                 create_cache_file(recid, uid, record, True)
-                
+
             response['cacheDirty'], response['record'], \
                 response['cacheMTime'], response['recordRevision'], \
                 response['revisionAuthor'], response['lastRevision'], \
@@ -1201,6 +1207,7 @@ def perform_request_preview_record(request_type, recid, uid, data):
 
     return response
 
+
 def perform_request_get_pdf_url(recid):
     """ Handle request to get the URL of the attached PDF
     """
@@ -1216,18 +1223,14 @@ def perform_request_get_pdf_url(recid):
         response['pdf_url'] = ''
     return response
 
+
 def perform_request_record_has_pdf(recid, uid):
     """ Check if record has a pdf attached
     """
-    response = {'record_has_pdf': True}
     rec_info = BibRecDocs(recid)
     docs = rec_info.list_bibdocs()
-    try:
-        doc = docs[0]
-    except IndexError:
-        response['record_has_pdf'] = False
-    finally:
-        return response
+    return {'record_has_pdf': bool(docs)}
+
 
 def _get_formated_record(record, new_window):
     """Returns a record in a given format
