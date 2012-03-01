@@ -7,10 +7,11 @@ comprising institutes such as CERN, CfA, DESY, EPFL, FNAL, SLAC.
 The CERN development team currently consists of:
 
  - Jean-Yves Le Meur <jean-yves.le.meur@cern.ch>
-     Team leader.
+     CERN Digital Library Services team leader.
 
  - Tibor Simko <tibor.simko@cern.ch>
-     Head Developer.  General system architecture, release management.
+     CERN Digital Library Technology team leader.  Head Developer of
+     Invenio.  General system architecture, release management.
      WebSearch, BibIndex, BibSched, WebStat, WebStyle, WebSession,
      WebHelp, and more.
 
@@ -37,36 +38,25 @@ The CERN development team currently consists of:
  - Belinda Chan <belinda.chan@cern.ch>
      User documentation for personal features like alerts and baskets.
 
- - Marko Niinimaki <manzikki@gmail.com>
-     Contributions to the BibRank citation module and WebSearch
-     summary output formats.  Initial implementation of BibCatalog and
-     BibKnowledge.
-
- - Piotr Praczyk <piotr.praczyk@gmail.com>
-     OAI harvesting from arXiv.  Test harvesting interface, for
-     BibHarvest.  Record comparison library functions, for BibRecord.
-     Numerous improvements to BibEdit, e.g. holding pen, copy/paste,
-     undo/redo.
-
- - Christopher Hayward <christopher.james.hayward@cern.ch>
-     Improvements to the reference extraction tool.
-
  - Jaime Garcia Llopis <jaime.garcia.llopis@cern.ch>
      Improvements to the BibCirculation module.
+
+ - Flavio Costa <flavio.costa@cern.ch>
+     Contributions to the Italian translation.
+
+ - Jiri Kuncar <jiri.kuncar@cern.ch>
+     Contributions to the Czech translation.
 
  - Jan Aage Lavik <jan.age.lavik@cern.ch>
      Improvements to BibMatch with remote matching capabilities,
      improvements to plot extractor, improvements to harvesting and
      other small fixes.
 
- - Jan Iwaszkiewicz <jan.iwaszkiewicz@cern.ch>
-     Full-text snippet feature for full-text search.
-
- - Jocelyne Jerdelet <jocelyne.jerdelet@cern.ch>
-     Updates to `Howto MARC' guide.
-
- - Juan Francisco Pereira Corral <juan.francisco.pereira.corral@cern.ch>
-     Fix taxonomy regression test, for BibKnowledge.
+ - Piotr Praczyk <piotr.praczyk@gmail.com>
+     OAI harvesting from arXiv.  Test harvesting interface, for
+     BibHarvest.  Record comparison library functions, for BibRecord.
+     Numerous improvements to BibEdit, e.g. holding pen, copy/paste,
+     undo/redo.
 
  - Roman Chyla <roman.chyla@cern.ch>
      WSGI handler accepts UTF-8 strings.
@@ -79,8 +69,11 @@ The CERN development team currently consists of:
      Weiler.  Fixes for basket export facility and adding external
      items to baskets.
 
- - Tony Ohls <tony.ohls@cern.ch>
-     Fixes for regexp treatment in BibConvert.
+ - Annette Holtkamp <annette.holtkamp@cern.ch>
+     Updates to `Howto MARC' guide.
+
+ - Jocelyne Jerdelet <jocelyne.jerdelet@cern.ch>
+     Updates to `Howto MARC' guide.
 
 The EPFL development team currently consists of:
 
@@ -89,10 +82,6 @@ The EPFL development team currently consists of:
      Other contributions and improvements.
 
 The SLAC development team currently consists of:
-
- - Travis Brooks <travis@slac.stanford.edu>
-     Team leader.  Support for SPIRES search syntax and other
-     improvements.
 
  - Joe Blaylock <jrbl@slac.stanford.edu>
      Rewrite of SPIRES query syntax parser, support for nested
@@ -123,6 +112,26 @@ Many former team members (mostly CERN staff and fellows, technical
 students, diploma students, summer students) contributed to the
 project since 2002.  In an approximately decreasing chronological
 order:
+
+ - Juan Francisco Pereira Corral <juan.francisco.pereira.corral@cern.ch>
+     Fix taxonomy regression test, for BibKnowledge.
+
+ - Jan Iwaszkiewicz <jan.iwaszkiewicz@cern.ch>
+     Full-text snippet feature for full-text search.
+
+ - Christopher Hayward <christopher.james.hayward@cern.ch>
+     Improvements to the reference extraction tool.
+
+ - Travis Brooks <travis@slac.stanford.edu>
+     Support for SPIRES search syntax and other improvements.
+
+ - Tony Ohls <tony.ohls@cern.ch>
+     Fixes for regexp treatment in BibConvert.
+
+ - Marko Niinimaki <manzikki@gmail.com>
+     Contributions to the BibRank citation module and WebSearch
+     summary output formats.  Initial implementation of BibCatalog and
+     BibKnowledge.
 
  - Mathieu Barras <mbarras@gmail.com>
      Initial implementation of SWORD client application.
