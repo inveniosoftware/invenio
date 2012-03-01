@@ -1018,7 +1018,8 @@ class BibSched:
                     return False
 
             for other_task_id, other_proc, other_dummy, other_status, other_sequenceid in higher + lower:
-                if sequenceid == other_sequenceid and task_id > other_task_id:
+                if sequenceid is not None and \
+                    sequenceid == other_sequenceid and task_id > other_task_id:
                     Log('Same sequence id processes.')
                     ## If there is a task with same sequence number then do not run the current task
                     return False
