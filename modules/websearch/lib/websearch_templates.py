@@ -555,7 +555,8 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        title = get_fieldvalues(recid, "245__a")
+        title = get_fieldvalues(recid, "245__a") or \
+                get_fieldvalues(recid, "111__a")
 
         if title:
             title = title[0]
@@ -3148,7 +3149,8 @@ class Template:
         # okay, need to construct a simple "Detailed record" format of our own:
         out = "<p>&nbsp;"
         # secondly, title:
-        titles = get_fieldvalues(recID, "245__a")
+        titles = get_fieldvalues(recID, "245__a") or \
+                 get_fieldvalues(recID, "111__a")
         for title in titles:
             out += "<p><center><big><strong>%s</strong></big></center></p>" % cgi.escape(title)
         # thirdly, authors:
@@ -3276,7 +3278,8 @@ class Template:
 
         # record 'recID' does not exist in format 'format', so print some default format:
         # firstly, title:
-        titles = get_fieldvalues(recID, "245__a")
+        titles = get_fieldvalues(recID, "245__a") or \
+                 get_fieldvalues(recID, "111__a")
         # secondly, authors:
         authors = get_fieldvalues(recID, "100__a") + get_fieldvalues(recID, "700__a")
         # thirdly, date of creation:
