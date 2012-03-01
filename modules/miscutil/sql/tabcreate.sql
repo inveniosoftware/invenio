@@ -3528,7 +3528,8 @@ CREATE TABLE IF NOT EXISTS schTASK (
   PRIMARY KEY  (id),
   KEY status (status),
   KEY runtime (runtime),
-  KEY priority (priority)
+  KEY priority (priority),
+  KEY sequenceid (sequenceid)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS hstTASK (
@@ -3546,7 +3547,8 @@ CREATE TABLE IF NOT EXISTS hstTASK (
   PRIMARY KEY  (id),
   KEY status (status),
   KEY runtime (runtime),
-  KEY priority (priority)
+  KEY priority (priority),
+  KEY sequenceid (sequenceid)
 ) ENGINE=MyISAM;
 
 -- Batch Upload History

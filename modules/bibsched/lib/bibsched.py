@@ -951,17 +951,19 @@ class BibSched:
         min_task_id = None
         min_proc = None
         min_status = None
+        min_sequenceid = None
         to_stop = []
         ## For all the lower priority tasks...
         for (this_task_id, this_proc, this_priority, this_status, this_sequenceid) in task_set:
             if not self.is_task_safe_to_execute(this_proc, proc):
-                to_stop.append((this_task_id, this_proc, this_priority, this_status))
+                to_stop.append((this_task_id, this_proc, this_priority, this_status, this_sequenceid))
             elif (min_prio is None or this_priority < min_prio) and this_status != 'SLEEPING':
                 ## We don't put to sleep already sleeping task :-)
                 min_prio = this_priority
                 min_task_id = this_task_id
                 min_proc = this_proc
                 min_status = this_status
+                min_sequenceid = this_sequenceid
 
         if len(task_set) < CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS and not to_stop:
             ## All the task are safe and there are enough resources
@@ -970,7 +972,7 @@ class BibSched:
             if to_stop:
                 return to_stop, []
             elif min_task_id:
-                return [], [(min_task_id, min_proc, min_prio, min_status)]
+                return [], [(min_task_id, min_proc, min_prio, min_status, min_sequenceid)]
             else:
                 return [], []
 
@@ -998,7 +1000,7 @@ class BibSched:
         #Log("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s" % (task_id, proc, runtime, status, priority))
 
         if (task_id, proc, runtime, status, priority, host, sequenceid) in self.node_relevant_waiting_tasks:
-#        elif task_id in self.task_status['WAITING'] or task_id in self.task_status['SLEEPING']:
+            #elif task_id in self.task_status['WAITING'] or task_id in self.task_status['SLEEPING']:
             #Log("Trying to run %s" % task_id)
 
             if priority < -10:
@@ -1017,10 +1019,17 @@ class BibSched:
                     #Log("Cannot run because task_id: %s, proc: %s is the queue and incompatible" % (other_task_id, other_proc))
                     return False
 
+            if sequenceid:
+                max_priority = run_sql("SELECT MAX(priority) FROM schTASK WHERE status='WAITING' AND sequenceid=%s", (sequenceid, ))[0][0]
+                if run_sql("UPDATE schTASK SET priority=%s WHERE status='WAITING' AND sequenceid=%s", (max_priority, sequenceid)):
+                    Log("Raised all waiting tasks with sequenceid %s to the max priority %s" % (sequenceid, max_priority))
+                    ## Some priorities where raised
+                    return False
+
             for other_task_id, other_proc, other_dummy, other_status, other_sequenceid in higher + lower:
                 if sequenceid is not None and \
                     sequenceid == other_sequenceid and task_id > other_task_id:
-                    Log('Same sequence id processes.')
+                    Log('Task %s need to run after task %s since they have the same sequence id: %s' % (task_id, other_task_id, sequenceid))
                     ## If there is a task with same sequence number then do not run the current task
                     return False
 
@@ -1088,10 +1097,10 @@ class BibSched:
                 ## It's not still safe to run the task.
                 ## We first need to stop task that should be stopped
                 ## and to put to sleep task that should be put to sleep
-                for (other_task_id, other_proc, other_priority, other_status) in tasks_to_stop:
+                for (other_task_id, other_proc, other_priority, other_status, other_sequenceid) in tasks_to_stop:
                     Log("Send STOP signal to #%d (%s) which was in status %s" % (other_task_id, other_proc, other_status))
                     bibsched_set_status(other_task_id, 'ABOUT TO STOP', other_status)
-                for (other_task_id, other_proc, other_priority, other_status) in tasks_to_sleep:
+                for (other_task_id, other_proc, other_priority, other_status, other_sequenceid) in tasks_to_sleep:
                     Log("Send SLEEP signal to #%d (%s) which was in status %s" % (other_task_id, other_proc, other_status))
                     bibsched_set_status(other_task_id, 'ABOUT TO SLEEP', other_status)
                 time.sleep(CFG_BIBSCHED_REFRESHTIME)

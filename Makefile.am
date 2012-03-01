@@ -542,8 +542,10 @@ update-db-from-v1.0-to-v1.1: # update DB from v1.0 release series to v1.1 releas
 	echo "UPDATE sbmFUNCTIONS SET function='Move_CKEditor_Files_to_Storage' WHERE function='Move_FCKeditor_Files_to_Storage';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK CHANGE proc proc varchar(255) NOT NULL;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK ADD sequenceid int(8) NULL default NULL;" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE schTASK ADD INDEX sequenceid (sequenceid);" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE hstTASK CHANGE proc proc varchar(255) NOT NULL;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE hstTASK ADD sequenceid int(8) NULL default NULL;" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE hstTASK ADD INDEX sequenceid (sequenceid);" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE session CHANGE session_object session_object longblob;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE session CHANGE session_expiry session_expiry datetime NOT NULL default '0000-00-00 00:00:00';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE oaiREPOSITORY CHANGE setSpec setSpec varchar(255) NOT NULL default 'GLOBAL_SET';" | ${prefix}/bin/dbexec
