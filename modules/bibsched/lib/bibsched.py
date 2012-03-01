@@ -953,7 +953,7 @@ class BibSched:
         min_status = None
         to_stop = []
         ## For all the lower priority tasks...
-        for (this_task_id, this_proc, this_priority, this_status) in task_set:
+        for (this_task_id, this_proc, this_priority, this_status, this_sequenceid) in task_set:
             if not self.is_task_safe_to_execute(this_proc, proc):
                 to_stop.append((this_task_id, this_proc, this_priority, this_status))
             elif (min_prio is None or this_priority < min_prio) and this_status != 'SLEEPING':
