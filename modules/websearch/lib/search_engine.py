@@ -886,9 +886,9 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
         # only if we have a detailed meta format and we are looking at a
         # single record
         if (recID != -1 and CFG_WEBSEARCH_DETAILED_META_FORMAT):
-            metaheaderadd += format_record(recID,\
-                                           CFG_WEBSEARCH_DETAILED_META_FORMAT,\
-                                            ln = ln)
+            metaheaderadd += format_record(recID, \
+                                           CFG_WEBSEARCH_DETAILED_META_FORMAT, \
+                                           ln = ln)
 
         ## generate navtrail:
         navtrail = create_navtrail_links(cc, aas, ln)
