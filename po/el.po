@@ -18,8 +18,8 @@ msgstr ""
 "Project-Id-Version: Invenio 1.0.0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2012-02-29 15:03+0100\n"
-"PO-Revision-Date: 2012-02-17 18:27+0200\n"
-"Last-Translator: Theodoropoulos Theodoros <theod@lib.auth.gr>\n"
+"PO-Revision-Date: 2012-03-01 16:53+0100\n"
+"Last-Translator: Nikolaos Kasioumis <nikolaos.kasioumis@cern.ch>\n"
 "Language-Team: EL <info@invenio-software.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -5169,7 +5169,7 @@ msgstr "Αρχεία"
 
 #: modules/websearch/lib/websearchadminlib.py:3381
 msgid "Plots"
-msgstr ""
+msgstr "Διαγράμματα"
 
 #: modules/websearch/lib/websearchadminlib.py:3382
 msgid "Holdings"
@@ -8709,7 +8709,7 @@ msgstr "Τι νέο υπάρχει"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py:225
 msgid "Under the CERN sky"
-msgstr ""
+msgstr "Κάτω από τον ουρανό του CERN"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_article_author.py:48
 #, python-format
@@ -8795,7 +8795,7 @@ msgstr "Κριτήρια Αναζήτησης"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:299
 msgid "Output tags"
-msgstr ""
+msgstr "Πεδία εξόδου"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:300
 msgid "Filter collection"
@@ -10434,7 +10434,7 @@ msgstr "Η ημερομηνία επιστροφής άλλαξε. Νέα ημε
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8020
 msgid "Back borrower's loans"
-msgstr ""
+msgstr "Επιστροφή στους δανεισμούς"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8273
 msgid "Select item"
@@ -10615,6 +10615,8 @@ msgstr "Μια νέα αίτηση διαδανεισμού καταχωρήθη
 msgid ""
 "I accept the %s of the service in particular the return of books in due time."
 msgstr ""
+"Αποδέχομαι τους %s της υπηρεσίας, ιδίως την επιστροφή των βιβλίων σε εύθετο "
+"χρόνο."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10821
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11028
@@ -10820,6 +10822,8 @@ msgid ""
 "Borrower accepts the %s of the service in particular the return of books in "
 "due time."
 msgstr ""
+"Ο δανειζόμενος αποδέχεται τους %s της υπηρεσίας, ιδίως την επιστροφή των "
+"βιβλίων σε εύθετο χρόνο."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14474
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15960
@@ -11033,7 +11037,7 @@ msgstr "Δεν έγινε ποτέ harvest"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:161
 msgid "View Holding Pen"
-msgstr ""
+msgstr "Προβολή Λίστας Αναθεώρησης"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:186
 #: modules/bibharvest/lib/oai_harvest_admin.py:547
@@ -11068,11 +11072,11 @@ msgstr "Σύγκριση με αρχικό"
 #: modules/bibharvest/lib/oai_harvest_admin.py:1098
 #: modules/bibharvest/lib/oai_harvest_admin.py:1143
 msgid "Delete from holding pen"
-msgstr ""
+msgstr "Διαγραφή από τη λίστα αναθεώρησης"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1116
 msgid "Error when retrieving the Holding Pen entry"
-msgstr ""
+msgstr "Λάθος κατά την ανάκτηση της εγγραφής από τη λίστα αναθεώρησης"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1124
 msgid "Error when retrieving the record"
@@ -11085,7 +11089,7 @@ msgstr ""
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1137
 msgid "Accept Holding Pen version"
-msgstr ""
+msgstr "Αποδοχή της εκδοχής από τη λίστα αναθεώρησης"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:75
 msgid "Limit display to knowledge bases matching"
@@ -11133,6 +11137,9 @@ msgid ""
 "given field. The list is generated dynamically by                          "
 "searching the records using a search expression."
 msgstr ""
+"Μια δυναμική γνωσιακή βάση είναι μια λίστα από τιμές ενός δεδομένου πεδίου. "
+"Η λίστα δημιουργείται δυναμικά αναζητώντας τις εγγραφές χρησιμοποιώντας μια "
+"συμβολοσειρά αναζήτησης."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:229
 msgid ""
@@ -11142,12 +11149,18 @@ msgid ""
 "'270__a:*Paris*', a list of institutes in Paris                          "
 "will be created."
 msgstr ""
+"Παράδειγμα: Οι εγγραφές σας περιέχουν το πεδίο 270__a για το όνομα και τη "
+"διεύθυνση του ιδρύματος του συγγραφέα. Αν ορίσετε το πεδίο σε '270__a' και "
+"την έκφραση σε '270__a:*Paris*', μια λίστα με τα ιδρύματα στο Παρίσι θα "
+"δημιουργηθεί."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:234
 msgid ""
 "If the expression is empty, a list of all values                          in "
 "270__a will be created."
 msgstr ""
+"Αν η έκφραση είναι κενή, μια λίστα με όλες τις τιμές του 270__a θα "
+"δημιουργηθεί."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:236
 msgid ""
@@ -11155,12 +11168,16 @@ msgid ""
 "it will be replaced by a search string when the                          "
 "knowledge base is used."
 msgstr ""
+"Αν η έκφραση περιέχει '%', όπως '270__a:*%*', θα αντικατασταθεί από μια "
+"συμβολοσειρά αναζήτησης όταν η γνωσιακή βάση χρησιμοποιηθεί."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:239
 msgid ""
 "You can enter a collection name if the expression                          "
 "should be evaluated in a specific collection."
 msgstr ""
+"Μπορείτε να εισάγετε ένα όνομα συλλογής, αν η έκφραση θα πρέπει να "
+"αξιολογηθεί σε μια συγκεκριμένη συλλογή."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:255
 msgid "Exporting: "
@@ -11189,6 +11206,8 @@ msgid ""
 "Here you can add new mappings to this base                         and "
 "change the base attributes."
 msgstr ""
+"Εδώ μπορείτε να προσθέσετε νέες αντιστοιχίσεις σε αυτή τη βάση και να "
+"αλλάξετε τις ιδιότητες της βάσης."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:333
 msgid "Map From"
@@ -11200,11 +11219,11 @@ msgstr "Αναζήτηση αντιστοίχισης"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:514
 msgid "You can get a these mappings in textual format by: "
-msgstr ""
+msgstr "Μπορείτε να πάρετε αυτές τις αντιστοιχίσεις σε μορφή κειμένου από: "
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:516
 msgid "And the KBA version by:"
-msgstr ""
+msgstr "Και την εκδοχή KBA από:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:667
 msgid "Your rule"
@@ -11396,15 +11415,6 @@ msgstr ""
 "Ο χρήστης '%(x_user)s' δεν έχει δικαίωμα να τροποποιήσει την συλλογή "
 "'%(x_coll)s'"
 
-#~ msgid "No fulltext"
-#~ msgstr "Δίχως πλήρες κείμενο"
-
-#~ msgid "the beginning"
-#~ msgstr "αρχή"
-
-#~ msgid "now"
-#~ msgstr "τώρα"
-
 #~ msgid "Upload priority"
 #~ msgstr "Προτεραιότητα μεταφόρτωσης"
 
@@ -11463,6 +11473,10 @@ msgstr ""
 
 #~ msgid "The selected basket is no longer public."
 #~ msgstr "Το συγκεκριμένο καλάθι δεν είναι πλέον δημόσιο."
+
+#~ msgid "You do not have permission to delete this note."
+#~ msgstr ""
+#~ "Δεν έχετε τα απαιτούμενα δικαιώματα για να διαγράψετε αυτή τη σημείωση."
 
 #~ msgid ""
 #~ "The note you are deleting does not exist or you do not have access to it."
@@ -11699,6 +11713,20 @@ msgstr ""
 #~ msgid "This message does not exist."
 #~ msgstr "Αυτό το μήνυμα δεν υπάρχει."
 
+#~ msgid ""
+#~ "Warning: full-text search is only available for a subset of papers mostly "
+#~ "from 2006-2011."
+#~ msgstr ""
+#~ "Προειδοποίηση: η αναζήτηση πλήρους κειμένου είναι διαθέσιμη μόνο για ένα "
+#~ "τμήμα δημοσιεύσεων, κυρίως από το 2006 μέχρι το 2011."
+
+#~ msgid ""
+#~ "Warning: figure caption search is only available for a subset of papers "
+#~ "mostly from 2008-2011."
+#~ msgstr ""
+#~ "Προειδοποίηση: η αναζήτηση λεζάντας διαγραμμάτων είναι διαθέσιμη μόνο για "
+#~ "ένα τμήμα δημοσιεύσεων, κυρίως από το 2008 μέχρι το 2011."
+
 #~ msgid "There is no index %s.  Searching for %s in all fields."
 #~ msgstr ""
 #~ "Δεν υπάρχει το ευρετήριο %s. Γίνεται αναζήτηση του %s σε όλα τα πεδία."
@@ -11932,6 +11960,9 @@ msgstr ""
 #~ msgid "Events"
 #~ msgstr "Συμβάντα"
 
+#~ msgid "Staff Association"
+#~ msgstr "Σύλλογος Προσωπικού"
+
 #~ msgid "when subfield $$"
 #~ msgstr "όταν το υποπεδίο $$"
 
@@ -11949,6 +11980,30 @@ msgstr ""
 
 #~ msgid "Manually"
 #~ msgstr "Χειροκίνητα"
+
+#~ msgid "period_of_interest_from"
+#~ msgstr "period_of_interest_from"
+
+#~ msgid "jsCal3"
+#~ msgstr "jsCal3"
+
+#~ msgid "period_of_interest_to"
+#~ msgstr "period_of_interest_to"
+
+#~ msgid "jsCal4"
+#~ msgstr "jsCal4"
+
+#~ msgid "jsCal1"
+#~ msgstr "jsCal1"
+
+#~ msgid "jsCal2"
+#~ msgstr "jsCal2"
+
+#~ msgid "the beginning"
+#~ msgstr "αρχή"
+
+#~ msgid "now"
+#~ msgstr "τώρα"
 
 #~ msgid "ERROR: %s does not exist"
 #~ msgstr "Σφάλμα: το %s δεν υπάρχει"
@@ -11975,6 +12030,13 @@ msgstr ""
 #~ msgstr "Αρχείο %s: η διαγραφή απέτυχε"
 
 #~ msgid ""
+#~ "Error when formatting the Holding Pen entry. Probably its content is "
+#~ "broken"
+#~ msgstr ""
+#~ "Λάθος κατά τη διαμόρφωση της εγγραφής από τη λίστα αναθεώρησης. Πιθανώς "
+#~ "το περιεχόμενό της να μην είναι έγκυρο"
+
+#~ msgid ""
 #~ "Limit display to knowledge bases matching %(keyword_field)s in their "
 #~ "rules and descriptions"
 #~ msgstr ""
@@ -11991,14 +12053,39 @@ msgstr ""
 #~ msgid "Please upload the RDF file for taxonomy %s"
 #~ msgstr "Παρακαλώ ανεβάστε το RDF αρχείο της ταξινόμησης %s"
 
+#~ msgid ""
+#~ "Example 1: Your records contain field 270__a for                          "
+#~ "the name and address of the author's institute.                          "
+#~ "If you set the field to '270__a' and the "
+#~ "expression                          to '270__a:*Paris*', a list of "
+#~ "institutes in Paris                          will be created."
+#~ msgstr ""
+#~ "Παράδειγμα 1: Οι εγγραφές σας περιέχουν το πεδίο 270__a για το όνομα και "
+#~ "τη διεύθυνση του ιδρύματος του συγγραφέα. Αν ορίσετε το πεδίο σε '270__a' "
+#~ "και την έκφραση σε '270__a:*Paris*', μια λίστα από ιδρύματα στο Παρίσι θα "
+#~ "δημιουργηθεί."
+
+#~ msgid ""
+#~ "Example 2: Return the institute's name (100__a) when "
+#~ "the                          user gives its postal code "
+#~ "(270__a):                          Set field to 100__a, expression to "
+#~ "270__a:*%*."
+#~ msgstr ""
+#~ "Παράδειγμα 2: Επέστρεψε το όνομα του ιδρύματος (100__a) όταν ο χρήστης "
+#~ "δώσει τον ταχυδρομικό του κώδικα (270__a): Όρισε το πεδίο σε 100__a, την "
+#~ "έκφραση σε 270__a:*%*."
+
 #~ msgid "Any collection"
 #~ msgstr "Οποιαδήποτε συλλογή"
 
 #~ msgid "Knowledge base is empty"
-#~ msgstr "Η γνωσιακή Βάση είναι κενή"
+#~ msgstr "Η γνωσιακή βάση είναι κενή"
 
 #~ msgid "Update Base Attributes"
 #~ msgstr "Ενημέρωση Χαρακτηριστικών Βάσης"
+
+#~ msgid "This knowledge base is not used in any format elements."
+#~ msgstr "Αυτή η γνωσιακή βάση δεν χρησιμοποιείται σε κανένα στοιχείο μορφής."
 
 #~ msgid "Your rule: %s"
 #~ msgstr "Ο κανόνας σας: %s"
@@ -12251,6 +12338,14 @@ msgstr ""
 #~ msgid "These records have been marked as not being from this person."
 #~ msgstr "Οι εγγραφές αυτές σημάνθηκαν οτι δεν ανήκουν σε αυτό το άτομο."
 
+#~ msgid "They will be regarded in the next run of the author "
+#~ msgstr "Θα εξετασθούν στην επόμενη εκτέλεση του αλγορίθμου "
+
+#~ msgid "disambiguation algorithm and might disappear from this listing."
+#~ msgstr ""
+#~ "αποσαφήνισης συγγραφέα και ενδέχεται να εξαφανιστούν από αυτόν τον "
+#~ "κατάλογο."
+
 #~ msgid "Not provided"
 #~ msgstr "Δεν παρέχεται"
 
@@ -12321,6 +12416,9 @@ msgstr ""
 #~ msgid "Symbols legend: "
 #~ msgstr "Λεζάντα συμβόλων: "
 
+#~ msgid "Everything is shiny, captain!"
+#~ msgstr "Όρτσα τα πανιά καπετάνιε!"
+
 #~ msgid "The result of this request will be visible immediately"
 #~ msgstr "Το αποτέλεσμα του αιτήματος αυτού θα είναι άμεσα ορατό"
 
@@ -12360,6 +12458,9 @@ msgstr ""
 #~ msgid "Sorry."
 #~ msgstr "Λυπούμαστε."
 
+#~ msgid "Please provide at least one transaction."
+#~ msgstr "Παρακαλώ δώστε τουλάχιστον μία συναλλαγή."
+
 #~ msgid "Error:"
 #~ msgstr "Σφάλμα:"
 
@@ -12370,13 +12471,16 @@ msgstr ""
 #~ msgstr "Παρακαλώ παρέχετε το κύριο όνομά σας"
 
 #~ msgid "Your first name:"
-#~ msgstr "Κύριο όνομα:"
+#~ msgstr "Το κύριο όνομά σας:"
 
 #~ msgid "Please provide your last name"
 #~ msgstr "Παρακαλώ παρέχετε το επίθετό σας"
 
 #~ msgid "Your last name:"
-#~ msgstr "Επίθετο:"
+#~ msgstr "Το επίθετό σας:"
+
+#~ msgid "Please provide your eMail address"
+#~ msgstr "Παρακαλώ δώστε τη διεύθυνση ηλεκτρονικού ταχυδρομείου σας"
 
 #~ msgid ""
 #~ "This eMail address is reserved by a user. Please log in or provide an "
@@ -12405,6 +12509,18 @@ msgstr ""
 
 #~ msgid "Mark as _not_ your documents"
 #~ msgstr "Επισήμανση των εγγράφων ως _μη_ δικά σας"
+
+#~ msgid "Nothing staged as not yours"
+#~ msgstr "Τίποτα εκκρεμές ως μη δικό σας"
+
+#~ msgid "Mark as their documents"
+#~ msgstr "Επισήμανση ως δικά τους έγγραφα"
+
+#~ msgid "Nothing staged in this category"
+#~ msgstr "Τίποτα εκκρεμές σε αυτήν την κατηγορία"
+
+#~ msgid "Mark as _not_ their documents"
+#~ msgstr "Επισήμανση ως _μη_ δικά τους έγγραφα"
 
 #~ msgid ""
 #~ "  * You can come back to this page later. Nothing will be lost. <br />"
@@ -12454,6 +12570,9 @@ msgstr ""
 
 #~ msgid "Correct my publication lists!"
 #~ msgstr "Διορθώστε την λίστα δημοσιεύσεών μου!"
+
+#~ msgid "No fulltext"
+#~ msgstr "Δίχως πλήρες κείμενο"
 
 #~ msgid "Date:"
 #~ msgstr "Ημερομηνία:"
@@ -12817,6 +12936,9 @@ msgstr ""
 
 #~ msgid "Configure BibHarvest"
 #~ msgstr "Παραμετροποίηση BibHarvest"
+
+#~ msgid "View all reported comments"
+#~ msgstr "Προβολή όλων των πιθανά προσβλητικών σχολίων"
 
 #~ msgid "View all reported reviews"
 #~ msgstr "Προβολή όλων των πιθανά προσβλητικών κριτικών"
