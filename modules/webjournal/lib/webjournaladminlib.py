@@ -76,7 +76,7 @@ from invenio.bibrecord import \
      create_record, \
      print_rec
 from invenio.bibformat import format_record
-from invenio.bibtask import task_low_level_submission
+from invenio.bibtask import task_low_level_submission, bibtask_allocate_sequenceid
 from invenio.search_engine import get_all_collections_of_a_record
 import invenio.template
 wjt = invenio.template.load('webjournal')
@@ -753,6 +753,7 @@ def move_drafts_articles_to_ready(journal_name, issue):
     collections_to_refresh = {}
 
     categories = get_journal_categories(journal_name, issue)
+    task_sequence_id = str(bibtask_allocate_sequenceid())
     for category in categories:
         articles = get_journal_articles(journal_name, issue, category)
         for order, recids in articles.iteritems():
@@ -781,10 +782,12 @@ def move_drafts_articles_to_ready(journal_name, issue):
                     # Submit
                     task_low_level_submission('bibupload',
                                               'WebJournal',
-                                              '-c', new_record_xml_path)
+                                              '-c', new_record_xml_path,
+                                              '-I', task_sequence_id)
                     task_low_level_submission('bibindex',
                                               'WebJournal',
-                                              '-i', str(recid))
+                                              '-i', str(recid),
+                                              '-I', task_sequence_id)
                     for collection in get_all_collections_of_a_record(recid):
                         collections_to_refresh[collection] = ''
 
@@ -793,7 +796,8 @@ def move_drafts_articles_to_ready(journal_name, issue):
     for collection in collections_to_refresh.keys():
         task_low_level_submission('webcoll',
                                   'WebJournal',
-                                  '-f', '-p', '2','-c', collection)
+                                  '-f', '-p', '2','-c', collection,
+                                  '-I', task_sequence_id)
 
 def update_draft_record_metadata(record, protected_datafields, keyword_to_remove):
     """
