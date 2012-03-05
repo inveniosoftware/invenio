@@ -71,12 +71,14 @@ Contents
      b) MySQL server (may be on a remote machine), and MySQL client
         (must be available locally too).  MySQL versions 4.1 or 5.0
         are supported.  Please set the variable "max_allowed_packet"
-        in your "my.cnf" init file to at least 4M.  You may perhaps
-        also want to run your MySQL server natively in UTF-8 mode by
-        setting "default-character-set=utf8" in various parts of your
-        "my.cnf" file, such as in the "[mysql]" part and elsewhere;
-        but this is not really required.
-          <http://mysql.com/>
+        in your "my.cnf" init file to at least 4M.  (For sites such as
+        INSPIRE, having 1M records with 10M citer-citee pairs in its
+        citation map, you may need to increase max_allowed_packet to
+        1G.)  You may perhaps also want to run your MySQL server
+        natively in UTF-8 mode by setting "default-character-set=utf8"
+        in various parts of your "my.cnf" file, such as in the
+        "[mysql]" part and elsewhere; but this is not really required.
+        <http://mysql.com/>
 
      c) Apache 2 server, with support for loading DSO modules, and
         optionally with SSL support for HTTPS-secure user

@@ -15,11 +15,11 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.0-rc0\n"
+"Project-Id-Version: Invenio 1.0.0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2011-12-19 22:09+0100\n"
-"PO-Revision-Date: 2012-02-17 18:27+0200\n"
-"Last-Translator: Theodoropoulos Theodoros <theod@lib.auth.gr>\n"
+"PO-Revision-Date: 2012-03-01 16:53+0100\n"
+"Last-Translator: Nikolaos Kasioumis <nikolaos.kasioumis@cern.ch>\n"
 "Language-Team: EL <info@invenio-software.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -5501,7 +5501,7 @@ msgstr "Αρχεία"
 
 #: modules/websearch/lib/websearchadminlib.py:3400
 msgid "Plots"
-msgstr ""
+msgstr "Διαγράμματα"
 
 #: modules/websearch/lib/websearchadminlib.py:3401
 msgid "Holdings"
@@ -9228,7 +9228,7 @@ msgstr "Τι νέο υπάρχει"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py:224
 msgid "Under the CERN sky"
-msgstr ""
+msgstr "Κάτω από τον ουρανό του CERN"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_article_author.py:48
 #, python-format
@@ -9294,7 +9294,7 @@ msgstr "Συμβάντα"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:97
 msgid "Staff Association"
-msgstr ""
+msgstr "Σύλλογος Προσωπικού"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:106
 msgid "Archive"
@@ -9330,7 +9330,7 @@ msgstr "Κριτήρια Αναζήτησης"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:315
 msgid "Output tags"
-msgstr ""
+msgstr "Πεδία εξόδου"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:316
 msgid "Filter collection"
@@ -10982,7 +10982,7 @@ msgstr "Η ημερομηνία επιστροφής άλλαξε. Νέα ημε
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8012
 msgid "Back borrower's loans"
-msgstr ""
+msgstr "Επιστροφή στους δανεισμούς"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8265
 msgid "Select item"
@@ -11123,11 +11123,11 @@ msgstr "Περίοδος ενδιαφέροντος - Από"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15937
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15938
 msgid "period_of_interest_from"
-msgstr ""
+msgstr "period_of_interest_from"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10434
 msgid "jsCal3"
-msgstr ""
+msgstr "jsCal3"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10435
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10588
@@ -11148,11 +11148,11 @@ msgstr "Περίοδος ενδιαφέροντος - Έως"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15939
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15940
 msgid "period_of_interest_to"
-msgstr ""
+msgstr "period_of_interest_to"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10436
 msgid "jsCal4"
-msgstr ""
+msgstr "jsCal4"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10437
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10589
@@ -11188,6 +11188,8 @@ msgstr "Μια νέα αίτηση διαδανεισμού καταχωρήθη
 msgid ""
 "I accept the %s of the service in particular the return of books in due time."
 msgstr ""
+"Αποδέχομαι τους %s της υπηρεσίας, ιδίως την επιστροφή των βιβλίων σε εύθετο "
+"χρόνο."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10808
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11015
@@ -11197,12 +11199,12 @@ msgstr "Θέλω μόνο αυτή την έκδοση."
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11011
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15938
 msgid "jsCal1"
-msgstr ""
+msgstr "jsCal1"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11012
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15940
 msgid "jsCal2"
-msgstr ""
+msgstr "jsCal2"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11059
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15082
@@ -11403,6 +11405,8 @@ msgid ""
 "Borrower accepts the %s of the service in particular the return of books in "
 "due time."
 msgstr ""
+"Ο δανειζόμενος αποδέχεται τους %s της υπηρεσίας, ιδίως την επιστροφή των "
+"βιβλίων σε εύθετο χρόνο."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14458
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15943
@@ -11622,7 +11626,7 @@ msgstr "Δεν έγινε ποτέ harvest"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:162
 msgid "View Holding Pen"
-msgstr ""
+msgstr "Προβολή Λίστας Αναθεώρησης"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:187
 #: modules/bibharvest/lib/oai_harvest_admin.py:559
@@ -11657,11 +11661,11 @@ msgstr "Σύγκριση με αρχικό"
 #: modules/bibharvest/lib/oai_harvest_admin.py:1110
 #: modules/bibharvest/lib/oai_harvest_admin.py:1155
 msgid "Delete from holding pen"
-msgstr ""
+msgstr "Διαγραφή από τη λίστα αναθεώρησης"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1128
 msgid "Error when retrieving the Holding Pen entry"
-msgstr ""
+msgstr "Λάθος κατά την ανάκτηση της εγγραφής από τη λίστα αναθεώρησης"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1136
 msgid "Error when retrieving the record"
@@ -11670,11 +11674,12 @@ msgstr "Λάθος κατά την ανάκτηση της εγγραφής"
 #: modules/bibharvest/lib/oai_harvest_admin.py:1144
 msgid ""
 "Error when formatting the Holding Pen entry. Probably its content is broken"
-msgstr ""
+msgstr "Λάθος κατά τη διαμόρφωση της εγγραφής από τη λίστα αναθεώρησης. "
+"Πιθανώς το περιεχόμενό της να μην είναι έγκυρο"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1149
 msgid "Accept Holding Pen version"
-msgstr ""
+msgstr "Αποδοχή της εκδοχής από τη λίστα αναθεώρησης"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:51
 #, python-format
@@ -11728,6 +11733,9 @@ msgid ""
 "given field. The list is generated dynamically by                          "
 "searching the records using a search expression."
 msgstr ""
+"Μια δυναμική γνωσιακή βάση είναι μια λίστα από τιμές ενός δεδομένου πεδίου. "
+"Η λίστα δημιουργείται δυναμικά αναζητώντας τις εγγραφές χρησιμοποιώντας μια "
+"συμβολοσειρά αναζήτησης."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:239
 msgid ""
@@ -11737,12 +11745,17 @@ msgid ""
 "'270__a:*Paris*', a list of institutes in Paris                          "
 "will be created."
 msgstr ""
+"Παράδειγμα: Οι εγγραφές σας περιέχουν το πεδίο 270__a για το όνομα και τη "
+"διεύθυνση του ιδρύματος του συγγραφέα. Αν ορίσετε το πεδίο σε '270__a' και "
+"την έκφραση σε '270__a:*Paris*', μια λίστα με τα ιδρύματα στο Παρίσι θα "
+"δημιουργηθεί."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:244
 msgid ""
 "If the expression is empty, a list of all values                          in "
 "270__a will be created."
 msgstr ""
+"Αν η έκφραση είναι κενή, μια λίστα με όλες τις τιμές του 270__a θα δημιουργηθεί."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:246
 msgid ""
@@ -11750,12 +11763,16 @@ msgid ""
 "it will be replaced by a search string when the                          "
 "knowledge base is used."
 msgstr ""
+"Αν η έκφραση περιέχει '%', όπως '270__a:*%*', θα αντικατασταθεί από μια "
+"συμβολοσειρά αναζήτησης όταν η γνωσιακή βάση χρησιμοποιηθεί."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:249
 msgid ""
 "You can enter a collection name if the expression                          "
 "should be evaluated in a specific collection."
 msgstr ""
+"Μπορείτε να εισάγετε ένα όνομα συλλογής, αν η έκφραση θα πρέπει να "
+"αξιολογηθεί σε μια συγκεκριμένη συλλογή."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:251
 msgid ""
@@ -11765,6 +11782,10 @@ msgid ""
 "'270__a:*Paris*', a list of institutes in Paris                          "
 "will be created."
 msgstr ""
+"Παράδειγμα 1: Οι εγγραφές σας περιέχουν το πεδίο 270__a για το όνομα και τη "
+"διεύθυνση του ιδρύματος του συγγραφέα. Αν ορίσετε το πεδίο σε '270__a' και "
+"την έκφραση σε '270__a:*Paris*', μια λίστα από ιδρύματα στο Παρίσι θα "
+"δημιουργηθεί."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:256
 msgid ""
@@ -11773,6 +11794,9 @@ msgid ""
 "(270__a):                          Set field to 100__a, expression to 270__a:"
 "*%*."
 msgstr ""
+"Παράδειγμα 2: Επέστρεψε το όνομα του ιδρύματος (100__a) όταν ο χρήστης "
+"δώσει τον ταχυδρομικό του κώδικα (270__a): Όρισε το πεδίο σε 100__a, την "
+"έκφραση σε 270__a:*%*."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:260
 msgid "Any collection"
@@ -11805,6 +11829,8 @@ msgid ""
 "Here you can add new mappings to this base                         and "
 "change the base attributes."
 msgstr ""
+"Εδώ μπορείτε να προσθέσετε νέες αντιστοιχίσεις σε αυτή τη βάση και "
+"να αλλάξετε τις ιδιότητες της βάσης."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:362
 msgid "Map From"
@@ -11816,15 +11842,15 @@ msgstr "Αναζήτηση αντιστοίχισης"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:480
 msgid "Knowledge base is empty"
-msgstr "Η γνωσιακή Βάση είναι κενή"
+msgstr "Η γνωσιακή βάση είναι κενή"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:545
 msgid "You can get a these mappings in textual format by: "
-msgstr ""
+msgstr "Μπορείτε να πάρετε αυτές τις αντιστοιχίσεις σε μορφή κειμένου από: "
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:547
 msgid "And the KBA version by:"
-msgstr ""
+msgstr "Και την εκδοχή KBA από:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:627
 msgid "Update Base Attributes"
@@ -11832,7 +11858,7 @@ msgstr "Ενημέρωση Χαρακτηριστικών Βάσης"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:670
 msgid "This knowledge base is not used in any format elements."
-msgstr ""
+msgstr "Αυτή η γνωσιακή βάση δεν χρησιμοποιείται σε κανένα στοιχείο μορφής."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:700
 #, python-format
@@ -12442,11 +12468,12 @@ msgstr "Οι εγγραφές αυτές σημάνθηκαν οτι δεν αν
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:837
 msgid "They will be regarded in the next run of the author "
-msgstr ""
+msgstr "Θα εξετασθούν στην επόμενη εκτέλεση του αλγορίθμου "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:838
 msgid "disambiguation algorithm and might disappear from this listing."
-msgstr ""
+msgstr "αποσαφήνισης συγγραφέα και ενδέχεται να εξαφανιστούν από αυτόν τον "
+"κατάλογο."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:864
 #: modules/bibauthorid/lib/bibauthorid_templates.py:865
@@ -12549,7 +12576,7 @@ msgstr "Λεζάντα συμβόλων: "
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1128
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1186
 msgid "Everything is shiny, captain!"
-msgstr ""
+msgstr "Όρτσα τα πανιά καπετάνιε!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1129
 msgid "The result of this request will be visible immediately"
@@ -12600,7 +12627,7 @@ msgstr "Λυπούμαστε."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1221
 msgid "Please provide at least one transaction."
-msgstr ""
+msgstr "Παρακαλώ δώστε τουλάχιστον μία συναλλαγή."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1221
 msgid "Error:"
@@ -12617,7 +12644,7 @@ msgstr "Παρακαλώ παρέχετε το κύριο όνομά σας"
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1243
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1245
 msgid "Your first name:"
-msgstr "Κύριο όνομα:"
+msgstr "Το κύριο όνομά σας:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1251
 msgid "Please provide your last name"
@@ -12626,11 +12653,11 @@ msgstr "Παρακαλώ παρέχετε το επίθετό σας"
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1256
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1258
 msgid "Your last name:"
-msgstr "Επίθετο:"
+msgstr "Το επίθετό σας:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1266
 msgid "Please provide your eMail address"
-msgstr ""
+msgstr "Παρακαλώ δώστε τη διεύθυνση ηλεκτρονικού ταχυδρομείου σας"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1272
 msgid ""
@@ -12671,20 +12698,20 @@ msgstr "Επισήμανση των εγγράφων ως _μη_ δικά σας
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1340
 msgid "Nothing staged as not yours"
-msgstr ""
+msgstr "Τίποτα εκκρεμές ως μη δικό σας"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1344
 msgid "Mark as their documents"
-msgstr ""
+msgstr "Επισήμανση ως δικά τους έγγραφα"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1355
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1370
 msgid "Nothing staged in this category"
-msgstr ""
+msgstr "Τίποτα εκκρεμές σε αυτήν την κατηγορία"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1359
 msgid "Mark as _not_ their documents"
-msgstr ""
+msgstr "Επισήμανση ως _μη_ δικά τους έγγραφα"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1376
 msgid "  * You can come back to this page later. Nothing will be lost. <br />"
