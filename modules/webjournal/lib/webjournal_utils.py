@@ -664,6 +664,16 @@ def get_journal_collection_to_refresh_on_release(journal_name):
     return [coll for coll in config_strings.get('update_on_release/collection', []) if \
             collection_reclist_cache.cache.has_key(coll)]
 
+def get_journal_index_to_refresh_on_release(journal_name):
+    """
+    Returns the list of indexed to update (BibIndex) upon release of
+    an issue.
+    """
+    from invenio.bibindex_engine import get_index_id_from_index_name
+    config_strings = get_xml_from_config(["update_on_release/index"], journal_name)
+    return [index for index in config_strings.get('update_on_release/index', []) if \
+            get_index_id_from_index_name(index) != '']
+
 def get_journal_template(template, journal_name, ln=CFG_SITE_LANG):
     """
     Returns the journal templates name for the given template type

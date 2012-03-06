@@ -39,6 +39,7 @@
         <update_on_release>
             <collection>Atlantis Times</collection>
             <collection>Atlantis Times Drafts</collection>
+            <index>collection</index>
         </update_on_release>
 	<first_issue>02/2009</first_issue>
         <draft_keyword>DRAFT</draft_keyword>
