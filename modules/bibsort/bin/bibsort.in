@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!@PYTHON@
 ## -*- mode: python; coding: utf-8; -*-
 ##
 ## This file is part of Invenio.
