@@ -668,7 +668,7 @@ def eval_format_element(format_element, bfo, parameters=None, verbose=0):
                     output_text += '<b><span style="color: rgb(255, 0, 0);">'+ \
                                    str(exc.message) +'</span></b> '
         # (3)
-        if escape in ['0', '1', '2', '3', '4', '5', '6', '7']:
+        if escape in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
             escape_mode = int(escape)
 
         # If escape is equal to 1, then escape all
@@ -1869,6 +1869,8 @@ class BibFormatObject:
                       7. Mix of mode 0 and mode 1. If field_value
                       starts with <!--HTML-->, then use mode 0.
                       Else use mode 1.
+                      8. Same as mode 1, but also escape double-quotes
+                      9. Same as mode 4, but also escape double-quotes
 
         @param tag: the marc code of a field
         @param escape: 1 if returned value should be escaped. Else 0. (see above for other modes)
@@ -1941,6 +1943,8 @@ class BibFormatObject:
                       7. Mix of mode 0 and mode 1. If field_value
                       starts with <!--HTML-->, then use mode 0.
                       Else use mode 1.
+                      8. Same as mode 1, but also escape double-quotes
+                      9. Same as mode 4, but also escape double-quotes
 
         @param tag: the marc code of a field
         @param escape: 1 if returned values should be escaped. Else 0.
@@ -2032,6 +2036,8 @@ def escape_field(value, mode=0):
       - mode 6: same as 3, but allows more tags, like <img>
       - mode 7: mix of mode 0 and mode 1. If field_value starts with <!--HTML-->,
         then use mode 0. Else use mode 1.
+      - mode 8: same as mode 1, but also escape double-quotes
+      - mode 9: same as mode 4, but also escape double-quotes
 
     @param value: value to escape
     @param mode: escaping mode to use
@@ -2039,6 +2045,8 @@ def escape_field(value, mode=0):
     """
     if mode == 1:
         return cgi.escape(value)
+    elif mode == 8:
+        return cgi.escape(value, True)
     elif mode in [2, 5]:
         allowed_attribute_whitelist = CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST
         allowed_tag_whitelist = CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST + \
@@ -2086,15 +2094,21 @@ def escape_field(value, mode=0):
                 return cgi.escape(value)
         else:
             return cgi.escape(value)
-    elif mode == 4:
+    elif mode in [4, 9]:
         try:
-            return washer.wash(value,
-                               allowed_attribute_whitelist=[],
-                               allowed_tag_whitelist=[]
-                               )
+            out = washer.wash(value,
+                              allowed_attribute_whitelist=[],
+                              allowed_tag_whitelist=[]
+                              )
+            if mode == 9:
+                out = out.replace('"', '&quot;')
+            return out
         except HTMLParseError:
             # Parsing failed
-            return cgi.escape(value)
+            if mode == 4:
+                return cgi.escape(value)
+            else:
+                return cgi.escape(value, True)
     elif mode == 7:
         if value.lstrip(' \n').startswith(html_field):
             return value
