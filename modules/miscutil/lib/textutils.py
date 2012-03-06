@@ -99,6 +99,43 @@ CFG_WRAP_TEXT_IN_A_BOX_STYLES = {
 
 }
 
+re_unicode_lowercase_a = re.compile(unicode(r"(?u)[áàäâãå]", "utf-8"))
+re_unicode_lowercase_ae = re.compile(unicode(r"(?u)[æ]", "utf-8"))
+re_unicode_lowercase_e = re.compile(unicode(r"(?u)[éèëê]", "utf-8"))
+re_unicode_lowercase_i = re.compile(unicode(r"(?u)[íìïî]", "utf-8"))
+re_unicode_lowercase_o = re.compile(unicode(r"(?u)[óòöôõø]", "utf-8"))
+re_unicode_lowercase_u = re.compile(unicode(r"(?u)[úùüû]", "utf-8"))
+re_unicode_lowercase_y = re.compile(unicode(r"(?u)[ýÿ]", "utf-8"))
+re_unicode_lowercase_c = re.compile(unicode(r"(?u)[çć]", "utf-8"))
+re_unicode_lowercase_n = re.compile(unicode(r"(?u)[ñ]", "utf-8"))
+re_unicode_uppercase_a = re.compile(unicode(r"(?u)[ÁÀÄÂÃÅ]", "utf-8"))
+re_unicode_uppercase_ae = re.compile(unicode(r"(?u)[Æ]", "utf-8"))
+re_unicode_uppercase_e = re.compile(unicode(r"(?u)[ÉÈËÊ]", "utf-8"))
+re_unicode_uppercase_i = re.compile(unicode(r"(?u)[ÍÌÏÎ]", "utf-8"))
+re_unicode_uppercase_o = re.compile(unicode(r"(?u)[ÓÒÖÔÕØ]", "utf-8"))
+re_unicode_uppercase_u = re.compile(unicode(r"(?u)[ÚÙÜÛ]", "utf-8"))
+re_unicode_uppercase_y = re.compile(unicode(r"(?u)[Ý]", "utf-8"))
+re_unicode_uppercase_c = re.compile(unicode(r"(?u)[ÇĆ]", "utf-8"))
+re_unicode_uppercase_n = re.compile(unicode(r"(?u)[Ñ]", "utf-8"))
+re_latex_lowercase_a = re.compile("\\\\[\"H'`~^vu=k]\{?a\}?")
+re_latex_lowercase_ae = re.compile("\\\\ae\\{\\}?")
+re_latex_lowercase_e = re.compile("\\\\[\"H'`~^vu=k]\\{?e\\}?")
+re_latex_lowercase_i = re.compile("\\\\[\"H'`~^vu=k]\\{?i\\}?")
+re_latex_lowercase_o = re.compile("\\\\[\"H'`~^vu=k]\\{?o\\}?")
+re_latex_lowercase_u = re.compile("\\\\[\"H'`~^vu=k]\\{?u\\}?")
+re_latex_lowercase_y = re.compile("\\\\[\"']\\{?y\\}?")
+re_latex_lowercase_c = re.compile("\\\\['uc]\\{?c\\}?")
+re_latex_lowercase_n = re.compile("\\\\[c'~^vu]\\{?n\\}?")
+re_latex_uppercase_a = re.compile("\\\\[\"H'`~^vu=k]\\{?A\\}?")
+re_latex_uppercase_ae = re.compile("\\\\AE\\{?\\}?")
+re_latex_uppercase_e = re.compile("\\\\[\"H'`~^vu=k]\\{?E\\}?")
+re_latex_uppercase_i = re.compile("\\\\[\"H'`~^vu=k]\\{?I\\}?")
+re_latex_uppercase_o = re.compile("\\\\[\"H'`~^vu=k]\\{?O\\}?")
+re_latex_uppercase_u = re.compile("\\\\[\"H'`~^vu=k]\\{?U\\}?")
+re_latex_uppercase_y = re.compile("\\\\[\"']\\{?Y\\}?")
+re_latex_uppercase_c = re.compile("\\\\['uc]\\{?C\\}?")
+re_latex_uppercase_n = re.compile("\\\\[c'~^vu]\\{?N\\}?")
+
 def indent_text(text,
                 nb_tabs=0,
                 tab_str="  ",
@@ -519,7 +556,7 @@ def translate_to_ascii(values):
     """
     Transliterate the string contents of the given sequence into ascii representation.
     Returns a sequence with the modified values if the module 'unidecode' is
-    available. Otherwise it will return the same sequence untouched.
+    available. Otherwise it will fall back to the inferior strip_accents function.
 
     For example: H\xc3\xb6hne becomes Hohne.
 
@@ -531,16 +568,19 @@ def translate_to_ascii(values):
     @return: sequence with values transformed to ascii
     @rtype: sequence
     """
-    if not UNIDECODE_AVAILABLE or not values:
+    if not values:
         return values
     if type(values) == str:
         values = [values]
     for index, value in enumerate(values):
         if not value:
             continue
-        encoded_text, encoding = guess_minimum_encoding(value)
-        unicode_text = unicode(encoded_text.decode(encoding))
-        ascii_text = unidecode(unicode_text).encode('ascii')
+        if not UNIDECODE_AVAILABLE:
+            ascii_text = strip_accents(value)
+        else:
+            encoded_text, encoding = guess_minimum_encoding(value)
+            unicode_text = unicode(encoded_text.decode(encoding))
+            ascii_text = unidecode(unicode_text).encode('ascii')
         values[index] = ascii_text
     return values
 
@@ -578,3 +618,60 @@ def xml_entities_to_utf8(text, skip=('lt', 'gt', 'amp')):
                     pass
         return text # leave as is
     return re.sub("&#?\w+;", fixup, text)
+
+def strip_accents(x):
+    """
+    Strip accents in the input phrase X (assumed in UTF-8) by replacing
+    accented characters with their unaccented cousins (e.g. é by e).
+
+    @param x: the input phrase to strip.
+    @type x: string
+
+    @return: Return such a stripped X.
+    """
+    x = re_latex_lowercase_a.sub("a", x)
+    x = re_latex_lowercase_ae.sub("ae", x)
+    x = re_latex_lowercase_e.sub("e", x)
+    x = re_latex_lowercase_i.sub("i", x)
+    x = re_latex_lowercase_o.sub("o", x)
+    x = re_latex_lowercase_u.sub("u", x)
+    x = re_latex_lowercase_y.sub("x", x)
+    x = re_latex_lowercase_c.sub("c", x)
+    x = re_latex_lowercase_n.sub("n", x)
+    x = re_latex_uppercase_a.sub("A", x)
+    x = re_latex_uppercase_ae.sub("AE", x)
+    x = re_latex_uppercase_e.sub("E", x)
+    x = re_latex_uppercase_i.sub("I", x)
+    x = re_latex_uppercase_o.sub("O", x)
+    x = re_latex_uppercase_u.sub("U", x)
+    x = re_latex_uppercase_y.sub("Y", x)
+    x = re_latex_uppercase_c.sub("C", x)
+    x = re_latex_uppercase_n.sub("N", x)
+
+    # convert input into Unicode string:
+    try:
+        y = unicode(x, "utf-8")
+    except:
+        return x # something went wrong, probably the input wasn't UTF-8
+    # asciify Latin-1 lowercase characters:
+    y = re_unicode_lowercase_a.sub("a", y)
+    y = re_unicode_lowercase_ae.sub("ae", y)
+    y = re_unicode_lowercase_e.sub("e", y)
+    y = re_unicode_lowercase_i.sub("i", y)
+    y = re_unicode_lowercase_o.sub("o", y)
+    y = re_unicode_lowercase_u.sub("u", y)
+    y = re_unicode_lowercase_y.sub("y", y)
+    y = re_unicode_lowercase_c.sub("c", y)
+    y = re_unicode_lowercase_n.sub("n", y)
+    # asciify Latin-1 uppercase characters:
+    y = re_unicode_uppercase_a.sub("A", y)
+    y = re_unicode_uppercase_ae.sub("AE", y)
+    y = re_unicode_uppercase_e.sub("E", y)
+    y = re_unicode_uppercase_i.sub("I", y)
+    y = re_unicode_uppercase_o.sub("O", y)
+    y = re_unicode_uppercase_u.sub("U", y)
+    y = re_unicode_uppercase_y.sub("Y", y)
+    y = re_unicode_uppercase_c.sub("C", y)
+    y = re_unicode_uppercase_n.sub("N", y)
+    # return UTF-8 representation of the Unicode string:
+    return y.encode("utf-8")

@@ -96,7 +96,7 @@ from invenio.intbitset import intbitset
 from invenio.dbquery import DatabaseError, deserialize_via_marshal, InvenioDbQueryWildcardLimitError
 from invenio.access_control_engine import acc_authorize_action
 from invenio.errorlib import register_exception
-from invenio.textutils import encode_for_xml, wash_for_utf8
+from invenio.textutils import encode_for_xml, wash_for_utf8, strip_accents
 from invenio.htmlutils import get_mathjax_header
 from invenio.htmlutils import nmtoken_from_string
 
@@ -157,42 +157,6 @@ re_pattern_short_words = re.compile(r'([\s\"]\w{1,3})[\*\%]+')
 re_pattern_space = re.compile("__SPACE__")
 re_pattern_today = re.compile("\$TODAY\$")
 re_pattern_parens = re.compile(r'\([^\)]+\s+[^\)]+\)')
-re_unicode_lowercase_a = re.compile(unicode(r"(?u)[áàäâãå]", "utf-8"))
-re_unicode_lowercase_ae = re.compile(unicode(r"(?u)[æ]", "utf-8"))
-re_unicode_lowercase_e = re.compile(unicode(r"(?u)[éèëê]", "utf-8"))
-re_unicode_lowercase_i = re.compile(unicode(r"(?u)[íìïî]", "utf-8"))
-re_unicode_lowercase_o = re.compile(unicode(r"(?u)[óòöôõø]", "utf-8"))
-re_unicode_lowercase_u = re.compile(unicode(r"(?u)[úùüû]", "utf-8"))
-re_unicode_lowercase_y = re.compile(unicode(r"(?u)[ýÿ]", "utf-8"))
-re_unicode_lowercase_c = re.compile(unicode(r"(?u)[çć]", "utf-8"))
-re_unicode_lowercase_n = re.compile(unicode(r"(?u)[ñ]", "utf-8"))
-re_unicode_uppercase_a = re.compile(unicode(r"(?u)[ÁÀÄÂÃÅ]", "utf-8"))
-re_unicode_uppercase_ae = re.compile(unicode(r"(?u)[Æ]", "utf-8"))
-re_unicode_uppercase_e = re.compile(unicode(r"(?u)[ÉÈËÊ]", "utf-8"))
-re_unicode_uppercase_i = re.compile(unicode(r"(?u)[ÍÌÏÎ]", "utf-8"))
-re_unicode_uppercase_o = re.compile(unicode(r"(?u)[ÓÒÖÔÕØ]", "utf-8"))
-re_unicode_uppercase_u = re.compile(unicode(r"(?u)[ÚÙÜÛ]", "utf-8"))
-re_unicode_uppercase_y = re.compile(unicode(r"(?u)[Ý]", "utf-8"))
-re_unicode_uppercase_c = re.compile(unicode(r"(?u)[ÇĆ]", "utf-8"))
-re_unicode_uppercase_n = re.compile(unicode(r"(?u)[Ñ]", "utf-8"))
-re_latex_lowercase_a = re.compile("\\\\[\"H'`~^vu=k]\{?a\}?")
-re_latex_lowercase_ae = re.compile("\\\\ae\\{\\}?")
-re_latex_lowercase_e = re.compile("\\\\[\"H'`~^vu=k]\\{?e\\}?")
-re_latex_lowercase_i = re.compile("\\\\[\"H'`~^vu=k]\\{?i\\}?")
-re_latex_lowercase_o = re.compile("\\\\[\"H'`~^vu=k]\\{?o\\}?")
-re_latex_lowercase_u = re.compile("\\\\[\"H'`~^vu=k]\\{?u\\}?")
-re_latex_lowercase_y = re.compile("\\\\[\"']\\{?y\\}?")
-re_latex_lowercase_c = re.compile("\\\\['uc]\\{?c\\}?")
-re_latex_lowercase_n = re.compile("\\\\[c'~^vu]\\{?n\\}?")
-re_latex_uppercase_a = re.compile("\\\\[\"H'`~^vu=k]\\{?A\\}?")
-re_latex_uppercase_ae = re.compile("\\\\AE\\{?\\}?")
-re_latex_uppercase_e = re.compile("\\\\[\"H'`~^vu=k]\\{?E\\}?")
-re_latex_uppercase_i = re.compile("\\\\[\"H'`~^vu=k]\\{?I\\}?")
-re_latex_uppercase_o = re.compile("\\\\[\"H'`~^vu=k]\\{?O\\}?")
-re_latex_uppercase_u = re.compile("\\\\[\"H'`~^vu=k]\\{?U\\}?")
-re_latex_uppercase_y = re.compile("\\\\[\"']\\{?Y\\}?")
-re_latex_uppercase_c = re.compile("\\\\['uc]\\{?C\\}?")
-re_latex_uppercase_n = re.compile("\\\\[c'~^vu]\\{?N\\}?")
 
 class RestrictedCollectionDataCacher(DataCacher):
     def __init__(self):
@@ -1466,57 +1430,6 @@ def wash_colls(cc, c, split_colls=0, verbose=0):
         debug += "<br />colls_out : %s" % colls_out
 
     return (cc, colls_out_for_display, colls_out, hosted_colls_out, debug)
-
-def strip_accents(x):
-    """Strip accents in the input phrase X (assumed in UTF-8) by replacing
-    accented characters with their unaccented cousins (e.g. é by e).
-    Return such a stripped X."""
-    x = re_latex_lowercase_a.sub("a", x)
-    x = re_latex_lowercase_ae.sub("ae", x)
-    x = re_latex_lowercase_e.sub("e", x)
-    x = re_latex_lowercase_i.sub("i", x)
-    x = re_latex_lowercase_o.sub("o", x)
-    x = re_latex_lowercase_u.sub("u", x)
-    x = re_latex_lowercase_y.sub("x", x)
-    x = re_latex_lowercase_c.sub("c", x)
-    x = re_latex_lowercase_n.sub("n", x)
-    x = re_latex_uppercase_a.sub("A", x)
-    x = re_latex_uppercase_ae.sub("AE", x)
-    x = re_latex_uppercase_e.sub("E", x)
-    x = re_latex_uppercase_i.sub("I", x)
-    x = re_latex_uppercase_o.sub("O", x)
-    x = re_latex_uppercase_u.sub("U", x)
-    x = re_latex_uppercase_y.sub("Y", x)
-    x = re_latex_uppercase_c.sub("C", x)
-    x = re_latex_uppercase_n.sub("N", x)
-
-    # convert input into Unicode string:
-    try:
-        y = unicode(x, "utf-8")
-    except:
-        return x # something went wrong, probably the input wasn't UTF-8
-    # asciify Latin-1 lowercase characters:
-    y = re_unicode_lowercase_a.sub("a", y)
-    y = re_unicode_lowercase_ae.sub("ae", y)
-    y = re_unicode_lowercase_e.sub("e", y)
-    y = re_unicode_lowercase_i.sub("i", y)
-    y = re_unicode_lowercase_o.sub("o", y)
-    y = re_unicode_lowercase_u.sub("u", y)
-    y = re_unicode_lowercase_y.sub("y", y)
-    y = re_unicode_lowercase_c.sub("c", y)
-    y = re_unicode_lowercase_n.sub("n", y)
-    # asciify Latin-1 uppercase characters:
-    y = re_unicode_uppercase_a.sub("A", y)
-    y = re_unicode_uppercase_ae.sub("AE", y)
-    y = re_unicode_uppercase_e.sub("E", y)
-    y = re_unicode_uppercase_i.sub("I", y)
-    y = re_unicode_uppercase_o.sub("O", y)
-    y = re_unicode_uppercase_u.sub("U", y)
-    y = re_unicode_uppercase_y.sub("Y", y)
-    y = re_unicode_uppercase_c.sub("C", y)
-    y = re_unicode_uppercase_n.sub("N", y)
-    # return UTF-8 representation of the Unicode string:
-    return y.encode("utf-8")
 
 def wash_index_term(term, max_char_length=50, lower_term=True):
     """

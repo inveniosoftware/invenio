@@ -53,7 +53,7 @@ from invenio.bibdocfile import bibdocfile_url_p, \
      bibdocfile_url_to_bibdoc, normalize_format, \
      download_url, guess_format_from_url, BibRecDocs
 from invenio.websubmit_file_converter import convert_file, get_file_converter_logger
-from invenio.search_engine import perform_request_search, strip_accents, \
+from invenio.search_engine import perform_request_search, \
      wash_index_term, lower_index_term, get_index_stemming_language, \
      get_synonym_terms
 from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, \
@@ -66,7 +66,7 @@ from invenio.bibtask import task_init, write_message, get_datetime, \
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
 from invenio.htmlutils import remove_html_markup, get_links_in_html_page
-from invenio.textutils import wash_for_utf8
+from invenio.textutils import wash_for_utf8, strip_accents
 from invenio.search_engine_utils import get_fieldvalues
 
 if sys.hexversion < 0x2040000:
