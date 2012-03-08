@@ -905,6 +905,7 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
         # will be washed/fixed when calling tidy_html(): double-escape
         # all &gt; first, and use &gt;&gt;
         msg = msg.replace('&gt;', '&amp;gt;')
+        msg = re.sub('^\s*<blockquote', '<br/> <blockquote', msg)
         msg = re.sub('<blockquote.*?>\s*<(p|div).*?>', '&gt;&gt;', msg)
         msg = re.sub('</(p|div)>\s*</blockquote>', '', msg)
         # Then definitely remove any blockquote, whatever it is
@@ -912,6 +913,8 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
         msg = re.sub('</blockquote>', '</div>', msg)
         # Tidy up the HTML
         msg = tidy_html(msg)
+        # We remove EOL that might have been introduced when tidying
+        msg = msg.replace('\n', '').replace('\r', '')
         # Now that HTML has been cleaned, unescape &gt;
         msg = msg.replace('&gt;', '>')
         msg = msg.replace('&amp;gt;', '&gt;')

@@ -748,59 +748,62 @@ class WebCommentTransformationHTMLMarkupTest(unittest.TestCase):
     def test_unordered_lists_markup_transformation(self):
         """webcomment - unordered lists markup transformation """
         washer = EmailWasher()
-        body_input = '<ul><li>foo</li><li>bar</li></ul>'
-        """
-        <ul>
+        body_input = """<ul>
           <li>foo</li>
           <li>bar</li>
-        </ul>
-        """
-        body_expected = '* foo* bar'
-        """
-        * foo
-        * bar
-        """
+        </ul>"""
+        body_expected = """
+  * foo
+  * bar
+"""
+        self.assertEqual(washer.wash(body_input),
+                         body_expected)
+
+        # Without spaces and EOL
+        body_input = '<ul><li>foo</li><li>bar</li></ul>'
         self.assertEqual(washer.wash(body_input),
                          body_expected)
 
     def test_ordered_lists_markup_transformation(self):
         """ webcomment - ordered lists markup transformation """
         washer = EmailWasher()
-        body_input = '<ol><li>foo</li><li>bar</li></ol>'
-        """
-        <ol>
+        body_input = """<ol>
           <li>foo</li>
           <li>bar</li>
-        </ol>
-        """
-        body_expected = '1. foo2. bar'
-        """
-        1. foo
-        2. bar
-        """
+        </ol>"""
+        body_expected = """
+  1. foo
+  2. bar
+"""
+        self.assertEqual(washer.wash(body_input),
+                         body_expected)
+
+        # Without spaces and EOL
+        body_input = '<ol><li>foo</li><li>bar</li></ol>'
         self.assertEqual(washer.wash(body_input),
                          body_expected)
 
     def test_nested_lists_markup_transformation(self):
         """ webcomment - nested lists markup transformation """
         washer = EmailWasher()
-        body_input = '<ol><li>foo<ol><li>nested foo</li></ol></li><li>bar</li></ol>'
-        """
-        <ol>
+        body_input =  """<ol>
           <li>foo
             <ol>
               <li>nested foo</li>
             </ol>
           </li>
           <li>bar</li>
-        </ol>
-        """
-        body_expected = '1. foo1. nested foo2. bar'
-        """
-        1. foo
-          1. nested foo
-        2. bar
-        """
+        </ol>"""
+        body_expected = """
+  1. foo
+    1. nested foo
+  2. bar
+"""
+        self.assertEqual(washer.wash(body_input),
+                         body_expected)
+
+        # Without spaces and EOL
+        body_input = '<ol><li>foo<ol><li>nested foo</li></ol></li><li>bar</li></ol>'
         self.assertEqual(washer.wash(body_input),
                          body_expected)
 
@@ -828,15 +831,14 @@ class WebCommentTransformationHTMLMarkupTest(unittest.TestCase):
     def test_global_markup_transformation(self):
         """ webcomment - global transformation """
         washer = EmailWasher()
-        body_input = '<a href="http://foo.com">http://foo.com</a><ol><li>Main Ordered List item</li><li>Below is an example of HTML nested ordered list<ul><li>nested list item 1</li><li>nested list item 2</li><li>Sub nested ordered list<ol><li>sub nested list item A</li><li>sub nested list item B</li></ol></li></ul></li><li>The last line in the ordered list</li></ol><a href="http://foo.com">bar</a>'
-        """
-        <a href="http://foo.com">http://foo.com</a>
+        body_input = """<a href="http://foo.com">http://foo.com</a>
         <ol>
           <li>Main Ordered List item</li>
-          <li>Below is an example of HTML nested ordered list
+          <li>Below is an example of HTML nested unordered list
             <ul>
               <li>nested list item 1</li>
-              <li>nested list item 2</li>
+
+                 <li>nested list item 2</li>
               <li>Sub nested ordered list
                 <ol>
                   <li>sub nested list item A</li>
@@ -845,28 +847,28 @@ class WebCommentTransformationHTMLMarkupTest(unittest.TestCase):
               </li>
             </ul>
           </li>
-          <li>The last line in the ordered list</li>
-        </ol>
-        <a href="http://foo.com">bar</a>
-        """
-        body_expected = '<http://foo.com>1. Main Ordered List item2. Below is an example of HTML nested ordered list* nested list item 1* nested list item 2* Sub nested ordered list1. sub nested list item A2. sub nested list item B3. The last line in the ordered list<http://foo.com>(bar)'
-        """
-        <http://foo.com>
-        1. Main Ordered List item
-        2. Below is an example of HTML nested ordered list
-          * nested list item 1
-          * nested list item 2
-          * Sub nested ordered list
-            1. sub nested list item A
-            2. sub nested list item B
-        3. The last line in the ordered list
-        <http://foo.com>(bar)
-        """
+          <li>The last line in the main ordered list</li>
+        </ol> <a href="http://foo.com">bar</a>"""
+        body_expected = """<http://foo.com>
+  1. Main Ordered List item
+  2. Below is an example of HTML nested unordered list
+    * nested list item 1
+    * nested list item 2
+    * Sub nested ordered list
+      1. sub nested list item A
+      2. sub nested list item B
+  3. The last line in the main ordered list
+ <http://foo.com>(bar)"""
         self.assertEqual(washer.wash(body_input),
                          body_expected)
 
-TEST_SUITE = make_test_suite(WebCommentWebPagesAvailabilityTest,
-                             WebCommentRestrictionsTest,
+        # Without spaces and EOL
+        body_input = '<a href="http://foo.com">http://foo.com</a><ol><li>Main Ordered List item</li><li>Below is an example of HTML nested unordered list<ul><li>nested list item 1</li><li>nested list item 2</li><li>Sub nested ordered list<ol><li>sub nested list item A</li><li>sub nested list item B</li></ol></li></ul></li><li>The last line in the main ordered list</li></ol> <a href="http://foo.com">bar</a>'
+        self.assertEqual(washer.wash(body_input),
+                         body_expected)
+
+TEST_SUITE = make_test_suite(#WebCommentWebPagesAvailabilityTest,
+                             #WebCommentRestrictionsTest,
                              WebCommentTransformationHTMLMarkupTest)
 
 if __name__ == "__main__":

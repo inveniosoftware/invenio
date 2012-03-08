@@ -29,7 +29,6 @@ from invenio.textutils import indent_text, encode_for_xml
 import re
 import cgi
 import os
-import string
 
 try:
     from BeautifulSoup import BeautifulSoup
@@ -168,7 +167,6 @@ class HTMLWasher(HTMLParser):
              render_unallowed_tags=False,
              allowed_tag_whitelist=CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST,
              automatic_link_transformation=False,
-             allowed_tag_whitelist=cfg_html_buffer_allowed_tag_whitelist,
              allowed_attribute_whitelist=\
                     CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST):
         """
@@ -225,7 +223,7 @@ class HTMLWasher(HTMLParser):
                 for url in possible_urls:
                     if regex_url.search(url):
                         transformed_url = '<a href="%s">%s</a>' % (url, url)
-                        data = string.replace(data, url, transformed_url)
+                        data = data.replace(url, transformed_url)
                 self.result += data
             else:
                 self.result += cgi.escape(data, True)
