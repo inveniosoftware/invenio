@@ -517,7 +517,6 @@ class SpiresToInvenioSyntaxConverter:
         'kw' : 'keyword:',
         # note
         'note' : '500__a:',
-        'n' : '500__a:',
         # old title
         'old-title' : '246__a:',
         'old-t' : '246__a:',
