@@ -449,7 +449,6 @@ function resetBibeditState(){
   gPhysCopiesNum = 0;
   gBibCircUrl = null;
 
-  updateRevisionsHistory();
   updateInterfaceAccordingToMode();
   updateRevisionsHistory();
   updateUrView();
@@ -2822,7 +2821,9 @@ function onContentChange(value, th){
    *
    * Returns: string - string to be introduced in the cell th
    */
-
+   if (failInReadOnly()){
+    return;
+  }
   /* Extract information about the field to edit from cell id */
   var tmpArray = th.id.split('_');
   var tag = tmpArray[1], fieldPosition = tmpArray[2], subfieldIndex = tmpArray[3];
@@ -3104,10 +3105,10 @@ function updateInterfaceAccordingToMode(){
   // updating the switch button caption
   if (gReadOnlyMode){
     deactivateRecordMenu();
-    $('#btnSwitchReadOnly').attr("innerHTML", "R/W");
+    $('#btnSwitchReadOnly').html("R/W");
   } else {
     activateRecordMenu();
-    $('#btnSwitchReadOnly').attr("innerHTML", "Read-only");
+    $('#btnSwitchReadOnly').html("Read-only");
   }
 }
 
@@ -3213,7 +3214,7 @@ function updateRevisionsHistory(){
     result += tmpResult["HTML"];
   }
 
-  $("#bibEditRevisionsHistory").attr("innerHTML", result);
+  $("#bibEditRevisionsHistory").html(result);
   $(".bibEditRevHistoryEntryContent").bind("click", function(evt){
     var revision = $(this)[0].id.split("_")[1];
     updateStatus('updating');

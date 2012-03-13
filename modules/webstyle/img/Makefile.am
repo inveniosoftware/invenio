@@ -78,6 +78,7 @@ img_DATA = add-small.png \
            drop_down_menu_arrow_down_w.gif \
            edit1.gif \
            external-icon-light-8x8.gif \
+           eye.png \
            feed-icon-12x12.gif \
            file-icon-none-96x128.gif \
            file-icon-text-12x16.gif \

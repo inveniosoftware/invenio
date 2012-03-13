@@ -457,6 +457,10 @@ def page_style():
                     vertical-align: bottom;
                 }
 
+                .bibEditRevHistoryEntryContent{
+                    cursor: pointer;
+                }
+
                 .revisionLine {
                     position: absolute;
                     top:0;
