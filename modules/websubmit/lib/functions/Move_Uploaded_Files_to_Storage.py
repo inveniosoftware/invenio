@@ -68,6 +68,11 @@ def Move_Uploaded_Files_to_Storage(parameters, curdir, form, user_info=None):
     create_icon_doctypes = parameters.get('createIconDoctypes').split('|')
     force_file_revision = (parameters.get('forceFileRevision') == '1')
 
+    try:
+        websubmit_managedocfiles._read_file_revision_interface_configuration_from_disk(curdir)
+    except IOError:
+        return
+
     websubmit_managedocfiles.move_uploaded_files_to_storage(curdir,
                                         recid, iconsize,
                                         create_icon_doctypes,
