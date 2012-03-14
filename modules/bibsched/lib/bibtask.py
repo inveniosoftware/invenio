@@ -551,17 +551,26 @@ def task_sleep_now_if_required(can_stop_too=False):
         signal.signal(signal.SIGTSTP, _task_sig_dumb)
         os.kill(os.getpid(), signal.SIGSTOP)
         time.sleep(1)
-        task_update_status("CONTINUING")
-        write_message("... continuing...")
+        if task_read_status() == 'NOW STOP':
+            if can_stop_too:
+                write_message("stopped")
+                task_update_status("STOPPED")
+                sys.exit(0)
+            else:
+                write_message("stopping as soon as possible...")
+                task_update_status('ABOUT TO STOP')
+        else:
+            write_message("... continuing...")
+            task_update_status("CONTINUING")
         signal.signal(signal.SIGTSTP, _task_sig_sleep)
     elif status == 'ABOUT TO STOP' and can_stop_too:
         write_message("stopped")
         task_update_status("STOPPED")
         sys.exit(0)
-    runtime_limit = task_get_option("limit")
-    if runtime_limit is not None:
-        if not (runtime_limit[0] <= time.time() <= runtime_limit[1]):
-            if can_stop_too:
+    if can_stop_too:
+        runtime_limit = task_get_option("limit")
+        if runtime_limit is not None:
+            if not (runtime_limit[0] <= time.time() <= runtime_limit[1]):
                 write_message("stopped (outside runtime limit)")
                 task_update_status("STOPPED")
                 sys.exit(0)
