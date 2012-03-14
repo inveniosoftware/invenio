@@ -560,5 +560,8 @@ update-db-from-v1.0-to-v1.1: # update DB from v1.0 release series to v1.1 releas
 	echo "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','aspect');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','batch_template');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','title');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Set_RN_From_Sysno', 'Set the value of global rn variable to the report number identified by sysno (recid)');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','edsrn');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','rep_tags');" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~ *.pyc *.tmp

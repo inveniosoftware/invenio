@@ -88,7 +88,8 @@ pylib_DATA = __init__.py \
              Move_Revised_Files_to_Storage.py \
              Move_Photos_to_Storage.py \
              Video_Processing.py \
-             DEMOVID_Validation.py
+             DEMOVID_Validation.py \
+             Set_RN_From_Sysno.py
 
 EXTRA_DIST = $(pylib_DATA)
 
