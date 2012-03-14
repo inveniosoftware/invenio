@@ -151,7 +151,7 @@ install-jquery-plugins: install-jquery-plugins
 	wget https://raw.github.com/malsup/form/master/jquery.form.js --no-check-certificate && \
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
 	wget https://raw.github.com/akaihola/jquery-autogrow/master/jquery.autogrow.js --no-check-certificate && \
-	wget http://autobahn.tablesorter.com/jquery.tablesorter.zip && \
+	wget -O jquery.tablesorter.zip http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip && \
 	wget http://www.uploadify.com/wp-content/uploads/uploadify-v2.1.4.zip -O uploadify.zip && \
 	unzip jquery.tablesorter.zip && \
 	rm jquery.tablesorter.zip && \
