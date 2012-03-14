@@ -291,13 +291,11 @@ def task_init(
                 help_specific_usage, version, specific_params,
                 task_submit_elaborate_specific_parameter_fnc,
                 task_submit_check_options_fnc)
-        except SystemExit:
-            raise
-        except Exception, e:
-            register_exception(alert_admin=True)
-            write_message("Error in parsing the parameters: %s." % e, sys.stderr)
-            write_message("Exiting.", sys.stderr)
+        except (SystemExit, Exception), err:
             if not to_be_submitted:
+                register_exception(alert_admin=True)
+                write_message("Error in parsing the parameters: %s." % err, sys.stderr)
+                write_message("Exiting.", sys.stderr)
                 task_update_status("ERROR")
             raise
 
