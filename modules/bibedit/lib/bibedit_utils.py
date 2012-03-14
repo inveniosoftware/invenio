@@ -55,6 +55,7 @@ from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_QUEUE_CHECK_METHOD, \
     CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE
 from invenio.dateutils import convert_datetext_to_dategui
+from invenio.textutils import wash_for_xml
 from invenio.bibedit_dblayer import get_bibupload_task_opts, \
     get_marcxml_of_record_revision, get_record_revisions, \
     get_info_of_record_revision
@@ -279,7 +280,7 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
     # order subfields alphabetically before saving the record
     record_order_subfields(record)
 
-    xml_to_write = record_xml_output(record)
+    xml_to_write = wash_for_xml(record_xml_output(record))
 
     # Write XML file.
     if not to_merge:

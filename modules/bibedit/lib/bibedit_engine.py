@@ -79,6 +79,7 @@ from invenio.webuser import session_param_get, session_param_set
 from invenio.bibcatalog import bibcatalog_system
 from invenio.webpage import page
 from invenio.htmlutils import get_mathjax_header
+from invenio.textutils import wash_for_xml
 from invenio.bibknowledge import get_kbd_values_for_bibedit, get_kbr_values, \
      get_kbt_items_for_bibedit, kb_exists
 
@@ -669,7 +670,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                 pending_changes = tmp_result[3]
 #                disabled_changes = tmp_result[4]
 
-                xml_record = print_rec(record)
+                xml_record = wash_for_xml(print_rec(record))
                 record, status_code, list_of_errors = create_record(xml_record)
                 if status_code == 0:
                     response['resultCode'], response['errors'] = 110, \
@@ -1118,7 +1119,7 @@ def perform_request_autocomplete(request_type, recid, uid, data):
             #check that the values are not already contained in other
             #instances of this field
             record = get_cache_file_contents(recid, uid)[2]
-            xml_rec = print_rec(record)
+            xml_rec = wash_for_xml(print_rec(record))
             record, status_code, dummy_errors = create_record(xml_rec)
             existing_values = []
             if (status_code != 0):
