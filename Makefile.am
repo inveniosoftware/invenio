@@ -135,7 +135,7 @@ uninstall-jscalendar-plugin:
 	@echo "** The jsCalendar plugin was successfully uninstalled.   **"
 	@echo "***********************************************************"
 
-install-jquery-plugins: install-jquery-plugins
+install-jquery-plugins:
 	@echo "***********************************************************"
 	@echo "** Installing various jQuery plugins, please wait...     **"
 	@echo "***********************************************************"
