@@ -24,6 +24,7 @@ import time
 import sys
 import os
 import zlib
+from datetime import datetime
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -72,9 +73,25 @@ def get_citation_weight(rank_method_code, config):
 
     if task_get_option("quick") == "no":
         last_update_time = "0000-00-00 00:00:00"
-        write_message("running thorough indexing since quick option not used", verbose=3)
+        write_message("running thorough indexing since quick option not used",
+                      verbose=3)
 
-    last_modified_records = get_last_modified_rec(last_update_time)
+    try:
+        # check indexing times of `journal' and `reportnumber`
+        # indexes, and only fetch records which have been indexed
+        sql = "SELECT DATE_FORMAT(MIN(last_updated), " \
+              "'%%Y-%%m-%%d %%H:%%i:%%s') FROM idxINDEX WHERE name IN (%s,%s)"
+        index_update_time = run_sql(sql, ('journal', 'reportnumber'), 1)[0][0]
+    except IndexError:
+        write_message("Not running citation indexer since journal/reportnumber"
+                      " indexes are not created yet.")
+        return {}, None
+
+    if index_update_time > datetime.now().strftime("%Y-%m-%d %H:%M:%S"):
+        return {}, None
+
+    last_modified_records = get_last_modified_rec(last_update_time,
+                                                  index_update_time)
     #id option forces re-indexing a certain range even if there are no new recs
     if last_modified_records or task_get_option("id"):
         if task_get_option("id"):
@@ -91,7 +108,6 @@ def get_citation_weight(rank_method_code, config):
                        str(len(last_modified_records))+" updates: "+ \
                        str(len(updated_recid_list)))
 
-        #write_message("updated_recid_list: "+str(updated_recid_list))
         result_intermediate = last_updated_result(rank_method_code)
 
         #result_intermed should be warranted to exists!
@@ -99,17 +115,6 @@ def get_citation_weight(rank_method_code, config):
         #make an empty start set
         if task_get_option("quick") == "no":
             result_intermediate = [{}, {}, {}]
-        else:
-            # check indexing times of `journal' and `reportnumber`
-            # indexes, since if they are not up to date yet, then we
-            # should wait and not run citation indexing as of yet:
-            last_timestamp_bibrec = run_sql("SELECT DATE_FORMAT(MAX(modification_date), '%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec", (), 1)[0][0]
-            last_timestamp_indexes = run_sql("SELECT DATE_FORMAT(MAX(last_updated), '%%Y-%%m-%%d %%H:%%i:%%s') FROM idxINDEX WHERE name IN (%s,%s)", ('journal', 'reportnumber'), 1)[0][0]
-            if not last_timestamp_indexes or \
-               not last_timestamp_bibrec or \
-               last_timestamp_bibrec > last_timestamp_indexes:
-                write_message("Not running citation indexer since journal/reportnumber indexes are not up to date yet.")
-                return {}
 
         citation_weight_dic_intermediate = result_intermediate[0]
         citation_list_intermediate = result_intermediate[1]
@@ -144,7 +149,8 @@ def get_citation_weight(rank_method_code, config):
                            citation_weight_dic_intermediate,
                            citation_list_intermediate,
                            reference_list_intermediate,
-                           config,updated_recid_list)
+                           config,
+                           updated_recid_list)
                     #dic is docid-numberofreferences like {1: 2, 2: 0, 3: 1}
         #write_message("Docid-number of known references "+str(dic))
         end_time = time.time()
@@ -153,7 +159,7 @@ def get_citation_weight(rank_method_code, config):
     else:
         dic = {}
         write_message("No new records added since last time this rank method was executed")
-    return dic
+    return dic, index_update_time
 
 def get_bibrankmethod_lastupdate(rank_method_code):
     """return the last excution date of bibrank method
@@ -165,15 +171,18 @@ def get_bibrankmethod_lastupdate(rank_method_code):
         return "0000-00-00 00:00:00"
     return r
 
-def get_last_modified_rec(bibrank_method_lastupdate):
-    """ return the list of recods which have been modified after the last exec
-        of bibrank method. The result is expected to have ascending num order.
+def get_last_modified_rec(bibrank_method_lastupdate, indexes_lastupdate):
+    """Get records to be updated by bibrank indexing
+
+    Return the list of records which have been modified between the last
+    execution of bibrank method and the latest journal/report index updates.
+    The result is expected to have ascending id order.
     """
     query = """SELECT id FROM bibrec
-               WHERE modification_date >= '%s' """ % bibrank_method_lastupdate
-    query += "order by id ASC"
-    ilist = run_sql(query)
-    return ilist
+               WHERE modification_date >= %s
+               AND modification_date < %s
+               ORDER BY id ASC"""
+    return run_sql(query, (bibrank_method_lastupdate, indexes_lastupdate))
 
 def create_recordid_list(rec_ids):
     """Create a list of record ids out of RECIDS.

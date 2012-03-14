@@ -71,6 +71,7 @@ __revision__ = "$Id$"
 
 
 import sys
+import traceback
 import ConfigParser
 
 from invenio.config import CFG_ETCDIR
@@ -165,6 +166,7 @@ def task_run_core():
                     % key)
     except StandardError, e:
         write_message("\nException caught: %s" % e, sys.stderr)
+        write_message(traceback.format_exc()[:-1])
         register_exception()
         task_update_status("ERROR")
         sys.exit(1)
