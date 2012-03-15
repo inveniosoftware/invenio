@@ -57,9 +57,11 @@ def Move_to_Done(parameters, curdir, form, user_info=None):
     if CFG_PATH_TAR != "" and CFG_PATH_GZIP != "":
         os.chdir(DONEDIR)
         tar_txt = "%s -cf - %s > %s.tar" % (CFG_PATH_TAR,namedir,namedir)
-        os.system(tar_txt)
+        if os.system(tar_txt):
+            raise InvenioWebSubmitFunctionError("Cannot create .tar in directory %s" % DONEDIR)
         zip_txt = "%s %s.tar" % (CFG_PATH_GZIP,namedir)
-        os.system(zip_txt)
+        if os.system(zip_txt):
+            raise InvenioWebSubmitFunctionError("Cannot create .gz in directory %s" % DONEDIR)
         rm_txt = "rm -R %s" % namedir
         os.system(rm_txt)
     return ""
