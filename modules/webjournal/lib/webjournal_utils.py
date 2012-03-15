@@ -41,7 +41,7 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL
 from invenio.dbquery import run_sql
 from invenio.bibformat_engine import BibFormatObject
-from invenio.search_engine import search_pattern
+from invenio.search_engine import search_pattern, record_exists
 from invenio.messages import gettext_set_language
 from invenio.errorlib import register_exception
 
@@ -324,7 +324,7 @@ def get_journal_articles(journal_name, issue, category,
         recids_issue.union_update(search_pattern(p='773__n:%s' % issue.lstrip('0')))
 
     recids_rule.intersection_update(recids_issue)
-    recids = list(recids_rule)
+    recids = [recid for recid in recids_rule if record_exists(recid) == 1]
 
     if use_cache:
         _cache_journal_articles(journal_name, issue, category, recids)
