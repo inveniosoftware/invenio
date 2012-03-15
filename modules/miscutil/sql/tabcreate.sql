@@ -3664,7 +3664,7 @@ CREATE TABLE IF NOT EXISTS jrnISSUE (
 
 CREATE TABLE IF NOT EXISTS hstRECORD (
   id_bibrec mediumint(8) unsigned NOT NULL,
-  marcxml blob NOT NULL,
+  marcxml longblob NOT NULL,
   job_id mediumint(15) unsigned NOT NULL,
   job_name varchar(255) NOT NULL,
   job_person varchar(255) NOT NULL,
@@ -4129,5 +4129,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_release_1_1_0',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_31_tablesorter_location',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_01_lower_user_email',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_21_aiduserinputlog_userid_check',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_15_history_fix',NOW());
 
 -- end of file
