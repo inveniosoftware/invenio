@@ -96,6 +96,9 @@ def Get_Recid(parameters, curdir, form, user_info=None):
     As a note, you can test your pattern, using the search engine
     and see if it retrieves the expected results.
 
+    WARNING: this check is not applied if a SN file already exists in
+    curdir.
+
     Unless file curdir/SN exists, the function depends upon the global
     value 'rn' having been set (for eg. by calling Get_Report_Number'
     prior to this function) It will use this value when searching for

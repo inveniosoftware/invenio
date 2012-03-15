@@ -625,6 +625,7 @@ INSERT INTO sbmFUNDESC VALUES ('Video_Processing','batch_template');
 INSERT INTO sbmFUNDESC VALUES ('Video_Processing','title');
 INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','edsrn');
 INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','rep_tags');
+INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','record_search_pattern');
 
 INSERT INTO sbmGFILERESULT VALUES ('HTML','HTML document');
 INSERT INTO sbmGFILERESULT VALUES ('WORD','data');
