@@ -58,6 +58,7 @@ from invenio.config import \
      CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
      CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, \
      CFG_WEBSEARCH_FULLTEXT_SNIPPETS, \
+     CFG_WEBSEARCH_DISPLAY_NEAREST_TERMS, \
      CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE, \
      CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
@@ -2632,7 +2633,8 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
     # load the right message language
     _ = gettext_set_language(ln)
 
-    out = ""
+    if not CFG_WEBSEARCH_DISPLAY_NEAREST_TERMS:
+        return _("Your search did not match any records.  Please try again.")
     nearest_terms = []
     if not p: # sanity check
         p = "."
