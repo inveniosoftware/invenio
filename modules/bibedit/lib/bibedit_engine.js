@@ -193,6 +193,7 @@ $(function(){
    * Initialize all components.
    */
   initMenu();
+  initDialogs();
   initJeditable();
   initAjax();
   initMisc();
@@ -223,6 +224,21 @@ function initClipboard(){
   // attaching the events -> handlers are stored in bibedit_engine.js file
   $(document).bind("copy", onPerformCopy);
   $(document).bind("paste", onPerformPaste);
+}
+
+function initDialogs(){
+  /*
+   * Overrides _makeDraggable from jQuery UI dialog code in order to allow
+   * the dialog go off the viewport
+   *
+   */
+   if (!$.ui.dialog.prototype._makeDraggableBase) {
+    $.ui.dialog.prototype._makeDraggableBase = $.ui.dialog.prototype._makeDraggable;
+    $.ui.dialog.prototype._makeDraggable = function() {
+        this._makeDraggableBase();
+        this.uiDialog.draggable("option", "containment", false);
+    };
+   }
 }
 
 function initMisc(){
