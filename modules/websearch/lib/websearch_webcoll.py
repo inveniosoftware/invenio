@@ -453,6 +453,8 @@ class Collection:
                                  'LHC First Beam Videos',
                                  'CERN openlab Videos']:
                     recIDs = sort_records(None, recIDs, '269__c')
+                elif self.name in ['LHCb Talks']:
+                    recIDs = sort_records(None, recIDs, 'reportnumber')
             # CERN hack ends.
 
             total = len(recIDs)
@@ -515,7 +517,7 @@ class Collection:
             if CFG_CERN_SITE and self.name in ['Videos']:
                 return websearch_templates.tmpl_instant_browse(
                     aas=aas, ln=ln, recids=passIDs, more_link=url, grid_layout=True)
-      
+
             return websearch_templates.tmpl_instant_browse(
                 aas=aas, ln=ln, recids=passIDs, more_link=url)
 
