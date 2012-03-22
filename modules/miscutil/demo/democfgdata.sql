@@ -1623,7 +1623,7 @@ INSERT INTO externalcollection (id, name) VALUES (13, 'KISS Books/Journals');
 INSERT INTO externalcollection (id, name) VALUES (14, 'KISS Preprints');
 INSERT INTO externalcollection (id, name) VALUES (15, 'NEBIS');
 INSERT INTO externalcollection (id, name) VALUES (16, 'SLAC Library Catalog');
-INSERT INTO externalcollection (id, name) VALUES (17, 'SPIRES HEP');
+INSERT INTO externalcollection (id, name) VALUES (17, 'INSPIRE');
 INSERT INTO externalcollection (id, name) VALUES (18, 'Scirus');
 INSERT INTO externalcollection (id, name) VALUES (19, 'Atlantis Institute Books');
 INSERT INTO externalcollection (id, name) VALUES (20, 'Atlantis Institute Articles');
