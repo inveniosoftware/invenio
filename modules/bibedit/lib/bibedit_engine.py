@@ -126,8 +126,7 @@ def get_available_fields_templates():
     record
     """
     templates = get_field_templates()
-    #result = get_empty_fields_templates()
-    result = []
+    result = get_empty_fields_templates()
     for template in templates:
         tplTag = template[3].keys()[0]
         field = template[3][tplTag][0]
@@ -358,7 +357,7 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False, \
         response.update(perform_request_update_record(request_type, recid, \
                                                       uid, cacheMTime, data, \
                                                       hpChanges, undo_redo, \
-                                                      isBulk, ln))
+                                                      isBulk))
     elif request_type in ('autosuggest', 'autocomplete', 'autokeyword'):
         response.update(perform_request_autocomplete(request_type, recid, uid, \
                                                      data))

@@ -20,11 +20,12 @@ etc_DATA = MARC21slim.dtd refextract-journal-titles.kb refextract-report-numbers
 	refextract-authors.kb refextract-job-preprints.cfg
 
 rectmpldir = $(etcdir)/record_templates/
-rectmpl_DATA = poem.xml
+rectmpl_DATA = record_poem.xml
 
 fldtmpldir = $(etcdir)/field_templates/
-fldtmpl_DATA = firstauthor.xml \
-               reference.xml
+fldtmpl_DATA = field_firstauthor.xml \
+               field_reference.xml \
+               field_FFT.xml
 
 EXTRA_DIST = $(etc_DATA) \
              $(rectmpl_DATA) \

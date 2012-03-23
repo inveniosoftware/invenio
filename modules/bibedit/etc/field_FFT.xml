@@ -1,0 +1,11 @@
+<!-- BibEdit-Field-Template-Name: FFT -->
+<!-- BibEdit-Field-Template-Description: FFT -->
+<record>
+  <datafield tag="FFT" ind1=" " ind2=" ">
+    <subfield code="a">VOLATILE:URL of the file to upload</subfield>
+    <subfield code="d">VOLATILE:file description</subfield>
+    <subfield code="f">VOLATILE:file format (e.g. .pdf)</subfield>
+    <subfield code="n">VOLATILE:file name (e.g. CERN-FOO-2010-001)</subfield>
+    <subfield code="t">VOLATILE:INSPIRE-PUBLIC</subfield>
+  </datafield>
+</record>
