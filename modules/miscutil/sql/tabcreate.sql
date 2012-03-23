@@ -4032,13 +4032,6 @@ CREATE TABLE IF NOT EXISTS `aidCACHE` (
   INDEX `last_updated-b` (`last_updated`)
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS `aidPROBCACHE` (
-  `cluster` VARCHAR( 256 ) NOT NULL ,
-  `bibmap` MEDIUMBLOB NOT NULL ,
-  `matrix` LONGBLOB NOT NULL ,
-  PRIMARY KEY ( `cluster` )
-) ENGINE = MYISAM ;
-
 -- refextract tables:
 
 CREATE TABLE IF NOT EXISTS `xtrJOB` (

@@ -42,6 +42,8 @@ from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 from invenio.config import CFG_SITE_URL
 from invenio.mailutils import send_email
 
+from invenio.bibauthorid_dbinterface import get_personiID_external_ids    #export
+
 def get_person_redirect_link(pid):
     '''
     Returns the canonical name of a pid if found, the pid itself otherwise

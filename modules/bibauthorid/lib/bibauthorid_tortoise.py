@@ -17,97 +17,185 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from operator import itemgetter
-from itertools import groupby
+import bibauthorid_config as bconfig
+from datetime import datetime
 
-from bibauthorid_cluster_set import Cluster_set
-from bibauthorid_cluster_set import cluster_sets_from_marktables
+from bibauthorid_cluster_set import delayed_cluster_sets_from_marktables
+from bibauthorid_cluster_set import delayed_cluster_sets_from_personid
 from bibauthorid_wedge import wedge
 from bibauthorid_name_utils import generate_last_name_cluster_str
-from bibauthorid_backinterface import get_all_names_from_personid
-from bibauthorid_backinterface import in_results
+from bibauthorid_backinterface import empty_results_table
+from bibauthorid_backinterface import remove_result_cluster
 from bibauthorid_general_utils import bibauthor_print
-from bibauthorid_scheduler import schedule
+from bibauthorid_prob_matrix import prepare_matirx
+from bibauthorid_scheduler import schedule \
+                                  , Estimator \
+                                  , matrix_coefs \
+                                  , wedge_coefs
+'''
+    There are three main entry points to tortoise
+
+    i) tortoise
+        Performs disambiguation iteration.
+        The arguemnt pure indicates whether to use
+        the claims and the rejections or not.
+        Use pure=True only to test the accuracy of tortoise.
+
+    ii) tortoise_from_scratch
+        NOT RECOMMENDED!
+        Use this function only if you have just
+        installed invenio and this is your first
+        disambiguation or if personid is broken.
+
+    iii) tortoise_last_name
+        Computes the clusters for only one last name
+        group. Is is primary used for testing. It
+        may also be used to fix a broken last name
+        cluster. It does not involve multiprocessing
+        so it is convinient to debug with pdb.
+'''
+
+# Exit codes:
+# The standard ones are not well documented
+# so we are using random numbers.
 
 def tortoise_from_scratch():
-    cluster_sets = ((cs, sum(len(c.bibs) for c in cs.clusters))
-        for cs in cluster_sets_from_marktables())
-    cluster_sets = sorted(cluster_sets, key=itemgetter(1))
-    args = [(x[0], ) for x in cluster_sets]
-    sizs = map(itemgetter(1), cluster_sets)
+    bibauthor_print("Preparing cluster sets.")
+    cluster_sets, lnames, sizes = delayed_cluster_sets_from_marktables()
+    bibauthor_print("Building all matrices.")
+    exit_statuses = schedule_create_matrix(
+        cluster_sets,
+        sizes,
+        force=True)
+    assert len(exit_statuses) == len(cluster_sets)
 
-    schedule(disambiguate, args, sizs)
+    empty_results_table()
+
+    bibauthor_print("Preparing cluster sets.")
+    cluster_sets, lnames, sizes = delayed_cluster_sets_from_marktables()
+    bibauthor_print("Starting disambiguation.")
+    exit_statuses = schedule_wedge_and_store(
+        cluster_sets,
+        sizes)
+    assert len(exit_statuses) == len(cluster_sets)
 
 
-def tortoise(pure=False, only_missing=False):
-    names = create_lastname_list_from_personid()
-    names = sorted(names, key=itemgetter(2))
-    args = [(x[1], x[0], pure, only_missing) for x in names]
-    sizs = map(itemgetter(2), names)
+def tortoise(pure=False,
+             force_matrix_creation=False,
+             skip_matrix_creation=False,
+             last_run=None):
+    assert not force_matrix_creation or not skip_matrix_creation
+    # The computation must be forced in case we want
+    # to compute pure results
+    force_matrix_creation = force_matrix_creation or pure
 
-    schedule(disambiguate_last_name, args, sizs)
+    if not skip_matrix_creation:
+        bibauthor_print("Preparing cluster sets.")
+        clusters, lnames, sizes = delayed_cluster_sets_from_personid(pure, last_run)
+        bibauthor_print("Building all matrices.")
+        exit_statuses = schedule_create_matrix(
+            clusters,
+            sizes,
+            force=force_matrix_creation)
+        assert len(exit_statuses) == len(clusters)
+
+    bibauthor_print("Preparing cluster sets.")
+    clusters, lnames, sizes = delayed_cluster_sets_from_personid(pure, last_run)
+    bibauthor_print("Starting disambiguation.")
+    exit_statuses = schedule_wedge_and_store(
+        clusters,
+        sizes)
+    assert len(exit_statuses) == len(clusters)
 
 
-def tortoise_last_name(name, pure=False):
+def tortoise_last_name(name, from_mark=False, pure=False):
+    assert not(from_mark and pure)
+
     lname = generate_last_name_cluster_str(name)
 
-    names = create_lastname_list_from_personid()
-    names = filter(lambda x: x[0] == name, names)
-
-    if names:
-        pids = names[0][1]
-        bibauthor_print("Found %s(%s), %d pids" % (name, lname, len(pids)))
-        disambiguate_last_name(pids, lname, pure, False)
+    if from_mark:
+        clusters, lnames, sizes = delayed_cluster_sets_from_marktables()
     else:
+        clusters, lnames, sizes = delayed_cluster_sets_from_personid(pure)
+
+    try:
+        idx = lnames.index(lname)
+        cluster = clusters[idx]
+        size = sizes[idx]
+        bibauthor_print("Found, %s(%s). Total number of bibs: %d." % (name, lname, size))
+        cluster_set = cluster()
+        create_matrix(cluster_set, True)
+        wedge_and_store(cluster_set)
+    except IndexError:
         bibauthor_print("Sorry, %s(%s) not found in the last name clusters" % (name, lname))
 
 
-def create_lastname_list_from_personid():
-    '''
-    This function generates a dictionary from a last name
-    to list of personids which have this lastname.
-    '''
-    # ((personid, [full Name1], Nbibs) ... )
-    all_names = get_all_names_from_personid()
+def create_matrix(cluster_set, force):
+    bibs = cluster_set.num_all_bibs
+    expected = bibs * (bibs - 1) / 2
+    bibauthor_print("Start building matrix for %s. Total number of bibs: %d, "
+                    "maximum number of comparisons: %d"
+                    % (cluster_set.last_name, bibs, expected))
 
-    # ((personid, last_name, Nbibs) ... )
-    all_names = ((row[0], generate_last_name_cluster_str(iter(row[1]).next()), row[2])
-                  for row in all_names)
-
-    # { (last_name, [(personid)... ], Nbibs) ... }
-    all_names = groupby(sorted(all_names, key=itemgetter(1)), key=itemgetter(1))
-    all_names = ((key, list(data)) for key, data in all_names)
-    all_names = ((key, map(itemgetter(0), data), sum(x[2] for x in data)) for key, data in all_names)
-
-    return all_names
+    return prepare_matirx(cluster_set, force)
 
 
-def disambiguate_last_name(personids, last_name, pure, only_missing):
-    '''
-    Creates a cluster_set from personid and calls disambiguate.
-    '''
-    if only_missing and in_results(last_name):
-        return
-
-    cs = Cluster_set()
-    if pure:
-        cs.create_pure(personids, last_name)
-    else:
-        cs.create_skeleton(personids, last_name)
-    disambiguate(cs)
+def force_create_matrix(cluster_set, force):
+    bibauthor_print("Building a cluster set.")
+    return create_matrix(cluster_set(), force)
 
 
-def disambiguate(cluster_set):
-    '''
-    Updates personid from a list of personids, sharing common
-    last name, and this last name.
-    '''
-    bibs = sum(len(c.bibs) for c in cluster_set.clusters)
+def wedge_and_store(cluster_set):
+    bibs = cluster_set.num_all_bibs
     expected = bibs * (bibs - 1) / 2
     bibauthor_print("Start working on %s. Total number of bibs: %d, "
                     "maximum number of comparisons: %d"
-                     % (cluster_set.last_name, bibs, expected))
+                    % (cluster_set.last_name, bibs, expected))
 
     wedge(cluster_set)
+    remove_result_cluster(cluster_set.last_name)
     cluster_set.store()
+    return True
 
+
+def force_wedge_and_store(cluster_set):
+    bibauthor_print("Building a cluster set.")
+    return wedge_and_store(cluster_set())
+
+
+def schedule_create_matrix(cluster_sets, sizes, force):
+    def create_job(cluster):
+        def ret():
+            return force_create_matrix(cluster, force)
+        return ret
+
+    memfile_path = None
+    if bconfig.DEBUG_PROCESS_PEAK_MEMORY:
+        tt = datetime.now()
+        tt = (tt.hour, tt.minute, tt.day, tt.month, tt.year)
+        memfile_path = ('%smatrix_memory_%d:%d_%d-%d-%d.log' %
+                        ((bconfig.TORTOISE_FILES_PATH,) + tt))
+
+    return schedule(map(create_job, cluster_sets),
+                    sizes,
+                    Estimator(matrix_coefs),
+                    memfile_path)
+
+
+def schedule_wedge_and_store(cluster_sets, sizes):
+    def create_job(cluster):
+        def ret():
+            return force_wedge_and_store(cluster)
+        return ret
+
+    memfile_path = None
+    if bconfig.DEBUG_PROCESS_PEAK_MEMORY:
+        tt = datetime.now()
+        tt = (tt.hour, tt.minute, tt.day, tt.month, tt.year)
+        memfile_path = ('%swedge_memory_%d:%d_%d-%d-%d.log' %
+                        ((bconfig.TORTOISE_FILES_PATH,) + tt))
+
+    return schedule(map(create_job, cluster_sets),
+                    sizes,
+                    Estimator(wedge_coefs),
+                    memfile_path)

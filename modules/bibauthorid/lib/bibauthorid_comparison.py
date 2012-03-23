@@ -20,7 +20,7 @@
 import re
 import bibauthorid_config as bconfig
 from itertools import starmap
-from operator import itemgetter, mul
+from operator import mul
 from bibauthorid_name_utils import compare_names
 from bibauthorid_dbinterface import get_name_by_bibrecref
 from bibauthorid_dbinterface import get_grouped_records
@@ -36,7 +36,6 @@ from bibauthorid_general_utils import metadata_comparison_print
 # Be sure to use processes instead of
 # threads if you need parallel
 # computation!
-
 
 # FIXME: hack for Python-2.4; switch to itemgetter() once Python-2.6 is default
 # use_refrec = itemgetter(slice(None))
@@ -151,10 +150,10 @@ def compare_bibrefrecs(bibref1, bibref2):
     if papers != '?':
         return papers
 
-#    if bconfig.CFG_INSPIRE_SITE:
-#        insp_ids = _compare_inspireid(bibref1, bibref2)
-#        if insp_ids != '?':
-#            return insp_ids
+    if bconfig.CFG_INSPIRE_SITE:
+        insp_ids = _compare_inspireid(bibref1, bibref2)
+        if insp_ids != '?':
+            return insp_ids, 1.
 
     # unfortunately, we have to do all comparisons
     if bconfig.CFG_INSPIRE_SITE:
@@ -187,7 +186,6 @@ def compare_bibrefrecs(bibref1, bibref2):
 
     results.append((coll, 3.))
     total_weights = sum(res[1] for res in results)
-
     metadata_comparison_print("Final vector: %s." % str(results))
     results = filter(lambda x: x[0] != '?', results)
 
@@ -213,6 +211,7 @@ def _compare_affiliations(bib1, bib2):
 
     ret = jaccard(aff1, aff2)
     return ret
+
 
 @cached_arg(use_refrec)
 def _find_unified_affiliation(bib):
@@ -248,10 +247,10 @@ def _compare_inspireid(bib1, bib2):
         return '?'
     elif iids1 == iids2:
         metadata_comparison_print("The ids are the same.")
-        return '+'
+        return 1.
     else:
         metadata_comparison_print("The ids are different.")
-        return '-'
+        return 0.
 
 
 @cached_arg(use_refrec)
@@ -380,3 +379,5 @@ def _compare_citations_by(bib1, bib2):
     cites2 = _find_citations_by(bib2)
 
     return jaccard(cites1, cites2)
+
+

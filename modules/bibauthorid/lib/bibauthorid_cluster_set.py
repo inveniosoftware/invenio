@@ -17,19 +17,18 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from itertools import chain, groupby
+from itertools import chain, groupby, izip, cycle
 from operator import itemgetter
 from bibauthorid_matrix_optimization import maximized_mapping
 from bibauthorid_backinterface import save_cluster
 from bibauthorid_backinterface import get_all_papers_of_pids
 from bibauthorid_backinterface import get_bib10x, get_bib70x
-from bibauthorid_backinterface import get_all_valid_bibrecs
-from bibauthorid_backinterface import get_bibrefrec_subset
-from bibauthorid_backinterface import remove_result_cluster
+from bibauthorid_backinterface import get_all_modified_names_from_personid
+from bibauthorid_backinterface import get_signatures_from_bibrefs
 from bibauthorid_name_utils import generate_last_name_cluster_str
 
 
-class Blob:
+class Blob(object):
     def __init__(self, personid_records):
         '''
         @param personid_records:
@@ -91,8 +90,8 @@ def group_blobs(blobs):
     return (union, independent)
 
 
-class Cluster_set:
-    class Cluster:
+class ClusterSet(object):
+    class Cluster(object):
         def __init__(self, bibs, hate = []):
             # hate is a symetrical relation
             self.bibs = set(bibs)
@@ -113,6 +112,13 @@ class Cluster_set:
 
     def __init__(self):
         self.clusters = []
+        self.update_bibs()
+
+    def update_bibs(self):
+        self.num_all_bibs = sum(len(cl.bibs) for cl in self.clusters)
+
+    def all_bibs(self):
+        return chain.from_iterable(cl.bibs for cl in self.clusters)
 
     def create_skeleton(self, personids, last_name):
         blobs = create_blobs_by_pids(personids)
@@ -137,6 +143,8 @@ class Cluster_set:
                 bcl.hate.add(cl)
             self.clusters.append(cl)
 
+        self.update_bibs()
+        return self
 
     # Creates a cluster set, ignoring the claims and the
     # rejected papers.
@@ -145,6 +153,8 @@ class Cluster_set:
         self.last_name = last_name
 
         self.clusters = [self.Cluster((blob.bib,)) for blob in blobs]
+        self.update_bibs()
+        return self
 
     # no longer used
     def create_body(self, blobs):
@@ -158,6 +168,15 @@ class Cluster_set:
             cl = self.Cluster(bibs)
             cl.personid = pid
             self.clusters.append(cl)
+        self.update_bibs()
+        return self
+
+    def create_from_mark(self, bibrefs, last_name):
+        bibrecrefs = get_signatures_from_bibrefs(bibrefs)
+        self.clusters = [ClusterSet.Cluster([bib]) for bib in bibrecrefs]
+        self.last_name = last_name
+        self.update_bibs()
+        return self
 
     # a *very* slow fucntion checking when the hate relation is no longer symetrical
     def _debug_test_hate_relation(self):
@@ -195,7 +214,6 @@ class Cluster_set:
         mapping = maximized_mapping(matr)
         return dict((cs1.clusters[mappy[0]], cs2.clusters[mappy[1]]) for mappy in mapping)
 
-
     def store(self):
         '''
         Stores the cluster set in a special table.
@@ -203,38 +221,65 @@ class Cluster_set:
         tortoise/wedge in a table and later merge them
         with personid.
         '''
-        remove_result_cluster("%s." % self.last_name)
         named_clusters = (("%s.%d" % (self.last_name, idx), cl) for idx, cl in enumerate(self.clusters))
         map(save_cluster, named_clusters)
 
 
-def cluster_sets_from_marktables():
-    # { (100, 123) -> name }
-    ref100 = get_bib10x()
-    ref700 = get_bib70x()
-    bibref_2_name = dict([((100, ref), generate_last_name_cluster_str(name)) for ref, name in ref100] +
-                         [((700, ref), generate_last_name_cluster_str(name)) for ref, name in ref700])
-
-    all_recs = get_all_valid_bibrecs()
-
-    all_bibrefrecs = chain(set((100, ref, rec) for rec, ref in get_bibrefrec_subset(100, all_recs, map(itemgetter(0), ref100))),
-                           set((700, ref, rec) for rec, ref in get_bibrefrec_subset(700, all_recs, map(itemgetter(0), ref700))))
-
-    last_name_2_bibs = {}
-
-    for bibrefrec in all_bibrefrecs:
-        table, ref, unused = bibrefrec
-        name = bibref_2_name[(table, ref)]
-        last_name_2_bibs[name] = last_name_2_bibs.get(name, []) + [bibrefrec]
-
-    cluster_sets = []
-
-    for name, bibrecrefs in last_name_2_bibs.items():
-        new_cluster_set = Cluster_set()
-        new_cluster_set.clusters = [Cluster_set.Cluster([bib]) for bib in bibrecrefs]
-        new_cluster_set.last_name = name
-        cluster_sets.append(new_cluster_set)
-
-    return cluster_sets
+def delayed_create_from_mark(bibrefs, last_name):
+    def ret():
+        return ClusterSet().create_from_mark(bibrefs, last_name)
+    return ret
 
 
+def delayed_cluster_sets_from_marktables():
+    # { name -> [(table, bibref)] }
+    name_buket = {}
+    for tab, ref, name in chain(izip(cycle((100,)), *izip(*get_bib10x())),
+                                izip(cycle((700,)), *izip(*get_bib70x()))):
+        name = generate_last_name_cluster_str(name)
+        name_buket[name] = name_buket.get(name, []) + [(tab, ref)]
+
+    all_refs = ((name, refs, len(list(get_signatures_from_bibrefs(refs))))
+                for name, refs in name_buket.items())
+    all_refs = sorted(all_refs, key = itemgetter(2))
+    return ([delayed_create_from_mark(refs, name) for name, refs, size in all_refs],
+             map(itemgetter(0), all_refs),
+             map(itemgetter(2), all_refs))
+
+
+def create_lastname_list_from_personid(last_modification):
+    '''
+    This function generates a dictionary from a last name
+    to list of personids which have this lastname.
+    '''
+    # ((personid, [full Name1], Nbibs) ... )
+    all_names = get_all_modified_names_from_personid(last_modification)
+
+    # ((personid, last_name, Nbibs) ... )
+    all_names = ((row[0], generate_last_name_cluster_str(iter(row[1]).next()), row[2])
+                  for row in all_names)
+
+    # { (last_name, [(personid)... ], Nbibs) ... }
+    all_names = groupby(sorted(all_names, key=itemgetter(1)), key=itemgetter(1))
+    all_names = ((key, list(data)) for key, data in all_names)
+    all_names = ((key, map(itemgetter(0), data), sum(x[2] for x in data)) for key, data in all_names)
+
+    return all_names
+
+
+def delayed_create(create_f, pids, lname):
+    def ret():
+        return create_f(ClusterSet(), pids, lname)
+    return ret
+
+
+def delayed_cluster_sets_from_personid(pure, last_modification=None):
+    names = create_lastname_list_from_personid(last_modification)
+    names = sorted(names, key=itemgetter(2))
+    if pure:
+        create = ClusterSet.create_pure
+    else:
+        create = ClusterSet.create_skeleton
+    return ([delayed_create(create, name[1], name[0]) for name in names],
+            map(itemgetter(0), names),
+            map(itemgetter(2), names))

@@ -22,9 +22,13 @@ bibauthorid_general_utils
 '''
 
 import bibauthorid_config as bconfig
-
+from datetime import datetime
+PRINT_TS = bconfig.DEBUG_TIMESTAMPS
+PRINT_TS_US = bconfig.DEBUG_TIMESTAMPS_UPDATE_STATUS and PRINT_TS
 
 def __print_func(*args):
+    if PRINT_TS:
+        print datetime.now(),
     for arg in args:
         print arg,
     print ""
@@ -43,23 +47,28 @@ name_comparison_print = __create_conditional_print(bconfig.DEBUG_NAME_COMPARISON
 metadata_comparison_print = __create_conditional_print(bconfig.DEBUG_METADATA_COMPARISON_OUTPUT)
 wedge_print = __create_conditional_print(bconfig.DEBUG_WEDGE_OUTPUT)
 
+
 if bconfig.DEBUG_OUTPUT:
     import sys
 
-    status_len = 65
+    status_len = 68
     comment_len = 40
 
     def padd(stry, l):
         return stry[:l].ljust(l)
 
-    def update_status(percent, comment=""):
-        percent = int(percent * 100)
-        progress = padd("[%s%s] %d%% done" % ("#" * (percent / 2), "-" * (50 - percent / 2), percent), status_len)
+    def update_status(percent, comment="", print_ts=False):
+        filled = int(percent * 50)
+        bar = "[%s%s] " % ("#" * filled, "-" * (50 - filled))
+        percent = ("%.2f%% done" % (percent * 100)).rjust(12)
+        progress = padd(bar + percent, status_len)
         comment = padd(comment, comment_len)
+        if print_ts or PRINT_TS_US:
+            print  datetime.now(),
         print progress, comment, '\r',
 
     def update_status_final(comment=""):
-        update_status(1., comment)
+        update_status(1., comment, print_ts=PRINT_TS)
         print ""
         sys.stdout.flush()
 
@@ -70,15 +79,28 @@ else:
     def update_status_final(comment=""):
         pass
 
-mem_file = '/tmp/tortoise_memory.log'
-
-def print_tortoise_memory_log(summary):
-    fp = open(mem_file, 'a')
-    stry = "PID:\t%s\tPEAK:\t%s\tEST:\t%s\tBIBS:\t%s\n" % (summary['pid'], summary['peak'], summary['est'], summary['bibs'])
+def print_tortoise_memory_log(summary, fp):
+    stry = "PID:\t%s\tPEAK:\t%s,%s\tEST:\t%s\tBIBS:\t%s\n" % (summary['pid'], summary['peak1'], summary['peak2'], summary['est'], summary['bibs'])
     fp.write(stry)
-    fp.close()
 
-def clear_tortoise_memory_log():
-    fp = open(mem_file, 'w')
-    fp.close()
 
+def parse_tortoise_memory_log(memfile_path):
+    f = open(memfile_path)
+    lines = f.readlines()
+    f.close()
+
+    def line_2_dict(line):
+        line = line.split('\t')
+        ret = {  'mem1' : int(line[3].split(",")[0]),
+                 'mem2' : int(line[3].split(",")[1]),
+                 'est'  : float(line[5]),
+                 'bibs' : int(line[7])
+                 }
+        return ret
+
+    return map(line_2_dict, lines)
+
+
+eps = 1e-6
+def is_eq(v1, v2):
+    return v1 + eps > v2 and v2 + eps > v1

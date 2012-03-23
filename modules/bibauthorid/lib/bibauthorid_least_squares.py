@@ -18,35 +18,32 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import operator
-from itertools import izip, starmap
+from itertools import izip, starmap, repeat
 
-def approximate(xs, ys):
+def approximate(xs, ys, power):
     assert len(xs) == len(ys)
+
+    matrix_size = power + 1
+    variables = 2 * power + 1
 
     xs = map(float, xs)
     ys = map(float, ys)
 
-    xs0 = [1] * len(xs)
-    xs1 = xs
-    xs2 = list(starmap(operator.mul, izip(xs, xs)))
-    xs3 = list(starmap(operator.mul, izip(xs, xs2)))
-    xs4 = starmap(operator.mul, izip(xs, xs3))
-
-    xs = [xs0, xs1, xs2, xs3, xs4]
+    xs = reduce(lambda x, y: x + [list(starmap(operator.mul, izip(x[-1], y)))], repeat(xs, variables - 1), [[1] * len(xs)])
+    assert len(xs) == variables
 
     s = map(sum, xs)
-
     assert s[0] == len(ys)
 
-    b = [sum(starmap(operator.mul, izip(ys, x))) for x in xs[:3]]
-    a = [s[i:i+3] for i in xrange(3)]
+    b = [sum(starmap(operator.mul, izip(ys, x))) for x in xs[:matrix_size]]
+    a = [s[i:i + matrix_size] for i in xrange(matrix_size)]
 
     # So, we have a*x = b and we are looking for x
-
     matr = [ai + [bi] for ai, bi in izip(a, b)]
 
     def unify_row(i, j):
-        matr[i] = [matr[i][k] / matr[i][j] for k in xrange(len(matr[i]))]
+        matr[i] = [cell / matr[i][j] for cell in matr[i]]
+        assert matr[i][j] == 1
 
     def subtract_row(i, j, row):
         assert matr[i][j] == 1
@@ -55,19 +52,40 @@ def approximate(xs, ys):
 
         assert matr[row][j] == 0
 
-    unify_row(0, 0)
-    subtract_row(0, 0, 1)
-    subtract_row(0, 0, 2)
-    unify_row(1, 1)
-    subtract_row(1, 1, 2)
-    unify_row(2, 2)
-    subtract_row(2, 2, 1)
-    subtract_row(2, 2, 0)
-    subtract_row(1, 1, 0)
+# NOTE: Example for matrix_size = 3
+#    unify_row(0, 0)
+#    subtract_row(0, 0, 1)
+#    subtract_row(0, 0, 2)
+#    unify_row(1, 1)
+#    subtract_row(1, 1, 2)
+#    unify_row(2, 2)
+#    subtract_row(2, 2, 1)
+#    subtract_row(2, 2, 0)
+#    subtract_row(1, 1, 0)
 
-    assert matr[0][0:3] == [1, 0, 0]
-    assert matr[1][0:3] == [0, 1, 0]
-    assert matr[2][0:3] == [0, 0, 1]
+    for i in xrange(matrix_size):
+        unify_row(i, i)
+        for j in xrange(matrix_size - i - 1):
+            subtract_row(i, i, i + j + 1)
 
-    return map(operator.itemgetter(3), matr)
+    for i in xrange(matrix_size):
+        for j in xrange(matrix_size - i - 1):
+            subtract_row(matrix_size - i - 1, matrix_size - i - 1, j)
 
+    assert all(matr[i][:matrix_size] == ([0] * i) + [1] + ([0] * (matrix_size - 1 - i)) for i in xrange(matrix_size))
+
+    ret = map(operator.itemgetter(matrix_size), matr)
+
+    return ret
+
+
+def to_function(poly):
+    power = len(poly) - 1
+    def func(x):
+        arr = [1.]
+        for i in xrange(power):
+            arr.append(arr[-1] * x)
+
+        assert len(arr) == len(poly)
+        return sum(p * x for p, x in izip(poly, arr))
+    return func

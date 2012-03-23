@@ -20,11 +20,12 @@
 import bibauthorid_config as bconfig
 from itertools import izip, starmap
 from operator import mul
+from bibauthorid_backinterface import Bib_matrix
 from bibauthorid_general_utils import update_status \
                                     , update_status_final \
                                     , bibauthor_print \
                                     , wedge_print
-from bibauthorid_prob_matrix import probability_matrix
+from bibauthorid_prob_matrix import ProbabilityMatrix
 import numpy
 
 eps = 0.001
@@ -32,31 +33,23 @@ eps = 0.001
 # The lower bound of the edges being processed by the wedge algorithm.
 edge_cut_prob = bconfig.WEDGE_THRESHOLD / 2
 
-special_items = ((None, -3.), ('+', -2.), ('-', -1.))
-special_symbols = dict((x[0], x[1]) for x in special_items)
-special_numbers = dict((x[1], x[0]) for x in special_items)
-
 def wedge(cluster_set):
-    if bconfig.DEBUG_CHECKS:
-        assert cluster_set._debug_test_hate_relation()
-        assert cluster_set._debug_duplicated_recs()
+    matr = ProbabilityMatrix()
+    matr.load(cluster_set.last_name)
 
-#    import guppy; hp = guppy.hpy(); import pdb; pdb.set_trace();
-    matr = probability_matrix(cluster_set, True, True)
-
-    new2old = convert_cluster_set(cluster_set, matr)
+    convert_cluster_set(cluster_set, matr)
     del matr # be sure that this is the last reference!
 
-    do_wedge(cluster_set, new2old)
+    do_wedge(cluster_set)
 
-    restore_cluster_set(cluster_set, new2old)
+    restore_cluster_set(cluster_set)
 
     if bconfig.DEBUG_CHECKS:
         assert cluster_set._debug_test_hate_relation()
         assert cluster_set._debug_duplicated_recs()
 
 
-def do_wedge(cluster_set, mapping, deep_debug = False):
+def do_wedge(cluster_set, deep_debug=False):
     '''
     Rearranges the cluster_set acoarding to be values in the probability_matrix.
     The deep debug option will produce a lot of output. Avoid using it with more
@@ -105,9 +98,6 @@ def do_wedge(cluster_set, mapping, deep_debug = False):
         '''
         return edge[2][0] + edge[2][1] / 10.
 
-    if bconfig.DEBUG_CHECKS:
-        assert cluster_set._debug_test_hate_relation()
-        assert cluster_set._debug_duplicated_recs(mapping)
     bib_map = create_bib_2_cluster_dict(cluster_set)
 
     plus_edges, minus_edges, edges = group_edges(cluster_set)
@@ -121,9 +111,6 @@ def do_wedge(cluster_set, mapping, deep_debug = False):
             cluster_set.clusters.remove(cl2)
             for v in cl2.bibs:
                 bib_map[v] = cl1
-            if bconfig.DEBUG_CHECKS:
-                assert cluster_set._debug_test_hate_relation()
-                assert cluster_set._debug_duplicated_recs(mapping)
     update_status_final("Agglomerating obvious clusters done.")
 
     for i, (bib1, bib2) in enumerate(minus_edges):
@@ -144,16 +131,12 @@ def do_wedge(cluster_set, mapping, deep_debug = False):
             update_status(float(current) / len(edges), "Wedge...")
 
         assert unused != '+' and unused != '-'
-        if bconfig.DEBUG_CHECKS:
-            assert cluster_set._debug_test_hate_relation()
-            assert cluster_set._debug_duplicated_recs(mapping)
-
         wedge_print("Wedge: poped new edge: Verts = %s, %s Value = (%f, %f)" % (v1, v2, unused[0], unused[1]))
         cl1 = bib_map[v1]
         cl2 = bib_map[v2]
         if cl1 != cl2 and not cl1.hates(cl2):
             if deep_debug:
-                export_to_dot(cluster_set, "/tmp/%s%d.dot" % (cluster_set.last_name, current), mapping, (v1, v2, unused))
+                export_to_dot(cluster_set, "/tmp/%s%d.dot" % (cluster_set.last_name, current), cluster_set.mapping, (v1, v2, unused))
 
             if decide(cl1, cl2):
                 wedge_print("Wedge: Joined!")
@@ -173,7 +156,7 @@ def do_wedge(cluster_set, mapping, deep_debug = False):
     bibauthor_print("")
 
     if deep_debug:
-        export_to_dot(cluster_set, "/tmp/%sfinal.dot" % cluster_set.last_name, mapping)
+        export_to_dot(cluster_set, "/tmp/%sfinal.dot" % cluster_set.last_name, cluster_set.mapping)
 
 def meld_edges(p1, p2):
     '''
@@ -185,10 +168,10 @@ def meld_edges(p1, p2):
     out_edges2, verts2 = p2
 
     def median(e1, e2):
-        if e1[0] in special_numbers:
+        if e1[0] in Bib_matrix.special_numbers:
             return e1
 
-        if e2[0] in special_numbers:
+        if e2[0] in Bib_matrix.special_numbers:
             return e2
 
         inter_cert = e1[1] * verts1 + e2[1] * verts2
@@ -225,6 +208,9 @@ def convert_cluster_set(cs, prob_matr):
         clus.bibs = range(start, end)
 
     assert len(result_mapping) == len(set(result_mapping))
+    assert len(result_mapping) == cs.num_all_bibs
+
+    cs.new2old = result_mapping
 
     # step 2:
     #    + Using the prob matrix create a vector values to all other bibs.
@@ -238,13 +224,13 @@ def convert_cluster_set(cs, prob_matr):
 
         for v1 in c1.bibs:
             pointer = numpy.ndarray(shape=(len(result_mapping), 2), dtype=float, order='C')
-            pointer.fill(special_symbols[None])
+            pointer.fill(Bib_matrix.special_symbols[None])
             for c2 in cs.clusters:
                 if c1 != c2 and not c1.hates(c2):
                     for v2 in c2.bibs:
                         val = prob_matr[result_mapping[v1], result_mapping[v2]]
-                        if val in special_symbols:
-                            numb = special_symbols[val]
+                        if val in Bib_matrix.special_symbols:
+                            numb = Bib_matrix.special_symbols[val]
                             val = (numb, numb)
                         assert len(val) == 2
                         pointer[v2] = val
@@ -254,12 +240,11 @@ def convert_cluster_set(cs, prob_matr):
 
     update_status_final("Converting the cluster set done.")
 
-    return result_mapping
-
-def restore_cluster_set(cs, new2old):
+def restore_cluster_set(cs):
     for cl in cs.clusters:
-        cl.bibs = set(new2old[b] for b in cl.bibs)
+        cl.bibs = set(cs.new2old[b] for b in cl.bibs)
         del cl.out_edges
+    cs.update_bibs()
 
 def create_bib_2_cluster_dict(cs):
     '''
@@ -285,15 +270,15 @@ def group_edges(cs):
         pointers = cl1.out_edges
         for bib2 in xrange(len(cl1.out_edges)):
             val = pointers[bib2]
-            if val[0] not in special_numbers:
+            if val[0] not in Bib_matrix.special_numbers:
                 if val[0] > edge_cut_prob:
                     pairs.append((bib1, bib2, val))
-            elif val[0] == special_symbols['+']:
+            elif val[0] == Bib_matrix.special_symbols['+']:
                 plus.append((bib1, bib2))
-            elif val[0] == special_symbols['-']:
+            elif val[0] == Bib_matrix.special_symbols['-']:
                 minus.append((bib1, bib2))
             else:
-                assert val[0] == special_symbols[None]
+                assert val[0] == Bib_matrix.special_symbols[None]
 
     update_status_final("Finished with the edge grouping.")
 
@@ -340,5 +325,3 @@ def export_to_dot(cs, fname, graph_info, extra_edge=None):
                       for b1 in clus.bibs for h in clus.hate for b2 in h.bibs))
 
     fptr.write("}")
-
-
