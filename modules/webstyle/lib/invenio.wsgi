@@ -27,4 +27,16 @@ try:
 except:
     pass
 
+# pre-load citation dictionaries upon WSGI application start-up (the
+# citation dictionaries are loaded lazily, which is good for CLI
+# processes such as bibsched, but for web user queries we want them to
+# be available right after web server start-up):
+try:
+    from invenio.bibrank_citation_searcher import get_citedby_hitset, \
+         get_refersto_hitset
+    get_citedby_hitset(None)
+    get_refersto_hitset(None)
+except:
+    pass
+
 from invenio.webinterface_handler_wsgi import application
