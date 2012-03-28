@@ -2127,7 +2127,15 @@ def search_unit(p, f=None, m=None, wl=0):
     ## look up hits:
     if CFG_SOLR_URL and f == 'fulltext':
         # redirect to Solr/Lucene
-        return search_unit_in_solr(p, f, m)
+        try:
+            return search_unit_in_solr(p, f, m)
+        except:
+            # There were troubles with getting full-text search
+            # results from Solr. Let us alert the admin of these
+            # problems and let us simply return empty results to the
+            # end user.
+            register_exception(alert_admin=True)
+            return hitset
     if f == 'datecreated':
         hitset = search_unit_in_bibrec(p, p, 'c')
     elif f == 'datemodified':
