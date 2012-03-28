@@ -1060,7 +1060,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         record_status = record_exists(argd['recid'])
         merged_recid = get_merged_recid(argd['recid'])
         if record_status == -1 and merged_recid:
-            url = CFG_SITE_URL + '/record/%s?ln=%s'
+            url = CFG_SITE_URL + '/' + CFG_SITE_RECORD + '/%s?ln=%s'
             url %= (str(merged_recid), argd['ln'])
             redirect_to_url(req, url)
 
