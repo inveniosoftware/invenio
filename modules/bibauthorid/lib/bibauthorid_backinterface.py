@@ -63,6 +63,7 @@ from bibauthorid_dbinterface import personid_name_from_signature         #emitti
 from bibauthorid_dbinterface import get_existing_result_clusters         #emitting
 from bibauthorid_dbinterface import remove_personid_papers               #emitting
 from bibauthorid_dbinterface import repair_personid                      #emitting
+from bibauthorid_dbinterface import get_sql_time                         #emitting
 
 from search_engine import perform_request_search
 import bibauthorid_dbinterface as dbinter

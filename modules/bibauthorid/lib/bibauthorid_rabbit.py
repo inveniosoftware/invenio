@@ -94,7 +94,7 @@ def rabbit(bibrecs, check_invalid_papers=False):
         best_match = [(new_signatures[new], old_signatures[old])
                       for new, old, score in maximized_mapping(matrix) if score > threshold]
         for new, old in best_match:
-            modify_signature(list(old) + [rec], new)
+            modify_signature(old, rec, new, new_signatures_names[new])
 
         remove_sigs(tuple(list(old) + [rec]) for old in old_signatures)
 

@@ -45,6 +45,13 @@ from dbquery import run_sql \
                     , ProgrammingError
 
 
+def get_sql_time():
+    '''
+    Returns the time acoarding to the database. The type is datetime.datetime.
+    '''
+    return run_sql("select now()")[0][0]
+
+
 def set_personid_row(person_id, tag, value, opt1=0, opt2=0, opt3=""):
     '''
     Inserts data and the additional options of a person by a given personid and tag.
@@ -383,7 +390,8 @@ def get_person_db_names_count(pid, sort_by_count=True):
 
     id_2_count = run_sql("select bibref_table, bibref_value "
                          "from aidPERSONIDPAPERS "
-                         "where personid = %s", (pid,))
+                         "where personid = %s "
+                         "and flag > -2", (pid,))
 
     ref100 = [refid[1] for refid in id_2_count if refid[0] == '100']
     ref700 = [refid[1] for refid in id_2_count if refid[0] == '700']
@@ -441,7 +449,7 @@ def get_person_names_count(pid):
     @type value: string
     '''
     return run_sql("select name, count(name) from aidPERSONIDPAPERS where "
-                   "personid=%s group by name", (pid,))
+                   "personid=%s and flag > -2 group by name", (pid,))
 
 
 def get_person_db_names_set(pid):
@@ -629,7 +637,7 @@ def get_request_ticket(person_id, ticket_id=None):
     return [[[(s[0][3:], s[1]) for s in d], k] for k, d in groupby(sorted(tickets, key=lambda k: k[2]), key=lambda k: k[2])]
 
 
-def insert_user_log(userinfo, personid, action, tag, value, comment='', transactionid=0, timestamp=''):
+def insert_user_log(userinfo, personid, action, tag, value, comment='', transactionid=0, timestamp=None):
     '''
     Instert log entries in the user log table.
     For example of entres look at the table generation script.
@@ -654,15 +662,13 @@ def insert_user_log(userinfo, personid, action, tag, value, comment='', transact
 #    if transactionid == 0:
 #        transactionid = max(run_sql('SELECT  MAX(transactionid) FROM `aidUSERINPUTLOG`')[0][0], -1) + 1
 
-    if timestamp:
-        tsui = str(timestamp)
-    else:
-        tsui = run_sql('select now()')[0][0]
+    if not timestamp:
+        timestamp = run_sql('select now()')[0][0]
 
 #    run_sql('insert into aidUSERINPUTLOG (transactionid,timestamp,userinfo,personid,action,tag,value,comment) values '
 #            '(%(transactionid)s,%(timestamp)s,%(userinfo)s,%(personid)s,%(action)s,%(tag)s,%(value)s,%(comment)s)',
 #            ({'transactionid':str(transactionid),
-#              'timestamp':str(tsui),
+#              'timestamp':timestamp.timestamp,
 #              'userinfo':str(userinfo),
 #              'personid':str(personid),
 #              'action':str(action),
@@ -672,8 +678,8 @@ def insert_user_log(userinfo, personid, action, tag, value, comment='', transact
     run_sql('insert into aidUSERINPUTLOG '
             '(transactionid,timestamp,userinfo,personid,action,tag,value,comment) values '
             '(%s,%s,%s,%s,%s,%s,%s,%s)',
-            (str(transactionid), str(tsui), str(userinfo), str(personid),
-             str(action), str(tag), str(value), str(comment)))
+            (transactionid, timestamp, userinfo, personid,
+             action, tag, value, comment))
 
     return transactionid
 
@@ -725,16 +731,16 @@ def confirm_papers_to_person(pid, papers, user_level=0):
     '''
     for p in papers:
         bibref, rec = p[0].split(",")
+        rec = int(rec)
         table, ref = bibref.split(":")
+        ref = int(ref)
 
-        present = run_sql("select * from aidPERSONIDPAPERS where "
-                          " bibref_table = %s and"
-                          " bibref_value = %s and"
-                          " bibrec = %s", (table, ref, rec))
+        run_sql("delete from aidPERSONIDPAPERS where personid=%s and bibrec=%s", (pid[0], rec))
+        run_sql("delete from aidPERSONIDPAPERS where bibref_table=%s and "
+                " bibref_value = %s and bibrec=%s",
+                (table, ref, rec))
 
-        if not present:
-            add_signature([table, ref, rec], None, pid[0])
-
+        add_signature([table, ref, rec], None, pid[0])
         run_sql("update aidPERSONIDPAPERS "
                 "set personid = %s "
                 ", flag = %s "
@@ -912,23 +918,14 @@ def resolve_paper_access_right(acc):
     except:
         return bconfig.CLAIMPAPER_VIEW_PID_UNIVERSE
 
-def get_recently_modified_record_ids(date='00-00-00 00:00:00'):
+def get_recently_modified_record_ids(date):
     '''
     Returns the bibrecs with modification date more recent then date, or all
     the bibrecs if no date is specified.
     @param date: date
     '''
-    papers = run_sql("select id from bibrec where modification_date > %s",
-                     (str(date),))
-    if papers:
-        bibrecs = map(int, *zip(*papers))
-        all_bibrecs = perform_request_search(p="")
-        bibrecs = list(set(bibrecs) & set(all_bibrecs))
-        min_date = run_sql("select max(modification_date) from bibrec")
-    else:
-        bibrecs = []
-        min_date = run_sql("select now()")
-    return bibrecs, min_date
+    return [p[0] for p in run_sql(
+               "select id from bibrec where modification_date > %s", (date,))]
 
 
 def get_cached_author_page(pageparam):
@@ -1055,7 +1052,7 @@ def get_deleted_papers():
                    "where o.id_bibxxx = dummy.iid")
 
 #bibauthorid_maintenance personid update private methods
-def update_personID_canonical_names(persons_list=[], overwrite=False, suggested=''):
+def update_personID_canonical_names(persons_list=None, overwrite=False, suggested=''):
     '''
     Updates the personID table creating or updating canonical names for persons
     @param: persons_list: persons to consider for the update  (('1'),)
@@ -1442,15 +1439,15 @@ def get_signatures_from_rec(bibrec):
                    , (bibrec,))
 
 
-def modify_signature(bibrecref, bibref):
+def modify_signature(oldref, oldrec, newref, newname):
     '''
     Modifies a signature in aidPERSONIDpapers.
     '''
     return run_sql("UPDATE aidPERSONIDPAPERS "
-                   "SET bibref_table = %s, bibref_value = %s "
+                   "SET bibref_table = %s, bibref_value = %s, name = %s "
                    "WHERE bibref_table = %s AND bibref_value = %s AND bibrec = %s"
-                   , (str(bibref[0]), bibref[1],
-                      str(bibrecref[0]), bibrecref[1], bibrecref[2]))
+                   , (str(newref[0]), newref[1], newname,
+                      str(oldref[0]), oldref[1], oldrec))
 
 
 def find_pids_by_name(name):
@@ -1519,6 +1516,28 @@ def get_full_personid_data(table_name="`aidPERSONIDDATA`"):
                    "opt1, opt2, opt3 from %s" % table_name)
 
 
+def get_wrong_names():
+    '''
+    Returns a generator with all wrong names in aidPERSONIDPAPERS.
+    Every element is (table, ref, correct_name).
+    '''
+
+    bib100 = dict(((x[0], create_normalized_name(split_name_parts(x[1]))) for x in get_bib10x()))
+    bib700 = dict(((x[0], create_normalized_name(split_name_parts(x[1]))) for x in get_bib70x()))
+
+    pidnames100 = run_sql("select distinct  bibref_value, name from aidPERSONIDPAPERS "
+                          " where bibref_table='100'")
+    pidnames700 = run_sql("select distinct  bibref_value, name from aidPERSONIDPAPERS "
+                          " where bibref_table='700'")
+
+    wrong100 = set(('100', x[0], bib100.get(x[0], None)) for x in pidnames100 if x[1] != bib100.get(x[0], None))
+    wrong700 = set(('700', x[0], bib700.get(x[0], None)) for x in pidnames700 if x[1] != bib700.get(x[0], None))
+
+    total = len(wrong100) + len(wrong700)
+
+    return chain(wrong100, wrong700), total
+
+
 def check_personid_papers():
     '''
     Checks all invariants of personid
@@ -1554,6 +1573,17 @@ def check_personid_papers():
             for ref in refs:
                 print "\t%s" % ref
 
+    wrong_names, count = get_wrong_names()
+
+    if count > 0:
+        ret = False
+        print "%d corrupted names in aidPERSONIDPAPERS." % count
+        for wrong_name in wrong_names:
+            if wrong_name[2]:
+                print "Outdated name, '%s'(%s:%d)." % (wrong_name[2], wrong_name[0], wrong_name[1])
+            else:
+                print "Invalid id(%s:%d)." % (wrong_name[0], wrong_name[1])
+
     return ret
 
 
@@ -1561,11 +1591,10 @@ def repair_personid():
     '''
     This should make check_personid_papers() to return true.
     '''
-    def drun_sql(q, a):
-        print q % a
-        run_sql(q, a)
-
-    for pid in (p[0] for p in run_sql("select distinct personid from aidPERSONIDPAPERS")):
+    pids = run_sql("select distinct personid from aidPERSONIDPAPERS")
+    lpids = len(pids)
+    for i, pid in enumerate((p[0] for p in pids)):
+        update_status(float(i) / lpids, "Checking per-pid...")
         rows = run_sql("select bibrec, bibref_table, bibref_value, flag "
                        "from aidPERSONIDPAPERS where personid = %s", (pid,))
 
@@ -1590,8 +1619,13 @@ def repair_personid():
                             "and bibref_value = %s "
                             "and flag = %s"
                             , (pid, sig[0], sig[1], sig[2], sig[3]))
+    update_status(1., "Done with per-pid fixing.")
+    print ""
 
-    for rec in (r[0] for r in run_sql("select distinct bibrec from aidPERSONIDPAPERS")):
+    recs = run_sql("select distinct bibrec from aidPERSONIDPAPERS")
+    lrecs = len(recs)
+    for i, rec in enumerate((r[0] for r in recs)):
+        update_status(float(i) / lrecs, "Checking per-rec...")
         rows = run_sql("select bibref_table, bibref_value, flag from aidPERSONIDPAPERS "
                        "where bibrec = %s", (rec,))
         kfuc = itemgetter(slice(0, 2))
@@ -1622,6 +1656,22 @@ def repair_personid():
                             "and bibref_table = %s "
                             "and bibref_value = %s"
                             , (rec, bibref[0], bibref[1]))
+    update_status(1., "Done with per-rec fixing.")
+    print ""
+
+    update_status(0 / 1, "Fixing wrong names...")
+    wrong_names, count = get_wrong_names()
+    for i, w in enumerate(wrong_names):
+        update_status(i / count, "Fixing wrong names...")
+        if w[2]:
+            run_sql("update aidPERSONIDPAPERS set name=%s where bibref_table=%s and bibref_value=%s",
+                    (w[2], w[0], w[1]))
+        else:
+            run_sql("delete from aidPERSONIDPAPERS where bibref_table=%s and bibref_value=%s",
+                    (w[2], w[0], w[1]))
+
+    update_status(1., "Fixed all wrong names.")
+    print ""
 
 
 def get_all_bibrecs():

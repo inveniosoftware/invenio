@@ -116,7 +116,7 @@ def start_workers(job, arr_args, workers_n):
 
     start = 0
     for lenght, workers in tasks:
-        if lenght:
+        if lenght > 0:
             end = start + lenght
             all_jobs.append((start, end, workers))
             start = end

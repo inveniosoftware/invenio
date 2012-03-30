@@ -29,6 +29,7 @@ import bibtask
 from bibauthorid_backinterface import get_papers_recently_modified
 from bibauthorid_backinterface import get_user_log
 from bibauthorid_backinterface import insert_user_log
+from bibauthorid_backinterface import get_sql_time
 
 try:
     any([True])
@@ -228,19 +229,22 @@ def _task_submit_check_options():
     return True
 
 
-def run_rabbit(paperslist, all_records=False):
+def rabbit_with_log(papers, check_invalid_papers, log_comment):
     from bibauthorid_rabbit import rabbit
 
+    starting_time = get_sql_time()
+    rabbit(papers, check_invalid_papers)
+    insert_user_log('daemon', '-1', 'PID_UPDATE', 'bibsched', 'status', comment=log_comment, timestamp=starting_time)
+
+def run_rabbit(paperslist, all_records=False):
     if not paperslist and all_records:
-        rabbit(None, check_invalid_papers=True)
-        insert_user_log('daemon', '-1', 'PID_UPDATE', 'bibsched', 'status',
-                    comment='bibauthorid_daemon, update_personid on all papers')
+        rabbit_with_log(None, True, 'bibauthorid_daemon, update_personid on all papers')
     elif not paperslist:
         last_log = get_user_log(userinfo='daemon', action='PID_UPDATE', only_most_recent=True)
 
         if len(last_log) >= 1:
             #select only the most recent papers
-            recently_modified, min_date = get_papers_recently_modified(date=last_log[0][2])
+            recently_modified = get_papers_recently_modified(date=last_log[0][2])
             if not recently_modified:
                 bibtask.write_message("update_personID_table_from_paper: "
                                       "All person entities up to date.",
@@ -248,19 +252,12 @@ def run_rabbit(paperslist, all_records=False):
             else:
                 bibtask.write_message("update_personID_table_from_paper: Running on: " +
                                       str(recently_modified), stream=sys.stdout, verbose=0)
-                rabbit(recently_modified, check_invalid_papers=True)
-                insert_user_log('daemon', '-1', 'PID_UPDATE', 'bibsched', 'status',
-                            comment='bibauthorid_daemon, run_personid_fast_assign_papers on '
-                            + str([paperslist, all_records, recently_modified]),
-                            timestamp=min_date[0][0])
+                rabbit_with_log(recently_modified, True, 'bibauthorid_daemon, run_personid_fast_assign_papers on '
+                                                 + str([paperslist, all_records, recently_modified]))
         else:
-            rabbit(None, check_invalid_papers=True)
-            insert_user_log('daemon', '-1', 'PID_UPDATE', 'bibsched', 'status',
-                            comment='bibauthorid_daemon, update_personid on all papers')
+            rabbit_with_log(None, True, 'bibauthorid_daemon, update_personid on all papers')
     else:
-        rabbit(paperslist, check_invalid_papers=True)
-        insert_user_log('daemon', '-1', 'PFAP', 'bibsched', 'status',
-                        comment='bibauthorid_daemon, personid_fast_assign_papers on ' + str(paperslist))
+        rabbit_with_log(paperslist, True, 'bibauthorid_daemon, personid_fast_assign_papers on ' + str(paperslist))
 
 
 def run_tortoise(from_scratch):

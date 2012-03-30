@@ -55,7 +55,7 @@ class probability_matrix:
         if expected == 0:
             expected = 1
 
-        save_interval = 10000000
+        save_interval = 10 ** 8
         self.cur_calc = 0
         self.save_calc = save_interval
         self.opti = 0
