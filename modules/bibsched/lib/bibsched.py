@@ -40,6 +40,7 @@ from invenio.config import \
      CFG_PREFIX, \
      CFG_BIBSCHED_REFRESHTIME, \
      CFG_BIBSCHED_LOG_PAGER, \
+     CFG_BIBSCHED_EDITOR, \
      CFG_BINDIR, \
      CFG_LOGDIR, \
      CFG_BIBSCHED_GC_TASKS_OLDER_THAN, \
@@ -56,12 +57,21 @@ from invenio.shellutils import run_shell_command
 CFG_VALID_STATUS = ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING', '% DELETED', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'STOPPED', 'SLEEPING', 'KILLED', 'NOW STOP')
 
 
+def get_pager():
+    """
+    Return the first available pager.
+    """
+    for pager in os.environ.get('PAGER', ''), CFG_BIBSCHED_LOG_PAGER, '/usr/bin/less', '/bin/more':
+        if os.path.exists(pager):
+            return pager
+
+
 def get_editor():
     """
     Return the first available editor.
     """
-    for editor in os.environ.get('EDITOR'), '/usr/bin/vim', '/usr/bin/emacs', '/usr/bin/vi', '/usr/bin/nano':
-        if editor and os.path.exists(editor):
+    for editor in os.environ.get('EDITOR', ''), CFG_BIBSCHED_EDITOR, '/usr/bin/vim', '/usr/bin/emacs', '/usr/bin/vi', '/usr/bin/nano':
+        if os.path.exists(editor):
             return editor
 
 shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
@@ -357,7 +367,7 @@ class Manager:
         else:
             logname = os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % task_id)
         if os.path.exists(logname):
-            pager = CFG_BIBSCHED_LOG_PAGER or os.environ.get('PAGER', '/bin/more')
+            pager = get_pager()
             if os.path.exists(pager):
                 self.curses.endwin()
                 os.system('%s %s' % (pager, logname))
@@ -365,6 +375,8 @@ class Manager:
                 self.old_stdout.flush()
                 raw_input()
                 self.curses.panel.update_panels()
+            else:
+                self._display_message_box("No pager was found")
 
     def edit_motd(self):
         """Add, delete or change the motd message that will be shown when the
