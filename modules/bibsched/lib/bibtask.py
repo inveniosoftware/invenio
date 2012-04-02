@@ -883,6 +883,7 @@ def _task_run(task_run_fnc):
         except SystemExit:
             pass
         except:
+            write_message(traceback.format_exc()[:-1])
             register_exception(alert_admin=True)
             if task_get_task_param('stop_queue_on_error'):
                 task_update_status("ERROR")
