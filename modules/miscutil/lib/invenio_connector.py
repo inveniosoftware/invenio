@@ -48,9 +48,14 @@ import os
 import time
 import sys
 
+MECHANIZE_CLIENTFORM_VERSION_CHANGE = (0, 2, 0)
 try:
     import mechanize
-    import ClientForm
+    if mechanize.__version__ < MECHANIZE_CLIENTFORM_VERSION_CHANGE:
+        OLD_MECHANIZE_VERSION = True
+        import ClientForm
+    else:
+        OLD_MECHANIZE_VERSION = False
     MECHANIZE_AVAILABLE = True
 except ImportError:
     MECHANIZE_AVAILABLE = False
@@ -165,7 +170,8 @@ class InvenioConnector(object):
                 self._check_credentials()
             else:
                 self.user = None
-                raise InvenioConnectorAuthError("The Python modules Mechanize and ClientForm must" \
+                raise InvenioConnectorAuthError("The Python module Mechanize (and ClientForm" \
+                                                " if Mechanize version < 0.2.0) must" \
                                                 " be installed to perform authenticated requests.")
 
     def _init_browser(self):
@@ -447,13 +453,17 @@ class Record(dict):
         else:
             return None
 
-class _SGMLParserFactory( mechanize.DefaultFactory):
+class _SGMLParserFactory(mechanize.DefaultFactory):
     """
     Black magic to be able to interact with CERN SSO forms.
     """
     def __init__(self, i_want_broken_xhtml_support=False):
-        forms_factory = mechanize.FormsFactory(
-            form_parser_class=ClientForm.XHTMLCompatibleFormParser)
+        if OLD_MECHANIZE_VERSION:
+            forms_factory = mechanize.FormsFactory(
+                form_parser_class=ClientForm.XHTMLCompatibleFormParser)
+        else:
+            forms_factory = mechanize.FormsFactory(
+                form_parser_class=mechanize.XHTMLCompatibleFormParser)
         mechanize.Factory.__init__(
             self,
             forms_factory=forms_factory,

@@ -41,10 +41,10 @@ class InvenioConnectorTest(unittest.TestCase):
 
     def test_remote_search(self):
         """InvenioConnector - remote search"""
-        server = InvenioConnector("http://inspirebeta.net")
+        server = InvenioConnector("http://invenio-demo.cern.ch")
         result = server.search(p='ellis', of='id')
         self.assertTrue(len(result) > 0, \
-                        'did not get remote search results from http://inspirebeta.net.')
+                        'did not get remote search results from http://invenio-demo.cern.ch')
 
     def test_search_collections(self):
         """InvenioConnector - collection search"""
