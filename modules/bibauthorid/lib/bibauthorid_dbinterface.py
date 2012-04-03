@@ -1103,7 +1103,6 @@ def update_personID_canonical_names(persons_list=None, overwrite=False, suggeste
 
     if verbose_prints:
         update_status(1.)
-    print
 
 
 def personid_get_recids_affected_since(last_timestamp):
