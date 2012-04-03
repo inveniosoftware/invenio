@@ -177,7 +177,7 @@ def update_personID_table_from_paper(papers_list=None, personid=None):
     rows_limit = 10000000
     end_loop = False
     while not end_loop:
-        task_sleep_now_if_required(True)
+        task_sleep_now_if_required(can_stop_too=False)
         papers_data = dbinter.collect_personid_papers(person=personid_q,
                                                       limit=(counter, rows_limit,))
 
@@ -200,7 +200,7 @@ def update_personID_table_from_paper(papers_list=None, personid=None):
         del(papers_data)
 
         if len(to_remove) > 0:
-            task_sleep_now_if_required(True)
+            task_sleep_now_if_required(can_stop_too=False)
             delta = dbinter.delete_personid_by_id(to_remove)
             counter -= delta
             if bconfig.TABLES_UTILS_DEBUG:
@@ -223,7 +223,7 @@ def update_personID_table_from_paper(papers_list=None, personid=None):
             for w in workers:
                 w.join()
 
-            task_sleep_now_if_required(True)
+            task_sleep_now_if_required(can_stop_too=False)
 
 
 def personid_remove_automatically_assigned_papers(pids=None):
@@ -333,7 +333,7 @@ def personid_fast_assign_papers(paperslist=None, use_threading_not_multiprocessi
                     p.join()
                     process_list.remove(p)
 
-            task_sleep_now_if_required(True)
+            task_sleep_now_if_required(can_stop_too=False)
     else:
         max_processes = bconfig.CFG_BIBAUTHORID_PERSONID_SQL_MAX_THREADS
         checker = status_checker()
@@ -351,7 +351,7 @@ def personid_fast_assign_papers(paperslist=None, use_threading_not_multiprocessi
                     p.join()
                     workers.remove(p)
 
-            task_sleep_now_if_required(True)
+            task_sleep_now_if_required(can_stop_too=False)
 
 def get_recids_affected_since(last_timestamp):
     '''

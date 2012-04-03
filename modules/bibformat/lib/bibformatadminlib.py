@@ -34,9 +34,10 @@ from invenio.bibformat_config import \
      CFG_BIBFORMAT_TEMPLATES_PATH, \
      CFG_BIBFORMAT_OUTPUTS_PATH, \
      CFG_BIBFORMAT_ELEMENTS_PATH, \
-     CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION
+     CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, \
+     InvenioBibFormatError
 from invenio.urlutils import wash_url_argument
-from invenio.errorlib import get_msgs_for_code_list
+from invenio.errorlib import register_exception
 from invenio.messages import gettext_set_language, wash_language, language_list_long
 from invenio.search_engine import perform_request_search
 from invenio import bibformat_dblayer
@@ -67,14 +68,9 @@ def perform_request_index(ln=CFG_SITE_LANG, warnings=None, is_admin=False):
     Returns the main BibFormat admin page.
 
     @param ln: language
-    @param warnings: a list of messages to display at top of the page, that prevents writability in etc
     @param is_admin: indicate if user is authorized to use BibFormat
     @return: the main admin page
     """
-    if warnings is not None and len(warnings) > 0:
-        warnings = get_msgs_for_code_list(warnings, 'warning', ln)
-        warnings = [x[1] for x in warnings] # Get only message, not code
-
     return bibformat_templates.tmpl_admin_index(ln, warnings, is_admin)
 
 def perform_request_format_templates_management(ln=CFG_SITE_LANG, checking=0):
@@ -108,7 +104,8 @@ def perform_request_format_templates_management(ln=CFG_SITE_LANG, checking=0):
             continue
 
         status = check_format_template(filename, checking)
-        if len(status) > 1 or (len(status)==1 and status[0][0] != 'ERR_BIBFORMAT_CANNOT_READ_TEMPLATE_FILE'):
+        import string
+        if len(status) > 1 or (len(status)==1 and status[0].find('Could not read format template named') == -1):
             status = '''
             <a style="color: rgb(255, 0, 0);"
             href="%(siteurl)s/admin/bibformat/bibformatadmin.py/validate_format?ln=%(ln)s&amp;bft=%(bft)s">Not OK</a>
@@ -403,10 +400,13 @@ def perform_request_format_element_test(bfe, ln=CFG_SITE_LANG, param_values=None
                                                search_pattern = search_pattern.split(' '),
                                                xml_record = None,
                                                user_info = user_info)
-        (result, errors) = bibformat_engine.eval_format_element(format_element, bfo, params)
+        (result, dummy) = bibformat_engine.eval_format_element(format_element, bfo, params)
     else:
-        result = get_msgs_for_code_list([("ERR_BIBFORMAT_NO_RECORD_FOUND_FOR_PATTERN", search_pattern)],
-                                        stream='error', ln=CFG_SITE_LANG)[0][1]
+        try:
+            raise InvenioBibFormatError(_('No Record Found for %s.') % search_pattern)
+        except InvenioBibFormatError, exc:
+            register_exception()
+            result = exc.message
 
     return bibformat_templates.tmpl_admin_format_element_test(ln,
                                                               bfe,
@@ -445,7 +445,7 @@ def perform_request_output_formats_management(ln=CFG_SITE_LANG, sortby="code"):
         # Validate the output format
         status = check_output_format(code)
         # If there is an error but the error is just 'format is not writable', do not display as error
-        if len(status) > 1 or (len(status)==1 and status[0][0] != 'ERR_BIBFORMAT_CANNOT_WRITE_OUTPUT_FILE'):
+        if len(status) > 1 or (len(status)==1 and status[0].find('BibFormat could not write to output format') == -1):
             status = '''
             <a style="color: rgb(255, 0, 0);"
             href="%(siteurl)s/admin/bibformat/bibformatadmin.py/validate_format?ln=%(ln)s&bfo=%(bfo)s">Not OK</a>
@@ -1236,15 +1236,11 @@ def perform_request_format_validate(ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=No
     """
 
     if bfo is not None:
-        errors = check_output_format(bfo)
-        messages = get_msgs_for_code_list(code_list = errors, ln=ln)
+        messages = check_output_format(bfo)
     elif bft is not None:
-        errors = check_format_template(bft, checking=1)
-        messages = get_msgs_for_code_list(code_list = errors, ln=ln)
+        messages = check_format_template(bft, checking=1)
     elif bfe is not None:
-        errors = check_format_element(bfe)
-        messages = get_msgs_for_code_list(code_list = errors, ln=ln)
-
+        messages = check_format_element(bfe)
     if messages is None:
         messages = []
 
@@ -1262,6 +1258,7 @@ def check_output_format(code):
     @param code: the 6 chars code of the output format to check
     @return: a list of errors
     """
+    _ = gettext_set_language(CFG_SITE_LANG)
     errors = []
     filename = bibformat_engine.resolve_output_format_filename(code)
     if can_read_output_format(code):
@@ -1279,61 +1276,121 @@ def check_output_format(code):
                 # Check tag
                 if not clean_line.endswith(":"):
                     # Column misses at the end of line
-                    errors.append(("ERR_BIBFORMAT_OUTPUT_RULE_FIELD_COL", line, i))
+                    try:
+                        raise InvenioBibFormatError(_('Tag specification "%s" must end with column ":" at line %s.') % (line, i))
+                    except InvenioBibFormatError, exc:
+                        register_exception()
+                        errors.append(exc.message)
                 if not clean_line.lower().startswith("tag"):
                     # Tag keyword is missing
-                    errors.append(("ERR_BIBFORMAT_OUTPUT_TAG_MISSING", line, i))
+                    try:
+                        raise InvenioBibFormatError(_('Tag specification "%s" must start with "tag" at line %s.') % (line, i))
+                    except InvenioBibFormatError, exc:
+                        register_exception()
+                        errors.append(exc.message)
                 elif not clean_line.startswith("tag"):
                     # Tag was not lower case
-                    errors.append(("ERR_BIBFORMAT_OUTPUT_WRONG_TAG_CASE", line, i))
+                    try:
+                        raise InvenioBibFormatError(_('"tag" must be lowercase in "%s" at line %s.') % (line, i))
+                    except InvenioBibFormatError, exc:
+                        register_exception()
+                        errors.append(exc.message)
 
                 clean_line = clean_line.rstrip(": ") #remove : and spaces at the end of line
 
                 current_tag = "".join(clean_line.split()[1:]).strip() #the tag starts at second position
                 if len(clean_line.split()) > 2: #We should only have 'tag' keyword and tag
-                    errors.append(("ERR_BIBFORMAT_INVALID_OUTPUT_RULE_FIELD", i))
+                    try:
+                        raise InvenioBibFormatError(_('Should be "tag field_number:" at line %s.') % i)
+                    except InvenioBibFormatError, exc:
+                        register_exception()
+                        errors.append(exc.message)
                 else:
                     if len(check_tag(current_tag)) > 0:
                         # Invalid tag
-                        errors.append(("ERR_BIBFORMAT_INVALID_OUTPUT_RULE_FIELD_tag", current_tag, i))
+                        try:
+                            raise InvenioBibFormatError(_('Invalid tag "%s" at line %s.') % (current_tag, i))
+                        except InvenioBibFormatError, exc:
+                            register_exception()
+                            errors.append(exc.message)
                     if not clean_line.startswith("tag"):
-                        errors.append(("ERR_BIBFORMAT_INVALID_OUTPUT_RULE_FIELD", i))
+                        try:
+                            raise InvenioBibFormatError(_('Should be "tag field_number:" at line %s.') % i)
+                        except InvenioBibFormatError, exc:
+                            register_exception()
+                            errors.append(exc.message)
 
             elif line.find('---') != -1:
                 # Check condition
                 if current_tag == "":
-                    errors.append(("ERR_BIBFORMAT_OUTPUT_CONDITION_OUTSIDE_FIELD", line, i))
+                    try:
+                        raise InvenioBibFormatError(_('Condition "%s" is outside a tag specification at line %s.') % (line, i))
+                    except InvenioBibFormatError, exc:
+                        register_exception()
+                        errors.append(exc.message)
 
                 words = line.split('---')
                 if len(words) != 2:
-                    errors.append(("ERR_BIBFORMAT_INVALID_OUTPUT_CONDITION", line, i))
+                    try:
+                        raise InvenioBibFormatError(_('Condition "%s" can only have a single separator --- at line %s.') % (line, i))
+                    except InvenioBibFormatError, exc:
+                        register_exception()
+                        errors.append(exc.message)
                 template = words[-1].strip()
                 path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + template
                 if not os.path.exists(path):
-                    errors.append(("ERR_BIBFORMAT_WRONG_OUTPUT_RULE_TEMPLATE_REF", template, i))
+                    try:
+                        raise InvenioBibFormatError(_('Template "%s" does not exist at line %s.') % (template, i))
+                    except InvenioBibFormatError, exc:
+                        register_exception()
+                        errors.append(exc.message)
 
             elif line.find(':') != -1 or (line.strip().lower().startswith("default") and line.find('---') == -1):
                 # Check default template
                 clean_line = line.strip()
                 if line.find(':') == -1:
                     # Column misses after default
-                    errors.append(("ERR_BIBFORMAT_OUTPUT_RULE_DEFAULT_COL", line, i))
+                    try:
+                        raise InvenioBibFormatError(_('Missing column ":" after "default" in "%s" at line %s.') % (line, i))
+                    except InvenioBibFormatError, exc:
+                        register_exception()
+                        errors.append(exc.message)
                 if not clean_line.startswith("default"):
                     # Default keyword is missing
-                    errors.append(("ERR_BIBFORMAT_OUTPUT_DEFAULT_MISSING", line, i))
+                    try:
+                        raise InvenioBibFormatError(_('Default template specification "%s" must start with "default :" at line %s.') % (line, i))
+                    except InvenioBibFormatError, exc:
+                        register_exception()
+                        errors.append(exc.message)
                 if not clean_line.startswith("default"):
                     # Default was not lower case
-                    errors.append(("ERR_BIBFORMAT_OUTPUT_WRONG_DEFAULT_CASE", line, i))
+                    try:
+                        raise InvenioBibFormatError(_('"default" keyword must be lowercase in "%s" at line %s.') % (line, i))
+                    except InvenioBibFormatError, exc:
+                        register_exception()
+                        errors.append(exc.message)
                 default = "".join(line.split(':')[1]).strip()
                 path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + default
                 if not os.path.exists(path):
-                    errors.append(("ERR_BIBFORMAT_WRONG_OUTPUT_RULE_TEMPLATE_REF", default, i))
+                    try:
+                        raise InvenioBibFormatError(_('Template "%s" does not exist at line %s.') % (default, i))
+                    except InvenioBibFormatError, exc:
+                        register_exception()
+                        errors.append(exc.message)
 
             else:
                 # Check others
-                errors.append(("ERR_BIBFORMAT_WRONG_OUTPUT_LINE", line, i))
+                try:
+                    raise InvenioBibFormatError(_('Line %s could not be understood at line %s.') % (line, i))
+                except InvenioBibFormatError, exc:
+                    register_exception()
+                    errors.append(exc.message)
     else:
-        errors.append(("ERR_BIBFORMAT_CANNOT_READ_OUTPUT_FILE", filename, ""))
+        try:
+            raise InvenioBibFormatError(_('Output format %s cannot not be read. %s') % (filename, ""))
+        except InvenioBibFormatError, exc:
+            register_exception()
+            errors.append(exc.message)
 
     return errors
 
@@ -1348,6 +1405,7 @@ def check_format_template(filename, checking=0):
     @return: a list of errors
     """
     errors = []
+    _ = gettext_set_language(CFG_SITE_LANG)
     if can_read_format_template(filename):#Can template be read?
         if filename.endswith('.'+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
             #format_template = bibformat_engine.get_format_template(filename, with_attributes=True)
@@ -1357,12 +1415,20 @@ def check_format_template(filename, checking=0):
             # Look for name
             match = bibformat_engine.pattern_format_template_name.search(code)
             if match is None:#Is tag <name> defined in template?
-                errors.append(("ERR_BIBFORMAT_TEMPLATE_HAS_NO_NAME", filename))
+                try:
+                    raise InvenioBibFormatError(_('Could not find a name specified in tag "<name>" inside format template %s.') % filename)
+                except InvenioBibFormatError, exc:
+                    register_exception()
+                    errors.append(exc.message)
 
             # Look for description
             match = bibformat_engine.pattern_format_template_desc.search(code)
             if match is None:#Is tag <description> defined in template?
-                errors.append(("ERR_BIBFORMAT_TEMPLATE_HAS_NO_DESCRIPTION", filename))
+                try:
+                    raise InvenioBibFormatError(_('Could not find a description specified in tag "<description>" inside format template %s.') % filename)
+                except InvenioBibFormatError, exc:
+                    register_exception()
+                    errors.append(exc.message)
 
             format_template = bibformat_engine.get_format_template(filename, with_attributes=False)
             code = format_template['code']
@@ -1373,14 +1439,26 @@ def check_format_template(filename, checking=0):
                 element_name = element_match.group("function_name")
                 filename = bibformat_engine.resolve_format_element_filename(element_name)
                 if filename is None and not bibformat_dblayer.tag_exists_for_name(element_name): #Is element defined?
-                    errors.append(("ERR_BIBFORMAT_TEMPLATE_CALLS_UNDEFINED_ELEM", filename, element_name))
+                    try:
+                        raise InvenioBibFormatError(_('Format template %s calls undefined element "%s".') % (filename, element_name))
+                    except InvenioBibFormatError, exc:
+                        register_exception()
+                        errors.append(exc.message)
                 else:
                     format_element = bibformat_engine.get_format_element(element_name, with_built_in_params=True)
                     if format_element is None:#Can element be loaded?
                         if not can_read_format_element(element_name):
-                            errors.append(("ERR_BIBFORMAT_TEMPLATE_CALLS_UNREADABLE_ELEM", filename, element_name))
+                            try:
+                                raise InvenioBibFormatError(_('Format template %s calls unreadable element "%s". Check element file permissions.') % (filename, element_name))
+                            except InvenioBibFormatError, exc:
+                                register_exception()
+                                errors.append(exc.message)
                         else:
-                            errors.append(("ERR_BIBFORMAT_TEMPLATE_CALLS_UNLOADABLE_ELEM", element_name, filename))
+                            try:
+                                raise InvenioBibFormatError(_('Cannot load element "%s" in template %s. Check element code.') % (element_name, filename))
+                            except InvenioBibFormatError, exc:
+                                register_exception()
+                                errors.append(exc.message)
                     else:
                         # Are the parameters used defined in element?
                         params_call = bibformat_engine.pattern_function_params.finditer(element_match.group())
@@ -1400,8 +1478,11 @@ def check_format_template(filename, checking=0):
                                 allowed_params.append(allowed_param['name'])
 
                             if not param in allowed_params:
-                                errors.append(("ERR_BIBFORMAT_TEMPLATE_WRONG_ELEM_ARG",
-                                               element_name, param, filename))
+                                try:
+                                    raise InvenioBibFormatError(_('Format element %s uses unknown parameter "%s" in format template %s.') % (element_name, param, filename))
+                                except InvenioBibFormatError, exc:
+                                    register_exception()
+                                    errors.append(exc.message)
 
                         # The following code is too much time consuming. Only do where really requested
                         if checking > 0:
@@ -1414,7 +1495,11 @@ def check_format_template(filename, checking=0):
                                 errors.extend(errors_)
 
     else:# Template cannot be read
-        errors.append(("ERR_BIBFORMAT_CANNOT_READ_TEMPLATE_FILE", filename, ""))
+        try:
+            raise InvenioBibFormatError(_('Could not read format template named %s. %s') % (filename, ""))
+        except InvenioBibFormatError, exc:
+            register_exception()
+            errors.append(exc.message)
     return errors
 
 def check_format_element(name):
@@ -1427,6 +1512,7 @@ def check_format_element(name):
     @return: a list of errors
     """
     errors = []
+    _ = gettext_set_language(CFG_SITE_LANG)
     filename = bibformat_engine.resolve_format_element_filename(name)
     if filename is not None:#Can element be found in files?
         if can_read_format_element(name):#Can element be read?
@@ -1451,14 +1537,25 @@ def check_format_element(name):
                     (result, errors_) = bibformat_engine.eval_format_element(element, bfo, verbose=7)
                     errors.extend(errors_)
             except Exception, e:
-                errors.append(("ERR_BIBFORMAT_IN_FORMAT_ELEMENT", name, e))
+                try:
+                    raise InvenioBibFormatError(_('Error in format element %s. %s.') % (name, e))
+                except InvenioBibFormatError, exc:
+                    register_exception()
+                    errors.append(exc.message)
         else:
-            errors.append(("ERR_BIBFORMAT_CANNOT_READ_ELEMENT_FILE", filename, ""))
+            try:
+                raise InvenioBibFormatError(_('Format element %s cannot not be read. %s') % (filename, ""))
+            except InvenioBibFormatError, exc:
+                register_exception()
+                errors.append(exc.message)
     elif bibformat_dblayer.tag_exists_for_name(name):#Can element be found in database?
         pass
     else:
-        errors.append(("ERR_BIBFORMAT_CANNOT_RESOLVE_ELEMENT_NAME", name))
-
+        try:
+            raise InvenioBibFormatError(_('Could not find format element named %s.') % name)
+        except InvenioBibFormatError, exc:
+            register_exception()
+            errors.append(exc.message)
     return errors
 
 def check_tag(tag):

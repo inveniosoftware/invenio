@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,6 +26,8 @@ __revision__ = "$Id$"
 import os
 import re
 import time
+import subprocess
+import shutil
 
 from invenio.config import \
      CFG_PATH_GZIP, \
@@ -40,26 +42,21 @@ def Move_to_Done(parameters, curdir, form, user_info=None):
     Then it tars and gzips the directory.
     """
     global rn
-    data = re.search(".*/([^/]*)/([^/]*)/[^/]*$",curdir)
+    data = re.search(".*/([^/]*)/([^/]*)/[^/]*$", curdir)
     dir = data.group(1)
     doctype = data.group(2)
-    DONEDIR = "%s/done/%s/%s" % (CFG_WEBSUBMIT_STORAGEDIR,dir,doctype)
-    if not os.path.exists(DONEDIR):
+    donedir = os.path.join(CFG_WEBSUBMIT_STORAGEDIR, "done", dir, doctype)
+    if not os.path.exists(donedir):
         try:
-            os.makedirs(DONEDIR)
+            os.makedirs(donedir)
         except:
-            raise InvenioWebSubmitFunctionError("Cannot create done directory %s" % DONEDIR)
+            raise InvenioWebSubmitFunctionError("Cannot create done directory %s" % donedir)
     # Moves the files to the done diectory and creates an archive
-    rn = rn.replace("/","-")
-    namedir = "%s_%s" % (rn,time.strftime("%Y%m%d%H%M%S"))
-    FINALDIR = "%s/%s" % (DONEDIR,namedir)
-    os.rename(curdir,FINALDIR)
+    rn = rn.replace("/", "-")
+    namedir = "%s_%s" % (rn, time.strftime("%Y%m%d%H%M%S"))
+    finaldir = os.path.join(donedir, namedir)
+    os.rename(curdir, finaldir)
     if CFG_PATH_TAR != "" and CFG_PATH_GZIP != "":
-        os.chdir(DONEDIR)
-        tar_txt = "%s -cf - %s > %s.tar" % (CFG_PATH_TAR,namedir,namedir)
-        os.system(tar_txt)
-        zip_txt = "%s %s.tar" % (CFG_PATH_GZIP,namedir)
-        os.system(zip_txt)
-        rm_txt = "rm -R %s" % namedir
-        os.system(rm_txt)
+        if subprocess.Popen([CFG_PATH_TAR, '-czf', '%s.tar.gz' % namedir, namedir], cwd=donedir).wait() == 0:
+            shutil.rmtree(finaldir)
     return ""

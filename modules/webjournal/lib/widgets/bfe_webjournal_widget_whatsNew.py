@@ -24,7 +24,7 @@ including 'breaking news'.
 import time
 import os
 
-from invenio.search_engine import search_pattern
+from invenio.search_engine import search_pattern, record_exists
 from invenio.bibformat_engine import BibFormatObject
 from invenio.config import \
      CFG_SITE_URL, \
@@ -178,7 +178,8 @@ def _get_breaking_news(lang, journal_name):
     if not journal_name.lower() == 'cernbulletin':
         return ''
     # Look for active breaking news
-    breaking_news_recids = list(search_pattern(p='980__a:BULLETINBREAKING'))
+    breaking_news_recids = [recid for recid in search_pattern(p='980__a:BULLETINBREAKING') \
+                            if record_exists(recid) == 1]
     today = time.mktime(time.localtime())
     breaking_news = ""
     for recid in breaking_news_recids:

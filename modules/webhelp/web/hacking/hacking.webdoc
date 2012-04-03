@@ -81,6 +81,11 @@ the taxonomy extensions we use, how the keyword extraction algorithm works.
 ranking methods available in bibrank works, and how they can
 be tweaked to give various output.</dd>
 
+<dt><a href="bibsort-internals">BibSort Internals</a></dt>
+<dd>Describes information useful to understand how BibSort
+module works and how various data manipulations are done,
+stored and retrieved.</dd>
+
 <dt><a href="bibedit-internals">BibEdit Internals</a></dt>
 <dd>Describes information useful to manipulate single records.</dd>
 

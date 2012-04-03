@@ -3225,6 +3225,13 @@ CREATE TABLE IF NOT EXISTS cmtSUBSCRIPTION (
   KEY id_user (id_bibrec, id_user)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS cmtCOLLAPSED (
+  id_bibrec int(15) unsigned NOT NULL default '0',
+  id_cmtRECORDCOMMENT int(15) unsigned NULL,
+  id_user int(15) unsigned NOT NULL,
+  PRIMARY KEY (id_user, id_bibrec, id_cmtRECORDCOMMENT)
+) ENGINE=MyISAM;
+
 -- tables for BibKnowledge:
 
 CREATE TABLE IF NOT EXISTS knwKB (
@@ -3517,15 +3524,17 @@ CREATE TABLE IF NOT EXISTS schTASK (
   status varchar(50),
   progress varchar(255),
   priority tinyint(4) NOT NULL default 0,
+  sequenceid int(8) NULL default NULL,
   PRIMARY KEY  (id),
   KEY status (status),
   KEY runtime (runtime),
-  KEY priority (priority)
+  KEY priority (priority),
+  KEY sequenceid (sequenceid)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS hstTASK (
   id int(15) unsigned NOT NULL,
-  proc varchar(20) NOT NULL,
+  proc varchar(255) NOT NULL,
   host varchar(255) NOT NULL default '',
   user varchar(50) NOT NULL,
   runtime datetime NOT NULL,
@@ -3534,10 +3543,12 @@ CREATE TABLE IF NOT EXISTS hstTASK (
   status varchar(50),
   progress varchar(255),
   priority tinyint(4) NOT NULL default 0,
+  sequenceid int(8) NULL default NULL,
   PRIMARY KEY  (id),
   KEY status (status),
   KEY runtime (runtime),
-  KEY priority (priority)
+  KEY priority (priority),
+  KEY sequenceid (sequenceid)
 ) ENGINE=MyISAM;
 
 -- Batch Upload History
@@ -4056,6 +4067,50 @@ CREATE TABLE IF NOT EXISTS `xtrJOB` (
   `name` varchar(30) NOT NULL,
   `last_updated` datetime NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
+
+-- tables for bibsort module
+
+CREATE TABLE IF NOT EXISTS bsrMETHOD (
+  id mediumint(8) unsigned NOT NULL auto_increment,
+  name varchar(20) NOT NULL,
+  definition varchar(255) NOT NULL,
+  washer varchar(255) NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY (name)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS bsrMETHODNAME (
+  id_bsrMETHOD mediumint(8) unsigned NOT NULL,
+  ln char(5) NOT NULL default '',
+  type char(3) NOT NULL default 'sn',
+  value varchar(255) NOT NULL,
+  PRIMARY KEY (id_bsrMETHOD, ln, type)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS bsrMETHODDATA (
+  id_bsrMETHOD mediumint(8) unsigned NOT NULL,
+  data_dict longblob,
+  data_dict_ordered longblob,
+  data_list_sorted longblob,
+  last_updated datetime,
+  PRIMARY KEY (id_bsrMETHOD)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS bsrMETHODDATABUCKET (
+  id_bsrMETHOD mediumint(8) unsigned NOT NULL,
+  bucket_no tinyint(2) NOT NULL,
+  bucket_data longblob,
+  bucket_last_value varchar(255),
+  last_updated datetime,
+  PRIMARY KEY (id_bsrMETHOD, bucket_no)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS collection_bsrMETHOD (
+  id_collection mediumint(9) unsigned NOT NULL,
+  id_bsrMETHOD mediumint(9) unsigned NOT NULL,
+  score tinyint(4) unsigned NOT NULL default '0',
+  PRIMARY KEY (id_collection, id_bsrMETHOD)
 ) ENGINE=MyISAM;
 
 -- end of file

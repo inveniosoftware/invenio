@@ -1,0 +1,92 @@
+## -*- mode: html; coding: utf-8; -*-
+
+## This file is part of Invenio.
+## Copyright (C) 2010, 2011, 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+<!-- WebDoc-Page-Title: BibSort Internals -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking Invenio</a> -->
+<!-- WebDoc-Page-Revision: $Id$ -->
+
+<pre>
+<blockquote>
+
+BibSort main goal is to make the sorting of search results faster.
+It does this by creating several buckets that are then loaded by
+the search_engine and cached.
+
+This is what happens per sorting method (which can be either
+a ranking method or a sorting field/list of MARC tags):
+
+    I. <b>Rebalancing the buckets</b> (reconstructing the buckets):
+	- (1) the data for all the records is loaded into a dictionary
+	- (2) based on the washer method (if any is defined in the
+		cfg file) date is adjusted (dates normalized, removing
+		leading articles..)
+	- (3) the data dictionary (containing recid:value) is then
+		sorted based on values
+	- (4) after the sorting, each record receives a weight (it can
+		be the index in the sorted list or a multiple of the index)
+	- (5) based on the sorted list of recids, the buckets are created,
+		by splitting this list in CFG_BIBSORT_BUCKETS parts
+	- (6) the maximum weight per bucket will also be stored in
+		the database, along with each bucket
+	- (7) everything is stored in the database
+
+    II. <b>Updating the buckets</b> (can run each 5 min, to update
+	the buckets with the latest changes. Probably it would be best
+	to run it after BibIndex, in order for the user to see the new
+	changes as soon as they are indexed)
+	- (1) detect which methods should be updated: either
+		ranking - from rnkMETHOD tables, either usual sorting
+		(by field or MARC)
+	- (1i) if RNK method -> then run rebalancing, since anyway,
+		we have to read all the data for all the record
+		(check also if the method needs to be deleted
+		rather then updated) - END
+	- (1ii) if sort by field -> detect which recids have been
+		modified since the last run of bibsort
+	- (2) based on the washer method (if any is defined in
+		the cfg file) date is adjusted (dates normalized,
+		removing leading articles..)
+	- (3) compute the records that need to be inserted, modified and
+		deleted (with the help of the data dictionary (see I.2)
+		that is loaded from db)
+	- (3i) insert: new recids with their values will be inserted into
+		the data dictionary; binary search will be used to compute
+		the index of the new record in the sorted list of records;
+		a new weight will be given to this record based on this index
+		and on the weights of its neighbours (ex: recid 3 needs to be
+		inserted between recid1-weight=4 and recid2: weight=8 =>
+		recid3 will have weight=6); initially, the weights are given
+		as such that there are free weights between any 2 recids;
+		when these spaces are filled, the weights will be recomputed,
+		to recreate spaces between them.)
+	- (3ii) delete: the recids will be deleted from all the data structures
+		(except the buckets, since there is no actual need for that,
+		the intersection with the search_engine output will guarantee
+		that the record will  not be displayed)
+	- (3iii) modify: combination between insert and delete
+	- (4) update the buckets to reflect the latest changes; here, we will
+		take advantage of the maximum weight per bucket = the highest
+		weight value per bucket (I.6); since the buckets are not ordered
+		(are intbitsets, for taking advantage of fast intersections)
+		we will add the new records based on their weight (the main idea
+		is to compare the weight of the modified records with the max weight
+		and decide in which bucket to be added/deleted.
+
+</blockquote>
+</pre>

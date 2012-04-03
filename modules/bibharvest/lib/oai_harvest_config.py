@@ -29,3 +29,13 @@ CFG_OAI_POSSIBLE_POSTMODES = [\
          ["t", "attach full-text (t)"], \
          ["f", "filter (f)"], \
          ["u", "upload (u)"]]
+
+# Exceptions: warnings
+class InvenioOAIHarvestWarning(Exception):
+    """A generic warning for OAIHarvest."""
+    def __init__(self, message):
+        """Initialisation."""
+        self.message = message
+    def __str__(self):
+        """String representation."""
+        return repr(self.message)

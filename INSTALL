@@ -5,7 +5,7 @@ About
 =====
 
 This document specifies how to build, customize, and install Invenio
-v1.0.0-rc0 for the first time.  See RELEASE-NOTES if you are upgrading
+v1.0.0 for the first time.  See RELEASE-NOTES if you are upgrading
 from a previous Invenio release.
 
 Contents
@@ -71,12 +71,14 @@ Contents
      b) MySQL server (may be on a remote machine), and MySQL client
         (must be available locally too).  MySQL versions 4.1 or 5.0
         are supported.  Please set the variable "max_allowed_packet"
-        in your "my.cnf" init file to at least 4M.  You may perhaps
-        also want to run your MySQL server natively in UTF-8 mode by
-        setting "default-character-set=utf8" in various parts of your
-        "my.cnf" file, such as in the "[mysql]" part and elsewhere;
-        but this is not really required.
-          <http://mysql.com/>
+        in your "my.cnf" init file to at least 4M.  (For sites such as
+        INSPIRE, having 1M records with 10M citer-citee pairs in its
+        citation map, you may need to increase max_allowed_packet to
+        1G.)  You may perhaps also want to run your MySQL server
+        natively in UTF-8 mode by setting "default-character-set=utf8"
+        in various parts of your "my.cnf" file, such as in the
+        "[mysql]" part and elsewhere; but this is not really required.
+        <http://mysql.com/>
 
      c) Apache 2 server, with support for loading DSO modules, and
         optionally with SSL support for HTTPS-secure user
@@ -277,13 +279,13 @@ Contents
 ----------------
 
       $ cd $HOME/src/
-      $ wget http://invenio-software.org/download/invenio-1.0.0-rc0.tar.gz
-      $ wget http://invenio-software.org/download/invenio-1.0.0-rc0.tar.gz.md5
-      $ wget http://invenio-software.org/download/invenio-1.0.0-rc0.tar.gz.sig
-      $ md5sum -v -c invenio-1.0.0-rc0.tar.gz.md5
-      $ gpg --verify invenio-1.0.0-rc0.tar.gz.sig invenio-1.0.0-rc0.tar.gz
-      $ tar xvfz invenio-1.0.0-rc0.tar.gz
-      $ cd invenio-1.0.0-rc0
+      $ wget http://invenio-software.org/download/invenio-1.0.0.tar.gz
+      $ wget http://invenio-software.org/download/invenio-1.0.0.tar.gz.md5
+      $ wget http://invenio-software.org/download/invenio-1.0.0.tar.gz.sig
+      $ md5sum -v -c invenio-1.0.0.tar.gz.md5
+      $ gpg --verify invenio-1.0.0.tar.gz.sig invenio-1.0.0.tar.gz
+      $ tar xvfz invenio-1.0.0.tar.gz
+      $ cd invenio-1.0.0
       $ ./configure
       $ make
       $ make install
@@ -328,19 +330,19 @@ Contents
           sources.  (The built files will be installed into different
           "target" directories later.)
 
-      $ wget http://invenio-software.org/download/invenio-1.0.0-rc0.tar.gz
-      $ wget http://invenio-software.org/download/invenio-1.0.0-rc0.tar.gz.md5
-      $ wget http://invenio-software.org/download/invenio-1.0.0-rc0.tar.gz.sig
+      $ wget http://invenio-software.org/download/invenio-1.0.0.tar.gz
+      $ wget http://invenio-software.org/download/invenio-1.0.0.tar.gz.md5
+      $ wget http://invenio-software.org/download/invenio-1.0.0.tar.gz.sig
 
           Fetch Invenio source tarball from the distribution server,
           together with MD5 checksum and GnuPG cryptographic signature
           files useful for verifying the integrity of the tarball.
 
-      $ md5sum -v -c invenio-1.0.0-rc0.tar.gz.md5
+      $ md5sum -v -c invenio-1.0.0.tar.gz.md5
 
           Verify MD5 checksum.
 
-      $ gpg --verify invenio-1.0.0-rc0.tar.gz.sig invenio-1.0.0-rc0.tar.gz
+      $ gpg --verify invenio-1.0.0.tar.gz.sig invenio-1.0.0.tar.gz
 
           Verify GnuPG cryptographic signature.  Note that you may
           first have to import my public key into your keyring, if you
@@ -352,11 +354,11 @@ Contents
           warning that may follow after the signature has been
           successfully verified.
 
-      $ tar xvfz invenio-1.0.0-rc0.tar.gz
+      $ tar xvfz invenio-1.0.0.tar.gz
 
           Untar the distribution tarball.
 
-      $ cd invenio-1.0.0-rc0
+      $ cd invenio-1.0.0
 
           Go to the source directory.
 
@@ -514,6 +516,14 @@ Contents
 
           This will automatically download and install the MediaElementJS
           HTML5 video player that is needed for videos on the DEMO site.
+
+      $ make install-solrutils  ## optional
+
+          This will automatically download and install a Solr instance
+          which can be used for full-text searching.  See CFG_SOLR_URL
+          variable in the invenio.conf.  Note that the admin later has
+          to take care of running init.d scripts which would start the
+          Solr instance automatically.
 
 2b. Configuration
 -----------------

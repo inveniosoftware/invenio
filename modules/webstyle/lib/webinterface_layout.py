@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -43,7 +43,7 @@ class WebInterfaceDumbPages(WebInterfaceDirectory):
         except ImportError:
             page = lambda *args: args[1]
         req.status = apache.HTTP_INTERNAL_SERVER_ERROR
-        msg = "<p>This functionality is facing a temporary failure.</p>"
+        msg = "<p>This functionality is experiencing a temporary failure.</p>"
         msg += "<p>The administrator has been informed about the problem.</p>"
         try:
             from invenio.config import CFG_SITE_ADMIN_EMAIL

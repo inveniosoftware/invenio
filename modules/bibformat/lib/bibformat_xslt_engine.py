@@ -280,7 +280,7 @@ def eval_bibformat_libxslt(ctx, recID, template_code):
         bfo = BibFormatObject(recID_int)
         return format_with_format_template(None, bfo,
                                            verbose=0,
-                                           format_template_code=template_code)[0]
+                                           format_template_code=template_code)
     except Exception, err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
@@ -324,7 +324,7 @@ def eval_bibformat_4suite(ctx, recID, template_code):
         bfo = BibFormatObject(recID_int)
         return format_with_format_template(None, bfo,
                                            verbose=0,
-                                           format_template_code=template_code)[0]
+                                           format_template_code=template_code)
     except Exception, err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \

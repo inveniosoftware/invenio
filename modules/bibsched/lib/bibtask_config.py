@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -30,13 +30,16 @@ CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
                            "oaiharvest", "oairepositoryupdater", "inveniogc",
                            "webstatadmin", "bibclassify", "bibexport",
                            "dbdump", "batchuploader", "bibauthorid", 'bibencode',
-                           "bibtasklet", "refextract", "bibcircd")
+                           "bibtasklet", "refextract", "bibcircd", "bibsort")
 
 # Tasks that should be run as standalone task
 CFG_BIBTASK_MONOTASKS = ("bibupload", "dbdump", "inveniogc")
 
+# Tasks that should be run during fixed times
+CFG_BIBTASK_FIXEDTIMETASKS = ("oaiharvest", )
+
 # Task that should not be reinstatiated
-CFG_BIBTASK_NON_REPETITIVE_TASK = ('bibupload')
+CFG_BIBTASK_NON_REPETITIVE_TASK = ('bibupload', )
 
 ## Default options for each bibtasks
 # for each bibtask name are specified those settings that the bibtask expects

@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -14,18 +14,5 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-testdir = $(libdir)/webtest/invenio
-
-test_DATA = test_bibedit_access_curator_coll.html \
-            test_bibedit_access_curator_all.html \
-            test_bibedit_access_curator_none.html \
-            test_bibedit_basic_record_locking.html
-
-
-stylesdir=$(localstatedir)/www/css
-styles_DATA = bibedit.css
-
-EXTRA_DIST = $(doc_DATA) $(test_DATA) $(styles_DATA)
 
 CLEANFILES = *~ *.tmp

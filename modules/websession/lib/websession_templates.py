@@ -1121,6 +1121,8 @@ class Template:
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/websubmitadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebSubmit"))
                 if action == "runbibdocfile":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/submit/managedocfiles?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run Document File Manager"))
+                if action == "cfgbibsort":
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibsort/bibsortadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibSort"))
             if tmp_out:
                 out += _("Here are some interesting web admin links for you:") + tmp_out
 
@@ -1236,7 +1238,7 @@ class Template:
 
         out = '''<div class="hassubmenu%(on)s">
         <a hreflang="en" class="header%(selected)s" href="%(CFG_SITE_SECURE_URL)s/youraccount/display?ln=%(ln)s">%(personalize)s</a>
-        <ul class="subsubmenu" style="width: 13em;">''' % {
+        <ul class="subsubmenu">''' % {
                 'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
                 'ln' : ln,
                 'personalize': _("Personalize"),
@@ -1345,7 +1347,7 @@ class Template:
         if activities:
             out += '''<div class="hassubmenu%(on)s">
             <a hreflang="en" class="header%(selected)s" href="%(CFG_SITE_SECURE_URL)s/youraccount/youradminactivities?ln=%(ln)s">%(admin)s</a>
-            <ul class="subsubmenu" style="width: 19em;">''' % {
+            <ul class="subsubmenu">''' % {
             'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
             'ln' : ln,
             'admin': _("Administration"),

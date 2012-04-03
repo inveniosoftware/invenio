@@ -250,6 +250,10 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
                             CFG_OAI_ID_FIELD[5:6],
                             oai_ids[0])
                 out += "<datafield tag=\"980\" ind1=\" \" ind2=\" \"><subfield code=\"c\">DELETED</subfield></datafield>\n"
+                from invenio.search_engine import get_merged_recid
+                # obtain the recid of the new record
+                merged_recid = str(get_merged_recid(recID))
+                out += "<datafield tag=\"970\" ind1=\" \" ind2=\" \"><subfield code=\"d\">%s</subfield></datafield>\n" % merged_recid
             else:
                 # controlfields
                 query = "SELECT b.tag,b.value,bb.field_number FROM bib00x AS b, bibrec_bib00x AS bb "\

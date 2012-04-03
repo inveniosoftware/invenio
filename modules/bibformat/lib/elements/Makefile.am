@@ -35,7 +35,7 @@ pylib_DATA = bfe_field.py bfe_title.py bfe_authors.py bfe_abstract.py bfe_affili
 	     bfe_duration.py bfe_record_url.py bfe_video_selector.py \
 	     bfe_video_platform_downloads.py bfe_video_platform_suggestions.py \
 	     bfe_video_platform_sources.py bfe_sciencewise.py bfe_bookmark.py \
-         bfe_oai_marcxml.py
+	     bfe_oai_marcxml.py bfe_copyright.py
 
 tmpdir = $(prefix)/var/tmp/tests_bibformat_elements
 

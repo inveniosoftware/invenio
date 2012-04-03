@@ -24,6 +24,7 @@ from invenio import webinterface_handler_config as apache
 
 import os
 import cgi
+import urllib
 from invenio.config import CFG_SITE_SECURE_URL, \
                            CFG_ACCESS_CONTROL_LEVEL_SITE, \
                            CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
@@ -65,7 +66,7 @@ from invenio.webbasket_config import CFG_WEBBASKET_CATEGORIES, \
                                      CFG_WEBBASKET_SHARE_LEVELS
 from invenio.webbasket_dblayer import get_basket_name, \
      get_max_user_rights_on_basket
-from invenio.urlutils import get_referer, redirect_to_url, make_canonical_urlargd, quote
+from invenio.urlutils import get_referer, redirect_to_url, make_canonical_urlargd
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webstat import register_customevent
 from invenio.errorlib import register_exception
@@ -351,10 +352,10 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                 return
 
         elif argd['bskid']:
-            rssurl = "%s/yourbaskets/display?category=%s&topic=%s&group=%i&bskid=%i&of=xr" % \
+            rssurl = "%s/yourbaskets/display?category=%s&amp;topic=%s&amp;group=%i&amp;bskid=%i&amp;of=xr" % \
                      (CFG_SITE_SECURE_URL,
-                      cgi.escape(argd['category']),
-                      cgi.escape(argd['topic']),
+                      argd['category'],
+                      urllib.quote(argd['topic']),
                       argd['group'],
                       argd['bskid'])
 
@@ -373,7 +374,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
     def search(self, req, form):
         """Search baskets interface."""
-
         argd = wash_urlargd(form, {'category': (str, ""),
                                    'topic': (str, ""),
                                    'group': (int, 0),
@@ -511,6 +511,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'recid': (int, 0),
                                    'note_title': (str, ""),
                                    'note_body': (str, ""),
+                                   'date_creation': (str, ""),
                                    'editor_type': (str, ""),
                                    'of': (str, ''),
                                    'ln': (str, CFG_SITE_LANG),
@@ -538,16 +539,17 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use baskets."))
 
         (body, navtrail) = perform_request_save_note(uid=uid,
-                                                    category=argd['category'],
-                                                    topic=argd['topic'],
-                                                    group_id=argd['group'],
-                                                    bskid=argd['bskid'],
-                                                    recid=argd['recid'],
-                                                    note_title=argd['note_title'],
-                                                    note_body=argd['note_body'],
-                                                    editor_type=argd['editor_type'],
-                                                    ln=argd['ln'],
-                                                    reply_to=argd['reply_to'])
+                                                     category=argd['category'],
+                                                     topic=argd['topic'],
+                                                     group_id=argd['group'],
+                                                     bskid=argd['bskid'],
+                                                     recid=argd['recid'],
+                                                     note_title=argd['note_title'],
+                                                     note_body=argd['note_body'],
+                                                     date_creation=argd['date_creation'],
+                                                     editor_type=argd['editor_type'],
+                                                     ln=argd['ln'],
+                                                     reply_to=argd['reply_to'])
 
         # TODO: do not stat event if save was not succussful
         # register event in webstat
@@ -671,6 +673,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'es_desc': (str, ""),
                                    'es_url': (str, ""),
                                    'note_body': (str, ""),
+                                   'date_creation': (str, ""),
                                    'editor_type': (str, ""),
                                    'b': (str, ""),
                                    'copy': (int, 0),
@@ -712,6 +715,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                es_desc=argd['es_desc'],
                                                es_url=argd['es_url'],
                                                note_body=argd['note_body'],
+                                               date_creation=argd['date_creation'],
                                                editor_type=argd['editor_type'],
                                                category=argd['category'],
                                                b=argd['b'],
@@ -749,14 +753,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
     def delete(self, req, form):
         """Delete basket interface"""
-        argd = wash_urlargd(form, {'bskid': (int, -1),
-                                   'confirmed': (int, 0),
-                                   'category':
-                                     (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
-                                   'topic': (str, ""),
-                                   'group': (int, 0),
-                                   'of'   : (str, ''),
-                                   'ln': (str, CFG_SITE_LANG)})
+        argd = wash_urlargd(form, {'bskid'      : (int, -1),
+                                   'confirmed'  : (int, 0),
+                                   'category'   : (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
+                                   'topic'      : (str, ""),
+                                   'group'      : (int, 0),
+                                   'of'         : (str, ''),
+                                   'ln'         : (str, CFG_SITE_LANG)})
 
         _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
@@ -792,7 +795,11 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             elif argd['category'] == CFG_WEBBASKET_CATEGORIES['GROUP']:
                 argd['group'] = wash_group(uid, argd['group'])[0]
             url = """%s/yourbaskets/display?category=%s&topic=%s&group=%i&ln=%s""" % \
-                  (CFG_SITE_SECURE_URL, argd['category'], argd['topic'], argd['group'], argd['ln'])
+                  (CFG_SITE_SECURE_URL,
+                   argd['category'],
+                   urllib.quote(argd['topic']),
+                   argd['group'],
+                   argd['ln'])
             redirect_to_url(req, url)
         else:
             navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
@@ -864,8 +871,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use baskets."))
 
         url = CFG_SITE_SECURE_URL
-        url += '/yourbaskets/display?category=%s&amp;topic=%s&amp;group=%i&amp;bskid=%i&amp;ln=%s' % \
-               (argd['category'], argd['topic'], argd['group'], argd['bskid'], argd['ln'])
+        url += '/yourbaskets/display?category=%s&topic=%s&group=%i&bskid=%i&ln=%s' % \
+               (argd['category'], urllib.quote(argd['topic']), argd['group'], argd['bskid'], argd['ln'])
         if argd['action'] == CFG_WEBBASKET_ACTIONS['DELETE']:
             delete_record(uid, argd['bskid'], argd['recid'])
             redirect_to_url(req, url)
@@ -962,14 +969,17 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         if argd['cancel']:
             url = CFG_SITE_SECURE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s'
-            url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'], argd['topic'],
+            url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                    urllib.quote(argd['topic']),
                     argd['ln'])
             redirect_to_url(req, url)
         elif argd['delete']:
             url = CFG_SITE_SECURE_URL
             url += '/yourbaskets/delete?bskid=%i&category=%s&topic=%s&ln=%s' % \
-                   (argd['bskid'], CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-                   argd['topic'], argd['ln'])
+                   (argd['bskid'],
+                    CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                    urllib.quote(argd['topic']),
+                    argd['ln'])
             redirect_to_url(req, url)
         elif argd['add_group'] and not(argd['new_group']):
             body = perform_request_add_group(uid=uid,
@@ -1002,13 +1012,14 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                 argd['topic'] = argd['new_topic']
             url = CFG_SITE_SECURE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s' % \
                   (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-                   argd['topic'], argd['ln'])
+                   urllib.quote(argd['topic']),
+                   argd['ln'])
             redirect_to_url(req, url)
         else:
             body = perform_request_edit(uid=uid,
-                                                    bskid=argd['bskid'],
-                                                    topic=argd['topic'],
-                                                    ln=argd['ln'])
+                                        bskid=argd['bskid'],
+                                        topic=argd['topic'],
+                                        ln=argd['ln'])
 
         navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
                    '%s</a>'
@@ -1079,24 +1090,20 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if argd['cancel']:
             url = CFG_SITE_SECURE_URL + '/yourbaskets/display?category=%s&ln=%s'
             url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'], argd['ln'])
-            #url = CFG_SITE_SECURE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s'
-            #url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'], argd['topic'],
-            #        argd['ln'])
             redirect_to_url(req, url)
         elif argd['delete']:
             url = CFG_SITE_SECURE_URL
             url += '/yourbaskets/delete?bskid=%i&category=%s&topic=%s&ln=%s' % \
-                   (argd['bskid'], CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-                   argd['topic'], argd['ln'])
+                   (argd['bskid'],
+                    CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                    urllib.quote(argd['topic']),
+                    argd['ln'])
             redirect_to_url(req, url)
         elif argd['submit']:
             body = perform_request_edit_topic(uid=uid,
                                               topic=argd['topic'],
                                               new_name=argd['new_name'],
                                               ln=argd['ln'])
-            #url = CFG_SITE_SECURE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s' % \
-            #      (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-            #       argd['topic'], argd['ln'])
             url = CFG_SITE_SECURE_URL + '/yourbaskets/display?category=%s&ln=%s' % \
                   (CFG_WEBBASKET_CATEGORIES['PRIVATE'], argd['ln'])
             redirect_to_url(req, url)
@@ -1129,7 +1136,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         #except:
         #    register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
-        return page(title = _("Edit topic"),
+        return page(title       = _("Edit topic"),
                     body        = body,
                     navtrail    = navtrail + navtrail_end,
                     uid         = uid,
@@ -1214,13 +1221,15 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                 url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                         bskid,
                         argd['colid'],
-                        quote(argd['es_title']),
-                        quote(argd['es_desc']),
-                        quote(argd['es_url']),
+                        urllib.quote(argd['es_title']),
+                        urllib.quote(argd['es_desc']),
+                        urllib.quote(argd['es_url']),
                         argd['ln'])
             else:
                 url = CFG_SITE_SECURE_URL + '/yourbaskets/display?category=%s&topic=%s&ln=%s'
-                url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'], topic, argd['ln'])
+                url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                        urllib.quote(topic),
+                        argd['ln'])
             redirect_to_url(req, url)
         else:
             body = perform_request_create_basket(req,
@@ -1311,7 +1320,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                 page_end(req, of=argd['of'])
                 return
         elif argd['bskid']:
-            rssurl = "%s/yourbaskets/display_public?&bskid=%i&of=xr" % \
+            rssurl = "%s/yourbaskets/display_public?&amp;bskid=%i&amp;of=xr" % \
                      (CFG_SITE_SECURE_URL,
                       argd['bskid'])
 

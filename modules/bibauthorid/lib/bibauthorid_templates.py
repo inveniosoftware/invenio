@@ -770,7 +770,7 @@ class Template:
         @type rest_of_papers: list
         @param review_needed: list of papers that need a review (choose name)
         @type review_needed:list
-        @param rt_tickets: list of tickes for this Person
+        @param rt_tickets: list of tickets for this Person
         @type rt_tickets: list
         @param open_rt_tickets: list of open request tickets
         @type open_rt_tickets: list
@@ -1123,7 +1123,7 @@ class Template:
             h('<img src="%s/img/aid_warning_granted.png" '
               'alt="%s" width="30" height="30" />'
               % (CFG_SITE_URL, self._("Confirmation needed to continue")))
-            h(self._('The result of this request will be visible immediately but we need your confirmation to do so for this paper have been manually claimed before'))
+            h(self._('The result of this request will be visible immediately but we need your confirmation to do so for this paper has been manually claimed before'))
             h('</span><br />')
             h('<span style="margin-left:25px; vertical-align:middle;">')
             h('<img src="%s/img/aid_denied.png" '
@@ -1494,6 +1494,8 @@ class Template:
                             + self._('Recent Papers') +
                             '</a></em>')
                             % (pid))
+            else:
+                h("</em>")
 
             if search_ticket:
                 link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, pid)
@@ -1647,7 +1649,7 @@ class Template:
         if paps:
             plist = plist + "We have got and automatically claimed for You the following papers from arXiv.org: <br>"
             for p in paps:
-                plist = plist + "  "+str(p)+"<br>"
+                plist = plist + "  " + str(p) + "<br>"
         else:
             plist = "We have got no papers from arXiv.org which we could claim automatically for You. <br>"
         return plist

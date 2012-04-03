@@ -32,8 +32,10 @@ from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      CFG_WEBBASKET_ACTIONS, \
                                      CFG_WEBBASKET_SHARE_LEVELS_ORDERED, \
                                      CFG_WEBBASKET_MAX_COMMENT_THREAD_DEPTH
+from invenio.config import CFG_SITE_URL
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
+from invenio.search_engine import get_fieldvalues
 
 ########################### Table of contents ################################
 #
@@ -63,6 +65,7 @@ from invenio.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
 #    - get_basket_record
 #    - get_basket_content
 #    - get_basket_item
+#    - get_basket_item_title_and_URL
 #    - share_basket_with_group
 #    - update_rights
 #    - move_item
@@ -227,37 +230,11 @@ def get_personal_baskets_info_for_topic(uid, topic):
 
     return res
 
-def get_all_personal_basket_ids_and_names_by_topic(uid):
-    """For a given user return all their personal baskets
-    (in tuples: (id, name)) grouped by topic. Note that the
-    basket tuples have to evaluated to be converted to actual
-    tuples."""
+def get_all_user_personal_basket_ids_by_topic(uid):
+    """For a given user return all their personal basket ids grouped by topic."""
 
     query = """ SELECT      ubsk.topic,
-                            count(bsk.id),
-                            GROUP_CONCAT('(', bsk.id, ', \"', bsk.name, '\")'
-                                        ORDER BY bsk.name)
-                FROM        user_bskBASKET AS ubsk
-                JOIN        bskBASKET AS bsk
-                ON          ubsk.id_bskBASKET=bsk.id
-                AND         ubsk.id_user=bsk.id_owner
-                WHERE       bsk.id_owner=%s
-                GROUP BY    ubsk.topic
-                ORDER BY    ubsk.topic"""
-    params = (uid,)
-    res = run_sql(query, params)
-
-    return res
-
-def get_all_personal_basket_ids_and_names_by_topic_for_add_to_list(uid):
-    """For a given user return all their personal baskets
-    (in tuples: (id, name)) grouped by topic. Note that the
-    basket tuples have to evaluated to be converted to actual
-    tuples."""
-
-    query = """ SELECT      ubsk.topic,
-                            GROUP_CONCAT('(', bsk.id, ', \"', bsk.name, '\")'
-                                        ORDER BY bsk.name)
+                            GROUP_CONCAT(bsk.id)
                 FROM        user_bskBASKET AS ubsk
                 JOIN        bskBASKET AS bsk
                 ON          ubsk.id_bskBASKET=bsk.id
@@ -348,6 +325,29 @@ def get_personal_topics_infos(uid):
                ORDER BY topic"""
     uid = int(uid)
     res = run_sql(query, (uid,))
+    return res
+
+def get_basket_ids_and_names(bskids, limit=0):
+    """For the given basket ids, return their ids and names,
+    ordered by basket name.
+    If 'limit' is greater than 0, limit the number of results returned."""
+
+    if not((type(bskids) is list) or (type(bskids) is tuple)):
+        bskids = [bskids]
+
+    query = """ SELECT      bsk.id,
+                            bsk.name
+                FROM        bskBASKET AS bsk
+                WHERE       %s
+                ORDER BY    bsk.name
+                %s"""
+    sep = ' OR '
+    query %= (sep.join(['id=%s'] * len(bskids)), limit and 'LIMIT %i' % limit or '')
+
+    params = tuple(bskids)
+
+    res = run_sql(query, params)
+
     return res
 
 def rename_basket(bskid, new_name):
@@ -679,6 +679,58 @@ def get_basket_item(bskid, recid, format='hb'):
     else:
         return ()
 
+def get_basket_item_title_and_URL(recid):
+    """
+    Retrieves the title and URL for the specified item in the specified basket.
+
+    @param bskid: The basked id
+    @type bskid: int
+
+    @param recid: The record (item) id
+    @type recid: int
+
+    @return: A tuple containing the title as a sting and the URL as a string.
+    """
+
+    if recid > 0:
+        # This is a local record, we can easily retrieve the title using the
+        # search engine's get_fieldvalues function and the MARC field and tag.
+        title_list = get_fieldvalues(recid, '245___')
+        # Check if the main title is always the first element in the list
+        if title_list:
+            title = title_list[0]
+        else:
+            title = ""
+        url = '%s/record/%i' % (CFG_SITE_URL, recid)
+    elif recid < 0:
+        # This is an external record or item, use 
+        title = "This is an external record or item."
+        url = '%s' % (CFG_SITE_URL,)
+
+        query = """ SELECT  rec.collection_id,
+                            rec.original_url,
+                            fmt.value
+                    FROM    bskEXTREC as rec,
+                            bskEXTFMT as fmt
+                    WHERE   rec.id=%s
+                        AND fmt.id_bskEXTREC=%s
+                        AND fmt.format='hb'"""
+        params = (-recid, -recid)
+        result = run_sql(query, params)
+        if result:
+            item = __decompress_last(result[0])
+            collection = item[0]
+            url = item[1]
+            hb = item[2]
+            if collection == 0:
+                # This is an external item
+                title = hb.split('\n',1)[0]
+            elif collection > 0:
+                # This is an external record from a hosted collection
+                title = hb.split('</strong>',1)[0].split('<strong>')[-1]
+
+    return (title, url)
+
 def share_basket_with_group(bskid, group_id,
                             share_level=CFG_WEBBASKET_SHARE_LEVELS['READITM']):
     """ Share basket bskid with group group_id with given share_level
@@ -781,7 +833,6 @@ def add_to_basket(uid,
                   es_desc="",
                   es_url=""):
     """Add items (recids) basket (bskid)."""
-
     if (recids or (colid == -1 and es_title and es_desc and es_url)) and bskid > 0:
         query_max_score = """   SELECT   MAX(score)
                                 FROM     bskREC
@@ -896,9 +947,6 @@ def add_to_many_baskets(uid, recids=[], colid=0, bskids=[], es_title="", es_desc
             # sets approach
             #existing_recids = [ids[1] for ids in res2A]
             #new_recids = list(set(recids)-set(existing_recids))
-            f = open("/tmp/bsk_db", "w")
-            f.write(str(recids) + "\n" + str(existing_recids) + "\n" + str(existing_ids) + "\n" + str(new_recids) + "\n")
-            f.close()
             if new_recids:
                 query2B = """INSERT
                              INTO   bskEXTREC
@@ -1109,17 +1157,12 @@ def get_group_name(gid):
 
     return res
 
-def get_all_group_basket_ids_and_names_by_group(uid):
-    """For a given user return all their group baskets
-    (in tuples: (id, name)) grouped by group. Note that the
-    basket tuples have to evaluated to be converted to actual
-    tuples."""
+def get_all_user_group_basket_ids_by_group(uid):
+    """For a given user return all their group basket ids grouped by group."""
 
     query = """ SELECT      ug.id,
                             ug.name,
-                            count(bsk.id),
-                            GROUP_CONCAT('(', ugbsk.id_bskBASKET, ', \"', bsk.name, '\")'
-                                        ORDER BY bsk.name)
+                            GROUP_CONCAT(ugbsk.id_bskBASKET)
                 FROM        usergroup AS ug
                 JOIN        usergroup_bskBASKET AS ugbsk
                     ON      ugbsk.id_usergroup=ug.id
@@ -1135,15 +1178,12 @@ def get_all_group_basket_ids_and_names_by_group(uid):
 
     return res
 
-def get_all_group_basket_ids_and_names_by_group_for_add_to_list(uid):
-    """For a given user return all their group baskets
-    (in tuples: (id, name)) grouped by group. Note that the
-    basket tuples have to evaluated to be converted to actual
-    tuples."""
+def get_all_user_group_basket_ids_by_group_with_add_rights(uid):
+    """For a given user return all their group basket ids grouped by group.
+    Return only the basket ids to which it is allowed to add records."""
 
     query = """ SELECT      ug.name,
-                            GROUP_CONCAT('(', ugbsk.id_bskBASKET, ', \"', bsk.name, '\")'
-                                        ORDER BY bsk.name)
+                            GROUP_CONCAT(ugbsk.id_bskBASKET)
                 FROM        usergroup AS ug
                 JOIN        usergroup_bskBASKET AS ugbsk
                     ON      ugbsk.id_usergroup=ug.id
@@ -1247,7 +1287,7 @@ def get_all_items_in_user_group_baskets(uid,
     If group is set, return only that group's items."""
 
     if group:
-        group_clause = """AND     ubsk.id_usergroup=%s"""
+        group_clause = """AND     ugbsk.id_usergroup=%s"""
         params_local = (group, uid)
         params_external = (group, uid, format)
     else:
@@ -1260,15 +1300,16 @@ def get_all_items_in_user_group_baskets(uid,
                             bsk.name,
                             uug.id_usergroup,
                             ug.name,
+                            ugbsk.share_level,
                             GROUP_CONCAT(rec.id_bibrec_or_bskEXTREC)
                 FROM        bskREC AS rec
                 JOIN        bskBASKET AS bsk
                     ON      bsk.id=rec.id_bskBASKET
-                JOIN        usergroup_bskBASKET AS ubsk
-                    ON      ubsk.id_bskBASKET=rec.id_bskBASKET
+                JOIN        usergroup_bskBASKET AS ugbsk
+                    ON      ugbsk.id_bskBASKET=rec.id_bskBASKET
                     %s
                 JOIN        user_usergroup AS uug
-                    ON      uug.id_usergroup=ubsk.id_usergroup
+                    ON      uug.id_usergroup=ugbsk.id_usergroup
                     AND     uug.id_user=%%s
                 JOIN        usergroup AS ug
                     ON      ug.id=uug.id_usergroup
@@ -1282,16 +1323,17 @@ def get_all_items_in_user_group_baskets(uid,
                             bsk.name,
                             uug.id_usergroup,
                             ug.name,
+                            ugbsk.share_level,
                             rec.id_bibrec_or_bskEXTREC,
                             ext.value
                 FROM        bskREC AS rec
                 JOIN        bskBASKET AS bsk
                     ON      bsk.id=rec.id_bskBASKET
-                JOIN        usergroup_bskBASKET AS ubsk
-                    ON      ubsk.id_bskBASKET=rec.id_bskBASKET
+                JOIN        usergroup_bskBASKET AS ugbsk
+                    ON      ugbsk.id_bskBASKET=rec.id_bskBASKET
                     %s
                 JOIN        user_usergroup AS uug
-                    ON      uug.id_usergroup=ubsk.id_usergroup
+                    ON      uug.id_usergroup=ugbsk.id_usergroup
                     AND     uug.id_user=%%s
                 JOIN        usergroup AS ug
                     ON      ug.id=uug.id_usergroup
@@ -1325,6 +1367,7 @@ def get_all_items_in_user_group_baskets_by_matching_notes(uid,
                             bsk.name,
                             uug.id_usergroup,
                             ug.name,
+                            ugbsk.share_level,
                             GROUP_CONCAT(DISTINCT(notes.id_bibrec_or_bskEXTREC))
                 FROM        bskRECORDCOMMENT AS notes
                 JOIN        bskBASKET AS bsk
@@ -1525,6 +1568,7 @@ def get_all_items_in_user_public_baskets(uid,
     query_local = """
                 SELECT      rec.id_bskBASKET,
                             bsk.name,
+                            ugbsk.share_level,
                             GROUP_CONCAT(rec.id_bibrec_or_bskEXTREC)
                 FROM        bskREC AS rec
                 JOIN        bskBASKET AS bsk
@@ -1546,6 +1590,7 @@ def get_all_items_in_user_public_baskets(uid,
     query_external = """
                 SELECT      rec.id_bskBASKET,
                             bsk.name,
+                            ugbsk.share_level,
                             rec.id_bibrec_or_bskEXTREC,
                             ext.value
                 FROM        bskREC AS rec
@@ -1580,6 +1625,7 @@ def get_all_items_in_user_public_baskets_by_matching_notes(uid,
 
     query = """ SELECT      notes.id_bskBASKET,
                             bsk.name,
+                            ugbsk.share_level,
                             GROUP_CONCAT(DISTINCT(notes.id_bibrec_or_bskEXTREC))
                 FROM        bskRECORDCOMMENT AS notes
                 JOIN        bskBASKET AS bsk
@@ -1611,6 +1657,7 @@ def get_all_items_in_all_public_baskets(format='hb'):
     query_local = """
                 SELECT      rec.id_bskBASKET,
                             bsk.name,
+                            ugbsk.share_level,
                             GROUP_CONCAT(rec.id_bibrec_or_bskEXTREC)
                 FROM        bskREC AS rec
                 JOIN        bskBASKET AS bsk
@@ -1626,6 +1673,7 @@ def get_all_items_in_all_public_baskets(format='hb'):
     query_external = """
                 SELECT      rec.id_bskBASKET,
                             bsk.name,
+                            ugbsk.share_level,
                             rec.id_bibrec_or_bskEXTREC,
                             ext.value
                 FROM        bskREC AS rec
@@ -1654,6 +1702,7 @@ def get_all_items_in_all_public_baskets_by_matching_notes(p=""):
 
     query = """ SELECT      notes.id_bskBASKET,
                             bsk.name,
+                            ugbsk.share_level,
                             GROUP_CONCAT(DISTINCT(notes.id_bibrec_or_bskEXTREC))
                 FROM        bskRECORDCOMMENT AS notes
                 JOIN        bskBASKET AS bsk
@@ -2099,8 +2148,13 @@ def get_note(cmtid):
         return res[0]
     return out
 
-def save_note(uid, bskid, recid, title, body, reply_to=None):
-    """Save then given note (title, body) on the given item in the given basket."""
+def save_note(uid, bskid, recid, title, body, date_creation=None, reply_to=None):
+    """Save then given note (title, body) on the given item in the given basket.
+    @param date_creation: date in which the note was created
+    @type date_creation: None or String, e.g: '2011-07-04 14:20:57'
+
+    Note: convert_datestruct_to_datetext((2005, 11, 16, 15, 11, 44, 2, 320, 0)) -> '2005-11-16 15:11:44'
+    """
     if reply_to and CFG_WEBBASKET_MAX_COMMENT_THREAD_DEPTH >= 0:
         # Check that we have not reached max depth
         note_ancestors = get_note_ancestors(reply_to)
@@ -2110,7 +2164,11 @@ def save_note(uid, bskid, recid, title, body, reply_to=None):
             else:
                 reply_to = note_ancestors[CFG_WEBBASKET_MAX_COMMENT_THREAD_DEPTH - 1]
 
-    date = convert_datestruct_to_datetext(localtime())
+    if not date_creation:
+        date = convert_datestruct_to_datetext(localtime())
+    else: #the date comes with the proper format
+        date = date_creation
+
     res = run_sql("""INSERT INTO bskRECORDCOMMENT (id_user, id_bskBASKET,
                        id_bibrec_or_bskEXTREC, title, body, date_creation, in_reply_to_id_bskRECORDCOMMENT)
                      VALUES (%s, %s, %s, %s, %s, %s, %s)""",
@@ -2187,6 +2245,31 @@ def note_belongs_to_item_in_basket_p(cmtid, recid, bskid):
     res = run_sql(query, params)
 
     return __wash_sql_count(res)
+
+def get_number_of_notes_per_record_in_basket(bskid, recids):
+    """Returns the number of comments per record
+    for all the given records in the given basket"""
+
+    # We need to convert the list of recids into a string of commma separated
+    # numbers (recids), instead of a tuple, to cover the case where we have
+    # single element lists of recids. Example:
+    # [1] --> '1' instaed of [1] --> (1,)
+    # Single element tuples would cause the query to fail due to the syntax.
+    query = """ SELECT      rec.id_bibrec_or_bskEXTREC,
+                            COUNT(cmt.id_bibrec_or_bskEXTREC)
+                FROM        bskREC as rec
+                LEFT JOIN   bskRECORDCOMMENT as cmt
+                    ON      cmt.id_bibrec_or_bskEXTREC = rec.id_bibrec_or_bskEXTREC
+                WHERE       rec.id_bskBASKET=%%s
+                    AND     rec.id_bibrec_or_bskEXTREC IN (%s)
+                GROUP BY    id_bibrec_or_bskEXTREC
+                ORDER BY    rec.score""" % (str(map(int, recids))[1:-1],)
+
+    params = (bskid,)
+
+    result = run_sql(query, params)
+
+    return result
 
 ########################## Usergroup functions ################################
 

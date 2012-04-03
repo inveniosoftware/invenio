@@ -53,7 +53,7 @@ from invenio.bibdocfile import bibdocfile_url_p, \
      bibdocfile_url_to_bibdoc, normalize_format, \
      download_url, guess_format_from_url, BibRecDocs
 from invenio.websubmit_file_converter import convert_file, get_file_converter_logger
-from invenio.search_engine import perform_request_search, strip_accents, \
+from invenio.search_engine import perform_request_search, \
      wash_index_term, lower_index_term, get_index_stemming_language, \
      get_synonym_terms
 from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, \
@@ -66,8 +66,12 @@ from invenio.bibtask import task_init, write_message, get_datetime, \
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
 from invenio.htmlutils import remove_html_markup, get_links_in_html_page
-from invenio.textutils import wash_for_utf8
+from invenio.textutils import wash_for_utf8, strip_accents
 from invenio.search_engine_utils import get_fieldvalues
+
+if CFG_SOLR_URL:
+    import solr
+    SOLR_CONNECTION = solr.SolrConnection(CFG_SOLR_URL)
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -263,6 +267,22 @@ def get_words_from_date_tag(datestring, stemming_language=None):
             out.append("-".join(parts[:nb]))
     return out
 
+def solr_add_fulltext(recid, text):
+    """
+    Helper function that dispatches TEXT to Solr for given record ID.
+    Returns True/False upon success/failure.
+    """
+    if recid:
+        try:
+            utext = unicode(text, 'utf-8')
+            SOLR_CONNECTION.add(id=recid, fulltext=utext)
+            SOLR_CONNECTION.commit()
+            return True
+        except (UnicodeDecodeError, UnicodeEncodeError):
+            # forget about bad UTF-8 files
+            pass
+    return False
+
 def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
     """Returns all the words contained in the document specified by
        URL_DIRECT_OR_INDIRECT with the words being split by various
@@ -287,8 +307,10 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
             if not bibdoc.has_text(require_up_to_date=True):
                 bibdoc.extract_text(perform_ocr=perform_ocr)
             if CFG_SOLR_URL:
-                # we are relying on Solr to provide full-text indexing, so do
-                # nothing here (FIXME: dispatch indexing to Solr)
+                # we are relying on Solr to provide full-text
+                # indexing, so dispatch text Solr and return nothing
+                # here:
+                solr_add_fulltext(bibdoc.recid, bibdoc.get_text())
                 return []
             else:
                 return get_words_from_phrase(bibdoc.get_text(), stemming_language)
@@ -324,8 +346,10 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
                         text = open(tmptext).read()
                         os.remove(tmptext)
                         if CFG_SOLR_URL:
-                            # we are relying on Solr to provide full-text indexing, so do
-                            # nothing here (FIXME: dispatch indexing to Solr)
+                            # we are relying on Solr to provide full-text
+                            # indexing, so dispatch text Solr and return nothing
+                            # here:
+                            solr_add_fulltext(None, text) # FIXME: use real record ID
                             tmpwords = []
                         else:
                             tmpwords = get_words_from_phrase(text, stemming_language)

@@ -33,7 +33,7 @@ class RunSqlReturnListOfDictionaries(unittest.TestCase):
         """dbquery - select simple columns query"""
         res = dbquery.run_sql("SELECT id,name,dbquery FROM collection WHERE id<3", with_dict=True)
         self.assertEqual(res, ([{'dbquery': None, 'id': 1, 'name': 'Atlantis Institute of Fictive Science'},
-                                {'dbquery': 'collection:PREPRINT', 'id': 2, 'name': 'Preprints'}]))
+                                {'dbquery': '980:"PREPRINT"', 'id': 2, 'name': 'Preprints'}]))
 
     def test_select_date_format_column_query(self):
         """dbquery - select date format column query"""
@@ -53,7 +53,7 @@ class RunSqlReturnListOfDictionaries(unittest.TestCase):
     def test_select_all_columns_query(self):
         """dbquery - select all columns query"""
         res = dbquery.run_sql("SELECT * FROM collection WHERE id=2", with_dict=True) # kwalitee: disable=sql
-        self.assertEqual(res, ([{'dbquery': 'collection:PREPRINT',
+        self.assertEqual(res, ([{'dbquery': '980:"PREPRINT"',
                                   'id': 2,
                                   'name': 'Preprints',
                                   'nbrecs': 37L,

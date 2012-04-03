@@ -87,29 +87,22 @@ CFG_BIBFORMAT_BFX_LABEL_DEFINITIONS = {
 'reference':                 []
 }
 
-CFG_BIBFORMAT_BFX_ERROR_MESSAGES = \
-{
-    'ERR_BFX_TEMPLATE_REF_NO_NAME'                   :  'Error: Missing attribute "name" in TEMPLATE_REF.',
-    'ERR_BFX_TEMPLATE_NOT_FOUND'                     :  'Error: Template %s not found.',
-    'ERR_BFX_ELEMENT_NO_NAME'                        :  'Error: Missing attribute "name" in ELEMENT.',
-    'ERR_BFX_FIELD_NO_NAME'                          :  'Error: Missing attribute "name" in FIELD.',
-    'ERR_BFX_LOOP_NO_OBJECT'                         :  'Error: Missing attribute "object" in LOOP.',
-    'ERR_BFX_NO_SUCH_FIELD'                          :  'Error: Field %s is not defined',
-    'ERR_BFX_IF_NO_NAME'                             :  'Error: Missing attrbute "name" in IF.',
-    'ERR_BFX_TEXT_NO_VALUE'                          :  'Error: Missing attribute "value" in TEXT.',
-    'ERR_BFX_INVALID_RE'                             :  'Error: Invalid regular expression: %s',
-    'ERR_BFX_INVALID_OPERATOR_NAME'                  :  'Error: Name %s is not recognised as a valid operator name.',
-    'ERR_BFX_INVALID_DISPLAY_TYPE'                   :  'Error: Invalid display type. Must be one of: value, tag, ind1, ind2, code; received: %s',
-    'ERR_BFX_IF_WRONG_SYNTAX'                        :  'Error: Invalid syntax of IF statement.',
-    'ERR_BFX_DUPLICATE_NAME'                         :  'Error: Duplicate name: %s.',
-    'ERR_BFX_TEMPLATE_NO_NAME'                       :  'Error: No name defined for the template.',
-    'ERR_BFX_NO_TEMPLATES_FOUND'                     :  'Error: No templates found in the document.',
-    'ERR_BFX_TOO_MANY_TEMPLATES'                     :  'Error: More than one templates found in the document. No format found.'
-}
+# Exceptions: errors
+class InvenioBibFormatBfxError(Exception):
+    """A generic error for BibFormat_Bfx."""
+    def __init__(self, message):
+        """Initialisation."""
+        self.message = message
+    def __str__(self):
+        """String representation."""
+        return repr(self.message)
 
-CFG_BIBFORMAT_BFX_WARNING_MESSAGES = \
-{
-    'WRN_BFX_TEMPLATE_NO_DESCRIPTION'   : 'Warning: No description entered for the template.',
-    'WRN_BFX_TEMPLATE_NO_CONTENT'       : 'Warning: No content type specified for the template. Using default: text/xml.',
-    'WRN_BFX_NO_FORMAT_FOUND'           : 'Warning: No format found. Will look for a default template.'
-}
+# Exceptions: warnings
+class InvenioBibFormatBfxWarning(Exception):
+    """A generic warning for BibFormat_Bfx."""
+    def __init__(self, message):
+        """Initialisation."""
+        self.message = message
+    def __str__(self):
+        """String representation."""
+        return repr(self.message)

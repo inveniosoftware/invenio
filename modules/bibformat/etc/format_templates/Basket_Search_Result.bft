@@ -1,0 +1,6 @@
+<name>Basket Search Result</name>
+<description>Tiny HTML record used to display search results within WebBasket</description>
+<BFE_TITLE_BRIEF />
+<BFE_AUTHORS limit="1" prefix=" - " extension=" <em>et al</em>"/>
+<BFE_PUBLI_INFO prefix=" - "/>
+<BFE_PRIMARY_REPORT_NUMBER prefix=" - "/>

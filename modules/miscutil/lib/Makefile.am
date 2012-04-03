@@ -47,6 +47,7 @@ pylib_DATA = __init__.py \
              urlutils_tests.py \
              w3c_validator.py \
              intbitset_tests.py \
+             intbitset_helper.py \
              inveniocfg.py \
              shellutils.py \
              shellutils_tests.py \

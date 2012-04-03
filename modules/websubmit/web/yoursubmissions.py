@@ -29,6 +29,7 @@ from invenio.config import \
      CFG_SITE_SECURE_URL
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_admin import *
+from invenio.access_control_engine import acc_authorize_action
 from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, get_email, page_not_authorized
 from invenio.messages import gettext_set_language, wash_language
@@ -48,19 +49,14 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",
     # get user ID:
     try:
         uid = getUid(req)
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+        (auth_code, auth_message) = acc_authorize_action(uid, 'submit')
+        if auth_code > 0 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yoursubmissions.py/index",
-                                       navmenuid='yoursubmissions')
+                                       navmenuid='yoursubmissions',
+                                       text=auth_message)
         u_email = get_email(uid)
     except Error, e:
         return errorMsg(str(e), req, ln=ln)
-
-    if u_email == "guest" or u_email == "":
-        return warningMsg(websubmit_templates.tmpl_warning_message(
-                 ln = ln,
-                 msg = _("Sorry, you must log in to perform this action."),
-               ),req, ln = ln)
-
 
     if deletedId != "":
         t += deleteSubmission(deletedId,deletedAction,deletedDoctype,u_email)

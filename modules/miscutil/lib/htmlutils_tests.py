@@ -164,39 +164,31 @@ class HTMLTidyingTest(unittest.TestCase):
 <LI><A HREF="three.html">Three</A>
 </UL>''' # Input test 427841 from Tidy
 
-    def test_tidy_html_with_utidylib(self):
-        """htmlutils - Tidying up HTML with µTidylib """
-        res1 = tidy_html(self.html_buffer_1, 'utidylib')
-        res2 = tidy_html(self.html_buffer_2, 'utidylib')
-        res3 = tidy_html(self.html_buffer_3, 'utidylib')
-        if CFG_TIDY_INSTALLED:
+    if CFG_TIDY_INSTALLED:
+        def test_tidy_html_with_utidylib(self):
+            """htmlutils - Tidying up HTML with µTidylib """
+            res1 = tidy_html(self.html_buffer_1, 'utidylib')
+            res2 = tidy_html(self.html_buffer_2, 'utidylib')
+            res3 = tidy_html(self.html_buffer_3, 'utidylib')
             self.assertEqual(res1.replace('\n', '').replace(' ', ''),
-                             'test')
+                            'test')
             self.assertEqual(res2.replace('\n', '').replace(' ', ''),
-                             '<blockquote>test<div>test2</div></blockquote>')
+                            '<blockquote>test<div>test2</div></blockquote>')
             self.assertEqual(res3.replace('\n', '').replace(' ', ''),
-                             '<ul><li><ul><li><ahref="rememberwhenb.html">Next</a></li><li><ahref="daysofourlives.html">Back</a></li><li><ahref="newstuff.html">NewStuff</a></li></ul></li></ul><ul><li>Mergeadjacentlists</li></ul><divstyle="margin-left:2em"><ul><li><ahref="one.html">One</a></li><li><ahref="two.html">Two</a></li><li><ahref="three.html">Three</a></li></ul></div>')
-        else:
-            self.assertEqual(res1, res1)
-            self.assertEqual(res2, res2)
-            self.assertEqual(res3, res3)
+                            '<ul><li><ul><li><ahref="rememberwhenb.html">Next</a></li><li><ahref="daysofourlives.html">Back</a></li><li><ahref="newstuff.html">NewStuff</a></li></ul></li></ul><ul><li>Mergeadjacentlists</li></ul><divstyle="margin-left:2em"><ul><li><ahref="one.html">One</a></li><li><ahref="two.html">Two</a></li><li><ahref="three.html">Three</a></li></ul></div>')
 
-    def test_tidy_html_with_beautifulsoup(self):
-        """htmlutils - Tidying up HTML with BeautifulSoup"""
-        res1 = tidy_html(self.html_buffer_1, 'beautifulsoup')
-        res2 = tidy_html(self.html_buffer_2, 'beautifulsoup')
-        res3 = tidy_html(self.html_buffer_3, 'beautifulsoup')
-        if CFG_TIDY_INSTALLED:
+    if CFG_BEAUTIFULSOUP_INSTALLED:
+        def test_tidy_html_with_beautifulsoup(self):
+            """htmlutils - Tidying up HTML with BeautifulSoup"""
+            res1 = tidy_html(self.html_buffer_1, 'beautifulsoup')
+            res2 = tidy_html(self.html_buffer_2, 'beautifulsoup')
+            res3 = tidy_html(self.html_buffer_3, 'beautifulsoup')
             self.assertEqual(res1.replace('\n', '').replace(' ', ''),
-                             'test')
+                            'test')
             self.assertEqual(res2.replace('\n', '').replace(' ', ''),
-                             '<blockquote>test<div>test2</div></blockquote>')
+                            '<blockquote>test<div>test2</div></blockquote>')
             self.assertEqual(res3.replace('\n', '').replace(' ', ''),
-                             '<ul><li><ul><li><ahref="rememberwhenb.html">Next</a></li><li><ahref="daysofourlives.html">Back</a></li><li><ahref="newstuff.html">NewStuff</a></li></ul></li></ul><ul><li>Mergeadjacentlists</li></ul><ul><ul><li><ahref="one.html">One</a></li><li><ahref="two.html">Two</a></li><li><ahref="three.html">Three</a></li></ul></ul>')
-        else:
-            self.assertEqual(res1, res1)
-            self.assertEqual(res2, res2)
-            self.assertEqual(res3, res3)
+                            '<ul><li><ul><li><ahref="rememberwhenb.html">Next</a></li><li><ahref="daysofourlives.html">Back</a></li><li><ahref="newstuff.html">NewStuff</a></li></ul></li></ul><ul><li>Mergeadjacentlists</li></ul><ul><ul><li><ahref="one.html">One</a></li><li><ahref="two.html">Two</a></li><li><ahref="three.html">Three</a></li></ul></ul>')
 
     def test_tidy_html_with_unknown_lib(self):
         """htmlutils - Tidying up HTML with non existing library"""
@@ -221,6 +213,45 @@ class HTMLMarkupRemovalTest(unittest.TestCase):
         self.assertEqual(remove_html_markup(test_input, 'X'),
                          test_expected)
 
+class HTMLAutomaticLinksTransformation(unittest.TestCase):
+    """Test functions related to transforming links into HTML context"""
+
+    def __init__(self, methodName='test'):
+        self.washer = HTMLWasher()
+        unittest.TestCase.__init__(self, methodName)
+
+    def test_transform_link(self):
+        """htmlutils - transforming a link"""
+        body_input = 'https://cdsweb.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es'
+        body_expected = '<a href="https://cdsweb.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es">https://cdsweb.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es</a>'
+        self.assertEqual(self.washer.wash(html_buffer=body_input,
+                                          automatic_link_transformation=True),
+                         body_expected)
+
+    def test_transform_several_links(self):
+        """htmlutils - transforming several links"""
+        body_input = 'some text https://cdsweb.cern.ch/collection/Videos?ln=es more text https://cdsweb.cern.ch/search?p=%27CERN+News'
+        body_expected = 'some text <a href="https://cdsweb.cern.ch/collection/Videos?ln=es">https://cdsweb.cern.ch/collection/Videos?ln=es</a> more text <a href="https://cdsweb.cern.ch/search?p=%27CERN">https://cdsweb.cern.ch/search?p=%27CERN</a>+News'
+        self.assertEqual(self.washer.wash(html_buffer=body_input,
+                                          automatic_link_transformation=True),
+                         body_expected)
+
+    def test_transform_just_valid_links(self):
+        """htmlutils - transforming just valid links"""
+        body_input = body_input = 'some text https://cdsweb.cern.ch/collection/Videos?ln=es more text https://cdsweb..cern/search?p=%27CERN+News'
+        body_expected = 'some text <a href="https://cdsweb.cern.ch/collection/Videos?ln=es">https://cdsweb.cern.ch/collection/Videos?ln=es</a> more text https://cdsweb..cern/search?p=%27CERN+News'
+        self.assertEqual(self.washer.wash(html_buffer=body_input,
+                                          automatic_link_transformation=True),
+                         body_expected)
+
+    def test_not_transform_link(self):
+        """htmlutils - not transforming a link"""
+        body_input = '<a href="https://cdsweb.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es">Multimedia</a>'
+        body_expected = '<a href="https://cdsweb.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es">Multimedia</a>'
+        self.assertEqual(self.washer.wash(html_buffer=body_input,
+                                          automatic_link_transformation=True),
+                         body_expected)
+
 class HTMLCreation(unittest.TestCase):
     """Test functions related to creation of HTML markup."""
 
@@ -235,6 +266,7 @@ TEST_SUITE = make_test_suite(XSSEscapingTest,
                              HTMLWashingTest,
                              HTMLMarkupRemovalTest,
                              HTMLTidyingTest,
+                             HTMLAutomaticLinksTransformation,
                              HTMLCreation)
 
 if __name__ == "__main__":

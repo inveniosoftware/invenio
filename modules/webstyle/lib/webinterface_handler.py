@@ -42,7 +42,7 @@ import gc
 
 from invenio import webinterface_handler_config as apache
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_TMPDIR, \
-    CFG_SITE_RECORD
+    CFG_SITE_RECORD, CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.messages import wash_language
 from invenio.urlutils import redirect_to_url
 from invenio.errorlib import register_exception
@@ -384,6 +384,12 @@ def create_handler(root):
                 ## Let's collapse multiple slashes into a single /
                 uri = RE_SLASHES.sub('/', uri)
                 path = uri[1:].split('/')
+
+            if CFG_ACCESS_CONTROL_LEVEL_SITE > 1:
+                ## If the site is under maintainance mode let's return
+                ## 503 to casual crawler to avoid having the site being
+                ## indexed
+                req.status = 503
 
             if uri.startswith('/yours') or not guest_p:
                 ## Private/personalized request should not be cached

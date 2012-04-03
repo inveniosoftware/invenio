@@ -41,9 +41,9 @@ from invenio.config import \
      CFG_DEVEL_SITE
 from invenio.dbquery import Error
 from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import acc_is_role
 from invenio.webpage import page, create_error_box
-from invenio.webuser import getUid, get_email, collect_user_info
+from invenio.webuser import getUid, get_email, collect_user_info, isGuestUser, \
+                            page_not_authorized
 from invenio.websubmit_config import *
 from invenio.messages import gettext_set_language, wash_language
 from invenio.webstat import register_customevent
@@ -172,13 +172,14 @@ def interface(req,
     txt = []
     noPage = []
     # Preliminary tasks
-    # check that the user is logged in
-    if not uid_email or uid_email == "guest":
-        return warningMsg(websubmit_templates.tmpl_warning_message(
-                           ln = ln,
-                           msg = _("Sorry, you must log in to perform this action.")
-                         ), req, ln)
-        # warningMsg("""<center><font color="red"></font></center>""",req, ln)
+    if not access:
+        # In some cases we want to take the users directly to the submit-form.
+        # This fix makes this possible - as it generates the required access
+        # parameter if it is not present.
+        pid = os.getpid()
+        now = time.time()
+        access = "%i_%s" % (now, pid)
+
     # check we have minimum fields
     if not doctype or not act or not access:
         ## We don't have all the necessary information to go ahead
@@ -319,8 +320,13 @@ def interface(req,
         categ = req.form.get('combo%s' % doctype, '*')
 
     # is user authorized to perform this action?
-    (auth_code, auth_message) = acc_authorize_action(req, "submit", verbose=0, doctype=doctype, act=act, categ=categ)
-    if acc_is_role("submit", doctype=doctype, act=act) and auth_code != 0:
+    (auth_code, auth_message) = acc_authorize_action(req, 'submit', \
+                                                     authorized_if_no_roles=not isGuestUser(uid), \
+                                                     verbose=0, \
+                                                     doctype=doctype, \
+                                                     act=act, \
+                                                     categ=categ)
+    if not auth_code == 0:
         return warningMsg("""<center><font color="red">%s</font></center>""" % auth_message, req)
 
     ## update the "journal of submission":
@@ -790,13 +796,6 @@ def endaction(req,
     uid = getUid(req)
     uid_email = get_email(uid)
     # Preliminary tasks
-    # check that the user is logged in
-    if uid_email == "" or uid_email == "guest":
-        return warningMsg(websubmit_templates.tmpl_warning_message(
-                           ln = ln,
-                           msg = _("Sorry, you must log in to perform this action.")
-                         ), req, ln)
-
     ## check we have minimum fields
     if not doctype or not act or not access:
         ## We don't have all the necessary information to go ahead
@@ -1155,7 +1154,7 @@ def endaction(req,
                 req = req,
                 navmenuid='submit')
 
-def home(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
+def home(req, catalogues_text, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
     """This function generates the WebSubmit "home page".
        Basically, this page contains a list of submission-collections
        in WebSubmit, and gives links to the various document-type
@@ -1163,6 +1162,7 @@ def home(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
        Document-types only appear on this page when they have been
        connected to a submission-collection in WebSubmit.
        @param req: (apache request object)
+       @param catalogues_text (string): the computed catalogues tree
        @param c: (string) - defaults to CFG_SITE_NAME
        @param ln: (string) - The Invenio interface language of choice.
         Defaults to CFG_SITE_LANG (the default language of the installation).
@@ -1178,11 +1178,9 @@ def home(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
     # load the right message language
     _ = gettext_set_language(ln)
 
-    user_info = collect_user_info(req)
-
     finaltext = websubmit_templates.tmpl_submit_home_page(
                     ln = ln,
-                    catalogues = makeCataloguesTable(user_info, ln)
+                    catalogues = catalogues_text
                 )
 
     return page(title=_("Submit"),
@@ -1196,19 +1194,28 @@ def home(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
                navmenuid='submit'
                )
 
-def makeCataloguesTable(user_info, ln=CFG_SITE_LANG):
+def makeCataloguesTable(req, ln=CFG_SITE_LANG):
     """Build the 'catalogues' (submission-collections) tree for
        the WebSubmit home-page. This tree contains the links to
        the various document types in WebSubmit.
-       @param user_info: (dict) - the user information in order to decide
-        whether to display a submission.
+       @param req: (dict) - the user request object
+        in order to decide whether to display a submission.
        @param ln: (string) - the language of the interface.
         (defaults to 'CFG_SITE_LANG').
-       @return: (string) - the submission-collections tree.
+       @return: (string, bool, bool) - the submission-collections tree.
+            True if there is at least one submission authorized for the user
+            True if there is at least one submission
     """
+    def is_at_least_one_submission_authorized(cats):
+        for cat in cats:
+            if cat['docs']:
+                return True
+            for son in cat['sons']:
+                if is_at_least_one_submission_authorized(son):
+                    return True
+        return False
     text = ""
     catalogues = []
-
     ## Get the submission-collections attached at the top level
     ## of the submission-collection tree:
     top_level_collctns = get_collection_children_of_submission_collection(0)
@@ -1216,17 +1223,19 @@ def makeCataloguesTable(user_info, ln=CFG_SITE_LANG):
         ## There are submission-collections attatched to the top level.
         ## retrieve their details for displaying:
         for child_collctn in top_level_collctns:
-            catalogues.append(getCatalogueBranch(child_collctn[0], 1, user_info))
-
+            catalogues.append(getCatalogueBranch(child_collctn[0], 1, req))
         text = websubmit_templates.tmpl_submit_home_catalogs(
                  ln=ln,
-                 catalogs=catalogues
-               )
+                 catalogs=catalogues)
+        submissions_exist = True
+        at_least_one_submission_authorized = is_at_least_one_submission_authorized(catalogues)
     else:
         text = websubmit_templates.tmpl_submit_home_catalog_no_content(ln=ln)
-    return text
+        submissions_exist = False
+        at_least_one_submission_authorized = False
+    return text, at_least_one_submission_authorized, submissions_exist
 
-def getCatalogueBranch(id_father, level, user_info):
+def getCatalogueBranch(id_father, level, req):
     """Build up a given branch of the submission-collection
        tree. I.e. given a parent submission-collection ID,
        build up the tree below it. This tree will include
@@ -1237,7 +1246,7 @@ def getCatalogueBranch(id_father, level, user_info):
         from which to begin building the branch.
        @param level: (integer) - the level of the current submission-
         collection branch.
-       @param user_info: (dict) - the user information in order to decide
+       @param req: (dict) - the user request object in order to decide
         whether to display a submission.
        @return: (dictionary) - the branch and its sub-branches.
     """
@@ -1260,8 +1269,16 @@ def getCatalogueBranch(id_father, level, user_info):
                        ## of the submission-collection
     doctype_children = \
        get_doctype_children_of_submission_collection(id_father)
+    user_info = collect_user_info(req)
+
     for child_doctype in doctype_children:
-        if acc_authorize_action(user_info, 'submit', authorized_if_no_roles=True, doctype=child_doctype[0])[0] == 0:
+        ## To get access to a submission pipeline for a logged in user,
+        ## it is decided by any authorization. If none are defined for the action
+        ## then a logged in user will get access.
+        ## If user is not logged in, a specific rule to allow the action is needed
+        if acc_authorize_action(req, 'submit', \
+                                authorized_if_no_roles=not isGuestUser(user_info['uid']), \
+                                doctype=child_doctype[0])[0] == 0:
             elem['docs'].append(getDoctypeBranch(child_doctype[0]))
 
     ## Now, get the collection-children of this submission-collection:
@@ -1269,7 +1286,7 @@ def getCatalogueBranch(id_father, level, user_info):
     collctn_children = \
          get_collection_children_of_submission_collection(id_father)
     for child_collctn in collctn_children:
-        elem['sons'].append(getCatalogueBranch(child_collctn[0], level + 1, user_info))
+        elem['sons'].append(getCatalogueBranch(child_collctn[0], level + 1, req))
 
     ## Now return this branch of the built-up 'collection-tree':
     return elem
@@ -1366,17 +1383,22 @@ def action(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, doctype=""):
     # get user ID:
     try:
         uid = getUid(req)
-        uid_email = get_email(uid)
     except Error, e:
         return errorMsg(e, req, c, ln)
     #parses database to get all data
     ## first, get the list of categories
     doctype_categs = get_categories_of_doctype(doctype)
     for doctype_categ in doctype_categs:
+        if not acc_authorize_action(req, 'submit', \
+                                    authorized_if_no_roles=not isGuestUser(uid), \
+                                    verbose=0, \
+                                    doctype=doctype, \
+                                    categ=doctype_categ[0])[0] == 0:
+            # This category is restricted for this user, move on to the next categories.
+            continue
         nbCateg = nbCateg+1
         snameCateg.append(doctype_categ[0])
         lnameCateg.append(doctype_categ[1])
-
     ## Now get the details of the document type:
     doctype_details = get_doctype_details(doctype)
     if doctype_details is None:
@@ -1392,6 +1414,12 @@ def action(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, doctype=""):
     ## Get the details of the actions supported by this document-type:
     doctype_actions = get_actions_on_submission_page_for_doctype(doctype)
     for doctype_action in doctype_actions:
+        if not acc_authorize_action(req, 'submit', \
+                                    authorized_if_no_roles=not isGuestUser(uid), \
+                                    doctype=doctype, \
+                                    act=doctype_action[0])[0] == 0:
+            # This action is not authorized for this user, move on to the next actions.
+            continue
         ## Get the details of this action:
         action_details = get_action_details(doctype_action[0])
         if action_details is not None:
@@ -1400,11 +1428,17 @@ def action(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, doctype=""):
             actionbutton.append(action_details[4])
             statustext.append(action_details[5])
 
+    if not snameCateg and not actionShortDesc:
+        return page_not_authorized(req, "../submit",
+                                   uid=uid,
+                                   navmenuid='submit')
+
+
     ## Send the gathered information to the template so that the doctype's
     ## home-page can be displayed:
     t = websubmit_templates.tmpl_action_page(
           ln=ln,
-          uid=uid, guest=(uid_email == "" or uid_email == "guest"),
+          uid=uid,
           pid = os.getpid(),
           now = time.time(),
           doctype = doctype,
@@ -1723,7 +1757,6 @@ def log_function(curdir, message, start_time, filename="function_log"):
         fd = open("%s/%s" % (curdir, filename), "a+")
         fd.write("""%s --- %s\n""" % (message, time_lap))
         fd.close()
-
 
 ## FIXME: Duplicated
 

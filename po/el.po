@@ -1,4 +1,3 @@
-# # This file is part of Invenio.
 # # Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
 # #
 # # Invenio is free software; you can redistribute it and/or
@@ -16,11 +15,11 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.0-rc0\n"
+"Project-Id-Version: Invenio 1.0.0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2011-12-19 22:12+0100\n"
-"PO-Revision-Date: 2010-11-09 15:02+0200\n"
-"Last-Translator: Theodoropoulos Theodoros <theod@lib.auth.gr>\n"
+"PO-Revision-Date: 2012-03-01 16:53+0100\n"
+"Last-Translator: Nikolaos Kasioumis <nikolaos.kasioumis@cern.ch>\n"
 "Language-Team: EL <info@invenio-software.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -168,7 +167,7 @@ msgstr "Regular expression:"
 #: modules/websearch/lib/search_engine.py:1218
 #: modules/websearch/lib/websearch_templates.py:1100
 msgid "All of the words:"
-msgstr "Όλες οι λέξεις"
+msgstr "Όλες οι λέξεις:"
 
 #: modules/websearch/doc/search-guide.webdoc:351
 #: modules/websearch/doc/search-guide.webdoc:386
@@ -802,9 +801,8 @@ msgid "Search"
 msgstr "Αναζήτηση"
 
 #: modules/webhelp/web/help-central.webdoc:133
-#, fuzzy
 msgid "Citation Metrics"
-msgstr "Παραπομπές"
+msgstr "Στατιστικά Παραπομπών"
 
 #: modules/websearch/doc/search-tips.webdoc:35
 #: modules/websearch/doc/search-tips.webdoc:66
@@ -2083,25 +2081,22 @@ msgid "Warning: Please, select a valid date"
 msgstr "Προσοχή: Παρακαλώ, επιλέξτε μια σωστή ημερομηνία"
 
 #: modules/bibupload/lib/batchuploader_templates.py:185
-#, fuzzy
 msgid "Select file to upload"
-msgstr "Επιλογή αρχείου για ανέβασμα:"
+msgstr "Επιλογή αρχείου για ανέβασμα"
 
 #: modules/bibupload/lib/batchuploader_templates.py:186
-#, fuzzy
 msgid "File type"
-msgstr "Τύπος αρχείου:"
+msgstr "Τύπος αρχείου"
 
 #: modules/bibupload/lib/batchuploader_templates.py:187
 #: modules/bibupload/lib/batchuploader_templates.py:395
-#, fuzzy
 msgid "Upload mode"
-msgstr "Μέθοδος upload:"
+msgstr "Τρόπος μεταφόρτωσης"
 
 #: modules/bibupload/lib/batchuploader_templates.py:188
 #: modules/bibupload/lib/batchuploader_templates.py:396
 msgid "Upload later? then select:"
-msgstr "Για μεταχρονολογημένο ανέβασμα, επιλέξτε:"
+msgstr "Για μεταχρονολογημένη μεταφόρτωση, επιλέξτε:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:189
 #: modules/bibupload/lib/batchuploader_templates.py:397
@@ -2128,26 +2123,25 @@ msgstr "Παράδειγμα"
 
 #: modules/bibupload/lib/batchuploader_templates.py:192
 #: modules/bibupload/lib/batchuploader_templates.py:400
-#, fuzzy, python-format
+#, python-format
 msgid "All fields with %(x_fmt_open)s*%(x_fmt_close)s are mandatory"
-msgstr "εάν %(x_fmt_open)sόχι%(x_fmt_close)s πρέπει να καθορίσετε ένα καλάθι"
+msgstr "Όλα τα πεδία με %(x_fmt_open)s*%(x_fmt_close)s είναι υποχρεωτικά"
 
 #: modules/bibupload/lib/batchuploader_templates.py:194
 #: modules/bibupload/lib/batchuploader_templates.py:391
-#, fuzzy
 msgid "Upload priority"
-msgstr "Ιστορικό:"
+msgstr "Προτεραιότητα μεταφόρτωσης"
 
 #: modules/bibupload/lib/batchuploader_templates.py:214
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Your file has been successfully queued. You can check your "
 "%(x_url1_open)supload history%(x_url1_close)s or %(x_url2_open)ssubmit "
 "another file%(x_url2_close)s"
 msgstr ""
-"Το αρχείο σας, έχει μπει στην ουρά. Μπορείτε να ελέγξετε τo "
+"Το αρχείο σας έχει μπει στην ουρά. Μπορείτε να ελέγξετε τo "
 "%(x_url1_open)sιστορικό%(x_url1_close)s ή να %(x_url2_open)sυποβάλλετε "
-"επιπλέον αρχεία%(x_url2_close)s"
+"%(x_url2_close)s κάποιο άλλο αρχείο"
 
 #: modules/bibupload/lib/batchuploader_templates.py:225
 #, python-format
@@ -2155,6 +2149,8 @@ msgid ""
 "The MARCXML submitted is not valid. Please, review the file and "
 "%(x_url2_open)sresubmit it%(x_url2_close)s"
 msgstr ""
+"Το MARCXML που υποβλήθηκε δεν είναι έγκυρο. Παρακαλώ, ελέγξτε το αρχείο και "
+"%(x_url2_open)sυποβάλλετέ το%(x_url2_close)s"
 
 #: modules/bibupload/lib/batchuploader_templates.py:237
 msgid "No metadata files have been uploaded yet."
@@ -2194,21 +2190,19 @@ msgstr "Μαζικό ανέβασμα αρχείων εγγράφων"
 #: modules/bibupload/lib/batchuploader_templates.py:340
 #: modules/bibupload/lib/batchuploader_webinterface.py:267
 msgid "Upload history"
-msgstr "Ιστορικό:"
+msgstr "Ιστορικό"
 
 #: modules/bibupload/lib/batchuploader_templates.py:343
 msgid "Daemon monitor"
 msgstr "Παρακολούθηση εργασιών"
 
 #: modules/bibupload/lib/batchuploader_templates.py:392
-#, fuzzy
 msgid "Input directory"
-msgstr "Κατάλογος Εξόδου"
+msgstr "Κατάλογος εισόδου"
 
 #: modules/bibupload/lib/batchuploader_templates.py:394
-#, fuzzy
 msgid "Filename matching"
-msgstr "Όνομα αρχείου"
+msgstr "Αντιστοίχιση ονόματος αρχείου"
 
 #: modules/bibupload/lib/batchuploader_templates.py:409
 #, python-format
@@ -2216,12 +2210,10 @@ msgid "<b>%s documents</b> have been found."
 msgstr "<b>%s έγγραφα</b> βρέθηκαν."
 
 #: modules/bibupload/lib/batchuploader_templates.py:411
-#, fuzzy
 msgid "The following files have been successfully queued:"
-msgstr "Τα παρακάτω αρχεία μπήκαν στην ουρά επιτυχώς:"
+msgstr "Τα παρακάτω αρχεία μπήκαν επιτυχώς στην ουρά:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:416
-#, fuzzy
 msgid "The following errors have occurred:"
 msgstr "Έχουν εντοπιστεί τα παρακάτω σφάλματα:"
 
@@ -2242,6 +2234,8 @@ msgid ""
 "Using %(x_fmt_open)sweb interface upload%(x_fmt_close)s, actions are "
 "executed a single time."
 msgstr ""
+"Χρησιμοποιώντας τη %(x_fmt_open)sσελίδα μεταφόρτωσης%(x_fmt_close)s, οι "
+"ενέργειές σας εκτελούνται μόνο μια φορά."
 
 #: modules/bibupload/lib/batchuploader_templates.py:437
 #, python-format
@@ -2249,10 +2243,12 @@ msgid ""
 "Check the %(x_url_open)sBatch Uploader daemon help page%(x_url_close)s for "
 "executing these actions periodically."
 msgstr ""
+"Δείτε τη %(x_url_open)sσελίδα βοήθειας για το Μαζικό Ανέβασμα%(x_url_close)s "
+"για το πως μπορείτε να εκτελείτε αυτές τις ενέργειες περιοδικά."
 
 #: modules/bibupload/lib/batchuploader_templates.py:442
 msgid "Metadata folders"
-msgstr ""
+msgstr "Φάκελοι μεταδεδομένων"
 
 #: modules/bibupload/lib/batchuploader_templates.py:464
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2301
@@ -2274,29 +2270,27 @@ msgstr "ID"
 
 #: modules/bibupload/lib/batchuploader_templates.py:464
 msgid "Progress"
-msgstr ""
+msgstr "Πρόοδος"
 
 #: modules/bibupload/lib/batchuploader_templates.py:466
 msgid "Last BibSched tasks:"
-msgstr ""
+msgstr "Τελευταίες εργασίες:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:475
-#, fuzzy
 msgid "Next scheduled BibSched run:"
-msgstr "προγραμματισμένος χρόνος:"
+msgstr "Επόμενη προγραμματισμένη εκτέλεση του BibSched:"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:154
 msgid "Document batch upload result"
-msgstr "Αποτέλεσμα μαζικού ανεβάσματος εγγράφων"
+msgstr "Αποτέλεσμα μαζικής μεταφόρτωσης εγγράφων"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:238
 msgid "Invalid MARCXML"
-msgstr ""
+msgstr "Μη έγκυρο MARCXML"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:241
-#, fuzzy
 msgid "Upload successful"
-msgstr "Ανέβασμα επιτυχές"
+msgstr "Επιτυχής μεταφόρτωση"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:291
 msgid "Batch Uploader: Daemon monitor"
@@ -2532,7 +2526,7 @@ msgstr "Έτος"
 #: modules/miscutil/lib/errorlib_webinterface.py:74
 #: modules/miscutil/lib/errorlib_webinterface.py:79
 msgid "Sorry"
-msgstr "Λυπάμαι"
+msgstr "Λυπούμαστε"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:65
 #: modules/miscutil/lib/errorlib_webinterface.py:70
@@ -2547,9 +2541,8 @@ msgid "The error report has been sent."
 msgstr "Η αναφορά σφάλματος έχει σταλεί."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:99
-#, fuzzy
 msgid "Many thanks for helping us to improve the service."
-msgstr "Ευχαριστούμε που βοηθάτε να γίνει το Invenio καλύτερο."
+msgstr "Ευχαριστούμε που βοηθάτε να γίνει καλύτερη η υπηρεσία."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:101
 msgid "Use the back button of your browser to return to the previous page."
@@ -2567,7 +2560,7 @@ msgstr "περιοδικό"
 
 #: modules/miscutil/lib/inveniocfg.py:493
 msgid "record ID"
-msgstr "αριθμό εγγραφής"
+msgstr "ταυτότητα εγγραφής"
 
 #: modules/miscutil/lib/inveniocfg.py:506
 msgid "word similarity"
@@ -2587,7 +2580,7 @@ msgstr "χρονική εξέλιξη αριθμού παραπομπών"
 
 #: modules/miscutil/lib/inveniocfg.py:510
 msgid "all-time-best cite rank"
-msgstr ""
+msgstr "all-time-best κατάταξη παραπομπών"
 
 #: modules/miscutil/lib/inveniocfg.py:511
 msgid "time-decay cite rank"
@@ -2611,19 +2604,19 @@ msgstr "Εάν χρείαζεστε ανθρώπινη παρέμβαση, επ�
 #: modules/websession/lib/webuser.py:896 modules/websession/lib/webuser.py:905
 #: modules/websession/lib/webuser.py:906
 msgid "Run Record Editor"
-msgstr ""
+msgstr "Εκτέλεση Επεξεργαστή Εγγραφών"
 
 #: modules/webaccess/lib/access_control_config.py:301
 #: modules/websession/lib/websession_templates.py:1092
 msgid "Run Multi-Record Editor"
-msgstr ""
+msgstr "Εκτέλεση Επεξεργαστή Πολλαπλών Εγγραφών"
 
 #: modules/webaccess/lib/access_control_config.py:302
 #: modules/websession/lib/websession_templates.py:1123
 #: modules/websession/lib/webuser.py:897 modules/websession/lib/webuser.py:907
 #: modules/websession/lib/webuser.py:908
 msgid "Run Document File Manager"
-msgstr ""
+msgstr "Εκτέλεση Διαχειριστή Αρχείων"
 
 #: modules/webaccess/lib/access_control_config.py:303
 #: modules/websession/lib/websession_templates.py:1096
@@ -2631,9 +2624,8 @@ msgid "Run Record Merger"
 msgstr "Συγχώνευση Εγγραφών"
 
 #: modules/webaccess/lib/access_control_config.py:304
-#, fuzzy
 msgid "Run BibSword client"
-msgstr "Εκτέλεση BibEdit"
+msgstr "Εκτέλεση BibSword client"
 
 #: modules/webaccess/lib/access_control_config.py:305
 #: modules/websession/lib/websession_templates.py:1103
@@ -2702,7 +2694,7 @@ msgstr "Μαζικό Ανέβασμα"
 
 #: modules/webaccess/lib/access_control_config.py:318
 msgid "Run Person/Author Manager"
-msgstr ""
+msgstr "Εκτέλεση Διαχειριστή Προσώπων/Συγγραφέων"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3703
 #, python-format
@@ -3238,48 +3230,50 @@ msgstr "Παρουσίαση ειδοποιήσεων"
 #: modules/webbasket/lib/webbasket.py:2181
 msgid ""
 "The selected public basket does not exist or you do not have access to it."
-msgstr ""
+msgstr "Το επιλεγμένο δημόσιο καλάθι δεν υπάρχει ή δεν έχετε πρόσβαση σε αυτό."
 
 #: modules/webbasket/lib/webbasket.py:112
 msgid "Please select a valid public basket from the list of public baskets."
 msgstr ""
+"Παρακαλώ επιλέγξτε ένα έγκυρο δημόσιο καλάθι από τη λίστα δημοσίων καλαθιών."
 
 #: modules/webbasket/lib/webbasket.py:135
 #: modules/webbasket/lib/webbasket.py:298
 #: modules/webbasket/lib/webbasket.py:1000
 msgid "The selected item does not exist or you do not have access to it."
-msgstr ""
+msgstr "Το συγκεκριμένο αντικείμενο δεν υπάρχει ή δεν έχετε πρόσβαση σε αυτό."
 
 #: modules/webbasket/lib/webbasket.py:141
-#, fuzzy
 msgid "Returning to the public basket view."
-msgstr "Επιστροφή σε μηνιαία προβολή"
+msgstr "Επιστροφή στην προβολή του δημόσιου καλαθιού."
 
 #: modules/webbasket/lib/webbasket.py:416
 #: modules/webbasket/lib/webbasket.py:474
 #: modules/webbasket/lib/webbasket.py:1419
 #: modules/webbasket/lib/webbasket.py:1483
-#, fuzzy
 msgid "You do not have permission to write notes to this item."
-msgstr "Δεν έχετε τα απαιτούμενα δικαιώματα για να δείτε το στοιχείο αυτό."
+msgstr ""
+"Δεν έχετε τα απαιτούμενα δικαιώματα για την προσθήκη σημειώσεων σε αυτό το "
+"αντικείμενο."
 
 #: modules/webbasket/lib/webbasket.py:429
 #: modules/webbasket/lib/webbasket.py:1431
 msgid ""
 "The note you are quoting does not exist or you do not have access to it."
 msgstr ""
+"Η σημείωση στην οποία αναφέρεστε δεν υπάρχει ή δεν έχετε πρόσβαση σε αυτήν."
 
 #: modules/webbasket/lib/webbasket.py:484
 #: modules/webbasket/lib/webbasket.py:1495
 msgid "You must fill in both the subject and the body of the note."
-msgstr ""
+msgstr "Πρέπει να συμπληρώσετε το θέμα καθώς και το κείμενο της σημείωσης."
 
 #: modules/webbasket/lib/webbasket.py:581
 #: modules/webbasket/lib/webbasket.py:657
 #: modules/webbasket/lib/webbasket.py:713
 #: modules/webbasket/lib/webbasket.py:2680
 msgid "The selected topic does not exist or you do not have access to it."
-msgstr ""
+msgstr "Το συγκεκριμένο θέμα δεν υπάρχει ή δεν έχετε πρόσβαση σε αυτό."
 
 #: modules/webbasket/lib/webbasket.py:623
 #: modules/webbasket/lib/webbasket.py:743
@@ -3287,104 +3281,117 @@ msgstr ""
 #: modules/webbasket/lib/webbasket.py:2715
 #: modules/webbasket/lib/webbasket.py:2722
 msgid "The selected basket does not exist or you do not have access to it."
-msgstr ""
+msgstr "Το συγκεκριμένο καλάθι δεν υπάρχει ή δεν έχετε πρόσβαση σε αυτό."
 
 #: modules/webbasket/lib/webbasket.py:734
 msgid "The selected basket is no longer public."
-msgstr ""
+msgstr "Το συγκεκριμένο καλάθι δεν είναι πλέον δημόσιο."
 
 #: modules/webbasket/lib/webbasket.py:1548
-#, fuzzy
 msgid "You do not have permission to delete this note."
-msgstr "Δεν έχετε τα απαιτούμενα δικαιώματα για να δείτε το στοιχείο αυτό."
+msgstr ""
+"Δεν έχετε τα απαιτούμενα δικαιώματα για να διαγράψετε αυτή τη σημείωση."
 
 #: modules/webbasket/lib/webbasket.py:1559
 msgid ""
 "The note you are deleting does not exist or you do not have access to it."
 msgstr ""
+"Η σημείωση που προσπαθείτε να διαγράψετε δεν υπάρχει ή δεν έχετε πρόσβαση σε "
+"αυτήν."
 
 #: modules/webbasket/lib/webbasket.py:1656
-#, fuzzy, python-format
+#, python-format
 msgid "Sorry, you do not have sufficient rights to add record #%i."
-msgstr "Δεν έχετε τα απαιτούμενα δικαιώματα για να δείτε το στοιχείο αυτό."
+msgstr ""
+"Λυπούμαστε, δεν έχετε τα απαιτούμενα δικαιώματα για την προσθήκη της "
+"εγγραφής #%i."
 
 #: modules/webbasket/lib/webbasket.py:1662
 msgid "Some of the items were not added due to lack of sufficient rights."
 msgstr ""
+"Μερικά από τα αντικείμενα δεν προστέθηκαν λόγω έλλειψης των απαιτούμενων "
+"δικαιωμάτων."
 
 #: modules/webbasket/lib/webbasket.py:1679
 msgid "Please provide a title for the external source."
-msgstr ""
+msgstr "Παρακαλώ δώστε ένα τίτλο για την εξωτερική πηγή."
 
 #: modules/webbasket/lib/webbasket.py:1685
 msgid "Please provide a description for the external source."
-msgstr ""
+msgstr "Παρακαλώ δώστε μια περιγραφή για την εξωτερική πηγή."
 
 #: modules/webbasket/lib/webbasket.py:1691
 msgid "Please provide a url for the external source."
-msgstr ""
+msgstr "Παρακαλώ δώστε μια διεύθυνση URL για την εξωτερική πηγή."
 
 #: modules/webbasket/lib/webbasket.py:1700
-#, fuzzy
 msgid "The url you have provided is not valid."
-msgstr "Το στοιχείο που επιλέξατε, δεν υπάρχει."
+msgstr "Η διεύθυνση URL που δώσατε δεν είναι έγκυρη."
 
 #: modules/webbasket/lib/webbasket.py:1707
 msgid ""
 "The url you have provided is not valid: The request contains bad syntax or "
 "cannot be fulfilled."
 msgstr ""
+"Η διεύθυνση URL που δώσατε δεν είναι έγκυρη: Η σύνταξη της αίτησης δεν είναι "
+"σωστή ή η αίτηση δεν μπορεί να εκπληρωθεί."
 
 #: modules/webbasket/lib/webbasket.py:1714
 msgid ""
 "The url you have provided is not valid: The server failed to fulfil an "
 "apparently valid request."
 msgstr ""
+"Η διεύθυνση URL που δώσατε δεν είναι έγκυρη: Ο διακομιστής δεν κατάφερε να "
+"εκπληρώσει μια φαινομενικά έγκυρη αίτηση."
 
 #: modules/webbasket/lib/webbasket.py:1763
 #: modules/webbasket/lib/webbasket.py:1884
 #: modules/webbasket/lib/webbasket.py:1953
-#, fuzzy
 msgid "Sorry, you do not have sufficient rights on this basket."
-msgstr ""
-"Δεν έχετε τα απαιτούμενα δικαιώματα για να αλλάξετε τα περιεχόμενα του "
-"καλαθιού αυτού."
+msgstr "Λυπούμαστε, δεν έχετε τα απαιτούμενα δικαιώματα σε αυτό το καλάθι."
 
 #: modules/webbasket/lib/webbasket.py:1772
-#, fuzzy
 msgid "No records to add."
-msgstr "Αντιγραφή εγγραφής στο καλάθι"
+msgstr "Καμία εγγραφή για προσθήκη."
 
 #: modules/webbasket/lib/webbasket.py:1812
 #: modules/webbasket/lib/webbasket.py:2652
 msgid "Cannot add items to the selected basket. Invalid parameters."
 msgstr ""
+"Η προσθήκη αντικειμένων στο συγκεκριμένο καλάθι δεν είναι δυνατή. Μη έγκυρες "
+"παράμετροι."
 
 #: modules/webbasket/lib/webbasket.py:1824
 msgid ""
 "A default topic and basket have been automatically created. Edit them to "
 "rename them as you see fit."
 msgstr ""
+"Ένα προεπιλεγμένο θέμα και καλάθι δημιουργήθηκαν αυτόματα. Επεξεργαστείτε τα "
+"για να τα μετονομάσετε όπως εσείς επιθυμείτε."
 
 #: modules/webbasket/lib/webbasket.py:2101
 msgid "Please provide a name for the new basket."
-msgstr ""
+msgstr "Παρακαλώ δώστε ένα όνομα για το νέο καλάθι."
 
 #: modules/webbasket/lib/webbasket.py:2107
 msgid "Please select an existing topic or create a new one."
-msgstr ""
+msgstr "Παρακαλώ επιλέγξτε ένα υπάρχον θέμα ή δημιουργήστε ένα νέο."
 
 #: modules/webbasket/lib/webbasket.py:2143
 msgid ""
 "You cannot subscribe to this basket, you are the either owner or you have "
 "already subscribed."
 msgstr ""
+"Δεν μπορείτε να εγγραφείτε σε αυτό το καλάθι, είτε είστε ο ιδιοκτήτης ή "
+"έχετε ήδη εγγραφεί."
 
 #: modules/webbasket/lib/webbasket.py:2173
 msgid ""
 "You cannot unsubscribe from this basket, you are the either owner or you "
 "have already unsubscribed."
 msgstr ""
+"Δεν μπορείτε να διαγραφείτε από αυτό το καλάθι, είτε είστε ο ιδιοκτήτης είτε "
+"έχετε ήδη διαγραφεί."
 
 #: modules/webbasket/lib/webbasket.py:2266
 #: modules/webbasket/lib/webbasket.py:2379
@@ -3456,36 +3463,36 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:2629
 #: modules/webbasket/lib/webbasket.py:2667
-#, fuzzy
 msgid ""
 "The category you have selected does not exist. Please select a valid "
 "category."
-msgstr "Το στοιχείο που επιλέξατε, δεν υπάρχει."
+msgstr ""
+"Η κατηγορία που επιλέξατε δεν υπάρχει. Παρακαλώ επιλέγξτε μια έγκυρη "
+"κατηγορία."
 
 #: modules/webbasket/lib/webbasket.py:2693
 msgid "The selected group does not exist or you do not have access to it."
-msgstr ""
+msgstr "Η συγκεκριμένη ομάδα δεν υπάρχει ή δεν έχετε πρόσβαση σε αυτήν."
 
 #: modules/webbasket/lib/webbasket.py:2738
 msgid "The selected output format is not available or is invalid."
-msgstr ""
+msgstr "Η συγκεκριμένη μορφή εξόδου δεν είναι διαθέσιμη ή δεν είναι έγκυρη."
 
 #: modules/webbasket/lib/webbasket_templates.py:87
-#, fuzzy
 msgid ""
 "You have no personal or group baskets or are subscribed to any public "
 "baskets."
 msgstr ""
-"Δεν έχετε κάποιο προσωπικό ή ομαδικό καλάθι, ή δεν είστε γραμμένοι σε κάποιο "
-"δημόσιο καλάθι"
+"Δεν έχετε κάποιο προσωπικό ή ομαδικό καλάθι, ή δεν έχετε εγγραφεί σε κάποιο "
+"δημόσιο καλάθι."
 
 #: modules/webbasket/lib/webbasket_templates.py:88
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You may want to start by %(x_url_open)screating a new basket%(x_url_close)s."
 msgstr ""
-"Μπορείτε να κοιτάξετε στις %(x_url_open)s%(x_category)s σελίδες"
-"%(x_url_close)s"
+"Μπορείτε να ξεκινήσετε %(x_url_open)sδημιουργώντας ένα νέο καλάθι"
+"%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:112
 #: modules/webbasket/lib/webbasket_templates.py:178
@@ -3508,7 +3515,7 @@ msgstr "Αναζήτηση καλαθιών για"
 
 #: modules/webbasket/lib/webbasket_templates.py:560
 msgid "Search also in notes (where allowed)"
-msgstr "Αναζητήστε επίσης και στις παρατηρήσεις (όπου επιτρέπεται)"
+msgstr "Αναζητήστε επίσης και στις σημειώσεις (όπου επιτρέπεται)"
 
 #: modules/webbasket/lib/webbasket_templates.py:597
 msgid "Results overview"
@@ -3527,9 +3534,9 @@ msgstr "Περίληψη αποτελεσμάτων"
 #: modules/webbasket/lib/webbasket_templates.py:744
 #: modules/webbasket/lib/webbasket_templates.py:760
 #: modules/webbasket/lib/webbasket_templates.py:776
-#, fuzzy, python-format
+#, python-format
 msgid "%i items found"
-msgstr "στοιχεία βρέθηκαν"
+msgstr "%i αντικείμενα βρέθηκαν"
 
 #: modules/webbasket/lib/webbasket_templates.py:632
 #: modules/webbasket/lib/webbasket_templates.py:758
@@ -3538,7 +3545,7 @@ msgstr "Όλα τα δημόσια καλάθια"
 
 #: modules/webbasket/lib/webbasket_templates.py:648
 msgid "No items found."
-msgstr "Δεν βρέθηκαν στοιχεία."
+msgstr "Δεν βρέθηκε κανένα αντικείμενο."
 
 #: modules/webbasket/lib/webbasket_templates.py:675
 #: modules/webbasket/lib/webbasket_templates.py:709
@@ -3546,7 +3553,7 @@ msgstr "Δεν βρέθηκαν στοιχεία."
 #: modules/webbasket/lib/webbasket_templates.py:774
 #, python-format
 msgid "In %(x_linked_basket_name)s"
-msgstr ""
+msgstr "Στο %(x_linked_basket_name)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:869
 #: modules/webbasket/lib/webbasket_webinterface.py:1291
@@ -3566,7 +3573,7 @@ msgstr "Τελευταία ενημέρωση"
 #: modules/webbasket/lib/webbasket_templates.py:872
 #: modules/bibcirculation/lib/bibcirculation_templates.py:113
 msgid "Items"
-msgstr "Στοιχεία"
+msgstr "Αντικείμενα"
 
 #: modules/webbasket/lib/webbasket_templates.py:873
 msgid "Views"
@@ -3577,24 +3584,26 @@ msgid "There is currently no publicly accessible basket"
 msgstr "Δεν υπάρχει κάποιο δημόσιο καλάθι διαθέσιμο"
 
 #: modules/webbasket/lib/webbasket_templates.py:977
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Displaying public baskets %(x_from)i - %(x_to)i out of "
 "%(x_total_public_basket)i public baskets in total."
-msgstr "Προβολή δημόσιων καλαθιών %s - %s από συνόλου %s."
+msgstr ""
+"Προβολή δημόσιων καλαθιών %(x_from)i - %(x_to)i από συνόλο "
+"%(x_total_public_basket)i."
 
 #: modules/webbasket/lib/webbasket_templates.py:1044
 #: modules/webbasket/lib/webbasket_templates.py:1068
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_title)s, by %(x_name)s on %(x_date)s:"
-msgstr "Κρίθηκε από τον %(x_nickname)s στις %(x_date)s"
+msgstr "%(x_title)s, από %(x_name)s στις %(x_date)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:1047
 #: modules/webbasket/lib/webbasket_templates.py:1071
 #: modules/webcomment/lib/webcomment.py:1605
 #, python-format
 msgid "%(x_name)s wrote on %(x_date)s:"
-msgstr "%(x_name)s έγγραψε στις %(x_date)s:"
+msgstr "%(x_name)s έγραψε στις %(x_date)s:"
 
 #: modules/webbasket/lib/webbasket_templates.py:1127
 msgid "Select topic"
@@ -3617,7 +3626,6 @@ msgstr "Δημιουργία νέου θέματος"
 
 #: modules/webbasket/lib/webbasket_templates.py:1145
 #: modules/webbasket/lib/webbasket_templates.py:1538
-#, fuzzy
 msgid "Basket name"
 msgstr "Όνομα καλαθιού"
 
@@ -3635,15 +3643,15 @@ msgstr "Δημιουργία νέου καλαθιού"
 #: modules/webbasket/lib/webbasket_templates.py:3182
 #: modules/webbasket/lib/webbasket_templates.py:3498
 msgid "External item"
-msgstr "Εξωτερικό στοιχείο"
+msgstr "Εξωτερικό αντικείμενο"
 
 #: modules/webbasket/lib/webbasket_templates.py:1270
 msgid ""
 "Provide a url for the external item you wish to add and fill in a title and "
 "description"
 msgstr ""
-"Δώστε ένα url για το εξωτερικό στοιχείο που θέλετε να προσθέσετε και "
-"συμπληρώστε έναν τίτλο και μια περιγραφή"
+"Δώστε μια διεύθυνση URL για το εξωτερικό αντικείμενο που θέλετε να "
+"προσθέσετε και συμπληρώστε έναν τίτλο και μια περιγραφή"
 
 #: modules/webbasket/lib/webbasket_templates.py:1271
 #: modules/websubmit/lib/websubmit_templates.py:2726
@@ -3668,29 +3676,29 @@ msgid "URL"
 msgstr "URL"
 
 #: modules/webbasket/lib/webbasket_templates.py:1305
-#, fuzzy, python-format
+#, python-format
 msgid "%i items have been successfully added to your basket"
-msgstr "στοιχεία εχουν προστεθεί επιτυχώς στο καλάθι σας"
+msgstr "%i αντικείμενα προστέθηκαν επιτυχώς στο καλάθι σας"
 
 #: modules/webbasket/lib/webbasket_templates.py:1306
-#, fuzzy, python-format
+#, python-format
 msgid "Proceed to the %(x_url_open)sbasket%(x_url_close)s"
-msgstr "Εγγραφείτε στην %(x_url2_open)sροή RSS%(x_url2_close)s."
+msgstr "Προχωρήστε στο %(x_url_open)sκαλάθι%(x_url_close)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:1311
-#, fuzzy, python-format
+#, python-format
 msgid " or return to your %(x_url_open)sprevious basket%(x_url_close)s"
-msgstr " Έχετε τώρα πρόσβαση στον %(x_url_open)sλογαριασμό%(x_url_close)s σας."
+msgstr " ή επιστρέψτε στο %(x_url_open)sπροηγούμενο καλάθι%(x_url_close)s σας"
 
 #: modules/webbasket/lib/webbasket_templates.py:1315
-#, fuzzy, python-format
+#, python-format
 msgid " or return to your %(x_url_open)ssearch%(x_url_close)s"
-msgstr " Έχετε τώρα πρόσβαση στον %(x_url_open)sλογαριασμό%(x_url_close)s σας."
+msgstr " ή επιστρέψτε στην %(x_url_open)sαναζήτησή%(x_url_close)s σας"
 
 #: modules/webbasket/lib/webbasket_templates.py:1428
-#, fuzzy, python-format
+#, python-format
 msgid "Adding %i items to your baskets"
-msgstr "στοιχείων στα καλάθια μου"
+msgstr "Προσθήκη %i αντικειμένων στα καλάθια μου"
 
 #: modules/webbasket/lib/webbasket_templates.py:1429
 #, python-format
@@ -3698,22 +3706,24 @@ msgid ""
 "Please choose a basket: %(x_basket_selection_box)s %(x_fmt_open)s(or "
 "%(x_url_open)screate a new one%(x_url_close)s first)%(x_fmt_close)s"
 msgstr ""
+"Παρακαλώ επιλέξτε ένα καλάθι: %(x_basket_selection_box)s %(x_fmt_open)s(ή "
+"%(x_url_open)sδημιουργήστε ένα νέο%(x_url_close)s πρώτα)%(x_fmt_close)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:1443
 msgid "Optionally, add a note to each one of these items"
-msgstr "Προαιρετικά, προσθέστε σημείωση σε καθένα από αυτά τα στοιχεία"
+msgstr "Προαιρετικά, προσθέστε μια σημείωση σε καθένα από αυτά τα αντικείμενα"
 
 #: modules/webbasket/lib/webbasket_templates.py:1444
 msgid "Optionally, add a note to this item"
-msgstr "Προαιρετικά, πρόσθεστε σημείωση στο στοιχείο αυτό"
+msgstr "Προαιρετικά, πρόσθεστε μια σημείωση στο αντικείμενο αυτό"
 
 #: modules/webbasket/lib/webbasket_templates.py:1450
 msgid "Add items"
-msgstr "Προσθήκη στοιχείων"
+msgstr "Προσθήκη αντικειμένων"
 
 #: modules/webbasket/lib/webbasket_templates.py:1474
 msgid "Are you sure you want to delete this basket?"
-msgstr "Είστε σίγουροι οτι θέλετε να διαγράψετε το καλάθι αυτό;"
+msgstr "Είστε σίγουροι οτι θέλετε να διαγράψετε αυτό το καλάθι;"
 
 #: modules/webbasket/lib/webbasket_templates.py:1476
 #, python-format
@@ -3769,9 +3779,9 @@ msgid "Delete basket"
 msgstr "Διαγραφή καλαθιού"
 
 #: modules/webbasket/lib/webbasket_templates.py:1616
-#, fuzzy, python-format
+#, python-format
 msgid "Editing basket %(x_basket_name)s"
-msgstr "Τροποποίηση καλαθιού \"%s\""
+msgstr "Επεξεργασία καλαθιού %(x_basket_name)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:1625
 #: modules/webbasket/lib/webbasket_templates.py:1680
@@ -3779,14 +3789,13 @@ msgid "Save changes"
 msgstr "Αποθήκευση αλλαγών"
 
 #: modules/webbasket/lib/webbasket_templates.py:1646
-#, fuzzy
 msgid "Topic name"
-msgstr "Όνομα θέματος:"
+msgstr "Όνομα θέματος"
 
 #: modules/webbasket/lib/webbasket_templates.py:1675
 #, python-format
 msgid "Editing topic: %(x_topic_name)s"
-msgstr ""
+msgstr "Επεξεργασία θέματος: %(x_topic_name)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:1692
 #: modules/webbasket/lib/webbasket_templates.py:1707
@@ -3823,7 +3832,7 @@ msgstr "προβολή σημειώσεων"
 
 #: modules/webbasket/lib/webbasket_templates.py:1713
 msgid "add notes"
-msgstr "προσθήκη σημείωσης"
+msgstr "προσθήκη σημειώσεων"
 
 #: modules/webbasket/lib/webbasket_templates.py:1715
 msgid "add records"
@@ -3871,7 +3880,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1809
 #: modules/websession/lib/websession_webinterface.py:263
 msgid "This functionality is forbidden to guest users."
-msgstr "Η λειτουργία αυτή δεν επιτρέπεται στους χρήστες guest."
+msgstr "Η λειτουργία αυτή δεν επιτρέπεται στους επισκέπτες."
 
 #: modules/webbasket/lib/webbasket_templates.py:1862
 #: modules/webcomment/lib/webcomment_templates.py:864
@@ -3880,15 +3889,15 @@ msgstr "Επιστροφή στα αποτελέσματα αναζήτησης"
 
 #: modules/webbasket/lib/webbasket_templates.py:1990
 #: modules/webbasket/lib/webbasket_templates.py:3022
-#, fuzzy, python-format
+#, python-format
 msgid "%i items"
-msgstr "τεκμήρια"
+msgstr "%i αντικείμενα"
 
 #: modules/webbasket/lib/webbasket_templates.py:1991
 #: modules/webbasket/lib/webbasket_templates.py:3024
-#, fuzzy, python-format
+#, python-format
 msgid "%i notes"
-msgstr "προβολή σημειώσεων"
+msgstr "%i σημειώσεις"
 
 #: modules/webbasket/lib/webbasket_templates.py:1991
 #: modules/webbasket/lib/webbasket_templates.py:3024
@@ -3896,9 +3905,9 @@ msgid "no notes yet"
 msgstr "δίχως σημειώσεις"
 
 #: modules/webbasket/lib/webbasket_templates.py:1994
-#, fuzzy, python-format
+#, python-format
 msgid "%i subscribers"
-msgstr "συνδρομητές"
+msgstr "%i συνδρομητές"
 
 #: modules/webbasket/lib/webbasket_templates.py:1996
 #: modules/webbasket/lib/webbasket_templates.py:3026
@@ -3907,15 +3916,14 @@ msgstr "τελευταία ενημέρωση"
 
 #: modules/webbasket/lib/webbasket_templates.py:2000
 #: modules/webbasket/lib/webbasket_templates.py:2079
-#, fuzzy
 msgid "Add item"
-msgstr "Προσθήκη στοιχείων"
+msgstr "Προσθήκη αντικειμένου"
 
 #: modules/webbasket/lib/webbasket_templates.py:2003
 #: modules/webbasket/lib/webbasket_templates.py:2082
 #: modules/webbasket/lib/webbasket_webinterface.py:1037
 msgid "Edit basket"
-msgstr "Διόρθωση καλαθιού"
+msgstr "Επεξεργασία καλαθιού"
 
 #: modules/webbasket/lib/webbasket_templates.py:2016
 #: modules/webbasket/lib/webbasket_templates.py:2093
@@ -3926,7 +3934,7 @@ msgstr "Διαγραφή συνδρομής από αυτό το καλάθι"
 
 #: modules/webbasket/lib/webbasket_templates.py:2098
 msgid "This basket is publicly accessible at the following address:"
-msgstr "Το καλάθι αυτό είναι δημοσίως προσβάσιμο στην διεύθυνση:"
+msgstr "Το καλάθι αυτό είναι δημοσίως προσβάσιμο στη διεύθυνση:"
 
 #: modules/webbasket/lib/webbasket_templates.py:2162
 #: modules/webbasket/lib/webbasket_templates.py:3137
@@ -3936,41 +3944,40 @@ msgstr "Το καλάθι είναι άδειο"
 #: modules/webbasket/lib/webbasket_templates.py:2196
 msgid "You do not have sufficient rights to view this basket's content."
 msgstr ""
-"Δεν έχετε τα απαιτούμενα δικαιώματα για να αλλάξετε τα περιεχόμενα του "
-"καλαθιού αυτού."
+"Δεν έχετε τα απαιτούμενα δικαιώματα για να δείτε τα περιεχόμενα αυτού του "
+"καλαθιού."
 
 #: modules/webbasket/lib/webbasket_templates.py:2239
 msgid "Move item up"
-msgstr "Μετακίνηση στοιχείου επάνω"
+msgstr "Μετακίνηση αντικειμένου επάνω"
 
 #: modules/webbasket/lib/webbasket_templates.py:2243
 msgid "You cannot move this item up"
-msgstr "Είναι αδύνατη η μετακίνηση του στοιχείου αυτού πάνω"
+msgstr "Είναι αδύνατη η μετακίνηση του αντικειμένου αυτού πάνω"
 
 #: modules/webbasket/lib/webbasket_templates.py:2257
 msgid "Move item down"
-msgstr "Μετακίνηση στοιχείου κάτω"
+msgstr "Μετακίνηση αντικειμένου κάτω"
 
 #: modules/webbasket/lib/webbasket_templates.py:2261
 msgid "You cannot move this item down"
-msgstr "Είναι αδύνατη η μετακίνηση του στοιχείου αυτού κάτω"
+msgstr "Είναι αδύνατη η μετακίνηση του αντικειμένου αυτού κάτω"
 
 #: modules/webbasket/lib/webbasket_templates.py:2275
 #: modules/webbasket/lib/webbasket_templates.py:3178
 msgid "Copy item"
-msgstr "Αντιγραφή στοιχείου"
+msgstr "Αντιγραφή αντικειμένου"
 
 #: modules/webbasket/lib/webbasket_templates.py:2291
 msgid "Remove item"
-msgstr "Διαγραφή στοιχείου"
+msgstr "Διαγραφή αντικειμένου"
 
 #: modules/webbasket/lib/webbasket_templates.py:2363
 #: modules/webbasket/lib/webbasket_templates.py:2718
 #: modules/webbasket/lib/webbasket_templates.py:3239
 #: modules/webbasket/lib/webbasket_templates.py:3539
-#, fuzzy
 msgid "This record does not seem to exist any more"
-msgstr "Η εγγραφή που ζητήσατε δεν υπάρχει."
+msgstr "Αυτή η εγγραφή δε φαίνεται να υπάρχει πλέον."
 
 #: modules/webbasket/lib/webbasket_templates.py:2366
 #: modules/webbasket/lib/webbasket_templates.py:2868
@@ -4005,7 +4012,7 @@ msgstr "Προσθήκη σημείωσης..."
 #: modules/webbasket/lib/webbasket_templates.py:3330
 #, python-format
 msgid "Item %(x_item_index)i of %(x_item_total)i"
-msgstr ""
+msgstr "Αντικείμενο %(x_item_index)i από %(x_item_total)i"
 
 #: modules/webbasket/lib/webbasket_templates.py:2491
 #: modules/webbasket/lib/webbasket_templates.py:2494
@@ -4016,7 +4023,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:3415
 #: modules/webbasket/lib/webbasket_templates.py:3418
 msgid "Previous item"
-msgstr "Προηγούμενο στοιχείο"
+msgstr "Προηγούμενο αντικειμένο"
 
 #: modules/webbasket/lib/webbasket_templates.py:2506
 #: modules/webbasket/lib/webbasket_templates.py:2509
@@ -4027,7 +4034,7 @@ msgstr "Προηγούμενο στοιχείο"
 #: modules/webbasket/lib/webbasket_templates.py:3427
 #: modules/webbasket/lib/webbasket_templates.py:3430
 msgid "Next item"
-msgstr "Επόμενο στοιχείο"
+msgstr "Επόμενο αντικείμενο"
 
 #: modules/webbasket/lib/webbasket_templates.py:2519
 #: modules/webbasket/lib/webbasket_templates.py:2606
@@ -4039,18 +4046,18 @@ msgstr "Επιστροφή στο καλάθι"
 #: modules/webbasket/lib/webbasket_templates.py:2666
 #: modules/webbasket/lib/webbasket_templates.py:3491
 msgid "The item you have selected does not exist."
-msgstr "Το στοιχείο που επιλέξατε, δεν υπάρχει."
+msgstr "Το αντικείμενο που επιλέξατε δεν υπάρχει."
 
 #: modules/webbasket/lib/webbasket_templates.py:2694
 #: modules/webbasket/lib/webbasket_templates.py:3515
 msgid "You do not have sufficient rights to view this item's notes."
 msgstr ""
-"Δεν έχετε τα απαιτούμενα δικαιώματα για να δείτε τις σημειώσεις του "
-"στοιχείου αυτού."
+"Δεν έχετε τα απαιτούμενα δικαιώματα για να δείτε τις σημειώσεις αυτού του "
+"αντικειμένου."
 
 #: modules/webbasket/lib/webbasket_templates.py:2735
 msgid "You do not have sufficient rights to view this item."
-msgstr "Δεν έχετε τα απαιτούμενα δικαιώματα για να δείτε το στοιχείο αυτό."
+msgstr "Δεν έχετε τα απαιτούμενα δικαιώματα για να δείτε αυτό το αντικείμενο."
 
 #: modules/webbasket/lib/webbasket_templates.py:2842
 #: modules/webbasket/lib/webbasket_templates.py:2852
@@ -4075,9 +4082,9 @@ msgstr "Απάντηση"
 
 #: modules/webbasket/lib/webbasket_templates.py:2919
 #: modules/webbasket/lib/webbasket_templates.py:3717
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_title)s, by %(x_name)s on %(x_date)s"
-msgstr "Κρίθηκε από τον %(x_nickname)s στις %(x_date)s"
+msgstr "%(x_title)s, από %(x_name)s στις %(x_date)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:2921
 #: modules/webbasket/lib/webbasket_templates.py:3719
@@ -4095,11 +4102,11 @@ msgstr "Εγγραφή στο καλάθι αυτό"
 
 #: modules/webbasket/lib/webbasket_templates.py:3090
 msgid "This public basket belongs to the user "
-msgstr "Το δημόσιο αυτό καλάθι ανήκει στον χρήστη "
+msgstr "Αυτό το δημόσιο καλάθι ανήκει στον χρήστη "
 
 #: modules/webbasket/lib/webbasket_templates.py:3114
 msgid "This public basket belongs to you."
-msgstr "Το δημόσιο αυτό καλάθι ανήκει σ'εσένα."
+msgstr "Αυτό το δημόσιο καλάθι μου ανήκει."
 
 #: modules/webbasket/lib/webbasket_templates.py:3889
 msgid "All your baskets"
@@ -4158,7 +4165,7 @@ msgstr "Παρουσίαση καλαθιών"
 #: modules/webbasket/lib/webbasket_webinterface.py:639
 #: modules/webbasket/lib/webbasket_webinterface.py:1604
 msgid "Display item and notes"
-msgstr "Παρουσίαση στοιχείων και σημειώσεων"
+msgstr "Παρουσίαση αντικειμένου και σημειώσεων"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:821
 msgid "Delete a basket"
@@ -4169,78 +4176,74 @@ msgid "Copy record to basket"
 msgstr "Αντιγραφή εγγραφής στο καλάθι"
 
 #: modules/webcomment/lib/webcommentadminlib.py:122
-#, fuzzy
 msgid "Invalid comment ID."
-msgstr "ID σχολίου"
+msgstr "Μη έγκυρη ταυτότητα σχολίου"
 
 #: modules/webcomment/lib/webcommentadminlib.py:142
-#, fuzzy, python-format
+#, python-format
 msgid "Comment ID %s does not exist."
-msgstr "Ο χρήστης %s δεν υπάρχει."
+msgstr "Η ταυτότητα σχολίου %s δεν υπάρχει."
 
 #: modules/webcomment/lib/webcommentadminlib.py:156
-#, fuzzy, python-format
+#, python-format
 msgid "Record ID %s does not exist."
-msgstr "Ο χρήστης %s δεν υπάρχει."
+msgstr "Η ταυτότητα εγγραφής %s δεν υπάρχει."
 
 #: modules/webcomment/lib/webcomment.py:166
 #: modules/webcomment/lib/webcomment.py:210
 msgid "Bad page number --> showing first page."
-msgstr ""
+msgstr "Μη έγκυρος αριθμός σελίδας --> προβολή της πρώτης σελίδας."
 
 #: modules/webcomment/lib/webcomment.py:174
-#, fuzzy
 msgid "Bad number of results per page --> showing 10 results per page."
-msgstr "Αριθμός αποτελεσμάτων ανά σελίδα"
+msgstr ""
+"Μη έγκυρος αριθμός αποτελεσμάτων ανά σελίδα --> προβολή 10 αποτελεσμάτων ανά "
+"σελίδα."
 
 #: modules/webcomment/lib/webcomment.py:183
 msgid "Bad display order --> showing most helpful first."
-msgstr ""
+msgstr "Μη έγκυρη σειρά προβολής --> προβολή του πιο σχετικού πρώτα."
 
 #: modules/webcomment/lib/webcomment.py:192
 msgid "Bad display order --> showing oldest first."
-msgstr ""
+msgstr "Μη έγκυρη σειρά προβολής --> προβολή του αρχαιότερου πρώτα."
 
 #: modules/webcomment/lib/webcomment.py:229
 #: modules/webcomment/lib/webcomment.py:1579
 #: modules/webcomment/lib/webcomment.py:1632
-#, fuzzy
 msgid "Comments on records have been disallowed by the administrator."
-msgstr "Η ομάδα %s διεγράφη από τον διαχειριστή."
+msgstr "Τα σχόλια σε εγγραφές έχουν απαγορευθεί από τον διαχειριστή."
 
 #: modules/webcomment/lib/webcomment.py:237
 #: modules/webcomment/lib/webcomment.py:260
 #: modules/webcomment/lib/webcomment.py:1419
 #: modules/webcomment/lib/webcomment.py:1440
 msgid "Your feedback has been recorded, many thanks."
-msgstr ""
+msgstr "Το σχόλιό σας καταγράφηκε, ευχαρισούμε πολύ."
 
 #: modules/webcomment/lib/webcomment.py:244
-#, fuzzy
 msgid "You have already reported an abuse for this comment."
-msgstr ""
-"Έχετε ήδη φτάσει τον μέγιστο αριθμό αρχείων για τον συγκεκριμένο τύπο "
-"εγγράφου"
+msgstr "Έχετε ήδη αναφέρει αυτό το σχόλιο ως κακόβουλο."
 
 #: modules/webcomment/lib/webcomment.py:251
-#, fuzzy
 msgid "The comment you have reported no longer exists."
-msgstr "Το στοιχείο που επιλέξατε, δεν υπάρχει."
+msgstr "Το σχόλιο που αναφέρατε δεν υπάρχει πλέον."
 
 #: modules/webcomment/lib/webcomment.py:267
 msgid "Sorry, you have already voted. This vote has not been recorded."
-msgstr ""
+msgstr "Λυπούμαστε, έχετε ήδη ψηφίσει. Αυτή η ψήφος δεν καταγράφηκε."
 
 #: modules/webcomment/lib/webcomment.py:274
 msgid ""
 "You have been subscribed to this discussion. From now on, you will receive "
 "an email whenever a new comment is posted."
 msgstr ""
+"Εγγραφήκατε σε αυτήν τη συζήτηση. Από εδώ και στο εξής θα λαμβάνετε ένα "
+"email ειδοποίησης κάθε φορά που ένα νέο σχόλιο θα αναρτάται."
 
 #: modules/webcomment/lib/webcomment.py:281
-#, fuzzy
 msgid "You have been unsubscribed from this discussion."
-msgstr "Διαγραφή από αυτό το καλάθι"
+msgstr "Διαγραφήκατε από αυτήν τη συζήτηση."
 
 #: modules/webcomment/lib/webcomment.py:1171
 #, python-format
@@ -4250,81 +4253,82 @@ msgstr "Εγγραφή %i"
 #: modules/webcomment/lib/webcomment.py:1182
 #, python-format
 msgid "%(report_number)s\"%(title)s\" has been reviewed"
-msgstr ""
+msgstr "%(report_number)s\"%(title)s\" έχει αναθεωρηθεί"
 
 #: modules/webcomment/lib/webcomment.py:1186
 #, python-format
 msgid "%(report_number)s\"%(title)s\" has been commented"
-msgstr ""
+msgstr "%(report_number)s\"%(title)s\" έχει σχολιαστεί"
 
 #: modules/webcomment/lib/webcomment.py:1407
 #, python-format
 msgid "%s is an invalid record ID"
-msgstr ""
+msgstr "%s είναι μια μη έγκυρη ταυτότητα εγγραφής"
 
 #: modules/webcomment/lib/webcomment.py:1426
 #: modules/webcomment/lib/webcomment.py:1447
 msgid "Your feedback could not be recorded, please try again."
-msgstr ""
+msgstr "Το σχόλιο σας δεν μπόρεσε να καταγραφεί, παρακαλώ ξαναδοκιμάστε."
 
 #: modules/webcomment/lib/webcomment.py:1555
 #, python-format
 msgid "%s is an invalid user ID."
-msgstr ""
+msgstr "%s είναι μια μη έγκυρη ταυτότητα χρήστη."
 
 #: modules/webcomment/lib/webcomment.py:1589
-#, fuzzy
 msgid "Cannot reply to a review."
-msgstr "Σήμανση κριτικής ως μη κακόβουλη"
+msgstr "Δεν μπορείτε να απαντήσετε σε μια κριτική."
 
 #: modules/webcomment/lib/webcomment.py:1644
 msgid "You must enter a title."
-msgstr ""
+msgstr "Πρέπει να εισάγετε ένα τίτλο."
 
 #: modules/webcomment/lib/webcomment.py:1651
 msgid "You must choose a score."
-msgstr ""
+msgstr "Πρέπει να επιλέξετε έναν βαθμό."
 
 #: modules/webcomment/lib/webcomment.py:1658
 msgid "You must enter a text."
-msgstr ""
+msgstr "Πρέπει να εισάγετε ένα κείμενο."
 
 #: modules/webcomment/lib/webcomment.py:1675
-#, fuzzy
 msgid "You already wrote a review for this record."
-msgstr "Δεν έχετε δικαίωμα να δείτε την περιοχή αυτή."
+msgstr "Έχετε ήδη γράψει μια κριτική για αυτήν την εγγραφή."
 
 #: modules/webcomment/lib/webcomment.py:1693
 msgid "You already posted a comment short ago. Please retry later."
 msgstr ""
+"Γράψατε ένα σχόλιο ήδη πριν από πολύ λίγο χρόνο. Παρακαλώ δοκιμάστε ξανά."
 
 #: modules/webcomment/lib/webcomment.py:1705
 msgid "Failed to insert your comment to the database. Please try again."
 msgstr ""
+"Αποτυχία εισαγωγής του σχολίου σας στη βάση δεδομένων. Παρακαλώ δοκιμάστε "
+"αργότερα."
 
 #: modules/webcomment/lib/webcomment.py:1719
 msgid "Unknown action --> showing you the default add comment form."
 msgstr ""
+"Άγνωστη ενέργεια --> προβολή της προεπιλεγμένης φόρμας εισαγωγής σχολίου"
 
 #: modules/webcomment/lib/webcomment.py:1841
-#, fuzzy, python-format
+#, python-format
 msgid "Record ID %s does not exist in the database."
-msgstr "Το email που εισάγατε δεν υπάρχει στην βάση."
+msgstr "Η ταυτότητα εγγραφής %s δεν υπάρχει στη βάση δεδομένων."
 
 #: modules/webcomment/lib/webcomment.py:1849
-#, fuzzy
 msgid "No record ID was given."
-msgstr "Λυπάμαι, καμία ταυτότητα εγγράφου δεν δόθηκε."
+msgstr "Δε δόθηκε καμία ταυτότητα εγγραφής."
 
 #: modules/webcomment/lib/webcomment.py:1857
-#, fuzzy, python-format
+#, python-format
 msgid "Record ID %s is an invalid ID."
-msgstr "Λυπάμαι, το %s δεν είναι έγκυρη τιμή ταυτότητας."
+msgstr "Η ταυτότητα εγγραφής %s δεν είναι μια έγκυρη τιμή ταυτότητας."
 
 #: modules/webcomment/lib/webcomment.py:1865
 #, python-format
 msgid "Record ID %s is not a number."
-msgstr ""
+msgstr "Η ταυτότητα εγγραφής %s δεν είναι αριθμός."
 
 #: modules/webcomment/lib/webcomment_templates.py:79
 #: modules/webcomment/lib/webcomment_templates.py:839
@@ -4333,16 +4337,18 @@ msgid "Write a comment"
 msgstr "Γράψτε ένα σχόλιο"
 
 #: modules/webcomment/lib/webcomment_templates.py:94
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "<div class=\"webcomment_comment_round_header\">%(x_nb)i Comments for round "
 "\"%(x_name)s\""
-msgstr "%(x_name)s έγγραψε στις %(x_date)s:"
+msgstr ""
+"<div class=\"webcomment_comment_round_header\">%(x_nb)i Σχόλια για στάδιο "
+"\"%(x_name)s\""
 
 #: modules/webcomment/lib/webcomment_templates.py:96
 #, python-format
 msgid "<div class=\"webcomment_comment_round_header\">%(x_nb)i Comments"
-msgstr ""
+msgstr "<div class=\"webcomment_comment_round_header\">%(x_nb)i Σχόλια"
 
 #: modules/webcomment/lib/webcomment_templates.py:124
 #, python-format
@@ -4362,16 +4368,16 @@ msgstr "Ξεκινήστε μια συζήτηση σχετικά με το έγ
 #: modules/webcomment/lib/webcomment_templates.py:180
 #, python-format
 msgid "Sorry, the record %s does not seem to exist."
-msgstr "Λυπάμαι, η εγγραφή %s δεν υπάρχει."
+msgstr "Λυπούμαστε, η εγγραφή %s δεν υπάρχει."
 
 #: modules/webcomment/lib/webcomment_templates.py:182
 #, python-format
 msgid "Sorry, %s is not a valid ID value."
-msgstr "Λυπάμαι, το %s δεν είναι έγκυρη τιμή ταυτότητας."
+msgstr "Λυπούμαστε, το %s δεν είναι έγκυρη τιμή ταυτότητας."
 
 #: modules/webcomment/lib/webcomment_templates.py:184
 msgid "Sorry, no record ID was provided."
-msgstr "Λυπάμαι, καμία ταυτότητα εγγράφου δεν δόθηκε."
+msgstr "Λυπούμαστε, δεν δόθηκε καμία ταυτότητα εγγραφής."
 
 #: modules/webcomment/lib/webcomment_templates.py:188
 #, python-format
@@ -4381,9 +4387,9 @@ msgstr "Πιθανόν να θέλετε να φυλλομετρήσετε απ�
 #: modules/webcomment/lib/webcomment_templates.py:244
 #: modules/webcomment/lib/webcomment_templates.py:704
 #: modules/webcomment/lib/webcomment_templates.py:714
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_nb)i comments for round \"%(x_name)s\""
-msgstr "%(x_name)s έγγραψε στις %(x_date)s:"
+msgstr "%(x_nb)i σχόλια για στάδιο \"%(x_name)s\""
 
 #: modules/webcomment/lib/webcomment_templates.py:267
 #: modules/webcomment/lib/webcomment_templates.py:763
@@ -4427,11 +4433,13 @@ msgid ""
 "<div class=\"webcomment_review_first_introduction\">Be the first to review "
 "this document.</div>"
 msgstr ""
+"<div class=\"webcomment_review_first_introduction\">Γίνετε ο πρώτος που θα  "
+"γράψει κριτική για αυτό το έγγραφο.</div>"
 
 #: modules/webcomment/lib/webcomment_templates.py:368
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_name)s"
-msgstr "σύνδεσμος στην %(x_sitename)s"
+msgstr "%(x_name)s"
 
 #: modules/webcomment/lib/webcomment_templates.py:375
 #: modules/webcomment/lib/webcomment_templates.py:764
@@ -4453,11 +4461,11 @@ msgstr "Χαρακτηρισμός σχολίου ως μη ενοχλητικό
 
 #: modules/webcomment/lib/webcomment_templates.py:418
 msgid "Attached file"
-msgstr ""
+msgstr "Συνημμένο αρχείο"
 
 #: modules/webcomment/lib/webcomment_templates.py:418
 msgid "Attached files"
-msgstr ""
+msgstr "Συνημμένα αρχεία"
 
 #: modules/webcomment/lib/webcomment_templates.py:484
 #, python-format
@@ -4465,10 +4473,10 @@ msgid "Reviewed by %(x_nickname)s on %(x_date)s"
 msgstr "Κρίθηκε από τον %(x_nickname)s στις %(x_date)s"
 
 #: modules/webcomment/lib/webcomment_templates.py:488
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_nb_people)s out of %(x_nb_total)s people found this review useful"
 msgstr ""
-"%(x_nb_people)i από %(x_nb_total)i ανθρώπους βρήκαν την κριτική αυτή χρήσιμη"
+"%(x_nb_people)s από %(x_nb_total)s ανθρώπους βρήκαν την κριτική αυτή χρήσιμη"
 
 #: modules/webcomment/lib/webcomment_templates.py:510
 msgid "Undelete review"
@@ -4581,7 +4589,8 @@ msgstr "Δεν έχετε δικαίωμα να σχολιάσετε ή να κ�
 #, python-format
 msgid "Note: Your nickname, %s, will be displayed as author of this comment."
 msgstr ""
-"Σημείωση: Το ψευδώνυμό %s θα εμφανίζεται σαν συγγραφέας του σχολίου αυτού."
+"Σημείωση: Το ψευδώνυμό σας, %s, θα εμφανίζεται ως συγγραφέας του σχολίου "
+"αυτού."
 
 #: modules/webcomment/lib/webcomment_templates.py:1136
 #: modules/webcomment/lib/webcomment_templates.py:1253
@@ -4596,31 +4605,30 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:1153
 msgid "Once logged in, authorized users can also attach files."
 msgstr ""
+"Αφού συνδεθούν, οι εξουσιοδοτημένοι χρήστες μπορούν επίσης να επισυνάψουν "
+"αρχεία."
 
 #: modules/webcomment/lib/webcomment_templates.py:1168
-#, fuzzy
 msgid "Optionally, attach a file to this comment"
-msgstr "Προαιρετικά, πρόσθεστε σημείωση στο στοιχείο αυτό"
+msgstr "Προαιρετικά, μπορείτε να επισυνάψετε ένα αρχείο σε αυτό το σχόλιο"
 
 #: modules/webcomment/lib/webcomment_templates.py:1169
-#, fuzzy
 msgid "Optionally, attach files to this comment"
-msgstr "Προαιρετικά, πρόσθεστε σημείωση στο στοιχείο αυτό"
+msgstr "Προαιρετικά, μπορείτε να επισυνάψετε αρχεία σε αυτό το σχόλιο"
 
 #: modules/webcomment/lib/webcomment_templates.py:1170
-#, fuzzy
 msgid "Max one file"
-msgstr "Προσθήκη νέου αρχείου"
+msgstr "Όριο ένα αρχείο"
 
 #: modules/webcomment/lib/webcomment_templates.py:1171
-#, fuzzy, python-format
+#, python-format
 msgid "Max %i files"
-msgstr "αρχείο(α)"
+msgstr "Όριο %i αρχεία"
 
 #: modules/webcomment/lib/webcomment_templates.py:1172
 #, python-format
 msgid "Max %(x_nb_bytes)s per file"
-msgstr ""
+msgstr "Όριο %(x_nb_bytes)s ανά αρχείο"
 
 #: modules/webcomment/lib/webcomment_templates.py:1187
 msgid "Send me an email when a new comment is posted"
@@ -4735,7 +4743,8 @@ msgstr "ID σχολίου:"
 #: modules/webcomment/lib/webcomment_templates.py:1517
 msgid "Or enter a record ID to list all the associated comments/reviews:"
 msgstr ""
-"Εναλλακτικά, εισάγετε ID εγγραφής για να εμφανίσετε τα σχόλια/κριτικές:"
+"Εναλλακτικά, εισάγετε την ταυτότητα εγγραφής για να εμφανίσετε τα σχετικά "
+"σχόλια/κριτικές:"
 
 #: modules/webcomment/lib/webcomment_templates.py:1518
 msgid "Record ID:"
@@ -4927,7 +4936,8 @@ msgstr "Ορίστε όλα τα ύποπτα σχόλια, ταξινομημέ
 #, python-format
 msgid "Here are all reviews for record %i, sorted by the most reported"
 msgstr ""
-"Όλες οι κριτικές για την εγγραφή %i, ταξινομημένες κατά αριθμό αναφορών"
+"Εδώ φαίνονται όλες οι κριτικές για την εγγραφή %i, ταξινομημένες κατά αριθμό "
+"αναφορών"
 
 #: modules/webcomment/lib/webcomment_templates.py:1945
 msgid "Show comments"
@@ -5008,9 +5018,8 @@ msgstr ""
 "%(CFG_SITE_SUPPORT_EMAIL)s>"
 
 #: modules/webcomment/lib/webcomment_templates.py:2219
-#, fuzzy
 msgid "Your comment will be lost."
-msgstr "Το σχόλιό σας έχει δημοσιευτεί επιτυχώς"
+msgstr "Το σχόλιό σας θα χαθεί."
 
 #: modules/webcomment/lib/webcomment_webinterface.py:261
 #: modules/webcomment/lib/webcomment_webinterface.py:493
@@ -5023,6 +5032,8 @@ msgid ""
 "The size of file \\\"%s\\\" (%s) is larger than maximum allowed file size "
 "(%s). Select files again."
 msgstr ""
+"Το μέγεθος του αρχείου \\\"%s\\\" (%s) είναι μεγαλύτερο από το μέγιστο "
+"επιτρεπόμενο όριο (%s). Επιλέξτε αρχεία ξανά."
 
 #: modules/webcomment/lib/webcomment_webinterface.py:476
 #: modules/websubmit/lib/websubmit_templates.py:2668
@@ -5032,19 +5043,16 @@ msgstr "Προσθήκη σχολίου"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:734
 #: modules/webcomment/lib/webcomment_webinterface.py:768
-#, fuzzy
 msgid "Page Not Found"
-msgstr "Η Σελίδα %s Δεν Βρέθηκε"
+msgstr "Η σελίδα δε βρέθηκε"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:735
-#, fuzzy
 msgid "The requested comment could not be found"
-msgstr "Η σελίδα που ζητήσατε, δεν υπάρχει"
+msgstr "Το συγκεκριμένο σχόλιο δεν υπάρχει"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:769
-#, fuzzy
 msgid "The requested file could not be found"
-msgstr "Η σελίδα που ζητήσατε, δεν υπάρχει"
+msgstr "Το αρχείο που ζητήσατε δεν υπάρχει"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:45
 #: modules/webcomment/web/admin/webcommentadmin.py:59
@@ -5104,13 +5112,12 @@ msgstr "Επαναφορά σχολίων"
 #: modules/webmessage/lib/webmessage.py:137
 #: modules/webmessage/lib/webmessage.py:203
 msgid "Sorry, this message in not in your mailbox."
-msgstr ""
+msgstr "Λυπούμαστε, αυτό το μήνυμα δε βρίσκεται στο γραμματοκιβώτιό σας."
 
 #: modules/webmessage/lib/webmessage.py:75
 #: modules/webmessage/lib/webmessage.py:219
-#, fuzzy
 msgid "This message does not exist."
-msgstr "Αυτή η εγγραφή δεν υπάρχει."
+msgstr "Αυτό το μήνυμα δεν υπάρχει."
 
 #: modules/webmessage/lib/webmessage.py:144
 msgid "The message could not be deleted."
@@ -5385,31 +5392,39 @@ msgid ""
 "Warning: full-text search is only available for a subset of papers mostly "
 "from 2006-2011."
 msgstr ""
+"Προειδοποίηση: η αναζήτηση πλήρους κειμένου είναι διαθέσιμη μόνο για ένα "
+"τμήμα δημοσιεύσεων, κυρίως από το 2006 μέχρι το 2011."
 
 #: modules/websearch/lib/search_engine.py:1947
 msgid ""
 "Warning: figure caption search is only available for a subset of papers "
 "mostly from 2008-2011."
 msgstr ""
+"Προειδοποίηση: η αναζήτηση λεζάντας διαγραμμάτων είναι διαθέσιμη μόνο για "
+"ένα τμήμα δημοσιεύσεων, κυρίως από το 2008 μέχρι το 2011."
 
 #: modules/websearch/lib/search_engine.py:1953
 #, python-format
 msgid "There is no index %s.  Searching for %s in all fields."
-msgstr ""
+msgstr "Δεν υπάρχει το ευρετήριο %s. Γίνεται αναζήτηση του %s σε όλα τα πεδία."
 
 #: modules/websearch/lib/search_engine.py:1957
 #, python-format
 msgid "Instead searching %s."
-msgstr ""
+msgstr "Αναζήτηση αντ'αυτού σε %s."
 
 #: modules/websearch/lib/search_engine.py:1963
 msgid "Search term too generic, displaying only partial results..."
 msgstr ""
+"Ο όρος αναζήτησης είναι πολύ γενικός. Εμφανίζεται ένα τμήμα των "
+"αποτελεσμάτων..."
 
 #: modules/websearch/lib/search_engine.py:1966
 msgid ""
 "No phrase index available for fulltext yet, looking for word combination..."
 msgstr ""
+"Δεν είναι διαθέσιμο κάποιο ευρετήριο για το πλήρες κείμενο, γίνεται "
+"αναζήτηση για συδυασμό λέξεων..."
 
 #: modules/websearch/lib/search_engine.py:2006
 #, python-format
@@ -5434,6 +5449,9 @@ msgid ""
 "Search syntax misunderstood. Ignoring all parentheses in the query. If this "
 "doesn't help, please check your search and try again."
 msgstr ""
+"Υπάρχει πρόβλημα στην σύνταξη των όρων αναζήτησης. Θα αγνοηθούν όλες οι "
+"παρενθέσεις στο ερώτημα.Αν δεν σας καλύπτει, ελέγξτε τους όρους αναζήτησης "
+"και δοκιμάστε ξανά."
 
 #: modules/websearch/lib/search_engine.py:2573
 #, python-format
@@ -5453,29 +5471,29 @@ msgstr ""
 "κλειστές συλλογές, παρακαλώ επιλέξτε τις στην αρχή."
 
 #: modules/websearch/lib/search_engine.py:2696
-#, fuzzy
 msgid "No match found, please enter different search terms."
-msgstr "Χρησιμοποιήστε διαφορετικά κριτήρια έρευνας."
+msgstr ""
+"Δεν βρέθηκε αποτέλεσμα, παρακαλώ εισάγετε διαφορετικά κριτήρια αναζήτησης."
 
 #: modules/websearch/lib/search_engine.py:2702
-#, fuzzy, python-format
+#, python-format
 msgid "There are no records referring to %s."
-msgstr "Δεν υπάρχουν αιτήσεις"
+msgstr "Δεν υπάρχουν εγγραφές που να αναφέρονται στο %s."
 
 #: modules/websearch/lib/search_engine.py:2704
-#, fuzzy, python-format
+#, python-format
 msgid "There are no records cited by %s."
-msgstr "Δεν υπάρχουν αιτήσεις"
+msgstr "Δεν υπάρχουν εγγραφές που να παραπέμπονται από το %s."
 
 #: modules/websearch/lib/search_engine.py:2709
 #, python-format
 msgid "No word index is available for %s."
-msgstr "Δεν υπάρχει ευρετήριο λέξεων για %s."
+msgstr "Δεν υπάρχει ευρετήριο λέξεων για το %s."
 
 #: modules/websearch/lib/search_engine.py:2720
 #, python-format
 msgid "No phrase index is available for %s."
-msgstr "Δεν υπάρχει ευρετήριο φράσεων για %s."
+msgstr "Δεν υπάρχει ευρετήριο φράσεων για το %s."
 
 #: modules/websearch/lib/search_engine.py:2767
 #, python-format
@@ -5500,8 +5518,8 @@ msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
 "sort order."
 msgstr ""
-"Λυπάμαι, ταξινόμηση επιτρέπεται σε σετ των %d εγγραφών το πολύ. Θα γίνει "
-"χρήση της της εξ΄ορισμού ταξινόμησης."
+"Λυπούμαστε, η ταξινόμηση επιτρέπεται σε σετ των %d εγγραφών το πολύ. Θα "
+"γίνει χρήση της της εξ΄ορισμού ταξινόμησης."
 
 #: modules/websearch/lib/search_engine.py:3510
 #, python-format
@@ -5509,7 +5527,7 @@ msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
 "instead."
 msgstr ""
-"Λυπάμαι, η '%s' δεν είναι έγκυρη επιλογή ταξινόμησης. Έγινε επιλογή της "
+"Λυπούμαστε, η '%s' δεν είναι έγκυρη επιλογή ταξινόμησης. Έγινε επιλογή της "
 "ταξινόμησης κατά τίτλο."
 
 #: modules/websearch/lib/search_engine.py:3703
@@ -5563,13 +5581,12 @@ msgid "Usage statistics"
 msgstr "Στατιστικά χρήσης"
 
 #: modules/websearch/lib/websearchadminlib.py:3399
-#, fuzzy
 msgid "Files"
-msgstr "Αρχείο"
+msgstr "Αρχεία"
 
 #: modules/websearch/lib/websearchadminlib.py:3400
 msgid "Plots"
-msgstr ""
+msgstr "Διαγράμματα"
 
 #: modules/websearch/lib/websearchadminlib.py:3401
 msgid "Holdings"
@@ -5879,7 +5896,7 @@ msgstr "Η Συλλογή %s Δεν Βρέθηκε"
 #: modules/websearch/lib/websearch_webinterface.py:1576
 #, python-format
 msgid "Sorry, collection %s does not seem to exist."
-msgstr "Λυπάμαι, η συλλογή %s δεν υπάρχει."
+msgstr "Λυπούμαστε, η συλλογή %s δεν υπάρχει."
 
 #: modules/websearch/lib/websearch_templates.py:3616
 #: modules/websearch/lib/websearch_webinterface.py:1577
@@ -5910,16 +5927,15 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3746
 #: modules/websearch/lib/websearch_templates.py:3796
-#, fuzzy
 msgid "Back to search"
-msgstr "Επιστροφή στα αποτελέσματα αναζήτησης"
+msgstr "Επιστροφή στην αναζήτηση"
 
 #: modules/websearch/lib/websearch_templates.py:3756
 #: modules/websearch/lib/websearch_templates.py:3772
 #: modules/websearch/lib/websearch_templates.py:3787
 #, python-format
 msgid "%s of"
-msgstr ""
+msgstr "%s από"
 
 #: modules/websearch/lib/websearch_templates.py:3886
 msgid "People who downloaded this document also downloaded:"
@@ -5946,79 +5962,69 @@ msgstr "... εκ των οποίων αυτο-αναφορές: %s εγγραφ�
 
 #: modules/websearch/lib/websearch_templates.py:4157
 msgid "Name variants"
-msgstr ""
+msgstr "Παραλλαγές του ονόματος"
 
 #: modules/websearch/lib/websearch_templates.py:4168
 msgid "No Name Variants"
-msgstr ""
+msgstr "Δεν υπάρχουν παραλλαγές του ονόματος"
 
 #: modules/websearch/lib/websearch_templates.py:4176
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:763
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:920
-#, fuzzy
 msgid "Papers"
-msgstr "Δημοσιεύσεις:"
+msgstr "Δημοσιεύσεις"
 
 #: modules/websearch/lib/websearch_templates.py:4180
 msgid "downloaded"
-msgstr "έγιναν download"
+msgstr "κατέβηκαν"
 
 #: modules/websearch/lib/websearch_templates.py:4181
 msgid "times"
 msgstr "φορές"
 
 #: modules/websearch/lib/websearch_templates.py:4210
-#, fuzzy
 msgid "No Papers"
-msgstr "Δημοσιεύσεις:"
+msgstr "Χωρίς Δημοσιεύσεις"
 
 #: modules/websearch/lib/websearch_templates.py:4223
-#, fuzzy
 msgid "unknown affiliation"
-msgstr "Άγνωστη ενέργεια"
+msgstr "άγνωστο affiliation"
 
 #: modules/websearch/lib/websearch_templates.py:4230
-#, fuzzy
 msgid "No Affiliations"
-msgstr "Affiliations:"
+msgstr "Χωρίς affiliations"
 
 #: modules/websearch/lib/websearch_templates.py:4232
-#, fuzzy
 msgid "Affiliations"
-msgstr "Affiliations:"
+msgstr "Affiliations"
 
 #: modules/websearch/lib/websearch_templates.py:4248
-#, fuzzy
 msgid "No Keywords"
-msgstr "Λέξεις κλειδιά"
+msgstr "Χωρίς λέξεις-κλειδιά"
 
 #: modules/websearch/lib/websearch_templates.py:4251
-#, fuzzy
 msgid "Frequent keywords"
-msgstr "Συχνά χρησιμοποιούμενες λέξεις-κλειδιά:"
+msgstr "Συχνά χρησιμοποιούμενες λέξεις-κλειδιά"
 
 #: modules/websearch/lib/websearch_templates.py:4256
-#, fuzzy
 msgid "Frequent co-authors"
-msgstr "Συχνά χρησιμοποιούμενοι συγγραφείς:"
+msgstr "Συχνά εμφανιζόμενοι προσθετοι συγγραφείς"
 
 #: modules/websearch/lib/websearch_templates.py:4267
-#, fuzzy
 msgid "No Frequent Co-authors"
-msgstr "Συχνά χρησιμοποιούμενοι συγγραφείς:"
+msgstr "Κανένας συχνά εμφανιζόμενος πρόσθετος συγγραφέα"
 
 #: modules/websearch/lib/websearch_templates.py:4291
 msgid "This is me.  Verify my publication list."
-msgstr ""
+msgstr "Είμαι εγώ. Επιβεβαιώστε την λίστα δημοσιευμάτων μου."
 
 #: modules/websearch/lib/websearch_templates.py:4330
 msgid "Citations:"
 msgstr "Παραπομπές:"
 
 #: modules/websearch/lib/websearch_templates.py:4334
-#, fuzzy
 msgid "No Citation Information available"
-msgstr "Δεν υπάρχει διαθέσιμη πληροφορία"
+msgstr "Δεν υπάρχουν διαθέσιμες πληροφορίες για παραπομπές"
 
 #: modules/websearch/lib/websearch_templates.py:4401
 msgid "Citation summary results"
@@ -6037,23 +6043,20 @@ msgid "Average citations per paper:"
 msgstr "Μέσος αριθμός παραπομπών ανά άρθρο:"
 
 #: modules/websearch/lib/websearch_templates.py:4444
-#, fuzzy
 msgid "Total number of citations excluding self-citations:"
-msgstr "Συνολικός αριθμός παραπομπών:"
+msgstr "Συνολικός αριθμός παραπομπών χωρίς αυτοαναφορές:"
 
 #: modules/websearch/lib/websearch_templates.py:4449
-#, fuzzy
 msgid "Average citations per paper excluding self-citations:"
-msgstr "Μέσος αριθμός παραπομπών ανά άρθρο:"
+msgstr "Μέσος αριθμός παραπομπών ανά άρθρο χωρίς αυτοαναφορές:"
 
 #: modules/websearch/lib/websearch_templates.py:4458
 msgid "Breakdown of papers by citations:"
 msgstr "Ανάλυση των άρθρων με βάση τις παραπομπές:"
 
 #: modules/websearch/lib/websearch_templates.py:4492
-#, fuzzy
 msgid "Additional Citation Metrics"
-msgstr "Επιπλέον λεπτομέρειες"
+msgstr "Πρόσθετα στατιστικά αναφορών"
 
 #: modules/websearch/lib/websearch_webinterface.py:735
 #: modules/websearch/lib/websearch_webinterface.py:747
@@ -6062,11 +6065,15 @@ msgid ""
 "We're sorry. The requested author \"%s\" seems not to be listed on the "
 "specified paper."
 msgstr ""
+"Λυπούμαστε. Ο συγγραφέας \"%s\" που ζητήσατε, δεν εμφανίζεται στο "
+"συγκεκριμένο άρθρο."
 
 #: modules/websearch/lib/websearch_webinterface.py:738
 #: modules/websearch/lib/websearch_webinterface.py:750
 msgid "Please try the following link to start a broader search on the author: "
 msgstr ""
+"Παρακαλώ δοκιμάστε τον παρακάτω σύνδεσμο για να διεξάγετε μια ευρύτερη "
+"αναζήτηση για τον συγγραφέα: "
 
 #: modules/websearch/lib/websearch_webinterface.py:1163
 msgid "You are not authorized to view this area."
@@ -6416,7 +6423,7 @@ msgid ""
 msgstr ""
 "Με τα καλάθια μπορείτε να ορίζεσε συγκεκριμένες συλλογές αντικειμένων και να "
 "αποθηκεύετε χρήσιμες εγγραφές για να τις προσπελάσετε αργότερα ή να τις "
-"μοιραστείτε με άλλους. "
+"μοιραστείτε με άλλους."
 
 #: modules/websession/lib/websession_templates.py:475
 msgid ""
@@ -6516,7 +6523,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:644
 msgid "Your Tickets"
-msgstr ""
+msgstr "Τα tickets μου"
 
 #: modules/websession/lib/websession_templates.py:646
 #: modules/websession/lib/websession_webinterface.py:625
@@ -6754,9 +6761,8 @@ msgid "You are enabled to the following roles: %(x_role)s."
 msgstr "Έχετε ενεργοποιηθεί για τους ακόλουθους ρόλους: %(x_role)s."
 
 #: modules/websession/lib/websession_templates.py:1098
-#, fuzzy
 msgid "Run BibSword Client"
-msgstr "Εκτέλεση BibEdit"
+msgstr "Εκτέλεση του BibSword Client"
 
 #: modules/websession/lib/websession_templates.py:1125
 msgid "Here are some interesting web admin links for you:"
@@ -6987,6 +6993,12 @@ msgid ""
 "\n"
 "Best regards.\n"
 msgstr ""
+"Χαίρετε:\n"
+"\n"
+"Ενδεχομένως να ενδιαφέρεστε να συμμετέχετε στο γκρουπ \"%(x_name)s\".\n"
+"Μπορείτε να εγγραφείτε κάνοντας κλικ εδώ:  %(x_url)s.\n"
+"\n"
+"Με φιλικούς χαιρετισμούς.\n"
 
 #: modules/websession/lib/websession_templates.py:2074
 #, python-format
@@ -7098,18 +7110,25 @@ msgid ""
 "Warning: The password set for MySQL root user is the same as the default "
 "Invenio password. For security purposes, you may want to change the password."
 msgstr ""
+"Προειδοποίηση: Ο κωδικός της MySQL για τον χρήστη root είναι ίδιος με τον "
+"προκαθορισμένο κωδικό του Invenio. Για λόγους ασφαλείας, προτείνουμε να "
+"αλλάξετε τον κωδικό."
 
 #: modules/websession/lib/websession_templates.py:2442
 msgid ""
 "Warning: The password set for the Invenio MySQL user is the same as the "
 "shipped default. For security purposes, you may want to change the password."
 msgstr ""
+"Προειδοποίηση: Ο κωδικός της MySQL για τον χρήστη του invenio είναι ίδιος με "
+"τον προκαθορισμένο.Για λόγους ασφαλείας, προτείνουμε να αλλάξετε τον κωδικό."
 
 #: modules/websession/lib/websession_templates.py:2448
 msgid ""
 "Warning: The password set for the Invenio admin user is currently empty. For "
 "security purposes, it is strongly recommended that you add a password."
 msgstr ""
+"Προειδοποίηση: Ο κωδικός για τον διαχειριστή του Invenio είναι κενός. Για "
+"λόγους ασφαλείας, προτείνουμε να εισάγετε κάποιο κωδικό."
 
 #: modules/websession/lib/websession_templates.py:2454
 msgid ""
@@ -7117,9 +7136,11 @@ msgid ""
 "info@invenio-software.org. It is recommended that you change this to your "
 "own address."
 msgstr ""
+"Προειδοποίηση: Η διεύθυνση του email για το υποστήριξη του συστήματος είναι "
+"επί του παρόντος το info@invenio-software.org. Προτείνεται να την αλλάξετε "
+"και να εισάγετε την δική σας διεύθυνση."
 
 #: modules/websession/lib/websession_templates.py:2460
-#, fuzzy
 msgid ""
 "A newer version of Invenio is available for download. You may want to visit  "
 msgstr ""
@@ -7131,6 +7152,8 @@ msgid ""
 "Cannot download or parse release notes from http://invenio-software.org/repo/"
 "invenio/tree/RELEASE-NOTES"
 msgstr ""
+"Δεν είναι δυνατό να κατέβουν και να αναλυθούν οι σημειώσεις έκδοσης από το "
+"http://invenio-software.org/repo/invenio/tree/RELEASE-NOTES"
 
 #: modules/websession/lib/webuser.py:149
 msgid "Database problem"
@@ -7442,7 +7465,7 @@ msgstr "Οι ρυθμίσεις χρήστη αποθηκεύτηκαν με ε�
 
 #: modules/websession/lib/websession_webinterface.py:487
 msgid "Editing bibcatalog authorization failed"
-msgstr ""
+msgstr "Η επεξεργασία της εξουσιοδότησης για το bibcatalog απέτυχε"
 
 #: modules/websession/lib/websession_webinterface.py:488
 msgid "Empty username or password"
@@ -7587,7 +7610,7 @@ msgstr "Το πρόβλημα καταγράφηκε και θα ληφθεί υ
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:733
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:765
 msgid "Your tickets"
-msgstr ""
+msgstr "Τα tickets μου"
 
 #: modules/websession/lib/websession_webinterface.py:1015
 #: modules/websession/lib/websession_webinterface.py:1056
@@ -7616,42 +7639,35 @@ msgstr "Τροποποίηση μελών ομάδας"
 
 #: modules/websession/lib/webgroup.py:158
 #: modules/websession/lib/webgroup.py:432
-#, fuzzy
 msgid "Please enter a group name."
-msgstr "Παρακαλώ εισάγετε όνομα χρήστη ή ομάδας."
+msgstr "Παρακαλώ εισάγετε όνομα ομάδας."
 
 #: modules/websession/lib/webgroup.py:168
 #: modules/websession/lib/webgroup.py:442
-#, fuzzy
 msgid "Please enter a valid group name."
-msgstr "Παρακαλώ εισάγετε όνομα χρήστη ή ομάδας."
+msgstr "Παρακαλώ εισάγετε ένα έγκυρο όνομα ομάδας."
 
 #: modules/websession/lib/webgroup.py:178
 #: modules/websession/lib/webgroup.py:452
-#, fuzzy
 msgid "Please choose a group join policy."
-msgstr "Παρακαλώ επιλέξτε μια κατηγορία"
+msgstr "Παρακαλώ επιλέξτε μια πολιτική ένταξης στην ομάδα."
 
 #: modules/websession/lib/webgroup.py:188
 #: modules/websession/lib/webgroup.py:462
-#, fuzzy
 msgid "Group name already exists. Please choose another group name."
-msgstr "Ένα αρχείο με όνομα %s υπάρχει ήδη. Παρακαλώ επιλέξτε ένα άλλο όνομα."
+msgstr "Το όνομα της ομάδας υπάρχει ήδη. Παρακαλώ επιλέξτε ένα άλλο όνομα."
 
 #: modules/websession/lib/webgroup.py:260
-#, fuzzy
 msgid "You are already member of the group."
-msgstr "Δεν είστε μέλος κάποιας ομάδας."
+msgstr "Είστε ήδη μέλος αυτής της ομάδας."
 
 #: modules/websession/lib/webgroup.py:302
-#, fuzzy
 msgid "Please select only one group."
-msgstr "Παρακαλώ επιλέξτε ένα ή περισσότερα"
+msgstr "Παρακαλώ επιλέξτε μόνο μια ομάδα."
 
 #: modules/websession/lib/webgroup.py:359
-#, fuzzy
 msgid "Please select one group."
-msgstr "Παρακαλώ επιλέξτε ένα ή περισσότερα"
+msgstr "Παρακαλώ επιλέξτε μια ομάδα."
 
 #: modules/websession/lib/webgroup.py:384
 #: modules/websession/lib/webgroup.py:399
@@ -7662,43 +7678,41 @@ msgstr "Παρακαλώ επιλέξτε ένα ή περισσότερα"
 #: modules/websession/lib/webgroup.py:644
 #: modules/websession/lib/webgroup.py:711
 msgid "Sorry, there was an error with the database."
-msgstr ""
+msgstr "Λυπούμαστε, υπήρξε κάποιο σφάλμα με την βάση δεδομένων."
 
 #: modules/websession/lib/webgroup.py:391
 #: modules/websession/lib/webgroup.py:562
-#, fuzzy
 msgid "Sorry, you do not have sufficient rights on this group."
-msgstr "Δεν έχετε τα απαιτούμενα δικαιώματα για να δείτε το στοιχείο αυτό."
+msgstr "Δεν έχετε τα απαιτούμενα δικαιώματα για αυτή την ομάδα."
 
 #: modules/websession/lib/webgroup.py:499
-#, fuzzy
 msgid "The group has already been deleted."
-msgstr "Η εγγραφή έχει διαγραφεί."
+msgstr "Η ομάδα έχει ήδη διαγραφεί."
 
 #: modules/websession/lib/webgroup.py:611
 msgid "Please choose a member if you want to remove him from the group."
-msgstr ""
+msgstr "Παρακαλώ επιλέξτε ένα μέλος για να το διαγράψετε από την ομάδα."
 
 #: modules/websession/lib/webgroup.py:651
 msgid ""
 "Please choose a user from the list if you want him to be added to the group."
 msgstr ""
+"Παρακαλώ επιλέξτε έναν χρήστη από την λίστα αν θέλετε να προστεθεί στην "
+"ομάδα."
 
 #: modules/websession/lib/webgroup.py:664
-#, fuzzy
 msgid "The user is already member of the group."
-msgstr "Δεν είστε μέλος κάποιας ομάδας."
+msgstr "Ο χρήστης είναι ήδη μέλλος της ομάδας."
 
 #: modules/websession/lib/webgroup.py:718
 msgid ""
 "Please choose a user from the list if you want him to be removed from "
 "waiting list."
-msgstr ""
+msgstr "Παρακαλώ επιλέξτε ένα μέλος για να αφαιρέσετε από την λίστα αναμονής."
 
 #: modules/websession/lib/webgroup.py:731
-#, fuzzy
 msgid "The user request for joining group has already been rejected."
-msgstr "Το αίτημα σας για προσχώρηση στην ομάδα %s, απορρίφθηκε."
+msgstr "Το αίτημα για προσχώρηση στην ομάδα έχει ήδη απορριφθεί."
 
 #: modules/webstyle/lib/webstyle_templates.py:86
 #: modules/webstyle/lib/webstyle_templates.py:95
@@ -7768,9 +7782,8 @@ msgstr "Παρακαλώ επικοινωνήστε με τον %s αναφέρ�
 
 #: modules/webstyle/lib/webstyle_templates.py:728
 #: modules/websubmit/lib/websubmit_templates.py:1231
-#, fuzzy
 msgid "Restricted"
-msgstr "περιορισμένο"
+msgstr "Περιορισμένο"
 
 #: modules/webstyle/lib/webstyle_templates.py:848
 #, python-format
@@ -7838,7 +7851,7 @@ msgstr "Η Σελίδα %s Δεν Βρέθηκε"
 #: modules/webstyle/lib/webdoc_webinterface.py:187
 #, python-format
 msgid "Sorry, page %s does not seem to exist."
-msgstr "Λυπάμαι, η σελίδα %s δεν υπάρχει."
+msgstr "Λυπούμαστε, η σελίδα %s δεν υπάρχει."
 
 #: modules/webstyle/lib/webdoc_webinterface.py:190
 #, python-format
@@ -7864,6 +7877,8 @@ msgid ""
 "The file you want to edit is protected against modifications. Your action "
 "has not been applied"
 msgstr ""
+"Το αρχείο που προσπαθείτε να τροποποιήσετε, προστατεύεται από τις αλλαγές. Η "
+"ενέργειά σας δεν εφαρμόστηκε."
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:562
 #, python-format
@@ -7969,6 +7984,8 @@ msgstr "Αποθήκευση αλλαγών"
 #, python-format
 msgid "Need help revising or adding files to record %(recid)s"
 msgstr ""
+"Χρειάζεται η συνδρομή σας για ενημέρωση και προσθήκη αρχείων στην εγγραφή "
+"%(recid)s"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:897
 #, python-format
@@ -8043,7 +8060,8 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_engine.py:797
 #: modules/websubmit/web/yoursubmissions.py:61
 msgid "Sorry, you must log in to perform this action."
-msgstr "Λυπάμαι, πρέπει να κάνετε login για να εκτελέσετε την λειτουργία αυτή."
+msgstr ""
+"Λυπούμαστε, πρέπει να κάνετε login για να εκτελέσετε την λειτουργία αυτή."
 
 #: modules/websubmit/lib/websubmit_engine.py:186
 #: modules/websubmit/lib/websubmit_engine.py:804
@@ -8124,6 +8142,10 @@ msgid ""
 "inserted into the form</em> (e.g. by copy and pasting some text from a PDF "
 "file)."
 msgstr ""
+"Εντοπίστηκε ένα σημαντικό σφάλμα. Οι διαχειριστές έχουν ειδοποιηθεί. <br /"
+"><em>Λάβετε υπόψη σας οτι το σφάλμα μπορεί να οφείλεται σε προβληματικούς "
+"χαρακτήρες που εισήχθησαν στην φόρμα</em> (πχ από αντιγραφή και επικόλληση "
+"από κάποιο αρχείο PDF)."
 
 #: modules/websubmit/lib/websubmit_engine.py:1384
 #, python-format
@@ -8792,10 +8814,11 @@ msgstr "Η πρόσβαση στο αρχείο αυτό είναι περιορ
 #: modules/websubmit/lib/websubmit_webinterface.py:228
 msgid "An error has happened in trying to stream the request file."
 msgstr ""
+"Παρουσιάστηκε σφάλμα στην προσπάθεια να γίνει stream το ζητούμενο αρχείο."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:231
 msgid "The requested file is hidden and can not be accessed."
-msgstr ""
+msgstr "Το ζητούμενο αρχείο είναι κρυμμένο και δεν μπορεί να προσπελαστεί."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:238
 msgid "Requested file does not seem to exist."
@@ -8807,7 +8830,7 @@ msgstr "Πρόσβαση στο πλήρες κείμενο"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:321
 msgid "An error has happened in trying to retrieve the requested file."
-msgstr ""
+msgstr "Παρουσιάστηκε σφάλμα στην προσπάθεια να ανακτηθεί το ζητούμενο αρχείο."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:323
 msgid "Not enough information to retrieve the document"
@@ -8815,7 +8838,7 @@ msgstr "Δεν υπάρχουν αρκετές πληροφορίες για τ�
 
 #: modules/websubmit/lib/websubmit_webinterface.py:331
 msgid "An error has happened in trying to retrieving the requested file."
-msgstr ""
+msgstr "Παρουσιάστηκε σφάλμα στην προσπάθεια να ανακτηθεί το ζητούμενο αρχείο."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:383
 msgid "Manage Document Files"
@@ -8856,15 +8879,15 @@ msgstr "Ακύρωση όλων των αλλαγών"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:1171
 msgid "Sorry, 'sub' parameter missing..."
-msgstr ""
+msgstr "Λυπούμαστε, η παράμετρος 'sub' λείπει..."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:1174
 msgid "Sorry. Cannot analyse parameter"
-msgstr "Λυπάμαι. Αδύνατον να αναλυθεί η παράμετρος"
+msgstr "Λυπούμαστε. Αδύνατον να αναλυθεί η παράμετρος"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:1235
 msgid "Sorry, invalid URL..."
-msgstr "Λυπάμαι, μη έγκυρο URL..."
+msgstr "Λυπούμαστε, μη έγκυρο URL..."
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3902
 #, python-format
@@ -8872,6 +8895,8 @@ msgid ""
 "Unable to move field at position %s to position %s on page %s of submission "
 "'%s%s' - Invalid Field Position Numbers"
 msgstr ""
+"Αδυναμία μετακίνησης του πεδίου από την θέση %s στην θέση %s στην σελίδα %s "
+"της υποβολής '%s%s' - Μη έγκυρες θέσεις πεδίου"
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3913
 #, python-format
@@ -8880,6 +8905,9 @@ msgid ""
 "submission %s - could not move field at position %s to temporary field "
 "location"
 msgstr ""
+"Αδυναμία ανταλλαγής του πεδίου από την θέση %s στην θέση %s στην σελίδα %s "
+"της υποβολής %s - δεν ήταν δυνατό να μετακινηθεί το πεδίο από την θέση %s σε "
+"προσωρινή θέση"
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3924
 #, python-format
@@ -8888,6 +8916,10 @@ msgid ""
 "submission %s - could not move field at position %s to position %s. Please "
 "ask Admin to check that a field was not stranded in a temporary position"
 msgstr ""
+"Αδυναμία ανταλλαγής του πεδίου από την θέση %s στην θέση %s στην σελίδα %s "
+"της υποβολής %s - δεν ήταν δυνατό να μετακινηθεί το πεδίο από την θέση %s "
+"στην θέση %s. Παρακαλώ ζητήστε από τους διαχειριστές να ελέγξουν αν κάποιο "
+"πεδίο δεν χάθηκε σε κάποια προσωρινή θέση"
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3935
 #, python-format
@@ -8897,6 +8929,10 @@ msgid ""
 "position %s from temporary position. Field is now stranded in temporary "
 "position and must be corrected manually by an Admin"
 msgstr ""
+"Αδυναμία ανταλλαγής του πεδίου από την θέση %s στην θέση %s στην σελίδα %s "
+"της υποβολής %s - δεν ήταν δυνατό να μετακινηθεί το πεδίο της θέσης %s στην "
+"θέση %s από την προσωρινή θέση. Το πεδίο είναι τώρα χαμένο σε μια προσωρινή "
+"θέση και πρέπει να ελεγχθεί από κάποιον διαχειριστή"
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3946
 #, python-format
@@ -8905,6 +8941,10 @@ msgid ""
 "%s - could not decrement the position of the fields below position %s. Tried "
 "to recover - please check that field ordering is not broken"
 msgstr ""
+"Αδυναμία μετακίνησης του πεδίου από την θέση %s στην θέση %s στην σελίδα %s "
+"της υποβολής %s - δεν ήταν δυνατό να μειωθεί η θέση των πεδίων κάτω από την "
+"θέση %s. Έγινε προσπάθεια ανάκτησης - παρακαλώ ελέγξτε οτι η σειρά της "
+"αρίθμησης δεν έχει χαλάσει"
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3957
 #, python-format
@@ -8914,28 +8954,34 @@ msgid ""
 "%s. The field that was at position %s is now stranded in a temporary "
 "position."
 msgstr ""
+"Αδυναμία μετακίνησης του πεδίου από την θέση %s στην θέση %s στην σελίδα %s "
+"της υποβολής %s%s - δεν ήταν δυνατό να αυξηθεί η θέση των πεδίων κάτω από "
+"την θέση %s. Το πεδίο που ήταν στην θέση %s είναι τώρα χαμένο σε μια "
+"προσωρινή θέση."
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3968
 #, python-format
 msgid ""
 "Moved field from position %s to position %s on page %s of submission '%s%s'."
 msgstr ""
+"Μετακινήθηκε το πεδίο από την θέση %s στην θέση %s στην σελίδα %s της "
+"υποβολής '%s%s'."
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3989
-#, fuzzy, python-format
+#, python-format
 msgid "Unable to delete field at position %s from page %s of submission '%s'"
 msgstr ""
-"Δεν είναι δυνατόν να προσδιορισθεί ο αριθμός των σελίδων που υποβάλετε."
+"Αδύνατο να διαγραφεί το πεδίο στην θέση %s της σελίδας %s της υποβολής '%s'"
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3999
-#, fuzzy, python-format
+#, python-format
 msgid "Unable to delete field at position %s from page %s of submission '%s%s'"
 msgstr ""
-"Δεν είναι δυνατόν να προσδιορισθεί ο αριθμός των σελίδων που υποβάλετε."
+"Αδύνατο να διαγραφεί το πεδίο στην θέση %s της σελίδας %s της υποβολής '%s%s'"
 
 #: modules/websubmit/web/approve.py:55
 msgid "approve.py: cannot determine document reference"
-msgstr ""
+msgstr "approve.py: δεν μπορεί να καθοριστεί αναφορά αρχείου"
 
 #: modules/websubmit/web/approve.py:58
 msgid "approve.py: cannot find document in database"
@@ -8943,7 +8989,7 @@ msgstr "approve.py: δεν μπορεί να βρεθεί το αρχείο στ
 
 #: modules/websubmit/web/approve.py:72
 msgid "Sorry parameter missing..."
-msgstr "Λυπάμαι, κάποια παράμετρος λείπει..."
+msgstr "Λυπούμαστε, κάποια παράμετρος λείπει..."
 
 #: modules/websubmit/web/publiline.py:133
 msgid "Document Approval Workflow"
@@ -9260,7 +9306,7 @@ msgstr "Η κατηγορία %(category_name)s δεν υπάρχει"
 #: modules/webjournal/lib/webjournal_config.py:531
 msgid "Sorry, this category does not exist for this journal and issue."
 msgstr ""
-"Λυπάμαι, η κατηγορία αυτή δεν υπάρχει για το συγκεκριμένο περιοδικό και "
+"Λυπούμαστε, η κατηγορία αυτή δεν υπάρχει για το συγκεκριμένο περιοδικό και "
 "τεύχος"
 
 #: modules/webjournal/lib/webjournaladminlib.py:350
@@ -9301,9 +9347,9 @@ msgid "Edit Settings"
 msgstr "Αλλαγή ρυθμίσεων"
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:43
-#, fuzzy, python-format
+#, python-format
 msgid "You have %i tickets."
-msgstr "Έχετε ορίσει %s ειδοποιήσεις."
+msgstr "Έχετε %i tickets."
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:62
 msgid "show"
@@ -9342,12 +9388,12 @@ msgstr "Τι νέο υπάρχει"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py:224
 msgid "Under the CERN sky"
-msgstr ""
+msgstr "Κάτω από τον ουρανό του CERN"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_article_author.py:48
 #, python-format
 msgid "About your article at %(url)s"
-msgstr ""
+msgstr "Σχετικά με το άρθρο σας στο %(url)s"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_imprint.py:122
 msgid "Issue No."
@@ -9396,24 +9442,23 @@ msgstr "Γενικές πληροφορίες"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:94
 msgid "Announcements"
-msgstr ""
+msgstr "Ανακοινώσεις"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:95
-#, fuzzy
 msgid "Training"
-msgstr "Προειδοποίηση"
+msgstr "Εκπαίδευση"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:96
 msgid "Events"
-msgstr ""
+msgstr "Συμβάντα"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:97
 msgid "Staff Association"
-msgstr ""
+msgstr "Σύλλογος Προσωπικού"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:106
 msgid "Archive"
-msgstr ""
+msgstr "Αρχείο"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:133
 msgid "Select Year:"
@@ -9433,7 +9478,7 @@ msgstr "Συγκριση μεταξύ δύο αναθεωρήσεων της ε�
 
 #: modules/bibedit/lib/bibedit_webinterface.py:192
 msgid "Failed to create a ticket"
-msgstr ""
+msgstr "Αδυναμία δημιουργίας ticket"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:313
 msgid "Next Step"
@@ -9444,14 +9489,12 @@ msgid "Search criteria"
 msgstr "Κριτήρια Αναζήτησης"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:315
-#, fuzzy
 msgid "Output tags"
-msgstr "Μορφή Εξόδου"
+msgstr "Πεδία εξόδου"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:316
-#, fuzzy
 msgid "Filter collection"
-msgstr "συλλογή"
+msgstr "Φιλτράρισμα συλλογής"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:317
 msgid "1. Choose search criteria"
@@ -9468,9 +9511,8 @@ msgstr ""
 "εγγραφές θα φιλτραριστούν χρησιμοποιώντας τα συγκεκριμένα κριτήρια."
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:320
-#, fuzzy
 msgid "Preview results"
-msgstr "Προεπισκόπιση Αποτελεσμάτων"
+msgstr "Προεπισκόπιση αποτελεσμάτων"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:552
 msgid "2. Define changes"
@@ -9485,19 +9527,16 @@ msgstr ""
 "εγγραφή που ταιριάζει με τα κριτήρια της αναζήτησης."
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:554
-#, fuzzy
 msgid "Define new field action"
-msgstr "Ορισμός ενέργειας πεδίου"
+msgstr "Ορισμός ενέργειας νέου πεδίου"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:555
-#, fuzzy
 msgid "Define new subfield action"
-msgstr "Ορισμός ενέργειας υποπεδίου"
+msgstr "Ορισμός ενέργειας νέου υποπεδίου"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:557
-#, fuzzy
 msgid "Select action"
-msgstr "Επιλέξτε μια βαθμολογία"
+msgstr "Επιλογή ενέργειας"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:558
 msgid "Add field"
@@ -9528,23 +9567,20 @@ msgid "Save"
 msgstr "Αποθήκευση"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:565
-#, fuzzy
 msgid "Replace substring"
-msgstr "Αντικατάσταση περιεχομένου"
+msgstr "Αντικατάσταση τμήματος κειμένου"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:566
-#, fuzzy
 msgid "Replace full content"
-msgstr "Αντικατάσταση περιεχομένου"
+msgstr "Αντικατάσταση όλου του περιεχομένου"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:567
 msgid "with"
 msgstr "με"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:568
-#, fuzzy
 msgid "when subfield $$"
-msgstr "Προσθήκη υποπεδίου"
+msgstr "όταν το υποπεδίο $$"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:569
 msgid "new value"
@@ -9552,30 +9588,27 @@ msgstr "νέα τιμή"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:570
 msgid "is equal to"
-msgstr ""
+msgstr "είναι ίσο με"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:571
 msgid "contains"
-msgstr ""
+msgstr "περιλαμβάνει"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:572
-#, fuzzy
 msgid "condition"
-msgstr "Έκδοση"
+msgstr "προϋπόθεση"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:573
-#, fuzzy
 msgid "when other subfield"
-msgstr "Προσθήκη υποπεδίου"
+msgstr "όταν άλλο υποπεδίο"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:574
-#, fuzzy
 msgid "when subfield"
-msgstr "Προσθήκη υποπεδίου"
+msgstr "όταν το υποπεδίο"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:575
 msgid "Apply only to specific field instances"
-msgstr ""
+msgstr "Να εφαρμοστεί μόνο σε συγκεκριμένες εμφανίσεις του πεδίου"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:576
 msgid "value"
@@ -9594,7 +9627,7 @@ msgstr "βρέθηκαν εγγραφές"
 
 #: modules/bibedit/lib/bibeditmulti_webinterface.py:102
 msgid "Multi-Record Editor"
-msgstr ""
+msgstr "Επεξεργαστής πολλαπλών εγγραφών"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:116
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:132
@@ -9625,7 +9658,7 @@ msgstr "Νέο"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:196
 msgid "Last run"
-msgstr "Τελευταία Εκτέλεση"
+msgstr "Τελευταία εκτέλεση"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:256
 msgid "Frequency"
@@ -9679,10 +9712,9 @@ msgstr "Όλα"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:654
 msgid "None"
-msgstr ""
+msgstr "Κανένα"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:672
-#, fuzzy
 msgid "Manually"
 msgstr "Χειροκίνητα"
 
@@ -9725,7 +9757,7 @@ msgstr "Εξαγωγή Αποτελεσμάτων Εργασιών"
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:389
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:423
 msgid "Export Job Result"
-msgstr "Εξαγωγή Αποτελεσμάτων Εργασίας"
+msgstr "Εξαγωγή Αποτελέσματος Εργασίας"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:465
 #: modules/bibexport/lib/bibexport_method_fieldexporter.py:500
@@ -9738,7 +9770,7 @@ msgstr "Δεν έχετε δικαίωμα πρόσβασης σ'αυτόν το
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8849
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10425
 msgid "Loan information"
-msgstr "Πληροφορίες δανεισμού:"
+msgstr "Πληροφορίες δανεισμού"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:403
 #, fuzzy
@@ -9755,7 +9787,7 @@ msgstr "Συγγραφέας"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:430
 msgid "Editor"
-msgstr ""
+msgstr "Συντάκτης"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:431
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1759
@@ -9809,7 +9841,7 @@ msgstr "ISBN"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12996
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15517
 msgid "Mailbox"
-msgstr ""
+msgstr "Θυρίδα ταχυδρομείου"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:456
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2388
@@ -10665,7 +10697,7 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1753
 msgid "Loan informations"
-msgstr "Πληροφορίες Δανεισμού"
+msgstr "Πληροφορίες δανεισμού"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1758
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2102
@@ -10718,7 +10750,7 @@ msgstr "Επιλέξτε αίτηση"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1878
 msgid "Welcome to Invenio BibCirculation Admin"
-msgstr ""
+msgstr "Καλωσήλθατε στην διαχείριση του BibCirculation του Invenio"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1904
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2207
@@ -10918,7 +10950,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2321
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2502
 msgid "User information"
-msgstr "Πληροφορίες χρήστη:"
+msgstr "Πληροφορίες χρήστη"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2391
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2508
@@ -11052,7 +11084,7 @@ msgstr "Ακύρωση αίτησης κράτησης"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3682
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4637
 msgid "There are no requests."
-msgstr "Δεν υπάρχουν αιτήσεις"
+msgstr "Δεν υπάρχουν αιτήσεις."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3093
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7149
@@ -11085,9 +11117,8 @@ msgid "Item details"
 msgstr "Λεπτομέρειες τεκμηρίου"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3100
-#, fuzzy
 msgid "Edit this record"
-msgstr "Επεξεργασία της παρούσας εγγραφής"
+msgstr "Επεξεργασία της εγγραφής αυτής"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3101
 #, fuzzy
@@ -11193,7 +11224,7 @@ msgstr "Δανεισμοί"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3439
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4608
 msgid "Historical overview"
-msgstr ""
+msgstr "Επισκόπηση ιστρορικού"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3569
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4747
@@ -11234,7 +11265,7 @@ msgstr "Γράμματα εκπρόθεσμων"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14664
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15641
 msgid "No notes"
-msgstr "Αρ. σημειώσεων"
+msgstr "Χωρίς σημειώσεις"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3883
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3993
@@ -11338,7 +11369,7 @@ msgstr "Αιτήσεις"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4675
 msgid "Request option(s)"
-msgstr ""
+msgstr "Επιλογές αίτησης"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4786
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8852
@@ -11433,7 +11464,7 @@ msgstr "Ειδοποίηση"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5348
 msgid "Load"
-msgstr ""
+msgstr "Φόρτωση"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5367
 msgid "Send"
@@ -11635,7 +11666,7 @@ msgstr "Σημειώσεις σχετικά με την βιβλιοθήκη"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8856
 msgid "Requested ?"
-msgstr ""
+msgstr "Αιτηθέντα ;"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8876
 msgid "New due date: "
@@ -11753,7 +11784,7 @@ msgstr "Ημ/νία παραγγελίας"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13911
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15586
 msgid "Expected date"
-msgstr ""
+msgstr "Αναμενόμενη ημερομηνία"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10863
 msgid "A new purchase has been registered with success."
@@ -11761,7 +11792,7 @@ msgstr "Μια νέα αγορά καταχωρήθηκε με επιτυχία.
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10912
 msgid "Ordered date"
-msgstr ""
+msgstr "Ημερομηνία παραγγελίας"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10962
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11577
@@ -11794,7 +11825,7 @@ msgstr "Λεπτομέρειες αιτήσεων διαδανεισμού"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17382
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17518
 msgid "Period of interest - From"
-msgstr ""
+msgstr "Περίοδος ενδιαφέροντος - Από"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11215
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11431
@@ -11804,7 +11835,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17384
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17520
 msgid "Period of interest - To"
-msgstr ""
+msgstr "Περίοδος ενδιαφέροντος - Έως"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11217
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11433
@@ -11855,7 +11886,7 @@ msgstr "Προμηθευτής"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11518
 msgid "Interest from"
-msgstr ""
+msgstr "Ενδιαφέρον από"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11636
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12361
@@ -11876,14 +11907,12 @@ msgid "Date requested"
 msgstr "Νέο αίτημα"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12062
-#, fuzzy
 msgid "Periodical Title"
-msgstr "Τίτλος άρθρου"
+msgstr "Τίτλος Περιοδικού"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12063
-#, fuzzy
 msgid "Article Title"
-msgstr "Τίτλος άρθρου"
+msgstr "Τίτλος Άρθρου"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12065
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17313
@@ -12020,7 +12049,7 @@ msgstr "Λεπτομέρειες αιτήσεων διαδανεισμού"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17317
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17515
 msgid "Budget code"
-msgstr ""
+msgstr "Κωδικός κονδυλίου"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13997
 msgid "Purchase information updated with success."
@@ -12152,7 +12181,7 @@ msgstr "Λεπτομέρειες άρθρου"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17309
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17507
 msgid "Periodical title"
-msgstr ""
+msgstr "Τίτλος περιοδικού"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17310
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17508
@@ -12189,12 +12218,11 @@ msgstr "Ενημέρωση ρυθμίσεων"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17765
 msgid "the beginning"
-msgstr ""
+msgstr "αρχή"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17766
-#, fuzzy
 msgid "now"
-msgstr "όχι"
+msgstr "τώρα"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:60
 msgid "BibCheck Admin"
@@ -12208,19 +12236,19 @@ msgid "Not authorized"
 msgstr "Χωρίς εξουσιοδότηση"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:80
-#, fuzzy, python-format
+#, python-format
 msgid "ERROR: %s does not exist"
-msgstr "Ο χρήστης %s δεν υπάρχει."
+msgstr "Σφάλμα: το %s δεν υπάρχει"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:82
-#, fuzzy, python-format
+#, python-format
 msgid "ERROR: %s is not a directory"
-msgstr "δεν είναι κατάλογος"
+msgstr "Σφάλμα: το %s δεν είναι κατάλογος αρχείων"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:84
-#, fuzzy, python-format
+#, python-format
 msgid "ERROR: %s is not writable"
-msgstr "δεν είναι εγγράψιμο"
+msgstr "Σφάλμα: το %s δεν είναι εγγράψιμο"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:117
 msgid "Limit to knowledge bases containing string:"
@@ -12228,7 +12256,7 @@ msgstr "Περιορισμός σε γνωσιακές βάσεις που πε�
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:135
 msgid "Really delete"
-msgstr ""
+msgstr "Επιβεβαίωση διαγραφής"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:141
 msgid "Verify syntax"
@@ -12245,11 +12273,11 @@ msgstr "Το αρχείο %s δεν υπάρχει."
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:175
 msgid "Calling bibcheck -verify failed."
-msgstr ""
+msgstr "Η εκτέλεση του bibcheck -verify απέτυχε."
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:182
 msgid "Verify BibCheck config file"
-msgstr ""
+msgstr "Επιβεβαίωση του αρχείου παραμέτρων του BibCheck"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:183
 msgid "Verify problem"
@@ -12261,46 +12289,46 @@ msgstr "Αρχείο"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:241
 msgid "Edit BibCheck config file"
-msgstr ""
+msgstr "Τροποποίηση του αρχείου παραμέτρων του BibCheck"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:269
-#, fuzzy, python-format
+#, python-format
 msgid "File %s already exists."
-msgstr "υπάρχει ήδη."
+msgstr "Το αρχείο %s υπάρχει ήδη."
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:272
 #, python-format
 msgid "File %s: written OK."
-msgstr ""
+msgstr "Αρχείο %s: η εγγραφή πέτυχε."
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:278
-#, fuzzy, python-format
+#, python-format
 msgid "File %s: write failed."
-msgstr "η εγγραφή απέτυχε."
+msgstr "Αρχείο %s: η εγγραφή απέτυχε."
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:280
 msgid "Save BibCheck config file"
-msgstr ""
+msgstr "Αποθήκευση αρχείου παραμέτρων του BibCheck"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:313
-#, fuzzy, python-format
+#, python-format
 msgid "File %s deleted."
-msgstr "Το αρχείο %s δεν υπάρχει."
+msgstr "Το αρχείο %s έχει διαγραφεί."
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:315
-#, fuzzy, python-format
+#, python-format
 msgid "File %s: delete failed."
-msgstr "η διαγραφή απέτυχε"
+msgstr "Αρχείο %s: η διαγραφή απέτυχε"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:317
 msgid "Delete BibCheck config file"
-msgstr "Διαγραφή αρχείου "
+msgstr "Διαγραφή αρχείου παραμέτρων του BibCheck"
 
 #: modules/bibharvest/lib/oai_repository_admin.py:155
 #: modules/bibharvest/lib/oai_repository_admin.py:260
 #: modules/bibharvest/lib/oai_repository_admin.py:339
 msgid "Return to main selection"
-msgstr ""
+msgstr "Επιστροφή στην αρχική επιλογή"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:119
 msgid "Overview of sources"
@@ -12320,11 +12348,11 @@ msgstr "ποτέ"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:150
 msgid "Never harvested"
-msgstr ""
+msgstr "Δεν έγινε ποτέ harvest"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:162
 msgid "View Holding Pen"
-msgstr ""
+msgstr "Προβολή Λίστας Αναθεώρησης"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:187
 #: modules/bibharvest/lib/oai_harvest_admin.py:559
@@ -12359,11 +12387,11 @@ msgstr "Σύγκριση με αρχικό"
 #: modules/bibharvest/lib/oai_harvest_admin.py:1110
 #: modules/bibharvest/lib/oai_harvest_admin.py:1155
 msgid "Delete from holding pen"
-msgstr ""
+msgstr "Διαγραφή από τη λίστα αναθεώρησης"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1128
 msgid "Error when retrieving the Holding Pen entry"
-msgstr ""
+msgstr "Λάθος κατά την ανάκτηση της εγγραφής από τη λίστα αναθεώρησης"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1136
 msgid "Error when retrieving the record"
@@ -12373,10 +12401,12 @@ msgstr "Λάθος κατά την ανάκτηση της εγγραφής"
 msgid ""
 "Error when formatting the Holding Pen entry. Probably its content is broken"
 msgstr ""
+"Λάθος κατά τη διαμόρφωση της εγγραφής από τη λίστα αναθεώρησης. Πιθανώς το "
+"περιεχόμενό της να μην είναι έγκυρο"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1149
 msgid "Accept Holding Pen version"
-msgstr ""
+msgstr "Αποδοχή της εκδοχής από τη λίστα αναθεώρησης"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:51
 #, python-format
@@ -12384,11 +12414,12 @@ msgid ""
 "Limit display to knowledge bases matching %(keyword_field)s in their rules "
 "and descriptions"
 msgstr ""
+"Περιορισμός εμφάνισης σε γνωσιακές βάσεις που έχουν το %(keyword_field)s "
+"στους κανόνες και τις περιγραφές τους"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:89
-#, fuzzy
 msgid "No Knowledge Base"
-msgstr "Γνωσιακές Βάσεις"
+msgstr "Καμία Γνωσιακή Βάση"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:148
 msgid "Add New Knowledge Base"
@@ -12400,11 +12431,11 @@ msgstr "Παραμετροποίηση μιας δυναμικής Γνωσια�
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:150
 msgid "Add New Taxonomy"
-msgstr ""
+msgstr "Προσθήκη Νέας Ταξινόμησης"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:191
 msgid "This knowledge base already has a taxonomy file."
-msgstr ""
+msgstr "Αυτή η γνωσιακή βάση έχει ήδη αρχείο ταξινόμησης."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:192
 msgid "If you upload another file, the current version will be replaced."
@@ -12414,15 +12445,16 @@ msgstr "Αν ανεβάσετε κάποιο άλλο αρχείο, η παρο�
 #, python-format
 msgid "The current taxonomy can be accessed with this URL: %s"
 msgstr ""
+"Η τρέχουσα ταξινόμηση μπορεί να προσπελαστεί από αυτή την διεύθυνση: %s"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:197
 #, python-format
 msgid "Please upload the RDF file for taxonomy %s"
-msgstr ""
+msgstr "Παρακαλώ ανεβάστε το RDF αρχείο της ταξινόμησης %s"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:234
 msgid "Please configure"
-msgstr ""
+msgstr "Παρακαλώ ρυθμίστε"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:235
 msgid ""
@@ -12430,6 +12462,9 @@ msgid ""
 "given field. The list is generated dynamically by                          "
 "searching the records using a search expression."
 msgstr ""
+"Μια δυναμική γνωσιακή βάση είναι μια λίστα από τιμές ενός δεδομένου πεδίου. "
+"Η λίστα δημιουργείται δυναμικά αναζητώντας τις εγγραφές χρησιμοποιώντας μια "
+"συμβολοσειρά αναζήτησης."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:239
 msgid ""
@@ -12439,12 +12474,18 @@ msgid ""
 "'270__a:*Paris*', a list of institutes in Paris                          "
 "will be created."
 msgstr ""
+"Παράδειγμα: Οι εγγραφές σας περιέχουν το πεδίο 270__a για το όνομα και τη "
+"διεύθυνση του ιδρύματος του συγγραφέα. Αν ορίσετε το πεδίο σε '270__a' και "
+"την έκφραση σε '270__a:*Paris*', μια λίστα με τα ιδρύματα στο Παρίσι θα "
+"δημιουργηθεί."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:244
 msgid ""
 "If the expression is empty, a list of all values                          in "
 "270__a will be created."
 msgstr ""
+"Αν η έκφραση είναι κενή, μια λίστα με όλες τις τιμές του 270__a θα "
+"δημιουργηθεί."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:246
 msgid ""
@@ -12452,12 +12493,16 @@ msgid ""
 "it will be replaced by a search string when the                          "
 "knowledge base is used."
 msgstr ""
+"Αν η έκφραση περιέχει '%', όπως '270__a:*%*', θα αντικατασταθεί από μια "
+"συμβολοσειρά αναζήτησης όταν η γνωσιακή βάση χρησιμοποιηθεί."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:249
 msgid ""
 "You can enter a collection name if the expression                          "
 "should be evaluated in a specific collection."
 msgstr ""
+"Μπορείτε να εισάγετε ένα όνομα συλλογής, αν η έκφραση θα πρέπει να "
+"αξιολογηθεί σε μια συγκεκριμένη συλλογή."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:251
 msgid ""
@@ -12467,6 +12512,10 @@ msgid ""
 "'270__a:*Paris*', a list of institutes in Paris                          "
 "will be created."
 msgstr ""
+"Παράδειγμα 1: Οι εγγραφές σας περιέχουν το πεδίο 270__a για το όνομα και τη "
+"διεύθυνση του ιδρύματος του συγγραφέα. Αν ορίσετε το πεδίο σε '270__a' και "
+"την έκφραση σε '270__a:*Paris*', μια λίστα από ιδρύματα στο Παρίσι θα "
+"δημιουργηθεί."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:256
 msgid ""
@@ -12475,15 +12524,17 @@ msgid ""
 "(270__a):                          Set field to 100__a, expression to 270__a:"
 "*%*."
 msgstr ""
+"Παράδειγμα 2: Επέστρεψε το όνομα του ιδρύματος (100__a) όταν ο χρήστης δώσει "
+"τον ταχυδρομικό του κώδικα (270__a): Όρισε το πεδίο σε 100__a, την έκφραση "
+"σε 270__a:*%*."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:260
-#, fuzzy
 msgid "Any collection"
-msgstr "οποιαδήποτε συλλογή"
+msgstr "Οποιαδήποτε συλλογή"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:282
 msgid "Exporting: "
-msgstr "Γίνεται εξαγωγή:"
+msgstr "Γίνεται εξαγωγή: "
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:324
 #: modules/bibknowledge/lib/bibknowledge_templates.py:588
@@ -12508,6 +12559,8 @@ msgid ""
 "Here you can add new mappings to this base                         and "
 "change the base attributes."
 msgstr ""
+"Εδώ μπορείτε να προσθέσετε νέες αντιστοιχίσεις σε αυτή τη βάση και να "
+"αλλάξετε τις ιδιότητες της βάσης."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:362
 msgid "Map From"
@@ -12518,43 +12571,43 @@ msgid "Search for a mapping"
 msgstr "Αναζήτηση αντιστοίχισης"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:480
-#, fuzzy
 msgid "Knowledge base is empty"
-msgstr "Γνωσιακή Βάση %s"
+msgstr "Η γνωσιακή βάση είναι κενή"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:545
 msgid "You can get a these mappings in textual format by: "
-msgstr ""
+msgstr "Μπορείτε να πάρετε αυτές τις αντιστοιχίσεις σε μορφή κειμένου από: "
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:547
 msgid "And the KBA version by:"
-msgstr ""
+msgstr "Και την εκδοχή KBA από:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:627
-#, fuzzy
 msgid "Update Base Attributes"
-msgstr "Ενημέρωση Χαρακτηριστικών Μορφής"
+msgstr "Ενημέρωση Χαρακτηριστικών Βάσης"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:670
 msgid "This knowledge base is not used in any format elements."
-msgstr ""
+msgstr "Αυτή η γνωσιακή βάση δεν χρησιμοποιείται σε κανένα στοιχείο μορφής."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:700
-#, fuzzy, python-format
+#, python-format
 msgid "Your rule: %s"
-msgstr "Οι Ειδοποιήσεις μου"
+msgstr "Ο κανόνας σας: %s"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:702
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "The left side of the rule (%s) already appears in these knowledge bases:"
-msgstr "ήδη εμφανίζεται στις εξής γνωσιακές βάσεις"
+msgstr ""
+"Η αριστερή μεριά του κανόνα (%s) ήδη εμφανίζεται στις εξής γνωσιακές βάσεις:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:705
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "The right side of the rule (%s) already appears in these knowledge bases:"
-msgstr "ήδη εμφανίζεται στις εξής γνωσιακές βάσεις"
+msgstr ""
+"Η δεξιά μεριά του κανόνα (%s) ήδη εμφανίζεται στις εξής γνωσιακές βάσεις:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:719
 msgid "Please select action"
@@ -12592,21 +12645,20 @@ msgstr "Γνωσιακές Βάσεις"
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:117
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:129
 msgid "Cannot upload file"
-msgstr ""
+msgstr "Δεν είναι εφικτή η μεταφόρτωση του αρχείου"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:107
-#, fuzzy
 msgid "You have not selected a file to upload"
-msgstr "Επιλογή αρχείου για ανέβασμα:"
+msgstr "Δεν έχετε επιλέξει αρχείο για μεταφόρτωση"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:141
-#, fuzzy, python-format
+#, python-format
 msgid "File %s uploaded."
-msgstr "Πιθανώς δεν έχει ανέβει κανένα αρχείο"
+msgstr "Το αρχείο %s έχει ανέβει."
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:143
 msgid "File uploaded"
-msgstr ""
+msgstr "Το αρχείο μεταφορτώθηκε"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:172
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:216
@@ -12673,69 +12725,66 @@ msgid "Delete Knowledge Base"
 msgstr "Διαγραφή Γνωσιακής Βάσης"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:157
-#, fuzzy
 msgid "BibSword Admin Interface"
-msgstr "BibEdit Admin Interface"
+msgstr "BibSword Admin Interface"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:171
 #: modules/bibsword/lib/bibsword_webinterface.py:277
 #: modules/bibsword/lib/bibsword_webinterface.py:301
 #: modules/bibsword/lib/bibsword_webinterface.py:330
 msgid "Export with BibSword: Step 2/4"
-msgstr ""
+msgstr "Εξαγωγή με το BibSword: Βήμα 2/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:222
 #: modules/bibsword/lib/bibsword_webinterface.py:233
 #: modules/bibsword/lib/bibsword_webinterface.py:291
 msgid "Export with BibSword: Step 1/4"
-msgstr ""
+msgstr "Εξαγωγή με το BibSword: Βήμα 1/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:315
 #: modules/bibsword/lib/bibsword_webinterface.py:343
 #: modules/bibsword/lib/bibsword_webinterface.py:374
 msgid "Export with BibSword: Step 3/4"
-msgstr ""
+msgstr "Εξαγωγή με το BibSword: Βήμα 3/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:358
 #: modules/bibsword/lib/bibsword_webinterface.py:389
 msgid "Export with BibSword: Step 4/4"
-msgstr ""
+msgstr "Εξαγωγή με το BibSword: Βήμα 4/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:434
 msgid "Export with BibSword: Acknowledgement"
-msgstr ""
+msgstr "Εξαγωγή με το BibSword: Βεβαίωση"
 
 #: modules/bibupload/lib/batchuploader_engine.py:243
 msgid "More than one possible recID, ambiguous behaviour"
-msgstr ""
+msgstr "Περισσότερα από ένα πιθανά redID, αμφίσημη συμπεριφορά"
 
 #: modules/bibupload/lib/batchuploader_engine.py:243
 msgid "No records match that file name"
-msgstr ""
+msgstr "Δεν υπάρχουν εγγραφές που να ταυτίζονται με αυτό το όνομα αρχείου"
 
 #: modules/bibupload/lib/batchuploader_engine.py:244
-#, fuzzy
 msgid "File already exists"
-msgstr "υπάρχει ήδη."
+msgstr "Το αρχείο υπάρχει ήδη"
 
 #: modules/bibupload/lib/batchuploader_engine.py:244
 msgid "A file with the same name and format already exists"
-msgstr ""
+msgstr "Ένα αρχείο με αυτό το όνομα και αυτή την μορφή υπάρχει ήδη"
 
 #: modules/bibupload/lib/batchuploader_engine.py:245
 #, python-format
 msgid "No rights to upload to collection '%s'"
-msgstr ""
+msgstr "Δεν έχετε δικαίωμα να μεταφορτώσετε στην συλλογή '%s'"
 
 #: modules/bibupload/lib/batchuploader_engine.py:449
-#, fuzzy
 msgid "Guests are not authorized to run batchuploader"
-msgstr "Δεν έχετε δικαίωμα να χρησιμοποιήσετε τις ειδοποιήσεις."
+msgstr "Οι επισκέπτες δεν έχουν δικαίωμα να χρησιμοποιήσουν το batchuploader"
 
 #: modules/bibupload/lib/batchuploader_engine.py:451
-#, fuzzy, python-format
+#, python-format
 msgid "The user '%s' is not authorized to run batchuploader"
-msgstr "Δεν έχετε δικαίωμα να χρησιμοποιήσετε τις ειδοποιήσεις."
+msgstr "Ο χρήστης '%s' δεν έχει δικαίωμα να χρησιμοποιήσει το batchuploader"
 
 #: modules/bibupload/lib/batchuploader_engine.py:506
 #: modules/bibupload/lib/batchuploader_engine.py:519
@@ -12743,22 +12792,24 @@ msgstr "Δεν έχετε δικαίωμα να χρησιμοποιήσετε �
 msgid ""
 "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
 msgstr ""
+"Ο χρήστης '%(x_user)s' δεν έχει δικαίωμα να τροποποιήσει την συλλογή "
+"'%(x_coll)s'"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:267
 msgid "Fatal: Author ID capabilities are disabled on this system."
 msgstr ""
+"Σφάλμα: η χρήση του Author ID έχουν απενεργοποιηθεί σε αυτό το σύστημα."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:270
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:313
-#, fuzzy
 msgid "Fatal: You are not allowed to access this functionality."
-msgstr "Δεν έχετε πρόσβαση στις υπηρεσίες διαχείρισης."
+msgstr "Σφάλμα: Δεν έχετε δικαίωμα να χρησιμοποιήσετε αυτή την λειτουργία."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:662
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:763
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:920
 msgid "Papers removed from this profile"
-msgstr ""
+msgstr "Οι δημοσιεύσεις έχουν αφαιρεθεί από το προφίλ αυτό"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:663
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:667
@@ -12769,75 +12820,73 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:921
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:925
 msgid "Papers in need of review"
-msgstr ""
+msgstr "Δημοσιεύσεις που χρειάζονται αξιολόγηση"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:664
 msgid "Open Tickets"
-msgstr ""
+msgstr "Ανοιχτά Tickets"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:664
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:729
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:765
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:922
 msgid "Data"
-msgstr ""
+msgstr "Δεδομένα"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:665
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:766
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:923
 msgid "Papers of this Person"
-msgstr ""
+msgstr "Δημοσιεύσεις του ατόμου αυτού"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:666
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:767
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:924
 msgid "Papers _not_ of this Person"
-msgstr ""
+msgstr "Δημοσιεύσεις που δεν ανήκουν στο άτομο αυτό"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:668
 msgid "Tickets for this Person"
-msgstr ""
+msgstr "Tickets για το άτομο αυτό"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:669
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:734
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:770
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:927
-#, fuzzy
 msgid "Additional Data for this Person"
-msgstr "Επιπλέον λεπτομέρειες"
+msgstr "Επιπλέον δεδομένα για το άτομο αυτό"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:671
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:735
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:771
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:947
 msgid "Sorry, there are currently no documents to be found in this category."
-msgstr ""
+msgstr "Αυτή τη στιγμή δεν υπάρχουν έντυπα στην κατηγορία αυτή."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:672
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:772
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:948
 msgid "Yes, those papers are by this person."
-msgstr ""
+msgstr "Ναι, αυτές οι δημοσιεύσεις είναι από αυτό το άτομο."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:673
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:773
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:949
 msgid "No, those papers are not by this person"
-msgstr ""
+msgstr "Όχι, αυτές οι δημοσιεύσεις δεν είναι από αυτό το άτομο."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:674
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:774
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:950
 msgid "Assign to other person"
-msgstr ""
+msgstr "Άνάθεση σε άλλο άτομο"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:675
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:739
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:775
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:951
-#, fuzzy
 msgid "Forget decision"
-msgstr "Λήψη απόφασης"
+msgstr "Παράβλεψη απόφασης"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:676
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:690
@@ -12845,7 +12894,6 @@ msgstr "Λήψη απόφασης"
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:790
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:952
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:966
-#, fuzzy
 msgid "Confirm!"
 msgstr "Επιβεβαίωση"
 
@@ -12853,20 +12901,19 @@ msgstr "Επιβεβαίωση"
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:777
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:953
 msgid "Yes, this paper is by this person."
-msgstr ""
+msgstr "Ναι, αυτή η δημοσίευση είναι από αυτό το άτομο."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:678
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:778
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:954
-#, fuzzy
 msgid "Rejected!"
-msgstr "Απορριφθέντα"
+msgstr "Απορρίφθηκε"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:679
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:779
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:955
 msgid "No, this paper is <i>not</i> by this person"
-msgstr ""
+msgstr "Όχι, αυτή η δημοσίευση <i>δεν</i> είναι από αυτό το άτομο"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:680
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:688
@@ -12881,7 +12928,7 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:964
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:972
 msgid "Assign to another person"
-msgstr ""
+msgstr "Ανάθεση σε άλλο άτομο"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:681
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:689
@@ -12896,20 +12943,19 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:965
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:973
 msgid "To other person!"
-msgstr ""
+msgstr "Σε άλλο άτομο!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:682
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:782
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:958
-#, fuzzy
 msgid "Confirmed."
-msgstr "Επιβεβαίωση"
+msgstr "Επιβεβαιώθηκε."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:683
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:783
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:959
 msgid "Marked as this person's paper"
-msgstr ""
+msgstr "Σημάνθηκε ως δημοσίευση αυτού του ατόμου"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:684
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:692
@@ -12920,9 +12966,8 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:792
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:960
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:968
-#, fuzzy
 msgid "Forget decision!"
-msgstr "Λήψη απόφασης"
+msgstr "Παράβλεψη απόφασης!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:685
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:693
@@ -12930,579 +12975,581 @@ msgstr "Λήψη απόφασης"
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:793
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:961
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:969
-#, fuzzy
 msgid "Forget decision."
-msgstr "Λήψη απόφασης"
+msgstr "Παράβλεψη απόφασης."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:686
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:786
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:962
 msgid "Repeal!"
-msgstr ""
+msgstr "Ανάκληση!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:687
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:787
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:963
 msgid "But it's <i>not</i> this person's paper."
-msgstr ""
+msgstr "Αλλά <i>δεν</i> είναι δημοσίευση αυτού του ατόμου."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:691
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:791
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:967
 msgid "But it <i>is</i> this person's paper."
-msgstr ""
+msgstr "Αλλά <i>είναι</i> είναι δημοσίευση αυτού του ατόμου."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:694
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:794
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:970
 msgid "Repealed"
-msgstr ""
+msgstr "Ανακλήθηκε"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:695
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:795
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:971
 msgid "Marked as not this person's paper"
-msgstr ""
+msgstr "Σημάνθηκε ως δημοσίευση όχι αυτού του ατόμου"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:727
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:730
-#, fuzzy
 msgid "Your papers"
-msgstr "Οι Ειδοποιήσεις μου"
+msgstr "Οι δημοσιεύσεις μου"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:727
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:731
-#, fuzzy
 msgid "Not your papers"
-msgstr "Ξεχάσατε τον κωδικό σας;"
+msgstr "Δημοσιεύσεις που δεν ανήκουν σε εσάς"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:736
-#, fuzzy
 msgid "These are mine!"
-msgstr "Υπάρχουν %i καλάθια"
+msgstr "Είναι δικές μου!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:737
-#, fuzzy
 msgid "These are not mine!"
-msgstr "Δεν υπάρχουν δανεισμοί."
+msgstr "Δεν είναι δικές μου!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:738
 msgid "It's not mine, but I know whose it is!"
-msgstr ""
+msgstr "Δεν είναι δική μου, αλλά γνωρίζω σε ποιόν ανήκει!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:740
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:754
 msgid "Mine!"
-msgstr ""
+msgstr "Δική μου!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:741
 msgid "This is my paper!"
-msgstr ""
+msgstr "Αυτή είναι δική μου δημοσίευση!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:742
-#, fuzzy
 msgid "Not mine!"
-msgstr "Μη Ορισμένο"
+msgstr "Όχι δική μου"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:743
 msgid "This is not my paper!"
-msgstr ""
+msgstr "Αυτή δεν είναι δική μου δημοσίευση"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:746
-#, fuzzy
 msgid "Not Mine."
-msgstr "Μη Ορισμένο"
+msgstr "Δεν είναι δική μου."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:747
 msgid "Marked as my paper!"
-msgstr ""
+msgstr "Σημάνθηκε ως δική μου δημοσίευση!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:749
 msgid "Forget assignment decision"
-msgstr ""
+msgstr "Παράβλεψη απόφασης ανάθεσης"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:750
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:758
-#, fuzzy
 msgid "Not Mine!"
-msgstr "Μη Ορισμένο"
+msgstr "Όχι δική μου!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:751
 msgid "But this is mine!"
-msgstr ""
+msgstr "Μα είναι δική μου!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:755
 msgid "But this is my paper!"
-msgstr ""
+msgstr "Μα είναι δική μου δημοσίευση!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:759
 msgid "Marked as not your paper."
-msgstr ""
+msgstr "Σημάνθηκε ως δημοσίευση που δεν ανήκει σε εσάς."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:769
 msgid "Tickes you created about this person"
-msgstr ""
+msgstr "Tickets που δημιουργήσατε για αυτό το άτομο"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:922
 msgid "Tickets"
-msgstr ""
+msgstr "Tickets"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:926
-#, fuzzy
 msgid "Request Tickets"
-msgstr "Αιτήσεις"
+msgstr "Ticket Αιτήσεων"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:1178
-#, fuzzy
 msgid "Submit Attribution Information"
-msgstr "Εκτύπωση πληροφοριών δανεισμού"
+msgstr "Υποβολή πληροφοριών ανάθεσης"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:1323
-#, fuzzy
 msgid "Please review your actions"
-msgstr "Παρακαλώ επιλέξτε μια ενέργεια"
+msgstr "Παρακαλώ εξετάστε τις ενέργειές σας"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2008
-#, fuzzy
 msgid "Claim this paper"
-msgstr "προσθήκη αυτού του χρήστη"
+msgstr "Διεκδικήστε την δημοσίευση αυτή"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2109
 msgid ""
 "<p>We're sorry. An error occurred while handling your request. Please find "
 "more information below:</p>"
 msgstr ""
+"<p>Λυπούμαστε, αλλά συνέβει ένα σφάλμα κατά την διαχείριση της αίτησής σας. "
+"Παρακαλώ δείτε παρακάτω επιπλέον πληροφορίες:</p>"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2187
 msgid "Person search for assignment in progress!"
-msgstr ""
+msgstr "Η αναζήτηση ατόμου για ανάθεση δημοσιεύσεων είναι σε εξέλιξη!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2188
-#, fuzzy
 msgid "You are searching for a person to assign the following papers:"
-msgstr "Είστε μέλος των ακόλουθων ομάδων:"
+msgstr "Γίνεται αναζήτηση ατόμου για ανάθεση των παρακάτω δημοσιεύσεων:"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2349
 #, python-format
 msgid "You are going to claim papers for: %s"
-msgstr ""
+msgstr "Πρόκειται να διεκδικήσετε δημοσιεύσεις για: %s"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2377
 msgid "This page in not accessible directly."
-msgstr ""
+msgstr "Η σελίδα αυτή δεν είναι προσβάσιμη άμεσα."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2379
 msgid "Welcome!"
-msgstr ""
+msgstr "Καλωσήλθατε!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:153
 msgid "Click here to review the transactions."
-msgstr ""
+msgstr "Πατήστε εδώ για να επανεξετάσετε τις ενέργειες."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:196
-#, fuzzy
 msgid "Quit searching."
-msgstr "Έκτέλεση έρευνας"
+msgstr "Άκύρωση έρευνας."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:417
-#, fuzzy
 msgid "You are about to attribute the following paper"
-msgstr "Είστε μέλος των ακόλουθων ομάδων:"
+msgstr "Πρόκειται να αναθέσετε την παρακάτω δημοσίευση"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:439
 msgid "Info"
-msgstr ""
+msgstr "Πληροφορίες"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:451
 msgid " Search for a person to attribute the paper to"
-msgstr ""
+msgstr " Αναζήτηση ατόμου για την ανάθεση της δημοσίευσης αυτής"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:512
 #: modules/bibauthorid/lib/bibauthorid_templates.py:607
 #: modules/bibauthorid/lib/bibauthorid_templates.py:679
-#, fuzzy
 msgid "Select All"
-msgstr "Διαγραφή Όλων"
+msgstr "Επιλογή Όλων"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:513
 #: modules/bibauthorid/lib/bibauthorid_templates.py:608
 #: modules/bibauthorid/lib/bibauthorid_templates.py:680
-#, fuzzy
 msgid "Select None"
-msgstr "Επιλέξτε μια βαθμολογία"
+msgstr "Επιλογή Κανενός"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:514
 #: modules/bibauthorid/lib/bibauthorid_templates.py:609
 #: modules/bibauthorid/lib/bibauthorid_templates.py:681
-#, fuzzy
 msgid "Invert Selection"
-msgstr "Επιλογή αξιολογητή"
+msgstr "Αντιστροφή Επιλογής"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:516
 #: modules/bibauthorid/lib/bibauthorid_templates.py:611
 msgid "Hide successful claims"
-msgstr ""
+msgstr "Απόκρυψη επιτυχημένων διεκδικήσεων"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:576
-#, fuzzy
 msgid "No status information found."
-msgstr "Πληροφορίες δανεισμού:"
+msgstr "Δεν βρέθηκαν πληροφορίες κατάστασης."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:598
 msgid "Operator review of user actions pending"
-msgstr ""
+msgstr "Εκκρεμεί επανεξέταση των ενεργειών του χρήστη από τον διαχειριστή"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:642
 msgid "Sorry, there are currently no records to be found in this category."
-msgstr ""
+msgstr "Δεν υπάρχουν εγγραφές σε αυτή την κατηγορία."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:671
-#, fuzzy
 msgid "Review Transaction"
-msgstr "Αναθεώρηση"
+msgstr "Επανεξέταση ενεργειών"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:678
-#, fuzzy
 msgid " On all pages: "
-msgstr "Ακύρωση όλων των αλλαγών"
+msgstr " Σε όλες τις σελίδες: "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:714
 msgid "Names variants:"
-msgstr ""
+msgstr "Εναλλακτικές μορφές ονομάτων:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:836
 msgid "These records have been marked as not being from this person."
-msgstr ""
+msgstr "Οι εγγραφές αυτές σημάνθηκαν οτι δεν ανήκουν σε αυτό το άτομο."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:837
 msgid "They will be regarded in the next run of the author "
-msgstr ""
+msgstr "Θα εξετασθούν στην επόμενη εκτέλεση του αλγορίθμου "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:838
 msgid "disambiguation algorithm and might disappear from this listing."
 msgstr ""
+"αποσαφήνισης συγγραφέα και ενδέχεται να εξαφανιστούν από αυτόν τον κατάλογο."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:864
 #: modules/bibauthorid/lib/bibauthorid_templates.py:865
 #: modules/bibauthorid/lib/bibauthorid_templates.py:868
-#, fuzzy
 msgid "Not provided"
-msgstr "Χωρίς κριτική ακόμα"
+msgstr "Δεν παρέχεται"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:866
-#, fuzzy
 msgid "Not available"
-msgstr "Δεν υπάρχουν διαθέσιμα περιοδικά"
+msgstr "Μη διαθέσιμο"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:867
-#, fuzzy
 msgid "No comments"
-msgstr "σχόλια"
+msgstr "Δίχως σχόλια"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:869
-#, fuzzy
 msgid "Not Available"
-msgstr "Δεν υπάρχει διαθέσιμη πληροφορία"
+msgstr "Μη διαθέσιμο"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:889
-#, fuzzy
 msgid " Delete this ticket"
-msgstr "Διαγραφή καλαθιού"
+msgstr " Διαγραφή αυτού του ticket"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:893
 msgid " Commit this entire ticket"
-msgstr ""
+msgstr " Αποθήκευση αυτού του ticket"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:952
 msgid "... This tab is currently under construction ... "
-msgstr ""
+msgstr "... Αυτό το πλαίσιο είναι υπό κατασκευή ..."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:973
 msgid ""
 "We could not reliably determine the name of the author on the records below "
 "to automatically perform an assignment."
 msgstr ""
+"Ήταν αδύνατο να καθορίσουμε το όνομα του συγγραφέα για τις παρακάτω εγγραφές "
+"ώστε να γίνει αυτόματα η διασύνδεση."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:975
 msgid "Please select an author for the records in question."
-msgstr ""
+msgstr "Παρακαλώ επιλέξτε έναν συγγραφέα για τις εν λόγω εγγραφές."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:976
 msgid "Boxes not selected will be ignored in the process."
-msgstr ""
+msgstr "Τα κουτιά που δεν επιλέχθηκαν, θα αγνοηθούν στην διαδικασία."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:983
-#, fuzzy
 msgid "Select name for"
-msgstr "Επιλέξτε μια βαθμολογία"
+msgstr "Επιλέξτε όνομα για"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:992
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1018
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1162
-#, fuzzy
 msgid "Error retrieving record title"
-msgstr "Λάθος κατά την ανάκτηση της εγγραφής"
+msgstr "Λάθος κατά την ανάκτηση του τίτλου της εγγραφής"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:994
-#, fuzzy
 msgid "Paper title: "
-msgstr "Δημοσιεύσεις:"
+msgstr "Τίτλος δημοσίευσης: "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1006
-#, fuzzy
 msgid "The following names have been automatically chosen:"
-msgstr "Τα παρακάτω αρχεία μπήκαν στην ουρά επιτυχώς:"
+msgstr "Τα παρακάτω ονόματα επιλέχθηκαν αυτόματα:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1021
 msgid " --  With name: "
-msgstr ""
+msgstr " -- Με όνομα: "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1027
 msgid "Ignore"
-msgstr ""
+msgstr "Παράβλεψη"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1076
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1092
-#, fuzzy
 msgid "Navigation:"
-msgstr "Παραπομπές:"
+msgstr "Πλοήγηση:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1077
 msgid "Run paper attribution for another author"
-msgstr ""
+msgstr "Εκτέλεση ανάθεσης δημοσιεύσεων για άλλο συγγραφέα"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1078
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1095
-#, fuzzy
 msgid "Person Interface FAQ"
-msgstr "Περιβάλλον Διαχείρισης Δημοσιεύσεων"
+msgstr "FAQ διεπαφής ατόμων"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1093
-#, fuzzy
 msgid "Person Search"
-msgstr "Αναζήτηση"
+msgstr "Αναζήτηση Ατόμων"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1094
 msgid "Open tickets"
-msgstr ""
+msgstr "Ανοιχτά tickets"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1123
 msgid "Symbols legend: "
-msgstr ""
+msgstr "Λεζάντα συμβόλων: "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1128
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1186
 msgid "Everything is shiny, captain!"
-msgstr ""
+msgstr "Όρτσα τα πανιά καπετάνιε!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1129
 msgid "The result of this request will be visible immediately"
-msgstr ""
+msgstr "Το αποτέλεσμα του αιτήματος αυτού θα είναι άμεσα ορατό"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1134
 msgid "Confirmation needed to continue"
-msgstr ""
+msgstr "Χρειάζεται επιβεβαίωση για συνέχεια"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1135
 msgid ""
 "The result of this request will be visible immediately but we need your "
 "confirmation to do so for this paper have been manually claimed before"
 msgstr ""
+"Το αποτέλεσμα του αιτήματος αυτού θα είναι άμεσα ορατό, αλλά χρειαζόμαστε "
+"επιβεβαίωση του αιτήματος επειδή η δημοσίευση αυτή έχει διεκδικηθεί "
+"χειροκίνητα στο παρελθόν"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1140
 msgid "This will create a change request for the operators"
-msgstr ""
+msgstr "Αυτό θα δημιουργήσει ένα αίτημα αλλάγής προς τους διαχειριστές"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1141
 msgid ""
 "The result of this request will be visible upon confirmation through an "
 "operator"
 msgstr ""
+"Το αποτέλεσμα του αιτήματος αυτού θα γίνει ορατό μετά από επιβεβαίωση ενός "
+"διαχειριστή"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1179
-#, fuzzy
 msgid "Selected name on paper"
-msgstr "Επιλέξτε μια βαθμολογία"
+msgstr "Επιλεγμένο όνομα στην δημοσίευση"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1190
 msgid "Verification needed to continue"
-msgstr ""
+msgstr "Χρειάζεται επιβεβαίωση για συνέχεια"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1194
 msgid "This will create a request for the operators"
-msgstr ""
+msgstr "Αυτό θα δημιουργήσει ένα αίτημα προς τους διαχειριστές"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1216
 msgid "Please Check your entries"
-msgstr ""
+msgstr "Παρακαλώ ελέξτε τις καταχωρήσεις σας"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1216
-#, fuzzy
 msgid "Sorry."
-msgstr "Λυπάμαι"
+msgstr "Λυπούμαστε."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1221
-#, fuzzy
 msgid "Please provide at least one transaction."
-msgstr "Πρέπει να κάνετε login για να εκτελέσετε την λειτουργία αυτή."
+msgstr "Παρακαλώ δώστε τουλάχιστον μία συναλλαγή."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1221
-#, fuzzy
 msgid "Error:"
-msgstr "Σφάλμα"
+msgstr "Σφάλμα:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1232
-#, fuzzy
 msgid "Please provide your information"
-msgstr "Πληροφορίες νέου προμηθευτή"
+msgstr "Παρακαλώ παρέχετε τις πληροφορίες σας"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1239
-#, fuzzy
 msgid "Please provide your first name"
-msgstr "Παρακαλώ κάντε login πρώτα."
+msgstr "Παρακαλώ παρέχετε το κύριο όνομά σας"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1243
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1245
 msgid "Your first name:"
-msgstr ""
+msgstr "Το κύριο όνομά σας:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1251
 msgid "Please provide your last name"
-msgstr ""
+msgstr "Παρακαλώ παρέχετε το επίθετό σας"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1256
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1258
-#, fuzzy
 msgid "Your last name:"
-msgstr "Οι δανεισμοί μου"
+msgstr "Το επίθετό σας:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1266
 msgid "Please provide your eMail address"
-msgstr ""
+msgstr "Παρακαλώ δώστε τη διεύθυνση ηλεκτρονικού ταχυδρομείου σας"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1272
 msgid ""
 "This eMail address is reserved by a user. Please log in or provide an "
 "alternative eMail address"
 msgstr ""
+"Αυτή η διεύθυνση email χρησιμοποιείται ήδη από κάποιον χρήστη. Παρακαλώ "
+"κάντε login ή δώστε κάποια εναλλακτική διεύθυνση email"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1277
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1279
-#, fuzzy
 msgid "Your eMail:"
-msgstr "Οι Ειδοποιήσεις μου"
+msgstr "Το email σας:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1283
 msgid "You may leave a comment (optional)"
-msgstr ""
+msgstr "Προαιρετικά μπορείτε να αφήσετε κάποιο σχόλιο"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1296
-#, fuzzy
 msgid "Continue claiming*"
-msgstr "Συνεχίστε πάραυτα"
+msgstr "Συνέχιση διεκδίκησης*"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1298
 msgid "Confirm these changes**"
-msgstr ""
+msgstr "Επιβεβαίωση των αλλαγών**"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1301
-#, fuzzy
 msgid "!Delete the entire request!"
-msgstr "Διαγραφή επιλεγμένων κριτικών"
+msgstr "!Διαγραφή όλης της αίτησης!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1314
-#, fuzzy
 msgid "Mark as your documents"
-msgstr "έγγραφα όλων των ειδών"
+msgstr "Επισήμανση των εγγράφων ως δικά σας"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1329
 msgid "Mark as _not_ your documents"
-msgstr ""
+msgstr "Επισήμανση των εγγράφων ως _μη_ δικά σας"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1340
 msgid "Nothing staged as not yours"
-msgstr ""
+msgstr "Τίποτα εκκρεμές ως μη δικό σας"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1344
-#, fuzzy
 msgid "Mark as their documents"
-msgstr "Επιστροφή στο έγγραφο"
+msgstr "Επισήμανση ως δικά τους έγγραφα"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1355
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1370
 msgid "Nothing staged in this category"
-msgstr ""
+msgstr "Τίποτα εκκρεμές σε αυτήν την κατηγορία"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1359
-#, fuzzy
 msgid "Mark as _not_ their documents"
-msgstr "Επιστροφή στο έγγραφο"
+msgstr "Επισήμανση ως _μη_ δικά τους έγγραφα"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1376
 msgid "  * You can come back to this page later. Nothing will be lost. <br />"
 msgstr ""
+" * Μπορείτε να επιστρέψετε αργότερα στην σελίδα αυτή. Τίποδα δεν θα χαθεί. "
+"<br />"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1377
 msgid ""
 "  ** Performs all requested changes. Changes subject to permission "
 "restrictions will be submitted to an operator for manual review."
 msgstr ""
+"  ** Εκτελεί όλες τις αιτούμενες αλλαγές. Αλλαγές που χρειάζονται άδεια, θα "
+"αποσταλλούν σε κάποιο διαχειριστή για έλεγχο."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1433
 #, python-format
 msgid "We do not have a publication list for '%s'."
-msgstr ""
+msgstr "Δεν υπάρχει λίστα δημοσιεύσεων για τον/την '%s'."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1448
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1560
-#, fuzzy
 msgid "Create a new Person for your search"
-msgstr "Δεν υπάρχουν αποτελέσματα για την αναζήτησή σας."
+msgstr "Δημιουργήστε ένα νέο άτομο για την αναζήτησή σας"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1503
-#, fuzzy
 msgid "Recent Papers"
-msgstr "Δημοσιεύσεις:"
+msgstr "Πρόσφατες Δημοσιεύσεις"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1515
 msgid "YES!"
-msgstr ""
+msgstr "ΝΑΙ!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1516
 msgid " Attribute Papers To "
-msgstr ""
+msgstr " Απόδοση δημοσιεύσεων σε "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1522
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1544
-#, fuzzy
 msgid "Publication List "
-msgstr "Ημ/νία έκδοσης"
+msgstr "Λίστα δημοσιεύσεων "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1529
 msgid "Showing the"
-msgstr ""
+msgstr "Εμφάνιση των"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1529
-#, fuzzy
 msgid "most recent documents:"
-msgstr "Λίστα αξιολογηθέντων εγγράφων"
+msgstr "πιο πρόσφατων εγγράφων:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1538
-#, fuzzy
 msgid "Sorry, there are no documents known for this person"
-msgstr "Λυπάμαι, η κατηγορία αυτή δεν υπάρχει για το συγκεκριμένο περιοδικό."
+msgstr "Λυπούμαστε, δεν υπάρχουν έγγραφα για το άτομο αυτό"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1540
 msgid ""
 "Information not shown to increase performances. Please refine your search."
 msgstr ""
+"Οι πληροφορίες δεν εμφανίζονται για να αυξήσουν την επίδοση του συστήματος. "
+"Παρακαλώ βελτιώστε την αναζήτησή σας."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1648
 msgid "Correct my publication lists!"
-msgstr ""
+msgstr "Διορθώστε την λίστα δημοσιεύσεών μου!"
+
+#~ msgid "This book is sent to you ..."
+#~ msgstr "Το βιβλίο έχει αποσταλλεί σε εσάς ..."
 
 #~ msgid "Id"
 #~ msgstr "Id"
+
+#~ msgid "0 borrower(s) found."
+#~ msgstr "0 δανειζόμενοι βρέθηκαν."
+
+#~ msgid "You can see your loans "
+#~ msgstr "Μπορείτε να δείτε τους δανεισμούς σας"
+
+#~ msgid "."
+#~ msgstr "."
+
+#~ msgid ""
+#~ "The item %(x_title)s with barcode %(x_barcode)s has been returned with "
+#~ "success."
+#~ msgstr ""
+#~ "Το τεκμήριο %(x_title)s με barcode %(x_barcode)s έχει επιστραφεί με "
+#~ "επιτυχία."
+
+#~ msgid "There %s request(s) on the book who has been returned."
+#~ msgstr "Υπάρχουν %s αιτήσεις σχετικά με το βιβλίο που έχει επιστραφεί."
+
+#~ msgid "There are no requests waiting on the item <strong>%s</strong>."
+#~ msgstr ""
+#~ "Δεν υπάρχουν εκκρεμείς αιτήσεις για το τεκμήριο <strong>%s</strong>."
+
+#~ msgid "No. Copies"
+#~ msgstr "Αρ. Αντιτύπων"
+
+#~ msgid "Hold requests and loans overview on"
+#~ msgstr "Αιτήσεις κρατήσεων και δανεισμών για το"
+
+#~ msgid "Library(ies)"
+#~ msgstr "Βιβλιοθήκη/ες"
 
 #~ msgid "new copy"
 #~ msgstr "νεο αντίγραφο"
@@ -13510,14 +13557,68 @@ msgstr ""
 #~ msgid "A %s has been added."
 #~ msgstr "Προστέθηκε %s"
 
+#~ msgid "0 library(ies) found."
+#~ msgstr "0 βιβλιοθήκες βρέθηκαν."
+
+#~ msgid "Back borrower's loans"
+#~ msgstr "Επιστροφή στους δανεισμούς"
+
+#~ msgid "period_of_interest_from"
+#~ msgstr "period_of_interest_from"
+
+#~ msgid "jsCal3"
+#~ msgstr "jsCal3"
+
+#~ msgid "period_of_interest_to"
+#~ msgstr "period_of_interest_to"
+
+#~ msgid "jsCal4"
+#~ msgstr "jsCal4"
+
 #~ msgid "Borrower wants only this edition?"
 #~ msgstr "Ο δανειζόμενος επιθυμεί μόνο αυτή την έκδοση;"
+
+#~ msgid ""
+#~ "I accept the %s of the service in particular the return of books in due "
+#~ "time."
+#~ msgstr ""
+#~ "Αποδέχομαι τους %s της υπηρεσίας, ιδίως την επιστροφή των βιβλίων σε "
+#~ "εύθετο χρόνο."
+
+#~ msgid "jsCal1"
+#~ msgstr "jsCal1"
+
+#~ msgid "jsCal2"
+#~ msgstr "jsCal2"
+
+#~ msgid "Volume, Issue, Page"
+#~ msgstr "Τόμος, Τεύχος, Σελίδα"
 
 #~ msgid "Barcoce"
 #~ msgstr "Barcode"
 
 #~ msgid "An ILL request has been updated with success."
 #~ msgstr "Το αίτημα διαδανεισμού ενημερώθηκε με επιτυχία."
+
+#~ msgid "Book does not exists on Invenio."
+#~ msgstr "Το βιβλίο δεν υπάρχει στο σύστημα."
+
+#~ msgid ""
+#~ "Borrower accepts the %s of the service in particular the return of books "
+#~ "in due time."
+#~ msgstr ""
+#~ "Ο δανειζόμενος αποδέχεται τους %s της υπηρεσίας, ιδίως την επιστροφή των "
+#~ "βιβλίων σε εύθετο χρόνο."
+
+#~ msgid "Check if the book already exists on Invenio,"
+#~ msgstr "Έλεγχος αν το βιβλίο υπάρχει στο σύστημα,"
+
+#~ msgid ""
+#~ "Check if the book already exists on Invenio, before to send your ILL "
+#~ "request."
+#~ msgstr ""
+#~ "Ελέγξτε αν το βιβλίο υπάρχει ήδη στο καταθετήριο πριν στείλετε αίτημα "
+#~ "διαδανεισμού."
 
 #~ msgid "Book does not exists on Invenio. Please fill the following form."
 #~ msgstr ""
@@ -13530,9 +13631,8 @@ msgstr ""
 #~ msgid "last note on"
 #~ msgstr "τελευταία σημείωση σε"
 
-#, fuzzy
 #~ msgid ", no notes yet"
-#~ msgstr "δίχως σημειώσεις"
+#~ msgstr ", δίχως σημειώσεις"
 
 #~ msgid "HTML brief"
 #~ msgstr "σύντομη HTML"
@@ -13897,6 +13997,9 @@ msgstr ""
 #~ msgid "There are record revisions not yet synchronized with the database."
 #~ msgstr ""
 #~ "Υπάρχουν εκδόσεις της εγγραφής που δεν έχουν συγχρονιστεί με την βάση."
+
+#~ msgid "Please try again in a few minutes."
+#~ msgstr "Παρακαλώ ξαναδοκιμάστε αργότερα."
 
 #~ msgid ""
 #~ "A new revision of this record is not yet synchronized with the database."

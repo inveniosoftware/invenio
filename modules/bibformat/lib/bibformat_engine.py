@@ -53,8 +53,7 @@ from invenio.config import \
      CFG_BINDIR, \
      CFG_SITE_LANG
 from invenio.errorlib import \
-     register_errors, \
-     get_msgs_for_code_list
+     register_exception
 from invenio.bibrecord import \
      create_record, \
      record_get_field_instances, \
@@ -74,7 +73,8 @@ from invenio.bibformat_config import \
      CFG_BIBFORMAT_TEMPLATES_PATH, \
      CFG_BIBFORMAT_ELEMENTS_PATH, \
      CFG_BIBFORMAT_OUTPUTS_PATH, \
-     CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
+     CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH, \
+     InvenioBibFormatError
 from invenio.bibformat_utils import \
      record_get_xml, \
      parse_tag
@@ -323,7 +323,10 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
         search_pattern = []
 
     out = ""
-    errors_ = []
+
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+
     # Temporary workflow (during migration of formats):
     # Call new BibFormat
     # But if format not found for new BibFormat, then call old BibFormat
@@ -366,19 +369,17 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
             return out + call_old_bibformat(recID, of=of, on_the_fly=True,
                                             verbose=verbose)
     ############################# END ##################################
+        try:
+            raise InvenioBibFormatError(_('No template could be found for output format %s.') % of)
+        except InvenioBibFormatError, exc:
+            register_exception(req=bfo.req)
 
-        error = get_msgs_for_code_list([("ERR_BIBFORMAT_NO_TEMPLATE_FOUND", of)],
-                                       stream='error', ln=CFG_SITE_LANG)
-        errors_.append(error)
-        if verbose == 0:
-            register_errors(error, 'error')
-        elif verbose > 5:
-            return out + error[0][1]
+        if verbose > 5:
+            return out + str(exc.message)
         return out
 
     # Format with template
-    (out_, errors) = format_with_format_template(template, bfo, verbose)
-    errors_.extend(errors)
+    out_ = format_with_format_template(template, bfo, verbose)
 
     out += out_
 
@@ -427,7 +428,7 @@ def decide_format_template(bfo, of):
 def format_with_format_template(format_template_filename, bfo,
                                 verbose=0, format_template_code=None):
     """ Format a record given a
-    format template. Also returns errors
+    format template.
 
     Returns a formatted version of the record represented by bfo,
     in the language specified in bfo, and with the specified format template.
@@ -444,7 +445,7 @@ def format_with_format_template(format_template_filename, bfo,
                                                        5: errors,
                                                        7: errors and warnings,
                                                        9: errors and warnings, stop if error (debug mode ))
-    @return: tuple (formatted text, errors)
+    @return: formatted text
     """
     _ = gettext_set_language(bfo.lang)
 
@@ -456,7 +457,6 @@ def format_with_format_template(format_template_filename, bfo,
         translated_word = _(word)
         return translated_word
 
-    errors_ = []
     if format_template_code is not None:
         format_content = str(format_template_code)
     else:
@@ -468,10 +468,9 @@ def format_with_format_template(format_template_filename, bfo,
         filtered_format = filter_languages(format_content, bfo.lang)
         localized_format = translation_pattern.sub(translate, filtered_format)
 
-        (evaluated_format, errors) = eval_format_template_elements(localized_format,
-                                                                   bfo,
-                                                                   verbose)
-        errors_ = errors
+        evaluated_format = eval_format_template_elements(localized_format,
+                                                         bfo,
+                                                         verbose)
     else:
         #.xsl
         if bfo.xml_record:
@@ -486,13 +485,12 @@ def format_with_format_template(format_template_filename, bfo,
         # Transform MARCXML using stylesheet
         evaluated_format = format(xml_record, template_source=format_content)
 
-    return (evaluated_format, errors_)
+    return evaluated_format
 
 
 def eval_format_template_elements(format_template, bfo, verbose=0):
     """
     Evalutes the format elements of the given template and replace each element with its value.
-    Also returns errors.
 
     Prepare the format template content so that we can directly replace the marc code by their value.
     This implies:
@@ -506,8 +504,7 @@ def eval_format_template_elements(format_template, bfo, verbose=0):
                     9: errors and warnings, stop if error (debug mode ))
     @return: tuple (result, errors)
     """
-    errors_ = []
-
+    _ = gettext_set_language(bfo.lang)
     # First define insert_element_code(match), used in re.sub() function
     def insert_element_code(match):
         """
@@ -527,12 +524,14 @@ def eval_format_template_elements(format_template, bfo, verbose=0):
                        cgi.escape(str(e)).replace('\n', '<br/>') + \
                        '</span>'
         if format_element is None:
-            error = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_RESOLVE_ELEMENT_NAME", function_name)],
-                                           stream='error', ln=CFG_SITE_LANG)
-            errors_.append(error)
+            try:
+                raise InvenioBibFormatError(_('Could not find format element named %s.') % function_name)
+            except InvenioBibFormatError, exc:
+                register_exception(req=bfo.req)
+
             if verbose >= 5:
                 return '<b><span style="color: rgb(255, 0, 0);">' + \
-                       error[0][1]+'</span></b>'
+                       str(exc.message)+'</span></b>'
         else:
             params = {}
             # Look for function parameters given in format template code
@@ -545,19 +544,16 @@ def eval_format_template_elements(format_template, bfo, verbose=0):
                     params[name] = value
 
             # Evaluate element with params and return (Do not return errors)
-            (result, errors) = eval_format_element(format_element,
+            (result, dummy) = eval_format_element(format_element,
                                                    bfo,
                                                    params,
                                                    verbose)
-            errors_.append(errors)
             return result
-
 
     # Substitute special tags in the format by our own text.
     # Special tags have the form <BNE_format_element_name [param="value"]* />
     format = pattern_tag.sub(insert_element_code, format_template)
-
-    return (format, errors_)
+    return format
 
 
 def eval_format_element(format_element, bfo, parameters=None, verbose=0):
@@ -616,23 +612,24 @@ def eval_format_element(format_element, bfo, parameters=None, verbose=0):
 
         # Execute function with given parameters and return result.
         function = format_element['code']
+        _ = gettext_set_language(bfo.lang)
 
         try:
             output_text = apply(function, (), params)
         except Exception, e:
             name = format_element['attrs']['name']
-            error = ("ERR_BIBFORMAT_EVALUATING_ELEMENT", name, str(params))
-            errors.append(error)
-            if verbose == 0:
-                register_errors(errors, 'error')
-            elif verbose >= 5:
+            try:
+                raise InvenioBibFormatError(_('Error when evaluating format element %s with parameters %s.') % (name, str(params)))
+            except InvenioBibFormatError, exc:
+                register_exception(req=bfo.req)
+                errors.append(exc.message)
+
+            if verbose >= 5:
                 tb = sys.exc_info()[2]
-                error_string = get_msgs_for_code_list(error,
-                                                      stream='error',
-                                                      ln=CFG_SITE_LANG)
+
                 stack = traceback.format_exception(Exception, e, tb, limit=None)
                 output_text = '<b><span style="color: rgb(255, 0, 0);">'+ \
-                              str(error_string[0][1]) + "".join(stack) +'</span></b> '
+                              str(exc.message) + "".join(stack) +'</span></b> '
 
         # None can be returned when evaluating function
         if output_text is None:
@@ -659,17 +656,17 @@ def eval_format_element(format_element, bfo, parameters=None, verbose=0):
             try:
                 escape_mode = apply(escape_function, (), {'bfo': bfo})
             except Exception, e:
-                error = ("ERR_BIBFORMAT_EVALUATING_ELEMENT_ESCAPE", name)
-                errors.append(error)
-                if verbose == 0:
-                    register_errors(errors, 'error')
-                elif verbose >= 5:
+                try:
+                    raise InvenioBibFormatError(_('Escape mode for format element %s could not be retrieved. Using default mode instead.') % name)
+                except InvenioBibFormatError, exc:
+                    register_exception(req=bfo.req)
+                    errors.append(exc.message)
+
+                if verbose >= 5:
                     tb = sys.exc_info()[2]
-                    error_string = get_msgs_for_code_list(error,
-                                                          stream='error',
-                                                          ln=CFG_SITE_LANG)
+
                     output_text += '<b><span style="color: rgb(255, 0, 0);">'+ \
-                                   str(error_string[0][1]) +'</span></b> '
+                                   str(exc.message) +'</span></b> '
         # (3)
         if escape in ['0', '1', '2', '3', '4', '5', '6', '7']:
             escape_mode = int(escape)
@@ -731,15 +728,14 @@ def eval_format_element(format_element, bfo, parameters=None, verbose=0):
                 output_text = output_text[:nbMax]
             except:
                 name = format_element['attrs']['name']
-                error = ("ERR_BIBFORMAT_NBMAX_NOT_INT", name)
-                errors.append(error)
-                if verbose < 5:
-                    register_errors(error, 'error')
-                elif verbose >= 5:
-                    error_string = get_msgs_for_code_list(error,
-                                                          stream='error',
-                                                          ln=CFG_SITE_LANG)
-                    output_text = output_text.append(error_string[0][1])
+                try:
+                    raise InvenioBibFormatError(_('"nbMax" parameter for %s must be an "int".') % name)
+                except InvenioBibFormatError, exc:
+                    register_exception(req=bfo.req)
+                    errors.append(exc.message)
+
+                if verbose >= 5:
+                    output_text = output_text.append(exc.message)
 
 
 
@@ -763,17 +759,19 @@ def eval_format_element(format_element, bfo, parameters=None, verbose=0):
         return (output_text, errors)
     else:
         # c) Element is unknown
-        error = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_RESOLVE_ELEMENT_NAME", format_element)],
-                                       stream='error', ln=CFG_SITE_LANG)
-        errors.append(error)
+        try:
+            raise InvenioBibFormatError(_('Could not find format element named %s.') % format_element)
+        except InvenioBibFormatError, exc:
+            register_exception(req=bfo.req)
+            errors.append(exc.message)
+
         if verbose < 5:
-            register_errors(error, 'error')
             return ("", errors)
         elif verbose >= 5:
             if verbose >= 9:
-                sys.exit(error[0][1])
+                sys.exit(exc.message)
             return ('<b><span style="color: rgb(255, 0, 0);">' + \
-                    error[0][1]+'</span></b>', errors)
+                    str(exc.message)+'</span></b>', errors)
 
 
 def filter_languages(format_template, ln='en'):
@@ -842,7 +840,7 @@ def get_format_template(filename, with_attributes=False):
     @param with_attributes: if True, fetch the attributes (names and description) for format'
     @return: strucured content of format template
     """
-
+    _ = gettext_set_language(CFG_SITE_LANG)
     # Get from cache whenever possible
     global format_templates_cache
 
@@ -879,9 +877,10 @@ def get_format_template(filename, with_attributes=False):
         format_template['code'] = code
 
     except Exception, e:
-        errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_READ_TEMPLATE_FILE", filename, str(e))],
-                                        stream='error', ln=CFG_SITE_LANG)
-        register_errors(errors, 'error')
+        try:
+            raise InvenioBibFormatError(_('Could not read format template named %s. %s.') % (filename, str(e)))
+        except InvenioBibFormatError, exc:
+            register_exception()
 
     # Save attributes if necessary
     if with_attributes:
@@ -929,6 +928,7 @@ def get_format_template_attrs(filename):
     @param filename: the name of a format template
     @return: a structure with detailed information about given format template
     """
+    _ = gettext_set_language(CFG_SITE_LANG)
     attrs = {}
     attrs['name'] = ""
     attrs['description'] = ""
@@ -956,10 +956,11 @@ def get_format_template_attrs(filename):
             if match is not None:
                 attrs['description'] = match.group('desc').rstrip('.')
     except Exception, e:
-        errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_READ_TEMPLATE_FILE",
-                                          filename, str(e))],
-                                        stream='error', ln=CFG_SITE_LANG)
-        register_errors(errors, 'error')
+        try:
+            raise InvenioBibFormatError(_('Could not read format template named %s. %s.') % (filename, str(e)))
+        except InvenioBibFormatError, exc:
+            register_exception()
+
         attrs['name'] = filename
 
     return attrs
@@ -986,6 +987,7 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
     @param with_built_in_params: if True, load the parameters built in all elements
     @return: a dictionary with format element attributes
     """
+    _ = gettext_set_language(CFG_SITE_LANG)
     # Get from cache whenever possible
     global format_elements_cache
 
@@ -1019,13 +1021,13 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
             return format_element
 
         else:
-            errors = get_msgs_for_code_list([("ERR_BIBFORMAT_FORMAT_ELEMENT_NOT_FOUND",
-                                              element_name)],
-                                            stream='error', ln=CFG_SITE_LANG)
-            if verbose == 0:
-                register_errors(errors, 'error')
-            elif verbose >= 5:
-                sys.stderr.write(errors[0][1])
+            try:
+                raise InvenioBibFormatError(_('Format element %s could not be found.') % element_name)
+            except InvenioBibFormatError, exc:
+                register_exception()
+
+            if verbose >= 5:
+                sys.stderr.write(exc.message)
             return None
 
     else:
@@ -1053,17 +1055,18 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
             # traceback in all cases
             tb = sys.exc_info()[2]
             stack = traceback.format_exception(Exception, e, tb, limit=None)
-            errors = get_msgs_for_code_list([("ERR_BIBFORMAT_IN_FORMAT_ELEMENT",
-                                              element_name,"\n" + "\n".join(stack[-2:-1]))],
-                                            stream='error', ln=CFG_SITE_LANG)
-            if verbose == 0:
-                register_errors(errors, 'error')
-            elif verbose >= 5:
-                sys.stderr.write(errors[0][1])
+            try:
+                raise InvenioBibFormatError(_('Error in format element %s. %s.') % (element_name,"\n" + "\n".join(stack[-2:-1])))
+            except InvenioBibFormatError, exc:
+                register_exception()
+                errors.append(exc.message)
+
+            if verbose >= 5:
+                sys.stderr.write(exc.message)
 
         if errors:
             if verbose >= 7:
-                raise Exception, errors[0][1]
+                raise Exception, exc.message
             return None
 
         # Load function 'format_element()' inside element
@@ -1076,17 +1079,18 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
                 function_format  = module.__dict__[module_name].format
                 format_element['code'] = function_format
             except AttributeError, e:
-                errors = get_msgs_for_code_list([("ERR_BIBFORMAT_FORMAT_ELEMENT_FORMAT_FUNCTION",
-                                                  element_name)],
-                                                stream='error', ln=CFG_SITE_LANG)
-                if verbose == 0:
-                    register_errors(errors, 'error')
-                elif verbose >= 5:
-                    sys.stderr.write(errors[0][1])
+                try:
+                    raise InvenioBibFormatError(_('Format element %s has no function named "format".') % element_name)
+                except InvenioBibFormatError, exc:
+                    register_exception()
+                    errors.append(exc.message)
+
+                if verbose >= 5:
+                    sys.stderr.write(exc.message)
 
         if errors:
             if verbose >= 7:
-                raise Exception, errors[0][1]
+                raise Exception, exc.message
             return None
 
         # Load function 'escape_values()' inside element
@@ -1401,14 +1405,16 @@ def get_output_format(code, with_attributes=False, verbose=0):
                                                        9: errors and warnings, stop if error (debug mode ))
     @return: strucured content of output format
     """
-
+    _ = gettext_set_language(CFG_SITE_LANG)
     output_format = {'rules':[], 'default':""}
     filename = resolve_output_format_filename(code, verbose)
 
     if filename is None:
-        errors = get_msgs_for_code_list([("ERR_BIBFORMAT_OUTPUT_FORMAT_CODE_UNKNOWN", code)],
-                                        stream='error', ln=CFG_SITE_LANG)
-        register_errors(errors, 'error')
+        try:
+            raise InvenioBibFormatError(_('Output format with code %s could not be found.') % code)
+        except InvenioBibFormatError, exc:
+            register_exception()
+
         if with_attributes: #Create empty attrs if asked for attributes
             output_format['attrs'] = get_output_format_attrs(code, verbose)
         return output_format
@@ -1461,9 +1467,10 @@ def get_output_format(code, with_attributes=False, verbose=0):
                 output_format['default'] = default
 
     except Exception, e:
-        errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_READ_OUTPUT_FILE", filename, str(e))],
-                                        stream='error', ln=CFG_SITE_LANG)
-        register_errors(errors, 'error')
+        try:
+            raise InvenioBibFormatError(_('Output format %s cannot not be read. %s.') % (filename, str(e)))
+        except InvenioBibFormatError, exc:
+            register_exception()
 
     # Cache and return
     format_outputs_cache[filename] = output_format
@@ -1607,6 +1614,7 @@ def resolve_output_format_filename(code, verbose=0):
                                                        9: errors and warnings, stop if error (debug mode ))
     @return: the corresponding filename, with right case, or None if not found
     """
+    _ = gettext_set_language(CFG_SITE_LANG)
     #Remove non alphanumeric chars (except . and _)
     code = re.sub(r"[^.0-9a-zA-Z_]", "", code)
     if not code.endswith("."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION):
@@ -1619,14 +1627,15 @@ def resolve_output_format_filename(code, verbose=0):
             return filename
 
     # No output format with that name found
-    errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_RESOLVE_OUTPUT_NAME", code)],
-                                    stream='error', ln=CFG_SITE_LANG)
-    if verbose == 0:
-        register_errors(errors, 'error')
-    elif verbose >= 5:
-        sys.stderr.write(errors[0][1])
+    try:
+        raise InvenioBibFormatError(_('Could not find output format named %s.') % code)
+    except InvenioBibFormatError, exc:
+        register_exception()
+
+    if verbose >= 5:
+        sys.stderr.write(exc.message)
         if verbose >= 9:
-            sys.exit(errors[0][1])
+            sys.exit(exc.message)
     return None
 
 def get_fresh_format_template_filename(name):
@@ -1677,6 +1686,7 @@ def get_fresh_output_format_filename(code):
     @param code: the code of an output format
     @return: the corresponding filename, and modified code if necessary
     """
+    _ = gettext_set_language(CFG_SITE_LANG)
     #code = re.sub(r"\W", "", code) #Remove non alphanumeric chars
     code = code.upper().replace(" ", "_")
     # Remove non alphanumeric chars (except . and _)
@@ -1698,9 +1708,11 @@ def get_fresh_output_format_filename(code):
         # We should not try more than 99999... Well I don't see how we
         # could get there.. Sanity check.
         if index >= 99999:
-            errors = get_msgs_for_code_list([("ERR_BIBFORMAT_NB_OUTPUTS_LIMIT_REACHED", code)],
-                                            stream='error', ln=CFG_SITE_LANG)
-            register_errors(errors, 'error')
+            try:
+                raise InvenioBibFormatError(_('Could not find a fresh name for output format %s.') % code)
+            except InvenioBibFormatError, exc:
+                register_exception()
+
             sys.exit("Output format cannot be named as %s"%code)
 
     return (filename + "." + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, filename)
@@ -2108,4 +2120,3 @@ if __name__ == "__main__":
     profile.run('bf_profile()', "bibformat_profile")
     p = pstats.Stats("bibformat_profile")
     p.strip_dirs().sort_stats("cumulative").print_stats()
-

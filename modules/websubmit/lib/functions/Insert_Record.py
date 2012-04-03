@@ -24,7 +24,8 @@ import shutil
 from invenio.config import \
      CFG_TMPDIR
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
-from invenio.bibtask import task_low_level_submission
+from invenio.websubmit_functions.Shared_Functions import ParamFromFile
+from invenio.bibtask import task_low_level_submission, bibtask_allocate_sequenceid
 
 def Insert_Record(parameters, curdir, form, user_info=None):
     """
@@ -33,6 +34,7 @@ def Insert_Record(parameters, curdir, form, user_info=None):
     this function, for eg. using "Make_Record".
     """
     global rn
+    sequence_id = bibtask_allocate_sequenceid(curdir)
     if os.path.exists(os.path.join(curdir, "recmysql")):
         recfile = "recmysql"
     else:
@@ -42,6 +44,6 @@ def Insert_Record(parameters, curdir, form, user_info=None):
                               (rn.replace('/', '_'),
                                time.strftime("%Y-%m-%d_%H:%M:%S")))
     shutil.copy(initial_file, final_file)
-    bibupload_id = task_low_level_submission('bibupload', 'websubmit.Insert_Record', '-r', '-i', final_file, '-P', '3')
+    bibupload_id = task_low_level_submission('bibupload', 'websubmit.Insert_Record', '-r', '-i', final_file, '-P', '3', '-I', str(sequence_id))
     open(os.path.join(curdir, 'bibupload_id'), 'w').write(str(bibupload_id))
     return ""

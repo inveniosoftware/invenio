@@ -23640,4 +23640,232 @@ Only the mountain and I.
       <subfield code="x">http://invenio-software.org/download/invenio-demo-site-files/icon-journal_galapagos_archipelago.jpg</subfield>
     </datafield>
   </record>
+  <record>
+    <datafield tag="037" ind1=" " ind2=" ">
+      <subfield code="a">CERN-MOVIE-2010-075</subfield>
+    </datafield>
+    <datafield tag="041" ind1=" " ind2=" ">
+      <subfield code="a">silent</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="a">CMS team</subfield>
+      <subfield code="e">Produced by</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">CMS animation of the high-energy collisions at 7 TeV on 30th March 2010</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+      <subfield code="c">2010</subfield>
+    </datafield>
+    <datafield tag="269" ind1=" " ind2=" ">
+      <subfield code="b">CERN Copyright</subfield>
+      <subfield code="c">2010-03-30</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+      <subfield code="a">10 sec</subfield>
+      <subfield code="b">720x576 16/9, 25</subfield>
+    </datafield>
+    <datafield tag="340" ind1=" " ind2=" ">
+      <subfield code="a">UNKNOWN PAL</subfield>
+    </datafield>
+    <datafield tag="595" ind1=" " ind2=" ">
+      <subfield code="a">CERN EDS</subfield>
+    </datafield>
+    <datafield tag="653" ind1="1" ind2=" ">
+      <subfield code="a">LHC</subfield>
+      <subfield code="9">CERN</subfield>
+    </datafield>
+    <datafield tag="653" ind1="1" ind2=" ">
+      <subfield code="a">CMS</subfield>
+      <subfield code="9">CERN</subfield>
+    </datafield>
+    <datafield tag="653" ind1="1" ind2=" ">
+      <subfield code="a">LHCfirstphysics</subfield>
+      <subfield code="9">CERN</subfield>
+    </datafield>
+    <datafield tag="690" ind1="C" ind2=" ">
+      <subfield code="a">publvideomovie</subfield>
+    </datafield>
+    <datafield tag="909" ind1="C" ind2="0">
+      <subfield code="Y">2010</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">VIDEO</subfield>
+    </datafield>
+    <datafield tag="520" ind1=" " ind2=" ">
+      <subfield code="a">Run 132440 - Event  2732271</subfield>
+    </datafield>
+    <datafield tag="542" ind1=" " ind2=" ">
+      <subfield code="d">CERN</subfield>
+      <subfield code="g">2010</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_POSTER.jpg</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_POSTER</subfield>
+      <subfield code="f">jpg</subfield>
+      <subfield code="d">POSTER</subfield>
+      <subfield code="z">POSTER</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075.mpg;master</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075</subfield>
+      <subfield code="f">mpg;master</subfield>
+      <subfield code="d">MASTER</subfield>
+      <subfield code="z">MASTER</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075.webm;480p</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075</subfield>
+      <subfield code="f">webm;480p</subfield>
+      <subfield code="d">WEBM_480P</subfield>
+      <subfield code="z">WEBM_480P</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075.webm;720p</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075</subfield>
+      <subfield code="f">webm;720p</subfield>
+      <subfield code="d">WEBM_720P</subfield>
+      <subfield code="z">WEBM_720P</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_01.jpg;big</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_01</subfield>
+      <subfield code="f">jpg;big</subfield>
+      <subfield code="d">BIGTHUMB</subfield>
+      <subfield code="z">BIGTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_01.jpg;small</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_01</subfield>
+      <subfield code="f">jpg;small</subfield>
+      <subfield code="d">SMALLTHUMB</subfield>
+      <subfield code="z">SMALLTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_02.jpg;big</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_02</subfield>
+      <subfield code="f">jpg;big</subfield>
+      <subfield code="d">BIGTHUMB</subfield>
+      <subfield code="z">BIGTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_02.jpg;small</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_02</subfield>
+      <subfield code="f">jpg;small</subfield>
+      <subfield code="d">SMALLTHUMB</subfield>
+      <subfield code="z">SMALLTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_03.jpg;big</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_03</subfield>
+      <subfield code="f">jpg;big</subfield>
+      <subfield code="d">BIGTHUMB</subfield>
+      <subfield code="z">BIGTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_03.jpg;small</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_03</subfield>
+      <subfield code="f">jpg;small</subfield>
+      <subfield code="d">SMALLTHUMB</subfield>
+      <subfield code="z">SMALLTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_04.jpg;big</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_04</subfield>
+      <subfield code="f">jpg;big</subfield>
+      <subfield code="d">BIGTHUMB</subfield>
+      <subfield code="z">BIGTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_04.jpg;small</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_04</subfield>
+      <subfield code="f">jpg;small</subfield>
+      <subfield code="d">SMALLTHUMB</subfield>
+      <subfield code="z">SMALLTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_05.jpg;big</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_05</subfield>
+      <subfield code="f">jpg;big</subfield>
+      <subfield code="d">BIGTHUMB</subfield>
+      <subfield code="z">BIGTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_05.jpg;small</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_05</subfield>
+      <subfield code="f">jpg;small</subfield>
+      <subfield code="d">SMALLTHUMB</subfield>
+      <subfield code="z">SMALLTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_06.jpg;big</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_06</subfield>
+      <subfield code="f">jpg;big</subfield>
+      <subfield code="d">BIGTHUMB</subfield>
+      <subfield code="z">BIGTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_06.jpg;small</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_06</subfield>
+      <subfield code="f">jpg;small</subfield>
+      <subfield code="d">SMALLTHUMB</subfield>
+      <subfield code="z">SMALLTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_07.jpg;big</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_07</subfield>
+      <subfield code="f">jpg;big</subfield>
+      <subfield code="d">BIGTHUMB</subfield>
+      <subfield code="z">BIGTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_07.jpg;small</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_07</subfield>
+      <subfield code="f">jpg;small</subfield>
+      <subfield code="d">SMALLTHUMB</subfield>
+      <subfield code="z">SMALLTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_08.jpg;big</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_08</subfield>
+      <subfield code="f">jpg;big</subfield>
+      <subfield code="d">BIGTHUMB</subfield>
+      <subfield code="z">BIGTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_08.jpg;small</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_08</subfield>
+      <subfield code="f">jpg;small</subfield>
+      <subfield code="d">SMALLTHUMB</subfield>
+      <subfield code="z">SMALLTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_09.jpg;big</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_09</subfield>
+      <subfield code="f">jpg;big</subfield>
+      <subfield code="d">BIGTHUMB</subfield>
+      <subfield code="z">BIGTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_09.jpg;small</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_09</subfield>
+      <subfield code="f">jpg;small</subfield>
+      <subfield code="d">SMALLTHUMB</subfield>
+      <subfield code="z">SMALLTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_10.jpg;big</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_10</subfield>
+      <subfield code="f">jpg;big</subfield>
+      <subfield code="d">BIGTHUMB</subfield>
+      <subfield code="z">BIGTHUMB</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/CERN-MOVIE-2010-075_10.jpg;small</subfield>
+      <subfield code="n">CERN-MOVIE-2010-075_10</subfield>
+      <subfield code="f">jpg;small</subfield>
+      <subfield code="d">SMALLTHUMB</subfield>
+      <subfield code="z">SMALLTHUMB</subfield>
+    </datafield>
+  </record>
 </collection>

@@ -32,6 +32,15 @@ from invenio.config import CFG_SITE_ADMIN_EMAIL
 
 def Video_Processing(parameters, curdir, form, user_info=None):
     """
+    Perform all the required processing of the video.
+
+    Parameters are:
+    * "batch_template": to specify the absolute path to a
+        configuration describe which manipulation should the uploaded file
+        receive. If empty, will use by default
+        etc/bibencode/batch_template_submission.json
+    * "aspect": to specify in which form element the aspect will be available
+    * "title": to specify in which form element the title will be available
     """
 
     ## Read the batch template for submissions

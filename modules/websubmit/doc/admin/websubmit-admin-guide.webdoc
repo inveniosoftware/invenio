@@ -119,6 +119,18 @@ descriptions, etc.)</b>
     <li>6.2&nbsp;&nbsp;<a href="#6.2">User-level</a></li>
   </ul>
 </li>
+<li><strong>7. <a href="#linking">Linking to submissions</a></strong>
+  <ul style="list-style-type:None">
+    <li>7.1&nbsp;&nbsp;<a href="#linkingfromsubmissions">Adding a link from the submissions page</a></li>
+    <li>7.2&nbsp;&nbsp;<a href="#linkingwithurl">Linking to a submission with direct URL (in email, formats, etc.)</a></li>
+  </ul>
+</li>
+<li><strong>8. <a href="#terminology">Terminology</a></strong>
+  <ul style="list-style-type:None">
+    <li>8.1&nbsp;&nbsp;<a href="#terminologydocumenttype">8.1 The document type of a file (<code>doctype</code>)</a></li>
+    <li>8.2&nbsp;&nbsp;<a href="#terminologycurdir">8.2 The submission directory (<code>curdir</code>)</a></li>
+  </ul>
+</li>
 </ul>
 
 &nbsp;&nbsp;&nbsp;&nbsp;(Check out the <a href="#oldwebsubmitguide">old WebSubmit admin guide</a>)<br/>
@@ -1511,9 +1523,58 @@ etc. submission workflow (for eg. just after the "Get_Recid"
 function). Check also the <a href="#2.4">Restricting the
 submission</a> how-to from this guide.</p>
 
+<a name="linking"></a><h2>7. Linking to submissions</h2>
 
-<a name="7"></a><h2>Terminology</h2>
-<a name="7.1"></a><h3>The document type of a file (<code>doctype</code>)</h3>
+<a name="linkingfromsubmissions"></a><h3>7.1 Adding a link from the submissions page</h3>
+
+<p>Please refer to the tutorial (<a href="#2.1.7">section 2.1.7</a>) to learn how to populate the list
+of submissions on the main submission page (at <em><CFG_SITE_URL>/submit/</em>).</p>
+
+<a name="linkingwithurl"></a><h3>7.2 Linking to a submission with direct URL (in email, formats, etc.)</h3>
+
+<p>It might be necessary to construct URL that lead to the submission,
+for eg. when sending emails, or when displaying some actions from the
+Detailed record view (formats).</p>
+
+<h4 id="linkingwithurlmainpage">7.2.1 URL to main submission page</h4>
+
+<p>A url to the main page of a submission can be built with this pattern:</p>
+<pre class="code"><CFG_SITE_URL>/submit?doctype=DEMOART</pre>
+<p>where <code>DEMOART</code> would be your submission code.</p>
+
+
+<h4 id="linkingwithurljump">7.2.2 URL to jump straight into the submission</h4>
+
+<p>One can directly move into the submission by building such a URL:</p>
+<pre class="code"><CFG_SITE_URL>/submit/direct?sub={action}(submission_code)</pre>
+
+<p>For eg: <code><CFG_SITE_URL>/submit/direct?sub=MBIDEMOART</code>
+
+<p>In that way one would skip the submission "splash" page (<i>Page "0"</i>) and jump straight to the submission page 1.
+For an action that must deal with a specific record (eg. MBI, APP) one can already pre-fill for eg. the "report number" field:</p>
+<pre class="code"><CFG_SITE_URL>/submit/direct?sub=MBIDEMOART&DEMOART_RN=TESLA-FEL-99-07</pre>
+
+<p>Depending on the way your submission is built, you might <strong>have</strong> also to specify the category of the document to modify (the category is usually chosen on page "0" of the submission):</p>
+<pre class="code"><CFG_SITE_URL>/submit/direct?sub=MBIDEMOART&DEMOART_RN=TESLA-FEL-99-07&comboDEMOART=Article</pre>
+<p>(Note how the category field is constructed: <code>combo{submission_code}</code> )</p>
+
+<p>You can add as many parameters as needed to ensure that the form is filled with adequate values before being presented to the user. The parameters names correspond to the fields names in WebSubmit. For eg:</p>
+<pre class="code"><CFG_SITE_URL>/submit/direct?sub=MBIDEMOART&DEMOART_RN=TESLA-FEL-99-07&comboDEMOART=Article&DEMOART_CHANGE=DEMOART_TITLE</pre>
+<p>The parameters that you have to specify will depend on the usage which is made of them on the submission side.</p>
+
+<p>For fields that can take several values as input (for eg. selection lists, as in the <code>DEMOART_CHANGE</code> example above) and that translate into a file in the submission direction with one value per line, you would have to specify all the values in the same URL argument, separated by <code>"%0A"</code> (newline <code>"\n"</code> encoded for URL):</p>
+<pre class="code"><CFG_SITE_URL>/submit/direct?sub=MBIDEMOART&DEMOART_RN=TESLA-FEL-99-07&comboDEMOART=Article&DEMOART_CHANGE=DEMOART_TITLE%0ADEMOART_ABS</pre>
+
+<p>Depending on how your submission is build, you can also move to another page ("<code>curpage</code>" param) or another step of the workflow("<code>step</code>" param):</p>
+<pre class="code"><CFG_SITE_URL>/submit/direct?sub=MBIDEMOART&DEMOART_RN=TESLA-FEL-99-07&comboDEMOART=Article&DEMOART_CHANGE=DEMOART_TITLE&step=1</pre>
+
+<p>(In the above example a logged in user would skip the submission splash page AND the modificaton interface to select the document and fields to update, to jump directly to the <code>DEMOART_TITLE</code> modification field)</p>
+
+<p>In such cases you have to make sure that you provide all the information requested by the submission at each of the steps/pages until the provided step/page. Depending on how your submission is built it might be simply not possible to do that. This would be especially true when advancing steps, as functions netween the steps would not be run &mdash; most probably advancing directly to step 1 will be a maximum one can easily support &mdash; while controlling "<code>curpage</code>" parameter might be easier.</p>
+
+
+<a name="terminology"></a><h2>8. Terminology</h2>
+<a name="terminologydocumenttype"></a><h3>8.1 The document type of a file (<code>doctype</code>)</h3>
 
 <p>The document type is an attribute of a file. It can be seen as a
 category which lets you organize your files: "Main" file,
@@ -1525,7 +1586,7 @@ document type, or simply to make the configuration of the submission
 easier, depending on which technique you use to manage files.</p>
 
 
-<a name="7.2"></a><h3>The submission directory (<code>curdir</code>)</h3>
+<a name="terminologycurdir"></a><h3>8.2 The submission directory (<code>curdir</code>)</h3>
 
 <p>The WebSubmit workflow mainly splits in two parts: data gathering
 (user interface side, with WebSubmit pages and elements) and data

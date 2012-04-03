@@ -24,21 +24,12 @@
 
 __revision__ = "$Id$"
 
-# pylint: disable=C0301
-CFG_MISCUTIL_ERROR_MESSAGES = \
-{   'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED':  '_("Invalid argument %s was passed")',
-    'ERR_MISCUTIL_WRITE_FAILED': '_("Unable to write to file %s")',
-    'ERR_MISCUTIL_NO_ERROR_MESSAGE': '_("Trying to write a non error message to error log")',
-    'ERR_MISCUTIL_NO_WARNING_MESSAGE': '_("Trying to write a non error message or non warning message to error log")',
-    'ERR_MISCUTIL_TOO_MANY_ARGUMENT': '_("Unable to display error: Too many arguments given for error %s")',
-    'ERR_MISCUTIL_TOO_FEW_ARGUMENT':'_("Unable to display error: Too few arguments given for error %s")',
-    'ERR_MISCUTIL_IMPORT_ERROR': '_("An undefined error has occured (%s). \'%s\' does not exist")',
-    'ERR_MISCUTIL_NO_DICT': '_("An undefined error has occured (%s). %s does not contain %s")',
-    'ERR_MISCUTIL_NO_MESSAGE_IN_DICT': '_("An undefined error has occured. %s not defined in %s")',
-    'ERR_MISCUTIL_UNDEFINED_ERROR': '_("An undefined error has occured (%s)")',
-    'ERR_MISCUTIL_BAD_ARGUMENT_TYPE': '_("Unable to display error: Arguments do not match for error %s")',
-    'ERR_MISCUTIL_DEBUG': 'Error nb %i',
-    'ERR_MISCUTIL_NOT_ATTEMPTING_SEND_EMAIL' : '_("The system is not attempting to send an email from %s, to %s, with body %s")',
-    'ERR_MISCUTIL_CONNECTION_SMTP': '_("Error in connecting to the SMPT server waiting %s seconds. Exception is %s, while sending email from %s to %s with body %s.")',
-    'ERR_MISCUTIL_SENDING_EMAIL' : '_("Error in sending email from %s to %s with body %s")'
-}
+# Exceptions: errors
+class InvenioMiscUtilError(Exception):
+    """A generic error for MiscUtil."""
+    def __init__(self, message):
+        """Initialisation."""
+        self.message = message
+    def __str__(self):
+        """String representation."""
+        return repr(self.message)

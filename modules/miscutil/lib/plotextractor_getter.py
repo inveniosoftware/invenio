@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import urllib, time, os, sys, re
+import urllib2, time, os, sys, re
 from invenio.config import CFG_TMPDIR, \
                            CFG_PLOTEXTRACTOR_SOURCE_BASE_URL, \
                            CFG_PLOTEXTRACTOR_SOURCE_TARBALL_FOLDER, \
@@ -316,17 +316,14 @@ def parse_and_download(infile, sdir):
         line = line.strip()
         if line.startswith('http://'):
             # hurray!
-            try:
-                url = line
-                filename = url.split('/')[-1]
-                filename = os.path.join(tardir, filename)
-                urllib.urlretrieve(url, filename)
-                tarfiles.append(filename)
-                write_message('Downloaded to ' + filename)
-                time.sleep(CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT) # be nice!
-            except:
+            url = line
+            filename = url.split('/')[-1]
+            if not download(url, tardir, filename):
                 write_message(filename + ' may already exist')
                 write_message(sys.exc_info()[0])
+            filename = os.path.join(tardir, filename)
+            tarfiles.append(filename)
+            time.sleep(CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT) # be nice!
         elif line.startswith('arXiv'):
             tarfiles.extend(tarballs_by_arXiv_id([line.strip()], sdir))
 
@@ -345,18 +342,19 @@ def harvest_single(single, to_dir, selection=("tarball", "pdf")):
             if not found
     """
 
-    if single.find('arXiv') > -1 and \
-           CFG_PLOTEXTRACTOR_SOURCE_BASE_URL == 'http://arxiv.org/':
+    if single.find('arXiv') > -1 and 'arxiv.org' in CFG_PLOTEXTRACTOR_SOURCE_BASE_URL.lower():
         id_str = re.findall('[a-zA-Z\\-]+/\\d+|\\d+\\.\\d+', single)[0]
         idno = id_str.split('/')
         if len(idno) > 0:
             idno = idno[-1]
         yymm = int(idno[:4])
         yymm_dir = make_useful_directories(yymm, to_dir)
-        url_for_file = CFG_PLOTEXTRACTOR_SOURCE_BASE_URL + CFG_PLOTEXTRACTOR_SOURCE_TARBALL_FOLDER + \
+        url_for_file = CFG_PLOTEXTRACTOR_SOURCE_BASE_URL + \
+                       CFG_PLOTEXTRACTOR_SOURCE_TARBALL_FOLDER + \
                        id_str
-        url_for_pdf = CFG_PLOTEXTRACTOR_SOURCE_BASE_URL + CFG_PLOTEXTRACTOR_SOURCE_PDF_FOLDER + \
-                      id_str
+        url_for_pdf = CFG_PLOTEXTRACTOR_SOURCE_BASE_URL + \
+                      CFG_PLOTEXTRACTOR_SOURCE_PDF_FOLDER + \
+                      id_str + '.pdf' # adds '.pdf' to avoid arXiv internal redirect from arXivID to arXivID.pdf
         individual_file = 'arXiv:' + id_str.replace('/', '_')
         individual_dir = make_single_directory(yymm_dir, individual_file)
         abs_path = os.path.join(individual_dir, individual_file)
@@ -616,12 +614,17 @@ def download(url, filename, to_dir):
     new_file = os.path.join(to_dir, filename)
 
     try:
-        urllib.urlretrieve(url, new_file)
+        conn = urllib2.urlopen(url)
+        response = conn.read()
+        conn.close()
+        new_file_fd = open(new_file, 'w')
+        new_file_fd.write(response)
+        new_file_fd.close()
         write_message('Downloaded to ' + new_file)
         return True
-    except IOError:
+    except (IOError, urllib2.URLError), e:
         # this could be a permissions error, but it probably means that
         # there's nothing left in that section YYMM
-        write_message('Nothing at ' + new_file)
+        write_message('Error downloading from %s: \n%s\n' % (url, str(e)))
         return False
 

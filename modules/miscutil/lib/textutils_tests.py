@@ -42,7 +42,8 @@ from invenio.textutils import \
      wash_for_utf8, \
      decode_to_unicode, \
      translate_latex2unicode, \
-     translate_to_ascii
+     translate_to_ascii, \
+     strip_accents
 
 from invenio.testutils import make_test_suite, run_test_suite
 
@@ -441,9 +442,19 @@ class TranslateToAsciiTest(unittest.TestCase):
         self.assertEqual(translate_to_ascii([]), [])
         self.assertEqual(translate_to_ascii([None]), [None])
 
+class TestStripAccents(unittest.TestCase):
+    """Test for handling of UTF-8 accents."""
+
+    def test_strip_accents(self):
+        """textutils - stripping of accented letters"""
+        self.assertEqual("memememe",
+                         strip_accents('mémêmëmè'))
+        self.assertEqual("MEMEMEME",
+                         strip_accents('MÉMÊMËMÈ'))
+
 TEST_SUITE = make_test_suite(WrapTextInABoxTest, GuessMinimumEncodingTest,
                              WashForXMLTest, WashForUTF8Test, DecodeToUnicodeTest,
-                             Latex2UnicodeTest, TranslateToAsciiTest)
+                             Latex2UnicodeTest, TranslateToAsciiTest, TestStripAccents)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

@@ -45,8 +45,9 @@ from invenio.config import CFG_SITE_NAME, \
      CFG_SITE_RECORD
 
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
-from invenio.websubmit_functions.Shared_Functions import get_nice_bibsched_related_message
+from invenio.websubmit_functions.Shared_Functions import get_nice_bibsched_related_message, ParamFromFile
 from invenio.mailutils import scheduled_send_email
+from invenio.bibtask import bibtask_allocate_sequenceid
 
 def Mail_Submitter(parameters, curdir, form, user_info=None):
     """
@@ -77,6 +78,7 @@ def Mail_Submitter(parameters, curdir, form, user_info=None):
                  document (if any)
     """
     FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
+    sequence_id = bibtask_allocate_sequenceid(curdir)
     # retrieve report number
     edsrn = parameters['edsrn']
     newrnin = parameters['newrnin']
@@ -124,8 +126,11 @@ def Mail_Submitter(parameters, curdir, form, user_info=None):
     email_txt += get_nice_bibsched_related_message(curdir)
     email_txt = email_txt + "Thank you for using %s Submission Interface.\n" % CFG_SITE_NAME
 
-    ## send the mail
-    scheduled_send_email(FROMADDR, m_recipient.strip(), "%s: Document Received" % fullrn, email_txt, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
+    ## send the mail, if there are any recipients or copy to admin
+    if m_recipient or CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN:
+        scheduled_send_email(FROMADDR, m_recipient.strip(), "%s: Document Received" % fullrn, email_txt,
+                             copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN,
+                             other_bibtasklet_arguments=['-I', str(sequence_id)])
 
     return ""
 

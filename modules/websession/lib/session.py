@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -40,7 +40,8 @@ else:
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.dbquery import run_sql, blob_to_string
 from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
-    CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT, CFG_SITE_URL, CFG_SITE_SECURE_URL
+    CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT, CFG_SITE_URL, CFG_SITE_SECURE_URL, \
+    CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS
 from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
     CFG_WEBSESSION_ONE_DAY, CFG_WEBSESSION_CLEANUP_CHANCE, \
     CFG_WEBSESSION_ENABLE_LOCKING
@@ -187,13 +188,19 @@ class InvenioSession(dict):
             remote_ip = self._req.remote_ip
             if self._req.is_https():
                 if session_dict['_https_ip'] is not None and \
-                        session_dict['_https_ip'] != remote_ip:
+                        _mkip(session_dict['_https_ip']) >> \
+                            CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS != \
+                        _mkip(remote_ip) >> \
+                            CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS:
                     invalid = True
                 else:
                     session_dict['_https_ip'] = remote_ip
             else:
                 if session_dict['_http_ip'] is not None and \
-                        session_dict['_http_ip'] != remote_ip:
+                        _mkip(session_dict['_http_ip']) >> \
+                            CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS != \
+                        _mkip(remote_ip) >> \
+                            CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS:
                     invalid = True
                 else:
                     session_dict['_http_ip'] = remote_ip
@@ -219,7 +226,7 @@ class InvenioSession(dict):
         """
         Save the session to the database.
         """
-        if not self._invalid:
+        if not self._invalid and self._sid:
             session_dict = {"_data" : self.copy(),
                     "_created" : self._created,
                     "_accessed": self._accessed,
@@ -397,6 +404,7 @@ class InvenioSession(dict):
         self._req.log_error("InvenioSession: registered database cleanup.")
 
     def __del__(self):
+        self.save()
         self.unlock()
 
     def get_need_https(self):
@@ -519,3 +527,12 @@ def _new_sid(req):
         rnd2,
         remote_ip)
     ).hexdigest()
+
+def _mkip(ip):
+    """
+    Compute a numerical value for a dotted IP
+    """
+    num = 0L
+    for i in map (int, ip.split ('.')):
+        num = (num << 8) + i
+    return num

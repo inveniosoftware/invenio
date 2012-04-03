@@ -139,7 +139,7 @@ def Send_Approval_Request (parameters, curdir, form, user_info=None):
     mail_referee = "The document %s has been submitted to the %s Server..\nYour approval is requested on it.\n\n" % (rn,CFG_SITE_NAME)
     mail_referee +="Title: %s\n\nAuthor(s): %s\n\n" % (title,author)
     mail_referee +="To access the document(s), select the file(s) from the location:<%s/%s/%s/files/>\n\n" % (CFG_SITE_URL,CFG_SITE_RECORD,sysno)
-    mail_referee +="To approve/reject the document, you should go to this URL:\n<%s/approve.py?%s>\n" % (CFG_SITE_URL,access)
+    mail_referee +="To approve/reject the document, you should go to this URL:\n<%s/approve.py?access=%s>\n" % (CFG_SITE_URL,access)
     mail_referee +="---------------------------------------------\nBest regards.\nThe submission team.\n"
     #Send mail to referee
     send_email(FROMADDR, addresses, title_referee, mail_referee, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)

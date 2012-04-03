@@ -276,6 +276,23 @@ engine.
 
 <tr>
 <td>
+  <strong>BibSort Admin</strong>
+</td>
+<td>
+  Enables you to configure the sorting methods displayed to the user. You can update
+  the sorting data for a particular set of records, you can rebalance all the sorting
+  data, you can remove all the sorting data associated with a method.
+</td>
+<td>
+  <a href="<CFG_SITE_URL>/admin/bibsort/bibsortadmin.py">BibSort Admin Interface</a>
+</td>
+<td>
+  <a href="bibsort-admin-guide">BibSort Admin Guide</a>
+</td>
+</tr>
+
+<tr>
+<td>
   <strong>BibClassify Admin</strong>
 </td>
 <td>

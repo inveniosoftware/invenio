@@ -42,7 +42,7 @@ from invenio.config import \
      CFG_DEVEL_SITE
 from invenio.dbquery import run_sql
 from invenio.bibformat_engine import BibFormatObject
-from invenio.search_engine import search_pattern
+from invenio.search_engine import search_pattern, record_exists
 from invenio.messages import gettext_set_language
 from invenio.errorlib import register_exception
 
@@ -325,7 +325,7 @@ def get_journal_articles(journal_name, issue, category,
         recids_issue.union_update(search_pattern(p='773__n:%s' % issue.lstrip('0')))
 
     recids_rule.intersection_update(recids_issue)
-    recids = list(recids_rule)
+    recids = [recid for recid in recids_rule if record_exists(recid) == 1]
 
     if use_cache:
         _cache_journal_articles(journal_name, issue, category, recids)
@@ -663,6 +663,16 @@ def get_journal_collection_to_refresh_on_release(journal_name):
     config_strings = get_xml_from_config(["update_on_release/collection"], journal_name)
     return [coll for coll in config_strings.get('update_on_release/collection', []) if \
             collection_reclist_cache.cache.has_key(coll)]
+
+def get_journal_index_to_refresh_on_release(journal_name):
+    """
+    Returns the list of indexed to update (BibIndex) upon release of
+    an issue.
+    """
+    from invenio.bibindex_engine import get_index_id_from_index_name
+    config_strings = get_xml_from_config(["update_on_release/index"], journal_name)
+    return [index for index in config_strings.get('update_on_release/index', []) if \
+            get_index_id_from_index_name(index) != '']
 
 def get_journal_template(template, journal_name, ln=CFG_SITE_LANG):
     """

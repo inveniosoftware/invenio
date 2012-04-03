@@ -860,7 +860,7 @@ function isRevisionID(str) {
   return false;
 }
 function onclickSubmitButton() {
-  var checkbox = $('#bibMergeDupeCheckbox').attr('checked');
+  var checkbox = $('#bibMergeDupeCheckbox').is(':checked');
 
   if (displayAlert('confirmSubmit')){
       var _data = {

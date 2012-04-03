@@ -72,6 +72,10 @@ try:
         AVAILABLE_PARSERS.append('4suite')
 except ImportError:
     pass
+except Exception, err:
+    from warnings import warn
+    warn("Error when importing 4suite: %s" % err)
+    pass
 
 try:
     import xml.dom.minidom

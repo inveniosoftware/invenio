@@ -358,6 +358,7 @@ della ricerca.</it>
 
 <h5><lang>
 <en>How to use parentheses:</en>
+<fr>Comment utiliser les parenthèses:</fr>
 </lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
@@ -377,6 +378,8 @@ della ricerca.</it>
 <lang>
   <en>Return records containing either <em>gravity</em> or <em>supergravity</em>,
       and <em>ellis</em> or <em>perelstein</em>.  Nested parentheses are supported.</en>
+  <fr>Retourne les notices contenant soit <em>gravity</em> ou <em>supergravity</em>,
+      et <em>ellis</em> ou <em>perelstein</em>. Les parenthèses imbriquées sont supportées.</fr>
 </lang>
 </td>
 </tr>
@@ -384,6 +387,7 @@ della ricerca.</it>
 <div align="right"><small><a href="search-guide<lang:link/>#parens">
 <lang>
   <en>more on parentheses...</en>
+  <fr>plus d'informations au sujet des parenthèses...</fr>
 </lang>
 </a></small></div>
 
@@ -467,6 +471,7 @@ della ricerca.</it>
 
 <h5><lang>
 <en>How to search inside citation network:</en>
+<fr>Comment rechercher dans le graphe des citations:</fr>
 </lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
@@ -485,6 +490,7 @@ della ricerca.</it>
 <td width="50%">
 <lang>
   <en>Return papers that are cited between 3 and 30 times.</en>
+  <fr>Retourne les articles cités entre 3 et 30 fois.</fr>
 </lang>
 </td>
 </tr>
@@ -504,6 +510,8 @@ della ricerca.</it>
 <lang>
   <en>Return all papers that cite any of the papers written
   by <em>ellis</em>.  Useful for citation alerts.</en>
+  <fr>Retourne tous les articles qui citent n'importe lequel des articles
+  écrits par <em>ellis</em>. Utile pour être alerté de nouvelles citations.</fr>
 </lang>
 </td>
 </tr>
@@ -523,6 +531,8 @@ della ricerca.</it>
 <lang>
   <en>Return all papers that are cited by any of the papers written
   by <em>ellis</em>.</en>
+  <fr>Retourne tous les articles cités par n'importe lequel des articles écrits
+  par <em>ellis</em>.</fr>
 </lang>
 </td>
 </tr>
@@ -530,6 +540,7 @@ della ricerca.</it>
 <div align="right"><small><a href="search-guide<lang:link/>#referstocitedby">
 <lang>
   <en>more on refersto/citedby operators...</en>
+  <fr>plus d'informations au sujet des opérateurs refersto/citedby...</fr>
 </lang>
 </a></small></div>
 

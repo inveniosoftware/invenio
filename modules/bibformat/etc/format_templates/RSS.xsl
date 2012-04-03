@@ -35,7 +35,7 @@ xmlns:marc="http://www.loc.gov/MARC21/slim"
 xmlns:fn="http://cdsweb.cern.ch/bibformat/fn"
 xmlns:dc="http://purl.org/dc/elements/1.1/"
 xmlns:dcterms="http://purl.org/dc/terms/"
-exclude-result-prefixes="marc fn dc dcterms opensearch">
+exclude-result-prefixes="marc fn dc dcterms">
 <xsl:output method="xml"  indent="yes" encoding="UTF-8" omit-xml-declaration="yes"/>
 <xsl:template match="/">
 	<xsl:if test="collection">

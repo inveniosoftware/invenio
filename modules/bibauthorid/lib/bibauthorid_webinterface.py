@@ -766,7 +766,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                                  'confirmed_ns': _('Papers of this Person'),
                                  'repealed_ns': _('Papers _not_ of this Person'),
                                  'review_ns': _('Papers in need of review'),
-                                 'tickets_ns': _('Tickes you created about this person'),
+                                 'tickets_ns': _('Tickets you created about this person'),
                                  'data_ns': _('Additional Data for this Person')}
             buttons_verbiage_dict = {'mass_buttons': {'no_doc_string': _('Sorry, there are currently no documents to be found in this category.'),
                                                   'b_confirm': _('Yes, those papers are by this person.'),
@@ -1136,13 +1136,13 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                             except IndexError:
                                 continue # No bibrefs on record--discard
 
-                            if not pid in bibrefs_to_confirm:
-                                bibrefs_to_confirm[pid] = {
-                                    'person_name': person_name,
-                                    'canonical_id': "TBA",
-                                    'bibrecs': {brr[0]: brr[1]}}
-                            else:
-                                bibrefs_to_confirm[pid]['bibrecs'][brr[0]] = brr[1]
+                        if not pid in bibrefs_to_confirm:
+                            bibrefs_to_confirm[pid] = {
+                                'person_name': person_name,
+                                'canonical_id': "TBA",
+                                'bibrecs': {brr[0]: brr[1]}}
+                        else:
+                            bibrefs_to_confirm[pid]['bibrecs'][brr[0]] = brr[1]
 
             if bibrefs_to_confirm or bibrefs_auto_assigned:
                 pinfo["bibref_check_required"] = True

@@ -27,7 +27,6 @@ import unittest
 from invenio import search_engine
 from invenio.testutils import make_test_suite, run_test_suite
 
-
 class TestMiscUtilityFunctions(unittest.TestCase):
     """Test whatever non-data-specific utility functions are essential."""
 
@@ -73,16 +72,6 @@ class TestWashQueryParameters(unittest.TestCase):
         # datetext mode takes precedence, d2 missing, d2* should be ignored
         self.assertEqual(search_engine.wash_dates(d1="1980-01-28 01:02:03", d2y=2003, d2m=2, d2d=3),
                          ('1980-01-28 01:02:03', '2003-02-03 00:00:00'))
-
-class TestStripAccents(unittest.TestCase):
-    """Test for handling of UTF-8 accents."""
-
-    def test_strip_accents(self):
-        """search engine - stripping of accented letters"""
-        self.assertEqual("memememe",
-                         search_engine.strip_accents('mémêmëmè'))
-        self.assertEqual("MEMEMEME",
-                         search_engine.strip_accents('MÉMÊMËMÈ'))
 
 class TestQueryParser(unittest.TestCase):
     """Test of search pattern (or query) parser."""
@@ -270,7 +259,6 @@ class TestQueryParser(unittest.TestCase):
 
 
 TEST_SUITE = make_test_suite(TestWashQueryParameters,
-                             TestStripAccents,
                              TestQueryParser,
                              TestMiscUtilityFunctions)
 

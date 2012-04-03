@@ -1,7 +1,7 @@
 ## -*- mode: html; coding: utf-8; -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -272,7 +272,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   International Standard Serial Number (NR) - [CER base=3n periodical]
-	 $b   ISSN Support (NR) - [CER]
+         $b   ISSN Support (NR) - [CER]
 
 
 024   OPEN ARCHIVES INITIATIVE (R) [CERN]
@@ -285,6 +285,18 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a    OAI - [CER]
          $p    OAI-set indicator - [CER]
+
+
+024  DIGITAL OBJECT IDENTIFIER
+
+      Indicators
+      First  Source specified in subfield $2
+         7
+      Second - undefined
+
+      Subfield Code(s)
+         $a   "doi" (CERN prefix: 10.5170)
+         $2   doi
 
 
 030   CODEN DESIGNATION  (R)
@@ -306,7 +318,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
               "CERN ISOLDE",IEX,MAN,MMD,WAI/UDC]
 
       NOTE:
-      [035 $9 inspire {record with other subject than Particle Physics to import into INSPIRE}
+      035 $9 inspire {record with other subject than Particle Physics to import into INSPIRE}
 
 
 037   SOURCE OF ACQUISITION  (R) [CERN]
@@ -363,6 +375,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Classification number (R) - [CER]
+         $b   980__a + 260__c + 088__a [CER] (this field is useful for sort the collection by reportnumber - Council documents)
          $2   Number source (NR) - [CER]
 
 
@@ -374,6 +387,9 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   Report number (NR) - [ARC,CER,MAN,MMD]
          $9   CERN internal number (NR) - [CER,MMD]
 
+      CER: $9 not displayed but searchable
+
+      not used in Inspire ?
 
 100   MAIN ENTRY--PERSONAL NAME  (NR) [CERN]
 
@@ -382,8 +398,11 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Personal name (NR) - [CER,MAN,MMD]
          $e   Relator term (NR) - [CER,MMD]
+         $h   CCID (NR) - [CER]
+         $i   INSPIRE Number (NR) - [CER]
          $u   Affiliation (R) - [CER]
 
+      CER: $e entries: dir., ed., ...
 
 110   MAIN ENTRY--CORPORATE NAME  (NR) [CERN]
 
@@ -403,10 +422,10 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   Meeting: conference, school, workshop (NR) - [CER,MAN]
          $c   Location of meeting  (NR) - [CER]
          $d   Date of meeting (NR) - [CER]
-         $f   Year of meetig (NR) - [CER]
+         $f   Year of meeting (NR) - [CER]
          $g   Conference code (NR) - [CER]
          $n   Number of part/section/meeting (NR) - [CER]
-         $w   Country (NR) - [CER]
+         $w   Country code (NR) - [CER]
          $z   Closing date (NR) - [CER]
          $9   Opening date (NR) - [CER]
 
@@ -513,20 +532,20 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $g   Reprinted editions  (NR) - [CER base=2n,41-45]
 
       NOTE: This tag is not used for base=3n [use tag 933]
+      NOTE: This full tag ($a,$b,$c) HAS TO BE USED for base=14 (THESES)
 
 
-269   PUBLICATION, DISTRIBUTION, ETC. (IMPRINT) (NR) [CERN]
+269   PRE-PUBLICATION, DISTRIBUTION, ETC. (IMPRINT) (NR) [CERN]
 
       Indicators - Both undefined
 
       Subfield Code(s)
-         $a   Place of publ. (NR) - [ARC,CER not base=2n,41-45,IEX,MAN,MMD]
-         $b   Name of publ. (NR) - [ARC,CER not base=2n,41-45,IEX,MAN,MMD]
-         $c   Complete date (NR) - [ARC,CER not base=2n,41-45,IEX,MAN,MMD]
+         $a   Place of publ. (NR) - [ARC,CER NOT for base=14,2n,41-45,IEX,MAN,MMD]
+         $b   Name of publ. (NR) - [ARC,CER NOT for base=14,2n,41-45,IEX,MAN,MMD]
+         $c   Complete date (NR) - [ARC,CER NOT for base=14,2n,41-45,IEX,MAN,MMD]
 
-
-      NOTE: Don't use the following lines for CER base=2n,41-45 !!
-
+      NOTE: Don't use the following lines for CER base=14,2n,41-45 !!
+      NOTE: Don't use for THESES
 
 270   ADDRESS (R) [CERN]
 
@@ -567,7 +586,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Indicators - Both undefined
 
       Subfield Code(s)
-	$a   Content type term (R) - [CER]
+         $a   Content type term (R) - [CER]
 
       NOTE: use for SLIDES
 
@@ -611,6 +630,11 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $b   University (NR) - [CER base=14]
          $c   Date of year of defense - [CER base=14]
 
+      CER:
+         $a: PhD, Master, Bachelor, Diploma, Habilitation, Laurea, Thesis, internship report
+
+      Inspire: $b$c$d (marc standard)
+
 
 506   RESTRICTIONS ON ACCESS NOTE (R)
 
@@ -645,6 +669,30 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $9   number of the abstract  (NR) - [ARC,CER,IEX,MAN,MMD/BUL]
 
 
+536    FUNDING INFORMATION (R)
+
+      Indicators - Both undefined
+
+      Subfield Code(s)
+         $a   Funding agency/program (NR) - [CER]
+         $c   Grant number
+         $f   Project number
+         $r   Access information
+
+      NOTE: $r used for Open Access tag in OpenAIRE
+
+
+540  TERMS GOVERNING USE AND REPRODUCTION (LICENSE) [CER]
+
+      Indicators - Both undefined
+
+      Subfield Code(s)
+         $a   Terms governing use and reproduction, e.g. CC License
+         $b   person or institution imposing the license (author, publisher)
+         $u   URI
+         $3   material (currently not used)
+
+
 541   IMMEDIATE SOURCE OF ACQUISITION NOTE  (R) [CER]
 
       Indicators - Both undefined
@@ -658,13 +706,28 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $9   Price for the user to pay [CER]
 
 
+542   COPYRIGHT INFORMATION [CER]
+
+      Indicators
+      First   Undefined
+      Second  Undefined
+
+      Subfield Code(s)
+         $d   Copyright holder
+         $g   Copyright date
+         $u   URI (URL or URN, more detailed statement about copyright status)
+         $e   Copyright holder contact information
+         $f   Copyright statement as presented on the resource
+         $3   materials  (currently not used)
+
+
 546   LANGUAGE NOTE (R) [CERN]
 
       Indicators - Both undefined
 
       Subfield Code(s)
          $a   Language of source (NR) - [MAN]
-         $g   Target language (NR) - [MAN
+         $g   Target language (NR) - [MAN]
 
 
 555   CUMULATIVE INDEX/FINDING AIDS NOTE (R)
@@ -714,6 +777,11 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $s   Subject note (NR) - [MMD]
 
       NOTE: Don't use this tag for base=3n use tag 937
+
+      USAGE
+          CER:
+            $a pr/lkr not found:  publication not found for "to be published in"
+            $a no fulltext
 
 
 596   SLAC NOTE (R) [CERN]
@@ -770,6 +838,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Topical term or geographic name (NR) - [CER,MAN,MMD]
          $2   Source of heading or term  (NR) - [CER,MAN,MMD]
+         $e   description to be displayed (default: keyword) (NR) - [CER]
 
 
 650   SUBJECT ADDED ENTRY--TOPICAL TERM:2  (R)
@@ -783,13 +852,15 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Topical term or geographic name (NR) - [CER,MAN,MMD]
          $2   Source of heading or term  (NR) - [CER,MAN,MMD]
+         $e   description to be displayed (default: keyword) (NR) - [CER]
+         $p   percentage (relevance of topic, used for INTC) (NR)
 
 
 653   ENGLISH INDEX TERM--UNCONTROLLED:1 (R) [CERN]
 
       Indicators
       First   Level of index term
-        1    Primary
+        1     Primary
       Second  Undefined
 
       Subfield Code(s)
@@ -882,8 +953,12 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Personal name (NR) - [ARC,CER,MMD]
          $e   Relator term  (NR) - [ARC,CER,MMD]
+         $g   CCID (NR) - [CER]
+         $i   INSPIRE Number (NR) - [CER]
          $u   Affiliation  (R) - [CER,IEX,MMD]
 
+      CER:
+        $e entries: dir., ed., ...
 
 710   ADDED ENTRY--CORPORATE NAME  (R) [CERN]
 
@@ -895,6 +970,9 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $g   Collaboration  (NR) - [CER]
          $5   CERN Paper (NR) - [CER,MAN,MMD]
          $9   CERN Work (NR) - [CER]
+
+NOTE: $9 is no more used from 2009?
+          $5 Department, no more in use from May 2011
 
 
 711   ADDED ENTRY--MEETING NAME  (R) [CERN]
@@ -995,11 +1073,19 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   "DOI"  (NR) - [CER]
          $c   Pagination  (NR) - [ARC,CER,MMD]
          $d   Complete date (NR) - [CER,MMD]
+         $e   Recid of the linked document record (NR) - [CER]
+         $f   Note regarding a DN (down record) link - (NR) [CER]
          $n   Number [issue] (NR) - [ARC,CER,MMD]
          $p   Title (NR) - [ARC,CER,MMD]
          $u   URL (NR) - [MMD]
          $v   Volume (NR) - [CER,MMD]
          $y   Year (NR) - [ARC,CER,MMD]
+         $t   Talk given at - [INS]
+         $w   CNUM - [INS]
+         $x   In *...* p1-p2 [INS]  {for book chapters}
+
+        NOTE: 773__$$e<cds nr>$$f<conf code>$$c<pages> used for conference contributions from June 2011 to be standard with Inspire Cataloguing
+        NOTE: 773__a not to be used in the future, DOI only in 024
 
 
 780   PRECEDING ENTRY (R)
@@ -1031,17 +1117,32 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Main entry heading (NR) - [CER base=3n]
          $i   Display text (NR) - [CER base=3n] {other forms of relation}
+         $r   Report number
          $t   Title (NR) - [CER base=3n]
          $w   Record control number (R) - [CER base=3n]
 
+787   OTHER RELATIONSHIP ENTRY   (R)
+
+      Indicators
+      First   Note controller
+         0 - Display note (in $i)
+         1 - Do not display note
+
+      Subfield Code(s)
+
+         $i   Relationship information (R) - [CER]
+         $r   Report number
+         $w   Record control number (R) - [CER]
+
+NOTE: Used to link Conference papers and Slides records ($i Conference paper - $w CDS recid)
 
 852  LOCATION  (R)
 
      Indicators - Both undefined
 
      Subfield Codes
-        $a   Location  (NR) - [ARC,CER,MAN,MMD]
-        $c   Shelving location (NR) - [ARC,CER]
+         $a   Location  (NR) - [ARC,CER,MAN,MMD]
+         $c   Shelving location (NR) - [ARC,CER]
 
 
 856   ELECTRONIC LOCATION AND ACCESS:1 (R)
@@ -1053,10 +1154,10 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          ^       No information provided
 
       Subfield Code(s)
-         $f - Electronic name (R) - [MAN,MMD]
+         $f   Electronic name (R) - [MAN,MMD]
 
 
-856   ELECTRONIC LOCATION AND ACCESS:1 (R)
+856   ELECTRONIC LOCATION AND ACCESS:2 (R)
 
       Indicators
       First   Access method
@@ -1067,15 +1168,18 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $d   Path (R) - [MMD]
          $q   Electronic format type (NR) - [IEX,MMD] {$x EDL;
-	MMD/PHO: IF .jpeg $x picture} {MMD [bases80-89][.gif] -> $x icon}
+    MMD/PHO: IF .jpeg $x picture} {MMD [bases80-89][.gif] -> $x icon}
          $s   File size (R) - [INDICO]
-         $u   Uniform Resource Identifier (NR) - [ARC,CER,IEX,MAN,MMD]
+         $u   Uniform Resource Identifier (NR) - [ARC,CER,IEX,MAN,MMD,INS]
          $x   Nonpublic note  (NR) - [CER,MMD]
          $y   Link text (NR) - [ARC,CER,IEX,MAN,MMD]
-         $z   Public note (R) - [CER]
+         $z   Public note (R) - [CER,MMD]
 
+    NOTE: $u used for URL and URN, repeatable for URN. repeat 856 for several url's
+    NOTE: $z Stamped by WebSubmit: DATE
+             $z Figure
 
-856   ELECTRONIC LOCATION AND ACCESS:2 (R)
+856   ELECTRONIC LOCATION AND ACCESS:3 (R)
 
       Indicators
       First   Access method
@@ -1094,7 +1198,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $3 - Materials specified (NR) - [CER base=3n]
 
 
-856   ELECTRONIC LOCATION AND ACCESS:3 (R)
+856   ELECTRONIC LOCATION AND ACCESS:4 (R)
 
       Indicators
       First   Access method
@@ -1108,7 +1212,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $y   Link text (NR) - [CER base=3n]
 
 
-856   ELECTRONIC LOCATION AND ACCESS:1 (R)
+856   ELECTRONIC LOCATION AND ACCESS:5 (R)
 
       Indicators
       First   Access method
@@ -1154,7 +1258,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $u   Name of institute (NR) - [CER,MAN] {Now no more in use
-	for CER, but 100 $u and 700 $u}
+    for CER, but 100 $u and 700 $u}
 
 
 902   OTHER INSTITUTES  (R) [CERN]
@@ -1382,7 +1486,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Opening date/Date received (NR) - [ARC,MAN]
-         $b   Closing date/Date completed (NR) - [ARC,MAN]
+         $b   Closing date/Date completed (NR) - [ARC,CER,MAN]
 
 
 926   RECIPIENT (NR) [CERN]
@@ -1608,6 +1712,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 964   ITEM (NR) [Invenio/MySQL]
 
       Indicators - Both undefined
+      Indicates the number of physical items attached to the record. The field is created as soon as an item is linked to the record.
 
       Subfield Code(s)
          $a Owner - [ARC,CER,IEX,MAN,MMD,WAI/UDC]
@@ -1621,6 +1726,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   AL500 sysno (NR) - [ARC,CER,IEX,MAN,MMD,WAI/UDC]
+         $d   recid of surviving record (in deleted record after merging)
 
          Taken from AL500 SYS
 
@@ -1635,6 +1741,8 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $c   Deleted indicator (NR) - [ARC,CER,IEX,MAN,MMD
 
          Generated and used in MySQL; accepted in AL500
+
+        NOTE: Should be only one Primary ($a) and other Secondary collections in ($b)
 
 
 981   SYSTEM NUMBER OF DELETED DOUBLE RECORDS (R) [CERN]
@@ -1654,16 +1762,37 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          5    References
 
       Subfield Code(s)
+         $a   DOI
+         $h  authors
+         $m  Miscellaneous [contains 1st part of reference] (R)
+         $n   Issue Number (NR)
          $o   Order number [contains [ ] line number] (NR)
-         $m   Miscellaneous [contains 1st part of reference] (R)
-         $t   Journal Title abbreviation (NR)
          $p   Page (NR)
+         $r   Report Number (NR)
+         $s   Journal publication note: title vol (year) page/artid
+         $t   Journal Title abbreviation (NR)
+         $u   Uniform Resource Identifier (NR)
          $v   Volume (NR)
          $y   Year (NR)
-         $n   Issue Number (NR)
-         $u   Uniform Resource Identifier (NR)
-         $r   Report Number (NR)
-         NOT YET IMPLEMENTED
+
+      CER: $s title vol (year) page/artid   {letter belongs to title}
+      INS: $s title, vol, page/artid  {letter belongs to vol}
+
+    NOTE: Used for the references extracted with refextract
+
+999   REFERENCES (R) [CERN] [Invenio/MySQL]
+
+      Indicators
+      First   Origine of indicator
+         C    CERN
+      Second  Type
+         6    Refextract
+
+      Subfield Code(s)
+
+         $a   Refextract info
+
+    NOTE: Used for the references extracted with refextract
 
 BAS   BASE
 
@@ -1689,6 +1818,17 @@ CAT   CAT (R)
 
          For MySQL use tag 961
 
+FFT   FILE UPLOAD (R)
+
+      Indicators - Both undefined
+
+      Subfield Code(s)
+         $a  Uniform Resource Identifier (NR)
+         $d  Description (NR)
+         $t   Document type
+
+         NOTE: Used in Bibupload to upload and attach files in CDS
+         NOTE: Default for $t is MAIN. In contrast to CDS, MAIN will hide a file on INSPIRE. For public files use INSPIRE-PUBLIC
 
 FMT   FORMAT
 
@@ -1747,6 +1887,7 @@ LKR   ALEPH Linking Field (R)
          $t - base=3n [for paper version of e-journals]/title - (NR) - [CER,MMD]
 
          For MySQL use tag 962
+         NOTE: $b and $n used in conference contribution/book chapters records to make the link to the conference/book record (note that $b is actually the Aleph sysno)
 
 
 OWN   OWNER (NR)

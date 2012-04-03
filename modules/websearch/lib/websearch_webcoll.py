@@ -547,7 +547,7 @@ class Collection:
         res = run_sql(query)
         if res:
             for row in res:
-                values.append({'value' : row[0], 'text': row[1]})
+                values.append({'value' : row[0], 'text': get_field_i18nname(row[1], ln)})
         else:
             for tmp in ('title', 'author', 'report number', 'year'):
                 values.append({'value' : tmp.replace(' ', ''), 'text' : get_field_i18nname(tmp, ln)})

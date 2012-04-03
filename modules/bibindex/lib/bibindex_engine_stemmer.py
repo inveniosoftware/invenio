@@ -23,7 +23,7 @@ BibIndex stemmer facility based on the Porter Stemming Algorithm.
 __revision__ = "$Id$"
 
 from thread import get_ident
-from invenio.bibindex_engine_stemmer_greek import greek_stemmer
+from invenio.bibindex_engine_stemmer_greek import GreekStemmer
 
 _stemmers = {}
 
@@ -38,6 +38,7 @@ try:
         'finnish' : 'fi',
         'french' : 'fr',
         'german' : 'de',
+        'greek' : 'el',
         'hungarian' : 'hu',
         'italian' : 'it',
         'norwegian' : 'no',
@@ -62,10 +63,6 @@ try:
         """Return WORD stemmed according to language LANG (e.g. 'en')."""
         if lang and is_stemmer_available_for_language(lang):
             return _stemmers[get_ident()][lang].stemWord(word)
-        elif lang == 'el':
-            #TODO: first we have to capitalize the word
-            # and remove accents from the vowels
-            return greek_stemmer().stem_word(word)
         else:
             return word
 
@@ -95,6 +92,7 @@ try:
                     stemmers_initialized[dst_lang] = Stemmer.Stemmer(src_lang, 40000)
             except (TypeError, KeyError):
                 pass
+        stemmers_initialized['el'] = GreekStemmer()
         return stemmers_initialized
 
 
@@ -102,6 +100,8 @@ except ImportError:
     ### Here is the original PorterStemmer class provided as a fallback,
     ### the "free of charge for any purpose" implementation of the Porter stemmer
     ### algorithm in Python.  The Invenio API interface follows below.
+
+    _stemmers = {}
 
     class PorterStemmer:
         """
@@ -437,38 +437,46 @@ except ImportError:
             self.step5()
             return self.b[self.k0:self.k+1]
 
-    _stemmers[get_ident()] = PorterStemmer()
-
     def is_stemmer_available_for_language(lang):
         """Return true if stemmer for language LANG is available.
         Return false otherwise.
         """
-        return lang == 'en'
+        return lang in ('en', 'el')
 
     def stem(word, lang):
         """Return WORD stemmed according to language LANG (e.g. 'en')."""
-        if lang == 'en' and _stemmers and _stemmers.has_key(get_ident()):
-            #make sure _stemmers[get_ident()] is avail..
-            return _stemmers[get_ident()].stem(word, 0, len(word)-1)
-        elif lang == 'el':
-            #TODO: first we have to capitalize the word
-            # and remove accents from the vowels
-            return greek_stemmer().stem_word(word)
+        if lang in ('en', 'el'):
+            if not get_ident() in _stemmers:
+                _stemmers[get_ident()] = {
+                    'en': PorterStemmer(),
+                    'el': GreekStemmer()}
+            if lang == 'en':
+                #make sure _stemmers[get_ident()] is avail..
+                return _stemmers[get_ident()]['en'].stem(word, 0, len(word)-1)
+            elif lang == 'el':
+                return _stemmers[get_ident()]['el'].stemWord(word)
         else:
             return word
 
     def stemWords(words, lang):
         """Return WORDS stemmed according to language LANG (e.g. 'en')."""
-        if lang == 'en' and _stemmers and _stemmers.has_key(get_ident()):
-            #make sure _stemmers[get_ident()] is avail..
-            return [_stemmers[get_ident()].stem(word, 0, len(word)-1) for word in words]
+        if lang in ('en', 'el'):
+            if not get_ident() in _stemmers:
+                _stemmers[get_ident()] = {
+                    'en': PorterStemmer(),
+                    'el': GreekStemmer()}
+            if lang == 'en':
+                #make sure _stemmers[get_ident()] is avail..
+                return [_stemmers[get_ident()]['en'].stem(word, 0, len(word)-1) for word in words]
+            elif lang == 'el':
+                return _stemmers[get_ident()]['el'].stemWords(words)
         else:
             return words
 
     def get_stemming_language_map():
         """Return a diction of code language, language name for all the available
         languages."""
-        return {'english' : 'en'}
+        return {'english' : 'en', 'greek': 'el'}
 
 
 if __name__ == '__main__':

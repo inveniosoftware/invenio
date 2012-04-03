@@ -118,7 +118,7 @@ eficaç.</p>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Recherche structurée</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Expressions régulières</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Requêtes de plages</a>
-<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#referstocitedby">Refersto/citedby search operators</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#referstocitedby">Opérateurs de recherche refersto/citedby</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Recherche combinée métadonnées/fulltext/citation</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Foire aux questions</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">Comment sélectionner vos termes de recherche de manière intelligente (en termes de vitesse)</a>
@@ -1968,6 +1968,7 @@ precisió a la cerca.  </ca>
 <h3><a name="parens">
 <lang>
 <en>Parentheses</en>
+<fr>Parenthèses</fr>
 </lang>
 </a></h3>
 
@@ -1975,6 +1976,9 @@ precisió a la cerca.  </ca>
 <en>
 You can also use parentheses in your queries to group boolean expressions together:
 </en>
+<fr>
+Vous pouvez aussi utiliser des parenthèses pour grouper des expressions booléennes:
+</fr>
 </lang>
 
     <form action="<CFG_SITE_URL>/search" method="get">
@@ -1997,6 +2001,14 @@ and either <em>ellis</em> or <em>perelstein</em> anywhere in the record.</p>
 <p>Note that you can use any number of parentheses in the query.  Nested
 parentheses, such as <code>foo AND (bar OR (fuux NOT quux))</code>, are also supported.</p>
 </en>
+<fr>
+<p>Cette requête retourne toutes les notices contenant soit <em>gravity</em> ou <em>supergravity</em>,
+et soit <em>ellis</em> ou <em>perelstein</em> n'importe où dans la notice.</p>
+
+<p>Notez que vous pouvez utiliser autant de parenthèses que nécessaire dans la requête.  Les
+parenthèses imbriquées, telles que <code>foo AND (bar OR (fuux NOT quux))</code>, sont également
+supportées.</p>
+</fr>
 </lang>
 
 <h3><a name="punctuation">
@@ -3528,15 +3540,20 @@ cal escriure:
 <h3><a name="referstocitedby">
 <lang>
 <en>Refersto and citedby search operators</en>
+<fr>Opérateurs de recherche refersto/citedby</fr>
 </lang>
 </a></h3>
 
 <lang>
-<en>
-<p>It is possible to search in citation network by means
+<en><p>It is possible to search in citation network by means
    of <code>citedby</code> and <code>refersto</code> search operators.
    For example, to find out who cites hep-th/0201100, you can type:</p>
-
+</en>
+<fr><p>Il est possible de rechercher dans la graphe des citations en utilisant
+   les opérateurs de recherche <code>citedby</code> et <code>refersto</code>.
+   Par exemple, pour trouver qui cite hep-th/0201100, vous pouvez entrer:</p>
+</fr>
+</lang>
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
@@ -3547,9 +3564,14 @@ cal escriure:
       <input class="formbutton" type="submit" name="action" value="_(Search)_" />
       </blockquote>
       </form>
-
+<lang>
+<en>
    <p>For example, to find out which papers are cited by Klebanov, you can type:</p>
-
+</en>
+<fr>
+   <p>Par exemple, pour trouver quels articles sont cités par Klebanov, saisissez:</p>
+</fr>
+</lang>
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
@@ -3560,9 +3582,14 @@ cal escriure:
       <input class="formbutton" type="submit" name="action" value="_(Search)_" />
       </blockquote>
       </form>
-
+<lang>
+<en>
    <p>To set up a cite alert for new papers citing author I. Klebanov, you can type:</p>
-
+</en>
+<fr>
+   <p>Pour mettre en place une alerte dès qu'un nouvel article cite l'auteur I. Klebanov, saisissez:</p>
+</fr>
+</lang>
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
@@ -3573,12 +3600,18 @@ cal escriure:
       <input class="formbutton" type="submit" name="action" value="_(Search)_" />
       </blockquote>
       </form>
-
-   <p>Note that <code>refersto</code> and <code>citedby</code> search
+<lang>
+<en><p>Note that <code>refersto</code> and <code>citedby</code> search
    operators work on any regular query.  For example, to find all
    papers that cite papers that are tagged with the gravitino keyword,
    type:</p>
-
+</en>
+<fr><p>Notez que les opérateurs de recherche <code>refersto</code> et
+    <code>citedby</code> fonctionnent pour n'importe quelle requête.  Par
+    exemple, pour trouver tous les articles qui citent des articles marqués
+    du mot clé gravitino, saisissez:</p>
+</fr>
+</lang>
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
@@ -3589,12 +3622,19 @@ cal escriure:
       <input class="formbutton" type="submit" name="action" value="_(Search)_" />
       </blockquote>
       </form>
-
-   <p>Note also that these operators can be freely combined with
+<lang>
+<en><p>Note also that these operators can be freely combined with
    regular metadata search.  For example, to find papers authored by
    Klebanov that are cited by Papadimitriou but that do not cite any
    of Papadimitriou's papers themselves, you can type:</p>
-
+</en>
+<fr><p>Notez que ces opérateurs peuvent être librement combinés avec la
+       recherche standard dans les métadonnées.  Par exemple, pour trouver
+       les articles écrits par Klebanov qui sont cités par des articles de
+       Papadimitriou, mais qui ne citent en retour aucun des articles de
+       Papadimitriou, indiquez:</p>
+</fr>
+</lang>
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
@@ -3605,13 +3645,20 @@ cal escriure:
       <input class="formbutton" type="submit" name="action" value="_(Search)_" />
       </blockquote>
       </form>
-
-   <p>Finally, you can make use of regexp-style quoting or
+<lang>
+<en><p>Finally, you can make use of regexp-style quoting or
    phrase-style quoting to combine search expressions in the same
    refersto/citedby operand.  For example, to find papers that are
    referring to only those I. Klebanov's papers that mention O(N) in
    the title, you can type:</p>
-
+</en>
+<fr><p>Finalement, vous pouvez utiliser une syntaxe similaire à la
+  recherche par expressions régulières ou par phrases pour combiner
+  plusieurs expressions dans le même opérateur refersto/citedby. Par
+  exemple, pour trouver les articles qui citent uniquement les articles de
+  I. Klebanov mentionnant O(N) dans leur titre, saisissez:</p>
+</fr>
+</lang>
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
@@ -3622,8 +3669,6 @@ cal escriure:
       <input class="formbutton" type="submit" name="action" value="_(Search)_" />
       </blockquote>
       </form>
-</en>
-</lang>
 
 <h3><a name="combined">
 <lang>

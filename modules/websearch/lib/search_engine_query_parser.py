@@ -36,6 +36,7 @@ except ImportError:
 
 from invenio.bibindex_engine_tokenizer import BibIndexFuzzyNameTokenizer as FNT
 from invenio.logicutils import to_cnf
+from invenio.config import CFG_WEBSEARCH_SPIRES_SYNTAX
 
 
 NameScanner = FNT()
@@ -516,7 +517,6 @@ class SpiresToInvenioSyntaxConverter:
         'kw' : 'keyword:',
         # note
         'note' : '500__a:',
-        'n' : '500__a:',
         # old title
         'old-title' : '246__a:',
         'old-t' : '246__a:',
@@ -734,12 +734,17 @@ class SpiresToInvenioSyntaxConverter:
         Return true if query begins with find, fin, or f, or if it contains
         a SPIRES-specific keyword (a, t, etc.), or if it contains the invenio
         author: field search. """
+        if not CFG_WEBSEARCH_SPIRES_SYNTAX:
+            #SPIRES syntax is switched off
+            return False
         query = query.lower()
         if self._re_spires_find_keyword.match(query):
+            #leading 'find' is present and SPIRES syntax is switched on
             return True
-        for word in query.split(' '):
-            if self._SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS.has_key(word):
-                return True
+        if CFG_WEBSEARCH_SPIRES_SYNTAX > 1:
+            for word in query.split(' '):
+                if self._SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS.has_key(word):
+                    return True
         return False
 
     def convert_query(self, query):

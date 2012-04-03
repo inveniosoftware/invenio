@@ -2,7 +2,7 @@
 ## Ranking of records using different parameters and methods.
 
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -95,9 +95,15 @@ def citation_exec(rank_method_code, name, config):
     else:
         dict = get_citation_weight(rank_method_code, config)
         if dict:
+            if task_get_option("id") or task_get_option("collection") or \
+               task_get_option("modified"):
+                # user have asked to citation-index specific records
+                # only, so we should not update citation indexer's
+                # last run time stamp information
+                begin_date = None
             intoDB(dict, begin_date, rank_method_code)
         else:
-            write_message("no need to update the indexes for citations")
+            write_message("No need to update the indexes for citations.")
 
 def download_weight_filtering_user(run):
     return bibrank_engine(run)
@@ -225,7 +231,8 @@ def intoDB(dict, date, rank_method_code):
     serdata = serialize_via_marshal(dict);
     midstr = str(mid[0][0]);
     run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) VALUES (%s,%s)", (midstr, serdata,))
-    run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", (date, rank_method_code))
+    if date:
+        run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", (date, rank_method_code))
 
     # FIXME: the following is a workaround for the citation indexer
     # memory troubles, when Apache WSGI daemon processes may end up

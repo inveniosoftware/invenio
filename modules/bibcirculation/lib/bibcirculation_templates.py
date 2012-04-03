@@ -17762,8 +17762,8 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
         </table>
 
         """ % (_("date restriction"),
-               _("From"), CFG_SITE_URL, _("the beginning"),
-               _("To"), CFG_SITE_URL, _("now"))
+               _("From"), CFG_SITE_URL, "the beginning",
+               _("To"), CFG_SITE_URL, "now")
 
         out += """
         <br />

@@ -29,7 +29,9 @@ import os
 import sys
 import time
 import unittest
+import cgi
 
+from urlparse import urlsplit, urlunsplit
 from urllib import urlencode
 from itertools import chain, repeat
 
@@ -42,7 +44,7 @@ except ImportError:
 
 import invenio
 from invenio.config import CFG_SITE_URL, \
-     CFG_SITE_SECURE_URL, CFG_LOGDIR
+     CFG_SITE_SECURE_URL, CFG_LOGDIR, CFG_SITE_NAME_INTL
 from invenio.w3c_validator import w3c_validate, w3c_errors_to_str, \
      CFG_TESTS_REQUIRE_HTML_VALIDATION
 
@@ -400,8 +402,14 @@ class InvenioWebTestCase(unittest.TestCase):
     def setUp(self):
         """Initialization before tests."""
 
+        ## Let's default to English locale
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference('intl.accept_languages', 'en-us, en')
+        profile.update_preferences()
+
         # the instance of Firefox WebDriver is created
-        self.browser = webdriver.Firefox()
+        self.browser = webdriver.Firefox(profile)
+
         # list of errors
         self.errors = []
 
@@ -459,21 +467,41 @@ class InvenioWebTestCase(unittest.TestCase):
         except:
             raise InvenioWebTestCaseException(element=element_partial_link_text)
 
-    def find_element_by_id_with_timeout(self, element_id, timeout=30):
+    def find_element_by_id_with_timeout(self, element_id, timeout=30, text=""):
         """ Find an element by id. This waits up to 'timeout' seconds
         before throwing an InvenioWebTestCaseException or if it finds the element
         will return it in 0 - timeout seconds.
+        If the parameter text is provided, the function waits
+        until the element is found and its content is equal to the given text.
+        If the element's text is not equal to the given text an exception will be raised
+        and the result of this comparison will be stored in the errors list
+        #NOTE: Currently this is used to wait for an element's text to be
+        refreshed using JavaScript
         @param element_id: id of the element to find
         @type element_id: string
         @param timeout: time in seconds before throwing an exception
         if the element is not found
         @type timeout: int
+        @param text: expected text inside the given element.
+        @type text: string
         """
 
         try:
             WebDriverWait(self.browser, timeout).until(lambda driver: driver.find_element_by_id(element_id))
         except:
             raise InvenioWebTestCaseException(element=element_id)
+
+        if text:
+            q = self.browser.find_element_by_id(element_id)
+            try:
+                # if the element's text is not equal to the given text, an exception will be raised
+                WebDriverWait(self.browser, timeout).until(lambda driver: driver.find_element_by_id(element_id) and q.text==text)
+            except:
+                # let's store the result of the comparison in the errors list
+                try:
+                    self.assertEqual(q.text, text)
+                except AssertionError, e:
+                    self.errors.append(str(e))
 
     def find_element_by_xpath_with_timeout(self, element_xpath, timeout=30):
         """ Find an element by xpath. This waits up to 'timeout' seconds
@@ -491,6 +519,22 @@ class InvenioWebTestCase(unittest.TestCase):
         except:
             raise InvenioWebTestCaseException(element=element_xpath)
 
+    def find_elements_by_class_name_with_timeout(self, element_class_name, timeout=30):
+        """ Find an element by class name. This waits up to 'timeout' seconds
+        before throwing an InvenioWebTestCaseException or if it finds the element
+        will return it in 0 - timeout seconds.
+        @param element_class_name: class name of the element to find
+        @type element_class_name: string
+        @param timeout: time in seconds before throwing an exception
+        if the element is not found
+        @type timeout: int
+        """
+
+        try:
+            WebDriverWait(self.browser, timeout).until(lambda driver: driver.find_element_by_class_name(element_class_name))
+        except:
+            raise InvenioWebTestCaseException(element=element_class_name)
+
     def find_page_source_with_timeout(self, timeout=30):
         """ Find the page source. This waits up to 'timeout' seconds
         before throwing an InvenioWebTestCaseException
@@ -506,14 +550,16 @@ class InvenioWebTestCase(unittest.TestCase):
         except:
             raise InvenioWebTestCaseException(element="page source")
 
-    def login(self, username="guest", password=""):
+    def login(self, username="guest", password="", force_ln='en'):
         """ Login function
         @param username: the username (nickname or email)
         @type username: string
         @param password: the corresponding password
         @type password: string
+        @param force_ln: if the arrival page doesn't use the corresponding
+            language, then the browser will redirect to it.
+        @type force_ln: string
         """
-
         if not "You can use your nickname or your email address to login." in self.browser.page_source:
             if "You are no longer recognized by our system" in self.browser.page_source:
                 self.find_element_by_link_text_with_timeout("login here")
@@ -524,12 +570,19 @@ class InvenioWebTestCase(unittest.TestCase):
 
         self.find_element_by_name_with_timeout("p_un")
         self.browser.find_element_by_name("p_un").clear()
-        self.fill_textbox("p_un", username)
+        self.fill_textbox(textbox_name="p_un", text=username)
         self.find_element_by_name_with_timeout("p_pw")
         self.browser.find_element_by_name("p_pw").clear()
-        self.fill_textbox("p_pw", password)
+        self.fill_textbox(textbox_name="p_pw",  text=password)
         self.find_element_by_name_with_timeout("action")
         self.browser.find_element_by_name("action").click()
+        if force_ln and CFG_SITE_NAME_INTL[force_ln] not in self.browser.page_source:
+            splitted_url = list(urlsplit(self.browser.current_url))
+            query = cgi.parse_qs(splitted_url[3])
+            query.update({u'ln': unicode(force_ln)})
+            splitted_url[3] = urlencode(query)
+            new_url = urlunsplit(splitted_url)
+            self.browser.get(new_url)
 
     def logout(self):
         """ Logout function
@@ -538,29 +591,46 @@ class InvenioWebTestCase(unittest.TestCase):
         self.find_element_by_link_text_with_timeout("logout")
         self.browser.find_element_by_link_text("logout").click()
 
-    def element_value_test(self, element_name, \
-                           expected_element_value="", unexpected_element_value=""):
+    def element_value_test(self, element_name="", element_id="", \
+                           expected_element_value="", unexpected_element_value="", in_form=True):
         """ Function to check if the value in the given
         element is the expected (unexpected) value or not
         @param element_name: name of the corresponding element in the form
         @type element_name: string
+        @param element_id: id of the corresponding element in the form
+        @type element_id: string
         @param expected_element_value: the expected element value
         @type expected_element_value: string
         @param unexpected_element_value: the unexpected element value
         @type unexpected_element_value: string
+        @param in_form: depends on this parameter, the value of the given element
+        is got in a different way. If it is True, the given element is a textbox
+        or a textarea in a form.
+        @type in_form: boolean
         """
 
-        self.find_element_by_name_with_timeout(element_name)
-        q = self.browser.find_element_by_name(element_name)
+        if element_name:
+            self.find_element_by_name_with_timeout(element_name)
+            q = self.browser.find_element_by_name(element_name)
+        elif element_id:
+            self.find_element_by_id_with_timeout(element_id)
+            q = self.browser.find_element_by_id(element_id)
+
         if unexpected_element_value:
             try:
-                self.assertNotEqual(q.get_attribute('value'), unexpected_element_value)
+                if in_form:
+                    self.assertNotEqual(q.get_attribute('value'), unexpected_element_value)
+                else:
+                    self.assertNotEqual(q.text, unexpected_element_value)
             except AssertionError, e:
                 self.errors.append(str(e))
 
         if expected_element_value:
             try:
-                self.assertEqual(q.get_attribute('value'), expected_element_value)
+                if in_form:
+                    self.assertEqual(q.get_attribute('value'), expected_element_value)
+                else:
+                    self.assertEqual(q.text, expected_element_value)
             except AssertionError, e:
                 self.errors.append(str(e))
 
@@ -602,68 +672,100 @@ class InvenioWebTestCase(unittest.TestCase):
                 except AssertionError, e:
                     self.errors.append(str(e))
 
-    def choose_selectbox_option_by_label(self, selectbox_name, label):
+    def choose_selectbox_option_by_label(self, selectbox_name="", selectbox_id="", label=""):
         """ Select the option at the given label in
         the corresponding select box
         @param selectbox_name: the name of the corresponding
         select box in the form
         @type selectbox_name: string
+        @param selectbox_id: the id of the corresponding
+        select box in the form
+        @type selectbox_id: string
         @param label: the option at this label will be selected
         @type label: string
         """
 
-        self.find_element_by_name_with_timeout(selectbox_name)
-        selectbox = self.browser.find_element_by_name(selectbox_name)
+        if selectbox_name:
+            self.find_element_by_name_with_timeout(selectbox_name)
+            selectbox = self.browser.find_element_by_name(selectbox_name)
+        elif selectbox_id:
+            self.find_element_by_id_with_timeout(selectbox_id)
+            selectbox = self.browser.find_element_by_id(selectbox_id)
+
         options = selectbox.find_elements_by_tag_name("option")
         for option in options:
             if option.text == label:
                 option.click()
                 break
 
-    def choose_selectbox_option_by_index(self, selectbox_name, index):
+    def choose_selectbox_option_by_index(self, selectbox_name="", selectbox_id="", index=""):
         """ Select the option at the given index in
         the corresponding select box
         @param selectbox_name: the name of the corresponding
         select box in the form
         @type selectbox_name: string
+        @param selectbox_id: the id of the corresponding
+        select box in the form
+        @type selectbox_id: string
         @param index: the option at this index will be selected
         @type index: int
         """
 
-        self.find_element_by_name_with_timeout(selectbox_name)
-        selectbox = self.browser.find_element_by_name(selectbox_name)
-        options = selectbox.find_elements_by_tag_name("option")
-        options[index].click()
+        if selectbox_name:
+            self.find_element_by_name_with_timeout(selectbox_name)
+            selectbox = self.browser.find_element_by_name(selectbox_name)
+        elif selectbox_id:
+            self.find_element_by_id_with_timeout(selectbox_id)
+            selectbox = self.browser.find_element_by_id(selectbox_id)
 
-    def choose_selectbox_option_by_value(self, selectbox_name, value):
+        options = selectbox.find_elements_by_tag_name("option")
+        options[int(index)].click()
+
+    def choose_selectbox_option_by_value(self, selectbox_name="", selectbox_id="", value=""):
         """ Select the option at the given value in
         the corresponding select box
         @param selectbox_name: the name of the corresponding
         select box in the form
-        @type selectbox_name: string
+        @type selectbox_id: string
+        @param selectbox_id: the id of the corresponding
+        select box in the form
+        @type selectbox_id: string
         @param value: the option at this value will be selected
         @type value: string
         """
 
-        self.find_element_by_name_with_timeout(selectbox_name)
-        selectbox = self.browser.find_element_by_name(selectbox_name)
+        if selectbox_name:
+            self.find_element_by_name_with_timeout(selectbox_name)
+            selectbox = self.browser.find_element_by_name(selectbox_name)
+        elif selectbox_id:
+            self.find_element_by_id_with_timeout(selectbox_id)
+            selectbox = self.browser.find_element_by_id(selectbox_id)
+
         options = selectbox.find_elements_by_tag_name("option")
         for option in options:
             if option.get_attribute('value') == value:
                 option.click()
                 break
 
-    def fill_textbox(self, textbox_name, text):
+    def fill_textbox(self, textbox_name="", textbox_id="", text=""):
         """ Fill in the input textbox or textarea with the given text
         @param textbox_name: the name of the corresponding textbox
         or text area in the form
         @type textbox_name: string
+        @param textbox_id: the id of the corresponding textbox
+        or text area in the form
+        @type textbox_id: string
         @param text: the information that the user wants to send
         @type text: string
         """
 
-        self.find_element_by_name_with_timeout(textbox_name)
-        textbox = self.browser.find_element_by_name(textbox_name)
+        if textbox_name:
+            self.find_element_by_name_with_timeout(textbox_name)
+            textbox = self.browser.find_element_by_name(textbox_name)
+        elif textbox_id:
+            self.find_element_by_id_with_timeout(textbox_id)
+            textbox = self.browser.find_element_by_id(textbox_id)
+
         textbox.send_keys(text)
 
     def handle_popup_dialog(self):
@@ -686,8 +788,10 @@ class InvenioWebTestCaseException(Exception):
     the corresponding function. See also:
     find_element_by_name_with_timeout()
     find_element_by_link_text_with_timeout()
+    find_element_by_partial_link_text_with_timeout()
     find_element_by_id_with_timeout()
     find_element_by_xpath_with_timeout()
+    find_elements_by_class_name_with_timeout()
     find_page_source_with_timeout()
     """
 

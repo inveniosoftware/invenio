@@ -58,6 +58,30 @@ class TestStemmer(unittest.TestCase):
             self.assertEqual(expected_result,
                              bibindex_engine_stemmer.stem(test_word, "en"))
 
+    def test_stemmer_greek(self):
+        """bibindex engine - Greek stemmer"""
+        greek_test_cases = [['πληροφορίες', 'ΠΛΗΡΟΦΟΡΙ'],
+                            ['πείραμα', 'ΠΕΙΡΑΜ'],
+                            ['πειράματα', 'ΠΕΙΡΑΜ'],
+                            ['πειραματιστής', 'ΠΕΙΡΑΜΑΤΙΣΤ'],
+                            ['πειραματίζομαι', 'ΠΕΙΡΑΜΑΤΙΖ'],
+                            ['πειραματίζεσαι', 'ΠΕΙΡΑΜΑΤΙΖ'],
+                            ['πειραματίστηκα', 'ΠΕΙΡΑΜΑΤΙΣΤ'],
+                            ['πειραματόζωο', 'ΠΕΙΡΑΜΑΤΟΖΩ'],
+                            ['ζώο', 'ΖΩ'],
+                            ['πειραματισμός', 'ΠΕΙΡΑΜΑΤΙΣΜ'],
+                            ['πειραματικός', 'ΠΕΙΡΑΜΑΤΙΚ'],
+                            ['πειραματικά', 'ΠΕΙΡΑΜΑΤ'],
+                            ['ηλεκτρόνιο', 'ΗΛΕΚΤΡΟΝΙ'],
+                            ['ηλεκτρονιακός', 'ΗΛΕΚΤΡΟΝΙΑΚ'],
+                            ['ακτίνα', 'ΑΚΤΙΝ'],
+                            ['ακτινοβολία', 'ΑΚΤΙΝΟΒΟΛ'],
+                            ['E=mc^2', 'E=MC^2'],
+                            ['α+β=γ', 'Α+Β=Γ']]
+        for test_word, expected_result in greek_test_cases:
+            self.assertEqual(expected_result,
+                             bibindex_engine_stemmer.stem(test_word, "el"))
+
 TEST_SUITE = make_test_suite(TestStemmer,)
 
 if __name__ == "__main__":

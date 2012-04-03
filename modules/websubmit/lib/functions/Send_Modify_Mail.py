@@ -86,8 +86,9 @@ def Send_Modify_Mail (parameters, curdir, form, user_info=None):
         email_txt += "You can check the modified document here:\n"
         email_txt += "<%s/%s/%s>\n\n" % (CFG_SITE_URL,CFG_SITE_RECORD,sysno)
     email_txt += "Please note that the modifications will be taken into account in a couple of minutes.\n\nBest regards,\nThe %s Server support Team" % CFG_SITE_NAME
-    # send the mail
-    send_email(FROMADDR,sub,"%s modified" % rn,email_txt,copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
+    # send the mail if any recipients or copy to admin
+    if sub or CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN:
+        send_email(FROMADDR,sub,"%s modified" % rn,email_txt,copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
     return ""
 
 

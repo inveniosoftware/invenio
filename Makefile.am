@@ -36,6 +36,14 @@ CKEDITOR = ckeditor_$(CKV).zip
 MEV = master
 MEDIAELEMENT = http://github.com/johndyer/mediaelement/zipball/$(MEV)
 
+#for solrutils
+INVENIO_JAVA_PATH = org/invenio_software/solr
+solrdirname = apache-solr-3.1.0
+solrdir = $(prefix)/lib/$(solrdirname)
+solrutils_dir=$(CURDIR)/modules/miscutil/lib/solrutils
+
+CLASSPATH=.:${solrdir}/dist/solrj-lib/commons-io-1.4.jar:${solrdir}/dist/apache-solr-core-*jar:${solrdir}/contrib/jzlib-1.0.7.jar:${solrdir}/dist/apache-solr-solrj-3.1.0.jar:${solrdir}/dist/solrj-lib/slf4j-api-1.5.5.jar:${solrdir}/dist/*:${solrdir}/contrib/basic-lucene-libs/*:${solrdir}/contrib/analysis-extras/lucene-libs/*:${solrdir}/dist/solrj-lib/*
+
 # git-version-get stuff:
 BUILT_SOURCES = $(top_srcdir)/.version
 $(top_srcdir)/.version:
@@ -88,7 +96,7 @@ etags:
 	(cd $(top_srcdir) && find $(top_srcdir) -name "*.py" -print | xargs etags)
 
 install-data-local:
-	for d in / /cache /log /tmp /tmp-shared /data /run ; do	\
+	for d in / /cache /log /tmp /tmp-shared /data /run /tmp-shared/bibencode/jobs/done ; do	\
 		mkdir -p $(localstatedir)$$d ;		\
 	done
 	@echo "************************************************************"
@@ -271,6 +279,32 @@ uninstall-pdfa-helper-files:
 	@echo "** The PDF/A helper files were successfully uninstalled. **"
 	@echo "***********************************************************"
 
+#Solrutils allows automatic installation, running and searching of an external Solr index.
+install-solrutils:
+	@echo "***********************************************************"
+	@echo "** Installing Solrutils and solr, please wait...         **"
+	@echo "***********************************************************"
+	cd $(prefix)/lib && \
+	if test -d apache-solr*; then echo A solr directory already exists in `pwd` . \
+	Please remove it manually, if you are sure it is not needed; exit 2; fi ; \
+        if test -f apache-solr*; then echo solr tarball already exists in `pwd` . \
+        Please remove it manually.; exit 2; fi ; \
+	wget http://www.apache.org/dist//lucene/solr/3.1.0/apache-solr-3.1.0.tgz && \
+	tar -xzf apache-solr-3.1.0.tgz && \
+	rm apache-solr-3.1.0.tgz
+	cd $(solrdir)/contrib/ ;\
+	wget http://mirrors.ibiblio.org/pub/mirrors/maven2/com/jcraft/jzlib/1.0.7/jzlib-1.0.7.jar && \
+	cd $(solrdir)/contrib/ ;\
+	jar -xf ../example/webapps/solr.war WEB-INF/lib/lucene-core-3.1.0.jar ; \
+        if test -d basic-lucene-libs; then rm -rf basic-lucene-libs; fi ; \
+        mv WEB-INF/lib/ basic-lucene-libs ; \
+        cp $(solrutils_dir)/schema.xml $(solrdir)/example/solr/conf/
+	cp $(solrutils_dir)/solrconfig.xml $(solrdir)/example/solr/conf/
+	cd $(solrutils_dir) && \
+	javac -classpath $(CLASSPATH) -d $(solrdir)/contrib @$(solrutils_dir)/java_sources.txt && \
+	cd $(solrdir)/contrib/ && \
+	jar -cf invenio-solr.jar org/invenio_software/solr/*class
+
 update-v0.3.0-tables update-v0.3.1-tables:
 	echo "ALTER TABLE idxINDEXNAME CHANGE id_idxINDEX id_idxINDEX mediumint(9) unsigned NOT NULL FIRST;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE rnkMETHODNAME CHANGE id_rnkMETHOD id_rnkMETHOD mediumint(9) unsigned NOT NULL FIRST;" | ${prefix}/bin/dbexec
@@ -421,7 +455,10 @@ update-v0.99.2-tables:
 update-v0.99.3-tables:
 	@echo "Nothing to do; table structure did not change between v0.99.3 and v0.99.4."
 
-update-v0.99.4-tables: # from v0.99.4 to v1.0.0-rc0
+update-v0.99.4-tables:
+	@echo "Nothing to do; table structure did not change between v0.99.4 and v0.99.5."
+
+update-v0.99.5-tables: # from v0.99.5 to v1.0.0-rc0
 	echo "RENAME TABLE oaiARCHIVE TO oaiREPOSITORY;" | ${prefix}/bin/dbexec
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "INSERT INTO knwKB (id,name,description,kbtype) SELECT id,name,description,'' FROM fmtKNOWLEDGEBASES;" | ${prefix}/bin/dbexec
@@ -517,7 +554,10 @@ update-v0.99.4-tables: # from v0.99.4 to v1.0.0-rc0
 	echo -e 'from invenio.access_control_firerole import repair_role_definitions;\
 	repair_role_definitions()' | $(PYTHON)
 
-update-v1.0.0-rc0-tables: # from v1.0.0-rc0 to next release
+update-v1.0.0-rc0-tables: # from v1.0.0-rc0 to v1.0.0
+	@echo "Nothing to do; table structure did not change between v1.0.0-rc0 and v1.0.0."
+
+update-db-from-v1.0-to-v1.1: # update DB from v1.0 release series to v1.1 release series
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Set_Embargo','Set an embargo on all the documents of a given record.');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Set_Embargo','date_file');" | ${prefix}/bin/dbexec
@@ -532,10 +572,28 @@ update-v1.0.0-rc0-tables: # from v1.0.0-rc0 to next release
 	echo "UPDATE sbmALLFUNCDESCR SET function='Move_CKEditor_Files_to_Storage', description='Transfer files attached to the record with the CKEditor' WHERE function='Move_FCKeditor_Files_to_Storage';" | ${prefix}/bin/dbexec
 	echo "UPDATE sbmFUNCTIONS SET function='Move_CKEditor_Files_to_Storage' WHERE function='Move_FCKeditor_Files_to_Storage';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK CHANGE proc proc varchar(255) NOT NULL;" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE schTASK ADD sequenceid int(8) NULL default NULL;" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE schTASK ADD INDEX sequenceid (sequenceid);" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE hstTASK CHANGE proc proc varchar(255) NOT NULL;" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE hstTASK ADD sequenceid int(8) NULL default NULL;" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE hstTASK ADD INDEX sequenceid (sequenceid);" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE session CHANGE session_object session_object longblob;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE session CHANGE session_expiry session_expiry datetime NOT NULL default '0000-00-00 00:00:00';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE oaiREPOSITORY CHANGE setSpec setSpec varchar(255) NOT NULL default 'GLOBAL_SET';" | ${prefix}/bin/dbexec
 	echo "UPDATE oaiREPOSITORY SET setSpec='GLOBAL_SET' WHERE setSpec='';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE user_query_basket ADD COLUMN alert_desc TEXT DEFAULT NULL AFTER alert_name;" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Link_Records','Link two records toghether via MARC');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Video_Processing',NULL);" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Link_Records','edsrn');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Link_Records','edsrn2');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Link_Records','directRelationship');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Link_Records','reverseRelationship');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','aspect');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','batch_template');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','title');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Set_RN_From_Sysno', 'Set the value of global rn variable to the report number identified by sysno (recid)');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','edsrn');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','rep_tags');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','record_search_pattern');" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~ *.pyc *.tmp

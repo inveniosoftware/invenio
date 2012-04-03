@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -214,8 +214,7 @@ def create_new_person(uid, uid_is_owner=False):
     '''
     Create a new person. Set the uid as owner if requested.
     '''
-    pids = run_sql("select count(personid) from aidPERSONID")[0][0]
-    if int(pids) > 0:
+    if len(run_sql("SELECT personid FROM aidPERSONID LIMIT 1")):
         pid = run_sql("select max(personid) from aidPERSONID")[0][0]
         pid = int(pid) + 1
     else:
@@ -461,9 +460,8 @@ class PersonIDStatusDataCacher(DataCacher):
             Sets the Data Cacher content to True if the table is not empty
             '''
             try:
-                res = run_sql("SELECT count(personid) FROM aidPERSONID "
-                              "where tag='paper'")
-                if res and res[0] and res[0][0] > 0:
+                if len(run_sql("SELECT personid FROM aidPERSONID "
+                               "WHERE tag='paper' LIMIT 1")):
                     return True
                 else:
                     return False

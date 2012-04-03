@@ -29,12 +29,12 @@ INSERT INTO user_usergroup VALUES (5,2,'A',NOW());
 INSERT INTO user_usergroup VALUES (6,2,'M',NOW());
 INSERT INTO user_usergroup VALUES (7,2,'M',NOW());
 
-INSERT INTO collection VALUES (2,'Preprints','collection:PREPRINT',NULL,NULL);
-INSERT INTO collection VALUES (3,'Books','collection:BOOK',NULL,NULL);
-INSERT INTO collection VALUES (4,'Theses','collection:THESIS',NULL,NULL);
-INSERT INTO collection VALUES (5,'Reports','collection:REPORT',NULL,NULL);
-INSERT INTO collection VALUES (6,'Articles','collection:ARTICLE',NULL,NULL);
-INSERT INTO collection VALUES (8,'Pictures','collection:PICTURE',NULL,NULL);
+INSERT INTO collection VALUES (2,'Preprints','980:"PREPRINT"',NULL,NULL);
+INSERT INTO collection VALUES (3,'Books','980:"BOOK"',NULL,NULL);
+INSERT INTO collection VALUES (4,'Theses','980:"THESIS"',NULL,NULL);
+INSERT INTO collection VALUES (5,'Reports','980:"REPORT"',NULL,NULL);
+INSERT INTO collection VALUES (6,'Articles','980:"ARTICLE"',NULL,NULL);
+INSERT INTO collection VALUES (8,'Pictures','980:"PICTURE"',NULL,NULL);
 INSERT INTO collection VALUES (9,'CERN Divisions',NULL,NULL,NULL);
 INSERT INTO collection VALUES (10,'CERN Experiments',NULL,NULL,NULL);
 INSERT INTO collection VALUES (11,'Theoretical Physics (TH)','division:TH',NULL,NULL);
@@ -44,14 +44,15 @@ INSERT INTO collection VALUES (14,'ALEPH','experiment:ALEPH',NULL,NULL);
 INSERT INTO collection VALUES (15,'Articles & Preprints',NULL,NULL,NULL);
 INSERT INTO collection VALUES (16,'Books & Reports',NULL,NULL,NULL);
 INSERT INTO collection VALUES (17,'Multimedia & Arts',NULL,NULL,NULL);
-INSERT INTO collection VALUES (18,'Poetry','collection:POETRY',NULL,NULL);
-INSERT INTO collection VALUES (19,'Atlantis Times News','collection:ATLANTISTIMESNEWS',NULL,NULL);
-INSERT INTO collection VALUES (20,'Atlantis Times Arts','collection:ATLANTISTIMESARTS',NULL,NULL);
-INSERT INTO collection VALUES (21,'Atlantis Times Science','collection:ATLANTISTIMESSCIENCE',NULL,NULL);
+INSERT INTO collection VALUES (18,'Poetry','980:"POETRY"',NULL,NULL);
+INSERT INTO collection VALUES (19,'Atlantis Times News','980:"ATLANTISTIMESNEWS"',NULL,NULL);
+INSERT INTO collection VALUES (20,'Atlantis Times Arts','980:"ATLANTISTIMESARTS"',NULL,NULL);
+INSERT INTO collection VALUES (21,'Atlantis Times Science','980:"ATLANTISTIMESSCIENCE"',NULL,NULL);
 INSERT INTO collection VALUES (22,'Atlantis Times',NULL,NULL,NULL);
 INSERT INTO collection VALUES (23,'Atlantis Institute Books','hostedcollection:',NULL,NULL);
 INSERT INTO collection VALUES (24,'Atlantis Institute Articles','hostedcollection:',NULL,NULL);
-INSERT INTO collection VALUES (25,'Atlantis Times Drafts','collection:ATLANTISTIMESSCIENCEDRAFT or collection:ATLANTISTIMESARTSDRAFT or collection:ATLANTISTIMESNEWSDRAFT',NULL,NULL);
+INSERT INTO collection VALUES (25,'Atlantis Times Drafts','980:"ATLANTISTIMESSCIENCEDRAFT" or 980:"ATLANTISTIMESARTSDRAFT" or 980:"ATLANTISTIMESNEWSDRAFT"',NULL,NULL);
+INSERT INTO collection VALUES (26,'Videos','980:"VIDEO"',NULL,NULL);
 
 INSERT INTO clsMETHOD VALUES (1,'HEP','http://invenio-software.org/download/invenio-demo-site-files/HEP.rdf','High Energy Physics Taxonomy','0000-00-00 00:00:00');
 INSERT INTO clsMETHOD VALUES (2,'NASA-subjects','http://invenio-software.org/download/invenio-demo-site-files/NASA-subjects.rdf','NASA Subjects','0000-00-00 00:00:00');
@@ -544,6 +545,10 @@ INSERT INTO collectionname VALUES (24,'fr','ln','Atlantis Institute Articles');
 INSERT INTO collectionname VALUES (25,'en','ln','Atlantis Times Drafts');
 INSERT INTO collectionname VALUES (25,'fr','ln','Atlantis Times Ébauches');
 
+INSERT INTO collectionname VALUES (26,'en','ln','Videos');
+INSERT INTO collectionname VALUES (26,'fr','ln','Vidéos');
+INSERT INTO collectionname VALUES (26,'it','ln','Filmati');
+
 INSERT INTO collection_collection VALUES (1,15,'r',60);
 INSERT INTO collection_collection VALUES (1,16,'r',40);
 INSERT INTO collection_collection VALUES (1,17,'r',30);
@@ -554,9 +559,10 @@ INSERT INTO collection_collection VALUES (15,2,'r',10);
 INSERT INTO collection_collection VALUES (16,3,'r',30);
 INSERT INTO collection_collection VALUES (16,4,'r',20);
 INSERT INTO collection_collection VALUES (16,5,'r',10);
-INSERT INTO collection_collection VALUES (17,8,'r',30);
+INSERT INTO collection_collection VALUES (17,8,'r',40);
 INSERT INTO collection_collection VALUES (17,18,'r',20);
 INSERT INTO collection_collection VALUES (17,22,'r',10);
+INSERT INTO collection_collection VALUES (17,26,'r',30);
 INSERT INTO collection_collection VALUES (22,19,'r',30);
 INSERT INTO collection_collection VALUES (22,20,'r',20);
 INSERT INTO collection_collection VALUES (22,21,'r',10);
@@ -874,6 +880,8 @@ INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) 
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,87,'ar','rt',100);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,88,'ar','rt',90);
 
+INSERT INTO collectiondetailedrecordpagetabs(id_collection,tabs) VALUES(26,'');
+
 INSERT INTO example VALUES (1,'author search','author:"Ellis, J"');
 INSERT INTO example VALUES (2,'word search','quantum');
 INSERT INTO example VALUES (3,'wildcard word search','quant*');
@@ -1025,6 +1033,7 @@ INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'DEMOPIC',3);
 INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'DEMOART',4);
 INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'DEMOBOO',5);
 INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'DEMOJRN',6);
+INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'DEMOVID',7);
 
 INSERT INTO sbmCATEGORIES (doctype,sname,lname,score) VALUES ('DEMOPIC','LIFE','Life at CERN',3);
 INSERT INTO sbmCATEGORIES (doctype,sname,lname,score) VALUES ('DEMOPIC','HIST','Personalities and History of CERN',2);
@@ -1042,6 +1051,7 @@ INSERT INTO sbmDOCTYPE VALUES ('Demo Article Submission','DEMOART','2008-03-06',
 INSERT INTO sbmDOCTYPE VALUES ('Demo Book Submission (Refereed)','DEMOBOO','2008-03-06','2008-03-06','<br /><br />The Demo Book submission demonstrates a refereed submission.<br /><br />\r\nWhen the details of a book are submitted by a user, they must be approved by a referee before the record is integrated into the ATLANTIS repository.<br />\r\nApproved books are integrated into the ATLANTIS \"Books\" collection.<br />\r\n');
 INSERT INTO sbmDOCTYPE VALUES ('Demo Poetry Submission','DEMOPOE','2008-03-12','2008-03-12','<br /><br />\r\nThe Demo Poetry submission demonstrates a simple submission type with a submission form split over two pages.<br />\r\nIt does not use categories. Records created with this submission are inserted into the ATLANTIS \"Poetry\" collection.\r\n<br /><br />');
 INSERT INTO sbmDOCTYPE VALUES ('Demo Journal Submission','DEMOJRN','2008-09-18','2008-09-18','The Demo Journal submission submits records that will be integrated into the demo "Atlantis Times" journal.<br />\r\n Makes use of CKEditor to provide WYSIWYG HTML edition of the articles. Install it with <code>make install-ckeditor-plugin</code>.');
+INSERT INTO sbmDOCTYPE VALUES ('Demo Video Submission','DEMOVID','2012-02-16','2012-02-16','This is a prototype implementation of a video submission workflow. It will generate all necessary files and video formats from one file uploaded to the system.');
 
 INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,1,'DEMOPIC_TITLE','<table width=\"100%\" bgcolor=\"#D3E3E2\" align=\"center\" cellspacing=\"2\" cellpadding=\"2\" border=\"1\"><tr><td align=\"left\"><br /><b>Submit an ATLANTIS picture:</b><br /><br /><span style=\"color: red;\">*</span>Picture Title:<br />','M','Picture Title','','2007-09-13','2007-10-04',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,2,'DEMOPIC_PHOTOG','<br /><br />Picture Author(s) or Photographers(s): <i>(one per line)</i><br />','O','Photographer(s)','','2007-09-13','2007-09-13',NULL,NULL);
@@ -1133,6 +1143,8 @@ INSERT INTO sbmFIELD VALUES ('SBIDEMOJRN',1,10,'DEMOJRN_IN','','O','Journal Name
 INSERT INTO sbmFIELD VALUES ('SBIDEMOJRN',1,12,'DEMOJRN_END','</td></tr><tr><td colspan=\"2\">','O','','','2008-09-26','2009-02-20',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('SBIDEMOJRN',1,8,'DEMOJRN_ABSE','</td></tr><tr><td><br />English article:<br />','O','English article:','','2008-11-04','2009-01-09',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('SBIDEMOJRN',1,14,'DEMOJRN_CATEG','','O','comboDEMOJRN-like for MBI','','2009-10-15','2009-10-15',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOVID',1,1,'DEMOVID_SINGLE','','O','','','2012-02-16','2012-02-16',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOVID',1,2,'DEMOVID_SUBMIT','','O','','','2012-02-16','2012-02-16',NULL,NULL);
 
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_TITLE',NULL,'245__a','T',NULL,5,60,NULL,NULL,NULL,'2007-09-13','2007-09-13',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_PHOTOG',NULL,'100__a','T',NULL,6,30,NULL,NULL,NULL,'2007-09-13','2007-09-19','<br /><br />Picture Author(s) or Photographers(s)<br /><i>(optional)(<B>one per line</B>)</i>:<br />',NULL,0);
@@ -1221,6 +1233,14 @@ INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_IN',NULL,'595__a','H',NULL,NULL,NULL,N
 INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_ABSE',NULL,'520__b','R',NULL,100,90,NULL,NULL,'from invenio.htmlutils import get_html_text_editor\r\nfrom invenio.config import CFG_SITE_URL\r\nfrom invenio.search_engine_utils import get_fieldvalues\r\nimport os\r\n\r\n\r\nif (\'modify\' in curdir) and not os.path.exists(\"%s/DEMOJRN_ABSE\" % curdir):\r\n    try:\r\n        content = get_fieldvalues(int(sysno), \'520__b\')[0]\r\n    except:\r\n        content = \'\'\r\nelif os.path.exists(\"%s/DEMOJRN_ABSE\" % curdir):\r\n    content = file(\"%s/DEMOJRN_ABSE\" % curdir).read()\r\nelse:\r\n    content = \'\'\r\n\r\ntext = get_html_text_editor(\"DEMOJRN_ABSE\",id=\"BulletinCKEditor2\", content=content, toolbar_set=\"WebJournal\", width=\'522px\', height=\'700px\', file_upload_url=CFG_SITE_URL + \'/submit/attachfile\', custom_configurations_path=\'/ckeditor/journal-editor-config.js\')\r\n\r\n','2008-09-22','2009-02-23','</td></tr><tr><td><br />English Article:<br />',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_ENDING',NULL,'','H',NULL,NULL,NULL,NULL,NULL,NULL,'2009-02-06','2009-02-20','</td></tr></table>',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_CATEG',NULL,'','R',NULL,NULL,NULL,NULL,NULL,'# Solve usual problem with submit/direct?.. links that bypass \r\n# the comboXXX (category selection) of the submission. Retrieve \r\n# the value, and set it (only in the case of MBI)\r\n\r\nfrom invenio.search_engine_utils import get_fieldvalues\r\n\r\nif \"modify\" in curdir:\r\n    try:\r\n        comboDEMOJRNfile = file(\"%s/%s\" % (curdir,\'comboDEMOJRN\'), \'w\')\r\n        report_number = get_fieldvalues(int(sysno), \'037__a\')[0]\r\n        category = report_number.split(\'-\')[1]\r\n        comboDEMOJRNfile.write(category)\r\n        comboDEMOJRNfile.close()\r\n    except:\r\n        text = \'\'','2009-10-15','2009-10-15',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOVID_ASPECT',NULL,'','R',NULL,NULL,NULL,NULL,NULL,'from invenio.bibencode_websubmit import websumbit_aspect_ratio_form_element\r\n\r\ntext = websumbit_aspect_ratio_form_element(curdir, doctype, uid, access)','2012-02-16','2012-02-16','Aspect Ratio',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOVID_AU',NULL,'100__a','T',NULL,6,80,NULL,NULL,NULL,'2012-02-16','2012-02-16',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOVID_DESCR',NULL,'520__a','T',NULL,12,80,NULL,NULL,NULL,'2012-02-16','2012-02-16',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOVID_FILE',NULL,'','F',NULL,NULL,NULL,NULL,NULL,NULL,'2012-02-16','2012-02-16',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOVID_SINGLE',NULL,'','R',NULL,NULL,NULL,NULL,NULL,'from invenio.bibencode_websubmit import (get_session_id, websubmit_singlepage)\r\n\r\n# Retrieve session id\r\ntry:\r\n    # User info is defined only in MBI/MPI actions...\r\n    session_id = get_session_id(None, uid, user_info) \r\nexcept:\r\n    session_id = get_session_id(req, uid, {})\r\n\r\ntext = websubmit_singlepage(curdir, doctype, uid, access, session_id)','2012-02-16','2012-02-16',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOVID_SUBMIT',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<input type=\"button\" class=\"adminbutton\" width=\"400\" height=\"50\" name=\"endS\" value=\"finish submission\" onclick=\"finish();\" />\r\n</div>','2012-02-16','2012-02-16',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOVID_TITLE',NULL,'245__a','I',NULL,NULL,NULL,NULL,NULL,NULL,'2012-02-16','2012-02-16',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOVID_YEAR',NULL,'909C0y','I',4,NULL,NULL,4,NULL,NULL,'2012-02-16','2012-02-16',NULL,NULL,0);
 
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Mail_Submitter',70,1);
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Print_Success',60,1);
@@ -1374,6 +1394,13 @@ INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOJRN','Make_Modify_Record',40,2);
 INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOJRN','Move_CKEditor_Files_to_Storage',30,2);
 INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOJRN','Get_Recid',20,2);
 INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOJRN','Get_Report_Number',10,2);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOVID','Create_Recid',10,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOVID','Insert_Record',40,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOVID','Mail_Submitter',60,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOVID','Make_Record',30,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOVID','Print_Success',50,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOVID','Report_Number_Generation',20,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOVID','Video_Processing',70,1);
 
 INSERT INTO sbmIMPLEMENT VALUES ('DEMOPIC','SBI','Y','SBIDEMOPIC',1,'2007-09-13','2007-10-04',1,'','',0,0,'');
 INSERT INTO sbmIMPLEMENT VALUES ('DEMOPIC','MBI','Y','MBIDEMOPIC',1,'2007-10-04','2007-10-04',2,'','',0,0,'');
@@ -1389,6 +1416,7 @@ INSERT INTO sbmIMPLEMENT VALUES ('DEMOPOE','SBI','Y','SBIDEMOPOE',2,'2008-03-12'
 INSERT INTO sbmIMPLEMENT VALUES ('DEMOPOE','MBI','Y','MBIDEMOPOE',1,'2008-03-12','2008-03-12',2,'','',0,0,'');
 INSERT INTO sbmIMPLEMENT VALUES ('DEMOJRN','SBI','Y','SBIDEMOJRN',1,'2008-09-18','2009-02-23',1,'','',0,0,'');
 INSERT INTO sbmIMPLEMENT VALUES ('DEMOJRN','MBI','Y','MBIDEMOJRN',1,'2008-09-18','2009-02-23',2,'','',0,0,'');
+INSERT INTO sbmIMPLEMENT VALUES ('DEMOVID','SBI','Y','SBIDEMOVID',1,'2012-02-16','2012-02-16',1,'','',0,0,'');
 
 INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','addressesMBI','');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','authorfile','DEMOPIC_PHOTOG');
@@ -1547,6 +1575,21 @@ INSERT INTO sbmPARAMETERS VALUES ('DEMOJRN','rnin','comboDEMOJRN');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOJRN','yeargen','AUTO');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOJRN','input_fields','DEMOJRN_ABSE,DEMOJRN_ABSF');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOJRN','files','DEMOJRN_ABSE,DEMOJRN_ABSF');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','aspect','DEMOVID_ASPECT');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','authorfile','DEMOVID_AU');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','autorngen','Y');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','counterpath','lastid_DEMOVID_<PA>yy</PA>');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','createTemplate','DEMOVIDcreate.tpl');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','edsrn','DEMOVID_RN');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','emailFile','SuE');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','newrnin','NEWRN');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','rnformat','DEMO-VIDEO-<PA>yy</PA>');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','rnin','comboDEMOVID');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','sourceTemplate','DEMOVID.tpl');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','status','ADDED');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','title','DEMOVID_TITLE');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','titleFile','DEMOVID_TITLE');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOVID','yeargen','AUTO');
 
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (2,'demo_jif','0000-00-00 00:00:00');
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,2,90);

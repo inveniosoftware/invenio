@@ -99,8 +99,11 @@ contributed to the project:
   - Genis Musulmanbekov <genis@jinr.ru>
     Contributions to the Russian translation.
 
-  - Andrey Tremba <metandrey@gmail.com>
-    Contributions to the Russian translation.
+ - Andrey Tremba <metandrey@gmail.com>
+   Contributions to the Russian translation.
+
+ - Cornelia Plott <c.plott@fz-juelich.de>
+   Contributions to the German translation.
 
 The URL handler was inspired by the Quixote Web Framework which is
 ``Copyright (c) 2004 Corporation for National Research Initiatives;
@@ -150,11 +153,16 @@ The ISOCoatedsb.icc ICC profile has been retrieved from the European Color
 Initiative.
 <http://www.eci.org/>
 
-The PEP8 conformance checking script (pep8.py) was written by Johann
-C. Rocholl <johann@browsershots.org>.  The pep8.py version included
-with Invenio was downloaded from
+The PEP8 conformance checking script (pep8.py) was written by
+Johann C. Rocholl <johann@browsershots.org>.
+The pep8.py version included with Invenio was downloaded from
 <http://svn.browsershots.org/trunk/devtools/pep8/pep8.py> on
 2009-06-14.
+
+The logicutils library was originally authored by
+Peter Norvig <peter.norvig@google.com> and was taken from
+<http://code.google.com/p/aima-python/> on 2010-05-20 and later expanded
+to fit Invenio needs.
 
 The git-version-gen script was taken from gnulib 20100704+stable-1.
 <http://www.gnu.org/software/gnulib/>

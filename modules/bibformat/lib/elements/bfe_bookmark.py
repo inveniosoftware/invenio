@@ -24,7 +24,7 @@
 
 import cgi
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
+from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD, CFG_CERN_SITE
 from invenio.search_engine import record_public_p
 from invenio.bibformat_elements.bfe_sciencewise import create_sciencewise_url, \
     get_arxiv_reportnumber
@@ -64,17 +64,19 @@ def format_element(bfo, only_public_records=1, sites="linkedin,twitter,facebook,
     sciencewise_script = ""
     if sciencewise:
         reportnumber = get_arxiv_reportnumber(bfo)
+        sciencewise_url = ""
         if reportnumber:
             sciencewise_url = create_sciencewise_url(reportnumber)
-            if sciencewise_url:
-                sciencewise_script = """\
-    $.bookmark.addSite('sciencewise', 'ScienceWise.info', '%(siteurl)s/img/sciencewise.png', 'en', 'bookmark', '%(url)s');
-    $('#bookmark_sciencewise').bookmark({sites: ['sciencewise']});
+        if not sciencewise_url and CFG_CERN_SITE:
+            sciencewise_url = create_sciencewise_url(bfo.recID, cds=True)
+        if sciencewise_url:
+            sciencewise_script = """\
+$.bookmark.addSite('sciencewise', 'ScienceWise.info', '%(siteurl)s/img/sciencewise.png', 'en', 'bookmark', '%(url)s');
+$('#bookmark_sciencewise').bookmark({sites: ['sciencewise']});
 """ % {
-                    'siteurl': CFG_SITE_URL,
-                    'url': sciencewise_url.replace("'", r"\'"),
-                }
-
+                'siteurl': CFG_SITE_URL,
+                'url': sciencewise_url.replace("'", r"\'"),
+            }
     return """\
 <!-- JQuery Bookmark Button BEGIN -->
 <div id="bookmark"></div><div id="bookmark_sciencewise"></div>

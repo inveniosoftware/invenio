@@ -2,7 +2,7 @@
 ## Comments and reviews for records.
 
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -37,7 +37,11 @@ from invenio.webcomment import check_recID_is_in_range, \
                                check_user_can_view_comments, \
                                check_user_can_send_comments, \
                                check_user_can_view_comment, \
-                               query_get_comment
+                               query_get_comment, \
+                               toggle_comment_visibility, \
+                               check_comment_belongs_to_record, \
+                               is_comment_deleted
+
 from invenio.config import \
      CFG_TMPDIR, \
      CFG_SITE_LANG, \
@@ -86,7 +90,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
     """Defines the set of /comments pages."""
 
     _exports = ['', 'display', 'add', 'vote', 'report', 'index', 'attachments',
-                'subscribe', 'unsubscribe']
+                'subscribe', 'unsubscribe', 'toggle']
 
     def __init__(self, recid=-1, reviews=0):
         self.recid = recid
@@ -331,6 +335,31 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                 text = auth_msg_1 + auth_msg_2)
 
+        if argd['comid']:
+            # If replying to a comment, are we on a record that
+            # matches the original comment user is replying to?
+            if not check_comment_belongs_to_record(argd['comid'], self.recid):
+                return page_not_authorized(req, "../", \
+                                           text = _("Specified comment does not belong to this record"))
+
+
+            # Is user trying to reply to a restricted comment? Make
+            # sure user has access to it.  We will then inherit its
+            # restriction for the new comment
+            (auth_code, auth_msg) = check_user_can_view_comment(user_info, argd['comid'])
+            if auth_code:
+                return page_not_authorized(req, "../", \
+                                           text = _("You do not have access to the specified comment"))
+
+            # Is user trying to reply to a deleted comment? If so, we
+            # let submitted comment go (to not lose possibly submitted
+            # content, if comment is submitted while original is
+            # deleted), but we "reset" comid to make sure that for
+            # action 'REPLY' the original comment is not included in
+            # the reply
+            if is_comment_deleted(argd['comid']):
+                argd['comid'] = 0
+
         user_info = collect_user_info(req)
         can_attach_files = False
         (auth_code, auth_msg) = check_user_can_attach_file_to_comments(user_info, self.recid)
@@ -532,7 +561,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                    'p': (int, 1),
                                    'referer': (str, None)
                                    })
-
+        _ = gettext_set_language(argd['ln'])
         client_ip_address = req.remote_ip
         uid = getUid(req)
 
@@ -548,14 +577,31 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                 text = auth_msg)
 
+        # Check that comment belongs to this recid
+        if not check_comment_belongs_to_record(argd['comid'], self.recid):
+            return page_not_authorized(req, "../", \
+                                       text = _("Specified comment does not belong to this record"))
+
+        # Check that user can access the record
+        (auth_code, auth_msg) = check_user_can_view_comment(user_info, argd['comid'])
+        if auth_code:
+            return page_not_authorized(req, "../", \
+                                       text = _("You do not have access to the specified comment"))
+
+        # Check that comment is not currently deleted
+        if is_comment_deleted(argd['comid']):
+            return page_not_authorized(req, "../", \
+                                       text = _("You cannot vote for a deleted comment"),
+                                       ln=argd['ln'])
+
         success = perform_request_vote(argd['comid'], client_ip_address, argd['com_value'], uid)
         if argd['referer']:
-            argd['referer'] += "?ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;voted=%s&amp;" % (
+            argd['referer'] += "?ln=%s&do=%s&ds=%s&nb=%s&p=%s&voted=%s&" % (
                 argd['ln'], argd['do'], argd['ds'], argd['nb'], argd['p'], success)
             redirect_to_url(req, argd['referer'])
         else:
             #Note: sent to comments display
-            referer = "%s/%s/%s/%s?&amp;ln=%s&amp;voted=1"
+            referer = "%s/%s/%s/%s?&ln=%s&voted=1"
             referer %= (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, self.discussion == 1 and 'reviews' or 'comments', argd['ln'])
             redirect_to_url(req, referer)
 
@@ -591,13 +637,14 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                    'p': (int, 1),
                                    'referer': (str, None)
                                    })
+        _ = gettext_set_language(argd['ln'])
 
         client_ip_address = req.remote_ip
         uid = getUid(req)
 
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = check_user_can_view_comments(user_info, self.recid)
-        if auth_code or user_info['email'] == 'guest':
+        if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
@@ -607,14 +654,31 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                 text = auth_msg)
 
+        # Check that comment belongs to this recid
+        if not check_comment_belongs_to_record(argd['comid'], self.recid):
+            return page_not_authorized(req, "../", \
+                                       text = _("Specified comment does not belong to this record"))
+
+        # Check that user can access the record
+        (auth_code, auth_msg) = check_user_can_view_comment(user_info, argd['comid'])
+        if auth_code:
+            return page_not_authorized(req, "../", \
+                                       text = _("You do not have access to the specified comment"))
+
+        # Check that comment is not currently deleted
+        if is_comment_deleted(argd['comid']):
+            return page_not_authorized(req, "../", \
+                                       text = _("You cannot report a deleted comment"),
+                                       ln=argd['ln'])
+
         success = perform_request_report(argd['comid'], client_ip_address, uid)
         if argd['referer']:
-            argd['referer'] += "?ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;reported=%s&amp;" % (argd['ln'], argd['do'], argd['ds'], argd['nb'], argd['p'], str(success))
+            argd['referer'] += "?ln=%s&do=%s&ds=%s&nb=%s&p=%s&reported=%s&" % (argd['ln'], argd['do'], argd['ds'], argd['nb'], argd['p'], str(success))
 
             redirect_to_url(req, argd['referer'])
         else:
             #Note: sent to comments display
-            referer = "%s/%s/%s/%s/display?ln=%s&amp;voted=1"
+            referer = "%s/%s/%s/%s/display?ln=%s&voted=1"
             referer %= (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, self.discussion==1 and 'reviews' or 'comments', argd['ln'])
             redirect_to_url(req, referer)
 
@@ -664,6 +728,26 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         display_url = "%s/%s/%s/comments/display?subscribed=%s&ln=%s" % \
                       (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, str(-success), argd['ln'])
         redirect_to_url(req, display_url)
+
+    def toggle(self, req, form):
+        """
+        Store the visibility of a comment for current user
+        """
+        argd = wash_urlargd(form, {'comid': (int, -1),
+                                   'referer': (str, None),
+                                   'collapse': (int, 1)})
+
+        uid = getUid(req)
+
+        if isGuestUser(uid):
+            # We do not store information for guests
+            return ''
+
+        toggle_comment_visibility(uid, argd['comid'], argd['collapse'], self.recid)
+        if argd['referer']:
+            return redirect_to_url(req, CFG_SITE_SECURE_URL + \
+                                   (not argd['referer'].startswith('/') and '/' or '') + \
+                                   argd['referer'] + '#' + str(argd['comid']))
 
 class WebInterfaceCommentsFiles(WebInterfaceDirectory):
     """Handle <strike>upload and </strike> access to files for comments.
@@ -747,6 +831,12 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
         elif auth_code:
             return page_not_authorized(req, "../", \
                                        text = auth_msg,
+                                       ln=argd['ln'])
+
+        # Check that comment is not currently deleted
+        if is_comment_deleted(argd['comid']):
+            return page_not_authorized(req, "../", \
+                                       text = _("You cannot access files of a deleted comment"),
                                        ln=argd['ln'])
 
         if not argd['file'] is None:

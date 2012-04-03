@@ -25,7 +25,7 @@ records.
 import cgi
 import re
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_CERN_SITE
 from invenio.messages import gettext_set_language
 
 _RE_MODERN_ARXIV = re.compile('(arxiv:)?(?P<number>\d{4}.\d{4}(v\d+)?)')
@@ -43,6 +43,8 @@ def format_element(bfo):
             icon = create_sciencewise_icon(reportnumber)
             if icon:
                 return icon
+    if CFG_CERN_SITE:
+        return create_sciencewise_icon(bfo.recID, cds=True)
     return ""
 
 def get_arxiv_reportnumber(bfo):
@@ -67,11 +69,13 @@ def escape_values(bfo):
     """
     return 0
 
-def create_sciencewise_url(reportnumber):
+def create_sciencewise_url(reportnumber, cds=False):
     """
     If the reportnumber is a valid arXiv reportnumber return a ScienceWise.info
     URL.
     """
+    if cds:
+        return "http://sciencewise.info/bookmarks/cds:%s/add" % reportnumber
     reportnumber = reportnumber.lower()
     g = _RE_BAD_OLD_ARXIV.match(reportnumber)
     if g:
@@ -82,12 +86,19 @@ def create_sciencewise_url(reportnumber):
             return "http://sciencewise.info/bookmarks/%s/add" % g.group('number')
     return ""
 
-def create_sciencewise_icon(reportnumber, lang=CFG_SITE_LANG):
+def create_sciencewise_icon(reportnumber, lang=CFG_SITE_LANG, cds=False):
     """
     If the reportnumber is a valid arXiv reportnumber return a ScienceWise.info
     icon.
     """
     _ = gettext_set_language(lang)
+    if cds:
+        return """\
+    <a href="http://sciencewise.info/bookmarks/cds:%(id)s/add" target="_blank" title="%(title)s"><img src="%(siteurl)s/img/sciencewise.png" width="23" height="16" alt="ScienceWise.info icon" /></a>""" % {
+                'id': cgi.escape(reportnumber, True),
+                'title': cgi.escape(_("Add this document to your ScienceWise.info bookmarks"), True),
+                'siteurl': cgi.escape(CFG_SITE_URL, True)
+            }
     reportnumber = reportnumber.lower()
     g = _RE_BAD_OLD_ARXIV.match(reportnumber)
     if g:

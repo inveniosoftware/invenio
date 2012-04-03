@@ -37,7 +37,7 @@ if sys.hexversion < 0x2040000:
 from mechanize import Browser, LinkNotFoundError
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_NAME, CFG_SITE_LANG, \
-    CFG_SITE_RECORD, CFG_SITE_LANGS
+    CFG_SITE_RECORD, CFG_SITE_LANGS, CFG_WEBSEARCH_SPIRES_SYNTAX
 from invenio.testutils import make_test_suite, \
                               run_test_suite, \
                               make_url, make_surl, test_web_page_content, \
@@ -807,7 +807,7 @@ class WebSearchTestWildcardLimit(unittest.TestCase):
     def test_wildcard_limit_correctly_passed_when_set(self):
         """websearch - wildcard limit is correctly passed when set"""
         self.assertEqual([],
-            test_web_page_content(CFG_SITE_URL + '/search?p=e*&f=author&of=id&wl=5',
+            test_web_page_content(CFG_SITE_URL + '/search?p=e*&f=author&of=id&wl=5&rg=100',
                                   expected_text="[9, 10, 11, 17, 46, 48, 50, 51, 52, 53, 54, 67, 72, 74, 81, 88, 92, 96]"))
 
     def test_wildcard_limit_correctly_not_active(self):
@@ -983,6 +983,28 @@ class WebSearchNearestTermsTest(unittest.TestCase):
                                                expected_link_target=CFG_SITE_URL+"/search?ln=en&p=title%3Aenergi+author%3Aenqvist&f=keyword",
                                                expected_link_label='enqvist'))
 
+    def test_nearest_terms_box_in_unsuccessful_uppercase_query(self):
+        """ websearch - nearest terms box for unsuccessful uppercase query """
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=fOo%3Atest',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=food",
+                                               expected_link_label='food'))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=arXiv%3A1007.5048',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=artist",
+                                               expected_link_label='artist'))
+
+    def test_nearest_terms_box_in_unsuccessful_spires_query(self):
+        """ websearch - nearest terms box for unsuccessful spires query """
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=find+a+foobar',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=find+a+finch",
+                                               expected_link_label='finch'))
+
+
 class WebSearchBooleanQueryTest(unittest.TestCase):
     """Check various boolean queries."""
 
@@ -1032,7 +1054,7 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
     def test_search_engine_python_api_for_successful_query(self):
         """websearch - search engine Python API for successful query"""
         self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47],
-                         perform_request_search(p='ellis'))
+                         perform_request_search(p='ellis', rg=None))
 
     def test_search_engine_python_api_for_existing_record(self):
         """websearch - search engine Python API for existing record"""
@@ -1088,7 +1110,7 @@ class WebSearchSearchEngineWebAPITest(unittest.TestCase):
     def test_search_engine_web_api_for_successful_query(self):
         """websearch - search engine Web API for successful query"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id&rg=100',
                                                expected_text="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47]"))
 
     def test_search_engine_web_api_for_existing_record(self):
@@ -1434,13 +1456,13 @@ class WebSearchSortResultsTest(unittest.TestCase):
         """websearch - search results sorting, default method"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=of&f=title&rg=1',
-                                               expected_text="[TESLA-FEL-99-07]"))
+                                               expected_text="CMS animation of the high-energy collisions"))
 
     def test_sort_results_ascending(self):
         """websearch - search results sorting, ascending field"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=of&f=title&rg=1&sf=reportnumber&so=a',
-                                               expected_text="ISOLTRAP"))
+                         test_web_page_content(CFG_SITE_URL + '/search?p=of&f=title&rg=2&sf=reportnumber&so=a',
+                                               expected_text="[astro-ph/0104076]"))
 
     def test_sort_results_descending(self):
         """websearch - search results sorting, descending field"""
@@ -1604,13 +1626,13 @@ class WebSearchMARCQueryTest(unittest.TestCase):
     def test_many_marc_tags_partial_phrase_query(self):
         """websearch - many MARC tags, partial phrase query (245)"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%27and%27',
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%27and%27&rg=100',
                                                expected_text="[1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 91, 96]"))
 
     def test_single_marc_tag_regexp_query(self):
         """websearch - single MARC tag, regexp query"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%2Fand%2F',
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%2Fand%2F&rg=100',
                                                expected_text="[1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 91, 96]"))
 
 class WebSearchExtSysnoQueryTest(unittest.TestCase):
@@ -2028,19 +2050,20 @@ class WebSearchReferstoCitedbyTest(unittest.TestCase):
 class WebSearchSPIRESSyntaxTest(unittest.TestCase):
     """Test of SPIRES syntax issues"""
 
-    def test_and_not_parens(self):
-        'websearch - find a ellis, j and not a enqvist'
-        self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL +'/search?p=find+a+ellis%2C+j+and+not+a+enqvist&of=id&ap=0',
-                                               expected_text='[9, 12, 14, 47]'))
+    if CFG_WEBSEARCH_SPIRES_SYNTAX > 0:
+        def test_and_not_parens(self):
+            'websearch - find a ellis, j and not a enqvist'
+            self.assertEqual([],
+                             test_web_page_content(CFG_SITE_URL +'/search?p=find+a+ellis%2C+j+and+not+a+enqvist&of=id&ap=0',
+                                                   expected_text='[9, 12, 14, 47]'))
 
-    def test_dadd_search(self):
-        'websearch - find da > today - 3650'
-        # XXX: assumes we've reinstalled our site in the last 10 years
-        # should return every document in the system
-        self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL +'/search?ln=en&p=find+da+%3E+today+-+3650&f=&of=id',
-                                               expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104]'))
+        def test_dadd_search(self):
+            'websearch - find da > today - 3650'
+            # XXX: assumes we've reinstalled our site in the last 10 years
+            # should return every document in the system
+            self.assertEqual([],
+                             test_web_page_content(CFG_SITE_URL +'/search?ln=en&p=find+da+%3E+today+-+3650&f=&of=id',
+                                                   expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 107]'))
 
 
 class WebSearchDateQueryTest(unittest.TestCase):

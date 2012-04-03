@@ -1,145 +1,144 @@
 --------------------------------------------------------------------
-Invenio v1.0.0-rc0 is released
-December 21, 2010
+Invenio v1.0.0 is released
+February 29, 2012
 http://invenio-software.org/
 --------------------------------------------------------------------
 
-Invenio v1.0.0-rc0 was released on December 21, 2010.
+Invenio v1.0.0 was released on February 29, 2012.
 
-This is the initial release candidate for Invenio v1.0.0.  It is well
-tested and stable but it contains a few known issues that we plan to
-address in a forthcoming release candidate.  We would like to
-encourage you to try v1.0.0-rc0 on your test server and to report us
-any issues you may encounter.
+This release contains numerous bug fixes and other minor improvements
+over the Invenio v1.0.0-rc0 release candidate.  (Major new features
+developed in the meantime will be part of the Invenio v1.1 release
+series.)  Invenio v1.0.0 is recommended for production to all Invenio
+sites using v1.0.0-rc0 or previous v0.99 release series.
 
 What's new:
 -----------
 
- *) CDS Invenio becomes Invenio as of this release
+ *) BatchUploader: fix retrieval of recs from extoaiid
 
- *) new facility of hosted collections; support for external records
-    in search collections, user alerts and baskets (WebSearch,
-    WebAlert, WebBasket)
+ *) BibCirculation: fix regexp for dictionary checking; security check
+    before eval
 
- *) support for nested parentheses in search query syntax (WebSearch)
+ *) BibConvert: fix UP and DOWN for UTF-8 strings
 
- *) new refersto/citedby search operators for second-order searches in
-    citation map (BibRank, WebSearch)
+ *) bibdocfile: add missing normalize_format() calls;
+    check_bibdoc_authorization caseless; fix append WRT
+    description/restriction; fix cli_set_batch function; fix
+    documentation WRT --with-version; fix handling of embargo firerole
+    rule; fix parsing of complex subformats
 
- *) numerous improvements to SPIRES query syntax parser (WebSearch)
+ *) BibEdit: fix crash in Ajax request; fix undefined dictionary key
 
- *) enhancement to search results summaries, e.g. co-author lists on
-    author pages, e.g. h-index (WebSearch)
+ *) BibFormat: better escape BFE in admin test UI; do not exit if no
+    XSLT processor found; fix regression test; fix URL to ejournal
+    resolver; fix XSLT formatting of MARCXML snippets; removes 'No
+    fulltext' message; special handling of INSPIRE-PUBLIC type; use
+    default namespace in XSL
 
- *) new support for unAPI, Zotero, OpenSearch, AWS (WebSearch)
+ *) BibHarvest: check for empty resumptionToken; fix MARCXML creation
+    in OAI updater; optional JSON dependency
 
- *) new phrase and word-pair indexes (BibIndex)
+ *) BibIndex: fix author:Campbell-Wilson word query; fix
+    double-stemming upon indexing; fix Porter stemmer in multithread;
+    Greek stemmer improvements
 
- *) new fuzzy author name matching mode (BibIndex)
+ *) BibKnowledge: make XML/XSLT libs optional
 
- *) new time-dependent citation ranking family of methods (BibRank)
+ *) BibRank: CERN hack to inactivate similarity lists; fix citation
+    indexer time stamp updating; fix citation indexing of deleted
+    records; fix citedby/refersto for infinite sets; fix empty
+    citation data cacher; fix incremental citation indexer leaks; make
+    numpy optional; minimum x-axis in citation history graphs; run
+    citation indexer after word indexer
 
- *) full-text search now shows context snippets (BibFormat)
+ *) BibRecord: fix for record_get_field_instances()
 
- *) improvements to the basket UI, basket export facility (WebBasket)
+ *) BibSched: fix guess_apache_process_user_from_ps; use larger
+    timouts for launching tasks
 
- *) new support for FCKeditor in submissions and user comments,
-    possibility to attach files (WebComment, WebSubmit)
+ *) BibUpload: FFT regression tests not to use CDS
 
- *) commenting facility enhanced with rounds and threads (WebComment)
+ *) htmlutils: fix FCKeditor upload URLs
 
- *) new facility to moderate user comments (WebComment)
+ *) installation: add note about optional hashlib; change table TYPE
+    to ENGINE in SQL; fix 'install-mathjax-plugin'; fix issue with
+    FCKeditor; fix 'make install-jquery-plugins'; fix output message
+    cosmetics; new 'make install-ckeditor-plugin'; re-enable WSGI
+    pre-loading
 
- *) enhanced CLI tool for document file management bringing new
-    options such as hidden file flag (WebSubmit)
+ *) intbitset: fix never ending loop in __repr__; fix several memory
+    leaks
 
- *) numerous improvements to the submission system, e.g. asynchronous
-    JavaScript upload support, derived document formats, icon
-    creation, support for automatic conversion of OpenOffice
-    documents, PDF/A, OCR (WebSubmit)
+ *) inveniocfg: fix resetting ranking method names
 
- *) new full-text file metadata reader/writer tool (WebSubmit)
+ *) inveniogc: new CLI options check/optimise tables
 
- *) new experimental SWORD protocol client application (BibSword)
+ *) kwalitee: grep-like output and exit status changes; use
+    `--check-some` as default CLI option
 
- *) complete rewrite of the record editor using Ajax technology for
-    faster user operation, with new features such as field templates,
-    cloning, copy/paste, undo/redo, auto-completion, etc (BibEdit)
+ *) mailutils: remove unnecessary 'multipart/related'
 
- *) new multi-record editor to alter many records in one go (BibEdit)
+ *) plotextractor: fix INSPIRE unit test
 
- *) new Ajax-based record differ and merger (BibMerge)
+ *) textmarc2xmlmarc: fix handling of BOM
 
- *) new fuzzy record matching mode, with possibility to match records
-    against remote Invenio installations (BibMatch)
+ *) urlutils: new Indico request generator helper
 
- *) new circulation and holdings module (BibCirculation)
+ *) WebAccess: fix Access policy page; fix FireRole handling integer
+    uid; fix retrieving emails from firerole
 
- *) new facility for matching provenance information when uploading
-    records (BibUpload)
+ *) WebAlert: fix the display of records in alerts
 
- *) new possibility of uploading incoming changes into holding pen
-    (BibUpload)
+ *) WebBasket: fix missing return statement; fix number of items in
+    public baskets
 
- *) new batch uploader facility to support uploading of metadata files
-    and of full-text files either in CLI or over web (BibUpload)
+ *) WebComment: CERN-specific hack for ATLAS comments; fix discussion
+    display in bfe_comments; fix washing of email to admin; improve
+    sanity checks
 
- *) new record exporting module supporting e.g. Sitemap and Google
-    Scholar export methods (BibExport)
+ *) WebHelp: HOWTO MARC document update
 
- *) improvements to the keyword classifier, e.g. author and core
-    keywords (BibClassify)
+ *) WebJournal: fix seminar widget encoding issue; fix seminar widget
+    for new Indico APIs; update weather widget for new APIs
 
- *) new facility for external robot-like login method (WebAccess)
+ *) WebSearch: add refersto:/a b c/ example to guide; CERN-specific
+    hack for journal sorting; CERN-specific hack for latest additions;
+    fix case-insensitive collection search; fix CDSIndico external
+    search; fix collection translation in admin UI; fix
+    get_fieldvalues() when recid is str; fix
+    get_index_id_from_field(); fix structured regexp query parsing;
+    fix symbol name typo in loop checking; parenthesised collection
+    definitions; remove accent-search warning in guide; remove Report
+    for INSPIRE author pages; replace CDS Indico by Indico; updates
+    some output phrases
 
- *) numerous improvements to the journal creation facility, new
-    journal `Atlantis Times' demo journal (WebJournal)
+ *) WebSession: fix crash when no admin user exists
 
- *) refactored and improved OAI exporter and harvester (BibHarvest)
+ *) WebStyle: better service failure message; fix implementation of
+    req.get_hostname; fluid width of the menu; pre-load citation
+    dictionaries for web
 
- *) new taxonomy-based and dynamic-query knowledge base types
-    (BibKnowledge)
+ *) WebSubmit: avoid printing empty doctype section;
+    check_user_can_view_record in publiline; fix filename bug in
+    document manager; fix handling of uploaded files; fix
+    record_search_pattern in DEMOJRN
 
- *) possibility to switch on/off user features such as alerts and
-    baskets based on RBAC rules (WebAccess and other modules)
+ *) xmlmarclint: 'no valid record detected' error
 
- *) various improvements to task scheduler, for example better
-    communication with tasks, possibility to run certain bibsched
-    tasks within given time limit, etc (BibSched)
+ *) I18N: updates to Catalan, Czech, French, German, Greek, Italian,
+    Slovak, and Spanish translations
 
- *) new database dumper for backup purposes (MiscUtil)
-
- *) new plotextractor library for extracting plots from compuscripts,
-    new figure caption index and the Plots tab (MiscUtil, BibIndex,
-    Webearch)
-
- *) enhanced reference extrator, e.g. support for DOI, for author name
-    recognition (MiscUtil)
-
- *) new register emergency feature e.g. to alert admins by SMS in case
-    the task queue stops (MiscUtil)
-
- *) infrastructure move from mod_python to mod_wsgi, support for
-    mod_xsendfile (WebStyle and many modules)
-
- *) infrastructure move from jsMath to MathJax (MiscUtil)
-
- *) some notable backward-incompatible changes: removed authentication
-    methods related to Apache user and group files, changed BibFormat
-    element's API (BibFormat, many modules)
-
- *) new translations (Afrikaans, Galician, Georgian, Romanian,
-    Kinyarwanda) plus many translation updates
-
- *) other numerous improvements and bug fixes done in about 1600
-    commits over Invenio v0.99 series
+ *) Note: for a complete list of new features in Invenio v1.0 release
+    series over Invenio v0.99 release series, please see:
+    <http://invenio-software.org/blog/invenio-1.0.0-rc0>
 
 Download:
 ---------
 
-  <http://invenio-software.org/download/invenio-1.0.0-rc0.tar.gz>
-  <http://invenio-software.org/download/invenio-1.0.0-rc0.tar.gz.md5>
-  <http://invenio-software.org/download/invenio-1.0.0-rc0.tar.gz.sig>
+  <http://invenio-software.org/download/invenio-1.0.0.tar.gz>
+  <http://invenio-software.org/download/invenio-1.0.0.tar.gz.md5>
+  <http://invenio-software.org/download/invenio-1.0.0.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -149,11 +148,30 @@ Please follow the INSTALL file bundled in the distribution tarball.
 Upgrade notes:
 --------------
 
-Upgrade from v0.99 series is not recommended for production servers
-yet.  For test servers, please install an empty Invenio v1.0 series
-installation, dump your production tables and load them onto your test
-system, and run the usual `make update-v0.99.3-tables' statements
-followed by reindexing.  More concrete upgrade instructions will be
-provided with the final Invenio v1.0.0 release.
+If you are upgrading from Invenio v1.0.0-rc0, then:
+
+ - Stop your bibsched queue and your Apache server.
+
+ - Install the update:
+
+     $ cd invenio-1.0.0
+     $ cp -a /opt/invenio/etc /opt/invenio/etc.OLD
+     $ sh /opt/invenio/etc/build/config.nice
+     $ make
+     $ make check-custom-templates
+     $ sudo -u www-data make install
+     $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
+     $ cp -a /opt/invenio/etc.OLD /opt/invenio/etc
+
+ - In order to apply the double-stemming fix for the indexer,
+   reindexing of those indexes that use stemming is recommended:
+
+     $ sudo -u www-data bibindex -u admin -R
+
+ - Restart your Apache server and your bibsched queue.  You are done.
+
+If you are upgrading from a previous Invenio release (notably from
+v0.99 release series), then please see a dedicated Invenio Upgrade
+wiki page at <http://invenio-software.org/wiki/Installation/Upgrade>.
 
 - end of file -

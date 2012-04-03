@@ -58,6 +58,7 @@ modules/bibrank/etc/template_single_tag_rank_method.cfg
 modules/bibsched/bin/bibsched
 modules/bibsched/bin/bibtaskex
 modules/bibsched/bin/bibtasklet
+modules/bibsort/bin/bibsort
 modules/bibsword/bin/bibsword
 modules/bibupload/bin/batchuploader
 modules/bibupload/bin/bibupload

@@ -1087,18 +1087,12 @@ function displayRevisionHistoryEntry(recId, revisionId){
     "bibEditRevHistorySelectedEntry" : "bibEditRevHistoryEntry";
   var timeString = formatDateTime(getRevisionDate(revisionId));
 
-/*  var additionalAttrs = {};
-  if (revisionId == gRecRev){
-    additionalAttrs.disabled = "disabled"
-  }
-  additionalAttrs.title = "Merge with the newest revision";
-  */
-
-  compareButtonId = 'btnCompareRevision_' + revisionId;
-
-  mergeImgId = 'imgMergeWithNewest_' + revisionId;
-  compareImgId = 'imgCompareWithCurrent_' + revisionId;
-  revertImgId = 'imgRevert_' + revisionId;
+  /* Define icons per row */
+  var mergeImgId = 'imgMergeWithNewest_' + revisionId;
+  var compareImgId = 'imgCompareWithCurrent_' + revisionId;
+  var revertImgId = 'imgRevert_' + revisionId;
+  var checkImgId = 'imgCheck_' + revisionId;
+  var checkImg = img('/img/eye.png', checkImgId, 'bibEditRevHistoryLinkImg', {'title': 'Show record revision on Editor'})
 
   var mergeUrl = '/'+ gSITE_RECORD +'/merge#recid1=' + recId + '&recid2=' + recId + '.' + revisionId;
   var mergeWithNewestControl = '<a href="' + mergeUrl +
@@ -1115,7 +1109,7 @@ function displayRevisionHistoryEntry(recId, revisionId){
 
   var resultHTML = '<div class="' + entryClass + '">\n' +
     '<div class="bibEditRevHistoryEntryContent" id="bibEditRevHistoryEntry_' +
-    revisionId+ '">' + timeString +
+    revisionId + '">' + checkImg + timeString +
     '</div><div class="bibEditRevHistoryEntryControls"><div style="display:table-row;">' +
     mergeWithNewestControl + compareWithCurrentControl + revertToRevisionControl + "</div></div></div>\n";
 

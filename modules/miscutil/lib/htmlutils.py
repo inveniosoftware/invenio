@@ -52,6 +52,15 @@ CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST = ('href', 'name', 'class')
 
 ## precompile some often-used regexp for speed reasons:
 RE_HTML = re.compile("(?s)<[^>]*>|&#?\w+;")
+RE_HTML_WITHOUT_ESCAPED_CHARS = re.compile("(?s)<[^>]*>")
+
+# url validation regex
+regex_url = re.compile(r'^(?:http|ftp)s?://' # http:// or https://
+                       r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
+                       r'localhost|' #localhost...
+                       r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+                       r'(?::\d+)?' # optional port
+                       r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
 def nmtoken_from_string(text):
     """
@@ -157,6 +166,7 @@ class HTMLWasher(HTMLParser):
     def wash(self, html_buffer,
              render_unallowed_tags=False,
              allowed_tag_whitelist=CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST,
+             automatic_link_transformation=False,
              allowed_attribute_whitelist=\
                     CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST):
         """
@@ -174,6 +184,7 @@ class HTMLWasher(HTMLParser):
         self.previous_type_lists = []
         self.url = ''
         self.render_unallowed_tags = render_unallowed_tags
+        self.automatic_link_transformation = automatic_link_transformation
         self.allowed_tag_whitelist = allowed_tag_whitelist
         self.allowed_attribute_whitelist = allowed_attribute_whitelist
         self.feed(html_buffer)
@@ -204,15 +215,18 @@ class HTMLWasher(HTMLParser):
     def handle_data(self, data):
         """Function called for text nodes"""
         if not self.silent:
-            # let's to check if data contains a link
-            import string
-            if string.find(str(data),'http://') == -1:
-                self.result += cgi.escape(data, True)
+            possible_urls = re.findall(r'(https?://[\w\d:#%/;$()~_?\-=\\\.&]*)', data)
+            # validate possible urls
+            # we'll transform them just in case
+            # they are valid.
+            if possible_urls and self.automatic_link_transformation:
+                for url in possible_urls:
+                    if regex_url.search(url):
+                        transformed_url = '<a href="%s">%s</a>' % (url, url)
+                        data = data.replace(url, transformed_url)
+                self.result += data
             else:
-                if self.url:
-                    if self.url <> data:
-                        self.url = ''
-                        self.result += '(' + cgi.escape(data, True) + ')'
+                self.result += cgi.escape(data, True)
 
     def handle_endtag(self, tag):
         """Function called for ending of tags"""
@@ -480,7 +494,7 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
 
     return editor
 
-def remove_html_markup(text, replacechar=' '):
+def remove_html_markup(text, replacechar=' ', remove_escaped_chars_p=True):
     """
     Remove HTML markup from text.
 
@@ -489,10 +503,29 @@ def remove_html_markup(text, replacechar=' '):
     @param replacechar: By which character should we replace HTML markup.
         Usually, a single space or an empty string are nice values.
     @type replacechar: string
+    @param remove_escaped_chars_p: If True, also remove escaped characters
+        like '&amp;', '&lt;', '&gt;' and '&quot;'.
+    @type remove_escaped_chars_p: boolean
     @return: Input text with HTML markup removed.
     @rtype: string
     """
+    if not remove_escaped_chars_p:
+        return RE_HTML_WITHOUT_ESCAPED_CHARS.sub(replacechar, text)
     return RE_HTML.sub(replacechar, text)
+
+def unescape(s, quote=False):
+    """
+    The opposite of the cgi.escape function.
+    Replace escaped characters '&amp;', '&lt;' and '&gt;' with the corresponding
+    regular characters. If the optional flag quote is true, the escaped quotation
+    mark character ('&quot;') is also translated.
+    """
+    s = s.replace('&lt;', '<')
+    s = s.replace('&gt;', '>')
+    if quote:
+        s = s.replace('&quot;', '"')
+    s = s.replace('&amp;', '&')
+    return s
 
 
 class EscapedString(str):

@@ -25,6 +25,7 @@ import unittest
 import sys
 import zlib
 import os
+import re
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -36,6 +37,23 @@ from invenio.testutils import make_test_suite, run_test_suite
 from invenio.config import CFG_TMPDIR
 
 CFG_INTBITSET_BIG_EXAMPLE = open(os.path.join(CFG_TMPDIR, "intbitset_example.int")).read()
+
+def _check_enough_ram():
+    """
+    Return if there is enough RAM, i.e. if free outputs more than 1G of ram.
+    """
+    from invenio.shellutils import run_shell_command
+    try:
+        return int(re.sub(r'\s+', ' ', run_shell_command("free")[1].splitlines()[1]).split(' ')[1]) > 1024 * 1024
+    except:
+        ## Are we really on Linux? Maybe on a BSD system?
+        try:
+            return int(run_shell_command("sysctl -n hw.memsize")[1]) > 1024 * 1024
+        except:
+            # Still no luck
+            return False
+
+CFG_ENOUGH_RAM = _check_enough_ram()
 
 class IntBitSetTest(unittest.TestCase):
     """Test functions related to intbitset data structure."""
@@ -329,14 +347,19 @@ class IntBitSetTest(unittest.TestCase):
             self.assertEqual(intbitset(set1), intbitset().fastload((intbitset(set1).fastdump())))
         for set1 in self.sets + [[]]:
             self.assertEqual(intbitset(set1, trailing_bits=True), intbitset().fastload(intbitset(set1, trailing_bits=True).fastdump()))
-        for set1 in self.sets + [[]]:
-            self.assertEqual(intbitset(set1), intbitset().fastload((intbitset(set1).fastdump())))
-        for set1 in self.sets + [[]]:
-            self.assertEqual(intbitset(set1, trailing_bits=True), intbitset().fastload(intbitset(set1, trailing_bits=True).fastdump()))
 
-    #def test_set_emptiness(self):
-        #"""intbitset - tests for emptiness"""
-        #map(lambda x, y: self.assertEqual(x.__nonzero__(), y, "%s is %s empty" % (x, not y and 'not' or '')), self.sets. self.emptiness)
+    def test_pickling(self):
+        """intbitset - pickling"""
+        import cPickle
+        for set1 in self.sets + [[]]:
+            self.assertEqual(intbitset(set1), cPickle.loads(cPickle.dumps(intbitset(set1), -1)))
+        for set1 in self.sets + [[]]:
+            self.assertEqual(intbitset(set1, trailing_bits=True), cPickle.loads(cPickle.dumps(intbitset(set1, trailing_bits=True), -1)))
+
+    def test_set_emptiness(self):
+        """intbitset - tests for emptiness"""
+        for set1 in self.sets + [[]]:
+            self.assertEqual(not set(set1), not intbitset(set1))
 
     def test_set_clear(self):
         """intbitset - clearing"""
@@ -350,10 +373,14 @@ class IntBitSetTest(unittest.TestCase):
 
     def test_set_repr(self):
         """intbitset - Pythonic representation"""
-        for set1 in self.sets + [[]] + self.big_examples:
+        if CFG_ENOUGH_RAM:
+            big_examples = self.big_examples
+        else:
+            big_examples = []
+        for set1 in self.sets + [[]] + big_examples:
             intbitset1 = intbitset(set1)
             self.assertEqual(intbitset1, eval(repr(intbitset1)))
-        for set1 in self.sets + [[]] + self.big_examples:
+        for set1 in self.sets + [[]] + big_examples:
             intbitset1 = intbitset(set1, trailing_bits=True)
             self.assertEqual(intbitset1, eval(repr(intbitset1)))
 

@@ -25,11 +25,14 @@
 
 __revision__ = "$Id$"
 
+import os
 from invenio.config import CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_URL, CFG_SITE_ADMIN_EMAIL, \
     CFG_SITE_RECORD
 from invenio.webuser import email_valid_p
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
+from invenio.websubmit_functions.Shared_Functions import ParamFromFile
 from invenio.mailutils import scheduled_send_email
+from invenio.bibtask import bibtask_allocate_sequenceid
 
 CFG_EMAIL_FROM_ADDRESS = '%s Submission Engine <%s>' % (CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL)
 
@@ -94,6 +97,7 @@ def Mail_New_Record_Notification(parameters, curdir, form, user_info=None):
        @return: (string) - an empty string;
     """
     global sysno ## (I'm really sorry for that! :-O )
+    sequence_id = bibtask_allocate_sequenceid(curdir)
     ## Read items from the parameters array into local vars:
     item_status     = parameters["item_status"]
     mail_submitters = parameters["mail_submitters"]
@@ -293,17 +297,20 @@ Thank you for submitting your item into %(sitename)s.
         ## Post the mail:
         scheduled_send_email(CFG_EMAIL_FROM_ADDRESS, owners_email, \
                    "[%s] Submitted" % reference_numbers, \
-                   email_txt, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
+                   email_txt, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN, \
+                   other_bibtasklet_arguments=['-I', str(sequence_id)])
     elif managers_email != "":
         ## Although it's not desirable to mail the submitters, if "managers"
         ## have been given, it is reasonable to mail them:
         scheduled_send_email(CFG_EMAIL_FROM_ADDRESS, managers_email, \
                    "[%s] Submitted" % reference_numbers, \
-                   email_txt, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
+                   email_txt, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN, \
+                   other_bibtasklet_arguments=['-I', str(sequence_id)])
     elif CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN:
         ## We don't want to mail the "owners". Let's mail the admin instead:
         scheduled_send_email(CFG_EMAIL_FROM_ADDRESS, CFG_SITE_ADMIN_EMAIL, \
-                   "[%s] Submitted" % reference_numbers, email_txt)
+                   "[%s] Submitted" % reference_numbers, email_txt, \
+                   other_bibtasklet_arguments=['-I', str(sequence_id)])
 
     ## Return an empty string
     return ""

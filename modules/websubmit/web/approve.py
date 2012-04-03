@@ -25,13 +25,16 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_SECURE_URL, \
-     CFG_SITE_NAME_INTL
-from invenio.dbquery import run_sql
+     CFG_SITE_NAME_INTL, \
+     CFG_SITE_SECURE_URL
 from invenio.websubmit_config import *
+from invenio.websubmit_dblayer import get_approval_url_parameters
 from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import redirect_to_url
+from invenio.webinterface_handler import wash_urlargd
+from invenio.access_control_engine import acc_authorize_action
 
 def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
     """Approval web Interface.
@@ -39,37 +42,23 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
 
     """
     uid = getUid(req)
-    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+    (auth_code, auth_message) = acc_authorize_action(uid, 'submit')
+    if auth_code > 0 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return page_not_authorized(req, "../approve.py/index",
-                                   navmenuid='yourapprovals')
+                                   navmenuid='yourapprovals',
+                                   text=auth_message)
 
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    form = req.form
-    if form.keys():
-        # form keys can be a list of 'access pw' and ln, so remove 'ln':
-        for key in form.keys():
-            if key != 'ln':
-                access = key
-        if access == "":
-            return warningMsg(_("approve.py: cannot determine document reference"), req)
-        res = run_sql("select doctype,rn from sbmAPPROVAL where access=%s",(access,))
-        if len(res) == 0:
-            return warningMsg(_("approve.py: cannot find document in database"), req)
-        else:
-            doctype = res[0][0]
-            rn = res[0][1]
-        res = run_sql("select value from sbmPARAMETERS where name='edsrn' and doctype=%s",(doctype,))
-        edsrn = res[0][0]
-        url = "%s/submit/direct?%s" % (CFG_SITE_SECURE_URL, urllib.urlencode({
-            edsrn: rn,
-            'access' : access,
-            'sub' : 'APP%s' % doctype,
-            'ln' : ln
-        }))
-        redirect_to_url(req, url)
-    else:
-        return warningMsg(_("Sorry parameter missing..."), req, c, ln)
+    args = wash_urlargd(req.form, {'access': (str, '')})
+    if args['access'] == "":
+        return warningMsg(_("approve.py: cannot determine document reference"), req, c, ln)
+    url_params = get_approval_url_parameters(args['access'])
+    if not url_params:
+        return warningMsg(_("approve.py: cannot find document in database"), req, c, ln)
+    url_params['ln'] = ln
+    url = "%s/submit/direct?%s" % (CFG_SITE_SECURE_URL, urllib.urlencode(url_params))
+    redirect_to_url(req, url)
 
 def warningMsg(title, req, c=None, ln=CFG_SITE_LANG):
     # load the right message language

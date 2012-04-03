@@ -199,6 +199,7 @@ DEF_ACTIONS = (
                ('cfgbibindex', 'configure BibIndex', '', 'no'),
                ('cfgbibexport', 'configure BibExport', '', 'no'),
                ('cfgrobotkeys', 'configure Robot keys', 'login_method,robot', 'yes'),
+               ('cfgbibsort', 'configure BibSort', '', 'no'),
                ('runbibindex', 'run BibIndex', '', 'no'),
                ('runbibupload', 'run BibUpload', '', 'no'),
                ('runwebcoll', 'run webcoll', 'collection', 'yes'),
@@ -290,7 +291,8 @@ DEF_DEMO_AUTHS = (
              ('atlantiseditor', 'cfgwebjournal', {'name': 'AtlantisTimes', 'with_editor_rights': 'yes'}),
              ('referee_DEMOBOO_*', 'runbatchuploader', {'collection': 'Books'}),
              ('poetrycommentreader', 'viewcomment', {'collection': 'Poetry'}),
-             ('atlantiseditor', VIEWRESTRCOLL, {'collection': 'Atlantis Times Drafts'})
+             ('atlantiseditor', VIEWRESTRCOLL, {'collection': 'Atlantis Times Drafts'}),
+             ('anyuser', 'submit', {'doctype': 'DEMOART', 'act': 'SBI', 'categ': 'ARTICLE'}),
             )
 
 _ = gettext_set_language(CFG_SITE_LANG)
@@ -313,6 +315,7 @@ CFG_ACC_ACTIVITIES_URLS = {
     'cfgwebsearch' : (_("Configure WebSearch"), "%s/admin/websearch/websearchadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgwebsubmit' : (_("Configure WebSubmit"), "%s/admin/websubmit/websubmitadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgwebjournal' : (_("Configure WebJournal"), "%s/admin/webjournal/webjournaladmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgbibsort' : (_("Configure BibSort"), "%s/admin/bibsort/bibsortadmin.py?ln=%%s" % CFG_SITE_URL),
     'runbibcirculation' : (_("Run BibCirculation"), "%s/admin/bibcirculation/bibcirculationadmin.py?ln=%%s" % CFG_SITE_URL),
     'runbatchuploader' : (_("Run Batch Uploader"), "%s/batchuploader/metadata?ln=%%s" % CFG_SITE_URL),
     'claimpaper_claim_others_papers' : (_("Run Person/Author Manager"), "%s/person/search?ln=%%s" % CFG_SITE_URL)
