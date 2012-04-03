@@ -1307,11 +1307,13 @@ function onPreviewClick(){
   /*
    * Handle 'Preview' button (preview record).
    */
-    createReq({'new_window': true, recID: gRecID, requestType: 'preview'
+   var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700);
+   createReq({'new_window': true, recID: gRecID, requestType: 'preview'
        }, function(json){
        // Preview was successful.
+        $(dialogPreview.dialogDiv).remove();
         var html_preview = json['html_preview'];
-        var preview_window = window.open('', '', 'width=768,height=768,resizeable,scrollbars');
+        var preview_window = openCenteredPopup('', 'Record preview', 768, 768);
         preview_window.document.write(html_preview);
         preview_window.document.close(); // needed for chrome and safari
        });
@@ -1325,7 +1327,7 @@ function onOpenPDFClick() {
        }, function(json){
         // Preview was successful.
         var pdf_url = json['pdf_url'];
-        var preview_window = window.open(pdf_url, '', 'resizeable,scrollbars');
+        var preview_window = openCenteredPopup(pdf_url);
         preview_window.document.close(); // needed for chrome and safari
        });
 

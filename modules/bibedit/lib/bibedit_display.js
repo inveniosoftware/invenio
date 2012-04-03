@@ -1207,3 +1207,21 @@ function addContentToDialog(dialog, html_content, alertText){
   dialog.contentSpan.html("<strong>" + alertText + "</strong>\n\
                     <br /><br />" + html_content);
 }
+
+/*
+ * **************************************************************************************
+ */
+
+function openCenteredPopup(pageURL, title, w, h) {
+  /* Opens a centered popup */
+  var targetWindow;
+  if (w === undefined || h === undefined) {
+    targetWindow = window.open(pageURL, title,'resizeable,scrollbars');
+  }
+  else {
+    var left = (screen.width/2)-(w/2);
+    var top = (screen.height/2)-(h/2);
+    targetWindow = window.open(pageURL, title, 'width=' + w + ',height=' + h + ',top='+ top +',left=' + left + ',resizeable,scrollbars');
+  }
+  return targetWindow;
+}
