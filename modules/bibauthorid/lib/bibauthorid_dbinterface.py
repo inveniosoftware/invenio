@@ -339,7 +339,8 @@ def get_persons_from_recids(recids, return_alt_names=False,
     for rec in recids:
         pids = run_sql("SELECT personid "
                        "FROM aidPERSONIDPAPERS "
-                       "WHERE bibrec = %s",
+                       "WHERE bibrec = %s "
+                       " and flag > -2 ",
                        (rec,))
 
         # for some reason python's set is faster than a mysql distinct
@@ -360,7 +361,8 @@ def get_persons_from_recids(recids, return_alt_names=False,
         if return_alt_names:
             names = run_sql("SELECT name "
                             "FROM aidPERSONIDPAPERS "
-                            "WHERE personid = %s",
+                            "WHERE personid = %s "
+                            " and flag > -2 ",
                             (pid,))
             names = set(n[0] for n in names)
 
@@ -369,7 +371,8 @@ def get_persons_from_recids(recids, return_alt_names=False,
         if return_all_person_papers:
             recs = run_sql("SELECT bibrec "
                            "FROM aidPERSONIDPAPERS "
-                           "WHERE personid = %s",
+                           "WHERE personid = %s "
+                           " and flag > -2 ",
                            (pid,))
             recs = set(r[0] for r in recs)
 
