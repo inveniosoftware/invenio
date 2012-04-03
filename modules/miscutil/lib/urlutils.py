@@ -46,7 +46,7 @@ from invenio import webinterface_handler_config as apache
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE, \
-     CFG_WEBDIR
+     CFG_WEBDIR, CFG_SITE_NAME,  CFG_VERSION
 
 def wash_url_argument(var, new_type):
     """
@@ -466,6 +466,16 @@ def urlargs_replace_text_in_arg(urlargs, regexp_argname, text_old, text_new):
     if out.startswith("&amp;"):
         out = out[5:]
     return out
+
+def make_user_agent_string(component=None):
+    """
+    Return a nice and uniform user-agent string to be used when Invenio
+    act as a client in HTTP requests.
+    """
+    ret = "Invenio-%s (+%s; \"%s\")" % (CFG_VERSION, CFG_SITE_URL, CFG_SITE_NAME)
+    if component:
+        ret += " %s" % component
+    return ret
 
 def create_AWS_request_url(base_url, argd, _amazon_secret_access_key,
                            _timestamp=None):

@@ -499,6 +499,35 @@ the detailde representation of the record can be fetched (i.e. its canonical URL
 <p>Note that, currently, in case the specified URL can not be reached at the time of the POST request,
 the whole bibupload task will fail.</p>
 
+<p>If you use the same callback URL to receive the feedback from more than one bibupload request
+you might want to be able to correctly identify each bibupload call with the corresponding
+feedback. For this reason you can pass to the bibupload call an additional argument:
+<pre>
+--nonce VALUE
+</pre>
+where value can be any string you wish. Such string will be then added to the JSON structure, as in
+(supposing you specified <tt>--nonce 1234</tt>):
+<pre>
+{
+    "nonce": "1234",
+    "results": [
+        {
+            "recid": -1,
+            "error_message": "ERROR: can not retrieve the record identifier",
+            "success": false
+        },
+        {
+            "recid": 1000,
+            "error_message": "",
+            "success": true,
+            "marcxml": "<record><controlfield tag=\"001\">1000</controlfield>...</record>",
+            "url": "http://www.example.org/record/1000"
+        },
+        ...
+    ]
+}
+</pre>
+</p>
 <a name="4"></a><h2>4. Batch Uploader</h2>
 <a name="4.1"></a><h3>4.1 Web interface - Cataloguers</h3>
 <p>The batchuploader web interface can be used either to upload metadata files or documents. Opposed to daemon mode, actions will be executed only once.</p>
@@ -520,6 +549,33 @@ The allowed user agents can also be defined using the <tt>CFG_BATCHUPLOADER_WEB_
 bibupload task that is launched by a given batchuploader request, by adding
 the optional POST field <tt>callback_url</tt> with the same semantic of the <tt>--callback-url</tt>
 command line parameter of bibupload (see the previous paragraph <a href="#3.7">Obtaining feedbacks</a>).</p>
+
+<p>A second more <em>RESTful</em> interface is also available: it will suffice to append to the URL the specific mode (among "<em>insert</em>",
+"<em>append</em>", "<em>correct</em>", "<em>delete</em>", "<em>replace</em>"), as in:
+<pre>
+http://cdsweb.cern.ch/batchuploader/robotupload/insert
+</pre>
+</p>
+<p>The <em>callback_url</em> argument can be put in query part of the URL as in:
+<pre>
+http://cdsweb.cern.ch/batchuploader/robotupload/insert?callback_url=http://myhandler
+</pre>
+<p>
+
+<p>The MARCXML content should then be specified as the body of the request. With <em>curl</em> this can be implemented as in:
+<pre>
+$ curl -T localfile.xml http://cdsweb.cern.ch/batchuploader/robotupload/insert?callback_url=http://... -A invenio_webupload -H "Content-Type: application/marcxml+xml"
+</pre>
+
+<p>The <em>nonce</em> argument that can be passed to BibUpload as described in the previous paragraph can also be specified with both robotupload interfaces. E.g.:
+<pre>
+$ curl -F 'file=@localfile.xml' -F 'nonce=1234' -F 'mode=-i' http://cdsweb.cern.ch/batchuploader/robotupload -F 'callback_url=http://...' -A invenio_webupload
+</pre>
+and
+<pre>
+$ curl -T localfile.xml http://cdsweb.cern.ch/batchuploader/robotupload/insert?nonce=1234&callback_url=http://... -A invenio_webupload -H "Content-Type: application/marcxml+xml"
+</pre>
+</p>
 
 <a name="4.3"></a><h3>4.2 Daemon mode</h3>
 

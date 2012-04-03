@@ -364,7 +364,7 @@ def create_handler(root):
     def _handler(req):
         """ This handler is invoked by mod_python with the apache request."""
         try:
-            allowed_methods = ("GET", "POST", "HEAD", "OPTIONS")
+            allowed_methods = ("GET", "POST", "HEAD", "OPTIONS", "PUT")
             req.allow_methods(allowed_methods, 1)
             if req.method not in allowed_methods:
                 raise apache.SERVER_RETURN, apache.HTTP_METHOD_NOT_ALLOWED

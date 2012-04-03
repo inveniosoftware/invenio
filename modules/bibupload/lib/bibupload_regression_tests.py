@@ -55,6 +55,8 @@ from invenio.testutils import make_test_suite, run_test_suite, test_web_page_con
 from invenio.bibdocfile import BibRecDocs
 from invenio.bibtask import task_set_task_param, setup_loggers, task_set_option, task_low_level_submission
 from invenio.bibrecord import record_has_field,record_get_field_value
+from invenio.shellutils import run_shell_command
+
 
 # helper functions:
 
@@ -261,7 +263,7 @@ class BibUploadCallbackURLTest(GenericBibUploadTest):
         def test_simple_insert_callback_url(self):
             """bibupload - --callback-url with simple insert"""
             taskid = task_low_level_submission('bibupload', 'test', '-i', self.testfile_path, '--callback-url', CFG_SITE_URL + '/httptest/post2?%s' % urlencode({"save": self.resultfile_path}), '-v0')
-            os.system(CFG_BINDIR + '/bibupload' + " %s" % taskid)
+            run_shell_command(CFG_BINDIR + '/bibupload %s', [taskid])
             results = json.loads(open(self.resultfile_path).read())
             self.failUnless('results' in results)
             self.assertEqual(len(results['results']), 1)

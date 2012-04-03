@@ -27,6 +27,8 @@ from invenio.config import CFG_SITE_SECURE_URL
 from invenio.urlutils import redirect_to_url
 from invenio.messages import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.webinterface_handler_config import SERVER_RETURN, HTTP_NOT_FOUND
+from invenio.webinterface_handler_wsgi_utils import handle_file_post
 from invenio.webuser import getUid, page_not_authorized
 from invenio.webpage import page
 
@@ -45,7 +47,31 @@ except:
 class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
     """Defines the set of /batchuploader pages."""
 
-    _exports = ['', 'metadata', 'robotupload', 'metasubmit', 'history', 'documents', 'docsubmit', 'daemon', 'allocaterecord']
+    _exports = ['', 'metadata', 'metasubmit', 'history', 'documents', 'docsubmit', 'daemon', 'allocaterecord']
+
+    def _lookup(self, component, path):
+        def restupload(req, form):
+            """Interface for robots used like this:
+                $ curl --data-binary '@localfile.xml' http://cdsweb.cern.ch/batchuploader/robotupload/[insert|replace|correct|append]?[callback_url=http://...]&nonce=1234 -A invenio_webupload
+            """
+            filepath, mimetype = handle_file_post(req)
+            argd = wash_urlargd(form, {'callback_url': (str, None), 'nonce': (str, None)})
+            return cli_upload(req, open(filepath), '--' + path[0], argd['callback_url'], argd['nonce'])
+
+        def legacyrobotupload(req, form):
+            """Interface for robots used like this:
+                $ curl -F 'file=@localfile.xml' -F 'mode=-i' [-F 'callback_url=http://...'] [-F 'nonce=1234'] http://cdsweb.cern.ch/batchuploader/robotupload -A invenio_webupload
+            """
+            argd = wash_urlargd(form, {'mode': (str, None), 'callback_url': (str, None), 'nonce': (str, None)})
+            return cli_upload(req, form.get('file', None), argd['mode'], argd['callback_url'], argd['nonce'])
+
+        if component == 'robotupload':
+            if path and path[0] in ('insert', 'replace', 'correct', 'append'):
+                return restupload, None
+            else:
+                return legacyrobotupload, None
+        else:
+            return None, path
 
     def index(self, req, form):
         """ The function called by default
@@ -162,13 +188,6 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
                     req = req,
                     language = argd['ln'],
                     navmenuid = "batchuploader")
-
-    def robotupload(self, req, form):
-        """Interface for robots used like this:
-            $ curl -F 'file=@localfile.xml' -F 'mode=-i' [-F 'callback_url=http://...' http://cdsweb.cern.ch/batchuploader/robotupload] -A invenio_webupload
-        """
-        argd = wash_urlargd(form, {'mode': (str, None), 'callback_url': (str, None)})
-        cli_upload(req, form.get('file', None), argd['mode'], argd['callback_url'])
 
     def allocaterecord(self, req, form):
         """

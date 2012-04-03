@@ -147,6 +147,13 @@ def get_task_pid(task_name, task_id, ignore_error=False):
         register_exception()
         return get_my_pid(task_name, str(task_id))
 
+def get_last_taskid():
+    """Return the last taskid used."""
+    return run_sql("SELECT MAX(id) FROM schTASK")[0][0]
+
+def delete_task(task_id):
+    """Delete the corresponding task."""
+    run_sql("DELETE FROM schTASK WHERE id=%s", (task_id, ))
 
 def is_task_scheduled(task_name):
     """Check if a certain task_name is due for execution (WAITING or RUNNING)"""

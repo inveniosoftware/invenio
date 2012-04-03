@@ -1964,6 +1964,7 @@ Examples:
 \t\t\trecord does not exist (thus allocating it on-the-fly)
   --callback-url\tSend via a POST request a JSON-serialized answer (see admin guide), in
 \t\t\torder to provide a feedback to an external service about the outcome of the operation.
+  --nonce\t\twhen used together with --callback add the nonce value in the JSON message.
 """,
             version=__revision__,
             specific_params=("ircazdS:fno",
@@ -1980,7 +1981,8 @@ Examples:
                    "holdingpen",
                    "pretend",
                    "force",
-                   "callback-url="
+                   "callback-url=",
+                   "nonce="
                  ]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_run_fnc=task_run_core)
@@ -2079,6 +2081,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
 
     elif key in ("--callback-url", ):
         task_set_option('callback_url', value)
+    elif key in ("--nonce", ):
+        task_set_option('nonce', value)
     else:
         return False
     return True
@@ -2136,6 +2140,7 @@ def post_results_to_callback_url(results, callback_url):
         raise ValueError("Scheme not handled %s for callback_url %s" % (scheme, callback_url))
     request = urllib2.Request(callback_url, data=json_results)
     request.add_header('Content-Type', 'application/json')
+    request.add_header('User-Agent', '')
     request.get_method = lambda: 'POST'
     return opener.open(request)
 
@@ -2211,6 +2216,9 @@ def task_run_core():
                         verbose=1, stream=sys.stderr)
         callback_url = task_get_option("callback_url")
         if callback_url:
+            nonce = task_get_option("nonce")
+            if nonce:
+                results_for_callback["nonce"] = nonce
             post_results_to_callback_url(results_for_callback, callback_url)
 
     if task_get_task_param('verbose') >= 1:
