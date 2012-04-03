@@ -617,14 +617,18 @@ def task_read_status():
         out = 'UNKNOWN'
     return out
 
-def write_messages(msgs, stream=sys.stdout, verbose=1):
+def write_messages(msgs, stream=None, verbose=1):
     """Write many messages through write_message"""
+    if stream is None:
+        stream = sys.stdout
     for msg in msgs.split('\n'):
         write_message(msg, stream, verbose)
 
-def write_message(msg, stream=sys.stdout, verbose=1):
+def write_message(msg, stream=None, verbose=1):
     """Write message and flush output stream (may be sys.stdout or sys.stderr).
     Useful for debugging stuff."""
+    if stream is None:
+        stream = sys.stdout
     if msg and _TASK_PARAMS['verbose'] >= verbose:
         if stream == sys.stdout:
             logging.info(msg)
