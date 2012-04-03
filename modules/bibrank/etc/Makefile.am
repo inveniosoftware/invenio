@@ -39,6 +39,7 @@ etc_DATA = bibrankgkb.cfg \
            citerank_citation_t.cfg \
            citerank_pagerank_c.cfg \
            citerank_pagerank_t.cfg \
+           selfcites.cfg \
            demo_itc_collection.cfg \
            template_index_term_count.cfg
 

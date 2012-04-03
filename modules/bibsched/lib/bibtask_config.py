@@ -30,7 +30,8 @@ CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
                            "oaiharvest", "oairepositoryupdater", "inveniogc",
                            "webstatadmin", "bibclassify", "bibexport",
                            "dbdump", "batchuploader", "bibauthorid", 'bibencode',
-                           "bibtasklet", "refextract", "bibcircd", "bibsort", "webauthorprofile")
+                           "bibtasklet", "refextract", "bibcircd", "bibsort",
+                           "webauthorprofile", "selfcites")
 
 # Tasks that should be run as standalone task
 CFG_BIBTASK_MONOTASKS = ("bibupload", "dbdump", "inveniogc")
