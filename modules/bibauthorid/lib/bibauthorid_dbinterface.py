@@ -1055,7 +1055,8 @@ def get_deleted_papers():
                    "where o.id_bibxxx = dummy.iid")
 
 #bibauthorid_maintenance personid update private methods
-def update_personID_canonical_names(persons_list=None, overwrite=False, suggested=''):
+def update_personID_canonical_names(persons_list=None, overwrite=False, suggested='',
+                                    verbose_prints=False):
     '''
     Updates the personID table creating or updating canonical names for persons
     @param: persons_list: persons to consider for the update  (('1'),)
@@ -1066,7 +1067,8 @@ def update_personID_canonical_names(persons_list=None, overwrite=False, suggeste
         persons_list = [x[0] for x in run_sql('select distinct personid from aidPERSONIDPAPERS')]
 
     for idx, pid in enumerate(persons_list):
-        update_status(float(idx) / float(len(persons_list)))
+        if verbose_prints:
+            update_status(float(idx) / float(len(persons_list)))
         current_canonical = run_sql("select data from aidPERSONIDDATA where "
                                     "personid=%s and tag=%s", (pid, 'canonical_name'))
 
@@ -1099,7 +1101,8 @@ def update_personID_canonical_names(persons_list=None, overwrite=False, suggeste
                 run_sql("insert into aidPERSONIDDATA (personid, tag, data) values (%s,%s,%s) ",
                          (pid, 'canonical_name', canonical_name))
 
-    update_status(1.)
+    if verbose_prints:
+        update_status(1.)
     print
 
 
