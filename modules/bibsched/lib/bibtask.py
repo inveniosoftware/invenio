@@ -68,7 +68,7 @@ from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
     CFG_EXTERNAL_AUTHENTICATION
 from invenio.webuser import get_user_preferences, get_email
 from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
-    CFG_BIBTASK_DEFAULT_TASK_SETTINGS
+    CFG_BIBTASK_DEFAULT_TASK_SETTINGS, CFG_BIBTASK_FIXEDTIMETASKS
 from invenio.dateutils import parse_runtime_limit
 from invenio.shellutils import escape_shell_arg
 
@@ -91,6 +91,7 @@ _TASK_PARAMS = {
         'post-process': [],
         'sequence-id':None,
         'stop_queue_on_error': False,
+        'fixed_time': False,
         }
 
 # Global _OPTIONS dictionary.
@@ -359,6 +360,7 @@ def task_init(
         "post-process": [],
         "sequence-id": None,
         "stop_queue_on_error": False,
+        "fixed_time": False,
     }
     to_be_submitted = True
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
@@ -502,6 +504,7 @@ def _task_build_params(
                 "sequence-id=",
                 "stop-on-error",
                 "continue-on-error",
+                "fixed-time",
             ] + long_params)
     except getopt.GetoptError, err:
         _usage(1, err, help_specific_usage=help_specific_usage, description=description)
@@ -538,6 +541,8 @@ def _task_build_params(
                 _TASK_PARAMS["stop_queue_on_error"] = True
             elif opt[0] in ("--continue-on-error", ):
                 _TASK_PARAMS["stop_queue_on_error"] = False
+            elif opt[0] in ("--fixed-time", ):
+                _TASK_PARAMS["fixed_time"] = True
             elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
                 not task_submit_elaborate_specific_parameter_fnc(opt[0],
                     opt[1], opts, args):
@@ -628,19 +633,22 @@ def write_message(msg, stream=sys.stdout, verbose=1):
         logging.debug(msg)
 
 _RE_SHIFT = re.compile("([-\+]{0,1})([\d]+)([dhms])")
-def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
+def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S", now=None):
     """Returns a date string according to the format string.
        It can handle normal date strings and shifts with respect
        to now."""
-    date = time.time()
-    factors = {"d":24*3600, "h":3600, "m":60, "s":1}
+    date = now or datetime.datetime.now()
+
+    factors = {"d": 24 * 3600, "h": 3600, "m": 60, "s": 1}
     m = _RE_SHIFT.match(var)
     if m:
         sign = m.groups()[0] == "-" and -1 or 1
         factor = factors[m.groups()[2]]
         value = float(m.groups()[1])
-        date = time.localtime(date + sign * factor * value)
-        date = time.strftime(format_string, date)
+        delta = sign * factor * value
+        while delta > 0 and date < datetime.datetime.now():
+            date = date + datetime.timedelta(seconds=delta)
+        date = date.strftime(format_string)
     else:
         date = time.strptime(var, format_string)
         date = time.strftime(format_string, date)
@@ -886,7 +894,13 @@ def _task_run(task_run_fnc):
             argv = _task_get_options(_TASK_PARAMS['task_id'], _TASK_PARAMS['task_name'])
             verbose_argv = 'Will execute: %s' % ' '.join([escape_shell_arg(str(arg)) for arg in argv])
 
-            new_runtime = get_datetime(sleeptime)
+            # Here we check if the task can shift away of has to be run at
+            # a fixed time
+            old_runtime = run_sql("SELECT runtime FROM schTASK WHERE id=%s", (_TASK_PARAMS['task_id'], ))[0][0]
+            if not task_get_task_param('fixed_time') or _TASK_PARAMS['task_name'] not in CFG_BIBTASK_FIXEDTIMETASKS:
+                old_runtime = None
+            new_runtime = get_datetime(sleeptime, now=old_runtime)
+
             ## The task is a daemon. We resubmit it
             if task_status == 'DONE':
                 ## It has finished in a good way. We recycle the database row
@@ -940,6 +954,7 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
     sys.stderr.write("  -s, --sleeptime=SLEEP\tSleeping frequency after"
         " which to repeat the task.\n"
         "\t\t\tExamples: 30m, 2h, 1d. [default=no]\n")
+    sys.stderr.write("  --fixed-time\t\tAvoid drifting of execution time when using --sleeptime\n")
     sys.stderr.write("  -I, --sequence-id=SEQUENCE-ID\tSequence Id of the current process\n")
     sys.stderr.write("  -L  --limit=LIMIT\tTime limit when it is"
         " allowed to execute the task.\n"

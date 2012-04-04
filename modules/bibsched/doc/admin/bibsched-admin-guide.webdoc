@@ -156,22 +156,35 @@ interface, only the latest log will be displayed.</p>
 <h2>Bibtasks command line interface</h2>
 <p>Each bibtask has a common command interface in addition to the proper bibtask related options.
 <pre>
-    Scheduling options:
-    -u, --user=USER       User name to submit the task as, password needed.
-    -t, --runtime=TIME    Time to execute the task (now), e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26
-    -s, --sleeptime=SLEEP Sleeping frequency after which to repeat task (no), e.g.: 30m, 2h, 1d
-    -L, --limit=LIMIT     Time limit when it is allowed to execute the task, e.g. Sunday 01:00-05:00.
-                          The time limit syntax is [Wee[kday]] [hh[:mm][-hh[:mm]]].
-    -P, --priority=PRI    Task priority (0=default, 1=higer, etc).
-    -N, --name=NAME       Task specific name (advanced option).
-    General options:
-    -h, --help            Print this help.
-    -V, --version         Print version information.
-    -v, --verbose=LEVEL   Verbose level (0=min, 1=default, 9=max).
-        --profile=STATS   Print profile information. STATS is a comma-separated
-                          list of desired output stats (calls, cumulative,
-                          file, line, module, name, nfl, pcalls, stdname, time).
+  Scheduling options:
+  -u, --user=USER       User name under which to submit this task.
+  -t, --runtime=TIME    Time to execute the task. [default=now]
+                        Examples: +15s, 5m, 3h, 2002-10-27 13:57:26.
+  -s, --sleeptime=SLEEP Sleeping frequency after which to repeat the task.
+                        Examples: 30m, 2h, 1d. [default=no]
+  --fixed-time          Avoid drifting of execution time when using --sleeptime
+  -I, --sequence-id=SEQUENCE-ID Sequence Id of the current process
+  -L  --limit=LIMIT     Time limit when it is allowed to execute the task.
+                        Examples: 22:00-03:00, Sunday 01:00-05:00.
+                        Syntax: [Wee[kday]] [hh[:mm][-hh[:mm]]].
+  -P, --priority=PRI    Task priority (0=default, 1=higher, etc).
+  -N, --name=NAME       Task specific name (advanced option).
 
+  General options:
+  -h, --help            Print this help.
+  -V, --version         Print version information.
+  -v, --verbose=LEVEL   Verbose level (0=min, 1=default, 9=max).
+  --profile=STATS       Print profile information. STATS is a comma-separated
+                        list of desired output stats (calls, cumulative,
+                        file, line, module, name, nfl, pcalls, stdname, time).
+  --stop-on-error       In case of unrecoverable error stop the bibsched queue.
+  --continue-on-error   In case of unrecoverable error don't stop the bibsched queue.
+  --post-process=BIB_TASKLET_NAME[parameters]   Postprocesses the specified
+                        bibtasklet with the given parameters between square
+                        brackets.
+                        Example:--post-process "bst_send_email[fromaddr=
+                        'foo@xxx.com', toaddr='bar@xxx.com', subject='hello',
+                        content='help']"
 </pre>
 </p>
 
