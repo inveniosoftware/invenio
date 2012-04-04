@@ -53,7 +53,7 @@ from invenio.textutils import wrap_text_in_a_box
 from invenio.errorlib import register_exception, register_emergency
 from invenio.shellutils import run_shell_command
 
-CFG_VALID_STATUS = ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING', '% DELETED', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'STOPPED', 'SLEEPING', 'KILLED')
+CFG_VALID_STATUS = ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING', '% DELETED', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'STOPPED', 'SLEEPING', 'KILLED', 'NOW STOP')
 
 
 def get_editor():
@@ -622,16 +622,16 @@ class Manager:
         status = self.currentrow[5]
         if status in ('RUNNING', 'CONTINUING', 'ABOUT TO SLEEP', 'SLEEPING'):
             if status == 'SLEEPING':
+                bibsched_set_status(task_id, 'NOW STOP', 'SLEEPING')
                 bibsched_send_signal(process, task_id, signal.SIGCONT)
                 count = 10
-                while bibsched_get_status(task_id) == 'SLEEPING':
+                while bibsched_get_status(task_id) == 'NOW STOP':
                     if count <= 0:
-                        bibsched_set_status(task_id, 'ERROR', 'SLEEPING')
+                        bibsched_set_status(task_id, 'ERROR', 'NOW STOP')
                         self.display_in_footer("It seems impossible to wakeup this task.")
                         return
                     time.sleep(CFG_BIBSCHED_REFRESHTIME)
                     count -= 1
-                bibsched_set_status(task_id, 'ABOUT TO STOP', 'CONTINUING')
             else:
                 bibsched_set_status(task_id, 'ABOUT TO STOP', status)
             self.display_in_footer("STOP signal sent to task #%s" % task_id)

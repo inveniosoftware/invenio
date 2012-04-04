@@ -52,7 +52,7 @@ def Move_to_Done(parameters, curdir, form, user_info=None):
         except:
             raise InvenioWebSubmitFunctionError("Cannot create done directory %s" % donedir)
     # Moves the files to the done diectory and creates an archive
-    rn = rn.replace("/", "-")
+    rn = rn.replace("/", "-").replace(" ","")
     namedir = "%s_%s" % (rn, time.strftime("%Y%m%d%H%M%S"))
     finaldir = os.path.join(donedir, namedir)
     os.rename(curdir, finaldir)
