@@ -99,7 +99,7 @@ from invenio.errorlib import register_exception
 from invenio.bibrecord import record_get_field_instances, \
     field_get_subfield_values, field_get_subfield_instances, \
     encode_for_xml
-from invenio.urlutils import create_url
+from invenio.urlutils import create_url, make_user_agent_string
 from invenio.textutils import nice_size
 from invenio.access_control_engine import acc_authorize_action
 from invenio.webuser import collect_user_info
@@ -4001,6 +4001,7 @@ def open_url(url, headers=None, head_request=False):
 
     request_obj = head_request and HeadRequest or urllib2.Request
     request = request_obj(url)
+    request.add_header('User-Agent', make_user_agent_string('bibdocfile'))
     for key, value in headers_to_use.items():
         request.add_header(key, value)
 

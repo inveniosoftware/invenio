@@ -30,6 +30,9 @@ from invenio.bibrecord import record_get_field_instances, \
                               field_get_subfield_values
 from invenio.shellutils import run_shell_command
 from invenio.plotextractor_output_utils import write_message
+from invenio.urlutils import make_invenio_opener
+
+PLOTEXTRACTOR_OPENER = make_invenio_opener('plotextractor')
 
 PDF_EXTENSION = '.pdf'
 
@@ -614,7 +617,7 @@ def download(url, filename, to_dir):
     new_file = os.path.join(to_dir, filename)
 
     try:
-        conn = urllib2.urlopen(url)
+        conn = PLOTEXTRACTOR_OPENER.open(url)
         response = conn.read()
         conn.close()
         new_file_fd = open(new_file, 'w')

@@ -25,7 +25,10 @@ import urllib2
 import urllib
 import mimetools
 from invenio import intbitset
+from invenio.urlutils import make_invenio_opener
 from invenio.jsonutils import json
+
+SOLRUTILS_OPENER = make_invenio_opener('solrutils')
 
 def solr_get_facets(bitset, solr_url):
     facet_query_url = "%s/invenio_facets" % solr_url
@@ -46,7 +49,7 @@ def solr_get_facets(bitset, solr_url):
     r.add_unredirected_header('Content-Type', contenttype)
 
     # post the request and get back the facets as json
-    u = urllib2.urlopen(r)
+    u = SOLRUTILS_OPENER.open(r)
     return json.load(u)
 
 def solr_get_bitset(query, solr_url):
@@ -54,7 +57,7 @@ def solr_get_bitset(query, solr_url):
 
     # query to get a bitset
     bitset = intbitset.intbitset()
-    u = urllib2.urlopen(invenio_query_url)
+    u = SOLRUTILS_OPENER.open(invenio_query_url)
     data = u.read()
     bitset.fastload(data)
     return bitset

@@ -40,6 +40,12 @@ import tempfile
 import urllib2
 import bibclassify_config as bconfig
 
+if bconfig.STANDALONE:
+    from urllib2 import urlopen
+else:
+    from urlutils import make_invenio_opener
+    urlopen = make_invenio_opener('BibClassify').open
+
 log = bconfig.get_logger("bibclassify.text_extractor")
 
 
@@ -117,7 +123,7 @@ def text_lines_from_url(url, user_agent=""):
     if user_agent:
         request.add_header("User-Agent", user_agent)
     try:
-        distant_stream = urllib2.urlopen(request)
+        distant_stream = urlopen(request)
         # Write the URL content to a temporary file.
         local_file = tempfile.mkstemp(prefix="bibclassify.")[1]
         local_stream = open(local_file, "w")

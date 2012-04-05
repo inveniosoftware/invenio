@@ -31,7 +31,9 @@ import re
 import sys
 import os
 import inspect
-from urllib import urlencode, quote_plus, quote
+import urllib
+import urllib2
+from urllib import urlencode, quote_plus, quote, FancyURLopener
 from urlparse import urlparse
 from cgi import parse_qs, escape
 from md5 import md5
@@ -476,6 +478,27 @@ def make_user_agent_string(component=None):
     if component:
         ret += " %s" % component
     return ret
+
+class InvenioFancyURLopener(FancyURLopener):
+    ## Provide default user agent string
+    version = make_user_agent_string()
+    def prompt_user_passwd(self, host, realm):
+        """Don't prompt"""
+        return None, None
+
+## Let's override default useragent string
+## See: http://docs.python.org/release/2.4.4/lib/module-urllib.html
+urllib._urlopener = InvenioFancyURLopener()
+
+def make_invenio_opener(component=None):
+    """
+    Return an urllib2 opener with the useragent already set in the appropriate
+    way.
+    """
+    opener = urllib2.build_opener()
+    opener.addheaders = [('User-agent', make_user_agent_string(component))]
+    return opener
+
 
 def create_AWS_request_url(base_url, argd, _amazon_secret_access_key,
                            _timestamp=None):

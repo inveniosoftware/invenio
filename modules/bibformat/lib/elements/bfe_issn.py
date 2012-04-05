@@ -22,13 +22,15 @@
 __revision__ = "$Id$"
 
 import pprint
-import urllib
 import sys
 import re
 import getopt
 from invenio.search_engine import perform_request_search
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.config import CFG_CERN_SITE
+from invenio.urlutils import make_invenio_opener
+
+BIBFORMAT_OPENER = make_invenio_opener('BibFormat')
 
 if CFG_CERN_SITE:
     journal_name_tag = '773__p'
@@ -957,7 +959,7 @@ def build_issns_from_distant_site(url):
       ''', re.IGNORECASE | re.DOTALL | re.VERBOSE)
     request = '/search?cc=Periodicals&ot=022,210&of=tm'
     try:
-        fields = urllib.urlopen(url.rstrip('/') + request).readlines()
+        fields = BIBFORMAT_OPENER.open(url.rstrip('/') + request).readlines()
     except IOError:
         sys.stderr.write("Error: Could not connect to %s.\n" % url)
         sys.exit(0)

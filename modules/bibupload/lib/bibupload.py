@@ -73,6 +73,7 @@ from invenio.search_engine import get_record
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
 from invenio.intbitset import intbitset
+from invenio.urlutils import make_user_agent_string
 from invenio.config import CFG_WEBSUBMIT_FILEDIR
 from invenio.bibtask import task_init, write_message, \
     task_set_option, task_get_option, task_get_task_param, task_update_status, \
@@ -2140,7 +2141,7 @@ def post_results_to_callback_url(results, callback_url):
         raise ValueError("Scheme not handled %s for callback_url %s" % (scheme, callback_url))
     request = urllib2.Request(callback_url, data=json_results)
     request.add_header('Content-Type', 'application/json')
-    request.add_header('User-Agent', '')
+    request.add_header('User-Agent', make_user_agent_string('BibUpload'))
     request.get_method = lambda: 'POST'
     return opener.open(request)
 

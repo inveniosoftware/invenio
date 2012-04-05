@@ -23,7 +23,6 @@ import os
 import time
 import re
 import socket
-from urllib2 import urlopen
 try:
     # Try to load feedparser.  Remember for later if it was installed
     # or not. Note that feedparser is slow to load: if we don't load
@@ -40,7 +39,7 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.errorlib import register_exception
 from invenio.webjournal_utils import \
-     parse_url_string
+     parse_url_string, WEBJOURNAL_OPENER
 from invenio.messages import gettext_set_language
 
 re_image_pattern = re.compile(r'<img\s*(class=["\']imageScale["\'])*?\s*src="(?P<image>\S*)"\s*/>',
@@ -205,7 +204,7 @@ def _update_feed(yahoo_weather_rss, cached_filename, expire_time_filename):
     socket.setdefaulttimeout(2.0)
     try:
         try:
-            feed = urlopen(yahoo_weather_rss)
+            feed = WEBJOURNAL_OPENER.open(yahoo_weather_rss)
         except:
             return
     finally:

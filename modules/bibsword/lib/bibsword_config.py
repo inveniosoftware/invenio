@@ -24,9 +24,6 @@ from invenio.bibformat_dblayer import get_tag_from_name
 #Maximal time to keep the stored XML Service doucment before reloading it in sec
 CFG_BIBSWORD_SERVICEDOCUMENT_UPDATE_TIME = 3600
 
-#Default user agent for invenio sword-client
-CFG_DEFAULT_USER_AGENT = 'Invenio SWORD client'
-
 #Default submission status
 CFG_SUBMISSION_STATUS_SUBMITTED = "submitted"
 CFG_SUBMISSION_STATUS_PUBLISHED = "published"
