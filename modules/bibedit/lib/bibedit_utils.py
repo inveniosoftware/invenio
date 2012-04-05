@@ -47,7 +47,7 @@ from invenio.bibrecord import create_record, create_records, \
     record_order_subfields, record_get_field_instances, \
     record_add_field, field_get_subfield_codes, field_add_subfield, \
     field_get_subfield_values, record_delete_fields, record_add_fields, \
-    record_get_field_values
+    record_get_field_values, print_rec
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
@@ -228,7 +228,7 @@ def create_cache_file(recid, uid, record='', cache_dirty=False, pending_changes=
         record_revision = datetime.now().timetuple()
 
     cache_file = open(file_path, 'w')
-    assert_undo_redo_lists_correctness(undo_list, redo_list);
+    assert_undo_redo_lists_correctness(undo_list, redo_list)
     cPickle.dump([cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list], cache_file)
     cache_file.close()
     return record_revision, record
@@ -252,7 +252,7 @@ def get_cache_file_contents(recid, uid):
     if cache_file:
         cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list = cPickle.load(cache_file)
         cache_file.close()
-        assert_undo_redo_lists_correctness(undo_list, redo_list);
+        assert_undo_redo_lists_correctness(undo_list, redo_list)
 
         return cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list
 
@@ -263,7 +263,7 @@ def update_cache_file_contents(recid, uid, record_revision, record, pending_chan
     """
     cache_file = _get_cache_file(recid, uid, 'w')
     if cache_file:
-        assert_undo_redo_lists_correctness(undo_list, redo_list);
+        assert_undo_redo_lists_correctness(undo_list, redo_list)
         cPickle.dump([True, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list], cache_file)
         cache_file.close()
         return get_cache_mtime(recid, uid)
@@ -293,7 +293,6 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
         if cache:
             record = cache[2]
             used_changes = cache[4]
-#            record_strip_empty_fields(record) # now performed for every record after removing unfilled volatile fields
             xml_record = record_xml_output(record)
             delete_cache_file(recid, uid)
             delete_disabled_changes(used_changes)
@@ -758,3 +757,62 @@ def replace_references(recid, txt=None, inspire=CFG_INSPIRE_SITE, uid=None):
         out_xml = None
 
     return out_xml
+
+#################### cnum generation ####################
+
+def record_is_conference(record):
+    """
+    Determine if the record is a new conference based on the value present
+    on field 980
+
+    @param record: record to be checked
+    @type record: bibrecord object
+
+    @return: True if record is a conference, False otherwise
+    @rtype: boolean
+    """
+    # Get collection field content (tag 980)
+    tag_980_content = record_get_field_values(record, "980", " ", " ", "a")
+    if "CONFERENCES" in tag_980_content:
+        return True
+    return False
+
+def add_record_cnum(recid, uid):
+    """
+    Check if the record has already a cnum. If not generate a new one
+    and return the result
+
+    @param recid: recid of the record under check. Used to retrieve cache file
+    @type recid: int
+
+    @param uid: id of the user. Used to retrieve cache file
+    @type uid: int
+
+    @return: None if cnum already present, new cnum otherwise
+    @rtype: None or string
+    """
+    # Import placed here to avoid circular dependency
+    from invenio.sequtils_cnum import CnumSeq, ConferenceNoStartDateError
+
+    record_revision, record, pending_changes, deactivated_hp_changes, \
+    undo_list, redo_list = get_cache_file_contents(recid, uid)[1:]
+
+    record_strip_empty_volatile_subfields(record)
+
+    # Check if record already has a cnum
+    tag_111__g_content = record_get_field_value(record, "111", " ", " ", "g")
+    if tag_111__g_content:
+        return
+    else:
+        cnum_seq = CnumSeq()
+        try:
+            new_cnum = cnum_seq.next_value(xml_record=wash_for_xml(print_rec(record)))
+        except ConferenceNoStartDateError:
+            return None
+        field_add_subfield(record['111'][0], 'g', new_cnum)
+        update_cache_file_contents(recid, uid, record_revision,
+                                   record, \
+                                   pending_changes, \
+                                   deactivated_hp_changes, \
+                                   undo_list, redo_list)
+        return new_cnum

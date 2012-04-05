@@ -115,7 +115,7 @@ def populate_cnums():
     Populates table seqSTORE with the cnums present in CONFERENCE records
     """
     # First get all records from conference collection
-    conf_records = perform_request_search(f="collection", p="CONFERENCES")
+    conf_records = perform_request_search(cc="Conferences", p="111__g:C*", rg=0)
 
     for recid in conf_records:
         cnum = record_get_field_value(get_bibrecord(recid), tag="111", ind1="", ind2="", code="g")

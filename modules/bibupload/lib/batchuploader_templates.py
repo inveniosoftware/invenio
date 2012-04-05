@@ -29,6 +29,7 @@ from invenio.config import CFG_SITE_URL
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
 from invenio.urlutils import auto_version_url
+from invenio.htmlutils import escape_html
 
 
 class Template:
@@ -211,12 +212,19 @@ class Template:
             <option value="1">normal</option>
             <option value="5">high</option>
         </select>
-    <br/>
-    <div>%(txt_upload_later)s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="italics">%(txt_date)s:</span>
-    <input type="text" id="datepicker" name="submit_date" value=%(submit_date)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
-    &nbsp;&nbsp;<span class="italics">%(txt_time)s:</span>
-    <input type="text" name="submit_time" id="submit_time" value=%(submit_time)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
-    <span class="italics">%(txt_example)s: 2012-12-20 19:22:18</span>
+    </div>
+    <div>
+        <label class="nowidth" for="skip_simulation">
+            &nbsp;&nbsp;%(txt_skip_simulation)s
+        </label>
+        <input type="checkbox" name="skip_simulation" value="skip">
+    </div>
+    <div>
+        %(txt_upload_later)s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="italics">%(txt_date)s:</span>
+        <input type="text" id="datepicker" name="submit_date" value=%(submit_date)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
+        &nbsp;&nbsp;<span class="italics">%(txt_time)s:</span>
+        <input type="text" name="submit_time" id="submit_time" value=%(submit_time)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
+        <span class="italics">%(txt_example)s: 2012-12-20 19:22:18</span>
     </div>
     <div><i>%(txt_mandatory)s</i></div>
     <div> <input type="submit" value="Upload" class="adminbutton"> </div>
@@ -231,6 +239,7 @@ class Template:
         'txt_mandatory': _("All fields with %(x_fmt_open)s*%(x_fmt_close)s are mandatory") % \
                   {'x_fmt_open': '<span class="mandatory_field">', 'x_fmt_close': '</span>'},
         'txt_priority': _("Upload priority"),
+        'txt_skip_simulation': _("Skip upload simulation"),
         'type_sel1': filetype == 'marcxml' and "selected" or "",
         'type_sel2': filetype == 'textmarc' and "selected" or "",
         'mode_sel1': mode == '--insert' and "selected" or "",
@@ -464,7 +473,7 @@ class Template:
     def tmpl_display_confirm_page(self, ln=CFG_SITE_LANG,
                 metafile=None, filetype=None, mode=None, submit_date=None,
                 submit_time=None, file_name=None, priority=None,
-                errors_upload=''):
+                errors_upload='', skip_simulation=False):
         """ Display a confirmation page before uploading metadata
         """
         _ = gettext_set_language(ln)
@@ -481,11 +490,17 @@ class Template:
             error_msgs.append("<li>%s</li>" % error)
         error_msgs.append("</ol>")
 
-        errors_textarea = """%(text_error1)s
-                              <div class="batchuploader_error"> %(error_msgs)s </div>
-                              <br />
-                           """ % {'text_error1': '<div class="clean_error">Some errors have been found during the upload simulation</div>',
-                                  'error_msgs': '\n'.join(error_msgs)}
+        errors_textarea = ""
+        if not skip_simulation:
+            errors_textarea = """%(text_error1)s
+                                  <div class="batchuploader_error"> %(error_msgs)s </div>
+                                  <br />
+                               """ % {'text_error1': '<div class="clean_error">Some errors have been found during the upload simulation</div>',
+                                      'error_msgs': '\n'.join(error_msgs)}
+            if not errors_upload:
+                errors_textarea = '<div class="clean_ok">No errors were found during the upload simulation</div><br/>'
+
+        marcxml_textarea = """<textarea style="background-color: lightyellow" name="metafile" rows="20" cols="80">%(filecontent)s</textarea> """ % {'filecontent': escape_html(metafile.value)}
 
         body_content = """<form class="uploadform" method="post" action="%(site_url)s/batchuploader/metasubmit">""" \
                                        % {'site_url': CFG_SITE_URL}
@@ -498,7 +513,7 @@ class Template:
                         <input type="hidden" name="filename" value=%(filename)s>
                         <input type="hidden" name="priority" value=%(priority_num)s>
                         <div> %(errors_textarea)s %(text_confirm1)s <strong>%(filetype)s</strong> %(text_confirm2)s <strong>%(filename)s</strong> %(text_confirm3)s: <br /><br />
-                            <textarea style="background-color: lightyellow" name="metafile" rows="20" cols="80">%(filecontent)s</textarea>
+                            %(marcxml_textarea)s
                             <br /><br />
                             %(text_confirm4)s <strong>%(priority_txt)s</strong> %(text_confirm5)s <strong>%(mode)s</strong>.
                             <br/><br/>
@@ -521,6 +536,7 @@ class Template:
                                'schedule_msg' : display_schedule and schedule_msg or '',
                                'filetype': filetype,
                                'filename': file_name,
+                               'marcxml_textarea': marcxml_textarea,
                                'filecontent': metafile.value,
                                'priority_num': priority,
                                'priority_txt': priority_map[priority],
@@ -528,7 +544,7 @@ class Template:
                                'num_rec': metafile.value.count('<record>'),
                                'submit_date': submit_date,
                                'submit_time': submit_time,
-                               'errors_textarea': errors_upload and errors_textarea or '<div class="clean_ok">No errors were found during the upload simulation</div><br/>',
+                               'errors_textarea': errors_textarea,
                                'confirm_disabled': errors_upload and 'DISABLED style="background:grey;"' or ''}
         body_content += """</div></form> """
         return body_content

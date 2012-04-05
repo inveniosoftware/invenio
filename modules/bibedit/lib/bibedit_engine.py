@@ -63,7 +63,8 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     revision_to_timestamp, timestamp_to_revision, \
     get_record_revision_timestamps, record_revision_exists, \
     can_record_have_physical_copies, extend_record_with_template, \
-    merge_record_with_template, record_xml_output, replace_references
+    replace_references, merge_record_with_template, record_xml_output, \
+    record_is_conference, add_record_cnum
 
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
@@ -675,7 +676,6 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
         # - Cache file modified in other editor
         # - Record locked by other user
         # - Record locked by queue
-        # - Invalid XML characters
         # If the cache is outdated cacheOutdated will be set to True in the
         # response.
         if not cache_exists(recid, uid):
@@ -706,14 +706,14 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                 elif status_code == 0:
                     response['resultCode'], response['errors'] = 110, \
                         list_of_errors
-                elif not data['force'] and \
-                        not latest_record_revision(recid, record_revision):
+                if not data['force'] and not latest_record_revision(recid, record_revision):
                     response['cacheOutdated'] = True
-                    if CFG_DEVEL_SITE:
-                        response['record_revision'] = record_revision.__str__()
-                        response['newest_record_revision'] = \
-                            get_record_last_modification_date(recid).__str__()
                 else:
+                    if record_is_conference(record):
+                        new_cnum = add_record_cnum(recid, uid)
+                        if new_cnum:
+                            response["new_cnum"] = new_cnum
+
                     save_xml_record(recid, uid)
                     response['resultCode'] = 4
             except Exception, e:
@@ -1337,7 +1337,7 @@ def _get_formated_record(record, new_window):
     """
     from invenio.config import CFG_WEBSTYLE_TEMPLATE_SKIN
 
-    xml_record = wash_for_xml(bibrecord.record_xml_output(record))
+    xml_record = wash_for_xml(record_xml_output(record))
 
     result = ''
     if new_window:

@@ -162,10 +162,9 @@ var gBibCircUrl = null;
 
 var gDisplayBibCircPanel = false;
 
-//KB related variables
+// KB related variables
 var gKBSubject = null;
 var gKBInstitution = null;
-
 
 /*
  * **************************** 2. Initialization ******************************
@@ -1176,7 +1175,6 @@ function onGetRecordSuccess(json){
   // Get KB information
   gKBSubject = json['KBSubject'];
   gKBInstitution = json['KBInstitution'];
-
   var revDt = formatDateTime(getRevisionDate(gRecRev));
   var recordRevInfo = "record revision: " + revDt;
   var revAuthorString = gRecRevAuthor;
@@ -1265,20 +1263,20 @@ function onSubmitPreviewSuccess(dialogPreview, html_preview){
         close: function() { updateStatus('ready'); },
         buttons: {
             "Submit changes": function() {
-                createReq({recID: gRecID, requestType: 'submit',
-                  force: onSubmitClick.force}, function(json){
-                      // Submission was successful.
-                      changeAndSerializeHash({state: 'submit', recid: gRecID});
-                      var resCode = json['resultCode'];
-                      cleanUp(!gNavigatingRecordSet, '', null, true);
-                      updateStatus('report', gRESULT_CODES[resCode]);
-                      updateToolbar(false);
-                      resetBibeditState();
-                      displayMessage(resCode);
-                      updateStatus('ready');
-              });
-              $( this ).remove();
-            },
+                        createReq({recID: gRecID, requestType: 'submit',
+                          force: onSubmitClick.force}, function(json) {
+                            // Submission was successful.
+                            changeAndSerializeHash({state: 'submit', recid: gRecID});
+                            var resCode = json['resultCode'];
+                            cleanUp(!gNavigatingRecordSet, '', null, true);
+                            updateStatus('report', gRESULT_CODES[resCode]);
+                            displayMessage(resCode, false, [json["new_cnum"]]);
+                            updateToolbar(false);
+                            resetBibeditState();
+                            updateStatus('ready');
+                        });
+                        $( this ).remove();
+                    },
             Cancel: function() {
                         updateStatus('ready');
                         $( this ).remove();

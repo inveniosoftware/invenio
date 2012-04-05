@@ -820,7 +820,12 @@ function displayMessage(msgCode, keepContent, args) {
         break;
     case 4:
         msg = 'Your modifications have now been submitted. ' +
-            'They will be processed as soon as the task queue is empty. <br />';
+              'They will be processed as soon as the task queue is empty.<br />';
+        if (typeof args !== 'undefined') {
+            if (typeof args[0] !== 'undefined') {
+                msg += '<br /><strong>The conference cnum is ' + args[0] + '</strong>';
+            }
+        }
         break;
     case 10:
         msg = 'The record will be deleted as soon as the task queue is empty.';

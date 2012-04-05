@@ -208,7 +208,6 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
         time = argd['submit_time'] not in ['hh:mm:ss', ''] \
                 and argd['submit_time'] or ''
 
-        #Function where bibupload queues the file
         auth_code, auth_message = metadata_upload(req,
                                   argd['metafile'], argd['filetype'],
                                   argd['mode'].split()[0],
@@ -245,7 +244,8 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
                                    'submit_date': (str, None),
                                    'submit_time': (str, None),
                                    'filename': (str, None),
-                                   'priority': (str, None)})
+                                   'priority': (str, None),
+                                   'skip_simulation': (str, None)})
         _ = gettext_set_language(argd['ln'])
 
         # Check if the page is directly accessed or no file selected
@@ -258,11 +258,16 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
         time = argd['submit_time'] not in ['hh:mm:ss', ''] \
                 and argd['submit_time'] or ''
 
-        errors_upload = perform_upload_check(argd['metafile'].value, argd['mode'])
+        errors_upload = ''
+
+        skip_simulation = argd['skip_simulation'] == "skip"
+        if not skip_simulation:
+            errors_upload = perform_upload_check(argd['metafile'].value, argd['mode'])
 
         body = batchuploader_templates.tmpl_display_confirm_page(argd['ln'],
                 argd['metafile'], argd['filetype'], argd['mode'], date,
-                time, argd['filename'], argd['priority'], errors_upload)
+                time, argd['filename'], argd['priority'], errors_upload,
+                skip_simulation)
 
         uid = getUid(req)
         navtrail = '''<a class="navtrail" href="%s/batchuploader/metadata">%s</a>''' % \
