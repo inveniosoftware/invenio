@@ -4059,4 +4059,14 @@ CREATE TABLE IF NOT EXISTS collection_bsrMETHOD (
   PRIMARY KEY (id_collection, id_bsrMETHOD)
 ) ENGINE=MyISAM;
 
+-- tables for sequence storage
+
+CREATE TABLE IF NOT EXISTS seqSTORE (
+  id int(15) NOT NULL auto_increment,
+  seq_name varchar(15),
+  seq_value varchar(20),
+  PRIMARY KEY (id),
+  UNIQUE KEY seq_name_value (seq_name, seq_value)
+) ENGINE=MyISAM;
+
 -- end of file

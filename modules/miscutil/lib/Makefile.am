@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -64,7 +64,10 @@ pylib_DATA = __init__.py \
              remote_debugger.py \
              remote_debugger_config.py \
              remote_debugger_wsgi_reload.py \
-             jsonutils.py
+             jsonutils.py \
+	         sequtils_cnum.py \
+	         sequtils.py \
+	         sequtils_regression_tests.py
 
 noinst_DATA = testimport.py \
               kwalitee.py \
