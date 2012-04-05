@@ -424,7 +424,7 @@ def get_info_of_revision_id(revid):
         author = tmp_res[0][1]
         if not author:
             author = 'N/A'
-        res += '%s%s%s' % (revid.ljust(22), task_id.ljust(15), author.ljust(15))
+        res += '%s %s %s' % (revid.ljust(22), task_id.ljust(15), author.ljust(15))
         job_details = tmp_res[0][2].split()
         upload_mode = job_details[0] + job_details[1][:-1]
         upload_file = job_details[2] + job_details[3][:-1]
