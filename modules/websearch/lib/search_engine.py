@@ -5842,6 +5842,7 @@ def prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection,
     if output is not None:
         return output
 
+
     # another external search if we still don't have something
     if results_final == {} and not kwargs['hosted_colls_actual_or_potential_results_p']:
         if of.startswith("h"):
@@ -5851,15 +5852,18 @@ def prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection,
             # Print empty, but valid XML
             print_records_prologue(req, of)
             print_records_epilogue(req, of)
+        kwargs['results_final'] = results_final
         return page_end(req, of, ln, em)
 
 
     # search stage 5: apply search option limits and restrictions:
     output = prs_apply_search_limits(results_final, kwargs=kwargs, **kwargs)
+    kwargs['results_final'] = results_final
+
     if output is not None:
         return output
 
-    kwargs['results_final'] = results_final
+
 
 
 def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=None,

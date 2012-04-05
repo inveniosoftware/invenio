@@ -28,6 +28,7 @@ import unittest
 import re
 import urlparse, cgi
 import sys
+import cStringIO
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -1114,7 +1115,6 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
     def test_search_engine_python_api_textmarc(self):
         """websearch - search engine Python API for Text MARC output"""
         # we are testing example from /help/hacking/search-engine-api
-        import cStringIO
         tmp = cStringIO.StringIO()
         perform_request_search(req=tmp, p='higgs', of='tm', ot=['100', '700'])
         out = tmp.getvalue()
@@ -2247,8 +2247,14 @@ class WebSearchPerformRequestSearchRefactoringTest(unittest.TestCase):
 
         #params.update(map(lambda x: x.split('=', 1), test_args.split(';')))
 
+        req = cStringIO.StringIO()
+        params['req'] = req
 
         recs = perform_request_search(**params)
+
+        if isinstance(expected_results, str):
+            req.seek(0)
+            recs = req.read()
 
         # this is just used to generate the results from the seearch engine before refactoring
         #if recs != expected_results:
@@ -2330,6 +2336,10 @@ class WebSearchPerformRequestSearchRefactoringTest(unittest.TestCase):
         self.run_test('p=Ellis, J;ap=1', [9, 10, 11, 12, 14, 17, 18, 47])
 
         self.run_test('p=Ellis, J;ap=0', [9, 10, 11, 12, 14, 17, 18, 47])
+
+        self.run_test('p=recid:148x', [])
+
+        self.run_test('p=recid:148x;of=xm;rg=200', "<collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n\n</collection>")
 
 
 
