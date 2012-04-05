@@ -336,6 +336,13 @@ def get_persons_from_recids(recids, return_alt_names=False,
     pid_2_data = dict()
     all_pids = set()
 
+    def get_canonical_name(pid):
+        return run_sql("SELECT data "
+                            "FROM aidPERSONIDDATA "
+                            "WHERE tag = %s "
+                            "AND personid = %s",
+                            ('canonical_name', pid))
+
     for rec in recids:
         pids = run_sql("SELECT personid "
                        "FROM aidPERSONIDPAPERS "
@@ -349,14 +356,25 @@ def get_persons_from_recids(recids, return_alt_names=False,
         rec_2_pid[rec] = list(pids)
 
     for pid in all_pids:
-        canonical = run_sql("SELECT data "
-                            "FROM aidPERSONIDDATA "
-                            "WHERE tag = %s "
-                            "AND personid = %s",
-                            ('canonical_name', pid))
-        assert len(canonical) == 1
+        pid_data = {}
 
-        pid_data = {'canonical_id' : canonical[0][0]}
+        canonical = get_canonical_name(pid)
+        #We can supposed that this person didn't have a chance to get a canonical name yet
+        #because it was not fully processed by it's creator. Anyway it's safe to try to create one
+        #before failing miserably
+        if not canonical:
+            update_personID_canonical_names([pid])
+        canonical = get_canonical_name(pid)
+
+        #assert len(canonical) == 1
+        #This condition cannot hold in case claims or update daemons are run in parallel
+        #with this, as it can happen that a person with papers exists for wich a canonical name
+        #has not been computed yet. Hence, it will be indexed next time, so it learns.
+        #Each person should have at most one canonical name, so: 
+        assert len(canonical) <= 1
+
+        if len(canonical) == 1:
+            pid_data = {'canonical_id' : canonical[0][0]}
 
         if return_alt_names:
             names = run_sql("SELECT name "
