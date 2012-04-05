@@ -221,7 +221,7 @@ def test():
 <record>
     <datafield tag="542" ind1=" " ind2=" ">
         <subfield code="d">CERN</subfield>
-        <subfield code="e">ATLAS Experiment © CERN</subfield>
+        <subfield code="f">ATLAS Experiment © CERN</subfield>
     </datafield>
 </record>'''
 
@@ -523,7 +523,7 @@ def test():
     <datafield tag="542" ind1=" " ind2=" ">
         <subfield code="d">CERN</subfield>
         <subfield code="g">1984</subfield>
-        <subfield code="e">ATLAS Experiment © CERN</subfield>
+        <subfield code="f">ATLAS Experiment © CERN</subfield>
     </datafield>
 </record>'''
 
