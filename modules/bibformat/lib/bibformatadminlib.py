@@ -1207,7 +1207,7 @@ def perform_request_format_validate(ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=No
     if messages is None:
         messages = []
 
-    messages = map(lambda x: encode_for_xml(x[1]), messages)
+    messages = [encode_for_xml(message) for message in messages]
 
     return bibformat_templates.tmpl_admin_validate_format(ln, messages)
 
