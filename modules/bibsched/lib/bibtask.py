@@ -376,6 +376,9 @@ def task_init(
     if task_name not in CFG_BIBTASK_VALID_TASKS or os.path.realpath(os.path.join(CFG_BINDIR, task_name)) != os.path.realpath(sys.argv[0]):
         raise OSError("%s is not in the allowed modules" % sys.argv[0])
 
+    from invenio.errorlib import wrap_warn
+    wrap_warn()
+
     if type(argv) is dict:
         # FIXME: REMOVE AFTER MAJOR RELEASE 1.0
         # This is needed for old task submitted before CLI parameters
