@@ -22,7 +22,7 @@ $(document).ready(function() {
     $('[class^=more-]').hide();
     $('[class^=mpid]').click(function() {
         var $this = $(this);
-        var x = $this.attr("className");
+        var x = $this.prop("className");
         $('.more-' + x).toggle();
         var toggleimg = $this.find('img').attr('src');
 
