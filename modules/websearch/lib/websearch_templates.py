@@ -4429,104 +4429,164 @@ class Template:
           - 'content' *string* - The main content of the page
         """
         # load the right message language
-        _ = gettext_set_language(ln)
-
         out = ''
         if content is not None:
             out += content
 
         return out
 
-    def tmpl_citesummary_prologue(self, d_total_recs, l_colls, searchpattern, searchfield, ln=CFG_SITE_LANG):
+    def tmpl_citesummary_title(self, ln=CFG_SITE_LANG):
+        """HTML citesummary title and breadcrumbs
+
+        A part of HCS format suite."""
+        return ''
+
+    def tmpl_citesummary2_title(self, searchpattern, ln=CFG_SITE_LANG):
+        """HTML citesummary title and breadcrumbs
+
+        A part of HCS2 format suite."""
+        return ''
+
+    def tmpl_citesummary_back_link(self, searchpattern, ln=CFG_SITE_LANG):
+        """HTML back to citesummary link
+
+        A part of HCS2 format suite."""
+        _ = gettext_set_language(ln)
+        out = ''
+        params = {'ln': 'en',
+                  'p': quote(searchpattern),
+                  'of': 'hcs'}
+        msg = _('Back to citesummary')
+
+        url = CFG_SITE_URL + '/search?' + \
+                          '&'.join(['='.join(i) for i in params.iteritems()])
+        out += '<p><a href="%(url)s">%(msg)s</a></p>' % {'url': url, 'msg': msg}
+
+        return out
+
+    def tmpl_citesummary_more_links(self, searchpattern, ln=CFG_SITE_LANG):
+        _ = gettext_set_language(ln)
+        out = ''
+        msg = _('<p><a href="%(url)s">%(msg)s</a></p>')
+        params = {'ln': ln,
+                  'p': quote(searchpattern),
+                  'of': 'hcs2'}
+        url = CFG_SITE_URL + '/search?' + \
+                       '&amp;'.join(['='.join(i) for i in params.iteritems()])
+        out += msg % {'url': url,
+                      'msg': _('Exclude self-citations')}
+
+        return out
+
+    def tmpl_citesummary_prologue(self, d_recids, collections, search_patterns,
+                                  searchfield, citable_recids, total_count,
+                                  ln=CFG_SITE_LANG):
         """HTML citesummary format, prologue. A part of HCS format suite."""
         _ = gettext_set_language(ln)
         out = """<table id="citesummary">
-                  <tr><td><strong class="headline">%(msg_title)s</strong></td>""" % \
+                  <tr>
+                    <td>
+                      <strong class="headline">%(msg_title)s</strong>
+                    </td>""" % \
                {'msg_title': _("Citation summary results"), }
-        for coll, colldef in l_colls:
-            out += '<td align="right">%s</td>' % coll
+        for coll, dummy in collections:
+            out += '<td align="right">%s</td>' % _(coll)
         out += '</tr>'
         out += """<tr><td><strong>%(msg_recs)s</strong></td>""" % \
-               {'msg_recs': _("Total number of citable papers analyzed:"), }
-        for coll, colldef in l_colls:
+               {'msg_recs': _("Total number of papers analyzed:"), }
+        for coll, colldef in collections:
             link_url = CFG_SITE_URL + '/search?p='
-            if searchpattern:
-                p = searchpattern
+            if search_patterns[coll]:
+                p = search_patterns[coll]
                 if searchfield:
-                    if " " in searchpattern:
-                        p = searchfield + ':"' + searchpattern + '"'
+                    if " " in p:
+                        p = searchfield + ':"' + p + '"'
                     else:
-                        p = searchfield + ':' + searchpattern
+                        p = searchfield + ':' + p
                 link_url += quote(p)
             if colldef:
                 link_url += '%20AND%20' + quote(colldef)
-            link_url += '&amp;rm=citation';
-            link_text = self.tmpl_nice_number(d_total_recs[coll], ln)
-            out += '<td align="right"><a href="%s">%s</a></td>' % (link_url, link_text)
+            link_text = self.tmpl_nice_number(len(d_recids[coll]), ln)
+            out += '<td align="right"><a href="%s">%s</a></td>' % (link_url,
+                                                                   link_text)
         out += '</tr>'
         return out
 
-    def tmpl_citesummary_overview(self, d_total_cites, d_avg_cites, l_colls, ln=CFG_SITE_LANG):
+    def tmpl_citesummary_overview(self, collections, d_total_cites,
+                                  d_avg_cites, ln=CFG_SITE_LANG):
         """HTML citesummary format, overview. A part of HCS format suite."""
         _ = gettext_set_language(ln)
         out = """<tr><td><strong>%(msg_cites)s</strong></td>""" % \
               {'msg_cites': _("Total number of citations:"), }
-        for coll, colldef in l_colls:
-            out += '<td align="right">%s</td>' % self.tmpl_nice_number(d_total_cites[coll], ln)
+        for coll, dummy in collections:
+            total_cites = d_total_cites[coll]
+            out += '<td align="right">%s</td>' % \
+                                        self.tmpl_nice_number(total_cites, ln)
         out += '</tr>'
         out += """<tr><td><strong>%(msg_avgcit)s</strong></td>""" % \
                {'msg_avgcit': _("Average citations per paper:"), }
-        for coll, colldef in l_colls:
-            out += '<td align="right">%.1f</td>' % d_avg_cites[coll]
+        for coll, dummy in collections:
+            avg_cites = d_avg_cites[coll]
+            out += '<td align="right">%.1f</td>' % avg_cites
         out += '</tr>'
         return out
 
-    def tmpl_citesummary_minus_self_cites(self, d_total_cites, d_avg_cites, l_colls, ln=CFG_SITE_LANG):
+    def tmpl_citesummary_minus_self_cites(self, d_total_cites, d_avg_cites,
+                                          ln=CFG_SITE_LANG):
         """HTML citesummary format, overview. A part of HCS format suite."""
         _ = gettext_set_language(ln)
+        msg = _("Total number of citations excluding self-citations")
         out = """<tr><td><strong>%(msg_cites)s</strong>""" % \
-              {'msg_cites': _("Total number of citations excluding self-citations"), }
+                                                           {'msg_cites': msg, }
 
-        out += ' <small><small>[<a href="'
         # use ? help linking in the style of oai_repository_admin.py
-        out += '%s">' % (CFG_SITE_URL + '/help/citation-metrics#citesummary_self-cites')
-        out += '?</a>]</small></small></td>'
+        msg = ' <small><small>[<a href="%s%s">?</a>]</small></small></td>'
+        out += msg % (CFG_SITE_URL,
+                      '/help/citation-metrics#citesummary_self-cites')
 
-        for coll, colldef in l_colls:
-            out += '<td align="right">%s</td>' % self.tmpl_nice_number(d_total_cites[coll], ln)
+        for total_cites in d_total_cites.values():
+            out += '<td align="right">%s</td>' % \
+                                        self.tmpl_nice_number(total_cites, ln)
         out += '</tr>'
+        msg = _("Average citations per paper excluding self-citations")
         out += """<tr><td><strong>%(msg_avgcit)s</strong>""" % \
-               {'msg_avgcit': _("Average citations per paper excluding self-citations"), }
-        out += ' <small><small>[<a href="'
+                                                        {'msg_avgcit': msg, }
         # use ? help linking in the style of oai_repository_admin.py
-        out += '%s">' % (CFG_SITE_URL + '/help/citation-metrics#citesummary_self-cites')
-        out += '?</a>]</small></small></td>'
+        msg = ' <small><small>[<a href="%s%s">?</a>]</small></small></td>'
+        out += msg % (CFG_SITE_URL,
+                      '/help/citation-metrics#citesummary_self-cites')
 
-        for coll, colldef in l_colls:
-            out += '<td align="right">%.1f</td>' % d_avg_cites[coll]
+        for avg_cites in d_avg_cites.itervalues():
+            out += '<td align="right">%.1f</td>' % avg_cites
         out += '</tr>'
         return out
+
+    def tmpl_citesummary_footer(self):
+        return ''
 
     def tmpl_citesummary_breakdown_header(self, ln=CFG_SITE_LANG):
         _ = gettext_set_language(ln)
         return """<tr><td><strong>%(msg_breakdown)s</strong></td></tr>""" % \
                {'msg_breakdown': _("Breakdown of papers by citations:"), }
 
+    def tmpl_citesummary_breakdown_by_fame(self, d_cites, low, high, fame,
+                                           l_colls, searchpatterns,
+                                           searchfield, ln=CFG_SITE_LANG):
+        """HTML citesummary format, breakdown by fame.
 
-    def tmpl_citesummary_breakdown_by_fame(self, d_cites, low, high, fame, l_colls, searchpattern, searchfield, ln=CFG_SITE_LANG):
-        """HTML citesummary format, breakdown by fame. A part of HCS format suite."""
+        A part of HCS format suite."""
         _ = gettext_set_language(ln)
         out = """<tr><td>%(fame)s</td>""" % \
-              {'fame': fame, }
+              {'fame': _(fame), }
         for coll, colldef in l_colls:
             link_url = CFG_SITE_URL + '/search?p='
-            if searchpattern:
-                p = searchpattern
+            if searchpatterns.get(coll, None):
+                p = searchpatterns.get(coll, None)
                 if searchfield:
-                    if " " in searchpattern:
-                        p = searchfield + ':"' + searchpattern + '"'
+                    if " " in p:
+                        p = searchfield + ':"' + p + '"'
                     else:
-                        p = searchfield + ':' + searchpattern
+                        p = searchfield + ':' + p
                 link_url += quote(p) + '%20AND%20'
             if colldef:
                 link_url += quote(colldef) + '%20AND%20'
@@ -4535,29 +4595,33 @@ class Template:
             else:
                 link_url += quote('cited:%i->%i' % (low, high))
             link_text = self.tmpl_nice_number(d_cites[coll], ln)
-            out += '<td align="right"><a href="%s">%s</a></td>' % (link_url, link_text)
+            out += '<td align="right"><a href="%s">%s</a></td>' % (link_url,
+                                                                   link_text)
         out += '</tr>'
         return out
 
-    def tmpl_citesummary_h_index(self, d_h_factors, l_colls, ln=CFG_SITE_LANG):
+    def tmpl_citesummary_h_index(self, collections,
+                                                d_h_factors, ln=CFG_SITE_LANG):
         """HTML citesummary format, h factor output. A part of the HCS suite."""
         _ = gettext_set_language(ln)
-        out = "<tr><td></td></tr><tr><td><strong>%(msg_additional)s</strong> <small><small>[<a href=\"%(help_url)s\">?</a>]</small></small></td></tr>" % \
-              {'msg_additional': _("Additional Citation Metrics"),
+        out = "<tr><td></td></tr><tr><td><strong>%(msg_metrics)s</strong> <small><small>[<a href=\"%(help_url)s\">?</a>]</small></small></td></tr>" % \
+              {'msg_metrics': _("Citation metrics"),
                'help_url': CFG_SITE_URL + '/help/citation-metrics', }
-        out += '<tr><td>h-index <small><small>[<a href="'
+        out += '<tr><td>h-index'
         # use ? help linking in the style of oai_repository_admin.py
-        out += '%s">' % (CFG_SITE_URL + '/help/citation-metrics#citesummary_h-index')
-        out += '?</a>]</small></small></td>'
-        for coll, colldef in l_colls:
-            out += '<td align="right">%s</td>' % self.tmpl_nice_number(d_h_factors[coll], ln)
+        msg = ' <small><small>[<a href="%s%s">?</a>]</small></small></td>'
+        out += msg % (CFG_SITE_URL,
+                      '/help/citation-metrics#citesummary_h-index')
+        for coll, dummy in collections:
+            h_factors = d_h_factors[coll]
+            out += '<td align="right">%s</td>' % \
+                                          self.tmpl_nice_number(h_factors, ln)
         out += '</tr>'
         return out
 
     def tmpl_citesummary_epilogue(self, ln=CFG_SITE_LANG):
         """HTML citesummary format, epilogue. A part of HCS format suite."""
-        _ = gettext_set_language(ln)
-        out = """</table>"""
+        out = "</table>"
         return out
 
     def tmpl_unapi(self, formats, identifier=None):

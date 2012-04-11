@@ -134,3 +134,13 @@
      </dd>
     </dl>
 
+    <dl>
+     <dt>
+       <a name="citesummary_RPP">
+                 Total number of citations minus RPP:
+       </a>
+     </dt>
+     <dd>
+              This count excludes all citations to the Review of Particle Physics
+     </dd>
+    </dl>
