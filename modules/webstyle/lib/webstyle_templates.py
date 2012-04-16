@@ -322,12 +322,19 @@ template function generated it.
         else:
             inspect_templates_message = ""
 
+        sitename = CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)
+        if headertitle == sitename:
+            pageheadertitle = headertitle
+        else:
+            pageheadertitle = headertitle + ' - ' + sitename
+
+
         out = """\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="%(ln_iso_639_a)s" xml:lang="%(ln_iso_639_a)s">
 <head>
- <title>%(headertitle)s - %(sitename)s</title>
+ <title>%(pageheadertitle)s</title>
  <link rev="made" href="mailto:%(sitesupportemail)s" />
  <link rel="stylesheet" href="%(cssurl)s/img/invenio%(cssskin)s.css" type="text/css" />
  <!--[if lt IE 8]>
@@ -416,7 +423,7 @@ template function generated it.
           'langlink': '?ln=' + ln,
 
           'sitename' : CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
-          'headertitle' : cgi.escape(headertitle),
+          'pageheadertitle': cgi.escape(pageheadertitle),
 
           'sitesupportemail' : CFG_SITE_SUPPORT_EMAIL,
 
