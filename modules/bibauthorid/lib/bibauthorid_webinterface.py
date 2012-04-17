@@ -1058,7 +1058,8 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                                       if (row['bibref'] == str(rrecid) and
                                           row['pid'] == rpid)]:
                     ticket_update["bibref"] = rbibref
-                    del(ticket_update["incomplete"])
+                    if "incomplete" in ticket_update:
+                        del(ticket_update["incomplete"])
 
             for ticket_remove in [row for row in ticket
                                   if ('incomplete' in row)]:
