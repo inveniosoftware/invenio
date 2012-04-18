@@ -79,6 +79,8 @@ def Report_Number_Generation(parameters, curdir, form, user_info=None):
                   the length is automatically
                   extended. Choose 1 to never have leading
                   zeros. Default length: 3.
+
+      * initialvalue: Initial value for the counter, 0 by default
     """
     global doctype, access, act, dir, rn
     # The program must automatically generate the report number
@@ -162,8 +164,12 @@ def Report_Number_Generation(parameters, curdir, form, user_info=None):
             if oldrn != "" and not re.search("\?\?\?", oldrn):
                 rn = oldrn
                 return ""
+        # What is the initial value, if any, of the generated report number?
+        initial_value = 0
+        if parameters.has_key('initialvalue') and parameters['initialvalue'].isdigit():
+            initial_value = int(parameters['initialvalue'])-1
         # create it
-        rn = create_reference(counter_path, rn_format, nb_length)
+        rn = create_reference(counter_path, rn_format, nb_length, initial_value)
         rn = rn.replace("\n", "")
         rn = rn.replace("\r", "")
         rn = rn.replace("\015", "")
@@ -190,7 +196,7 @@ def Report_Number_Generation(parameters, curdir, form, user_info=None):
     fp.close()
     return ""
 
-def create_reference(counter_path, ref_format, nb_length=3):
+def create_reference(counter_path, ref_format, nb_length=3, initial_value=0):
     """From the counter-file for this document submission, get the next
        reference number and create the reference.
     """
@@ -219,7 +225,7 @@ def create_reference(counter_path, ref_format, nb_length=3):
         else:
             try:
                 if not fp.read():
-                    fp.write("0")
+                    fp.write(str(initial_value))
             finally:
                 fp.flush()
                 fcntl.lockf(fp, fcntl.LOCK_UN)
@@ -228,17 +234,17 @@ def create_reference(counter_path, ref_format, nb_length=3):
     fp = open(counter, "r+", 0)
     fcntl.lockf(fp, fcntl.LOCK_EX)
     try:
-        id = fp.read()
-        if id.strip() == '':
-            id = 0
+        id_value = fp.read()
+        if id_value.strip() == '':
+            id_value = initial_value
         else:
-            id = int(id)
-        id += 1
+            id_value = int(id_value)
+        id_value += 1
         fp.seek(0)
-        fp.write(str(id))
+        fp.write(str(id_value))
         ## create final value
-        reference = ("%s-%0" + str(nb_length) + "d") % (ref_format,id)
-        ## Return the report number prelude with the id concatenated on at the end
+        reference = ("%s-%0" + str(nb_length) + "d") % (ref_format,id_value)
+        ## Return the report number prelude with the id_value concatenated on at the end
         return reference
     finally:
         fp.flush()
