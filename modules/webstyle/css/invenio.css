@@ -2693,6 +2693,7 @@ div.detailedrecordbox, div.detailedrecordminipanel {
     margin:auto;
     position:relative;
     max-width: 1280px;
+    display: table;
 }
 div.detailedrecordbox img, div.detailedrecordminipanel img{
    border:none;
