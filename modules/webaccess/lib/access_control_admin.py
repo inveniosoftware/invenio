@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1222,10 +1222,14 @@ def acc_is_user_in_role(user_info, id_role):
 def acc_get_user_roles_from_user_info(user_info):
     """get all roles a user is connected to."""
 
-    roles = intbitset(run_sql("""SELECT ur.id_accROLE
-        FROM user_accROLE ur
-        WHERE ur.id_user = %s AND ur.expiration >= NOW()
-        ORDER BY ur.id_accROLE""", (user_info['uid'], )))
+    uid = user_info['uid']
+    if uid == -1:
+        roles = intbitset()
+    else:
+        roles = intbitset(run_sql("""SELECT ur.id_accROLE
+            FROM user_accROLE ur
+            WHERE ur.id_user = %s AND ur.expiration >= NOW()
+            ORDER BY ur.id_accROLE""", (uid, )))
 
     potential_implicit_roles = run_sql("""SELECT id, firerole_def_ser FROM accROLE
         WHERE firerole_def_ser IS NOT NULL""")
@@ -1272,22 +1276,25 @@ def acc_find_user_role_actions(user_info):
     """find name of all roles and actions connected to user_info."""
 
     uid = user_info['uid']
+    # Not actions for anonymous
+    if uid == -1:
+        res1 = []
+    else:
+        # Let's check if user is superadmin
+        id_superadmin = acc_get_role_id(SUPERADMINROLE)
+        if id_superadmin in acc_get_user_roles_from_user_info(user_info):
+            return [(SUPERADMINROLE, action[1]) \
+                                        for action in acc_get_all_actions()]
 
-    # Let's check if user is superadmin
-    id_superadmin = acc_get_role_id(SUPERADMINROLE)
-    if id_superadmin in acc_get_user_roles_from_user_info(user_info):
-        return [(SUPERADMINROLE, action[1]) for action in acc_get_all_actions()]
-
-    query = """SELECT DISTINCT r.name, a.name
-        FROM user_accROLE ur, accROLE_accACTION_accARGUMENT raa, accACTION a,
-        accROLE r
-        WHERE ur.id_user = %s and
-        ur.expiration >= NOW() and
-        ur.id_accROLE = raa.id_accROLE and
-        raa.id_accACTION = a.id and
-        raa.id_accROLE = r.id """
-
-    res1 = run_sql(query, (uid, ))
+        query = """SELECT DISTINCT r.name, a.name
+                   FROM user_accROLE ur, accROLE_accACTION_accARGUMENT raa,
+                   accACTION a, accROLE r
+                   WHERE ur.id_user = %s AND
+                   ur.expiration >= NOW() AND
+                   ur.id_accROLE = raa.id_accROLE AND
+                   raa.id_accACTION = a.id AND
+                   raa.id_accROLE = r.id """
+        res1 = run_sql(query, (uid, ))
 
     res2 = []
     for res in res1:
@@ -1297,7 +1304,7 @@ def acc_find_user_role_actions(user_info):
     if type(user_info) == type({}):
         query = """SELECT DISTINCT r.name, a.name, r.firerole_def_ser
             FROM accROLE_accACTION_accARGUMENT raa, accACTION a, accROLE r
-            WHERE raa.id_accACTION = a.id and
+            WHERE raa.id_accACTION = a.id AND
             raa.id_accROLE = r.id """
 
         res3 = run_sql(query)
