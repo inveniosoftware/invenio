@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -49,7 +49,7 @@ __revision__ = "$Id$"
 import os
 import sys
 from invenio.config import CFG_LOGDIR, CFG_PATH_MYSQL, CFG_DATABASE_HOST, \
-     CFG_DATABASE_USER, CFG_DATABASE_PASS, CFG_DATABASE_NAME
+     CFG_DATABASE_USER, CFG_DATABASE_PASS, CFG_DATABASE_NAME, CFG_PATH_GZIP
 from invenio.bibtask import task_init, write_message, task_set_option, \
         task_get_option, task_update_progress, task_update_status, \
         task_get_task_param
@@ -81,11 +81,12 @@ def _dump_database(dirname, filename):
         sys.exit(1)
     cmd += " --skip-opt --add-drop-table --add-locks --create-options " \
            " --quick --extended-insert --set-charset --disable-keys " \
-           " --host=%s --user=%s --password=%s %s" % \
+           " --host=%s --user=%s --password=%s %s | %s -c " % \
            (escape_shell_arg(CFG_DATABASE_HOST),
             escape_shell_arg(CFG_DATABASE_USER),
             escape_shell_arg(CFG_DATABASE_PASS),
-            escape_shell_arg(CFG_DATABASE_NAME))
+            escape_shell_arg(CFG_DATABASE_NAME),
+            CFG_PATH_GZIP)
     dummy1, dummy2, dummy3 = run_shell_command(cmd, None, dirname + os.sep + filename)
     if dummy1:
         write_message("ERROR: mysqldump exit code is %s." % repr(dummy1),
@@ -136,7 +137,7 @@ def _dbdump_run_task_core():
     output_dir = task_get_option('output', CFG_LOGDIR)
     output_num = task_get_option('number', 5)
     output_fil_prefix = CFG_DATABASE_NAME + '-dbdump-'
-    output_fil_suffix = task_get_task_param('task_starting_time').replace(' ','_') + '.sql'
+    output_fil_suffix = task_get_task_param('task_starting_time').replace(' ','_') + '.sql.gz'
     output_fil = output_fil_prefix + output_fil_suffix
     write_message("Reading parameters ended")
     # make dump:
