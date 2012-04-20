@@ -668,7 +668,7 @@ def get_request_ticket(person_id, ticket_id=None):
     return [[[(s[0][3:], s[1]) for s in d], k] for k, d in groupby(sorted(tickets, key=lambda k: k[2]), key=lambda k: k[2])]
 
 
-def insert_user_log(userinfo, personid, action, tag, value, comment='', transactionid=0, timestamp=None):
+def insert_user_log(userinfo, personid, action, tag, value, comment='', transactionid=0, timestamp=None, userid=''):
     '''
     Instert log entries in the user log table.
     For example of entres look at the table generation script.
@@ -690,26 +690,13 @@ def insert_user_log(userinfo, personid, action, tag, value, comment='', transact
     @return: the transactionid
     @rtype: longint
     '''
-#    if transactionid == 0:
-#        transactionid = max(run_sql('SELECT  MAX(transactionid) FROM `aidUSERINPUTLOG`')[0][0], -1) + 1
-
     if not timestamp:
         timestamp = run_sql('select now()')[0][0]
 
-#    run_sql('insert into aidUSERINPUTLOG (transactionid,timestamp,userinfo,personid,action,tag,value,comment) values '
-#            '(%(transactionid)s,%(timestamp)s,%(userinfo)s,%(personid)s,%(action)s,%(tag)s,%(value)s,%(comment)s)',
-#            ({'transactionid':str(transactionid),
-#              'timestamp':timestamp.timestamp,
-#              'userinfo':str(userinfo),
-#              'personid':str(personid),
-#              'action':str(action),
-#              'tag':str(tag),
-#              'value':str(value),
-#              'comment':str(comment)}))
     run_sql('insert into aidUSERINPUTLOG '
-            '(transactionid,timestamp,userinfo,personid,action,tag,value,comment) values '
+            '(transactionid,timestamp,userinfo,userid,personid,action,tag,value,comment) values '
             '(%s,%s,%s,%s,%s,%s,%s,%s)',
-            (transactionid, timestamp, userinfo, personid,
+            (transactionid, timestamp, userinfo, userid, personid,
              action, tag, value, comment))
 
     return transactionid
@@ -1029,7 +1016,7 @@ def update_cached_author_page(pageparam, page):
     run_sql("delete from aidCACHE where object_name='authorpage_cache' and object_key=%s", (str(pageparam),))
     run_sql("insert into aidCACHE values (Null,'authorpage_cache',%s,%s,now())", (str(pageparam), str(page)))
 
-def get_user_log(transactionid='', userinfo='', personID='', action='', tag='', value='', comment='', only_most_recent=False):
+def get_user_log(transactionid='', userinfo='', userid='', personID='', action='', tag='', value='', comment='', only_most_recent=False):
     '''
     Get user log table entry matching all the given parameters; all of them are optional.
     IF no parameters are given retuns the complete log table
@@ -1047,6 +1034,8 @@ def get_user_log(transactionid='', userinfo='', personID='', action='', tag='', 
         sql_query += ' and transactionid=\'' + str(transactionid) + '\''
     if userinfo:
         sql_query += ' and userinfo=\'' + str(userinfo) + '\''
+    if userid:
+        sql_query += ' and userid=\'' + str(userid) + '\''
     if personID:
         sql_query += ' and personid=\'' + str(personID) + '\''
     if action:

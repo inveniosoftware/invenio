@@ -59,8 +59,12 @@ def update_person_canonical_name(person_id, canonical_name, userinfo=''):
     @param person_id: person id
     @param canonical_name: string
     '''
+    if userinfo.count('||'):
+        uid = userinfo.split('||')[0]
+    else:
+        uid = ''
     dbapi.update_personID_canonical_names((person_id,), overwrite=True, suggested=canonical_name)
-    dbapi.insert_user_log(userinfo, person_id, 'data_update', 'CMPUI_changecanonicalname', '', 'Canonical name manually updated.')
+    dbapi.insert_user_log(userinfo, person_id, 'data_update', 'CMPUI_changecanonicalname', '', 'Canonical name manually updated.', userid=uid)
 
 def get_canonical_id_from_person_id(person_id):
     '''
@@ -737,8 +741,13 @@ def insert_log(userinfo, personid, action, tag, value, comment='', transactionid
         except (ValueError, TypeError):
             return -1
 
+    if userinfo.count('||'):
+        uid = userinfo.split('||')[0]
+    else:
+        uid = ''
+
     return dbapi.insert_user_log(userinfo, personid, action, tag,
-                       value, comment, transactionid)
+                       value, comment, transactionid, userid=uid)
 
 
 def user_can_modify_data(uid, pid):
@@ -1343,16 +1352,21 @@ def execute_action(action, pid, bibref, uid, userinfo='', comment=''):
     elif not is_valid_bibref(bibref):
         return False
 
+    if userinfo.count('||'):
+        uid = userinfo.split('||')[0]
+    else:
+        uid = ''
+
     user_level = _resolve_maximum_acces_rights(uid)[1]
 
     if action in ['confirm', 'assign']:
-        dbapi.insert_user_log(userinfo, pid, 'assign', 'CMPUI_ticketcommit', bibref, comment)
+        dbapi.insert_user_log(userinfo, pid, 'assign', 'CMPUI_ticketcommit', bibref, comment, userid=uid)
         dbapi.confirm_papers_to_person((str(pid),), [[bibref]], user_level)
     elif action in ['repeal']:
-        dbapi.insert_user_log(userinfo, pid, 'repeal', 'CMPUI_ticketcommit', bibref, comment)
-        dbapi.reject_papers_from_person(pid, [bibref], user_level)
+        dbapi.insert_user_log(userinfo, pid, 'repeal', 'CMPUI_ticketcommit', bibref, comment, userid=uid)
+        dbapi.reject_papers_from_person((str(pid),), [[bibref]], user_level)
     elif action in ['reset']:
-        dbapi.insert_user_log(userinfo, pid, 'reset', 'CMPUI_ticketcommit', bibref, comment)
+        dbapi.insert_user_log(userinfo, pid, 'reset', 'CMPUI_ticketcommit', bibref, comment, userid=uid)
         dbapi.reset_papers_flag((str(pid),), [[bibref]])
     else:
         return False

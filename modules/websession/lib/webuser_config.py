@@ -42,5 +42,6 @@ CFG_WEBUSER_USER_TABLES = (
     ("user_expJOB", "id_user"),
     ("swrCLIENTDATA", "id_user"),
     ("sbmCOOKIES", "uid"),
-    ("userEXT", "id_user")
+    ("userEXT", "id_user"),
+    ("aidUSERINPUTLOG", "userid"),
 )
