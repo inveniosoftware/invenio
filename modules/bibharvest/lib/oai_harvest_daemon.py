@@ -37,6 +37,7 @@ import calendar
 import shutil
 import tempfile
 import urlparse
+import random
 
 from invenio.config import \
      CFG_BINDIR, \
@@ -139,6 +140,7 @@ def task_run_core():
         #  | id | baseurl | metadataprefix | arguments | comment
         #  | bibconvertcfgfile | name   | lastrun | frequency
         #  | postprocess | setspecs | bibfilterprogram
+        source_id = repos[0][0]
         baseurl = str(repos[0][1])
         metadataprefix = str(repos[0][2])
         bibconvert_cfgfile = str(repos[0][5])
@@ -190,7 +192,7 @@ def task_run_core():
                                                    harvestpath=harvestpath,
                                                    setspecs=setspecs)
             if exit_code == 1 :
-                update_lastrun(repos[0][0])
+                update_lastrun(source_id)
                 harvested_files_list = file_list
             else :
                 write_message("an error occurred while harvesting from source %s:\n%s\n" % \
@@ -222,7 +224,7 @@ def task_run_core():
                                                        fro=fromdate,
                                                        setspecs=setspecs)
                 if exit_code == 1 :
-                    update_lastrun(repos[0][0])
+                    update_lastrun(source_id)
                     harvested_files_list = file_list
                 else :
                     write_message("an error occurred while harvesting from source %s:\n%s\n" % \
@@ -476,88 +478,52 @@ def task_run_core():
         if "u" in postmode:
             write_message("upload step started")
             if 'f' in postmode:
-                # upload filtered files
-                uploaded = False
-                i = 0
-                for active_file in active_files_list:
-                    task_sleep_now_if_required()
-                    i += 1
-                    if get_nb_records_in_file(active_file + ".insert.xml") > 0:
-                        task_update_progress("Uploading new records harvested from %s (%i/%i)" % \
-                                             (reponame, \
-                                              i, \
-                                              len(active_files_list)))
-                        res += call_bibupload(active_file + ".insert.xml", \
-                                              ["-i"], oai_src_id=repos[0][0])
-                        uploaded = True
-                    task_sleep_now_if_required()
-                    if get_nb_records_in_file(active_file + ".correct.xml") > 0:
-                        task_update_progress("Uploading corrections for records harvested from %s (%i/%i)" % \
-                                             (reponame, \
-                                              i, \
-                                              len(active_files_list)))
-                        res += call_bibupload(active_file + ".correct.xml", \
-                                              ["-c"], oai_src_id=repos[0][0])
-                        uploaded = True
-                    if get_nb_records_in_file(active_file + ".append.xml") > 0:
-                        task_update_progress("Uploading additions for records harvested from %s (%i/%i)" % \
-                                             (reponame, \
-                                              i, \
-                                              len(active_files_list)))
-                        res += call_bibupload(active_file + ".append.xml", \
-                                              ["-a"], oai_src_id=repos[0][0])
-                        uploaded = True
-                    if get_nb_records_in_file(active_file + ".holdingpen.xml") > 0:
-                        task_update_progress("Uploading records harvested from %s to holding pen (%i/%i)" % \
-                                             (reponame, \
-                                              i, \
-                                              len(active_files_list)))
-                        res += call_bibupload(active_file + ".holdingpen.xml", \
-                                              ["-o"], oai_src_id=repos[0][0])
-                        uploaded = True
-                if len(active_files_list) > 0:
-                    if res == 0:
-                        if uploaded:
-                            write_message("material harvested from source %s was successfully uploaded" % \
-                                          (reponame,))
-                        else:
-                            write_message("nothing to upload")
-                    else:
-                        write_message("an error occurred while uploading harvest from %s" % (reponame,))
-                        error_happened_p = 2
-                        continue
+                upload_modes = [('.insert.xml', '-i'),
+                                ('.correct.xml', '-c'),
+                                ('.append.xml', '-a'),
+                                ('.holdingpen.xml', '-o')]
             else:
-                # upload files normally
-                res = 0
-                i = 0
-                uploaded = False
-                for active_file in active_files_list:
-                    i += 1
-                    task_sleep_now_if_required()
-                    if get_nb_records_in_file(active_file) > 0:
-                        task_update_progress("Uploading records harvested from %s (%i/%i)" % \
-                                             (reponame, \
-                                              i, \
-                                              len(active_files_list)))
-                        res += call_bibupload(active_file, oai_src_id=repos[0][0])
-                        uploaded = True
-                    if res == 0:
-                        if uploaded:
-                            write_message("material harvested from source %s was successfully uploaded" % \
-                                          (reponame,))
-                        else:
-                            write_message("nothing to upload")
-                    else:
-                        write_message("an error occurred while uploading harvest from %s" % (reponame,))
-                        error_happened_p = 2
+                upload_modes = [('', '-ir')]
+
+            i = 0
+            last_upload_task_id = -1
+            # Get a random sequence ID that will allow for the tasks to be
+            # run in order, regardless if parallel task execution is activated
+            sequence_id = random.randrange(1, 4294967296)
+            for active_file in active_files_list:
+                task_sleep_now_if_required()
+                i += 1
+                task_update_progress("Uploading records harvested from %s (%i/%i)" % \
+                                    (reponame, \
+                                     i, \
+                                     len(active_files_list)))
+                for suffix, mode in upload_modes:
+                    upload_filename = active_file + suffix
+                    if get_nb_records_in_file(upload_filename) == 0:
                         continue
+                    last_upload_task_id = call_bibupload(upload_filename, \
+                                                         [mode], \
+                                                         source_id, \
+                                                         sequence_id)
+                    if not last_upload_task_id:
+                        error_happened_p = 2
+                        write_message("an error occurred while uploading %s from %s" % \
+                                      (upload_filename, reponame))
+                        break
+                else:
+                    write_message("material harvested from source %s was successfully uploaded" % \
+                                  (reponame,))
+            if len(active_files_list) > 0:
+                write_message("nothing to upload")
             write_message("upload step ended")
 
             if CFG_INSPIRE_SITE:
                 # Launch BibIndex,Webcoll update task to show uploaded content quickly
-                task_low_level_submission("bibindex", "oai", *tuple(['-w', 'reportnumber,collection', '-P', '6']))
-                task_low_level_submission("webcoll", "oai", *tuple(['-c', 'HEP', '-P', '6']))
+                task_low_level_submission("bibindex", "oaiharvest", *tuple(['-w', 'reportnumber,collection', '-P', '6', '-I', str(sequence_id)]))
+                task_low_level_submission("webcoll", "oaiharvest", *tuple(['-c', 'HEP', '-P', '6', '-I', str(sequence_id)]))
+
         write_message("post-harvest processes ended")
+
     if error_happened_p:
         if CFG_OAI_FAILED_HARVESTING_STOP_QUEUE == 0 or \
            not task_get_task_param("sleeptime") or \
@@ -1213,25 +1179,38 @@ def create_oaiharvest_log_str(task_id, oai_src_id, xml_content):
     except Exception, msg:
         print "Logging exception : %s   " % (str(msg),)
 
-def call_bibupload(marcxmlfile, mode=None, oai_src_id= -1):
-    """Call bibupload in insert mode on MARCXMLFILE."""
+def call_bibupload(marcxmlfile, mode=None, oai_src_id= -1, sequence_id=None):
+    """
+    Creates a bibupload task for the task scheduler in given mode
+    on given file. Returns the generated task id and logs the event
+    in oaiHARVESTLOGS, also adding any given oai source identifier.
+
+    @param marcxmlfile: base-marcxmlfilename to upload
+    @param mode: mode to upload in
+    @param oai_src_id: id of current source config
+    @param sequence_id: sequence-number, if relevant
+
+    @return: task_id if successful, otherwise None.
+    """
     if mode is None:
         mode = ["-r", "-i"]
     if os.path.exists(marcxmlfile):
         try:
             args = mode
-            # Add custom name 'oai' with priority 6 and file to upload to arguments
+            # Add job with priority 6 (above normal bibedit tasks) and file to upload to arguments
             #FIXME: allow per-harvest arguments
-            args.extend(["-N", "oai", "-P", "6", marcxmlfile])
+            args.extend(["-P", "6", marcxmlfile])
+            if sequence_id:
+                args.extend(['-I', str(sequence_id)])
             task_id = task_low_level_submission("bibupload", "oaiharvest", *tuple(args))
             create_oaiharvest_log(task_id, oai_src_id, marcxmlfile)
         except Exception, msg:
             write_message("An exception during submitting oaiharvest task occured : %s " % (str(msg)))
-            return 1
-        return 0
+            return None
+        return task_id
     else:
         write_message("marcxmlfile %s does not exist" % (marcxmlfile,))
-        return 1
+        return None
 
 def call_bibfilter(bibfilterprogram, marcxmlfile):
     """
