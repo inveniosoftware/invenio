@@ -164,7 +164,6 @@ function onSearchClick(event){
       changeAndSerializeHash({state: 'edit', recid: searchPattern});
       cleanUp(true, null, null, true);
       updateStatus('error', gRESULT_CODES[102]);
-      $('.headline').text('Record Editor: Record #' + searchPattern);
       updateToolbar(false);
       displayMessage(102);
     }

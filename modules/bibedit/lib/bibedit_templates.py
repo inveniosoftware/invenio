@@ -348,48 +348,58 @@ def page_style():
     style = """<style type="text/css">"""
     style += """
                 .pagefooter {
-                    position: fixed;
-                    bottom: 0px;
-                    height: 0px;
-                    margin-top: 0px;
+                    display: none;
                 }
 
-                .pagebodystripemiddle {
-                    position:relative;
-                    width: 996px;
-                    height: 860px;
+                .revisionLine {
+                    font-size:12px;
+                    color: rgb(90, 134, 196);
                 }
 
-                .headline_div {
-                    position: absolute;
-                    top:0;
-                    left:0;
-                    background: #ffffff;
-                    margin-left : 175px;
-                    width : 750px;
-                    height: 45px;
-                    text-indent: -15px;
+                .floatRight {
+                    float: right;
+                }
+
+                .floatLeft {
+                    float: left;
+                }
+
+                #Toptoolbar {
+                    overflow: auto;
                 }
 
                 #bibEditContent {
-                    position: absolute;
-                    top:0;
-                    left:0;
-                    margin-top: 55px;
                     margin-left: 175px;
-                    overflow: auto;
                     width: 750px;
-                    height: 805px;
+                }
+
+                #bibEditContentTable {
+                    overflow: auto;
+                    border-top:1px solid;
+                    border-color: #575757;
+                    margin-top: 5px;
                 }
 
                 #bibEditMenu {
                     width: 135px;
-                    position: absolute;
-                    top: 0px;
+                    float: left;
                     padding-left: 10px;
                     font-size: 0.8em;
-                    left: 0px;
                     z-index:1;
+                }
+
+                #bibEditMessage {
+                    display: none;
+                    margin: 3px 3px 3px 3px;
+                    width: 740px;
+                }
+
+                .warningMsg{
+                    padding: 10px 10px 2px 10px;
+                }
+
+                div.refextracted {
+                    line-height:25px;
                 }
 
                 #bibEditMenu .bibEditMenuSection {
@@ -412,11 +422,15 @@ def page_style():
                     overflow:hidden;
                     word-wrap: break-word;
                  }
+
                  #bibEditTable td textarea{
                     max-width: 615px;
                     min-height: 65px;
                     max-height: 600px;
+                }
 
+                .bibEditCellFieldTag:focus {
+                    outline: none;
                 }
 
                 #bibEditMenu .bibEditMenuSection table {
@@ -461,33 +475,19 @@ def page_style():
                     cursor: pointer;
                 }
 
-                .revisionLine {
-                    position: absolute;
-                    top:0;
-                    left:0;
-                    margin-left: 175px;
-                    font-size:12px;
-                    color: rgb(90, 134, 196);
+
+                 /* jQuery-UI Theming used for:
+                  * - Dialog refextract
+                  */
+
+                .dialog-box-centered {
+                    margin-top: 300px;
+                    text-align: center;
                 }
 
-                .navtrailboxbody {
-                    width: 700px;
-                }
-
-                .headline {
-                    display: none;
-                }
-
-                #topToolbarRight {
-                    position: absolute;
-                    top:0;
-                    right:0;
-                    height: 48px;
-                    padding-top: 12px;
-                }
-
-                #top_toolbar_hr {
-                    padding-top: 46px;
+                .dialog-icon {
+                    float: left;
+                    margin: 12px 7px 10px 0;
                 }
 
                 /* jQuery-UI Theming used for:
@@ -507,7 +507,7 @@ def page_style():
                     -moz-background-origin: padding;
                     -moz-background-size: auto auto;
                     background-attachment: scroll;
-                    background-position: 50% 50%;
+                    background-position: 50%% 50%%;
                     background-repeat: repeat;
                     background-color: #666666;
                     opacity: 0.5;
@@ -538,8 +538,14 @@ def page_style():
 
                 .ui-autocomplete {
                     cursor: default;
+                    width: 300px;
                 }
 
+                .ui-dialog-content {
+                    background-color: red;
+                }
+
+                /* End of jQuery UI Theming */
             """
     style += "</style>"
     return style

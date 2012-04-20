@@ -244,7 +244,12 @@ def perform_request_init(uid, ln, req, lastupdated):
     #oaiId = record_extract_oai_id(rec)
 
     body += bibedit_templates.menu()
-    body += '    <div id="bibEditContent"></div>\n'
+    body += """<div id="bibEditContent">
+               <div class="revisionLine"></div>
+               <div id="Toptoolbar"></div>
+               <div id="bibEditMessage"></div>
+               <div id="bibEditContentTable"></div>
+               </div>"""
 
     return body, errors, warnings
 

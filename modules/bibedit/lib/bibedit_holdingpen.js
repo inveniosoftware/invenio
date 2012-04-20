@@ -898,7 +898,7 @@ function addGeneralControls(){
     */
   if ($("#bibeditHoldingPenGC").length == 0){
     panel = createGeneralControlsPanel();
-    $("#bibEditContent").prepend(panel);
+    $("#bibEditContentTable").prepend(panel);
   }
 }
 
