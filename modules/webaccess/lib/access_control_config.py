@@ -589,7 +589,8 @@ DEF_ACTIONS = (
                ('claimpaper_change_own_data', 'Change data associated to his own person ID', '', 'no'),
                ('claimpaper_change_others_data', 'Change data of any person ID', '', 'no'),
                ('runbibtasklet', 'run BibTaskLet', '', 'no'),
-               ('cfgbibsched', 'configure BibSched', '', 'no')
+               ('cfgbibsched', 'configure BibSched', '', 'no'),
+               ('runinfomanager', 'run Info Space Manager', '', 'no')
               )
 
 # Default authorizations
@@ -665,6 +666,7 @@ CFG_ACC_ACTIVITIES_URLS = {
     'cfgbibsort' : (_("Configure BibSort"), "%s/admin/bibsort/bibsortadmin.py?ln=%%s" % CFG_SITE_URL),
     'runbibcirculation' : (_("Run BibCirculation"), "%s/admin/bibcirculation/bibcirculationadmin.py?ln=%%s" % CFG_SITE_URL),
     'runbatchuploader' : (_("Run Batch Uploader"), "%s/batchuploader/metadata?ln=%%s" % CFG_SITE_URL),
+    'runinfomanager' : (_("Run Info Space Manager"), "%s/info/manage?ln=%%s" % CFG_SITE_URL),
     'claimpaper_claim_others_papers' : (_("Run Person/Author Manager"), "%s/person/search?ln=%%s" % CFG_SITE_URL)
 }
 

@@ -1010,6 +1010,7 @@ def cli_cmd_create_apache_conf(conf):
             os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'tmp', 'attachfile'),
             os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'data', 'comments'),
             os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'data', 'baskets', 'comments'),
+            os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'lib', 'webdoc', 'invenio', 'info'),
             '/tmp'): # BibExport
         if xsendfile_directive_needed:
             xsendfile_directive += '        XSendFilePath %s\n' % path
