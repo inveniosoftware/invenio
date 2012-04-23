@@ -519,8 +519,11 @@ def task_run_core():
 
             if CFG_INSPIRE_SITE:
                 # Launch BibIndex,Webcoll update task to show uploaded content quickly
-                task_low_level_submission("bibindex", "oaiharvest", *tuple(['-w', 'reportnumber,collection', '-P', '6', '-I', str(sequence_id)]))
-                task_low_level_submission("webcoll", "oaiharvest", *tuple(['-c', 'HEP', '-P', '6', '-I', str(sequence_id)]))
+                bibindex_params = ['-w', 'reportnumber,collection', \
+                                   '-P', '6', \
+                                   '-I', str(sequence_id), \
+                                   '--post-process', 'bst_run_bibtask[taskname="webcoll", user="oaiharvest", P="6", c="HEP"]']
+                task_low_level_submission("bibindex", "oaiharvest", *tuple(bibindex_params))
 
         write_message("post-harvest processes ended")
 
