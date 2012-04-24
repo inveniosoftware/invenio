@@ -2172,16 +2172,15 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
     set = intbitset() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
     limit_reached = 0 # flag for knowing if the query limit has been reached
-    # deduce into which bibwordsX table we will search:
-    stemming_language = get_index_stemming_language(get_index_id_from_field("anyfield"))
-    bibwordsX = "idxWORD%02dF" % get_index_id_from_field("anyfield")
-    if f:
-        index_id = get_index_id_from_field(f)
-        if index_id:
-            bibwordsX = "idxWORD%02dF" % index_id
-            stemming_language = get_index_stemming_language(index_id)
-        else:
-            return intbitset() # word index f does not exist
+
+    # if no field is specified, search in the global index.
+    f = f or 'anyfield'
+    index_id = get_index_id_from_field(f)
+    if index_id:
+        bibwordsX = "idxWORD%02dF" % index_id
+        stemming_language = get_index_stemming_language(index_id)
+    else:
+        return intbitset() # word index f does not exist
 
     # wash 'word' argument and run query:
     if f == 'authorcount' and word.endswith('+'):
