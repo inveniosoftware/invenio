@@ -2470,12 +2470,12 @@ INSERT INTO jrnISSUE (id_jrnJOURNAL,issue_number,issue_display,date_released,dat
 INSERT INTO jrnISSUE (id_jrnJOURNAL,issue_number,issue_display,date_released) VALUES (1,'03/2009','02-03/2009','2009-01-16');
 
 -- BibAuthorID demo person assignment:
-INSERT INTO aidPERSONID VALUES (NULL,1,'uid','2','0','0');
-INSERT INTO aidPERSONID VALUES (NULL,2,'uid','1','0','0');
-INSERT INTO aidPERSONID VALUES (NULL,3,'uid','4','0','0');
-INSERT INTO aidPERSONID VALUES (NULL,4,'uid','5','0','0');
-INSERT INTO aidPERSONID VALUES (NULL,5,'uid','6','0','0');
-INSERT INTO aidPERSONID VALUES (NULL,6,'uid','7','0','0');
-INSERT INTO aidPERSONID VALUES (NULL,7,'uid','8','0','0');
+INSERT INTO aidPERSONIDDATA (personid, tag, data) VALUES (1,'uid','2');
+INSERT INTO aidPERSONIDDATA (personid, tag, data) VALUES (2,'uid','1');
+INSERT INTO aidPERSONIDDATA (personid, tag, data) VALUES (3,'uid','4');
+INSERT INTO aidPERSONIDDATA (personid, tag, data) VALUES (4,'uid','5');
+INSERT INTO aidPERSONIDDATA (personid, tag, data) VALUES (5,'uid','6');
+INSERT INTO aidPERSONIDDATA (personid, tag, data) VALUES (6,'uid','7');
+INSERT INTO aidPERSONIDDATA (personid, tag, data) VALUES (7,'uid','8');
 
 -- end of file
