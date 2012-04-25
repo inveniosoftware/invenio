@@ -29,6 +29,7 @@ import re
 import marshal
 import getopt
 from socket import gethostname
+from subprocess import Popen
 import signal
 
 from invenio.bibtask_config import \
@@ -125,7 +126,7 @@ def get_my_pid(process, args=''):
         command = "ps -o pid,args | grep '%s %s' | grep -v 'grep' | sed -n 1p" % (process, args)
     else:
         command = "ps -C %s o '%%p%%a' | grep '%s %s' | grep -v 'grep' | sed -n 1p" % (process, process, args)
-    answer = os.popen(command).read().strip()
+    answer = run_shell_command(command)[1].strip()
     if answer == '':
         answer = 0
     else:
@@ -204,6 +205,19 @@ def gc_tasks(verbose=False, statuses=None, since=None, tasks=None):
                              runtime<%%s""" % status_query, (task, date))
             write_message('Archived %s %s tasks (created before %s) with %s' \
                                             % (res, task, date, status_query))
+
+
+
+def spawn_task(command):
+    """
+    Spawn the provided command in a way that is detached from the current
+    group. In this way a signal received by bibsched is not going to be
+    automatically propagated to the spawned process.
+    """
+    def preexec():  # Don't forward signals.
+        os.setpgrp()
+
+    Popen(command, preexec_fn=preexec, shell=True)
 
 
 def bibsched_get_host(task_id):
@@ -631,9 +645,8 @@ order to let this task run. The current priority is %s. New value:" \
                               WHERE id=%s and status='WAITING'""",
                            (self.hostname, task_id)):
                     program = os.path.join(CFG_BINDIR, process)
-                    COMMAND = "%s %s > /dev/null 2> /dev/null &" \
-                                                     % (program, str(task_id))
-                    os.system(COMMAND)
+                    command = "%s %s > /dev/null 2> /dev/null &" % (program, str(task_id))
+                    spawn_task(command)
                     Log("manually running task #%d (%s)" % (task_id, process))
                 else:
                     ## Process already running (typing too quickly on the keyboard?)
@@ -1135,16 +1148,16 @@ class BibSched(object):
                         ## okay, we have a synchronous monotask to run:
                         ## (won't be interrupted by any other task that may pop in)
                         ### !!! THIS MEANS BIBUPLOADS BLOCK EVERYTHING
-                        COMMAND = "(%s %s > /dev/null 2> /dev/null %s)" \
+                        command = "(%s %s > /dev/null 2> /dev/null %s)" \
                                             % (program, str(task_id), exit_str)
                     else:
-                        COMMAND = "(%s %s > /dev/null 2> /dev/null %s) &" \
+                        command = "(%s %s > /dev/null 2> /dev/null %s) &" \
                                             % (program, str(task_id), exit_str)
                     ### Set the task to scheduled and tie it to this host
                     if self.tie_task_to_host(task_id):
                         Log("Task #%d (%s) started" % (task_id, proc))
                         ### Relief the lock for the BibTask, it is save now to do so
-                        os.system(COMMAND)
+                        spawn_task(command)
                         count = 10
                         while run_sql("""SELECT status FROM schTASK
                                          WHERE id=%s AND status='SCHEDULED'""",
