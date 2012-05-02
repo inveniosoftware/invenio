@@ -92,7 +92,13 @@ def scheduled_send_email(fromaddr,
     if user is None:
         user = fromaddr
     if other_bibtasklet_arguments is None:
-        other_bibtasklet_arguments = ()
+        other_bibtasklet_arguments = []
+    else:
+        other_bibtasklet_arguments = list(other_bibtasklet_arguments)
+    if not header is None:
+        other_bibtasklet_arguments.extend(("-a", "header=%s" % header))
+    if not footer is None:
+        other_bibtasklet_arguments.extend(("-a", "footer=%s" % footer))
     return task_low_level_submission(
         "bibtasklet", user, "-T", "bst_send_email",
         "-a", "fromaddr=%s" % fromaddr,
