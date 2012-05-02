@@ -47,7 +47,7 @@ img_DATA = add-small.png \
            aid_to_other.png \
            aid_to_other_gray.png \
            ajax-loader.gif \
-	   application_pdf.png \
+	         application_pdf.png \
            balloon_arrow_left_shadow.png \
            balloon_bottom_left_shadow.png \
            balloon_bottom_shadow.png \
@@ -70,6 +70,7 @@ img_DATA = add-small.png \
            delete.png \
            description.gif \
            diff.png \
+           document-print.png \
            dot.gif \
            down-trans.gif \
            down.gif \
@@ -253,7 +254,7 @@ img_DATA = add-small.png \
            wb-unsubscribe.png \
            white_field.gif \
            wsignout.gif \
-	   compare.png \
+	         compare.png \
            document-preview.png \
            ui-anim_basic_16x16.gif
 

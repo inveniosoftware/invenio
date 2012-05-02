@@ -476,6 +476,23 @@ def page_style():
                     cursor: pointer;
                 }
 
+                @media print {
+                    #bibEditContentTable {
+                        height: 100%;
+                    }
+
+                    img[id^='btnAddSubfield'] {
+                        display:none;
+                    }
+
+                    .pagefooter {
+                        display: none;
+                    }
+
+                    .bibEditVolatileSubfield {
+                        display:none;
+                    }
+                }
 
                  /* jQuery-UI Theming used for:
                   * - Dialog refextract

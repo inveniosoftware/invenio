@@ -1319,6 +1319,13 @@ function onPreviewClick(){
        });
 }
 
+function onPrintClick() {
+  /*
+   * Print page, makes use of special css rules @media print
+   */
+  window.print();
+}
+
 function onOpenPDFClick() {
   /*
    * Create request to retrieve PDF from record and open it in new window
