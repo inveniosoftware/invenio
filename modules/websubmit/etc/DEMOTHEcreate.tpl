@@ -13,6 +13,5 @@ START::DEFP()---<record>
 700a::REP(EOL,)::RANGE(2,1999)::MINLW(82)---<datafield tag="700" ind1=" " ind2=" "><subfield code="a"><:DEMOTHE_AU*::DEMOTHE_AU:></subfield></datafield>
 700a::REP(EOL,)::MINLW(116)---<datafield tag="700" ind1=" " ind2=" "><subfield code="a"><:DEMOTHE_SUPERV*::DEMOTHE_SUPERV:></subfield><subfield code="e">dir.</subfield></datafield>
 856f::REPL(EOL,)---<datafield tag="856" ind1="0" ind2=" "><subfield code="f"><:SuE::SuE:></subfield></datafield>
-8564u::REPL(EOL,)---<datafield tag="856" ind1="4" ind2=" "><subfield code="u">http://localhost/record/<:SN::SN:>/files/<:DEMOTHE_FILE_RENAMED::DEMOTHE_FILE_RENAMED:></subfield><subfield code="z">Access to files</subfield></datafield>
 980::DEFP()---<datafield tag="980" ind1=" " ind2=" "><subfield code="a">THESIS</subfield></datafield>
 END::DEFP()---</record>
