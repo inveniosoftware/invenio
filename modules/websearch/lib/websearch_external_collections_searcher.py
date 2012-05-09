@@ -614,6 +614,10 @@ class InvenioSearchEngine(ExternalSearchEngine):
                 search_url_params += '&d2y=' + req_args_dict['d2y'][0]
             if req_args_dict.has_key('ap'):
                 search_url_params += '&ap=' + req_args_dict['ap'][0]
+            if req_args_dict.has_key('sf'):
+                search_url_params += '&sf=' + req_args_dict['sf'][0]
+            if req_args_dict.has_key('so'):
+                search_url_params += '&so=' + req_args_dict['so'][0]
             if not '&userurl=true' in req_args:
                 search_url_params += '&of=' + self.fetch_format
             return self.search_url + search_url_params
