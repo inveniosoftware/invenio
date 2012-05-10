@@ -34,7 +34,7 @@ from invenio.bibencode_config import (
                         CFG_BIBENCODE_FFMPEG_METADATA_SET_COMMAND,
                         CFG_BIBENCODE_PBCORE_MAPPINGS
                         )
-from invenio.bibencode_utils import probe, getval, mediainfo
+from invenio.bibencode_utils import probe, getval, mediainfo, seconds_to_timecode
 
 ## Stores metadata for the process. Many different functions in BibEncode
 ## need access to video metadata regularly. Because we dont pass objects arount
