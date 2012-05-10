@@ -1902,14 +1902,19 @@ function createAddFieldInterface(initialContent, initialTemplateNo){
   $('#btnAddFieldAddSubfield_' + fieldTmpNo).bind('click', function(){
     addFieldAddSubfieldEditor(jQRowGroupID, fieldTmpNo, "", "");
   });
+
   $('#txtAddFieldTag_' + fieldTmpNo).bind('keyup', onAddFieldChange);
+  initInputHotkeys('#txtAddFieldTag_' + fieldTmpNo);
   $('#txtAddFieldInd1_' + fieldTmpNo).bind('keyup', onAddFieldChange);
+  initInputHotkeys('#txtAddFieldInd1_' + fieldTmpNo);
   $('#txtAddFieldInd2_' + fieldTmpNo).bind('keyup', onAddFieldChange);
-  $('#txtAddFieldSubfieldCode_' + fieldTmpNo + '_0').bind('keyup',
-							  onAddFieldChange);
+  initInputHotkeys('#txtAddFieldInd2_' + fieldTmpNo);
+  $('#txtAddFieldSubfieldCode_' + fieldTmpNo + '_0').bind('keyup', onAddFieldChange);
+  initInputHotkeys('#txtAddFieldSubfieldCode_' + fieldTmpNo + '_0');
   $('#txtAddFieldValue_' + fieldTmpNo + '_0').bind('keyup', function (e){
     onAddFieldValueKeyPressed(e, jQRowGroupID, fieldTmpNo, 0);
   });
+  initInputHotkeys('#txtAddFieldValue_' + fieldTmpNo + '_0');
 
   $('#selectAddFieldTemplate_' + fieldTmpNo).bind('change', function(e){
       value = $('#selectAddFieldTemplate_' + fieldTmpNo).attr("value");
