@@ -340,6 +340,7 @@ def encode_video(input_file, output_file,
         if process.poll() == 1:
             update_fnc("  An FFMPEG error has appeared, see log")
             message_fnc("An FFMPEG error has appeared encoding %s" % output_file)
+            message_fnc("Command was: %s" % ' '.join(command))
             message_fnc("Last lines of the FFmpeg log:")
             ## open the logfile again an retrieve the size
             log_file_handle2 = open(log_file_name, 'rb')
