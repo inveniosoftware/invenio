@@ -558,7 +558,8 @@ class SpiresToInvenioSyntaxConverter:
         'hep-topic' : '695__a:',
         'desy-keyword' : '695__a:',
         'dk' : '695__a:',
-
+        # doi
+        'doi': 'doi:',
         # topcite
         'topcit' : 'cited:',
         'topcite' : 'cited:',
