@@ -26,6 +26,7 @@ import cgi
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD, CFG_CERN_SITE
 from invenio.search_engine import record_public_p
+from invenio.jsonutils import wash_for_js
 from invenio.bibformat_elements.bfe_sciencewise import create_sciencewise_url, \
     get_arxiv_reportnumber
 from invenio.webjournal_utils import \
@@ -111,8 +112,8 @@ $('#bookmark_sciencewise').bookmark({sites: ['sciencewise']});
         icons: '%(siteurl)s/img/bookmarks.png',
         url: '%(url)s',
         addEmail: true,
-        title: '%(title)s',
-        description: '%(description)s'
+        title: %(title)s,
+        description: %(description)s
     });
 // ]]>
 </script>
@@ -120,8 +121,8 @@ $('#bookmark_sciencewise').bookmark({sites: ['sciencewise']});
 """ % {
         'siteurl': CFG_SITE_URL,
         'sciencewise': sciencewise_script,
-        'title': cgi.escape(title).replace("'", r"\'"),
-        'description': cgi.escape(description).replace("'", r"\'"),
+        'title': wash_for_js(cgi.escape(title)),
+        'description': wash_for_js(cgi.escape(description)),
         'sites_js': sites_js,
         'url': url,
     }
