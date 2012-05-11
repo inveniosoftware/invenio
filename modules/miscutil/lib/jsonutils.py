@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -86,3 +86,17 @@ def json_remove_comments(text):
     )
     return re.sub(pattern, replacer, text)
 
+def wash_for_js(text):
+    """
+    Escapes a string so it can be used as a JavaScript string.
+    """
+    if isinstance(text, basestring):
+        if CFG_JSON_AVAILABLE:
+            return json.dumps(text)
+        else:
+            text = text.replace("\r\n","\\r\\n")
+            text = text.replace("\n","\\n")
+            text = text.replace('"','\\"')
+            return '''"%s"''' % text
+    else:
+        return text
