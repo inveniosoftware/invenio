@@ -412,13 +412,14 @@ At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praese
 
 class DecodeToUnicodeTest(unittest.TestCase):
     """Test functions related to decode_to_unicode function."""
-
     if CHARDET_AVAILABLE:
         def test_decode_to_unicode(self):
             """textutils - decode_to_unicode."""
-            self.assertEqual(decode_to_unicode('\202\203\204\205', failover_encoding='latin1'), u'\x82\x83\x84\x85')
+            self.assertEqual(decode_to_unicode('\202\203\204\205', default_encoding='latin1'), u'\x82\x83\x84\x85')
             self.assertEqual(decode_to_unicode('àèéìòù'), u'\xe0\xe8\xe9\xec\xf2\xf9')
             self.assertEqual(decode_to_unicode('Ιθάκη'), u'\u0399\u03b8\u03ac\u03ba\u03b7')
+    else:
+        pass
 
 class Latex2UnicodeTest(unittest.TestCase):
     """Test functions related to translating LaTeX symbols to Unicode."""
@@ -432,15 +433,17 @@ class Latex2UnicodeTest(unittest.TestCase):
 
 class TranslateToAsciiTest(unittest.TestCase):
     """Test functions related to transliterating text to ascii."""
-
-    def test_text_to_ascii(self):
-        """textutils - translate_to_ascii"""
-        self.assertEqual(translate_to_ascii(["á í Ú", "H\xc3\xb6hne", "Åge Øst Vær", "normal"]), \
-                                            ["a i U", "Hohne", "Age Ost Vaer", "normal"])
-        self.assertEqual(translate_to_ascii("àèéìòù"), ["aeeiou"])
-        self.assertEqual(translate_to_ascii(None), None)
-        self.assertEqual(translate_to_ascii([]), [])
-        self.assertEqual(translate_to_ascii([None]), [None])
+    if UNIDECODE_AVAILABLE:
+        def test_text_to_ascii(self):
+            """textutils - translate_to_ascii"""
+            self.assertEqual(translate_to_ascii(["á í Ú", "H\xc3\xb6hne", "Åge Øst Vær", "normal"]), \
+                                                ["a i U", "Hohne", "Age Ost Vaer", "normal"])
+            self.assertEqual(translate_to_ascii("àèéìòù"), ["aeeiou"])
+            self.assertEqual(translate_to_ascii(None), None)
+            self.assertEqual(translate_to_ascii([]), [])
+            self.assertEqual(translate_to_ascii([None]), [None])
+    else:
+        pass
 
 class TestStripAccents(unittest.TestCase):
     """Test for handling of UTF-8 accents."""

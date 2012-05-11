@@ -437,18 +437,16 @@ def remove_line_breaks(text):
     """
     return unicode(text, 'utf-8').replace('\f', '').replace('\n', '').replace('\r', '').replace(u'\xe2\x80\xa8', '').replace(u'\xe2\x80\xa9', '').replace(u'\xc2\x85', '').encode('utf-8')
 
-def decode_to_unicode(text, failover_encoding='utf-8'):
+def decode_to_unicode(text, default_encoding='utf-8'):
     """
-    Decode input text into Unicode representation by first attempting to detect
-    the type of encoding used in the given text. This is useful when input encoding
-    is unknown.
-
+    Decode input text into Unicode representation by first using the default
+    encoding utf-8.
+    If the operation fails, it detects the type of encoding used in the given text.
     For optimal result, it is recommended that the 'chardet' module is installed.
     NOTE: Beware that this might be slow for *very* large strings.
 
     If chardet detection fails, it will try to decode the string using the basic
-    detection function guess_minimum_encoding(). Should that fail, it will decode
-    the string in the given "failover-encoding" (defaults to UTF-8).
+    detection function guess_minimum_encoding().
 
     Also, bear in mind that it is impossible to detect the correct encoding at all
     times, other then taking educated guesses. With that said, this function will
@@ -458,14 +456,18 @@ def decode_to_unicode(text, failover_encoding='utf-8'):
     @param text: the text to decode
     @type text: string
 
-    @param failover_encoding: the 'backup' character encoding to use. Optional.
-    @type failover_encoding: string
+    @param default_encoding: the character encoding to use. Optional.
+    @type default_encoding: string
 
     @return: input text as Unicode
     @rtype: string
     """
     if not text:
         return ""
+    try:
+        return text.decode(default_encoding)
+    except (UnicodeError, LookupError):
+        pass
     detected_encoding = None
     if CHARDET_AVAILABLE:
         # We can use chardet to perform detection
@@ -475,11 +477,7 @@ def decode_to_unicode(text, failover_encoding='utf-8'):
     if detected_encoding == None:
         # No chardet detection, try to make a basic guess
         dummy, detected_encoding = guess_minimum_encoding(text)
-    try:
-        return text.decode(detected_encoding)
-    except (UnicodeError, LookupError):
-        pass
-    return text.decode(failover_encoding)
+    return text.decode(detected_encoding)
 
 def translate_latex2unicode(text, kb_file="%s/bibconvert/KB/latex-to-unicode.kb" % \
                             (CFG_ETCDIR,)):
