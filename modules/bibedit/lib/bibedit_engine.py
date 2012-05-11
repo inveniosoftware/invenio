@@ -30,6 +30,7 @@ from invenio import bibrecord
 from invenio import bibformat
 
 from invenio.jsonutils import json, CFG_JSON_AVAILABLE
+from invenio.urlutils import auto_version_url
 from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL, CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL, \
     CFG_BIBEDIT_JS_CLONED_RECORD_COLOR, \
@@ -236,8 +237,8 @@ def perform_request_init(uid, ln, req, lastupdated):
                'bibedit_clipboard.js','jquery-ui.min.js']
 
     for script in scripts:
-        body += '    <script type="text/javascript" src="%s/js/%s">' \
-            '</script>\n' % (CFG_SITE_URL, script)
+        body += '    <script type="text/javascript" src="%s/%s">' \
+            '</script>\n' % (CFG_SITE_URL, auto_version_url("js/" + script))
 
     body += '<link rel="stylesheet" type="text/css" href="/img/jquery-ui.css" />'
 
