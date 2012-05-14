@@ -58,6 +58,8 @@ CFG_VALID_STATUS = ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING',
                     '% DELETED', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'STOPPED',
                     'SLEEPING', 'KILLED', 'NOW STOP', 'ERRORS REPORTED')
 
+SHIFT_RE = re.compile("([-\+]{0,1})([\d]+)([dhms])")
+
 
 class RecoverableError(StandardError):
     pass
@@ -67,7 +69,13 @@ def get_pager():
     """
     Return the first available pager.
     """
-    for pager in os.environ.get('PAGER', ''), CFG_BIBSCHED_LOG_PAGER, '/usr/bin/less', '/bin/more':
+    paths = (
+        os.environ.get('PAGER', ''),
+        CFG_BIBSCHED_LOG_PAGER,
+        '/usr/bin/less',
+        '/bin/more'
+    )
+    for pager in paths:
         if os.path.exists(pager):
             return pager
 
@@ -76,19 +84,27 @@ def get_editor():
     """
     Return the first available editor.
     """
-    for editor in os.environ.get('EDITOR', ''), CFG_BIBSCHED_EDITOR, '/usr/bin/vim', '/usr/bin/emacs', '/usr/bin/vi', '/usr/bin/nano':
+    paths = (
+        os.environ.get('EDITOR', ''),
+        CFG_BIBSCHED_EDITOR,
+        '/usr/bin/vim',
+        '/usr/bin/emacs',
+        '/usr/bin/vi',
+        '/usr/bin/nano',
+    )
+    for editor in paths:
         if os.path.exists(editor):
             return editor
 
-shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
+
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
     """Returns a date string according to the format string.
        It can handle normal date strings and shifts with respect
        to now."""
     try:
         date = time.time()
-        factors = {"d":24*3600, "h":3600, "m":60, "s":1}
-        m = shift_re.match(var)
+        factors = {"d": 24*3600, "h": 3600, "m": 60, "s": 1}
+        m = SHIFT_RE.match(var)
         if m:
             sign = m.groups()[0] == "-" and -1 or 1
             factor = factors[m.groups()[2]]
@@ -102,22 +118,25 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
     except:
         return None
 
+
 def get_my_pid(process, args=''):
     if sys.platform.startswith('freebsd'):
-        COMMAND = "ps -o pid,args | grep '%s %s' | grep -v 'grep' | sed -n 1p" % (process, args)
+        command = "ps -o pid,args | grep '%s %s' | grep -v 'grep' | sed -n 1p" % (process, args)
     else:
-        COMMAND = "ps -C %s o '%%p%%a' | grep '%s %s' | grep -v 'grep' | sed -n 1p" % (process, process, args)
-    answer = os.popen(COMMAND).read().strip()
+        command = "ps -C %s o '%%p%%a' | grep '%s %s' | grep -v 'grep' | sed -n 1p" % (process, process, args)
+    answer = os.popen(command).read().strip()
     if answer == '':
         answer = 0
     else:
         answer = answer[:answer.find(' ')]
     return int(answer)
 
+
 def get_task_pid(task_name, task_id, ignore_error=False):
     """Return the pid of task_name/task_id"""
     try:
-        pid = int(open(os.path.join(CFG_PREFIX, 'var', 'run', 'bibsched_task_%d.pid' % task_id)).read())
+        path = os.path.join(CFG_PREFIX, 'var', 'run', 'bibsched_task_%d.pid' % task_id)
+        pid = int(open(path).read())
         os.kill(pid, signal.SIGUSR2)
         return pid
     except (OSError, IOError):
@@ -126,16 +145,22 @@ def get_task_pid(task_name, task_id, ignore_error=False):
         register_exception()
         return get_my_pid(task_name, str(task_id))
 
+
 def is_task_scheduled(task_name):
     """Check if a certain task_name is due for execution (WAITING or RUNNING)"""
-    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc = %s AND (status='WAITING' OR status='RUNNING')"
+    sql = """SELECT COUNT(proc) FROM schTASK
+             WHERE proc = %s AND (status='WAITING' OR status='RUNNING')"""
     return run_sql(sql, (task_name,))[0][0] > 0
+
 
 def get_task_ids_by_descending_date(task_name, statuses=['SCHEDULED']):
     """Returns list of task ids, ordered by descending runtime."""
-    sql = "SELECT id FROM schTASK WHERE proc=%s AND (" + \
-          " OR ".join(["status = '%s'" % x for x in statuses]) + ") ORDER BY runtime DESC"
+    sql = """SELECT id FROM schTASK
+             WHERE proc=%s AND (%s)
+             ORDER BY runtime DESC""" \
+                        % " OR ".join(["status = '%s'" % x for x in statuses])
     return [x[0] for x in run_sql(sql, (task_name,))]
+
 
 def get_task_options(task_id):
     """Returns options for task_id read from the BibSched task queue table."""
@@ -144,6 +169,7 @@ def get_task_options(task_id):
         return marshal.loads(res[0][0])
     except IndexError:
         return list()
+
 
 def gc_tasks(verbose=False, statuses=None, since=None, tasks=None):
     """Garbage collect the task queue."""
@@ -164,17 +190,20 @@ def gc_tasks(verbose=False, statuses=None, since=None, tasks=None):
         if task in CFG_BIBSCHED_GC_TASKS_TO_REMOVE:
             res = run_sql("""DELETE FROM schTASK WHERE proc=%%s AND %s AND
                              runtime<%%s""" % status_query, (task, date))
-            write_message('Deleted %s %s tasks (created before %s) with %s' % (res, task, date, status_query))
+            write_message('Deleted %s %s tasks (created before %s) with %s' \
+                                            % (res, task, date, status_query))
         elif task in CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE:
             run_sql("""INSERT INTO hstTASK(id,proc,host,user,
-                    runtime,sleeptime,arguments,status,progress)
-                SELECT id,proc,host,user,
-                    runtime,sleeptime,arguments,status,progress
-                FROM schTASK WHERE proc=%%s AND %s AND
-                    runtime<%%s""" % status_query, (task, date))
+                       runtime,sleeptime,arguments,status,progress)
+                       SELECT id,proc,host,user,
+                       runtime,sleeptime,arguments,status,progress
+                       FROM schTASK WHERE proc=%%s AND %s AND
+                       runtime<%%s""" % status_query, (task, date))
             res = run_sql("""DELETE FROM schTASK WHERE proc=%%s AND %s AND
                              runtime<%%s""" % status_query, (task, date))
-            write_message('Archived %s %s tasks (created before %s) with %s' % (res, task, date, status_query))
+            write_message('Archived %s %s tasks (created before %s) with %s' \
+                                            % (res, task, date, status_query))
+
 
 def bibsched_get_host(task_id):
     """Retrieve the hostname of the task"""
@@ -182,9 +211,11 @@ def bibsched_get_host(task_id):
     if res:
         return res[0][0]
 
+
 def bibsched_set_host(task_id, host=""):
     """Update the progress of task_id."""
     return run_sql("UPDATE schTASK SET host=%s WHERE id=%s", (host, task_id))
+
 
 def bibsched_get_status(task_id):
     """Retrieve the task status."""
@@ -192,35 +223,42 @@ def bibsched_get_status(task_id):
     if res:
         return res[0][0]
 
+
 def bibsched_set_status(task_id, status, when_status_is=None):
     """Update the status of task_id."""
     if when_status_is is None:
-        return run_sql("UPDATE schTASK SET status=%s WHERE id=%s", (status, task_id))
+        return run_sql("UPDATE schTASK SET status=%s WHERE id=%s",
+                       (status, task_id))
     else:
-        return run_sql("UPDATE schTASK SET status=%s WHERE id=%s AND status=%s", (status, task_id, when_status_is))
+        return run_sql("UPDATE schTASK SET status=%s WHERE id=%s AND status=%s",
+                       (status, task_id, when_status_is))
+
 
 def bibsched_set_progress(task_id, progress):
     """Update the progress of task_id."""
     return run_sql("UPDATE schTASK SET progress=%s WHERE id=%s", (progress, task_id))
 
+
 def bibsched_set_priority(task_id, priority):
     """Update the priority of task_id."""
     return run_sql("UPDATE schTASK SET priority=%s WHERE id=%s", (priority, task_id))
 
-def bibsched_send_signal(proc, task_id, signal):
+
+def bibsched_send_signal(proc, task_id, sig):
     """Send a signal to a given task."""
     if bibsched_get_host(task_id) != gethostname():
         return False
     pid = get_task_pid(proc, task_id, True)
     if pid:
         try:
-            os.kill(pid, signal)
+            os.kill(pid, sig)
             return True
         except OSError:
             return False
     return False
 
-class Manager:
+
+class Manager(object):
     def __init__(self, old_stdout):
         import curses
         import curses.panel
@@ -235,7 +273,7 @@ class Manager:
         self.footer_waiting_item = "[R Run] [D Delete] [N Priority]"
         self.footer_running_item = "[S Sleep] [T Stop] [K Kill]"
         self.footer_stopped_item = "[I Initialise] [D Delete] [K Acknowledge]"
-        self.footer_sleeping_item   = "[W Wake Up] [T Stop] [K Kill]"
+        self.footer_sleeping_item = "[W Wake Up] [T Stop] [K Kill]"
         self.item_status = ""
         self.rows = []
         self.panel = None
@@ -252,17 +290,17 @@ class Manager:
             motd_path = os.path.join(CFG_PREFIX, "var", "run", "bibsched.motd")
             self.motd = open(motd_path).read().strip()
             if len(self.motd) > 0:
-                self.motd = "MOTD [%s] " % time.strftime("%Y-%m-%d %H:%M",time.localtime(os.path.getmtime(motd_path))) + self.motd
+                self.motd = "MOTD [%s] " % time.strftime("%Y-%m-%d %H:%M", time.localtime(os.path.getmtime(motd_path))) + self.motd
                 self.header_lines = 3
         except IOError:
             self.motd = ""
         self.selected_line = self.header_lines
         wrapper(self.start)
 
-    def handle_keys(self, chr):
-        if chr == -1:
+    def handle_keys(self, char):
+        if char == -1:
             return
-        if self.auto_mode and (chr not in (self.curses.KEY_UP,
+        if self.auto_mode and (char not in (self.curses.KEY_UP,
                                            self.curses.KEY_DOWN,
                                            self.curses.KEY_PPAGE,
                                            self.curses.KEY_NPAGE,
@@ -273,7 +311,7 @@ class Manager:
                                            ord("l"), ord("L"), ord("e"), ord("E"))):
             self.display_in_footer("in automatic mode")
             self.stdscr.refresh()
-        #elif self.move_mode and (chr not in (self.curses.KEY_UP,
+        #elif self.move_mode and (char not in (self.curses.KEY_UP,
                                              #self.curses.KEY_DOWN,
                                              #ord("m"), ord("M"), ord("q"),
                                              #ord("Q"))):
@@ -281,83 +319,87 @@ class Manager:
             #self.stdscr.refresh()
         else:
             status = self.currentrow and self.currentrow[5] or None
-            if chr == self.curses.KEY_UP:
+            if char == self.curses.KEY_UP:
                 #if self.move_mode:
                     #self.move_up()
                 #else:
-                self.selected_line = max(self.selected_line - 1, self.header_lines)
+                self.selected_line = max(self.selected_line - 1,
+                                         self.header_lines)
                 self.repaint()
-            if chr == self.curses.KEY_PPAGE:
-                self.selected_line = max(self.selected_line - 10, self.header_lines)
+            if char == self.curses.KEY_PPAGE:
+                self.selected_line = max(self.selected_line - 10,
+                                         self.header_lines)
                 self.repaint()
-            elif chr == self.curses.KEY_DOWN:
+            elif char == self.curses.KEY_DOWN:
                 #if self.move_mode:
                     #self.move_down()
                 #else:
-                self.selected_line = min(self.selected_line + 1, len(self.rows) + self.header_lines - 1)
+                self.selected_line = min(self.selected_line + 1,
+                                         len(self.rows) + self.header_lines - 1)
                 self.repaint()
-            elif chr == self.curses.KEY_NPAGE:
-                self.selected_line = min(self.selected_line + 10, len(self.rows) + self.header_lines - 1)
+            elif char == self.curses.KEY_NPAGE:
+                self.selected_line = min(self.selected_line + 10,
+                                         len(self.rows) + self.header_lines - 1)
                 self.repaint()
-            elif chr == self.curses.KEY_HOME:
+            elif char == self.curses.KEY_HOME:
                 self.first_visible_line = 0
                 self.selected_line = self.header_lines
-            elif chr == ord("g"):
+            elif char == ord("g"):
                 self.selected_line = self.header_lines
                 self.repaint()
-            elif chr == ord("G"):
+            elif char == ord("G"):
                 self.selected_line = len(self.rows) + self.header_lines - 1
                 self.repaint()
-            elif chr in (ord("a"), ord("A")):
+            elif char in (ord("a"), ord("A")):
                 self.change_auto_mode()
-            elif chr == ord("l"):
+            elif char == ord("l"):
                 self.openlog()
-            elif chr == ord("L"):
+            elif char == ord("L"):
                 self.openlog(err=True)
-            elif chr in (ord("w"), ord("W")):
+            elif char in (ord("w"), ord("W")):
                 self.wakeup()
-            elif chr in (ord("n"), ord("N")):
+            elif char in (ord("n"), ord("N")):
                 self.change_priority()
-            elif chr in (ord("r"), ord("R")):
+            elif char in (ord("r"), ord("R")):
                 if status in ('WAITING', 'SCHEDULED'):
                     self.run()
-            elif chr in (ord("s"), ord("S")):
+            elif char in (ord("s"), ord("S")):
                 self.sleep()
-            elif chr in (ord("k"), ord("K")):
+            elif char in (ord("k"), ord("K")):
                 if status in ('ERROR', 'DONE WITH ERRORS', 'ERRORS REPORTED'):
                     self.acknowledge()
                 elif status is not None:
                     self.kill()
-            elif chr in (ord("t"), ord("T")):
+            elif char in (ord("t"), ord("T")):
                 self.stop()
-            elif chr in (ord("d"), ord("D")):
+            elif char in (ord("d"), ord("D")):
                 self.delete()
-            elif chr in (ord("i"), ord("I")):
+            elif char in (ord("i"), ord("I")):
                 self.init()
-            #elif chr in (ord("m"), ord("M")):
+            #elif char in (ord("m"), ord("M")):
                 #self.change_select_mode()
-            elif chr in (ord("p"), ord("P")):
+            elif char in (ord("p"), ord("P")):
                 self.purge_done()
-            elif chr in (ord("o"), ord("O")):
+            elif char in (ord("o"), ord("O")):
                 self.display_task_options()
-            elif chr in (ord("e"), ord("E")):
+            elif char in (ord("e"), ord("E")):
                 self.edit_motd()
-            elif chr == ord("1"):
+            elif char == ord("1"):
                 self.display = 1
                 self.first_visible_line = 0
                 self.selected_line = self.header_lines
                 self.display_in_footer("only done processes are displayed")
-            elif chr == ord("2"):
+            elif char == ord("2"):
                 self.display = 2
                 self.first_visible_line = 0
                 self.selected_line = self.header_lines
                 self.display_in_footer("only not done processes are displayed")
-            elif chr == ord("3"):
+            elif char == ord("3"):
                 self.display = 3
                 self.first_visible_line = 0
                 self.selected_line = self.header_lines
                 self.display_in_footer("only archived processes are displayed")
-            elif chr in (ord("q"), ord("Q")):
+            elif char in (ord("q"), ord("Q")):
                 if self.curses.panel.top_panel() == self.panel:
                     self.panel.bottom()
                     self.curses.panel.update_panels()
@@ -367,7 +409,6 @@ class Manager:
 
     def openlog(self, err=False):
         task_id = self.currentrow[0]
-        status = self.currentrow[5]
         if err:
             logname = os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % task_id)
         else:
@@ -399,7 +440,7 @@ class Manager:
             except IOError:
                 self.motd = ""
             if len(self.motd) > 0:
-                self.motd = "MOTD [%s] " % time.strftime("%m-%d-%Y %H:%M",time.localtime(os.path.getmtime(motdpath))) + self.motd
+                self.motd = "MOTD [%s] " % time.strftime("%m-%d-%Y %H:%M", time.localtime(os.path.getmtime(motdpath))) + self.motd
             if previous[24:] != self.motd[24:]:
                 if len(previous) == 0:
                     Log('motd set to "%s"' % self.motd.replace("\n", "|"))
@@ -416,7 +457,7 @@ class Manager:
 
     def display_task_options(self):
         """Nicely display information about current process."""
-        msg =  '        id: %i\n\n' % self.currentrow[0]
+        msg = '        id: %i\n\n' % self.currentrow[0]
         pid = get_task_pid(self.currentrow[1], self.currentrow[0], True)
         if pid is not None:
             msg += '       pid: %s\n\n' % pid
@@ -461,7 +502,8 @@ class Manager:
 
     def count_processes(self, status):
         out = 0
-        res = run_sql("SELECT COUNT(id) FROM schTASK WHERE status=%s GROUP BY status", (status,))
+        res = run_sql("""SELECT COUNT(id) FROM schTASK
+                         WHERE status=%s GROUP BY status""", (status,))
         try:
             out = res[0][0]
         except:
@@ -471,7 +513,12 @@ class Manager:
     def change_priority(self):
         task_id = self.currentrow[0]
         priority = self.currentrow[8]
-        new_priority = self._display_ask_number_box("Insert the desired priority for task %s. The smaller the number the less the priority. Note that a number less than -10 will mean to always postpone the task while a number bigger than 10 will mean some tasks with less priority could be stopped in order to let this task run. The current priority is %s. New value:" % (task_id, priority))
+        new_priority = self._display_ask_number_box("Insert the desired \
+priority for task %s. The smaller the number the less the priority. Note that \
+a number less than -10 will mean to always postpone the task while a number \
+bigger than 10 will mean some tasks with less priority could be stopped in \
+order to let this task run. The current priority is %s. New value:" \
+                                                        % (task_id, priority))
         try:
             new_priority = int(new_priority)
         except ValueError:
@@ -505,7 +552,7 @@ class Manager:
             (self.height - height) / 2 + 1,
             (self.width - width) / 2 + 1
             )
-        self.panel = self.curses.panel.new_panel( self.win )
+        self.panel = self.curses.panel.new_panel(self.win)
         self.panel.top()
         self.win.border()
         i = 1
@@ -534,7 +581,7 @@ class Manager:
             (self.height - height) / 2 + 1,
             (self.width - width) / 2 + 1
             )
-        self.panel = self.curses.panel.new_panel( self.win )
+        self.panel = self.curses.panel.new_panel(self.win)
         self.panel.top()
         self.win.border()
         i = 1
@@ -559,7 +606,7 @@ class Manager:
             (self.height - height) / 2 + 1,
             (self.width - width) / 2 + 1
             )
-        self.panel = self.curses.panel.new_panel( self.win )
+        self.panel = self.curses.panel.new_panel(self.win)
         self.panel.top()
         self.win.border()
         i = 1
@@ -573,13 +620,14 @@ class Manager:
 
     def purge_done(self):
         """Garbage collector."""
-        if self._display_YN_box("You are going to purge the list of DONE tasks.\n\n"
+        if self._display_YN_box(
+            "You are going to purge the list of DONE tasks.\n\n"
             "%s tasks, submitted since %s days, will be archived.\n\n"
             "%s tasks, submitted since %s days, will be deleted.\n\n"
             "Are you sure?" % (
-                ','.join(CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE),
+                ', '.join(CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE),
                 CFG_BIBSCHED_GC_TASKS_OLDER_THAN,
-                ','.join(CFG_BIBSCHED_GC_TASKS_TO_REMOVE),
+                ', '.join(CFG_BIBSCHED_GC_TASKS_TO_REMOVE),
                 CFG_BIBSCHED_GC_TASKS_OLDER_THAN)):
             gc_tasks()
             self.display_in_footer("DONE processes purged")
@@ -592,9 +640,12 @@ class Manager:
             #self.display_in_footer("a process is already running!")
         if status == "WAITING":
             if process in self.helper_modules:
-                if run_sql("UPDATE schTASK SET status='SCHEDULED', host=%s WHERE id=%s and status='WAITING'", (self.hostname, task_id)):
+                if run_sql("""UPDATE schTASK SET status='SCHEDULED', host=%s
+                              WHERE id=%s and status='WAITING'""",
+                           (self.hostname, task_id)):
                     program = os.path.join(CFG_BINDIR, process)
-                    COMMAND = "%s %s > /dev/null 2> /dev/null &" % (program, str(task_id))
+                    COMMAND = "%s %s > /dev/null 2> /dev/null &" \
+                                                     % (program, str(task_id))
                     os.system(COMMAND)
                     Log("manually running task #%d (%s)" % (task_id, process))
                 else:
@@ -614,7 +665,6 @@ class Manager:
 
     def sleep(self):
         task_id = self.currentrow[0]
-        process = self.currentrow[1].split(':')[0]
         status = self.currentrow[5]
         if status in ('RUNNING', 'CONTINUING'):
             bibsched_set_status(task_id, 'ABOUT TO SLEEP', status)
@@ -696,7 +746,7 @@ class Manager:
 
             self.auto_mode = 0
         else:
-            program = os.path.join( CFG_BINDIR, "bibsched")
+            program = os.path.join(CFG_BINDIR, "bibsched")
             COMMAND = "%s -q start" % program
             os.system(COMMAND)
 
@@ -743,7 +793,7 @@ class Manager:
             attr = self.curses.color_pair(4) + self.curses.A_BOLD
         elif row[5] == "WAITING":
             attr = self.curses.color_pair(3) + self.curses.A_BOLD
-        elif row[5] in ("RUNNING","CONTINUING") :
+        elif row[5] in ("RUNNING", "CONTINUING"):
             attr = self.curses.color_pair(2) + self.curses.A_BOLD
         elif not header and row[8]:
             attr = self.curses.A_BOLD
@@ -762,7 +812,7 @@ class Manager:
         if self.y == self.selected_line - self.first_visible_line and self.y > 1:
             self.current_attr = attr
             attr += self.curses.A_REVERSE
-        if header: # Dirty hack. put_line should be better refactored.
+        if header:  # Dirty hack. put_line should be better refactored.
             # row contains one less element: arguments
             ## !!! FIXME: THIS IS CRAP
             myline = str(row[0]).ljust(col_w[0]-1)
@@ -792,9 +842,9 @@ class Manager:
             self.stdscr.addnstr(self.y, 0, myline, maxx, attr)
         except self.curses.error:
             pass
-        self.y = self.y+1
+        self.y += 1
 
-    def display_in_footer(self, footer, i = 0, print_time_p=0):
+    def display_in_footer(self, footer, i=0, print_time_p=0):
         if print_time_p:
             footer = "%s %s" % (footer, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         maxx = self.stdscr.getmaxyx()[1]
@@ -806,7 +856,7 @@ class Manager:
         else:
             colorpair = 1
         try:
-            self.stdscr.addnstr(self.y - i, 0, footer, maxx - 1, self.curses.A_STANDOUT + self.curses.color_pair(colorpair) + self.curses.A_BOLD )
+            self.stdscr.addnstr(self.y - i, 0, footer, maxx - 1, self.curses.A_STANDOUT + self.curses.color_pair(colorpair) + self.curses.A_BOLD)
         except self.curses.error:
             pass
 
@@ -823,9 +873,9 @@ class Manager:
         maxy = self.height - 2
         #maxx = self.width
         if len(self.motd) > 0:
-            self.put_line((self.motd.strip().replace("\n"," - ")[:79], "", "", "", "", "", "", "", ""), header=False, motd=True)
+            self.put_line((self.motd.strip().replace("\n", " - ")[:79], "", "", "", "", "", "", "", ""), header=False, motd=True)
         self.put_line(("ID", "PROC [PRI]", "USER", "RUNTIME", "SLEEP", "STATUS", "HOST", "PROGRESS"), header=True)
-        self.put_line(("","","","","","","", ""), header=True)
+        self.put_line(("", "", "", "", "", "", "", ""), header=True)
         if self.selected_line > maxy + self.first_visible_line - 1:
             self.first_visible_line = self.selected_line - maxy + 1
         if self.selected_line < self.first_visible_line + 2:
@@ -864,7 +914,7 @@ class Manager:
             self.curses.init_pair(6, self.curses.COLOR_CYAN, self.curses.COLOR_BLACK)
             self.curses.init_pair(7, self.curses.COLOR_YELLOW, self.curses.COLOR_BLACK)
         self.stdscr = stdscr
-        self.base_panel = self.curses.panel.new_panel( self.stdscr )
+        self.base_panel = self.curses.panel.new_panel(self.stdscr)
         self.base_panel.bottom()
         self.curses.panel.update_panels()
         self.height, self.width = stdscr.getmaxyx()
@@ -888,20 +938,25 @@ class Manager:
                     table = "hstTASK"
                     order = "runtime DESC"
                     where = ''
-                self.rows = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress,arguments,priority,host,sequenceid FROM %s WHERE status NOT LIKE '%%_DELETED' %s ORDER BY %s""" % (table, where, order))
+                sql = """SELECT id, proc, user, runtime, sleeptime, status,
+                         progress, arguments, priority, host, sequenceid
+                         FROM %s
+                         WHERE status NOT LIKE '%%_DELETED' %s
+                         ORDER BY %s""" % (table, where, order)
+                self.rows = run_sql(sql)
                 ring = 0
                 self.repaint()
             ring += 1
             char = -1
             try:
                 char = timed_out(self.stdscr.getch, 1)
-                if char == 27: # escaping sequence
+                if char == 27:  # escaping sequence
                     char = self.stdscr.getch()
-                    if char == 79: # arrow
+                    if char == 79:  # arrow
                         char = self.stdscr.getch()
-                        if char == 65: #arrow up
+                        if char == 65:  # arrow up
                             char = self.curses.KEY_UP
-                        elif char == 66: #arrow down
+                        elif char == 66:  # arrow down
                             char = self.curses.KEY_DOWN
                         elif char == 72:
                             char = self.curses.KEY_PPAGE
@@ -917,7 +972,8 @@ class Manager:
                 char = -1
             self.handle_keys(char)
 
-class BibSched:
+
+class BibSched(object):
     def __init__(self):
         self.hostname = gethostname()
         self.helper_modules = CFG_BIBTASK_VALID_TASKS
@@ -936,11 +992,15 @@ class BibSched:
         @return: True if the scheduling was successful, False otherwise,
             e.g. if the task was scheduled concurrently on a different host.
         """
-        if not run_sql("SELECT id FROM schTASK WHERE id=%s AND host='' AND status='WAITING'", (task_id, )):
+        if not run_sql("""SELECT id FROM schTASK WHERE id=%s AND host=''
+                          AND status='WAITING'""", (task_id, )):
             ## The task was already tied?
             return False
-        run_sql("UPDATE schTASK SET host=%s, status='SCHEDULED' WHERE id=%s AND host='' AND status='WAITING'", (self.hostname, task_id))
-        return bool(run_sql("SELECT id FROM schTASK WHERE id=%s AND host=%s", (task_id, self.hostname, )))
+        run_sql("""UPDATE schTASK SET host=%s, status='SCHEDULED'
+                   WHERE id=%s AND host='' AND status='WAITING'""",
+                (self.hostname, task_id))
+        return bool(run_sql("SELECT id FROM schTASK WHERE id=%s AND host=%s",
+                            (task_id, self.hostname)))
 
     def filter_for_allowed_tasks(self):
         """ Removes all tasks that are not allowed in this Invenio instance
@@ -949,20 +1009,20 @@ class BibSched:
         n_active = []
         if "bibupload" not in self.allowed_task_types:
             self.node_relevant_bibupload_tasks = ()
-        for id, proc, runtime, status, priority, host, sequenceid in self.node_relevant_waiting_tasks:
+        for task_id, proc, runtime, status, priority, host, sequenceid in self.node_relevant_waiting_tasks:
             procname = proc.split(':')[0]
             if procname in self.allowed_task_types:
-                n_waiting.append((id, proc, runtime, status, priority, host, sequenceid))
-        for id, proc, runtime, status, priority, host, sequenceid in self.node_relevant_active_tasks:
+                n_waiting.append((task_id, proc, runtime, status, priority, host, sequenceid))
+        for task_id, proc, runtime, status, priority, host, sequenceid in self.node_relevant_active_tasks:
             procname = proc.split(':')[0]
             if procname in self.allowed_task_types:
-                n_active.append((id, proc, runtime, status, priority, host, sequenceid))
+                n_active.append((task_id, proc, runtime, status, priority, host, sequenceid))
         self.node_relevant_active_tasks = tuple(n_active)
         self.node_relevant_waiting_tasks = tuple(n_waiting)
 
     def is_task_safe_to_execute(self, proc1, proc2):
         """Return True when the two tasks can run concurrently."""
-        return proc1 != proc2 # and not proc1.startswith('bibupload') and not proc2.startswith('bibupload')
+        return proc1 != proc2  # and not proc1.startswith('bibupload') and not proc2.startswith('bibupload')
 
     def get_tasks_to_sleep_and_stop(self, proc, task_set):
         """Among the task_set, return the list of tasks to stop and the list
@@ -1004,8 +1064,8 @@ class BibSched:
         lower = []
         ### !!! We allready have this in node_relevant_active_tasks
         for other_task_id, task_proc, runtime, status, task_priority, task_host, sequenceid in self.node_relevant_active_tasks:
-#        for other_task_id, task_proc, runtime, status, task_priority, task_host in self.node_relevant_active_tasks:
-#        for other_task_id, task_proc, task_priority, status in self.get_running_tasks():
+        # for other_task_id, task_proc, runtime, status, task_priority, task_host in self.node_relevant_active_tasks:
+        # for other_task_id, task_proc, task_priority, status in self.get_running_tasks():
             if task_id == other_task_id:
                 continue
             if task_priority < priority and task_host == self.hostname:
@@ -1041,9 +1101,15 @@ class BibSched:
                     return False
 
             if sequenceid:
-                max_priority = run_sql("SELECT MAX(priority) FROM schTASK WHERE status='WAITING' AND sequenceid=%s", (sequenceid, ))[0][0]
-                if run_sql("UPDATE schTASK SET priority=%s WHERE status='WAITING' AND sequenceid=%s", (max_priority, sequenceid)):
-                    Log("Raised all waiting tasks with sequenceid %s to the max priority %s" % (sequenceid, max_priority))
+                max_priority = run_sql("""SELECT MAX(priority) FROM schTASK
+                                          WHERE status='WAITING'
+                                          AND sequenceid=%s""",
+                                       (sequenceid, ))[0][0]
+                if run_sql("""UPDATE schTASK SET priority=%s
+                              WHERE status='WAITING' AND sequenceid=%s""",
+                           (max_priority, sequenceid)):
+                    Log("Raised all waiting tasks with sequenceid " \
+                        "%s to the max priority %s" % (sequenceid, max_priority))
                     ## Some priorities where raised
                     return False
 
@@ -1095,25 +1161,30 @@ class BibSched:
                     if proc in CFG_BIBTASK_MONOTASKS:
                         ## okay, we have a synchronous monotask to run:
                         ## (won't be interrupted by any other task that may pop in)
-                        COMMAND = "(%s %s > /dev/null 2> /dev/null %s)" % (program, str(task_id), exit_str) ### !!! THIS MEANS BIBUPLOADS BLOCK EVERYTHING
+                        ### !!! THIS MEANS BIBUPLOADS BLOCK EVERYTHING
+                        COMMAND = "(%s %s > /dev/null 2> /dev/null %s)" \
+                                            % (program, str(task_id), exit_str)
                     else:
-                        COMMAND = "(%s %s > /dev/null 2> /dev/null %s) &" % (program, str(task_id), exit_str)
+                        COMMAND = "(%s %s > /dev/null 2> /dev/null %s) &" \
+                                            % (program, str(task_id), exit_str)
                     ### Set the task to scheduled and tie it to this host
                     if self.tie_task_to_host(task_id):
                         Log("Task #%d (%s) started" % (task_id, proc))
                         ### Relief the lock for the BibTask, it is save now to do so
                         os.system(COMMAND)
                         count = 10
-                        while run_sql("SELECT status FROM schTASK WHERE id=%s AND status='SCHEDULED'", (task_id, )):
+                        while run_sql("""SELECT status FROM schTASK
+                                         WHERE id=%s AND status='SCHEDULED'""",
+                                      (task_id, )):
                             ## Polling to wait for the task to really start,
                             ## in order to avoid race conditions.
                             if count <= 0:
-                                raise StandardError, "Process %s (task_id: %s) was launched but seems not to be able to reach RUNNING status." % (proc, task_id)
+                                raise StandardError("Process %s (task_id: %s) was launched but seems not to be able to reach RUNNING status." % (proc, task_id))
                             time.sleep(CFG_BIBSCHED_REFRESHTIME)
                             count -= 1
                     return True
                 else:
-                    raise StandardError, "%s is not in the allowed modules" % procname
+                    raise StandardError("%s is not in the allowed modules" % procname)
             else:
                 ## It's not still safe to run the task.
                 ## We first need to stop task that should be stopped
@@ -1132,10 +1203,10 @@ class BibSched:
             sql = "SELECT count(id) FROM schTASK WHERE status='ERROR'" \
                   " OR status='DONE WITH ERRORS' OR STATUS='CERROR'"
             if run_sql(sql)[0][0] > 0:
-                errors = run_sql("SELECT id,proc,status FROM schTASK" \
-                          " WHERE status='ERROR' " \
-                          "OR status='DONE WITH ERRORS'" \
-                          "OR status='CERROR'")
+                errors = run_sql("""SELECT id,proc,status FROM schTASK
+                                    WHERE status = 'ERROR'
+                                    OR status = 'DONE WITH ERRORS'
+                                    OR status = 'CERROR'""")
                 msg_errors = ["    #%s %s -> %s" % row for row in errors]
                 msg = 'BibTask with ERRORS:\n%s' % "\n".join(msg_errors)
                 err_types = set(e[2] for e in errors if e[2])
@@ -1150,16 +1221,32 @@ class BibSched:
                 check_errors()
             except RecoverableError, msg:
                 register_emergency('Light emergency from %s: BibTask failed: %s' % (CFG_SITE_URL, msg))
-                run_sql("UPDATE schTASK set status='ERRORS REPORTED' where status='CERROR'")
+                run_sql("UPDATE schTASK SET status='ERRORS REPORTED' WHERE status='CERROR'")
 
             max_bibupload_priority = run_sql("SELECT max(priority) FROM schTASK WHERE status='WAITING' AND proc='bibupload' AND runtime<=NOW()")
             if max_bibupload_priority:
-                run_sql("UPDATE schTASK SET priority=%s WHERE status='WAITING' AND proc='bibupload' AND runtime<=NOW()", ( max_bibupload_priority[0][0], ))
+                run_sql(
+                """UPDATE schTASK SET priority=%s
+                   WHERE status='WAITING' AND proc='bibupload'
+                   AND runtime<=NOW()""", (max_bibupload_priority[0][0], ))
             ## The bibupload tasks are sorted by id, which means by the order they were scheduled
-            self.node_relevant_bibupload_tasks = run_sql("SELECT id,proc,runtime,status,priority,host,sequenceid FROM schTASK WHERE status='WAITING' AND proc='bibupload' AND runtime<=NOW() ORDER BY id ASC LIMIT 1", n=1)
+            self.node_relevant_bibupload_tasks = run_sql(
+                """SELECT id, proc, runtime, status, priority, host, sequenceid
+                   FROM schTASK WHERE status = 'WAITING'
+                   AND proc = 'bibupload'
+                   AND runtime <= NOW()
+                   ORDER BY id ASC LIMIT 1""", n=1)
             ## The other tasks are sorted by priority
-            self.node_relevant_waiting_tasks = run_sql("SELECT id,proc,runtime,status,priority,host,sequenceid FROM schTASK WHERE (status='WAITING' AND runtime<=NOW()) OR status='SLEEPING' ORDER BY priority DESC, runtime ASC, id ASC")
-            self.node_relevant_active_tasks = run_sql("SELECT id,proc,runtime,status,priority,host,sequenceid FROM schTASK WHERE status IN ('RUNNING','CONTINUING','SCHEDULED','ABOUT TO STOP','ABOUT TO SLEEP')")
+            self.node_relevant_waiting_tasks = run_sql(
+                """SELECT id, proc, runtime, status, priority, host, sequenceid
+                   FROM schTASK WHERE (status='WAITING' AND runtime <= NOW())
+                   OR status = 'SLEEPING'
+                   ORDER BY priority DESC, runtime ASC, id ASC""")
+            self.node_relevant_active_tasks = run_sql(
+                """SELECT id, proc, runtime, status, priority, host,sequenceid
+                   FROM schTASK WHERE status IN ('RUNNING', 'CONTINUING',
+                                                 'SCHEDULED', 'ABOUT TO STOP',
+                                                 'ABOUT TO SLEEP')""")
             self.active_tasks_all_nodes = tuple(self.node_relevant_active_tasks)
             ## Remove tasks that can not be executed on this host
             self.filter_for_allowed_tasks()
@@ -1198,12 +1285,15 @@ class BibSched:
                 pass
             raise
 
+
 class TimedOutExc(Exception):
-    def __init__(self, value = "Timed Out"):
+    def __init__(self, value="Timed Out"):
         Exception.__init__(self)
         self.value = value
+
     def __str__(self):
         return repr(self.value)
+
 
 def timed_out(f, timeout, *args, **kwargs):
     def handler(signum, frame):
@@ -1220,11 +1310,12 @@ def timed_out(f, timeout, *args, **kwargs):
 
 
 def Log(message):
-    log = open(CFG_LOGDIR + "/bibsched.log","a")
+    log = open(CFG_LOGDIR + "/bibsched.log", "a")
     log.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
     log.write(message)
     log.write("\n")
     log.close()
+
 
 def redirect_stdout_and_stderr():
     "This function redirects stdout and stderr to bibsched.log and bibsched.err file."
@@ -1232,6 +1323,7 @@ def redirect_stdout_and_stderr():
     sys.stdout = open(CFG_LOGDIR + "/bibsched.log", "a")
     sys.stderr = open(CFG_LOGDIR + "/bibsched.err", "a")
     return old_stdout
+
 
 def usage(exitcode=1, msg=""):
     """Prints usage info."""
@@ -1276,12 +1368,15 @@ Purge options:
 
 pidfile = os.path.join(CFG_PREFIX, 'var', 'run', 'bibsched.pid')
 
+
 def error(msg):
-    print >> sys.stderr, "error: " + msg
+    print >> sys.stderr, "error: %s" % msg
     sys.exit(1)
 
+
 def warning(msg):
-    print >> sys.stderr, "warning: " + msg
+    print >> sys.stderr, "warning: %s" % msg
+
 
 def server_pid(ping_the_process=True, check_is_really_bibsched=True):
     # The pid must be stored on the filesystem
@@ -1300,13 +1395,15 @@ def server_pid(ping_the_process=True, check_is_really_bibsched=True):
             return None
 
     if check_is_really_bibsched:
-        output = run_shell_command("ps p %s -o args=", (str(pid),))[1]
+        output = run_shell_command("ps p %s -o args=", (str(pid), ))[1]
         if not 'bibsched' in output:
             warning("pidfile %s found referring to pid %s which does not correspond to bibsched: cmdline is %s" % (pidfile, pid, output))
             return None
+
     return pid
 
-def start(verbose = True):
+
+def start(verbose=True):
     """ Fork this process in the background and start processing
     requests. The process PID is stored in a pid file, so that it can
     be stopped later on."""
@@ -1355,7 +1452,6 @@ def start(verbose = True):
         except OSError:
             pass
 
-    return
 
 def halt(verbose=True, soft=False):
     pid = server_pid()
@@ -1376,12 +1472,12 @@ def halt(verbose=True, soft=False):
     if verbose:
         print "stopping bibsched: pid %d" % pid
     os.unlink(pidfile)
-    return
 
-def monitor(verbose = True):
+
+def monitor(verbose=True):
     old_stdout = redirect_stdout_and_stderr()
-    manager = Manager(old_stdout)
-    return
+    Manager(old_stdout)
+
 
 def write_message(msg, stream=None, verbose=1):
     """Write message and flush output stream (may be sys.stdout or sys.stderr).
@@ -1399,6 +1495,7 @@ def write_message(msg, stream=None, verbose=1):
             stream.flush()
         else:
             sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
+
 
 def report_queue_status(verbose=True, status=None, since=None, tasks=None):
     """
@@ -1423,7 +1520,8 @@ def report_queue_status(verbose=True, status=None, since=None, tasks=None):
             since = '-' + since
             since_query = "AND runtime >= '%s'" % get_datetime(since)
 
-        res = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress,priority
+        res = run_sql("""SELECT id, proc, user, runtime, sleeptime,
+                                status, progress, priority
                         FROM schTASK WHERE status=%%s %(task_query)s
                         %(since_query)s ORDER BY id ASC""" % {
                             'task_query' : task_query,
@@ -1434,9 +1532,11 @@ def report_queue_status(verbose=True, status=None, since=None, tasks=None):
         write_message("%s processes: %d" % (status, len(res)))
         for (proc_id, proc_proc, proc_user, proc_runtime, proc_sleeptime,
              proc_status, proc_progress, proc_priority) in res:
-            write_message(' * ID="%s" PRIORITY="%s" PROC="%s" USER="%s" RUNTIME="%s" SLEEPTIME="%s" STATUS="%s" PROGRESS="%s"' % \
-                          (proc_id, proc_priority, proc_proc, proc_user, proc_runtime,
-                           proc_sleeptime, proc_status, proc_progress))
+            write_message(' * ID="%s" PRIORITY="%s" PROC="%s" USER="%s" ' \
+                          'RUNTIME="%s" SLEEPTIME="%s" STATUS="%s" ' \
+                          'PROGRESS="%s"' % (proc_id,
+                          proc_priority, proc_proc, proc_user, proc_runtime,
+                          proc_sleeptime, proc_status, proc_progress))
         return
 
     write_message("BibSched queue status report for %s:" % gethostname())
@@ -1449,12 +1549,12 @@ def report_queue_status(verbose=True, status=None, since=None, tasks=None):
         for state in status:
             report_about_processes(state, since, tasks)
     write_message("Done.")
-    return
 
-def restart(verbose = True):
+
+def restart(verbose=True):
     halt(verbose, soft=True)
     start(verbose)
-    return
+
 
 def stop(verbose=True):
     """
@@ -1467,7 +1567,14 @@ def stop(verbose=True):
         print "Stopping BibSched if running"
     halt(verbose, soft=True)
     run_sql("UPDATE schTASK SET status='WAITING' WHERE status='SCHEDULED'")
-    res = run_sql("SELECT id,proc,status FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%_DELETED' AND (status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='CONTINUING')")
+    res = run_sql("""SELECT id, proc, status FROM schTASK
+                     WHERE status NOT LIKE 'DONE'
+                     AND status NOT LIKE '%_DELETED'
+                     AND (status='RUNNING'
+                         OR status='ABOUT TO STOP'
+                         OR status='ABOUT TO SLEEP'
+                         OR status='SLEEPING'
+                         OR status='CONTINUING')""")
     if verbose:
         print "Stopping all running BibTasks"
     for task_id, proc, status in res:
@@ -1475,7 +1582,14 @@ def stop(verbose=True):
             bibsched_send_signal(proc, task_id, signal.SIGCONT)
             time.sleep(CFG_BIBSCHED_REFRESHTIME)
         bibsched_set_status(task_id, 'ABOUT TO STOP')
-    while run_sql("SELECT id FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%_DELETED' AND (status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='CONTINUING')"):
+    while run_sql("""SELECT id FROM schTASK
+                     WHERE status NOT LIKE 'DONE'
+                     AND status NOT LIKE '%_DELETED'
+                     AND (status='RUNNING'
+                          OR status='ABOUT TO STOP'
+                          OR status='ABOUT TO SLEEP'
+                          OR status='SLEEPING'
+                          OR status='CONTINUING')"""):
         if verbose:
             sys.stdout.write('.')
             sys.stdout.flush()
@@ -1484,7 +1598,7 @@ def stop(verbose=True):
     if verbose:
         print "\nStopped"
     Log("BibSched and all BibTasks stopped")
-    return
+
 
 def main():
     from invenio.bibtask import check_running_process_user
@@ -1497,7 +1611,7 @@ def main():
 
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:], "hVdqS:s:t:", [
-            "help","version","daemon", "quiet", "since=", "status=", "task="])
+           "help", "version", "daemon", "quiet", "since=", "status=", "task="])
     except getopt.GetoptError, err:
         Log("Error: %s" % err)
         usage(1, err)
@@ -1532,25 +1646,24 @@ def main():
             usage(1)
 
     try:
-        cmd = args [0]
+        cmd = args[0]
     except IndexError:
         cmd = 'monitor'
 
     try:
         if cmd in ('status', 'purge'):
-            { 'status' : report_queue_status,
+            {'status' : report_queue_status,
               'purge' : gc_tasks,
-            } [cmd] (verbose, status, since, tasks)
+            }[cmd](verbose, status, since, tasks)
         else:
-            {'start':   start,
-            'halt':    halt,
+            {'start': start,
+            'halt': halt,
             'stop': stop,
             'restart': restart,
-            'monitor': monitor} [cmd] (verbose)
+            'monitor': monitor}[cmd](verbose)
     except KeyError:
         usage(1, 'unkown command: %s' % cmd)
 
-    return
 
 if __name__ == '__main__':
     main()
