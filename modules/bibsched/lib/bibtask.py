@@ -900,8 +900,9 @@ def _task_run(task_run_fnc):
 
             # Here we check if the task can shift away of has to be run at
             # a fixed time
-            old_runtime = run_sql("SELECT runtime FROM schTASK WHERE id=%s", (_TASK_PARAMS['task_id'], ))[0][0]
-            if not task_get_task_param('fixed_time') or _TASK_PARAMS['task_name'] not in CFG_BIBTASK_FIXEDTIMETASKS:
+            if task_get_task_param('fixed_time') or _TASK_PARAMS['task_name'] in CFG_BIBTASK_FIXEDTIMETASKS:
+                old_runtime = run_sql("SELECT runtime FROM schTASK WHERE id=%s", (_TASK_PARAMS['task_id'], ))[0][0]
+            else:
                 old_runtime = None
             new_runtime = get_datetime(sleeptime, now=old_runtime)
 
