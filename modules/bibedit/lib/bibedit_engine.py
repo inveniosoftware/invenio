@@ -1258,17 +1258,13 @@ def _get_formated_record(record, new_window):
 
     result = ''
     if new_window:
-        result =  "<html><head><title>Record preview</title>"
-        result += """<style type="text/css">
-                        #referenceinp_link { display: none; }
-                        #referenceinp_link_span { display: none; }
-                    </style></head>
-                    <link rel="stylesheet" href="%(cssurl)s/img/invenio%(cssskin)s.css" type="text/css">
-                    """%{'cssurl': CFG_SITE_URL,
+        result =  """ <html><head><title>Record preview</title>
+                      <script type="text/javascript" src="https://inspireheptest.cern.ch/js/jquery.min.js"></script>
+                      <link rel="stylesheet" href="%(cssurl)s/img/invenio%(cssskin)s.css" type="text/css"></head>
+                   """%{'cssurl': CFG_SITE_URL,
                          'cssskin': CFG_WEBSTYLE_TEMPLATE_SKIN != 'default' and '_' + CFG_WEBSTYLE_TEMPLATE_SKIN or ''
                         }
         result += get_mathjax_header(True) + '<body>'
-    if new_window:
         result += "<h2> Brief format preview </h2><br />"
         result += bibformat.format_record(recID=None,
                                          of="hb",
@@ -1285,6 +1281,11 @@ def _get_formated_record(record, new_window):
                                     'hdref',
                                     xml_record=xml_record)
 
+    result += """<script>
+                    $('#referenceinp_link').hide();
+                    $('#referenceinp_link_span').hide();
+                </script>
+              """
     if new_window:
         result += "</body></html>"
 
