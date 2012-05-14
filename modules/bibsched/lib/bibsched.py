@@ -267,7 +267,6 @@ class Manager(object):
         self.curses = curses
         self.helper_modules = CFG_BIBTASK_VALID_TASKS
         self.running = 1
-        #self.footer_move_mode = "[KeyUp/KeyDown Move] [M Select mode] [Q Quit]"
         self.footer_auto_mode = "Automatic Mode [A Manual] [1/2/3 Display] [P Purge] [l/L Log] [O Opts] [E Edit motd] [Q Quit]"
         self.footer_select_mode = "Manual Mode [A Automatic] [1/2/3 Display Type] [P Purge] [l/L Log] [O Opts] [E Edit motd] [Q Quit]"
         self.footer_waiting_item = "[R Run] [D Delete] [N Priority]"
@@ -279,7 +278,6 @@ class Manager(object):
         self.panel = None
         self.display = 2
         self.first_visible_line = 0
-        #self.move_mode = 0
         self.auto_mode = 0
         self.currentrow = None
         self.current_attr = 0
@@ -311,18 +309,9 @@ class Manager(object):
                                            ord("l"), ord("L"), ord("e"), ord("E"))):
             self.display_in_footer("in automatic mode")
             self.stdscr.refresh()
-        #elif self.move_mode and (char not in (self.curses.KEY_UP,
-                                             #self.curses.KEY_DOWN,
-                                             #ord("m"), ord("M"), ord("q"),
-                                             #ord("Q"))):
-            #self.display_in_footer("in move mode")
-            #self.stdscr.refresh()
         else:
             status = self.currentrow and self.currentrow[5] or None
             if char == self.curses.KEY_UP:
-                #if self.move_mode:
-                    #self.move_up()
-                #else:
                 self.selected_line = max(self.selected_line - 1,
                                          self.header_lines)
                 self.repaint()
@@ -331,9 +320,6 @@ class Manager(object):
                                          self.header_lines)
                 self.repaint()
             elif char == self.curses.KEY_DOWN:
-                #if self.move_mode:
-                    #self.move_down()
-                #else:
                 self.selected_line = min(self.selected_line + 1,
                                          len(self.rows) + self.header_lines - 1)
                 self.repaint()
@@ -376,8 +362,6 @@ class Manager(object):
                 self.delete()
             elif char in (ord("i"), ord("I")):
                 self.init()
-            #elif char in (ord("m"), ord("M")):
-                #self.change_select_mode()
             elif char in (ord("p"), ord("P")):
                 self.purge_done()
             elif char in (ord("o"), ord("O")):
@@ -727,17 +711,6 @@ order to let this task run. The current priority is %s. New value:" \
         else:
             self.display_in_footer("Cannot initialise running processes")
 
-    #def change_select_mode(self):
-        #if self.move_mode:
-            #self.move_mode = 0
-        #else:
-            #status = self.currentrow[5]
-            #if status in ("RUNNING" , "CONTINUING" , "SLEEPING"):
-                #self.display_in_footer("cannot move running processes!")
-            #else:
-                #self.move_mode = 1
-        #self.stdscr.refresh()
-
     def change_auto_mode(self):
         if self.auto_mode:
             program = os.path.join(CFG_BINDIR, "bibsched")
@@ -751,16 +724,7 @@ order to let this task run. The current priority is %s. New value:" \
             os.system(COMMAND)
 
             self.auto_mode = 1
-            self.move_mode = 0
         self.stdscr.refresh()
-
-    #def move_up(self):
-        #self.display_in_footer("not implemented yet")
-        #self.stdscr.refresh()
-
-    #def move_down(self):
-        #self.display_in_footer("not implemented yet")
-        #self.stdscr.refresh()
 
     def put_line(self, row, header=False, motd=False):
         ## ROW: (id,proc,user,runtime,sleeptime,status,progress,arguments,priority,host)
@@ -768,12 +732,6 @@ order to let this task run. The current priority is %s. New value:" \
         col_w = [7 , 25, 15, 21, 7, 11, 20, 60]
         maxx = self.width
         if self.y == self.selected_line - self.first_visible_line and self.y > 1:
-            #if self.auto_mode:
-                #attr = self.curses.color_pair(2) + self.curses.A_STANDOUT + self.curses.A_BOLD + self.current.A_REVERSE
-            ##elif self.move_mode:
-                ##attr = self.curses.color_pair(7) + self.curses.A_STANDOUT + self.curses.A_BOLD
-            #else:
-                #attr = self.curses.color_pair(8) + self.curses.A_STANDOUT + self.curses.A_BOLD + self.current.A_REVERSE
             self.item_status = row[5]
             self.currentrow = row
         if motd:
@@ -781,8 +739,6 @@ order to let this task run. The current priority is %s. New value:" \
         elif self.y == self.header_lines - 2:
             if self.auto_mode:
                 attr = self.curses.color_pair(2) + self.curses.A_STANDOUT + self.curses.A_BOLD
-            #elif self.move_mode:
-                #attr = self.curses.color_pair(7) + self.curses.A_STANDOUT + self.curses.A_BOLD
             else:
                 attr = self.curses.color_pair(8) + self.curses.A_STANDOUT + self.curses.A_BOLD
         elif row[5] == "DONE":
@@ -851,8 +807,6 @@ order to let this task run. The current priority is %s. New value:" \
         footer = footer.ljust(maxx)
         if self.auto_mode:
             colorpair = 2
-        #elif self.move_mode:
-            #colorpair = 7
         else:
             colorpair = 1
         try:
@@ -885,8 +839,6 @@ order to let this task run. The current priority is %s. New value:" \
         self.y = self.stdscr.getmaxyx()[0] - 1
         if self.auto_mode:
             self.display_in_footer(self.footer_auto_mode, print_time_p=1)
-        #elif self.move_mode:
-            #self.display_in_footer(self.footer_move_mode, print_time_p=1)
         else:
             self.display_in_footer(self.footer_select_mode, print_time_p=1)
             footer2 = ""
@@ -1363,7 +1315,6 @@ Purge options:
 
 """ % (sys.argv[0], CFG_BIBSCHED_GC_TASKS_OLDER_THAN, ','.join(CFG_BIBSCHED_GC_TASKS_TO_REMOVE + CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE)))
 
-    #sys.stderr.write("  -v, --verbose=LEVEL \t Verbose level (0=min, 1=default, 9=max).\n")
     sys.exit(exitcode)
 
 pidfile = os.path.join(CFG_PREFIX, 'var', 'run', 'bibsched.pid')
