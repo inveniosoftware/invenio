@@ -165,7 +165,7 @@ install-jquery-plugins:
 	mv uploadify/jquery.uploadify.v2.1.4.min.js ./jquery.uploadify.min.js && \
 	rm uploadify.zip && rm -r uploadify && \
 	wget --no-check-certificate https://github.com/douglascrockford/JSON-js/raw/master/json2.js && \
-	wget https://raw.github.com/jeresig/jquery.hotkeys/master/jquery.hotkeys.js && \
+	wget https://raw.github.com/jeresig/jquery.hotkeys/master/jquery.hotkeys.js --no-check-certificate && \
 	wget http://jquery.bassistance.de/treeview/jquery.treeview.zip && \
 	unzip jquery.treeview.zip -d jquery-treeview && \
 	rm jquery.treeview.zip && \
