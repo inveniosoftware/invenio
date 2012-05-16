@@ -37,7 +37,7 @@ from bibauthorid_backinterface import get_coauthors_from_paper
 from bibauthorid_backinterface import get_signatures_from_rec
 from bibauthorid_backinterface import modify_signature
 from bibauthorid_backinterface import remove_sigs
-from bibauthorid_backinterface import find_pids_by_name
+from bibauthorid_backinterface import find_pids_by_name, find_pids_by_exact_name
 from bibauthorid_backinterface import new_person_from_signature
 from bibauthorid_backinterface import add_signature
 from bibauthorid_backinterface import update_personID_canonical_names
@@ -105,33 +105,18 @@ def rabbit(bibrecs, check_invalid_papers=False):
 
         for sig in not_matched:
             name = new_signatures_names[sig]
-            family = split_name_parts(name)[0]
-            possible_pids = find_pids_by_name(family)
-            possible_pids = [p for p in possible_pids if int(p[0]) not in used_pids]
+            matched_pids = find_pids_by_exact_name(name)
+            matched_pids = [p for p in matched_pids if int(p[0]) not in used_pids]
 
-            if not possible_pids:
+            if not matched_pids:
                 new_pid = new_person_from_signature(list(sig) + [rec], name)
                 used_pids.add(new_pid)
                 updated_pids.add(new_pid)
-                continue
 
-            # python 2.4 doesn't support key argument on max
-            winner = possible_pids[0]
-            win_score = compare_names(name, winner[1])
-            for cur in possible_pids[1:]:
-                score = compare_names(name, cur[1])
-                if win_score < score:
-                    winner = cur
-                    win_score = score
-
-            if win_score >= threshold:
-                add_signature(list(sig) + [rec], name, winner[0])
-                used_pids.add(winner[0])
-                updated_pids.add(winner[0])
             else:
-                new_pid = new_person_from_signature(list(sig) + [rec], name)
-                used_pids.add(new_pid)
-                updated_pids.add(new_pid)
+                add_signature(list(sig) + [rec], name, matched_pids[0][0])
+                used_pids.add(matched_pids[0][0])
+                updated_pids.add(matched_pids[0][0])
 
     if updated_pids: # an empty set will update all canonical_names
         update_personID_canonical_names(updated_pids)

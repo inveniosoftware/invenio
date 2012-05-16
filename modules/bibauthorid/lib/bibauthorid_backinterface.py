@@ -64,6 +64,7 @@ from bibauthorid_dbinterface import get_existing_result_clusters         #emitti
 from bibauthorid_dbinterface import remove_personid_papers               #emitting
 from bibauthorid_dbinterface import repair_personid                      #emitting
 from bibauthorid_dbinterface import get_sql_time                         #emitting
+from bibauthorid_dbinterface import find_pids_by_exact_name              #emittingq
 
 from search_engine import perform_request_search
 import bibauthorid_dbinterface as dbinter

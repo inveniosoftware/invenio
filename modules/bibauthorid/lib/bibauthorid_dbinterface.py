@@ -1482,6 +1482,14 @@ def find_pids_by_name(name):
                        "WHERE name like %s"
                        , (name + ',%',)))
 
+def find_pids_by_exact_name(name):
+    """
+    Finds names and personids by a name.
+    """
+    return set(run_sql("SELECT personid "
+                   "FROM aidPERSONIDPAPERS "
+                   "WHERE name = %s"
+                   , (name,)))
 
 def remove_sigs(signatures):
     '''
@@ -1608,7 +1616,6 @@ def check_personid_papers():
                 print "Invalid id(%s:%d)." % (wrong_name[0], wrong_name[1])
 
     return ret
-
 
 def repair_personid():
     '''
