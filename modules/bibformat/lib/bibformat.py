@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -138,6 +138,16 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                 </span><br/>""" % (recID, last_updated)
             if of.lower() == 'xm':
                 res = filter_hidden_fields(res, user_info)
+            # try to replace language links in pre-cached res, if applicable:
+            if ln != CFG_SITE_LANG and of.lower() in CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS:
+                # The following statements try to quickly replace any
+                # language arguments in URL links.  Not an exact
+                # science, but should work most of the time for most
+                # of the formats, with not too many false positives.
+                # We don't have time to parse output much here.
+                res = res.replace('?ln=' + CFG_SITE_LANG, '?ln=' + ln)
+                res = res.replace('&ln=' + CFG_SITE_LANG, '&ln=' + ln)
+                res = res.replace('&amp;ln=' + CFG_SITE_LANG, '&amp;ln=' + ln)
             out += res
             return out
         else:
