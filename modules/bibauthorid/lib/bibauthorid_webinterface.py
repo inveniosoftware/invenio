@@ -25,6 +25,7 @@ from cgi import escape
 from copy import deepcopy
 from pprint import pformat
 
+from operator import itemgetter
 try:
     from invenio.jsonutils import json, CFG_JSON_AVAILABLE
 except:
@@ -2275,10 +2276,15 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
 #                authorpapers = sorted(authorpapers, key=itemgetter(0),
 #                                      reverse=True)
                 if index < bconfig.PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT:
-                    authorpapers = [[paper] for paper in
-                                    sort_records(None, [i[0] for i in
-                                                 webapi.get_papers_by_person_id(pid, -1)],
-                                                 sort_field="year", sort_order="a")]
+                    #We are no longer sorting by date because of the huge impact this have 
+                    #on the system.
+                    #The sorting is now done per recordid
+#                    authorpapers = [[paper] for paper in
+#                                    sort_records(None, [i[0] for i in
+#                                                 webapi.get_papers_by_person_id(pid, -1)],
+#                                                 sort_field="year", sort_order="a")]
+                    authorpapers = sorted([[p[0]] for p in webapi.get_papers_by_person_id(pid, -1)],
+                                          key=itemgetter(0))
                 else:
                     authorpapers = [['Not retrieved to increase performances.']]
 
