@@ -3940,6 +3940,7 @@ CREATE TABLE IF NOT EXISTS `aidPERSONIDPAPERS` (
   INDEX `name-b` (`name`) ,
   INDEX `pn-b` (`personid`, `name`) ,
   INDEX `timestamp-b` (`last_updated`) ,
+  INDEX `flag-b` (`flag`) ,
   INDEX `ptvrf-b` (`personid`, `bibref_table`, `bibref_value`, `bibrec`, `flag`)
 ) ENGINE=MYISAM;
 
