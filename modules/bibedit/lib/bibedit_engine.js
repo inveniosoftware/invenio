@@ -2401,11 +2401,21 @@ function onAddSubfieldsSave(event, tag, fieldPosition){
     return;
   }
 
-  if (!subfields.length == 0){
+  /* Check if $$9 CURATOR is present */
+  var iscurated = false;
+  if (tag === "999") {
+    current_field_subfields = gRecord[tag][fieldPosition][0];
+    for (var i = 0, j = current_field_subfields.length; i < j; i++) {
+        if (current_field_subfields[i][0] == "9" && current_field_subfields[i][1] == "CURATOR") {
+            iscurated = true;
+        }
+    }
+  }
+  if (!subfields.length == 0) {
       /* Loop through all subfields to look for new subfields in the format
        * $$aContent$$bMore content and split them accordingly */
       var subfieldsExtended = [];
-      for (var i=0; i<subfields.length;i++) {
+      for (var i=0, j=subfields.length; i < j; i++) {
           if (valueContainsSubfields(subfields[i][1])) {
               var subfieldsToAdd = new Array(), subfieldCode = subfields[i][0];
               splitContentSubfields(subfields[i][1], subfieldCode, subfieldsToAdd);
@@ -2417,41 +2427,43 @@ function onAddSubfieldsSave(event, tag, fieldPosition){
       }
       if (typeof subfieldsExtended[0] != 'undefined') {
           /* We have split some subfields */
-          for (var i=0;i<subfieldsExtended.length;i++) {
+          for (var i=0, j=subfieldsExtended.length; i < j; i++) {
               subfields[i] = subfieldsExtended[i];
           }
       }
-     // creating the undo/redo handler
-    var urHandler = prepareUndoHandlerAddSubfields(tag, fieldPosition, subfields);
-    addUndoOperation(urHandler);
-    // Create Ajax request
-    var data = {
-      recID: gRecID,
-      requestType: 'addSubfields',
-      tag: tag,
-      fieldPosition: fieldPosition,
-      subfields: subfields,
-      undoRedo: urHandler
-    };
-    createReq(data, function(json){
-      updateStatus('report', gRESULT_CODES[json['resultCode']]);
-    }, false);
+      if (tag === "999" && !iscurated) {
+        subfields.push(new Array('9', 'CURATOR'));
+      }
+      // creating the undo/redo handler
+      var urHandler = prepareUndoHandlerAddSubfields(tag, fieldPosition, subfields);
+      addUndoOperation(urHandler);
+      // Create Ajax request
+      var data = {
+        recID: gRecID,
+        requestType: 'addSubfields',
+        tag: tag,
+        fieldPosition: fieldPosition,
+        subfields: subfields,
+        undoRedo: urHandler
+      };
+      createReq(data, function(json){
+        updateStatus('report', gRESULT_CODES[json['resultCode']]);
+      }, false);
 
-    // Continue local updating
-    var field = gRecord[tag][fieldPosition];
-    field[0] = field[0].concat(subfields);
-    var rowGroup  = $('#rowGroup_' + fieldID);
-    var coloredRowGroup = $(rowGroup).hasClass('bibEditFieldColored');
-    $(rowGroup).replaceWith(createField(tag, field, fieldPosition));
-    if (coloredRowGroup)
-      $('#rowGroup_' + fieldID).addClass('bibEditFieldColored');
+      // Continue local updating
+      var field = gRecord[tag][fieldPosition];
+      field[0] = field[0].concat(subfields);
+      var rowGroup  = $('#rowGroup_' + fieldID);
+      var coloredRowGroup = $(rowGroup).hasClass('bibEditFieldColored');
+      $(rowGroup).replaceWith(createField(tag, field, fieldPosition));
+      if (coloredRowGroup)
+        $('#rowGroup_' + fieldID).addClass('bibEditFieldColored');
 
-    // Color the new fields for a short period.
-    var rows = $('#rowGroup_' + fieldID + ' tr');
-    $(rows).slice(rows.length - subfields.length).effect('highlight', {
-      color: gNEW_CONTENT_COLOR}, gNEW_CONTENT_COLOR_FADE_DURATION);
-  }
-  else{
+      // Color the new fields for a short period.
+      var rows = $('#rowGroup_' + fieldID + ' tr');
+      $(rows).slice(rows.length - subfields.length).effect('highlight', {
+        color: gNEW_CONTENT_COLOR}, gNEW_CONTENT_COLOR_FADE_DURATION);
+  } else {
     // No valid fields were submitted.
     $('#rowAddSubfields_' + fieldID + '_' + 0).nextAll().andSelf().remove();
     updateStatus('ready');
