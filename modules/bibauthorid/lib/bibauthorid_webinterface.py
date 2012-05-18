@@ -2428,6 +2428,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             except (IndexError, KeyError):
                 pass
 
+        req.write(TEMPLATE.tmpl_welcome_personid_association(pid))
         req.write(TEMPLATE.tmpl_welcome_arXiv_papers(arxivp))
         if CFG_INSPIRE_SITE:
             #logs arXive logins, for debug purposes.

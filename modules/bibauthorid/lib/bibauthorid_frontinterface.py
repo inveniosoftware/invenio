@@ -57,6 +57,7 @@ from bibauthorid_dbinterface import confirm_papers_to_person           #emitting
 from bibauthorid_dbinterface import get_name_by_bibrecref              #emitting
 from bibauthorid_dbinterface import get_personids_and_papers_from_bibrecs
 from bibauthorid_dbinterface import get_uid_from_personid
+from bibauthorid_dbinterface import get_canonical_id_from_personid     #emitting
 
 def set_person_data(person_id, tag, value, user_level=0):
     old = dbinter.get_personid_row(person_id, tag)

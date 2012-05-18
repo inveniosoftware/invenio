@@ -35,6 +35,7 @@ from invenio.session import get_session
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibauthorid_webapi import get_person_redirect_link, get_canonical_id_from_person_id
 from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
+from invenio.bibauthorid_frontinterface import get_canonical_id_from_personid
 from invenio.messages import gettext_set_language, wash_language
 #from invenio.textutils import encode_for_xml
 
@@ -1641,6 +1642,31 @@ class Template:
         return '<a rel="nofollow" href=action?checkout=True><b>' + \
             self._('Correct my publication lists!') + \
             '</b></a>'
+
+    def tmpl_welcome_personid_association(self, pid):
+        """
+        """
+        canon_name = get_canonical_id_from_personid(pid)
+        head = "<br>"
+        if canon_name:
+            body = ("Your arXiv.org account is associated "
+                    "with person %s." % canon_name[0][0])
+        else:
+            body = ("Warning: your arXiv.org account is associated with an empty profile. "
+                    "This can happen if it the first time you log in and you do not have any "
+                    "paper directly claimen in arXiv.org which we can use to identify you."
+                    "If this is the case, you are welcome to search and claim your papers to your"
+                    " new profile manually, or please contact us to get help.")
+
+        body += ("<br>You are very welcome to contact us shall you need any help or explanation"
+                 " about the management of"
+                 " your profile page"
+                 " in INSPIRE and it's connections with arXiv.org: "
+                 '''<a href="mailto:authors@inspirehep.net?subject=Help on arXiv.org SSO login and paper claiming"> authors@inspirehep.net </a>''')
+        tail = "<br>"
+
+        return head + body + tail
+
 
     def tmpl_welcome_arXiv_papers(self, paps):
         '''
