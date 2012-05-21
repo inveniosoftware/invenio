@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -896,6 +896,7 @@ def get_database_last_updated_timestamp():
     database_tables_timestamps.append(get_table_update_time('field%'))
     database_tables_timestamps.append(get_table_update_time('format%'))
     database_tables_timestamps.append(get_table_update_time('rnkMETHODNAME'))
+    database_tables_timestamps.append(get_table_update_time('accROLE_accACTION_accARGUMENT'))
     return max(database_tables_timestamps)
 
 def get_cache_last_updated_timestamp():
