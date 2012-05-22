@@ -5718,7 +5718,7 @@ def get_most_popular_field_values(recids, tags, exclude_values=None, count_repet
     if count_repetitive_values:
         # counting technique A: can look up many records at once: (very fast)
         for tag in tags:
-            vals_to_count.extend(get_fieldvalues(recids, tag))
+            vals_to_count.extend(get_fieldvalues(recids, tag, sort=False))
     else:
         # counting technique B: must count record-by-record: (slow)
         for recid in recids:
