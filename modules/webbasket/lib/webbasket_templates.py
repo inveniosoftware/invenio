@@ -2239,6 +2239,7 @@ class Template:
                                            nb_subscribers,
                                            date_modification,
                                            (user_can_view_content,
+                                            user_can_add_item,
                                             user_can_edit_basket,
                                             user_can_view_notes),
                                            selected_category,
@@ -2251,6 +2252,7 @@ class Template:
             out += self.tmpl_basket_footer(bskid,
                                            nb_items,
                                            (user_can_view_content,
+                                            user_can_add_item,
                                             user_can_edit_basket),
                                            selected_category,
                                            selected_topic,
@@ -2290,6 +2292,7 @@ class Template:
                            nb_subscribers,
                            date_modification,
                            (user_can_view_content,
+                            user_can_add_item,
                             user_can_edit_basket,
                             user_can_view_notes),
                            selected_category,
@@ -2309,28 +2312,34 @@ class Template:
                             ', ' + (_('%i subscribers') % nb_subscribers) or \
                             ''
         last_update_field = '<br />' + _('last update') + ': ' + date_modification
-        if user_can_edit_basket:
+
+        ## By default we assume the user has no rights on the basket
+        #edit_basket = """<small>%s</small>""" % (_("You cannot edit this basket"),)
+        #delete_basket = """<small>%s</small>""" % (_("You cannot delete this basket"),)
+        edit_basket = ""
+        delete_basket = ""
+        add_ext_resource = ""
+
+        if user_can_add_item:
             add_ext_resource_url = """%s/yourbaskets/add?category=%s&amp;bskid=%i""" % (CFG_SITE_URL,selected_category,bskid,)
             add_ext_resource_logo = """<img src="%s/img/wb-create-basket.png" />""" % (CFG_SITE_URL,)
             add_ext_resource = """<a href="%s">%s%s</a>""" % (add_ext_resource_url, add_ext_resource_logo, _("Add item"))
+        
+        if user_can_edit_basket:
             edit_basket_url = """%s/yourbaskets/edit?bskid=%i&amp;topic=%s&amp;ln=%s""" % (CFG_SITE_URL, bskid, urllib.quote(selected_topic), ln)
             edit_basket_logo = """<img src="%s/img/wb-edit-basket.png" />""" % (CFG_SITE_URL,)
-            edit_basket = """<a href="%s">%s%s</a>""" % (edit_basket_url, edit_basket_logo, _("Edit basket"))
+            edit_basket = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (edit_basket_url, edit_basket_logo, _("Edit basket"))
             delete_basket_url = """%s/yourbaskets/edit?bskid=%i&amp;topic=%s&amp;delete=1&amp;ln=%s""" % (CFG_SITE_URL, bskid, urllib.quote(selected_topic), ln)
             delete_basket_logo = """<img src="%s/img/wb-delete-basket.png" />""" % (CFG_SITE_URL,)
-            delete_basket = """<a href="%s">%s%s</a>""" % (delete_basket_url, delete_basket_logo, _("Delete basket"))
-        else:
-            #edit_basket = """<small>%s</small>""" % (_("You cannot edit this basket"),)
-            #delete_basket = """<small>%s</small>""" % (_("You cannot delete this basket"),)
-            edit_basket = ""
-            delete_basket = ""
-            add_ext_resource = ""
+            delete_basket = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (delete_basket_url, delete_basket_logo, _("Delete basket"))
+
         if selected_category==CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
             unsubscribe_url = """%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
             unsubscribe_logo = """<img src="%s/img/wb-unsubscribe.png" />""" % (CFG_SITE_URL,)
             unsubscribe = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (unsubscribe_url, unsubscribe_logo, _("Unsubscribe from basket"))
         else:
             unsubscribe = ""
+
         out = """
   <thead>
     <tr>
@@ -2348,9 +2357,7 @@ class Template:
             </td>
             <td class="bskbasketheaderoptions">
               %(add_ext_resource)s
-              &nbsp;&nbsp;
               %(edit_basket)s
-              &nbsp;&nbsp;
               %(delete_basket)s
               %(unsubscribe)s
             </td>
@@ -2378,6 +2385,7 @@ class Template:
                            bskid,
                            nb_items,
                            (user_can_view_content,
+                            user_can_add_item,
                             user_can_edit_basket),
                            selected_category,
                            selected_topic,
@@ -2388,20 +2396,25 @@ class Template:
         _ = gettext_set_language(ln)
 
         optional_colspan = nb_items and user_can_view_content and ' colspan="3"' or ''
-        if user_can_edit_basket:
+
+        ## By default we assume the user has no rights on the basket
+        edit_basket = ""
+        delete_basket = ""
+        add_ext_resource = ""
+
+        if user_can_add_item:
             add_ext_resource_url = """%s/yourbaskets/add?category=%s&amp;bskid=%i""" % (CFG_SITE_URL,selected_category,bskid,)
             add_ext_resource_logo = """<img src="%s/img/wb-create-basket.png" />""" % (CFG_SITE_URL,)
             add_ext_resource = """<a href="%s">%s%s</a>""" % (add_ext_resource_url, add_ext_resource_logo, _("Add item"))
+
+        if user_can_edit_basket:
             edit_basket_url = """%s/yourbaskets/edit?bskid=%i&amp;topic=%s&amp;ln=%s""" % (CFG_SITE_URL, bskid, urllib.quote(selected_topic), ln)
             edit_basket_logo = """<img src="%s/img/wb-edit-basket.png" />""" % (CFG_SITE_URL,)
-            edit_basket = """<a href="%s">%s%s</a>""" % (edit_basket_url, edit_basket_logo, _("Edit basket"))
+            edit_basket = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (edit_basket_url, edit_basket_logo, _("Edit basket"))
             delete_basket_url = """%s/yourbaskets/edit?bskid=%i&amp;topic=%s&amp;delete=1&amp;ln=%s""" % (CFG_SITE_URL, bskid, urllib.quote(selected_topic), ln)
             delete_basket_logo = """<img src="%s/img/wb-delete-basket.png" />""" % (CFG_SITE_URL,)
-            delete_basket = """<a href="%s">%s%s</a>""" % (delete_basket_url, delete_basket_logo, _("Delete basket"))
-        else:
-            edit_basket = ""
-            delete_basket = ""
-            add_ext_resource = ""
+            delete_basket = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (delete_basket_url, delete_basket_logo, _("Delete basket"))
+
         if selected_category==CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
             unsubscribe_url = """%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
             unsubscribe_logo = """<img src="%s/img/wb-unsubscribe.png" />""" % (CFG_SITE_URL,)
@@ -2427,9 +2440,7 @@ class Template:
             </td>
             <td class="bskbasketfooteroptions">
               %(add_ext_resource)s
-              &nbsp;&nbsp;
               %(edit_basket)s
-              &nbsp;&nbsp;
               %(delete_basket)s
               %(unsubscribe)s
             </td>
