@@ -933,7 +933,8 @@ WSGIRestrictStdout Off
         </Directory>
         ErrorLog %(logdir)s/apache.err
         LogLevel warn
-        CustomLog %(logdir)s/apache.log combined
+        LogFormat "%%h %%l %%u %%t \\"%%r\\" %%>s %%b \\"%%{Referer}i\\" \\"%%{User-agent}i\\" %%D" combined_with_timing
+        CustomLog %(logdir)s/apache.log combined_with_timing
         DirectoryIndex index.en.html index.html
         Alias /img/ %(webdir)s/img/
         Alias /js/ %(webdir)s/js/
@@ -1008,7 +1009,8 @@ WSGIRestrictStdout Off
         </Directory>
         ErrorLog %(logdir)s/apache-ssl.err
         LogLevel warn
-        CustomLog %(logdir)s/apache-ssl.log combined
+        LogFormat "%%h %%l %%u %%t \\"%%r\\" %%>s %%b \\"%%{Referer}i\\" \\"%%{User-agent}i\\" %%D" combined_with_timing
+        CustomLog %(logdir)s/apache-ssl.log combined_with_timing
         DirectoryIndex index.en.html index.html
         Alias /img/ %(webdir)s/img/
         Alias /js/ %(webdir)s/js/
