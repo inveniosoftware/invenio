@@ -232,18 +232,6 @@ def intoDB(dict, date, rank_method_code):
     if date:
         run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", (date, rank_method_code))
 
-    # FIXME: the following is a workaround for the citation indexer
-    # memory troubles, when Apache WSGI daemon processes may end up
-    # doubling the memory after citation dictionary is updated;
-    # therefore let us restart the WSGI daemon application after the
-    # citation indexer finished, which relieves this problem.  The
-    # restart is done via touching invenio.wsgi file.  The proper fix
-    # for this problem would be strict separation between citation
-    # indexer updating dicts and citation searcher loading dicts.
-    if rank_method_code == 'citation':
-        os.system('touch ' + os.path.join(CFG_PREFIX, 'var', 'www-wsgi',
-                                          'invenio.wsgi'))
-
 def fromDB(rank_method_code):
     """Get the data for a rank method"""
     id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
