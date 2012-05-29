@@ -939,9 +939,9 @@ order to let this task run. The current priority is %s. New value:" \
                 char = -1
             self.handle_keys(char)
 
-
 class BibSched(object):
-    def __init__(self):
+    def __init__(self, debug=False):
+        self.debug = debug
         self.hostname = gethostname()
         self.helper_modules = CFG_BIBTASK_VALID_TASKS
         ## All the tasks in the queue that the node is allowed to manipulate
@@ -1044,19 +1044,21 @@ class BibSched(object):
     def handle_task(self, task_id, proc, runtime, status, priority, host, sequenceid):
         """Perform needed action of the row representing a task.
         Return True when task_status need to be refreshed"""
-        #Log('%s id: %s, proc: %s, runtime: %s, status: %s, priority: %s' % (task_status, task_id, proc, runtime, status, priority))
-        #Log("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s" % (task_id, proc, runtime, status, priority))
+        debug = self.debug
+        if debug:
+            Log("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s" % (task_id, proc, runtime, status, priority))
 
         if (task_id, proc, runtime, status, priority, host, sequenceid) in self.node_relevant_waiting_tasks:
-            #elif task_id in self.task_status['WAITING'] or task_id in self.task_status['SLEEPING']:
-            #Log("Trying to run %s" % task_id)
+            if debug:
+                Log("Trying to run %s" % task_id)
 
             if priority < -10:
                 return False
 
             lower, higher = self.split_active_tasks_by_priority(task_id, priority)
-            #Log('lower: %s' % lower)
-            #Log('higher: %s' % higher)
+            if debug:
+                Log('lower: %s' % lower)
+                Log('higher: %s' % higher)
             for other_task_id, other_proc, other_runtime, other_status, other_priority, other_host, other_sequenceid in self.active_tasks_all_nodes:
                 if not self.is_task_safe_to_execute(proc, other_proc):
                     ### !!! WE NEED TO CHECK FOR TASKS THAT CAN ONLY BE EXECUTED ON ONE MACHINE AT ONE TIME
@@ -1064,7 +1066,8 @@ class BibSched(object):
                     ## There's at least a higher priority task running that
                     ## cannot run at the same time of the given task.
                     ## We give up
-                    #Log("Cannot run because task_id: %s, proc: %s is the queue and incompatible" % (other_task_id, other_proc))
+                    if debug:
+                        Log("Cannot run because task_id: %s, proc: %s is the queue and incompatible" % (other_task_id, other_proc))
                     return False
 
             if sequenceid:
@@ -1092,19 +1095,22 @@ class BibSched(object):
                 ### !!! THIS HAS TO BE ADAPTED FOR MULTINODE
                 ### !!! Basically, the number of concurrent tasks should count per node
                 ## Not enough resources.
-                #Log("Cannot run because all resource (%s) are used (%s), higher: %s" % (CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS, len(higher), higher))
+                if debug:
+                    Log("Cannot run because all resource (%s) are used (%s), higher: %s" % (CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS, len(higher), higher))
                 return False
 
             ## We check if it is necessary to stop/put to sleep some lower priority
             ## task.
             tasks_to_stop, tasks_to_sleep = self.get_tasks_to_sleep_and_stop(proc, lower)
-            #Log('tasks_to_stop: %s' % tasks_to_stop)
-            #Log('tasks_to_sleep: %s' % tasks_to_sleep)
+            if debug:
+                Log('tasks_to_stop: %s' % tasks_to_stop)
+                Log('tasks_to_sleep: %s' % tasks_to_sleep)
 
             if tasks_to_stop and priority < 100:
                 ## Only tasks with priority higher than 100 have the power
                 ## to put task to stop.
-                #Log("Cannot run because there are task to stop: %s and priority < 100" % tasks_to_stop)
+                if debug:
+                    Log("Cannot run because there are task to stop: %s and priority < 100" % tasks_to_stop)
                 return False
 
             procname = proc.split(':')[0]
@@ -1315,11 +1321,11 @@ The following commands are available for bibsched:
    status     get report about current status of the queue
    purge      purge the scheduler queue from old tasks
 
-Command options:
-  -d, --daemon     \t Launch BibSched in the daemon mode (deprecated, use 'start')
 General options:
   -h, --help       \t Print this help.
   -V, --version    \t Print version information.
+  -q, --quiet      \t Quiet mode
+  -d, --debug      \t Write debugging information in bibsched.log
 Status options:
   -s, --status=LIST\t Which BibTask status should be considered (default is Running,waiting)
   -S, --since=TIME\t Since how long time to consider tasks e.g.: 30m, 2h, 1d (default
@@ -1373,8 +1379,7 @@ def server_pid(ping_the_process=True, check_is_really_bibsched=True):
 
     return pid
 
-
-def start(verbose=True):
+def start(verbose=True, debug=False):
     """ Fork this process in the background and start processing
     requests. The process PID is stored in a pid file, so that it can
     be stopped later on."""
@@ -1414,7 +1419,7 @@ def start(verbose=True):
     sys.stdin.close()
     redirect_stdout_and_stderr()
 
-    sched = BibSched()
+    sched = BibSched(debug=debug)
     try:
         sched.watch_loop()
     finally:
@@ -1424,7 +1429,7 @@ def start(verbose=True):
             pass
 
 
-def halt(verbose=True, soft=False):
+def halt(verbose=True, soft=False, debug=False):
     pid = server_pid()
     if not pid:
         if soft:
@@ -1444,14 +1449,12 @@ def halt(verbose=True, soft=False):
         print "stopping bibsched: pid %d" % pid
     os.unlink(pidfile)
 
-
-def monitor(verbose=True):
+def monitor(verbose=True, debug=False):
     old_stdout, old_stderr = redirect_stdout_and_stderr()
     try:
         Manager(old_stdout)
     finally:
         restore_stdout_and_stderr(old_stdout, old_stderr)
-
 
 def write_message(msg, stream=None, verbose=1):
     """Write message and flush output stream (may be sys.stdout or sys.stderr).
@@ -1524,13 +1527,11 @@ def report_queue_status(verbose=True, status=None, since=None, tasks=None):
             report_about_processes(state, since, tasks)
     write_message("Done.")
 
+def restart(verbose = True, debug=False):
+    halt(verbose, soft=True, debug=debug)
+    start(verbose, debug=debug)
 
-def restart(verbose=True):
-    halt(verbose, soft=True)
-    start(verbose)
-
-
-def stop(verbose=True):
+def stop(verbose=True, debug=False):
     """
     * Stop bibsched
     * Send stop signal to all the running tasks
@@ -1539,7 +1540,7 @@ def stop(verbose=True):
     """
     if verbose:
         print "Stopping BibSched if running"
-    halt(verbose, soft=True)
+    halt(verbose, soft=True, debug=debug)
     run_sql("UPDATE schTASK SET status='WAITING' WHERE status='SCHEDULED'")
     res = run_sql("""SELECT id, proc, status FROM schTASK
                      WHERE status NOT LIKE 'DONE'
@@ -1582,10 +1583,11 @@ def main():
     status = None
     since = None
     tasks = None
+    debug = False
 
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:], "hVdqS:s:t:", [
-           "help", "version", "daemon", "quiet", "since=", "status=", "task="])
+            "help", "version", "debug", "quiet", "since=", "status=", "task="])
     except getopt.GetoptError, err:
         Log("Error: %s" % err)
         usage(1, err)
@@ -1598,12 +1600,6 @@ def main():
             print __revision__
             sys.exit(0)
 
-        elif opt in ["-d", "--daemon"]:
-            redirect_stdout_and_stderr()
-            sched = BibSched()
-            Log("daemon started")
-            sched.watch_loop()
-
         elif opt in ['-q', '--quiet']:
             verbose = False
 
@@ -1615,6 +1611,9 @@ def main():
 
         elif opt in ['-t', '--task']:
             tasks = arg.split(',')
+
+        elif opt in ['-d', '--debug']:
+            debug = True
 
         else:
             usage(1)
@@ -1634,7 +1633,7 @@ def main():
             'halt': halt,
             'stop': stop,
             'restart': restart,
-            'monitor': monitor}[cmd](verbose)
+            'monitor': monitor}[cmd](verbose=verbose, debug=debug)
     except KeyError:
         usage(1, 'unkown command: %s' % cmd)
 
