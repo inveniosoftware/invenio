@@ -43,9 +43,11 @@ from invenio.textutils import \
      decode_to_unicode, \
      translate_latex2unicode, \
      translate_to_ascii, \
-     strip_accents
+     strip_accents, \
+     remove_control_characters
 
 from invenio.testutils import make_test_suite, run_test_suite
+
 
 class GuessMinimumEncodingTest(unittest.TestCase):
     """Test functions related to guess_minimum_encoding function."""
@@ -54,6 +56,7 @@ class GuessMinimumEncodingTest(unittest.TestCase):
         self.assertEqual(guess_minimum_encoding('patata'), ('patata', 'ascii'))
         self.assertEqual(guess_minimum_encoding('àèéìòù'), ('\xe0\xe8\xe9\xec\xf2\xf9', 'latin1'))
         self.assertEqual(guess_minimum_encoding('Ιθάκη'), ('Ιθάκη', 'utf8'))
+
 
 class WashForXMLTest(unittest.TestCase):
     """Test functions related to wash_for_xml function."""
@@ -194,6 +197,7 @@ class WashForXMLTest(unittest.TestCase):
                                       xml_version='1.1'), '\x08\tsome chars')
         self.assertEqual(wash_for_xml('$b\bar{b}$', xml_version='1.1'), '$b\x08ar{b}$')
 
+
 class WashForUTF8Test(unittest.TestCase):
     def test_normal_legal_string_washing(self):
         """textutils - testing UTF-8 washing on a perfectly normal string"""
@@ -248,6 +252,7 @@ class WashForUTF8Test(unittest.TestCase):
     def test_already_utf8_input(self):
         """textutils - washing a Unicode string into UTF-8 binary string"""
         self.assertEqual('Göppert', wash_for_utf8(u'G\xf6ppert', True))
+
 
 class WrapTextInABoxTest(unittest.TestCase):
     """Test functions related to wrap_text_in_a_box function."""
@@ -361,7 +366,6 @@ class WrapTextInABoxTest(unittest.TestCase):
 """
         self.assertEqual(wrap_text_in_a_box("ciao\ncome và?"), result)
 
-
     def test_indented_box_wrap_text_in_a_box(self):
         """textutils - wrap_text_in_a_box indented box."""
         result = """
@@ -410,6 +414,7 @@ At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praese
 """
         self.assertEqual(wrap_text_in_a_box(text), result)
 
+
 class DecodeToUnicodeTest(unittest.TestCase):
     """Test functions related to decode_to_unicode function."""
     if CHARDET_AVAILABLE:
@@ -421,6 +426,7 @@ class DecodeToUnicodeTest(unittest.TestCase):
     else:
         pass
 
+
 class Latex2UnicodeTest(unittest.TestCase):
     """Test functions related to translating LaTeX symbols to Unicode."""
 
@@ -431,11 +437,12 @@ class Latex2UnicodeTest(unittest.TestCase):
         self.assertEqual(translate_latex2unicode("\\AAkeson"), u'\u212bkeson')
         self.assertEqual(translate_latex2unicode("$\\mathsl{\\Zeta}$"), u'\U0001d6e7')
 
-class TranslateToAsciiTest(unittest.TestCase):
-    """Test functions related to transliterating text to ascii."""
+
+class TestStripping(unittest.TestCase):
+    """Test for stripping functions like accents and control characters."""
     if UNIDECODE_AVAILABLE:
         def test_text_to_ascii(self):
-            """textutils - translate_to_ascii"""
+            """textutils - transliterate to ascii using unidecode"""
             self.assertEqual(translate_to_ascii(["á í Ú", "H\xc3\xb6hne", "Åge Øst Vær", "normal"]), \
                                                 ["a i U", "Hohne", "Age Ost Vaer", "normal"])
             self.assertEqual(translate_to_ascii("àèéìòù"), ["aeeiou"])
@@ -445,19 +452,23 @@ class TranslateToAsciiTest(unittest.TestCase):
     else:
         pass
 
-class TestStripAccents(unittest.TestCase):
-    """Test for handling of UTF-8 accents."""
-
     def test_strip_accents(self):
-        """textutils - stripping of accented letters"""
+        """textutils - transliterate to ascii (basic)"""
         self.assertEqual("memememe",
                          strip_accents('mémêmëmè'))
         self.assertEqual("MEMEMEME",
                          strip_accents('MÉMÊMËMÈ'))
 
+    def test_remove_control_characters(self):
+        """textutils - stripping of accented letters"""
+        self.assertEqual("foo\nbar\tfab\n\r",
+                         remove_control_characters('foo\nbar\tfab\n\r'))
+        self.assertEqual("abc de",
+                         remove_control_characters('abc\02de'))
+
 TEST_SUITE = make_test_suite(WrapTextInABoxTest, GuessMinimumEncodingTest,
                              WashForXMLTest, WashForUTF8Test, DecodeToUnicodeTest,
-                             Latex2UnicodeTest, TranslateToAsciiTest, TestStripAccents)
+                             Latex2UnicodeTest, TestStripping)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

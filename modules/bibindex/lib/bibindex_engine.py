@@ -66,7 +66,7 @@ from invenio.bibtask import task_init, write_message, get_datetime, \
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
 from invenio.htmlutils import remove_html_markup, get_links_in_html_page
-from invenio.textutils import wash_for_utf8, strip_accents
+from invenio.textutils import wash_for_utf8, strip_accents, remove_control_characters
 from invenio.search_engine_utils import get_fieldvalues
 
 if CFG_SOLR_URL:
@@ -274,6 +274,8 @@ def solr_add_fulltext(recid, text):
     """
     if recid:
         try:
+            # Remove any illegal characters
+            text = remove_control_characters(text)
             utext = unicode(text, 'utf-8')
             SOLR_CONNECTION.add(id=recid, fulltext=utext)
             SOLR_CONNECTION.commit()
