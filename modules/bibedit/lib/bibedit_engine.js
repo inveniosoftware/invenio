@@ -2123,14 +2123,14 @@ function addFieldSave(fieldTmpNo)
   var insertPosition = $(jQRowGroupID).data('insertionPoint');
   var selected_tag = $(jQRowGroupID).data('selected_tag');
 
-  if (controlfield){
+  if (controlfield) {
     // Controlfield. Validate and prepare to update.
     if (fieldIsProtected(tag)){
       displayAlert('alertAddProtectedField', [tag]);
       updateStatus('ready');
       return;
     }
-    if (!validMARC('ControlTag', tag) || value == ''){
+    if (!validMARC('ControlTag', tag) || value == '') {
       displayAlert('alertCriticalInput');
       updateStatus('ready');
       return;
@@ -2138,23 +2138,21 @@ function addFieldSave(fieldTmpNo)
     var field = [[], ' ', ' ', value, 0];
     var fieldPosition = getFieldPositionInTag(tag, field);
   }
-  else{
+  else {
     // Regular field. Validate and prepare to update.
     ind1 = $('#txtAddFieldInd1_' + fieldTmpNo).val();
     ind1 = (ind1 == '' || ind1 == '_') ? ' ' : ind1;
     ind2 = $('#txtAddFieldInd2_' + fieldTmpNo).val();
     ind2 = (ind2 == '' || ind2 == '_') ? ' ' : ind2;
     var MARC = tag + ind1 + ind2;
-    if (fieldIsProtected(MARC)){
+    if (fieldIsProtected(MARC)) {
       displayAlert('alertAddProtectedField', [MARC]);
       updateStatus('ready');
       return;
     }
     var validInd1 = (ind1 == ' ' || validMARC('Indicator1', ind1));
     var validInd2 = (ind2 == ' ' || validMARC('Indicator2', ind2));
-    if (!validMARC('Tag', tag)
-  || !validInd1
-  || !validInd2){
+    if (!validMARC('Tag', tag) || !validInd1 || !validInd2) {
       displayAlert('alertCriticalInput');
       updateStatus('ready');
       return;
@@ -2162,12 +2160,15 @@ function addFieldSave(fieldTmpNo)
     // Collect valid subfields in an array.
     var invalidOrEmptySubfields = false;
      $('#rowGroupAddField_' + fieldTmpNo + ' .bibEditTxtSubfieldCode'
-      ).each(function(){
+      ).each(function() {
         var subfieldTmpNo = this.id.slice(this.id.lastIndexOf('_')+1);
         var txtValue = $('#txtAddFieldValue_' + fieldTmpNo + '_' +
     subfieldTmpNo);
         var value = $(txtValue).val();
         value = value.replace(/^\s+|\s+$/g,""); // Remove whitespace from the ends of strings
+        if (isSubjectSubfield(MARC, this.value)) {
+          value = check_subjects_KB(value);
+        }
         var isStillVolatile = txtValue.hasClass('bibEditVolatileSubfield');
 
         if (!$(this).hasClass('bibEditInputError')
@@ -2360,31 +2361,37 @@ function onAddSubfieldsChange(event){
   }
 }
 
-function onAddSubfieldsSave(event, tag, fieldPosition){
+function onAddSubfieldsSave(event, tag, fieldPosition) {
   /*
    * Handle 'Save' button in add subfields form.
    */
   updateStatus('updating');
 
+  var field = gRecord[tag][fieldPosition];
   var fieldID = tag + '_' + fieldPosition;
+  var tag_ind = tag + field[1] + field[2];
   var subfields = [];
   var protectedSubfield = false, invalidOrEmptySubfields = false;
   // Collect valid fields in an array.
   $('#rowGroup_' + fieldID + ' .bibEditTxtSubfieldCode'
    ).each(function(){
      var MARC = getMARC(tag, fieldPosition) + this.value;
-     if ($.inArray(MARC, gPROTECTED_FIELDS) != -1){
+     if ($.inArray(MARC, gPROTECTED_FIELDS) != -1) {
        protectedSubfield = MARC;
        return false;
      }
-     var subfieldTmpNo = this.id.slice(this.id.lastIndexOf('_')+1);
+     var subfieldTmpNo = this.id.slice(this.id.lastIndexOf('_') + 1);
      var txtValue = $('#txtAddSubfieldsValue_' + fieldID + '_' +
        subfieldTmpNo);
      var value = $(txtValue).val();
-     if (!$(this).hasClass('bibEditInputError')
-   && this.value != ''
-   && !$(txtValue).hasClass('bibEditInputError')
-   && value != '')
+     /* Check if we need to transform automatically the value (in the case
+        of a subject subfield)
+     */
+     if (isSubjectSubfield(tag_ind, this.value)) {
+      value = check_subjects_KB(value);
+     }
+     if (!$(this).hasClass('bibEditInputError') && this.value != ''
+         && !$(txtValue).hasClass('bibEditInputError') && value != '')
        subfields.push([this.value, value]);
      else
        invalidOrEmptySubfields = true;
@@ -2404,7 +2411,7 @@ function onAddSubfieldsSave(event, tag, fieldPosition){
   /* Check if $$9 CURATOR is present */
   var iscurated = false;
   if (tag === "999") {
-    current_field_subfields = gRecord[tag][fieldPosition][0];
+    current_field_subfields = field[0];
     for (var i = 0, j = current_field_subfields.length; i < j; i++) {
         if (current_field_subfields[i][0] == "9" && current_field_subfields[i][1] == "CURATOR") {
             iscurated = true;
@@ -2451,7 +2458,6 @@ function onAddSubfieldsSave(event, tag, fieldPosition){
       }, false);
 
       // Continue local updating
-      var field = gRecord[tag][fieldPosition];
       field[0] = field[0].concat(subfields);
       var rowGroup  = $('#rowGroup_' + fieldID);
       var coloredRowGroup = $(rowGroup).hasClass('bibEditFieldColored');
@@ -2933,7 +2939,7 @@ function valueContainsSubfields(value) {
     return regExp.test(value);
 }
 
-function splitContentSubfields(value, subfieldCode, subfieldsToAdd) {
+function splitContentSubfields(value, subfieldCode, subfieldsToAdd, isSubject) {
     /*
      * Purpose: split content into pairs subfield index - subfield value
      *
@@ -2944,11 +2950,19 @@ function splitContentSubfields(value, subfieldCode, subfieldsToAdd) {
     var splitValue = value.split('$$');
     subfieldsToAdd.push(new Array(subfieldCode, splitValue[0]));
     for (var i=1, n=splitValue.length; i<n; i++) {
-        subfieldsToAdd.push(new Array(splitValue[i][0], splitValue[i].substring(1)));
+        var subfieldValue = splitValue[i].substring(1);
+        if (isSubject) {
+          subfieldValue = check_subjects_KB(subfieldValue);
+        }
+        subfieldsToAdd.push(new Array(splitValue[i][0], subfieldValue));
     }
 }
 
-function is_reference_manually_curated(field){
+function is_reference_manually_curated(field) {
+  /*
+   * Checks if the given field has a subfield with code 9 and content
+   * CURATOR. Used to check if a reference is manually curated
+   */
     for (var i=0, n=field[0].length; i < n; i++) {
         if (field[0][i][0] == '9' && field[0][i][1] == "CURATOR")
             return true;
@@ -2956,7 +2970,7 @@ function is_reference_manually_curated(field){
     return false;
 }
 
-function onContentChange(value, th){
+function onContentChange(value, th) {
   /*
    * Purpose: jEditable callback when the user hits enter in the editable field.
    * Input(s): string:value - the new content value
@@ -3008,17 +3022,17 @@ function onContentChange(value, th){
         }
     }
     else {
+        var isSubject = isSubjectSubfield(tag_ind, field[0][subfieldIndex][0]);
         var subfieldsToAdd = new Array(), bulkOperation = false, subfield_offset;
         /* Edit subfield value */
-        /* If editing subject field, check KB */
-        if (tag_ind == '65017' && field[0][subfieldIndex][0] == 'a') {
-            value = check_subjects_KB(value);
+        if (field[0][subfieldIndex][1] == value) {
+            return escapeHTML(value);
         }
         /* Check if there are subfields inside of the content value
          * e.g 999C5 $$mThis a test$$hThis is a second subfield */
         else if (valueContainsSubfields(value)) {
             bulkOperation = true;
-            splitContentSubfields(value, oldSubfieldCode, subfieldsToAdd);
+            splitContentSubfields(value, oldSubfieldCode, subfieldsToAdd, isSubject);
             if (tag_ind == '999C5' && !is_reference_manually_curated(field)){
                 subfieldsToAdd.push(new Array('9', 'CURATOR'));
             }
@@ -3026,19 +3040,6 @@ function onContentChange(value, th){
             field[0].push.apply(field[0], subfieldsToAdd); // update gRecord, add new subfields
             oldValue = field[0][subfieldIndex][1];
             subfield_offset = 1;
-        }
-        /* If editing reference field, add $$9 subfield */
-        else if (tag_ind == '999C5' && !is_reference_manually_curated(field)){
-            bulkOperation = true;
-            subfieldsToAdd.push.apply(subfieldsToAdd, field[0]);
-            subfieldsToAdd.push(new Array("9", "CURATOR"));
-            var test = field[0].length;
-            field[0].splice(0, test);
-            field[0].push.apply(field[0], subfieldsToAdd); // update gRecord, add new
-            subfield_offset = subfieldsToAdd.length - 1;
-        }
-        else if (field[0][subfieldIndex][1] == value)
-            return escapeHTML(value);
         }
         /* If editing reference field, add $$9 subfield */
         else if (tag_ind == '999C5' && !is_reference_manually_curated(field)){
@@ -3052,7 +3053,7 @@ function onContentChange(value, th){
         }
         else {
             /* If editing subject field, check KB */
-            if (tag_ind == '65017' && field[0][subfieldIndex][0] == 'a') {
+            if (isSubject) {
               value = check_subjects_KB(value);
               newValue = value;
             }
@@ -5084,4 +5085,12 @@ function onBibCirculationBtnClicked(e){
   */
   var link = bibCircIntGetEditCopyUrl(gRecID);
   window.open(link);
+}
+
+function isSubjectSubfield(tag_ind, subfield_code) {
+  /*
+   * Checks if the tag + indicators and the subfield code belong to
+   * the subject subfield
+   */
+  return (tag_ind === "65017" && subfield_code === "a")
 }
