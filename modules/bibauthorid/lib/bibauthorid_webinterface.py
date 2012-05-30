@@ -225,6 +225,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         title = self.adf['title'][ulevel](req, form, ln)
         body = TEMPLATE.tmpl_person_detail_layout(content)
         metaheaderadd = self._scripts()
+        metaheaderadd += '\n <meta name="robots" content="nofollow" />'
         self._clean_ticket(req)
 
         return page(title=title,
