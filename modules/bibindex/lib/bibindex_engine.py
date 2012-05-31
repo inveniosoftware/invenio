@@ -1009,6 +1009,7 @@ class WordTable:
             i_low = arange[0]
             chunksize_count = 0
             while i_low <= arange[1]:
+                task_sleep_now_if_required()
                 # calculate chunk group of recIDs and treat it:
                 i_high = min(i_low + opt_flush - flush_count - 1, arange[1])
                 i_high = min(i_low + chunksize - chunksize_count - 1, i_high)
@@ -1231,6 +1232,7 @@ class WordTable:
         """
         count = 0
         for arange in recIDs:
+            task_sleep_now_if_required()
             self.del_recID_range(arange[0], arange[1])
             count = count + arange[1] - arange[0]
         self.put_into_db()
@@ -1318,9 +1320,11 @@ class WordTable:
 
         time_started = time.time() # will measure profile time
         for arange in recIDs:
+
             i_low = arange[0]
             chunksize_count = 0
             while i_low <= arange[1]:
+                task_sleep_now_if_required()
                 # calculate chunk group of recIDs and treat it:
                 i_high = min(i_low + opt_flush - flush_count - 1, arange[1])
                 i_high = min(i_low + chunksize - chunksize_count - 1, i_high)
