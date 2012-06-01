@@ -45,7 +45,7 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_TAG_FORMAT, CFG_BIBEDIT_AJAX_RESULT_CODES_REV, \
     CFG_BIBEDIT_AUTOSUGGEST_TAGS, CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS,\
     CFG_BIBEDIT_KEYWORD_TAXONOMY, CFG_BIBEDIT_KEYWORD_TAG, \
-    CFG_BIBEDIT_KEYWORD_RDFLABEL
+    CFG_BIBEDIT_KEYWORD_RDFLABEL, CFG_BIBEDIT_MSG
 
 from invenio.config import CFG_SITE_LANG, CFG_DEVEL_SITE
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
@@ -63,7 +63,8 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     revision_to_timestamp, timestamp_to_revision, \
     get_record_revision_timestamps, record_revision_exists, \
     can_record_have_physical_copies, extend_record_with_template, \
-    merge_record_with_template
+    merge_record_with_template, record_xml_output, \
+    user_can_edit_record_collection
 
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
@@ -690,6 +691,8 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
 
                 # Simulate upload to catch errors
                 errors_upload = perform_upload_check(xml_record, '--replace')
+                if not user_can_edit_record_collection(req, recid):
+                    errors_upload += CFG_BIBEDIT_MSG["not_authorised"]
                 if errors_upload:
                     response['resultCode'], response['errors'] = 113, \
                         errors_upload

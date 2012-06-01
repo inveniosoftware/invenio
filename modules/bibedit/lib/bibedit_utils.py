@@ -46,8 +46,8 @@ from invenio.bibrecord import create_record, create_records, \
     record_strip_empty_fields, record_strip_empty_volatile_subfields, \
     record_order_subfields, record_get_field_instances, \
     record_add_field, field_get_subfield_codes, field_add_subfield, \
-    field_get_subfield_values
-
+    field_get_subfield_values, record_delete_fields, record_add_fields, \
+    record_get_field_values
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
@@ -63,7 +63,7 @@ from invenio.search_engine import print_record, record_exists, get_colID, \
      guess_primary_collection_of_a_record, get_record, \
      get_all_collections_of_a_record
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.webuser import get_user_info
+from invenio.webuser import get_user_info, getUid
 from invenio.dbquery import run_sql
 from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.access_control_engine import acc_authorize_action
@@ -80,21 +80,46 @@ re_ftmpl_name = re.compile('<!-- BibEdit-Field-Template-Name: (.*) -->')
 re_ftmpl_description = re.compile('<!-- BibEdit-Field-Template-Description: (.*) -->')
 
 
+VOLATILE_PREFIX = "VOLATILE:"
+
 # Authorization
 
 def user_can_edit_record_collection(req, recid):
     """ Check if user has authorization to modify a collection
     the recid belongs to
     """
+    def remove_volatile(field_value):
+        """ Remove volatile keyword from field value """
+        if field_value.startswith(VOLATILE_PREFIX):
+            field_value = field_value[len(VOLATILE_PREFIX):]
+        return field_value
+
+    # Get the collections the record belongs to
     record_collections = get_all_collections_of_a_record(recid)
-    if not record_collections:
+
+    uid = getUid(req)
+    # In case we are creating a new record
+    if cache_exists(recid, uid):
+        dummy1, dummy2, record, dummy3, dummy4, dummy5, dummy6 = get_cache_file_contents(recid, uid)
+        values = record_get_field_values(record, '980', code="a")
+        record_collections.extend([remove_volatile(v) for v in values])
+
+    normalized_collections = []
+    for collection in record_collections:
+        # Get the normalized collection name present in the action table
+        res = run_sql("""SELECT value FROM accARGUMENT
+                         WHERE keyword='collection'
+                         AND value=%s;""", (collection,))
+        if res:
+            normalized_collections.append(res[0][0])
+    if not normalized_collections:
         # Check if user has access to all collections
         auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
                                                        collection='')
         if auth_code == 0:
             return True
     else:
-        for collection in record_collections:
+        for collection in normalized_collections:
             auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
                                                            collection=collection)
             if auth_code == 0:

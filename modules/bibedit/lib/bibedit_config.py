@@ -89,7 +89,7 @@ CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY = 5000
 ## CFG_BIBEDIT_AJAX_RESULT_CODES - dictionary of result codes and messages used
 ## by the Ajax engine.
 
-CFG_BIBEDIT_AJAX_RESULT_CODES_REV= {
+CFG_BIBEDIT_AJAX_RESULT_CODES_REV = {
 #TODO: all the result codes should be accessible through the constants rather than
 #      a direct number ! some parts of the bibedit_engine.py are not readable because
 #      of using the numbers
@@ -152,6 +152,10 @@ CFG_BIBEDIT_AJAX_RESULT_CODES = {
     113: 'Error: Upload simulation found some errors'
 }
 
+CFG_BIBEDIT_MSG = {
+    "not_authorised" : "You are not authorised to submit a record into the given \
+                        collection. Please, review the collection tags."
+}
 ## CFG_BIBEDIT_MAX_SEARCH_RESULTS
 CFG_BIBEDIT_MAX_SEARCH_RESULTS = 99
 
