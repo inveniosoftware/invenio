@@ -610,7 +610,7 @@ def get_person_papers(pid, flag,
                               , (paper[2],))
 
             if date_id:
-                date_id_s = list_2_SQL_str(date_id)
+                date_id_s = list_2_SQL_str(date_id, lambda x: x[0])
                 date = run_sql("SELECT value "
                                "FROM bib26x "
                                "WHERE id in %s "
@@ -628,7 +628,7 @@ def get_person_papers(pid, flag,
                                     , (paper[2],))
 
             if experiment_id:
-                experiment_id_s = list_2_SQL_str(experiment_id)
+                experiment_id_s = list_2_SQL_str(experiment_id, lambda x: x[0])
                 experiment = run_sql("SELECT value "
                                      "FROM bib69x "
                                      "WHERE id in %s "
