@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,22 +19,22 @@
 '''
     bibauthorid_frontinterface
     This file aims to filter and modify the interface given by
-    bibauthorid_bdinterface in order to make it usable by the 
+    bibauthorid_bdinterface in order to make it usable by the
     backend so to keep it as clean as possible.
 '''
 
 from itertools import groupby
 from operator import itemgetter
+import bibauthorid_config as bconfig
 
 from bibauthorid_dbinterface import get_recently_modified_record_ids as get_papers_recently_modified #emitting
 from bibauthorid_dbinterface import get_user_log                         #emitting
 from bibauthorid_dbinterface import insert_user_log                      #emitting
 from bibauthorid_dbinterface import get_all_names_from_personid          #emitting
-from bibauthorid_dbinterface import filter_newer_bibs                    #emitting
 from bibauthorid_dbinterface import get_key_words                        #emitting
 from bibauthorid_dbinterface import bib_matrix                           #emitting
 from bibauthorid_dbinterface import get_name_by_bibrecref                #emitting
-from bibauthorid_dbinterface import get_new_pesonid                      #emitting
+from bibauthorid_dbinterface import get_new_personid                     #emitting
 from bibauthorid_dbinterface import get_deleted_papers                   #emitting
 from bibauthorid_dbinterface import get_authors_from_paper               #emitting
 from bibauthorid_dbinterface import get_coauthors_from_paper             #emitting
@@ -64,76 +64,21 @@ from bibauthorid_dbinterface import get_existing_result_clusters         #emitti
 from bibauthorid_dbinterface import remove_personid_papers               #emitting
 from bibauthorid_dbinterface import repair_personid                      #emitting
 from bibauthorid_dbinterface import get_sql_time                         #emitting
-from bibauthorid_dbinterface import find_pids_by_exact_name              #emittingq
+from bibauthorid_dbinterface import find_pids_by_exact_name              #emitting
+from bibauthorid_dbinterface import get_all_papers_of_pids               #emitting
+from bibauthorid_dbinterface import get_claimed_papers                   #emitting
+from bibauthorid_dbinterface import remove_result_cluster                #emitting
+from bibauthorid_dbinterface import filter_modified_record_ids           #emitting
+from bibauthorid_dbinterface import personid_from_signature              #emitting
+from bibauthorid_dbinterface import move_signature                       #emitting
+from bibauthorid_dbinterface import find_conflicts                       #emitting
+from bibauthorid_dbinterface import get_signature_info                   #emitting
+from bibauthorid_dbinterface import in_results
+from bibauthorid_dbinterface import check_results                        #emitting
+from bibauthorid_dbinterface import check_merger                         #emitting
 
 from search_engine import perform_request_search
 import bibauthorid_dbinterface as dbinter
-
-
-class blob:
-    def __init__(self, personid_records):
-        '''
-        @param personid_records:
-            A list of tuples: (personid, bibrefrec, flag).
-            Notice that all bibrefrecs should be the same
-            since the blob represents only one bibrefrec.
-        '''
-        self.bib = personid_records[0][1]
-        assert all(p[1] == self.bib for p in personid_records)
-        self.claimed = set()
-        self.assigned = set()
-        self.rejected = set()
-        for pid, unused, flag in personid_records:
-            if flag > 1:
-                self.claimed.add(pid)
-            elif flag >= -1:
-                self.assigned.add(pid)
-            else:
-                self.rejected.add(pid)
-
-
-def create_blobs_by_pids(pids):
-    '''
-    Returs a list of blobs by a given set of personids.
-    Blob is an object which describes all information
-    for a bibrefrec in the personid table.
-    @type pids: iterable of integers
-    '''
-    all_bibs = dbinter.get_all_papers_of_pids(pids)
-    all_bibs = ((x[0], (int(x[1]), x[2], x[3]), x[4]) for x in all_bibs)
-    bibs_dict = groupby(sorted(all_bibs, key=itemgetter(1)), key=itemgetter(1))
-    blobs = [blob(list(bibs)) for unused, bibs in bibs_dict]
-
-    return blobs
-
-
-def group_blobs(blobs):
-    '''
-    Separates the blobs into two groups
-    of objects - those with claims and
-    those without.
-    '''
-
-    # created from blobs, which are claimed
-    # [(bibrefrec, personid)]
-    union = []
-
-    # created from blobs, which are not claimed
-    # [(bibrefrec, personid/None, [personid])]
-    independent = []
-
-    for blob in blobs:
-        if len(blob.claimed) > 0:
-            assert len(blob.claimed) == 1
-            union.append((blob.bib, list(blob.claimed)[0]))
-        elif len(blob.assigned) > 0:
-            assert len(blob.assigned) == 1
-            independent.append((blob.bib, list(blob.assigned)[0], list(blob.rejected)))
-        else:
-            assert len(blob.assigned) == 0
-            independent.append((blob.bib, None, list(blob.rejected)))
-
-    return (union, independent)
 
 
 def group_personid(papers_table="aidPERSONID_PAPERS", data_table="aidPERSONID_DATA"):
@@ -217,5 +162,7 @@ def filter_bibrecs_outside(all_papers):
         remove_all_bibrecs(sep)
 
 def get_all_valid_bibrecs():
-    return perform_request_search(p="")
+    collection_restriction_pattern = " or ".join(["980__a:\"%s\"" % x for x in bconfig.LIMIT_TO_COLLECTIONS])
+    return perform_request_search(p="%s" % collection_restriction_pattern, rg=0)
+
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,6 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 '''
 bibauthorid_name_utils
     Bibauthorid utilities used by many parts of the framework
@@ -25,6 +26,8 @@ import re
 import bibauthorid_config as bconfig
 from bibauthorid_string_utils import string_partition
 from copy import deepcopy
+
+from bibauthorid_general_utils import name_comparison_print
 
 try:
     from invenio.config import CFG_ETCDIR
@@ -38,9 +41,7 @@ except ImportError:
     try:
         from Levenshtein import distance
     except ImportError:
-        bconfig.LOGGER.exception("Levenshtein Module not available!")
-        if bconfig.AUTHORNAMES_UTILS_DEBUG:
-            print "Levenshtein Module not available!"
+        name_comparison_print("Levenshtein Module not available!")
         def distance(s1, s2):
             d = {}
             lenstr1 = len(s1)
@@ -247,8 +248,6 @@ def clean_name_string(namestring, replacement=" ", keep_whitespace=True,
     whitespace_removal = re.compile("[\s]{2,100}")
     tmp = artifact_removal.sub(replacement, namestring)
 
-#    print namestring, "->", whitespace_removal.sub(" ", tmp).strip()
-
     return whitespace_removal.sub(" ", tmp).strip()
 
 
@@ -307,324 +306,6 @@ def soft_compare_names(origin_name, target_name):
         name_score = (matching_i + matching_n) * 0.4 / (max_names + max_initials)
         score += name_score
     return score
-
-#def jaro_str_distance(str1, str2):
-#    """
-#    The Jaro string similarity algorithm as described in
-#    'Jaro, M.A. (1989): "Advances in record linkage methodology as applied
-#    to the 1985 census of Tampa Florida'
-#
-#    @param str1: The first string
-#    @type str1: string
-#    @param str2: The second string
-#    @type str2: string
-#
-#    @return: approximate string comparison measure (between 0.0 and 1.0)
-#    @rtype: float
-#    """
-#
-#    if (not str1) or (not str2):
-#        return 0.0
-#    elif str1 == str2:
-#        return 1.0
-#
-#    jaro_marker = chr(1)
-#
-#    len1 = len(str1)
-#    len2 = len(str2)
-#
-#    halflen = max(len1, len2) / 2 + 1
-#
-#    assignments1 = ''
-#    assignments2 = ''
-#
-#    workstr1 = str1
-#    workstr2 = str2
-#
-#    common1 = common2 = 0
-#
-#    # Analyze the first string
-#    for i in xrange(len1):
-#        start = max(0, i - halflen)
-#        end = min(i + halflen + 1, len2)
-#        index = workstr2.find(str1[i], start, end)
-#
-#        if index > -1:  # Found common character
-#            common1 += 1
-#            assignments1 = assignments1 + str1[i]
-#            workstr2 = workstr2[:index] + jaro_marker + workstr2[index + 1:]
-#
-#    # Analyze the second string
-#    for i in xrange(len2):
-#        start = max(0, i - halflen)
-#        end = min(i + halflen + 1, len1)
-#        index = workstr1.find(str2[i], start, end)
-#
-#        if (index > -1):  # Found common character
-#            common2 += 1
-#            assignments2 = assignments2 + str2[i]
-#            workstr1 = workstr1[:index] + jaro_marker + workstr1[index + 1:]
-#
-#        common = float(common1 + common2) / 2.0
-#
-#    if (common == 0):
-#        return 0.0
-#
-#    transpositions = 0
-#
-#    for i in xrange(len(assignments1)):
-#        if (assignments1[i] != assignments2[i]):
-#            transpositions += 1
-#
-#    transpositions /= 2.0
-#
-#    common = float(common)
-#    len1 = float(len1)
-#    len2 = float(len2)
-#    jaro_constant = 1.0 / 3.0
-#    jaro_transpositions = (common1 - transpositions) / common1
-#    jaro_common_to_len_ratio = common1 / len1 + common1 / len2
-#
-#    dist = jaro_constant * (jaro_common_to_len_ratio + jaro_transpositions)
-#
-#    return dist
-#
-#
-#def _winkler_modifier(str1, str2, in_weight):
-#    """
-#    Applies the winkler modifier to a score obtained by the Jaro string
-#    similarity measure. This is described in Winkler, W.E. (1999) "The state
-#    of record linkage and current research problems".
-#
-#    If the first characters of the two strings (up to first 4) are identical,
-#    the similarity weight will be increased.
-#
-#    @param str1: The first string
-#    @type str1: string
-#    @param str2: The second string
-#    @type str2: string
-#    @param in_weight: Similarity score obtained by the Jaro algorithm
-#    @type in_weight: float
-#
-#    @return: approximate string comparison measure (between 0.0 and 1.0)
-#    @rtype: float
-#    """
-#    if (not str1) or (not str2):
-#        return 0.0
-#    elif str1 == str2:
-#        return 1.0
-#
-#    # Compute how many characters are common at beginning
-#    minlen = min(len(str1), len(str2))
-#    common_chars_num = 0
-#
-#    for common_chars_num in xrange(1, minlen + 1):
-#        if str1[:common_chars_num] != str2[:common_chars_num]:
-#            break
-#
-#    common_chars_num -= 1
-#
-#    if (common_chars_num > 4):
-#        common_chars_num = 4
-#
-#    winkler_weight = in_weight + common_chars_num * 0.1 * (1.0 - in_weight)
-#
-#    final_result = 0.0
-#
-#    if winkler_weight >= 0.0 and winkler_weight <= 1.0:
-#        final_result = winkler_weight
-#    elif winkler_weight > 1.0:
-#        final_result = 1.0
-#
-#    return final_result
-#
-#
-#def jaro_winkler_str_similarity(str1, str2):
-#    """
-#    For backwards compatibility, call Jaro followed by Winkler modification.
-#
-#    @param str1: The first string
-#    @type str1: string
-#    @param str2: The second string
-#    @type str2: string
-#
-#    @return: approximate string comparison measure (between 0.0 and 1.0)
-#    @rtype: float
-#    """
-#    jaro_weight = jaro_str_distance(str1, str2)
-#
-#    return _winkler_modifier(str1, str2, jaro_weight)
-
-
-#def _perform_matching(orig_name, targ_name):
-#    '''
-#
-#    @param orig_name:
-#    @type orig_name:
-#    @param targ_name:
-#    @type targ_name:
-#    '''
-#    tname = deepcopy(targ_name)
-#    oname = deepcopy(orig_name)
-#
-#    potential_name_matches = min(len(oname[2]), len(tname[2]))
-#    names_p_weight = 0.0
-#    initials_p_weight = _compare_initials(oname, tname)
-#
-#    if initials_p_weight > 0.0:
-#        names_p_weight = _compare_first_names(oname, tname)
-#
-#    names_w = .5
-#    ini_w = .5
-#
-#    if (names_p_weight > 0.6) and (potential_name_matches > 0):
-#        names_w = .7
-#        ini_w = .3
-#
-#    if (initials_p_weight == 1.0) and (len(oname[1]) != len(tname[1])):
-#        initials_p_weight -= .1
-#
-#    if (names_p_weight == 1.0) and ((len(oname[2]) != len(tname[2]))
-#        or not len(oname[2])) and (potential_name_matches < 2):
-#        names_p_weight -= .1
-#
-#    if (initials_p_weight == 1.0) and (names_p_weight <= 0):
-#        names_w = 0.
-#        ini_w = 0.
-#
-#    res = names_w * names_p_weight + ini_w * initials_p_weight
-#
-##    print "|--> Comparing Names: %s  and  %s" % (oname, tname)
-#    bconfig.LOGGER.debug(("|---> iWeight (%s) * ip (%s) + nWeight " +
-#                        "(%s) * nP (%s) = %s") % (ini_w, initials_p_weight,
-#                                            names_w, names_p_weight, res))
-#
-#    return (names_w * names_p_weight + ini_w * initials_p_weight)
-
-
-#def _compare_initials(orig_name, targ_name):
-#    '''
-#    Compares Author's initials and returns the assigned score.
-#
-#    @param orig_name: The first author's last name, first name(s) and initial
-#    @type orig_name: list of strings and lists of strings
-#    @param targ_name: The second author's last name, first name(s) and initial
-#    @type targ_name: list of strings and lists of strings
-#
-#    @return: a value describing the likelihood of the initials being the same
-#    @rtype: float
-#    '''
-#    # determine minimal number of initials and declare the
-#    # count of max. possible matches
-#    tname = deepcopy(targ_name)
-#    oname = deepcopy(orig_name)
-#
-#    max_possible_matches = min(len(oname[1]), len(tname[1]))
-#    initial_weight_denominator = (float(1 + max_possible_matches) /
-#                                  2.0) * max_possible_matches
-#    initials_p_weight = 0.0
-#
-#    if max_possible_matches > 0:
-#        for index, item in enumerate(oname[1]):
-##            print "|---> Trying Initial: ", I
-#            if index < max_possible_matches:
-#                try:
-#                    targ_index = tname[1].index(item)
-#
-#                    if index == targ_index:
-#                        initials_p_weight += (
-#                            float(index + 1) / initial_weight_denominator)
-#                    else:
-#                        initials_p_weight += 1. / (5 * max_possible_matches *
-#                                                   abs(index - targ_index))
-#                    tname[1][targ_index] = ''
-#                except (IndexError, ValueError, ZeroDivisionError):
-##                    initials_p_weight = 0.1
-#                    break
-#    else:
-#        initials_p_weight = 0.0
-#
-#    return initials_p_weight
-
-
-#def _compare_first_names(orig_name, targ_name):
-#    '''
-#    Compares Author's first names and returns the assigned score.
-#
-#    @param orig_name: The first author's last name, first name(s) and initial
-#    @type orig_name: list of strings and lists of strings
-#    @param targ_name: The second author's last name, first name(s) and initial
-#    @type targ_name: list of strings and lists of strings
-#
-#    @return: a value that describes the likelihood of the names being the same
-#    @rtype: float
-#    '''
-#    # determine minimal number of names and declare the
-#    # count of max. possible matches
-#
-#    string_similarity = None
-#
-#    try:
-#        from Levenshtein import jaro_winkler
-#        string_similarity = jaro_winkler
-#    except ImportError:
-#        string_similarity = jaro_winkler_str_similarity
-#
-#    tname = deepcopy(targ_name)
-#    oname = deepcopy(orig_name)
-#
-#    names_p_weight = 0.0
-#    max_possible_matches = float(min(len(oname[2]), len(tname[2])))
-#    name_weight_denominator = ((1.0 + max_possible_matches)
-#                               / 2.0 * max_possible_matches)
-#    equal_set = set(oname[2]).intersection(set(tname[2]))
-#    equal_names = [i for i in oname[2] if i in equal_set]
-#
-#    if max_possible_matches < 1.:
-#        return 1.0
-#
-#    if len(equal_names) == max_possible_matches:
-#        for index, item in enumerate(equal_names):
-#            if index <= max_possible_matches:
-#                try:
-#                    targ_index = tname[2].index(item)
-#                    initial_index = oname[1].index(item[0].upper())
-#
-#                    if (index == targ_index) or (initial_index == targ_index):
-#                        names_p_weight += (float(index + 1) /
-#                                           float(name_weight_denominator))
-#                    else:
-#                        names_p_weight += 1. / (2 * max_possible_matches *
-#                                              abs(index - targ_index))
-#                    tname[2][targ_index] = ''
-#                except (IndexError, ValueError, ZeroDivisionError):
-#                    break
-#
-#    else:
-#        fuzzy_matches = 0
-#        wrong_position_modifier = 0
-#
-##        for name1 in oname[2]:
-##            for name2 in tname[2]:
-##                similarity = string_similarity(name1, name2)
-##                if similarity > 0.91:
-##                    fuzzy_matches += 1
-##                    if oname[2].index(name1) != tname[2].index(name2):
-##                        wrong_position_modifier += 0.05
-#        for name1 in oname[2]:
-#            for name2 in tname[2]:
-#                fuzzy_matches += string_similarity(name1, name2)
-#                if oname[2].index(name1) != tname[2].index(name2):
-#                    wrong_position_modifier += 0.05
-#
-#        if fuzzy_matches > 0:
-#            num_comparisons = len(oname[2]) * len(tname[2])
-#            names_p_weight = (fuzzy_matches / num_comparisons -
-#                              wrong_position_modifier)
-#        else:
-#            names_p_weight = -0.3
-#
-#    return names_p_weight
 
 
 def create_name_tuples(names):
@@ -809,7 +490,6 @@ def full_names_are_synonymous(name1, name2, name_variations):
     if not isinstance(name2, list):
         name2 = split_name_parts(name2)
 
-    print_debug = False
     names_are_synonymous_b = False
     max_matches = min(len(name1[2]), len(name2[2]))
     matches = []
@@ -825,9 +505,7 @@ def full_names_are_synonymous(name1, name2, name_variations):
             tname = clean_name_string(tname, "", False, True)
 
             if (oname in nvar and tname in nvar) or oname == tname:
-                if print_debug:
-                    print '      ', oname, ' and ', tname, ' are synonyms!'
-
+                name_comparison_print('      ', oname, ' and ', tname, ' are synonyms!')
                 matches[i] = True
 
         if sum(matches) == max_matches:
@@ -920,24 +598,20 @@ def compare_names(origin_name, target_name, initials_penalty=False):
     '''
     Compare two names.
     '''
-    AUTHORNAMES_UTILS_DEBUG = bconfig.AUTHORNAMES_UTILS_DEBUG
     MAX_ALLOWED_SURNAME_DISTANCE = 2
-    if AUTHORNAMES_UTILS_DEBUG:
-        print "\nComparing: " , origin_name, ' ', target_name
+    name_comparison_print("\nComparing: " , origin_name, ' ', target_name)
     gendernames = GLOBAL_gendernames
     name_variations = GLOBAL_name_variations
     no = split_name_parts(origin_name, True, "", True)
     nt = split_name_parts(target_name, True, "", True)
 
-    if AUTHORNAMES_UTILS_DEBUG:
-        print "|- splitted no: ", no
-        print "|- splitted nt: ", nt
+    name_comparison_print("|- splitted no: ", no)
+    name_comparison_print("|- splitted nt: ", nt)
 
     score = 0.0
 
     surname_dist = distance(no[0], nt[0])
-    if AUTHORNAMES_UTILS_DEBUG:
-        print "|- surname distance: ", surname_dist
+    name_comparison_print("|- surname distance: ", surname_dist)
 
     if surname_dist > 0:
         artifact_removal = re.compile("[^a-zA-Z0-9]")
@@ -950,23 +624,20 @@ def compare_names(origin_name, target_name, initials_penalty=False):
             score = max(0.0, 0.5 - (float(surname_dist) / float(MAX_ALLOWED_SURNAME_DISTANCE)))
     else:
         score = 1.0
-    if AUTHORNAMES_UTILS_DEBUG:
-        print '||- surname score: ', score
+    name_comparison_print('||- surname score: ', score)
 
     initials_only = ((min(len(no[2]), len(nt[2]))) == 0)
     only_initials_available = False
     if len(no[2]) == len(nt[2]) and initials_only:
         only_initials_available = True
 
-    if AUTHORNAMES_UTILS_DEBUG:
-        print '|- initials only: ', initials_only
-        print '|- only initials available: ', only_initials_available
+    name_comparison_print('|- initials only: ', initials_only)
+    name_comparison_print('|- only initials available: ', only_initials_available)
 
     names_are_equal_composites = False
     if not initials_only:
         names_are_equal_composites = full_names_are_equal_composites(origin_name, target_name)
-    if AUTHORNAMES_UTILS_DEBUG:
-        print "|- equal composites: ", names_are_equal_composites
+    name_comparison_print("|- equal composites: ", names_are_equal_composites)
 
     max_n_initials = max(len(no[1]), len(nt[1]))
     initials_intersection = set(no[1]).intersection(set(nt[1]))
@@ -1000,12 +671,11 @@ def compare_names(origin_name, target_name, initials_penalty=False):
 
     score = score - (0.75 * initials_screwup + 0.10 * (1 - initials_c)\
             + 0.15 * initials_distance) * (score)
-    if AUTHORNAMES_UTILS_DEBUG:
-        print "|- initials sets: ", no[1], " ", nt[1]
-        print "|- initials distance: ", initials_distance
-        print "|- initials c: ", initials_c
-        print "|- initials screwup: ", initials_screwup
-        print "||- initials score: ", score
+    name_comparison_print("|- initials sets: ", no[1], " ", nt[1])
+    name_comparison_print("|- initials distance: ", initials_distance)
+    name_comparison_print("|- initials c: ", initials_c)
+    name_comparison_print("|- initials screwup: ", initials_screwup)
+    name_comparison_print("||- initials score: ", score)
 
     composits_eq = full_names_are_equal_composites(no, nt)
     if len(no[2]) > 0 and len(nt[2]) > 0:
@@ -1036,87 +706,69 @@ def compare_names(origin_name, target_name, initials_penalty=False):
         avg_names_screwup = 0
 
     score = score - score * 0.75 * max_names_screwup - score * 0.25 * avg_names_screwup
-    if AUTHORNAMES_UTILS_DEBUG:
-        print "|- max names screwup: ", max_names_screwup
-        print "|- avg screwup: ", avg_names_screwup
-        print "||- names score: ", score
-        print "|- names composites: ", composits_eq
-        print "|- same gender: ", gender_eq
-        print "|- synonims: ", vars_eq
-        print "|- substrings: ", substr_eq
+    name_comparison_print("|- max names screwup: ", max_names_screwup)
+    name_comparison_print("|- avg screwup: ", avg_names_screwup)
+    name_comparison_print("||- names score: ", score)
+    name_comparison_print("|- names composites: ", composits_eq)
+    name_comparison_print("|- same gender: ", gender_eq)
+    name_comparison_print("|- synonims: ", vars_eq)
+    name_comparison_print("|- substrings: ", substr_eq)
 
     if vars_eq:
         synmap = [[i, j, names_are_synonymous(i, j, name_variations)] for i in no[2] for j in nt[2]]
         synmap = [i for i in synmap if i[2] == True]
-        if AUTHORNAMES_UTILS_DEBUG:
-            print "|-- synmap: ", synmap
+        name_comparison_print("|-- synmap: ", synmap)
         for i in synmap:
             if no[2].index(i[0]) == nt[2].index(i[1]):
                 score = score + (1 - score) * 0.5
             else:
                 score = score + (1 - score) * 0.15
     else:
-        if AUTHORNAMES_UTILS_DEBUG:
-            print "|-- synmap: empty"
-    if AUTHORNAMES_UTILS_DEBUG:
-        print "|-- synmap score: ", score
+        name_comparison_print("|-- synmap: empty")
+    name_comparison_print("|-- synmap score: ", score)
 
     if substr_eq and not initials_only:
         ssmap = [[i, j, names_are_substrings(i, j)] for i in no[2] for j in nt[2]]
         ssmap = [i for i in ssmap if i[2] == True]
-        if AUTHORNAMES_UTILS_DEBUG:
-            print "|-- substr map: ", ssmap
+        name_comparison_print("|-- substr map: ", ssmap)
         for i in ssmap:
             if no[2].index(i[0]) == nt[2].index(i[1]):
                 score = score + (1 - score) * 0.2
             else:
                 score = score + (1 - score) * 0.05
     else:
-        if AUTHORNAMES_UTILS_DEBUG:
-            print "|-- substr map: empty"
+        name_comparison_print("|-- substr map: empty")
 
-    if AUTHORNAMES_UTILS_DEBUG:
-        print "|-- substring score: ", score
+    name_comparison_print("|-- substring score: ", score)
 
     if composits_eq and not initials_only:
-        if AUTHORNAMES_UTILS_DEBUG:
-            print "|-- composite names"
+        name_comparison_print("|-- composite names")
         score = score + (1 - score) * 0.2
     else:
-        if AUTHORNAMES_UTILS_DEBUG:
-            print "|-- not composite names"
-    if AUTHORNAMES_UTILS_DEBUG:
-        print "|-- composite score: ", score
+        name_comparison_print("|-- not composite names")
+    name_comparison_print("|-- composite score: ", score)
 
     if not gender_eq:
         score = score / 3.
-        if AUTHORNAMES_UTILS_DEBUG:
-            print "|-- apply gender penalty"
+        name_comparison_print("|-- apply gender penalty")
     else:
-        if AUTHORNAMES_UTILS_DEBUG:
-            print "|--   no  gender penalty"
+        name_comparison_print("|--   no  gender penalty")
 
-    if AUTHORNAMES_UTILS_DEBUG:
-        print "|-- gender score: ", score
+    name_comparison_print("|-- gender score: ", score)
 
     if surname_dist > MAX_ALLOWED_SURNAME_DISTANCE:
         score = 0.0
-        if AUTHORNAMES_UTILS_DEBUG:
-            print "|- surname trim: ", score
+        name_comparison_print("|- surname trim: ", score)
     else:
-        if AUTHORNAMES_UTILS_DEBUG:
-            print "|- no surname trim: ", score
+        name_comparison_print("|- no surname trim: ", score)
 
     if initials_only and (not only_initials_available or initials_penalty):
         score = score * .9
-        if AUTHORNAMES_UTILS_DEBUG:
-            print "|- initials only penalty: ", score, initials_only, only_initials_available
+        name_comparison_print("|- initials only penalty: ", score, initials_only, only_initials_available)
     else:
-        if AUTHORNAMES_UTILS_DEBUG:
-            print "|- no initials only penalty", initials_only, only_initials_available
+        name_comparison_print("|- no initials only penalty", initials_only, only_initials_available)
 
-    if AUTHORNAMES_UTILS_DEBUG:
-        print "||- final score:  ", score
+    name_comparison_print("||- final score:  ", score)
 
 
     return score

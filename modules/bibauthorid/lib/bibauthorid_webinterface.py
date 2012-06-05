@@ -16,6 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """Bibauthorid Web Interface Logic and URL handler."""
 # pylint: disable=W0105
 # pylint: disable=C0301
@@ -2523,7 +2524,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             query = "(recid:"
             query += " OR recid:".join(papers)
             query += ") AND 037:arxiv"
-            db_docs = perform_request_search(p=query)
+            db_docs = perform_request_search(p=query, rg=0)
             nickmail = ""
             nickname = ""
             db_arxiv_ids = []
@@ -2542,7 +2543,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                 nickname = nickmail
 
             db_arxiv_ids = get_fieldvalues(db_docs, "037__a")
-
             construct = {"nickname": nickname,
                          "claims": ";".join(db_arxiv_ids)}
 

@@ -229,12 +229,16 @@ def _task_submit_check_options():
     return True
 
 
-def rabbit_with_log(papers, check_invalid_papers, log_comment):
+def rabbit_with_log(papers, check_invalid_papers, log_comment, partial=False):
     from bibauthorid_rabbit import rabbit
 
     starting_time = get_sql_time()
     rabbit(papers, check_invalid_papers)
-    insert_user_log('daemon', '-1', 'PID_UPDATE', 'bibsched', 'status', comment=log_comment, timestamp=starting_time)
+    if partial:
+        action = 'PID_UPDATE_PARTIAL'
+    else:
+        action = 'PID_UPDATE'
+    insert_user_log('daemon', '-1', action, 'bibsched', 'status', comment=log_comment, timestamp=starting_time)
 
 def run_rabbit(paperslist, all_records=False):
     if not paperslist and all_records:
@@ -257,7 +261,7 @@ def run_rabbit(paperslist, all_records=False):
         else:
             rabbit_with_log(None, True, 'bibauthorid_daemon, update_personid on all papers')
     else:
-        rabbit_with_log(paperslist, True, 'bibauthorid_daemon, personid_fast_assign_papers on ' + str(paperslist))
+        rabbit_with_log(paperslist, True, 'bibauthorid_daemon, personid_fast_assign_papers on ' + str(paperslist), partial=True)
 
 
 def run_tortoise(from_scratch):

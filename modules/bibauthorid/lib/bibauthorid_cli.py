@@ -22,15 +22,14 @@ bibauthorid_cli
     This module provides a command-line interface for BibAuthorID.
 """
 
-import bibauthorid_config as bconfig
-
+from bibauthorid_general_utils import bibauthor_print
 
 def main():
     """Main function """
     try:
         import bibauthorid_daemon as daemon
     except ImportError:
-        bconfig.LOGGER.error("Hmm...No Daemon process running.")
+        bibauthor_print("Hmm...No Daemon process running.")
         return
 
     daemon.bibauthorid_daemon()

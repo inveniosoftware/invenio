@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,7 +26,8 @@ from bibauthorid_comparison import cached_sym
 from bibauthorid_name_utils import compare_names as comp_names
 from bibauthorid_name_utils import split_name_parts
 from bibauthorid_name_utils import create_normalized_name
-from bibauthorid_general_utils import update_status
+from bibauthorid_general_utils import update_status \
+                                    , update_status_final
 from bibauthorid_matrix_optimization import maximized_mapping
 from bibauthorid_backinterface import get_all_valid_bibrecs
 from bibauthorid_backinterface import filter_bibrecs_outside
@@ -37,7 +38,7 @@ from bibauthorid_backinterface import get_coauthors_from_paper
 from bibauthorid_backinterface import get_signatures_from_rec
 from bibauthorid_backinterface import modify_signature
 from bibauthorid_backinterface import remove_sigs
-from bibauthorid_backinterface import find_pids_by_name, find_pids_by_exact_name
+from bibauthorid_backinterface import find_pids_by_exact_name
 from bibauthorid_backinterface import new_person_from_signature
 from bibauthorid_backinterface import add_signature
 from bibauthorid_backinterface import update_personID_canonical_names
@@ -76,8 +77,8 @@ def rabbit(bibrecs, check_invalid_papers=False):
         markrefs = frozenset(chain(izip(cycle([100]), imap(itemgetter(0), get_authors_from_paper(rec))),
                                    izip(cycle([700]), imap(itemgetter(0), get_coauthors_from_paper(rec)))))
 
-        personid_rows = [map(int, row[:4]) + [row[4]] for row in get_signatures_from_rec(rec)]
-        personidrefs_names = dict(((row[1], row[2]), row[4]) for row in personid_rows)
+        personid_rows = [map(int, row[:3]) + [row[4]] for row in get_signatures_from_rec(rec)]
+        personidrefs_names = dict(((row[1], row[2]), row[3]) for row in personid_rows)
 
         personidrefs = frozenset(personidrefs_names.keys())
         new_signatures = list(markrefs - personidrefs)
@@ -118,8 +119,8 @@ def rabbit(bibrecs, check_invalid_papers=False):
                 used_pids.add(matched_pids[0][0])
                 updated_pids.add(matched_pids[0][0])
 
+    update_status_final()
+
     if updated_pids: # an empty set will update all canonical_names
         update_personID_canonical_names(updated_pids)
-    update_status(1)
-    print
 

@@ -139,7 +139,7 @@ $(document).ready(function() {
 
 
 function toggle_claimed_rows() {
-    $("img[alt^=Confirmed.]").parents("tr").toggle()
+    $('img[alt^="Confirmed."]').parents("tr").toggle()
 
     if ($("#toggle_claimed_rows").attr("alt") == 'hide') {
         $("#toggle_claimed_rows").attr("alt", 'show');

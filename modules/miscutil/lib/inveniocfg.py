@@ -191,10 +191,6 @@ def convert_conf_option(option_name, option_value):
     if option_name in ['CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY',
                        'CFG_BIBMATCH_LOCAL_SLEEPTIME',
                        'CFG_BIBMATCH_REMOTE_SLEEPTIME',
-                       'CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_BCTKD_RA',
-                       'CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_NEW_RA',
-                       'CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH',
-                       'CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N',
                        'CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT',
                        'CFG_BIBMATCH_FUZZY_MATCH_VALIDATION_LIMIT']:
         option_value = float(option_value[1:-1])

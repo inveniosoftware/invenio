@@ -943,7 +943,7 @@ def arxiv_login(req):
     #'external_firstname': 'Henning',
 
     try:
-        found_bibrecs = set(zip(*[perform_request_search(p='037:' + str(arx), of='id')
+        found_bibrecs = set(zip(*[perform_request_search(p='037:' + str(arx), of='id', rg=0)
                               for arx in arxiv_p_ids])[0])
     except IndexError:
         found_bibrecs = set()
@@ -1346,7 +1346,7 @@ def execute_action(action, pid, bibref, uid, userinfo='', comment=''):
         dbapi.confirm_papers_to_person((str(pid),), [[bibref]], user_level)
     elif action in ['repeal']:
         dbapi.insert_user_log(userinfo, pid, 'repeal', 'CMPUI_ticketcommit', bibref, comment)
-        dbapi.reject_papers_from_person((str(pid),), [[bibref]], user_level)
+        dbapi.reject_papers_from_person(pid, [bibref], user_level)
     elif action in ['reset']:
         dbapi.insert_user_log(userinfo, pid, 'reset', 'CMPUI_ticketcommit', bibref, comment)
         dbapi.reset_papers_flag((str(pid),), [[bibref]])
