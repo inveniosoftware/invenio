@@ -27,17 +27,20 @@ The main API functions are:
 
 import os
 import fcntl
-import sys
 import tempfile
 import time
 import signal
 import select
+from itertools import chain
 from cStringIO import StringIO
 import subprocess
 
 from invenio.config import CFG_MISCUTIL_DEFAULT_PROCESS_TIMEOUT
 
-__all__ = ['run_shell_command', 'run_process_with_timeout', 'Timeout']
+__all__ = ['run_shell_command',
+           'run_process_with_timeout',
+           'Timeout',
+           'split_cli_ids_arg']
 
 """
 This module implements two functions:
@@ -52,10 +55,12 @@ specify a input file, capturing the standard output and standard error and
 killing the process after a given timeout.
 """
 
+
 class Timeout(Exception):
     """Exception raised by with_timeout() when the operation takes too long.
     """
     pass
+
 
 def run_shell_command(cmd, args=None, filename_out=None, filename_err=None):
     """Run operating system command cmd with arguments from the args
@@ -148,6 +153,7 @@ def run_shell_command(cmd, args=None, filename_out=None, filename_err=None):
     os.close(cmd_err_fd)
     # return results:
     return cmd_exit_code, cmd_out, cmd_err
+
 
 def run_process_with_timeout(args, filename_in=None, filename_out=None, filename_err=None, cwd=None, timeout=CFG_MISCUTIL_DEFAULT_PROCESS_TIMEOUT, sudo=None):
     """Execute the specified process but within a certain timeout.
@@ -274,6 +280,7 @@ def run_process_with_timeout(args, filename_in=None, filename_out=None, filename
                 break
     return process.poll(), tmp_stdout.getvalue(), tmp_stderr.getvalue()
 
+
 def escape_shell_arg(shell_arg):
     """Escape shell argument shell_arg by placing it within
     single-quotes.  Any single quotes found within the shell argument
@@ -292,6 +299,7 @@ def escape_shell_arg(shell_arg):
         raise TypeError(msg)
 
     return "'%s'" % shell_arg.replace("'", r"'\''")
+
 
 def mymkdir(newdir, mode=0777):
     """works the way a good mkdir should :)
@@ -312,7 +320,33 @@ def mymkdir(newdir, mode=0777):
             os.umask(022)
             os.mkdir(newdir, mode)
 
+
 def s(t):
     ## De-comment this to have lots of debugging information
     #print time.time(), t
     pass
+
+
+def split_cli_ids_arg(value):
+    """
+    Split ids given in the command line
+    Possible formats are:
+    * 1
+    * 1,2,3,4
+    * 1-5,20,30,40
+    Returns respectively
+    * set([1])
+    * set([1,2,3,4])
+    * set([1,2,3,4,5,20,30,40])
+    """
+    def parse(el):
+        el = el.strip()
+        if not el:
+            ret = []
+        elif '-' in el:
+            start, end = el.split('-', 1)
+            ret = xrange(int(start), int(end) + 1)
+        else:
+            ret = [int(el)]
+        return ret
+    return set(chain(*(parse(c) for c in value.split(',') if c.strip())))

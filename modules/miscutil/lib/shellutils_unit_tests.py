@@ -28,8 +28,9 @@ import os
 from invenio.config import CFG_TMPDIR
 
 from invenio.shellutils import escape_shell_arg, run_shell_command, \
-    run_process_with_timeout, Timeout
+    run_process_with_timeout, Timeout, split_cli_ids_arg
 from invenio.testutils import make_test_suite, run_test_suite
+
 
 class EscapeShellArgTest(unittest.TestCase):
     """Testing of escaping shell arguments."""
@@ -91,6 +92,7 @@ class EscapeShellArgTest(unittest.TestCase):
         self.assertEqual(r"'5 < 10'",
                          escape_shell_arg(r'5 < 10'))
 
+
 class RunShellCommandTest(unittest.TestCase):
     """Testing of running shell commands."""
 
@@ -113,6 +115,7 @@ class RunShellCommandTest(unittest.TestCase):
         """shellutils - running wrong command should raise an exception"""
         self.assertRaises(TypeError, run_shell_command,
                           "echo %s %s %s", ("hello", "world",))
+
 
 class RunProcessWithTimeoutTest(unittest.TestCase):
     """Testing of running a process with timeout."""
@@ -153,7 +156,6 @@ else:
 
     def test_run_cmd_timeout_no_zombie(self):
         """shellutils - running simple command no zombie"""
-        t1 = time.time()
         self.assertRaises(Timeout, run_process_with_timeout, (self.script_path, '15', "THISISATEST"), timeout=5)
         ps_output = run_shell_command('ps aux')[1]
         self.failIf('THISISATEST' in ps_output, '"THISISATEST" was found in %s' % ps_output)
@@ -185,9 +187,25 @@ else:
         exitstatus, stdout, stderr = run_process_with_timeout([self.script_path, '5'], timeout=10, sudo='foo')
         self.assertNotEqual(exitstatus, 0)
 
+
+class SplitIdsTest(unittest.TestCase):
+    def test_one(self):
+        self.assertEqual(split_cli_ids_arg("1"), set([1]))
+
+    def test_range(self):
+        self.assertEqual(split_cli_ids_arg("1-5"), set([1, 2, 3, 4, 5]))
+
+    def test_multiple(self):
+        self.assertEqual(split_cli_ids_arg("1,5,7"), set([1, 5, 7]))
+
+    def test_complex(self):
+        self.assertEqual(split_cli_ids_arg("1-1,7,10-11,4"), set([1, 4, 7, 10, 11]))
+
+
 TEST_SUITE = make_test_suite(EscapeShellArgTest,
                              RunShellCommandTest,
-                             RunProcessWithTimeoutTest)
+                             RunProcessWithTimeoutTest,
+                             SplitIdsTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
