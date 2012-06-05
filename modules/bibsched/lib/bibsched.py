@@ -1010,12 +1010,16 @@ class BibSched(object):
         """Among the task_set, return the list of tasks to stop and the list
         of tasks to sleep.
         """
+        if proc in CFG_BIBTASK_MONOTASKS:
+            return [], task_set
+
         min_prio = None
         min_task_id = None
         min_proc = None
         min_status = None
         min_sequenceid = None
         to_stop = []
+
         ## For all the lower priority tasks...
         for (this_task_id, this_proc, this_priority, this_status, this_sequenceid) in task_set:
             if not self.is_task_safe_to_execute(this_proc, proc):
@@ -1104,6 +1108,12 @@ class BibSched(object):
                     Log('Task %s need to run after task %s since they have the same sequence id: %s' % (task_id, other_task_id, sequenceid))
                     ## If there is a task with same sequence number then do not run the current task
                     return False
+
+            if proc in CFG_BIBTASK_MONOTASKS and higher:
+                ## This is a monotask
+                if debug:
+                    Log("Cannot run because this is a monotask and there are higher priority tasks: %s" % (higher, ))
+                return False
 
             ## No higher priority task have issue with the given task.
             if proc not in CFG_BIBTASK_FIXEDTIMETASKS and len(higher) >= CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS:
