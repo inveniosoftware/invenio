@@ -644,7 +644,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = check_user_can_view_comments(user_info, self.recid)
-        if auth_code and user_info['email'] == 'guest':
+        if isGuestUser(uid):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \

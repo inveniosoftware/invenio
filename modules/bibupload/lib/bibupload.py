@@ -1472,6 +1472,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
                 if not found_bibdoc:
                     if not pretend:
                         bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
+                        bibdoc.set_status(restriction)
                         for (url, format, description, comment, flags) in urls:
                             assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment, flags))
             elif mode == 'correct':
@@ -1536,6 +1537,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
                     else:
                         if not pretend:
                             bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
+                            bibdoc.set_status(restriction)
                             for (url, format, description, comment, flags) in urls:
                                 assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment, flags))
             elif mode == 'append':
