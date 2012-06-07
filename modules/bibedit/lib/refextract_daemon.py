@@ -345,6 +345,9 @@ def _task_run_core():
                         'kb-journal'                 : 0,
                         'kb-report-number'           : 0,
                         'extraction-mode'            : 'ref',
+                        'authors'                    : 0,
+                        'affiliations'               : 0,
+                        'treat_as_raw_section'       : 0,
                       }
 
     ## holds the name of the extraction job, and if it's already in the db
@@ -399,13 +402,7 @@ def _task_run_core():
 
     ## If some records exist which actually need to have their references extracted
     if daemon_cli_opts['fulltext']:
-        try:
-            ## Call Refextract
-            begin_extraction(daemon_cli_options=daemon_cli_opts)
-        except Exception, err:
-            write_message("Error: Unable to extract references.\n%s\n" % \
-                (err.args[0]), stream=sys.stdout, verbose=0)
-            raise StandardError
+        begin_extraction(daemon_cli_options=daemon_cli_opts)
 
         try:
             ## Always move contents of file holding xml into a file
