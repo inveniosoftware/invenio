@@ -38,7 +38,6 @@ from invenio.bibtask import write_message, task_get_option, \
                      task_update_progress, task_sleep_now_if_required, \
                      task_get_task_param
 from invenio.errorlib import register_exception
-from invenio.intbitset import intbitset
 from invenio.bibindex_engine import get_field_tags
 from invenio.bibindex_engine import CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
 
@@ -68,117 +67,70 @@ def get_citation_weight(rank_method_code, config, chunk_size=20000):
     the index of sorted research results by citation information
     """
     begin_time = time.time()
-    last_update_time = get_bibrankmethod_lastupdate(rank_method_code)
 
-    if task_get_option("quick") == "no":
-        last_update_time = "0000-00-00 00:00:00"
-        write_message("running thorough indexing since quick option not used",
-                      verbose=3)
+    quick = task_get_option("quick") != "no"
 
-    try:
-        # check indexing times of `journal' and `reportnumber`
-        # indexes, and only fetch records which have been indexed
-        sql = "SELECT DATE_FORMAT(MIN(last_updated), " \
-              "'%%Y-%%m-%%d %%H:%%i:%%s') FROM idxINDEX WHERE name IN (%s,%s)"
-        index_update_time = run_sql(sql, ('journal', 'reportnumber'), 1)[0][0]
-    except IndexError:
-        write_message("Not running citation indexer since journal/reportnumber"
-                      " indexes are not created yet.")
-        index_update_time = "0000-00-00 00:00:00"
-
-    if index_update_time > datetime.now().strftime("%Y-%m-%d %H:%M:%S"):
-        index_update_time = "0000-00-00 00:00:00"
-
-    last_modified_records = get_last_modified_rec(last_update_time,
-                                                  index_update_time)
     # id option forces re-indexing a certain range
     # even if there are no new recs
-    if last_modified_records or task_get_option("id"):
-        if task_get_option("id"):
-            # construct a range of records to index
-            updated_recid_list = []
-            for first, last in task_get_option("id"):
-                updated_recid_list += range(first, last+1)
-            write_message('Records to process: %s' % \
-                                                      str(updated_recid_list))
+    if task_get_option("id"):
+        # construct a range of records to index
+        updated_recids = []
+        for first, last in task_get_option("id"):
+            updated_recids += range(first, last+1)
+        if len(updated_recids) > 10000:
+            str_updated_recids = str(updated_recids[:10]) + ' ... ' + str(updated_recids[-10:])
         else:
-            updated_recid_list = create_recordid_list(last_modified_records)
+            str_updated_recids = str(updated_recids)
+        write_message('Records to process: %s' % str_updated_recids)
+        index_update_time = None
+    else:
+        bibrank_update_time = get_bibrankmethod_lastupdate(rank_method_code)
+        if not quick:
+            bibrank_update_time = "0000-00-00 00:00:00"
+        write_message("bibrank: %s" % bibrank_update_time)
+        index_update_time = get_bibindex_update_time()
+        write_message("bibindex: %s" % index_update_time)
+        if index_update_time > datetime.now().strftime("%Y-%m-%d %H:%M:%S"):
+            index_update_time = "0000-00-00 00:00:00"
+        updated_recids = get_modified_recs(bibrank_update_time,
+                                           index_update_time)
+        if len(updated_recids) > 10000:
+            str_updated_recids = str(updated_recids[:10]) + ' ... ' + str(updated_recids[-10:])
+        else:
+            str_updated_recids = str(updated_recids)
+        write_message("%s records to update" % str_updated_recids)
 
-            write_message("Last update %s records: %s updates: %s" % \
-                                                   (last_update_time,
-                                                    len(last_modified_records),
-                                                    len(updated_recid_list)))
-
+    if updated_recids:
         # result_intermediate should be warranted to exists!
         # but if the user entered a "-R" (do all) option, we need to
         # make an empty start set
-        quick = task_get_option("quick") != "no"
         if quick:
-            cites_weight = last_updated_result(rank_method_code)
-            cites = get_cit_dict("citationdict")
-            refs = get_cit_dict("reversedict")
-            selfcites = get_cit_dict("selfcitdict")
-            selfrefs = get_cit_dict("selfcitedbydict")
-            authorcites = get_initial_author_dict()
+            dicts = {
+                'cites_weight': last_updated_result(rank_method_code),
+                'cites': get_cit_dict("citationdict"),
+                'refs': get_cit_dict("reversedict"),
+                'selfcites': get_cit_dict("selfcitdict"),
+                'selfrefs': get_cit_dict("selfcitedbydict"),
+                'authorcites': get_initial_author_dict(),
+            }
         else:
-            cites_weight, cites, refs = {}, {}, {}
-            selfcites, selfrefs, authorcites = {}, {}, {}
+            dicts = {
+                'cites_weight': {},
+                'cites': {},
+                'refs': {},
+                'selfcites': {},
+                'selfrefs': {},
+                'authorcites': {},
+            }
 
-        # Enrich updated_recid_list so that it would contain also
-        # records citing or referring to updated records, so that
-        # their citation information would be updated too.  Not the
-        # most efficient way to treat this problem, but the one that
-        # requires least code changes until ref_analyzer() is more
-        # nicely re-factored.
-        updated_recid_list_set = intbitset(updated_recid_list)
-        for somerecid in updated_recid_list:
-            # add both citers and citees:
-            updated_recid_list_set |= intbitset(cites.get(somerecid, []))
-            updated_recid_list_set |= intbitset(refs.get(somerecid, []))
-
-        # Process recent records first
-        # The older records were most likely added by the above steps
-        # to be reprocessed so they only have minor changes
-        updated_recid_iter = iter(sorted(updated_recid_list_set, reverse=True))
-
-        # Split records to process into chunks so that we do not
-        # fill up too much memory
-        while True:
-            task_sleep_now_if_required()
-            chunk = list(islice(updated_recid_iter, chunk_size))
-            if not chunk:
-                if not quick:
-                    insert_cit_ref_list_intodb(cites,
-                                               refs,
-                                               selfcites,
-                                               selfrefs,
-                                               authorcites)
-                break
-            write_message("Processing chunk #%s to #%s" % (chunk[0], chunk[-1]))
-            cites_weight, cites, refs, selfcites, selfrefs, authorcites \
-                        = process_chunk(chunk,
-                                        config,
-                                        cites_weight,
-                                        cites,
-                                        refs,
-                                        selfcites,
-                                        selfrefs,
-                                        authorcites,
-                                        do_catchup=quick)
-
-            if quick:
-                # Store partial result as it is just an update and not
-                # a creation from scratch
-                insert_cit_ref_list_intodb(cites,
-                                           refs,
-                                           selfcites,
-                                           selfrefs,
-                                           authorcites)
+        # Process fully the updated records
+        process_and_store(updated_recids, config, dicts, chunk_size, quick)
 
         end_time = time.time()
         write_message("Total time of get_citation_weight(): %.2f sec" % \
                                                       (end_time - begin_time))
         task_update_progress("citation analysis done")
+        cites_weight = dicts['cites_weight']
     else:
         cites_weight = {}
         write_message("No new records added since last time this " \
@@ -187,32 +139,85 @@ def get_citation_weight(rank_method_code, config, chunk_size=20000):
     return cites_weight, index_update_time
 
 
-def process_chunk(recids, config, cites_weight, cites, refs, selfcites,
-                                       selfrefs, authorcites, do_catchup=True):
+def process_and_store(recids, config, dicts, chunk_size, quick):
+    # Process recent records first
+    # The older records were most likely added by the above steps
+    # to be reprocessed so they only have minor changes
+    recids_iter = iter(sorted(recids, reverse=True))
+
+    # Split records to process into chunks so that we do not
+    # fill up too much memory
+    while True:
+        task_sleep_now_if_required()
+        chunk = list(islice(recids_iter, chunk_size))
+        if not chunk:
+            if not quick:
+                store_dicts(dicts)
+            break
+        write_message("Processing chunk #%s to #%s" % (chunk[0], chunk[-1]))
+
+        # dicts are modified in-place
+        process_chunk(chunk, config, dicts)
+
+        if quick:
+            # Store partial result as it is just an update and not
+            # a creation from scratch
+            store_dicts(dicts)
+
+
+def process_chunk(recids, config, dicts):
+    cites_weight = dicts['cites_weight']
+    cites = dicts['cites']
+    refs = dicts['refs']
+
+    old_refs = {}
+    for recid in recids:
+        old_refs[recid] = set(refs.get(recid, []))
+
+    old_cites = {}
+    for recid in recids:
+        old_cites[recid] = set(cites.get(recid, []))
+
+    process_inner(recids, config, dicts)
+
+    # Records cited by updated_recid_list
+    # They can only loose references as added references
+    # are already added to the dicts at this point
+    for somerecid in recids:
+        for recid in set(old_cites[somerecid]) - set(cites.get(somerecid, [])):
+            refs[recid] = list(set(refs.get(recid, [])) - set([somerecid]))
+            if not refs[recid]:
+                del refs[recid]
+
+    # Records referenced by updated_recid_list
+    # They can only loose citations as added citations
+    # are already added to the dicts at this point
+    for somerecid in recids:
+        for recid in set(old_refs[somerecid]) - set(refs.get(somerecid, [])):
+            cites[recid] = list(set(cites.get(recid, [])) - set([somerecid]))
+            cites_weight[recid] = len(cites[recid])
+            if not cites[recid]:
+                del cites[recid]
+                del cites_weight[recid]
+
+
+def process_inner(recids, config, dicts, do_catchup=True):
     tags = get_tags_config(config)
+
     # call the procedure that does the hard work by reading fields of
     # citations and references in the updated_recid's (but nothing else)!
     write_message("Entering get_citation_informations", verbose=9)
     citation_informations = get_citation_informations(recids, tags,
                                                  fetch_catchup_info=do_catchup)
-    # write_message("citation_informations: "+str(citation_informations))
-    # create_analysis_tables() #temporary..
-                              #test how much faster in-mem indexing is
+
     write_message("Entering ref_analyzer", verbose=9)
     # call the analyser that uses the citation_informations to really
     # search x-cites-y in the coll..
     return ref_analyzer(citation_informations,
-                       cites_weight,
-                       cites,
-                       refs,
-                       selfcites,
-                       selfrefs,
-                       authorcites,
-                       recids,
-                       tags,
-                       do_catchup=do_catchup)
-    # dic is docid-numberofreferences like {1: 2, 2: 0, 3: 1}
-    # write_message("Docid-number of known references "+str(dic))
+                        dicts,
+                        recids,
+                        tags,
+                        do_catchup=do_catchup)
 
 
 def get_bibrankmethod_lastupdate(rank_method_code):
@@ -229,7 +234,22 @@ def get_bibrankmethod_lastupdate(rank_method_code):
     return r
 
 
-def get_last_modified_rec(bibrank_method_lastupdate, indexes_lastupdate):
+def get_bibindex_update_time():
+    try:
+        # check indexing times of `journal' and `reportnumber`
+        # indexes, and only fetch records which have been indexed
+        sql = "SELECT DATE_FORMAT(MIN(last_updated), " \
+              "'%%Y-%%m-%%d %%H:%%i:%%s') FROM idxINDEX WHERE name IN (%s,%s)"
+        index_update_time = run_sql(sql, ('journal', 'reportnumber'), 1)[0][0]
+    except IndexError:
+        write_message("Not running citation indexer since journal/reportnumber"
+                      " indexes are not created yet.")
+        index_update_time = "0000-00-00 00:00:00"
+
+    return index_update_time
+
+
+def get_modified_recs(bibrank_method_lastupdate, indexes_lastupdate):
     """Get records to be updated by bibrank indexing
 
     Return the list of records which have been modified between the last
@@ -240,14 +260,8 @@ def get_last_modified_rec(bibrank_method_lastupdate, indexes_lastupdate):
                WHERE modification_date >= %s
                AND modification_date < %s
                ORDER BY id ASC"""
-    return run_sql(query, (bibrank_method_lastupdate, indexes_lastupdate))
-
-
-def create_recordid_list(rec_ids):
-    """Create a list of record ids out of RECIDS.
-       The result is expected to have ascending numerical order.
-    """
-    return [row[0] for row in rec_ids]
+    records = run_sql(query, (bibrank_method_lastupdate, indexes_lastupdate))
+    return [r[0] for r in records]
 
 
 def last_updated_result(rank_method_code):
@@ -580,12 +594,17 @@ def standardize_report_number(report_number):
     return report_number
 
 
-def ref_analyzer(citation_informations, citations_weight, citations,
-                 references, selfcites, selfrefs, authorcites,
+def ref_analyzer(citation_informations, dicts,
                  updated_recids, tags, do_catchup=True):
     """Analyze the citation informations and calculate the citation weight
        and cited by list dictionary.
     """
+    citations_weight = dicts['cites_weight']
+    citations = dicts['cites']
+    references = dicts['refs']
+    selfcites = dicts['selfcites']
+    selfrefs = dicts['selfrefs']
+    authorcites = dicts['authorcites']
 
     def step(msg_prefix, recid, done, total):
         if done % 30 == 0:
@@ -890,29 +909,12 @@ def ref_analyzer(citation_informations, citations_weight, citations,
                                                         selfrefs, authorcites
 
 
-def insert_cit_ref_list_intodb(citation_dic, reference_dic, selfcbdic,
-                               selfdic, authorcitdic):
+def store_dicts(dicts):
     """Insert the reference and citation list into the database"""
-    insert_into_cit_db(reference_dic, "reversedict")
-    insert_into_cit_db(citation_dic, "citationdict")
-    insert_into_cit_db(selfcbdic, "selfcitedbydict")
-    insert_into_cit_db(selfdic, "selfcitdict")
-
-    for a in authorcitdic.keys():
-        lserarr = serialize_via_marshal(authorcitdic[a])
-        # author name: replace " with something else
-        a.replace('"', '\'')
-        a = unicode(a, 'utf-8')
-        try:
-            ablob = run_sql("SELECT hitlist FROM rnkAUTHORDATA WHERE aterm = %s", (a,))
-            if not (ablob):
-                run_sql("INSERT INTO rnkAUTHORDATA(aterm,hitlist) VALUES (%s,%s)",
-                         (a, lserarr))
-            else:
-                run_sql("UPDATE rnkAUTHORDATA SET hitlist  = %s WHERE aterm=%s",
-                        (lserarr, a))
-        except:
-            register_exception(prefix="could not read/write rnkAUTHORDATA aterm=%s hitlist=%s" % (a, lserarr), alert_admin=True)
+    insert_into_cit_db(dicts['refs'], "reversedict")
+    insert_into_cit_db(dicts['cites'], "citationdict")
+    insert_into_cit_db(dicts['selfcites'], "selfcitedbydict")
+    insert_into_cit_db(dicts['selfrefs'], "selfcitdict")
 
 
 def insert_into_cit_db(dic, name):
