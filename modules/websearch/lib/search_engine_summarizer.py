@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2010, 2011 CERN.
+## Copyright (C) 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -139,6 +139,10 @@ def get_coauthors(author, tags, cache):
         return cache[author]
 
     friends = set()
+
+    # sanity check: author may not exist
+    if not author:
+        return friends
 
     try:
         authorid = int(author)
