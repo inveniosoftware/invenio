@@ -22,22 +22,23 @@
 import traceback
 
 from datetime import datetime
+from itertools import chain
 from invenio.bibtask import task_get_option, write_message, \
                             task_sleep_now_if_required, \
                             task_update_progress
 from invenio.dbquery import run_sql
 from invenio.search_engine import get_record
 from invenio.search_engine import get_collection_reclist
+from invenio.refextract_api import get_pdf_doc
 from invenio.bibrecord import record_get_field_instances, \
                               field_get_subfield_values
 
 
-
-def task_run_core_wrapper(name, core_func):
+def task_run_core_wrapper(name, core_func, extra_vars=None):
     def fun():
         try:
-            return task_run_core(name, core_func)
-        except Exception, e:
+            return task_run_core(name, core_func, extra_vars)
+        except Exception:
             # Remove extra '\n'
             write_message(traceback.format_exc()[:-1])
             raise
@@ -109,18 +110,16 @@ def fetch_concerned_records(name):
 
 def fetch_concerned_arxiv_records(name):
     task_update_progress("Fetching arxiv record ids")
-    name = "%s:arxiv" % name
 
-    last_recid, last_date = fetch_last_updated(name)
+    dummy, last_date = fetch_last_updated(name)
 
     # Fetch all records inserted since last run
     sql = "SELECT `id`, `modification_date` FROM `bibrec` " \
         "WHERE `modification_date` >= %s " \
-        "AND `modification_date` > NOW() - INTERVAL 7 DAY " \
+        "AND `creation_date` > NOW() - INTERVAL 7 DAY " \
         "ORDER BY `modification_date`" \
         "LIMIT 5000"
     records = run_sql(sql, [last_date.isoformat()])
-    records = [(2856, None)]
 
     def check_arxiv(recid):
         record = get_record(recid)
@@ -131,8 +130,16 @@ def fetch_concerned_arxiv_records(name):
                     return True
         return False
 
+    def check_pdf_date(recid):
+        doc = get_pdf_doc(recid)
+        if doc:
+            return doc.md > last_date
+        return False
+
     records = [(r, mod_date) for r, mod_date in records if check_arxiv(r)]
-    write_message("recids %s" % repr(records))
+    records = [(r, mod_date) for r, mod_date in records if check_pdf_date(r)]
+    write_message("recids %s" % repr([(r, mod_date.isoformat()) \
+                                               for r, mod_date in records]))
     task_update_progress("Done fetching arxiv record ids")
     return records
 
@@ -145,7 +152,7 @@ def process_records(name, records, func, extra_vars):
         msg = "Extracting for %s (%d/%d)" % (recid, count, total)
         task_update_progress(msg)
         write_message(msg)
-        func(recid)
+        func(recid, **extra_vars)
         if date:
             store_last_updated(recid, date, name)
         count += 1
@@ -165,8 +172,9 @@ def task_run_core(name, func, extra_vars=None):
 
     if task_get_option('arxiv'):
         extra_vars['_arxiv'] = True
-        records = fetch_concerned_arxiv_records(name)
-        process_records(name, records, func, extra_vars)
+        arxiv_name = "%s:arxiv" % name
+        records = fetch_concerned_arxiv_records(arxiv_name)
+        process_records(arxiv_name, records, func, extra_vars)
 
     write_message("Complete")
     return True

@@ -27,7 +27,6 @@ try:
 except ImportError:
     from md5 import new as md5
 
-from invenio.refextract_cli import halt
 from invenio.refextract_config import CFG_REFEXTRACT_KBS
 from invenio.bibknowledge import get_kbr_items
 from invenio.config import CFG_REFEXTRACT_KBS_OVERRIDE
@@ -89,8 +88,10 @@ def load_kb(path, builder):
     try:
         path.startswith
     except AttributeError:
+        write_message("Loading kb from array", verbose=3)
         return load_kb_from_iterable(path, builder)
     else:
+        write_message("Loading kb from %s" % path, verbose=3)
         kb_start = 'kb:'
         if path.startswith(kb_start):
             return load_kb_from_db(path[len(kb_start):], builder)
@@ -308,7 +309,7 @@ def build_reportnum_kb(fpath):
             # complete regex:
             # will be in the style "(categ)-(numatn1|numatn2|numatn3|...)"
             for classification in preprint_classifications:
-                search_pattern_str = ur'[^a-zA-Z0-9\/\.\-]((?P<categ>' \
+                search_pattern_str = ur'(?:^|[^a-zA-Z0-9\/\.\-])((?P<categ>' \
                                      + classification[0].strip() + u')' \
                                      + numeration_regexp + u')'
 
@@ -338,14 +339,14 @@ def build_reportnum_kb(fpath):
                                                      # read from the KB
 
     # pattern to recognise an institute name line in the KB
-    re_institute_name = re.compile(r'^\#{5}\s*(.+)\s*\#{5}$', re.UNICODE)
+    re_institute_name = re.compile(ur'^\*{5}\s*(.+)\s*\*{5}$', re.UNICODE)
 
     # pattern to recognise an institute preprint categ line in the KB
     re_preprint_classification = \
-                re.compile(r'^\s*(\w.*)\s*---\s*(\w.*)\s*$', re.UNICODE)
+                re.compile(ur'^\s*(\w.*)\s*---\s*(\w.*)\s*$', re.UNICODE)
 
     # pattern to recognise a preprint numeration-style line in KB
-    re_numeration_pattern = re.compile(r'^\<(.+)\>$', re.UNICODE)
+    re_numeration_pattern = re.compile(ur'^\<(.+)\>$', re.UNICODE)
 
     kb_line_num = 0    # when making the dictionary of patterns, which is
                        # keyed by the category search string, this counter
@@ -355,7 +356,7 @@ def build_reportnum_kb(fpath):
 
     try:
         if isinstance(fpath, basestring):
-            write_message('Loading reports kb', verbose=3)
+            write_message('Loading reports kb from %s' % fpath, verbose=3)
             fh = open(fpath, "r")
             fpath_needs_closing = True
         else:
@@ -372,9 +373,7 @@ def build_reportnum_kb(fpath):
             except UnicodeError:
                 write_message("*** Unicode problems in %s for line %e" \
                                  % (fpath, kb_line_num), sys.stderr, verbose=0)
-                halt(err=UnicodeError,
-                     msg="Error: Unable to parse report number kb (line: %s)" % str(kb_line_num),
-                     exit_code=1)
+                raise UnicodeError("Error: Unable to parse report number kb (line: %s)" % str(kb_line_num))
 
             m_institute_name = re_institute_name.search(rawline)
             if m_institute_name:
@@ -434,9 +433,7 @@ def build_reportnum_kb(fpath):
                """to read from KB %(kb)s.""" \
                % {'kb' : fpath}
         write_message(emsg, sys.stderr, verbose=0)
-        halt(err=IOError,
-             msg="Error: Unable to open report number kb '%s'" % fpath,
-             exit_code=1)
+        raise IOError("Error: Unable to open report number kb '%s'" % fpath)
 
     # return the preprint reference patterns and the replacement strings
     # for non-standard categ-strings:
@@ -469,7 +466,7 @@ def build_special_journals_kb(fpath):
     before the volume.
     """
     journals = set()
-    write_message('Loading special journals kb', verbose=3)
+    write_message('Loading special journals kb from %s' % fpath, verbose=3)
     fh = open(fpath, "r")
     try:
         for line in fh:
@@ -491,14 +488,14 @@ def build_books_kb(fpath):
     if isinstance(fpath, basestring):
         fpath_needs_closing = True
         try:
-            write_message('Loading books kb', verbose=3)
+            write_message('Loading books kb from %s' % fpath, verbose=3)
             fh = open(fpath, "r")
             source = csv.reader(fh, delimiter='|', lineterminator=';')
         except IOError:
             # problem opening KB for reading, or problem while reading from it:
             emsg = "Error: Could not build list of books - failed " \
                    "to read from KB %(kb)s." % {'kb' : fpath}
-            halt(err=IOError, msg=emsg, exit_code=1)
+            raise IOError(emsg)
     else:
         fpath_needs_closing = False
         source = fpath
@@ -522,14 +519,14 @@ def build_publishers_kb(fpath):
     if isinstance(fpath, basestring):
         fpath_needs_closing = True
         try:
-            write_message('Loading publishers kb', verbose=3)
+            write_message('Loading publishers kb from %s' % fpath, verbose=3)
             fh = open(fpath, "r")
             source = csv.reader(fh, delimiter='|', lineterminator='\n')
         except IOError:
             # problem opening KB for reading, or problem while reading from it:
             emsg = "Error: Could not build list of publishers - failed " \
                    "to read from KB %(kb)s." % {'kb' : fpath}
-            halt(err=IOError, msg=emsg, exit_code=1)
+            raise IOError(emsg)
     else:
         fpath_needs_closing = False
         source = fpath
@@ -561,9 +558,7 @@ def build_authors_kb(fpath):
             emsg = "Error: Could not build list of authors - failed " \
                    "to read from KB %(kb)s." % {'kb' : fpath}
             write_message(emsg, sys.stderr, verbose=0)
-            halt(err=IOError,
-                 msg="Error: Unable to open authors kb '%s'" % fpath,
-                 exit_code=1)
+            raise IOError("Error: Unable to open authors kb '%s'" % fpath)
     else:
         fpath_needs_closing = False
         fh = fpath
@@ -603,9 +598,7 @@ def build_journals_re_kb(fpath):
         try:
             fh = open(fpath, "r")
         except IOError:
-            halt(err=IOError,
-                 msg="Error: Unable to open journal kb '%s'" % fpath,
-                 exit_code=1)
+            raise IOError("Error: Unable to open journal kb '%s'" % fpath)
     else:
         fpath_needs_closing = False
         fh = fpath

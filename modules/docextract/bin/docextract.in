@@ -48,7 +48,7 @@ import sys
 
 from invenio.refextract_cli import main as cli_main
 from invenio.refextract_cli import get_cli_options
-from invenio.refextract_engine import begin_extraction
+from invenio.refextract_cli import begin_extraction
 
 
 if __name__ == '__main__':

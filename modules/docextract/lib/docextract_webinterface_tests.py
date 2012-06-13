@@ -33,6 +33,7 @@ EXPECTED_RESPONSE = """<record>
       <subfield code="o">1</subfield>
       <subfield code="h">D. Clowe, A. Gonzalez, and M. Markevitch</subfield>
       <subfield code="s">Astrophys.J.,604,596</subfield>
+      <subfield code="y">2004</subfield>
    </datafield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">2</subfield>
@@ -43,44 +44,49 @@ EXPECTED_RESPONSE = """<record>
       <subfield code="o">3</subfield>
       <subfield code="h">M. Girardi, G. Giuricin, F. Mardirossian, M. Mezzetti, and W. Boschin</subfield>
       <subfield code="s">Astrophys.J.,505,74</subfield>
+      <subfield code="y">1998</subfield>
    </datafield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">4</subfield>
       <subfield code="h">D. A. White, C. Jones, and W. Forman</subfield>
       <subfield code="s">Mon.Not.Roy.Astron.Soc.,292,419</subfield>
+      <subfield code="y">1997</subfield>
    </datafield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">5</subfield>
       <subfield code="h">V.C. Rubin, N. Thonnard, and W. K. Ford</subfield>
       <subfield code="s">Astrophys.J.,238,471</subfield>
+      <subfield code="y">1980</subfield>
    </datafield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">6</subfield>
       <subfield code="h">A. Bosma</subfield>
       <subfield code="s">Astron.J.,86,1825</subfield>
+      <subfield code="y">1981</subfield>
    </datafield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">7</subfield>
       <subfield code="h">S.M. Faber and J.S. Gallagher</subfield>
       <subfield code="s">Ann.Rev.Astron.Astrophys.,17,135</subfield>
+      <subfield code="y">1979</subfield>
    </datafield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">8</subfield>
       <subfield code="h">M. Persic, P. Salucci, and F. Stel</subfield>
       <subfield code="s">Mon.Not.Roy.Astron.Soc.,281,27</subfield>
+      <subfield code="y">1996</subfield>
    </datafield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">9</subfield>
       <subfield code="h">M. Lowewnstein and R. E. White</subfield>
       <subfield code="s">Astrophys.J.,518,50</subfield>
+      <subfield code="y">1999</subfield>
    </datafield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">10</subfield>
       <subfield code="h">D. P. Clemens</subfield>
       <subfield code="s">Astrophys.J.,295,422</subfield>
-   </datafield>
-   <datafield tag="999" ind1="C" ind2="6">
-      <subfield code="a">Invenio/1.0.0-rc0.735-eb90d refextract/1.0.0-rc0.735-eb90d-1326974791-0-0-9-10-0-0-1</subfield>
+      <subfield code="y">1985</subfield>
    </datafield>
 </record>"""
 
@@ -106,14 +112,16 @@ class DocExtractTest(unittest.TestCase):
 
             pdf = open("%s/docextract/example.pdf" % CFG_ETCDIR, 'rb')
             response = requests.post(url, files={'pdf': pdf})
-            compare_references(self, response.content, EXPECTED_RESPONSE)
+            # Remove stats tag
+            lines = response.content.split('\n')
+            lines[-6:-1] = []
+            compare_references(self, '\n'.join(lines), EXPECTED_RESPONSE)
 
         def test_url(self):
             url = CFG_SITE_URL + '/textmining/api/extract-references-pdf-url'
 
             pdf = CFG_SITE_URL + '/textmining/example.pdf'
             response = requests.post(url, data={'url': pdf})
-            print response.content
             compare_references(self, response.content, EXPECTED_RESPONSE)
 
         def test_txt(self):
@@ -121,4 +129,13 @@ class DocExtractTest(unittest.TestCase):
 
             pdf = open("%s/docextract/example.txt" % CFG_ETCDIR, 'rb')
             response = requests.post(url, files={'txt': pdf})
-            compare_references(self, response.content, EXPECTED_RESPONSE)
+            # Remove stats tag
+            lines = response.content.split('\n')
+            lines[-6:-1] = []
+            compare_references(self, '\n'.join(lines), EXPECTED_RESPONSE)
+
+
+TEST_SUITE = make_test_suite(DocExtractTest)
+
+if __name__ == '__main__':
+    run_test_suite(TEST_SUITE)

@@ -20,7 +20,6 @@
 import re
 import sys
 from invenio.docextract_utils import write_message
-from invenio.refextract_cli import halt
 from invenio.refextract_config import CFG_REFEXTRACT_KBS
 
 
@@ -403,9 +402,9 @@ def make_extra_author_regex_str():
         emsg = """Error: Could not build knowledge base containing """ \
                """author patterns - failed """ \
                """to read from KB %(kb)s.\n""" \
-               % { 'kb' : fpath }
+               % {'kb' : fpath}
         write_message(emsg, sys.stderr, verbose=0)
-        halt(err=IOError, msg="Error: Unable to open author kb '%s'" % fpath, exit_code=1)
+        raise IOError("Error: Unable to open author kb '%s'" % fpath)
 
     for line_num, rawline in enumerate(fh):
         try:
@@ -413,8 +412,7 @@ def make_extra_author_regex_str():
         except UnicodeError:
             write_message("*** Unicode problems in %s for line %d" \
                              % (fpath, line_num), sys.stderr, verbose=0)
-            halt(err=UnicodeError, \
-                 msg="Error: Unable to parse author kb (line: %s)" % str(line_num), exit_code=1)
+            raise UnicodeError("Error: Unable to parse author kb (line: %s)" % str(line_num))
         if rawline.strip() and rawline[0].strip() != '#':
             add_to_auth_list(rawline)
             ## Shorten collaboration to 'coll'

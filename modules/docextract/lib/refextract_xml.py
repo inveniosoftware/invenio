@@ -20,11 +20,10 @@
 import re
 
 from xml.sax.saxutils import escape as encode_for_xml
-from time import mktime, localtime
+from datetime import datetime
 
-from invenio.refextract_re import re_arxiv_notation, re_num
+from invenio.refextract_re import re_num
 from invenio.docextract_utils import write_message
-
 from invenio.refextract_config import \
     CFG_REFEXTRACT_TAG_ID_REFERENCE, \
     CFG_REFEXTRACT_IND1_REFERENCE, \
@@ -41,6 +40,8 @@ from invenio.refextract_config import \
     CFG_REFEXTRACT_IND1_EXTRACTION_STATS, \
     CFG_REFEXTRACT_IND2_EXTRACTION_STATS, \
     CFG_REFEXTRACT_SUBFIELD_EXTRACTION_STATS, \
+    CFG_REFEXTRACT_SUBFIELD_EXTRACTION_TIME, \
+    CFG_REFEXTRACT_SUBFIELD_EXTRACTION_VERSION, \
     CFG_REFEXTRACT_VERSION, \
     CFG_REFEXTRACT_XML_RECORD_CLOSE, \
     CFG_REFEXTRACT_SUBFIELD_URL_DESCR, \
@@ -50,7 +51,11 @@ from invenio.refextract_config import \
     CFG_REFEXTRACT_SUBFIELD_QUOTED, \
     CFG_REFEXTRACT_SUBFIELD_ISBN, \
     CFG_REFEXTRACT_SUBFIELD_PUBLISHER, \
+    CFG_REFEXTRACT_SUBFIELD_YEAR, \
     CFG_REFEXTRACT_SUBFIELD_BOOK
+
+from invenio import config
+CFG_INSPIRE_SITE = getattr(config, 'CFG_INSPIRE_SITE', False)
 
 
 def format_marker(line_marker):
@@ -105,13 +110,13 @@ def create_xml_record(counts, recid, xml_lines, status_code=0):
 
     ## Start with the opening record tag:
     out += u"%(record-open)s\n" \
-              % { 'record-open' : CFG_REFEXTRACT_XML_RECORD_OPEN, }
+              % {'record-open': CFG_REFEXTRACT_XML_RECORD_OPEN, }
 
     ## Display the record-id controlfield:
     out += \
      u"""   <controlfield tag="%(cf-tag-recid)s">%(recid)d</controlfield>\n""" \
-     % { 'cf-tag-recid' : CFG_REFEXTRACT_CTRL_FIELD_RECID,
-         'recid'        : recid,
+     % {'cf-tag-recid' : CFG_REFEXTRACT_CTRL_FIELD_RECID,
+        'recid'        : recid,
        }
 
     ## Loop through all xml lines and add them to the output string:
@@ -119,26 +124,30 @@ def create_xml_record(counts, recid, xml_lines, status_code=0):
 
     ## add the 999C6 status subfields:
     out += u"""   <datafield tag="%(df-tag-ref-stats)s" ind1="%(df-ind1-ref-stats)s" ind2="%(df-ind2-ref-stats)s">
-      <subfield code="%(sf-code-ref-stats)s">%(version)s %(timestamp)s-%(status)s-%(reportnum)s-%(title)s-%(author)s-%(url)s-%(doi)s-%(misc)s</subfield>
+      <subfield code="%(sf-code-ref-stats)s">%(status)s-%(reportnum)s-%(title)s-%(author)s-%(url)s-%(doi)s-%(misc)s</subfield>
+      <subfield code="%(sf-code-ref-time)s">%(timestamp)s</subfield>
+      <subfield code="%(sf-code-ref-version)s">%(version)s</subfield>
    </datafield>\n""" \
-        % { 'df-tag-ref-stats'  : CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS,
-            'df-ind1-ref-stats' : CFG_REFEXTRACT_IND1_EXTRACTION_STATS,
-            'df-ind2-ref-stats' : CFG_REFEXTRACT_IND2_EXTRACTION_STATS,
-            'sf-code-ref-stats' : CFG_REFEXTRACT_SUBFIELD_EXTRACTION_STATS,
-            'version'           : CFG_REFEXTRACT_VERSION,
-            'timestamp'         : str(int(mktime(localtime()))),
-            'status'            : status_code,
-            'reportnum'         : counts['reportnum'],
-            'title'             : counts['title'],
-            'author'            : counts['auth_group'],
-            'url'               : counts['url'],
-            'doi'               : counts['doi'],
-            'misc'              : counts['misc'],
+        % {'df-tag-ref-stats'   : CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS,
+           'df-ind1-ref-stats'  : CFG_REFEXTRACT_IND1_EXTRACTION_STATS,
+           'df-ind2-ref-stats'  : CFG_REFEXTRACT_IND2_EXTRACTION_STATS,
+           'sf-code-ref-stats'  : CFG_REFEXTRACT_SUBFIELD_EXTRACTION_STATS,
+           'sf-code-ref-time'   : CFG_REFEXTRACT_SUBFIELD_EXTRACTION_TIME,
+           'sf-code-ref-version': CFG_REFEXTRACT_SUBFIELD_EXTRACTION_VERSION,
+           'version'            : CFG_REFEXTRACT_VERSION,
+           'timestamp'          : datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+           'status'             : status_code,
+           'reportnum'          : counts['reportnum'],
+           'title'              : counts['title'],
+           'author'             : counts['auth_group'],
+           'url'                : counts['url'],
+           'doi'                : counts['doi'],
+           'misc'               : counts['misc'],
           }
 
     ## Now add the closing tag to the record:
     out += u"%(record-close)s\n" \
-           % { 'record-close' : CFG_REFEXTRACT_XML_RECORD_CLOSE, }
+           % {'record-close' : CFG_REFEXTRACT_XML_RECORD_CLOSE, }
 
     ## Be sure to call this BEFORE compress_subfields
     out = filter_processed_references(''.join(out))
@@ -149,7 +158,12 @@ def create_xml_record(counts, recid, xml_lines, status_code=0):
     return out
 
 
-def build_formatted_xml_citation(citation_elements, line_marker, inspire_format):
+def build_xml_citations(splitted_citations, line_marker):
+    return [build_xml_citation(citation_elements, line_marker) \
+                                   for citation_elements in splitted_citations]
+
+
+def build_xml_citation(citation_elements, line_marker, inspire_format=None):
     """ Create the MARC-XML string of the found reference information which was taken
         from a tagged reference line.
         @param citation_elements: (list) an ordered list of dictionary elements,
@@ -157,6 +171,9 @@ def build_formatted_xml_citation(citation_elements, line_marker, inspire_format)
         @param line_marker: (string) The line marker for this single reference line (e.g. [19])
         @return xml_line: (string) The MARC-XML representation of the list of reference elements
     """
+    if inspire_format is None:
+        inspire_format = CFG_INSPIRE_SITE
+
     ## Begin the datafield element
     xml_line = start_datafield_element(line_marker)
 
@@ -170,118 +187,39 @@ def build_formatted_xml_citation(citation_elements, line_marker, inspire_format)
     ## in the xml mark-up
     citation_structure = []
     auth_for_ibid = None
-    elements_processed = 0
 
     for element in citation_elements:
         ## Before going onto checking 'what' the next element is, handle misc text and semi-colons
         ## Multiple misc text subfields will be compressed later
         ## This will also be the only part of the code that deals with MISC tag_typed elements
-        if element['misc_txt'].strip(" .,"):
-            lower_stripped_misc = element['misc_txt'].lower().strip(".,:;- []")
-            ## If misc text is ultimately just a semi-colon, don't add it as a new subfield
-            ## But still use it to dictate whether a new citation is created
-            if (element['misc_txt'].strip(" .,") == ";" or \
-                (not re.sub(re_arxiv_notation, "", lower_stripped_misc) and \
-                 element['type'] == 'REPORTNUMBER')):
-                misc_txt = False
-            else:
-                misc_txt = element['misc_txt']
-
-            # Now.. if the MISC text is simply a single semi-colon,
-            # AND at least a title or a report number has also been identified..
-            # Mark up as a new citation
-            # (this is done before the 'author choice' is made, as it's more reliable)
-            # (an author choice will not create a new citation if a correct semi-colon is found)
-            # It is important to note that Author tagging helps the accurate detection
-            # a dual citation when looking for semi-colons (by reducing the length of misc text)
-            split_sc = split_on_semi_colon(element['misc_txt'],
-                                           line_elements,
-                                           elements_processed,
-                                           len(citation_elements))
-
-            # Ignore semi-colon splitting heuristics, if the current item is a known ibid.
-            # if element['type'] == 'TITLE' and element['is_ibid']:
-            #    split_sc = ""
-
-            if split_sc == "after":
-                if misc_txt:
-                    # Append the misc subfield, before any of semi-colons (if any),
-                    # only if there is are other elements to be processed after this current element
-                    xml_line += """
-      <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>""" \
-                            % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
-                                'misc-val'               : encode_for_xml(misc_txt),
-                              }
-                if element['type'] != 'MISC' or num + 1 < len(citation_elements):
-                    # THEN set as a new citation line
-                    # %%%%% Set as NEW citation line %%%%%
-                    (xml_line, auth_for_ibid) = append_datafield_element(line_marker,
-                                                                         citation_structure,
-                                                                         line_elements,
-                                                                         auth_for_ibid,
-                                                                         xml_line)
-            elif split_sc == "before":
-                # %%%%% Set as NEW citation line %%%%%
-                (xml_line, auth_for_ibid) = append_datafield_element(line_marker,
-                                                                     citation_structure,
-                                                                     line_elements,
-                                                                     auth_for_ibid,
-                                                                     xml_line)
-                if misc_txt:
-                    # THEN append the misc text found AFTER the semi-colon (if any)
-                    # Append the misc subfield, before any of semi-colons
-                    xml_line += """
-      <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>""" \
-                            % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
-                                'misc-val'               : encode_for_xml(misc_txt),
-                              }
-            elif misc_txt:
-                # Just append the misc subfield anyway
-                # In the case of:
-                # no semi-colon branch, or this is the last element to be processed, and it is not just a semi-colon
-                xml_line += """
-      <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>""" \
-                        % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
-                            'misc-val'               : encode_for_xml(misc_txt),
-                          }
+        if element['misc_txt'].strip(".,:;- []"):
+            xml_line = append_subfield_element(xml_line,
+                               CFG_REFEXTRACT_SUBFIELD_MISC,
+                               element['misc_txt'].strip(".,:;- []"))
 
         # Now handle the type dependent actions
         # TITLE
         if element['type'] == "JOURNAL":
-
-            # If a report number has been marked up, and there's misc text before this title and the last tag
-            s = element['misc_txt'].lower().strip(".,:;- []")
-            s = re.sub(re_arxiv_notation, "", s)
-            if is_in_line_elements("REPORTNUMBER", line_elements) and \
-                    len(s) > 0:
-                # %%%%% Set as NEW citation line %%%%%
-                xml_line, auth_for_ibid = append_datafield_element(line_marker,
-                    citation_structure, line_elements,
-                    auth_for_ibid, xml_line)
-            elif is_in_line_elements("JOURNAL", line_elements):
-                # %%%%% Set as NEW citation line %%%%%
-                xml_line, auth_for_ibid = append_datafield_element(line_marker,
-                    citation_structure, line_elements, auth_for_ibid, xml_line)
 
             # Select the journal title output format
             if inspire_format:
                 # ADD to current datafield
                 xml_line += """
       <subfield code="%(sf-code-ref-title)s">%(title)s,%(volume)s,%(page)s</subfield>""" \
-              % { 'sf-code-ref-title'   : CFG_REFEXTRACT_SUBFIELD_TITLE,
-                  'title'               : encode_for_xml(element['title']),
-                  'volume'              : encode_for_xml(element['volume']),
-                  'page'                : encode_for_xml(element['page']),
+              % {'sf-code-ref-title': CFG_REFEXTRACT_SUBFIELD_TITLE,
+                 'title'            : encode_for_xml(element['title']),
+                 'volume'           : encode_for_xml(element['volume']),
+                 'page'             : encode_for_xml(element['page']),
                 }
             else:
                 # ADD to current datafield
                 xml_line += """
       <subfield code="%(sf-code-ref-title)s">%(title)s %(volume)s (%(year)s) %(page)s</subfield>""" \
-              % { 'sf-code-ref-title'   : CFG_REFEXTRACT_SUBFIELD_TITLE,
-                  'title'               : encode_for_xml(element['title']),
-                  'volume'              : encode_for_xml(element['volume']),
-                  'year'                : encode_for_xml(element['year']),
-                  'page'                : encode_for_xml(element['page']),
+              % {'sf-code-ref-title': CFG_REFEXTRACT_SUBFIELD_TITLE,
+                 'title'            : encode_for_xml(element['title']),
+                 'volume'           : encode_for_xml(element['volume']),
+                 'year'             : encode_for_xml(element['year']),
+                 'page'             : encode_for_xml(element['page']),
                 }
 
             # Now, if there are any extra (numeration based) IBID's after this title
@@ -297,65 +235,49 @@ def build_formatted_xml_citation(citation_elements, line_marker, inspire_format)
                     if inspire_format:
                         xml_line += """
       <subfield code="%(sf-code-ref-title)s">%(title)s,%(volume)s,%(page)s</subfield>""" \
-                          % { 'sf-code-ref-title'   : CFG_REFEXTRACT_SUBFIELD_TITLE,
-                              'title'               : encode_for_xml(ibid['title']),
-                              'volume'              : encode_for_xml(ibid['volume']),
-                              'page'                : encode_for_xml(ibid['page']),
+                          % {'sf-code-ref-title': CFG_REFEXTRACT_SUBFIELD_TITLE,
+                             'title'            : encode_for_xml(ibid['title']),
+                             'volume'           : encode_for_xml(ibid['volume']),
+                             'page'             : encode_for_xml(ibid['page']),
                             }
                     else:
                         xml_line += """
       <subfield code="%(sf-code-ref-title)s">%(title)s %(volume)s (%(year)s) %(page)s</subfield>""" \
-                          % { 'sf-code-ref-title'   : CFG_REFEXTRACT_SUBFIELD_TITLE,
-                              'title'               : encode_for_xml(ibid['title']),
-                              'volume'              : encode_for_xml(ibid['volume']),
-                              'year'                : encode_for_xml(ibid['year']),
-                              'page'                : encode_for_xml(ibid['page']),
+                          % {'sf-code-ref-title': CFG_REFEXTRACT_SUBFIELD_TITLE,
+                             'title'            : encode_for_xml(ibid['title']),
+                             'volume'           : encode_for_xml(ibid['volume']),
+                             'year'             : encode_for_xml(ibid['year']),
+                             'page'             : encode_for_xml(ibid['page']),
                             }
             # Add a Title element to the past elements list, since we last found an IBID
             line_elements.append(element)
 
         # REPORT NUMBER
         elif element['type'] == "REPORTNUMBER":
-            report_number = element['report_num']
-            ## If a report number has been marked up, and there's misc text before this title and the last tag
-            s = element['misc_txt'].lower().strip(".,:;- []")
-            s = re.sub(re_arxiv_notation, "", s)
-            if is_in_line_elements("JOURNAL", line_elements) and len(s) > 0:
-                # %%%%% Set as NEW citation line %%%%%
-                xml_line, auth_for_ibid = append_datafield_element(line_marker,
-                    citation_structure, line_elements, auth_for_ibid, xml_line)
-            elif is_in_line_elements("REPORTNUMBER", line_elements):
-                # %%%%% Set as NEW citation line %%%%%
-                xml_line, auth_for_ibid = append_datafield_element(line_marker,
-                    citation_structure, line_elements, auth_for_ibid, xml_line)
             # ADD to current datafield
-            xml_line += """
-      <subfield code="%(sf-code-ref-report-num)s">%(report-number)s</subfield>""" \
-                % {'sf-code-ref-report-num' : CFG_REFEXTRACT_SUBFIELD_REPORT_NUM,
-                   'report-number'          : encode_for_xml(report_number)
-                }
+            xml_line = append_subfield_element(xml_line,
+                                               CFG_REFEXTRACT_SUBFIELD_REPORT_NUM,
+                                               element['report_num'])
             line_elements.append(element)
 
         # URL
         elif element['type'] == "URL":
             if element['url_string'] == element['url_desc']:
                 # Build the datafield for the URL segment of the reference line:
-                xml_line += """
-      <subfield code="%(sf-code-ref-url)s">%(url)s</subfield>""" \
-                    % {    'sf-code-ref-url'       : CFG_REFEXTRACT_SUBFIELD_URL,
-                           'url'                   : encode_for_xml(element['url_string'])
-                      }
+                xml_line = append_subfield_element(xml_line,
+                                                   CFG_REFEXTRACT_SUBFIELD_URL,
+                                                   element['url_string'])
             # Else, in the case that the url string and the description differ in some way, include them both
             else:
                 # Build the datafield for the URL segment of the reference line:
                 xml_line += """
       <subfield code="%(sf-code-ref-url)s">%(url)s</subfield>
       <subfield code="%(sf-code-ref-url-desc)s">%(url-desc)s</subfield>""" \
-                    % {  'sf-code-ref-url'          : CFG_REFEXTRACT_SUBFIELD_URL,
-                            'sf-code-ref-url-desc'  : CFG_REFEXTRACT_SUBFIELD_URL_DESCR,
-                            'url'                   : encode_for_xml(element['url_string']),
-                            'url-desc'              : encode_for_xml(element['url_desc'])
-                         }
+                    % {'sf-code-ref-url'     : CFG_REFEXTRACT_SUBFIELD_URL,
+                       'sf-code-ref-url-desc': CFG_REFEXTRACT_SUBFIELD_URL_DESCR,
+                        'url'                : encode_for_xml(element['url_string']),
+                        'url-desc'           : encode_for_xml(element['url_desc'])
+                      }
             line_elements.append(element)
 
         # DOI
@@ -363,92 +285,63 @@ def build_formatted_xml_citation(citation_elements, line_marker, inspire_format)
             ## Split on hitting another DOI in the same line
             if is_in_line_elements("DOI", line_elements):
                 ## %%%%% Set as NEW citation line %%%%%
-                (xml_line, auth_for_ibid) = append_datafield_element(line_marker,
-                                                                     citation_structure,
-                                                                     line_elements,
-                                                                     auth_for_ibid,
-                                                                     xml_line)
-            xml_line += """
-      <subfield code="%(sf-code-ref-doi)s">%(doi-val)s</subfield>""" \
-                % {     'sf-code-ref-doi'       : CFG_REFEXTRACT_SUBFIELD_DOI,
-                        'doi-val'               : encode_for_xml(element['doi_string'])
-                 }
+                xml_line, auth_for_ibid = append_datafield_element(line_marker,
+                                                                   citation_structure,
+                                                                   line_elements,
+                                                                   auth_for_ibid,
+                                                                   xml_line)
+            xml_line = append_subfield_element(xml_line,
+                                               CFG_REFEXTRACT_SUBFIELD_DOI,
+                                               element['doi_string'])
             line_elements.append(element)
 
         # AUTHOR
         elif element['type'] == "AUTH":
+            value = element['auth_txt']
+            if element['auth_type'] == 'incl':
+                value = "(%s)" % value
 
-            if element['auth_type'] != 'incl':
-                auth_choice = dump_or_split_author(element['misc_txt'],
-                                                   line_elements)
-                if auth_choice == "dump":
-                    # This author is no good, place it into misc text
-                    xml_line += '\n      <subfield code="' \
-                        '%(sf-code-ref-misc)s">%(auth-txt)s</subfield>' % {
-                        'sf-code-ref-misc' : CFG_REFEXTRACT_SUBFIELD_MISC,
-                        'auth-txt'         : encode_for_xml(element['auth_txt']),
-                    }
-                else:
-                    # Either the author denotes a new citation, or it is the first in this reference
-                    if auth_choice == "split":
-                        ## This author triggered the creation of a new datafield
-                        if element['auth_type'] == 'etal' or \
-                            element['auth_type'] == 'stnd':
-                            ## %%%%% Set as NEW citation line %%%%%
-                            xml_line, auth_for_ibid = append_datafield_element(
-                                line_marker, citation_structure, line_elements,
-                                auth_for_ibid, xml_line)
-                    # Add the author subfield with the author text
-                    xml_line += '\n      <subfield code="' \
-                        '%(sf-code-ref-auth)s">%(authors)s</subfield>' % {
-                        'authors'           : encode_for_xml(element['auth_txt']),
-                        'sf-code-ref-auth'  : CFG_REFEXTRACT_SUBFIELD_AUTH,
-                    }
-
-                    line_elements.append(element)
-
-            elif element['auth_type'] == 'incl':
-                # Always include the matched author from the knowledge base into the datafield,
-                # No splitting heuristics are used here. It is purely so that it can be included
-                # with any previously found authors for this datafield.
-                xml_line += '\n      <subfield code="' \
-                    '%(sf-code-ref-auth)s">(%(authors)s)</subfield>' % {
-                    'authors'           : encode_for_xml(element['auth_txt']),
-                    'sf-code-ref-auth'  : CFG_REFEXTRACT_SUBFIELD_AUTH,
-                }
+            if is_in_line_elements("AUTH", line_elements) and line_elements[-1]['type'] != "AUTH":
+                xml_line = append_subfield_element(xml_line,
+                                                   CFG_REFEXTRACT_SUBFIELD_MISC,
+                                                   value)
+            else:
+                xml_line = append_subfield_element(xml_line,
+                                                   CFG_REFEXTRACT_SUBFIELD_AUTH,
+                                                   value)
+                line_elements.append(element)
 
         elif element['type'] == "QUOTED":
-            xml_line += '\n      <subfield code="' \
-                '%(subfield-code)s">%(title)s</subfield>' % {
-                'title'         : encode_for_xml(element['title']),
-                'subfield-code' : CFG_REFEXTRACT_SUBFIELD_QUOTED,
-            }
+            xml_line = append_subfield_element(xml_line,
+                                               CFG_REFEXTRACT_SUBFIELD_QUOTED,
+                                               element['title'])
+            line_elements.append(element)
 
         elif element['type'] == "ISBN":
-            xml_line += '\n      <subfield code="' \
-                '%(subfield-code)s">%(title)s</subfield>' % {
-                'title'         : encode_for_xml(element['ISBN']),
-                'subfield-code' : CFG_REFEXTRACT_SUBFIELD_ISBN,
-            }
+            xml_line = append_subfield_element(xml_line,
+                                               CFG_REFEXTRACT_SUBFIELD_ISBN,
+                                               element['ISBN'])
+            line_elements.append(element)
 
         elif element['type'] == "BOOK":
-            xml_line += '\n      <subfield code="' \
-                '%(subfield-code)s">%(title)s</subfield>' % {
-                'title'         : encode_for_xml(element['title']),
-                'subfield-code' : CFG_REFEXTRACT_SUBFIELD_QUOTED,
-            }
+            xml_line = append_subfield_element(xml_line,
+                                               CFG_REFEXTRACT_SUBFIELD_QUOTED,
+                                               element['title'])
             xml_line += '\n      <subfield code="%s" />' % \
                 CFG_REFEXTRACT_SUBFIELD_BOOK
+            line_elements.append(element)
 
         elif element['type'] == "PUBLISHER":
-            xml_line += '\n      <subfield code="' \
-                '%(subfield-code)s">%(title)s</subfield>' % {
-                'title'         : encode_for_xml(element['publisher']),
-                'subfield-code' : CFG_REFEXTRACT_SUBFIELD_PUBLISHER,
-            }
+            xml_line = append_subfield_element(xml_line,
+                                               CFG_REFEXTRACT_SUBFIELD_PUBLISHER,
+                                               element['publisher'])
+            line_elements.append(element)
 
-        # The number of elements processed
-        elements_processed += 1
+        elif element['type'] == "YEAR":
+            xml_line = append_subfield_element(xml_line,
+                                               CFG_REFEXTRACT_SUBFIELD_YEAR,
+                                               element['year'])
+            line_elements.append(element)
 
     # Append the author, if needed for an ibid, for the last element
     # in the entire line. Don't bother setting the author to be used
@@ -459,6 +352,15 @@ def build_formatted_xml_citation(citation_elements, line_marker, inspire_format)
     xml_line += "\n   </datafield>\n"
 
     return xml_line
+
+
+def append_subfield_element(xml_line, subfield_code, value):
+    xml_element = '\n      <subfield code="' \
+        '%(sf-code-ref-auth)s">%(value)s</subfield>' % {
+            'value'             : encode_for_xml(value),
+            'sf-code-ref-auth'  : subfield_code,
+        }
+    return xml_line + xml_element
 
 
 def start_datafield_element(line_marker):
@@ -597,8 +499,8 @@ def check_author_for_ibid(line_elements, author):
             ## No need to reset the author to be used for ibids, since this line holds an ibid
             return """
           <subfield code="%(sf-code-ref-auth)s">%(authors)s</subfield>""" \
-                % { 'authors'          : encode_for_xml(author['auth_txt'].strip('()')),
-                    'sf-code-ref-auth' : CFG_REFEXTRACT_SUBFIELD_AUTH,
+                % {'authors'          : encode_for_xml(author['auth_txt'].strip('()')),
+                   'sf-code-ref-auth' : CFG_REFEXTRACT_SUBFIELD_AUTH,
                   }, author
 
         ## Set the author for to be used for ibids, when a standard title is present in this line,
@@ -640,11 +542,11 @@ def append_datafield_element(line_marker,
    </datafield>
    <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">
       <subfield code="%(sf-code-ref-marker)s">%(marker-val)s</subfield>""" \
-    % {      'df-tag-ref'         : CFG_REFEXTRACT_TAG_ID_REFERENCE,
-             'df-ind1-ref'        : CFG_REFEXTRACT_IND1_REFERENCE,
-             'df-ind2-ref'        : CFG_REFEXTRACT_IND2_REFERENCE,
-             'sf-code-ref-marker' : CFG_REFEXTRACT_SUBFIELD_MARKER,
-             'marker-val'         : encode_for_xml(format_marker(line_marker))
+    % {'df-tag-ref'         : CFG_REFEXTRACT_TAG_ID_REFERENCE,
+       'df-ind1-ref'        : CFG_REFEXTRACT_IND1_REFERENCE,
+       'df-ind2-ref'        : CFG_REFEXTRACT_IND2_REFERENCE,
+       'sf-code-ref-marker' : CFG_REFEXTRACT_SUBFIELD_MARKER,
+       'marker-val'         : encode_for_xml(format_marker(line_marker))
     }
 
     ## add the past elements for end previous citation to the citation_structure list
@@ -692,7 +594,7 @@ def filter_processed_references(out):
     new_out = '\n'.join([l for l in [rec.rstrip() for rec in ref_lines] if l])
 
     if len(reference_lines) != len(new_out):
-        write_message("* filter results: unfilter references line length is %d and filtered length is %d" \
+        write_message("  * filter results: unfilter references line length is %d and filtered length is %d" \
               % (len(reference_lines), len(new_out)), verbose=2)
 
     return new_out

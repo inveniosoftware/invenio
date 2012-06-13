@@ -29,9 +29,16 @@ __revision__ = "$Id$"
 import traceback
 import optparse
 import sys
+import os
 
+from invenio.refextract_config import \
+            CFG_REFEXTRACT_XML_VERSION, \
+            CFG_REFEXTRACT_XML_COLLECTION_OPEN, \
+            CFG_REFEXTRACT_XML_COLLECTION_CLOSE
 from invenio.docextract_utils import write_message, setup_loggers
 from invenio.bibtask import task_update_progress
+from invenio.refextract_api import extract_references_from_file_xml, \
+                                   extract_references_from_string_xml
 
 # Is refextract running standalone? (Default = yes)
 RUNNING_INDEPENDENTLY = False
@@ -197,3 +204,113 @@ def main(config, args, run):
         write_message(traceback.format_exc()[:-1], verbose=9)
         write_message("Error: %s" % e, verbose=0)
         halt(exit_code=1)
+
+
+def extract_one(config, pdf_path):
+    """Extract references from one file"""
+
+    # the document body is not empty:
+    # 2. If necessary, locate the reference section:
+    if config.treat_as_reference_section:
+        docbody = open(pdf_path).read().decode('utf-8')
+        out = extract_references_from_string_xml(docbody)
+    else:
+        write_message("* processing pdffile: %s" % pdf_path, verbose=2)
+        out = extract_references_from_file_xml(pdf_path)
+
+    return out
+
+
+def begin_extraction(config, files):
+    """Starts the core extraction procedure. [Entry point from main]
+
+       Only refextract_daemon calls this directly, from _task_run_core()
+       @param daemon_cli_options: contains the pre-assembled list of cli flags
+       and values processed by the Refextract Daemon. This is full only when
+       called as a scheduled bibtask inside bibsched.
+    """
+    # Store xml records here
+    output = []
+
+    for num, path in enumerate(files):
+        # Announce the document extraction number
+        write_message("Extracting %d of %d" % (num + 1, len(files)),
+                      verbose=1)
+        out = extract_one(config, path)
+        output.append(out)
+
+    # Write our references
+    write_references(config, output)
+
+
+def write_references(config, xml_references):
+    """Write marcxml to file
+
+    * Output xml header
+    * Output collection opening tag
+    * Output xml for each record
+    * Output collection closing tag
+    """
+    if config.xmlfile:
+        ofilehdl = open(config.xmlfile, 'w')
+    else:
+        ofilehdl = sys.stdout
+
+    try:
+        print >>ofilehdl, CFG_REFEXTRACT_XML_VERSION.encode("utf-8")
+        print >>ofilehdl, CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8")
+        for out in xml_references:
+            print >>ofilehdl, out.encode("utf-8")
+        print >>ofilehdl, CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8")
+        ofilehdl.flush()
+    except IOError, err:
+        write_message("%s\n%s\n" % (config.xmlfile, err), \
+                          sys.stderr, verbose=0)
+        halt(err=IOError, msg="Error: Unable to write to '%s'" \
+                 % config.xmlfile, exit_code=1)
+
+    if config.xmlfile:
+        ofilehdl.close()
+        # limit m tag data to something less than infinity
+        limit_m_tags(config.xmlfile, 2048)
+
+
+def limit_m_tags(xml_file, length_limit):
+    """Limit size of miscellaneous tags"""
+    temp_xml_file = xml_file + '.temp'
+    try:
+        ofilehdl = open(xml_file, 'r')
+    except IOError:
+        write_message("***%s\n" % xml_file, verbose=0)
+        raise IOError("Error: Unable to read from '%s'" % xml_file)
+    try:
+        nfilehdl = open(temp_xml_file, 'w')
+    except IOError:
+        write_message("***%s\n" % temp_xml_file, verbose=0)
+        raise IOError("Error: Unable to write to '%s'" % temp_xml_file)
+
+    for line in ofilehdl:
+        line_dec = line.decode("utf-8")
+        start_ind = line_dec.find('<subfield code="m">')
+        if start_ind != -1:
+            # This line is an "m" line:
+            last_ind = line_dec.find('</subfield>')
+            if last_ind != -1:
+                # This line contains the end-tag for the "m" section
+                leng = last_ind - start_ind - 19
+                if leng > length_limit:
+                    # want to truncate on a blank to avoid problems..
+                    end = start_ind + 19 + length_limit
+                    for lett in range(end - 1, last_ind):
+                        xx = line_dec[lett:lett+1]
+                        if xx == ' ':
+                            break
+                        else:
+                            end += 1
+                    middle = line_dec[start_ind+19:end-1]
+                    line_dec = start_ind * ' ' + '<subfield code="m">' + \
+                              middle + '  !Data truncated! ' + '</subfield>\n'
+        nfilehdl.write("%s" % line_dec.encode("utf-8"))
+    nfilehdl.close()
+    # copy back to original file name
+    os.rename(temp_xml_file, xml_file)

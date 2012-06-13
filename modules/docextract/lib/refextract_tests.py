@@ -197,7 +197,14 @@ class FindSectionTest(unittest.TestCase):
 
 class SearchTest(unittest.TestCase):
     def setUp(self):
-        setup_loggers(verbosity=1)
+        setup_loggers(verbosity=9)
+        from invenio import refextract_kbs
+        self.old_override = refextract_kbs.CFG_REFEXTRACT_KBS_OVERRIDE
+        refextract_kbs.CFG_REFEXTRACT_KBS_OVERRIDE = {}
+
+    def tearDown(self):
+        from invenio import refextract_kbs
+        refextract_kbs.CFG_REFEXTRACT_KBS_OVERRIDE = self.old_override
 
     def test_not_recognized(self):
         field, pattern = search_from_reference('[1] J. Mars, oh hello')

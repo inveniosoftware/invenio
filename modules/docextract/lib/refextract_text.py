@@ -26,7 +26,7 @@ from invenio.docextract_text import join_lines, \
                                     repair_broken_urls, \
                                     re_multiple_space, \
                                     remove_page_boundary_lines
-
+from invenio.refextract_config import CFG_REFEXTRACT_MAX_LINES
 from invenio.refextract_find import find_end_of_reference_section, \
                                     get_reference_section_beginning
 
@@ -79,7 +79,7 @@ def extract_references_from_fulltext(fulltext):
                                        ref_sect_start["title_marker_same_line"],
                                        ref_sect_start["marker"])
 
-    return (refs, status, how_found_start)
+    return refs, status, how_found_start
 
 
 def get_reference_lines(docbody,
@@ -181,7 +181,7 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
     """
     ## initialise some vars:
     rebuilt_references = []
-    working_line = u''
+    working_ref = []
 
     strip_before = True
     if ref_line_marker_ptn is None or \
@@ -207,60 +207,56 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
     # Work backwards, starting from the last 'broken' reference line
     # Append each fixed reference line to rebuilt_references
     current_ref = None
+    line_counter = 0
+
+    def prepare_ref(working_ref):
+        working_line = ""
+        for l in reversed(working_ref):
+            working_line = join_lines(working_line, l)
+        working_line = working_line.rstrip()
+        return wash_and_repair_reference_line(working_line)
+
     for line in reversed(ref_sectn):
+        # Try to find the marker for the reference line
         if strip_before:
             current_string = line.strip()
-            # Try to find the marker for the reference line
-            m_ref_line_marker = p_ref_line_marker.match(current_string)
+            m_ref_line_marker = p_ref_line_marker.search(current_string)
         else:
-            m_ref_line_marker = p_ref_line_marker.match(line)
+            m_ref_line_marker = p_ref_line_marker.search(line)
             current_string = line.strip()
 
         if m_ref_line_marker and (not current_ref \
-                or current_ref == int(m_ref_line_marker.group('num')) + 1):
+                or current_ref == int(m_ref_line_marker.group('marknum')) + 1):
             # Reference line marker found! : Append this reference to the
             # list of fixed references and reset the working_line to 'blank'
             if current_string != '':
                 ## If it's not a blank line to separate refs
-                working_line = join_lines(current_string, working_line)
+                working_ref.append(current_string)
             # Append current working line to the refs list
-            working_line = working_line.rstrip()
-            working_line = wash_and_repair_reference_line(working_line)
-            rebuilt_references.append(working_line)
+            if line_counter < CFG_REFEXTRACT_MAX_LINES:
+                rebuilt_references.append(prepare_ref(working_ref))
             try:
-                current_ref = int(m_ref_line_marker.group('num'))
+                current_ref = int(m_ref_line_marker.group('marknum'))
             except IndexError:
                 pass  # this line doesn't have numbering
-            working_line = u''
-        else:
-            if current_string != u'':
-                # Continuation of line
-                if current_string[-1] == u'-':
-                    # hyphenated word at the end of the
-                    # line - don't add in a space
-                    working_line = current_string[:-1] + working_line
-                elif current_string[-1] == u' ':
-                    # space at the end of the
-                    # line - don't add in a space
-                    working_line = current_string + working_line
-                else:
-                    # no space or hyphenated word at the end of this
-                    # line - add in a space
-                    working_line = current_string + u' ' + working_line
+            working_ref = []
+            line_counter = 0
+        elif current_string != u'':
+            # Continuation of line
+            working_ref.append(current_string)
+            line_counter += 1
 
-    if working_line != u'':
+    if working_ref:
         # Append last line
-        working_line = working_line.rstrip()
-        working_line = wash_and_repair_reference_line(working_line)
-        rebuilt_references.append(working_line)
+        rebuilt_references.append(prepare_ref(working_ref))
 
     # A list of reference lines has been built backwards - reverse it:
     rebuilt_references.reverse()
 
     # Make sure mulitple markers within references are correctly
     # in place (compare current marker num with current marker num +1)
-    rebuilt_references = correct_rebuilt_lines(rebuilt_references, \
-                                               p_ref_line_marker)
+    # rebuilt_references = correct_rebuilt_lines(rebuilt_references, \
+    #                                            p_ref_line_marker)
 
     # For each properly formated reference line, try to identify cases
     # where there is more than one citation in a single line. This is
@@ -287,206 +283,6 @@ def wash_and_repair_reference_line(line):
     # single space:
     line = re_multiple_space.sub(u' ', line)
     return line
-
-
-def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
-    """Try to correct any cases where a reference line has been incorrectly
-       split based upon a wrong numeration marker. That is to say, given the
-       following situation:
-
-       [1] Smith, J blah blah
-       [2] Brown, N blah blah see reference
-       [56] for more info [3] Wills, A blah blah
-       ...
-
-       The first part of the 3rd line clearly belongs with line 2. This function
-       will try to fix this situation, to have the following situation:
-
-       [1] Smith, J blah blah
-       [2] Brown, N blah blah see reference [56] for more info
-       [3] Wills, A blah blah
-
-       If it cannot correctly guess the correct break-point in such a line, it
-       will give up and the original list of reference lines will be returned.
-
-       @param rebuilt_lines: (list) the rebuilt reference lines
-       @param p_refmarker: (compiled regex pattern object) the pattern used to
-        match regex line numeration markers. **MUST HAVE A GROUP 'marknum' to
-        encapsulate the mark number!** (e.g. r'\[(?P<marknum>\d+)\]')
-       @return: (list) of strings. If necessary, the corrected reference lines.
-        Else the orginal 'rebuilt' lines.
-    """
-    fixed = []
-    try:
-        m = p_refmarker.match(rebuilt_lines[0])
-        last_marknum = int(m.group("marknum"))
-        if last_marknum != 1:
-            # Even the first mark isnt 1 - probaby too dangerous to
-            # try to repair
-            return rebuilt_lines
-    except (IndexError, AttributeError, ValueError):
-        # Sometihng went wrong. Either no references, not a numbered line
-        # marker (int() failed), or no reference line marker (NoneType was
-        # passed). In any case, unable to test for correct reference line
-        # numberring - just return the lines as they were.
-        return rebuilt_lines
-
-    # Loop through each line in "rebuilt_lines" and test the mark at the
-    # beginning.
-    # If current-line-mark = previous-line-mark + 1, the line will be taken to
-    # be correct and appended to the list of fixed-lines. If not, then the loop
-    # will attempt to test whether the current line marker is actually part of
-    # the previous line by looking in the current line for another marker
-    # that has the numeric value of previous-marker + 1. If found, that marker
-    # will be taken as the true marker for the line and the leader of the line
-    # (up to the point of this marker) will be appended to the previous line.
-    # E.g.:
-    # [1] Smith, J blah blah
-    # [2] Brown, N blah blah see reference
-    # [56] for more info [3] Wills, A blah blah
-    # ...
-    #
-    # ...will be transformed into:
-    # [1] Smith, J blah blah
-    # [2] Brown, N blah blah see reference [56] for more info
-    # [3] Wills, A blah blah
-    # ...
-
-    # first line is correct, to put it into fixed:
-    fixed.append(rebuilt_lines[0])
-    for x in xrange(1, len(rebuilt_lines)):
-        m = p_refmarker.match(rebuilt_lines[x])
-        try:
-            # Get the number of this line:
-            curline_mark_num = m.group("marknum")
-        except AttributeError:
-            # This line does not have a line marker at the start.
-            # Add this line to the end of the previous line.
-            fixed[len(fixed) - 1] += rebuilt_lines[x]
-        else:
-            if int(curline_mark_num) == last_marknum + 1:
-                # The marker number for this reference line is correct.
-                # Append it to the 'fixed' lines and move on.
-                fixed.append(rebuilt_lines[x])
-                last_marknum += 1
-            elif len(rebuilt_lines[x][m.end():].strip()) == 0:
-                # This line consists of a marker-number only - it is not a
-                # correct marker. Append it to the last line.
-                fixed[len(fixed) - 1] += rebuilt_lines[x]
-            else:
-                # This marker != previous-marker + 1.
-                # May have taken some of the last line into this line.
-                # Can we find the next marker in this line?
-                # Test for this situation:
-                # [54] for more info [3] Wills, A blah blah
-                current_line = rebuilt_lines[x]
-                m_next_mark = p_refmarker.search(current_line[m.end():])
-                while m_next_mark is not None:
-                    # Another "line marker" is present in this line.
-                    # Test it to see if it is equal to the previous
-                    # 'real' marker + 1:
-                    if int(m_next_mark.group("marknum")) == \
-                       last_marknum + 1:
-                        # This seems to be the marker for the next line.
-                        # Test to see that the marker is followed by
-                        # something meaningful (a letter at least.)
-                        # I.e. We want to fix this:
-                        # [54] for more info [3] Wills, A blah blah
-                        #
-                        # but we don't want to fix this:
-                        # [54] for more info or even reference [3]
-                        #
-                        # as that would be unsafe.
-                        m_test_nxt_mark_not_eol = \
-                          re.search(re.escape(m_next_mark.group()) \
-                                     + '\s*[A-Za-z]', current_line)
-                        if m_test_nxt_mark_not_eol is not None:
-                            # move this section back to its real line:
-
-                            # get the segment of line (before the marker,
-                            # which holds a marker that isn't supposed to
-                            # be next) to be moved back to the previous line
-                            # where it belongs, (append a newline to it too):
-                            movesect = \
-                               current_line[0:m_test_nxt_mark_not_eol.start()] \
-                               + "\n"
-
-                            # Now get the previous line into a variable
-                            # (without its newline at the end):
-                            previous_line = fixed[len(fixed) - 1].rstrip("\n")
-
-                            # Now append the section which is to be moved to the
-                            # previous line. Check the last character
-                            # of the previous line. If it's a space, then just
-                            # directly append this new section. Else, append a
-                            # space then this new section.
-                            if previous_line[len(previous_line)-1] not in (u' ', u'-'):
-                                movesect = ' ' + movesect
-                            previous_line += movesect
-                            fixed[len(fixed) - 1] = previous_line
-
-                            # Now append the remainder of the current line to
-                            # the list of fixed lines, and move on to the
-                            # next line:
-                            fixed.append(current_line[m_test_nxt_mark_not_eol.start():])
-
-                            last_marknum += 1
-                            break
-                        else:
-                            # The next 'marker' in this line was not followed
-                            # by text. Take from the beginning of this line, to
-                            # the end of this marker, and append it to the end
-                            # of the previous line:
-                            previous_line = fixed[len(fixed) - 1].rstrip("\n")
-                            movesect = current_line[0:m_next_mark.end()] + "\n"
-                            # Append the section to be moved to the previous
-                            # line variable.
-                            # Check the last character of the previous line.
-                            # If it's a space, then just directly append this
-                            # new section. Else, append a space then this new
-                            # section.
-                            if previous_line[len(previous_line)-1] not in (u' ', u'-'):
-                                movesect = ' ' + movesect
-                            previous_line += movesect
-                            fixed[len(fixed) - 1] = previous_line
-                            # Should be blank?
-                            current_line = current_line[m_next_mark.end():]
-
-                    else:
-                        # This 'marker' is false - its value is not equal to
-                        # the previous marker + 1
-                        previous_line = fixed[len(fixed) - 1].rstrip("\n")
-                        movesect = current_line[0:m_next_mark.end()] + "\n"
-                        # Now append the section to be moved to the previous
-                        # line variable.
-                        # Check the last character of the previous line. If
-                        # it's a space, then just directly append this new
-                        # section. Else, append a space then this new section.
-                        if previous_line[len(previous_line)-1] not in (u' ', u'-'):
-                            movesect = ' ' + movesect
-                        previous_line += movesect
-                        fixed[len(fixed) - 1] = previous_line
-                        current_line = current_line[m_next_mark.end():]
-
-                    # Get next match:
-                    m_next_mark = p_refmarker.search(current_line)
-
-                # If there was still some of the "current line" left,
-                # append it to the previous line:
-                if len(current_line.strip()) > 0:
-                    previous_line = fixed[len(fixed) - 1].rstrip("\n")
-                    movesect = current_line
-                    # Now append the section to be moved to the previous line
-                    # variable.
-                    # Check the last character of the previous line. If it's a
-                    # space, then just directly append this new section. Else,
-                    # append a space then this new section.
-                    if previous_line[len(previous_line)-1] not in (u' ', u'-'):
-                        movesect = ' ' + movesect
-                    previous_line += movesect
-                    fixed[len(fixed) - 1] = previous_line
-
-    return fixed
 
 
 def test_for_blank_lines_separating_reference_lines(ref_sect):

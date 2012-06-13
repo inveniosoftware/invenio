@@ -28,10 +28,10 @@ import sys
 from invenio.bibtask import task_init, task_set_option, \
                             task_get_option, write_message
 from invenio.config import CFG_VERSION, \
-                           CFG_INSPIRE_SITE, \
                            CFG_SITE_SECURE_URL, \
                            CFG_BIBCATALOG_SYSTEM, \
                            CFG_REFEXTRACT_TICKET_QUEUE
+from invenio.search_engine import perform_request_search
 # Help message is the usage() print out of how to use Refextract
 from invenio.refextract_cli import HELP_MESSAGE, DESCRIPTION
 from invenio.refextract_api import update_references, \
@@ -61,7 +61,7 @@ def check_options():
     return True
 
 
-def parse_option(key, value, opts, args):
+def cb_parse_option(key, value, opts, args):
     """ Must be defined for bibtask to create a task """
     if args and len(args) > 0:
         # There should be no standalone arguments for any refextract job
@@ -99,7 +99,8 @@ def parse_option(key, value, opts, args):
         if not collections:
             collections = set()
             task_set_option('collections', collections)
-        collections.update(split_ids(value))
+        for v in value.split(","):
+            collections.update(perform_request_search(c=v))
     elif key in ('-r', '--recids'):
         recids = task_get_option('recids')
         if not recids:
@@ -111,6 +112,8 @@ def parse_option(key, value, opts, args):
 
 
 def create_ticket(recid, bibcatalog_system, queue=CFG_REFEXTRACT_TICKET_QUEUE):
+    write_message('bibcatalog_system %s' % bibcatalog_system, verbose=1)
+    write_message('queue %s' % queue, verbose=1)
     if bibcatalog_system and queue:
 
         subject = "Refs for #%s" % recid
@@ -127,11 +130,13 @@ def create_ticket(recid, bibcatalog_system, queue=CFG_REFEXTRACT_TICKET_QUEUE):
 
         # Only create tickets for HEP
         if not in_hep:
+            write_message("not in hep", verbose=1)
             return
 
         for report_tag in record_get_field_instances(record, "037"):
             for category in field_get_subfield_values(report_tag, 'c'):
                 if category.startswith('astro-ph'):
+                    write_message("astro-ph", verbose=1)
                     # We do not curate astro-ph
                     return
 
@@ -148,11 +153,6 @@ def create_ticket(recid, bibcatalog_system, queue=CFG_REFEXTRACT_TICKET_QUEUE):
 
 
 def task_run_core(recid, bibcatalog_system=None, _arxiv=False):
-    if task_get_option('inspire'):
-        inspire = True
-    else:
-        inspire = CFG_INSPIRE_SITE
-
     if _arxiv:
         overwrite = True
     else:
@@ -160,7 +160,6 @@ def task_run_core(recid, bibcatalog_system=None, _arxiv=False):
 
     try:
         update_references(recid,
-                          inspire=inspire,
                           overwrite=overwrite)
         msg = "Extracted references for %s" % recid
         if overwrite:
@@ -171,6 +170,7 @@ def task_run_core(recid, bibcatalog_system=None, _arxiv=False):
         # Create a RT ticket if necessary
         if not _arxiv and task_get_option('new') \
                                     or task_get_option('create-ticket'):
+            write_message("Checking if we should create a ticket", verbose=1)
             create_ticket(recid, bibcatalog_system)
     except FullTextNotAvailable:
         write_message("No full text available for %s" % recid)
@@ -232,7 +232,7 @@ def main():
                              "no-overwrite",
                              "arxiv",
                              "create-ticket"]),
-        task_submit_elaborate_specific_parameter_fnc=parse_option,
+        task_submit_elaborate_specific_parameter_fnc=cb_parse_option,
         task_submit_check_options_fnc=check_options,
         task_run_fnc=task_run_core_wrapper('refextract',
                                            task_run_core,

@@ -33,11 +33,6 @@ from invenio.refextract_api import extract_references_from_file_xml, \
                                    extract_references_from_string_xml
 from invenio.bibformat_engine import format_record
 
-try:
-    from invenio.config import CFG_INSPIRE_SITE
-except ImportError:
-    CFG_INSPIRE_SITE = False
-
 
 def check_login(req):
     """Check that the user is logged in"""
@@ -50,12 +45,12 @@ def check_login(req):
 
 def check_url(url):
     """Check that the url we received is not gibberish"""
-    return not url.startswith('http://') and \
-           not url.startswith('https://') and \
-           not url.startswith('ftp://')
+    return url.startswith('http://') or \
+           url.startswith('https://') or \
+           url.startswith('ftp://')
 
 
-def extract_from_pdf_string(pdf, inspire=CFG_INSPIRE_SITE):
+def extract_from_pdf_string(pdf):
     """Extract references from a pdf stored in a string
 
     Given a string representing a pdf, this function writes the string to
@@ -67,7 +62,7 @@ def extract_from_pdf_string(pdf, inspire=CFG_INSPIRE_SITE):
     try:
         tf.write(pdf)
         tf.flush()
-        refs = extract_references_from_file_xml(tf.name, inspire=inspire)
+        refs = extract_references_from_file_xml(tf.name)
     finally:
         # Also deletes the file
         tf.close()
@@ -136,11 +131,11 @@ class WebInterfaceDocExtract(WebInterfaceDirectory):
 
     api = WebInterfaceAPIDocExtract()
 
-    def example_pdf(self, _req, _form):
+    def example_pdf(self, req, _form):
         """Serve a test pdf for tests"""
         f = open("%s/docextract/example.pdf" % CFG_ETCDIR, 'rb')
         try:
-            return f.read()
+            req.write(f.read())
         finally:
             f.close()
 

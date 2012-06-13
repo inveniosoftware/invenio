@@ -21,18 +21,30 @@ import re
 from datetime import datetime
 
 # Pattern for PoS journal
-re_pos_year = ur'\s*(?P<year>\s\(?(?:19|20)\d{2}\)?)?'
-# e.g. e.g. LAT2007
-re_pos_volume = ur'\s+(?P<volume>\w{1,10}(?:19|20)\d{2})\s*'
-re_pos_page = ur'\s+(?P<page>\d{1,4})'
+
+# e.g. 2006
+re_pos_year_num = ur'(?:19|20)\d{2}'
+re_pos_year = ur'(?P<year>(' \
+                  + ur'\s' + re_pos_year_num + ur'\s' \
+                  + ur'|' \
+                  + ur'\(' + re_pos_year_num + '\)' \
+                  + ur'))'
+# e.g. LAT2007
+re_pos_volume = ur'(?P<volume>\w{1,10}(?:19|20)\d{2})'
+# e.g. (LAT2007)
+re_pos_volume_par = ur'\(' + re_pos_volume + ur'\)'
+# e.g. 20
+re_pos_page = ur'(?P<page>\d{1,4})'
 re_pos_title = ur'POS'
 
 re_pos_patterns = [
-    re_pos_title + re_pos_year + re_pos_volume + re_pos_page,
-    re_pos_title + re_pos_volume + re_pos_year + re_pos_page,
-    re_pos_title + re_pos_volume + re_pos_page + re_pos_year,
+    re_pos_title + ur'\s*' + re_pos_year + ur'\s+' + re_pos_volume + ur'\s+' + re_pos_page,
+    re_pos_title + ur'\s+' + re_pos_volume + ur'\s*' + re_pos_year + ur'\s*' + re_pos_page,
+    re_pos_title + ur'\s+' + re_pos_volume + ur'\s+' + re_pos_page + ur'\s*' + re_pos_year,
+    re_pos_title + ur'\s*' + re_pos_volume_par + ur'\s*' + re_pos_page,
 ]
 re_opts = re.VERBOSE | re.UNICODE | re.IGNORECASE
+
 
 def compute_pos_patterns(patterns):
     return [re.compile(p, re_opts) for p in patterns]
@@ -44,11 +56,82 @@ re_arxiv = re.compile(ur""" # arxiv 9910-1234v9 [physics.ins-det]
     [\s.-]*(?P<num>\d{4})(?:[\s-]*V(?P<version>\d))?
     \s*(?P<suffix>\[[A-Z.-]+\])? """, re.VERBOSE | re.UNICODE | re.IGNORECASE)
 
+# Pattern for old arxiv numbers
+old_arxiv_numbers = ur"(?P<num>/\d{7})"
+old_arxiv = {
+    ur"acc-ph": None,
+    ur"astro-ph": None,
+    ur"astro-phy": "astro-ph",
+    ur"astro-ph\.[a-z]{2}": None,
+    ur"atom-ph": None,
+    ur"chao-dyn": None,
+    ur"chem-ph": None,
+    ur"cond-mat": None,
+    ur"cs": None,
+    ur"cs\.[a-z]{2}": None,
+    ur"gr-qc": None,
+    ur"hep-ex": None,
+    ur"hep-lat": None,
+    ur"hep-ph": None,
+    ur"hepph": "hep-ph",
+    ur"hep-th": None,
+    ur"hepth": "hep-th",
+    ur"math": None,
+    ur"math\.[a-z]{2}": None,
+    ur"math-ph": None,
+    ur"nlin": None,
+    ur"nlin\.[a-z]{2}": None,
+    ur"nucl-ex": None,
+    ur"nucl-th": None,
+    ur"physics": None,
+    ur"physics\.acc-ph": None,
+    ur"physics\.ao-ph": None,
+    ur"physics\.atm-clus": None,
+    ur"physics\.atom-ph": None,
+    ur"physics\.bio-ph": None,
+    ur"physics\.chem-ph": None,
+    ur"physics\.class-ph": None,
+    ur"physics\.comp-ph": None,
+    ur"physics\.data-an": None,
+    ur"physics\.ed-ph": None,
+    ur"physics\.flu-dyn": None,
+    ur"physics\.gen-ph": None,
+    ur"physics\.geo-ph": None,
+    ur"physics\.hist-ph": None,
+    ur"physics\.ins-det": None,
+    ur"physics\.med-ph": None,
+    ur"physics\.optics": None,
+    ur"physics\.plasm-ph": None,
+    ur"physics\.pop-ph": None,
+    ur"physics\.soc-ph": None,
+    ur"physics\.space-ph": None,
+    ur"plasm-ph": "physics\.plasm-ph",
+    ur"q-bio\.[a-z]{2}": None,
+    ur"q-fin\.[a-z]{2}": None,
+    ur"q-alg": None,
+    ur"quant-ph": None,
+    ur"quant-phys": "quant-ph",
+    ur"solv-int": None,
+    ur"stat\.[a-z]{2}": None,
+    ur"stat-mech": None,
+}
+
+
+def compute_arxiv_re(report_pattern, report_number):
+    if report_number is None:
+        report_number = ur"\g<name>"
+    report_re = re.compile("(?P<name>" + report_pattern + ")" \
+                                        + old_arxiv_numbers, re.U|re.I)
+    return report_re, report_number
+
+RE_OLD_ARXIV = [compute_arxiv_re(*i) for i in old_arxiv.iteritems()]
+
 
 def compute_years():
     current_year = datetime.now().year
     return '|'.join(str(y)[2:] for y in xrange(1991, current_year + 1))
 arxiv_years = compute_years()
+
 
 def compute_months():
     return '|'.join(str(y).zfill(2) for y in xrange(1, 13))
@@ -223,15 +306,15 @@ re_sep = ur"\s*[,\s:-]\s*"
 re_title_tag = ur"(?P<title_tag><cds\.JOURNAL>[^<]*<\/cds\.JOURNAL>)"
 
 # Number (within a volume)
-re_volume_sub_number = ur'[Nn][oO\xb0]\.?\s*\d{1,6}'
+re_volume_sub_number = ur'[Nn][oO°]\.?\s*\d{1,6}'
 re_volume_sub_number_opt = u'(?:' + re_sep + u'(?P<vol_sub>' + \
     re_volume_sub_number + u'))?'
 
 # Volume
-re_volume_prefix = ur"(?:[Vv]o?l?\.?|[Nn]o\.?)"  # Optional Vol./No.
+re_volume_prefix = ur"(?:[Vv]o?l?\.?|[Nn][oO°]\.?)"  # Optional Vol./No.
 re_volume_suffix = ur"(?:\s*\(\d{1,2}(?:-\d)?\))?"
-re_volume_num = ur"\d+|" + "(?P<roman>(?<!\w)" + re_roman_numbers + "(?!\w))"
-re_volume_id = ur"(?P<vol>(?:(?:[A-Za-z]\s?)?(?P<vol_num>%s))|(?:(?:[A-Za-z]\s?)?\d+\s*\-\s*(?:[A-Za-z]\s?)?\d+))" % re_volume_num
+re_volume_num = ur"\d+|" + "(?:(?<!\w)" + re_roman_numbers + "(?!\w))"
+re_volume_id = ur"(?P<vol>(?:(?:[A-Za-z]\s?)?(?P<vol_num>%(volume_num)s))|(?:(?:%(volume_num)s)(?:[A-Za-z]))|(?:(?:[A-Za-z]\s?)?\d+\s*\-\s*(?:[A-Za-z]\s?)?\d+))" % {'volume_num': re_volume_num}
 re_volume_check = ur"(?<![\/\d])"
 re_volume = ur"\b" + u"(?:" + re_volume_prefix + u")?\s*" + re_volume_check + \
     re_volume_id + re_volume_suffix
@@ -314,15 +397,8 @@ re_correct_numeration_2nd_try_ptn3 = (re.compile(
   re.UNICODE|re.VERBOSE), ur'\g<title_tag>  <cds.VOL>\g<vol></cds.VOL> ' \
                                       ur'<cds.PG>\g<page></cds.PG>')
 
-re_correct_numeration_2nd_try_ptn4 = (re.compile(
-  re_title_tag + re_sep +                          # Recognised, tagged title
-  re_volume + re_volume_sub_number_opt + re_sep +  # The volume
-  re_year,                                         # The year
-  re.UNICODE|re.VERBOSE), ur'\g<title_tag>  <cds.VOL>\g<vol></cds.VOL> ' \
-                                      ur'<cds.YR>(\g<year>)</cds.YR> ' \
-                                      ur'<cds.PG>1</cds.PG>')
 
-re_correct_numeration_2nd_try_ptn5 = (re.compile(
+re_correct_numeration_2nd_try_ptn4 = (re.compile(
   re_title_tag + re_sep +        # Recognised, tagged title
   re_year + ur"\s*[.,\s:]\s*" +  # Year
   re_volume + re_sep +           # The volume
@@ -331,7 +407,7 @@ re_correct_numeration_2nd_try_ptn5 = (re.compile(
     ur'<cds.YR>(\g<year>)</cds.YR> <cds.PG>\g<page></cds.PG>')
 
 
-re_correct_numeration_2nd_try_ptn6 = (re.compile(
+re_correct_numeration_2nd_try_ptn5 = (re.compile(
   re_title_tag + re_sep + re_volume, re.UNICODE|re.VERBOSE),
     ur'\g<title_tag> <cds.VOL>\g<vol></cds.VOL>')
 
@@ -508,27 +584,27 @@ def get_reference_section_title_patterns():
        @return: (list) of compiled regex patterns.
     """
     patterns = []
-    titles = [ u'references',
-               u'references.',
-               u'r\u00C9f\u00E9rences',
-               u'r\u00C9f\u00C9rences',
-               u'reference',
-               u'refs',
-               u'r\u00E9f\u00E9rence',
-               u'r\u00C9f\u00C9rence',
-               u'r\xb4ef\xb4erences',
-               u'r\u00E9fs',
-               u'r\u00C9fs',
-               u'bibliography',
-               u'bibliographie',
-               u'citations',
-               u'literaturverzeichnis' ]
+    titles = [u'references',
+              u'references.',
+              u'r\u00C9f\u00E9rences',
+              u'r\u00C9f\u00C9rences',
+              u'reference',
+              u'refs',
+              u'r\u00E9f\u00E9rence',
+              u'r\u00C9f\u00C9rence',
+              u'r\xb4ef\xb4erences',
+              u'r\u00E9fs',
+              u'r\u00C9fs',
+              u'bibliography',
+              u'bibliographie',
+              u'citations',
+              u'literaturverzeichnis']
     sect_marker = u'^\s*([\[\-\{\(])?\s*' \
                   u'((\w|\d){1,5}([\.\-\,](\w|\d){1,5})?\s*' \
                   u'[\.\-\}\)\]]\s*)?' \
                   u'(?P<title>'
     sect_marker1 = u'^(\d){1,3}\s*(?P<title>'
-    line_end  = ur'(\s*s\s*e\s*c\s*t\s*i\s*o\s*n\s*)?)([\)\}\]])?' \
+    line_end = ur'(\s*s\s*e\s*c\s*t\s*i\s*o\s*n\s*)?)([\)\}\]])?' \
         ur'($|\s*[\[\{\(\<]\s*[1a-z]\s*[\}\)\>\]]|\:$)'
 
     for t in titles:
@@ -648,14 +724,14 @@ def get_post_reference_section_keyword_patterns():
        @return: (list) of compiled regex patterns.
     """
     compiled_patterns = []
-    patterns = [ u'(' + _create_regex_pattern_add_optional_spaces_to_word_characters(u'prepared') + \
-                                 ur'|' + _create_regex_pattern_add_optional_spaces_to_word_characters(u'created') + \
-                                 ur').*(AAS\s*)?\sLATEX',
-                 ur'AAS\s+?LATEX\s+?' + _create_regex_pattern_add_optional_spaces_to_word_characters(u'macros') + u'v',
-                 ur'^\s*' + _create_regex_pattern_add_optional_spaces_to_word_characters(u'This paper has been produced using'),
-                 ur'^\s*' + \
-                                 _create_regex_pattern_add_optional_spaces_to_word_characters(u'This article was processed by the author using Springer-Verlag') + \
-                                 u' LATEX' ]
+    patterns = [u'(' + _create_regex_pattern_add_optional_spaces_to_word_characters(u'prepared') + \
+                ur'|' + _create_regex_pattern_add_optional_spaces_to_word_characters(u'created') + \
+                ur').*(AAS\s*)?\sLATEX',
+                ur'AAS\s+?LATEX\s+?' + _create_regex_pattern_add_optional_spaces_to_word_characters(u'macros') + u'v',
+                ur'^\s*' + _create_regex_pattern_add_optional_spaces_to_word_characters(u'This paper has been produced using'),
+                ur'^\s*' + \
+                _create_regex_pattern_add_optional_spaces_to_word_characters(u'This article was processed by the author using Springer-Verlag') + \
+                u' LATEX']
     for p in patterns:
         compiled_patterns.append(re.compile(p, re.I|re.UNICODE))
     return compiled_patterns

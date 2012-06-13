@@ -25,7 +25,7 @@ from invenio.config import CFG_VERSION, CFG_ETCDIR
 # pylint: disable=C0301
 
 # Version number:
-CFG_REFEXTRACT_VERSION = "Invenio/%s refextract/%s" % (CFG_VERSION, '1.3')
+CFG_REFEXTRACT_VERSION = "Invenio/%s refextract/%s" % (CFG_VERSION, '1.4')
 # Module config directory
 CFG_CONF_DIR = '%s/docextract' % CFG_ETCDIR
 
@@ -62,15 +62,16 @@ CFG_REFEXTRACT_SUBFIELD_AUTH             = "h"      # ref author subfield
 CFG_REFEXTRACT_SUBFIELD_QUOTED           = "t"      # ref title subfield
 CFG_REFEXTRACT_SUBFIELD_ISBN             = "i"      # ref isbn subfield
 CFG_REFEXTRACT_SUBFIELD_PUBLISHER        = "p"      # ref publisher subfield
+CFG_REFEXTRACT_SUBFIELD_YEAR             = "y"      # ref publisher subfield
 CFG_REFEXTRACT_SUBFIELD_BOOK             = "xbook"  # ref book subfield
 
 ## refextract statistics fields:
-CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS   = "999"  # ref-stats tag
-CFG_REFEXTRACT_IND1_EXTRACTION_STATS     = "C"    # ref-stats ind1
-CFG_REFEXTRACT_IND2_EXTRACTION_STATS     = "6"    # ref-stats ind2
-CFG_REFEXTRACT_SUBFIELD_EXTRACTION_STATS = "a"    # ref-stats subfield
-
-
+CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS     = "999" # ref-stats tag
+CFG_REFEXTRACT_IND1_EXTRACTION_STATS       = "C"   # ref-stats ind1
+CFG_REFEXTRACT_IND2_EXTRACTION_STATS       = "6"   # ref-stats ind2
+CFG_REFEXTRACT_SUBFIELD_EXTRACTION_STATS   = "a"   # ref-stats subfield
+CFG_REFEXTRACT_SUBFIELD_EXTRACTION_TIME    = "t"   # ref-stats time subfield
+CFG_REFEXTRACT_SUBFIELD_EXTRACTION_VERSION = "v"   # ref-stats version subfield
 ## Internal tags are used by refextract to mark-up recognised citation
 ## information. These are the "closing tags:
 CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM = r"</cds.REPORTNUMBER>"
@@ -110,3 +111,6 @@ CGF_REFEXTRACT_SEMI_COLON_MISC_TEXT_SENSITIVITY = 60
 ## than this value is found, then the latter author group is dumped into misc.
 ## (A higher value will increase splitting strictness. i.e. Fewer splits)
 CGF_REFEXTRACT_ADJACENT_AUTH_MISC_SEPARATION = 10
+
+## Maximum number of lines for a citation before it is considered invalid
+CFG_REFEXTRACT_MAX_LINES = 25

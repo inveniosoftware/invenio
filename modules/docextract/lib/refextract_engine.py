@@ -23,15 +23,12 @@
 
 __revision__ = "$Id$"
 
-import sys
 import re
 import os
 import subprocess
+from itertools import chain
 
 from invenio.refextract_config import \
-            CFG_REFEXTRACT_XML_VERSION, \
-            CFG_REFEXTRACT_XML_COLLECTION_OPEN, \
-            CFG_REFEXTRACT_XML_COLLECTION_CLOSE, \
             CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM, \
             CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL, \
             CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND, \
@@ -42,25 +39,18 @@ from invenio.refextract_config import \
             CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL, \
             CFG_REFEXTRACT_MARKER_CLOSING_TITLE, \
             CFG_REFEXTRACT_MARKER_CLOSING_SERIES
-try:
-    from invenio.config import CFG_INSPIRE_SITE
-except ImportError:
-    CFG_INSPIRE_SITE = False
 
 # make refextract runnable without requiring the full Invenio installation:
 from invenio.config import CFG_PATH_GFILE
 
-from invenio.refextract_find import get_reference_section_beginning
-from invenio.refextract_text import rebuild_reference_lines
 from invenio.refextract_tag import tag_reference_line, \
     sum_2_dictionaries, identify_and_tag_DOI, identify_and_tag_URLs
-from invenio.refextract_text import extract_references_from_fulltext
 from invenio.refextract_xml import create_xml_record, \
-                                   build_formatted_xml_citation
+                                   build_xml_citations
 from invenio.docextract_pdf import convert_PDF_to_plaintext
 from invenio.docextract_utils import write_message
-from invenio.refextract_cli import halt
 from invenio.refextract_kbs import get_kbs
+from invenio.refextract_linker import find_referenced_recid
 from invenio.refextract_re import get_reference_line_numeration_marker_patterns, \
                                   regex_match_list, \
                                   re_tagged_citation, \
@@ -82,49 +72,6 @@ are output to the standard output stream as default, or instead to an xml file.
 
 # components relating to the standardisation and
 # recognition of citations in reference lines:
-
-
-def limit_m_tags(xml_file, length_limit):
-    """Limit size of miscellaneous tags"""
-    temp_xml_file = xml_file + '.temp'
-    try:
-        ofilehdl = open(xml_file, 'r')
-    except IOError:
-        write_message("***%s\n" % xml_file, verbose=0)
-        halt(err=IOError, msg="Error: Unable to read from '%s'" % xml_file,
-             exit_code=1)
-    try:
-        nfilehdl = open(temp_xml_file, 'w')
-    except IOError:
-        write_message("***%s\n" % temp_xml_file, verbose=0)
-        halt(err=IOError, msg="Error: Unable to write to '%s'" % temp_xml_file,
-             exit_code=1)
-
-    for line in ofilehdl:
-        line_dec = line.decode("utf-8")
-        start_ind = line_dec.find('<subfield code="m">')
-        if start_ind != -1:
-            # This line is an "m" line:
-            last_ind = line_dec.find('</subfield>')
-            if last_ind != -1:
-                # This line contains the end-tag for the "m" section
-                leng = last_ind - start_ind - 19
-                if leng > length_limit:
-                    # want to truncate on a blank to avoid problems..
-                    end = start_ind + 19 + length_limit
-                    for lett in range(end - 1, last_ind):
-                        xx = line_dec[lett:lett+1]
-                        if xx == ' ':
-                            break
-                        else:
-                            end += 1
-                    middle = line_dec[start_ind+19:end-1]
-                    line_dec = start_ind * ' ' + '<subfield code="m">' + \
-                              middle + '  !Data truncated! '  + '</subfield>\n'
-        nfilehdl.write("%s" % line_dec.encode("utf-8"))
-    nfilehdl.close()
-    # copy back to original file name
-    os.rename(temp_xml_file, xml_file)
 
 
 def remove_reference_line_marker(line):
@@ -194,10 +141,11 @@ def handle_special_journals(citation_elements, kbs):
 
             # Sometimes the page is omitted and the year is written in its place
             # We can never be sure but it's very likely that page > 1900 is
-            # actually a year
+            # actually a year, so we skip this reference
             if el['year'] == '' and re.match('(19|20)\d{2}$', el['page']):
-                el['year'] = el['page']
-                el['page'] = '1'
+                el['type'] = 'MISC'
+                el['misc_txt'] = "%s,%s,%s" \
+                                     % (el['title'], el['volume'], el['page'])
 
             el['volume'] = el['year'][-2:] + '%02d' % int(el['volume'])
 
@@ -225,7 +173,8 @@ def format_hep(citation_elements):
 
     e.g. replaces hep-th-9711200 with hep-th/9711200
     """
-    prefixes = ('astro-ph-', 'hep-th-', 'hep-ph-', 'hep-ex-', 'hep-lat-')
+    prefixes = ('astro-ph-', 'hep-th-', 'hep-ph-', 'hep-ex-', 'hep-lat-',
+                'math-ph-')
     for el in citation_elements:
         if el['type'] == 'REPORTNUMBER':
             for p in prefixes:
@@ -236,6 +185,10 @@ def format_hep(citation_elements):
 
 
 def format_author_ed(citation_elements):
+    """Standardise to (ed.) and (eds.)
+
+    e.g. Remove extra space in (ed. )
+    """
     for el in citation_elements:
         if el['type'] == 'AUTH':
             el['auth_txt'] = el['auth_txt'].replace('(ed. )', '(ed.)')
@@ -244,8 +197,13 @@ def format_author_ed(citation_elements):
 
 
 def look_for_books(citation_elements, kbs):
+    """Look for books in our kb
+
+    Create book tags by using the authors and the title to find books
+    in our knowledge base
+    """
     authors = None
-    title   = None
+    title = None
     for el in citation_elements:
         if el['type'] == 'AUTH':
             authors = el
@@ -270,6 +228,12 @@ def look_for_books(citation_elements, kbs):
 
 
 def split_volume_from_journal(citation_elements):
+    """Split volume from journal title
+
+    We need this because sometimes the volume is attached to the journal title
+    instead of the volume. In those cases we move it here from the title to the
+    volume
+    """
     for el in citation_elements:
         if el['type'] == 'JOURNAL' and ';' in el['title']:
             el['title'], series = el['title'].rsplit(';', 1)
@@ -277,7 +241,183 @@ def split_volume_from_journal(citation_elements):
     return citation_elements
 
 
+def remove_b_for_nucl_phys(citation_elements):
+    """Removes b from the volume of some journals
+
+    Removes the B from the volume for Nucl.Phys.Proc.Suppl. because in INSPIRE
+    that journal is handled differently.
+    """
+    for el in citation_elements:
+        if el['type'] == 'JOURNAL' and el['title'] == 'Nucl.Phys.Proc.Suppl.' \
+            and 'volume' in el \
+            and (el['volume'].startswith('b') or el['volume'].startswith('B')):
+            el['volume'] = el['volume'][1:]
+    return citation_elements
+
+
+def mangle_volume(citation_elements):
+    """Make sure the volume letter is before the volume number
+
+    e.g. transforms 100B to B100
+    """
+    volume_re = re.compile(ur"(\d+)([A-Z])", re.U|re.I)
+    for el in citation_elements:
+        if el['type'] == 'JOURNAL':
+            matches = volume_re.match(el['volume'])
+            if matches:
+                el['volume'] = matches.group(2) + matches.group(1)
+
+    return citation_elements
+
+
+def balance_authors(splitted_citations, new_elements):
+    if not splitted_citations:
+        return
+
+    last_citation = splitted_citations[-1]
+    current_citation = new_elements
+
+    if last_citation[-1]['type'] == 'AUTH' \
+            and sum([1 for cit in last_citation if cit['type'] == 'AUTH']) > 1:
+        el = last_citation.pop()
+        current_citation.insert(0, el)
+
+
+def split_citations(citation_elements):
+    """Split a citation line in multiple citations
+
+    We handle the case where the author has put 2 citations in the same line
+    but split with ; or some other method.
+    """
+    splitted_citations = []
+    new_elements = []
+    current_recid = None
+
+    def check_ibid(current_elements, trigger_el):
+        # Check for ibid
+        if trigger_el.get('is_ibid', False):
+            if splitted_citations:
+                els = chain(reversed(current_elements),
+                            reversed(splitted_citations[-1]))
+            else:
+                els = reversed(current_elements)
+            for el in els:
+                if el['type'] == 'AUTH':
+                    new_elements.append(el.copy())
+                    break
+
+    def start_new_citation():
+        """Start new citation"""
+        splitted_citations.append(new_elements[:])
+        del new_elements[:]
+
+    to_merge = None
+    for el in citation_elements:
+        if to_merge:
+            el['misc_txt'] = to_merge + " " + el.get('misc_txt', '')
+            to_merge = None
+
+        try:
+            el_recid = find_referenced_recid(el).pop()
+        except (IndexError, KeyError):
+            el_recid = None
+
+        if current_recid and el_recid and current_recid == el_recid:
+            # Do not start a new citation
+            pass
+        elif current_recid and el_recid and current_recid != el_recid:
+            start_new_citation()
+            # Some authors may be found in the previous citation
+            balance_authors(splitted_citations, new_elements)
+        elif ';' in el['misc_txt'] and valid_citation(new_elements):
+            el['misc_txt'], to_merge = el['misc_txt'].rsplit(';', 1)
+            start_new_citation()
+
+        if el_recid:
+            current_recid = el_recid
+
+        check_ibid(new_elements, el)
+        new_elements.append(el)
+
+    if to_merge:
+        new_elements[-1]['misc_txt'] += " " + to_merge
+        new_elements[-1]['misc_txt'] = new_elements[-1]['misc_txt'].strip()
+
+    splitted_citations.append(new_elements)
+
+    return splitted_citations
+
+
+def valid_citation(citation):
+    els_to_remove = ('MISC', )
+    for el in citation:
+        if el['type'] not in els_to_remove:
+            return True
+    return False
+
+
+def remove_invalid_references(splitted_citations):
+    def add_misc(el, txt):
+        if not el.get('misc_txt'):
+            el['misc_txt'] = txt
+        else:
+            el['misc_txt'] += " " + txt
+
+    splitted_citations = [citation for citation in splitted_citations \
+                                                                   if citation]
+
+    # We merge some elements in here which means it only makes sense when
+    # we have at least 2 elements to merge together
+    if len(splitted_citations) > 1:
+        previous_citation = None
+        for citation in splitted_citations:
+            if not valid_citation(citation):
+                # Merge to previous one misc txt
+                if previous_citation:
+                    citation_to_merge_into = previous_citation
+                else:
+                    citation_to_merge_into = splitted_citations[1]
+
+                for el in citation:
+                    add_misc(citation_to_merge_into[-1], el['misc_txt'])
+
+            previous_citation = citation
+
+    return [citation for citation in splitted_citations \
+                                                   if valid_citation(citation)]
+
+
+def add_year_elements(splitted_citations):
+    for citation in splitted_citations:
+        for el in citation:
+            if el['type'] == 'YEAR':
+                continue
+
+        year = None
+        for el in citation:
+            if el['type'] == 'JOURNAL' or el['type'] == 'BOOK' \
+                                                              and 'year' in el:
+                year = el['year']
+                break
+        if year:
+            citation.append({'type': 'YEAR',
+                             'year': year,
+                             'misc_txt': '',
+                            })
+
+    return splitted_citations
+
+
 ## End of elements transformations
+
+
+def print_citations(splitted_citations, line_marker):
+    write_message('* splitted_citations', verbose=9)
+    write_message('  * line marker %s' % line_marker, verbose=9)
+    for citation in splitted_citations:
+        write_message("  * elements", verbose=9)
+        for el in citation:
+            write_message('    * %s %s' % (el['type'], repr(el)), verbose=9)
 
 
 def parse_reference_line(ref_line, kbs, bad_titles_count={}):
@@ -298,7 +438,7 @@ def parse_reference_line(ref_line, kbs, bad_titles_count={}):
                                                        bad_titles_count)
 
     # Debug print tagging (authors, titles, volumes, etc.)
-    write_message('  * tags %r' % tagged_line, verbose=9)
+    write_message('* tags %r' % tagged_line, verbose=9)
 
     # Using the recorded information, create a MARC XML representation
     # of the rebuilt line:
@@ -318,8 +458,20 @@ def parse_reference_line(ref_line, kbs, bad_titles_count={}):
     citation_elements = format_author_ed(citation_elements)
     citation_elements = look_for_books(citation_elements, kbs)
     citation_elements = format_hep(citation_elements)
+    citation_elements = remove_b_for_nucl_phys(citation_elements)
+    citation_elements = mangle_volume(citation_elements)
 
-    return citation_elements, line_marker, counts, bad_titles_count
+    # Split the reference in multiple ones if needed
+    splitted_citations = split_citations(citation_elements)
+
+    # Remove references with only misc text
+    splitted_citations = remove_invalid_references(splitted_citations)
+    # Find year
+    splitted_citations = add_year_elements(splitted_citations)
+    # For debugging puposes
+    print_citations(splitted_citations, line_marker)
+
+    return splitted_citations, line_marker, counts, bad_titles_count
 
 
 def parse_references_elements(ref_sect, kbs):
@@ -384,7 +536,7 @@ def parse_references_elements(ref_sect, kbs):
                           'line_marker': line_marker})
 
     # Return the list of processed reference lines:
-    return (citations, counts, bad_titles_count)
+    return citations, counts, bad_titles_count
 
 
 def parse_tagged_reference_line(line_marker,
@@ -425,8 +577,8 @@ def parse_tagged_reference_line(line_marker,
     while tag_match is not None:
         # While there are tags inside this reference line...
         tag_match_start = tag_match.start()
-        tag_match_end   = tag_match.end()
-        tag_type        = tag_match.group(1)
+        tag_match_end = tag_match.end()
+        tag_type = tag_match.group(1)
         cur_misc_txt += processed_line[0:tag_match_start]
 
         # Catches both standard titles, and ibid's
@@ -455,7 +607,7 @@ def parse_tagged_reference_line(line_marker,
 
                 # Closing tag was found:
                 # The title text to be used in the marked-up citation:
-                title_text  = processed_line[tag_match_end:idx_closing_tag]
+                title_text = processed_line[tag_match_end:idx_closing_tag]
 
                 # Now trim this matched title and its tags from the start of the line:
                 processed_line = processed_line[idx_closing_tag+closing_tag_length:]
@@ -464,8 +616,8 @@ def parse_tagged_reference_line(line_marker,
                 if numeration_match:
                     # recognised numeration immediately after the title - extract it:
                     reference_volume = numeration_match.group('vol')
-                    reference_year   = numeration_match.group('yr') or ''
-                    reference_page   = numeration_match.group('pg')
+                    reference_year = numeration_match.group('yr') or ''
+                    reference_page = numeration_match.group('pg')
 
                     # This is used on two accounts:
                     # 1. To get the series char from the title, if no series was found with the numeration
@@ -482,14 +634,14 @@ def parse_tagged_reference_line(line_marker,
                     # 'extra_ibids' are there to hold ibid's without the word 'ibid', which
                     # come directly after this title
                     # i.e., they are recognised using title numeration instead of ibid notation
-                    identified_citation_element = {   'type'       : "JOURNAL",
-                                                      'misc_txt'   : cur_misc_txt,
-                                                      'title'      : title_text,
-                                                      'volume'     : reference_volume,
-                                                      'year'       : reference_year,
-                                                      'page'       : reference_page,
-                                                      'is_ibid'    : is_ibid,
-                                                      'extra_ibids': []
+                    identified_citation_element = {'type'       : "JOURNAL",
+                                                   'misc_txt'   : cur_misc_txt,
+                                                   'title'      : title_text,
+                                                   'volume'     : reference_volume,
+                                                   'year'       : reference_year,
+                                                   'page'       : reference_page,
+                                                   'is_ibid'    : is_ibid,
+                                                   'extra_ibids': []
                                                   }
                     count_title += 1
                     cur_misc_txt = u""
@@ -502,8 +654,8 @@ def parse_tagged_reference_line(line_marker,
                     while numeration_match is not None:
 
                         reference_volume = numeration_match.group('vol')
-                        reference_year   = numeration_match.group('yr')
-                        reference_page   = numeration_match.group('pg')
+                        reference_year = numeration_match.group('yr')
+                        reference_page = numeration_match.group('pg')
 
                         if numeration_match.group('series'):
                             reference_volume = numeration_match.group('series') + reference_volume
@@ -513,12 +665,12 @@ def parse_tagged_reference_line(line_marker,
 
                         # Takes the just found title text
                         identified_citation_element['extra_ibids'].append(
-                                                { 'type'       : "JOURNAL",
-                                                  'misc_txt'   : "",
-                                                  'title'      : title_text,
-                                                  'volume'     : reference_volume,
-                                                  'year'       : reference_year,
-                                                  'page'       : reference_page,
+                                                {'type'       : "JOURNAL",
+                                                 'misc_txt'   : "",
+                                                 'title'      : title_text,
+                                                 'volume'     : reference_volume,
+                                                 'year'       : reference_year,
+                                                 'page'       : reference_page,
                                                 })
                         # Increment the stats counters:
                         count_title += 1
@@ -567,7 +719,7 @@ def parse_tagged_reference_line(line_marker,
             # From the "identified_urls" list, get this URL and its
             # description string:
             url_string = identified_urls[0][0]
-            url_desc  = identified_urls[0][1]
+            url_desc = identified_urls[0][1]
 
             # Now move past this "<cds.URL />"tag in the line:
             processed_line = processed_line[tag_match_end:]
@@ -877,254 +1029,7 @@ def get_plaintext_document_body(fpath, keep_layout=False):
     return (textbody, status)
 
 
-def write_raw_references_to_stream(recid, raw_refs, strm):
-    """Write a list of raw reference lines to the a given stream.
-       Each reference line is preceeded by the record-id. Thus, if for example,
-       the following 2 reference lines were passed to this function:
-        [1] See http://invenio-software.org/ for more details.
-        [2] Example, AN: private communication (1996).
-       and the record-id was "1", the raw reference lines printed to the stream
-       would be:
-        1:[1] See http://invenio-software.org/ for more details.
-        1:[2] Example, AN: private communication (1996).
-       @param recid: (string) the record-id of the document for which raw
-        references are to be written-out.
-       @param raw_refs: (list) of strings. The raw references to be written-out.
-       @param strm: (open stream object) - the stream object to which the
-        references are to be written. If the stream object is not a valid open
-        stream (or is None, by default), the standard error stream (sys.stderr)
-        will be used by default.
-       @return: None.
-    """
-    # write the reference lines to the stream:
-    for x in raw_refs:
-        strm.write("%(recid)s:%(refline)s\n" % {'recid' : recid,
-                                                'refline' : x.encode("utf-8")})
-    strm.flush()
-
-
-def extract_one(config, kbs, num, pdf_path):
-    """Extract references from one file"""
-    write_message("* processing pdffile: %s" % pdf_path, verbose=2)
-
-    # 1. Get this document body as plaintext:
-    (docbody, extract_error) = get_plaintext_document_body(pdf_path)
-
-    if extract_error == 1:
-        # Non-existent or unreadable pdf/text directory.
-        halt(msg="Error: Unable to open '%s' for extraction" \
-             % pdf_path, exit_code=1)
-    elif extract_error == 0 and len(docbody) == 0:
-        halt(msg="Error: Empty document text", exit_code=1)
-
-    write_message("* get_plaintext_document_body gave: " \
-                         "%d lines, overall error: %d" \
-                         % (len(docbody), extract_error), verbose=2)
-
-    # the document body is not empty:
-    # 2. If necessary, locate the reference section:
-    if config.treat_as_reference_section:
-        # don't search for citations in the document body:
-        # treat it as a reference section:
-        refs_info = get_reference_section_beginning(docbody)
-        docbody = rebuild_reference_lines(docbody, refs_info['marker_pattern'])
-        reflines = docbody
-        how_found_start = 1
-    else:
-        # launch search for the reference section in the document body:
-        (reflines, extract_error, how_found_start) = \
-                   extract_references_from_fulltext(docbody)
-        if len(reflines) == 0 and extract_error == 0:
-            extract_error = 6
-        write_message("* extract_references_from_fulltext " \
-                      "gave len(reflines): %d overall error: %d" \
-                       % (len(reflines), extract_error), verbose=2)
-
-    # 3. Standardise the reference lines:
-    (processed_references, counts, record_titles_count) = \
-      parse_references_elements(reflines, kbs)
-
-    processed_references = build_xml_references(processed_references,
-                                                config.inspire)
-
-    # 4. Display the extracted references, status codes, etc:
-    if config.output_raw:
-        write_raw_references(num, reflines)
-
-    # If found ref section by a weaker method and only found misc/urls then junk it
-    # studies show that such cases are ~ 100% rubbish. Also allowing only
-    # urls found greatly increases the level of rubbish accepted..
-    if counts['reportnum'] + counts['title'] == 0 and how_found_start > 2:
-        counts.update({'misc': 0, 'url': 0, 'doi': 0, 'auth_group': 0})
-        processed_references = []
-        write_message("* Found ONLY miscellaneous/Urls so removed it " \
-            "how_found_start=  %d" % how_found_start, verbose=2)
-    elif counts['reportnum'] + counts['title']  > 0 and how_found_start > 2:
-        write_message("* Found journals/reports with how_found_start= " \
-            " %d" % how_found_start, verbose=2)
-
-    # Display the processed reference lines:
-    out = create_xml_record(counts,
-                            num,
-                            processed_references,
-                            extract_error)
-
-    return out, record_titles_count
-
-
-def begin_extraction(config, files):
-    """Starts the core extraction procedure. [Entry point from main]
-
-       Only refextract_daemon calls this directly, from _task_run_core()
-       @param daemon_cli_options: contains the pre-assembled list of cli flags
-       and values processed by the Refextract Daemon. This is full only when
-       called as a scheduled bibtask inside bibsched.
-    """
-    # What journal title format are we using?
-    if not config.inspire:
-        config.inspire = CFG_INSPIRE_SITE
-
-    if config.inspire:
-        write_message("Using inspire journal title form", verbose=2)
-    else:
-        write_message("Using invenio journal title form", verbose=2)
-
-    # Gather fulltext document locations from input arguments
-    extract_jobs = files
-
-    # Read the authors knowledge base, creating the search
-    # and replace terms
-    kbs = get_kbs(custom_kbs_files={
-        'authors'       : config.kb_authors,
-        'journals'      : config.kb_journals,
-        'report-numbers': config.kb_report_numbers,
-        'books'         : config.kb_books,
-        'conferences'   : config.kb_conferences,
-    })
-
-    # A dictionary to contain the counts of all 'bad titles' found during
-    # this reference extraction job:
-    all_found_titles_count = {}
-    # Store xml records here
-    output = []
-
-    for num, curitem in enumerate(extract_jobs):
-        # Announce the document extraction number
-        write_message("Extracting %d of %d" % (num + 1, len(extract_jobs)),
-                      verbose=1)
-
-        out, record_titles_count = extract_one(config, kbs, num + 1, curitem)
-        # Add the count of 'bad titles' found in this line to the total
-        # for the reference section:
-        all_found_titles_count = sum_2_dictionaries(all_found_titles_count,
-                                                    record_titles_count)
-
-        display_lines_count(out)
-        output.append(out)
-
-    # Write our references
-    write_references(config, output)
-
-    # If the option to write the statistics about all periodical titles matched
-    # during the extraction-job was selected, do so using the specified file.
-    # Note: the matched titles are the Left-Hand-Side titles in the KB, i.e.
-    # the BAD versions of titles.
-    if config.dictfile:
-        write_titles_statistics(all_found_titles_count, config.dictfile)
-
-
-def write_references(config, xml_references):
-    """Write marcxml to file
-
-    * Output xml header
-    * Output collection opening tag
-    * Output xml for each record
-    * Output collection closing tag
-    """
-    if config.xmlfile:
-        ofilehdl = open(config.xmlfile, 'w')
-    else:
-        ofilehdl = sys.stdout
-
-    try:
-        print >>ofilehdl, CFG_REFEXTRACT_XML_VERSION.encode("utf-8")
-        print >>ofilehdl, CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8")
-        for out in xml_references:
-            print >>ofilehdl, out.encode("utf-8")
-        print >>ofilehdl, CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8")
-        ofilehdl.flush()
-    except IOError, err:
-        write_message("%s\n%s\n" % (config.xmlfile, err), \
-                          sys.stderr, verbose=0)
-        halt(err=IOError, msg="Error: Unable to write to '%s'" \
-                 % config.xmlfile, exit_code=1)
-
-    if config.xmlfile:
-        ofilehdl.close()
-        # limit m tag data to something less than infinity
-        limit_m_tags(config.xmlfile, 2048)
-
-
-def display_lines_count(text):
-    """Display lines count
-
-    Give a text, it counts the number of lines in it and displays it
-    """
-    lines_count = sum([1 for c in text if c == '\n'])
-    write_message("* display_xml_record: %d lines" % lines_count, verbose=2)
-
-
-def write_raw_references(num, reflines):
-    """Write raw references to a file
-
-    If you want to save the raw references to a file
-    They will be save in the current directory named by their position
-    1st file will be named 1.rawrefs
-    2nd file will be named 2.rawrefs
-    """
-    # now write the raw references to the stream:
-    raw_file = '%d.rawrefs' % num
-    try:
-        rawfilehdl = open(raw_file, 'w')
-    except IOError:
-        halt(err=IOError, msg="Error: Unable to write to '%s'" \
-                      % raw_file, exit_code=1)
-
-    try:
-        write_raw_references_to_stream(num, reflines, rawfilehdl)
-    finally:
-        rawfilehdl.close()
-
-
-def write_titles_statistics(all_found_titles_count, destination_file):
-    """Write title statistics to file
-
-    Write statistics from the extraction to a file
-    Output file will look like
-        3:JHEP
-        3:EUR PHYS J
-        25:PHYS REV
-    """
-    try:
-        dfilehdl = open(destination_file, "w")
-    except IOError, (errno, err_string):
-        # There was a problem writing out the statistics
-        write_message("""Unable to write "matched titles" """ \
-                         """statistics to output file\n""" \
-                         """Error Number %d (%s).""" \
-                         % (errno, err_string), \
-                         sys.stderr, verbose=0)
-        halt(err=IOError, msg="Error: Unable to write to '%s'" \
-            % destination_file, exit_code=1)
-
-    try:
-        for ktitle, kcount in all_found_titles_count.iteritems():
-            dfilehdl.write("%d:%s\n" % (kcount, ktitle.encode("utf-8")))
-    finally:
-        dfilehdl.close()
-
-
-def build_xml_references(citations, inspire=CFG_INSPIRE_SITE):
+def build_xml_references(citations):
     """Build marc xml from a references list
 
     Transform the reference elements into marc xml
@@ -1133,23 +1038,21 @@ def build_xml_references(citations, inspire=CFG_INSPIRE_SITE):
 
     for c in citations:
         # Now, run the method which will take as input:
-        # 1. A list of dictionaries, where each dictionary is a piece
+        # 1. A list of lists of dictionaries, where each dictionary is a piece
         # of citation information corresponding to a tag in the citation.
         # 2. The line marker for this entire citation line (mulitple citation
         # 'finds' inside a single citation will use the same marker value)
         # The resulting xml line will be a properly marked up form of the
         # citation. It will take into account authors to try and split up
         # references which should be read as two SEPARATE ones.
-        xml_line = build_formatted_xml_citation(c['elements'],
-                                                c['line_marker'],
-                                                inspire)
-        xml_references.append(xml_line)
+        xml_lines = build_xml_citations(c['elements'],
+                                        c['line_marker'])
+        xml_references.extend(xml_lines)
 
     return xml_references
 
 
-def parse_references(reference_lines, recid=1,
-                                    kbs_files=None, inspire=CFG_INSPIRE_SITE):
+def parse_references(reference_lines, recid=1, kbs_files=None):
     """Parse a list of references
 
     Given a list of raw reference lines (list of strings),
@@ -1161,6 +1064,6 @@ def parse_references(reference_lines, recid=1,
     (processed_references, counts, dummy_bad_titles_count) = \
                                 parse_references_elements(reference_lines, kbs)
     # Generate marc xml using the elements list
-    xml_out = build_xml_references(processed_references, inspire)
+    xml_out = build_xml_references(processed_references)
     # Generate the xml string to be outputted
     return create_xml_record(counts, recid, xml_out)

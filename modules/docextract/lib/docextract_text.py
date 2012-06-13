@@ -101,7 +101,9 @@ def join_lines(line1, line2):
     >>> join_lines('a-', 'b')
     'ab'
     """
-    if line1[-1] == u'-':
+    if line1 == u"":
+        pass
+    elif line1[-1] == u'-':
         ## hyphenated word at the end of the
         ## line - don't add in a space and remove hyphen
         line1 = line1[:-1]

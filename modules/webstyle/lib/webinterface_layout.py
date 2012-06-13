@@ -299,7 +299,8 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'person',
         'admin2',
         'linkbacks',
-        'author'
+        'author',
+        'textmining',
         ] + test_exports + openaire_exports
 
     def __init__(self):
@@ -336,6 +337,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     #redirects author to the new webauthor
     author = WebInterfaceWebAuthorPages()
     #author = WebInterfaceAuthorPages()
+    textmining = WebInterfaceDocExtract()
 
 # This creates the 'handler' function, which will be invoked directly
 # by mod_python.

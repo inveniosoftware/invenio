@@ -396,7 +396,7 @@ def find_end_of_reference_section(docbody,
             # 5 lines for other reference numeration markers:
             y = x + 1
             line_found = False
-            while y < x + 6 and y < len(docbody) and not line_found:
+            while y < x + 200 and y < len(docbody) and not line_found:
                 num_match = regex_match_list(docbody[y].strip(), mk_patterns)
                 if num_match and not num_match.group(0).isdigit():
                     try:
