@@ -3956,12 +3956,12 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
             elif format.startswith("hd"):
                 # HTML detailed format:
                 for irec in range(irec_max, irec_min, -1):
-                    merged_recid = get_merged_recid(recIDs[irec])
-                    if record_exists(recIDs[irec]) == -1 and not merged_recid:
+                    if record_exists(recIDs[irec]) == -1:
                         print_warning(req, _("The record has been deleted."))
+                        merged_recid = get_merged_recid(recIDs[irec])
+                        if merged_recid:
+                            print_warning(req, _("The record %d replaces it." % merged_recid))
                         continue
-                    if merged_recid:
-                        recIDs[irec] = merged_recid
                     unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(recIDs[irec])),
                                                             recIDs[irec], ln=ln)
                     ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
@@ -4266,14 +4266,15 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
         if format == '':
             format = 'hd'
 
-        merged_recid = get_merged_recid(recID)
-        if record_exist_p == -1 and not merged_recid and get_output_format_content_type(format) == 'text/html':
+        if record_exist_p == -1 and get_output_format_content_type(format) == 'text/html':
             # HTML output displays a default value for deleted records.
             # Other format have to deal with it.
             out += _("The record has been deleted.")
-        else:
+            # was record deleted-but-merged ?
+            merged_recid = get_merged_recid(recID)
             if merged_recid:
-                recID = merged_recid
+                out += ' ' + _("The record %d replaces it." % merged_recid)
+        else:
             out += call_bibformat(recID, format, ln, search_pattern=search_pattern,
                                   user_info=user_info, verbose=verbose)
 
