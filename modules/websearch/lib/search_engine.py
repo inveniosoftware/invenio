@@ -3204,11 +3204,16 @@ def get_merged_recid(recID):
     @param recID: deleted record recID
     @type recID: int
     @return: merged record recID
-    @rtype: int
+    @rtype: int or None
     """
-    merged_recid = get_fieldvalues(recID, "970__d")
-    if merged_recid:
-        return int(merged_recid[0])
+    merged_recid = None
+    for val in get_fieldvalues(recID, "970__d"):
+        try:
+            merged_recid = int(val)
+            break
+        except ValueError:
+            pass
+    return merged_recid
 
 def record_exists(recID):
     """Return 1 if record RECID exists.
