@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,9 +29,12 @@ def format_element(bfo, kb):
     @param kb: a knowledge base use to translate the collection identifier
     """
 
-    collection_identifier = bfo.field("980__a")
+    collection_identifiers = bfo.fields("980__a")
 
+    for collection_identifier in collection_identifiers:
+        translated_collection_identifier = bfo.kb(kb, collection_identifier)
+        if translated_collection_identifier:
+            return translated_collection_identifier
 
-    translated_collection_identifier = bfo.kb(kb, collection_identifier)
+    return ''
 
-    return translated_collection_identifier
