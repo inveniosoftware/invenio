@@ -196,7 +196,7 @@ function resize_content() {
   var bibedit_table_top = $("#bibEditContentTable").offset().top;
   var bibedit_table_height = Math.round(.93 * ($(window).height() - bibedit_table_top));
   bibedit_table_height = parseInt(bibedit_table_height) + 'px';
-  $("#bibEditContentTable").css('height',bibedit_table_height);
+  $("#bibEditContentTable").css('height', bibedit_table_height);
 }
 
 $(function(){
@@ -1323,7 +1323,9 @@ function onPrintClick() {
   /*
    * Print page, makes use of special css rules @media print
    */
+  $("#bibEditContentTable").css('height', "100%");
   window.print();
+  resize_content();
 }
 
 function onOpenPDFClick() {
@@ -2576,8 +2578,7 @@ function onContentClick(cell){
   }
 }
 
-function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex, 
-        subfieldCode, value, changeNo, undoDescriptor, modifySubfieldCode){
+function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex, subfieldCode, value, changeNo, undoDescriptor, modifySubfieldCode) {
   var requestType;
   if (modifySubfieldCode == true) {
       requestType = 'modifySubfieldTag';
@@ -2603,9 +2604,7 @@ function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex,
   return data;
 }
 
-function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, 
-                            value, consumedChange, undoDescriptor,
-                            modifySubfieldCode){
+function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, value, consumedChange, undoDescriptor, modifySubfieldCode) {
   updateStatus('updating');
   // Create Ajax request for simple updating the subfield value
   if (consumedChange == undefined || consumedChange == null){
@@ -2626,10 +2625,7 @@ function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode,
   }, false);
 }
 
-function getBulkUpdateSubfieldContentRequestData(tag, fieldPosition,
-                                                 subfieldIndex, subfieldCode,
-                                                 value, consumedChange,
-                                                 undoDescriptor, subfieldsToAdd, subfield_offset) {
+function getBulkUpdateSubfieldContentRequestData(tag, fieldPosition, subfieldIndex, subfieldCode, value, consumedChange, undoDescriptor, subfieldsToAdd, subfield_offset) {
     /*
      *Purpose: prepare data to be included in the request for a bulk update
      *         of the subfield content
@@ -2665,8 +2661,7 @@ function getBulkUpdateSubfieldContentRequestData(tag, fieldPosition,
     return changesAdd
 }
 
-function bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, subfieldCode,
-                            value, consumedChange, undoDescriptor, subfieldsToAdd, subfields_offset) {
+function bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, subfieldCode, value, consumedChange, undoDescriptor, subfieldsToAdd, subfields_offset) {
     /*
      *Purpose: perform request for a bulk update as the user introduced in the content
      *         field multiple subfields to be added in the form $$aTest$$bAnother
@@ -2730,8 +2725,7 @@ function updateFieldTag(oldTag, newTag, oldInd1, oldInd2, ind1, ind2, fieldPosit
   }, false);
 }
 
-function getUpdateFieldTagRequestData(oldTag, oldInd1, oldInd2, newTag, ind1, ind2,
-                                      fieldPosition, changeNo, undoDescriptor){
+function getUpdateFieldTagRequestData(oldTag, oldInd1, oldInd2, newTag, ind1, ind2, fieldPosition, changeNo, undoDescriptor){
   var data = {
     recID: gRecID,
     requestType: "modifyFieldTag",
@@ -2868,7 +2862,7 @@ function onAutosuggest(event) {
 
 
 /*put the content of the autosuggest select into the field where autoselect was lauched*/
-function onAutosuggestSelect(selectidandselval){
+function onAutosuggestSelect(selectidandselval) {
   /*first take the selectid. It is the string before the first hyphen*/
   var tmpArray = selectidandselval.split('-');
   var selectid = tmpArray[0];
@@ -2978,24 +2972,28 @@ function onContentChange(value, th) {
    *
    * Returns: string - string to be introduced in the cell th
    */
-   if (failInReadOnly()){
+  if (failInReadOnly()) {
     return;
   }
   /* Extract information about the field to edit from cell id */
   var tmpArray = th.id.split('_');
-  var tag = tmpArray[1], fieldPosition = tmpArray[2], subfieldIndex = tmpArray[3];
   var cellType = tmpArray[0];
+  var tag = tmpArray[1],
+      fieldPosition = tmpArray[2],
+      subfieldIndex = tmpArray[3];
 
   /* Get field instance to be updated from global variable gRecord */
-  var field = gRecord[tag][fieldPosition];
-  var tag_ind = tag + field[1] + field[2]; // tag + indicators. e.g 999C5
+  var field_instance = gRecord[tag][fieldPosition];
+  var subfield_instance = field_instance[0][subfieldIndex];
+  var tag_ind = tag + field_instance[1] + field_instance[2]; // tag + indicators. e.g 999C5
 
   /* Sanitize cell input value */
   value = value.replace(/\n/g, ' '); // Replace newlines with spaces.
   value = value.replace(/^\s+|\s+$/g,""); // Remove whitespace from the ends of strings
 
-  var oldValue = ""; //variable that will contain old value from gRecord
-  if (subfieldIndex == undefined){
+  var oldValue = ""; // variable that will contain old value from gRecord
+  var newValue = escapeHTML(value);
+  if (subfieldIndex == undefined) {
     /* Edit field tag */
     if (cellType == 'fieldTag') {
         if (tag_ind == value.replace(/_/g, " "))
@@ -3004,28 +3002,31 @@ function onContentChange(value, th) {
             oldValue = tag_ind;
         }
     }
-    else{
+    else {
         /* subfield index should not be undefined. Return the same value. */
         return escapeHTML(value);
     }
   }
   else {
-    var oldSubfieldCode = field[0][subfieldIndex][0];
+    var oldSubfieldCode = subfield_instance[0];
     if (cellType == 'subfieldTag') {
         /* Edit subfield code */
-        if (field[0][subfieldIndex][0] == value)
+        if (subfield_instance[0] == value) {
             return escapeHTML(value);
+        }
         else {
-            oldValue = field[0][subfieldIndex][0]; // get old subfield code from gRecord
-            field[0][subfieldIndex][0] = value; // update gRecord
-            oldSubfieldCode = field[0][subfieldIndex][0];
+            oldValue = subfield_instance[0]; // get old subfield code from gRecord
+            subfield_instance[0] = value; // update gRecord
+            var newSubfieldCode = subfield_instance[0];
         }
     }
     else {
-        var isSubject = isSubjectSubfield(tag_ind, field[0][subfieldIndex][0]);
-        var subfieldsToAdd = new Array(), bulkOperation = false, subfield_offset;
+        var isSubject = isSubjectSubfield(tag_ind, subfield_instance[0]);
+        var subfieldsToAdd = [],
+            bulkOperation = false,
+            subfield_offset;
         /* Edit subfield value */
-        if (field[0][subfieldIndex][1] == value) {
+        if (subfield_instance[1] == value) {
             return escapeHTML(value);
         }
         /* Check if there are subfields inside of the content value
@@ -3033,22 +3034,22 @@ function onContentChange(value, th) {
         else if (valueContainsSubfields(value)) {
             bulkOperation = true;
             splitContentSubfields(value, oldSubfieldCode, subfieldsToAdd, isSubject);
-            if (tag_ind == '999C5' && !is_reference_manually_curated(field)){
+            if (tag_ind == '999C5' && !is_reference_manually_curated(field_instance)) {
                 subfieldsToAdd.push(new Array('9', 'CURATOR'));
             }
-            field[0].splice(subfieldIndex, 1); // update gRecord, remove old content
-            field[0].push.apply(field[0], subfieldsToAdd); // update gRecord, add new subfields
-            oldValue = field[0][subfieldIndex][1];
+            oldValue = subfield_instance[1];
+            field_instance[0].splice(subfieldIndex, 1); // update gRecord, remove old content
+            field_instance[0].push.apply(field_instance[0], subfieldsToAdd); // update gRecord, add new subfields
             subfield_offset = 1;
         }
         /* If editing reference field, add $$9 subfield */
-        else if (tag_ind == '999C5' && !is_reference_manually_curated(field)){
+        else if (tag_ind == '999C5' && !is_reference_manually_curated(field_instance)) {
             bulkOperation = true;
-            field[0][subfieldIndex][1] = value;
-            subfieldsToAdd.push.apply(subfieldsToAdd, field[0]);
-            subfieldsToAdd.push(new Array("9", "CURATOR"));
-            field[0].splice(0, field[0].length);
-            field[0].push.apply(field[0], subfieldsToAdd); // update gRecord, add new
+            subfield_instance[1] = value;
+            subfieldsToAdd.push.apply(subfieldsToAdd, field_instance[0]);
+            subfieldsToAdd.push(["9", "CURATOR"]);
+            field_instance[0].splice(0, field_instance[0].length);
+            field_instance[0].push.apply(field_instance[0], subfieldsToAdd); // update gRecord, add new
             subfield_offset = subfieldsToAdd.length - 1;
         }
         else {
@@ -3057,8 +3058,8 @@ function onContentChange(value, th) {
               value = check_subjects_KB(value);
               newValue = value;
             }
-            oldValue = field[0][subfieldIndex][1]; // get old subfield value from gRecord
-            field[0][subfieldIndex][1] = value; // update gRecord
+            oldValue = subfield_instance[1]; // get old subfield value from gRecord
+            subfield_instance[1] = value; // update gRecord
         }
     }
   }
@@ -3068,90 +3069,87 @@ function onContentChange(value, th) {
   var urHandler;
   var operation_type;
   switch (cellType) {
-      case 'subfieldTag':
-          value = field[0][subfieldIndex][1];
-          operation_type = "change_subfield_code";
-          urHandler = prepareUndoHandlerChangeSubfield(tag,
-                                                       fieldPosition,
-                                                       subfieldIndex,
-                                                       value,
-                                                       value,
-                                                       oldValue,
-                                                       oldSubfieldCode,
-                                                       operation_type);
-          break;
-      case 'fieldTag':
-          var oldTag = oldValue.substring(0,3);
-          var oldInd1 = oldValue.substring(3,4);
-          var oldInd2 = oldValue.substring(4,5);
-          var newTag = value.substring(0,3);
-          var newInd1 = value.substring(3,4);
-          var newInd2 = value.substring(4,5);
-          operation_type = "change_field_code";
-          urHandler = prepareUndoHandlerChangeFieldCode(oldTag,
-                                                        oldInd1,
-                                                        oldInd2,
-                                                        newTag,
-                                                        newInd1,
-                                                        newInd2,
-                                                        fieldPosition,
-                                                        operation_type);
-          break;
-      default:
-          if (bulkOperation) {
-              var undoHandlers = [];
-              /* Prepare  undo handlers to modify subfield content and to
-               * add new subfields */
+  case 'subfieldTag':
+      value = subfield_instance[1];
+      operation_type = "change_subfield_code";
+      urHandler = prepareUndoHandlerChangeSubfield(tag,
+                                                   fieldPosition,
+                                                   subfieldIndex,
+                                                   value,
+                                                   value,
+                                                   oldValue,
+                                                   newSubfieldCode,
+                                                   operation_type);
+      break;
+  case 'fieldTag':
+      var oldTag = oldValue.substring(0,3);
+      var oldInd1 = oldValue.substring(3,4);
+      var oldInd2 = oldValue.substring(4,5);
+      var newTag = value.substring(0,3);
+      var newInd1 = value.substring(3,4);
+      var newInd2 = value.substring(4,5);
+      operation_type = "change_field_code";
+      urHandler = prepareUndoHandlerChangeFieldCode(oldTag,
+                                                    oldInd1,
+                                                    oldInd2,
+                                                    newTag,
+                                                    newInd1,
+                                                    newInd2,
+                                                    fieldPosition,
+                                                    operation_type);
+      break;
+  default:
+      if (bulkOperation) {
+          var undoHandlers = [];
+          /* Prepare  undo handlers to modify subfield content and to
+           * add new subfields */
 
-              /* 1) Modify main subfield content */
-              newValue = subfieldsToAdd[0][1];
-              undoHandlers.push(prepareUndoHandlerChangeSubfield(tag,
+          undoHandlers.push(prepareUndoHandlerChangeSubfield(tag,
+                                                   fieldPosition,
+                                                   subfieldIndex,
+                                                   oldValue,
+                                                   newValue,
+                                                   oldSubfieldCode,
+                                                   oldSubfieldCode,
+                                                   "change_content"));
+
+          /* 2) Add new subfields */
+          undoHandlers.push(prepareUndoHandlerAddSubfields(tag,
+                                                           fieldPosition,
+                                                           subfieldsToAdd.slice(1)));
+          urHandler = prepareUndoHandlerBulkOperation(undoHandlers, "addSufields");
+      }
+      else {
+          operation_type = "change_content";
+          urHandler = prepareUndoHandlerChangeSubfield(tag,
                                                        fieldPosition,
                                                        subfieldIndex,
                                                        oldValue,
                                                        newValue,
                                                        oldSubfieldCode,
                                                        oldSubfieldCode,
-                                                       "change_content"));
-
-              /* 2) Add new subfields */
-              undoHandlers.push(prepareUndoHandlerAddSubfields(tag,
-                                                               fieldPosition,
-                                                               subfieldsToAdd.slice(1)));
-              urHandler = prepareUndoHandlerBulkOperation(undoHandlers, "addSufields");
-          }
-          else {
-              operation_type = "change_content";
-              urHandler = prepareUndoHandlerChangeSubfield(tag,
-                                                           fieldPosition,
-                                                           subfieldIndex,
-                                                           oldValue,
-                                                           newValue,
-                                                           oldSubfieldCode,
-                                                           oldSubfieldCode,
-                                                           operation_type);
-          }
+                                                       operation_type);
+      }
 
   }
   addUndoOperation(urHandler);
 
   // Generate AJAX request
   switch (cellType) {
-      case 'subfieldTag':
-          value = field[0][subfieldIndex][1];
-          updateSubfieldValue(tag, fieldPosition, subfieldIndex, oldSubfieldCode, value,
-                              null, urHandler, modifySubfieldCode=true);
-          break;
-      case 'fieldTag':
-          updateFieldTag(oldTag, newTag, oldInd1, oldInd2, newInd1, newInd2, fieldPosition, null, urHandler);
-          break;
-      default:
-          if (bulkOperation) {
-              bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, oldSubfieldCode, newValue, null, urHandler, subfieldsToAdd, subfield_offset);
-          }
-          else {
-              updateSubfieldValue(tag, fieldPosition, subfieldIndex, oldSubfieldCode, value, null, urHandler);
-          }
+  case 'subfieldTag':
+      updateSubfieldValue(tag, fieldPosition, subfieldIndex, newSubfieldCode, value,
+                          null, urHandler, modifySubfieldCode=true);
+      break;
+  case 'fieldTag':
+      updateFieldTag(oldTag, newTag, oldInd1, oldInd2, newInd1, newInd2, fieldPosition, null, urHandler);
+      break;
+  default:
+      if (bulkOperation) {
+          bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, oldSubfieldCode, newValue, null, urHandler, subfieldsToAdd, subfield_offset);
+      }
+      else {
+          updateSubfieldValue(tag, fieldPosition, subfieldIndex, oldSubfieldCode, value, null, urHandler);
+      }
   }
 
   var idPrefix;
@@ -4967,7 +4965,7 @@ function createFields(toCreateFields, isUndo){
   //   this structure is the same as for the function deleteFields
 
   // 1) Preparing the AJAX request
-  var tagsToRedraw = {}
+  var tagsToRedraw = {};
   var ajaxData = {
     recID: gRecID,
     requestType: 'addFieldsSubfieldsOnPositions',

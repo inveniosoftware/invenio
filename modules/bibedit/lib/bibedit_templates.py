@@ -477,10 +477,6 @@ def page_style():
                 }
 
                 @media print {
-                    #bibEditContentTable {
-                        height: 100%;
-                    }
-
                     img[id^='btnAddSubfield'] {
                         display:none;
                     }
