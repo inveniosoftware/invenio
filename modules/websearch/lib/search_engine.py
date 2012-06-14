@@ -2803,8 +2803,17 @@ def guess_primary_collection_of_a_record(recID):
                                            'ATLAS Internal Notes Physics',
                                            'ATLAS Internal Notes General',):
                 if recID in get_collection_reclist(alternative_collection):
-                    out = alternative_collection
-                    break
+                    return alternative_collection
+
+        # dirty hack for FP
+        FP_collections = {'DO': 'Current Price Enquiries',
+                          'IT': 'Current Invitation for Tenders',
+                          'MS': 'Current Market Surveys'}
+        fp_coll_ids = [coll for coll in dbcollids if coll in FP_collections]
+        for coll in fp_coll_ids:
+            if recID in get_collection_reclist(FP_collections[coll]):
+                return FP_collections[coll]
+
     return out
 
 _re_collection_url = re.compile('/collection/(.+)')
