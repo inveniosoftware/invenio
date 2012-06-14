@@ -959,13 +959,18 @@ class SpiresToInvenioSyntaxConverter:
 
             else:
                 words = content.split()
-                if len(words) > 1:
+                if len(words) == 0:
+                    # this should almost never happen, req user to say 'find a junk:'
+                    result = term
+                elif len(words) == 1:
+                    # this is more common but still occasional
+                    result = term + words[0]
+                else:
+                    # general case
                     result = '(' + term + words[0]
                     for word in words[1:]:
                         result += ' and ' + term + word
                     result += ')'
-                else:
-                    result = term + words[0]
 
             # replace back __SPACE__ by spaces:
             result = self._re_pattern_space.sub(" ", result)
