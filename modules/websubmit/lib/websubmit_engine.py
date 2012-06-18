@@ -1236,9 +1236,8 @@ def makeCataloguesTable(req, ln=CFG_SITE_LANG):
         for cat in cats:
             if cat['docs']:
                 return True
-            for son in cat['sons']:
-                if is_at_least_one_submission_authorized(son):
-                    return True
+            if is_at_least_one_submission_authorized(cat['sons']):
+                return True
         return False
     text = ""
     catalogues = []
