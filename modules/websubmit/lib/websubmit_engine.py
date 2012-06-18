@@ -790,6 +790,29 @@ def endaction(req,
                            msg = _("Sorry, you must log in to perform this action.")
                          ), req, ln)
 
+    ## Get the submission storage directory from the DB:
+    submission_dir = get_storage_directory_of_action(act)
+    if submission_dir:
+        indir = submission_dir
+    else:
+        ## Unable to determine the submission-directory:
+        return warningMsg(_("Unable to find the submission directory for the action: %s") % escape(str(act)), req, c, ln)
+    curdir = os.path.join(CFG_WEBSUBMIT_STORAGEDIR, indir, doctype, access)
+    if os.path.exists(os.path.join(curdir, "combo%s" % doctype)):
+        fp = open(os.path.join(curdir, "combo%s" % doctype), "r")
+        categ = fp.read()
+        fp.close()
+    else:
+        categ = req.form.get('combo%s' % doctype, '*')
+
+    # is user authorized to perform this action?
+    (auth_code, auth_message) = acc_authorize_action(req, "submit", verbose=0, doctype=doctype, act=act, categ=categ)
+    if acc_is_role("submit", doctype=doctype, act=act) and auth_code != 0:
+        return warningMsg("""<center><font color="red">%s</font></center>""" % auth_message, req)
+
+    if not auth_code == 0:
+        return warningMsg("""<center><font color="red">%s</font></center>""" % auth_message, req)
+
     ## check we have minimum fields
     if not doctype or not act or not access:
         ## We don't have all the necessary information to go ahead
