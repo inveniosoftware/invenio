@@ -1129,8 +1129,10 @@ def update_personID_canonical_names(persons_list=None, overwrite=False, suggeste
                                     "personid=%s and tag=%s", (pid, 'canonical_name'))
 
         if overwrite or len(current_canonical) == 0:
-            names = get_person_names_count(pid)
+            run_sql("delete from aidPERSONIDDATA where personid=%s and tag=%s",
+                    (pid, 'canonical_name'))
 
+            names = get_person_names_count(pid)
             names = sorted(names, key=lambda k: k[1], reverse=True)
             if len(names) < 1 and not suggested:
                 continue
@@ -1140,17 +1142,14 @@ def update_personID_canonical_names(persons_list=None, overwrite=False, suggeste
                 else:
                     canonical_name = create_canonical_name(names[0][0])
 
-                run_sql("delete from aidPERSONIDDATA where personid=%s and tag=%s",
-                        (pid, 'canonical_name'))
-
                 existing_cnames = run_sql("select data from aidPERSONIDDATA "
                                           "where tag=%s and data like %s",
                                           ('canonical_name', str(canonical_name) + '%'))
 
-                existing_cnames = set(name[0] for name in existing_cnames)
+                existing_cnames = set(name[0].lower() for name in existing_cnames)
                 for i in count(1):
                     cur_try = canonical_name + '.' + str(i)
-                    if cur_try not in existing_cnames:
+                    if cur_try.lower() not in existing_cnames:
                         canonical_name = cur_try
                         break
 
