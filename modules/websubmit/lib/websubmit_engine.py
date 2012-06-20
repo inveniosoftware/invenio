@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -795,6 +795,32 @@ def endaction(req,
     # get user ID:
     uid = getUid(req)
     uid_email = get_email(uid)
+
+    ## Get the submission storage directory from the DB:
+    submission_dir = get_storage_directory_of_action(act)
+    if submission_dir:
+        indir = submission_dir
+    else:
+        ## Unable to determine the submission-directory:
+        return warningMsg(_("Unable to find the submission directory for the action: %s") % escape(str(act)), req, c, ln)
+    curdir = os.path.join(CFG_WEBSUBMIT_STORAGEDIR, indir, doctype, access)
+    if os.path.exists(os.path.join(curdir, "combo%s" % doctype)):
+        fp = open(os.path.join(curdir, "combo%s" % doctype), "r");
+        categ = fp.read()
+        fp.close()
+    else:
+        categ = req.form.get('combo%s' % doctype, '*')
+
+    # is user authorized to perform this action?
+    (auth_code, auth_message) = acc_authorize_action(req, 'submit', \
+                                                     authorized_if_no_roles=not isGuestUser(uid), \
+                                                     verbose=0, \
+                                                     doctype=doctype, \
+                                                     act=act, \
+                                                     categ=categ)
+    if not auth_code == 0:
+        return warningMsg("""<center><font color="red">%s</font></center>""" % auth_message, req)
+
     # Preliminary tasks
     ## check we have minimum fields
     if not doctype or not act or not access:
