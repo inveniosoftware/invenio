@@ -190,7 +190,7 @@ div .boxleft_2 {
     background-color: #C3D9FF;
 }
 
-.clean-ok{
+.clean-ok {
     border:solid 1px #349534;
     background:#C9FFCA;
     color:#008000;
@@ -200,7 +200,7 @@ div .boxleft_2 {
     text-align:center;
 }
 
-.clean-error{
+.clean-error {
     border:solid 1px #CC0000;
     background:#F7CBCA;
     color:#CC0000;
@@ -208,6 +208,10 @@ div .boxleft_2 {
     font-weight:bold;
     padding:4px;
     text-align:center;
+}
+
+.clean-error ul {
+    text-align:left;
 }
 
 .modify-list{
@@ -648,7 +652,23 @@ div .boxleft_2 {
 
         return modifications_html
 
+    def tmpl_locked_record_list(self, language, locked_records):
+        """Returns list of records currently locked in the bibsched queue
+        """
+        _ = gettext_set_language(language)
 
+        locked_msg = _("WARNING: The following records are pending execution\
+                        in the task queue.\
+                        If you proceed with the changes, the modifications made\
+                        with other tool (e.g. BibEdit) to these records will\
+                        be lost")
+
+        locked_list = ["<ul>"]
+        for recid in locked_records:
+            locked_list.append("<li><a href=%s  target='_blank'>%s</a></li>" % (CFG_SITE_URL + "/record/" + str(recid), recid))
+
+        return ("<div class='clean-error'>" + locked_msg + "<br />" +
+                '\n'.join(locked_list) + "</div>")
 
     def _build_navigation_image(self, class_name, image_file_name, alt_text):
         """Creates html for image from the page navigation line """
