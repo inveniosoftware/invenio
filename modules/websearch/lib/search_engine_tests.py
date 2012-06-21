@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -257,6 +257,10 @@ class TestQueryParser(unittest.TestCase):
         self._check('author:  "Ellis, J"', None, None,
                     [['+', 'Ellis, J', 'author', 'a']])
 
+    def test_search_pattern_with_equal_sign(self):
+        "search engine - parsing query with equal sign"
+        self._check('title:"s = 630"', None, None,
+                    [['+', 's = 630', 'title', 'a']])
 
 TEST_SUITE = make_test_suite(TestWashQueryParameters,
                              TestQueryParser,

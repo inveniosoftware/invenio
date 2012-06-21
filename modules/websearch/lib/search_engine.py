@@ -145,7 +145,6 @@ cfg_nicely_ordered_collection_list = 0 # do we propose collection list nicely or
 re_word = re.compile('[\s]')
 re_quotes = re.compile('[\'\"]')
 re_doublequote = re.compile('\"')
-re_equal = re.compile('\=')
 re_logical_and = re.compile('\sand\s', re.I)
 re_logical_or = re.compile('\sor\s', re.I)
 re_logical_not = re.compile('\snot\s', re.I)
@@ -710,7 +709,6 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
             # and spaces after colon as well:
             p = re_pattern_spaces_after_colon.sub(lambda x: string.replace(x.group(1), ' ', '__SPACE__'), p)
             # wash argument:
-            p = re_equal.sub(":", p)
             p = re_logical_and.sub(" ", p)
             p = re_logical_or.sub(" |", p)
             p = re_logical_not.sub(" -", p)
