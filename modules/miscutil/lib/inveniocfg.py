@@ -133,7 +133,9 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS',
                        'CFG_BIBSCHED_NODE_TASKS',
                        'CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE',
-                       'CFG_OAI_METADATA_FORMATS']:
+                       'CFG_OAI_METADATA_FORMATS',
+                       'CFG_WEBSUBMIT_DESIRED_CONVERSIONS',
+                       'CFG_BIBDOCFILE_BEST_FORMATS_TO_EXTRACT_TEXT_FROM',]:
         option_value = option_value[1:-1]
 
     ## 3cbis) very special cases: dicts with backward compatible string
@@ -164,7 +166,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_OAI_FRIENDS',
                        'CFG_WEBSTYLE_REVERSE_PROXY_IPS',
                        'CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS',
-                       'CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS']:
+                       'CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS',
+                       'CFG_BIBFORMAT_HIDDEN_FILE_FORMATS',]:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:

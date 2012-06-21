@@ -69,11 +69,10 @@ from invenio.config import CFG_TMPDIR, CFG_ETCDIR, CFG_PYLIBDIR, \
     CFG_PATH_CONVERT, \
     CFG_PATH_PAMFILE, \
     CFG_BINDIR, \
-    CFG_BIBSCHED_PROCESS_USER
-
-from invenio.websubmit_config import \
-    CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM, \
+    CFG_BIBSCHED_PROCESS_USER, \
+    CFG_BIBDOCFILE_BEST_FORMATS_TO_EXTRACT_TEXT_FROM, \
     CFG_WEBSUBMIT_DESIRED_CONVERSIONS
+
 from invenio.errorlib import register_exception
 
 def get_file_converter_logger():
@@ -217,7 +216,7 @@ def get_conversion_map():
     return ret
 
 
-def get_best_format_to_extract_text_from(filelist, best_formats=CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM):
+def get_best_format_to_extract_text_from(filelist, best_formats=CFG_BIBDOCFILE_BEST_FORMATS_TO_EXTRACT_TEXT_FROM):
     """
     Return among the filelist the best file whose format is best suited for
     extracting text.

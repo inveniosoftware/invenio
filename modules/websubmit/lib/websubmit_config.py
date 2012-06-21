@@ -51,35 +51,6 @@ CFG_RESERVED_SUBMISSION_FILENAMES = ['SuE',
                                      'SN',
                                      'ln']
 
-## CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM -- a comma-separated
-## list of document extensions in decrescent order of preference
-## to suggest what is considered the best format to extract text from.
-CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM = ('txt', 'html', 'xml', 'odt', 'doc', 'docx', 'djvu', 'pdf', 'ps', 'ps.gz')
-
-## CFG_WEBSUBMIT_DESIRED_CONVERSIONS -- a dictionary having as keys
-## a format and as values the corresponding list of desired converted
-## formats.
-CFG_WEBSUBMIT_DESIRED_CONVERSIONS = {
-    'pdf' : ('pdf;pdfa', ),
-    'ps.gz' : ('pdf;pdfa', ),
-    'djvu' : ('pdf', ),
-    'sxw': ('doc', 'odt', 'pdf;pdfa', ),
-    'docx' : ('doc', 'odt', 'pdf;pdfa', ),
-    'doc' : ('odt', 'pdf;pdfa', 'docx'),
-    'rtf' : ('pdf;pdfa', 'odt', ),
-    'odt' : ('pdf;pdfa', 'doc', ),
-    'pptx' : ('ppt', 'odp', 'pdf;pdfa', ),
-    'ppt' : ('odp', 'pdf;pdfa', 'pptx'),
-    'sxi': ('odp', 'pdf;pdfa', ),
-    'odp' : ('pdf;pdfa', 'ppt', ),
-    'xlsx' : ('xls', 'ods', 'csv'),
-    'xls' : ('ods', 'csv'),
-    'ods' : ('xls', 'xlsx', 'csv'),
-    'sxc': ('xls', 'xlsx', 'csv'),
-    'tiff' : ('pdf;pdfa', ),
-    'tif' : ('pdf;pdfa', ),
-}
-
 ## CFG_WEBSUBMIT_ICON_SUBFORMAT_RE -- a subformat is an Invenio concept to give
 ## file formats more semantic. For example "foo.gif;icon" has ".gif;icon"
 ## 'format', ".gif" 'superformat' and "icon" 'subformat'. That means that this

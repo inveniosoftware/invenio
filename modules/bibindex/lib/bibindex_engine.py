@@ -43,7 +43,6 @@ from invenio.config import \
      CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES, \
      CFG_BIBINDEX_SPLASH_PAGES, \
      CFG_SOLR_URL
-from invenio.websubmit_config import CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM
 from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
     CFG_MYSQL_THREAD_TIMEOUT, \
     CFG_CHECK_MYSQL_THREADS
