@@ -3015,13 +3015,14 @@ def guess_primary_collection_of_a_record(recID):
                     return alternative_collection
 
         # dirty hack for FP
-        FP_collections = {'DO': 'Current Price Enquiries',
-                          'IT': 'Current Invitation for Tenders',
-                          'MS': 'Current Market Surveys'}
+        FP_collections = {'DO': ['Current Price Enquiries', 'Archived Price Enquiries'],
+                          'IT': ['Current Invitation for Tenders', 'Archived Invitation for Tenders'],
+                          'MS': ['Current Market Surveys', 'Archived Market Surveys']}
         fp_coll_ids = [coll for coll in dbcollids if coll in FP_collections]
         for coll in fp_coll_ids:
-            if recID in get_collection_reclist(FP_collections[coll]):
-                return FP_collections[coll]
+            for coll_name in FP_collections[coll]:
+                if recID in get_collection_reclist(coll_name):
+                    return coll_name
 
     return out
 
