@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -152,7 +152,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
             if (line.count('id: ticket/') > 0):
                 dummy, tnum = line.split('/') #get the ticket id
                 try:
-                    inum = int(tnum)
+                    dummy = int(tnum)
                     tickets.append(tnum)
                 except:
                     pass
@@ -402,7 +402,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
         os.environ["RTUSER"] = username
         os.environ["RTSERVER"] = BIBCATALOG_RT_SERVER
         passwd = escape_shell_arg(passwd)
-        dummy, myout, dummyerr = run_shell_command("echo "+passwd+" | " + command)
+        error_code, myout, dummyerr = run_shell_command("echo "+passwd+" | " + command)
+        if error_code > 0:
+            raise ValueError, 'Problem running "%s": %d' % (command, error_code)
         return myout
-
-
