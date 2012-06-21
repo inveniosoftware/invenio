@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -124,7 +124,7 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
                         'file_icon': file_icon,
                         'url_format': escape(url_format.upper())
                     })
-            out += " ".join(url_list) + additional_str + versions_str + separator
+                out += " ".join(url_list) + additional_str + versions_str + separator
 
     if CFG_CERN_SITE and cern_urls:
         link_word = len(cern_urls) == 1 and _('%(x_sitename)s link') or _('%(x_sitename)s links')
