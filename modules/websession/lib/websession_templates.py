@@ -146,7 +146,7 @@ class Template:
                     </td>
                   </tr>
                   <tr><td></td><td align="left">
-                    <code class="blocknote"><input class="formbutton" type="submit" value="%(set_values)s" /></code>&nbsp;&nbsp;&nbsp;
+                    <input class="formbutton" type="submit" value="%(set_values)s" />&nbsp;&nbsp;&nbsp;
                   </td></tr>
                 </table>
                 <input type="hidden" name="action" value="edit" />
@@ -199,7 +199,7 @@ class Template:
                     </td>
                   </tr>
                   <tr><td></td><td align="left">
-                    <code class="blocknote"><input class="formbutton" type="submit" value="%(set_values)s" /></code>&nbsp;&nbsp;&nbsp;
+                    <input class="formbutton" type="submit" value="%(set_values)s" />&nbsp;&nbsp;&nbsp;
                   </td></tr>
                 </table>
                 <input type="hidden" name="action" value="edit" />
@@ -391,7 +391,7 @@ class Template:
               </td>
             </tr>
             <tr><td>&nbsp;</td>
-              <td><code class="blocknote"><input class="formbutton" type="submit" value="%(send)s" /></code></td>
+              <td><input class="formbutton" type="submit" value="%(send)s" /></td>
             </tr>
           </table>
 
@@ -891,7 +891,7 @@ class Template:
                    <td align="left"><input type="checkbox" name="remember_me" id="remember_me"/><em><label for="remember_me">%(remember_me)s</label></em></td>
                   <tr>
                    <td></td>
-                   <td align="center" colspan="3"><code class="blocknote"><input class="formbutton" type="submit" name="action" value="%(login)s" /></code>""" % {
+                   <td align="center" colspan="3"><input class="formbutton" type="submit" name="action" value="%(login)s" />""" % {
                        'ln': ln,
                        'referer' : cgi.escape(referer),
                        'username' : _("Username"),
@@ -1020,7 +1020,7 @@ class Template:
                 </tr>
                 <tr>
                  <td></td>
-                 <td align="left" colspan="3"><code class="blocknote"><input class="formbutton" type="submit" name="action" value="%(register)s" /></code></td>
+                 <td align="left" colspan="3"><input class="formbutton" type="submit" name="action" value="%(register)s" /></td>
                 </tr>
               </table>
               </form>
