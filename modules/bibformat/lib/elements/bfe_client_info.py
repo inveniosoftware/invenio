@@ -22,7 +22,7 @@ def format_element(bfo, var=''):
     '''
     Print several client specific variables.
     @param var: the name of the desired variable. Can be one of: ln, search_pattern, uid, referer, uri, nickname, email
-           lang: the current language of the user
+           ln: the current language of the user
            search_pattern: the list of keywords used by the user
            uid: the current user id
            referer: the url the user came from

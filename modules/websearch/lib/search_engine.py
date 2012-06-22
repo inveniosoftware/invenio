@@ -71,6 +71,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_SOLR_URL, \
+     CFG_WEBSEARCH_DETAILED_META_FORMAT, \
      CFG_SITE_RECORD, \
      CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
      CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY, \
@@ -846,6 +847,13 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
             metaheaderadd = get_mathjax_header(req.is_https())
         else:
             metaheaderadd = ''
+        # Add metadata in meta tags for Google scholar-esque harvesting...
+        # only if we have a detailed meta format and we are looking at a
+        # single record
+        if (recID != -1 and CFG_WEBSEARCH_DETAILED_META_FORMAT):
+            metaheaderadd += format_record(recID, \
+                                           CFG_WEBSEARCH_DETAILED_META_FORMAT, \
+                                           ln = ln)
 
         ## generate navtrail:
         navtrail = create_navtrail_links(cc, aas, ln)

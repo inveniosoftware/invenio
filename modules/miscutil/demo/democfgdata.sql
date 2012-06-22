@@ -1,5 +1,5 @@
 -- This file is part of Invenio.
--- Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+-- Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 --
 -- Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -2012,6 +2012,7 @@ INSERT INTO knwKB VALUES ('2','EJOURNALS','Knowledge base of all known electroni
 INSERT INTO knwKB VALUES ('3','DBCOLLID2BIBTEX','Mapping between the 980 field and BibTeX entry types.', NULL);
 INSERT INTO knwKB VALUES ('4','SEARCH-SYNONYM-JOURNAL','Knowledge base of journal title synonyms.  Used during search time.', NULL);
 INSERT INTO knwKB VALUES ('5','INDEX-SYNONYM-TITLE','Knowledge base of title word synonyms.  Used during indexing time.', NULL);
+INSERT INTO knwKB VALUES ('6','DBCOLLID2OPENGRAPHTYPE','Maps collection 980 field to an Open Graph Type', NULL);
 
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('ARTICLE','Published Article', '1');
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('PREPRINT','Preprint', '1');
@@ -2357,6 +2358,9 @@ INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('PHRVD','Phys. Rev., D', 
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('Phys.Rev.D','Phys. Rev., D', '4');
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('beta','β', '5');
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('β','beta', '5');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('ARTICLE','article', '6');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('BOOK','book', '6');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('VIDEO','video.other', '6');
 
 -- crcLIBRARY demo data:
 INSERT INTO crcLIBRARY (name, address, email, phone, notes) VALUES ('Atlantis Main Library', 'CH-1211 Geneva 23', 'atlantis@cds.cern.ch', '1234567', '');
