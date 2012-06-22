@@ -117,8 +117,7 @@ class Template:
             out += """<option value="%(id)s">%(name)s</option>""" % \
                    {'id': alert['id'], 'name': cgi.escape(alert['name'])}
         out += """</select>
-                &nbsp;<code class="blocknote">
-                <input class="formbutton" type="submit" name="action" value="%(show)s" /></code>
+                &nbsp;<input class="formbutton" type="submit" name="action" value="%(show)s" />
                 </form>""" % {
                   'show' : _("SHOW"),
                 }
@@ -234,8 +233,8 @@ class Template:
                     <td colspan="2" style="text-align:center">
                       <input type="hidden" name="idq" value="%(idq)s" />
                       <input type="hidden" name="ln" value="%(ln)s" />
-                      <code class="blocknote"><input class="formbutton" type="submit" name="action" value="&nbsp;%(set_alert)s&nbsp;" /></code>&nbsp;
-                      <code class="blocknote"><input class="formbutton" type="reset" value="%(clear_data)s" /></code>
+                      <input class="formbutton" type="submit" name="action" value="&nbsp;%(set_alert)s&nbsp;" />&nbsp;
+                      <input class="formbutton" type="reset" value="%(clear_data)s" />
                      </td>
                     </tr>
                    </table>
