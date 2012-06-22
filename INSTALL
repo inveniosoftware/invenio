@@ -575,6 +575,7 @@ Contents
              CFG_DATABASE_NAME = invenio
              CFG_DATABASE_USER = invenio
              CFG_DATABASE_PASS = my123p$ss
+             CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE = 1
 
           You should override at least the parameters mentioned above
           in order to define some very essential runtime parameters
@@ -585,6 +586,12 @@ Contents
           moderator, and alert engine (CFG_SITE_SUPPORT_EMAIL,
           CFG_SITE_ADMIN_EMAIL, etc), and last but not least your
           database credentials (CFG_DATABASE_*).
+
+          If this is a first installation of Invenio it is recommended
+          you set the CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE
+          variable to 1. If this is instead an upgrade from an existing
+          installation don't add it until you have run:
+          $ bibdocfile --fix-bibdocfsinfo-cache .
 
           The Invenio system will then read both the default
           invenio.conf file and your customized invenio-local.conf

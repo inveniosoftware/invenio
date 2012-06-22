@@ -90,6 +90,7 @@ If you are upgrading from Invenio v1.0.0, then:
                   --exclude bibconvert/config/DEMOPICcreate.tpl \
                   --exclude bibconvert/config/DEMOTHEcreate.tpl \
                   /opt/invenio/etc/
+     FIXME: add note about need to run bibdocfile --fix-bibdocfsinfo-cache
 
  c) Restart your Apache server and your bibsched queue.
 

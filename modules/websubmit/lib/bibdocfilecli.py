@@ -396,6 +396,24 @@ def cli_docids_iterator(options, recids=None, docids=None):
             yield docid
     raise StopIteration
 
+def cli_get_stats(dummy):
+    """Print per every collection some stats"""
+    def print_table(title, table):
+        if table:
+            print "=" * 20, title, "=" * 20
+            for row in table:
+                print "\t".join(str(elem) for elem in row)
+
+    for collection, reclist in run_sql("SELECT name, reclist FROM collection ORDER BY name"):
+        print "-" * 79
+        print "Statistic for: %s " % collection
+        reclist = intbitset(reclist)
+        if reclist:
+            sqlreclist = "(" + ','.join(str(elem) for elem in reclist) + ')'
+            print_table("Formats", run_sql("SELECT COUNT(format) as c, format FROM bibrec_bibdoc AS bb JOIN bibdocfsinfo AS fs ON bb.id_bibdoc=fs.id_bibdoc WHERE id_bibrec in %s AND last_version=true GROUP BY format ORDER BY c DESC" % sqlreclist)) # kwalitee: disable=sql
+            print_table("Mimetypes", run_sql("SELECT COUNT(mime) as c, mime FROM bibrec_bibdoc AS bb JOIN bibdocfsinfo AS fs ON bb.id_bibdoc=fs.id_bibdoc WHERE id_bibrec in %s AND last_version=true GROUP BY mime ORDER BY c DESC" % sqlreclist)) # kwalitee: disable=sql
+            print_table("Sizes", run_sql("SELECT SUM(filesize) AS c FROM bibrec_bibdoc AS bb JOIN bibdocfsinfo AS fs ON bb.id_bibdoc=fs.id_bibdoc WHERE id_bibrec in %s AND last_version=true" % sqlreclist)) # kwalitee: disable=sql
+
 class OptionParserSpecial(OptionParser):
     def format_help(self, *args, **kwargs):
         result = OptionParser.format_help(self, *args, **kwargs)
@@ -480,6 +498,7 @@ Examples:
     getting_information_options.add_option('--get-info', dest='action', action='store_const', const='get-info', help='print all the informations about the matched record/documents')
     getting_information_options.add_option('--get-disk-usage', dest='action', action='store_const', const='get-disk-usage', help='print disk usage statistics of the matched documents')
     getting_information_options.add_option('--get-history', dest='action', action='store_const', const='get-history', help='print the matched documents history')
+    getting_information_options.add_option('--get-stats', dest='action', action='store_const', const='get-stats', help='print some statistics of file properties grouped by collections')
     parser.add_option_group(getting_information_options)
 
     setting_information_options = OptionGroup(parser, 'Actions for setting information')
@@ -519,6 +538,7 @@ Examples:
     housekeeping_options.add_option("--fix-marc", action='store_const', const='fix-marc', dest='action', help='synchronize MARC after filesystem/database')
     housekeeping_options.add_option("--fix-format", action='store_const', const='fix-format', dest='action', help='fix format related inconsistences')
     housekeeping_options.add_option("--fix-duplicate-docnames", action='store_const', const='fix-duplicate-docnames', dest='action', help='fix duplicate docnames associated with the same record')
+    housekeeping_options.add_option("--fix-bibdocfsinfo-cache", action='store_const', const='fix-bibdocfsinfo-cache', dest='action', help='fix bibdocfsinfo cache related inconsistences')
     parser.add_option_group(housekeeping_options)
 
     experimental_options = OptionGroup(parser, 'Experimental options (do not expect to find them in the next release)')
@@ -714,6 +734,29 @@ def cli_rename(options):
     ffts = {recid : [{'docname' : docname, 'new_docname' : new_docname}]}
     return bibupload_ffts(ffts, append=False)
 
+def cli_fix_bibdocfsinfo_cache(options):
+    """Rebuild the bibdocfsinfo table according to what is available on filesystem"""
+    to_be_fixed = intbitset()
+    for docid in intbitset(run_sql("SELECT id FROM bibdoc")):
+        print "Fixing bibdocfsinfo table for docid %s..." % docid,
+        sys.stdout.flush()
+        try:
+            bibdoc = BibDoc(docid)
+        except InvenioWebSubmitFileError, err:
+            print err
+            continue
+        try:
+            bibdoc._sync_to_db()
+        except Exception, err:
+            recid = bibdoc.recid
+            if recid:
+                to_be_fixed.add(recid)
+            print "ERROR: %s, scheduling a fix for recid %s" % (err, recid)
+        print "DONE"
+    if to_be_fixed:
+        cli_fix_format(options, recids=to_be_fixed)
+    print "You can now add CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE=1 to your invenio-local.conf file."
+
 def cli_fix_all(options):
     """Fix all the records of a recid_set."""
     ffts = {}
@@ -772,7 +815,7 @@ def cli_check_duplicate_docnames(options):
         bibrecdocs = BibRecDocs(recid)
         if bibrecdocs.check_duplicate_docnames():
             count += 1
-            print sys.stderr, "recid %s has duplicate docnames!"
+            print >> sys.stderr, "recid %s has duplicate docnames!"
     if count:
         print "%d out of %d records have duplicate docnames." % (count, tot)
         return False
@@ -780,11 +823,13 @@ def cli_check_duplicate_docnames(options):
         print "All records appear to be correct with respect to duplicate docnames."
         return True
 
-def cli_fix_format(options):
+def cli_fix_format(options, recids=None):
     """Fix format-related inconsistences."""
     fixed = intbitset()
     tot = 0
-    for recid in cli_recids_iterator(options):
+    if not recids:
+        recids = cli_recids_iterator(options)
+    for recid in recids:
         tot += 1
         bibrecdocs = BibRecDocs(recid)
         for docname in bibrecdocs.get_bibdoc_names():
@@ -1128,6 +1173,11 @@ def main():
             cli_hide(options)
         elif getattr(options, 'action', None) == 'unhide':
             cli_unhide(options)
+        elif getattr(options, 'action', None) == 'fix-bibdocfsinfo-cache':
+            options.empty_docs = 'yes'
+            cli_fix_bibdocfsinfo_cache(options)
+        elif getattr(options, 'action', None) == 'get-stats':
+            cli_get_stats(options)
         else:
             print >> sys.stderr, "ERROR: Action %s is not valid" % getattr(options, 'action', None)
             sys.exit(1)

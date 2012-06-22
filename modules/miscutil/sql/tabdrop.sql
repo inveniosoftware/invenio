@@ -409,6 +409,7 @@ DROP TABLE IF EXISTS schTASK;
 DROP TABLE IF EXISTS bibdoc;
 DROP TABLE IF EXISTS bibdoc_bibdoc;
 DROP TABLE IF EXISTS bibrec_bibdoc;
+DROP TABLE IF EXISTS bibdocfsinfo;
 DROP TABLE IF EXISTS usergroup;
 DROP TABLE IF EXISTS user_usergroup;
 DROP TABLE IF EXISTS user_basket;

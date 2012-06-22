@@ -2920,6 +2920,26 @@ CREATE TABLE IF NOT EXISTS bibdoc_bibdoc (
   KEY  (id_bibdoc2)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS bibdocfsinfo (
+  id_bibdoc mediumint(9) unsigned NOT NULL,
+  version tinyint(4) unsigned NOT NULL,
+  format varchar(50) NOT NULL,
+  last_version boolean NOT NULL,
+  cd datetime NOT NULL,
+  md datetime NOT NULL,
+  checksum char(32) NOT NULL,
+  filesize bigint(15) unsigned NOT NULL,
+  mime varchar(100) NOT NULL,
+  master_format varchar(50) NULL default NULL,
+  PRIMARY KEY (id_bibdoc, version, format),
+  KEY (last_version),
+  KEY (format),
+  KEY (cd),
+  KEY (md),
+  KEY (filesize),
+  KEY (mime)
+) ENGINE=MyISAM;
+
 -- tables for publication requests:
 
 CREATE TABLE IF NOT EXISTS publreq (
