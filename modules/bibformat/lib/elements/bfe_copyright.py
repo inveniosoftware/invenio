@@ -31,7 +31,7 @@ CFG_CERN_LICENSE_URL = 'http://copyright.cern.ch/'
 
 def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", instances_separator=", ",
                    link_to_licenses='yes', auto_link_to_CERN_license='no', remove_link_to_CERN_license='yes',
-                   show_licenses='yes'):
+                   show_licenses='yes', show_material="yes", license_to_url_kb='LICENSE2URL'):
     """
     Print copyright information
 
@@ -44,7 +44,8 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
     @param auto_link_to_CERN_license: if 'yes', automatically add a link to CERN license when applicable (even if not in metadata)
     @param remove_link_to_CERN_license: if 'yes', remove link to CERN license when existing in the metadata. This option is ignored when auto_link_to_CERN_license is set to 'yes'
     @param show_licenses: if 'no', completely ignore license information
-
+    @param show_material: if 'yes', material to which license/copyright applies ($3 subfield) is displayed
+    @param license_to_url_kb: knowledge base used to map a license (as found in 540__a) to a URL
     """
     if auto_link_to_CERN_license.lower() == 'yes':
         # These option are mutually exclusive
@@ -62,11 +63,15 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
 
             # Check to which bibdoc ID this copyright applies
             bibdoc_id = 0
+            material = None
             if copyright_info.has_key('8'):
                 try:
                     bibdoc_id = int(copyright_info['8'])
                 except:
                     pass
+            elif copyright_info.has_key('3'):
+                # in that case, map using subfield $3
+                material = copyright_info['3']
 
             # Retrieve what to display to user
             label = ''
@@ -96,20 +101,29 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
                 continue
 
             # Append our copyright to the list, for given BibDoc
-            if not copyrights_and_licenses_list.has_key(bibdoc_id):
+            if not copyrights_and_licenses_list.has_key(bibdoc_id) and not (material and bibdoc_id == 0):
                 copyrights_and_licenses_list[bibdoc_id] = {'copyright':[], 'license': []}
-            copyrights_and_licenses_list[bibdoc_id]['copyright'].append((label, copyright_info.get('d', '')))
+            elif material and not copyrights_and_licenses_list.has_key(material):
+                copyrights_and_licenses_list[material] = {'copyright':[], 'license': []}
+            if not (material and bibdoc_id == 0):
+                copyrights_and_licenses_list[bibdoc_id]['copyright'].append((label, copyright_info.get('d', '')))
+            elif copyrights_and_licenses_list.has_key(material):
+                copyrights_and_licenses_list[material]['copyright'].append((label, copyright_info.get('d', '')))
 
         # Now get the licenses. Try to map to a copyright
         for license_info in licenses_info:
 
             # Check to which bibdoc ID this license applies
             bibdoc_id = 0
+            material = None
             if license_info.has_key('8'):
                 try:
                     bibdoc_id = int(license_info['8'])
                 except:
                     pass
+            elif license_info.has_key('3'):
+                # in that case, map using subfield $3
+                material = license_info['3']
             label = ''
             url = ''
             license_body = ''
@@ -123,20 +137,28 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
                    ((label in ('&copy; CERN', 'CERN')) or ('CERN' in license_body)) and \
                    auto_link_to_CERN_license.lower() == 'yes':
                 url = CFG_CERN_LICENSE_URL
+            if not url and license_to_url_kb:
+                # Look for URL in knowledge base
+                url = bfo.kb(license_to_url_kb, label)
             if license_info.has_key('u'):
                 # License URL
                 url = license_info['u']
 
             # Append our license to the list, for given BibDoc
-            if not copyrights_and_licenses_list.has_key(bibdoc_id):
+            if not copyrights_and_licenses_list.has_key(bibdoc_id) and not (material and bibdoc_id == 0):
                 copyrights_and_licenses_list[bibdoc_id] = {'copyright':[], 'license': []}
-            copyrights_and_licenses_list[bibdoc_id]['license'].append([label, license_body, url])
+            elif material and not copyrights_and_licenses_list.has_key(material):
+                copyrights_and_licenses_list[material] = {'copyright':[], 'license': []}
+            if not (material and bibdoc_id == 0):
+                copyrights_and_licenses_list[bibdoc_id]['license'].append([label, license_body, url])
+            elif copyrights_and_licenses_list.has_key(material):
+                copyrights_and_licenses_list[material]['license'].append([label, license_body, url])
 
         # We also need to add the auto CERN licenses to specified BibDocs
         for bibdoc_id in add_CERN_license_link_to_bibdocs:
             copyrights_and_licenses_list[bibdoc_id]['license'].append(['', '', CFG_CERN_LICENSE_URL])
 
-        for bibdoc_id, copyright_and_license in copyrights_and_licenses_list.iteritems():
+        for linkage, copyright_and_license in copyrights_and_licenses_list.iteritems():
             copyrights = copyright_and_license['copyright']
             licenses = copyright_and_license['license']
             if len(copyrights) == 1 and len(licenses) == 1:
@@ -149,15 +171,21 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
                            license_url == CFG_CERN_LICENSE_URL:
                         # Thou must not display the license
                         license_url = ''
-                    if license_url and link_to_licenses.lower() == 'yes':
-                        out.add(create_html_link(license_url, {}, copyright_label))
+                    if show_material == 'yes' and not isinstance(linkage, int):
+                        linkage_prefix = linkage + ': '
                     else:
-                        out.add(copyright_label)
+                        linkage_prefix = ''
+                    if license_url and link_to_licenses.lower() == 'yes':
+                        out.add(linkage_prefix + create_html_link(license_url, {}, copyright_label))
+                    else:
+                        out.add(linkage_prefix + copyright_label)
                     continue
 
             # that is an 'else' for all other cases...
             # First print simply the copyrights
             copyright_tmp = copyrights_separator.join([copyright_label for (copyright_label, copyright_holder) in copyrights])
+            if show_material == 'yes' and not isinstance(linkage, int):
+                copyright_tmp =  linkage + ': ' + copyright_tmp
 
             license_tmp = []
             # Then do the licenses.
@@ -574,6 +602,114 @@ def test():
     bfo22 = BibFormatObject(0, xml_record=xml22)
     assert(format_element(bfo22)  == '<a href="http://bbc.co.uk">&copy; 1984 BBC</a>')
 
+
+    xml23 = '''
+<record>
+    <datafield tag="540" ind1=" " ind2=" ">
+        <subfield code="a">CC-BY-3.0</subfield>
+        <subfield code="u">http://creativecommons.org/licenses/by/3.0/</subfield>
+        <subfield code="3">Preprint</subfield>
+    </datafield>
+    <datafield tag="540" ind1=" " ind2=" ">
+        <subfield code="a">CC-BY-3.0</subfield>
+        <subfield code="u">http://creativecommons.org/licenses/by/3.0/</subfield>
+        <subfield code="3">Publication</subfield>
+    </datafield>
+    <datafield tag="542" ind1=" " ind2=" ">
+        <subfield code="d">CERN</subfield>
+        <subfield code="g">2011</subfield>
+        <subfield code="3">Preprint</subfield>
+    </datafield>
+    <datafield tag="542" ind1=" " ind2=" ">
+        <subfield code="d">CERN</subfield>
+        <subfield code="g">2012</subfield>
+       <subfield code="3">Publication</subfield>
+    </datafield>
+</record>'''
+
+    bfo23 = BibFormatObject(0, xml_record=xml23)
+    assert(format_element(bfo23)  == 'Publication: &copy; 2012 CERN (License: <a href="http://creativecommons.org/licenses/by/3.0/">CC-BY-3.0</a>), Preprint: &copy; 2011 CERN (License: <a href="http://creativecommons.org/licenses/by/3.0/">CC-BY-3.0</a>)')
+
+
+    xml24 = '''
+<record>
+    <datafield tag="540" ind1=" " ind2=" ">
+        <subfield code="a">CC-BY-3.0</subfield>
+        <subfield code="u">http://creativecommons.org/licenses/by/3.0/</subfield>
+        <subfield code="8">1</subfield>
+    </datafield>
+    <datafield tag="540" ind1=" " ind2=" ">
+        <subfield code="a">CC-BY-3.0</subfield>
+        <subfield code="u">http://creativecommons.org/licenses/by/3.0/</subfield>
+        <subfield code="3">Publication</subfield>
+    </datafield>
+    <datafield tag="542" ind1=" " ind2=" ">
+        <subfield code="d">CERN</subfield>
+        <subfield code="g">2011</subfield>
+        <subfield code="8">1</subfield>
+    </datafield>
+    <datafield tag="542" ind1=" " ind2=" ">
+        <subfield code="d">CERN</subfield>
+        <subfield code="g">2012</subfield>
+       <subfield code="3">Publication</subfield>
+    </datafield>
+</record>'''
+
+    bfo24 = BibFormatObject(0, xml_record=xml24)
+    assert(format_element(bfo24)  == 'Publication: &copy; 2012 CERN (License: <a href="http://creativecommons.org/licenses/by/3.0/">CC-BY-3.0</a>), &copy; 2011 CERN (License: <a href="http://creativecommons.org/licenses/by/3.0/">CC-BY-3.0</a>)')
+
+
+    xml25 = '''
+<record>
+    <datafield tag="540" ind1=" " ind2=" ">
+        <subfield code="a">CC-BY-3.0</subfield>
+        <subfield code="u">http://creativecommons.org/licenses/by/3.0/</subfield>
+        <subfield code="3">Publication</subfield>
+    </datafield>
+    <datafield tag="540" ind1=" " ind2=" ">
+        <subfield code="a">CERN</subfield>
+        <subfield code="3">Preprint</subfield>
+    </datafield>
+    <datafield tag="542" ind1=" " ind2=" ">
+        <subfield code="d">CERN</subfield>
+        <subfield code="g">2011</subfield>
+        <subfield code="3">Preprint</subfield>
+    </datafield>
+    <datafield tag="542" ind1=" " ind2=" ">
+        <subfield code="d">FOO</subfield>
+        <subfield code="g">2012</subfield>
+       <subfield code="3">Publication</subfield>
+    </datafield>
+</record>'''
+
+    bfo25 = BibFormatObject(0, xml_record=xml25)
+    assert(format_element(bfo25, auto_link_to_CERN_license='yes')  == 'Publication: &copy; 2012 FOO (License: <a href="http://creativecommons.org/licenses/by/3.0/">CC-BY-3.0</a>), Preprint: <a href="http://copyright.cern.ch/">&copy; 2011 CERN</a>')
+
+
+    xml26 = '''
+<record>
+    <datafield tag="540" ind1=" " ind2=" ">
+        <subfield code="a">CC-BY-3.0</subfield>
+        <subfield code="3">Publication</subfield>
+    </datafield>
+    <datafield tag="540" ind1=" " ind2=" ">
+        <subfield code="a">CERN</subfield>
+        <subfield code="3">Preprint</subfield>
+    </datafield>
+    <datafield tag="542" ind1=" " ind2=" ">
+        <subfield code="d">CERN</subfield>
+        <subfield code="g">2011</subfield>
+        <subfield code="3">Preprint</subfield>
+    </datafield>
+    <datafield tag="542" ind1=" " ind2=" ">
+        <subfield code="d">FOO</subfield>
+        <subfield code="g">2012</subfield>
+       <subfield code="3">Publication</subfield>
+    </datafield>
+</record>'''
+
+    bfo26 = BibFormatObject(0, xml_record=xml26)
+    assert(format_element(bfo26, remove_link_to_CERN_license="no")  == 'Publication: &copy; 2012 FOO (License: <a href="http://creativecommons.org/licenses/by/3.0/">CC-BY-3.0</a>), Preprint: <a href="http://copyright.cern.ch/">&copy; 2011 CERN</a>')
 
 
     print "All tests run ok"

@@ -2013,6 +2013,7 @@ INSERT INTO knwKB VALUES ('3','DBCOLLID2BIBTEX','Mapping between the 980 field a
 INSERT INTO knwKB VALUES ('4','SEARCH-SYNONYM-JOURNAL','Knowledge base of journal title synonyms.  Used during search time.', NULL);
 INSERT INTO knwKB VALUES ('5','INDEX-SYNONYM-TITLE','Knowledge base of title word synonyms.  Used during indexing time.', NULL);
 INSERT INTO knwKB VALUES ('6','DBCOLLID2OPENGRAPHTYPE','Maps collection 980 field to an Open Graph Type', NULL);
+INSERT INTO knwKB VALUES ('7','LICENSE2URL','Map a license name to its URL', NULL);
 
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('ARTICLE','Published Article', '1');
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('PREPRINT','Preprint', '1');
@@ -2361,6 +2362,13 @@ INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('β','beta', '5');
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('ARTICLE','article', '6');
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('BOOK','book', '6');
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('VIDEO','video.other', '6');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CERN','http://copyright.cern.ch/', '7');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-3.0','http://creativecommons.org/licenses/by/3.0/', '7');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-SA-3.0','http://creativecommons.org/licenses/by-sa/3.0/', '7');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-NC-3.0','http://creativecommons.org/licenses/by-nc/3.0/', '7');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-ND-3.0','http://creativecommons.org/licenses/by-nd/3.0/', '7');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-NC-SA-3.0','http://creativecommons.org/licenses/by-nc-sa/3.0/', '7');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-NC-ND-3.0','http://creativecommons.org/licenses/by-nc-nd/3.0/', '7');
 
 -- crcLIBRARY demo data:
 INSERT INTO crcLIBRARY (name, address, email, phone, notes) VALUES ('Atlantis Main Library', 'CH-1211 Geneva 23', 'atlantis@cds.cern.ch', '1234567', '');
