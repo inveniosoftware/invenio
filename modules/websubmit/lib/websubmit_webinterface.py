@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -442,20 +442,20 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             body += create_file_upload_interface(\
                 recid=argd['recid'],
                 ln=argd['ln'],
-                doctypes_and_desc=[('main', 'Main document'),
-                                   ('latex', 'LaTeX'),
-                                   ('source', 'Source'),
-                                   ('additional', 'Additional File'),
-                                   ('audio', 'Audio file'),
-                                   ('video', 'Video file'),
-                                   ('script', 'Script'),
-                                   ('data', 'Data'),
-                                   ('figure', 'Figure'),
-                                   ('schema', 'Schema'),
-                                   ('graph', 'Graph'),
-                                   ('image', 'Image'),
-                                   ('drawing', 'Drawing'),
-                                   ('slides', 'Slides')],
+                doctypes_and_desc=[('Main', 'Main document'),
+                                   ('LaTeX', 'LaTeX'),
+                                   ('Source', 'Source'),
+                                   ('Additional', 'Additional File'),
+                                   ('Audio', 'Audio file'),
+                                   ('Video', 'Video file'),
+                                   ('Script', 'Script'),
+                                   ('Data', 'Data'),
+                                   ('Figure', 'Figure'),
+                                   ('Schema', 'Schema'),
+                                   ('Graph', 'Graph'),
+                                   ('Image', 'Image'),
+                                   ('Drawing', 'Drawing'),
+                                   ('Slides', 'Slides')],
                 can_revise_doctypes=['*'],
                 can_comment_doctypes=['*'],
                 can_describe_doctypes=['*'],
