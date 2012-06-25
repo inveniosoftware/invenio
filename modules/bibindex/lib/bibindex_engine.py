@@ -81,12 +81,15 @@ if sys.hexversion < 0x2040000:
 if CFG_CERN_SITE:
     CFG_JOURNAL_TAG = '773__%'
     CFG_JOURNAL_PUBINFO_STANDARD_FORM = "773__p 773__v (773__y) 773__c"
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*\s\w.*\s\(\d+\)\s\w.*$'
 elif CFG_INSPIRE_SITE:
     CFG_JOURNAL_TAG = '773__%'
     CFG_JOURNAL_PUBINFO_STANDARD_FORM = "773__p,773__v,773__c"
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*,\w.*,\w.*$'
 else:
     CFG_JOURNAL_TAG = '909C4%'
     CFG_JOURNAL_PUBINFO_STANDARD_FORM = "909C4p 909C4v (909C4y) 909C4c"
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*\s\w.*\s\(\d+\)\s\w.*$'
 
 ## precompile some often-used regexp for speed reasons:
 re_subfields = re.compile('\$\$\w')

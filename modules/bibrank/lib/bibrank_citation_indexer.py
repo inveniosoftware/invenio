@@ -40,6 +40,7 @@ from invenio.bibtask import write_message, task_get_option, \
                      task_get_task_param
 from invenio.errorlib import register_exception
 from invenio.intbitset import intbitset
+from invenio.bibindex_engine import CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
 
 class memoise:
     def __init__(self, function):
@@ -53,6 +54,8 @@ class memoise:
             return object
 
 INTBITSET_OF_DELETED_RECORDS = search_unit(p='DELETED', f='980', m='a')
+
+re_CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = re.compile(CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK)
 
 def get_recids_matching_query(pvalue, fvalue):
     """Return list of recIDs matching query for PVALUE and FVALUE."""
@@ -357,11 +360,12 @@ def get_citation_informations(recid_list, config):
             d_reports_numbers[recid] = l_report_numbers
 
             if reference_report_numbers:
+                write_message(str(recid)+"'s report number values "+str(l_report_numbers), verbose=9)
                 d_references_report_numbers[recid] = reference_report_numbers
 
             references_s = get_fieldvalues(recid, p_reference_tag)
-            write_message(str(recid)+"'s "+str(p_reference_tag)+" values "+str(references_s), verbose=9)
             if references_s:
+                write_message(str(recid)+"'s "+str(p_reference_tag)+" values "+str(references_s), verbose=9)
                 d_references_s[recid] = references_s
 
             #get a combination of
@@ -677,6 +681,17 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 p.replace("\n",'')
                 #search for "hep-th/5644654 or such" in existing records
                 rec_ids = get_recids_matching_query(p, f)
+
+                if len(rec_ids) > 1:
+                    msg = "Whoops: record '%d' report number value '%s' " \
+                          "matches many records; taking only the first one. %s" % \
+                          (thisrecid, p, repr(rec_ids))
+                    write_message(msg, stream=sys.stderr)
+                    try:
+                        raise ValueError(msg)
+                    except ValueError:
+                        register_exception(alert_admin=True)
+
                 if rec_ids and rec_ids[0]:
                     write_citer_cited(thisrecid, rec_ids[0])
                     remove_from_missing(p)
@@ -742,13 +757,36 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 matches = re.compile("(.*)(-\d+$)").findall(p)
                 if matches and matches[0]:
                     p = matches[0][0]
+
+                # check reference value to see whether it is well formed:
+                if not re_CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK.match(p):
+                    msg = "Whoops, record '%d' reference value '%s' " \
+                          "is not well formed; skipping it." % (thisrecid, p)
+                    write_message(msg, stream=sys.stderr)
+                    try:
+                        raise ValueError(msg)
+                    except ValueError:
+                        register_exception(alert_admin=True)
+                    continue # skip this ill-formed value
+
+                # look for reference value:
                 rec_id = None
                 try:
                     rec_ids = list(search_unit(p, 'journal') - INTBITSET_OF_DELETED_RECORDS)
                 except:
                     rec_ids = None
-                write_message("These match searching "+p+" in journal: "+str(rec_id), verbose=9)
+                if len(rec_ids) > 1:
+                    msg = "Whoops, record '%d' reference value '%s' " \
+                          "matches many records; taking only the first one. %s" % \
+                          (thisrecid, p, repr(rec_ids))
+                    write_message(msg, stream=sys.stderr)
+                    try:
+                        raise ValueError(msg)
+                    except ValueError:
+                        register_exception(alert_admin=True)
+
                 if rec_ids and rec_ids[0]:
+                    write_message("These match searching "+p+" in journal: "+repr(rec_ids), verbose=9)
                     #the refered publication is in our collection, remove
                     #from missing
                     remove_from_missing(p)
