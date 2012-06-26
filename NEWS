@@ -6,6 +6,52 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+Invenio v1.0.1 -- released 2012-06-28
+-------------------------------------
+
+ *) BibFormat: fix format validation report; fix opensearch prefix
+    exclusion in RSS; fix retrieval of collection identifier
+
+ *) BibIndex: new unit tests for the Greek stemmer
+
+ *) BibSched: improve low level submission arg parsing; set ERROR
+    status when wrong params; task can stop immediately when sleeping
+
+ *) BibSword: remove dangling documentation
+
+ *) BibUpload: fix setting restriction in -a/-ir modes
+
+ *) WebAlert: simplify HTML markup
+
+ *) WebComment: only logged users to use report abuse
+
+ *) WebJournal: hide deleted records
+
+ *) WebSearch: adapt test cases for citation summary; fix collection
+    order on the search page; look at access control when webcolling;
+    sorting in citesummary breakdown links
+
+ *) WebSession: simplify HTML markup
+
+ *) WebSubmit: capitalise doctypes in Doc File Manager; check
+    authorizations in endaction; check for problems when archiving;
+    ensure unique tmp file name for upload; fix email formatting; fix
+    Move_to_Done function; remove 8564_ field from demo templates;
+    skip file upload if necessary; update CERN-specific config
+
+ *) bibdocfile: BibRecDocs recID argument type check
+
+ *) data cacher: deletes cache before refilling it
+
+ *) dbquery: fix dbexec CLI WRT max allowed packet
+
+ *) I18N: updates to Greek translation
+
+ *) installation: fix circular install-jquery-plugins; fix demo user
+    initialisation; fix jQuery tablesorter download URL; fix jQuery
+    uploadify download URL; more info about max_allowed_packet; remove
+    unneeded rxp binary package
+
 Invenio v1.0.0 -- released 2012-02-29
 -------------------------------------
 
