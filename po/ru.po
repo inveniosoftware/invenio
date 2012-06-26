@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.0\n"
+"Project-Id-Version: Invenio 1.0.1\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2012-02-29 15:03+0100\n"
+"POT-Creation-Date: 2012-06-26 13:05+0200\n"
 "PO-Revision-Date: 2008-02-29 14:25+0100\n"
 "Last-Translator: Iaroslav Gaponenko <adrahil@gmail.com>\n"
 "Language-Team: RU <info@invenio-software.org>\n"
@@ -79,7 +79,7 @@ msgstr "Область Администратора"
 #: modules/websearch/doc/search-guide.webdoc:559
 #: modules/websearch/doc/search-guide.webdoc:696
 #: modules/websearch/doc/search-guide.webdoc:834
-#: modules/websearch/lib/search_engine.py:4476
+#: modules/websearch/lib/search_engine.py:4493
 #: modules/websearch/lib/websearch_templates.py:804
 #: modules/websearch/lib/websearch_templates.py:882
 #: modules/websearch/lib/websearch_templates.py:1005
@@ -1458,7 +1458,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:929
 #: modules/bibformat/lib/bibformat_templates.py:1054
 #: modules/bibupload/lib/batchuploader_templates.py:426
-#: modules/webalert/lib/webalert_templates.py:319
+#: modules/webalert/lib/webalert_templates.py:318
 #: modules/websubmit/lib/websubmit_managedocfiles.py:370
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:194
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:255
@@ -1622,8 +1622,8 @@ msgstr ""
 
 #: modules/bibformat/lib/bibformat_templates.py:934
 #: modules/bibformat/lib/bibformat_templates.py:1058
-#: modules/webalert/lib/webalert_templates.py:326
-#: modules/webalert/lib/webalert_templates.py:463
+#: modules/webalert/lib/webalert_templates.py:325
+#: modules/webalert/lib/webalert_templates.py:462
 #: modules/webmessage/lib/webmessage_templates.py:89
 #: modules/websubmit/lib/websubmit_templates.py:1483
 msgid "Action"
@@ -2878,85 +2878,85 @@ msgstr "Вы не принадлежыте никакой группе."
 msgid "alert name"
 msgstr "имя сообщения"
 
-#: modules/webalert/lib/webalert_templates.py:123
+#: modules/webalert/lib/webalert_templates.py:122
 msgid "SHOW"
 msgstr "ПОКАЗАТЬ"
 
-#: modules/webalert/lib/webalert_templates.py:172
+#: modules/webalert/lib/webalert_templates.py:171
 msgid ""
 "This alert will notify you each time/only if a new item satisfies the "
 "following query:"
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:173
+#: modules/webalert/lib/webalert_templates.py:172
 msgid "QUERY"
 msgstr "ВОПРОС"
 
-#: modules/webalert/lib/webalert_templates.py:211
+#: modules/webalert/lib/webalert_templates.py:210
 msgid "Alert identification name:"
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:213
+#: modules/webalert/lib/webalert_templates.py:212
 msgid "Search-checking frequency:"
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:217
-#: modules/webalert/lib/webalert_templates.py:337
+#: modules/webalert/lib/webalert_templates.py:216
+#: modules/webalert/lib/webalert_templates.py:336
 #: modules/bibharvest/lib/oai_harvest_admin.py:141
 msgid "monthly"
 msgstr "каждый месяц"
 
-#: modules/webalert/lib/webalert_templates.py:218
-#: modules/webalert/lib/webalert_templates.py:335
+#: modules/webalert/lib/webalert_templates.py:217
+#: modules/webalert/lib/webalert_templates.py:334
 #: modules/bibharvest/lib/oai_harvest_admin.py:140
 msgid "weekly"
 msgstr "каждую неделю"
 
-#: modules/webalert/lib/webalert_templates.py:219
-#: modules/webalert/lib/webalert_templates.py:332
+#: modules/webalert/lib/webalert_templates.py:218
+#: modules/webalert/lib/webalert_templates.py:331
 #: modules/bibharvest/lib/oai_harvest_admin.py:139
 msgid "daily"
 msgstr "каждый день"
 
-#: modules/webalert/lib/webalert_templates.py:220
+#: modules/webalert/lib/webalert_templates.py:219
 msgid "Send notification email?"
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:223
-#: modules/webalert/lib/webalert_templates.py:340
+#: modules/webalert/lib/webalert_templates.py:222
+#: modules/webalert/lib/webalert_templates.py:339
 msgid "yes"
 msgstr "да"
 
-#: modules/webalert/lib/webalert_templates.py:224
-#: modules/webalert/lib/webalert_templates.py:342
+#: modules/webalert/lib/webalert_templates.py:223
+#: modules/webalert/lib/webalert_templates.py:341
 msgid "no"
 msgstr "нет"
 
-#: modules/webalert/lib/webalert_templates.py:225
+#: modules/webalert/lib/webalert_templates.py:224
 #, python-format
 msgid "if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket"
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:227
+#: modules/webalert/lib/webalert_templates.py:226
 msgid "Store results in basket?"
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:248
+#: modules/webalert/lib/webalert_templates.py:247
 msgid "SET ALERT"
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:249
+#: modules/webalert/lib/webalert_templates.py:248
 msgid "CLEAR DATA"
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:300
+#: modules/webalert/lib/webalert_templates.py:299
 #, python-format
 msgid ""
 "Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the "
 "%(x_url2_open)spopular searches%(x_url2_close)s, or the input form."
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:318
+#: modules/webalert/lib/webalert_templates.py:317
 #: modules/webcomment/lib/webcomment_templates.py:230
 #: modules/webcomment/lib/webcomment_templates.py:632
 #: modules/webcomment/lib/webcomment_templates.py:1904
@@ -2968,27 +2968,27 @@ msgstr ""
 msgid "No"
 msgstr "Нет"
 
-#: modules/webalert/lib/webalert_templates.py:320
+#: modules/webalert/lib/webalert_templates.py:319
 msgid "Search checking frequency"
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:321
+#: modules/webalert/lib/webalert_templates.py:320
 msgid "Notification by email"
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:322
+#: modules/webalert/lib/webalert_templates.py:321
 msgid "Result in basket"
 msgstr "Результат в корзине"
 
-#: modules/webalert/lib/webalert_templates.py:323
+#: modules/webalert/lib/webalert_templates.py:322
 msgid "Date last run"
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:324
+#: modules/webalert/lib/webalert_templates.py:323
 msgid "Creation date"
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:325
+#: modules/webalert/lib/webalert_templates.py:324
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:346
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:399
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:459
@@ -2996,59 +2996,59 @@ msgstr ""
 msgid "Query"
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:368
+#: modules/webalert/lib/webalert_templates.py:367
 #: modules/webbasket/lib/webbasket_templates.py:1748
 msgid "no basket"
 msgstr "нет корзин"
 
-#: modules/webalert/lib/webalert_templates.py:385
+#: modules/webalert/lib/webalert_templates.py:384
 msgid "Modify"
 msgstr "изменить"
 
-#: modules/webalert/lib/webalert_templates.py:391
+#: modules/webalert/lib/webalert_templates.py:390
 #: modules/webjournal/lib/webjournaladminlib.py:225
 #: modules/webjournal/lib/webjournaladminlib.py:231
 msgid "Remove"
 msgstr "Удалить"
 
-#: modules/webalert/lib/webalert_templates.py:393
-#: modules/webalert/lib/webalert_templates.py:483
+#: modules/webalert/lib/webalert_templates.py:392
+#: modules/webalert/lib/webalert_templates.py:482
 msgid "Execute search"
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:399
+#: modules/webalert/lib/webalert_templates.py:398
 #, python-format
 msgid "You have defined %s alerts."
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:437
+#: modules/webalert/lib/webalert_templates.py:436
 #, python-format
 msgid ""
 "You have not executed any search yet. Please go to the %(x_url_open)ssearch "
 "interface%(x_url_close)s first."
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:446
+#: modules/webalert/lib/webalert_templates.py:445
 #, python-format
 msgid ""
 "You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
 "the last 30 days or so."
 msgstr ""
 
-#: modules/webalert/lib/webalert_templates.py:451
+#: modules/webalert/lib/webalert_templates.py:450
 #, fuzzy, python-format
 msgid "Here are the %s most popular searches."
 msgstr "самые популярные поиски"
 
-#: modules/webalert/lib/webalert_templates.py:462
+#: modules/webalert/lib/webalert_templates.py:461
 msgid "Question"
 msgstr "Вопрос"
 
-#: modules/webalert/lib/webalert_templates.py:466
+#: modules/webalert/lib/webalert_templates.py:465
 msgid "Last Run"
 msgstr "Последнуй запуск"
 
-#: modules/webalert/lib/webalert_templates.py:484
+#: modules/webalert/lib/webalert_templates.py:483
 msgid "Set new alert"
 msgstr ""
 
@@ -3159,7 +3159,7 @@ msgstr "Персонализовать"
 #: modules/webstyle/lib/webstyle_templates.py:582
 #: modules/webstyle/lib/webstyle_templates.py:619
 #: modules/webstyle/lib/webstyle_templates.py:621
-#: modules/websubmit/lib/websubmit_engine.py:1713
+#: modules/websubmit/lib/websubmit_engine.py:1736
 #: modules/websubmit/lib/websubmit_webinterface.py:1127
 #: modules/bibcatalog/lib/bibcatalog_templates.py:37
 #: modules/bibedit/lib/bibedit_webinterface.py:205
@@ -5020,8 +5020,8 @@ msgstr ""
 
 #: modules/websearch/lib/search_engine.py:742
 #: modules/websearch/lib/search_engine.py:769
-#: modules/websearch/lib/search_engine.py:4499
-#: modules/websearch/lib/search_engine.py:4552
+#: modules/websearch/lib/search_engine.py:4516
+#: modules/websearch/lib/search_engine.py:4569
 msgid "Search Results"
 msgstr "Результаты поиска"
 
@@ -5069,41 +5069,41 @@ msgstr "короткий HTML"
 msgid "latest first"
 msgstr "сначала последний запрос"
 
-#: modules/websearch/lib/search_engine.py:1682
+#: modules/websearch/lib/search_engine.py:1689
 msgid "No values found."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:1800
+#: modules/websearch/lib/search_engine.py:1807
 #, python-format
 msgid ""
 "Warning: full-text search is only available for a subset of papers mostly "
 "from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:1804
+#: modules/websearch/lib/search_engine.py:1811
 #, python-format
 msgid ""
 "Warning: figure caption search is only available for a subset of papers "
 "mostly from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:1813
+#: modules/websearch/lib/search_engine.py:1820
 msgid ""
 "No phrase index available for fulltext yet, looking for word combination..."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:1854
+#: modules/websearch/lib/search_engine.py:1861
 #, fuzzy, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
 "Ни один результат не найден для <em>%s</em>, взамен используется <em>%s</"
 "em> ..."
 
-#: modules/websearch/lib/search_engine.py:1864
-#: modules/websearch/lib/search_engine.py:1873
-#: modules/websearch/lib/search_engine.py:4471
-#: modules/websearch/lib/search_engine.py:4509
-#: modules/websearch/lib/search_engine.py:4560
+#: modules/websearch/lib/search_engine.py:1871
+#: modules/websearch/lib/search_engine.py:1880
+#: modules/websearch/lib/search_engine.py:4488
+#: modules/websearch/lib/search_engine.py:4526
+#: modules/websearch/lib/search_engine.py:4577
 #: modules/websubmit/lib/websubmit_webinterface.py:110
 #: modules/websubmit/lib/websubmit_webinterface.py:145
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:327
@@ -5111,13 +5111,13 @@ msgstr ""
 msgid "Requested record does not seem to exist."
 msgstr "Эта запись не существует"
 
-#: modules/websearch/lib/search_engine.py:1995
+#: modules/websearch/lib/search_engine.py:2002
 msgid ""
 "Search syntax misunderstood. Ignoring all parentheses in the query. If this "
 "doesn't help, please check your search and try again."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:2317
+#: modules/websearch/lib/search_engine.py:2324
 #, fuzzy, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
@@ -5126,7 +5126,7 @@ msgstr ""
 "Не найден результат в наборе %s. В других публичных наборах <a class="
 "\"nearestterms\" href=\"%s\">%d резултатов</a>."
 
-#: modules/websearch/lib/search_engine.py:2326
+#: modules/websearch/lib/search_engine.py:2333
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
@@ -5134,75 +5134,75 @@ msgstr ""
 "Ваш запрос не удовлетворён ни одним доступным набором. Для поиска документа "
 "ограниченного доступа, выберете сначала ваш набор."
 
-#: modules/websearch/lib/search_engine.py:2443
+#: modules/websearch/lib/search_engine.py:2450
 #, fuzzy, python-format
 msgid "There are no records referring to %s."
 msgstr "Существуют %i корзин"
 
-#: modules/websearch/lib/search_engine.py:2445
+#: modules/websearch/lib/search_engine.py:2452
 #, fuzzy, python-format
 msgid "There are no records cited by %s."
 msgstr "Существуют %i корзин"
 
-#: modules/websearch/lib/search_engine.py:2450
+#: modules/websearch/lib/search_engine.py:2457
 #, fuzzy, python-format
 msgid "No word index is available for %s."
 msgstr "Не найден лексический индекс для"
 
-#: modules/websearch/lib/search_engine.py:2461
+#: modules/websearch/lib/search_engine.py:2468
 #, fuzzy, python-format
 msgid "No phrase index is available for %s."
 msgstr "Не найден фразовый индех для"
 
-#: modules/websearch/lib/search_engine.py:2506
+#: modules/websearch/lib/search_engine.py:2513
 #, fuzzy, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
 "Nearest terms in any collection are:"
 msgstr "не найден. Возможные термины:"
 
-#: modules/websearch/lib/search_engine.py:2510
+#: modules/websearch/lib/search_engine.py:2517
 #, fuzzy, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
 msgstr "не найден. Возможные термины:"
 
-#: modules/websearch/lib/search_engine.py:3256
+#: modules/websearch/lib/search_engine.py:3273
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
 "sort order."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:3280
+#: modules/websearch/lib/search_engine.py:3297
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
 "instead."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:3473
-#: modules/websearch/lib/search_engine.py:3802
-#: modules/websearch/lib/search_engine.py:3980
-#: modules/websearch/lib/search_engine.py:4003
-#: modules/websearch/lib/search_engine.py:4011
-#: modules/websearch/lib/search_engine.py:4019
-#: modules/websearch/lib/search_engine.py:4065
+#: modules/websearch/lib/search_engine.py:3490
+#: modules/websearch/lib/search_engine.py:3819
+#: modules/websearch/lib/search_engine.py:3997
+#: modules/websearch/lib/search_engine.py:4020
+#: modules/websearch/lib/search_engine.py:4028
+#: modules/websearch/lib/search_engine.py:4036
+#: modules/websearch/lib/search_engine.py:4082
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:325
 msgid "The record has been deleted."
 msgstr "The record has been deleted."
 
-#: modules/websearch/lib/search_engine.py:3701
+#: modules/websearch/lib/search_engine.py:3718
 msgid "Use different search terms."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:4781
+#: modules/websearch/lib/search_engine.py:4798
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "Не найден ни один результат в пределах данного временного интервала, отмена "
 "условия..."
 
-#: modules/websearch/lib/search_engine.py:4808
+#: modules/websearch/lib/search_engine.py:4825
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "Не найден ни один результат для вашего ограничения поиска, отмена условия..."
@@ -5666,7 +5666,7 @@ msgstr ""
 msgid "Breakdown of papers by citations:"
 msgstr ""
 
-#: modules/websearch/lib/websearch_templates.py:4124
+#: modules/websearch/lib/websearch_templates.py:4123
 #, fuzzy
 msgid "Additional Citation Metrics"
 msgstr "Добавить комментарий"
@@ -7130,9 +7130,9 @@ msgstr "Главная страница"
 #: modules/webstyle/lib/webstyle_templates.py:432
 #: modules/webstyle/lib/webstyle_templates.py:501
 #: modules/websubmit/lib/websubmit_engine.py:690
-#: modules/websubmit/lib/websubmit_engine.py:1121
-#: modules/websubmit/lib/websubmit_engine.py:1167
-#: modules/websubmit/lib/websubmit_engine.py:1400
+#: modules/websubmit/lib/websubmit_engine.py:1144
+#: modules/websubmit/lib/websubmit_engine.py:1190
+#: modules/websubmit/lib/websubmit_engine.py:1423
 msgid "Submit"
 msgstr "Внести"
 
@@ -7428,7 +7428,7 @@ msgid "Sorry, you must log in to perform this action."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:184
-#: modules/websubmit/lib/websubmit_engine.py:797
+#: modules/websubmit/lib/websubmit_engine.py:820
 #, fuzzy
 msgid "Not enough information to go ahead with the submission."
 msgstr "это действие не применяется на этот тип документа"
@@ -7438,57 +7438,58 @@ msgstr "это действие не применяется на этот тип
 #: modules/websubmit/lib/websubmit_engine.py:281
 #: modules/websubmit/lib/websubmit_engine.py:353
 #: modules/websubmit/lib/websubmit_engine.py:394
-#: modules/websubmit/lib/websubmit_engine.py:811
-#: modules/websubmit/lib/websubmit_engine.py:849
-#: modules/websubmit/lib/websubmit_engine.py:907
-#: modules/websubmit/lib/websubmit_engine.py:948
+#: modules/websubmit/lib/websubmit_engine.py:834
+#: modules/websubmit/lib/websubmit_engine.py:872
+#: modules/websubmit/lib/websubmit_engine.py:930
+#: modules/websubmit/lib/websubmit_engine.py:971
 #, fuzzy
 msgid "Invalid parameters"
 msgstr "Изменить параметры"
 
 #: modules/websubmit/lib/websubmit_engine.py:196
-#: modules/websubmit/lib/websubmit_engine.py:803
+#: modules/websubmit/lib/websubmit_engine.py:826
 #, fuzzy
 msgid "Invalid doctype and act parameters"
 msgstr "Изменить параметры"
 
 #: modules/websubmit/lib/websubmit_engine.py:227
-#: modules/websubmit/lib/websubmit_engine.py:838
+#: modules/websubmit/lib/websubmit_engine.py:799
+#: modules/websubmit/lib/websubmit_engine.py:861
 #, python-format
 msgid "Unable to find the submission directory for the action: %s"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:236
-#: modules/websubmit/lib/websubmit_engine.py:991
+#: modules/websubmit/lib/websubmit_engine.py:1014
 #, fuzzy
 msgid "Unknown document type"
 msgstr "неизвестный тип документа"
 
 #: modules/websubmit/lib/websubmit_engine.py:242
-#: modules/websubmit/lib/websubmit_engine.py:997
+#: modules/websubmit/lib/websubmit_engine.py:1020
 #, fuzzy
 msgid "Unknown action"
 msgstr "неизвестное действие"
 
 #: modules/websubmit/lib/websubmit_engine.py:250
-#: modules/websubmit/lib/websubmit_engine.py:1004
+#: modules/websubmit/lib/websubmit_engine.py:1027
 msgid "Unable to determine the number of submission pages."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:291
-#: modules/websubmit/lib/websubmit_engine.py:857
+#: modules/websubmit/lib/websubmit_engine.py:880
 msgid ""
 "Unable to create a directory for this submission. The administrator has been "
 "alerted."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:400
-#: modules/websubmit/lib/websubmit_engine.py:955
+#: modules/websubmit/lib/websubmit_engine.py:978
 msgid "Cannot create submission directory. The administrator has been alerted."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:422
-#: modules/websubmit/lib/websubmit_engine.py:977
+#: modules/websubmit/lib/websubmit_engine.py:1000
 msgid "No file uploaded?"
 msgstr ""
 
@@ -7499,7 +7500,7 @@ msgstr ""
 msgid "Unknown form field found on submission page."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_engine.py:1040
+#: modules/websubmit/lib/websubmit_engine.py:1063
 msgid ""
 "A serious function-error has been encountered. Adminstrators have been "
 "alerted. <br /><em>Please not that this might be due to wrong characters "
@@ -7507,17 +7508,17 @@ msgid ""
 "file)."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_engine.py:1363
+#: modules/websubmit/lib/websubmit_engine.py:1386
 #, fuzzy, python-format
 msgid "Unable to find document type: %s"
 msgstr "неизвестный тип документа"
 
-#: modules/websubmit/lib/websubmit_engine.py:1649
+#: modules/websubmit/lib/websubmit_engine.py:1672
 #, fuzzy
 msgid "The chosen action is not supported by the document type."
 msgstr "Вами выбранное действие не применяется на этот документ"
 
-#: modules/websubmit/lib/websubmit_engine.py:1726
+#: modules/websubmit/lib/websubmit_engine.py:1749
 #: modules/websubmit/lib/websubmit_webinterface.py:1143
 #: modules/websubmit/web/approve.py:81
 msgid "Warning"
@@ -8684,7 +8685,7 @@ msgstr ""
 msgid "There are no new articles for the moment"
 msgstr ""
 
-#: modules/webjournal/lib/widgets/bfe_webjournal_widget_whatsNew.py:286
+#: modules/webjournal/lib/widgets/bfe_webjournal_widget_whatsNew.py:287
 #, fuzzy
 msgid "What's new"
 msgstr "Имя корзины"

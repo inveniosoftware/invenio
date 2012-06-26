@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.0\n"
+"Project-Id-Version: Invenio 1.0.1\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2012-02-29 15:03+0100\n"
+"POT-Creation-Date: 2012-06-26 13:05+0200\n"
 "PO-Revision-Date: 2010-07-27 15:13+0100\n"
 "Last-Translator: Nino Jejelava <nino.jejelava@gmail.com>\n"
 "Language-Team: KA <info@invenio-software.org>\n"
@@ -81,7 +81,7 @@ msgstr "ადმინისტრატორის არეა"
 #: modules/websearch/doc/search-guide.webdoc:559
 #: modules/websearch/doc/search-guide.webdoc:696
 #: modules/websearch/doc/search-guide.webdoc:834
-#: modules/websearch/lib/search_engine.py:4476
+#: modules/websearch/lib/search_engine.py:4493
 #: modules/websearch/lib/websearch_templates.py:804
 #: modules/websearch/lib/websearch_templates.py:882
 #: modules/websearch/lib/websearch_templates.py:1005
@@ -1453,7 +1453,7 @@ msgstr "შეამოწმეთ დამოკიდებულება�
 #: modules/bibformat/lib/bibformat_templates.py:929
 #: modules/bibformat/lib/bibformat_templates.py:1054
 #: modules/bibupload/lib/batchuploader_templates.py:426
-#: modules/webalert/lib/webalert_templates.py:319
+#: modules/webalert/lib/webalert_templates.py:318
 #: modules/websubmit/lib/websubmit_managedocfiles.py:370
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:194
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:255
@@ -1615,8 +1615,8 @@ msgstr "ბოლო ცვლილების თარიღი"
 
 #: modules/bibformat/lib/bibformat_templates.py:934
 #: modules/bibformat/lib/bibformat_templates.py:1058
-#: modules/webalert/lib/webalert_templates.py:326
-#: modules/webalert/lib/webalert_templates.py:463
+#: modules/webalert/lib/webalert_templates.py:325
+#: modules/webalert/lib/webalert_templates.py:462
 #: modules/webmessage/lib/webmessage_templates.py:89
 #: modules/websubmit/lib/websubmit_templates.py:1483
 msgid "Action"
@@ -2842,11 +2842,11 @@ msgstr "თქვენ გეკუთვლით შემდეგი შე
 msgid "alert name"
 msgstr "შეტყობინების სახელი"
 
-#: modules/webalert/lib/webalert_templates.py:123
+#: modules/webalert/lib/webalert_templates.py:122
 msgid "SHOW"
 msgstr "ჩვენება"
 
-#: modules/webalert/lib/webalert_templates.py:172
+#: modules/webalert/lib/webalert_templates.py:171
 msgid ""
 "This alert will notify you each time/only if a new item satisfies the "
 "following query:"
@@ -2854,68 +2854,68 @@ msgstr ""
 "ეს შეტყობინება გააქტიურდება ყოველ ჯერზე /მხოლოდ მაშინ თუ ახალი ელემენტი "
 "აკმაყოფილებს შემდეგ მოთხოვნას:"
 
-#: modules/webalert/lib/webalert_templates.py:173
+#: modules/webalert/lib/webalert_templates.py:172
 msgid "QUERY"
 msgstr "მოთხოვნა"
 
-#: modules/webalert/lib/webalert_templates.py:211
+#: modules/webalert/lib/webalert_templates.py:210
 msgid "Alert identification name:"
 msgstr "იდენტიფიცირების სახელის შეტყობინება:"
 
-#: modules/webalert/lib/webalert_templates.py:213
+#: modules/webalert/lib/webalert_templates.py:212
 msgid "Search-checking frequency:"
 msgstr "ძებნის სიხშირის შემოწმება:"
 
-#: modules/webalert/lib/webalert_templates.py:217
-#: modules/webalert/lib/webalert_templates.py:337
+#: modules/webalert/lib/webalert_templates.py:216
+#: modules/webalert/lib/webalert_templates.py:336
 #: modules/bibharvest/lib/oai_harvest_admin.py:141
 msgid "monthly"
 msgstr "თვიური"
 
-#: modules/webalert/lib/webalert_templates.py:218
-#: modules/webalert/lib/webalert_templates.py:335
+#: modules/webalert/lib/webalert_templates.py:217
+#: modules/webalert/lib/webalert_templates.py:334
 #: modules/bibharvest/lib/oai_harvest_admin.py:140
 msgid "weekly"
 msgstr "კვირეული"
 
-#: modules/webalert/lib/webalert_templates.py:219
-#: modules/webalert/lib/webalert_templates.py:332
+#: modules/webalert/lib/webalert_templates.py:218
+#: modules/webalert/lib/webalert_templates.py:331
 #: modules/bibharvest/lib/oai_harvest_admin.py:139
 msgid "daily"
 msgstr "დღიური"
 
-#: modules/webalert/lib/webalert_templates.py:220
+#: modules/webalert/lib/webalert_templates.py:219
 msgid "Send notification email?"
 msgstr "გავაგზავნო პირადი შეტყობინება ელფოსტაზე?"
 
-#: modules/webalert/lib/webalert_templates.py:223
-#: modules/webalert/lib/webalert_templates.py:340
+#: modules/webalert/lib/webalert_templates.py:222
+#: modules/webalert/lib/webalert_templates.py:339
 msgid "yes"
 msgstr "დიახ"
 
-#: modules/webalert/lib/webalert_templates.py:224
-#: modules/webalert/lib/webalert_templates.py:342
+#: modules/webalert/lib/webalert_templates.py:223
+#: modules/webalert/lib/webalert_templates.py:341
 msgid "no"
 msgstr "არა"
 
-#: modules/webalert/lib/webalert_templates.py:225
+#: modules/webalert/lib/webalert_templates.py:224
 #, python-format
 msgid "if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket"
 msgstr "თუ %(x_fmt_open)sno%(x_fmt_close)s თქვენ უნდა მიუთითოთ კალათა"
 
-#: modules/webalert/lib/webalert_templates.py:227
+#: modules/webalert/lib/webalert_templates.py:226
 msgid "Store results in basket?"
 msgstr "დავიმახსოვრო შედეგები კალათაში?"
 
-#: modules/webalert/lib/webalert_templates.py:248
+#: modules/webalert/lib/webalert_templates.py:247
 msgid "SET ALERT"
 msgstr "შეტყობინების დაყენება"
 
-#: modules/webalert/lib/webalert_templates.py:249
+#: modules/webalert/lib/webalert_templates.py:248
 msgid "CLEAR DATA"
 msgstr "მონაცემების გასუფთავება"
 
-#: modules/webalert/lib/webalert_templates.py:300
+#: modules/webalert/lib/webalert_templates.py:299
 #, python-format
 msgid ""
 "Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the "
@@ -2925,7 +2925,7 @@ msgstr ""
 "%(x_url1_close)s, %(x_url2_open)sპოპულარული ძიებიდან%(x_url2_close)s, ან "
 "შემავალი ფორმა."
 
-#: modules/webalert/lib/webalert_templates.py:318
+#: modules/webalert/lib/webalert_templates.py:317
 #: modules/webcomment/lib/webcomment_templates.py:230
 #: modules/webcomment/lib/webcomment_templates.py:632
 #: modules/webcomment/lib/webcomment_templates.py:1904
@@ -2937,27 +2937,27 @@ msgstr ""
 msgid "No"
 msgstr "არა"
 
-#: modules/webalert/lib/webalert_templates.py:320
+#: modules/webalert/lib/webalert_templates.py:319
 msgid "Search checking frequency"
 msgstr "ძიების შემოწმების სიხშრე"
 
-#: modules/webalert/lib/webalert_templates.py:321
+#: modules/webalert/lib/webalert_templates.py:320
 msgid "Notification by email"
 msgstr "ელფოსტით შეტყობინება"
 
-#: modules/webalert/lib/webalert_templates.py:322
+#: modules/webalert/lib/webalert_templates.py:321
 msgid "Result in basket"
 msgstr "შედეგი კალათაში"
 
-#: modules/webalert/lib/webalert_templates.py:323
+#: modules/webalert/lib/webalert_templates.py:322
 msgid "Date last run"
 msgstr "ბოლო გაშვების თარიღი"
 
-#: modules/webalert/lib/webalert_templates.py:324
+#: modules/webalert/lib/webalert_templates.py:323
 msgid "Creation date"
 msgstr "შექმნის თარიღი"
 
-#: modules/webalert/lib/webalert_templates.py:325
+#: modules/webalert/lib/webalert_templates.py:324
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:346
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:399
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:459
@@ -2965,32 +2965,32 @@ msgstr "შექმნის თარიღი"
 msgid "Query"
 msgstr "შეკითხვა"
 
-#: modules/webalert/lib/webalert_templates.py:368
+#: modules/webalert/lib/webalert_templates.py:367
 #: modules/webbasket/lib/webbasket_templates.py:1748
 msgid "no basket"
 msgstr "კალათა არ არის"
 
-#: modules/webalert/lib/webalert_templates.py:385
+#: modules/webalert/lib/webalert_templates.py:384
 msgid "Modify"
 msgstr "შესწორება"
 
-#: modules/webalert/lib/webalert_templates.py:391
+#: modules/webalert/lib/webalert_templates.py:390
 #: modules/webjournal/lib/webjournaladminlib.py:225
 #: modules/webjournal/lib/webjournaladminlib.py:231
 msgid "Remove"
 msgstr "წაშლა"
 
-#: modules/webalert/lib/webalert_templates.py:393
-#: modules/webalert/lib/webalert_templates.py:483
+#: modules/webalert/lib/webalert_templates.py:392
+#: modules/webalert/lib/webalert_templates.py:482
 msgid "Execute search"
 msgstr "ძებნის განხორციელება"
 
-#: modules/webalert/lib/webalert_templates.py:399
+#: modules/webalert/lib/webalert_templates.py:398
 #, python-format
 msgid "You have defined %s alerts."
 msgstr "თქვენ გაქვთ განსაზღვრული %s შეტყობინება."
 
-#: modules/webalert/lib/webalert_templates.py:437
+#: modules/webalert/lib/webalert_templates.py:436
 #, python-format
 msgid ""
 "You have not executed any search yet. Please go to the %(x_url_open)ssearch "
@@ -2999,7 +2999,7 @@ msgstr ""
 "თქვენ ჯერ არ განგიხორციელებიათ ძებნა. გთხოვთ პირველად მიხვიდეთ "
 "%(x_url_open)sძიების ინტერფეისზე%(x_url_close)s."
 
-#: modules/webalert/lib/webalert_templates.py:446
+#: modules/webalert/lib/webalert_templates.py:445
 #, python-format
 msgid ""
 "You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
@@ -3008,20 +3008,20 @@ msgstr ""
 "თქვენ განახორციელეთ %(x_nb1)s ძიება (%(x_nb2)s განსხვავებული კითხვა) "
 "დაახლოებით ბოლო 30 დღის განმავლობაში."
 
-#: modules/webalert/lib/webalert_templates.py:451
+#: modules/webalert/lib/webalert_templates.py:450
 #, python-format
 msgid "Here are the %s most popular searches."
 msgstr "აქ არის %s ყველაზე პოპულარული ძიება."
 
-#: modules/webalert/lib/webalert_templates.py:462
+#: modules/webalert/lib/webalert_templates.py:461
 msgid "Question"
 msgstr "კითხვა"
 
-#: modules/webalert/lib/webalert_templates.py:466
+#: modules/webalert/lib/webalert_templates.py:465
 msgid "Last Run"
 msgstr "ბოლო გაშვება"
 
-#: modules/webalert/lib/webalert_templates.py:484
+#: modules/webalert/lib/webalert_templates.py:483
 msgid "Set new alert"
 msgstr "აღალი შეტყობინების დაყენება"
 
@@ -3130,7 +3130,7 @@ msgstr "%s, პერსონოლიზაცია"
 #: modules/webstyle/lib/webstyle_templates.py:582
 #: modules/webstyle/lib/webstyle_templates.py:619
 #: modules/webstyle/lib/webstyle_templates.py:621
-#: modules/websubmit/lib/websubmit_engine.py:1713
+#: modules/websubmit/lib/websubmit_engine.py:1736
 #: modules/websubmit/lib/websubmit_webinterface.py:1127
 #: modules/bibcatalog/lib/bibcatalog_templates.py:37
 #: modules/bibedit/lib/bibedit_webinterface.py:205
@@ -4946,8 +4946,8 @@ msgstr "წერილის წაკითხვა"
 
 #: modules/websearch/lib/search_engine.py:742
 #: modules/websearch/lib/search_engine.py:769
-#: modules/websearch/lib/search_engine.py:4499
-#: modules/websearch/lib/search_engine.py:4552
+#: modules/websearch/lib/search_engine.py:4516
+#: modules/websearch/lib/search_engine.py:4569
 msgid "Search Results"
 msgstr "ძიების შედეგები"
 
@@ -4993,54 +4993,54 @@ msgstr "მოკლე HTML"
 msgid "latest first"
 msgstr "უახლესი პირველი"
 
-#: modules/websearch/lib/search_engine.py:1682
+#: modules/websearch/lib/search_engine.py:1689
 msgid "No values found."
 msgstr "მნიშვნელობა ვერ მოიძებნა."
 
-#: modules/websearch/lib/search_engine.py:1800
+#: modules/websearch/lib/search_engine.py:1807
 #, python-format
 msgid ""
 "Warning: full-text search is only available for a subset of papers mostly "
 "from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:1804
+#: modules/websearch/lib/search_engine.py:1811
 #, python-format
 msgid ""
 "Warning: figure caption search is only available for a subset of papers "
 "mostly from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:1813
+#: modules/websearch/lib/search_engine.py:1820
 msgid ""
 "No phrase index available for fulltext yet, looking for word combination..."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:1854
+#: modules/websearch/lib/search_engine.py:1861
 #, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
 "პირდაპირი დამთხვევა ვერ მოიძებნა %(x_query1)s თვის, ვიყენებ %(x_query2)s "
 "სამაგიეროდ..."
 
-#: modules/websearch/lib/search_engine.py:1864
-#: modules/websearch/lib/search_engine.py:1873
-#: modules/websearch/lib/search_engine.py:4471
-#: modules/websearch/lib/search_engine.py:4509
-#: modules/websearch/lib/search_engine.py:4560
+#: modules/websearch/lib/search_engine.py:1871
+#: modules/websearch/lib/search_engine.py:1880
+#: modules/websearch/lib/search_engine.py:4488
+#: modules/websearch/lib/search_engine.py:4526
+#: modules/websearch/lib/search_engine.py:4577
 #: modules/websubmit/lib/websubmit_webinterface.py:110
 #: modules/websubmit/lib/websubmit_webinterface.py:145
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:327
 msgid "Requested record does not seem to exist."
 msgstr "მოთხოვნილი ჩანაჭერი არ არსებობს."
 
-#: modules/websearch/lib/search_engine.py:1995
+#: modules/websearch/lib/search_engine.py:2002
 msgid ""
 "Search syntax misunderstood. Ignoring all parentheses in the query. If this "
 "doesn't help, please check your search and try again."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:2317
+#: modules/websearch/lib/search_engine.py:2324
 #, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
@@ -5049,7 +5049,7 @@ msgstr ""
 "დამთხვევა ვერ მოიძებნა %(x_collection)s კოლექციაში. სხვა საჯარო კოლექციებმა "
 "მოგვცეს %(x_url_open)s%(x_nb_hits)d შედეგი%(x_url_close)s."
 
-#: modules/websearch/lib/search_engine.py:2326
+#: modules/websearch/lib/search_engine.py:2333
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
@@ -5057,27 +5057,27 @@ msgstr ""
 "თქვენი მოთხოვნა არცერთ საჯარო კოლექციას არ დაემთხვა. თუ თქვენ აკრძალული "
 "კოლექციებში გნებავთ ძიება, გთხოვთ ჯერ მიუთითოთ კოლექცია."
 
-#: modules/websearch/lib/search_engine.py:2443
+#: modules/websearch/lib/search_engine.py:2450
 #, fuzzy, python-format
 msgid "There are no records referring to %s."
 msgstr "მოთხოვნები არ არის."
 
-#: modules/websearch/lib/search_engine.py:2445
+#: modules/websearch/lib/search_engine.py:2452
 #, fuzzy, python-format
 msgid "There are no records cited by %s."
 msgstr "მოთხოვნები არ არის."
 
-#: modules/websearch/lib/search_engine.py:2450
+#: modules/websearch/lib/search_engine.py:2457
 #, python-format
 msgid "No word index is available for %s."
 msgstr "სიტყვის ინდეხი არ არის ხელმისაწვდომი %s -სათვის."
 
-#: modules/websearch/lib/search_engine.py:2461
+#: modules/websearch/lib/search_engine.py:2468
 #, python-format
 msgid "No phrase index is available for %s."
 msgstr "ფრაზის ინდექსი მიუწვდომელია %s -თვის."
 
-#: modules/websearch/lib/search_engine.py:2506
+#: modules/websearch/lib/search_engine.py:2513
 #, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
@@ -5086,7 +5086,7 @@ msgstr ""
 "ძიების სიტყვა%(x_term)s ინდექსში %(x_index)s არ დაემთხვა არცერთ პარამეტრს. "
 "წყობილი სიტყვები ყველა კოლექციაშ არიან:"
 
-#: modules/websearch/lib/search_engine.py:2510
+#: modules/websearch/lib/search_engine.py:2517
 #, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
@@ -5094,7 +5094,7 @@ msgstr ""
 "ძიების სიტყვა %s არ დაემთხვა არცერთ ჩანაწერს. წყობილი სიტყვები ყველა "
 "კოლექციაში არიან:"
 
-#: modules/websearch/lib/search_engine.py:3256
+#: modules/websearch/lib/search_engine.py:3273
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
@@ -5103,7 +5103,7 @@ msgstr ""
 "უკაცრავად, დახარისხება ხელმისაწვდომია თუ გვაქვს %d მდე ჩანაწერი. ვიყენებ "
 "პირველად დახარისხებას."
 
-#: modules/websearch/lib/search_engine.py:3280
+#: modules/websearch/lib/search_engine.py:3297
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
@@ -5112,27 +5112,27 @@ msgstr ""
 "უკაცრავად, %s არ არის ნებადართული დახარისხების კრიტერიუმი. დასახარისხებლად "
 "ვიყენებ სათაურს."
 
-#: modules/websearch/lib/search_engine.py:3473
-#: modules/websearch/lib/search_engine.py:3802
-#: modules/websearch/lib/search_engine.py:3980
-#: modules/websearch/lib/search_engine.py:4003
-#: modules/websearch/lib/search_engine.py:4011
-#: modules/websearch/lib/search_engine.py:4019
-#: modules/websearch/lib/search_engine.py:4065
+#: modules/websearch/lib/search_engine.py:3490
+#: modules/websearch/lib/search_engine.py:3819
+#: modules/websearch/lib/search_engine.py:3997
+#: modules/websearch/lib/search_engine.py:4020
+#: modules/websearch/lib/search_engine.py:4028
+#: modules/websearch/lib/search_engine.py:4036
+#: modules/websearch/lib/search_engine.py:4082
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:325
 msgid "The record has been deleted."
 msgstr "ჩანაწერი წაშლილია."
 
-#: modules/websearch/lib/search_engine.py:3701
+#: modules/websearch/lib/search_engine.py:3718
 msgid "Use different search terms."
 msgstr "გამოიყენეთ სხვადასხვა ძიების სიტყვები."
 
-#: modules/websearch/lib/search_engine.py:4781
+#: modules/websearch/lib/search_engine.py:4798
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "დამთხვევა არ არის მითთებულ დროის ინტერვალშ, ვუგულებელყოფ ამ პირობას ..."
 
-#: modules/websearch/lib/search_engine.py:4808
+#: modules/websearch/lib/search_engine.py:4825
 msgid "No match within your search limits, discarding this condition..."
 msgstr "თქვენი ძიების ლიმიტში დამთხვევა არ მოიძებნა, ვუგულებელყოფ ამ პირობას"
 
@@ -5575,7 +5575,7 @@ msgstr "საშუალო ციტირება სტატიაზე:
 msgid "Breakdown of papers by citations:"
 msgstr "სტატიების ციტირებით დაშლა"
 
-#: modules/websearch/lib/websearch_templates.py:4124
+#: modules/websearch/lib/websearch_templates.py:4123
 #, fuzzy
 msgid "Additional Citation Metrics"
 msgstr "დამათებითი ინფორმაცია"
@@ -7133,9 +7133,9 @@ msgstr "მთავარი"
 #: modules/webstyle/lib/webstyle_templates.py:432
 #: modules/webstyle/lib/webstyle_templates.py:501
 #: modules/websubmit/lib/websubmit_engine.py:690
-#: modules/websubmit/lib/websubmit_engine.py:1121
-#: modules/websubmit/lib/websubmit_engine.py:1167
-#: modules/websubmit/lib/websubmit_engine.py:1400
+#: modules/websubmit/lib/websubmit_engine.py:1144
+#: modules/websubmit/lib/websubmit_engine.py:1190
+#: modules/websubmit/lib/websubmit_engine.py:1423
 msgid "Submit"
 msgstr "დაყენება"
 
@@ -7446,7 +7446,7 @@ msgstr ""
 "განახორციელოთ."
 
 #: modules/websubmit/lib/websubmit_engine.py:184
-#: modules/websubmit/lib/websubmit_engine.py:797
+#: modules/websubmit/lib/websubmit_engine.py:820
 msgid "Not enough information to go ahead with the submission."
 msgstr "ინფორმაცია არ არის საკმარისი იმისათვის რომ განაგრძოთ წარდგენა."
 
@@ -7455,41 +7455,42 @@ msgstr "ინფორმაცია არ არის საკმარი
 #: modules/websubmit/lib/websubmit_engine.py:281
 #: modules/websubmit/lib/websubmit_engine.py:353
 #: modules/websubmit/lib/websubmit_engine.py:394
-#: modules/websubmit/lib/websubmit_engine.py:811
-#: modules/websubmit/lib/websubmit_engine.py:849
-#: modules/websubmit/lib/websubmit_engine.py:907
-#: modules/websubmit/lib/websubmit_engine.py:948
+#: modules/websubmit/lib/websubmit_engine.py:834
+#: modules/websubmit/lib/websubmit_engine.py:872
+#: modules/websubmit/lib/websubmit_engine.py:930
+#: modules/websubmit/lib/websubmit_engine.py:971
 msgid "Invalid parameters"
 msgstr "პარამეტრები არასწორია"
 
 #: modules/websubmit/lib/websubmit_engine.py:196
-#: modules/websubmit/lib/websubmit_engine.py:803
+#: modules/websubmit/lib/websubmit_engine.py:826
 msgid "Invalid doctype and act parameters"
 msgstr "არასწორი დოკუმენტის ტიპი და მოქმედების პარამეტრები"
 
 #: modules/websubmit/lib/websubmit_engine.py:227
-#: modules/websubmit/lib/websubmit_engine.py:838
+#: modules/websubmit/lib/websubmit_engine.py:799
+#: modules/websubmit/lib/websubmit_engine.py:861
 #, python-format
 msgid "Unable to find the submission directory for the action: %s"
 msgstr "ვერ ვპოულობ დამატების დირექტორიას, შემდეგი მოქმედებისათვის %s"
 
 #: modules/websubmit/lib/websubmit_engine.py:236
-#: modules/websubmit/lib/websubmit_engine.py:991
+#: modules/websubmit/lib/websubmit_engine.py:1014
 msgid "Unknown document type"
 msgstr "დოკუმენტის ტიპი უცნობია"
 
 #: modules/websubmit/lib/websubmit_engine.py:242
-#: modules/websubmit/lib/websubmit_engine.py:997
+#: modules/websubmit/lib/websubmit_engine.py:1020
 msgid "Unknown action"
 msgstr "უცნობი მოქმდება"
 
 #: modules/websubmit/lib/websubmit_engine.py:250
-#: modules/websubmit/lib/websubmit_engine.py:1004
+#: modules/websubmit/lib/websubmit_engine.py:1027
 msgid "Unable to determine the number of submission pages."
 msgstr "ვერ ხერხდება წარდგენილი გვერდების რიცხვის დადგენა."
 
 #: modules/websubmit/lib/websubmit_engine.py:291
-#: modules/websubmit/lib/websubmit_engine.py:857
+#: modules/websubmit/lib/websubmit_engine.py:880
 msgid ""
 "Unable to create a directory for this submission. The administrator has been "
 "alerted."
@@ -7498,14 +7499,14 @@ msgstr ""
 "ადმინისტრატორს."
 
 #: modules/websubmit/lib/websubmit_engine.py:400
-#: modules/websubmit/lib/websubmit_engine.py:955
+#: modules/websubmit/lib/websubmit_engine.py:978
 msgid "Cannot create submission directory. The administrator has been alerted."
 msgstr ""
 "ვერ ხერხდება დამატების დირექტორიის შექმნა. შეტყობინება გაეგზავნა "
 "ადმინისტრატორს."
 
 #: modules/websubmit/lib/websubmit_engine.py:422
-#: modules/websubmit/lib/websubmit_engine.py:977
+#: modules/websubmit/lib/websubmit_engine.py:1000
 msgid "No file uploaded?"
 msgstr "ფაილი არ არის ატვირთული ?"
 
@@ -7516,7 +7517,7 @@ msgstr "ფაილი არ არის ატვირთული ?"
 msgid "Unknown form field found on submission page."
 msgstr "დამატების გვერდზე აღმოჩდა ამოუცნობი ტიპის ველი."
 
-#: modules/websubmit/lib/websubmit_engine.py:1040
+#: modules/websubmit/lib/websubmit_engine.py:1063
 msgid ""
 "A serious function-error has been encountered. Adminstrators have been "
 "alerted. <br /><em>Please not that this might be due to wrong characters "
@@ -7527,16 +7528,16 @@ msgstr ""
 "<br /><em>შეიძლება გამოწვეული იყოს არასწორი სიმბოლოების გამოყენების გამო</"
 "em> (მაგალითად PDF ფაილიდან დაკოპირებით)."
 
-#: modules/websubmit/lib/websubmit_engine.py:1363
+#: modules/websubmit/lib/websubmit_engine.py:1386
 #, python-format
 msgid "Unable to find document type: %s"
 msgstr "ვერ ვპოულობ დოკუმენტის ტიპს: %s"
 
-#: modules/websubmit/lib/websubmit_engine.py:1649
+#: modules/websubmit/lib/websubmit_engine.py:1672
 msgid "The chosen action is not supported by the document type."
 msgstr "არჩეული ქმედება არ არის მხარდაჭერილი არჩეული დოკუმენტის ტიპით."
 
-#: modules/websubmit/lib/websubmit_engine.py:1726
+#: modules/websubmit/lib/websubmit_engine.py:1749
 #: modules/websubmit/lib/websubmit_webinterface.py:1143
 #: modules/websubmit/web/approve.py:81
 msgid "Warning"
@@ -8654,7 +8655,7 @@ msgstr "კვირის განმავლობაში სემინ�
 msgid "There are no new articles for the moment"
 msgstr "ამ მომენტისთვის არ არის ახალი სტატიები"
 
-#: modules/webjournal/lib/widgets/bfe_webjournal_widget_whatsNew.py:286
+#: modules/webjournal/lib/widgets/bfe_webjournal_widget_whatsNew.py:287
 msgid "What's new"
 msgstr "რა არის ახალი"
 
