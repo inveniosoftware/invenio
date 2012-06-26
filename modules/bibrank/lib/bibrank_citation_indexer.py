@@ -22,6 +22,7 @@ __revision__ = "$Id$"
 import re
 import time
 import os
+import sys
 import ConfigParser
 from itertools import islice
 from datetime import datetime
@@ -39,6 +40,7 @@ from invenio.bibtask import write_message, task_get_option, \
 from invenio.errorlib import register_exception
 from invenio.intbitset import intbitset
 from invenio.bibindex_engine import get_field_tags
+from invenio.bibindex_engine import CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
 
 
 class memoise:
@@ -52,6 +54,8 @@ class memoise:
         return self.memo[args]
 
 INTBITSET_OF_DELETED_RECORDS = search_unit(p='DELETED', f='980', m='a')
+
+re_CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = re.compile(CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK)
 
 
 def get_recids_matching_query(p, f, m='e'):
@@ -654,10 +658,17 @@ def ref_analyzer(citation_informations, citations_weight, citations,
             else:
                 remove_from_missing(refnumber)
 
-            # TODO: if we match more than one record
-            # either duplicate record or something else
-            # Maybe we should alert admins selectively
-            for recid in recids:
+            if len(recids) > 1:
+                msg = "Whoops: record '%d' report number value '%s' " \
+                      "matches many records; taking only the first one. %s" % \
+                      (thisrecid, refnumber, repr(recids))
+                write_message(msg, stream=sys.stderr)
+                try:
+                    raise ValueError(msg)
+                except ValueError:
+                    register_exception(alert_admin=True)
+
+            for recid in recids[:1]: # take only the first one
                 add_to_dicts(thisrecid, recid)
 
     mesg = "done fully"
@@ -679,6 +690,17 @@ def ref_analyzer(citation_informations, citations_weight, citations,
             p = reference
             field = 'journal'
 
+            # check reference value to see whether it is well formed:
+            if not re_CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK.match(p):
+                msg = "Whoops, record '%d' reference value '%s' " \
+                      "is not well formed; skipping it." % (thisrecid, p)
+                write_message(msg, stream=sys.stderr)
+                try:
+                    raise ValueError(msg)
+                except ValueError:
+                    register_exception(alert_admin=True)
+                continue # skip this ill-formed value
+
             recids = search_unit(p, field) - INTBITSET_OF_DELETED_RECORDS
             write_message("These match searching %s in %s: %s" \
                                  % (reference, field, list(recids)), verbose=9)
@@ -688,7 +710,17 @@ def ref_analyzer(citation_informations, citations_weight, citations,
             else:
                 remove_from_missing(p)
 
-            for recid in recids:
+            if len(recids) > 1:
+                msg = "Whoops: record '%d' reference value '%s' " \
+                      "matches many records; taking only the first one. %s" % \
+                      (thisrecid, p, repr(recids))
+                write_message(msg, stream=sys.stderr)
+                try:
+                    raise ValueError(msg)
+                except ValueError:
+                    register_exception(alert_admin=True)
+
+            for recid in recids[:1]: # take only the first one
                 add_to_dicts(thisrecid, recid)
 
     mesg = "done fully"
@@ -718,7 +750,17 @@ def ref_analyzer(citation_informations, citations_weight, citations,
             else:
                 remove_from_missing(p)
 
-            for recid in recids:
+            if len(recids) > 1:
+                msg = "Whoops: record '%d' DOI value '%s' " \
+                      "matches many records; taking only the first one. %s" % \
+                      (thisrecid, p, repr(recids))
+                write_message(msg, stream=sys.stderr)
+                try:
+                    raise ValueError(msg)
+                except ValueError:
+                    register_exception(alert_admin=True)
+
+            for recid in recids[:1]: # take only the first one
                 add_to_dicts(thisrecid, recid)
 
     mesg = "done fully"
