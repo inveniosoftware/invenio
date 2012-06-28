@@ -35,9 +35,6 @@ The CERN development team currently consists of:
  - Chris Montarbaud <christiane.montarbaud@cern.ch>
      Multimedia and photo management.
 
- - Belinda Chan <belinda.chan@cern.ch>
-     User documentation for personal features like alerts and baskets.
-
  - Jaime Garcia Llopis <jaime.garcia.llopis@cern.ch>
      Improvements to the BibCirculation module.
 
@@ -46,6 +43,9 @@ The CERN development team currently consists of:
 
  - Jiri Kuncar <jiri.kuncar@cern.ch>
      Contributions to the Czech translation.
+
+ - Olivier Canévet <olivier.canevet@cern.ch>
+     Fixes for WebComment report abuse facility.
 
  - Jan Aage Lavik <jan.age.lavik@cern.ch>
      Improvements to BibMatch with remote matching capabilities,
@@ -68,6 +68,9 @@ The CERN development team currently consists of:
      Initial implementation of BibAuthorID module, with Henning
      Weiler.  Fixes for basket export facility and adding external
      items to baskets.
+
+ - Alessio Deiana <alessio.deiana@cern.ch>
+     Improvements to data cacher and cite summary.
 
  - Annette Holtkamp <annette.holtkamp@cern.ch>
      Updates to `Howto MARC' guide.
@@ -112,6 +115,9 @@ Many former team members (mostly CERN staff and fellows, technical
 students, diploma students, summer students) contributed to the
 project since 2002.  In an approximately decreasing chronological
 order:
+
+ - Belinda Chan <belinda.chan@cern.ch>
+     User documentation for personal features like alerts and baskets.
 
  - Juan Francisco Pereira Corral <juan.francisco.pereira.corral@cern.ch>
      Fix taxonomy regression test, for BibKnowledge.
