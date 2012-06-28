@@ -53,7 +53,7 @@ def format_element(bfo, categories, label="Subscribe by RSS",
     args = parse_url_string(bfo.user_info['uri'])
     category_name = args["category"]
     journal_name = args["journal_name"]
-    ln = args["ln"]
+    ln = bfo.lang
     _ = gettext_set_language(ln)
 
 

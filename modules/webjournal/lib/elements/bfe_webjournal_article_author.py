@@ -24,8 +24,6 @@ from invenio.config import \
      CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE
 from invenio.urlutils import create_html_mailto
 from invenio.messages import gettext_set_language
-from invenio.webjournal_utils import \
-     parse_url_string
 
 def format_element(bfo, separator, display_email='yes',
            email_obfuscation_mode=CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE):
@@ -36,8 +34,7 @@ def format_element(bfo, separator, display_email='yes',
     @param display_email: if yes, display link to authors' emails
     @param email_obfuscation_mode: how email are protected. See possible values in CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE in invenio.conf.
     """
-    args = parse_url_string(bfo.user_info['uri'])
-    ln = args["ln"]
+    ln = bfo.lang
     _ = gettext_set_language(ln)
 
     try:

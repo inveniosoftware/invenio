@@ -45,7 +45,7 @@ def format_element(bfo, new_articles_first='yes',
     this_issue_number = args["issue"]
     category_name = args["category"]
     journal_name = args["journal_name"]
-    ln = args["ln"]
+    ln = bfo.lang
     _ = gettext_set_language(ln)
 
     this_title = ""

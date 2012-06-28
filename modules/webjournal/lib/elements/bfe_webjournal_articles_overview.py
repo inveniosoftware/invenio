@@ -98,7 +98,7 @@ def format_element(bfo, number_of_featured_articles="1",
     this_issue_number = args["issue"]
     category_name = args["category"]
     verbose = args["verbose"]
-    ln = args["ln"]
+    ln = bfo.lang
     _ = gettext_set_language(ln)
 
     if image_px_width.isdigit():

@@ -45,7 +45,7 @@ def format_element(bfo, lowest_issue):
     journal_name = args["journal_name"]
     archive_year = args["archive_year"] # None if not specified
     # Note that you can also access the argument 'archive_search'
-    ln = args["ln"]
+    ln = bfo.lang
     _ = gettext_set_language(ln)
 
     released_issues = get_all_released_issues(journal_name)
