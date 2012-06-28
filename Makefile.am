@@ -605,5 +605,13 @@ update-db-from-v1.0-to-v1.1: # update DB from v1.0 release series to v1.1 releas
 	echo "INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','rep_tags');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','record_search_pattern');" | ${prefix}/bin/dbexec
 	echo "UPDATE externalcollection SET name='INSPIRE' where name='SPIRES HEP';" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Notify_URL','Access URL, possibly to post content');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','url');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','data');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','admin_emails');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','content_type');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','attempt_times');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','attempt_sleeptime');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','user');" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~ *.pyc *.tmp
