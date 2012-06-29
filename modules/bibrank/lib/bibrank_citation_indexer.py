@@ -668,7 +668,7 @@ def ref_analyzer(citation_informations, citations_weight, citations,
                 except ValueError:
                     register_exception(alert_admin=True)
 
-            for recid in recids[:1]: # take only the first one
+            for recid in list(recids)[:1]: # take only the first one
                 add_to_dicts(thisrecid, recid)
 
     mesg = "done fully"
@@ -720,7 +720,7 @@ def ref_analyzer(citation_informations, citations_weight, citations,
                 except ValueError:
                     register_exception(alert_admin=True)
 
-            for recid in recids[:1]: # take only the first one
+            for recid in list(recids)[:1]: # take only the first one
                 add_to_dicts(thisrecid, recid)
 
     mesg = "done fully"
@@ -760,7 +760,7 @@ def ref_analyzer(citation_informations, citations_weight, citations,
                 except ValueError:
                     register_exception(alert_admin=True)
 
-            for recid in recids[:1]: # take only the first one
+            for recid in list(recids)[:1]: # take only the first one
                 add_to_dicts(thisrecid, recid)
 
     mesg = "done fully"
