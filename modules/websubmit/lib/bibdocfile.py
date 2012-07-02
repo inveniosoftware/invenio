@@ -2550,7 +2550,7 @@ class BibDoc:
         if format[:1] == '.':
             format = format[1:]
         format = format.upper()
-        return run_sql("INSERT INTO rnkDOWNLOADS "
+        return run_sql("INSERT DELAYED INTO rnkDOWNLOADS "
             "(id_bibrec,id_bibdoc,file_version,file_format,"
             "id_user,client_host,download_time) VALUES "
             "(%s,%s,%s,%s,%s,INET_ATON(%s),NOW())",
