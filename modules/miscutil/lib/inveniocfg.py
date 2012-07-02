@@ -275,7 +275,7 @@ def cli_cmd_update_dbquery_py(conf):
     ## replace db parameters:
     out = ''
     for line in open(dbquerypyfile, 'r').readlines():
-        match = re.search(r'^CFG_DATABASE_(HOST|PORT|NAME|USER|PASS)(\s*=\s*)\'.*\'$', line)
+        match = re.search(r'^CFG_DATABASE_(HOST|PORT|NAME|USER|PASS|SLAVE)(\s*=\s*)\'.*\'$', line)
         if match:
             dbparam = 'CFG_DATABASE_' + match.group(1)
             out += "%s%s'%s'\n" % (dbparam, match.group(2),
@@ -304,7 +304,7 @@ def cli_cmd_update_dbexec(conf):
     ## replace db parameters via sed:
     out = ''
     for line in open(dbexecfile, 'r').readlines():
-        match = re.search(r'^CFG_DATABASE_(HOST|PORT|NAME|USER|PASS)(\s*=\s*)\'.*\'$', line)
+        match = re.search(r'^CFG_DATABASE_(HOST|PORT|NAME|USER|PASS|SLAVE)(\s*=\s*)\'.*\'$', line)
         if match:
             dbparam = 'CFG_DATABASE_' + match.group(1)
             out += "%s%s'%s'\n" % (dbparam, match.group(2),

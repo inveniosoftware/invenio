@@ -21,6 +21,7 @@ Invenio utilities to run SQL queries.
 The main API functions are:
     - run_sql()
     - run_sql_many()
+    - run_sql_with_limit()
 but see the others as well.
 """
 
@@ -70,16 +71,20 @@ CFG_DATABASE_PORT = '3306'
 CFG_DATABASE_NAME = 'invenio'
 CFG_DATABASE_USER = 'invenio'
 CFG_DATABASE_PASS = 'my123p$ss'
+CFG_DATABASE_SLAVE = ''
 
 _DB_CONN = {}
+_DB_CONN[CFG_DATABASE_HOST] = {}
+_DB_CONN[CFG_DATABASE_SLAVE] = {}
 
 def unlock_all():
-    for db in _DB_CONN.values():
-        try:
-            cur = db.cur()
-            cur.execute("UNLOCK TABLES")
-        except:
-            pass
+    for dbhost in _DB_CONN.keys():
+        for db in _DB_CONN[dbhost].values():
+            try:
+                cur = db.cur()
+                cur.execute("UNLOCK TABLES")
+            except:
+                pass
 
 atexit.register(unlock_all)
 
@@ -89,8 +94,7 @@ class InvenioDbQueryWildcardLimitError(Exception):
         """Initialization."""
         self.res = res
 
-def _db_login(relogin = 0):
-
+def _db_login(dbhost=CFG_DATABASE_HOST, relogin=0):
     """Login to the database."""
 
     ## Note: we are using "use_unicode=False", because we want to
@@ -105,51 +109,51 @@ def _db_login(relogin = 0):
     ## upgrade to more recent versions anyway.
 
     if CFG_MISCUTIL_SQL_USE_SQLALCHEMY:
-        return connect(host=CFG_DATABASE_HOST, port=int(CFG_DATABASE_PORT),
+        return connect(host=dbhost, port=int(CFG_DATABASE_PORT),
                        db=CFG_DATABASE_NAME, user=CFG_DATABASE_USER,
                        passwd=CFG_DATABASE_PASS,
                        use_unicode=False, charset='utf8')
     else:
         thread_ident = (os.getpid(), get_ident())
     if relogin:
-        _DB_CONN[thread_ident] = connect(host=CFG_DATABASE_HOST,
+        _DB_CONN[dbhost][thread_ident] = connect(host=dbhost,
                                          port=int(CFG_DATABASE_PORT),
                                          db=CFG_DATABASE_NAME,
                                          user=CFG_DATABASE_USER,
                                          passwd=CFG_DATABASE_PASS,
                                          use_unicode=False, charset='utf8')
-        return _DB_CONN[thread_ident]
+        return _DB_CONN[dbhost][thread_ident]
     else:
-        if _DB_CONN.has_key(thread_ident):
-            return _DB_CONN[thread_ident]
+        if _DB_CONN[dbhost].has_key(thread_ident):
+            return _DB_CONN[dbhost][thread_ident]
         else:
-            _DB_CONN[thread_ident] = connect(host=CFG_DATABASE_HOST,
+            _DB_CONN[dbhost][thread_ident] = connect(host=dbhost,
                                              port=int(CFG_DATABASE_PORT),
                                              db=CFG_DATABASE_NAME,
                                              user=CFG_DATABASE_USER,
                                              passwd=CFG_DATABASE_PASS,
                                              use_unicode=False, charset='utf8')
-            return _DB_CONN[thread_ident]
+            return _DB_CONN[dbhost][thread_ident]
 
-def _db_logout():
+def _db_logout(dbhost=CFG_DATABASE_HOST):
     """Close a connection."""
     try:
-        del _DB_CONN[(os.getpid(), get_ident())]
+        del _DB_CONN[dbhost][(os.getpid(), get_ident())]
     except KeyError:
         pass
 
-def close_connection():
+def close_connection(dbhost=CFG_DATABASE_HOST):
     """
     Enforce the closing of a connection
     Highly relevant in multi-processing and multi-threaded modules
     """
     try:
-        _DB_CONN[(os.getpid(), get_ident())].close()
-        del(_DB_CONN[(os.getpid(), get_ident())])
+        _DB_CONN[dbhost][(os.getpid(), get_ident())].close()
+        del(_DB_CONN[dbhost][(os.getpid(), get_ident())])
     except KeyError:
         pass
 
-def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False):
+def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave=False):
     """Run SQL on the server with PARAM and return result.
     @param param: tuple of string params to insert in the query (see
     notes below)
@@ -181,13 +185,17 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False):
         # do not connect to the database as the site is closed for maintenance:
         return []
 
-    ### log_sql_query(sql, param) ### UNCOMMENT ONLY IF you REALLY want to log all queries
-
     if param:
         param = tuple(param)
 
+    dbhost = CFG_DATABASE_HOST
+    if run_on_slave and CFG_DATABASE_SLAVE:
+        dbhost = CFG_DATABASE_SLAVE
+
+    ### log_sql_query(dbhost, sql, param) ### UNCOMMENT ONLY IF you REALLY want to log all queries
+
     try:
-        db = _db_login()
+        db = _db_login(dbhost)
         cur = db.cursor()
         gc.disable()
         rc = cur.execute(sql, param)
@@ -195,7 +203,7 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False):
     except OperationalError: # unexpected disconnect, bad malloc error, etc
         # FIXME: now reconnect is always forced, we may perhaps want to ping() first?
         try:
-            db = _db_login(relogin=1)
+            db = _db_login(dbhost, relogin=1)
             cur = db.cursor()
             gc.disable()
             rc = cur.execute(sql, param)
@@ -229,7 +237,7 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False):
             rc = cur.lastrowid
         return rc
 
-def run_sql_many(query, params, limit=CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT):
+def run_sql_many(query, params, limit=CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT, run_on_slave=False):
     """Run SQL on the server with PARAM.
     This method does executemany and is therefore more efficient than execute
     but it has sense only with queries that affect state of a database
@@ -243,19 +251,22 @@ def run_sql_many(query, params, limit=CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT):
 
     @return: SQL result as provided by database
     """
+    dbhost = CFG_DATABASE_HOST
+    if run_on_slave and CFG_DATABASE_SLAVE:
+        dbhost = CFG_DATABASE_SLAVE
     i = 0
     r = None
     while i < len(params):
         ## make partial query safely (mimicking procedure from run_sql())
         try:
-            db = _db_login()
+            db = _db_login(dbhost)
             cur = db.cursor()
             gc.disable()
             rc = cur.executemany(query, params[i:i + limit])
             gc.enable()
         except OperationalError:
             try:
-                db = _db_login(relogin=1)
+                db = _db_login(dbhost, relogin=1)
                 cur = db.cursor()
                 gc.disable()
                 rc = cur.executemany(query, params[i:i + limit])
@@ -270,7 +281,7 @@ def run_sql_many(query, params, limit=CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT):
         i += limit
     return r
 
-def run_sql_with_limit(query, param=None, n=0, with_desc=False, wildcard_limit=0):
+def run_sql_with_limit(query, param=None, n=0, with_desc=False, wildcard_limit=0, run_on_slave=False):
     """This function should be used in some cases, instead of run_sql function, in order
         to protect the db from queries that might take a log time to respond
         Ex: search queries like [a-z]+ ; cern*; a->z;
@@ -282,9 +293,9 @@ def run_sql_with_limit(query, param=None, n=0, with_desc=False, wildcard_limit=0
     except ValueError:
         raise
     if wildcard_limit < 1:#no limit on the wildcard queries
-        return run_sql(query, param, n, with_desc)
+        return run_sql(query, param, n, with_desc, run_on_slave=run_on_slave)
     safe_query = query + " limit %s" %wildcard_limit
-    res = run_sql(safe_query, param, n, with_desc)
+    res = run_sql(safe_query, param, n, with_desc, run_on_slave=run_on_slave)
     if len(res) == wildcard_limit:
         raise InvenioDbQueryWildcardLimitError(res)
     return res
@@ -303,7 +314,7 @@ def blob_to_string(ablob):
     else:
         return ablob
 
-def log_sql_query(sql, param=None):
+def log_sql_query(dbhost, sql, param=None):
     """Log SQL query into prefix/var/log/dbquery.log log file.  In order
        to enable logging of all SQL queries, please uncomment one line
        in run_sql() above. Useful for fine-level debugging only!
@@ -314,6 +325,7 @@ def log_sql_query(sql, param=None):
     log_path = CFG_LOGDIR + '/dbquery.log'
     date_of_log = convert_datestruct_to_datetext(time.localtime())
     message = date_of_log + '-->\n'
+    message += indent_text('Host:\n' + indent_text(str(dbhost), 2, wrap=True), 2)
     message += indent_text('Query:\n' + indent_text(str(sql), 2, wrap=True), 2)
     message += indent_text('Params:\n' + indent_text(str(param), 2, wrap=True), 2)
     message += '-----------------------------\n\n'
@@ -324,7 +336,7 @@ def log_sql_query(sql, param=None):
     except:
         pass
 
-def get_table_update_time(tablename):
+def get_table_update_time(tablename, run_on_slave=False):
     """Return update time of TABLENAME.  TABLENAME can contain
        wildcard `%' in which case we return the maximum update time
        value.
@@ -338,7 +350,8 @@ def get_table_update_time(tablename):
     # MySQL-5.0, we can employ a much cleaner technique of using
     # SELECT UPDATE_TIME FROM INFORMATION_SCHEMA.TABLES WHERE
     # table_name='collection'.
-    res = run_sql("SHOW TABLE STATUS LIKE %s", (tablename,))
+    res = run_sql("SHOW TABLE STATUS LIKE %s", (tablename,),
+                  run_on_slave=run_on_slave)
     update_times = [] # store all update times
     for row in res:
         if type(row[10]) is long or \
@@ -353,13 +366,14 @@ def get_table_update_time(tablename):
             update_times.append(str(row[11]))
     return max(update_times)
 
-def get_table_status_info(tablename):
+def get_table_status_info(tablename, run_on_slave=False):
     """Return table status information on TABLENAME.  Returned is a
        dict with keys like Name, Rows, Data_length, Max_data_length,
        etc.  If TABLENAME does not exist, return empty dict.
     """
     # Note: again a hack so that it works on all MySQL 4.0, 4.1, 5.0
-    res = run_sql("SHOW TABLE STATUS LIKE %s", (tablename,))
+    res = run_sql("SHOW TABLE STATUS LIKE %s", (tablename,),
+                  run_on_slave=run_on_slave)
     table_status_info = {} # store all update times
     for row in res:
         if type(row[10]) is long or \
@@ -415,7 +429,7 @@ def wash_table_column_name(colname):
         raise Exception('The table column %s is not valid.' % repr(colname))
     return colname
 
-def real_escape_string(unescaped_string):
+def real_escape_string(unescaped_string, run_on_slave=False):
     """
     Escapes special characters in the unescaped string for use in a DB query.
 
@@ -425,6 +439,9 @@ def real_escape_string(unescaped_string):
     @return: Returns the escaped string
     @rtype: str
     """
-    connection_object = _db_login()
+    dbhost = CFG_DATABASE_HOST
+    if run_on_slave and CFG_DATABASE_SLAVE:
+        dbhost = CFG_DATABASE_SLAVE
+    connection_object = _db_login(dbhost)
     escaped_string = connection_object.escape_string(unescaped_string)
     return escaped_string

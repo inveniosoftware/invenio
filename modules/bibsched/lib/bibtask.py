@@ -991,7 +991,7 @@ def _task_sig_sleep(sig, frame):
     write_message("task_sig_sleep(), got signal %s frame %s"
             % (sig, frame), verbose=9)
     write_message("sleeping as soon as possible...")
-    _db_login(1)
+    _db_login(relogin=1)
     task_update_status("ABOUT TO SLEEP")
 
 def _task_sig_stop(sig, frame):
@@ -999,7 +999,7 @@ def _task_sig_stop(sig, frame):
     write_message("task_sig_stop(), got signal %s frame %s"
             % (sig, frame), verbose=9)
     write_message("stopping as soon as possible...")
-    _db_login(1) # To avoid concurrency with an interrupted run_sql call
+    _db_login(relogin=1) # To avoid concurrency with an interrupted run_sql call
     task_update_status("ABOUT TO STOP")
 
 def _task_sig_suicide(sig, frame):
@@ -1009,7 +1009,7 @@ def _task_sig_suicide(sig, frame):
     write_message("suiciding myself now...")
     task_update_status("SUICIDING")
     write_message("suicided")
-    _db_login(1)
+    _db_login(relogin=1)
     task_update_status("SUICIDED")
     sys.exit(1)
 
