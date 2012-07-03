@@ -101,6 +101,7 @@ class InvenioSession(dict):
         self._timeout = 0
         self._locked = 0
         self._invalid = 0
+        self._dirty = False
         self._http_ip = None
         self._https_ip = None
         self.__need_https = False
@@ -155,6 +156,16 @@ class InvenioSession(dict):
         # need cleanup?
         if random.randint(1, CFG_WEBSESSION_CLEANUP_CHANCE) == 1:
             self.cleanup()
+
+    def __setitem__(self, key, value):
+        if self.get(key) != value:
+            dict.__setitem__(self, key, value)
+            self._dirty = True
+
+    def __delitem__(self, key):
+        if key in self:
+            dict.__delitem__(self, key)
+            self._dirty = True
 
     def set_remember_me(self, remember_me=True):
         """
@@ -226,7 +237,8 @@ class InvenioSession(dict):
         """
         Save the session to the database.
         """
-        if not self._invalid and self._sid:
+        uid = self.get('uid', -1)
+        if not self._invalid and self._sid and self._dirty and uid > 0:
             session_dict = {"_data" : self.copy(),
                     "_created" : self._created,
                     "_accessed": self._accessed,
@@ -240,7 +252,7 @@ class InvenioSession(dict):
             session_expiry = time.time() + self._timeout + CFG_WEBSESSION_ONE_DAY
             session_expiry = convert_datestruct_to_datetext(time.gmtime(session_expiry))
 
-            uid = self.get('uid', -1)
+            ## We store something only for real users.
             run_sql("""
                 INSERT session(
                     session_key,
@@ -263,7 +275,7 @@ class InvenioSession(dict):
         """
         Delete the session.
         """
-        run_sql("DELETE FROM session WHERE session_key=%s", (self._sid, ))
+        run_sql("DELETE LOW_PRIORITY FROM session WHERE session_key=%s", (self._sid, ))
         self.clear()
 
     def invalidate(self):
@@ -397,7 +409,7 @@ class InvenioSession(dict):
             of the request handling.
             """
             run_sql("""
-                DELETE FROM session
+                DELETE LOW_PRIORITY FROM session
                 WHERE session_expiry<=UTC_TIMESTAMP()
             """)
         self._req.register_cleanup(session_cleanup)

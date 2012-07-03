@@ -194,10 +194,12 @@ def getUid(req):
     if uid == -1: # first time, so create a guest user
         if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
             uid = session['uid'] = createGuestUser()
+            session.set_remember_me(False)
             guest = 1
         else:
             if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0:
                 session['uid'] = 0
+                session.set_remember_me(False)
                 return 0
             else:
                 return -1
@@ -234,14 +236,13 @@ def setUid(req, uid, remember_me=False):
     session['uid'] = uid
     if remember_me:
         session.set_timeout(86400)
-        session.set_remember_me()
+    session.set_remember_me(remember_me)
     if uid > 0:
         user_info = collect_user_info(req, login_time=True)
         session['user_info'] = user_info
         req._user_info = user_info
     else:
         del session['user_info']
-    session.save()
     return uid
 
 def session_param_del(req, key):
@@ -250,7 +251,6 @@ def session_param_del(req, key):
     """
     session = get_session(req)
     del session[key]
-    session.save()
 
 def session_param_set(req, key, value):
     """
@@ -258,7 +258,6 @@ def session_param_set(req, key, value):
     """
     session = get_session(req)
     session[key] = value
-    session.save()
 
 def session_param_get(req, key):
     """
@@ -657,7 +656,7 @@ def logoutUser(req):
     if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
         uid = createGuestUser()
         session['uid'] = uid
-        session.save()
+        session.set_remember_me(False)
     else:
         uid = 0
         session.invalidate()
