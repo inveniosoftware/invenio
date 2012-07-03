@@ -142,14 +142,14 @@ def load_role_definition(role_id):
     @param role_id:
     @return: a deserialized compiled role definition
     """
-    res = run_sql("SELECT firerole_def_ser FROM accROLE WHERE id=%s", (role_id, ), 1)
+    res = run_sql("SELECT firerole_def_ser FROM accROLE WHERE id=%s", (role_id, ), 1, run_on_slave=True)
     if res:
         try:
             return deserialize(res[0][0])
         except Exception:
             ## Something bad might have happened? (Update of Python?)
             repair_role_definitions()
-            res = run_sql("SELECT firerole_def_ser FROM accROLE WHERE id=%s", (role_id, ), 1)
+            res = run_sql("SELECT firerole_def_ser FROM accROLE WHERE id=%s", (role_id, ), 1, run_on_slave=True)
             if res:
                 return deserialize(res[0][0])
     return CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ
