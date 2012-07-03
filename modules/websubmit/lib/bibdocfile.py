@@ -58,6 +58,8 @@ import base64
 import binascii
 import cgi
 import sys
+from warnings import warn
+
 if sys.hexversion < 0x2060000:
     from md5 import md5
 else:
@@ -1399,7 +1401,6 @@ class BibDoc:
             docname = normalize_docname(docname)
         self.docfiles = []
         self.md5s = None
-        self.related_files = []
         self.human_readable = human_readable
         if docid:
             if not recid:
@@ -1408,17 +1409,7 @@ class BibDoc:
                     recid = res[0][0]
                     doctype = res[0][1]
                 else:
-                    res = run_sql("SELECT id_bibdoc1,type FROM bibdoc_bibdoc WHERE id_bibdoc2=%s LIMIT 1", (docid,), 1)
-                    if res:
-                        main_docid = res[0][0]
-                        doctype = res[0][1]
-                        res = run_sql("SELECT id_bibrec,type FROM bibrec_bibdoc WHERE id_bibdoc=%s LIMIT 1", (main_docid,), 1)
-                        if res:
-                            recid = res[0][0]
-                        else:
-                            raise InvenioWebSubmitFileError, "The docid %s associated with docid %s is not associated with any record" % (main_docid, docid)
-                    else:
-                        raise InvenioWebSubmitFileError, "The docid %s is not associated to any recid or other docid" % docid
+                    warn("Docid %s is orphan" % docid)
             else:
                 res = run_sql("SELECT type FROM bibrec_bibdoc WHERE id_bibrec=%s AND id_bibdoc=%s LIMIT 1", (recid, docid,), 1)
                 if res:
@@ -1497,8 +1488,6 @@ class BibDoc:
                     raise InvenioWebSubmitFileError, e
         # build list of attached files
         self._build_file_list('init')
-        # link with related_files
-        self._build_related_file_list()
 
     def __repr__(self):
         """
@@ -1653,7 +1642,6 @@ class BibDoc:
             self.status = new_status
             self.touch()
             self._build_file_list()
-            self._build_related_file_list()
 
     def add_file_new_version(self, filename, description=None, comment=None, format=None, flags=None):
         """
@@ -2053,7 +2041,6 @@ class BibDoc:
             Md5Folder(self.basedir).update()
             self.touch()
             self._build_file_list('rename')
-            self._build_related_file_list()
 
     def set_comment(self, comment, format, version=None):
         """
@@ -2505,24 +2492,6 @@ class BibDoc:
                 if context == 'rename':
                     md = '' # No modification time
                 log_action(deletedstr, self.id, docname, format, version, size, checksum, md)
-
-    def _build_related_file_list(self):
-        """Lists all files attached to the bibdoc. This function should be
-        called everytime the bibdoc is modified within e.g. its icon.
-        @deprecated: use subformats instead.
-        """
-        self.related_files = {}
-        res = run_sql("SELECT ln.id_bibdoc2,ln.type,bibdoc.status FROM "
-            "bibdoc_bibdoc AS ln,bibdoc WHERE id=ln.id_bibdoc2 AND "
-            "ln.id_bibdoc1=%s", (self.id,))
-        for row in res:
-            docid = row[0]
-            doctype = row[1]
-            if row[2] != 'DELETED':
-                if not self.related_files.has_key(doctype):
-                    self.related_files[doctype] = []
-                cur_doc = BibDoc(docid=docid, human_readable=self.human_readable)
-                self.related_files[doctype].append(cur_doc)
 
     def get_total_size_latest_version(self):
         """Return the total size used on disk of all the files belonging
