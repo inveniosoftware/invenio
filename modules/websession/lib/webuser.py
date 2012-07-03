@@ -324,7 +324,8 @@ def isGuestUser(uid, run_on_slave=True):
     """
     out = 1
     try:
-        res = run_sql("SELECT email FROM user WHERE id=%s LIMIT 1", (uid,), 1, run_on_slave)
+        res = run_sql("SELECT email FROM user WHERE id=%s LIMIT 1", (uid,), 1,
+                      run_on_slave=run_on_slave)
         if res:
             if res[0][0]:
                 out = 0
