@@ -166,7 +166,7 @@ class RestrictedCollectionDataCacher(DataCacher):
             try:
                 res = run_sql("""SELECT DISTINCT ar.value
                     FROM accROLE_accACTION_accARGUMENT raa JOIN accARGUMENT ar ON raa.id_accARGUMENT = ar.id
-                    WHERE ar.keyword = 'collection' AND raa.id_accACTION = %s""", (VIEWRESTRCOLL_ID,))
+                    WHERE ar.keyword = 'collection' AND raa.id_accACTION = %s""", (VIEWRESTRCOLL_ID,), run_on_slave=True)
             except Exception:
                 # database problems, return empty cache
                 return []

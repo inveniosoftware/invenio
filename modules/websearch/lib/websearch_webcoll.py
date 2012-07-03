@@ -896,7 +896,7 @@ def get_database_last_updated_timestamp():
     database_tables_timestamps.append(get_table_update_time('field%'))
     database_tables_timestamps.append(get_table_update_time('format%'))
     database_tables_timestamps.append(get_table_update_time('rnkMETHODNAME'))
-    database_tables_timestamps.append(get_table_update_time('accROLE_accACTION_accARGUMENT'))
+    database_tables_timestamps.append(get_table_update_time('accROLE_accACTION_accARGUMENT', run_on_slave=True))
     return max(database_tables_timestamps)
 
 def get_cache_last_updated_timestamp():

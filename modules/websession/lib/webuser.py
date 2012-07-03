@@ -358,7 +358,7 @@ def isUserSuperAdmin(user_info):
         FROM accROLE r LEFT JOIN user_accROLE ur
         ON r.id = ur.id_accROLE
         WHERE r.name = %s AND
-        ur.id_user = %s AND ur.expiration>=NOW() LIMIT 1""", (SUPERADMINROLE, user_info['uid']), 1):
+        ur.id_user = %s AND ur.expiration>=NOW() LIMIT 1""", (SUPERADMINROLE, user_info['uid']), 1, run_on_slave=True):
         return True
     return acc_firerole_check_user(user_info, load_role_definition(acc_get_role_id(SUPERADMINROLE)))
 
@@ -945,7 +945,7 @@ def list_users_in_role(role):
                        FROM user_accROLE uacc JOIN accROLE acc
                          ON uacc.id_accROLE=acc.id
                       WHERE acc.name=%s""",
-                  (role,))
+                  (role,), run_on_slave=True)
     if res:
         return map(lambda x: int(x[0]), res)
     return []
@@ -969,7 +969,7 @@ def list_users_in_roles(role_list):
         for role in role_list[:-1]:
             query_addons += "acc.name=%s OR "
         query_addons += "acc.name=%s"
-    res = run_sql(query + query_addons, query_params)
+    res = run_sql(query + query_addons, query_params, run_on_slave=True)
     if res:
         return map(lambda x: int(x[0]), res)
     return []
