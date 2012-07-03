@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -317,14 +317,14 @@ def get_uid_from_email(email):
         register_exception()
         return -1
 
-def isGuestUser(uid):
+def isGuestUser(uid, run_on_slave=True):
     """It Checks if the userId corresponds to a guestUser or not
 
        isGuestUser(uid) -> boolean
     """
     out = 1
     try:
-        res = run_sql("SELECT email FROM user WHERE id=%s LIMIT 1", (uid,), 1)
+        res = run_sql("SELECT email FROM user WHERE id=%s LIMIT 1", (uid,), 1, run_on_slave)
         if res:
             if res[0][0]:
                 out = 0
@@ -799,7 +799,7 @@ def create_userinfobox_body(req, uid, language="en"):
     try:
         return tmpl.tmpl_create_userinfobox(ln=language,
                                             url_referer=url_referer,
-                                            guest=isGuestUser(uid),
+                                            guest=int(user_info['guest']),
                                             username=get_nickname_or_email(uid),
                                             submitter=user_info['precached_viewsubmissions'],
                                             referee=user_info['precached_useapprove'],
@@ -852,7 +852,7 @@ def create_useractivities_menu(req, uid, navmenuid, ln="en"):
             ln=ln,
             selected=is_user_menu_selected,
             url_referer=url_referer,
-            guest=isGuestUser(uid),
+            guest=int(user_info['guest']),
             username=get_nickname_or_email(uid),
             submitter=user_info['precached_viewsubmissions'],
             referee=user_info['precached_useapprove'],
@@ -916,7 +916,7 @@ def create_adminactivities_menu(req, uid, navmenuid, ln="en"):
             ln=ln,
             selected=navmenuid == 'admin',
             url_referer=url_referer,
-            guest=isGuestUser(uid),
+            guest=int(user_info['guest']),
             username=get_nickname_or_email(uid),
             submitter=user_info['precached_viewsubmissions'],
             referee=user_info['precached_useapprove'],
