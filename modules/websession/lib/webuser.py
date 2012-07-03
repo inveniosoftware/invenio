@@ -191,22 +191,23 @@ def getUid(req):
         ## Not possible to obtain a session
         return 0
     uid = session.get('uid', -1)
-    if uid == -1: # first time, so create a guest user
-        if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-            uid = session['uid'] = createGuestUser()
-            session.set_remember_me(False)
-            guest = 1
-        else:
-            if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0:
-                session['uid'] = 0
+    if not session.need_https:
+        if uid == -1: # first time, so create a guest user
+            if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                uid = session['uid'] = createGuestUser()
                 session.set_remember_me(False)
-                return 0
+                guest = 1
             else:
-                return -1
-    else:
-        if not hasattr(req, '_user_info') and 'user_info' in session:
-            req._user_info = session['user_info']
-            req._user_info = collect_user_info(req, refresh=True)
+                if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0:
+                    session['uid'] = 0
+                    session.set_remember_me(False)
+                    return 0
+                else:
+                    return -1
+        else:
+            if not hasattr(req, '_user_info') and 'user_info' in session:
+                req._user_info = session['user_info']
+                req._user_info = collect_user_info(req, refresh=True)
 
     if guest == 0:
         guest = isGuestUser(uid)
