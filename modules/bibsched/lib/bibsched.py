@@ -215,7 +215,7 @@ def spawn_task(command, wait=False):
     automatically propagated to the spawned process.
     """
     def preexec():  # Don't forward signals.
-        os.setpgrp()
+        os.setsid()
 
     process = Popen(command, preexec_fn=preexec, shell=True)
     if wait:
