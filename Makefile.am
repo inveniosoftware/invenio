@@ -517,4 +517,7 @@ update-v1.0.0-rc0-tables: # from v1.0.0-rc0 to v1.0.0
 update-v1.0.0-tables: # from v1.0.0 to v1.0.1
 	@echo "Nothing to do; table structure did not change between v1.0.0 and v1.0.1."
 
+update-v1.0.1-tables: # from v1.0.1 to v1.0.2
+	@echo "ALTER TABLE session ADD KEY session_expiry (session_expiry);" | ${prefix}/bin/dbexec
+
 CLEANFILES = *~ *.pyc *.tmp

@@ -2851,7 +2851,8 @@ CREATE TABLE IF NOT EXISTS session (
   session_object blob,
   uid int(15) unsigned NOT NULL,
   UNIQUE KEY session_key (session_key),
-  KEY uid (uid)
+  KEY uid (uid),
+  KEY session_expiry (session_expiry)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS user (
