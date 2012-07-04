@@ -1869,7 +1869,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     can_see_hidden = False
     if req:
         user_info = collect_user_info(req)
-        can_see_hidden = (acc_authorize_action(user_info, 'runbibedit')[0] == 0)
+        can_see_hidden = user_info.get('precached_canseehiddenmarctags', False)
     if can_see_hidden:
         myhiddens = []
 
@@ -4259,7 +4259,9 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
         display_claim_this_paper = False
     #check from user information if the user has the right to see hidden fields/tags in the
     #records as well
-    can_see_hidden = (acc_authorize_action(user_info, 'runbibedit')[0] == 0)
+    can_see_hidden = False
+    if user_info:
+        can_see_hidden = user_info.get('precached_canseehiddenmarctags', False)
 
     out = ""
 

@@ -1100,6 +1100,7 @@ def collect_user_info(req, login_time=False, refresh=False):
         'precached_viewclaimlink' : False,
         'precached_usepaperclaim' : False,
         'precached_usepaperattribution' : False,
+        'precached_canseehiddenmarctags' : False,
     }
 
     try:
@@ -1230,6 +1231,7 @@ def collect_user_info(req, login_time=False, refresh=False):
                 user_info['precached_viewsubmissions'] = isUserSubmitter(user_info)
                 user_info['precached_useapprove'] = isUserReferee(user_info)
                 user_info['precached_useadmin'] = isUserAdmin(user_info)
+                user_info['precached_canseehiddenmarctags'] = acc_authorize_action(user_info, 'runbibedit')[0] == 0
                 usepaperclaim = False
                 usepaperattribution = False
                 viewclaimlink = False
