@@ -443,6 +443,31 @@ class IntBitSetTest(unittest.TestCase):
                 self._helper_sanity_test(intbitset1)
                 self.assertEqual(res1, res2)
 
+    def test_set_getitem(self):
+        """intbitset - __getitem__"""
+        for set1 in self.sets + [[]]:
+            intbitset1 = intbitset(set1)
+            pythonlist1 = list(set1)
+            for i in xrange(-2 * len(set1) - 2, 2 * len(set1) + 2):
+                try:
+                    res1 = pythonlist1[i]
+                except IndexError:
+                    self.assertRaises(IndexError, intbitset1.__getitem__, i)
+                    continue
+                res2 = intbitset1[i]
+                self.assertEqual(res1, res2)
+
+        for set1 in self.sets + [[]]:
+            intbitset1 = intbitset(set1)
+            pythonlist1 = list(set1)
+            for start in xrange(-2 * len(set1) - 2, 2 * len(set1) + 2):
+                for stop in xrange(-2 * len(set1) - 2, 2 * len(set1) + 2):
+                    for step in xrange(1, 3):
+                        res1 = pythonlist1[start:stop:step]
+                        res2 = intbitset1[start:stop:step]
+                        self.assertEqual(res1, list(res2), "Failure with set %s, start %s, stop %s, step %s, found %s, expected %s, indices: %s" % (set1, start, stop, step, list(res2), res1, slice(start, stop, step).indices(len(pythonlist1))))
+
+
     def test_set_iterator(self):
         """intbitset - set iterator"""
         for set1 in self.sets + [[]]:

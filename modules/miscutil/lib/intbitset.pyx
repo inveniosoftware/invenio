@@ -16,7 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __revision__ = "$Id$"
-__apilevel__ = 1.04
+__apilevel__ = 1.05
 
 """
 Defines an intbitset data object to hold unordered sets of unsigned
@@ -437,6 +437,71 @@ cdef class intbitset:
             return ret
         else:
             return self.__repr__()
+
+    def __getitem__(self, key):
+        cdef Py_ssize_t i
+        cdef int elem = -1
+        cdef int start
+        cdef int end
+        cdef int step
+        if hasattr(key, 'indices'):
+            ## This is a slice object!
+            if self.bitset.trailing_bits and (key.start < 0 or key.end < 0):
+                raise IndexError("negative indexes are not allowed on infinite intbitset")
+            retset = intbitset()
+            start, end, step = key.indices(intBitSetGetTot(self.bitset))
+            if step < 0:
+                raise ValueError("negative steps are not supported")
+            for i in range(start):
+                elem = intBitSetGetNext(self.bitset, elem)
+                if elem < 0:
+                    return retset()
+            for i in range(end - start):
+                elem = intBitSetGetNext(self.bitset, elem)
+                if elem < 0:
+                    return retset
+                if i % step == 0:
+                    retset.add(elem)
+            return retset
+        else:
+            end = key
+            if end < 0:
+                if self.bitset.trailing_bits:
+                    raise IndexError("negative indexes are not allowed on infinite intbitset")
+                end += intBitSetGetTot(self.bitset)
+                if end < 0:
+                    raise IndexError("intbitset index out of range")
+            if end >= intBitSetGetTot(self.bitset):
+                raise IndexError("intbitset index out of range")
+            for i in range(end + 1):
+                elem = intBitSetGetNext(self.bitset, elem)
+            return elem
+
+    #def __getslice__(self, Py_ssize_t key1, Py_ssize_t key2):
+        #cdef Py_ssize_t i
+        #cdef int elem = -1
+        #ret = intbitset()
+        #if key1 < 0:
+            #if self.bitset.trailing_bits:
+                #raise IndexError("negative indexes are not allowed on infinite intbitset")
+            #key1 += intBitSetGetTot(self.bitset)
+            #if key1 < 0:
+                #key1 = 0
+        #if key2 < 0:
+            #if self.bitset.trailing_bits:
+                #raise IndexError("negative indexes are not allowed on infinite intbitset")
+            #key2 += intBitSetGetTot(self.bitset)
+        #for i in range(key1):
+            #elem = intBitSetGetNext(self.bitset, elem)
+            #if elem < -1:
+                #return ret
+        #for i in range(key2 + 1):
+            #elem = intBitSetGetNext(self.bitset, elem)
+            #if elem < -1:
+                #return ret
+            #ret.add(elem)
+        #return ret
+
 
     ## Buffer interface
     #def __getreadbuffer__(self, int i, void **p):
