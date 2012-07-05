@@ -802,7 +802,7 @@ def move_drafts_articles_to_ready(journal_name, issue):
     for collection in collections_to_refresh.keys():
         task_low_level_submission('webcoll',
                                   'WebJournal',
-                                  '-f', '-p', '2','-c', collection,
+                                  '-f', '-P', '2', '-p', '1', '-c', collection,
                                   '-I', task_sequence_id)
 
 def update_draft_record_metadata(record, protected_datafields, keyword_to_remove):
