@@ -69,6 +69,7 @@ IntBitSet *intBitSetISub(IntBitSet *const x, IntBitSet *const y);
 int intBitSetAdaptMax(IntBitSet *const x, IntBitSet *const y);
 int intBitSetAdaptMin(IntBitSet *const x, IntBitSet *const y);
 int intBitSetGetNext(const IntBitSet *const x, register int last);
+int intBitSetGetLast(const IntBitSet *const x);
 /** Compare.
  * Compare two intbitset.
  * Returns 0 if the two bitset are equals.

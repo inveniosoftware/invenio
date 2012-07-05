@@ -427,6 +427,22 @@ class IntBitSetTest(unittest.TestCase):
             self.assertEqual(intbitset1, intbitset2)
             self.assertEqual(intbitset1, intbitset3)
 
+    def test_set_pop(self):
+        """intbitset - set pop"""
+        for set1 in self.sets + [[]]:
+            intbitset1 = intbitset(set1)
+            pythonlist1 = list(set1)
+            while True:
+                try:
+                    res1 = pythonlist1.pop()
+                except IndexError:
+                    self.assertRaises(KeyError, intbitset1.pop)
+                    self._helper_sanity_test(intbitset1)
+                    break
+                res2 = intbitset1.pop()
+                self._helper_sanity_test(intbitset1)
+                self.assertEqual(res1, res2)
+
     def test_set_iterator(self):
         """intbitset - set iterator"""
         for set1 in self.sets + [[]]:

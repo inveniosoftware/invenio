@@ -385,8 +385,22 @@ IntBitSet *intBitSetISub(IntBitSet *const dst, IntBitSet *const src) {
     return dst;
 }
 
+int intBitSetGetLast(const IntBitSet *const x) {
+    register word_t *base = x->bitset;
+    register word_t *end = x->bitset + x->allocated;
+    register int i;
+    if (x->trailing_bits) return -2;
+    while (base < end) {
+        if (*(--end))
+            for (i=wordbitsize; i>=0; --i)
+                if ((*end & ((word_t) 1 << (word_t) i)))
+                    return (int) i + (int) (end - x->bitset) * wordbitsize;
+    }
+    return -1;
+}
+
 int intBitSetGetNext(const IntBitSet *const x, register int last) {
-    register word_t* base = x->bitset + (++last / wordbitsize);
+    register word_t *base = x->bitset + (++last / wordbitsize);
     register int i = last % wordbitsize;
     register word_t *end = x->bitset + x->allocated;
     while(base < end) {
