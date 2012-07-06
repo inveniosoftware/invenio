@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -37,7 +37,7 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_ETCDIR, \
      CFG_CACHEDIR, \
-     CFG_TMPDIR, \
+     CFG_TMPSHAREDDIR, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_RECORD
 from invenio.messages import gettext_set_language
@@ -766,7 +766,7 @@ def move_drafts_articles_to_ready(journal_name, issue):
                 record_xml = format_record(recid, of='xm')
                 if not record_xml:
                     continue
-                new_record_xml_path = os.path.join(CFG_TMPDIR,
+                new_record_xml_path = os.path.join(CFG_TMPSHAREDDIR,
                                                    'webjournal_publish_' + \
                                                    str(recid) + '.xml')
                 if os.path.exists(new_record_xml_path):
