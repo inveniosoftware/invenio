@@ -282,7 +282,7 @@ Contents
       $ wget http://invenio-software.org/download/invenio-1.0.1.tar.gz
       $ wget http://invenio-software.org/download/invenio-1.0.1.tar.gz.md5
       $ wget http://invenio-software.org/download/invenio-1.0.1.tar.gz.sig
-      $ md5sum -v -c invenio-1.0.1.tar.gz.md5
+      $ md5sum -c invenio-1.0.1.tar.gz.md5
       $ gpg --verify invenio-1.0.1.tar.gz.sig invenio-1.0.1.tar.gz
       $ tar xvfz invenio-1.0.1.tar.gz
       $ cd invenio-1.0.1
@@ -338,7 +338,7 @@ Contents
           together with MD5 checksum and GnuPG cryptographic signature
           files useful for verifying the integrity of the tarball.
 
-      $ md5sum -v -c invenio-1.0.1.tar.gz.md5
+      $ md5sum -c invenio-1.0.1.tar.gz.md5
 
           Verify MD5 checksum.
 
