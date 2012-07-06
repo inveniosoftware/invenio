@@ -702,6 +702,18 @@ user's browser, but is not check server-side.</li>
 creation of your element. You can then add it to your submission
 page.</p>
 
+<p><b id="reservedelementnames">About element names</b>: some
+names are "reserved", and should not be used as names for elements, as
+they would overlap with filenames created internally by WebSubmit in
+the submission directory (curdir). You can still use these element
+names, but should be aware of the potential side effects of changing
+such variables with user submitted values. An up-to-date list of
+reserved filenames for your installation can be found by
+running <code>python -c 'from invenio.websubmit_config import
+CFG_RESERVED_SUBMISSION_FILENAMES;print
+CFG_RESERVED_SUBMISSION_FILENAMES'</code>.</p>
+
+
 <a name="3.2.1"></a><h4>3.2.1 User Defined Input Elements</h4>
 <p>This element is simply displaying the the content defined in the
   field "Element Description". The content must be HTML-escaped (or
@@ -792,6 +804,7 @@ refreshed.</li>
 <li>You should never specify a response element as "mandatory" when
 including it on your page.</li>
 </ul>
+
 A possible skeleton for a response element could be: (FIXME: Check...)
 </p>
 <pre class="code">

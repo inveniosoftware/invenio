@@ -292,6 +292,17 @@ def interface(req,
         except Exception, e:
             register_exception(req=req, alert_admin=True)
             return warningMsg(_("Unable to create a directory for this submission. The administrator has been alerted."), req, c, ln)
+
+    ## Retrieve the previous page, as submitted to curdir (before we
+    ## overwrite it with our curpage as declared from the incoming
+    ## form)
+    try:
+        fp = open(os.path.join(curdir, "curpage"))
+        previous_page_from_disk = fp.read()
+        fp.close()
+    except:
+        previous_page_from_disk = "1"
+
     # retrieve the original main menu url and save it in the "mainmenu" file
     if mainmenu != "":
         fp = open(os.path.join(curdir, "mainmenu"), "w")
@@ -367,9 +378,18 @@ def interface(req,
 
         # Do not write reserved filenames to disk
         if filename in CFG_RESERVED_SUBMISSION_FILENAMES:
-            # Unless there is really an element with that name in the
-            # interface, which means that admin authorized it
-            if not filename in [submission_field[3] for submission_field in get_form_fields_on_submission_page(subname, curpage)]:
+            # Unless there is really an element with that name on this
+            # page or previous one (either visited, or declared to be
+            # visited), which means that admin authorized it.
+            if not ((str(curpage).isdigit() and \
+                    filename in [submission_field[3] for submission_field in \
+                                 get_form_fields_on_submission_page(subname, curpage)]) or \
+                    (str(curpage).isdigit() and int(curpage) > 1 and \
+                    filename in [submission_field[3] for submission_field in \
+                                 get_form_fields_on_submission_page(subname, int(curpage) - 1)]) or \
+                    (previous_page_from_disk.isdigit() and \
+                     filename in [submission_field[3] for submission_field in \
+                                  get_form_fields_on_submission_page(subname, int(previous_page_from_disk))])):
                 # Still this will filter out reserved field names that
                 # might have been called by functions such as
                 # Create_Modify_Interface function in MBI step, or
@@ -902,6 +922,24 @@ def endaction(req,
     else:
         mainmenu = "%s/submit" % (CFG_SITE_URL,)
 
+    num_submission_pages = get_num_pages_of_submission(subname)
+    if num_submission_pages is not None:
+        nbpages = num_submission_pages
+    else:
+        ## Unable to determine the number of pages for this submission:
+        return warningMsg(_("Unable to determine the number of submission pages."), \
+                        req, CFG_SITE_NAME, ln)
+
+    ## Retrieve the previous page, as submitted to curdir (before we
+    ## overwrite it with our curpage as declared from the incoming
+    ## form)
+    try:
+        fp = open(os.path.join(curdir, "curpage"))
+        previous_page_from_disk = fp.read()
+        fp.close()
+    except:
+        previous_page_from_disk = str(num_submission_pages)
+
     ## retrieve the name of the file in which the reference of
     ## the submitted document will be stored
     rn_filename = get_parameter_value_for_doctype(doctype, "edsrn")
@@ -945,10 +983,16 @@ def endaction(req,
 
         # Do not write reserved filenames to disk
         if filename in CFG_RESERVED_SUBMISSION_FILENAMES:
-            # Unless there is really an element with that name in the
-            # interface, which means that admin authorized it
-            if not filename in [submission_field[3] for submission_field in get_form_fields_on_submission_page(subname, curpage)]:
-                # Still this will filter out reserved field names that
+            # Unless there is really an element with that name on this
+            # page, or on the previously visited one, which means that
+            # admin authorized it. Note that in endaction() curpage is
+            # equivalent to the "previous" page value
+            if not ((previous_page_from_disk.isdigit() and \
+                    filename in [submission_field[3] for submission_field in \
+                                  get_form_fields_on_submission_page(subname, int(previous_page_from_disk))]) or \
+                    (str(curpage).isdigit() and int(curpage) > 1 and \
+                     filename in [submission_field[3] for submission_field in \
+                                  get_form_fields_on_submission_page(subname, int(curpage) - 1)])):
                 # might have been called by functions such as
                 # Create_Modify_Interface function in MBI step, or
                 # dynamic fields in response elements, but that is
@@ -1032,14 +1076,6 @@ def endaction(req,
     if actname is None:
         ## Unknown action:
         return warningMsg(_("Unknown action"), req, c, ln)
-
-    num_submission_pages = get_num_pages_of_submission(subname)
-    if num_submission_pages is not None:
-        nbpages = num_submission_pages
-    else:
-        ## Unable to determine the number of pages for this submission:
-        return warningMsg(_("Unable to determine the number of submission pages."), \
-                        req, CFG_SITE_NAME, ln)
 
     ## Determine whether the action is finished
     ## (ie there are no other steps after the current one):
