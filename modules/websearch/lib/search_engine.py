@@ -2049,9 +2049,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         # fulltext/caption search warnings for INSPIRE:
         fields_to_be_searched = [f for o, p, f, m in basic_search_units]
         if 'fulltext' in fields_to_be_searched:
-            write_warning( _("Warning: full-text search is only available for a subset of papers mostly from %(x_range_from_year)s-%(x_range_to_year)s.") % \
-                          {'x_range_from_year': '2006',
-                           'x_range_to_year': '2012'}, req=req)
+            write_warning(_("Full-text search is currently available for all arXiv papers, many theses, a few report series and some journal articles"), req=req)
         elif 'caption' in fields_to_be_searched:
             write_warning(_("Warning: figure caption search is only available for a subset of papers mostly from %(x_range_from_year)s-%(x_range_to_year)s.") % \
                           {'x_range_from_year': '2008',
