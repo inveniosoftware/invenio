@@ -817,9 +817,9 @@ class Template:
                           document.forms[0].submit();
                          }
                        """ % {
-                         'msg' : _("The field %(field)s is mandatory.") + '\n' \
+                         'msg' : _("The field %(field)s is mandatory.") % returnto + '\\n' \
                                  + _("Going back to page") \
-                                 + str(returnto['page']),
+                                 + " " + str(returnto['page']),
                          'page' : returnto['page']
                        }
             else:
