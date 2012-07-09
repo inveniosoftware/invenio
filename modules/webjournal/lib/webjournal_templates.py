@@ -115,6 +115,41 @@ class Template:
                 ''' % (title_msg, msg, mail_msg)
         return page(req=req, title=title, body=box)
 
+    def tmpl_admin_regenerate_confirm(self,
+                                      ln,
+                                      journal_name,
+                                      issue,
+                                      issue_released_p):
+        """
+        Ask user confirmation about regenerating the issue, as well as if
+        we should move all the drafts to the public collection.
+
+        Parameters:
+
+             journal_name -  the journal for which the cache should
+                             be delete
+                    issue -  the issue for which the cache should be
+                             deleted
+                      ln  -  language
+        issue_released_p  -  is issue already released?
+        """
+        out = '''
+    <form action="/admin/webjournal/webjournaladmin.py/regenerate" name="regenerate" method="post">
+    You are going to refresh the cache for issue %(issue)s. Do you want to continue? <br/>
+    <input type="hidden" name="confirmed_p" value="confirmed"/>
+    <input type="hidden" name="journal_name" value="%(journal_name)s">
+    <input type="hidden" name="issue" value="%(issue)s">
+    <input type="hidden" name="ln" value="%(ln)s">
+    <input type="checkbox" name="publish_draft_articles_p" value="move" id="publish_draft_articles_p" %(disabled)s/><label for="publish_draft_articles_p">Also switch all "<em>Offline</em>" articles to "<em>Online</em>"</label>[<a target="_blank" href="/help/admin/webjournal-editor-guide#cache-online">?</a>]<br/></br>
+    <input class="adminbutton" type="submit" value="Regenerate"/>
+    </form>
+    ''' % {'issue': issue,
+           'journal_name': journal_name,
+           'ln': ln,
+           'disabled': not issue_released_p and 'disabled="disabled"' or ""}
+
+        return out
+
     def tmpl_admin_regenerate_success(self, ln, journal_name, issue):
         """
         Success message if a user applied the "regenerate" link. Links back to

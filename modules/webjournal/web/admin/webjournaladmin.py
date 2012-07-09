@@ -235,7 +235,8 @@ def alert(req, journal_name="", ln=CFG_SITE_LANG, sent="False", plainText=u"",
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def regenerate(req, journal_name="", issue="", ln=CFG_SITE_LANG):
+def regenerate(req, journal_name="", issue="", ln=CFG_SITE_LANG,
+               confirmed_p="", publish_draft_articles_p=""):
     """
     Clears the cache for the given issue.
     """
@@ -253,6 +254,8 @@ def regenerate(req, journal_name="", issue="", ln=CFG_SITE_LANG):
         journal_name = wash_journal_name(ln, journal_name)
         issue_number = wash_issue_number(ln, journal_name,
                                          issue)
+        confirmed_p = wash_url_argument(confirmed_p, 'str') == "confirmed"
+        publish_draft_articles_p = wash_url_argument(publish_draft_articles_p, 'str') == "move"
 
     except InvenioWebJournalNoJournalOnServerError, e:
         register_exception(req=req)
@@ -270,10 +273,12 @@ def regenerate(req, journal_name="", issue="", ln=CFG_SITE_LANG):
     auth = acc_authorize_action(getUid(req), 'cfgwebjournal',
                                 name="%s" % journal_name)
     if auth[0] == 0:
-        return page(title=_("Issue regenerated"),
+        return page(title=confirmed_p and _("Issue regenerated") or _("Regenerate Issue"),
                     body=wjn.perform_regenerate_issue(ln=ln,
                                                       journal_name=journal_name,
-                                                      issue=issue),
+                                                      issue=issue,
+                                                      confirmed_p=confirmed_p,
+                                                      publish_draft_articles_p=publish_draft_articles_p),
                     uid=uid,
                     language=ln,
                     req=req,
