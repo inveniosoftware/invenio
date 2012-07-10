@@ -37,7 +37,7 @@ import subprocess
 
 from invenio.config import CFG_MISCUTIL_DEFAULT_PROCESS_TIMEOUT
 
-__all__ = ['run_shell_command', 'run_process_with_timeout', 'Timeout', 'SmarterPopen']
+__all__ = ['run_shell_command', 'run_process_with_timeout', 'Timeout']
 
 """
 This module implements two functions:
