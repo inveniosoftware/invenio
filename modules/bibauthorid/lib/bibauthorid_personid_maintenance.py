@@ -32,6 +32,10 @@ from bibauthorid_backinterface import repair_personid                      #emit
 from bibauthorid_backinterface import check_results                        #emitting
 from bibauthorid_backinterface import check_merger                         #emitting
 from bibauthorid_backinterface import restore_personids                    #emitting
+from bibauthorid_backinterface import get_full_personid_papers
+from bibauthorid_backinterface import get_full_results
+from bibauthorid_backinterface import personid_get_recids_affected_since as get_recids_affected_since
+
 
 def convert_personid():
     from dbquery import run_sql # oh come on, the whole function will be removed soon
@@ -102,4 +106,3 @@ def compare_personids(path):
     pid1_p, pid1_d = group_personid("aidPERSONIDPAPERS_copy", "aidPERSONIDDATA_copy")
     pid2_p, pid2_d = group_personid("aidPERSONIDPAPERS", "aidPERSONIDDATA")
     compare_personid_tables(pid1_p, pid1_d, pid2_p, pid2_d, fp)
-

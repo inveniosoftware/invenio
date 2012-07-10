@@ -4085,7 +4085,6 @@ CREATE TABLE IF NOT EXISTS collection_bsrMETHOD (
 ) ENGINE=MyISAM;
 
 -- tables for sequence storage
-
 CREATE TABLE IF NOT EXISTS seqSTORE (
   id int(15) NOT NULL auto_increment,
   seq_name varchar(15),
@@ -4095,7 +4094,6 @@ CREATE TABLE IF NOT EXISTS seqSTORE (
 ) ENGINE=MyISAM;
 
 -- table for API key
-
 CREATE TABLE IF NOT EXISTS webapikey (
   id varchar(150) NOT NULL,
   secret varchar(150) NOT NULL,
@@ -4107,4 +4105,14 @@ CREATE TABLE IF NOT EXISTS webapikey (
   KEY (status)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS `wapCACHE` (
+  `object_name` varchar(120) NOT NULL,
+  `object_key` varchar(120) NOT NULL,
+  `object_value` longtext,
+  `object_status` varchar(120),
+  `last_updated` datetime NOT NULL,
+  PRIMARY KEY  (`object_name`,`object_key`),
+  INDEX `last_updated-b` (`last_updated`),
+  INDEX `status-b` (`object_status`)
+) ENGINE=MyISAM;
 -- end of file

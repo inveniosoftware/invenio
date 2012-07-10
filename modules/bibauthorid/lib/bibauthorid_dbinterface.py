@@ -36,6 +36,7 @@ from operator import itemgetter
 from search_engine import perform_request_search
 from access_control_engine import acc_authorize_action
 
+
 from bibauthorid_name_utils import split_name_parts
 from bibauthorid_name_utils import create_canonical_name
 from bibauthorid_name_utils import create_normalized_name
@@ -168,18 +169,18 @@ def get_new_personid():
     else:
         return 0
 
-
-def get_existing_personids():
-    try:
-        pids_data = set(zip(*run_sql("select distinct personid from aidPERSONIDDATA"))[0])
-    except IndexError:
+def get_existing_personids(with_papers_only=False):
+    if not with_papers_only:
+        try:
+            pids_data = set(map(int, zip(*run_sql("select distinct personid from aidPERSONIDDATA"))[0]))
+        except IndexError:
+            pids_data = set()
+    else:
         pids_data = set()
-
     try:
-        pids_pap = set(zip(*run_sql("select distinct personid from aidPERSONIDPAPERS"))[0])
+        pids_pap = set(map(int, zip(*run_sql("select distinct personid from aidPERSONIDPAPERS"))[0]))
     except IndexError:
         pids_pap = set()
-
     return pids_data | pids_pap
 
 
@@ -556,8 +557,7 @@ def get_person_bibrecs(pid):
     @param pid: integer personid
     @return [bibrec1,...,bibrecN]
     '''
-    papers = run_sql("select bibrec from aidPERSONIDPAPERS where personid=%s", (str(pid),))
-
+    papers = run_sql("select bibrec from aidPERSONIDPAPERS where personid=%s and flag > -2", (str(pid),))
     if papers:
         return list(set(zip(*papers)[0]))
     else:
@@ -748,9 +748,6 @@ def confirm_papers_to_person(pid, papers, user_level=0):
     @type pid: ('2',)
     @param papers: list of papers to confirm
     @type papers: (('100:7531,9024',),)
-    @param gather_list: list to store the pids to be updated rather than
-    calling update_personID_names_string_set
-    @typer gather_list: set([('2',), ('3',)])
     '''
 
     new_pid = get_new_personid()
@@ -840,9 +837,6 @@ def reset_papers_flag(pid, papers):
     Resets the flag associated to the papers to '0'
     @param papers: list of papers to confirm
     @type papers: (('100:7531,9024',),)
-    @param gather_list: list to store the pids to be updated rather than
-    calling update_personID_names_string_set
-    @typer gather_list: set([('2',), ('3',)])
     '''
     for p in papers:
         bibref, rec = p[0].split(",")
@@ -1098,7 +1092,6 @@ def get_user_log(transactionid='', userinfo='', userid='', personID='', action='
     if only_most_recent:
         sql_query += ' order by timestamp desc limit 0,1'
     return run_sql(sql_query)
-
 
 def list_2_SQL_str(items, f=lambda x: x):
     """
@@ -1621,7 +1614,6 @@ def get_all_authors(bibrec):
         authors_7 = []
 
     return [a[0] for a in authors_1] + [a[0] for a in authors_7]
-
 
 def get_title_from_rec(rec):
     """
@@ -2432,7 +2424,6 @@ def copy_personids():
             "SELECT * "
             "FROM `aidPERSONIDPAPERS")
 
-
 def delete_empty_persons():
     pp = run_sql("select personid from aidPERSONIDPAPERS")
     pp = set(p[0] for p in pp)
@@ -2456,7 +2447,6 @@ def restore_personids():
             "SELECT * "
             "FROM `aidPERSONIDPAPERS_copy")
 
-
 def resolve_affiliation(ambiguous_aff_string):
     """
     This is a method available in the context of author disambiguation in ADS
@@ -2476,7 +2466,6 @@ def resolve_affiliation(ambiguous_aff_string):
         return aff_id[0][0]
     else:
         return "None"
-
 
 def get_free_pids():
     '''
@@ -2526,3 +2515,26 @@ def get_signatures_from_bibrefs(bibrefs):
 def get_all_valid_bibrecs():
     collection_restriction_pattern = " or ".join(["980__a:\"%s\"" % x for x in bconfig.LIMIT_TO_COLLECTIONS])
     return perform_request_search(p="%s" % collection_restriction_pattern, rg=0)
+
+
+def get_coauthor_pids(pid, exclude_bibrecs=None):
+    papers = get_person_bibrecs(pid)
+    if exclude_bibrecs:
+        papers = set(papers) - set(exclude_bibrecs)
+
+    if not papers:
+        return []
+
+    papers_s = list_2_SQL_str(papers)
+
+    pids = run_sql("select personid,bibrec from aidPERSONIDPAPERS "
+                   "where bibrec in %s and flag > -2" % papers_s)
+
+
+    pids = set((int(p[0]), int(p[1])) for p in pids)
+    pids = sorted([p[0] for p in pids])
+    pids = groupby(pids)
+    pids = [(key, len(list(val))) for key, val in pids if key != pid]
+    pids = sorted(pids, key=lambda x: x[1], reverse=True)
+
+    return pids
