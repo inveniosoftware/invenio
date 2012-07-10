@@ -900,7 +900,7 @@ def insert_bibfmt(id_bibrec, marc, format, modification_date='1970-01-01 00:00:0
     except ValueError:
         modification_date = '1970-01-01 00:00:00'
 
-    query = """INSERT INTO  bibfmt (id_bibrec, format, last_updated, value)
+    query = """INSERT LOW_PRIORITY INTO bibfmt (id_bibrec, format, last_updated, value)
         VALUES (%s, %s, %s, %s)"""
     try:
         if not pretend:
@@ -1650,7 +1650,7 @@ def update_bibfmt_format(id_bibrec, format_value, format_name, modification_date
         # compress the format_value value
         pickled_format_value =  compress(format_value)
         # update the format:
-        query = """UPDATE bibfmt SET last_updated=%s, value=%s WHERE id_bibrec=%s AND format=%s"""
+        query = """UPDATE LOW_PRIORITY bibfmt SET last_updated=%s, value=%s WHERE id_bibrec=%s AND format=%s"""
         params = (modification_date, pickled_format_value, id_bibrec, format_name)
         try:
             if not pretend:
@@ -1682,7 +1682,7 @@ def delete_bibfmt_format(id_bibrec, format_name, pretend=False):
     Delete format FORMAT_NAME from bibfmt table for record ID_BIBREC.
     """
     if not pretend:
-        run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s and format=%s", (id_bibrec, format_name))
+        run_sql("DELETE LOW_PRIORITY FROM bibfmt WHERE id_bibrec=%s and format=%s", (id_bibrec, format_name))
     return 0
 
 def archive_marcxml_for_history(recID, pretend=False):

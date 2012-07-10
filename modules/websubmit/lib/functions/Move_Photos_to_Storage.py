@@ -211,7 +211,7 @@ def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
 
     # Delete the HB BibFormat cache in the DB, so that the fulltext
     # links do not point to possible dead files
-    run_sql("DELETE from bibfmt WHERE format='HB' AND id_bibrec=%s", (sysno,))
+    run_sql("DELETE LOW_PRIORITY from bibfmt WHERE format='HB' AND id_bibrec=%s", (sysno,))
 
     return ""
 

@@ -2816,6 +2816,7 @@ CREATE TABLE IF NOT EXISTS format (
   description varchar(255) default '',
   content_type varchar(255) default '',
   visibility tinyint NOT NULL default '1',
+  last_updated datetime NOT NULL default '0000-00-00',
   PRIMARY KEY  (id),
   UNIQUE KEY code (code)
 ) ENGINE=MyISAM;
