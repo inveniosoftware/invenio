@@ -2460,7 +2460,7 @@ class BibDoc:
         self.docfiles = []
         if CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE and context == 'init':
             ## In normal init context we read from DB
-            res = run_sql("SELECT version, format, cd, md, checksum, filesize, FROM bibdocfsinfo WHERE id_bibdoc=%s", (self.id, ))
+            res = run_sql("SELECT version, format, cd, md, checksum, filesize FROM bibdocfsinfo WHERE id_bibdoc=%s", (self.id, ))
             for version, format, cd, md, checksum, size in res:
                 self.docfiles.append(BibDocFile(
                     os.path.join(self.basedir, self.docname + format + ";%s" % version), self.doctype,
