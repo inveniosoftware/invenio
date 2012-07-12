@@ -237,7 +237,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     the other modules."""
 
     _exports = WebInterfaceSearchInterfacePages._exports + \
-        WebInterfaceWebAuthorPages._exports + [
+        [
         'youraccount',
         'youralerts',
         'yourbaskets',
