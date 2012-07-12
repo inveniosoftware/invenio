@@ -624,14 +624,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibrecord/doc/hacking/Makefile \
      modules/bibrecord/etc/Makefile \
      modules/bibrecord/lib/Makefile \
-     modules/refextract/Makefile \
-     modules/refextract/bin/Makefile \
-     modules/refextract/bin/refextract \
-     modules/refextract/doc/Makefile \
-     modules/refextract/doc/admin/Makefile \
-     modules/refextract/doc/hacking/Makefile \
-     modules/refextract/etc/Makefile \
-     modules/refextract/lib/Makefile \
      modules/bibedit/Makefile \
      modules/bibedit/bin/Makefile \
      modules/bibedit/bin/bibedit \
@@ -903,6 +895,15 @@ AC_CONFIG_FILES([config.nice  \
      modules/websubmit/lib/functions/Makefile \
      modules/websubmit/web/Makefile \
      modules/websubmit/web/admin/Makefile \
+     modules/docextract/Makefile \
+     modules/docextract/bin/Makefile \
+     modules/docextract/bin/docextract \
+     modules/docextract/bin/refextract \
+     modules/docextract/doc/Makefile \
+     modules/docextract/lib/Makefile \
+     modules/docextract/etc/Makefile \
+     modules/docextract/doc/admin/Makefile \
+     modules/docextract/doc/hacking/Makefile \
      ])
 
 ## Finally, write output files:

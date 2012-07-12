@@ -4046,6 +4046,7 @@ CREATE TABLE IF NOT EXISTS `xtrJOB` (
   `id` tinyint(4) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
   `last_updated` datetime NOT NULL,
+  `last_recid` mediumint(8) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM;
 
