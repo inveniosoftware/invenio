@@ -706,3 +706,28 @@ def show_diff(original, modified, prefix="<pre>", sufix="</pre>"):
 
     result.append(sufix)
     return '\n'.join(result)
+
+
+def transliterate_ala_lc(value):
+    """
+    Transliterate a string.
+    Compatibility with the ALA-LC romanization standard:
+    http://www.loc.gov/catdir/cpso/roman.html
+
+    Maps from one system of writing into another, letter by letter.
+    Uses 'unidecode' if available.
+
+    @param values: string to transform
+    @type values: string
+
+    @return: string transliterated
+    @rtype: string
+    """
+    if not value:
+        return value
+    if UNIDECODE_AVAILABLE:
+        text = unidecode(value)
+    else:
+        text = translate_to_ascii(value)
+        text = text.pop()
+    return text

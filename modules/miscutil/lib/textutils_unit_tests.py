@@ -43,7 +43,9 @@ from invenio.textutils import \
      decode_to_unicode, \
      translate_latex2unicode, \
      translate_to_ascii, \
-     strip_accents
+     strip_accents, \
+     remove_control_characters, \
+     transliterate_ala_lc
 
 from invenio.testutils import make_test_suite, run_test_suite
 
@@ -458,10 +460,31 @@ class TestStripping(unittest.TestCase):
         self.assertEqual("MEMEMEME",
                          strip_accents('MÉMÊMËMÈ'))
 
+    def test_remove_control_characters(self):
+        """textutils - stripping of accented letters"""
+        self.assertEqual("foo\nbar\tfab\n\r",
+                         remove_control_characters('foo\nbar\tfab\n\r'))
+        self.assertEqual("abc de",
+                         remove_control_characters('abc\02de'))
+
+
+class TestALALC(unittest.TestCase):
+    """Test for handling ALA-LC transliteration."""
+
+    if UNIDECODE_AVAILABLE:
+        def test_alalc(self):
+            msg = "眾鳥高飛盡"
+            encoded_text, encoding = guess_minimum_encoding(msg)
+            unicode_text = unicode(encoded_text.decode(encoding))
+            self.assertEqual("Zhong Niao Gao Fei Jin ",
+                             transliterate_ala_lc(unicode_text))
+
+
 TEST_SUITE = make_test_suite(WrapTextInABoxTest, GuessMinimumEncodingTest,
                              WashForXMLTest, WashForUTF8Test, DecodeToUnicodeTest,
-                             Latex2UnicodeTest, TestStripping)
+                             Latex2UnicodeTest, TestStripping,
+                             TestALALC)
+
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
-
