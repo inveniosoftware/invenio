@@ -223,6 +223,29 @@ def task_low_level_submission(name, user, *argv):
                     pass
         return sleeptime
 
+    def get_sequenceid(argv):
+        """Try to get the sequenceid by analysing the arguments."""
+        sequenceid = None
+        argv = list(argv)
+        while True:
+            try:
+                opts, args = getopt.gnu_getopt(argv, 'I:', ['sequence-id='])
+            except getopt.GetoptError, err:
+                ## We remove one by one all the non recognized parameters
+                if len(err.opt) > 1:
+                    argv = [arg for arg in argv if arg != '--%s' % err.opt and not arg.startswith('--%s=' % err.opt)]
+                else:
+                    argv = [arg for arg in argv if not arg.startswith('-%s' % err.opt)]
+            else:
+                break
+        for opt in opts:
+            if opt[0] in ('-I', '--sequence-id'):
+                try:
+                    sequenceid = opt[1]
+                except ValueError:
+                    pass
+        return sequenceid
+
     task_id = None
     try:
         if not name in CFG_BIBTASK_VALID_TASKS:
@@ -238,6 +261,7 @@ def task_low_level_submission(name, user, *argv):
         special_name = get_special_name(argv)
         runtime = get_runtime(argv)
         sleeptime = get_sleeptime(argv)
+        sequenceid = get_sequenceid(argv)
         argv = tuple([os.path.join(CFG_BINDIR, name)] + list(argv))
 
         if special_name:
@@ -247,9 +271,9 @@ def task_low_level_submission(name, user, *argv):
 
         ## submit task:
         task_id = run_sql("""INSERT INTO schTASK (proc,user,
-            runtime,sleeptime,status,progress,arguments,priority)
-            VALUES (%s,%s,%s,%s,'WAITING',%s,%s,%s)""",
-            (name, user, runtime, sleeptime, verbose_argv, marshal.dumps(argv), priority))
+            runtime,sleeptime,status,progress,arguments,priority,sequenceid)
+            VALUES (%s,%s,%s,%s,'WAITING',%s,%s,%s,%s)""",
+            (name, user, runtime, sleeptime, verbose_argv, marshal.dumps(argv), priority, sequenceid))
 
     except Exception:
         register_exception(alert_admin=True)
