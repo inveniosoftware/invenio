@@ -1576,21 +1576,21 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             skip_checkout_faulty_fields = True
 
         if not ("user_first_name_sys" in pinfo and pinfo["user_first_name_sys"]):
-            if "user_first_name" in argd:
+            if "user_first_name" in argd and argd['user_first_name']:
                 if not argd["user_first_name"] and not skip_checkout_faulty_fields:
                     pinfo["checkout_faulty_fields"].append("user_first_name")
                 else:
                     pinfo["user_first_name"] = escape(argd["user_first_name"])
 
         if not ("user_last_name_sys" in pinfo and pinfo["user_last_name_sys"]):
-            if "user_last_name" in argd:
+            if "user_last_name" in argd and argd['user_last_name']:
                 if not argd["user_last_name"] and not skip_checkout_faulty_fields:
                     pinfo["checkout_faulty_fields"].append("user_last_name")
                 else:
                     pinfo["user_last_name"] = escape(argd["user_last_name"])
 
         if not ("user_email_sys" in pinfo and pinfo["user_email_sys"]):
-            if "user_email" in argd:
+            if "user_email" in argd and argd['user_email']:
                 if (not argd["user_email"]
                     or not email_valid_p(argd["user_email"])):
                     pinfo["checkout_faulty_fields"].append("user_email")
