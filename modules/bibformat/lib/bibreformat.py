@@ -126,7 +126,7 @@ def bibreformat_task(fmt, sql, sql_queries, cds_query, process_format, process, 
         write_message("Querying database (%s) ..." % sql_query, verbose=2)
         recIDs |= intbitset(run_sql(sql_query))
 
-    if fmt == "HDREF":
+    if fmt == "HDREF" and recIDs:
         # HDREF represents the references tab
         # the tab needs to be recomputed not only when the record changes
         # but also when one of the citations changes
