@@ -78,11 +78,13 @@ IntBitSet *intBitSetResetFromBuffer(IntBitSet *const bitset, const void *const b
 
 IntBitSet *intBitSetReset(IntBitSet *const bitset) {
     // fprintf(stderr, "intBitSetReset called\n");
-    bitset->allocated = 0;
+    // NOTE: soft reset the memory. Instead of freeing it, which is slow
+    // simply declare in the intbitset that the allocated memory is one only
+    // word, and zero that word, so that as soon as more memory is needed
+    // a realloc will be triggered.
+    bitset->allocated = 1;
     bitset->size = -1;
-    if (bitset->bitset)
-        PyMem_Free(bitset->bitset);
-    bitset->bitset = NULL;
+    *bitset->bitset = 0;
     bitset->trailing_bits = 0;
     bitset->tot = 0;
     return bitset;
