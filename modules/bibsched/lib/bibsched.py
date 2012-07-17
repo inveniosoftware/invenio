@@ -28,6 +28,7 @@ import time
 import re
 import marshal
 import getopt
+from itertools import chain
 from socket import gethostname
 from subprocess import Popen
 import signal
@@ -1087,15 +1088,19 @@ class BibSched(object):
             if debug:
                 Log('lower: %s' % lower)
                 Log('higher: %s' % higher)
-            for other_task_id, other_proc, other_runtime, other_status, other_priority, other_host, other_sequenceid in self.active_tasks_all_nodes:
-                if not self.is_task_safe_to_execute(proc, other_proc):
+
+            for other_task_id, other_proc, other_runtime, other_status, \
+                other_priority, other_host, other_sequenceid in chain(
+                self.node_relevant_sleeping_tasks, self.active_tasks_all_nodes):
+                if task_id != other_task_id and \
+                            not self.is_task_safe_to_execute(proc, other_proc):
                     ### !!! WE NEED TO CHECK FOR TASKS THAT CAN ONLY BE EXECUTED ON ONE MACHINE AT ONE TIME
                     ### !!! FOR EXAMPLE BIBUPLOADS WHICH NEED TO BE EXECUTED SEQUENTIALLY AND NEVER CONCURRENTLY
                     ## There's at least a higher priority task running that
                     ## cannot run at the same time of the given task.
                     ## We give up
                     if debug:
-                        Log("Cannot run because task_id: %s, proc: %s is the queue and incompatible" % (other_task_id, other_proc))
+                        Log("Cannot run because task_id: %s, proc: %s is in the queue and incompatible" % (other_task_id, other_proc))
                     return False
 
             if sequenceid:
@@ -1255,6 +1260,10 @@ class BibSched(object):
                 """SELECT id, proc, runtime, status, priority, host, sequenceid
                    FROM schTASK WHERE (status='WAITING' AND runtime <= NOW())
                    OR status = 'SLEEPING'
+                   ORDER BY priority DESC, runtime ASC, id ASC""")
+            self.node_relevant_sleeping_tasks = run_sql(
+                """SELECT id, proc, runtime, status, priority, host, sequenceid
+                   FROM schTASK WHERE status = 'SLEEPING'
                    ORDER BY priority DESC, runtime ASC, id ASC""")
             self.node_relevant_active_tasks = run_sql(
                 """SELECT id, proc, runtime, status, priority, host,sequenceid
