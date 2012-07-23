@@ -131,6 +131,7 @@ def bibreformat_task(fmt, sql, sql_queries, cds_query, process_format, process, 
         # the tab needs to be recomputed not only when the record changes
         # but also when one of the citations changes
         latest_bibrank_run = get_bibrankmethod_lastupdate('citation')
+        start_date = latest_bibrank_run
         sql = """SELECT id, modification_date FROM bibrec
                  WHERE id in (%s)""" % ','.join(str(r) for r in recIDs)
 
