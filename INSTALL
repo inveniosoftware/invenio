@@ -36,7 +36,7 @@ Contents
               python-4suite-xml python-simplejson python-xml \
               python-libxml2 python-libxslt1 gnuplot poppler-utils \
               gs-common clisp gettext libapache2-mod-wsgi unzip \
-              python-dateutil python-rdflib \
+              python-dateutil python-rdflib python-pyparsing \
               python-gnuplot python-magic pdftk html2text giflib-tools \
               pstotext netpbm python-pypdf python-chardet python-lxml
 
@@ -91,6 +91,8 @@ Contents
         as well as the following Python modules:
           - (mandatory) MySQLdb (version >= 1.2.1_p2; see below)
              <http://sourceforge.net/projects/mysql-python>
+          - (mandatory) Pyparsing, for document parsing
+             <http://pyparsing.wikispaces.com/>
           - (recommended) python-dateutil, for complex date processing:
              <http://labix.org/python-dateutil>
           - (recommended) PyXML, for XML processing:

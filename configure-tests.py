@@ -105,6 +105,7 @@ try:
         import hashlib
     import marshal
     import os
+    import pyparsing
     import signal
     import tempfile
     import time

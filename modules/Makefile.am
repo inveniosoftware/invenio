@@ -25,6 +25,7 @@ SUBDIRS = bibauthorid \
           bibedit \
           bibencode \
           bibexport \
+          bibfield \
           bibformat \
           bibindex \
           bibknowledge \

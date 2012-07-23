@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS bibrec (
   id mediumint(8) unsigned NOT NULL auto_increment,
   creation_date datetime NOT NULL default '0000-00-00',
   modification_date datetime NOT NULL default '0000-00-00',
+  master_format varchar(16) NOT NULL default 'marc',
   PRIMARY KEY  (id),
   KEY creation_date (creation_date),
   KEY modification_date (modification_date)
@@ -4322,5 +4323,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_01_08_new_goto_tabl
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_15_bibdocfile_model',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_02_01_oaiREPOSITORY_last_updated',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_07_crcILLREQUEST_overdue_letter',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_01_12_bibrec_master_format',NOW());
 
 -- end of file

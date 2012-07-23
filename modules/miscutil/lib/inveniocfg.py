@@ -29,6 +29,7 @@ General options:
 Options to finish your installation:
    --create-apache-conf     create Apache configuration files
    --create-tables          create DB tables for Invenio
+   --load-bibfield-conf     load the BibField configuration
    --load-webstat-conf      load the WebStat configuration
    --drop-tables            drop DB tables of Invenio
    --check-openoffice       check for correctly set up of openoffice temporary directory
@@ -56,6 +57,7 @@ Options to update DB tables:
    --reset-siteadminemail   reset tables to take account of new CFG_SITE_ADMIN_EMAIL
    --reset-fieldnames       reset tables to take account of new I18N names from PO files
    --reset-recstruct-cache  reset record structure cache according to CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE
+   --reset-recjson-cache    reset record json cache according to CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE
 
 Options to upgrade your installation:
     --upgrade                       apply all pending upgrades
@@ -219,7 +221,8 @@ You may want to customise your invenio-local.conf configuration accordingly."""
                        'CFG_WEBSTYLE_REVERSE_PROXY_IPS',
                        'CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS',
                        'CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS',
-                       'CFG_BIBFORMAT_HIDDEN_FILE_FORMATS',]:
+                       'CFG_BIBFORMAT_HIDDEN_FILE_FORMATS',
+                       'CFG_BIBFIELD_MASTER_FORMATS', ]:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:
@@ -519,6 +522,44 @@ def cli_cmd_reset_recstruct_cache(conf):
         print ">>> Cleaning recstruct cache..."
         run_sql("DELETE FROM bibfmt WHERE format='recstruct'")
 
+def cli_cmd_reset_recjson_cache(conf):
+    """If CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE is changed, this function
+    will adapt the database to either store or not store the recjson
+    format."""
+    try:
+        import cPickle as pickle
+    except:
+        import pickle
+    from invenio.intbitset import intbitset
+    from invenio.dbquery import run_sql
+    from invenio.bibfield import get_record
+    from invenio.bibsched import server_pid, pidfile
+    enable_recjson_cache = conf.get("Invenio", "CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE")
+    enable_recjson_cache = enable_recjson_cache in ('True', '1')
+    pid = server_pid(ping_the_process=False)
+    if pid:
+        print >> sys.stderr, "ERROR: bibsched seems to run with pid %d, according to %s." % (pid, pidfile)
+        print >> sys.stderr, "       Please stop bibsched before running this procedure."
+        sys.exit(1)
+    if enable_recjson_cache:
+        print ">>> Searching records which need recjson cache resetting; this may take a while..."
+        all_recids = intbitset(run_sql("SELECT id FROM bibrec"))
+        #TODO: prevent doing all records?
+        recids = all_recids
+        print ">>> Generating recjson cache..."
+        tot = len(recids)
+        count = 0
+        for recid in recids:
+            run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s AND format='recjson'", (recid,))
+            #TODO: Update the cache or wait for the first access
+            get_record(recid)
+            count += 1
+            if count % 1000 == 0:
+                print "    ... done records %s/%s" % (count, tot)
+        if count % 1000 != 0:
+            print "    ... done records %s/%s" % (count, tot)
+        print ">>> recjson cache generated successfully."
+
 def cli_cmd_reset_siteadminemail(conf):
     """
     Reset user-related tables with new CFG_SITE_ADMIN_EMAIL read from conf files.
@@ -724,6 +765,12 @@ def cli_cmd_load_webstat_conf(conf):
         print "ERROR: failed execution of", cmd
         sys.exit(1)
     print ">>> WebStat config load successfully."
+
+def cli_cmd_load_bibfield_config(conf):
+    print ">>> Going to load BibField config..."
+    from invenio.bibfield_config_engine import BibFieldParser
+    BibFieldParser().write_to_file()
+    print ">>> BibField config load successfully."
 
 def cli_cmd_drop_tables(conf):
     """Drop Invenio DB tables.  Useful for the uninstallation process."""
@@ -1397,6 +1444,7 @@ def prepare_option_parser():
     finish_options = OptionGroup(parser, "Options to finish your installation")
     finish_options.add_option("", "--create-apache-conf", dest='actions', const='create-apache-conf', action="append_const", help="create Apache configuration files")
     finish_options.add_option("", "--create-tables", dest='actions', const='create-tables', action="append_const", help="create DB tables for Invenio")
+    finish_options.add_option("", "--load-bibfield-conf", dest='actions', const='load-bibfield-conf', action="append_const", help="load bibfield configuration file")
     finish_options.add_option("", "--load-webstat-conf", dest='actions', const='load-webstat-conf', action="append_const", help="load the WebStat configuration")
     finish_options.add_option("", "--drop-tables", dest='actions', const='drop-tables', action="append_const", help="drop DB tables of Invenio")
     finish_options.add_option("", "--check-openoffice", dest='actions', const='check-openoffice', action="append_const", help="check for correctly set up of openoffice temporary directory")
@@ -1428,6 +1476,7 @@ def prepare_option_parser():
     reset_options.add_option("", "--reset-siteadminemail", dest='actions', const='reset-siteadminemail', action="append_const", help="reset tables to take account of new CFG_SITE_ADMIN_EMAIL")
     reset_options.add_option("", "--reset-fieldnames", dest='actions', const='reset-fieldnames', action="append_const", help="reset tables to take account of new I18N names from PO files")
     reset_options.add_option("", "--reset-recstruct-cache", dest='actions', const='reset-recstruct-cache', action="append_const", help="reset record structure cache according to CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE")
+    reset_options.add_option("", "--reset-recjson-cache", dest='actions', const='reset-recjson-cache', action="append_const", help="reset record json structure cache according to CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE")
     parser.add_option_group(reset_options)
 
     upgrade_options = OptionGroup(parser, "Options to upgrade your installation")
@@ -1520,6 +1569,8 @@ def main(*cmd_args):
                 cli_cmd_drop_tables(conf)
             elif action == 'check-openoffice':
                 cli_check_openoffice(conf)
+            elif action == 'load-bibfield-conf':
+                cli_cmd_load_bibfield_config(conf)
             elif action == 'create-demo-site':
                 cli_cmd_create_demo_site(conf)
             elif action == 'load-demo-records':
@@ -1565,6 +1616,8 @@ def main(*cmd_args):
                 cli_cmd_reset_fieldnames(conf)
             elif action == 'reset-recstruct-cache':
                 cli_cmd_reset_recstruct_cache(conf)
+            elif action == 'reset-recjson-cache':
+                cli_cmd_reset_recjson_cache(conf)
             elif action == 'create-apache-conf':
                 cli_cmd_create_apache_conf(conf)
             elif action == 'upgrade':
