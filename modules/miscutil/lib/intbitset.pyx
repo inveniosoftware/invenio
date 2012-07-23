@@ -16,7 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __revision__ = "$Id$"
-__apilevel__ = 1.05
+__apilevel__ = 1.06
 
 """
 Defines an intbitset data object to hold unordered sets of unsigned
@@ -47,6 +47,11 @@ from invenio.intbitset_helper import _
 
 __all__ = ['intbitset']
 
+cdef extern from *:
+    ## See: <http://wiki.cython.org/FAQ/#HowdoIuse.27const.27.3F>
+    ## In order to avoid warnings with PyObject_AsReadBuffer
+    ctypedef void* const_void_ptr "const void*"
+
 cdef extern from "intbitset.h":
     ctypedef int Py_ssize_t
 
@@ -68,7 +73,6 @@ cdef extern from "intbitset.h":
     int maxelem
     IntBitSet *intBitSetCreate(int size, bint trailing_bits)
     IntBitSet *intBitSetCreateFromBuffer(void *buf, int bufsize)
-    IntBitSet *intBitSetCreateNoAllocate()
     IntBitSet *intBitSetResetFromBuffer(IntBitSet *bitset, void *buf, int bufsize)
     IntBitSet *intBitSetReset(IntBitSet *bitset)
     void intBitSetDestroy(IntBitSet *bitset)
@@ -76,9 +80,9 @@ cdef extern from "intbitset.h":
     int intBitSetGetSize(IntBitSet *bitset)
     int intBitSetGetAllocated(IntBitSet *bitset)
     int intBitSetGetTot(IntBitSet * bitset)
-    bint intBitSetIsInElem(IntBitSet *bitset, int elem)
-    void intBitSetAddElem(IntBitSet *bitset, int elem)
-    void intBitSetDelElem(IntBitSet *bitset, int elem)
+    bint intBitSetIsInElem(IntBitSet *bitset, unsigned int elem)
+    void intBitSetAddElem(IntBitSet *bitset, unsigned int elem)
+    void intBitSetDelElem(IntBitSet *bitset, unsigned int elem)
     bint intBitSetEmpty(IntBitSet *bitset)
     IntBitSet *intBitSetUnion(IntBitSet *x, IntBitSet *y)
     IntBitSet *intBitSetIntersection(IntBitSet *x, IntBitSet *y)
@@ -156,7 +160,7 @@ cdef class intbitset:
         after the biggest one added with rhs.
         """
         cdef Py_ssize_t size = 0
-        cdef void *buf = NULL
+        cdef const_void_ptr buf = NULL
         cdef int elem
         cdef int i
         cdef int last
@@ -189,7 +193,7 @@ cdef class intbitset:
                 except Exception, msg:
                     raise ValueError("rhs is corrupted: %s" % msg)
             elif hasattr(rhs, '__iter__'):
-                tuple_of_tuples = rhs and type(rhs[0]) is tuple
+                tuple_of_tuples = rhs and hasattr(rhs[0], '__getitem__')
                 try:
                     if preallocate < 0:
                         if rhs and type(rhs[0]) is int:
@@ -337,6 +341,7 @@ cdef class intbitset:
         return self
 
     def __isub__(self, rhs):
+        """Remove all elements of another set from this set."""
         cdef int elem
         if isinstance(rhs, (int, long)):
             if self.sanity_checks:
@@ -372,34 +377,50 @@ cdef class intbitset:
         intBitSetDelElem(self.bitset, elem)
 
     def __and__(self, intbitset rhs not None):
+        """Return the intersection of two intbitsets as a new set.
+        (i.e. all elements that are in both intbitsets.)
+        """
         ret = intbitset(no_allocate=1)
         (<intbitset>ret).bitset = intBitSetIntersection((<intbitset> self).bitset, rhs.bitset)
         return ret
 
     def __or__(self, intbitset rhs not None):
+        """Return the union of two intbitsets as a new set.
+        (i.e. all elements that are in either intbitsets.)
+        """
         ret = intbitset(no_allocate=1)
         (<intbitset>ret).bitset = intBitSetUnion((<intbitset> self).bitset, rhs.bitset)
         return ret
 
     def __xor__(self, intbitset rhs not None):
+        """Return the symmetric difference of two sets as a new set.
+        (i.e. all elements that are in exactly one of the sets.)
+        """
         ret = intbitset(no_allocate=1)
         (<intbitset>ret).bitset = intBitSetXor((<intbitset> self).bitset, rhs.bitset)
         return ret
 
     def __sub__(self, intbitset rhs not None):
+        """Return the difference of two intbitsets as a new set.
+        (i.e. all elements that are in this intbitset but not the other.)
+        """
         ret = intbitset(no_allocate=1)
         (<intbitset>ret).bitset = intBitSetSub((<intbitset> self).bitset, rhs.bitset)
         return ret
 
     def __iand__(self, intbitset rhs not None):
+        """Update a intbitset with the intersection of itself and another."""
         intBitSetIIntersection(self.bitset, rhs.bitset)
         return self
 
     def __ior__(self, intbitset rhs not None):
+        """Update a intbitset with the union of itself and another."""
         intBitSetIUnion(self.bitset, rhs.bitset)
         return self
 
     def __ixor__(self, intbitset rhs not None):
+        """Update an intbitset with the symmetric difference of itself and another.
+        """
         intBitSetIXor(self.bitset, rhs.bitset)
         return self
 
@@ -417,15 +438,15 @@ cdef class intbitset:
         cdef int tot
         tot = intBitSetGetTot(self.bitset)
         if tot < 0:
-            begin_list = self.to_sorted_list(0, 10)
+            begin_list = self[0:10]
             ret = "intbitset(["
             for n in begin_list:
                 ret = ret + '%i, ' % n
             ret = ret + "...])"
             return ret
         elif tot > 10:
-            begin_list = self.to_sorted_list(0, 5)
-            end_list = self.to_sorted_list(tot - 5, tot)
+            begin_list = self[0:5]
+            end_list = self[tot - 5:tot]
             ret = "intbitset(["
             for n in begin_list:
                 ret = ret + '%i, ' % n
@@ -446,16 +467,16 @@ cdef class intbitset:
         cdef int step
         if hasattr(key, 'indices'):
             ## This is a slice object!
-            if self.bitset.trailing_bits and (key.start < 0 or key.end < 0):
+            if self.bitset.trailing_bits and (key.start < 0 or key.stop < 0):
                 raise IndexError("negative indexes are not allowed on infinite intbitset")
             retset = intbitset()
             start, end, step = key.indices(intBitSetGetTot(self.bitset))
             if step < 0:
-                raise ValueError("negative steps are not supported")
+                raise ValueError("negative steps are not yet supported")
             for i in range(start):
                 elem = intBitSetGetNext(self.bitset, elem)
                 if elem < 0:
-                    return retset()
+                    return retset
             for i in range(end - start):
                 elem = intBitSetGetNext(self.bitset, elem)
                 if elem < 0:
@@ -553,15 +574,6 @@ cdef class intbitset:
     def clear(self):
         intBitSetReset(self.bitset)
 
-    def difference(intbitset self, rhs):
-        """Return the difference of two intbitsets as a new set.
-        (i.e. all elements that are in this intbitset but not the other.)
-        """
-        return self.__sub__(rhs)
-
-    def difference_update(self, rhs):
-        """Remove all elements of another set from this set."""
-        self.__isub__(rhs)
 
     def discard(self, int elem):
         """Remove an element from a intbitset if it is a member.
@@ -573,25 +585,14 @@ cdef class intbitset:
                 raise OverflowError("Element must be <= %s" % maxelem)
         intBitSetDelElem(self.bitset, elem)
 
-    def intersection(self, rhs):
-        """Return the intersection of two intbitsets as a new set.
-        (i.e. all elements that are in both intbitsets.)
-        """
-        return self.__and__(rhs)
-
-    def intersection_update(self, rhs):
-        """Update a intbitset with the intersection of itself and another."""
-        self.__iand__(rhs)
-
-    def union(self, rhs):
-        """Return the union of two intbitsets as a new set.
-        (i.e. all elements that are in either intbitsets.)
-        """
-        return self.__or__(rhs)
-
-    def union_update(self, rhs):
-        """Update a intbitset with the union of itself and another."""
-        self.__ior__(rhs)
+    difference = __sub__
+    difference_update = __isub__
+    intersection = __and__
+    intersection_update = __iand__
+    union = __or__
+    union_update = __ior__
+    symmetric_difference = __xor__
+    symmetric_difference_update = __ixor__
 
     def issubset(self, rhs):
         """Report whether another set contains this set."""
@@ -600,17 +601,6 @@ cdef class intbitset:
     def issuperset(self, rhs):
         """Report whether this set contains another set."""
         return self.__ge__(rhs)
-
-    def symmetric_difference(self, rhs):
-        """Return the symmetric difference of two sets as a new set.
-        (i.e. all elements that are in exactly one of the sets.)
-        """
-        return self.__xor__(rhs)
-
-    def symmetric_difference_update(self, rhs):
-        """Update an intbitset with the symmetric difference of itself and another.
-        """
-        self.__ixor__(rhs)
 
     # Dumping & Loading
     def fastdump(self):
@@ -626,7 +616,7 @@ cdef class intbitset:
         to the fastdump method into the current intbitset. The previous content
         will be replaced."""
         cdef Py_ssize_t size
-        cdef void *buf
+        cdef const_void_ptr buf
         buf = NULL
         size = 0
         try:
@@ -719,57 +709,6 @@ cdef class intbitset:
 
     def get_allocated(self):
         return intBitSetGetAllocated(self.bitset)
-
-    def get_sorted_element(self, int index):
-        """Return element at position index in the sorted representation of the
-        set. Note that index must be less than len(self)"""
-        cdef int l
-        cdef int last
-        cdef int i
-        l = intBitSetGetTot(self.bitset)
-        if index < 0:
-            if self.bitset.trailing_bits:
-                raise OverflowError("It's impossible to retrieve a negative item from an infinite set.")
-            index = index + l
-        elif index > maxelem:
-            raise OverflowError("Index must be <= %s" % maxelem)
-        if 0 <= index < l:
-            last = intBitSetGetNext(self.bitset, -1)
-            for i from 0 <= i < index:
-                last = intBitSetGetNext(self.bitset, last)
-        else:
-            raise IndexError("intbitset index out of range")
-        return last
-
-    def to_sorted_list(self, int i, int j):
-        """Return a sublist of the sorted representation of the set.
-        Note, negative indices are not supported."""
-        cdef int l
-        cdef int last
-        cdef int cnt
-        if self.bitset.trailing_bits and (i < 0 or j < 0):
-            raise OverflowError("It's impossible to retrieve a sublist using negative indices from an infinite set.")
-        elif (i > maxelem or j > maxelem):
-            raise OverflowError("Indexes must be <= %s" % maxelem)
-        l = intBitSetGetTot(self.bitset)
-        if i == 0 and j == -1:
-            return intbitset(self)
-        ret = intbitset()
-        if i < 0:
-            i = i + l
-        if j < 0:
-            j = j + l
-        if i >= l:
-            i = l
-        if j >= l:
-            j = l
-        last = -1
-        for cnt from 0 <= cnt < i:
-            last = intBitSetGetNext(self.bitset, last)
-        for cnt from i <= cnt < j:
-            last = intBitSetGetNext(self.bitset, last)
-            intBitSetAddElem((<intbitset> ret).bitset, last)
-        return ret
 
     def is_infinite(self):
         """Return True if the intbitset is infinite. (i.e. trailing_bits=True

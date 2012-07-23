@@ -361,6 +361,19 @@ class IntBitSetTest(unittest.TestCase):
         for set1 in self.sets + [[]]:
             self.assertEqual(not set(set1), not intbitset(set1))
 
+    def test_set_len(self):
+        """intbitset - tests len()"""
+        for set1 in self.sets + [[]]:
+            intbitset1 = intbitset(set1)
+            pythonset1 = set(set1)
+            self.assertEqual(len(pythonset1), len(intbitset1))
+            intbitset1.add(76543)
+            pythonset1.add(76543)
+            self.assertEqual(len(pythonset1), len(intbitset1))
+            intbitset1.remove(76543)
+            pythonset1.remove(76543)
+            self.assertEqual(len(pythonset1), len(intbitset1))
+
     def test_set_clear(self):
         """intbitset - clearing"""
         for set1 in self.sets + [[]]:

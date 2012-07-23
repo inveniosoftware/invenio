@@ -39,6 +39,7 @@ setup(
     author_email = 'info@invenio-software.org',
     url = 'http://invenio-software.org/',
     ext_modules=[
-        Extension("invenio.intbitset", ["intbitset.c", "intbitset_impl.c"], extra_compile_args=['-O3']),
+        Extension("invenio.intbitset", ["intbitset.c", "intbitset_impl.c"], extra_compile_args=['-O3'])
+            ## For debug -> '-ftree-vectorizer-verbose=2'
     ],
 )

@@ -52,23 +52,14 @@ IntBitSet *intBitSetCreate(register const int size, const bool_t trailing_bits) 
     return ret;
 }
 
-IntBitSet *intBitSetCreateNoAllocate() {
-    // fprintf(stderr, "intBitSetCreateNoAllocate called\n");
-    IntBitSet *ret = PyMem_Malloc(sizeof(IntBitSet));
-    ret->allocated = 0;
-    ret->size = -1;
-    ret->trailing_bits = 0;
-    ret->tot = 0;
-    ret->bitset = NULL;
-    return ret;
-}
-
 IntBitSet *intBitSetResetFromBuffer(IntBitSet *const bitset, const void *const buf, const Py_ssize_t bufsize) {
     // fprintf(stderr, "intBitSetResetFromBuffer called\n");
-    bitset->allocated = bufsize/wordbytesize;
-    if (bitset->bitset)
+    register Py_ssize_t newallocate = bufsize/wordbytesize;
+    if (newallocate > bitset->allocated) {
         PyMem_Free(bitset->bitset);
-    bitset->bitset = PyMem_Malloc(bufsize);
+        bitset->bitset = PyMem_Malloc(bufsize);
+    }
+    bitset->allocated = newallocate;
     bitset->tot = -1;
     bitset->size = bitset->allocated - 1;
     memcpy(bitset->bitset, buf, bufsize);
@@ -139,7 +130,9 @@ int intBitSetGetSize(IntBitSet * const bitset) {
 
 int intBitSetGetTot(IntBitSet *const bitset) {
     register word_t* base;
+#ifndef __GNUC__
     register int i;
+#endif
     register int tot;
     register word_t *end;
     if (bitset->trailing_bits)
@@ -149,10 +142,16 @@ int intBitSetGetTot(IntBitSet *const bitset) {
         tot = 0;
         for (base = bitset->bitset; base < end; ++base)
             if (*base)
+#ifdef __GNUC__
+                // See:
+                // <http://stackoverflow.com/questions/109023/best-algorithm-to-count-the-number-of-set-bits-in-a-32-bit-integer>
+                tot += __builtin_popcountl(*base);
+#else
                 for (i=0; i<wordbitsize; ++i)
                     if ((*base & ((word_t) 1 << i)) != 0) {
                         ++tot;
                     }
+#endif
         bitset->tot = tot;
     }
     return bitset->tot;
@@ -162,26 +161,28 @@ int intBitSetGetAllocated(const IntBitSet * const bitset) {
     return bitset->allocated;
 }
 
-void intBitSetResize(IntBitSet *const bitset, register const int allocated) {
+void intBitSetResize(IntBitSet *const bitset, register const unsigned int allocated) {
     // fprintf(stderr, "intBitSetResize called\n");
     register word_t *base;
     register word_t *end;
+    register word_t trailing_bits;
     if (allocated > bitset->allocated) {
         bitset->bitset = PyMem_Realloc(bitset->bitset, allocated * wordbytesize);
         base = bitset->bitset + bitset->allocated;
         end = bitset->bitset + allocated;
+        trailing_bits = bitset->trailing_bits;
         for (; base<end; ++base)
-            *(base) = bitset->trailing_bits;
+            *(base) = trailing_bits;
         bitset->allocated = allocated;
     }
 }
 
-bool_t intBitSetIsInElem(const IntBitSet * const bitset, register const int elem) {
+bool_t intBitSetIsInElem(const IntBitSet * const bitset, register const unsigned int elem) {
     return ((elem < bitset->allocated * wordbitsize) ?
             (bitset->bitset[elem / wordbitsize] & ((word_t) 1 << ((word_t)elem % (word_t)wordbitsize))) != 0 : bitset->trailing_bits != 0);
 }
 
-void intBitSetAddElem(IntBitSet *const bitset, register const int elem) {
+void intBitSetAddElem(IntBitSet *const bitset, register const unsigned int elem) {
     if (elem >= (bitset->allocated - 1) * wordbitsize) {
         if (bitset->trailing_bits)
             return;
@@ -193,7 +194,7 @@ void intBitSetAddElem(IntBitSet *const bitset, register const int elem) {
     bitset->size = -1;
 }
 
-void intBitSetDelElem(IntBitSet *const bitset, register const int elem) {
+void intBitSetDelElem(IntBitSet *const bitset, register const unsigned int elem) {
     if (elem >= (bitset->allocated - 1) * wordbitsize) {
         if (!bitset->trailing_bits)
             return;
@@ -308,6 +309,7 @@ IntBitSet *intBitSetSub(IntBitSet *const x, IntBitSet *const y) {
     register word_t *retend;
     register IntBitSet * ret = PyMem_Malloc(sizeof (IntBitSet));
     register int tmpsize = intBitSetAdaptMin(x, y);
+    register word_t trailing_bits;
     ret->allocated = x->allocated > tmpsize ? x->allocated : tmpsize;
     xbase = x->bitset;
     ybase = y->bitset;
@@ -318,8 +320,9 @@ IntBitSet *intBitSetSub(IntBitSet *const x, IntBitSet *const y) {
     for (; retbase < retend; ++xbase, ++ybase, ++retbase)
         *(retbase) = *(xbase) & ~*(ybase);
     retend = ret->bitset+ret->allocated;
+    trailing_bits = y->trailing_bits;
     for (; retbase < retend; ++xbase, ++retbase)
-        *retbase = *xbase & ~y->trailing_bits;
+        *retbase = *xbase & ~trailing_bits;
     ret->trailing_bits = x->trailing_bits & ~y->trailing_bits;
     return ret;
 }
@@ -377,14 +380,16 @@ IntBitSet *intBitSetISub(IntBitSet *const dst, IntBitSet *const src) {
     register word_t *srcbase;
     register word_t *dstend;
     register int allocated = intBitSetAdaptMin(dst, src);
+    register word_t trailing_bits;
     dstbase = dst->bitset;
     srcbase = src->bitset;
     dstend = dst->bitset + allocated;
     for (; dstbase < dstend; ++dstbase, ++srcbase)
         *dstbase &= ~*srcbase;
     dstend = dst->bitset + dst->allocated;
+    trailing_bits = src->trailing_bits;
     for (; dstbase < dstend; ++dstbase)
-        *dstbase &= ~src->trailing_bits;
+        *dstbase &= ~trailing_bits;
     dst->size = -1;
     dst->tot = -1;
     dst->trailing_bits &= ~src->trailing_bits;
