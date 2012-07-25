@@ -32,6 +32,7 @@ def bst_send_email(fromaddr,
                copy_to_admin=0,
                attempt_times=1,
                attempt_sleeptime=10,
+               replytoaddr="",
                ):
     """
     Send a forged email to TOADDR from FROMADDR with message created from subjet, content and possibly
@@ -54,6 +55,8 @@ def bst_send_email(fromaddr,
     @type attempt_times: int
     @param attempt_sleeptime: seconds in between tries
     @type attempt_sleeptime: int
+    @param replytoaddr: comma-separated list of emails to add as reply-to header
+    @type replytoaddr: string
 
     If sending fails, try to send it ATTEMPT_TIMES, and wait for
     ATTEMPT_SLEEPTIME seconds in between tries.
@@ -61,5 +64,5 @@ def bst_send_email(fromaddr,
     copy_to_admin = int(copy_to_admin)
     attempt_times = int(attempt_times)
     attempt_sleeptime = int(attempt_sleeptime)
-    return send_email(fromaddr=fromaddr, toaddr=toaddr, subject=subject, content=content, header=header, footer=footer, copy_to_admin=copy_to_admin, attempt_times=attempt_times, attempt_sleeptime=attempt_sleeptime)
+    return send_email(fromaddr=fromaddr, toaddr=toaddr, subject=subject, content=content, header=header, footer=footer, copy_to_admin=copy_to_admin, attempt_times=attempt_times, attempt_sleeptime=attempt_sleeptime, replytoaddr=replytoaddr)
 

@@ -65,7 +65,8 @@ def scheduled_send_email(fromaddr,
                attempt_times=1,
                attempt_sleeptime=10,
                user=None,
-               other_bibtasklet_arguments=None):
+               other_bibtasklet_arguments=None,
+               replytoaddr=""):
     """
     Like send_email, but send an email via the bibsched
     infrastructure.
@@ -84,11 +85,16 @@ def scheduled_send_email(fromaddr,
         None, the sender will be used
     @param other_bibtasklet_arguments: other arguments to append to the list
         of arguments to the call of task_low_level_submission
+    @param replytoaddr: [string or list-of-strings] to be used for the
+                        reply-to header of the email (if string, then
+                        receivers are separated by ',')
     @return: the scheduled bibtasklet
     """
     from invenio.bibtask import task_low_level_submission
     if not isinstance(toaddr, (unicode, str)):
         toaddr = ','.join(toaddr)
+    if not isinstance(replytoaddr, (unicode, str)):
+        replytoaddr = ','.join(replytoaddr)
     if user is None:
         user = fromaddr
     if other_bibtasklet_arguments is None:
@@ -103,6 +109,7 @@ def scheduled_send_email(fromaddr,
         "bibtasklet", user, "-T", "bst_send_email",
         "-a", "fromaddr=%s" % fromaddr,
         "-a", "toaddr=%s" % toaddr,
+        "-a", "replytoaddr=%s" % replytoaddr,
         "-a", "subject=%s" % subject,
         "-a", "content=%s" % content,
         "-a", "copy_to_admin=%s" % copy_to_admin,
@@ -125,7 +132,8 @@ def send_email(fromaddr,
                attempt_sleeptime=10,
                debug_level=0,
                ln=CFG_SITE_LANG,
-               charset=None
+               charset=None,
+               replytoaddr="",
                ):
     """Send a forged email to TOADDR from FROMADDR with message created from subjet, content and possibly
     header and footer.
@@ -147,6 +155,9 @@ def send_email(fromaddr,
     @param ln: [string] invenio language
     @param charset: [string] the content charset. By default is None which means
     to try to encode the email as ascii, then latin1 then utf-8.
+    @param replytoaddr: [string or list-of-strings] to be used for the
+                        reply-to header of the email (if string, then
+                        receivers are separated by ',')
 
     If sending fails, try to send it ATTEMPT_TIMES, and wait for
     ATTEMPT_SLEEPTIME seconds in between tries.
@@ -177,7 +188,7 @@ This message would have been sent to the following recipients:
         usebcc = False
     body = forge_email(fromaddr, toaddr, subject, content, html_content,
                        html_images, usebcc, header, footer, html_header,
-                       html_footer, ln, charset)
+                       html_footer, ln, charset, replytoaddr)
 
     _ = gettext_set_language(CFG_SITE_LANG)
 
@@ -291,7 +302,7 @@ def email_html_footer(ln=CFG_SITE_LANG):
 def forge_email(fromaddr, toaddr, subject, content, html_content='',
                 html_images=None, usebcc=False, header=None, footer=None,
                 html_header=None, html_footer=None, ln=CFG_SITE_LANG,
-                charset=None):
+                charset=None, replytoaddr=""):
     """Prepare email. Add header and footer if needed.
     @param fromaddr: [string] sender
     @param toaddr: [string or list-of-strings] list of receivers (if string, then
@@ -306,6 +317,9 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
     @param ln: language
     @charset: [string] the content charset. By default is None which means
     to try to encode the email as ascii, then latin1 then utf-8.
+    @param replytoaddr: [string or list-of-strings] to be used for the
+                        reply-to header of the email (if string, then
+                        receivers are separated by ',')
     @return: forged email as a string"""
 
     if html_images is None:
@@ -342,6 +356,13 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
     except (UnicodeEncodeError, UnicodeDecodeError):
         toaddr = Header(toaddr, 'utf-8')
 
+    if type(replytoaddr) is not str:
+        replytoaddr = ','.join(replytoaddr)
+    try:
+        replytoaddr = replytoaddr.encode('ascii')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        replytoaddr = Header(replytoaddr, 'utf-8')
+
     if html_content:
         if html_header is None:
             html_content = email_html_header(ln) + html_content
@@ -360,6 +381,8 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
         msg_root = MIMEMultipart('alternative')
         msg_root['Subject'] = subject
         msg_root['From'] = fromaddr
+        if replytoaddr:
+            msg_root['Reply-To'] = replytoaddr
         if usebcc:
             msg_root['Bcc'] = toaddr
             msg_root['To'] = 'Undisclosed.Recipients:'
@@ -388,6 +411,8 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
     else:
         msg_root = MIMEText(content, _charset=content_charset)
         msg_root['From'] = fromaddr
+        if replytoaddr:
+            msg_root['Reply-To'] = replytoaddr
         if usebcc:
             msg_root['Bcc'] = toaddr
             msg_root['To'] = 'Undisclosed.Recipients:'
