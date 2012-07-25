@@ -1,0 +1,559 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+
+{% macro collection_tree(collections, limit=None) %}
+{%- set idxs = [0] -%}
+
+<style>
+	.listplaceholder { 
+		height: 1.5em; line-height: 1.2em; 
+		border: 0.2em dashed #ccc;
+		border-radius-topright: 30px 20px;
+		border-radius-topleft: 30px 20px;
+	}
+.temp_placeholder { 
+		height: 1.5em; line-height: 1.2em; 
+		border: 0.2em dashed #ccc;
+		-moz-border-radius-topright: 30px 20px;
+		-moz-border-radius-topleft: 30px 20px;
+	}
+</style>
+<ul {{ kwargs|xmlattr }}>
+{% for collection in collections recursive %}
+  <li>
+    {# Do not show checkboxes in new UI
+    {% if idxs|length == 1 %}
+    <input type="checkbox" name="c" value="{{ collection.name }}" checked/>
+    {% endif %}
+    #}
+    <a  href="{{ url_for(".collection", name=collection.name) }}" data-id="{{ collection.id }}">
+      {{ collection.name_ln }}
+    </a>
+  {% if collection.collection_children and idxs|length < limit %}
+    {%- do idxs.append(loop.index) -%}
+    <ul {{ kwargs|xmlattr }}>
+      {{ loop(collection.collection_children) }}
+    </ul>
+    {%- do idxs.pop() -%}
+  {% endif %}
+  </li>
+{% endfor %}
+</ul>
+
+<script>
+	// drag and drop JS code 
+$(function() {
+	$( ".sortable" ).sortable({
+		connectWith: ".connectedSortable",
+		placeholder: "listplaceholder",
+		cursor: "move",
+		start: function(event, ui) {
+			$(ui.item).parent().prepend('<li class="temp_placeholder"></li>');
+		},
+		stop: function(event, ui) {
+			$(".temp_placeholder").remove();
+		},
+		change: function(event, ui) {
+			$(".temp_placeholder").remove();
+			$(ui.placeholder).parent().append('<li class="temp_placeholder"></li>');
+			$(ui.placeholder).prev(".temp_placeholder").remove();
+			$(ui.placeholder).next(".temp_placeholder").remove();
+		}
+	});
+$( ".sortable" ).disableSelection();
+
+
+});
+</script>
+{% endmacro %}
+
+{% macro portalbox_sidebar(portalboxes, width=2) %}
+  {% if portalboxes %}
+  <div {{ kwargs|xmlattr }}>
+    <ul class="thumbnails">
+    {% for cp in portalboxes %}
+    <li class="span{{ width }}">
+    <div class="thumbnail">
+      <h5>{{ cp.portalbox.title }}</h5>
+      <p>{{ cp.portalbox.body|safe }}</p>
+    </div>
+    </li>
+    {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro search_also(externalcollections) %}
+  {% if externalcollections %}
+    <h4>{{ _("Search also") }}</h4>
+    <ul>
+    {% for ex in externalcollections %}
+      <li>{{ ex.name }} <a href="{{ ex.engine.base_url}}">
+        <img src="{{ url_for("static", filename="img/external-icon-light-8x8.gif")}}" alt="{{ ex.engine.base_url }}"/>
+        </a></li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endmacro %}
+
+{% macro _search_hidden_options() %}
+
+  {%- for name in ['rg', 'of', 'so', 'sf', 'rm'] -%}
+  {%- if request.args.get(name) -%}
+  <input type="hidden" name="{{ name }}" value="{{ request.args.get(name, '') }}" />
+  {%- endif -%}
+  {%- endfor -%}
+
+{% endmacro %}
+
+{% macro _search_advanced_box(collection) %}
+  <div style="padding: 0px;" class="dropdown-menu donothide">
+    <div class="row">
+      <div class="span6" style="min-width: 400px;">
+
+        <div class="modal-header">
+          <button type="button" style="z-index:9999; position: relative;" class="close" onclick="$('.dropdown.open').removeClass('open')">×</button>
+          <label class="control-label">
+            <strong>{{ _('Add to search') }}</strong>
+          </label>
+          <div style="padding-top:4px;" class="controls btn-group" data-toggle="buttons-radio">
+              <label class="btn btn-mini active">
+                <input style="display:none;" type="radio" name="op1" value="a" checked/>{{ _('AND') }}
+              </label>
+              <label class="btn btn-mini">
+                <input style="display:none;" type="radio" name="op1" value="o"/>{{ _('OR') }}
+              </label>
+              <label class="btn btn-mini">
+                <input style="display:none;" type="radio" name="op1" value="n"/>{{ _('AND NOT') }}
+              </label>
+            </div>
+
+        </div><!-- end modal-header-->
+
+        <div class="modal-body">
+
+          <div class="control-group">
+            <label style="padding-top:1px;" class="control-label">
+              <select style="width:100%;" name="m1">
+                {%- for k,v in config.CFG_WEBSEACH_MATCHING_TYPES.iteritems() -%}
+                  <option value="{{ k }}">{{ _(v.title)|safe }}</option>
+                {%- endfor -%}
+              </select>
+            </label>
+            <div class="controls">
+              <input type="text" name="p1" value="" class="span3"/>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">{{ _('in') }}:</label>
+            <div class="controls">
+            <select class="span2" name="f">
+              {% for code, name in collection.search_within.iteritems() %}
+              <option value="{{ code }}">
+                {{ name }}
+              </option>
+              {% endfor %}
+            </select>
+            <span id="addtosearch" class="btn">
+              <i class="icon-ok"></i>
+            </span>
+            </div>
+          </div>
+
+          {% for id, soo in collection.search_options|groupby('id_field') %}
+          <hr/>
+          <div class="control-group">
+            <label class="control-label">{{ soo[0].field.name_ln }}</label>
+            <div class="controls">
+            <select class="span2" name="{{ soo[0].field.code }}">
+              <option value="">*** {{ _('select') }} ***</option>
+              {% for so in soo %}
+              <option value="{{ so.fieldvalue.value }}">
+                {{ so.fieldvalue.name }}
+              </option>
+              {% endfor %}
+            </select>
+            <span data-target="p" data-source="{{ soo[0].field.code }}" class="btn appender">
+              <i class="icon-ok"></i>
+            </span>
+            </div>
+          </div>
+          {% endfor %}
+
+        </div><!-- end modal-body -->
+
+        <div class="modal-footer">
+          <button name="action_search" type="submit" class="btn btn-primary">
+            <i class="icon-search icon-white"></i> {{ _("Search") }}
+          </button>
+        </div><!-- end modal-footer -->
+
+      </div><!-- end span5 -->
+    </div><!-- end row -->
+  </div><!-- end dropdown-menu -->
+
+{% endmacro %}
+
+{% macro search_form(collection) %}
+  <div id="search-box-main" class="row">
+    <div class="span12">
+      <div class="control-group well">
+        <form action="{{ url_for('.search') }}" name="search" method="get" class="form-horizontal" style="
+    width: 80%;
+    margin: 0px;
+    float: left;
+">
+          <label for="p" class="control-label">
+            {{ _("Search %d records for:")|format(collection.nbrecs) }}
+          </label>
+          <div class="controls">
+            <div id="searchdropdown" style="float: left;" class="dropdown">
+              <div class="input-append">
+                <input autocomplete="off" data-provide="typeahead" data-items="4" name="p" class="span5" type="text" placeholder="{{ _("Input query") }}" value="{{ request.args.get('p', '') }}" autofocus/><!--
+                No space!
+              --><span data-toggle="dropdown" data-target="#searchdropdown" class="add-on btn">
+                  <i class="caret"></i>
+                </span>
+              </div>
+
+{#
+ # This is a dirty hack for browser without Javascript support.
+ #}
+<script>
+  var box = {{ _search_advanced_box(collection)|tojson|safe }};
+  document.write(box);
+</script>
+
+              <!-- Hidden configuration fields -->
+              {% if collection.id != 1 %}
+              <input type="hidden" name="cc" value="{{ collection.name }}" />
+              {% endif %}
+              {{ _search_hidden_options() }}
+              <!-- end of configuration fields -->
+
+              <button name="action_search" type="submit" class="btn btn-primary">
+                <i class="icon-search icon-white"></i> {{ _("Search") }}
+              </button>
+
+              <span class="help-inline">
+                <a href="/help/search-tips">{{ _("Search Tips") }}</a>
+              </span>
+            </div>
+          </div><!-- end controls -->
+        </form>
+
+        <form action="{{ url_for('.search') }}" name="settings" method="get" style="
+          margin: 0px;
+          " class="form-inline">
+          <input name="p" value="{{ request.args.get('p','') }}" type="hidden" />
+
+
+        <div id="settingsdropdown" class="pull-right btn-group dropdown">
+          <button class="btn dropdown-toggle" data-target="#settingsdropdown" data-toggle="dropdown">
+            <i class="icon-cog"></i>
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu donothide">
+            <li style="width: 100%; float: left; padding: 3px 15px;">
+          <div class="control-group">
+            <label class="control-label">{{ _('View') }}</label>
+            <div class="controls">
+              <select name="rg" class="pull-right span2">
+              {%- for i in [10, 25, 50, 100, 250, 500] -%}
+              {%- if i <= config.CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS -%}
+                <option value="{{ i }}"{{ ' selected' if request.args.get('rg',10)==i.__str__() }}>{{ i }} {{ _('results') }}</option>
+              {%- endif -%}
+              {%- endfor -%}
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">{{ _('Action') }}</label>
+            <div class="controls">
+              <div class="btn-group" data-toggle="buttons-radio" onclick="return false;">
+              <label class="btn btn-small active">
+                <input style="display:none;" type="radio" name="actiona" value="search" checked="checked">
+                {{ _('Search') }}
+              </label>
+              <label class="btn btn-small">
+                <input style="display:none;" type="radio" name="actiona" value="browse" checked="">
+                {{ _('Browse') }}
+              </label>
+              </div>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">{{ _('Output format') }}</label>
+            <div class="controls">
+              <select name="of" class="pull-right span2">
+              {%- for i in collection.formatoptions -%}
+                <option value="{{ i.code }}"{{ ' selected' if request.args.get('of','hb')==i.code }}>{{ i.name }}</option>
+              {%- endfor -%}
+              </select>
+            </div>
+          </div>
+            </li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li class="divider"></li>
+            <li style="padding: 0 15px 3px 15px;;">
+              <button class="btn">
+                <i class="icon-ok"></i> {{ _('Apply') }}
+              </button>
+            </li>
+          </ul>
+        </div>
+        </form>
+        <div style="clear: both;"></div>
+
+      </div><!-- end controll-group well -->
+    </div><!-- end span12 -->
+  </div><!-- end row -->
+
+
+
+  <script>
+  $(function () {
+
+    $("form[name=search]").submit(function() {
+      $('.donothide').remove();
+      return true; // ensure form still submits
+    });
+
+    if (!("autofocus" in $("form[name=search] input[name=q]"))) {
+      // ensure we get the focus always in search input
+      $("form[name=search] input[name=q]").focus();
+    }
+
+    var op1_fn = {'a': 'AND ', 'o': 'OR ', 'n': 'AND NOT '},
+        m1_fn = {
+        {%- for k,v in config.CFG_WEBSEACH_MATCHING_TYPES.iteritems() -%}
+          '{{ k }}': function(val, f) {
+            {{ v.tokenize|safe }}
+          }{{ ',' if not loop.last }}
+        {%- endfor -%}
+        };
+
+    var addtosearch_callback = function(e) {
+      var op1 = $('[name=op1]:checked').val(),
+          m1 = $('[name=m1]').val(),
+          p1 = $('[name=p1]').val(),
+          f = $('[name=f]').val(),
+          p = $('[name=p]'),
+          val = p.val(),
+          op = (op1=='a' && val=="")?'':op1_fn[op1];
+      if (val !== "") {
+        val += ' ';
+      }
+      if (p1 === "") { return false; }
+      if (f !== "") {
+        f +=':';
+      }
+      p.val(val+op+m1_fn[m1](p1,f));
+      $('[name=p1]').val('');
+      e.stopPropagation();
+      return false;
+    };
+
+    $('#addtosearch').on('click', addtosearch_callback);
+    $('[name=p1]').keypress(function(event) {
+      if ( event.which == 13 ) {
+        event.preventDefault();
+        addtosearch_callback(event);
+      }
+    });
+
+    $('#searchdropdown .appender').on('click', function(e) {
+        var op1 = $('[name=op1]:checked').val(),
+            btn = $(this),
+            source = $('[name='+btn.attr('data-source')+']'),
+            target = $('[name='+btn.attr('data-target')+']'),
+            val = target.val(),
+            op = (op1=='a' && val=="")?'':op1_fn[op1];
+        if (val !== "") {
+          val += ' ';
+        }
+        if (source.val() === "") { return false }
+        if (source.val().length > 0) {
+          target.val(val+op+source.attr('name')+':"'+source.val()+'"');
+          source.val('');
+        }
+        e.stopPropagation();
+        return false;
+    });
+
+    $('#searchdropdown .btn-primary').on('click', function(e) {
+      addtosearch_callback(e);
+      $('#searchdropdown .appender').trigger('click');
+    });
+
+    $('html').on('click.dropdown', '.dropdown .donothide', function (e) {
+      if (!$(e.target).hasClass('close')) {
+        e.stopPropagation();
+      }
+    });
+
+    $('html').on('click.dropdown.donothide.data-api', function (e) {
+      $('#searchdropdown').removeClass('open');
+    });
+
+    var source = $.map({{ collection.search_within.keys()[1:]|tojson|safe }},
+          function(val, i) { return val+':';}); //['author:', 'title:', 'isbn:'];
+    source.push('AND ');
+    source.push('OR ');
+    source.push('AND NOT ');
+
+    var sources = {
+    {% for id, soo in collection.search_options|groupby('id_field') %}
+      '{{ soo[0].field.code }}': [{% for so in soo %}
+            '{{ so.fieldvalue.name }}' {{ ',' if not loop.last }}
+            {% endfor %}
+        ]{{ ',' if not loop.last }}
+    {% endfor %}
+    };
+
+    {% for id, soo in collection.search_options|groupby('id_field') %}
+    source.push('{{ soo[0].field.code }}');
+    {% endfor %}
+
+    var orig = {
+      lookup: $.fn.typeahead.Constructor.prototype.lookup,
+      render: $.fn.typeahead.Constructor.prototype.render,
+      matcher:$.fn.typeahead.Constructor.prototype.matcher,
+      select:$.fn.typeahead.Constructor.prototype.select
+    };
+
+    $.extend($.fn.typeahead.Constructor.prototype, {
+      lookup: function(event) {
+        var query = this.$element.val(),
+        m = query.lastIndexOf(':'),
+        type = query.substr(0,m),
+        n = type.lastIndexOf(' ');
+        if (0<n && n<m) {
+          type = type.substr(n+1);
+        }
+        if (m>query.lastIndexOf(' ') && type in sources) {
+          this.options.type = 'data';
+          this.source = this.options.sources[type];
+        } else {
+          this.options.type = 'search';
+          this.source = source;
+        }
+        orig.lookup.call(this);
+      },
+      select: function() {
+        var val = this.$menu.find('.active').attr('data-value');
+
+        if (this.options.type == 'data') {
+        var m = this.query.lastIndexOf(':'),
+            newVal = this.$element.val().substr(0, m);
+        if (~m) {
+          newVal += ':"';
+        }
+        this.$element.val(newVal+val+'" ');
+        this.$element.change();
+        this.options.type = 'search';
+        return this.hide();
+        }
+
+        if (this.options.type == 'search') {
+        var m = this.query.lastIndexOf(' '),
+            im = (m<0)?0:m+1,
+            p = this.$element.val(),
+            op = ("+-|".indexOf(p[im])>-1)?p[im]:'',
+            newVal = p.substr(0, m);
+        if (~m) {
+          newVal += ' ';
+        }
+        this.$element.val(newVal+op+val);
+        this.$element.change();
+        return this.hide();
+        }
+
+        orig.select.call(this);
+        return this;
+      },
+
+      /*
+      render: function(items) {
+
+      if (this.options.type != 'email') {
+        orig.render.call(this, items);
+        return this;
+      }
+
+      var that = this,
+        text = this.query.replace(/@.*$/, ''),
+        val;
+
+      items = $(items).map(function(i, item) {
+        val = text + '@' + item;
+        i = $(that.options.item).attr('data-value', val);
+        i.find('a').html(that.highlighter(val));
+        return i[0];
+      });
+
+      items.first().addClass('active');
+      this.$menu.html(items);
+      return this;
+      },
+      */
+      matcher: function(item) {
+
+        if (this.options.type == 'data') {
+        var m = this.query.lastIndexOf(':'),
+          search;
+
+        search = this.query.substr(m + 1).toLowerCase();
+        return search.length && ~item.toLowerCase().indexOf(search);
+        }
+
+        if (this.options.type == 'search') {
+        var m = this.query.lastIndexOf(' '),
+          search;
+
+        search = this.query.substr(m + 1).toLowerCase();
+        offset = 0;
+        if (search.length && "+-|".indexOf(search[0]) > -1) {
+          offset = 1;
+        }
+        return search.length && ~item.toLowerCase().indexOf(search.substr(offset));
+        }
+
+        return orig.matcher.call(this, item);
+      }
+    });
+
+
+    $('form[name=search] input[name=p]').typeahead({
+      source: source,
+      sources: sources,
+      type: 'search'
+    });
+
+  });
+
+ </script>
+
+
+{% endmacro %}
+

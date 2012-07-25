@@ -1,0 +1,81 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% from "_formhelpers.html" import th with context %}
+{% from "_formhelpers.html" import render_filter_form with context %}
+{% from "websearch_admin_helpers.html" import collection_tree with context %}
+{% extends "page.html" %}
+{% set title = _("WebSearch Admin") %}
+{% set personalize_selected = True %}
+
+{% block header %}
+{{ super() }}
+{% js "js/jquery/jquery-1.7.2.min.js" %}
+{% js "js/jquery/jquery-ui-1.8.21.custom.min.js" %}
+{% endblock header %}
+
+{% block body %}
+{% if collection.collection_children_r %}
+<div class="span4 collection">
+	<h4>{{ _("Narrow by collections") }}</h4>
+	{{ collection_tree(collection.collection_children_r, limit=2,class="nav nav-list sortable
+	connectedSortable") }}
+</div>
+{% else %}
+<div class="span{{ '8' if collection.collection_children_v else '10' }}">
+	{% for recid in collection.reclist %}
+	<div class="row-fluid">
+		<div class="span1">
+			<small style="font-size:70%;">
+				{{ get_creation_date(recid, fmt="%Y-%m-%d<br />%H:%i")|safe }}
+			</small>
+		</div>
+		<div class="span11">
+			{{ format_record(recid, 'hb', ln=g.ln)|safe }}
+			<p>
+			<a href="{{ url_for('.search', recid=recid, ln=g.ln) }}">
+				{{ _("Detailed record") }}
+			</a>
+			-
+			<a href="{{ url_for('.search', p="recid:%d" % recid, rm='wrd', ln=ln) }}">
+				{{ _("Similar records") }}
+			</a>
+			</p>
+		</div>
+	</div>
+	{% endfor %}
+</div>
+{% endif %}
+
+{% if collection.collection_children_v %}
+<div class="span6 collection">
+	<h4>{{ _("Focus on") }}</h4>
+	{{ collection_tree(collection.collection_children_v, limit=2, class="nav nav-list") }}
+
+</div>
+{% else %}
+<div class="span2">
+	{{ search_also(collection.externalcollections_2) }}
+</div>
+{% endif %}
+
+<div style="clear:both;"></div>
+
+{% endblock %}
+
+
