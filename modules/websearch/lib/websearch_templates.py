@@ -3564,10 +3564,20 @@ class Template:
 
     def tmpl_xml_endnote_prologue(self):
         """Creates XML EndNote prologue."""
+        out = """<xml>\n<records>\n"""
+        return out
+
+    def tmpl_xml_endnote_8x_prologue(self):
+        """Creates XML EndNote prologue."""
         out = """<records>\n"""
         return out
 
     def tmpl_xml_endnote_epilogue(self):
+        """Creates XML EndNote epilogue."""
+        out = """\n</records>\n</xml>"""
+        return out
+
+    def tmpl_xml_endnote_8x_epilogue(self):
         """Creates XML EndNote epilogue."""
         out = """\n</records>"""
         return out

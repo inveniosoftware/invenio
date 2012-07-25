@@ -53,38 +53,42 @@ exclude-result-prefixes="marc fn">
  </xsl:template>
 
 <xsl:template match="record">
-        <authors>
-                <xsl:for-each select="datafield[(@tag='100' or @tag='700') and @ind1=' ' and @ind2=' ']">
-	                <author>
-                                <xsl:value-of select="subfield[@code='a']" />
-                        </author>
-                </xsl:for-each>
-        </authors>
-        <title>
-                <xsl:for-each select="datafield[@tag='245' and @ind1=' ' and @ind2=' ']">
-                        <xsl:value-of select="subfield[@code='a']"/>
-                        <xsl:if test="subfield[@code='b']">
-                                <xsl:text>: </xsl:text><xsl:value-of select="subfield[@code='b']"/>
-                        </xsl:if>
-                </xsl:for-each>
-        </title>
-        <secondary_title>
-                <xsl:value-of select="datafield[@tag='773' and @ind1=' ' and @ind2=' ']/subfield[@code='p']"/>
-        </secondary_title>
+        <contributors>
+            <xsl:if test="datafield[(@tag='100' or @tag='700') and @ind1=' ' and @ind2=' ']">
+            <authors>
+            <xsl:for-each select="datafield[(@tag='100' or @tag='700') and @ind1=' ' and @ind2=' ']">
+                <author>
+                <xsl:value-of select="subfield[@code='a']" />
+                </author>
+            </xsl:for-each>
+            </authors>
+            </xsl:if>
+        </contributors>
+        <titles>
+            <title>
+                    <xsl:for-each select="datafield[@tag='245' and @ind1=' ' and @ind2=' ']">
+                            <xsl:value-of select="subfield[@code='a']"/>
+                            <xsl:if test="subfield[@code='b']">
+                                    <xsl:text>: </xsl:text><xsl:value-of select="subfield[@code='b']"/>
+                            </xsl:if>
+                    </xsl:for-each>
+            </title>
+            <secondary-title>
+                    <xsl:value-of select="datafield[@tag='773' and @ind1=' ' and @ind2=' ']/subfield[@code='p']"/>
+            </secondary-title>
+        </titles>
         <pages>
                 <xsl:value-of select="datafield[@tag='773' and @ind1=' ' and @ind2=' ']/subfield[@code='c']" />
                 <xsl:value-of select="datafield[@tag='909' and @ind1='C' and @ind2='4']/subfield[@code='c']" />
         </pages>
-        <number>
-                <xsl:value-of select="datafield[@tag='773' and @ind1=' ' and @ind2=' ']/subfield[@code='n']" />
-        </number>
         <volume>
                 <xsl:value-of select="datafield[@tag='773' and @ind1=' ' and @ind2=' ']/subfield[@code='v']" />
                 <xsl:value-of select="datafield[@tag='909' and @ind1='C' and @ind2='4']/subfield[@code='v']" />
         </volume>
-        <abstract>
-            <xsl:value-of select="datafield[@tag='520' and @ind1=' ' and @ind2=' ']/subfield[@code='a']" />
-        </abstract>
+        <number>
+                <xsl:value-of select="datafield[@tag='773' and @ind1=' ' and @ind2=' ']/subfield[@code='n']" />
+        </number>
+        <xsl:if test="datafield[@tag='653' and @ind1='1' and @ind2=' ']/subfield[@code='a']">
         <keywords>
                 <xsl:for-each select="datafield[@tag='653' and @ind1='1' and @ind2=' ']/subfield[@code='a']">
                         <keyword>
@@ -92,12 +96,21 @@ exclude-result-prefixes="marc fn">
                         </keyword>
                 </xsl:for-each>
         </keywords>
-        <year>
-                <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_YEAR date_format=&quot;%Y&quot;>')" />
-        </year>
-        <date>
-                <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_DATE date_format=&quot;%Y-%m-%d&quot;>')" />
-        </date>
+        </xsl:if>
+        <dates>
+            <year>
+                    <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_YEAR date_format=&quot;%Y&quot;>')" />
+            </year>
+            <xsl:if test="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_DATE date_format=&quot;%Y-%m-%d&quot;>')">
+            <pub-dates>
+                <date>
+                        <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_DATE date_format=&quot;%Y-%m-%d&quot;>')" />
+                </date>
+            </pub-dates>
+            </xsl:if>
+        </dates>
+        <abstract>
+            <xsl:value-of select="datafield[@tag='520' and @ind1=' ' and @ind2=' ']/subfield[@code='a']" />
+        </abstract>
 </xsl:template>
 </xsl:stylesheet>
-

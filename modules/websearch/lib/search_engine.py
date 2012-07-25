@@ -4193,6 +4193,8 @@ def print_records_prologue(req, format, cc=None):
         prologue = websearch_templates.tmpl_xml_refworks_prologue()
     elif format.startswith('xr'):
         prologue = websearch_templates.tmpl_xml_rss_prologue(cc=cc)
+    elif format.startswith('xe8x'):
+        prologue = websearch_templates.tmpl_xml_endnote_8x_prologue()
     elif format.startswith('xe'):
         prologue = websearch_templates.tmpl_xml_endnote_prologue()
     elif format.startswith('xo'):
@@ -4217,6 +4219,8 @@ def print_records_epilogue(req, format):
         epilogue = websearch_templates.tmpl_xml_refworks_epilogue()
     elif format.startswith('xr'):
         epilogue = websearch_templates.tmpl_xml_rss_epilogue()
+    elif format.startswith('xe8x'):
+        epilogue = websearch_templates.tmpl_xml_endnote_8x_epilogue()
     elif format.startswith('xe'):
         epilogue = websearch_templates.tmpl_xml_endnote_epilogue()
     elif format.startswith('xo'):
