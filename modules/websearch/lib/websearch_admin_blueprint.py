@@ -63,3 +63,28 @@ def index():
 	return dict(collection=collection) 
 
 
+
+@blueprint.route('/modifycollectiontree', methods=['GET', 'POST'])
+#@blueprint.invenio_wash_urlargd({'id': (int, 0), 'id_dad': (int, 0), 'score': (int, 0)})
+@blueprint.invenio_authenticated
+@blueprint.invenio_templated('websearch_admin_index.html')
+def modifycollectiontree():
+    id = request.args.get('id', 0, type=int)
+    id_dad = request.args.get('id_dad', 0, type=int)
+    score = request.args.get('score', 0, type=int)
+    flash(_("Bam, ajax style! id = %d id_dad = %d score = %d") % (id, id_dad, score), "info")
+
+    collection = Collection.query.get_or_404(id)
+
+    # check to see if it is only one dad
+    if len(collection.dads) > 1:
+        return "multiple dads"
+    # get the dad
+    olddad = collection.dads.pop()
+    db.session.delete(olddad)
+    newdad = Collection.query.get_or_404(id_dad) 
+    newdad._collection_children.set(CollectionCollection(id_son=collection.id), score)
+
+    db.session.commit()
+    return dict()#redirect(url_for('.index'))
+

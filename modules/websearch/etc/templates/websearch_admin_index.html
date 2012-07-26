@@ -33,8 +33,8 @@
 {% if collection.collection_children_r %}
 <div class="span4 collection">
 	<h4>{{ _("Narrow by collections") }}</h4>
-	{{ collection_tree(collection.collection_children_r, limit=2,class="nav nav-list sortable
-	connectedSortable") }}
+	{{ collection_tree(collection, 'collection_children_r', limit=2,class="nav nav-list sortable
+	connectedSortable" ) }}
 </div>
 {% else %}
 <div class="span{{ '8' if collection.collection_children_v else '10' }}">
@@ -65,7 +65,7 @@
 {% if collection.collection_children_v %}
 <div class="span6 collection">
 	<h4>{{ _("Focus on") }}</h4>
-	{{ collection_tree(collection.collection_children_v, limit=2, class="nav nav-list") }}
+	{# collection_tree(collection.collection_children_v, class="nav nav-list") #}
 
 </div>
 {% else %}

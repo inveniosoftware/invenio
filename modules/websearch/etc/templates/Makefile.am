@@ -27,7 +27,9 @@ templates_DATA = record.html \
 		 websearch_index.html \
 		 websearch_helpers.html \
 		 websearch_results.html \
-		 websearch_search.html
+		 websearch_search.html \
+		 websearch_admin_index.html \
+		 websearch_admin_helpers.html
 
 EXTRA_DIST = $(templates_DATA)
 
