@@ -871,7 +871,7 @@ class Template:
                       <td>%(login_select)s</td>
                    </tr>""" % {
                      'login_title' : cgi.escape(_("Login method:")),
-                     'login_select' : cgi.escape(login_select),
+                     'login_select' : login_select,
                    }
         else:
             # only one login method available
