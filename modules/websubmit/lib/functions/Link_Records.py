@@ -78,6 +78,13 @@ def Link_Records(parameters, curdir, form, user_info=None):
     edsrn2 = parameters["edsrn2"]
     direct_relationship = parameters["directRelationship"]
     reverse_relationship = parameters["reverseRelationship"]
+    keep_original_edsrn2 = parameters.get("keep_original_edsrn2", "True")
+    if keep_original_edsrn2 == "True":
+        keep_original_edsrn2 = True
+    elif keep_original_edsrn2 == "False":
+        keep_original_edsrn2 = False
+    else:
+        keep_original_edsrn2 = True
     recid_a = int(sysno)
     if exists(join(curdir, edsrn)):
         rn_a = open(join(curdir, edsrn)).read().strip()
@@ -101,7 +108,8 @@ def Link_Records(parameters, curdir, form, user_info=None):
         rn_b = ""
         recid_b, rn_b = get_recid_and_reportnumber(recid=recid_b)
     else:
-        recid_b, rn_b = get_recid_and_reportnumber(reportnumber=rn_b)
+        recid_b, rn_b = get_recid_and_reportnumber(reportnumber=rn_b,
+                                                   keep_original_reportnumber=keep_original_edsrn2)
 
     g = RE_FILENAME.match(direct_relationship)
     if g:
@@ -132,7 +140,7 @@ def Link_Records(parameters, curdir, form, user_info=None):
     open(join(curdir, 'bibupload_link_record_id'), 'w').write(str(bibupload_id))
     return ""
 
-def get_recid_and_reportnumber(recid=None, reportnumber=None):
+def get_recid_and_reportnumber(recid=None, reportnumber=None, keep_original_reportnumber=True):
     """
     Given at least a recid or a reportnumber, this function will look into
     the system for the matching record and will return a normalized
@@ -160,10 +168,13 @@ def get_recid_and_reportnumber(recid=None, reportnumber=None):
             raise ValueError('More than one record matches the reportnumber "%s": %s' % (reportnumber, ', '.join(recids)))
         elif len(recids) == 1:
             recid = list(recids)[0]
-            reportnumbers = get_fieldvalues(recid, CFG_PRIMARY_REPORTNUMBER)
-            if not reportnumbers:
-                raise ValueError("The matched record %s does not have a primary report number" % recid)
-            return recid, reportnumbers[0]
+            if keep_original_reportnumber:
+                return recid, reportnumber
+            else:
+                reportnumbers = get_fieldvalues(recid, CFG_PRIMARY_REPORTNUMBER)
+                if not reportnumbers:
+                    raise ValueError("The matched record %s does not have a primary report number" % recid)
+                return recid, reportnumbers[0]
         else:
             raise ValueError("No records are matched by the provided reportnumber: %s" % reportnumber)
     raise ValueError("At least the recid or the reportnumber must be specified")

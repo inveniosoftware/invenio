@@ -597,6 +597,7 @@ update-db-from-v1.0-to-v1.1: # update DB from v1.0 release series to v1.1 releas
 	echo "INSERT INTO sbmFUNDESC VALUES ('Link_Records','edsrn2');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Link_Records','directRelationship');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Link_Records','reverseRelationship');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Link_Records','keep_original_edsrn2');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','aspect');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','batch_template');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','title');" | ${prefix}/bin/dbexec
