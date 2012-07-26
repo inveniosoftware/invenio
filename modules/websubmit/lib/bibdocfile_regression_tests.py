@@ -32,6 +32,9 @@ from invenio.config import \
         CFG_WEBSUBMIT_FILEDIR, \
         CFG_SITE_RECORD
 
+from datetime import datetime
+import time
+
 class BibDocFsInfoTest(unittest.TestCase):
     """Regression tests about the table bibdocfsinfo"""
     def setUp(self):
@@ -108,7 +111,8 @@ class BibDocsTest(unittest.TestCase):
         """bibdocfile - BibDocs functions"""
         #add file
         my_bibrecdoc = BibRecDocs(2)
-        my_bibrecdoc.add_new_file(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', 'Main', 'img_test', False, 'test add new file', 'test', '.jpg')
+        timestamp1 = datetime.strptime("2011-10-09 08:07:06", "%Y-%m-%d %H:%M:%S")
+        my_bibrecdoc.add_new_file(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', 'Main', 'img_test', False, 'test add new file', 'test', '.jpg', modification_date=timestamp1)
         my_new_bibdoc = my_bibrecdoc.get_bibdoc("img_test")
         value = my_bibrecdoc.list_bibdocs()
         self.assertEqual(len(value), 2)
@@ -133,9 +137,12 @@ class BibDocsTest(unittest.TestCase):
         #get file number
         self.assertEqual(my_new_bibdoc.get_file_number(), 1)
         #add file new version
-        my_new_bibdoc.add_file_new_version(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', description= 'the new version', comment=None, format=None, flags=["PERFORM_HIDE_PREVIOUS"])
+        timestamp2 = datetime.strptime("2010-09-08 07:06:05", "%Y-%m-%d %H:%M:%S")
+        my_new_bibdoc.add_file_new_version(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', description= 'the new version', comment=None, format=None, flags=["PERFORM_HIDE_PREVIOUS"], modification_date=timestamp2)
         self.assertEqual(my_new_bibdoc.list_versions(), [1, 2])
         #revert
+        timestamp3 = datetime.now()
+        time.sleep(2) # so we can see a difference between now() and the time of the revert
         my_new_bibdoc.revert(1)
         self.assertEqual(my_new_bibdoc.list_versions(), [1, 2, 3])
         self.assertEqual(my_new_bibdoc.get_description('.jpg', version=3), 'test add new file')
@@ -165,6 +172,10 @@ class BibDocsTest(unittest.TestCase):
         self.assertEqual(my_new_bibdoc.get_description('.jpg', version=1), 'new comment')
         #get history
         assert len(my_new_bibdoc.get_history()) > 0
+        #check modification date
+        self.assertEqual(my_new_bibdoc.get_file('.jpg', version=1).md, timestamp1)
+        self.assertEqual(my_new_bibdoc.get_file('.jpg', version=2).md, timestamp2)
+        assert my_new_bibdoc.get_file('.jpg', version=3).md > timestamp3
         #delete file
         my_new_bibdoc.delete_file('.jpg', 2)
         #list all files
@@ -172,8 +183,12 @@ class BibDocsTest(unittest.TestCase):
         #delete file
         my_new_bibdoc.delete_file('.jpg', 3)
         #add new format
-        my_new_bibdoc.add_file_new_format(CFG_PREFIX + '/lib/webtest/invenio/test.gif', version=None, description=None, comment=None, format=None)
+        timestamp4 = datetime.strptime("2012-11-10 09:08:07", "%Y-%m-%d %H:%M:%S")
+        my_new_bibdoc.add_file_new_format(CFG_PREFIX + '/lib/webtest/invenio/test.gif', version=None, description=None, comment=None, format=None, modification_date=timestamp4)
         self.assertEqual(len(my_new_bibdoc.list_all_files()), 2)
+        #check modification time
+        self.assertEqual(my_new_bibdoc.get_file('.jpg', version=1).md, timestamp1)
+        self.assertEqual(my_new_bibdoc.get_file('.gif', version=1).md, timestamp4)
         #delete file
         my_new_bibdoc.delete_file('.jpg', 1)
         #delete file
@@ -187,9 +202,11 @@ class BibDocsTest(unittest.TestCase):
         #hidden?
         self.assertEqual(my_new_bibdoc.hidden_p('.jpg', version=1), True)
         #add and get icon
-        my_new_bibdoc.add_icon( CFG_PREFIX + '/lib/webtest/invenio/icon-test.gif')
+        my_new_bibdoc.add_icon( CFG_PREFIX + '/lib/webtest/invenio/icon-test.gif', modification_date=timestamp4)
         value =  my_bibrecdoc.list_bibdocs()[1]
         self.assertEqual(value.get_icon(), my_new_bibdoc.get_icon())
+        #check modification time
+        self.assertEqual(my_new_bibdoc.get_icon().md, timestamp4)
         #delete icon
         my_new_bibdoc.delete_icon()
         #get icon
@@ -219,7 +236,8 @@ class BibDocFilesTest(unittest.TestCase):
         """bibdocfile - BibDocFile functions """
         #add bibdoc
         my_bibrecdoc = BibRecDocs(2)
-        my_bibrecdoc.add_new_file(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', 'Main', 'img_test', False, 'test add new file', 'test', '.jpg')
+        timestamp = datetime.strptime("2010-09-08 07:06:05", "%Y-%m-%d %H:%M:%S")
+        my_bibrecdoc.add_new_file(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', 'Main', 'img_test', False, 'test add new file', 'test', '.jpg', modification_date=timestamp)
         my_new_bibdoc = my_bibrecdoc.get_bibdoc("img_test")
         my_new_bibdocfile = my_new_bibdoc.list_all_files()[0]
         #get url
@@ -261,6 +279,8 @@ class BibDocFilesTest(unittest.TestCase):
         assert 'files/img_test.jpg?version=1">' in value
         #hidden?
         self.assertEqual(my_new_bibdocfile.hidden_p(), False)
+        #check modification date
+        self.assertEqual(my_new_bibdocfile.md, timestamp)
         #delete
         my_new_bibdoc.delete()
         self.assertEqual(my_new_bibdoc.deleted_p(), True)
