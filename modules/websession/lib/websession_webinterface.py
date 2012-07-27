@@ -385,8 +385,15 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         if args['email'] or args['nickname']:
             uid2 = webuser.emailUnique(args['email'])
             uid_with_the_same_nickname = webuser.nicknameUnique(args['nickname'])
-            if (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2 or (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1 and \
-                                                           webuser.email_valid_p(args['email']))) \
+            current_nickname = webuser.get_nickname(uid)
+            if current_nickname and args['nickname'] and \
+               current_nickname != args['nickname']:
+                # User tried to set nickname while one is already
+                # defined (policy is that nickname is not to be
+                # changed)
+                mess += '<p>' + _("Your nickname has not been updated")
+            elif (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2 or (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1 and \
+                                                             webuser.email_valid_p(args['email']))) \
                and (args['nickname'] is None or webuser.nickname_valid_p(args['nickname'])) \
                and uid2 != -1 and (uid2 == uid or uid2 == 0) \
                and uid_with_the_same_nickname != -1 and (uid_with_the_same_nickname == uid or uid_with_the_same_nickname == 0):
