@@ -328,6 +328,11 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         ## Will hold the output messages:
         mess = ''
 
+        ## Would hold link to previous page and title for the link:
+        act = None
+        linkname = None
+        title = None
+
         ## Change login method if needed:
         if args['login_method'] and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 4 \
                 and args['login_method'] in CFG_EXTERNAL_AUTHENTICATION:
