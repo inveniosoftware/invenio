@@ -403,7 +403,7 @@ int intBitSetGetLast(const IntBitSet *const x) {
     if (x->trailing_bits) return -2;
     while (base < end) {
         if (*(--end))
-            for (i=wordbitsize; i>=0; --i)
+            for (i=wordbitsize-1; i>=0; --i)
                 if ((*end & ((word_t) 1 << (word_t) i)))
                     return (int) i + (int) (end - x->bitset) * wordbitsize;
     }

@@ -59,6 +59,7 @@ class IntBitSetTest(unittest.TestCase):
     """Test functions related to intbitset data structure."""
     def setUp(self):
         self.sets = [
+            [1024],
             [10, 20],
             [10, 40],
             [60, 70],
@@ -69,7 +70,8 @@ class IntBitSetTest(unittest.TestCase):
             [10000],
             [23, 45, 67, 89, 110, 130, 174, 1002, 2132, 23434],
             [700, 2000],
-        ]
+            range(1000, 1100),
+        ] + [[i] for i in range(1000, 1100)]
         self.fncs_list = [
             (intbitset.__and__, set.__and__, int.__and__, False),
             (intbitset.__or__, set.__or__, int.__or__, False),
