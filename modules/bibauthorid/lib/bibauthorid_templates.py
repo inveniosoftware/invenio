@@ -1622,10 +1622,11 @@ class Template:
         h = html.append
 
         h(' <ul><li><a rel="nofollow" href=%s> Login through arXiv.org </a> <small>' % bconfig.BIBAUTHORID_CFG_INSPIRE_LOGIN)
-        h ('(This is faster for you, as it allows your changes to be publicly shown immediately.)</small> <br><br>')
-        h(' <li><a rel="nofollow" href=%s/person/%s?open_claim=True> Continue as a guest </a>'
-          '<small>(It will take some time before your changes are publicly shown.'
-          'Use only if you don\'t have an arXiv.org account.)</small><br><br></ul>' % (CFG_SITE_URL, person))
+        h(' - Use this option if you have an arXiv account.')
+        h('(If you login through arXiv.org, INSPIRE will immediately verify you as an author and process your claimed papers.) </small><br><br>')
+        h(' <li><a rel="nofollow" href=%s/person/%s?open_claim=True> Continue as a guest </a> <small>' % (CFG_SITE_URL, person))
+        h(' - Use this option if you DON\'T have an arXiv account, or you have not claimed any paper in arXiv.')
+        h('(If you login as a guest, INSPIRE will need to confirm you as an author before processing your claimed papers.) </small><br><br>')
         h('If you login through arXiv.org we can verify that you are the author of these papers and accept your claims rapidly, '
           'as well as adding additional claims from arXiv. <br>If you choose not to login via arXiv your changes will '
           'be publicly visible only after our editors check and confirm them, usually a few days.<br>  '

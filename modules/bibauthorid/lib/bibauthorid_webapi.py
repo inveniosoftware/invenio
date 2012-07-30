@@ -923,14 +923,11 @@ def arxiv_login(req):
     try:
         name = uinfo['external_firstname']
     except KeyError:
-        name = None
+        name = ''
     try:
         surname = uinfo['external_familyname']
     except KeyError:
-        surname = None
-
-    if surname and not name:
-        name = ''
+        surname = ''
 
     if surname:
         session['personinfo']['arxiv_name'] = nameapi.create_normalized_name(
