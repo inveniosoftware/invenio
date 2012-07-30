@@ -130,7 +130,7 @@ WEDGE_THRESHOLD = 0.8
 # BibAuthorID debugging options
 
 # This flag triggers most of the output.
-DEBUG_OUTPUT = True
+DEBUG_OUTPUT = False
 
 # The following options trigger the output for parts of
 # bibauthorid which normally generate too much output

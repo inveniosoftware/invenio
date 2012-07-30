@@ -929,8 +929,15 @@ def arxiv_login(req):
     except KeyError:
         surname = None
 
-    session['personinfo']['arxiv_name'] = nameapi.create_normalized_name(
+    if surname and not name:
+        name = ''
+
+    if surname:
+        session['personinfo']['arxiv_name'] = nameapi.create_normalized_name(
                                           nameapi.split_name_parts(surname + ', ' + name))
+    else:
+        session['personinfo']['arxiv_name'] = ''
+
     session.save()
 
     try:
