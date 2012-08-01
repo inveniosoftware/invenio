@@ -22,6 +22,7 @@ websearch database models.
 """
 
 # General imports.
+import re
 from flask import g
 from sqlalchemy.ext.mutable import Mutable
 from invenio.intbitset import intbitset
@@ -191,6 +192,14 @@ class Collection(db.Model):
     @property
     def is_restricted(self):
         return collection_restricted_p(self.name)
+
+    @property
+    def type(self):
+        p = re.compile("\d+:.*")
+        if p.match(self.dbquery.lower()) :
+            return 'r'
+        else:
+            return 'v'
 
     _collection_children = db.relationship(lambda: CollectionCollection,
                                 collection_class=OrderedList,

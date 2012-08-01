@@ -31,16 +31,23 @@
         height: 0.2em;
     }
 </style>
-<ul {{ kwargs|xmlattr }} data-id="{{ collection.id }}">
+<ul class="nav nav-list">
+    <li class="nav-header">Document Server</li>
+<ul {{ kwargs|xmlattr }}  data-id="{{ collection.id }}">
+    <li class="subnode_dropspace"> </li>
     {% for c in collection|attr(children) recursive %}
-    <li data-id="{{ c.id }}">
+    <li data-id="{{ c.id }}" data-type="{{ c.type }}">
+    {% if c.type == 'v' %}
+    <i>
     <a  href="{{ url_for(".collection", name=c.name) }}" >
         {{ c.name_ln }}
-        <span class="pull-right">
-            <i class="icon-chevron-up"></i>
-            <i class="icon-chevron-down"></i>
-        </span>
     </a>
+    </i>
+    {% else %}
+    <a  href="{{ url_for(".collection", name=c.name) }}" >
+        {{ c.name_ln }}
+    </a>
+    {% endif %}
     <ul {{ kwargs|xmlattr }} data-id="{{ c.id }}">
         {# this makes possible adding a subchild to the leaf nodes #}
         <li class="subnode_dropspace"> </li>
@@ -50,6 +57,8 @@
     </ul>
     </li>
     {% endfor %}
+    <li class="subnode_dropspace"> </li>
+</ul>
 </ul>
 
 <script>
@@ -59,8 +68,9 @@
         $(".temp_placeholder").remove();
 
         // Adds a placeholder at the bottom of the list
-        $(ui.placeholder).parent().append('<li class="list_placeholder temp_placeholder"></li>');
-
+        if ($(ui.placeholder).parent().children().size() > 2 ) {
+            $(ui.placeholder).parent().append('<li class="list_placeholder temp_placeholder"></li>');
+        }
         // this doesn't allow two placeholders next to each other
         $(ui.placeholder).prev(".temp_placeholder").remove();
         $(ui.placeholder).next(".temp_placeholder").remove();
@@ -78,12 +88,11 @@
             change: function(event, ui) {
                 set_placeholders(ui);
             },
-            out: function(event, ui) {
-                $(".temp_sublist").remove();
-            },
             stop: function(event, ui) {
                 // Removes the temporary placeholders from the tree 
                 $(".temp_placeholder").remove();
+
+                // Makes the ajax request
                 $.ajax( '{{url_for('.modifycollectiontree')}}', {
                     type: 'GET',
                     data: 'id='+ $(ui.item).attr("data-id") +
@@ -98,6 +107,11 @@
 
     });
 </script>
+{% endmacro %}
+
+{% macro colleection_form(query="") %}
+<div {{ kwargs|xmlattr }}>
+</div>
 {% endmacro %}
 
 {% macro portalbox_sidebar(portalboxes, width=2) %}

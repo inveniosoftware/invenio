@@ -46,7 +46,7 @@ not_guest = lambda: not current_user.is_guest()
 blueprint = InvenioBlueprint('websearch_admin', __name__, url_prefix="/admin/websearch",
 		config=[],
 		breadcrumbs=[],
-		menubuilder=[('main.admin.websearch', _('Search Admin'),
+		menubuilder=[('main.admin.websearch', _('Configure WebSearch'),
 			'websearch_admin.index', 50)])
 """ Previous inputs calculations not processed """
 @cache.memoize(3600)
@@ -54,13 +54,17 @@ blueprint = InvenioBlueprint('websearch_admin', __name__, url_prefix="/admin/web
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
+@blueprint.route('/index', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
 #@blueprint.invenio_authorized('usemessages')
 @blueprint.invenio_templated('websearch_admin_index.html')
 def index():
-
+    
 	collection = Collection.query.get_or_404(1)
-	return dict(collection=collection) 
+    orphans =  Collection.query.filter(Collection.id !=
+            CollectionCollection.id_dad,
+            id != CollectionCollection.id_son).get_or_404(1)
+	return dict(collection=collection, orphans=orphans) 
 
 
 
@@ -72,7 +76,7 @@ def modifycollectiontree():
     id = request.args.get('id', 0, type=int)
     id_dad = request.args.get('id_dad', 0, type=int)
     score = request.args.get('score', 0, type=int)
-    flash(_("Bam, ajax style! id = %d id_dad = %d score = %d") % (id, id_dad, score), "info")
+    flash(_("id = %d id_dad = %d score = %d") % (id, id_dad, score), "info")
 
     collection = Collection.query.get_or_404(id)
 
@@ -83,8 +87,12 @@ def modifycollectiontree():
     olddad = collection.dads.pop()
     db.session.delete(olddad)
     newdad = Collection.query.get_or_404(id_dad) 
-    newdad._collection_children.set(CollectionCollection(id_son=collection.id), score)
+    newdad._collection_children.set(CollectionCollection(id_son=collection.id,
+        type=collection.type), score)
 
     db.session.commit()
     return dict()#redirect(url_for('.index'))
+
+#@blueprint.route('/managecollectiontree')
+#@blueprint.invenio_authenticated
 
