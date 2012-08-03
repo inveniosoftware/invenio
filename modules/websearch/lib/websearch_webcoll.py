@@ -43,7 +43,7 @@ from invenio.messages import gettext_set_language, language_list_long
 from invenio.search_engine import search_pattern_parenthesised, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records
 from invenio.dbquery import run_sql, Error, get_table_update_time
 from invenio.bibrank_record_sorter import get_bibrank_methods
-from invenio.dateutils import convert_datestruct_to_dategui
+from invenio.dateutils import convert_datestruct_to_dategui, strftime
 from invenio.bibformat import format_record
 from invenio.shellutils import mymkdir
 from invenio.intbitset import intbitset
@@ -846,10 +846,10 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
         factor = factors[m.groups()[2]]
         value = float(m.groups()[1])
         date = time.localtime(date + sign * factor * value)
-        date = time.strftime(format_string, date)
+        date = strftime(format_string, date)
     else:
         date = time.strptime(var, format_string)
-        date = time.strftime(format_string, date)
+        date = strftime(format_string, date)
     return date
 
 def get_current_time_timestamp():

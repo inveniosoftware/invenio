@@ -21,6 +21,7 @@
 
 import sys
 import time
+from invenio.dateutils import datetime, strftime
 from invenio.dbquery import deserialize_via_marshal, \
 serialize_via_marshal, run_sql, Error
 from invenio.search_engine import get_field_tags, search_pattern
@@ -200,7 +201,9 @@ def get_data_for_definition_bibrec(column_name, recids_copy):
     dict_column = {}
     for recid in recids_copy:
         creation_date = run_sql('SELECT %s from bibrec WHERE id = %%s' %column_name, (recid, ))[0][0]
-        dict_column[recid] = creation_date.strftime('%Y%m%d%H%M%S')
+        new_creation_date = datetime(creation_date.year,creation_date.month,creation_date.day, \
+                                     creation_date.hour,creation_date.minute, creation_date.second)
+        dict_column[recid] = new_creation_date.strftime('%Y%m%d%H%M%S')
     return dict_column
 
 
@@ -309,7 +312,7 @@ def write_to_methoddata_table(id_method, data_dict, data_dict_ordered, data_list
     serialized_data_dict_ordered = serialize_via_marshal(data_dict_ordered)
     serialized_data_list_sorted = serialize_via_marshal(data_list_sorted)
     write_message('Serialization completed.', verbose=5)
-    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    date = strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     if not update_timestamp:
         try:
             date = run_sql('SELECT last_update from bsrMETHODDATA WHERE id_bsrMETHOD = %s', (id_method, ))[0][0]
@@ -342,7 +345,7 @@ def write_to_buckets_table(id_method, bucket_no, bucket_data, bucket_last_value,
                   %(bucket_no, id_method), verbose=5)
     write_message('Serializing data for bucket number %s' %bucket_no, verbose=5)
     serialized_bucket_data = bucket_data.fastdump()
-    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    date = strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     if not update_timestamp:
         try:
             date = run_sql('SELECT last_update from bsrMETHODDATABUCKET WHERE id_bsrMETHOD = %s and bucket_no = %s', \
@@ -710,7 +713,7 @@ def perform_update_buckets(recids_current_ordered, recids_to_insert, recids_old_
             for recid in bucket_delete.get(bucket_no, []):
                 bucket_data.remove(recid)
             if update_timestamp:
-                date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                date = strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                 run_sql("UPDATE bsrMETHODDATABUCKET \
                     SET bucket_data = %s, last_updated = %s \
                     WHERE id_bsrMETHOD = %s AND bucket_no = %s", \

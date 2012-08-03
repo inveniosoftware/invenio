@@ -201,4 +201,8 @@ specialchar plugin from Frederico Knabben.
 The oai2.xsl.v1.0 OAI to HTML XSLT Style Sheet was taken from EPrints.
 <http://www.eprints.org/software/xslt.php>
 
+The original dateutils.stfrtime function was taken from
+<https://github.com/django/django/blob/stable/1.4.x/django/utils/datetime_safe.py>
+Author: Russell Keith-Magee <russell@keith-magee.com>
+
 - end of file -

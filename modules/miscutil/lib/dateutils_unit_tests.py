@@ -23,10 +23,10 @@ __revision__ = "$Id$"
 
 import unittest
 import datetime
-import time
 import calendar
-import dateutils
 
+from time import mktime, strptime
+from invenio import dateutils
 from invenio.config import CFG_SITE_LANGS
 from invenio.testutils import make_test_suite, run_test_suite
 
@@ -129,8 +129,8 @@ class ParseRuntimeLimitTest(unittest.TestCase):
         future_from = present_from + datetime.timedelta(days=7)
         future_to = present_to + datetime.timedelta(days=7)
         expected = (
-            (time.mktime(present_from.timetuple()), time.mktime(present_to.timetuple())),
-            (time.mktime(future_from.timetuple()), time.mktime(future_to.timetuple())),
+            (mktime(present_from.timetuple()), mktime(present_to.timetuple())),
+            (mktime(future_from.timetuple()), mktime(future_to.timetuple())),
             )
         result = dateutils.parse_runtime_limit(limit)
         self.assertEqual(expected, result)
@@ -147,8 +147,8 @@ class ParseRuntimeLimitTest(unittest.TestCase):
         future_from = present_from + datetime.timedelta(days=7)
         future_to = present_to + datetime.timedelta(days=7)
         expected = (
-            (time.mktime(present_from.timetuple()), time.mktime(present_to.timetuple())),
-            (time.mktime(future_from.timetuple()), time.mktime(future_to.timetuple())),
+            (mktime(present_from.timetuple()), mktime(present_to.timetuple())),
+            (mktime(future_from.timetuple()), mktime(future_to.timetuple())),
             )
         result = dateutils.parse_runtime_limit(limit)
         self.assertEqual(expected, result)
@@ -165,8 +165,8 @@ class ParseRuntimeLimitTest(unittest.TestCase):
         future_from = present_from + datetime.timedelta(days=7)
         future_to = present_to + datetime.timedelta(days=7)
         expected = (
-            (time.mktime(present_from.timetuple()), time.mktime(present_to.timetuple())),
-            (time.mktime(future_from.timetuple()), time.mktime(future_to.timetuple())),
+            (mktime(present_from.timetuple()), mktime(present_to.timetuple())),
+            (mktime(future_from.timetuple()), mktime(future_to.timetuple())),
             )
         result = dateutils.parse_runtime_limit(limit)
         self.assertEqual(expected, result)
@@ -181,15 +181,82 @@ class ParseRuntimeLimitTest(unittest.TestCase):
         future_from = present_from + datetime.timedelta(days=1)
         future_to = present_to + datetime.timedelta(days=1)
         expected = (
-            (time.mktime(present_from.timetuple()), time.mktime(present_to.timetuple())),
-            (time.mktime(future_from.timetuple()), time.mktime(future_to.timetuple())),
+            (mktime(present_from.timetuple()), mktime(present_to.timetuple())),
+            (mktime(future_from.timetuple()), mktime(future_to.timetuple())),
             )
         result = dateutils.parse_runtime_limit(limit)
         self.assertEqual(expected, result)
 
+class STRFTimeTest(unittest.TestCase):
+    """
+    Testing support of datest before 1900 for function strftime
+    """
+    def test_strftime_date_over_1900(self):
+        test_date = "12.03.1908"
+        expected = "Thu, 12 Mar 1908 00:00:00 +0000"
+        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", strptime(test_date,"%d.%m.%Y"))
+        self.assertEqual(expected, result)
+
+    def test_strftime_date_under_1900(self):
+        test_date = "3.1.1765"
+        expected = "Thu, 03 Jan 1765 00:00:00 +0000"
+        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", strptime(test_date,"%d.%m.%Y"))
+        self.assertEqual(expected, result)
+
+    def test_strftime_date_over_1900_object(self):
+        test_date = "12.03.1908"
+        expected = "Thu, 12 Mar 1908 00:00:00 +0000"
+        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", datetime.date(1908,3,12))
+        self.assertEqual(expected, result)
+
+    def test_strftime_date_under_1900_object(self):
+        test_date = "3.1.1765"
+        expected = "Thu, 03 Jan 1765 00:00:00 +0000"
+        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", datetime.date(1765,1,3))
+        self.assertEqual(expected, result)
+
+class DateTest(unittest.TestCase):
+    """
+    Testing creation of date object
+    """
+    def test_date_creation(self):
+        expected = datetime.date.today()
+        result = dateutils.date.today()
+        self.assertEqual(expected, result)
+
+    def test_date_strftime(self):
+        expected = datetime.date.today().strftime("%a, %d %b %Y %H:%M:%S +0000")
+        date_object = dateutils.date.today()
+        result = date_object.strftime("%a, %d %b %Y %H:%M:%S +0000")
+        self.assertEqual(expected, result)
+
+class DateTimeTest(unittest.TestCase):
+    """
+    Testing creation of date object
+    """
+    def test_datetime_creation_after_1900(self):
+        expected = datetime.datetime(1908,3,12,12,12,12)
+        result = dateutils.datetime(1908,3,12,12,12,12)
+        self.assertEqual(expected, result)
+
+    def test_datetime_creation_before_1900(self):
+        expected = datetime.datetime(1765,1,3,10,2,13)
+        result = dateutils.datetime(1765,1,3,10,2,13)
+        self.assertEqual(expected, result)
+
+    def test_datetime_strftime_before_1900(self):
+        new_datetime = dateutils.datetime(1765,1,3,10,2,13)
+        expected = "Thu, 03 Jan 1765 10:02:13 +0000"
+        result = new_datetime.strftime("%a, %d %b %Y %H:%M:%S +0000")
+        self.assertEqual(expected, result)
+
 TEST_SUITE = make_test_suite(ConvertFromDateCVSTest,
                              ConvertIntoDateGUITest,
-                             ParseRuntimeLimitTest,)
+                             ParseRuntimeLimitTest,
+                             STRFTimeTest,
+                             DateTest,
+                             DateTimeTest
+                             )
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

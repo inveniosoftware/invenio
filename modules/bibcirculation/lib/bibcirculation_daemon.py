@@ -24,7 +24,6 @@ BibCirculation daemon.
 __revision__ = "$Id$"
 
 import sys
-import datetime
 import time
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_init
@@ -34,6 +33,7 @@ from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
      CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibcirculation_utils import generate_email_body
+import datetime
 
 
 def get_expired_loan():
@@ -120,9 +120,12 @@ def send_second_recall(date_letters):
     #datetime.strptime(date_letters, "%Y-%m-%d") doesn't work (only on 2.5).
     tmp_date = datetime.datetime(*time_tuple[0:3]) + datetime.timedelta(weeks=1)
 
-    if tmp_date.strftime("%Y-%m-%d") == today.strftime("%Y-%m-%d"):
-        return True
-    else:
+    try:
+        if tmp_date.strftime("%Y-%m-%d") == today.strftime("%Y-%m-%d"):
+            return True
+        else:
+            return False
+    except ValueError:
         return False
 
 def send_third_recall(date_letters):
@@ -138,9 +141,12 @@ def send_third_recall(date_letters):
     #datetime.strptime(date_letters, "%Y-%m-%d") doesn't work (only on 2.5).
     tmp_date = datetime.datetime(*time_tuple[0:3]) + datetime.timedelta(days=3)
 
-    if tmp_date.strftime("%Y-%m-%d") == today.strftime("%Y-%m-%d"):
-        return True
-    else:
+    try:
+        if tmp_date.strftime("%Y-%m-%d") == today.strftime("%Y-%m-%d"):
+            return True
+        else:
+            return False
+    except ValueError:
         return False
 
 def task_run_core():

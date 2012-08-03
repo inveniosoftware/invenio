@@ -24,13 +24,11 @@ __revision__ = "$Id$"
 import datetime
 import time
 import cgi
-
 from invenio.urlutils import create_html_link
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, \
      CFG_CERN_SITE, CFG_SITE_SECURE_URL, CFG_SITE_RECORD
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
 from invenio.messages import gettext_set_language
-
 import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_utils import get_book_cover, \
       book_information_from_MARC, \

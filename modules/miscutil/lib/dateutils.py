@@ -44,8 +44,8 @@ __revision__ = "$Id$"
 import datetime
 import re
 import time
-from time import strptime, strftime, localtime
-
+from datetime import date as real_date, datetime as real_datetime
+from time import strptime, strftime as real_strftime, localtime
 from invenio.config import CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 
@@ -58,6 +58,20 @@ except ImportError:
 datetext_default = '0000-00-00 00:00:00'
 datestruct_default = (0, 0, 0, 0, 0, 0, 0, 0, 0)
 datetext_format = "%Y-%m-%d %H:%M:%S"
+
+class date(real_date):
+    def strftime(self, fmt):
+        return strftime(fmt, self)
+
+class datetime(real_datetime):
+    def strftime(self, fmt):
+        return strftime(fmt, self)
+
+    def combine(self, date, time):
+        return datetime(date.year, date.month, date.day, time.hour, time.minute, time.microsecond, time.tzinfo)
+
+    def date(self):
+        return date(self.year, self.month, self.day)
 
 def convert_datetext_to_dategui(datetext, ln=CFG_SITE_LANG, secs=False):
     """
@@ -331,7 +345,7 @@ def parse_runtime_limit(value):
         except KeyError:
             raise ValueError, "%s is not a good weekday name." % value
 
-    today = datetime.datetime.today()
+    today = datetime.today()
     try:
         g = _RE_RUNTIMELIMIT_FULL.search(value)
         if not g:
@@ -363,7 +377,7 @@ def parse_runtime_limit(value):
             if beginning_time > ending_time:
                 beginning_time -= 24 * 3600
 
-        reference_time = time.mktime(datetime.datetime(today.year, today.month, today.day).timetuple())
+        reference_time = time.mktime(datetime(today.year, today.month, today.day).timetuple())
         current_range = (
             reference_time + first_occasion_day + beginning_time,
             reference_time + first_occasion_day + ending_time
@@ -399,3 +413,55 @@ def guess_datetime(datetime_string):
             except ValueError:
                 pass
     raise ValueError("It is not possible to guess the datetime format of %s" % datetime_string)
+
+# This library does not support strftime's "%s" or "%y" format strings.
+# Allowed if there's an even number of "%"s because they are escaped.
+_illegal_formatting = re.compile(r"((^|[^%])(%%)*%[sy])")
+
+def _findall(text, substr):
+    # Also finds overlaps
+    sites = []
+    i = 0
+    while 1:
+        j = text.find(substr, i)
+        if j == -1:
+            break
+        sites.append(j)
+        i=j+1
+    return sites
+
+def strftime(fmt, dt):
+    if not isinstance(dt, real_date):
+        dt = datetime(dt.tm_year, dt.tm_mon, dt.tm_mday, dt.tm_hour, dt.tm_min, dt.tm_sec)
+    if dt.year >= 1900:
+        return real_strftime(fmt, dt.timetuple())
+    illegal_formatting = _illegal_formatting.search(fmt)
+    if illegal_formatting:
+        raise TypeError("strftime of dates before 1900 does not handle" + illegal_formatting.group(0))
+
+    year = dt.year
+    # For every non-leap year century, advance by
+    # 6 years to get into the 28-year repeat cycle
+    delta = 2000 - year
+    off = 6 * (delta // 100 + delta // 400)
+    year = year + off
+
+    # Move to around the year 2000
+    year = year + ((2000 - year) // 28) * 28
+    timetuple = dt.timetuple()
+    s1 = real_strftime(fmt, (year,) + timetuple[1:])
+    sites1 = _findall(s1, str(year))
+
+    s2 = real_strftime(fmt, (year+28,) + timetuple[1:])
+    sites2 = _findall(s2, str(year+28))
+
+    sites = []
+    for site in sites1:
+        if site in sites2:
+            sites.append(site)
+
+    s = s1
+    syear = "%04d" % (dt.year,)
+    for site in sites:
+        s = s[:site] + syear + s[site+4:]
+    return s
