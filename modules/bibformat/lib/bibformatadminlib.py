@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1207,7 +1207,7 @@ def perform_request_format_validate(ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=No
     if messages is None:
         messages = []
 
-    messages = [encode_for_xml(message) for message in messages]
+    messages = map(lambda x: encode_for_xml(x[1]), messages)
 
     return bibformat_templates.tmpl_admin_validate_format(ln, messages)
 
@@ -1451,7 +1451,3 @@ def perform_request_dreamweaver_floater():
     elements = filter(filter_elem, elements)
 
     return bibformat_templates.tmpl_dreamweaver_floater(CFG_SITE_LANG, elements)
-
-
-
-
