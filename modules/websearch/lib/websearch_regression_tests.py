@@ -1600,7 +1600,7 @@ class WebSearchSpecialTermsQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=U%281%29+OR+SL%282%2CZ%29',
                                                expected_text="[57, 79, 80, 88]"))
 
-    def test_special_terms_u1_and_sl_or_parens(self):
+    def FIXME_TICKET_453_test_special_terms_u1_and_sl_or_parens(self):
         """websearch - query for special terms, (U(1) OR SL(2,Z))"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=%28U%281%29+OR+SL%282%2CZ%29%29',
