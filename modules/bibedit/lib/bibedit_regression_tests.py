@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -33,9 +33,9 @@ class BibEditWebPagesAvailabilityTest(unittest.TestCase):
     def test_bibedit_admin_interface_availability(self):
         """bibedit - availability of BibEdit Admin interface pages"""
 
-        baseurl = CFG_SITE_URL + '/admin/bibedit/bibeditadmin.py/'
+        baseurl = CFG_SITE_URL + '/record/1/'
 
-        _exports = ['', 'index', 'edit', 'submit']
+        _exports = ['edit']
 
         error_messages = []
         for url in [baseurl + page for page in _exports]:
