@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -116,7 +116,8 @@ def run_test_suite(testsuite, warn_user=False):
     """
     if warn_user:
         warn_user_about_tests()
-    unittest.TextTestRunner(verbosity=2).run(testsuite)
+    res = unittest.TextTestRunner(verbosity=2).run(testsuite)
+    return res.wasSuccessful()
 
 def make_url(path, **kargs):
     """ Helper to generate an absolute invenio URL with query
@@ -345,7 +346,8 @@ def build_and_run_unit_test_suite():
         test_modules.append(module.TEST_SUITE)
 
     complete_suite = unittest.TestSuite(test_modules)
-    unittest.TextTestRunner(verbosity=2).run(complete_suite)
+    res = unittest.TextTestRunner(verbosity=2).run(complete_suite)
+    return res.wasSuccessful()
 
 def build_and_run_regression_test_suite():
     """
@@ -368,7 +370,8 @@ def build_and_run_regression_test_suite():
     warn_user_about_tests()
 
     complete_suite = unittest.TestSuite(test_modules)
-    unittest.TextTestRunner(verbosity=2).run(complete_suite)
+    res = unittest.TextTestRunner(verbosity=2).run(complete_suite)
+    return res.wasSuccessful()
 
 def build_and_run_web_test_suite():
     """
@@ -391,7 +394,8 @@ def build_and_run_web_test_suite():
     warn_user_about_tests()
 
     complete_suite = unittest.TestSuite(test_modules)
-    unittest.TextTestRunner(verbosity=2).run(complete_suite)
+    res = unittest.TextTestRunner(verbosity=2).run(complete_suite)
+    return res.wasSuccessful()
 
 
 class InvenioWebTestCase(unittest.TestCase):
