@@ -953,7 +953,26 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
     def test_search_engine_python_api_for_successful_query(self):
         """websearch - search engine Python API for successful query"""
         self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47],
-                         perform_request_search(p='ellis', rg=None))
+                         perform_request_search(p='ellis'))
+
+    def test_search_engine_web_api_ignore_paging_parameter(self):
+        """websearch - search engine Python API for successful query, ignore paging parameters"""
+        self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47],
+                         perform_request_search(p='ellis', rg=5, jrec=3))
+
+    def test_search_engine_web_api_respect_sorting_parameter(self):
+        """websearch - search engine Python API for successful query, respect sorting parameters"""
+        self.assertEqual([77, 84, 85],
+                         perform_request_search(p='klebanov'))
+        self.assertEqual([77, 85, 84],
+                         perform_request_search(p='klebanov', sf='909C4v'))
+
+    def test_search_engine_web_api_respect_ranking_parameter(self):
+        """websearch - search engine Python API for successful query, respect ranking parameters"""
+        self.assertEqual([77, 84, 85],
+                         perform_request_search(p='klebanov'))
+        self.assertEqual([85, 77, 84],
+                         perform_request_search(p='klebanov', rm='citation'))
 
     def test_search_engine_python_api_for_existing_record(self):
         """websearch - search engine Python API for existing record"""
@@ -1009,8 +1028,32 @@ class WebSearchSearchEngineWebAPITest(unittest.TestCase):
     def test_search_engine_web_api_for_successful_query(self):
         """websearch - search engine Web API for successful query"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id&rg=100',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id',
                                                expected_text="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47]"))
+
+    def test_search_engine_web_api_ignore_paging_parameter(self):
+        """websearch - search engine Web API for successful query, ignore paging parameters"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id&rg=5&jrec=3',
+                                               expected_text="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47]"))
+
+    def test_search_engine_web_api_respect_sorting_parameter(self):
+        """websearch - search engine Web API for successful query, respect sorting parameters"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id',
+                                               expected_text="[77, 84, 85]"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id&sf=909C4v',
+                                               expected_text="[77, 85, 84]"))
+
+    def test_search_engine_web_api_respect_ranking_parameter(self):
+        """websearch - search engine Web API for successful query, respect ranking parameters"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id',
+                                               expected_text="[77, 84, 85]"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id&rm=citation',
+                                               expected_text="[85, 77, 84]"))
 
     def test_search_engine_web_api_for_existing_record(self):
         """websearch - search engine Web API for existing record"""

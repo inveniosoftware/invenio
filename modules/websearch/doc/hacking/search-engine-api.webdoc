@@ -74,7 +74,7 @@ via both a high-level and low-level API interface.
 
                 rg - records in groups of (e.g. "10").  Defines how many hits
                      per collection in the search results page are
-                     displayed.
+                     displayed.  (Note that `rg' is ignored in case of `of=id'.)
 
                 sf - sort field (e.g. "title").
 
@@ -144,7 +144,8 @@ via both a high-level and low-level API interface.
                      or splitted by collection.
 
               jrec - jump to record (e.g. "234").  Used for navigation
-                     inside the search results.
+                     inside the search results.  (Note that `jrec' is ignored
+                     in case of `of=id'.)
 
              recid - display record ID (e.g. "20000").  Do not
                      search/browse but go straight away to the Detailed

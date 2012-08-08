@@ -4695,7 +4695,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
 
           rg - records in groups of (e.g. "10").  Defines how many hits
                per collection in the search results page are
-               displayed.
+               displayed.  (Note that `rg' is ignored in case of `of=id'.)
 
           sf - sort field (e.g. "title").
 
@@ -4765,7 +4765,8 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                or splitted by collection.
 
         jrec - jump to record (e.g. "234").  Used for navigation
-               inside the search results.
+               inside the search results.  (Note that `jrec' is ignored
+               in case of `of=id'.)
 
        recid - display record ID (e.g. "20000").  Do not
                search/browse but go straight away to the Detailed
@@ -5384,11 +5385,11 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                 if rm: # do we have to rank?
                     results_final_for_all_colls_rank_records_output = rank_records(req, rm, 0, results_final_for_all_selected_colls,
                                                                                    string.split(p) + string.split(p1) +
-                                                                                   string.split(p2) + string.split(p3), verbose, so, of, ln, rg, jrec)
+                                                                                   string.split(p2) + string.split(p3), verbose, so, of, ln, rg=0, jrec=0)
                     if results_final_for_all_colls_rank_records_output[0]:
                         recIDs = results_final_for_all_colls_rank_records_output[0]
                 elif sf or (CFG_BIBSORT_BUCKETS and sorting_methods): # do we have to sort?
-                    recIDs = sort_records(req, recIDs, sf, so, sp, verbose, of, ln, rg, jrec)
+                    recIDs = sort_records(req, recIDs, sf, so, sp, verbose, of, ln, rg=None, jrec=None)
                 return recIDs
             elif of.startswith("h"):
                 if of not in ['hcs']:
