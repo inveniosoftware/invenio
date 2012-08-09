@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -89,7 +89,7 @@ class Template:
         """
 
         styles += """
-        <link type="text/css" href="%(site_url)s/img/jquery/jquery-ui.css" rel="stylesheet" />
+        <link type="text/css" href="%(site_url)s/img/jquery-ui.css" rel="stylesheet" />
         <script type="text/javascript">
             function clearText(field){
                 if (field.value == field.defaultValue){
@@ -484,4 +484,3 @@ class Template:
         body_content += tupletotable(header=header, tuple=actions)
 
         return body_content
-

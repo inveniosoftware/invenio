@@ -3,7 +3,7 @@
 
 	<link rel="stylesheet" href="/img/video_platform_record.css" type="text/css" />
 	<link rel="stylesheet" href="/mediaelement/mediaelementplayer.css" type="text/css" />
-	<script type="text/javascript" src="/js/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="/js/jquery.min.js"></script>
 	<script type="text/javascript" src="/mediaelement/mediaelement-and-player.js"></script>
 	<script type="text/javascript" src="/js/video_platform_record.js"></script>
 
@@ -52,4 +52,3 @@
 
 		<!-- Elements that are only evaluated by JavaScript -->
 		<BFE_VIDEO_PLATFORM_DOWNLOADS/>
-

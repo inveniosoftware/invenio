@@ -1,7 +1,7 @@
 ## Administrator interface for Bibcirculation
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -885,7 +885,7 @@ def loan_on_desk_step3(req, user_id, list_of_barcodes, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 body=body,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3916,7 +3916,7 @@ def create_new_request_step3(req, borrower_id, barcode, recid,
                 uid=id_user,
                 req=req,
                 body=body,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4092,7 +4092,7 @@ def place_new_request_step2(req, barcode, recid, user_info, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 body=body,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5025,7 +5025,7 @@ def acq_details_step1(req, delete_key, ill_request_id, new_status,
     return page(title=title,
                 uid=id_user,
                 req=req,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                 body=body,
                 language=ln,
                 navtrail=navtrail_previous_links,
@@ -5641,7 +5641,7 @@ def register_ill_request_with_no_recid_step1(req, borrower_id,
     return page(title=_("Register ILL request"),
                 uid=id_user,
                 req=req,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                 body=body,
                 language=ln,
                 navtrail=navtrail_previous_links,
@@ -6457,7 +6457,7 @@ def register_ill_article_request_step1(req, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 body=body,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery/jquery-ui.css\" type=\"text/css\" />"%(CFG_SITE_SECURE_URL),
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />"%(CFG_SITE_SECURE_URL),
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 

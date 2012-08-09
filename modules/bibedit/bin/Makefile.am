@@ -19,7 +19,6 @@ bin_SCRIPTS = refextract \
               xmlmarclint \
               xmlmarc2textmarc \
               textmarc2xmlmarc \
-              bibeditcache \
               bibedit
 
 EXTRA_DIST = refextract.in \

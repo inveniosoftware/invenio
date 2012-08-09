@@ -24,21 +24,6 @@ __revision__ = "$Id$"
 from invenio.config import CFG_SITE_URL
 from invenio.messages import gettext_set_language
 
-from urllib import quote
-import sys
-
-if sys.hexversion < 0x2060000:
-    try:
-        import simplejson as json
-        simplejson_available = True
-    except ImportError:
-        # Okay, no Ajax app will be possible, but continue anyway,
-        # since this package is only recommended, not mandatory.
-        simplejson_available = False
-else:
-    import json
-    simplejson_available = True
-
 class Template:
 
     """BibEdit Templates Class."""
@@ -319,38 +304,6 @@ class Template:
 
         return value
 
-    def page_headers(self, js_jquery_scripts, js_scripts, stylesheets,
-                     constants_to_export, field_templates):
-        header = ""
-        header += '<script type="text/javascript">\n'
-        for key in constants_to_export:
-            header += '    var %s = %s;\n' % (key, constants_to_export[key])
-        header += '    </script>\n'
-
-        # Adding the information about field templates
-
-        header += "<script>\n" + \
-             "   var fieldTemplates = %s\n" % (json.dumps(field_templates), ) + \
-             "</script>\n"
-        # Add scripts (the ordering is NOT irrelevant).
-
-
-        for script in js_jquery_scripts:
-            header += '    <script type="text/javascript" src="%s/js/jquery/%s">' \
-                '</script>\n' % (CFG_SITE_URL, script)
-
-        for script in js_scripts:
-            header += '    <script type="text/javascript" src="%s/js/%s">' \
-                '</script>\n' % (CFG_SITE_URL, script)
-
-        for stylesheet in stylesheets:
-            header += '    <link type="text/css" href="%s/css/%s" rel="stylesheet">' \
-                '</link>\n' % (CFG_SITE_URL, stylesheet)
-
-        return header
-
-
-
 def img(src, _class='', **kargs):
     """Create an HTML <img> element."""
     src = 'src="%s" ' % src
@@ -456,12 +409,6 @@ def page_style():
                 }
 
                 #bibEditTable td {
-                    overflow:hidden;
-                    word-wrap: break-word;
-                }
-
-                #bibEditTable td {
-                    max-width: 500px;
                     overflow:hidden;
                     word-wrap: break-word;
                  }
@@ -600,8 +547,6 @@ def page_style():
                 .ui-autocomplete {
                     cursor: default;
                 }
-
-
 
             """
     style += "</style>"

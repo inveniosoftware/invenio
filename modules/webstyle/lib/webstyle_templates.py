@@ -1,4 +1,4 @@
-    ## This file is part of Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
@@ -356,7 +356,7 @@ template function generated it.
  <meta http-equiv="Content-Language" content="%(ln)s" />
  <meta name="description" content="%(description)s" />
  <meta name="keywords" content="%(keywords)s" />
- <script type="text/javascript" src="%(cssurl)s/js/jquery/jquery.min.js"></script>
+ <script type="text/javascript" src="%(cssurl)s/js/jquery.min.js"></script>
  %(metaheaderadd)s
 </head>
 <body%(body_css_classes)s lang="%(ln_iso_639_a)s"%(rtl_direction)s>

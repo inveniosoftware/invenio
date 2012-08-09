@@ -533,7 +533,7 @@ class Template:
                           "jquery.ajaxPager.js"]
         jquery_scripts_strings = []
         for script in jquery_scripts:
-            entry_str = """    <script type="text/javascript" src="%(baseurl)s/js/jquery/%(sname)s"></script>\n""" % {
+            entry_str = """    <script type="text/javascript" src="%(baseurl)s/js/%(sname)s"></script>\n""" % {
                     "baseurl": CFG_SITE_URL,
                     "sname" : script
                 }
@@ -541,7 +541,7 @@ class Template:
         jquery_scripts_string = "".join(jquery_scripts_strings)
 
         return """ %(scriptsstring)s
-    <link rel="stylesheet" href="%(baseurl)s/js/jquery/jquery-treeview/jquery.treeview.css" />
+    <link rel="stylesheet" href="%(baseurl)s/js/jquery-treeview/jquery.treeview.css" />
     <link rel="stylesheet" href="%(baseurl)s/img/jquery.ajaxPager.css" />
     <script type="text/javascript">
         var serverAddress = '%(baseurl)s';

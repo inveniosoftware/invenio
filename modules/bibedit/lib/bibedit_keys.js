@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2009, 2010, 2011, 2012 CERN.
+ * Copyright (C) 2009, 2010, 2011 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -28,16 +28,17 @@
 
 var gReady = true;
 
+function initInputHotkeys(input_element) {
+    /* Binding of shortcuts for input elements */
 
-/** a functor allowing skipping the usage of hotkeys plugin in the case of inputs */
-function disableInInput(fn){
-    return function(event){
-	//TODO: Piotr: Here a check if the even is fired on the input
-	if (event.target.tagName.toLowerCase() != "input"){
-	    fn(event);
-	}
-    }
+    // Lauch autosuggest
+    $(input_element).bind('keydown', 'ctrl+shift+a', function (event)  { onAutosuggest(event); } );
+    // Save content and jump to next content field.
+    $(input_element).bind('keydown', 'tab', onKeyTab);
+    // Save content and jump to previous content field.
+    $(input_element).bind('keydown', 'shift+tab', onKeyTab);
 }
+
 function initHotkeys(){
   /*
    * Initialize non-input hotkeys.
@@ -51,79 +52,57 @@ function initHotkeys(){
    * initInputHotkeys)
    */
   // New record.
-  $(document).bind('keydown', 'Shift+n',
-    disableInInput(function(event){
+  $(document).bind('keydown', 'shift+n', function(event){
       $('#imgNewRecord').trigger('click');
       event.preventDefault();
-    }));
-
+  });
   // Clone record.
-  $(document).bind('keydown', 'Shift+l',
-    disableInInput(function(event){
+  $(document).bind('keydown', 'shift+l', function(event){
       var imgCloneRecord = $('#imgCloneRecord');
       if (!imgCloneRecord.hasClass('bibEditImgFaded')){
 	imgCloneRecord.trigger('click');
 	event.preventDefault();
       }
-  }));
+  });
   // Focus on record selection field.
-  $(document).bind('keydown', 'g',
-    disableInInput(function(event){
+  $(document).bind('keydown','g', function(event){
       $('#txtSearchPattern').focus();
       event.preventDefault();
-    }));
+  });
   // Previous record.
-  $(document).bind('keydown', 'Ctrl+right',
-    disableInInput(function(event){
+  $(document).bind('keydown', 'ctrl+right', function(event){
       var btnNext = $('#btnNext');
       if (!btnNext.attr('disabled')){
 	btnNext.trigger('click');
 	event.preventDefault();
       }
-  }));
-
+  });
   // Next record.
-  $(document).bind('keydown', 'Ctrl+left',
-    disableInInput(function(event){
+  $(document).bind('keydown', 'ctrl+left', function(event){
       var btnPrev = $('#btnPrev');
       if (!btnPrev.attr('disabled')){
 	btnPrev.trigger('click');
 	event.preventDefault();
       }
-    }));
-
+  });
   // Submit record.
-  $(document).bind('keydown', 'Shift+s',
-    disableInInput(function(event){
+  $(document).bind('keydown','shift+s', function(event){
       var btnSubmit = $('#btnSubmit');
       if (!btnSubmit.attr('disabled')){
 	btnSubmit.trigger('click');
 	event.preventDefault();
       }
-    }));
+  });
   // Cancel editing.
-  $(document).bind('keydown', 'shift+c',
-    disableInInput(function(event){
+  $(document).bind('keydown','shift+c', function(event){
       var btnCancel = $('#btnCancel');
       if (!btnCancel.attr('disabled')){
 	btnCancel.trigger('click');
 	event.preventDefault();
       }
-    }));
-
-  // Delete record.
-  $(document).bind('keydown', 'Shift+d',
-   disableInInput(function(event){
-      var btnDeleteRecord = $('#btnDeleteRecord');
-      if (!btnDeleteRecord.attr('disabled')){
-	btnDeleteRecord.trigger('click');
-	event.preventDefault();
-      }
-   }));
-
+  });
   // Toggle MARC/human tags.
-  $(document).bind('keydown', 'Shift+t',
-    disableInInput(function(event){
+  $(document).bind('keydown','shift+t', function(event){
       if (gTagFormat == 'MARC'){
 	var btnHumanTags = $('#btnHumanTags');
 	if (!btnHumanTags.attr('disabled')){
@@ -138,48 +117,27 @@ function initHotkeys(){
 	  event.preventDefault();
 	}
       }
-    }));
-
+  });
   // Add new field.
-  $(document).bind('keydown', 'a',
-    disableInInput(function(event){
+  $(document).bind('keydown', 'a', function(event){
       var btnAddField = $('#btnAddField');
       if (!btnAddField.attr('disabled')){
 	btnAddField.trigger('click');
 	event.preventDefault();
       }
-    }));
-
+  });
   // Delete selected field(s).
-  $(document).bind('keydown', 'del',
-    disableInInput(function(event){
+  $(document).bind('keydown', 'del', function(event){
       var btnDeleteSelected = $('#btnDeleteSelected');
       if (!btnDeleteSelected.attr('disabled')){
 	onDeleteClick(event);
 	event.preventDefault();
       }
-  }));
-
-  // Toggle 'selection mode'.
-  $(document).bind('keydown', 's', disableInInput(onKeyS));
-
+  });
 
   // Edit focused subfield.
   $(document).bind('keydown', 'return',
-		   function (event)  { onKeyReturn(event); return false; } );
-  // Save content and jump to next content field.
-  $(document).bind('keydown', 'tab', onKeyTab);
-
-  // Lauch autosuggest
-  $(document).bind('keydown', 'ctrl+shift+a', function (event)  { onAutosuggest(event); } );
-  $(document).bind('keydown', 'ctrl+9', function (event)  { onAutosuggest(event); } );
-
-  // Save content and jump to previous content field.
-  $(document).bind('keydown', 'shift+tab', onKeyTab);
-  // Select focused subfield.
-  $(document).bind('keydown', 'space', disableInInput(onKeySpace));
-  // Select focused subfields parent field.
-  $(document).bind('keydown', 'shift+space', disableInInput(onKeySpace));
+		   onKeyReturn);
   // Move selected field/subfield up.
   $(document).bind('keydown', 'ctrl+up', onKeyCtrlUp);
   // Move selected field/subfield down.
@@ -197,38 +155,12 @@ function initHotkeys(){
     onTriggerFormControl('Clear', event);
   });
   // Add subfield in form.
-  $(document).bind('keydown', 'ctrl+shift+e', onKeyCtrlShiftE);
+  $(document).bind('keydown', 'ctrl+e', onKeyCtrlShiftE);
   // Remove subfield from form.
   $(document).bind('keydown', 'ctrl+shift+d', onKeyCtrlShiftD);
   // Binding the undo/redo operations
-
   $(document).bind('keydown', 'ctrl+shift+z', onUndo);
   $(document).bind('keydown', 'ctrl+shift+y', onRedo);
-}
-
-function onKeyS(event){
-  /*
-   * Handle key 's' (toggle selection mode).
-   */
-  if (gRecID){
-    if (gSelectionModeOn){
-      $('#bibEditTable').unbind('mouseover.selection');
-      gSelectionModeOn = false;
-      updateStatus('report', 'Selection mode: Off');
-    }
-    else{
-      $('#bibEditTable').bind('mouseover.selection', function(event){
-	var targetID = event.target.id;
-	if (targetID.slice(0, targetID.indexOf('_')) == 'content' &&
-	    !$(event.target).hasClass('bibEditSelected'))
-	  onKeySpace(event);
-      });
-      gSelectionModeOn = true;
-      updateStatus('report', 'Selection mode: On');
-    }
-    if (!event.isDefaultPrevented())
-      event.preventDefault();
-  }
 }
 
 function onKeyReturn(event){
@@ -270,7 +202,7 @@ function onKeyCtrlUp(event){
   /*
    * Handle key ctrl+up (move subfield up).
    */
-  if (gReady === false)
+  if (gReady==false)
     return;
   gReady = false;
   // check if we want to move a field or subfield
@@ -299,7 +231,7 @@ function onKeyCtrlDown(event){
   /*
    * Handle key ctrl+down (move subfield down).
    */
-  if (gReady === false)
+  if (gReady==false)
     return;
   gReady = false;
   // check if we want to move a field or subfield

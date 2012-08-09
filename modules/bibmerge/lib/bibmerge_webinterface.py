@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -111,7 +111,7 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
         if not ajax_request:
             # Show BibEdit start page.
             body, errors, warnings = perform_request_init()
-            metaheaderadd = """<script type="text/javascript" src="%(site)s/js/jquery/json2.js"></script>
+            metaheaderadd = """<script type="text/javascript" src="%(site)s/js/json2.js"></script>
   <script type="text/javascript" src="%(site)s/js/bibmerge_engine.js"></script>""" % {'site': CFG_SITE_SECURE_URL}
             title = 'Record Merger'
             return page(title         = title,

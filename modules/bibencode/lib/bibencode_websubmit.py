@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,8 +26,8 @@ Requirements:
     Server side:
         Fully enabled BibEncode module (Codecs, FFmpeg, Mediainfo ...)
         Uploadify JQuery Plugin
-            js/jquery/jquery.min.js
-            js/jquery/jquery.uploadify.min.js
+            js/jquery.min.js
+            js/jquery.uploadify.min.js
             js/swfobject.js
 
 """
@@ -166,8 +166,8 @@ def form_body():
 
 def form_javascript():
     return """
-            <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery/jquery.min.js"></script>
-            <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery/jquery.uploadify.min.js"></script>
+            <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery.min.js"></script>
+            <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery.uploadify.min.js"></script>
             <script type="text/javascript" src="%(CFG_SITE_URL)s/js/swfobject.js"></script>
             <script type="text/javascript">
                 var global_resume = %(resume)s;

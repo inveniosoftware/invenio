@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -44,7 +44,7 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_TAG_FORMAT, CFG_BIBEDIT_AJAX_RESULT_CODES_REV, \
     CFG_BIBEDIT_AUTOSUGGEST_TAGS, CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS,\
     CFG_BIBEDIT_KEYWORD_TAXONOMY, CFG_BIBEDIT_KEYWORD_TAG, \
-    CFG_BIBEDIT_KEYWORD_RDFLABEL, CFG_BIBEDIT_LOG, CFG_BIBEDIT_LOGFILE
+    CFG_BIBEDIT_KEYWORD_RDFLABEL
 
 from invenio.config import CFG_SITE_LANG, CFG_DEVEL_SITE
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
@@ -61,7 +61,7 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     update_cache_file_contents, get_field_templates, get_marcxml_of_revision, \
     revision_to_timestamp, timestamp_to_revision, \
     get_record_revision_timestamps, record_revision_exists, \
-    can_record_have_physical_copies, bibedit_log, extend_record_with_template, \
+    can_record_have_physical_copies, extend_record_with_template, \
     merge_record_with_template
 
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
@@ -214,22 +214,31 @@ def perform_request_init(uid, ln, req, lastupdated):
             'gAVAILABLE_KBS': get_available_kbs(),
             'gTagsToAutocomplete': CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS
             }
+    body += '<script type="text/javascript">\n'
+    for key in data:
+        body += '    var %s = %s;\n' % (key, data[key])
+    body += '    </script>\n'
 
+    # Adding the information about field templates
     fieldTemplates = get_available_fields_templates()
-
-    jquery_scripts = ['jquery.effects.core.min.js',
-                          'jquery.effects.highlight.min.js',
-                          'jquery.autogrow.js', 'jquery.jeditable.mini.js',
-                          'jquery.hotkeys.min.js', 'json2.js']
-
-    scripts = ['bibedit_display.js', 'bibedit_engine.js', 'bibedit_keys.js',
+    body += "<script>\n" + \
+            "   var fieldTemplates = %s\n" % (json.dumps(fieldTemplates), ) + \
+            "</script>\n"
+    # Add scripts (the ordering is NOT irrelevant).
+    scripts = ['jquery.jeditable.mini.js', 'jquery.hotkeys.js', 'json2.js',
+               'bibedit_display.js', 'bibedit_engine.js', 'bibedit_keys.js',
                'bibedit_menu.js', 'bibedit_holdingpen.js', 'marcxml.js',
                'bibedit_clipboard.js','jquery-ui.min.js']
 
-    stylesheets = ['bibedit.css']
+    for script in scripts:
+        body += '    <script type="text/javascript" src="%s/js/%s">' \
+            '</script>\n' % (CFG_SITE_URL, script)
 
-    body += bibedit_templates.page_headers(jquery_scripts, scripts,
-                                           stylesheets, data, fieldTemplates)
+    body += '<link rel="stylesheet" type="text/css" href="/img/jquery-ui.css" />'
+
+    # Build page structure and menu.
+    # rec = create_record(format_record(235, "xm"))[0]
+    #oaiId = record_extract_oai_id(rec)
 
     body += bibedit_templates.menu()
     body += '    <div id="bibEditContent"></div>\n'
@@ -309,13 +318,9 @@ def perform_request_newticket(recid, uid):
         errmsg = "No ticket system configured"
     return (errmsg, t_url)
 
-
 def perform_request_ajax(req, recid, uid, data, isBulk = False, \
                          ln = CFG_SITE_LANG):
     """Handle Ajax requests by redirecting to appropriate function."""
-
-    bibedit_log( str(data) )
-
     response = {}
     request_type = data['requestType']
     undo_redo = None
@@ -614,7 +619,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             if template_to_merge:
                 record = merge_record_with_template(record, template_to_merge)
                 create_cache_file(recid, uid, record, True)
-
+                
             response['cacheDirty'], response['record'], \
                 response['cacheMTime'], response['recordRevision'], \
                 response['revisionAuthor'], response['lastRevision'], \
@@ -853,7 +858,7 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
             # This is a genuine operation - we have to add a new descriptor
             # to the undo list and cancel the redo unless the operation is
             # a bulk operation
-            if undoRedoOp != None and undoRedoOp != 0:
+            if undoRedoOp != None:
                 undo_list = undo_list + [undoRedoOp]
                 redo_list = []
             else:

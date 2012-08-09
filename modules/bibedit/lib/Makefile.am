@@ -38,8 +38,7 @@ pylib_DATA = bibrecord_config.py \
              bibedit_web_tests.py \
              bibeditmulti_templates.py \
              bibeditmulti_webinterface.py \
-             bibeditmulti_engine.py \
-             bibedit_cachetool.py
+             bibeditmulti_engine.py
 
 jsdir=$(localstatedir)/www/js
 
@@ -57,8 +56,7 @@ install-data-hook:
 	## Let's initialize an empty jquery.min.js, so that if the admin does not
 	## run make install-jquery-plugins, at least when jquery.min.js is
 	## downloaded by the client browser, no 404 error is raised.
-	@mkdir -p $(jsdir)/jquery
-	@touch $(jsdir)/jquery/jquery.min.js
+	@touch $(jsdir)/jquery.min.js
 
 EXTRA_DIST = $(pylib_DATA) \
              $(js_DATA)
