@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,14 +21,17 @@
 __revision__ = "$Id$"
 
 import re
-from invenio.bibdocfile import BibRecDocs, file_strip_ext
+from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, compose_format
 from invenio.messages import gettext_set_language
-from invenio.config import CFG_SITE_URL, CFG_CERN_SITE, CFG_SITE_RECORD
+from invenio.config import CFG_SITE_URL, CFG_CERN_SITE, CFG_SITE_RECORD, \
+    CFG_BIBFORMAT_HIDDEN_FILE_FORMATS
 from invenio.websubmit_config import CFG_WEBSUBMIT_ICON_SUBFORMAT_RE
 from cgi import escape, parse_qs
 from urlparse import urlparse
 from os.path import basename
 import urllib
+
+_CFG_NORMALIZED_BIBFORMAT_HIDDEN_FILE_FORMATS = set(normalize_format(fmt) for fmt in CFG_BIBFORMAT_HIDDEN_FILE_FORMATS)
 
 cern_arxiv_categories = ["astro-ph", "chao-dyn", "cond-mat", "gr-qc",
                          "hep-ex", "hep-lat", "hep-ph", "hep-th", "math-ph",
@@ -124,7 +127,7 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
                         'file_icon': file_icon,
                         'url_format': escape(url_format.upper())
                     })
-            out += " ".join(url_list) + additional_str + versions_str + separator
+                out += " ".join(url_list) + additional_str + versions_str + separator
 
     if CFG_CERN_SITE and cern_urls:
         link_word = len(cern_urls) == 1 and _('%(x_sitename)s link') or _('%(x_sitename)s links')
@@ -230,6 +233,10 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
             url_format = filename[len(name):]
             if url_format.startswith('.'):
                 url_format = url_format[1:]
+
+            if compose_format(url_format, subformat) in _CFG_NORMALIZED_BIBFORMAT_HIDDEN_FILE_FORMATS:
+                ## This format should be hidden.
+                continue
 
             descr = _("Fulltext")
             if complete_url.has_key('y'):

@@ -25,6 +25,7 @@ from os import access, F_OK, R_OK, getpid, rename, unlink
 from time import strftime, localtime
 from invenio.websubmitadmin_dblayer import *
 from invenio.websubmitadmin_config import *
+from invenio.websubmit_config import CFG_RESERVED_SUBMISSION_FILENAMES
 from invenio.access_control_admin import acc_get_all_roles, acc_get_role_users, acc_delete_user_role
 from invenio.config import CFG_SITE_LANG, CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR
 from invenio.access_control_engine import acc_authorize_action
@@ -979,6 +980,8 @@ def perform_request_add_element(elname=None, elmarccode=None, eltype=None, elsiz
         if err_code == 0:
             ## Element added: show page listing WebSubmit elements
             user_msg.append("""'%s' Element Added to WebSubmit""" % (elname,))
+            if elname in CFG_RESERVED_SUBMISSION_FILENAMES:
+                user_msg.append("""WARNING: '%s' is a reserved name. Check WebSubmit admin guide to be aware of possible side-effects.""" % elname)
             title = "Available WebSubmit Elements"
             all_elements = get_elename_allelements()
             body = websubmitadmin_templates.tmpl_display_allelements(all_elements, user_msg=user_msg)

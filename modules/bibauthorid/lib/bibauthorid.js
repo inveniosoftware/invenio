@@ -22,7 +22,7 @@ $(document).ready(function() {
     $('[class^=more-]').hide();
     $('[class^=mpid]').click(function() {
         var $this = $(this);
-        var x = $this.attr("className");
+        var x = $this.prop("className");
         $('.more-' + x).toggle();
         var toggleimg = $this.find('img').attr('src');
 
@@ -139,7 +139,7 @@ $(document).ready(function() {
 
 
 function toggle_claimed_rows() {
-    $("img[alt^=Confirmed.]").parents("tr").toggle()
+    $('img[alt^="Confirmed."]').parents("tr").toggle()
 
     if ($("#toggle_claimed_rows").attr("alt") == 'hide') {
         $("#toggle_claimed_rows").attr("alt", 'show');

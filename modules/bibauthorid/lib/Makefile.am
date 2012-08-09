@@ -1,6 +1,6 @@
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,26 +18,33 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibauthorid_backinterface.py \
-             bibauthorid_cli.py \
-             bibauthorid_cluster_set.py \
-             bibauthorid_comparison.py \
-             bibauthorid_config.py \
-             bibauthorid_daemon.py \
-             bibauthorid_dbinterface.py \
-             bibauthorid_frontinterface.py \
-             bibauthorid_general_utils.py \
-             bibauthorid_name_utils.py \
-             bibauthorid_personid_maintenance.py \
-             bibauthorid_prob_matrix.py \
-             bibauthorid_searchinterface.py \
-             bibauthorid_string_utils.py \
-             bibauthorid_templates.py \
-             bibauthorid_webapi.py \
-             bibauthorid_webinterface.py \
-             bibauthorid_wedge.py \
-             __init__.py
-
+pylib_DATA = \
+	bibauthorid_cli.py \
+	bibauthorid_daemon.py \
+	bibauthorid_least_squares.py \
+	bibauthorid_personid_maintenance.py \
+	bibauthorid_scheduler.py \
+	bibauthorid_tortoise.py \
+	__init__.py \
+	bibauthorid_cluster_set.py \
+	bibauthorid_dbinterface.py \
+	bibauthorid_matrix_optimization.py \
+	bibauthorid_prob_matrix.py \
+	bibauthorid_searchinterface.py \
+	bibauthorid_webapi.py \
+	bibauthorid_comparison.py \
+	bibauthorid_frontinterface.py \
+	bibauthorid_merge.py \
+	bibauthorid_rabbit.py \
+	bibauthorid_string_utils.py \
+	bibauthorid_webinterface.py \
+	bibauthorid_backinterface.py \
+	bibauthorid_config.py \
+	bibauthorid_general_utils.py \
+	bibauthorid_name_utils.py \
+	bibauthorid_recipes.py \
+	bibauthorid_templates.py \
+	bibauthorid_wedge.py
 
 jsdir=$(localstatedir)/www/js
 

@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,7 +17,8 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibcatalog.py bibcatalog_templates.py bibcatalog_system.py bibcatalog_system_rt.py
+pylib_DATA = bibcatalog.py bibcatalog_templates.py bibcatalog_system.py \
+             bibcatalog_system_rt.py bibcatalog_system_rt_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
 

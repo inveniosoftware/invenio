@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -873,7 +873,7 @@ def __display_basket(uid, bskid,
             deleted_record_notes = db.get_notes(bskid, recid)
             # remove the deleted record recid from the basket bskid
             db.delete_item(bskid, recid)
-            recid = get_merged_recid(recid)
+            recid = merged_recid
             # add the merged record recid in the basket bskid
             db.add_to_basket(uid, [recid], 0, bskid)
             # save the notes in the merged record recid

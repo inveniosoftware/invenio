@@ -17,7 +17,7 @@
 
 pylibdir=$(libdir)/python/invenio/bibsched_tasklets
 
-pylib_DATA = __init__.py bst_fibonacci.py bst_send_email.py bst_twitter_fetcher.py
+pylib_DATA = __init__.py bst_fibonacci.py bst_send_email.py bst_twitter_fetcher.py bst_run_bibtask.py
 
 EXTRA_DIST = $(pylib_DATA)
 

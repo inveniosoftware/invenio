@@ -30,7 +30,7 @@ etc_DATA = Default_HTML_captions.bft Picture_HTML_brief.bft \
 	   Poetry_HTML_brief.bft Poetry_HTML_detailed.bft \
 	   AID_HTML_very_brief.bft Podcast.xsl \
 	   Video_HTML_brief.bft Video_HTML_detailed.bft \
-	   Basket_Search_Result.bft
+	   Basket_Search_Result.bft Default_HTML_meta.bft
 
 tmpdir = $(prefix)/var/tmp
 

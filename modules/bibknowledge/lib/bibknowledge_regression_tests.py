@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -180,7 +180,7 @@ class BibknowledgeRegressionTests(unittest.TestCase):
     def test_kbd_export_as_list(self):
         """bibknowledge - export dynamic kb to web as list of values"""
         kbpage = CFG_SITE_URL+"/kb/export?kbname="+self.dyn_kbname
-        errs = test_web_page_content(kbpage, expected_text=['Charles Darwin', 'Witten, Edward'])
+        errs = test_web_page_content(kbpage, expected_text=['Charles Darwin', '李白'])
         self.assertEqual([], errs)
 
     def test_kbd_export_as_json(self):
@@ -236,5 +236,3 @@ TEST_SUITE = make_test_suite(BibknowledgeRegressionTests)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
-
-

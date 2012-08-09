@@ -23,7 +23,7 @@
 
 from invenio.dbquery import run_sql
 
-def get_fieldvalues(recIDs, tag, repetitive_values=True):
+def get_fieldvalues(recIDs, tag, repetitive_values=True, sort=True):
     """
     Return list of field values for field TAG for the given record ID
     or list of record IDs.  (RECIDS can be both an integer or a list
@@ -67,11 +67,16 @@ def get_fieldvalues(recIDs, tag, repetitive_values=True):
             queryselect = "DISTINCT(bx.value)"
         else:
             queryselect = "bx.value"
+
+        if sort:
+            sort_sql = "ORDER BY bibx.field_number, bx.tag ASC"
+        else:
+            sort_sql = ""
+
         query = "SELECT %s FROM %s AS bx, %s AS bibx " \
                 "WHERE bibx.id_bibrec IN (%s) AND bx.id=bibx.id_bibxxx AND " \
-                "bx.tag LIKE %%s " \
-                "ORDER BY bibx.field_number, bx.tag ASC" % \
-                (queryselect, bx, bibx, ("%s,"*len(queryparam))[:-1])
+                "bx.tag LIKE %%s %s" % \
+                (queryselect, bx, bibx, ("%s,"*len(queryparam))[:-1], sort_sql)
         res = run_sql(query, tuple(queryparam) + (tag,))
         for row in res:
             out.append(row[0])

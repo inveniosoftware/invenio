@@ -230,6 +230,8 @@ functions. This API is to be used only inside format elements.
           6 - Same as 3, with more tags allowed (like &lt;img>)
           7 - Mix of mode 0 and mode 1. If field_value starts
               with &lt;!-- HTML -->, then use mode 0. Else use mode 1.
+          8. Same as mode 1, but also escape double-quotes
+          9. Same as mode 4, but also escape double-quotes
 
     The arguments are:
 
@@ -258,6 +260,8 @@ functions. This API is to be used only inside format elements.
           6 - Same as 3, with more tags allowed (like &lt;img>)
           7 - Mix of mode 0 and mode 1. If field_value starts
               with &lt;!-- HTML -->, then use mode 0. Else use mode 1.
+          8 - Same as mode 1, but also escape double-quotes
+          9 - Same as mode 4, but also escape double-quotes
 
     The arguments are:
 
@@ -321,6 +325,8 @@ functions. This API is to be used only inside format elements.
                   6 - Same as 3, with more tags allowed (like &lt;img>)
                   7 - Mix of mode 0 and mode 1. If field_value starts
                       with &lt;!-- HTML -->, then use mode 0. Else use mode 1.
+                  8 - Same as mode 1, but also escape double-quotes
+                  9 - Same as mode 4, but also escape double-quotes
 
     The arguments are:
 

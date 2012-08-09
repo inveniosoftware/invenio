@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -191,20 +191,23 @@ def getUid(req):
         ## Not possible to obtain a session
         return 0
     uid = session.get('uid', -1)
-    if uid == -1: # first time, so create a guest user
-        if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-            uid = session['uid'] = createGuestUser()
-            guest = 1
-        else:
-            if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0:
-                session['uid'] = 0
-                return 0
+    if not session.need_https:
+        if uid == -1: # first time, so create a guest user
+            if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                uid = session['uid'] = createGuestUser()
+                session.set_remember_me(False)
+                guest = 1
             else:
-                return -1
-    else:
-        if not hasattr(req, '_user_info') and 'user_info' in session:
-            req._user_info = session['user_info']
-            req._user_info = collect_user_info(req, refresh=True)
+                if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0:
+                    session['uid'] = 0
+                    session.set_remember_me(False)
+                    return 0
+                else:
+                    return -1
+        else:
+            if not hasattr(req, '_user_info') and 'user_info' in session:
+                req._user_info = session['user_info']
+                req._user_info = collect_user_info(req, refresh=True)
 
     if guest == 0:
         guest = isGuestUser(uid)
@@ -234,14 +237,13 @@ def setUid(req, uid, remember_me=False):
     session['uid'] = uid
     if remember_me:
         session.set_timeout(86400)
-        session.set_remember_me()
+    session.set_remember_me(remember_me)
     if uid > 0:
         user_info = collect_user_info(req, login_time=True)
         session['user_info'] = user_info
         req._user_info = user_info
     else:
         del session['user_info']
-    session.save()
     return uid
 
 def session_param_del(req, key):
@@ -250,7 +252,6 @@ def session_param_del(req, key):
     """
     session = get_session(req)
     del session[key]
-    session.save()
 
 def session_param_set(req, key, value):
     """
@@ -258,7 +259,6 @@ def session_param_set(req, key, value):
     """
     session = get_session(req)
     session[key] = value
-    session.save()
 
 def session_param_get(req, key):
     """
@@ -317,14 +317,15 @@ def get_uid_from_email(email):
         register_exception()
         return -1
 
-def isGuestUser(uid):
+def isGuestUser(uid, run_on_slave=True):
     """It Checks if the userId corresponds to a guestUser or not
 
        isGuestUser(uid) -> boolean
     """
     out = 1
     try:
-        res = run_sql("SELECT email FROM user WHERE id=%s LIMIT 1", (uid,), 1)
+        res = run_sql("SELECT email FROM user WHERE id=%s LIMIT 1", (uid,), 1,
+                      run_on_slave=run_on_slave)
         if res:
             if res[0][0]:
                 out = 0
@@ -358,7 +359,7 @@ def isUserSuperAdmin(user_info):
         FROM accROLE r LEFT JOIN user_accROLE ur
         ON r.id = ur.id_accROLE
         WHERE r.name = %s AND
-        ur.id_user = %s AND ur.expiration>=NOW() LIMIT 1""", (SUPERADMINROLE, user_info['uid']), 1):
+        ur.id_user = %s AND ur.expiration>=NOW() LIMIT 1""", (SUPERADMINROLE, user_info['uid']), 1, run_on_slave=True):
         return True
     return acc_firerole_check_user(user_info, load_role_definition(acc_get_role_id(SUPERADMINROLE)))
 
@@ -656,7 +657,7 @@ def logoutUser(req):
     if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
         uid = createGuestUser()
         session['uid'] = uid
-        session.save()
+        session.set_remember_me(False)
     else:
         uid = 0
         session.invalidate()
@@ -799,7 +800,7 @@ def create_userinfobox_body(req, uid, language="en"):
     try:
         return tmpl.tmpl_create_userinfobox(ln=language,
                                             url_referer=url_referer,
-                                            guest=isGuestUser(uid),
+                                            guest=int(user_info['guest']),
                                             username=get_nickname_or_email(uid),
                                             submitter=user_info['precached_viewsubmissions'],
                                             referee=user_info['precached_useapprove'],
@@ -852,7 +853,7 @@ def create_useractivities_menu(req, uid, navmenuid, ln="en"):
             ln=ln,
             selected=is_user_menu_selected,
             url_referer=url_referer,
-            guest=isGuestUser(uid),
+            guest=int(user_info['guest']),
             username=get_nickname_or_email(uid),
             submitter=user_info['precached_viewsubmissions'],
             referee=user_info['precached_useapprove'],
@@ -916,7 +917,7 @@ def create_adminactivities_menu(req, uid, navmenuid, ln="en"):
             ln=ln,
             selected=navmenuid == 'admin',
             url_referer=url_referer,
-            guest=isGuestUser(uid),
+            guest=int(user_info['guest']),
             username=get_nickname_or_email(uid),
             submitter=user_info['precached_viewsubmissions'],
             referee=user_info['precached_useapprove'],
@@ -945,7 +946,7 @@ def list_users_in_role(role):
                        FROM user_accROLE uacc JOIN accROLE acc
                          ON uacc.id_accROLE=acc.id
                       WHERE acc.name=%s""",
-                  (role,))
+                  (role,), run_on_slave=True)
     if res:
         return map(lambda x: int(x[0]), res)
     return []
@@ -969,7 +970,7 @@ def list_users_in_roles(role_list):
         for role in role_list[:-1]:
             query_addons += "acc.name=%s OR "
         query_addons += "acc.name=%s"
-    res = run_sql(query + query_addons, query_params)
+    res = run_sql(query + query_addons, query_params, run_on_slave=True)
     if res:
         return map(lambda x: int(x[0]), res)
     return []
@@ -1099,6 +1100,7 @@ def collect_user_info(req, login_time=False, refresh=False):
         'precached_viewclaimlink' : False,
         'precached_usepaperclaim' : False,
         'precached_usepaperattribution' : False,
+        'precached_canseehiddenmarctags' : False,
     }
 
     try:
@@ -1229,6 +1231,7 @@ def collect_user_info(req, login_time=False, refresh=False):
                 user_info['precached_viewsubmissions'] = isUserSubmitter(user_info)
                 user_info['precached_useapprove'] = isUserReferee(user_info)
                 user_info['precached_useadmin'] = isUserAdmin(user_info)
+                user_info['precached_canseehiddenmarctags'] = acc_authorize_action(user_info, 'runbibedit')[0] == 0
                 usepaperclaim = False
                 usepaperattribution = False
                 viewclaimlink = False

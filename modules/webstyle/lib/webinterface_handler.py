@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -375,7 +375,7 @@ def create_handler(root):
             # Set user agent for fckeditor.py, which needs it here
             os.environ["HTTP_USER_AGENT"] = req.headers_in.get('User-Agent', '')
 
-            guest_p = isGuestUser(getUid(req))
+            guest_p = isGuestUser(getUid(req), run_on_slave=False)
 
             uri = req.uri
             if uri == '/':

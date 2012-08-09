@@ -59,6 +59,7 @@ class IntBitSetTest(unittest.TestCase):
     """Test functions related to intbitset data structure."""
     def setUp(self):
         self.sets = [
+            [1024],
             [10, 20],
             [10, 40],
             [60, 70],
@@ -69,7 +70,8 @@ class IntBitSetTest(unittest.TestCase):
             [10000],
             [23, 45, 67, 89, 110, 130, 174, 1002, 2132, 23434],
             [700, 2000],
-        ]
+            range(1000, 1100),
+        ] + [[i] for i in range(1000, 1100)]
         self.fncs_list = [
             (intbitset.__and__, set.__and__, int.__and__, False),
             (intbitset.__or__, set.__or__, int.__or__, False),
@@ -361,6 +363,19 @@ class IntBitSetTest(unittest.TestCase):
         for set1 in self.sets + [[]]:
             self.assertEqual(not set(set1), not intbitset(set1))
 
+    def test_set_len(self):
+        """intbitset - tests len()"""
+        for set1 in self.sets + [[]]:
+            intbitset1 = intbitset(set1)
+            pythonset1 = set(set1)
+            self.assertEqual(len(pythonset1), len(intbitset1))
+            intbitset1.add(76543)
+            pythonset1.add(76543)
+            self.assertEqual(len(pythonset1), len(intbitset1))
+            intbitset1.remove(76543)
+            pythonset1.remove(76543)
+            self.assertEqual(len(pythonset1), len(intbitset1))
+
     def test_set_clear(self):
         """intbitset - clearing"""
         for set1 in self.sets + [[]]:
@@ -426,6 +441,47 @@ class IntBitSetTest(unittest.TestCase):
             self._helper_sanity_test(intbitset3)
             self.assertEqual(intbitset1, intbitset2)
             self.assertEqual(intbitset1, intbitset3)
+
+    def test_set_pop(self):
+        """intbitset - set pop"""
+        for set1 in self.sets + [[]]:
+            intbitset1 = intbitset(set1)
+            pythonlist1 = list(set1)
+            while True:
+                try:
+                    res1 = pythonlist1.pop()
+                except IndexError:
+                    self.assertRaises(KeyError, intbitset1.pop)
+                    self._helper_sanity_test(intbitset1)
+                    break
+                res2 = intbitset1.pop()
+                self._helper_sanity_test(intbitset1)
+                self.assertEqual(res1, res2)
+
+    def test_set_getitem(self):
+        """intbitset - __getitem__"""
+        for set1 in self.sets + [[]]:
+            intbitset1 = intbitset(set1)
+            pythonlist1 = list(set1)
+            for i in xrange(-2 * len(set1) - 2, 2 * len(set1) + 2):
+                try:
+                    res1 = pythonlist1[i]
+                except IndexError:
+                    self.assertRaises(IndexError, intbitset1.__getitem__, i)
+                    continue
+                res2 = intbitset1[i]
+                self.assertEqual(res1, res2)
+
+        for set1 in self.sets + [[]]:
+            intbitset1 = intbitset(set1)
+            pythonlist1 = list(set1)
+            for start in xrange(-2 * len(set1) - 2, 2 * len(set1) + 2):
+                for stop in xrange(-2 * len(set1) - 2, 2 * len(set1) + 2):
+                    for step in xrange(1, 3):
+                        res1 = pythonlist1[start:stop:step]
+                        res2 = intbitset1[start:stop:step]
+                        self.assertEqual(res1, list(res2), "Failure with set %s, start %s, stop %s, step %s, found %s, expected %s, indices: %s" % (set1, start, stop, step, list(res2), res1, slice(start, stop, step).indices(len(pythonlist1))))
+
 
     def test_set_iterator(self):
         """intbitset - set iterator"""

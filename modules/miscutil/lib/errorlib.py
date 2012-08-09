@@ -121,6 +121,8 @@ def register_emergency(msg, recipients=None):
     from invenio.mailutils import send_email
     if not recipients:
         recipients = get_emergency_recipients()
+    recipients = set(recipients)
+    recipients.add(CFG_SITE_ADMIN_EMAIL)
     for address_str in recipients:
         send_email(CFG_SITE_SUPPORT_EMAIL, address_str, "Emergency notification", msg)
 
@@ -505,3 +507,19 @@ def _truncate_dynamic_string(val, maxlength=500):
     if len(out) > maxlength:
         out = out[:maxlength] + ' [...]'
     return out
+
+
+def wrap_warn():
+    import warnings
+
+    def wrapper(warn_fun):
+        def fun(*args, **kwargs):
+            traceback.print_stack()
+            return warn_fun(*args, **kwargs)
+        return fun
+
+    # Ideally we would use @wraps when we drop python 2.4
+    wrapper.__name__ = warnings.warn.__name__
+    wrapper.__module__ = warnings.warn.__module__
+    wrapper.__doc__ = warnings.warn.__doc__
+    warnings.warn = wrapper(warnings.warn)

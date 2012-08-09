@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -437,6 +437,8 @@ class Collection:
                                  'LHC First Beam Videos',
                                  'CERN openlab Videos']:
                     recIDs = sort_records(None, recIDs, '269__c')
+                elif self.name in ['LHCb Talks']:
+                    recIDs = sort_records(None, recIDs, 'reportnumber')
             # CERN hack ends.
 
             total = len(recIDs)
@@ -499,7 +501,7 @@ class Collection:
             if CFG_CERN_SITE and self.name in ['Videos']:
                 return websearch_templates.tmpl_instant_browse(
                     aas=aas, ln=ln, recids=passIDs, more_link=url, grid_layout=True)
-      
+
             return websearch_templates.tmpl_instant_browse(
                 aas=aas, ln=ln, recids=passIDs, more_link=url)
 
@@ -923,6 +925,7 @@ def get_database_last_updated_timestamp():
     database_tables_timestamps.append(get_table_update_time('field%'))
     database_tables_timestamps.append(get_table_update_time('format%'))
     database_tables_timestamps.append(get_table_update_time('rnkMETHODNAME'))
+    database_tables_timestamps.append(get_table_update_time('accROLE_accACTION_accARGUMENT', run_on_slave=True))
     return max(database_tables_timestamps)
 
 def get_cache_last_updated_timestamp():

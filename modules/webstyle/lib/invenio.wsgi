@@ -27,6 +27,14 @@ try:
 except:
     pass
 
+# wrap warnings (usually from sql queries) to log the traceback
+# of their origin for debugging
+try:
+    from invenio.errorlib import wrap_warn
+    wrap_warn()
+except:
+    pass
+
 # pre-load citation dictionaries upon WSGI application start-up (the
 # citation dictionaries are loaded lazily, which is good for CLI
 # processes such as bibsched, but for web user queries we want them to

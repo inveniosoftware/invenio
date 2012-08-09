@@ -43,7 +43,11 @@
     </ul>
 </li>
 <li><strong>7. <a href="#sendAlert">Send an Alert</a></strong></li></li>
-<li><strong>8. <a href="#cache">Regenerate Your Journal</a></strong></li>
+<li><strong>8. <a href="#cache">Regenerate Your Journal</a></strong>
+    <ul style="list-style-type:None">
+      <li><strong>8.1 <a href="#cache-online">Switch Offline articles to Online</a></strong></li>
+    </ul>
+</li>
 <li><strong>9. <a href="#adminTasks">Other Administrative tasks</a></strong></li>
 </ul>
 
@@ -285,6 +289,14 @@ You can group as many issue as you want. Only the selected issue
 number(s) will be published. Click on the "Publish" button once done.
 </p>
 
+<p>Depending on the configuration set by your administrator, when an
+issue is released, any article still marked as "Offline" for this
+issue is switched to "Online" to ensure consistency between the
+journal view and <CFG_SITE_NAME>. Read more
+about <a href="#offlineVsOnline">Offline/Online articles</a>. You also
+have the possibility to mark "Online" any further set of articles
+added for this issue by <a href="#cache-online">regenerating the
+issue</a> and ticking the adequate checkbox.</p>
 
 <h3><a name="issueUpdates">6.1 Issue Updates</a></h3>
 
@@ -304,8 +316,11 @@ release <code>17/2009</code>.</p>
 
 <p>If you just want to add an article to an already released issue
 without using grouped issues, simply submit your article for this
-issue, and <a href="#cache">update the cache</a>.</p>
-
+issue, and <a href="#cache">update the cache</a>. (If necessary note
+that you can either mark the article as "Online" when submitting it,
+or by ticking the adequate checkbox when <a href="#cache-online">regenerating the
+issue</a>. Read more about <a href="#offlineVsOnline">Offline/Online
+articles</a>)</p>
 
 <h2><a name="sendAlert">7. Send an Alert</a></h2>
 <p>
@@ -337,6 +352,18 @@ journal after it has been released.
 <p>To do so, go to your
 journal <a href="<CFG_SITE_URL>/admin/webjournal/webjournaladmin.py">administration
 page</a>, and click on the "regenerate" link of the issue you want to update.</p>
+
+<h3><a name="cache-online">8.1 Switch Offline articles to Online</a></h3>
+
+<p>When regenerating the cache of a journal issue you have the
+possibility to switch all the articles still marked as "Offline"
+(i.e. drafts) to "Online" (similarly to what is taking place when
+releasing an issue). Tick the corresponding checkbox if you which so.
+Note that the box is disabled if trying to re-generate the cache for
+an issue unreleased yet.</p>
+
+<p>Read more about <a href="#offlineVsOnline">Offline/Online
+articles</a>.</p>
 
 <h2><a name="adminTasks">9. Other Administrative tasks</a></h2>
 

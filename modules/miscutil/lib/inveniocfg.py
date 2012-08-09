@@ -133,7 +133,9 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS',
                        'CFG_BIBSCHED_NODE_TASKS',
                        'CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE',
-                       'CFG_OAI_METADATA_FORMATS']:
+                       'CFG_OAI_METADATA_FORMATS',
+                       'CFG_WEBSUBMIT_DESIRED_CONVERSIONS',
+                       'CFG_BIBDOCFILE_BEST_FORMATS_TO_EXTRACT_TEXT_FROM',]:
         option_value = option_value[1:-1]
 
     ## 3cbis) very special cases: dicts with backward compatible string
@@ -165,7 +167,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_OAI_FRIENDS',
                        'CFG_WEBSTYLE_REVERSE_PROXY_IPS',
                        'CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS',
-                       'CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS']:
+                       'CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS',
+                       'CFG_BIBFORMAT_HIDDEN_FILE_FORMATS',]:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:
@@ -192,10 +195,6 @@ def convert_conf_option(option_name, option_value):
     if option_name in ['CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY',
                        'CFG_BIBMATCH_LOCAL_SLEEPTIME',
                        'CFG_BIBMATCH_REMOTE_SLEEPTIME',
-                       'CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_BCTKD_RA',
-                       'CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_NEW_RA',
-                       'CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH',
-                       'CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N',
                        'CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT',
                        'CFG_BIBMATCH_FUZZY_MATCH_VALIDATION_LIMIT']:
         option_value = float(option_value[1:-1])
@@ -277,7 +276,7 @@ def cli_cmd_update_dbquery_py(conf):
     ## replace db parameters:
     out = ''
     for line in open(dbquerypyfile, 'r').readlines():
-        match = re.search(r'^CFG_DATABASE_(HOST|PORT|NAME|USER|PASS)(\s*=\s*)\'.*\'$', line)
+        match = re.search(r'^CFG_DATABASE_(HOST|PORT|NAME|USER|PASS|SLAVE)(\s*=\s*)\'.*\'$', line)
         if match:
             dbparam = 'CFG_DATABASE_' + match.group(1)
             out += "%s%s'%s'\n" % (dbparam, match.group(2),
@@ -306,7 +305,7 @@ def cli_cmd_update_dbexec(conf):
     ## replace db parameters via sed:
     out = ''
     for line in open(dbexecfile, 'r').readlines():
-        match = re.search(r'^CFG_DATABASE_(HOST|PORT|NAME|USER|PASS)(\s*=\s*)\'.*\'$', line)
+        match = re.search(r'^CFG_DATABASE_(HOST|PORT|NAME|USER|PASS|SLAVE)(\s*=\s*)\'.*\'$', line)
         if match:
             dbparam = 'CFG_DATABASE_' + match.group(1)
             out += "%s%s'%s'\n" % (dbparam, match.group(2),
@@ -757,17 +756,20 @@ your site and documents!"""))
 def cli_cmd_run_unit_tests(conf):
     """Run unit tests, usually on the working demo site."""
     from invenio.testutils import build_and_run_unit_test_suite
-    build_and_run_unit_test_suite()
+    if not build_and_run_unit_test_suite():
+        sys.exit(1)
 
 def cli_cmd_run_regression_tests(conf):
     """Run regression tests, usually on the working demo site."""
     from invenio.testutils import build_and_run_regression_test_suite
-    build_and_run_regression_test_suite()
+    if not build_and_run_regression_test_suite():
+        sys.exit(1)
 
 def cli_cmd_run_web_tests(conf):
     """Run web tests in a browser. Requires Firefox with Selenium."""
     from invenio.testutils import build_and_run_web_test_suite
-    build_and_run_web_test_suite()
+    if not build_and_run_web_test_suite():
+        sys.exit(1)
 
 def _detect_ip_address():
     """Detect IP address of this computer.  Useful for creating Apache
@@ -934,7 +936,8 @@ WSGIRestrictStdout Off
         </Directory>
         ErrorLog %(logdir)s/apache.err
         LogLevel warn
-        CustomLog %(logdir)s/apache.log combined
+        LogFormat "%%h %%l %%u %%t \\"%%r\\" %%>s %%b \\"%%{Referer}i\\" \\"%%{User-agent}i\\" %%D" combined_with_timing
+        CustomLog %(logdir)s/apache.log combined_with_timing
         DirectoryIndex index.en.html index.html
         Alias /img/ %(webdir)s/img/
         Alias /css/ %(webdir)s/css/
@@ -1010,7 +1013,8 @@ WSGIRestrictStdout Off
         </Directory>
         ErrorLog %(logdir)s/apache-ssl.err
         LogLevel warn
-        CustomLog %(logdir)s/apache-ssl.log combined
+        LogFormat "%%h %%l %%u %%t \\"%%r\\" %%>s %%b \\"%%{Referer}i\\" \\"%%{User-agent}i\\" %%D" combined_with_timing
+        CustomLog %(logdir)s/apache-ssl.log combined_with_timing
         DirectoryIndex index.en.html index.html
         Alias /img/ %(webdir)s/img/
         Alias /css/ %(webdir)s/css/

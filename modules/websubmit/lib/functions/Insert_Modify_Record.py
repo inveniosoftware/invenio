@@ -20,6 +20,7 @@ __revision__ = "$Id$"
 import os
 import shutil
 import time
+import tempfile
 
 from invenio.config import \
      CFG_TMPDIR
@@ -45,9 +46,11 @@ def Insert_Modify_Record(parameters, curdir, form, user_info=None):
     else:
         raise InvenioWebSubmitFunctionError("Could not find record file")
     initial_file = os.path.join(curdir, recfile)
-    final_file = os.path.join(CFG_TMPDIR, "%s_%s" % \
-                              (rn.replace('/', '_'),
-                               time.strftime("%Y-%m-%d_%H:%M:%S")))
+    tmp_fd, final_file = tempfile.mkstemp(dir=CFG_TMPDIR,
+                                          prefix="%s_%s" % \
+                                          (rn.replace('/', '_'),
+                                           time.strftime("%Y-%m-%d_%H:%M:%S")))
+    os.close(tmp_fd)
     shutil.copy(initial_file, final_file)
     bibupload_id = task_low_level_submission('bibupload', 'websubmit.Insert_Modify_Record', '-c', final_file, '-P', '3', '-I', str(sequence_id))
     open(os.path.join(curdir, 'bibupload_id'), 'w').write(str(bibupload_id))

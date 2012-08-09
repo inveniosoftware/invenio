@@ -68,7 +68,7 @@ def cli_list_revisions(recid, details=False):
     if not details:
         out = '\n'.join(record_rev_list)
     else:
-        out = "%s%s%s%s\n" % ("# Revision".ljust(22), "# Task ID".ljust(15),
+        out = "%s %s %s %s\n" % ("# Revision".ljust(22), "# Task ID".ljust(15),
                               "# Author".ljust(15), "# Job Details")
         out += '\n'.join([get_info_of_revision_id(revid) for revid in record_rev_list])
     if out:

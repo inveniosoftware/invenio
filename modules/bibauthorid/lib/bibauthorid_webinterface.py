@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,6 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """Bibauthorid Web Interface Logic and URL handler."""
 # pylint: disable=W0105
 # pylint: disable=C0301
@@ -25,6 +26,7 @@ from cgi import escape
 from copy import deepcopy
 from pprint import pformat
 
+from operator import itemgetter
 try:
     from invenio.jsonutils import json, CFG_JSON_AVAILABLE
 except:
@@ -57,13 +59,8 @@ import invenio.bibauthorid_webapi as webapi
 import invenio.bibauthorid_config as bconfig
 
 from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
-from invenio.bibauthorid_frontinterface import update_personID_names_string_set
-
-from pprint import pformat
-
 
 TEMPLATE = load('bibauthorid')
-
 
 class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
     """
@@ -229,6 +226,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         title = self.adf['title'][ulevel](req, form, ln)
         body = TEMPLATE.tmpl_person_detail_layout(content)
         metaheaderadd = self._scripts()
+        metaheaderadd += '\n <meta name="robots" content="nofollow" />'
         self._clean_ticket(req)
 
         return page(title=title,
@@ -834,7 +832,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         '''
         session = get_session(req)
         personinfo = {}
-        records = []
 
         try:
             personinfo = session["personinfo"]
@@ -855,15 +852,15 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         all_papers = webapi.get_papers_by_person_id(self.person_id,
                                                     ext_out=True)
 
-        for paper in all_papers:
-            records.append({'recid': paper[0],
-                            'bibref': paper[1],
-                            'flag': paper[2],
-                            'authorname': paper[3],
-                            'authoraffiliation': paper[4],
-                            'paperdate': paper[5],
-                            'rt_status': paper[6],
-                            'paperexperiment': paper[7]})
+        records = [{'recid': paper[0],
+                    'bibref': paper[1],
+                    'flag': paper[2],
+                    'authorname': paper[3],
+                    'authoraffiliation': paper[4],
+                    'paperdate': paper[5],
+                    'rt_status': paper[6],
+                    'paperexperiment': paper[7]}
+                    for paper in all_papers]
 
         rejected_papers = [row for row in records if row['flag'] < -1]
         rest_of_papers = [row for row in records if row['flag'] >= -1]
@@ -1034,6 +1031,11 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         pinfo = session["personinfo"]
         ticket = pinfo["ticket"]
 
+        if 'arxiv_name' in pinfo:
+            arxiv_name = [pinfo['arxiv_name']]
+        else:
+            arxiv_name = None
+
         if 'ln' in pinfo:
             ln = pinfo["ln"]
         else:
@@ -1115,8 +1117,14 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                     continue # we already assessed those bibrefs.
 
                 fctptr = webapi.get_possible_bibrefs_from_pid_bibrec
-                bibrec_refs = fctptr(pid, [recid])
-                person_name = webapi.get_most_frequent_name_from_pid(pid)
+                bibrec_refs = fctptr(pid, [recid], additional_names=arxiv_name)
+                person_name = webapi.get_most_frequent_name_from_pid(pid, allow_none=True)
+
+                if not person_name:
+                    if arxiv_name:
+                        person_name = ''.join(arxiv_name)
+                    else:
+                        person_name = " "
 
                 for brr in bibrec_refs:
                     if len(brr[1]) == 1:
@@ -1351,12 +1359,9 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         if "user_email" in pinfo:
             userinfo['email'] = pinfo["user_email"]
 
-        pids_to_update = set()
         for t in ticket:
             t['execution_result'] = webapi.execute_action(t['action'], t['pid'], t['bibref'], uid,
-                                                          pids_to_update,
                                                           userinfo['uid-ip'], str(userinfo))
-        update_personID_names_string_set(pids_to_update)
         session.save()
 
 
@@ -1382,17 +1387,14 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         if "user_email" in pinfo:
             userinfo['email'] = pinfo["user_email"]
 
-        pids_to_update = set()
         for t in list(ticket):
             if t['status'] in ['granted', 'warning_granted']:
                 t['execution_result'] = webapi.execute_action(t['action'],
                                                     t['pid'], t['bibref'], uid,
-                                                    pids_to_update,
                                                     userinfo['uid-ip'], str(userinfo))
                 ok_tickets.append(t)
                 ticket.remove(t)
 
-        update_personID_names_string_set(pids_to_update)
 
         if ticket:
             webapi.create_request_ticket(userinfo, ticket)
@@ -1574,21 +1576,21 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             skip_checkout_faulty_fields = True
 
         if not ("user_first_name_sys" in pinfo and pinfo["user_first_name_sys"]):
-            if "user_first_name" in argd:
+            if "user_first_name" in argd and argd['user_first_name']:
                 if not argd["user_first_name"] and not skip_checkout_faulty_fields:
                     pinfo["checkout_faulty_fields"].append("user_first_name")
                 else:
                     pinfo["user_first_name"] = escape(argd["user_first_name"])
 
         if not ("user_last_name_sys" in pinfo and pinfo["user_last_name_sys"]):
-            if "user_last_name" in argd:
+            if "user_last_name" in argd and argd['user_last_name']:
                 if not argd["user_last_name"] and not skip_checkout_faulty_fields:
                     pinfo["checkout_faulty_fields"].append("user_last_name")
                 else:
                     pinfo["user_last_name"] = escape(argd["user_last_name"])
 
         if not ("user_email_sys" in pinfo and pinfo["user_email_sys"]):
-            if "user_email" in argd:
+            if "user_email" in argd and argd['user_email']:
                 if (not argd["user_email"]
                     or not email_valid_p(argd["user_email"])):
                     pinfo["checkout_faulty_fields"].append("user_email")
@@ -2276,10 +2278,15 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
 #                authorpapers = sorted(authorpapers, key=itemgetter(0),
 #                                      reverse=True)
                 if index < bconfig.PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT:
-                    authorpapers = [[paper] for paper in
-                                    sort_records(None, [i[0] for i in
-                                                 webapi.get_papers_by_person_id(pid, -1)],
-                                                 sort_field="year", sort_order="a")]
+                    #We are no longer sorting by date because of the huge impact this have 
+                    #on the system.
+                    #The sorting is now done per recordid
+#                    authorpapers = [[paper] for paper in
+#                                    sort_records(None, [i[0] for i in
+#                                                 webapi.get_papers_by_person_id(pid, -1)],
+#                                                 sort_field="year", sort_order="a")]
+                    authorpapers = sorted([[p[0]] for p in webapi.get_papers_by_person_id(pid, -1)],
+                                          key=itemgetter(0))
                 else:
                     authorpapers = [['Not retrieved to increase performances.']]
 
@@ -2421,6 +2428,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             except (IndexError, KeyError):
                 pass
 
+        req.write(TEMPLATE.tmpl_welcome_personid_association(pid))
         req.write(TEMPLATE.tmpl_welcome_arXiv_papers(arxivp))
         if CFG_INSPIRE_SITE:
             #logs arXive logins, for debug purposes.
@@ -2517,7 +2525,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             query = "(recid:"
             query += " OR recid:".join(papers)
             query += ") AND 037:arxiv"
-            db_docs = perform_request_search(p=query)
+            db_docs = perform_request_search(p=query, rg=0)
             nickmail = ""
             nickname = ""
             db_arxiv_ids = []
@@ -2536,7 +2544,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                 nickname = nickmail
 
             db_arxiv_ids = get_fieldvalues(db_docs, "037__a")
-
             construct = {"nickname": nickname,
                          "claims": ";".join(db_arxiv_ids)}
 

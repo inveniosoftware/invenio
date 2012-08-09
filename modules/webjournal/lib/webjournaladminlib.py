@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -37,7 +37,7 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_ETCDIR, \
      CFG_CACHEDIR, \
-     CFG_TMPDIR, \
+     CFG_TMPSHAREDDIR, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_RECORD
 from invenio.messages import gettext_set_language
@@ -71,7 +71,8 @@ from invenio.webjournal_utils import \
      get_journal_issue_grouping, \
      get_journal_languages, \
      get_journal_collection_to_refresh_on_release, \
-     get_journal_index_to_refresh_on_release
+     get_journal_index_to_refresh_on_release, \
+     issue_is_later_than
 from invenio.dbquery import run_sql
 from invenio.bibrecord import \
      create_record, \
@@ -257,26 +258,51 @@ def perform_feature_record(journal_name,
                                              msg=msg)
 def perform_regenerate_issue(issue,
                              journal_name,
-                             ln=CFG_SITE_LANG):
+                             ln=CFG_SITE_LANG,
+                             confirmed_p=False,
+                             publish_draft_articles_p=False):
     """
     Clears the cache for the given issue.
 
     Parameters:
-        journal_name  -  the journal for which the cache should be
-                         deleted
-               issue  -  the issue for which the cache should be deleted
-                  ln  -  language
+
+                 journal_name -  the journal for which the cache should
+                                 be deleted
+                        issue -  the issue for which the cache should be
+                                 deleted
+                          ln  -  language
+                 confirmed_p  -  if True, regenerate. Else ask confirmation
+    publish_draft_articles_p  -  should the remaining draft articles in
+                                 the issue be made public?
     """
-    success = clear_cache_for_issue(journal_name,
-                                    issue)
-    if success:
-        return wjt.tmpl_admin_regenerate_success(ln,
+
+    if not confirmed_p:
+        # Ask user confirmation about the regeneration
+        current_issue = get_current_issue(ln, journal_name)
+        issue_released_p = not issue_is_later_than(issue, current_issue)
+        return wjt.tmpl_admin_regenerate_confirm(ln,
                                                  journal_name,
-                                                 issue)
+                                                 issue,
+                                                 issue_released_p)
     else:
-        return wjt.tmpl_admin_regenerate_error(ln,
-                                               journal_name,
-                                               issue)
+        # Regenerate the issue (clear the cache)
+        success = clear_cache_for_issue(journal_name,
+                                        issue)
+        if publish_draft_articles_p:
+            current_issue = get_current_issue(ln, journal_name)
+            if not issue_is_later_than(issue, current_issue):
+                # This issue is already released: we can safely publish
+                # the articles. Otherwise we'll refuse to publish the drafts
+                move_drafts_articles_to_ready(journal_name, issue)
+
+        if success:
+            return wjt.tmpl_admin_regenerate_success(ln,
+                                                     journal_name,
+                                                     issue)
+        else:
+            return wjt.tmpl_admin_regenerate_error(ln,
+                                                   journal_name,
+                                                   issue)
 
 def perform_request_issue_control(journal_name, issues,
                                   action, ln=CFG_SITE_LANG):
@@ -766,7 +792,7 @@ def move_drafts_articles_to_ready(journal_name, issue):
                 record_xml = format_record(recid, of='xm')
                 if not record_xml:
                     continue
-                new_record_xml_path = os.path.join(CFG_TMPDIR,
+                new_record_xml_path = os.path.join(CFG_TMPSHAREDDIR,
                                                    'webjournal_publish_' + \
                                                    str(recid) + '.xml')
                 if os.path.exists(new_record_xml_path):
@@ -802,7 +828,7 @@ def move_drafts_articles_to_ready(journal_name, issue):
     for collection in collections_to_refresh.keys():
         task_low_level_submission('webcoll',
                                   'WebJournal',
-                                  '-f', '-p', '2','-c', collection,
+                                  '-f', '-P', '2', '-p', '1', '-c', collection,
                                   '-I', task_sequence_id)
 
 def update_draft_record_metadata(record, protected_datafields, keyword_to_remove):

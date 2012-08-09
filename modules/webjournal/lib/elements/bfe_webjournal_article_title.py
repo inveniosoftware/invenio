@@ -19,14 +19,12 @@
 """
 WebJournal Element - display article title
 """
-from invenio.webjournal_utils import parse_url_string
 def format_element(bfo):
     """
     Display article title
     """
     # Retrieve context (journal, issue and category) from URI
-    args = parse_url_string(bfo.user_info['uri'])
-    ln = args["ln"]
+    ln = bfo.lang
 
     if ln == "fr":
         title = bfo.fields('246_1a', escape=1)

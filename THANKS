@@ -105,6 +105,9 @@ contributed to the project:
  - Cornelia Plott <c.plott@fz-juelich.de>
    Contributions to the German translation.
 
+ - Johnny Mariéthoz <johnny.mariethoz@rero.ch>
+   Patch to improve BibRecDocs argument checking.
+
 The URL handler was inspired by the Quixote Web Framework which is
 ``Copyright (c) 2004 Corporation for National Research Initiatives;
 All Rights Reserved''.

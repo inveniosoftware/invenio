@@ -84,16 +84,16 @@ $(document).ready(function() {
 				DEMOVID_TITLE: {
 					required: true,
 					minlength: 2,
-					maxlength: 50,
+					maxlength: 50
 				},
 				DEMOVID_YEAR: {
 					required: true,
 					minlength: 4,
 					maxlength: 4,
-					digits: true,
+					digits: true
 				},
 				DEMOVID_AU: {
-					required: true,
+					required: true
 				},
 				DEMOVID_DESCR: {
 					required: true,
@@ -102,7 +102,7 @@ $(document).ready(function() {
 				DEMOVID_FILE: {
 					required: {
 						depends: function(element) {
-							return !global_upload_success
+							return !global_upload_success;
 						}
 					}
 				}
@@ -119,7 +119,7 @@ $(document).ready(function() {
 					maxlength: "The year must only have 4 digits."
 				},
 				DEMOVID_AU: {
-					required: "Please enter at least one author.",
+					required: "Please enter at least one author."
 				},
 				DEMOVID_DESCR: {
 					required: "Please enter a description.",
@@ -133,8 +133,8 @@ $(document).ready(function() {
 	/*
 	 * Initialise the video preview slideshow
 	 */
-	animate_aspect()
-	setInterval("slideshow()", 3000)
+	animate_aspect();
+	setInterval("slideshow()", 3000);
 	$("[name=Aspect]").change(animate_aspect);
 	$("#AspectX").change(animate_aspect);
 	$("#AspectY").change(animate_aspect);

@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -58,6 +58,8 @@ import base64
 import binascii
 import cgi
 import sys
+from warnings import warn
+
 if sys.hexversion < 0x2060000:
     from md5 import md5
 else:
@@ -114,7 +116,8 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_BIBDOCFILE_USE_XSENDFILE, \
     CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY, \
     CFG_SITE_RECORD, \
-    CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS
+    CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS, \
+    CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE
 
 from invenio.websubmit_config import CFG_WEBSUBMIT_ICON_SUBFORMAT_RE, \
     CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT
@@ -557,7 +560,10 @@ class BibRecDocs:
     @type bibdocs: list of BibDoc
     """
     def __init__(self, recid, deleted_too=False, human_readable=False):
-        self.id = recid
+        try:
+            self.id = int(recid)
+        except ValueError:
+            raise ValueError("BibRecDocs: recid is %s but must be an integer." % repr(recid))
         self.human_readable = human_readable
         self.deleted_too = deleted_too
         self.bibdocs = []
@@ -1396,7 +1402,6 @@ class BibDoc:
             docname = normalize_docname(docname)
         self.docfiles = []
         self.md5s = None
-        self.related_files = []
         self.human_readable = human_readable
         if docid:
             if not recid:
@@ -1405,17 +1410,7 @@ class BibDoc:
                     recid = res[0][0]
                     doctype = res[0][1]
                 else:
-                    res = run_sql("SELECT id_bibdoc1,type FROM bibdoc_bibdoc WHERE id_bibdoc2=%s LIMIT 1", (docid,), 1)
-                    if res:
-                        main_docid = res[0][0]
-                        doctype = res[0][1]
-                        res = run_sql("SELECT id_bibrec,type FROM bibrec_bibdoc WHERE id_bibdoc=%s LIMIT 1", (main_docid,), 1)
-                        if res:
-                            recid = res[0][0]
-                        else:
-                            raise InvenioWebSubmitFileError, "The docid %s associated with docid %s is not associated with any record" % (main_docid, docid)
-                    else:
-                        raise InvenioWebSubmitFileError, "The docid %s is not associated to any recid or other docid" % docid
+                    warn("Docid %s is orphan" % docid)
             else:
                 res = run_sql("SELECT type FROM bibrec_bibdoc WHERE id_bibrec=%s AND id_bibdoc=%s LIMIT 1", (recid, docid,), 1)
                 if res:
@@ -1494,8 +1489,6 @@ class BibDoc:
                     raise InvenioWebSubmitFileError, e
         # build list of attached files
         self._build_file_list('init')
-        # link with related_files
-        self._build_related_file_list()
 
     def __repr__(self):
         """
@@ -1650,7 +1643,6 @@ class BibDoc:
             self.status = new_status
             self.touch()
             self._build_file_list()
-            self._build_related_file_list()
 
     def add_file_new_version(self, filename, description=None, comment=None, format=None, flags=None):
         """
@@ -1686,6 +1678,8 @@ class BibDoc:
                 else:
                     format = normalize_format(format)
                 destination = "%s/%s%s;%i" % (self.basedir, self.docname, format, myversion)
+                if run_sql("SELECT id_bibdoc FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=%s AND format=%s", (self.id, myversion, format)):
+                    raise InvenioWebSubmitFileError("According to the database a file of format %s is already attached to the docid %s" % (format, self.id))
                 try:
                     shutil.copyfile(filename, destination)
                     os.chmod(destination, 0644)
@@ -1713,6 +1707,9 @@ class BibDoc:
             self.touch()
             Md5Folder(self.basedir).update()
             self._build_file_list()
+        just_added_file = self.get_file(format, myversion)
+        run_sql("INSERT INTO bibdocfsinfo(id_bibdoc, version, format, last_version, cd, md, checksum, filesize, mime) VALUES(%s, %s, %s, true, %s, %s, %s, %s, %s)", (self.id, myversion, format, just_added_file.cd, just_added_file.md, just_added_file.get_checksum(), just_added_file.get_size(), just_added_file.mime))
+        run_sql("UPDATE bibdocfsinfo SET last_version=false WHERE id_bibdoc=%s AND version<%s", (self.id, myversion))
 
     def add_file_new_format(self, filename, version=None, description=None, comment=None, format=None, flags=None):
         """
@@ -1747,6 +1744,8 @@ class BibDoc:
                     format = decompose_file(filename)[2]
                 else:
                     format = normalize_format(format)
+                if run_sql("SELECT id_bibdoc FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=%s AND format=%s", (self.id, version, format)):
+                    raise InvenioWebSubmitFileError("According to the database a file of format %s is already attached to the docid %s" % (format, self.id))
                 destination = "%s/%s%s;%i" % (self.basedir, self.docname, format, version)
                 if os.path.exists(destination):
                     raise InvenioWebSubmitFileError, "A file for docname '%s' for the recid '%s' already exists for the format '%s'" % (self.docname, self.recid, format)
@@ -1771,6 +1770,8 @@ class BibDoc:
             Md5Folder(self.basedir).update()
             self.touch()
             self._build_file_list()
+        just_added_file = self.get_file(format, version)
+        run_sql("INSERT INTO bibdocfsinfo(id_bibdoc, version, format, last_version, cd, md, checksum, filesize, mime) VALUES(%s, %s, %s, true, %s, %s, %s, %s, %s)", (self.id, version, format, just_added_file.cd, just_added_file.md, just_added_file.get_checksum(), just_added_file.get_size(), just_added_file.mime))
 
     def purge(self):
         """
@@ -1792,6 +1793,7 @@ class BibDoc:
             Md5Folder(self.basedir).update()
             self.touch()
             self._build_file_list()
+            run_sql("DELETE FROM bibdocfsinfo WHERE id_bibdoc=%s AND version<%s", (self.id, version))
 
     def expunge(self):
         """
@@ -1806,6 +1808,7 @@ class BibDoc:
         run_sql('DELETE FROM bibdoc_bibdoc WHERE id_bibdoc1=%s OR id_bibdoc2=%s', (self.id, self.id))
         run_sql('DELETE FROM bibdoc WHERE id=%s', (self.id, ))
         run_sql('INSERT DELAYED INTO hstDOCUMENT(action, id_bibdoc, docname, doctimestamp) VALUES("EXPUNGE", %s, %s, NOW())', (self.id, self.docname))
+        run_sql('DELETE FROM bibdocfsinfo WHERE id_bibdoc=%s', (self.id, ))
 
         del self.docfiles
         del self.id
@@ -1826,25 +1829,12 @@ class BibDoc:
         @type version: integer
         @raise InvenioWebSubmitFileError: in case of errors
         """
-        try:
-            version = int(version)
-            new_version = self.get_latest_version() + 1
-            for docfile in self.list_version_files(version):
-                destination = "%s/%s%s;%i" % (self.basedir, self.docname, docfile.get_format(), new_version)
-                if os.path.exists(destination):
-                    raise InvenioWebSubmitFileError, "A file for docname '%s' for the recid '%s' already exists for the format '%s'" % (self.docname, self.recid, docfile.get_format())
-                try:
-                    shutil.copyfile(docfile.get_full_path(), destination)
-                    os.chmod(destination, 0644)
-                    self.more_info.set_comment(self.more_info.get_comment(docfile.get_format(), version), docfile.get_format(), new_version)
-                    self.more_info.set_description(self.more_info.get_description(docfile.get_format(), version), docfile.get_format(), new_version)
-                except Exception, e:
-                    register_exception()
-                    raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (docfile.get_full_path(), destination, e)
-        finally:
-            Md5Folder(self.basedir).update()
-            self.touch()
-            self._build_file_list()
+        version = int(version)
+        docfiles = self.list_version_files(version)
+        if docfiles:
+            self.add_file_new_version(docfiles[0].get_full_path(), description=docfiles[0].get_description(), comment=docfiles[0].get_comment(), format=docfiles[0].get_format(), flags=docfiles[0].flags)
+        for docfile in docfiles[1:]:
+            self.add_file_new_format(docfile.filename, description=docfile.get_description(), comment=docfile.get_comment(), format=docfile.get_format(), flags=docfile.flags)
 
     def import_descriptions_and_comments_from_marc(self, record=None):
         """
@@ -2050,7 +2040,6 @@ class BibDoc:
             Md5Folder(self.basedir).update()
             self.touch()
             self._build_file_list('rename')
-            self._build_related_file_list()
 
     def set_comment(self, comment, format, version=None):
         """
@@ -2389,6 +2378,7 @@ class BibDoc:
             return
         try:
             os.remove(afile.get_full_path())
+            run_sql("DELETE FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=%s AND format=%s", (self.id, afile.get_version(), afile.get_format))
         except OSError:
             pass
         self.touch()
@@ -2458,7 +2448,7 @@ class BibDoc:
                     deleted_files[key] = value
             return (added_files, deleted_files)
 
-        if context != 'init':
+        if context != ('init', 'init_from_disk'):
             previous_file_list = list(self.docfiles)
         res = run_sql("SELECT status,docname,creation_date,"
             "modification_date,more_info FROM bibdoc WHERE id=%s", (self.id,))
@@ -2468,24 +2458,33 @@ class BibDoc:
         self.status = res[0][0]
         self.more_info = BibDocMoreInfo(self.id, blob_to_string(res[0][4]))
         self.docfiles = []
-        if os.path.exists(self.basedir):
-            self.md5s = Md5Folder(self.basedir)
-            files = os.listdir(self.basedir)
-            files.sort()
-            for afile in files:
-                if not afile.startswith('.'):
-                    try:
-                        filepath = os.path.join(self.basedir, afile)
-                        dirname, basename, format, fileversion = decompose_file_with_version(filepath)
-                        checksum = self.md5s.get_checksum(afile)
-                        # we can append file:
-                        self.docfiles.append(BibDocFile(filepath, self.doctype,
-                            fileversion, basename, format,
-                            self.recid, self.id, self.status, checksum,
-                            self.more_info, human_readable=self.human_readable))
-                    except Exception, e:
-                        register_exception()
-        if context == 'init':
+        if CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE and context == 'init':
+            ## In normal init context we read from DB
+            res = run_sql("SELECT version, format, cd, md, checksum, filesize FROM bibdocfsinfo WHERE id_bibdoc=%s", (self.id, ))
+            for version, format, cd, md, checksum, size in res:
+                self.docfiles.append(BibDocFile(
+                    os.path.join(self.basedir, self.docname + format + ";%s" % version), self.doctype,
+                    version, self.docname, format, self.recid, self.id, self.status, checksum,
+                    self.more_info, human_readable=self.human_readable, cd=cd, md=md, size=size))
+        else:
+            if os.path.exists(self.basedir):
+                self.md5s = Md5Folder(self.basedir)
+                files = os.listdir(self.basedir)
+                files.sort()
+                for afile in files:
+                    if not afile.startswith('.'):
+                        try:
+                            filepath = os.path.join(self.basedir, afile)
+                            dirname, basename, format, fileversion = decompose_file_with_version(filepath)
+                            checksum = self.md5s.get_checksum(afile)
+                            # we can append file:
+                            self.docfiles.append(BibDocFile(filepath, self.doctype,
+                                fileversion, basename, format,
+                                self.recid, self.id, self.status, checksum,
+                                self.more_info, human_readable=self.human_readable))
+                        except Exception, e:
+                            register_exception()
+        if context in ('init', 'init_from_disk'):
             return
         else:
             added_files, deleted_files = make_removed_added_bibdocfiles(previous_file_list)
@@ -2503,23 +2502,15 @@ class BibDoc:
                     md = '' # No modification time
                 log_action(deletedstr, self.id, docname, format, version, size, checksum, md)
 
-    def _build_related_file_list(self):
-        """Lists all files attached to the bibdoc. This function should be
-        called everytime the bibdoc is modified within e.g. its icon.
-        @deprecated: use subformats instead.
+    def _sync_to_db(self):
         """
-        self.related_files = {}
-        res = run_sql("SELECT ln.id_bibdoc2,ln.type,bibdoc.status FROM "
-            "bibdoc_bibdoc AS ln,bibdoc WHERE id=ln.id_bibdoc2 AND "
-            "ln.id_bibdoc1=%s", (self.id,))
-        for row in res:
-            docid = row[0]
-            doctype = row[1]
-            if row[2] != 'DELETED':
-                if not self.related_files.has_key(doctype):
-                    self.related_files[doctype] = []
-                cur_doc = BibDoc(docid=docid, human_readable=self.human_readable)
-                self.related_files[doctype].append(cur_doc)
+        Update the content of the bibdocfile table by taking what is available on the filesystem.
+        """
+        self._build_file_list('init_from_disk')
+        run_sql("DELETE FROM bibdocfsinfo WHERE id_bibdoc=%s", (self.id,))
+        for afile in self.docfiles:
+            run_sql("INSERT INTO bibdocfsinfo(id_bibdoc, version, format, last_version, cd, md, checksum, filesize, mime) VALUES(%s, %s, %s, false, %s, %s, %s, %s, %s)", (self.id, afile.get_version(), afile.get_format(), afile.cd, afile.md, afile.get_checksum(), afile.get_size(), afile.mime))
+            run_sql("UPDATE bibdocfsinfo SET last_version=true WHERE id_bibdoc=%s AND version=%s", (self.id, self.get_latest_version()))
 
     def get_total_size_latest_version(self):
         """Return the total size used on disk of all the files belonging
@@ -2590,7 +2581,7 @@ class BibDoc:
         if format[:1] == '.':
             format = format[1:]
         format = format.upper()
-        return run_sql("INSERT INTO rnkDOWNLOADS "
+        return run_sql("INSERT DELAYED INTO rnkDOWNLOADS "
             "(id_bibrec,id_bibdoc,file_version,file_format,"
             "id_user,client_host,download_time) VALUES "
             "(%s,%s,%s,%s,%s,INET_ATON(%s),NOW())",
@@ -2629,7 +2620,7 @@ class BibDocFile:
     """This class represents a physical file in the Invenio filesystem.
     It should never be instantiated directly"""
 
-    def __init__(self, fullpath, doctype, version, name, format, recid, docid, status, checksum, more_info=None, human_readable=False):
+    def __init__(self, fullpath, doctype, version, name, format, recid, docid, status, checksum, more_info=None, human_readable=False, cd=None, md=None, size=None):
         self.fullpath = os.path.abspath(fullpath)
         self.doctype = doctype
         self.docid = docid
@@ -2649,21 +2640,18 @@ class BibDocFile:
         self.format = normalize_format(format)
         self.superformat = get_superformat_from_format(self.format)
         self.subformat = get_subformat_from_format(self.format)
-        if format == "":
+        self.fullname = name
+        if format:
+            self.fullname += self.superformat
+        self.mime, self.encoding = _mimes.guess_type(self.fullname)
+        if self.mime is None:
             self.mime = "application/octet-stream"
-            self.encoding = ""
-            self.fullname = name
-        else:
-            self.fullname = "%s%s" % (name, self.superformat)
-            (self.mime, self.encoding) = _mimes.guess_type(self.fullname)
-            if self.mime is None:
-                self.mime = "application/octet-stream"
         self.more_info = more_info
         self.hidden = 'HIDDEN' in self.flags
-        self.size = os.path.getsize(fullpath)
-        self.md = datetime.fromtimestamp(os.path.getmtime(fullpath))
+        self.size = size or os.path.getsize(fullpath)
+        self.md = md or datetime.fromtimestamp(os.path.getmtime(fullpath))
         try:
-            self.cd = datetime.fromtimestamp(os.path.getctime(fullpath))
+            self.cd = cd or datetime.fromtimestamp(os.path.getctime(fullpath))
         except OSError:
             self.cd = self.md
         self.name = name

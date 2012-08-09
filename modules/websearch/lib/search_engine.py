@@ -71,6 +71,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_SOLR_URL, \
+     CFG_WEBSEARCH_DETAILED_META_FORMAT, \
      CFG_SITE_RECORD, \
      CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
      CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY, \
@@ -144,7 +145,6 @@ cfg_nicely_ordered_collection_list = 0 # do we propose collection list nicely or
 re_word = re.compile('[\s]')
 re_quotes = re.compile('[\'\"]')
 re_doublequote = re.compile('\"')
-re_equal = re.compile('\=')
 re_logical_and = re.compile('\sand\s', re.I)
 re_logical_or = re.compile('\sor\s', re.I)
 re_logical_not = re.compile('\snot\s', re.I)
@@ -184,7 +184,7 @@ class RestrictedCollectionDataCacher(DataCacher):
             try:
                 res = run_sql("""SELECT DISTINCT ar.value
                     FROM accROLE_accACTION_accARGUMENT raa JOIN accARGUMENT ar ON raa.id_accARGUMENT = ar.id
-                    WHERE ar.keyword = 'collection' AND raa.id_accACTION = %s""", (VIEWRESTRCOLL_ID,))
+                    WHERE ar.keyword = 'collection' AND raa.id_accACTION = %s""", (VIEWRESTRCOLL_ID,), run_on_slave=True)
             except Exception:
                 # database problems, return empty cache
                 return []
@@ -727,7 +727,6 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
             # and spaces after colon as well:
             p = re_pattern_spaces_after_colon.sub(lambda x: string.replace(x.group(1), ' ', '__SPACE__'), p)
             # wash argument:
-            p = re_equal.sub(":", p)
             p = re_logical_and.sub(" ", p)
             p = re_logical_or.sub(" |", p)
             p = re_logical_not.sub(" -", p)
@@ -863,6 +862,13 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
             metaheaderadd = get_mathjax_header(req.is_https())
         else:
             metaheaderadd = ''
+        # Add metadata in meta tags for Google scholar-esque harvesting...
+        # only if we have a detailed meta format and we are looking at a
+        # single record
+        if (recID != -1 and CFG_WEBSEARCH_DETAILED_META_FORMAT):
+            metaheaderadd += format_record(recID, \
+                                           CFG_WEBSEARCH_DETAILED_META_FORMAT, \
+                                           ln = ln)
 
         ## generate navtrail:
         navtrail = create_navtrail_links(cc, aas, ln)
@@ -1887,7 +1893,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     can_see_hidden = False
     if req:
         user_info = collect_user_info(req)
-        can_see_hidden = (acc_authorize_action(user_info, 'runbibedit')[0] == 0)
+        can_see_hidden = user_info.get('precached_canseehiddenmarctags', False)
     if can_see_hidden:
         myhiddens = []
 
@@ -2196,16 +2202,15 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
     set = intbitset() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
     limit_reached = 0 # flag for knowing if the query limit has been reached
-    # deduce into which bibwordsX table we will search:
-    stemming_language = get_index_stemming_language(get_index_id_from_field("anyfield"))
-    bibwordsX = "idxWORD%02dF" % get_index_id_from_field("anyfield")
-    if f:
-        index_id = get_index_id_from_field(f)
-        if index_id:
-            bibwordsX = "idxWORD%02dF" % index_id
-            stemming_language = get_index_stemming_language(index_id)
-        else:
-            return intbitset() # word index f does not exist
+
+    # if no field is specified, search in the global index.
+    f = f or 'anyfield'
+    index_id = get_index_id_from_field(f)
+    if index_id:
+        bibwordsX = "idxWORD%02dF" % index_id
+        stemming_language = get_index_stemming_language(index_id)
+    else:
+        return intbitset() # word index f does not exist
 
     # wash 'word' argument and run query:
     if f == 'authorcount' and word.endswith('+'):
@@ -3037,8 +3042,18 @@ def guess_primary_collection_of_a_record(recID):
                                            'ATLAS Internal Notes Physics',
                                            'ATLAS Internal Notes General',):
                 if recID in get_collection_reclist(alternative_collection):
-                    out = alternative_collection
-                    break
+                    return alternative_collection
+
+        # dirty hack for FP
+        FP_collections = {'DO': ['Current Price Enquiries', 'Archived Price Enquiries'],
+                          'IT': ['Current Invitation for Tenders', 'Archived Invitation for Tenders'],
+                          'MS': ['Current Market Surveys', 'Archived Market Surveys']}
+        fp_coll_ids = [coll for coll in dbcollids if coll in FP_collections]
+        for coll in fp_coll_ids:
+            for coll_name in FP_collections[coll]:
+                if recID in get_collection_reclist(coll_name):
+                    return coll_name
+
     return out
 
 _re_collection_url = re.compile('/collection/(.+)')
@@ -3229,11 +3244,16 @@ def get_merged_recid(recID):
     @param recID: deleted record recID
     @type recID: int
     @return: merged record recID
-    @rtype: int
+    @rtype: int or None
     """
-    merged_recid = get_fieldvalues(recID, "970__d")
-    if merged_recid:
-        return int(merged_recid[0])
+    merged_recid = None
+    for val in get_fieldvalues(recID, "970__d"):
+        try:
+            merged_recid = int(val)
+            break
+        except ValueError:
+            pass
+    return merged_recid
 
 def record_exists(recID):
     """Return 1 if record RECID exists.
@@ -3303,7 +3323,7 @@ def print_warning(req, msg, msg_type='', prologue='<br />', epilogue='<br />'):
                  ))
         return
 
-def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_NAME, nb_found=-1, jrec=1, rg=10,
+def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_NAME, nb_found=-1, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS,
                       aas=0, ln=CFG_SITE_LANG, p1="", p2="", p3="", f1="", f2="", f3="", m1="", m2="", m3="", op1="", op2="",
                       sc=1, pl_in_url="",
                       d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, dt="",
@@ -3363,7 +3383,7 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_NAME, nb
              cpu_time = cpu_time,
            )
 
-def print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_NAME, nb_found=-1, jrec=1, rg=10,
+def print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_NAME, nb_found=-1, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS,
                       aas=0, ln=CFG_SITE_LANG, p1="", p2="", p3="", f1="", f2="", f3="", m1="", m2="", m3="", op1="", op2="",
                       sc=1, pl_in_url="",
                       d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, dt="",
@@ -3842,7 +3862,7 @@ def get_interval_for_records_to_sort(nb_found, jrec=None, rg=None):
 
     return irec_min, irec_max
 
-def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LANG,
+def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, format='hb', ot='', ln=CFG_SITE_LANG,
                   relevances=[], relevances_prologue="(", relevances_epilogue="%%)",
                   decompress=zlib.decompress, search_pattern='', print_records_prologue_p=True,
                   print_records_epilogue_p=True, verbose=0, tab='', sf='', so='d', sp='',
@@ -3987,12 +4007,12 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
             elif format.startswith("hd"):
                 # HTML detailed format:
                 for irec in range(irec_max, irec_min, -1):
-                    merged_recid = get_merged_recid(recIDs[irec])
-                    if record_exists(recIDs[irec]) == -1 and not merged_recid:
+                    if record_exists(recIDs[irec]) == -1:
                         print_warning(req, _("The record has been deleted."))
+                        merged_recid = get_merged_recid(recIDs[irec])
+                        if merged_recid:
+                            print_warning(req, _("The record %d replaces it." % merged_recid))
                         continue
-                    if merged_recid:
-                        recIDs[irec] = merged_recid
                     unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(recIDs[irec])),
                                                             recIDs[irec], ln=ln)
                     ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
@@ -4274,7 +4294,9 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
         display_claim_this_paper = False
     #check from user information if the user has the right to see hidden fields/tags in the
     #records as well
-    can_see_hidden = (acc_authorize_action(user_info, 'runbibedit')[0] == 0)
+    can_see_hidden = False
+    if user_info:
+        can_see_hidden = user_info.get('precached_canseehiddenmarctags', False)
 
     out = ""
 
@@ -4297,14 +4319,15 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
         if format == '':
             format = 'hd'
 
-        merged_recid = get_merged_recid(recID)
-        if record_exist_p == -1 and not merged_recid and get_output_format_content_type(format) == 'text/html':
+        if record_exist_p == -1 and get_output_format_content_type(format) == 'text/html':
             # HTML output displays a default value for deleted records.
             # Other format have to deal with it.
             out += _("The record has been deleted.")
-        else:
+            # was record deleted-but-merged ?
+            merged_recid = get_merged_recid(recID)
             if merged_recid:
-                recID = merged_recid
+                out += ' ' + _("The record %d replaces it." % merged_recid)
+        else:
             out += call_bibformat(recID, format, ln, search_pattern=search_pattern,
                                   user_info=user_info, verbose=verbose)
 
@@ -4708,7 +4731,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
 
           rg - records in groups of (e.g. "10").  Defines how many hits
                per collection in the search results page are
-               displayed.
+               displayed.  (Note that `rg' is ignored in case of `of=id'.)
 
           sf - sort field (e.g. "title").
 
@@ -4780,7 +4803,8 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                or splitted by collection.
 
         jrec - jump to record (e.g. "234").  Used for navigation
-               inside the search results.
+               inside the search results.  (Note that `jrec' is ignored
+               in case of `of=id'.)
 
        recid - display record ID (e.g. "20000").  Do not
                search/browse but go straight away to the Detailed
@@ -5606,7 +5630,7 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
                 results_final_recIDs_ranked, results_final_relevances, results_final_relevances_prologue, results_final_relevances_epilogue, results_final_comments = \
                                              rank_records(req, rm, 0, results_final[coll],
                                                           string.split(p) + string.split(p1) +
-                                                          string.split(p2) + string.split(p3), verbose, so, of, ln, rg, jrec)
+                                                          string.split(p2) + string.split(p3), verbose, so, of, ln, rg=0, jrec=0)
                 if of.startswith("h"):
                     print_warning(req, results_final_comments)
                 if results_final_recIDs_ranked:
@@ -5616,7 +5640,7 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
                     print_warning(req, results_final_relevances_prologue)
                     print_warning(req, results_final_relevances_epilogue)
             elif sf or (CFG_BIBSORT_BUCKETS and sorting_methods): # do we have to sort?
-                results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose, of, ln, rg, jrec)
+                results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose, of, ln, rg=None, jrec=None)
 
             if len(results_final_recIDs) < CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT:
                 results_final_colls.append(results_final_recIDs)
@@ -6073,7 +6097,7 @@ def get_most_popular_field_values(recids, tags, exclude_values=None, count_repet
     if count_repetitive_values:
         # counting technique A: can look up many records at once: (very fast)
         for tag in tags:
-            vals_to_count.extend(get_fieldvalues(recids, tag))
+            vals_to_count.extend(get_fieldvalues(recids, tag, sort=False))
     else:
         # counting technique B: must count record-by-record: (slow)
         for recid in recids:

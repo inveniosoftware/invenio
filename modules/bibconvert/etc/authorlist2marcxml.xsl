@@ -84,7 +84,7 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
   <!-- FUNCTION  print-u-affiliation: prints the authors affiliation inside xxx__u subfield -->
   <xsl:template name="print-u-affiliation">
     <xsl:param name="orgid"/>
-    <xsl:variable name="orgname" select="//foaf:Organization[@id=$orgid]/cal:orgName[@source='spiresICN']" />
+    <xsl:variable name="orgname" select="//foaf:Organization[@id=$orgid]/cal:orgName[@source='spiresICN'] | //foaf:Organization[@id=$orgid]/cal:orgName[@source='inspire'] | //foaf:Organization[@id=$orgid]/cal:orgName[@source='INSPIRE']" />
     <xsl:choose>
       <xsl:when test="not(contains($orgname, 'UNDEFINED')) and $orgname!=''">
         <subfield code="u"><xsl:value-of select="normalize-space($orgname)"/></subfield>

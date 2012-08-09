@@ -52,7 +52,7 @@ def format_element(bfo, latest_issue_only='yes', newest_articles_only='yes',
     """
     args = parse_url_string(bfo.user_info['uri'])
     journal_name = args["journal_name"]
-    ln = args["ln"]
+    ln = bfo.lang
     _ = gettext_set_language(ln)
 
     if latest_issue_only.lower() == 'yes':

@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -249,10 +249,10 @@ def acc_is_role(name_action, **arguments):
 
     # first check if an action exists with this name
     id_action = acc_get_action_id(name_action)
-    arole = run_sql("SELECT id_accROLE FROM accROLE_accACTION_accARGUMENT WHERE id_accACTION=%s AND argumentlistid <= 0 LIMIT 1", (id_action, ), 1)
+    arole = run_sql("SELECT id_accROLE FROM accROLE_accACTION_accARGUMENT WHERE id_accACTION=%s AND argumentlistid <= 0 LIMIT 1", (id_action, ), 1, run_on_slave=True)
     if arole:
         return True
-    other_roles_to_check = run_sql("SELECT id_accROLE, keyword, value, argumentlistid FROM  accROLE_accACTION_accARGUMENT JOIN accARGUMENT ON id_accARGUMENT=id WHERE id_accACTION=%s AND argumentlistid > 0", (id_action, ))
+    other_roles_to_check = run_sql("SELECT id_accROLE, keyword, value, argumentlistid FROM  accROLE_accACTION_accARGUMENT JOIN accARGUMENT ON id_accARGUMENT=id WHERE id_accACTION=%s AND argumentlistid > 0", (id_action, ), run_on_slave=True)
     other_roles_to_check_dict = {}
     for id_accROLE, keyword, value, argumentlistid in other_roles_to_check:
         try:
@@ -993,7 +993,7 @@ def acc_get_action_id(name_action):
 
     try:
         return run_sql("""SELECT id FROM accACTION WHERE name = %s""",
-        (name_action, ))[0][0]
+        (name_action, ), run_on_slave=True)[0][0]
     except (ProgrammingError, IndexError):
         return 0
 
@@ -1099,7 +1099,7 @@ def acc_get_role_id(name_role):
     """get id of role, name given. """
     try:
         return run_sql("""SELECT id FROM accROLE WHERE name = %s""",
-        (name_role, ))[0][0]
+        (name_role, ), run_on_slave=True)[0][0]
     except IndexError:
         return 0
 
@@ -1214,7 +1214,7 @@ def acc_is_user_in_role(user_info, id_role):
     if run_sql("""SELECT ur.id_accROLE
             FROM user_accROLE ur
             WHERE ur.id_user = %s AND ur.expiration >= NOW() AND
-            ur.id_accROLE = %s LIMIT 1""", (user_info['uid'], id_role), 1):
+            ur.id_accROLE = %s LIMIT 1""", (user_info['uid'], id_role), 1, run_on_slave=True):
         return True
 
     return acc_firerole_check_user(user_info, load_role_definition(id_role))
@@ -1222,13 +1222,17 @@ def acc_is_user_in_role(user_info, id_role):
 def acc_get_user_roles_from_user_info(user_info):
     """get all roles a user is connected to."""
 
-    roles = intbitset(run_sql("""SELECT ur.id_accROLE
-        FROM user_accROLE ur
-        WHERE ur.id_user = %s AND ur.expiration >= NOW()
-        ORDER BY ur.id_accROLE""", (user_info['uid'], )))
+    uid = user_info['uid']
+    if uid == -1:
+        roles = intbitset()
+    else:
+        roles = intbitset(run_sql("""SELECT ur.id_accROLE
+            FROM user_accROLE ur
+            WHERE ur.id_user = %s AND ur.expiration >= NOW()
+            ORDER BY ur.id_accROLE""", (uid, ), run_on_slave=True))
 
     potential_implicit_roles = run_sql("""SELECT id, firerole_def_ser FROM accROLE
-        WHERE firerole_def_ser IS NOT NULL""")
+        WHERE firerole_def_ser IS NOT NULL""", run_on_slave=True)
 
     for role_id, firerole_def_ser in potential_implicit_roles:
         if role_id not in roles:
@@ -1243,7 +1247,7 @@ def acc_get_user_roles(id_user):
     explicit_roles = run_sql("""SELECT ur.id_accROLE
         FROM user_accROLE ur
         WHERE ur.id_user = %s AND ur.expiration >= NOW()
-        ORDER BY ur.id_accROLE""", (id_user, ))
+        ORDER BY ur.id_accROLE""", (id_user, ), run_on_slave=True)
 
     return [id_role[0] for id_role in explicit_roles]
 
@@ -1272,22 +1276,25 @@ def acc_find_user_role_actions(user_info):
     """find name of all roles and actions connected to user_info."""
 
     uid = user_info['uid']
+    # Not actions for anonymous
+    if uid == -1:
+        res1 = []
+    else:
+        # Let's check if user is superadmin
+        id_superadmin = acc_get_role_id(SUPERADMINROLE)
+        if id_superadmin in acc_get_user_roles_from_user_info(user_info):
+            return [(SUPERADMINROLE, action[1]) \
+                                        for action in acc_get_all_actions()]
 
-    # Let's check if user is superadmin
-    id_superadmin = acc_get_role_id(SUPERADMINROLE)
-    if id_superadmin in acc_get_user_roles_from_user_info(user_info):
-        return [(SUPERADMINROLE, action[1]) for action in acc_get_all_actions()]
-
-    query = """SELECT DISTINCT r.name, a.name
-        FROM user_accROLE ur, accROLE_accACTION_accARGUMENT raa, accACTION a,
-        accROLE r
-        WHERE ur.id_user = %s and
-        ur.expiration >= NOW() and
-        ur.id_accROLE = raa.id_accROLE and
-        raa.id_accACTION = a.id and
-        raa.id_accROLE = r.id """
-
-    res1 = run_sql(query, (uid, ))
+        query = """SELECT DISTINCT r.name, a.name
+                   FROM user_accROLE ur, accROLE_accACTION_accARGUMENT raa,
+                   accACTION a, accROLE r
+                   WHERE ur.id_user = %s AND
+                   ur.expiration >= NOW() AND
+                   ur.id_accROLE = raa.id_accROLE AND
+                   raa.id_accACTION = a.id AND
+                   raa.id_accROLE = r.id """
+        res1 = run_sql(query, (uid, ), run_on_slave=True)
 
     res2 = []
     for res in res1:
@@ -1297,10 +1304,10 @@ def acc_find_user_role_actions(user_info):
     if type(user_info) == type({}):
         query = """SELECT DISTINCT r.name, a.name, r.firerole_def_ser
             FROM accROLE_accACTION_accARGUMENT raa, accACTION a, accROLE r
-            WHERE raa.id_accACTION = a.id and
+            WHERE raa.id_accACTION = a.id AND
             raa.id_accROLE = r.id """
 
-        res3 = run_sql(query)
+        res3 = run_sql(query, run_on_slave=True)
         res4 = []
         for role_name, action_name, role_definition in res3:
             if acc_firerole_check_user(user_info,
@@ -1361,10 +1368,10 @@ def acc_find_possible_roles(name_action, always_add_superadmin=True, **arguments
     given arguments. roles is a list of role_id
     """
     id_action = acc_get_action_id(name_action)
-    roles = intbitset(run_sql("SELECT id_accROLE FROM accROLE_accACTION_accARGUMENT WHERE id_accACTION=%s AND argumentlistid <= 0", (id_action, )))
+    roles = intbitset(run_sql("SELECT id_accROLE FROM accROLE_accACTION_accARGUMENT WHERE id_accACTION=%s AND argumentlistid <= 0", (id_action, ), run_on_slave=True))
     if always_add_superadmin:
         roles.add(CFG_SUPERADMINROLE_ID)
-    other_roles_to_check = run_sql("SELECT id_accROLE, keyword, value, argumentlistid FROM  accROLE_accACTION_accARGUMENT JOIN accARGUMENT ON id_accARGUMENT=id WHERE id_accACTION=%s AND argumentlistid > 0", (id_action, ))
+    other_roles_to_check = run_sql("SELECT id_accROLE, keyword, value, argumentlistid FROM  accROLE_accACTION_accARGUMENT JOIN accARGUMENT ON id_accARGUMENT=id WHERE id_accACTION=%s AND argumentlistid > 0", (id_action, ), run_on_slave=True)
     other_roles_to_check_dict = {}
     for id_accROLE, keyword, value, argumentlistid in other_roles_to_check:
         if id_accROLE not in roles:

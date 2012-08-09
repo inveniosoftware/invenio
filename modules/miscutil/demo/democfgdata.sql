@@ -1,5 +1,5 @@
 -- This file is part of Invenio.
--- Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+-- Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 --
 -- Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -18,10 +18,10 @@
 INSERT INTO user VALUES (2,'jekyll@cds.cern.ch',AES_ENCRYPT(email,'j123ekyll'),'1',NULL,'jekyll','');
 INSERT INTO user VALUES (3,'hyde@cds.cern.ch',AES_ENCRYPT(email,'h123yde'),'1',NULL,'hyde','');
 INSERT INTO user VALUES (4,'dorian.gray@cds.cern.ch',AES_ENCRYPT(email,'d123orian'),'1',NULL,'dorian','');
-INSERT INTO user VALUES (5,'romeo.montague@cds.cern.ch',AES_ENCRYPT(email,'r123omeo'),'1','NULL','romeo','');
-INSERT INTO user VALUES (6,'juliet.capulet@cds.cern.ch',AES_ENCRYPT(email,'j123uliet'),'1','NULL','juliet','');
-INSERT INTO user VALUES (7,'benvolio.montague@cds.cern.ch',AES_ENCRYPT(email,'b123envolio'),'1','NULL','benvolio','');
-INSERT INTO user VALUES (8,'balthasar.montague@cds.cern.ch',AES_ENCRYPT(email,'b123althasar'),'1','NULL','balthasar','');
+INSERT INTO user VALUES (5,'romeo.montague@cds.cern.ch',AES_ENCRYPT(email,'r123omeo'),'1',NULL,'romeo','');
+INSERT INTO user VALUES (6,'juliet.capulet@cds.cern.ch',AES_ENCRYPT(email,'j123uliet'),'1',NULL,'juliet','');
+INSERT INTO user VALUES (7,'benvolio.montague@cds.cern.ch',AES_ENCRYPT(email,'b123envolio'),'1',NULL,'benvolio','');
+INSERT INTO user VALUES (8,'balthasar.montague@cds.cern.ch',AES_ENCRYPT(email,'b123althasar'),'1',NULL,'balthasar','');
 INSERT INTO usergroup VALUES (1,'Theses viewers','Theses viewers internal group','VO','INTERNAL');
 INSERT INTO usergroup VALUES (2,'montague-family','The Montague family.','VM','INTERNAL');
 INSERT INTO user_usergroup VALUES (2,1,'M',NOW());
@@ -1623,7 +1623,7 @@ INSERT INTO externalcollection (id, name) VALUES (13, 'KISS Books/Journals');
 INSERT INTO externalcollection (id, name) VALUES (14, 'KISS Preprints');
 INSERT INTO externalcollection (id, name) VALUES (15, 'NEBIS');
 INSERT INTO externalcollection (id, name) VALUES (16, 'SLAC Library Catalog');
-INSERT INTO externalcollection (id, name) VALUES (17, 'SPIRES HEP');
+INSERT INTO externalcollection (id, name) VALUES (17, 'INSPIRE');
 INSERT INTO externalcollection (id, name) VALUES (18, 'Scirus');
 INSERT INTO externalcollection (id, name) VALUES (19, 'Atlantis Institute Books');
 INSERT INTO externalcollection (id, name) VALUES (20, 'Atlantis Institute Articles');
@@ -2012,6 +2012,8 @@ INSERT INTO knwKB VALUES ('2','EJOURNALS','Knowledge base of all known electroni
 INSERT INTO knwKB VALUES ('3','DBCOLLID2BIBTEX','Mapping between the 980 field and BibTeX entry types.', NULL);
 INSERT INTO knwKB VALUES ('4','SEARCH-SYNONYM-JOURNAL','Knowledge base of journal title synonyms.  Used during search time.', NULL);
 INSERT INTO knwKB VALUES ('5','INDEX-SYNONYM-TITLE','Knowledge base of title word synonyms.  Used during indexing time.', NULL);
+INSERT INTO knwKB VALUES ('6','DBCOLLID2OPENGRAPHTYPE','Maps collection 980 field to an Open Graph Type', NULL);
+INSERT INTO knwKB VALUES ('7','LICENSE2URL','Map a license name to its URL', NULL);
 
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('ARTICLE','Published Article', '1');
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('PREPRINT','Preprint', '1');
@@ -2357,6 +2359,16 @@ INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('PHRVD','Phys. Rev., D', 
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('Phys.Rev.D','Phys. Rev., D', '4');
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('beta','β', '5');
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('β','beta', '5');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('ARTICLE','article', '6');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('BOOK','book', '6');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('VIDEO','video.other', '6');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CERN','http://copyright.cern.ch/', '7');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-3.0','http://creativecommons.org/licenses/by/3.0/', '7');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-SA-3.0','http://creativecommons.org/licenses/by-sa/3.0/', '7');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-NC-3.0','http://creativecommons.org/licenses/by-nc/3.0/', '7');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-ND-3.0','http://creativecommons.org/licenses/by-nd/3.0/', '7');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-NC-SA-3.0','http://creativecommons.org/licenses/by-nc-sa/3.0/', '7');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-NC-ND-3.0','http://creativecommons.org/licenses/by-nc-nd/3.0/', '7');
 
 -- crcLIBRARY demo data:
 INSERT INTO crcLIBRARY (name, address, email, phone, notes) VALUES ('Atlantis Main Library', 'CH-1211 Geneva 23', 'atlantis@cds.cern.ch', '1234567', '');
@@ -2470,12 +2482,12 @@ INSERT INTO jrnISSUE (id_jrnJOURNAL,issue_number,issue_display,date_released,dat
 INSERT INTO jrnISSUE (id_jrnJOURNAL,issue_number,issue_display,date_released) VALUES (1,'03/2009','02-03/2009','2009-01-16');
 
 -- BibAuthorID demo person assignment:
-INSERT INTO aidPERSONID VALUES (NULL,1,'uid','2','0','0');
-INSERT INTO aidPERSONID VALUES (NULL,2,'uid','1','0','0');
-INSERT INTO aidPERSONID VALUES (NULL,3,'uid','4','0','0');
-INSERT INTO aidPERSONID VALUES (NULL,4,'uid','5','0','0');
-INSERT INTO aidPERSONID VALUES (NULL,5,'uid','6','0','0');
-INSERT INTO aidPERSONID VALUES (NULL,6,'uid','7','0','0');
-INSERT INTO aidPERSONID VALUES (NULL,7,'uid','8','0','0');
+INSERT INTO aidPERSONIDDATA (personid, tag, data) VALUES (1,'uid','2');
+INSERT INTO aidPERSONIDDATA (personid, tag, data) VALUES (2,'uid','1');
+INSERT INTO aidPERSONIDDATA (personid, tag, data) VALUES (3,'uid','4');
+INSERT INTO aidPERSONIDDATA (personid, tag, data) VALUES (4,'uid','5');
+INSERT INTO aidPERSONIDDATA (personid, tag, data) VALUES (5,'uid','6');
+INSERT INTO aidPERSONIDDATA (personid, tag, data) VALUES (6,'uid','7');
+INSERT INTO aidPERSONIDDATA (personid, tag, data) VALUES (7,'uid','8');
 
 -- end of file

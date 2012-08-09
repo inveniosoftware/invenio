@@ -83,10 +83,21 @@ CFG_EXTERNAL_COLLECTIONS = {
         {'engine': 'NEBIS'},
     'Scirus':
         {'engine': 'Scirus'},
-    'SPIRES HEP':
-        {'engine': 'SPIRES'},
     'SLAC Library Catalog':
         {'engine': 'SPIRESBooks'},
+    'INSPIRE':
+        {'engine': 'Invenio',
+         'base_url': 'http://inspirehep.net/',
+         'parser_params':
+            {'host': 'inspirehep.net',
+             'path': '',
+             'parser': InvenioHTMLExternalCollectionResultsParser,
+             'fetch_format': 'hb',
+             'num_results_regex_str': r'<strong>([0-9,]+?)</strong> records found',
+             'nbrecs_regex_str': r'<!-- Search-Engine-Total-Number-Of-Results: ([0-9,]+?) -->',
+             'nbrecs_url': 'http://inspirehep.net/search?rg=0&of=xm'},
+         'search_url': 'http://inspirehep.net/search?p=',
+         'record_url': 'http://inspirehep.net/record/'},
     'ScienceCinema':
         {'engine': 'ScienceCinema'},
     'Atlantis Institute Books':

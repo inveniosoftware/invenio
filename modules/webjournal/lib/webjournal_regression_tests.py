@@ -372,12 +372,34 @@ class HtmlCachingFunction(unittest.TestCase):
         value = wju.clear_cache_for_issue('AtlantisTimes', '03/2009')
         self.assertEqual(value, True)
 
+class FormattingElements(unittest.TestCase):
+    """Test how formatting elements behave in various contexts"""
+
+    def test_language_handling_in_journal(self):
+        """webjournal - check washing of ln parameter in /journal handler"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/journal/AtlantisTimes/2009/03/News/103?verbose=9&ln=hello' ,
+                                               expected_text=["we rode to another estate",
+                                                              "The forest abounded with beautiful objects"],
+                                               unexpected_text=["Error when evaluating format element WEBJOURNAL_"])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_language_handling_in_record(self):
+        """webjournal - check washing of ln parameter in /record handler"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/record/103?verbose=9&ln=hello' ,
+                                               expected_text=["we rode to another estate",
+                                                              "The forest abounded with beautiful objects"],
+                                               unexpected_text=["Error when evaluating format element WEBJOURNAL_"])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
 TEST_SUITE = make_test_suite(ArticlesRelated,
                              CategoriesRelated,
                              JournalConfigVars,
                              TimeIssueFunctions,
                              JournalRelated,
-                             HtmlCachingFunction)
+                             HtmlCachingFunction,
+                             FormattingElements)
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
 

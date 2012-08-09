@@ -30,7 +30,7 @@ import os
 try:
     from invenio.dbquery import run_sql, wash_table_column_name
     from invenio.config import CFG_LOGDIR, CFG_TMPDIR, CFG_CACHEDIR, \
-         CFG_TMPSHAREDDIR, CFG_WEBSEARCH_RSS_TTL, \
+         CFG_TMPSHAREDDIR, CFG_WEBSEARCH_RSS_TTL, CFG_PREFIX, \
          CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS
     from invenio.bibtask import task_init, task_set_option, task_get_option, \
          write_message, write_messages
@@ -59,7 +59,7 @@ CFG_MAX_ATIME_RM_OAI = 14
 CFG_MAX_ATIME_ZIP_OAI = 3
 # After how many days to remove deleted bibdocs
 CFG_DELETED_BIBDOC_MAXLIFE = 365 * 10
-# AFter how many day to remove old cached webjournal files
+# After how many day to remove old cached webjournal files
 CFG_WEBJOURNAL_TTL = 7
 # After how many days to zip obsolete bibsword xml log files
 CFG_MAX_ATIME_ZIP_BIBSWORD = 7
@@ -71,6 +71,17 @@ CFG_MAX_ATIME_WEBSUBMIT_TMP_VIDEO = 3
 CFG_MAX_ATIME_RM_REFEXTRACT = 28
 # After how many days to remove obsolete bibdocfiles temporary files
 CFG_MAX_ATIME_RM_BIBDOC = 4
+# After how many days to remove obsolete WebSubmit-created temporary
+# icon files
+CFG_MAX_ATIME_RM_ICON = 7
+# After how many days to remove obsolete WebSubmit-created temporary
+# stamp files
+CFG_MAX_ATIME_RM_STAMP = 7
+# After how many days to remove obsolete WebJournal-created update XML
+CFG_MAX_ATIME_RM_WEBJOURNAL_XML = 7
+# After how many days to remove obsolete temporary files attached with
+# the CKEditor in WebSubmit context?
+CFG_MAX_ATIME_RM_WEBSUBMIT_CKEDITOR_FILE = 28
 
 def gc_exec_command(command):
     """ Exec the command logging in appropriate way its output."""
@@ -155,6 +166,28 @@ def clean_tempfiles():
     gc_exec_command('find %s -name "bibdocfile_*"'
         ' -atime +%s -exec rm %s -f {} \;' \
             % (CFG_TMPDIR, CFG_MAX_ATIME_RM_BIBDOC, vstr))
+
+    write_message("- deleting old temporary WebSubmit icons")
+    gc_exec_command('find %s -name "websubmit_icon_creator_*"'
+        ' -atime +%s -exec rm %s -f {} \;' \
+            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_ICON, vstr))
+
+    write_message("- deleting old temporary WebSubmit stamps")
+    gc_exec_command('find %s -name "websubmit_file_stamper_*"'
+        ' -atime +%s -exec rm %s -f {} \;' \
+            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_STAMP, vstr))
+
+    write_message("- deleting old temporary WebJournal XML files")
+    gc_exec_command('find %s -name "webjournal_publish_*"'
+        ' -atime +%s -exec rm %s -f {} \;' \
+            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_WEBJOURNAL_XML, vstr))
+
+    write_message("- deleting old temporary files attached with CKEditor")
+    gc_exec_command('find %s/var/tmp/attachfile/ '
+        ' -atime +%s -exec rm %s -f {} \;' \
+            % (CFG_PREFIX, CFG_MAX_ATIME_RM_WEBSUBMIT_CKEDITOR_FILE,
+               vstr))
+
     write_message("""CLEANING OF TMP FILES FINISHED""")
 
 def clean_cache():

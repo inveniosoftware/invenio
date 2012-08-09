@@ -44,7 +44,6 @@ typedef struct {
 } IntBitSet;
 
 IntBitSet *intBitSetCreate(register const int size, const bool_t trailing_bits);
-IntBitSet *intBitSetCreateNoAllocate(void);
 IntBitSet *intBitSetCreateFromBuffer(const void * const buf, const Py_ssize_t bufsize);
 IntBitSet *intBitSetResetFromBuffer(IntBitSet *const bitset, const void *const buf, const Py_ssize_t bufsize);
 IntBitSet *intBitSetReset(IntBitSet *const bitset);
@@ -53,10 +52,10 @@ IntBitSet *intBitSetClone(const IntBitSet * const bitset);
 int intBitSetGetSize(IntBitSet * const bitset);
 int intBitSetGetAllocated(const IntBitSet * const bitset);
 int intBitSetGetTot(IntBitSet * const bitset);
-void intBitSetResize(IntBitSet *const bitset, register const int allocated);
-bool_t intBitSetIsInElem(const IntBitSet * const bitset, register const int elem);
-void intBitSetAddElem(IntBitSet *const bitset, register const int elem);
-void intBitSetDelElem(IntBitSet *const bitset, register const int elem);
+void intBitSetResize(IntBitSet *const bitset, register const unsigned int allocated);
+bool_t intBitSetIsInElem(const IntBitSet * const bitset, register const unsigned int elem);
+void intBitSetAddElem(IntBitSet *const bitset, register const unsigned int elem);
+void intBitSetDelElem(IntBitSet *const bitset, register const unsigned int elem);
 bool_t intBitSetEmpty(const IntBitSet * const bitset);
 IntBitSet *intBitSetUnion(IntBitSet *const x, IntBitSet *const y);
 IntBitSet *intBitSetXor(IntBitSet *const x, IntBitSet *const y);
@@ -69,6 +68,7 @@ IntBitSet *intBitSetISub(IntBitSet *const x, IntBitSet *const y);
 int intBitSetAdaptMax(IntBitSet *const x, IntBitSet *const y);
 int intBitSetAdaptMin(IntBitSet *const x, IntBitSet *const y);
 int intBitSetGetNext(const IntBitSet *const x, register int last);
+int intBitSetGetLast(const IntBitSet *const x);
 /** Compare.
  * Compare two intbitset.
  * Returns 0 if the two bitset are equals.

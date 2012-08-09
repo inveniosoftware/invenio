@@ -4517,7 +4517,6 @@ class Template:
                 link_url += quote('cited:0')
             else:
                 link_url += quote('cited:%i->%i' % (low, high))
-            link_url += '&amp;rm=citation';
             link_text = self.tmpl_nice_number(d_cites[coll], ln)
             out += '<td align="right"><a href="%s">%s</a></td>' % (link_url, link_text)
         out += '</tr>'

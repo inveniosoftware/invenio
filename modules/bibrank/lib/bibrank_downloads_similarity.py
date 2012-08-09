@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -55,7 +55,7 @@ def register_page_view_event(recid, uid, client_ip_address):
         # do not register access if we are in read-only access control
         # site mode:
         return []
-    return run_sql("INSERT INTO rnkPAGEVIEWS " \
+    return run_sql("INSERT DELAYED INTO rnkPAGEVIEWS " \
                    " (id_bibrec,id_user,client_host,view_time) " \
                    " VALUES (%s,%s,INET_ATON(%s),NOW())", \
                    (recid, uid, client_ip_address))

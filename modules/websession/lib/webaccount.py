@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -36,7 +36,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
     SUPERADMINROLE, CFG_EXTERNAL_AUTH_DEFAULT
 from invenio.dbquery import run_sql
-from invenio.webuser import getUid,isGuestUser, get_user_preferences, \
+from invenio.webuser import getUid, get_user_preferences, \
         collect_user_info
 from invenio.access_control_admin import acc_find_user_role_actions
 from invenio.messages import gettext_set_language
@@ -47,14 +47,13 @@ websession_templates = invenio.template.load('websession')
 
 def perform_info(req, ln):
     """Display the main features of CDS personalize"""
-    out = ""
     uid = getUid(req)
 
     user_info = collect_user_info(req)
     return websession_templates.tmpl_account_info(
             ln = ln,
             uid = uid,
-            guest = isGuestUser(uid),
+            guest = int(user_info['guest']),
             CFG_CERN_SITE = CFG_CERN_SITE,
            )
 
@@ -81,7 +80,7 @@ def perform_youradminactivities(user_info, ln):
     your_role_actions = acc_find_user_role_actions(user_info)
     your_roles = []
     your_admin_activities = []
-    guest = isGuestUser(user_info['uid'])
+    guest = int(user_info['guest'])
     for (role, action) in your_role_actions:
         if role not in your_roles:
             your_roles.append(role)
@@ -110,7 +109,7 @@ def perform_display_account(req, username, bask, aler, sear, msgs, loan, grps, s
     uid = getUid(req)
     user_info = collect_user_info(req)
     #your account
-    if isGuestUser(uid):
+    if int(user_info['guest']):
         user = "guest"
         login = "%s/youraccount/login?ln=%s" % (CFG_SITE_SECURE_URL, ln)
         accBody = _("You are logged in as guest. You may want to %(x_url_open)slogin%(x_url_close)s as a regular user.") %\

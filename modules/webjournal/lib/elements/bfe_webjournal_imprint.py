@@ -60,7 +60,7 @@ def format_element(bfo, display_date='yes', display_issue_number='yes',
     args = parse_url_string(bfo.user_info['uri'])
     journal_name = args["journal_name"]
     issue_number = args["issue"]
-    ln = args["ln"]
+    ln = bfo.lang
     _ = gettext_set_language(ln)
 
     try:

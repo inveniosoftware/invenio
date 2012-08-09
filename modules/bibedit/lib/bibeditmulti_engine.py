@@ -53,6 +53,8 @@ from invenio.dbquery import run_sql
 
 from invenio import xmlmarc2textmarc as xmlmarc2textmarc
 
+from invenio.bibedit_utils import record_locked_by_queue
+
 from invenio import template
 multiedit_templates = template.load('bibeditmulti')
 
@@ -368,7 +370,8 @@ def perform_request_detailed_record(record_id, update_commands, output_format, l
     return response
 
 def perform_request_test_search(search_criteria, update_commands, output_format, page_to_display, 
-                                language, outputTags, collection="", compute_modifications = 0):
+                                language, outputTags, collection="", compute_modifications=0,
+                                upload_mode='-c'):
     """Returns the results of a test search.
 
     @param search_criteria: search criteria used in the test search
@@ -412,7 +415,11 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
     records_content = []
 
     record_modifications = 0
+
+    locked_records = []
     for record_id in record_IDs:
+        if upload_mode == '-r' and record_locked_by_queue(record_id):
+            locked_records.append(record_id)
         current_modifications = [current_command._modifications for current_command in update_commands]
         formated_record = _get_formated_record(record_id=record_id,
                              output_format=output_format,
@@ -439,9 +446,12 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
             total_modifications.append(subfield_modifications)
         records_content = records_content[first_record_to_display:last_record_to_display + 1]
 
-    response['display_info_box'] = compute_modifications
+    response['display_info_box'] = compute_modifications or locked_records
     response['info_html'] = multiedit_templates.info_box(language = language,
                                                 total_modifications = total_modifications)
+    if locked_records:
+        response['info_html'] += multiedit_templates.tmpl_locked_record_list(language = language,
+                                                locked_records = locked_records)
     response['search_html'] = multiedit_templates.search_results(records = records_content,
                                                 number_of_records = number_of_records,
                                                 current_page = page_to_display,

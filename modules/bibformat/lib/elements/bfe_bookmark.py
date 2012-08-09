@@ -26,8 +26,13 @@ import cgi
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD, CFG_CERN_SITE
 from invenio.search_engine import record_public_p
+from invenio.jsonutils import wash_for_js
 from invenio.bibformat_elements.bfe_sciencewise import create_sciencewise_url, \
     get_arxiv_reportnumber
+from invenio.webjournal_utils import \
+     parse_url_string, \
+     make_journal_url, \
+     get_journals_ids_and_names
 
 def format_element(bfo, only_public_records=1, sites="linkedin,twitter,facebook,google,delicious,sciencewise"):
     """
@@ -77,6 +82,19 @@ $('#bookmark_sciencewise').bookmark({sites: ['sciencewise']});
                 'siteurl': CFG_SITE_URL,
                 'url': sciencewise_url.replace("'", r"\'"),
             }
+
+    url = '%(siteurl)s/%(record)s/%(recid)s' % \
+          {'recid': bfo.recID,
+           'record': CFG_SITE_RECORD,
+           'siteurl': CFG_SITE_URL}
+
+    args = parse_url_string(bfo.user_info['uri'])
+    journal_name = args["journal_name"]
+    if journal_name and \
+       (journal_name in [info.get('journal_name', '') for info in get_journals_ids_and_names()]):
+        # We are displaying a WebJournal article: URL is slightly different
+        url = make_journal_url(bfo.user_info['uri'])
+
     return """\
 <!-- JQuery Bookmark Button BEGIN -->
 <div id="bookmark"></div><div id="bookmark_sciencewise"></div>
@@ -92,10 +110,10 @@ $('#bookmark_sciencewise').bookmark({sites: ['sciencewise']});
     $('#bookmark').bookmark({
         sites: [%(sites_js)s],
         icons: '%(siteurl)s/img/bookmarks.png',
-        url: '%(siteurl)s/%(record)s/%(recid)s',
+        url: '%(url)s',
         addEmail: true,
-        title: '%(title)s',
-        description: '%(description)s'
+        title: %(title)s,
+        description: %(description)s
     });
 // ]]>
 </script>
@@ -103,11 +121,10 @@ $('#bookmark_sciencewise').bookmark({sites: ['sciencewise']});
 """ % {
         'siteurl': CFG_SITE_URL,
         'sciencewise': sciencewise_script,
-        'title': cgi.escape(title).replace("'", r"\'"),
-        'description': cgi.escape(description).replace("'", r"\'"),
+        'title': wash_for_js(cgi.escape(title)),
+        'description': wash_for_js(cgi.escape(description)),
         'sites_js': sites_js,
-        'record': CFG_SITE_RECORD,
-        'recid': bfo.recID
+        'url': url,
     }
 
 def escape_values(bfo):

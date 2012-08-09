@@ -169,7 +169,8 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
                                                     language,
                                                     output_tags,
                                                     collection,
-                                                    compute_modifications))
+                                                    compute_modifications,
+                                                    upload_mode))
             return json.dumps(json_response)
 
         elif action_type == self._action_types.display_detailed_result:

@@ -34,6 +34,8 @@ try:
     from invenio.intbitset import intbitset
     from invenio.search_engine import perform_request_search, search_pattern
     from invenio.search_engine import print_record
+    from invenio.bibrank_citation_searcher import get_cited_by
+    from invenio.bibrank_citation_indexer import get_bibrankmethod_lastupdate
     from invenio.bibformat import format_record
     from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
     from invenio.bibtask import task_init, write_message, task_set_option, \
@@ -100,6 +102,21 @@ def bibreformat_task(fmt, sql, sql_queries, cds_query, process_format, process, 
     for sql_query in sql_queries:
         write_message("Querying database (%s) ..." % sql_query, verbose=2)
         recIDs |= intbitset(run_sql(sql_query))
+
+    if fmt == "HDREF":
+        # HDREF represents the references tab
+        # the tab needs to be recomputed not only when the record changes
+        # but also when one of the citations changes
+        latest_bibrank_run = get_bibrankmethod_lastupdate('citation')
+        sql = """SELECT id, modification_date FROM bibrec
+                 WHERE id in (%s)""" % ','.join(str(r) for r in recIDs)
+
+        def check_date(mod_date):
+            return mod_date < latest_bibrank_run
+        recIDs = intbitset([recid for recid, mod_date in run_sql(sql) \
+                                                    if check_date(mod_date)])
+        for r in recIDs:
+            recIDs |= intbitset(get_cited_by(r))
 
 ### list of corresponding record IDs was retrieved
 ### now format the selected records

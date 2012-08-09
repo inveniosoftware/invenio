@@ -1334,7 +1334,10 @@ def parse_url_string(uri):
     URI beforehand, so that journal name exist, issue number is
     correct, etc.  The only remaining problem might be due to the
     capitalization of journal name in contact, search and popup pages,
-    so clean the journal name
+    so clean the journal name. Note that language is also as returned
+    from the URL, which might need to be filtered to match available
+    languages (WebJournal elements can rely in bfo.lang to retrieve
+    washed language)
 
     returns:
         args: all arguments in dict form

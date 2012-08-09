@@ -43,7 +43,6 @@ from invenio.config import \
      CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES, \
      CFG_BIBINDEX_SPLASH_PAGES, \
      CFG_SOLR_URL
-from invenio.websubmit_config import CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM
 from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
     CFG_MYSQL_THREAD_TIMEOUT, \
     CFG_CHECK_MYSQL_THREADS
@@ -66,7 +65,7 @@ from invenio.bibtask import task_init, write_message, get_datetime, \
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
 from invenio.htmlutils import remove_html_markup, get_links_in_html_page
-from invenio.textutils import wash_for_utf8, strip_accents
+from invenio.textutils import wash_for_utf8, strip_accents, remove_control_characters
 from invenio.search_engine_utils import get_fieldvalues
 
 if CFG_SOLR_URL:
@@ -82,12 +81,15 @@ if sys.hexversion < 0x2040000:
 if CFG_CERN_SITE:
     CFG_JOURNAL_TAG = '773__%'
     CFG_JOURNAL_PUBINFO_STANDARD_FORM = "773__p 773__v (773__y) 773__c"
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*\s\w.*\s\(\d+\)\s\w.*$'
 elif CFG_INSPIRE_SITE:
     CFG_JOURNAL_TAG = '773__%'
     CFG_JOURNAL_PUBINFO_STANDARD_FORM = "773__p,773__v,773__c"
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*,\w.*,\w.*$'
 else:
     CFG_JOURNAL_TAG = '909C4%'
     CFG_JOURNAL_PUBINFO_STANDARD_FORM = "909C4p 909C4v (909C4y) 909C4c"
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*\s\w.*\s\(\d+\)\s\w.*$'
 
 ## precompile some often-used regexp for speed reasons:
 re_subfields = re.compile('\$\$\w')
@@ -274,6 +276,8 @@ def solr_add_fulltext(recid, text):
     """
     if recid:
         try:
+            # Remove any illegal characters
+            text = remove_control_characters(text)
             utext = unicode(text, 'utf-8')
             SOLR_CONNECTION.add(id=recid, fulltext=utext)
             SOLR_CONNECTION.commit()
@@ -1007,6 +1011,7 @@ class WordTable:
             i_low = arange[0]
             chunksize_count = 0
             while i_low <= arange[1]:
+                task_sleep_now_if_required()
                 # calculate chunk group of recIDs and treat it:
                 i_high = min(i_low + opt_flush - flush_count - 1, arange[1])
                 i_high = min(i_low + chunksize - chunksize_count - 1, i_high)
@@ -1229,6 +1234,7 @@ class WordTable:
         """
         count = 0
         for arange in recIDs:
+            task_sleep_now_if_required()
             self.del_recID_range(arange[0], arange[1])
             count = count + arange[1] - arange[0]
         self.put_into_db()
@@ -1316,9 +1322,11 @@ class WordTable:
 
         time_started = time.time() # will measure profile time
         for arange in recIDs:
+
             i_low = arange[0]
             chunksize_count = 0
             while i_low <= arange[1]:
+                task_sleep_now_if_required()
                 # calculate chunk group of recIDs and treat it:
                 i_high = min(i_low + opt_flush - flush_count - 1, arange[1])
                 i_high = min(i_low + chunksize - chunksize_count - 1, i_high)

@@ -898,7 +898,7 @@ def create_file_upload_interface(recid,
                                          body=_("""Dear Support,
 I would need help to revise or add a file to record %(recid)s.
 I have attached the new version to this email.
-Best regards"""))
+Best regards""") % {'recid': recid or ''})
 
         problem_revising = _('Having a problem revising a file? Send the revised version to %(mailto_link)s.') % {'mailto_link': mailto_link}
         if len(cleaned_doctypes) > 0:

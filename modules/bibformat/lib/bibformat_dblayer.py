@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -456,10 +456,15 @@ def get_preformatted_record(recID, of, decompress=zlib.decompress):
     @param decompress: the method used to decompress the preformatted record in database
     @return: formatted record as String, or None if not exist
     """
+    # Decide whether to use DB slave:
+    if of in ('xm', 'recstruct'):
+        run_on_slave = False # for master formats, use DB master
+    else:
+        run_on_slave = True # for other formats, we can use DB slave
     # Try to fetch preformatted record
     query = "SELECT value FROM bibfmt WHERE id_bibrec=%s AND format=%s"
     params = (recID, of)
-    res = run_sql(query, params)
+    res = run_sql(query, params, run_on_slave=run_on_slave)
     if res:
         # record 'recID' is formatted in 'of', so return it
         return "%s" % decompress(res[0][0])
@@ -478,9 +483,14 @@ def get_preformatted_record_date(recID, of):
     @param of: the output format code
     @return: the date of the last update of the cache, or None if not exist
     """
+    # Decide whether to use DB slave:
+    if of in ('xm', 'recstruct'):
+        run_on_slave = False # for master formats, use DB master
+    else:
+        run_on_slave = True # for other formats, we can use DB slave
     # Try to fetch preformatted record
     query = "SELECT last_updated FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, of)
-    res = run_sql(query)
+    res = run_sql(query, run_on_slave=run_on_slave)
     if res:
         # record 'recID' is formatted in 'of', so return it
         return "%s" % res[0][0]
@@ -516,4 +526,3 @@ def get_preformatted_record_date(recID, of):
 ##     for row in res:
 ##         if not row[0] in output_formats:
 ##             query = "DELETE FROM format WHERE code='%s'"%row[0]
-

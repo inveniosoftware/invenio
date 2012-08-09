@@ -96,7 +96,7 @@ etags:
 	(cd $(top_srcdir) && find $(top_srcdir) -name "*.py" -print | xargs etags)
 
 install-data-local:
-	for d in / /cache /log /tmp /tmp-shared /data /run /tmp-shared/bibencode/jobs/done ; do	\
+	for d in / /cache /cache/RTdata /log /tmp /tmp-shared /data /run /tmp-shared/bibencode/jobs/done ; do	\
 		mkdir -p $(localstatedir)$$d ;		\
 	done
 	@echo "************************************************************"
@@ -557,6 +557,12 @@ update-v0.99.5-tables: # from v0.99.5 to v1.0.0-rc0
 update-v1.0.0-rc0-tables: # from v1.0.0-rc0 to v1.0.0
 	@echo "Nothing to do; table structure did not change between v1.0.0-rc0 and v1.0.0."
 
+update-v1.0.0-tables: # from v1.0.0 to v1.0.1
+	@echo "Nothing to do; table structure did not change between v1.0.0 and v1.0.1."
+
+update-v1.0.1-tables: # from v1.0.1 to v1.0.2
+	@echo "ALTER TABLE session ADD KEY session_expiry (session_expiry);" | ${prefix}/bin/dbexec
+
 update-db-from-v1.0-to-v1.1: # update DB from v1.0 release series to v1.1 release series
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Set_Embargo','Set an embargo on all the documents of a given record.');" | ${prefix}/bin/dbexec
@@ -595,5 +601,6 @@ update-db-from-v1.0-to-v1.1: # update DB from v1.0 release series to v1.1 releas
 	echo "INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','edsrn');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','rep_tags');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','record_search_pattern');" | ${prefix}/bin/dbexec
+	echo "UPDATE externalcollection SET name='INSPIRE' where name='SPIRES HEP';" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~ *.pyc *.tmp

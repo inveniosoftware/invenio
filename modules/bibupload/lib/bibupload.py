@@ -523,7 +523,12 @@ def open_marc_file(path):
     except IOError, erro:
         write_message("Error: %s" % erro, verbose=1, stream=sys.stderr)
         write_message("Exiting.", sys.stderr)
-        task_update_status("ERROR")
+        if erro.errno == 2:
+            # No such file or directory
+            # Not scary
+            task_update_status("CERROR")
+        else:
+            task_update_status("ERROR")
         sys.exit(1)
     return marc
 
@@ -540,7 +545,7 @@ def xml_marc_to_records(xml_marc):
         write_message("Error: MARCXML file has wrong format: %s" % recs,
             verbose=1, stream=sys.stderr)
         write_message("Exiting.", sys.stderr)
-        task_update_status("ERROR")
+        task_update_status("CERROR")
         sys.exit(1)
     else:
         recs = map((lambda x:x[0]), recs)
@@ -1467,6 +1472,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
                 if not found_bibdoc:
                     if not pretend:
                         bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
+                        bibdoc.set_status(restriction)
                         for (url, format, description, comment, flags) in urls:
                             assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment, flags))
             elif mode == 'correct':
@@ -1531,6 +1537,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
                     else:
                         if not pretend:
                             bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
+                            bibdoc.set_status(restriction)
                             for (url, format, description, comment, flags) in urls:
                                 assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment, flags))
             elif mode == 'append':

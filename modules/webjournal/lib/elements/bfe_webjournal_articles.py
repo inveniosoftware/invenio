@@ -58,7 +58,7 @@ def format_element(bfo, new_articles_first='yes',
     this_issue_number = args["issue"]
     category_name = args["category"]
     verbose = args["verbose"]
-    ln = args["ln"]
+    ln = bfo.lang
     _ = gettext_set_language(ln)
 
     # Try to get the page from cache. Only if issue is older or equal

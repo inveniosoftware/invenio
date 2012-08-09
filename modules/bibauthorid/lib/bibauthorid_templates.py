@@ -35,6 +35,7 @@ from invenio.session import get_session
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibauthorid_webapi import get_person_redirect_link, get_canonical_id_from_person_id
 from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
+from invenio.bibauthorid_frontinterface import get_canonical_id_from_personid
 from invenio.messages import gettext_set_language, wash_language
 #from invenio.textutils import encode_for_xml
 
@@ -89,7 +90,7 @@ class Template:
         h('    <strong>%s</strong> %s' % (teaser, message))
 
         if show_close_btn:
-            h('    <span style="float:right; margin-right: 0.3em;"><a href="#" class="aid_close-notify">X</a></span></p>')
+            h('    <span style="float:right; margin-right: 0.3em;"><a rel="nofollow" href="#" class="aid_close-notify">X</a></span></p>')
 
         h(' </div>')
         h('</div>')
@@ -119,7 +120,7 @@ class Template:
         h('    <strong>%s</strong> %s' % (teaser, message))
 
         if show_close_btn:
-            h('    <span style="float:right; margin-right: 0.3em;"><a href="#" class="aid_close-notify">X</a></span></p>')
+            h('    <span style="float:right; margin-right: 0.3em;"><a rel="nofollow" href="#" class="aid_close-notify">X</a></span></p>')
 
         h(' </div>')
         h('</div>')
@@ -150,11 +151,11 @@ class Template:
         h('  <div style="margin-top: 20px; padding: 0pt 0.7em;" class="ui-state-highlight ui-corner-all">')
         h('    <p><span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>')
         h('    <strong>%s</strong> %s ' % (teaser, message))
-        h('<a id="checkout" href="action?checkout=True">' + self._('Click here to review the transactions.') + '</a>')
+        h('<a rel="nofollow" id="checkout" href="action?checkout=True">' + self._('Click here to review the transactions.') + '</a>')
         h('<br>')
 
         if show_close_btn:
-            h('    <span style="float:right; margin-right: 0.3em;"><a href="#" class="aid_close-notify">X</a></span></p>')
+            h('    <span style="float:right; margin-right: 0.3em;"><a rel="nofollow" href="#" class="aid_close-notify">X</a></span></p>')
 
         h(' </div>')
         h('</div>')
@@ -193,11 +194,11 @@ class Template:
             h("<li>%s</li>"
                    % (format_record(pbibrec, "ha")))
         h("</ul>")
-        h('<a id="checkout" href="action?cancel_search_ticket=True">' + self._('Quit searching.') + '</a>')
+        h('<a rel="nofollow" id="checkout" href="action?cancel_search_ticket=True">' + self._('Quit searching.') + '</a>')
 #        h('DBGticket - ' + str(search_ticket))
 
         if show_close_btn:
-            h('    <span style="float:right; margin-right: 0.3em;"><a href="#" class="aid_close-notify">X</a></span></p>')
+            h('    <span style="float:right; margin-right: 0.3em;"><a rel="nofollow" href="#" class="aid_close-notify">X</a></span></p>')
 
         h(' </div>')
         h('</div>')
@@ -280,14 +281,14 @@ class Template:
                 '%(confirm_text)s <br>')
         if show_reset_button:
             stri = stri + (
-                '<a id="aid_reset_gr" class="aid_grey" href="%(url)s/person/action?reset=True&selection=%(ref)s&pid=%(pid)s">'
+                '<a rel="nofollow" id="aid_reset_gr" class="aid_grey" href="%(url)s/person/action?reset=True&selection=%(ref)s&pid=%(pid)s">'
                 '<img src="%(url)s/img/aid_reset_gray.png" alt="%(alt_forget)s" style="margin-left:22px;" />'
                 '%(forget_text)s</a><br>')
         stri = stri + (
-                '<a id="aid_repeal" class="aid_grey" href="%(url)s/person/action?repeal=True&selection=%(ref)s&pid=%(pid)s">'
+                '<a rel="nofollow" id="aid_repeal" class="aid_grey" href="%(url)s/person/action?repeal=True&selection=%(ref)s&pid=%(pid)s">'
                 '<img src="%(url)s/img/aid_reject_gray.png" alt="%(alt_repeal)s" style="margin-left:22px;"/>'
                 '%(repeal_text)s</a><br>'
-                '<a id="aid_to_other" class="aid_grey" href="%(url)s/person/action?to_other_person=True&selection=%(ref)s">'
+                '<a rel="nofollow" id="aid_to_other" class="aid_grey" href="%(url)s/person/action?to_other_person=True&selection=%(ref)s">'
                 '<img src="%(url)s/img/aid_to_other_gray.png" alt="%(alt_to_other)s" style="margin-left:22px;"/>'
                 '%(to_other_text)s</a> </span>')
         return (stri
@@ -328,14 +329,14 @@ class Template:
                 '%(repeal_text)s <br>')
         if show_reset_button:
             stri = stri + (
-                '<a id="aid_reset" class="aid_grey" href="%(url)s/person/action?reset=True&selection=%(ref)s&pid=%(pid)s">'
+                '<a rel="nofollow" id="aid_reset" class="aid_grey" href="%(url)s/person/action?reset=True&selection=%(ref)s&pid=%(pid)s">'
                 '<img src="%(url)s/img/aid_reset_gray.png" alt="%(alt_forget)s" style="margin-left: 22px;" />'
                 '%(forget_text)s</a><br>')
         stri = stri + (
-                '<a id="aid_confirm" class="aid_grey" href="%(url)s/person/action?confirm=True&selection=%(ref)s&pid=%(pid)s">'
+                '<a rel="nofollow" id="aid_confirm" class="aid_grey" href="%(url)s/person/action?confirm=True&selection=%(ref)s&pid=%(pid)s">'
                 '<img src="%(url)s/img/aid_check_gray.png" alt="%(alt_confirm)s" style="margin-left: 22px;" />'
                 '%(confirm_text)s</a><br>'
-                '<a id="aid_to_other" class="aid_grey" href="%(url)s/person/action?to_other_person=True&selection=%(ref)s">'
+                '<a rel="nofollow" id="aid_to_other" class="aid_grey" href="%(url)s/person/action?to_other_person=True&selection=%(ref)s">'
                 '<img src="%(url)s/img/aid_to_other_gray.png" alt="%(alt_to_other)s" style="margin-left:22px;"/>'
                 '%(to_other_text)s</a> </span>')
 
@@ -372,13 +373,13 @@ class Template:
         '''
         #batchprocess?mconfirm=True&bibrefs=['100:17,16']&pid=1
         str = ('<!--0!--><span id="aid_status_details"> '
-                '<a id="aid_confirm" href="%(url)s/person/action?confirm=True&selection=%(ref)s&pid=%(pid)s">'
+                '<a rel="nofollow" id="aid_confirm" href="%(url)s/person/action?confirm=True&selection=%(ref)s&pid=%(pid)s">'
                 '<img src="%(url)s/img/aid_check.png" alt="%(alt_confirm)s" />'
                 '%(confirm_text)s</a><br />'
-                '<a id="aid_repeal" href="%(url)s/person/action?repeal=True&selection=%(ref)s&pid=%(pid)s">'
+                '<a rel="nofollow" id="aid_repeal" href="%(url)s/person/action?repeal=True&selection=%(ref)s&pid=%(pid)s">'
                 '<img src="%(url)s/img/aid_reject.png" alt="%(alt_repeal)s" />'
                 '%(repeal_text)s</a> <br />'
-                '<a id="aid_to_other" href="%(url)s/person/action?to_other_person=True&selection=%(ref)s">'
+                '<a rel="nofollow" id="aid_to_other" href="%(url)s/person/action?to_other_person=True&selection=%(ref)s">'
                 '<img src="%(url)s/img/aid_to_other.png" alt="%(alt_to_other)s" />'
                 '%(to_other_text)s</a> </span>')
         return (str
@@ -431,15 +432,15 @@ class Template:
         h('<p> Your options: </p>')
 
         if pid > -1:
-            h(('<a id="clam_for_myself" href="%s/person/action?confirm=True&%s&pid=%s"> Claim for yourself </a> <br>')
+            h(('<a rel="nofollow" id="clam_for_myself" href="%s/person/action?confirm=True&%s&pid=%s"> Claim for yourself </a> <br>')
               % (CFG_SITE_URL, bibs, str(pid)))
 
         if last_viewed_pid:
-            h(('<a id="clam_for_last_viewed" href="%s/person/action?confirm=True&%s&pid=%s"> Attribute to %s </a> <br>')
+            h(('<a rel="nofollow" id="clam_for_last_viewed" href="%s/person/action?confirm=True&%s&pid=%s"> Attribute to %s </a> <br>')
               % (CFG_SITE_URL, bibs, str(last_viewed_pid[0]), last_viewed_pid[1]))
 
         if search_enabled:
-            h(('<a id="claim_search" href="%s/person/action?to_other_person=True&%s">' + self._(' Search for a person to attribute the paper to') + ' </a> <br>')
+            h(('<a rel="nofollow" id="claim_search" href="%s/person/action?to_other_person=True&%s">' + self._(' Search for a person to attribute the paper to') + ' </a> <br>')
                   % (CFG_SITE_URL, bibs))
 
         return "\n".join(pp_html)
@@ -500,10 +501,10 @@ class Template:
                    % (form_id))
 
         h('<div class="aid_reclist_selector">') #+self._(' On all pages: '))
-        h('<a rel="group_1" href="#select_all">' + self._('Select All') + '</a> | ')
-        h('<a rel="group_1" href="#select_none">' + self._('Select None') + '</a> | ')
-        h('<a rel="group_1" href="#invert_selection">' + self._('Invert Selection') + '</a> | ')
-        h('<a id="toggle_claimed_rows" href="javascript:toggle_claimed_rows();" '
+        h('<a rel="nofollow" rel="group_1" href="#select_all">' + self._('Select All') + '</a> | ')
+        h('<a rel="nofollow" rel="group_1" href="#select_none">' + self._('Select None') + '</a> | ')
+        h('<a rel="nofollow" rel="group_1" href="#invert_selection">' + self._('Invert Selection') + '</a> | ')
+        h('<a rel="nofollow" id="toggle_claimed_rows" href="javascript:toggle_claimed_rows();" '
           'alt="hide">' + self._('Hide successful claims') + '</a>')
         h('</div>')
 
@@ -542,24 +543,24 @@ class Template:
             rec_info = format_record(paper['recid'], "ha")
             rec_info = str(idx + 1) + '.  ' + rec_info
             h("    <td>%s</td>" % (rec_info))
-            h("    <td>%s</td>" % (paper['authorname'].encode("utf-8")))
+            h("    <td>%s</td>" % (paper['authorname']))
             aff = ""
 
             if paper['authoraffiliation']:
-                aff = paper['authoraffiliation'].encode("utf-8")
+                aff = paper['authoraffiliation']
             else:
                 aff = "Not assigned"
 
             h("    <td>%s</td>" % (aff))
 
             if paper['paperdate']:
-                pdate = paper['paperdate'].encode("utf-8")
+                pdate = paper['paperdate']
             else:
                 pdate = 'N.A.'
             h("    <td>%s</td>" % pdate)
 
             if paper['paperexperiment']:
-                pdate = paper['paperexperiment'].encode("utf-8")
+                pdate = paper['paperexperiment']
             else:
                 pdate = 'N.A.'
             h("    <td>%s</td>" % pdate)
@@ -595,10 +596,10 @@ class Template:
         h("</table>")
 
         h('<div class="aid_reclist_selector">') #+self._(' On all pages: '))
-        h('<a rel="group_1" href="#select_all">' + self._('Select All') + '</a> | ')
-        h('<a rel="group_1" href="#select_none">' + self._('Select None') + '</a> | ')
-        h('<a rel="group_1" href="#invert_selection">' + self._('Invert Selection') + '</a> | ')
-        h('<a id="toggle_claimed_rows" href="javascript:toggle_claimed_rows();" '
+        h('<a rel="nofollow" rel="group_1" href="#select_all">' + self._('Select All') + '</a> | ')
+        h('<a rel="nofollow" rel="group_1" href="#select_none">' + self._('Select None') + '</a> | ')
+        h('<a rel="nofollow" rel="group_1" href="#invert_selection">' + self._('Invert Selection') + '</a> | ')
+        h('<a rel="nofollow" id="toggle_claimed_rows" href="javascript:toggle_claimed_rows();" '
           'alt="hide">' + self._('Hide successful claims') + '</a>')
         h('</div>')
 
@@ -659,7 +660,7 @@ class Template:
                 rec_info = rec_info.replace("person/search?q=", "author/")
 
             h("    <td>%s</td>" % (rec_info))
-            h('    <td><a href="/person/batchprocess?selected_bibrecs=%s&mfind_bibref=claim">' + self._('Review Transaction') + '</a></td>'
+            h('    <td><a rel="nofollow" href="/person/batchprocess?selected_bibrecs=%s&mfind_bibref=claim">' + self._('Review Transaction') + '</a></td>'
                            % (paper))
             h("  </tr>")
 
@@ -667,9 +668,9 @@ class Template:
         h("</table>")
 
         h('<div style="text-align:left;">' + self._(' On all pages: '))
-        h('<a rel="group_1" href="#select_all">' + self._('Select All') + '</a> | ')
-        h('<a rel="group_1" href="#select_none">' + self._('Select None') + '</a> | ')
-        h('<a rel="group_1" href="#invert_selection">' + self._('Invert Selection') + '</a>')
+        h('<a rel="nofollow" rel="group_1" href="#select_all">' + self._('Select All') + '</a> | ')
+        h('<a rel="nofollow" rel="group_1" href="#select_none">' + self._('Select None') + '</a> | ')
+        h('<a rel="nofollow" rel="group_1" href="#invert_selection">' + self._('Invert Selection') + '</a>')
         h('</div>')
 
         h('<div style="vertical-align:middle;">')
@@ -790,23 +791,23 @@ class Template:
         h('  <ul>')
         if 'records' in show_tabs:
             r = verbiage_dict['confirmed']
-            h('    <li><a href="#tabRecords"><span>%(r)s (%(l)s)</span></a></li>' %
+            h('    <li><a rel="nofollow" href="#tabRecords"><span>%(r)s (%(l)s)</span></a></li>' %
               ({'r':r, 'l':len(rest_of_papers)}))
         if 'repealed' in show_tabs:
             r = verbiage_dict['repealed']
-            h('    <li><a href="#tabNotRecords"><span>%(r)s (%(l)s)</span></a></li>' %
+            h('    <li><a rel="nofollow" href="#tabNotRecords"><span>%(r)s (%(l)s)</span></a></li>' %
               ({'r':r, 'l':len(rejected_papers)}))
         if 'review' in show_tabs:
             r = verbiage_dict['review']
-            h('    <li><a href="#tabReviewNeeded"><span>%(r)s (%(l)s)</span></a></li>' %
+            h('    <li><a rel="nofollow" href="#tabReviewNeeded"><span>%(r)s (%(l)s)</span></a></li>' %
               ({'r':r, 'l':len(review_needed)}))
         if 'tickets' in show_tabs:
             r = verbiage_dict['tickets']
-            h('    <li><a href="#tabTickets"><span>%(r)s (%(l)s)</span></a></li>' %
+            h('    <li><a rel="nofollow" href="#tabTickets"><span>%(r)s (%(l)s)</span></a></li>' %
               ({'r':r, 'l':len(open_rt_tickets)}))
         if 'data' in show_tabs:
             r = verbiage_dict['data']
-            h('    <li><a href="#tabData"><span>%s</span></a></li>' % r)
+            h('    <li><a rel="nofollow" href="#tabData"><span>%s</span></a></li>' % r)
         h('  </ul>')
 
         if 'records' in show_tabs:
@@ -877,11 +878,11 @@ class Template:
                         actions.append(info)
 
                 if 'delete' in ticket_links:
-                    h(('<strong>Ticket number: %(tnum)s </strong> <a id="cancel" href=%(url)s/person/action?cancel_rt_ticket=True&selection=%(tnum)s&pid=%(pid)s>' + self._(' Delete this ticket') + ' </a>')
+                    h(('<strong>Ticket number: %(tnum)s </strong> <a rel="nofollow" id="cancel" href=%(url)s/person/action?cancel_rt_ticket=True&selection=%(tnum)s&pid=%(pid)s>' + self._(' Delete this ticket') + ' </a>')
                   % ({'tnum':t[1], 'url':CFG_SITE_URL, 'pid':str(person_id)}))
 
                 if 'commit' in ticket_links:
-                    h((' or <a id="commit" href=%(url)s/person/action?commit_rt_ticket=True&selection=%(tnum)s&pid=%(pid)s>' + self._(' Commit this entire ticket') + ' </a> <br>')
+                    h((' or <a rel="nofollow" id="commit" href=%(url)s/person/action?commit_rt_ticket=True&selection=%(tnum)s&pid=%(pid)s>' + self._(' Commit this entire ticket') + ' </a> <br>')
                   % ({'tnum':t[1], 'url':CFG_SITE_URL, 'pid':str(person_id)}))
 
                 h('<dd>')
@@ -904,7 +905,7 @@ class Template:
                         title = "No title available"
 
                     if 'commit_entry' in ticket_links:
-                        h('<a id="action" href="%(url)s/person/action?%(action)s=True&pid=%(pid)s&selection=%(bib)s&rt_id=%(rt)s">%(action)s - %(name)s on %(title)s </a>'
+                        h('<a rel="nofollow" id="action" href="%(url)s/person/action?%(action)s=True&pid=%(pid)s&selection=%(bib)s&rt_id=%(rt)s">%(action)s - %(name)s on %(title)s </a>'
                       % ({'action': a[0], 'url': CFG_SITE_URL,
                           'pid': str(person_id), 'bib':a[1],
                           'name': pname, 'title': title, 'rt': t[1]}))
@@ -913,11 +914,11 @@ class Template:
                       % ({'action': a[0], 'name': pname, 'title': title}))
 
                     if 'del_entry' in ticket_links:
-                        h(' - <a id="action" href="%(url)s/person/action?cancel_rt_ticket=True&pid=%(pid)s&selection=%(bib)s&rt_id=%(rt)s&rt_action=%(action)s"> Delete this entry </a>'
+                        h(' - <a rel="nofollow" id="action" href="%(url)s/person/action?cancel_rt_ticket=True&pid=%(pid)s&selection=%(bib)s&rt_id=%(rt)s&rt_action=%(action)s"> Delete this entry </a>'
                       % ({'action': a[0], 'url': CFG_SITE_URL,
                           'pid': str(person_id), 'bib': a[1], 'rt': t[1]}))
 
-                    h(' - <a id="show_paper" target="_blank" href="%(url)s/record/%(record)s"> View record <br>' % ({'url':CFG_SITE_URL, 'record':str(bibrec)}))
+                    h(' - <a rel="nofollow" id="show_paper" target="_blank" href="%(url)s/record/%(record)s"> View record <br>' % ({'url':CFG_SITE_URL, 'record':str(bibrec)}))
                 h('</dd>')
                 h('</dd><br>')
 #            h(str(open_rt_tickets))
@@ -961,10 +962,10 @@ class Template:
         html = []
         h = html.append
         h('<form id="review" action="/person/action" method="post">')
-        h('<p><strong>' + self._('We could not reliably determine the name of the author on the records below to automatically perform an assignment.')
+        h('<p><strong>' + self._("Make sure we match the right names!")
           + '</strong></p>')
-        h('<p>' + self._('Please select an author for the records in question.') + '<br/>')
-        h(self._('Boxes not selected will be ignored in the process.'))
+        h('<p>' + self._('Please select an author on each of the records that will be assigned.') + '<br/>')
+        h(self._('Papers without a name selected will be ignored in the process.'))
         h('</p>')
 
         for person in bibrefs_to_confirm:
@@ -984,7 +985,7 @@ class Template:
 
                 h(self._("Paper title: ") + fv)
                 h('<select name="bibrecgroup%s">' % (recid))
-                h('<option value="" selected>-- Ignore --</option>')
+                h('<option value="" selected>-- Choose author name --</option>')
 
                 for bibref in bibrefs_to_confirm[person]["bibrecs"][recid]:
                     h('<option value="%s||%s">%s</option>'
@@ -1065,8 +1066,8 @@ class Template:
         h('<div id="aid_menu">')
         h('  <ul>')
         h('    <li>' + self._('Navigation:') + '</li>')
-        h(('    <li><a href="%s/person/search">' + self._('Run paper attribution for another author') + '</a></li>') % CFG_SITE_URL)
-        h('    <!--<li><a href="#">' + self._('Person Interface FAQ') + '</a></li>!-->')
+        h(('    <li><a rel="nofollow" href="%s/person/search">' + self._('Run paper attribution for another author') + '</a></li>') % CFG_SITE_URL)
+        h('    <!--<li><a rel="nofollow" href="#">' + self._('Person Interface FAQ') + '</a></li>!-->')
         h('  </ul>')
         h('</div>')
 
@@ -1081,9 +1082,9 @@ class Template:
         h('<div id="aid_menu">')
         h('  <ul>')
         h('    <li>' + self._('Navigation:') + '</li>')
-        h(('    <li><a href="%s/person/search">' + self._('Person Search') + '</a></li>') % CFG_SITE_URL)
-        h(('    <li><a href="%s/person/tickets_admin">' + self._('Open tickets') + '</a></li>') % CFG_SITE_URL)
-        h('    <!--<li><a href="#">' + self._('Person Interface FAQ') + '</a></li>!-->')
+        h(('    <li><a rel="nofollow" href="%s/person/search">' + self._('Person Search') + '</a></li>') % CFG_SITE_URL)
+        h(('    <li><a rel="nofollow" href="%s/person/tickets_admin">' + self._('Open tickets') + '</a></li>') % CFG_SITE_URL)
+        h('    <!--<li><a rel="nofollow" href="#">' + self._('Person Interface FAQ') + '</a></li>!-->')
         h('  </ul>')
         h('</div>')
 
@@ -1186,7 +1187,7 @@ class Template:
 
             h('</td>')
             h('<td>')
-            h('<a href="%s/person/action?checkout_remove_transaction=%s ">'
+            h('<a rel="nofollow" href="%s/person/action?checkout_remove_transaction=%s ">'
               'Cancel'
               '</a>' % (CFG_SITE_URL, ticket['bibref']))
             h('</td>')
@@ -1425,7 +1426,7 @@ class Template:
                                  " Try using a less specific author name, or check" +
                                  " back in a few days as attributions are updated " +
                                  "frequently.  Or you can send us feedback, at ") +
-                                 "<a href=\"mailto:%s\">%s</a>.</strong>") % (query, authemail, authemail))
+                                 "<a rel='nofollow' href=\"mailto:%s\">%s</a>.</strong>") % (query, authemail, authemail))
             h('</div>')
             if new_person_link:
                 if search_ticket:
@@ -1435,7 +1436,7 @@ class Template:
                 else:
                     link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, '-3')
                 h('<div>')
-                h('<a href="%s">' % (link))
+                h('<a rel="nofollow" href="%s">' % (link))
                 h(self._("Create a new Person for your search"))
                 h('</a>')
                 h('</div>')
@@ -1487,7 +1488,7 @@ class Template:
             h('</div>')
             h('<em style="padding-left:1.5em;">')
             if index < bconfig.PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT:
-                h(('<a href="#" id="aid_moreinfolink" class="mpid%s">'
+                h(('<a rel="nofollow" href="#" id="aid_moreinfolink" class="mpid%s">'
                             '<img src="../img/aid_plus_16.png" '
                             'alt = "toggle additional information." '
                             'width="11" height="11"/> '
@@ -1504,14 +1505,14 @@ class Template:
                     link = link + '&selection=%s' % str(r)
 
                 h(('<span style="margin-left: 120px;">'
-                            '<em><a href="%s" id="confirmlink">'
+                            '<em><a rel="nofollow" href="%s" id="confirmlink">'
                             '<strong>' + self._('YES!') + '</strong>'
                             + self._(' Attribute Papers To ') +
                             '%s %s </a></em></span>')
                             % (link, get_person_redirect_link(pid), papers_string))
             else:
                 h(('<span style="margin-left: 40px;">'
-                            '<em><a href="%s/%s/%s" id="aid_moreinfolink">'
+                            '<em><a rel="nofollow" href="%s/%s/%s" id="aid_moreinfolink">'
                             + self._('Publication List ') + '(%s) %s </a></em></span>')
                             % (CFG_SITE_URL, linktarget,
                                get_person_redirect_link(pid),
@@ -1533,7 +1534,7 @@ class Template:
                 h("<p>" + self._('Information not shown to increase performances. Please refine your search.') + "</p>")
 
             h(('<span style="margin-left: 40px;">'
-                        '<em><a href="%s/%s/%s" target="_blank" id="aid_moreinfolink">'
+                        '<em><a rel="nofollow" href="%s/%s/%s" target="_blank" id="aid_moreinfolink">'
                         + self._('Publication List ') + '(%s)</a> (in a new window or tab)</em></span>')
                         % (CFG_SITE_URL, linktarget,
                            get_person_redirect_link(pid),
@@ -1549,7 +1550,7 @@ class Template:
             else:
                 link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, '-3')
             h('<div>')
-            h('<a href="%s">' % (link))
+            h('<a rel="nofollow" href="%s">' % (link))
             h(self._("Create a new Person for your search"))
             h('</a>')
             h('</div>')
@@ -1587,7 +1588,7 @@ class Template:
 
         h('If you have '
           'any questions or encounter any problems please contact us here: '
-          '<a href="mailto:%s">%s</a></p>'
+          '<a rel="nofollow" href="mailto:%s">%s</a></p>'
           % (CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL,
              CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL))
 
@@ -1608,7 +1609,7 @@ class Template:
         h('<p>When the link appears we invite you to confirm the papers that are '
           'yours and to reject the ones that you are not author of. If you have '
           'any questions or encounter any problems please contact us here: '
-          '<a href="mailto:%s">%s</a></p>'
+          '<a rel="nofollow" href="mailto:%s">%s</a></p>'
           % (CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL,
              CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL))
 
@@ -1621,11 +1622,12 @@ class Template:
         html = []
         h = html.append
 
-        h(' <ul><li><a href=%s> Login through arXiv.org </a> <small>' % bconfig.BIBAUTHORID_CFG_INSPIRE_LOGIN)
-        h ('(This is faster for you, as it allows your changes to be publicly shown immediately.)</small> <br><br>')
-        h(' <li><a href=%s/person/%s?open_claim=True> Continue as a guest </a>'
-          '<small>(It will take some time before your changes are publicly shown.'
-          'Use only if you don\'t have an arXiv.org account.)</small><br><br></ul>' % (CFG_SITE_URL, person))
+        h(' <ul><li><a rel="nofollow" href=%s> Login through arXiv.org </a> <small>' % bconfig.BIBAUTHORID_CFG_INSPIRE_LOGIN)
+        h(' - Use this option if you have an arXiv account.')
+        h('(If you login through arXiv.org, INSPIRE will immediately verify you as an author and process your claimed papers.) </small><br><br>')
+        h(' <li><a rel="nofollow" href=%s/person/%s?open_claim=True> Continue as a guest </a> <small>' % (CFG_SITE_URL, person))
+        h(' - Use this option if you DON\'T have an arXiv account, or you have not claimed any paper in arXiv.')
+        h('(If you login as a guest, INSPIRE will need to confirm you as an author before processing your claimed papers.) </small><br><br>')
         h('If you login through arXiv.org we can verify that you are the author of these papers and accept your claims rapidly, '
           'as well as adding additional claims from arXiv. <br>If you choose not to login via arXiv your changes will '
           'be publicly visible only after our editors check and confirm them, usually a few days.<br>  '
@@ -1637,9 +1639,34 @@ class Template:
         '''
         Creates the link for the actual user action.
         '''
-        return '<a href=action?checkout=True><b>' + \
+        return '<a rel="nofollow" href=action?checkout=True><b>' + \
             self._('Correct my publication lists!') + \
             '</b></a>'
+
+    def tmpl_welcome_personid_association(self, pid):
+        """
+        """
+        canon_name = get_canonical_id_from_personid(pid)
+        head = "<br>"
+        if canon_name:
+            body = ("Your arXiv.org account is associated "
+                    "with person %s." % canon_name[0][0])
+        else:
+            body = ("Warning: your arXiv.org account is associated with an empty profile. "
+                    "This can happen if it the first time you log in and you do not have any "
+                    "paper directly claimen in arXiv.org which we can use to identify you."
+                    "If this is the case, you are welcome to search and claim your papers to your"
+                    " new profile manually, or please contact us to get help.")
+
+        body += ("<br>You are very welcome to contact us shall you need any help or explanation"
+                 " about the management of"
+                 " your profile page"
+                 " in INSPIRE and it's connections with arXiv.org: "
+                 '''<a href="mailto:authors@inspirehep.net?subject=Help on arXiv.org SSO login and paper claiming"> authors@inspirehep.net </a>''')
+        tail = "<br>"
+
+        return head + body + tail
+
 
     def tmpl_welcome_arXiv_papers(self, paps):
         '''
@@ -1647,7 +1674,7 @@ class Template:
         '''
         plist = "<br><br>"
         if paps:
-            plist = plist + "We have got and automatically claimed for You the following papers from arXiv.org: <br>"
+            plist = plist + "We have got and we are about to automatically claim for You the following papers from arXiv.org: <br>"
             for p in paps:
                 plist = plist + "  " + str(p) + "<br>"
         else:
@@ -1669,7 +1696,7 @@ class Template:
         if len(tickets) > 0:
             h('List of open tickets: <br><br>')
             for t in tickets:
-                h('<a href=%(cname)s#tabTickets> %(longname)s - (%(cname)s - PersonID: %(pid)s): %(num)s open tickets. </a><br>'
+                h('<a rel="nofollow" href=%(cname)s#tabTickets> %(longname)s - (%(cname)s - PersonID: %(pid)s): %(num)s open tickets. </a><br>'
                   % ({'cname':str(t[1]), 'longname':str(t[0]), 'pid':str(t[2]), 'num':str(t[3])}))
         else:
             h('There are currently no open tickets.')

@@ -57,6 +57,7 @@ CFG_BIBTASK_DEFAULT_TASK_SETTINGS = {
     'oaiharvest': {
         'repository': None,
         'dates': None,
+        'fixed_time': True
     },
     'oairepositoryupdater': {
         'no_upload': 0,
@@ -70,6 +71,7 @@ CFG_BIBTASK_DEFAULT_TASK_SETTINGS = {
         'stage_to_start_from': 1,
         'pretend': False,
         'force': False,
+        'stop_queue_on_error': True,
     },
     'bibindex': {
         'cmd': 'add',

@@ -26,7 +26,6 @@ from invenio.htmlutils import HTMLWasher
 from invenio.messages import gettext_set_language
 from invenio.urlutils import create_html_mailto
 from invenio.config import CFG_CERN_SITE
-from invenio.webjournal_utils import parse_url_string
 from invenio.bibformat_elements import bfe_fulltext
 
 def format_element(bfo, separator='<br/>'):
@@ -35,9 +34,7 @@ def format_element(bfo, separator='<br/>'):
 
     @param separator: separator between each body
     """
-    # Retrieve context (journal, issue and category) from URI
-    args = parse_url_string(bfo.user_info['uri'])
-    ln = args["ln"]
+    ln = bfo.lang
     _ = gettext_set_language(ln)
 
     if ln == "fr":

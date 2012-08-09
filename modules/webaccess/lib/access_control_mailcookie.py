@@ -105,7 +105,7 @@ def mail_cookie_retrieve_kind(cookie):
     try:
         password = cookie[:16]+cookie[-16:]
         cookie_id = int(cookie[16:-16], 16)
-        res = run_sql("SELECT kind FROM accMAILCOOKIE WHERE id=%s", (cookie_id, ))
+        res = run_sql("SELECT kind FROM accMAILCOOKIE WHERE id=%s", (cookie_id, ), run_on_slave=True)
         if res:
             kind = res[0][0]
             assert(kind in _authorizations_kind)
@@ -123,7 +123,7 @@ def mail_cookie_check_common(cookie, delete=False):
         raise InvenioWebAccessMailCookieError, "Cookie not valid: %s" % e
     try:
         res = run_sql("SELECT kind, AES_DECRYPT(data,%s), onetime, status FROM accMAILCOOKIE WHERE "
-            "id=%s AND expiration>=NOW()", (password, cookie_id))
+            "id=%s AND expiration>=NOW()", (password, cookie_id), run_on_slave=True)
         if not res:
             raise StandardError
     except StandardError:

@@ -769,6 +769,12 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
             inv_search = 'year:1978-10-21->9999'
             self._compare_searches(inv_search, spi_search)
 
+        def test_spires_syntax_trailing_colon(self):
+            """SPIRES search syntax - test for blowup with trailing colon"""
+            spi_search = "find a watanabe:"
+            invenio_search = "author:watanabe:"
+            self._compare_searches(invenio_search, spi_search)
+
         if DATEUTIL_AVAILABLE:
             def test_date_by_lt_d_MO_yr(self):
                 """SPIRES search syntax - searching by date < 23 Sep 2010: will only work with dateutil installed"""
@@ -954,8 +960,8 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         def test_absorbs_naked_author_search(self):
             """SPIRES search syntax - author ellis"""
             invenio_search = "author:ellis"
-            naked_search = "author ellis"
-            self._compare_searches(invenio_search, naked_search)
+            spi_search = "author ellis"
+            self._compare_searches(invenio_search, spi_search)
 
         def test_spires_syntax_detected_naked_a(self):
             """SPIRES search syntax - test detection a ellis"""

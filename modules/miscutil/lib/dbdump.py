@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -49,11 +49,12 @@ __revision__ = "$Id$"
 import os
 import sys
 from invenio.config import CFG_LOGDIR, CFG_PATH_MYSQL, CFG_DATABASE_HOST, \
-     CFG_DATABASE_USER, CFG_DATABASE_PASS, CFG_DATABASE_NAME
+     CFG_DATABASE_USER, CFG_DATABASE_PASS, CFG_DATABASE_NAME, CFG_PATH_GZIP
 from invenio.bibtask import task_init, write_message, task_set_option, \
-        task_get_option, task_update_progress, task_update_status, \
-        task_get_task_param
+                            task_get_option, task_update_progress, \
+                            task_get_task_param
 from invenio.shellutils import run_shell_command, escape_shell_arg
+
 
 def _delete_old_dumps(dirname, filename, number_to_keep):
     """
@@ -68,6 +69,7 @@ def _delete_old_dumps(dirname, filename, number_to_keep):
         write_message("... deleting %s" % dirname + os.sep + afile)
         os.remove(dirname + os.sep + afile)
 
+
 def _dump_database(dirname, filename):
     """
     Dump Invenio database into SQL file called FILENAME living in
@@ -76,32 +78,32 @@ def _dump_database(dirname, filename):
     write_message("... writing %s" % dirname + os.sep + filename)
     cmd = CFG_PATH_MYSQL + 'dump'
     if not os.path.exists(cmd):
-        write_message("ERROR: cannot find %s." % cmd, stream=sys.stderr)
-        task_update_status("ERROR")
-        sys.exit(1)
+        msg = "ERROR: cannot find %s." % cmd
+        write_message(msg, stream=sys.stderr)
+        raise StandardError(msg)
+
     cmd += " --skip-opt --add-drop-table --add-locks --create-options " \
            " --quick --extended-insert --set-charset --disable-keys " \
-           " --host=%s --user=%s --password=%s %s" % \
+           " --host=%s --user=%s --password=%s %s | %s -c " % \
            (escape_shell_arg(CFG_DATABASE_HOST),
             escape_shell_arg(CFG_DATABASE_USER),
             escape_shell_arg(CFG_DATABASE_PASS),
-            escape_shell_arg(CFG_DATABASE_NAME))
+            escape_shell_arg(CFG_DATABASE_NAME),
+            CFG_PATH_GZIP)
     dummy1, dummy2, dummy3 = run_shell_command(cmd, None, dirname + os.sep + filename)
     if dummy1:
-        write_message("ERROR: mysqldump exit code is %s." % repr(dummy1),
-                      stream=sys.stderr)
-        task_update_status("ERROR")
-        sys.exit(1)
+        msg = "ERROR: mysqldump exit code is %s." % repr(dummy1)
+        write_message(msg, stream=sys.stderr)
+        raise StandardError(msg)
     if dummy2:
-        write_message("ERROR: mysqldump stdout is %s." % repr(dummy1),
-                      stream=sys.stderr)
-        task_update_status("ERROR")
-        sys.exit(1)
+        msg = "ERROR: mysqldump stdout is %s." % repr(dummy1)
+        write_message(msg, stream=sys.stderr)
+        raise StandardError(msg)
     if dummy3:
-        write_message("ERROR: mysqldump stderr is %s." % repr(dummy1),
-                      stream=sys.stderr)
-        task_update_status("ERROR")
-        sys.exit(1)
+        msg = "ERROR: mysqldump stderr is %s." % repr(dummy1)
+        write_message(msg, stream=sys.stderr)
+        raise StandardError(msg)
+
 
 def _dbdump_elaborate_submit_param(key, value, dummyopts, dummyargs):
     """
@@ -112,16 +114,17 @@ def _dbdump_elaborate_submit_param(key, value, dummyopts, dummyargs):
         try:
             task_set_option('number', int(value))
         except ValueError:
-            raise StandardError, "ERROR: Number '%s' is not integer." % value
+            raise StandardError("ERROR: Number '%s' is not integer." % value)
     elif key in ('-o', '--output'):
         if os.path.isdir(value):
             task_set_option('output', value)
         else:
-            raise StandardError, "ERROR: Output '%s' is not a directory." % \
-                  value
+            raise StandardError("ERROR: Output '%s' is not a directory." % \
+                  value)
     else:
         return False
     return True
+
 
 def _dbdump_run_task_core():
     """
@@ -136,7 +139,7 @@ def _dbdump_run_task_core():
     output_dir = task_get_option('output', CFG_LOGDIR)
     output_num = task_get_option('number', 5)
     output_fil_prefix = CFG_DATABASE_NAME + '-dbdump-'
-    output_fil_suffix = task_get_task_param('task_starting_time').replace(' ','_') + '.sql'
+    output_fil_suffix = task_get_task_param('task_starting_time').replace(' ', '_') + '.sql.gz'
     output_fil = output_fil_prefix + output_fil_suffix
     write_message("Reading parameters ended")
     # make dump:
@@ -153,6 +156,7 @@ def _dbdump_run_task_core():
     task_update_progress("Done.")
     return True
 
+
 def main():
     """Main that construct all the bibtask."""
     task_init(authorization_action='rundbdump',
@@ -166,6 +170,7 @@ def main():
                                ["number=", "output="]),
               task_submit_elaborate_specific_parameter_fnc=_dbdump_elaborate_submit_param,
               task_run_fnc=_dbdump_run_task_core)
+
 
 if __name__ == '__main__':
     main()

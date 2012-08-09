@@ -42,7 +42,7 @@ def format_element(bfo, category_prefix, category_suffix, separator=" | ",
     journal_name = args["journal_name"]
     selected_category = args["category"]
     this_issue_number = args["issue"]
-    ln = args["ln"]
+    ln = bfo.lang
     _ = gettext_set_language(ln)
 
     # Retrieve categories for this journal and issue

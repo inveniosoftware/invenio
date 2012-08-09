@@ -16,6 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """
 bibauthorid_config
     Part of the framework responsible for supplying configuration options used
@@ -23,7 +24,6 @@ bibauthorid_config
     declare any configuration options for the modules within themselves.
 """
 
-import logging.handlers
 import sys
 import os.path as osp
 
@@ -32,29 +32,23 @@ try:
 except ImportError:
     SUPERADMINROLE = "Superadmin"
 
-
 GLOBAL_CONFIG = True
 
 try:
     from invenio.config import CFG_BIBAUTHORID_PERSONID_SQL_MAX_THREADS, \
         CFG_BIBAUTHORID_MAX_PROCESSES, \
-        CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_BCTKD_RA, \
-        CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_NEW_RA, \
-        CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH, \
-        CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N, \
         CFG_BIBAUTHORID_EXTERNAL_CLAIMED_RECORDS_KEY, \
-        CFG_BIBAUTHORID_ATTACH_VA_TO_MULTIPLE_RAS , \
         CFG_BIBAUTHORID_ENABLED, \
         CFG_BIBAUTHORID_ON_AUTHORPAGES, \
         CFG_BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE, \
-        CFG_INSPIRE_SITE
+        CFG_INSPIRE_SITE, \
+        CFG_ADS_SITE
 
 except ImportError:
     GLOBAL_CONFIG = False
 
-
 # Current version of the framework
-VERSION = '1.1.0'
+VERSION = '1.1.2'
 
 # make sure current directory is importable
 FILE_PATH = osp.dirname(osp.abspath(__file__))
@@ -90,7 +84,6 @@ if GLOBAL_CONFIG:
 else:
     AID_ENABLED = True
 
-
 # Enable AuthorID information on the author pages.
 if GLOBAL_CONFIG:
     AID_ON_AUTHORPAGES = CFG_BIBAUTHORID_ON_AUTHORPAGES
@@ -99,7 +92,11 @@ else:
 
 # Limit the disambiguation to a specific collections. Leave empty for all
 # Collections are to be defined as a list of strings
-LIMIT_TO_COLLECTIONS = []
+# Special for ADS: Focus on ASTRONOMY collection
+if GLOBAL_CONFIG and CFG_ADS_SITE:
+    LIMIT_TO_COLLECTIONS = ["ASTRONOMY"]
+else:
+    LIMIT_TO_COLLECTIONS = []
 
 # Exclude documents that are visible in a collection mentioned here:
 EXCLUDE_COLLECTIONS = ["HEPNAMES", "INST", "Deleted", "DELETED", "deleted"]
@@ -127,126 +124,25 @@ if GLOBAL_CONFIG and CFG_BIBAUTHORID_MAX_PROCESSES:
 else:
     BIBAUTHORID_MAX_PROCESSES = 12
 
-# Threshold for connecting a paper to a person: BCTKD are the papers from the
-# backtracked RAs found searching back for the papers already connected to the
-# persons, NEW is for the newly found one
-if GLOBAL_CONFIG and CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_BCTKD_RA:
-    PERSONID_MIN_P_FROM_BCTKD_RA = CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_BCTKD_RA
-else:
-    PERSONID_MIN_P_FROM_BCTKD_RA = 0.5
-
-if GLOBAL_CONFIG and CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_NEW_RA:
-    PERSONID_MIN_P_FROM_NEW_RA = CFG_BIBAUTHORID_PERSONID_MIN_P_FROM_NEW_RA
-else:
-    PERSONID_MIN_P_FROM_NEW_RA = 0.5
-
-# Minimum threshold for the compatibility list of persons to an RA: if no RA
-# is more compatible that that it will create a new person
-if GLOBAL_CONFIG and CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH:
-    PERSONID_MAX_COMP_LIST_MIN_TRSH = CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH
-else:
-    PERSONID_MAX_COMP_LIST_MIN_TRSH = 0.5
-
-if GLOBAL_CONFIG and CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N:
-    PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N = CFG_BIBAUTHORID_PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N
-else:
-    PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N = 0.5
-
-#personid fast assign papers minimum name threshold: names below will create new persons,
-#names over will add the paper to the most compatible one
-PERSONID_FAST_ASSIGN_PAPERS_MIN_NAME_TRSH = 0.8
-
-#Create_new_person flags thresholds
-PERSONID_CNP_FLAG_1 = 0.75
-PERSONID_CNP_FLAG_MINUS1 = 0.5
-
-# update_personid_from_algorithm  person_paper_list for get_person_ra call
-# minimum flag
-PERSONID_UPFA_PPLMF = -1
+WEDGE_THRESHOLD = 0.8
 
 
-# Update/disambiguation process surname list creation method
-# Can be either 'mysql' or 'regexp'.
-# 'mysql' is inerently slow but accurate, 'regexp' is really really fast, but with potentially
-#different results. 'mysql' left in for compatibility.
-BIBAUTHORID_LIST_CREATION_METHOD = 'regexp'
+# BibAuthorID debugging options
 
+# This flag triggers most of the output.
+DEBUG_OUTPUT = False
 
-#Tables Utils debug output
-TABLES_UTILS_DEBUG = False
-AUTHORNAMES_UTILS_DEBUG = False
+# The following options trigger the output for parts of
+# bibauthorid which normally generate too much output
+DEBUG_NAME_COMPARISON_OUTPUT = False
+DEBUG_METADATA_COMPARISON_OUTPUT = False
+DEBUG_WEDGE_OUTPUT = False
+DEBUG_PROCESS_PEAK_MEMORY = True
 
-# Is the authorid algorithm allowed to attach a virtual author to multiple
-# real authors in the last run of the orphan processing?
-if GLOBAL_CONFIG and CFG_BIBAUTHORID_ATTACH_VA_TO_MULTIPLE_RAS:
-    ATTACH_VA_TO_MULTIPLE_RAS = CFG_BIBAUTHORID_ATTACH_VA_TO_MULTIPLE_RAS
-else:
-    ATTACH_VA_TO_MULTIPLE_RAS = False
-
-# Shall we send from locally defined eMail address or from the users one
-# when we send out a ticket? Default is True -> send with user's email
-TICKET_SENDING_FROM_USER_EMAIL = True
-# Log Level for the message output.
-# Log Levels are defined in the Python logging system
-# 0 - 50 (log everything - log exceptions)
-LOG_LEVEL = 30
-
-# Default logging file name
-LOG_FILENAME = "job.log"
-
-# tables_utils_config
-TABLE_POPULATION_BUNCH_SIZE = 6000
-
-# Max number of authors on a paper to be considered while creating jobs
-MAX_AUTHORS_PER_DOCUMENT = 15
-
-# Set limit_authors to true, if papers that are written by collaborations
-# or by more than MAX_AUTHORS_PER_DOCUMENT authors shall be excluded
-# The default is False.
-LIMIT_AUTHORS_PER_DOCUMENT = False
-
-# Regexp for the names separation
-NAMES_SEPARATOR_CHARACTER_LIST = ",;.=\-\(\)"
-SURNAMES_SEPARATOR_CHARACTER_LIST = ",;"
-
-# Path where all the modules live and which prefix the have.
-MODULE_PATH = ("%s/bibauthorid_comparison_functions/aid_cmp_*.py"
-               % (FILE_PATH,))
-
-## threshold for adding a va to more than one real authors for
-## the add_new_virtualauthor function
-REALAUTHOR_VA_ADD_THERSHOLD = 0.449
-
-## parameters for the 'compute real author name' function
-CONFIDENCE_THRESHOLD = 0.46
-P_THRESHOLD = 0.46
-INVERSE_THRESHOLD_DELTA = 0.1
-
-## parameters for the comparison function chain
-CONSIDERATION_THRESHOLD = 0.04
-
-## Set up complex logging system:
-## - Setup Default logger, which logs to console on critical events only
-## - on init call, set up a three-way logging system:
-## - 1. Log to console anything ERROR or higher.
-## - 2. Log everything LOG_LEVEL or higher to memory and
-## - 3. Flush to file in the specified path.
-
-LOGGERS = []
-HANDLERS = {}
-
-## Default logger and handler
-DEFAULT_HANDLER = logging.StreamHandler()
-DEFAULT_LOG_FORMAT = logging.Formatter('%(levelname)-8s %(message)s')
-DEFAULT_HANDLER.setFormatter(DEFAULT_LOG_FORMAT)
-DEFAULT_HANDLER.setLevel(logging.CRITICAL)
-
-## workaround for the classes to detect that LOGGER is actually an instance
-## of type logging.
-LOGGER = logging.getLogger("Dummy")
-LOGGER.addHandler(DEFAULT_HANDLER)
-LOGGER.setLevel(LOG_LEVEL)
-
+# Keep in mind that you might use an assert instead of this option.
+# Use DEBUG_CHECKS to guard heavy computations in order to make
+# their use explicit.
+DEBUG_CHECKS = False
 
 ## force skip ui arxiv stub page (specific for inspire)
 BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = True
@@ -256,77 +152,17 @@ if GLOBAL_CONFIG and CFG_INSPIRE_SITE:
 else:
     BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = True
 
-
 ## URL for the remote INSPIRE login that shall be shown on (arXiv stub page.)
 BIBAUTHORID_CFG_INSPIRE_LOGIN = ""
-
 
 if GLOBAL_CONFIG and CFG_INSPIRE_SITE:
     BIBAUTHORID_CFG_INSPIRE_LOGIN = 'https://arxiv.org/inspire_login'
 
-if not LOGGERS:
-    LOGGERS.append(logging.getLogger("Dummy"))
-    LOGGERS[0].addHandler(DEFAULT_HANDLER)
+# Shall we send from locally defined eMail address or from the users one
+# when we send out a ticket? Default is True -> send with user's email
+TICKET_SENDING_FROM_USER_EMAIL = True
 
+# Regexp for the names separation
+NAMES_SEPARATOR_CHARACTER_LIST = ",;.=\-\(\)"
+SURNAMES_SEPARATOR_CHARACTER_LIST = ",;"
 
-def init_logger(logfile=None):
-    '''
-    Set up specific logger for 3-way logging.
-
-    @param logfile: path to file which will be used for flushing the memory
-        log cache.
-    @type logfile: string
-    '''
-
-    if not logfile:
-        return False
-
-    logging.addLevelName(25, "LOG")
-
-    HANDLERS['filelog'] = logging.FileHandler(logfile, mode="w")
-    HANDLERS['memlog'] = logging.handlers.MemoryHandler(1000, logging.ERROR,
-                                                        HANDLERS['filelog'])
-    HANDLERS['console'] = logging.StreamHandler()
-
-    formatter = logging.Formatter("%(asctime)s -- %(levelname)-8s %(message)s",
-                                  "%Y-%m-%d %H:%M:%S")
-    HANDLERS['filelog'].setFormatter(formatter)
-    HANDLERS['memlog'].setFormatter(formatter)
-    HANDLERS['console'].setFormatter(formatter)
-
-    HANDLERS['memlog'].setLevel(LOG_LEVEL)
-    HANDLERS['console'].setLevel(logging.ERROR)
-
-    if LOGGERS:
-        LOGGERS[:] = []
-
-    LOGGERS.append(logging.getLogger(""))
-    LOGGERS[0].setLevel(LOG_LEVEL)
-    LOGGERS[0].addHandler(HANDLERS['memlog'])
-    LOGGERS[0].addHandler(HANDLERS['console'])
-
-
-def stop_and_close_logger():
-    '''
-    Closes and detaches all handlers from the logging instances. Necessary to
-    flush the latest contents of the memory handler to file.
-    '''
-    HANDLERS['memlog'].close()
-    HANDLERS['filelog'].close()
-    HANDLERS['console'].close()
-    LOGGER.removeHandler(HANDLERS['memlog'])
-    LOGGER.removeHandler(HANDLERS['console'])
-
-## Logging 'device' used by the classes to write log messages
-LOGGER = LOGGERS[0]
-
-## STANDALONE defines if the algorithm is run within the environment of
-## Invenio/Inspire or if it is used individually (e.g. Grid usage)
-STANDALONE = False
-
-try:
-    import dbquery
-except ImportError, err:
-    STANDALONE = True
-    LOGGER.warning('Bibauthorid is running in standalone mode.\n'
-                   '-> Access to the database is not supported.')

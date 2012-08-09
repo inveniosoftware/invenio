@@ -2920,6 +2920,26 @@ CREATE TABLE IF NOT EXISTS bibdoc_bibdoc (
   KEY  (id_bibdoc2)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS bibdocfsinfo (
+  id_bibdoc mediumint(9) unsigned NOT NULL,
+  version tinyint(4) unsigned NOT NULL,
+  format varchar(50) NOT NULL,
+  last_version boolean NOT NULL,
+  cd datetime NOT NULL,
+  md datetime NOT NULL,
+  checksum char(32) NOT NULL,
+  filesize bigint(15) unsigned NOT NULL,
+  mime varchar(100) NOT NULL,
+  master_format varchar(50) NULL default NULL,
+  PRIMARY KEY (id_bibdoc, version, format),
+  KEY (last_version),
+  KEY (format),
+  KEY (cd),
+  KEY (md),
+  KEY (filesize),
+  KEY (mime)
+) ENGINE=MyISAM;
+
 -- tables for publication requests:
 
 CREATE TABLE IF NOT EXISTS publreq (
@@ -2941,7 +2961,8 @@ CREATE TABLE IF NOT EXISTS session (
   session_object longblob,
   uid int(15) unsigned NOT NULL,
   UNIQUE KEY session_key (session_key),
-  KEY uid (uid)
+  KEY uid (uid),
+  KEY session_expiry (session_expiry)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS user (
@@ -3930,21 +3951,49 @@ CREATE TABLE IF NOT EXISTS hstEXCEPTION (
 
 -- tables for BibAuthorID module:
 
-CREATE TABLE IF NOT EXISTS `aidPERSONID` (
-  `id` bigint(15) NOT NULL AUTO_INCREMENT,
-  `personid` bigint(15) NOT NULL,
-  `tag` varchar(50) NOT NULL,
-  `data` varchar(250) NOT NULL,
-  `flag` int NOT NULL DEFAULT '0',
-  `lcul` int NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  INDEX `personid-b` (`personid`),
-  INDEX `tag-b` (`tag`),
-  INDEX `data-b` (`data`),
-  INDEX `flag-b` (`flag`),
-  INDEX `tdf-b` (`tag`,`data`,`flag`),
-  INDEX `ptf-b` (`personid`,`tag`,`flag`)
-) ENGINE=MyISAM;
+CREATE TABLE IF NOT EXISTS `aidPERSONIDPAPERS` (
+  `personid` BIGINT( 16 ) UNSIGNED NOT NULL ,
+  `bibref_table` ENUM(  '100',  '700' ) NOT NULL ,
+  `bibref_value` MEDIUMINT( 8 ) UNSIGNED NOT NULL ,
+  `bibrec` MEDIUMINT( 8 ) UNSIGNED NOT NULL ,
+  `name` VARCHAR( 256 ) NOT NULL ,
+  `flag` SMALLINT( 2 ) NOT NULL DEFAULT  '0' ,
+  `lcul` SMALLINT( 2 ) NOT NULL DEFAULT  '0' ,
+  `last_updated` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+  INDEX `personid-b` (`personid`) ,
+  INDEX `reftable-b` (`bibref_table`) ,
+  INDEX `refvalue-b` (`bibref_value`) ,
+  INDEX `rec-b` (`bibrec`) ,
+  INDEX `name-b` (`name`) ,
+  INDEX `pn-b` (`personid`, `name`) ,
+  INDEX `timestamp-b` (`last_updated`) ,
+  INDEX `flag-b` (`flag`) ,
+  INDEX `ptvrf-b` (`personid`, `bibref_table`, `bibref_value`, `bibrec`, `flag`)
+) ENGINE=MYISAM;
+
+CREATE TABLE IF NOT EXISTS `aidRESULTS` (
+  `personid` VARCHAR( 256 ) NOT NULL ,
+  `bibref_table` ENUM(  '100',  '700' ) NOT NULL ,
+  `bibref_value` MEDIUMINT( 8 ) UNSIGNED NOT NULL ,
+  `bibrec` MEDIUMINT( 8 ) UNSIGNED NOT NULL ,
+  INDEX `personid-b` (`personid`) ,
+  INDEX `reftable-b` (`bibref_table`) ,
+  INDEX `refvalue-b` (`bibref_value`) ,
+  INDEX `rec-b` (`bibrec`)
+) ENGINE=MYISAM;
+
+CREATE TABLE IF NOT EXISTS `aidPERSONIDDATA` (
+  `personid` BIGINT( 16 ) UNSIGNED NOT NULL ,
+  `tag` VARCHAR( 64 ) NOT NULL ,
+  `data` VARCHAR( 256 ) NOT NULL ,
+  `opt1` MEDIUMINT( 8 ) NULL DEFAULT NULL ,
+  `opt2` MEDIUMINT( 8 ) NULL DEFAULT NULL ,
+  `opt3` VARCHAR( 256 ) NULL DEFAULT NULL ,
+  INDEX `personid-b` (`personid`) ,
+  INDEX `tag-b` (`tag`) ,
+  INDEX `data-b` (`data`) ,
+  INDEX `opt1` (`opt1`)
+) ENGINE=MYISAM;
 
 CREATE TABLE IF NOT EXISTS `aidUSERINPUTLOG` (
   `id` bigint(15) NOT NULL AUTO_INCREMENT,
@@ -3966,88 +4015,6 @@ CREATE TABLE IF NOT EXISTS `aidUSERINPUTLOG` (
   INDEX `value-b` (`value`)
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS `aidAUTHORNAMES` (
-  `id` bigint(15) NOT NULL auto_increment,
-  `Name` varchar(255) NOT NULL,
-  `bibrefs` varchar(200) NOT NULL,
-  `db_name` varchar(255),
-  PRIMARY KEY  (`id`),
-  INDEX `Name-b` (`Name`),
-  INDEX `db_Name-b` (`db_name`),
-  INDEX `bibrefs-b` (`bibrefs`)
-) ENGINE=MyISAM;
-
-CREATE TABLE IF NOT EXISTS `aidAUTHORNAMESBIBREFS` (
-  `id` bigint(15) NOT NULL auto_increment,
-  `Name_id` bigint(15) NOT NULL,
-  `bibref` varchar(200) NOT NULL,
-  PRIMARY KEY  (`id`),
-  INDEX `Name_id-b` (`Name_id`),
-  INDEX `bibref-b` (`bibref`)
-) ENGINE=MyISAM;
-
-CREATE TABLE IF NOT EXISTS `aidDOCLIST` (
-  `id` bigint(15) NOT NULL auto_increment,
-  `bibrecID` bigint(15) NOT NULL,
-  `processed_author` bigint(15) default NULL,
-  PRIMARY KEY  (`id`),
-  INDEX `bibrecID-b` (`bibrecID`),
-  INDEX `processed_author-b` (`processed_author`)
-) ENGINE=MyISAM;
-
-CREATE TABLE IF NOT EXISTS `aidREALAUTHORS` (
-  `id` bigint(15) NOT NULL auto_increment,
-  `realauthorID` bigint(15) NOT NULL,
-  `virtualauthorID` bigint(15) NOT NULL,
-  `p` float NOT NULL,
-  PRIMARY KEY  (`id`),
-  INDEX `realauthorID-b` (`realauthorID`),
-  INDEX `virtualauthorID-b` (`virtualauthorID`)
-) ENGINE=MyISAM;
-
-CREATE TABLE IF NOT EXISTS `aidREALAUTHORDATA` (
-  `id` bigint(15) NOT NULL auto_increment,
-  `realauthorID` bigint(15) NOT NULL,
-  `tag` varchar(50) NOT NULL,
-  `value` varchar(255) NOT NULL,
-  `va_count` int(8) NOT NULL default '0',
-  `va_names_p` double NOT NULL default '0' COMMENT 'Summed VA-Names probability',
-  `va_p` double NOT NULL default '0' COMMENT 'Summed VA probabilities',
-  PRIMARY KEY  (`id`),
-  INDEX `realauthorID-b` (`realauthorID`,`tag`),
-  INDEX `value-b` (`value`),
-  INDEX `tag-b` (`tag`)
-) ENGINE=MyISAM;
-
-CREATE TABLE IF NOT EXISTS `aidVIRTUALAUTHORS` (
-  `id` bigint(15) NOT NULL auto_increment,
-  `virtualauthorID` bigint(15) NOT NULL,
-  `authornamesID` bigint(15) NOT NULL,
-  `p` float NOT NULL,
-  `clusterID` bigint(15) NOT NULL default '0',
-  PRIMARY KEY  (`id`),
-  INDEX `authornamesID-b` (`authornamesID`),
-  INDEX `clusterID-b` (`clusterID`),
-  INDEX `virtualauthorID-b` (`virtualauthorID`)
-) ENGINE=MyISAM;
-
-CREATE TABLE IF NOT EXISTS `aidVIRTUALAUTHORSDATA` (
-  `id` bigint(15) NOT NULL auto_increment,
-  `virtualauthorID` bigint(15) NOT NULL,
-  `tag` varchar(255) NOT NULL,
-  `value` varchar(255) NOT NULL,
-  PRIMARY KEY  (`id`),
-  INDEX `virtualauthorID-b` (`virtualauthorID`),
-  INDEX `tag-b` (`tag`),
-  INDEX `value-b` (`value`)
-) ENGINE=MyISAM;
-
-CREATE TABLE IF NOT EXISTS `aidVIRTUALAUTHORSCLUSTERS` (
-  `id` int(15) NOT NULL auto_increment,
-  `cluster_name` varchar(60) NOT NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM;
-
 CREATE TABLE IF NOT EXISTS `aidCACHE` (
   `id` int(15) NOT NULL auto_increment,
   `object_name` varchar(120) NOT NULL,
@@ -4059,6 +4026,13 @@ CREATE TABLE IF NOT EXISTS `aidCACHE` (
   INDEX `key-b` (`object_key`),
   INDEX `last_updated-b` (`last_updated`)
 ) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `aidPROBCACHE` (
+  `cluster` VARCHAR( 256 ) NOT NULL ,
+  `bibmap` MEDIUMBLOB NOT NULL ,
+  `matrix` LONGBLOB NOT NULL ,
+  PRIMARY KEY ( `cluster` )
+) ENGINE = MYISAM ;
 
 -- refextract tables:
 
@@ -4111,6 +4085,16 @@ CREATE TABLE IF NOT EXISTS collection_bsrMETHOD (
   id_bsrMETHOD mediumint(9) unsigned NOT NULL,
   score tinyint(4) unsigned NOT NULL default '0',
   PRIMARY KEY (id_collection, id_bsrMETHOD)
+) ENGINE=MyISAM;
+
+-- tables for sequence storage
+
+CREATE TABLE IF NOT EXISTS seqSTORE (
+  id int(15) NOT NULL auto_increment,
+  seq_name varchar(15),
+  seq_value varchar(20),
+  PRIMARY KEY (id),
+  UNIQUE KEY seq_name_value (seq_name, seq_value)
 ) ENGINE=MyISAM;
 
 -- end of file

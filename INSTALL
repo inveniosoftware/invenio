@@ -5,7 +5,7 @@ About
 =====
 
 This document specifies how to build, customize, and install Invenio
-v1.0.0 for the first time.  See RELEASE-NOTES if you are upgrading
+v1.0.1 for the first time.  See RELEASE-NOTES if you are upgrading
 from a previous Invenio release.
 
 Contents
@@ -43,7 +43,7 @@ Contents
         You may also want to install some of the following packages,
         if you have them available on your concrete architecture:
 
-          $ sudo aptitude install rxp python-psyco sbcl cmucl \
+          $ sudo aptitude install python-psyco sbcl cmucl \
               pylint pychecker pyflakes python-profiler python-epydoc \
               libapache2-mod-xsendfile openoffice.org python-utidylib \
               python-beautifulsoup
@@ -279,13 +279,13 @@ Contents
 ----------------
 
       $ cd $HOME/src/
-      $ wget http://invenio-software.org/download/invenio-1.0.0.tar.gz
-      $ wget http://invenio-software.org/download/invenio-1.0.0.tar.gz.md5
-      $ wget http://invenio-software.org/download/invenio-1.0.0.tar.gz.sig
-      $ md5sum -v -c invenio-1.0.0.tar.gz.md5
-      $ gpg --verify invenio-1.0.0.tar.gz.sig invenio-1.0.0.tar.gz
-      $ tar xvfz invenio-1.0.0.tar.gz
-      $ cd invenio-1.0.0
+      $ wget http://invenio-software.org/download/invenio-1.0.1.tar.gz
+      $ wget http://invenio-software.org/download/invenio-1.0.1.tar.gz.md5
+      $ wget http://invenio-software.org/download/invenio-1.0.1.tar.gz.sig
+      $ md5sum -c invenio-1.0.1.tar.gz.md5
+      $ gpg --verify invenio-1.0.1.tar.gz.sig invenio-1.0.1.tar.gz
+      $ tar xvfz invenio-1.0.1.tar.gz
+      $ cd invenio-1.0.1
       $ ./configure
       $ make
       $ make install
@@ -330,19 +330,19 @@ Contents
           sources.  (The built files will be installed into different
           "target" directories later.)
 
-      $ wget http://invenio-software.org/download/invenio-1.0.0.tar.gz
-      $ wget http://invenio-software.org/download/invenio-1.0.0.tar.gz.md5
-      $ wget http://invenio-software.org/download/invenio-1.0.0.tar.gz.sig
+      $ wget http://invenio-software.org/download/invenio-1.0.1.tar.gz
+      $ wget http://invenio-software.org/download/invenio-1.0.1.tar.gz.md5
+      $ wget http://invenio-software.org/download/invenio-1.0.1.tar.gz.sig
 
           Fetch Invenio source tarball from the distribution server,
           together with MD5 checksum and GnuPG cryptographic signature
           files useful for verifying the integrity of the tarball.
 
-      $ md5sum -v -c invenio-1.0.0.tar.gz.md5
+      $ md5sum -c invenio-1.0.1.tar.gz.md5
 
           Verify MD5 checksum.
 
-      $ gpg --verify invenio-1.0.0.tar.gz.sig invenio-1.0.0.tar.gz
+      $ gpg --verify invenio-1.0.1.tar.gz.sig invenio-1.0.1.tar.gz
 
           Verify GnuPG cryptographic signature.  Note that you may
           first have to import my public key into your keyring, if you
@@ -354,11 +354,11 @@ Contents
           warning that may follow after the signature has been
           successfully verified.
 
-      $ tar xvfz invenio-1.0.0.tar.gz
+      $ tar xvfz invenio-1.0.1.tar.gz
 
           Untar the distribution tarball.
 
-      $ cd invenio-1.0.0
+      $ cd invenio-1.0.1
 
           Go to the source directory.
 
@@ -575,6 +575,7 @@ Contents
              CFG_DATABASE_NAME = invenio
              CFG_DATABASE_USER = invenio
              CFG_DATABASE_PASS = my123p$ss
+             CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE = 1
 
           You should override at least the parameters mentioned above
           in order to define some very essential runtime parameters
@@ -585,6 +586,12 @@ Contents
           moderator, and alert engine (CFG_SITE_SUPPORT_EMAIL,
           CFG_SITE_ADMIN_EMAIL, etc), and last but not least your
           database credentials (CFG_DATABASE_*).
+
+          If this is a first installation of Invenio it is recommended
+          you set the CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE
+          variable to 1. If this is instead an upgrade from an existing
+          installation don't add it until you have run:
+          $ bibdocfile --fix-bibdocfsinfo-cache .
 
           The Invenio system will then read both the default
           invenio.conf file and your customized invenio-local.conf

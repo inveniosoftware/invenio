@@ -59,7 +59,7 @@ def format_element(bfo, indico_baseurl="https://indico.cern.ch", indico_what='ca
     out = get_widget_html(bfo, indico_baseurl, indico_what, indico_loc, indico_id,
                           indico_onlypublic, indico_from, indico_to,
                           indico_key, indico_sig, indico_credential_path,
-                          cached_filename, args['ln'])
+                          cached_filename, bfo.lang)
     return out
 
 def escape_values(bfo):

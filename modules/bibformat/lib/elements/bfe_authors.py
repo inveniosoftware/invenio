@@ -99,12 +99,19 @@ def format_element(bfo, limit, separator=' ; ',
         return separator.join(authors[:int(limit)]) + extension
 
     elif limit.isdigit() and nb_authors > int(limit) and interactive == "yes":
-        out = '''
+        out = '<a name="show_hide" />'
+        out += separator.join(authors[:int(limit)])
+        out += '<span id="more_%s" style="">' % bibrec_id + separator + \
+               separator.join(authors[int(limit):]) + '</span>'
+        out += ' <span id="extension_%s"></span>' % bibrec_id
+        out += ' <small><i><a id="link_%s" href="#" style="color:rgb(204,0,0);"></a></i></small>' % bibrec_id
+        out += '''
         <script type="text/javascript">
-        function toggle_authors_visibility(){
-            var more = document.getElementById('more');
-            var link = document.getElementById('link');
-            var extension = document.getElementById('extension');
+        $('#link_%(recid)s').click(function(event) {
+            event.preventDefault();
+            var more = document.getElementById('more_%(recid)s');
+            var link = document.getElementById('link_%(recid)s');
+            var extension = document.getElementById('extension_%(recid)s');
             if (more.style.display=='none'){
                 more.style.display = '';
                 extension.style.display = 'none';
@@ -115,26 +122,21 @@ def format_element(bfo, limit, separator=' ; ',
                 link.innerHTML = "%(show_more)s"
             }
             link.style.color = "rgb(204,0,0);"
-        }
+        });
 
-        function set_up(){
-            var extension = document.getElementById('extension');
+        function set_up_%(recid)s(){
+            var extension = document.getElementById('extension_%(recid)s');
             extension.innerHTML = "%(extension)s";
-            toggle_authors_visibility();
+            $('#link_%(recid)s').click();
         }
 
         </script>
         ''' % {'show_less':_("Hide"),
              'show_more':_("Show all %i authors") % nb_authors,
-             'extension':extension}
+             'extension':extension,
+             'recid': bibrec_id}
+        out += '<script type="text/javascript">set_up_%s()</script>' % bibrec_id
 
-        out += '<a name="show_hide" />'
-        out += separator.join(authors[:int(limit)])
-        out += '<span id="more" style="">' + separator + \
-               separator.join(authors[int(limit):]) + '</span>'
-        out += ' <span id="extension"></span>'
-        out += ' <small><i><a id="link" href="#" onclick="toggle_authors_visibility()" style="color:rgb(204,0,0);"></a></i></small>'
-        out += '<script type="text/javascript">set_up()</script>'
         return out
     elif nb_authors > 0:
         return separator.join(authors)

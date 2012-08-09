@@ -371,6 +371,17 @@ class WebSearchTestRecord(unittest.TestCase):
                          test_web_page_content(make_url('/%s/8/plots' % CFG_SITE_RECORD),
                                                expected_text='div id="clip"',
                                                unexpected_text='Abstract'))
+    def test_meta_header(self):
+        """ websearch - test that metadata embedded in header of hd
+        relies on hdm format and Default_HTML_meta bft, but hook is in
+        websearch to display the format
+        """
+
+        self.assertEqual([],
+                         test_web_page_content(make_url('/record/1'),
+                                               expected_text='<meta content="ALEPH experiment: Candidate of Higgs boson production" name="citation_title" />'))
+        return
+
 
 class WebSearchTestCollections(unittest.TestCase):
 
@@ -1054,7 +1065,26 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
     def test_search_engine_python_api_for_successful_query(self):
         """websearch - search engine Python API for successful query"""
         self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47],
-                         perform_request_search(p='ellis', rg=None))
+                         perform_request_search(p='ellis'))
+
+    def test_search_engine_web_api_ignore_paging_parameter(self):
+        """websearch - search engine Python API for successful query, ignore paging parameters"""
+        self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47],
+                         perform_request_search(p='ellis', rg=5, jrec=3))
+
+    def test_search_engine_web_api_respect_sorting_parameter(self):
+        """websearch - search engine Python API for successful query, respect sorting parameters"""
+        self.assertEqual([77, 84, 85],
+                         perform_request_search(p='klebanov'))
+        self.assertEqual([77, 85, 84],
+                         perform_request_search(p='klebanov', sf='909C4v'))
+
+    def test_search_engine_web_api_respect_ranking_parameter(self):
+        """websearch - search engine Python API for successful query, respect ranking parameters"""
+        self.assertEqual([77, 84, 85],
+                         perform_request_search(p='klebanov'))
+        self.assertEqual([85, 77, 84],
+                         perform_request_search(p='klebanov', rm='citation'))
 
     def test_search_engine_python_api_for_existing_record(self):
         """websearch - search engine Python API for existing record"""
@@ -1110,8 +1140,32 @@ class WebSearchSearchEngineWebAPITest(unittest.TestCase):
     def test_search_engine_web_api_for_successful_query(self):
         """websearch - search engine Web API for successful query"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id&rg=100',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id',
                                                expected_text="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47]"))
+
+    def test_search_engine_web_api_ignore_paging_parameter(self):
+        """websearch - search engine Web API for successful query, ignore paging parameters"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id&rg=5&jrec=3',
+                                               expected_text="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47]"))
+
+    def test_search_engine_web_api_respect_sorting_parameter(self):
+        """websearch - search engine Web API for successful query, respect sorting parameters"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id',
+                                               expected_text="[77, 84, 85]"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id&sf=909C4v',
+                                               expected_text="[77, 85, 84]"))
+
+    def test_search_engine_web_api_respect_ranking_parameter(self):
+        """websearch - search engine Web API for successful query, respect ranking parameters"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id',
+                                               expected_text="[77, 84, 85]"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id&rm=citation',
+                                               expected_text="[85, 77, 84]"))
 
     def test_search_engine_web_api_for_existing_record(self):
         """websearch - search engine Web API for existing record"""
@@ -1701,7 +1755,7 @@ class WebSearchSpecialTermsQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=U%281%29+OR+SL%282%2CZ%29',
                                                expected_text="[57, 79, 80, 88]"))
 
-    def test_special_terms_u1_and_sl_or_parens(self):
+    def FIXME_TICKET_453_test_special_terms_u1_and_sl_or_parens(self):
         """websearch - query for special terms, (U(1) OR SL(2,Z))"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=%28U%281%29+OR+SL%282%2CZ%29%29',
@@ -1782,7 +1836,7 @@ class WebSearchSummarizerTest(unittest.TestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=hcs',
                                                expected_text="Less known papers (1-9)",
-                                               expected_link_target=CFG_SITE_URL+"/search?p=ellis%20AND%20cited%3A1-%3E9&rm=citation",
+                                               expected_link_target=CFG_SITE_URL+"/search?p=ellis%20AND%20cited%3A1-%3E9",
                                                expected_link_label='1'))
 
     def test_ellis_not_quark_citation_summary_advanced(self):
@@ -1790,7 +1844,7 @@ class WebSearchSummarizerTest(unittest.TestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?ln=en&as=1&m1=a&p1=ellis&f1=author&op1=n&m2=a&p2=quark&f2=&op2=a&m3=a&p3=&f3=&action_search=Search&sf=&so=a&rm=&rg=10&sc=1&of=hcs',
                                                expected_text="Less known papers (1-9)",
-                                               expected_link_target=CFG_SITE_URL+'/search?p=author%3Aellis%20and%20not%20quark%20AND%20cited%3A1-%3E9&rm=citation',
+                                               expected_link_target=CFG_SITE_URL+'/search?p=author%3Aellis%20and%20not%20quark%20AND%20cited%3A1-%3E9',
                                                expected_link_label='1'))
 
     def test_ellis_not_quark_citation_summary_regular(self):
@@ -1798,7 +1852,7 @@ class WebSearchSummarizerTest(unittest.TestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=author%3Aellis+and+not+quark&f=&action_search=Search&sf=&so=d&rm=&rg=10&sc=0&of=hcs',
                                                expected_text="Less known papers (1-9)",
-                                               expected_link_target=CFG_SITE_URL+'/search?p=author%3Aellis%20and%20not%20quark%20AND%20cited%3A1-%3E9&rm=citation',
+                                               expected_link_target=CFG_SITE_URL+'/search?p=author%3Aellis%20and%20not%20quark%20AND%20cited%3A1-%3E9',
                                                expected_link_label='1'))
 
     def test_compute_self_citations(self):

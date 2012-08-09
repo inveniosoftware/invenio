@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -251,9 +251,9 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
                             oai_ids[0])
                 out += "<datafield tag=\"980\" ind1=\" \" ind2=\" \"><subfield code=\"c\">DELETED</subfield></datafield>\n"
                 from invenio.search_engine import get_merged_recid
-                # obtain the recid of the new record
-                merged_recid = str(get_merged_recid(recID))
-                out += "<datafield tag=\"970\" ind1=\" \" ind2=\" \"><subfield code=\"d\">%s</subfield></datafield>\n" % merged_recid
+                merged_recid = get_merged_recid(recID)
+                if merged_recid: # record was deleted but merged to other record, so display this information:
+                    out += "<datafield tag=\"970\" ind1=\" \" ind2=\" \"><subfield code=\"d\">%d</subfield></datafield>\n" % merged_recid
             else:
                 # controlfields
                 query = "SELECT b.tag,b.value,bb.field_number FROM bib00x AS b, bibrec_bib00x AS bb "\
@@ -822,4 +822,3 @@ def cut_out_snippet(text, patterns, nb_words_around, max_words, right_boundary =
             snippet = ""
 
     return (snippets, max_words)
-
