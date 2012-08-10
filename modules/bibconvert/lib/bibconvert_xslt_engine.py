@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,6 +24,7 @@ Customized to support BibConvert functions through the
 use of XPath 'format' function.
 
 Dependencies: Need one of the following XSLT processors:
+              - lxml
               - libxml2 & libxslt
               - 4suite
 
@@ -56,29 +57,112 @@ CFG_BIBCONVERT_FUNCTION_NS = "http://cdsweb.cern.ch/bibconvert/fn"
 # Import one XSLT processor
 #
 # processor_type:
-#       -1 : No processor found
-#        0 : libxslt
-#        1 : 4suite
-processor_type = -1
+#        0 : No processor found
+#        1 : lxml
+#        2 : libxslt
+#        3 : 4suite
+processor_type = 0
+
 try:
-    # libxml2 & libxslt
-    import libxml2
-    import libxslt
-    processor_type = 0
+    # lxml
+    from lxml import etree
+    processor_type = 1
 except ImportError:
     pass
 
-if processor_type == -1:
+if processor_type == 0:
+    try:
+        # libxml2 & libxslt
+        import libxml2
+        import libxslt
+        processor_type = 2
+    except ImportError:
+        pass
+
+if processor_type == 0:
     try:
         # 4suite
         from Ft.Xml.Xslt import Processor, XsltException
         from Ft.Xml import InputSource
         from xml.dom import Node
-        processor_type = 1
+        processor_type = 3
     except ImportError:
         pass
 
+if processor_type == 0:
+    # No XSLT processor found
+    sys.stderr.write('No XSLT processor could be found.\n' \
+                     'No output produced.\n')
+
 CFG_BIBCONVERT_XSL_PATH = "%s%sbibconvert%sconfig" % (CFG_ETCDIR, os.sep, os.sep)
+
+def bibconvert_function_lxml(dummy_ctx, value, func):
+    """
+    lxml extension function:
+    Bridge between BibConvert formatting functions and XSL stylesheets.
+
+    Can be used in that way in XSL stylesheet
+    (provided xmlns:fn="http://cdsweb.cern.ch/bibconvert/fn" has been declared):
+    <xsl:value-of select="fn:format(., 'ADD(mypref,mysuff)')"/>
+    (Adds strings 'mypref' and 'mysuff' as prefix/suffix to current node value,
+    using BibConvert ADD function)
+
+    if value is int, value is converted to string
+    if value is Node (PyCObj), first child node (text node) is taken as value
+    """
+    try:
+        if isinstance(value, str):
+            string_value = value
+        elif isinstance(value, (int, long)):
+            string_value = str(value)
+        elif isinstance(value, list):
+            value = value[0]
+            if isinstance(value, str):
+                string_value = value
+            elif isinstance(value, (int, long)):
+                string_value = str(value)
+            else:
+                string_value = value.text
+        else:
+            string_value = value.text
+
+        return FormatField(string_value, func).rstrip('\n')
+
+    except Exception, err:
+        sys.stderr.write("Error during formatting function evaluation: " + \
+                         str(err) + \
+                         '\n')
+
+    return ''
+
+def bibconvert_escape_lxml(dummy_ctx, value):
+    """
+    Bridge to lxml to escape the provided value.
+    """
+    try:
+        if isinstance(value, str):
+            string_value = value
+        elif isinstance(value, (int, long)):
+            string_value = str(value)
+        elif isinstance(value, list):
+            value = value[0]
+            if isinstance(value, str):
+                string_value = value
+            elif isinstance(value, (int, long)):
+                string_value = str(value)
+            else:
+                string_value = value.text
+        else:
+            string_value = value.text
+
+        return encode_for_xml(string_value)
+
+    except Exception, err:
+        sys.stderr.write("Error during formatting function evaluation: " + \
+                         str(err) + \
+                         '\n')
+
+    return ''
 
 def bibconvert_function_libxslt(dummy_ctx, value, func):
     """
@@ -131,7 +215,6 @@ def bibconvert_escape_libxslt(dummy_ctx, value):
                          '\n')
 
     return ''
-
 
 def bibconvert_function_4suite(dummy_ctx, value, func):
     """
@@ -191,7 +274,7 @@ def convert(xmltext, template_filename=None, template_source=None):
     @param template_source: The configuration describing the processing.
     @return: the transformed XML text, or None if an error occured
     """
-    if processor_type == -1:
+    if processor_type == 0:
         # No XSLT processor found
         raise "No XSLT processor could be found"
 
@@ -217,7 +300,68 @@ def convert(xmltext, template_filename=None, template_source=None):
         return None
 
     result = ""
-    if processor_type == 0:
+
+    if processor_type == 1:
+        # lxml
+
+        try:
+            xml = etree.XML(xmltext)
+        except etree.XMLSyntaxError, e:
+            error = 'The XML code given is invalid. [%s]' % (e,)
+            sys.stderr.write(error)
+            return None
+        except:
+            error = 'Failed to process the XML code.'
+            sys.stderr.write(error)
+            return None
+
+        try:
+            xsl = etree.XML(template)
+        except etree.XMLSyntaxError, e:
+            error = 'The XSL code given is invalid. [%s]' % (e,)
+            sys.stderr.write(error)
+            return None
+        except:
+            error = 'Failed to process the XSL code.'
+            sys.stderr.write(error)
+            return None
+
+        try:
+            fns = etree.FunctionNamespace(CFG_BIBCONVERT_FUNCTION_NS)
+            fns["format"] = bibconvert_function_lxml
+            fns["escape"] = bibconvert_escape_lxml
+        except etree.NamespaceRegistryError, e:
+            error = 'Failed registering the XPath extension function. [%s]' % (e,)
+            sys.stderr.write(error)
+            return None
+
+        try:
+            xslt = etree.XSLT(xsl)
+        except etree.XSLTParseError, e:
+            error = 'The XSL code given is invalid. [%s]' % (e,)
+            sys.stderr.write(error)
+            return None
+        except:
+            error = 'Failed to process the XSL code.'
+            sys.stderr.write(error)
+            return None
+
+        try:
+            temporary_result = xslt(xml)
+        except:
+            error = 'Failed to perform the XSL transformation.'
+            sys.stderr.write(error)
+            return None
+
+        result = str(temporary_result)
+
+        # Housekeeping
+        del temporary_result
+        del xslt
+        del xsl
+        del xml
+
+    elif processor_type == 2:
         # libxml2 & libxslt
 
         # Register BibConvert functions for use in XSL
@@ -252,7 +396,7 @@ def convert(xmltext, template_filename=None, template_source=None):
         source.freeDoc()
         result_object.freeDoc()
 
-    elif processor_type == 1:
+    elif processor_type == 3:
         # 4suite
 
         # Init
@@ -314,4 +458,3 @@ def convert(xmltext, template_filename=None, template_source=None):
 
 if __name__ == "__main__":
     pass
-

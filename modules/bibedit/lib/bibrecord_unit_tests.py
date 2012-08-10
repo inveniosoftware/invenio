@@ -34,6 +34,12 @@ except ImportError:
     parser_pyrxp_available = False
 
 try:
+    from lxml import etree
+    parser_lxml_available = True
+except ImportError:
+    parser_lxml_available = False
+
+try:
     import Ft.Xml.Domlette
     parser_4suite_available = True
 except ImportError:
@@ -146,6 +152,12 @@ class BibRecordParsersTest(unittest.TestCase):
         def test_pyRXP(self):
             """ bibrecord - create_record() with pyRXP """
             record = bibrecord._create_record_rxp(self.xmltext)
+            self.assertEqual(record, self.expected_record)
+
+    if parser_lxml_available:
+        def test_lxml(self):
+            """ bibrecord - create_record() with lxml"""
+            record = bibrecord._create_record_lxml(self.xmltext)
             self.assertEqual(record, self.expected_record)
 
     if parser_4suite_available:
@@ -1466,6 +1478,14 @@ class BibRecordSingletonTest(unittest.TestCase):
                                            keep_singletons=False)[0][0]
             self.assertEqual(rec, self.rec_expected)
 
+    if parser_lxml_available:
+        def test_singleton_removal_lxml(self):
+            """bibrecord - enforcing singleton removal with lxml"""
+            rec = bibrecord.create_records(self.xml, verbose=1,
+                                           correct=1, parser='lxml',
+                                           keep_singletons=False)[0][0]
+            self.assertEqual(rec, self.rec_expected)
+
 class BibRecordNumCharRefTest(unittest.TestCase):
     """ bibrecord - testing numerical character reference expansion"""
 
@@ -1515,6 +1535,13 @@ class BibRecordNumCharRefTest(unittest.TestCase):
                                            correct=1, parser='pyrxp')[0][0]
             #self.assertEqual(rec, self.rec_expected)
             self.assertEqual(rec, None)
+
+    if parser_lxml_available:
+        def test_numcharref_expansion_lxml(self):
+            """bibrecord - numcharref expansion with lxml"""
+            rec = bibrecord.create_records(self.xml, verbose=1,
+                                           correct=1, parser='lxml')[0][0]
+            self.assertEqual(rec, self.rec_expected)
 
 TEST_SUITE = make_test_suite(
     BibRecordSuccessTest,

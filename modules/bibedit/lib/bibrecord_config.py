@@ -49,7 +49,7 @@ CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL = 0
 CFG_BIBRECORD_DEFAULT_CORRECT = 0
 
 # XML parsers available:
-CFG_BIBRECORD_PARSERS_AVAILABLE = ['pyrxp', '4suite', 'minidom']
+CFG_BIBRECORD_PARSERS_AVAILABLE = ['pyrxp', 'lxml', '4suite', 'minidom']
 
 # Exceptions
 class InvenioBibRecordParserError(Exception):
