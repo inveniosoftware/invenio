@@ -103,10 +103,15 @@ def format_element(bfo, new_articles_first='yes',
                     if article_is_new:
                         css_classes.append('new')
 
+                    separator = bfo.field('594__a')
+                    if separator == "YES":
+                        menu_out += '''<hr/>'''
+
                     menu_out += '''<div class="active">
             <div class="subNavigationMenuItem %s">%s</div></div>''' % \
                     (' '.join(css_classes),
                      this_title)
+
                 else:
                     temp_rec = BibFormatObject(article_id)
                     title = ''
@@ -129,6 +134,10 @@ def format_element(bfo, new_articles_first='yes',
                     if article_is_new:
                         css_classes.append('new')
 
+                    separator = temp_rec.field('594__a')
+                    if separator == "YES":
+                        menu_out += '''<hr/>'''
+
                     menu_out += '''<div class="subNavigationMenuItem %s">
                     <a href="%s">%s</a></div>
                     ''' % (' '.join(css_classes),
@@ -137,6 +146,7 @@ def format_element(bfo, new_articles_first='yes',
                                              'ln': bfo.lang,
                                              'category': category}),
                            title)
+
         menu_out += '</div>'
 
     return menu_out
