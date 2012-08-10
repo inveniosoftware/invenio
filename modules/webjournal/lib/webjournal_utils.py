@@ -353,6 +353,8 @@ def _cache_journal_articles(journal_name, issue, category, articles):
         journal_info = {}
     except EOFError:
         journal_info = {}
+    except ValueError:
+        journal_info = {}
 
     if not journal_info.has_key('journal_articles'):
         journal_info['journal_articles'] = {}
@@ -400,6 +402,8 @@ def _get_cached_journal_articles(journal_name, issue, category):
     except IOError:
         journal_articles = None
     except EOFError:
+        journal_articles = None
+    except ValueError:
         journal_articles = None
 
     return journal_articles
@@ -1207,6 +1211,8 @@ def get_journal_id(journal_name, ln=CFG_SITE_LANG):
             journal_id = None
         except IOError:
             journal_id = None
+        except ValueError:
+            journal_id = None
     else:
         try:
             res = run_sql("SELECT id FROM jrnJOURNAL WHERE name=%s",
@@ -1223,6 +1229,8 @@ def get_journal_id(journal_name, ln=CFG_SITE_LANG):
             except cPickle.PickleError, e:
                 journal_id = None
             except IOError:
+                journal_id = None
+            except ValueError:
                 journal_id = None
 
     if journal_id is None:
@@ -1291,6 +1299,8 @@ def get_journals_ids_and_names():
             except IOError:
                 # Well, can't do anything...
                 continue
+            except ValueError:
+                continue
     else:
         try:
             res = run_sql("SELECT id, name FROM jrnJOURNAL ORDER BY id")
@@ -1320,6 +1330,8 @@ def get_journals_ids_and_names():
                     continue
                 except IOError:
                     # Well, can't do anything...
+                    continue
+                except ValueError:
                     continue
 
     return journals

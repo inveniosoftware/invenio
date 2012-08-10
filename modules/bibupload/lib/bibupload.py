@@ -1947,10 +1947,12 @@ Examples:
     $ bibupload -i input.xml
 """,
             help_specific_usage="""  -a, --append\t\tnew fields are appended to the existing record
-  -c, --correct\t\tfields are replaced by the new ones in the existing record
+  -c, --correct\t\tfields are replaced by the new ones in the existing record, except
+\t\t\twhen overridden by CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS
   -f, --format\t\ttakes only the FMT fields into account. Does not update
   -i, --insert\t\tinsert the new record in the database
-  -r, --replace\t\tthe existing record is entirely replaced by the new one
+  -r, --replace\t\tthe existing record is entirely replaced by the new one,
+\t\t\texcept for fields in CFG_BIBUPLOAD_STRONG_TAGS
   -z, --reference\tupdate references (update only 999 fields)
   -d, --delete\t\tspecified fields are deleted in existing record
   -S, --stage=STAGE\tstage to start from in the algorithm (0: always done; 1: FMT tags;
