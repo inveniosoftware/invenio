@@ -161,6 +161,8 @@ input file should contain record ID in the 001 tag and the title in
                   and fully replaced.  Signals error if record
                   is not found via matching record IDs or system
                   numbers.
+                  Fields defined in Invenio config variable
+                  CFG_BIBUPLOAD_STRONG_TAGS are not replaced.
 
                   Note also that `-r' can be combined with `-i'
                   into an `-ir' option that would automatically
@@ -182,6 +184,11 @@ input file should contain record ID in the 001 tag and the title in
                   removed and replaced by those from the XML
                   MARC file.  Fields not present in XML MARC
                   file are not changed (unlike the -r option).
+                  Fields with "provenance" subfields defined in
+                  'CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS'
+                  are protected against deletion unless the
+                  input MARCXML contains a matching
+                  provenance value.
                   Signals error if record is not found via
                   matching record IDs or system numbers.
 

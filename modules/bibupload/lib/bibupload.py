@@ -24,10 +24,12 @@ tables according to options.
 Usage: bibupload [options]
 Command options:
   -a, --append          new fields are appended to the existing record
-  -c, --correct         fields are replaced by the new ones in the existing record
+  -c, --correct         fields are replaced by the new ones in the existing record, except
+                        when overridden by CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS
   -f, --format          takes only the FMT fields into account. Does not update
   -i, --insert          insert the new record in the database
-  -r, --replace         the existing record is entirely replaced by the new one
+  -r, --replace         the existing record is entirely replaced by the new one,
+                        except fields defined in CFG_BIBUPLOAD_STRONG_TAGS
   -z, --reference       update references (update only 999 fields)
   -d, --delete          specified fields are deleted in existing record
   -S, --stage=STAGE     stage to start from in the algorithm (0: always done; 1: FMT tags;
@@ -1797,10 +1799,12 @@ Examples:
     $ bibupload -i input.xml
 """,
             help_specific_usage="""  -a, --append\t\tnew fields are appended to the existing record
-  -c, --correct\t\tfields are replaced by the new ones in the existing record
+  -c, --correct\t\tfields are replaced by the new ones in the existing record, except
+\t\t\twhen overridden by CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS
   -f, --format\t\ttakes only the FMT fields into account. Does not update
   -i, --insert\t\tinsert the new record in the database
-  -r, --replace\t\tthe existing record is entirely replaced by the new one
+  -r, --replace\t\tthe existing record is entirely replaced by the new one,
+\t\t\texcept for fields in CFG_BIBUPLOAD_STRONG_TAGS
   -z, --reference\tupdate references (update only 999 fields)
   -d, --delete\t\tspecified fields are deleted in existing record
   -S, --stage=STAGE\tstage to start from in the algorithm (0: always done; 1: FMT tags;
