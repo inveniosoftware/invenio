@@ -855,10 +855,10 @@ function displayMessage(msgCode, keepContent, args){
       msg = 'Result code: <b>' + msgCode + '</b>';
   }
   if (!keepContent) {
-    $('#bibEditContentTable').html('<div class="warningMsg">' + msg + '</div>');
+    $('#bibEditContentTable').html('<div id="warningMsg" class="warningMsg">' + msg + '</div>');
   }
   else {
-    $('#bibEditMessage').html('<div class="warningMsg">' + msg + '</div>').slideDown('slow');
+    $('#bibEditMessage').html('<div id="warningMsg" class="warningMsg">' + msg + '</div>').slideDown('slow');
   }
 }
 
@@ -900,7 +900,7 @@ function displayCacheOutdatedScreen(requestType){
   var viewMARCXMLURL = recordURL + '?of=xm';
   var msg = '';
   if (requestType == 'submit')
-    msg = '<div class="warningMsg">Someone has changed this record while you were editing. ' +
+    msg = '<div id="warningMsg" class="warningMsg">Someone has changed this record while you were editing. ' +
       'You can:<br /><ul>' +
       '<li>View (<b><a href="' + recordURL + '" target="_blank">HTML</a></b>,' +
       ' <b><a href="' + viewMARCURL + '" target="_blank">MARC</a></b>,' +
@@ -914,7 +914,7 @@ function displayCacheOutdatedScreen(requestType){
     '(keep the latest version)</li>' +
     '</ul></div>';
   else if (requestType == 'getRecord')
-    msg = '<div class="warningMsg">You have unsubmitted changes to this record, but someone has ' +
+    msg = '<div id="warningMsg" class="warningMsg">You have unsubmitted changes to this record, but someone has ' +
       'changed the record while you were editing. You can:<br /><ul>' +
       '<li>View (<b><a href="' + recordURL + '" target="_blank">HTML</a></b>,' +
       ' <b><a href="' + viewMARCURL + '" target="_blank">MARC</a></b>,' +

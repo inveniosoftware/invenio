@@ -79,7 +79,7 @@ class InvenioBibEditWebTest(InvenioWebTestCase):
         self.browser.find_element_by_id("btnSearch").click()
         self.find_element_by_id_with_timeout("cellStatus", text="Error: Permission denied")
         self.find_element_by_id_with_timeout("cellStatus", text="Ready")
-        self.element_value_test(element_id="bibEditMessage", expected_element_value="Could not access record. Permission denied.", in_form=False)
+        self.element_value_test(element_id="warningMsg", expected_element_value="Could not access record. Permission denied.", in_form=False)
         self.logout()
 
     def test_bibedit_access_curator_none(self):
@@ -94,14 +94,14 @@ class InvenioBibEditWebTest(InvenioWebTestCase):
         self.browser.find_element_by_id("btnSearch").click()
         self.find_element_by_id_with_timeout("cellStatus", text="Error: Permission denied")
         self.find_element_by_id_with_timeout("cellStatus", text="Ready")
-        self.element_value_test(element_id="bibEditMessage", expected_element_value="Could not access record. Permission denied.", in_form=False)
+        self.element_value_test(element_id="warningMsg", expected_element_value="Could not access record. Permission denied.", in_form=False)
         self.browser.find_element_by_id("txtSearchPattern").clear()
         self.fill_textbox(textbox_id="txtSearchPattern", text="70")
         self.find_element_by_id_with_timeout("btnSearch")
         self.browser.find_element_by_id("btnSearch").click()
         self.find_element_by_id_with_timeout("cellStatus", text="Error: Permission denied")
         self.find_element_by_id_with_timeout("cellStatus", text="Ready")
-        self.element_value_test(element_id="bibEditMessage", expected_element_value="Could not access record. Permission denied.", in_form=False)
+        self.element_value_test(element_id="warningMsg", expected_element_value="Could not access record. Permission denied.", in_form=False)
         self.logout()
 
     def test_bibedit_basic_record_locking(self):
@@ -125,7 +125,7 @@ class InvenioBibEditWebTest(InvenioWebTestCase):
         self.find_element_by_id_with_timeout("btnSearch")
         self.browser.find_element_by_id("btnSearch").click()
         self.find_element_by_id_with_timeout("cellStatus", text="Error: Record locked by user")
-        self.element_value_test(element_id="bibEditMessage", expected_element_value="This record is currently being edited by another user. Please try again later.", in_form=False)
+        self.element_value_test(element_id="warningMsg", expected_element_value="This record is currently being edited by another user. Please try again later.", in_form=False)
         self.logout()
         # login as balthasar
         self.login(username="balthasar", password="b123althasar")

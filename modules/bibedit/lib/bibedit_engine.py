@@ -786,7 +786,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
         if data.has_key('cacheMTime'):
             if cache_exists(recid, uid) and get_cache_mtime(recid, uid) == \
                 data['cacheMTime']:
-                    delete_cache_file(recid, uid)
+                delete_cache_file(recid, uid)
         response['resultCode'] = 11
 
     elif request_type == 'prepareRecordMerge':
