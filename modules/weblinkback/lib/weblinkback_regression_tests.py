@@ -58,6 +58,19 @@ from invenio.weblinkback_config import CFG_WEBLINKBACK_STATUS, \
                                        CFG_WEBLINKBACK_PAGE_TITLE_STATUS
 
 
+def get_max_auto_increment_id(table):
+    return run_sql("SELECT Auto_increment FROM information_schema.tables WHERE table_name=%s AND table_schema = 'invenio'", (table,))[0][0] - 1
+
+
+def remove_test_data():
+    run_sql("DELETE FROM lnkENTRY")
+    run_sql("DELETE FROM lnkENTRYURLTITLE")
+    run_sql("DELETE FROM lnkENTRYLOG")
+    run_sql("DELETE FROM lnkLOG")
+    run_sql("DELETE FROM lnkADMINURL")
+    run_sql("DELETE FROM lnkADMINURLLOG")
+
+
 class WebLinkbackWebPagesAvailabilityTest(unittest.TestCase):
     """Test WebLinkback web pages whether they are up or not"""
 
@@ -106,7 +119,7 @@ class WebLinkbackDatabaseTest(unittest.TestCase):
         self.insert_time = []
         self.user_info = {'uid': 0}
 
-        self.truncate_tables()
+        self.remove_test_data()
 
         # recid 41
         run_sql("INSERT INTO lnkENTRY (origin_url, id_bibrec, additional_properties, type, status, insert_time) VALUES ('URL1', 41, NULL, %s, %s, NOW())", (CFG_WEBLINKBACK_TYPE['TRACKBACK'], CFG_WEBLINKBACK_STATUS['PENDING']))
@@ -168,16 +181,14 @@ class WebLinkbackDatabaseTest(unittest.TestCase):
 
     def tearDown(self):
         """Remove test data"""
-        self.truncate_tables()
+        self.remove_test_data()
 
-    def truncate_tables(self):
-        """Truncate tables"""
-        run_sql("DELETE FROM lnkENTRY")
-        run_sql("DELETE FROM lnkENTRYURLTITLE")
-        run_sql("DELETE FROM lnkENTRYLOG")
-        run_sql("DELETE FROM lnkLOG")
-        run_sql("DELETE FROM lnkADMINURL")
-        run_sql("DELETE FROM lnkADMINURLLOG")
+    def remove_test_data(self):
+        """Clean tables"""
+        self._max_id_lnkENTRY = get_max_auto_increment_id('lnkENTRY')
+        self._max_id_lnkADMINURL = get_max_auto_increment_id('lnkADMINURL')
+        self._max_id_lnkLOG = get_max_auto_increment_id('lnkLOG')
+        remove_test_data()
 
     def get_all_from_table(self, tableName):
         return run_sql("SELECT * FROM %s" % tableName) # kwalitee: disable=sql
@@ -249,7 +260,7 @@ class WebLinkbackDatabaseTest(unittest.TestCase):
                                                        username='admin',
                                                        expected_text=text))
 
-    def FIXME_TICKET_1136_test_create_linkback1(self):
+    def test_create_linkback1(self):
         """weblinkback - create linkback"""
         recid = 42
         argd = {'url': 'URL',
@@ -261,7 +272,7 @@ class WebLinkbackDatabaseTest(unittest.TestCase):
                 }
 
         linkbackid = create_trackback(recid, argd['url'], argd['title'], argd['excerpt'], argd['blog_name'], argd['id'], argd['source'], self.user_info)
-        self.assertEqual(10, linkbackid)
+        self.assertEqual(10 + self._max_id_lnkENTRY, linkbackid)
 
         linkback = get_all_linkbacks(recid=recid)[5]
         self.assertEqual(linkbackid, linkback[0])
@@ -312,7 +323,7 @@ class WebLinkbackDatabaseTest(unittest.TestCase):
         self.assertEqual(9, len(self.get_all_from_table("lnkENTRY")))
         self.assertEqual(9, len(self.get_all_from_table("lnkENTRYLOG")))
 
-    def FIXME_TICKET_1136_test_create_linkback2(self):
+    def test_create_linkback2(self):
         """weblinkback - create linkback with URL title"""
         recid = 42
         argd = {'url': 'URL',
@@ -324,7 +335,7 @@ class WebLinkbackDatabaseTest(unittest.TestCase):
                 }
 
         linkbackid = create_trackback(recid, argd['url'], argd['title'], argd['excerpt'], argd['blog_name'], argd['id'], argd['source'], self.user_info)
-        self.assertEqual(10, linkbackid)
+        self.assertEqual(10 + self._max_id_lnkENTRY, linkbackid)
 
         linkback = get_all_linkbacks(recid=recid)[5]
         self.assertEqual(linkbackid, linkback[0])
@@ -393,12 +404,12 @@ class WebLinkbackDatabaseTest(unittest.TestCase):
         self.assertNotEqual([], test_web_page_content(url,
                                                       username='admin'))
 
-    def FIXME_TICKET_1136_test_get_approved_latest_added_linkback(self):
+    def test_get_approved_latest_added_linkback(self):
         """weblinkback - get approved latest added linkbacks"""
         for linkbackid in (1, 2, 5, 6, 7):
-            approve_linkback(linkbackid, self.user_info)
+            approve_linkback(linkbackid + self._max_id_lnkENTRY, self.user_info)
 
-        reject_linkback(4, self.user_info)
+        reject_linkback(4 + self._max_id_lnkENTRY, self.user_info)
 
         self.assertEqual(0, len(get_approved_latest_added_linkbacks(0)))
         self.assertEqual(1, len(get_approved_latest_added_linkbacks(1)))
@@ -409,11 +420,11 @@ class WebLinkbackDatabaseTest(unittest.TestCase):
 
         approved_linkbacks = get_approved_latest_added_linkbacks(6)
         self.assertEqual(5, len(approved_linkbacks))
-        self.assertEqual(1, approved_linkbacks[0][0])
-        self.assertEqual(2, approved_linkbacks[1][0])
-        self.assertEqual(5, approved_linkbacks[2][0])
-        self.assertEqual(6, approved_linkbacks[3][0])
-        self.assertEqual(7, approved_linkbacks[4][0])
+        self.assertEqual(1 + self._max_id_lnkENTRY, approved_linkbacks[0][0])
+        self.assertEqual(2 + self._max_id_lnkENTRY, approved_linkbacks[1][0])
+        self.assertEqual(5 + self._max_id_lnkENTRY, approved_linkbacks[2][0])
+        self.assertEqual(6 + self._max_id_lnkENTRY, approved_linkbacks[3][0])
+        self.assertEqual(7 + self._max_id_lnkENTRY, approved_linkbacks[4][0])
 
         url = CFG_SITE_URL + '/linkbacks/'
         expected_texts = ('URL1', 'URL2', 'URL5', 'URL6', 'URL7')
@@ -448,13 +459,13 @@ class WebLinkbackDatabaseTest(unittest.TestCase):
                                                        username='admin',
                                                        expected_text=text))
 
-    def FIXME_TICKET_1136_test_url_remove(self):
+    def test_url_remove(self):
         """weblinkback - test remove URL rom list"""
         add_url_to_list('url1', CFG_WEBLINKBACK_LIST_TYPE['BLACKLIST'], self.user_info)
         add_url_to_list('url2', CFG_WEBLINKBACK_LIST_TYPE['BLACKLIST'], self.user_info)
         remove_url('url2')
         # creating a different log, might detect a bug in the logging ids
-        approve_linkback(1, self.user_info)
+        approve_linkback(1 + self._max_id_lnkENTRY, self.user_info)
         add_url_to_list('url3', CFG_WEBLINKBACK_LIST_TYPE['BLACKLIST'], self.user_info)
 
         admin_url_table = self.get_all_from_table('lnkADMINURL')
@@ -466,20 +477,20 @@ class WebLinkbackDatabaseTest(unittest.TestCase):
         # there are more logs due to the inserted linkbacks in setUp()
         self.assertEqual(12, len(logTable))
 
-        self.assertEqual(1, admin_url_table[0][0])
+        self.assertEqual(1 + self._max_id_lnkADMINURL, admin_url_table[0][0])
         # there are more logs due to the inserted linkbacks in setUp()
-        self.assertEqual(1, admin_url_log_table[0][0])
-        self.assertEqual(10, admin_url_log_table[0][1])
+        self.assertEqual(1 + self._max_id_lnkADMINURL, admin_url_log_table[0][0])
+        self.assertEqual(10 + self._max_id_lnkLOG, admin_url_log_table[0][1])
 
-        self.assertEqual(3, admin_url_table[1][0])
+        self.assertEqual(3 + self._max_id_lnkADMINURL, admin_url_table[1][0])
         # there are more logs due to the inserted linkbacks in setUp()
-        self.assertEqual(3, admin_url_log_table[1][0])
+        self.assertEqual(3 + self._max_id_lnkADMINURL, admin_url_log_table[1][0])
         # 9 linkbacks inserted  (9)
         # 2 urls inserted      (11)
         # 1 url removed        (11) (log id 10 removed)
         # 1 linkback approved  (12)
         # 1 url inserted       (13)
-        self.assertEqual(13, admin_url_log_table[1][1])
+        self.assertEqual(13 + self._max_id_lnkLOG, admin_url_log_table[1][1])
 
         url = CFG_SITE_URL + '/admin/weblinkback/weblinkbackadmin.py/lists'
         expected_texts = ('url1', 'url3')
@@ -537,12 +548,12 @@ class WebLinkbackDatabaseTest(unittest.TestCase):
         self.assertEqual(9, len(self.get_all_from_table("lnkENTRY")))
         self.assertEqual(11, len(self.get_all_from_table("lnkENTRYLOG")))
 
-    def FIXME_TICKET_1136_test_delete_linkbacks_on_blacklist(self):
+    def test_delete_linkbacks_on_blacklist(self):
         """weblinkback - test delete linkbacks on blacklist"""
         for linkbackid in (1, 2, 3, 4):
-            approve_linkback(linkbackid, self.user_info)
+            approve_linkback(linkbackid + self._max_id_lnkENTRY, self.user_info)
         for linkbackid in (5, 6):
-            reject_linkback(linkbackid, self.user_info)
+            reject_linkback(linkbackid + self._max_id_lnkENTRY, self.user_info)
 
         add_url_to_list('RL1', CFG_WEBLINKBACK_LIST_TYPE['BLACKLIST'], self.user_info)
         add_url_to_list('URL5', CFG_WEBLINKBACK_LIST_TYPE['BLACKLIST'], self.user_info)
@@ -579,29 +590,28 @@ class WebLinkbackUpdaterTest(unittest.TestCase):
     def setUp(self):
         """Insert test data"""
         self.user_info = {'uid': 0}
-        self.truncate_tables()
+        self.remove_test_data()
 
     def tearDown(self):
         """Remove test data"""
-        self.truncate_tables()
+        self.remove_test_data()
 
-    def truncate_tables(self):
-        """Truncate tables"""
-        run_sql("DELETE FROM lnkENTRY")
-        run_sql("DELETE FROM lnkENTRYURLTITLE")
-        run_sql("DELETE FROM lnkENTRYLOG")
-        run_sql("DELETE FROM lnkLOG")
+    def remove_test_data(self):
+        """Clean tables"""
+        self._max_id_lnkENTRY = get_max_auto_increment_id('lnkENTRY')
+
+        remove_test_data()
 
     def get_all_from_table(self, tableName):
         return run_sql("SELECT * FROM %s" % tableName) # kwalitee: disable=sql
 
-    def test_update_titles_of_new_linkbacks(self):
-        """weblinkback - test update titles of new linkbacks"""
-        self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.au&title=Google' % CFG_SITE_RECORD, username='admin'))
-        self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.at' % CFG_SITE_RECORD, username='admin'))
-        self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.co.za&title=Google' % CFG_SITE_RECORD, username='admin'))
+    if HAS_MOCK:
+        def test_update_titles_of_new_linkbacks(self):
+            """weblinkback - test update titles of new linkbacks"""
+            self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.au&title=Google' % CFG_SITE_RECORD, username='admin'))
+            self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.at' % CFG_SITE_RECORD, username='admin'))
+            self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.co.za&title=Google' % CFG_SITE_RECORD, username='admin'))
 
-        if HAS_MOCK:
             p = patch('invenio.weblinkback.get_title_of_page', get_title_of_page_mock1)
             p.start()
             update_linkbacks(1)
@@ -611,15 +621,15 @@ class WebLinkbackUpdaterTest(unittest.TestCase):
             self.assertEqual("Google", url_titles[2][2])
             p.stop()
 
-    def test_update_titles_of_old_linkbacks(self):
-        """weblinkback - test update titles of old linkbacks"""
-        self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.au&title=Google' % CFG_SITE_RECORD, username='admin'))
-        self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.at' % CFG_SITE_RECORD, username='admin'))
-        self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.co.za&title=Google' % CFG_SITE_RECORD, username='admin'))
+    if HAS_MOCK:
+        def test_update_titles_of_old_linkbacks(self):
+            """weblinkback - test update titles of old linkbacks"""
+            self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.au&title=Google' % CFG_SITE_RECORD, username='admin'))
+            self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.at' % CFG_SITE_RECORD, username='admin'))
+            self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.co.za&title=Google' % CFG_SITE_RECORD, username='admin'))
 
-        update_url_title("http://www.google.au", "Google AU")
+            update_url_title("http://www.google.au", "Google AU")
 
-        if HAS_MOCK:
             p = patch('invenio.weblinkback.get_title_of_page', get_title_of_page_mock1)
             p.start()
             update_linkbacks(2)
@@ -639,13 +649,13 @@ class WebLinkbackUpdaterTest(unittest.TestCase):
             self.assertEqual("Google", url_entries[2][2])
             p.stop()
 
-    def test_update_manually_set_page_titles(self):
-        """weblinkback - test update manually set page titles"""
-        self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.au&title=Google' % CFG_SITE_RECORD, username='admin'))
-        self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.at' % CFG_SITE_RECORD, username='admin'))
-        self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.co.za&title=Google' % CFG_SITE_RECORD, username='admin'))
+    if HAS_MOCK:
+        def test_update_manually_set_page_titles(self):
+            """weblinkback - test update manually set page titles"""
+            self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.au&title=Google' % CFG_SITE_RECORD, username='admin'))
+            self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.at' % CFG_SITE_RECORD, username='admin'))
+            self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.co.za&title=Google' % CFG_SITE_RECORD, username='admin'))
 
-        if HAS_MOCK:
             p = patch('invenio.weblinkback.get_title_of_page', get_title_of_page_mock1)
             p.start()
             update_linkbacks(3)
@@ -656,7 +666,7 @@ class WebLinkbackUpdaterTest(unittest.TestCase):
             p.stop()
 
     if HAS_MOCK:
-        def FIXME_TICKET_1136_test_detect_and_disable_broken_linkbacks(self):
+        def test_detect_and_disable_broken_linkbacks(self):
             """weblinkback - test detect and disable broken linkbacks"""
             self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.au&title=Google' % CFG_SITE_RECORD, username='admin'))
             self.assertNotEqual([], test_web_page_content(CFG_SITE_URL + '/%s/41/linkbacks/sendtrackback?url=http://www.google.at' % CFG_SITE_RECORD, username='admin'))
@@ -749,7 +759,7 @@ class WebLinkbackUpdaterTest(unittest.TestCase):
             self.assertEqual(5, url_titles[3][4])
             self.assertEqual(1, url_titles[3][5])
 
-            approve_linkback(4, self.user_info)
+            approve_linkback(4 + self._max_id_lnkENTRY, self.user_info)
 
             update_linkbacks(3)
             url_titles = self.get_all_from_table("lnkENTRYURLTITLE")
@@ -794,8 +804,8 @@ class WebLinkbackUpdaterTest(unittest.TestCase):
             self.assertEqual(5, url_titles[3][4])
             self.assertEqual(1, url_titles[3][5])
 
-            reject_linkback(1, self.user_info)
-            reject_linkback(3, self.user_info)
+            reject_linkback(1 + self._max_id_lnkENTRY, self.user_info)
+            reject_linkback(3 + self._max_id_lnkENTRY, self.user_info)
 
             update_linkbacks(4)
             url_titles = self.get_all_from_table("lnkENTRYURLTITLE")
