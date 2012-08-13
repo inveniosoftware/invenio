@@ -145,7 +145,7 @@ int intBitSetGetTot(IntBitSet *const bitset) {
 #ifdef __GNUC__
                 // See:
                 // <http://stackoverflow.com/questions/109023/best-algorithm-to-count-the-number-of-set-bits-in-a-32-bit-integer>
-                tot += __builtin_popcountl(*base);
+                tot += __builtin_popcountll(*base);
 #else
                 for (i=0; i<wordbitsize; ++i)
                     if ((*base & ((word_t) 1 << i)) != 0) {
