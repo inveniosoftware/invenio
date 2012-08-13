@@ -246,9 +246,6 @@ def get_pretty_traceback(req=None, exc_info=None):
                 print >> tracestack_data_stream, "-" * 79
                 for line in xrange(first_line, last_line+1):
                     code_line = code[line-1].rstrip()
-                    for value in values_to_hide:
-                        ## Let's hide passwords
-                        code_line = code_line.replace(value, '<*****>')
                     if line == frame.f_lineno:
                         print >> tracestack_data_stream, \
                             "----> %4i %s" % (line, code_line)
@@ -268,9 +265,6 @@ def get_pretty_traceback(req=None, exc_info=None):
                     ## variable that was not fully initialized as the
                     ## exception was raised during its __init__ call).
                     value = "ERROR: when representing the value: %s" % (err)
-                for to_hide in values_to_hide:
-                    ## Let's hide passwords
-                    value = value.replace(to_hide, '<*****>')
                 try:
                     print >> tracestack_data_stream, \
                         _truncate_dynamic_string(value)
@@ -278,6 +272,9 @@ def get_pretty_traceback(req=None, exc_info=None):
                     print >> tracestack_data_stream, \
                         "<ERROR WHILE PRINTING VALUE>"
         tracestack_data = tracestack_data_stream.getvalue()
+        for to_hide in values_to_hide:
+            ## Let's hide passwords
+            tracestack_data = tracestack_data.replace(to_hide, '<*****>')
 
         ## Okay, start printing:
         output = StringIO()
