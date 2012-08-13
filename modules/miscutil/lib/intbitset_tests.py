@@ -71,7 +71,10 @@ class IntBitSetTest(unittest.TestCase):
             [23, 45, 67, 89, 110, 130, 174, 1002, 2132, 23434],
             [700, 2000],
             range(1000, 1100),
-        ] + [[i] for i in range(1000, 1100)]
+            [30], [31], [32], [33],
+            [62], [63], [64], [65],
+            [126], [127], [128], [129]
+        ]
         self.fncs_list = [
             (intbitset.__and__, set.__and__, int.__and__, False),
             (intbitset.__or__, set.__or__, int.__or__, False),
