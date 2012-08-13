@@ -104,7 +104,7 @@ function holdingPenPanelSetChanges(data){
    */
   if (data.recID == gRecID || data.recID == gRecIDLoading) {
     holdingPenPanelRemoveEntries();
-    for (var i = 0; i < data['changes'].length; i++) {
+    for (var i = 0, n=data['changes'].length; i < n; i++) {
       holdingPenPanelAddEntry(data['changes'][i]);
     }
   }
@@ -898,7 +898,7 @@ function addGeneralControls(){
     */
   if ($("#bibeditHoldingPenGC").length == 0){
     panel = createGeneralControlsPanel();
-    $("#bibEditContent").prepend(panel);
+    $("#bibEditContentTable").prepend(panel);
   }
 }
 

@@ -30,6 +30,7 @@ from invenio import bibrecord
 from invenio import bibformat
 
 from invenio.jsonutils import json, CFG_JSON_AVAILABLE
+from invenio.urlutils import auto_version_url
 from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL, CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL, \
     CFG_BIBEDIT_JS_CLONED_RECORD_COLOR, \
@@ -44,7 +45,7 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_TAG_FORMAT, CFG_BIBEDIT_AJAX_RESULT_CODES_REV, \
     CFG_BIBEDIT_AUTOSUGGEST_TAGS, CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS,\
     CFG_BIBEDIT_KEYWORD_TAXONOMY, CFG_BIBEDIT_KEYWORD_TAG, \
-    CFG_BIBEDIT_KEYWORD_RDFLABEL
+    CFG_BIBEDIT_KEYWORD_RDFLABEL, CFG_BIBEDIT_MSG
 
 from invenio.config import CFG_SITE_LANG, CFG_DEVEL_SITE
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
@@ -62,7 +63,8 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     revision_to_timestamp, timestamp_to_revision, \
     get_record_revision_timestamps, record_revision_exists, \
     can_record_have_physical_copies, extend_record_with_template, \
-    merge_record_with_template
+    merge_record_with_template, record_xml_output, \
+    user_can_edit_record_collection
 
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
@@ -70,7 +72,8 @@ from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_modify_subfield, record_move_subfield, \
     create_field, record_replace_field, record_move_fields, \
     record_modify_controlfield, record_get_field_values, \
-    record_get_subfields
+    record_get_subfields, record_get_field_instances, record_add_fields, \
+    record_strip_empty_fields, record_strip_empty_volatile_subfields
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL, CFG_SITE_RECORD, CFG_BIBEDIT_KB_SUBJECTS, \
     CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS
@@ -83,8 +86,12 @@ from invenio.textutils import wash_for_xml
 from invenio.bibknowledge import get_kbd_values_for_bibedit, get_kbr_values, \
      get_kbt_items_for_bibedit, kb_exists
 
+from invenio.batchuploader_engine import perform_upload_check
+
 from invenio.bibcirculation_dblayer import get_number_copies, has_copies
 from invenio.bibcirculation_utils import create_item_details_url
+
+from invenio.bibdocfile import BibRecDocs, InvenioWebSubmitFileError
 
 import invenio.template
 bibedit_templates = invenio.template.load('bibedit')
@@ -231,8 +238,8 @@ def perform_request_init(uid, ln, req, lastupdated):
                'bibedit_clipboard.js','jquery-ui.min.js']
 
     for script in scripts:
-        body += '    <script type="text/javascript" src="%s/js/%s">' \
-            '</script>\n' % (CFG_SITE_URL, script)
+        body += '    <script type="text/javascript" src="%s/%s">' \
+            '</script>\n' % (CFG_SITE_URL, auto_version_url("js/" + script))
 
     body += '<link rel="stylesheet" type="text/css" href="/img/jquery-ui.css" />'
 
@@ -241,7 +248,12 @@ def perform_request_init(uid, ln, req, lastupdated):
     #oaiId = record_extract_oai_id(rec)
 
     body += bibedit_templates.menu()
-    body += '    <div id="bibEditContent"></div>\n'
+    body += """<div id="bibEditContent">
+               <div class="revisionLine"></div>
+               <div id="Toptoolbar"></div>
+               <div id="bibEditMessage"></div>
+               <div id="bibEditContentTable"></div>
+               </div>"""
 
     return body, errors, warnings
 
@@ -354,7 +366,7 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False, \
         response.update(perform_request_update_record(request_type, recid, \
                                                       uid, cacheMTime, data, \
                                                       hpChanges, undo_redo, \
-                                                      isBulk, ln))
+                                                      isBulk))
     elif request_type in ('autosuggest', 'autocomplete', 'autokeyword'):
         response.update(perform_request_autocomplete(request_type, recid, uid, \
                                                      data))
@@ -377,7 +389,11 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False, \
         response.update(perform_bulk_request_ajax(req, recid, uid, changes, \
                                                   undo_redo, cacheMTime))
     elif request_type in ('preview', ):
-        response.update(perform_request_preview_record(request_type, recid, uid))
+        response.update(perform_request_preview_record(request_type, recid, uid, data))
+    elif request_type in ('get_pdf_url', ):
+        response.update(perform_request_get_pdf_url(recid))
+    elif request_type in ('record_has_pdf', ):
+        response.update(perform_request_record_has_pdf(recid, uid))
 
     return response
 
@@ -619,7 +635,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             if template_to_merge:
                 record = merge_record_with_template(record, template_to_merge)
                 create_cache_file(recid, uid, record, True)
-                
+
             response['cacheDirty'], response['record'], \
                 response['cacheMTime'], response['recordRevision'], \
                 response['revisionAuthor'], response['lastRevision'], \
@@ -672,7 +688,15 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
 
                 xml_record = wash_for_xml(print_rec(record))
                 record, status_code, list_of_errors = create_record(xml_record)
-                if status_code == 0:
+
+                # Simulate upload to catch errors
+                errors_upload = perform_upload_check(xml_record, '--replace')
+                if not user_can_edit_record_collection(req, recid):
+                    errors_upload += CFG_BIBEDIT_MSG["not_authorised"]
+                if errors_upload:
+                    response['resultCode'], response['errors'] = 113, \
+                        errors_upload
+                elif status_code == 0:
                     response['resultCode'], response['errors'] = 110, \
                         list_of_errors
                 elif not data['force'] and \
@@ -759,9 +783,10 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
     elif request_type == 'deleteRecordCache':
         # Delete the cache file. Ignore the request if the cache has been
         # modified in another editor.
-        if cache_exists(recid, uid) and get_cache_mtime(recid, uid) == \
+        if data.has_key('cacheMTime'):
+            if cache_exists(recid, uid) and get_cache_mtime(recid, uid) == \
                 data['cacheMTime']:
-            delete_cache_file(recid, uid)
+                delete_cache_file(recid, uid)
         response['resultCode'] = 11
 
     elif request_type == 'prepareRecordMerge':
@@ -787,8 +812,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
     return response
 
 def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
-                                  hpChanges, undoRedoOp, isBulk=False, \
-                                  ln=CFG_SITE_LANG):
+                                  hpChanges, undoRedoOp, isBulk=False):
     """
     Handle record update requests like adding, modifying, moving or deleting
     of fields or subfields. Possible common error situations::
@@ -1176,7 +1200,7 @@ def perform_request_bibcatalog(request_type, recid, uid):
         response['resultCode'] = 31
     return response
 
-def perform_request_preview_record(request_type, recid, uid):
+def perform_request_preview_record(request_type, recid, uid, data):
     """ Handle request to preview record with formatting
 
     """
@@ -1187,31 +1211,87 @@ def perform_request_preview_record(request_type, recid, uid):
             dummy1, dummy2, record, dummy3, dummy4, dummy5, dummy6 = get_cache_file_contents(recid, uid)
         else:
             record = get_bibrecord(recid)
-    response['html_preview'] = _get_formated_record(record)
+
+    # clean the record from unfilled volatile fields
+    record_strip_empty_volatile_subfields(record)
+    record_strip_empty_fields(record)
+    response['html_preview'] = _get_formated_record(record, data['new_window'])
+
+    # clean the record from unfilled volatile fields
+    record_strip_empty_volatile_subfields(record)
+    record_strip_empty_fields(record)
+    response['html_preview'] = _get_formated_record(record, data['new_window'])
 
     return response
 
-def _get_formated_record(record):
+
+def perform_request_get_pdf_url(recid):
+    """ Handle request to get the URL of the attached PDF
+    """
+    response = {}
+    rec_info = BibRecDocs(recid)
+    docs = rec_info.list_bibdocs()
+    try:
+        doc = docs[0]
+        response['pdf_url'] = doc.get_file('pdf').get_url()
+    except (IndexError, InvenioWebSubmitFileError):
+        # FIXME, return here some information about error.
+        # We could allow the user to specify a URl and add the FFT tags automatically
+        response['pdf_url'] = ''
+    return response
+
+
+def perform_request_record_has_pdf(recid, uid):
+    """ Check if record has a pdf attached
+    """
+    rec_info = BibRecDocs(recid)
+    docs = rec_info.list_bibdocs()
+    return {'record_has_pdf': bool(docs)}
+
+
+def _get_formated_record(record, new_window):
     """Returns a record in a given format
 
     @param record: BibRecord object
+    @param new_window: Boolean, indicates if it is needed to add all the headers
+    to the page (used when clicking Preview button)
     """
+    from invenio.config import CFG_WEBSTYLE_TEMPLATE_SKIN
 
-    xml_record = bibrecord.record_xml_output(record)
+    xml_record = wash_for_xml(bibrecord.record_xml_output(record))
 
-    result =  "<html><head><title>Record preview</title></head>"
-    result += get_mathjax_header(True)
-    result += "<body><h2> Brief format preview </h2>"
+    result = ''
+    if new_window:
+        result =  """ <html><head><title>Record preview</title>
+                      <script type="text/javascript" src="https://inspireheptest.cern.ch/js/jquery.min.js"></script>
+                      <link rel="stylesheet" href="%(cssurl)s/img/invenio%(cssskin)s.css" type="text/css"></head>
+                   """%{'cssurl': CFG_SITE_URL,
+                         'cssskin': CFG_WEBSTYLE_TEMPLATE_SKIN != 'default' and '_' + CFG_WEBSTYLE_TEMPLATE_SKIN or ''
+                        }
+        result += get_mathjax_header(True) + '<body>'
+        result += "<h2> Brief format preview </h2><br />"
+        result += bibformat.format_record(recID=None,
+                                         of="hb",
+                                         xml_record=xml_record) + "<br />"
+
+    result += "<br /><h2> Detailed format preview </h2><br />"
     result += bibformat.format_record(recID=None,
-                                     of="hb",
-                                     xml_record=xml_record)
-    result += "<h2> Detailed format preview </h2>"
+                                      of="hd",
+                                      xml_record=xml_record)
+    #Preview references
+    result += "<br /><h2> References </h2><br />"
 
-    result += bibformat.format_record(recID=None,
-                                     of="hd",
-                                     xml_record=xml_record)
+    result += bibformat.format_record(0,
+                                    'hdref',
+                                    xml_record=xml_record)
 
-    result += "</body></html>"
+    result += """<script>
+                    $('#referenceinp_link').hide();
+                    $('#referenceinp_link_span').hide();
+                </script>
+              """
+    if new_window:
+        result += "</body></html>"
 
 
     return result

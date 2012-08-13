@@ -65,7 +65,7 @@ function displayRecord(){
   }
   // Close and display table.
   table += '</table>';
-  $('#bibEditContent').append(table);
+  $('#bibEditContentTable').append(table);
   // now displaying the remaining controls
   for (changeNr in gHoldingPenChanges){
       addChangeControl(changeNr, false);
@@ -137,8 +137,8 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
   var autosuggest = false;
   var autocomplete = false;
   var autokeyword = false;
-  for (var i=0;i<gAUTOSUGGEST_TAGS.length;i++) { if (MARC == gAUTOSUGGEST_TAGS[i]) { autosuggest = true; }}
-  for (var i=0;i<gAUTOCOMPLETE_TAGS.length;i++) { if (MARC == gAUTOCOMPLETE_TAGS[i]) { autocomplete = true; }}
+  for (var i=0, n=gAUTOSUGGEST_TAGS.length; i<n; i++) { if (MARC == gAUTOSUGGEST_TAGS[i]) { autosuggest = true; }}
+  for (var i=0, n=gAUTOCOMPLETE_TAGS.length; i<n; i++) { if (MARC == gAUTOCOMPLETE_TAGS[i]) { autocomplete = true; }}
   if (MARC == gKEYWORD_TAG) { autokeyword = true; }
   if (!protectedField){
     // Enable features for unprotected fields.
@@ -188,8 +188,8 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
   cellContentTitle + cellContentOnClick + 'tabindex="0">' + subfieldTagToPrint +
       '</td>' +
       '<td id="content_' + subfieldID + '" class="' + cellContentClass + cellContentAdditionalClass +  '" ' +
-	cellContentTitle + autosuggestkeypress + cellContentOnClick + 'tabindex="0">' +
-	subfieldValue +
+      cellContentTitle + autosuggestkeypress + cellContentOnClick + 'tabindex="0">' +
+      subfieldValue +
       '</td>' +
       '<td class="bibEditCellAddSubfields">' + btnAddSubfield + '</td>' +
       '</tr>';
@@ -399,7 +399,7 @@ function addFieldAddedControl(changeNo){
       applyButton + rejectButton +
       "</div></div>";
 
-  $('#bibEditContent').append(content);
+  $('#bibEditContentTable').append(content);
 }
 
 function removeAllChangeControls(){
@@ -571,7 +571,7 @@ function createHoldingPenPanelEntry(changesetNumber, changesetDatetime){
   //informationsSection = "<div class=\"bibeditHPInformationsSection\">" + numberSection + previewSection + datetimeSection  + "</div>";
 
   //return "<div class=\"bibeditHPPanelEntry\" id=\"bibeditHoldingPenPanelEntry_" +
-  //	changesetNumber	 + "\">" + informationsSection + manipulationControlsSection + "</div>";
+  //   changesetNumber  + "\">" + informationsSection + manipulationControlsSection + "</div>";
 }
 
 function createGeneralControlsPanel(){
@@ -584,21 +584,37 @@ function createGeneralControlsPanel(){
   return result;
 }
 
+/// end of the Holding Pen Connected functions
+
 function createTopToolbar(){
   /* Generate BibEdit top toolbar */
 
-  $('.headline_div').after('<div class="revisionLine"></div>');
-  // When Special modes are available there will be a loop through all of
-  // them and the appropriate icons will be added
-  
-  var toolbar_html = "<div id='topToolbarRight'><img id='img_preview' class='bibEditImgCtrlDisabled' src='/img/document-preview.png' ";
-  toolbar_html += "width='40px' height='40px' title='Preview record' /></div>";
-  toolbar_html += "<div id='top_toolbar_hr'><hr></div>"
+  $('.headline_div').remove();
 
-  $('.headline_div').html(toolbar_html);
+  var icon_doc_preview = "<img id='img_preview' class='bibEditImgCtrlDisabled' \n\
+                          src='/img/document-preview.png' width='40px' \n\
+                          height='40px' title='Preview record' />";
+  var icon_open_pdf = "<img id='img_open_pdf' class='bibEditImgCtrlDisabled' \n\
+                          src='/img/application_pdf.png' width='40px' \n\
+                          height='40px' title='Open PDF file' />";
+  var icon_print = "<img id='img_print' class='bibEditImgCtrlDisabled' \n\
+                          src='/img/document-print.png' width='40px' \n\
+                          height='40px' title='Print page' />";
+
+  var toolbar_html = "<div class='floatRight'>" + icon_doc_preview + "</div>" +
+                     "<div class='floatRight'>" + icon_open_pdf + "</div>" +
+                     "<div class='floatRight'>" + icon_print + "</div>";
+  $('#Toptoolbar').html(toolbar_html);
+
   $('#img_preview').bind('click', onPreviewClick);
+  $('#img_open_pdf').bind('click', onOpenPDFClick);
+  $('#img_print').bind('click', onPrintClick);
 
   $('#img_preview').unbind('click').removeClass(
+    'bibEditImgCtrlEnabled').addClass('bibEditImgCtrlDisabled');
+  $('#img_open_pdf').unbind('click').removeClass(
+    'bibEditImgCtrlEnabled').addClass('bibEditImgCtrlDisabled');
+  $('#img_print').unbind('click').removeClass(
     'bibEditImgCtrlEnabled').addClass('bibEditImgCtrlDisabled');
 }
 
@@ -606,18 +622,27 @@ function updateToolbar(enable) {
     if (enable === true) {
         $('#img_preview').bind('click', onPreviewClick).removeClass(
         'bibEditImgCtrlDisabled').addClass('bibEditImgCtrlEnabled');
+        $('#img_print').unbind('click', onPrintClick).bind('click', onPrintClick).removeClass(
+        'bibEditImgCtrlDisabled').addClass('bibEditImgCtrlEnabled');
+        if (record_has_pdf()) {
+          $('#img_open_pdf').unbind('click', onOpenPDFClick).bind('click', onOpenPDFClick).removeClass(
+          'bibEditImgCtrlDisabled').addClass('bibEditImgCtrlEnabled');
+        }
         $('.revisionLine').show();
     }
     else {
         $('#img_preview').unbind('click', onPreviewClick).removeClass(
         'bibEditImgCtrlEnabled').addClass('bibEditImgCtrlDisabled');
+        $('#img_open_pdf').unbind('click', onOpenPDFClick).removeClass(
+        'bibEditImgCtrlEnabled').addClass('bibEditImgCtrlDisabled');
+        $('#img_print').unbind('click', onPrintClick).removeClass(
+        'bibEditImgCtrlEnabled').addClass('bibEditImgCtrlDisabled');
         $('.revisionLine').hide();
+        $('#bibEditMessage').hide();
     }
 }
 
-/// end of the Holding Pen Connected functions
-
-function createAddFieldForm(fieldTmpNo, fieldTemplateNo){
+function createAddFieldForm(fieldTmpNo, fieldTemplateNo, def_field_tag, def_ind1, def_ind2){
   /*
    * Create an 'Add field' form.
    * fieldTmpNo - temporary field number
@@ -632,22 +657,22 @@ function createAddFieldForm(fieldTmpNo, fieldTemplateNo){
   return '' +
     '<tbody id="rowGroupAddField_' + fieldTmpNo + '">' +
       '<tr>' +
-	'<td></td>' +
-	'<td><b>New</b></td>' +
-	'<td></td>' +
-	'<td></td>' +
-	'<td><div class="bibEditAddFieldManipulationsBar"><div class="bibEditAddFieldFormSelectTemplate">Add field: ' +
+    '<td></td>' +
+    '<td><b>New</b></td>' +
+    '<td></td>' +
+    '<td></td>' +
+    '<td><div class="bibEditAddFieldManipulationsBar"><div class="bibEditAddFieldFormSelectTemplate">Add field: ' +
     select('selectAddFieldTemplate_' + fieldTmpNo, fieldTemplatesData, fieldTemplateNo) +
     '</div><div class="bibEditAddFieldFormCreateSimilar"> Add ' +
       input('text', 'selectAddFieldTemplateTimes_' + fieldTmpNo, "addFieldAddSimilarInput", {"maxlength" : 4, "size": 1}) +
-	button('similar', 'selectAddSimilarFields_' + fieldTmpNo, "", {}) +
+    button('similar', 'selectAddSimilarFields_' + fieldTmpNo, "", {}) +
         '</div></div></td>' +
-	'<td>' +
+    '<td>' +
         img('/img/add.png', 'btnAddFieldAddSubfield_' + fieldTmpNo, '', {
-	    title: 'Add subfield'}) +
-	'</td>' +
+        title: 'Add subfield'}) +
+    '</td>' +
       '</tr>' +
-      createAddFieldRow(fieldTmpNo, 0) +
+      createAddFieldRow(fieldTmpNo, 0, "", "", def_field_tag, def_ind1, def_ind2) +
       // adding a row used to insert at the end without repositioning the tag and indicators
       '<tr>' +
       '<td></td>' +
@@ -661,7 +686,7 @@ function createAddFieldForm(fieldTmpNo, fieldTemplateNo){
     '</tbody>';
 }
 
-function createAddFieldRow(fieldTmpNo, subfieldTmpNo, defaultCode, defaultValue){
+function createAddFieldRow(fieldTmpNo, subfieldTmpNo, defaultCode, defaultValue, def_field_tag, def_ind1, def_ind2){
   /*
    * Create a row in the 'Add field' form.
    * optional parameters:
@@ -688,11 +713,11 @@ function createAddFieldRow(fieldTmpNo, subfieldTmpNo, defaultCode, defaultValue)
     btnAddFieldRemove = '';
   if (subfieldTmpNo == 0){
     txtAddFieldTag = input('text', 'txtAddFieldTag_' + fieldTmpNo,
-            'bibEditTxtTag', {maxlength: 3});
+            'bibEditTxtTag', {maxlength: 3}, def_field_tag);
     txtAddFieldInd1 = input('text', 'txtAddFieldInd1_' + fieldTmpNo,
-          'bibEditTxtInd', {maxlength: 1});
+          'bibEditTxtInd', {maxlength: 1}, def_ind1);
     txtAddFieldInd2 = input('text', 'txtAddFieldInd2_' + fieldTmpNo,
-          'bibEditTxtInd', {maxlength: 1});
+          'bibEditTxtInd', {maxlength: 1}, def_ind2);
   }
   else
     btnAddFieldRemove = img('/img/delete.png', 'btnAddFieldRemove_' +
@@ -705,12 +730,12 @@ function createAddFieldRow(fieldTmpNo, subfieldTmpNo, defaultCode, defaultValue)
       '</td>' +
       '<td></td>' +
       '<td class="bibEditCellAddSubfieldCode">' +
-	input('text', 'txtAddFieldSubfieldCode_' + fieldTmpNo + '_' +
-	      subfieldTmpNo, 'bibEditTxtSubfieldCode', {maxlength: 1, value: fieldCode}) +
+    input('text', 'txtAddFieldSubfieldCode_' + fieldTmpNo + '_' +
+          subfieldTmpNo, 'bibEditTxtSubfieldCode', {maxlength: 1, value: fieldCode}) +
       '</td>' +
       '<td>' +
-	input('text', 'txtAddFieldValue_' + fieldTmpNo + '_' +
-	      subfieldTmpNo, 'bibEditTxtValue' + additionalClass, {value : fieldValue}) +
+    input('text', 'txtAddFieldValue_' + fieldTmpNo + '_' +
+          subfieldTmpNo, 'bibEditTxtValue' + additionalClass, {value : fieldValue}) +
       '</td>' +
       '<td>' + btnAddFieldRemove + '</td>' +
     '</tr>';
@@ -746,8 +771,8 @@ function createAddSubfieldsRow(fieldID, subfieldTmpNo, defSubCode, defValue){
       '<td></td>' +
       '<td></td>' +
       '<td class="bibEditCellAddSubfieldCode">' +
-	input('text', 'txtAddSubfieldsCode_' + subfieldID,
-	      'bibEditTxtSubfieldCode', {maxlength: 1},  defSubCode) +
+    input('text', 'txtAddSubfieldsCode_' + subfieldID,
+          'bibEditTxtSubfieldCode', {maxlength: 1},  defSubCode) +
       '</td>' +
       '<td>' +
       input('text', 'txtAddSubfieldsValue_' + subfieldID, 'bibEditTxtValue', {}, defValue) +
@@ -773,9 +798,9 @@ function displayMessage(msgCode, keepContent, args){
       break;
     case 4:
       msg = 'Your modifications have now been submitted. ' +
-  'They will be processed as soon as the task queue is empty.';
+  'They will be processed as soon as the task queue is empty. <br />';
       break;
-    case 6:
+    case 10:
       msg = 'The record will be deleted as soon as the task queue is empty.';
       break;
     case 101:
@@ -823,13 +848,18 @@ function displayMessage(msgCode, keepContent, args){
     case 111:
       msg = 'Internal error. Cache file format is incorrect. Try to open the record again';
       break;
+    case 113:
+      msg = 'An error ocurred during the upload simulation: <br /><br />' + args[0] + '<br />';
+      break;
     default:
       msg = 'Result code: <b>' + msgCode + '</b>';
   }
-  if (!keepContent)
-    $('#bibEditContent').html('<div id="bibEditMessage">' + msg + '</div>');
-  else
-    $('#bibEditContent').prepend('<div id="bibEditMessage">' + msg + '</div>');
+  if (!keepContent) {
+    $('#bibEditContentTable').html('<div id="warningMsg" class="warningMsg">' + msg + '</div>');
+  }
+  else {
+    $('#bibEditMessage').html('<div id="warningMsg" class="warningMsg">' + msg + '</div>').slideDown('slow');
+  }
 }
 
 function displayNewRecordScreen(){
@@ -855,7 +885,7 @@ function displayNewRecordScreen(){
   '<td>' + gRECORD_TEMPLATES[i][2] + '</td></tr>';
   }
   msg += '</table></li>';
-  $('#bibEditContent').html(msg);
+  $('#bibEditContentTable').html(msg);
 }
 
 function displayCacheOutdatedScreen(requestType){
@@ -864,13 +894,13 @@ function displayCacheOutdatedScreen(requestType){
    * during editing). Options differ depending on wether the situation was
    * discovered when fetching or when submitting the record.
    */
-  $('#bibEditMessage').remove();
+  $('#bibEditMessage').html('');
   var recordURL = gSITE_URL + '/'+ gSITE_RECORD +'/' + gRecID + '/';
   var viewMARCURL = recordURL + '?of=hm';
   var viewMARCXMLURL = recordURL + '?of=xm';
   var msg = '';
   if (requestType == 'submit')
-    msg = 'Someone has changed this record while you were editing. ' +
+    msg = '<div id="warningMsg" class="warningMsg">Someone has changed this record while you were editing. ' +
       'You can:<br /><ul>' +
       '<li>View (<b><a href="' + recordURL + '" target="_blank">HTML</a></b>,' +
       ' <b><a href="' + viewMARCURL + '" target="_blank">MARC</a></b>,' +
@@ -880,11 +910,11 @@ function displayCacheOutdatedScreen(requestType){
     'with the latest version by using the merge interface</li>' +
     '<li><a href="#" id="lnkForceSubmit"><b>Force your changes</b></a> ' +
     '(<b>Warning: </b>overwrites the latest version)</li>' +
-    '<li><a href="#" id="lnkDiscardChanges><b>Discard your changes</b></a> ' +
+    '<li><a href="#" id="lnkDiscardChanges"><b>Discard your changes</b></a> ' +
     '(keep the latest version)</li>' +
-    '</ul>';
+    '</ul></div>';
   else if (requestType == 'getRecord')
-    msg = 'You have unsubmitted changes to this record, but someone has ' +
+    msg = '<div id="warningMsg" class="warningMsg">You have unsubmitted changes to this record, but someone has ' +
       'changed the record while you were editing. You can:<br /><ul>' +
       '<li>View (<b><a href="' + recordURL + '" target="_blank">HTML</a></b>,' +
       ' <b><a href="' + viewMARCURL + '" target="_blank">MARC</a></b>,' +
@@ -897,8 +927,8 @@ function displayCacheOutdatedScreen(requestType){
       '<li>Keep editing. When submitting you will be offered to overwrite ' +
       'the latest version. Click <a href="#" id="lnkRemoveMsg">here' +
       '</a> to remove this message.</li>' +
-      '</ul>';
-  $('#bibEditContent').prepend('<div id="bibEditMessage">' + msg + '</div>');
+      '</ul></div>';
+  $('#bibEditMessage').html(msg).slideDown("slow");
 }
 
 function displayAlert(msgType, args){
@@ -1114,7 +1144,6 @@ function escapeHTML(value){
   return value;
 }
 
-
 /*
  * **************************** Functions related to Template interface ****************************************
  */
@@ -1141,4 +1170,74 @@ function createTemplateList(){
   }
   msg += '</table></li>';
   $('#bibEditTemplateList').html(msg);
+}
+
+/*
+ * **************************** Functions related to jquery UI dialog ****************************************
+ */
+
+function createDialog(title, LoadingText, height, width){
+  /* Creates a jQuery UI dialog
+   *
+   * title: string, title displayed on top of the dialog
+   * LoadingText: string, text displayed above the loading bar
+   * heigth: int, height of the dialog
+   * width: int, width of the dialog
+   *
+   */
+  var dialog = {
+        dialogDiv : $( '<div>' ),
+        contentParagraph : $('<p>'),
+        contentSpan : $('<span>'),
+        iconSpan : $('<span>')
+  };
+  var dialogDiv = dialog.dialogDiv;
+  var contentParagraph = dialog.contentParagraph;
+  var contentSpan = dialog.contentSpan;
+  var iconSpan = dialog.iconSpan;
+  contentParagraph.addClass('dialog-box-centered');
+  contentSpan.html(LoadingText + "<br /><br /> <img src='/img/ajax-loader.gif'>");
+  dialogDiv.append(contentParagraph.append(contentSpan));
+  dialogDiv.appendTo( $( 'body' ) );
+  dialogDiv.dialog({
+       title: title,
+       resizable: false,
+       height: height,
+       width: width
+  });
+
+  return dialog;
+}
+
+function addContentToDialog(dialog, html_content, alertText){
+  /* Modify internal content of a jQuery UI dialog
+   *
+   * dialog: object containing different parts of the dialog (see createDialog())
+   * html_content: string, main text of the dialog
+   * alertText: string, text besides the alert icon
+   *
+   */
+  dialog.iconSpan.addClass('ui-icon').addClass('ui-icon-alert').addClass('dialog-icon');
+  dialog.contentParagraph.before(dialog.iconSpan);
+  dialog.contentParagraph.removeClass('dialog-box-centered');
+  dialog.contentSpan.html("<strong>" + alertText + "</strong>\n\
+                    <br /><br />" + html_content);
+}
+
+/*
+ * **************************************************************************************
+ */
+
+function openCenteredPopup(pageURL, title, w, h) {
+  /* Opens a centered popup */
+  var targetWindow;
+  if (w === undefined || h === undefined) {
+    targetWindow = window.open(pageURL, title,'resizeable,scrollbars');
+  }
+  else {
+    var left = (screen.width/2)-(w/2);
+    var top = (screen.height/2)-(h/2);
+    targetWindow = window.open(pageURL, title, 'width=' + w + ',height=' + h + ',top='+ top +',left=' + left + ',resizeable,scrollbars');
+  }
+  return targetWindow;
 }

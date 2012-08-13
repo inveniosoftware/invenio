@@ -66,10 +66,12 @@ bibdocfile command line tool.</p>
 	(in search results).</td> </tr>
     <tr> <td>Ctrl+Left</td> <td>Previous</td> <td>Go to previous record
 	(in search results).</td> </tr>
+    <tr> <td>Shift+n</td> <td>New record</td> <td>Opens the new record dialog.
+    </td> </tr>
     <tr> <td>Shift+s</td> <td>Submit</td> <td>Submit the record.</td> </tr>
     <tr> <td>Shift+c</td> <td>Cancel</td> <td>Cancel editing of the
 	record.</td> </tr>
-    <tr> <td>Shift+d</td> <td>Delete</td> <td>Delete the record.</td> </tr>
+    <tr> <td>Shift+l</td> <td>Clone</td> <td>Clone the record.</td> </tr>
     <tr> <td>Shift+t</td> <td>Tags</td> <td>Toggle MARC/human tags.</td> </tr>
     <tr> <td>a</td> <td>Add field</td> <td>Add a new, empty field.</td> </tr>
     <tr> <td>Del</td> <td>Delete selected</td> <td>Deletes all selected
@@ -83,20 +85,14 @@ bibdocfile command line tool.</p>
     <tr> <th>Shortcut</th> <th>Definition</th> <th>Action</th> </tr>
   </thead>
   <tbody>
+    <tr> <td>Esc</td> <td>Cancel</td> <td>Cancel edition of subfield</td> </tr>
     <tr> <td>Tab</td> <td>Next</td> <td>Move focus to next subfield.</td> </tr>
     <tr> <td>Shift+Tab</td> <td>Previous</td> <td>Move focus to previous
 	subfield.</td> </tr>
     <tr> <td>Return</td> <td>Edit</td> <td>Edit focused subfield.</td> </tr>
-    <tr> <td>Space</td> <td>Select</td> <td>Select focused subfield.</td> </tr>
-    <tr> <td>Shift+Space</td> <td>Select field</td> <td>Select parent field of
-	focused subfield.</td> </tr>
     <tr> <td>Ctrl+Up</td> <td>Move up</td> <td>Move focused subfield up.</td> </tr>
     <tr> <td>Ctrl+Down</td> <td>Move down</td> <td>Move focused subfield
 	down.</td> </tr>
-    <tr> <td>Ctrl+Shift+e</td> <td>Add subfield</td> <td>Add an additional
-	subfield at the end.</td> </tr>
-    <tr> <td>Ctrl+Shift+d</td> <td>Remove subfield</td> <td>Remove a subfield
-	from the end.</td> </tr>
   </tbody>
 </table>
 
@@ -106,12 +102,6 @@ bibdocfile command line tool.</p>
     <tr> <th>Shortcut</th> <th>Definition</th> <th>Action</th> </tr>
   </thead>
   <tbody>
-    <tr> <td>Ctrl+Shift+s</td> <td>Save</td> <td>Save content of
-	field/form.</td> </tr>
-    <tr> <td>Ctrl+Shift+s</td> <td>Cancel</td> <td>Cancel editing of
-	field/form.</td> </tr>
-    <tr> <td>Ctrl+Shift+s</td> <td>Clear</td> <td>Clear content of
-	field/form.</td> </tr>
     <tr> <td>Ctrl+Shift+e</td> <td>Add subfield</td> <td>Add an additional
 	subfield at the end.</td> </tr>
     <tr> <td>Ctrl+Shift+d</td> <td>Remove subfield</td> <td>Remove a subfield
@@ -125,7 +115,9 @@ bibdocfile command line tool.</p>
     <tr> <th>Shortcut</th> <th>Definition</th> <th>Action</th> </tr>
   </thead>
   <tbody>
-    <tr> <td>s</td> <td>Selection mode</td> <td>Toggle selection mode.</td> </tr>
+    <tr> <td>alt+s</td> <td>Selection mode</td> <td>Toggle selection mode.</td> </tr>
+    <tr> <td>Ctrl+Shift+z</td> <td>Undo</td> <td>Undo last action.</td> </tr>
+    <tr> <td>Ctrl+Shift+y</td> <td>Redo</td> <td>Redo last action.</td> </tr>
   </tbody>
 </table>
 
