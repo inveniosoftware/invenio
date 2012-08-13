@@ -3977,6 +3977,22 @@ class HeadRequest(urllib2.Request):
     def get_method(self):
         return 'HEAD'
 
+
+def read_cookie(cookiefile):
+    """
+    Parses a cookie file and returns a string as needed for the urllib2 headers
+    The file should respect the Netscape cookie specifications
+    """
+    cookie_data = ''
+    cfile = open(cookiefile, 'r')
+    for line in cfile.readlines():
+        tokens = line.split('\t')
+        if len(tokens) == 7: # we are on a cookie line
+            cookie_data += '%s=%s; ' % (tokens[5], tokens[6].replace('\n', ''))
+    cfile.close()
+    return cookie_data
+
+
 def open_url(url, headers=None, head_request=False):
     """
     Opens a URL. If headers are passed as argument, no check is performed and
@@ -4012,6 +4028,10 @@ def open_url(url, headers=None, head_request=False):
     request = request_obj(url)
     request.add_header('User-Agent', make_user_agent_string('bibdocfile'))
     for key, value in headers_to_use.items():
+        try:
+            value = globals()[value['fnc']](**value['args'])
+        except (KeyError, TypeError):
+            pass
         request.add_header(key, value)
 
     return urllib2.urlopen(request)
