@@ -281,6 +281,22 @@ class Collection(db.Model):
                     Field.name.in_(CFG_WEBSEARCH_SEARCH_WITHIN)).all()]))
         return default
 
+    # Gets the list of localized names as an array
+    collection_names = db.relationship(
+            lambda : Collectionname,
+            primaryjoin= lambda: Collection.id==Collectionname.id_collection,
+            foreign_keys=lambda: Collectionname.id_collection
+            )
+
+    # Gets the translation according to the lang code
+    def translation(self, lang):
+        try:
+            return db.object_session(self).query(Collectionname).\
+                with_parent(self).filter(db.and_(Collectionname.ln==lang,
+                    Collectionname.type=='ln')).first().value
+        except:
+            return "" 
+
 
     #@db.hybrid_property
     #def externalcollections(self):
@@ -308,6 +324,12 @@ class Collectionname(db.Model):
                 server_default='sn')
     value = db.Column(db.String(255), nullable=False)
 
+    def __init__(self, collection, ln, type, value):
+        self.id_collection = collection.id
+        self.ln = ln
+        self.type = type
+        self.value = value
+
     @db.hybrid_property
     def ln_type(self):
         return (self.ln, self.type)
@@ -315,6 +337,7 @@ class Collectionname(db.Model):
     @ln_type.setter
     def ln_type(self, value):
         (self.ln, self.type) = value
+
 
 
 #from sqlalchemy import event

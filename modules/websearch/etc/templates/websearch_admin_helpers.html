@@ -39,13 +39,13 @@
     <li data-id="{{ c.id }}" data-type="{{ c.type }}">
     {% if c.type == 'v' %}
     <i>
-    <a  href="{{ url_for(".collection", name=c.name) }}" >
-        {{ c.name_ln }}
+    <a  href="{{ url_for(".manage_collection", name=c.name) }}" >
+        {{ c.name }}
     </a>
     </i>
     {% else %}
-    <a  href="{{ url_for(".collection", name=c.name) }}" >
-        {{ c.name_ln }}
+    <a  href="{{ url_for(".manage_collection", name=c.name) }}" >
+        {{ c.name }}
     </a>
     {% endif %}
     <ul {{ kwargs|xmlattr }} data-id="{{ c.id }}">
@@ -109,10 +109,30 @@
 </script>
 {% endmacro %}
 
-{% macro colleection_form(query="") %}
+{% macro collection_translations(collection) %}
 <div {{ kwargs|xmlattr }}>
+    <h2>Modify translations</h2>
+    {% if config.CFG_LANGUAGE_LIST_LONG %}
+        <form class="form-horizontal" method="POST" action="{{ url_for('.update_translations', id=collection.id) }}">
+        {% for (lang, lang_namelong) in config.CFG_LANGUAGE_LIST_LONG %}
+        <div class="control-group" >
+            <label class="control-label" for="{{ lang }}"> {{ lang_namelong }}  
+            </label>
+                <div class="controls" >
+                    <input type="text" class="input-xlarge" id="{{ lang }}" name="{{ lang }}" value="{{ collection.translation(lang) }}"></input>
+                </div>
+    </div>
+        {% endfor %}
+        <div class="form-actions">
+            <p><input type="submit" name="send_button" value="{{ _("Send") }}" class="btn
+            btn-primary"/></p>
+        </div>
+        </form>
+    {% endif %}
 </div>
 {% endmacro %}
+
+
 
 {% macro portalbox_sidebar(portalboxes, width=2) %}
 {% if portalboxes %}
