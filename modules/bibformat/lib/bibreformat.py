@@ -145,12 +145,16 @@ def bibreformat_task(fmt, sql, sql_queries, cds_query, process_format, process, 
 ### list of corresponding record IDs was retrieved
 ### now format the selected records
 
+    write_message("recids %s" % str(list(recIDs)))
+
     if process_format:
+        write_message("records without cache %s" % str(list(without_format)))
         write_message("Records to be processed: %d" % (len(recIDs) \
                                                + len(without_format)))
         write_message("Out of it records without existing cache: %d" % len(without_format))
     else:
         write_message("Records to be processed: %d" % (len(recIDs)))
+
 
 ### Initialize main loop
 
