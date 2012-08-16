@@ -453,6 +453,7 @@ div .boxleft_2 {
         <select class="selectConditionExactMatch">
             <option value="0">%(text_equal_to)s</option>
             <option value="1">%(text_contains)s</option>
+            <option value="2">%(text_not_exists)s</option>
         </select>
         <input id="textBoxCondition" class="txtValue textBoxCondition" type="text" value="%(text_condition)s"/>
         </td>
@@ -533,6 +534,7 @@ div .boxleft_2 {
         <select class="selectConditionExactMatch">
             <option value="0">%(text_equal_to)s</option>
             <option value="1">%(text_contains)s</option>
+            <option value="2">%(text_not_exists)s</option>
         </select>
         <input id="textBoxCondition" class="txtValue textBoxCondition" type="text" value="%(text_condition)s"/>
         </td>
@@ -586,6 +588,7 @@ div .boxleft_2 {
               "text_new_value" : _("new value"),
               "text_equal_to" : _("is equal to"),
               "text_contains" : _("contains"),
+              "text_not_exists" : _("does not exist"),
               "text_condition" : _("condition"),
               "text_condition_subfield" : _("when other subfield"),
               "text_condition_subfield_delete" : _("when subfield"),
