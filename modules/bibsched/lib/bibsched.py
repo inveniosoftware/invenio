@@ -1066,7 +1066,8 @@ class BibSched(object):
         Return True when task_status need to be refreshed"""
         debug = self.debug
         if debug:
-            Log("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s" % (task_id, proc, runtime, status, priority))
+            Log("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s, host: %s, sequenceid: %s" %
+                (task_id, proc, runtime, status, priority, host, sequenceid))
 
         if (task_id, proc, runtime, status, priority, host, sequenceid) in self.node_relevant_waiting_tasks:
             if debug:
@@ -1101,6 +1102,21 @@ class BibSched(object):
                     Log("Raised all waiting tasks with sequenceid " \
                         "%s to the max priority %s" % (sequenceid, max_priority))
                     ## Some priorities where raised
+                    return False
+                current_runtimes = run_sql("""SELECT id, runtime FROM schTASK WHERE sequenceid=%s AND status='WAITING' ORDER by id""", (sequenceid, ))
+                runtimes_adjusted = False
+                if current_runtimes:
+                    last_runtime = current_runtimes[0][1]
+                    for the_task_id, runtime in current_runtimes:
+                        if runtime < last_runtime:
+                            run_sql("""UPDATE schTASK SET runtime=%s WHERE id=%s""", (last_runtime, the_task_id))
+                            if debug:
+                                Log("Adjusted runtime of task_id %s to %s in order to be executed in the correct sequenceid order" % (the_task_id, last_runtime))
+                            runtimes_adjusted = True
+                            runtime = last_runtime
+                        last_runtime = runtime
+                if runtimes_adjusted:
+                    ## Some runtime have been adjusted
                     return False
 
             for other_task_id, other_proc, other_dummy, other_status, other_sequenceid in higher + lower:

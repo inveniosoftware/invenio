@@ -887,7 +887,10 @@ def _task_run(task_run_fnc):
                 postponed_times = int(g.group(1))
             else:
                 postponed_times = 0
-            run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s, host='' WHERE id=%s", (new_runtime, 'Postponed %d time(s)' % (postponed_times + 1), _TASK_PARAMS['task_id']))
+            if _TASK_PARAMS['sequence-id']:
+                ## Also postponing other dependent tasks.
+                run_sql("UPDATE schTASK SET runtime=%s, progress=%s WHERE sequenceid=%s AND status='WAITING'", (new_runtime, 'Postponed as task %s' % _TASK_PARAMS['task_id'], _TASK_PARAMS['sequence-id'])) # kwalitee: disable=sql
+            run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s, host='' WHERE id=%s", (new_runtime, 'Postponed %d time(s)' % (postponed_times + 1), _TASK_PARAMS['task_id'])) # kwalitee: disable=sql
             write_message("Task #%d postponed because outside of runtime limit" % _TASK_PARAMS['task_id'])
             return True
 
