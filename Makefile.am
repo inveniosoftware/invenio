@@ -134,6 +134,20 @@ uninstall-jscalendar-plugin:
 	@echo "** The jsCalendar plugin was successfully uninstalled.   **"
 	@echo "***********************************************************"
 
+install-js-test-driver:
+	@echo "*******************************************************"
+	@echo "** Installing js-test-driver, please wait...         **"
+	@echo "*******************************************************"
+	mkdir -p $(prefix)/lib/java/js-test-driver && \
+	cd $(prefix)/lib/java/js-test-driver && \
+	wget http://invenio-software.org/download/js-test-driver/JsTestDriver-1.3.5.jar -O JsTestDriver.jar
+
+uninstall-js-test-driver:
+	@rm -rvf ${prefix}/lib/java/js-test-driver
+	@echo "*********************************************************"
+	@echo "** The js-test-driver was successfully uninstalled.    **"
+	@echo "*********************************************************"
+
 install-jquery-plugins:
 	@echo "***********************************************************"
 	@echo "** Installing various jQuery plugins, please wait...     **"

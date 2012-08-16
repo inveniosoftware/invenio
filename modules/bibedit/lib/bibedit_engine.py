@@ -241,6 +241,9 @@ def perform_request_init(uid, ln, req, lastupdated):
         body += '    <script type="text/javascript" src="%s/%s">' \
             '</script>\n' % (CFG_SITE_URL, auto_version_url("js/" + script))
 
+    # Init BibEdit
+    body += '<script>$(init_bibedit);</script>'
+
     body += '<link rel="stylesheet" type="text/css" href="/img/jquery-ui.css" />'
 
     # Build page structure and menu.

@@ -833,6 +833,12 @@ def cli_cmd_run_unit_tests(conf):
     if not build_and_run_unit_test_suite():
         sys.exit(1)
 
+def cli_cmd_run_js_unit_tests(conf):
+    """Run JavaScript unit tests, usually on the working demo site."""
+    from invenio.testutils import build_and_run_js_unit_test_suite
+    if not build_and_run_js_unit_test_suite():
+        sys.exit(1)
+
 def cli_cmd_run_regression_tests(conf):
     """Run regression tests, usually on the working demo site."""
     from invenio.testutils import build_and_run_regression_test_suite
@@ -1405,6 +1411,7 @@ def prepare_option_parser():
     demotest_options.add_option("", "--remove-demo-records", dest='actions', const='remove-demo-records', action="append_const", help="remove demo records, keeping demo site")
     demotest_options.add_option("", "--drop-demo-site", dest='actions', const='drop-demo-site', action="append_const", help="drop demo site configurations too")
     demotest_options.add_option("", "--run-unit-tests", dest='actions', const='run-unit-tests', action="append_const", help="run unit test suite (needs demo site)")
+    demotest_options.add_option("", "--run-js-unit-tests", dest='actions', const='run-js-unit-tests', action="append_const", help="run JS unit test suite (needs demo site)")
     demotest_options.add_option("", "--run-regression-tests", dest='actions', const='run-regression-tests', action="append_const", help="run regression test suite (needs demo site)")
     demotest_options.add_option("", "--run-web-tests", dest='actions', const='run-web-tests', action="append_const", help="run web tests in a browser (needs demo site, Firefox, Selenium IDE)")
     parser.add_option_group(demotest_options)
@@ -1526,6 +1533,8 @@ def main(*cmd_args):
                 cli_cmd_drop_demo_site(conf)
             elif action == 'run-unit-tests':
                 cli_cmd_run_unit_tests(conf)
+            elif action == 'run-js-unit-tests':
+                cli_cmd_run_js_unit_tests(conf)
             elif action == 'run-regression-tests':
                 cli_cmd_run_regression_tests(conf)
             elif action == 'run-web-tests':
