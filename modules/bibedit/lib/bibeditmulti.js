@@ -242,7 +242,7 @@ function onAjaxSuccess(json) {
             gComputeModifications = 0;
 
         }
-        $("#preview_area").css("text-align", "")
+        $("#preview_area").css("text-align", "");
         $("#preview_area").html(search_html);
 }
 
@@ -771,8 +771,8 @@ function onButtonSaveNewFieldConditionClick() {
     gFields[fieldID].condition = condition;
     gFields[fieldID].conditionSubfieldExactMatch = conditionSubfieldExactMatch;
 
-    if (conditionSubfieldExactMatch == 0) {
-        conditionExactText = "is equal to"
+    if (conditionSubfieldExactMatch === "0") {
+        conditionExactText = "is equal to";
     } else conditionExactText = "contains";
 
     templateDisplayField.find(".conditionExact").eq(0).text(conditionExactText);
@@ -831,11 +831,23 @@ function onTextBoxConditionSubfieldDisplayChange(){
 
     var subfieldDisplayID = subfieldElement.attr("id");
 
+    //when deleting field, we need to use .templateDisplayField instead of .templateDisplaySubfield
+    if (typeof subfieldDisplayID === "undefined")
+    {
+        subfieldElement = $(this).parents(".templateDisplayField");
+        subfieldDisplayID = subfieldElement.attr("id");
+    }
+
     var fieldID = getFieldID(subfieldDisplayID);
     var subfieldID = getSubfieldID(subfieldDisplayID);
 
     var conditionSubfield = subfieldElement.find(".textBoxConditionSubfield").eq(0).val();
-    gFields[fieldID].subfields[subfieldID].conditionSubfield = conditionSubfield;
+
+    if (typeof subfieldID === "undefined") {
+        gFields[fieldID].conditionSubfield = conditionSubfield;
+    } else {
+        gFields[fieldID].subfields[subfieldID].conditionSubfield = conditionSubfield;
+    }
 }
 
 function onTextBoxConditionFieldDisplayChange() {
@@ -917,5 +929,4 @@ function onPressEsc(evt){
 function onSelectCollectionChange(evt){
     onButtonTestSearchClick();
 }
-
 
