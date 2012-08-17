@@ -121,7 +121,6 @@ def redirect_to_url(req, url, redirection_type=None, norobot=False):
     """
     if redirection_type is None:
         redirection_type = apache.HTTP_MOVED_TEMPORARILY
-    req.headers_out["Location"] = url
 
     del req.headers_out["Cache-Control"]
     req.headers_out["Cache-Control"] = "no-cache, private, no-store, " \
@@ -130,6 +129,35 @@ def redirect_to_url(req, url, redirection_type=None, norobot=False):
 
     if norobot:
         req.headers_out["X-Robots-Tag"] = "noarchive, nosnippet, noindex, nocache"
+
+    user_agent = req.headers_in.get('User-Agent')
+    if 'Microsoft Office Existence Discovery' in user_agent or 'ms-office' in user_agent:
+        ## HACK: this is to workaround Microsoft Office trying to be smart
+        ## when users click on URLs in Office documents that require
+        ## authentication. Office will check the validity of the URL
+        ## but will pass the browser the redirected URL rather than
+        ## the original one. This is incompatible with e.g. Shibboleth
+        ## based SSO since the referer would be lost.
+        ## See: http://support.microsoft.com/kb/899927
+        req.status = 200
+        req.content_type = 'text/html'
+        if req.method != 'HEAD':
+            req.write("""
+<html>
+    <head>
+        <title>Intermediate page for URLs clicked on MS Office Documents</title>
+        <meta http-equiv="REFRESH" content="5;url=%(url)s"></meta>
+    </head>
+    <body>
+        <p>You are going to be redirected to the desired content within 5 seconds. If the redirection does not happen automatically please click on <a href="%(url)s">%(url_ok)s</a>.</p>
+    </body>
+</html>""" % {
+                'url': escape(req.unparsed_uri, True),
+                'url_ok': escape(req.unparsed_uri)
+            })
+        raise apache.SERVER_RETURN(apache.DONE)
+
+    req.headers_out["Location"] = url
 
     if req.response_sent_p:
         raise IOError("Cannot redirect after headers have already been sent.")
