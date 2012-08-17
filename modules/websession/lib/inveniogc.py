@@ -131,14 +131,15 @@ def clean_tempfiles():
     gc_exec_command('find %s -name "bibconvertrun.*"'
         ' -exec rm %s -f {} \;' \
             % (CFG_TMPDIR, vstr))
+    # Using mtime and -r here to include directories.
     gc_exec_command('find %s -name "oaiharvest*"'
-        ' -atime +%s -exec gzip %s -9 {} \;' \
+        ' -mtime +%s -exec gzip %s -9 {} \;' \
             % (CFG_TMPDIR, CFG_MAX_ATIME_ZIP_OAI, vstr))
     gc_exec_command('find %s -name "oaiharvest*"'
-        ' -atime +%s -exec rm %s -f {} \;' \
+        ' -mtime +%s -exec rm %s -rf {} \;' \
             % (CFG_TMPDIR, CFG_MAX_ATIME_RM_OAI, vstr))
     gc_exec_command('find %s -name "oai_archive*"'
-        ' -atime +%s -exec rm %s -f {} \;' \
+        ' -mtime +%s -exec rm %s -rf {} \;' \
             % (CFG_TMPDIR, CFG_MAX_ATIME_RM_OAI, vstr))
 
     write_message("- deleting/gzipping temporary old "

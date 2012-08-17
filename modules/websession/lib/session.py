@@ -198,21 +198,31 @@ class InvenioSession(dict):
             session_dict = cPickle.loads(blob_to_string(res[0][0]))
             remote_ip = self._req.remote_ip
             if self._req.is_https():
-                if session_dict['_https_ip'] is not None and \
-                        _mkip(session_dict['_https_ip']) >> \
-                            CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS != \
-                        _mkip(remote_ip) >> \
-                            CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS:
-                    invalid = True
+                if session_dict['_https_ip'] is not None:
+                    if ':' in remote_ip:
+                        ## IPV6 address, we don't skip bits
+                        if session_dict['_https_ip'] != remote_ip:
+                            invalid = True
+                    else:
+                        if _mkip(session_dict['_https_ip']) >> \
+                                CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS != \
+                            _mkip(remote_ip) >> \
+                                CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS:
+                            invalid = True
                 else:
                     session_dict['_https_ip'] = remote_ip
             else:
-                if session_dict['_http_ip'] is not None and \
-                        _mkip(session_dict['_http_ip']) >> \
-                            CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS != \
-                        _mkip(remote_ip) >> \
-                            CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS:
-                    invalid = True
+                if session_dict['_http_ip'] is not None:
+                    if ':' in remote_ip:
+                        ## IPV6 address, we don't skip bits
+                        if session_dict['_http_ip'] != remote_ip:
+                            invalid = True
+                    else:
+                        if _mkip(session_dict['_http_ip']) >> \
+                                CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS != \
+                            _mkip(remote_ip) >> \
+                                CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS:
+                            invalid = True
                 else:
                     session_dict['_http_ip'] = remote_ip
 

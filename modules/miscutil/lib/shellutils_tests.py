@@ -156,8 +156,8 @@ else:
         t1 = time.time()
         self.assertRaises(Timeout, run_process_with_timeout, (self.script_path, '15', "THISISATEST"), timeout=5)
         ps_output = run_shell_command('ps aux')[1]
-        self.failIf('THISISATEST' in ps_output)
-        self.failIf('sleep' in ps_output)
+        self.failIf('THISISATEST' in ps_output, '"THISISATEST" was found in %s' % ps_output)
+        self.failIf('sleep 15' in ps_output, '"sleep 15" was found in %s' % ps_output)
 
     def test_run_cmd_timeout_no_timeout(self):
         """shellutils - running simple command without expiring timeout"""
