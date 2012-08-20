@@ -754,6 +754,11 @@ function onButtonSaveNewFieldClick(instance) {
     templateNewField.replaceWith(templateDisplayField);
 
     addMessage(fieldID, actionText);
+
+    // If we are not deleting fields, we want the first subfield action to be opened automatically
+    if(field.action !== gFieldActionTypes.deleteField){
+        templateDisplayField.find(".buttonNewSubfield").eq(0).click();
+    }
 }
 
 function onButtonSaveNewFieldConditionClick() {
