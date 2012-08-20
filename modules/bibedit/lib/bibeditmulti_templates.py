@@ -441,7 +441,7 @@ div .boxleft_2 {
             <span class="conditionExact conditionParametersDisplay"></span>
             <input id="textBoxConditionFieldDisplay" class="txtValue textBoxCondition conditionParametersDisplay" type="text"/>
         </td>
-        <td align="center">
+        <td>
             <img src="%(site_url)s/img/add.png" class="buttonNewSubfield" alt="Add new"/>
             <span class="buttonNewSubfield linkButton">%(text_define_subfield)s</span>
         </td>
