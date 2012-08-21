@@ -25,6 +25,8 @@ import unittest
 import os
 import os.path
 import urllib2
+import urlparse
+import socket
 from urllib import urlencode
 
 from invenio.testutils import make_test_suite, run_test_suite
@@ -38,6 +40,12 @@ from invenio.urlutils import make_user_agent_string
 from invenio.search_engine import get_record
 
 CFG_HAS_CURL = os.path.exists("/usr/bin/curl")
+
+## NOTE: default invenio.conf authorization are granted only to 127.0.0.1
+## or 127.0.1.1, a.k.a. localhost, so the following checks if the current host
+## is well recognized as localhost. Otherwise disable tests since they would
+## fail due to not enough authorizations.
+CFG_LOCALHOST_OK = socket.gethostbyname(urlparse.urlparse(CFG_SITE_URL)[1].split(':')[0]) in ('127.0.0.1', '127.0.1.1')
 
 class BatchUploaderRobotUploadTests(GenericBibUploadTest):
     """
@@ -89,30 +97,33 @@ class BatchUploaderRobotUploadTests(GenericBibUploadTest):
         if current_task != self.last_taskid:
             delete_task(current_task)
 
-    def test_bad_marcxml(self):
-        """batchuploader - robotupload bad MARCXML"""
-        self.req.add_data("BLABLA")
-        result = urllib2.urlopen(self.req).read()
-        self.assertEqual(result, "[ERROR] MARCXML is not valid.\n")
+    if CFG_LOCALHOST_OK:
+        def test_bad_marcxml(self):
+            """batchuploader - robotupload bad MARCXML"""
+            self.req.add_data("BLABLA")
+            result = urllib2.urlopen(self.req).read()
+            self.assertEqual(result, "[ERROR] MARCXML is not valid.\n")
 
-    def test_bad_agent(self):
-        """batchuploader - robotupload bad agent"""
-        self.req.add_header('User-Agent', 'badagent')
-        result = urllib2.urlopen(self.req).read()
-        self.assertEqual(result, "[ERROR] Sorry, the badagent useragent cannot use the service.\n")
+    if CFG_LOCALHOST_OK:
+        def test_bad_agent(self):
+            """batchuploader - robotupload bad agent"""
+            self.req.add_header('User-Agent', 'badagent')
+            result = urllib2.urlopen(self.req).read()
+            self.assertEqual(result, "[ERROR] Sorry, the badagent useragent cannot use the service.\n")
 
-    def test_simple_insert(self):
-        """batchuploader - robotupload simple insert"""
-        result = urllib2.urlopen(self.req).read()
-        self.failUnless("[INFO]" in result)
-        current_task = get_last_taskid()
-        run_shell_command("%s/bibupload %%s" % CFG_BINDIR, [str(current_task)])
-        current_recid = run_sql("SELECT MAX(id) FROM bibrec")[0][0]
-        self.failIfEqual(self.last_recid, current_recid)
-        record = get_record(current_recid)
-        self.assertEqual(record['245'][0][0], [('a', 'The title')])
+    if CFG_LOCALHOST_OK:
+        def test_simple_insert(self):
+            """batchuploader - robotupload simple insert"""
+            result = urllib2.urlopen(self.req).read()
+            self.failUnless("[INFO]" in result)
+            current_task = get_last_taskid()
+            run_shell_command("%s/bibupload %%s" % CFG_BINDIR, [str(current_task)])
+            current_recid = run_sql("SELECT MAX(id) FROM bibrec")[0][0]
+            self.failIfEqual(self.last_recid, current_recid)
+            record = get_record(current_recid)
+            self.assertEqual(record['245'][0][0], [('a', 'The title')])
 
-    if CFG_DEVEL_SITE:
+    if CFG_DEVEL_SITE and CFG_LOCALHOST_OK:
         ## This expect a particular testing web handler that is available
         ## only when CFG_DEVEL_SITE is set up correctly
         def test_insert_with_callback(self):
@@ -182,11 +193,8 @@ class BatchUploaderRobotUploadTests(GenericBibUploadTest):
                     os.remove(curl_input_file)
 
 
-
-
 TEST_SUITE = make_test_suite(BatchUploaderRobotUploadTests)
 
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
-
