@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -44,7 +44,9 @@ from invenio.webstat import perform_request_index, \
     perform_display_custom_summary, \
     perform_display_stats_per_coll, \
     perform_display_current_system_health, \
-    perform_display_coll_list
+    perform_display_yearly_report, \
+    perform_display_coll_list, \
+    perform_display_ingestion_status
 
 
 def detect_suitable_graph_format():
@@ -66,7 +68,7 @@ SUITABLE_GRAPH_FORMAT = detect_suitable_graph_format()
 class WebInterfaceStatsPages(WebInterfaceDirectory):
     """Defines the set of stats pages."""
 
-    _exports = ['', 'system_health',
+    _exports = ['', 'system_health', 'systemhealth', 'yearly_report', 'ingestion_health',
                  'collection_population', 'new_records', 'search_frequency', 'search_type_distribution',
                  'download_frequency', 'comments_frequency', 'number_of_loans', 'web_submissions',
                  'loans_stats', 'loans_lists', 'renewals_lists', 'returns_table', 'returns_graph',
@@ -122,6 +124,56 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='current system health',
+                    language=ln)
+
+    def systemhealth(self, req, form):
+        """Redirect for the old URL. """
+        return redirect_to_url (req, "%s/stats/system_health" % (CFG_SITE_URL))
+
+    def yearly_report(self, req, form):
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
+        user_info = collect_user_info(req)
+        (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
+        if auth_code:
+            return page_not_authorized(req,
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
+                text=auth_msg,
+                navmenuid='yearly report',
+                ln=ln)
+        return page(title="Yearly report",
+                    body=perform_display_yearly_report(ln=ln),
+                    navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
+                    description="CDS, Statistics, Yearly report",
+                    keywords="CDS, statistics, yearly report",
+                    req=req,
+                    lastupdated=__lastupdated__,
+                    navmenuid='yearly report',
+                    language=ln)
+
+    def ingestion_health(self, req, form):
+        argd = wash_urlargd(form, { 'pattern': (str, None),
+                                    'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
+        req_ingestion = argd['pattern']
+        user_info = collect_user_info(req)
+        (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
+        if auth_code:
+            return page_not_authorized(req,
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
+                text=auth_msg,
+                navmenuid='ingestion status',
+                ln=ln)
+        return page(title="Check ingestion health",
+                    body=perform_display_ingestion_status(req_ingestion, ln=ln),
+                    navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
+                    description="CDS, Statistics, Ingestion health",
+                    keywords="CDS, statistics, Ingestion health",
+                    req=req,
+                    lastupdated=__lastupdated__,
+                    navmenuid='ingestion health',
                     language=ln)
 
     # KEY EVENT SECTION

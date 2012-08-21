@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -79,7 +79,15 @@ from invenio.webstat_engine import get_keyevent_trend_collection_population, \
     get_invenio_error_log_ranking, \
     get_invenio_last_n_errors, \
     update_error_log_analyzer, \
-    get_apache_error_log_ranking
+    get_apache_error_log_ranking, \
+    get_last_updates, \
+    get_list_link, \
+    get_general_status, \
+    get_ingestion_matching_records, \
+    get_record_ingestion_status, \
+    get_specific_ingestion_status, \
+    get_title_ingestion, \
+    get_record_last_modification
 
 # Imports handling custom events
 from invenio.webstat_engine import get_customevent_table, \
@@ -972,7 +980,7 @@ def perform_request_index(ln=CFG_SITE_LANG):
     out = TEMPLATES.tmpl_welcome(ln=ln)
 
     # Display the health box
-    out += TEMPLATES.tmpl_system_health_list(ln=ln)
+    out += TEMPLATES.tmpl_system_health_list(get_general_status(), ln=ln)
 
     # Produce a list of the key statistics
     out += TEMPLATES.tmpl_keyevent_list(ln=ln)
@@ -985,14 +993,27 @@ def perform_request_index(ln=CFG_SITE_LANG):
 
     # Display annual report
     out += TEMPLATES.tmpl_custom_summary(ln=ln)
+    out += TEMPLATES.tmpl_yearly_report_list(ln=ln)
 
     # Display test for collections
     out += TEMPLATES.tmpl_collection_stats_main_list(ln=ln)
 
     return out
 
-
 def perform_display_current_system_health(ln=CFG_SITE_LANG):
+    """
+    Display the current general system health:
+        - Uptime/load average
+        - Apache status
+        - Session information
+        - Searches recount
+        - New records
+        - Bibsched queue
+        - New/modified records
+        - Indexing, ranking, sorting and collecting methods
+        - Baskets
+        - Alerts
+    """
     from ConfigParser import ConfigParser
     conf = ConfigParser()
     conf.read(CFG_WEBSTAT_CONFIG_PATH)
@@ -1003,6 +1024,17 @@ def perform_display_current_system_health(ln=CFG_SITE_LANG):
     yesterday = (now - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
     today = now.strftime("%Y-%m-%d")
     tomorrow = (now + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+
+    # Append uptime and load average to the health box
+    if conf.get("general", "uptime_box") == "True":
+        health_indicators.append(("Uptime cmd",
+                                  get_keyevent_snapshot_uptime_cmd()))
+
+    # Append number of Apache processes to the health box
+    if conf.get("general", "apache_box") == "True":
+        health_indicators.append(("Apache processes",
+                                  get_keyevent_snapshot_apache_processes()))
+        health_indicators.append(None)
 
     # Append session information to the health box
     if conf.get("general", "visitors_box") == "True":
@@ -1052,6 +1084,39 @@ def perform_display_current_system_health(ln=CFG_SITE_LANG):
             health_indicators.append(("    " + item[0], str(item[1])))
         health_indicators.append(None)
 
+    # Append records pending
+    if conf.get("general", "waiting_box") == "True":
+        last_index, last_rank, last_sort, last_coll=get_last_updates()
+        index_categories = ('global', 'collection', 'abstract',
+                            'author', 'keyword', 'reference',
+                            'reportnumber', 'title', 'fulltext',
+                            'year', 'journal', 'collaboration',
+                            'affiliation', 'exactauthor', 'caption',
+                            'firstauthor', 'exactfirstauthor',
+                            'authorcount')
+        rank_categories = ('wrd', 'demo_jif', 'citation',
+                            'citerank_citation_t',
+                            'citerank_pagerank_c',
+                            'citerank_pagerank_t')
+        sort_categories = ('latest first', 'title', 'author', 'report number',
+                            'most cited')
+
+        health_indicators.append(("Records pending per indexing method since", last_index))
+        for ic in index_categories:
+            health_indicators.append(("   - " + str(ic), get_list_link('index', ic)))
+        health_indicators.append(None)
+        health_indicators.append(("Records pending per ranking method since", last_rank))
+        for rc in rank_categories:
+            health_indicators.append(("   - " + str(rc), get_list_link('rank', rc)))
+        health_indicators.append(None)
+        health_indicators.append(("Records pending per sorting method since", last_sort))
+        for sc in sort_categories:
+            health_indicators.append(("   - " + str(sc), get_list_link('sort', sc)))
+        health_indicators.append(None)
+        health_indicators.append(("Records pending for webcolling since", last_coll))
+        health_indicators.append(("   - webcoll", get_list_link('collect')))
+        health_indicators.append(None)
+
     # Append basket stats to the health box
     if conf.get("general", "basket_box") == "True":
         health_indicators += basket_display()
@@ -1062,24 +1127,92 @@ def perform_display_current_system_health(ln=CFG_SITE_LANG):
         health_indicators += alert_display()
         health_indicators.append(None)
 
-    # Append loans stats to the health box
-    if conf.get("general", "loan_box") == "True":
-        health_indicators += loan_display()
-        health_indicators.append(None)
-
-    # Append number of Apache processes to the health box
-    if conf.get("general", "apache_box") == "True":
-        health_indicators.append(("Apache processes",
-                                  get_keyevent_snapshot_apache_processes()))
-
-    # Append uptime and load average to the health box
-    if conf.get("general", "uptime_box") == "True":
-        health_indicators.append(("Uptime cmd",
-                                  get_keyevent_snapshot_uptime_cmd()))
-
     # Display the health box
     return TEMPLATES.tmpl_system_health(health_indicators, ln=ln)
 
+def perform_display_ingestion_status(req_ingestion, ln=CFG_SITE_LANG):
+    """
+    Display the updating status for the records matching a
+    given request.
+
+    @param req_ingestion: Search pattern request
+    @type req_ingestion: str
+    """
+    # preconfigured values
+    index_methods = ('global', 'collection', 'abstract', 'author', 'keyword',
+                    'reference', 'reportnumber', 'title', 'fulltext',
+                    'year', 'journal', 'collaboration', 'affiliation',
+                    'exactauthor', 'caption', 'firstauthor',
+                    'exactfirstauthor', 'authorcount')
+    rank_methods = ('wrd', 'demo_jif', 'citation', 'citerank_citation_t',
+                    'citerank_pagerank_c', 'citerank_pagerank_t')
+    sort_methods = ('latest first', 'title', 'author', 'report number',
+                    'most cited')
+    from ConfigParser import ConfigParser
+    conf = ConfigParser()
+    conf.read(CFG_WEBSTAT_CONFIG_PATH)
+    general = get_general_status()
+    flag = 0  # match with pending records
+    stats = []
+
+    list_records = get_ingestion_matching_records(req_ingestion, \
+                    int(conf.get("general", "max_ingestion_health")))
+    if list_records == []:
+        stats.append(("No matches for your query!", " "*60))
+        return TEMPLATES.tmpl_ingestion_health(general, req_ingestion, stats, \
+               ln=ln)
+    else:
+        for record in list_records:
+            if record == 0:
+                return TEMPLATES.tmpl_ingestion_health(general, None, \
+                                                       None, ln=ln)
+            elif record == -1:
+                stats.append(("Invalid pattern! Please retry", " "*60))
+                return TEMPLATES.tmpl_ingestion_health(general, None, \
+                                                       stats, ln=ln)
+            else:
+                stat = get_record_ingestion_status(record)
+                last_mod = get_record_last_modification(record)
+                if stat != 0:
+                    flag = 1 # match
+                    # Indexing
+                    stats.append((get_title_ingestion(record, last_mod)," "*90))
+                    stats.append(("Pending for indexing methods:", " "*80))
+                    for im in index_methods:
+                        last = get_specific_ingestion_status(record,"index", im)
+                        if last != None:
+                            stats.append(("    - %s"%im, "last: " + last))
+                    # Ranking
+                    stats.append(("Pending for ranking methods:", " "*80))
+                    for rm in rank_methods:
+                        last = get_specific_ingestion_status(record, "rank", rm)
+                        if last != None:
+                            stats.append(("    - %s"%rm, "last: " + last))
+                    # Sorting
+                    stats.append(("Pending for sorting methods:", " "*80))
+                    for sm in sort_methods:
+                        last = get_specific_ingestion_status(record, "sort", sm)
+                        if last != None:
+                            stats.append(("    - %s"%sm, "last: " + last))
+                    # Collecting
+                    stats.append(("Pending for webcolling:", " "*80))
+                    last = get_specific_ingestion_status(record, "collect", )
+                    if last != None:
+                        stats.append(("    - webcoll", "last: " + last))
+    # if there was no match
+    if flag == 0:
+        stats.append(("All matching records up to date!", " "*60))
+    return TEMPLATES.tmpl_ingestion_health(general, req_ingestion, stats, ln=ln)
+
+def perform_display_yearly_report(ln=CFG_SITE_LANG):
+    """
+    Display the year recount
+    """
+    # Append loans stats to the box
+    year_report = []
+    year_report += loan_display()
+    year_report.append(None)
+    return TEMPLATES.tmpl_yearly_report(year_report, ln=ln)
 
 def perform_display_keyevent(event_id=None, args={},
                              req=None, ln=CFG_SITE_LANG):

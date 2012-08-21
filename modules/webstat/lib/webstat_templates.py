@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,6 +19,7 @@ __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
 import datetime, cgi, urllib, os
+import re
 from invenio.config import \
      CFG_WEBDIR, \
      CFG_SITE_URL, \
@@ -26,7 +27,6 @@ from invenio.config import \
      CFG_SITE_NAME
 from invenio.search_engine import get_coll_sons
 from invenio.webstat_engine import get_invenio_error_details
-
 
 class Template:
 
@@ -39,17 +39,45 @@ class Template:
                      raw data can be exported for offline processing. Further on, a general
                      overview is presented below under the label Current System Health.</p>"""
 
-    def tmpl_system_health_list(self, ln=CFG_SITE_LANG):
+    def tmpl_system_health_list(self, recount, ln=CFG_SITE_LANG):
         """
         Generates a box with current information from the system providing the administrator
         an easy way of overlooking the 'health', i.e. the current performance/efficency, of
         the system.
         """
-        return """<h3>Current system health</h3>
-            See <a href="%s/stats/system_health%s">current system health</a>""" % \
-            (CFG_SITE_URL, (CFG_SITE_LANG != ln and '?ln=' + ln) or '')
+        temp_out = """<h3>Current system health</h3>
+                    <p>Please, choose the information you want to review.</p>
+                    <ul>
+                    """
+        if recount == 0:
+            temp_out += """
+                    <li class="warninggreen">
+                        <a href="%s/stats/system_health%s">
+                            Current system health</a>
+                            (all records up to date!)</li>
+                        """ % \
+                    (CFG_SITE_URL, (CFG_SITE_LANG != ln and '?ln=' + ln) or '')
+        else:
+            temp_out += """
+                    <li class="warningred">
+                        <a href="%s/stats/system_health%s">
+                            Current system health</a>
+                            (around %s records pending)</li>
+                        """ % \
+                    (CFG_SITE_URL, (CFG_SITE_LANG != ln and '?ln=' + ln) \
+                    or '', str(recount))
+        temp_out += """
+                    <li><a href="%s/stats/ingestion_health%s">
+                        Check ingestion health for specific records</a></li>
+                    </ul>
+                    """ % \
+                    (CFG_SITE_URL, (CFG_SITE_LANG != ln and '?ln=' + ln) or '')
+        return temp_out
 
     def tmpl_system_health(self, health_statistics, ln=CFG_SITE_LANG):
+        """
+        Generates the system health list of parameters.
+        """
         temp_out = ""
         for statistic in health_statistics:
             if statistic is None:
@@ -57,11 +85,25 @@ class Template:
             elif statistic[1] is None:
                 temp_out += statistic[0] + '\n'
             else:
-                temp_out += statistic[0] + \
-                            '.' * (85 - len(str(statistic[0])) - len(str(statistic[1]))) + \
-                            str(statistic[1]) + '\n'
+                # regular expression, just to extract the text
+                # inside the link and view it's length
+                aux = re.search('.*>(.*)<.*', str(statistic[1]))
+                if aux is None:
+                    temp_out += statistic[0] + " " + '.' * \
+                                (85 - len(str(statistic[0])) - \
+                                len(str(statistic[1]))) + " " + \
+                                str(statistic[1]) + '\n'
+                else:
+                    temp_out += statistic[0] + " " + '.' * \
+                                (85 - len(str(statistic[0])) - \
+                                len(str(aux.group(1)))) + " " + \
+                                str(statistic[1]) + '\n'
+        temp_out = "<pre>" + temp_out + "</pre>"
+        temp_out += '<a href="%s/stats/ingestion_health%s">Check ingestion \
+                    health for specific records pending</a>' % (CFG_SITE_URL,
+                    (CFG_SITE_LANG != ln and '?ln=' + ln) or '')
+        return temp_out
 
-        return "<pre>" + temp_out + "</pre>"
 
     def tmpl_keyevent_list(self, ln=CFG_SITE_LANG):
         """
@@ -123,7 +165,6 @@ class Template:
         Generates the tables with the bibcirculation statistics
         """
         out = """<h3>Bibcirculation stats</h3>"""
-
         return out
 
     def tmpl_error_log_statistics_list(self, ln=CFG_SITE_LANG):
@@ -168,11 +209,103 @@ class Template:
 
     def tmpl_custom_summary(self, ln=CFG_SITE_LANG):
         """
-        Link to custom annual report
+        Link to custom annual report.
         """
         return """<h3>Library report</h3>
                  <ul><li><a href="%s/stats/custom_summary">Custom query summary</a></li></ul>
                  """ % CFG_SITE_URL
+
+    def tmpl_yearly_report_list(self, ln=CFG_SITE_LANG):
+        """
+        Link to yearly report
+        """
+        return """<h3>Yearly report</h3>
+                <p>Yearly report with the total number of circulation transactions
+                (loans, renewals, returns, ILL requests, hold request).</p>
+                <ul><li><a href="%s/stats/yearly_report">Yearly report</a></li></ul>
+                """ % CFG_SITE_URL
+
+    def tmpl_yearly_report(self, year_report, ln=CFG_SITE_LANG):
+        """
+        Display yearly report with the total number of circulation transactions.
+        """
+        temp_out = ""
+        for info in year_report:
+            if info is None:
+                temp_out += '\n'
+            elif info[1] is None:
+                temp_out += info[0] + '\n'
+            else:
+                temp_out += info[0] + " " + \
+                        '.' * (85 - len(str(info[0])) - \
+                        len(str(info[1]))) + " " + str(info[1]) + '\n'
+        return "<pre>" + temp_out + "</pre>"
+
+    def tmpl_ingestion_health(self, general, req_ingestion=None, stats=None, ln=CFG_SITE_LANG):
+        """
+        Display the record status search box and the results of the last
+        request, if done.
+        """
+        # Introduction and search box
+        temp_out = """
+            <p>Check the ingestion health for records pending or go to
+            <a href="%s/stats/system_health%s">current system health</a>.</p>
+            """ % \
+            (CFG_SITE_URL, (CFG_SITE_LANG != ln and '?ln=' + ln) or '')
+        if general == 0:
+            temp_out += """
+                    <p class="warninggreen">(all records up to date!)</p>
+                        """
+        else:
+            temp_out += """
+                    <p class="warningred">(around %s records pending)</p>
+                        """ % str(general)
+
+        temp_out += """
+                <form method="get"> <input type="hidden" name="ln" value="%s" />
+                """ % ln
+
+        if req_ingestion == None:
+            temp_out += self._tmpl_text_box("pattern", "", ln=ln)
+        else:
+            temp_out += self._tmpl_text_box("pattern", req_ingestion, ln=ln)
+        temp_out += """
+                    <input class="formbutton" type="submit" />
+                    </form>
+                    """
+        if stats==None:
+            return temp_out
+        else:
+            # results of the last request
+            info_stats = self.tmpl_ingestion_list(stats, ln=ln)
+            return  temp_out + info_stats
+
+    def tmpl_ingestion_list(self, ingestion_statistics, ln=CFG_SITE_LANG):
+        """
+        Generates the system ingestion health.
+        """
+        temp_out = ""
+        for statistic in ingestion_statistics:
+            if statistic is None:
+                temp_out += '\n'
+            elif statistic[1] is None:
+                temp_out += statistic[0] + '\n'
+            else:
+                # regular expression, just to extract the text
+                # inside the link and view it's length
+                aux = re.search('.*>(.*)<.*', str(statistic[0]))
+                if aux is None:
+                    temp_out += statistic[0] + " " + '.' * \
+                                (85 - len(str(statistic[0])) - \
+                                len(str(statistic[1]))) + " " + \
+                                str(statistic[1]) + '\n'
+                else:
+                    temp_out += statistic[0] + " " + '.' * \
+                                (85 - len(str(aux.group(1))) - \
+                                len(str(statistic[1]))) + " " + \
+                                str(statistic[1]) + '\n'
+        temp_out = "<pre>" + temp_out + "</pre>"
+        return temp_out
 
     def tmpl_collection_stats_main_list(self, ln=CFG_SITE_LANG):
         """
