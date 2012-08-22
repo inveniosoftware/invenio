@@ -418,38 +418,14 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                'manage_files': _("Document File Manager"),
                'record': _("Record #%i") % argd['recid']}
 
-            # FIXME: add parameters to `runbibdocfile' in order to
-            # configure the file editor based on role, or at least
-            # move configuration below to some config file.
             body += create_file_upload_interface(\
                 recid=argd['recid'],
                 ln=argd['ln'],
-                doctypes_and_desc=[('Main', 'Main document'),
-                                   ('LaTeX', 'LaTeX'),
-                                   ('Source', 'Source'),
-                                   ('Additional', 'Additional File'),
-                                   ('Audio', 'Audio file'),
-                                   ('Video', 'Video file'),
-                                   ('Script', 'Script'),
-                                   ('Data', 'Data'),
-                                   ('Figure', 'Figure'),
-                                   ('Schema', 'Schema'),
-                                   ('Graph', 'Graph'),
-                                   ('Image', 'Image'),
-                                   ('Drawing', 'Drawing'),
-                                   ('Slides', 'Slides')],
-                can_revise_doctypes=['*'],
-                can_comment_doctypes=['*'],
-                can_describe_doctypes=['*'],
-                can_delete_doctypes=['*'],
-                can_keep_doctypes=['*'],
-                can_rename_doctypes=['*'],
-                can_add_format_to_doctypes=['*'],
-                can_restrict_doctypes=['*'],
-                restrictions_and_desc=[('', 'Public'),
-                                       ('restricted', 'Restricted')],
                 uid=uid,
-                sbm_access=access)[1]
+                sbm_access=access,
+                restrictions_and_desc=CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_RESTRICTIONS,
+                doctypes_and_desc=CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_DOCTYPES,
+                **CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_MISC)[1]
 
             body += '''<br />
             <form method="post" action="%(CFG_SITE_URL)s/submit/managedocfiles">

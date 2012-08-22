@@ -120,10 +120,13 @@ def convert_conf_option(option_name, option_value):
     if option_value in ['"True"', '"False"', '"None"']:
         option_value = option_value[1:-1]
 
-    ## 3c) special cases: dicts
+    ## 3c) special cases: dicts and real pythonic lists
     if option_name in ['CFG_WEBSEARCH_FIELDS_CONVERT',
                        'CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS',
-                       'CFG_SITE_EMERGENCY_EMAIL_ADDRESSES']:
+                       'CFG_SITE_EMERGENCY_EMAIL_ADDRESSES',
+                       'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_MISC',
+                       'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_DOCTYPES',
+                       'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_RESTRICTIONS']:
         option_value = option_value[1:-1]
 
     ## 3d) special cases: comma-separated lists
