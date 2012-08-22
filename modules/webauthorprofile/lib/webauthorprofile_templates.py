@@ -195,7 +195,8 @@ class Template:
             baid_query = 'author:%s' % bibauthorid_data["cid"]
         elif bibauthorid_data["pid"] > -1:
             baid_query = 'author:%s' % bibauthorid_data["pid"]
-
+        else:
+            baid_query = ''
 
         sorted_names_list = sorted(names_dict.iteritems(), key=itemgetter(1),
                                    reverse=True)

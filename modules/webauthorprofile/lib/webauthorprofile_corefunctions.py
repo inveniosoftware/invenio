@@ -151,7 +151,10 @@ def get_institute_pub_dict(person_id):
     @return [{'intitute':[pubs,...]},bool]
     """
     pubs = get_pubs(person_id)[0]
-    namesdict = get_person_names_dicts(person_id)[0]
+    namesdict, status = get_person_names_dicts(person_id)
+    if not status:
+        return namesdict, status
+
     db_names_dict = namesdict['db_names_dict']
     names_list = db_names_dict.keys()
     return retrieve_update_cache('institute_pub_dict', 'pid:' + str(person_id), _get_institute_pub_dict,
@@ -611,9 +614,11 @@ def _get_person_names_dicts_fallback(person_id):
     pcount = len(p)
     if p:
         formatted = format_record(p[0], 'XM')
-        s = formatted.lower().index(person_id.lower())
-        if s:
+        try:
+            formatted.lower().index(person_id.lower())
             person_id = formatted[s:s + len(person_id)]
+        except Exception:
+            pass
     return {'longest':person_id, 'names_dict':{person_id:pcount}, 'db_names_dict':{person_id:pcount}}
 
 def _get_total_downloads_fallback(pubs):
