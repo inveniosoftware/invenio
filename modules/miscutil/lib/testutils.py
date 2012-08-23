@@ -342,7 +342,7 @@ def build_and_run_unit_test_suite():
                                 base.endswith('_web_tests')):
             continue
 
-        module = __import__('invenio.' + base, globals(), locals(), ['TEST_SUITE'])
+        module = __import__('invenio.' + base, fromlist=['TEST_SUITE'])
         test_modules.append(module.TEST_SUITE)
 
     complete_suite = unittest.TestSuite(test_modules)
@@ -364,7 +364,7 @@ def build_and_run_regression_test_suite():
         if ext != '.py' or not base.endswith('_regression_tests'):
             continue
 
-        module = __import__('invenio.' + base, globals(), locals(), ['TEST_SUITE'])
+        module = __import__('invenio.' + base, fromlist=['TEST_SUITE'])
         test_modules.append(module.TEST_SUITE)
 
     warn_user_about_tests()
@@ -388,7 +388,7 @@ def build_and_run_web_test_suite():
         if ext != '.py' or not base.endswith('_web_tests'):
             continue
 
-        module = __import__('invenio.' + base, globals(), locals(), ['TEST_SUITE'])
+        module = __import__('invenio.' + base, fromlist=['TEST_SUITE'])
         test_modules.append(module.TEST_SUITE)
 
     warn_user_about_tests()
