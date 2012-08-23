@@ -419,20 +419,21 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
     if page_to_display < 1:
         page_to_display = 1
 
-    last_page_number = number_of_records/RECORDS_PER_PAGE+1
+    last_page_number = number_of_records / RECORDS_PER_PAGE + 1
     if page_to_display > last_page_number:
         page_to_display = last_page_number
 
     first_record_to_display = RECORDS_PER_PAGE * (page_to_display - 1)
-    last_record_to_display = (RECORDS_PER_PAGE*page_to_display) - 1
+    last_record_to_display = (RECORDS_PER_PAGE * page_to_display) - 1
 
     if not compute_modifications:
         record_IDs = record_IDs[first_record_to_display:last_record_to_display + 1]
 
+    # displayed_records is a list containing IDs of records that will be displayed on current page
+    displayed_records = record_IDs[:RECORDS_PER_PAGE]
     records_content = []
 
     record_modifications = 0
-
     locked_records = []
     for record_id in record_IDs:
         if upload_mode == '-r' and record_locked_by_queue(record_id):
@@ -440,15 +441,13 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
         current_modifications = [current_command._modifications for current_command in update_commands]
         formated_record = _get_formated_record(record_id=record_id,
                              output_format=output_format,
-                             update_commands = update_commands,
-                             language=language, outputTags=outputTags)
+                             update_commands=update_commands,
+                             language=language, outputTags=outputTags, run_diff=record_id in displayed_records)
         new_modifications = [current_command._modifications for current_command in update_commands]
         if new_modifications > current_modifications:
             record_modifications += 1
 
         records_content.append((record_id, formated_record))
-
-
     total_modifications = []
     if compute_modifications:
         field_modifications = 0
@@ -530,13 +529,14 @@ def _get_record_diff(record_textmarc, updated_record_textmarc, outputTags, recor
     result.append("</pre>")
     return '\n'.join(result)
 
-def _get_formated_record(record_id, output_format, update_commands, language, outputTags=""):
+def _get_formated_record(record_id, output_format, update_commands, language, outputTags="", run_diff=True):
     """Returns a record in a given format
 
     @param record_id: the ID of record to format
     @param output_format: an output format code (or short identifier for the output format)
     @param update_commands: list of commands used to update record contents
     @param language: the language to use to format the record
+    @param run_diff: determines if we want to run _get_recodr_diff function, which sometimes takes too much time
     """
     if update_commands:
         # Modify te bibrecord object with the appropriate actions
@@ -549,7 +549,7 @@ def _get_formated_record(record_id, output_format, update_commands, language, ou
     old_record = search_engine.get_record(recid=record_id)
     old_record_textmarc = xmlmarc2textmarc.create_marc_record(old_record, sysno="", options=textmarc_options)
     if "hm" == output_format:
-        if update_commands:
+        if update_commands and run_diff:
             updated_record_textmarc = xmlmarc2textmarc.create_marc_record(updated_record, sysno="", options=textmarc_options)
             result = _get_record_diff(old_record_textmarc, updated_record_textmarc, outputTags, record_id)
         else:

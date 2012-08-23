@@ -196,11 +196,6 @@ function onButtonBackToResultsClick() {
 	}
 }
 
-function onButtonGoToNextPageClick(){
-	gPageToDiplay++;
-	performAJAXRequest();
-}
-
 function onButtonSubmitChangesClick(){
 	/*
 	 * Submits changes defined by user
