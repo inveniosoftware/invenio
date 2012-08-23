@@ -62,7 +62,7 @@ from invenio.access_control_config import DEF_DEMO_USER_ROLES, \
     DEF_DEMO_ROLES, DEF_DEMO_AUTHS, WEBACCESSACTION, MAXPAGEUSERS, \
     SUPERADMINROLE, CFG_EXTERNAL_AUTHENTICATION, DELEGATEADDUSERROLE, \
     CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, InvenioWebAccessFireroleError, \
-    MAXSELECTUSERS, CFG_EXTERNAL_AUTH_DEFAULT
+    MAXSELECTUSERS, CFG_EXTERNAL_AUTH_DEFAULT, CFG_WEB_API_KEY_STATUS
 from invenio.bibtask import authenticate
 from cgi import escape
 
@@ -1083,9 +1083,10 @@ def perform_editaccount(req, userID, mtype='', content='', callback='yes', confi
     <td>2.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s&amp;mtype=perform_modifypreferences">Modify preferences</a></small></td>
     </tr><tr>
     <td>3.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s&amp;mtype=perform_deleteaccount">Delete account</a></small></td>
+    <td>4.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s&amp;mtype=perform_modifyapikeydata">Edit REST API Key</a></small></td>
     </tr>
     </table>
-    """ % (CFG_SITE_SECURE_URL, userID, CFG_SITE_SECURE_URL, userID, CFG_SITE_SECURE_URL, userID, CFG_SITE_SECURE_URL, userID)
+    """ % (CFG_SITE_SECURE_URL, userID, CFG_SITE_SECURE_URL, userID, CFG_SITE_SECURE_URL, userID, CFG_SITE_SECURE_URL, userID, CFG_SITE_SECURE_URL, userID)
 
     if mtype == "perform_modifylogindata" and content:
         fin_output += content
@@ -1101,6 +1102,11 @@ def perform_editaccount(req, userID, mtype='', content='', callback='yes', confi
         fin_output += content
     elif mtype == "perform_deleteaccount" or not mtype:
         fin_output += perform_deleteaccount(req, userID, callback='')
+
+    if mtype == "perform_modifyapikeydata" and content:
+        fin_output += content
+    elif mtype == "perform_modifyapikeydata" or not mtype:
+        fin_output += perform_modifyapikeydata(req, userID, callback='')
 
     return index(req=req,
                 title='Edit Account',
@@ -1260,6 +1266,46 @@ def perform_deleteaccount(req, userID, callback='yes', confirm=0):
 
     if callback:
         return perform_editaccount(req, userID, mtype='perform_deleteaccount', content=addadminbox(subtitle, body), callback='yes')
+    else:
+        return addadminbox(subtitle, body)
+
+def perform_modifyapikeydata(req, userID, keyID='', status='' , callback='yes', confirm=0):
+    """modify REST API keys of an account"""
+
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
+
+    subtitle = """<a name="4"></a>4. Edit REST API Keys.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % CFG_SITE_SECURE_URL
+
+    if confirm in [1, "1"]:
+        run_sql("UPDATE apikey SET status=%s WHERE id=%s", (status, keyID))
+
+    res = run_sql("SELECT id, description, status FROM apikey WHERE id_user=%s", (userID, ))
+    output = ""
+    if res:
+        for key_info in res:
+            text = ''
+            text += ' <span class="adminlabel">Key: </span><code>%s</code><br />\n' % key_info[0]
+            text += ' <input class="admin_wvar" type="hidden" name="keyID" value="%s" />' % key_info[0]
+            text += ' <span class="adminlabel">Description: </span>%s<br />\n' % key_info[1]
+            text += ' <select name="status"> '
+            for status in CFG_WEB_API_KEY_STATUS.values():
+                text += ' <option %s value="%s">%s</option>' % (("", "selected")[key_info[2] == status], status, status)
+            text += ' </select> <br />\n'
+            if key_info[0] == keyID:
+                text += '<b><span class="info">Key status modified</span></b>'
+            output += createhiddenform(action="modifyapikeydata",
+                                       text=text,
+                                       userID=userID,
+                                       confirm=1,
+                                       button="Modify")
+    else:
+        output += '<b><span class="info">The account id given does not have REST API Keys.</span></b>'
+
+    body = [output]
+
+    if callback:
+        return perform_editaccount(req, userID, mtype='perform_modifyapikeydata', content=addadminbox(subtitle, body), callback='yes')
     else:
         return addadminbox(subtitle, body)
 

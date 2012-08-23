@@ -38,12 +38,14 @@ __revision__ = "$Id$"
 import getopt
 import sys
 import time
-import urllib
 import re
 import ConfigParser
 
+from invenio.urlutils import make_invenio_opener
 from invenio.config import CFG_ETCDIR
 from invenio.dbquery import run_sql
+
+BIBRANK_OPENER = make_invenio_opener('BibRank')
 
 opts_dict = {}
 task_id = -1
@@ -168,7 +170,7 @@ def get_from_source(type, data):
         for link in data[0].keys():
             if opts_dict["verbose"] >= 9:
                 write_message(data[0][link])
-            page = urllib.urlopen(data[0][link])
+            page = BIBRANK_OPENER.open(data[0][link])
             input = page.read()
             #Using the regexp from config file
             reg = re.compile(data[1])

@@ -111,7 +111,7 @@ class HTTPAsyncPageGetter(asyncore.dispatcher_with_send):
         self.header_data = ""
 
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.request, self.host, self.port = build_request(self.uri)
+        self.request, self.host, self.port = build_rest_request(self.uri)
         try:
             self.connect((self.host, self.port))
         except:
@@ -153,7 +153,7 @@ class HTTPAsyncPageGetter(asyncore.dispatcher_with_send):
         """
         print >> sys.stderr, "%s: %s" % (type, message)
 
-def build_request(uri):
+def build_rest_request(uri):
     """Build an http request for a specific url."""
 
     scheme, host, path, params, query, dummy = urlparse.urlparse(uri)

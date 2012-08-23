@@ -71,6 +71,8 @@ from invenio.bibcirculation_config import \
      CFG_BIBCIRCULATION_ACQ_TYPE
 import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
+from invenio.bibcirculation_utils import looks_like_dictionary, \
+    BIBCIRCULATION_OPENER
 import invenio.template
 bc_templates = invenio.template.load('bibcirculation')
 
@@ -2581,8 +2583,7 @@ def new_item(req, isbn, ln=CFG_SITE_LANG):
 
     if isbn:
         from xml.dom import minidom
-        import urllib
-        filexml = urllib.urlopen('http://ecs.amazonaws.com/onca/xml?' \
+        filexml = BIBCIRCULATION_OPENER.open('http://ecs.amazonaws.com/onca/xml?' \
                                  'Service=AWSECommerceService&AWSAccessKeyId=' \
                                  + CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY + \
                                  '&Operation=ItemSearch&Condition=All&' \
@@ -2665,7 +2666,7 @@ def new_item(req, isbn, ln=CFG_SITE_LANG):
             edition = ""
             book_info.append(str(edition))
 
-        cover_xml = urllib.urlopen('http://ecs.amazonaws.com/onca/xml' \
+        cover_xml = BIBCIRCULATION_OPENER.open('http://ecs.amazonaws.com/onca/xml' \
                                    '?Service=AWSECommerceService&AWSAccessKeyId=' \
                                    + CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY + \
                                    '&Operation=ItemSearch&Condition=All&' \

@@ -35,7 +35,7 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_SITE_RECORD
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
-        CFG_EXTERNAL_AUTH_LOGOUT_SSO
+        CFG_EXTERNAL_AUTH_LOGOUT_SSO, CFG_WEB_API_KEY_STATUS
 from invenio.urlutils import make_canonical_urlargd, create_url, create_html_link
 from invenio.htmlutils import escape_html, nmtoken_from_string
 from invenio.messages import gettext_set_language, language_list_long
@@ -98,6 +98,100 @@ class Template:
             },
             'external_user_groups' : _('External user groups'),
         }
+        return out
+
+    def tmpl_user_api_key(self, ln=CFG_SITE_LANG, keys_info=None):
+        """
+        Displays all the API key that the user owns the user
+
+        Parameters:
+
+          - 'ln' *string* - The language to display the interface in
+          - 'key_info' *tuples* - Contains the tuples with the key data (id, desciption, status)
+
+        """
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = """
+                <script type="text/javascript">
+                   $(document).ready(function(){
+                        $(".key_value").hide();
+                        $(".key_label").click(function(){
+                            $(this).next(".key_value").slideToggle("slow");
+                          });
+                    });
+                </script>
+                <p><big><strong class="headline">%(user_api_key)s</strong></big></p>
+              """ % {
+                     'user_api_key' : _("API keys")
+                     }
+
+        if keys_info and len(keys_info) != 0:
+            out += "<p>%(user_keys)s</p>" % {'user_keys': _("These are your current API keys")}
+            out += """
+                    <table>
+                    """
+            for key_info in keys_info:
+                out += """
+                        <tr><td>%(key_description)s</td>
+                        <td>%(key_status)s</td>
+                        </tr><tr>
+                        <td class = "key_label">
+                            <a name="#%(index)s" href="#%(index)s"> %(key_label)s</a>
+                        </td>
+                        <td class="key_value"><code/>%(key_id)s</code></td>
+                        </tr><tr>
+                        <td></td>
+                        <td align="left">
+                            <form method="post" action="%(sitesecureurl)s/youraccount/apikey" name="api_key_remove">
+                                 <input type="hidden" name="key_id" value="%(key_id)s" />
+                                <code class="blocknote"><input class="formbutton" type="%(input_type)s" value="%(remove_key)s" /></code>
+                            </form>
+                        </td>
+                        </tr>
+                       """ % {
+                              'key_description': _("Description: " + cgi.escape(key_info[1])),
+                              'key_status': _("Status: " + key_info[2]),
+                              'key_id': _(key_info[0]),
+                              'index':  keys_info.index(key_info),
+                              'key_label': _("API key"),
+                              'remove_key' : _("Delete key"),
+                              'sitesecureurl': CFG_SITE_SECURE_URL,
+                              'input_type': ("submit", "hidden")[key_info[2] == CFG_WEB_API_KEY_STATUS['REVOKED']]
+                              }
+            out += "</table>"
+
+        out += """
+                <form method="post" action="%(sitesecureurl)s/youraccount/apikey" name="api_key_create">
+                <p>%(create_new_key)s</p>
+                <table>
+                    <tr><td align="right" valign="top"><strong>
+                      <label for="new_key_description">%(new_key_description_label)s:</label></strong><br />
+                      <small class="important">(%(mandatory)s)</small>
+                    </td><td valign="top">
+                      <input type="text" size="50" name="key_description" id="key_description" value=""/><br />
+                      <small><span class="quicknote">%(note)s:</span>
+                       %(new_key_description_note)s
+                      </small>
+                    </td>
+                  </tr>
+                  <tr><td></td><td align="left">
+                    <code class="blocknote"><input class="formbutton" type="submit" value="%(create_new_key_button)s" /></code>
+                  </td></tr>
+                </table>
+                </form>
+        """ % {
+               'create_new_key' : _("If you want to create a new API key, please enter a description for it"),
+               'new_key_description_label' : _("Description for the new API key"),
+               'mandatory' : _("mandatory"),
+               'note' : _("Note"),
+               'new_key_description_note': _("The description should be something meaningful for you to recognize the API key"),
+               'create_new_key_button' : _("Create new key"),
+               'sitesecureurl': CFG_SITE_SECURE_URL
+               }
+
         return out
 
     def tmpl_user_preferences(self, ln, email, email_disabled, password_disabled, nickname):

@@ -26,7 +26,7 @@ import sys
 import bibauthorid_config as bconfig
 import bibtask
 
-from bibauthorid_backinterface import get_papers_recently_modified
+from bibauthorid_backinterface import get_recently_modified_record_ids
 from bibauthorid_backinterface import get_user_log
 from bibauthorid_backinterface import insert_user_log
 from bibauthorid_backinterface import get_sql_time
@@ -240,6 +240,7 @@ def rabbit_with_log(papers, check_invalid_papers, log_comment, partial=False):
         action = 'PID_UPDATE'
     insert_user_log('daemon', '-1', action, 'bibsched', 'status', comment=log_comment, timestamp=starting_time)
 
+
 def run_rabbit(paperslist, all_records=False):
     if not paperslist and all_records:
         rabbit_with_log(None, True, 'bibauthorid_daemon, update_personid on all papers')
@@ -248,7 +249,7 @@ def run_rabbit(paperslist, all_records=False):
 
         if len(last_log) >= 1:
             #select only the most recent papers
-            recently_modified = get_papers_recently_modified(date=last_log[0][2])
+            recently_modified = get_recently_modified_record_ids(date=last_log[0][2])
             if not recently_modified:
                 bibtask.write_message("update_personID_table_from_paper: "
                                       "All person entities up to date.",
@@ -266,13 +267,23 @@ def run_rabbit(paperslist, all_records=False):
 
 def run_tortoise(from_scratch):
     from bibauthorid_tortoise import tortoise, tortoise_from_scratch
+
     if from_scratch:
         tortoise_from_scratch()
     else:
-        tortoise()
+        start_time = get_sql_time()
+        tortoise_db_name = 'tortoise'
+
+        last_run = get_user_log(userinfo=tortoise_db_name, only_most_recent=True)
+        if last_run:
+            modified = get_recently_modified_record_ids(last_run[0][2])
+        else:
+            modified = []
+        tortoise(modified)
+
+    insert_user_log(tortoise_db_name, '-1', '', '', '', timestamp=start_time)
 
 
 def run_merge():
     from bibauthorid_merge import merge
     merge()
-

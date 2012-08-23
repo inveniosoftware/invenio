@@ -66,10 +66,13 @@ try:
     from invenio.bibtask import task_low_level_submission
     from invenio.search_engine import perform_request_search, collection_restricted_p
     from invenio.bibformat import format_records
+    from invenio.urlutils import make_user_agent_string
     LOCAL_SITE_URLS = [CFG_SITE_URL, CFG_SITE_SECURE_URL]
+    CFG_USER_AGENT = make_user_agent_string("invenio_connector")
 except ImportError:
     LOCAL_SITE_URLS = None
     CFG_CERN_SITE = 0
+    CFG_USER_AGENT = "invenio_connector"
 
 CFG_CDS_URL = "http://cdsweb.cern.ch/"
 
@@ -375,7 +378,7 @@ class InvenioConnector(object):
                                         'mode': mode})
             ## We don't use self.browser as batchuploader is protected by IP
             opener = urllib2.build_opener()
-            opener.addheaders = [('User-agent', 'invenio_webupload')]
+            opener.addheaders = [('User-Agent', CFG_USER_AGENT)]
             return opener.open(self.server_url + "/batchuploader/robotupload", params,)
 
     def _parse_results(self, results, cached_records):

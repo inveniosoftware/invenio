@@ -23,7 +23,6 @@ import sys
 import cPickle
 import re
 import os
-from urllib2 import urlopen
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -72,7 +71,8 @@ from invenio.webjournal_utils import \
      get_journal_languages, \
      get_journal_collection_to_refresh_on_release, \
      get_journal_index_to_refresh_on_release, \
-     issue_is_later_than
+     issue_is_later_than, \
+     WEBJOURNAL_OPENER
 from invenio.dbquery import run_sql
 from invenio.bibrecord import \
      create_record, \
@@ -479,7 +479,7 @@ def perform_request_alert(journal_name, issue,
         html_string = None
         if html_mail == "html":
             # Also send as HTML: retrieve from current issue
-            html_file = urlopen('%s/journal/%s?ln=%s'
+            html_file = WEBJOURNAL_OPENER.open('%s/journal/%s?ln=%s'
                                 % (CFG_SITE_URL, journal_name, alert_ln))
             html_string = html_file.read()
             html_file.close()
@@ -910,7 +910,7 @@ def put_css_in_file(html_message, journal_name):
     css_path = get_journal_css_url(journal_name)
     if not css_path:
         return
-    css_file = urlopen(css_path)
+    css_file = WEBJOURNAL_OPENER.open(css_path)
     css = css_file.read()
     css = make_full_paths_in_css(css, journal_name)
     html_parted = html_message.split("</head>")

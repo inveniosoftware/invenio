@@ -67,8 +67,11 @@ import config
 # only if not running in a stanalone mode
 if bconfig.STANDALONE:
     dbquery = None
+    from urllib2 import urlopen
 else:
     import dbquery
+    from urlutils import make_invenio_opener
+    urlopen = make_invenio_opener('BibClassify').open
 
 _contains_digit = re.compile("\d")
 _starts_with_non = re.compile("(?i)^non[a-z]")
@@ -783,7 +786,7 @@ def _get_last_modification_date(url):
     """Get the last modification date of the ontology."""
     request = urllib2.Request(url)
     request.get_method = lambda: "HEAD"
-    http_file = urllib2.urlopen(request)
+    http_file = urlopen(request)
     date_string = http_file.headers["last-modified"]
     parsed = time.strptime(date_string, "%a, %d %b %Y %H:%M:%S %Z")
     return datetime(*(parsed)[0:6])
@@ -793,7 +796,7 @@ def _download_ontology(url, local_file):
     log.debug("Copying remote ontology '%s' to file '%s'." % (url,
         local_file))
     try:
-        url_desc = urllib2.urlopen(url)
+        url_desc = urlopen(url)
         file_desc = open(local_file, 'w')
         file_desc.write(url_desc.read())
         file_desc.close()

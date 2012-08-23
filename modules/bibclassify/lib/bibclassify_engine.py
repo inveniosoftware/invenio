@@ -53,9 +53,12 @@ import bibclassify_text_normalizer as normalizer
 import bibclassify_keyword_analyzer as keyworder
 import bibclassify_acronym_analyzer as acronymer
 
-
-
-
+try:
+    from invenio.urlutils import make_user_agent_string
+except ImportError:
+    ## Not in Invenio, we simply use default agent
+    def make_user_agent_string(component=None):
+        return bconfig.CFG_BIBCLASSIFY_USER_AGENT
 
 # ---------------------------------------------------------------------
 #                          API
@@ -112,7 +115,7 @@ def output_keywords_for_sources(input_sources, taxonomy_name, output_mode="text"
         else:
             # Treat as a URL.
             text_lines = extractor.text_lines_from_url(entry,
-                user_agent=bconfig.CFG_BIBCLASSIFY_USER_AGENT)
+                user_agent=make_user_agent_string("BibClassify"))
             if text_lines:
                 source = entry.split("/")[-1]
                 process_lines()

@@ -25,59 +25,11 @@
 
 from itertools import groupby
 from operator import itemgetter
-import bibauthorid_config as bconfig
 
-from bibauthorid_dbinterface import get_recently_modified_record_ids as get_papers_recently_modified #emitting
-from bibauthorid_dbinterface import get_user_log                         #emitting
-from bibauthorid_dbinterface import insert_user_log                      #emitting
-from bibauthorid_dbinterface import get_all_names_from_personid          #emitting
-from bibauthorid_dbinterface import get_key_words                        #emitting
-from bibauthorid_dbinterface import bib_matrix                           #emitting
-from bibauthorid_dbinterface import get_name_by_bibrecref                #emitting
-from bibauthorid_dbinterface import get_new_personid                     #emitting
-from bibauthorid_dbinterface import get_deleted_papers                   #emitting
-from bibauthorid_dbinterface import get_authors_from_paper               #emitting
-from bibauthorid_dbinterface import get_coauthors_from_paper             #emitting
-from bibauthorid_dbinterface import delete_paper_from_personid           #emitting
-from bibauthorid_dbinterface import get_signatures_from_rec              #emitting
-from bibauthorid_dbinterface import modify_signature                     #emitting
-from bibauthorid_dbinterface import remove_sigs                          #emitting
-from bibauthorid_dbinterface import find_pids_by_name                    #emitting
-from bibauthorid_dbinterface import new_person_from_signature            #emitting
-from bibauthorid_dbinterface import add_signature                        #emitting
-from bibauthorid_dbinterface import copy_personids                       #emitting
-from bibauthorid_dbinterface import get_all_bibrecs                      #emitting
-from bibauthorid_dbinterface import remove_all_bibrecs                   #emitting
-from bibauthorid_dbinterface import save_cluster                         #emitting
-from bibauthorid_dbinterface import empty_results_table                  #emitting
-from bibauthorid_dbinterface import check_personid_papers                #emitting
-from bibauthorid_dbinterface import get_bib10x, get_bib70x               #emitting
-from bibauthorid_dbinterface import get_bibrefrec_subset                 #emitting
-from bibauthorid_dbinterface import update_personID_canonical_names      #emitting
-from bibauthorid_dbinterface import get_full_personid_papers             #emitting
-from bibauthorid_dbinterface import get_full_results                     #emitting
-from bibauthorid_dbinterface import personid_get_recids_affected_since   #emitting
-from bibauthorid_dbinterface import get_existing_personids               #emitting
-from bibauthorid_dbinterface import get_lastname_results                 #emitting
-from bibauthorid_dbinterface import personid_name_from_signature         #emitting
-from bibauthorid_dbinterface import get_existing_result_clusters         #emitting
-from bibauthorid_dbinterface import remove_personid_papers               #emitting
-from bibauthorid_dbinterface import repair_personid                      #emitting
-from bibauthorid_dbinterface import get_sql_time                         #emitting
-from bibauthorid_dbinterface import find_pids_by_exact_name              #emitting
-from bibauthorid_dbinterface import get_all_papers_of_pids               #emitting
-from bibauthorid_dbinterface import get_claimed_papers                   #emitting
-from bibauthorid_dbinterface import remove_result_cluster                #emitting
-from bibauthorid_dbinterface import filter_modified_record_ids           #emitting
-from bibauthorid_dbinterface import personid_from_signature              #emitting
-from bibauthorid_dbinterface import move_signature                       #emitting
-from bibauthorid_dbinterface import find_conflicts                       #emitting
-from bibauthorid_dbinterface import get_signature_info                   #emitting
-from bibauthorid_dbinterface import in_results
-from bibauthorid_dbinterface import check_results                        #emitting
-from bibauthorid_dbinterface import check_merger                         #emitting
+#Well this is bad, BUT otherwise there must 100+ lines
+#of the form from dbinterface import ...  # emitting
+from bibauthorid_dbinterface import *
 
-from search_engine import perform_request_search
 import bibauthorid_dbinterface as dbinter
 
 
@@ -160,9 +112,4 @@ def filter_bibrecs_outside(all_papers):
 
     for sep in separated:
         remove_all_bibrecs(sep)
-
-def get_all_valid_bibrecs():
-    collection_restriction_pattern = " or ".join(["980__a:\"%s\"" % x for x in bconfig.LIMIT_TO_COLLECTIONS])
-    return perform_request_search(p="%s" % collection_restriction_pattern, rg=0)
-
 

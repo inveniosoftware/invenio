@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -46,6 +46,16 @@ from invenio.bibcirculation_config import \
                                 CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN, \
                                 CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED, \
                                 CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED
+from invenio.urlutils import create_html_link, make_invenio_opener
+from invenio.config import CFG_SITE_URL, CFG_TMPDIR
+from invenio.bibcirculation_config import CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY, \
+     CFG_BIBCIRCULATION_WORKING_DAYS, \
+     CFG_BIBCIRCULATION_HOLIDAYS
+from invenio.messages import gettext_set_language
+
+import datetime, time, re
+
+BIBCIRCULATION_OPENER = make_invenio_opener('BibCirculation')
 
 DICC_REGEXP = re.compile("^\{('[^']*': ?('[^']*'|\"[^\"]+\"|[0-9]*|None)(, ?'[^']*': ?('[^']*'|\"[^\"]+\"|[0-9]*|None))*)?\}$")
 
@@ -174,10 +184,9 @@ def get_book_cover(isbn):
     """
 
     from xml.dom import minidom
-    import urllib
 
     # connect to AWS
-    cover_xml = urllib.urlopen('http://ecs.amazonaws.com/onca/xml' \
+    cover_xml = BIBCIRCULATION_OPENER.open('http://ecs.amazonaws.com/onca/xml' \
                                '?Service=AWSECommerceService&AWSAccessKeyId=' \
                                + CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY + \
                                '&Operation=ItemSearch&Condition=All&' \

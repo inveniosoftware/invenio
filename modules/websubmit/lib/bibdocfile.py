@@ -99,7 +99,7 @@ from invenio.errorlib import register_exception
 from invenio.bibrecord import record_get_field_instances, \
     field_get_subfield_values, field_get_subfield_instances, \
     encode_for_xml
-from invenio.urlutils import create_url
+from invenio.urlutils import create_url, make_user_agent_string
 from invenio.textutils import nice_size
 from invenio.access_control_engine import acc_authorize_action
 from invenio.webuser import collect_user_info
@@ -2378,7 +2378,12 @@ class BibDoc:
             return
         try:
             os.remove(afile.get_full_path())
-            run_sql("DELETE FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=%s AND format=%s", (self.id, afile.get_version(), afile.get_format))
+            run_sql("DELETE FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=%s AND format=%s", (self.id, afile.get_version(), afile.get_format()))
+            last_version = run_sql("SELECT max(version) FROM bibdocfsinfo WHERE id_bibdoc=%s", (self.id, ))[0][0]
+            if last_version:
+                ## Updating information about last version
+                run_sql("UPDATE bibdocfsinfo SET last_version=true WHERE id_bibdoc=%s AND version=%s", (self.id, last_version))
+                run_sql("UPDATE bibdocfsinfo SET last_version=false WHERE id_bibdoc=%s AND version<>%s", (self.id, last_version))
         except OSError:
             pass
         self.touch()
@@ -4001,6 +4006,7 @@ def open_url(url, headers=None, head_request=False):
 
     request_obj = head_request and HeadRequest or urllib2.Request
     request = request_obj(url)
+    request.add_header('User-Agent', make_user_agent_string('bibdocfile'))
     for key, value in headers_to_use.items():
         request.add_header(key, value)
 

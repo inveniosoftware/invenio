@@ -22,7 +22,7 @@ BibSWORD Client Http Queries
 import urllib2
 from tempfile import NamedTemporaryFile
 from invenio.config import CFG_TMPDIR
-from invenio.bibsword_config import CFG_DEFAULT_USER_AGENT
+from invenio.urlutils import make_user_agent_string
 
 class RemoteSwordServer:
     '''This class gives every tools to communicate with the SWORD/APP deposit
@@ -30,7 +30,7 @@ class RemoteSwordServer:
     '''
 
     # static variable used to properly perform http request
-    agent = CFG_DEFAULT_USER_AGENT
+    agent = make_user_agent_string("BibSWORD")
 
 
     def __init__(self, authentication_infos):
@@ -113,7 +113,7 @@ class RemoteSwordServer:
 
         headers['X-No-Op'] = 'True'
         headers['X-Verbose'] = 'True'
-        headers['User-Agent'] = CFG_DEFAULT_USER_AGENT
+        headers['User-Agent'] = self.agent
 
         #format the request
         result = urllib2.Request(deposit_url, media['file'], headers)
@@ -136,7 +136,7 @@ class RemoteSwordServer:
         #prepare the header of the request
         headers = {}
         headers['Host'] = 'arxiv.org'
-        headers['User-Agent'] = CFG_DEFAULT_USER_AGENT
+        headers['User-Agent'] = self.agent
         headers['Content-Type'] = 'application/atom+xml;type=entry'
         #if on behalf, add to the header
         if onbehalf != '':
@@ -173,7 +173,7 @@ class RemoteSwordServer:
         #format the http request
         request = urllib2.Request(status_url)
         request.add_header('Host', 'arxiv.org')
-        request.add_header('User-Agent', CFG_DEFAULT_USER_AGENT)
+        request.add_header('User-Agent', self.agent)
 
         #launch request
         try:

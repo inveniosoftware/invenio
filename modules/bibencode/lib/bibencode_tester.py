@@ -32,6 +32,7 @@ import invenio.config
 from invenio.bibencode_encode import encode_video
 from invenio.bibencode_extract import extract_frames
 from invenio.textutils import wait_for_user
+from invenio.urlutils import make_invenio_opener
 from os.path import basename
 import os
 from urlparse import urlsplit
@@ -39,6 +40,8 @@ import shutil
 import urllib2
 
 from invenio.testutils import make_test_suite, run_test_suite
+
+BIBENCODE_OPENER = make_invenio_opener('BibEncode')
 
 ## original URL
 video_url = "http://media.xiph.org/video/derf/y4m/blue_sky_1080p25.y4m"
@@ -83,7 +86,7 @@ def download(url, localFileName = None):
     """
     localName = url2name(url)
     req = urllib2.Request(url)
-    r = urllib2.urlopen(req)
+    r = BIBENCODE_OPENER.open(req)
     if r.info().has_key('Content-Disposition'):
         # If the response has Content-Disposition, we take file name from it
         localName = r.info()['Content-Disposition'].split('filename=')[1]

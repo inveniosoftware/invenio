@@ -102,8 +102,14 @@ elif CFG_OPENAIRE_SITE:
     CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
     CFG_EXTERNAL_AUTHENTICATION = {
     "Local": None,
-    "OpenAIRE": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False),
-    "ZOpenAIRE": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
+    "OpenAIRE": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False, external_id_attribute_name="id"),
+    }
+elif CFG_INSPIRE_SITE:
+    CFG_EXTERNAL_AUTH_DEFAULT = 'arXiv'
+    CFG_EXTERNAL_AUTH_USING_SSO = False
+    CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
+    CFG_EXTERNAL_AUTHENTICATION = {
+        "arXiv": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
     }
 elif CFG_INSPIRE_SITE:
     # INSPIRE specific robot configuration
@@ -361,3 +367,12 @@ CFG_WEBACCESS_WARNING_MSGS = {
                                19: """The site is having troubles in sending you an email for confirming your email address. The error has been logged and will be taken care of as soon as possible.""",
                                20: """No roles are authorized to perform action %s with the given parameters."""
         }
+
+#There are three status key that must be here: OK, REMOVED and REVOKED
+#the value doesn't matter at all
+CFG_WEB_API_KEY_STATUS = {
+                      'OK':'OK',
+                      'REMOVED':'REMOVED',
+                      'REVOKED':'REVOKED',
+                      'WARNING':'WARNING'
+                      }

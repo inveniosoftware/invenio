@@ -103,7 +103,8 @@ class ExternalAuthCern(ExternalAuth):
     def auth_user(self, username, password, req=None):
         """
         Check USERNAME and PASSWORD against CERN NICE/CRA database.
-        Return None if authentication failed, or the email address of the
+        Return (None, None) if authentication failed, or the
+        (email address, nickname) of the
         person if the authentication was successful.  In order to do
         this you may perhaps have to keep a translation table between
         usernames and email addresses.
@@ -116,9 +117,9 @@ class ExternalAuthCern(ExternalAuth):
         infos = self._try_twice(funct=AuthCernWrapper.get_user_info, \
                 params={"user_name":username, "password":password})
         if "email" in infos:
-            return infos["email"]
+            return infos["email"], infos["login"]
         else:
-            return None
+            return None, None
 
     def user_exists(self, email, req=None):
         """Checks against CERN NICE/CRA for existance of email.

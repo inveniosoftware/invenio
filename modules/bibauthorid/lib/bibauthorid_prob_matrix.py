@@ -20,34 +20,56 @@
 import bibauthorid_config as bconfig
 from bibauthorid_comparison import compare_bibrefrecs
 from bibauthorid_comparison import clear_all_caches as clear_comparison_caches
-from bibauthorid_backinterface import bib_matrix
-from bibauthorid_backinterface import get_sql_time
+from bibauthorid_backinterface import Bib_matrix
 from bibauthorid_backinterface import filter_modified_record_ids
-from bibauthorid_general_utils import update_status \
-                                    , update_status_final
+from bibauthorid_general_utils import bibauthor_print \
+                                    , update_status \
+                                    , update_status_final \
+                                    , is_eq
 
 if bconfig.DEBUG_CHECKS:
-    def _debug_is_eq(v1, v2):
-        eps = 1e-2
-        return v1 + eps > v2 and v2 + eps > v1
-
     def _debug_is_eq_v(vl1, vl2):
         if isinstance(vl1, str) and isinstance(vl2, str):
             return vl1 == vl2
 
         if isinstance(vl1, tuple) and isinstance(vl2, tuple):
-            return _debug_is_eq(vl1[0], vl2[0]) and _debug_is_eq(vl1[1], vl2[1])
+            return is_eq(vl1[0], vl2[0]) and is_eq(vl1[1], vl2[1])
 
         return False
 
-class probability_matrix:
+
+class ProbabilityMatrix(object):
     '''
     This class contains and maintains the comparison
     between all virtual authors. It is able to write
     and read from the database and update the results.
     '''
+    def __init__(self):
+        self._bib_matrix = Bib_matrix()
 
-    def __init__(self, cluster_set, use_cache=False, save_cache=False):
+    def load(self, lname, load_map=True, load_matrix=True):
+        update_status(0., "Loading probability matrix...")
+        self._bib_matrix.load(lname, load_map, load_matrix)
+        update_status_final("Probability matrix loaded.")
+
+    def store(self, name):
+        update_status(0., "Saving probability matrix...")
+        self._bib_matrix.store(name)
+        update_status_final("Probability matrix saved.")
+
+    def __getitem__(self, bibs):
+        return self._bib_matrix[bibs[0], bibs[1]]
+
+
+    def __get_up_to_date_bibs(self):
+        return frozenset(filter_modified_record_ids(
+                         self._bib_matrix.get_keys(),
+                         self._bib_matrix.creation_time))
+
+    def is_up_to_date(self, cluster_set):
+        return self.__get_up_to_date_bibs() >= frozenset(cluster_set.all_bibs())
+
+    def recalculate(self, cluster_set):
         '''
         Constructs probability matrix. If use_cache is true, it will
         try to load old computations from the database. If save cache
@@ -59,24 +81,14 @@ class probability_matrix:
             if cur_calc % 10000000 == 0:
                 clear_comparison_caches()
 
-        self._bib_matrix = bib_matrix(cluster_set)
+        old_matrix = self._bib_matrix
+        cached_bibs = self.__get_up_to_date_bibs()
+        self._bib_matrix = Bib_matrix(cluster_set)
 
-        old_matrix = bib_matrix()
-
-        ncl = sum(len(cl.bibs) for cl in cluster_set.clusters)
+        ncl = cluster_set.num_all_bibs
         expected = ((ncl * (ncl - 1)) / 2)
         if expected == 0:
             expected = 1
-
-        if use_cache and old_matrix.load(cluster_set.last_name):
-            cached_bibs = set(filter_modified_record_ids(
-                                  old_matrix.get_keys(),
-                                  old_matrix.creation_time))
-        else:
-            cached_bibs = set()
-
-        if save_cache:
-            creation_time = get_sql_time()
 
         cur_calc, opti = 0, 0
         for cl1 in cluster_set.clusters:
@@ -103,13 +115,23 @@ class probability_matrix:
                             self._bib_matrix[bib1, bib2] = val
 
         clear_comparison_caches()
-
-        if save_cache:
-            update_status(1., "saving...")
-            self._bib_matrix.store(cluster_set.last_name, creation_time)
-
         update_status_final("Matrix done. %d calc, %d opt." % (cur_calc, opti))
 
-    def __getitem__(self, bibs):
-        return self._bib_matrix[bibs[0], bibs[1]]
 
+def prepare_matirx(cluster_set, force):
+    if bconfig.DEBUG_CHECKS:
+        assert cluster_set._debug_test_hate_relation()
+        assert cluster_set._debug_duplicated_recs()
+
+    matr = ProbabilityMatrix()
+    matr.load(cluster_set.last_name, load_map=True, load_matrix=False)
+    if not force and matr.is_up_to_date(cluster_set):
+        bibauthor_print("Cluster %s is up-to-date and therefore will not be computed."
+            % cluster_set.last_name)
+        # nothing to do
+        return False
+
+    matr.load(cluster_set.last_name, load_map=False, load_matrix=True)
+    matr.recalculate(cluster_set)
+    matr.store(cluster_set.last_name)
+    return True

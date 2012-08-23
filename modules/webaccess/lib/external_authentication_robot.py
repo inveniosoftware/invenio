@@ -154,6 +154,9 @@ class ExternalAuthRobot(ExternalAuth):
     @param userip_attribute_name: the actual key in the assertion that will
         contain the user IP.
     @type userip_attribute_name: string
+    @param external_id_attribute_name: the actual string that identifies the
+        user in the external authentication system. By default this is set
+        to be the same as the nickname, but this can be configured.
     @param check_user_ip: whether to check for the IP address of the user
         using the given URL, against the IP address stored in the assertion
         to be identical. If 0, no IP check will be performed, if 1, only the
@@ -174,6 +177,7 @@ class ExternalAuthRobot(ExternalAuth):
             timeout_attribute_name=CFG_ROBOT_TIMEOUT_ATTRIBUTE_NAME,
             userip_attribute_name=CFG_ROBOT_USERIP_ATTRIBUTE_NAME,
             check_user_ip=4,
+            external_id_attribute_name=CFG_ROBOT_NICKNAME_ATTRIBUTE_NAME,
             use_zlib=True,
             ):
         ExternalAuth.__init__(self, enforce_external_nicknames=enforce_external_nicknames)
@@ -183,6 +187,7 @@ class ExternalAuthRobot(ExternalAuth):
         self.groups_separator = groups_separator
         self.timeout_attribute_name = timeout_attribute_name
         self.userip_attribute_name = userip_attribute_name
+        self.external_id_attribute_name = external_id_attribute_name
         self.check_user_ip = check_user_ip
         self.use_zlib = use_zlib
 
@@ -238,13 +243,14 @@ class ExternalAuthRobot(ExternalAuth):
         """
         data = self.__extract_attribute(req)
         email = data.get(self.email_attribute_name)
+        ext_id = data.get(self.external_id_attribute_name, email)
         if email:
             if isinstance(email, str):
-                return email.strip().lower()
+                return email.strip().lower(), ext_id.strip()
             else:
                 raise InvenioWebAccessExternalAuthError("The email provided in the assertion is invalid: %s" % (repr(email)))
         else:
-            return None
+            return None, None
 
     def fetch_user_groups_membership(self, username, password=None, req=None):
         """Given a username and a password, returns a dictionary of groups

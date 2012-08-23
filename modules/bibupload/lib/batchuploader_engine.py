@@ -39,7 +39,7 @@ from invenio.config import CFG_BINDIR, CFG_TMPSHAREDDIR, CFG_LOGDIR, \
                             CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
                             CFG_OAI_ID_FIELD, CFG_BATCHUPLOADER_DAEMON_DIR, \
                             CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS, \
-                            CFG_BATCHUPLOADER_WEB_ROBOT_AGENT, \
+                            CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS, \
                             CFG_PREFIX, CFG_SITE_LANG
 from invenio.textutils import encode_for_xml
 from invenio.bibtask import task_low_level_submission
@@ -62,6 +62,8 @@ except ImportError:
 PERMITTED_MODES = ['-i', '-r', '-c', '-a', '-ir',
                    '--insert', '--replace', '--correct', '--append']
 
+_CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS_RE = re.compile(CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS)
+
 def cli_allocate_record(req):
     req.content_type = "text/plain"
     req.send_http_header()
@@ -79,7 +81,7 @@ def cli_allocate_record(req):
     recid = run_sql("insert into bibrec (creation_date,modification_date) values(NOW(),NOW())")
     return recid
 
-def cli_upload(req, file_content=None, mode=None, callback_url=None):
+def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None):
     """ Robot interface for uploading MARC files
     """
     req.content_type = "text/plain"
@@ -91,16 +93,11 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None):
         _log(msg)
         return _write(req, msg)
     if not _check_client_useragent(req):
-        msg = "[ERROR] Sorry, this useragent cannot use the service."
+        msg = "[ERROR] Sorry, the %s useragent cannot use the service." % _get_useragent(req)
         _log(msg)
         return _write(req, msg)
 
-    arg_file = file_content
     arg_mode = mode
-    if not arg_file:
-        msg = "[ERROR] Please specify file body to input."
-        _log(msg)
-        return _write(req, msg)
     if not arg_mode:
         msg = "[ERROR] Please specify upload mode to use."
         _log(msg)
@@ -109,12 +106,26 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None):
         msg = "[ERROR] Invalid upload mode."
         _log(msg)
         return _write(req, msg)
-    if hasattr(arg_file, "filename"):
-        arg_file = arg_file.value
+
+    arg_file = file_content
+    if hasattr(arg_file, 'read'):
+        ## We've been passed a readable file, e.g. req
+        arg_file = arg_file.read()
+        if not arg_file:
+            msg = "[ERROR] Please provide a body to your request."
+            _log(msg)
+            return _write(req, msg)
     else:
-        msg = "[ERROR] 'file' parameter must be a (single) file"
-        _log(msg)
-        return _write(req, msg)
+        if not arg_file:
+            msg = "[ERROR] Please specify file body to input."
+            _log(msg)
+            return _write(req, msg)
+        if hasattr(arg_file, "filename"):
+            arg_file = arg_file.value
+        else:
+            msg = "[ERROR] 'file' parameter must be a (single) file"
+            _log(msg)
+            return _write(req, msg)
 
     # write temporary file:
     tempfile.tempdir = CFG_TMPSHAREDDIR
@@ -143,13 +154,14 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None):
         msg = "[ERROR] MARCXML is not valid."
         _log(msg)
         return _write(req, msg)
+    args = ['bibupload', "batchupload", arg_mode, filename]
     # run upload command
     if callback_url:
-        task_low_level_submission('bibupload', "batchupload", arg_mode, filename, "--callback-url", callback_url)
-        msg = "[INFO] %s %s %s %s %s" % ('bibupload', arg_mode, filename, "--callback-url", callback_url)
-    else:
-        task_low_level_submission('bibupload', "batchupload", arg_mode, filename)
-        msg = "[INFO] %s %s %s" % ('bibupload', arg_mode, filename)
+        args += ["--callback-url", callback_url]
+        if nonce:
+            args += ["--nonce", nonce]
+    task_low_level_submission(*args)
+    msg = "[INFO] %s" % ' '.join(args)
     _log(msg)
     return _write(req, msg)
 
@@ -513,6 +525,11 @@ def perform_upload_check(xml_record, mode):
 
     return '\n'.join(error_cache)
 
+def _get_useragent(req):
+    """Return client user agent from req object."""
+    user_info = collect_user_info(req)
+    return user_info['agent']
+
 def _get_client_ip(req):
     """Return client IP address from req object."""
     return str(req.remote_ip)
@@ -530,9 +547,8 @@ def _check_client_useragent(req):
     """
     Is this user agent permitted to use the service?
     """
-    user_info = collect_user_info(req)
-    client_useragent = user_info['agent']
-    if client_useragent in CFG_BATCHUPLOADER_WEB_ROBOT_AGENT:
+    client_useragent = _get_useragent(req)
+    if _CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS_RE.match(client_useragent):
         return True
     return False
 

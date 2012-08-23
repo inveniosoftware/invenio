@@ -2978,6 +2978,15 @@ CREATE TABLE IF NOT EXISTS user (
   KEY nickname (nickname)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS userEXT (
+  id varbinary(255) NOT NULL,
+  method varchar(50) NOT NULL,
+  id_user int(15) unsigned NOT NULL,
+  PRIMARY KEY (id, method),
+  UNIQUE KEY (id_user, method)
+) ENGINE=MyISAM;
+
+
 -- tables for usergroups
 
 CREATE TABLE IF NOT EXISTS usergroup (
@@ -3999,6 +4008,7 @@ CREATE TABLE IF NOT EXISTS `aidUSERINPUTLOG` (
   `id` bigint(15) NOT NULL AUTO_INCREMENT,
   `transactionid` bigint(15) NOT NULL,
   `timestamp` datetime NOT NULL,
+  `userid` int,
   `userinfo` varchar(255) NOT NULL,
   `personid` bigint(15) NOT NULL,
   `action` varchar(50) NOT NULL,
@@ -4009,6 +4019,7 @@ CREATE TABLE IF NOT EXISTS `aidUSERINPUTLOG` (
   INDEX `transactionid-b` (`transactionid`),
   INDEX `timestamp-b` (`timestamp`),
   INDEX `userinfo-b` (`userinfo`),
+  INDEX `userid-b` (`userid`),
   INDEX `personid-b` (`personid`),
   INDEX `action-b` (`action`),
   INDEX `tag-b` (`tag`),
@@ -4026,13 +4037,6 @@ CREATE TABLE IF NOT EXISTS `aidCACHE` (
   INDEX `key-b` (`object_key`),
   INDEX `last_updated-b` (`last_updated`)
 ) ENGINE=MyISAM;
-
-CREATE TABLE IF NOT EXISTS `aidPROBCACHE` (
-  `cluster` VARCHAR( 256 ) NOT NULL ,
-  `bibmap` MEDIUMBLOB NOT NULL ,
-  `matrix` LONGBLOB NOT NULL ,
-  PRIMARY KEY ( `cluster` )
-) ENGINE = MYISAM ;
 
 -- refextract tables:
 
@@ -4158,6 +4162,19 @@ CREATE TABLE IF NOT EXISTS lnkADMINURLLOG (
   id_lnkLOG int(15) unsigned NOT NULL,
   FOREIGN KEY (id_lnkADMINURL) REFERENCES lnkADMINURL(id),
   FOREIGN KEY (id_lnkLOG) REFERENCES lnkLOG(id)
+) ENGINE=MyISAM;
+
+-- table for API key
+
+CREATE TABLE IF NOT EXISTS webapikey (
+  id varchar(150) NOT NULL,
+  secret varchar(150) NOT NULL,
+  id_user int(15) NOT NULL,
+  status varchar(25) NOT NULL default 'OK',
+  description varchar(255) default NULL,
+  PRIMARY KEY (id),
+  KEY (id_user),
+  KEY (status)
 ) ENGINE=MyISAM;
 
 -- end of file

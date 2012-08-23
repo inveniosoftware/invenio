@@ -55,6 +55,7 @@ from invenio import webgroup
 from invenio import webgroup_dblayer
 from invenio.messages import gettext_set_language, wash_language
 from invenio.mailutils import send_email
+from invenio.errorlib import register_exception
 from invenio.access_control_mailcookie import mail_cookie_retrieve_kind, \
     mail_cookie_check_pw_reset, mail_cookie_delete_cookie, \
     mail_cookie_create_pw_reset, mail_cookie_check_role, \
@@ -64,16 +65,21 @@ from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS, \
     CFG_EXTERNAL_AUTH_USING_SSO, CFG_EXTERNAL_AUTH_LOGOUT_SSO, \
     CFG_EXTERNAL_AUTHENTICATION, CFG_EXTERNAL_AUTH_SSO_REFRESH
 
+from invenio import web_api_key
+
+
 import invenio.template
 websession_templates = invenio.template.load('websession')
 bibcatalog_templates = invenio.template.load('bibcatalog')
+
+
 
 class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
     _exports = ['', 'edit', 'change', 'lost', 'display',
                 'send_email', 'youradminactivities', 'access',
                 'delete', 'logout', 'login', 'register', 'resetpassword',
-                'robotlogin', 'robotlogout']
+                'robotlogin', 'robotlogout', 'apikey']
 
     _force_https = True
 
@@ -247,6 +253,34 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     lastupdated=__lastupdated__,
                     navmenuid='youraccount')
 
+    def apikey(self, req, form):
+        args = wash_urlargd(form, {
+                                   'key_description' : (str, None),
+                                   'key_id' : (str, None),
+                                   'referer': (str, '')
+                                   })
+        uid = webuser.getUid(req)
+        # load the right message language
+        _ = gettext_set_language(args['ln'])
+
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return webuser.page_not_authorized(req, "../youraccount/edit",
+                                               navmenuid='youraccount')
+        if webuser.isGuestUser(uid):
+            return webuser.page_not_authorized(req, "../youraccount/edit",
+                                               text=_("This functionality is forbidden to guest users."),
+                                               navmenuid='youraccount')
+
+        if args['key_id']:
+            web_api_key.mark_web_api_key_as_removed(args['key_id'])
+        else:
+            uid = webuser.getUid(req)
+            web_api_key.create_new_web_api_key(uid, args['key_description'])
+
+        if args['referer']:
+            redirect_to_url(req, args['referer'])
+        else:
+            redirect_to_url(req, '%s/youraccount/edit?ln=%s' % (CFG_SITE_SECURE_URL, args['ln']))
 
     def edit(self, req, form):
         args = wash_urlargd(form, {"verbose" : (int, 0)})

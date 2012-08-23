@@ -31,6 +31,7 @@ from bibauthorid_backinterface import personid_get_recids_affected_since as get_
 from bibauthorid_backinterface import repair_personid                      #emitting
 from bibauthorid_backinterface import check_results                        #emitting
 from bibauthorid_backinterface import check_merger                         #emitting
+from bibauthorid_backinterface import restore_personids                    #emitting
 
 def convert_personid():
     from dbquery import run_sql # oh come on, the whole function will be removed soon

@@ -20,15 +20,14 @@
 WebJournal widget - Display Indico seminars
 """
 from invenio.config import CFG_CACHEDIR, CFG_SITE_LANG
-from urllib2 import urlopen
 from xml.dom import minidom
-from invenio.urlutils import create_Indico_request_url
+from invenio.urlutils import create_Indico_request_url, make_invenio_opener
 import time
 import base64
 import socket
 
 from invenio.webjournal_utils import \
-     parse_url_string
+     parse_url_string, WEBJOURNAL_OPENER
 from invenio.messages import gettext_set_language
 
 update_frequency = 3600 # in seconds
@@ -173,7 +172,7 @@ def _update_seminars(indico_baseurl, indico_what, indico_loc, indico_id,
     socket.setdefaulttimeout(2.0)
     try:
         try:
-            indico_xml = urlopen(url)
+            indico_xml = WEBJOURNAL_OPENER.open(url)
         except:
             return
     finally:

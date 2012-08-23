@@ -445,7 +445,7 @@ class FieldStorage:
         #
 
         self.list = FieldList()
-        self.wsgi_input_consumed = True
+        self.wsgi_input_consumed = False
 
         # always process GET-style parameters
         if req.args:
@@ -470,15 +470,14 @@ class FieldStorage:
 
         if ctype.startswith("application/x-www-form-urlencoded"):
             pairs = parse_qsl(req.read(clen), keep_blank_values)
+            self.wsgi_input_consumed = True
             for pair in pairs:
                 self.add_field(pair[0], pair[1])
             return
-
-
-        if not ctype.startswith("multipart/"):
+        elif not ctype.startswith("multipart/"):
             # we don't understand this content-type
-            self.wsgi_input_consumed = False
             return
+        self.wsgi_input_consumed = True
 
         # figure out boundary
         try:
@@ -823,7 +822,7 @@ RE_CDISPOSITION_FILENAME = re.compile(r'filename=(?P<filename>[\w\.]*)')
 def handle_file_post(req, allowed_mimetypes=None):
     """
     Handle the POST of a file.
-    @return: the a tuple with th full path to the file saved on disk,
+    @return: the a tuple with the full path to the file saved on disk,
     and it's mimetype as provided by the request.
     @rtype: (string, string)
     """

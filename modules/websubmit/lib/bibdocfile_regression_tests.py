@@ -24,6 +24,7 @@ __revision__ = "$Id$"
 import unittest
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibdocfile import BibRecDocs, check_bibdoc_authorization, bibdocfile_url_p
+from invenio.dbquery import run_sql
 from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
 from invenio.config import \
         CFG_SITE_URL, \
@@ -31,6 +32,28 @@ from invenio.config import \
         CFG_WEBSUBMIT_FILEDIR, \
         CFG_SITE_RECORD
 
+class BibDocFsInfoTest(unittest.TestCase):
+    """Regression tests about the table bibdocfsinfo"""
+    def setUp(self):
+        self.my_bibrecdoc = BibRecDocs(2)
+        self.unique_name = self.my_bibrecdoc.propose_unique_docname('file')
+        self.my_bibdoc = self.my_bibrecdoc.add_new_file(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', docname=self.unique_name)
+        self.my_bibdoc_id = self.my_bibdoc.id
+
+    def tearDown(self):
+        self.my_bibdoc.expunge()
+
+    def test_hard_delete(self):
+        """bibdocfile - test correct update of bibdocfsinfo when hard-deleting"""
+        self.assertEqual(run_sql("SELECT MAX(version) FROM bibdocfsinfo WHERE id_bibdoc=%s", (self.my_bibdoc_id, ))[0][0], 1)
+        self.assertEqual(run_sql("SELECT last_version FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=1 AND format='.jpg'", (self.my_bibdoc_id, ))[0][0], True)
+        self.my_bibdoc.add_file_new_version(CFG_PREFIX + '/lib/webtest/invenio/test.gif')
+        self.assertEqual(run_sql("SELECT MAX(version) FROM bibdocfsinfo WHERE id_bibdoc=%s", (self.my_bibdoc_id, ))[0][0], 2)
+        self.assertEqual(run_sql("SELECT last_version FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=2 AND format='.gif'", (self.my_bibdoc_id, ))[0][0], True)
+        self.assertEqual(run_sql("SELECT last_version FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=1 AND format='.jpg'", (self.my_bibdoc_id, ))[0][0], False)
+        self.my_bibdoc.delete_file('.gif', 2)
+        self.assertEqual(run_sql("SELECT MAX(version) FROM bibdocfsinfo WHERE id_bibdoc=%s", (self.my_bibdoc_id, ))[0][0], 1)
+        self.assertEqual(run_sql("SELECT last_version FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=1 AND format='.jpg'", (self.my_bibdoc_id, ))[0][0], True)
 
 
 class BibRecDocsTest(unittest.TestCase):
@@ -271,6 +294,7 @@ TEST_SUITE = make_test_suite(BibRecDocsTest,
                              BibDocsTest,
                              BibDocFilesTest,
                              CheckBibDocAuthorizationTest,
-                             BibDocFileURLTest)
+                             BibDocFileURLTest,
+                             BibDocFsInfoTest)
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

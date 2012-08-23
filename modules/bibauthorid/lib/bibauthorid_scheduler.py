@@ -19,13 +19,11 @@
 
 import re
 import os
-import operator
-from itertools import izip, starmap
-from invenio.bibauthorid_general_utils import print_tortoise_memory_log
-from invenio.bibauthorid_general_utils import clear_tortoise_memory_log
-import invenio.bibauthorid_config as bconfig
-
-coefs = [1. / 17., -1., 0.]
+import sys
+from bibauthorid_general_utils import print_tortoise_memory_log
+from bibauthorid_least_squares import to_function as create_approx_func
+import bibauthorid_config as bconfig
+from bibauthorid_general_utils import is_eq, update_status, update_status_final
 
 def to_number(stry):
     return int(re.sub("\D", "", stry))
@@ -49,8 +47,15 @@ def get_peak_mem():
     mem = dict_by_file("/proc/%d/status" % pid)
     return map(to_number, (mem["VmPeak"], mem["VmHWM"]))
 
-def estimate_ram_usage(bibs):
-    return sum(starmap(operator.mul, izip(coefs, (bibs * bibs, bibs, 1))))
+
+class Estimator(object):
+    def __init__(self, coefs):
+        self.estimate = create_approx_func(coefs)
+
+
+matrix_coefs = [1133088., 4., 0.016]
+wedge_coefs = [800000., 230., 0.018]
+
 
 def get_biggest_below(lim, arr):
     for idx, elem in enumerate(arr):
@@ -58,88 +63,106 @@ def get_biggest_below(lim, arr):
             return idx - 1
     return len(arr) - 1
 
-def initialize_ram_estimation():
-    global coefs
-    coefs[2] = get_peak_mem()[0] * 0.9
 
 def get_cores_count():
     import multiprocessing
     return multiprocessing.cpu_count()
 
-def schedule(job, args, sizs):
-    assert len(args) == len(sizs)
+
+def schedule(jobs, sizs, estimator, memfile_path=None):
+    if bconfig.DEBUG_PROCESS_PEAK_MEMORY and memfile_path:
+        def register_memory_usage():
+            pid = os.getpid()
+            peak = get_peak_mem()
+            fp = open(memfile_path, 'a')
+            print_tortoise_memory_log(
+                {'pid'  : pid,
+                 'peak1': peak[0],
+                 'peak2': peak[1],
+                 'est'  : sizs[idx],
+                 'bibs' : bibs[idx]
+                 },
+                fp
+                )
+            fp.close()
+    else:
+        def register_memory_usage():
+            pass
+
+    def run_job(idx):
+        try:
+            sys.stdout = output_killer
+            jobs[idx]()
+            register_memory_usage()
+            os._exit(os.EX_OK)
+        except Exception, e:
+            f = open('/tmp/exception-%s' % str(os.getpid()), "w")
+            f.write(str(e) + '\n')
+            f.close()
+            os._exit(os.EX_SOFTWARE)
+
+    output_killer = open(os.devnull, 'w')
+    assert len(jobs) == len(sizs)
+    ret_status = [None] * len(jobs)
 
     max_workers = get_cores_count()
-    pid_2_size = {}
+    pid_2_idx_size = {}
     #free = get_free_memory()
-    free = get_total_memory()
+    initial = get_total_memory()
+    free = initial
 
     bibs = sizs
-    initialize_ram_estimation()
-    sizs = map(estimate_ram_usage, sizs)
+    sizs = map(estimator.estimate, sizs)
 
-    if bconfig.DEBUG_PROCESS_PEAK_MEMORY:
-        clear_tortoise_memory_log()
+    done = 0.
+    total = sum(sizs)
+    jobs_n = len(jobs)
 
-    too_big = sorted((idx for idx in xrange(len(sizs)) if sizs[idx] > free), reverse=True)
+    update_status(0., "%d / %d" % (0, jobs_n))
+    too_big = sorted((idx for idx, size in enumerate(sizs) if size > free), reverse=True)
     for idx in too_big:
         pid = os.fork()
         if pid == 0: # child
-            job(*args[idx])
-            if bconfig.DEBUG_PROCESS_PEAK_MEMORY:
-                pid = os.getpid()
-                print_tortoise_memory_log(
-                    {'pid'  : pid,
-                     'peak' : get_peak_mem(),
-                     'est'  : sizs[idx],
-                     'bibs' : bibs[idx]})
-
-            os._exit(0)
+            run_job(idx)
         else: # parent
-            del args[idx]
+            done += sizs[idx]
+            cpid, status = os.wait()
+            update_status(done / total, "%d / %d" % (jobs_n - len(jobs), jobs_n))
+            ret_status[idx] = status
+            assert cpid == pid
+            del jobs[idx]
             del sizs[idx]
             del bibs[idx]
-            cpid, status = os.wait()
-            assert cpid == pid
 
-    while args or pid_2_size:
-        while len(pid_2_size) < max_workers:
+    while jobs or pid_2_idx_size:
+        while len(pid_2_idx_size) < max_workers:
             idx = get_biggest_below(free, sizs)
-
             if idx != -1:
                 pid = os.fork()
                 if pid == 0: # child
-                    job(*args[idx])
-                    if bconfig.DEBUG_PROCESS_PEAK_MEMORY:
-                        pid = os.getpid()
-                        print_tortoise_memory_log(
-                            {'pid'  : pid,
-                             'peak' : get_peak_mem(),
-                             'est'  : sizs[idx],
-                             'bibs' : bibs[idx]})
-
-                    os._exit(0)
+                    run_job(idx)
                 else: # parent
-                    pid_2_size[pid] = (sizs[idx], args[idx])
+                    pid_2_idx_size[pid] = (idx, sizs[idx])
                     assert free > sizs[idx]
                     free -= sizs[idx]
-                    del args[idx]
+                    del jobs[idx]
                     del sizs[idx]
                     del bibs[idx]
             else:
                 break
 
         pid, status = os.wait()
-        assert pid in pid_2_size
-        freed, name = pid_2_size[pid]
-        if status != 0:
-            import sys
-            print >> sys.stderr, "Worker %s died." % str(name)
-            sys.stderr.flush()
-            assert False
-
+        assert pid in pid_2_idx_size
+        idx, freed = pid_2_idx_size[pid]
+        done += freed
+        update_status(done / total, "%d / %d" % (jobs_n - len(jobs) - len(pid_2_idx_size), jobs_n))
+        ret_status[idx] = status
         free += freed
-        del pid_2_size[pid]
+        del pid_2_idx_size[pid]
 
-    assert not pid_2_size
+    update_status_final("%d / %d" % (jobs_n, jobs_n))
+    assert is_eq(free, initial)
+    assert not pid_2_idx_size
+    assert all(stat != None for stat in ret_status)
 
+    return ret_status

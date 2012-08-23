@@ -32,7 +32,8 @@ import sys
 import os
 import inspect
 import urllib
-from urllib import urlencode, quote_plus, quote
+import urllib2
+from urllib import urlencode, quote_plus, quote, FancyURLopener
 from urlparse import urlparse
 from cgi import parse_qs, escape
 from md5 import md5
@@ -53,7 +54,7 @@ from invenio import webinterface_handler_config as apache
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE, \
-     CFG_WEBDIR
+     CFG_WEBDIR, CFG_SITE_NAME,  CFG_VERSION
 
 def wash_url_argument(var, new_type):
     """
@@ -131,7 +132,6 @@ def redirect_to_url(req, url, redirection_type=None, norobot=False):
     """
     if redirection_type is None:
         redirection_type = apache.HTTP_MOVED_TEMPORARILY
-    req.headers_out["Location"] = url
 
     del req.headers_out["Cache-Control"]
     req.headers_out["Cache-Control"] = "no-cache, private, no-store, " \
@@ -140,6 +140,35 @@ def redirect_to_url(req, url, redirection_type=None, norobot=False):
 
     if norobot:
         req.headers_out["X-Robots-Tag"] = "noarchive, nosnippet, noindex, nocache"
+
+    user_agent = req.headers_in.get('User-Agent')
+    if 'Microsoft Office Existence Discovery' in user_agent or 'ms-office' in user_agent:
+        ## HACK: this is to workaround Microsoft Office trying to be smart
+        ## when users click on URLs in Office documents that require
+        ## authentication. Office will check the validity of the URL
+        ## but will pass the browser the redirected URL rather than
+        ## the original one. This is incompatible with e.g. Shibboleth
+        ## based SSO since the referer would be lost.
+        ## See: http://support.microsoft.com/kb/899927
+        req.status = 200
+        req.content_type = 'text/html'
+        if req.method != 'HEAD':
+            req.write("""
+<html>
+    <head>
+        <title>Intermediate page for URLs clicked on MS Office Documents</title>
+        <meta http-equiv="REFRESH" content="5;url=%(url)s"></meta>
+    </head>
+    <body>
+        <p>You are going to be redirected to the desired content within 5 seconds. If the redirection does not happen automatically please click on <a href="%(url)s">%(url_ok)s</a>.</p>
+    </body>
+</html>""" % {
+                'url': escape(req.unparsed_uri, True),
+                'url_ok': escape(req.unparsed_uri)
+            })
+        raise apache.SERVER_RETURN(apache.DONE)
+
+    req.headers_out["Location"] = url
 
     if req.response_sent_p:
         raise IOError("Cannot redirect after headers have already been sent.")
@@ -455,12 +484,43 @@ def get_title_of_page(url):
     """
     if BEAUTIFUL_SOUP_IMPORTED:
         try:
-            soup = BeautifulSoup.BeautifulSoup(urllib.urlopen(url))
+            opener = make_invenio_opener('UrlUtils')
+            soup = BeautifulSoup.BeautifulSoup(opener.open(url))
             return soup.title.string.encode("utf-8")
         except:
             return None
     else:
         return "Title not available"
+
+def make_user_agent_string(component=None):
+    """
+    Return a nice and uniform user-agent string to be used when Invenio
+    act as a client in HTTP requests.
+    """
+    ret = "Invenio-%s (+%s; \"%s\")" % (CFG_VERSION, CFG_SITE_URL, CFG_SITE_NAME)
+    if component:
+        ret += " %s" % component
+    return ret
+
+class InvenioFancyURLopener(FancyURLopener):
+    ## Provide default user agent string
+    version = make_user_agent_string()
+    def prompt_user_passwd(self, host, realm):
+        """Don't prompt"""
+        return None, None
+
+## Let's override default useragent string
+## See: http://docs.python.org/release/2.4.4/lib/module-urllib.html
+urllib._urlopener = InvenioFancyURLopener()
+
+def make_invenio_opener(component=None):
+    """
+    Return an urllib2 opener with the useragent already set in the appropriate
+    way.
+    """
+    opener = urllib2.build_opener()
+    opener.addheaders = [('User-agent', make_user_agent_string(component))]
+    return opener
 
 def create_AWS_request_url(base_url, argd, _amazon_secret_access_key,
                            _timestamp=None):

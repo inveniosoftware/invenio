@@ -66,6 +66,7 @@ except ImportError:
                         d[(i, j)] = min (d[(i, j)], d[i - 2, j - 2] + cost) # transposition
             return d[lenstr1 - 1, lenstr2 - 1]
 
+artifact_removal = re.compile("[^a-zA-Z0-9]")
 
 #Gender names and names variation files are loaded updon module import to increase performances
 
@@ -376,20 +377,6 @@ def full_names_are_equal_composites(name1, name2):
     return is_equal_composite
 
 
-def names_are_equal_gender(name1, name2, gendernames):
-    '''
-    Checks if names have the same gender
-    @param gendernames: dictionary male/female names
-    '''
-    g1 = [name1 in gendernames['boys'], name1 in gendernames['girls']]
-    g2 = [name2 in gendernames['boys'], name2 in gendernames['girls']]
-
-    if (g1[0] == g2[0] == True) and (g1[1] == False or g2[1] == False):
-        return True
-    if (g1[1] == g2[1] == True) and (g1[0] == False or g2[0] == False):
-        return True
-    return False
-
 def full_names_are_equal_gender(name1, name2, gendernames):
     '''
     Checks on gender equality of two first names baes on a word list
@@ -571,7 +558,7 @@ def _load_gender_firstnames_dict(files=''):
     girlf = open(files['girl'], 'r')
     girln = set([x.strip().lower() for x in girlf.readlines()])
     girlf.close()
-    return {'boys':list(boyn - girln), 'girls':list(girln - boyn)}
+    return {'boys':(boyn - girln), 'girls':(girln - boyn)}
 
 
 def _load_firstname_variations(filename=''):
@@ -770,7 +757,6 @@ def compare_names(origin_name, target_name, initials_penalty=False):
 
     name_comparison_print("||- final score:  ", score)
 
-
     return score
 
 
@@ -780,7 +766,6 @@ def generate_last_name_cluster_str(name):
     this name should be associated with.
     '''
     family = split_name_parts(name.decode('utf-8'))[0]
-    artifact_removal = re.compile("[^a-zA-Z0-9]")
     return artifact_removal.sub("", family).lower()
 
 

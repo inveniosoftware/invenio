@@ -23,7 +23,8 @@ pylib_DATA = bibupload_config.py \
              batchuploader_webinterface.py \
              batchuploader_engine.py \
              batchuploader_templates.py \
-             batchuploader.py
+             batchuploader.py \
+             batchuploader_regression_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
 

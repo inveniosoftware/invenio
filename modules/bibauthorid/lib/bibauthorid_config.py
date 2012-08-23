@@ -127,10 +127,33 @@ else:
 WEDGE_THRESHOLD = 0.8
 
 
+#Rabbit use or ignore external ids
+RABBIT_USE_EXTERNAL_IDS = True
+
+#Collect and use in rabbit external ids INSPIREID
+COLLECT_EXTERNAL_ID_INSPIREID = CFG_INSPIRE_SITE
+RABBIT_USE_EXTERNAL_ID_INSPIREID = CFG_INSPIRE_SITE
+
+#Force rabbit to cache entire marc tables instead of querying db if dealing with more
+#then threshold papers
+RABBIT_USE_CACHED_GET_GROUPED_RECORDS_THRESHOLD = 500
+
+
+#Cache the personid table for performing exact name searches?
+RABBIT_USE_CACHED_PID_FOR_EXACT_NAME_SEARCH = True
+
+#Collect external ids from and store them as person attributes only from manually claimed papers?
+LIMIT_EXTERNAL_IDS_COLLECTION_TO_CLAIMED_PAPERS = False
+
+
 # BibAuthorID debugging options
 
 # This flag triggers most of the output.
 DEBUG_OUTPUT = False
+# Print timestamps 
+DEBUG_TIMESTAMPS = False
+# Print timestamps even in update_status
+DEBUG_TIMESTAMPS_UPDATE_STATUS = False
 
 # The following options trigger the output for parts of
 # bibauthorid which normally generate too much output
@@ -143,6 +166,8 @@ DEBUG_PROCESS_PEAK_MEMORY = True
 # Use DEBUG_CHECKS to guard heavy computations in order to make
 # their use explicit.
 DEBUG_CHECKS = False
+
+TORTOISE_FILES_PATH = '/opt/tortoise_cache/'
 
 ## force skip ui arxiv stub page (specific for inspire)
 BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = True

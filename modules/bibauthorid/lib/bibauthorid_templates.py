@@ -34,9 +34,12 @@ from invenio.bibformat import format_record
 from invenio.session import get_session
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibauthorid_webapi import get_person_redirect_link, get_canonical_id_from_person_id
+from invenio.bibauthorid_webapi import get_personiID_external_ids
+from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string, get_uid_from_personid
 from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
 from invenio.bibauthorid_frontinterface import get_canonical_id_from_personid
 from invenio.messages import gettext_set_language, wash_language
+from invenio.webuser import get_email
 #from invenio.textutils import encode_for_xml
 
 class Template:
@@ -941,7 +944,24 @@ class Template:
             h('To change the number if greater then one, please change all the other names first, then updating this one will do the trick. </div>')
             h('</form> </div></div>')
 
-            h('  <br><br>' + self._('... This tab is currently under construction ... ') + '</p>')
+            userid = get_uid_from_personid(person_id)
+            h('<div> <br>')
+            h('<strong> Internal IDs </strong> <br>')
+            if userid:
+                email = get_email(int(userid))
+                h('UserID: INSPIRE user %s is associated with this profile with email: %s' % (str(userid), str(email)))
+            else:
+                h('UserID: There is no INSPIRE user associated to this profile!')
+            h('<br></div><br>')
+
+            external_ids = get_personiID_external_ids(person_id)
+            h('<div>')
+            h('<strong> External IDs </strong><br>')
+            for id in external_ids:
+                for k in external_ids[id]:
+                    h('  %s : %s <br>' % (id, k))
+            h('</div>')
+
             h("  </div>")
 
         h("</div>")
@@ -1623,7 +1643,7 @@ class Template:
         h = html.append
 
         h(' <ul><li><a rel="nofollow" href=%s> Login through arXiv.org </a> <small>' % bconfig.BIBAUTHORID_CFG_INSPIRE_LOGIN)
-        h(' - Use this option if you have an arXiv account.')
+        h(' - Use this option if you have an arXiv account and have claimed your papers in arXiv.')
         h('(If you login through arXiv.org, INSPIRE will immediately verify you as an author and process your claimed papers.) </small><br><br>')
         h(' <li><a rel="nofollow" href=%s/person/%s?open_claim=True> Continue as a guest </a> <small>' % (CFG_SITE_URL, person))
         h(' - Use this option if you DON\'T have an arXiv account, or you have not claimed any paper in arXiv.')

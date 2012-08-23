@@ -36,6 +36,7 @@ from invenio.access_control_firerole import compile_role_definition, \
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_DEVEL_SITE
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
+from invenio.dbquery import run_sql
 
 class WebAccessWebPagesAvailabilityTest(unittest.TestCase):
     """Check WebAccess web pages whether they are up or not."""
@@ -114,14 +115,17 @@ if CFG_DEVEL_SITE:
         Check whether robot login functionality is OK.
         """
         def _erase_example_user_and_groups(self):
-            from invenio.dbquery import run_sql
-            uid = run_sql("SELECT id FROM user WHERE email=%s", (self.a_email, ))
-            if uid:
-                run_sql("DELETE FROM user WHERE id=%s", (uid[0][0], ))
-                run_sql("DELETE FROM user_usergroup WHERE id_user=%s", (uid[0][0], ))
-            for method_name in self.robot_login_methods:
-                for group in self.some_groups:
-                    run_sql("DELETE FROM usergroup WHERE name=%s", (group + " [" + method_name + "]",))
+            for email in (self.a_email, self.another_email):
+                uid = run_sql("SELECT id FROM user WHERE email=%s", (email, ))
+                if uid:
+                    run_sql("DELETE FROM user WHERE id=%s", (uid[0][0], ))
+                    run_sql("DELETE FROM user_usergroup WHERE id_user=%s", (uid[0][0], ))
+                    run_sql("DELETE FROM userEXT WHERE id_user=%s", (uid[0][0], ))
+                for method_name in self.robot_login_methods:
+                    for group in self.some_groups:
+                        run_sql("DELETE FROM usergroup WHERE name=%s", ("%s [%s]" % (group, method_name), ))
+            for nickname in (self.a_nickname, self.another_nickname):
+                run_sql("DELETE FROM userEXT WHERE id=%s", (nickname, ))
 
         def setUp(self):
             from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION
@@ -129,7 +133,9 @@ if CFG_DEVEL_SITE:
             self.a_robot = "regression-test"
             self.a_password = "123"
             self.a_email = "foo.bar@example.org"
+            self.another_email = "baz@example.org"
             self.a_nickname = "foo-bar"
+            self.another_nickname = "baz"
             self.some_groups = ["a group for regression test", "another group for regression test"]
             self.myip = urlopen(CFG_SITE_URL + "/httptest/whatismyip").read()
             from invenio.external_authentication_robot import update_robot_key
@@ -224,6 +230,64 @@ if CFG_DEVEL_SITE:
                     error_messages = test_web_page_content(url, expected_text="does not validate against the digest")
                     if error_messages:
                         self.fail(merge_error_messages(error_messages))
+                finally:
+                    self._erase_example_user_and_groups()
+
+        def test_robot_login_method_changed_email(self):
+            """webaccess - robot login method changed email"""
+            for method_name, method in self.robot_login_methods.iteritems():
+                url = method.test_create_example_url(self.a_email, method_name, self.a_robot, self.myip, nickname=self.a_nickname)
+                url2 = method.test_create_example_url(self.another_email, method_name, self.a_robot, self.myip, nickname=self.a_nickname)
+                try:
+                    error_messages = test_web_page_content(url, expected_text=self.a_nickname)
+                    if error_messages:
+                        self.fail(merge_error_messages(error_messages))
+                    id_user = run_sql("SELECT id FROM user WHERE email=%s", (self.a_email, ))[0][0]
+                    self.failUnless(run_sql("SELECT * FROM userEXT WHERE id=%s AND id_user=%s AND method=%s", (self.a_nickname, id_user, method_name)), "Can't find id %s for user %s with metod %s. userEXT contains: %s" % (self.a_nickname, id_user, method_name, run_sql("SELECT * FROM userEXT")))
+                    error_messages = test_web_page_content(url2, expected_text=self.a_nickname)
+                    if error_messages:
+                        self.fail(merge_error_messages(error_messages))
+                    id_user2 = run_sql("SELECT id FROM user WHERE email=%s", (self.another_email, ))[0][0]
+                    self.assertEqual(id_user, id_user2)
+                    self.failUnless(run_sql("SELECT * FROM userEXT WHERE id=%s AND id_user=%s AND method=%s", (self.a_nickname, id_user2, method_name)))
+                    ## The old email should not exist any longer.
+                    self.failIf(run_sql("SELECT * FROM user WHERE email=%s", (self.a_email, )))
+                finally:
+                    self._erase_example_user_and_groups()
+
+        def test_robot_login_method_merging_accounts(self):
+            """webaccess - robot login method merging accounts"""
+            for method_name, method in self.robot_login_methods.iteritems():
+                url = method.test_create_example_url(self.a_email, method_name, self.a_robot, self.myip, nickname=self.a_nickname)
+                url2 = method.test_create_example_url(self.another_email, method_name, self.a_robot, self.myip, nickname=self.another_nickname)
+                url3 = method.test_create_example_url(self.a_email, method_name, self.a_robot, self.myip, nickname=self.another_nickname)
+                try:
+                    error_messages = test_web_page_content(url, expected_text=self.a_nickname)
+                    if error_messages:
+                        self.fail(merge_error_messages(error_messages))
+                    id_user = run_sql("SELECT id FROM user WHERE email=%s", (self.a_email, ))[0][0]
+                    self.failUnless(run_sql("SELECT * FROM userEXT WHERE id=%s AND id_user=%s AND method=%s", (self.a_nickname, id_user, method_name)))
+                    error_messages = test_web_page_content(url2, expected_text=self.another_nickname)
+                    if error_messages:
+                        self.fail(merge_error_messages(error_messages))
+                    id_user2 = run_sql("SELECT id FROM user WHERE email=%s", (self.another_email, ))[0][0]
+                    self.failIfEqual(id_user, id_user2)
+                    self.failUnless(run_sql("SELECT * FROM userEXT WHERE id=%s AND id_user=%s AND method=%s", (self.another_nickname, id_user2, method_name)), "Can't find id %s for user %s with metod %s. userEXT contains: %s" % (self.another_nickname, id_user2, method_name, run_sql("SELECT * FROM userEXT")))
+                    ## The first email should still exists
+                    self.failUnless(run_sql("SELECT * FROM user WHERE email=%s", (self.a_email, )))
+                    ## We log in with the 1st email but with the second nickname.
+                    ## That means the 1st user should be merged into the second.
+                    ## However we still check for the 1st nickname, as in Invenio,
+                    ## once a nickname is assigned it will never change!
+                    error_messages = test_web_page_content(url3, expected_text=self.a_nickname)
+                    if error_messages:
+                        self.fail(merge_error_messages(error_messages))
+                    ## The another_email should not exist any longer.
+                    self.failIf(run_sql("SELECT * FROM user WHERE email=%s", (self.another_email, )), "%s still exists! while it should have been merged into %s: %s, userEXT contains: %s" % (self.another_email, self.a_email, run_sql("SELECT * FROM user WHERE email=%s", (self.another_email, )), run_sql("SELECT * FROM userEXT")))
+                    ## And the corresponding user should not exist anymore as it has been
+                    ## merged into id_user
+                    self.failIf(run_sql("SELECT * FROM user WHERE id=%s", (id_user2, )))
+                    self.failUnless(run_sql("SELECT * FROM user WHERE id=%s AND email=%s", (id_user, self.a_email)))
                 finally:
                     self._erase_example_user_and_groups()
 

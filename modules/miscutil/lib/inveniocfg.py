@@ -112,14 +112,15 @@ def convert_conf_option(option_name, option_value):
         option_value = 'r"[' + option_value[1:-1] + ']"'
 
     ## 3abis) special cases: real regexps
-    if option_name in ['CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES']:
+    if option_name in ['CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES',
+                       'CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS']:
         option_value = 'r"' + option_value[1:-1] + '"'
 
     ## 3b) special cases: True, False, None
     if option_value in ['"True"', '"False"', '"None"']:
         option_value = option_value[1:-1]
 
-    ## 3c) special cases: dicts
+    ## 3c) special cases: dicts and real pythonic lists
     if option_name in ['CFG_WEBSEARCH_FIELDS_CONVERT',
                        'CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS',
                        'CFG_SITE_EMERGENCY_EMAIL_ADDRESSES',
@@ -135,7 +136,11 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE',
                        'CFG_OAI_METADATA_FORMATS',
                        'CFG_WEBSUBMIT_DESIRED_CONVERSIONS',
-                       'CFG_BIBDOCFILE_BEST_FORMATS_TO_EXTRACT_TEXT_FROM',]:
+                       'CFG_BIBDOCFILE_BEST_FORMATS_TO_EXTRACT_TEXT_FROM',
+                       'CFG_WEB_API_KEY_ALLOWED_URL',
+                       'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_MISC',
+                       'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_DOCTYPES',
+                       'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_RESTRICTIONS']:
         option_value = option_value[1:-1]
 
     ## 3cbis) very special cases: dicts with backward compatible string
@@ -160,7 +165,6 @@ def convert_conf_option(option_name, option_value):
                        'CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST',
                        'CFG_WEBSEARCH_RSS_I18N_COLLECTIONS',
                        'CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY',
-                       'CFG_BATCHUPLOADER_WEB_ROBOT_AGENT',
                        'CFG_BIBAUTHORID_EXTERNAL_CLAIMED_RECORDS_KEY',
                        'CFG_BIBCIRCULATION_ITEM_STATUS_OPTIONAL',
                        'CFG_PLOTEXTRACTOR_DISALLOWED_TEX',
@@ -203,7 +207,14 @@ def convert_conf_option(option_name, option_value):
     if option_name in ['CFG_BIBMATCH_MATCH_VALIDATION_RULESETS']:
         option_value = option_value[1:-1]
 
-    ## 4) finally, return output line:
+    ## 4a) dropped variables
+    if option_name in ['CFG_BATCHUPLOADER_WEB_ROBOT_AGENT']:
+        print >> sys.stderr, ("""ERROR: CFG_BATCHUPLOADER_WEB_ROBOT_AGENT has been dropped in favour of
+CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS.
+Please, update your invenio-local.conf file accordingly.""")
+        option_value = option_value[1:-1]
+
+    ## 5) finally, return output line:
     return '%s = %s' % (option_name, option_value)
 
 def cli_cmd_update_config_py(conf):
