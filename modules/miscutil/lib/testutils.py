@@ -31,6 +31,7 @@ import time
 import unittest
 import cgi
 
+from warnings import warn
 from urlparse import urlsplit, urlunsplit
 from urllib import urlencode
 from itertools import chain, repeat
@@ -42,11 +43,11 @@ except ImportError:
     # web tests will not be available, but unit and regression tests will:
     pass
 
-import invenio
 from invenio.config import CFG_SITE_URL, \
-     CFG_SITE_SECURE_URL, CFG_LOGDIR, CFG_SITE_NAME_INTL
+     CFG_SITE_SECURE_URL, CFG_LOGDIR, CFG_SITE_NAME_INTL, CFG_PYLIBDIR
 from invenio.w3c_validator import w3c_validate, w3c_errors_to_str, \
      CFG_TESTS_REQUIRE_HTML_VALIDATION
+from invenio.pluginutils import PluginContainer
 
 def warn_user_about_tests(test_suite_type='regression'):
     """
@@ -327,23 +328,18 @@ def build_and_run_unit_test_suite():
     and run it.  Called by 'inveniocfg --run-unit-tests'.
     """
 
-    # We first import webinterface_tests in order to be sure to have
-    # the fake Apache environment loaded among first things.  This is
-    # needed for older OSes and mod_pythons such as on SLC4.
-#    from invenio import webinterface_tests
+    test_modules_map = PluginContainer(
+        os.path.join(CFG_PYLIBDIR, 'invenio', '*_tests.py'),
+        lambda plugin_name, plugin_code: getattr(plugin_code, "TEST_SUITE"))
+    test_modules = [test_modules_map[name] for name in test_modules_map
+        if not name.endswith('_regression_tests') and not name.endswith('_web_tests')]
 
-    test_modules = []
+    broken_tests = test_modules_map.get_broken_plugins()
 
-    for candidate in os.listdir(os.path.dirname(invenio.__file__)):
-        base, ext = os.path.splitext(candidate)
-
-        if ext != '.py' or not (base.endswith('_tests') and not \
-                                base.endswith('_regression_tests') and not \
-                                base.endswith('_web_tests')):
-            continue
-
-        module = __import__('invenio.' + base, fromlist=['TEST_SUITE'])
-        test_modules.append(module.TEST_SUITE)
+    broken_unit_tests = ['%s (reason: %s)' % (name, broken_tests[name][1]) for name in broken_tests
+        if not name.endswith('_regression_tests') and not name.endswith('_web_tests')]
+    if broken_unit_tests:
+        warn("Broken unit tests suites found: %s" % ', '.join(broken_unit_tests))
 
     complete_suite = unittest.TestSuite(test_modules)
     res = unittest.TextTestRunner(verbosity=2).run(complete_suite)
@@ -356,16 +352,16 @@ def build_and_run_regression_test_suite():
     run it.  Called by 'inveniocfg --run-regression-tests'.
     """
 
-    test_modules = []
+    test_modules_map = PluginContainer(
+        os.path.join(CFG_PYLIBDIR, 'invenio', '*_regression_tests.py'),
+        lambda plugin_name, plugin_code: getattr(plugin_code, "TEST_SUITE"))
+    test_modules = test_modules_map.values()
 
-    for candidate in os.listdir(os.path.dirname(invenio.__file__)):
-        base, ext = os.path.splitext(candidate)
+    broken_tests = test_modules_map.get_broken_plugins()
 
-        if ext != '.py' or not base.endswith('_regression_tests'):
-            continue
-
-        module = __import__('invenio.' + base, fromlist=['TEST_SUITE'])
-        test_modules.append(module.TEST_SUITE)
+    broken_regression_tests = ['%s (reason: %s)' % (name, broken_tests[name][1]) for name in broken_tests]
+    if broken_regression_tests:
+        warn("Broken regression tests suites found: %s" % ', '.join(broken_regression_tests))
 
     warn_user_about_tests()
 
@@ -380,16 +376,16 @@ def build_and_run_web_test_suite():
     run it.  Called by 'inveniocfg --run-web-tests'.
     """
 
-    test_modules = []
+    test_modules_map = PluginContainer(
+        os.path.join(CFG_PYLIBDIR, 'invenio', '*_web_tests.py'),
+        lambda plugin_name, plugin_code: getattr(plugin_code, "TEST_SUITE"))
+    test_modules = test_modules_map.values()
 
-    for candidate in os.listdir(os.path.dirname(invenio.__file__)):
-        base, ext = os.path.splitext(candidate)
+    broken_tests = test_modules_map.get_broken_plugins()
 
-        if ext != '.py' or not base.endswith('_web_tests'):
-            continue
-
-        module = __import__('invenio.' + base, fromlist=['TEST_SUITE'])
-        test_modules.append(module.TEST_SUITE)
+    broken_web_tests = ['%s (reason: %s)' % (name, broken_tests[name][1]) for name in broken_tests]
+    if broken_web_tests:
+        warn("Broken web tests suites found: %s" % ', '.join(broken_web_tests))
 
     warn_user_about_tests()
 
