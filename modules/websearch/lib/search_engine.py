@@ -2638,40 +2638,157 @@ def search_unit_citedby(query):
 
 def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", verbose=0, ln=CFG_SITE_LANG, display_nearest_terms_box=True):
     """Return dict of hitsets given by intersection of hitset with the collection universes."""
+
     _ = gettext_set_language(ln)
 
-    # search stage 4: intersect with the collection universe:
+    # search stage 4: intersect with the collection universe
     if verbose and of.startswith("h"):
         t1 = os.times()[4]
-    results = {}
+
+    results = {}  # all final results
     results_nbhits = 0
-    for coll in colls:
-        results[coll] = hitset_in_any_collection & get_collection_reclist(coll)
-        results_nbhits += len(results[coll])
+
+    # obtain user_info
+    if isinstance(req, cStringIO.OutputType):
+        user_info = {}
+    else:
+        user_info = collect_user_info(req)
+
+    try:
+        recids_in_any_collection = list(hitset_in_any_collection)
+    except:
+        # the user displayed a specific collection
+        recids_in_any_collection = []
+
+    # let's get the restricted collections the user has rights to view
+    restricted_collections = user_info.get('precached_permitted_restricted_collections', [])
+
+    if not recids_in_any_collection or \
+        (not req or isinstance(req, cStringIO.OutputType)):
+        # we were called from CLI, then we will return all recids,
+        # the public and the restricted ones, or the user displayed
+        # a specific collection
+        for coll in colls:
+            results[coll] = hitset_in_any_collection & get_collection_reclist(coll)
+            results_nbhits += len(results[coll])
+    else:
+        # let's build the list of the both public and restricted
+        # daughter collections of the collection from which the user
+        # started his/her search. This list of daughter colls will be
+        # used in the warning proposing a search in that collections
+        daughter_colls = list(colls)
+        current_coll = req.argd['cc'] # current_coll: coll from which user started his/her search
+        if restricted_collections:
+            for restricted_coll in restricted_collections:
+                restricted_coll_ancestors = get_coll_ancestors(restricted_coll)
+                if current_coll in restricted_coll_ancestors:
+                    daughter_colls.append(restricted_coll)
+
+        # let's enrich the list of colls where we are looking for
+        # with the restricted collections the user has access to
+        final_colls = set(colls)
+        final_colls.update(restricted_collections)
+        final_colls = list(final_colls)
+        for coll in final_colls:
+            if coll in restricted_collections:  # restricted collection
+                for recid in recids_in_any_collection:
+                    # let's get the restricted collections each recid belongs to
+                    restricted_collections_for_recid = \
+                        get_restricted_collections_for_recid(recid, recreate_cache_if_needed=False)
+                    if coll in restricted_collections_for_recid:
+                        # coll is restricted, user has rights to view it and
+                        # the recid belongs to this restricted coll
+                        restricted_coll = coll
+                        restricted_coll_ancestors = get_coll_ancestors(restricted_coll)
+                        # let's hang the results found from the correct coll
+                        if current_coll in restricted_coll_ancestors:
+                            # restricted_coll hangs from current_coll
+                            direct_dad = 1
+                            for coll in final_colls:
+                                if coll in restricted_coll_ancestors:
+                                     # current_coll is not direct dad of restricted_coll
+                                    if results.has_key(coll):
+                                        results[coll].union_update(hitset_in_any_collection & \
+                                                                   get_collection_reclist(restricted_coll))
+                                    else:
+                                        results.update({coll : hitset_in_any_collection & \
+                                                        get_collection_reclist(restricted_coll)})
+                                    results_nbhits += len(results[coll])
+                                    direct_dad = 0
+
+                            if direct_dad:
+                                # current_coll is direct dad of restricted_coll
+                                if results.has_key(coll):
+                                    results[restricted_coll].union_update(hitset_in_any_collection & \
+                                                                          get_collection_reclist(restricted_coll))
+                                else:
+                                    results.update({restricted_coll : hitset_in_any_collection & \
+                                                    get_collection_reclist(restricted_coll)})
+                                results_nbhits += len(results[restricted_coll])
+
+                        elif coll == current_coll:
+                            # user started his/her search from a restricted collection
+                            if results.has_key(coll):
+                                results[coll].union_update(hitset_in_any_collection & \
+                                                           get_collection_reclist(coll))
+                            else:
+                                results.update({coll : hitset_in_any_collection & \
+                                                get_collection_reclist(coll)})
+                            results_nbhits += len(results[coll])
+
+            else: # public collection
+                if results.has_key(coll):
+                    results[coll].union_update(hitset_in_any_collection & \
+                                               get_collection_reclist(coll))
+                else:
+                    results.update({coll : hitset_in_any_collection & \
+                                    get_collection_reclist(coll)})
+                results_nbhits += len(results[coll])
+
     if results_nbhits == 0:
-        # no hits found, try to search in Home:
-        results_in_Home = hitset_in_any_collection & get_collection_reclist(CFG_SITE_NAME)
-        if len(results_in_Home) > 0:
-            # some hits found in Home, so propose this search:
+        # no hits found, try to search in Home and restricted and/or hidden collections:
+        results = {}
+        results_in_Home = hitset_in_any_collection & \
+                            get_collection_reclist(CFG_SITE_NAME)
+        results_in_restricted_collections = 0
+        results_in_hidden_collections = 0
+        for coll in restricted_collections:
+            if not get_coll_ancestors(coll): # hidden collection
+                results_in_hidden_collections += len(hitset_in_any_collection & \
+                                                     get_collection_reclist(coll))
+            else:
+                results_in_restricted_collections += len(hitset_in_any_collection & \
+                                                         get_collection_reclist(coll))
+
+        total_results = results_in_restricted_collections + len(results_in_Home)
+
+        if total_results > 0:
+            # some hits found in Home and/or restricted collections, so propose this search:
             if of.startswith("h") and display_nearest_terms_box:
                 url = websearch_templates.build_search_url(req.argd, cc=CFG_SITE_NAME, c=[])
-                write_warning(_("No match found in collection %(x_collection)s. Other public collections gave %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s.") %\
-                              {'x_collection': '<em>' + string.join([get_coll_i18nname(coll, ln, False) for coll in colls], ', ') + '</em>',
+                write_warning(_("No match found in collection %(x_collection)s. Other collections gave %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s.") %\
+                              {'x_collection': '<em>' + string.join([get_coll_i18nname(coll, ln, False) for coll in daughter_colls], ', ') + '</em>',
                                'x_url_open': '<a class="nearestterms" href="%s">' % (url),
-                               'x_nb_hits': len(results_in_Home),
+                               'x_nb_hits': total_results,
                                'x_url_close': '</a>'}, req=req)
-            results = {}
         else:
-            # no hits found in Home, recommend different search terms:
+            # no hits found, either user is looking for a document and he/she has not rights
+            # or user is looking for a hidden document:
             if of.startswith("h") and display_nearest_terms_box:
-                write_warning(_("No public collection matched your query. "
-                                     "If you were looking for a non-public document, please choose "
-                                     "the desired restricted collection first."), req=req)
-            results = {}
+                if results_in_hidden_collections:
+                    write_warning(_("No public collection matched your query. "
+                                         "If you were looking for a hidden document, please type "
+                                         "the correct URL for this record."), req=req)
+                else:
+                    write_warning(_("No public collection matched your query. "
+                                         "If you were looking for a non-public document, please choose "
+                                         "the desired restricted collection first."), req=req)
+
     if verbose and of.startswith("h"):
         t2 = os.times()[4]
         write_warning("Search stage 4: intersecting with collection universe gave %d hits." % results_nbhits, req=req)
         write_warning("Search stage 4: execution took %.2f seconds." % (t2 - t1), req=req)
+
     return results
 
 def intersect_results_with_hitset(req, results, hitset, ap=0, aptext="", of="hb"):
@@ -5172,7 +5289,6 @@ def prs_search(kwargs=None, recid=0, req=None, cc=None, p=None, p1=None, p2=None
         if not of in ['hcs']:
             perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose,
                                                        ln, selected_external_collections_infos, em=em)
-
     return page_end(req, of, ln, em)
 
 
@@ -5604,6 +5720,7 @@ def prs_apply_search_limits(results_final, kwargs=None, req=None, of=None, cc=No
                 perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose,
                                                            ln, selected_external_collections_infos, em=em)
             return page_end(req, of, ln, em)
+
         if results_final == {} and not hosted_colls_actual_or_potential_results_p:
             if of.startswith("h"):
                 perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose,
@@ -5905,6 +6022,7 @@ def prs_search_common(kwargs=None, req=None, of=None, cc=None, ln=None, uid=None
             print_records_epilogue(req, of)
         return page_end(req, of, ln, em)
 
+
     # store this search query results into search results cache if needed:
     prs_store_results_in_cache(query_representation_in_cache, results_in_any_collection, **kwargs)
 
@@ -5931,12 +6049,11 @@ def prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection,
     if output is not None:
         return output
 
-
     # another external search if we still don't have something
     if results_final == {} and not kwargs['hosted_colls_actual_or_potential_results_p']:
         if of.startswith("h"):
             perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose,
-                                            ln, kwargs['selected_external_collections_infos'], em=em)
+                                                       ln, kwargs['selected_external_collections_infos'], em=em)
         if of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
@@ -5944,15 +6061,11 @@ def prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection,
         kwargs['results_final'] = results_final
         return page_end(req, of, ln, em)
 
-
     # search stage 5: apply search option limits and restrictions:
     output = prs_apply_search_limits(results_final, kwargs=kwargs, **kwargs)
     kwargs['results_final'] = results_final
-
     if output is not None:
         return output
-
-
 
 
 def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=None,

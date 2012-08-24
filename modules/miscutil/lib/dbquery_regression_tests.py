@@ -48,7 +48,7 @@ class RunSqlReturnListOfDictionaries(unittest.TestCase):
         res = dbquery.run_sql("SELECT id+nbrecs,name FROM collection WHERE id>1 AND id<5", with_dict=True)
         self.assertEqual(res, ([{'id+nbrecs': 39L, 'name': 'Preprints'},
                                 {'id+nbrecs': 17L, 'name': 'Books'},
-                                {'id+nbrecs': 12L, 'name': 'Theses'}]))
+                                {'id+nbrecs': 13L, 'name': 'Theses'}]))
 
     def test_select_all_columns_query(self):
         """dbquery - select all columns query"""

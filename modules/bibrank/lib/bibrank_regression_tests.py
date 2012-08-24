@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -78,7 +78,7 @@ class BibRankWordSimilarityRankingTest(unittest.TestCase):
         """bibrank - search results ranked by word similarity"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellis&rm=wrd&of=id',
-                                               expected_text="[8, 10, 11, 12, 47, 17, 13, 16, 9, 14, 18, 15]"))
+                                               expected_text="[8, 10, 17, 11, 12, 13, 47, 16, 9, 14, 18, 15]"))
 
     def test_similar_records_link(self):
         """bibrank - 'Similar records' link"""

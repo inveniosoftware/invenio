@@ -59,7 +59,6 @@ from invenio.config import \
      CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
      CFG_CERN_SITE, \
      CFG_INSPIRE_SITE, \
-     CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL, \
      CFG_BIBAUTHORID_ENABLED, \
      CFG_SITE_RECORD
 
@@ -1300,8 +1299,7 @@ def collect_user_info(req, login_time=False, refresh=False):
             if login_time:
                 ## Heavy computational information
                 from invenio.access_control_engine import acc_authorize_action
-                if CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL > 0:
-                    user_info['precached_permitted_restricted_collections'] = get_permitted_restricted_collections(user_info)
+                user_info['precached_permitted_restricted_collections'] = get_permitted_restricted_collections(user_info)
                 user_info['precached_usebaskets'] = acc_authorize_action(user_info, 'usebaskets')[0] == 0
                 user_info['precached_useloans'] = acc_authorize_action(user_info, 'useloans')[0] == 0
                 user_info['precached_usegroups'] = acc_authorize_action(user_info, 'usegroups')[0] == 0

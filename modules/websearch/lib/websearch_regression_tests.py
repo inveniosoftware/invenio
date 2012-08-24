@@ -38,7 +38,8 @@ if sys.hexversion < 0x2040000:
 from mechanize import Browser, LinkNotFoundError
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_NAME, CFG_SITE_LANG, \
-    CFG_SITE_RECORD, CFG_SITE_LANGS, CFG_WEBSEARCH_SPIRES_SYNTAX
+    CFG_SITE_RECORD, CFG_SITE_LANGS, \
+    CFG_SITE_SECURE_URL, CFG_WEBSEARCH_SPIRES_SYNTAX
 from invenio.testutils import make_test_suite, \
                               run_test_suite, \
                               make_url, make_surl, test_web_page_content, \
@@ -52,7 +53,8 @@ from invenio.search_engine import perform_request_search, \
     wash_colls, record_public_p
 from invenio import search_engine_summarizer
 from invenio.search_engine_utils import get_fieldvalues
-
+from invenio.intbitset import intbitset
+from invenio.search_engine import intersect_results_with_collrecs
 
 if 'fr' in CFG_SITE_LANGS:
     lang_french_configured = True
@@ -1126,6 +1128,17 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
 000000001 100__ $$aPhotolab
 """)
 
+    def test_search_engine_python_api_for_intersect_results_with_one_collrec(self):
+        """websearch - search engine Python API for intersect results with one collrec"""
+        self.assertEqual({'Books & Reports': intbitset([19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34])},
+                         intersect_results_with_collrecs(None, intbitset(range(0,110)), ['Books & Reports'], 0, 'id', 0, 'en', False))
+
+    def test_search_engine_python_api_for_intersect_results_with_several_collrecs(self):
+        """websearch - search engine Python API for intersect results with several collrecs"""
+        self.assertEqual({'Books': intbitset([21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34]),
+                          'Reports': intbitset([19, 20]),
+                          'Theses': intbitset([35, 36, 37, 38, 39, 40, 41, 42, 105])},
+                         intersect_results_with_collrecs(None, intbitset(range(0,110)), ['Books', 'Theses', 'Reports'], 0, 'id', 0, 'en', False))
 
 class WebSearchSearchEngineWebAPITest(unittest.TestCase):
     """Check typical search engine Web API calls on the demo data."""
@@ -1192,7 +1205,7 @@ class WebSearchSearchEngineWebAPITest(unittest.TestCase):
                                                expected_text="[1, 2, 3, 4, 5, 6, 7, 8, 9]"))
 
 class WebSearchRestrictedCollectionTest(unittest.TestCase):
-    """Test of the restricted Theses collection behaviour."""
+    """Test of the restricted collections behaviour."""
 
     def test_restricted_collection_interface_page(self):
         """websearch - restricted collection interface page body"""
@@ -1287,8 +1300,10 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
     def test_get_permitted_restricted_collections(self):
         """websearch - get_permitted_restricted_collections"""
         from invenio.webuser import get_uid_from_email, collect_user_info
-        self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('jekyll@cds.cern.ch'))), ['Theses'])
+        self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('jekyll@cds.cern.ch'))), ['Theses', 'Drafts'])
         self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('hyde@cds.cern.ch'))), [])
+        self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('balthasar.montague@cds.cern.ch'))), ['ALEPH Theses', 'ALEPH Internal Notes', 'Atlantis Times Drafts'])
+        self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('dorian.gray@cds.cern.ch'))), ['ISOLDE Internal Notes'])
 
     def test_restricted_record_has_restriction_flag(self):
         """websearch - restricted record displays a restriction flag"""
@@ -1308,6 +1323,308 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
             pass
         else:
             self.fail("Oops, a 'Restricted' flag should appear on restricted records.")
+
+
+class WebSearchRestrictedCollectionHandlingTest(unittest.TestCase):
+    """
+    Check how the restricted or restricted and "hidden" collection
+    handling works: (i)user has or not rights to access to specific
+    records or collections, (ii)public and restricted results are displayed
+    in the right position in the collection tree, (iii)display the right
+    warning depending on the case.
+
+    Changes in the collection tree used for testing (are showed the records used for testing as well):
+
+                  Articles & Preprints                                           Books & Reports
+              _____________|________________                               ____________|_____________
+              |        |          |        |                               |           |            |
+          Articles   Drafts(r)  Notes   Preprints                         Books      Theses(r)    Reports
+            69        77         109      10                                           105
+            77        98                  98
+           108       105
+
+                                                      CERN Experiments
+                                    _________________________|___________________________
+                                    |                                                   |
+                                  ALEPH                                              ISOLDE
+                   _________________|_________________                      ____________|_____________
+                   |                |                |                      |                        |
+                 ALEPH            ALEPH            ALEPH                   ISOLDE                  ISOLDE
+                Papers       Internal Notes(r)    Theses(r)                Papers               Internal Notes(r&h)
+                  10               109              105                      69                       110
+                 108                                106
+
+    Authorized users:
+        jekyll -> Drafts, Theses
+        balthasar -> ALEPH Internal Notes, ALEPH Theses
+        dorian -> ISOLDE Internal Notes
+    """
+
+    def test_show_public_colls_in_warning_as_unauthorizad_user(self):
+        """websearch - show public daugther collections in warning to unauthorized user"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Articles+%26+Preprints&sc=1&p=recid:20',
+                                               username='hyde',
+                                               password='h123yde',
+                                               expected_text=['No match found in collection <em>Articles, Preprints, Notes</em>.'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+
+    def test_show_public_and_restricted_colls_in_warning_as_authorized_user(self):
+        """websearch - show public and restricted daugther collections in warning to authorized user"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Articles+%26+Preprints&sc=1&p=recid:20',
+                                               username='jekyll',
+                                               password='j123ekyll',
+                                               expected_text=['No match found in collection <em>Articles, Preprints, Notes, Drafts</em>.'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_restricted_record_in_different_colls_as_unauthorized_user(self):
+        """websearch - record belongs to different restricted collections with different rights, user not has rights"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?p=105&f=recid',
+                                               username='hyde',
+                                               password='h123yde',
+                                               expected_text=['No public collection matched your query.'],
+                                               unexpected_text=['records found'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_restricted_record_in_different_colls_as_authorized_user_of_one_coll(self):
+        """websearch - record belongs to different restricted collections with different rights, balthasar has rights to one of them"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?&sc=1&p=recid:105&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts',
+                                               username='balthasar',
+                                               password='b123althasar',
+                                               expected_text=['ALEPH Theses', '[CERN-THESIS-99-074]'],
+                                               unexpected_text=['No public collection matched your query.'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+
+    def test_restricted_record_in_different_colls_as_authorized_user_of_two_colls(self):
+        """websearch - record belongs to different restricted collections with different rights, jekyll has rights to two of them"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?&sc=1&p=recid:105&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts',
+                                               username='jekyll',
+                                               password='j123ekyll',
+                                               expected_text=['Articles &amp; Preprints', 'Books &amp; Reports'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_restricted_record_in_different_colls_as_authorized_user_of_all_colls(self):
+        """websearch - record belongs to different restricted collections with different rights, admin has rights to all of them"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?&sc=1&p=recid:105&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts',
+                                               username='admin',
+                                               expected_text=['Articles &amp; Preprints', 'Books &amp; Reports', 'ALEPH Theses'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_search_restricted_record_from_not_dad_coll(self):
+        """websearch - record belongs to different restricted collections with different rights, search from a not dad collection"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Multimedia+%26+Arts&sc=1&p=recid%3A105&f=&action_search=Search&c=Pictures&c=Poetry&c=Atlantis+Times',
+                                               username='admin',
+                                               expected_text=['No match found in collection', '3 hits'],
+                                               expected_link_target=CFG_SITE_SECURE_URL+'/search?ln=en&p=recid%3A105&sc=1')
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_public_and_restricted_record_as_unauthorized_user(self):
+        """websearch - record belongs to different public and restricted collections, user not has rights"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?&sc=1&p=geometry&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts&of=id',
+                                               username='guest',
+                                               expected_text='[80, 86]',
+                                               unexpected_text='[40, 80, 86]')
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_public_and_restricted_record_as_authorized_user(self):
+        """websearch - record belongs to different public and restricted collections, admin has rights"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?&sc=1&p=geometry&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts&of=id',
+                                               username='admin',
+                                               password='',
+                                               expected_text='[40, 80, 86]')
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_public_and_restricted_record_of_focus_as_unauthorized_user(self):
+        """websearch - record belongs to both a public and a restricted collection of "focus on", user not has rights"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Articles+%26+Preprints&sc=1&p=109&f=recid',
+                                               username='hyde',
+                                               password='h123yde',
+                                               expected_text=['Notes', 'LEP Center-of-Mass Energies in Presence of Opposite'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_public_and_restricted_record_of_focus_as_authorized_user(self):
+        """websearch - record belongs to both a public and a restricted collection of "focus on", user has rights"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?&sc=1&p=109&f=recid&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts',
+                                               username='balthasar',
+                                               password='b123althasar',
+                                               expected_text=['Articles &amp; Preprints', 'ALEPH Internal Notes', 'LEP Center-of-Mass Energies in Presence of Opposite'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_search_public_and_restricted_record_from_not_dad_coll_as_authorized_user(self):
+        """websearch - record belongs to both a public and a restricted collection, search from a not dad collection, admin has rights"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Books+%26+Reports&sc=1&p=recid%3A98&f=&action_search=Search&c=Books&c=Reports',
+                                               username='admin',
+                                               password='',
+                                               expected_text=['No match found in collection <em>Books, Reports, Theses</em>', '2 hits'],
+                                               expected_link_target=CFG_SITE_SECURE_URL+'/search?ln=en&p=recid%3A98&sc=1')
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_search_public_and_restricted_record_from_not_dad_coll_as_unauthorized_user(self):
+        """websearch - record belongs to both a public and a restricted collection, search from a not dad collection, hyde not has rights"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Books+%26+Reports&sc=1&p=recid%3A98&f=&action_search=Search&c=Books&c=Reports',
+                                               username='hyde',
+                                               password='h123yde',
+                                               expected_text=['No match found in collection <em>Books, Reports</em>', '1 hits'],
+                                               expected_link_target=CFG_SITE_SECURE_URL+'/search?ln=en&p=recid%3A98&sc=1')
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_restricted_record_of_focus_as_authorized_user(self):
+        """websearch - record belongs to a restricted collection of "focus on", balthasar has rights"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?&sc=1&p=106&f=recid&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts&of=id',
+                                               username='balthasar',
+                                               password='b123althasar',
+                                               expected_text='[106]',
+                                               unexpected_text='[]')
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_display_dad_coll_of_restricted_coll_as_unauthorized_user(self):
+        """websearch - unauthorized user displays a collection that contains a restricted collection"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Articles+%26+Preprints&sc=1&p=&f=&action_search=Search&c=Articles&c=Drafts&c=Preprints',
+                                               username='guest',
+                                               expected_text=['This collection is restricted.'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_display_dad_coll_of_restricted_coll_as_authorized_user(self):
+        """websearch - authorized user displays a collection that contains a restricted collection"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Articles+%26+Preprints&sc=1&p=&f=&action_search=Search&c=Articles&c=Drafts&c=Notes&c=Preprints',
+                                               username='jekyll',
+                                               password='j123ekyll',
+                                               expected_text=['Articles', 'Drafts', 'Notes', 'Preprints'],
+                                               unexpected_text=['This collection is restricted.'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_search_restricted_record_from_coll_of_focus_as_unauthorized_user(self):
+        """websearch - search for a record that belongs to a restricted collection from a collection of "focus on" , jekyll not has rights"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=CERN+Divisions&sc=1&p=recid%3A106&f=&action_search=Search&c=Experimental+Physics+(EP)&c=Theoretical+Physics+(TH)',
+                                               username='jekyll',
+                                               password='j123ekyll',
+                                               expected_text=['No public collection matched your query.'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_search_restricted_record_from_coll_of_focus_as_authorized_user(self):
+        """websearch - search for a record that belongs to a restricted collection from a collection of "focus on" , admin has rights"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=CERN+Divisions&sc=1&p=recid%3A106&f=&action_search=Search&c=Experimental+Physics+(EP)&c=Theoretical+Physics+(TH)',
+                                               username='admin',
+                                               password='',
+                                               expected_text=['No match found in collection <em>Experimental Physics (EP), Theoretical Physics (TH)</em>.', '1 hits'],
+                                               expected_link_target=CFG_SITE_SECURE_URL+'/search?ln=en&p=recid%3A106&sc=1')
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_search_restricted_record_from_not_direct_dad_coll_and_display_in_right_position_in_tree(self):
+        """websearch - search for a restricted record from not direct dad collection and display it on its right position in the tree"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&sc=1&p=recid%3A40&f=&action_search=Search&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts',
+                                               username='admin',
+                                               password='',
+                                               expected_text=['Books &amp; Reports','[LBL-22304]'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_search_restricted_record_from_direct_dad_coll_and_display_in_right_position_in_tree(self):
+        """websearch - search for a restricted record from the direct dad collection and display it on its right position in the tree"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Books+%26+Reports&sc=1&p=recid%3A40&f=&action_search=Search&c=Books&c=Reports',
+                                               username='admin',
+                                               password='',
+                                               expected_text=['Theses',  '[LBL-22304]'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_restricted_and_hidden_record_as_unauthorized_user(self):
+        """websearch - search for a "hidden" record, user not has rights"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&sc=1&p=recid%3A110&f=&action_search=Search&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts',
+                                               username='guest',
+                                               expected_text=['If you were looking for a non-public document'],
+                                               unexpected_text=['If you were looking for a hidden document'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_restricted_and_hidden_record_as_authorized_user(self):
+        """websearch - search for a "hidden" record, admin has rights"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&sc=1&p=recid%3A110&f=&action_search=Search&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts',
+                                               username='admin',
+                                               password='',
+                                               expected_text=['If you were looking for a hidden document, please type the correct URL for this record.'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_enter_url_of_restricted_and_hidden_coll_as_unauthorized_user(self):
+        """websearch - unauthorized user types the concret URL of a "hidden" collection"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=ISOLDE+Internal+Notes&sc=1&p=&f=&action_search=Search',
+                                               username='guest',
+                                               expected_text=['This collection is restricted.'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_enter_url_of_restricted_and_hidden_coll_as_authorized_user(self):
+        """websearch - authorized user types the concret URL of a "hidden" collection"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=ISOLDE+Internal+Notes&sc=1&p=&f=&action_search=Search',
+                                               username='dorian',
+                                               password='d123orian',
+                                               expected_text=['ISOLDE Internal Notes', '[CERN-PS-PA-Note-93-04]'],
+                                               unexpected_text=['This collection is restricted.'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_search_for_pattern_from_the_top_as_unauthorized_user(self):
+        """websearch - unauthorized user searches for a pattern from the top"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&sc=1&p=of&f=&action_search=Search&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts',
+                                               username='guest',
+                                               expected_text=['Articles &amp; Preprints', '61', 'records found',
+                                                              'Books &amp; Reports', '2', 'records found',
+                                                              'Multimedia &amp; Arts', '14', 'records found'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_search_for_pattern_from_the_top_as_authorized_user(self):
+        """websearch - authorized user searches for a pattern from the top"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&sc=1&p=of&f=&action_search=Search&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts',
+                                               username='admin',
+                                               password='',
+                                               expected_text=['Articles &amp; Preprints', '61', 'records found',
+                                                              'Books &amp; Reports', '6', 'records found',
+                                                              'Multimedia &amp; Arts', '14', 'records found',
+                                                              'ALEPH Theses', '1', 'records found',
+                                                              'ALEPH Internal Notes', '1', 'records found'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_search_for_pattern_from_an_specific_coll_as_unauthorized_user(self):
+        """websearch - unauthorized user searches for a pattern from one specific collection"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Books+%26+Reports&sc=1&p=of&f=&action_search=Search&c=Books&c=Reports',
+                                               username='guest',
+                                               expected_text=['Books', '1', 'records found',
+                                                              'Reports', '1', 'records found'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_search_for_pattern_from_an_specific_coll_as_authorized_user(self):
+        """websearch - authorized user searches for a pattern from one specific collection"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Books+%26+Reports&sc=1&p=of&f=&action_search=Search&c=Books&c=Reports',
+                                               username='admin',
+                                               password='',
+                                               expected_text=['Books', '1', 'records found',
+                                                              'Reports', '1', 'records found',
+                                                              'Theses', '4', 'records found'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
 
 class WebSearchRestrictedPicturesTest(unittest.TestCase):
     """
@@ -1353,10 +1670,10 @@ class WebSearchRestrictedWebJournalFilesTest(unittest.TestCase):
         """websearch - files of unreleased articles are not available to guest"""
 
         # Record is not public...
-        self.assertEqual(record_public_p(106), False)
+        self.assertEqual(record_public_p(112), False)
 
         # ... and guest cannot access attached files
-        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/106/files/journal_galapagos_archipelago.jpg' % CFG_SITE_RECORD,
+        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/112/files/journal_galapagos_archipelago.jpg' % CFG_SITE_RECORD,
                                                expected_text=['This file is restricted.  If you think you have right to access it, please authenticate yourself.'])
         if error_messages:
             self.fail(merge_error_messages(error_messages))
@@ -1365,10 +1682,10 @@ class WebSearchRestrictedWebJournalFilesTest(unittest.TestCase):
         """websearch - files of unreleased articles are available to editor"""
 
         # Record is not public...
-        self.assertEqual(record_public_p(106), False)
+        self.assertEqual(record_public_p(112), False)
 
         # ... but editor can access attached files
-        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/106/files/journal_galapagos_archipelago.jpg' % CFG_SITE_RECORD,
+        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/112/files/journal_galapagos_archipelago.jpg' % CFG_SITE_RECORD,
                                                username='balthasar',
                                                password='b123althasar',
                                                expected_text=[],
@@ -1381,10 +1698,10 @@ class WebSearchRestrictedWebJournalFilesTest(unittest.TestCase):
         """websearch - files of released articles are available to guest"""
 
         # Record is not public...
-        self.assertEqual(record_public_p(105), False)
+        self.assertEqual(record_public_p(111), False)
 
         # ... but user can access attached files, as article is released
-        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/105/files/journal_scissor_beak.jpg' % CFG_SITE_RECORD,
+        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/111/files/journal_scissor_beak.jpg' % CFG_SITE_RECORD,
                                                expected_text=[],
                                                 unexpected_text=['This file is restricted',
                                                                  'You are not authorized'])
@@ -1395,11 +1712,11 @@ class WebSearchRestrictedWebJournalFilesTest(unittest.TestCase):
         """websearch - restricted files of released articles are not available to guest"""
 
         # Record is not public...
-        self.assertEqual(record_public_p(105), False)
+        self.assertEqual(record_public_p(111), False)
 
         # ... and user cannot access restricted attachements, even if
         # article is released
-        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/105/files/restricted-journal_scissor_beak.jpg' % CFG_SITE_RECORD,
+        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/111/files/restricted-journal_scissor_beak.jpg' % CFG_SITE_RECORD,
                                                expected_text=['This file is restricted.  If you think you have right to access it, please authenticate yourself.'])
         if error_messages:
             self.fail(merge_error_messages(error_messages))
@@ -1684,13 +2001,13 @@ class WebSearchMARCQueryTest(unittest.TestCase):
         """websearch - many MARC tags, partial phrase query (245)"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%27and%27&rg=100',
-                                               expected_text="[1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 91, 96]"))
+                                               expected_text="[1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 91, 96, 108]"))
 
     def test_single_marc_tag_regexp_query(self):
         """websearch - single MARC tag, regexp query"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%2Fand%2F&rg=100',
-                                               expected_text="[1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 91, 96]"))
+                                               expected_text="[1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 91, 96, 108]"))
 
 class WebSearchExtSysnoQueryTest(unittest.TestCase):
     """Test of queries using external system numbers."""
@@ -1805,13 +2122,16 @@ class WebSearchSummarizerTest(unittest.TestCase):
     def test_most_popular_field_values_singletag(self):
         """websearch - most popular field values, simple tag"""
         from invenio.search_engine import get_most_popular_field_values
-        self.assertEqual((('PREPRINT', 37), ('ARTICLE', 28), ('BOOK', 14), ('THESIS', 8), ('PICTURE', 7), ('POETRY', 2), ('REPORT', 2),  ('ATLANTISTIMESNEWS', 1)),
+        self.assertEqual((('PREPRINT', 37), ('ARTICLE', 28), ('BOOK', 14), ('THESIS', 8), ('PICTURE', 7),
+                         ('DRAFT', 2), ('POETRY', 2), ('REPORT', 2), ('ALEPHPAPER', 1), ('ATLANTISTIMESNEWS', 1),
+                         ('ISOLDEPAPER', 1)),
                          get_most_popular_field_values(range(0,100), '980__a'))
 
     def test_most_popular_field_values_singletag_multiexclusion(self):
         """websearch - most popular field values, simple tag, multiple exclusions"""
         from invenio.search_engine import get_most_popular_field_values
-        self.assertEqual((('PREPRINT', 37), ('ARTICLE', 28), ('BOOK', 14), ('REPORT', 2), ('ATLANTISTIMESNEWS', 1)),
+        self.assertEqual((('PREPRINT', 37), ('ARTICLE', 28), ('BOOK', 14), ('DRAFT', 2), ('REPORT', 2),
+                          ('ALEPHPAPER', 1), ('ATLANTISTIMESNEWS', 1), ('ISOLDEPAPER', 1)),
                          get_most_popular_field_values(range(0,100), '980__a', ('THESIS', 'PICTURE', 'POETRY')))
 
     def test_most_popular_field_values_multitag(self):
@@ -2120,7 +2440,7 @@ class WebSearchSPIRESSyntaxTest(unittest.TestCase):
             # should return every document in the system
             self.assertEqual([],
                              test_web_page_content(CFG_SITE_URL +'/search?ln=en&p=find+da+%3E+today+-+3650&f=&of=id',
-                                                   expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 107]'))
+                                                   expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 107, 108, 109, 113]'))
 
 
 class WebSearchDateQueryTest(unittest.TestCase):
@@ -2128,7 +2448,6 @@ class WebSearchDateQueryTest(unittest.TestCase):
 
     def setUp(self):
         """Establish variables we plan to re-use"""
-        from invenio.intbitset import intbitset
         self.empty = intbitset()
 
     def test_search_unit_hits_for_datecreated_previous_millenia(self):
@@ -2302,13 +2621,13 @@ class WebSearchPerformRequestSearchRefactoringTest(unittest.TestCase):
         # FIXME_TICKET_1174
         # self.run_test('p=el*;rm=citation', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 92, 97, 100, 103, 18, 74, 91, 94, 81])
 
-        self.run_test('p=el*;rm=wrd', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 74, 81, 91, 92, 94, 97, 100, 103])
+        self.run_test('p=el*;rm=wrd', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 74, 81, 91, 92, 94, 97, 100, 103, 109])
 
-        self.run_test('p=el*;sf=title', [100, 32, 8, 15, 16, 81, 97, 34, 23, 58, 2, 14, 9, 11, 30, 52, 48, 94, 17, 56, 18, 91, 59, 12, 92, 74, 54, 103, 10, 51, 47, 13])
+        self.run_test('p=el*;sf=title', [100, 32, 8, 15, 16, 81, 97, 34, 23, 58, 2, 14, 9, 11, 30, 109, 52, 48, 94, 17, 56, 18, 91, 59, 12, 92, 74, 54, 103, 10, 51, 47, 13])
 
-        self.run_test('p=boson;rm=citation', [1, 47, 50, 77, 95])
+        self.run_test('p=boson;rm=citation', [1, 47, 50, 107, 108, 77, 95])
 
-        self.run_test('p=boson;rm=wrd', [47, 50, 95, 77, 1])
+        self.run_test('p=boson;rm=wrd', [108, 77, 47, 50, 95, 1, 107])
 
         self.run_test('p1=ellis;f1=author;m1=a;op1=a;p2=john;f2=author;m2=a', [])
 
@@ -2351,6 +2670,7 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchSearchEnginePythonAPITest,
                              WebSearchSearchEngineWebAPITest,
                              WebSearchRestrictedCollectionTest,
+                             WebSearchRestrictedCollectionHandlingTest,
                              WebSearchRestrictedPicturesTest,
                              WebSearchRestrictedWebJournalFilesTest,
                              WebSearchRSSFeedServiceTest,
@@ -2379,6 +2699,7 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchWashCollectionsTest,
                              WebSearchAuthorCountQueryTest,
                              WebSearchPerformRequestSearchRefactoringTest)
+
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

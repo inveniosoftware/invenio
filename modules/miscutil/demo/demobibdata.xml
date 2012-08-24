@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <collection xmlns="http://www.loc.gov/MARC21/slim">
-  <record>
+<record>
     <datafield tag="037" ind1=" " ind2=" ">
       <subfield code="a">CERN-EX-0106015</subfield>
     </datafield>
@@ -1918,6 +1918,9 @@
     </datafield>
     <datafield tag="980" ind1=" " ind2=" ">
       <subfield code="a">PREPRINT</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">ALEPHPAPER</subfield>
     </datafield>
     <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">[1]</subfield>
@@ -16019,6 +16022,9 @@
     <datafield tag="980" ind1=" " ind2=" ">
       <subfield code="a">ARTICLE</subfield>
     </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">ISOLDEPAPER</subfield>
+    </datafield>
   </record>
   <record>
     <datafield tag="037" ind1=" " ind2=" ">
@@ -17044,6 +17050,9 @@
     </datafield>
     <datafield tag="980" ind1=" " ind2=" ">
       <subfield code="a">ARTICLE</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">DRAFT</subfield>
     </datafield>
     <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">[1]</subfield>
@@ -23333,6 +23342,9 @@
     <datafield tag="980" ind1=" " ind2=" ">
       <subfield code="a">PREPRINT</subfield>
     </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">DRAFT</subfield>
+    </datafield>
     <datafield tag="964" ind1=" " ind2=" ">
       <subfield code="a">0001</subfield>
     </datafield>
@@ -23427,7 +23439,7 @@
       <subfield code="a">Atlantis (Timaeus)</subfield>
     </datafield>
     <datafield tag="520" ind1=" " ind2=" ">
-      <subfield code="b">&lt;!--HTML-->&lt;p class="articleHeader">This great island lay over against the Pillars of Heracles, in extent greater than Libya and Asia put together, and was the passage to other islands and to a great ocean of which the Mediterranean sea was only the harbour; and within the Pillars the empire of Atlantis reached in Europe to Tyrrhenia and in Libya to Egypt.&lt;/p> &lt;p>This mighty power was arrayed against Egypt and Hellas and all the countries&lt;/p> &lt;div class="phrwithcaption"> &lt;div class="imageScale">&lt;img src="http://invenio-software.org/download/invenio-demo-site-files/icon-journal_Athanasius_Kircher_Atlantis_image.gif" alt="" />&lt;/div> &lt;p>Representation of Atlantis by Athanasius Kircher (1669)&lt;/p> &lt;/div> bordering on the Mediterranean. Then your city did bravely, and won renown over the whole earth. For at the peril of her own existence, and when the other Hellenes had deserted her, she repelled the invader, and of her own accord gave liberty to all the nations within the Pillars. A little while afterwards there were great earthquakes and floods, and your warrior race all sank into the earth; and the great island of Atlantis also disappeared in the sea. This is the explanation of the shallows which are found in that part of the Atlantic ocean. &lt;p> &lt;/p> (Excerpt from TIMAEUS, By Plato, translated By Jowett, Benjamin)&lt;br /></subfield>
+      <subfield code="b">&lt;!--HTML-->&lt;p class="articleHeader">This great island lay over against the Pillars of Heracles, in extent greater than Libya and Asia put together, and was the passage to other islands and to a great ocean of which the Mediterranean sea was only the harbour; and within the Pillars the empire of Atlantis reached in Europe to Tyrrhenia and in Libya to Egypt.&lt;/p> &lt;p>This mighty power was arrayed against Egypt and Hellas and all the countries&lt;/p> &lt;div class="phrwithcaption"> &lt;div class="imageScale">&lt;img src="http://invenio-software.org/download/invenio-demo-site-files/icon-journal_Athanasius_Kircher_Atlantis_image.gif" alt="" />&lt;/div> &lt;p>Representation of Atlantis by Athanasius Kircher (1669)&lt;/p> &lt;/div> bordering on the Mediterranean. Then your city did bravely, and won renown over the whole earth. For at the peril of her own existence, and when the other Hellenes had deserted her, she repelled the invader, and of her own accord gave liberty to all the nations within the Pillars. A little while afterwards there were great earthquakes and floods, and your warrior race all sank into the earth; and the great island of Atlantis also disappeared in the sea. This is the explanation of the shallows which are found in that part of the Atlantic ocean. &lt;p> &lt;/p> (Excerpt from TIMAEUS, By Plato, translated By Jowett, Benjamin)&lt;br /></subfield>
     </datafield>
     <datafield tag="590" ind1=" " ind2=" ">
       <subfield code="b">&lt;!--HTML-->&lt;br /></subfield>
@@ -23561,6 +23573,705 @@ Only the mountain and I.
     </datafield>
     <datafield tag="980" ind1=" " ind2=" ">
       <subfield code="a">POETRY</subfield>
+    </datafield>
+  </record>
+  <record>
+    <controlfield tag="005">20110118111428.0</controlfield>
+    <datafield tag="035" ind1=" " ind2=" ">
+        <subfield code="9">Inspire</subfield>
+        <subfield code="a">882629</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+        <subfield code="9">SPIRES</subfield>
+        <subfield code="a">8921016</subfield>
+    </datafield>
+    <datafield tag="041" ind1=" " ind2=" ">
+        <subfield code="a">eng</subfield>
+    </datafield>
+    <datafield tag="088" ind1=" " ind2=" ">
+        <subfield code="a">CERN-THESIS-99-074</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Goodsir, S M</subfield>
+        <subfield code="u">Imperial Coll., London</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+        <subfield code="a">A W mass measurement with the ALEPH detector</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+        <subfield code="a">London</subfield>
+        <subfield code="b">Imperial Coll.</subfield>
+        <subfield code="c">1999</subfield>
+    </datafield>
+    <datafield tag="502" ind1=" " ind2=" ">
+        <subfield code="a">PhD</subfield>
+        <subfield code="b">London U.</subfield>
+        <subfield code="c">1999</subfield>
+    </datafield>
+    <datafield tag="595" ind1=" " ind2=" ">
+        <subfield code="a">No fulltext</subfield>
+    </datafield>
+    <datafield tag="595" ind1=" " ind2=" ">
+        <subfield code="a">CERN EDS</subfield>
+    </datafield>
+    <datafield tag="650" ind1="1" ind2="7">
+        <subfield code="2">SzGeCERN</subfield>
+        <subfield code="a">Detectors and Experimental Techniques</subfield>
+    </datafield>
+    <datafield tag="690" ind1="C" ind2=" ">
+        <subfield code="a">THESIS</subfield>
+    </datafield>
+    <datafield tag="690" ind1="C" ind2=" ">
+        <subfield code="a">CERN</subfield>
+    </datafield>
+    <datafield tag="690" ind1="C" ind2=" ">
+        <subfield code="a">ALEPH</subfield>
+    </datafield>
+    <datafield tag="693" ind1=" " ind2=" ">
+        <subfield code="a">CERN LHC</subfield>
+        <subfield code="e">ALEPH</subfield>
+    </datafield>
+    <datafield tag="916" ind1=" " ind2=" ">
+        <subfield code="s">h</subfield>
+        <subfield code="w">201103</subfield>
+    </datafield>
+    <datafield tag="960" ind1=" " ind2=" ">
+        <subfield code="a">14</subfield>
+    </datafield>
+    <datafield tag="961" ind1=" " ind2=" ">
+        <subfield code="c">20110128</subfield>
+        <subfield code="h">1717</subfield>
+        <subfield code="l">CER01</subfield>
+        <subfield code="x">20110118</subfield>
+    </datafield>
+    <datafield tag="963" ind1=" " ind2=" ">
+        <subfield code="a">PUBLIC</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+        <subfield code="a">002943225CER</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+        <subfield code="a">ALEPHTHESIS</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+        <subfield code="a">THESIS</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+        <subfield code="a">DRAFT</subfield>
+    </datafield>
+    <datafield tag="024" ind1="8" ind2=" ">
+        <subfield code="a">oai:cds.cern.ch:1322667</subfield>
+        <subfield code="p">cerncds:CERN</subfield>
+    </datafield>
+  </record>
+  <record>
+    <controlfield tag="003">SzGeCERN</controlfield>
+    <datafield tag="035" ind1=" " ind2=" ">
+        <subfield code="9">CDS</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">33028075</subfield>
+    </datafield>
+    <datafield tag="041" ind1=" " ind2=" ">
+        <subfield code="a">eng</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Hodgson, P</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+        <subfield code="a">A measurement of the di-jet cross-sections in two photon physics at LEP 2</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+        <subfield code="a">Sheffield</subfield>
+        <subfield code="b">Sheffield Univ.</subfield>
+        <subfield code="c">2001</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+        <subfield code="a">mult. p</subfield>
+    </datafield>
+    <datafield tag="502" ind1=" " ind2=" ">
+        <subfield code="a">PhD</subfield>
+        <subfield code="b">Sheffield Univ.</subfield>
+        <subfield code="c">2001</subfield>
+    </datafield>
+    <datafield tag="520" ind1=" " ind2=" ">
+        <subfield code="a">This thesis presents a study of di-jet production in untagged two photon events in the ALEPH detector at LEP with sq root s=183 GeV. A low background sample of 145146 untagged gamma gamma events is obtained and from this 2346 di-jet events are found. A clustering algorithm, KTCLUS, is used to reconstruct the jet momenta. The data is corrected back to hadron level using the PHOJET Monte Carlo and this sample is compared with two independent NLO QCD calculations. Good agreement is seen except at the lowest jet P sub T , where the calculations overshoot the data; however, it should be noted that perturbative QCD is less reliable at low P sub T.</subfield>
+    </datafield>
+    <datafield tag="595" ind1=" " ind2=" ">
+        <subfield code="a">SIS INIS2004</subfield>
+    </datafield>
+    <datafield tag="650" ind1="1" ind2="7">
+        <subfield code="2">SzGeCERN</subfield>
+        <subfield code="a">Particle Physics</subfield>
+    </datafield>
+    <datafield tag="690" ind1="C" ind2=" ">
+        <subfield code="a">THESIS</subfield>
+    </datafield>
+    <datafield tag="690" ind1="C" ind2=" ">
+        <subfield code="a">ALEPH</subfield>
+    </datafield>
+    <datafield tag="693" ind1=" " ind2=" ">
+        <subfield code="a">CERN LEP</subfield>
+        <subfield code="e">ALEPH</subfield>
+    </datafield>
+    <datafield tag="694" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">Physics of elementary particles and fields</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">accelerators-</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">bosons-</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">computer-codes</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">cyclic-accelerators</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">elementary-particles</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">energy-range</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">field-theories</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">gev-range</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">jet-model</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">k-codes</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">lep-storage-rings</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">linear-momentum</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">massless-particles</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">mathematical-models</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">multiple-production</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">particle-discrimination</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">particle-identification</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">particle-models</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">particle-production</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">photons-</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">quantum-chromodynamics</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">quantum-field-theory</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">storage-rings</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">synchrotrons-</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">INIS</subfield>
+        <subfield code="a">transverse-momentum</subfield>
+    </datafield>
+    <datafield tag="916" ind1=" " ind2=" ">
+        <subfield code="s">n</subfield>
+        <subfield code="w">200431</subfield>
+    </datafield>
+    <datafield tag="960" ind1=" " ind2=" ">
+        <subfield code="a">14</subfield>
+    </datafield>
+    <datafield tag="961" ind1=" " ind2=" ">
+        <subfield code="c">20100419</subfield>
+        <subfield code="h">1112</subfield>
+        <subfield code="l">CER01</subfield>
+        <subfield code="x">20040730</subfield>
+    </datafield>
+    <datafield tag="963" ind1=" " ind2=" ">
+        <subfield code="a">PUBLIC</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+        <subfield code="a">002474361CER</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+        <subfield code="a">ALEPHTHESIS</subfield>
+    </datafield>
+  </record>
+  <record>
+    <controlfield tag="003">SzGeCERN</controlfield>
+    <controlfield tag="005">20080521084337.0</controlfield>
+    <datafield tag="035" ind1=" " ind2=" ">
+        <subfield code="9">SPIRES</subfield>
+        <subfield code="a">4066995</subfield>
+    </datafield>
+    <datafield tag="037" ind1=" " ind2=" ">
+        <subfield code="a">CERN-EP-99-060</subfield>
+    </datafield>
+    <datafield tag="041" ind1=" " ind2=" ">
+        <subfield code="a">eng</subfield>
+    </datafield>
+    <datafield tag="084" ind1=" " ind2=" ">
+        <subfield code="2">CERN Library</subfield>
+        <subfield code="a">EP-1999-060</subfield>
+    </datafield>
+    <datafield tag="088" ind1=" " ind2=" ">
+        <subfield code="9">SCAN-9910048</subfield>
+    </datafield>
+    <datafield tag="088" ind1=" " ind2=" ">
+        <subfield code="a">CERN-L3-175</subfield>
+    </datafield>
+    <datafield tag="110" ind1=" " ind2=" ">
+        <subfield code="a">CERN. Geneva</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+        <subfield code="a">Limits on Higgs boson masses from combining the data of the four LEP experiments at $\sqrt{s} \leq 183 GeV$</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+        <subfield code="c">1999</subfield>
+    </datafield>
+    <datafield tag="269" ind1=" " ind2=" ">
+        <subfield code="a">Geneva</subfield>
+        <subfield code="b">CERN</subfield>
+        <subfield code="c">26 Apr 1999</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+        <subfield code="a">18 p</subfield>
+    </datafield>
+    <datafield tag="490" ind1=" " ind2=" ">
+        <subfield code="a">ALEPH Papers</subfield>
+    </datafield>
+    <datafield tag="500" ind1=" " ind2=" ">
+        <subfield code="a">Preprint not submitted to publication</subfield>
+    </datafield>
+    <datafield tag="595" ind1=" " ind2=" ">
+        <subfield code="a">No authors</subfield>
+    </datafield>
+    <datafield tag="595" ind1=" " ind2=" ">
+        <subfield code="a">CERN-EP</subfield>
+    </datafield>
+    <datafield tag="595" ind1=" " ind2=" ">
+        <subfield code="a">OA</subfield>
+    </datafield>
+    <datafield tag="595" ind1=" " ind2=" ">
+        <subfield code="a">SIS:200740 PR/LKR not found (from SLAC, INSPEC)</subfield>
+    </datafield>
+    <datafield tag="650" ind1="1" ind2="7">
+        <subfield code="2">SzGeCERN</subfield>
+        <subfield code="a">Particle Physics - Experiment</subfield>
+    </datafield>
+    <datafield tag="690" ind1="C" ind2=" ">
+        <subfield code="a">CERN</subfield>
+    </datafield>
+    <datafield tag="690" ind1="C" ind2=" ">
+        <subfield code="a">PREPRINT</subfield>
+    </datafield>
+    <datafield tag="693" ind1=" " ind2=" ">
+        <subfield code="a">CERN LEP</subfield>
+        <subfield code="e">ALEPH</subfield>
+    </datafield>
+    <datafield tag="693" ind1=" " ind2=" ">
+        <subfield code="a">CERN LEP</subfield>
+        <subfield code="e">DELPHI</subfield>
+    </datafield>
+    <datafield tag="693" ind1=" " ind2=" ">
+        <subfield code="a">CERN LEP</subfield>
+        <subfield code="e">L3</subfield>
+    </datafield>
+    <datafield tag="693" ind1=" " ind2=" ">
+        <subfield code="a">CERN LEP</subfield>
+        <subfield code="e">OPAL</subfield>
+    </datafield>
+    <datafield tag="695" ind1=" " ind2=" ">
+        <subfield code="9">MEDLINE</subfield>
+        <subfield code="a">searches Higgs bosons</subfield>
+    </datafield>
+    <datafield tag="697" ind1="C" ind2=" ">
+        <subfield code="a">LexiHiggs</subfield>
+    </datafield>
+    <datafield tag="710" ind1=" " ind2=" ">
+        <subfield code="5">EP</subfield>
+    </datafield>
+    <datafield tag="710" ind1=" " ind2=" ">
+        <subfield code="g">ALEPH Collaboration</subfield>
+    </datafield>
+    <datafield tag="710" ind1=" " ind2=" ">
+        <subfield code="g">DELPHI Collaboration</subfield>
+    </datafield>
+    <datafield tag="710" ind1=" " ind2=" ">
+        <subfield code="g">L3 Collaboration</subfield>
+    </datafield>
+    <datafield tag="710" ind1=" " ind2=" ">
+        <subfield code="g">LEP Working Group for Higgs Boson Searches</subfield>
+    </datafield>
+    <datafield tag="710" ind1=" " ind2=" ">
+        <subfield code="g">OPAL Collaboration</subfield>
+    </datafield>
+    <datafield tag="901" ind1=" " ind2=" ">
+        <subfield code="u">CERN</subfield>
+    </datafield>
+    <datafield tag="916" ind1=" " ind2=" ">
+        <subfield code="s">h</subfield>
+        <subfield code="w">199941</subfield>
+    </datafield>
+    <datafield tag="960" ind1=" " ind2=" ">
+        <subfield code="a">11</subfield>
+    </datafield>
+    <datafield tag="963" ind1=" " ind2=" ">
+        <subfield code="a">PUBLIC</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+        <subfield code="a">000330309CER</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+        <subfield code="a">ARTICLE</subfield>
+    </datafield>
+  </record>
+  <record>
+    <controlfield tag="003">SzGeCERN</controlfield>
+    <controlfield tag="005">20090128145544.0</controlfield>
+    <datafield tag="037" ind1=" " ind2=" ">
+        <subfield code="a">CERN-ALEPH-ARCH-DATA-2009-004</subfield>
+    </datafield>
+    <datafield tag="041" ind1=" " ind2=" ">
+        <subfield code="a">eng</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Beddall, Andrew</subfield>
+        <subfield code="u">Gaziantep U.</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+        <subfield code="a">Residual Bose-Einstein Correlations and the Söding Model</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+        <subfield code="c">2008</subfield>
+    </datafield>
+    <datafield tag="269" ind1=" " ind2=" ">
+        <subfield code="a">Geneva</subfield>
+        <subfield code="b">CERN</subfield>
+        <subfield code="c">19 Jan 2009</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+        <subfield code="a">8 p</subfield>
+    </datafield>
+    <datafield tag="520" ind1=" " ind2=" ">
+        <subfield code="a">Bose--Einstein correlations between identical pions close in phase-space is thought to be responsible for the observed distortion in mass spectra of non-identical pions. For example in the decays \rho 0 \rightarrow \pi + \pi - and \rho \pm \rightarrow \pi \pm \pi 0, such distortions are a residual effect where the pions from the \rho decay interact with other identical pions that are close in phase-space. Such interactions can be significant in, for example, hadronic decays of Z bosons where pion multiplicities are high, and resonances such as \rho mesons decay with a very short lifetime thereby creating pions that are close to prompt pions created directly. We present the S{ö}ding model and show that it has been used successfully to model distortions in \pi \pm \pi 0 mass spectra in hadronic Z decays recorded by ALEPH.</subfield>
+    </datafield>
+    <datafield tag="595" ind1=" " ind2=" ">
+        <subfield code="a">CERN EDS</subfield>
+    </datafield>
+    <datafield tag="650" ind1="1" ind2="7">
+        <subfield code="2">SzGeCERN</subfield>
+        <subfield code="a">Particle Physics - Experiment</subfield>
+    </datafield>
+    <datafield tag="693" ind1=" " ind2=" ">
+        <subfield code="a">CERN LEP</subfield>
+        <subfield code="e">ALEPH</subfield>
+    </datafield>
+    <datafield tag="700" ind1=" " ind2=" ">
+        <subfield code="a">Beddall, Ayda</subfield>
+        <subfield code="u">Gaziantep U.</subfield>
+    </datafield>
+    <datafield tag="700" ind1=" " ind2=" ">
+        <subfield code="a">Bingül, Ahmet</subfield>
+        <subfield code="u">Gaziantep U.</subfield>
+    </datafield>
+    <datafield tag="710" ind1=" " ind2=" ">
+        <subfield code="5">PH-EP</subfield>
+    </datafield>
+    <datafield tag="773" ind1=" " ind2=" ">
+        <subfield code="c">173-180</subfield>
+        <subfield code="n">1</subfield>
+        <subfield code="p">Acta Phys. Pol. B</subfield>
+        <subfield code="v">39</subfield>
+        <subfield code="y">2008</subfield>
+    </datafield>
+    <datafield tag="859" ind1=" " ind2=" ">
+        <subfield code="f">nathalie.grub@cern.ch</subfield>
+    </datafield>
+    <datafield tag="916" ind1=" " ind2=" ">
+        <subfield code="s">n</subfield>
+        <subfield code="w">200904</subfield>
+    </datafield>
+    <datafield tag="960" ind1=" " ind2=" ">
+        <subfield code="a">13</subfield>
+    </datafield>
+    <datafield tag="961" ind1=" " ind2=" ">
+        <subfield code="c">20100205</subfield>
+        <subfield code="h">1021</subfield>
+        <subfield code="l">CER01</subfield>
+        <subfield code="x">20090119</subfield>
+    </datafield>
+    <datafield tag="963" ind1=" " ind2=" ">
+        <subfield code="a">PUBLIC</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+        <subfield code="a">000701647CER</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+        <subfield code="a">ARTICLE</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+        <subfield code="a">ALEPHPAPER</subfield>
+    </datafield>
+  </record>
+  <record>
+    <controlfield tag="003">SzGeCERN</controlfield>
+    <controlfield tag="005">20080909102446.0</controlfield>
+    <datafield tag="035" ind1=" " ind2=" ">
+        <subfield code="9">INTINT</subfield>
+        <subfield code="a">0000990</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+        <subfield code="9">WAI01</subfield>
+        <subfield code="a">000004764</subfield>
+    </datafield>
+    <datafield tag="041" ind1=" " ind2=" ">
+        <subfield code="a">eng</subfield>
+    </datafield>
+    <datafield tag="088" ind1=" " ind2=" ">
+        <subfield code="a">CERN-ALEPH-95-089</subfield>
+    </datafield>
+    <datafield tag="088" ind1=" " ind2=" ">
+        <subfield code="a">CERN-ALEPH-PHYSIC-95-083</subfield>
+    </datafield>
+    <datafield tag="088" ind1=" " ind2=" ">
+        <subfield code="9">CERN-SL-Note-95-77-BI</subfield>
+    </datafield>
+    <datafield tag="088" ind1=" " ind2=" ">
+        <subfield code="a">SL-Note-95-77-BI</subfield>
+    </datafield>
+    <datafield tag="110" ind1=" " ind2=" ">
+        <subfield code="a">CERN. Geneva</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+        <subfield code="a">LEP Center-of-Mass Energies in Presence of Opposite Sign Vertical Dispersion in Bunch-Train Operation</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+        <subfield code="c">1995</subfield>
+    </datafield>
+    <datafield tag="269" ind1=" " ind2=" ">
+        <subfield code="a">Geneva</subfield>
+        <subfield code="b">CERN</subfield>
+        <subfield code="c">17 Jul 1995</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+        <subfield code="a">14 p</subfield>
+    </datafield>
+    <datafield tag="595" ind1=" " ind2=" ">
+        <subfield code="a">SIS ALEPH2004</subfield>
+    </datafield>
+    <datafield tag="595" ind1=" " ind2=" ">
+        <subfield code="a">SIS SLNOTE2003</subfield>
+    </datafield>
+    <datafield tag="650" ind1="1" ind2="7">
+        <subfield code="2">SzGeCERN</subfield>
+        <subfield code="a">Accelerators and Storage Rings</subfield>
+    </datafield>
+    <datafield tag="653" ind1="1" ind2=" ">
+        <subfield code="9">CERN</subfield>
+        <subfield code="a">CERN LEP</subfield>
+    </datafield>
+    <datafield tag="653" ind1="1" ind2=" ">
+        <subfield code="9">CERN</subfield>
+        <subfield code="a">beam-energy</subfield>
+    </datafield>
+    <datafield tag="653" ind1="1" ind2=" ">
+        <subfield code="9">CERN</subfield>
+        <subfield code="a">bunch-trains</subfield>
+    </datafield>
+    <datafield tag="691" ind1=" " ind2=" ">
+        <subfield code="a">LEP = Large Electron Positron Collider</subfield>
+    </datafield>
+    <datafield tag="693" ind1=" " ind2=" ">
+        <subfield code="a">CERN LEP</subfield>
+        <subfield code="e">ALEPH</subfield>
+    </datafield>
+    <datafield tag="694" ind1=" " ind2=" ">
+        <subfield code="9">CERN</subfield>
+        <subfield code="a">PHYSIC (PHYSICs)</subfield>
+    </datafield>
+    <datafield tag="710" ind1=" " ind2=" ">
+        <subfield code="g">LEP Energy Working Group</subfield>
+    </datafield>
+    <datafield tag="710" ind1=" " ind2=" ">
+        <subfield code="5">SL</subfield>
+    </datafield>
+    <datafield tag="710" ind1=" " ind2=" ">
+        <subfield code="a">The LEP energy working group</subfield>
+    </datafield>
+    <datafield tag="852" ind1=" " ind2=" ">
+        <subfield code="c">DD506</subfield>
+    </datafield>
+    <datafield tag="916" ind1=" " ind2=" ">
+        <subfield code="s">n</subfield>
+        <subfield code="w">200350</subfield>
+    </datafield>
+    <datafield tag="960" ind1=" " ind2=" ">
+        <subfield code="a">04</subfield>
+    </datafield>
+    <datafield tag="963" ind1=" " ind2=" ">
+        <subfield code="a">PUBLIC</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+        <subfield code="a">000415594CER</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+        <subfield code="a">NOTE</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+        <subfield code="a">ALEPHNOTE</subfield>
+    </datafield>
+  </record>
+  <record>
+    <controlfield tag="003">SzGeCERN</controlfield>
+    <controlfield tag="005">20040304154728.0</controlfield>
+    <datafield tag="035" ind1=" " ind2=" ">
+        <subfield code="a">0335074CERCER</subfield>
+    </datafield>
+    <datafield tag="041" ind1=" " ind2=" ">
+        <subfield code="a">eng</subfield>
+    </datafield>
+    <datafield tag="088" ind1=" " ind2=" ">
+        <subfield code="a">CERN-PS-PA-Note-93-04</subfield>
+    </datafield>
+    <datafield tag="088" ind1=" " ind2=" ">
+        <subfield code="a">CERN-PS-PA-Note-93-04-PPC</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+        <subfield code="a">Geneva</subfield>
+        <subfield code="b">CERN</subfield>
+        <subfield code="c">1993</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+        <subfield code="a">207 p</subfield>
+    </datafield>
+    <datafield tag="595" ind1=" " ind2=" ">
+        <subfield code="a">gift: Bouthéon, Marcel</subfield>
+    </datafield>
+    <datafield tag="650" ind1="1" ind2="7">
+        <subfield code="2">SzGeCERN</subfield>
+        <subfield code="a">Accelerators and Storage Rings</subfield>
+    </datafield>
+    <datafield tag="650" ind1="2" ind2="7">
+        <subfield code="2">SzGeCERN</subfield>
+        <subfield code="a">Miscellaneous</subfield>
+    </datafield>
+    <datafield tag="653" ind1="1" ind2=" ">
+        <subfield code="9">CERN</subfield>
+        <subfield code="a">East Hall</subfield>
+    </datafield>
+    <datafield tag="653" ind1="1" ind2=" ">
+        <subfield code="9">CERN</subfield>
+        <subfield code="a">ISOLDE</subfield>
+    </datafield>
+    <datafield tag="653" ind1="1" ind2=" ">
+        <subfield code="9">CERN</subfield>
+        <subfield code="a">antiprotons</subfield>
+    </datafield>
+    <datafield tag="653" ind1="1" ind2=" ">
+        <subfield code="9">CERN</subfield>
+        <subfield code="a">heavy ions</subfield>
+    </datafield>
+    <datafield tag="653" ind1="1" ind2=" ">
+        <subfield code="9">CERN</subfield>
+        <subfield code="a">proton beams</subfield>
+    </datafield>
+    <datafield tag="690" ind1="C" ind2=" ">
+        <subfield code="a">CERN</subfield>
+    </datafield>
+    <datafield tag="690" ind1="C" ind2=" ">
+        <subfield code="a">CONFERENCE</subfield>
+    </datafield>
+    <datafield tag="690" ind1="C" ind2=" ">
+        <subfield code="a">PROCEEDINGS</subfield>
+    </datafield>
+    <datafield tag="700" ind1=" " ind2=" ">
+        <subfield code="a">Manglunki, Django</subfield>
+        <subfield code="e">ed.</subfield>
+    </datafield>
+    <datafield tag="710" ind1=" " ind2=" ">
+        <subfield code="5">PS</subfield>
+    </datafield>
+    <datafield tag="711" ind1=" " ind2=" ">
+        <subfield code="a">PPD '93</subfield>
+    </datafield>
+    <datafield tag="901" ind1=" " ind2=" ">
+        <subfield code="u">CERN</subfield>
+    </datafield>
+    <datafield tag="916" ind1=" " ind2=" ">
+        <subfield code="a">d</subfield>
+        <subfield code="s">h</subfield>
+        <subfield code="w">199936</subfield>
+        <subfield code="y">y1999</subfield>
+    </datafield>
+    <datafield tag="960" ind1=" " ind2=" ">
+        <subfield code="a">42</subfield>
+    </datafield>
+    <datafield tag="961" ind1=" " ind2=" ">
+        <subfield code="c">20091104</subfield>
+        <subfield code="h">2203</subfield>
+        <subfield code="l">CER01</subfield>
+        <subfield code="x">19991117</subfield>
+    </datafield>
+    <datafield tag="963" ind1=" " ind2=" ">
+        <subfield code="a">PUBLIC</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+        <subfield code="a">PROCEEDINGS</subfield>
+    </datafield>
+    <datafield tag="964" ind1=" " ind2=" ">
+        <subfield code="a">0001</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+        <subfield code="a">000335074CER</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+        <subfield code="a">ISOLDENOTE</subfield>
     </datafield>
   </record>
   <record>

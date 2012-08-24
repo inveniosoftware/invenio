@@ -24,6 +24,8 @@ INSERT INTO user VALUES (7,'benvolio.montague@cds.cern.ch',AES_ENCRYPT(email,'b1
 INSERT INTO user VALUES (8,'balthasar.montague@cds.cern.ch',AES_ENCRYPT(email,'b123althasar'),'1',NULL,'balthasar','');
 INSERT INTO usergroup VALUES (1,'Theses viewers','Theses viewers internal group','VO','INTERNAL');
 INSERT INTO usergroup VALUES (2,'montague-family','The Montague family.','VM','INTERNAL');
+INSERT INTO usergroup VALUES (3,'ALEPH viewers','ALEPH viewers internal group','VO','INTERNAL');
+INSERT INTO usergroup VALUES (4,'ISOLDE Internal Notes viewers','ISOLDE Internal Notes viewers internal group','VO','INTERNAL');
 INSERT INTO user_usergroup VALUES (2,1,'M',NOW());
 INSERT INTO user_usergroup VALUES (5,2,'A',NOW());
 INSERT INTO user_usergroup VALUES (6,2,'M',NOW());
@@ -39,8 +41,8 @@ INSERT INTO collection VALUES (9,'CERN Divisions',NULL,NULL,NULL);
 INSERT INTO collection VALUES (10,'CERN Experiments',NULL,NULL,NULL);
 INSERT INTO collection VALUES (11,'Theoretical Physics (TH)','division:TH',NULL,NULL);
 INSERT INTO collection VALUES (12,'Experimental Physics (EP)','division:EP',NULL,NULL);
-INSERT INTO collection VALUES (13,'ISOLDE','experiment:ISOLDE',NULL,NULL);
-INSERT INTO collection VALUES (14,'ALEPH','experiment:ALEPH',NULL,NULL);
+INSERT INTO collection VALUES (13,'ISOLDE','',NULL,NULL);
+INSERT INTO collection VALUES (14,'ALEPH','',NULL,NULL);
 INSERT INTO collection VALUES (15,'Articles & Preprints',NULL,NULL,NULL);
 INSERT INTO collection VALUES (16,'Books & Reports',NULL,NULL,NULL);
 INSERT INTO collection VALUES (17,'Multimedia & Arts',NULL,NULL,NULL);
@@ -52,7 +54,14 @@ INSERT INTO collection VALUES (22,'Atlantis Times',NULL,NULL,NULL);
 INSERT INTO collection VALUES (23,'Atlantis Institute Books','hostedcollection:',NULL,NULL);
 INSERT INTO collection VALUES (24,'Atlantis Institute Articles','hostedcollection:',NULL,NULL);
 INSERT INTO collection VALUES (25,'Atlantis Times Drafts','980:"ATLANTISTIMESSCIENCEDRAFT" or 980:"ATLANTISTIMESARTSDRAFT" or 980:"ATLANTISTIMESNEWSDRAFT"',NULL,NULL);
-INSERT INTO collection VALUES (26,'Videos','980:"VIDEO"',NULL,NULL);
+INSERT INTO collection VALUES (26, 'Notes', '980:"NOTE"', NULL, NULL);
+INSERT INTO collection VALUES (27, 'ALEPH Papers', '980:"ALEPHPAPER"', NULL, NULL);
+INSERT INTO collection VALUES (28, 'ALEPH Internal Notes', '980:"ALEPHNOTE"', NULL, NULL);
+INSERT INTO collection VALUES (29, 'ALEPH Theses', '980:"ALEPHTHESIS"', NULL, NULL);
+INSERT INTO collection VALUES (30, 'ISOLDE Papers', '980:"ISOLDEPAPER"', NULL, NULL);
+INSERT INTO collection VALUES (31, 'ISOLDE Internal Notes', '980:"ISOLDENOTE"', NULL, NULL);
+INSERT INTO collection VALUES (32, 'Drafts', '980:"DRAFT"', NULL, NULL);
+INSERT INTO collection VALUES (33,'Videos','980:"VIDEO"',NULL,NULL);
 
 INSERT INTO clsMETHOD VALUES (1,'HEP','http://invenio-software.org/download/invenio-demo-site-files/HEP.rdf','High Energy Physics Taxonomy','0000-00-00 00:00:00');
 INSERT INTO clsMETHOD VALUES (2,'NASA-subjects','http://invenio-software.org/download/invenio-demo-site-files/NASA-subjects.rdf','NASA Subjects','0000-00-00 00:00:00');
@@ -545,9 +554,25 @@ INSERT INTO collectionname VALUES (24,'fr','ln','Atlantis Institute Articles');
 INSERT INTO collectionname VALUES (25,'en','ln','Atlantis Times Drafts');
 INSERT INTO collectionname VALUES (25,'fr','ln','Atlantis Times Ébauches');
 
-INSERT INTO collectionname VALUES (26,'en','ln','Videos');
-INSERT INTO collectionname VALUES (26,'fr','ln','Vidéos');
-INSERT INTO collectionname VALUES (26,'it','ln','Filmati');
+INSERT INTO collectionname VALUES (26,'en','ln','Notes');
+
+INSERT INTO collectionname VALUES (27,'en','ln','ALEPH Papers');
+
+INSERT INTO collectionname VALUES (28,'en','ln','ALEPH Internal Notes');
+
+INSERT INTO collectionname VALUES (29,'en','ln','ALEPH Theses');
+
+INSERT INTO collectionname VALUES (30, 'en','ln', 'ISOLDE Papers');
+
+INSERT INTO collectionname VALUES (31, 'en','ln', 'ISOLDE Internal Notes');
+
+INSERT INTO collectionname VALUES (32, 'en','ln', 'Drafts');
+
+INSERT INTO collectionname VALUES (33,'en','ln','Videos');
+INSERT INTO collectionname VALUES (33,'fr','ln','Vidéos');
+INSERT INTO collectionname VALUES (33,'it','ln','Filmati');
+
+
 
 INSERT INTO collection_collection VALUES (1,15,'r',60);
 INSERT INTO collection_collection VALUES (1,16,'r',40);
@@ -556,23 +581,31 @@ INSERT INTO collection_collection VALUES (1,17,'r',30);
 -- INSERT INTO collection_collection VALUES (1,24,'r',10);
 INSERT INTO collection_collection VALUES (15,6,'r',20);
 INSERT INTO collection_collection VALUES (15,2,'r',10);
+INSERT INTO collection_collection VALUES (15,32,'r',10);
+INSERT INTO collection_collection VALUES (15,26,'r',10);
 INSERT INTO collection_collection VALUES (16,3,'r',30);
 INSERT INTO collection_collection VALUES (16,4,'r',20);
 INSERT INTO collection_collection VALUES (16,5,'r',10);
-INSERT INTO collection_collection VALUES (17,8,'r',40);
+INSERT INTO collection_collection VALUES (17,8,'r',30);
 INSERT INTO collection_collection VALUES (17,18,'r',20);
 INSERT INTO collection_collection VALUES (17,22,'r',10);
-INSERT INTO collection_collection VALUES (17,26,'r',30);
+INSERT INTO collection_collection VALUES (17,33,'r',30);
 INSERT INTO collection_collection VALUES (22,19,'r',30);
 INSERT INTO collection_collection VALUES (22,20,'r',20);
 INSERT INTO collection_collection VALUES (22,21,'r',10);
-
 INSERT INTO collection_collection VALUES (1,9,'v',20);
 INSERT INTO collection_collection VALUES (1,10,'v',10);
 INSERT INTO collection_collection VALUES (9,11,'r',10);
 INSERT INTO collection_collection VALUES (9,12,'r',20);
 INSERT INTO collection_collection VALUES (10,13,'r',10);
 INSERT INTO collection_collection VALUES (10,14,'r',20);
+INSERT INTO collection_collection VALUES (13,30,'r',20);
+-- INSERT INTO collection_collection VALUES (13,31,'r',10); -- ISOLDE Internal Notes
+INSERT INTO collection_collection VALUES (14,27,'r',20);
+INSERT INTO collection_collection VALUES (14,28,'r',10);
+INSERT INTO collection_collection VALUES (14,29,'r',10);
+
+
 
 INSERT INTO collection_example VALUES (1,1,1);
 INSERT INTO collection_example VALUES (1,5,2);
@@ -879,8 +912,15 @@ INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) 
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,86,'lt','rt',90);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,87,'ar','rt',100);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,88,'ar','rt',90);
+INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (26,89,'en','rt',100);
+INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (27,90,'en','rt',100);
+INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (28,91,'en','rt',100);
+INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (29,92,'en','rt',100);
+INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (30,93,'en','rt',100);
+INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (31,94,'en','rt',100);
+INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (32,95,'en','rt',100);
 
-INSERT INTO collectiondetailedrecordpagetabs(id_collection,tabs) VALUES(26,'');
+INSERT INTO collectiondetailedrecordpagetabs(id_collection,tabs) VALUES(33,'');
 
 INSERT INTO example VALUES (1,'author search','author:"Ellis, J"');
 INSERT INTO example VALUES (2,'word search','quantum');
@@ -1022,6 +1062,13 @@ INSERT INTO portalbox VALUES (85,'APIE PUSLAPĮ', 'Sveiki atvykę į Invenio ban
 INSERT INTO portalbox VALUES (86,'TAIP PAT ŽIŪRĖKITE','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>'); -- '
 INSERT INTO portalbox VALUES (87,'حول هذا الموقع','مرحبا بكم في الموقع التجريبي لإنفينيو، المحطة الخادمة (الحرة) المبرمجة من طرف المنظمة الأوربية للبحوث النووية. الرجاء عدم التردد للإطلاع على جميع صفحات هذا الموقع التجريبي');
 INSERT INTO portalbox VALUES (88,'زوروا أيضا','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (89,'ABOUT Notes','The Notes collection is a temporary collection that is being used for testing.');
+INSERT INTO portalbox VALUES (90,'ABOUT ALEPH Papers','The ALEPH Papers collection is a temporary collection that is being used for testing.');
+INSERT INTO portalbox VALUES (91,'ABOUT ALEPH Internal Notes','The ALEPH Internal Notes collection is a temporary restricted collection that is being used for testing.');
+INSERT INTO portalbox VALUES (92,'ABOUT ALEPH Theses','The ALEPH Theses collection is a temporary restricted collection that is being used for testing.');
+INSERT INTO portalbox VALUES (93,'ABOUT ISOLDE Papers','The ISOLDE Papers collection is a temporary collection that is being used for testing.');
+INSERT INTO portalbox VALUES (94,'ABOUT ISOLDE Internal Notes','The ISOLDE Internal Notes collection is a temporary restricted and hidden collection that is being used for testing.');
+INSERT INTO portalbox VALUES (95,'ABOUT Drafts','The Drafts collection is a temporary restricted collection that is being used for testing.');
 
 INSERT INTO sbmCOLLECTION VALUES (36,'Document Types');
 

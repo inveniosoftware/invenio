@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -244,27 +244,27 @@ class TimeIssueFunctions(unittest.TestCase):
 
         # Even though article is not in public collection (yet?), it
         # is part of a released issue
-        self.assertEqual(wju.is_recid_in_released_issue(105), True)
+        self.assertEqual(wju.is_recid_in_released_issue(111), True)
 
         # Article is not part of public collection, and is not part of
         # a released issue
-        self.assertEqual(wju.is_recid_in_released_issue(106), False)
+        self.assertEqual(wju.is_recid_in_released_issue(112), False)
 
     def test_article_in_unreleased_issue(self):
         """webjournal - check access to unreleased article"""
 
         # Record is not public
-        self.assertEqual(record_public_p(106), False)
+        self.assertEqual(record_public_p(112), False)
 
         # Unreleased article is not visible to guest
-        error_messages = test_web_page_content(CFG_SITE_URL + '/journal/AtlantisTimes/2009/06/News/106' ,
+        error_messages = test_web_page_content(CFG_SITE_URL + '/journal/AtlantisTimes/2009/06/News/112' ,
                                                expected_text=["A naturalist's voyage around the world"],
                                                unexpected_text=['Galapagos Archipelago'])
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
         # Unreleased article is visible to editor
-        error_messages = test_web_page_content(CFG_SITE_URL + '/journal/AtlantisTimes/2009/06/News/106',
+        error_messages = test_web_page_content(CFG_SITE_URL + '/journal/AtlantisTimes/2009/06/News/112',
                                                username='balthasar',
                                                password='b123althasar',
                                                expected_text=['Galapagos Archipelago'],
@@ -277,10 +277,10 @@ class TimeIssueFunctions(unittest.TestCase):
         """webjournal - check access to restricted article in released issue"""
 
         # Record is not public
-        self.assertEqual(record_public_p(106), False)
+        self.assertEqual(record_public_p(112), False)
 
         # Released article (even if restricted) is visible to guest
-        error_messages = test_web_page_content(CFG_SITE_URL + '/journal/AtlantisTimes/2009/03/Science/105' ,
+        error_messages = test_web_page_content(CFG_SITE_URL + '/journal/AtlantisTimes/2009/03/Science/111' ,
                                                expected_text=["Scissor-beak"],
                                                unexpected_text=["A naturalist's voyage around the world"])
         if error_messages:
@@ -406,17 +406,3 @@ TEST_SUITE = make_test_suite(ArticlesRelated,
                              FormattingElements)
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-

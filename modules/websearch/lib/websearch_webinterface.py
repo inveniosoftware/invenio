@@ -79,7 +79,6 @@ from invenio.config import \
      CFG_WEBDIR, \
      CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS, \
      CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
-     CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL, \
      CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
      CFG_WEBSEARCH_RSS_I18N_COLLECTIONS, \
      CFG_INSPIRE_SITE, \
@@ -430,17 +429,6 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                     argd['rg'] = int(pref['websearch_group_records'])
             except (KeyError, ValueError):
                 pass
-
-            if CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL == 2:
-                ## Let's update the current collections list with all
-                ## the restricted collections the user has rights to view.
-                try:
-                    restricted_collections = user_info['precached_permitted_restricted_collections']
-                    argd_collections = set(argd['c'])
-                    argd_collections.update(restricted_collections)
-                    argd['c'] = list(argd_collections)
-                except KeyError:
-                    pass
 
         if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and acc_authorize_action(req, 'runbibedit')[0] != 0:
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
