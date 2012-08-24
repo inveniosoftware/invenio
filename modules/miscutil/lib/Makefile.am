@@ -19,47 +19,47 @@ pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = __init__.py \
              errorlib.py \
-             errorlib_tests.py \
+             errorlib_unit_tests.py \
              errorlib_webinterface.py \
              errorlib_regression_tests.py \
              data_cacher.py \
              dbdump.py \
              web_api_key.py \
-             web_api_key_tests.py \
+             web_api_key_unit_tests.py \
              dbquery.py \
-             dbquery_tests.py \
+             dbquery_unit_tests.py \
              dbquery_regression_tests.py \
              logicutils.py \
-             logicutils_tests.py \
+             logicutils_unit_tests.py \
              mailutils.py \
              miscutil_config.py \
              messages.py \
-             messages_tests.py \
+             messages_unit_tests.py \
              textutils.py \
-             textutils_tests.py \
+             textutils_unit_tests.py \
              dateutils.py \
-             dateutils_tests.py \
+             dateutils_unit_tests.py \
              htmlutils.py \
-             htmlutils_tests.py \
+             htmlutils_unit_tests.py \
              testutils.py \
              testutils_regression_tests.py \
              invenio_connector.py \
              invenio_connector_regression_tests.py \
              urlutils.py \
-             urlutils_tests.py \
+             urlutils_unit_tests.py \
              w3c_validator.py \
-             intbitset_tests.py \
+             intbitset_unit_tests.py \
              intbitset_helper.py \
              inveniocfg.py \
              shellutils.py \
-             shellutils_tests.py \
+             shellutils_unit_tests.py \
              pluginutils.py \
-             pluginutils_tests.py \
+             pluginutils_unit_tests.py \
              plotextractor.py \
              plotextractor_converter.py \
              plotextractor_getter.py \
              plotextractor_output_utils.py \
-             plotextractor_tests.py \
+             plotextractor_unit_tests.py \
              plotextractor_regression_tests.py \
              plotextractor_config.py \
              solrutils.py \
@@ -67,6 +67,7 @@ pylib_DATA = __init__.py \
              remote_debugger_config.py \
              remote_debugger_wsgi_reload.py \
              jsonutils.py \
+             jsonutils_unit_tests.py \
              sequtils_cnum.py \
              sequtils.py \
              sequtils_regression_tests.py

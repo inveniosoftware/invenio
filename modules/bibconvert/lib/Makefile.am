@@ -9,7 +9,7 @@
 ## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -17,7 +17,7 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibconvert.py bibconvert_tests.py	\
+pylib_DATA = bibconvert.py bibconvert_unit_tests.py	\
 	     bibconvert_bfx_engine.py \
 	     bibconvert_xslt_engine.py \
              bibconvert_regression_tests.py

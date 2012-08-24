@@ -9,7 +9,7 @@
 ## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -21,7 +21,7 @@ pylib_DATA = webalert.py \
              webalert_templates.py \
              webalert_webinterface.py \
              alert_engine.py \
-             alert_engine_tests.py \
+             alert_engine_unit_tests.py \
              alert_engine_config.py \
              htmlparser.py \
              webalert_regression_tests.py \

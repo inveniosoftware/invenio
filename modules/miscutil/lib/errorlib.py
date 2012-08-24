@@ -43,7 +43,7 @@ from invenio.dbquery import run_sql
 
 ## Regular expression to match possible password related variable that should
 ## be disclosed in frame analysis.
-RE_PWD = re.compile(r"pwd|pass", re.I)
+RE_PWD = re.compile(r"pwd|pass|p_pw", re.I)
 
 
 def get_client_info(req):
@@ -215,10 +215,8 @@ def get_pretty_traceback(req=None, exc_info=None):
         print >> tracestack_data_stream, \
                 "\n** Traceback details \n"
         traceback.print_exc(file=tracestack_data_stream)
-        tb = sys.exc_info()[2]
-        while 1:
-            if not tb.tb_next:
-                break
+        tb = exc_info[2]
+        while tb.tb_next:
             tb = tb.tb_next
         stack = []
         f = tb.tb_frame
@@ -237,8 +235,11 @@ def get_pretty_traceback(req=None, exc_info=None):
                         frame.f_code.co_name,
                         frame.f_code.co_filename,
                         frame.f_lineno)
+            ## Dereferencing f_locals
+            ## See: http://utcc.utoronto.ca/~cks/space/blog/python/FLocalsAndTraceFunctions
+            local_values = frame.f_locals
             try:
-                values_to_hide |= find_all_values_to_hide(frame.f_locals)
+                values_to_hide |= find_all_values_to_hide(local_values)
 
                 code = open(frame.f_code.co_filename).readlines()
                 first_line = max(1, frame.f_lineno-3)
@@ -255,7 +256,7 @@ def get_pretty_traceback(req=None, exc_info=None):
                 print >> tracestack_data_stream, "-" * 79
             except:
                 pass
-            for key, value in frame.f_locals.items():
+            for key, value in local_values.items():
                 print >> tracestack_data_stream, "\t%20s = " % key,
                 try:
                     value = repr(value)

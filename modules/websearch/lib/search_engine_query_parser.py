@@ -26,9 +26,15 @@ import string
 from datetime import datetime
 
 try:
-    from dateutil import parser as du_parser
-    from dateutil.relativedelta import relativedelta as du_delta
-    GOT_DATEUTIL = True
+    import dateutil
+    if not hasattr(dateutil, '__version__') or dateutil.__version__.startswith('1.'):
+        from dateutil import parser as du_parser
+        from dateutil.relativedelta import relativedelta as du_delta
+        GOT_DATEUTIL = True
+    else:
+        from warnings import warn
+        warn("Not using dateutil module because the version %s is not compatible with Python-2.x" % dateutil.__version__)
+        GOT_DATEUTIL = False
 except ImportError:
     # Ok, no date parsing is possible, but continue anyway,
     # since this package is only recommended, not mandatory.

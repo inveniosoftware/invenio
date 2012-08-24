@@ -21,7 +21,7 @@ pylib_DATA = elmsubmit.py elmsubmit_misc.py elmsubmit_config.py \
              elmsubmit_field_validation.py elmsubmit_filename_generator.py \
              elmsubmit_html2txt.py elmsubmit_richtext2txt.py \
              elmsubmit_generate_marc.py elmsubmit_submission_parser.py \
-             myhtmlentitydefs.py mime.types.edited elmsubmit_tests.py
+             myhtmlentitydefs.py mime.types.edited elmsubmit_unit_tests.py
 
 tmpdir = $(prefix)/var/tmp
 tmp_DATA =  elmsubmit_tests_1.mbox elmsubmit_tests_2.mbox
