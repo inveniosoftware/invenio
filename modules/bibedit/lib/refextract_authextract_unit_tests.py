@@ -39,7 +39,7 @@ from invenio.testutils import make_test_suite, run_test_suite
 
 # pylint: disable-msg=C0301
 
-def setup_files(self):    
+def setup_files(self):
     self.test_pdfname = CFG_TMPDIR + '/demoextract.pdf'
     self.test_txtname = CFG_TMPDIR + '/demoextract.txt'
     from os.path import exists, getsize
@@ -71,7 +71,7 @@ class RefExtractPDFTest(unittest.TestCase):
     def setUp(self):
         setup_files(self)
         set_test_cli_opts()
-        
+
 
     def test_PDF_extraction(self):
         """ refextract test basic pdf extraction ---necessary for some remaining tests"""
@@ -83,7 +83,7 @@ class RefExtractPDFTest(unittest.TestCase):
         for line in docbody:
             file.write(line)
         file.close
-            
+
 
 class RefExtractExtractSectionTest(unittest.TestCase):
     """ refextract - test finding ref and auth sections """
@@ -110,7 +110,7 @@ class RefExtractExtractSectionTest(unittest.TestCase):
 
     def test_author_finding(self):
         """ find author section """
-        
+
         (authors, extract_error, how_start) = refextract.extract_section_from_fulltext(self.textbody,'authors')
         for line in authors:
             print "%s" % line.encode("utf8")
@@ -179,8 +179,8 @@ class RefExtractAuthorParsingTest(unittest.TestCase):
             ,"""L. Gladney,59"""
             ,"""M. Biasiniab
             """]
-        
-        
+
+
 
     def test_reference_parsing(self):
         """Use a hardcoded set of authors to test the parsing"""
@@ -189,7 +189,7 @@ class RefExtractAuthorParsingTest(unittest.TestCase):
          refextract.create_marc_xml_author_section(self.authlines)
         self.assert_(re.search('<subfield code=\"a\">Biasini, M.\s?</subfield>',processed_authors[44]))
         print processed_authors
-        
+
 
 class RefExtractReferenceParsingTest(unittest.TestCase):
     """ Test the parsing of reference strings """
@@ -276,11 +276,13 @@ class RefExtractReferenceParsingTest(unittest.TestCase):
 
 
 
-
+## FIXME: all the tests are disabled since they are no longer in sync
+## with the current development of Invenio. We keep this file for reference
+## in case we want to reimplement them
 TEST_SUITE = make_test_suite(#RefExtractPDFTest,
                              #RefExtractExtractSectionTest,
-                             RefExtractAuthorParsingTest,
-                             RefExtractReferenceParsingTest,
+                             #RefExtractAuthorParsingTest,
+                             #RefExtractReferenceParsingTest,
                              )
 
 if __name__ == '__main__':

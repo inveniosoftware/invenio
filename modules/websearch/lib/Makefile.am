@@ -33,6 +33,7 @@ pylib_DATA = \
 	websearchadmin_regression_tests.py \
 	websearch_external_collections.py \
 	search_engine_summarizer.py \
+	search_engine_summarizer_unit_tests.py \
 	websearch_external_collections_config.py \
 	websearch_external_collections_getter.py \
 	websearch_external_collections_getter_unit_tests.py \

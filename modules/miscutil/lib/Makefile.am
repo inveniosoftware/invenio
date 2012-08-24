@@ -67,6 +67,7 @@ pylib_DATA = __init__.py \
              remote_debugger_config.py \
              remote_debugger_wsgi_reload.py \
              jsonutils.py \
+             jsonutils_unit_tests.py \
              sequtils_cnum.py \
              sequtils.py \
              sequtils_regression_tests.py
