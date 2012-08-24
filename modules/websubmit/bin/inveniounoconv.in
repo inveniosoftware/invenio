@@ -1,4 +1,25 @@
-#!/usr/bin/env python
+#!@OPENOFFICE_PYTHON@
+##
+## This file is part of Invenio.
+## Copyright (C) 2011, 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""
+Run-Unoconv-as-nobody wrapper.
+"""
 
 ### This program is free software; you can redistribute it and/or modify
 ### it under the terms of the GNU General Public License as published by
@@ -18,10 +39,15 @@ from distutils.version import LooseVersion
 import getopt
 import glob
 import os
-import socket
 import subprocess
 import sys
 import time
+import signal
+import errno
+
+from invenio.websubmit_file_converter import CFG_OPENOFFICE_TMPDIR
+
+CFG_SOFFICE_PID = os.path.join(CFG_OPENOFFICE_TMPDIR, 'soffice.pid')
 
 __version__ = "$Revision$"
 # $Source$
@@ -224,18 +250,18 @@ def office_environ(office):
 
 def debug_office():
     if 'URE_BOOTSTRAP' in os.environ:
-        print >>sys.stderr, 'URE_BOOTSTRAP=%s' % os.environ['URE_BOOTSTRAP']
+        print >> sys.stderr, 'URE_BOOTSTRAP=%s' % os.environ['URE_BOOTSTRAP']
     if 'UNO_PATH' in os.environ:
-        print >>sys.stderr, 'UNO_PATH=%s' % os.environ['UNO_PATH']
+        print >> sys.stderr, 'UNO_PATH=%s' % os.environ['UNO_PATH']
     if 'UNO_TYPES' in os.environ:
-        print >>sys.stderr, 'UNO_TYPES=%s' % os.environ['UNO_TYPES']
+        print >> sys.stderr, 'UNO_TYPES=%s' % os.environ['UNO_TYPES']
     print 'PATH=%s' % os.environ['PATH']
     if 'PYTHONHOME' in os.environ:
-        print >>sys.stderr, 'PYTHONHOME=%s' % os.environ['PYTHONHOME']
+        print >> sys.stderr, 'PYTHONHOME=%s' % os.environ['PYTHONHOME']
     if 'PYTHONPATH' in os.environ:
-        print >>sys.stderr, 'PYTHONPATH=%s' % os.environ['PYTHONPATH']
+        print >> sys.stderr, 'PYTHONPATH=%s' % os.environ['PYTHONPATH']
     if 'LD_LIBRARY_PATH' in os.environ:
-        print >>sys.stderr, 'LD_LIBRARY_PATH=%s' % os.environ['LD_LIBRARY_PATH']
+        print >> sys.stderr, 'LD_LIBRARY_PATH=%s' % os.environ['LD_LIBRARY_PATH']
 
 def python_switch(office):
     if office.pythonhome:
@@ -246,6 +272,7 @@ def python_switch(office):
                                    os.path.join(office.pythonhome, 'lib', 'site-packages') + os.pathsep + \
                                    office.unopath
 
+    os.environ['HOME'] = CFG_OPENOFFICE_TMPDIR
     os.environ['UNO_PATH'] = office.unopath
 
     info(3, "-> Switching from %s to %s" % (sys.executable, office.python))
@@ -326,11 +353,11 @@ class FmtList:
         return ret
 
     def display(self, doctype):
-        print >>sys.stderr, "The following list of %s formats are currently available:\n" % doctype
+        print >> sys.stderr, "The following list of %s formats are currently available:\n" % doctype
         for fmt in self.list:
             if fmt.doctype == doctype:
-                print >>sys.stderr, "  %-8s - %s" % (fmt.name, fmt)
-        print >>sys.stderr
+                print >> sys.stderr, "  %-8s - %s" % (fmt.name, fmt)
+        print >> sys.stderr
 
 fmts = FmtList()
 
@@ -358,7 +385,7 @@ fmts.add('document', 'sdw4', 'sdw', 'StarWriter 4.0', 'StarWriter 4.0') ### 2
 fmts.add('document', 'sdw3', 'sdw', 'StarWriter 3.0', 'StarWriter 3.0') ### 20
 fmts.add('document', 'stw', 'stw', 'Open Office.org 1.0 Text Document Template', 'writer_StarOffice_XML_Writer_Template') ### 9
 fmts.add('document', 'sxw', 'sxw', 'Open Office.org 1.0 Text Document', 'StarOffice XML (Writer)') ### 1
-fmts.add('document', 'text', 'txt', 'Text Encoded', 'Text (Encoded)') ### 26
+fmts.add('document', 'text', 'txt', 'Text Encoded', 'Text (encoded)') ### 26
 fmts.add('document', 'txt', 'txt', 'Text', 'Text') ### 34
 fmts.add('document', 'uot', 'uot', 'Unified Office Format text','UOF text') ### 27
 fmts.add('document', 'vor', 'vor', 'StarWriter 5.0 Template', 'StarWriter 5.0 Vorlage/Template') ### 6
@@ -500,6 +527,7 @@ class Options:
         self.importfilter = ""
         self.listener = False
         self.nolaunch = False
+        self.kill = False
         self.output = None
         self.password = None
         self.pipe = None
@@ -510,15 +538,16 @@ class Options:
         self.template = None
         self.timeout = 6
         self.verbose = 0
+        self.remove = None
 
         ### Get options from the commandline
         try:
-            opts, args = getopt.getopt (args, 'c:Dd:e:f:hi:Llo:np:s:T:t:v',
+            opts, args = getopt.getopt (args, 'c:Dd:e:f:hi:Llko:np:s:T:t:vr:',
                 ['connection=', 'debug', 'doctype=', 'export', 'format=',
-                 'help', 'import', 'listener', 'no-launch', 'output=',
+                 'help', 'import', 'listener', 'kill', 'no-launch', 'output=',
                  'outputpath', 'password=', 'pipe=', 'port=', 'server=',
                  'timeout=', 'show', 'stdout', 'template', 'verbose',
-                 'version'] )
+                 'version', 'remove='] )
         except getopt.error, exc:
             print 'unoconv: %s, try unoconv -h for a list of all the options' % str(exc)
             sys.exit(255)
@@ -549,7 +578,7 @@ class Options:
                         except ValueError:
                             self.exportfilter.append( PropertyValue( name, 0, value, 0 ) )
                 else:
-                    print >>sys.stderr, 'Warning: Option %s cannot be parsed, ignoring.' % arg
+                    print >> sys.stderr, 'Warning: Option %s cannot be parsed, ignoring.' % arg
 #                    self.exportfilter = arg
             elif opt in ['-f', '--format']:
                 self.format = arg
@@ -557,12 +586,14 @@ class Options:
                 self.importfilter = arg
             elif opt in ['-l', '--listener']:
                 self.listener = True
+            elif opt in ['-k', '--kill']:
+                self.kill = True
             elif opt in ['-n', '--no-launch']:
                 self.nolaunch = True
             elif opt in ['-o', '--output']:
                 self.output = arg
             elif opt in ['--outputpath']:
-                print >>sys.stderr, 'Warning: This option is deprecated by --output.'
+                print >> sys.stderr, 'Warning: This option is deprecated by --output.'
                 self.output = arg
             elif opt in ['--password']:
                 self.password = arg
@@ -582,19 +613,55 @@ class Options:
                 self.timeout = int(arg)
             elif opt in ['-v', '--verbose']:
                 self.verbose = self.verbose + 1
+            elif opt in ['-r', '--remove']:
+                self.remove = arg
             elif opt in ['--version']:
                 self.version()
                 sys.exit(255)
 
         ### Enable verbosity
         if self.verbose >= 2:
-            print >>sys.stderr, 'Verbosity set to level %d' % self.verbose
+            print >> sys.stderr, 'Verbosity set to level %d' % self.verbose
 
         self.filenames = args
 
+        if self.remove:
+            if os.path.exists(self.remove):
+                os.remove(self.remove)
+            print >> sys.stderr, "%s file created by OpenOffice was successfully removed." % self.remove
+            sys.stderr.flush()
+            sys.exit(0)
+
+        if self.kill:
+            try:
+                pid = int(open(CFG_SOFFICE_PID, 'r').read())
+            except Exception, err:
+                print >> sys.stderr, "%s does not exist or does not contain a valid pid: %s" % (CFG_SOFFICE_PID, err)
+            else:
+                try:
+                    os.kill(pid, signal.SIGTERM)
+                except OSError, err:
+                    if err.errno != errno.ESRCH:
+                        os.remove(CFG_SOFFICE_PID)
+                        print >> sys.stderr, 'soffice.bin was hopefully already killed.'
+                        sys.exit(0)
+                time.sleep(2)
+                try:
+                    os.kill(pid, signal.SIGKILL)
+                except OSError, err:
+                    if err.errno != errno.ESRCH:
+                        os.remove(CFG_SOFFICE_PID)
+                        print >> sys.stderr, 'soffice.bin was hopefully already killed.'
+                        sys.exit(0)
+                    pass
+                if os.path.exists(CFG_SOFFICE_PID):
+                    os.remove(CFG_SOFFICE_PID)
+            print >> sys.stderr, 'soffice.bin was hopefully killed.'
+            sys.exit(0)
+
         if not self.listener and not self.showlist and self.doctype != 'list' and not self.filenames:
-            print >>sys.stderr, 'unoconv: you have to provide a filename as argument'
-            print >>sys.stderr, 'Try `unoconv -h\' for more information.'
+            print >> sys.stderr, 'unoconv: you have to provide a filename as argument'
+            print >> sys.stderr, 'Try `unoconv -h\' for more information.'
             sys.exit(255)
 
         ### Set connection string
@@ -634,6 +701,7 @@ class Options:
 
         print 'unoconv %s' % VERSION
         print 'Written by Dag Wieers <dag@wieers.com>'
+        print 'Patched to run within Invenio by <info@invenio-software.org>'
         print 'Homepage at http://dag.wieers.com/home-made/unoconv/'
         print
         print 'platform %s/%s' % (os.name, sys.platform)
@@ -643,10 +711,10 @@ class Options:
         print 'build revision $Rev$'
 
     def usage(self):
-        print >>sys.stderr, 'usage: unoconv [options] file [file2 ..]'
+        print >> sys.stderr, 'usage: unoconv [options] file [file2 ..]'
 
     def help(self):
-        print >>sys.stderr, '''Convert from and to any format supported by LibreOffice
+        print >> sys.stderr, '''Convert from and to any format supported by LibreOffice
 
 unoconv options:
   -c, --connection=string  use a custom connection string
@@ -658,6 +726,8 @@ unoconv options:
   -i, --import=string      set import filter option string
                              eg. -i utf8
   -l, --listener           start a permanent listener to use by unoconv clients
+  -k, --kill               kill any listener on the local machine (Invenio)
+  -r, --remove=filename    remove a file created by LibreOffice (Invenio)
   -n, --no-launch          fail if no listener is found (default: launch one)
   -o, --output=name        output basename, filename or directory
       --pipe=name          alternative method of connection using a pipe
@@ -700,8 +770,10 @@ class Convertor:
                 product = self.svcmgr.createInstance("com.sun.star.configuration.ConfigurationProvider").createInstanceWithArguments("com.sun.star.configuration.ConfigurationAccess", UnoProps(nodepath="/org.openoffice.Setup/Product"))
                 if product.ooName != "LibreOffice" or LooseVersion(product.ooSetupVersion) <= LooseVersion('3.3'):
                     ooproc = subprocess.Popen([office.binary, "-headless", "-invisible", "-nocrashreport", "-nodefault", "-nofirststartwizard", "-nologo", "-norestore", "-accept=%s" % op.connection], env=os.environ)
+                    open(CFG_SOFFICE_PID, 'w').write(str(ooproc.pid))
                 else:
                     ooproc = subprocess.Popen([office.binary, "--headless", "--invisible", "--nocrashreport", "--nodefault", "--nofirststartwizard", "--nologo", "--norestore", "--accept=%s" % op.connection], env=os.environ)
+                    open(CFG_SOFFICE_PID, 'w').write(str(ooproc.pid))
                 info(2, '%s listener successfully started. (pid=%s)' % (product.ooName, ooproc.pid))
 
                 ### Try connection to it for op.timeout seconds (flakky OpenOffice)
@@ -765,16 +837,16 @@ class Convertor:
                         break
                 else:
                     outputfmt = outputfmt[0]
-    #       print >>sys.stderr, 'unoconv: format `%s\' is part of multiple doctypes %s, selecting `%s\'.' % (format, [fmt.doctype for fmt in outputfmt], outputfmt[0].doctype)
+    #       print >> sys.stderr, 'unoconv: format `%s\' is part of multiple doctypes %s, selecting `%s\'.' % (format, [fmt.doctype for fmt in outputfmt], outputfmt[0].doctype)
             else:
                 outputfmt = outputfmt[0]
 
         ### No format found, throw error
         if not outputfmt:
             if doctype:
-                print >>sys.stderr, 'unoconv: format [%s/%s] is not known to unoconv.' % (op.doctype, op.format)
+                print >> sys.stderr, 'unoconv: format [%s/%s] is not known to unoconv.' % (op.doctype, op.format)
             else:
-                print >>sys.stderr, 'unoconv: format [%s] is not known to unoconv.' % op.format
+                print >> sys.stderr, 'unoconv: format [%s] is not known to unoconv.' % op.format
             die(1)
 
         return outputfmt
@@ -786,10 +858,10 @@ class Convertor:
         outputfmt = self.getformat(inputfn)
 
         if op.verbose > 0:
-            print >>sys.stderr, 'Input file:', inputfn
+            print >> sys.stderr, 'Input file:', inputfn
 
         if not os.path.exists(inputfn):
-            print >>sys.stderr, 'unoconv: file `%s\' does not exist.' % inputfn
+            print >> sys.stderr, 'unoconv: file `%s\' does not exist.' % inputfn
             exitcode = 1
 
         try:
@@ -818,7 +890,7 @@ class Convertor:
                     templateurl = unohelper.absolutize(self.cwd, unohelper.systemPathToFileUrl(op.template))
                     document.StyleFamilies.loadStylesFromURL(templateurl, templateprops)
                 else:
-                    print >>sys.stderr, 'unoconv: template file `%s\' does not exist.' % op.template
+                    print >> sys.stderr, 'unoconv: template file `%s\' does not exist.' % op.template
                     exitcode = 1
 
             ### Update document links
@@ -864,6 +936,9 @@ class Convertor:
             elif outputfmt.filter == 'Text - txt - csv (StarCalc)':
                 outputprops += UnoProps(FilterOptions="44,34,0")
 
+            elif outputfmt.filter in ('writer_pdf_Export', 'impress_pdf_Export', 'calc_pdf_Export', 'draw_pdf_Export'):
+                outputprops += UnoProps(SelectPdfVersion=1)
+
             if not op.stdout:
                 (outputfn, ext) = os.path.splitext(inputfn)
                 if not op.output:
@@ -883,6 +958,8 @@ class Convertor:
             try:
                 document.storeToURL(outputurl, tuple(outputprops) )
             except IOException, e:
+                from invenio.errorlib import get_pretty_traceback
+                print >> sys.stderr, get_pretty_traceback()
                 raise UnoException("Unable to store document to %s with properties %s. Exception: %s" % (outputurl, outputprops, e), None)
 
             phase = "dispose"
@@ -938,43 +1015,56 @@ class Listener:
         try:
             resolver = self.svcmgr.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver", self.context)
             product = self.svcmgr.createInstance("com.sun.star.configuration.ConfigurationProvider").createInstanceWithArguments("com.sun.star.configuration.ConfigurationAccess", UnoProps(nodepath="/org.openoffice.Setup/Product"))
+            if os.path.exists(CFG_SOFFICE_PID):
+                pid = int(open(CFG_SOFFICE_PID).read())
+                try:
+                    os.kill(pid, signal.SIGUSR2)
+                except OSError, err:
+                    if err.errno != errno.ESRCH:
+                        error("Looks like %s is already running but the %s file refers to a different pid %s: %s" % (office.binary, CFG_SOFFICE_PID, pid, err))
+                        return
+                    else:
+                        info(1, "Existing %s listener found with pid %s, nothing to do." % (product.ooName, pid))
             try:
                 unocontext = resolver.resolve("uno:%s" % op.connection)
             except NoConnectException, e:
                 pass
             else:
-                info(1, "Existing %s listener found, nothing to do." % product.ooName)
+                error("Looks like %s is already running but the %s file is empty, does not exist or refers to a wrong pid %s" % (office.binary, CFG_SOFFICE_PID, pid))
                 return
             if product.ooName != "LibreOffice" or LooseVersion(product.ooSetupVersion) <= LooseVersion('3.3'):
-                subprocess.call([office.binary, "-headless", "-invisible", "-nocrashreport", "-nodefault", "-nologo", "-nofirststartwizard", "-norestore", "-accept=%s" % op.connection], env=os.environ)
+                ooproc = subprocess.Popen([office.binary, "-headless", "-invisible", "-nocrashreport", "-nodefault", "-nologo", "-nofirststartwizard", "-norestore", "-accept=%s" % op.connection], env=os.environ)
             else:
-                subprocess.call([office.binary, "--headless", "--invisible", "--nocrashreport", "--nodefault", "--nologo", "--nofirststartwizard", "--norestore", "--accept=%s" % op.connection], env=os.environ)
+                ooproc = subprocess.Popen([office.binary, "--headless", "--invisible", "--nocrashreport", "--nodefault", "--nologo", "--nofirststartwizard", "--norestore", "--accept=%s" % op.connection], env=os.environ)
+            open(CFG_SOFFICE_PID, 'w').write(str(ooproc.pid))
+            ooproc.wait()
+            os.remove(CFG_SOFFICE_PID)
         except Exception, e:
             error("Launch of %s failed.\n%s" % (office.binary, e))
         else:
             info(1, "Existing %s listener found, nothing to do." % product.ooName)
 
-def error(str):
+def error(msg):
     "Output error message"
-    print >>sys.stderr, str
+    print >> sys.stderr, msg
 
-def info(level, str):
+def info(level, msg):
     "Output info message"
     if 'op' not in globals():
         pass
     elif op.verbose >= 3 and level >= 3:
-        print >>sys.stderr, "DEBUG:", str
+        print >> sys.stderr, "DEBUG:", msg
     elif not op.stdout and level <= op.verbose:
-        print >>sys.stdout, str
+        print >> sys.stdout, msg
     elif level <= op.verbose:
-        print >>sys.stderr, str
+        print >> sys.stderr, msg
 
-def die(ret, str=None):
+def die(ret, msg=None):
     "Print optional error and exit with errorcode"
     global convertor, ooproc, office
 
-    if str:
-        error('Error: %s' % str)
+    if msg:
+        error('Error: %s' % msg)
 
     ### Did we start our own listener instance ?
     if not op.listener and ooproc and convertor:
@@ -1053,6 +1143,8 @@ def main():
 
 ### Main entrance
 if __name__ == '__main__':
+    os.environ['HOME'] = CFG_OPENOFFICE_TMPDIR
+
     exitcode = 0
 
     info(3, 'sysname=%s, platform=%s, python=%s, python-version=%s' % (os.name, sys.platform, sys.executable, sys.version))
@@ -1068,14 +1160,14 @@ if __name__ == '__main__':
             break
         except:
 #            debug_office()
-            print >>sys.stderr, "unoconv: Cannot find a suitable pyuno library and python binary combination in %s" % of
-            print >>sys.stderr, "ERROR:", sys.exc_info()[1]
-            print >>sys.stderr
+            print >> sys.stderr, "unoconv: Cannot find a suitable pyuno library and python binary combination in %s" % of
+            print >> sys.stderr, "ERROR:", sys.exc_info()[1]
+            print >> sys.stderr
     else:
 #        debug_office()
-        print >>sys.stderr, "unoconv: Cannot find a suitable office installation on your system."
-        print >>sys.stderr, "ERROR: Please locate your office installation and send your feedback to:"
-        print >>sys.stderr, "       http://github.com/dagwieers/unoconv/issues"
+        print >> sys.stderr, "unoconv: Cannot find a suitable office installation on your system."
+        print >> sys.stderr, "ERROR: Please locate your office installation and send your feedback to:"
+        print >> sys.stderr, "       http://github.com/dagwieers/unoconv/issues"
         sys.exit(1)
 
     ### Now that we have found a working pyuno library, let's import some classes
@@ -1120,4 +1212,7 @@ if __name__ == '__main__':
         main()
     except KeyboardInterrupt, e:
         die(6, 'Exiting on user request')
+    except:
+        from invenio.errorlib import register_exception
+        register_exception(alert_admin=True)
     die(exitcode)
