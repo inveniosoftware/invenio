@@ -29,10 +29,10 @@ from invenio.testutils import make_test_suite, run_test_suite
 from invenio.search_engine import create_basic_search_units, perform_request_search
 from invenio.config import CFG_WEBSEARCH_SPIRES_SYNTAX
 
-try:
+if search_engine_query_parser.GOT_DATEUTIL:
     import dateutil
     DATEUTIL_AVAILABLE = True
-except ImportError:
+else:
     DATEUTIL_AVAILABLE = False
 
 
