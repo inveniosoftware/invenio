@@ -449,6 +449,8 @@ class PluginContainer(object):
             if plugin['enabled']:
                 yield plugin_name
 
+    __iter__ = iterkeys
+
     def itervalues(self):
         """
         As in C{dict.itervalues} but checks if the plugin are correctly
