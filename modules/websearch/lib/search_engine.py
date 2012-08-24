@@ -4610,8 +4610,14 @@ def call_bibformat(recID, format="HD", ln=CFG_SITE_LANG, search_pattern=None, us
 
     keywords = []
     if search_pattern is not None:
-        units = create_basic_search_units(None, str(search_pattern), None)
-        keywords = [unit[1] for unit in units if (unit[0] != '-' and unit[2] in [None, 'fulltext'])]
+        for unit in create_basic_search_units(None, str(search_pattern), None):
+            bsu_o, bsu_p, bsu_f, bsu_m = unit[0], unit[1], unit[2], unit[3]
+            if (bsu_o != '-' and bsu_f in [None, 'fulltext']):
+                if bsu_m == 'a' and bsu_p.startswith('%') and bsu_p.endswith('%'):
+                    # remove leading and training `%' representing partial phrase search
+                    keywords.append(bsu_p[1:-1])
+                else:
+                    keywords.append(bsu_p)
 
     out = format_record(recID,
                          of=format,
