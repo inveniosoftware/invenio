@@ -29,7 +29,7 @@ pylib_DATA = bibclassify_acronym_analyzer.py \
              bibclassify_text_normalizer.py \
              bibclassify_microtests.py \
              bibclassify_templates.py \
-             bibclassify_tests.py \
+             bibclassify_unit_tests.py \
              bibclassify_webinterface.py
 
 EXTRA_DIST = $(pylib_DATA)

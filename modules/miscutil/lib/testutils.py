@@ -323,21 +323,19 @@ def merge_error_messages(error_messages):
 
 def build_and_run_unit_test_suite():
     """
-    Detect all Invenio modules with names ending by '*_tests.py' (and
-    not '_regression_tests.py'), build a complete test suite of them,
-    and run it.  Called by 'inveniocfg --run-unit-tests'.
+    Detect all Invenio modules with names ending by '*_unit_tests.py', build
+    a complete test suite of them, and run it.
+    Called by 'inveniocfg --run-unit-tests'.
     """
 
     test_modules_map = PluginContainer(
-        os.path.join(CFG_PYLIBDIR, 'invenio', '*_tests.py'),
+        os.path.join(CFG_PYLIBDIR, 'invenio', '*_unit_tests.py'),
         lambda plugin_name, plugin_code: getattr(plugin_code, "TEST_SUITE"))
-    test_modules = [test_modules_map[name] for name in test_modules_map
-        if not name.endswith('_regression_tests') and not name.endswith('_web_tests')]
+    test_modules = [test_modules_map[name] for name in test_modules_map]
 
     broken_tests = test_modules_map.get_broken_plugins()
 
-    broken_unit_tests = ['%s (reason: %s)' % (name, broken_tests[name][1]) for name in broken_tests
-        if not name.endswith('_regression_tests') and not name.endswith('_web_tests')]
+    broken_unit_tests = ['%s (reason: %s)' % (name, broken_tests[name][1]) for name in broken_tests]
     if broken_unit_tests:
         warn("Broken unit tests suites found: %s" % ', '.join(broken_unit_tests))
 

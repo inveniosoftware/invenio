@@ -128,15 +128,15 @@ href="http://diveintopython.org/unit_testing/">http://diveintopython.org/unit_te
 <code>webbasketlib.py</code> in the example above) should come with a
 testing file where the test cases are stored.  The test file is to be
 named identically as the lib file it tests, but with the suffix
-<code>_tests</code> (in our example,
-<code>webbasketlib_tests.py</code>).
+<code>_unit_tests</code> (in our example,
+<code>webbasketlib_unit_tests.py</code>).
 </p>
 
 <p>The test cases are written using Pythonic unittest TestCase class.
 An example for testing search engine query parameter washing function:
 <blockquote>
 <pre>
-$ cat /opt/invenio/lib/python/invenio/search_engine_tests.py
+$ cat /opt/invenio/lib/python/invenio/search_engine_unit_tests.py
 [...]
 import search_engine
 import unittest
@@ -166,7 +166,7 @@ the tests available in this file:
 
 <blockquote>
 <pre>
-$ cat /opt/invenio/lib/python/invenio/search_engine_tests.py
+$ cat /opt/invenio/lib/python/invenio/search_engine_unit_tests.py
 [...]
 TEST_SUITE = make_test_suite(TestWashQueryParameters,
                              TestStripAccents,
@@ -177,22 +177,22 @@ TEST_SUITE = make_test_suite(TestWashQueryParameters,
 </p>
 
 <p>In this way, all the test cases defined in the file
-<code>search_engine_tests.py</code> will be executed when the global
+<code>search_engine_unit_tests.py</code> will be executed when the global
 <code>testcase</code> executable is called.
 
 <p>Note that it may be time-consuming to run all the tests in one go.
 If you are interested in running tests only on a certain file (say
-<code>search_engine_tests.py</code>), then launch:
+<code>search_engine_unit_tests.py</code>), then launch:
 
 <blockquote>
 <pre>
-$ python /opt/invenio/lib/python/invenio/search_engine_tests.py
+$ python /opt/invenio/lib/python/invenio/search_engine_unit_tests.py
 </pre>
 </blockquote>
 </p>
 
 <p>For full-scale examples, you may follow
-<code>search_engine_tests.py</code> and other <code>_tests.py</code>
+<code>search_engine_unit_tests.py</code> and other <code>_unit_tests.py</code>
 files in the source distribution.
 </p>
 
@@ -243,7 +243,7 @@ bibindex engine list union ... ok
 FAIL: search engine washing of query patterns
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/opt/invenio/lib/python/invenio/search_engine_tests.py", line 25, in test_wash_pattern
+  File "/opt/invenio/lib/python/invenio/search_engine_unit_tests.py", line 25, in test_wash_pattern
     self.assertEqual("ell*", search_engine.wash_pattern('ell*'))
   File "/usr/lib/python2.3/unittest.py", line 302, in failUnlessEqual
     raise self.failureException, \
@@ -307,7 +307,7 @@ href="http://c2.com/cgi/wiki?RegressionTesting">http://c2.com/cgi/wiki?Regressio
 <a name="3.2"></a><h3>3.2 Writing regression tests</h3>
 
 <p>Regression tests are written per application (or sub-module) in
-files named like <code>websearch_regression_tests.py</code> or
+files named like <code>websearch_regression_unit_tests.py</code> or
 <code>websubmitadmin_regression_tests.py</code>.
 </p>
 

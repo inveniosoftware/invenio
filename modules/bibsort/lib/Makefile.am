@@ -21,9 +21,9 @@ pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = bibsort_daemon.py \
              bibsort_engine.py \
-             bibsort_engine_tests.py \
+             bibsort_engine_unit_tests.py \
              bibsort_washer.py \
-             bibsort_washer_tests.py \
+             bibsort_washer_unit_tests.py \
              bibsortadminlib.py
 
 EXTRA_DIST = $(pylib_DATA)
