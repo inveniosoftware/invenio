@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -43,7 +43,8 @@ def wash_author_name(p):
         # we have canonical author ID form, so ignore all washing
         return p
     out = re_pattern_fuzzy_author_dots.sub(" ", p)
-    return re_pattern_fuzzy_author_spaces.sub(" ", out)
+    out = re_pattern_fuzzy_author_spaces.sub(" ", out)
+    return out.strip()
 
 def author_name_requires_phrase_search(p):
     """
