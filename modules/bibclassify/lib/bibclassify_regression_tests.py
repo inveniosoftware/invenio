@@ -27,7 +27,7 @@ from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
     test_web_page_content
 
-from invenio.bibclassify_tests import BibClassifyTestCase, suite
+from invenio.bibclassify_unit_tests import BibClassifyTestCase, suite
 
 import bibclassify_config as bconfig
 from testutils import make_test_suite, run_test_suite
