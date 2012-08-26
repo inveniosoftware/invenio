@@ -204,6 +204,9 @@ class Template:
         content = []
 
         for name, frequency in sorted_names_list:
+            if not name:
+                name = ''
+
             prquery = baid_query + ' exactauthor:"' + name + '"'
             name_lnk = create_html_link(websearch_templates.build_search_url(p=prquery),
                                                               {},

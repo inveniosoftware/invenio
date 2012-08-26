@@ -700,6 +700,8 @@ def  _get_rec_query_fallback(bibauthorid_data, authorname, db_names_dict, person
     '''
     Returns query to find author's papers in search engine
     '''
+    if authorname == None:
+        authorname = ''
     rec_query = ""
     extended_author_search_str = ""
 
@@ -721,6 +723,8 @@ def  _get_rec_query_fallback(bibauthorid_data, authorname, db_names_dict, person
             for name_index, name_query in enumerate(db_names_dict.keys()):
                 if name_index > 0:
                     extended_author_search_str += " OR "
+                if not name_query:
+                    name_query = ''
 
                 extended_author_search_str += 'exactauthor:"' + name_query + '"'
 
