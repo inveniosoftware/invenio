@@ -3,7 +3,7 @@
 ## $Id$
 ##
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2012 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,7 +22,12 @@
 """
 __revision__ = "$Id$"
 
-from sets import Set
+import sys
+
+if sys.hexversion < 0x2040000:
+    # pylint: disable=W0622
+    from sets import Set as set
+    # pylint: enable=W0622
 
 from invenio.config import CFG_SITE_URL, CFG_CERN_SITE
 from invenio.urlutils import create_html_link
@@ -57,7 +62,7 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
 
     copyrights_and_licenses_list = {}
     if copyrights_info or licenses_info:
-        out = Set()
+        out = set()
 
         for copyright_info in copyrights_info:
 
@@ -717,4 +722,3 @@ def test():
 
 if __name__ == "__main__":
     test()
-
