@@ -60,7 +60,7 @@ def create_invenio_flask_app():
     from invenio.webmessage_mailutils import email_quoted_txt2html
     from flask.ext.assets import Environment, Bundle
     from invenio.webinterface_handler_flask_utils import unicodifier
-
+    from flaskext.gravatar import Gravatar
 
     ## The Flask application instance
     _app = Flask(__name__,
@@ -135,6 +135,14 @@ def create_invenio_flask_app():
                *collection))
     _app.jinja_env.add_extension(CollectionExtension)
     _app.jinja_env.add_extension('jinja2.ext.do')
+
+    # Let's create Gravatar bridge.
+    _gravatar = Gravatar(_app,
+                    size=100,
+                    rating='g',
+                    default='retro',
+                    force_default=False,
+                    force_lower=False)
 
     @_login_manager.user_loader
     def _load_user(uid):

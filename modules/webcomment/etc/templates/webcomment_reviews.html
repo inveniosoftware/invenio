@@ -52,13 +52,13 @@
       {{ ('<i class="icon-star"></i>'|safe) * (c.star_score%5) }}{{ ('<i class="icon-star-empty"></i>'|safe) * ((5-c.star_score)%5) }}
       <a class="pull-right" title="{{ _('Permalink to this comment') }}" href="#{{ c.id }}">¶</a>
     </small>
-    <h4>
+    </h4>
     <blockquote>
       <p>
       {{ c.body }}
       </p>
       <small>
-        <i class="icon-user"></i>
+        <img src="{{ c.user.email|gravatar(size=14, default=url_for('static', filename='img/user-icon-1-16x16.gif', _external=True)) }}" alt="avatar"/>
         {%- if c.user -%}
         <a href="{{ url_for('yourmessages.add', sent_to_user_nicks=c.user.nickname) }}">
           {{ c.user.nickname }}

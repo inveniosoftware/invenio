@@ -30,7 +30,7 @@
     <a style="margin-bottom: 1px;" class="{{ a_class }}" href="{{ url_for('yourmessages.view', msgid=m.id) }}">
       <div style="width: 100%; float: left;">
         <div style="float:left; width: 30px; padding: 4px;">
-          <img src="http://placehold.it/30x30" alt="avatar"/>
+          <img src="{{ m.user_from.email|gravatar(size=30, default=url_for('static', filename='img/user-icon-1-24x24.gif', _external=True)) }}" alt="avatar"/>
         </div>
         <div style="margin-left: 38px;">
           <strong>{{ m.user_from.nickname }}</strong>
