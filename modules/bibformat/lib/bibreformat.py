@@ -1,7 +1,7 @@
 ## -*- mode: python; coding: utf-8; -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -256,10 +256,8 @@ def iterate_over_new(list, fmt):
         t1 = os.times()[4]
         start_date = time.strftime('%Y-%m-%d %H:%M:%S')
         formatted_record = zlib.compress(format_record(recID, fmt, on_the_fly=True))
-        if run_sql('SELECT id FROM bibfmt WHERE id_bibrec=%s AND format=%s', (recID, fmt)):
-            run_sql('UPDATE bibfmt SET last_updated=%s, value=%s WHERE id_bibrec=%s AND format=%s', (start_date, formatted_record, recID, fmt))
-        else:
-            run_sql('INSERT INTO bibfmt(id_bibrec, format, last_updated, value) VALUES(%s, %s, %s, %s)', (recID, fmt, start_date, formatted_record))
+        run_sql('REPLACE INTO bibfmt (id_bibrec, format, last_updated, value) VALUES (%s, %s, %s, %s)',
+                (recID, fmt, start_date, formatted_record))
         t2 = os.times()[4]
         tbibformat += (t2 - t1)
         count += 1

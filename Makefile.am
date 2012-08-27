@@ -613,5 +613,9 @@ update-db-from-v1.0-to-v1.1: # update DB from v1.0 release series to v1.1 releas
 	echo "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','attempt_times');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','attempt_sleeptime');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','user');" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bibfmt DROP COLUMN id;" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bibfmt ADD PRIMARY KEY (id_bibrec, format);" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bibfmt DROP KEY id_bibrec;" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bibfmt ADD KEY last_updated (last_updated);" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~ *.pyc *.tmp
