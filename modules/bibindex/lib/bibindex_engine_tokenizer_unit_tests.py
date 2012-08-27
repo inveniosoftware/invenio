@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -299,6 +299,13 @@ class TestExactNameTokenizer(unittest.TestCase):
         self.assertEqual(self.tokenizer.tokenize('J. R. Doe'),
                          ['J R Doe'])
 
+    def test_exact_author_name_tokenizer_trailing_dots(self):
+        """BibIndexExactNameTokenizer - name with trailing dots"""
+        self.assertEqual(self.tokenizer.tokenize('Doe, J'),
+                         ['Doe, J'])
+        self.assertEqual(self.tokenizer.tokenize('Doe, J.'),
+                         ['Doe, J'])
+
     def test_exact_author_name_tokenizer_hyphens(self):
         """BibIndexExactNameTokenizer - name with hyphens"""
         self.assertEqual(self.tokenizer.tokenize('Doe, Jean-Pierre'),
@@ -313,4 +320,3 @@ TEST_SUITE = make_test_suite(TestFuzzyNameTokenizerScanning,
 if __name__ == '__main__':
     #unittest.main()
     run_test_suite(TEST_SUITE)
-
