@@ -21,7 +21,7 @@ pylib_DATA = weblinkback_config.py \
              weblinkback_dblayer.py \
              weblinkback_regression_tests.py \
              weblinkback_templates.py \
-             weblinkback_tests.py \
+             weblinkback_unit_tests.py \
              weblinkback_webinterface.py \
              weblinkback.py \
              weblinkbackadminlib.py
