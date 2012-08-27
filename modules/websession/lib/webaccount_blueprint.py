@@ -57,7 +57,7 @@ def login():
                 User.password==form.password.data)).one()
             login_user(user) #, remember=form.remember.data)
             flash(_("You have been logged in."), "info")
-            return redirect(request.values.get("referer") or url_for(".login"))
+            return redirect(request.form.get("referer", url_for(".login")))
         except:
             flash(_("Problem with login."), "error")
 

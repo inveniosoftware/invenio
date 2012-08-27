@@ -84,6 +84,7 @@ class GuestUser(dict):
             self._create_guest()
         else:
             # Minimal information about user.
+            self['id'] = 0
             self['email'] = ''
             self['guest'] = '1'
 
@@ -224,6 +225,7 @@ class InvenioLoginManager(object):
                 logout_user()
             else:
                 ctx.user = user
+        ctx.user.reload(update_session=True)
 
 # A proxy for current user
 current_user = LocalProxy(lambda: _request_ctx_stack.top.user)
@@ -242,6 +244,7 @@ def login_user(user, remember=False, force=False):
 
 def logout_user():
     session.uid = None
+    session._uid = None
     current_app.login_manager.reload_user()
     return True
 
