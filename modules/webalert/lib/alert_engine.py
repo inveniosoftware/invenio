@@ -39,10 +39,11 @@ from invenio.config import \
 from invenio.webbasket_dblayer import get_basket_owner_id, add_to_basket
 from invenio.webbasket import format_external_records
 from invenio.search_engine import perform_request_search, wash_colls, \
-get_coll_sons, is_hosted_collection, get_coll_normalised_name
+     get_coll_sons, is_hosted_collection, get_coll_normalised_name, \
+     check_user_can_view_record
 from invenio.webinterface_handler import wash_urlargd
 from invenio.dbquery import run_sql
-from invenio.webuser import get_email
+from invenio.webuser import get_email, collect_user_info
 from invenio.mailutils import send_email
 from invenio.errorlib import register_exception
 from invenio.alert_engine_config import CFG_WEBALERT_DEBUG_LEVEL
@@ -75,35 +76,52 @@ def get_alert_queries_for_user(uid):
 def get_alerts(query, frequency):
     """Returns a dictionary of all the records found for a specific query and frequency along with other informationm"""
 
-    r = run_sql('select id_user, id_query, id_basket, frequency, date_lastrun, alert_name, notification from user_query_basket where id_query=%s and frequency=%s;', (query['id_query'], frequency,))
+    r = run_sql('select id_user, id_query, id_basket, frequency, date_lastrun, alert_name, notification, alert_desc, alert_recipient from user_query_basket where id_query=%s and frequency=%s;', (query['id_query'], frequency,))
     return {'alerts': r, 'records': query['records'], 'argstr': query['argstr'], 'date_from': query['date_from'], 'date_until': query['date_until']}
 
 def add_records_to_basket(records, basket_id):
     """Add the given records to the given baskets"""
 
     index = 0
+    owner_uid = get_basket_owner_id(basket_id)
+    # We check that the owner of the recipient basket would be allowed
+    # to view the records. This does not apply to external records
+    # (hosted collections).
+    user_info = collect_user_info(owner_uid)
+    filtered_records = ([], records[1])
+    filtered_out_recids = [] # only set in debug mode
+    for recid in records[0]:
+        (auth_code, auth_msg) = check_user_can_view_record(user_info, recid)
+        if auth_code == 0:
+            filtered_records[0].append(recid)
+        elif CFG_WEBALERT_DEBUG_LEVEL > 2:
+            # only keep track of this in DEBUG mode
+            filtered_out_recids.append(recid)
 
-    nrec = len(records[0])
+    nrec = len(filtered_records[0])
     index += nrec
     if index > CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
         index = CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
     if nrec > 0:
         nrec_to_add = nrec < index and nrec or index
         if CFG_WEBALERT_DEBUG_LEVEL > 0:
-            print "-> adding %i records into basket %s: %s" % (nrec_to_add, basket_id, records[0][:nrec_to_add])
+            print "-> adding %i records into basket %s: %s" % (nrec_to_add, basket_id, filtered_records[0][:nrec_to_add])
             if nrec > nrec_to_add:
-                print "-> not added %i records into basket %s: %s due to maximum limit restrictions." % (nrec - nrec_to_add, basket_id, records[0][nrec_to_add:])
+                print "-> not added %i records into basket %s: %s due to maximum limit restrictions." % (nrec - nrec_to_add, basket_id, filtered_records[0][nrec_to_add:])
         try:
             if CFG_WEBALERT_DEBUG_LEVEL == 0:
-                owner_uid = get_basket_owner_id(basket_id)
-                add_to_basket(owner_uid, records[0][:nrec_to_add], 0, basket_id)
+                add_to_basket(owner_uid, filtered_records[0][:nrec_to_add], 0, basket_id)
             else:
                 print '   NOT ADDED, DEBUG LEVEL > 0'
         except Exception:
             register_exception()
 
+    if CFG_WEBALERT_DEBUG_LEVEL > 2 and filtered_out_recids:
+        print "-> these records have been filtered out, as user id %s did not have access:\n%s" % \
+              (owner_uid, repr(filtered_out_recids))
+
     if index < CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
-        for external_collection_results in records[1][0]:
+        for external_collection_results in filtered_records[1][0]:
             nrec = len(external_collection_results[1][0])
             # index_tmp: the number of maximum allowed records to be added to
             # the basket for the next collection.
@@ -119,7 +137,6 @@ def add_records_to_basket(records, basket_id):
                         print "-> not added %s external records (collection \"%s\") into basket %s: %s due to maximum limit restriction" % (nrec - nrec_to_add, external_collection_results[0], basket_id, external_collection_results[1][0][nrec_to_add:])
                 try:
                     if CFG_WEBALERT_DEBUG_LEVEL == 0:
-                        owner_uid = get_basket_owner_id(basket_id)
                         collection_id = get_collection_id(external_collection_results[0])
                         added_items = add_to_basket(owner_uid, external_collection_results[1][0][:nrec_to_add], collection_id, basket_id)
                         format_external_records(added_items, of="xm")
@@ -130,7 +147,7 @@ def add_records_to_basket(records, basket_id):
             elif nrec > 0 and CFG_WEBALERT_DEBUG_LEVEL > 0:
                 print "-> not added %s external records (collection \"%s\") into basket %s: %s due to maximum limit restriction" % (nrec, external_collection_results[0], basket_id, external_collection_results[1][0])
     elif CFG_WEBALERT_DEBUG_LEVEL > 0:
-        for external_collection_results in records[1][0]:
+        for external_collection_results in filtered_records[1][0]:
             nrec = len(external_collection_results[1][0])
             if nrec > 0:
                 print "-> not added %i external records (collection \"%s\") into basket %s: %s due to maximum limit restrictions" % (nrec, external_collection_results[0], basket_id, external_collection_results[1][0])
@@ -144,14 +161,41 @@ def get_query(alert_id):
 def email_notify(alert, records, argstr):
     """Send the notification e-mail for a specific alert."""
 
-    if len(records[0]) == 0:
+    uid = alert[0]
+    user_info = collect_user_info(uid)
+    alert_recipient_email = alert[8] # set only by admin. Bypasses access-right checks.
+    filtered_out_recids = [] # only set in debug mode
+
+    if not alert_recipient_email:
+        # Filter out records that user (who setup the alert) should
+        # not see. This does not apply to external records (hosted
+        # collections).
+        filtered_records = ([], records[1])
+        for recid in records[0]:
+            (auth_code, auth_msg) = check_user_can_view_record(user_info, recid)
+            if auth_code == 0:
+                filtered_records[0].append(recid)
+            elif CFG_WEBALERT_DEBUG_LEVEL > 2:
+                # only keep track of this in DEBUG mode
+                filtered_out_recids.append(recid)
+    else:
+        # If admin has decided to send to some mailing-list, we cannot
+        # verify that recipients have access to the records. So keep
+        # all of them.
+        filtered_records = records
+
+    if len(filtered_records[0]) == 0:
         total_n_external_records = 0
-        for external_collection_results in records[1][0]:
+        for external_collection_results in filtered_records[1][0]:
             total_n_external_records += len(external_collection_results[1][0])
         if total_n_external_records == 0:
             return
 
     msg = ""
+
+    if CFG_WEBALERT_DEBUG_LEVEL > 2 and filtered_out_recids:
+        print "-> these records have been filtered out, as user id %s did not have access:\n%s" % \
+              (uid, repr(filtered_out_recids))
 
     if CFG_WEBALERT_DEBUG_LEVEL > 0:
         msg = "*** THIS MESSAGE WAS SENT IN DEBUG MODE ***\n\n"
@@ -170,9 +214,9 @@ def email_notify(alert, records, argstr):
     frequency = alert[3]
 
     msg += webalert_templates.tmpl_alert_email_body(
-        alert[5], url, records, pattern, collections, frequency, alert_use_basket_p(alert))
+        alert[5], url, filtered_records, pattern, collections, frequency, alert_use_basket_p(alert))
 
-    email = get_email(alert[0])
+    email = alert_recipient_email or get_email(uid)
 
     if email == 'guest':
         print "********************************************************************************"

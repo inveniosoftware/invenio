@@ -3094,6 +3094,7 @@ CREATE TABLE IF NOT EXISTS user_query_basket (
   date_lastrun date default '0000-00-00',
   alert_name varchar(30) NOT NULL default '',
   alert_desc text default NULL,
+  alert_recipient text default NULL,
   notification char(1) NOT NULL default 'y',
   PRIMARY KEY  (id_user,id_query,frequency,id_basket),
   KEY alert_name (alert_name)
