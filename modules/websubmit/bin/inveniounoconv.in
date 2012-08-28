@@ -633,31 +633,13 @@ class Options:
             sys.exit(0)
 
         if self.kill:
-            try:
-                pid = int(open(CFG_SOFFICE_PID, 'r').read())
-            except Exception, err:
-                print >> sys.stderr, "%s does not exist or does not contain a valid pid: %s" % (CFG_SOFFICE_PID, err)
-            else:
-                try:
-                    os.kill(pid, signal.SIGTERM)
-                except OSError, err:
-                    if err.errno != errno.ESRCH:
-                        os.remove(CFG_SOFFICE_PID)
-                        print >> sys.stderr, 'soffice.bin was hopefully already killed.'
-                        sys.exit(0)
-                time.sleep(2)
-                try:
-                    os.kill(pid, signal.SIGKILL)
-                except OSError, err:
-                    if err.errno != errno.ESRCH:
-                        os.remove(CFG_SOFFICE_PID)
-                        print >> sys.stderr, 'soffice.bin was hopefully already killed.'
-                        sys.exit(0)
-                    pass
-                if os.path.exists(CFG_SOFFICE_PID):
-                    os.remove(CFG_SOFFICE_PID)
-            print >> sys.stderr, 'soffice.bin was hopefully killed.'
+            from invenio.shellutils import run_shell_command
+            run_shell_command('killall %s', [os.path.basename(office.binary)])
+            time.sleep(1)
+            run_shell_command('killall -9 %s', [os.path.basename(office.binary)])
+            print >> sys.stderr, 'soffice.bin was hopefully already killed.'
             sys.exit(0)
+
 
         if not self.listener and not self.showlist and self.doctype != 'list' and not self.filenames:
             print >> sys.stderr, 'unoconv: you have to provide a filename as argument'
@@ -770,10 +752,8 @@ class Convertor:
                 product = self.svcmgr.createInstance("com.sun.star.configuration.ConfigurationProvider").createInstanceWithArguments("com.sun.star.configuration.ConfigurationAccess", UnoProps(nodepath="/org.openoffice.Setup/Product"))
                 if product.ooName != "LibreOffice" or LooseVersion(product.ooSetupVersion) <= LooseVersion('3.3'):
                     ooproc = subprocess.Popen([office.binary, "-headless", "-invisible", "-nocrashreport", "-nodefault", "-nofirststartwizard", "-nologo", "-norestore", "-accept=%s" % op.connection], env=os.environ)
-                    open(CFG_SOFFICE_PID, 'w').write(str(ooproc.pid))
                 else:
                     ooproc = subprocess.Popen([office.binary, "--headless", "--invisible", "--nocrashreport", "--nodefault", "--nofirststartwizard", "--nologo", "--norestore", "--accept=%s" % op.connection], env=os.environ)
-                    open(CFG_SOFFICE_PID, 'w').write(str(ooproc.pid))
                 info(2, '%s listener successfully started. (pid=%s)' % (product.ooName, ooproc.pid))
 
                 ### Try connection to it for op.timeout seconds (flakky OpenOffice)
@@ -1015,30 +995,17 @@ class Listener:
         try:
             resolver = self.svcmgr.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver", self.context)
             product = self.svcmgr.createInstance("com.sun.star.configuration.ConfigurationProvider").createInstanceWithArguments("com.sun.star.configuration.ConfigurationAccess", UnoProps(nodepath="/org.openoffice.Setup/Product"))
-            if os.path.exists(CFG_SOFFICE_PID):
-                pid = int(open(CFG_SOFFICE_PID).read())
-                try:
-                    os.kill(pid, signal.SIGUSR2)
-                except OSError, err:
-                    if err.errno != errno.ESRCH:
-                        error("Looks like %s is already running but the %s file refers to a different pid %s: %s" % (office.binary, CFG_SOFFICE_PID, pid, err))
-                        return
-                    else:
-                        info(1, "Existing %s listener found with pid %s, nothing to do." % (product.ooName, pid))
             try:
                 unocontext = resolver.resolve("uno:%s" % op.connection)
             except NoConnectException, e:
                 pass
             else:
-                error("Looks like %s is already running but the %s file is empty, does not exist or refers to a wrong pid %s" % (office.binary, CFG_SOFFICE_PID, pid))
+                info(1, "Existing %s listener found, nothing to do." % product.ooName)
                 return
             if product.ooName != "LibreOffice" or LooseVersion(product.ooSetupVersion) <= LooseVersion('3.3'):
-                ooproc = subprocess.Popen([office.binary, "-headless", "-invisible", "-nocrashreport", "-nodefault", "-nologo", "-nofirststartwizard", "-norestore", "-accept=%s" % op.connection], env=os.environ)
+                subprocess.call([office.binary, "-headless", "-invisible", "-nocrashreport", "-nodefault", "-nologo", "-nofirststartwizard", "-norestore", "-accept=%s" % op.connection], env=os.environ)
             else:
-                ooproc = subprocess.Popen([office.binary, "--headless", "--invisible", "--nocrashreport", "--nodefault", "--nologo", "--nofirststartwizard", "--norestore", "--accept=%s" % op.connection], env=os.environ)
-            open(CFG_SOFFICE_PID, 'w').write(str(ooproc.pid))
-            ooproc.wait()
-            os.remove(CFG_SOFFICE_PID)
+                subprocess.call([office.binary, "--headless", "--invisible", "--nocrashreport", "--nodefault", "--nologo", "--nofirststartwizard", "--norestore", "--accept=%s" % op.connection], env=os.environ)
         except Exception, e:
             error("Launch of %s failed.\n%s" % (office.binary, e))
         else:
