@@ -615,9 +615,9 @@ def _get_person_names_dicts_fallback(person_id):
     if p:
         formatted = format_record(p[0], 'XM')
         try:
-            formatted.lower().index(person_id.lower())
+            s = formatted.lower().index(person_id.lower())
             person_id = formatted[s:s + len(person_id)]
-        except Exception:
+        except (IndexError, ValueError):
             pass
     return {'longest':person_id, 'names_dict':{person_id:pcount}, 'db_names_dict':{person_id:pcount}}
 
