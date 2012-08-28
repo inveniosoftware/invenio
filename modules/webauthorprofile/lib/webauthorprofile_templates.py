@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -56,6 +56,19 @@ _RE_SPACES = re.compile(r"\s+")
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
+
+def wrap_author_name_in_quotes_if_needed(author_name):
+    """
+    If AUTHOR_NAME contains space, return it wrapped inside double
+    quotes.  Otherwise return it as is.  Useful for links like
+    author:J.R.Ellis.1 versus author:"Ellis, J".
+    """
+    if not author_name:
+        return ''
+    if ' ' in author_name: # and not author_name.startswith('"') and not author_name.endswith('"'):
+        return '"' + author_name + '"'
+    else:
+        return author_name
 
 class Template:
 
@@ -152,6 +165,8 @@ class Template:
         return out
 
     def tmpl_hepnames(self, hepdict, ln, add_box=True, loading=False):
+        if not CFG_INSPIRE_SITE:
+            return ''
         if not loading:
             if hepdict['HaveHep']:
                 contents = hepdict['heprecord']
@@ -192,9 +207,9 @@ class Template:
         _ = gettext_set_language(ln)
 
         if bibauthorid_data["cid"]:
-            baid_query = 'author:%s' % bibauthorid_data["cid"]
+            baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["cid"])
         elif bibauthorid_data["pid"] > -1:
-            baid_query = 'author:%s' % bibauthorid_data["pid"]
+            baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["pid"])
         else:
             baid_query = ''
 
@@ -231,9 +246,9 @@ class Template:
         if not loading and pubs:
             ib_pubs = intbitset(pubs)
             if bibauthorid_data["cid"]:
-                baid_query = 'author:%s' % bibauthorid_data["cid"]
+                baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["cid"])
             elif bibauthorid_data["pid"] > -1:
-                baid_query = 'author:%s' % bibauthorid_data["pid"]
+                baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["pid"])
             baid_query = baid_query + " authorcount:1 "
 
             rec_query = baid_query
@@ -267,7 +282,7 @@ class Template:
             colls = collsd.keys()
             colls.sort(lambda x, y: cmp(len(collsd[y]), len(collsd[x]))) # sort by number of papers
             for coll in colls:
-                rec_query = baid_query + 'collection:' + coll
+                rec_query = baid_query + 'collection:' + wrap_author_name_in_quotes_if_needed(coll)
                 line2 += "<br />" + create_html_link(websearch_templates.build_search_url(p=rec_query),
                                                                            {}, coll + " (" + str(len(collsd[coll])) + ")",)
 
@@ -291,9 +306,9 @@ class Template:
         if not loading and pubs:
             ib_pubs = intbitset(pubs)
             if bibauthorid_data["cid"]:
-                baid_query = 'author:%s' % bibauthorid_data["cid"]
+                baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["cid"])
             elif bibauthorid_data["pid"] > -1:
-                baid_query = 'author:%s' % bibauthorid_data["pid"]
+                baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["pid"])
             baid_query = baid_query + " "
 
             rec_query = baid_query
@@ -327,7 +342,7 @@ class Template:
             colls = collsd.keys()
             colls.sort(lambda x, y: cmp(len(collsd[y]), len(collsd[x]))) # sort by number of papers
             for coll in colls:
-                rec_query = baid_query + 'collection:' + coll
+                rec_query = baid_query + 'collection:' + wrap_author_name_in_quotes_if_needed(coll)
                 line2 += "<br />" + create_html_link(websearch_templates.build_search_url(p=rec_query),
                                                                            {}, coll + " (" + str(len(collsd[coll])) + ")",)
 
@@ -356,9 +371,9 @@ class Template:
             ib_self_pubs = intbitset(self_pubs)
 
             if bibauthorid_data["cid"]:
-                baid_query = 'author:%s' % bibauthorid_data["cid"]
+                baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["cid"])
             else:
-                baid_query = 'author:%s' % bibauthorid_data["pid"]
+                baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["pid"])
             baid_query = baid_query + " "
 
             rec_query = baid_query
@@ -403,8 +418,8 @@ class Template:
                 self_collsd[coll] = list(ib_self_pubs & search_result)
 
             for coll in CFG_COLLS:
-                rec_query = baid_query + 'collection:' + coll
-                self_rec_query = baid_query + 'collection:' + coll + ' authorcount:1 '
+                rec_query = baid_query + 'collection:' + wrap_author_name_in_quotes_if_needed(coll)
+                self_rec_query = baid_query + 'collection:' + wrap_author_name_in_quotes_if_needed(coll) + ' authorcount:1 '
                 descstr.append("%s" % coll)
                 psummary.append(("" +
                              create_html_link(websearch_templates.build_search_url(p=rec_query),
@@ -429,9 +444,9 @@ class Template:
     def tmpl_keyword_box(self, kwtuples, bibauthorid_data, ln, add_box=True, loading=False):
         _ = gettext_set_language(ln)
         if bibauthorid_data["cid"]:
-            baid_query = 'author:%s' % bibauthorid_data["cid"]
+            baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["cid"])
         else:
-            baid_query = 'author:%s' % bibauthorid_data["pid"]
+            baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["pid"])
         # print frequent keywords:
         keywstr = ""
         if (kwtuples):
@@ -491,9 +506,9 @@ class Template:
     def tmpl_collab_box(self, collabs, bibauthorid_data, ln, add_box=True, loading=False):
         _ = gettext_set_language(ln)
         if bibauthorid_data["cid"]:
-            baid_query = 'author:%s' % bibauthorid_data["cid"]
+            baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["cid"])
         else:
-            baid_query = 'author:%s' % bibauthorid_data["pid"]
+            baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["pid"])
         # print frequent keywords:
         collabstr = ""
         if (collabs):
@@ -567,9 +582,9 @@ class Template:
     def tmpl_coauthor_box(self, bibauthorid_data, authors, ln, add_box=True, loading=False):
         _ = gettext_set_language(ln)
         if bibauthorid_data["cid"]:
-            baid_query = 'author:%s ' % bibauthorid_data["cid"]
+            baid_query = 'exactauthor:%s ' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["cid"])
         else:
-            baid_query = 'author:%s ' % bibauthorid_data["pid"]
+            baid_query = 'exactauthor:%s ' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["pid"])
         header = "<strong>" + _("Frequent co-authors (excluding collaborations)") + "</strong>"
         content = ""
         sorted_coauthors = sorted(sorted(authors, key=itemgetter(1)),
@@ -582,7 +597,7 @@ class Template:
             content = []
             for canonical, name, frequency in sorted_coauthors:
                 if canonical:
-                    second_author = 'author:%s' % canonical
+                    second_author = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(canonical)
                 else:
                     second_author = 'exactauthor:"%s"' % name
                 rec_query = baid_query + second_author + " -710:'Collaboration' "
@@ -627,9 +642,9 @@ class Template:
 
     def tmpl_numpaperstitle(self, bibauthorid_data, pubs):
         if bibauthorid_data["cid"]:
-            baid_query = 'author:%s' % bibauthorid_data["cid"]
+            baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["cid"])
         else:
-            baid_query = 'author:%s' % bibauthorid_data["pid"]
+            baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["pid"])
 
         pubs_to_papers_link = create_html_link(websearch_templates.build_search_url(p=baid_query), {}, str(len(pubs)))
 
@@ -651,9 +666,9 @@ class Template:
         '''
         _ = gettext_set_language(ln)
         if bibauthorid_data["cid"]:
-            baid_query = 'author:%s' % bibauthorid_data["cid"]
+            baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["cid"])
         else:
-            baid_query = 'author:%s' % bibauthorid_data["pid"]
+            baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["pid"])
         sorted_names_list = sorted(names_dict.iteritems(), key=itemgetter(1),
                                    reverse=True)
         pubs_to_papers_link = create_html_link(websearch_templates.build_search_url(p=baid_query), {}, str(len(pubs)))
@@ -682,7 +697,7 @@ class Template:
         html = []
         html.append(headertext)
 
-        if person_link:
+        if person_link or person_link == 'None':
             cmp_link = ('<div><a href="%s/person/claimstub?person=%s">%s</a></div>'
                       % (CFG_SITE_URL, person_link,
                          _("This is me.  Verify my publication list.")))
@@ -763,4 +778,3 @@ class Template:
             h(tmpl.tmpl_close_table())
             return '\n'.join(out)
         return cont
-
