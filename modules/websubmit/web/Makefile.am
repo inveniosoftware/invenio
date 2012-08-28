@@ -32,6 +32,8 @@ test_DATA = test.pdf \
             test.odt \
             test.doc \
             test.docx \
+            test.html \
+            test.ps.gz \
             icon-test.gif \
             test.tar.gz
 

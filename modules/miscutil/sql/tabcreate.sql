@@ -1729,14 +1729,13 @@ CREATE TABLE IF NOT EXISTS bibrec_bib99x (
 -- tables for bibliographic records formatted:
 
 CREATE TABLE IF NOT EXISTS bibfmt (
-  id mediumint(8) unsigned NOT NULL auto_increment,
   id_bibrec int(8) unsigned NOT NULL default '0',
   format varchar(10) NOT NULL default '',
   last_updated datetime NOT NULL default '0000-00-00',
   value longblob,
-  PRIMARY KEY  (id),
-  KEY id_bibrec (id_bibrec),
-  KEY format (format)
+  PRIMARY KEY  (id_bibrec, format),
+  KEY format (format),
+  KEY last_updated (last_updated)
 ) ENGINE=MyISAM;
 
 -- tables for index files:

@@ -560,7 +560,7 @@ def find_record_format(rec_id, format):
        2 if found more than once (should never occur).
     """
     out = 0
-    query = """SELECT COUNT(id) FROM bibfmt WHERE id_bibrec=%s AND format=%s"""
+    query = """SELECT COUNT(*) FROM bibfmt WHERE id_bibrec=%s AND format=%s"""
     params = (rec_id, format)
     res = []
     try:

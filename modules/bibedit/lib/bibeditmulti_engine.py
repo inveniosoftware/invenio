@@ -61,7 +61,7 @@ multiedit_templates = template.load('bibeditmulti')
 # base command for subfields
 class BaseSubfieldCommand:
     """Base class for commands manipulating subfields"""
-    def __init__(self, subfield, value = "", new_value = "", condition = "", condition_exact_match=True, condition_subfield = ""):
+    def __init__(self, subfield, value = "", new_value = "", condition = "", condition_exact_match=True , condition_does_not_exist=False, condition_subfield = ""):
         """Initialization."""
         self._subfield = subfield
         self._value = value
@@ -69,6 +69,7 @@ class BaseSubfieldCommand:
         self._condition = condition
         self._condition_subfield = condition_subfield
         self._condition_exact_match = condition_exact_match
+        self._condition_does_not_exist = condition_does_not_exist
         self._modifications = 0
 
     def process_field(self, record, tag, field_number):
@@ -84,6 +85,9 @@ class BaseSubfieldCommand:
         in order to act only on certain subfields
         @return True if condition match, False if condition does not match
         """
+        #if condition is "does not exists" this function returns False
+        if self._condition_does_not_exist:
+            return False
         if self._condition_exact_match:
             # exact matching
             if self._condition == subfield_value:
@@ -119,7 +123,6 @@ class BaseSubfieldCommand:
                 subfield_index = 0
                 for subfield in field[0]:
                     if self._condition != 'condition':
-                        # only modify subfields that match the condition
                         if subfield[0] == self._subfield:
                             for subfield in field[0]:
                                 if self._condition_subfield == subfield[0]:
@@ -142,13 +145,19 @@ class AddSubfieldCommand(BaseSubfieldCommand):
     def _perform_on_all_matching_subfields_add_subfield(self, record, tag, field_number, callback):
         if tag not in record.keys():
             return
+        subfield_exists = False
         for field in record[tag]:
             if field[4] == field_number:
                 for subfield in field[0]:
-                    if self._condition_subfield == subfield[0]:
+                    if subfield[0] == self._condition_subfield:
+                        subfield_exists = True
+                    if self._condition_subfield == subfield[0] and self._condition_does_not_exist == False:
                         if self._subfield_condition_match(subfield[1]):
                             self._add_subfield_modification()
                             callback(record, tag, field_number, None)
+                if self._condition_does_not_exist and subfield_exists == False:
+                    self._add_subfield_modification()
+                    callback(record, tag, field_number, None)
 
     def process_field(self, record, tag, field_number):
         """@see: BaseSubfieldCommand.process_field"""
@@ -157,7 +166,7 @@ class AddSubfieldCommand(BaseSubfieldCommand):
                                          self._subfield, self._value,
                                          None,
                                          field_position_global=field_number)
-        if self._condition != 'condition':
+        if self._condition != 'condition' or self._condition_does_not_exist:
             self._perform_on_all_matching_subfields_add_subfield(record, tag,
                                                                 field_number, action)
         else:
@@ -281,11 +290,12 @@ class AddFieldCommand(BaseFieldCommand):
 class DeleteFieldCommand(BaseFieldCommand):
     """Deletes given fields from a record"""
 
-    def __init__(self, tag, ind1, ind2, subfield_commands, conditionSubfield="", condition="", condition_exact_match=True):
+    def __init__(self, tag, ind1, ind2, subfield_commands, conditionSubfield="", condition="", condition_exact_match=True, _condition_does_not_exist=False):
         BaseFieldCommand.__init__(self, tag, ind1, ind2, subfield_commands)
         self._conditionSubfield = conditionSubfield
         self._condition = condition
         self._condition_exact_match = condition_exact_match
+        self._condition_does_not_exist = _condition_does_not_exist
 
     def _delete_field_condition(self, record):
         """Checks if a subfield meets the condition for the
@@ -293,8 +303,12 @@ class DeleteFieldCommand(BaseFieldCommand):
         """
         try:
             for field in record[self._tag]:
+                subfield_exists = False
                 for subfield in field[0]:
                     if subfield[0] == self._conditionSubfield:
+                        subfield_exists = True
+                        if self._condition_does_not_exist == True:
+                            break
                         if self._condition_exact_match:
                             if self._condition == subfield[1]:
                                 bibrecord.record_delete_field(record, self._tag, self._ind1, self._ind2, field_position_global=field[4])
@@ -305,6 +319,9 @@ class DeleteFieldCommand(BaseFieldCommand):
                                 bibrecord.record_delete_field(record, self._tag, self._ind1, self._ind2, field_position_global=field[4])
                                 self._modifications += 1
                                 break
+                if subfield_exists == False and self._condition_does_not_exist:
+                    bibrecord.record_delete_field(record, self._tag, self._ind1, self._ind2, field_position_global=field[4])
+                    self._modifications += 1
         except KeyError:
             pass
 
@@ -402,20 +419,21 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
     if page_to_display < 1:
         page_to_display = 1
 
-    last_page_number = number_of_records/RECORDS_PER_PAGE+1
+    last_page_number = number_of_records / RECORDS_PER_PAGE + 1
     if page_to_display > last_page_number:
         page_to_display = last_page_number
 
     first_record_to_display = RECORDS_PER_PAGE * (page_to_display - 1)
-    last_record_to_display = (RECORDS_PER_PAGE*page_to_display) - 1
+    last_record_to_display = (RECORDS_PER_PAGE * page_to_display) - 1
 
     if not compute_modifications:
         record_IDs = record_IDs[first_record_to_display:last_record_to_display + 1]
 
+    # displayed_records is a list containing IDs of records that will be displayed on current page
+    displayed_records = record_IDs[:RECORDS_PER_PAGE]
     records_content = []
 
     record_modifications = 0
-
     locked_records = []
     for record_id in record_IDs:
         if upload_mode == '-r' and record_locked_by_queue(record_id):
@@ -423,15 +441,13 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
         current_modifications = [current_command._modifications for current_command in update_commands]
         formated_record = _get_formated_record(record_id=record_id,
                              output_format=output_format,
-                             update_commands = update_commands,
-                             language=language, outputTags=outputTags)
+                             update_commands=update_commands,
+                             language=language, outputTags=outputTags, run_diff=record_id in displayed_records)
         new_modifications = [current_command._modifications for current_command in update_commands]
         if new_modifications > current_modifications:
             record_modifications += 1
 
         records_content.append((record_id, formated_record))
-
-
     total_modifications = []
     if compute_modifications:
         field_modifications = 0
@@ -513,13 +529,14 @@ def _get_record_diff(record_textmarc, updated_record_textmarc, outputTags, recor
     result.append("</pre>")
     return '\n'.join(result)
 
-def _get_formated_record(record_id, output_format, update_commands, language, outputTags=""):
+def _get_formated_record(record_id, output_format, update_commands, language, outputTags="", run_diff=True):
     """Returns a record in a given format
 
     @param record_id: the ID of record to format
     @param output_format: an output format code (or short identifier for the output format)
     @param update_commands: list of commands used to update record contents
     @param language: the language to use to format the record
+    @param run_diff: determines if we want to run _get_recodr_diff function, which sometimes takes too much time
     """
     if update_commands:
         # Modify te bibrecord object with the appropriate actions
@@ -532,7 +549,7 @@ def _get_formated_record(record_id, output_format, update_commands, language, ou
     old_record = search_engine.get_record(recid=record_id)
     old_record_textmarc = xmlmarc2textmarc.create_marc_record(old_record, sysno="", options=textmarc_options)
     if "hm" == output_format:
-        if update_commands:
+        if update_commands and run_diff:
             updated_record_textmarc = xmlmarc2textmarc.create_marc_record(updated_record, sysno="", options=textmarc_options)
             result = _get_record_diff(old_record_textmarc, updated_record_textmarc, outputTags, record_id)
         else:

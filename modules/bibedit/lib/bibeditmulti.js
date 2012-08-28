@@ -116,14 +116,14 @@ function createCommandsList(){
 		}
 
 		var field = {
-	        tag : currentField.tag,
-	        ind1 : currentField.ind1,
-	        ind2 : currentField.ind2,
-	        action : currentField.action,
+            tag : currentField.tag,
+            ind1 : currentField.ind1,
+            ind2 : currentField.ind2,
+            action : currentField.action,
                 condition : currentField.condition,
                 conditionSubfield : currentField.conditionSubfield,
                 conditionSubfieldExactMatch: currentField.conditionSubfieldExactMatch,
-	        subfields : subfieldsList
+            subfields : subfieldsList
 		};
 
 		commands.push(field);
@@ -196,11 +196,6 @@ function onButtonBackToResultsClick() {
 	}
 }
 
-function onButtonGoToNextPageClick(){
-	gPageToDiplay++;
-	performAJAXRequest();
-}
-
 function onButtonSubmitChangesClick(){
 	/*
 	 * Submits changes defined by user
@@ -220,7 +215,7 @@ function rebindControls() {
 	rebindActionsRelatedControls();
 	initTextBoxes();
 
-        $("#buttonTestSearch").live("click", onButtonTestSearchClick);
+    $("#buttonTestSearch").live("click", onButtonTestSearchClick);
 	$("#buttonPreviewResults").live("click", onButtonPreviewResultsClick);
 	$("#buttonSubmitChanges").live("click", onButtonSubmitChangesClick);
 	$(".buttonBackToResults").live("click", onButtonBackToResultsClick);
@@ -228,7 +223,7 @@ function rebindControls() {
 	$(".buttonOutputFormatHTMLBrief").live("click", onButtonOutputFormatHTMLBriefClick);
 	$(".buttonOutputFormatHTMLDetailed").live("click", onButtonOutputFormatHTMLDetailedClick);
 	$(".buttonOutputFormatMARC").live("click", onButtonOutputFormatMARCClick);
-        $(".buttonGoToFirstPage").live("click", onButtonGoToFirstPageClick);
+    $(".buttonGoToFirstPage").live("click", onButtonGoToFirstPageClick);
 	$(".buttonGoToPreviousPage").live("click", onButtonGoToPreviousPageClick);
 	$(".buttonGoToNextPage").live("click", onButtonGoToNextPageClick);
 }
@@ -242,12 +237,12 @@ function onAjaxSuccess(json) {
             gComputeModifications = 0;
 
         }
-        $("#preview_area").css("text-align", "")
+        $("#preview_area").css("text-align", "");
         $("#preview_area").html(search_html);
 }
 
 function displayError(msg) {
-    $("#preview_area").css("text-align", "")
+    $("#preview_area").css("text-align", "");
     $("#preview_area").html(msg);
 }
 
@@ -677,9 +672,11 @@ function onButtonSaveNewSubfieldClick() {
     // update subfield appearence at the user interface
     var actionText = templateNewSubfield.find(".subfieldActionType").eq(0).find('option').filter(':selected').text();
     var conditionExactText;
-    if (currentSubfield.conditionSubfieldExactMatch == 0) {
-        conditionExactText = "is equal to"
-    } else conditionExactText = "contains";
+    if (currentSubfield.conditionSubfieldExactMatch === "0") {
+        conditionExactText = "is equal to";
+    } else if (currentSubfield.conditionSubfieldExactMatch === "1") {
+        conditionExactText = "contains";
+    } else conditionExactText = "does not exist";
 
     templateDisplaySubfield.attr("id", subfieldDisplayID);
     templateDisplaySubfield.find(".action").eq(0).text(actionText);
@@ -692,7 +689,12 @@ function onButtonSaveNewSubfieldClick() {
         templateDisplaySubfield.find(".textBoxConditionSubfield").eq(0).attr("value", currentSubfield.conditionSubfield);
     }
 
-    if (templateDisplaySubfield.find(".textBoxCondition").eq(0).val() != 'condition') {
+    // show "when subfield $$..." does not exist without "condition" textBox
+    if (templateDisplaySubfield.find(".conditionExact").eq(0).text() == 'does not exist') {
+        displayProperSubfieldInformation(templateDisplaySubfield, currentSubfield.action, 'true');
+        templateDisplaySubfield.find(".textBoxCondition").hide();
+    }
+    else if (templateDisplaySubfield.find(".textBoxCondition").eq(0).val() != 'condition') {
         displayProperSubfieldInformation(templateDisplaySubfield, currentSubfield.action, 'true');
     }
     else {
@@ -717,7 +719,6 @@ function onButtonDeleteSubfieldClick() {
 
 function onButtonSaveNewFieldClick(instance) {
     // template for displaying the information
-
     var templateDisplayField = $("#displayTemplates .templateDisplayField").clone();
 
     // Possibility to add a condition is only valid when deleting a field
@@ -754,6 +755,11 @@ function onButtonSaveNewFieldClick(instance) {
     templateNewField.replaceWith(templateDisplayField);
 
     addMessage(fieldID, actionText);
+
+    // If we are not deleting fields, we want the first subfield action to be opened automatically
+    if(field.action !== gFieldActionTypes.deleteField){
+        templateDisplayField.find(".buttonNewSubfield").eq(0).click();
+    }
 }
 
 function onButtonSaveNewFieldConditionClick() {
@@ -771,9 +777,13 @@ function onButtonSaveNewFieldConditionClick() {
     gFields[fieldID].condition = condition;
     gFields[fieldID].conditionSubfieldExactMatch = conditionSubfieldExactMatch;
 
-    if (conditionSubfieldExactMatch == 0) {
-        conditionExactText = "is equal to"
-    } else conditionExactText = "contains";
+    if (conditionSubfieldExactMatch === "0") {
+        conditionExactText = "is equal to";
+    }
+    else if(conditionSubfieldExactMatch === "1") {
+        conditionExactText = "contains";
+    }
+    else conditionExactText = "does not exist";
 
     templateDisplayField.find(".conditionExact").eq(0).text(conditionExactText);
     templateDisplayField.find("#textBoxConditionFieldDisplay").eq(0).attr("value", condition);
@@ -786,6 +796,11 @@ function onButtonSaveNewFieldConditionClick() {
     templateDisplayField.find(".conditionActOnFieldsSave").hide();
 
     templateDisplayField.find(".conditionParametersDisplay").show();
+
+    // show "when subfield $$..." does not exist without "condition" textBox
+    if (templateDisplayField.find(".conditionExact").eq(0).text() == 'does not exist') {
+        templateDisplayField.find("#textBoxConditionFieldDisplay").hide();
+    }
 
 }
 
@@ -831,11 +846,23 @@ function onTextBoxConditionSubfieldDisplayChange(){
 
     var subfieldDisplayID = subfieldElement.attr("id");
 
+    //when deleting field, we need to use .templateDisplayField instead of .templateDisplaySubfield
+    if (typeof subfieldDisplayID === "undefined")
+    {
+        subfieldElement = $(this).parents(".templateDisplayField");
+        subfieldDisplayID = subfieldElement.attr("id");
+    }
+
     var fieldID = getFieldID(subfieldDisplayID);
     var subfieldID = getSubfieldID(subfieldDisplayID);
 
     var conditionSubfield = subfieldElement.find(".textBoxConditionSubfield").eq(0).val();
-    gFields[fieldID].subfields[subfieldID].conditionSubfield = conditionSubfield;
+
+    if (typeof subfieldID === "undefined") {
+        gFields[fieldID].conditionSubfield = conditionSubfield;
+    } else {
+        gFields[fieldID].subfields[subfieldID].conditionSubfield = conditionSubfield;
+    }
 }
 
 function onTextBoxConditionFieldDisplayChange() {
@@ -847,6 +874,18 @@ function onTextBoxConditionFieldDisplayChange() {
 
     var condition = templateDisplayField.find("#textBoxConditionFieldDisplay").eq(0).val();
     gFields[fieldID].condition = condition;
+}
+
+function onSelectConditionExactMatchValueDisplayChange(){
+    var conditionOption = $("option:selected",this).val();
+
+    var subfieldElement = $(this).parents(".conditionParameters");
+
+    if (conditionOption == 2){
+        subfieldElement.find(".textBoxCondition").hide();
+    } else {
+        subfieldElement.find(".textBoxCondition").show();
+    }
 }
 
 function rebindActionsRelatedControls() {
@@ -874,6 +913,7 @@ function rebindActionsRelatedControls() {
     $("#textBoxConditionDisplay").live("change", onTextBoxConditionDisplayChange);
     $("#textBoxConditionFieldDisplay").live("change", onTextBoxConditionFieldDisplayChange);
     $("#textBoxConditionSubfieldDisplay").live("change", onTextBoxConditionSubfieldDisplayChange);
+    $(".selectConditionExactMatch").live("change", onSelectConditionExactMatchValueDisplayChange);
     // Cancel text boxes
     $(".txtTag, .txtInd").live("keyup", onPressEsc);
     // Submit form when pressing Enter
@@ -917,5 +957,4 @@ function onPressEsc(evt){
 function onSelectCollectionChange(evt){
     onButtonTestSearchClick();
 }
-
 

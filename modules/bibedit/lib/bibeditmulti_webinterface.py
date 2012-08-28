@@ -209,19 +209,22 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
             new_value = current_subfield["newValue"]
             condition = current_subfield["condition"]
             condition_exact_match = False
+            condition_does_not_exist = False
             if int(current_subfield["conditionSubfieldExactMatch"]) == 0:
                 condition_exact_match = True
+            if int(current_subfield["conditionSubfieldExactMatch"]) == 2:
+                condition_does_not_exist = True
             condition_subfield = current_subfield["conditionSubfield"]
 
             if action == self._subfield_action_types.add:
-                subfield_command = multi_edit_engine.AddSubfieldCommand(subfield_code, value, condition=condition, condition_exact_match=condition_exact_match, condition_subfield=condition_subfield)
+                subfield_command = multi_edit_engine.AddSubfieldCommand(subfield_code, value, condition=condition, condition_exact_match=condition_exact_match, condition_does_not_exist=condition_does_not_exist, condition_subfield=condition_subfield)
             elif action == self._subfield_action_types.delete:
-                subfield_command = multi_edit_engine.DeleteSubfieldCommand(subfield_code, condition=condition, condition_exact_match=condition_exact_match, condition_subfield=condition_subfield)
+                subfield_command = multi_edit_engine.DeleteSubfieldCommand(subfield_code, condition=condition, condition_exact_match=condition_exact_match, condition_does_not_exist=condition_does_not_exist, condition_subfield=condition_subfield)
                 upload_mode_replace = True
             elif action == self._subfield_action_types.replace_content:
-                subfield_command = multi_edit_engine.ReplaceSubfieldContentCommand(subfield_code, value, condition=condition, condition_exact_match=condition_exact_match, condition_subfield=condition_subfield)
+                subfield_command = multi_edit_engine.ReplaceSubfieldContentCommand(subfield_code, value, condition=condition, condition_exact_match=condition_exact_match, condition_does_not_exist=condition_does_not_exist, condition_subfield=condition_subfield)
             elif action == self._subfield_action_types.replace_text:
-                subfield_command = multi_edit_engine.ReplaceTextInSubfieldCommand(subfield_code, value, new_value, condition=condition, condition_exact_match=condition_exact_match, condition_subfield=condition_subfield)
+                subfield_command = multi_edit_engine.ReplaceTextInSubfieldCommand(subfield_code, value, new_value, condition=condition, condition_exact_match=condition_exact_match, condition_does_not_exist=condition_does_not_exist, condition_subfield=condition_subfield)
             else:
                 subfield_command = multi_edit_engine.BaseFieldCommand(subfield_code, value, new_value)
 
@@ -247,8 +250,11 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
             conditionSubfield = current_field["conditionSubfield"]
             condition = current_field["condition"]
             condition_exact_match = False
+            condition_does_not_exist = False
             if int(current_field["conditionSubfieldExactMatch"]) == 0:
                 condition_exact_match = True
+            if int(current_field["conditionSubfieldExactMatch"]) == 2:
+                condition_does_not_exist = True
 
             subfields = current_field["subfields"]
             subfield_commands, upload_mode_replace = self._create_subfield_commands_list(subfields)
@@ -258,7 +264,7 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
             if action == self._field_action_types.add:
                 command = multi_edit_engine.AddFieldCommand(tag, ind1, ind2, subfield_commands)
             elif action == self._field_action_types.delete:
-                command = multi_edit_engine.DeleteFieldCommand(tag, ind1, ind2, subfield_commands, conditionSubfield, condition, condition_exact_match)
+                command = multi_edit_engine.DeleteFieldCommand(tag, ind1, ind2, subfield_commands, conditionSubfield, condition, condition_exact_match, condition_does_not_exist)
                 upload_mode = '-r'
             elif action == self._field_action_types.update:
                 command = multi_edit_engine.UpdateFieldCommand(tag, ind1, ind2, subfield_commands)

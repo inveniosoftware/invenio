@@ -69,6 +69,7 @@ from invenio.config import CFG_TMPDIR, CFG_ETCDIR, CFG_PYLIBDIR, \
     CFG_PATH_CONVERT, \
     CFG_PATH_PAMFILE, \
     CFG_BINDIR, \
+    CFG_LOGDIR, \
     CFG_BIBSCHED_PROCESS_USER, \
     CFG_BIBDOCFILE_BEST_FORMATS_TO_EXTRACT_TEXT_FROM, \
     CFG_WEBSUBMIT_DESIRED_CONVERSIONS
@@ -94,6 +95,7 @@ CFG_ICC_PATH = os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates',
 CFG_PDFA_DEF_PATH = os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'PDFA_def.ps')
 CFG_PDFX_DEF_PATH = os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'PDFX_def.ps')
 
+CFG_UNOCONV_LOG_PATH = os.path.join(CFG_LOGDIR, 'unoconv.log')
 _RE_CLEAN_SPACES = re.compile(r'\s+')
 
 
@@ -140,9 +142,7 @@ def get_conversion_map():
         ret['.ps.gz']['.ps'] = (gunzip, {})
     if CFG_PATH_ANY2DJVU:
         ret['.pdf']['.djvu'] = (any2djvu, {})
-        ret['.pdf;pdfa']['.djvu'] = (any2djvu, {})
         ret['.ps']['.djvu'] = (any2djvu, {})
-        ret['.ps.gz']['.djvu'] = (any2djvu, {})
     if CFG_PATH_DJVUPS:
         ret['.djvu']['.ps'] = (djvu2ps, {'compress': False})
         if CFG_PATH_GZIP:
@@ -188,24 +188,49 @@ def get_conversion_map():
         ret['.tif']['.pdf'] = (tiff2pdf, {})
     if CFG_PATH_OPENOFFICE_PYTHON and CFG_OPENOFFICE_SERVER_HOST:
         ret['.rtf']['.odt'] = (unoconv, {'output_format': 'odt'})
+        ret['.rtf']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
+        ret['.rtf']['.txt'] = (unoconv, {'output_format': 'txt'})
+        ret['.rtf']['.docx'] = (unoconv, {'output_format': 'docx'})
         ret['.doc']['.odt'] = (unoconv, {'output_format': 'odt'})
+        ret['.doc']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
+        ret['.doc']['.txt'] = (unoconv, {'output_format': 'txt'})
+        ret['.doc']['.docx'] = (unoconv, {'output_format': 'docx'})
         ret['.docx']['.odt'] = (unoconv, {'output_format': 'odt'})
+        ret['.docx']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
+        ret['.docx']['.txt'] = (unoconv, {'output_format': 'txt'})
         ret['.sxw']['.odt'] = (unoconv, {'output_format': 'odt'})
+        ret['.sxw']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
+        ret['.sxw']['.txt'] = (unoconv, {'output_format': 'txt'})
+        ret['.docx']['.docx'] = (unoconv, {'output_format': 'docx'})
         ret['.odt']['.doc'] = (unoconv, {'output_format': 'doc'})
         ret['.odt']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
         ret['.odt']['.txt'] = (unoconv, {'output_format': 'txt'})
+        ret['.odt']['.docx'] = (unoconv, {'output_format': 'docx'})
         ret['.ppt']['.odp'] = (unoconv, {'output_format': 'odp'})
+        ret['.ppt']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
+        ret['.ppt']['.txt'] = (unoconv, {'output_format': 'txt'})
+        ret['.ppt']['.pptx'] = (unoconv, {'output_format': 'pptx'})
         ret['.pptx']['.odp'] = (unoconv, {'output_format': 'odp'})
+        ret['.pptx']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
+        ret['.pptx']['.txt'] = (unoconv, {'output_format': 'txt'})
         ret['.sxi']['.odp'] = (unoconv, {'output_format': 'odp'})
+        ret['.sxi']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
+        ret['.sxi']['.txt'] = (unoconv, {'output_format': 'txt'})
+        ret['.sxi']['.pptx'] = (unoconv, {'output_format': 'pptx'})
         ret['.odp']['.ppt'] = (unoconv, {'output_format': 'ppt'})
         ret['.odp']['.pptx'] = (unoconv, {'output_format': 'pptx'})
         ret['.odp']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
+        ret['.odp']['.txt'] = (unoconv, {'output_format': 'txt'})
+        ret['.odp']['.pptx'] = (unoconv, {'output_format': 'pptx'})
         ret['.xls']['.ods'] = (unoconv, {'output_format': 'ods'})
+        ret['.xls']['.xlsx'] = (unoconv, {'output_format': 'xslx'})
         ret['.xlsx']['.ods'] = (unoconv, {'output_format': 'ods'})
         ret['.sxc']['.ods'] = (unoconv, {'output_format': 'ods'})
+        ret['.sxc']['.xlsx'] = (unoconv, {'output_format': 'xslx'})
         ret['.ods']['.xls'] = (unoconv, {'output_format': 'xls'})
         ret['.ods']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
         ret['.ods']['.csv'] = (unoconv, {'output_format': 'csv'})
+        ret['.ods']['.xlsx'] = (unoconv, {'output_format': 'xslx'})
     ret['.csv']['.txt'] = (txt2text, {})
 
     ## Let's add all the existing output formats as potential input formats.
@@ -498,7 +523,8 @@ def _register_unoconv():
     _UNOCONV_DAEMON_LOCK.acquire()
     try:
         if not _UNOCONV_DAEMON:
-            _UNOCONV_DAEMON = subprocess.Popen(['sudo', '-S', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-s', CFG_OPENOFFICE_SERVER_HOST, '-p', str(CFG_OPENOFFICE_SERVER_PORT), '-l'], stdin=open('/dev/null', 'r'), stdout=open('/dev/null', 'r'), stderr=open('/dev/null', 'r'))
+            output_log = open(CFG_UNOCONV_LOG_PATH, 'a')
+            _UNOCONV_DAEMON = subprocess.Popen(['sudo', '-S', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-vvv', '-s', CFG_OPENOFFICE_SERVER_HOST, '-p', str(CFG_OPENOFFICE_SERVER_PORT), '-l'], stdin=open('/dev/null', 'r'), stdout=output_log, stderr=output_log)
             time.sleep(3)
     finally:
         _UNOCONV_DAEMON_LOCK.release()
@@ -511,7 +537,8 @@ def _unregister_unoconv():
     _UNOCONV_DAEMON_LOCK.acquire()
     try:
         if _UNOCONV_DAEMON:
-            subprocess.call(['sudo', '-S', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-k'], stdin=open('/dev/null', 'r'), stdout=open('/dev/null', 'r'), stderr=open('/dev/null', 'r'))
+            output_log = open(CFG_UNOCONV_LOG_PATH, 'a')
+            subprocess.call(['sudo', '-S', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-k', '-vvv'], stdin=open('/dev/null', 'r'), stdout=output_log, stderr=output_log)
             time.sleep(1)
             if _UNOCONV_DAEMON.poll():
                 try:
@@ -550,7 +577,7 @@ def unoconv(input_file, output_file=None, output_format='txt', pdfopt=True, **du
             tmpoutputfile = tempfile.mktemp(dir=CFG_OPENOFFICE_TMPDIR, suffix=normalize_format(output_format))
             get_file_converter_logger().debug("Prepared output file %s" % tmpoutputfile)
             try:
-                execute_command(os.path.join(CFG_BINDIR, 'inveniounoconv'), '-s', CFG_OPENOFFICE_SERVER_HOST, '-p', str(CFG_OPENOFFICE_SERVER_PORT), '--output', tmpoutputfile, '-f', unoconv_format, tmpinputfile, sudo=CFG_OPENOFFICE_USER)
+                execute_command(os.path.join(CFG_BINDIR, 'inveniounoconv'), '-vvv', '-s', CFG_OPENOFFICE_SERVER_HOST, '-p', str(CFG_OPENOFFICE_SERVER_PORT), '--output', tmpoutputfile, '-f', unoconv_format, tmpinputfile, sudo=CFG_OPENOFFICE_USER)
             except:
                 register_exception(alert_admin=True)
                 raise
@@ -560,9 +587,9 @@ def unoconv(input_file, output_file=None, output_format='txt', pdfopt=True, **du
             _register_unoconv()
             time.sleep(5)
             try:
-                execute_command(os.path.join(CFG_BINDIR, 'inveniounoconv'), '-s', CFG_OPENOFFICE_SERVER_HOST, '-p', str(CFG_OPENOFFICE_SERVER_PORT), '--output', tmpoutputfile, '-f', unoconv_format, tmpinputfile, sudo=CFG_OPENOFFICE_USER)
+                execute_command(os.path.join(CFG_BINDIR, 'inveniounoconv'), '-vvv', '-s', CFG_OPENOFFICE_SERVER_HOST, '-p', str(CFG_OPENOFFICE_SERVER_PORT), '--output', tmpoutputfile, '-f', unoconv_format, tmpinputfile, sudo=CFG_OPENOFFICE_USER)
             except InvenioWebSubmitFileConverterError:
-                execute_command(os.path.join(CFG_BINDIR, 'inveniounoconv'), '-k', sudo=CFG_OPENOFFICE_USER)
+                execute_command(os.path.join(CFG_BINDIR, 'inveniounoconv'), '-vvv', '-k', sudo=CFG_OPENOFFICE_USER)
                 if not os.path.exists(tmpoutputfile) or not os.path.getsize(tmpoutputfile):
                     raise InvenioWebSubmitFileConverterError('No output was generated by OpenOffice')
                 else:

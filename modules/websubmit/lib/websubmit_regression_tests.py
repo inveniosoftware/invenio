@@ -24,6 +24,7 @@ __revision__ = "$Id$"
 import unittest
 import os
 import sys
+from warnings import warn
 
 from invenio.errorlib import register_exception
 from invenio.config import CFG_SITE_URL, CFG_PREFIX, CFG_TMPDIR
@@ -131,6 +132,12 @@ class WebSubmitXSSVulnerabilityTest(unittest.TestCase):
 
 def WebSubmitFileConverterTestGenerator():
     from invenio.websubmit_file_converter import get_conversion_map, can_convert
+    if can_convert('.odt', '.txt'):
+        ## Special test for unoconv/LibreOffice
+        yield WebSubmitFileConverterTest(os.path.join(CFG_PREFIX, 'lib', 'webtest', 'invenio', 'test.odt'), '.odt', '.txt')
+    if can_convert('.doc', '.txt'):
+        ## Special test for unoconv/LibreOffice
+        yield WebSubmitFileConverterTest(os.path.join(CFG_PREFIX, 'lib', 'webtest', 'invenio', 'test.doc'), '.doc', '.txt')
     for from_format in get_conversion_map().keys():
         input_file = os.path.join(CFG_PREFIX, 'lib', 'webtest', 'invenio', 'test%s' % from_format)
         if not os.path.exists(input_file):
@@ -139,9 +146,12 @@ def WebSubmitFileConverterTestGenerator():
         for to_format in get_conversion_map().keys():
             if from_format == to_format:
                 continue
-            if not can_convert(from_format, to_format):
-                continue
-            yield WebSubmitFileConverterTest(input_file, from_format, to_format)
+            conversion_map = can_convert(from_format, to_format)
+            if conversion_map:
+                if [converter for converter in conversion_map if converter[0].__name__ == 'unoconv']:
+                    ## We don't want to test unoconv which is tested separately
+                    continue
+                yield WebSubmitFileConverterTest(input_file, from_format, to_format)
 
 class WebSubmitFileConverterTest(unittest.TestCase):
     """Test WebSubmit file converter tool"""
