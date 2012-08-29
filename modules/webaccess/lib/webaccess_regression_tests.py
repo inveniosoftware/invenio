@@ -277,9 +277,7 @@ if CFG_DEVEL_SITE:
                     self.failUnless(run_sql("SELECT * FROM user WHERE email=%s", (self.a_email, )))
                     ## We log in with the 1st email but with the second nickname.
                     ## That means the 1st user should be merged into the second.
-                    ## However we still check for the 1st nickname, as in Invenio,
-                    ## once a nickname is assigned it will never change!
-                    error_messages = test_web_page_content(url3, expected_text=self.a_nickname)
+                    error_messages = test_web_page_content(url3, expected_text=self.another_nickname)
                     if error_messages:
                         self.fail(merge_error_messages(error_messages))
                     ## The another_email should not exist any longer.

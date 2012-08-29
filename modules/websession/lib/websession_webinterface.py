@@ -768,8 +768,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         try:
             (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, args['p_un'], args['p_pw'], args['login_method'])
         except InvenioWebAccessExternalAuthError, err:
-            return page("Error", body=str(err))
-        if len(iden)>0:
+            return page("Error", body=str(err), req=req)
+        if iden:
             uid = webuser.update_Uid(req, args['p_un'], args['remember_me'])
             uid2 = webuser.getUid(req)
             if uid2 == -1:
@@ -863,7 +863,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             # Fake parameters for p_un & p_pw because SSO takes them from the environment
             (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, '', '', CFG_EXTERNAL_AUTH_USING_SSO)
             args['remember_me'] = False
-        if len(iden)>0:
+        if iden:
             uid = webuser.update_Uid(req, args['p_un'], args['remember_me'])
             uid2 = webuser.getUid(req)
             if uid2 == -1:

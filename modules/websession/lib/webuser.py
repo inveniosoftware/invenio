@@ -34,12 +34,13 @@ __revision__ = "$Id$"
 import cgi
 import urllib
 import urlparse
-from socket import gaierror
 import socket
 import smtplib
 import re
 import random
 import datetime
+
+from socket import gaierror
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
@@ -533,6 +534,7 @@ def merge_usera_into_userb(id_usera, id_userb):
             for table, dummy in CFG_WEBUSER_USER_TABLES:
                 run_sql("LOCK TABLE %s WRITE" % table)
         index = 0
+        table = ''
         try:
             for index, (table, column) in enumerate(CFG_WEBUSER_USER_TABLES):
                 run_sql("UPDATE %(table)s SET %(column)s=%%s WHERE %(column)s=%%s; DELETE FROM %(table)s WHERE %(column)s=%%s;" % {
@@ -540,9 +542,9 @@ def merge_usera_into_userb(id_usera, id_userb):
                     'column': column
                 }, (id_userb, id_usera, id_usera))
         except Exception, err:
-            msg = "Error when merging id_user=%s into id_userb=%s for table %s: %s\n"
-            msg += "users where succesfully already merged for tables: %s\n" % ', '.join(CFG_WEBUSER_USER_TABLES[:index])
-            msg += "users where not succesfully already merged for tables: %s\n" % ', '.join(CFG_WEBUSER_USER_TABLES[index:])
+            msg = "Error when merging id_user=%s into id_userb=%s for table %s: %s\n" % (id_usera, id_userb, table, err)
+            msg += "users where succesfully already merged for tables: %s\n" % ', '.join([table[0] for table in CFG_WEBUSER_USER_TABLES[:index]])
+            msg += "users where not succesfully already merged for tables: %s\n" % ', '.join([table[0] for table in CFG_WEBUSER_USER_TABLES[index:]])
             register_exception(alert_admin=True, prefix=msg)
             raise
     finally:
@@ -560,7 +562,7 @@ def loginUser(req, p_un, p_pw, login_method):
     # go on with the old stuff based on p_email:
 
     if not login_method in CFG_EXTERNAL_AUTHENTICATION:
-        return ([], p_email, p_pw, 12)
+        return (None, p_email, p_pw, 12)
 
     if CFG_EXTERNAL_AUTHENTICATION[login_method]: # External Authentication
         try:
@@ -578,7 +580,7 @@ def loginUser(req, p_un, p_pw, login_method):
                 if not p_extid:
                     p_extid = p_email
             else:
-                return([], p_email, p_pw, 15)
+                return (None, p_email, p_pw, 15)
         except InvenioWebAccessExternalAuthError:
             register_exception(req=req, alert_admin=True)
             raise
@@ -597,6 +599,12 @@ def loginUser(req, p_un, p_pw, login_method):
                         new_id = res[0][0]
                         merge_usera_into_userb(id_user, new_id)
                         run_sql("DELETE FROM user WHERE id=%s", (id_user, ))
+                        for row in run_sql("SELECT method FROM userEXT WHERE id_user=%s", (id_user, )):
+                            ## For all known accounts of id_user not conflicting with new_id we move them to refer to new_id
+                            if not run_sql("SELECT method FROM userEXT WHERE id_user=%s AND method=%s", (new_id, row[0])):
+                                run_sql("UPDATE userEXT SET id_user=%s WHERE id_user=%s AND method=%s", (new_id, id_user, row[0]))
+                        ## And we delete the duplicate remaining ones :-)
+                        run_sql("DELETE FROM userEXT WHERE id_user=%s", (id_user, ))
                         id_user = new_id
                     else:
                         ## We just need to rename the email address of the
@@ -636,9 +644,9 @@ def loginUser(req, p_un, p_pw, login_method):
                     elif res == 0: # Everything was ok, with or without nickname.
                         id_user = run_sql("SELECT id from user where email=%s", (p_email,))[0][0]
                     elif res == 6: # error in contacting the user via email
-                        return([], p_email, p_pw_local, 19)
+                        return (None, p_email, p_pw_local, 19)
                     else:
-                        return([], p_email, p_pw_local, 13)
+                        return (None, p_email, p_pw_local, 13)
                     run_sql("INSERT INTO userEXT(id, method, id_user) VALUES(%s, %s, %s)", (p_extid, login_method, id_user))
             if CFG_EXTERNAL_AUTHENTICATION[login_method].enforce_external_nicknames:
                 ## Let's still fetch a possibly upgraded nickname.
@@ -662,7 +670,7 @@ def loginUser(req, p_un, p_pw, login_method):
                 pass
             except:
                 register_exception(req=req, alert_admin=True)
-                return([], p_email, p_pw, 16)
+                return (None, p_email, p_pw, 16)
             else: # Groups synchronization
                 if groups:
                     from invenio.webgroup import synchronize_external_groups
@@ -675,7 +683,7 @@ def loginUser(req, p_un, p_pw, login_method):
                     # Let's prevent the user to switch login_method
                     if user_prefs.has_key("login_method") and \
                             user_prefs["login_method"] != login_method:
-                        return([], p_email, p_pw, 11)
+                        return (None, p_email, p_pw, 11)
                 user_prefs["login_method"] = login_method
 
             # Cleaning external settings
@@ -691,11 +699,11 @@ def loginUser(req, p_un, p_pw, login_method):
                 pass
             except InvenioWebAccessExternalAuthError:
                 register_exception(req=req, alert_admin=True)
-                return([], p_email, p_pw, 16)
+                return (None, p_email, p_pw, 16)
             # Storing settings
             set_user_preferences(id_user, user_prefs)
         else:
-            return ([], p_un, p_pw, 10)
+            return (None, p_un, p_pw, 10)
     else: # Internal Authenthication
         if not p_pw:
             p_pw = ''
@@ -709,16 +717,16 @@ def loginUser(req, p_un, p_pw, login_method):
                 p_email = query_result[0][1].lower()
                 if login_method != preferred_login_method:
                     if preferred_login_method in CFG_EXTERNAL_AUTHENTICATION:
-                        return ([], p_email, p_pw, 11)
+                        return (None, p_email, p_pw, 11)
             elif note == '2': # Email address need to be confirmed by user
-                return ([], p_email, p_pw, 17)
+                return (None, p_email, p_pw, 17)
             elif note == '0': # Account need to be confirmed by administrator
-                return ([], p_email, p_pw, 18)
+                return (None, p_email, p_pw, 18)
         else:
-            return ([], p_email, p_pw, 14)
+            return (None, p_email, p_pw, 14)
     # Login successful! Updating the last access time
     run_sql("UPDATE user SET last_login=NOW() WHERE email=%s", (p_email,))
-    return (query_result, p_email, p_pw, 0)
+    return (id_user, p_email, p_pw, 0)
 
 
 def drop_external_settings(userId):
