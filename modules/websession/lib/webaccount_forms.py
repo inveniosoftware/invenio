@@ -20,7 +20,7 @@
 """WebAccount Forms"""
 
 from invenio.webinterface_handler_flask_utils import _
-from flaskext.wtf import Form, SubmitField, BooleanField, TextField, \
+from flask.ext.wtf import Form, SubmitField, BooleanField, TextField, \
                          TextAreaField, PasswordField, Required, \
                          HiddenField,  validators
 from invenio.websession_model import User

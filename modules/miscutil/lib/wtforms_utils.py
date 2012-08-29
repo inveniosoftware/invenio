@@ -33,7 +33,7 @@ import time
 from wtforms.widgets import TextInput
 from wtforms.fields import Field, TextField, HiddenField
 from wtforms import validators
-from flaskext.wtf import Form
+from flask.ext.wtf import Form
 from wtforms.ext.csrf.session import SessionSecureForm
 
 class TimeField(Field):
