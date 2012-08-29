@@ -198,7 +198,9 @@ def get_cited_by_list(person_id):
             [[ [recid, [cits] ],
             bool]
     '''
-    pubs = get_pubs(person_id)[0]
+    pubs, pubstatus = get_pubs(person_id)
+    if not pubstatus:
+        return [None, False]
     return retrieve_update_cache('cited_by_list', 'pid:' + str(person_id),
                           _get_cited_by_list, pubs, person_id)
 
@@ -209,7 +211,9 @@ def get_kwtuples(person_id):
     @return [ (('kword',count),),
             bool]
     '''
-    pubs = get_pubs(person_id)[0]
+    pubs, pubstatus = get_pubs(person_id)
+    if not pubstatus:
+        return [None, False]
     return retrieve_update_cache('kwtuples', 'pid:' + str(person_id),
                            _get_kwtuples, pubs, person_id)
 
@@ -229,7 +233,9 @@ def get_collabtuples(person_id):
     @return [ (('kword',count),),
             bool]
     '''
-    pubs = get_pubs(person_id)[0]
+    pubs, pubstatus = get_pubs(person_id)
+    if not pubstatus:
+        return [None, False]
     return retrieve_update_cache('collabtuples', 'pid:' + str(person_id),
                            _get_collabtuples, pubs, person_id)
 
@@ -250,8 +256,12 @@ def get_summarize_records(person_id, tag, ln):
     @param ln: str language
     @return: [htmlsnippet, bool]
     '''
-    pubs = get_pubs(person_id)[0]
-    rec_query = get_rec_query(person_id)[0]
+    pubs, pubstatus = get_pubs(person_id)
+    if not pubstatus:
+        return [None, False]
+    rec_query, rcstatus = get_rec_query(person_id)
+    if not rcstatus:
+        return [None, False]
     return retrieve_update_cache('summarize_records' + '-' + str(ln), 'pid:' + str(person_id),
                           _get_summarize_records, pubs, tag, ln, rec_query, person_id)
 
@@ -271,10 +281,14 @@ def get_rec_query(person_id):
     @param: person_id: int person id
     @return: ['author:"canonical name or pid"', bool]
     '''
-    namesdict = get_person_names_dicts(person_id)[0]
+    namesdict, ndstatus = get_person_names_dicts(person_id)
+    if not ndstatus:
+        return [None, False]
     authorname = namesdict['longest']
     db_names_dict = namesdict['db_names_dict']
-    person_link = get_veryfy_my_pubs_list_link(person_id)[0]
+    person_link, plstatus = get_veryfy_my_pubs_list_link(person_id)
+    if not plstatus:
+        return [None, False]
     bibauthorid_data = {"is_baid": True, "pid":person_id, "cid":person_link}
     return retrieve_update_cache('rec_query', 'pid:' + str(person_id),
                           _get_rec_query, bibauthorid_data, authorname, db_names_dict, person_id)
@@ -285,7 +299,9 @@ def get_hepnames_data(person_id):
     @param bibauthorid_data: dict with 'is_baid':bool, 'cid':canonicalID, 'pid':personid
     @return: [data, bool]
     '''
-    person_link = get_veryfy_my_pubs_list_link(person_id)[0]
+    person_link, plstatus = get_veryfy_my_pubs_list_link(person_id)
+    if not plstatus:
+        return [None, False]
     bibauthorid_data = {"is_baid": True, "pid":person_id, "cid":person_link}
     return retrieve_update_cache('hepnames_data', 'pid:' + str(bibauthorid_data['pid']),
                           _get_hepnames_data, bibauthorid_data, person_id)
