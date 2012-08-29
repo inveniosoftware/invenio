@@ -296,8 +296,8 @@ install-bootstrap:
 	cp bootstrap/css/bootstrap.min.css ${prefix}/var/www/css/bootstrap.min.css && \
 	cp bootstrap/img/glyphicons-halflings-white.png ${prefix}/var/www/img/glyphicons-halflings-white.png && \
 	cp bootstrap/img/glyphicons-halflings.png ${prefix}/var/www/img/glyphicons-halflings.png && \
-	cp bootstrap/js/bootstrap.js ${prefix}/var/www/js/jquery/bootstrap.js && \
-	cp bootstrap/js/bootstrap.min.js ${prefix}/var/www/js/jquery/bootstrap.min.js && \
+	cp bootstrap/js/bootstrap.js ${prefix}/var/www/js/bootstrap.js && \
+	cp bootstrap/js/bootstrap.min.js ${prefix}/var/www/js/bootstrap.min.js && \
 	rm -fr /tmp/invenio-bootstrap )
 	@echo "***********************************************************"
 	@echo "** The Twitter Bootstrap was successfully installed.     **"
@@ -310,8 +310,8 @@ uninstall-bootstrap:
 	rm ${prefix}/var/www/css/bootstrap.min.css && \
 	rm ${prefix}/var/www/img/glyphicons-halflings-white.png && \
 	rm ${prefix}/var/www/img/glyphicons-halflings.png && \
-	rm ${prefix}/var/www/js/jquery/bootstrap.js && \
-	rm ${prefix}/var/www/js/jquery/bootstrap.min.js
+	rm ${prefix}/var/www/js/bootstrap.js && \
+	rm ${prefix}/var/www/js/bootstrap.min.js
 	@echo "***********************************************************"
 	@echo "** The Twitter Bootstrap was successfully uninstalled.   **"
 	@echo "***********************************************************"
