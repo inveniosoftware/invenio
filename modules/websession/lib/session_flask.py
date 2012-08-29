@@ -43,7 +43,8 @@ from invenio.config import \
 
 __all__ = ["InvenioSession", "InvenioSessionInterface"]
 
-CFG_SUPPORT_HTTPS = CFG_SITE_SECURE_URL.startswith("https://")
+#CFG_SUPPORT_HTTPS = CFG_SITE_SECURE_URL.startswith("https://")
+CFG_SUPPORT_HTTPS = False ## FIXME: add support for redirecting to HTTPS
 
 # Store session information in memory cache (Redis, Memcache, ...).
 CFG_SESSION_USE_CACHE = True
@@ -64,6 +65,13 @@ class InvenioSession(dict, SessionMixin):
         self.sid = sid
         self.logging_in = False
         current_app.logger.info("initializing session with sid=%s" % sid)
+
+    def need_https(self):
+        """
+        Return True if the user was at some point authenticated and hence his
+        session identifier need to be sent via HTTPS
+        """
+        return request.cookies.get(current_app.session_cookie_name + 'stub', 'NO') == 'HTTPS'
 
     def check_ip(self, request):
         """
