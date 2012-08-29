@@ -708,7 +708,10 @@ class Template:
         html_keywords = self.tmpl_keyword_box(kwtuples, bibauthorid_data, ln, loading=not eval[4])
         html_affiliations = self.tmpl_affiliations_box(aff_pubdict, ln, loading=not eval[2])
         html_coauthors = self.tmpl_coauthor_box(bibauthorid_data, authors, ln, loading=not eval[5])
-        html_hepnames = self.tmpl_hepnames(hepdict, ln, loading=not eval[11])
+        if CFG_INSPIRE_SITE:
+            html_hepnames = self.tmpl_hepnames(hepdict, ln, loading=not eval[11])
+        else:
+            html_hepnames = ''
         html_citations = self.tmpl_citations_box(citedbylist, pubs, summarize_records, ln, loading=not eval[9])
         html_collabs = self.tmpl_collab_box(collabs, bibauthorid_data, ln, loading=not eval[13])
 

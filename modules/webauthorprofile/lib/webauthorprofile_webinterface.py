@@ -439,7 +439,7 @@ class WebAuthorPages(WebInterfaceDirectory):
             json_data = json.loads(str(form['jsondata']))
             json_data = json_unicode_to_utf8(json_data)
             # loop to check which boxes need content
-            json_response['boxes_info'].update({'name_variants': {'status':beval[0], 'html_content': webauthorprofile_templates.tmpl_author_name_variants_box(req, db_names_dict, bibauthorid_data, ln, add_box=False, loading=not beval[7])}})
+            json_response['boxes_info'].update({'name_variants': {'status':beval[0], 'html_content': webauthorprofile_templates.tmpl_author_name_variants_box(req, db_names_dict, bibauthorid_data, ln, add_box=False, loading=not beval[0])}})
             json_response['boxes_info'].update({'combined_papers': {'status':(beval[3] and beval[12]), 'html_content': webauthorprofile_templates.tmpl_papers_with_self_papers_box(req, pubs, selfpubs, bibauthorid_data, totaldownloads, ln, add_box=False, loading=not beval[3])}})
             #json_response['boxes_info'].update({'papers': {'status':beval[3], 'html_content': webauthorprofile_templates.tmpl_papers_box(req, pubs, bibauthorid_data, totaldownloads, ln, add_box=False, loading=not beval[3])}})
             json_response['boxes_info'].update({'selfpapers': {'status':beval[12], 'html_content': webauthorprofile_templates.tmpl_self_papers_box(req, selfpubs, bibauthorid_data, totaldownloads, ln, add_box=False, loading=not beval[12])}})
@@ -456,7 +456,7 @@ class WebAuthorPages(WebInterfaceDirectory):
             req.write(json.dumps(json_response))
         else:
             gboxstatus = ''
-            if False not in [beval[2], beval[3], beval[4], beval[5], beval[7], beval[9], beval[11]]:
+            if False not in beval:
                 gboxstatus = 'noAjax'
             req.write('<script type="text/javascript">var gBOX_STATUS = "%s" </script>' % (gboxstatus))
             req.write(webauthorprofile_templates.tmpl_author_page(req,
