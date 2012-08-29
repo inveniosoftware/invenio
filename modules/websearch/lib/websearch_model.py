@@ -26,6 +26,7 @@ from flask import g
 from sqlalchemy.ext.mutable import Mutable
 from invenio.intbitset import intbitset
 from invenio.search_engine_config import CFG_WEBSEARCH_SEARCH_WITHIN
+from invenio.search_engine import collection_restricted_p
 from invenio.sqlalchemyutils import db
 from sqlalchemy.orm.collections import InstrumentedList
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -41,13 +42,20 @@ class IntbitsetPickle(object):
     def dumps(self, obj, protocol=None):
         if obj is not None:
             return obj.fastdump()
-        return obj
+        return intbitset([]).fastdump()
 
     def loads(self, obj):
         try:
             return intbitset(obj)
         except:
             return intbitset()
+
+
+def IntbitsetCmp(x,y):
+    if x is None or y is None:
+        return False
+    else:
+        return x==y
 
 
 class OrderedList(InstrumentedList):
@@ -139,6 +147,7 @@ class Collection(db.Model):
                 server_default='0')
     #FIXME mutable has not very good performance
     reclist = db.Column(db.PickleType(pickler=IntbitsetPickle(),
+                                     comparator=IntbitsetCmp,
                                      mutable=True))
     _names = db.relationship(lambda: Collectionname,
                          backref='collection',
@@ -178,6 +187,10 @@ class Collection(db.Model):
             filter(CollectionCollection.id_son==self.id).\
             order_by(db.asc(Collection.nbrecs)).\
             first()
+
+    @property
+    def is_restricted(self):
+        return collection_restricted_p(self.name)
 
     _collection_children = db.relationship(lambda: CollectionCollection,
                                 collection_class=OrderedList,

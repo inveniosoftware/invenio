@@ -25,9 +25,12 @@ from datetime import datetime
 from hashlib import md5
 
 from flask import Blueprint, session, make_response, g, render_template, \
-                  request, flash, jsonify, redirect, url_for, current_app
+                  request, flash, jsonify, redirect, url_for, current_app,\
+                  abort
 from invenio.cache import cache
 from invenio.intbitset import intbitset as HitSet
+from invenio.access_control_engine import acc_authorize_action
+from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.sqlalchemyutils import db
 from invenio.websearch_model import Collection, CollectionCollection
 from invenio.websession_model import User
@@ -73,14 +76,6 @@ def cached_format_record(recIDs, of, ln='', verbose=0,
 @blueprint.invenio_templated('websearch_index.html')
 def index(sort=False, filter=None):
     uid = current_user.get_id()
-    #cc_son_id = db.session.query(CollectionCollection.id_son).subquery()
-    #q = db.session.query(CollectionCollection).filter(db.and_(
-    #        db.not_(CollectionCollection.id_dad.in_(cc_son_id)),
-    #        CollectionCollection.type==db.bindparam('type')))
-
-    #narrow = q.params(type='r').all()
-    #focus = q.params(type='v').all()
-
     collection = Collection.query.get_or_404(1)
 
     return dict(collection=collection,
@@ -192,6 +187,8 @@ class SearchUrlargs(object):
 
         user_storable_args = self.user_storable_args
         args_keys = user_storable_args.keys()
+        if self.user.settings is None:
+            self.user.settings = dict()
         return dict(map(lambda (k,v): (user_storable_args[k], v),
                     filter(lambda (k,v): k in args_keys,
                     self.user.settings.iteritems())))
@@ -244,6 +241,16 @@ def search():
         collection = Collection.query.filter(Collection.name==name).first_or_404()
     else:
         collection = Collection.query.get_or_404(1)
+
+    if collection.is_restricted:
+        (auth_code, auth_msg) = acc_authorize_action(uid,
+                                        VIEWRESTRCOLL,
+                                        collection=collection.name)
+        if auth_code and current_user.is_guest():
+            return redirect(url_for('youraccount.login',
+                                    referer=request.url))
+        elif auth_code:
+            return abort(401)
 
     from invenio.websearch_webinterface import wash_search_urlargd
     argd = argd_orig = wash_search_urlargd(request.args)

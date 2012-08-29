@@ -242,7 +242,11 @@
     float: left;
 ">
           <label for="p" class="control-label">
-            {{ _("Search %d records for:")|format(collection.nbrecs) }}
+            {%- set nbrecs = collection.nbrecs -%}
+            {%- if not collection.nbrecs -%}
+            {%- set nbrecs = 0 -%}
+            {%- endif -%}
+            {{ _("Search %d records for:")|format(nbrecs) }}
           </label>
           <div class="controls">
             <div id="searchdropdown" style="float: left;" class="dropdown">
