@@ -455,7 +455,7 @@ class WebAuthorPages(WebInterfaceDirectory):
             req.content_type = 'application/json'
             req.write(json.dumps(json_response))
         else:
-            gboxstatus = ''
+            gboxstatus = self.person_id
             if False not in beval:
                 gboxstatus = 'noAjax'
             req.write('<script type="text/javascript">var gBOX_STATUS = "%s" </script>' % (gboxstatus))

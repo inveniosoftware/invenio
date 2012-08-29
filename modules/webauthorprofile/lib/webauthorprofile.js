@@ -45,7 +45,7 @@ function initAjax(){
     {cache: false,
       dataType: 'json',
       type: 'POST',
-      url: '.'
+      url: gBOX_STATUS
     }
   );
 }
