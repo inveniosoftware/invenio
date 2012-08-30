@@ -1,0 +1,6 @@
+Flask-Assets==0.7
+Flask-Cache==0.7.0
+Flask-Gravatar==0.2.3
+Flask-SQLAlchemy==0.16
+Flask-Testing==0.4
+Flask-WTF==0.8
