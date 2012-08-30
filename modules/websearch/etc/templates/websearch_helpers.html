@@ -447,7 +447,7 @@
 
     var sources = {
     {% for id, soo in collection.search_options|groupby('id_field') %}
-      '{{ soo[0].field.code }}': [{% for so in soo %}
+      '{{ soo[0].field.code }}:': [{% for so in soo %}
             '{{ so.fieldvalue.name }}' {{ ',' if not loop.last }}
             {% endfor %}
         ]{{ ',' if not loop.last }}
@@ -455,7 +455,7 @@
     };
 
     {% for id, soo in collection.search_options|groupby('id_field') %}
-    source.push('{{ soo[0].field.code }}');
+    source.push('{{ soo[0].field.code }}:');
     {% endfor %}
 
     var orig = {
