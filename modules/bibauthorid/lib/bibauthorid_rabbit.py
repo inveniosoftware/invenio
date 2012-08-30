@@ -51,29 +51,10 @@ from bibauthorid_backinterface import get_inspire_id
 from bibauthorid_backinterface import get_person_with_extid
 from bibauthorid_backinterface import get_name_string_to_pid_dictionary
 from bibauthorid_backinterface import get_new_personid
+from bibauthorid_backinterface import get_bibrecref_to_pid_dictuonary
 
 USE_EXT_IDS = bconfig.RABBIT_USE_EXTERNAL_IDS
 USE_INSPIREID = bconfig.RABBIT_USE_EXTERNAL_ID_INSPIREID
-
-if bconfig.RABBIT_USE_CACHED_PID_FOR_EXACT_NAME_SEARCH:
-    PID_CACHE = get_name_string_to_pid_dictionary()
-
-    def find_pids_by_exact_names_cache(name):
-        try:
-            return zip(PID_CACHE[name])
-        except KeyError:
-            return []
-
-    def add_signature_using_names_cache(sig, name, pid):
-        try:
-            PID_CACHE[name].add(pid)
-        except KeyError:
-            PID_CACHE[name] = set([pid])
-        _add_signature(sig, name, pid)
-
-    def new_person_from_signature_using_names_cache(sig, name):
-        pid = get_new_personid()
-        add_signature_using_names_cache(sig, name, pid)
 
 
 def rabbit(bibrecs, check_invalid_papers=False):
@@ -82,7 +63,27 @@ def rabbit(bibrecs, check_invalid_papers=False):
     @type bibrecs: an iterable of ints
     @return: none
     '''
-    if bconfig.RABBIT_USE_CACHED_PID_FOR_EXACT_NAME_SEARCH:
+    if bconfig.RABBIT_USE_CACHED_PID:
+        PID_NAMES_CACHE = get_name_string_to_pid_dictionary()
+
+        def find_pids_by_exact_names_cache(name):
+            try:
+                return zip(PID_NAMES_CACHE[name])
+            except KeyError:
+                return []
+
+        def add_signature_using_names_cache(sig, name, pid):
+            try:
+                PID_NAMES_CACHE[name].add(pid)
+            except KeyError:
+                PID_NAMES_CACHE[name] = set([pid])
+            _add_signature(sig, name, pid)
+
+        def new_person_from_signature_using_names_cache(sig, name):
+            pid = get_new_personid()
+            add_signature_using_names_cache(sig, name, pid)
+            return pid
+
         add_signature = add_signature_using_names_cache
         new_person_from_signature = new_person_from_signature_using_names_cache
         find_pids_by_exact_name = find_pids_by_exact_names_cache
@@ -104,7 +105,8 @@ def rabbit(bibrecs, check_invalid_papers=False):
         if check_invalid_papers:
             filter_bibrecs_outside(all_bibrecs)
 
-    if len(bibrecs) > bconfig.RABBIT_USE_CACHED_GET_GROUPED_RECORDS_THRESHOLD:
+    if (bconfig.RABBIT_USE_CACHED_GET_GROUPED_RECORDS and
+        len(bibrecs) > bconfig.RABBIT_USE_CACHED_GET_GROUPED_RECORDS_THRESHOLD):
         populate_partial_marc_caches()
         SWAPPED_GET_GROUPED_RECORDS = True
     else:

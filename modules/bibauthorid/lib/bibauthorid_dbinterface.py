@@ -45,6 +45,8 @@ from bibauthorid_general_utils import update_status \
                                     , update_status_final
 from dbquery import run_sql
 
+from collections import defaultdict
+
 MARC_100_700_CACHE = None
 
 COLLECT_INSPIRE_ID = bconfig.COLLECT_EXTERNAL_ID_INSPIREID
@@ -73,7 +75,7 @@ def get_personid_row(person_id, tag):
 
     @param person_id: id of the person to read the attribute from
     @type person_id: int
-    @param tag: the tag to read.
+    @param tag: the tag to read. 
     @type tag: string
 
     @return: the data associated with a virtual author
@@ -399,7 +401,7 @@ def get_persons_from_recids(recids, return_alt_names=False,
         #with this, as it can happen that a person with papers exists for wich a canonical name
         #has not been computed yet. Hence, it will be indexed next time, so it learns.
         #Each person should have at most one canonical name, so:
-        assert len(canonical) <= 1
+        assert len(canonical) <= 1, "A person cannot have more than one canonical name"
 
         if len(canonical) == 1:
             pid_data = {'canonical_id' : canonical[0][0]}
@@ -700,7 +702,7 @@ def insert_user_log(userinfo, personid, action, tag, value, comment='', transact
 
     run_sql('insert into aidUSERINPUTLOG '
             '(transactionid,timestamp,userinfo,userid,personid,action,tag,value,comment) values '
-            '(%s,%s,%s,%s,%s,%s,%s,%s)',
+            '(%s,%s,%s,%s,%s,%s,%s,%s,%s)',
             (transactionid, timestamp, userinfo, userid, personid,
              action, tag, value, comment))
 
@@ -1123,7 +1125,7 @@ def _get_authors_from_paper_from_cache(paper):
     '''
     try:
         ids = MARC_100_700_CACHE['brb100'][paper]['id'].keys()
-        refs = [i for i in ids if '__a' in MARC_100_700_CACHE['b100'][i][0]]
+        refs = [i for i in ids if '100__a' in MARC_100_700_CACHE['b100'][i][0]]
     except KeyError:
         return tuple()
     return zip(refs)
@@ -1152,7 +1154,7 @@ def _get_coauthors_from_paper_from_cache(paper):
     '''
     try:
         ids = MARC_100_700_CACHE['brb700'][paper]['id'].keys()
-        refs = [i for i in ids if '__a' in MARC_100_700_CACHE['b700'][i][0]]
+        refs = [i for i in ids if '700__a' in MARC_100_700_CACHE['b700'][i][0]]
     except KeyError:
         return tuple()
     return zip(refs)
@@ -1327,50 +1329,50 @@ def populate_partial_marc_caches():
         return
 
     def br_dictionarize(maptable):
-        md = {}
-        for i in maptable:
-            try:
-                try:
-                    md[i[0]]['id'][i[1]].append(i[2])
-                except KeyError:
-                    md[i[0]]['id'][i[1]] = [i[2]]
-                try:
-                    md[i[0]]['fn'][i[2]].append(i[1])
-                except KeyError:
-                    md[i[0]]['fn'][i[2]] = [i[1]]
-            except KeyError:
-                md[i[0]] = {'id':{}, 'fn':{}}
-                md[i[0]]['id'][i[1]] = [i[2]]
-                md[i[0]]['fn'][i[2]] = [i[1]]
+        gc.collect()
+        gc.disable()
+        md = defaultdict(dict)
+        maxiters = len(set(map(itemgetter(0), maptable)))
+        for i, v in enumerate(groupby(maptable, itemgetter(0))):
+            if i % 1000 == 0:
+                update_status(float(i) / maxiters, 'br_dictionarizing...')
+            if i % 500000 == 0:
+                update_status(float(i) / maxiters, 'br_dictionarizing...GC')
+                gc.collect()
+            id = defaultdict(list)
+            fn = defaultdict(list)
+            for _, k, z in v[1]:
+                id[k].append(z)
+                fn[z].append(k)
+            md[v[0]]['id'] = id
+            md[v[0]]['fn'] = fn
+        update_status_final('br_dictionarizieng done')
+        gc.enable()
         return md
 
     def bib_dictionarize(bibtable):
-        md = {}
-        for i in bibtable:
-            md[i[0]] = (i[1], i[2])
-        return md
-
+        return dict((i[0], (i[1], i[2])) for i in bibtable)
 
     update_status(.0, 'Populating get_grouped_records_table_cache')
-    bibrec_bib10x = run_sql("select * from bibrec_bib10x")
+    bibrec_bib10x = sorted(run_sql("select * from bibrec_bib10x"))
     update_status(.125, 'Populating get_grouped_records_table_cache')
     brd_b10x = br_dictionarize(bibrec_bib10x)
     del bibrec_bib10x
 
     update_status(.25, 'Populating get_grouped_records_table_cache')
-    bibrec_bib70x = run_sql("select * from bibrec_bib70x")
+    bibrec_bib70x = sorted(run_sql("select * from bibrec_bib70x"))
     update_status(.375, 'Populating get_grouped_records_table_cache')
     brd_b70x = br_dictionarize(bibrec_bib70x)
     del bibrec_bib70x
 
     update_status(.5, 'Populating get_grouped_records_table_cache')
-    bib10x = run_sql("select * from bib10x")
+    bib10x = (run_sql("select * from bib10x"))
     update_status(.625, 'Populating get_grouped_records_table_cache')
     bibd_10x = bib_dictionarize(bib10x)
     del bib10x
 
     update_status(.75, 'Populating get_grouped_records_table_cache')
-    bib70x = run_sql("select * from bib70x")
+    bib70x = (run_sql("select * from bib70x"))
     update_status(.875, 'Populating get_grouped_records_table_cache')
     bibd_70x = bib_dictionarize(bib70x)
     del bib70x
@@ -1439,7 +1441,7 @@ def _get_grouped_records_from_db(bibrefrec, *args):
                       "WHERE id_bibrec = %d "
                       "AND field_number = %d" %
                       (mapping_table, rec, int(field_number)))
-    assert len(grouped) > 0
+    assert len(grouped) > 0, "There should be a most one grouped value per tag."
     grouped_s = list_2_SQL_str(grouped, lambda x: str(x[0]))
 
     ret = {}
@@ -1537,8 +1539,7 @@ def _get_name_by_bibrecref_from_db(bib):
     tag = "%s__a" % str(bib[0])
     ret = run_sql("select value from %s where id = '%s' and tag = '%s'" % (table, refid, tag))
 
-    # if zero - check if the garbage collector has run
-    assert len(ret) == 1
+    assert len(ret) == 1, "A bibrefrec must have exactly one name(%s)" % str(bib)
     return ret[0][0]
 
 def _get_name_by_bibrecref_from_cache(bib):
@@ -1548,7 +1549,7 @@ def _get_name_by_bibrecref_from_cache(bib):
     '''
     table = "b%s" % bib[0]
     refid = bib[1]
-    tag = "__a"
+    tag = "%s__a" % str(bib[0])
     ret = None
     try:
         if tag in MARC_100_700_CACHE[table][refid][0]:
@@ -1557,11 +1558,14 @@ def _get_name_by_bibrecref_from_cache(bib):
         #The GC did run and the table is not clean?
         #We might want to allow empty response here
         raise Exception(str(bib) + str(e))
-    assert ret
+    if bconfig.DEBUG_CHECKS:
+        assert ret == _get_name_by_bibrecref_from_db(bib)
     return ret
 
 def get_name_by_bibrecref(bib):
     if MARC_100_700_CACHE:
+        if bconfig.DEBUG_CHECKS:
+            assert _get_name_by_bibrecref_from_cache(bib) == _get_name_by_bibrecref_from_db(bib)
         return _get_name_by_bibrecref_from_cache(bib)
     else:
         return _get_name_by_bibrecref_from_db(bib)
@@ -1857,11 +1861,153 @@ def get_name_string_to_pid_dictionary():
     namesdict = {}
     all_names = run_sql("select personid,name from aidPERSONIDPAPERS")
     for x in all_names:
-        try:
-            namesdict[x[1]].add(x[0])
-        except KeyError:
-            namesdict[x[1]] = set([x[0]])
+        namesdict.setdefault(x[1], set()).add(x[0])
     return namesdict
+
+#could be useful to optimize rabbit, still unused, watch out.
+def get_bibrecref_to_pid_dictuonary():
+    brr2pid = {}
+    all_brr = run_sql("select personid,bibref_table,bibref_value.bibrec from aidPERSONIDPAPERS")
+    for x in all_brr:
+        brr2pid.setdefault(tuple(x[1:]), set()).add(x[0])
+    return brr2pid
+
+def check_personid_papers(output_file=None):
+    '''
+    Checks all invariants of personid.
+    Writes in stdout if output_file if False.
+    '''
+
+    if output_file:
+        fp = open(output_file, "w")
+        printer = lambda x: fp.write(x + '\n')
+    else:
+        printer = bibauthor_print
+
+    checkers = (
+                check_wrong_names,
+                check_duplicated_papers,
+                check_duplicated_signatures,
+                check_wrong_rejection,
+                check_canonical_names,
+                check_empty_personids
+                #check_claim_inspireid_contradiction
+                )
+    # Avoid writing f(a) or g(a), because one of the calls
+    # might be optimized.
+    return all([check(printer) for check in checkers])
+
+def repair_personid(output_file=None):
+    '''
+    This should make check_personid_papers() to return true.
+    '''
+    if output_file:
+        fp = open(output_file, "w")
+        printer = lambda x: fp.write(x + '\n')
+    else:
+        printer = bibauthor_print
+
+    checkers = (
+                check_wrong_names,
+                check_duplicated_papers,
+                check_duplicated_signatures,
+                check_wrong_rejection,
+                check_canonical_names,
+                check_empty_personids
+                #check_claim_inspireid_contradiction
+                )
+
+    first_check = [check(printer) for check in checkers]
+    repair_pass = [check(printer, repair=True) for check in checkers]
+    last_check = [check(printer) for check in checkers]
+
+    if not all(first_check):
+        assert not(all(repair_pass))
+        assert all(last_check)
+
+    return all(last_check)
+
+def check_duplicated_papers(printer, repair=False):
+    all_ok = True
+    bibrecs_to_reassign = []
+
+    recs = run_sql("select personid,bibrec from aidPERSONIDPAPERS where flag <> %s", (-2,))
+    d = {}
+
+    for x, y in recs:
+        d.setdefault(x, []).append(y)
+
+    for pid , bibrec in d.iteritems():
+        if not len(bibrec) == len(set(bibrec)):
+            all_ok = False
+            dups = sorted(bibrec)
+            dups = [x for i, x in enumerate(dups[0:len(dups) - 1]) if x == dups[i + 1]]
+            printer("Person %d has duplicated papers: %s", (pid, dups))
+
+            if repair:
+                for dupbibrec in dups:
+                    printer("Repairing duplicated bibrec %s" % str(dupbibrec))
+                    involved_claimed = run_sql("select personid,bibref_table,bibref_value,bibrec,flag "
+                                       "from aidPERSONIDPAPERS where personid=%s and bibrec=%s "
+                                       "and flag >= 2", (pid, dupbibrec))
+
+                    if len(involved_claimed) != 1:
+                        bibrecs_to_reassign.append(dupbibrec)
+                        run_sql("delete from aidPERSONIDPAPERS where personid=%s and bibrec=%s", (pid, dupbibrec))
+                    else:
+                        involved_not_claimed = run_sql("select personid,bibref_table,bibref_value,bibrec,flag "
+                                   "from aidPERSONIDPAPERS where personid=%s and bibrec=%s "
+                                   "and flag < 2", (pid, dupbibrec))
+                        for v in involved_not_claimed:
+                            run_sql("delete from aidPERSONIDPAPERS where personid=%s and bibref_table=%s "
+                                    "and bibref_value=%s and bibrec=%s and flag=%s", (v))
+
+    if repair and bibrecs_to_reassign:
+        printer("Reassigning deleted bibrecs %s" % str(bibrecs_to_reassign))
+        from bibauthorid_rabbit import rabbit
+        rabbit(bibrecs_to_reassign)
+
+    return all_ok
+
+
+def check_duplicated_signatures(printer, repair=False):
+    all_ok = True
+
+    brr = run_sql("select bibref_table, bibref_value, bibrec from aidPERSONIDPAPERS where flag > %s", ("-2",))
+
+    bibrecs_to_reassign = []
+
+    d = {}
+    for x, y, z in brr:
+        d.setdefault(z, []).append((x, y))
+
+    for bibrec, bibrefs in d.iteritems():
+        if not len(bibrefs) == len(set(bibrefs)):
+            all_ok = False
+            dups = sorted(bibrefs)
+            dups = [x for i, x in enumerate(dups[0:len(dups) - 1]) if x == dups[i + 1]]
+            printer("Paper %d has duplicated signatures: %s" % (bibrec, dups))
+
+            if repair:
+                for dup in set(dups):
+                    printer("Repairing duplicate %s" % str(dup))
+                    claimed = run_sql("select personid,bibref_table,bibref_value,bibrec from "
+                                      "aidPERSONIDPAPERS where bibref_table=%s and bibref_value=%s "
+                                      "and bibrec=%s and flag=2", (dup[0], dup[1], bibrec))
+                    if len(claimed) != 1:
+                        bibrecs_to_reassign.append(bibrec)
+                        run_sql("delete from aidPERSONIDPAPERS where bibref_table=%s  and "
+                                "bibref_value = %s and bibrec = %s", (dup[0], dup[1], bibrec))
+                    else:
+                        run_sql("delete from aidPERSONIDPAPERS where bibref_table=%s and bibref_value=%s "
+                                      "and bibrec=%s and flag<2", (dup[0], dup[1], bibrec))
+
+    if repair and bibrecs_to_reassign:
+        printer("Reassigning deleted duplicates %s" % str(bibrecs_to_reassign))
+        from bibauthorid_rabbit import rabbit
+        rabbit(bibrecs_to_reassign)
+    return all_ok
+
 
 def get_wrong_names():
     '''
@@ -1884,93 +2030,36 @@ def get_wrong_names():
 
     return chain(wrong100, wrong700), total
 
-
-def check_personid_papers(output_file=None):
-    '''
-    Checks all invariants of personid.
-    Writes in stdout if output_file if False.
-    '''
-
-    if output_file:
-        fp = open(output_file, "w")
-        printer = lambda x: fp.write(x + '\n')
-    else:
-        printer = bibauthor_print
-
-    checkers = (check_duplicated_papers,
-                check_duplicated_signatures,
-                check_wrong_names,
-                check_canonical_names,
-               # check_empty_personids,
-                check_wrong_rejection,
-#                check_claim_ispireid_contradiction,
-               )
-
-    # Avoid writing f(a) or g(a), because one of the calls
-    # might be optimized.
-    return all([check(printer) for check in checkers])
-
-
-def check_duplicated_papers(printer):
-    ret = True
-    pids = set(run_sql("select personid from aidPERSONIDPAPERS"))
-    for pid in pids:
-        pid = pid[0]
-        recs = run_sql("select bibrec from aidPERSONIDPAPERS where personid = %s and flag <> %s", (pid, -2))
-        recs = [rec[0] for rec in recs]
-        for rec in set(recs):
-            recs.remove(rec)
-
-        if recs:
-            ret = False
-            printer("Person %d has duplicated papers: %s" % (pid, str(tuple(set(recs)))))
-
-    return ret
-
-
-def check_duplicated_signatures(printer):
-    ret = True
-    recs = set(run_sql("select bibrec from aidPERSONIDPAPERS"))
-    for rec in recs:
-        rec = rec[0]
-        refs = list(run_sql("select bibref_table, bibref_value from aidPERSONIDPAPERS where bibrec = %s and flag > %s", (rec, "-2")))
-
-        for ref in set(refs):
-            refs.remove(ref)
-
-        if refs:
-            ret = False
-            refs = sorted(refs)
-            refs = groupby(refs)
-            refs = ["Found %s:%s %d times." % (key[0], key[1], len(list(data)) + 1) for key, data in refs]
-            printer("Paper %d has duplicated signatures:" % rec)
-            for ref in refs:
-                printer("\t%s" % ref)
-
-    return ret
-
-
-def check_wrong_names(printer):
+def check_wrong_names(printer, repair=False):
     ret = True
     wrong_names, number = get_wrong_names()
 
     if number > 0:
         ret = False
         printer("%d corrupted names in aidPERSONIDPAPERS." % number)
-        for wrong_name in wrong_names:
+        for i, wrong_name in  enumerate(wrong_names):
             if wrong_name[2]:
                 printer("Outdated name, '%s'(%s:%d)." % (wrong_name[2], wrong_name[0], wrong_name[1]))
             else:
                 printer("Invalid id(%s:%d)." % (wrong_name[0], wrong_name[1]))
 
+            if repair:
+                printer("Fixing wrong name: %s" % str(wrong_name))
+                if wrong_name[2]:
+                    run_sql("update aidPERSONIDPAPERS set name=%s where bibref_table=%s and bibref_value=%s",
+                            (wrong_name[2], wrong_name[0], wrong_name[1]))
+                else:
+                    run_sql("delete from aidPERSONIDPAPERS where bibref_table=%s and bibref_value=%s",
+                            (wrong_name[0], wrong_name[1]))
     return ret
 
-
-def check_canonical_names(printer):
+def check_canonical_names(printer, repair=False):
     ret = True
 
     pid_cn = run_sql("select personid, data from aidPERSONIDDATA where tag = %s", ('canonical_name',))
     pid_2_cn = dict((k, len(list(d))) for k, d in groupby(sorted(pid_cn, key=itemgetter(0)), key=itemgetter(0)))
+
+    pid_to_repair = []
 
     for pid in get_existing_personids():
         canon = pid_2_cn.get(pid, 0)
@@ -1981,14 +2070,19 @@ def check_canonical_names(printer):
                 if papers != 0:
                     printer("Personid %d does not have a canonical name, but have %d papers." % (pid, papers))
                     ret = False
+                    pid_to_repair.append(pid)
             else:
                 printer("Personid %d has %d canonical names.", (pid, canon))
+                pid_to_repair.append(pid)
                 ret = False
 
+    if repair and not ret:
+        printer("Repairing canonical names for pids: %s" % str(pid_to_repair))
+        update_personID_canonical_names(pid_to_repair, overwrite=True)
     return ret
 
 
-def check_empty_personids(printer):
+def check_empty_personids(printer, repair=False):
     ret = True
 
     paper_pids = set(p[0] for p in run_sql("select personid from aidPERSONIDPAPERS"))
@@ -1999,36 +2093,73 @@ def check_empty_personids(printer):
 
         if fields == 0:
             printer("Personid %d has no papers and nothing else than canonical_name." % p)
+            if repair:
+                printer("Deleting empty person %s" % str(p))
+                run_sql("delete from aidPERSONIDDATA where personid=%s", (p,))
             ret = False
 
     return ret
 
-def check_wrong_rejection(printer):
-    ret = True
 
-    all_rejections = run_sql("select personid, bibref_table, bibref_value, bibrec "
+def check_wrong_rejection(printer, repair=False):
+    all_ok = True
+
+    to_reassign = []
+    to_deal_with = []
+
+    all_rejections = set(run_sql("select bibref_table, bibref_value, bibrec "
                              "from aidPERSONIDPAPERS "
                              "where flag = %s",
-                             ('-2',))
+                             ('-2',)))
+    all_confirmed = set(run_sql("select bibref_table, bibref_value, bibrec "
+                             "from aidPERSONIDPAPERS "
+                             "where flag > %s",
+                             ('-2',)))
 
-    for rej in all_rejections:
-        sigs = run_sql("select personid from aidPERSONIDPAPERS "
-                       "where bibref_table = %s "
-                       "and bibref_value = %s "
-                       "and bibrec = %s "
-                       "and flag <> '-2'", rej[1:])
+    not_assigned = all_rejections - all_confirmed
 
-        # To avoid duplication of error messages don't complain
-        # if the papers is assigned to more than one personids.
-        if not sigs:
-            printer("The paper (%s:%s,%s) was rejected from person %d, but never assigned or claimed." % (rej[1:] + rej[:1]))
-            ret = False
+    if not_assigned:
+        all_ok = False
+        for s in not_assigned:
+            printer('Paper (%s:%s,%s) was rejected but never reassigned' % s)
+            to_reassign.append(s[2])
 
-        elif rej[1] in sigs:
-            printer("Personid %d has both assigned and rejected paper (%s:%s,%s)." % rej)
-            ret = False
 
-    return ret
+    all_rejections = set(run_sql("select personid, bibref_table, bibref_value, bibrec "
+                             "from aidPERSONIDPAPERS "
+                             "where flag = %s",
+                             ('-2',)))
+    all_confirmed = set(run_sql("select personid, bibref_table, bibref_value, bibrec "
+                             "from aidPERSONIDPAPERS "
+                             "where flag > %s",
+                             ('-2',)))
+
+    both_confirmed_and_rejected = all_rejections & all_confirmed
+
+    if both_confirmed_and_rejected:
+        all_ok = False
+        for i in both_confirmed_and_rejected:
+            printer("Conflicting assignment/rejection: %s" % str(i))
+            to_deal_with.append(i)
+
+    if repair and (to_reassign or to_deal_with):
+
+        from bibauthorid_rabbit import rabbit
+
+        if to_reassign:
+            printer("Reassigning bibrecs with missing entries: %s" % str(to_reassign))
+            rabbit(to_reassign)
+
+        if to_deal_with:
+            #We got claims and rejections on the same person for the same paper. Let's forget about
+            #it and reassign it automatically, they'll make up their minds sooner or later.
+            printer("Deleting and reassigning bibrefrecs with conflicts %s" % str(to_deal_with))
+            for sig in to_deal_with:
+                run_sql("delete from aidPERSONIDPAPERS where personid=%s and bibref_table=%s and "
+                        "bibref_value=%s and bibrec = %s", (sig))
+            rabbit(map(itemgetter(3), to_deal_with))
+
+    return all_ok
 
 
 def check_merger():
@@ -2212,107 +2343,6 @@ def check_claim_inspireid_contradiction():
             print "Inspireid cluster %s" % str(map(itemgetter(1), cluster))
             print "Contradicting claims: %s" % str(problem)
             print
-
-
-def repair_personid():
-    '''
-    This should make check_personid_papers() to return true.
-    '''
-    pids = set(run_sql("select personid from aidPERSONIDPAPERS"))
-    lpids = len(pids)
-    for i, pid in enumerate((p[0] for p in pids)):
-        update_status(float(i) / lpids, "Checking per-pid...")
-        rows = run_sql("select bibrec, bibref_table, bibref_value, flag "
-                       "from aidPERSONIDPAPERS where personid = %s", (pid,))
-
-        rows = ((k, list(d))
-                for k, d in groupby(sorted(rows, key=itemgetter(0)), itemgetter(0)))
-
-        for rec, sigs in rows:
-            if len(sigs) > 1:
-                claimed = [sig for sig in sigs if sig[3] > 1]
-                rejected = [sig for sig in sigs if sig[3] < -1]
-
-                if len(claimed) == 1:
-                    sigs.remove(claimed[0])
-                elif len(claimed) == 0 and len(rejected) == 1:
-                    sigs.remove(rejected[0])
-
-                for sig in set(sigs):
-                    run_sql("delete from aidPERSONIDPAPERS "
-                            "where personid = %s "
-                            "and bibrec = %s "
-                            "and bibref_table = %s "
-                            "and bibref_value = %s "
-                            "and flag = %s"
-                            , (pid, sig[0], sig[1], sig[2], sig[3]))
-    update_status_final("Done with per-pid fixing.")
-
-    recs = run_sql("select distinct bibrec from aidPERSONIDPAPERS")
-    lrecs = len(recs)
-    for i, rec in enumerate((r[0] for r in recs)):
-        update_status(float(i) / lrecs, "Checking per-rec...")
-        rows = run_sql("select bibref_table, bibref_value, flag from aidPERSONIDPAPERS "
-                       "where bibrec = %s", (rec,))
-        kfuc = itemgetter(slice(0, 2))
-        rows = ((k, map(itemgetter(2), d)) for k, d in groupby(sorted(rows), kfuc))
-
-        for bibref, flags in rows:
-            if len(flags) > 1:
-                claimed = sum(1 for f in flags if f > 1)
-                rejected = sum(1 for f in flags if f < -1)
-
-                if claimed == 1:
-                    run_sql("delete from aidPERSONIDPAPERS "
-                            "where bibrec = %s "
-                            "and bibref_table = %s "
-                            "and bibref_value = %s "
-                            "and flag <> %s"
-                            , (rec, bibref[0], bibref[1], 2))
-                elif claimed == 0 and rejected == 1:
-                    run_sql("delete from aidPERSONIDPAPERS "
-                            "where bibrec = %s "
-                            "and bibref_table = %s "
-                            "and bibref_value = %s "
-                            "and flag <> %s"
-                            , (rec, bibref[0], bibref[1], -2))
-                else:
-                    run_sql("delete from aidPERSONIDPAPERS "
-                            "where bibrec = %s "
-                            "and bibref_table = %s "
-                            "and bibref_value = %s"
-                            , (rec, bibref[0], bibref[1]))
-    update_status_final("Done with per-rec fixing.")
-
-    update_status(0 / 1, "Fixing wrong names...")
-    wrong_names, number = get_wrong_names()
-    for i, w in enumerate(wrong_names):
-        update_status(i / number, "Fixing wrong names...")
-        if w[2]:
-            run_sql("update aidPERSONIDPAPERS set name=%s where bibref_table=%s and bibref_value=%s",
-                    (w[2], w[0], w[1]))
-        else:
-            run_sql("delete from aidPERSONIDPAPERS where bibref_table=%s and bibref_value=%s",
-                    (w[0], w[1]))
-
-    no_rejs = frozenset(run_sql("select bibref_table, bibref_value, bibrec from aidPERSONIDPAPERS where flag <> -2"))
-    rejs = frozenset(run_sql("select bibref_table, bibref_value, bibrec from aidPERSONIDPAPERS where flag = -2"))
-    floating_rejs = rejs - no_rejs
-
-    update_personID_canonical_names(map(new_person_from_signature, floating_rejs))
-
-    update_status_final("Fixed all wrong names.")
-
-    update_status(0, "Checking missing canonical names...")
-    paper_pids = run_sql("select distinct personid from aidPERSONIDPAPERS")
-    cname_pids = run_sql("select distinct personid from aidPERSONIDDATA where tag='canonical_name'")
-    missing_cnames = list(set(p[0] for p in paper_pids) - set(p[0] for p in cname_pids))
-    npids = len(missing_cnames)
-    for pid in missing_cnames:
-        update_status(missing_cnames.index(pid) / float(npids), "Creating missing canonical names...")
-        update_personID_canonical_names([pid])
-    update_status_final("Done restoring canonical names.")
-
 
 def get_all_bibrecs():
     return [x[0] for x in run_sql("select distinct bibrec from aidPERSONIDPAPERS")]

@@ -19,6 +19,7 @@
 
 import bibauthorid_config as bconfig
 from datetime import datetime
+import os
 
 from bibauthorid_cluster_set import delayed_cluster_sets_from_marktables
 from bibauthorid_cluster_set import delayed_cluster_sets_from_personid
@@ -29,9 +30,11 @@ from bibauthorid_backinterface import remove_result_cluster
 from bibauthorid_general_utils import bibauthor_print
 from bibauthorid_prob_matrix import prepare_matirx
 from bibauthorid_scheduler import schedule \
-                                  , Estimator \
                                   , matrix_coefs \
                                   , wedge_coefs
+from bibauthorid_least_squares import to_function as create_approx_func
+
+
 '''
     There are three main entry points to tortoise
 
@@ -68,6 +71,7 @@ def tortoise_from_scratch():
         sizes,
         force=True)
     assert len(exit_statuses) == len(cluster_sets)
+    assert all(stat == os.EX_OK for stat in exit_statuses)
 
     empty_results_table()
 
@@ -78,6 +82,7 @@ def tortoise_from_scratch():
         cluster_sets,
         sizes)
     assert len(exit_statuses) == len(cluster_sets)
+    assert all(stat == os.EX_OK for stat in exit_statuses)
 
 
 def tortoise(pure=False,
@@ -98,6 +103,7 @@ def tortoise(pure=False,
             sizes,
             force=force_matrix_creation)
         assert len(exit_statuses) == len(clusters)
+        assert all(stat == os.EX_OK for stat in exit_statuses)
 
     bibauthor_print("Preparing cluster sets.")
     clusters, lnames, sizes = delayed_cluster_sets_from_personid(pure, last_run)
@@ -106,6 +112,7 @@ def tortoise(pure=False,
         clusters,
         sizes)
     assert len(exit_statuses) == len(clusters)
+    assert all(stat == os.EX_OK for stat in exit_statuses)
 
 
 def tortoise_last_name(name, from_mark=False, pure=False):
@@ -178,7 +185,7 @@ def schedule_create_matrix(cluster_sets, sizes, force):
 
     return schedule(map(create_job, cluster_sets),
                     sizes,
-                    Estimator(matrix_coefs),
+                    create_approx_func(matrix_coefs),
                     memfile_path)
 
 
@@ -197,5 +204,5 @@ def schedule_wedge_and_store(cluster_sets, sizes):
 
     return schedule(map(create_job, cluster_sets),
                     sizes,
-                    Estimator(wedge_coefs),
+                    create_approx_func(matrix_coefs),
                     memfile_path)

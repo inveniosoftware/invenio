@@ -136,13 +136,15 @@ RABBIT_USE_EXTERNAL_ID_INSPIREID = CFG_INSPIRE_SITE
 
 #Force rabbit to cache entire marc tables instead of querying db if dealing with more
 #then threshold papers
-RABBIT_USE_CACHED_GET_GROUPED_RECORDS_THRESHOLD = 500
+RABBIT_USE_CACHED_GET_GROUPED_RECORDS = True
+RABBIT_USE_CACHED_GET_GROUPED_RECORDS_THRESHOLD = 1000
 
 
 #Cache the personid table for performing exact name searches?
-RABBIT_USE_CACHED_PID_FOR_EXACT_NAME_SEARCH = True
+RABBIT_USE_CACHED_PID = True
 
-#Collect external ids from and store them as person attributes only from manually claimed papers?
+#Collect (external ids from and store them as person attributes) _only_ from manually claimed papers?
+#If false, collects even from non claimed papers.
 LIMIT_EXTERNAL_IDS_COLLECTION_TO_CLAIMED_PAPERS = False
 
 
