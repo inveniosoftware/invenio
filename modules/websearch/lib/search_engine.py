@@ -6013,23 +6013,22 @@ def prs_search_common(kwargs=None, req=None, of=None, cc=None, ln=None, uid=None
 
 
     if len(results_in_any_collection) == 0 and not kwargs['hosted_colls_actual_or_potential_results_p']:
-        if of.startswith("h"):
-            perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose,
-                                                       ln, kwargs['selected_external_collections_infos'], em=em)
-        elif of.startswith("x"):
+        if of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
             print_records_epilogue(req, of)
-        return page_end(req, of, ln, em)
-
+        return None
 
     # store this search query results into search results cache if needed:
     prs_store_results_in_cache(query_representation_in_cache, results_in_any_collection, **kwargs)
 
     # search stage 4 and 5: intersection with collection universe and sorting/limiting
-    output = prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection, kwargs=kwargs, **kwargs)
-    if output is not None:
-        return output
+    try:
+        output = prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection, kwargs=kwargs, **kwargs)
+        if output is not None:
+            return output
+    except Exception: # no results to display
+        return None
 
     t2 = os.times()[4]
     cpu_time = t2 - t1
@@ -6051,15 +6050,12 @@ def prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection,
 
     # another external search if we still don't have something
     if results_final == {} and not kwargs['hosted_colls_actual_or_potential_results_p']:
-        if of.startswith("h"):
-            perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose,
-                                                       ln, kwargs['selected_external_collections_infos'], em=em)
         if of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
             print_records_epilogue(req, of)
         kwargs['results_final'] = results_final
-        return page_end(req, of, ln, em)
+        raise Exception
 
     # search stage 5: apply search option limits and restrictions:
     output = prs_apply_search_limits(results_final, kwargs=kwargs, **kwargs)
