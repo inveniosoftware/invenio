@@ -23,6 +23,7 @@
 __revision__ = "$Id$"
 
 try:
+    from invenio.flaskshell import *
     from invenio.webaccessadmin_lib import main
 except ImportError, e:
     print "Error: %s" % e

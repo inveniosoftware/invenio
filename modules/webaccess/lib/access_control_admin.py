@@ -86,7 +86,7 @@ def acc_add_action(name_action='', description='', optional='no',
 
     # insert the new entry
     try:
-        a = AccACTION(name=name_action, decription=description,
+        a = AccACTION(name=name_action, description=description,
                       allowedkeywords=keystr, optional=optional)
         db.session.add(a)
         db.session.commit()

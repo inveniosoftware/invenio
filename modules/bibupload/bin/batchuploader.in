@@ -37,6 +37,7 @@ Batch Uploader: Batch uploading of metadata and documents.
 """
 
 try:
+    from invenio.flaskshell import *
     from invenio.batchuploader import main
 except ImportError, e:
     print "Error: %s" % e

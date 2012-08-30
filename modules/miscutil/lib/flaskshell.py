@@ -1,8 +1,7 @@
-#!@PYTHON@
-## -*- mode: python; coding: utf-8; -*-
-
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,16 +17,23 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Administers the WebStat framework by creating/deleting custom events as well as triggering caching of event raw data."""
+"""
+This module implement a helper for interactive shell or commandline tools.
+"""
 
-__revision__ = "$Id$"
+# STEP 1 - Import Invenio Flask Application constructor and database object.
+from invenio.webinterface_handler_flask import create_invenio_flask_app
+from invenio.sqlalchemyutils import db
 
-try:
-    from invenio.flaskshell import *
-    from invenio.webstatadmin import main
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+# STEP 2 - Create application object and initialize database.
+app = create_invenio_flask_app()
+db.init_invenio()
+db.init_cfg(app)
+db.init_app(app)
 
-main()
+# STEP 3 - Create fake application request context and use it.
+ctx = app.test_request_context()
+ctx.push()
+# For explanation see: http://flask.pocoo.org/docs/shell/#firing-before-after-request
+app.preprocess_request()
+

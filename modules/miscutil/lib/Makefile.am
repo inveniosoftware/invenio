@@ -91,6 +91,7 @@ pylib_DATA = __init__.py \
              sequtils_cnum.py \
              sequtils.py \
              sequtils_regression_tests.py \
+	     flaskshell.py \
 	     wtforms_utils.py
 
 noinst_DATA = testimport.py \

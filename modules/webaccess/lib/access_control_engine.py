@@ -52,14 +52,18 @@ def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **argum
     authorization will be granted.
     Returns (0, msg) when the authorization is granted, (1, msg) when it's not.
     """
-    if type(req) is not int:
+    from flask import current_app
+    current_app.logger.info(req)
+    current_app.logger.info(type(req))
+    if type(req) not in [int, long]:
         req = current_user.get_id()
+    current_app.logger.info(req)
     user_info = collect_user_info(req) #FIXME
     roles = acc_find_possible_roles(name_action, always_add_superadmin=False, **arguments)
-    from flask import current_app
     current_app.logger.info(user_info)
     current_app.logger.info(roles)
     roles.add(CFG_SUPERADMINROLE_ID)
+
     if acc_is_user_in_any_role(user_info, roles):
         ## User belong to at least one authorized role
         ## or User is SUPERADMIN

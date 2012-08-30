@@ -25,6 +25,7 @@ Guest user sessions garbage collector.  To be run via cron once per day. (say)
 __revision__ = "$Id$"
 
 try:
+    from invenio.flaskshell import *
     from invenio.inveniogc import main
 except ImportError, e:
     print "Error: %s" % e

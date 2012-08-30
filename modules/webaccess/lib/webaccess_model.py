@@ -28,6 +28,7 @@ from invenio.sqlalchemyutils import db
 
 from invenio.websession_model import User
 
+db.Model.__table_args__ = {'useexisting':True}
 class AccACTION(db.Model):
     """Represents a AccACTION record."""
     __tablename__ = 'accACTION'

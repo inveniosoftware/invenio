@@ -24,6 +24,7 @@ __revision__ = "$Id$"
 
 try:
     import sys
+    from invenio.flaskshell import *
     from invenio.config import *
     from invenio.access_control_engine import acc_authorize_action
     from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS

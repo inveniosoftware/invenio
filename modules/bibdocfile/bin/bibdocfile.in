@@ -24,6 +24,7 @@ BibDocFile CLI tool.
 __revision__ = "$Id$"
 
 try:
+    from invenio.flaskshell import *
     from invenio.bibdocfilecli import main
 except ImportError, e:
     print "Error: %s" % e

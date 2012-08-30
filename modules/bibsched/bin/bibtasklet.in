@@ -25,6 +25,7 @@ function dropped into /opt/cds-invenio/lib/python/invenio/bibsched_tasklets/.
 """
 
 try:
+    from invenio.flaskshell import *
     from invenio.bibtasklet import main
 except ImportError, e:
     print "Error: %s" % e

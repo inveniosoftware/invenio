@@ -25,6 +25,7 @@ __revision__ = "$Id$"
 try:
     import sys
     import getopt
+    from invenio.flaskshell import *
     from invenio.config import CFG_VERSION, CFG_SITE_SUPPORT_EMAIL
     from invenio.alert_engine import run_alerts
     from time import time

@@ -35,6 +35,7 @@ Run-Unoconv-as-nobody wrapper.
 ### Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 ### Copyright 2007-2010 Dag Wieers <dag@wieers.com>
 
+
 from distutils.version import LooseVersion
 import getopt
 import glob
@@ -45,6 +46,7 @@ import time
 import signal
 import errno
 
+from invenio.flaskshell import *
 from invenio.websubmit_file_converter import CFG_OPENOFFICE_TMPDIR
 
 CFG_SOFFICE_PID = os.path.join(CFG_OPENOFFICE_TMPDIR, 'soffice.pid')

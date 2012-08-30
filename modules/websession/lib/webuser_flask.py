@@ -172,6 +172,8 @@ class UserInfo(GuestUser):
         current_app.logger.info("Login UserInfo ...")
         from invenio.websession_model import User
         user = User.query.get(session.uid)
+        if user is None:
+            return
         self['id'] = user.id or None
         self['nickname'] = user.nickname or ''
         self['email'] = user.email or ''

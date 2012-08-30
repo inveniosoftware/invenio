@@ -178,6 +178,7 @@ class PasswordComparator(Comparator):
             return hashlib.md5(password).digest()
         email = self.__clause_element__().table.columns.email
         return db.func.aes_encrypt(email, password)
+
 try:
     from flask.ext.sqlalchemy import SQLAlchemy
 except:
@@ -188,13 +189,15 @@ from sqlalchemy.engine.url import URL
 
 class InvenioDB(SQLAlchemy):
     """Invenio database object."""
+
+    PasswordComparator = PasswordComparator
+
     def init_invenio(self, engine=None):
         #               connect_args={'use_unicode':False, 'charset':'utf8'})
         #self.session = scoped_session(sessionmaker(autocommit=False,
         #                                 autoflush=False,
         #                                 bind=self.engine))
 
-        self.PasswordComparator = PasswordComparator
         self.Model.todict = todict
         self.Model.fromdict = fromdict
         self.Model.__iter__ = iterfunc
@@ -230,16 +233,6 @@ class InvenioDB(SQLAlchemy):
             exec("from %s import *"%(m.__name__))
         return schemadiff.getDiffOfModelAgainstDatabase(self.metadata,
             self.engine, excludeTables=excludeTables)
-
-    def console(self):
-        from flask import Flask
-        app = Flask(__name__)
-        self.init_cfg(app)
-        app.config['TESTING'] = True
-        app.config['SQLALCHEMY_ECHO'] = True
-        self.init_app(app)
-        ctx = app.test_request_context()
-        ctx.push()
 
 
 db = InvenioDB()

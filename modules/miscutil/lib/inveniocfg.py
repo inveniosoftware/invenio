@@ -741,11 +741,12 @@ your database tables and related data on filesystem!"""))
         print msg
 
     import shutil
-    from invenio.bibdocfile import _make_base_dir
+    from invenio import flaskshell
+    from flask import current_app
+    current_app.logger.info('Dropping tables')
     from invenio.sqlalchemyutils import db, load_all_model_files
+    from invenio.bibdocfile import _make_base_dir
     from sqlalchemy import event
-    db.init_invenio()
-    db.console()
 
     def bibdoc_before_drop(target, connection, **kw):
         for (docid,) in db.session.query(target.c.id).all():

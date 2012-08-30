@@ -51,6 +51,7 @@ Options:
 """
 
 try:
+    from invenio.flaskshell import *
     from invenio.bibsort_daemon import main
 except ImportError, e:
     print "Error: %s" % e
