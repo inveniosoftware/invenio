@@ -111,7 +111,7 @@ class BibDocsTest(unittest.TestCase):
         """bibdocfile - BibDocs functions"""
         #add file
         my_bibrecdoc = BibRecDocs(2)
-        timestamp1 = datetime.strptime("2011-10-09 08:07:06", "%Y-%m-%d %H:%M:%S")
+        timestamp1 = datetime(*(time.strptime("2011-10-09 08:07:06", "%Y-%m-%d %H:%M:%S")[:6]))
         my_bibrecdoc.add_new_file(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', 'Main', 'img_test', False, 'test add new file', 'test', '.jpg', modification_date=timestamp1)
         my_new_bibdoc = my_bibrecdoc.get_bibdoc("img_test")
         value = my_bibrecdoc.list_bibdocs()
@@ -137,7 +137,7 @@ class BibDocsTest(unittest.TestCase):
         #get file number
         self.assertEqual(my_new_bibdoc.get_file_number(), 1)
         #add file new version
-        timestamp2 = datetime.strptime("2010-09-08 07:06:05", "%Y-%m-%d %H:%M:%S")
+        timestamp2 = datetime(*(time.strptime("2010-09-08 07:06:05", "%Y-%m-%d %H:%M:%S")[:6]))
         my_new_bibdoc.add_file_new_version(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', description= 'the new version', comment=None, format=None, flags=["PERFORM_HIDE_PREVIOUS"], modification_date=timestamp2)
         self.assertEqual(my_new_bibdoc.list_versions(), [1, 2])
         #revert
@@ -183,7 +183,7 @@ class BibDocsTest(unittest.TestCase):
         #delete file
         my_new_bibdoc.delete_file('.jpg', 3)
         #add new format
-        timestamp4 = datetime.strptime("2012-11-10 09:08:07", "%Y-%m-%d %H:%M:%S")
+        timestamp4 = datetime(*(time.strptime("2012-11-10 09:08:07", "%Y-%m-%d %H:%M:%S")[:6]))
         my_new_bibdoc.add_file_new_format(CFG_PREFIX + '/lib/webtest/invenio/test.gif', version=None, description=None, comment=None, format=None, modification_date=timestamp4)
         self.assertEqual(len(my_new_bibdoc.list_all_files()), 2)
         #check modification time
@@ -236,7 +236,7 @@ class BibDocFilesTest(unittest.TestCase):
         """bibdocfile - BibDocFile functions """
         #add bibdoc
         my_bibrecdoc = BibRecDocs(2)
-        timestamp = datetime.strptime("2010-09-08 07:06:05", "%Y-%m-%d %H:%M:%S")
+        timestamp = datetime(*(time.strptime("2010-09-08 07:06:05", "%Y-%m-%d %H:%M:%S")[:6]))
         my_bibrecdoc.add_new_file(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', 'Main', 'img_test', False, 'test add new file', 'test', '.jpg', modification_date=timestamp)
         my_new_bibdoc = my_bibrecdoc.get_bibdoc("img_test")
         my_new_bibdocfile = my_new_bibdoc.list_all_files()[0]

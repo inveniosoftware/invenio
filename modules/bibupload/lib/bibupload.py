@@ -1299,7 +1299,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
             timestamp = field_get_subfield_values(fft, 's')
             if timestamp:
                 try:
-                    timestamp = datetime.strptime(timestamp[0], "%Y-%m-%d %H:%M:%S")
+                    timestamp = datetime(*(time.strptime(timestamp[0], "%Y-%m-%d %H:%M:%S")[:6]))
                 except ValueError:
                     write_message('Warning: The timestamp is not in a good format, thus will be ignored. The format should be YYYY-MM-DD HH:MM:SS')
                     timestamp = ''
