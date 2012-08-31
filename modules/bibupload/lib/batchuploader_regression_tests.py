@@ -56,6 +56,8 @@ class BatchUploaderRobotUploadTests(GenericBibUploadTest):
         self.callback_result_path = os.path.join(CFG_TMPDIR, 'robotupload.json')
         self.callback_url = CFG_SITE_URL + '/httptest/post2?%s' % urlencode({
                     "save": self.callback_result_path})
+        self.oracle_callback_url = CFG_SITE_URL + '/httptest/oraclefriendly?%s' % urlencode({
+                    "save": self.callback_result_path})
         if os.path.exists(self.callback_result_path):
             os.remove(self.callback_result_path)
         self.last_taskid = get_last_taskid()
@@ -87,6 +89,13 @@ class BatchUploaderRobotUploadTests(GenericBibUploadTest):
         self.req_nonce.add_header('Content-Type', 'application/marcxml+xml')
         self.req_nonce.add_header('User-Agent', 'invenio_webupload')
         self.req_nonce.add_data(self.marcxml)
+        self.oracle_url = CFG_SITE_URL + '/batchuploader/robotupload/insert?' + urlencode({
+                'special_treatment': 'oracle',
+                'callback_url': self.oracle_callback_url})
+        self.req_oracle = urllib2.Request(self.oracle_url)
+        self.req_oracle.add_header('Content-Type', 'application/marcxml+xml')
+        self.req_oracle.add_header('User-Agent', 'invenio_webupload')
+        self.req_oracle.add_data(self.marcxml)
         self.legacy_url = CFG_SITE_URL + '/batchuploader/robotupload'
 
     def tearDown(self):
@@ -142,13 +151,29 @@ class BatchUploaderRobotUploadTests(GenericBibUploadTest):
         def test_insert_with_nonce(self):
             """batchuploader - robotupload insert with nonce"""
             result = urllib2.urlopen(self.req_nonce).read()
-            self.failUnless("[INFO]" in result)
+            self.failUnless("[INFO]" in result, '"%s" did not contained "[INFO]"' % result)
             current_task = get_last_taskid()
             run_shell_command("%s/bibupload %%s" % CFG_BINDIR, [str(current_task)])
             results = json.loads(open(self.callback_result_path).read())
-            self.failUnless('results' in results, '"%s" did not contained [INFO]' % result)
+            self.failUnless('results' in results, '"%s" did not contained "results" key' % results)
             self.assertEqual(len(results['results']), 1)
             self.assertEqual(results['nonce'], "1234")
+            self.failUnless(results['results'][0]['success'])
+            self.failUnless(results['results'][0]['recid'] > 0)
+            self.failUnless("""<subfield code="a">Doe, John</subfield>""" in results['results'][0]['marcxml'], results['results'][0]['marcxml'])
+
+        def test_insert_with_oracle(self):
+            """batchuploader - robotupload insert with oracle special treatment"""
+            import os
+            if os.path.exists('/opt/invenio/var/log/invenio.err'):
+                os.remove('/opt/invenio/var/log/invenio.err')
+            result = urllib2.urlopen(self.req_oracle).read()
+            self.failUnless("[INFO]" in result, '"%s" did not contained "[INFO]"' % result)
+            current_task = get_last_taskid()
+            run_shell_command("%s/bibupload %%s" % CFG_BINDIR, [str(current_task)])
+            results = json.loads(open(self.callback_result_path).read())
+            self.failUnless('results' in results, '"%s" did not contained "results" key' % results)
+            self.assertEqual(len(results['results']), 1)
             self.failUnless(results['results'][0]['success'])
             self.failUnless(results['results'][0]['recid'] > 0)
             self.failUnless("""<subfield code="a">Doe, John</subfield>""" in results['results'][0]['marcxml'], results['results'][0]['marcxml'])
@@ -174,6 +199,7 @@ class BatchUploaderRobotUploadTests(GenericBibUploadTest):
                     os.remove(curl_input_file)
 
             def test_legacy_insert_via_curl(self):
+                """batchuploader - robotupload legacy insert via CLI curl"""
                 curl_input_file = os.path.join(CFG_TMPDIR, 'curl_test.xml')
                 open(curl_input_file, "w").write(self.marcxml)
                 try:

@@ -36,6 +36,7 @@ import copy
 import tempfile
 import urlparse
 import urllib2
+import urllib
 
 from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_REFERENCE_TAG, \
@@ -95,6 +96,8 @@ stat['nb_holdingpen'] = 0
 stat['exectime'] = time.localtime()
 
 _WRITING_RIGHTS = None
+
+CFG_BIBUPLOAD_ALLOWED_SPECIAL_TREATMENTS = ('oracle', )
 
 ## Let's set a reasonable timeout for URL request (e.g. FFT)
 socket.setdefaulttimeout(40)
@@ -1977,6 +1980,9 @@ Examples:
   --callback-url\tSend via a POST request a JSON-serialized answer (see admin guide), in
 \t\t\torder to provide a feedback to an external service about the outcome of the operation.
   --nonce\t\twhen used together with --callback add the nonce value in the JSON message.
+  --special-treatment=MODE\tif "oracle" is specified, when used together with --callback_url,
+\t\t\tPOST an application/x-www-form-urlencoded request where the JSON message is encoded
+\t\t\tinside a form field called "results".
 """,
             version=__revision__,
             specific_params=("ircazdS:fno",
@@ -1994,7 +2000,8 @@ Examples:
                    "pretend",
                    "force",
                    "callback-url=",
-                   "nonce="
+                   "nonce=",
+                   "special-treatment=",
                  ]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_run_fnc=task_run_core)
@@ -2095,6 +2102,13 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         task_set_option('callback_url', value)
     elif key in ("--nonce", ):
         task_set_option('nonce', value)
+    elif key in ("--special-treatment", ):
+        if value.lower() in CFG_BIBUPLOAD_ALLOWED_SPECIAL_TREATMENTS:
+            if value.lower() == 'oracle':
+                task_set_option('oracle_friendly', True)
+        else:
+            print >> sys.stderr, """The specified value is not in the list of allowed special treatments codes: %s""" % CFG_BIBUPLOAD_ALLOWED_SPECIAL_TREATMENTS
+            return False
     else:
         return False
     return True
@@ -2150,10 +2164,15 @@ def post_results_to_callback_url(results, callback_url):
         opener = urllib2.build_opener(urllib2.HTTPSHandler)
     else:
         raise ValueError("Scheme not handled %s for callback_url %s" % (scheme, callback_url))
-    request = urllib2.Request(callback_url, data=json_results)
-    request.add_header('Content-Type', 'application/json')
+    if task_get_option('oracle_friendly'):
+        request = urllib2.Request(callback_url, data=urllib.urlencode({'results': json_results}))
+        request.add_header('User-Agent', make_user_agent_string('BibUpload'))
+        request.add_header('Content-Type', 'application/x-www-form-urlencoded')
+    else:
+        request = urllib2.Request(callback_url, data=json_results)
+        request.add_header('Content-Type', 'application/json')
+        request.get_method = lambda: 'POST'
     request.add_header('User-Agent', make_user_agent_string('BibUpload'))
-    request.get_method = lambda: 'POST'
     return opener.open(request)
 
 def task_run_core():

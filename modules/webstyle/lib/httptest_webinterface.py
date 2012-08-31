@@ -33,7 +33,7 @@ from invenio.webinterface_handler import WebInterfaceDirectory, wash_urlargd
 from invenio.urlutils import redirect_to_url
 
 class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
-    _exports = ["", "post1", "post2", "sso", "dumpreq", "complexpost", "whatismyip"]
+    _exports = ["", "post1", "post2", "sso", "dumpreq", "complexpost", "whatismyip", "oraclefriendly"]
 
     def __call__(self, req, form):
         redirect_to_url(req, CFG_SITE_URL + '/httptest/post1')
@@ -100,6 +100,20 @@ class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
         if argd['save'] and argd['save'].startswith(CFG_TMPDIR):
             open(argd['save'], "w").write(open(path).read())
         return stream_file(req, path, mime=mimetype)
+
+    def oraclefriendly(self, req, form):
+        """
+        This specifically for batchuploader with the oracle-friendly patch
+        """
+        from invenio.webinterface_handler_wsgi_utils import handle_file_post
+        from invenio.bibdocfile import stream_file
+        argd = wash_urlargd(form, {"save": (str, ""), "results": (str, "")})
+        if req.method != 'POST':
+            body = """<p>Please send a FORM via POST.</p>"""
+            return page("test2", body=body, req=req)
+        if argd['save'] and argd['save'].startswith(CFG_TMPDIR):
+            open(argd['save'], "w").write(argd['results'])
+        return argd['results']
 
     def complexpost(self, req, form):
         body = """
