@@ -29,7 +29,6 @@ pylib_DATA = webmessage.py \
              webmessage_webinterface.py \
              webmessage_regression_tests.py \
              webmessage_unit_tests.py \
-             webmessage_tests.py \
              webmessage_web_tests.py \
              webmessage_blueprint.py
 
