@@ -176,7 +176,8 @@ def email_alert(mapper, connection, target):
                     **kwargs)
 
     for u in m.recipients:
-        if u.settings.get('webmessage_email_alert', True):
+        if isinstance(u.settings, dict) and \
+            u.settings.get('webmessage_email_alert', True):
             alert(
                 CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,
                 u.email,

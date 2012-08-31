@@ -30,9 +30,14 @@ from invenio.dbquery import serialize_via_marshal, deserialize_via_marshal
 #TODO Consider using standard cPickle or pickle
 #     (then just remove pickler=MarshalPickle()).
 class MarshalPickle(object):
+    def __init__(self, set_empty=False):
+        self.set_empty = set_empty
+
     def dumps(self, obj, protocol=None):
         if obj is not None:
             obj = serialize_via_marshal(obj)
+        elif self.set_empty:
+            obj = serialize_via_marshal({})
         return obj
 
     def loads(self, obj):
@@ -55,7 +60,7 @@ class User(db.Model):
                 server_default='')
     _password = db.Column(db.LargeBinary, name="password", nullable=False)
     note = db.Column(db.String(255), nullable=True)
-    settings = db.Column(db.PickleType(pickler=MarshalPickle()),
+    settings = db.Column(db.PickleType(pickler=MarshalPickle(set_empty=True)),
                          nullable=True)
     nickname = db.Column(db.String(255), nullable=False,
                 server_default='')
