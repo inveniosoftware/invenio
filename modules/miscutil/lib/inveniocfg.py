@@ -617,14 +617,15 @@ the above error message and fix the problem before continuing.""" % \
     ## possible Python/MySQL/MySQLdb mis-setup:
     print "Testing Python/MySQL/MySQLdb UTF-8 chain...",
     try:
-        beta_in_utf8 = "β" # Greek beta in UTF-8 is 0xCEB2
-        run_sql("CREATE TEMPORARY TABLE test__invenio__utf8 (x char(1), y varbinary(2)) DEFAULT CHARACTER SET utf8")
-        run_sql("INSERT INTO test__invenio__utf8 (x, y) VALUES (%s, %s)", (beta_in_utf8, beta_in_utf8))
-        res = run_sql("SELECT x,y,HEX(x),HEX(y),LENGTH(x),LENGTH(y),CHAR_LENGTH(x),CHAR_LENGTH(y) FROM test__invenio__utf8")
-        assert res[0] == ('\xce\xb2', '\xce\xb2', 'CEB2', 'CEB2', 2L, 2L, 1L, 2L)
-        run_sql("DROP TEMPORARY TABLE test__invenio__utf8")
-    except Exception, err:
-        print wrap_text_in_a_box("""\
+        try:
+            beta_in_utf8 = "β" # Greek beta in UTF-8 is 0xCEB2
+            run_sql("CREATE TABLE test__invenio__utf8 (x char(1), y varbinary(2)) DEFAULT CHARACTER SET utf8 ENGINE=MyISAM;")
+            run_sql("INSERT INTO test__invenio__utf8 (x, y) VALUES (%s, %s)", (beta_in_utf8, beta_in_utf8))
+            res = run_sql("SELECT x,y,HEX(x),HEX(y),LENGTH(x),LENGTH(y),CHAR_LENGTH(x),CHAR_LENGTH(y) FROM test__invenio__utf8")
+            assert res[0] == ('\xce\xb2', '\xce\xb2', 'CEB2', 'CEB2', 2L, 2L, 1L, 2L)
+            run_sql("DROP TABLE test__invenio__utf8")
+        except Exception, err:
+            print wrap_text_in_a_box("""\
 DATABASE RELATED ERROR %s\n
 
 A problem was detected with the UTF-8 treatment in the chain
@@ -635,7 +636,9 @@ versions of some prerequisite packages?\n
 Please check the INSTALL file and please fix this problem
 before continuing.""" % err)
 
-        sys.exit(1)
+            sys.exit(1)
+    finally:
+        run_sql("DROP TABLE IF EXISTS test__invenio__utf8")
     print "ok"
 
 def cli_cmd_create_tables(conf):

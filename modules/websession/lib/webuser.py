@@ -67,7 +67,7 @@ try:
 except ImportError:
     pass
 from invenio.dbquery import run_sql, OperationalError, \
-    serialize_via_marshal, deserialize_via_marshal
+    serialize_via_marshal, deserialize_via_marshal, CFG_DATABASE_DANGEROUS_LOCKING
 from invenio.access_control_admin import acc_get_role_id, acc_get_action_roles, acc_get_action_id, acc_is_user_in_role, acc_find_possible_activities
 from invenio.access_control_mailcookie import mail_cookie_create_mail_activation
 from invenio.access_control_firerole import acc_firerole_check_user, load_role_definition
@@ -524,8 +524,14 @@ def merge_usera_into_userb(id_usera, id_userb):
     preferencea.update(preferenceb)
     set_user_preferences(id_userb, preferencea)
     try:
-        for table, dummy in CFG_WEBUSER_USER_TABLES:
-            run_sql("LOCK TABLE %s WRITE" % table)
+        if CFG_DATABASE_DANGEROUS_LOCKING:
+            try:
+                raise Exception("You are using MySQL-5.5 or newer. Please consider downgrading MySQL. The current version contains DDL issue which may cause deadlock when trying to lock database tables. Locking is now disabled.")
+            except Exception:
+                register_exception(alert_admin=True)
+        else:
+            for table, dummy in CFG_WEBUSER_USER_TABLES:
+                run_sql("LOCK TABLE %s WRITE" % table)
         index = 0
         try:
             for index, (table, column) in enumerate(CFG_WEBUSER_USER_TABLES):
@@ -540,7 +546,8 @@ def merge_usera_into_userb(id_usera, id_userb):
             register_exception(alert_admin=True, prefix=msg)
             raise
     finally:
-        run_sql("UNLOCK TABLES")
+        if not CFG_DATABASE_DANGEROUS_LOCKING:
+            run_sql("UNLOCK TABLES")
 
 def loginUser(req, p_un, p_pw, login_method):
     """It is a first simple version for the authentication of user. It returns the id of the user,

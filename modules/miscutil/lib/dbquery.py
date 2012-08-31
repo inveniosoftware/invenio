@@ -46,6 +46,12 @@ from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, \
     CFG_MISCUTIL_SQL_USE_SQLALCHEMY, \
     CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT
 
+## FIXME: MySQL 5.5 may have DDL issues so let's detect which version
+## we are running on, and let's set CFG_DATABASE_DANGEROUS_LOCKING in case we are
+## running on 5.5, so that client code that has to do things like LOCK
+## can exploit whether it is safe to do so.
+CFG_DATABASE_DANGEROUS_LOCKING = False
+
 if CFG_MISCUTIL_SQL_USE_SQLALCHEMY:
     try:
         import sqlalchemy.pool as pool
@@ -193,14 +199,13 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave
         dbhost = CFG_DATABASE_SLAVE
 
     ### log_sql_query(dbhost, sql, param) ### UNCOMMENT ONLY IF you REALLY want to log all queries
-
     try:
         db = _db_login(dbhost)
         cur = db.cursor()
         gc.disable()
         rc = cur.execute(sql, param)
         gc.enable()
-    except OperationalError: # unexpected disconnect, bad malloc error, etc
+    except (OperationalError, InterfaceError): # unexpected disconnect, bad malloc error, etc
         # FIXME: now reconnect is always forced, we may perhaps want to ping() first?
         try:
             db = _db_login(dbhost, relogin=1)
@@ -208,7 +213,7 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave
             gc.disable()
             rc = cur.execute(sql, param)
             gc.enable()
-        except OperationalError: # again an unexpected disconnect, bad malloc error, etc
+        except (OperationalError, InterfaceError): # unexpected disconnect, bad malloc error, etc
             raise
 
     if string.upper(string.split(sql)[0]) in ("SELECT", "SHOW", "DESC", "DESCRIBE"):
@@ -264,14 +269,14 @@ def run_sql_many(query, params, limit=CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT, run_o
             gc.disable()
             rc = cur.executemany(query, params[i:i + limit])
             gc.enable()
-        except OperationalError:
+        except (OperationalError, InterfaceError):
             try:
                 db = _db_login(dbhost, relogin=1)
                 cur = db.cursor()
                 gc.disable()
                 rc = cur.executemany(query, params[i:i + limit])
                 gc.enable()
-            except OperationalError:
+            except (OperationalError, InterfaceError):
                 raise
         ## collect its result:
         if r is None:
@@ -445,3 +450,8 @@ def real_escape_string(unescaped_string, run_on_slave=False):
     connection_object = _db_login(dbhost)
     escaped_string = connection_object.escape_string(unescaped_string)
     return escaped_string
+
+try:
+    CFG_DATABASE_DANGEROUS_LOCKING = [int(var) for var in run_sql("SHOW VARIABLES LIKE 'version'")[0][1].split('.')[:2]] >= [5, 5]
+except:
+    pass
