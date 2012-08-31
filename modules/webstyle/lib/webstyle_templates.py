@@ -839,7 +839,6 @@ URI: http://%(host)s%(page)s
                        'record_brief':record_brief}
 
         out = restriction_flag + out
-
         return out
 
     def detailed_record_container_bottom(self, recid, tabs, ln=CFG_SITE_LANG,

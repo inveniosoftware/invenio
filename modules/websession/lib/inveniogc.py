@@ -1,7 +1,7 @@
 ## -*- mode: python; coding: utf-8; -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -113,43 +113,50 @@ def clean_tempfiles():
     write_message("- deleting/gzipping temporary empty/old "
             "BibReformat xml files")
     vstr = task_get_option('verbose') > 1 and '-v' or ''
-    gc_exec_command('find %s -name "rec_fmt_*"'
+    gc_exec_command('find %s %s -name "rec_fmt_*"'
         ' -size 0c -exec rm %s -f {} \;' \
-            % (CFG_TMPDIR, vstr))
-    gc_exec_command('find %s -name "rec_fmt_*"'
+            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, vstr))
+    gc_exec_command('find %s %s -name "rec_fmt_*"'
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_FMT, vstr))
-    gc_exec_command('find %s -name "rec_fmt_*"'
+            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
+               CFG_MAX_ATIME_RM_FMT, vstr))
+    gc_exec_command('find %s %s -name "rec_fmt_*"'
         ' -atime +%s -exec gzip %s -9 {} \;' \
-            % (CFG_TMPDIR, CFG_MAX_ATIME_ZIP_FMT, vstr))
+            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
+               CFG_MAX_ATIME_ZIP_FMT, vstr))
 
     write_message("- deleting/gzipping temporary old "
             "BibHarvest xml files")
-    gc_exec_command('find %s -name "bibharvestadmin.*"'
+    gc_exec_command('find %s %s -name "bibharvestadmin.*"'
         ' -exec rm %s -f {} \;' \
-            % (CFG_TMPDIR, vstr))
-    gc_exec_command('find %s -name "bibconvertrun.*"'
+            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, vstr))
+    gc_exec_command('find %s %s -name "bibconvertrun.*"'
         ' -exec rm %s -f {} \;' \
-            % (CFG_TMPDIR, vstr))
+            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, vstr))
     # Using mtime and -r here to include directories.
-    gc_exec_command('find %s -name "oaiharvest*"'
+    gc_exec_command('find %s %s -name "oaiharvest*"'
         ' -mtime +%s -exec gzip %s -9 {} \;' \
-            % (CFG_TMPDIR, CFG_MAX_ATIME_ZIP_OAI, vstr))
-    gc_exec_command('find %s -name "oaiharvest*"'
-        ' -mtime +%s -exec rm %s -rf {} \;' \
-            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_OAI, vstr))
-    gc_exec_command('find %s -name "oai_archive*"'
-        ' -mtime +%s -exec rm %s -rf {} \;' \
-            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_OAI, vstr))
+            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
+               CFG_MAX_ATIME_ZIP_OAI, vstr))
+    gc_exec_command('find %s %s -name "oaiharvest*"'
+        ' -mtime +%s -exec rm %s -f {} \;' \
+            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
+               CFG_MAX_ATIME_RM_OAI, vstr))
+    gc_exec_command('find %s %s -name "oai_archive*"'
+        ' -mtime +%s -exec rm %s -f {} \;' \
+            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
+               CFG_MAX_ATIME_RM_OAI, vstr))
 
     write_message("- deleting/gzipping temporary old "
             "BibSword files")
-    gc_exec_command('find %s -name "bibsword_*"'
+    gc_exec_command('find %s %s -name "bibsword_*"'
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_BIBSWORD, vstr))
-    gc_exec_command('find %s -name "bibsword_*"'
+            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
+               CFG_MAX_ATIME_RM_BIBSWORD, vstr))
+    gc_exec_command('find %s %s -name "bibsword_*"'
         ' -atime +%s -exec gzip %s -9 {} \;' \
-            % (CFG_TMPDIR, CFG_MAX_ATIME_ZIP_BIBSWORD, vstr))
+            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
+               CFG_MAX_ATIME_ZIP_BIBSWORD, vstr))
 
     # DELETE ALL FILES CREATED DURING VIDEO SUBMISSION
     write_message("- deleting old video submissions")
@@ -159,29 +166,34 @@ def clean_tempfiles():
 
     write_message("- deleting temporary old "
             "RefExtract files")
-    gc_exec_command('find %s -name "refextract_task_*"'
+    gc_exec_command('find %s %s -name "refextract_task_*"'
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_REFEXTRACT, vstr))
+            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
+               CFG_MAX_ATIME_RM_REFEXTRACT, vstr))
 
     write_message("- deleting temporary old bibdocfiles")
-    gc_exec_command('find %s -name "bibdocfile_*"'
+    gc_exec_command('find %s %s -name "bibdocfile_*"'
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_BIBDOC, vstr))
+            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
+               CFG_MAX_ATIME_RM_BIBDOC, vstr))
 
     write_message("- deleting old temporary WebSubmit icons")
-    gc_exec_command('find %s -name "websubmit_icon_creator_*"'
+    gc_exec_command('find %s %s -name "websubmit_icon_creator_*"'
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_ICON, vstr))
+            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
+               CFG_MAX_ATIME_RM_ICON, vstr))
 
     write_message("- deleting old temporary WebSubmit stamps")
-    gc_exec_command('find %s -name "websubmit_file_stamper_*"'
+    gc_exec_command('find %s %s -name "websubmit_file_stamper_*"'
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_STAMP, vstr))
+            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
+               CFG_MAX_ATIME_RM_STAMP, vstr))
 
     write_message("- deleting old temporary WebJournal XML files")
-    gc_exec_command('find %s -name "webjournal_publish_*"'
+    gc_exec_command('find %s %s -name "webjournal_publish_*"'
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_WEBJOURNAL_XML, vstr))
+            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
+               CFG_MAX_ATIME_RM_WEBJOURNAL_XML, vstr))
 
     write_message("- deleting old temporary files attached with CKEditor")
     gc_exec_command('find %s/var/tmp/attachfile/ '

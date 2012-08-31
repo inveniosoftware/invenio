@@ -25,7 +25,6 @@ pylib_DATA = \
 	bibauthorid_personid_maintenance.py \
 	bibauthorid_scheduler.py \
 	bibauthorid_tortoise.py \
-	__init__.py \
 	bibauthorid_cluster_set.py \
 	bibauthorid_dbinterface.py \
 	bibauthorid_matrix_optimization.py \
@@ -44,7 +43,8 @@ pylib_DATA = \
 	bibauthorid_name_utils.py \
 	bibauthorid_recipes.py \
 	bibauthorid_templates.py \
-	bibauthorid_wedge.py
+	bibauthorid_wedge.py \
+	bibauthorid_webauthorprofileinterface.py
 
 jsdir=$(localstatedir)/www/js
 

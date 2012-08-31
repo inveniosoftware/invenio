@@ -41,7 +41,7 @@ class WebInterfaceDumbPages(WebInterfaceDirectory):
         try:
             from invenio.webpage import page
         except ImportError:
-            page = lambda *args: args[1]
+            page = lambda * args: args[1]
         req.status = apache.HTTP_INTERNAL_SERVER_ERROR
         msg = "<p>This functionality is experiencing a temporary failure.</p>"
         msg += "<p>The administrator has been informed about the problem.</p>"
@@ -68,12 +68,6 @@ try:
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceSearchInterfacePages = WebInterfaceDumbPages
-
-try:
-    from invenio.websearch_webinterface import WebInterfaceAuthorPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceAuthorPages = WebInterfaceDumbPages
 
 try:
     from invenio.websearch_webinterface import WebInterfaceRSSFeedServicePages
@@ -235,6 +229,13 @@ except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceBibSchedPages = WebInterfaceDumbPages
 
+try:
+    from invenio.webauthorprofile_webinterface import WebAuthorPages
+    WebInterfaceWebAuthorPages = WebAuthorPages
+except:
+    register_exception(alert_admin=True, subject='EMERGENCY')
+    WebInterfaceWebAuthorPages = WebInterfaceDumbPages
+
 if CFG_OPENAIRE_SITE:
     try:
         from invenio.openaire_deposit_webinterface import \
@@ -269,7 +270,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     the other modules."""
 
     _exports = WebInterfaceSearchInterfacePages._exports + \
-        WebInterfaceAuthorPages._exports + [
+        [
         'youraccount',
         'youralerts',
         'yourbaskets',
@@ -294,7 +295,8 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'bibsword',
         'person',
         'admin2',
-        'linkbacks'
+        'linkbacks',
+        'author'
         ] + test_exports + openaire_exports
 
     def __init__(self):
@@ -304,7 +306,6 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         if CFG_OPENAIRE_SITE:
             self.deposit = WebInterfaceOpenAIREDepositPages()
 
-    author = WebInterfaceAuthorPages()
     submit = WebInterfaceSubmitPages()
     youraccount = WebInterfaceYourAccountPages()
     youralerts = WebInterfaceYourAlertsPages()
@@ -329,6 +330,9 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     bibsword = WebInterfaceSword()
     person = WebInterfaceBibAuthorIDPages()
     linkbacks = WebInterfaceRecentLinkbacksPages()
+    #redirects author to the new webauthor
+    author = WebInterfaceWebAuthorPages()
+    #author = WebInterfaceAuthorPages()
 
 # This creates the 'handler' function, which will be invoked directly
 # by mod_python.

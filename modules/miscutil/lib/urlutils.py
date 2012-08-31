@@ -141,7 +141,7 @@ def redirect_to_url(req, url, redirection_type=None, norobot=False):
     if norobot:
         req.headers_out["X-Robots-Tag"] = "noarchive, nosnippet, noindex, nocache"
 
-    user_agent = req.headers_in.get('User-Agent')
+    user_agent = req.headers_in.get('User-Agent', '')
     if 'Microsoft Office Existence Discovery' in user_agent or 'ms-office' in user_agent:
         ## HACK: this is to workaround Microsoft Office trying to be smart
         ## when users click on URLs in Office documents that require

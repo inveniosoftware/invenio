@@ -182,6 +182,8 @@ def force_webcoll(recid):
     reload(websearch_webcoll)
     index_id, index_name, index_tags = bibindex_engine.get_word_tables("collection")[0]
     bibindex_engine.WordTable(index_name, index_id, index_tags, "idxWORD%02dF", default_get_words_fnc=bibindex_engine.get_words_from_phrase, tag_to_words_fnc_map={'8564_u': bibindex_engine.get_words_from_fulltext}).add_recIDs([[recid, recid]], 1)
+    #sleep 1s to make sure all tables are ready
+    time.sleep(1)
     c = websearch_webcoll.Collection()
     c.calculate_reclist()
     c.update_reclist()
@@ -4317,6 +4319,173 @@ allow any</subfield>
 
         self.assertEqual(test_web_page_content(testrec_expected_url, 'hyde', 'h123yde', expected_text='Authorization failure'), [])
         self.assertEqual(test_web_page_content(testrec_expected_url, 'jekyll', 'j123ekyll', expected_text=expected_content_version), [])
+
+
+    def test_simple_fft_insert_with_modification_time(self):
+        """bibupload - simple FFT insert with modification time"""
+        # define the test case:
+        test_to_upload = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="980" ind1=" " ind2=" ">
+          <subfield code="a">ARTICLE</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
+          <subfield code="s">2006-05-04 03:02:01</subfield>
+         </datafield>
+        </record>
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
+        testrec_expected_xm = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
+         </datafield>
+         <datafield tag="980" ind1=" " ind2=" ">
+          <subfield code="a">ARTICLE</subfield>
+         </datafield>
+        </record>
+        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_hm = """
+        001__ 123456789
+        003__ SzGeCERN
+        100__ $$aTest, John$$uTest University
+        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
+        980__ $$aARTICLE
+        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        testrec_expected_url2 = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        # insert test record:
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        err, recid, msg = bibupload.bibupload(recs[0], opt_mode='insert')
+        # replace test buffers with real recid of inserted test record:
+        testrec_expected_xm = testrec_expected_xm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_hm = testrec_expected_hm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_url = testrec_expected_url.replace('123456789',
+                                                          str(recid))
+        testrec_expected_url2 = testrec_expected_url2.replace('123456789',
+                                                          str(recid))
+        # compare expected results:
+        inserted_xm = print_record(recid, 'xm')
+        inserted_hm = print_record(recid, 'hm')
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
+        self.failUnless(try_url_download(testrec_expected_url))
+        force_webcoll(recid)
+        self.assertEqual(test_web_page_content(testrec_expected_url2, expected_text='<em>04 May 2006, 03:02</em>'), [])
+
+
+    def test_multiple_fft_insert_with_modification_time(self):
+        """bibupload - multiple FFT insert with modification time"""
+        # define the test case:
+        test_to_upload = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="980" ind1=" " ind2=" ">
+          <subfield code="a">ARTICLE</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
+          <subfield code="s">2006-05-04 03:02:01</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%(siteurl)s/img/head.gif</subfield>
+          <subfield code="s">2007-05-04 03:02:01</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%(siteurl)s/%(CFG_SITE_RECORD)s/95/files/9809057.pdf</subfield>
+          <subfield code="s">2008-05-04 03:02:01</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%(prefix)s/var/tmp/demobibdata.xml</subfield>
+          <subfield code="s">2009-05-04 03:02:01</subfield>
+         </datafield>
+        </record>
+        """ % {
+            'prefix': CFG_PREFIX,
+            'siteurl': CFG_SITE_URL,
+            'CFG_SITE_RECORD': CFG_SITE_RECORD,
+        }
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        err, recid, msg = bibupload.bibupload(recs[0], opt_mode='insert')
+        # replace test buffers with real recid of inserted test record:
+        testrec_expected_url = testrec_expected_url.replace('123456789',
+                                                          str(recid))
+        force_webcoll(recid)
+        self.assertEqual(test_web_page_content(testrec_expected_url, expected_text=['<em>04 May 2006, 03:02</em>', '<em>04 May 2007, 03:02</em>', '<em>04 May 2008, 03:02</em>', '<em>04 May 2009, 03:02</em>']), [])
+
+    def test_simple_fft_correct_with_modification_time(self):
+        """bibupload - simple FFT correct with modification time"""
+        # define the test case:
+        test_to_upload = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="980" ind1=" " ind2=" ">
+          <subfield code="a">ARTICLE</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
+          <subfield code="s">2007-05-04 03:02:01</subfield>
+         </datafield>
+        </record>
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
+        test_to_correct = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%(siteurl)s/img/sb.gif</subfield>
+          <subfield code="n">site_logo</subfield>
+          <subfield code="s">2008-05-04 03:02:01</subfield>
+         </datafield>
+        </record>
+        """ % {
+            'siteurl': CFG_SITE_URL
+        }
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        # insert test record:
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        err, recid, msg = bibupload.bibupload(recs[0], opt_mode='insert')
+        # replace test buffers with real recid of inserted test record:
+        testrec_expected_url = testrec_expected_url.replace('123456789',
+                                                          str(recid))
+        test_to_correct = test_to_correct.replace('123456789',
+                                                          str(recid))
+        # correct test record with new FFT:
+        recs = bibupload.xml_marc_to_records(test_to_correct)
+        bibupload.bibupload(recs[0], opt_mode='correct')
+        force_webcoll(recid)
+        self.assertEqual(test_web_page_content(testrec_expected_url, expected_text=['<em>04 May 2008, 03:02</em>']), [])
 
 
 TEST_SUITE = make_test_suite(BibUploadHoldingPenTest,

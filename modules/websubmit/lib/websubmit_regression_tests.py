@@ -25,7 +25,10 @@ import unittest
 import os
 import sys
 from warnings import warn
+from logging import StreamHandler, DEBUG
+from cStringIO import StringIO
 
+from invenio.websubmit_file_converter import get_file_converter_logger
 from invenio.errorlib import register_exception
 from invenio.config import CFG_SITE_URL, CFG_PREFIX, CFG_TMPDIR
 from invenio.testutils import make_test_suite, run_test_suite, \
@@ -158,9 +161,11 @@ class WebSubmitFileConverterTest(unittest.TestCase):
 
     def __init__(self, input_file, from_format, to_format):
         super(WebSubmitFileConverterTest, self).__init__('runTest')
-        from invenio.websubmit_file_converter import get_file_converter_logger
-        from logging import StreamHandler, DEBUG
-        from cStringIO import StringIO
+        self.from_format = from_format
+        self.to_format = to_format
+        self.input_file = input_file
+
+    def setUp(self):
         logger = get_file_converter_logger()
         self.log = StringIO()
         logger.setLevel(DEBUG)
@@ -169,9 +174,7 @@ class WebSubmitFileConverterTest(unittest.TestCase):
         handler = StreamHandler(self.log)
         handler.setLevel(DEBUG)
         logger.addHandler(handler)
-        self.from_format = from_format
-        self.to_format = to_format
-        self.input_file = input_file
+
 
     def shortDescription(self):
         return """websubmit - test %s to %s conversion""" % (self.from_format, self.to_format)

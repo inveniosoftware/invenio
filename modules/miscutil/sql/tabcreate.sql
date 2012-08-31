@@ -3094,6 +3094,7 @@ CREATE TABLE IF NOT EXISTS user_query_basket (
   date_lastrun date default '0000-00-00',
   alert_name varchar(30) NOT NULL default '',
   alert_desc text default NULL,
+  alert_recipient text default NULL,
   notification char(1) NOT NULL default 'y',
   PRIMARY KEY  (id_user,id_query,frequency,id_basket),
   KEY alert_name (alert_name)
@@ -4091,7 +4092,6 @@ CREATE TABLE IF NOT EXISTS collection_bsrMETHOD (
 ) ENGINE=MyISAM;
 
 -- tables for sequence storage
-
 CREATE TABLE IF NOT EXISTS seqSTORE (
   id int(15) NOT NULL auto_increment,
   seq_name varchar(15),
@@ -4164,7 +4164,6 @@ CREATE TABLE IF NOT EXISTS lnkADMINURLLOG (
 ) ENGINE=MyISAM;
 
 -- table for API key
-
 CREATE TABLE IF NOT EXISTS webapikey (
   id varchar(150) NOT NULL,
   secret varchar(150) NOT NULL,
@@ -4176,4 +4175,14 @@ CREATE TABLE IF NOT EXISTS webapikey (
   KEY (status)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS `wapCACHE` (
+  `object_name` varchar(120) NOT NULL,
+  `object_key` varchar(120) NOT NULL,
+  `object_value` longtext,
+  `object_status` varchar(120),
+  `last_updated` datetime NOT NULL,
+  PRIMARY KEY  (`object_name`,`object_key`),
+  INDEX `last_updated-b` (`last_updated`),
+  INDEX `status-b` (`object_status`)
+) ENGINE=MyISAM;
 -- end of file

@@ -1,5 +1,6 @@
+##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2011 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,19 +16,22 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-etcdir = $(sysconfdir)/bibformat/output_formats
+pylibdir = $(libdir)/python/invenio
 
-etc_DATA = HB.bfo HC.bfo HD.bfo HP.bfo HX.bfo XM.bfo EXCEL.bfo \
-	   XD.bfo HS.bfo HA.bfo \
-	   XE.bfo XN.bfo XR.bfo XW.bfo \
-	   XOAIDC.bfo XO.bfo XOAIMARC.bfo \
-	   HDREF.bfo HDFILE.bfo HDACT.bfo XP.bfo BSR.bfo WAPAFF.bfo \
-	   HDM.bfo
+pylib_DATA = webauthorprofile_corefunctions.py \
+	     webauthorprofile_dbapi.py \
+	     webauthorprofile_interface.py \
+	     webauthorprofile_templates.py  \
+	     webauthorprofile_webinterface.py \
+	     webauthorprofile_cli.py \
+	     webauthorprofile_daemon.py
 
-tmpdir = $(prefix)/var/tmp
 
-tmp_DATA = TEST1.bfo TEST2.bfo TEST3.bfo
+jsdir=$(localstatedir)/www/js
 
-EXTRA_DIST = $(etc_DATA) $(tmp_DATA)
+js_DATA = webauthorprofile.js
 
-CLEANFILES = *.tmp
+EXTRA_DIST = $(pylib_DATA) \
+             $(js_DATA)
+
+CLEANFILES = *~ *.tmp *.pyc

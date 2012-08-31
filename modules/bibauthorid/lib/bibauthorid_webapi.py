@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,6 +25,7 @@ Provides utilities to safely interact with stored data.
 import invenio.bibauthorid_config as bconfig
 import invenio.bibauthorid_frontinterface as dbapi
 import invenio.bibauthorid_name_utils as nameapi
+import invenio.webauthorprofile_interface as webauthorapi
 
 import invenio.search_engine as search_engine
 from search_engine import perform_request_search
@@ -1376,6 +1377,7 @@ def execute_action(action, pid, bibref, uid, userinfo='', comment=''):
     #This is the only point which modifies a person, so this can trigger the
     #deletion of a cached page
     dbapi.delete_cached_author_page(pid)
+    webauthorapi.expire_all_cache_for_personid(pid)
 
     return True
 

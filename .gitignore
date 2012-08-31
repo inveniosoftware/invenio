@@ -31,6 +31,7 @@ po/*.sed
 *.sse2f
 *.lib
 *.x86f
+modules/webauthorprofile/bin/webauthorprofile
 modules/bibauthorid/bin/bibauthorid
 modules/bibcirculation/bin/bibcircd
 modules/bibclassify/bin/bibclassify

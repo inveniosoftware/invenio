@@ -29,13 +29,11 @@ __revision__ = "$Id$"
 
 import re
 import zlib
-import shlex
-from subprocess import *
 
 from invenio.config import \
      CFG_OAI_ID_FIELD, \
      CFG_WEBSEARCH_FULLTEXT_SNIPPETS, \
-     CFG_WEBSEARCH_FULLTEXT_SNIPPETS_WORDS, \
+     CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS, \
      CFG_INSPIRE_SITE
 from invenio.dbquery import run_sql
 from invenio.urlutils import string_to_numeric_char_reference
@@ -213,6 +211,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
     if format == "marcxml" or format == "oai_dc":
         out += "  <record>\n"
         out += "   <header>\n"
+
         for identifier in get_fieldvalues(recID, CFG_OAI_ID_FIELD):
             out += "    <identifier>%s</identifier>\n" % identifier
         out += "    <datestamp>%s</datestamp>\n" % get_modification_date(recID)
@@ -576,9 +575,8 @@ def latex_to_html(text):
 
     return text
 
-def get_pdf_snippets(recID, patterns,
-                     nb_words_around=CFG_WEBSEARCH_FULLTEXT_SNIPPETS_WORDS,
-                     max_snippets=CFG_WEBSEARCH_FULLTEXT_SNIPPETS):
+def get_pdf_snippets(recID, patterns):
+
     """
     Extract text snippets around 'patterns' from the newest PDF file of 'recID'
     The search is case-insensitive.
@@ -608,14 +606,21 @@ def get_pdf_snippets(recID, patterns,
                     text_path_courtesy = ''
             break # stop at the first good PDF textable file
 
-    if text_path:
-        out = get_text_snippets(text_path, patterns, nb_words_around, max_snippets)
+    nb_chars = CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS.get('', 0)
+    max_snippets = CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS.get('', 0)
+    if CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS.has_key(text_path_courtesy):
+        nb_chars=CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS[text_path_courtesy]
+    if CFG_WEBSEARCH_FULLTEXT_SNIPPETS.has_key(text_path_courtesy):
+        max_snippets=CFG_WEBSEARCH_FULLTEXT_SNIPPETS[text_path_courtesy]
+
+    if text_path and nb_chars and max_snippets:
+        out = get_text_snippets(text_path, patterns, nb_chars, max_snippets)
         if not out:
             # no hit, so check stemmed versions:
             from invenio.bibindex_engine_stemmer import stem
             stemmed_patterns = [stem(p, 'en') for p in patterns]
-            out = get_text_snippets(text_path, stemmed_patterns,
-                                    nb_words_around, max_snippets, False)
+            out = get_text_snippets(text_path, stemmed_patterns, nb_chars, max_snippets)
+
         if out:
             out_courtesy = ""
             if text_path_courtesy:
@@ -626,199 +631,133 @@ def get_pdf_snippets(recID, patterns,
     else:
         return ""
 
-def get_text_snippets(textfile_path, patterns, nb_words_around, max_snippets, \
-                      right_boundary = True):
+def get_text_snippets(textfile_path, patterns, nb_chars, max_snippets):
     """
-    Extract text snippets around 'patterns' from file found at 'textfile_path'
-    The snippets are meant to look like in the results of the popular search
-    engine: using " ... " between snippets.
+    Extract text snippets around 'patterns' from the file found at
+    'textfile_path'. The snippets are meant to look similar to results of
+    popular Internet search engines: using " ... " between snippets.
     For empty patterns it returns ""
-    The idea is to first produce big snippets with grep and then narrow them
-    using the cut_out_snippet function.
-    TODO: - distinguish the beginning of sentences and try to make the snippets
-    start there
-
-    @param textfile_path: path to a text file to extract snippet from
-    @param patterns: list of patterns to retrieve
-    @param nb_words_around: max number of words around the matched pattern
-    @param max_snippets: max number of snippets to include
-    @param right_boundary: match the right word boundary or not
-    @return: snippet
+    """
+    """
+    TODO: - distinguish the beginning of sentences and make the snippets
+            start there
+          - optimize finding patterns - first search for patterns apperaing next
+            to each other, secondly look for each patten not for first
+            occurances of any pattern
     """
 
     if len(patterns) == 0:
         return ""
 
-    # escape the parenthesis unless there is no space between then (e.g. U(1))
-    # escaping of spaces is done later - only for grepping .
-    escaped_keywords = []
-    for w in patterns:
-        #if there are both '(' and ')' in one word we leave them
-        if w.count('(') or w.count(')'):
-            if re.match("\w*\(\w*\)\w*", w):
-                w1 = w.replace('(', '\(')
-                escaped_keywords.append(w1.replace(')', '\)'))
-            else:
-                w1 = w.replace('(', '')
-                escaped_keywords.append(w1.replace(')', ''))
-        else:
-            escaped_keywords.append(w)
-    # the max number of words that the snippets can have for this record
-    words_left = max_snippets * (nb_words_around * 2 + 1)
-    # Assuming that there will be at least one word per line we can produce the
-    # big snippets like this
-    # FIXME: the ligature replacement should be done at the textification time;
-    # then the sed expression can go away here.
-    sed_cmd = "sed \'s/ﬀ/ff/g; s/ﬁ/fi/g; s/ﬂ/fl/g; s/ﬃ/ffi/g; s/ﬄ/ffl/g\' " \
-              + textfile_path
-    grep_args = [str(nb_words_around), str(nb_words_around), str(max_snippets)]
-    grep_cmd = "grep -i -E -A%s -B%s -m%s"
-    for p in escaped_keywords:
-        grep_cmd += " -e \"(\\b|\\s)\"%s"
-        if right_boundary:
-            grep_cmd += "\"(\\b|\\s)\""
-        # space escaping needed for grepping for phrases
-        grep_args.append(p.replace(' ', '\ '))
-    sed_call = shlex.split(sed_cmd)
-    grep_call = shlex.split(grep_cmd % tuple(grep_args))
-    p1 = Popen(sed_call, stdout=PIPE)
-    p2 = Popen(grep_call, stdin=p1.stdout, stdout=PIPE)
-    output = p2.communicate()[0]
-
+    max_lines = nb_chars / 40 + 2  # rule of thumb in order to catch nb_chars
+    # Produce the big snippets from which the real snippets will be cut out
+    cmd = "grep -i -C%s -m%s"
+    cmdargs = [str(max_lines), str(max_snippets)]
+    for p in patterns:
+        cmd += " -e %s"
+        cmdargs.append(" " + p)
+    cmd += " %s"
+    cmdargs.append(textfile_path)
+    (dummy1, output, dummy2) = run_shell_command(cmd, cmdargs)
+    # a fact to keep in mind with this call to grep is that if patterns appear
+    # in two contigious lines, they will not be separated by '--' and therefore
+    # treated as one 'big snippet'
     result = []
     big_snippets = output.split("--")
 
     # cut the snippets to match the nb_words_around parameter precisely:
     for s in big_snippets:
-        if words_left > 0:
-            #using patterns instead of escaped_keywords to make phase search work
-            #FIXME: parenthesis are not displayed in snippets
-            (small_snippets, words_left) = cut_out_snippet(s, patterns, \
-             nb_words_around, words_left, right_boundary)
-            #count words
-            result += small_snippets
+        small_snippet = cut_out_snippet(s, patterns, nb_chars)
+        result.append(small_snippet)
+
     # combine snippets
     out = ""
     count = 0
     for snippet in result:
         if snippet and count < max_snippets:
             if out:
-                out += "<br>"
-            out += "..." + snippet + "..."
-            count += 1
+                out += "..."
+            out += highlight(snippet, patterns)
+
     return out
 
-
-
-def get_tokens(text):
+def cut_out_snippet(text, patterns, nb_chars):
     """
-    Tokenize the words in the text
-
-    @param text: text to extract token from
-    @return: a list of tokens
+    Cut out one snippet in such a way that it includes at most nb_chars or
+    a few more chars until the end of last word.
+    The snippet can include:
+    - one pattern and "symmetrical" context
+    - several patterns as long as they fit into the nb_chars limit (context
+      is always "symmetrical")
     """
+    # TODO: cut at begin or end of sentence
 
-    b_pattern = '\\W+'
-    tokens = []
-    comp_p_b = re.compile(b_pattern, re.IGNORECASE | re.UNICODE)
-    previous = 0
-    for match in comp_p_b.finditer(text):
-        (s, e) = match.span()
-        if previous < s:
-            tokens.append((previous, s))
-        previous = e
-    return tokens
+    def starts_with_any(word, patterns):
+        # Check whether the word's beginning matches any of the patterns.
+        # The second argument is an array of patterns to match.
 
+        ret = False
+        lower_case = word.lower()
+        for p in patterns:
+            if lower_case.startswith(str(p).lower()):
+                ret = True
+                break
+        return ret
 
-def cut_out_snippet(text, patterns, nb_words_around, max_words, right_boundary = True):
-    """
-    Cut out one ore more snippets, limits to max_words param.
-    The snippet can include many occurances of the patterns if they are not
-    further appart than 2 * nb_words_around.
-
-    @param text: the text to process
-    @param patterns: the patterns to match
-    @param nb_words_around: max number of words around the matched pattern
-    @param max_words: maximum number of words in the snippet
-    @param right_boundary: match the right word boundary or not
-    @return: a tuple (list of snippets, max_words (?))
-    """
-
-    #index in 'matches'
-    next_pattern = 0
-    #get token representing words in text
-    tokens = get_tokens(text)
-
-    #Build a pattern of the kind keyword1 | keyword2 | keyword3
-    if right_boundary:
-        pattern = '(\\b)(' + '|'.join(patterns) + ')(\\b)'
-    else:
-        pattern = '(\\b)(' + '|'.join(patterns) + ')'
-    compiled_pattern = re.compile(pattern, re.IGNORECASE | re.UNICODE)
-
-    matches = []
-    for x in compiled_pattern.finditer(text):
-        matches.append((x.start(), x.end()))
-
-    def matches_any(index):
-        """
-        Is text[index] a beginning of a pattern?
-        """
-        if next_pattern < len(matches) and tokens[index][0] == matches[next_pattern][0]:
-            return True
-        else:
-            return False
-
-    snippets = []
     snippet = ""
-    last_written_word = -1
+    suffix = ""
+    words = text.split()
+
+    # Stage 1:
+    # Creating the snipper core starts and finishes with a matched pattern
+    # The idea is to find a pattern occurance, then go on creating a suffix until
+    # the next pattern is found. Then the suffix is added to the snippet
+    # unless the loop brakes before due to suffix being to long.
     i = 0
-    # next_pattern was set above
-    #FIXME: it would be better to generate all matching snippets and then score them,
-    #choose the most relevant ones.
-    while i < len(tokens) and max_words > 3:
-
-        (s, e) = tokens[i]
-        # For the last snippet for this record:
-        # make the nb_words_around smaller if required by max_words
-        # to make sure that at least one pattern is included
-        while nb_words_around * 2 + 1 > max_words:
-            nb_words_around -= 1
-
-        #can be first or a following pattern in this snippet
-        if matches_any(i):
-            (sm,em) = matches[next_pattern]
-            #move pointer
-            next_pattern += 1
-            # add part before first or following occurance of a word
-            j = max(last_written_word + 1, i - nb_words_around)
-            snippet += ' ' + text[tokens[j][0]:tokens[i-1][1]]
-            # write the pattern
-            snippet += (" " + text[sm:em])
-            while tokens[i][1] < em:
-                i += 1
-            last_written_word = i
-
-            # write the suffix. If pattern found, break
-            j = 1
-            while j <= nb_words_around and i + j < len(tokens):
-                if matches_any(i+j):
-                    break
-                else:
-                    snippet += (" " + text[tokens[i+j][0]:tokens[i+j][1]])
-                    last_written_word = i + j
-                    j += 1
-            i += j
+    start = -1 # start is an index of the first matched pattern
+    finish = -1 # is an index of the last matched pattern
+    #in this loop, the snippet core always starts and finishes with a matched pattern
+    while i < len(words) and len(snippet) + len(suffix) < nb_chars:
+        matched_word = starts_with_any(words[i], patterns)
+        #if the first pattern was already found
+        if len(snippet) == 0:
+            #first occurance of pattern
+            if matched_word:
+                snippet = words[i]
+                start = i
+                finish = i
+                suffix = ""
         else:
-            i += 1
-        # if the snippet is ready (i.e. we didn't just find a new match)
-        if snippet != "" and i < len(tokens) and not matches_any(i):
-            split_snippet = snippet.split()
-            #temporary rule of a thumb to make sure snippets aren't too long
-            if len(split_snippet) > nb_words_around * 4:
-                snippet = " ".join(split_snippet[0:(nb_words_around * 3)])
-            max_words -= len(snippet.split()) #potentially new length
-            snippets.append(highlight_matches(snippet, compiled_pattern))
-            snippet = ""
+            if matched_word:
+                # there is enough room for this pattern in the snippet because
+                # with previous word the snippet was shorter than nb_chars
+                snippet += suffix + " " + words[i] # suffix starts with a space
+                finish = i
+                suffix = ""
+            else:
+                suffix += " " + words[i]
+        i += 1
 
-    return (snippets, max_words)
+
+    # Stage 2: Wrap the snippet core symetrically up to the nb_chars
+    # if snippet is non-empty, then start and finish will be set before
+    front = True
+    while 0 < len(snippet) < nb_chars:
+        if front and start == 0:
+            front = False
+        else:
+            if not front and finish == len(words) -1:
+                front = True
+
+        if start == 0 and finish == len(words) - 1:
+            break
+
+        if front:
+            snippet = words[start -1] + " " + snippet
+            start -= 1
+            front = False
+        else:
+            snippet += " " + words[finish + 1]
+            finish += 1
+            front = True
+    return snippet

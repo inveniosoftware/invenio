@@ -873,7 +873,7 @@ class BibRecDocs:
             register_exception()
             raise InvenioWebSubmitFileError(str(e))
 
-    def add_new_file(self, fullpath, doctype="Main", docname=None, never_fail=False, description=None, comment=None, format=None, flags=None):
+    def add_new_file(self, fullpath, doctype="Main", docname=None, never_fail=False, description=None, comment=None, format=None, flags=None, modification_date=None):
         """
         Directly add a new file to this record.
 
@@ -924,17 +924,17 @@ class BibRecDocs:
         except InvenioWebSubmitFileError:
             # bibdoc doesn't already exists!
             bibdoc = self.add_bibdoc(doctype, docname, False)
-            bibdoc.add_file_new_version(fullpath, description=description, comment=comment, format=format, flags=flags)
+            bibdoc.add_file_new_version(fullpath, description=description, comment=comment, format=format, flags=flags, modification_date=modification_date)
             self.build_bibdoc_list()
         else:
             try:
-                bibdoc.add_file_new_format(fullpath, description=description, comment=comment, format=format, flags=flags)
+                bibdoc.add_file_new_format(fullpath, description=description, comment=comment, format=format, flags=flags, modification_date=modification_date)
                 self.build_bibdoc_list()
             except InvenioWebSubmitFileError, e:
                 # Format already exist!
                 if never_fail:
                     bibdoc = self.add_bibdoc(doctype, docname, True)
-                    bibdoc.add_file_new_version(fullpath, description=description, comment=comment, format=format, flags=flags)
+                    bibdoc.add_file_new_version(fullpath, description=description, comment=comment, format=format, flags=flags, modification_date=modification_date)
                     self.build_bibdoc_list()
                 else:
                     raise
@@ -979,7 +979,7 @@ class BibRecDocs:
         self.build_bibdoc_list()
         return bibdoc
 
-    def add_new_format(self, fullpath, docname=None, description=None, comment=None, format=None, flags=None):
+    def add_new_format(self, fullpath, docname=None, description=None, comment=None, format=None, flags=None, modification_date=None):
         """
         Adds a new file to an already existent document object as a new
         format.
@@ -1013,7 +1013,7 @@ class BibRecDocs:
         if 'pdfa' in get_subformat_from_format(format).split(';') and not 'PDF/A' in flags:
             flags.append('PDF/A')
         bibdoc = self.get_bibdoc(docname=docname)
-        bibdoc.add_file_new_format(fullpath, description=description, comment=comment, format=format, flags=flags)
+        bibdoc.add_file_new_format(fullpath, description=description, comment=comment, format=format, flags=flags, modification_date=modification_date)
         self.build_bibdoc_list()
         return bibdoc
 
@@ -1644,7 +1644,7 @@ class BibDoc:
             self.touch()
             self._build_file_list()
 
-    def add_file_new_version(self, filename, description=None, comment=None, format=None, flags=None):
+    def add_file_new_version(self, filename, description=None, comment=None, format=None, flags=None, modification_date=None):
         """
         Add a new version of a file. If no physical file is already attached
         to the document a the given file will have version 1. Otherwise the
@@ -1683,6 +1683,8 @@ class BibDoc:
                 try:
                     shutil.copyfile(filename, destination)
                     os.chmod(destination, 0644)
+                    if modification_date: # if the modification time of the file needs to be changed
+                        update_modification_date_of_file(destination, modification_date)
                 except Exception, e:
                     register_exception()
                     raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (filename, destination, e)
@@ -1711,7 +1713,7 @@ class BibDoc:
         run_sql("INSERT INTO bibdocfsinfo(id_bibdoc, version, format, last_version, cd, md, checksum, filesize, mime) VALUES(%s, %s, %s, true, %s, %s, %s, %s, %s)", (self.id, myversion, format, just_added_file.cd, just_added_file.md, just_added_file.get_checksum(), just_added_file.get_size(), just_added_file.mime))
         run_sql("UPDATE bibdocfsinfo SET last_version=false WHERE id_bibdoc=%s AND version<%s", (self.id, myversion))
 
-    def add_file_new_format(self, filename, version=None, description=None, comment=None, format=None, flags=None):
+    def add_file_new_format(self, filename, version=None, description=None, comment=None, format=None, flags=None, modification_date=None):
         """
         Add a file as a new format.
 
@@ -1752,6 +1754,8 @@ class BibDoc:
                 try:
                     shutil.copyfile(filename, destination)
                     os.chmod(destination, 0644)
+                    if modification_date: # if the modification time of the file needs to be changed
+                        update_modification_date_of_file(destination, modification_date)
                 except Exception, e:
                     register_exception()
                     raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (filename, destination, e)
@@ -1915,7 +1919,7 @@ class BibDoc:
                 return docfile
         return None
 
-    def add_icon(self, filename, format=None, subformat=CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT):
+    def add_icon(self, filename, format=None, subformat=CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT, modification_date=None):
         """
         Attaches icon to this document.
 
@@ -1938,7 +1942,7 @@ class BibDoc:
         if subformat:
             format += ";%s" % subformat
 
-        self.add_file_new_format(filename, format=format)
+        self.add_file_new_format(filename, format=format, modification_date=modification_date)
 
     def delete_icon(self, subformat_re=CFG_WEBSUBMIT_ICON_SUBFORMAT_RE):
         """
@@ -3973,6 +3977,22 @@ class HeadRequest(urllib2.Request):
     def get_method(self):
         return 'HEAD'
 
+
+def read_cookie(cookiefile):
+    """
+    Parses a cookie file and returns a string as needed for the urllib2 headers
+    The file should respect the Netscape cookie specifications
+    """
+    cookie_data = ''
+    cfile = open(cookiefile, 'r')
+    for line in cfile.readlines():
+        tokens = line.split('\t')
+        if len(tokens) == 7: # we are on a cookie line
+            cookie_data += '%s=%s; ' % (tokens[5], tokens[6].replace('\n', ''))
+    cfile.close()
+    return cookie_data
+
+
 def open_url(url, headers=None, head_request=False):
     """
     Opens a URL. If headers are passed as argument, no check is performed and
@@ -4008,6 +4028,26 @@ def open_url(url, headers=None, head_request=False):
     request = request_obj(url)
     request.add_header('User-Agent', make_user_agent_string('bibdocfile'))
     for key, value in headers_to_use.items():
+        try:
+            value = globals()[value['fnc']](**value['args'])
+        except (KeyError, TypeError):
+            pass
         request.add_header(key, value)
 
     return urllib2.urlopen(request)
+
+
+def update_modification_date_of_file(filepath, modification_date):
+    """Update the modification time and date of the file with the modification_date
+    @param filepath: the full path of the file that needs to be updated
+    @type filepath: string
+    @param modification_date: the new modification date and time
+    @type modification_date: datetime.datetime object
+    """
+    try:
+        modif_date_in_seconds = time.mktime(modification_date.timetuple()) # try to get the time in seconds
+    except (AttributeError, TypeError):
+        modif_date_in_seconds = 0
+    if modif_date_in_seconds:
+        statinfo = os.stat(filepath) # we need to keep the same access time
+        os.utime(filepath, (statinfo.st_atime, modif_date_in_seconds)) #update the modification time

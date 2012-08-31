@@ -557,6 +557,10 @@ AC_CONFIG_FILES([config.nice  \
      config/Makefile \
      config/invenio-autotools.conf \
      modules/Makefile \
+     modules/webauthorprofile/Makefile \
+     modules/webauthorprofile/lib/Makefile \
+     modules/webauthorprofile/bin/Makefile \
+     modules/webauthorprofile/bin/webauthorprofile \
      modules/bibauthorid/Makefile \
      modules/bibauthorid/bin/Makefile \
      modules/bibauthorid/bin/bibauthorid \
