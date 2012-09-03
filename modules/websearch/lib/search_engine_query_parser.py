@@ -27,7 +27,7 @@ from datetime import datetime
 
 try:
     import dateutil
-    if not hasattr(dateutil, '__version__') or dateutil.__version__.startswith('1.'):
+    if not hasattr(dateutil, '__version__') or dateutil.__version__ != '2.0':
         from dateutil import parser as du_parser
         from dateutil.relativedelta import relativedelta as du_delta
         GOT_DATEUTIL = True
