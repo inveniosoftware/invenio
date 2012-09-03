@@ -323,12 +323,12 @@ install-jquery-tokeninput:
 	rm -rf /tmp/jquery-tokeninput
 	mkdir /tmp/jquery-tokeninput
 	(cd /tmp/jquery-tokeninput && \
-	wget -O jquery-tokeninput.zip 'https://github.com/loopj/jquery-tokeninput/zipball/jquery-tokeninput-1.6.0' && \
+	wget -O jquery-tokeninput.zip 'https://github.com/loopj/jquery-tokeninput/zipball/jquery-tokeninput-1.6.0' --no-check-certificate && \
 	unzip -u jquery-tokeninput.zip && \
 	cp loopj-jquery-tokeninput-201d2d1/styles/token-input-facebook.css ${prefix}/var/www/css/token-input-facebook.css && \
 	cp loopj-jquery-tokeninput-201d2d1/styles/token-input-mac.css ${prefix}/var/www/css/token-input-mac.css && \
 	cp loopj-jquery-tokeninput-201d2d1/styles/token-input.css ${prefix}/var/www/css/token-input.css && \
-	cp loopj-jquery-tokeninput-201d2d1/src/jquery.tokeninput.js ${prefix}/var/www/js/jquery/jquery.tokeninput.js && \
+	cp loopj-jquery-tokeninput-201d2d1/src/jquery.tokeninput.js ${prefix}/var/www/js/jquery.tokeninput.js && \
 	rm -fr /tmp/jquery-tokeninput )
 	@echo "***********************************************************"
 	@echo "** The JQuery Tokeninput was successfully installed.     **"
@@ -338,7 +338,7 @@ uninstall-jquery-tokeninput:
 	rm ${prefix}/var/www/css/token-input-facebook.css && \
 	rm ${prefix}/var/www/css/token-input-mac.css && \
 	rm ${prefix}/var/www/css/token-input.css && \
-	rm ${prefix}/var/www/js/jquery/jquery.tokeninput.js
+	rm ${prefix}/var/www/js/jquery.tokeninput.js
 	@echo "***********************************************************"
 	@echo "** The JQuery Tokeninput was successfully uninstalled.   **"
 	@echo "***********************************************************"
