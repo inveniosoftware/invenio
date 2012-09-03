@@ -50,6 +50,10 @@ class ErrorlibWebPagesAvailabilityTest(unittest.TestCase):
 class ErrorlibRegisterExceptionTest(unittest.TestCase):
     """Check errorlib register_exception functionality."""
 
+    def setUp(self):
+        from invenio.dbquery import run_sql
+        run_sql("DELETE FROM hstEXCEPTION")
+
     def test_simple_register_exception(self):
         """errorlib - simple usage of register_exception"""
         try:
