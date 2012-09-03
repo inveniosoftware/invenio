@@ -143,7 +143,19 @@ def convert_conf_option(option_name, option_value):
                        'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_MISC',
                        'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_DOCTYPES',
                        'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_RESTRICTIONS']:
-        option_value = option_value[1:-1]
+        try:
+            option_value = option_value[1:-1]
+        except TypeError:
+            if option_name in ('CFG_WEBSEARCH_FULLTEXT_SNIPPETS',):
+                print >> sys.stderr, """WARNING: CFG_WEBSEARCH_FULLTEXT_SNIPPETS
+has changed syntax: it can be customised to display different snippets for
+different document types.  See the corresponding documentation in invenio.conf.
+You may want to customise your invenio-local.conf configuration accordingly."""
+                option_value = """{'': %s}""" % option_value
+            else:
+                print >> sys.stderr, "ERROR: type error in %s value %s." % \
+                      (option_name, option_value)
+                sys.exit(1)
 
     ## 3cbis) very special cases: dicts with backward compatible string
     if option_name in ['CFG_BIBINDEX_SPLASH_PAGES']:
