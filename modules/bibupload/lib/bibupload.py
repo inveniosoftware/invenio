@@ -1372,12 +1372,12 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
                         raise
                     if mode == 'correct' and bibdoc is not None and not new_revision_needed:
                         downloaded_urls.append((downloaded_url, format, description, comment, flags, timestamp))
-                        if not bibdoc.check_file_exists(downloaded_url):
+                        if not bibdoc.check_file_exists(downloaded_url, format):
                             new_revision_needed = True
                         else:
                             write_message("WARNING: %s is already attached to bibdoc %s for recid %s" % (url, docname, rec_id), stream=sys.stderr)
                     elif mode == 'append' and bibdoc is not None:
-                        if not bibdoc.check_file_exists(downloaded_url):
+                        if not bibdoc.check_file_exists(downloaded_url, format):
                             downloaded_urls.append((downloaded_url, format, description, comment, flags, timestamp))
                         else:
                             write_message("WARNING: %s is already attached to bibdoc %s for recid %s" % (url, docname, rec_id), stream=sys.stderr)
