@@ -1350,7 +1350,7 @@ class BibRecDocs:
                 self.merge_bibdocs(docname, new_docname)
             docnames.add(docname)
 
-    def check_file_exists(self, path):
+    def check_file_exists(self, path, format):
         """
         Check if a file with the same content of the file pointed in C{path}
         is already attached to this record.
@@ -1363,7 +1363,7 @@ class BibRecDocs:
         """
         # Let's consider all the latest files
         for bibdoc in self.list_bibdocs():
-            if bibdoc.check_file_exists(path):
+            if bibdoc.check_file_exists(path, format):
                 return True
         return False
 
@@ -2553,7 +2553,7 @@ class BibDoc:
         version = int(version)
         return [docfile for docfile in self.docfiles if docfile.get_version() == version and (list_hidden or not docfile.hidden_p())]
 
-    def check_file_exists(self, path):
+    def check_file_exists(self, path, format):
         """
         Check if a file with the same content of the file pointed in C{path}
         is already attached to this record.
@@ -2566,7 +2566,7 @@ class BibDoc:
         """
         # Let's consider all the latest files
         for afile in self.list_latest_files():
-            if afile.is_identical_to(path):
+            if afile.is_identical_to(path, format):
                 return True
         return False
 
@@ -2716,11 +2716,13 @@ class BibDocFile:
                  description = self.description or ''
                )
 
-    def is_identical_to(self, path):
+    def is_identical_to(self, path, format):
         """
         @path: the path of another file on disk.
         @return: True if L{path} is contains bitwise the same content.
         """
+        if self.format != format:
+            return False
         if os.path.getsize(path) != self.size:
             return False
         if calculate_md5(path) != self.checksum:

@@ -36,6 +36,7 @@ import copy
 import tempfile
 import urlparse
 import urllib2
+import urllib
 
 from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_REFERENCE_TAG, \
@@ -95,6 +96,8 @@ stat['nb_holdingpen'] = 0
 stat['exectime'] = time.localtime()
 
 _WRITING_RIGHTS = None
+
+CFG_BIBUPLOAD_ALLOWED_SPECIAL_TREATMENTS = ('oracle', )
 
 ## Let's set a reasonable timeout for URL request (e.g. FFT)
 socket.setdefaulttimeout(40)
@@ -897,7 +900,7 @@ def insert_bibfmt(id_bibrec, marc, format, modification_date='1970-01-01 00:00:0
     except ValueError:
         modification_date = '1970-01-01 00:00:00'
 
-    query = """INSERT INTO  bibfmt (id_bibrec, format, last_updated, value)
+    query = """INSERT LOW_PRIORITY INTO bibfmt (id_bibrec, format, last_updated, value)
         VALUES (%s, %s, %s, %s)"""
     try:
         if not pretend:
@@ -1369,12 +1372,12 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
                         raise
                     if mode == 'correct' and bibdoc is not None and not new_revision_needed:
                         downloaded_urls.append((downloaded_url, format, description, comment, flags, timestamp))
-                        if not bibdoc.check_file_exists(downloaded_url):
+                        if not bibdoc.check_file_exists(downloaded_url, format):
                             new_revision_needed = True
                         else:
                             write_message("WARNING: %s is already attached to bibdoc %s for recid %s" % (url, docname, rec_id), stream=sys.stderr)
                     elif mode == 'append' and bibdoc is not None:
-                        if not bibdoc.check_file_exists(downloaded_url):
+                        if not bibdoc.check_file_exists(downloaded_url, format):
                             downloaded_urls.append((downloaded_url, format, description, comment, flags, timestamp))
                         else:
                             write_message("WARNING: %s is already attached to bibdoc %s for recid %s" % (url, docname, rec_id), stream=sys.stderr)
@@ -1647,7 +1650,7 @@ def update_bibfmt_format(id_bibrec, format_value, format_name, modification_date
         # compress the format_value value
         pickled_format_value =  compress(format_value)
         # update the format:
-        query = """UPDATE bibfmt SET last_updated=%s, value=%s WHERE id_bibrec=%s AND format=%s"""
+        query = """UPDATE LOW_PRIORITY bibfmt SET last_updated=%s, value=%s WHERE id_bibrec=%s AND format=%s"""
         params = (modification_date, pickled_format_value, id_bibrec, format_name)
         try:
             if not pretend:
@@ -1679,7 +1682,7 @@ def delete_bibfmt_format(id_bibrec, format_name, pretend=False):
     Delete format FORMAT_NAME from bibfmt table for record ID_BIBREC.
     """
     if not pretend:
-        run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s and format=%s", (id_bibrec, format_name))
+        run_sql("DELETE LOW_PRIORITY FROM bibfmt WHERE id_bibrec=%s and format=%s", (id_bibrec, format_name))
     return 0
 
 def archive_marcxml_for_history(recID, pretend=False):
@@ -1977,6 +1980,9 @@ Examples:
   --callback-url\tSend via a POST request a JSON-serialized answer (see admin guide), in
 \t\t\torder to provide a feedback to an external service about the outcome of the operation.
   --nonce\t\twhen used together with --callback add the nonce value in the JSON message.
+  --special-treatment=MODE\tif "oracle" is specified, when used together with --callback_url,
+\t\t\tPOST an application/x-www-form-urlencoded request where the JSON message is encoded
+\t\t\tinside a form field called "results".
 """,
             version=__revision__,
             specific_params=("ircazdS:fno",
@@ -1994,7 +2000,8 @@ Examples:
                    "pretend",
                    "force",
                    "callback-url=",
-                   "nonce="
+                   "nonce=",
+                   "special-treatment=",
                  ]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_run_fnc=task_run_core)
@@ -2095,6 +2102,13 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         task_set_option('callback_url', value)
     elif key in ("--nonce", ):
         task_set_option('nonce', value)
+    elif key in ("--special-treatment", ):
+        if value.lower() in CFG_BIBUPLOAD_ALLOWED_SPECIAL_TREATMENTS:
+            if value.lower() == 'oracle':
+                task_set_option('oracle_friendly', True)
+        else:
+            print >> sys.stderr, """The specified value is not in the list of allowed special treatments codes: %s""" % CFG_BIBUPLOAD_ALLOWED_SPECIAL_TREATMENTS
+            return False
     else:
         return False
     return True
@@ -2150,10 +2164,15 @@ def post_results_to_callback_url(results, callback_url):
         opener = urllib2.build_opener(urllib2.HTTPSHandler)
     else:
         raise ValueError("Scheme not handled %s for callback_url %s" % (scheme, callback_url))
-    request = urllib2.Request(callback_url, data=json_results)
-    request.add_header('Content-Type', 'application/json')
+    if task_get_option('oracle_friendly'):
+        request = urllib2.Request(callback_url, data=urllib.urlencode({'results': json_results}))
+        request.add_header('User-Agent', make_user_agent_string('BibUpload'))
+        request.add_header('Content-Type', 'application/x-www-form-urlencoded')
+    else:
+        request = urllib2.Request(callback_url, data=json_results)
+        request.add_header('Content-Type', 'application/json')
+        request.get_method = lambda: 'POST'
     request.add_header('User-Agent', make_user_agent_string('BibUpload'))
-    request.get_method = lambda: 'POST'
     return opener.open(request)
 
 def task_run_core():

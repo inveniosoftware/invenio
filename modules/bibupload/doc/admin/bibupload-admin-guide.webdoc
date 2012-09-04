@@ -568,6 +568,11 @@ http://cdsweb.cern.ch/batchuploader/robotupload/insert?callback_url=http://myhan
 </pre>
 <p>
 
+<p>In case the HTTP server that is going to receive the feedback at <em>callback_url</em> expect the request to be encoded in <em>application/x-www-form-urlencoded</em> rather than <em>application/json</em> (e.g. if the server is implemented directly in Oracle),
+you can further specify the <em>special_treatment<em> argument and set it to <em>oracle</em>. The feedback will then be further encoded
+into an <em>application/x-www-form-urlencoded</em> request, with a single form key called <em>results</em>, which will contain
+the final JSON data.</p>
+
 <p>The MARCXML content should then be specified as the body of the request. With <em>curl</em> this can be implemented as in:
 <pre>
 $ curl -T localfile.xml http://cdsweb.cern.ch/batchuploader/robotupload/insert?callback_url=http://... -A invenio_webupload -H "Content-Type: application/marcxml+xml"

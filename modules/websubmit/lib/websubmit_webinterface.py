@@ -1346,10 +1346,20 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                 from invenio.webuser import collect_user_info
                 user_info = collect_user_info(req)
                 if doctype == 'CMSPUB' and act == "" and 'cds-admin [CERN]' not in user_info['group'] and not user_info['email'].lower() == 'cds.support@cern.ch':
+                    if isGuestUser(uid):
+                        return redirect_to_url(req, "%s/youraccount/login%s" % (
+                            CFG_SITE_SECURE_URL,
+                            make_canonical_urlargd({'referer' : CFG_SITE_SECURE_URL + req.unparsed_uri, 'ln' : args['ln']}, {}))
+                                               , norobot=True)
                     if 'cms-publication-committee-chair [CERN]' not in user_info['group']:
                         return page_not_authorized(req, "../submit", text="In order to access this submission interface you need to be member of the CMS Publication Committee Chair.",
                                         navmenuid='submit')
                 elif doctype == 'ATLPUB' and 'cds-admin [CERN]' not in user_info['group'] and not user_info['email'].lower() == 'cds.support@cern.ch':
+                    if isGuestUser(uid):
+                        return redirect_to_url(req, "%s/youraccount/login%s" % (
+                            CFG_SITE_SECURE_URL,
+                            make_canonical_urlargd({'referer' : CFG_SITE_SECURE_URL + req.unparsed_uri, 'ln' : args['ln']}, {}))
+                                               , norobot=True)
                     if 'atlas-gen [CERN]' not in user_info['group']:
                         return page_not_authorized(req, "../submit", text="In order to access this submission interface you need to be member of ATLAS.",
                                         navmenuid='submit')

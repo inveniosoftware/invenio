@@ -81,7 +81,7 @@ class BibRecDocsTest(unittest.TestCase):
         my_bibrecdoc.merge_bibdocs('img_test', 'file')
         self.assertEqual(len(my_bibrecdoc.get_bibdoc("img_test").list_all_files()), 2)
         #check file exists
-        self.assertEqual(my_bibrecdoc.check_file_exists(CFG_PREFIX + '/lib/webtest/invenio/test.jpg'), True)
+        self.assertEqual(my_bibrecdoc.check_file_exists(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', '.jpg'), True)
         #get bibdoc names
         self.assertEqual(my_bibrecdoc.get_bibdoc_names('Main')[0], '0104007_02')
         self.assertEqual(my_bibrecdoc.get_bibdoc_names('Main')[1],'img_test')

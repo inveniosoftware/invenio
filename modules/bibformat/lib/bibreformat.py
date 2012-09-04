@@ -38,6 +38,7 @@ try:
     from invenio.bibrank_citation_indexer import get_bibrankmethod_lastupdate
     from invenio.bibformat import format_record
     from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
+    from invenio.shellutils import split_cli_ids_arg
     from invenio.bibtask import task_init, write_message, task_set_option, \
             task_get_option, task_update_progress, task_has_option, \
             task_low_level_submission, task_sleep_now_if_required, \
@@ -45,9 +46,28 @@ try:
     import os
     import time
     import zlib
+    from datetime import datetime
 except ImportError, e:
     print "Error: %s" % e
     sys.exit(1)
+
+
+def fetch_last_updated(format):
+    select_sql = "SELECT last_updated FROM format WHERE code = %s"
+    row = run_sql(select_sql, (format.lower(), ))
+
+    # Fallback in case we receive None instead of a valid date
+    last_date = row[0][0] or datetime(year=1900, month=1, day=1)
+
+    return last_date
+
+
+def store_last_updated(format, update_date):
+    sql = "UPDATE format SET last_updated = %s " \
+           "WHERE code = %s AND (last_updated < %s or last_updated IS NULL)"
+    iso_date = update_date.strftime("%Y-%m-%d %H:%M:%S")
+    run_sql(sql, (iso_date, format.lower(), iso_date))
+
 
 ### run the bibreformat task bibsched scheduled
 ###
@@ -65,17 +85,20 @@ def bibreformat_task(fmt, sql, sql_queries, cds_query, process_format, process, 
     @param recids: a list of record IDs to reformat
     @return: None
     """
+    write_message("Processing format %s" % fmt)
+
     t1 = os.times()[4]
 
+    start_date = datetime.now()
 
 ### Query the database
 ###
     task_update_progress('Fetching records to process')
-    if process_format: # '-without' parameter
+    if process_format:  # '-without' parameter
         write_message("Querying database for records without cache...")
         without_format = without_fmt(sql)
 
-    recIDs = recids
+    recIDs = intbitset(recids)
 
     if cds_query['field']      != "" or  \
        cds_query['collection'] != "" or  \
@@ -103,7 +126,7 @@ def bibreformat_task(fmt, sql, sql_queries, cds_query, process_format, process, 
         write_message("Querying database (%s) ..." % sql_query, verbose=2)
         recIDs |= intbitset(run_sql(sql_query))
 
-    if fmt == "HDREF":
+    if fmt == "HDREF" and recIDs:
         # HDREF represents the references tab
         # the tab needs to be recomputed not only when the record changes
         # but also when one of the citations changes
@@ -163,6 +186,11 @@ def bibreformat_task(fmt, sql, sql_queries, cds_query, process_format, process, 
         tbibformat += tbibformat_2
         tbibupload += tbibupload_2
 
+### Store last run time
+    if task_has_option("last"):
+        write_message("storing run date to %s" % start_date)
+        store_last_updated(fmt, start_date)
+
 ### Final statistics
 
     t2 = os.times()[4]
@@ -209,27 +237,20 @@ def check_validity_input_formats(input_formats):
 ### Identify recIDs of records with missing format
 ###
 
-def without_fmt(sql):
+def without_fmt(queries, chunk_size=2000):
     """
     List of record IDs to be reformated, not having the specified format yet
 
     @param sql: a dictionary with sql queries to pick from
     @return: a list of record ID without pre-created format cache
     """
-
-    rec_ids_with_cache = []
-    all_rec_ids = []
-
-    q1 = sql['q1']
-    q2 = sql['q2']
-
-    ## get complete recID list
-    all_rec_ids = intbitset(run_sql(q1))
-
-    ## get complete recID list of formatted records
-    rec_ids_with_cache = intbitset(run_sql(q2))
-
-    return all_rec_ids - rec_ids_with_cache
+    sql = queries['missing']
+    recids = intbitset()
+    max_id = run_sql("SELECT max(id) FROM bibrec")[0][0]
+    for start in xrange(1, max_id + 1, chunk_size):
+        end = start + chunk_size
+        recids += intbitset(run_sql(sql, (start, end)))
+    return recids
 
 
 ### Bibreformat all selected records (using new python bibformat)
@@ -256,7 +277,7 @@ def iterate_over_new(list, fmt):
         t1 = os.times()[4]
         start_date = time.strftime('%Y-%m-%d %H:%M:%S')
         formatted_record = zlib.compress(format_record(recID, fmt, on_the_fly=True))
-        run_sql('REPLACE INTO bibfmt (id_bibrec, format, last_updated, value) VALUES (%s, %s, %s, %s)',
+        run_sql('REPLACE LOW_PRIORITY INTO bibfmt (id_bibrec, format, last_updated, value) VALUES (%s, %s, %s, %s)',
                 (recID, fmt, start_date, formatted_record))
         t2 = os.times()[4]
         tbibformat += (t2 - t1)
@@ -268,6 +289,7 @@ def iterate_over_new(list, fmt):
     if (tot % 100) != 0:
         write_message("   ... formatted %s records out of %s" % (count, tot))
     return (tot, tbibformat, tbibupload)
+
 
 def iterate_over_old(list, fmt):
     """
@@ -281,9 +303,9 @@ def iterate_over_old(list, fmt):
     n_rec       = 0
     n_max       = 10000
     xml_content = ''        # hold the contents
-    tbibformat  = 0     # time taken up by external call
-    tbibupload  = 0     # time taken up by external call
-    total_rec      = 0          # Number of formatted records
+    tbibformat  = 0         # time taken up by external call
+    tbibupload  = 0         # time taken up by external call
+    total_rec   = 0         # Number of formatted records
 
     for record in list:
 
@@ -363,7 +385,7 @@ def iterate_over_old(list, fmt):
 
         finalfilename = "%s/rec_fmt_%s.xml" % (CFG_TMPDIR, time.strftime('%Y%m%d_%H%M%S'))
         filename = "%s/bibreformat.xml" % CFG_TMPDIR
-        filehandle = open(filename ,"w")
+        filehandle = open(filename, "w")
         filehandle.write(xml_content)
         filehandle.close()
 
@@ -401,6 +423,7 @@ def iterate_over_old(list, fmt):
 
     return (total_rec, tbibformat, tbibupload)
 
+
 def task_run_core():
     """Runs the task by fetching arguments from the BibSched task queue.  This is what BibSched will be invoking via daemon call."""
 
@@ -408,13 +431,28 @@ def task_run_core():
     if task_get_option('format'):
         fmts = task_get_option('format')
     else:
-        fmts = 'HB' # default value if no format option given
+        fmts = 'HB'  # default value if no format option given
     for fmt in fmts.split(','):
+        last_updated = fetch_last_updated(fmt)
+        write_message("last stored run date is %s" % last_updated)
+
         sql = {
-            "all" : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt,
-            "last": "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='%s' and bf.last_updated < br.modification_date" % fmt,
-            "q1"  : "select br.id from bibrec as br",
-            "q2"  : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt
+            "all" : """SELECT br.id FROM bibrec AS br, bibfmt AS bf
+                       WHERE bf.id_bibrec = br.id AND bf.format = '%s'""" % fmt,
+            "last": """SELECT br.id FROM bibrec AS br
+                       INNER JOIN bibfmt AS bf ON bf.id_bibrec = br.id
+                       WHERE br.modification_date >= '%(last_updated)s'
+                       AND bf.format='%(format)s'
+                       AND bf.last_updated < br.modification_date""" \
+                            % {'format': fmt,
+                               'last_updated': last_updated.strftime('%Y-%m-%d %H:%M:%S')},
+            "missing"  : """SELECT br.id
+                            FROM bibrec as br
+                            LEFT JOIN bibfmt as bf
+                            ON bf.id_bibrec = br.id AND bf.format ='%s'
+                            WHERE bf.id_bibrec IS NULL
+                            AND br.id BETWEEN %%s AND %%s
+                         """ % fmt,
         }
         sql_queries = []
         cds_query = {}
@@ -442,26 +480,22 @@ def task_run_core():
         else:
             cds_query['matching']      = ""
 
-        recids = intbitset()
         if task_has_option("recids"):
-            for recid in task_get_option('recids').split(','):
-                if ":" in recid:
-                    start = int(recid.split(':')[0])
-                    end = int(recid.split(':')[1])
-                    recids += range(start, end)
-                else:
-                    recids.add(int(recid))
+            recids = split_cli_ids_arg(task_get_option('recids'))
+        else:
+            recids = []
 
     ### sql commands to be executed during the script run
     ###
         bibreformat_task(fmt, sql, sql_queries, cds_query, task_has_option('without'), not task_has_option('noprocess'), recids)
     return True
 
+
 def main():
     """Main that construct all the bibtask."""
     task_init(authorization_action='runbibformat',
-            authorization_msg="BibReformat Task Submission",
-            description="""
+              authorization_msg="BibReformat Task Submission",
+              description="""
 BibReformat formats the records and saves the produced outputs for
 later retrieval.
 
@@ -523,6 +557,7 @@ Pattern options:
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_run_fnc=task_run_core)
 
+
 def task_submit_check_options():
     """Last checks and updating on the options..."""
     if not (task_has_option('all') or task_has_option('collection') \
@@ -531,6 +566,7 @@ def task_submit_check_options():
         task_set_option('without', 1)
         task_set_option('last', 1)
     return True
+
 
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """
@@ -549,11 +585,11 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         task_set_option("noprocess", 1)
     elif key in ("-f", "--field"):
         task_set_option("field", value)
-    elif key in ("-p","--pattern"):
+    elif key in ("-p", "--pattern"):
         task_set_option("pattern", value)
     elif key in ("-m", "--matching"):
         task_set_option("matching", value)
-    elif key in ("-o","--format"):
+    elif key in ("-o", "--format"):
         input_formats = value.split(',')
         ## check the validity of the given output formats
         invalid_format = check_validity_input_formats(input_formats)
@@ -564,9 +600,9 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
                 from invenio.errorlib import register_exception
                 register_exception(prefix="The given output format '%s' is not available or is invalid. Please try again" % invalid_format, alert_admin=True)
                 return
-        else: # every given format is available
+        else:  # every given format is available
             task_set_option("format", value)
-    elif key in ("-i","--id"):
+    elif key in ("-i", "--id"):
         task_set_option("recids", value)
     else:
         return False

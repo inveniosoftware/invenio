@@ -166,7 +166,7 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
                         raise InvenioWebSubmitFunctionWarning(msg)
                 fullpath = "%s/files/%s/%s%s" % (curdir, path, filename, extension)
                 ## Check if there is any existing similar file
-                if not bibrecdocs.check_file_exists(fullpath):
+                if not bibrecdocs.check_file_exists(fullpath, extension):
                     bibdoc = bibrecdocs.add_new_file(fullpath, doctype=paths_and_doctypes.get(path, path), never_fail=True)
                     bibdoc.set_status(restriction)
                     ## Fulltext
@@ -234,7 +234,7 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
 
     # Delete the HB BibFormat cache in the DB, so that the fulltext
     # links do not point to possible dead files
-    run_sql("DELETE from bibfmt WHERE format='HB' AND id_bibrec=%s", (sysno,))
+    run_sql("DELETE LOW_PRIORITY from bibfmt WHERE format='HB' AND id_bibrec=%s", (sysno,))
 
     return ""
 

@@ -1,7 +1,7 @@
 ## $Id: Revise_Files.py,v 1.37 2009/03/26 15:11:05 jerome Exp $
 
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -653,7 +653,7 @@ def create_file_upload_interface(recid,
                     os.renames(uploaded_filepath, new_uploaded_filepath)
 
                     if file_action == "add":
-                        # if not bibrecdocs.check_file_exists(new_uploaded_filepath): # No need to check: done before...
+                        # no need to check bibrecdocs.check_file_exists(new_uploaded_filepath, new_uploaded_format): was done before
                         # Log
                         if file_rename != '':
                             # at this point, bibdocname is specified
@@ -1875,7 +1875,7 @@ def move_uploaded_files_to_storage(working_dir, recid, icon_sizes,
 
     # Delete the HB BibFormat cache in the DB, so that the fulltext
     # links do not point to possible dead files
-    run_sql("DELETE from bibfmt WHERE format='HB' AND id_bibrec=%s", (recid,))
+    run_sql("DELETE LOW_PRIORITY from bibfmt WHERE format='HB' AND id_bibrec=%s", (recid,))
 
     # Update the MARC
     cli_fix_marc(None, [recid], interactive=False)

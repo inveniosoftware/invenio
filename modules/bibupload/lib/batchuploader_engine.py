@@ -81,7 +81,7 @@ def cli_allocate_record(req):
     recid = run_sql("insert into bibrec (creation_date,modification_date) values(NOW(),NOW())")
     return recid
 
-def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None):
+def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None, special_treatment=None):
     """ Robot interface for uploading MARC files
     """
     req.content_type = "text/plain"
@@ -160,6 +160,8 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None)
         args += ["--callback-url", callback_url]
         if nonce:
             args += ["--nonce", nonce]
+        if special_treatment:
+            args += ["--special-treatment", special_treatment]
     task_low_level_submission(*args)
     msg = "[INFO] %s" % ' '.join(args)
     _log(msg)

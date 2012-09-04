@@ -619,5 +619,6 @@ update-db-from-v1.0-to-v1.1: # update DB from v1.0 release series to v1.1 releas
 	echo "ALTER TABLE bibfmt DROP KEY id_bibrec;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE bibfmt ADD KEY last_updated (last_updated);" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE user_query_basket ADD COLUMN alert_recipient TEXT DEFAULT NULL AFTER alert_desc;" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE format ADD COLUMN last_updated datetime NOT NULL default '0000-00-00' AFTER visibility;" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~ *.pyc *.tmp

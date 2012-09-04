@@ -1257,7 +1257,7 @@ def collect_user_info(req, login_time=False, refresh=False):
             if (CFG_BIBAUTHORID_ENABLED
                 and usepaperattribution
                 and viewlink):
-                    viewclaimlink = True
+                viewclaimlink = True
 
             user_info['precached_viewclaimlink'] = viewclaimlink
             user_info['precached_usepaperattribution'] = usepaperattribution
@@ -1344,7 +1344,7 @@ def collect_user_info(req, login_time=False, refresh=False):
                 if (CFG_BIBAUTHORID_ENABLED
                     and usepaperattribution
                     and viewlink):
-                        viewclaimlink = True
+                    viewclaimlink = True
 
 #                if (CFG_BIBAUTHORID_ENABLED
 #                    and ((usepaperclaim or usepaperattribution)
