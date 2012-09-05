@@ -55,7 +55,7 @@ class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
         for var, value in req.subprocess_env.iteritems():
             if var.startswith('HTTP_ADFS_'):
                 sso_env[var] = value
-        out = "<html><head><title>SSO test</title</head>"
+        out = "<html><head><title>SSO test</title></head>"
         out += "<body><table>"
         for var, value in sso_env.iteritems():
             out += "<tr><td><strong>%s</strong></td><td>%s</td></tr>" % (var, value)
@@ -75,7 +75,7 @@ class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
         """
         if req.method == 'POST':
             if 'file' in form:
-                for row in form['file'].file:
+                for row in form['file']:#.file:
                     req.write(row)
             return ''
         else:

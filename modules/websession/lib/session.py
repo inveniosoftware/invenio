@@ -74,11 +74,12 @@ def get_session(req, sid=None):
     @raise ValueError: if C{sid} is provided and it doesn't correspond to a
         valid session.
     """
+    from flask import session
     if sid is not None:
-        req._session = FlaskInvenioSession(sid=sid)
+        req._session = session#FlaskInvenioSession(sid=sid)
         return req._session
     if not hasattr(req, '_session'):
-        req._session = FlaskInvenioSession(sid = sid)
+        req._session = session#FlaskInvenioSession(sid = sid)
     return req._session
 
 class InvenioSession(dict):

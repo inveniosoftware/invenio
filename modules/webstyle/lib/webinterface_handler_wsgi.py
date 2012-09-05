@@ -46,6 +46,7 @@ from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
     CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE, CFG_SITE_URL, \
     CFG_SITE_SECURE_URL, CFG_WEBSTYLE_REVERSE_PROXY_IPS
 from invenio.errorlib import register_exception, get_pretty_traceback
+from flask import request, current_app
 
 ## Static files are usually handled directly by the webserver (e.g. Apache)
 ## However in case WSGI is required to handle static files too (such
@@ -104,7 +105,9 @@ class SimulatedModPythonRequest(object):
         self.__bytes_sent = 0
         self.__allowed_methods = []
         self.__cleanups = []
-        self.headers_out = self.__headers
+        self.__mimetype = request.mimetype
+        self.headers_out = { 'Cache-Control': None }
+        self.headers_out.update(dict(request.headers))
         ## See: <http://www.python.org/dev/peps/pep-0333/#the-write-callable>
         self.__write = None
         self.__write_error = False
@@ -123,42 +126,14 @@ class SimulatedModPythonRequest(object):
         if environ.get('CONTENT_TYPE'):
             self.__headers_in['content-type'] = environ['CONTENT_TYPE']
 
-    def get_flask_request_context(self):
-        ctx = self.__flask_app.request_context(self.__environ)
-        with ctx:
-            if self.__flask_app.preprocess_request() is not None:
-                return None
-        return ctx
-
     def get_wsgi_environ(self):
         return self.__environ
 
     def get_post_form(self):
+        """ Returns only POST form. """
         self.__tainted = True
-        post_form = self.__environ.get('wsgi.post_form')
-        input = self.__environ['wsgi.input']
-        if (post_form is not None
-            and post_form[0] is input):
-            return post_form[2]
-        # This must be done to avoid a bug in cgi.FieldStorage
-        self.__environ.setdefault('QUERY_STRING', '')
-
-        ## Video handler hack:
-        uri = self.__environ['PATH_INFO']
-        if uri.endswith("upload_video"):
-            tmp_shared = True
-        else:
-            tmp_shared = False
-        fs = FieldStorage(self, keep_blank_values=1, to_tmp_shared=tmp_shared)
-        if fs.wsgi_input_consumed:
-            new_input = InputProcessed()
-            post_form = (new_input, input, fs)
-            self.__environ['wsgi.post_form'] = post_form
-            self.__environ['wsgi.input'] = new_input
-        else:
-            post_form = (input, None, fs)
-            self.__environ['wsgi.post_form'] = post_form
-        return fs
+        from werkzeug.datastructures import CombinedMultiDict
+        return CombinedMultiDict([request.form, request.files])
 
     def get_response_sent_p(self):
         return self.__response_sent_p
@@ -203,13 +178,13 @@ class SimulatedModPythonRequest(object):
             self.__buffer = ''
 
     def set_content_type(self, content_type):
-        self.__headers['content-type'] = content_type
+        request.__mimetype = content_type
         if self.__is_https:
             if content_type.startswith("text/html") or content_type.startswith("application/rss+xml"):
                 self.__replace_https = True
 
     def get_content_type(self):
-        return self.__headers['content-type']
+        return request.mimetype
 
     def send_http_header(self):
         if not self.__response_sent_p:
@@ -227,10 +202,10 @@ class SimulatedModPythonRequest(object):
         return '?'.join([self.__environ['PATH_INFO'], self.__environ['QUERY_STRING']])
 
     def get_uri(self):
-        return self.__environ['PATH_INFO']
+        return request.environ['PATH_INFO']
 
     def get_headers_in(self):
-        return self.__headers_in
+        return request.headers #self.__headers_in
 
     def get_subprocess_env(self):
         return self.__environ
@@ -239,7 +214,7 @@ class SimulatedModPythonRequest(object):
         pass
 
     def get_args(self):
-        return self.__environ['QUERY_STRING']
+        return request.environ['QUERY_STRING']
 
     def get_remote_ip(self):
         if 'X-FORWARDED-FOR' in self.__headers_in and \
@@ -263,13 +238,13 @@ class SimulatedModPythonRequest(object):
                                    "clients are not trusted.  Please configure this variable.",
                                    alert_admin=True)
                 return '10.0.0.11'
-        return self.__environ.get('REMOTE_ADDR')
+        return request.remote_addr
 
     def get_remote_host(self):
-        return self.__environ.get('REMOTE_HOST')
+        return request.environ['REMOTE_HOST']
 
     def get_header_only(self):
-        return self.__environ['REQUEST_METHOD'] == 'HEAD'
+        return request.environ['REQUEST_METHOD'] == 'HEAD'
 
     def set_status(self, status):
         self.__status = '%s %s' % (status, HTTP_STATUS_MAP.get(int(status), 'Explanation not available'))
@@ -322,10 +297,10 @@ class SimulatedModPythonRequest(object):
         return self.__is_https
 
     def get_method(self):
-        return self.__environ['REQUEST_METHOD']
+        return request.environ['REQUEST_METHOD']
 
     def get_hostname(self):
-        return self.__environ.get('HTTP_HOST', '')
+        return request.environ.get('HTTP_HOST', '')
 
     def set_filename(self, filename):
         self.__filename = filename
@@ -379,7 +354,7 @@ class SimulatedModPythonRequest(object):
         return self.__cleanups
 
     def get_referer(self):
-        return self.headers_in.get('referer')
+        return request.referrer
 
     def get_what_was_written(self):
         return self.__what_was_written
@@ -485,6 +460,7 @@ def application(environ, start_response, flask_app=None):
                 req.flush()
         except:
             register_exception(req=req, alert_admin=True)
+            raise
             if not req.response_sent_p:
                 req.status = HTTP_INTERNAL_SERVER_ERROR
                 req.headers_out['content-type'] = 'text/html'
@@ -497,8 +473,9 @@ def application(environ, start_response, flask_app=None):
             else:
                 return generate_error_page(req, page_already_started=True)
     finally:
-        for (callback, data) in req.get_cleanups():
-            callback(data)
+        pass
+        #for (callback, data) in req.get_cleanups():
+        #    callback(data)
     return []
 
 def generate_error_page(req, admin_was_alerted=True, page_already_started=False):
@@ -566,7 +543,9 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
         ## the req.form must be casted to dict because of Python 2.4 and earlier
         ## otherwise any object exposing the mapping interface can be
         ## used with the magic **
-        form = dict(req.form)
+        from flask import request
+        form = dict(request.args.to_dict(flat=True))
+        form.update(dict(request.form.to_dict(flat=True)))
         for key, value in form.items():
             ## FIXME: this is a backward compatibility workaround
             ## because most of the old administration web handler

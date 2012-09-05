@@ -245,10 +245,10 @@ class WebInterfaceDirectory(object):
             raise apache.SERVER_RETURN, apache.DONE
 
         form = req.form
-        if 'ln' not in form and \
-                req.uri not in CFG_NO_LANG_RECOGNITION_URIS:
-            ln = get_preferred_user_language(req)
-            form.add_field('ln', ln)
+        #if 'ln' not in form and \
+        #        req.uri not in CFG_NO_LANG_RECOGNITION_URIS:
+        #    ln = get_preferred_user_language(req)
+        #    form.add_field('ln', ln)
         result = _check_result(req, obj(req, form))
         return result
 
@@ -365,9 +365,9 @@ def create_handler(root):
         """ This handler is invoked by mod_python with the apache request."""
         try:
             allowed_methods = ("GET", "POST", "HEAD", "OPTIONS", "PUT")
-            req.allow_methods(allowed_methods, 1)
-            if req.method not in allowed_methods:
-                raise apache.SERVER_RETURN, apache.HTTP_METHOD_NOT_ALLOWED
+            #req.allow_methods(allowed_methods, 1)
+            #if req.method not in allowed_methods:
+            #    raise apache.SERVER_RETURN, apache.HTTP_METHOD_NOT_ALLOWED
 
             if req.method == 'OPTIONS':
                 ## OPTIONS is used to now which method are allowed

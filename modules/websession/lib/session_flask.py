@@ -73,6 +73,36 @@ class InvenioSession(dict, SessionMixin):
         """
         return request.cookies.get(current_app.session_cookie_name + 'stub', 'NO') == 'HTTPS'
 
+    def delete(self, clear=True):
+        """
+        Delete the session.
+        """
+        if CFG_SESSION_USE_CACHE:
+            cache.delete(CFG_SESSION_KEY_PREFIX+self.sid)
+        else:
+            from invenio.websession_model import Session
+            Session.query.filter(Session.session_key==self.sid).delete()
+        if clear:
+            self.clear()
+
+    def invalidate(self):
+        """
+        Declare the session as invalid.
+        """
+        self.delete()
+        self._invalid = 1
+
+    def set_remember_me(self, remember_me=True):
+        """
+        Set/Unset the L{_remember_me} flag.
+
+        @param remember_me: True if the session cookie should last one day or
+            until the browser is closed.
+        @type remember_me: bool
+        """
+        self._remember_me = remember_me
+        self['_permanent'] = remember_me
+
     def check_ip(self, request):
         """
         Return True if the session is being used from the same IP address
@@ -188,14 +218,13 @@ class InvenioSessionInterface(SessionInterface):
         from invenio.websession_model import Session
         if not session:
             current_app.logger.info("empty session detected. Deleting it")
-            Session.query.filter(Session.session_key==session.sid).delete()
             response.delete_cookie(app.session_cookie_name,
                                     domain=domain)
             response.delete_cookie(app.session_cookie_name + 'stub',
                                     domain=domain)
             return
-        session_expiry = datetime.utcnow() + \
-                         self.get_session_expiration_time(app, session)
+        timeout = self.get_session_expiration_time(app, session)
+        session_expiry = datetime.utcnow() + timeout
         max_age = cookie_expiry = None
         uid = session.uid
         if uid > -1 and session.permanent:
@@ -208,10 +237,7 @@ class InvenioSessionInterface(SessionInterface):
             sid = self.generate_sid()
             ## And remove the cookie that has been set
             current_app.logger.info("... and delete previous one")
-            if CFG_SESSION_USE_CACHE:
-                cache.delete(CFG_SESSION_KEY_PREFIX+sid)
-            else:
-                Session.query.filter(Session.session_key==session.sid).delete()
+            session.delete(clear=False)
             response.delete_cookie(app.session_cookie_name, domain=domain)
             response.delete_cookie(app.session_cookie_name + 'stub',
                                    domain=domain)
@@ -222,7 +248,7 @@ class InvenioSessionInterface(SessionInterface):
         session['user_info'] = session.user_info
         if CFG_SESSION_USE_CACHE:
             cache.set(CFG_SESSION_KEY_PREFIX+sid, self.serializer.dumps(dict(session)),
-                      timeout = 3600) #self.get_session_expiration_time(app, session))
+                      timeout = timeout)
         else:
             s = Session()
             s.session_key = sid

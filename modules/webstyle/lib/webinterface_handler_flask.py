@@ -33,21 +33,32 @@ from werkzeug.routing import BuildError, NotFound, RequestRedirect
 from invenio.sqlalchemyutils import db
 from invenio import config
 from invenio.errorlib import register_exception
+from invenio.config import CFG_PYLIBDIR, \
+    CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
+    CFG_BIBDOCFILE_USE_XSENDFILE, \
+    CFG_LOGDIR, CFG_SITE_LANG, CFG_WEBDIR, \
+    CFG_ETCDIR, CFG_DEVEL_SITE, \
+    CFG_FLASK_CACHE_TYPE
+from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, CFG_WEBSESSION_ONE_DAY
 
 def create_invenio_flask_app():
     """
     This prepare wsgi Invenio application based on Flask.
     """
 
-#from invenio.webinterface_handler_wsgi import application as _legacy_app
+    ## The Flask application instance
+    _app = Flask(__name__,
+        static_url_path='/', ## We assume anything under '/' which is static to be handled directly by Apache
+        static_folder=CFG_WEBDIR)
+
+    ## Let's initialize database.
+    db.init_invenio()
+    db.init_cfg(_app)
+    # Register Flask application in flask-sqlalchemy extension
+    db.init_app(_app)
+
+
     from invenio.pluginutils import PluginContainer, create_enhanced_plugin_builder
-    from invenio.config import CFG_PYLIBDIR, \
-        CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
-        CFG_BIBDOCFILE_USE_XSENDFILE, \
-        CFG_LOGDIR, CFG_SITE_LANG, CFG_WEBDIR, \
-        CFG_ETCDIR, CFG_DEVEL_SITE, \
-        CFG_FLASK_CACHE_TYPE
-    from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, CFG_WEBSESSION_ONE_DAY
     from invenio.session_flask import InvenioSessionInterface
 #from flaskext.login import LoginManager
     from invenio.webuser_flask import InvenioLoginManager
@@ -62,10 +73,33 @@ def create_invenio_flask_app():
     from invenio.webinterface_handler_flask_utils import unicodifier
     from flaskext.gravatar import Gravatar
 
-    ## The Flask application instance
-    _app = Flask(__name__,
-        static_url_path='/', ## We assume anything under '/' which is static to be handled directly by Apache
-        static_folder=CFG_WEBDIR)
+
+    from invenio.webinterface_handler_wsgi import \
+                application as legacy_application
+
+    class LegacyAppMiddleware(object):
+        def __init__(self, app):
+            self.app = app
+
+        def __call__(self, environ, start_response):
+            with self.app.request_context(environ):
+                try:
+                    response = self.app.full_dispatch_request()
+                except Exception, e:
+                    # e == 404
+                    #try:
+                    return legacy_application(environ, start_response)
+                    #except:
+                    #    pass
+                    #response = self.app.make_response(self.app.handle_exception(e))
+                return response(environ, start_response)
+
+    _app.wsgi_app = LegacyAppMiddleware(_app)
+
+    @_app.errorhandler(404)
+    def page_not_found(error):
+        print error, "Will try to call legacy application."
+        raise
 
     if CFG_FLASK_CACHE_TYPE not in [None, 'null']:
         _app.jinja_options = dict(_app.jinja_options,
@@ -74,6 +108,7 @@ def create_invenio_flask_app():
             bytecode_cache=MemcachedBytecodeCache(
                                 cache, prefix="jinja::",
                                 timeout=3600))
+
 
     ## Let's customize the template loader to first look into
     ## /opt/invenio/etc-local/templates and then into /opt/invenio/etc/templates
@@ -399,16 +434,11 @@ class InvenioFlaskDispatcher(object):
     will be resolved (if possible) via the Invenio handler.
     """
     def __init__(self, legacy_application=None):
-        db.init_invenio()
         self.flask_application = create_invenio_flask_app()
         if legacy_application is None:
             from invenio.webinterface_handler_wsgi import \
                 application as legacy_application
         self.legacy_application = legacy_application
-        # Setup the SQLAlchemy database URI
-        db.init_cfg(self.flask_application)
-        # Register Flask application in flask-sqlalchemy extension
-        db.init_app(self.flask_application)
         #del legacy_application
 
     def __call__(self, environ, start_response):
