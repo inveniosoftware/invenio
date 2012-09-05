@@ -163,6 +163,9 @@ def email_notify(alert, records, argstr):
 
     uid = alert[0]
     user_info = collect_user_info(uid)
+    frequency = alert[3]
+    alert_name = alert[5]
+    alert_description = alert[7]
     alert_recipient_email = alert[8] # set only by admin. Bypasses access-right checks.
     filtered_out_recids = [] # only set in debug mode
 
@@ -211,10 +214,14 @@ def email_notify(alert, records, argstr):
     sc = query.get('sc', ['1'])
     collections = calculate_desired_collection_list(collection_list, current_collection, int(sc[0]))
 
-    frequency = alert[3]
-
-    msg += webalert_templates.tmpl_alert_email_body(
-        alert[5], url, filtered_records, pattern, collections, frequency, alert_use_basket_p(alert))
+    msg += webalert_templates.tmpl_alert_email_body(alert_name,
+                                                    alert_description,
+                                                    url,
+                                                    filtered_records,
+                                                    pattern,
+                                                    collections,
+                                                    frequency,
+                                                    alert_use_basket_p(alert))
 
     email = alert_recipient_email or get_email(uid)
 
@@ -233,7 +240,7 @@ def email_notify(alert, records, argstr):
     if CFG_WEBALERT_DEBUG_LEVEL < 2:
         send_email(fromaddr=webalert_templates.tmpl_alert_email_from(),
                    toaddr=email,
-                   subject=webalert_templates.tmpl_alert_email_title(alert[5]),
+                   subject=webalert_templates.tmpl_alert_email_title(alert_name),
                    content=msg,
                    header='',
                    footer='',
@@ -242,7 +249,7 @@ def email_notify(alert, records, argstr):
     if CFG_WEBALERT_DEBUG_LEVEL == 4:
         send_email(fromaddr=webalert_templates.tmpl_alert_email_from(),
                    toaddr=CFG_SITE_ADMIN_EMAIL,
-                   subject=webalert_templates.tmpl_alert_email_title(alert[5]),
+                   subject=webalert_templates.tmpl_alert_email_title(alert_name),
                    content=msg,
                    header='',
                    footer='',

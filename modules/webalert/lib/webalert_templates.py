@@ -499,7 +499,7 @@ class Template:
     def tmpl_alert_email_from(self):
         return '%s Alert Engine <%s>' % (CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
 
-    def tmpl_alert_email_body(self, name, url, records, pattern,
+    def tmpl_alert_email_body(self, name, description, url, records, pattern,
                               collection_list, frequency, add_to_basket_p):
 
         recids_by_collection = {}
@@ -558,7 +558,8 @@ class Template:
 Hello:
 
 Below are the results of the email notification alert that
-you set up with the %(sitename)s.
+was set up with the %(sitename)s.
+%(description)s
 This is an automatic message, please don't reply to it.
 For any question, please use <%(sitesupportemail)s> instead.
 
@@ -570,6 +571,7 @@ url: <%(url)s>
 """ % {'sitesupportemail': CFG_SITE_SUPPORT_EMAIL,
        'name': name,
        'sitename': CFG_SITE_NAME,
+       'description': description and '\n' + description + '\n' or '',
        'pattern': pattern,
        'collections': collections,
        'frequency': frequency,
