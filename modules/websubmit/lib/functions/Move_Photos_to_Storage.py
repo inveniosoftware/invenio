@@ -257,7 +257,8 @@ def get_session_id(req, uid, user_info):
     session_id = None
     try:
         try:
-            session_id = req._session.sid()
+            from flask import session
+            session_id = session.sid
         except AttributeError, e:
             # req was maybe not available (for eg. when this is run
             # through Create_Modify_Interface.py)

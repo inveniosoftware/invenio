@@ -132,8 +132,7 @@ class SimulatedModPythonRequest(object):
     def get_post_form(self):
         """ Returns only POST form. """
         self.__tainted = True
-        from werkzeug.datastructures import CombinedMultiDict
-        return CombinedMultiDict([request.form, request.files])
+        return request.values.to_dict(flat=True)
 
     def get_response_sent_p(self):
         return self.__response_sent_p
@@ -546,8 +545,7 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
         ## otherwise any object exposing the mapping interface can be
         ## used with the magic **
         from flask import request
-        form = dict(request.args.to_dict(flat=True))
-        form.update(dict(request.form.to_dict(flat=True)))
+        form = dict(request.values.to_dict(flat=True))
         for key, value in form.items():
             ## FIXME: this is a backward compatibility workaround
             ## because most of the old administration web handler
