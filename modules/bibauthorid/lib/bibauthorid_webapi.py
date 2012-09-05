@@ -32,7 +32,7 @@ from search_engine import perform_request_search
 from cgi import escape
 from time import gmtime, strftime, ctime
 from invenio.access_control_admin import acc_find_user_role_actions
-from invenio.webuser import collect_user_info, get_session, getUid
+from invenio.webuser import collect_user_info, getUid
 from invenio.webuser import isUserSuperAdmin
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_get_role_id, acc_get_user_roles
@@ -45,6 +45,7 @@ from invenio.mailutils import send_email
 from operator import add
 
 from invenio.bibauthorid_dbinterface import get_personiID_external_ids    #pylint: disable-msg=W0614
+from flask import session
 
 def get_person_redirect_link(pid):
     '''
@@ -797,7 +798,6 @@ def arxiv_login(req, picked_profile=None):
     @rtype: int
     '''
     def session_bareinit(req):
-        session = get_session(req)
         try:
             pinfo = session["personinfo"]
             if 'ticket' not in pinfo:
@@ -812,7 +812,6 @@ def arxiv_login(req, picked_profile=None):
 
 
     session_bareinit(req)
-    session = get_session(req)
 
     pinfo = session['personinfo']
     ticket = session['personinfo']['ticket']

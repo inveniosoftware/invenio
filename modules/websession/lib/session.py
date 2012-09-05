@@ -76,10 +76,10 @@ def get_session(req, sid=None):
     """
     from flask import session
     if sid is not None:
-        req._session = session#FlaskInvenioSession(sid=sid)
+        req._session = session
         return req._session
     if not hasattr(req, '_session'):
-        req._session = session#FlaskInvenioSession(sid = sid)
+        req._session = session
     return req._session
 
 class InvenioSession(dict):

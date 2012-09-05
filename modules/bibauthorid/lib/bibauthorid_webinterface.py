@@ -45,7 +45,6 @@ from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.messages import gettext_set_language #, wash_language
 from invenio.template import load
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.session import get_session
 from invenio.urlutils import redirect_to_url
 from invenio.webuser import getUid, page_not_authorized, collect_user_info, set_user_preferences
 from invenio.webuser import email_valid_p, emailUnique
@@ -59,6 +58,7 @@ import invenio.bibauthorid_webapi as webapi
 import invenio.bibauthorid_config as bconfig
 
 from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
+from flask import session
 
 
 TEMPLATE = load('bibauthorid')
@@ -175,7 +175,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
 
         rt_ticket_id = argd['ticketid']
         req.argd = argd #needed for perform_req_search
-        session = get_session(req)
         ulevel = self.__get_user_role(req)
         uid = getUid(req)
 
@@ -248,7 +247,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         @param req_level: Request level required for the page
         @type req_level: string
         '''
-        session = get_session(req)
         uid = getUid(req)
         pinfo = session["personinfo"]
         uinfo = collect_user_info(req)
@@ -320,7 +318,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         @param req: Apache Request Object
         @type req: Apache Request Object
         '''
-        session = get_session(req)
         uid = getUid(req)
         ulevel = self.__get_user_role(req)
 
@@ -473,7 +470,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         menu = TEMPLATE.tmpl_person_menu()
 
         if "verbose" in argd and argd["verbose"] > 0:
-            session = get_session(req)
             pinfo = session['personinfo']
             menu += "\n<pre>" + pformat(pinfo) + "</pre>\n"
 
@@ -495,7 +491,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         menu = TEMPLATE.tmpl_person_menu()
 
         if "verbose" in argd and argd["verbose"] > 0:
-            session = get_session(req)
             pinfo = session['personinfo']
             menu += "\n<pre>" + pformat(pinfo) + "</pre>\n"
 
@@ -517,7 +512,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         menu = TEMPLATE.tmpl_person_menu_admin()
 
         if "verbose" in argd and argd["verbose"] > 0:
-            session = get_session(req)
             pinfo = session['personinfo']
             menu += "\n<pre>" + pformat(pinfo) + "</pre>\n"
 
@@ -534,7 +528,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         @param ln: language to show this page in
         @type ln: string
         '''
-        session = get_session(req)
         pinfo = session['personinfo']
         ticket = pinfo['ticket']
         pendingt = []
@@ -647,7 +640,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         @param ln: language to show this page in
         @type ln: string
         '''
-        session = get_session(req)
 #        uid = getUid(req)
         pinfo = session["personinfo"]
         if 'ln' in pinfo:
@@ -711,7 +703,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         @param ln: language to show this page in
         @type ln: string
         '''
-        session = get_session(req)
         uid = getUid(req)
         pinfo = session['personinfo']
         if 'ln' in pinfo:
@@ -794,7 +785,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                                                     'repeal_text': _('Marked as not this person\'s paper'),
                                                     'to_other_text': _('Assign to another person'),
                                                     'alt_to_other': _('To other person!')}}
-        session = get_session(req)
         uid = getUid(req)
         open_tickets = webapi.get_person_request_ticket(self.person_id)
         tickets = []
@@ -831,7 +821,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         @param buttons_verbiage_dict: language for the buttons
         @type buttons_verbiage_dict: dict
         '''
-        session = get_session(req)
         personinfo = {}
 
         try:
@@ -901,7 +890,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
 
     def _get_default_verbiage_dicts_for_admin(self, req):
 
-        session = get_session(req)
         personinfo = {}
 
         try:
@@ -928,7 +916,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
 
     def _get_default_buttons_verbiage_dicts_for_admin(self, req):
 
-        session = get_session(req)
         personinfo = {}
 
         try:
@@ -996,7 +983,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         Takes care of the ticket  when in user and guest mode
 
         '''
-        session = get_session(req)
         uid = getUid(req)
         pinfo = session["personinfo"]
 #        ulevel = pinfo["ulevel"]
@@ -1028,7 +1014,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         checks if some of the transactions on the ticket are needing a review.
         If it's the case prompts the user to select the right bibref
         '''
-        session = get_session(req)
         pinfo = session["personinfo"]
         ticket = pinfo["ticket"]
 
@@ -1199,7 +1184,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         displays the user what can/cannot finally be done, leaving the option of kicking some
         transactions from the ticket before commit
         '''
-        session = get_session(req)
         uid = getUid(req)
         userinfo = collect_user_info(uid)
         pinfo = session["personinfo"]
@@ -1345,7 +1329,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         Actual execution of the ticket transactions
         '''
         self._clean_ticket(req)
-        session = get_session(req)
         uid = getUid(req)
         pinfo = session["personinfo"]
         ticket = pinfo["ticket"]
@@ -1372,7 +1355,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         Actual execution of the ticket transactions
         '''
         self._clean_ticket(req)
-        session = get_session(req)
         uid = getUid(req)
         pinfo = session["personinfo"]
         ticket = pinfo["ticket"]
@@ -1416,7 +1398,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         Actual execution of the ticket transactions
         '''
         self._clean_ticket(req)
-        session = get_session(req)
         pinfo = session["personinfo"]
         uid = getUid(req)
         userinfo = {'uid-ip': "userid: %s (from %s)" % (uid, req.remote_ip)}
@@ -1447,7 +1428,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         The ticket dispatch is finished, redirect to the original page of
         origin or to the last_viewed_pid
         '''
-        session = get_session(req)
         pinfo = session["personinfo"]
 
         if 'claim_in_process' in pinfo:
@@ -1473,7 +1453,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         '''
         Removes from a ticket the transactions with an execution_result flag
         '''
-        session = get_session(req)
         pinfo = session["personinfo"]
         ticket = pinfo["ticket"]
         for t in list(ticket):
@@ -1569,7 +1548,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
              'user_last_name': (str, None),
              'user_email': (str, None),
              'user_comments': (str, None)})
-        session = get_session(req)
         pinfo = session["personinfo"]
         ulevel = pinfo["ulevel"]
         skip_checkout_faulty_fields = False
@@ -1668,7 +1646,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         action = None
         bibrefs = None
 
-        session = get_session(req)
         uid = getUid(req)
         pinfo = session["personinfo"]
         ulevel = pinfo["ulevel"]
@@ -1964,7 +1941,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         @param ln: language to display the page in
         @type ln: string
         '''
-        session = get_session(req)
         uid = getUid(req)
         uinfo = collect_user_info(req)
         pinfo = session["personinfo"]
@@ -2030,7 +2006,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         @param form: GET/POST request parameters
         @type form: dict
         '''
-        session = get_session(req)
         pinfo = session["personinfo"]
         pinfo["search_ticket"] = dict()
         search_ticket = pinfo["search_ticket"]
@@ -2064,7 +2039,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         '''
         Commit of an rt ticket: creates a real ticket and commits.
         '''
-        session = get_session(req)
         pinfo = session["personinfo"]
         ulevel = pinfo["ulevel"]
         ticket = pinfo["ticket"]
@@ -2131,7 +2105,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         @param req: Apache Request Object
         @type req: Apache Request Object
         '''
-        session = get_session(req)
         try:
             pinfo = session["personinfo"]
         except KeyError:
@@ -2173,7 +2146,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         @param req: Apache request object
         @type req: Apache request object
         '''
-        session = get_session(req)
         pinfo = session["personinfo"]
         search_ticket = None
 
@@ -2207,7 +2179,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         @return: string
         '''
         self._session_bareinit(req)
-        session = get_session(req)
         no_access = self._page_access_permission_wall(req)
         new_person_link = False
 
@@ -2339,7 +2310,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         if 'person' in argd and argd['person']:
             person = argd['person']
 
-        session = get_session(req)
         try:
             pinfo = session["personinfo"]
             if pinfo['ulevel'] == 'admin':
@@ -2439,7 +2409,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             return
 
         #session must be read after webapi.arxiv_login did it's stuff
-        session = get_session(req)
         pinfo = session["personinfo"]
         pinfo["claimpaper_admin_last_viewed_pid"] = pid
         session.dirty = True
@@ -2519,7 +2488,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         if not CFG_JSON_AVAILABLE:
             return "500_json_not_found__install_package"
 
-        # session = get_session(req)
         request = None
         userid = None
 

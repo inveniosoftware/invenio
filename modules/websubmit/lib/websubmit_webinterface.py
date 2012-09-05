@@ -55,9 +55,11 @@ from invenio.websubmit_icon_creator import create_icon, InvenioWebSubmitIconCrea
 from invenio.ckeditor_invenio_connector import process_CKEditor_upload, send_response
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
-from invenio.session import get_session
+from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.jsonutils import json, CFG_JSON_AVAILABLE
 import invenio.template
+from flask import session
+
 webstyle_templates = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
 
@@ -109,25 +111,16 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             # Are we uploading using Flash, which does not transmit
             # cookie? The expect to receive session_id as a form
             # parameter.  First check that IP addresses do not
-            # mismatch. A ValueError will be raises if there is
-            # something wrong
-            session = get_session(req=req, sid=argd['session_id'])
-            try:
-                session = get_session(req=req, sid=argd['session_id'])
-            except ValueError, e:
-                raise apache.SERVER_RETURN(apache.HTTP_BAD_REQUEST)
+            # mismatch.
 
-            # Retrieve user information. We cannot rely on the session here.
-            res = run_sql("SELECT uid FROM session WHERE session_key=%s", (argd['session_id'],))
-            if len(res):
-                uid = res[0][0]
-                user_info = collect_user_info(uid)
-                try:
-                    act_fd = file(os.path.join(curdir, 'act'))
-                    action = act_fd.read()
-                    act_fd.close()
-                except:
-                    action = ""
+            uid = session.uid
+            user_info = collect_user_info(uid)
+            try:
+                act_fd = file(os.path.join(curdir, 'act'))
+                action = act_fd.read()
+                act_fd.close()
+            except:
+                action = ""
 
         # Is user authorized to perform this action?
         (auth_code, auth_message) = acc_authorize_action(uid, "submit",
@@ -276,25 +269,16 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             # Are we uploading using Flash, which does not transmit
             # cookie? The expect to receive session_id as a form
             # parameter.  First check that IP addresses do not
-            # mismatch. A ValueError will be raises if there is
-            # something wrong
-            session = get_session(req=req, sid=argd['session_id'])
-            try:
-                session = get_session(req=req, sid=argd['session_id'])
-            except ValueError, e:
-                raise apache.SERVER_RETURN(apache.HTTP_BAD_REQUEST)
+            # mismatch.
 
-            # Retrieve user information. We cannot rely on the session here.
-            res = run_sql("SELECT uid FROM session WHERE session_key=%s", (argd['session_id'],))
-            if len(res):
-                uid = res[0][0]
-                user_info = collect_user_info(uid)
-                try:
-                    act_fd = file(os.path.join(curdir, 'act'))
-                    action = act_fd.read()
-                    act_fd.close()
-                except:
-                    act = ""
+            uid = session.uid
+            user_info = collect_user_info(uid)
+            try:
+                act_fd = file(os.path.join(curdir, 'act'))
+                action = act_fd.read()
+                act_fd.close()
+            except:
+                act = ""
 
         # Is user authorized to perform this action?
         (auth_code, auth_message) = acc_authorize_action(uid, "submit",

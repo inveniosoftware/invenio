@@ -31,7 +31,6 @@ from invenio.config import CFG_SITE_LANG
 from invenio.config import CFG_SITE_URL
 from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 from invenio.bibformat import format_record
-from invenio.session import get_session
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibauthorid_webapi import get_person_redirect_link, get_canonical_id_from_person_id, get_person_names_from_id
 from invenio.bibauthorid_webapi import get_personiID_external_ids
@@ -41,6 +40,7 @@ from invenio.bibauthorid_frontinterface import get_canonical_id_from_personid
 from invenio.messages import gettext_set_language, wash_language
 from invenio.webuser import get_email
 #from invenio.textutils import encode_for_xml
+from flask import session
 
 class Template:
     """Templating functions used by aid"""
@@ -139,7 +139,7 @@ class Template:
         @param message: message to display in the box
         @type message: string
         @param teaser: Teaser text in bold next to icon
-        @type teaser: string
+        @type teaser: strinfrom flask import sessiong
         @param ticket: The ticket object from the session
         @param ticket: list of dict
         @param show_close_btn: display close button [x]
@@ -1215,7 +1215,6 @@ class Template:
             return "\n".join(html)
 
 
-        session = get_session(req)
         pinfo = session["personinfo"]
         ulevel = pinfo["ulevel"]
 

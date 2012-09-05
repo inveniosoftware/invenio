@@ -64,7 +64,7 @@ from invenio.config import \
      CFG_SITE_RECORD
 
 try:
-    from invenio.session import get_session
+    from flask import session
 except ImportError:
     pass
 from invenio.dbquery import run_sql, OperationalError, \
@@ -188,7 +188,7 @@ def getUid(req):
 
     guest = 0
     try:
-        session = get_session(req)
+        session = session._get_current_object()
     except Exception:
         ## Not possible to obtain a session
         return 0
@@ -233,9 +233,7 @@ def setUid(req, uid, remember_me=False):
     """
     if hasattr(req, '_user_info'):
         del req._user_info
-    session = get_session(req)
     session.invalidate()
-    session = get_session(req)
     session['_uid'] = uid
     if remember_me:
         session.set_timeout(86400)
@@ -252,14 +250,12 @@ def session_param_del(req, key):
     """
     Remove a given key from the session.
     """
-    session = get_session(req)
     del session[key]
 
 def session_param_set(req, key, value):
     """
     Associate a VALUE to the session param KEY for the current session.
     """
-    session = get_session(req)
     session[key] = value
 
 def session_param_get(req, key):
@@ -267,14 +263,12 @@ def session_param_get(req, key):
     Return session parameter value associated with session parameter KEY for the current session.
     If the key doesn't exists raise KeyError.
     """
-    session = get_session(req)
     return session[key]
 
 def session_param_list(req):
     """
     List all available session parameters.
     """
-    session = get_session(req)
     return session.keys()
 
 def get_last_login(uid):
@@ -733,7 +727,6 @@ def drop_external_settings(userId):
 def logoutUser(req):
     """It logout the user of the system, creating a guest user.
     """
-    session = get_session(req)
     if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
         uid = createGuestUser()
         session['uid'] = uid
@@ -1219,7 +1212,6 @@ def collect_user_info(req, login_time=False, refresh=False):
             user_info['agent'] = req.user_agent or 'N/A'
         else:
             is_req = True
-            session = get_session(req)
             uid = getUid(req)
             if hasattr(req, '_user_info') and not login_time:
                 user_info = req._user_info
@@ -1231,7 +1223,7 @@ def collect_user_info(req, login_time=False, refresh=False):
             except gaierror:
                 #FIXME: we should support IPV6 too. (hint for FireRole)
                 pass
-            user_info['session'] = get_session(req).sid
+            user_info['session'] = session.sid
             user_info['remote_host'] = req.remote_host or ''
             user_info['referer'] = req.headers_in.get('Referer', '')
             user_info['uri'] = req.unparsed_uri or ''
