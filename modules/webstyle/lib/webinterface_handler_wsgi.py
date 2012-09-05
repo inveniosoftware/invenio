@@ -46,7 +46,7 @@ from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
     CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE, CFG_SITE_URL, \
     CFG_SITE_SECURE_URL, CFG_WEBSTYLE_REVERSE_PROXY_IPS
 from invenio.errorlib import register_exception, get_pretty_traceback
-from flask import request, current_app
+from flask import request, current_app, after_this_request
 
 ## Static files are usually handled directly by the webserver (e.g. Apache)
 ## However in case WSGI is required to handle static files too (such
@@ -348,7 +348,9 @@ class SimulatedModPythonRequest(object):
         return self.__environ['wsgi.input'].read(hint)
 
     def register_cleanup(self, callback, data=None):
-        self.__cleanups.append((callback, data))
+        @after_this_request
+        def f(response):
+            callback(data)
 
     def get_cleanups(self):
         return self.__cleanups
