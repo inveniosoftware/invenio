@@ -74,7 +74,7 @@ msgstr "UND NICHT"
 #: modules/bibcheck/web/admin/bibcheckadmin.py:302
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:70
 msgid "Admin Area"
-msgstr "Verwaltungsraum"
+msgstr "Administration"
 
 #: modules/websearch/doc/search-guide.webdoc:427
 #: modules/websearch/doc/search-guide.webdoc:559
@@ -92,7 +92,7 @@ msgstr "Verwaltungsraum"
 #: modules/websearch/lib/websearch_templates.py:2232
 #: modules/websearch/lib/websearch_templates.py:2263
 msgid "Browse"
-msgstr "Durchblättern"
+msgstr "Blättern"
 
 #: modules/webhelp/web/help-central.webdoc:50
 #: modules/websearch/doc/search-tips.webdoc:20
@@ -119,7 +119,7 @@ msgstr "Suchtipps"
 #: modules/websearch/doc/search-guide.webdoc:820
 #: modules/miscutil/lib/inveniocfg.py:481
 msgid "abstract"
-msgstr "Abstrakt"
+msgstr "Kurzfassung"
 
 #: modules/websearch/doc/search-guide.webdoc:348
 #: modules/websearch/doc/search-guide.webdoc:383
@@ -783,7 +783,7 @@ msgstr "Suchen"
 
 #: modules/webhelp/web/help-central.webdoc:133
 msgid "Citation Metrics"
-msgstr "Zitationsgrößen"
+msgstr "Zitationsmetriken"
 
 #: modules/websearch/doc/search-tips.webdoc:35
 #: modules/websearch/doc/search-tips.webdoc:66
@@ -1087,9 +1087,8 @@ msgstr "Genaue Phrase:"
 
 #: modules/webhelp/web/help-central.webdoc:108
 #: modules/websubmit/doc/submit-guide.webdoc:20
-#, fuzzy
 msgid "Submit Guide"
-msgstr "Eintragehilfe"
+msgstr "Hinweise zum Eintragen"
 
 #: modules/websearch/doc/search-guide.webdoc:360
 #: modules/websearch/doc/search-guide.webdoc:395
@@ -1133,7 +1132,7 @@ msgstr "UND"
 #: modules/websearch/doc/search-guide.webdoc:826
 #: modules/miscutil/lib/inveniocfg.py:482
 msgid "keyword"
-msgstr "Kennwort"
+msgstr "Schlagwort"
 
 #: modules/websearch/doc/search-tips.webdoc:36
 #: modules/websearch/doc/search-tips.webdoc:67
@@ -1437,7 +1436,7 @@ msgstr "Attribute der Vorlage ändern"
 #: modules/bibformat/lib/bibformat_templates.py:600
 #: modules/bibformat/lib/bibformat_templates.py:631
 msgid "Template Editor"
-msgstr "Vorlageeditor"
+msgstr "Vorlageneditor"
 
 #: modules/bibformat/lib/bibformat_templates.py:320
 #: modules/bibformat/lib/bibformat_templates.py:433
@@ -1566,7 +1565,7 @@ msgstr "Dokumentation verstecken"
 #: modules/bibformat/lib/bibformat_templates.py:588
 #: modules/websubmit/lib/websubmit_templates.py:868
 msgid "Your modifications will not be saved."
-msgstr ""
+msgstr "Ihre Änderungen werde nicht gespeichert."
 
 #: modules/bibformat/lib/bibformat_templates.py:938
 #: modules/bibformat/lib/bibformat_templates.py:1062
@@ -1614,7 +1613,7 @@ msgstr "Status"
 #: modules/bibformat/lib/bibformat_templates.py:939
 #: modules/bibformat/lib/bibformat_templates.py:1063
 msgid "Last Modification Date"
-msgstr "Datum der letzen Modifikation"
+msgstr "Datum der letzen Änderung"
 
 #: modules/bibformat/lib/bibformat_templates.py:940
 #: modules/bibformat/lib/bibformat_templates.py:1064
@@ -1738,7 +1737,7 @@ msgstr "Änderungen speichern"
 
 #: modules/bibformat/lib/bibformat_templates.py:1910
 msgid "No problem found with format"
-msgstr "Kein Problem gefunden mit dem Format"
+msgstr "In diesem Format wurden keine Probleme gemeldet."
 
 #: modules/bibformat/lib/bibformat_templates.py:1912
 msgid "An error has been found"
@@ -1897,7 +1896,7 @@ msgstr "Ausgabeformat kann nicht erstellt werden"
 #: modules/bibformat/web/admin/bibformatadmin.py:587
 #: modules/bibformat/web/admin/bibformatadmin.py:1023
 msgid "Restricted Format Template"
-msgstr "Eingeschränkte Formatvorlagge"
+msgstr "Eingeschränkte Formatvorlage"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:539
 #, python-format
@@ -1949,7 +1948,7 @@ msgstr "Format Element %s überprüfen"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1053
 msgid "Format Validation"
-msgstr "Format Überprüfung"
+msgstr "Formatüberprüfung"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:53
 #: modules/bibharvest/lib/bibharvest_templates.py:70
@@ -1958,7 +1957,7 @@ msgstr "Siehe Handbuch"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:81
 msgid "OAI sources currently present in the database"
-msgstr "Es sind zur Zeit OAI Quellen in der Datenbank"
+msgstr "Aktuell definierte OAI Quellen"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:82
 msgid "No OAI sources currently present in the database"
@@ -1990,7 +1989,7 @@ msgstr "die baseURL scheint nicht OAI-kompatibel zu sein"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:284
 msgid "View next entries..."
-msgstr "Nächste Einträge"
+msgstr "Nächste Einträge..."
 
 #: modules/bibharvest/lib/bibharvest_templates.py:341
 msgid "previous month"
@@ -2032,11 +2031,11 @@ msgstr ""
 
 #: modules/bibrank/lib/bibrank_citation_grapher.py:137
 msgid "Citation history:"
-msgstr "Zitations Chronik"
+msgstr "Zitationschronik"
 
 #: modules/bibrank/lib/bibrank_downloads_grapher.py:85
 msgid "Download history:"
-msgstr "Download Chronik"
+msgstr "Downloadchronik"
 
 #: modules/bibrank/lib/bibrank_downloads_grapher.py:107
 #, fuzzy
@@ -2075,7 +2074,7 @@ msgstr "Upload Modus"
 #: modules/bibupload/lib/batchuploader_templates.py:188
 #: modules/bibupload/lib/batchuploader_templates.py:396
 msgid "Upload later? then select:"
-msgstr "Später Hochladen? dann auswählen:"
+msgstr "Später Hochladen? Dann auswählen:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:189
 #: modules/bibupload/lib/batchuploader_templates.py:397
@@ -2152,7 +2151,7 @@ msgstr "Ablaufzeitpunkt"
 
 #: modules/bibupload/lib/batchuploader_templates.py:279
 msgid "No document files have been uploaded yet."
-msgstr "Dokument-Dateien sind bisher noch nicht hochgeladen wurden."
+msgstr "Bisher wurden noch keine Datieen hochgeladen."
 
 #: modules/bibupload/lib/batchuploader_templates.py:334
 #: modules/bibupload/lib/batchuploader_webinterface.py:73
@@ -2236,15 +2235,15 @@ msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:464
 msgid "Progress"
-msgstr ""
+msgstr "Fortschritt"
 
 #: modules/bibupload/lib/batchuploader_templates.py:466
 msgid "Last BibSched tasks:"
-msgstr ""
+msgstr "Letzter Bibsched Auftrag:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:475
 msgid "Next scheduled BibSched run:"
-msgstr ""
+msgstr "Nächster Bibsched Auftrag:"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:154
 msgid "Document batch upload result"
@@ -2514,9 +2513,8 @@ msgid "The error report has been sent."
 msgstr "Der Fehlerbericht wurde gelöscht."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:99
-#, fuzzy
 msgid "Many thanks for helping us to improve the service."
-msgstr "Vielen Dank für Verbesserungsvorschläge zu Invenio."
+msgstr "Vielen Dank für Verbesserungsvorschläge!"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:101
 msgid "Use the back button of your browser to return to the previous page."
@@ -2566,7 +2564,7 @@ msgstr "Hallo:"
 
 #: modules/miscutil/lib/mailutils.py:241 modules/miscutil/lib/mailutils.py:261
 msgid "Best regards"
-msgstr "Viele Grüsse"
+msgstr "Mit freundlichen Grüssen"
 
 #: modules/miscutil/lib/mailutils.py:243 modules/miscutil/lib/mailutils.py:263
 msgid "Need human intervention?  Contact"
@@ -2589,7 +2587,7 @@ msgstr "Multi-Record Editor ausführen"
 #: modules/websession/lib/webuser.py:897 modules/websession/lib/webuser.py:907
 #: modules/websession/lib/webuser.py:908
 msgid "Run Document File Manager"
-msgstr "Document File Manager ausführen"
+msgstr "Dateimmanager ausführen"
 
 #: modules/webaccess/lib/access_control_config.py:303
 #: modules/websession/lib/websession_templates.py:1096
@@ -2733,7 +2731,7 @@ msgstr "Ihr Konto wurde am '%s' gelöscht:"
 #: modules/websearch/lib/websearch_templates.py:3336
 #: modules/websearch/lib/websearch_templates.py:3341
 msgid "Detailed record"
-msgstr "Details vom Eintrag"
+msgstr "Details des Eintrags"
 
 #: modules/webalert/lib/htmlparser.py:187
 #: modules/websearch/lib/websearch_templates.py:1613
@@ -2762,13 +2760,11 @@ msgstr "Sie haben keine Rechte für diese Aktion."
 
 #: modules/webalert/lib/webalert.py:198
 msgid "You already have an alert defined for the specified query and basket."
-msgstr ""
-"Sie haben bereits eine Benachrichtigung eingerichtet für diese Suchabfrage/"
-"diesen Korb."
+msgstr "Sie haben für diese Suchanfrage/diesen Korb bereits eine Benachrichtigung eingerichtet"
 
 #: modules/webalert/lib/webalert.py:221 modules/webalert/lib/webalert.py:345
 msgid "The alert name cannot be empty."
-msgstr "Der Name der Benachrichtigung kann nicht leer sein."
+msgstr "Die Benachrichtigung muss einen Namen haben."
 
 #: modules/webalert/lib/webalert.py:226
 msgid "You are not the owner of this basket."
@@ -6834,7 +6830,7 @@ msgstr "Neue Gruppe erstellen"
 
 #: modules/websession/lib/websession_templates.py:1562
 msgid "You are a member of the following groups:"
-msgstr "Sie sind kein Mitgliedd in den folgenden Gruppen:"
+msgstr "Sie sind Mitglied in den folgenden Gruppen:"
 
 #: modules/websession/lib/websession_templates.py:1585
 msgid "You are not a member of any groups."

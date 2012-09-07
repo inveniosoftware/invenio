@@ -1,7 +1,7 @@
 ## -*- mode: python; coding: utf-8; -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -86,7 +86,7 @@ def OAI_Session(server, script, http_param_dict , method="POST", output="",
     in corresponding filepath, with a unique number appended at the end.
     This number starts at 'resume_request_nbr'.
 
-    Returns a tuple containing an int corresponding to the last created 'resume_request_nbr' and 
+    Returns a tuple containing an int corresponding to the last created 'resume_request_nbr' and
     a list of harvested files.
     """
     sys.stderr.write("Starting the harvesting session at %s" %
@@ -243,15 +243,27 @@ def OAI_Request(server, script, params, method="POST", secure=False,
                  (If provided, 'key_file' must also be provided)
 
       attempts - *int* maximum number of attempts
-    Return:
 
     Returns harvested data if harvest is successful.
+
+    Note: if the environment variable "http_proxy" is set, the defined
+          proxy will be used in order to instantiate a connection,
+          however no special treatment is supported for HTTPS
     """
 
     headers = {"Content-type":"application/x-www-form-urlencoded",
                "Accept":"text/xml",
                "From": CFG_SITE_ADMIN_EMAIL,
                "User-Agent":"Invenio %s" % CFG_VERSION}
+
+    proxy = os.getenv('http_proxy')
+    if proxy:
+        if proxy.startswith('http://'):
+            proxy = proxy[7:]
+        proxy = proxy.strip('/ ')
+        if len(proxy) > 0:
+            script = 'http://' + server + script
+            server = proxy
 
     if password:
         # We use basic authentication
