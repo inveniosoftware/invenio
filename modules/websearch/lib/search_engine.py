@@ -354,8 +354,11 @@ except Exception:
 def get_collection_reclist(coll):
     """Return hitset of recIDs that belong to the collection 'coll'."""
     collection_reclist_cache.recreate_cache_if_needed()
+    if coll not in collection_reclist_cache.cache:
+        return HitSet() # collection does not exist; return empty set
     if not collection_reclist_cache.cache[coll]:
-        # not yet it the cache, so calculate it and fill the cache:
+        # collection's reclist not in the cache yet, so calculate it
+        # and fill the cache:
         set = HitSet()
         query = "SELECT nbrecs,reclist FROM collection WHERE name=%s"
         res = run_sql(query, (coll, ), 1)
