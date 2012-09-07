@@ -51,7 +51,6 @@ from bibauthorid_backinterface import get_inspire_id
 from bibauthorid_backinterface import get_person_with_extid
 from bibauthorid_backinterface import get_name_string_to_pid_dictionary
 from bibauthorid_backinterface import get_new_personid
-from bibauthorid_backinterface import get_bibrecref_to_pid_dictuonary
 
 USE_EXT_IDS = bconfig.RABBIT_USE_EXTERNAL_IDS
 USE_INSPIREID = bconfig.RABBIT_USE_EXTERNAL_ID_INSPIREID

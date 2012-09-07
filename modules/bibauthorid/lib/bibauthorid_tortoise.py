@@ -29,9 +29,7 @@ from bibauthorid_backinterface import empty_results_table
 from bibauthorid_backinterface import remove_result_cluster
 from bibauthorid_general_utils import bibauthor_print
 from bibauthorid_prob_matrix import prepare_matirx
-from bibauthorid_scheduler import schedule \
-                                  , matrix_coefs \
-                                  , wedge_coefs
+from bibauthorid_scheduler import schedule, matrix_coefs
 from bibauthorid_least_squares import to_function as create_approx_func
 
 

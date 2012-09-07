@@ -45,7 +45,27 @@ from bibauthorid_general_utils import update_status \
                                     , update_status_final
 from dbquery import run_sql
 
-from collections import defaultdict
+try:
+    from collections import defaultdict
+except ImportError:
+    class defaultdict(dict):
+        def __init__(self, default_factory, *args, **kwargs):
+            super(defaultdict, self).__init__(*args, **kwargs)
+            self.default_factory = default_factory
+
+        def __missing__(self, key):
+            try:
+                self[key] = self.default_factory()
+            except TypeError:
+                raise KeyError("Missing key %s" % (key,))
+            else:
+                return self[key]
+
+        def __getitem__(self, key):
+            try:
+                return super(defaultdict, self).__getitem__(key)
+            except KeyError:
+                return self.__missing__(key)
 
 MARC_100_700_CACHE = None
 
@@ -1339,12 +1359,12 @@ def populate_partial_marc_caches():
             if i % 500000 == 0:
                 update_status(float(i) / maxiters, 'br_dictionarizing...GC')
                 gc.collect()
-            id = defaultdict(list)
+            idx = defaultdict(list)
             fn = defaultdict(list)
             for _, k, z in v[1]:
                 id[k].append(z)
                 fn[z].append(k)
-            md[v[0]]['id'] = id
+            md[v[0]]['id'] = idx
             md[v[0]]['fn'] = fn
         update_status_final('br_dictionarizieng done')
         gc.enable()
@@ -2037,7 +2057,7 @@ def check_wrong_names(printer, repair=False):
     if number > 0:
         ret = False
         printer("%d corrupted names in aidPERSONIDPAPERS." % number)
-        for i, wrong_name in  enumerate(wrong_names):
+        for wrong_name in wrong_names:
             if wrong_name[2]:
                 printer("Outdated name, '%s'(%s:%d)." % (wrong_name[2], wrong_name[0], wrong_name[1]))
             else:
