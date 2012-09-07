@@ -139,11 +139,11 @@ def clean_tempfiles():
             % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                CFG_MAX_ATIME_ZIP_OAI, vstr))
     gc_exec_command('find %s %s -name "oaiharvest*"'
-        ' -mtime +%s -exec rm %s -f {} \;' \
+        ' -mtime +%s -exec rm %s -rf {} \;' \
             % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                CFG_MAX_ATIME_RM_OAI, vstr))
     gc_exec_command('find %s %s -name "oai_archive*"'
-        ' -mtime +%s -exec rm %s -f {} \;' \
+        ' -mtime +%s -exec rm %s -rf {} \;' \
             % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                CFG_MAX_ATIME_RM_OAI, vstr))
 
