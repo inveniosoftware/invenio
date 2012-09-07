@@ -25,7 +25,7 @@ from invenio.cache import cache
 from invenio.intbitset import intbitset as HitSet
 from invenio.sqlalchemyutils import db
 from invenio.websearch_model import Collection, CollectionCollection, \
-        Collectionname
+        Collectionname, CollectionPortalbox, OrderedList
 from invenio.websession_model import User
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.webuser_flask import current_user
@@ -36,10 +36,12 @@ from invenio.search_engine import search_pattern_parenthesised,\
         perform_request_search,\
         search_pattern
 
+from wtforms import TextField
+
 from invenio.messages import language_list_long
 
 # imports the necessary forms
-from websearch_admin_forms import CollectionForm
+from websearch_admin_forms import CollectionForm, TranslationsForm
 
 from wtforms.ext.sqlalchemy.orm import model_form
 
@@ -65,7 +67,7 @@ blueprint = InvenioBlueprint(
 
 @blueprint.route('/', methods=['GET', 'POST'])
 @blueprint.route('/index', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
+#@blueprint.invenio_authenticated
 #@blueprint.invenio_authorized('usemessages')
 @blueprint.invenio_templated('websearch_admin_index.html')
 def index():
@@ -79,19 +81,26 @@ def index():
 
 
 @blueprint.route('/modifycollectiontree', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_templated('websearch_admin_index.html')
+#@blueprint.invenio_authenticated
+#@blueprint.invenio_templated('websearch_admin_index.html')
 def modifycollectiontree():
+    """
+    Handler of the tree changing operations triggered by the drag and drop operation
+    """
+
+    # Get the requests parameters
     id = request.args.get('id', 0, type=int)
     id_dad = request.args.get('id_dad', 0, type=int)
     score = request.args.get('score', 0, type=int)
-    flash(_("id = %d id_dad = %d score = %d") % (id, id_dad, score), "info")
+    score = score - 1
+    type = request.args.get('type')
 
     collection = Collection.query.get_or_404(id)
 
     # check to see if it is only one dad
     if len(collection.dads) > 1:
         return "multiple dads"
+
     # get the dad
     olddad = collection.dads.pop()
     db.session.delete(olddad)
@@ -100,17 +109,17 @@ def modifycollectiontree():
         type=collection.type), score)
 
     db.session.commit()
-    return dict()#redirect(url_for('.index'))
+    return ""
 
 
-"""
-Here is where managing the tree is possible
-"""
 
 
 @blueprint.route('/collectiontree', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
+#@blueprint.invenio_authenticated
 def managecollectiontree():
+    """
+    Here is where managing the tree is possible
+    """
 
     collection = Collection.query.get_or_404(1)
     orphans = Collection.query.filter(
@@ -122,23 +131,34 @@ def managecollectiontree():
 
 @blueprint.route('/collection/<name>', methods=['GET', 'POST'])
 @blueprint.route('/collection/view/<name>', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
+#@blueprint.invenio_authenticated
 #@blueprint.invenio_templated('websearch_admin_collection.html')
 def manage_collection(name):
     collection = Collection.query.filter(Collection.name==name).first_or_404()
     form = CollectionForm(request.form, obj = collection)
 
+    # gets the collections translations
+    translations = dict((x.ln,x.value) for x in  collection.collection_names)
+
+    # Creating the translations form
+    TranslationsFormFilled = TranslationsForm(language_list_long(), translations)
+    translation_form = TranslationsFormFilled(request.form)
+    #for x in  collection.collection_names:
+    #    translation_form[x.ln](default = x.value)
+
+    #translation_form.populate_obj(translations)
+
     return render_template('websearch_admin_collection.html', \
-            collection = collection, form=form)
+            collection = collection, form=form, \
+            translation_form=translation_form)
 
 
-@blueprint.route('/collection/update<id>', methods=['POST'])
-@blueprint.invenio_authenticated
+@blueprint.route('/collection/update/<id>', methods=['POST'])
+#@blueprint.invenio_authenticated
 def update(id):
     form = CollectionForm(request.form)
 
     if  request.method == 'POST':# and form.validate():
-        #collection_id = request.form.id
         collection = Collection.query.filter(Collection.id==id).first_or_404()
 
         form.populate_obj(collection)
@@ -151,21 +171,22 @@ def update(id):
 
 @blueprint.route('/collection/new', methods=['GET', 'POST'])
 @blueprint.route('/collection/add', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
+#@blueprint.invenio_authenticated
 @blueprint.invenio_templated('websearch_admin_collection.html')
 def create_collection():
     form = CollectionForm()
     return dict(form=form)
 
 
-"""
-updates translations if the value is altered or not void
-"""
 
 
 @blueprint.route('/collection/update_translations<id>', methods=['POST'])
-@blueprint.invenio_authenticated
+#@blueprint.invenio_authenticated
 def update_translations(id):
+    """
+    updates translations if the value is altered or not void
+    """
+
     collection = Collection.query.filter(Collection.id==id).first_or_404()
 
     for (lang, lang_long) in language_list_long():
@@ -187,3 +208,39 @@ def update_translations(id):
 
     flash(_('Collection was updated on n languages:'), "info")
     return redirect(url_for('.manage_collection', name = collection.name))
+
+
+@blueprint.route('/collection/manage_portalboxes_order', methods=['GET', 'POST'])
+#@blueprint.invenio_authenticated
+def manage_portalboxes_order():
+    id_p = request.args.get('id', 0 , type=int)
+    collection_id = request.args.get('id_collection', 0 , type=int)
+    order = request.args.get('score', 0 , type=int)
+
+    collection = Collection.query.filter(Collection.id==collection_id).first_or_404()
+
+    portalbox = \
+            CollectionPortalbox.query.filter(db.and_(
+                CollectionPortalbox.id_portalbox==id_p,
+                CollectionPortalbox.id_collection==collection_id)).first_or_404()
+
+    position = portalbox.position
+    p_order = portalbox.score
+
+    db.session.delete(portalbox)
+
+    #p = portalboxes.pop(portalbox)
+    collection.portal_boxes_ln.set(CollectionPortalbox(collection_id, \
+            id_p,\
+            g.ln, position, p_order ), order )
+    db.session.commit()
+
+    return ''
+
+
+@blueprint.route('/collection/edit_portalbox', methods=['GET', 'POST'])
+def edit_portalbox():
+#    collection = Collection.query.filter(Collection.name==name).first_or_404()
+    portalbox = Portalbox.query.filter(Portalbox.id==request.args.get('id', 0, type=int))
+
+    return dict(portalbox = portalbox)

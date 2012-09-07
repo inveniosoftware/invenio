@@ -132,6 +132,10 @@ class InvenioBaseForm(Form, SessionSecureForm):
     def __init__(self, *args, **kwargs):
         super(InvenioBaseForm, self).__init__(*args, csrf_context=session, **kwargs)
 
+    def add_fields(self, name, field):
+        self.__setattr__(name, field)
+
+
 class FilterForm(InvenioBaseForm):
     """
     Filter forms contains hidden fields to keep sorting.

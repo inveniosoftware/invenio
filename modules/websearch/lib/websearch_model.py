@@ -69,12 +69,29 @@ class OrderedList(InstrumentedList):
 
     def set(self, item, index=0):
         if self:
-            item.score = index
-            for i,it in enumerate(sorted(self, key=lambda obj: obj.score)[index:]):
-                it.score = index + i + 1
+            s = sorted(self, key=lambda obj: obj.score, reverse=True)
+            #if index == 0:
+            #    item.score = s[-1].score + 1
+            #else:
+            #if index >= len(s):
+            #    index = len(s) - 1
+
+            item.score = s[index].score + 1
+
+            for i,it in enumerate(s[:index]):
+                it.score = item.score + (len(s[:index]) - i)
+                #if s[i+1].score more then break
         else:
             item.score=index
         InstrumentedList.append(self, item)
+
+    def pop(self, item):
+        #FIXME
+        if self:
+            obj_list = sorted(self, key=lambda obj: obj.score)
+            for i, it in enumerate(obj_list):
+                if obj_list[i] == item:
+                    return InstrumentedList.pop(self,i)
 
 
 def attribute_multi_dict_collection(creator, key_attr, val_attr):
@@ -295,7 +312,14 @@ class Collection(db.Model):
                 with_parent(self).filter(db.and_(Collectionname.ln==lang,
                     Collectionname.type=='ln')).first().value
         except:
-            return "" 
+            return ""
+
+    portal_boxes_ln = db.relationship(
+            lambda : CollectionPortalbox,
+            collection_class=OrderedList,
+            primaryjoin= lambda: Collection.id==CollectionPortalbox.id_collection,
+            foreign_keys= lambda: CollectionPortalbox.id_collection,
+            order_by=lambda: db.asc(CollectionPortalbox.score))
 
 
     #@db.hybrid_property
@@ -417,9 +441,28 @@ class Portalbox(db.Model):
     title = db.Column(db.Text, nullable=False)
     body = db.Column(db.Text, nullable=False)
 
+def get_pbx_pos():
+    """Returns a list of all the positions for a portalbox"""
+
+    position = {}
+    position["rt"] = "Right Top"
+    position["lt"] = "Left Top"
+    position["te"] = "Title Epilog"
+    position["tp"] = "Title Prolog"
+    position["ne"] = "Narrow by coll epilog"
+    position["np"] = "Narrow by coll prolog"
+    return position
+
+
 class CollectionPortalbox(db.Model):
     """Represents a CollectionPortalbox record."""
-    def __init__(self):
+    def __init__(self , id_collection, id_portalbox, ln, position, score):
+        self.id_collection = id_collection
+        self.id_portalbox = id_portalbox
+        self.ln = ln
+        self.position = position
+        self.score = score
+
         pass
     __tablename__ = 'collection_portalbox'
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
