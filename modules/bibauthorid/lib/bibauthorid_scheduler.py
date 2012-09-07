@@ -48,9 +48,11 @@ def get_peak_mem():
     return map(to_number, (mem["VmPeak"], mem["VmHWM"]))
 
 
-matrix_coefs = [1133088., 4., 0.016]
-wedge_coefs = [800000., 230., 0.018]
+#matrix_coefs = [1133088., 0., 1.5]
+#wedge_coefs = [800000., 0., 2.]
 
+matrix_coefs = [1000., 500., 0.01]
+wedge_coefs = [1000., 500., 0.02]
 
 def get_biggest_job_below(lim, arr):
     return dropwhile(lambda x: x[1] < lim, enumerate(chain(arr, [lim]))).next()[0] - 1
@@ -108,6 +110,7 @@ def schedule(jobs, sizs, estimator, memfile_path=None):
 
     done = 0.
     total = sum(sizs)
+    biggest = max(sizs)
 
     update_status(0., "0 / %d" % len(jobs))
     too_big = [idx for idx in free_idxs if sizs[idx] > free]
@@ -130,6 +133,7 @@ def schedule(jobs, sizs, estimator, memfile_path=None):
                 job_idx = free_idxs[idx]
                 pid = os.fork()
                 if pid == 0: # child
+                    os.nice(int((float(sizs[idx]) * 20.0 / biggest)))
                     run_job(job_idx)
                 else: # parent
                     pid_2_idx[pid] = job_idx

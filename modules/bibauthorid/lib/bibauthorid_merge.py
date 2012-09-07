@@ -19,6 +19,7 @@
 
 from operator import itemgetter
 from itertools import groupby, chain, imap, izip
+import gc
 
 from bibauthorid_general_utils import update_status \
                                     , update_status_final
@@ -37,18 +38,21 @@ from bibauthorid_backinterface import get_signature_info
 from bibauthorid_dbinterface import delete_empty_persons
 from bibauthorid_dbinterface import get_bibrefrec_to_pid_flag_mapping
 
-def merge_static():
+def merge_static_classy():
     '''
         This function merges aidPERSONIDPAPERS with aidRESULTS.
         Use it after tortoise.
         This function is static: if aid* tables are changed while it's running,
         probably everything will crash and a black hole will open, eating all your data.
+        
+        NOTE: this is more elegant that merge_static but much slower. Will have to be improved
+               before it can replace it.
     '''
     class Sig(object):
         def __init__(self, bibrefrec, pid_flag):
             self.rejected = dict(filter(lambda p:                p[1] <= -2, pid_flag))
-            self.assigned =      filter(lambda p: -2 <  p[1] and p[1] <   2, pid_flag)
-            self.claimed =       filter(lambda p:  2 <= p[1],                pid_flag)
+            self.assigned = filter(lambda p:-2 < p[1] and p[1] < 2, pid_flag)
+            self.claimed = filter(lambda p:  2 <= p[1], pid_flag)
             self.bibrefrec = bibrefrec
 
             assert self.invariant()
@@ -171,7 +175,7 @@ def merge_static():
     delete_empty_persons()
     update_personID_canonical_names()
 
-def merge_static_oldstyle():
+def merge_static():
     '''
         This function merges aidPERSONIDPAPERS with aidRESULTS.
         Use it after tortoise.

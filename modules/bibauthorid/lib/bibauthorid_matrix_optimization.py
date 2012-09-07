@@ -34,12 +34,11 @@ def maximized_mapping(matrix):
         return []
 
     sorts = sorted([(i, j, v) for i, row in enumerate(matrix) for j, v in enumerate(row)]
-                   , key = itemgetter(2)
-                   , reverse = True)
+                   , key=itemgetter(2)
+                   , reverse=True)
     freei = set(range(len(matrix)))
     freej = set(range(len(matrix[0])))
     res = []
-
     for i, j, v in sorts:
         if i in freei and j in freej:
             res.append((i, j, v))
