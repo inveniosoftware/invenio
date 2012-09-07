@@ -1,7 +1,7 @@
 ## -*- mode: python; coding: utf-8; -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,6 +25,7 @@ This 'getter' simply retrieve the records from an OAI repository.
 __revision__ = "$Id$"
 
 try:
+    import os
     import sys
     import httplib
     import urllib
@@ -260,12 +261,25 @@ def OAI_Request(server, script, params, method="POST", secure=False,
                  key in case the server to harvest requires
                  certificate-based authentication
                  (If provided, 'key_file' must also be provided)
+
+     Note: if the environment variable "http_proxy" is set, the defined
+           proxy will be used in order to instantiate a connection,
+           however no special treatment is supported for HTTPS
     """
 
     headers = {"Content-type":"application/x-www-form-urlencoded",
                "Accept":"text/xml",
                "From": CFG_SITE_ADMIN_EMAIL,
                "User-Agent":"Invenio %s" % CFG_VERSION}
+
+    proxy = os.getenv('http_proxy')
+    if proxy:
+        if proxy.startswith('http://'):
+            proxy = proxy[7:]
+        proxy = proxy.strip('/ ')
+        if len(proxy) > 0:
+            script = 'http://' + server + script
+            server = proxy
 
     if password:
         # We use basic authentication
