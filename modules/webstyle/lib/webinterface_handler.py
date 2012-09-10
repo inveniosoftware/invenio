@@ -61,6 +61,7 @@ CFG_NO_LANG_RECOGNITION_URIS = ['/rss',
 RE_SLASHES = re.compile('/+')
 RE_SPECIAL_URI = re.compile('^/record/\d+|^/collection/.+')
 
+_RE_BAD_MSIE = re.compile("MSIE\s+(\d+\.\d+)")
 
 def _debug(req, msg):
     """
@@ -359,12 +360,17 @@ def create_handler(root):
                 uri = RE_SLASHES.sub('/', uri)
                 path = uri[1:].split('/')
 
+            g = _RE_BAD_MSIE.search(req.headers_in.get('User-Agent', "MSIE 6.0"))
+            bad_msie = g and float(g.group(1)) < 9.0
             if uri.startswith('/yours') or not guest_p:
                 ## Private/personalized request should not be cached
-                req.headers_out['Cache-Control'] = 'private, no-cache, no-store, max-age=0, must-revalidate'
-                req.headers_out['Pragma'] = 'no-cache'
-                req.headers_out['Vary'] = '*'
-            else:
+                if bad_msie and req.is_https():
+                    req.headers_out['Cache-Control'] = 'private, max-age=0, must-revalidate'
+                else:
+                    req.headers_out['Cache-Control'] = 'private, no-cache, no-store, max-age=0, must-revalidate'
+                    req.headers_out['Pragma'] = 'no-cache'
+                    req.headers_out['Vary'] = '*'
+            elif not (bad_msie and req.is_https()):
                 req.headers_out['Cache-Control'] = 'public, max-age=3600'
                 req.headers_out['Vary'] = 'Cookie, ETag, Cache-Control'
 
