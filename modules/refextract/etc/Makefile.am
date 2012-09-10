@@ -15,15 +15,13 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-rectmpldir = $(sysconfdir)/bibedit/record_templates/
-rectmpl_DATA = record_poem.xml
+etcdir = $(sysconfdir)/refextract/
 
-fldtmpldir = $(sysconfdir)/bibedit/field_templates/
-fldtmpl_DATA = field_firstauthor.xml \
-               field_reference.xml \
-               field_FFT.xml
+etc_DATA = refextract-journal-titles.kb \
+           refextract-report-numbers.kb \
+           refextract-authors.kb \
+           refextract-job-preprints.cfg
 
-EXTRA_DIST = $(rectmpl_DATA) \
-             $(fldtmpl_DATA)
+EXTRA_DIST = $(etc_DATA)
 
 CLEANFILES = *~ *.tmp

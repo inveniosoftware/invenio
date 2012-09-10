@@ -90,7 +90,7 @@ def _task_submit_elaborate_specific_parameter(key, value, opts, args):
             return False
 
         ## ---- Get the task file with this name
-        task_file_dir = os.path.join(CFG_ETCDIR, 'bibedit')
+        task_file_dir = os.path.join(CFG_ETCDIR, 'refextract')
         ## The job file name
         task_file =  value + '.cfg'
         abs_path = os.path.join(task_file_dir, task_file)

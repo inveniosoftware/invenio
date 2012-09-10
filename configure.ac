@@ -607,13 +607,27 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibconvert/doc/hacking/Makefile \
      modules/bibconvert/etc/Makefile \
      modules/bibconvert/lib/Makefile \
+     modules/bibrecord/Makefile \
+     modules/bibrecord/bin/Makefile \
+     modules/bibrecord/bin/xmlmarc2textmarc \
+     modules/bibrecord/bin/textmarc2xmlmarc \
+     modules/bibrecord/bin/xmlmarclint \
+     modules/bibrecord/doc/Makefile \
+     modules/bibrecord/doc/admin/Makefile \
+     modules/bibrecord/doc/hacking/Makefile \
+     modules/bibrecord/etc/Makefile \
+     modules/bibrecord/lib/Makefile \
+     modules/refextract/Makefile \
+     modules/refextract/bin/Makefile \
+     modules/refextract/bin/refextract \
+     modules/refextract/doc/Makefile \
+     modules/refextract/doc/admin/Makefile \
+     modules/refextract/doc/hacking/Makefile \
+     modules/refextract/etc/Makefile \
+     modules/refextract/lib/Makefile \
      modules/bibedit/Makefile \
      modules/bibedit/bin/Makefile \
      modules/bibedit/bin/bibedit \
-     modules/bibedit/bin/refextract \
-     modules/bibedit/bin/xmlmarc2textmarc \
-     modules/bibedit/bin/textmarc2xmlmarc \
-     modules/bibedit/bin/xmlmarclint \
      modules/bibedit/doc/Makefile \
      modules/bibedit/doc/admin/Makefile \
      modules/bibedit/doc/hacking/Makefile \

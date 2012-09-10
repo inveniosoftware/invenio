@@ -7680,7 +7680,7 @@ def begin_extraction(daemon_cli_options=None):
         ## Do a quick test to see if the specified kb file exists.
         ## If it does not, assume name and append onto etc directory.
         if not os.path.exists(titles_kb_file):
-            titles_kb_file = os.path.join(CFG_ETCDIR, 'bibedit', os.path.basename(titles_kb_file))
+            titles_kb_file = os.path.join(CFG_ETCDIR, 'refextract', os.path.basename(titles_kb_file))
 
 
 		## Read the journal titles knowledge base, creating the search
@@ -7700,7 +7700,7 @@ def begin_extraction(daemon_cli_options=None):
         ## Do a quick test to see if the specified kb file exists.
         ## If it does not, assume name and append onto etc directory.
         if not os.path.exists(repno_kb_file):
-            repno_kb_file = os.path.join(CFG_ETCDIR, 'bibedit', os.path.basename(repno_kb_file))
+            repno_kb_file = os.path.join(CFG_ETCDIR, 'refextract', os.path.basename(repno_kb_file))
 
         (preprint_reportnum_sre, \
          standardised_preprint_reportnum_categs) = \

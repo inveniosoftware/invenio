@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,15 +15,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-rectmpldir = $(sysconfdir)/bibedit/record_templates/
-rectmpl_DATA = record_poem.xml
+pylibdir = $(libdir)/python/invenio
 
-fldtmpldir = $(sysconfdir)/bibedit/field_templates/
-fldtmpl_DATA = field_firstauthor.xml \
-               field_reference.xml \
-               field_FFT.xml
+pylib_DATA = refextract_cli.py \
+             refextract_daemon.py \
+             refextract_config.py \
+             refextract.py \
+             refextract_unit_tests.py \
+             refextract_authextract_unit_tests.py
 
-EXTRA_DIST = $(rectmpl_DATA) \
-             $(fldtmpl_DATA)
+EXTRA_DIST = $(pylib_DATA)
 
-CLEANFILES = *~ *.tmp
+CLEANFILES = *~ *.tmp *.pyc

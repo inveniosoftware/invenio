@@ -29,11 +29,11 @@ from invenio.config import CFG_VERSION, CFG_ETCDIR
 CFG_REFEXTRACT_VERSION = "Invenio/%s refextract/%s" % (CFG_VERSION, CFG_VERSION)
 
 # periodicals knowledge base:
-CFG_REFEXTRACT_KB_JOURNAL_TITLES = "%s/bibedit/refextract-journal-titles.kb" % CFG_ETCDIR
+CFG_REFEXTRACT_KB_JOURNAL_TITLES = "%s/refextract/refextract-journal-titles.kb" % CFG_ETCDIR
 # report numbers knowledge base:
-CFG_REFEXTRACT_KB_REPORT_NUMBERS = "%s/bibedit/refextract-report-numbers.kb" % CFG_ETCDIR
+CFG_REFEXTRACT_KB_REPORT_NUMBERS = "%s/refextract/refextract-report-numbers.kb" % CFG_ETCDIR
 # authors which should be recognised as such
-CFG_REFEXTRACT_KB_AUTHORS = "%s/bibedit/refextract-authors.kb" % CFG_ETCDIR
+CFG_REFEXTRACT_KB_AUTHORS = "%s/refextract/refextract-authors.kb" % CFG_ETCDIR
 
 ## Lines holding key matches will be replaced with the value at extraction time
 CFG_REFEXTRACT_INSTITUTION_REPLACEMENTS = {r'^Livermore' : 'LLNL, Livermore', \
