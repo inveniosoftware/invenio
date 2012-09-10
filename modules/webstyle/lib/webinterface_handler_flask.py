@@ -87,8 +87,11 @@ def create_invenio_flask_app():
                     response = self.app.full_dispatch_request()
                 except Exception, e:
                     # e == 404
-                    #try:
-                    return legacy_application(environ, start_response)
+                    try:
+                        return legacy_application(environ, start_response)
+                    except:
+                        register_exception(alert_admin=True)
+                        raise
                     #except:
                     #    pass
                     #response = self.app.make_response(self.app.handle_exception(e))
@@ -422,46 +425,4 @@ def create_invenio_flask_app():
         pass
 
     return _app
-
-## assuming there is a flask_application
-
-class InvenioFlaskDispatcher(object):
-    """
-    This class has to be instantiated only once and is implementing a
-    WSGI application wrapping Flask and Invenio legacy web interface
-    handler.
-    If the Flask handler can not resolve a given URL request then this
-    will be resolved (if possible) via the Invenio handler.
-    """
-    def __init__(self, legacy_application=None):
-        self.flask_application = create_invenio_flask_app()
-        if legacy_application is None:
-            from invenio.webinterface_handler_wsgi import \
-                application as legacy_application
-        self.legacy_application = legacy_application
-        #del legacy_application
-
-    def __call__(self, environ, start_response):
-        """
-        Special method to implement the WSGI application protocol
-        """
-        try:
-            urls = self.flask_application.url_map.bind_to_environ(environ)
-            try:
-                _endpoint, _args = urls.match()
-            except NotFound, e:
-                ## This should be handled by Invenio legacy_application
-                with self.flask_application.request_context(environ):
-                    if current_app.preprocess_request() is not None:
-                        return None
-                    return self.legacy_application(environ, start_response,
-                                                   self.flask_application)
-            except RequestRedirect:
-                return self.flask_application(environ, start_response)
-            else:
-                ## OK this is a brand new Flask application :-)
-                return self.flask_application(environ, start_response)
-        except:
-            register_exception(alert_admin=True)
-            raise
 

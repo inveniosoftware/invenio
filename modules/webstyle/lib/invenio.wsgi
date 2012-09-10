@@ -47,6 +47,5 @@ try:
 except:
     pass
 
-#from invenio.webinterface_handler_flask import application
-from invenio.webinterface_handler_flask import InvenioFlaskDispatcher
-application = InvenioFlaskDispatcher()
+from invenio.webinterface_handler_flask import create_invenio_flask_app
+application = create_invenio_flask_app()
