@@ -292,6 +292,8 @@ def external_collection_apply_changes(changes_list):
 # Misc functions
 def external_collection_sort_engine_by_name(engines_set):
     """Return a list of sorted (by name) search engines."""
+    if not engines_set:
+        return []
     engines_list = [engine for engine in engines_set]
     engines_list.sort(lambda x, y: cmp(x.name, y.name))
     return engines_list

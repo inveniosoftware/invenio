@@ -20,8 +20,8 @@
 import re
 import os
 import sys
+from itertools import dropwhile, chain
 from bibauthorid_general_utils import print_tortoise_memory_log
-from bibauthorid_least_squares import to_function as create_approx_func
 import bibauthorid_config as bconfig
 from bibauthorid_general_utils import is_eq, update_status, update_status_final
 
@@ -48,20 +48,12 @@ def get_peak_mem():
     return map(to_number, (mem["VmPeak"], mem["VmHWM"]))
 
 
-class Estimator(object):
-    def __init__(self, coefs):
-        self.estimate = create_approx_func(coefs)
-
-
 matrix_coefs = [1133088., 4., 0.016]
 wedge_coefs = [800000., 230., 0.018]
 
 
-def get_biggest_below(lim, arr):
-    for idx, elem in enumerate(arr):
-        if elem > lim:
-            return idx - 1
-    return len(arr) - 1
+def get_biggest_job_below(lim, arr):
+    return dropwhile(lambda x: x[1] < lim, enumerate(chain(arr, [lim]))).next()[0] - 1
 
 
 def get_cores_count():
@@ -101,68 +93,67 @@ def schedule(jobs, sizs, estimator, memfile_path=None):
             f.close()
             os._exit(os.EX_SOFTWARE)
 
-    output_killer = open(os.devnull, 'w')
-    assert len(jobs) == len(sizs)
-    ret_status = [None] * len(jobs)
-
     max_workers = get_cores_count()
-    pid_2_idx_size = {}
+    pid_2_idx = {}
     #free = get_free_memory()
     initial = get_total_memory()
     free = initial
+    output_killer = open(os.devnull, 'w')
 
+    ret_status = [None] * len(jobs)
     bibs = sizs
-    sizs = map(estimator.estimate, sizs)
+    sizs = map(estimator, sizs)
+    free_idxs = range(len(jobs))
+    assert len(jobs) == len(sizs) == len(ret_status) == len(bibs) == len(free_idxs)
 
     done = 0.
     total = sum(sizs)
-    jobs_n = len(jobs)
 
-    update_status(0., "%d / %d" % (0, jobs_n))
-    too_big = sorted((idx for idx, size in enumerate(sizs) if size > free), reverse=True)
+    update_status(0., "0 / %d" % len(jobs))
+    too_big = [idx for idx in free_idxs if sizs[idx] > free]
     for idx in too_big:
         pid = os.fork()
         if pid == 0: # child
             run_job(idx)
         else: # parent
             done += sizs[idx]
+            del free_idxs[idx]
             cpid, status = os.wait()
-            update_status(done / total, "%d / %d" % (jobs_n - len(jobs), jobs_n))
+            update_status(done / total, "%d / %d" % (len(jobs) - len(free_idxs), len(jobs)))
             ret_status[idx] = status
             assert cpid == pid
-            del jobs[idx]
-            del sizs[idx]
-            del bibs[idx]
 
-    while jobs or pid_2_idx_size:
-        while len(pid_2_idx_size) < max_workers:
-            idx = get_biggest_below(free, sizs)
+    while free_idxs or pid_2_idx:
+        while len(pid_2_idx) < max_workers:
+            idx = get_biggest_job_below(free, (sizs[idx] for idx in free_idxs))
             if idx != -1:
+                job_idx = free_idxs[idx]
                 pid = os.fork()
                 if pid == 0: # child
-                    run_job(idx)
+                    run_job(job_idx)
                 else: # parent
-                    pid_2_idx_size[pid] = (idx, sizs[idx])
-                    assert free > sizs[idx]
-                    free -= sizs[idx]
-                    del jobs[idx]
-                    del sizs[idx]
-                    del bibs[idx]
+                    pid_2_idx[pid] = job_idx
+                    assert free > sizs[job_idx]
+                    free -= sizs[job_idx]
+                    del free_idxs[idx]
             else:
                 break
 
         pid, status = os.wait()
-        assert pid in pid_2_idx_size
-        idx, freed = pid_2_idx_size[pid]
+        assert pid in pid_2_idx
+        idx = pid_2_idx[pid]
+        freed = sizs[idx]
         done += freed
-        update_status(done / total, "%d / %d" % (jobs_n - len(jobs) - len(pid_2_idx_size), jobs_n))
         ret_status[idx] = status
         free += freed
-        del pid_2_idx_size[pid]
+        del pid_2_idx[pid]
+        update_status(done / total, "%d / %d" % (len(jobs) - len(free_idxs) - len(pid_2_idx), len(jobs)))
 
-    update_status_final("%d / %d" % (jobs_n, jobs_n))
+    update_status_final("%d / %d" % (len(jobs), len(jobs)))
     assert is_eq(free, initial)
-    assert not pid_2_idx_size
+    assert not pid_2_idx
+    assert not free_idxs
+    assert len(jobs) == len(sizs) == len(ret_status) == len(bibs)
     assert all(stat != None for stat in ret_status)
 
     return ret_status

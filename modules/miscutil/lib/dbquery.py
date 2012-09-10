@@ -46,12 +46,6 @@ from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, \
     CFG_MISCUTIL_SQL_USE_SQLALCHEMY, \
     CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT
 
-## FIXME: MySQL 5.5 may have DDL issues so let's detect which version
-## we are running on, and let's set CFG_DATABASE_DANGEROUS_LOCKING in case we are
-## running on 5.5, so that client code that has to do things like LOCK
-## can exploit whether it is safe to do so.
-CFG_DATABASE_DANGEROUS_LOCKING = False
-
 if CFG_MISCUTIL_SQL_USE_SQLALCHEMY:
     try:
         import sqlalchemy.pool as pool
@@ -122,24 +116,26 @@ def _db_login(dbhost=CFG_DATABASE_HOST, relogin=0):
     else:
         thread_ident = (os.getpid(), get_ident())
     if relogin:
-        _DB_CONN[dbhost][thread_ident] = connect(host=dbhost,
+        connection = _DB_CONN[dbhost][thread_ident] = connect(host=dbhost,
                                          port=int(CFG_DATABASE_PORT),
                                          db=CFG_DATABASE_NAME,
                                          user=CFG_DATABASE_USER,
                                          passwd=CFG_DATABASE_PASS,
                                          use_unicode=False, charset='utf8')
-        return _DB_CONN[dbhost][thread_ident]
+        connection.autocommit(True)
+        return connection
     else:
         if _DB_CONN[dbhost].has_key(thread_ident):
             return _DB_CONN[dbhost][thread_ident]
         else:
-            _DB_CONN[dbhost][thread_ident] = connect(host=dbhost,
+            connection = _DB_CONN[dbhost][thread_ident] = connect(host=dbhost,
                                              port=int(CFG_DATABASE_PORT),
                                              db=CFG_DATABASE_NAME,
                                              user=CFG_DATABASE_USER,
                                              passwd=CFG_DATABASE_PASS,
                                              use_unicode=False, charset='utf8')
-            return _DB_CONN[dbhost][thread_ident]
+            connection.autocommit(True)
+            return connection
 
 def _db_logout(dbhost=CFG_DATABASE_HOST):
     """Close a connection."""
@@ -450,8 +446,3 @@ def real_escape_string(unescaped_string, run_on_slave=False):
     connection_object = _db_login(dbhost)
     escaped_string = connection_object.escape_string(unescaped_string)
     return escaped_string
-
-try:
-    CFG_DATABASE_DANGEROUS_LOCKING = [int(var) for var in run_sql("SHOW VARIABLES LIKE 'version'")[0][1].split('.')[:2]] >= [5, 5]
-except:
-    pass

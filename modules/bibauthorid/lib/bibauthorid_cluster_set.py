@@ -37,7 +37,8 @@ class Blob(object):
             since the Blob represents only one bibrefrec.
         '''
         self.bib = personid_records[0][1]
-        assert all(p[1] == self.bib for p in personid_records)
+        assert all(p[1] == self.bib for p in personid_records), \
+            "All cluster sets should share the bibrefrec"
         self.claimed = set()
         self.assigned = set()
         self.rejected = set()
@@ -81,7 +82,8 @@ def group_blobs(blobs):
     independent = []
 
     for blob in blobs:
-        assert len(blob.claimed) + len(blob.assigned) == 1
+        assert len(blob.claimed) + len(blob.assigned) == 1, \
+            "Each blob must have exactly one associated signature"
         if len(blob.claimed) > 0:
             union.append((blob.bib, list(blob.claimed)[0]))
         else:

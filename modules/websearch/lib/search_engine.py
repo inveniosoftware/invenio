@@ -405,8 +405,11 @@ def get_collection_reclist(coll, recreate_cache_if_needed=True):
     """Return hitset of recIDs that belong to the collection 'coll'."""
     if recreate_cache_if_needed:
         collection_reclist_cache.recreate_cache_if_needed()
+    if coll not in collection_reclist_cache.cache:
+        return intbitset() # collection does not exist; return empty set
     if not collection_reclist_cache.cache[coll]:
-        # not yet it the cache, so calculate it and fill the cache:
+        # collection's reclist not in the cache yet, so calculate it
+        # and fill the cache:
         set = intbitset()
         query = "SELECT nbrecs,reclist FROM collection WHERE name=%s"
         res = run_sql(query, (coll, ), 1)

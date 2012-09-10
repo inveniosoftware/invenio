@@ -65,7 +65,7 @@ def do_wedge(cluster_set, deep_debug=False):
     def compare_to(cl1, cl2):
         pointers = [cl1.out_edges[v] for v in cl2.bibs]
 
-        assert pointers
+        assert pointers, "Wedge: no edges between clusters!"
         vals, probs = zip(*pointers)
 
         avg = sum(vals) / len(vals)
@@ -130,7 +130,7 @@ def do_wedge(cluster_set, deep_debug=False):
         if (current % interval) == 0:
             update_status(float(current) / len(edges), "Wedge...")
 
-        assert unused != '+' and unused != '-'
+        assert unused != '+' and unused != '-', "Signed edge after filter!"
         wedge_print("Wedge: poped new edge: Verts = %s, %s Value = (%f, %f)" % (v1, v2, unused[0], unused[1]))
         cl1 = bib_map[v1]
         cl2 = bib_map[v2]
@@ -178,7 +178,7 @@ def meld_edges(p1, p2):
         inter_prob = e1[0] * e1[1] * verts1 + e2[0] * e2[1] * verts2
         return (inter_prob / inter_cert, inter_cert / (verts1 + verts2))
 
-    assert len(out_edges1) == len(out_edges2)
+    assert len(out_edges1) == len(out_edges2), "Invalid arguments for meld edges"
     size = len(out_edges1)
 
     result = numpy.ndarray(shape=(size, 2), dtype=float, order='C')
@@ -207,8 +207,8 @@ def convert_cluster_set(cs, prob_matr):
         end = len(result_mapping)
         clus.bibs = range(start, end)
 
-    assert len(result_mapping) == len(set(result_mapping))
-    assert len(result_mapping) == cs.num_all_bibs
+    assert len(result_mapping) == len(set(result_mapping)), "Cluster set conversion failed"
+    assert len(result_mapping) == cs.num_all_bibs, "Cluster set conversion failed"
 
     cs.new2old = result_mapping
 
@@ -219,7 +219,7 @@ def convert_cluster_set(cs, prob_matr):
     for current, c1 in enumerate(cs.clusters):
         update_status(float(current) / len(cs.clusters), "Converting the cluster set...")
 
-        assert len(c1.bibs) > 0
+        assert len(c1.bibs) > 0, "Empty cluster send to wedge"
         pointers = []
 
         for v1 in c1.bibs:
@@ -232,7 +232,7 @@ def convert_cluster_set(cs, prob_matr):
                         if val in Bib_matrix.special_symbols:
                             numb = Bib_matrix.special_symbols[val]
                             val = (numb, numb)
-                        assert len(val) == 2
+                        assert len(val) == 2, "Edge coding failed"
                         pointer[v2] = val
             pointers.append((pointer, 1))
 
@@ -278,7 +278,7 @@ def group_edges(cs):
             elif val[0] == Bib_matrix.special_symbols['-']:
                 minus.append((bib1, bib2))
             else:
-                assert val[0] == Bib_matrix.special_symbols[None]
+                assert val[0] == Bib_matrix.special_symbols[None], "Invalid Edge"
 
     update_status_final("Finished with the edge grouping.")
 
@@ -295,8 +295,8 @@ def join(cl1, cl2):
                                (cl2.out_edges, len(cl2.bibs)))[0]
     cl1.bibs += cl2.bibs
 
-    assert not cl1.hates(cl1)
-    assert not cl2.hates(cl2)
+    assert not cl1.hates(cl1), "Joining hateful clusters"
+    assert not cl2.hates(cl2), "Joining hateful clusters"
 
     cl1.hate |= cl2.hate
     for cl in cl2.hate:
