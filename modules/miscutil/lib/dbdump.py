@@ -25,6 +25,8 @@ Usage: /opt/invenio/bin/dbdump [options]
 Command options:
   -o, --output=DIR      Output directory. [default=/opt/invenio/var/log]
   -n, --number=NUM      Keep up to NUM previous dump files. [default=5]
+  --params=PARAMS       Specify your own mysqldump parameters. Optional.
+  --compress            Compress dump directly into gzip.
 
 Scheduling options:
   -u, --user=USER User name to submit the task as, password needed.
@@ -47,16 +49,22 @@ General options:
 __revision__ = "$Id$"
 
 import os
-import sys
+import re
+
 from invenio.config import CFG_LOGDIR, CFG_PATH_MYSQL, CFG_PATH_GZIP
 from invenio.dbquery import CFG_DATABASE_HOST, \
                             CFG_DATABASE_USER, \
                             CFG_DATABASE_PASS, \
-                            CFG_DATABASE_NAME
-from invenio.bibtask import task_init, write_message, task_set_option, \
-                            task_get_option, task_update_progress, \
+                            CFG_DATABASE_NAME, \
+                            CFG_DATABASE_PORT
+from invenio.bibtask import task_init, \
+                            write_message, \
+                            task_set_option, \
+                            task_get_option, \
+                            task_update_progress, \
                             task_get_task_param
-from invenio.shellutils import run_shell_command, escape_shell_arg
+from invenio.shellutils import run_shell_command, \
+                               escape_shell_arg
 
 
 def _delete_old_dumps(dirname, filename, number_to_keep):
@@ -73,39 +81,80 @@ def _delete_old_dumps(dirname, filename, number_to_keep):
         os.remove(dirname + os.sep + afile)
 
 
-def _dump_database(dirname, filename):
+def dump_database(dump_path, host=CFG_DATABASE_HOST, port=CFG_DATABASE_PORT, \
+                  user=CFG_DATABASE_USER, passw=CFG_DATABASE_PASS, \
+                  name=CFG_DATABASE_NAME, params=None, compress=False):
     """
-    Dump Invenio database into SQL file called FILENAME living in
-    DIRNAME.
-    """
-    write_message("... writing %s" % dirname + os.sep + filename)
-    cmd = CFG_PATH_MYSQL + 'dump'
-    if not os.path.exists(cmd):
-        msg = "ERROR: cannot find %s." % cmd
-        write_message(msg, stream=sys.stderr)
-        raise StandardError(msg)
+    Dump Invenio database into SQL file located at DUMP_PATH.
 
-    cmd += " --skip-opt --add-drop-table --add-locks --create-options " \
-           " --quick --extended-insert --set-charset --disable-keys " \
-           " --host=%s --user=%s --password=%s %s | %s -c " % \
-           (escape_shell_arg(CFG_DATABASE_HOST),
-            escape_shell_arg(CFG_DATABASE_USER),
-            escape_shell_arg(CFG_DATABASE_PASS),
-            escape_shell_arg(CFG_DATABASE_NAME),
-            CFG_PATH_GZIP)
-    dummy1, dummy2, dummy3 = run_shell_command(cmd, None, dirname + os.sep + filename)
-    if dummy1:
-        msg = "ERROR: mysqldump exit code is %s." % repr(dummy1)
-        write_message(msg, stream=sys.stderr)
-        raise StandardError(msg)
-    if dummy2:
-        msg = "ERROR: mysqldump stdout is %s." % repr(dummy1)
-        write_message(msg, stream=sys.stderr)
-        raise StandardError(msg)
-    if dummy3:
-        msg = "ERROR: mysqldump stderr is %s." % repr(dummy1)
-        write_message(msg, stream=sys.stderr)
-        raise StandardError(msg)
+    Will perform the command to mysqldump with the given host configuration
+    and user credentials.
+
+    Optional mysqldump parameters can also be passed. Otherwise, a default
+    set of parameters will be used.
+
+    @param dump_path: path on the filesystem to save the dump to.
+    @type dump_path: string
+
+    @param host: hostname of mysql database node to connect to.
+    @type host: string
+
+    @param port: port of mysql database node to connect to
+    @type port: string
+
+    @param user: username to connect with
+    @type user: string
+
+    @param passw: password to connect to with
+    @type passw: string
+
+    @param name: name of mysql database node to dump
+    @type name: string
+
+    @param params: command line parameters to pass to mysqldump. Optional.
+    @type params: string
+
+    @param compress: should the dump be compressed through gzip?
+    @type compress: bool
+    """
+    write_message("... writing %s" % (dump_path,))
+
+    # Is mysqldump installed or in the right path?
+    cmd_prefix = CFG_PATH_MYSQL + 'dump'
+    if not os.path.exists(cmd_prefix):
+        raise StandardError("%s is not installed." % (cmd_prefix))
+
+    if not params:
+        # No parameters set, lets use the default ones.
+        params = " --skip-opt --add-drop-table --add-locks --create-options" \
+                 " --quick --extended-insert --set-charset --disable-keys" \
+                 " --lock-tables=false"
+
+    dump_cmd = "%s %s " \
+               " --host=%s --port=%s --user=%s --password=%s %s" % \
+               (cmd_prefix, \
+                params, \
+                re.escape(host), \
+                re.escape(str(port)), \
+                re.escape(user), \
+                re.escape(passw), \
+                re.escape(name))
+
+    if compress:
+        dump_cmd = "%s | %s -cf; exit ${PIPESTATUS[0]}" % \
+                   (dump_cmd, \
+                    CFG_PATH_GZIP)
+        dump_cmd = "bash -c %s" % (escape_shell_arg(dump_cmd),)
+
+    exit_code, stdout, stderr = run_shell_command(dump_cmd, None, dump_path)
+
+    if exit_code:
+        raise StandardError("ERROR: mysqldump exit code is %s. stderr: %s stdout: %s" % \
+                            (repr(exit_code), \
+                             repr(stderr), \
+                             repr(stdout)))
+
+    write_message("... completed writing %s" % (dump_path,))
 
 
 def _dbdump_elaborate_submit_param(key, value, dummyopts, dummyargs):
@@ -117,13 +166,19 @@ def _dbdump_elaborate_submit_param(key, value, dummyopts, dummyargs):
         try:
             task_set_option('number', int(value))
         except ValueError:
-            raise StandardError("ERROR: Number '%s' is not integer." % value)
+            raise StandardError("ERROR: Number '%s' is not integer." % (value,))
     elif key in ('-o', '--output'):
         if os.path.isdir(value):
             task_set_option('output', value)
         else:
             raise StandardError("ERROR: Output '%s' is not a directory." % \
-                  value)
+                  (value,))
+    elif key in ('--params'):
+        task_set_option('params', value)
+    elif key in ('--compress'):
+        if not CFG_PATH_GZIP or (CFG_PATH_GZIP and not os.path.exists(CFG_PATH_GZIP)):
+            raise StandardError("ERROR: No valid gzip path is defined.")
+        task_set_option('compress', True)
     else:
         return False
     return True
@@ -141,19 +196,28 @@ def _dbdump_run_task_core():
     write_message("Reading parameters started")
     output_dir = task_get_option('output', CFG_LOGDIR)
     output_num = task_get_option('number', 5)
-    output_fil_prefix = CFG_DATABASE_NAME + '-dbdump-'
-    output_fil_suffix = task_get_task_param('task_starting_time').replace(' ', '_') + '.sql.gz'
-    output_fil = output_fil_prefix + output_fil_suffix
+    params = task_get_option('params', None)
+    compress = task_get_option('compress', False)
+
+    output_file_suffix = task_get_task_param('task_starting_time').replace(' ', '_') + '.sql'
+    if compress:
+        output_file_suffix = "%s.gz" % (output_file_suffix,)
     write_message("Reading parameters ended")
+
     # make dump:
     task_update_progress("Dumping database")
     write_message("Database dump started")
-    _dump_database(output_dir, output_fil)
+
+    output_file_prefix = '%s-dbdump-' % (CFG_DATABASE_NAME,)
+    output_file = output_file_prefix + output_file_suffix
+    dump_path = output_dir + os.sep + output_file
+    dump_database(dump_path, params=params, compress=compress)
+
     write_message("Database dump ended")
     # prune old dump files:
     task_update_progress("Pruning old dump files")
     write_message("Pruning old dump files started")
-    _delete_old_dumps(output_dir, output_fil_prefix, output_num)
+    _delete_old_dumps(output_dir, output_file_prefix, output_num)
     write_message("Pruning old dump files ended")
     # we are done:
     task_update_progress("Done.")
@@ -167,13 +231,14 @@ def main():
               help_specific_usage="""\
   -o, --output=DIR      Output directory. [default=%s]
   -n, --number=NUM      Keep up to NUM previous dump files. [default=5]
+  --params=PARAMS       Specify your own mysqldump parameters. Optional.
+  --compress            Compress dump directly into gzip.
 """ % CFG_LOGDIR,
               version=__revision__,
-              specific_params=("n:o:",
-                               ["number=", "output="]),
+              specific_params=("n:o:p:",
+                               ["number=", "output=", "params=", "compress"]),
               task_submit_elaborate_specific_parameter_fnc=_dbdump_elaborate_submit_param,
               task_run_fnc=_dbdump_run_task_core)
-
 
 if __name__ == '__main__':
     main()
