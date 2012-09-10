@@ -237,13 +237,17 @@ def _parse_cookie(str, Class, names=None):
 
     return result
 
+_RE_BAD_MSIE = re.compile("MSIE\s+(\d+\.\d+)")
 def add_cookies(req, cookies):
     """
     Sets one or more cookie in outgoing headers and adds a cache
     directive so that caches don't cache the cookie.
     """
     if not req.headers_out.has_key("Set-Cookie"):
-        req.headers_out.add("Cache-Control", 'no-cache="set-cookie"')
+        g = _RE_BAD_MSIE.search(req.headers_in.get('User-Agent', "MSIE 6.0"))
+        bad_msie = g and float(g.group(1)) < 9.0
+        if not (bad_msie and req.is_https()):
+            req.headers_out.add("Cache-Control", 'no-cache="set-cookie"')
 
     for cookie in cookies:
         req.headers_out.add("Set-Cookie", str(cookie))
