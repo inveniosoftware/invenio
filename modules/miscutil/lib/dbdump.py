@@ -27,6 +27,7 @@ Command options:
   -n, --number=NUM      Keep up to NUM previous dump files. [default=5]
   --params=PARAMS       Specify your own mysqldump parameters. Optional.
   --compress            Compress dump directly into gzip.
+  --slave               Perform the dump from a slave, if any.
 
 Scheduling options:
   -u, --user=USER User name to submit the task as, password needed.
@@ -56,7 +57,8 @@ from invenio.dbquery import CFG_DATABASE_HOST, \
                             CFG_DATABASE_USER, \
                             CFG_DATABASE_PASS, \
                             CFG_DATABASE_NAME, \
-                            CFG_DATABASE_PORT
+                            CFG_DATABASE_PORT, \
+                            CFG_DATABASE_SLAVE
 from invenio.bibtask import task_init, \
                             write_message, \
                             task_set_option, \
@@ -157,6 +159,60 @@ def dump_database(dump_path, host=CFG_DATABASE_HOST, port=CFG_DATABASE_PORT, \
     write_message("... completed writing %s" % (dump_path,))
 
 
+def dump_slave_database(dump_path, host, params=None):
+    """
+    Performs a dump of a defined slave database, making sure
+    to halt slave replication until the dump has completed.
+
+    @param dump_path: path on the filesystem to save the dump to.
+    @type dump_path: string
+
+    @param host: hostname or IP of DB slave to dump from.
+    @type host: string
+
+    @param params: command line parameters to pass to mysqldump. Optional.
+    @type params: string
+    """
+    # We need to stop slave replication before performing the dump
+    write_message("... stopping slave")
+
+    # Is mysqladmin installed or in the right path?
+    admin_cmd = CFG_PATH_MYSQL + 'admin'
+    if not os.path.exists(admin_cmd):
+        raise StandardError("%s is not installed." % (admin_cmd))
+
+    slave_cmd = "%s -e 'STOP SLAVE SQL_THREAD;' " \
+                " --host=%s --port=%s --user=%s --password=%s" \
+                % (CFG_PATH_MYSQL,
+                   escape_shell_arg(host),
+                   escape_shell_arg(CFG_DATABASE_PORT),
+                   escape_shell_arg(CFG_DATABASE_USER),
+                   escape_shell_arg(CFG_DATABASE_PASS))
+
+    exit_code, dummy1, stderr = run_shell_command(slave_cmd)
+    if exit_code:
+        raise StandardError("ERROR: Stopping slave failed: %s" % (stderr,))
+
+    write_message("... slave stopped")
+
+    dump_database(dump_path, \
+                  host=host, \
+                  params=params)
+
+    write_message("... starting slave.")
+    admin_cmd += " start-slave " \
+                 " --host=%s --port=%s --user=%s --password=%s " % \
+                 (escape_shell_arg(host),
+                  escape_shell_arg(CFG_DATABASE_PORT),
+                  escape_shell_arg(CFG_DATABASE_USER),
+                  escape_shell_arg(CFG_DATABASE_PASS),)
+
+    exit_code, dummy1, stderr = run_shell_command(admin_cmd)
+    if exit_code:
+        raise StandardError("ERROR: Starting slave failed: %s" % (stderr,))
+    write_message("... slave started")
+
+
 def _dbdump_elaborate_submit_param(key, value, dummyopts, dummyargs):
     """
     Elaborate task submission parameter.  See bibtask's
@@ -179,6 +235,13 @@ def _dbdump_elaborate_submit_param(key, value, dummyopts, dummyargs):
         if not CFG_PATH_GZIP or (CFG_PATH_GZIP and not os.path.exists(CFG_PATH_GZIP)):
             raise StandardError("ERROR: No valid gzip path is defined.")
         task_set_option('compress', True)
+    elif key in ('--slave'):
+        if value:
+            task_set_option('slave', value)
+        else:
+            if not CFG_DATABASE_SLAVE:
+                raise StandardError("ERROR: No slave defined.")
+            task_set_option('slave', CFG_DATABASE_SLAVE)
     else:
         return False
     return True
@@ -198,6 +261,7 @@ def _dbdump_run_task_core():
     output_num = task_get_option('number', 5)
     params = task_get_option('params', None)
     compress = task_get_option('compress', False)
+    slave = task_get_option('slave', False)
 
     output_file_suffix = task_get_task_param('task_starting_time').replace(' ', '_') + '.sql'
     if compress:
@@ -208,10 +272,16 @@ def _dbdump_run_task_core():
     task_update_progress("Dumping database")
     write_message("Database dump started")
 
-    output_file_prefix = '%s-dbdump-' % (CFG_DATABASE_NAME,)
-    output_file = output_file_prefix + output_file_suffix
-    dump_path = output_dir + os.sep + output_file
-    dump_database(dump_path, params=params, compress=compress)
+    if slave:
+        output_file_prefix = 'slave-%s-dbdump-' % (CFG_DATABASE_NAME,)
+        output_file = output_file_prefix + output_file_suffix
+        dump_path = output_dir + os.sep + output_file
+        dump_slave_database(dump_path, slave, params)
+    else:
+        output_file_prefix = '%s-dbdump-' % (CFG_DATABASE_NAME,)
+        output_file = output_file_prefix + output_file_suffix
+        dump_path = output_dir + os.sep + output_file
+        dump_database(dump_path, params=params)
 
     write_message("Database dump ended")
     # prune old dump files:
@@ -233,10 +303,11 @@ def main():
   -n, --number=NUM      Keep up to NUM previous dump files. [default=5]
   --params=PARAMS       Specify your own mysqldump parameters. Optional.
   --compress            Compress dump directly into gzip.
+  --slave=HOST          Perform the dump from a slave, if no host use CFG_DATABASE_SLAVE.
 """ % CFG_LOGDIR,
               version=__revision__,
               specific_params=("n:o:p:",
-                               ["number=", "output=", "params=", "compress"]),
+                               ["number=", "output=", "params=", "slave=", "compress"]),
               task_submit_elaborate_specific_parameter_fnc=_dbdump_elaborate_submit_param,
               task_run_fnc=_dbdump_run_task_core)
 
