@@ -3344,29 +3344,30 @@ div.bibcircbottom {
     border: solid 1px #000000;
 }
 
-.bibHarvestPagerNavigationBar{
+.oaiHarvestPagerNavigationBar{
     display: table-row;
 }
 
-.bibHarvestPagerNavigationLink{
+.oaiHarvestPagerNavigationLink{
     display: table-cell;
     padding: 5px;
     cursor: default;
 }
 
-.bibHarvestPagerHiddenNavigationLink{
+.oaiHarvestPagerHiddenNavigationLink{
     display: none;
 }
 
-.bibHarvestPagerHiddenPage{
+.oaiHarvestPagerHiddenPage{
     display: none;
 }
 
-.bibHarvestPagerCurrentPageLink{
+.oaiHarvestPagerCurrentPageLink{
     background-color: #a0a0ff;
 }
 
-.bibHarvestPagerPage{
+.oaiHarvestPagerPage{
+}
 
 /* WebComment Refactor */
 

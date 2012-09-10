@@ -403,17 +403,17 @@ def create_handler(root):
                 ## indexed
                 req.status = 503
 
+            g = _RE_BAD_MSIE.search(req.headers_in.get('User-Agent', "MSIE 6.0"))
+            bad_msie = g and float(g.group(1)) < 9.0
             if uri.startswith('/yours') or not guest_p:
                 ## Private/personalized request should not be cached
-                g = _RE_BAD_MSIE.search(req.headers_in.get('User-Agent', "MSIE 6.0"))
-                bad_msie = g and float(g.group(1)) < 9.0
-                if bad_msie:
+                if bad_msie and req.is_https():
                     req.headers_out['Cache-Control'] = 'private, max-age=0, must-revalidate'
                 else:
                     req.headers_out['Cache-Control'] = 'private, no-cache, no-store, max-age=0, must-revalidate'
                     req.headers_out['Pragma'] = 'no-cache'
                     req.headers_out['Vary'] = '*'
-            else:
+            elif not (bad_msie and req.is_https()):
                 req.headers_out['Cache-Control'] = 'public, max-age=3600'
                 req.headers_out['Vary'] = 'Cookie, ETag, Cache-Control'
 

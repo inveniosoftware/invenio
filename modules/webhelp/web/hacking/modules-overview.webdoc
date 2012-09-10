@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -93,7 +93,7 @@ descriptions the module relationship diagram is presented.
  configuration files.
  </li>
 
- <li><strong>BibHarvest</strong> represents the <a
+ <li><strong>OAIHarvest</strong> represents the <a
  href="http://www.openarchives.org/">OAi-PMH</a> compatible harvester
  allowing the repository to gather metadata from fellow OAi-compliant
  repositories and the OAi-PMH repository management. Repository is
@@ -267,5 +267,3 @@ descriptions the module relationship diagram is presented.
 <p>Relationship between the modules: <br />
 <img src="<CFG_SITE_URL>/img/hacking/modules-overview-diagram.jpeg" border="0" alt="Modules overview diagram" />
 </p>
-
-

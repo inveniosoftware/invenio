@@ -25,6 +25,7 @@ Some functions are registered in order to be used in XSL code:
   - modification_date(recID)
 
 Dependencies: Need one of the following XSLT processors:
+              - lxml
               - libxml2 & libxslt
               - 4suite
 
@@ -50,29 +51,39 @@ CFG_BIBFORMAT_FUNCTION_NS = "http://cdsweb.cern.ch/bibformat/fn"
 # Import one XSLT processor
 #
 # processor_type:
-#       -1 : No processor found
-#        0 : libxslt
-#        1 : 4suite
-processor_type = -1
+#        0 : No processor found
+#        1 : lxml
+#        2 : libxslt
+#        3 : 4suite
+processor_type = 0
+
 try:
-    # libxml2 & libxslt
-    import libxml2
-    import libxslt
-    processor_type = 0
+    # lxml
+    from lxml import etree
+    processor_type = 1
 except ImportError:
     pass
 
-if processor_type == -1:
+if processor_type == 0:
+    try:
+        # libxml2 & libxslt
+        import libxml2
+        import libxslt
+        processor_type = 2
+    except ImportError:
+        pass
+
+if processor_type == 0:
     try:
         # 4suite
         from Ft.Xml.Xslt import Processor
         from Ft.Xml import InputSource
         from xml.dom import Node
-        processor_type = 1
+        processor_type = 3
     except ImportError:
         pass
 
-if processor_type == -1:
+if processor_type == 0:
     # No XSLT processor found
     sys.stderr.write('No XSLT processor could be found.\n' \
                      'No output produced.\n')
@@ -80,6 +91,58 @@ if processor_type == -1:
 
 ##################################################################
 # Support for 'creation_date' and 'modification_date' functions  #
+
+def get_creation_date_lxml(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
+    """
+    libxslt extension function:
+    Bridge between BibFormat and XSL stylesheets.
+    Returns record creation date.
+
+    Can be used in that way in XSL stylesheet
+    (provided xmlns:fn="http://cdsweb.cern.ch/bibformat/fn" has been declared):
+    <xsl:value-of select="fn:creation_date(445)"/> where 445 is a recID
+
+    if recID is string, value is converted to int
+    if recID is Node, first child node (text node) is taken as value
+
+    @param ctx: context as passed by lxml
+    @param recID: record ID
+    @param fmt: format of the returned date
+    @return: creation date of X{recID}
+    @rtype: string
+    """
+    try:
+        if isinstance(recID, str):
+            recID_int = int(recID)
+        elif isinstance(recID, (int, long)):
+            recID_int = recID
+        elif isinstance(recID, list):
+            recID = recID[0]
+            if isinstance(recID, str):
+                recID_int = int(recID)
+            else:
+                recID_int = int(recID.text)
+        else:
+            recID_int = int(recID.text)
+
+        if isinstance(fmt, str):
+            fmt_str = fmt
+        elif isinstance(fmt, list):
+            fmt = fmt[0]
+            if isinstance(fmt, str):
+                fmt_str = fmt
+            else:
+                fmt_str = fmt.text
+        else:
+            fmt_str = fmt.text
+
+        return get_creation_date(recID_int, fmt_str)
+    except Exception, err:
+        sys.stderr.write("Error during formatting function evaluation: " + \
+                         str(err) + \
+                         '\n')
+
+        return ''
 
 def get_creation_date_libxslt(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
     """
@@ -156,6 +219,58 @@ def get_creation_date_4suite(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
             fmt_str = str(fmt)
 
         return get_creation_date(recID_int, fmt_str)
+    except Exception, err:
+        sys.stderr.write("Error during formatting function evaluation: " + \
+                         str(err) + \
+                         '\n')
+
+        return ''
+
+def get_modification_date_lxml(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
+    """
+    libxslt extension function:
+    Bridge between BibFormat and XSL stylesheets.
+    Returns record modification date.
+
+    Can be used in that way in XSL stylesheet
+    (provided xmlns:fn="http://cdsweb.cern.ch/bibformat/fn" has been declared):
+    <xsl:value-of select="fn:creation_date(445)"/> where 445 is a recID
+
+    if recID is string, value is converted to int
+    if recID is Node, first child node (text node) is taken as value
+
+    @param ctx: context as passed by lxml
+    @param recID: record ID
+    @param fmt: format of the returned date
+    @return: modification date of X{recID}
+    @rtype: string
+    """
+    try:
+        if isinstance(recID, str):
+            recID_int = int(recID)
+        elif isinstance(recID, (int, long)):
+            recID_int = recID
+        elif isinstance(recID, list):
+            recID = recID[0]
+            if isinstance(recID, str):
+                recID_int = int(recID)
+            else:
+                recID_int = int(recID.text)
+        else:
+            recID_int = int(recID.text)
+
+        if isinstance(fmt, str):
+            fmt_str = fmt
+        elif isinstance(fmt, list):
+            fmt = fmt[0]
+            if isinstance(fmt, str):
+                fmt_str = fmt
+            else:
+                fmt_str = fmt.text
+        else:
+            fmt_str = fmt.text
+
+        return get_modification_date(recID_int, fmt_str)
     except Exception, err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
@@ -245,6 +360,55 @@ def get_modification_date_4suite(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
 
         return ''
 
+def eval_bibformat_lxml(ctx, recID, template_code):
+    """
+    libxslt extension function:
+    Bridge between BibFormat and XSL stylesheets.
+    Returns the evaluation of the given piece of format template
+
+    Can be used in that way in XSL stylesheet
+    (provided xmlns:fn="http://cdsweb.cern.ch/bibformat/fn" has been declared):
+    <xsl:value-of select="fn:eval_bibformat(marc:controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')" />
+
+    if recID is string, value is converted to int
+    if recID is Node, first child node (text node) is taken as value
+    template_code is evaluated as a format template piece of code. '<'
+    and '"' need to be escaped with '&lt;' and '&quot;'
+
+    @param ctx: context as passed by lxml
+    @param recID: record ID
+    @param template_code: the code calling a BFE_ as it would be use in format template
+    @return: the evalued call to a format template (usually a call to a format element)
+    @rtype: string
+    """ #'
+    from invenio.bibformat_engine import \
+    format_with_format_template, \
+    BibFormatObject
+    try:
+        if isinstance(recID, str):
+            recID_int = int(recID)
+        elif isinstance(recID, (int, long)):
+            recID_int = recID
+        elif isinstance(recID, list):
+            recID = recID[0]
+            if isinstance(recID, str):
+                recID_int = int(recID)
+            else:
+                recID_int = int(recID.text)
+        else:
+            recID_int = int(recID.text)
+
+        bfo = BibFormatObject(recID_int)
+        return format_with_format_template(None, bfo,
+                                           verbose=0,
+                                           format_template_code=template_code)
+    except Exception, err:
+        sys.stderr.write("Error during formatting function evaluation: " + \
+                         str(err) + \
+                         '\n')
+
+        return ''
+
 def eval_bibformat_libxslt(ctx, recID, template_code):
     """
     libxslt extension function:
@@ -287,7 +451,6 @@ def eval_bibformat_libxslt(ctx, recID, template_code):
                          '\n')
 
         return ''
-
 
 def eval_bibformat_4suite(ctx, recID, template_code):
     """
@@ -351,7 +514,7 @@ def format(xmltext, template_filename=None, template_source=None):
     @param template_source: The configuration describing the processing.
     @return: the transformed XML text.
     """
-    if processor_type == -1:
+    if processor_type == 0:
         # No XSLT processor found
         sys.stderr.write('No XSLT processor could be found.')
         #sys.exit(1)
@@ -386,7 +549,69 @@ def format(xmltext, template_filename=None, template_source=None):
     xmltext = xmltext.replace('ind2=""', 'ind2=" "')
 
     result = ""
-    if processor_type == 0:
+
+    if processor_type == 1:
+        # lxml
+
+        try:
+            xml = etree.XML(xmltext)
+        except etree.XMLSyntaxError, e:
+            error = 'The XML code given is invalid. [%s]' % (e,)
+            sys.stderr.write(error)
+            return result
+        except:
+            error = 'Failed to process the XML code.'
+            sys.stderr.write(error)
+            return result
+
+        try:
+            xsl = etree.XML(template)
+        except etree.XMLSyntaxError, e:
+            error = 'The XSL code given is invalid. [%s]' % (e,)
+            sys.stderr.write(error)
+            return result
+        except:
+            error = 'Failed to process the XSL code.'
+            sys.stderr.write(error)
+            return result
+
+        try:
+            fns = etree.FunctionNamespace(CFG_BIBFORMAT_FUNCTION_NS)
+            fns["creation_date"]     = get_creation_date_lxml
+            fns["modification_date"] = get_modification_date_lxml
+            fns["eval_bibformat"]    = eval_bibformat_lxml
+        except etree.NamespaceRegistryError, e:
+            error = 'Failed registering the XPath extension function. [%s]' % (e,)
+            sys.stderr.write(error)
+            return result
+
+        try:
+            xslt = etree.XSLT(xsl)
+        except etree.XSLTParseError, e:
+            error = 'The XSL code given is invalid. [%s]' % (e,)
+            sys.stderr.write(error)
+            return result
+        except:
+            error = 'Failed to process the XSL code.'
+            sys.stderr.write(error)
+            return result
+
+        try:
+            temporary_result = xslt(xml)
+        except:
+            error = 'Failed to perform the XSL transformation.'
+            sys.stderr.write(error)
+            return result
+
+        result = str(temporary_result)
+
+        # Housekeeping
+        del temporary_result
+        del xslt
+        del xsl
+        del xml
+
+    elif processor_type == 2:
         # libxml2 & libxslt
 
         # Register BibFormat functions for use in XSL
@@ -418,7 +643,7 @@ def format(xmltext, template_filename=None, template_source=None):
         source.freeDoc()
         result_object.freeDoc()
 
-    elif processor_type == 1:
+    elif processor_type == 3:
         # 4suite
 
         # Init

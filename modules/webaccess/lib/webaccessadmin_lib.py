@@ -1278,9 +1278,9 @@ def perform_modifyapikeydata(req, userID, keyID='', status='' , callback='yes', 
     subtitle = """<a name="4"></a>4. Edit REST API Keys.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % CFG_SITE_SECURE_URL
 
     if confirm in [1, "1"]:
-        run_sql("UPDATE apikey SET status=%s WHERE id=%s", (status, keyID))
+        run_sql("UPDATE webapikey SET status=%s WHERE id=%s", (status, keyID))
 
-    res = run_sql("SELECT id, description, status FROM apikey WHERE id_user=%s", (userID, ))
+    res = run_sql("SELECT id, description, status FROM webapikey WHERE id_user=%s", (userID, ))
     output = ""
     if res:
         for key_info in res:

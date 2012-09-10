@@ -29,6 +29,17 @@ from invenio.jsonutils import json
 from invenio.bibformat_config  import CFG_BIBFORMAT_ELEMENTS_PATH
 from invenio.config import CFG_WEBDIR
 
+processor_type = 0
+try:
+    from lxml import etree
+    processor_type = 1
+except ImportError:
+    try:
+        import libxml2
+        import libxslt
+        processor_type = 2
+    except ImportError:
+        pass
 
 def get_kb_mappings(kb_name="", key="", value="", match_type="s"):
     """Get leftside/rightside mappings from kb kb_name.
@@ -433,16 +444,33 @@ def get_kbt_items(taxonomyfilename, templatefilename, searchwith=""):
     @param templatefile: full path+name of the XSLT file
     @param searchwith: a term to search with
     """
-    import libxml2
-    import libxslt
-    styledoc = libxml2.parseFile(templatefilename)
-    style = libxslt.parseStylesheetDoc(styledoc)
-    doc = libxml2.parseFile(taxonomyfilename)
-    result = style.applyStylesheet(doc, None)
-    strres = style.saveResultToString(result)
-    style.freeStylesheet()
-    doc.freeDoc()
-    result.freeDoc()
+
+    if processor_type == 1:
+        # lxml
+        doc = etree.XML(taxonomyfilename)
+        styledoc = etree.XML(templatefilename)
+        style = etree.XSLT(styledoc)
+        result = style(doc)
+        strres = str(result)
+        del result
+        del style
+        del styledoc
+        del doc
+
+    elif processor_type == 2:
+        # libxml2 & libxslt
+        styledoc = libxml2.parseFile(templatefilename)
+        style = libxslt.parseStylesheetDoc(styledoc)
+        doc = libxml2.parseFile(taxonomyfilename)
+        result = style.applyStylesheet(doc, None)
+        strres = style.saveResultToString(result)
+        style.freeStylesheet()
+        doc.freeDoc()
+        result.freeDoc()
+    else:
+        # no xml parser found
+        strres = ""
+
     ritems = []
     if len(strres) == 0:
         return []

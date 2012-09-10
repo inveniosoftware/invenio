@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -72,14 +72,14 @@ data are uploaded in Invenio, you may want to modify them via
   periodical batch upload of data.  For example, you can define from
   where to harvest, with what periodicity, how to transform data
   before uploading them into Invenio, etc. See also
-   <a href="<CFG_SITE_URL>/admin/bibharvest/oairepositoryadmin.py">OAI Repository Admin</a>
+   <a href="<CFG_SITE_URL>/admin/oairepository/oairepositoryadmin.py">OAI Repository Admin</a>
    to expose your data to other harvesters.
 </td>
 <td>
-  <a href="<CFG_SITE_URL>/admin/bibharvest/oaiharvestadmin.py">OAI Harvest Admin Interface</a>
+  <a href="<CFG_SITE_URL>/admin/oaiharvest/oaiharvestadmin.py">OAI Harvest Admin Interface</a>
 </td>
 <td>
-  <a href="oai-admin-guide">OAI Admin Guide</a>
+  <a href="oaiharvest-admin-guide">OAI Harvest Admin Guide</a>
 </td>
 </tr>
 
@@ -353,14 +353,14 @@ engine.
     Enables you to define which records should be tagged to be exposed
     via the OAI Repository gateway, so that other other repositories
     can harvest your records. See also
-    <a href="<CFG_SITE_URL>/admin/bibharvest/oaiharvestadmin.py">OAI Harvest Admin</a>
+    <a href="<CFG_SITE_URL>/admin/oaiharvest/oaiharvestadmin.py">OAI Harvest Admin</a>
     to import data into your repository.
 </td>
 <td>
-  <a href="<CFG_SITE_URL>/admin/bibharvest/oairepositoryadmin.py">OAI repository Admin Interface</a>
+  <a href="<CFG_SITE_URL>/admin/oairepository/oairepositoryadmin.py">OAI Repository Admin Interface</a>
 </td>
 <td>
-  <a href="oai-admin-guide">OAI Admin Guide</a>
+  <a href="oairepository-admin-guide">OAI Repository Admin Guide</a>
 </td>
 </tr>
 

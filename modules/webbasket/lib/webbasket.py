@@ -2867,7 +2867,15 @@ def wash_of(of):
     """Wash the output format"""
     _ = gettext_set_language(CFG_SITE_LANG)
 
-    list_of_accepted_formats = ['hb', 'xm', 'hx', 'xd', 'xe', 'xn', 'xw', 'xr', 'xp']
+    list_of_accepted_formats = ['hb',
+                                'xm',
+                                'hx',
+                                'xd',
+                                'xe',
+                                'xn',
+                                'xw',
+                                'xr',
+                                'xp']
 
     if of in list_of_accepted_formats:
         return (of, None)

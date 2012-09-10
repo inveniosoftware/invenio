@@ -38,7 +38,7 @@ Contents
               gs-common clisp gettext libapache2-mod-wsgi unzip \
               python-dateutil python-rdflib \
               python-gnuplot python-magic pdftk html2text giflib-tools \
-              pstotext netpbm python-pypdf python-chardet
+              pstotext netpbm python-pypdf python-chardet python-lxml
 
         You may also want to install some of the following packages,
         if you have them available on your concrete architecture:
@@ -98,8 +98,10 @@ Contents
              <http://pyxml.sourceforge.net/topics/download.html>
           - (recommended) PyRXP, for very fast XML MARC processing:
              <http://www.reportlab.org/pyrxp.html>
+          - (recommended) lxml, for XML/XLST processing:
+             <http://lxml.de/>
           - (recommended) libxml2-python, for XML/XLST processing:
-             <ftp://xmlsoft.org/libxml2/python/>
+             <ftp://xmlsoft.oqrg/libxml2/python/>
           - (recommended) simplejson, for AJAX apps:
              <http://undefined.org/python/#simplejson>
              Note that if you are using Python-2.6, you don't need to

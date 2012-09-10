@@ -4099,7 +4099,13 @@ class Template:
                                    public=False):
         """Tamplate that creates a bullet list of export as formats for a basket or an item."""
 
-        list_of_export_as_formats = [('BibTeX','hx'), ('DC','xd'), ('EndNote','xe'), ('MARCXML', 'xm'), ('NLM','xn'), ('RefWorks','xw'), ('RSS','xr')]
+        list_of_export_as_formats = [('BibTeX','hx'),
+                                     ('DC','xd'),
+                                     ('EndNote','xe'),
+                                     ('MARCXML', 'xm'),
+                                     ('NLM','xn'),
+                                     ('RefWorks','xw'),
+                                     ('RSS','xr')]
 
         recid = item and "&amp;recid=" + str(item[0]) or ""
 

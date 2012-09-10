@@ -86,7 +86,7 @@ be tweaked to give various output.</dd>
 module works and how various data manipulations are done,
 stored and retrieved.</dd>
 
-<dt><a href="bibedit-internals">BibEdit Internals</a></dt>
+<dt><a href="bibrecord-internals">BibRecord Internals</a></dt>
 <dd>Describes information useful to manipulate single records.</dd>
 
 <dt><a href="miscutil-internals">MiscUtil Internals</a></dt>

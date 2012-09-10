@@ -41,13 +41,19 @@ from invenio.bibformat import format_record
 from invenio.websearch_external_collections_getter import fetch_url_content
 import cgi
 
+xml_parser_type = 0
+try:
+    from lxml import etree
+    xml_parser_type = 1
+except ImportError:
+    try:
+        import libxml2
+        xml_parser_type = 2
+    except ImportError:
+        pass
+
 re_href = re.compile(r'<a[^>]*href="?([^">]*)"?[^>]*>', re.IGNORECASE)
 re_img = re.compile(r'<img[^>]*src="?([^">]*)"?[^>]*>', re.IGNORECASE)
-
-try:
-    import libxml2
-except ImportError:
-    pass
 
 def correct_url(htmlcode, host, path):
     """This function is used to correct urls in html code.
@@ -564,21 +570,39 @@ class ScienceCinemaXMLExternalCollectionResultsParser(ExternalCollectionResultsP
             link = ''
             image = ''
             snippets = ''
-            subnode = record_node.children
-            while subnode is not None:
-                if subnode.name == 'ostiId':
-                    ostiId = str(subnode.content)
-                elif subnode.name == 'title':
-                    title = str(subnode.content)
-                elif subnode.name == 'description':
-                    description = str(subnode.content)
-                elif subnode.name == 'link':
-                    link = str(subnode.content)
-                elif subnode.name == 'image':
-                    image = str(subnode.content)
-                elif subnode.name == 'snippets':
-                    snippets = str(subnode.content)
-                subnode = subnode.next
+            if xml_parser_type == 1:
+                # lxml
+                subnodes = record_node.iterchildren()
+                for subnode in subnodes:
+                    if subnode.tag == 'ostiId':
+                        ostiId = str(subnode.text)
+                    elif subnode.tag == 'title':
+                        title = str(subnode.text)
+                    elif subnode.tag == 'description':
+                        description = str(subnode.text)
+                    elif subnode.tag == 'link':
+                        link = str(subnode.text)
+                    elif subnode.tag == 'image':
+                        image = str(subnode.text)
+                    elif subnode.tag == 'snippets':
+                        snippets = str(subnode.text)
+            elif xml_parser_type == 2:
+                # libxml2
+                subnode = record_node.children
+                while subnode is not None:
+                    if subnode.name == 'ostiId':
+                        ostiId = str(subnode.content)
+                    elif subnode.name == 'title':
+                        title = str(subnode.content)
+                    elif subnode.name == 'description':
+                        description = str(subnode.content)
+                    elif subnode.name == 'link':
+                        link = str(subnode.content)
+                    elif subnode.name == 'image':
+                        image = str(subnode.content)
+                    elif subnode.name == 'snippets':
+                        snippets = str(subnode.content)
+                    subnode = subnode.next
             return """<table><tr><td><img style="max-width:180px" src="%(image)s"/></td><td valign="top"><b>%(title)s</b><br/>
 %(description)s<br/>
 <a href="%(link)s">%(link)s</a></td></tr></table>
@@ -594,7 +618,24 @@ class ScienceCinemaXMLExternalCollectionResultsParser(ExternalCollectionResultsP
             """Return HTML formatted version of a metadata record_node"""
             return process_audio_record(record_node)
 
-        try:
+        if xml_parser_type == 1:
+            # lxml
+            document = etree.XML(self.buffer)
+            nodes = document.iterchildren()
+            for node in nodes:
+                current_nodename = node.tag
+                if current_nodename in ['audio']:
+                    results = node.iterchildren()
+                    for result in results:
+                        if result.tag == 'record':
+                            if current_nodename == 'audio':
+                                self.add_html_result(process_audio_record(result))
+                            elif current_nodename == 'metadata':
+                                self.add_html_result(process_metadata_record(result))
+            del document
+
+        elif xml_parser_type == 2:
+            # libxml2
             document = libxml2.parseDoc(self.buffer)
             node = document.getRootElement().children
             while node is not None:
@@ -610,5 +651,7 @@ class ScienceCinemaXMLExternalCollectionResultsParser(ExternalCollectionResultsP
                         result = result.next
                 node = node.next
             document.freeDoc()
-        except Exception, e:
+
+        else:
+            # no xml parser found
             return

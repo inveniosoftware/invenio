@@ -17,18 +17,7 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibrecord_config.py \
-             bibrecord.py \
-             bibrecord_unit_tests.py \
-             refextract_cli.py \
-             refextract_daemon.py \
-             refextract_config.py \
-             refextract.py \
-             refextract_unit_tests.py \
-             refextract_authextract_unit_tests.py \
-             xmlmarc2textmarc.py \
-             textmarc2xmlmarc.py \
-             bibedit_config.py \
+pylib_DATA = bibedit_config.py \
              bibedit_dblayer.py \
              bibedit_engine.py \
              bibedit_regression_tests.py \

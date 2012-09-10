@@ -53,9 +53,9 @@ CFG_MAX_ATIME_ZIP_LOG = 7
 CFG_MAX_ATIME_RM_FMT = 28
 # After how many days to zip obsolete bibreformat fmt xml files
 CFG_MAX_ATIME_ZIP_FMT = 7
-# After how many days to remove obsolete bibharvest fmt xml files
+# After how many days to remove obsolete oaiharvest fmt xml files
 CFG_MAX_ATIME_RM_OAI = 14
-# After how many days to zip obsolete bibharvest fmt xml files
+# After how many days to zip obsolete oaiharvest fmt xml files
 CFG_MAX_ATIME_ZIP_OAI = 3
 # After how many days to remove deleted bibdocs
 CFG_DELETED_BIBDOC_MAXLIFE = 365 * 10
@@ -126,8 +126,8 @@ def clean_tempfiles():
                CFG_MAX_ATIME_ZIP_FMT, vstr))
 
     write_message("- deleting/gzipping temporary old "
-            "BibHarvest xml files")
-    gc_exec_command('find %s %s -name "bibharvestadmin.*"'
+            "OAIHarvest xml files")
+    gc_exec_command('find %s %s -name "oaiharvestadmin.*"'
         ' -exec rm %s -f {} \;' \
             % (CFG_TMPDIR, CFG_TMPSHAREDDIR, vstr))
     gc_exec_command('find %s %s -name "bibconvertrun.*"'
