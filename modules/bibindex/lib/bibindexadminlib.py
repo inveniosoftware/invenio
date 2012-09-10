@@ -1732,7 +1732,7 @@ def get_lang_list(table, field, id):
 def check_user(req, role, adminarea=2, authorized=0):
     # FIXME: Add doctype.
     # This function is similar to the one found in
-    # bibharvest/lib/oai_repository_admin.py, bibrank/lib/bibrankadminlib.py and
+    # oairepository/lib/oai_repository_admin.py, bibrank/lib/bibrankadminlib.py and
     # websubmit/lib/websubmitadmin_engine.py.
     auth_code, auth_message = acc_authorize_action(req, role)
     if not authorized and auth_code != 0:

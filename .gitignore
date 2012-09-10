@@ -44,10 +44,8 @@ modules/bibrecord/bin/xmlmarclint
 modules/bibencode/bin/bibencode
 modules/bibexport/bin/bibexport
 modules/bibformat/bin/bibreformat
-modules/bibharvest/bin/bibharvest
-modules/bibharvest/bin/oaiarchive
-modules/bibharvest/bin/oaiharvest
-modules/bibharvest/bin/oairepositoryupdater
+modules/oaiharvest/bin/oaiharvest
+modules/oairepository/bin/oairepositoryupdater
 modules/bibindex/bin/bibindex
 modules/bibindex/bin/bibstat
 modules/bibmatch/bin/bibmatch

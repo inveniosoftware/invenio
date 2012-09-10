@@ -25,7 +25,6 @@ SUBDIRS = bibauthorid \
           bibencode \
           bibexport \
           bibformat \
-          bibharvest \
           bibindex \
           bibknowledge \
           bibmatch \
@@ -38,6 +37,8 @@ SUBDIRS = bibauthorid \
           bibupload \
           elmsubmit \
           miscutil \
+          oaiharvest \
+          oairepository \
           refextract \
           webaccess \
           webalert \

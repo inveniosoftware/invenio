@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -312,8 +312,8 @@ CFG_ACC_ACTIVITIES_URLS = {
     'runbibswordclient' : (_("Run BibSword client"), "%s/bibsword/?ln=%%s" % CFG_SITE_URL),
     'cfgbibknowledge' : (_("Configure BibKnowledge"), "%s/kb?ln=%%s" % CFG_SITE_URL),
     'cfgbibformat' : (_("Configure BibFormat"), "%s/admin/bibformat/bibformatadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgoaiharvest' : (_("Configure OAI Harvest"), "%s/admin/bibharvest/oaiharvestadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgoairepository' : (_("Configure OAI Repository"), "%s/admin/bibharvest/oairepositoryadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgoaiharvest' : (_("Configure OAI Harvest"), "%s/admin/oaiharvest/oaiharvestadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgoairepository' : (_("Configure OAI Repository"), "%s/admin/oairepository/oairepositoryadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgbibindex' : (_("Configure BibIndex"), "%s/admin/bibindex/bibindexadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgbibrank' : (_("Configure BibRank"), "%s/admin/bibrank/bibrankadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgwebaccess' : (_("Configure WebAccess"), "%s/admin/webaccess/webaccessadmin.py?ln=%%s" % CFG_SITE_URL),

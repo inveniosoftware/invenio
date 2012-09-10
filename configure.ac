@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -663,17 +663,25 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibformat/lib/elements/Makefile \
      modules/bibformat/web/Makefile \
      modules/bibformat/web/admin/Makefile \
-     modules/bibharvest/Makefile \
-     modules/bibharvest/bin/Makefile \
-     modules/bibharvest/bin/oairepositoryupdater \
-     modules/bibharvest/bin/oaiharvest \
-     modules/bibharvest/doc/Makefile \
-     modules/bibharvest/doc/admin/Makefile \
-     modules/bibharvest/doc/hacking/Makefile \
-     modules/bibharvest/etc/Makefile \
-     modules/bibharvest/lib/Makefile \
-     modules/bibharvest/web/Makefile \
-     modules/bibharvest/web/admin/Makefile \
+     modules/oaiharvest/Makefile \
+     modules/oaiharvest/bin/Makefile \
+     modules/oaiharvest/bin/oaiharvest \
+     modules/oaiharvest/doc/Makefile \
+     modules/oaiharvest/doc/admin/Makefile \
+     modules/oaiharvest/doc/hacking/Makefile \
+     modules/oaiharvest/lib/Makefile \
+     modules/oaiharvest/web/Makefile \
+     modules/oaiharvest/web/admin/Makefile \
+     modules/oairepository/Makefile \
+     modules/oairepository/bin/Makefile \
+     modules/oairepository/bin/oairepositoryupdater \
+     modules/oairepository/doc/Makefile \
+     modules/oairepository/doc/admin/Makefile \
+     modules/oairepository/doc/hacking/Makefile \
+     modules/oairepository/etc/Makefile \
+     modules/oairepository/lib/Makefile \
+     modules/oairepository/web/Makefile \
+     modules/oairepository/web/admin/Makefile \
      modules/bibindex/Makefile \
      modules/bibindex/bin/Makefile \
      modules/bibindex/bin/bibindex \

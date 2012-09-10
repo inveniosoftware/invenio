@@ -54,7 +54,7 @@ The CERN development team currently consists of:
 
  - Piotr Praczyk <piotr.praczyk@gmail.com>
      OAI harvesting from arXiv.  Test harvesting interface, for
-     BibHarvest.  Record comparison library functions, for BibRecord.
+     OAIHarvest.  Record comparison library functions, for BibRecord.
      Numerous improvements to BibEdit, e.g. holding pen, copy/paste,
      undo/redo.
 
@@ -177,8 +177,8 @@ order:
      Improvements to the submission approval workflow.
 
  - Martin Vesely <martin.vesely@cern.ch>
-     BibHarvest, OAI daemon and admin interface. BibConvert
-     text-oriented mode. BibMatch.
+     OAIHarvest, OAIRepository, OAI daemon and admin
+     interface. BibConvert text-oriented mode. BibMatch.
 
  - Tony Osborne <tony.osborne@cern.ch>
      Improvements to the reference extractor.
@@ -228,7 +228,7 @@ order:
      Complex approval and refereeing subsystem, for WebSubmit.
 
  - Alberto Pepe <alberto.pepe@cern.ch>
-     BibClassify, BibHarvest Admin.
+     BibClassify, OAIHarvest Admin.
 
  - Nikolay Dyankov <ndyankov@gmail.com>
      XML-based BFX formatting engine, for BibFormat.
